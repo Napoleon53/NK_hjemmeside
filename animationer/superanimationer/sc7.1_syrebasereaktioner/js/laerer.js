@@ -8,11 +8,17 @@
    laerredets bund, som i sc4.6.
 
    Scener:
-     intro      alle faner: praesentationen (D.INTRO_*), naar eleven vil
+     intro      alle faner: praesentationen (D.INTRO_*), naar eleven vil.
+                Ét trin ad gangen med to til fire saetninger: han peger
+                paa det, der blinker, og bliver staaende, til eleven
+                trykker Naeste. Koden er faelles: NK.Praesentation.trin
+                (../kemichael/praesentation.js).
      faerdig    fane 1: alle ti reaktioner loest, kun foerste gang
-     tiITraek   fane 2 og 3: ti i traek, kun foerste gang pr. fane
+     tiITraek   fane 2 og 3: ti i traek uden fejl, kun foerste gang pr.
+                fane. Fanerne har ingen ende, saa det er deres maal.
      kaffeSur   fane 1: en hydron sluppet i kaffen (paaskeaegget)
-   Kaffekoppen er det faelles paaskeaeg.
+   Han kommer kun ind af sig selv ved de tre sidste (brugerens regler
+   4. nov. 2026). Kaffekoppen er det faelles paaskeaeg.
    ===================================================================== */
 (function () {
     "use strict";
@@ -91,66 +97,6 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen (som sc4.6) -------------------------------------------
-       Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke. Han
-       gaar kun, naar eleven vil det: knappen Spring praesentationen over, to
-       klik direkte paa ham eller Esc. */
-    function introTrin(sim, linjer, standX, peg) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: standX },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            var v = peg && peg[i];
-            trin.push({ kald: function () { sim.introTrin = i + 1; } });
-            if (v) trin.push({ arm: v, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { sim.introTrin = 0; } },
-            { gaa: UDE }
-        ]);
-    }
-
-    function introVaek(P, knapId) {
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(knapId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
-
     /* Peg paa et punkt i pixels */
     function pegPaa(sim, punkt) {
         return function () {
@@ -199,27 +145,19 @@
         return this.lay ? this.lay.kant + 120 : 200;
     };
 
-    PH.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_HYDRON,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () { return mig.plus ? { x: mig.plus.x, y: mig.plus.y } : null; }),
-                1: pegPaa(this, function () { return mig.plus ? { x: mig.pos[1].x0, y: mig.plus.y } : null; })
-            }), false);
-    };
-    introVaek(PH, "hydron-spring");
+    PH.introLinjer = function () { return D.INTRO_HYDRON; };
+    NK.Praesentation.trin(PH);
 
     PH.laererFaerdig = function () {
         if (!this.laerer) return;
         this.laererKoer("faerdig", rosTrin(D.HYDRON_FAERDIG), false);
     };
 
-    /* Paaskeaegget: en hydron i kaffen */
+    /* Paaskeaegget: en hydron i kaffen. Under praesentationen siger han
+       ikke noget; paa vej ud efter den kan han godt vende om. */
     PH.laererKaffeSur = function () {
         var L = this.laerer;
-        if (!L || (L.scene && L.scene.navn !== "intro")) return;
+        if (!L || this.kmIntro || (L.scene && L.scene.navn !== "introUd")) return;
         var mig = this;
         var replik = D.KAFFE_SUR[this.kaffeNr % D.KAFFE_SUR.length];
         this.kaffeNr++;
@@ -239,31 +177,20 @@
     };
 
     /* ----- Fane 2 og 3: tavlen ---------------------------------------------------------------- */
-    function tavleFane(P, intro, knapId) {
+    /* ros: replikken, foerste gang der er ti i traek uden fejl */
+    function tavleFane(P, intro, ros) {
         kobl(P, kaffeValg(["tiITraek"]));
         P.laererPladsPx = function () {
             return this.lay ? this.lay.R.x + 120 : 200;
         };
-        P.laererIntro = function () {
-            if (!this.laerer) return;
-            var mig = this;
-            this.laererKoer("intro", introTrin(this, intro,
-                function () { return mig.laererPlads(); },
-                {
-                    0: pegPaa(this, function () { return mig.sk ? { x: mig.sk.x[2], y: mig.lay.ligY } : null; }),
-                    1: pegPaa(this, function () {
-                        var r = mig.brikker && mig.brikker[0] && mig.brikker[0].r;
-                        return r ? { x: r.x + r.b / 2, y: r.y + r.h / 2 } : null;
-                    })
-                }), false);
-        };
-        introVaek(P, knapId);
+        P.introLinjer = function () { return intro; };
+        NK.Praesentation.trin(P);
         P.laererTiITraek = function () {
             if (!this.laerer) return;
-            this.laererKoer("tiITraek", rosTrin(D.TI_I_TRAEK), false);
+            this.laererKoer("tiITraek", rosTrin(ros), false);
         };
     }
 
-    tavleFane(NK.SimProdukter.prototype, D.INTRO_PRODUKTER, "prod-spring");
-    tavleFane(NK.SimPar.prototype, D.INTRO_PAR, "par-spring");
+    tavleFane(NK.SimProdukter.prototype, D.INTRO_PRODUKTER, D.ROS_PRODUKTER);
+    tavleFane(NK.SimPar.prototype, D.INTRO_PAR, D.ROS_PAR);
 }());

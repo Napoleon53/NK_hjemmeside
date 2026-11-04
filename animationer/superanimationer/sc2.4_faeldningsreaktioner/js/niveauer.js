@@ -8,8 +8,10 @@
 
    Alle tre har de samme fire trin som den gamle c2.4: ionerne,
    bundfaldet, formlen og ionskemaet. Et trin med givet() klares af
-   sig selv. Trin 2 paa Middel og Svær er det samme: eleven klikker
-   paa bundfaldet i faeldningstabellen.
+   sig selv. Trin 2 paa Middel og Svær er det samme: eleven slaar op i
+   faeldningstabellen og klikker paa bundfaldet. Svarknapperne vaelger
+   kun; motoren (js/opgave.js) kalder bedoem, naar der trykkes Indsend
+   svar.
    ===================================================================== */
 (function () {
     "use strict";
@@ -67,7 +69,8 @@
     /* ----- Faelles trin: bundfaldet i tabellen (niveau 2 og 3) ------------- */
     var TRIN_BUNDFALD = {
         navn: "Bundfaldet",
-        spm: "Hvilket af de nye par er tungtopløseligt? Klik på det i fældningstabellen.",
+        spm: "Ionerne bytter partner. Hvilket af de nye par er tungtopløseligt? Slå op i fældningstabellen.",
+        opslagSpm: "Ionerne i de to opløsninger bytter partner. Find det nye par, der er tungtopløseligt, og klik på det.",
         tabelKlik: function (niv, k, a) {
             var o = niv.o, ny = D.nytPar(o, k, a);
             if (ny && ny.kode === "T") {
@@ -83,7 +86,7 @@
         hint: function (niv) {
             var o = niv.o;
             niv.hint = o.nye.map(function (n) { return { kat: n.salt.kat.id, an: n.salt.an.id }; });
-            return "Ionerne bytter partner. De nye par er " + nyePar(o) + ". Slå dem begge op.";
+            return "Ionerne bytter partner. De nye par er " + nyePar(o) + ". Find begge i tabellen.";
         },
         vis: function (niv) {
             var o = niv.o;
@@ -192,13 +195,16 @@
                 givet: function () { return "givet"; }
             },
             {
-                /* To dele: foerst de nye par i tabellen, saa hvad der falder ud. */
+                /* To dele: foerst de nye par i tabellen (opslaget), saa hvad
+                   der falder ud (svar paa kortet). */
                 navn: "Bundfaldet",
                 spm: function (niv) {
-                    return niv.s.fase === "b" ? "Hvad sker der, når de to opløsninger blandes?"
-                        : "Ionerne bytter partner. Find de to nye par i fældningstabellen.";
+                    return niv.s.fase === "b" ? "De to nye par står på tavlen. Hvad falder ud?"
+                        : "Ionerne bytter partner. Slå de to nye par op i fældningstabellen.";
                 },
-                start: function (niv) { niv.s.fundne = []; niv.s.fase = "a"; niv.s.forkerte = {}; },
+                opslagSpm: "Ionerne i de to opløsninger bytter partner. Find de to nye par i tabellen, og klik på dem.",
+                slaaOp: function (niv) { return niv.s.fase === "a"; },
+                start: function (niv) { niv.s.fundne = []; niv.s.fase = "a"; },
                 tabelKlik: function (niv, k, a) {
                     if (niv.s.fase !== "a") return;
                     var o = niv.o, ny = D.nytPar(o, k, a);
@@ -221,18 +227,13 @@
                     if (D.gammeltPar(o, k, a)) niv.saetBesked(gammelt(o, k, a), "skidt");
                     else if (o.ioner.indexOf(D.ion(k)) < 0 || o.ioner.indexOf(D.ion(a)) < 0) niv.saetBesked(ikkeHer(o, k, a), "skidt");
                 },
-                valg: function (niv) {
-                    if (niv.s.fase !== "b") return "";
-                    var o = niv.o;
-                    var muligheder = [o.nye[0].salt.formel + " falder ud", o.nye[1].salt.formel + " falder ud",
-                        "Begge falder ud", "Intet bundfald"];
-                    return '<div class="valg fire">' + muligheder.map(function (m, i) {
-                        return '<button class="valgknap' + (niv.s.forkerte[i] ? " forkert" : "") + '" type="button" data-i="' + i + '"'
-                            + (niv.s.forkerte[i] ? " disabled" : "") + ">" + m + "</button>";
-                    }).join("") + "</div>";
+                muligheder: function (niv) {
+                    if (niv.s.fase !== "b") return null;
+                    var o = niv.o, r = ["0", "1", "begge", "ingen"].indexOf(rigtigtUdfald(o));
+                    return [o.nye[0].salt.formel + " falder ud", o.nye[1].salt.formel + " falder ud", "Begge falder ud", "Intet bundfald"]
+                        .map(function (t, i) { return { tekst: t, rigtig: i === r }; });
                 },
-                valgKlik: function (niv, i) {
-                    if (niv.s.fase !== "b") return;
+                bedoem: function (niv, i) {
                     var o = niv.o, v = ["0", "1", "begge", "ingen"][i], rigtig = rigtigtUdfald(o);
                     if (v === rigtig) { niv.loes(false, resultat(o, false)); return; }
                     niv.s.forkerte[i] = true;
@@ -243,7 +244,7 @@
                             ? n.salt.formel + " er L i tabellen. Det er letopløseligt og bliver i opløsning."
                             : n.salt.formel + " falder ganske rigtigt ud. Se også på det andet par.";
                     } else if (v === "ingen") {
-                        tekst = "Se efter T i de to felter, du fandt. T betyder tungtopløseligt.";
+                        tekst = "Se efter T ved de to nye par på tavlen. T betyder tungtopløseligt.";
                     } else {
                         tekst = o.udfald === "ingen" ? "Begge nye par er L i tabellen." : "Kun det ene af de nye par er T i tabellen.";
                     }
@@ -324,37 +325,42 @@
         trin: [
             {
                 navn: "Ionerne",
-                spm: "Hvilke ioner er der i de to opløsninger? Klik på dem.",
+                spm: "Hvilke ioner er der i de to opløsninger? Vælg alle fire, og tryk Indsend svar.",
+                flere: true,
                 start: function (niv) {
                     var o = niv.o;
                     niv.s.fundneIoner = {};
-                    niv.s.forkerte = {};
                     niv.s.chips = NK.bland(o.ioner.map(function (i) { return { ion: i, tekst: ionT(i) }; })
                         .concat(D.ionAtrapper(o)));
                 },
-                valg: function (niv) {
-                    return '<div class="valg chips">' + niv.s.chips.map(function (c, i) {
-                        var brugt = c.ion && niv.s.fundneIoner[c.ion.id], forkert = niv.s.forkerte[i];
-                        return '<button class="ionknap' + (forkert ? " forkert" : "") + (brugt ? " brugt" : "") + '" type="button" data-i="' + i + '"'
-                            + (brugt || forkert ? " disabled" : "") + ">" + c.tekst + "</button>";
-                    }).join("") + "</div>";
+                muligheder: function (niv) {
+                    return niv.s.chips.map(function (c) {
+                        return { tekst: c.tekst, rigtig: !!c.ion, fundet: !!(c.ion && niv.s.fundneIoner[c.ion.id]) };
+                    });
                 },
-                valgKlik: function (niv, i) {
-                    var o = niv.o, c = niv.s.chips[i];
-                    if (c.ion) {
-                        niv.s.fundneIoner[c.ion.id] = true;
-                        /* Begge ioner fra ét salt: de dukker op i glasset. */
-                        var S = D.saltMed(o, c.ion);
-                        if (niv.s.fundneIoner[S.kat.id] && niv.s.fundneIoner[S.an.id]) niv.baeger.visIoner(S === o.A ? "A" : "B");
-                        if (Object.keys(niv.s.fundneIoner).length === 4) {
-                            niv.loes(false, "Rigtigt. Ionerne svømmer rundt hver for sig i opløsningerne.");
-                            return;
-                        }
-                        niv.besked = { tekst: c.tekst + " er med i " + D.saltMed(o, c.ion).formel + ".", klasse: "god" };
-                    } else {
-                        niv.s.forkerte[i] = true;
-                        niv.besked = { tekst: c.tekst + ": " + c.forklaring, klasse: "skidt" };
+                /* Er der et forkert valg med, godkendes intet: de forkerte bliver
+                   roede med forklaring, og de rigtige bliver staaende som valgt.
+                   Ellers godkendes de valgte, og et salts ioner dukker op i dets
+                   glas, naar begge er fundet. */
+                bedoem: function (niv, valgte) {
+                    var o = niv.o, chips = niv.s.chips;
+                    var forkerte = valgte.filter(function (i) { return !chips[i].ion; });
+                    if (forkerte.length) {
+                        forkerte.forEach(function (i) { niv.s.forkerte[i] = true; });
+                        niv.s.valgt = valgte.filter(function (i) { return chips[i].ion; });
+                        var c = chips[forkerte[0]];
+                        niv.besked = { tekst: c.tekst + ": " + c.forklaring
+                            + (forkerte.length > 1 ? " De andre røde svar passer heller ikke." : ""), klasse: "skidt" };
+                        niv.vis();
+                        return;
                     }
+                    valgte.forEach(function (i) { niv.s.fundneIoner[chips[i].ion.id] = true; });
+                    [["A", o.A], ["B", o.B]].forEach(function (x) {
+                        if (niv.s.fundneIoner[x[1].kat.id] && niv.s.fundneIoner[x[1].an.id]) niv.baeger.visIoner(x[0]);
+                    });
+                    var mangler = 4 - Object.keys(niv.s.fundneIoner).length;
+                    if (!mangler) { niv.loes(false, "Rigtigt. Ionerne svømmer rundt hver for sig i opløsningerne."); return; }
+                    niv.besked = { tekst: "Rigtigt indtil videre. Der mangler " + (mangler === 1 ? "én ion" : ["", "", "to", "tre"][mangler] + " ioner") + ".", klasse: "god" };
                     niv.vis();
                 },
                 hint: function () { return HINT_IONER; },
@@ -370,16 +376,12 @@
                 spm: "Hvad er formlen for bundfaldet?",
                 start: function (niv) {
                     var P = niv.o.P;
-                    niv.s.forkerte = {};
                     niv.s.formelValg = NK.bland([{ tekst: P.formel, rigtig: true }].concat(D.formelVarianter(P).slice(0, 3)));
                 },
-                valg: function (niv) {
-                    return '<div class="valg fire">' + niv.s.formelValg.map(function (v, i) {
-                        var f = niv.s.forkerte[i];
-                        return '<button class="valgknap formel' + (f ? " forkert" : "") + '" type="button" data-i="' + i + '"' + (f ? " disabled" : "") + ">" + v.tekst + "</button>";
-                    }).join("") + "</div>";
+                muligheder: function (niv) {
+                    return niv.s.formelValg.map(function (v) { return { tekst: v.tekst, rigtig: !!v.rigtig }; });
                 },
-                valgKlik: function (niv, i) {
+                bedoem: function (niv, i) {
                     var v = niv.s.formelValg[i], P = niv.o.P;
                     if (v.rigtig) { niv.loes(false, "Rigtigt. " + D.hvorforFormel(P)); return; }
                     niv.s.forkerte[i] = true;
@@ -392,7 +394,7 @@
             },
             {
                 navn: "Ionskemaet",
-                spm: "Afstem ionskemaet, og vælg tilstandsform.",
+                spm: "Afstem ionskemaet på tavlen med + og −, og klik på tilstandsformen.",
                 start: function (niv) { niv.s.k = [1, 1, 1]; niv.s.t = ["", "", ""]; },
                 tavleKlik: function (niv, b) {
                     var s = niv.s;
@@ -463,8 +465,8 @@
         trin: [
             {
                 navn: "Ionerne",
-                spm: "Skriv ionerne i de to opløsninger.",
-                valg: function () { return LADNINGSKNAPPER; },
+                spm: "Skriv ionerne i de to opløsninger på tavlen.",
+                vaerktoej: function () { return LADNINGSKNAPPER; },
                 tjek: function (niv) {
                     var o = niv.o, s = niv.s, foerste = null;
                     s.fejl = {};
@@ -502,8 +504,8 @@
             TRIN_BUNDFALD,
             {
                 navn: "Formlen",
-                spm: "Skriv formlen for bundfaldet.",
-                valg: function () { return SKRIVNOTE; },
+                spm: "Skriv formlen for bundfaldet på tavlen.",
+                vaerktoej: function () { return SKRIVNOTE; },
                 tjek: function (niv) {
                     var P = niv.o.P;
                     var v = F.vurderSalt(niv.s.felt.P, P, { o: niv.o });
@@ -526,8 +528,8 @@
             },
             {
                 navn: "Ionskemaet",
-                spm: "Skriv ionskemaet med tal foran og tilstandsform.",
-                valg: function () { return LADNINGSKNAPPER; },
+                spm: "Skriv ionskemaet på tavlen med tal foran og tilstandsform.",
+                vaerktoej: function () { return LADNINGSKNAPPER; },
                 tjek: function (niv) {
                     var s = niv.s;
                     /* Et tal skrevet foran formlen flyttes over i talfeltet. */

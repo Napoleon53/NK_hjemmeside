@@ -36,7 +36,7 @@
     D.BROEK = [
         {
             id: "hi", gruppe: "gas", navn: "Hydrogeniodid",
-            tekst: "Hydrogen og iod danner hydrogeniodid. Alle tre stoffer er gasser.",
+            tekst: "Dihydrogen og diiod danner hydrogeniodid. Alle tre stoffer er gasser.",
             r: [[1, "H2", "g"], [1, "I2", "g"]],
             p: [[2, "HI", "g"]],
             stoffer: ["H2", "I2", "HI", "H", "I", "H2O"],
@@ -44,7 +44,7 @@
         },
         {
             id: "nh3", gruppe: "gas", navn: "Ammoniaksyntesen",
-            tekst: "Haber-Bosch-processen, hvor ammoniak fremstilles af nitrogen og hydrogen.",
+            tekst: "Haber-Bosch-processen, hvor ammoniak fremstilles af dinitrogen og dihydrogen.",
             r: [[1, "N2", "g"], [3, "H2", "g"]],
             p: [[2, "NH3", "g"]],
             stoffer: ["N2", "H2", "NH3", "NO", "O2", "N"],
@@ -96,7 +96,7 @@
             r: [[2, "H2O", "l"]],
             p: [[1, "H3O^+", "aq"], [1, "OH^-", "aq"]],
             stoffer: ["H2O", "H3O^+", "OH^-", "H^+", "O2", "H2"],
-            forklaring: "Vandet er opløsningsmiddel, H₂O(l), og er ikke med, heller ikke med koefficienten 2. Nævneren bliver 1. Brøken er vands ionprodukt K<sub>v</sub>, som er 1,0 · 10⁻¹⁴ (mol/L)² ved 25 °C."
+            forklaring: "H₂O(l) er opløsningsmiddel og er ikke med, heller ikke med koefficienten 2. Nævneren bliver 1. Brøken er vands ionprodukt K<sub>v</sub> = 1,0 · 10⁻¹⁴ (mol/L)² ved 25 °C."
         },
         {
             id: "fescn", gruppe: "vand", navn: "Jernthiocyanat",
@@ -276,7 +276,7 @@
             hvorfor: "Kantede parenteser betyder koncentration, altså stofmængde pr. liter: mol/L."
         },
         {
-            q: "N₂(g) + 3H₂(g) ⇌ 2NH₃(g). Hvordan står hydrogen i reaktionsbrøken?",
+            q: "N₂(g) + 3H₂(g) ⇌ 2NH₃(g). Hvordan står dihydrogen i reaktionsbrøken?",
             svar: ["[H₂]³", "3·[H₂]", "[H₂]", "[3H₂]"],
             nej: [null, "Koefficienten bliver ikke til et tal, der ganges på.", "Koefficienten 3 skal med.", "Koefficienten hører ikke inden i parentesen."],
             hvorfor: "Koefficienten 3 bliver til eksponenten 3, så leddet er [H₂]³."

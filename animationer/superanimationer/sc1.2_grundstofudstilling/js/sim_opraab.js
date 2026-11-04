@@ -171,7 +171,6 @@
         var mig = this;
         NK.el("opraab-knap").addEventListener("click", function () { mig.spilKnap("opraab"); });
         NK.el("opraab-hvem").addEventListener("click", function () { mig.spilKnap("hvem"); });
-        NK.el("opraab-spring").addEventListener("click", function () { mig.springIntro(); });
         this.bygTilbud();
         this.valgKnapper = [];
         var v = NK.el("opraab-valg");
@@ -403,8 +402,8 @@
     };
 
     /* ----- Kemichaels praesentation ----------------------------------------
-       Tilbuddet med Start praesentation og Nej tak: js/praesentation.js */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc1.2-intro-opraab", tilbud: "opraab-tilbud", spring: "opraab-spring" });
+       Tilbuddet med Start praesentation og Nej tak: ../kemichael/praesentation.js */
+    NK.Praesentation.kobl(P, { noegle: "nk-sc1.2-intro-opraab", tilbud: "opraab-tilbud" });
 
     P.enter = function () {
         if (this.tilstand !== "koerer") this.startKnap();

@@ -129,7 +129,7 @@
         /* Serien er klaret: klistermaerket kraever, at hoejst tre svar er vist */
         if (s.status.every(function (x) { return x > 0; })) {
             var vistAntal = s.status.filter(function (x) { return x === 2; }).length;
-            this.klaret("nv-" + this.retning + "-" + this.slags, vistAntal <= 3, D.ROS[this.retning]);
+            this.klaret("nv-" + this.retning + "-" + this.slags, vistAntal <= 3, D.KLISTER_KRAV.serie);
         }
         this.visPanel();
     };
@@ -154,8 +154,8 @@
         var inp = NK.el("nv-input"), felt = NK.el("nv-felt");
         var r = NK.Tjek.navn(inp.value, this.maal);
         if (r.ok) {
-            this.loes(this.maal.res, this.visteSvar);
             this.besked("<b>Rigtigt: " + NK.html(this.maal.navn) + ".</b>" + (r.note ? " " + NK.html(r.note) : ""), "god");
+            this.loes(this.maal.res, this.visteSvar);
             felt.classList.add("ok");
             inp.disabled = true;
             return;
@@ -197,8 +197,8 @@
         if (this.retning === "byg") {
             var m = this.maal.mol.kopi();
             this.braet.saet(m, true);
-            this.loes(NK.Navn.analyser(m), true);
             this.besked("Sådan ser <b>" + NK.html(this.maal.navn) + "</b> ud. Hovedkæden er grøn, sidegrupperne blå.", "gul");
+            this.loes(NK.Navn.analyser(m), true);
             return;
         }
         this.visteSvar = true;
@@ -206,8 +206,8 @@
         inp.value = this.maal.navn;
         inp.disabled = true;
         NK.el("nv-felt").classList.add("svar");
-        this.loes(this.maal.res, true);
         this.besked("Svaret: <b>" + NK.html(this.maal.navn) + "</b>.", "gul");
+        this.loes(this.maal.res, true);
     };
 
     /* ----- Panelet --------------------------------------------------------------------- */
@@ -302,8 +302,7 @@
     P.enter = function () { if (this.loest) this.knap(); else this.tjekNavn(); };
     P.fokus = function () { if (this.retning === "navn" && !this.loest) NK.el("nv-input").focus(); };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-navne", tilbud: "nv-tilbud", spring: "nv-spring" });
-    P.pegPaaFelt = function (til) { NK.el("nv-felt").classList.toggle("peg", til && this.retning === "navn"); };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-navne", tilbud: "nv-tilbud" });
 
     NK.SimNavne = SimNavne;
 }());

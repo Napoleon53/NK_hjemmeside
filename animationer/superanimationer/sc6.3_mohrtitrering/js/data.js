@@ -28,9 +28,9 @@
        kraftig), skyer: skyerne, hvor draaben rammer, suppe: det, kolben
        ligner langt forbi omslaget. */
     D.ORD = {
-        dcf: { navn: "dichlorfluorescein", start: "gulgrøn", svag: "svagt lyserød", farve: "lyserød", Farve: "Lyserød",
+        dcf: { navn: "dichlorfluorescein", start: "gulgrøn", svag: "svagt lyserød", farve: "lyserød",
                tydelig: "tydeligt lyserød", kraftig: "kraftigt lyserød", skyer: "lyserøde skyer", suppe: "hindbærsmoothie" },
-        chromat: { navn: "kaliumchromat", start: "gul", svag: "svagt rødbrun", farve: "rødbrun", Farve: "Rødbrun",
+        chromat: { navn: "kaliumchromat", start: "gul", svag: "svagt rødbrun", farve: "rødbrun",
                    tydelig: "tydeligt rødbrun", kraftig: "mørk rødbrun", skyer: "rødbrune skyer", suppe: "tomatsuppe" }
     };
 
@@ -39,11 +39,22 @@
         D.O = o;
         D.TITRER_HINT = "Træk skyderen ved hanen mod højre. Dryp til sidst, og luk hanen, så snart kolben bliver " + o.svag + ".";
         D.INTRO_TITRERING = [
-            "Titreringen. Havvand i kolben, sølvnitrat i buretten.",
-            "Åbn hanen, og luk den, når kolben bliver " + o.farve + ".",
-            "Sølvnitrat giver sorte fingre. Spørg mig ikke hvordan."
+            { tekst: "I denne fane titrerer du havvand med sølvnitrat for at bestemme, hvor meget chlorid havvandet indeholder. " +
+                "Kolben indeholder 1,00 g havvand, 20 mL demineraliseret vand og lidt " + o.navn + ", som farver væsken " + o.start + ". " +
+                "Buretten indeholder sølvnitrat.",
+              sel: ["#tit-anker-buret", "#tit-anker-kolbe"] },
+            { tekst: "Du åbner hanen ved at trække skyderen mod højre, og knappen 1 dråbe tilsætter én dråbe ad gangen. " +
+                "Du lukker hanen, så snart kolben er " + o.svag + " og forbliver det. " +
+                "Luppen viser imens, hvordan hver Ag⁺ fælder en Cl⁻ som hvidt sølvchlorid.",
+              sel: ["#tit-anker-hane", "#tit-anker-lup"] },
+            { tekst: "Når kolben har skiftet farve, aflæser du forbruget på buretten ved menisken i panelet og skriver tallet i feltet på kortet øverst i scenen. " +
+                "Kurven viser undervejs, hvordan stofmængderne i kolben ændrer sig. " +
+                "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
+              sel: ["#tit-skort", "#tit-buretkort", "#tit-kurvekort"] }
         ];
-        D.ROS_TITRERING = o.Farve + " på én dråbe. Det tager nogle et helt år.";
+        D.ROS_TITRERING = "Kolben blev " + o.farve + " på den sidste dråbe. Nogle elever bruger et helt år på at nå den præcision.";
+        /* Over 1 mL forbi omslaget, foerste gang og derefter hver tredje
+           (brugerens valg 4. nov. 2026, se tjekMork i sim_titrering.js) */
         D.BEM_MORK = "Stop nu, medmindre du vil lave " + o.suppe + ".";
     };
 
@@ -77,7 +88,7 @@
        post: kolben faar postevand med lidt chlorid i stedet for
        demineraliseret vand. spm: "forbrug" (forbruget af soelvnitrat)
        eller "procent". samme: brug forrige situations kolber.
-       titel: overskriften i opgavekortet, aendring: skiltet ved kolbe B. */
+       titel: i etiketten paa kortet, aendring: skiltet ved kolbe B. */
     D.FORBRUG_VALG = ["Større", "Det samme", "Mindre"];
     D.PROCENT_VALG = ["For høj", "Korrekt", "For lav"];
 
@@ -145,24 +156,50 @@
     ];
 
     /* ----- Kemichael --------------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
-    /* D.INTRO_TITRERING, D.ROS_TITRERING og D.BEM_MORK skrives af D.saetOrd */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (de
+       usynlige .anker over laerredet og kortene i panelet). felt: kolberne
+       paa fane 3, tegnet paa laerredet (introFelt i js/laerer.js). Ingen
+       vittigheder i praesentationen.
+       D.INTRO_TITRERING og D.ROS_TITRERING skrives af D.saetOrd, fordi
+       farverne afhaenger af indikatoren. */
     D.INTRO_BEREGNING = [
-        "Beregningen. Fra forbruget til saltet i havvandet.",
-        "Skriv først formlen og så tallet i feltet til højre.",
-        "Enhederne skal med. Også når ingen kigger."
+        { tekst: "I denne fane beregner du masseprocenten af natriumchlorid i havvandet ud fra forbruget af sølvnitrat. " +
+            "Tavlen viser de fire trin i beregningen, og hvert trin bliver skrevet færdigt, når du har regnet det.",
+          sel: "#ber-anker-tavle" },
+        { tekst: "Målingen øverst i panelet er din egen fra fane 1. " +
+            "Har du ikke titreret selv, regner du på en klassekammerats måling. " +
+            "Når beregningen er færdig, giver knappen Ny opgave en ny måling.",
+          sel: "#ber-data" },
+        { tekst: "I hvert af de fire trin skriver du først formlen og derefter tallet i feltet på kortet øverst i scenen. " +
+            "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
+          sel: "#ber-skort" }
     ];
     D.INTRO_FORBRUG = [
-        "Fejlkilder. Én ting er ændret ved kolbe B.",
-        "Gæt, hvad der sker. Så titrerer jeg dem begge.",
-        "Sølvnitrat er dyrt. Jeg drypper, som var det mit eget."
+        { tekst: "I denne fane undersøger du, hvordan en ændring ved titreringen påvirker forbruget og masseprocenten. " +
+            "Kolbe A er som på fane 1, mens én ting er ændret ved kolbe B. " +
+            "Skiltet under kolbe B viser ændringen.",
+          felt: ["kolbeA", "kolbeB"] },
+        { tekst: "På kortet øverst i scenen vælger du, hvordan forbruget af sølvnitrat eller masseprocenten bliver for kolbe B i forhold til kolbe A, og trykker på Indsend svar. " +
+            "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
+          sel: "#for-skort" },
+        { tekst: "Når du har valgt et svar, bliver begge kolber titreret til omslaget. " +
+            "Tabellen i panelet viser bagefter forbruget og masseprocenten for begge kolber, og kortet forklarer resultatet.",
+          sel: "#for-tabelkort" }
     ];
 
-    D.ROS_BEREGNING = "Saltet er talt. Med enheder.";
-    D.ROS_FORBRUG = "Tolv kolber. Opvasken tager jeg ikke.";
+    /* Ros, foerste gang en hel fane er klaret (én gang pr. browser). Det
+       er sammen med paaskeaeggene de eneste gange, han kommer ind af sig
+       selv (brugerens regel 4. nov. 2026). */
+    D.ROS_BEREGNING = "Du har beregnet masseprocenten ud fra forbruget i buretten. Saltet i havvandet er nu talt.";
+    D.ROS_FORBRUG = "Du har gennemført alle seks opgaver om fejlkilder. Det blev til tolv kolber, og opvasken tager jeg ikke.";
 
-    D.BEM_TOM = "Hele buretten. Sølv er ikke gratis.";
-    D.AEG_PRAECIS = "På hundrededelen. Det har jeg aldrig ramt.";
+    /* Paaskeaeggene: buretten er loebet tom, og et resultat, der rammer
+       havvandets masseprocent paa hundrededelen */
+    D.BEM_TOM = "Du har tømt hele buretten. Sølvnitrat er ikke gratis.";
+    D.AEG_PRAECIS = "Dit resultat rammer havvandets masseprocent på hundrededelen. Det har jeg aldrig selv gjort.";
 
     D.saetOrd(NK.Kemi ? NK.Kemi.indikator : "dcf");
     NK.Data = D;

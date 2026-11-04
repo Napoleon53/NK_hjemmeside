@@ -110,6 +110,13 @@ sync; denne er færdig.
   altid kan ses (Giv hint, Næste hint, Vis svaret), og den lyser stille op
   efter et forkert svar. På papirkortet er den en stille knap med gul kant. Se superanimationernes README under
   "Kemichael".
+- Hvor Kemichael stadig er med (brugerens regler 4. nov. 2026): han taler altid
+  formelt, i hele sætninger som i Kemibogen, også i kaffe og påskeæg. Præsentationen
+  har to til fire trin med to til fire sætninger og to knapper, Næste og Spring
+  præsentationen over (fælles kode i `animationer/superanimationer/kemichael/praesentation.js`).
+  Han kommer kun ind af sig selv, når en fane eller animationen er gennemført, når
+  eleven gør noget vildt, eller når han har noget sjovt at sige (højst én gang pr.
+  fane). Se `animationer/superanimationer/kemichael/README.md`.
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
   Punkterne om superanimationer gælder som hidtil og arbejdes i

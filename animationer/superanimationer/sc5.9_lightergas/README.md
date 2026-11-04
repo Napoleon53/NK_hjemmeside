@@ -89,7 +89,10 @@ nævner det:
 **Påskeæggene, hvor forsøget går helt galt.** Kemichael kommer ind forfra,
 siger én tør replik (og, hvis målingen er i gang, at man bør starte
 forfra) og går igen. Uheldet skrives i hans uheldsregnskab. Replikkerne
-står i `D.PAATALE`.
+står i `D.PAATALE`. Han kommer ikke ind af andre grunde. Alt, hvad han siger, er
+hele sætninger i formelt sprog som i Kemibogen (brugerens regel 4. nov. 2026, se
+`../kemichael/README.md`); tørheden er bevaret, og replikken om at starte forfra
+nævner knappen Start forfra nederst til højre.
 
 * **Stikflammen:** hjulet på en tunet lighter. Første gang i en browser
   kommer glimtet om øjenbrynene fra 1994.

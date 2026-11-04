@@ -222,10 +222,9 @@ function koerTest(W) {
         var Fa = B.facit(o);
         facitBrikker(B, Fa.num).forEach(function (t) { S.tilfoej("num", t); });
         facitBrikker(B, Fa.den).forEach(function (t) { S.tilfoej("den", t); });
-        S.tjek();
-        var st = d.getElementById("br-status");
-        if (!S.faerdig || !st.classList.contains("god") || d.getElementById("br-stempel").hidden) loesFejl.push(o.id);
-        tekster.push(S.promptHTML(), S.beskedTekst());
+        S.indsend();
+        if (!S.faerdig || !S.el.skort.querySelector(".sk-bund.bliv.god") || d.getElementById("br-stempel").hidden) loesFejl.push(o.id);
+        tekster.push(S.kortTekst());
         S.nulstil();
     });
     paastand("alle 12 kan skrives med brikkerne", loesFejl.length === 0, loesFejl.join(", "));
@@ -233,11 +232,12 @@ function koerTest(W) {
     S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
     S.visListe();
     S.vaelg(1); S.nulstil();
-    paastand("en ny opgave har en tom brøk og en grå linje", !S.opg.a.num.length && d.getElementById("br-status").className === "statuslinje");
+    paastand("en ny opgave har en tom brøk, en neutral linje og et gråt Indsend svar", !S.opg.a.num.length &&
+        !/skidt|hint|god/.test(S.el.status.className) && S.el.indsend.classList.contains("ikke-klar"));
     S.tilfoej("num", { k: "stof", v: "NH3" }); S.tilfoej("num", { k: "eks", v: 2 });
     S.tilfoej("den", { k: "stof", v: "N2" }); S.tilfoej("den", { k: "tegn", v: "+" }); S.tilfoej("den", { k: "stof", v: "H2" });
-    S.tjek();
-    var st = d.getElementById("br-status");
+    S.indsend();
+    var st = S.el.status;
     paastand("en fejl gør linjen rød og får den til at ryste", st.classList.contains("skidt") && st.classList.contains("ryster"));
     paastand("brikken med fejlen er rød", d.querySelectorAll("#br-den .brik.rod").length === 1 && d.querySelector("#br-den .brik.rod").textContent === "+");
     paastand("knappen lyser stille efter en fejl", S.el.knap.classList.contains("peg"));
@@ -249,14 +249,14 @@ function koerTest(W) {
     paastand("en ændring starter trappen forfra", S.hjaelp === 0 && S.el.knap.textContent === "Giv et hint" && !d.querySelector("#br-den .brik.rod"));
     S.knap(); S.knap(); S.knap(); S.knap();
     paastand("Vis svaret skriver facit og giver det gule stempel", S.faerdig && B.dom(S.opg.o, S.opg.a.num, S.opg.a.den).ok &&
-        d.getElementById("br-status").classList.contains("gul") && d.getElementById("br-stempel").textContent === "Svaret");
+        S.el.skort.classList.contains("svar") && d.getElementById("br-stempel").textContent === "Svaret");
     paastand("uden stjerne, når svaret er vist", !S.status[1].stjerne);
-    paastand("knappen går videre til næste opgave", /Næste opgave/.test(S.el.knap.textContent));
+    paastand("kortets grønne knap går videre til næste opgave", /Næste opgave/.test((S.el.skort.querySelector("[data-videre]") || {}).textContent || ""));
     S.knap();
     paastand("Næste opgave er en anden reaktion", S.nr !== 1);
     /* Loest opgave: skemaet farvet, det, der ikke er med, streget ud */
     S.vaelg(11); S.nulstil();
-    S.tilfoej("num", { k: "stof", v: "CO2" }); S.tjek();
+    S.tilfoej("num", { k: "stof", v: "CO2" }); S.indsend();
     paastand("kalkbrænding: [CO₂] alene er rigtigt, og nævneren viser 1", S.faerdig && d.querySelector("#br-den .auto-en") !== null);
     paastand("de faste stoffer er streget ud i skemaet", d.querySelectorAll("#br-skema .art.ude").length === 2 && d.querySelectorAll("#br-skema .art.op").length === 1);
     paastand("arbejdet huskes, når man springer frem og tilbage", (function () {
@@ -368,22 +368,29 @@ function koerTest(W) {
         var dele = d.querySelectorAll("#ff-tavle .del");
         if (!o.slags) {
             dele[0].click();
+            if (F.faerdig || dele[0].classList.contains("god") || !dele[0].classList.contains("valgt")) ffFejl.push(o.id + " klik vælger kun");
+            F.indsend();
             if (F.faerdig || !dele[0].classList.contains("god")) ffFejl.push(o.id + " klik");
-            F.ingenFejl();
-            if (!F.faerdig || !d.getElementById("ff-status").classList.contains("god")) ffFejl.push(o.id + " ingen fejl");
+            F.valgKlik(0);
+            if (F.faerdig) ffFejl.push(o.id + " ingen fejl dømt uden Indsend");
+            F.indsend();
+            if (!F.faerdig || !F.el.skort.querySelector(".sk-bund.bliv.god") || !F.el.skort.querySelector(".sk-knap.rigtig")) ffFejl.push(o.id + " ingen fejl");
+            tekster.push(F.kortTekst());
             return;
         }
-        F.ingenFejl();
-        if (F.faerdig || !d.getElementById("ff-status").classList.contains("skidt")) ffFejl.push(o.id + " ingen fejl godtaget");
+        F.valgKlik(0); F.indsend();
+        if (F.faerdig || !F.el.status.classList.contains("skidt")) ffFejl.push(o.id + " ingen fejl godtaget");
         /* En rigtig del foerst, hvis der er en */
         var god = Array.prototype.filter.call(dele, function (e) { return !F.erMaal(e.getAttribute("data-z"), parseInt(e.getAttribute("data-i"), 10)); })[0];
-        if (god) { god.click(); if (F.faerdig || !god.classList.contains("god")) ffFejl.push(o.id + " god del"); tekster.push(F.beskedTekst()); }
+        if (god) { god.click(); F.indsend(); if (F.faerdig || !god.classList.contains("god")) ffFejl.push(o.id + " god del"); tekster.push(F.beskedTekst()); }
         var mal = Array.prototype.filter.call(dele, function (e) { return F.erMaal(e.getAttribute("data-z"), parseInt(e.getAttribute("data-i"), 10)); })[0];
         mal.click();
+        if (F.faerdig) ffFejl.push(o.id + " fejlen dømt uden Indsend");
+        F.indsend();
         if (!F.faerdig || !mal.classList.contains("fejlen") || d.getElementById("ff-rettet").hidden) ffFejl.push(o.id + " fundet");
-        tekster.push(F.beskedTekst(), F.promptHTML());
+        tekster.push(F.beskedTekst(), F.kortTekst());
     });
-    paastand("hver tavle kan rettes, og Ingen fejl godtages kun uden fejl", ffFejl.length === 0, ffFejl.join(", "));
+    paastand("hver tavle kan rettes med Indsend svar, og Der er ingen fejl godtages kun uden fejl", ffFejl.length === 0, ffFejl.join(", "));
     F.vaelg(4);
     F.knap(); F.knap(); F.knap();
     paastand("hint i tre trin, og stoffet lyser i skemaet", /Hint 3 af 3/.test(F.beskedTekst()) && d.querySelector("#ff-skema .art.lys") !== null);
@@ -418,7 +425,7 @@ function koerTest(W) {
         else if (Array.isArray(x)) x.forEach(saml);
         else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
     }({ B: D.BROEK.map(function (o) { return [o.navn, o.tekst, o.forklaring]; }), F: D.FAERDIG, R: D.ROS_OPGAVE }));
-    D.BROEK.forEach(function (o, i) { S.vaelg(i); tekster.push(S.promptHTML(), S.trinLinje()); });
+    D.BROEK.forEach(function (o, i) { S.vaelg(i); tekster.push(S.kortTekst(), S.trinLinje()); });
     tekster.push(F.trinLinje());
     tekster.push(d.getElementById("teori").textContent, d.body.textContent);
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -449,11 +456,10 @@ function koerTest(W) {
             var sk = d.getElementById("br-skema");
             if (sk.scrollWidth > sk.clientWidth + 1) lFejl.push(m.join("×") + " skemaet " + o.id);
             mindstSkema = Math.min(mindstSkema, parseFloat(W.getComputedStyle(sk).fontSize));
-            if (!under(d.getElementById("br-bakke"), d.getElementById("br-status"))) lFejl.push(m.join("×") + " bakken bag statuslinjen " + o.id);
+            if (!under(S.el.skort, d.getElementById("br-tavle"))) lFejl.push(m.join("×") + " kortet over tavlen " + o.id);
             var t = d.getElementById("br-tavle").getBoundingClientRect(), s = sc.getBoundingClientRect();
             if (t.top < s.top || t.right > s.right + 1 || t.left < s.left - 1) lFejl.push(m.join("×") + " tavlen uden for scenen " + o.id);
-            var tj = d.getElementById("br-tjek").getBoundingClientRect();
-            if (tj.right > t.right) lFejl.push(m.join("×") + " Tjek uden for tavlen " + o.id);
+            if (d.getElementById("br-bakke").getBoundingClientRect().bottom > s.bottom + 1) lFejl.push(m.join("×") + " bakken under scenen " + o.id);
             S.nulstil();
         });
         NK.visFane("fane-ff");
@@ -462,9 +468,11 @@ function koerTest(W) {
             F.tilpas();
             var sk = d.getElementById("ff-skema");
             if (sk.scrollWidth > sk.clientWidth + 1) lFejl.push(m.join("×") + " skemaet " + o.id);
-            if (!under(d.getElementById("ff-ingen"), d.getElementById("ff-status"))) lFejl.push(m.join("×") + " Ingen fejl bag statuslinjen " + o.id);
-            F.ingenFejl(); if (!F.faerdig) F.knap(), F.knap(), F.knap(), F.knap();
-            if (!under(d.getElementById("ff-tavle"), d.getElementById("ff-status"))) lFejl.push(m.join("×") + " den rettede tavle bag statuslinjen " + o.id);
+            if (!under(F.el.skort, d.getElementById("ff-tavle"))) lFejl.push(m.join("×") + " kortet over tavlen " + o.id);
+            F.valgKlik(0); F.indsend(); if (!F.faerdig) F.knap(), F.knap(), F.knap(), F.knap();
+            var sf = d.querySelector("#fane-ff .scene").getBoundingClientRect();
+            if (d.getElementById("ff-tavle").getBoundingClientRect().bottom > sf.bottom + 1) lFejl.push(m.join("×") + " den rettede tavle under scenen " + o.id);
+            if (!under(F.el.skort, d.getElementById("ff-tavle"))) lFejl.push(m.join("×") + " det løste kort over tavlen " + o.id);
             F.tilpas();
         });
         ["#fane-br .panel", "#fane-ff .panel"].forEach(function (sel) {
@@ -480,7 +488,7 @@ function koerTest(W) {
     NK.visFane("fane-br");
     S.vaelg(0);
     var smaa = [];
-    d.querySelectorAll(".panel *, .tavle *, .bakke *, .statuslinje *").forEach(function (e) {
+    d.querySelectorAll(".panel *, .tavle *, .bakke *, .scenekort *").forEach(function (e) {
         if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
         var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
         if (!egen) return;
@@ -488,6 +496,101 @@ function koerTest(W) {
         if (px < 11.5) smaa.push(e.className + " " + px);
     });
     paastand("ingen tekst under 11,5 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("10. Papirkortet (4. nov. 2026)");
+    paastand("papirkortet er slået til (body.papirkort og faelles/papirkort.css)", d.body.classList.contains("papirkort") &&
+        Array.prototype.some.call(d.querySelectorAll("link[rel=stylesheet]"), function (l) { return /faelles\/papirkort\.css$/.test(l.getAttribute("href")); }) && !!NK.Papir);
+    paastand("kortet står i scenen, ikke i panelet", d.querySelector("#fane-br .scene > #br-skort") && d.querySelector("#fane-ff .scene > #ff-skort") &&
+        !d.querySelector(".panel .scenekort") && !d.getElementById("br-prompt") && !d.getElementById("ff-prompt"));
+    paastand("ingen statuslinje eller opgavelinje nederst", !d.querySelector(".statuslinje") && !d.querySelector(".opgavelinje") && !d.getElementById("br-tjek") && !d.getElementById("ff-ingen"));
+    paastand("Start forfra står i panelet, ikke på kortet", d.querySelector("#fane-br .panel #br-forfra") && d.querySelector("#fane-ff .panel #ff-forfra") &&
+        !Array.prototype.some.call(d.querySelectorAll(".scenekort button"), function (b) { return /forfra/i.test(b.textContent); }));
+    NK.visFane("fane-br");
+    S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
+    S.vaelg(1); S.nulstil();
+    paastand("kortet viser etiketten og opgaven", /^Reaktion 2 af 12/.test(S.kortTekst().trim()) && /Skriv reaktionsbrøken/.test(S.kortTekst()) && S.el.skort.querySelector(".sk-chip"));
+    paastand("Indsend svar er gråt, før der er noget i brøken", S.el.indsend.classList.contains("ikke-klar") && !S.el.indsend.hidden);
+    S.indsendKlik();
+    paastand("Indsend svar uden brøk dømmer intet", !S.faerdig && !S.el.status.classList.contains("skidt"));
+    var F0 = B.facit(S.opg.o);
+    facitBrikker(B, F0.num).forEach(function (t) { S.tilfoej("num", t); });
+    facitBrikker(B, F0.den).forEach(function (t) { S.tilfoej("den", t); });
+    paastand("en færdig brøk bedømmes ikke af sig selv, og Indsend svar er klar", !S.faerdig && S.el.indsend.classList.contains("klar"));
+    var rI = S.el.indsend.getBoundingClientRect();
+    var kortFoer = S.el.skort.querySelector(".sk-tekst").textContent;
+    S.indsendKlik();
+    var vid = S.el.skort.querySelector("[data-videre]");
+    var rV = vid ? vid.getBoundingClientRect() : null;
+    paastand("rigtigt svar: kortet bliver på opgaven med forklaringen under", S.faerdig && S.el.skort.querySelector(".sk-tekst").textContent === kortFoer &&
+        !!S.el.skort.querySelector(".sk-bund.bliv.god") && S.el.indsend.hidden && S.el.knap.hidden);
+    paastand("Næste står, hvor Indsend svar stod", rV && Math.abs(rV.right - rI.right) < 4 && rV.top < rI.bottom + 40, rV ? Math.round(rV.right - rI.right) : "ingen knap");
+    var antalFoer = S.opg.a.num.length;
+    var bb = d.querySelector("#br-bakke .brik"), bp = midt(bb);
+    S.el.skort.classList.remove("blink");
+    haendelse(bb, "pointerdown", bp); haendelse(d, "pointerup", bp);
+    paastand("efter rigtigt svar er brøken låst, og kortet blinker", S.opg.a.num.length === antalFoer && S.el.skort.classList.contains("blink"));
+    vid.click();
+    paastand("Næste fører videre, og rosen står ikke under den næste opgave", S.nr !== 1 && !S.faerdig && !S.el.skort.querySelector(".bliv") && !/Rigtigt/.test(S.beskedTekst()));
+
+    NK.visFane("fane-ff");
+    F.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
+    F.vaelg(2);
+    var fd = d.querySelector("#ff-tavle .del[data-z='den'][data-i='0']");
+    fd.click();
+    paastand("fane 2: et klik på fejlen vælger kun", !F.faerdig && fd.classList.contains("valgt") && /Indsend svar: \[NO\]/.test(F.el.indsend.textContent), F.el.indsend.textContent);
+    F.valgKlik(0);
+    paastand("fane 2: Der er ingen fejl vælger kun og afløser delen", !F.faerdig && !fd.classList.contains("valgt") && F.el.skort.querySelector(".sk-knap.valgt"));
+    F.valgKlik(0); fd.click(); F.indsendKlik();
+    paastand("fane 2: rigtigt svar bliver på spørgsmålet med Næste", F.faerdig && F.el.skort.querySelector(".sk-bund.bliv [data-videre]") && /Hvilken del/.test(F.kortTekst()));
+    /* Den sidste tavle paa den sidste fane: ingen knap paa kortet */
+    F.status.forEach(function (x) { x.loest = true; });
+    F.vaelg(11); F.knap(); F.knap(); F.knap(); F.knap();
+    paastand("efter sidste opgave på sidste fane er der ingen knap på kortet", F.faerdig && !F.el.skort.querySelector("[data-videre]") && F.el.skort.querySelector(".sk-bund.bliv"));
+    F.status.forEach(function (x) { x.loest = false; });
+
+    /* Kortet holder sig i kortZone med det laengste hint, den laengste fejl og forklaringen */
+    var zFejl = [], hoejst = 0;
+    [[1400, 860], [1100, 700]].forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        function maal(sim, hvad) {
+            var h = sim.el.skort.getBoundingClientRect().height;
+            hoejst = Math.max(hoejst, h);
+            if (h > sim.kortZone() + 0.5) zFejl.push(m.join("×") + " " + hvad + " " + Math.round(h) + " > " + sim.kortZone());
+            var tv = sim.tavle.getBoundingClientRect();
+            if (sim.el.skort.getBoundingClientRect().bottom > tv.top + 1) zFejl.push(m.join("×") + " " + hvad + " dækker tavlen");
+        }
+        NK.visFane("fane-br");
+        D.BROEK.forEach(function (o, i) {
+            S.vaelg(i); S.nulstil();
+            S.tilfoej("num", { k: "stof", v: o.stoffer.filter(function (x) { return !B.find(o, x); })[0] });
+            S.indsend(); maal(S, o.id + " fejl");
+            S.knap(); S.knap(); S.knap(); maal(S, o.id + " hint 3");
+            S.knap(); maal(S, o.id + " svaret");
+            S.nulstil();
+            var Fa = B.facit(o);
+            facitBrikker(B, Fa.num).forEach(function (t) { S.tilfoej("num", t); });
+            facitBrikker(B, Fa.den).forEach(function (t) { S.tilfoej("den", t); });
+            S.indsend(); maal(S, o.id + " rigtigt");
+            S.klikArt(B.alle(o)[0]); maal(S, o.id + " rigtigt og klik i skemaet");
+            S.nulstil();
+        });
+        NK.visFane("fane-ff");
+        D.FEJL.forEach(function (o, i) {
+            F.vaelg(i);
+            var g = Array.prototype.filter.call(d.querySelectorAll("#ff-tavle .del"), function (e) { return !F.erMaal(e.getAttribute("data-z"), parseInt(e.getAttribute("data-i"), 10)); });
+            g.forEach(function (e) { e.click(); F.indsend(); maal(F, o.id + " god del"); });
+            F.knap(); F.knap(); F.knap(); maal(F, o.id + " hint 3");
+            F.knap(); maal(F, o.id + " svaret");
+        });
+    });
+    paastand("kortet holder sig i kortZone og over tavlen i 1400 × 860 og 1100 × 700 (højst " + Math.round(hoejst) + " px)", zFejl.length === 0, zFejl.slice(0, 4).join(", "));
+    S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
+    F.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    NK.visFane("fane-br");
 }
 </script>
 </body>

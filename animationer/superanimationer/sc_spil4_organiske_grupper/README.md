@@ -107,10 +107,19 @@ ikke, bruges den rigtige klasses kendetegn.
 
 ## Kemichael
 
-Præsenterer spillet med tilbuddet Start præsentation / Nej tak (`js/praesentation.js`,
-ens i alle superanimationer), én gang pr. udgave. Tre replikker i
-`D.UDGAVER[..].intro`; på den anden peger han på spandene. Han kommer ellers kun ved
-ny rekord og ved Stofgruppemester (`D.SLUT`), aldrig midt i et spil.
+Præsenterer spillet med tilbuddet Start præsentation / Nej tak, én gang pr. udgave
+(K viser den igen). Præsentationen er den fælles fra 4. nov. 2026
+(`../kemichael/praesentation.js` og `praesentation.css`): trinnene står i
+`D.UDGAVER[..].intro` (C tre trin, B fire med top 10), to til fire hele sætninger
+hver, og han peger på det, der blinker med en gul ramme: spandene, kortet
+Stofklasser, knapperne Regler og Stofklasserne og i B navnefeltet og top 10.
+Taleboblen har Næste (på sidste trin Afslut) og Spring præsentationen over; Enter
+og pil til højre er Næste, Esc springer over, og han går aldrig videre af sig selv.
+
+Af sig selv kommer han kun, når spillet er slut med en ny rekord, eller når eleven
+bliver Stofgruppemester (`D.SLUT`, én replik), aldrig midt i et spil. En ny rekord
+giver kun en replik første gang og derefter hver fjerde gang i samme besøg
+(brugerens valg 4. nov. 2026); Stofgruppemester giver altid én.
 
 ## Påskeægget
 
@@ -139,7 +148,7 @@ sender en score.
 | `js/spil.js` | ét spil: faldet, spandene, point, liv, niveauer, hjælperne (tegner ikke) |
 | `js/tegning.js` | tegner scenen |
 | `js/lyd.js` | små lyde lavet i koden (`NK.Spillyd`) |
-| `js/laerer.js`, `js/praesentation.js`, `js/sprites.js` | Kemichael |
+| `js/laerer.js`, `js/sprites.js` | Kemichael (præsentationen er fælles: `../kemichael/praesentation.js`) |
 | `js/rundvisning.js` | rundvisningen bag ? |
 | `js/app.js` | udgaven, panelet, kortene, tasterne og tegneløkken |
 | `_selvtest.html` | selvtesten |

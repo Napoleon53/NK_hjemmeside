@@ -47,10 +47,10 @@
         };
     };
 
-    P.promptHTML = function () {
+    /* Opgaven paa kortet: den kendte masse og spoergsmaalet */
+    P.kortTekst = function () {
         var o = this.x.o;
-        return '<p class="opgave-prompt">' + D.tekstMasse(this.x.m) + " g " + D.stof(o.kendt).formel + "</p>" +
-            '<p class="opgave-spm">' + NK.html(o.tekst) + "</p>";
+        return "Givet: <b>" + D.tekstMasse(this.x.m) + "\u00a0g " + D.stof(o.kendt).formel + "</b>. " + NK.html(o.tekst);
     };
 
     /* Scenen starter forfra: pulveret ligger paa vaegten */
@@ -68,12 +68,14 @@
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
+        /* Kortet staar oeverst; tavlen begynder under det */
+        lay.zone = this.kortZone();
+        var y0 = this.top(), fri = H - y0;
         /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
-        var top = H;
-        lay.bordY = Math.round(top - NK.klamp(H * 0.06, 18, 44));
-        /* Tavlen oeverst. Skemaet skal have hoved, tre raekker og plads til pilen paa tvaers */
-        var tH = NK.klamp(top * 0.5, 190, 380);
-        lay.tavle = { x: kant + 6, y: NK.klamp(H * 0.02, 8, 18), b: W - 2 * kant - 12, h: tH };
+        lay.bordY = Math.round(H - NK.klamp(H * 0.06, 18, 44));
+        /* Tavlen under kortet. Skemaet skal have hoved, tre raekker og plads til pilen paa tvaers */
+        var tH = NK.klamp(fri * 0.5, 170, 380);
+        lay.tavle = { x: kant + 6, y: y0, b: W - 2 * kant - 12, h: tH };
         var ind = NK.klamp(lay.tavle.b * 0.03, 8, 22);
         this.skema.layout({ x: lay.tavle.x + ind, y: lay.tavle.y + ind * 0.6, b: lay.tavle.b - 2 * ind, h: tH - ind * 1.2 }, this.L.ctx);
         /* Vaegtene og krukkerne paa bordet */

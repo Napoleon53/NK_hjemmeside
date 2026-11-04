@@ -455,37 +455,41 @@
         };
     };
 
-    /* ----- Kemichaels replikker ---------------------------------------- */
+    /* ----- Kemichaels replikker ----------------------------------------
 
-    /* Praesentationen, foerste gang fanen aabnes. Kort, og et klik eller
-       et tastetryk sender ham ud (js/laerer.js). */
-    D.INTRO = [
-        "Lageret. Halvdelen af etiketterne er faldet af.",
-        "Skriv svarene i felterne til højre.",
-        "Maskinen printer resten. Min kaffe venter."
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       sel: det, han peger paa, og som faar en gul ramme, der blinker
+       (CSS-selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). felt: noget, der er tegnet paa laerredet
+       (introFelt i js/laerer.js). Ingen vittigheder i praesentationen. */
+    D.INTRO_LAGER = [
+        { tekst: "I denne fane øver du dig i at skrive ionforbindelser, både fra navn til formel og fra formel til navn. Glassene på reolen har mistet halvdelen af etiketten. Du tager et glas ned på arbejdsbordet ved at klikke på glasset.",
+          sel: "#lager-anker-reol" },
+        { tekst: "Hver ion, du finder, lægger sig som en kugle ved glasset på arbejdsbordet. Når formlen eller navnet er rigtigt, viser kuglerne, hvor mange af hver ion der skal til, for at ladningerne tilsammen giver nul. Et klik på en af plakaterne på væggen viser det periodiske system eller de sammensatte ioner i stort format.",
+          sel: ["#lager-anker-bord", "#lager-anker-plakater"] },
+        { tekst: "Opgavekortet til højre har ét felt til hver ion og ét til formlen eller navnet, og du trykker Enter efter hvert felt. Knappen nederst på opgavekortet giver først et hint og derefter svaret. Et glas, du løser uden at se svaret, får en stjerne i oversigten over hylderne.",
+          sel: ["#lager-kort", "#lager-fremskridt"] }
     ];
     D.INTRO_BAAND = [
-        "Ny levering. Etiketterne mangler igen.",
-        "Skriv på maskinen, før glassene når kassen."
+        { tekst: "I denne fane skriver du de samme slags etiketter som på lageret, men nu på tid. Glassene kører på samlebåndet hen mod kassen, og hvert glas mangler halvdelen af etiketten. Et glas, der når kassen, koster et liv, og spillet slutter, når alle tre liv er brugt.",
+          sel: ["#baand-anker-baand", "#baand-anker-kasse"] },
+        { tekst: "Du skriver den manglende halvdel af etiketten på etiketmaskinen og trykker Enter. Svaret gælder altid det forreste glas på båndet, og et rigtigt svar sender glasset op på hylden med en ny etiket. Plakaterne på væggen kan slås op med et klik, men båndet kører imens.",
+          felt: "maskine", sel: ["#baand-anker-hylde", "#baand-anker-plakater"] },
+        { tekst: "Panelet til højre viser dine point, dit niveau, din stime og dine liv. Hvert femte rigtige svar giver et nyt niveau, og en stime af rigtige svar i træk giver flere point for hvert svar. Spillet begynder, når du trykker på knappen Start samlebåndet.",
+          sel: "#fane-baand .maaling" }
     ];
 
-    D.HYLDE_ROS = [
-        "Ti glas med etiket. Den hylde har ikke set sådan ud siden 2009.",
-        "Romertal og det hele. Jeg er rørt.",
-        "Sammensatte ioner. Og ingen af dem gik i stykker."
-    ];
-    D.HYLDE_ROS_STJERNER = [
-        "Ti glas, ti stjerner. Jeg tjekker lige, om jeg har tastet forkert.",
-        "Ti stjerner. Jern, kobber og bly er ikke vant til så meget ros.",
-        "Ti stjerner. Selv ammonium er imponeret."
-    ];
-    D.LAGER_FAERDIGT = "Hele lageret har etiketter. Nu mangler kun mit kontor.";
+    /* Han kommer kun ind af sig selv, naar hele lageret har etiketter, og
+       naar spillet paa samlebaandet er slut med ny rekord eller helt uden
+       rigtige svar (brugerens regel 4. nov. 2026). Rosen af en enkelt
+       hylde og replikkerne efter et almindeligt spil er taget ud. */
+    D.LAGER_FAERDIGT = "Alle 30 glas på lageret har nu en etiket. Det eneste sted uden etiketter er mit kontor.";
 
     D.SLUT_REPLIK = {
-        ingen: "Alle glas i kassen. Den kasse har plads. Det har den haft siden 2009.",
-        faa: "Kassen tager dem. Det gør den altid.",
-        mange: "Det gik stærkere end kaffemaskinen.",
-        rekord: "Ny rekord. Jeg skriver det ned. Et sted."
+        ingen: "Alle glassene endte i kassen. Kassen har heldigvis plads nok, og det har den haft siden 2009.",
+        rekord: "Du har sat ny rekord på samlebåndet. Jeg skriver rekorden ned på en seddel et sted."
     };
 
     NK.Data = D;

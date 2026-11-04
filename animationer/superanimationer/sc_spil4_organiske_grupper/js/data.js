@@ -161,9 +161,12 @@
                 { graense: 27000, fart: 2.15, nyt: 600, typer: ["cycloalkan", "aromat", "alkohol", "syre", "alken"] }
             ],
             intro: [
-                "Molekylerne falder. Træk dem ned i den rigtige spand.",
-                "Kig på stregerne. To streger er en dobbeltbinding.",
-                "Tre forkerte, og spillet er slut. Jeg tæller med."
+                { tekst: "I dette spil sorterer du organiske molekyler efter stofklasse. Molekylerne falder ned over skærmen, og du trækker hvert molekyle ned i spanden med den rigtige stofklasse, før det når bunden.",
+                  sel: "#spand-omraade" },
+                { tekst: "Stofklassen afgøres af bindingerne, ringene og grupperne i molekylet. To streger mellem to carbonatomer er en dobbeltbinding, og tre streger er en tripelbinding. Kortet Stofklasser viser, hvilke stofklasser du har mødt, og på hvilket niveau de næste kommer.",
+                  sel: "#klassekort" },
+                { tekst: "Den forkerte spand koster et liv, og efter tre forkerte er spillet slut. Fra niveau 2 falder der også hjælpere, og knappen Regler forklarer, hvad de gør. Knappen Stofklasserne viser et eksempel på hver stofklasse.",
+                  sel: ["#regelknap", "#teoriknap"] }
             ]
         },
         b: {
@@ -184,9 +187,14 @@
                 { graense: 27000, fart: 2.15, nyt: 600, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] }
             ],
             intro: [
-                "Molekylerne falder. Træk dem ned i den rigtige spand.",
-                "Se efter gruppen: OH, COOH, NH₂ eller C=O.",
-                "Jeg har selv tabt til en ester. Én gang."
+                { tekst: "I dette spil sorterer du organiske molekyler efter stofklasse. Molekylerne falder ned over skærmen, og du trækker hvert molekyle ned i spanden med den rigtige stofklasse, før det når bunden.",
+                  sel: "#spand-omraade" },
+                { tekst: "Stofklassen afgøres af den funktionelle gruppe i molekylet, for eksempel OH, COOH, NH₂ eller C=O. Kortet Stofklasser viser, hvilke stofklasser du har mødt, og på hvilket niveau de næste kommer.",
+                  sel: "#klassekort" },
+                { tekst: "Den forkerte spand koster et liv, og efter tre forkerte er spillet slut. Fra niveau 2 falder der også hjælpere, og knappen Regler forklarer, hvad de gør. Knappen Stofklasserne viser et eksempel på hver stofklasse.",
+                  sel: ["#regelknap", "#teoriknap"] },
+                { tekst: "I Kemi B kommer dit resultat på en fælles top 10 for hele skolen. Du skriver dit navn i feltet på kortet midt på skærmen, før du starter spillet.",
+                  sel: ["#mk-navn", "#toplistekort"] }
             ]
         }
     };
@@ -233,12 +241,15 @@
     /* Paaskeaegget: en kop kaffe falder én gang pr. spil, sjaeldent, fra niveau 3 */
     D.KAFFE = { fra: 2, chance: 1 / 90 };
 
-    /* ----- Kemichael --------------------------------------------------------- */
-    D.INTRO_PEG = 1;           /* under anden linje peger han paa spandene */
-    D.INTRO_PEG_PAA = "spand-omraade";
+    /* ----- Kemichael ---------------------------------------------------------
+       Praesentationen staar i D.UDGAVER[..].intro: trin med to til fire hele
+       saetninger i Kemibogens sprog (brugerens regler 4. nov. 2026). sel er
+       det, han peger paa, og som faar en gul ramme, der blinker.
+       Han kommer kun af sig selv, naar spillet er slut med en ny rekord,
+       eller naar eleven er blevet Stofgruppemester: én replik. */
     D.SLUT = {
-        rekord: ["Ny rekord. Jeg skriver den ned. Med blyant.", "Rekord. Spandene er imponerede. Jeg er rolig."],
-        mester: ["Stofgruppemester. Det står nu i protokollen.", "Stofgruppemester. Jeg har ikke flere spande."]
+        rekord: ["Du har sat ny rekord, og jeg skriver den ned med blyant.", "Du har sat ny rekord. Spandene er imponerede, men jeg er rolig."],
+        mester: ["Du er nu Stofgruppemester, og det står i protokollen.", "Du er nu Stofgruppemester. Jeg har ikke flere spande."]
     };
 
     /* ----- Linjen under scenen --------------------------------------------------

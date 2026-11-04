@@ -253,8 +253,9 @@ function koerTest(W) {
     paastand("et tomt felt er ikke en fejl", ms("", 0).tom === true);
 
     overskrift("6. Sproget");
-    var replikker = [].concat(D.INTRO_VAEGT, D.INTRO_ATOMER, D.INTRO_AFVEJ, D.ORDRE_ROS,
-        [D.MAAL_FAERDIG, D.ORDRER_FAERDIG, D.REKORD_REPLIK], D.RUNDE_REPLIK.map(function (r) { return r[1]; }));
+    var INTRO = [].concat(D.INTRO_VAEGT, D.INTRO_ATOMER, D.INTRO_AFVEJ);
+    var ROS = [D.RUNDE_REPLIK, D.RUNDE_ALLE_REPLIK, D.REKORD_REPLIK, D.ORDRER_FAERDIG];
+    var replikker = INTRO.map(function (l) { return l.tekst; }).concat(ROS);
     var tekster = replikker.concat(
         O.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + O.efter(m, O.komp(m.svar)); }),
         [].concat.apply([], O.TYPER.map(function (ty, ti) {
@@ -271,9 +272,13 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_VAEGT, D.INTRO_ATOMER, D.INTRO_AFVEJ].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med 'Her'", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("rosen er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
 
     overskrift("7. Vægten kan gennemføres");
@@ -349,8 +354,8 @@ function koerTest(W) {
     paastand("Vis svaret lægger 3 mol carbon på, og guldet flyver hjem", V.naaet && V.landet() === 3 && V.komp().tal.C === 3 &&
         V.el.knap.textContent === "Til de sværere opgaver →");
     V.knap(); tik(V, 3);
-    paastand("så kommer opgaverne, og Kemichael roser én gang", V.maalNr === 3 && V.opg.navn === "To klumper" &&
-        V.paaVaegten().length === 0 && !!(V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    paastand("så kommer opgaverne, og Kemichael kommer ikke (opvarmningen er ikke hele fanen)", V.maalNr === 3 && V.opg.navn === "To klumper" &&
+        V.paaVaegten().length === 0 && !V.laerer.scene);
     V.opg = O.opgave(3, pFe); V.visMaal();
     V.laegPaa(cuI); V.laegPaa(D.STOFFER.indexOf(D.stof("Ag"))); tik(V, 1);
     paastand("to klumper: kobber og sølv er for meget", !V.naaet && besked() === "Kobber og sølv vejer 171,42 g. Det er for meget.", besked());
@@ -421,6 +426,8 @@ function koerTest(W) {
     paastand("Vis svaret giver intet point", A.point === 1 && A.visteSvar);
     while (!A.slut) { if (!A.svar) A.vaelgSvar(A.facit()); A.knap(); }
     paastand("runden kan spilles til ende", A.slut && A.point === 7);
+    tik(A, 3);
+    paastand("runden er slut med syv rigtige: Kemichael kommer", !!(A.laerer.scene && A.laerer.scene.navn === "slut"));
     paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc5.2-atomer")) || {}).rekord >= 7);
     var planFejl = [];
     D.PAR.forEach(function (p) {
@@ -432,6 +439,14 @@ function koerTest(W) {
         });
     });
     paastand("skiltet har højst tre linjer pr. prøve og regner gram om til mol", planFejl.length === 0, planFejl.slice(0, 3).join(", "));
+    tik(A, 15);
+    var kaldA = 0, koerA = A.laererKoer;
+    A.laererKoer = function () { kaldA++; return koerA.apply(this, arguments); };
+    A.nyRunde();
+    while (!A.slut) { if (!A.svar) A.vaelgSvar(A.facit()); A.knap(); }
+    tik(A, 4);
+    delete A.laererKoer;
+    paastand("næste runde kommer han ikke igen (én gang pr. besøg)", A.point === 9 && kaldA === 0, kaldA);
     A.nyRunde();
 
     overskrift("9. Afvejningen kan gennemføres");
@@ -470,30 +485,32 @@ function koerTest(W) {
     paastand("Vis svaret løser ordren, men uden stjerne", F.status[1].loest && !F.status[1].stjerne && F.display().t === "80,94 g");
     loesOrdre(2); loesOrdre(3);
     tik(F, 4);
-    paastand("fire ordrer i niveau 1: Kemichael roser", F.rost[0] === true && !!(F.laerer.scene && F.laerer.scene.navn === "niveau"));
+    paastand("fire ordrer i niveau 1: Kemichael kommer ikke (kun når alle tolv er afvejet)", !F.laerer.scene);
     F.vaelg(0);
     paastand("en afvejet ordre vises færdig", F.opg.gennemsyn && F.opg.faerdig && F.el.knap.textContent === "Afvej igen");
+    D.ORDRER.forEach(function (o, i) { if (!F.status[i].loest) loesOrdre(i); });
+    tik(F, 3);
+    paastand("alle tolv ordrer er afvejet: Kemichael kommer", !!(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
+    tik(F, 15);
     F.nulstilAlt();
     paastand("Start forfra nulstiller alt", F.antalLoest() === 0);
 
-    overskrift("10. Kemichaels præsentation og rundvisningen");
+    overskrift("10. Kemichaels præsentation (fælles test) og rundvisningen");
     [["fane-vaegt", V], ["fane-atomer", A], ["fane-afvej", F]].forEach(function (x) {
         klik('[data-fane="' + x[0] + '"]');
         var sim = x[1];
-        sim.startIntro(true);
-        tik(sim, 1);
-        var navn = x[0].replace("fane-", "");
-        paastand(navn + ": K viser præsentationen, og knappen Spring over står der",
-            !!(sim.laerer.scene && sim.laerer.scene.navn === "intro") && !d.getElementById(navn + "-spring").hidden);
-        sim.springIntro();
-        paastand(navn + ": Spring over sender ham ud", sim.laerer.scene && sim.laerer.scene.navn === "introUd");
-        tik(sim, 3);
+        sim.tilpas();
+        tik(sim, 2.5);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(x[0] + ": " + r[0], r[1], r[2]);
+        });
     });
     klik('[data-fane="fane-vaegt"]');
-    V.startIntro(true); tik(V, 0.5);
+    V.startIntro(true); tik(V, 2.5);
     V.laegPaa(1); tik(V, 1);
-    paastand("man kan lægge klumper på, mens han taler", V.landet() >= 1 && V.laerer.scene.navn === "intro");
+    paastand("man kan lægge klumper på, mens han præsenterer", V.landet() >= 1 && V.laererIIntro());
     V.springIntro(); tik(V, 3);
+    paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
     var tur = ["#vaegt-anker-hylde", "#vaegt-anker-vaegt", "#vaegt-anker-zoom", "#vaegt-anker-plakat", "#vaegt-maaling", "#vaegt-kort",
         "#atomer-anker-vaegte", "#atomer-valg", "#atomer-anker-skilt", "#atomer-kort",
         "#afvej-kort", "#afvej-anker-krukke", "#afvej-anker-plakat", "#afvej-anker-vaegt", "#afvej-fremskridt"];

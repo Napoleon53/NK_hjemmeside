@@ -230,28 +230,32 @@
     /* ----- Kemichael ---------------------------------------------------------------------
        Han praesenterer ikke. Han kommer kun, naar forsoeget gaar helt galt
        (brugerens valg 27. sept. 2026), siger én tør replik og gaar igen.
-       Hoejst ca. 60 tegn. Ingen teori, og sarkasmen rammer handlingen. */
+       Brugerens regel 4. nov. 2026: hele saetninger i formelt sprog som i
+       Kemibogen, hoejst ca. 130 tegn. Ingen teori, og sarkasmen rammer
+       handlingen. forfra kommer kun, naar maalingen er i gang og nu er
+       oedelagt; knappen Start forfra staar nederst til hoejre i scenen
+       (\u00a0 er et haardt mellemrum, saa navnet ikke deles i taleboblen). */
     D.PAATALE = {
         stik: [
             "Lighteren skal vejes. Den er ikke et svejseapparat.",
-            "Den flamme kommer ikke med i beregningen.",
-            "Tunede lightere hører til på knallerter. Knap nok dér.",
-            "Fabrikken havde en grund til den pind."
+            "Stikflammen kommer ikke med i beregningen.",
+            "En tunet lighter hører til på en knallert og egentlig ikke engang dér.",
+            "Fabrikken havde en god grund til pinden på justeringsringen."
         ],
         vand: [
-            "Nu er der vand i lighteren. Den vejer mere, ikke mindre.",
-            "En tunet ventil lukker ikke tæt. Vandet fandt vej ind.",
-            "Den lighter har drukket. Vægten opdager det.",
-            "Vand i butan. Det bliver en sjov molarmasse."
+            "Nu er der vand i lighteren, så den vejer mere og ikke mindre.",
+            "En tunet ventil lukker ikke tæt, så vandet fandt vej ind.",
+            "Lighteren har drukket vand, og vægten opdager det.",
+            "Vand i lighteren giver en sjov molarmasse."
         ],
         wush: [
-            "Butan er tungere end luft. Den lå og ventede på bordet.",
-            "Gassen på bordet var der stadig. Nu er den brugt.",
-            "Gas på bordet og en gnist. Det står i regnskabet."
+            "Butan er tungere end luft, så gassen lå og ventede på bordet.",
+            "Gassen på bordet var der stadig, men nu er den brændt.",
+            "Gas på bordet og en gnist giver en brandkugle. Uheldet står nu i regnskabet."
         ],
         forfra: [
-            "Start forfra. Det går hurtigere end at forklare det.",
-            "Det forsøg er slut. Knappen står i hjørnet.",
+            "Start forfra med en ny lighter. Det går hurtigere end at forklare fejlen.",
+            "Målingen kan ikke bruges længere. Knappen Start\u00a0forfra står nederst til højre.",
             "En ny lighter er billigere end en ny rapport."
         ]
     };

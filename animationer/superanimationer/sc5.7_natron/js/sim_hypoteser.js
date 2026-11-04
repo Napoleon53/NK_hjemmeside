@@ -72,6 +72,7 @@
         this.opg = o;
         this.valgt = null;
         this.forkertDom = {};
+        this.domValg = null;
         this.regning.saet(o);
         this.opdaterForventet();
     };
@@ -104,7 +105,7 @@
             s = mangler.length ? "Regn først " + mangler.map(function (h) { return "hypotese " + h; }).join(", ").replace(/, ([^,]*)$/, " og $1") + ". Så kan du sammenligne." :
                 (m.faerdig ? D.DOM.spm : D.DOM.ikkeKonstant);
         }
-        return '<p class="maal-tekst">' + NK.html(s) + "</p>" + note;
+        return '<p class="maal-tekst">' + this.papirTekst(NK.html(s)) + "</p>" + note;
     };
 
     P.mangler = function () {
@@ -112,30 +113,36 @@
         return D.HYP_IDS.filter(function (h) { return !(NK.forventet && NK.forventet[h] !== undefined) || !mig.status[D.HYP_IDS.indexOf(h) + 1].loest; });
     };
 
-    /* Valgknapperne til dommen */
+    /* Dommen: svarknapperne paa kortet vaelger kun, Indsend svar sender ind */
+    P.domKlar = function () { return !!this.opg.dom && !this.mangler().length && this.maal.faerdig; };
+
     P.visKortEkstra = function () {
         var o = this.opg, mig = this, e = this.el.valg;
-        if (!o.dom) { e.hidden = true; e.innerHTML = ""; return; }
-        var klar = !this.mangler().length && this.maal.faerdig;
-        e.hidden = !klar;
-        e.innerHTML = "";
-        if (!klar) return;
+        if (!this.domKlar()) { e.hidden = true; e.innerHTML = ""; return; }
         var ret = this.rigtigDom();
-        D.HYP_IDS.forEach(function (h) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "knap";
-            b.textContent = h + ": " + T.P(h);
-            if (mig.faerdig) {
-                b.disabled = true;
-                if (h === ret) b.classList.add("rigtig");
-            } else if (mig.forkertDom[h]) {
-                b.disabled = true;
-                b.classList.add("forkert");
-            }
-            b.addEventListener("click", function () { mig.doem(h, "ok"); });
-            e.appendChild(b);
+        var svar = D.HYP_IDS.map(function (h) {
+            return { t: T.P(h), ok: h === ret, forkert: !!mig.forkertDom[h] };
         });
+        var valgtJ = this.domValg ? D.HYP_IDS.indexOf(this.domValg) : -1;
+        this.svarKnapper(e, svar, valgtJ, function (j) { mig.domValg = D.HYP_IDS[j]; });
+    };
+
+    /* Indsend svar: dommen, eller feltet i regnestykket i panelet */
+    P.harIndsend = function () {
+        if (this.opg.dom) return this.domKlar();
+        return !!this.regning.aktivt();
+    };
+
+    P.kanIndsende = function () {
+        if (this.opg.dom) return !!this.domValg;
+        var inp = this.regning.vaert.querySelectorAll("input:not([disabled])");
+        for (var i = 0; i < inp.length; i++) if (String(inp[i].value || "").trim()) return true;
+        return false;
+    };
+
+    P.indsend = function () {
+        if (this.opg.dom) { var h = this.domValg; this.domValg = null; this.doem(h, "ok"); return; }
+        this.regning.tjek();
     };
 
     /* Den hypotese, hvis forventede masse ligger naermest den maalte */
@@ -190,7 +197,7 @@
         var mangler = this.mangler();
         if (mangler.length) {
             var i = D.HYP_IDS.indexOf(mangler[0]) + 1;
-            return { hint: NK.html("Hypotese " + mangler[0] + " står i listen over opgaverne herunder."),
+            return { hint: NK.html("Hypotese " + mangler[0] + " står i listen over opgaverne i panelet til højre."),
                      svar: function () { mig.vaelg(i, false); } };
         }
         /* Massen er ikke konstant endnu: svaret er at gaa tilbage og varme */
@@ -202,7 +209,7 @@
         var o = this.opg;
         if (!o.dom) return trinLinjeRegning.call(this);
         if (this.faerdig) return "";
-        if (this.mangler().length) return "Vælg den hypotese, der mangler, i listen herunder.";
+        if (this.mangler().length) return "Vælg den hypotese, der mangler, i listen over opgaverne til højre.";
         return this.maal.faerdig ? "Vælg den hypotese, der passer med din måling." : "Gå til fanen Forsøget, og varm videre.";
     };
 
@@ -291,9 +298,9 @@
         var gb = smal ? 0 : Math.round(NK.klamp(W * 0.36, 200, 380));
         var tb = W - 36 - (gb ? gb + 20 : 0);
         var ctx = this.L.ctx;
-        lay.opgY = 12;
-        lay.opg = Tg.overTavle(ctx, this.overTekst(), tb - 14, NK.klamp(Math.min(W / 46, Hs / 24), 14, 19), 14);
-        var ty = lay.opgY + lay.opg.h + 16;
+        /* Tavlen begynder under den plads, kortet har faaet sat af; opgaven staar paa kortet */
+        lay.top = this.top();
+        var ty = lay.top;
         lay.tavle = { x: 20, y: ty, b: tb, h: Math.max(120, lay.bordY - ty - 16) };
         lay.graf = gb ? { x: W - gb - 14, y: ty - 6, b: gb, h: Math.max(120, lay.bordY - ty - 6) } :
             { x: 20, y: lay.bordY - 1, b: 1, h: 1 };
@@ -366,12 +373,6 @@
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);
-        var ot = this.overTekst();
-        if (!lay.opg || lay.opgTekst !== ot) {
-            lay.opgTekst = ot;
-            lay.opg = Tg.overTavle(ctx, ot, lay.tavle.b - 14, NK.klamp(Math.min(lay.W / 46, lay.Hs / 24), 14, 19), 14);
-        }
-        Tg.tegnOverTavle(ctx, lay.opg, lay.tavle.x, lay.opgY);
         if (o.dom) this.tegnDom(ctx, lay.tavle);
         else this.regning.tegnTavle(ctx, lay.tavle, this.data(), this.tid);
         if (lay.graf.b > 10) {

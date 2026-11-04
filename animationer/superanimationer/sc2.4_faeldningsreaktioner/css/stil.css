@@ -197,8 +197,10 @@ main { flex: 1; position: relative; min-height: 0; }
     grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
 }
 
-/* Scenen er en soejle: baegerglassene foroven, arbejdsbordet med
-   tavlen forneden. Glassene faar den plads, der er tilbage. */
+/* Scenen er en soejle: tekstboksen med opgaven oeverst, arbejdsbordet
+   med tavlen lige under og baegerglassene forneden. Glassene faar den
+   plads, der er tilbage (4. nov. 2026; foer stod glassene oeverst og
+   spoergsmaalet nederst paa arbejdsbordet). */
 .scene {
     position: relative;
     min-width: 0;
@@ -218,84 +220,19 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .baeger-omraade > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: default; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven over glassene, saa den ikke kan overses. Samme som i sc2.3. */
-.spring-over {
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 10px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over[hidden] { display: none; }
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Det, Kemichael peger paa, mens han taler om det */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.peg { outline: 2px solid var(--gul); outline-offset: 2px; animation: peg 1.2s ease-out infinite; }
-
 .arbejdsbord {
     flex: 0 0 auto;
-    margin: 0 16px 16px;
+    margin: 10px 16px 0;
     background-color: rgba(0, 0, 0, 0.26);
     border: 1px solid #3a3a47;
     border-radius: var(--radius);
-    padding: 12px 16px 12px;
+    padding: 10px 12px;
 }
-
-.ab-hoved {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.ab-trin {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--gul);
-    white-space: nowrap;
-}
-
-.ab-spm { font-size: 0.98rem; font-weight: 600; color: var(--tekst); line-height: 1.4; }
 
 /* ---------------------------------------------------------------------
    TAVLEN: reaktionsskemaet, der bygges op
    --------------------------------------------------------------------- */
 .tavle {
-    margin-top: 12px;
     background-color: #101016;
     border: 1px solid #34343f;
     border-radius: var(--radius-lil);
@@ -513,39 +450,10 @@ main { flex: 1; position: relative; min-height: 0; }
 .bundfaldchip .skrivefelt { margin: 2px -4px; }
 
 /* ---------------------------------------------------------------------
-   SVARMULIGHEDER, VAERKTOEJ OG BESKED
+   VAERKTOEJET UNDER TAVLEN (ladningsknapperne paa Svær)
    --------------------------------------------------------------------- */
 .ab-valg:empty { display: none; }
-.ab-valg { margin-top: 12px; }
-
-.valg { display: grid; gap: 8px; }
-.valg.fire { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-.valg.chips { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); }
-
-.valgknap, .ionknap {
-    background-color: var(--panel-2);
-    color: var(--tekst);
-    border: 1px solid #4a4a58;
-    border-radius: var(--radius-lil);
-    padding: 9px 10px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
-}
-
-.valgknap.formel, .ionknap { font-size: 1.2rem; }
-.valgknap:hover:not(:disabled), .ionknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: var(--blaa); }
-.valgknap:active:not(:disabled), .ionknap:active:not(:disabled) { transform: scale(0.97); }
-.valgknap.forkert, .ionknap.forkert { border-color: var(--roed); color: #f0918a; background-color: rgba(224, 84, 70, 0.1); cursor: default; animation: ryst 0.35s; }
-.ionknap.brugt { opacity: 0.25; cursor: default; }
-
-@keyframes ryst {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-}
+.ab-valg { margin-top: 10px; }
 
 .vaerktoej {
     display: flex;
@@ -578,21 +486,6 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .lknap:hover { background-color: var(--panel-3); border-color: var(--gul); }
 .vt-note { font-size: 0.8rem; color: var(--tekst-mat); margin-left: 8px; }
-
-.ab-bund {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.ab-bund .besked { flex: 1; min-height: 1.5em; }
-.knap.tjekknap { flex-shrink: 0; min-width: 96px; justify-content: center; font-size: 0.92rem; padding: 9px 14px; }
-
-.besked { margin: 0; font-size: 0.92rem; line-height: 1.5; color: #c8ced6; }
-.besked.god   { color: #7ee0a8; }
-.besked.skidt { color: #f0918a; }
-.besked.gul   { color: #f0d77a; }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -646,6 +539,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .kort > h2 .taeller b { color: var(--tekst); }
 
 .trinliste { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 4px; }
+.knap.nyknap { justify-content: center; width: 100%; color: var(--tekst-svag); }
 
 .trin-punkt {
     display: flex;
@@ -677,7 +571,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .trin-punkt.givet .tnr { background-color: #4a4a58; color: var(--tekst-svag); }
 .trin-punkt.givet .tnavn { color: var(--tekst-mat); }
 
-.opgavetekst { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; color: var(--tekst); }
 .trin-punkt.aktiv { color: var(--tekst); background-color: rgba(61, 158, 224, 0.12); border-color: rgba(61, 158, 224, 0.45); }
 .trin-punkt.aktiv .tnr { background-color: var(--blaa); color: #ffffff; }
 .trin-punkt.gjort { color: var(--tekst-svag); }
@@ -728,6 +621,10 @@ main { flex: 1; position: relative; min-height: 0; }
 .ftabel td.fundet { box-shadow: inset 0 0 0 2px var(--blaa), 0 0 8px rgba(61, 158, 224, 0.6); }
 .ftabel td.faeld { box-shadow: inset 0 0 0 2px var(--groen), 0 0 9px rgba(63, 174, 114, 0.8); }
 #tabel.aktiv td { cursor: pointer; }
+.tabelkort.kan-slaa-op { border-color: rgba(61, 158, 224, 0.55); }
+.tabelkort.kan-slaa-op #tabel td,
+.tabelkort.kan-slaa-op #tabel th { cursor: zoom-in; }
+.tabelkort.kan-slaa-op .tabelinfo { color: #9fd0f5; }
 #tabel.aktiv td:hover { outline: 2px solid var(--blaa); }
 #tabel td:hover { filter: brightness(1.25); }
 .ftabel td.blink { animation: celleblink 0.6s ease-out; }
@@ -980,8 +877,14 @@ select:focus-visible {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Kemichaels taleboble under praesentationen (../kemichael/praesentation.css)
+   er 44 % af omraadet med glassene. Ved 1400 px er det et par pixels for
+   smalt til, at Naeste og Spring praesentationen over kan staa paa én
+   linje, og boblen bliver for hoej til at staa over hans hoved. */
+#laerred-boble { width: clamp(300px, 47%, 440px); }
+
+/* Tilbuddet om Kemichaels praesentation: midt foroven over glassene
+   (../kemichael/praesentation.js) */
 .tilbud {
     position: absolute;
     top: 16px;
@@ -1028,3 +931,161 @@ select:focus-visible {
 
 /* hidden skal skjule tilbuddet, selv om .tilbud giver display: flex */
 .tilbud[hidden] { display: none; }
+
+/* =====================================================================
+   TEKSTBOKSEN (4. nov. 2026)
+   Et lyst papirkort oeverst midt i scenen som i de andre
+   superanimationer. Farverne og skriften kommer fra
+   ../faelles/papirkort.css; her staar kun opstillingen.
+   ===================================================================== */
+.tekstboks {
+    flex: 0 0 auto;
+    width: calc(100% - 32px);
+    max-width: 1000px;
+    margin: 12px auto 0;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+
+.scenekort .sk-svar { display: grid; gap: 8px; }
+.scenekort .sk-svar.korte { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.scenekort .sk-svar.lange { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.scenekort .sk-svar.chips { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+
+.scenekort .sk-knap {
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 1.12rem;
+    line-height: 1.25;
+    cursor: pointer;
+}
+
+.scenekort .sk-svar.lange .sk-knap { font-size: 1.02rem; }
+.scenekort .sk-knap:disabled { cursor: default; }
+
+.scenekort .sk-bund { display: flex; align-items: center; }
+.scenekort .sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; white-space: nowrap; }
+.scenekort .sk-videre { font-family: inherit; cursor: pointer; white-space: nowrap; }
+
+/* Knappen, der aabner opslaget: hovedknappen, lidt stoerre */
+html body.papirkort.papirkort .scenekort .knap.indsend.slaa-op { padding: 10px 22px; font-size: 1.02rem; }
+
+/* Luk tabellen i opslaget: en stille knap med graa kant */
+html body.papirkort.papirkort .scenekort .knap.luk {
+    padding: 8px 15px;
+    border: 1.5px solid var(--pk-knapkant);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 500;
+}
+
+html body.papirkort.papirkort .scenekort .knap.luk:hover { border-color: #8f8873; background-color: #fffdf6; }
+
+/* =====================================================================
+   OPSLAGET: faeldningstabellen i naesten fuld skaerm (4. nov. 2026)
+   Kortet med opgaven oeverst, reaktionsskemaet under og tabellen i
+   resten af hoejden. Tabellen er den samme som i panelet.
+   ===================================================================== */
+.opslag {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vh 2vw;
+    background-color: rgba(8, 8, 12, 0.74);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.opslag[hidden] { display: none; }
+.opslag.vis { opacity: 1; }
+
+.opslag-boks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vh;
+    width: 100%;
+    max-width: 1500px;
+    height: 100%;
+    padding: 14px 18px 10px;
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    overflow: auto;
+    outline: none;
+    transform: scale(0.97);
+    transition: transform 0.18s ease;
+}
+
+.opslag.vis .opslag-boks { transform: none; }
+
+.opslag-kort { flex: 0 0 auto; width: 100%; max-width: 1000px; margin: 0 auto; }
+.opslag-skema { flex: 0 0 auto; padding: 10px 12px 8px; }
+.opslag-skema .skema { font-size: 1.55rem; }
+
+.opslag-tabel { flex: 1 1 auto; min-height: 240px; display: flex; flex-direction: column; }
+.opslag-tabel #tabel { flex: 1 1 auto; min-height: 0; }
+.opslag .ftabel { height: 100%; font-size: clamp(0.95rem, 2.3vh, 1.3rem); border-spacing: 3px 3px; }
+.opslag .ftabel th.hjoerne { width: 70px; }
+.opslag .ftabel th.kat { font-size: clamp(0.9rem, 2.1vh, 1.2rem); }
+.opslag .ftabel th.an { padding-right: 10px; }
+.opslag .ftabel td, .opslag .ftabel th { padding: 2px 0; border-radius: 5px; }
+.opslag .tabelinfo { min-height: 1.5em; margin-top: 6px; font-size: 1rem; text-align: center; }
+.opslag .tabelnoegle { flex: 0 0 auto; justify-content: center; margin: 0; font-size: 0.92rem; }
+
+/* Reaktionsskemaet en del stoerre (brugeren 4. nov. 2026: "saa det er
+   nemmere at faa oeje paa"). Alt paa tavlen skaleres med em. */
+.skema { font-size: 2rem; gap: 8px 14px; }
+.skema .op { font-size: 0.85em; }
+.skema .op.pil { font-size: 1.05em; }
+.ion { font-size: 0.66em; padding: 3px 10px; }
+.ionplads { min-height: 44px; }
+.pladsholder { font-size: 0.8em; min-width: 72px; }
+.pladsholder.ion { font-size: 0.66em; min-width: 54px; }
+.bundfaldchip { font-size: 0.66em; min-height: 44px; }
+.bundfaldchip.kendt { font-size: 1em; }
+.koef b { font-size: 0.9em; }
+.skrivefelt { font-size: 0.75em; }
+.skrivefelt.stort { font-size: 0.85em; }
+.koeffelt, .tilstvalg, .tilstknap { font-size: 0.7em; }
+.ionskema .faerdigt { font-size: 1em; }
+.opslag-skema .skema { font-size: 2rem; }
+@media (max-width: 1320px) { .skema { font-size: 1.75rem; } }
+@media (max-height: 760px) { .skema { font-size: 1.65rem; } }
+/* Raekken med ionskemaet skal kunne staa paa én linje med felterne */
+.skema.ionskema { font-size: 1.6rem; }
+@media (max-width: 1320px), (max-height: 760px) { .skema.ionskema { font-size: 1.4rem; } }
+@media (max-width: 1180px), (max-height: 720px) {
+    .skema { font-size: 1.55rem; }
+    .skema.ionskema { font-size: 1.15rem; }
+    .vaerktoej .vt-note { flex-basis: auto; }
+}
+@media (max-width: 1180px), (max-height: 720px) {
+    .skema.ionskema { flex-wrap: nowrap; gap: 4px 6px; }
+    .ionskema .skrivefelt { width: 4.6em; }
+    .ionskema .led { gap: 3px; }
+}
+
+/* Papirkortet lidt stoerre, saa det passer til det store reaktionsskema
+   (brugeren 4. nov. 2026). Reglerne har et ekstra .tekstboks, saa de
+   vinder over ../faelles/papirkort.css. */
+html body.papirkort.papirkort .tekstboks.scenekort .sk-tekst { font-size: 1.22rem; line-height: 1.42; max-width: 70ch; }
+html body.papirkort.papirkort .tekstboks.scenekort { padding: 13px 18px 14px; }
+html body.papirkort.papirkort .tekstboks.scenekort .sk-knap { font-size: 1.25rem; padding: 9px 12px; }
+html body.papirkort.papirkort .tekstboks.scenekort .sk-svar.lange .sk-knap { font-size: 1.12rem; }
+html body.papirkort.papirkort .tekstboks.scenekort .sk-bund .st-tekst { font-size: 1.05rem; }
+html body.papirkort.papirkort .tekstboks.scenekort .knap.hjaelp,
+html body.papirkort.papirkort .tekstboks.scenekort .knap.indsend { font-size: 1.05rem; padding: 10px 18px; }
+html body.papirkort.papirkort .tekstboks.scenekort .knap.indsend.slaa-op { font-size: 1.12rem; padding: 12px 24px; }
+html body.papirkort.papirkort .tekstboks.scenekort .sk-videre { font-size: 1.08rem; padding: 11px 20px; }
+.tekstboks { max-width: 1060px; }
+@media (max-width: 1180px), (max-height: 720px) {
+    html body.papirkort.papirkort .tekstboks.scenekort .sk-tekst { font-size: 1.08rem; }
+    html body.papirkort.papirkort .tekstboks.scenekort .sk-knap { font-size: 1.1rem; padding: 6px 9px; }
+    html body.papirkort.papirkort .tekstboks.scenekort .sk-bund .st-tekst { font-size: 0.95rem; }
+}

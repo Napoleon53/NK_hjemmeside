@@ -90,14 +90,29 @@ et nyt glas med en ny ballon i og går. Det tæller i hans regnskab over uheld.
 En tom ballon brænder ikke: "Ballonen er tom. Stoffet er lukket inde i
 glasset."
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`): varm op tre replikker (han peger på reolen og
-termometeret), formen tre, spillet to. Han går kun ved den store knap, to klik
-på ham eller Esc. <kbd>K</kbd> viser præsentationen igen. Ellers roser han, når
-de fire mål er nået ("Fire mål. Stearinlyset overlevede."), første gang
-hvorfor er besvaret ("Det kogte du godt ned.", kun én gang pr. browser) og
-når runden er slut. Kaffekoppen er det
-fælles påskeæg.
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles fra 4. nov. 2026 (`../kemichael/praesentation.js`,
+reglerne i `../kemichael/README.md`): tre trin pr. fane med to til fire hele
+sætninger, en taleboble med Næste og Spring præsentationen over, og en gul
+ramme om det, han peger på. Han går aldrig videre af sig selv. Under
+præsentationen står han et andet sted end ellers (foran venstre del af
+zoomvinduet på fane 1 og 3 og mellem de to første glas på fane 2), så han ikke
+dækker kammeret, reolen eller glassene. <kbd>K</kbd> viser præsentationen igen.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret, og når
+tændstikken antænder ballonen:
+
+* fane 1, alle fire mål er nået: "Du har nået alle fire mål, og stearinlyset
+  har overlevet."
+* fane 2, hvorfor er besvaret rigtigt (kun første gang i browseren): "Du har
+  kogt forklaringen ned til molekylernes form."
+* fane 3, runden med ni blandinger er slut: én replik efter antallet af
+  rigtige (`D.RUNDE_REPLIK`) eller en ny rekord (`D.REKORD_REPLIK`)
+* påskeægget med tændstikken (se ovenfor): `D.BRAND`, derefter `D.BRAND_IGEN`,
+  og `D.NY_BALLON`, når han har sat et nyt glas i
+
+Under præsentationen venter rosen, til han er færdig, og en brændt ballon
+bliver skiftet uden ham. Kaffekoppen er det fælles påskeæg.
 
 Direkte links: `index.html#form` og `index.html#spil`.
 
@@ -142,11 +157,11 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, reolen, glasset med ballon, kammeret, termometeret,
                     vandbadet, zoomvinduet, parret, tændstikken og kurven
 js/termostat.js     temperaturen, som eleven trækker i termometeret
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_varm.js      fane 1
 js/sim_form.js      fane 2
 js/sim_spil.js      fane 3
-js/laerer.js        Kemichael på alle tre faner
+js/laerer.js        Kemichael på alle tre faner (præsentationen er fælles:
+                    ../kemichael/praesentation.js og praesentation.css)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -172,11 +187,12 @@ det bedste par rører mest for pentan og mindst for 2,2-dimethylpropan, at alle
 elleve alkaner er gas, væske og fast stof ved de rigtige temperaturer (og
 fryser på plads uden at overlappe), at alle 16 blandinger starter som væsker og
 koger i den rigtige rækkefølge, at alle tre faner kan gennemføres (fane 1 også
-med musen, med tændstikken og Kemichael), at sproget holder reglerne, og at
-layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller
-Chrome med `--allow-file-access-from-files` og lægger elevens gemte
-fremskridt tilbage bagefter. Sidst kørt 24. september 2026: ALT OK (87
-påstande).
+med musen, med tændstikken og Kemichael), at Kemichaels præsentation virker
+på alle tre faner (den fælles test i `../kemichael/praesentation.js`), at
+sproget holder reglerne, og at layoutet holder fra 520 × 380 til 1500 × 900.
+Den kræver en lokal server eller Chrome med `--allow-file-access-from-files`
+og lægger elevens gemte fremskridt tilbage bagefter. Sidst kørt 4. november
+2026: ALT OK (128 påstande).
 
 ## Forenklinger
 

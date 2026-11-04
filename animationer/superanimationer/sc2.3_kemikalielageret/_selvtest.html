@@ -290,37 +290,38 @@ function koerTest(W) {
     paastand("svaret for Fe³⁺ regner med 3 O²⁻ og 2 Fe", /3 O²⁻ giver −6\. Så skal 2 Fe give \+6, altså \+3 hver/.test(hFe.svar), hFe.svar);
 
     overskrift("7. Sproget");
+    var INTRO = D.INTRO_LAGER.concat(D.INTRO_BAAND);
+    var REPLIKKER = [D.LAGER_FAERDIGT].concat(Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }));
     var tekster = [].concat(
         D.STOFFER.map(function (s) { return s.fakta; }),
-        alleHints, alleBeskeder, D.INTRO, D.INTRO_BAAND,
-        D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT],
-        Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }),
+        alleHints, alleBeskeder, INTRO.map(function (l) { return l.tekst; }),
+        REPLIKKER,
         [d.body.innerText]
     );
     var tankestreg = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger", tankestreg.length === 0, tankestreg.slice(0, 2).join(" | "));
     var ettal = tekster.filter(function (t) { return /(^|[^\d(])1[+−-](?![\d])/.test(t) || /¹[⁺⁻]/.test(t); });
     paastand("ingen ladning skrevet som 1+ eller 1−", ettal.length === 0, ettal.slice(0, 2).join(" | "));
-    var lange = [].concat(D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT], D.INTRO, D.INTRO_BAAND,
-        Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; })).filter(function (t) { return t.length > 72; });
-    paastand("Kemichaels replikker er korte", lange.length === 0, lange.join(" | "));
+    /* Brugerens regler 4. nov. 2026: han siger mere ad gangen, i hele
+       saetninger, og kommer kun ind, naar en fane er gennemfoert */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = REPLIKKER.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 6; });
+    paastand("hans replikker er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
+    paastand("ingen ros af en enkelt hylde og ingen replik efter et almindeligt spil",
+        !D.HYLDE_ROS && !D.HYLDE_ROS_STJERNER && Object.keys(D.SLUT_REPLIK).sort().join() === "ingen,rekord");
 
-    overskrift("8. Kemichaels præsentation og etiketmaskinens display");
+    overskrift("8. Kemichaels præsentation (fælles test) og etiketmaskinens display");
     function kør(sim, sek) { for (var n = 0; n < Math.round(sek * 60); n++) sim.opdater(1 / 60); }
     L.springIntro();
     kør(L, 3);
-    L.startIntro(true);
-    kør(L, 0.3);
-    paastand("K starter præsentationen, og Spring over vises", L.laererIIntro() && !d.getElementById("lager-spring").hidden);
-    kør(L, 6);
-    paastand("han peger på feltet, mens han siger, at svarene skrives dér",
-        L.introTrin === 2 && L.aktivtFelt().feltEl.classList.contains("peg"), "trin " + L.introTrin);
-    L.springIntro();
-    kør(L, 0.1);
-    paastand("Spring præsentationen over sender ham ud med det samme", !L.laererIIntro() && !(L.laerer.taleUr > 0) &&
-        d.getElementById("lager-spring").hidden && !L.aktivtFelt().feltEl.classList.contains("peg"),
-        "intro " + L.laererIIntro() + ", taleUr " + L.laerer.taleUr + ", skjult " + d.getElementById("lager-spring").hidden +
-        ", peg " + L.aktivtFelt().feltEl.classList.contains("peg") + ", scene " + (L.laerer.scene && L.laerer.scene.navn));
+    NK.Praesentation.selvtest(L, function (sek) { kør(L, sek); }).forEach(function (r) {
+        paastand("lageret: " + r[0], r[1], r[2]);
+    });
+    paastand("den gamle knap Spring præsentationen over er væk fra begge faner",
+        !d.getElementById("lager-spring") && !d.getElementById("baand-spring"));
     kør(L, 4);
     L.startIntro(true);
     kør(L, 3.5);
@@ -329,6 +330,9 @@ function koerTest(W) {
     feltInput.dispatchEvent(new W.Event("input"));
     paastand("et tastetryk i feltet sender ham ikke ud", L.laererIIntro());
     feltInput.value = "";
+    feltInput.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter i feltet er Næste under præsentationen og tjekker ikke svaret",
+        L.laererIIntro() && L.introStatus().nr === 1 && L.opg.k === 0, L.introStatus() && L.introStatus().nr);
     function klikPaa(sim, px, py) {
         var r = sim.L.canvas.getBoundingClientRect();
         sim.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + px, clientY: r.top + py, bubbles: true }));
@@ -338,10 +342,27 @@ function koerTest(W) {
     var ls = L.laererLaerredSkala(), lr = L.laererRekt();
     var mx = (lr.x + lr.b / 2) * ls, my = (lr.y + 140) * ls;
     klikPaa(L, mx, my);
-    paastand("første klik på ham: han bliver, og knappen blinker", L.laererIIntro() &&
-        d.getElementById("lager-spring").classList.contains("puf"), "rammer ham: " + L.laererUnder(mx, my));
-    klikPaa(L, mx, my);
-    paastand("andet klik på ham sender ham ud", !L.laererIIntro());
+    var lagerBoble = d.getElementById("lager-laerred-boble");
+    paastand("et klik på ham: han bliver, og Næste blinker", L.laererIIntro() &&
+        lagerBoble.querySelector(".km-naeste").classList.contains("puf"), "rammer ham: " + L.laererUnder(mx, my));
+    d.querySelector('.faneknap[data-fane="fane-baand"]').click();
+    paastand("faneskift midt i præsentationen sender ham ud, og boblen forsvinder", !L.laererIIntro() && lagerBoble.hidden);
+    B.tilpas();
+    kør(B, 0.5);
+    NK.Praesentation.selvtest(B, function (sek) { kør(B, sek); }).forEach(function (r) {
+        paastand("samlebåndet: " + r[0], r[1], r[2]);
+    });
+    B.startIntro(true);
+    kør(B, 2.5);
+    B.input.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("samlebåndet: Enter er Næste under præsentationen og starter ikke spillet",
+        B.laererIIntro() && B.introStatus().nr === 1 && B.tilstand === "klar", B.tilstand);
+    B.start();
+    kør(B, 0.2);
+    paastand("samlebåndet: Start sender ham ud", !B.laererIIntro() && B.tilstand === "koerer");
+    B.nulstil();
+    kør(B, 3);
+    d.querySelector('.faneknap[data-fane="fane-lager"]').click();
     kør(L, 4);
     L.fokuseret = false;
     paastand("displayet peger på feltet til højre, når markøren ikke står i det", /til højre/.test(L.displayIndhold().tom));
@@ -364,9 +385,9 @@ function koerTest(W) {
         paastand(m[0] + " x " + m[1] + ": hylden på samlebåndet har plads til mindst otte glas", B.lay.hyldePlads >= 8, B.lay.hyldePlads);
     });
     B.L.b = 0;
-    var tilbudB = d.getElementById("baand-tilbud"), springB = d.getElementById("baand-spring");
-    paastand("samlebåndet: Start præsentation og Spring over står nederst i panelet, ikke i scenen",
-        !!tilbudB.closest(".panel") && !!springB.closest(".panel") && !tilbudB.closest(".scene") && !springB.closest(".scene"));
+    var tilbudB = d.getElementById("baand-tilbud");
+    paastand("samlebåndet: Start præsentation står nederst i panelet, ikke i scenen",
+        !!tilbudB.closest(".panel") && !tilbudB.closest(".scene"));
 
     overskrift("9. Lageret kan gennemføres");
     function svar(v) { var f = L.aktivtFelt(); f.input.value = v; L.tjek(); }
@@ -400,12 +421,19 @@ function koerTest(W) {
     paastand("fakta-linjen står under scenen", /vinduesglas/.test(d.getElementById("lager-status").textContent));
 
     var i, loeste = 1;
+    var hyldeRos = null;
     for (i = 1; i < 30; i++) {
         L.vaelg(i, true);
         var vagt = 0;
         while (!L.opg.faerdig && vagt++ < 10) svar(rigtigtSvar(L.aktivtFelt()));
         if (L.status[i].loest) loeste++;
+        if (i === 9) {
+            /* Den foerste hylde er faerdig: han venter, men kommer ikke */
+            for (var t9 = 0; t9 < 300; t9++) L.opdater(1 / 60);
+            hyldeRos = !!(L.laerer.scene && L.laerer.scene.navn === "hylde");
+        }
     }
+    paastand("Kemichael kommer ikke for at rose en enkelt hylde", hyldeRos === false);
     paastand("alle 30 glas kan løses", loeste === 30 && L.antalLoest() === 30);
     paastand("29 stjerner (det første fik svaret vist)", L.antalStjerner() === 29, L.antalStjerner());
     paastand("Kemichael venter med at rose den sidste hylde og hele lageret", !!(L.ventRos && L.ventRos.hylde === 2 && L.ventRos.alt));

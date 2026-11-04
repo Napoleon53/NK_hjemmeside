@@ -23,9 +23,10 @@ links går via `samling_alt.html?emne=c2.4` og brækker ikke.
    ikke emnet, og der er ingen dråbeflasker, uheld eller forløb i laboratoriet.
 4. **Loftet:** 3 faner (sværhedsgrader). En tabel med 12 positive og 8 negative ioner,
    40 opløsninger. På scenen 3 bægerglas med højst 20 ioner.
-5. **Layoutet:** scene plus panel. Scenen er bægerglassene foroven og
-   arbejdsbordet med reaktionsskemaet forneden. Panelet har trinene, den ene
-   hjælpeknap og fældningstabellen.
+5. **Layoutet:** scene plus panel. Scenen er tekstboksen med opgaven
+   øverst, arbejdsbordet med reaktionsskemaet lige under og bægerglassene
+   nederst (fra 4. nov. 2026; før stod glassene øverst og spørgsmålet
+   nederst). Panelet har trinene, knappen Ny opgave og fældningstabellen.
 
 Skemaformen er valgt af brugeren: eleven ender med **ionskemaet**, hvor
 tilskuerionerne er streget ud, fx 3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s). Sådan
@@ -35,14 +36,14 @@ skriver lærebogen og c2.5 det. Den gamle c2.4 afstemte hele saltskemaet.
 
 Brugeren ønskede, at det skal være tydeligt, at det er den samme opgave. Fanerne
 hedder derfor Let, Middel og Svær med en lille måler (1, 2 og 3 streger) og en
-linje om, hvad eleven selv gør. Opgavekortet har den samme opgavetekst ("Sølvnitrat
-og natriumphosphat blandes. Hvad falder ud, og hvad er ionskemaet?") og de samme
-fire trin på alle tre. Direkte links: `#let`, `#middel`, `#svaer`.
+linje om, hvad eleven selv gør. Tekstboksen begynder med blandingen
+("Sølvnitrat og natriumphosphat blandes.") på alle tre, og panelet viser de samme
+fire trin. Direkte links: `#let`, `#middel`, `#svaer`.
 
 | Fane | Eleven | Stilladset |
 |------|--------|------------|
-| Let · slå op i tabellen | finder de to nye par i tabellen og siger, hvad der falder ud | ionerne er givet, formlen og ionskemaet vises |
-| Middel · vælg svarene | går de fire trin igennem med svarmuligheder | forkerte svar er typiske fejl med forklaring |
+| Let · slå op i tabellen | finder de to nye par i opslaget og siger, hvad der falder ud | ionerne er givet, formlen og ionskemaet vises |
+| Middel · vælg svarene | går de fire trin igennem med svarmuligheder og Indsend svar | forkerte svar er typiske fejl med forklaring |
 | Svær · skriv selv | går de fire trin igennem og skriver selv ionerne, formlen og ionskemaet | skrivefeltet sætter tallene og bogstaverne rigtigt, og fejlen bliver genkendt |
 
 På Let står trin 1 som "givet" og trin 3 og 4 som "vises" i trinlisten; de
@@ -51,19 +52,56 @@ i tabellen, så hvad der falder ud. Let har blandinger med ét bundfald (55 %),
 intet bundfald (30 %) og to bundfald (15 %). Middel og Svær har altid ét
 bundfald. De fire trin:
 
-1. **Ionerne.** Hvilke ioner er der i de to opløsninger? Når begge ioner fra ét
-   salt er fundet (Middel) eller skrevet rigtigt (Svær), dukker de op i det
-   salts glas.
-2. **Bundfaldet.** Eleven klikker på det tungtopløselige par i
-   fældningstabellen. Så hældes glassene sammen, bundfaldet klumper sammen og
-   synker, og tilskuerionerne streges ud på tavlen.
+1. **Ionerne.** Hvilke ioner er der i de to opløsninger? På Middel vælger
+   eleven alle fire blandt otte og trykker Indsend svar. Er et forkert valg
+   med, godkendes intet: de forkerte bliver røde med forklaring, og de rigtige
+   bliver stående som valgt. Når begge ioner fra ét salt er godkendt (Middel)
+   eller skrevet rigtigt (Svær), dukker de op i det salts glas.
+2. **Bundfaldet.** Eleven slår op i fældningstabellen og klikker på det
+   tungtopløselige par (se Opslaget nedenfor). Så hældes glassene sammen,
+   bundfaldet klumper sammen og synker, og tilskuerionerne streges ud på
+   tavlen.
 3. **Formlen.** Bundfaldets formel, med ladningsregnskab i forklaringen.
 4. **Ionskemaet.** Tal foran og tilstandsform. Middel har + og − ved tallene
    og (aq)/(s) som knap; Svær har tre felter pr. led.
 
-Den ene knap i panelet er `Giv hint` → `Vis svaret` → (næste trin) → `Ny
-opgave`. Et vist svar tæller ikke med i "løst". De svære forhold (3 : 1, 3 : 2)
-kommer på Middel og Svær først, når eleven har løst to lette.
+Hintknappen i tekstboksen er `Giv et hint` → `Vis svaret`. Et vist svar
+tæller ikke med i "løst". De svære forhold (3 : 1, 3 : 2) kommer på Middel og
+Svær først, når eleven har løst to lette.
+
+## Tekstboksen og opslaget (4. nov. 2026)
+
+Brugeren: det var "lidt svært at gætte sig til at man skal klikke på
+fældningstabellen". Opgaveteksten skulle stå inde i hovedanimationen og være
+tydeligere, tekstboksen skulle bede eleven slå op i tabellen, og knappen skulle
+give tabellen i næsten fuld skærm sammen med reaktionsskemaet. Når de rigtige
+er klikket, er man tilbage ved den almindelige skærm.
+
+**Tekstboksen** er papirkortet fra `../faelles/papirkort.css` (lyst kort,
+Lexend), øverst midt i scenen som i de andre superanimationer. Al tekst står
+dér: "Trin 2 af 4" som indlejret overskrift, blandingen, spørgsmålet,
+svarmulighederne, beskeden (hint, forkert svar) og knapperne. Der er ingen
+tekstlinje på arbejdsbordet længere; under tavlen står kun ladningsknapperne
+på Svær. Svarknapperne vælger kun, og **Indsend svar** sender ind (grå, til
+noget er valgt). Enter i et felt på tavlen er det samme som Indsend svar.
+Efter et rigtigt svar bliver kortet på spørgsmålet: svaret bliver grønt,
+forklaringen står under, og **Næste trin →** står, hvor Indsend svar stod
+(til sidst **Ny opgave →**). Felterne på tavlen er låst imens. Ny opgave i
+panelet giver en anden blanding.
+
+**Opslaget.** I trinet med tabellen siger tekstboksen "Slå op i
+fældningstabellen", og hovedknappen hedder det samme. Knappen, eller et klik
+på tabellen i panelet, åbner opslaget: tekstboksen med det, eleven skal finde,
+reaktionsskemaet med ionerne og fældningstabellen i næsten fuld skærm. På Let
+finder eleven de to nye par; hvert fundet par kommer ind efter pilen med L
+eller T. På Middel og Svær klikker eleven på det tungtopløselige par. Hint og
+Vis svaret virker også i opslaget og markerer række og søjle i tabellen. Når
+det rigtige er fundet, står opslaget 1,7 sekund med beskeden i grønt og
+lukker så af sig selv; tabellen flytter tilbage i panelet. Bægerglassene står
+stille, mens opslaget er åbent, så eleven ser dem blive hældt sammen
+bagefter. Luk tabellen, Esc og et klik ved siden af lukker opslaget uden at
+miste det fundne. Tabellen er ét element, der flyttes ind og ud
+(`Opslag` i `js/opgave.js`).
 
 ### Skrivefeltet på Svær
 
@@ -141,9 +179,11 @@ js/formel.js      skrivefeltet: formatering, læsning og genkendelse af fejl
 js/tabel.js       fældningstabellen i panelet
 js/sprites.js     lageret til Kemichaels sprites
 js/baeger.js      de tre bægerglas med ionerne og bundfaldet
-js/opgave.js      motoren: trin, hjælpeknap, tavle og fælles hændelser
+js/opgave.js      motoren: trin, tekstboksen, Indsend svar, Næste trin,
+                  tavlen, opslaget og fælles hændelser
 js/niveauer.js    de tre sværhedsgrader og deres trin
-js/laerer.js      Kemichaels præsentation af hver sværhedsgrad
+js/laerer.js      Kemichaels præsentation af hver sværhedsgrad (den fælles
+                  ../kemichael/praesentation.js)
 js/rundvisning.js rundvisningen bag ?
 js/app.js         faneskift, tastatur, tegneløkke
 sprites/          bægerglasset (samme som sc2.1)
@@ -165,8 +205,10 @@ fejl, der passer på opgaven, kommer med. `D.formelKatalog` bruger de samme
 forklaringer til at genkende elevens egen formel på Svær.
 
 **Et trin** er et objekt i `js/niveauer.js` med `spm`, `hint`, `vis` og det, der
-skal til for at svare (`valg`, `tabelKlik`, `tjek`). Motoren i `js/opgave.js`
-står for resten.
+skal til for at svare: `muligheder` og `bedoem` (svarknapper og Indsend svar,
+`flere` når der vælges flere), `tabelKlik` og `opslagSpm` (opslaget) eller
+`tjek` (felterne på tavlen). `vaerktoej` er HTML under tavlen. Motoren i
+`js/opgave.js` står for resten; hovedkommentaren dér har hele listen.
 
 ## Selvtesten
 
@@ -174,28 +216,49 @@ står for resten.
 alle 533 par har rigtigt udfald og et afstemt fuldt skema, at svarmulighederne
 har præcis ét rigtigt svar med forklaring, at skrivefeltet formaterer alle 20
 ioner rigtigt, at de typiske fejl bliver genkendt, at det rigtige svar
-godkendes i alle opgaver, at alle tre niveauer kan gennemføres, at
-bundfaldet lander i glasset, og at sproget overholder reglerne.
+godkendes i alle opgaver, at alle tre niveauer kan gennemføres (med Indsend
+svar og Næste trin), at bundfaldet lander i glasset, at tekstboksen står
+øverst og er højst 215 px høj (kortet blev større og glassene mindre 4. nov.), at opslaget åbner, svarer og lukker,
+Kemichaels præsentation (tilbuddet, Næste, Spring præsentationen over, Esc,
+K, de gule rammer, armen, niveauskift og opslaget, trinenes længde og den
+fælles test fra `../kemichael/praesentation.js` på alle tre sværhedsgrader),
+og at sproget overholder reglerne.
 
 ## Kemichael
 
 Kemichael præsenterer hver sværhedsgrad første gang, den åbnes i en browser,
-som i sc2.3: han går ind foran det tomme glas i midten, siger tre korte
-replikker og går igen. Under anden replik peger han på det, den handler om, og
-det lyser op: tabellen (Let), opgavekortet (Middel) og arbejdsbordet (Svær).
-Scenen låser ikke. Knappen Spring præsentationen over, to klik på ham og Esc
-sender ham ud, og <kbd>K</kbd> viser præsentationen igen. Replikkerne står i
-`D.INTRO` i `js/data.js`, og hvad der er vist, huskes under `nk-sc2.4-intro` i
-browseren. Figuren, klik på ham og baggrundslivet kommer fra
+hvis eleven siger ja (se nedenfor). Præsentationen er den fælles fra 4. nov.
+2026 (`../kemichael/praesentation.js` og `praesentation.css`): han går ind
+foran det tomme glas i midten og siger tre trin (`D.INTRO` i `js/data.js`),
+hvert med to til fire hele sætninger i Kemibogens sprog: hvad sværhedsgraden
+træner, og hvordan tingene bruges. Teksten står i et lyst papirkort ved hans
+hoved med to knapper, "Næste" (på sidste trin "Afslut") og "Spring
+præsentationen over". Han går aldrig videre af sig selv; Enter og pil til
+højre er Næste, og Esc springer over. Det, trinnet handler om, får en gul
+ramme, der blinker: glassene (kun væsken med ionerne), tavlen, arbejdsbordet,
+fældningstabellen, trinene i panelet og tekstboksen. Armen sigter op mod
+tekstboksen og tavlen og til højre mod panelet; mod det venstre glas peger
+han ikke, men kigger derhen. Scenen låser ikke. Et andet niveau, opslaget i
+fældningstabellen og Spring præsentationen over sender ham ud, og <kbd>K</kbd>
+viser præsentationen igen. Hvad der er vist, huskes under `nk-sc2.4-intro` i
+browseren. Taleboblen er 47 % af området med glassene (`#laerred-boble` i
+`css/stil.css`), så de to knapper står på én linje ved 1400 px.
+
+Han kommer ellers ikke ind af sig selv (brugerens regel 4. nov. 2026). Her
+er ingen ros, intet påskeæg og ingen kaffekop; tilbage er kun de fælles svar,
+når man klikker på ham. De tre vittige replikker i den gamle præsentation
+("Jeg holder øje.", "De forkerte svar har jeg rettet før. Mange gange." og
+"Rødpennen er klar.") er taget ud, og to klik på ham sender ham ikke
+længere ud. Figuren og klik på ham kommer fra
 `../../v2/kemichael/kemichael.js`; koblingen står i `js/laerer.js`.
 
 ## Tilbuddet om præsentationen
 
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
-åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
+åbnes, står der Start præsentation og Nej tak midt foroven over glassene. Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker `startIntro` ind (`NK.Praesentation.pakInd`).
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
 
 ## I menuen

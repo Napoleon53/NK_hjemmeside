@@ -62,8 +62,7 @@
         this.koblMus();
         if (this.laererStart) this.laererStart();
         this.klargoerGaet();
-        this.visMaal();
-        this.visStatus();
+        this.visKort();
     }
 
     var P = SimVarm.prototype;
@@ -88,7 +87,8 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        var luft = NK.klamp(H * 0.085, 40, 64);
+        /* Alt tegnes under papirkortet oeverst i scenen (js/skort.js) */
+        var luft = this.skort.top();
 
         /* Reolen oeverst i venstre kolonne: fire glas pr. raekke, formlen under */
         var vB = Math.round(NK.klamp(W * 0.27, 170, 320));
@@ -173,8 +173,7 @@
         this.proeve.pause = !!this.pause;
         this.ballonVaek = false;
         this.byttet = true;
-        this.besked("", "");
-        this.visStatus();
+        this.visKort();
     };
 
     /* ----- Hvad der sker i proeven --------------------------------------------------- */
@@ -222,7 +221,12 @@
         NK.gem(NOEGLE, { maal: this.maalNr, fundet: this.fundet, gaet: this.gaet });
     };
 
-    /* ----- Maalene ---------------------------------------------------------------------- */
+    /* ----- Maalene ----------------------------------------------------------------------
+       Papirkortet (4. nov. 2026): maalet staar paa kortet oeverst midt i
+       scenen. Termometeret og glassene loeser intet af sig selv; eleven
+       trykker Indsend svar, og foerst da bedoemmes maalet (indsend). Efter
+       et rigtigt svar bliver maalet staaende med forklaringen under og
+       knappen Naeste maal, dér hvor Indsend svar stod. */
     P.maal = function () { return D.MAAL[this.maalNr] || null; };
 
     /* Maal 3: det stof, der skal gaettes paa. Decan, eller den laengste lige
@@ -257,82 +261,140 @@
         return m.hint.replace("{Navn}", st.Navn + ", " + D.formel(st) + ",").replace("{ned}", ned.navn);
     };
 
+    P.andreFundet = function () {
+        return this.fundet.filter(function (id) { return id !== "pentan"; }).length;
+    };
+
+    /* Er stoffet i glasset, og koger det (eller er det gas) ved temperaturen? */
+    P.koger = function (id) {
+        return this.stof().id === id && this.proeve.T >= D.stof(id).kp - 0.5 && this.fundet.indexOf(id) >= 0;
+    };
+
+    /* Er maalet naaet? (bruges af Indsend svar og af Vis svaret) */
+    P.maalOk = function (m) {
+        if (m.slags === "koge") return this.koger(m.id);
+        if (m.slags === "flere") return this.andreFundet() >= m.antal;
+        if (m.slags === "gaet") return !this.gaet || (this.gaet.sat && this.fundet.indexOf(this.gaet.id) >= 0);
+        return false;
+    };
+
+    /* Forklaringen, naar maalet er naaet */
+    P.efterTekst = function (m) {
+        if (m.slags !== "gaet") return m.efter;
+        if (!this.gaet) return "Alle kæderne er målt. Kurven er færdig.";
+        var st = D.stof(this.gaet.id), afv = Math.abs(this.gaet.t - st.kp);
+        return "Du gættede " + D.gradTekst(this.gaet.t, 0) + ". " + st.Navn + " koger ved " + D.gradTekst(st.kp) + ". " +
+            (afv <= D.GAET_GODT ? "Godt ramt." : "Kurven flader lidt ud, jo længere kæden er.");
+    };
+
+    /* Et kogepunkt er fundet. Blev stoffet til gaettet maalt, foer eleven
+       gættede, faar eleven et nyt stof at gaette paa. Vis svaret venter paa,
+       at maalet er naaet. */
     P.tjekMaal = function () {
         var m = this.maal();
         if (!m || this.naaet) return;
-        var ok = false, efter = m.efter, mig = this;
-        if (m.slags === "koge") ok = this.fundet.indexOf(m.id) >= 0;
-        if (m.slags === "flere") ok = this.fundet.filter(function (id) { return id !== "pentan"; }).length >= m.antal;
-        if (m.slags === "gaet") {
-            if (!this.gaet) { ok = true; efter = "Alle kæderne er målt. Kurven er færdig."; }
-            else if (this.fundet.indexOf(this.gaet.id) >= 0) {
-                var st = D.stof(this.gaet.id);
-                if (!this.gaet.sat) {
-                    /* Maalt foer gaettet: saa et nyt stof at gaette paa */
-                    var nyt = this.gaetStof();
-                    this.gaet = nyt ? { id: nyt.id, t: 0, sat: false } : null;
-                    if (nyt) {
-                        this.besked(NK.html(st.Navn) + " blev målt, før du gættede. Gæt så på " + NK.html(nyt.navn) + ".", "gul");
-                        this.visMaal();
-                        this.gem();
-                        return;
-                    }
-                    ok = true;
-                    efter = "Alle kæderne er målt. Kurven er færdig.";
-                } else {
-                    ok = true;
-                    var afv = Math.abs(this.gaet.t - st.kp);
-                    efter = "Du gættede " + D.gradTekst(this.gaet.t, 0) + ". " + st.Navn + " koger ved " + D.gradTekst(st.kp) + ". " +
-                        (afv <= D.GAET_GODT ? "Godt ramt." : "Kurven flader lidt ud, jo længere kæden er.");
-                }
-            }
+        if (m.slags === "gaet" && this.gaet && !this.gaet.sat && this.fundet.indexOf(this.gaet.id) >= 0) {
+            var st = D.stof(this.gaet.id), nyt = this.gaetStof();
+            this.gaet = nyt ? { id: nyt.id, t: 0, sat: false } : null;
+            if (nyt) this.skort.besked(NK.html(st.Navn) + " blev målt, før du gættede. Gæt nu på " + NK.html(nyt.navn) + ".", "gul");
+            this.gem();
+            this.visKort();
         }
-        if (!ok) return;
+        if (this.visSvarVent && this.maalOk(m)) this.loest("svar");
+    };
+
+    P.kanIndsende = function () {
+        var m = this.maal();
+        if (!m || this.naaet || this.visSvarVent) return false;
+        if (m.slags === "koge") return !!(this.termo.roert || this.byttet);
+        if (m.slags === "flere") return this.andreFundet() > 0;
+        if (m.slags === "gaet") return !this.gaet || !!this.gaet.sat;
+        return false;
+    };
+
+    P.indsendTekst = function () {
+        var m = this.maal();
+        if (!m) return "Indsend svar";
+        if (m.slags === "koge") return "Indsend svar: " + D.gradTekst(this.termo.T, 0);
+        if (m.slags === "flere") {
+            var n = this.andreFundet();
+            return "Indsend svar: " + n + (n === 1 ? " kogepunkt" : " kogepunkter");
+        }
+        return "Indsend svar";
+    };
+
+    /* Indsend svar: maalet bedoemmes */
+    P.kortIndsend = function () {
+        var m = this.maal();
+        if (!m || this.naaet) return;
+        if (this.maalOk(m)) { this.loest("selv"); return; }
+        var st = this.stof(), T = D.gradTekst(this.proeve.T, 0);
+        if (m.slags === "koge") {
+            var maal = D.stof(m.id);
+            if (st.id !== m.id) this.skort.fejl("Glasset i kammeret er " + NK.html(st.navn) + ". Træk glasset med " + NK.html(maal.navn) + " ned i kammeret.");
+            else this.skort.fejl("Ved " + T + " koger " + NK.html(maal.navn) + " ikke. Der kommer ingen bobler i glasset.");
+        } else if (m.slags === "flere") {
+            var mangler = m.antal - this.andreFundet();
+            this.skort.fejl("Kurven har " + this.andreFundet() + " kogepunkt" + (this.andreFundet() === 1 ? "" : "er") + " ud over pentan. Find " +
+                mangler + " mere.");
+        } else if (m.slags === "gaet") {
+            var g = D.stof(this.gaet.id);
+            this.skort.fejl("Kurven har ikke kogepunktet for " + NK.html(g.navn) + " endnu. Sæt " + NK.html(g.navn) + " i kammeret, og varm op, til det koger.");
+        }
+        this.visKort();
+    };
+
+    /* Maalet er naaet: kortet bliver paa maalet med forklaringen */
+    P.loest = function (maade) {
+        var m = this.maal();
+        if (!m || this.naaet) return;
         this.naaet = true;
+        this.svarVist = maade === "svar";
+        this.visSvarVent = false;
         this.hjaelp = 0;
-        this.besked(NK.html(efter), "god");
+        this.efter = this.efterTekst(m);
+        this.skort.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         this.maalNr = Math.min(D.MAAL.length, this.maalNr + 1);
         this.maalVist = this.maalNr - 1;
         this.gem();
-        this.visMaal();
-        void mig;
+        this.visKort();
     };
 
-    P.knap = function () {
-        if (this.naaet) {
-            this.naaet = false;
-            this.hjaelp = 0;
-            this.besked("", "");
-            if (this.maalNr >= D.MAAL.length && !this.rost) {
-                this.rost = true;
-                this.ventRos = 1.0;
-            }
-            this.klargoerGaet();
-            this.visMaal();
-            this.tjekMaal();
-            return;
+    /* Den groenne knap: naeste maal (eller frit valg efter det sidste) */
+    P.kortVidere = function () {
+        if (!this.naaet) return;
+        this.naaet = false;
+        this.hjaelp = 0;
+        this.skort.besked("", "");
+        if (this.maalNr >= D.MAAL.length && !this.rost) {
+            this.rost = true;
+            this.ventRos = 1.0;
         }
+        this.klargoerGaet();
+        this.visKort();
+    };
+
+    /* Hintknappen: Giv et hint, saa Vis svaret */
+    P.kortHint = function () {
         var m = this.maal();
-        if (!m) {
-            /* Alle maal er naaet: forfra, ogsaa kurven */
-            this.maalNr = 0;
-            this.fundet = [];
-            this.gaet = null;
-            this.sidstFundet = null;
-            this.note("");
-            this.gem();
-            this.besked("", "");
-            this.visMaal();
-            return;
-        }
+        if (!m || this.naaet) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(this.hintTekst(m)), "gul");
+            this.skort.hintTekst(NK.html(this.hintTekst(m)), 1, 1);
         } else {
+            this.visSvarVent = true;
+            this.skort.svarTekst("Kammeret viser det.");
             this.visSvaret(m);
+            this.tjekMaal();
         }
-        this.visMaal();
+        this.visKort();
+    };
+
+    /* Bruges af selvtesten og Enter: den groenne knap, ellers hintknappen */
+    P.knap = function () {
+        if (this.naaet) this.kortVidere();
+        else this.kortHint();
     };
 
     /* Vis svaret: stoffet saettes i, og kammeret skruer op */
@@ -347,7 +409,7 @@
             var mangler = ["metan", "hexan", "octan", "butan", "heptan", "decan"].filter(function (id) {
                 return mig.fundet.indexOf(id) < 0;
             });
-            var antal = m.antal - this.fundet.filter(function (id) { return id !== "pentan"; }).length;
+            var antal = m.antal - this.andreFundet();
             mangler.slice(0, Math.max(0, antal)).forEach(function (id) {
                 mig.fundet.push(id);
                 mig.glimt[id] = 1;
@@ -355,7 +417,6 @@
             });
             this.note("Tre kogepunkter er sat på kurven.");
             this.gem();
-            this.tjekMaal();
         } else if (m.slags === "gaet" && this.gaet) {
             var st = D.stof(this.gaet.id);
             this.gaet.t = Math.round(st.kp / 5) * 5;
@@ -367,6 +428,22 @@
         }
     };
 
+    /* Start maalene forfra (knappen i panelet efter det sidste maal) */
+    P.forfra = function () {
+        this.maalNr = 0;
+        this.fundet = [];
+        this.gaet = null;
+        this.naaet = false;
+        this.hjaelp = 0;
+        this.visSvarVent = false;
+        this.sidstFundet = null;
+        this.note("");
+        this.gem();
+        this.skort.besked("", "");
+        this.klargoerGaet();
+        this.visKort();
+    };
+
     P.nulstil = function () {
         /* Et nyt glas af samme stof, og kammeret tilbage paa stuetemperatur */
         this.termo.saet(D.STUE);
@@ -374,12 +451,12 @@
         this.ballonVaek = false;
         this.brand = null;
         this.stik = null;
-        this.besked("", "");
-        this.visStatus();
+        this.visKort();
     };
 
     P.enter = function () {
-        if (this.naaet || !this.maal()) this.knap();
+        if (this.naaet) this.kortVidere();
+        else if (this.kanIndsende()) this.kortIndsend();
     };
 
     P.fokus = function () {};
@@ -387,7 +464,7 @@
     /* Piletasterne skruer paa temperaturen, P holder pause */
     P.tast = function (tast, e) {
         if (tast === "p" || tast === "P") { this.skiftPause(); return true; }
-        if (this.termo.tast(tast, e && e.shiftKey)) { this.visStatus(); return true; }
+        if (this.termo.tast(tast, e && e.shiftKey)) { this.visKort(); return true; }
         return false;
     };
 
@@ -396,16 +473,11 @@
         this.proeve.pause = this.pause;
     };
 
-    /* ----- Panelet ---------------------------------------------------------------------- */
+    /* ----- Panelet og kortet ------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("varm-knap"),
-            besked: NK.el("varm-besked"),
-            kort: NK.el("varm-kort")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("varm-spring").addEventListener("click", function () { mig.springIntro(); });
+        this.skort = new NK.Skort("varm", this, D.ZONE.varm);
+        NK.el("varm-forfra").addEventListener("click", function () { mig.forfra(); });
         var note = document.createElement("p");
         note.className = "note";
         note.id = "varm-note";
@@ -413,62 +485,29 @@
         this.koblKurve();
     };
 
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
-
-    P.visMaal = function () {
+    /* Kortet oeverst i scenen */
+    P.kortData = function () {
         var vist = this.naaet ? this.maalVist : this.maalNr;
         var m = D.MAAL[vist] || null;
-        NK.saetTekst("varm-nr", String(Math.min(vist + 1, D.MAAL.length)));
-        if (m) {
-            NK.saetTekst("varm-maal-titel", "Mål");
-            NK.saetTekst("varm-prompt", this.maalTekst(m));
-        } else {
-            NK.saetTekst("varm-maal-titel", "Frit valg");
-            NK.saetTekst("varm-prompt", "Varm alle alkanerne op, som du vil. Kurven bliver hængende.");
-        }
-        var tekst, klasse = "knap";
+        if (!m) return { chip: "Frit valg", tekst: "Varm alle alkanerne op, som du vil. Kurven i panelet bliver hængende." };
+        var d = { chip: "Mål " + (vist + 1) + " af " + D.MAAL.length, tekst: this.maalTekst(m) };
         if (this.naaet) {
-            tekst = this.maalNr >= D.MAAL.length ? "Afslut målene →" : "Næste mål →";
-            klasse = "knap blaa banker";
-        } else if (!m) tekst = "Start målene forfra";
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.naaet);
-        NK.el("varm-taeller").hidden = !m;
-    };
-
-    /* Hvad stoffet er ved temperaturen lige nu, som tekst */
-    P.tilstandTekst = function () {
-        var P2 = this.proeve, g = P2.grupper[0], t = P2.taelling(g), st = g.st, T = P2.T;
-        if (P2.braendt && !t[0] && !t[1]) return "brændt";
-        if (t[0] && t[1]) return T >= st.smp ? "ved at smelte" : "ved at størkne";
-        if (T >= st.kp && t[1]) return "ved at koge";
-        if (T < st.kp && t[2] > P2.dampMaks(g)) return "ved at fortætte";
-        if (t[0] === g.n) return "fast stof";
-        if (t[2] === g.n) return "en gas";
-        if (t[1] + t[2] === g.n) return "en væske";
-        return "fast stof og væske";
-    };
-
-    P.visStatus = function () {
-        var st = this.stof(), tr = this.traek, t;
-        if (tr && tr.slags === "glas" && tr.flyttet) t = "Slip glasset i kammeret.";
-        else if (tr && tr.slags === "termo") t = "Kammeret er " + D.gradTekst(this.termo.T, 0) + ".";
-        else if (this.stik) t = this.stik.braender ? "Tændstikken brænder." : "Træk tændstikken op af æsken.";
-        else if (this.brand) t = "Gassen i ballonen brændte. Den blev til CO₂ og H₂O.";
-        else if (this.flyv) t = st.Navn + ", " + D.formel(st) + ", sættes i kammeret.";
-        else {
-            t = "<b>" + NK.html(st.Navn) + "</b> er " + this.tilstandTekst() + " ved " + D.gradTekst(this.proeve.T, 0) + ".";
-            if (!this.termo.roert) t += " Træk i termometeret.";
-            else if (!this.byttet) t += " Træk et andet glas ned i kammeret.";
+            d.bliv = { html: NK.html(this.efter || ""), maerke: this.svarVist ? "Svaret" : "Rigtigt",
+                       knap: this.maalNr >= D.MAAL.length ? "Afslut målene →" : "Næste mål →", gul: this.svarVist };
+            return d;
         }
-        NK.saetHTML("varm-status", t);
+        d.hint = this.visSvarVent ? null : (this.hjaelp === 0 ? "Giv et hint" : "Vis svaret");
+        d.indsend = this.visSvarVent ? null : { tekst: this.indsendTekst(), klar: this.kanIndsende() };
+        return d;
     };
 
+    P.visKort = function () {
+        this.skort.vis();
+        NK.el("varm-forfra").hidden = !!this.maal() || this.naaet;
+    };
+
+    /* Bagudkompatibelt navn (Kemichael og selvtesten) */
+    P.visMaal = function () { this.visKort(); };
     /* ----- Kurven i panelet -------------------------------------------------------------- */
     P.kurveData = function () {
         var mig = this;
@@ -507,7 +546,7 @@
         c.addEventListener("pointerdown", function (e) {
             var pt = mig.KL.punkt(e), u = hvad(pt);
             if (!u) {
-                if (mig.gaetAktiv()) mig.besked("Træk ? op eller ned til dit gæt.", "gul");
+                if (mig.gaetAktiv()) mig.skort.kort("Træk ? på kurven op eller ned til dit gæt.", 4);
                 return;
             }
             if (u.slags === "gaet" || u.slags === "gaetSoejle") {
@@ -535,7 +574,8 @@
                 mig.gaet.sat = true;
                 mig.gem();
                 var st = D.stof(mig.gaet.id);
-                mig.besked("Dit gæt: " + D.gradTekst(mig.gaet.t, 0) + ". Mål nu " + NK.html(st.navn) + " i kammeret.", "");
+                mig.skort.besked("Dit gæt: " + D.gradTekst(mig.gaet.t, 0) + ". Mål nu " + NK.html(st.navn) + " i kammeret.", "");
+                mig.visKort();
             }
         });
         c.addEventListener("pointerleave", function () { mig.kurveOver = null; });
@@ -589,7 +629,8 @@
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
-        this.visStatus();
+        this.skort.opdater(dt);
+        this.visKort();
     };
 
     /* Kemichael saetter et nyt glas med en ny ballon i */
@@ -612,7 +653,6 @@
         var ctx = this.L.ctx, lay = this.lay;
         if (!lay) return;
         var mig = this, st = this.stof(), mk = this.proeve.makro();
-        var puls = 0.55 + 0.45 * Math.sin(this.tid * 7);
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 6);
 
         /* Reolen med glassene ved stuetemperatur */
@@ -624,7 +664,7 @@
             if (i !== mig.valgt && i !== trukket && !iLuften) {
                 var G = Tg.glasMaal(hg.x, hg.y, lay.hyldeGlasH);
                 var over = mig.over && mig.over.slags === "hylde" && mig.over.i === i;
-                Tg.glas(ctx, G, hyldeMakro(hs), mig.tid, { lys: over ? 1 : (mig.pegHylde ? puls * 0.8 : 0) });
+                Tg.glas(ctx, G, hyldeMakro(hs), mig.tid, { lys: over ? 1 : 0 });
             }
             var skiltFarve = i === mig.valgt ? "#f2c53d" : (mig.fundet.indexOf(hs.id) >= 0 ? "#ffd2cb" : undefined);
             Tg.skilt(ctx, hg.x, hg.y + 13, [D.formel(hs)], { px: lay.skilt, farve: skiltFarve });
@@ -687,7 +727,7 @@
         var hd = Tg.termometer(ctx, lay.termo, this.termo.T, {
             trin: 50, store: 100, maerker: maerker, stue: true, tid: this.tid,
             haandtag: this.over && this.over.slags === "termo", traekker: tr && tr.slags === "termo",
-            puls: foersteMaal || this.pegTermo
+            puls: foersteMaal
         });
         if (foersteMaal && !tr) Tg.traekPil(ctx, hd.x, hd.y, hd.r * 2 + 18, this.tid);
 
@@ -750,7 +790,7 @@
             this.antaend(b);
         } else if (!s.ved) {
             s.ved = true;
-            this.besked(NK.html(D.TOM_BALLON), "");
+            this.skort.kort(NK.html(D.TOM_BALLON), 5);
         }
     };
 
@@ -761,7 +801,6 @@
         this.stik = null;
         if (this.traek && this.traek.slags === "stik") this.traek = null;
         this.braende++;
-        this.besked("", "");
     };
 
     /* ----- Musen ---------------------------------------------------------------------------- */
@@ -823,7 +862,7 @@
                 return;
             }
             try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
-            mig.visStatus();
+            mig.visKort();
         });
         c.addEventListener("pointermove", function (e) {
             var pt = mig.L.punkt(e), tr = mig.traek;
@@ -863,40 +902,34 @@
             this.termo.slip();
         } else if (tr.slags === "glas") {
             if (!tr.flyttet || (pt && this.overKammer(pt))) this.skift(tr.i);
-            else this.besked("Slip glasset over kammeret for at sætte det i.", "gul");
+            else this.skort.kort("Slip glasset over kammeret for at sætte det i.", 4);
         } else if (tr.slags === "stik") {
             if (this.stik && !this.stik.braender) {
-                this.besked("Tændstikker. Træk en op af æsken for at stryge den.", "");
+                this.skort.kort("Tændstikæsken. Træk en tændstik op af æsken for at stryge den.", 4);
             }
             this.stik = null;
         }
-        this.visStatus();
+        this.visKort();
     };
 
     /* Et klik uden at traekke: alt svarer */
     P.klikInfo = function (u) {
-        var st = this.stof();
+        var st = this.stof(), t = "";
         if (u.slags === "glas") {
-            this.besked(NK.html(st.Navn + ", " + D.formel(st) + ". ") + (this.fundet.indexOf(st.id) >= 0 ?
-                "Kogepunkt: " + D.gradTekst(st.kp) + "." : "Kogepunktet er ikke fundet endnu."), "");
+            t = NK.html(st.Navn + ", " + D.formel(st) + ". ") + (this.fundet.indexOf(st.id) >= 0 ?
+                "Kogepunktet er " + D.gradTekst(st.kp) + "." : "Kogepunktet for " + NK.html(st.navn) + " er ikke fundet endnu.");
         } else if (u.slags === "ballon") {
-            this.besked("Ballonen fanger gassen, når stoffet koger. Varm gas fylder mere.", "");
+            t = "Ballonen fanger gassen, når stoffet koger. Varm gas fylder mere.";
         } else if (u.slags === "kammer") {
-            this.besked("Kammeret har den temperatur, termometeret viser. Træk i termometeret.", "");
+            t = "Kammeret har den temperatur, termometeret viser. Træk i termometeret.";
         } else if (u.slags === "zoom") {
-            this.besked("Hver kugle er et C-atom med dets H-atomer. De gule prikker viser, hvor molekylerne rører hinanden.", "");
+            t = "Hver kugle er et C-atom med dets H-atomer. De gule prikker viser, hvor molekylerne rører hinanden.";
         }
+        if (t) this.skort.kort(t, 5);
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-varm", tilbud: "varm-tilbud", spring: "varm-spring" });
-
-    /* Mens han taler om hylden og termometeret, lyser de */
-    P.pegPaaFelt = function () {
-        var i = this.laererIIntro && this.laererIIntro() ? this.introTrin : 0;
-        this.pegHylde = i === 1;
-        this.pegTermo = i === 2;
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-varm", tilbud: "varm-tilbud" });
 
     NK.SimVarm = SimVarm;
 }());

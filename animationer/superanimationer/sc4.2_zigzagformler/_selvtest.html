@@ -425,8 +425,8 @@ function koerTest(W) {
     paastand("skuffen har ti klistermærker, ét for hver quiz", SK.ALLE.length === 10 && SK.antalAabne() === 0);
     var alleQuiz = SK.ALLE.map(function (k) { return k.quiz; }).sort().join();
     paastand("quizzerne er de ti på Zigzag, Navne og Isomerer", alleQuiz === ["is-4", "is-5", "is-6", "is-7", "nv-byg-alkaner", "nv-byg-alkener", "nv-navn-alkaner", "nv-navn-alkener", "zz-atomer", "zz-tegn"].join(), alleQuiz);
-    var kort = SK.ALLE.filter(function (k) { return k.replik.length > 62 || /[–—]/.test(k.replik + k.hvordan + k.titel); });
-    paastand("replikkerne er korte og uden tankestreger", kort.length === 0, kort.map(function (k) { return k.navn; }).join(", "));
+    var kort = SK.ALLE.filter(function (k) { return /[–—]/.test(k.hvordan + k.titel); });
+    paastand("klistermærkernes tekster er uden tankestreger", kort.length === 0, kort.map(function (k) { return k.navn; }).join(", "));
     var k1 = SK.laasOp("is-4"), k2 = SK.laasOp("is-4");
     paastand("en quiz låser sit klistermærke op én gang", k1 && k1.navn === "kaffekop" && k2 === null && SK.aaben("kaffekop") && SK.antalAabne() === 1);
     paastand("skuffen gemmes under den fælles nøgle, som tegnebrættet også læser", SK.NOEGLE === "nk-skuffe" && /kaffekop/.test(W.localStorage.getItem("nk-skuffe") || ""));
@@ -447,6 +447,8 @@ function koerTest(W) {
     });
     var gave = d.querySelector("#fane-isomerer .gave");
     paastand("Isomerer: C₄H₁₀ klaret giver kaffekoppen, konfetti og vinduet", SK.aaben("kaffekop") && gave && gave.textContent.indexOf("Kaffekoppen") >= 0 && I.konfettiListe && I.konfettiListe.length > 100);
+    /* Brugerens regel 4. nov. 2026: han kommer ikke for en enkelt quiz, kun for en hel fane */
+    paastand("Isomerer: Kemichael kommer ikke for ét klistermærke", !(I.laerer.scene && I.laerer.scene.navn === "faerdig"));
     var proev = gave && gave.querySelector(".gave-proev");
     paastand("knappen i vinduet åbner tegnebrættet i en ny fane med kaffekoppen klar",
         !!proev && proev.tagName === "A" && /\.\.\/tegnebraet\/index\.html#klister=kaffekop$/.test(proev.getAttribute("href")) && proev.getAttribute("target") === "_blank",
@@ -458,6 +460,29 @@ function koerTest(W) {
     I.nytNiveau(5);
     I.knap(); I.knap(); I.ryd = 0; I.knap(); I.knap(); I.ryd = 0; I.knap(); I.knap();
     paastand("Isomerer: alle isomerer vist af knappen giver ikke Bunsen", I.faerdig() && !SK.aaben("bunsen"));
+    paastand("Isomerer: Kemichael siger intet, når svarene er vist", !(I.laerer.scene && I.laerer.scene.navn === "faerdig"));
+    paastand("Isomerer: opgavekortet siger, hvorfor klistermærket udebliver", /Alle isomerer af C₅H₁₂ er på listen\. Isomererne af C₅H₁₂ er fundet, men klistermærket kræver, at du højst har set halvdelen af svarene\./.test(d.getElementById("is-besked").textContent),
+        d.getElementById("is-besked").textContent);
+    /* Zigzag: en serie med fire viste svar giver intet klistermaerke, men kortet siger hvorfor */
+    NK.visFane("zigzag");
+    d.querySelector('#zz-retning button[data-v="atomer"]').click();
+    var za = Z.serie();
+    za.status = [1, 1, 1, 1, 1, 2, 2, 2, 2, 0];
+    za.nr = 9;
+    Z.startOpgave();
+    Z.visSvar();
+    paastand("Zigzag: fire viste svar giver ikke festhatten, og opgavekortet siger hvorfor", Z.loest && !SK.aaben("festhat") &&
+        /^Svaret: .*\. Serien er klaret, men klistermærket kræver, at du højst har set tre af svarene\.$/.test(d.getElementById("zz-besked").textContent),
+        d.getElementById("zz-besked").textContent);
+    d.querySelector('#zz-retning button[data-v="tegn"]').click();
+    NK.visFane("isomerer");
+    /* Fanens sidste klistermaerke: hele fanen er klaret, og han roser én gang */
+    SK.laasOp("is-5"); SK.laasOp("is-6");
+    I.klaret("is-7", true);
+    paastand("Isomerer: fanens sidste klistermærke får Kemichael til at rose fanen", SK.aaben("kemichael") && !!(I.laerer.scene && I.laerer.scene.navn === "faerdig"));
+    Array.prototype.forEach.call(d.querySelectorAll(".gave"), function (x) { x.remove(); });
+    W.localStorage.removeItem(SK.NOEGLE);
+    SK.laasOp("is-4");
     /* Zigzag: en serie med højst tre viste svar giver gloøjnene */
     NK.visFane("zigzag");
     d.querySelector('#zz-retning button[data-v="tegn"]').click();
@@ -591,14 +616,43 @@ function koerTest(W) {
     OS.nytSpil();
     NK.visFane("zigzag");
 
+    overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    function koerTid(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    [["zigzag", "tegn"], ["zigzag", "atomer"], ["navne"], ["isomerer"], ["oploeselighed"]].forEach(function (f) {
+        NK.visFane(f[0]);
+        var sim = NK.sims["fane-" + f[0]];
+        if (f[1]) d.querySelector('#zz-retning button[data-v="' + f[1] + '"]').click();
+        sim.tilpas();
+        koerTid(sim, 4);
+        NK.Praesentation.selvtest(sim, function (sek) { koerTid(sim, sek); }).forEach(function (r) {
+            paastand(f.join(" ") + ": " + r[0], r[1], r[2]);
+        });
+    });
+    d.querySelector('#zz-retning button[data-v="tegn"]').click();
+    /* Under praesentationen venter rosen, til han er faerdig */
+    NK.visFane("oploeselighed");
+    OS.startIntro(true); koerTid(OS, 2.5);
+    OS.laererFaerdig(NK.Data.ROS.oploes); koerTid(OS, 1);
+    paastand("rosen venter, til præsentationen er slut", OS.laererIIntro() && OS.rosVenter === NK.Data.ROS.oploes);
+    OS.springIntro(); koerTid(OS, 0.5);
+    paastand("efter præsentationen kommer rosen", !OS.laererIIntro() && !OS.rosVenter && !!(OS.laerer.scene && OS.laerer.scene.navn === "faerdig"));
+    koerTid(OS, 12);
+    NK.visFane("zigzag");
+
     overskrift("10. Sproget");
     var tekst = d.body.innerText + "\n" + JSON.stringify(NK.Data) + "\n" + nT.map(function (x) { return besked(TJ.navn(x[1], x[0])); }).join("\n");
     paastand("ingen tankestreger (– og —)", !/[–—]/.test(tekst), (tekst.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
     paastand("ingen 1+ eller 1−", !/\b1[+−-]\s/.test(tekst));
-    var replikker = [].concat(NK.Data.INTRO_ZIGZAG, NK.Data.INTRO_NAVNE, NK.Data.INTRO_ISOMERER, NK.Data.INTRO_OPLOES,
-        Object.keys(NK.Data.ROS).map(function (k) { return NK.Data.ROS[k]; }));
-    var lange = replikker.filter(function (x) { return x.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var intro = [].concat(NK.Data.INTRO_ZIGZAG, NK.Data.INTRO_ZIGZAG_ATOMER, NK.Data.INTRO_NAVNE, NK.Data.INTRO_ISOMERER, NK.Data.INTRO_OPLOES)
+        .map(function (l) { return l.tekst; });
+    var lange = intro.filter(function (t) { var n = t.split(/[.?] /).length; return t.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0]);
+    var halve = intro.filter(function (t) { return !/^[A-ZÆØÅ].*\.$/.test(t) || /^Her\b/.test(t); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
+    var ros = Object.keys(NK.Data.ROS).map(function (k) { return NK.Data.ROS[k]; });
+    var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
+    paastand("rosen er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
 
     overskrift("11. Layout");
     var ramme = document.getElementById("ramme");

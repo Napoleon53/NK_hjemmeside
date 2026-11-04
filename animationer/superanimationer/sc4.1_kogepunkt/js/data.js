@@ -196,40 +196,60 @@
         return "Den korte kæde rører sine naboer mindst.";
     };
 
-    /* ----- Kemichael ------------------------------------------------------------- */
+    /* ----- Kemichael -------------------------------------------------------------
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_VARM = [
-        "Her varmer vi alkaner op. De står på hylden.",
-        "Træk i termometeret. Ballonen fanger gassen.",
-        "Tændstikkerne er til stearinlyset. Kun til det."
+        { tekst: "I denne fane undersøger du, hvordan kogepunktet for en alkan afhænger af kædens længde. Du trækker et glas fra hylden ned i kammeret. Ballonen på glasset fanger gassen, når stoffet koger.",
+          sel: ["#varm-anker-hylde", "#varm-anker-kammer"] },
+        { tekst: "Du varmer kammeret op eller køler det ned ved at trække i håndtaget på termometeret. Vinduet i midten viser molekylerne i glasset helt tæt på. Kuglerne er grå i et fast stof, orange i en væske og blå i en gas.",
+          sel: ["#varm-anker-termometer", "#varm-anker-zoom"] },
+        { tekst: "Opgavekortet giver dig ét mål ad gangen, og der er fire mål i alt. Knappen på kortet giver et hint og derefter svaret. Kurven under opgavekortet viser de kogepunkter, du har fundet.",
+          sel: ["#varm-kort", "#varm-kurve-kort"] }
     ];
     D.INTRO_FORM = [
-        "Tre stoffer med samme formel, C₅H₁₂.",
-        "Gæt, hvilken ballon der fyldes først.",
-        "Vandbadet er bare vand. Det drikker vi ikke."
+        { tekst: "I denne fane undersøger du, om molekylernes form påvirker kogepunktet. De tre glas i vandbadet indeholder pentan, 2-methylbutan og 2,2-dimethylpropan, som alle har formlen C₅H₁₂. Vinduet over hvert glas viser molekylerne i glasset.",
+          sel: ["#form-anker-bad", "#form-anker-zoom"] },
+        { tekst: "Først gætter du på opgavekortet, hvilken ballon der fyldes først. Du kan også gætte ved at klikke på et af glassene. Derefter varmer du vandbadet op ved at trække i håndtaget på termometeret.",
+          sel: ["#form-kort", "#form-anker-termometer"] },
+        { tekst: "Når alle tre stoffer har kogt, spørger opgavekortet, hvorfor ét af stofferne koger før de to andre. Knappen på kortet giver et hint og derefter svaret. Kogepunkterne kommer på listen under opgavekortet, og knappen under listen viser, hvor molekylerne rører hinanden.",
+          sel: ["#form-kort", "#form-tabel-kort"] }
     ];
     D.INTRO_SPIL = [
-        "Blandinger. Hvem koger først?",
-        "Du gætter. Kammeret varmer op og viser svaret."
+        { tekst: "I denne fane gætter du, hvilket stof i en blanding der koger først. Glasset i kammeret indeholder en blanding af to eller tre alkaner. Vinduet viser molekylerne af hvert stof i sin egen farve.",
+          sel: ["#spil-anker-kammer", "#spil-anker-zoom"] },
+        { tekst: "Du svarer på opgavekortet eller ved at klikke på et af molekylerne. Derefter varmer kammeret selv op, til det første stof er kogt væk. Opgavekortet forklarer bagefter, hvorfor netop det stof kogte først.",
+          sel: "#spil-valg" },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret, men du får ikke point for et svar, du har set. En runde består af ni blandinger fra tre niveauer. Kortet Runden tæller dine rigtige svar og husker din rekord.",
+          sel: ["#spil-kort", "#spil-runde"] }
     ];
 
-    D.MAAL_FAERDIG = "Fire mål. Stearinlyset overlevede.";
-    D.FORM_FAERDIG = "Det kogte du godt ned.";
+    /* Ros, naar en hel fane er klaret. Det er sammen med taendstikken de
+       eneste gange, han kommer ind af sig selv (brugerens regel 4. nov.
+       2026). Fane 1: alle fire maal. Fane 2: hvorfor er besvaret (kun
+       foerste gang i browseren). Fane 3: runden er slut. */
+    D.MAAL_FAERDIG = "Du har nået alle fire mål, og stearinlyset har overlevet.";
+    D.FORM_FAERDIG = "Du har kogt forklaringen ned til molekylernes form.";
     D.RUNDE_REPLIK = [
-        [0, "Det kogte over. En runde til?"],
-        [4, "Ikke dårligt. Et par fordampede."],
-        [7, "Flot. Du holder hovedet koldt."],
-        [9, "Ni af ni. Jeg er målløs. Næsten."]
+        [0, "Runden kogte over. Der er heldigvis flere blandinger på lageret."],
+        [4, "Runden gik ikke dårligt, men et par af svarene fordampede."],
+        [7, "Runden gik flot. Du holder hovedet koldt, selv når kammeret er varmt."],
+        [9, "Du har ni rigtige ud af ni. Jeg er næsten målløs."]
     ];
-    D.REKORD_REPLIK = "Ny rekord. Den skriver jeg ned. Et sted.";
+    D.REKORD_REPLIK = "Du har sat en ny rekord. Jeg skriver rekorden ned et sted.";
 
-    /* Taendstikken i ballonen: foerste gang og de naeste gange */
-    D.BRAND = "Ballonen var fuld af gas. Gas brænder.";
+    /* Paaskeaegget: taendstikken i ballonen, foerste gang og de naeste gange */
+    D.BRAND = "Ballonen var fuld af gas, og gas brænder.";
     D.BRAND_IGEN = [
-        "Igen. Ballonerne er talte.",
-        "Det er ikke et stearinlys.",
-        "Jeg har flere balloner. Ikke uendeligt mange."
+        "Ballonen brændte igen. Ballonerne er talte.",
+        "En ballon med gas er ikke et stearinlys.",
+        "Jeg har flere balloner, men jeg har ikke uendeligt mange."
     ];
-    D.NY_BALLON = "Ny ballon. Den her er ikke til fødselsdage.";
+    D.NY_BALLON = "Den nye ballon er ikke til fødselsdage.";
     D.TOM_BALLON = "Ballonen er tom. Stoffet er lukket inde i glasset.";
 
     NK.Data = D;

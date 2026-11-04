@@ -498,7 +498,18 @@ function koerTest(W) {
     paastand("runden kan gøres færdig", G.slut && tbKnap("gaet").textContent === "Ny runde" && /Runden er slut/.test(tbTekst("gaet")), G.nr);
     paastand("rekorden huskes", G.rekord === G.point && JSON.parse(W.localStorage.getItem("nk-sc3.5-gaet")).rekord === G.point);
     steg(G, 3.5);
-    paastand("Kemichael kommer, når runden er slut", G.laerer.scene && G.laerer.scene.navn === "slut");
+    paastand("runden er slut: Kemichael kommer, hvis der er mindst " + D.RUNDE_GOD + " rigtige (" + G.point + ")",
+        (G.point >= D.RUNDE_GOD) === !!(G.laerer.scene && G.laerer.scene.navn === "slut"), G.point);
+    var kaldG = 0, koerG = G.laererKoer;
+    G.laererKoer = function () { kaldG++; return koerG.apply(this, arguments); };
+    G.rundeRost = false;
+    G.laererSlut(5, false);
+    paastand("fem rigtige: han kommer ikke", kaldG === 0);
+    G.laererSlut(9, false);
+    paastand("ni rigtige: han kommer", kaldG === 1);
+    G.laererSlut(10, true);
+    paastand("næste runde kommer han ikke igen (én gang pr. besøg)", kaldG === 1);
+    delete G.laererKoer;
     G.laererNyt();
     knap("gaet", G);
     paastand("Ny runde starter forfra", !G.slut && G.nr === 0 && G.point === 0);
@@ -507,14 +518,38 @@ function koerTest(W) {
     var tb = d.getElementById("gaet-tilbud");
     G.visTilbud(false);
     paastand("tilbuddet forsvinder helt efter Nej tak", W.getComputedStyle(tb).display === "none");
-    paastand("replikkerne er højst 60 tegn", D.INTRO_FORSOEG.concat(D.INTRO_GAET, [D.SKEMA_FULDT, D.RYST_FOR_MEGET.blandes, D.RYST_FOR_MEGET.ikke, D.REKORD_REPLIK],
-        D.RUNDE_REPLIK.map(function (x) { return x[1]; })).every(function (l) { return l.length <= 60; }));
-    paastand("to eller tre linjer i hver præsentation", D.INTRO_FORSOEG.length === 3 && D.INTRO_GAET.length === 3);
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var INTRO = D.INTRO_FORSOEG.concat(D.INTRO_GAET);
+    var ROS = [D.SKEMA_FULDT, D.RYST_FOR_MEGET.blandes, D.RYST_FOR_MEGET.ikke, D.RUNDE_REPLIK, D.RUNDE_ALLE_REPLIK, D.REKORD_REPLIK];
+    var langeI = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", langeI.length === 0, langeI[0] && langeI[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med 'Her'", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
+
+    overskrift("7b. Kemichaels præsentation (fælles test)");
+    klik('[data-fane="fane-forsoeg"]');
+    F.tilpas();
+    for (var sn = 0; sn < 9 && F.fase === "start"; sn++) knap("forsoeg", F);
+    if (F.afvisTilbud) F.afvisTilbud();
+    paastand("fane 1 er forbi spørgsmålene, så prøven er fremme", F.fase === "test" && d.getElementById("forsoeg-anker-proeve").offsetWidth > 0);
+    [["fane-forsoeg", F], ["fane-gaet", G]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var sim = x[1];
+        sim.tilpas();
+        steg(sim, 2);
+        NK.Praesentation.selvtest(sim, function (sek) { steg(sim, sek); }).forEach(function (r) {
+            paastand(x[0] + ": " + r[0], r[1], r[2]);
+        });
+    });
+    paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
+    F.startForfra();
 
     overskrift("8. Sproget");
     var tekster = [d.body.innerText];
     ider.forEach(function (id) { tekster.push(D.stof(id).hvorfor); });
-    tekster = tekster.concat(D.INTRO_FORSOEG, D.INTRO_GAET, D.RUNDE_REPLIK.map(function (x) { return x[1]; }));
+    tekster = tekster.concat(INTRO.map(function (l) { return l.tekst; }), ROS);
     D.START.forEach(function (q) { tekster.push(q.spm, q.kontekst, q.hint, q.ros, q.fejl); });
     var indforstaaet = [];
     D.FORSOEG.concat(D.GAET_NYE).forEach(function (id) {
@@ -534,7 +569,7 @@ function koerTest(W) {
     var alt = tekster.join("\n");
     paastand("ingen tankestreger (– og —)", !/[–—]/.test(alt), (alt.match(/.{0,20}[–—].{0,20}/) || [""])[0]);
     paastand("ingen ladning skrevet som 1+ eller 1−", !/1[+−]/.test(alt));
-    paastand("ingen 'du skal lige'-talesprog", !/\b(lige|bare|faktisk)\b/i.test(D.INTRO_FORSOEG.concat(D.INTRO_GAET).join(" ")));
+    paastand("ingen 'du skal lige'-talesprog", !/\b(lige|bare|faktisk)\b/i.test(INTRO.map(function (l) { return l.tekst; }).join(" ")));
 
     overskrift("9. Layout");
     var ramme = document.getElementById("ramme");

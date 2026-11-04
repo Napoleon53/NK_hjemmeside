@@ -8,15 +8,17 @@
    (laererLaerredSkala), som i sc2.1, sc2.3 og sc2.4.
 
    Praesentationen starter kun, naar eleven vaelger Start praesentation
-   (js/praesentation.js). Han gaar ind foran bassinet, siger de to
-   linjer i D.INTRO og gaar igen. Mens han
-   siger linjen D.INTRO_PEG, peger han paa panelet, og kortet Haeld i
-   lyser op. Scenen laaser ikke. Knappen Spring praesentationen over, to
-   klik paa ham og Esc sender ham ud; K viser praesentationen igen.
+   (tilbuddet, som js/app.js laegger paa) eller trykker K. Den er den
+   faelles (../kemichael/praesentation.js, brugerens regler 4. nov.
+   2026): ét trin ad gangen med to til fire hele saetninger (D.INTRO i
+   js/tekster.js) i en taleboble ved hans hoved med knapperne Naeste og
+   Spring praesentationen over. Det, han peger paa, faar en gul ramme,
+   der blinker. Han gaar aldrig videre af sig selv, og Esc sender ham ud.
 
    Besoeg: han kommer kun forbi med én replik (D.REPLIK.svaever), naar en
-   oliedraabe svaever midt i blandingen (paaskeaegget), hoejst én gang pr.
-   sidevisning. Brugeren syntes, han talte for meget.
+   stor oliedraabe svaever midt i blandingen (paaskeaegget), hoejst én
+   gang pr. sidevisning. Det er en haendelse, eleven selv laver, ikke et
+   besoeg paa tid.
    ===================================================================== */
 (function () {
     "use strict";
@@ -29,17 +31,14 @@
     NK.Scene = NK.Scene || { BREDDE: 1000, HOEJDE: 600, ANKER: {} };
     Object.keys(K.ANKER).forEach(function (navn) { NK.Scene.ANKER[navn] = K.ANKER[navn]; });
 
-    var UDE = K.UDE, HAENGER = K.HAENGER;
+    var UDE = K.UDE;
     var NOEGLE = "nk-sc3.4-intro";
-    var PEG_PAA = "haeld-kort";
 
     function Laerer(laerred) {
         this.L = laerred;
         this.tid = 0;
         this.g = {};
         this.introVent = 0;
-        this.introTrin = 0;
-        this.introKlikTal = 0;
         this.besoegt = {};
         this.laererStart();
     }
@@ -52,8 +51,10 @@
         return NK.klamp(this.L.h / 600 * 0.92, 0.45, 1.25);
     };
 
+    /* Han staar mellem bassinet og glasset til hoejre, saa han ikke
+       daekker molekylerne i bassinet */
     P.laererPlads = function () {
-        return this.L.b * 0.3 / this.laererLaerredSkala();
+        return this.L.b * 0.74 / this.laererLaerredSkala();
     };
 
     P.laererTegnOver = function (ctx) {
@@ -94,73 +95,20 @@
         return this.laererIntroVaek();
     };
 
-    P.laererIntro = function () {
-        var mig = this;
-        var trin = [
-            { kald: function () { mig.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: function () { return mig.laererPlads(); } },
-            { tid: 0.2 }
-        ];
-        D.INTRO.forEach(function (l, i) {
-            trin.push({ kald: function () { mig.introTrin = i + 1; } });
-            if (i === D.INTRO_PEG) trin.push({ arm: function () { return mig.pegPanel(); }, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (i === D.INTRO_PEG) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        this.laererKoer("intro", trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { mig.introTrin = 0; } },
-            { gaa: UDE }
-        ]), false);
-    };
+    P.introLinjer = function () { return D.INTRO; };
 
-    /* Armens vinkel mod panelet til hoejre */
-    P.pegPanel = function () {
-        var s = this.laererLaerredSkala();
-        return this.pegVinkel(this.L.b / s + 60, this.L.h * 0.2 / s);
-    };
-
-    P.laererIIntro = function () {
-        var L = this.laerer;
-        return !!(L && L.scene && L.scene.navn === "intro");
-    };
-
-    P.laererIntroVaek = function () {
-        var L = this.laerer;
-        if (!this.laererIIntro()) return false;
-        L.tale = "";
-        L.taleUr = 0;
-        L.taleAlfa = 0;
-        this.introTrin = 0;
-        this.laererKoer("introUd", [
-            { arm: HAENGER, tid: 0.15 },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { gaa: UDE, loeb: true }
-        ], false);
-        return true;
-    };
-
-    P.laererIntroKlik = function (px, py) {
-        if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-        this.introKlikTal++;
-        if (this.introKlikTal >= 2) {
-            this.laererIntroVaek();
-        } else {
-            var k = NK.el("spring-over");
-            k.classList.remove("puf");
-            void k.offsetWidth;
-            k.classList.add("puf");
-        }
-        return true;
-    };
+    /* Laeg den faelles praesentation paa (laererIntro, Naeste, boblen,
+       laererIntroVaek, laererIIntro og laererIntroKlik). Det, han peger
+       paa, er kort i panelet og de usynlige .anker over laerredet. */
+    NK.Praesentation.trin(P);
 
     /* ----- Besoeg: én replik, saa gaar han igen ------------------------ */
     P.besoeg = function (hvad) {
         if (this.besoegt[hvad] || !this.laerer) return;
         var L = this.laerer;
-        if (L.scene) return;                     /* han er optaget; en anden gang */
+        /* Han er optaget (ogsaa naar han staar stille i praesentationen):
+           en anden gang. Scenen melder paaskeaegget igen hvert sekund. */
+        if (L.scene || this.kmIntro) return;
         this.besoegt[hvad] = true;
         var replik = K.replik("sc34-" + hvad, D.REPLIK[hvad]);
         var glad = hvad === "svaever";
@@ -184,16 +132,7 @@
             if (this.introVent <= 0) this.laererIntro();
         }
         this.opdaterLaerer(dt);
-        var iIntro = this.laererIIntro();
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("spring-over").hidden = !iIntro;
-        }
-        var peg = iIntro && this.introTrin === D.INTRO_PEG + 1;
-        if (peg !== this.pegerNu) {
-            this.pegerNu = peg;
-            NK.el(PEG_PAA).classList.toggle("peg", peg);
-        }
+        if (this.introOpdaterBoble && (this.kmIntro || this.kmBobleAktiv)) this.introOpdaterBoble();
     };
 
     NK.Laerer = Laerer;

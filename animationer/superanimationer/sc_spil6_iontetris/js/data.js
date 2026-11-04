@@ -108,35 +108,46 @@
     D.MUSIK_STYRKE = 0.2;
 
     /* ----- Kemichael -------------------------------------------------------
-       To eller tre replikker paa hoejst ca. 60 tegn pr. sværhedsgrad. Under
-       linjen D.INTRO_PEG peger han paa det, der staar i INTRO_PEG_PAA. */
+       Praesentationen pr. sværhedsgrad (../kemichael/praesentation.js): ét
+       trin ad gangen, og eleven trykker Naeste. Hvert trin er to til fire
+       hele saetninger i Kemibogens sprog (brugerens regler 4. nov. 2026).
+       sel er det, han peger paa, og som faar en gul ramme, der blinker
+       (brættet, gem og koeen er de usynlige .omraade over laerredet). */
     D.INTRO = {
         "let": [
-            "Farvede brikker er ioner. Plus skal mødes med minus.",
-            "Lav alle salte i panelet, så har du vundet.",
-            "Salt sprænger de grå felter, det ligger op ad. Held og lykke."
+            { tekst: "I dette spil laver du salte af ioner, der falder ned på brættet. Blå brikker er positive ioner, og røde brikker er negative ioner. En positiv og en negativ ion, der rører hinanden, bliver til salt, når ladningerne går lige op.",
+              sel: "#braet-omraade" },
+            { tekst: "Kortet Salte viser de ni salte, du skal lave på Let, og hvert salt, du laver, lyser op. Når du har lavet alle saltene, har du vundet, og rekorden er den hurtigste tid.",
+              sel: "#saltkort" },
+            { tekst: "Går ladningerne ikke op, kommer der en gul ramme om ionerne, og tallet over rammen er den ladning, rammen har tilbage. Grå sten reagerer ikke, men et salt sprænger de grå felter, det ligger op ad. Kortet Styring viser tasterne, og knappen Regler forklarer resten.",
+              sel: ["#styrekort", "#regelknap"] }
         ],
         middel: [
-            "Middel. Nu kommer Al³⁺ og N³⁻ også.",
-            "Ni salte skal laves. Al₂O₃ kræver fem brikker.",
-            "Stenene venter ikke på, at du bliver færdig."
+            { tekst: "På sværhedsgraden Middel laver du salte af ioner med større ladninger, fordi Al³⁺ og N³⁻ også falder. Al³⁺ skal for eksempel bruge tre Cl⁻, før ladningerne går lige op, og Al₂O₃ kræver fem brikker.",
+              sel: "#braet-omraade" },
+            { tekst: "Kortet Salte viser de ni salte, du skal lave på Middel. Når du har lavet alle saltene, har du vundet, og rekorden er den hurtigste tid.",
+              sel: "#saltkort" },
+            { tekst: "Skyggen under brikken lyser ikke grønt på Middel, så du skal selv se, om brikken bliver til salt. Køen viser de næste tre brikker, og tasten C gemmer en ion, der ikke har en partner endnu.",
+              sel: ["#naeste-omraade", "#gem-omraade"] }
         ],
         svaer: [
-            "Svær. Sammensatte ioner og ingen tal over rammerne.",
-            "Atten salte. To kan være på vej på samme tid.",
-            "Jeg nåede selv halvdelen. Det var et valg."
+            { tekst: "På sværhedsgraden Svær laver du salte med sammensatte ioner som OH⁻, NO₃⁻, SO₄²⁻ og PO₄³⁻. En sammensat ion står i parentes i formlen, når der er mere end én af den, som i Al₂(SO₄)₃.",
+              sel: "#braet-omraade" },
+            { tekst: "Kortet Salte viser de 18 salte, du skal lave på Svær. Når du har lavet alle saltene, har du vundet, og rekorden er den hurtigste tid.",
+              sel: "#saltkort" },
+            { tekst: "På Svær kan to salte være blandet i køen, og der står ingen tal over rammerne. Du skal derfor selv holde regnskab med ladningerne.",
+              sel: "#naeste-omraade" }
         ]
     };
-    D.INTRO_PEG = 1;
-    D.INTRO_PEG_PAA = { "let": "saltkort", middel: "saltkort", svaer: "saltkort" };
 
-    /* Naar spillet slutter. vundet: alle salte (rekord: hurtigste tid).
-       mange: mindst halvdelen af saltene. Ellers faa. */
+    /* Naar spillet er slut, kommer han ind og siger én replik. Det er den
+       eneste gang, han kommer af sig selv. vundet: alle salte (rekord:
+       hurtigste tid). mange: mindst halvdelen af saltene. Ellers faa. */
     D.SLUT = {
-        rekord: ["Alle salte, og ny rekord. Jeg tjekker lige facit.", "Rekordtid. Jeg skriver den ikke på tavlen."],
-        vundet: ["Alle salte. Lageret er komplet.", "Alle salte. Så kan stenene få fri."],
-        mange: ["Stenene vandt. Men der blev lavet salt.", "Over halvdelen. Stenene fik resten."],
-        faa: ["Stenene vandt. Det gør de tit første gang.", "Loftet kom før saltet. Det sker."]
+        rekord: ["Du har lavet alle saltene på ny rekordtid. Jeg tjekker facit for en sikkerheds skyld.", "Det er ny rekordtid, men jeg skriver den ikke på tavlen."],
+        vundet: ["Du har lavet alle saltene, og lageret er nu komplet.", "Du har lavet alle saltene, så stenene kan få fri."],
+        mange: ["Stenene vandt denne gang, men du nåede at lave mindst halvdelen af saltene.", "Du lavede mindst halvdelen af saltene, og stenene fik resten."],
+        faa: ["Stenene vandt denne gang. Det gør de ofte i det første spil.", "Brikkerne nåede loftet, før saltene var lavet. Det sker for de fleste."]
     };
 
     /* ----- Linjen under brættet -------------------------------------------

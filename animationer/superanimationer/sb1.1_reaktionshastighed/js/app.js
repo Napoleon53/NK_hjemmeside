@@ -11,9 +11,9 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. Faneskift og Spring over (stopIntro) skjuler
-       tilbuddet uden at huske det. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc er
+       det samme som Nej tak. Faneskift (stopIntro) skjuler tilbuddet
+       uden at huske det. */
     if (NK.Laerer) {
         NK.Praesentation.pakInd(NK.Laerer.prototype, {
             tilbud: function (id) { return { kurve: "kurve-tilbud", sammenstoed: "sam-tilbud", udtryk: "udtryk-tilbud" }[id]; },
@@ -33,7 +33,6 @@
 
     var sims = {};
     var faner = ["kurve", "sammenstoed", "udtryk"];
-    var SPRING = { kurve: "kurve-spring", sammenstoed: "sam-spring", udtryk: "udtryk-spring" };
     var aktiv = "kurve";
     var laerer = null;
     var sidsteTid = 0;
@@ -56,7 +55,7 @@
            den. Er han midt i en anden, gaar han foerst. */
         if (laerer) {
             laerer.stopIntro();
-            laerer.skiftLaerred(sims[id].L, SPRING[id]);
+            laerer.skiftLaerred(sims[id].L);
             laerer.startIntro(id, false);
         }
     }
@@ -118,15 +117,13 @@
         NK.visFane = visFane;
 
         if (NK.Laerer) {
-            laerer = new NK.Laerer(sims.kurve.L, SPRING.kurve);
+            laerer = new NK.Laerer(sims.kurve.L);
             NK.laerer = laerer;
-            Object.keys(SPRING).forEach(function (id) {
-                NK.el(SPRING[id]).addEventListener("click", function () { laerer.stopIntro(); });
-            });
         }
 
         /* Et tryk paa laerredet gaar foerst til Kemichael: under
-           praesentationen taeller det, ellers svarer han selv. */
+           praesentationen viser et tryk paa ham, hvor Naeste er, ellers
+           svarer han selv. */
         NK.laererFanger = function (p) {
             if (!laerer) return false;
             if (laerer.laererIntroKlik(p.x, p.y)) return true;

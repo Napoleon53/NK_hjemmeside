@@ -73,6 +73,7 @@
         this.valgt = -1;
         this.forste = -1;
         this.hjaelp = 0;
+        this.info = null;
         if (!behold) {
             this.vA = 0;
             this.vB = 0;
@@ -87,20 +88,37 @@
             this.vA = this.A.v;
             this.vB = this.B.v;
         }
-        this.bygValg();
         this.visKort();
         this.visTabel();
-        this.visStatus();
     };
 
-    /* Eleven vaelger et svar; saa titreres der */
-    P.vaelg = function (i) {
+    /* Et svar paa kortet vaelger kun (brugeren 24. okt. 2026); det sendes
+       med Indsend svar */
+    P.kortValg = function (i) {
+        if (!this.sit() || this.fase !== "vaelg") return;
+        if (this.afvisTilbud) this.afvisTilbud();
+        this.valgt = i;
+        this.visKort();
+    };
+
+    P.indsend = function () {
+        if (this.fase !== "vaelg") { this.kort.blink(); return; }
+        if (this.valgt < 0) {
+            this.kort.blink();
+            this.besked("Vælg et af svarene på kortet først.", "gul");
+            return;
+        }
+        this.send(this.valgt);
+    };
+
+    /* Svaret er sendt; saa titreres der */
+    P.send = function (i) {
         var sit = this.sit();
         if (!sit || this.fase !== "vaelg") return;
         if (this.afvisTilbud) this.afvisTilbud();
         this.valgt = i;
         if (this.forste === -1) this.forste = i;
-        this.bygValg();
+        this.besked("", "");
         if (sit.samme && this.koert) {
             this.vis();
             return;
@@ -110,57 +128,52 @@
         this.fase = "koerer";
         this.visKort();
         this.visTabel();
-        this.visStatus();
     };
 
+    /* Begge kolber er titreret: kortet bliver paa spoergsmaalet med svaret
+       groent (det valgte roedt, hvis det var forkert), forklaringen under
+       svarene og knappen videre, hvor Indsend svar stod */
     P.vis = function () {
         var sit = this.sit();
         this.fase = "vist";
         this.koert = true;
-        var rigtig = this.valgt === sit.rigtig;
         if (this.forste === sit.rigtig && !this.talt) { this.rigtige++; }
         this.talt = true;
-        var t = rigtig ? "Rigtigt. " + sit.efter :
-            NK.html(sit.forkert[this.valgt]) + " <b>Svar:</b> " + NK.html(sit.efter);
-        this.besked(rigtig ? NK.html(t) : t, rigtig ? "god" : "skidt");
         if (this.nr >= D.SITUATIONER.length - 1) {
-            this.besked(this.el.besked.innerHTML + "<br><b>" + this.rigtige + " af " + D.SITUATIONER.length +
-                " rigtige svar i første forsøg.</b>", rigtig ? "god" : "skidt");
             if (!NK.hent(NOEGLE_ROS, false)) {
                 NK.gem(NOEGLE_ROS, true);
                 this.ventRos = 1.2;
             }
         }
-        this.bygValg();
         this.visKort();
         this.visTabel();
-        this.visStatus();
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Naeste -------------------------------------- */
-    P.knap = function () {
-        var sit = this.sit();
-        if (this.fase === "vist") {
-            if (this.nr >= D.SITUATIONER.length - 1) {
-                if (NK.sims && NK.sims["fane-titrering"]) NK.sims["fane-titrering"].nyProeve();
-                if (NK.visFane) NK.visFane("fane-titrering");
-                return;
-            }
-            var naesteSamme = D.SITUATIONER[this.nr + 1].samme;
-            this.nr++;
-            this.talt = false;
-            this.startSituation(naesteSamme);
+    /* ----- Knappen: Giv hint -> Vis svaret; den groenne knap gaar videre ----------------- */
+    P.videre = function () {
+        if (this.fase !== "vist") return;
+        if (this.nr >= D.SITUATIONER.length - 1) {
+            if (NK.sims && NK.sims["fane-titrering"]) NK.sims["fane-titrering"].nyProeve();
+            if (NK.visFane) NK.visFane("fane-titrering");
             return;
         }
+        var naesteSamme = D.SITUATIONER[this.nr + 1].samme;
+        this.nr++;
+        this.talt = false;
+        this.startSituation(naesteSamme);
+    };
+
+    P.knap = function () {
+        var sit = this.sit();
+        if (this.fase === "vist") { this.videre(); return; }
         if (this.fase === "koerer") return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(sit.hint), "gul");
-            this.visKort();
+            this.besked('<span class="b-maerke">Hint</span> ' + NK.html(sit.hint), "gul");
             return;
         }
         if (this.forste < 0) this.forste = -2;   /* svaret er vist: taeller ikke som rigtigt */
-        this.vaelg(sit.rigtig);
+        this.send(sit.rigtig);
     };
 
     /* Indikatoren er skiftet: kolberne regnes om. Er de titreret, staar
@@ -176,7 +189,7 @@
             this.vB = Math.min(this.vB, this.B.v);
         }
         this.visTabel();
-        this.visStatus();
+        this.visKort();
     };
 
     P.nulstil = function () {
@@ -186,66 +199,52 @@
         this.startSituation();
     };
 
-    /* ----- Panelet --------------------------------------------------------------------------- */
+    /* ----- Panelet og kortet ------------------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("for-knap"),
-            besked: NK.el("for-besked"),
-            kort: NK.el("for-kort"),
-            valg: NK.el("for-valg")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("for-spring").addEventListener("click", function () { mig.springIntro(); });
+        this.kort = new NK.Scenekort("for", this, [196, 172]);
         NK.el("for-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
-    P.bygValg = function () {
-        var mig = this, sit = this.sit(), vaert = this.el.valg;
-        vaert.innerHTML = "";
-        if (!sit) return;
-        var rad = document.createElement("div");
-        rad.className = "vaelgerrad";
-        sit.valg.forEach(function (tekst, i) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "vaelger";
-            b.textContent = tekst;
-            if (mig.fase === "vist") {
-                if (i === sit.rigtig) b.className += " rigtig";
-                else if (i === mig.valgt) b.className += " forkert";
-                b.disabled = true;
-            } else if (i === mig.valgt) {
-                b.className += " valgt";
-                b.disabled = true;
-            } else if (mig.fase === "koerer") b.disabled = true;
-            b.addEventListener("click", function () { mig.vaelg(i); });
-            rad.appendChild(b);
-        });
-        vaert.appendChild(rad);
+    P.besked = function (html, klasse) {
+        this.fast = { html: html || "", klasse: klasse || "" };
+        this.visBund();
     };
 
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+    /* Linjen paa kortet: et svar paa et klik paa en kolbe (kort tid), mens
+       der titreres, eller fejl og hint */
+    P.visBund = function () {
+        if (!this.kort) return;
+        if (this.info && this.info.tid > 0) this.kort.bund(this.info.tekst, "peger");
+        else if (this.fase === "koerer") this.kort.bund("Kemichael titrerer begge kolber til omslaget.", "peger");
+        else this.kort.bund(this.fast.html, this.fast.klasse);
     };
 
     P.visKort = function () {
-        var sit = this.sit();
-        NK.saetTekst("for-titel", sit ? sit.titel : "Fejlkilde");
-        NK.saetTekst("for-nr", String(this.nr + 1));
-        NK.saetTekst("for-ialt", String(D.SITUATIONER.length));
-        NK.saetTekst("for-prompt", sit ? sit.tekst : "");
-        var tekst, klasse = "knap";
-        if (this.fase === "vist") {
-            tekst = this.nr >= D.SITUATIONER.length - 1 ? "Tag en ny prøve →" : "Næste →";
-            klasse = "knap blaa banker";
-        } else if (this.fase === "koerer") tekst = "Kemichael titrerer …";
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = this.fase === "koerer";
-        this.el.kort.classList.toggle("sejr", this.fase === "vist" && this.valgt === (sit && sit.rigtig));
+        var sit = this.sit(), mig = this;
+        if (!sit) return;
+        var vist = this.fase === "vist", rigtig = this.valgt === sit.rigtig;
+        var svar = sit.valg.map(function (t, j) {
+            return {
+                t: t,
+                valgt: !vist && j === mig.valgt,
+                rigtig: vist && j === sit.rigtig,
+                forkert: vist && j === mig.valgt && !rigtig,
+                dim: vist && j !== sit.rigtig && j !== mig.valgt
+            };
+        });
+        var d = { slags: "spm", chip: "Fejlkilde " + (this.nr + 1) + " af " + D.SITUATIONER.length + ": " + sit.titel,
+            tekst: NK.html(sit.tekst), efter: NK.Scenekort.svar(svar, this.fase !== "vaelg") };
+        if (vist) {
+            var t = rigtig ? NK.html(sit.efter) : NK.html(sit.forkert[this.valgt] + " " + sit.efter);
+            if (this.nr >= D.SITUATIONER.length - 1) t += " <b>" + this.rigtige + " af " + D.SITUATIONER.length + " rigtige i første forsøg.</b>";
+            d.bliv = { tekst: t, gul: !rigtig, knap: this.nr >= D.SITUATIONER.length - 1 ? "Tag en ny prøve →" : "Næste fejlkilde →" };
+        }
+        this.kort.vis(d);
+        var pegKnap = this.fast.klasse === "skidt" && this.hjaelp === 0;
+        if (this.fase === "vaelg") this.kort.knapper(this.hjaelp === 0 ? "Giv hint" : "Vis svaret", pegKnap, this.valgt >= 0);
+        else this.kort.knapper(null, false, null);
+        this.visBund();
     };
 
     /* Tabellen A og B. Det, der er aendret ved B, er gult. */
@@ -271,21 +270,15 @@
         NK.saetTekst("for-note", note);
     };
 
-    P.visStatus = function () {
-        var t;
-        if (this.fase === "vaelg") t = "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A. Vælg et svar til højre.";
-        else if (this.fase === "koerer") t = "Kemichael titrerer begge kolber til omslaget.";
-        else t = "Forbrug af sølvnitrat: " + K.mL(this.A.v) + " mL i kolbe A og " + K.mL(this.B.v) + " mL i kolbe B.";
-        NK.saetHTML("for-status", t);
-    };
-
     /* ----- Layout ------------------------------------------------------------------------------ */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.bordY = Math.round(H - NK.klamp(H * 0.12, 40, 80));
-        var topY = NK.klamp(H * 0.03, 8, 24) + 44;
+        /* Pladsen oeverst er sat af til kortet (kortZone); 40 px til tallet over buretten */
+        lay.zone = this.kort.zone();
+        var topY = 10 + lay.zone + 40;
         var x0 = NK.klamp(W * 0.14, 90, 170);
         var fri = W - kant - x0;
         lay.gA = Tg.opstilling(x0 + fri * 0.3, lay.bordY, topY, 0.85);
@@ -326,6 +319,10 @@
         if (this.ventRos > 0) {
             this.ventRos -= dt;
             if (this.ventRos <= 0 && this.laererReplik) this.laererReplik(D.ROS_FORBRUG, true);
+        }
+        if (this.info) {
+            this.info.tid -= dt;
+            if (this.info.tid <= 0) { this.info = null; this.visBund(); }
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
@@ -415,24 +412,24 @@
         var u = this.hvadErUnder(pt);
         if (!u) return;
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
-        if (u.slags === "A") NK.saetHTML("for-status", "Kolbe A: " + NK.tal2(this.A.m) + " g havvand fra " + this.sted + ", " + this.A.vand +
-            " mL demineraliseret vand og sølvnitrat " + K.c(this.A.c) + " M.");
-        if (u.slags === "B") NK.saetHTML("for-status", "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A.");
+        if (u.slags === "A") this.info = { tekst: "Kolbe A: " + NK.tal2(this.A.m) + " g havvand fra " + this.sted + ", " + this.A.vand +
+            " mL demineraliseret vand og sølvnitrat " + K.c(this.A.c) + " M.", tid: 5 };
+        if (u.slags === "B") this.info = { tekst: "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A.", tid: 5 };
+        this.visBund();
     };
 
     P.tast = function (e) {
-        if (this.fase === "vaelg" && /^[1-3]$/.test(e.key) && e.shiftKey) { this.vaelg(parseInt(e.key, 10) - 1); return true; }
+        if (this.fase === "vaelg" && /^[1-3]$/.test(e.key) && e.shiftKey) { this.kortValg(parseInt(e.key, 10) - 1); return true; }
         return false;
     };
 
     P.enter = function () {
-        if (this.fase === "vist") this.knap();
+        if (this.fase === "vist") this.videre();
+        else if (this.fase === "vaelg" && this.valgt >= 0) this.indsend();
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-forbrug", tilbud: "for-tilbud", spring: "for-spring" });
-
-    P.pegPaaFelt = function (til) { this.el.valg.classList.toggle("peg", !!til); };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-forbrug", tilbud: "for-tilbud" });
 
     NK.SimForbrug = SimForbrug;
 }());

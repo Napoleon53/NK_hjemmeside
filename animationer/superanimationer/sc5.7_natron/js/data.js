@@ -100,13 +100,13 @@
 
     /* Linjen i opgavekortet i hver fase */
     D.LINJE = {
-        valg: "Gæt først: vælg et af svarene herunder.",
-        foer: "Aflæs vægten under diglen, og skriv massen af natron i skemaet.",
+        valg: "",
+        foer: "Aflæs vægten under diglen. Skriv massen af natron i skemaet til højre.",
         flyt: "Sæt diglen på trefoden. Træk den derhen, eller klik på den.",
         taend: "Tænd brænderen under trefoden. Start med lav flamme.",
         varm: "Natronen varmes op. Sluk, når du vil veje, og flyt diglen over på vægten.",
         vaegtVent: "Diglen er varm. Vent, til vægten står stille, og aflæs den så.",
-        vej: "Vægten står stille. Skriv massen i skemaet.",
+        vej: "Vægten står stille. Skriv massen i skemaet til højre.",
         igen: "Sæt diglen tilbage på trefoden, og varm igen.",
         slukket: "Brænderen er slukket. Tænd den igen for at varme videre."
     };

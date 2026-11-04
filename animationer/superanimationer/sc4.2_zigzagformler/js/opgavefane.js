@@ -42,7 +42,6 @@
             });
             this.koblMus();
             this.bygTilbud();
-            NK.el(pre + "-spring").addEventListener("click", function () { mig.springIntro(); });
             if (this.laererStart) this.laererStart();
         };
 
@@ -216,16 +215,26 @@
 
         /* En quiz er klaret. egne: eleven har selv klaret de fleste opgaver
            og ikke bare set svarene. Er quizzens klistermaerke nyt, kommer det
-           frem, og Kemichael siger sin replik om det; ellers den almindelige ros. */
-        P.klaret = function (quiz, egne, ros) {
+           frem. Kemichael kommer kun, naar det var fanens sidste klistermaerke,
+           saa hele fanen er klaret (brugerens regel 4. nov. 2026).
+           krav: saetningen, der staar sidst i opgavekortets besked, naar for
+           mange svar er vist, saa eleven ved, hvorfor klistermaerket udebliver.
+           Opgavekortets besked skal derfor vaere skrevet, foer klaret kaldes. */
+        P.klaret = function (quiz, egne, krav) {
             if (!egne) {
-                if (this.laererFaerdig) this.laererFaerdig(NK.Data.ROS.forMangeSvar);
+                /* Efter svaret til den sidste opgave; et gammelt hint eller en
+                   fejl bliver ikke staaende foran kravet */
+                var e = NK.el(pre + "-besked"), gammel = e ? e.innerHTML : "";
+                if (e && krav) {
+                    if (gammel && !/^<b>Hint:/.test(gammel) && this.beskedKlasse !== "skidt") e.innerHTML = gammel + " " + NK.html(krav);
+                    else this.besked(NK.html(krav), "gul");
+                }
                 return null;
             }
             this.konfetti(true);
             var ny = NK.Skuffe.laasOp(quiz);
             if (ny) visGave(this, ny);
-            if (this.laererFaerdig) this.laererFaerdig(ny ? ny.replik : ros);
+            if (ny && this.laererFaneKlaret) this.laererFaneKlaret(quiz);
             return ny;
         };
     }

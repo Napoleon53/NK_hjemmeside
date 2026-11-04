@@ -6,7 +6,9 @@
    tavlen op i broeken: stofferne (de rigtige og nogle, der ligner),
    tegnene · + − 1 og eksponenterne. Et klik paa en brik i bakken
    laegger den bagerst i den blaa zone, og et klik paa en brik i broeken
-   fjerner den. Tjek broeken (eller Enter) doemmer med js/broek.js.
+   fjerner den. Indsend svar paa kortet (eller Enter) doemmer med
+   js/broek.js. Opgaven og beskederne staar paa papirkortet oeverst i
+   scenen (js/fane.js).
 
    Arbejdet i hver opgave huskes, mens siden er aaben, saa man kan
    springe frem og tilbage. Loeste opgaver huskes i browseren.
@@ -23,12 +25,10 @@
         this.skemaEl = NK.el("br-skema");
         this.tavle = NK.el("br-tavle");
         this.zoner = { num: NK.el("br-num"), den: NK.el("br-den") };
-        this.tjekKnap = NK.el("br-tjek");
         this.bakke = { stof: NK.el("br-stoffer"), tegn: NK.el("br-tegn"), eks: NK.el("br-eks") };
         this.arbejde = {};
         this.aktivZone = "num";
         this.rod = [];
-        this.tjekKnap.addEventListener("click", function () { mig.tjek(); });
         ["num", "den"].forEach(function (z) {
             mig.zoner[z].addEventListener("click", function (e) {
                 if (e.target.closest && e.target.closest(".brik")) return;
@@ -42,7 +42,7 @@
     }
 
     var P = SimBroek.prototype;
-    NK.Fane.paa(P, { navn: "br", naesteFane: "fane-ff", naesteNavn: "Find fejlen" });
+    NK.Fane.paa(P, { navn: "br", chip: "Reaktion", naesteFane: "fane-ff", naesteNavn: "Find fejlen" });
 
     /* ----- Opgaven ------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -66,20 +66,20 @@
         return !!(a && !a.faerdig && (a.num.length || a.den.length));
     };
 
-    P.promptHTML = function () {
-        var o = this.opg.o;
-        var h = '<p class="note-tekst">' + NK.html(o.tekst) + "</p>";
-        if (this.faerdig) {
-            h += '<div class="forklaring"><div class="fk-broek">' + B.kHTML(o) + " = " + B.broekHTML(B.facit(o)) +
-                "</div><p>" + o.forklaring + "</p></div>";
-        }
-        return h;
+    /* Kortet: reaktionen i ord og opgaven */
+    P.kortData = function () {
+        return { tekst: this.opg.o.tekst + " Skriv reaktionsbrøken for ligevægten." };
     };
 
     P.trinLinje = function () {
         var a = this.opg.a;
         if (!a.num.length && !a.den.length) return "Træk et stof fra bakken op i tælleren eller ned i nævneren.";
-        return "Byg resten af brøken, og tryk Tjek brøken.";
+        return "Byg resten af brøken, og tryk Indsend svar.";
+    };
+
+    P.kanIndsende = function () {
+        var a = this.opg.a;
+        return a.num.length > 0 || a.den.length > 0;
     };
 
     P.hintTrin = function () {
@@ -98,11 +98,6 @@
         return ud;
     }
 
-    P.svarTekst = function () {
-        var o = this.opg.o;
-        return B.kHTML(o) + " = " + NK.html(B.linje(B.facit(o))) + ".";
-    };
-
     P.visSvar = function () {
         var o = this.opg.o, a = this.opg.a, F = B.facit(o);
         this.brugtSvar = true;
@@ -110,17 +105,17 @@
         a.den = somBrikker(F.den);
         if (!F.den.length) a.den = [{ k: "tegn", v: "1" }];
         this.rod = [];
-        this.loest("svar", this.svarTekst());
+        this.loest("svar", this.opg.o.forklaring);
     };
 
-    /* ----- Tjek ---------------------------------------------------------------- */
-    P.tjek = function () {
+    /* ----- Indsend svar ---------------------------------------------------------- */
+    P.indsend = function () {
         if (this.faerdig) return;
         var o = this.opg.o, a = this.opg.a;
         var d = B.dom(o, a.num, a.den);
         if (d.ok) {
             this.rod = [];
-            this.loest("selv", this.svarTekst() + (d.enEks ? " " + NK.html("1" + NK.haevet(d.enEks) + " = 1, så nævneren er 1.") : ""), "Rigtigt ✓");
+            this.loest("selv", (d.enEks ? NK.html("1" + NK.haevet(d.enEks) + " = 1, så nævneren er 1.") + " " : "") + o.forklaring);
             return;
         }
         this.rod = d.rod || [];
@@ -132,8 +127,8 @@
     };
 
     P.enter = function () {
-        if (this.faerdig) this.knap();
-        else this.tjek();
+        if (this.faerdig) { if (this.videreTekst()) this.knap(); }
+        else this.indsendKlik();
     };
 
     P.efterOpgave = function () {
@@ -163,11 +158,12 @@
         this.nulstilHjaelp();
         this.tegnZoner();
         this.naesteLinje("", "");
+        this.visKnap();
         this.visListe();
     };
 
     P.vaelgZone = function (z) {
-        if (this.faerdig) return;
+        if (this.spaer()) return;
         this.aktivZone = z;
         this.tegnZoner();
     };
@@ -200,10 +196,7 @@
 
     /* Et klik uden traek */
     P.brikKlik = function (kilde) {
-        if (this.faerdig) {
-            this.kortBesked("Brøken er færdig. Knappen forneden går videre.", 3);
-            return;
-        }
+        if (this.spaer()) return;
         if (kilde.fra === "zone") this.fjern(kilde.z, kilde.i);
         else this.tilfoej(this.aktivZone, kilde);
     };
@@ -306,7 +299,6 @@
         st.hidden = !this.faerdig;
         st.textContent = a.vist ? "Svaret" : "Rigtigt ✓";
         st.classList.toggle("gul", !!a.vist);
-        this.tjekKnap.hidden = this.faerdig;
         NK.el("br-bakke").classList.toggle("laast", this.faerdig);
         this.visKobling(this.faerdig);
         this.visLys();
@@ -385,7 +377,7 @@
         if (!this.aktiv) return;
         if (!this.flyttet) {
             if (Math.hypot(e.clientX - this.x0, e.clientY - this.y0) < 6) return;
-            if (this.sim.faerdig) { this.nul(); return; }
+            if (this.sim.faerdig) { this.nul(); this.sim.spaer(); return; }
             this.flyttet = true;
             this.lavSpoegelse();
         }

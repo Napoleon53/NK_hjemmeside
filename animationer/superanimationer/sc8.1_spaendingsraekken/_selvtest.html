@@ -204,12 +204,13 @@ async function koerTest(W, ramme) {
     paastand("ingen tankestreger i " + tekster.length + " tekster", tankestreg.length === 0, tankestreg[0]);
     var enPlus = tekster.filter(function (s) { return /¹⁺|¹⁻|1\+|1−/.test(s); });
     paastand("ladning 1 skrives som + og −, aldrig 1+ og 1−", enPlus.length === 0, enPlus[0]);
-    var lange = INTRO.filter(function (l) { return l.tekst.length > 85; });
-    paastand("præsentationens linjer er højst 85 tegn (de står, til eleven trykker Næste)", lange.length === 0, lange[0] && lange[0].tekst);
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
     var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || l.tekst.split(" ").length < 6; });
     paastand("præsentationens linjer er hele sætninger", halve.length === 0, halve[0] && halve[0].tekst);
-    var korte = [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE].filter(function (t) { return t.length > 60; });
-    paastand("ros og påskeæg er højst ca. 60 tegn", korte.length === 0, korte[0]);
+    var korte = [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE].filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     paastand("ingen 'natronlud'", tekster.every(function (s) { return !/natronlud/i.test(s); }));
     paastand("ingen 'undefined' eller 'NaN' i teksterne", tekster.every(function (s) { return !/undefined|NaN/.test(s); }),
         tekster.filter(function (s) { return /undefined|NaN/.test(s); })[0]);
@@ -404,64 +405,16 @@ async function koerTest(W, ramme) {
     paastand("tasten N svarer nej", fu.valgt === 1);
 
     /* ----------------------------------------------------------------- */
-    overskrift("Kemichaels præsentation: ét trin ad gangen");
-    var navne = { "fane-forsoeg": ["fs-spring", D.INTRO_FORSOEG], "fane-raekken": ["rk-spring", D.INTRO_RAEKKEN], "fane-forudsig": ["fu-spring", D.INTRO_FORUDSIG] };
-    function inden(a, b, luft) {
-        return a.left >= b.left - luft && a.top >= b.top - luft && a.right <= b.right + luft && a.bottom <= b.bottom + luft;
-    }
-    for (var fane in navne) {
+    overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    ["fane-forsoeg", "fane-raekken", "fane-forudsig"].forEach(function (fane) {
         NK.visFane(fane);
-        var sim = NK.sims[fane], boble = doc.getElementById(navne[fane][0]), linjer = navne[fane][1];
+        var sim = NK.sims[fane];
         if (sim.nulstil) sim.nulstil();
         koerTid(sim, 2.5);
-        sim.startIntro(true);
-        paastand(fane + ": boblen vises ikke, før han står der", boble.hidden);
-        koerTid(sim, 2.5);
-        var st = sim.introStatus();
-        paastand(fane + ": K starter præsentationen, og boblen viser linje 1 med Næste",
-            sim.laererIIntro() && !!st && st.nr === 0 && !boble.hidden && W.getComputedStyle(boble).display !== "none" &&
-            boble.querySelector(".intro-tekst").textContent === linjer[0].tekst && /Næste/.test(boble.querySelector(".intro-naeste").textContent),
-            boble.querySelector(".intro-tekst").textContent);
-        koerTid(sim, 25);
-        paastand(fane + ": han går ikke videre af sig selv (25 s)", sim.laererIIntro() && sim.introStatus().nr === 0 && !boble.hidden);
-        var sceneR = boble.parentNode.getBoundingClientRect();
-        paastand(fane + ": boblen står inde i scenen", inden(boble.getBoundingClientRect(), sceneR, 1));
-        var trinOk = true, rammeOk = true, daekOk = true, note = "";
-        for (var t = 1; t < linjer.length; t++) {
-            boble.querySelector(".intro-naeste").click();
-            koerTid(sim, 1);
-            var s2 = sim.introStatus();
-            if (!s2 || s2.nr !== t || boble.querySelector(".intro-tekst").textContent !== linjer[t].tekst ||
-                    boble.querySelector(".intro-tal").textContent !== (t + 1) + "/" + linjer.length) { trinOk = false; note = "trin " + t; }
-            var maal = doc.querySelector(linjer[t].sel), rammer = NK.Fremhaev.synlige();
-            if (!maal || rammer.length !== 1) { rammeOk = false; note = "ramme i trin " + t + ": " + rammer.length; continue; }
-            var mr = maal.getBoundingClientRect(), rr = rammer[0];
-            if (!(mr.width > 20 && mr.height > 20) || Math.abs(rr.left - (mr.left - 5)) > 2 || Math.abs(rr.top - (mr.top - 5)) > 2 ||
-                    Math.abs(rr.width - (mr.width + 10)) > 2) { rammeOk = false; note = "ramme i trin " + t + " står forkert"; }
-            /* Boblen daekker hoejst en mindre del af det, han peger paa */
-            var br = boble.getBoundingClientRect();
-            var fb = Math.min(br.right, mr.right) - Math.max(br.left, mr.left), fh = Math.min(br.bottom, mr.bottom) - Math.max(br.top, mr.top);
-            var del = fb > 0 && fh > 0 ? fb * fh / (mr.width * mr.height) : 0;
-            if (del > 0.25) { daekOk = false; note = "boblen dækker " + Math.round(del * 100) + " % af " + linjer[t].sel; }
-        }
-        paastand(fane + ": Næste viser de " + linjer.length + " linjer én ad gangen", trinOk, note);
-        paastand(fane + ": det, han peger på, har en ramme om sig", rammeOk, note);
-        paastand(fane + ": boblen dækker ikke det, han peger på", daekOk, note);
-        paastand(fane + ": armen er løftet mod det, der blinker", sim.laerer.arm < NK.Kemichael.HAENGER - 0.5, sim.laerer.arm);
-        paastand(fane + ": sidste trin hedder Afslut", /Afslut/.test(boble.querySelector(".intro-naeste").textContent));
-        boble.querySelector(".intro-naeste").click();
-        koerTid(sim, 3);
-        paastand(fane + ": Afslut sender ham ud, og boblen og rammen forsvinder",
-            !sim.laererIIntro() && boble.hidden && NK.Fremhaev.synlige().length === 0 && sim.laerer.x < -100, sim.laerer.x);
-        sim.startIntro(true);
-        koerTid(sim, 2.5);
-        boble.querySelector(".intro-naeste").click();
-        koerTid(sim, 0.5);
-        var midt = sim.introStatus();
-        boble.querySelector(".intro-spring").click();
-        koerTid(sim, 3);
-        paastand(fane + ": Spring over stopper den midt i (trin 2)", !!midt && midt.nr === 1 && !sim.laererIIntro() && boble.hidden && NK.Fremhaev.synlige().length === 0);
-    }
+        NK.Praesentation.selvtest(sim, function (sek) { koerTid(sim, sek); }).forEach(function (r) {
+            paastand(fane + ": " + r[0], r[1], r[2]);
+        });
+    });
     /* Taleboblen paa laerredet tegnes efter alt andet (ros og paaskeaeg) */
     var kildeF = NK.SimForsoeg.prototype.tegn.toString(), kildeR = NK.SimRaekken.prototype.tegn.toString();
     paastand("fane 1 og 2 tegner hans taleboble allersidst", /laererTegnBoble\(ctx\);\s*}\s*$/.test(kildeF) && /laererTegnBoble\(ctx\);\s*}\s*$/.test(kildeR));

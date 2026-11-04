@@ -824,3 +824,76 @@ input[type="range"] {
 .opgavekort .besked { margin-top: 8px; }
 .opgavekort .knaprad { margin-top: 10px; }
 .opgavekort.sejr { border-left-color: var(--groen); animation: formelglimt 0.9s ease-out 2; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST MIDT I SCENEN (4. nov. 2026)
+   Opgaven, svarene, hint, forklaringen og knapperne staar paa ét kort
+   oeverst i midten af scenen (js/opgave.js). Farver og skrift kommer fra
+   ../faelles/papirkort.css, som indlaeses efter denne fil; her staar kun
+   opbygningen. Kortet skal kunne vaere i NK.kortZone() (206 px, 178 px
+   paa lave skaerme); selvtesten maaler det.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+}
+
+.sk-tekst { margin: 0; }
+.sk-chip { white-space: nowrap; }
+
+.sk-start { display: flex; align-items: center; gap: 14px; }
+.sk-start .sk-tekst { flex: 1; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2, .sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-svar.n4.kort { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+.sk-knap:disabled { cursor: default; }
+
+.v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.sk-bund { display: flex; align-items: center; }
+.sk-bund .st-tekst { flex: 1; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.92rem; }
+.sk-bund .knap.indsend.ikke-klar { cursor: default; }
+
+.sk-videre { flex: 0 0 auto; font-family: inherit; white-space: nowrap; cursor: pointer; }
+.sk-svaret { font-weight: 700; }
+
+@keyframes st-ryst {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+}
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .sk-knap { padding: 4px 9px; font-size: 0.88rem; }
+}

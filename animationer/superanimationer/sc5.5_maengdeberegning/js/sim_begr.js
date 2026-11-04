@@ -31,7 +31,6 @@
     function SimBegr() {
         this.startFane();
         this.brugt = {};
-        this.bygValg();
         this.introNu = true;
         this.nr = -1;
         var i = this.naesteUloeste();
@@ -85,11 +84,11 @@
         };
     };
 
-    P.promptHTML = function () {
+    /* Opgaven paa kortet: de to kendte masser og spoergsmaalet */
+    P.kortTekst = function () {
         var o = this.x.o, g = this.x.givet;
-        return '<p class="opgave-prompt">' + D.tekstMasse(g[o.a]) + " g " + D.stof(o.a).formel + " + " +
-            D.tekstMasse(g[o.b]) + " g " + D.stof(o.b).formel + "</p>" +
-            '<p class="opgave-spm">' + NK.html(o.tekst) + "</p>";
+        return "Givet: <b>" + D.tekstMasse(g[o.a]) + "\u00a0g " + D.stof(o.a).formel + "</b> og <b>" +
+            D.tekstMasse(g[o.b]) + "\u00a0g " + D.stof(o.b).formel + "</b>. " + NK.html(o.tekst);
     };
 
     P.nyOpgave = function () {
@@ -100,37 +99,41 @@
         this.a = { fase: 0, t: 0 };
         this.saet = this.x.tal.saet;
         this.valgtJ = -1;
+        this.valgBliv = null;
         this.pTid = null;
-        this.visValg();
     };
 
-    /* ----- Valget ---------------------------------------------------------------------------- */
-    P.bygValg = function () {
-        var mig = this;
-        this.el.valg = NK.el("begr-valg");
-        this.el.valg.addEventListener("click", function (e) {
-            var k = e.target.closest ? e.target.closest("button[data-j]") : null;
-            if (k) mig.vaelgBegr(parseInt(k.getAttribute("data-j"), 10), "gaet");
-        });
-    };
+    /* ----- Valget ----------------------------------------------------------------------------
+       Valget staar paa kortet som et spoergsmaal med to svar. Et svar (eller
+       et klik paa poserne) vaelger kun; Indsend svar sender ind. Mens poserne
+       reagerer, er svarene laast. Bagefter bliver kortet paa spoergsmaalet:
+       det valgte svar er groent (eller roedt, og det rigtige gult),
+       forklaringen staar under, og Naeste skridt fører videre. */
+    P.reagerer = function () { return !!(this.a && this.a.fase === 1); };
 
-    P.visValg = function () {
-        if (!this.opg) return;
+    P.valgData = function () {
+        if (!this.opg || this.faerdig) return null;
         var aktiv = this.skema.naeste() === "valg";
-        var o = this.x.o;
-        if (aktiv) {
-            var html = "";
-            [[this.jA, o.a], [this.jB, o.b]].forEach(function (x) {
-                html += '<button class="knap" type="button" data-j="' + x[0] + '">' + D.stof(x[1]).formel + " slipper op først</button>";
-            });
-            NK.saetHTML("begr-valg", html);
-        }
-        this.el.valg.hidden = !aktiv;
+        var vist = this.reagerer() || (this.venter && this.valgBliv);
+        if (!aktiv && !vist) return null;
+        var o = this.x.o, mig = this, kilde = this.opg.kilde, vb = this.valgBliv;
+        var svar = [[this.jA, o.a], [this.jB, o.b]].map(function (x) {
+            var j = x[0], s = { j: j, t: D.stof(x[1]).formel + " slipper op først" };
+            if (aktiv) { s.valgt = mig.valgtSvar === j; return s; }
+            s.laast = true;
+            if (mig.reagerer()) { s.valgt = mig.valgtJ === j; s.dim = mig.valgtJ !== j; return s; }
+            if (vb.svar) { s.svarVist = j === kilde; s.dim = j !== kilde; return s; }
+            if (j === mig.valgtJ) { s.rigtig = j === kilde; s.forkert = j !== kilde; }
+            else if (j === kilde) s.svarVist = true;
+            else s.dim = true;
+            return s;
+        });
+        return { spm: "Hvilket stof slipper op først?", svar: svar };
     };
 
     P.valgTekst = function () {
         var o = this.x.o;
-        return "Hvem slipper op først? Vælg " + D.stof(o.a).formel + " eller " + D.stof(o.b).formel + ".";
+        return "Vælg " + D.stof(o.a).formel + " eller " + D.stof(o.b).formel + " på kortet, og tryk Indsend svar.";
     };
 
     P.valgHint = function () {
@@ -160,22 +163,23 @@
         this.valgRigtig = rigtig && maade !== "svar";
         if (!this.valgRigtig) this.brugtSvar = true;
         this.hjaelp = 0;
+        this.valgSvar = maade === "svar";
+        this.valgtSvar = null;
         this.ekstra.push({ trin: "valg", html: this.valgHTML(), svar: !this.valgRigtig });
         this.a = { fase: 1, t: 0 };
-        this.visValg();
         this.visLinjer();
-        this.visKnap();
         this.skema.byg();
-        var L = D.stof(this.x.L).formel, E = D.stof(this.x.E).formel;
-        if (maade === "svar") this.besked(L + " slipper op først, og " + E + " er til overs. Se poserne.", "gul");
-        else this.besked(rigtig ? "Rigtigt gættet. Se poserne reagere i hele sæt." : "Se, hvad der sker.", rigtig ? "god" : "");
+        this.besked("Se poserne reagere i hele sæt efter skemaet.", "peger");
+        this.visKort();
     };
 
-    /* Efter reaktionen: forklaringen og naeste skridt */
+    /* Efter reaktionen bliver kortet paa valget med forklaringen, til eleven
+       trykker Naeste skridt */
     P.efterReaktion = function () {
         var L = D.stof(this.x.L).formel, E = D.stof(this.x.E).formel;
-        var linje = L + " slap op. " + E + " er til overs.";
-        if (this.valgtJ >= 0 && !this.valgRigtig && this.valgtJ !== this.opg.kilde) {
+        var linje = L + " slap op. " + E + " er til overs.", rigtig = true, maerke = "Rigtigt";
+        if (this.valgSvar) { maerke = "Svaret"; rigtig = false; }
+        else if (this.valgtJ >= 0 && !this.valgRigtig && this.valgtJ !== this.opg.kilde) {
             var r = this.opg.r, n = this.opg.n;
             var jV = this.valgtJ, jL = this.opg.kilde;
             var V = D.stof(r.led[jV].s).formel;
@@ -184,17 +188,18 @@
             } else {
                 linje = L + " slap op, ikke " + V + ". Del stofmængderne med koefficienterne.";
             }
-            this.besked(linje + " " + this.trinLinje(), "skidt");
-            this.fokus();
-            return;
+            rigtig = false;
+            maerke = "Ikke rigtigt";
         }
-        this.naesteLinje(linje, "");
-        this.fokus();
+        this.valgBliv = { rigtig: rigtig, svar: this.valgSvar, maerke: maerke, html: NK.html(linje) };
+        this.venter = true;
+        this.hjaelp = 0;
+        this.besked("", "");
+        this.visKort();
     };
 
     P.efterLoest = function (id) {
         if (id === this.jP + "_n") this.pTid = this.tid;
-        this.visValg();
     };
 
     P.slutLinje = function () {
@@ -208,8 +213,11 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
         lay.bordY = Math.round(H - NK.klamp(H * 0.06, 18, 44));
-        var tH = NK.klamp(H * 0.56, 190, 400);
-        lay.tavle = { x: kant + 6, y: NK.klamp(H * 0.02, 8, 18), b: W - 2 * kant - 12, h: tH };
+        /* Kortet staar oeverst; tavlen begynder under det */
+        lay.zone = this.kortZone();
+        var y0 = this.top();
+        var tH = NK.klamp((H - y0) * 0.56, 170, 400);
+        lay.tavle = { x: kant + 6, y: y0, b: W - 2 * kant - 12, h: tH };
         var ind = NK.klamp(lay.tavle.b * 0.03, 8, 22);
         this.skema.layout({ x: lay.tavle.x + ind, y: lay.tavle.y + ind * 0.6, b: lay.tavle.b - 2 * ind, h: tH - ind * 1.2 }, this.L.ctx);
         var zoneTop = lay.tavle.y + tH + 18;
@@ -361,14 +369,19 @@
     };
 
     P.overScene = function (pt) {
-        if (!pt || this.skema.naeste() !== "valg") return null;
+        if (!pt || this.skema.naeste() !== "valg" || this.reagerer()) return null;
         return this.hvilket(pt) >= 0 ? "pose" : null;
     };
 
     P.klikScene = function (pt) {
         var j = this.hvilket(pt);
         if (j < 0) return false;
-        if (this.skema.naeste() === "valg") { this.vaelgBegr(j, "gaet"); return true; }
+        if (this.skema.naeste() === "valg") {
+            if (this.reagerer()) { this.blinkKort(); return true; }
+            this.vaelgKortSvar(j);
+            this.kortBesked("Du har valgt " + this.skema.stof(j).formel + ". Tryk Indsend svar på kortet.", 4);
+            return true;
+        }
         var st = this.skema.stof(j), c = this.skema.celle(j + "_n");
         if (c.status === "ok" || c.status === "svar") this.kortBesked(D.tekstN(this.opg.n[j]) + " mol " + st.formel + ". Én pose er 1 mol.", 4);
         else this.kortBesked(D.tekstMasse(this.x.givet[st.id]) + " g " + st.formel + ". Regn stofmængden ud i skemaet.", 4);

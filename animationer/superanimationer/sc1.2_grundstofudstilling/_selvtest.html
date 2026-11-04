@@ -399,8 +399,9 @@ function koerTest(W) {
         tekster.push(f.fakta);
         f.orden.concat(["ialt"]).forEach(function (felt) { var h = D.hjaelpFormel(f, felt); tekster.push(h.hint, h.svar); });
     });
-    var replikker = [].concat(D.INTRO_MONTRE, D.INTRO_FORMLER, D.INTRO_OPRAAB, D.PERIODE_ROS, D.NIVEAU_ROS,
-        [D.MONTRE_FULD, D.FORMLER_FAERDIG], Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }));
+    var INTRO = [].concat(D.INTRO_MONTRE, D.INTRO_FORMLER, D.INTRO_OPRAAB);
+    var ROS = [D.MONTRE_FULD, D.FORMLER_FAERDIG].concat(Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }));
+    var replikker = INTRO.map(function (l) { return l.tekst; }).concat(ROS);
     tekster = tekster.concat(replikker);
     tilfaelde.forEach(function (t) { tekster.push(hvilke[t[0]](t[2], g(t[1])).besked); });
     formelTilfaelde.forEach(function (t) { tekster.push(T.antal(t[2], fo(t[0]), t[1]).besked); });
@@ -409,9 +410,13 @@ function koerTest(W) {
     paastand("ingen tankestreger", streger.length === 0, streger.slice(0, 2).join(" | "));
     var enPlus = tekster.filter(function (t) { return /(^|[^0-9])1[+−-](?![0-9])|¹⁺|¹⁻/.test(t.replace(/\d+\s*[+−-]\s*\d+/g, "")); });
     paastand("ingen ladning skrevet som 1+ eller 1−", enPlus.length === 0, enPlus.slice(0, 2).join(" | "));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("præsentationerne har to eller tre replikker", [D.INTRO_MONTRE, D.INTRO_FORMLER, D.INTRO_OPRAAB].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med 'Her'", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("rosen er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
 
     /* Alle tests herefter starter fra en tom browser */
     NOEGLER.forEach(function (n) { W.localStorage.removeItem(n); W.localStorage.setItem(n, n.indexOf("intro") >= 0 ? "true" : "{}"); });
@@ -469,7 +474,7 @@ function koerTest(W) {
     M.klikPlads(2);
     M.aktivtFelt().input.value = "2"; M.tjek();
     for (i = 0; i < 200; i++) M.opdater(1 / 60);
-    paastand("første periode fuld: Kemichael roser", M.rost[1] === true && !!(M.laerer && M.laerer.scene && M.laerer.scene.navn === "periode"));
+    paastand("første periode fuld: Kemichael kommer ikke (kun når alle 36 står der)", !M.laerer.scene);
     M.vaelg(11);
     paastand("en løst prøve vises med facit og skiltet", M.opg.gennemsyn && M.opg.faerdig && M.el.knap.textContent === "Øv prøven igen" && !!M.skiltMaal(M.opg.g));
     M.knap();
@@ -496,6 +501,15 @@ function koerTest(W) {
     paastand("chlor er løst i den rækkefølge", M.status[17].loest && M.status[17].stjerne);
     M.vaelg(18);
     paastand("linjen under scenen siger, hvad der skal ske", d.getElementById("montre-status").textContent.indexOf("træk prøven op på sin plads") >= 0);
+    M.nulstilAlt();
+    Object.keys(M.status).forEach(function (z) { if (Number(z) !== 2) M.status[z].loest = true; });
+    M.vaelg(2);
+    M.aktivtFelt().input.value = "helium"; M.tjek();
+    M.klikPlads(2);
+    M.aktivtFelt().input.value = "2"; M.tjek();
+    for (i = 0; i < 200; i++) M.opdater(1 / 60);
+    paastand("den sidste af de 36 prøver: Kemichael kommer", M.antalLoest() === 36 && !!(M.laerer.scene && M.laerer.scene.navn === "faerdig"));
+    for (i = 0; i < 60 * 15; i++) M.opdater(1 / 60);
     M.nulstilAlt();
     paastand("Tøm udstillingen nulstiller alt", M.antalLoest() === 0);
 
@@ -544,6 +558,14 @@ function koerTest(W) {
     paastand("tre stiplede rammer om SO₄", F.rammer.length === 3);
     F.knap();
     paastand("Næste flaske tager en uløst", F.valgt !== 9 && !F.status[F.valgt].loest);
+    paastand("én flaske: Kemichael kommer ikke", !F.laerer.scene);
+    F.nulstilAlt();
+    F.status.forEach(function (s, j) { if (j !== 9) s.loest = true; });
+    F.vaelg(9);
+    ["2", "3", "12", "17"].forEach(function (v) { F.aktivtFelt().input.value = v; F.tjek(); });
+    for (i = 0; i < 160; i++) F.opdater(1 / 60);
+    paastand("den sidste af de tolv flasker: Kemichael kommer", F.antalLoest() === 12 && !!(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
+    for (i = 0; i < 60 * 15; i++) F.opdater(1 / 60);
     F.nulstilAlt();
 
     overskrift("12. Opråbet kan spilles");
@@ -566,6 +588,13 @@ function koerTest(W) {
     paastand("når tiden løber ud, koster det et liv", O.liv === 1);
     for (i = 0; i < 60 * 40 && O.tilstand === "koerer"; i++) O.opdater(1 / 60);
     paastand("efter tre fejl er spillet slut", O.tilstand === "slut" && O.liv === 0);
+    paastand("første spil med ny rekord: Kemichael kommer", !!(O.laerer.scene && O.laerer.scene.navn === "slut"));
+    var kaldO = 0, koerO = O.laererKoer;
+    O.laererKoer = function () { kaldO++; return koerO.apply(this, arguments); };
+    O.laererSlut("mange");
+    O.laererSlut("faa");
+    delete O.laererKoer;
+    paastand("næste opråb kommer han ikke igen, og et svagt spil giver ingen replik", kaldO === 0, kaldO);
     paastand("fejlene står i listen bagefter", d.getElementById("opraab-log").children.length === 3 && !d.getElementById("opraab-log-kort").hidden);
     paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc1.2-opraab")) || {}).rekord === O.point);
     O.nulstil();
@@ -598,6 +627,7 @@ function koerTest(W) {
         O.opdater(1 / 60);
     }
     paastand("når alle 20 er fundet, er spillet slut", O.tilstand === "slut" && O.fundet === 20 && O.bunke.length === 0 && O.liv === 3);
+    paastand("alle 20 gåder fundet: Kemichael kommer", !!(O.laerer.scene && O.laerer.scene.navn === "slut"));
     var log = d.getElementById("opraab-log");
     paastand("de to, der kom igen, står én gang hver i listen med gåden", log.children.length === 2 && log.querySelectorAll("em").length === 2);
     paastand("rekorden gemmes for sig", (JSON.parse(W.localStorage.getItem("nk-sc1.2-opraab")) || {}).hvem === O.point && O.point > 0);
@@ -605,6 +635,19 @@ function koerTest(W) {
         d.getElementById("opraab-knap").style.display === "");
     O.vaelgSpil("opraab");
     paastand("tilbage til opråbet: livene er der igen", O.spil === "opraab" && O.tilstand === "klar" && d.getElementById("opraab-liv-raekke").style.display === "");
+
+    overskrift("12c. Kemichaels præsentation (fælles test)");
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    [["fane-montre", M], ["fane-formler", F], ["fane-opraab", O]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var sim = x[1];
+        sim.tilpas();
+        tik(sim, 12);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(x[0] + ": " + r[0], r[1], r[2]);
+        });
+    });
+    paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
 
     overskrift("13. Layoutet");
     var ramme = document.getElementById("ramme");

@@ -6,11 +6,12 @@
 
    Hjoernet: han staar nederst i hoejre hjoerne af scenen, hvor der er
    tomt, og ses fra brystet og op. Han gaar ind og ud ad hoejre kant, saa
-   han aldrig gaar hen over bordet eller glasset. Taleboblen tegnes her i
-   filen (laererTegnBoble), over hans hoved i samme hjoerne og fri af det,
-   fanen bruger (laererOptaget). Det, han taler om, faar en gul ramme
-   (NK.Fremhaev), saa han ikke skal gaa derhen for at vise det. Eleven kan
-   bruge fanen, mens han taler.
+   han aldrig gaar hen over bordet eller glasset. Taleboblen paa
+   laerredet tegnes her i filen (laererTegnBoble), over hans hoved i samme
+   hjoerne og fri af det, fanen bruger (laererOptaget). Det, han taler om,
+   faar en gul ramme (NK.Fremhaev, ../kemichael/praesentation.js), saa han
+   ikke skal gaa derhen for at vise det. Eleven kan bruge fanen, mens han
+   taler.
 
    Skalaen foelger laerredets hoejde (laererLaerredSkala). Kitlen stopper
    ved gulvet (NK.Scene.GULV): laerredets bund, og paa fane 1 oversiden af
@@ -22,19 +23,25 @@
      this.L                 laerredet
      laererOptaget()        rektangler { x, y, b, h } i laerredets pixels,
                             som boblen holder sig fri af
-     laererMaalRekt(navn)   rammerne til et navn i D.INTRO[fane].maal: en
-                            liste af rektangler i sidens pixels
+     introFelt(navn)        det, der er tegnet paa laerredet, og som
+                            praesentationen peger paa (D.INTRO, felt)
      laererGulvPx()         (kan undlades) gulvet i laerredets pixels
 
    Scener:
-     intro      naar eleven har sagt ja til praesentationen: tre eller
-                fire korte replikker (D.INTRO), hver med sin gule ramme.
-                Scenen laaser ikke, og han gaar ved knappen Spring over,
-                to klik paa ham eller Esc.
+     intro      naar eleven har sagt ja til praesentationen. Koden er
+                faelles (NK.Praesentation.trin): to til fire trin
+                (D.INTRO), hvert med to til fire hele saetninger i en
+                taleboble med Naeste og Spring praesentationen over. Det,
+                trinnet handler om, faar en gul ramme. Han gaar foerst
+                videre, naar eleven trykker Naeste.
      visStart   fane 3, "Start opgave": ramme om den ion, eleven kender,
-                og "Start med O."
-     ros        fane 3, hver tredje opgave, eleven loeser selv.
-   Han forklarer ikke teori. Den staar i hintene.
+                og én replik, fx "Du har ikke mødt sulfit endnu, men du
+                kender ladningen på Na. Derfor kan du regne ladningen på
+                sulfit ud." (brugerens oenske 4. nov. 2026).
+   Han roser ikke laengere hver tredje opgave (brugerens regel 4. nov.
+   2026: han kommer kun ind, naar noget er helt gennemfoert, eller naar
+   eleven goer noget vildt). Han forklarer ikke teori. Den staar i
+   hintene.
    ===================================================================== */
 (function () {
     "use strict";
@@ -84,79 +91,6 @@
         linjer.forEach(function (l) { bred = Math.max(bred, ctx.measureText(l).width); });
         return { linjer: linjer, b: Math.ceil(bred) + 2 * BOBLE.polX, h: linjer.length * BOBLE.linje + 2 * BOBLE.polY };
     }
-
-    /* Et element paa siden som rektangel i sidens pixels; null, hvis det
-       ikke ses. tekst: kun selve teksten, ikke hele linjens bredde. */
-    function elRekt(e, tekst) {
-        if (!e) return null;
-        var r;
-        if (tekst) {
-            var rng = document.createRange();
-            rng.selectNodeContents(e);
-            r = rng.getBoundingClientRect();
-        } else {
-            r = e.getBoundingClientRect();
-        }
-        return r.width > 0 && r.height > 0 ? { x: r.left, y: r.top, b: r.width, h: r.height } : null;
-    }
-
-    /* Det, der samlet fylder i et element (fx hylden, der gaar fra kant
-       til kant, men kun har ioner paa midten) */
-    function omkreds(e) {
-        if (!e) return null;
-        var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-        for (var i = 0; i < e.children.length; i++) {
-            var r = e.children[i].getBoundingClientRect();
-            if (!r.width) continue;
-            x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top);
-            x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom);
-        }
-        return x1 > x0 ? { x: x0, y: y0, b: x1 - x0, h: y1 - y0 } : null;
-    }
-
-    /* ----- Den gule ramme --------------------------------------------------
-       Om det, Kemichael taler om. Rammerne ligger oven paa siden
-       (position: fixed), fanger ingen klik og skal fornyes hvert billede.
-       Kommer der ikke et nyt kald i 0,2 s (fx fordi fanen er skiftet),
-       forsvinder de af sig selv. */
-    NK.Fremhaev = (function () {
-        var rammer = [], sidst = 0, vagt = false;
-        function ramme(i) {
-            if (!rammer[i]) {
-                var e = document.createElement("div");
-                e.className = "fremhaev-ramme";
-                e.setAttribute("aria-hidden", "true");
-                e.hidden = true;
-                document.body.appendChild(e);
-                rammer[i] = e;
-            }
-            return rammer[i];
-        }
-        function skjul() { rammer.forEach(function (e) { e.hidden = true; }); }
-        function tjek() {
-            if (window.performance.now() - sidst > 200) { skjul(); vagt = false; return; }
-            window.requestAnimationFrame(tjek);
-        }
-        function vis(liste) {
-            liste = (liste || []).filter(function (r) { return r && r.b > 0 && r.h > 0; });
-            var i;
-            for (i = 0; i < liste.length; i++) {
-                var e = ramme(i), r = liste[i], p = 5;
-                e.style.left = (r.x - p) + "px";
-                e.style.top = (r.y - p) + "px";
-                e.style.width = (r.b + 2 * p) + "px";
-                e.style.height = (r.h + 2 * p) + "px";
-                e.hidden = false;
-            }
-            for (; i < rammer.length; i++) rammer[i].hidden = true;
-            sidst = window.performance.now();
-            if (!vagt) { vagt = true; window.requestAnimationFrame(tjek); }
-        }
-        function synlige() {
-            return rammer.filter(function (e) { return !e.hidden; }).map(function (e) { return e.getBoundingClientRect(); });
-        }
-        return { vis: vis, skjul: skjul, synlige: synlige };
-    }());
 
     /* Scenens maal i figurens enheder: laerredet, og gulvet */
     function scenemaal(sim) {
@@ -214,10 +148,9 @@
             this.laererRammerVist = rammer.length > 0;
         };
 
-        /* maal: et navn (laererMaalRekt) eller en funktion, der giver
-           rektanglerne i sidens pixels */
+        /* maal: en funktion, der giver rektanglerne i sidens pixels */
         P.laererRammer = function (maal) {
-            var r = typeof maal === "function" ? maal.call(this) : (this.laererMaalRekt ? this.laererMaalRekt(maal) : null);
+            var r = typeof maal === "function" ? maal.call(this) : null;
             return (r || []).filter(Boolean);
         };
 
@@ -269,9 +202,10 @@
             return valgt;
         };
 
+        /* Under praesentationen staar teksten i HTML-boblen i stedet */
         P.laererTegnBoble = function (ctx) {
             var L = this.laerer;
-            if (!L || !L.tale || !(L.taleAlfa > 0.01)) return;
+            if (this.kmIntro || !L || !L.tale || !(L.taleAlfa > 0.01)) return;
             var r = this.laererBoblePlads(L.tale);
             this.laererBobleSidst = r;
             var fod = NK.klamp(r.haleX, r.x + 18, r.x + r.b - 18);
@@ -340,103 +274,52 @@
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
     /* ----- Praesentationen ------------------------------------------------
-       tekst: D.INTRO[fane], linjer og maal (hvad der faar ramme om sig,
-       mens linjen siges). Han gaar ind i hjoernet og bliver der. */
-    function introTrin(sim, tekst) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; sim.laererMaal = null; } },
-            { udtryk: { vrede: 0, humoer: 0.3, roed: 0, skeptisk: 0, briller: 0 } },
-            { gaa: function () { return this.laererHjoerneX(); } },
-            { tid: 0.15 }
-        ];
-        tekst.linjer.forEach(function (l, i) {
-            var maal = tekst.maal ? tekst.maal[i] : null;
-            trin.push({ kald: function () { sim.introTrin = i + 1; sim.laererMaal = maal || null; } });
-            trin.push({ arm: function () { return this.laererSeMod(maal); }, tid: 0.3 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { kald: function () { sim.introTrin = 0; sim.laererMaal = null; this.laerer.hovedMaal = 0; } },
-            { arm: HAENGER, tid: 0.3 },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { gaa: UDE }
-        ]);
-    }
+       Faelles (../kemichael/praesentation.js): ét trin ad gangen med
+       Naeste og Spring praesentationen over i en taleboble ved hans
+       hoved. Trinnene staar i D.INTRO[fane]. Han gaar ind i hjoernet og
+       bliver der, til eleven trykker Afslut eller springer over.
 
-    /* knapId: knappen Spring over paa fanen */
-    function introVaek(P, knapId) {
-        /* Et klik under praesentationen: rammer det ham, taeller det. Andet
-           klik paa ham sender ham ud, det foerste faar knappen til at blinke.
-           Klik andre steder gaar videre til fanen som ellers. */
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(knapId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererMaal = null;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { kald: function () { this.laerer.hovedMaal = 0; } },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
-
-    /* Praesentationen paa en fane. startIntro(tving) kaldes ved faneskift
-       og med K; foerste gang i browseren, eller altid med tving (js/app.js
-       viser tilbuddet i stedet, se js/praesentation.js). opdaterIntro(dt)
-       hvert billede: knappen Spring over staar over boblen, og tilbuddet
-       staar i hjoernet oven paa gulvet. */
-    function praesentation(P, fane, knapId, tilbudId) {
+       startIntro(tving) kaldes ved faneskift og med K. js/app.js pakker
+       den ind (NK.Praesentation.pakInd), saa der foerste gang staar Start
+       praesentation og Nej tak. opdaterIntro(dt) hvert billede: ventetiden,
+       boblen og tilbuddet, der staar i hjoernet oven paa gulvet. */
+    function praesentation(P, fane, tilbudId) {
         var noegle = "nk-sc2.2-intro-" + fane;
 
-        P.laererIntro = function () {
-            if (!this.laerer) return;
-            this.laererKoer("intro", introTrin(this, D.INTRO[fane]), false);
+        P.introLinjer = function () { return D.INTRO[fane]; };
+        /* Han staar i hjoernet, uanset hvad han viser */
+        P.laererPlads = function () { return this.laererHjoerneX(); };
+        NK.Praesentation.trin(P);
+
+        /* Til venstre for ham peger han ikke, for i hjoernet ville armen
+           gaa hen over ansigtet eller ud af scenen. Han kigger derhen, og
+           rammen viser det. Mod panelet til hoejre peger han. Den faelles
+           kode giver armen NED (skraat ned foran kroppen), naar maalet
+           staar til venstre for skulderen; her haenger den i stedet. */
+        var NED = 1.85, vis = P.introVis;
+        P.introVis = function (n) {
+            vis.call(this, n);
+            var sc = this.laerer && this.laerer.scene;
+            if (!sc || sc.navn !== "intro") return;
+            sc.trin.forEach(function (tr) {
+                if (typeof tr.arm !== "function") return;
+                var arm = tr.arm;
+                tr.arm = function () {
+                    var v = arm.apply(this, arguments);
+                    return Math.abs(v - NED) < 1e-9 ? HAENGER : v;
+                };
+            });
         };
-        introVaek(P, knapId);
 
         P.startIntro = function (tving) {
             if (!this.laererIntro) return;
             if (!tving && NK.hent(noegle, false)) return;
             NK.gem(noegle, true);
-            this.introVent = tving ? 0.1 : 0.9;
+            if (!this.laererIIntro()) this.introVent = tving ? 0.1 : 0.9;
         };
         P.springIntro = function () {
             this.introVent = 0;
             return !!(this.laererIntroVaek && this.laererIntroVaek());
-        };
-
-        /* Knappen staar over den hoejeste af fanens bobler, saa den ikke
-           hopper, naar en replik er en linje laengere end den forrige. */
-        P.laererPlacerSpring = function (knap) {
-            if (!this.laerer || !(this.L.h > 0)) return;
-            var mig = this, top = Infinity;
-            D.INTRO[fane].linjer.forEach(function (l) { top = Math.min(top, mig.laererBoblePlads(l).y); });
-            knap.style.top = Math.max(6, top - knap.offsetHeight - 8) + "px";
-            knap.style.right = BOBLE.kant + "px";
         };
 
         P.opdaterIntro = function (dt) {
@@ -444,17 +327,16 @@
                 this.introVent -= dt;
                 if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
             }
-            var iIntro = !!(this.laererIIntro && this.laererIIntro());
-            var knap = NK.el(knapId);
-            if (iIntro !== this.visesSpring) {
-                this.visesSpring = iIntro;
-                knap.hidden = !iIntro;
-            }
-            if (iIntro) this.laererPlacerSpring(knap);
+            if (this.kmIntro) this.introOpdaterBoble();
             var tilbud = NK.el(tilbudId);
             if (tilbud && !tilbud.hidden && this.L.h > 0) {
                 tilbud.style.bottom = Math.round(this.L.h - this.laererGulv() + 12) + "px";
             }
+        };
+
+        /* En ny opgave (laererNyt) afbryder praesentationen */
+        P.laererNytEkstra = function () {
+            if (this.kmIntro) this.laererIntroVaek();
         };
     }
 
@@ -486,7 +368,7 @@
     if (NK.SimBord) {
         var PB = NK.SimBord.prototype;
         kobl(PB, { fredet: [] });
-        praesentation(PB, "fane-bord", "bord-spring", "bord-tilbud");
+        praesentation(PB, "fane-bord", "bord-tilbud");
 
         /* Han staar oven paa den nederste hylde */
         PB.laererGulvPx = function () {
@@ -495,11 +377,9 @@
             return h.getBoundingClientRect().top - this.L.canvas.getBoundingClientRect().top;
         };
         PB.laererOptaget = function () { return [bordOptaget(this.bord)]; };
-        PB.laererMaalRekt = function (navn) {
-            if (navn === "bord") return [this.laererSide(bordRekt(this.bord))];
-            if (navn === "hylder") return [omkreds(this.bord.hyldeTop), omkreds(this.bord.hyldeBund)];
-            if (navn === "opgave") return [elRekt(NK.el("bord-opgaveknap"))];
-            return [];
+        /* Det, praesentationen peger paa paa laerredet */
+        PB.introFelt = function (navn) {
+            return navn === "bord" ? bordRekt(this.bord) : null;
         };
     }
 
@@ -507,52 +387,58 @@
     if (NK.SimVand) {
         var PV = NK.SimVand.prototype;
         kobl(PV, { fredet: [] });
-        praesentation(PV, "fane-vand", "vand-spring", "vand-tilbud");
+        praesentation(PV, "fane-vand", "vand-tilbud");
 
         PV.laererGlas = function () {
             var G = this.G;
             return G ? { x: G.x, y: G.y, b: G.b, h: G.h } : null;
         };
         PV.laererOptaget = function () { return [this.laererGlas()]; };
-        PV.laererMaalRekt = function (navn) {
-            if (navn === "glas") return [this.laererSide(this.laererGlas())];
-            if (navn === "salt") return [elRekt(NK.el("vand-saltkort"))];
-            if (navn === "opgave") return [elRekt(NK.el("vand-opgaveknap"))];
-            return [];
+        PV.introFelt = function (navn) {
+            return navn === "glas" ? this.laererGlas() : null;
         };
     }
 
     /* ----- Fane 3: den ukendte ion --------------------------------------- */
     if (NK.SimUkendt) {
         var PU = NK.SimUkendt.prototype;
-        kobl(PU, { fredet: ["intro", "visStart", "ros"] });
-        praesentation(PU, "fane-ukendt", "ukendt-spring", "ukendt-tilbud");
+        kobl(PU, { fredet: ["intro", "visStart"] });
+        praesentation(PU, "fane-ukendt", "ukendt-tilbud");
 
         PU.laererOptaget = function () {
             var p = this.plakater || {};
             return [bordOptaget(this.bord), p.pt, p.ioner];
         };
-        PU.laererMaalRekt = function (navn) {
+        /* Formlen over bordet (kun teksten, ikke hele linjens bredde),
+           bordet og de to plakater, i laerredets pixels */
+        PU.introFelt = function (navn) {
             var p = this.plakater || {};
-            if (navn === "formel") return [elRekt(NK.el("ukendt-uf"), true)];
-            if (navn === "trin") return [elRekt(document.querySelector("#ukendt-opgavekort .trin"))];
-            if (navn === "plakater") return [this.laererSide(p.pt), this.laererSide(p.ioner)];
-            if (navn === "opgave") return [elRekt(NK.el("ukendt-opgaveknap"))];
-            return [];
+            if (navn === "bord") return bordRekt(this.bord);
+            if (navn === "pt") return p.pt || null;
+            if (navn === "ioner") return p.ioner || null;
+            if (navn === "formel") {
+                var e = NK.el("ukendt-uf");
+                if (!e) return null;
+                var rng = document.createRange();
+                rng.selectNodeContents(e);
+                var r = rng.getBoundingClientRect(), c = this.L.canvas.getBoundingClientRect();
+                return r.width > 0 ? { x: r.left - c.left, y: r.top - c.top, b: r.width, h: r.height } : null;
+            }
+            return null;
         };
 
-        /* {ion} er den kendte ion. Replikkerne er korte og toerre. */
-        var START = [
-            "Start med {ion}. Den kender du.",
-            "{ion} først. Den er til at finde.",
-            "Den kendte først: {ion}.",
-            "Begynd med {ion}. Den ved du noget om."
-        ];
-        var ROS = [
-            "Tre mere. Formlerne afslører sig selv nu.",
-            "Det gik op. Som en lynlås.",
-            "Ukendt ion. Kendt nu."
-        ];
+        /* "Start opgave": én replik i to saetninger. Den siger, hvorfor
+           ionen er ukendt (en sammensat ion, eleven ikke har moedt, eller
+           et metal med flere ladninger), og at ladningen kan regnes ud,
+           fordi eleven kender den anden ion. Brugeren 4. nov. 2026: sulfit
+           var forvirrende uden den forklaring, og Kemichael skal sige det. */
+        function startReplik(sim) {
+            var u = sim.ion, k = sim.kendt;
+            var navn = u.sammensat ? u.navn : u.grund;
+            return (u.sammensat ? "Du har ikke mødt " + navn + " endnu" : NK.stort(navn) + " kan have flere ladninger")
+                + ", men du kender ladningen på " + k.formel + ". Derfor kan du regne ladningen på " + navn + " ud.";
+        }
+        PU.laererStartReplik = function () { return startReplik(this); };
 
         /* "Start opgave": punkt() giver midten af den kendte ions kort i
            pixels (kortene glider paa plads, mens han gaar ind). Kortet faar
@@ -561,47 +447,26 @@
         PU.laererVisStart = function (punkt, ion) {
             var L = this.laerer;
             if (!L) return;
-            if (this.laererIIntro()) {
-                L.tale = "";
-                L.taleUr = 0;
-                L.taleAlfa = 0;
-                this.introTrin = 0;
-            }
+            if (this.laererIIntro()) this.laererIntroVaek(true);
             var mig = this;
             function kort() {
                 var g = mig.bord.g, c = punkt();
                 if (!g || !c) return [];
                 return [mig.laererSide({ x: c.x - g.U / 2 + 3, y: c.y - g.hc / 2, b: g.U - 6, h: g.hc })];
             }
-            var replik = K.replik("visStart", START).replace("{ion}", ion.formel);
+            var replik = startReplik(this);
             this.laererKoer("visStart", [
                 { udtryk: { vrede: 0, humoer: 0.3, roed: 0, skeptisk: 0.3, briller: 1 } },
                 { gaa: function () { return this.laererHjoerneX(); } },
                 { kald: function () { this.laererMaal = kort; } },
                 { arm: function () { return this.laererSeMod(kort); }, tid: 0.3 },
-                { sig: replik, vis: 2.8, tid: 2.8 },
+                { sig: replik, vis: replikTid(replik), tid: replikTid(replik) },
                 { taleFaerdig: true },
                 { kald: function () { this.laererMaal = null; this.laerer.hovedMaal = 0; } },
                 { arm: HAENGER, tid: 0.3 },
                 { udtryk: { skeptisk: 0, briller: 0 } },
                 { gaa: UDE }
             ], false);
-        };
-
-        /* Ros: kort og toer. */
-        PU.laererRos = function () {
-            var L = this.laerer;
-            if (!L || L.scene) return;
-            this.laererKoer("ros", [
-                { udtryk: { vrede: 0, humoer: 0.8, roed: 0 } },
-                { gaa: function () { return this.laererHjoerneX(); } },
-                { tid: 0.3 },
-                { sig: K.replik("rosUkendt", ROS), vis: 2.6, tid: 2.6,
-                  hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
-                { kald: function () { this.laerer.nik = 0; } }
-            ].concat(K.ros(), [
-                { gaa: UDE }
-            ]), false);
         };
     }
 }());

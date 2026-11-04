@@ -23,7 +23,7 @@
     NK.MolSim = function () {};
     var B = NK.MolSim.prototype;
 
-    B.init = function (prefix, opgaver, tjekIds) {
+    B.init = function (prefix, opgaver, tjekIds, opgValg) {
         var mig = this;
         this.p = prefix;
         this.laerred = new NK.Laerred(NK.el(prefix + "-laerred"));
@@ -42,7 +42,7 @@
         this.sidstDrejet = -10;
         this.sidsteId = null;
         this.prikNoegle = "";
-        this.opgaver = new NK.Opgaver(prefix, opgaver, this);
+        this.opgaver = new NK.Opgaver(prefix, opgaver, this, opgValg);
         this.OPGAVER = opgaver;
 
         NK.Valg.byg(NK.el(prefix + "-menu"), this);
@@ -53,7 +53,8 @@
 
     B.molId = function () { return this.opgaveMol || NK.Valg.molId; };
     B.mol = function () { return D.molekyle(this.molId()); };
-    B.menuLaast = function () { return this.opgaver.igang(); };
+    /* Menuen er laast under en opgave, og mens kortet venter paa Naeste */
+    B.menuLaast = function () { return this.opgaver.igang() || this.opgaver.venter(); };
 
     /* En visning, som en opgave kan have slaaet fra eller til. */
     B.flag = function (id) {
@@ -93,14 +94,9 @@
         return D.molekyle(NK.tilfaeldig(andre.length ? andre : pulje));
     };
 
+    /* Korte beskeder staar i kortets nederste raekke, ikke nederst i scenen */
     B.besked = function (tekst) {
-        var e = NK.el(this.p + "-besked");
-        e.textContent = tekst;
-        e.classList.remove("vis");
-        void e.offsetWidth;
-        e.classList.add("vis");
-        window.clearTimeout(this._beskedUr);
-        this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 2600);
+        this.opgaver.besked(tekst, 2.6);
     };
 
     /* ----- Vinkelmaaleren ---------------------------------------------------- */
@@ -201,6 +197,7 @@
 
     B.tilpas = function () {
         var nyt = this.laerred.tilpas();
+        this.vis.top = NK.saetKortZone(this.laerred.canvas);
         if (this.prik.tilpas()) this.prikNoegle = "";
         this.vis.tilpas(this.laerred.b, this.laerred.h, this.radius(), nyt && !this._tilpasset);
         if (this.laerred.b > 10) this._tilpasset = true;
@@ -284,6 +281,9 @@
                 tekst: "Hvilken form har " + mol.formel + "?",
                 valg: D.FORM_ORDEN.map(function (f) { return D.FORMER[f].knap; }),
                 rigtig: D.FORM_ORDEN.indexOf(mol.form),
+                fejlValg: function (i) {
+                    return D.FORMER[D.FORM_ORDEN[i]].knap + " passer ikke til " + mol.formel + ". Tæl bindinger og frie elektronpar omkring centralatomet.";
+                },
                 hint: mol.hintForm,
                 svar: mol.svarForm,
                 start: function (s) { s.startOpgaveMol(mol.id, { form: true, vinkel: true }); },
@@ -298,6 +298,9 @@
                 tekst: "Hvor stor er bindingsvinklen i " + mol.formel + "?",
                 valg: VINKLER,
                 rigtig: VINKLER.indexOf(vinkel),
+                fejlValg: function (i) {
+                    return VINKLER[i] + " passer ikke til " + mol.formel + ". Mål vinklen med vinkelmåleren.";
+                },
                 hint: "Slå vinkelmåleren til, og klik på to atomer, der sidder på samme atom.",
                 svar: "Vinklen er " + vinkel + ". " + GRUND[mol.form],
                 start: function (s) { s.startOpgaveMol(mol.id, { vinkel: true }); },
@@ -317,6 +320,9 @@
                 tekst: "Hvor mange frie elektronpar har centralatomet " + navn + " i " + mol.formel + "?",
                 valg: ["0", "1", "2", "3"],
                 rigtig: k,
+                fejlValg: function (i) {
+                    return i + " frie elektronpar passer ikke. Træk elektronerne i bindingerne fra de " + v + " valenselektroner.";
+                },
                 hint: navn + " har " + v + " valenselektroner. Hvor mange af dem bruges i bindingerne?",
                 svar: navn + " har " + v + " valenselektroner, og " + brugt + " bruges i bindingerne. " +
                     (k === 0 ? "Der er ingen tilbage, så der er ingen frie elektronpar."
@@ -331,7 +337,10 @@
     NK.SimMolekyler = function () {
         var mig = this;
         this.kalotte = false;
-        this.init("mol", OPGAVER, ["mol-frie", "mol-prikvis", "mol-drej"]);
+        this.init("mol", OPGAVER, ["mol-frie", "mol-prikvis", "mol-drej"], {
+            antal: 6,
+            intro: "Drej molekylerne, og sammenlign dem med prikformlen. Opgaverne spørger om form, bindingsvinkel og frie elektronpar."
+        });
         Array.prototype.forEach.call(document.querySelectorAll("#mol-model .tilstandsknap"), function (k) {
             k.addEventListener("click", function () { mig.saetModel(k.getAttribute("data-model")); });
         });

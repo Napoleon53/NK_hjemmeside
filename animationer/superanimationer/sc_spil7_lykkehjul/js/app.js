@@ -16,8 +16,9 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. Går spillet i gang (stopIntro), huskes det også. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc er
+       det samme som Nej tak. Går spillet i gang (stopIntro), huskes det
+       også. */
     if (NK.Laerer) {
         NK.Praesentation.pakInd(NK.Laerer.prototype, {
             tilbud: "tilbud",
@@ -1156,7 +1157,6 @@
         if (NK.Laerer) {
             laerer = new NK.Laerer(laerred);
             NK.laerer = laerer;
-            el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
         }
 
         /* Titelskaermen */

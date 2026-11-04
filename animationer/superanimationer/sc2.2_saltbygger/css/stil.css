@@ -324,6 +324,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .ukendt-formel .uf { font-size: 2.2rem; font-weight: 600; line-height: 1.1; }
 .ukendt-formel .uf .fk { color: #f7a79d; }
 .ukendt-formel .uf .fa { color: #97cff5; }
+.ukendt-formel .uf .uq { color: #f2c53d; }
 .ukendt-formel .un { font-size: 0.95rem; color: var(--tekst-svag); margin-top: 3px; }
 .ukendt-formel .un:empty { display: none; }
 
@@ -446,58 +447,6 @@ main { flex: 1; position: relative; min-height: 0; }
 
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
-
-/* Knappen, der sender Kemichael ud under praesentationen. Den staar i
-   hjoernet over hans taleboble; js/laerer.js saetter top og right. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    right: 10px;
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: scale(1); }
-    40%  { transform: scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Den gule ramme om det, Kemichael taler om (NK.Fremhaev i js/laerer.js).
-   Den ligger oven paa siden og fanger ingen klik. */
-.fremhaev-ramme {
-    position: fixed;
-    z-index: 7;
-    pointer-events: none;
-    border: 3px solid var(--gul);
-    border-radius: 12px;
-    animation: fremhaev 1.3s ease-out infinite;
-}
-
-@keyframes fremhaev {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.55); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -984,7 +933,7 @@ select:focus-visible {
 #vand-laerred { touch-action: manipulation; }
 
 /* Tilbuddet om Kemichaels praesentation: nederst i hoejre hjoerne af
-   scenen, hvor han selv kommer til at staa (js/praesentation.js). Paa
+   scenen, hvor han selv kommer til at staa (../kemichael/praesentation.js). Paa
    fane 1 flytter js/laerer.js det op over den nederste hylde. */
 .tilbud {
     position: absolute;

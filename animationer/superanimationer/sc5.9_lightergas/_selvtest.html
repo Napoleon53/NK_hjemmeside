@@ -351,7 +351,14 @@ function koerTest(W) {
     paastand("en almindelig lighter giver en lille flamme uden Kemichael", A.flamme && !A.flamme.stik && !A.laerer.optaget() && A.uheld === null);
     mus("pointerup", g2.hjul.x, g2.hjul.y);
     tik(A, 1);
-    paastand("replikkerne er højst 60 tegn", Object.keys(D.PAATALE).every(function (k) { return D.PAATALE[k].every(function (l) { return l.length <= 60; }); }));
+    /* Brugerens regel 4. nov. 2026: hele saetninger i formelt sprog, hoejst ca. 130 tegn */
+    var kemLinjer = [];
+    Object.keys(D.PAATALE).forEach(function (k) { kemLinjer = kemLinjer.concat(D.PAATALE[k]); });
+    var kemDaarlige = kemLinjer.filter(function (t) {
+        return t.length > 130 || !/^[A-ZÆØÅ].*[.?!]$/.test(t) || /^Her\b/.test(t) ||
+            t.split(/[.?!] /).some(function (st) { return st.split(" ").length < 3 || /^(Og|Men|Hvis|Ikke|Ligesom|Knap|Bare|Som)\b/.test(st); });
+    });
+    paastand("Kemichaels " + kemLinjer.length + " replikker er hele sætninger på højst 130 tegn", kemDaarlige.length === 0, kemDaarlige.join(" | "));
     void tre;
 
     overskrift("7. Fane 2");

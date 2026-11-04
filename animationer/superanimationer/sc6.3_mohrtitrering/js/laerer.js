@@ -12,16 +12,27 @@
    er 0,8 (lidt mindre end i sc7.2), saa han kan staa ved siden af
    opstillingen uden at daekke buretten og kolben.
 
+   Under praesentationen er taleboblen et HTML-element med Naeste og
+   Spring praesentationen over (../kemichael/praesentation.js).
+
    Hver fane kobles paa for sig og skal have:
      this.tid              et ur, der altid gaar (sekunder)
      this.L                laerredet
      this.lay.kop          hvor koppen staar (han stiller sig ved siden af)
+     introLinjer()         praesentationens trin: [{ tekst, sel, felt }]
+     introFelt(navn)       et felt paa laerredet, han peger paa (fane 3:
+                           kolbeA og kolbeB med skiltene)
 
    Scener:
-     intro   hver fane: praesentationen (D.INTRO_*), naar eleven vil
-     sig     en replik: ros (med ros-regnskabet) eller en toer bemaerkning
-     glimt   et glimt af hans baggrund (K.glimtTrin), fx den foerste
-             titrering, der gav 140 %
+     intro   hver fane: praesentationen (D.INTRO_*), naar eleven vil.
+             Ét trin ad gangen: han siger to til fire saetninger, peger
+             paa det, der blinker (sel: de usynlige .anker over laerredet
+             og kortene i panelet; felt: kolberne paa fane 3), og bliver
+             staaende, til eleven trykker Naeste. Han gaar aldrig videre
+             af sig selv. Koden er faelles: NK.Praesentation.trin.
+     sig     en replik: ros, naar en fane er klaret foerste gang (med
+             ros-regnskabet), eller en toer bemaerkning (paaskeaeggene:
+             den tomme burette og resultatet paa hundrededelen)
    Kaffen staar paa bordet i alle tre faner og er det faelles paaskeaeg.
    NB: fanernes egne metoder maa ikke hedde det samme som dem, K.paa
    laegger paa (laererSig, laererKoer, laererTaler ...), se sc7.2.
@@ -58,21 +69,13 @@
                 var lay = this.lay, s = this.laererLaerredSkala();
                 return lay ? this.pegVinkel(lay.kop.x / s, (lay.kop.y - 24) / s) : -0.5;
             },
-            fredet: ["sig", "glimt"]
+            fredet: ["sig"]
         };
     }
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* Peg paa et punkt i pixels */
-    function pegPaa(sim, punkt) {
-        return function () {
-            var s = sim.laererLaerredSkala(), p = punkt();
-            return p ? sim.pegVinkel(p.x / s, p.y / s) : 0.5;
-        };
-    }
-
-    function kobl(P, peg) {
+    function kobl(P) {
         K.paa(P, kaffeValg());
 
         P.aendret = function () {};
@@ -112,70 +115,17 @@
             return Math.max(150, this.laererPladsPx() / this.laererLaerredSkala());
         };
 
-        /* ----- Praesentationen ----------------------------------------------- */
-        P.laererIntro = function () {
-            if (!this.laerer) return;
-            var sim = this;
-            var trin = [
-                { kald: function () { sim.introKlikTal = 0; } },
-                { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-                { gaa: function () { return sim.laererPlads(); } },
-                { tid: 0.2 }
-            ];
-            this.introLinjer().forEach(function (l, i) {
-                var v = peg[i] ? pegPaa(sim, function () { return peg[i](sim); }) : null;
-                trin.push({ kald: function () { sim.introTrin = i + 1; } });
-                if (v) trin.push({ arm: v, tid: 0.45 });
-                trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-                if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-            });
-            this.laererKoer("intro", trin.concat([
-                { taleFaerdig: true },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { kald: function () { sim.introTrin = 0; } },
-                { gaa: UDE }
-            ]), false);
-        };
-
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(this.springId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
+        /* Praesentationen: ét trin ad gangen med Naeste og Spring
+           praesentationen over (faelles, ../kemichael/praesentation.js) */
+        NK.Praesentation.trin(P);
 
         /* ----- En replik: ros (loefter fingeren og nikker) eller en toer
                  bemaerkning over brillerne ------------------------------------ */
         P.laererReplik = function (tekst, ros) {
-            /* En replik afbryder aldrig praesentationen */
-            if (!this.laerer || this.laererIIntro()) return;
+            /* En replik afbryder aldrig praesentationen. Rosen venter, til
+               han er faerdig (fanens ventRos kalder igen). */
+            if (!this.laerer) return;
+            if (this.laererIIntro()) { if (ros) this.ventRos = 1.5; return; }
             var trin;
             if (ros) {
                 trin = [
@@ -201,65 +151,29 @@
             }
             this.laererKoer("sig", trin, false);
         };
-
-        /* Et glimt af hans baggrund, hvis det ikke er vist i denne browser */
-        P.laererGlimt = function (id) {
-            if (!this.laerer || this.laerer.scene) return;
-            var glimt = K.glimtTrin(id);
-            if (!glimt.length) return;
-            this.laererKoer("glimt", [
-                { udtryk: { vrede: 0, humoer: 0.1, roed: 0.2, skeptisk: 0.4, briller: 1 } },
-                { gaa: P.laererPlads },
-                { tid: 0.3 }
-            ].concat(glimt, [
-                { udtryk: { skeptisk: 0, briller: 0, roed: 0 } },
-                { taleFaerdig: true },
-                { gaa: UDE }
-            ]), false);
-        };
     }
 
     /* ----- Fane 1: titreringen ------------------------------------------------------ */
     var PT = NK.SimTitrering.prototype;
-    PT.springId = "tit-spring";
     PT.introLinjer = function () { return D.INTRO_TITRERING; };
-    kobl(PT, {
-        0: function (sim) {
-            var g = sim.lay && sim.lay.g;
-            return g ? { x: g.cx, y: g.buret.y + 180 * g.s } : null;
-        },
-        1: function (sim) {
-            var sk = sim.lay && sim.lay.skyder;
-            return sk ? { x: sk.x0 + 20, y: sk.y } : null;
-        }
-    });
+    kobl(PT);
 
     /* ----- Fane 2: beregningen -------------------------------------------------------- */
     var PB = NK.SimBeregning.prototype;
-    PB.springId = "ber-spring";
     PB.introLinjer = function () { return D.INTRO_BEREGNING; };
-    kobl(PB, {
-        0: function (sim) {
-            var tv = sim.lay && sim.lay.tavle;
-            return tv ? { x: tv.x + tv.b * 0.35, y: tv.y + tv.h * 0.55 } : null;
-        },
-        1: function (sim) {
-            return sim.lay ? { x: sim.lay.W - 4, y: sim.lay.H * 0.35 } : null;
-        }
-    });
+    kobl(PB);
 
     /* ----- Fane 3: fejlkilder ------------------------------------------------------------- */
     var PF = NK.SimForbrug.prototype;
-    PF.springId = "for-spring";
     PF.introLinjer = function () { return D.INTRO_FORBRUG; };
-    kobl(PF, {
-        0: function (sim) {
-            var g = sim.lay && sim.lay.gB;
-            return g ? { x: g.cx, y: g.kolbe.y + 100 * g.k } : null;
-        },
-        1: function (sim) {
-            return sim.lay ? { x: sim.lay.W - 4, y: sim.lay.H * 0.3 } : null;
-        }
-    });
+    /* Praesentationens felter: kolbe A og B med skiltet under dem (ikke
+       hele stativet, saa taleboblen kan staa foroven) */
+    PF.introFelt = function (navn) {
+        var lay = this.lay, g = lay && (navn === "kolbeA" ? lay.gA : navn === "kolbeB" ? lay.gB : null);
+        if (!g) return null;
+        var halv = Math.max(75 * g.k, 90), top = g.kolbe.y - 6, bund = lay.skiltY + lay.px / 2 + 12;
+        return { x: g.cx - halv, y: top, b: 2 * halv, h: bund - top };
+    };
+    kobl(PF);
 
 }());

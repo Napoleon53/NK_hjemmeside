@@ -19,7 +19,7 @@
     var NOEGLE_INTRO = "nk-organiske-intro";
 
     /* Kemichael kommer ikke af sig selv: foerste gang staar der Start
-       praesentation og Nej tak (js/praesentation.js). Esc er det samme
+       praesentation og Nej tak (../kemichael/praesentation.js). Esc er det samme
        som Nej tak. Starter eleven et spil, huskes det som Nej tak. */
     if (NK.Laerer) {
         NK.Praesentation.pakInd(NK.Laerer.prototype, {
@@ -510,7 +510,6 @@
         if (NK.Laerer) {
             laerer = new NK.Laerer(laerred);
             NK.laerer = laerer;
-            NK.el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
         }
 
         NK.el("spilknap").addEventListener("click", primaer);

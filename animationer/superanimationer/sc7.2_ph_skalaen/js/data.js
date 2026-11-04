@@ -133,33 +133,47 @@
     ];
 
     /* ----- Kemichael ----------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       sel: det, han peger paa, og som faar en gul ramme, der blinker
+       (CSS-selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). felt "skilt": skiltet paa fane 3 (introFelt i
+       js/laerer.js). Ingen vittigheder og ingen teori i praesentationen. */
     D.INTRO_SKALA = [
-        "pH-skalaen. Hvert stof på bordet skal have en plads.",
-        "Træk et stof op, hvor du tror, det hører til.",
-        "Ingen smager på noget. Heller ikke på colaen."
+        { tekst: "I denne fane placerer du tolv hverdagsstoffer på pH-skalaen. Skalaen går fra −1 til 15, og farverne er universalindikatorens farver ved hver pH.",
+          sel: "#skala-anker-skala" },
+        { tekst: "Du trækker et stof fra bordet op på skalaen, der hvor du tror, at stoffet hører til. pH-metret måler derefter stoffet, og stoffet flyver hen til sin rigtige plads over skalaen. En gul trekant under skalaen viser dit gæt.",
+          sel: ["#skala-anker-stoffer", "#skala-anker-meter"] },
+        { tekst: "Der er to hylder med seks stoffer på hver, og opgavekortet viser, hvilken hylde du er nået til. Knappen på kortet giver først et hint og derefter svaret. Tabellen Gæt og målt samler dine gæt og de målte værdier.",
+          sel: ["#skala-kort", "#skala-gaetkort"] }
     ];
     D.INTRO_LUP = [
-        "Luppen viser ionerne i et bitte lille rum.",
-        "Træk pH-mærket. Luppen zoomer selv.",
-        "Vandmolekylerne har jeg skjult. De fyldte alt."
+        { tekst: "I denne fane ser du, hvordan antallet af H₃O⁺ og OH⁻ ændrer sig, når pH ændrer sig. Du flytter pH ved at trække pH-mærket på skalaen eller klikke på skalaen. Piletasterne på tastaturet flytter også pH-mærket.",
+          sel: "#lup-anker-skala" },
+        { tekst: "Luppen viser et lille rum af væsken i glasset, og hver prik er én ion. De røde prikker er H₃O⁺, og de blå prikker er OH⁻. Bliver der mere end 100 af én slags, zoomer luppen selv ind på et rum, der er 10 gange mindre.",
+          sel: ["#lup-anker-lup", "#lup-anker-zoom"] },
+        { tekst: "Opgavekortet giver dig fem mål ét ad gangen, og knappen på kortet giver først et hint og derefter svaret. Kortet I luppen viser antallet af ioner og koncentrationerne ved den pH, du har valgt.",
+          sel: ["#lup-kort", "#lup-maaling"] }
     ];
     D.INTRO_FORTYND = [
-        "Fortyndingsbordet. Saltsyre, NaOH og masser af vand.",
-        "Tryk Fortynd under saltsyren eller natriumhydroxiden.",
-        "Pipetten er ny. Den gamle ligger i vasken."
+        { tekst: "I denne fane undersøger du, hvad der sker med pH, når saltsyre og natriumhydroxid bliver fortyndet med vand. Saltsyren har pH 1, og natriumhydroxiden har pH 13. Hvert nyt glas står under sin pH på skalaen.",
+          sel: ["#fortynd-anker-flasker", "#fortynd-anker-skala"] },
+        { tekst: "Knappen Fortynd 10 gange laver et nyt glas med 1\u00a0mL fra glasset før og 9\u00a0mL vand. Den venstre knap fortynder saltsyren, og den højre knap fortynder natriumhydroxiden. Knappen virker kun, når målet på opgavekortet skal bruge den.",
+          felt: "skilt", sel: "#fortynd-anker-knapper" },
+        { tekst: "Luppen viser ionerne i det nyeste glas, og et klik på et andet glas viser det glas i luppen. Opgavekortet giver dig fem mål ét ad gangen, og knappen på kortet giver først et hint og derefter svaret.",
+          sel: ["#fortynd-anker-lup", "#fortynd-kort"] }
     ];
 
-    D.HYLDE_ROS = [
-        "Køkkenet er målt. Også min kaffe. Det var ikke aftalt.",
-        "Klorin og syre må aldrig blandes. Det er ikke en quiz."
-    ];
-    D.LUP_FAERDIG = "Fem mål. Luppen zoomede selv. Jeg vil have sådan en.";
-    D.FORTYND_BASISK = "Det er vand nu. Meget dyrt vand.";
-    D.FORTYND_FAERDIG = "Fem mål, og pipetten er hel. Det skriver jeg ned.";
+    /* Ros, foerste gang en hel fane er klaret. Det er de eneste gange, han
+       kommer ind af sig selv, ud over paaskeaegget (brugerens regler
+       4. nov. 2026). */
+    D.ROS_SKALA = "Du har målt alle tolv stoffer. Klorin og syre må aldrig blandes, og det er ikke bare et quizspørgsmål.";
+    D.LUP_FAERDIG = "Du har nået alle fem mål i luppen. Jeg vil også gerne have en lup, der selv zoomer.";
+    D.FORTYND_FAERDIG = "Du har nået alle fem mål ved fortyndingsbordet. Pipetten er stadig hel, og det skriver jeg ned.";
 
-    /* Paaskeaeg */
-    D.AEG_PRAECIS = "Præcis. Du har vel ikke smagt på den?";
+    /* Paaskeaegget: et gaet paa fane 1, der rammer inden for 0,1 */
+    D.AEG_PRAECIS = "Dit gæt rammer pH præcist. Du har vel ikke smagt på stoffet?";
 
     NK.Data = D;
 }());

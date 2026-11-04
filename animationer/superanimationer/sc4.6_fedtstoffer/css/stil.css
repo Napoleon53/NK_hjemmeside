@@ -182,52 +182,8 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .scene-mrk b { color: #ffffff; }
 
-/* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
+/* Usynlige felter oven paa laerredet, som rundvisningen og Kemichael peger paa */
 .anker { position: absolute; pointer-events: none; }
-
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 11px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -605,7 +561,6 @@ select:focus-visible {
 }
 
 .valgliste:empty { display: none; }
-.valgliste.peg { animation: peg 1.2s ease-out infinite; }
 
 .valglinje {
     display: flex;
@@ -671,8 +626,9 @@ select:focus-visible {
 
 .scene > canvas { touch-action: none; }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen
+   (../kemichael/praesentation.js). Taleboblen med Naeste og Spring
+   praesentationen over staar i ../kemichael/praesentation.css. */
 .tilbud {
     position: absolute;
     top: 16px;

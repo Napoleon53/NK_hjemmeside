@@ -387,10 +387,35 @@ function koerTest(W) {
     S.knap(); S.knap(); tik(S, 16);
     paastand("Vis svaret giver ikke point", S.fase === "svar" && S.point === 0 && /Sådan/.test(S.el.besked.textContent));
 
+    overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    ["fane-varm", "fane-form", "fane-spil"].forEach(function (fane) {
+        klik('[data-fane="' + fane + '"]');
+        var sim = NK.sims[fane];
+        sim.tilpas();
+        tik(sim, 2.5);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(fane + ": " + r[0], r[1], r[2]);
+        });
+    });
+    /* Under praesentationen kommer ballonen uden ham, og rosen venter */
+    klik('[data-fane="fane-varm"]');
+    V.tilpas();
+    V.startIntro(true); tik(V, 2.5);
+    V.brand = { t: 0 }; V.ballonVaek = true;
+    tik(V, 4);
+    paastand("en brændt ballon under præsentationen bliver skiftet uden ham", !V.brand && !V.ballonVaek && V.laererIIntro() && !(V.laerer.scene && V.laerer.scene.navn === "brand"));
+    V.ventRos = 0.1; tik(V, 1);
+    paastand("rosen venter, til præsentationen er slut", V.ventRos > 0 && V.laererIIntro());
+    V.springIntro(); tik(V, 3);
+    paastand("efter præsentationen kommer rosen", !V.laererIIntro() && !!(V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    tik(V, 12);
+
     overskrift("9. Sproget");
     var krop = d.body.innerText;
-    var replikker = [].concat(D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL, [D.MAAL_FAERDIG, D.FORM_FAERDIG, D.REKORD_REPLIK, D.BRAND, D.NY_BALLON],
+    var intro = [].concat(D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL).map(function (l) { return l.tekst; });
+    var ros = [].concat([D.MAAL_FAERDIG, D.FORM_FAERDIG, D.REKORD_REPLIK, D.BRAND, D.NY_BALLON],
         D.BRAND_IGEN, D.RUNDE_REPLIK.map(function (r) { return r[1]; }));
+    var replikker = intro.concat(ros);
     var tekster = replikker.concat(
         D.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
         D.HVORFOR.valg.map(function (v) { return v.t + " " + v.svar; }), [D.HVORFOR.spm, D.HVORFOR.hint, D.FORM_HINT, D.FORM_VARM_HINT, D.TOM_BALLON],
@@ -398,9 +423,14 @@ function koerTest(W) {
     var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = intro.filter(function (t) { var n = t.split(/[.?] /).length; return t.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0]);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL].every(function (l) { return l.length >= 2 && l.length <= 4; }));
+    var halve = intro.filter(function (t) { return !/^[A-ZÆØÅ].*\.$/.test(t) || /^Her\b/.test(t); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
+    var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     var tur = ["#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-kort", "#varm-kort",
         "#form-anker-bad", "#form-anker-zoom", "#form-anker-termometer", "#form-kort", "#form-tabel-kort",
         "#spil-anker-zoom", "#spil-valg", "#spil-anker-kammer", "#spil-kort", "#spil-runde"];

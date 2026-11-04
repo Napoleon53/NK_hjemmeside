@@ -33,7 +33,7 @@
             var s = gemt[o.nr];
             return { loest: !!(s && s.l), stjerne: !!(s && s.s) };
         });
-        this.rost = {};
+        this.rost = false;
         this.lay = null;
         this.over = null;
         this.g = { kaffekop: { skjult: true, iHaand: false } };
@@ -163,7 +163,6 @@
             nulstil: NK.el("regn-nulstil")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("regn-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
 
         D.NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -434,10 +433,10 @@
         s.stjerne = s.stjerne || !og.brugtSvar;
         this.gem();
         this.besked(og.brugtSvar ? "Alle stofmængderne er fundet." : "Alle stofmængderne passer med forholdet " + D.forhold(og.o.r) + ".", "god");
-        var nv = D.OPGAVER[i].niveau;
-        if (!foer && this.antalLoest(nv) === this.iNiveau(nv) && !this.rost[nv]) {
-            this.rost[nv] = true;
-            this.ventRos = { t: 1.6, niveau: nv, alt: this.antalLoest() === D.OPGAVER.length };
+        /* Alle tolv opgaver er loest: Kemichael kommer én gang */
+        if (!foer && this.antalLoest() === D.OPGAVER.length && !this.rost) {
+            this.rost = true;
+            this.ventRos = 1.6;
         }
     };
 
@@ -560,7 +559,8 @@
 
     P.nulstilAlt = function () {
         this.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-        this.rost = {};
+        this.rost = false;
+        this.ventRos = 0;
         this.gem();
         this.valgt = -1;
         this.opg = null;
@@ -587,13 +587,9 @@
                 f.fyld = NK.mod(f.fyld, maal, 7, dt);
             });
         }
-        if (this.ventRos) {
-            this.ventRos.t -= dt;
-            if (this.ventRos.t <= 0 && this.laererNiveau) {
-                var v = this.ventRos;
-                this.ventRos = null;
-                this.laererNiveau(v.niveau, v.alt);
-            }
+        if (this.ventRos > 0) {
+            this.ventRos -= dt;
+            if (this.ventRos <= 0 && this.laererFaerdig) this.laererFaerdig();
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
@@ -742,12 +738,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-regn", tilbud: "regn-tilbud", spring: "regn-spring" });
-
-    /* Mens han siger, at man skriver under formlerne, blinker felterne */
-    P.pegPaaFelt = function (til) {
-        if (this.el && this.el.felter) this.el.felter.classList.toggle("peg", !!til);
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-regn", tilbud: "regn-tilbud" });
 
     NK.SimRegn = SimRegn;
 }());

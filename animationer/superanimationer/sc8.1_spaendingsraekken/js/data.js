@@ -216,42 +216,44 @@
     };
 
     /* ----- Kemichael ------------------------------------------------------------
-       Praesentationen: ét trin ad gangen, og eleven trykker Naeste.
-       Hvert trin siger, hvad fanen traener, eller hvordan en ting bruges.
-       Hele saetninger og ingen vittigheder. sel: det, han peger paa, og
-       som faar en gul ramme, der blinker (en CSS-selector; felterne paa
-       laerredet er de usynlige .anker fra rundvisningen). */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_FORSOEG = [
-        { tekst: "Her undersøger du, hvilke metaller der reagerer med hvilke metalioner." },
-        { tekst: "Her står fem metalstænger. Træk en stang ned i et glas.", sel: "#fs-anker-holder" },
-        { tekst: "Fem glas har metalioner, og ét har saltsyre. Ionen står på skiltet under glasset.", sel: "#fs-anker-glas" },
-        { tekst: "Luppen viser stangen og ionerne helt tæt på. Klik på et glas for at se det.", sel: "#fs-anker-lup" },
-        { tekst: "Her står, hvad du skal gøre nu. Knappen giver et hint.", sel: "#fs-kort" },
-        { tekst: "Hvert forsøg bliver skrevet ind i skemaet. Et flueben betyder en reaktion.", sel: "#fs-skemakort" }
+        { tekst: "I denne fane undersøger du, hvilke metaller der reagerer med hvilke metalioner. Du trækker en metalstang ned i et af glassene og ser, om der sker en reaktion. Fem glas indeholder metalioner, og det sjette indeholder saltsyre. Skiltet under hvert glas viser, hvad glasset indeholder.",
+          sel: ["#fs-anker-holder", "#fs-anker-glas"] },
+        { tekst: "Luppen viser metalstangen og ionerne i opløsningen helt tæt på. Du vælger, hvilket glas luppen viser, ved at klikke på glasset.",
+          sel: "#fs-anker-lup" },
+        { tekst: "Opgavekortet fortæller, hvad du skal undersøge, og knappen på kortet giver et hint. Hvert forsøg bliver skrevet ind i skemaet, hvor et flueben betyder, at der skete en reaktion.",
+          sel: ["#fs-kort", "#fs-skemakort"] }
     ];
     D.INTRO_RAEKKEN = [
-        { tekst: "Her stiller du metallerne og hydrogen i rækkefølge, fra uædel til ædel." },
-        { tekst: "Her ligger seks kort. Træk dem op på hylden.", sel: "#rk-anker-kort" },
-        { tekst: "Hylden har seks pladser. Det mest uædle skal stå længst til venstre.", sel: "#rk-anker-hylde" },
-        { tekst: "Skemaet viser dine forsøg fra fane 1. Brug det til at finde rækkefølgen.", sel: "#rk-skemakort" },
-        { tekst: "Rækkefølgen bliver tjekket, når alle seks står på hylden. Knappen giver et hint.", sel: "#rk-kort" }
+        { tekst: "I denne fane stiller du de fem metaller og hydrogen i rækkefølge, fra det mest uædle til det mest ædle. Rækkefølgen skal du finde ud fra dine egne forsøg i fane 1." },
+        { tekst: "Du trækker kortene med de seks stoffer op på hylden, som har én plads til hvert kort. Det mest uædle stof skal stå længst til venstre.",
+          sel: ["#rk-anker-kort", "#rk-anker-hylde"] },
+        { tekst: "Skemaet viser resultaterne af dine forsøg fra fane 1. Rækkefølgen bliver tjekket, når alle seks kort står på hylden, og knappen på opgavekortet giver et hint.",
+          sel: ["#rk-skemakort", "#rk-kort"] }
     ];
     D.INTRO_FORUDSIG = [
-        { tekst: "Her bruger du spændingsrækken til at forudsige, om der sker en reaktion." },
-        { tekst: "Her hænger spændingsrækken. De uædle metaller står til venstre.", sel: "#fu-anker-raekke" },
-        { tekst: "En metalstang hænger over et glas med en opløsning.", sel: "#fu-anker-glas" },
-        { tekst: "Svar ja eller nej her. Bagefter kommer stangen ned i glasset.", sel: "#fu-valg" },
-        { tekst: "Sker der en reaktion, vælger du her de stoffer, der dannes, og afstemmer.", sel: "#fu-kort" },
-        { tekst: "Luppen viser, hvad der sker med elektronerne.", sel: "#fu-anker-lup" }
+        { tekst: "I denne fane bruger du spændingsrækken til at forudsige, om der sker en reaktion, når en metalstang kommer ned i en opløsning. I spændingsrækken står de uædle metaller til venstre.",
+          sel: "#fu-anker-raekke" },
+        { tekst: "Du svarer ja eller nej på opgavekortet, før metalstangen kommer ned i glasset. Bagefter kan du selv se, om du havde ret.",
+          sel: ["#fu-valg", "#fu-anker-glas"] },
+        { tekst: "Sker der en reaktion, vælger du på opgavekortet de stoffer, der dannes, og afstemmer reaktionen. Luppen viser imens, hvad der sker med elektronerne.",
+          sel: ["#fu-kort", "#fu-anker-lup"] }
     ];
 
-    /* Ros, foerste gang en fane er klaret */
-    D.ROS_FORSOEG = "Du har prøvet alle 25 forsøg. Skemaet er klar til fane 2.";
-    D.ROS_RAEKKEN = "Rækkefølgen er rigtig. Du har selv fundet spændingsrækken.";
-    D.ROS_FORUDSIG = "Tolv opgaver er løst. Du kan bruge spændingsrækken.";
+    /* Ros, foerste gang en hel fane er klaret. Det er de eneste gange,
+       han kommer ind af sig selv (brugerens regel 4. nov. 2026). */
+    D.ROS_FORSOEG = "Du har udført alle 25 forsøg. Skemaet er nu klar til fane 2, hvor du stiller metallerne i rækkefølge.";
+    D.ROS_RAEKKEN = "Rækkefølgen er rigtig. Du har selv fundet spændingsrækken ud fra dine egne forsøg.";
+    D.ROS_FORUDSIG = "Du har løst alle tolv opgaver og kan nu bruge spændingsrækken til at forudsige reaktioner.";
 
     /* Paaskeaegget: en stang sluppet over hans kaffe */
-    D.AEG_KAFFE = "Ikke i kaffen. Den er sur nok i forvejen.";
+    D.AEG_KAFFE = "Metalstangen skal ikke ned i min kaffe. Kaffen er sur nok i forvejen.";
 
     NK.Data = D;
 }());

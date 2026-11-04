@@ -128,8 +128,8 @@ springer knappen til Ny opgave.
 En **runde** er hver opgave én gang i tilfældig rækkefølge; tælleren i kortet viser
 fx 2/4. Efter den sidste hedder knappen Se resultatet: kortet får en grøn ramme,
 viser hvor mange der blev løst uden at se svaret og henviser til den anden fane,
-hvis den har opgaver tilbage. Kemichael kommer med en kort, tør ros. Start forfra
-begynder en ny runde. Mekanikken ligger i `js/opgave.js`; opgaverne selv ligger
+hvis den har opgaver tilbage. Kemichael kommer med en tør ros, første gang fanen er
+gennemført i dette besøg. Start forfra begynder en ny runde. Mekanikken ligger i `js/opgave.js`; opgaverne selv ligger
 nederst i hver sim-fil.
 
 **Fane 1**
@@ -161,6 +161,18 @@ ikke. `js/laerer.js` laver derfor et `NK.Scene` med de mål, figuren bruger, kob
 ham på begge faner og tegner ham skaleret efter lærredets højde. Hver fane har et
 ur, der altid går (`tid`), og `laererPladsPx()`, der siger, hvor han stiller sig.
 Man kan klikke på ham. Scenerne er `kogerOver` (fane 1) og `ros` (begge faner).
+
+Brugerens regel 4. nov. 2026 (se `../kemichael/README.md`): han præsenterer ikke
+og kommer kun ind af sig selv i to tilfælde, og alt, hvad han siger, er hele
+sætninger i formelt sprog som i Kemibogen.
+
+* **Overkogningen** (påskeægget, fane 1): én af tre replikker om ungdommen og
+  varmepladen på max og derefter "Der findes også en knap, der hedder Ny krystal."
+* **Rosen**, når alle fire opgaver på en fane er gennemført: én replik pr. fane og
+  kun første gang i et besøg ("Selv jeg er rørt." på fane 1, fredagskagen på fane 2).
+
+Han roser ikke enkelte svar og kommenterer ikke forkerte svar; det står i
+opgavekortet.
 
 ### Teori og quiz
 

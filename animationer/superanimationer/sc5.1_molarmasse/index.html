@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Molarmasse</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚖</span> Molarmasse</h1>
@@ -25,10 +27,10 @@
 
 <!-- ================================================================= -->
 <!-- FANE 1: VAEGTEN                                                    -->
-<!-- Raekkerne i opgavekortet bygges af sim_vaegt.js                    -->
+<!-- Raekkerne i regnestykket bygges af sim_vaegt.js                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-vaegt" role="tabpanel" aria-label="Vægten">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="vaegt-laerred"></canvas>
         <div class="anker" id="vaegt-anker-plakat"></div>
         <div class="anker" id="vaegt-anker-felt"></div>
@@ -38,24 +40,30 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="vaegt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="vaegt-status"></div>
+        <!-- Papirkortet (4. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="vaegt-skort">
+            <div id="vaegt-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="vaegt-bund">
+                <p class="st-tekst" id="vaegt-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="vaegt-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="vaegt-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="vaegt-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste stof -->
-        <div class="kort opgavekort" id="vaegt-kort">
-            <h2><span id="vaegt-niveau"></span><span class="taeller">stof <b id="vaegt-nr">1</b>/<span id="vaegt-antal-i-niveau">4</span></span></h2>
-            <div class="opgave-prompt formel" id="vaegt-prompt"></div>
-            <p class="opgave-spm" id="vaegt-spm"></p>
+        <!-- Regnestykket: eleven skriver atommasserne og molarmassen her.
+             Opgaven, beskeden og knapperne staar paa kortet i scenen. -->
+        <div class="kort regnekort" id="vaegt-regn">
+            <h2>Regnestykket <span class="taeller" id="vaegt-formel"></span></h2>
             <div class="raekker" id="vaegt-raekker"></div>
-            <p class="besked" id="vaegt-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="vaegt-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="vaegt-fremskridt">
             <h2>Stofferne <span class="taeller">vejet <b id="vaegt-loest">0</b>/12</span></h2>
             <div class="hyldeliste" id="vaegt-niveauer"></div>
+            <button class="knap igen" id="vaegt-igen" type="button" hidden><span>Vej stoffet igen</span><span class="tegn">↺</span></button>
             <button class="knap nulstil" id="vaegt-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
@@ -65,7 +73,7 @@
 <!-- FANE 2: SKAALVAEGTEN                                               -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-skaal" role="tabpanel" aria-label="Skålvægten">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="skaal-laerred"></canvas>
         <div class="anker" id="skaal-anker-vaegt"></div>
         <div class="anker" id="skaal-anker-kort"></div>
@@ -74,27 +82,25 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="skaal-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="skaal-status"></div>
+        <!-- Papirkortet (4. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort spm" id="skaal-skort">
+            <div id="skaal-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="skaal-bund">
+                <p class="st-tekst" id="skaal-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="skaal-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="skaal-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="skaal-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="skaal-kort">
-            <h2>Hvilken skål synker? <span class="taeller">par <b id="skaal-nr">1</b>/<span id="skaal-antal">9</span></span></h2>
-            <p class="opgave-spm">I hver skål ligger 1 mol af et stof. Skiltet på bordet viser, hvilke stoffer det er. Vægten er låst. Gæt, hvilken skål der synker, når låsen slippes.</p>
-            <div class="valgrad" id="skaal-valg">
-                <button class="valgknap" type="button" data-svar="v"><span class="pil">←</span>Venstre</button>
-                <button class="valgknap" type="button" data-svar="l"><span class="pil">↓</span>Står lige</button>
-                <button class="valgknap" type="button" data-svar="h"><span class="pil">→</span>Højre</button>
-            </div>
-            <p class="besked" id="skaal-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="skaal-knap" type="button">Giv hint</button></div>
-        </div>
-
-        <div class="kort maaling">
+        <div class="kort maaling" id="skaal-runden">
             <h2>Runden <span class="taeller">rekord <b id="skaal-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Par</span><span class="tal" id="skaal-par">1/9</span></div>
             <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="skaal-point">0</span></div>
             <div class="talraekke"><span>I træk</span><span class="tal" id="skaal-stime">0</span></div>
+            <button class="knap nulstil" id="skaal-nulstil" type="button"><span>Ny runde</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -103,7 +109,7 @@
 <!-- FANE 3: UKENDT STOF                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-ukendt" role="tabpanel" aria-label="Ukendt stof">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="ukendt-laerred"></canvas>
         <div class="anker" id="ukendt-anker-flaske"></div>
         <div class="anker" id="ukendt-anker-maerke"></div>
@@ -113,22 +119,23 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="ukendt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="ukendt-status"></div>
+        <!-- Papirkortet (4. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="ukendt-skort">
+            <div id="ukendt-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="ukendt-bund">
+                <p class="st-tekst" id="ukendt-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="ukendt-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="ukendt-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="ukendt-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="ukendt-kort">
-            <h2><span id="ukendt-niveau"></span><span class="taeller">flaske <b id="ukendt-nr">1</b>/<span id="ukendt-antal-i-niveau">4</span></span></h2>
-            <div class="opgave-prompt" id="ukendt-prompt"></div>
-            <p class="opgave-spm" id="ukendt-spm"></p>
-            <p class="besked" id="ukendt-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="ukendt-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort" id="ukendt-fremskridt">
             <h2>Flaskerne <span class="taeller">med etiket <b id="ukendt-loest">0</b>/12</span></h2>
             <div class="hyldeliste" id="ukendt-niveauer"></div>
+            <button class="knap igen" id="ukendt-igen" type="button" hidden><span>Tag etiketten af igen</span><span class="tegn">↺</span></button>
             <button class="knap nulstil" id="ukendt-nulstil" type="button"><span>Tag etiketterne af igen</span><span class="tegn">↺</span></button>
         </div>
     </aside>
@@ -183,13 +190,15 @@
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/sim_vaegt.js"></script>
 <script src="js/sim_skaal.js"></script>
 <script src="js/sim_ukendt.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
-<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

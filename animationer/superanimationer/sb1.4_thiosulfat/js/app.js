@@ -3,8 +3,8 @@
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Hver fane har sin egen Kemichael og sit
-   eget tilbud om praesentationen (js/laerer.js, js/praesentation.js),
-   som i sc1.2.
+   eget tilbud om praesentationen (js/laerer.js og den faelles
+   ../kemichael/praesentation.js).
    ===================================================================== */
 (function () {
     "use strict";

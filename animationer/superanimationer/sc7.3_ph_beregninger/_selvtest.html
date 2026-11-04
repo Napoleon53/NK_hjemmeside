@@ -25,7 +25,9 @@
    rigtige forklaring, at tasterne i Vis tasterne og Maple-koden giver
    facit i hundredvis af opgaver, at alle tre faner kan gennemføres, at
    tastaturet går til lommeregneren, at sproget overholder reglerne, at
-   Kemichael kan vises og sendes ud, og at layoutet holder fra
+   Kemichaels præsentation viser trinnene ét ad gangen med Næste og
+   Spring præsentationen over (den fælles test i
+   ../kemichael/praesentation.js), og at layoutet holder fra
    520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
@@ -406,7 +408,8 @@ function koerTest(W) {
 
     overskrift("10. Sproget");
     var tekster = [];
-    Object.keys(D.INTRO).forEach(function (p) { tekster = tekster.concat(D.INTRO[p]); });
+    var INTRO = [].concat(D.INTRO.ph, D.INTRO.konc, D.INTRO.staerk);
+    tekster = tekster.concat(INTRO.map(function (l) { return l.tekst; }));
     Object.keys(D.ROS).forEach(function (p) { tekster.push(D.ROS[p]); });
     Object.keys(D.FANER).forEach(function (p) { Object.keys(D.FANER[p].status).forEach(function (k) { tekster.push(D.FANER[p].status[k]); }); });
     Object.keys(D.STATION).forEach(function (k) { tekster.push(D.STATION[k]); });
@@ -423,8 +426,14 @@ function koerTest(W) {
     paastand("ingen tankestreger (– eller —)", streg.length === 0, streg.slice(0, 2).join(" | "));
     var ladning = tekster.filter(function (t) { return /¹[⁺⁻]|[A-Za-z)]1[+−-](?!\d)/.test(t); });
     paastand("ingen ladning skrevet som 1+ eller 1−", ladning.length === 0, ladning.slice(0, 2).join(" | "));
-    var lange = [].concat(D.INTRO.ph, D.INTRO.konc, D.INTRO.staerk).filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med Her", halve.length === 0, halve[0] && halve[0].tekst);
+    paastand("hver præsentation har to til fire trin", ["ph", "konc", "staerk"].every(function (p) { return D.INTRO[p].length >= 2 && D.INTRO[p].length <= 4; }));
+    var korte = Object.keys(D.ROS).map(function (p) { return D.ROS[p]; }).concat([D.AEG_42]).filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte.join(" | "));
     paastand("ingen natronlud (natriumhydroxid)", tekster.join(" ").indexOf("atronlud") < 0);
     var smaa = [];
     Array.prototype.forEach.call(d.querySelectorAll(".kort, .regner, .scene-mrk"), function (el) {
@@ -433,23 +442,39 @@ function koerTest(W) {
     });
     paastand("ingen tekst under 12 px i kortene og lommeregneren", smaa.length === 0, smaa.slice(0, 3).join(" | "));
 
-    overskrift("11. Kemichael");
+    overskrift("11. Kemichaels præsentation: ét trin ad gangen (fælles test)");
     [S1, S2, S3].forEach(function (sim, i) {
         NK.visFane(["fane-ph", "fane-konc", "fane-staerk"][i]);
+        function koerTid(sek) { for (var k = 0; k < Math.round(sek * 30); k++) { sim.tilpas(); sim.opdater(1 / 30); } }
+        koerTid(2.5);
+        NK.Praesentation.selvtest(sim, koerTid).forEach(function (r) {
+            paastand("fane " + (i + 1) + ": " + r[0], r[1], r[2]);
+        });
         sim.startIntro(true);
-        for (var k = 0; k < 90; k++) { sim.tilpas(); sim.opdater(1 / 30); }
+        koerTid(3);
         var inde = sim.laererIIntro();
         sim.springIntro();
-        for (k = 0; k < 90; k++) { sim.opdater(1 / 30); }
+        koerTid(3);
         paastand("fane " + (i + 1) + ": præsentationen starter med K og går ved Esc", inde && !sim.laererIIntro());
     });
     NK.visFane("fane-ph");
     S1.startIntro(true);
-    for (var k2 = 0; k2 < 400 && S1.introTrin !== 2; k2++) S1.opdater(1 / 30);
-    paastand("under replik 2 lyser lommeregneren", d.getElementById("regner").classList.contains("peg"));
+    for (var k2 = 0; k2 < 90; k2++) { S1.tilpas(); S1.opdater(1 / 30); }
+    S1.introNaeste();
+    for (k2 = 0; k2 < 30; k2++) S1.opdater(1 / 30);
+    var lr = d.getElementById("regner").getBoundingClientRect();
+    paastand("fane 1, trin 2: den gule ramme står om lommeregneren", NK.Fremhaev.synlige().some(function (r) {
+        return Math.abs(r.left - (lr.left - 5)) < 3 && Math.abs(r.top - (lr.top - 5)) < 3;
+    }));
     S1.springIntro();
-    for (k2 = 0; k2 < 60; k2++) S1.opdater(1 / 30);
-    paastand("… og holder op bagefter", !d.getElementById("regner").classList.contains("peg"));
+    for (k2 = 0; k2 < 90; k2++) S1.opdater(1 / 30);
+    var foerAeg = NK.aeg42Vist;
+    S1.startIntro(true);
+    for (k2 = 0; k2 < 90; k2++) { S1.tilpas(); S1.opdater(1 / 30); }
+    S1.laererAeg(D.AEG_42);
+    paastand("påskeægget med 42 venter under præsentationen og er ikke brugt bagefter", NK.aeg42Vist === foerAeg && S1.laererIIntro());
+    S1.springIntro();
+    for (k2 = 0; k2 < 90; k2++) S1.opdater(1 / 30);
 
     overskrift("12. Layoutet");
     var ramme = document.getElementById("ramme");

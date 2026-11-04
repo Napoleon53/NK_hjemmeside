@@ -395,7 +395,6 @@
             raekker: NK.el(p + "-raekker")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el(p + "-spring").addEventListener("click", function () { mig.springIntro(); });
         this.el.raekker.addEventListener("keydown", function (e) {
             if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); mig.tjek(); }
         });
@@ -989,20 +988,15 @@
     P.nulstil = function () { this.nyOpgave(); };
 
     /* ----- Kemichaels praesentation ---------------------------------------------------
-       Tilbuddet (js/praesentation.js) er bundet til én fane pr. prototype,
-       saa hver fane faar sin egen lille underklasse af SimRegn. Mens han
-       siger, at man bruger lommeregneren, lyser den. */
-    P.pegPaaFelt = function (til) {
-        var r = NK.el("regner");
-        til = !!til && this.p !== "staerk";
-        if (r && this.pegRegner !== til) { this.pegRegner = til; r.classList.toggle("peg", til); }
-    };
+       Tilbuddet (../kemichael/praesentation.js) er bundet til én fane pr.
+       prototype, saa hver fane faar sin egen lille underklasse af SimRegn.
+       Trinnene og den gule ramme laegges paa i js/laerer.js. */
 
     function fane(p) {
         function Fane() { SimRegn.call(this, p); }
         Fane.prototype = Object.create(SimRegn.prototype);
         Fane.prototype.constructor = Fane;
-        NK.Praesentation.kobl(Fane.prototype, { noegle: "nk-sc7.3-intro-" + p, tilbud: p + "-tilbud", spring: p + "-spring" });
+        NK.Praesentation.kobl(Fane.prototype, { noegle: "nk-sc7.3-intro-" + p, tilbud: p + "-tilbud" });
         return Fane;
     }
 

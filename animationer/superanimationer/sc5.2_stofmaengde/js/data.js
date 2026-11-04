@@ -118,13 +118,6 @@
         return (p.givet === "mol" ? D.nTekst(p.tal) + " mol " : NK.komma(p.m) + " g ") + p.st.navn;
     };
 
-    D.RUNDE_REPLIK = [
-        [0, "Tungt er ikke det samme som mange. Prøv igen."],
-        [3, "Det er stofmængden, der tæller. Bogstaveligt."],
-        [6, "Flertallet rigtigt. Vægtene er enige med dig."],
-        [9, "Ni rigtige. Du tæller bedre end vægtene."]
-    ];
-    D.REKORD_REPLIK = "Ny rekord. Jeg noterer det. Et sted.";
 
     /* ----- Fane 3: afvejning -------------------------------------------------
        En ordre er [niveau, symbol, stofmaengden, som den staar i ordren].
@@ -153,30 +146,47 @@
     });
 
     /* ----- Kemichael ------------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; tingene paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_VAEGT = [
-        "Vægten. Hver klump fra en krukke er 1 mol.",
-        "Træk dem op på vægten. Stofferne må gerne blandes.",
-        "Tæl gerne atomerne selv. Jeg venter ikke."
+        { tekst: "I denne fane lægger du klumper af seks grundstoffer på en vægt og ser, hvad de vejer. Hver klump i en krukke på hylden er 1 mol, og etiketten på krukken viser grundstoffets molarmasse.",
+          sel: "#vaegt-anker-hylde" },
+        { tekst: "Du trækker en klump op på vægten eller klikker på krukken, og klumper af forskellige grundstoffer må gerne ligge sammen. Panelet til højre viser stofmængden, massen og antallet af atomer for klumperne på vægten. Plakaten viser, at 1 mol altid er 6,02 · 10²³ atomer.",
+          sel: ["#vaegt-anker-vaegt", "#vaegt-maaling", "#vaegt-anker-plakat"] },
+        { tekst: "Opgavekortet giver først tre opgaver som opvarmning og derefter sværere opgaver med nye tal hver gang. Knappen på kortet giver et hint og derefter svaret.",
+          sel: "#vaegt-kort" }
     ];
     D.INTRO_ATOMER = [
-        "To vægte. De tæller atomer, men først når du har gættet.",
-        "Hvor er der flest atomer? Svar til højre."
+        { tekst: "I denne fane gætter du, hvor der er flest atomer, når to prøver står på hver sin vægt. Skiltet på bordet viser prøverne i mol eller i gram, og vægtene viser massen af prøverne.",
+          sel: ["#atomer-anker-vaegte", "#atomer-anker-skilt"] },
+        { tekst: "Du svarer venstre, lige mange eller højre med knapperne på opgavekortet eller med piletasterne. Bagefter tæller vægtene atomerne, og skiltet viser beregningen.",
+          sel: "#atomer-valg" },
+        { tekst: "En runde består af ni par fra tre niveauer, og panelet viser dine rigtige svar og din rekord. Knappen på opgavekortet giver et hint og derefter svaret.",
+          sel: ["#atomer-knap", "#fane-atomer .maaling"] }
     ];
     D.INTRO_AFVEJ = [
-        "Afvejning. Ordren står til højre.",
-        "Molarmassen står på krukken. Resten er et gangestykke.",
-        "Vægten afvejer, når tallet er rigtigt. Ikke før."
+        { tekst: "I denne fane regner du massen ud for en ordre og skriver massen på opgavekortet. Ordren viser stofmængden af et grundstof, og vægten skal vise massen af netop den stofmængde.",
+          sel: "#afvej-kort" },
+        { tekst: "Etiketten på krukken viser grundstoffets molarmasse, og plakaten viser formlen m = n · M med enhederne. Når massen er rigtig, bliver stoffet fra krukken hældt i vejebåden, og vægten viser massen.",
+          sel: ["#afvej-anker-plakat", "#afvej-anker-krukke", "#afvej-anker-vaegt"] },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Du får en stjerne for hver ordre, som du løser uden at se svaret, og listen under opgavekortet viser ordrerne i de tre niveauer.",
+          sel: ["#afvej-knap", "#afvej-fremskridt"] }
     ];
 
-    D.MAAL_FAERDIG = "Opvarmningen er slut. Guldet bliver på hylden, tak.";
-
-    D.ORDRE_ROS = [
-        "Fire ordrer afvejet. Hele mol er de nemme.",
-        "Under 1 mol, og intet gik tabt.",
-        "Skæve tal og små mængder. Godt regnet."
-    ];
-    D.ORDRER_FAERDIG = "Tolv ordrer afvejet. Jeg skriver det i regnskabet.";
+    /* Han kommer kun ind af sig selv, naar en hel fane er klaret (brugerens
+       regel 4. nov. 2026). Fane 2: én gang pr. besoeg, naar en runde er
+       slut med mindst RUNDE_GOD rigtige. Fane 3: naar alle tolv ordrer er
+       afvejet. Fane 1 har ingen ende og ingen ros. */
+    D.RUNDE_GOD = 6;
+    D.RUNDE_ALLE = 9;
+    D.RUNDE_REPLIK = "Du har svaret rigtigt på de fleste par, og vægtene er enige med dig.";
+    D.RUNDE_ALLE_REPLIK = "Du har ni rigtige ud af ni. Du tæller atomer bedre end vægtene.";
+    D.REKORD_REPLIK = "Det er en ny rekord. Jeg skriver den ned et sted.";
+    D.ORDRER_FAERDIG = "Du har afvejet alle tolv ordrer. Jeg skriver det ind i regnskabet.";
 
     NK.Data = D;
 }());

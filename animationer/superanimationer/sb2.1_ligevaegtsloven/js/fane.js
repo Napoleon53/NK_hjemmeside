@@ -1,24 +1,37 @@
 /* =====================================================================
-   fane.js - det, de to faner har til faelles (som sc1.4)
+   fane.js - det, de to faner har til faelles
 
-   Der er ingen laerer i denne animation. Al hjaelp staar i statuslinjen
-   nederst i scenen, lige under tavlen, og hjaelpeknappen sidder i samme
-   linje (moenstret fra sc1.4_afstemning).
+   Al tekst staar paa ét lyst papirkort oeverst midt i scenen, over
+   tavlen (Niels' beslutning 4. nov. 2026: alle aktive animationer har
+   papirkortet). Der er ingen statuslinje nederst og intet opgavekort i
+   panelet. Moenstret er sb4.4_intermolekylaere_bindinger og
+   faelles/papirkort.css og papirkort.js.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
      * listen i panelet: opgaverne i grupper, med loest og stjerne
-       (huskes i browseren)
-     * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
-       hvad der skete, og et ryst ved en fejl
-     * den ene knap: Giv et hint > Naeste hint > Vis svaret > Naeste opgave.
-       Den lyser stille op, naar eleven lige har svaret forkert.
+       (huskes i browseren). Start forfra ligger i panelet.
+     * scenekortet (visKort): etiketten (Reaktion 2 af 12), opgaven og
+       evt. svarknapper (kortData). Indsend svar er hovedknappen: det,
+       eleven bygger eller klikker paa tavlen, bedoemmes foerst, naar
+       eleven trykker Indsend svar. Knappen er graa, til der er noget at
+       sende ind.
+     * kortets nederste raekke: naeste skridt, fejl, hint og svaret paa
+       et klik i skemaet, hjaelpeknappen (Giv et hint > Naeste hint >
+       Vis svaret) og Indsend svar.
+     * loest: kortet bliver paa opgaven (papirkortet). Forklaringen staar
+       under opgaven, og knappen, der foerer videre, staar, hvor Indsend
+       svar stod. Kortets knap gaar altid fremad; efter den sidste opgave
+       paa den sidste fane er der ingen knap paa kortet.
+     * laasen: naar opgaven er loest, sker der intet ved et klik paa
+       brikkerne eller broeken; kortets groenne knap blinker i stedet.
 
    NK.Tavle.skema tegner reaktionsskemaet paa tavlen. Hvert stof kan
    klikkes, og et klik paa ligevaegtspilen er et paaskeaeg.
 
-   Fanen selv har: lavOpgave(nr), promptHTML(), hintTrin(), visSvar(),
-   trinLinje(), slutLinje(), enter() og fokusFelt().
+   Fanen selv har: lavOpgave(nr), kortData(), hintTrin(), visSvar(),
+   trinLinje(), indsend(), kanIndsende(), indsendTekst(), enter(),
+   nulstil() og fokusFelt(). Fanen kan have valgKlik(j) (svarknapper).
    ===================================================================== */
 (function () {
     "use strict";
@@ -48,12 +61,20 @@
             this.hjaelp = 0;          /* hvor mange hint eleven har bedt om */
             this.hintS = null;        /* det stof, hintet handler om */
             this.pegKnap = false;     /* knappen lyser stille efter en fejl */
-            this.el = { knap: el("knap"), liste: el("liste"), kort: el("kort"),
-                besked: el("besked"), status: el("status"), forfra: el("forfra") };
+            this.el = { knap: el("knap"), indsend: el("indsend"), liste: el("liste"), skort: el("skort"),
+                ind: el("ind"), besked: el("besked"), status: el("status"), forfra: el("forfra") };
             this.fast = { html: "", klasse: "" };
+            this.nuB = null;
             this.kortT = 0;
             this.el.knap.addEventListener("click", function () { mig.knap(); });
+            this.el.indsend.addEventListener("click", function () { mig.indsendKlik(); });
             if (this.el.forfra) this.el.forfra.addEventListener("click", function () { mig.nulstil(); mig.fokus(); });
+            this.el.skort.addEventListener("click", function (e) {
+                if (e.target.closest && e.target.closest("[data-videre]")) { mig.knap(); return; }
+                var k = e.target.closest ? e.target.closest("[data-valg]") : null;
+                if (!k || k.disabled || !mig.valgKlik) return;
+                mig.valgKlik(parseInt(k.getAttribute("data-valg"), 10));
+            });
             this.bygListe();
         };
 
@@ -134,23 +155,91 @@
             this.pegKnap = false;
             this.brugtSvar = false;
             this.faerdig = false;
+            this.slut = null;
             this.lavOpgave(i);
             this.tilpas();
             this.visKort();
             this.visListe();
-            if (this.faerdig && this.slut) this.besked(this.slut.html, this.slut.klasse);
-            else this.naesteLinje("", "");
+            this.naesteLinje("", "");
             this.fokus();
         };
 
+        /* Den hoejde, kortet har faaet sat af oeverst i scenen (CSS: --kz).
+           Tavlen begynder under den, saa kortet aldrig daekker den.
+           Selvtesten maaler kortet med det laengste hint og den laengste
+           forklaring. */
+        P.kortZone = function () {
+            var sc = this.el.skort.parentNode;
+            var v = parseFloat(window.getComputedStyle(sc).getPropertyValue("--kz"));
+            return isFinite(v) ? v : 190;
+        };
+
+        /* ----- Scenekortet ------------------------------------------------------------ */
         P.visKort = function () {
-            var o = this.opgaver[this.nr];
-            NK.saetTekst(navn + "-titel", o.navn);
-            NK.saetTekst(navn + "-nr", String(this.nr + 1));
-            NK.saetTekst(navn + "-antal", String(this.opgaver.length));
-            NK.saetHTML(navn + "-prompt", this.promptHTML());
-            this.el.kort.classList.toggle("sejr", this.faerdig);
+            var e = this.el.skort;
+            var kl = "scenekort " + (this.faerdig ? "loest bliv" + (this.slut && this.slut.maade === "svar" ? " svar" : "") : "opgave");
+            if (e.className.replace(" blink", "") !== kl) e.className = kl;
+            NK.saetHTML(navn + "-ind", this.kortHTML());
             this.visKnap();
+        };
+
+        P.chipTekst = function () {
+            return valg.chip + " " + (this.nr + 1) + " af " + this.opgaver.length;
+        };
+
+        P.kortHTML = function () {
+            var d = this.kortData();
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(this.chipTekst()) + "</span>" +
+                NK.Papir.tekst(NK.html(d.tekst)) + "</p>";
+            if (d.svar && d.svar.length) {
+                html += '<div class="sk-svar n' + d.svar.length + '">';
+                d.svar.forEach(function (sv, j) {
+                    html += '<button type="button" class="sk-knap' + (sv.klasse ? " " + sv.klasse : "") + '" data-valg="' + j + '"' +
+                        (sv.laast ? " disabled" : "") + ">" + NK.html(sv.t) + "</button>";
+                });
+                html += "</div>";
+            }
+            if (this.faerdig) html += this.blivHTML();
+            return html;
+        };
+
+        /* Papirkortet: kortet bliver paa opgaven efter et rigtigt svar.
+           Forklaringen staar under opgaven, og knappen, der foerer videre,
+           staar, hvor Indsend svar stod. */
+        P.blivHTML = function () {
+            var slut = this.slut || { maade: "selv", tekst: "" }, vist = slut.maade === "svar";
+            var knap = this.videreTekst();
+            var maerke = vist ? "Svaret" : (slut.maerke || "Rigtigt");
+            if (knap) return NK.Papir.bliv(slut.tekst || "", maerke, NK.html(knap), vist);
+            /* Ingen knap: den sidste opgave paa den sidste fane (forfra ligger i panelet) */
+            return NK.Papir.bliv(slut.tekst || "", maerke, "", vist).replace(/<button[^>]*data-videre[^>]*><\/button>/, "");
+        };
+
+        /* Kortets knap gaar altid fremad (brugeren 3. nov. 2026): naeste
+           uloeste opgave, naeste fane eller naeste opgave i listen. Efter den
+           sidste opgave paa den sidste fane er der ingen knap. */
+        P.videreTekst = function () {
+            if (this.naesteUloeste() >= 0) return "Næste opgave →";
+            if (valg.naesteFane) return "Videre til " + valg.naesteNavn + " →";
+            if (this.nr < this.opgaver.length - 1) return "Næste opgave →";
+            return "";
+        };
+
+        /* Kortet blinker: eleven greb ud efter tavlen, men skal foerst goere
+           det, kortet siger (her: trykke Naeste) */
+        P.kortBlink = function () {
+            var e = this.el.skort;
+            e.classList.remove("blink");
+            void e.offsetWidth;
+            e.classList.add("blink");
+        };
+
+        /* Laasen: naar opgaven er loest, saetter et klik paa tavlen intet i
+           gang. Fanen begynder alt, der aendrer noget, med  if (this.spaer()) return; */
+        P.spaer = function () {
+            if (!this.faerdig) return false;
+            this.kortBlink();
+            return true;
         };
 
         /* Hinttrappen for den tilstand, eleven staar i lige nu */
@@ -159,24 +248,57 @@
             return h && h.trin && h.trin.length ? h : { s: null, trin: ["Sammenlign brøken med skemaet."] };
         };
 
+        /* ----- Knapperne i kortets nederste raekke ------------------------------------ */
         P.visKnap = function () {
-            var tekst, klasse;
-            if (this.faerdig) {
-                klasse = "knap videre banker";
-                var naeste = this.naesteUloeste();
-                if (naeste >= 0) tekst = "Næste opgave →";
-                else if (valg.naesteFane) tekst = "Videre til " + valg.naesteNavn + " →";
-                else tekst = "Næste opgave →";
-            } else {
+            var tekst = "Giv et hint", klasse = "knap hjaelp";
+            if (!this.faerdig) {
                 var h = this.hintNu();
-                klasse = "knap hjaelp";
                 if (this.hjaelp === 0) tekst = "Giv et hint";
                 else if (this.hjaelp < h.trin.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.trin.length + ")";
-                else tekst = "Vis svaret";
+                else { tekst = "Vis svaret"; klasse += " svar"; }
                 if (this.pegKnap) klasse += " peg";
             }
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
+            this.visIndsend();
+            this.visBund();
+        };
+
+        P.kanSendes = function () {
+            return !this.faerdig && !!(this.kanIndsende && this.kanIndsende());
+        };
+
+        /* Indsend svar: graa, til der er noget at sende ind */
+        P.visIndsend = function () {
+            var e = this.el.indsend;
+            e.hidden = !!this.faerdig;
+            if (this.faerdig) return;
+            var kan = this.kanSendes();
+            var t = (kan && this.indsendTekst && this.indsendTekst()) || "Indsend svar";
+            if (e.textContent !== t) e.textContent = t;
+            e.classList.toggle("klar", kan);
+            e.classList.toggle("ikke-klar", !kan);
+            e.setAttribute("aria-disabled", kan ? "false" : "true");
+        };
+
+        P.indsendKlik = function () {
+            if (this.faerdig) return;
+            if (!this.kanSendes()) { this.kortBlink(); return; }
+            this.indsend();
+            this.fokus();
+        };
+
+        /* Kortets nederste raekke: beskeden og knapperne. Naar opgaven er
+           loest, er raekken vaek, medmindre et klik i skemaet lige har
+           faaet et svar. */
+        P.visBund = function () {
+            var b = this.nuB || this.fast || { html: "", klasse: "" };
+            var harTekst = !!b.html;
+            this.el.besked.hidden = !harTekst;
+            this.el.knap.hidden = !!this.faerdig;
+            var ryster = this.el.status.classList.contains("ryster");
+            this.el.status.hidden = !!this.faerdig && !harTekst;
+            this.el.status.className = "sk-bund" + (b.klasse ? " " + b.klasse : "") + (harTekst ? "" : " tom") + (ryster ? " ryster" : "");
         };
 
         P.naesteUloeste = function () {
@@ -188,13 +310,13 @@
             return -1;
         };
 
-        /* ----- Knappen: ét skridt hjaelp ad gangen ------------------------------- */
+        /* ----- Hjaelpeknappen (og den groenne knap paa kortet) ----------------------- */
         P.knap = function () {
             if (this.faerdig) {
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
                 else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
-                else this.vaelg((this.nr + 1) % this.opgaver.length);
+                else if (this.nr < this.opgaver.length - 1) this.vaelg(this.nr + 1);
                 return;
             }
             var h = this.hintNu();
@@ -233,7 +355,9 @@
             for (var i = 0; i < arter.length; i++) arter[i].classList.toggle("lys", liste.indexOf(arter[i].getAttribute("data-s")) >= 0);
         };
 
-        /* ----- Opgaven er loest --------------------------------------------------- */
+        /* ----- Opgaven er loest ------------------------------------------------------
+           maade: "selv" eller "svar" (Vis svaret). tekst er HTML. Kortet
+           bliver paa opgaven med forklaringen og knappen, der foerer videre. */
         P.loest = function (maade, tekst, maerke) {
             var s = this.status[this.nr];
             var foerste = !s.loest;
@@ -245,23 +369,15 @@
             s.stjerne = s.stjerne || !this.brugtSvar;
             this.gem();
             var alle = this.antalLoest() === this.opgaver.length;
-            var html;
-            if (maade === "svar") {
-                html = '<span class="b-maerke">Svaret</span> ' + (tekst || "");
-            } else {
-                html = '<span class="b-maerke stor">' + NK.html(maerke || "Rigtigt ✓") + "</span> " + (tekst || "") +
-                    (foerste ? " " + NK.html(NK.tilfaeldig(D.ROS_OPGAVE)) : "");
-            }
-            if (alle && foerste) html += " " + NK.html(D.FAERDIG[navn]);
-            this.slut = { html: html, klasse: maade === "svar" ? "gul" : "god" };
-            this.besked(html, this.slut.klasse);
+            this.slut = { maade: maade, maerke: maerke || "", tekst: (tekst || "") + (alle && foerste ? " " + NK.html(D.FAERDIG[navn]) : "") };
+            this.besked("", "");
             this.visLys();
             this.visKort();
             this.visListe();
             if (this.efterOpgave) this.efterOpgave();
         };
 
-        /* ----- Statuslinjen nederst i scenen ---------------------------------------
+        /* ----- Beskeden i kortets nederste raekke ------------------------------------
            besked: den faste linje. kortBesked: et svar paa et klik i scenen,
            der forsvinder igen efter sek sekunder. */
         P.besked = function (html, klasse) {
@@ -276,20 +392,20 @@
         };
 
         P.visBesked = function (b) {
-            var e = this.el.besked;
-            if (!e) return;
-            e.innerHTML = b.html;
-            if (this.el.status) this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "");
+            this.el.besked.innerHTML = b.html;
+            this.nuB = b;
+            this.visBund();
         };
 
         P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
+        P.kortTekst = function () { return this.el.skort.textContent; };
 
         P.naesteLinje = function (foer, slags) {
             var t = this.faerdig ? "" : this.trinLinje();
             this.besked((foer ? foer + " " : "") + NK.html(t), slags || "");
         };
 
-        /* Et forkert svar: beskeden, et ryst og en knap, der lyser stille */
+        /* Et forkert svar: beskeden, et ryst og en hintknap, der lyser stille */
         P.fejlLinje = function (tekst, maerke) {
             this.besked('<span class="b-maerke">' + NK.html(maerke || "Ikke endnu") + "</span> " + NK.html(tekst), "skidt");
             this.pegKnap = true;
@@ -299,7 +415,6 @@
 
         P.ryst = function () {
             var e = this.el.status;
-            if (!e) return;
             e.classList.remove("ryster");
             void e.offsetWidth;
             e.classList.add("ryster");
@@ -345,7 +460,8 @@
             });
         };
 
-        /* Et klik paa et stof i skemaet siger, hvad der staar, ikke hvad man skal */
+        /* Et klik paa et stof i skemaet siger, hvad der staar, ikke hvad man
+           skal. At se naermere paa skemaet er altid i orden. */
         P.klikArt = function (a) {
             var t = B.skriv(a.s) + " står " + (a.side === "r" ? "før" : "efter") + " pilen. (" + a.t + ") betyder " +
                 B.TILSTAND[a.t] + ".";

@@ -21,7 +21,8 @@
         { sel: "#mol-menu", titel: "Vælg molekyle", tekst: "Elleve molekyler med de fem former." },
 
         { sel: ".fane.aktiv .vinkelknap", titel: "Vinkelmåler", tekst: "Slå vinkelmåleren til, og klik på to atomer, der sidder på samme atom." },
-        { sel: ".fane.aktiv .opgavekort", titel: "Opgave", tekst: "Én knap: start en opgave, få et hint, se svaret eller tag en ny." },
+        { sel: ".fane.aktiv .scenekort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst i scenen. Vælg et svar, eller byg molekylet, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },
+        { sel: ".fane.aktiv .opgavekort", titel: "Opgaver", tekst: "Her kan du se, hvor mange opgaver du har løst. Start forfra begynder opgaverne på fanen forfra." },
         { sel: "#teoriknap", titel: "Teori", tekst: "Korte afsnit om elektronparfrastødning og de fem former. De er ikke nødvendige for at bruge animationen." }
     ];
 

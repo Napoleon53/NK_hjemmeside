@@ -1,6 +1,6 @@
 /* =====================================================================
    sb4.5 - Organisk syntese
-   Stilark. Grundlaget er sc1.4_afstemning med statuslinjen. Nyt nederst:
+   Stilark. Grundlaget er sc1.4_afstemning (papirkortet sidst i filen). Nyt nederst:
    toplinjen med kassen, lageret med flasker, kolben, tavlen, kunderne,
    butikken og esterkortet.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
@@ -416,23 +416,9 @@ select:focus-visible {
 /* Teorien */
 
 /* ---------------------------------------------------------------------
-   STATUSLINJEN nederst i scenen: naeste skridt, fejl, hint og ros, og
-   den ene knap. Den staar der, hvor eleven kigger, saa der ikke skal
-   ledes efter teksten i et hjoerne (brugerens valg 30. sept. 2026).
+   Beskeden og maerket paa papirkortet (udseendet ligger i
+   ../faelles/papirkort.css; her er kun grundlaget)
    --------------------------------------------------------------------- */
-.statuslinje {
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: 68px;
-    padding: 10px 14px;
-    border-top: 1px solid #33343f;
-    border-left: 5px solid #4a4a58;
-    background-color: #191a21;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
 .st-tekst {
     flex: 1;
     margin: 0;
@@ -460,42 +446,10 @@ select:focus-visible {
 
 .b-maerke.stor { font-size: 0.95rem; padding: 3px 12px; }
 
-.statuslinje.skidt { border-left-color: var(--roed); background-color: #231a1c; }
-.statuslinje.skidt .st-tekst { color: #ffb3aa; }
-.statuslinje.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.3); color: #ffd7d2; }
 
-.statuslinje.god { border-left-color: var(--groen); background-color: #17241e; }
-.statuslinje.god .st-tekst { color: #b8f0cf; }
-.statuslinje.god .b-maerke { background-color: rgba(63, 174, 114, 0.35); color: #d6ffe8; }
 
-.statuslinje.hint,
-.statuslinje.gul { border-left-color: var(--gul); background-color: #23201a; }
-.statuslinje.hint .st-tekst,
-.statuslinje.gul .st-tekst { color: #f7e4ab; }
-.statuslinje.hint .b-maerke,
-.statuslinje.gul .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
 
-.statuslinje.peger { border-left-color: var(--blaa); }
 
-@keyframes st-ryst {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-7px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(2px); }
-}
-
-.statuslinje.ryster { animation: st-ryst 0.4s ease-in-out 1; }
-
-/* Hjaelpeknappen: stor nok til at oejet finder den af sig selv */
-.statuslinje .knap {
-    flex: 0 0 auto;
-    justify-content: center;
-    min-width: 190px;
-    padding: 12px 20px;
-    font-size: 0.98rem;
-    font-weight: 700;
-}
 
 .knap.hjaelp {
     background-color: rgba(242, 197, 61, 0.12);
@@ -521,12 +475,9 @@ select:focus-visible {
 
 .knap.videre:hover:not(:disabled) { background-color: var(--groen); }
 
-/* Forfra: den lille knap ved siden af */
-.statuslinje .forfraknap { position: static; flex: 0 0 auto; }
-
 
 .forfraknap {
-    /* I statuslinjen staar den i raekken; reglerne nedenfor er resten */
+    /* Nederst i panelet (aldrig paa kortet) */
     position: static;
     z-index: 5;
     background-color: rgba(20, 20, 28, 0.85);
@@ -578,7 +529,6 @@ kbd {
    --------------------------------------------------------------------- */
 .note-tekst { margin: 0 0 4px; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-svag); }
 .forfraknap.advar { color: #ffd7d2; border-color: var(--roed); background-color: rgba(224, 84, 70, 0.25); }
-.statuslinje.ryster, .kurv.ryster { animation: ryst 0.35s ease 1; }
 
 /* Navnets to dele i tavlens farver (teorien og esterkortet) */
 .t-alk { color: #8fd0ff; }
@@ -588,8 +538,8 @@ kbd {
 /* =====================================================================
    SB4.5: FABRIKKEN
    Toplinjen har kassen, titlen, serien og udstyret. Scenen er en
-   kolonne: lageret med butikkens doer, ordrelinjen, arbejdsfladen
-   (kolben og tavlen) og statuslinjen. Panelet har kunderne, boersen og
+   kolonne: papirkortet med ordren, lageret med butikkens doer og
+   arbejdsfladen (kolben og tavlen). Panelet har kunderne, boersen og
    esterkortet.
    ===================================================================== */
 .scene {
@@ -598,7 +548,6 @@ kbd {
     background: radial-gradient(ellipse at 28% 70%, #20202b 0, var(--scene-bund) 68%);
 }
 
-.scene > .statuslinje { position: static; flex: 0 0 auto; }
 
 /* ----- Toplinjen: kassen, titlen, serien og udstyret ----------------------- */
 .hud { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
@@ -858,20 +807,6 @@ kbd {
 }
 
 .butikknap.peg { border-color: var(--gul); animation: peg-butik 1.6s ease-in-out infinite; }
-
-/* ----- Ordrelinjen over arbejdsfladen ------------------------------------------- */
-.ordrelinje {
-    flex: 0 0 auto;
-    margin: 10px 14px 0;
-    padding: 2px 12px;
-    font-size: 1.02rem;
-    line-height: 1.4;
-    color: #dfe4ea;
-    border-left: 4px solid var(--gul);
-}
-
-.ordrelinje .maalnavn { color: var(--gul); }
-.ol-ikon { font-size: 1.1rem; }
 
 /* ----- Arbejdsfladen: kolben, betjeningen og tavlen ----------------------------- */
 .arbejde {
@@ -1573,12 +1508,10 @@ kbd {
 @media (max-height: 760px) {
     .lager { padding-top: 7px; }
     .hylde { min-height: 58px; }
-    .ordrelinje { margin-top: 7px; font-size: 0.98rem; }
     .arbejde { padding-top: 6px; padding-bottom: 8px; }
     .plads { min-height: 46px; }
     .startknap { padding: 8px 10px; }
     .kontakt { padding: 6px 10px; }
-    .statuslinje { min-height: 60px; padding-top: 7px; padding-bottom: 7px; }
     .panel { gap: 8px; padding: 10px; }
     .kort { padding: 9px; }
     .ok-vaelg { padding: 5px 9px; }
@@ -1599,4 +1532,55 @@ kbd {
     .tavleboks { flex: none; width: 100%; height: 320px; }
     .scene { height: auto; min-height: 0; }
     .butik-krop { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
+}
+
+/* =====================================================================
+   PAPIRKORTET (4. nov. 2026)
+   Ét lyst kort oeverst i midten af scenen med ordren, naeste skridt,
+   beskeden og den stille hintknap. Det staar i scenens kolonne over
+   lageret, saa det aldrig daekker lageret, kolben eller tavlen.
+   Udseendet (papir, Lexend, farverne paa beskeden og knapperne) ligger i
+   ../faelles/papirkort.css; her er kun placeringen og raekkerne.
+   ===================================================================== */
+.scene > .scenekort {
+    position: relative;
+    z-index: 4;
+    flex: 0 0 auto;
+    align-self: center;
+    width: calc(100% - 28px);
+    max-width: 900px;
+    margin: 10px 14px 0;
+    /* Plads til ordren og en besked paa to linjer, saa kolben og tavlen
+       ikke hopper, naar der kommer et hint (paa lave skaerme vokser kortet) */
+    min-height: 118px;
+    box-sizing: border-box;
+}
+
+/* To spalter: ordren og beskeden til venstre, hintknappen til hoejre.
+   Uden besked fylder kortet saa kun ordren og skridtet. */
+.scene > .scenekort {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 14px;
+    align-content: start;
+}
+.scenekort .sk-tekst { grid-column: 1; grid-row: 1; margin: 0; align-self: center; }
+.scenekort > .sk-bund { display: contents; }
+.scenekort > .sk-bund > .st-tekst { grid-column: 1; grid-row: 2; margin-top: 8px; }
+.scenekort > .sk-bund > .st-tekst:empty { display: none; }
+.scenekort > .sk-bund > .knap { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.scenekort > .sk-blivramme { grid-column: 1 / span 2; grid-row: 2; }
+.scenekort .sk-chip { white-space: nowrap; }
+html body.papirkort.papirkort .scenekort .maalnavn { color: #0f1522; font-weight: 600; }
+html body.papirkort.papirkort .scenekort .sk-trin { color: var(--pk-tekst-svag); }
+
+.scenekort .sk-bund[hidden], .scenekort .sk-blivramme[hidden] { display: none; }
+.scenekort .sk-bund .knap.hjaelp { flex: 0 0 auto; justify-content: center; min-width: 150px; font-size: 0.92rem; }
+.scenekort .sk-videre { cursor: pointer; font-family: inherit; }
+
+/* Forfra nederst i panelet */
+.panel-forfra { align-self: flex-start; margin-top: auto; }
+
+@media (max-height: 760px) {
+    .scene > .scenekort { margin-top: 7px; min-height: 0; }
 }

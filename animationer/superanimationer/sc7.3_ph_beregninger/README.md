@@ -136,22 +136,40 @@ også Maple-linjen. Valget huskes i browseren.
 
 ## Kemichael
 
-Han præsenterer hver fane, når eleven trykker Start præsentation (reglen i
-`../README.md`). Replikkerne siger ligeud, hvad fanen går ud på, fordi den
-første udgave var for indforstået: "Her finder du pH, når du kender [H₃O⁺]."
-(han peger på kortet), "Følg trinene i opgaven, og brug lommeregneren." (den
-lyser), "Til sidst tjekker pH-metret dit svar. Det snyder ikke." Fane 2:
-pH-metret og opgaven. Fane 3: flasken og regnevejen. Han går kun ved den store knap,
-to klik på ham eller Esc; K viser præsentationen igen. Efter fem opgaver, som
-eleven selv har regnet på en fane, roser han tørt (én gang pr. browser).
-Kaffekoppen er det fælles påskeæg. **Påskeæg:** giver lommeregneren 42, siger
-han "42. Det er svaret, bare ikke på den her opgave."
+Han præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles (`../kemichael/praesentation.js`, brugerens regler
+4. nov. 2026): tre trin pr. fane med to til fire hele sætninger i Kemibogens sprog,
+en taleboble med Næste og Spring præsentationen over, og en gul ramme om det, han
+peger på (de usynlige `.anker` over lærredet, opgavekortet, knappen Giv hint og
+lommeregneren). Han går aldrig videre af sig selv; Enter og → er Næste, Esc
+springer over, og K viser præsentationen igen. Teksterne står i `D.INTRO` i
+`js/data.js`: fane 1 etiketten og stoffet, så regnevejen, opgavekortet og
+lommeregneren, så pH-metret og hintknappen; fane 2 pH-metret og etiketten, så
+regnevejen, så opgavekortet og lommeregneren; fane 3 flasken og etiketten, så
+regnevejen, så opgavekortet, lommeregneren og pH-metret. Under præsentationen
+står han til venstre for glasset eller flasken (`laererPlads` i `js/laerer.js`),
+så han ikke skjuler det, han taler om; ellers står han ved koppen som før.
+
+Ellers kommer han kun ind af sig selv to steder:
+
+* Efter fem opgaver, som eleven selv har regnet på en fane (én gang pr.
+  browser), roser han tørt: "Du har selv regnet pH rigtigt i fem opgaver.
+  pH-metret er begyndt at kede sig." (fane 1), "Du har udfyldt fem etiketter
+  rigtigt. Så mange korrekte etiketter har kemikalielageret aldrig haft." (fane
+  2) og "Du har regnet pH for fem flasker uden at åbne en eneste. Sådan skal
+  stærke syrer og baser behandles." (fane 3). Står præsentationen, venter rosen.
+* **Påskeæg:** giver lommeregneren 42, siger han "Lommeregneren viser 42. Det er
+  svaret på alt, men ikke på denne opgave." (én gang pr. besøg, aldrig midt i
+  præsentationen).
+
+Kaffekoppen er det fælles påskeæg.
 
 Direkte links: `index.html#konc` og `index.html#staerk`.
 
 Genveje: <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd>
-Kemichaels præsentation · <kbd>M</kbd> Maple · <kbd>Esc</kbd> luk eller send
-Kemichael ud. Resten af tastaturet går til lommeregneren (derfor skifter
+Kemichaels præsentation · <kbd>M</kbd> Maple · <kbd>Esc</kbd> luk eller spring
+præsentationen over (under præsentationen er <kbd>Enter</kbd> og <kbd>→</kbd>
+Næste). Resten af tastaturet går til lommeregneren (derfor skifter
 1, 2 og 3 ikke fane her).
 
 ### Det nye i forhold til den gamle animation
@@ -179,7 +197,6 @@ js/data.js          stofferne, flaskerne, teksterne under scenen og replikkerne
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, regnevejen (stationer og pile), etiketten, stofferne, pH-metret, flasken
 js/sim_regn.js      de tre faner (én klasse, tre underklasser): opgaverne, scenen og opgavekortet
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/laerer.js        Kemichael på alle tre faner og påskeægget
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, lommeregneren flyttes, teorien, tastaturet, tegneløkke
@@ -205,10 +222,12 @@ mange måder, at 28 typiske fejl giver den rigtige forklaring, at tasterne i Vis
 tasterne og Maple-koden giver facit i alle trin i 180 opgaver, at alle tre
 faner kan gennemføres i små bider (formelvalg, lommeregnerens besked, hjælpen til hver bid, og regnevejen, der vokser), at
 tastaturet går til lommeregneren og ikke til svarfeltet, at sproget holder
-reglerne, at Kemichael kan vises og sendes ud, og at layoutet holder fra
-520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
+reglerne, at Kemichaels præsentation viser trinnene ét ad gangen med Næste
+og Spring præsentationen over på alle faner (den fælles test), at rammen
+står om lommeregneren, at påskeægget venter under præsentationen, og at
+layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 25. september 2026: ALT OK (166 påstande).
+bagefter. Sidst kørt 4. november 2026: ALT OK (205 påstande).
 
 ## Forenklinger
 
@@ -231,9 +250,10 @@ bagefter. Sidst kørt 25. september 2026: ALT OK (166 påstande).
 
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
 præsentation og Nej tak midt foroven i scenen. Tilbuddet forsvinder også, når
-eleven har regnet det første trin. Koden er `js/praesentation.js` (samme fil
-som i sc1.2), koblet med `NK.Praesentation.kobl` på hver fanes underklasse
-nederst i `js/sim_regn.js`.
+eleven har regnet det første trin. Koden er den fælles
+`../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` på hver
+fanes underklasse nederst i `js/sim_regn.js` og `NK.Praesentation.trin` i
+`js/laerer.js`.
 
 ## I menuen
 

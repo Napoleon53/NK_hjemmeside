@@ -12,29 +12,31 @@
 
     var NK = window.NK;
 
-    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find søjlen med den positive ion og rækken med den negative. L er letopløseligt, T er tungtopløseligt." };
-    var OPGAVE = { sel: "#opgavekort", titel: "Opgaven", tekst: "Opgaven og de fire trin er de samme på alle sværhedsgrader. Knappen giver først et hint, så svaret og til sidst en ny opgave." };
+    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find søjlen med den positive ion og rækken med den negative. L er letopløseligt, T er tungtopløseligt. På trin 2 åbner et klik tabellen i stor udgave." };
+    var TRINENE = { sel: "#opgavekort", titel: "Trinene", tekst: "De fire trin er de samme på alle sværhedsgrader. Ny opgave giver en anden blanding." };
+    var KORT = { sel: "#tekstboks", titel: "Opgaven", tekst: "Her står blandingen og det, du skal gøre. Indsend svar tjekker det, du har skrevet. Enter i et felt gør det samme." };
 
     var TURE = {
         "tabel": [
-            { sel: "#baeger-omraade", titel: "De to opløsninger", tekst: "Ionerne svømmer rundt hver for sig. Når glassene hældes sammen, kan de finde nye partnere." },
+            { sel: "#tekstboks", titel: "Opgaven", tekst: "Her står blandingen og det, du skal gøre. Slå op i fældningstabellen viser tabellen i stor udgave sammen med skemaet." },
             { sel: "#tavle", titel: "Skemaet", tekst: "Her står de to salte og deres ioner. De nye par, du finder, kommer frem efter pilen." },
+            { sel: "#baeger-omraade", titel: "De to opløsninger", tekst: "Ionerne svømmer rundt hver for sig. Når glassene hældes sammen, kan de finde nye partnere." },
             TABEL,
-            OPGAVE,
+            TRINENE,
             { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Samme opgave og samme fire trin. På Let vises ionerne, formlen og ionskemaet for dig. På Middel vælger du svarene, og på Svær skriver du dem selv." }
         ],
         "vaelg": [
+            { sel: "#tekstboks", titel: "Opgaven", tekst: "Vælg dit svar, og tryk Indsend svar. De forkerte svar er fejl, som elever tit laver, og du får at vide hvorfor." },
             { sel: "#tavle", titel: "Skemaet", tekst: "Reaktionen bygges op her, ét trin ad gangen." },
-            { sel: "#ab-valg", titel: "Svarmulighederne", tekst: "De forkerte svar er fejl, som elever tit laver. Vælger du et, får du at vide hvorfor." },
             TABEL,
-            OPGAVE
+            TRINENE
         ],
         "skriv": [
             { sel: "#tavle", titel: "Skrivefelterne", tekst: "Tal efter et symbol bliver sænket af sig selv, og store og små bogstaver rettes. Skriv + eller − til sidst for ladningen: po43- bliver til PO₄³⁻." },
             { sel: "#ab-valg", titel: "Værktøjet", tekst: "Ladningsknapperne sætter ladningen på det felt, du står i." },
-            { sel: "#tjek", titel: "Tjek", tekst: "Tjekker dit svar. Enter i et felt gør det samme." },
+            KORT,
             TABEL,
-            OPGAVE
+            TRINENE
         ]
     };
 

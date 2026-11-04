@@ -68,14 +68,15 @@
         this.hjaelp = 0;
         this.aflaest = null;
         this.info = null;
-        this.bemMork = false;
         this.bemTom = false;
+        this.bemMork = false;
+        this.fast = { html: "", klasse: "" };
+        this.pegKnap = false;
         this.lup.nulstil();
         this.kurve.nulstil(this.vAek, K.nCl(this.pr), this.pr.ind);
         this.kurve.tilfoej(0, this.t.nClFri, 0, 0);
         if (this.laererNyt) this.laererNyt();
         this.besked("", "");
-        this.bygFelt();
         this.visKort();
         this.visStatus();
     };
@@ -122,8 +123,8 @@
     P.saetHane = function (a) {
         a = NK.klamp(a, 0, 1);
         if (a < 0.02) a = 0;
-        if (this.fase === "faerdig" && a > 0) {
-            this.info = { tekst: "Prøven er færdig. Tryk på <b>Ny prøve</b> for at titrere igen.", tid: 4 };
+        if (this.fase !== "titrer" && a > 0) {
+            this.laast();
             a = 0;
         }
         if (this.vUd() >= TOM - 1e-9) a = 0;
@@ -142,13 +143,20 @@
 
     /* Én draabe (knappen, D eller klik paa spidsen) */
     P.enDraabe = function () {
-        if (this.fase === "faerdig") {
-            this.info = { tekst: "Prøven er færdig. Tryk på <b>Ny prøve</b> for at titrere igen.", tid: 4 };
-            return;
-        }
+        if (this.fase !== "titrer") { this.laast(); return; }
         if (this.vUd() >= TOM - 1e-9) return;
         if (this.afvisTilbud) this.afvisTilbud();
         this.slip();
+    };
+
+    /* Forsoeget er laast, mens kortet spoerger om aflaesningen, og naar
+       proeven er faerdig (eleverne klikker, foer de laeser): kortet blinker,
+       og linjen paa kortet siger hvorfor */
+    P.laast = function () {
+        this.info = { tekst: this.fase === "aflaes" ? "Kolben har skiftet farve. Aflæs forbruget, og tryk på <b>Indsend svar</b>." :
+            "Prøven er færdig. Tryk på <b>Ny prøve</b> i panelet for at titrere igen.", tid: 4 };
+        if (this.kort) this.kort.blink();
+        this.visStatus();
     };
 
     P.slip = function () {
@@ -171,10 +179,19 @@
         if (v < this.vAek && this.skyer.length < 40) {
             this.skyer.push({ u: NK.r(-0.15, 0.15), w: 0, alder: 0, liv: 0.35 + 2.4 * naer * naer, retning: Math.random() < 0.5 ? -1 : 1 });
         }
-        if (this.forbi() > 1.0 && !this.bemMork) {
-            this.bemMork = true;
-            if (this.laererReplik) this.laererReplik(D.BEM_MORK);
-        }
+        this.tjekMork();
+    };
+
+    /* Over 1 mL forbi omslaget: en toer bemaerkning (D.BEM_MORK), én gang
+       pr. proeve, og kun foerste gang og derefter hver tredje gang i samme
+       besoeg (brugerens valg 4. nov. 2026). true, naar han kommer. */
+    P.tjekMork = function () {
+        if (this.forbi() <= 1.0 || this.bemMork) return false;
+        this.bemMork = true;
+        this.morkTal = (this.morkTal || 0) + 1;
+        if ((this.morkTal - 1) % 3 !== 0) return false;
+        if (this.laererReplik) this.laererReplik(D.BEM_MORK);
+        return true;
     };
 
     /* ----- Tegneloekken: draaberne ------------------------------------------------------ */
@@ -198,7 +215,7 @@
                 this.a = 0;
                 if (!this.bemTom) {
                     this.bemTom = true;
-                    if (this.laererReplik) this.laererReplik(D.BEM_TOM, true);
+                    if (this.laererReplik) this.laererReplik(D.BEM_TOM);
                 }
             } else {
                 this.acc += FART * this.a * this.a * dt;
@@ -235,43 +252,59 @@
             this.fase = "aflaes";
             this.hjaelp = 0;
             this.besked("", "");
-            this.bygFelt();
             this.visKort();
             this.fokus();
         }
     };
 
-    /* ----- Aflaesningen ---------------------------------------------------------------- */
+    /* ----- Aflaesningen: feltet paa kortet og Indsend svar --------------------------------- */
+    P.indsend = function () {
+        if (this.fase !== "aflaes") { this.kort.blink(); return; }
+        var inp = this.kort.input();
+        if (!inp || !inp.value.trim()) {
+            this.kort.blink();
+            this.besked("Skriv forbruget i feltet på kortet først.", "gul");
+            return;
+        }
+        this.tjekAflaesning();
+    };
+
+    P.kortInput = function () { this.visKnapper(); };
+
     P.tjekAflaesning = function () {
-        var inp = this.el.felt.querySelector("input");
+        var inp = this.kort.input();
         if (!inp) return;
         var svar = NK.Tjek.aflaesning(inp.value, this.vUd(), D.AFLAES_TOL);
         if (svar.ok) {
             this.godkend(NK.Tjek.tal(inp.value).v, false);
             return;
         }
-        this.besked(NK.html(svar.besked), svar.tom ? "gul" : "skidt");
-        var fe = this.el.felt.querySelector(".felt");
-        if (fe && !svar.tom) {
+        if (svar.tom) { this.besked(NK.html(svar.besked), "gul"); return; }
+        this.besked('<span class="b-maerke">Ikke endnu</span> ' + NK.html(svar.besked), "skidt");
+        var fe = inp.closest(".felt");
+        if (fe) {
             fe.classList.remove("ryst");
             void fe.offsetWidth;
             fe.classList.add("ryst");
         }
     };
 
+    /* Aflaesningen er godkendt (eller vist): kortet bliver paa spoergsmaalet
+       med tallet i feltet, forklaringen under det og knappen videre */
     P.godkend = function (v, vist) {
         this.aflaest = v;
         this.fase = "faerdig";
+        this.vist = !!vist;
         var over = this.forbi();
         var tekst;
         var o = D.O;
         if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev " + o.farve + " på den sidste dråbe.";
         else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.tydelig + ", så der er tilsat lidt for meget sølvnitrat.";
         else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.kraftig + ": omslaget kom tidligere, så forbruget er for stort.";
-        this.besked((vist ? "<b>Svar:</b> " : "") + NK.html(tekst), vist ? "gul" : "god");
+        this.slutTekst = tekst;
+        this.besked("", "");
         NK.maaling = { V: v, m: this.pr.m, c: this.pr.c, p: this.pr.p, sted: this.pr.sted, egen: true, over: over, nr: this.nr, brugt: false };
         if (this.afvisTilbud) this.afvisTilbud();
-        this.bygFelt();
         this.visKort();
         this.visStatus();
         if (!vist && over <= D.PRAECIS + 1e-9 && !NK.hent(NOEGLE_ROS, false)) {
@@ -280,16 +313,19 @@
         }
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Til beregningen ------------------------ */
+    /* ----- Knappen: Giv hint -> Vis svaret; den groenne knap gaar til beregningen ------- */
+    P.videre = function () {
+        if (this.fase === "faerdig" && NK.visFane) NK.visFane("fane-beregning");
+    };
+
     P.knap = function () {
-        if (this.fase === "faerdig") {
-            if (NK.visFane) NK.visFane("fane-beregning");
-            return;
-        }
+        if (this.fase === "faerdig") { this.videre(); return; }
+        if (this.auto) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(this.fase === "titrer" ? D.TITRER_HINT : D.AFLAES_HINT), "gul");
+            this.besked('<span class="b-maerke">Hint</span> ' + NK.html(this.fase === "titrer" ? D.TITRER_HINT : D.AFLAES_HINT), "gul");
             this.visKort();
+            this.fokus();
             return;
         }
         if (this.fase === "titrer") {
@@ -309,80 +345,68 @@
         this.nyProeve();
     };
 
-    /* ----- Panelet --------------------------------------------------------------------- */
+    /* ----- Panelet og kortet ------------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("tit-knap"),
-            besked: NK.el("tit-besked"),
-            kort: NK.el("tit-kort"),
-            felt: NK.el("tit-felt")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("tit-spring").addEventListener("click", function () { mig.springIntro(); });
+        this.kort = new NK.Scenekort("tit", this, [176, 150]);
         NK.el("tit-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
-    P.bygFelt = function () {
-        var mig = this, vaert = this.el.felt;
-        if (this.fase === "titrer") { vaert.innerHTML = ""; return; }
-        if (this.fase === "faerdig") {
-            vaert.innerHTML = '<div class="felt ok"><span class="felt-pre">V(AgNO₃) =</span><span class="felt-svar"><b>' +
-                K.mL(this.aflaest) + '</b> mL</span><span class="felt-maerke">✓</span></div>';
-            return;
-        }
-        vaert.innerHTML = '<div class="felt aktiv"><span class="felt-pre">V(AgNO₃) =</span>' +
-            '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Forbruget i mL" placeholder="aflæs buretten">' +
-            '<span class="felt-efter">mL</span><button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1">↵</button></div>';
-        var inp = vaert.querySelector("input");
-        inp.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); mig.tjekAflaesning(); }
-        });
-        vaert.querySelector(".felt-ok").addEventListener("click", function () { mig.tjekAflaesning(); });
-    };
-
     P.fokus = function () {
-        var inp = this.el.felt.querySelector("input");
+        var inp = this.kort.input();
         if (inp && NK.el("fane-titrering").classList.contains("aktiv") &&
             !document.querySelector(".overlay.vis") && !(NK.Rundvisning && NK.Rundvisning.aktiv())) {
             try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
         }
     };
 
+    /* Den faste besked paa kortet (fejl, hint, svar). Efter en fejl lyser
+       hintknappen stille op, til beskeden skifter. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        this.pegKnap = klasse === "skidt" && this.hjaelp === 0;
+        if (this.kort) this.visStatus();
+    };
+
+    P.visKnapper = function () {
+        var hint = null, indsend = null;
+        if (this.fase === "titrer" && !this.auto) hint = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+        if (this.fase === "aflaes") {
+            hint = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            var inp = this.kort.input();
+            indsend = !!(inp && inp.value.trim());
+        }
+        this.kort.knapper(hint, this.pegKnap, indsend);
     };
 
     P.visKort = function () {
-        NK.saetTekst("tit-titel", "Prøve " + this.nr);
-        NK.saetTekst("tit-sted", this.pr.sted + ", " + NK.tal2(this.pr.m) + " g");
-        var prompt, tekst, klasse = "knap";
+        var o = D.O, chip = "Prøve " + this.nr;
+        var sted = NK.tal2(this.pr.m) + " g havvand fra " + NK.html(this.pr.sted) + ".";
+        var spm = "Aflæs buretten ved menisken i panelet til højre. Hvor meget sølvnitrat er løbet ned?";
+        var felt = NK.Scenekort.felt;
         if (this.fase === "titrer") {
-            prompt = "Titrér havvandet, til kolben bliver " + D.O.svag + ".";
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            this.kort.vis({ slags: "opgave", chip: chip, tekst: sted + " Titrér havvandet, til kolben bliver " + o.svag + "." });
         } else if (this.fase === "aflaes") {
-            prompt = "Aflæs buretten. Hvor meget sølvnitrat er løbet ned?";
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            this.kort.vis({ slags: "spm", chip: chip, tekst: "Kolben er " + K.farveOrd(this.styrke(), this.uklar()) + ". " + spm,
+                efter: felt("tit-input", "V(AgNO₃) =", "mL", "aktiv", "", "aflæs buretten", "Forbruget i mL") });
         } else {
-            prompt = "Forbruget er aflæst.";
-            tekst = "Til beregningen →";
-            klasse = "knap blaa banker";
+            this.kort.vis({ slags: "spm", chip: chip, tekst: "Kolben har skiftet farve. " + spm,
+                efter: felt("tit-input", "V(AgNO₃) =", "mL", this.vist ? "svar" : "ok", K.mL(this.aflaest)),
+                bliv: { tekst: NK.html(this.slutTekst || ""), gul: this.vist, knap: "Til beregningen →" } });
         }
-        NK.saetTekst("tit-prompt", prompt);
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.fase === "faerdig");
+        this.visKnapper();
     };
 
+    /* Linjen paa kortet: et svar paa et klik i scenen (kort tid), saa
+       "Luk hanen!", saa fejl, hint og svar, og ellers det naeste skridt */
     P.visStatus = function () {
-        var t, o = D.O;
+        var t, kl = "peger", o = D.O;
         var v = this.vUd();
         if (this.info && this.info.tid > 0) t = this.info.tekst;
-        else if (this.fase === "faerdig") t = "Forbruget er " + K.mL(this.aflaest) + " mL. Gå videre til beregningen, eller tag en <b>ny prøve</b>.";
-        else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke(), this.uklar()) + ". Aflæs buretten i luppen til højre, og skriv forbruget.";
+        else if (this.fase === "titrer" && this.rodbrun() && this.a > 0) { t = "<b>Luk hanen!</b> Kolben er " + o.farve + "."; kl = "gul"; }
+        else if (this.fast.html) { t = this.fast.html; kl = this.fast.klasse; }
+        else if (this.fase !== "titrer") t = "";
         else if (this.auto) t = "Buretten titrerer selv. Hurtigt først, så dråbe for dråbe.";
-        else if (this.rodbrun() && this.a > 0) t = "<b>Luk hanen!</b> Kolben er " + o.farve + ".";
         else if (this.rodbrun()) t = "Kolben er " + o.farve + ".";
         else if (this.a > 0 && this.skyer.some(function (s) { return s.liv > 1.2; })) {
             t = this.a > 0.45 ? "De " + o.skyer + " bliver længere. Træk skyderen ned på <b>dryp</b>." :
@@ -391,7 +415,8 @@
         else if (this.a > 0) t = "Sølvnitrat løber ned. Hvidt sølvchlorid gør kolben uklar. Luk hanen, når den bliver " + o.farve + ".";
         else if (v > 0) t = "Kolben er " + o.start + " og uklar. Der er stadig chlorid tilbage. Åbn hanen igen.";
         else t = "Træk skyderen ved hanen mod højre for at åbne den.";
-        NK.saetHTML("tit-status", t);
+        this.kort.bund(t, t ? kl : "");
+        this.visKnapper();
     };
 
     /* ----- Layout ---------------------------------------------------------------------- */
@@ -400,7 +425,9 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.bordY = Math.round(H - NK.klamp(H * 0.1, 30, 70));
-        var topY = NK.klamp(H * 0.035, 10, 28);
+        /* Pladsen oeverst er sat af til kortet (kortZone), saa det ikke daekker buretten */
+        lay.zone = this.kort.zone();
+        var topY = 10 + lay.zone + NK.klamp(H * 0.02, 6, 16);
         var cx = NK.klamp(W * 0.33, 170, 360);
         var g = Tg.opstilling(cx, lay.bordY, topY, 1.1);
         lay.g = g;
@@ -469,6 +496,7 @@
             this.ventRos -= dt;
             if (this.ventRos <= 0 && this.laererReplik) this.laererReplik(D.ROS_TITRERING, true);
         }
+        if (this.fase === "aflaes") this.visKort();   /* kolbens farveord, naar de sidste skyer er vaek */
         this.visStatus();
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
@@ -538,7 +566,7 @@
         var lukNu = this.fase === "titrer" && this.a > 0 && this.rodbrun();
         Tg.skyder(ctx, lay.skyder, this.a, DRYP, {
             lys: this.over && this.over.slags === "skyder" || !!this.traek,
-            puls: vent || lukNu || this.pegHane ? puls : 0
+            puls: vent || lukNu ? puls : 0
         });
         Tg.pilleKnap(ctx, lay.draabe, "1 dråbe", {
             lys: this.over && this.over.slags === "draabe",
@@ -604,7 +632,7 @@
             var pt = mig.L.punkt(e);
             var u = mig.hvadErUnder(pt);
             if (!u || u.slags !== "skyder") return;
-            if (mig.fase === "faerdig") { mig.saetHane(1); return; }
+            if (mig.fase !== "titrer") { mig.laast(); return; }
             mig.traek = { start: pt };
             mig.saetHane(mig.skyderA(pt.x));
             try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
@@ -667,10 +695,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-titrering", tilbud: "tit-tilbud", spring: "tit-spring" });
-
-    /* Mens han siger, hvad man goer, banker skyderen */
-    P.pegPaaFelt = function (til) { this.pegHane = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-titrering", tilbud: "tit-tilbud" });
 
     NK.SimTitrering = SimTitrering;
 }());

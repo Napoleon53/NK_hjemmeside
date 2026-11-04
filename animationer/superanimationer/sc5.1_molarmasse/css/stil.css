@@ -185,51 +185,6 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 11px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.felt.peg { border-color: var(--gul); animation: peg 1.2s ease-out infinite; }
-
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */
@@ -737,8 +692,6 @@ select:focus-visible {
     border-radius: var(--radius-lil);
 }
 
-.valgrad.peg { animation: peg 1.2s ease-out infinite; }
-
 .valgknap {
     display: flex;
     flex-direction: column;
@@ -792,8 +745,8 @@ select:focus-visible {
     .opgave-prompt.formel { font-size: 1.6rem; }
 }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen
+   (../kemichael/praesentation.js) */
 .tilbud {
     position: absolute;
     top: 16px;
@@ -837,3 +790,75 @@ select:focus-visible {
 }
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST I SCENEN (brugerens valg 4. nov. 2026: alle aktive
+   animationer har papirkortet). Hele opgaven staar paa ét kort oeverst
+   midt i scenen: teksten, svarene, beskeden, Giv hint og Indsend svar,
+   og efter et rigtigt svar forklaringen og Naeste (js/kort.js).
+   Udseendet er ../faelles/papirkort.css; her staar kun pladsen og
+   opbygningen. Plakaten og alt andet paa laerredet begynder under
+   kortets plads (zone i js/kort.js), saa kortet ikke daekker dem.
+   Kortet er centreret med margin, ikke med transform.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border-radius: 12px;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-formel { font-size: 1.18em; font-weight: 700; white-space: nowrap; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.sk-knap {
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+.sk-knap .pil { margin-right: 6px; color: #8a6d12; font-weight: 700; }
+
+.sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+
+/* Et forkert gaet paa skaalvaegten: forklaringen i en roed boks */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
+    background-color: var(--pk-roed-lys);
+    border-left-color: var(--pk-roed);
+    color: var(--pk-roed-tekst);
+}
+
+/* Den sidste opgave: forklaringen uden knap */
+.sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
+
+/* Knapperne i panelet, der begynder forfra (aldrig paa kortet) */
+.knap.igen { margin-top: 10px; width: 100%; }
+.kort.regnekort { border-left: 3px solid var(--lilla); }
+#vaegt-formel { font-size: 0.86rem; color: var(--tekst); letter-spacing: 0; text-transform: none; }
+
+/* Tilbuddet om praesentationen staar nederst, saa det ikke daekker kortet */
+.tilbud { top: auto; bottom: 16px; }
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.93rem; }
+}
+
+@media (max-width: 700px) {
+    .sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

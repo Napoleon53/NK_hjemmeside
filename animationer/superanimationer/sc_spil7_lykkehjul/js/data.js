@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - quizzerne, hjulene og Kemichaels replikker
+   data.js - quizzerne, hjulene og Kemichaels praesentation
 
    De indbyggede quizzer staar i det samme tekstformat, som en laerer
    skriver sine egne i (se tekstformat.js). Saa kan de kopieres direkte
@@ -173,14 +173,18 @@
     D.HJUL_TID = 5.3;
 
     /* ----- Kemichaels praesentation -----------------------------------------
-       Første gang spillet åbnes i en browser. Højst ca. 60 tegn pr. replik og
-       ingen teori. Linjen i INTRO_PEG siger han, mens han peger på opsætningen. */
+       Paa titelskaermen, naar man beder om den (../kemichael/praesentation.js):
+       ét trin ad gangen, og man trykker Naeste. Hvert trin er to til fire
+       hele saetninger i Kemibogens sprog, uden teori og uden vittigheder.
+       sel: det, han peger paa, og som faar en gul ramme, der blinker. */
     D.INTRO = {
         titel: [
-            "Velkommen til Kemi-Lykkehjulet. Jeg er jeres vært.",
-            "Skriv holdenes navne her, og tryk Start.",
-            "Hjulet er ikke snydt. Det har jeg selv tjekket."
+            { tekst: "I Kemi-Lykkehjulet gætter du bogstaverne i et fagbegreb eller en kort sætning fra kemi. Hele klassen kan spille i hold på tavlen, eller én spiller kan spille alene ved sin egen computer. Du vælger mellem de to måder øverst i opsætningen.",
+              sel: "#tilstand" },
+            { tekst: "Under Quiz vælger du, hvilken quiz der skal spilles, og linjen under viser, hvor mange runder quizzen har. Knappen Quizzer som tekst åbner quizzerne som tekst, så du kan skrive dine egne. I holdspillet vælger du antallet af hold og skriver holdenes navne, og alene skriver du dit eget navn.",
+              sel: ["#quizvalg", "#egneknap", "#holdnavne, #alene-navn"] },
+            { tekst: "Spillet begynder, når du trykker på Start spillet. Knappen Regler øverst til højre viser spillets regler og tastaturgenveje, og knappen med spørgsmålstegnet giver en rundvisning på den skærm, der vises.",
+              sel: ["#start", "#regelknap", "#hjaelpknap"] }
         ]
     };
-    D.INTRO_PEG = 1;
 }());

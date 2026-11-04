@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alkaners kogepunkt</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">♨</span> Alkaners kogepunkt</h1>
@@ -27,8 +29,18 @@
 <!-- FANE 1: VARM OP                                                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-varm" role="tabpanel" aria-label="Varm op">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="varm-laerred"></canvas>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): målet,
+             hint, beskeden og knapperne (js/skort.js) -->
+        <div class="scenekort" id="varm-skort">
+            <div class="sk-ind" id="varm-ind"></div>
+            <div class="sk-bund" id="varm-bund">
+                <p class="st-tekst" id="varm-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="varm-hint" type="button">Giv et hint</button>
+                <button class="knap indsend" id="varm-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="varm-anker-hylde"></div>
         <div class="anker" id="varm-anker-kammer"></div>
         <div class="anker" id="varm-anker-termometer"></div>
@@ -37,22 +49,13 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="varm-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="varm-status"></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste maal -->
-        <div class="kort opgavekort" id="varm-kort">
-            <h2><span id="varm-maal-titel">Mål</span><span class="taeller" id="varm-taeller">mål <b id="varm-nr">1</b>/4</span></h2>
-            <p class="maal-tekst" id="varm-prompt"></p>
-            <p class="besked" id="varm-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="varm-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="varm-kurve-kort">
             <h2>Kogepunkter <span class="taeller" id="varm-antal"></span></h2>
             <canvas class="kurve" id="varm-kurve"></canvas>
+            <button class="knap nulstil" id="varm-forfra" type="button" hidden><span>Start målene forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -61,8 +64,18 @@
 <!-- FANE 2: FORMEN                                                     -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-form" role="tabpanel" aria-label="Formen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="form-laerred"></canvas>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): gættet, opgaven og spørgsmålet,
+             hint, beskeden og knapperne (js/skort.js) -->
+        <div class="scenekort" id="form-skort">
+            <div class="sk-ind" id="form-ind"></div>
+            <div class="sk-bund" id="form-bund">
+                <p class="st-tekst" id="form-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="form-hint" type="button">Giv et hint</button>
+                <button class="knap indsend" id="form-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="form-anker-zoom"></div>
         <div class="anker" id="form-anker-bad"></div>
         <div class="anker" id="form-anker-termometer"></div>
@@ -70,23 +83,14 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="form-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="form-status"></div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="form-kort">
-            <h2><span id="form-titel">Gæt</span><span class="taeller" id="form-trin"></span></h2>
-            <p class="maal-tekst" id="form-spm"></p>
-            <div class="valgliste" id="form-valg"></div>
-            <p class="besked" id="form-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="form-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="form-tabel-kort">
             <h2>Kogepunkter <span class="taeller">C₅H₁₂</span></h2>
             <div class="hyldeliste" id="form-tabel"></div>
             <button class="knap stor ekstra" id="form-beroering" type="button"><span>Se, hvor molekylerne rører hinanden</span><span class="tegn">›</span></button>
+            <button class="knap nulstil" id="form-forfra" type="button"><span>Forsøget forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -95,28 +99,27 @@
 <!-- FANE 3: HVEM KOGER FOERST?                                         -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-spil" role="tabpanel" aria-label="Hvem koger først?">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="spil-laerred"></canvas>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): spørgsmålet, svarene,
+             hint, beskeden og knapperne (js/skort.js) -->
+        <div class="scenekort" id="spil-skort">
+            <div class="sk-ind" id="spil-ind"></div>
+            <div class="sk-bund" id="spil-bund">
+                <p class="st-tekst" id="spil-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="spil-hint" type="button">Giv et hint</button>
+                <button class="knap indsend" id="spil-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="spil-anker-kammer"></div>
         <div class="anker" id="spil-anker-zoom"></div>
         <div class="tilbud" id="spil-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="spil-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="spil-status"></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste blanding -->
-        <div class="kort opgavekort" id="spil-kort">
-            <h2><span id="spil-niveau"></span><span class="taeller">blanding <b id="spil-nr">1</b>/<span id="spil-antal">9</span></span></h2>
-            <p class="opgave-spm">Hvem koger først? Gæt, før kammeret varmer op.</p>
-            <div class="valgliste" id="spil-valg"></div>
-            <p class="besked" id="spil-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="spil-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="spil-runde">
             <h2>Runden <span class="taeller">rekord <b id="spil-rekord">0</b></span></h2>
             <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="spil-point">0</span></div>
@@ -191,12 +194,14 @@
 
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/skort.js"></script>
 <script src="js/model.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
-<script src="js/praesentation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
 <script src="js/termostat.js"></script>
 <script src="js/sim_varm.js"></script>
 <script src="js/sim_form.js"></script>

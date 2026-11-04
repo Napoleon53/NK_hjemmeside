@@ -436,7 +436,6 @@
         if (NK.Laerer) {
             laerer = new NK.Laerer(laerred);
             NK.laerer = laerer;
-            el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
         }
         if (TOUCH) document.body.classList.add("touch");
 
@@ -491,6 +490,8 @@
         var studie = el("studie");
         studie.addEventListener("click", function (e) {
             if (!laerer || !laerer.synlig()) return;
+            /* Knapperne i hans taleboble skal altid kunne trykkes */
+            if (e.target && e.target.closest && e.target.closest(".km-boble")) return;
             var p = punkt(e);
             if (laerer.laererIntroKlik(p.x, p.y) || laerer.laererKlik(p.x, p.y)) {
                 e.stopPropagation();

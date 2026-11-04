@@ -230,7 +230,6 @@
             var p = mig.L.punkt(e);
             cv.style.cursor = mig.laererUnder && mig.laererUnder(p.x, p.y) ? "pointer" : "default";
         });
-        NK.el("konc-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.fokusNaeste = function (stof) {
@@ -342,7 +341,7 @@
         if (this.laererTegnOver) this.laererTegnOver(ctx);
     };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-konc", tilbud: "konc-tilbud", spring: "konc-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-konc", tilbud: "konc-tilbud" });
 
     NK.SimKonc = SimKonc;
 }());

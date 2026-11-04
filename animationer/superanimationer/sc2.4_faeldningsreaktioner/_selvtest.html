@@ -216,6 +216,8 @@ function koer() {
 
     overskrift("8. Alle tre niveauer kan gennemføres");
     function kor(niv, sek) { for (var t = 0; t < sek * 60; t++) niv.baeger.opdater(1 / 60, 900, 520); }
+    /* Svarknapperne vaelger kun; Indsend svar sender ind */
+    function svar(niv, liste) { [].concat(liste).forEach(function (i) { niv.valgKlik(i); }); niv.indsend(); }
     function parAf(n) { return D.PAR.filter(function (p) { return p.noegle === n; })[0]; }
     NK.visNiveau("tabel");
     var nt = NK.niveauer.tabel, f0 = nt.loest;
@@ -228,8 +230,16 @@ function koer() {
     nt.tabelKlik("Ag", "PO4"); nt.tabelKlik("Na", "NO3");
     paastand("niveau 1: begge nye par fundet, anden del af trin 2", nt.trin === 1 && nt.s.fase === "b");
     nt.valgKlik(1);
+    paastand("niveau 1: et klik på et svar vælger det kun", nt.trin === 1 && !nt.klaret && nt.s.valgt === 1 && !nt.s.forkerte[1]
+        && !!d.querySelector('#tekstboks .sk-knap.valgt[data-i="1"]') && !d.querySelector("#indsend.ikke-klar"));
+    nt.indsend();
     paastand("niveau 1: NaNO₃ falder ud er forkert med forklaring", nt.trin === 1 && /letopløseligt/.test(nt.besked.tekst), nt.besked.tekst);
-    nt.valgKlik(0);
+    nt.indsend();
+    paastand("niveau 1: Indsend svar uden valg bedømmer intet", nt.trin === 1 && !nt.klaret && nt.besked.klasse === "peger");
+    svar(nt, 0);
+    paastand("niveau 1: kortet bliver på spørgsmålet: svaret grønt og knappen Ny opgave, hvor Indsend svar stod",
+        !!nt.klaret && !!d.querySelector('#tekstboks .sk-knap.rigtig[data-i="0"]') && /Ny opgave/.test((d.querySelector("#tekstboks [data-videre]") || {}).textContent || "")
+        && !d.getElementById("indsend") && /Ag₃PO₄/.test(d.getElementById("tekstboks").textContent));
     paastand("niveau 1: løst, formel og ionskema vises, tælleren går op", nt.faerdig && nt.loest === f0 + 1
         && nt.status[2] === "givet" && nt.status[3] === "givet" && d.getElementById("tavle").textContent.indexOf("3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s)") >= 0);
     kor(nt, 7);
@@ -243,7 +253,7 @@ function koer() {
 
     nt.nyOpgave(parAf("K-NO3+Na-Cl"), false);
     nt.knap(); nt.knap();
-    nt.valgKlik(3);
+    svar(nt, 3);
     paastand("niveau 1: intet bundfald, svaret vist, tælleren står stille", nt.faerdig && nt.vist && nt.loest === f0 + 1);
     kor(nt, 6);
     paastand("niveau 1: intet bundfald i glasset", nt.baeger.ioner.every(function (p) { return !p.bunke; }) && nt.baeger.fase === "blandet");
@@ -253,22 +263,29 @@ function koer() {
     nv.nyOpgave(parAf("Fe3-Cl+Na-OH"), false);
     var fejlKlik = -1;
     nv.s.chips.forEach(function (c, i) { if (!c.ion && fejlKlik < 0) fejlKlik = i; });
-    nv.valgKlik(fejlKlik);
-    paastand("niveau 2: forkert ion giver forklaring", nv.trin === 0 && nv.besked.klasse === "skidt");
-    nv.s.chips.forEach(function (c, i) { if (c.ion === nv.o.A.kat) nv.valgKlik(i); });
+    var indexAf = function (ion) { var ud = -1; nv.s.chips.forEach(function (c, i) { if (c.ion === ion) ud = i; }); return ud; };
     var synlige = function (g) { return nv.baeger.ioner.filter(function (p) { return p.glas === g; }).every(function (p) { return p.maalAlfa === 1; }); };
-    paastand("niveau 2: én ion fra et salt fundet, glassene er stadig tomme", !synlige("A") && !synlige("B"));
-    nv.s.chips.forEach(function (c, i) { if (c.ion === nv.o.A.an) nv.valgKlik(i); });
+    svar(nv, [fejlKlik, indexAf(nv.o.A.kat)]);
+    paastand("niveau 2: et forkert valg med giver forklaring, og intet godkendes", nv.trin === 0 && nv.besked.klasse === "skidt"
+        && nv.s.forkerte[fejlKlik] && !nv.s.fundneIoner[nv.o.A.kat.id] && nv.s.valgt.indexOf(indexAf(nv.o.A.kat)) >= 0);
+    nv.indsend();
+    paastand("niveau 2: én ion fra et salt fundet, glassene er stadig tomme", nv.s.fundneIoner[nv.o.A.kat.id] && !synlige("A") && !synlige("B"));
+    svar(nv, indexAf(nv.o.A.an));
     paastand("niveau 2: begge ioner fra " + nv.o.A.formel + " fundet, de dukker op i dets glas", synlige("A") && !synlige("B"));
-    nv.s.chips.forEach(function (c, i) { if (c.ion && !nv.s.fundneIoner[c.ion.id]) nv.valgKlik(i); });
-    paastand("niveau 2: fire ioner fundet, trin 2", nv.trin === 1);
+    svar(nv, [indexAf(nv.o.B.kat), indexAf(nv.o.B.an)]);
+    paastand("niveau 2: fire ioner fundet, kortet bliver på trin 1 med Næste trin", nv.trin === 0 && !!nv.klaret
+        && /Næste trin/.test((d.querySelector("#tekstboks [data-videre]") || {}).textContent || ""));
+    nv.videre();
+    paastand("niveau 2: Næste trin fører til trin 2, og kortet beder om at slå op", nv.trin === 1 && !!d.getElementById("slaa-op"));
     nv.tabelKlik("Na", "Cl");
     paastand("niveau 2: det letopløselige par giver L-forklaring", nv.trin === 1 && /letopløseligt/.test(nv.besked.tekst));
     nv.tabelKlik("Fe3", "OH");
-    paastand("niveau 2: Fe(OH)₃ fundet, tilskuerionerne streget ud", nv.trin === 2 && d.querySelectorAll("#tavle .ion.tilskuer").length === 2);
-    nv.s.formelValg.forEach(function (v, i) { if (v.rigtig) nv.valgKlik(i); });
+    paastand("niveau 2: Fe(OH)₃ fundet, tilskuerionerne streget ud", !!nv.klaret && d.querySelectorAll("#tavle .ion.tilskuer").length === 2);
+    nv.videre();
+    svar(nv, nv.s.formelValg.map(function (v) { return v.rigtig; }).indexOf(true));
+    nv.videre();
     paastand("niveau 2: formlen valgt, trin 4", nv.trin === 3);
-    nv.s.k = [1, 3, 1]; nv.s.t = ["aq", "aq", "s"]; nv.tjek();
+    nv.s.k = [1, 3, 1]; nv.s.t = ["aq", "aq", "s"]; nv.indsend();
     paastand("niveau 2: ionskemaet afstemt, løst", nv.faerdig && !nv.vist && nv.loest === 1);
     paastand("niveau 2: tavlen viser Fe³⁺(aq) + 3 OH⁻(aq) → Fe(OH)₃(s)",
         d.getElementById("tavle").textContent.indexOf("Fe³⁺(aq) + 3 OH⁻(aq) → Fe(OH)₃(s)") >= 0);
@@ -284,9 +301,12 @@ function koer() {
     paastand("niveau 3: ionerne i Pb(NO₃)₂ er i glasset, KI's er ikke",
         ns.baeger.ioner.every(function (p) { return (p.glas === "A") === (p.maalAlfa === 1); }));
     ns.s.felt.B1 = tast("I-"); ns.tjek();
-    paastand("niveau 3: ionerne godkendt, trin 2", ns.trin === 1);
-    ns.tabelKlik("Pb", "I");
-    ns.s.felt.P = tast("PbI2"); ns.tjek();
+    paastand("niveau 3: ionerne godkendt, felterne låst, kortet venter på Næste trin", ns.trin === 0 && !!ns.klaret
+        && d.querySelectorAll("#tavle .skrivefelt:not([readonly])").length === 0);
+    ns.videre();
+    paastand("niveau 3: trin 2", ns.trin === 1);
+    ns.tabelKlik("Pb", "I"); ns.videre();
+    ns.s.felt.P = tast("PbI2"); ns.tjek(); ns.videre();
     paastand("niveau 3: PbI₂ godkendt, trin 4 med formlen skrevet i forvejen", ns.trin === 3 && ns.s.felt.f2 === "PbI₂");
     ns.s.felt.k0 = ""; ns.s.felt.f0 = tast("Pb2+"); ns.s.felt.t0 = "aq";
     ns.s.felt.k1 = ""; ns.s.felt.f1 = tast("2I-"); ns.s.felt.t1 = "aq"; ns.s.felt.t2 = "s";
@@ -315,9 +335,10 @@ function koer() {
     paastand("niveau 3: Enter tjekker", ns.besked.klasse === "skidt" && ns.s.ok.B0 === "Ag", ns.besked.tekst);
 
     ns.nyOpgave();
-    for (i = 0; i < 8 && !ns.faerdig; i++) ns.knap();
+    for (i = 0; i < 16 && !ns.faerdig; i++) ns.knap();
     paastand("niveau 3: kun hjælpeknappen gennemfører opgaven, tælleren står stille", ns.faerdig && ns.vist && ns.loest === 1);
-    paastand("niveau 3: hjælpeknappen hedder Ny opgave til sidst", d.getElementById("opgaveknap").textContent === "Ny opgave");
+    paastand("niveau 3: knappen hedder Ny opgave til sidst, og hintknappen er væk", !d.getElementById("opgaveknap")
+        && /Ny opgave/.test((d.querySelector("#tekstboks [data-videre]") || {}).textContent || ""));
 
     overskrift("9. Mange tilfældige opgaver i glassene");
     fejlliste = [];
@@ -353,23 +374,29 @@ function koer() {
         paastand("første gang Middel åbnes, står der Start præsentation og Nej tak, og han kommer ikke af sig selv",
             !tilbud.hidden && !lr.laererIIntro() && !(lr.introVent > 0));
         tilbud.querySelector(".tilbud-start").click();
-        korL(1.2);
-        paastand("Start præsentation: han går ind og præsenterer Middel", tilbud.hidden && lr.laererIIntro() && lr.introId === "vaelg");
-        paastand("knappen Spring præsentationen over står fremme", !d.getElementById("spring-over").hidden);
-        var pegede = false;
-        for (var t = 0; t < 30 * 60 && lr.laererIIntro(); t++) {
-            lr.opdater(1 / 60);
-            if (d.getElementById("opgavekort").classList.contains("peg")) pegede = true;
-        }
-        paastand("han peger på opgavekortet, mens han taler om trinene", pegede);
-        paastand("han går igen af sig selv, og knappen forsvinder", !lr.laererIIntro() && d.getElementById("spring-over").hidden
-            && !d.getElementById("opgavekort").classList.contains("peg"));
-        NK.visNiveau("tabel"); korL(0.5); NK.visNiveau("vaelg"); korL(1.5);
+        korL(3);
+        var boble = d.getElementById("laerred-boble");
+        paastand("Start præsentation: han går ind og præsenterer Middel med Næste og Spring præsentationen over",
+            tilbud.hidden && lr.laererIIntro() && lr.introId === "vaelg" && !!boble && !boble.hidden
+            && boble.querySelector(".km-tekst").textContent === D.INTRO.vaelg[0].tekst);
+        var rOpg = d.getElementById("opgavekort").getBoundingClientRect(), r0 = NK.Fremhaev.synlige()[0];
+        paastand("trin 1 på Middel: trinene i panelet har en gul ramme, og han peger op mod dem",
+            NK.Fremhaev.synlige().length === 1 && Math.abs(r0.left - (rOpg.left - 5)) < 2 && lr.laerer.arm > -0.25 && lr.laerer.arm < 1.6,
+            lr.laerer.arm.toFixed(2));
+        korL(25);
+        paastand("han går ikke videre af sig selv (25 s)", lr.laererIIntro() && lr.introStatus().nr === 0);
+        boble.querySelector(".km-naeste").click(); korL(1);
+        paastand("trin 2 på Middel: tavlen og de to glas har en gul ramme, og han peger op mod tavlen",
+            lr.introStatus().nr === 1 && NK.Fremhaev.synlige().length === 3 && lr.laerer.arm > -0.25 && lr.laerer.arm < 0.6,
+            NK.Fremhaev.synlige().length + " / " + lr.laerer.arm.toFixed(2));
+        NK.visNiveau("tabel"); korL(0.5);
+        paastand("et andet niveau sender ham ud", !lr.laererIIntro() && boble.hidden);
+        NK.visNiveau("vaelg"); korL(1.5);
         paastand("anden gang Middel åbnes, præsenterer han ikke igen", !lr.laererIIntro());
-        lr.startIntro("vaelg", true); korL(1);
-        paastand("K viser præsentationen igen", lr.laererIIntro());
-        d.getElementById("spring-over").click(); korL(0.2);
-        paastand("Spring over sender ham ud", !lr.laererIIntro());
+        lr.startIntro("vaelg", true); korL(2.5);
+        paastand("K viser præsentationen igen", lr.laererIIntro() && !boble.hidden);
+        boble.querySelector(".km-spring").click(); korL(0.2);
+        paastand("Spring præsentationen over sender ham ud", !lr.laererIIntro() && boble.hidden);
         NK.visNiveau("skriv"); korL(1.2);
         var visteTilbud = !tilbud.hidden;
         d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
@@ -377,18 +404,97 @@ function koer() {
             !!(JSON.parse(w.localStorage.getItem("nk-sc2.4-intro")) || {}).skriv);
         NK.visNiveau("vaelg"); korL(0.3);
         paastand("et niveau, der er set, viser ikke tilbuddet", tilbud.hidden);
-        lr.startIntro("skriv", true); korL(1);
+        lr.startIntro("skriv", true); korL(2.5);
         d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
         paastand("Esc under præsentationen sender ham ud", !lr.laererIIntro());
-        var lange = [];
-        Object.keys(D.INTRO).forEach(function (id) {
-            D.INTRO[id].forEach(function (l) { if (l.length > 60) lange.push(l); });
+        NK.visNiveau("tabel"); NK.niveauer.tabel.nyOpgave(); lr.startIntro("tabel", true); korL(2.5);
+        var iIntroLet = lr.laererIIntro();
+        NK.Opslag.aabn();
+        korL(0.2);
+        paastand("opslaget i fældningstabellen sender ham ud, så Esc lukker opslaget", iIntroLet && NK.Opslag.aaben() && !lr.laererIIntro(),
+            iIntroLet + " / " + NK.Opslag.aaben());
+        if (NK.Opslag.aaben()) NK.Opslag.luk(false);
+        korL(2);
+        /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+        var forkerte = [];
+        ["tabel", "vaelg", "skriv"].forEach(function (id) {
+            D.INTRO[id].forEach(function (l) {
+                var n = l.tekst.split(/[.?] /).length;
+                if (l.tekst.length > 420 || l.tekst.length < 100 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst)) forkerte.push(l.tekst.slice(0, 40));
+            });
         });
-        paastand("tre præsentationer à tre replikker på højst 60 tegn",
-            Object.keys(D.INTRO).length === 3 && lange.length === 0 && D.INTRO.tabel.length === 3, lange.join(" | "));
+        paastand("tre præsentationer à tre trin, hvert trin to til fire hele sætninger (højst 420 tegn)",
+            Object.keys(D.INTRO).length === 3 && forkerte.length === 0 && D.INTRO.tabel.length === 3, forkerte.join(" | "));
+
+        /* Den faelles test paa hver sværhedsgrad. startIntro(tving) er her
+           startIntro(id, tving), saa den kobles om, mens testen koerer. */
+        overskrift("10b. Kemichaels præsentation: ét trin ad gangen (fælles test)");
+        ["tabel", "vaelg", "skriv"].forEach(function (id) {
+            NK.visNiveau(id);
+            lr.stopIntro(); korL(2);
+            lr.introId = id;          /* introLinjer() er trinnene for introId */
+            lr.startIntro = function (tving) { return NK.Laerer.prototype.startIntro.call(this, id, tving); };
+            NK.Praesentation.selvtest(lr, korL).forEach(function (r) { paastand(id + ": " + r[0], r[1], r[2]); });
+            delete lr.startIntro;
+            korL(2);
+        });
+        NK.visNiveau("tabel"); korL(1);
     }
 
-    overskrift("11. Sproget");
+    overskrift("11. Tekstboksen og opslaget i fældningstabellen");
+    var Op = NK.Opslag, tb = d.getElementById("tekstboks"), panelTabel = d.getElementById("tabel-hjem");
+    NK.visNiveau("tabel");
+    nt.nyOpgave(parAf("Ag-NO3+Na-PO4"), false);
+    var r1 = tb.getBoundingClientRect(), r2 = d.getElementById("arbejdsbord").getBoundingClientRect(), r3 = d.getElementById("baeger-omraade").getBoundingClientRect();
+    paastand("tekstboksen står øverst i scenen, tavlen lige under og glassene nederst", r1.top < r2.top && r2.top < r3.top && r1.top < 90);
+    paastand("tekstboksen siger, hvad der blandes, og at der skal slås op", /Sølvnitrat og natriumphosphat blandes/.test(tb.textContent)
+        && /Slå de to nye par op i fældningstabellen/.test(tb.textContent) && !!d.getElementById("slaa-op"));
+    paastand("ingen tekstlinje nederst på arbejdsbordet", !d.getElementById("besked") || !!d.getElementById("besked").closest("#tekstboks"));
+    d.getElementById("slaa-op").click();
+    var ob = d.getElementById("opslag");
+    paastand("knappen Slå op åbner opslaget med tabellen og skemaet", Op.aaben() && !ob.hidden && !!ob.querySelector("#tabel .ftabel")
+        && /AgNO₃/.test(d.getElementById("opslag-skema").textContent) && !panelTabel.querySelector("#tabel"));
+    var rb = d.getElementById("opslag-boks").getBoundingClientRect();
+    paastand("opslaget fylder næsten hele skærmen (" + Math.round(rb.width) + " x " + Math.round(rb.height) + ")", rb.width > 0.9 * w.innerWidth && rb.height > 0.9 * w.innerHeight);
+    var celle = function (k, a) { return ob.querySelector('#tabel td[data-kat="' + k + '"][data-an="' + a + '"]'); };
+    celle("Ag", "NO3").click();
+    paastand("i opslaget giver det gamle par en forklaring i opslagets kort", /flasken/.test(d.getElementById("opslag-kort").textContent) && Op.aaben());
+    celle("Ag", "PO4").click();
+    paastand("første nye par fundet, opslaget bliver", Op.aaben() && !Op.lukker() && /\?/.test(d.getElementById("opslag-skema").textContent));
+    celle("Na", "NO3").click();
+    paastand("begge nye par fundet: opslaget lukker af sig selv om lidt", Op.aaben() && Op.lukker() && nt.s.fase === "b");
+    Op.lukNu();
+    paastand("tilbage ved blandingen: tabellen er i panelet igen, og kortet spørger, hvad der falder ud",
+        !Op.aaben() && ob.hidden && !!panelTabel.querySelector("#tabel .ftabel") && /Hvad falder ud\?/.test(tb.textContent)
+        && tb.querySelectorAll(".sk-knap").length === 4 && !/Begge nye par/.test(tb.textContent));
+    nt.nyOpgave(parAf("K-NO3+Na-Cl"), false);
+    d.querySelector('#tabel-hjem td[data-kat="Na"][data-an="NO3"]').click();
+    paastand("et klik på tabellen i panelet åbner opslaget i stedet for at svare", Op.aaben() && (nt.s.fundne || []).length === 0);
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc lukker opslaget, og knappen Slå op står der stadig", !Op.aaben() && !!d.getElementById("slaa-op"));
+    NK.visNiveau("vaelg");
+    nv.nyOpgave(parAf("Fe3-Cl+Na-OH"), false);
+    nv.knap(); nv.knap(); nv.videre();
+    d.getElementById("slaa-op").click();
+    celle("Fe3", "OH").click();
+    paastand("Middel: det tungtopløselige par fundet i opslaget, opslaget lukker", Op.lukker() && !!nv.klaret
+        && /Fe³⁺ og OH⁻ er T/.test(d.getElementById("opslag-kort").textContent));
+    Op.lukNu();
+    paastand("Middel: kortet bliver på trin 2 med forklaringen og Næste trin", !Op.aaben() && nv.trin === 1
+        && /Fe³⁺ og OH⁻ er T/.test(tb.textContent) && !!tb.querySelector("[data-videre]"));
+    var hMax = 0;
+    ["tabel", "vaelg", "skriv"].forEach(function (id) {
+        NK.visNiveau(id);
+        var n = NK.niveauer[id];
+        for (var r = 0; r < 4; r++) {
+            n.nyOpgave();
+            for (var k2 = 0; k2 < 14 && !n.faerdig; k2++) { hMax = Math.max(hMax, tb.offsetHeight); n.knap(); }
+            hMax = Math.max(hMax, tb.offsetHeight);
+        }
+    });
+    paastand("tekstboksen er højst 215 px høj ved 1400 x 860 (" + hMax + " px)", hMax <= 215);
+
+    overskrift("12. Sproget");
     var tekster = [d.body.innerText];
     D.PAR.forEach(function (p) {
         var o = D.lavOpgave(p);
@@ -401,7 +507,7 @@ function koer() {
         }
     });
     Object.keys(D.FINDES_IKKE).forEach(function (k) { tekster.push(D.FINDES_IKKE[k]); });
-    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k]); });
+    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { tekster.push(l.tekst); }); });
     ["tabel", "vaelg", "skriv"].forEach(function (id) {
         NK.NIVEAUER[id].trin.forEach(function (t) { tekster.push(typeof t.spm === "string" ? t.spm : "", t.navn); });
     });

@@ -31,7 +31,7 @@ holder styr på brættet, pointene og tiden. Hører til kategorien Spil
 | `index.html` | toplinje, scene, podier, reglerne og rundvisningen |
 | `css/stil.css` | alt udseende |
 | `js/kerne.js` | fælles hjælpere (som i sc2.4) |
-| `js/data.js` | **de to quizzer** og Kemichaels replikker |
+| `js/data.js` | **de to quizzer** og Kemichaels præsentation |
 | `js/spil.js` | reglerne og pointene, uden tegning |
 | `js/tekstformat.js` | quizzen som tekst: eksport, upload, kontrol og AI-vejledningen |
 | `js/lyd.js` | de originale lyde, hvis de findes, ellers spillets egne |
@@ -121,11 +121,20 @@ altså C), i stedet for den gamle Ion-Tetris, og i `FEEDBACK_EMNER` i
 `samling_alt.html`. B-udgaven (`index.html#b`) har ingen knap endnu, fordi der ikke
 er en spil-samling på B.
 
-## Tilbuddet om præsentationen
+## Tilbuddet om præsentationen og Kemichael
 
-Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
-åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
+Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang
+titelskærmen vises, står der Start præsentation og Nej tak midt foroven. Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
-Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
+spørge. Præsentationen er den fælles (`../kemichael/praesentation.js`,
+brugerens regler 4. nov. 2026): tre trin i `D.INTRO.titel` med to til fire
+hele sætninger i Kemibogens sprog, en taleboble ved hans hoved med **Næste**
+(på sidste trin **Afslut**) og **Spring præsentationen over**, og en gul
+ramme om det, han peger på (quizzens navn, opsætningen, Regler og ?). Han
+står til venstre for opsætningen og går aldrig videre af sig selv. Esc og
+Start spillet sender ham ud. `js/app.js` pakker lærerens `startIntro` ind
+(`NK.Praesentation.pakInd`), og `js/laerer.js` lægger præsentationen på
+(`NK.Praesentation.trin`). Under spillet kommer han ikke ind af sig selv; der er
+ingen replikker ved slutskærmen. Den gamle `js/praesentation.js`, knappen
+"Spring præsentationen over" midt i scenen og de tre korte replikker (med
+vittigheden om beløbene) er fjernet 4. nov. 2026.

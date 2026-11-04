@@ -147,22 +147,27 @@
     /* Lydknappen i toplinjen (kun paa svaerhedsgrader med musik) */
     D.LYD = { til: "Musik fra (M)", fra: "Musik til (M)" };
 
-    /* Kemichaels praesentation af startskaermen: hoejst ca. 60 tegn pr.
-       linje og ingen teori. Linjen i INTRO_PEG siger han, mens han peger
-       paa valgene. */
-    D.INTRO = {
-        start: [
-            "Velkommen til labyrinten. Jeg venter herude.",
-            "Vælg sværhedsgrad og emne. Løb så ind i det rigtige rum.",
-            "Spøgelserne kan ikke kemi. De kan til gengæld løbe."
-        ]
-    };
-    D.INTRO_PEG = 1;
+    /* ----- Kemichael ------------------------------------------------------
+       Praesentationen af startskaermen (../kemichael/praesentation.js):
+       ét trin ad gangen, og eleven trykker Naeste. Hvert trin er to til
+       fire hele saetninger i Kemibogens sprog, uden vittigheder og uden
+       teori. sel: det, han peger paa, og som faar en gul ramme, der
+       blinker (CSS-selectorer paa startskaermen og i toplinjen). */
+    D.INTRO = [
+        { tekst: "I dette spil repeterer du emner fra Kemi C. Hver opgave er et spørgsmål, og svaret står på et skilt i et af labyrintens fire rum. Du styrer Pacman med piletasterne og løber ind i rummet med det rigtige svar, før et spøgelse fanger dig." },
+        { tekst: "Først vælger du en sværhedsgrad. Sværhedsgraden bestemmer, hvor længe spøgelserne sover, hvor hurtigt de løber, og hvor ofte du må holde pause. På Svær kommer der flere spøgelser til undervejs.",
+          sel: "#svaerhed" },
+        { tekst: "Bagefter vælger du et emne eller Mix, der blander opgaver fra alle de andre emner. Du har tre liv i hvert forløb, og et forkert rum eller et spøgelse koster et liv. Prikkerne på et emne viser, hvilke sværhedsgrader du har klaret.",
+          sel: "#emner" },
+        { tekst: "Løber du ind i et forkert rum, står der et hint til netop den fejl under spørgsmålet. Knappen Regler viser alle reglerne og tastaturets genveje, og knappen med spørgsmålstegnet viser dig rundt på skærmen.",
+          sel: ["#regelknap", "#hjaelpknap"] }
+    ];
 
-    /* Han kommer forbi, naar nogen bliver Labyrintmester */
+    /* Han kommer kun af sig selv, naar nogen bliver Labyrintmester (hele
+       spillet er klaret). Én replik, trukket tilfaeldigt. */
     D.MESTER_REPLIK = [
-        "Labyrintmester. Spøgelserne har søgt om orlov.",
-        "Labyrintmester. Det skriver jeg i protokollen.",
-        "Labyrintmester. Spøgelserne vil have en omkamp."
+        "Du er nu Labyrintmester. Spøgelserne har søgt om orlov.",
+        "Du er nu Labyrintmester, og det skriver jeg i protokollen.",
+        "Du er nu Labyrintmester. Spøgelserne vil gerne have en omkamp."
     ];
 }());

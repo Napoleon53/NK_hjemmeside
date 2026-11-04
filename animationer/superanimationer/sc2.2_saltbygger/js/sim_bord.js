@@ -60,10 +60,9 @@
         NK.el("bord-afslut").addEventListener("click", function () { mig.visFrit(); });
 
         /* Kemichael (laerer.js): han tegnes paa bordets laerred, og et klik
-           paa ham under praesentationen taeller med. */
+           paa ham under praesentationen viser knappen Naeste. */
         this.L = this.bord.l;
         this.tid = 0;
-        NK.el("bord-spring").addEventListener("click", function () { mig.springIntro(); });
         this.L.canvas.addEventListener("click", function (e) {
             var r = mig.L.canvas.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
             if (mig.laererIntroKlik && mig.laererIntroKlik(x, y)) return;

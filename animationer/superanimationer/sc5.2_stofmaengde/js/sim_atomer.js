@@ -136,7 +136,6 @@
         Array.prototype.forEach.call(this.el.valg, function (k) {
             k.addEventListener("click", function () { mig.vaelgSvar(k.getAttribute("data-svar")); });
         });
-        NK.el("atomer-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.besked = function (html, klasse) {
@@ -435,9 +434,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-atomer", tilbud: "atomer-tilbud", spring: "atomer-spring" });
-
-    P.pegPaaFelt = function (til) { NK.el("atomer-valg").classList.toggle("peg", til); };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-atomer", tilbud: "atomer-tilbud" });
 
     NK.SimAtomer = SimAtomer;
 }());

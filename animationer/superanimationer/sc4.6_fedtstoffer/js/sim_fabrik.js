@@ -424,7 +424,6 @@
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
         NK.el("fabrik-forfra").addEventListener("click", function () { mig.nulstil(); });
-        NK.el("fabrik-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.besked = function (html, klasse) {
@@ -864,9 +863,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-fabrik", tilbud: "fabrik-tilbud", spring: "fabrik-spring" });
-
-    P.pegPaaFelt = function () {};
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-fabrik", tilbud: "fabrik-tilbud" });
 
     NK.SimFabrik = SimFabrik;
 }());

@@ -1,0 +1,175 @@
+/* =====================================================================
+   kemichael/praesentation.css - Kemichaels taleboble under
+   praesentationen og den gule ramme om det, han peger paa
+
+   Hoerer til kemichael/praesentation.js. Boblen er et lyst papirkort med
+   Lexend ligesom scenekortet (faelles/papirkort.css), saa praesentationen
+   ser ud som resten af teksten i animationen. Den har plads til to til
+   fire hele saetninger (brugerens oenske 4. nov. 2026: han siger mere ad
+   gangen) og to knapper: Naeste og Spring praesentationen over.
+   Decimaltal skrives med PUNKTUM i CSS.
+   ===================================================================== */
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("../faelles/lexend/lexend-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("../faelles/lexend/lexend-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.km-boble[hidden], .km-ramme[hidden] { display: none !important; }
+
+/* Boblen ligger oven paa scenen, saa intet i tegningen kan daekke den.
+   praesentation.js saetter left og top hvert billede. */
+.km-boble {
+    position: absolute;
+    left: 90px;
+    top: 90px;
+    z-index: 40;
+    box-sizing: border-box;
+    width: clamp(300px, 44%, 440px);
+    max-width: calc(100% - 16px);
+    padding: 13px 16px 12px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    border: 1px solid #b9b3a3;
+    border-radius: 14px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    text-align: left;
+}
+
+.km-tekst {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.km-linje {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.km-boble button {
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* Naeste er hovedknappen, som Indsend svar paa scenekortet */
+.km-naeste {
+    background-color: #2a76ac;
+    color: #ffffff;
+    border: 1px solid #2a76ac;
+    border-radius: 9px;
+    padding: 8px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.km-naeste span { margin-left: 4px; }
+.km-naeste:hover { background-color: #22618e; }
+.km-naeste:focus-visible, .km-spring:focus-visible { outline: 3px solid #e0b22e; outline-offset: 2px; }
+
+.km-tal {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #6b6659;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Spring praesentationen over: en stille knap med kant */
+.km-spring {
+    margin-left: auto;
+    background-color: transparent;
+    color: #3a4150;
+    border: 1px solid #c9c3b3;
+    border-radius: 9px;
+    padding: 7px 10px;
+    font-size: 0.86rem;
+    font-weight: 500;
+}
+
+.km-spring:hover { background-color: #efece2; color: #1d2433; }
+
+/* Halen: et lille kvadrat paa hoejkant i boblens kant mod hans mund.
+   data-hale siger hvilken kant; --hale er afstanden langs kanten. */
+.km-hale {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #fbfaf6;
+    transform: rotate(45deg);
+}
+
+.km-boble[data-hale="ned"] .km-hale {
+    left: calc(var(--hale, 60px) - 9px);
+    bottom: -9px;
+    border-right: 1px solid #b9b3a3;
+    border-bottom: 1px solid #b9b3a3;
+}
+
+.km-boble[data-hale="venstre"] .km-hale {
+    left: -9px;
+    top: calc(var(--hale, 40px) - 9px);
+    border-left: 1px solid #b9b3a3;
+    border-bottom: 1px solid #b9b3a3;
+}
+
+.km-boble[data-hale="hoejre"] .km-hale {
+    right: -9px;
+    top: calc(var(--hale, 40px) - 9px);
+    border-right: 1px solid #b9b3a3;
+    border-top: 1px solid #b9b3a3;
+}
+
+.km-boble[data-hale="ingen"] .km-hale { display: none; }
+
+/* Et klik paa Kemichael under praesentationen: Naeste viser sig */
+@keyframes km-puf {
+    0%   { box-shadow: 0 0 0 0 rgba(224, 178, 46, 0.9); transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { box-shadow: 0 0 0 16px rgba(224, 178, 46, 0); transform: scale(1); }
+}
+
+.km-naeste.puf { animation: km-puf 0.7s ease-out 2; }
+
+/* Den gule ramme om det, Kemichael peger paa. Den blinker, ligger oven
+   paa siden og fanger ingen klik. */
+.km-ramme {
+    position: fixed;
+    z-index: 39;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 3px solid #f2c53d;
+    border-radius: 12px;
+    background-color: rgba(242, 197, 61, 0.1);
+    animation: km-blink 0.9s ease-in-out infinite;
+}
+
+@keyframes km-blink {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.6); }
+    50%      { opacity: 0.35; box-shadow: 0 0 0 9px rgba(242, 197, 61, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .km-ramme { animation: none; }
+}

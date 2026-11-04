@@ -24,7 +24,8 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
    en masseprocent mellem ca. 1,5 og 4 %, buretten med en hane i trin, den gule
    chromatindikator, der bliver rødbrun, mikroniveauet med Cl⁻, Ag⁺, AgCl, CrO₄²⁻
    og Ag₂CrO₄, kurven over ionfordelingen, beregningen i trin og den sarkastiske
-   besked ved overtitrering (hindbærsmoothie er blevet til tomatsuppe). Ud:
+   besked ved overtitrering (hindbærsmoothie er blevet til tomatsuppe; fra 4. nov.
+   2026 kun første gang og derefter hver tredje, se Kemichael nedenfor). Ud:
    beregningen i en pop-up, knappen "Afslut titrering", toast-beskederne, konfetti
    og genstart ved at genindlæse siden.
 3. **Naboerne:** `sc6.1` ejer koncentration og fortynding, `sc6.2` formel og aktuel
@@ -81,8 +82,7 @@ lyserøde, som i bogens figur `mohr-trin`. Hvorfor indikatoren binder, er ikke v
 Ag₂CrO₄. Teorien viser kun delen om den valgte indikator; delen om
 dichlorfluorescein nævner, at metoden er opkaldt efter Mohr, som brugte
 kaliumchromat, og at chromat ikke bruges i skolen, fordi det er kræftfremkaldende.
-Kemichael siger "lyserød", og langt forbi omslaget laver man hindbærsmoothie i
-stedet for tomatsuppe. På smalle skærme forsvinder ordet Indikator (under 1250
+Kemichael siger "lyserød" i præsentationen og rosen. På smalle skærme forsvinder ordet Indikator (under 1250
 px), den fravalgte knap viser kun sin farveprik (under 1060 px), og fanerne får
 deres egen linje (under 960 px).
 
@@ -108,14 +108,40 @@ begge kolber til omslaget.
 Tabellen i panelet viser forbrug og masseprocent for A og B, og et forkert
 svar får en forklaring, der passer til netop det svar.
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation, tre
-replikker pr. fane. Han roser første gang en titrering er præcis, første gang en
-beregning er færdig og efter den sjette situation. Han bemærker det, når kolben
-er langt forbi omslaget ("Stop nu, medmindre du vil lave tomatsuppe."), og når
-buretten er løbet tom. Påskeæg: et resultat, der rammer havvandets masseprocent
-på hundrededelen, og glimtet om hans første titrering, når resultatet er langt
-for højt. Kaffekoppen er det fælles påskeæg. Han er den samme som i sc7.4, ikke
-den rolige Kemichael fra sc6.1 og sc6.2.
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles (`../kemichael/praesentation.js`, brugerens regler
+4. nov. 2026): tre trin pr. fane med to til fire hele sætninger i Kemibogens sprog,
+en taleboble med Næste og Spring præsentationen over, og en gul ramme om det, han
+peger på (de usynlige `.anker` over lærredet, kortene i panelet og på fane 3
+kolberne med skiltene, `introFelt` i `js/laerer.js`). Han går
+aldrig videre af sig selv. Teksterne står i `D.INTRO_*` i `js/data.js`
+(`D.INTRO_TITRERING` skrives af `D.saetOrd`, fordi farverne afhænger af
+indikatoren).
+
+Ellers kommer han kun ind, når en fane er klaret første gang i browseren, og ved
+to påskeæg:
+
+* Fane 1, første præcise titrering: "Kolben blev lyserød på den sidste dråbe.
+  Nogle elever bruger et helt år på at nå den præcision." (rødbrun med
+  kaliumchromat)
+* Fane 2, første færdige beregning: "Du har beregnet masseprocenten ud fra
+  forbruget i buretten. Saltet i havvandet er nu talt."
+* Fane 3, efter den sjette situation: "Du har gennemført alle seks opgaver om
+  fejlkilder. Det blev til tolv kolber, og opvasken tager jeg ikke."
+* Påskeæg, buretten løbet tom: "Du har tømt hele buretten. Sølvnitrat er ikke
+  gratis." (en tør bemærkning, ikke ros)
+* Påskeæg, elevens egen måling rammer havvandets masseprocent på hundrededelen:
+  "Dit resultat rammer havvandets masseprocent på hundrededelen. Det har jeg
+  aldrig selv gjort."
+
+* Når kolben er over 1 mL forbi omslaget: "Stop nu, medmindre du vil lave
+  hindbærsmoothie." (tomatsuppe med kaliumchromat). Én gang pr. prøve, og kun
+  første gang og derefter hver tredje gang i samme besøg (brugerens valg 4. nov.
+  2026, `tjekMork` i js/sim_titrering.js).
+
+Taget ud 4. nov. 2026: glimtet om hans første titrering, når resultatet er over
+25 % for højt, fordi det kommenterede en fejl, der er almindelig. Kaffekoppen er det fælles påskeæg. Han er den samme
+som i sc7.4, ikke den rolige Kemichael fra sc6.1 og sc6.2.
 
 Direkte links: `index.html#beregning` og `index.html#fejlkilder` (også `#kolber`
 og `#forbrug`). Fanens id er stadig `fane-forbrug`.
@@ -125,7 +151,8 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>R</kbd> ny prøve eller forfra · <kbd>I</kbd> skift indikator · <kbd>Enter</kbd> videre ·
 <kbd>mellemrum</kbd> åbn og luk hanen · <kbd>D</kbd> én dråbe ·
 <kbd>←</kbd> <kbd>→</kbd> hanen mindre og mere åben · <kbd>Esc</kbd> luk eller
-send Kemichael ud.
+spring præsentationen over · under præsentationen er <kbd>Enter</kbd> og
+<kbd>→</kbd> Næste.
 
 ### Det nye i forhold til den gamle animation
 
@@ -159,7 +186,6 @@ js/tegning.js       rummet, opstillingen, dråberne, skyderen, flasken, keglen o
                     (sc7.4's med rødbrune skyer og fnug af AgCl)
 js/lup.js           luppen med de 8 Cl⁻ og bundfaldet (fane 1)
 js/graf.js          kurven over stofmængderne og luppen på menisken i panelet
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_titrering.js fane 1
 js/sim_beregning.js fane 2
 js/sim_forbrug.js   fane 3
@@ -190,14 +216,15 @@ typiske fejl, at sproget holder reglerne, at fane 1 kan gennemføres med musen,
 at luppen og kurven viser det samme som kolben, at Vis svaret rammer omslaget ved
 seks prøver, at overtitrering og en tom burette opfører sig rigtigt, at fane 2
 og 3 kan gennemføres, at alle kolber på fane 3 er rødbrune til sidst, at
-Kemichael kan vises og sendes ud på alle faner, og at layoutet (også fanerne i
+Kemichaels præsentation viser trinnene ét ad gangen med Næste og Spring
+præsentationen over på alle faner (den fælles test), og at layoutet (også fanerne i
 toplinjen) holder fra 520 × 380 til 1500 × 900. Afsnit 1 til 10 kører med
 kaliumchromat. Afsnit 11 kører dichlorfluorescein: knapperne og teorien, modellen
 (samme ækvivalenspunkt, omslag inden for 0,01 mL, farveordene og sølvet regnet
 med), fane 1 med luppen og kurven, overtitrering, et skift midt i en titrering,
 tasten I, replikkerne, rundvisningen og fane 3. Den kræver en lokal server eller
 Chrome med `--allow-file-access-from-files`, og den lægger elevens valg tilbage
-bagefter. Sidst kørt 18. oktober 2026: ALT OK (130 påstande).
+bagefter. Sidst kørt 4. november 2026: ALT OK (168 påstande).
 
 ## Forenklinger
 
@@ -236,8 +263,9 @@ bagefter. Sidst kørt 18. oktober 2026: ALT OK (130 påstande).
 Som i sc7.4: første gang en fane åbnes, står der Start præsentation og Nej tak
 midt foroven i scenen. Start sender ham ind, Nej tak og Esc husker valget, og K
 viser præsentationen uden at spørge. Tilbuddet forsvinder også, når eleven har
-gjort noget på fanen. Koden er `js/praesentation.js`, koblet med
-`NK.Praesentation.kobl` i hver `sim_*.js`.
+gjort noget på fanen. Koden er den fælles `../kemichael/praesentation.js`,
+koblet med `NK.Praesentation.kobl` i hver `sim_*.js` og
+`NK.Praesentation.trin` i `js/laerer.js`.
 
 ## I menuen
 

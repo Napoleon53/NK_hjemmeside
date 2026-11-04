@@ -306,7 +306,6 @@
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
         NK.el("skala-nulstil").addEventListener("click", function () { mig.nulstil(); });
-        NK.el("skala-spring").addEventListener("click", function () { mig.springIntro(); });
         this.el.liste.addEventListener("click", function (e) {
             var r = e.target.closest ? e.target.closest("[data-id]") : null;
             if (!r) return;
@@ -539,14 +538,14 @@
         ctx.stroke();
         ctx.restore();
         var m = lay.meter;
-        var ud = Tg.phmeter(ctx, m.x, m.bund, m.h, this.visning, { lys: this.pegMeter ? puls : 0 });
+        var ud = Tg.phmeter(ctx, m.x, m.bund, m.h, this.visning, { lys: 0 });
         var sp = this.elektrodeSpids();
 
         /* Stofferne paa bordet og det, der maales */
         var navnPx = NK.klamp(lay.px, 12, 15);
         this.stoffer.forEach(function (s) {
             if (s.status !== "hylde" || (tr && tr.s === s && tr.flyttet)) return;
-            var lys = (mig.over && mig.over.slags === "hylde" && mig.over.s === s) ? 0.8 : (mig.pegStoffer ? puls * 0.8 : 0);
+            var lys = (mig.over && mig.over.slags === "hylde" && mig.over.s === s) ? 0.8 : 0;
             Tg.stof(ctx, s.st.id, s.x, s.y, s.h, { lys: lys });
             ctx.save();
             var px = NK.passendeSkrift(ctx, s.st.navn, lay.plads - 4, navnPx, 11, "700");
@@ -703,10 +702,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-skala", tilbud: "skala-tilbud", spring: "skala-spring" });
-
-    /* Mens han siger, at man traekker stofferne op, lyser de */
-    P.pegPaaFelt = function (til) { this.pegStoffer = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-skala", tilbud: "skala-tilbud" });
 
     NK.SimSkala = SimSkala;
 }());

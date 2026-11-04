@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spændingsrækken</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
 <body>
 
@@ -35,16 +36,6 @@
         <div class="tilbud" id="fs-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
-        </div>
-        <!-- Kemichaels taleboble under praesentationen: han gaar foerst videre, naar eleven trykker Naeste -->
-        <div class="intro-boble" id="fs-spring" hidden>
-            <p class="intro-tekst" aria-live="polite"></p>
-            <div class="intro-linje">
-                <button class="intro-naeste" type="button">Næste <span>→</span></button>
-                <span class="intro-tal">1/1</span>
-                <button class="intro-spring" type="button">Spring over <span>✕</span></button>
-            </div>
-            <span class="intro-hale" aria-hidden="true"></span>
         </div>
         <div class="scene-mrk" id="fs-status"></div>
     </div>
@@ -80,16 +71,6 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <!-- Kemichaels taleboble under praesentationen: han gaar foerst videre, naar eleven trykker Naeste -->
-        <div class="intro-boble" id="rk-spring" hidden>
-            <p class="intro-tekst" aria-live="polite"></p>
-            <div class="intro-linje">
-                <button class="intro-naeste" type="button">Næste <span>→</span></button>
-                <span class="intro-tal">1/1</span>
-                <button class="intro-spring" type="button">Spring over <span>✕</span></button>
-            </div>
-            <span class="intro-hale" aria-hidden="true"></span>
-        </div>
         <div class="scene-mrk" id="rk-status"></div>
     </div>
 
@@ -123,16 +104,6 @@
         <div class="tilbud" id="fu-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
-        </div>
-        <!-- Kemichaels taleboble under praesentationen: han gaar foerst videre, naar eleven trykker Naeste -->
-        <div class="intro-boble" id="fu-spring" hidden>
-            <p class="intro-tekst" aria-live="polite"></p>
-            <div class="intro-linje">
-                <button class="intro-naeste" type="button">Næste <span>→</span></button>
-                <span class="intro-tal">1/1</span>
-                <button class="intro-spring" type="button">Spring over <span>✕</span></button>
-            </div>
-            <span class="intro-hale" aria-hidden="true"></span>
         </div>
         <div class="scene-mrk" id="fu-status"></div>
     </div>
@@ -217,7 +188,7 @@
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/lup.js"></script>
-<script src="js/praesentation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
 <script src="js/sim_forsoeg.js"></script>
 <script src="js/sim_raekken.js"></script>
 <script src="js/sim_forudsig.js"></script>

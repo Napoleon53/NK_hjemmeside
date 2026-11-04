@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grundstofudstillingen</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚛</span> Grundstofudstillingen</h1>
@@ -27,7 +29,7 @@
 <!-- Raekkerne i opgavekortet bygges af sim_montre.js                   -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-montre" role="tabpanel" aria-label="Udstillingen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="montre-laerred"></canvas>
         <div class="anker" id="montre-anker-montre"></div>
         <div class="anker" id="montre-anker-kasse"></div>
@@ -37,19 +39,30 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="montre-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="montre-status"></div>
+        <!-- Papirkortet oeverst midt i scenen (js/kort.js, brugerens beslutning
+             4. nov. 2026): opgaven, feltet, hint, beskeden og knapperne -->
+        <div class="scenekort opgave" id="montre-skort">
+            <p class="sk-tekst" id="montre-spm"></p>
+            <div class="sk-raekke" id="montre-raekke">
+                <input class="sk-input" id="montre-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Svar">
+                <span class="sk-facit" id="montre-facit" hidden></span>
+                <span class="sk-knapper" id="montre-knapper">
+                    <button class="knap hjaelp" id="montre-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend ikke-klar" id="montre-indsend" type="button">Indsend svar</button>
+                </span>
+            </div>
+            <div class="sk-bund" id="montre-status" hidden><p class="st-tekst" id="montre-besked" aria-live="polite"></p></div>
+            <div id="montre-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste proeve -->
+        <!-- Oversigten over proevens tre trin. Selve opgaven staar paa kortet i scenen. -->
         <div class="kort opgavekort" id="montre-kort">
             <h2><span id="montre-hoved">Prøve fra kassen</span><span class="taeller">på plads <b id="montre-loest">0</b>/36</span></h2>
             <div class="opgave-prompt" id="montre-prompt"></div>
-            <p class="opgave-spm" id="montre-spm"></p>
             <div class="raekker" id="montre-raekker"></div>
-            <p class="besked" id="montre-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="montre-knap" type="button">Giv hint</button></div>
+            <button class="knap" id="montre-oev" type="button" hidden><span>Øv prøven igen</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort" id="montre-fremskridt">
@@ -64,7 +77,7 @@
 <!-- FANE 2: FORMLERNE                                                  -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-formler" role="tabpanel" aria-label="Formlerne">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="formler-laerred"></canvas>
         <div class="anker" id="formler-anker-montre"></div>
         <div class="anker" id="formler-anker-flaske"></div>
@@ -74,18 +87,30 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="formler-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="formler-status"></div>
+        <!-- Papirkortet oeverst midt i scenen (js/kort.js, brugerens beslutning
+             4. nov. 2026): opgaven, feltet, hint, beskeden og knapperne -->
+        <div class="scenekort opgave" id="formler-skort">
+            <p class="sk-tekst" id="formler-spm"></p>
+            <div class="sk-raekke" id="formler-raekke">
+                <input class="sk-input" id="formler-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Svar">
+                <span class="sk-facit" id="formler-facit" hidden></span>
+                <span class="sk-knapper" id="formler-knapper">
+                    <button class="knap hjaelp" id="formler-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend ikke-klar" id="formler-indsend" type="button">Indsend svar</button>
+                </span>
+            </div>
+            <div class="sk-bund" id="formler-status" hidden><p class="st-tekst" id="formler-besked" aria-live="polite"></p></div>
+            <div id="formler-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
+        <!-- Oversigten over flasken. Selve opgaven staar paa kortet i scenen. -->
         <div class="kort opgavekort" id="formler-kort">
             <h2><span id="formler-niveau"></span><span class="taeller">flaske <b id="formler-nr">1</b>/<span id="formler-antal-i-niveau">4</span></span></h2>
             <div class="opgave-prompt formel" id="formler-prompt"></div>
-            <p class="opgave-spm" id="formler-spm"></p>
             <div class="raekker" id="formler-raekker"></div>
-            <p class="besked" id="formler-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="formler-knap" type="button">Giv hint</button></div>
+            <button class="knap" id="formler-oev" type="button" hidden><span>Tæl flasken igen</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort" id="formler-fremskridt">
@@ -110,7 +135,6 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="opraab-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
     </div>
 
     <aside class="panel">
@@ -190,7 +214,9 @@
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/opslag.js"></script>
-<script src="js/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
+<script src="../kemichael/praesentation.js"></script>
 <script src="js/sim_montre.js"></script>
 <script src="js/sim_formler.js"></script>
 <script src="js/sim_opraab.js"></script>

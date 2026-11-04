@@ -65,8 +65,8 @@ vand er polært." Sådan blev det:
 
 ## Hvad viser den
 
-Åbn **`index.html`**. Mappen er selvstændig bortset fra `../../v2/kemichael/`, som
-Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
+Åbn **`index.html`**. Mappen er selvstændig bortset fra `../../v2/kemichael/` og
+de fælles filer i `../kemichael/`, som Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 **Fane 1, Forsøget** (`#forsoeg`). Et glas vand og et glas heptan i et stativ.
 Først tre spørgsmål på kortet (D.START i `js/data.js`); prøveglasset er ikke
@@ -100,8 +100,26 @@ tekstboksen). Bliver formlen for lille på et bredt layout, bruges det smalle me
 kortet foroven (`beregnLayout` og `kortDele` i `js/bord.js`).
 
 **Kemichael** tilbyder at præsentere hver fane (Start præsentation / Nej tak).
-Ellers kommer han kun, når skemaet er fuldt (én gang pr. browser), når en runde
-er slut, og ved påskeægget: ryst et færdigt glas seks gange mere.
+Præsentationen er den fælles (`../kemichael/praesentation.js`, se
+`../kemichael/README.md`): tre trin pr. fane med to til fire hele sætninger i
+hvert, og taleboblen har knapperne Næste (på sidste trin Afslut) og Spring
+præsentationen over. Han går aldrig videre af sig selv, og det, han peger på,
+får en gul ramme, der blinker. Han står helt ude til venstre, så glasset med
+vand kan ses. <kbd>K</kbd> viser præsentationen igen, og <kbd>Esc</kbd> springer
+den over.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret, eller ved
+påskeægget (brugerens regel 4. nov. 2026): når skemaet er fuldt, én gang pr.
+browser ("Du har udført alle tolv forsøg uden at knuse et eneste glas. Det
+skriver jeg ned."), én gang pr. besøg, når en runde på fane 2 er slut med
+mindst otte rigtige ("Du har gættet rigtigt på de fleste stoffer, så forsøget
+havde ikke meget at tilføje.", ved ti rigtige "Du har ti rigtige ud af ti.
+Glassene kunne være blevet stående i skabet." og ved en ny rekord "Det er en ny
+rekord. Den skriver jeg ikke på tavlen."), og ved påskeægget, når et færdigt
+glas rystes seks gange mere ("Glassets indhold er allerede blandet. Det bliver
+ikke mere blandet af, at du ryster glasset igen." eller "Stofferne i glasset
+blandes ikke, uanset hvor meget du ryster glasset. Det har jeg selv prøvet."). Rosen
+efter en svag runde er fjernet.
 
 **Teori** og **?** (rundvisningen) ligger i toplinjen.
 
@@ -190,12 +208,11 @@ js/sprites.js          indlæser sprites; målene står i MAAL
 js/molekyle.js         læser og tegner strukturformlerne, finder de polære grupper
 js/glas.js             reagensglasset: modellen og tegningen af indholdet
 js/tegning.js          rummet, bordet, kortet, søjlen, prøveglasset, mærkaterne
-js/praesentation.js    tilbuddet om præsentationen (samme fil som i sc1.2)
 js/tekstboks.js        spørgsmålet, svarene og knappen på kortet i scenen
 js/bord.js             scenen, begge faner deler: layout, pipetten, musen
 js/sim_forsoeg.js      fane 1: skemaet og linjen under scenen
 js/sim_gaet.js         fane 2: grupperne, polært/upolært og forsøget som facit
-js/laerer.js           Kemichael
+js/laerer.js           Kemichael (præsentationen er den fælles i ../kemichael/praesentation.js)
 js/rundvisning.js      rundvisningen bag ?
 js/app.js              faneskift, genveje og tegneløkken
 _selvtest.html         udviklerværktøj, indgår ikke i animationen
@@ -218,10 +235,15 @@ _selvtest.html         udviklerværktøj, indgår ikke i animationen
 nabo-animationen, alle 28 forsøg (rigtigt glas, lagenes rækkefølge, tempo),
 spørgsmålene om vand og heptan (svar, hint, Vis svaret, mærkerne på glassene), fane 1
 med musen, polært/upolært, de polære grupper og alle seks stoffer, fane 2 med musen,
-gruppen, svaret, glasset, der ikke passer, hintet og en hel runde, Kemichael,
-sproget (hver tekst nævner selv stoffet) og layoutet fra 390 × 844 til 1500 × 900,
-også at hver tekst kan være i tekstboksen. 122 kontroller, ALT OK 23. okt. 2026. Chrome kræver
-`--allow-file-access-from-files` eller en lokal server.
+gruppen, svaret, glasset, der ikke passer, hintet og en hel runde, at
+Kemichael kun kommer ind af sig selv, når en hel fane er klaret, eller ved
+påskeægget, præsentationen på begge faner (den fælles test
+`NK.Praesentation.selvtest`), sproget (hver tekst nævner selv stoffet) og
+layoutet fra 390 × 844 til 1500 × 900, også at hver tekst kan være i
+tekstboksen. 152 kontroller 4. nov. 2026; de tre fejl i layoutet (tekstboksen
+ruller på fane 2 ved 520 × 380, 860 × 640 og 1100 × 700) fandtes også før
+Kemichael blev bygget om. Chrome kræver `--allow-file-access-from-files` eller
+en lokal server.
 
 ## I menuen
 

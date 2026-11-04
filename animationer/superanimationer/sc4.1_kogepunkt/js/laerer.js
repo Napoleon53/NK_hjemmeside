@@ -17,12 +17,18 @@
      laererPladsPx()       hvor laereren stiller sig, i pixels fra venstre
 
    Scener:
-     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil
+     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil.
+               Ét trin ad gangen med Naeste og Spring praesentationen
+               over; han peger paa det, der blinker, og gaar aldrig
+               videre af sig selv. Koden er faelles:
+               ../kemichael/praesentation.js (NK.Praesentation.trin).
      faerdig   fane 1: alle fire maal; fane 2: hvorfor er besvaret
      brand     fane 1: taendstikken antaendte gassen i ballonen. Han
                kommer, siger det, saetter et nyt glas med ny ballon i og
                gaar. Det taeller som et uheld i hans regnskab.
      slut      fane 3: runden er slut
+   Det er de eneste gange, han kommer ind af sig selv (brugerens regel
+   4. nov. 2026): en hel fane er klaret, eller ballonen braender.
    Kaffen staar paa bordet og er det faelles paaskeaeg.
    ===================================================================== */
 (function () {
@@ -88,74 +94,15 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen (som sc5.2) -----------------------------------------
-       Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke. Han
-       gaar kun, naar eleven vil det: knappen Spring praesentationen over, to
-       klik direkte paa ham eller Esc (laererIntroVaek). Fanen saetter
-       this.introTrin, saa den kan pege med det, han taler om.
-       peg: { linje: vinkel-funktion } for de linjer, hvor han peger. */
-    function introTrin(sim, linjer, standX, peg) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: standX },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            var v = peg && peg[i];
-            trin.push({ kald: function () { sim.introTrin = i + 1; } });
-            if (v) trin.push({ arm: v, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { sim.introTrin = 0; } },
-            { gaa: UDE }
-        ]);
-    }
-
-    /* knapId: knappen Spring praesentationen over paa fanen */
-    function introVaek(P, knapId) {
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(knapId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
-
-    /* Peg over paa panelet til hoejre */
-    function pegPaaPanelet(sim) {
-        return function () {
-            var s = sim.laererLaerredSkala();
-            return sim.pegVinkel(sim.L.b / s + 60, sim.L.h * 0.3 / s);
+    /* Under praesentationen staar han et andet sted end ellers, saa han
+       ikke daekker kammeret, reolen eller glassene, han fortaeller om.
+       introPx(lay) giver stedet i pixels. Han peger kun mod hoejre, saa
+       han staar til venstre for det meste af det, han viser. */
+    function introPlads(P, introPx) {
+        var plads = P.laererPlads;
+        P.laererPlads = function () {
+            if (this.kmIntro && this.lay) return Math.max(150, introPx(this.lay) / this.laererLaerredSkala());
+            return plads.apply(this, arguments);
         };
     }
 
@@ -207,33 +154,25 @@
         return this.lay ? Math.max(90, this.lay.kammer.x - 50) : 250;
     };
 
-    PV.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_VARM,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: (lay.hylde.x0 + lay.hylde.x1) / 2, y: (lay.hylde.top + lay.hylde.bund) / 2 } : null;
-                }),
-                1: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: lay.termo.x, y: lay.termo.yFor(mig.termo.T) } : null;
-                })
-            }), false);
-    };
-    introVaek(PV, "varm-spring");
+    /* Praesentationen: ét trin ad gangen med Naeste og Spring
+       praesentationen over (faelles, ../kemichael/praesentation.js) */
+    /* Foran venstre del af zoomvinduet: reolen og kammeret staar fri */
+    introPlads(PV, function (lay) { return lay.zoom.x + 0.22 * lay.zoom.b; });
+    PV.introLinjer = function () { return D.INTRO_VARM; };
+    NK.Praesentation.trin(PV);
 
+    /* Alle fire maal er naaet. Staar praesentationen, venter rosen. */
     PV.laererFaerdig = function () {
         if (!this.laerer) return;
+        if (this.kmIntro) { this.ventRos = 1; return; }
         this.laererKoer("faerdig", rosTrin(PV, D.MAAL_FAERDIG), false);
     };
 
     /* Taendstikken braendte ballonen: han kommer og saetter en ny i */
     PV.laererBrand = function () {
         var mig = this;
-        if (!this.laerer) { this.brand.nyTid = 1.5; return; }
+        /* Under praesentationen kommer den nye ballon uden ham */
+        if (!this.laerer || this.kmIntro) { this.brand.nyTid = 1.5; return; }
         var replik = this.braende > 1 ? D.BRAND_IGEN[(this.braende - 2) % D.BRAND_IGEN.length] : D.BRAND;
         var pegGlas = pegPaa(this, function () {
             var G = mig.lay && mig.lay.glas;
@@ -265,23 +204,15 @@
         return this.lay ? Math.max(90, this.lay.bad.glas.x - 40) : 200;
     };
 
-    PF.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_FORM,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: lay.zoom[1].x + lay.zoom[1].b / 2, y: lay.zoom[1].y + lay.zoom[1].h / 2 } : null;
-                }),
-                1: pegPaaPanelet(this)
-            }), false);
-    };
-    introVaek(PF, "form-spring");
+    /* Mellem de to foerste glas i vandbadet: alle tre glas staar fri */
+    introPlads(PF, function (lay) { return (lay.glas[0].x + lay.glas[1].x) / 2; });
+    PF.introLinjer = function () { return D.INTRO_FORM; };
+    NK.Praesentation.trin(PF);
 
+    /* Hvorfor er besvaret: fanen er klaret. Staar praesentationen, venter rosen. */
     PF.laererFaerdig = function () {
         if (!this.laerer) return;
+        if (this.kmIntro) { this.ventRos = 1; return; }
         this.laererKoer("faerdig", rosTrin(PF, D.FORM_FAERDIG), false);
     };
 
@@ -295,15 +226,12 @@
         return this.lay ? Math.max(90, this.lay.kammer.x - 50) : 200;
     };
 
-    PS.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_SPIL,
-            function () { return mig.laererPlads(); },
-            { 1: pegPaaPanelet(this) }), false);
-    };
-    introVaek(PS, "spil-spring");
+    /* Foran venstre del af zoomvinduet: kammeret og listen staar fri */
+    introPlads(PS, function (lay) { return lay.zoom.x + 0.2 * lay.zoom.b; });
+    PS.introLinjer = function () { return D.INTRO_SPIL; };
+    NK.Praesentation.trin(PS);
 
+    /* Runden med ni blandinger er slut */
     PS.laererSlut = function (point, rekord) {
         if (!this.laerer) return;
         var replik = D.RUNDE_REPLIK[0][1];

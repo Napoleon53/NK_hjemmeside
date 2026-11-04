@@ -76,7 +76,8 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        var luft = NK.klamp(H * 0.085, 40, 64);
+        /* Alt tegnes under papirkortet oeverst i scenen (js/skort.js) */
+        var luft = this.skort.top();
         var titel = NK.klamp(H * 0.03, 16, 22);
         var raad = lay.bordY - luft - titel;
 
@@ -250,7 +251,6 @@
             valg: NK.el("form-valg")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("form-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("form-beroering").addEventListener("click", function () { mig.visBeroering(); });
         this.el.valg.addEventListener("click", function (e) {
             var b = e.target.closest ? e.target.closest("button") : null;
@@ -359,10 +359,9 @@
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.H + 10);
 
         /* Glassene i vandet og bakken over dem */
-        var puls = 0.55 + 0.45 * Math.sin(this.tid * 6);
         this.proever.forEach(function (p, i) {
             var G = lay.glas[i], over = mig.over && mig.over.slags === "glas" && mig.over.i === i;
-            var lys = over ? 1 : (mig.trin === "gaet" && mig.pegGlas ? puls : 0);
+            var lys = over ? 1 : 0;
             if (mig.gaettet === i && mig.trin !== "gaet") lys = Math.max(lys, 0.5);
             Tg.glas(ctx, G, p.makro(), mig.tid, { ballonFarve: FARVER[i], lys: lys, udenBallon: true });
         });
@@ -377,7 +376,7 @@
         var hd = Tg.termometer(ctx, lay.termo, this.termo.T, {
             trin: 5, store: 10, tid: this.tid,
             haandtag: this.over && this.over.slags === "termo", traekker: tr && tr.slags === "termo",
-            puls: (this.trin === "varm" && !this.termo.roert) || this.pegTermo
+            puls: this.trin === "varm" && !this.termo.roert
         });
         if (this.trin === "varm" && !this.termo.roert && !tr) Tg.traekPil(ctx, hd.x, hd.y, hd.r * 2 + 18, this.tid);
 
@@ -480,14 +479,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-form", tilbud: "form-tilbud", spring: "form-spring" });
-
-    /* Mens han taler om glassene og termometeret, lyser de */
-    P.pegPaaFelt = function () {
-        var i = this.laererIIntro && this.laererIIntro() ? this.introTrin : 0;
-        this.pegGlas = i === 2;
-        this.pegTermo = false;
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-form", tilbud: "form-tilbud" });
 
     NK.SimForm = SimForm;
 }());

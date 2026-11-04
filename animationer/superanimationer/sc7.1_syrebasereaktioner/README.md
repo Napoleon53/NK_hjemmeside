@@ -2,7 +2,7 @@
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv, bortset fra Kemichael, som hentes fra
-`../../v2/kemichael/`.
+`../../v2/kemichael/` og `../kemichael/`.
 
 Den afløser `animationer/kemi-c-filer/c7.1_syrebase_reaktioner.html` og er i
 menuen fra 26. sept. 2026; den gamle ligger i `kemi-c-filer/arkiv/`.
@@ -108,12 +108,12 @@ js/model.js           NK.Syrebase (roller, træning, forkerte svar, mærkater)
 js/tegning.js         rum og bord, strukturformler, hydronen, skemaet med
                       klammerne, tavlen, brikker og pladser
 js/sprites.js         lageret til Kemichaels sprites (ingen egne sprites)
-js/praesentation.js   tilbuddet om præsentationen (ens i alle mapper)
 js/tavle.js           det, fane 2 og 3 deler: layout, brikker, sværhedsgrad
 js/sim_hydron.js      fane 1
 js/sim_produkter.js   fane 2
 js/sim_par.js         fane 3
-js/laerer.js          Kemichael på de tre faner
+js/laerer.js          Kemichael på de tre faner (præsentationen er fælles:
+                      ../kemichael/praesentation.js og .css)
 js/rundvisning.js     rundvisningen bag "?"
 js/app.js             faneskift, teori, tastatur og tegneløkken
 _selvtest.html        udviklerværktøj, se nedenfor
@@ -127,7 +127,7 @@ _selvtest.html        udviklerværktøj, se nedenfor
   mod +x; molekylet til højre spejles.
 * **Flere stoffer i træningen:** en familie i `D.FAM`, pKs i `D.PKS` og
   stoffet i en liste i `D.NIVEAUER`. Modellen finder selv de gyldige par.
-* **Replikker:** `D.INTRO_*`, `D.HYDRON_FAERDIG`, `D.TI_I_TRAEK`, `D.KAFFE_SUR`.
+* **Replikker:** `D.INTRO_*`, `D.HYDRON_FAERDIG`, `D.ROS_PRODUKTER`, `D.ROS_PAR`, `D.KAFFE_SUR`.
 
 ## Forenklinger
 
@@ -143,11 +143,25 @@ _selvtest.html        udviklerværktøj, se nedenfor
 
 ## Kemichael
 
-Han tilbyder at præsentere hver fane (Start præsentation / Nej tak), og mens
-han taler, rykker indholdet til højre for ham. Han roser første gang alle ti
-reaktioner er løst, og første gang der er ti i træk på fane 2 og 3.
-Påskeæg: en hydron sluppet i kaffekoppen på fane 1 ("Min kaffe er sur nok i
-forvejen."). Koppen er desuden det fælles påskeæg.
+Han tilbyder at præsentere hver fane (Start præsentation / Nej tak), og
+tasten K viser præsentationen igen. Præsentationen er den fælles fra
+4. nov. 2026 (`../kemichael/praesentation.js`): tre trin pr. fane med to
+til fire hele sætninger, en taleboble med Næste og Spring præsentationen
+over, og en gul ramme om det, han peger på (partiklerne, skemaet, tavlen
+og kortene i panelet). Mens han taler, rykker indholdet til højre for ham.
+
+Han kommer kun ind af sig selv tre steder (brugerens regler 4. nov. 2026):
+
+* **Fane 1 gennemført:** første gang alle ti reaktioner er løst
+  (`D.HYDRON_FAERDIG`).
+* **Fane 2 og 3:** første gang der er ti i træk uden fejl på fanen
+  (`D.ROS_PRODUKTER`, `D.ROS_PAR`). Fanerne har ingen ende, så ti i træk er
+  deres mål.
+* **Påskeægget:** en hydron sluppet i kaffekoppen på fane 1 (`D.KAFFE_SUR`,
+  tre replikker på skift, fx "Hydronen skal ikke ned i min kaffe. Kaffen er
+  sur nok i forvejen.").
+
+Kaffekoppen og et prik på ham er elevens eget valg og er de fælles.
 
 ## Genveje
 
@@ -161,8 +175,9 @@ forvejen."). Koppen er desuden det fælles påskeæg.
 (Kemichael hentes derfra). Den tjekker formlerne, rollerne mod pKs, træningens
 par, strukturerne før og efter hver mulig overførsel, de forkerte svar, alle
 mærkater på alle stoffer, forløbet i de tre faner med musen, Kemichael,
-sproget og layoutet fra 520 × 380 til 1500 × 900.
-Sidst kørt: ALT OK, 25. september 2026.
+sproget og layoutet fra 520 × 380 til 1500 × 900. Præsentationen tjekkes med
+den fælles test (`NK.Praesentation.selvtest`) på alle tre faner.
+Sidst kørt: ALT OK, 4. november 2026.
 
 ## I menuen
 

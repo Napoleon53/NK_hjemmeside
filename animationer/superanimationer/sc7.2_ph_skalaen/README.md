@@ -2,7 +2,7 @@
 
 Superanimation om pH-skalaen: ét pH-trin er en faktor ti. Åbn `index.html`.
 Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js`). Ingen `fetch` og ingen moduler, så den
+(`../../v2/kemichael/kemichael.js` og `../kemichael/`). Ingen `fetch` og ingen moduler, så den
 virker fra harddisken.
 
 ## Bestillingen
@@ -87,15 +87,25 @@ Svaret kommer, når luppen har zoomet. Fem mål: gæt pH efter én fortynding
 (10.000), fortynd til basisk (det kan ikke lade sig gøre) og natriumhydroxiden
 1.000 gange (pH 16, 13, 10 eller 7).
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`): skalaen tre replikker (han peger på skalaen og
-stofferne), luppen tre (luppen og mærket), fortyndingen tre (skiltet og
-knappen). Han går kun ved den store knap, to klik på ham eller Esc. <kbd>K</kbd>
-viser præsentationen igen. Ellers roser han tørt efter hver hylde og det
-sidste mål i luppen og i fortyndingen, og når syren ikke blev basisk: "Det er
-vand nu. Meget dyrt vand." Kaffekoppen på bordet er det fælles påskeæg.
-**Påskeæg:** et gæt, der rammer inden for 0,1 ("Præcis. Du har vel ikke smagt
-på den?").
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles fra 4. nov. 2026 (`../kemichael/praesentation.js`):
+tre trin pr. fane med to til fire hele sætninger, en taleboble med Næste og
+Spring præsentationen over, og en gul ramme om det, han peger på. På fane 3
+står han midt på bordet, mens han præsenterer, så han ikke dækker saltsyren,
+knappen under den og luppen. <kbd>K</kbd> viser præsentationen igen.
+
+Han kommer kun ind af sig selv, når en hel fane er gennemført, og ved
+påskeægget (brugerens regler 4. nov. 2026):
+
+* **Fane 1:** når begge hylder er målt (`D.ROS_SKALA`), ikke efter den første.
+* **Fane 2 og 3:** efter det sidste mål (`D.LUP_FAERDIG`, `D.FORTYND_FAERDIG`).
+* **Påskeæg:** et gæt på fane 1, der rammer inden for 0,1, én gang pr. besøg
+  (`D.AEG_PRAECIS`: "Dit gæt rammer pH præcist. Du har vel ikke smagt på
+  stoffet?").
+
+Rosen efter hylde 1 ("Køkkenet er målt. Også min kaffe.") og replikken ved det
+basiske mål på fane 3 ("Det er vand nu. Meget dyrt vand.") er taget ud 4. nov.
+2026. Kaffekoppen på bordet er det fælles påskeæg.
 
 Direkte links: `index.html#lup` og `index.html#fortynd`.
 
@@ -135,11 +145,11 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, skalaen og mærket, stofferne, pH-metret, glassene, flasken,
                     pipetten, sprøjteflasken, luppen, ionerne og knapperne
 js/lup.js           luppen med prikkerne og dens autozoom: fælles for fane 2 og 3
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_skala.js     fane 1
 js/sim_lup.js       fane 2
 js/sim_fortynd.js   fane 3
-js/laerer.js        Kemichael på alle tre faner og påskeæggene
+js/laerer.js        Kemichael på alle tre faner og påskeægget (præsentationen er fælles:
+                    ../kemichael/praesentation.js og .css)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -172,10 +182,11 @@ reglerne, at luppen ved alle pH viser 10 til 100 af den ion, der er flest af,
 og zoomer ét trin ad gangen (tre gange fra pH 5 til 2, fire ud og fire ind fra
 pH 2 til 12), at kravlegården i fane 3 spærrer de rigtige knapper, at alle
 tre faner kan gennemføres (fane 1, 2 og 3 også med musen), at Kemichael kan
-vises og sendes ud på alle faner, og at layoutet holder fra 520 × 380 til
+vises og sendes ud på alle faner (den fælles test af præsentationen,
+`NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 29. september 2026: ALT OK (159 påstande).
+bagefter. Sidst kørt 4. november 2026: ALT OK (195 påstande).
 
 ## Forenklinger
 
@@ -204,9 +215,9 @@ bagefter. Sidst kørt 29. september 2026: ALT OK (159 påstande).
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
 præsentation og Nej tak midt foroven i scenen. Start sender ham ind, Nej tak og
 Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
-forsvinder også, når eleven har gjort noget på fanen. Koden er
-`js/praesentation.js` (samme fil som i sc1.2), koblet med
-`NK.Praesentation.kobl` i hver `sim_*.js`.
+forsvinder også, når eleven har gjort noget på fanen. Koden er den fælles
+`../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` i hver
+`sim_*.js` og `NK.Praesentation.trin` i `js/laerer.js`.
 
 ## Luppen bygget om (29. sept. 2026)
 

@@ -530,6 +530,9 @@ function koer() {
         && /Start med/.test(d.getElementById("ukendt-opgavetekst").textContent)
         && !!(fu.laerer && fu.laerer.scene && fu.laerer.scene.navn === "visStart"),
         fu.laerer && fu.laerer.scene && fu.laerer.scene.navn);
+    var snReplik = fu.laererStartReplik();
+    paastand("Kemichael siger, at tin kan have flere ladninger, og at ladningen kan regnes ud, fordi O er kendt",
+        snReplik === "Tin kan have flere ladninger, men du kender ladningen på O. Derfor kan du regne ladningen på tin ud.", snReplik);
     paastand("ingen plakat er fremme, før der bedes om et hint", !NK.Opslag.aaben());
     ukn.click();
     paastand("Giv hint: det periodiske system kommer frem med O fremhævet, og plakaten lyser",
@@ -606,6 +609,21 @@ function koer() {
         && fu.bord.neutral() && ukn.textContent === "Giv hint" && fu.svar.knapper.length === 4
         && /Slå først ladningen op/.test(d.getElementById("ukendt-opgavetekst").textContent)
         && /aktiv/.test(d.getElementById("ukendt-t3").className), d.getElementById("ukendt-opgavetekst").textContent);
+    var anReplik = fu.laererStartReplik();
+    paastand("Kemichael siger, at " + fu.ion.navn + " er ny, og at ladningen kan regnes ud, fordi " + fu.kendt.formel + " er kendt",
+        anReplik === "Du har ikke mødt " + fu.ion.navn + " endnu, men du kender ladningen på " + fu.kendt.formel
+        + ". Derfor kan du regne ladningen på " + fu.ion.navn + " ud.", anReplik);
+    paastand("lige efter lynlåsen er lukket, står det gamle salt stadig på bordet", fu.bord.kat === fu.kendt && !!fu.skift);
+    koerU(1.6);
+    var bu = fu.bord;
+    paastand("så skifter bordet til " + D.saltnavn(pa, fu.ion) + ": én " + pa.formel + " med ? og en gul ramme, én "
+        + D.ionTekst(fu.ion) + ", og formlen over bordet er ?", !fu.skift && bu.kat === pa && bu.an === fu.ion
+        && bu.nKat === 1 && bu.nAn === 1 && bu.ukendt.marker && !bu.ukendt.kendtFundet
+        && bu.kort.filter(function (k) { return !k.doer && k.side === "kat"; }).every(function (k) { return bu.tandKort(k) === 0; })
+        && bu.kort.filter(function (k) { return !k.doer && k.side === "an"; }).every(function (k) { return bu.tandKort(k) === Math.abs(fu.ion.q); })
+        && d.getElementById("ukendt-uf").textContent === "?"
+        && d.getElementById("ukendt-un").textContent === D.saltnavn(pa, fu.ion),
+        d.getElementById("ukendt-uf").textContent + " " + d.getElementById("ukendt-un").textContent);
     ukn.click();
     paastand("hintet til " + pa.formel + " åbner det periodiske system med " + pa.formel + " fremhævet",
         d.getElementById("opslag-pt").classList.contains("vis") && !!d.querySelector('.pt-celle.fremhaev[data-s="' + pa.formel + '"]')
@@ -613,6 +631,16 @@ function koer() {
     ukn.click();
     paastand("trin 3: Vis svaret viser " + D.ionTekst(pa) + " og går videre til formlen", fu.fase === "valg" && trinSvar(3) === D.ionTekst(pa)
         && !NK.Opslag.aaben() && tomt("ukendt-hint") && /formlen/.test(d.getElementById("ukendt-spm").textContent), trinSvar(3));
+    koerU(0.5);
+    paastand("trin 4: bordet virker som på fane 1, med + og − ved begge ioner, men den sidste kan ikke fjernes",
+        bu.ukendt === null && !bu.laast && bu.styr.kat.el.style.display === "" && bu.styr.an.el.style.display === ""
+        && bu.styr.kat.minus.disabled && !bu.styr.an.plus.disabled
+        && /Byg/.test(d.getElementById("ukendt-opgavetekst").textContent));
+    bu.fjern("kat");
+    bu.styr.an.plus.click();
+    paastand("+ lægger én " + fu.ion.formel + " mere, og den sidste " + pa.formel + " bliver liggende", bu.nKat === 1 && bu.nAn === 2,
+        bu.nKat + " og " + bu.nAn);
+    bu.styr.an.minus.click();
     ukn.click();
     var sidsteHint = d.getElementById("ukendt-hint").textContent;
     paastand("hintet til formlen nævner begge ladninger og at plus og minus skal gå lige op",
@@ -620,6 +648,11 @@ function koer() {
     ukn.click();
     paastand("trin 4: Vis svaret afslutter uden at tælle med og rydder hintet", fu.fase === "faerdig" && fu.loeste === loestFoer + 1
         && ukn.textContent === "Ny opgave" && tomt("ukendt-hint") && trinSvar(4) === D.formel(pa, fu.ion));
+    var nyF = D.forhold(pa, fu.ion);
+    paastand("bagefter ligger " + D.formel(pa, fu.ion) + " på bordet, låst, og formlen står over bordet",
+        bu.nKat === nyF.p && bu.nAn === nyF.n && bu.laast && bu.neutral()
+        && d.getElementById("ukendt-uf").textContent === D.formel(pa, fu.ion)
+        && d.getElementById("ukendt-un").textContent === D.saltnavn(pa, fu.ion), bu.nKat + " og " + bu.nAn);
     fu.startOpgave(D.UKENDT_OPGAVER.filter(function (o) { return o.an === "ClO" && o.kat === "Na"; })[0]);
     fu.begynd();
     vaelgRigtig(fu);
@@ -655,23 +688,31 @@ function koer() {
     paastand("han går ind fra højre kant, ikke hen over bordet", fb2.laerer.x > fb2.laererHjoerneX() && fb2.laerer.x * sHj < fb2.L.b + 200,
         Math.round(fb2.laerer.x * sHj) + " / " + Math.round(fb2.laererHjoerneX() * sHj));
     koerB(3.65);
-    var spring = d.getElementById("bord-spring");
+    var bobleB = d.getElementById("bord-laerred-boble");
     var Lk = fb2.laererRekt();
     paastand("han står nederst i højre hjørne, oven på den nederste hylde",
         Lk.x * sHj > fb2.L.b * 0.6 && (Lk.x + Lk.b) * sHj <= fb2.L.b && Math.abs((Lk.y + Lk.h) * sHj - fb2.laererGulv()) < 1
         && fb2.laererGulv() < fb2.L.h - 20,
         Math.round(Lk.x * sHj) + "-" + Math.round((Lk.x + Lk.b) * sHj) + " / gulv " + Math.round(fb2.laererGulv()) + " af " + fb2.L.h);
     var ramme1 = NK.Fremhaev.synlige();
-    paastand("første replik: bordet har en gul ramme", fb2.introTrin === 1 && ramme1.length === 1
-        && Math.abs(ramme1[0].left - (cr0.left + fb2.bord.g.x0 - 15)) < 2, fb2.introTrin + " / " + ramme1.length);
-    var sp = spring.getBoundingClientRect();
-    var bobleTop = Math.min.apply(null, D.INTRO["fane-bord"].linjer.map(function (l) { return fb2.laererBoblePlads(l).y; }));
-    paastand("Spring over står i hjørnet over boblen og fri af bordet",
-        sp.left > cr0.left + bo0.x + bo0.b && sp.right <= cr0.right && sp.bottom <= cr0.top + bobleTop,
-        Math.round(sp.left) + "-" + Math.round(sp.right) + " / " + Math.round(sp.bottom));
-    paastand("Start præsentation: han går ind og præsenterer, og knappen Spring over står der",
-        fb2.laererIIntro() && !spring.hidden && fb2.introTrin >= 1 && cw.localStorage.getItem("nk-sc2.2-intro-fane-bord") === "true",
-        fb2.laererIIntro() + " / " + spring.hidden + " / " + fb2.introTrin + " / " + cw.localStorage.getItem("nk-sc2.2-intro-fane-bord"));
+    paastand("Start præsentation: han går ind, og boblen viser trin 1 med Næste og Spring præsentationen over",
+        fb2.laererIIntro() && !!bobleB && !bobleB.hidden && fb2.introStatus().nr === 0
+        && !!bobleB.querySelector(".km-naeste") && !!bobleB.querySelector(".km-spring")
+        && cw.localStorage.getItem("nk-sc2.2-intro-fane-bord") === "true",
+        fb2.laererIIntro() + " / " + (bobleB && bobleB.hidden) + " / " + cw.localStorage.getItem("nk-sc2.2-intro-fane-bord"));
+    paastand("trin 1: de to hylder har hver sin gule ramme", ramme1.length === 2
+        && ramme1[0].bottom < cr0.top + fb2.bord.g.y0 && ramme1[1].top >= hbr.top - 10, ramme1.length);
+    var taleFoer = [fb2.laerer.tale, fb2.laerer.taleAlfa];
+    fb2.laerer.tale = "Prøve.";
+    fb2.laerer.taleAlfa = 1;
+    fb2.laererBobleSidst = null;
+    fb2.tegn();
+    paastand("lærredets egen taleboble tegnes ikke under præsentationen", !fb2.laererBobleSidst);
+    fb2.laerer.tale = taleFoer[0];
+    fb2.laerer.taleAlfa = taleFoer[1];
+    var bbB = bobleB.getBoundingClientRect(), hovB = fb2.introHoved();
+    paastand("boblen står ved hans hoved i hjørnet", bbB.right <= cr0.right + 1 && bbB.left > cr0.left + fb2.L.b * 0.4
+        && bbB.bottom <= cr0.top + hovB.top + 1, Math.round(bbB.left) + "-" + Math.round(bbB.right) + " / " + Math.round(bbB.bottom));
     var opgaveFoer = fb2.opgave;
     d.getElementById("bord-opgaveknap").click();
     paastand("præsentationen låser ikke: opgaven kan startes, og han bliver", !opgaveFoer && !!fb2.opgave && fb2.laererIIntro());
@@ -679,45 +720,59 @@ function koer() {
     klikB(10, fb2.L.h - 5);
     paastand("et klik ved siden af ham sender ham ikke ud", fb2.laererIIntro());
     var s2 = fb2.laererLaerredSkala(), Lb = fb2.laerer;
-    var hx = Lb.x * s2, hy = (Lb.y + 60) * s2;
-    klikB(hx, hy);
-    paastand("første klik på ham: han bliver, og knappen blinker", fb2.laererIIntro() && spring.classList.contains("puf"));
-    klikB(hx, hy);
+    klikB(Lb.x * s2, (Lb.y + 60) * s2);
+    paastand("et klik på ham: han bliver, og knappen Næste blinker", fb2.laererIIntro()
+        && bobleB.querySelector(".km-naeste").classList.contains("puf"));
+    bobleB.querySelector(".km-spring").click();
     koerB(0.2);
-    paastand("andet klik på ham sender ham ud", !fb2.laererIIntro() && spring.hidden);
+    paastand("Spring præsentationen over sender ham ud", !fb2.laererIIntro() && bobleB.hidden);
     fb2.startIntro(false);
     koerB(1.5);
     paastand("anden gang i samme browser præsenterer han ikke", !fb2.laererIIntro());
     tast("k");
+    koerB(2.5);
+    paastand("K får ham til at præsentere igen", fb2.laererIIntro() && !bobleB.hidden);
+    tast("ArrowRight");
     koerB(0.5);
-    paastand("K får ham til at præsentere igen", fb2.laererIIntro() && !spring.hidden);
+    paastand("pil til højre går ét trin videre", fb2.introStatus() && fb2.introStatus().nr === 1);
     tast("Escape");
     koerB(0.2);
-    paastand("Esc sender ham ud", !fb2.laererIIntro() && spring.hidden);
-    tast("k");
-    koerB(0.5);
-    spring.click();
-    koerB(0.2);
-    paastand("knappen sender ham ud", !fb2.laererIIntro() && spring.hidden);
+    paastand("Esc sender ham ud", !fb2.laererIIntro() && bobleB.hidden);
     koerB(1);
     paastand("han går ud ad højre kant, og den gule ramme forsvinder", fb2.laerer.x === NK.Kemichael.UDE
         && NK.Fremhaev.synlige().length === 0, fb2.laerer.x + " / " + NK.Fremhaev.synlige().length);
-    paastand("replikkerne er tre eller fire pr. fane, korte, og hver har noget, der får en ramme",
-        ["fane-bord", "fane-vand", "fane-ukendt"].every(function (f) {
-            var l = D.INTRO[f].linjer, m = D.INTRO[f].maal;
-            return l.length >= 3 && l.length <= 4 && l.every(function (x) { return x.length <= 70; })
-                && m.length === l.length && m.every(function (n) { return NK.sims[f].laererMaalRekt(n).length > 0; });
-        }));
+    tast("k");
+    koerB(2.5);
+    var iIntroB = fb2.laererIIntro();
+    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
+    paastand("et faneskift midt i præsentationen sender ham ud", iIntroB && !fb2.laererIIntro());
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
+    koerB(2);
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var forkerte = [];
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) {
+        D.INTRO[f].forEach(function (l) {
+            var n = l.tekst.split(/[.?] /).length;
+            if (l.tekst.length > 420 || l.tekst.length < 100 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst)) forkerte.push(l.tekst.slice(0, 40));
+        });
+        if (D.INTRO[f].length < 2 || D.INTRO[f].length > 4) forkerte.push(f + ": " + D.INTRO[f].length + " trin");
+    });
+    paastand("præsentationen har to til fire trin pr. fane, og hvert trin er to til fire hele sætninger (højst 420 tegn)",
+        forkerte.length === 0, forkerte.join("; "));
+    paastand("han roser ikke længere hver tredje opgave på fane 3", !fu.laererRos);
     var skala = fb2.laererLaerredSkala();
     paastand("Kemichael er mindre end i sc2.3, og kitlen stopper ved gulvet",
         Math.abs(skala - NK.klamp(fb2.L.h / 600 * 0.55, 0.4, 0.8)) < 1e-9
         && Math.abs(NK.Scene.GULV - fb2.laererGulv() / skala) < 1e-6, skala + " / " + NK.Scene.GULV);
 
-    /* Boblen: i hjørnet og fri af bordet, også med et stort salt paa */
+    /* Laerredets taleboble (Start opgave paa fane 3, prik og kaffe): i
+       hjoernet og fri af bordet, ogsaa med et stort salt paa */
+    var proeve = ["Du har ikke mødt thiosulfat endnu, men du kender ladningen på SO₄. Derfor kan du regne ladningen på thiosulfat ud.",
+        "Chrom kan have flere ladninger, men du kender ladningen på SO₄. Derfor kan du regne ladningen på chrom ud."];
     function boblerFri(sim) {
         var ud = [];
         sim.laerer.x = sim.laererHjoerneX();
-        D.INTRO[sim === fb2 ? "fane-bord" : "fane-ukendt"].linjer.concat(["Start med SO₄. Den kender du."]).forEach(function (l) {
+        proeve.forEach(function (l) {
             var r = sim.laererBoblePlads(l);
             var fri = r.x + r.b <= sim.L.b && r.y >= 0 && r.x > sim.L.b * 0.5
                 && sim.laererOptaget().filter(Boolean).every(function (o) {
@@ -746,22 +801,40 @@ function koer() {
     d.querySelector('.faneknap[data-fane="fane-vand"]').click();
     for (t4 = 0; t4 < 30; t4++) { fv4.tilpas(); fv4.opdater(1 / 60); }
     fv4.laerer.x = fv4.laererHjoerneX();
-    ikkeFri = D.INTRO["fane-vand"].linjer.filter(function (l) {
+    ikkeFri = proeve.filter(function (l) {
         var r = fv4.laererBoblePlads(l), g = fv4.laererGlas();
         return !(r.x >= g.x + g.b && r.x + r.b <= fv4.L.b);
     });
     fv4.laerer.x = NK.Kemichael.UDE;
     paastand("fane 2: boblen står til højre for glasset", !ikkeFri.length, ikkeFri.join("; "));
-    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
-    ["fane-vand", "fane-ukendt"].forEach(function (f) {
+
+    /* Start opgave paa fane 3 midt i praesentationen: han holder op med
+       den og viser, hvor man starter */
+    d.querySelector('.faneknap[data-fane="fane-ukendt"]').click();
+    fu4.startOpgave(D.UKENDT_OPGAVER[0]);
+    fu4.startIntro(true);
+    for (t4 = 0; t4 < 150; t4++) { fu4.tilpas(); fu4.opdater(1 / 60); }
+    var iIntro4 = fu4.laererIIntro();
+    d.getElementById("ukendt-opgaveknap").click();
+    for (t4 = 0; t4 < 6; t4++) { fu4.tilpas(); fu4.opdater(1 / 60); }
+    paastand("fane 3: Start opgave midt i præsentationen afslutter den, og han viser, hvor man starter",
+        iIntro4 && !fu4.laererIIntro() && fu4.laerer.scene && fu4.laerer.scene.navn === "visStart"
+        && d.getElementById("ukendt-laerred-boble").hidden, fu4.laerer.scene && fu4.laerer.scene.navn);
+    fu4.startOpgave(D.UKENDT_OPGAVER[0]);
+    for (t4 = 0; t4 < 200; t4++) { fu4.tilpas(); fu4.opdater(1 / 60); }
+
+    /* Den faelles test af praesentationen paa alle tre faner */
+    overskrift("16d. Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) {
+        d.querySelector('.faneknap[data-fane="' + f + '"]').click();
         var sim = NK.sims[f];
-        sim.startIntro(true);
-        for (var t = 0; t < 60; t++) { sim.tilpas(); sim.opdater(1 / 60); }
-        var ok = sim.laererIIntro() && !d.getElementById(f === "fane-vand" ? "vand-spring" : "ukendt-spring").hidden;
-        sim.springIntro();
-        for (t = 0; t < 12; t++) { sim.tilpas(); sim.opdater(1 / 60); }
-        paastand(f + ": præsentationen kan startes og stoppes", ok && !sim.laererIIntro());
+        if (sim.springIntro) sim.springIntro();
+        for (var t = 0; t < 150; t++) { sim.tilpas(); sim.opdater(1 / 60); }
+        NK.Praesentation.selvtest(sim, function (sek) { for (var i = 0; i < sek * 60; i++) { sim.tilpas(); sim.opdater(1 / 60); } }).forEach(function (r) {
+            paastand(f + ": " + r[0], r[1], r[2]);
+        });
     });
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
 
     overskrift("17. Ioner med ladningen 1 hedder + eller −, ikke 1+ eller 1−");
     var ladn = [[1, "+"], [-1, "−"], [2, "2+"], [-3, "3−"], [0, "0"]];
@@ -790,7 +863,7 @@ function koer() {
         NK.Rundvisning.ture[f].forEach(function (t) { saml(t.titel + " " + t.tekst, "rundvisning"); });
     });
     var fu3 = NK.sims["fane-ukendt"];
-    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) { D.INTRO[f].linjer.forEach(function (l) { saml(l, "præsentation " + f); }); });
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) { D.INTRO[f].forEach(function (l) { saml(l.tekst, "præsentation " + f); }); });
     NK.Opslag.aabn("pt", "O");
     saml(d.getElementById("opslag-pt").textContent + " " + d.getElementById("opslag-ioner").textContent, "plakaterne");
     NK.Opslag.luk();
@@ -802,6 +875,7 @@ function koer() {
         D.kendtValg(kendtIon).forEach(function (v) { saml(v.tekst + " " + v.forklaring, kendtIon.formel + " kendt"); });
         if (o.partner) D.kendtValg(D.ion(o.partner)).forEach(function (v) { saml(v.tekst + " " + v.forklaring, o.partner + " partner"); });
         fu3.startOpgave(o);
+        saml(fu3.laererStartReplik(), s.formel + " Kemichael");
         saml(d.getElementById("ukendt-opgavetekst").textContent + " " + d.querySelector("#ukendt-opgavekort .trin").textContent, s.formel + " intro");
         fu3.begynd();
         saml(fu3.hint() + " " + d.getElementById("ukendt-opgavetekst").textContent, s.formel + " trin 1");

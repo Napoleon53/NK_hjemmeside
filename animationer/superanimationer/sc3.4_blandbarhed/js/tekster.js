@@ -11,21 +11,30 @@
     var D = window.NK.Data;
 
     /* ----- Kemichael -----------------------------------------------------
-       Praesentationen: to linjer. Han peger paa panelet, mens han siger
-       linjen D.INTRO_PEG. Ellers siger han kun noget ved paaskeaegget. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad animationen traener, og hvordan tingene
+       bruges. sel: det, han peger paa, og som faar en gul ramme, der
+       blinker (kort i panelet og de usynlige .anker over laerredet).
+       Ingen vittigheder i praesentationen. Ellers siger han kun noget ved
+       paaskeaegget. */
     D.INTRO = [
-        "Et glas væske. Forstørret, så du ser molekylerne.",
-        "Hæld i herovre. Bliver det ét lag eller to?"
+        { tekst: "I denne animation undersøger du, hvilke væsker der kan blandes, og hvilke der lægger sig i to lag. Bassinet viser væsken så forstørret, at hver kugle er et molekyle. Glasset til højre viser den samme væske, som den ser ud for øjet.",
+          sel: ["#anker-bassin", "#anker-glas"] },
+        { tekst: "I kortet Hæld i hælder du vand, ethanol eller olie i bassinet. I kortet Ryst og varm ryster du bassinet, skruer op for temperaturen og vælger mellem tilbagesvaling og destillation. Knappen Tøm bassinet tømmer både bassinet og forlaget.",
+          sel: ["#haeld-kort", "#energi-kort"] },
+        { tekst: "Opgavekortet har seks opgaver om det, der sker i bassinet, og en opgave begynder, når du trykker på knappen Start opgave. Den samme knap giver derefter først et hint og så svaret. Knappen Quiz øverst til højre giver fem spørgsmål om blandbarhed.",
+          sel: ["#opgavekort", "#quizknap"] }
     ];
-    D.INTRO_PEG = 1;
 
     D.REPLIK = {
         /* En stor oliedraabe haenger midt i blandingen, fordi taethederne
-           naesten er ens (paaskeaegget) */
+           naesten er ens (paaskeaegget). Hele saetninger (brugerens regel
+           4. nov. 2026), og den toerre tone maa blive. */
         svaever: [
-            "Olien svæver næsten. Det lykkes sjældent for nogen.",
-            "Olien har ingen hast. Den kan ikke bestemme sig.",
-            "Næsten en svævende oliekugle. Kantinen vil ikke tro det."
+            "Oliedråben svæver midt i blandingen. Det er der ikke mange, der får til at lykkes.",
+            "Olien har ingen hast. Den kan ikke bestemme sig for, om den skal op eller ned.",
+            "Det er næsten en svævende oliekugle. Ingen i kantinen vil tro på det."
         ]
     };
 

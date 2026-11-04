@@ -13,11 +13,14 @@
 
    Scener:
      intro   foerste gang en udgave aabnes: tilbuddet Start praesentation
-             / Nej tak (js/praesentation.js), saa tre korte linjer
-             (D.UDGAVER[..].intro). Under linjen D.INTRO_PEG peger han paa
-             spandene, og de lyser op.
-     slut    ny rekord eller Stofgruppemester: én replik (D.SLUT), og han
-             gaar igen. Ellers kommer han ikke (han taler ikke uopfordret).
+             / Nej tak (NK.Praesentation.pakInd i js/app.js), saa trinnene
+             i D.UDGAVER[..].intro ét ad gangen med Naeste og Spring
+             praesentationen over. Han peger paa det, der blinker, og gaar
+             aldrig videre af sig selv. Koden er faelles:
+             ../kemichael/praesentation.js (NK.Praesentation.trin).
+     slut    spillet er slut med ny rekord, eller eleven er blevet
+             Stofgruppemester: én replik (D.SLUT), og han gaar igen.
+             Ellers kommer han ikke (han taler ikke uopfordret).
    Baggrundslivet er slaaet fra: han maa aldrig gaa hen over scenen,
    mens der spilles.
    ===================================================================== */
@@ -42,8 +45,6 @@
         this.g = {};
         this.introVent = 0;
         this.introId = null;
-        this.introTrin = 0;
-        this.introKlikTal = 0;
         this.laererStart();
     }
 
@@ -110,79 +111,28 @@
         return this.laererSlutVaek() || ud;
     };
 
-    P.laererIntro = function () {
-        var mig = this, U = D.UDGAVER[this.introId];
-        if (!U) return;
-        var trin = [
-            { kald: function () { mig.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: function () { return mig.laererPlads(); } },
-            { tid: 0.2 }
-        ];
-        U.intro.forEach(function (l, i) {
-            trin.push({ kald: function () { mig.introTrin = i + 1; } });
-            if (i === D.INTRO_PEG) trin.push({ arm: function () { return mig.pegPaa(D.INTRO_PEG_PAA); }, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (i === D.INTRO_PEG) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        this.laererKoer("intro", trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { mig.introTrin = 0; } },
-            { gaa: UDE }
-        ]), false);
+    /* Trinnene for den udgave, der praesenteres */
+    P.introLinjer = function () {
+        var U = D.UDGAVER[this.introId];
+        return U ? U.intro : [];
     };
 
-    /* Armens vinkel mod et element paa siden */
-    P.pegPaa = function (id) {
-        var s = this.laererLaerredSkala();
-        var e = NK.el(id);
-        if (!e || !e.offsetWidth) return HAENGER;
-        var r = e.getBoundingClientRect(), c = this.L.canvas.getBoundingClientRect();
-        return this.pegVinkel((r.left + r.width * 0.3 - c.left) / s, (r.top + r.height * 0.4 - c.top) / s);
-    };
-
-    P.laererIIntro = function () {
-        var L = this.laerer;
-        return !!(L && L.scene && L.scene.navn === "intro");
-    };
-
-    P.laererIntroVaek = function () {
-        var L = this.laerer;
-        if (!this.laererIIntro()) return false;
-        L.tale = "";
-        L.taleUr = 0;
-        L.taleAlfa = 0;
-        this.introTrin = 0;
-        this.laererKoer("introUd", [
-            { arm: HAENGER, tid: 0.15 },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { gaa: UDE, loeb: true }
-        ], false);
-        return true;
-    };
-
-    /* Et klik under praesentationen: rammer det ham, taeller det. Andet
-       klik paa ham sender ham ud, det foerste faar knappen til at blinke. */
-    P.laererIntroKlik = function (px, py) {
-        if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-        this.introKlikTal++;
-        if (this.introKlikTal >= 2) {
-            this.laererIntroVaek();
-        } else {
-            var k = NK.el("spring-over");
-            k.classList.remove("puf");
-            void k.offsetWidth;
-            k.classList.add("puf");
-        }
-        return true;
-    };
+    /* Den faelles praesentation: laererIntro, introNaeste, laererIntroVaek,
+       laererIIntro, laererIntroKlik og taleboblen (../kemichael/praesentation.js) */
+    NK.Praesentation.trin(P);
 
     /* ----- Ny rekord eller Stofgruppemester ---------------------------------- */
+    /* En ny rekord giver kun en replik foerste gang og derefter hver fjerde
+       gang i samme besoeg (brugerens valg 4. nov. 2026). Stofgruppemester
+       giver altid én. true, naar han kommer. */
     P.laererSlut = function (art) {
-        if (this.laererIIntro()) return;
+        if (this.laererIIntro()) return false;
         var liste = D.SLUT[art];
-        if (!liste) return;
+        if (!liste) return false;
+        if (art === "rekord") {
+            this.rekordTal = (this.rekordTal || 0) + 1;
+            if ((this.rekordTal - 1) % 4 !== 0) return false;
+        }
         var replik = liste[Math.floor(Math.random() * liste.length)];
         var mig = this;
         this.laererKoer("slut", [
@@ -195,6 +145,7 @@
             { taleFaerdig: true },
             { gaa: UDE }
         ]), false);
+        return true;
     };
 
     P.laererSlutVaek = function () {
@@ -218,17 +169,8 @@
             if (this.introVent <= 0) this.laererIntro();
         }
         this.opdaterLaerer(dt);
-        var iIntro = this.laererIIntro();
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("spring-over").hidden = !iIntro;
-        }
-        var peg = iIntro && this.introTrin === D.INTRO_PEG + 1 ? D.INTRO_PEG_PAA : null;
-        if (peg !== this.pegerPaa) {
-            if (this.pegerPaa && NK.el(this.pegerPaa)) NK.el(this.pegerPaa).classList.remove("peg");
-            if (peg && NK.el(peg)) NK.el(peg).classList.add("peg");
-            this.pegerPaa = peg;
-        }
+        /* Taleboblen og den gule ramme foelger ham */
+        if (this.kmIntro || this.kmBobleAktiv) this.introOpdaterBoble();
     };
 
     NK.Laerer = Laerer;

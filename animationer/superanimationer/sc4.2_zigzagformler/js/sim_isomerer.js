@@ -164,7 +164,8 @@
     /* Alle isomerer er fundet: klistermaerket kraever, at hoejst halvdelen er vist */
     P.klaretNiveau = function () {
         var vist = Object.keys(this.vist[this.n]).length;
-        this.klaret("is-" + this.n, vist <= Math.floor(this.isomerer().length / 2), this.n === 7 ? D.ROS.isomerAlle : D.ROS.isomer);
+        this.klaret("is-" + this.n, vist <= Math.floor(this.isomerer().length / 2),
+            D.KLISTER_KRAV.isomer.replace("{formel}", "C" + NK.saenket(this.n) + "H" + NK.saenket(2 * this.n + 2)));
     };
 
     P.formel = function () { return "C" + NK.saenket(this.n) + "H" + NK.saenket(2 * this.n + 2); };
@@ -245,8 +246,7 @@
     P.enter = function () { if (this.faerdig()) this.knap(); };
     P.fokus = function () {};
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-isomerer", tilbud: "is-tilbud", spring: "is-spring" });
-    P.pegPaaFelt = function (til) { NK.el("is-liste-kort").classList.toggle("peg", !!til); };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-isomerer", tilbud: "is-tilbud" });
 
     NK.SimIsomerer = SimIsomerer;
 }());

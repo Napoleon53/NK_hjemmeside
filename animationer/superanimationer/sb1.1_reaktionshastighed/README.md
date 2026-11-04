@@ -125,7 +125,7 @@ index.html            toplinje, tre faner, teori og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js           NK-navnerum, tal med komma og tierpotens, canvas
 js/model.js           kemien: bogens reaktion og hastighedsudtrykkene
-js/data.js            Kemichaels replikker, opgaverne og de otte reaktioner
+js/data.js            Kemichaels præsentation, opgaverne og de otte reaktioner
 js/sprites.js         lageret til bægerglasset og Kemichaels sprites
 js/opgave.js          opgavekortet med den ene knap (fane 1 og 2)
 js/sim_kurve.js       fane 1
@@ -160,14 +160,19 @@ fejlen, Kemichaels præsentation og sproget.
 
 ## Kemichael
 
-Kemichael præsenterer hver fane første gang, den åbnes i en browser, som i
-sc2.3 og sc2.4: han går ind midt på scenen, siger tre korte replikker og går
-igen. Under anden replik peger han på det kort i panelet, den handler om, og
-det lyser op. Scenen låser ikke. Knappen Spring præsentationen over, to klik
-på ham og Esc sender ham ud, og <kbd>K</kbd> viser præsentationen igen.
-Replikkerne står i `D.INTRO` i `js/data.js`, og hvad der er vist, huskes under
-`nk-sb1.1-intro` i browseren. Figuren kommer fra `../../v2/kemichael/kemichael.js`;
-koblingen står i `js/laerer.js`.
+Kemichael præsenterer en fane, når eleven vil: tilbuddet første gang fanen
+åbnes, og <kbd>K</kbd>. Præsentationen er den fælles
+(`../kemichael/praesentation.js`, brugerens regler 4. nov. 2026): tre trin på
+hver fane med to til fire hele sætninger i Kemibogens sprog, en taleboble ved
+hans hoved med knapperne **Næste** (på sidste trin **Afslut**) og **Spring
+præsentationen over**, og en gul ramme om det, han peger på (bægerglasset,
+grafen, kassen eller et kort i panelet). Han går aldrig videre af sig selv.
+Enter og pil til højre er Næste, Esc og et faneskift sender ham ud. Han træder
+ind lige fra lærredets kant og stiller sig ude til højre, over den sidste del
+af grafen. Trinnene står i `D.INTRO` i `js/data.js`, og hvad der er vist,
+huskes under `nk-sb1.1-intro` i browseren. Ellers kommer han ikke ind af sig
+selv; der er ingen ros eller replikker under opgaverne. Figuren kommer fra
+`../../v2/kemichael/kemichael.js`; koblingen står i `js/laerer.js`.
 
 ## I menuen
 
@@ -182,6 +187,9 @@ peger på `../superanimationer/sb1.1_reaktionshastighed/index.html`, og
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
 åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker lærerens `startIntro` ind (`NK.Praesentation.pakInd`) og i
+`js/laerer.js` lægger præsentationen på læreren (`NK.Praesentation.trin`). Den
+gamle `js/praesentation.js` og knappen "Spring præsentationen over" midt i
+scenen er fjernet 4. nov. 2026.
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".

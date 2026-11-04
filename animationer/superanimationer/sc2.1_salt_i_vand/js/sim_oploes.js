@@ -94,7 +94,7 @@
         if (this.laererStart) this.laererStart();
         NK.Valg.paa(this.nulstil.bind(this));
         this.nulstil();
-        this.opgaver = new NK.Opgaver("oploes", OPGAVER, this, "Opløsningen");
+        this.opgaver = new NK.Opgaver("oploes", OPGAVER, this, "Opløsningen", "om opløsningen");
         this.opdaterPanel();
     };
 
@@ -291,15 +291,17 @@
         var L = this.L;
         var kant = 14;
         var gammelCelle = this.celle;
+        /* Papirkortet har pladsen oeverst i scenen (NK.kortZone i js/opgave.js) */
+        var top = NK.kortTop();
 
         this.bred = L.b >= 700;
         if (this.bred) {
             this.makroB = NK.klamp(L.b * 0.27, 210, 330);
-            this.zoom = { x: this.makroB + 24, y: kant,
-                          b: Math.max(100, L.b - this.makroB - 24 - kant), h: Math.max(100, L.h - 2 * kant) };
+            this.zoom = { x: this.makroB + 24, y: top,
+                          b: Math.max(100, L.b - this.makroB - 24 - kant), h: Math.max(100, L.h - top - kant) };
         } else {
             this.makroB = NK.klamp(L.b * 0.36, 120, 190);
-            this.zoom = { x: kant, y: kant, b: Math.max(100, L.b - 2 * kant), h: Math.max(100, L.h - 2 * kant) };
+            this.zoom = { x: kant, y: top, b: Math.max(100, L.b - 2 * kant), h: Math.max(100, L.h - top - kant) };
         }
         var z = this.zoom;
         this.glasX = z.x;
@@ -379,13 +381,16 @@
         var MB = S.MAAL.baegerglas, MP = S.MAAL.varmeplade, MT = S.MAAL.termometer;
         var m = {};
         m.bw = this.makroB * (this.bred ? 0.78 : 0.72);
+        /* Glasset og pladen skal kunne staa under papirkortet */
+        var hPrB = 231 / MB.b + 1.2 * MP.h / MP.b;
+        if (this.bred) m.bw = Math.min(m.bw, (this.zoom.h - 50) / hPrB);
         m.s = m.bw / MB.b;
         m.pladeB = m.bw * 1.2;
         m.pladeH = m.pladeB * MP.h / MP.b;
         m.hoejde = m.bw * 231 / MB.b + m.pladeH + 22;      /* 22: knappernes navne under pladen */
         if (this.bred) {
             m.x = (this.makroB - m.bw) / 2 + 6;
-            m.y = this.L.h / 2 - m.hoejde / 2;
+            m.y = Math.max(this.zoom.y + 18, this.zoom.y + this.zoom.h / 2 - m.hoejde / 2);
         } else {
             m.boks = { x: this.zoom.x + 8, y: this.zoom.y + 8, b: this.makroB, h: m.hoejde + 30 };
             m.x = m.boks.x + (m.boks.b - m.bw) / 2;
@@ -1202,23 +1207,8 @@
         }
         NK.saetTekst("oploes-besked", besked);
         NK.saetKlasse("oploes-besked", klasse);
-
-        NK.saetTekst("oploes-status", this.statusTekst(tung));
     };
 
-    P.statusTekst = function (tung) {
-        if (this.pause) return "Billedet står stille, mens du leder.";
-        if (this.overkogStart !== null) return "Opløsningen koger over.";
-        if (this.tempValg.id === "max" && this.kogeTid > 2) return "Vandet koger.";
-        if (this.tilbage() === 0) return "Alt saltet er opløst.";
-        if (this.frie >= this.maxFrie()) {
-            return tung
-                ? "Mættet: der er kun plads til nogle ganske få ioner i vandet."
-                : "Vandet kan ikke opløse mere.";
-        }
-        if (this.knusTrin > 0) return "Krystallen er knust. Flere vandmolekyler kan tage fat på én gang.";
-        return "Vandmolekylerne vender den rigtige ende ind mod ionerne og river dem løs.";
-    };
 
     /* ----- Tegning ------------------------------------------------------------ */
     P.tegn = function () {
@@ -1700,7 +1690,7 @@
         var saltId = NK.tilfaeldig(["NaCl", "KNO3", "CaCl2", "CuSO4"]);
         var fejl = null;
         var o = {
-            tekst: "Ét vandmolekyle vender forkert ind mod sin ion. Klik på det.",
+            tekst: "Billedet står stille. Ét vandmolekyle vender forkert ind mod sin ion. Klik på det, og tryk på Indsend svar.",
             hint: "Oxygen (rød, δ−) skal vende ind mod en positiv ion, og hydrogen (hvid, δ+) mod en negativ.",
             svar: "",
             start: function (sim) {
@@ -1725,18 +1715,30 @@
                     ? "Molekylet vendte hydrogen ind mod en positiv ion. Det er oxygen-enden (δ−), der skal vende ind."
                     : "Molekylet vendte oxygen ind mod en negativ ion. Det er hydrogen-enderne (δ+), der skal vende ind.";
             },
-            klik: function (sim, x, y) {
+            /* Et klik vaelger kun et vandmolekyle (blaa ring); Indsend svar sender det ind */
+            peg: function (sim, x, y) {
                 var ramt = sim.vandVed(x, y);
-                if (!ramt) return false;
-                if (fejl && ramt.ion === fejl.ion && ramt.nr === fejl.nr) {
+                if (!ramt || !ramt.ion) return false;
+                if (o.valgt) o.valgt.ion.skal[o.valgt.nr].ring = null;
+                o.valgt = ramt;
+                ramt.ion.skal[ramt.nr].ring = "#2a76ac";
+                return true;
+            },
+            tjek: function () {
+                var v = o.valgt;
+                if (!v) return false;
+                if (fejl && v.ion === fejl.ion && v.nr === fejl.nr) {
                     var s = fejl.ion.skal[fejl.nr];
                     s.forkert = false;
                     s.ring = "#7ee0a8";
                     return true;
                 }
-                return "Det vandmolekyle vender rigtigt. Prøv et andet.";
+                v.ion.skal[v.nr].ring = null;
+                o.valgt = null;
+                return "Det valgte vandmolekyle vender rigtigt. Klik på et andet, og indsend igen.";
             },
             visSvar: function () {
+                if (o.valgt) o.valgt.ion.skal[o.valgt.nr].ring = null;
                 if (fejl) fejl.ion.skal[fejl.nr].ring = "#f2c53d";
             },
             slut: function (sim) {
@@ -1781,7 +1783,11 @@
             tjek: function (sim) {
                 if (NK.Valg.saltId !== "NaCl" || sim.tilbage() > 0 || sim.slutTid === null) return false;
                 if (sim.slutTid <= GRAENSE_SEK) return true;
-                return "Det tog " + Math.round(sim.slutTid) + " sekunder. Tryk på Ny krystal, og prøv igen.";
+                return "Opløsningen tog " + Math.round(sim.slutTid) + " sekunder. Tryk på Ny krystal, og prøv andre indstillinger.";
+            },
+            indsendTekst: function (sim) {
+                if (NK.Valg.saltId !== "NaCl" || sim.tilbage() > 0 || sim.slutTid === null) return "";
+                return "Indsend svar: " + Math.round(sim.slutTid) + " s";
             },
             visSvar: function (sim) {
                 sim.saetTemp(TEMPERATURER[2]);

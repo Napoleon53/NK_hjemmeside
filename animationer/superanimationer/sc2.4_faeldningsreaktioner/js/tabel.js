@@ -2,7 +2,9 @@
    tabel.js - faeldningstabellen i panelet
 
    Soejlerne er de positive ioner, raekkerne de negative (vendt 26. okt.
-   2026, saa tabellen er som i Kemibogen). Et felt er
+   2026, saa tabellen er som i Kemibogen). Tabellen staar i panelet og
+   flyttes ind i opslaget, naar eleven slaar op i den (js/opgave.js).
+   hvile er infolinjens tekst, naar musen ikke er over et felt. Et felt er
    L, T eller ÷. Tabellen er baade et opslagsvaerk og, i de trin, hvor
    det giver mening, selve maaden at svare paa: eleven klikker paa det
    par, der falder ud.
@@ -79,7 +81,7 @@
         var aktive = this.vaert.querySelectorAll(".over");
         for (var i = 0; i < aktive.length; i++) aktive[i].classList.remove("over");
         if (!k) {
-            this.info.textContent = "Hold musen over et felt.";
+            this.info.textContent = this.hvile || "Hold musen over et felt.";
             this.info.className = "tabelinfo";
             return;
         }

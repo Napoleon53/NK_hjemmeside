@@ -10,8 +10,8 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc er
+       det samme som Nej tak. */
     function tilbud(P, noegle, id) {
         if (!P || !P.startIntro) return;
         NK.Praesentation.pakInd(P, {
@@ -41,6 +41,9 @@
             knapper[i].classList.toggle("aktiv", valgt);
             knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
         }
+        /* Et faneskift midt i praesentationen sender ham ud */
+        var gammel = sims[aktivFane];
+        if (gammel && aktivFane !== id && gammel.laererIIntro && gammel.laererIIntro()) gammel.laererIntroVaek(true);
         aktivFane = id;
         if (NK.Rundvisning) NK.Rundvisning.luk();
         if (sims[id]) {

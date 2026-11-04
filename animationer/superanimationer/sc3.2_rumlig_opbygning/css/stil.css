@@ -180,7 +180,7 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Vinkelmaaleren oeverst til hoejre paa scenen */
 .vinkelknap {
     position: absolute;
-    top: 14px;
+    top: calc(var(--kortzone, 0px) + 14px);
     right: 14px;
     display: flex;
     align-items: center;
@@ -205,7 +205,7 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Prikformlen oeverst til venstre paa scenen */
 .prikpanel {
     position: absolute;
-    top: 14px;
+    top: calc(var(--kortzone, 0px) + 14px);
     left: 14px;
     width: 238px;
     padding: 7px 8px 6px;
@@ -660,3 +660,63 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gul); outli
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (4. nov. 2026): opgaven staar paa ét kort oeverst midt i
+   scenen (js/opgave.js). Farver, skrift og knapper kommer fra
+   ../faelles/papirkort.css; her staar kun placeringen og opbygningen.
+   Kortets hoejde maa ikke overstige kortZone() (NK.kortZone i
+   js/kerne.js); tegningen begynder under zonen (--kortzone paa .scene),
+   og selvtesten maaler det i en hoej og en lav skaerm.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(800px, calc(100% - 24px));
+}
+
+.sk-tekst { margin: 0; }
+.sk-chip { white-space: nowrap; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 460px; margin-left: auto; margin-right: auto; }
+.sk-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sk-svar.n5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.sk-svar.n6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.sk-svar.lang { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sk-svar.lang .sk-knap { justify-content: flex-start; text-align: left; }
+.sk-knap:disabled { cursor: default; }
+
+.sk-bund { display: flex; align-items: center; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; margin: 0; }
+.sk-bund .st-tekst[hidden] { display: block; visibility: hidden; padding: 0; }
+.sk-bund .knap { flex: 0 0 auto; margin-left: auto; min-width: 0; font-size: 0.95rem; }
+.sk-bund .knap + .knap { margin-left: 0; }
+.sk-bund .knap[hidden] { display: none; }
+
+.sk-videre { cursor: pointer; font-family: inherit; white-space: nowrap; }
+
+@keyframes st-ryst {
+    0%, 100% { transform: none; }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.opgave-nr { margin: 0; font-size: 0.88rem; color: var(--tekst-svag); }

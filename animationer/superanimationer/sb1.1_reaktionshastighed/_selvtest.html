@@ -276,32 +276,52 @@ function koer() {
     U.nyOpgave(0);
 
     overskrift("7. Kemichael og fanerne");
-    var intro = true;
+    /* Brugerens regler 4. nov. 2026: tre trin pr. fane med to til fire
+       hele saetninger, og den faelles boble med Naeste og Spring over */
+    var intro = true, introNote = "";
     Object.keys(D.INTRO).forEach(function (k) {
-        if (D.INTRO[k].length < 2 || D.INTRO[k].length > 3) intro = false;
-        D.INTRO[k].forEach(function (l) { if (l.length > 62) intro = false; });
-        if (!d.getElementById(D.PEG[k])) intro = false;
+        if (D.INTRO[k].length < 2 || D.INTRO[k].length > 4) { intro = false; introNote = k + ": " + D.INTRO[k].length + " trin"; }
+        D.INTRO[k].forEach(function (l) {
+            var n = l.tekst.split(/[.?] /).length;
+            if (l.tekst.length > 420 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst)) { intro = false; introNote = l.tekst.slice(0, 60); }
+        });
     });
-    paastand("to eller tre replikker pr. fane, højst ca. 60 tegn, og det, han peger på, findes", intro);
+    paastand("to til fire trin pr. fane, hvert med to til fire hele sætninger (højst 420 tegn)", intro, introNote);
+    paastand("den gamle knap Spring præsentationen over er væk", !d.getElementById("kurve-spring") && !d.getElementById("sam-spring") && !d.getElementById("udtryk-spring"));
     var L = NK.laerer;
+    /* Den faelles test kalder startIntro(tving); her er der én laerer for
+       hele siden, og startIntro tager (fane, tving) */
+    var startIntro = L.startIntro;
+    ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
+        NK.visFane(id);
+        for (i = 0; i < 60; i++) L.opdater(1 / 60);
+        L.introId = id;
+        L.startIntro = function (tving) { return startIntro.call(this, id, tving); };
+        NK.Praesentation.selvtest(L, function (sek) { for (var n = 0; n < Math.round(sek * 60); n++) L.opdater(1 / 60); }).forEach(function (r) {
+            paastand(id + ": " + r[0], r[1], r[2]);
+        });
+        delete L.startIntro;
+    });
     NK.visFane("sammenstoed");
     L.startIntro("sammenstoed", true);
     for (i = 0; i < 180; i++) L.opdater(1 / 60);
-    paastand("K viser præsentationen igen, og knappen Spring over vises", L.laererIIntro() && !d.getElementById("sam-spring").hidden);
-    d.getElementById("sam-spring").click();
+    var samBoble = d.getElementById("sam-laerred-boble");
+    paastand("K viser præsentationen igen med taleboblen", L.laererIIntro() && samBoble && !samBoble.hidden);
+    NK.visFane("kurve");
     for (i = 0; i < 120; i++) L.opdater(1 / 60);
-    paastand("Spring over sender ham ud", !L.laererIIntro() && d.getElementById("sam-spring").hidden);
-    /* Tilbuddet skal ogsaa vaere vaek paa skaermen, ikke kun have hidden:
-       .tilbud har display: flex, som ellers overtrumfer hidden */
+    paastand("faneskift midt i præsentationen sender ham ud, og boblen forsvinder", !L.laererIIntro() && samBoble.hidden);
     function ses(id) { var e = d.getElementById(id); return w.getComputedStyle(e).display !== "none" && e.offsetWidth > 0; }
     w.localStorage.setItem("nk-sb1.1-intro", JSON.stringify({ kurve: true, sammenstoed: true }));
     NK.visFane("udtryk");
     paastand("første gang på en fane står Start præsentation og Nej tak", ses("udtryk-tilbud"));
     d.querySelector("#udtryk-tilbud .tilbud-start").click();
     for (i = 0; i < 180; i++) L.opdater(1 / 60);
-    paastand("efter Start er tilbuddet væk, og han taler", !ses("udtryk-tilbud") && L.laererIIntro() && ses("udtryk-spring"));
+    paastand("efter Start er tilbuddet væk, og han taler", !ses("udtryk-tilbud") && L.laererIIntro() && ses("udtryk-laerred-boble"));
     for (i = 0; i < 1800; i++) L.opdater(1 / 60);
-    paastand("når han er færdig, er både tilbuddet og Spring over væk", !L.laererIIntro() && !ses("udtryk-tilbud") && !ses("udtryk-spring"));
+    paastand("han går ikke af sig selv, men venter på Næste", L.laererIIntro() && ses("udtryk-laerred-boble"));
+    d.querySelector("#udtryk-laerred-boble .km-spring").click();
+    for (i = 0; i < 120; i++) L.opdater(1 / 60);
+    paastand("efter Spring præsentationen over er både tilbuddet og boblen væk", !L.laererIIntro() && !ses("udtryk-tilbud") && !ses("udtryk-laerred-boble"));
     NK.visFane("kurve"); NK.visFane("udtryk");
     paastand("tilbuddet kommer ikke igen på samme fane", !ses("udtryk-tilbud"));
     ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
@@ -321,7 +341,7 @@ function koer() {
         tekster.push(o.tekst, o.hint, o.rigtigTekst || "");
         (o.valg || []).forEach(function (v) { tekster.push(v.tekst + " " + v.forklaring); });
     });
-    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k]); });
+    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k].map(function (l) { return l.tekst; })); });
     D.REAKTIONER.forEach(function (R) { tekster.push(R.ligning, D.udtrykTekst(R, R.orden)); });
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);

@@ -220,8 +220,9 @@ function koerTest(W) {
     paastand("et overskud på 0 godkendes, og et tomt felt er ikke en fejl", T.overskud("0", "agurk", D.ORDRER[3]).ok && T.produkter("", D.ORDRER[3]).tom);
 
     overskrift("6. Sproget");
-    var replikker = [].concat(D.INTRO_HOTDOG, D.INTRO_MOLEKYLER, D.INTRO_REGN, D.NIVEAU_ROS,
-        [D.HOTDOG_FAERDIG, D.MAAL_FAERDIG, D.OPGAVER_FAERDIG, D.AEG_AGURK]);
+    var INTRO = [].concat(D.INTRO_HOTDOG, D.INTRO_MOLEKYLER, D.INTRO_REGN);
+    var ROS = [D.HOTDOG_FAERDIG, D.MAAL_FAERDIG, D.OPGAVER_FAERDIG, D.AEG_AGURK];
+    var replikker = INTRO.map(function (l) { return l.tekst; }).concat(ROS);
     var tekster = replikker.concat(
         D.ORDRER.map(function (o) { return o.tekst + " " + (o.hint || "") + " " + o.efter + " " + o.bon; }),
         [].concat.apply([], D.ORDRER.map(function (o) {
@@ -235,9 +236,13 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_HOTDOG, D.INTRO_MOLEKYLER, D.INTRO_REGN].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med 'Her'", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
 
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
@@ -344,7 +349,7 @@ function koerTest(W) {
     felt(2, "3"); felt(3, "1"); felt(4, "3"); tik(H, 3);
     paastand("og det står bagefter, at den ene bøf ikke er nok", H.naaet && /1 bøf er ikke nok til en dobbeltburger mere/.test(H.el.besked.textContent));
     tik(H, 3);
-    paastand("efter alle ti ordrer roser Kemichael", !!(H.laerer.scene && H.laerer.scene.navn === "faerdig"));
+    paastand("efter alle ti ordrer kommer Kemichael (hele fanen er klaret)", !!(H.laerer.scene && H.laerer.scene.navn === "faerdig"));
     paastand("knappen går videre til molekylerne", H.el.knap.textContent === "Videre til molekylerne →");
     H.knap();
     paastand("og fane 2 vises", d.getElementById("fane-molekyler").classList.contains("aktiv"));
@@ -455,7 +460,7 @@ function koerTest(W) {
     paastand("tabellen viser før og efter", d.getElementById("molekyler-foer-0").textContent === "2" &&
         d.getElementById("molekyler-efter-3").textContent === "4" && d.getElementById("molekyler-foer-3").textContent === "0");
     tik(M, 3);
-    paastand("efter det sidste mål roser Kemichael", !!(M.laerer.scene && M.laerer.scene.navn === "faerdig"));
+    paastand("efter det sidste mål kommer Kemichael (hele fanen er klaret)", !!(M.laerer.scene && M.laerer.scene.navn === "faerdig"));
     M.knap();
     paastand("knappen gik videre til tavlen", d.getElementById("fane-regn").classList.contains("aktiv"));
     klik('[data-fane="fane-molekyler"]');
@@ -527,30 +532,33 @@ function koerTest(W) {
     R.nulstilAlt();
     [0, 1, 2, 3].forEach(loes);
     tik(R, 3);
-    paastand("fire opgaver på Let: Kemichael roser", R.rost[0] === true && !!(R.laerer.scene && R.laerer.scene.navn === "niveau"));
+    paastand("fire opgaver på Let: Kemichael kommer ikke (kun når alle tolv er løst)", !R.laerer.scene);
     R.vaelg(0);
     paastand("en løst opgave vises færdig", R.opg.gennemsyn && R.opg.faerdig && R.el.knap.textContent === "Regn den igen");
+    D.OPGAVER.forEach(function (o, i) { if (!R.status[i].loest) loes(i); });
+    tik(R, 3);
+    paastand("alle tolv opgaver er løst: Kemichael kommer", !!(R.laerer.scene && R.laerer.scene.navn === "faerdig"));
+    tik(R, 15);
     R.nulstilAlt();
     paastand("Start forfra nulstiller alt", R.antalLoest() === 0);
     tik(R, 3);
 
-    overskrift("10. Kemichaels præsentation og rundvisningen");
-    [["fane-hotdog", H, "hotdog"], ["fane-molekyler", M, "molekyler"], ["fane-regn", R, "regn"]].forEach(function (x) {
+    overskrift("10. Kemichaels præsentation (fælles test) og rundvisningen");
+    [["fane-hotdog", H], ["fane-molekyler", M], ["fane-regn", R]].forEach(function (x) {
         klik('[data-fane="' + x[0] + '"]');
         var sim = x[1];
-        sim.startIntro(true);
-        tik(sim, 1);
-        paastand(x[2] + ": K viser præsentationen, og knappen Spring over står der",
-            !!(sim.laerer.scene && sim.laerer.scene.navn === "intro") && !d.getElementById(x[2] + "-spring").hidden);
-        sim.springIntro();
-        paastand(x[2] + ": Spring over sender ham ud", sim.laerer.scene && sim.laerer.scene.navn === "introUd");
-        tik(sim, 3);
+        sim.tilpas();
+        tik(sim, 2.5);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(x[0] + ": " + r[0], r[1], r[2]);
+        });
     });
     klik('[data-fane="fane-hotdog"]');
-    H.startIntro(true); tik(H, 0.5);
+    H.startIntro(true); tik(H, 2.5);
     H.laegPaa("poelse"); tik(H, 1);
-    paastand("man kan lægge på brættet, mens han taler", H.antal("poelse") >= 1 && H.laerer.scene.navn === "intro");
+    paastand("man kan lægge på brættet, mens han præsenterer", H.antal("poelse") >= 1 && H.laererIIntro());
     H.springIntro(); tik(H, 3);
+    paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
     paastand("tilbuddet skjules med display: none efter Nej tak", (function () {
         H.visTilbud(true); H.afvisTilbud();
         return W.getComputedStyle(d.getElementById("hotdog-tilbud")).display === "none";

@@ -15,24 +15,24 @@
 
     var TURE = {
         "fane-fa": [
+            { sel: "#fa-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Svar i scenen eller på kortet, og tryk Indsend svar. Giv et hint giver ét hint ad gangen og til sidst svaret." },
             { sel: "#fa-anker-lys", titel: "Lyset", tekst: "Lampen sender hvidt lys gennem kuvetten. Noget af lyset bliver absorberet i kuvetten, og øjet ser resten." },
             { sel: "#fa-anker-graf", titel: "Spektret", tekst: "Absorbansen ved hver bølgelængde. Det farvede areal under kurven er det lys, stoffet absorberer. Hold musen over grafen for at se tallene." },
             { sel: "#fa-anker-cirkel", titel: "Farvecirklen", tekst: "Den farve, vi ser, står over for det lys, der bliver absorberet. Krydset er det absorberede lys." },
-            { sel: "#fa-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#fa-opgaver", titel: "Opgaverne", tekst: "Først bygger du farven selv, så kommer fem rigtige stoffer. En opgave, du løser uden at se svaret, får en stjerne." },
+            { sel: "#fa-opgaver", titel: "Opgaverne", tekst: "Først bygger du farven selv, så kommer fem rigtige stoffer. En opgave, du løser i første forsøg uden at se svaret, får en stjerne. Start forfra begynder opgaven forfra." },
             { sel: "#quizknap", titel: "Quizzen", tekst: "Seks spørgsmål om farver, spektre og chromoforer." }
         ],
         "fane-ko": [
+            { sel: "#ko-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Når du har svaret i scenen, trykker du Indsend svar. Giv et hint giver ét hint ad gangen." },
             { sel: "#ko-anker-tavle", titel: "Molekylet", tekst: "Den gule skygge viser de konjugerede dobbeltbindinger. På fanen Tomaten kan du klikke på dobbeltbindingerne." },
             { sel: "#ko-anker-graf", titel: "Spektret", tekst: "Fra 150 nm. Til venstre for 400 nm er UV, som øjet ikke kan se. Kun en top i det synlige lys giver farve." },
             { sel: "#ko-anker-glas", titel: "Glasset", tekst: "Farven, regnet af spektret." },
-            { sel: "#ko-status", titel: "Linjen forneden", tekst: "Næste skridt, og hvad der skete. Knappen giver ét hint ad gangen og til sidst svaret." },
             { sel: "#ko-opgaver", titel: "Opgaverne", tekst: "Fire opgaver med kæden og fire med lycopen fra tomater." }
         ],
         "fane-ch": [
+            { sel: "#ch-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Markér chromoforen i molekylet, og tryk Indsend svar. Derefter vælger du farven på kortet." },
             { sel: "#ch-anker-tavle", titel: "Molekylet", tekst: "Klik på dobbeltbindingerne i chromoforen. C=O og N=N tæller med. Klik igen for at fjerne en markering." },
             { sel: "#ch-anker-graf", titel: "Spektret og glasset", tekst: "Kommer frem, når du har valgt farven." },
-            { sel: "#ch-status", titel: "Linjen forneden", tekst: "Næste skridt, og hvad der gik galt. Knappen giver ét hint ad gangen og til sidst svaret." },
             { sel: "#ch-opgaver", titel: "Opgaverne", tekst: "Otte molekyler fra let til svær: nogle er farveløse, andre er farvestoffer." }
         ]
     };

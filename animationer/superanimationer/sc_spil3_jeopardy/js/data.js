@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - de to quizzer og Kemichaels replikker
+   data.js - de to quizzer og Kemichaels praesentation
 
    D.QUIZZER har én quiz pr. niveau. Linket vaelger niveauet:
    index.html er C (1.g), index.html#b er B. En laerer kan erstatte
@@ -212,15 +212,18 @@
     D.TAENKETID = 30;
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    /* Første gang spillet åbnes i en browser. Højst ca. 60 tegn pr. replik og
-       ingen teori. Den linje, der står i INTRO_PEG, siger han, mens han peger
-       på opsætningen. */
+    /* Paa titelskaermen, naar man beder om den (../kemichael/praesentation.js):
+       ét trin ad gangen, og man trykker Naeste. Hvert trin er to til fire
+       hele saetninger i Kemibogens sprog, uden teori og uden vittigheder.
+       sel: det, han peger paa, og som faar en gul ramme, der blinker. */
     D.INTRO = {
         titel: [
-            "Velkommen til Kemi-Jeopardy. Jeg er jeres vært.",
-            "Skriv holdenes navne her, og tryk Start.",
-            "Beløbene er i kroner. De bliver ikke udbetalt."
+            { tekst: "I Kemi-Jeopardy spiller klassen i hold om point på tavlen. Holdene vælger en kategori og et beløb på brættet og svarer på ledetråden ved at stille et spørgsmål. Under titlen står navnet på den quiz, der er valgt.",
+              sel: "#titel-quiz" },
+            { tekst: "Under titlen vælger du antallet af hold og tiden på uret, og holdenes navne skriver du i felterne. Knappen Egne spørgsmål åbner quizzen som tekst, så du kan skifte spørgsmålene ud. Spillet begynder, når du trykker på Start spillet.",
+              sel: "#opsaetning" },
+            { tekst: "Knappen Regler øverst til højre forklarer pointene, Daily Double og Final. Knappen med spørgsmålstegnet giver en rundvisning på den skærm, der vises.",
+              sel: ["#regelknap", "#hjaelpknap"] }
         ]
     };
-    D.INTRO_PEG = 1;
 }());

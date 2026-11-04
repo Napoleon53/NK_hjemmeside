@@ -447,43 +447,47 @@
     };
 
     /* ----- Kemichael -------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; tingene paa laerredet er de usynlige .anker fra
+       rundvisningen). felt: proeven paa bordet (introFelt i js/laerer.js).
+       Ingen vittigheder i praesentationen. */
     D.INTRO_MONTRE = [
-        "Grundstofudstillingen. Rengøringen har tømt den. Igen.",
-        "Prøverne står i kassen. Skriv svarene til højre.",
-        "Træk prøven op på sin plads. Den står på skiltet."
+        { tekst: "I denne fane sætter du grundstofferne 1 til 36 på plads i skolens grundstofudstilling. Udstillingen er formet som det periodiske system, og hvert rum har et skilt med atomnummer og symbol. Tallene foroven er hovedgrupperne, og tallene til venstre er perioderne.",
+          sel: "#montre-anker-montre" },
+        { tekst: "Prøven på bordet har et mærke, hvor enten navnet eller symbolet mangler. Du skriver navnet eller symbolet på opgavekortet og trækker prøven op i rummet med det rigtige symbol på skiltet.",
+          felt: "proeve", sel: "#montre-kort" },
+        { tekst: "Når prøven står på plads, skriver du elektronstrukturen, og tavlen tegner atommodellen imens. Knappen på opgavekortet giver et hint og derefter svaret. Navnetavlen midt i udstillingen viser alle grundstoffernes navne.",
+          sel: ["#montre-anker-tavle", "#montre-knap", "#montre-anker-navne"] }
     ];
     D.INTRO_FORMLER = [
-        "Flaskerne. Stofferne er lavet af udstillingens grundstoffer.",
-        "Tæl atomerne, og skriv tallene til højre.",
-        "Parenteser tæller. Det glemmer alle én gang."
+        { tekst: "I denne fane tæller du atomerne i et stof. Tavlen viser stoffets formel, og på opgavekortet skriver du antallet af atomer af hvert grundstof og til sidst antallet i alt.",
+          sel: ["#formler-anker-tavle", "#formler-kort"] },
+        { tekst: "Når et grundstof er talt rigtigt, flyver dets atomer ud af udstillingen og op på tavlen. En parentes i formlen bliver til lige så mange kopier, som tallet efter parentesen siger.",
+          sel: "#formler-anker-tavle" },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Du skifter stof ved at klikke på en af de små flasker på bordet, og listen under opgavekortet viser flaskerne i de tre niveauer.",
+          sel: ["#formler-knap", "#formler-anker-raekke", "#formler-fremskridt"] }
     ];
     D.INTRO_OPRAAB = [
-        "Opråb. Jeg siger et grundstof, og du finder det.",
-        "Tre fejl, og timen er slut. Det er ikke personligt."
+        { tekst: "I denne fane finder du grundstofferne i udstillingen på tid. Du svarer ved at klikke på grundstoffet i udstillingen, og når et rum blinker, vælger du grundstoffets navn på tavlen.",
+          sel: "#opraab-anker-montre" },
+        { tekst: "Tavlen siger, hvilket grundstof du skal finde, og kridtstregen på tavlen viser, hvor lang tid du har. Et hurtigt svar giver flere point, og en stime af rigtige svar ganger pointene op. Du mister et liv, hvis du svarer forkert eller ikke når at svare, og efter tre mistede liv er spillet slut.",
+          sel: ["#opraab-anker-tavle", "#opraab-kort"] },
+        { tekst: "Du starter spillet med knappen Start opråbet. Knappen Hvem er jeg? starter en ekstra runde med 20 gåder om grundstoffer, som du kender fra hverdagen.",
+          sel: ["#opraab-knap", "#opraab-hvem"] }
     ];
 
-    D.PERIODE_ROS = [
-        "Hydrogen og helium. Første periode er på plads.",
-        "Anden periode. Neon lyser, og det gør jeg næsten også.",
-        "Tredje periode. Natrium ligger stadig i olie. Godt.",
-        "Fjerde periode. Atten prøver, og arsenet er talt."
-    ];
-    D.MONTRE_FULD = "Udstillingen er fuld. Nu tør jeg vise den til rektor.";
-
-    D.NIVEAU_ROS = [
-        "Fire flasker. Tallene sad, hvor de skulle.",
-        "Samme symbol to steder, og ingen blev glemt.",
-        "Parenteserne holdt. Det gør de ikke altid."
-    ];
-    D.FORMLER_FAERDIG = "Tolv flasker talt. Jeg noterer det i regnskabet.";
-
+    /* Han kommer kun ind af sig selv, naar en hel fane er klaret (brugerens
+       regel 4. nov. 2026): alle 36 proever, alle tolv flasker, eller et
+       spil, der er gaaet godt (én gang pr. besoeg for hvert spil). */
+    D.MONTRE_FULD = "Alle 36 prøver står i udstillingen. Nu tør jeg vise den til rektor.";
+    D.FORMLER_FAERDIG = "Du har talt atomerne i alle tolv flasker. Jeg skriver det ind i regnskabet.";
     D.SLUT_REPLIK = {
-        ingen: "Nul point. Udstillingen står der stadig. Den venter.",
-        faa: "Der var flere grundstoffer, end du nåede. Det er der altid.",
-        mange: "Hurtigere end kaffemaskinen. Det er ikke svært.",
-        rekord: "Ny rekord. Jeg skriver det ned. Et sted.",
-        hvem: "Alle tyve fundet. Nu kender du dem bedre end rektor."
+        mange: "Du er hurtigere end kaffemaskinen, men det er heller ikke svært.",
+        rekord: "Det er en ny rekord. Jeg skriver den ned et sted.",
+        hvem: "Du har fundet alle tyve grundstoffer. Nu kender du dem bedre end rektor."
     };
 
     NK.Data = D;

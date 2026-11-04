@@ -86,17 +86,30 @@ atommassen forneden. Hullet i periode 1 forklarer, hvilket tal der er hvad,
 fordi atomnummeret i stedet for atommassen er den hyppigste fejl. Musen over
 et felt viser navnet.
 
-**Kemichael** præsenterer hver fane første gang, den åbnes i en browser, efter
-reglen i `../README.md`: vægten tre replikker (han peger på panelet og på
-forklaringen på plakaten), skålvægten tre (han peger på svarene), ukendt stof
-tre (han peger på mærket). Han går kun ved den store knap, to klik på ham
-eller Esc. <kbd>K</kbd> viser præsentationen igen. Ellers roser han kort, når
-et niveau er løst, og kommenterer runden på skålvægten. Replikkerne står
-nederst i `js/data.js`. 29. sept. 2026 blev de skrevet om til almindeligt
-dansk (brugeren: "Kemichael snakker generelt i tåger"): hver replik skal kunne
-forstås uden at kende scenen, fx "Her ligger 1 mol af et stof i hver skål."
-i stedet for "Skålvægten. 1 mol på hver side." Kaffekoppen på bordet (fane 1 og 3) er det fælles
-påskeæg.
+**Kemichael** præsenterer hver fane, når eleven siger ja (se nedenfor).
+Præsentationen er den fælles fra 4. nov. 2026 (`../kemichael/praesentation.js`
+og `praesentation.css`): tre trin pr. fane (`D.INTRO_*` i `js/data.js`), hvert
+med to til fire hele sætninger i Kemibogens sprog om, hvad fanen træner, og
+hvordan tingene bruges. Teksten står i et lyst papirkort ved hans hoved med to
+knapper, "Næste" (på sidste trin "Afslut") og "Spring præsentationen over". Han
+går aldrig videre af sig selv; Enter og pil til højre er Næste, og Esc springer
+over. Det, trinnet handler om, får en gul ramme, der blinker: plakaten, feltet
+med atomnummer og atommasse, vægten, skålvægten, skiltet, mærket, tavlen med
+etiketterne og kortene i panelet (de usynlige `.anker` fra rundvisningen). Han
+peger op mod plakaten og til højre mod panelet og bordet; mod noget til venstre
+for ham kigger han i stedet. Et faneskift sender ham ud, og <kbd>K</kbd> viser
+præsentationen igen.
+
+Han kommer ellers kun ind af sig selv, når en hel fane er gennemført
+(brugerens regel 4. nov. 2026): når alle tolv stoffer er vejet ("Du har vejet
+alle tolv stoffer og kan nu regne molarmassen ud for et stof ud fra
+formlen."), når alle tolv flasker har fået etiket ("Alle tolv flasker har fået
+den rigtige etiket, og du fandt hvert stof ud fra molarmassen.") og efter en
+runde på skålvægten med ni rigtige af ni ("Du har svaret rigtigt på alle ni
+par. Du ved, hvad der gør 1 mol af et stof tungt."). Rosen efter hvert niveau og
+kommentaren efter hver runde (efter antal rigtige og ved ny rekord) er taget
+ud; resultatet af runden står i opgavekortet. Kaffekoppen på bordet (fane 1 og
+3) er det fælles påskeæg, og klik på ham giver de fælles svar.
 
 Direkte links: `index.html#skaal` og `index.html#ukendt`.
 
@@ -177,7 +190,10 @@ uden at kuglerne falder oven i hinanden, at 12 typiske fejl i atommassen og 14
 i molarmassen giver den rigtige besked, at parrene synker til den rigtige side,
 og at mindst fire af dem har flest atomer på den lette side, at gåderne har den
 afstand, niveauet siger, at sproget holder reglerne, at alle tre faner kan
-gennemføres, og at layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en
+gennemføres, hvornår Kemichael kommer af sig selv (kun når en hel fane er
+gennemført), hans præsentation (også den fælles test fra
+`../kemichael/praesentation.js` på alle tre faner), og at layoutet holder fra
+520 × 380 til 1500 × 900. Den kræver en
 lokal server eller Chrome med `--allow-file-access-from-files`. Den lægger
 elevens gemte fremskridt tilbage bagefter.
 
@@ -200,8 +216,8 @@ elevens gemte fremskridt tilbage bagefter.
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
 åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker fanernes `startIntro` ind (`NK.Praesentation.pakInd`).
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
 
 ## I menuen

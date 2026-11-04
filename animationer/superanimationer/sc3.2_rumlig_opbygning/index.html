@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Molekylers rumlige opbygning</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1>Molekylers<span class="lang"> rumlige</span> opbygning</h1>
@@ -31,7 +32,16 @@
         <button class="vinkelknap" id="byg-vinkelknap" type="button" aria-pressed="false" title="Vinkelmåler (V)">
             <img src="sprites/vinkelmaaler.svg" alt=""><span>Vinkelmåler</span>
         </button>
-        <div class="scenebesked" id="byg-besked" aria-live="polite"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, brugerens valg 3. og 4. nov. 2026) -->
+        <div class="scenekort opgave" id="byg-skort">
+            <div class="sk-ind" id="byg-ind"></div>
+            <div class="sk-bund tom" id="byg-status">
+                <p class="st-tekst" id="byg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="byg-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="byg-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -66,15 +76,10 @@
             <div class="talraekke"><span id="byg-form-atom">Omkring valgt atom</span><span class="tal" id="byg-form">-</span></div>
             <div class="talraekke"><span>Målt vinkel</span><span class="tal gul" id="byg-vinkel">-</span></div>
         </div>
-
-        <!-- Én knap: Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
         <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="byg-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="byg-opg-tekst"></p>
-            <div class="valg" id="byg-opg-valg" hidden></div>
-            <p class="besked" id="byg-opg-hint"></p>
-            <p class="besked" id="byg-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="byg-opg-knap" type="button">Start opgave</button></div>
+            <h2>Opgaver <span class="taeller">løst: <b id="byg-opg-loest">0</b></span></h2>
+            <p class="opgave-nr">Opgaven på kortet: <b id="byg-opg-nr">ikke startet</b></p>
+            <div class="knaprad"><button class="knap nulstil" id="byg-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
         </div>
     </aside>
 </section>
@@ -92,7 +97,16 @@
         <button class="vinkelknap" id="mol-vinkelknap" type="button" aria-pressed="false" title="Vinkelmåler (V)">
             <img src="sprites/vinkelmaaler.svg" alt=""><span>Vinkelmåler</span>
         </button>
-        <div class="scenebesked" id="mol-besked" aria-live="polite"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, brugerens valg 3. og 4. nov. 2026) -->
+        <div class="scenekort opgave" id="mol-skort">
+            <div class="sk-ind" id="mol-ind"></div>
+            <div class="sk-bund tom" id="mol-status">
+                <p class="st-tekst" id="mol-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="mol-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="mol-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -124,14 +138,10 @@
             <div class="talraekke"><span>Bindingsvinkel</span><span class="tal gul" id="mol-vinkel"></span></div>
             <div class="talraekke"><span>Frie elektronpar på centralatomet</span><span class="tal" id="mol-frie-tal"></span></div>
         </div>
-
         <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="mol-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="mol-opg-tekst"></p>
-            <div class="valg" id="mol-opg-valg" hidden></div>
-            <p class="besked" id="mol-opg-hint"></p>
-            <p class="besked" id="mol-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="mol-opg-knap" type="button">Start opgave</button></div>
+            <h2>Opgaver <span class="taeller">løst: <b id="mol-opg-loest">0</b></span></h2>
+            <p class="opgave-nr">Opgaven på kortet: <b id="mol-opg-nr">ikke startet</b></p>
+            <div class="knaprad"><button class="knap nulstil" id="mol-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
         </div>
     </aside>
 </section>
@@ -169,6 +179,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/sprites.js"></script>

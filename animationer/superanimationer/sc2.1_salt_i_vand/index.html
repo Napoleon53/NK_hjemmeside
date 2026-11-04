@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Salt i vand</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">💧</span> Salt<span class="lang"> i vand</span></h1>
@@ -27,9 +28,18 @@
 <!-- FANE 1: OPLOESNINGEN                                               -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-oploes" role="tabpanel" aria-label="Opløsningen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="oploes-laerred"></canvas>
-        <div class="scene-mrk" id="oploes-status"></div>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): opgaven, svarene,
+             hint, forklaringen og knapperne (js/opgave.js) -->
+        <div class="scenekort" id="oploes-skort">
+            <div class="sk-ind" id="oploes-opg-ind"></div>
+            <div class="sk-bund" id="oploes-opg-status" hidden>
+                <p class="st-tekst" id="oploes-opg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="oploes-opg-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="oploes-opg-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -51,15 +61,11 @@
             <button class="knap nulstil" id="oploes-nulstil" type="button"><span>Ny krystal</span><span class="tegn">↺</span></button>
         </div>
 
-        <!-- Én knap, der aendrer sig med, hvor langt man er:
-             Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
+        <!-- Opgaverne staar paa kortet i scenen; her er kun taelleren og Start forfra -->
         <div class="kort opgavekort" id="oploes-opg-kort">
             <h2>Opgaver <span class="taeller"><b id="oploes-opg-nr">0</b>/<span id="oploes-opg-antal">4</span></span></h2>
-            <p class="opgave-spm" id="oploes-opg-tekst"></p>
-            <div class="valg en-spalte" id="oploes-opg-valg" hidden></div>
-            <p class="besked" id="oploes-opg-hint"></p>
-            <p class="besked" id="oploes-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="oploes-opg-knap" type="button">Start opgave</button></div>
+            <p class="note">Opgaverne står på kortet øverst i scenen.</p>
+            <button class="knap nulstil" id="oploes-opg-forfra" type="button" hidden><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort maaling">
@@ -75,8 +81,19 @@
 <!-- FANE 2: HVOR MEGET KAN DER VAERE?                                   -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-maetning" role="tabpanel" aria-label="Hvor meget kan der være?">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="maet-laerred"></canvas>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): opgaven, svarene,
+             hint, forklaringen og knapperne (js/opgave.js) -->
+        <div class="scenekort" id="maet-skort">
+            <div class="sk-ind" id="maet-opg-ind"></div>
+            <div class="sk-bund" id="maet-opg-status" hidden>
+                <p class="st-tekst" id="maet-opg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="maet-opg-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="maet-opg-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+
 
         <!-- Ligger over spatlen - positionen saettes af sim_maetning.js,
              saa den foelger glasset. -->
@@ -87,8 +104,6 @@
         </div>
 
         <button class="graf-skala-knap" id="maet-skala-knap" type="button">Skaler til stoffet</button>
-
-        <div class="scene-mrk" id="maet-status"></div>
     </div>
 
     <aside class="panel">
@@ -112,13 +127,11 @@
             <p class="note">Du kan også trække i kurven.</p>
         </div>
 
+        <!-- Opgaverne staar paa kortet i scenen; her er kun taelleren og Start forfra -->
         <div class="kort opgavekort" id="maet-opg-kort">
             <h2>Opgaver <span class="taeller"><b id="maet-opg-nr">0</b>/<span id="maet-opg-antal">4</span></span></h2>
-            <p class="opgave-spm" id="maet-opg-tekst"></p>
-            <div class="valg en-spalte" id="maet-opg-valg" hidden></div>
-            <p class="besked" id="maet-opg-hint"></p>
-            <p class="besked" id="maet-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="maet-opg-knap" type="button">Start opgave</button></div>
+            <p class="note">Opgaverne står på kortet øverst i scenen.</p>
+            <button class="knap nulstil" id="maet-opg-forfra" type="button" hidden><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort maaling">
@@ -168,7 +181,7 @@
         </ul>
 
         <h3>Opgaver</h3>
-        <p>Hver fane har fire opgaver. Sidder du fast, giver knappen først et hint og derefter svaret.</p>
+        <p>Hver fane har fire opgaver. De står på kortet øverst i scenen. Vælg et svar, og tryk på Indsend svar. Sidder du fast, giver knappen Giv et hint først et hint og derefter svaret.</p>
 
         <h3>De seks salte</h3>
         <p>Den grønne streg over knappen betyder <b>letopløseligt</b>, den orange <b>tungtopløseligt</b>. Det salt, du vælger, følger med over på den anden fane.</p>
@@ -196,6 +209,7 @@
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/valg.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/sim_oploes.js"></script>
 <script src="js/sim_maetning.js"></script>

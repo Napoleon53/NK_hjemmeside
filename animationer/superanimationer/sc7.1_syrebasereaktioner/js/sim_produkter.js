@@ -224,7 +224,6 @@
         var mig = this;
         this.el = { knap: NK.el("prod-knap"), besked: NK.el("prod-besked"), kort: NK.el("prod-kort") };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("prod-spring").addEventListener("click", function () { mig.springIntro(); });
         Tv.bindNiveau("prod-niveau", this);
     };
 
@@ -387,9 +386,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.1-intro-produkter", tilbud: "prod-tilbud", spring: "prod-spring" });
-
-    P.pegPaaFelt = function () {};
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.1-intro-produkter", tilbud: "prod-tilbud" });
 
     NK.SimProdukter = SimProdukter;
 }());

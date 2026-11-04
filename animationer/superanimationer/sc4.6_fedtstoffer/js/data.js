@@ -208,30 +208,45 @@
         ]
     };
 
-    /* ----- Kemichael ------------------------------------------------------------- */
+    /* ----- Kemichael -------------------------------------------------------------
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_FABRIK = [
-        "Fedtfabrikken. Kunderne står i panelet.",
-        "Træk tre fedtsyrer hen på glycerolens OH-grupper.",
-        "Kunderne betaler ikke. Det er en skole."
+        { tekst: "I denne fane bygger du fedtstoffer af glycerol og fedtsyrer. Du trækker en fedtsyre fra bordet hen på en af de tre OH-grupper på glycerol, og ved hver binding dannes der et vandmolekyle. Et klik på en fedtsyre på glycerol tager fedtsyren af igen.",
+          sel: ["#fabrik-anker-glycerol", "#fabrik-anker-fliser"] },
+        { tekst: "Kunden på opgavekortet fortæller, hvor fedtet skal være fast eller flydende. Kortet Dit fedtstof viser smeltepunktet og tilstanden fire steder i køkkenet, fra fryseren til solen. Ordren bliver tjekket, så snart der sidder tre fedtsyrer på glycerol.",
+          sel: ["#fabrik-kort", "#fabrik-fedt-kort"] },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Når du har leveret alle fem ordrer, kan du bygge frit. Fedtstoffet i glasset følger med over på fane 2.",
+          sel: ["#fabrik-knap", "#fabrik-anker-glas"] }
     ];
     D.INTRO_KOELE = [
-        "Et køkken: fryser, køleskab, bord og sol.",
-        "Træk et glas hen et sted. Vinduet viser molekylerne.",
-        "Lad ikke smørret stå i solen. Tro mig."
+        { tekst: "I denne fane undersøger du, hvor fedtstofferne fra køkkenet er faste, og hvor de er flydende. Glassene står på køkkenbordet ved 20 °C. Du kan trække et glas over i fryseren, i køleskabet eller i vindueskarmen i solen.",
+          sel: ["#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue"] },
+        { tekst: "Zoomvinduet viser molekylerne i det valgte glas helt tæt på. Hver kæde har sin fedtsyres farve, og faste molekyler ligger i rækker. Varedeklarationen viser, hvor mange procent af fedtsyrerne der er mættede, monoumættede og polyumættede.",
+          sel: ["#koele-anker-zoom", "#koele-dekl-kort"] },
+        { tekst: "Opgavekortet beder dig gætte, om fedtet er fast, delvist fast eller flydende. Når du har gættet, flytter glasset selv hen til det sted, opgaven nævner. Knappen på kortet giver et hint og derefter svaret. Til sidst spørger opgavekortet, hvorfor smør er fast i køleskabet, når solsikkeolie er flydende.",
+          sel: "#koele-kort" }
     ];
 
-    D.ORDRER_FAERDIG = "Fem ordrer leveret. Det glider.";
-    D.KOELE_FAERDIG = "Du har styr på køkkenet. Mere end jeg har.";
+    /* Ros, naar en hel fane er klaret (kun foerste gang i browseren).
+       Det er sammen med det harske smoer de eneste gange, han kommer ind
+       af sig selv (brugerens regel 4. nov. 2026). */
+    D.ORDRER_FAERDIG = "Du har leveret alle fem ordrer, og fabrikken kører som smurt.";
+    D.KOELE_FAERDIG = "Du har bedre styr på køkkenet, end jeg har.";
 
     /* Paaskeaegget: smoerret har staaet i solen i tre uger */
     D.HARSK_TID = 12;           /* sekunder i solen, foer det bliver harskt */
-    D.HARSK = "Smørsyre. Nu lugter køkkenet af surströmming.";
+    D.HARSK = "Smørret er blevet harskt, og der er dannet smørsyre. Nu lugter køkkenet af surströmming.";
     D.HARSK_IGEN = [
-        "Igen. Kaktussen kan også lugte det.",
+        "Smørret er harskt igen. Selv kaktussen kan lugte det.",
         "Smør hører til i køleskabet. Det står på pakken.",
-        "Jeg har mere smør. Ikke uendeligt meget."
+        "Jeg har mere smør, men jeg har ikke uendeligt meget."
     ];
-    D.NYT_SMOER = "Nyt smør. Det her bliver i køleskabet.";
+    D.NYT_SMOER = "Det nye smør hører til i køleskabet.";
 
     NK.Data = D;
 }());

@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Salt i havvand (Mohr-titrering)</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Salt i havvand</h1>
@@ -34,7 +36,7 @@
 <!-- FANE 1: TITRERINGEN                                                -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-titrering" role="tabpanel" aria-label="Titreringen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="tit-laerred"></canvas>
         <div class="anker" id="tit-anker-buret"></div>
         <div class="anker" id="tit-anker-hane"></div>
@@ -44,20 +46,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="tit-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="tit-status"></div>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (4. nov. 2026):
+             teksten, feltet eller svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="tit-skort">
+            <div class="sk-ind" id="tit-ind"></div>
+            <div class="sk-bund tom" id="tit-status">
+                <p class="st-tekst" id="tit-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="tit-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="tit-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Til beregningen -->
-        <div class="kort opgavekort" id="tit-kort">
-            <h2><span id="tit-titel">Prøve 1</span><span class="taeller" id="tit-sted">Vesterhavet, 1,00 g</span></h2>
-            <p class="maal-tekst" id="tit-prompt"></p>
-            <div class="opgave-felt" id="tit-felt"></div>
-            <p class="besked" id="tit-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="tit-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="tit-buretkort">
             <h2>Buretten ved menisken <span class="taeller">aflæs bunden</span></h2>
             <canvas class="panel-laerred aflaes" id="tit-aflaes"></canvas>
@@ -75,15 +76,23 @@
 <!-- FANE 2: BEREGNINGEN                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-beregning" role="tabpanel" aria-label="Beregningen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="ber-laerred"></canvas>
         <div class="anker" id="ber-anker-tavle"></div>
         <div class="tilbud" id="ber-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="ber-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="ber-status"></div>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (4. nov. 2026):
+             teksten, feltet eller svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="ber-skort">
+            <div class="sk-ind" id="ber-ind"></div>
+            <div class="sk-bund tom" id="ber-status">
+                <p class="st-tekst" id="ber-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ber-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="ber-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -96,14 +105,6 @@
             <p class="note" id="ber-note"></p>
         </div>
 
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny opgave -->
-        <div class="kort opgavekort" id="ber-kort">
-            <h2><span>Masseprocenten</span><span class="taeller">trin <b id="ber-nr">1</b>/4</span></h2>
-            <p class="maal-tekst" id="ber-prompt"></p>
-            <div class="raekker" id="ber-raekker"></div>
-            <p class="besked" id="ber-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="ber-knap" type="button">Giv hint</button></div>
-        </div>
     </aside>
 </section>
 
@@ -111,7 +112,7 @@
 <!-- FANE 3: FEJLKILDER                                                 -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-forbrug" role="tabpanel" aria-label="Fejlkilder">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="for-laerred"></canvas>
         <div class="anker" id="for-anker-a"></div>
         <div class="anker" id="for-anker-b"></div>
@@ -119,20 +120,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="for-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="for-status"></div>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (4. nov. 2026):
+             teksten, feltet eller svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="for-skort">
+            <div class="sk-ind" id="for-ind"></div>
+            <div class="sk-bund tom" id="for-status">
+                <p class="st-tekst" id="for-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="for-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="for-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste -->
-        <div class="kort opgavekort" id="for-kort">
-            <h2><span id="for-titel">Fejlkilde</span><span class="taeller"><b id="for-nr">1</b>/<span id="for-ialt">6</span></span></h2>
-            <p class="maal-tekst" id="for-prompt"></p>
-            <div class="opgave-felt" id="for-valg"></div>
-            <p class="besked" id="for-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="for-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="for-tabelkort">
             <h2>Kolberne</h2>
             <div class="ab-tabel" id="for-tabel"></div>
@@ -213,7 +213,9 @@
 <script src="js/tegning.js"></script>
 <script src="js/lup.js"></script>
 <script src="js/graf.js"></script>
-<script src="js/praesentation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/scenekort.js"></script>
 <script src="js/sim_titrering.js"></script>
 <script src="js/sim_beregning.js"></script>
 <script src="js/sim_forbrug.js"></script>

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Absorptionsspektre</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">◐</span> Absorptionsspektre</h1>
@@ -30,17 +31,19 @@
 <section class="fane aktiv" id="fane-fa" role="tabpanel" aria-label="Farven">
     <div class="scene">
         <canvas id="fa-laerred"></canvas>
-        <p class="opgavelinje" id="fa-opgave"></p>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="scenekort opgave" id="fa-skort">
+            <div class="sk-ind" id="fa-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="fa-status">
+                <p class="st-tekst" id="fa-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fa-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="fa-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="fa-anker-lys"></div>
         <div class="anker" id="fa-anker-cirkel"></div>
         <div class="anker" id="fa-anker-graf"></div>
-        <div class="scene-valg" id="fa-valg"></div>
-
-        <div class="statuslinje" id="fa-status">
-            <p class="st-tekst" id="fa-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="fa-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="fa-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -52,6 +55,8 @@
         <div class="kort" id="fa-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="fa-loest">0</b>/9</span></h2>
             <div class="opg-liste" id="fa-liste"></div>
+            <p class="faerdig-tekst" id="fa-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="fa-forfra" type="button" title="Samme opgave forfra (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -62,17 +67,20 @@
 <section class="fane" id="fane-ko" role="tabpanel" aria-label="Konjugeringen">
     <div class="scene">
         <canvas id="ko-laerred"></canvas>
-        <p class="opgavelinje" id="ko-opgave"></p>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="scenekort opgave" id="ko-skort">
+            <div class="sk-ind" id="ko-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="ko-status">
+                <p class="st-tekst" id="ko-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ko-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="ko-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="ko-anker-tavle"></div>
         <div class="anker" id="ko-anker-graf"></div>
         <div class="anker" id="ko-anker-glas"></div>
         <div class="scene-valg" id="ko-valg"></div>
-
-        <div class="statuslinje" id="ko-status">
-            <p class="st-tekst" id="ko-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="ko-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="ko-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -84,6 +92,8 @@
         <div class="kort" id="ko-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="ko-loest">0</b>/8</span></h2>
             <div class="opg-liste" id="ko-liste"></div>
+            <p class="faerdig-tekst" id="ko-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="ko-forfra" type="button" title="Samme opgave forfra (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -94,16 +104,19 @@
 <section class="fane" id="fane-ch" role="tabpanel" aria-label="Chromoforen">
     <div class="scene">
         <canvas id="ch-laerred"></canvas>
-        <p class="opgavelinje" id="ch-opgave"></p>
+        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="scenekort opgave" id="ch-skort">
+            <div class="sk-ind" id="ch-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="ch-status">
+                <p class="st-tekst" id="ch-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ch-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="ch-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="ch-anker-tavle"></div>
         <div class="anker" id="ch-anker-graf"></div>
         <div class="scene-valg" id="ch-valg"></div>
-
-        <div class="statuslinje" id="ch-status">
-            <p class="st-tekst" id="ch-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="ch-forfra" type="button" title="Samme molekyle forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="ch-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -115,6 +128,8 @@
         <div class="kort" id="ch-opgaver">
             <h2>Molekylerne <span class="taeller">løst <b id="ch-loest">0</b>/8</span></h2>
             <div class="opg-liste" id="ch-liste"></div>
+            <p class="faerdig-tekst" id="ch-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="ch-forfra" type="button" title="Samme molekyle forfra (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -199,6 +214,7 @@
 <script src="js/data.js"></script>
 <script src="js/molekyle.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_farve.js"></script>
 <script src="js/sim_konj.js"></script>

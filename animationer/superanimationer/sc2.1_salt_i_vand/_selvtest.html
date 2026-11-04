@@ -71,8 +71,8 @@ function koerTest() {
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["oploes-navn", "oploes-hverdag", "oploes-ligning", "oploes-graense", "oploes-besked",
-        "oploes-status", "maet-navn", "maet-graense", "maet-besked", "maet-status", "maet-temp-tal",
-        "oploes-opg-knap", "maet-opg-knap"];
+        "maet-navn", "maet-graense", "maet-besked", "maet-temp-tal",
+        "oploes-opg-ind", "maet-opg-ind"];
     var tomme = skalHaveTekst.filter(function (id) {
         var e = d.getElementById(id);
         return !e || !e.textContent.replace(/\s/g, "");
@@ -82,9 +82,9 @@ function koerTest() {
         d.querySelectorAll("#oploes-saltvalg .saltknap").length === 6 &&
         d.querySelectorAll("#maet-saltvalg .saltknap").length === 6);
     paastand("teoriboksen er bygget", d.querySelectorAll("#teori-liste .teorikort").length === D.TEORI.length);
-    paastand("opgaveknapperne starter på \"Start opgave\"",
-        d.getElementById("oploes-opg-knap").textContent === "Start opgave" &&
-        d.getElementById("maet-opg-knap").textContent === "Start opgave");
+    paastand("papirkortene starter med \"Start opgave\"",
+        d.querySelector("#oploes-skort .sk-videre").textContent === "Start opgave" &&
+        d.querySelector("#maet-skort .sk-videre").textContent === "Start opgave");
 
     overskrift("3. Faneskift: præcis én aktiv ad gangen");
     ["fane-maetning", "fane-oploes", "fane-maetning"].forEach(function (id) {
@@ -450,10 +450,13 @@ function koerTest() {
         return NK.Tegn.skalVand(null, o.x, o.y, s1.ionRadius(o), s.vinkel + o.skalfase, s1.vandSkala, o.ion.q > 0, { forkert: s.forkert });
     }
     if (fejlIon && godIon) {
+        paastand("intet valgt: intet at sende ind", fejlOpg.tjek(s1) === false);
         var pg = midtAf(godIon, godNr);
-        paastand("klik på et rigtigt vendt molekyle giver en besked", typeof fejlOpg.klik(s1, pg.x, pg.y) === "string");
+        paastand("et klik vælger kun et molekyle (blå ring)", fejlOpg.peg(s1, pg.x, pg.y) === true && !!godIon.skal[godNr].ring);
+        paastand("et rigtigt vendt molekyle sendt ind giver en forklaring", typeof fejlOpg.tjek(s1) === "string" && !godIon.skal[godNr].ring);
         var pf = midtAf(fejlIon, fejlNr);
-        paastand("klik på det forkerte løser opgaven", fejlOpg.klik(s1, pf.x, pf.y) === true);
+        fejlOpg.peg(s1, pf.x, pf.y);
+        paastand("det forkerte molekyle sendt ind løser opgaven", fejlOpg.tjek(s1) === true);
     }
     s1.nulstil();
 
@@ -481,18 +484,8 @@ function koerTest() {
     paastand("hurtigst-opgaven viser det store ur", hurtig.stortUr === true);
     s1.saetOmroering(false);
 
-    NK.Valg.saet("NaCl");
-    op1.ny();
-    var knap1 = d.getElementById("oploes-opg-knap");
-    var trapper = [knap1.textContent];
-    op1.knap(); trapper.push(knap1.textContent);
-    op1.knap(); trapper.push(knap1.textContent);
-    paastand("knappen går Giv hint → Vis svaret → Ny opgave",
-        trapper.join("|") === "Giv hint|Vis svaret|Ny opgave", trapper.join(" | "));
-    paastand("hint og svar står i kortet",
-        !!d.getElementById("oploes-opg-hint").textContent && !!d.getElementById("oploes-opg-svar").textContent);
+    s1.saetOmroering(false);
     s1.nulstil();
-
     overskrift("13. Fane 2: opløst + bundfald går op");
     var s2 = NK.sims["fane-maetning"];
     d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
@@ -587,7 +580,7 @@ function koerTest() {
         if (Math.abs(s2.bundfald() - tal(b.valg[b.rigtig])) > 0.06) { ok2[1] = false; note2[1] = b.tekst + " -> " + b.valg[b.rigtig]; }
 
         var c = op2.typer[2](s2); c.start(s2);
-        if (!(s2.bundfald() > 0) || c.tjek(s2) !== false) { ok2[2] = false; note2[2] = "start: " + c.tekst; }
+        if (!(s2.bundfald() > 0) || typeof c.tjek(s2) !== "string") { ok2[2] = false; note2[2] = "start: " + c.tekst; }
         s2.saetTemp(100);
         if (typeof c.tjek(s2) !== "string") { ok2[2] = false; note2[2] = "for varmt: " + c.tekst; }
         c.visSvar(s2);
@@ -605,24 +598,35 @@ function koerTest() {
     var brugt = [], orgTyper = op2.typer;
     op2.typer = orgTyper.map(function (fn, nr) { return function (sim) { brugt.push(nr); return fn(sim); }; });
     op2.nyRunde();
-    var knap2 = d.getElementById("maet-opg-knap");
     var trinListe = [];
-    for (i = 0; i < 4; i++) { op2.ny(); op2.visSvar(); trinListe.push(knap2.textContent); }
+    for (i = 0; i < 4; i++) { op2.ny(); op2.visSvar(); trinListe.push(d.querySelector("#maet-skort .sk-videre").textContent); }
     paastand("hver opgave kommer én gang i runden", brugt.slice().sort().join("") === "0123", brugt.join(" "));
-    paastand("efter den sidste står der Se resultatet",
-        trinListe.join("|") === "Ny opgave|Ny opgave|Ny opgave|Se resultatet", trinListe.join(" | "));
+    paastand("efter den sidste står der Se resultatet (kortets knap går altid fremad)",
+        trinListe.join("|") === "Næste opgave|Næste opgave|Næste opgave|Se resultatet", trinListe.join(" | "));
     paastand("tælleren viser 4/4", d.getElementById("maet-opg-nr").textContent === "4");
-    op2.knap();
-    var sejrTekst = d.getElementById("maet-opg-tekst").textContent;
-    paastand("resultatet vises", op2.faerdig && sejrTekst.indexOf("Alle fire") === 0, sejrTekst);
-    paastand("der henvises til den anden fane", d.getElementById("maet-opg-svar").textContent.indexOf("Opløsningen") >= 0);
-    paastand("kortet får sejrsrammen", d.getElementById("maet-opg-kort").classList.contains("sejr"));
-    paastand("knappen hedder Start forfra", knap2.textContent === "Start forfra");
+    op2.videre();
+    var sejrTekst = d.getElementById("maet-opg-ind").textContent;
+    paastand("resultatet vises på kortet", op2.faerdig && sejrTekst.indexOf("Du løste") >= 0, sejrTekst);
+    paastand("der henvises til den anden fane", sejrTekst.indexOf("Opløsningen") >= 0);
+    var resKnap = d.querySelectorAll("#maet-skort button:not([hidden])");
+    paastand("resultatkortet har ingen Start forfra, kun Videre til den anden fane",
+        resKnap.length === 1 && resKnap[0].textContent.indexOf("Videre til") === 0 && d.getElementById("maet-skort").textContent.indexOf("forfra") < 0);
+    paastand("Start forfra ligger i panelet", !d.getElementById("maet-opg-forfra").hidden);
     paastand("Kemichael kommer med ros", !!(s2.laerer.scene && s2.laerer.scene.navn === "ros"));
-    op2.knap();
-    paastand("en ny runde starter forfra", !op2.faerdig && op2.gennemfoert === 0 && brugt.length === 5);
+    d.getElementById("maet-opg-forfra").click();
+    paastand("Start forfra i panelet begynder en ny runde", !op2.faerdig && op2.gennemfoert === 0 && brugt.length === 5 && op2.tilstand === "opgave");
+    /* Brugerens regel 4. nov. 2026: rosen for en hel fane kommer én gang */
+    s2.laererNyt();
+    for (i = 0; i < 4; i++) { if (i) op2.ny(); op2.visSvar(); }
+    op2.videre();
+    paastand("en runde mere giver ikke ros igen (én gang pr. fane pr. besøg)",
+        op2.faerdig && !(s2.laerer.scene && s2.laerer.scene.navn === "ros"), op2.faerdig + " " + (s2.laerer.scene && s2.laerer.scene.navn));
+    op2.forfra();
     op2.typer = orgTyper;
     s2.nulstil();
+
+    overskrift("15c. Papirkortet");
+    papirkortTest(d, W, NK, s1, s2, op1, op2);
 
     overskrift("16. Quizzen");
     var quizOk = true, quizNote = "";
@@ -651,10 +655,169 @@ function koerTest() {
     var streg = alTekst.match(/.{0,25}[—–].{0,25}/);
     paastand("ingen tankestreger i den synlige tekst", !streg, streg ? streg[0] : "");
     paastand("ingen 1+ eller 1− i ladninger", !/[A-Za-z₀-₉]¹[⁺⁻]/.test(alTekst));
+    /* Brugerens regel 4. nov. 2026: Kemichael taler i hele saetninger */
+    var KR = NK.LaererReplikker;
+    var kemLinjer = KR.UNGDOMMEN.concat([KR.NY_KRYSTAL, KR.ROS.oploes, KR.ROS.maetning]);
+    var kemDaarlige = kemLinjer.filter(function (t) {
+        return t.length > 130 || !/^[A-ZÆØÅ].*[.?!]$/.test(t) || /[—–]/.test(t) || /^Her\b/.test(t) ||
+            t.split(/[.?!] /).some(function (st) { return st.split(" ").length < 3 || /^(Og|Men|Hvis|Ikke|Ligesom|Knap|Bare|Som)\b/.test(st); });
+    });
+    paastand("Kemichaels " + kemLinjer.length + " replikker er hele sætninger på højst 130 tegn", kemDaarlige.length === 0, kemDaarlige.join(" | "));
 
     NK.Valg.saet("NaCl");
     d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
     s1.nulstil();
+}
+
+/* Papirkortet (4. nov. 2026): kortet staar i scenen og ikke i panelet,
+   ingen statuslinje nederst, Indsend svar er graa uden valg, et valg
+   bedoemmer ikke af sig selv, rigtigt svar bliver paa opgaven med Naeste
+   samme sted, Start forfra aldrig paa kortet, og kortet holder sig i
+   kortZone paa en hoej og en lav skaerm. */
+function papirkortTest(d, W, NK, s1, s2, op1, op2) {
+    var i;
+    paastand("body har klassen papirkort, og papirkort.css og .js er indlæst",
+        d.body.classList.contains("papirkort") && !!NK.Papir && !!d.querySelector('link[href="../faelles/papirkort.css"]'));
+    ["oploes", "maet"].forEach(function (p) {
+        var k = d.getElementById(p + "-skort");
+        paastand(p + ": kortet står i scenen, ikke i panelet", !!k && !!k.closest(".scene") && !k.closest(".panel"));
+        paastand(p + ": panelet har ingen opgavetekst eller svar", !d.querySelector("#fane-" + (p === "maet" ? "maetning" : "oploes") + " .panel .sk-knap, #" + p + "-opg-kort .valgknap"));
+    });
+    paastand("ingen statuslinje nederst i scenerne", !d.querySelector(".scene-mrk") && !d.querySelector(".scene.medtekst"));
+    paastand("Lexend gælder kortet", W.getComputedStyle(d.getElementById("oploes-skort")).fontFamily.indexOf("Lexend") >= 0);
+
+    d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
+    s1.tilpas(); s1.layout(true);
+    op1.forfra();
+    op1.kaldSlut(op1.opgave);
+    /* Ligningsopgaven: svarene vaelger kun */
+    op1.koe = [1, 0, 2, 3];
+    op1.ny();
+    var o = op1.opgave, ind = d.getElementById("oploes-opg-indsend");
+    paastand("Indsend svar er gråt uden valg", ind.classList.contains("ikke-klar") && !op1.kanSendes());
+    var forkert = (o.rigtig + 1) % 4;
+    d.querySelector('#oploes-skort .sk-knap[data-nr="' + forkert + '"]').click();
+    paastand("et svar vælger kun (bedømmes ikke af sig selv)", op1.tilstand === "opgave" && !o.afsluttet &&
+        d.querySelector('#oploes-skort .sk-knap[data-nr="' + forkert + '"]').classList.contains("valgt") && ind.classList.contains("klar"));
+    ind.click();
+    paastand("et forkert svar sendt ind: rødt, låst, besked på kortet, hintknappen lyser",
+        d.querySelector('#oploes-skort .sk-knap[data-nr="' + forkert + '"]').classList.contains("forkert") &&
+        d.getElementById("oploes-opg-status").classList.contains("skidt") &&
+        d.getElementById("oploes-opg-knap").classList.contains("peg"));
+    var hk = d.getElementById("oploes-opg-knap");
+    paastand("hintknappen hedder Giv et hint", hk.textContent === "Giv et hint");
+    hk.click();
+    paastand("hintet står på kortet, og knappen bliver til Vis svaret",
+        d.getElementById("oploes-opg-status").classList.contains("hint") && hk.textContent === "Vis svaret");
+
+    function maal(navn) {
+        var k = d.getElementById(navn).getBoundingClientRect();
+        var sc = d.getElementById(navn).closest(".scene").getBoundingClientRect();
+        return { bund: k.bottom - sc.top, h: k.height };
+    }
+    function iZone(navn, hvad) {
+        var m = maal(navn), z = NK.kortZone();
+        paastand(hvad + ": kortet (" + Math.round(m.h) + " px) holder sig i kortZone (" + z + " px)", m.bund <= 10 + z + 2, "bund " + Math.round(m.bund));
+    }
+    iZone("oploes-skort", "ligning + forkert svar + hint");
+    paastand("lupen begynder under kortet", s1.zoom.y >= maal("oploes-skort").bund);
+
+    /* Rigtigt: kortet bliver paa opgaven */
+    d.querySelector('#oploes-skort .sk-knap[data-nr="' + o.rigtig + '"]').click();
+    ind.click();
+    var groen = d.querySelector('#oploes-skort .sk-knap.rigtig');
+    paastand("rigtigt: kortet bliver på opgaven med svaret grønt dér, hvor der blev klikket",
+        op1.tilstand === "bliv" && !!groen && groen.getAttribute("data-nr") === String(o.rigtig) &&
+        d.getElementById("oploes-opg-ind").textContent.indexOf(o.tekst.slice(0, 20)) >= 0);
+    var vid = d.querySelector("#oploes-skort .sk-bund.bliv .sk-videre");
+    paastand("forklaringen står under svarene, og Næste opgave står, hvor Indsend svar stod",
+        !!vid && vid.textContent === "Næste opgave" && d.getElementById("oploes-opg-status").hidden &&
+        d.querySelector("#oploes-skort .sk-bund.bliv .st-tekst").textContent.indexOf("Rigtigt") === 0);
+    paastand("Start forfra står ikke på kortet", d.getElementById("oploes-skort").textContent.indexOf("forfra") < 0);
+    iZone("oploes-skort", "ligning, rigtigt svar");
+    vid.click();
+    paastand("Næste opgave: rosen står ikke under den næste opgave",
+        op1.tilstand === "opgave" && !d.querySelector("#oploes-skort .sk-bund.bliv") && d.getElementById("oploes-opg-besked").textContent === "");
+
+    /* Den laengste: omroeringsopgaven med tre lange svar, forkert, hint og vist svar */
+    op1.kaldSlut(op1.opgave);
+    op1.koe = [3]; op1.ny(); o = op1.opgave;
+    op1.vaelg(0); op1.indsendKlik(); op1.hjaelpKlik();
+    iZone("oploes-skort", "AgCl-opgaven med hint");
+    op1.visSvar();
+    paastand("Vis svaret: kortet bliver på opgaven med svaret gult", op1.tilstand === "bliv" && !!d.querySelector("#oploes-skort .sk-knap.svar-vist"));
+    iZone("oploes-skort", "AgCl-opgaven, svaret vist");
+
+    /* Hurtigst: Indsend svar foelger uret, kontakterne loeser ikke opgaven */
+    op1.kaldSlut(op1.opgave);
+    op1.koe = [2]; op1.ny(); o = op1.opgave;
+    s1.saetTemp && s1.saetOmroering(true);
+    koerTid(s1, 40, 0.05);
+    paastand("hurtigst: omrøring slået til løser ikke opgaven", op1.tilstand === "opgave" && !op1.kanSendes());
+    op1.kaldSlut(op1.opgave);
+    s1.saetOmroering(false);
+
+    /* Fane 2: temperaturen sendes ind */
+    d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
+    s2.lagt = false; s2.tilpas();
+    op2.forfra(); op2.kaldSlut(op2.opgave);
+    op2.koe = [2]; op2.ny(); o = op2.opgave;
+    var ind2 = d.getElementById("maet-opg-indsend");
+    s2.saetTemp(100); s2.opdater(0.016);
+    paastand("fane 2: skyderen på 100 °C løser ikke opgaven af sig selv", op2.tilstand === "opgave" && !o.afsluttet);
+    paastand("Indsend svar viser temperaturen", ind2.textContent === "Indsend svar: 100 °C", ind2.textContent);
+    ind2.click();
+    paastand("for varmt sendt ind giver en forklaring på kortet", d.getElementById("maet-opg-status").classList.contains("skidt"));
+    op2.hjaelpKlik();
+    iZone("maet-skort", "fane 2 med hint");
+    paastand("grafen og knapperne begynder under kortet", s2.graf.y - 34 >= maal("maet-skort").bund && s2.spatelY - 36 >= maal("maet-skort").bund);
+    op2.visSvar();
+    iZone("maet-skort", "fane 2, svaret vist");
+    op2.kaldSlut(op2.opgave);
+
+    /* Lav skaerm */
+    var ramme = d.defaultView.frameElement;
+    ramme.style.height = "660px";
+    void W.innerHeight;
+    paastand("lav skærm: kortZone er mindre", NK.kortZone() === 178, W.innerHeight + " " + NK.kortZone());
+    d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
+    s1.L.tilpas(); s1.layout(true);
+    op1.koe = [3]; op1.ny();
+    op1.vaelg(0); op1.indsendKlik(); op1.hjaelpKlik();
+    iZone("oploes-skort", "lav skærm, AgCl-opgaven med hint");
+    op1.visSvar();
+    iZone("oploes-skort", "lav skærm, AgCl-opgaven, svaret vist");
+    op1.kaldSlut(op1.opgave);
+    op1.koe = [1]; op1.ny(); o = op1.opgave;
+    op1.vaelg((o.rigtig + 1) % 4); op1.indsendKlik(); op1.hjaelpKlik();
+    iZone("oploes-skort", "lav skærm, ligning + forkert svar + hint");
+    paastand("lav skærm: lupen begynder under kortet", s1.zoom.y >= maal("oploes-skort").bund);
+    op1.kaldSlut(op1.opgave);
+    d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
+    s2.lagt = false; s2.tilpas();
+    op2.koe = [2]; op2.ny(); op2.indsendKlik(); op2.hjaelpKlik();
+    iZone("maet-skort", "lav skærm, fane 2 med hint");
+    paastand("lav skærm: grafen begynder under kortet", s2.graf.y - 34 >= maal("maet-skort").bund);
+    op2.kaldSlut(op2.opgave);
+    ramme.style.height = "800px";
+    void W.innerHeight;
+    s2.lagt = false; s2.tilpas(); s1.L.tilpas(); s1.layout(true);
+
+    /* Tilbage til udgangspunktet */
+    [op1, op2].forEach(function (op) {
+        op.kaldSlut(op.opgave); op.opgave = null; op.nyRunde(); op.tilstand = "intro"; op.visStatus(); op.visKort();
+    });
+    paastand("teksterne på kortet holder grænserne (hint ≤ 100, forklaring ≤ 160, svar ≤ 34)", (function () {
+        var bad = [];
+        [op1, op2].forEach(function (op) {
+            for (var k = 0; k < 6; k++) op.typer.forEach(function (fn) {
+                var x = fn(op === op1 ? s1 : s2);
+                if (x.hint && x.hint.length > 100) bad.push("hint: " + x.hint);
+                if (x.valg) x.valg.forEach(function (v) { if (v.length > 34) bad.push("svar: " + v); });
+            });
+        });
+        return bad.length ? bad[0] : true;
+    }()) === true);
 }
 
 function numerisk(a, b) { return a - b; }

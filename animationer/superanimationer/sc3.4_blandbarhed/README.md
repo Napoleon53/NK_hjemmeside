@@ -77,9 +77,17 @@ Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddis
   ligget nederst i halvandet sekund.
 * **Quiz** (fem spørgsmål) og **Teori** ligger bag knapper i toplinjen, **?** giver
   rundvisningen.
-* **Kemichael** præsenterer bassinet, når eleven vælger det (to linjer, peger på
-  Hæld i). Ellers kommer han kun forbi med én replik, når en stor oliedråbe
-  hænger midt i blandingen (påskeægget), højst én gang pr. sidevisning. Brugeren syntes, han talte for
+* **Kemichael** præsenterer bassinet, når eleven vælger det (tilbuddet og
+  <kbd>K</kbd>). Præsentationen er den fælles (`../kemichael/praesentation.js`,
+  brugerens regler 4. nov. 2026): tre trin med to til fire hele sætninger i
+  Kemibogens sprog, en taleboble ved hans hoved med **Næste** (på sidste trin
+  **Afslut**) og **Spring præsentationen over**, og en gul ramme om det, han
+  peger på (bassinet og glasset, de to øverste kort i panelet, opgavekortet og
+  Quiz). Han går aldrig videre af sig selv, og Esc sender ham ud. Han står
+  mellem bassinet og glasset. Ellers kommer han kun forbi med én replik, når en
+  stor oliedråbe hænger midt i blandingen (påskeægget, en af tre i
+  `D.REPLIK.svaever`), højst én gang pr. sidevisning og aldrig midt i
+  præsentationen. Det er ikke et besøg på tid. Brugeren syntes, han talte for
   meget, da han også kommenterede overløb og rystninger.
 
 Påskeæg: lige dele vand og ethanol vejer 0,926 g/mL, næsten det samme som olie
@@ -265,6 +273,9 @@ I menuen fra 26. sept. 2026 som c3.4 i `kemi-c-filer/samling_c3.html` og i
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
 åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker lærerens `startIntro` ind (`NK.Praesentation.pakInd`) og i
+`js/laerer.js` lægger præsentationen på læreren (`NK.Praesentation.trin`). Den
+gamle `js/praesentation.js` og knappen "Spring præsentationen over" midt i
+scenen er fjernet 4. nov. 2026.
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".

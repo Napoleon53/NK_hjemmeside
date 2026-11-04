@@ -9,12 +9,13 @@
    loesning som i sc2.2).
 
    Scener:
-     intro    startskaermen: tilbuddet Start praesentation / Nej tak
-              (js/praesentation.js). Tre korte linjer (D.INTRO.start);
-              mens han siger linjen D.INTRO_PEG, peger han paa valgene,
-              og de lyser op. Han gaar kun, naar eleven vil det.
-     mester   han kommer forbi og siger én linje, naar nogen bliver
-              Labyrintmester.
+     intro    startskaermen: tilbuddet Start praesentation / Nej tak og
+              praesentationen (D.INTRO), ét trin ad gangen med Naeste og
+              Spring praesentationen over. Han peger paa det, der
+              blinker, og gaar aldrig videre af sig selv. Koden er
+              faelles: ../kemichael/praesentation.js (NK.Praesentation).
+     mester   han kommer forbi og siger én replik, naar nogen bliver
+              Labyrintmester (hele spillet er gennemfoert).
    Han kommer aldrig, mens der spilles, og han forklarer ikke teori.
    Baggrundslivet er slaaet fra, saa han ikke gaar hen over labyrinten.
    ===================================================================== */
@@ -30,17 +31,12 @@
     Object.keys(K.ANKER).forEach(function (navn) { NK.Scene.ANKER[navn] = K.ANKER[navn]; });
     K.baggrundsliv(false);
 
-    var UDE = K.UDE, HAENGER = K.HAENGER;
-
-    /* Det, han peger paa, mens han siger linjen D.INTRO_PEG */
-    var PEG_PAA = "valg";
+    var UDE = K.UDE;
 
     function Laerer(laerred) {
         this.L = laerred;
         this.tid = 0;
         this.introVent = 0;
-        this.introTrin = 0;
-        this.introKlikTal = 0;
         this.laererStart();
         this.bygTilbud();
     }
@@ -98,83 +94,16 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen --------------------------------------------- */
-    P.laererIntro = function () {
-        var mig = this, linjer = D.INTRO.start;
-        var trin = [
-            { kald: function () { mig.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.4, roed: 0, skeptisk: 0.25, briller: 0 } },
-            { gaa: function () { return mig.laererPlads(); } },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            trin.push({ kald: function () { mig.introTrin = i + 1; } });
-            if (i === D.INTRO_PEG) trin.push({ arm: function () { return mig.pegPaa(PEG_PAA); }, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (i === D.INTRO_PEG) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        this.laererKoer("intro", trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { mig.introTrin = 0; } },
-            { gaa: UDE }
-        ]), false);
-    };
-
-    /* Armens vinkel mod et element paa siden */
-    P.pegPaa = function (id) {
-        var s = this.laererLaerredSkala();
-        var e = NK.el(id);
-        if (!e || !e.offsetWidth) return HAENGER;
-        var r = e.getBoundingClientRect(), c = this.L.canvas.getBoundingClientRect();
-        return this.pegVinkel((r.left + r.width * 0.2 - c.left) / s, (r.top + r.height * 0.3 - c.top) / s);
-    };
-
-    /* Kaldes af js/praesentation.js: valgene lyser op, mens han peger */
-    P.pegPaaFelt = function (til) {
-        if (til === this.pegerNu) return;
-        this.pegerNu = til;
-        var e = NK.el(PEG_PAA);
-        if (e) e.classList.toggle("peg", !!til);
-    };
-
     P.iScene = function (navn) {
         var L = this.laerer;
         return !!(L && L.scene && L.scene.navn === navn);
     };
 
-    P.laererIIntro = function () { return this.iScene("intro"); };
-
-    P.laererIntroVaek = function () {
-        var L = this.laerer;
-        if (!this.laererIIntro()) return false;
-        L.tale = "";
-        L.taleUr = 0;
-        L.taleAlfa = 0;
-        this.introTrin = 0;
-        this.laererKoer("introUd", [
-            { arm: HAENGER, tid: 0.15 },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { gaa: UDE, loeb: true }
-        ], false);
-        return true;
-    };
-
-    /* Et klik under praesentationen: rammer det ham, taeller det. Andet
-       klik paa ham sender ham ud, det foerste faar knappen til at blinke. */
-    P.laererIntroKlik = function (px, py) {
-        if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-        this.introKlikTal++;
-        if (this.introKlikTal >= 2) {
-            this.laererIntroVaek();
-        } else {
-            var k = NK.el("spring-over");
-            k.classList.remove("puf");
-            void k.offsetWidth;
-            k.classList.add("puf");
-        }
-        return true;
-    };
+    /* ----- Praesentationen ---------------------------------------------
+       Faelles kode: ét trin ad gangen med Naeste og Spring
+       praesentationen over (../kemichael/praesentation.js). */
+    P.introLinjer = function () { return D.INTRO; };
+    NK.Praesentation.trin(P);
 
     /* Et spil gaar i gang: tilbuddet forsvinder (og huskes), og en
        praesentation, der er i gang, slutter. */
@@ -184,7 +113,9 @@
         return this.laererIntroVaek();
     };
 
-    /* ----- Labyrintmester ------------------------------------------------ */
+    /* ----- Labyrintmester ------------------------------------------------
+       Den eneste gang, han kommer af sig selv: hele spillet er klaret
+       (Mix paa Svaer). */
     P.mesterBesoeg = function () {
         var mig = this;
         var linje = NK.tilfaeldig(D.MESTER_REPLIK);
@@ -205,7 +136,7 @@
         this.opdaterLaerer(dt);
     };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-pacman-intro", tilbud: "tilbud", spring: "spring-over" });
+    NK.Praesentation.kobl(P, { noegle: "nk-pacman-intro", tilbud: "tilbud" });
 
     NK.Laerer = Laerer;
 }());

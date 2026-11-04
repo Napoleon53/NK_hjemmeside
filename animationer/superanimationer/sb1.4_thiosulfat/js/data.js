@@ -22,27 +22,40 @@
     var D = {};
 
     /* ----- Kemichael ----------------------------------------------------
-       Tre replikker pr. fane, hoejst ca. 60 tegn. Under linjen INTRO_PEG
-       peger han paa elementet i PEG, og det lyser op. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       sel: kort og knapper paa siden, der faar en gul ramme. felt: det,
+       der er tegnet paa laerredet (glas, oppefra, ur og graf; se
+       introFelt i js/laerer.js). Ingen vittigheder i praesentationen. */
     D.INTRO = {
         kryds: [
-            "Et kryds, et glas og et stopur. Mere skal der ikke til.",
-            "Tilsæt syren herovre, og stop uret, når krydset er væk.",
-            "Det lugter af SO₂ bagefter. Det er ikke mig."
+            { tekst: "I denne fane måler du, hvor lang tid der går, før krydset under bægerglasset forsvinder. I kortet Blandingen vælger du, hvor meget Na₂S₂O₃ der er i glasset. Derefter trækker du måleglasset med saltsyre hen over bægerglasset, og uret starter, når syren rammer.",
+              felt: "glas", sel: "#kryds-blanding" },
+            { tekst: "Krydset set oppefra viser, hvad du ser, når du kigger ned gennem væsken i glasset. Du stopper selv uret, når krydset ikke længere kan ses. Uret stopper, når du klikker på stopuret eller trykker Stop uret.",
+              felt: ["oppefra", "ur"] },
+            { tekst: "Grafen viser bagefter, hvor meget svovl der er dannet. En god måling ender på den stiplede linje, hvor krydset er væk. Kortet Måling samler dine målinger i en tabel med Δt og 1/Δt.",
+              felt: "graf", sel: "#kryds-maaling" },
+            { tekst: "Når du har lavet et par målinger, starter du quizzen på kortet Quiz. Quizzen har fem spørgsmål, og knappen på kortet giver først et hint og derefter svaret.",
+              sel: "#kryds-opgavekort" }
         ],
         konc: [
-            "Nu bestemmer du blandingen. Uret stopper selv.",
-            "Vælg rumfangene herovre, og tryk Bland og mål.",
-            "Regn koncentrationerne ud. Grafen venter på dig."
+            { tekst: "I denne fane undersøger du, hvordan koncentrationerne af thiosulfat og syre påvirker reaktionshastigheden. Du vælger rumfangene af Na₂S₂O₃, HCl og vand og trykker Bland og mål. Uret stopper selv, når krydset er væk.",
+              sel: "#konc-forsoeg" },
+            { tekst: "Hvert forsøg bliver en række i tabellen under grafen. Du regner selv [S₂O₃²⁻] og [H₃O⁺] i glasset ud og skriver tallene i tabellen. Efter to rigtige tal i en kolonne regnes resten af kolonnen for dig.",
+              sel: "#konc-tabel" },
+            { tekst: "Et rigtigt tal giver et punkt på grafen for 1/Δt. Knapperne over grafen skifter mellem [S₂O₃²⁻] og [H₃O⁺] på den vandrette akse. Opgavekortet stiller opgaver om dine forsøg, og knappen på kortet giver først et hint og derefter svaret.",
+              felt: "graf", sel: ["#konc-akse", "#konc-opgavekort"] }
         ],
         temp: [
-            "Samme blanding hver gang. Kun temperaturen skifter.",
-            "Vælg temperaturen herovre, og mål.",
-            "Min kaffe har også stuetemperatur. Desværre."
+            { tekst: "I denne fane undersøger du, hvordan temperaturen påvirker reaktionshastigheden. Blandingen er den samme i alle forsøg, så du vælger kun temperaturen og måler med den grønne knap.",
+              sel: "#temp-forsoeg" },
+            { tekst: "Hvert forsøg bliver et punkt på grafen og en række i tabellen under grafen. Grafen viser 1/Δt mod temperaturen, og punkterne bliver forbundet med en linje.",
+              felt: "graf", sel: "#temp-tabel" },
+            { tekst: "Når du har målt ved nogle temperaturer, starter du en opgave på opgavekortet. Knappen på kortet giver først et hint og derefter svaret.",
+              sel: "#temp-opgavekort" }
         ]
     };
-    D.INTRO_PEG = 1;
-    D.PEG = { kryds: "kryds-maaling", konc: "konc-forsoeg", temp: "temp-forsoeg" };
 
     /* ----- Fane 1: tre blandinger. Syren er altid 5 mL 1,0 M HCl, og
        der er vand til 45 mL i glasset, saa der er 50 mL i alt. Rumfanget

@@ -391,7 +391,6 @@
             valg: NK.el("koele-valg")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("koele-spring").addEventListener("click", function () { mig.springIntro(); });
         this.el.valg.addEventListener("click", function (e) {
             var b = e.target.closest ? e.target.closest("button") : null;
             if (!b || b.disabled) return;
@@ -561,8 +560,7 @@
             var tilst = D.tilstand(gl.fastVis);
             Tg.zoomKasse(ctx, z, gl.proeve, {
                 titel: gl.fedt.Navn + (gl.harsk ? " (harskt)" : ""),
-                tilstand: tilst, T: D.sted(gl.sted).T,
-                lys: this.pegZoom ? 0.5 + 0.5 * Math.sin(this.tid * 6) : 0
+                tilstand: tilst, T: D.sted(gl.sted).T
             });
             Tg.farveForklaring(ctx, z.x, z.y + z.h + NK.klamp(lay.H * 0.022, 12, 16), z.b, { px: 12, smoersyre: gl.harsk });
         }
@@ -670,13 +668,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-koele", tilbud: "koele-tilbud", spring: "koele-spring" });
-
-    /* Mens han taler om zoomvinduet, lyser det */
-    P.pegPaaFelt = function () {
-        var i = this.laererIIntro && this.laererIIntro() ? this.introTrin : 0;
-        this.pegZoom = i === 2;
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-koele", tilbud: "koele-tilbud" });
 
     NK.SimKoele = SimKoele;
 }());

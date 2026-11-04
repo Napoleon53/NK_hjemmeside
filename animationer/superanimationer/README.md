@@ -262,7 +262,9 @@ svarknapper bedømte ved klik, er Indsend svar kommet til, og Start forfra er
 taget af kortets grønne knap. Også sb4.3 fane 3 bliver på spørgsmålet
 (brugerens valg samme aften, der afløste løsningen med rigtigt på tavlen);
 svaret kommer ind på tavlen og lyser grønt, når eleven trykker Næste. Animationerne med opgavekortet i panelet (fx sb4.6, sb4.7, sb9.1,
-sc8.6) har ikke scenekortet og er ikke ændret.
+sc8.6) har ikke scenekortet og er ikke ændret. sc2.4 fik papirkortet som
+tekstboks 4. nov. 2026, da brugeren bad om opgaveteksten inde i scenen (se
+dens README under "Tekstboksen og opslaget").
 
 **1. Selvbærende.** Eleven lærer ved at gøre, ikke ved at læse.
 
@@ -417,8 +419,8 @@ den må aldrig stå i vejen for pointen.
 Kemichael præsenterer ikke fanerne. Brugeren fjernede reglen om, at han
 præsenterer hvert rum, den 27. september 2026, fordi præsentationerne ofte blev
 indforståede. De ældre superanimationer har stadig deres præsentation bag
-knapperne Start præsentation og Nej tak; de beholder den, til brugeren siger
-andet.
+knapperne Start præsentation og Nej tak; fra 4. nov. 2026 bruger de alle den
+fælles præsentation med Næste og Spring præsentationen over (se nedenfor).
 
 * **Ingen Kemichael ved katederet** (brugerens valg 9. oktober 2026: Kemichael
   hører primært til i laboratoriet, måske med et lille cameo hist og pist, og
@@ -451,25 +453,27 @@ andet.
   hints"). Hintene er de samme; de står i en statuslinje nederst i scenen
   på fane 1 og lige under det felt, eleven skriver i, på fane 2.
 
-### Når han præsenterer eller introducerer
+### Når han præsenterer, og hvornår han kommer ind (4. nov. 2026)
 
-Brugeren 3. oktober 2026, efter `sc8.1_spaendingsraekken`: det er fint, at han
-introducerer, men introduktionen skal lære eleven at bruge animationen. Det
-gælder de ældre præsentationer, når de bliver rettet, og enhver kort
-introduktion fra hans hjørne. Reglerne står udførligt i `kemichael/README.md`:
+Brugerens regler 4. november 2026, skrevet ud i `kemichael/README.md`
+under "Brugerens regler fra 4. november 2026". De gælder alle
+superanimationer med Kemichael:
 
-* Hver linje siger, hvad fanen træner, eller hvordan en bestemt ting bruges.
-  Hele, skarpe sætninger i almindeligt dansk. Ingen vittigheder, ingen gåder
-  og intet om ham selv.
-* Han peger på det, han taler om, og det får en gul ramme, der blinker: knappen,
-  feltet eller tingen i scenen.
-* Han går først videre, når eleven trykker Næste. Aldrig på tid.
-* Taleboblen ligger øverst, så intet i scenen dækker den, og den dækker ikke
-  det, han peger på.
-
-Mønster: `sc8.1_spaendingsraekken` (`js/praesentation.js`, `js/laerer.js` og
-`D.INTRO_*` i `js/data.js`). De andre ældre præsentationer kører stadig på tid;
-de rettes, når brugeren beder om det.
+* **Han taler altid formelt**: letforståeligt og skarpt skriftsprog i
+  du-form som i Kemibogens kapitel 1, i hele sætninger. Det gælder
+  præsentationen, rosen, påskeæggene, kaffen og prik.
+* **Præsentationen siger mere ad gangen**: to til fire trin pr. fane med to
+  til fire sætninger i hvert. Taleboblen har to knapper, "Næste" og "Spring
+  præsentationen over", og han går aldrig videre på tid. Det, han peger
+  på, får en gul ramme, der blinker. Koden er fælles:
+  `kemichael/praesentation.js` og `kemichael/praesentation.css`
+  (`NK.Praesentation.trin`, `kobl`, `pakInd` og `selvtest`). Mønster:
+  `sc8.1_spaendingsraekken`.
+* **Han kommer sjældent ind af sig selv**: kun når en hel fane eller hele
+  animationen er gennemført, når eleven gør noget vildt (et påskeæg), eller
+  når han har noget sjovt at sige (højst én gang pr. fane). Ikke ros til
+  enkelte svar, niveauer undervejs eller stribler, ikke kommentarer til
+  forkerte svar og ikke besøg på tid. Kaffen og prik er elevens eget valg.
 
 ## Fælles opbygning
 

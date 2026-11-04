@@ -22,9 +22,10 @@
    start, i halvtitrerpunktet og ved ækvivalenspunktet, omslaget på én
    dråbe), at tjekket af aflæsningen og de fire regnetrin giver den
    rigtige besked ved de typiske fejl, at sproget overholder reglerne, at
-   alle tre faner kan gennemføres (fane 1 også med musen), at Kemichael
-   kan vises og sendes ud, og at layoutet holder fra 520 × 380 til
-   1500 × 900.
+   alle tre faner kan gennemføres (fane 1 også med musen), at Kemichaels
+   præsentation viser trinnene ét ad gangen med Næste og Spring
+   præsentationen over (den fælles test i ../kemichael/praesentation.js),
+   og at layoutet holder fra 520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens valg og lægger dem tilbage bagefter.
@@ -175,9 +176,9 @@ function koerTest(W) {
     paastand("et tomt formelfelt er ikke en fejl", T.formel("nb", "  ").tom === true);
 
     overskrift("4. Sproget");
-    var replikker = [].concat(D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG,
-        [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_MORK, D.BEM_TOM, D.AEG_PRAECIS]);
-    var tekster = replikker.concat([D.TITRER_HINT, D.AFLAES_HINT],
+    var INTRO = [].concat(D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG);
+    var replikker = [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_TOM, D.AEG_PRAECIS];
+    var tekster = INTRO.map(function (x) { return x.tekst; }).concat(replikker, [D.TITRER_HINT, D.AFLAES_HINT],
         D.TRIN.map(function (x) { return x.navn + " " + x.hint; }),
         D.SITUATIONER.map(function (s) { return s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" ") + " " + s.valg.join(" ") + " " + s.aendring; }));
     var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
@@ -185,9 +186,14 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (x) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(x); }));
-    var lange = replikker.filter(function (x) { return x.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med Her", halve.length === 0, halve[0] && halve[0].tekst);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG].every(function (l) { return l.length >= 2 && l.length <= 4; }));
+    var korte = replikker.filter(function (x) { return x.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(x); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte.join(" | "));
     paastand("hver situation har en forklaring til hvert forkert svar", D.SITUATIONER.every(function (s) {
         return s.valg.length === 3 && s.forkert.every(function (f, i) { return i === s.rigtig ? f === "" : f.length > 10; });
     }));
@@ -327,18 +333,21 @@ function koerTest(W) {
     paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-valg .vaelger.rigtig") && !!d.querySelector("#for-valg .vaelger.forkert"));
     S3.nulstil();
 
-    overskrift("9. Kemichael");
+    overskrift("9. Kemichaels præsentation: ét trin ad gangen (fælles test)");
     ["fane-titrering", "fane-beregning", "fane-forbrug"].forEach(function (id) {
         klik('[data-fane="' + id + '"]');
         var sim = NK.sims[id];
         sim.tilpas();
+        tik(sim, 2.5);
+        NK.Praesentation.selvtest(sim, function (sek) { sim.tilpas(); tik(sim, sek); }).forEach(function (r) {
+            paastand(id + ": " + r[0], r[1], r[2]);
+        });
         sim.startIntro(true);
-        tik(sim, 2);
+        tik(sim, 2.5);
         var inde = sim.laererIIntro();
-        var spring = !d.getElementById(sim.springId).hidden;
         sim.springIntro();
         tik(sim, 4);
-        paastand(id + ": præsentationen kan vises og sendes ud med Esc", inde && spring && !sim.laererIIntro() && d.getElementById(sim.springId).hidden);
+        paastand(id + ": Esc (springIntro) sender ham ud midt i præsentationen", inde && !sim.laererIIntro());
     });
     try { W.localStorage.removeItem("nk-sc7.4-intro-titrering"); } catch (e) { /* ingen hukommelse */ }
     S1.startIntro(false);

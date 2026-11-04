@@ -147,7 +147,7 @@
        29. sept. 2026: det var uklart, hvad man skulle efter to vejninger). */
     P.promptHTML = function () {
         var o = this.opg;
-        if (this.valgt === null && !this.faerdig) return '<p class="maal-tekst">' + NK.html(o.valg.spm) + "</p>";
+        if (this.valgt === null && !this.faerdig) return '<p class="maal-tekst">' + this.papirTekst(NK.html(o.valg.spm)) + "</p>";
         var gaet = this.valgt !== null ? '<p class="gaet-linje">Dit gæt: <b>' + NK.html(o.valg.svar[this.valgt].t) + "</b></p>" : "";
         var nu = this.trinNu();
         return gaet + '<ol class="trinliste">' + o.trin.map(function (t, i) {
@@ -162,25 +162,30 @@
         return n === 0 ? 0 : (n === 1 ? 1 : 2);
     };
 
-    /* Valgknapperne til gaettet. De forsvinder, naar der er gaettet. */
+    /* Gaettet: et gratis gaet foer forsoeget, svarene virker med det samme */
+    P.gaetNu = function () { return this.valgt === null; };
+
+    /* Valgknapperne til gaettet staar paa kortet. De forsvinder, naar der er gaettet. */
     P.visKortEkstra = function () {
-        var o = this.opg, mig = this, e = this.el.valg;
-        e.innerHTML = "";
-        e.hidden = this.valgt !== null || this.faerdig;
-        if (e.hidden) return;
-        o.valg.svar.forEach(function (s, j) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "knap";
-            b.textContent = s.t;
-            if (mig.valgt !== null) {
-                b.disabled = true;
-                if (j === mig.valgt) b.classList.add("valgt");
-            }
-            b.addEventListener("click", function () { mig.vaelgSvar(j, "gaet"); });
-            e.appendChild(b);
-        });
+        var mig = this, e = this.el.valg;
+        if (this.valgt !== null || this.faerdig) { e.hidden = true; e.innerHTML = ""; return; }
+        /* Bogstavet staar i cirklen foran svaret, saa "A: " er taget af teksten */
+        var svar = this.opg.valg.svar.map(function (sv) { return { t: sv.t.replace(/^[A-D]: /, "") }; });
+        this.gaetKnapper(e, svar, function (j) { mig.vaelgSvar(j, "gaet"); });
     };
+
+    /* Indsend svar: tallet i skemaets felt (vaegten aflaest) */
+    P.harIndsend = function () { return this.aktivRaekke() && !!NK.el("forsoeg-inp"); };
+    P.feltTekst = function () {
+        var inp = NK.el("forsoeg-inp");
+        return inp ? String(inp.value || "").trim() : "";
+    };
+    P.kanIndsende = function () { return !!this.feltTekst(); };
+    P.indsendTekst = function () {
+        var t = this.feltTekst();
+        return t && t.length <= 8 ? "Indsend svar: " + t + " g" : "Indsend svar";
+    };
+    P.indsend = function () { this.tjekFelt(); };
 
     P.vaelgSvar = function (j, maade) {
         if (this.valgt !== null) return;
@@ -568,22 +573,23 @@
         if (id && d.sted !== "trefod" && !(this.flyt && this.flyt.til === "trefod")) this.kortBesked("Brænderen er tændt, men diglen står ikke på trefoden.");
     };
 
-    P.blokValg = function () {
-        this.kortBesked("Gæt først: vælg et af svarene i kortet.");
-        this.pegT = 1.6;
-    };
+    /* Et klik paa forsoeget foer gaettet: kortet blinker */
+    P.blokValg = function () { this.gaetBlink(); };
 
     /* ----- Layout ----------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
+        /* Forsoeget begynder under den plads, kortet har faaet sat af */
+        lay.top = this.top();
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.1, 40, 54));
+        var fri = lay.bordY - lay.top;
         /* Hoejre spalte: luppen og grafen */
         var rw = Math.round(NK.klamp(W * 0.34, 190, 360));
         var rx0 = W - rw - 12;
-        var zr = Math.round(NK.klamp(Math.min(rw * 0.4, Hs * 0.2), 50, 125));
-        lay.zoom = { x: rx0 + rw / 2, y: zr + 32, r: zr };
+        var zr = Math.round(NK.klamp(Math.min(rw * 0.4, fri * 0.24), 50, 125));
+        lay.zoom = { x: rx0 + rw / 2, y: lay.top + zr + 26, r: zr };
         var fp = NK.klamp(zr * 0.13, 12, 13);
         lay.lupFp = fp;
         var gy = lay.zoom.y + zr + fp * 2 + 26;
@@ -591,13 +597,13 @@
         if (lay.graf.h < 110) {
             /* Lav skaerm: luppen mindre */
             zr = Math.round(NK.klamp(zr * 0.75, 40, 90));
-            lay.zoom = { x: rx0 + rw / 2, y: zr + 30, r: zr };
+            lay.zoom = { x: rx0 + rw / 2, y: lay.top + zr + 24, r: zr };
             gy = lay.zoom.y + zr + fp * 2 + 24;
             lay.graf = { x: rx0, y: gy, b: rw, h: Math.max(80, lay.bordY - 12 - gy) };
         }
         /* Udstyret til venstre */
         var x0 = 14, eqW = rx0 - 14 - x0;
-        var th = Math.round(NK.klamp(Math.min(eqW * 0.4, (lay.bordY - 60) * 0.62), 100, 250));
+        var th = Math.round(NK.klamp(Math.min(eqW * 0.4, (fri - 40) * 0.68), 90, 250));
         var tb = th * NK.Sprites.MAAL.trefod.b / NK.Sprites.MAAL.trefod.h;
         var vb = NK.klamp(eqW * 0.3, 120, 220), vh = Tg.vaegtHoejde(vb);
         var jb = NK.klamp(eqW * 0.09, 40, 64);

@@ -371,23 +371,31 @@ function koerTest(W) {
     C.knap(); C.knap(); tik(C, 1);
     paastand("hint og Vis svaret sætter alle fire", C.loest && C.brikker.every(function (b) { return b.kol !== null; }) && C.iTraek === 0);
 
-    overskrift("8. Kemichaels præsentation");
+    overskrift("8. Kemichaels præsentation: ét trin ad gangen (fælles test)");
     [["fane-hydron", A], ["fane-produkter", B], ["fane-par", C]].forEach(function (x) {
         klik('[data-fane="' + x[0] + '"]');
         var sim = x[1];
         tik(sim, 12);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(x[0] + ": " + r[0], r[1], r[2]);
+        });
+        /* Mens han praesenterer, rykker indholdet til hoejre for ham */
         sim.startIntro(true);
         tik(sim, 3);
         var iIntro = sim.laererIIntro();
         var ryk = sim.fri > 50;
-        klik("#" + sim.el.knap.id.replace("-knap", "-spring"));
+        var boble = d.getElementById(sim.L.canvas.id + "-boble");
+        if (boble) boble.querySelector(".km-spring").click();
         tik(sim, 4);
-        paastand(x[0] + ": K viser præsentationen, indholdet rykker til højre, og knappen sender ham ud", iIntro && ryk && !sim.laererIIntro() && sim.fri < 1);
+        paastand(x[0] + ": K viser præsentationen, indholdet rykker til højre, og Spring præsentationen over sender ham ud",
+            iIntro && ryk && !sim.laererIIntro() && sim.fri < 1 && !!boble && boble.hidden);
     });
 
     overskrift("9. Sproget");
     var krop = d.body.innerText, teori = d.getElementById("teori").textContent;
-    var replikker = [].concat(D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR, [D.HYDRON_FAERDIG, D.TI_I_TRAEK], D.KAFFE_SUR);
+    var INTRO = [].concat(D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR);
+    var ROS = [D.HYDRON_FAERDIG, D.ROS_PRODUKTER, D.ROS_PAR].concat(D.KAFFE_SUR);
+    var replikker = INTRO.map(function (l) { return l.tekst; }).concat(ROS);
     var tekster = replikker.concat(D.HYDRON.map(function (o) { return o.tekst + " " + o.hint; }));
     D.NIVEAU_RAEKKE.forEach(function (n) {
         S.par(n).forEach(function (p) {
@@ -403,9 +411,14 @@ function koerTest(W) {
     paastand("ingen tankestreger på siden og i teorien", !/[–—]/.test(krop) && !/[–—]/.test(teori));
     var enere = tekster.concat([krop, teori]).filter(function (t) { return /[¹1][⁺⁻+−]/.test(t.replace(/\d+[+−-]\d/g, "")); });
     paastand("ingen 1+ eller 1−", enere.length === 0, enere.slice(0, 2).join(" | "));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regler 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med Her", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR].every(function (l) { return l.length >= 2 && l.length <= 4; }));
     var tur = ["#hydron-anker-mol", "#hydron-anker-skema", "#hydron-kort", "#hydron-par-kort", "#hydron-forfra", "#teoriknap",
         "#prod-anker-lign", "#prod-anker-brikker", "#prod-niveau", "#prod-kort", "#par-anker-lign", "#par-anker-brikker", "#par-niveau", "#par-kort"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));

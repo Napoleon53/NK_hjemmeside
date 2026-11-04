@@ -57,7 +57,7 @@
            bølgelængde, der staar paa grafen bagefter, og farve er det svar,
            modellen regner af det samme spektrum, som grafen viser. */
         {
-            id: "klorofyl", gruppe: "stof", type: "stof", navn: "Klorofyl a", formel: "C₅₅H₇₂MgN₄O₅",
+            id: "klorofyl", gruppe: "stof", type: "stof", kort: "klorofyl a", navn: "Klorofyl a", formel: "C₅₅H₇₂MgN₄O₅",
             beskrivelse: "Farvestoffet i blade og alger. Det fanger lyset til fotosyntesen.",
             toppe: [{ c: 433, w: 18, h: 1.4 }, { c: 410, w: 14, h: 0.35 }, { c: 662, w: 12, h: 1.1 }, { c: 615, w: 14, h: 0.22 }, { c: 578, w: 12, h: 0.1 }],
             top: [[415, 445], [650, 675]], lmax: 430, farve: "Grøn",
@@ -69,7 +69,7 @@
             }
         },
         {
-            id: "betacaroten", gruppe: "stof", type: "stof", navn: "β-caroten", formel: "C₄₀H₅₆",
+            id: "betacaroten", gruppe: "stof", type: "stof", kort: "β-caroten", navn: "β-caroten", formel: "C₄₀H₅₆",
             beskrivelse: "Farvestoffet i gulerødder, græskar og søde kartofler, her opløst i hexan.",
             toppe: [{ c: 425, w: 13, h: 0.95 }, { c: 451, w: 14, h: 1.3 }, { c: 478, w: 13, h: 1.12 }],
             top: [[418, 486]], lmax: 451, farve: "Gul",
@@ -81,7 +81,7 @@
             }
         },
         {
-            id: "kmno4", gruppe: "stof", type: "stof", navn: "Kaliumpermanganat", formel: "KMnO₄",
+            id: "kmno4", gruppe: "stof", type: "stof", kort: "kaliumpermanganat", navn: "Kaliumpermanganat", formel: "KMnO₄",
             beskrivelse: "Et salt, der giver en kraftigt farvet opløsning. Det er et stærkt oxidationsmiddel.",
             toppe: [{ c: 507, w: 11, h: 0.55 }, { c: 525, w: 12, h: 1.05 }, { c: 545, w: 12, h: 0.85 }, { c: 565, w: 11, h: 0.42 }, { c: 527, w: 35, h: 0.25 }],
             top: [[515, 555]], lmax: 528, farve: "Lilla",
@@ -93,7 +93,7 @@
             }
         },
         {
-            id: "cuso4", gruppe: "stof", type: "stof", navn: "Kobber(II)sulfat", formel: "CuSO₄(aq)",
+            id: "cuso4", gruppe: "stof", type: "stof", kort: "kobber(II)sulfat", navn: "Kobber(II)sulfat", formel: "CuSO₄(aq)",
             beskrivelse: "Kobber(II)ioner i vand. Toppen ligger i infrarødt, over 700 nm, men kurven stiger gennem det røde område.",
             toppe: [{ c: 800, w: 120, h: 1.8 }],
             top: [[655, 700]], lmax: 700, farve: "Blå",
@@ -105,7 +105,7 @@
             }
         },
         {
-            id: "cytc", gruppe: "stof", type: "stof", navn: "Cytochrom c (reduceret)", formel: "Cyt c (Fe²⁺)",
+            id: "cytc", gruppe: "stof", type: "stof", kort: "reduceret cytochrom c", navn: "Cytochrom c (reduceret)", formel: "Cyt c (Fe²⁺)",
             beskrivelse: "Et protein fra mitokondrierne. Jernet sidder i en ring, der giver spektret tre toppe.",
             toppe: [{ c: 415, w: 15, h: 1.7 }, { c: 520, w: 12, h: 0.4 }, { c: 550, w: 8, h: 0.8 }],
             top: [[405, 425]], lmax: 415, farve: "Rød",

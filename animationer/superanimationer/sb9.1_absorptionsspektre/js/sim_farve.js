@@ -25,8 +25,6 @@
 
     function SimFarve() {
         var mig = this;
-        this.valg = NK.el("fa-valg");
-        this.linjeEl = NK.el("fa-opgave");
         this.fotoner = [];
         this.blink = 0;
         this.startFane(D.FA, D.FA_GRUPPER);
@@ -35,7 +33,7 @@
     }
 
     var P = SimFarve.prototype;
-    NK.Fane.paa(P, { navn: "fa", naesteFane: "fane-ko", naesteNavn: "Konjugeringen" });
+    NK.Fane.paa(P, { navn: "fa", naesteFane: "fane-ko", naesteNavn: "Konjugeringen", zone: 196, zoneLav: 178 });
 
     P.chipTekst = function (o, i) { return String(i + 1); };
 
@@ -46,11 +44,13 @@
         this.fotoner = [];
         this.hover = null;
         this.traek = false;
-        this.forkerte = {};
         this.lysL = null;
         this.visLinjer = false;
         this.lysTone = undefined;
         this.glide = null;
+        this.auto = false;
+        this.klikL = null;
+        this.flyttet = false;
         if (o.type === "byg") {
             this.trin = "byg";
             this.topL = o.start;
@@ -60,8 +60,6 @@
             this.valgtL = null;
             this.lampe = false;
         }
-        this.bygValg();
-        this.visOpgavelinje();
     };
 
     P.toppe = function () {
@@ -101,56 +99,57 @@
         return Math.round(bedst);
     };
 
-    /* ----- Knapperne i scenen: de seks farver --------------------------------------- */
-    P.bygValg = function () {
-        var mig = this;
-        this.valg.innerHTML = "";
-        this.knapper = {};
-        if (this.o.type !== "stof" || this.trin !== "farve") { this.layout(); return; }
-        D.FARVER.forEach(function (f) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap farveknap";
-            k.innerHTML = '<span class="fk-proeve" style="background:' + f.css + '"></span>' + NK.html(f.navn);
-            k.addEventListener("click", function () { mig.svarFarve(f.navn); mig.fokus(); });
-            if (mig.forkerte[f.navn]) { k.classList.add("forkert"); k.disabled = true; }
-            mig.valg.appendChild(k);
-            mig.knapper[f.navn] = k;
-        });
-        this.layout();
+    /* ----- Papirkortet ------------------------------------------------------------ */
+    P.kortData = function () {
+        var o = this.o;
+        if (o.type === "byg") {
+            return { tekst: "Træk toppen af kurven på grafen, så opløsningen i kuvetten bliver " + o.maal.toLowerCase() + "." };
+        }
+        if (this.trin === "top") {
+            return { tekst: "Kuvetten med " + o.kort + " er dækket. Klik på grafen ved toppen af kurven, hvor stoffet absorberer mest lys." };
+        }
+        return {
+            tekst: "Toppen ligger ved " + this.valgtL + " nm. Hvilken farve har opløsningen af " + o.kort + "?",
+            farver: true,
+            svar: D.FARVER.map(function (f) { return { t: f.navn, css: f.css }; })
+        };
     };
 
-    P.visOpgavelinje = function () {
-        var o = this.o, t;
-        if (o.type === "byg") t = this.faerdig ? "Opløsningen er " + o.maal.toLowerCase() + ". Prøv at trække toppen videre, og se farven skifte." :
-            "Træk toppen, så opløsningen bliver " + o.maal.toLowerCase() + ".";
-        else if (this.faerdig) t = "Opløsningen er " + o.farve.toLowerCase() + ". Hold musen over grafen for at se lyset ved hver bølgelængde.";
-        else if (this.trin === "top") t = "Klik på toppen af kurven. Der absorberer stoffet mest lys.";
-        else t = "Kuvetten er dækket. Hvilken farve har opløsningen? Vælg den under grafen.";
-        NK.saetTekst("fa-opgave", t);
+    P.kanIndsende = function () {
+        if (this.glide) return false;
+        if (this.o.type === "byg") return this.flyttet;
+        return this.trin === "top" && this.klikL !== null;
     };
 
+    P.indsendTekst = function () {
+        if (this.o.type === "byg") return "Indsend svar: " + Math.round(this.topL) + " nm";
+        if (this.trin === "top" && this.klikL !== null) return "Indsend svar: " + Math.round(this.klikL) + " nm";
+        return "Indsend svar";
+    };
+
+    P.indsend = function () {
+        if (this.o.type === "byg") { this.tjekByg(); return; }
+        if (this.trin === "top" && this.klikL !== null) this.vurderTop(this.klikL);
+    };
+
+    P.svarValgt = function (j, d) {
+        this.svarFarve(d.svar[j].t, j);
+    };
+
+    /* Panelet: oplysningerne om stoffet og trinene */
     P.promptHTML = function () {
         var o = this.o;
         if (o.type === "byg") {
-            return '<p class="maal-tekst">Træk toppen, så opløsningen bliver <b>' + NK.html(o.maal.toLowerCase()) + "</b>.</p>" +
-                '<p class="note-tekst">Kurven viser, hvor meget lys stoffet absorberer ved hver bølgelængde. Lampen sender hvidt lys gennem kuvetten, og øjet ser det, der slipper igennem.</p>';
+            return '<p class="note-tekst">Kurven viser, hvor meget lys stoffet absorberer ved hver bølgelængde. Lampen sender hvidt lys gennem kuvetten, og øjet ser det, der slipper igennem.</p>';
         }
-        var trin1 = this.trin === "top" ? "aktiv" : "ok";
+        var trin1 = this.trin === "top" && !this.venter ? "aktiv" : "ok";
         var trin2 = this.faerdig ? "ok" : (this.trin === "farve" ? "aktiv" : "");
         var h = '<p class="stofnavn">' + NK.html(o.navn) + ' <span class="formel">' + NK.html(o.formel) + "</span></p>" +
             '<p class="note-tekst">' + NK.html(o.beskrivelse) + "</p>" +
             '<ol class="trinliste"><li class="' + trin1 + '">Find toppen' + (this.valgtL !== null ? ": " + this.valgtL + " nm" : "") + "</li>" +
             '<li class="' + trin2 + '">Vælg farven' + (this.faerdig ? ": " + NK.html(o.farve.toLowerCase()) : "") + "</li></ol>";
-        if (this.faerdig) h += '<div class="forklaring"><p>' + NK.html(o.forklaring) + "</p>" +
-            '<p class="maal">Et spektrofotometer måler ved toppen, ' + o.lmax + " nm, hvor stoffet absorberer mest.</p></div>";
+        if (this.faerdig) h += '<p class="note-tekst maal">Et spektrofotometer måler ved toppen, ' + o.lmax + " nm, hvor stoffet absorberer mest.</p>";
         return h;
-    };
-
-    P.trinLinje = function () {
-        if (this.trin === "byg") return "Træk i den gule knap på toppen, eller klik på grafen, hvor toppen skal stå.";
-        if (this.trin === "top") return "Klik på grafen der, hvor kurven er højest.";
-        return "Vælg farven med knapperne under grafen. Farvecirklen til højre kan hjælpe.";
     };
 
     /* ----- Hinttrappen og svaret ---------------------------------------------------- */
@@ -168,7 +167,7 @@
         ];
         return [
             "Vi ser det lys, der slipper igennem kuvetten, ikke det lys, der bliver absorberet.",
-            "Stoffet absorberer " + o.absorberer + ". Linjen i farvecirklen går fra det absorberede over til den farve, vi ser.",
+            "Stoffet absorberer " + o.absorberer + ". Linjen i farvecirklen går fra det absorberede til den farve, vi ser.",
             "Opløsningen er " + o.farve.toLowerCase() + "."
         ];
     };
@@ -188,40 +187,49 @@
         var o = this.o;
         if (this.trin === "byg") {
             this.glide = { fra: this.topL, til: o.svar, t: 0 };
+            this.auto = true;
             return;
         }
         if (this.trin === "top") {
-            this.saetTop(o.lmax);
-            this.besked('<span class="b-maerke">Svaret</span> ' + NK.html("Toppen ligger ved " + o.lmax + " nm. " + this.trinLinje()), "gul");
+            this.klikL = null;
+            this.valgtL = o.lmax;
+            this.lysL = null;
+            this.mellem("Toppen ligger ved " + o.lmax + " nm.", this.tilFarve);
             return;
         }
-        this.lampe = true;
-        this.loest(o.forklaring);
-        this.visOpgavelinje();
+        var d = this.kortData();
+        this.valgt = this.svarIndeks(d, o.farve);
+        this.svarFarve(o.farve, this.valgt);
     };
 
     /* ----- Elevens handlinger --------------------------------------------------------- */
-    P.saetTop = function (l) {
-        this.valgtL = l;
-        this.lysL = null;
+    P.tilFarve = function () {
         this.trin = "farve";
-        this.hjaelp = 0;
-        this.bygValg();
-        this.visKort();
-        this.visOpgavelinje();
+        this.lysL = null;
     };
 
-    /* Et klik paa grafen i trinnet Find toppen */
+    /* Springer trin 1 over (selvtesten og layoutet) */
+    P.saetTop = function (l) {
+        this.valgtL = l;
+        this.klikL = null;
+        this.venter = null;
+        this.nyDel();
+        this.tilFarve();
+        this.visKort();
+    };
+
+    /* Indsend svar i trinnet Find toppen */
     P.vurderTop = function (l) {
         var o = this.o, mig = this;
         var ramt = null;
         o.top.forEach(function (r) { if (l >= r[0] - 2 && l <= r[1] + 2) ramt = r; });
         if (ramt) {
             var lm = this.maksI(ramt[0], ramt[1]);
-            this.saetTop(lm);
-            var navn = F.lysOrd(lm);
-            this.godLinje("Toppen ligger ved " + lm + " nm. Der absorberer stoffet " + navn + " lys." +
-                (o.top.length > 1 ? " Kurven har også en høj top ved " + this.maksI(o.top[1][0], o.top[1][1]) + " nm." : ""));
+            this.valgtL = lm;
+            this.klikL = null;
+            this.lysL = null;
+            this.mellem("Toppen ligger ved " + lm + " nm. Der absorberer stoffet " + F.lysOrd(lm) + " lys." +
+                (o.top.length > 1 ? " Kurven har også en høj top ved " + this.maksI(o.top[1][0], o.top[1][1]) + " nm." : ""), this.tilFarve);
             return;
         }
         var anden = (o.andreToppe || []).some(function (r) { return l >= r[0] && l <= r[1]; });
@@ -232,48 +240,54 @@
         this.fejlLinje("Ved " + Math.round(l) + " nm er absorbansen kun " + Tg.tal(mig.A(l), 2) + ". Find det sted, hvor kurven er højest.");
     };
 
-    P.svarFarve = function (navn) {
+    P.svarFarve = function (navn, j) {
         var o = this.o;
         if (this.faerdig || this.trin !== "farve") return;
+        if (j === undefined) j = this.svarIndeks(this.kortData(), navn);
         if (navn === o.farve) {
-            if (this.knapper[navn]) this.knapper[navn].classList.add("rigtig");
             this.lampe = true;
             this.fotoner = [];
-            this.loest(o.forklaring);
-            this.visOpgavelinje();
-            for (var k in this.knapper) this.knapper[k].disabled = true;
+            this.loest(o.forklaring, undefined, j);
             return;
         }
-        this.forkerte[navn] = true;
-        if (this.knapper[navn]) { this.knapper[navn].classList.add("forkert"); this.knapper[navn].disabled = true; }
         var absorberetSvar = LYS_TIL_SVAR[F.lysNavn(o.lmax)];
         var tekst = o.nej && o.nej[navn];
         if (!tekst && navn === absorberetSvar) tekst = "Det er farven på det lys, stoffet absorberer. Vi ser det lys, der slipper igennem.";
         if (!tekst) tekst = "Stoffet absorberer " + o.absorberer + ". Find det i farvecirklen, og se på farven over for det.";
-        this.fejlLinje(tekst);
+        this.forkertValg(j, tekst);
     };
 
     P.byggetFaerdig = function () {
         var o = this.o;
         var lt = Math.round(this.topL);
+        this.auto = false;
         this.loest("Toppen står ved " + lt + " nm. Stoffet absorberer " + F.lysOrd(lt) + " lys, og resten blander sig til " +
             o.maal.toLowerCase() + ". " + o.maal + " står over for " + o.lys + " i farvecirklen.");
-        this.visOpgavelinje();
     };
 
+    /* Indsend svar i Byg farven: foerst nu bedoemmes farven */
     P.tjekByg = function () {
         if (this.faerdig || this.o.type !== "byg") return;
-        if (this.farve().navn === this.o.maal) this.byggetFaerdig();
-        else this.nulstilHjaelp();
+        var f = this.farve();
+        if (f.navn === this.o.maal) { this.byggetFaerdig(); return; }
+        this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ", ikke " + this.o.maal.toLowerCase() +
+            ". Den farve, vi ser, står over for det absorberede lys i farvecirklen.");
     };
 
-    P.enter = function () { if (this.faerdig) this.knap(); };
+    /* Eleven har flyttet toppen: Indsend bliver klar, og en gammel besked forsvinder */
+    P.flyttetTop = function () {
+        this.flyttet = true;
+        this.nulstilHjaelp();
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.visIndsend();
+    };
 
     /* Piletasterne flytter toppen */
     P.pil = function (r) {
         if (this.o.type !== "byg") return false;
+        if (this.spaer() || this.glide) return true;
         this.topL = NK.klamp(this.topL + r * 5, 400, 700);
-        this.tjekByg();
+        this.flyttetTop();
         return true;
     };
 
@@ -283,11 +297,8 @@
         this.L.tilpas();
         var W = this.L.b, H = this.L.h;
         var band = this.baand();
-        var linjeBund = this.linjeEl ? this.linjeEl.offsetTop + this.linjeEl.offsetHeight : 40;
-        var valgH = this.valg && this.valg.children.length ? this.valg.offsetHeight + 14 : 0;
-        if (this.valg) this.valg.style.bottom = (band.h + 12) + "px";
-        var top0 = linjeBund + 12;
-        var bund = band.y - (valgH ? valgH + 8 : 14);
+        var top0 = this.top();
+        var bund = band.y - 14;
         var avail = Math.max(200, bund - top0);
         var r1h = NK.klamp(avail * 0.4, 130, 250);
         /* farvecirklen: plads til navnene over og under ringen */
@@ -434,6 +445,7 @@
         var mig = this;
         var mark = [];
         if (this.o.type === "stof" && this.valgtL !== null) mark.push({ l: this.valgtL, tekst: "λmax = " + this.valgtL + " nm" });
+        else if (this.o.type === "stof" && this.klikL !== null) mark.push({ l: this.klikL, tekst: "Dit valg: " + Math.round(this.klikL) + " nm" });
         this.g = Tg.graf(ctx, lay.graf, {
             xmin: 400, xmax: 700, ymax: 2,
             kurver: [{ A: function (l) { return mig.A(l); } }],
@@ -468,15 +480,18 @@
         this.hover = this.g && this.g.inde(pt) ? NK.klamp(this.g.x2l(pt.x), 400, 700) : null;
         if (this.overHaandtag) return "greb";
         if (this.paaOeje(pt)) return "klik";
-        if (this.hover !== null && (this.o.type === "byg" || (this.trin === "top" && !this.faerdig))) return "klik";
+        if (this.hover !== null && (this.o.type === "byg" || (this.trin === "top" && !this.slutNu()))) return "klik";
         return null;
     };
 
     P.nedScene = function (pt) {
         if (this.o.type !== "byg" || this.glide || !this.g) return false;
         if (this.paaHaandtag(pt) || this.g.inde(pt)) {
+            /* Laast, naar kortet viser forklaringen og Naeste */
+            if (this.spaer()) return false;
             this.traek = true;
             this.topL = NK.klamp(this.g.x2l(pt.x), 400, 700);
+            this.flyttetTop();
             return true;
         }
         return false;
@@ -485,12 +500,14 @@
     P.flytScene = function (pt) {
         if (!this.traek) return;
         this.topL = NK.klamp(this.g.x2l(pt.x), 400, 700);
+        this.visIndsend();
     };
 
+    /* Et traek bedoemmes ikke, naar toppen slippes: eleven trykker Indsend svar */
     P.opScene = function () {
         if (!this.traek) return;
         this.traek = false;
-        this.tjekByg();
+        this.visIndsend();
     };
 
     P.klikScene = function (pt) {
@@ -499,9 +516,17 @@
             this.kortBesked("Øjet har tre slags tappe: til rødt, grønt og blåt lys. Hver farve, du ser, er en blanding af de tre.", 6);
             return;
         }
-        if (this.o.type === "stof" && this.trin === "top" && !this.faerdig && this.g && this.g.inde(pt)) {
-            this.vurderTop(NK.klamp(this.g.x2l(pt.x), 400, 700));
+        if (this.o.type === "stof" && this.trin === "top" && this.g && this.g.inde(pt)) {
+            if (this.spaer()) return;
+            /* Et klik vaelger kun stedet; Indsend svar bedoemmer det */
+            this.klikL = Math.round(NK.klamp(this.g.x2l(pt.x), 400, 700));
+            this.nulstilHjaelp();
+            if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+            this.visIndsend();
+            return;
         }
+        if (this.g && this.g.inde(pt) && this.o.type === "byg") return;
+        if (this.g && this.g.inde(pt) && (this.slutNu() || this.trin === "farve")) this.kortBlink();
     };
 
     NK.SimFarve = SimFarve;

@@ -244,6 +244,29 @@ function koerTest(W) {
     paastand("med svovlsyre og varme bliver ordren leveret: 180 kr. og 50 kr. for et nyt stof", S.leveret === 1 && S.penge === 245 + 180 + 50 &&
         S.tjent === 230 && /Leveret/.test(S.beskedTekst()) && /esterkortet/.test(S.beskedTekst()), S.penge + " " + S.beskedTekst());
     tekster.push(S.beskedTekst());
+    /* Papirkortet bliver paa den leverede ordre, til eleven trykker Naeste ordre */
+    var skort = d.getElementById("fb-skort");
+    var bliv = skort.querySelector(".sk-bund.bliv.god");
+    paastand("kortet bliver på den leverede ordre med en grøn forklaring og Næste ordre, dér hvor hintknappen stod",
+        /ethylethanoat til neglelakfjerner/.test(tekst("fb-opgave")) && !!bliv && /Leveret/.test(bliv.textContent) &&
+        !!bliv.querySelector(".sk-videre") && /Næste ordre/.test(bliv.querySelector(".sk-videre").textContent) &&
+        d.getElementById("fb-status").hidden && S.ordrer[0].maal === "ethylmethanoat" && !/ethylmethanoat/.test(skort.textContent), skort.textContent);
+    var pladsFoer = JSON.stringify(R.plads), betFoer = JSON.stringify(R.bet);
+    skort.classList.remove("blink");
+    d.getElementById("fb-start").click();
+    var blinkStart = skort.classList.contains("blink");
+    skort.classList.remove("blink");
+    d.getElementById("fb-varme").click();
+    var blinkVarme = skort.classList.contains("blink");
+    S.lager.ethanol = 1; R.bygHylde();
+    d.querySelector("#fb-hylde .flaske[data-id=ethanol]").click();
+    paastand("reaktoren er låst, mens kortet venter på Næste ordre: Start, Varme og lageret får kortet til at blinke",
+        blinkStart && blinkVarme && skort.classList.contains("blink") && JSON.stringify(R.plads) === pladsFoer && JSON.stringify(R.bet) === betFoer && !R.auto,
+        blinkStart + " " + blinkVarme + " " + JSON.stringify(R.plads));
+    S.lager.ethanol = 0; R.bygHylde();
+    bliv.querySelector(".sk-videre").click();
+    paastand("Næste ordre viser den nye ordre, og rosen står ikke under den", /ethylmethanoat/.test(tekst("fb-opgave")) && !/Leveret/.test(skort.textContent) &&
+        !d.getElementById("fb-status").hidden && d.getElementById("fb-bliv").hidden && !!skort.querySelector("#fb-knap") && !S.bliv, skort.textContent);
     paastand("serien står på 1, og esteren er på esterkortet", S.serie === 1 && S.kendt.ethylethanoat === 1 && tekst("fb-korttal") === "1" && tekst("fb-seriebonus") === "+10 %");
     S.lager.butansyre = 1; R.bygHylde();
     paastand("det, eleven selv har lavet, står forrest på lageret", d.querySelector("#fb-hylde .flaske").getAttribute("data-id") === "butansyre");
@@ -356,6 +379,7 @@ function koerTest(W) {
     paastand("et stof, der står på lageret, kan leveres med knappen på ordren", !!lk && S.penge === p1 + s1.vaerdi && !S.lager[s1.id] && S.leveret === 1, S.penge - p1);
     tekster.push(S.beskedTekst());
 
+    paastand("en levering fra lageret bliver også på ordren, og Enter går til næste ordre", !!S.bliv && (S.enter(), !S.bliv));
     /* Vis svaret bryder serien */
     S.serie = 3; S.visSerie();
     S.knap(); S.knap(); S.knap(); S.knap();
@@ -405,6 +429,13 @@ function koerTest(W) {
         ["octan1ol", "permanganat", { varme: true }], ["propan2ol", "permanganat", { varme: true }], ["methanol", "permanganat", { varme: true }],
         ["ethansyre", "ethanol", {}], ["ethanol", "ethanol", BET], ["methansyre", "permanganat", { varme: true }], ["methansyre", "ethansyre", BET]];
     var tF = [], skalaMin = {}, lF = [], tavleMaal = {};
+    var kortH = {}, langHint = "";
+    F.faste.concat(F.tilfaeldige).forEach(function (o) {
+        var h = NK.Fane.hintTekster(o.maal, function () { return false; });
+        h.trin.forEach(function (t) { if (t.length > langHint.length) langHint = t; });
+    });
+    maal.forEach(function (m) { kortH[m[1]] = 0; });
+    S.naesteLinje();
     /* Lageret fyldt, saa flaskerne staar i to raekker */
     D.STOFFER.forEach(function (x) { if (x.hylde) S.lager[x.id] = 1; });
     S.lager.butansyre = 1;
@@ -432,8 +463,18 @@ function koerTest(W) {
         var sc = d.querySelector(".scene"), p = d.querySelector(".panel"), top = d.querySelector(".top");
         if (p.scrollWidth > p.clientWidth + 1) lF.push(m.join("×") + " panelet er for bredt");
         if (top.scrollWidth > top.clientWidth + 1) lF.push(m.join("×") + " toplinjen er for bred");
-        var st = d.querySelector(".statuslinje").getBoundingClientRect(), r = sc.getBoundingClientRect();
-        if (st.bottom > r.bottom + 1) lF.push(m.join("×") + " statuslinjen er skåret af");
+        /* Papirkortet med det laengste hint: oeverst i scenen, over lageret, og kolben er stadig stor nok */
+        S.besked('<span class="b-maerke">Hint 3 af 3</span> ' + NK.html(langHint), "hint");
+        S.tilpas();
+        var kt = d.getElementById("fb-skort").getBoundingClientRect(), r = sc.getBoundingClientRect();
+        var lg = d.querySelector(".lager").getBoundingClientRect();
+        if (kt.top < r.top || kt.bottom > lg.top + 1) lF.push(m.join("×") + " kortet daekker lageret");
+        if (Math.abs((kt.left + kt.right) / 2 - (r.left + r.right) / 2) > 2) lF.push(m.join("×") + " kortet står ikke i midten");
+        var arb = d.querySelector(".arbejde").getBoundingClientRect();
+        if (arb.bottom > r.bottom + 1) lF.push(m.join("×") + " arbejdsfladen er skåret af");
+        if (kt.height > kortH[m[1]] + 0.5) kortH[m[1]] = kt.height;
+        S.naesteLinje();
+        S.tilpas();
         var kb = d.querySelector(".kolbe").getBoundingClientRect();
         if (kb.height < 200) lF.push(m.join("×") + " kolben er " + Math.round(kb.height) + " px");
         var tv = d.getElementById("fb-tavleboks").getBoundingClientRect();
@@ -445,7 +486,8 @@ function koerTest(W) {
     paastand("tavlen kan bygges for alle slags reaktioner fra 1100 × 650 til 1600 × 950", tF.length === 0, tF.slice(0, 3).join(", "));
     paastand("bindingerne er mindst 15 px lange ved 1100 × 650 og 21 px fra 1300 × 820", skalaMin[1100] >= 15 &&
         skalaMin[1300] >= 21 && skalaMin[1500] >= 21 && skalaMin[1600] >= 21, JSON.stringify(skalaMin).replace(/(\.\d)\d+/g, "$1") + " " + JSON.stringify(tavleMaal));
-    paastand("toplinje, panel, statuslinje, kolbe og tavle kan være der i alle fire størrelser med to rækker flasker", lF.length === 0, lF.slice(0, 4).join(", "));
+    paastand("toplinje, panel, papirkort, lager, kolbe og tavle kan være der i alle fire størrelser med to rækker flasker og det længste hint", lF.length === 0, lF.slice(0, 4).join(", ") + " " + JSON.stringify(kortH).replace(/(\.\d)\d+/g, "$1"));
+    S.naesteLinje();
     /* Butikken kan vaere paa skaermen */
     var bF = [];
     S.aabnButik(); B.laeg("ethanol"); B.laeg("ethansyre"); B.laeg("permanganat"); B.laeg("pentan1ol");
@@ -479,7 +521,7 @@ function koerTest(W) {
     var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t); });
     paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).map(function (t) { return t.match(ASCII_ORD)[0]; }).join(" | "));
     var smaa = [];
-    d.querySelectorAll(".top *, .panel *, .lager *, .statuslinje *, .reaktor *, .ordrelinje, .butik *, .ek-boks *").forEach(function (e) {
+    d.querySelectorAll(".top *, .panel *, .lager *, .scenekort *, .reaktor *, .butik *, .ek-boks *").forEach(function (e) {
         if (!e.childNodes.length || !e.textContent.trim() || !e.getClientRects().length) return;
         var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
         if (!egen) return;
@@ -487,6 +529,21 @@ function koerTest(W) {
         if (px < 11.5) smaa.push(e.className + " " + px);
     });
     paastand("ingen tekst under 11,5 px i toplinjen, lageret, kolben, panelet, butikken og esterkortet", smaa.length === 0, smaa.slice(0, 4).join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Papirkortet");
+    forfra();
+    var kortEl = d.getElementById("fb-skort");
+    paastand("papirkortet er slået til (body.papirkort og faelles/papirkort.css)", d.body.classList.contains("papirkort") &&
+        !!d.querySelector('link[href="../faelles/papirkort.css"]') && !!(W.NK.Papir && W.NK.Papir.bliv));
+    paastand("kortet står i scenen og ikke i panelet", !!kortEl.closest(".scene") && !kortEl.closest(".panel") && kortEl.parentNode.firstElementChild === kortEl);
+    paastand("der er ingen statuslinje og ingen ordrelinje", !d.querySelector(".statuslinje") && !d.getElementById("fb-ordrelinje"));
+    paastand("Forfra står i panelet og ikke på kortet", !!d.getElementById("fb-forfra").closest(".panel") && !kortEl.querySelector("#fb-forfra"));
+    paastand("hintknappen er en stille knap på kortet", !!kortEl.querySelector("#fb-knap.knap.hjaelp") && /Giv et hint/.test(tekst("fb-knap")));
+    var sidst = d.querySelector(".scene").lastElementChild;
+    paastand("arbejdsfladen er det nederste i scenen", sidst.classList.contains("arbejde"), sidst.className);
+    paastand("kortet viser ordren med etiketten Ordre og næste skridt", kortEl.querySelector(".sk-chip").textContent === "Ordre" &&
+        /Neglesalonen vil have ethylethanoat/.test(tekst("fb-opgave")) && /butikken/.test(tekst("fb-opgave")), tekst("fb-opgave"));
 
     /* Ryd op */
     d.getElementById("butik").classList.remove("vis");

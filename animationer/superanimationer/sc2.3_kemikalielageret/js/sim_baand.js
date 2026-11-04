@@ -521,8 +521,9 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------
        Foerste gang fanen aabnes, foer spillet er startet (og igen med K).
-       Knappen Spring praesentationen over, to klik paa ham, Esc og Start
-       sender ham ud; andre klik og tastetryk goer ikke. */
+       Selve praesentationen er den faelles (../kemichael/praesentation.js)
+       med Naeste og Spring praesentationen over i hans taleboble. Esc og
+       Start sender ham ogsaa ud; andre klik og tastetryk goer ikke. */
     P.startIntro = function (tving) {
         if (!this.laererIntro || this.tilstand !== "klar") return;
         if (!tving && NK.hent("nk-sc2.3-intro2", false)) return;
@@ -535,16 +536,13 @@
         return !!(this.laererIntroVaek && this.laererIntroVaek());
     };
 
+    /* Hvert billede: ventetiden og taleboblen */
     P.opdaterIntro = function (dt) {
         if (this.introVent > 0) {
             this.introVent -= dt;
             if (this.introVent <= 0 && this.laererIntro && this.tilstand === "klar") this.laererIntro();
         }
-        var iIntro = !!(this.laererIIntro && this.laererIIntro());
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("baand-spring").hidden = !iIntro;
-        }
+        if (this.introOpdaterBoble && (this.kmIntro || this.kmBobleAktiv)) this.introOpdaterBoble();
     };
 
     /* ----- Indtastning og mus -------------------------------------------------- */
@@ -557,12 +555,15 @@
     P.koblInput = function () {
         var mig = this;
         this.input.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            /* Under praesentationen er Enter Naeste, saa spillet ikke starter */
+            if (mig.laererIIntro && mig.laererIIntro()) { mig.introNaeste(); return; }
+            mig.tjek();
         });
         this.input.addEventListener("input", function () {
             mig.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
         });
-        NK.el("baand-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
         this.input.addEventListener("focus", function () { mig.fokuseret = true; });
         this.input.addEventListener("blur", function () { mig.fokuseret = false; });
         NK.el("baand-knap").addEventListener("click", function () { mig.knap(); });

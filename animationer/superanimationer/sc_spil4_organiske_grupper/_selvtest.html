@@ -471,6 +471,35 @@ function tests() {
     kFejl = null;
     try { NK.laerer.laererSlut("mester"); for (kt = 0; kt < 300; kt++) NK.app.trin(1 / 60); } catch (e) { kFejl = String(e); }
     paastand("Kemichaels replik ved Stofgruppemester kører uden fejl", !kFejl, kFejl);
+    for (kt = 0; kt < 600; kt++) NK.app.trin(1 / 60);
+    /* Brugerens valg 4. nov. 2026: en ny rekord giver kun en replik foerste
+       gang og derefter hver fjerde; Stofgruppemester altid */
+    var Lk = NK.laerer, rekSvar = [];
+    Lk.rekordTal = 0;
+    for (kt = 0; kt < 5; kt++) rekSvar.push(Lk.laererSlut("rekord"));
+    var mesterSvar = Lk.laererSlut("mester");
+    Lk.laererSlutVaek();
+    Lk.rekordTal = 0;
+    for (kt = 0; kt < 600; kt++) NK.app.trin(1 / 60);
+    paastand("ny rekord: han kommer første gang og derefter hver fjerde (1. og 5.), Stofgruppemester altid",
+        rekSvar.join() === "true,false,false,false,true" && mesterSvar === true, rekSvar.join() + " / " + mesterSvar);
+
+    /* Den faelles praesentation (../kemichael/praesentation.js) i begge
+       udgaver. Laererens startIntro tager udgaven foerst; testen kalder
+       startIntro(true), saa den peges paa udgaven her. */
+    ["c", "b"].forEach(function (u) {
+        overskrift("6" + (u === "c" ? "b" : "c") + ". Kemichaels præsentation i " + D.UDGAVER[u].navn + " (fælles test)");
+        NK.app.visUdgave(u);
+        NK.app.spil().nulstil();
+        var Lr = NK.laerer;
+        Lr.introId = u;
+        Lr.startIntro = function () { return NK.Laerer.prototype.startIntro.call(this, u, true); };
+        NK.Praesentation.selvtest(Lr, function (sek) {
+            for (var n = 0; n < Math.round(sek * 60); n++) NK.app.trin(1 / 60);
+        }).forEach(function (r) { paastand(r[0], r[1], r[2]); });
+        delete Lr.startIntro;
+    });
+    NK.app.visUdgave("c");
 
     /* ----------------------------------------------------------------- */
     overskrift("7. Escaperoommets segl 4");
@@ -487,7 +516,7 @@ function tests() {
     /* ----------------------------------------------------------------- */
     overskrift("8. Sproget");
     var tekster = [];
-    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) { tekster.push(l); }); });
+    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) { tekster.push(l.tekst); }); });
     Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { tekster.push(l); }); });
     Object.keys(D.BESKED).forEach(function (k) {
         var v = D.BESKED[k];
@@ -495,11 +524,19 @@ function tests() {
     });
     Object.keys(D.FORVEKSLING).forEach(function (k) { tekster.push(D.FORVEKSLING[k]); });
     Object.keys(D.KLASSER).forEach(function (k) { tekster.push(D.KLASSER[k].kendetegn); });
+    /* Brugerens regler 4. nov. 2026: han taler formelt og siger mere ad gangen */
     var lange = [];
-    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) { if (l.length > 62) lange.push(l); }); });
-    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { if (l.length > 62) lange.push(l); }); });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", !lange.length, lange.join(" | "));
-    paastand("tre replikker pr. udgave", D.UDGAVER.c.intro.length === 3 && D.UDGAVER.b.intro.length === 3);
+    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) {
+        var n = l.tekst.split(/[.?] /).length;
+        if (l.tekst.length > 420 || n < 2 || n > 4) lange.push(l.tekst);
+    }); });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", !lange.length, lange[0]);
+    var halve = [];
+    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) {
+        if (l.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(l) || l.split(" ").length < 6) halve.push(l);
+    }); });
+    paastand("replikkerne ved rekord og Stofgruppemester er hele sætninger på højst 130 tegn", !halve.length, halve[0]);
+    paastand("to til fire trin pr. udgave", ["c", "b"].every(function (u) { var n = D.UDGAVER[u].intro.length; return n >= 2 && n <= 4; }));
     var sideTekst = d.body.innerText + "\n" + tekster.join("\n");
     paastand("ingen tankestreger (– kun som binding, fx –OH)", !/—|\s–\s|\s–$|^–\s/m.test(sideTekst), (sideTekst.match(/.{0,20}(—|\s–\s).{0,20}/) || [""])[0]);
     paastand("ingen ladning skrevet som 1+ eller 1−", !/(¹[⁺⁻])|([A-Za-z₀-₉)]1[+−-](?![0-9a-z]))/.test(sideTekst), (sideTekst.match(/.{0,10}(¹[⁺⁻]|[A-Za-z₀-₉)]1[+−-]).{0,10}/) || [""])[0]);

@@ -10,9 +10,9 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. Faneskift og Spring over (stopIntro) skjuler
-       tilbuddet uden at huske det. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc er
+       det samme som Nej tak. Faneskift og Spring præsentationen over
+       (stopIntro) skjuler tilbuddet uden at huske det. */
     if (NK.Laerer) {
         NK.Praesentation.pakInd(NK.Laerer.prototype, {
             tilbud: "tilbud",
@@ -70,7 +70,9 @@
         if (dt > 0.1) dt = 0.1;
         laerred.tilpas();
         var b = niveauer[aktivId].baeger;
-        b.opdater(dt, laerred.b, laerred.h);
+        /* Mens opslaget daekker scenen, staar glassene stille, saa
+           eleven ser glassene blive haeldt sammen bagefter. */
+        if (!NK.Opslag.aaben()) b.opdater(dt, laerred.b, laerred.h);
         b.tegn(laerred);
         if (laerer) {
             laerer.opdater(dt);
@@ -81,6 +83,7 @@
 
     function tastatur(e) {
         if (e.key === "Escape") {
+            if (NK.Opslag.aaben()) { NK.Opslag.luk(NK.Opslag.lukker()); return; }
             lukOverlay();
             NK.Rundvisning.luk();
             if (laerer && !laerer.afvisTilbud()) laerer.stopIntro();
@@ -88,6 +91,7 @@
         }
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (NK.Opslag.aaben()) return;
         if (e.key >= "1" && e.key <= "3") { visNiveau(raekke[parseInt(e.key, 10) - 1]); return; }
         if ((e.key === "k" || e.key === "K") && laerer) { laerer.startIntro(aktivId, true); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
@@ -95,7 +99,7 @@
             else { lukOverlay(); NK.Rundvisning.start(aktivId); }
             return;
         }
-        if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
+        if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis") || NK.Opslag.aaben()) return;
         if (e.key === "r" || e.key === "R") niveauer[aktivId].nyOpgave();
     }
 
@@ -106,7 +110,6 @@
         if (NK.Laerer) {
             laerer = new NK.Laerer(laerred);
             NK.laerer = laerer;
-            NK.el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
         }
         raekke.forEach(function (id) { niveauer[id] = new NK.Niveau(NK.NIVEAUER[id]); });
         NK.niveauer = niveauer;        /* saa de kan pilles ved fra konsollen og selvtesten */

@@ -56,7 +56,6 @@
            gaar til ham, ikke til glasset. */
         this.L = this.l;
         this.tid = 0;
-        NK.el("vand-spring").addEventListener("click", function () { mig.springIntro(); });
         this.l.canvas.addEventListener("click", function (e) {
             var r = mig.l.canvas.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
             if (mig.laererIntroKlik && mig.laererIntroKlik(x, y)) return;

@@ -334,9 +334,34 @@ function koerTest(W) {
     tik(B, 14);
     paastand("han sætter nyt smør på bordet", !smoer.harsk && smoer.sted === "bord");
 
+    overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    ["fane-fabrik", "fane-koele"].forEach(function (fane) {
+        klik('[data-fane="' + fane + '"]');
+        var sim = NK.sims[fane];
+        tik(sim, 3);
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); }).forEach(function (r) {
+            paastand(fane + ": " + r[0], r[1], r[2]);
+        });
+    });
+    /* Under praesentationen kommer det nye smoer uden ham, og rosen venter */
+    B.nulstil(); tik(B, 1);
+    B.startIntro(true); tik(B, 2.5);
+    smoer = B.glasMedId("smoer");
+    B.flyt(smoer, "sol");
+    tik(B, D.HARSK_TID + 5);
+    paastand("harskt smør under præsentationen bliver skiftet uden ham", !smoer.harsk && B.laererIIntro() && !(B.laerer.scene && B.laerer.scene.navn === "harsk"));
+    B.ventRos = 0.1; tik(B, 1);
+    paastand("rosen venter, til præsentationen er slut", B.ventRos > 0 && B.laererIIntro());
+    B.springIntro(); tik(B, 3);
+    paastand("efter præsentationen kommer rosen", !B.laererIIntro() && !!(B.laerer.scene && B.laerer.scene.navn === "faerdig"));
+    tik(B, 12);
+    B.nulstil(); tik(B, 1);
+
     overskrift("9. Sproget");
     var krop = d.body.innerText;
-    var replikker = [].concat(D.INTRO_FABRIK, D.INTRO_KOELE, [D.ORDRER_FAERDIG, D.KOELE_FAERDIG, D.HARSK, D.NYT_SMOER], D.HARSK_IGEN);
+    var intro = [].concat(D.INTRO_FABRIK, D.INTRO_KOELE).map(function (l) { return l.tekst; });
+    var ros = [].concat([D.ORDRER_FAERDIG, D.KOELE_FAERDIG, D.HARSK, D.NYT_SMOER], D.HARSK_IGEN);
+    var replikker = intro.concat(ros);
     var tekster = replikker.concat(
         D.ORDRER.map(function (o) { return o.kunde + " " + o.tekst + " " + o.hint; }),
         D.KOELE_OPGAVER.map(function (o) { return o.hint + " " + o.efter; }),
@@ -345,9 +370,14 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− på siden", !/1[+−-](?!\d)/.test(krop.replace(/\d+[+−-]\d/g, "")));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_FABRIK, D.INTRO_KOELE].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = intro.filter(function (t) { var n = t.split(/[.?] /).length; return t.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0]);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_FABRIK, D.INTRO_KOELE].every(function (l) { return l.length >= 2 && l.length <= 4; }));
+    var halve = intro.filter(function (t) { return !/^[A-ZÆØÅ].*\.$/.test(t) || /^Her\b/.test(t); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
+    var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     var tur = ["#fabrik-anker-fliser", "#fabrik-anker-glycerol", "#fabrik-kort", "#fabrik-fedt-kort", "#fabrik-anker-glas", "#fabrik-forfra",
         "#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue", "#koele-anker-zoom", "#koele-kort", "#koele-dekl-kort"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));

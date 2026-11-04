@@ -33,7 +33,7 @@ holder styr på hjulet, gåderne og pointene. Hører til kategorien Spil
 | `index.html` | toplinje, scene, styring, podier, hjulscene, titel og vinduerne |
 | `css/stil.css` | alt udseende |
 | `js/kerne.js` | fælles hjælpere (som i `sc_spil3_jeopardy`) |
-| `js/data.js` | **de indbyggede quizzer** (som tekst), hjulene og Kemichaels replikker |
+| `js/data.js` | **de indbyggede quizzer** (som tekst), hjulene og Kemichaels præsentation |
 | `js/tavle.js` | sætter en løsning op på tavlens fire rækker |
 | `js/tekstformat.js` | quizzen som tekst: læs, skriv, link og vejledning til AI |
 | `js/spil.js` | reglerne og pointene, uden tegning, med Fortryd |
@@ -42,7 +42,6 @@ holder styr på hjulet, gåderne og pointene. Hører til kategorien Spil
 | `js/visning.js` | tavlen, bogstaverne, knapperne, podierne og plakaten |
 | `js/editor.js` | biblioteket med quizzer og vinduet Quizzer som tekst |
 | `js/sprites.js`, `js/laerer.js` | Kemichael (som i `sc_spil3_jeopardy`) |
-| `js/praesentation.js` | tilbuddet Start præsentation / Nej tak (fælles mønster) |
 | `js/rundvisning.js` | rundvisningen bag ? |
 | `js/app.js` | forløbet, knapperne og tastaturet |
 | `sprites/` | titlen, tavlens ramme, flisernes emblem, buerne og stjernerne |
@@ -140,7 +139,20 @@ Titelskærmen viser, hvilke lyde der bruges.
 * Finalen spilles af holdet med flest point; læreren kan vælge et andet hold.
   Kuvertens beløb trækkes, når præmiehjulet stopper, og vises først til sidst.
 * Kemichael præsenterer kun titelskærmen og har intet baggrundsliv, så han aldrig
-  går hen over tavlen.
+  går hen over tavlen. Han kommer, når man beder om det (tilbuddet Start
+  præsentation / Nej tak første gang og <kbd>K</kbd>). Præsentationen er den
+  fælles (`../kemichael/praesentation.js`, brugerens regler 4. nov. 2026): tre
+  trin i `D.INTRO.titel` med to til fire hele sætninger i Kemibogens sprog, en
+  taleboble ved hans hoved med **Næste** (på sidste trin **Afslut**) og
+  **Spring præsentationen over**, og en gul ramme om det, han peger på (Hold
+  på tavlen / Alene, quizvalget, holdnavnene eller dit navn, Start spillet,
+  Regler og ?). Han går aldrig videre af sig selv; Esc og Start spillet sender
+  ham ud. `js/app.js` pakker lærerens `startIntro` ind
+  (`NK.Praesentation.pakInd`), og `js/laerer.js` lægger præsentationen på
+  (`NK.Praesentation.trin`). Under spillet og ved slutskærmen siger han intet.
+  Den gamle `js/praesentation.js`, knappen "Spring præsentationen over" og de
+  tre korte replikker (med vittigheden om, at hjulet ikke er snydt) er fjernet
+  4. nov. 2026.
 
 ## Selvtesten
 

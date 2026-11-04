@@ -23,8 +23,10 @@
    og omslaget på én dråbe), at tjekket af aflæsningen og de fire
    regnetrin giver den rigtige besked ved de typiske fejl, at sproget
    overholder reglerne, at alle tre faner kan gennemføres (fane 1 også
-   med musen), at luppen viser det samme som kolben, at Kemichael kan
-   vises og sendes ud, og at layoutet holder fra 520 × 380 til 1500 × 900.
+   med musen), at luppen viser det samme som kolben, at Kemichaels
+   præsentation viser trinnene ét ad gangen med Næste og Spring
+   præsentationen over (den fælles test i ../kemichael/praesentation.js),
+   og at layoutet holder fra 520 × 380 til 1500 × 900.
    Afsnit 1 til 10 koeres med kaliumchromat som indikator; afsnit 11
    koerer den nye indikator, dichlorfluorescein (18. okt. 2026).
 
@@ -189,10 +191,23 @@ function koerTest(W) {
         formelFejl.map(function (x) { var r = T.formel(x[0], x[1]); return x[0] + " " + x[1] + "→" + (r.ok ? "ok " + (r.note || "") : r.besked); }).join("; "));
     paastand("et tomt formelfelt er ikke en fejl", T.formel("nb", "  ").tom === true);
 
+    /* Brugerens valg 4. nov. 2026: hindbærsmoothie (tomatsuppe) første gang og derefter hver tredje */
+    var morkSagt = [], morkSvar = [];
+    S1.laererReplik = function (t) { morkSagt.push(t); };
+    S1.forbi = function () { return 1.5; };
+    S1.morkTal = 0;
+    for (var mi = 0; mi < 4; mi++) { S1.bemMork = false; morkSvar.push(S1.tjekMork()); }
+    delete S1.laererReplik; delete S1.forbi;
+    S1.morkTal = 0; S1.bemMork = false;
+    paastand("over 1 mL forbi omslaget: han kommer første gang og derefter hver tredje (1. og 4.)",
+        morkSvar.join() === "true,false,false,true" && morkSagt.length === 2 && /^Stop nu, medmindre du vil lave (hindbærsmoothie|tomatsuppe)\.$/.test(morkSagt[0]),
+        morkSvar.join() + " " + morkSagt[0]);
+
     overskrift("4. Sproget");
-    var replikker = [].concat(D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG,
-        [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_MORK, D.BEM_TOM, D.AEG_PRAECIS]);
-    var tekster = replikker.concat([D.TITRER_HINT, D.AFLAES_HINT],
+    function introTekster(l) { return l.map(function (x) { return x.tekst; }); }
+    var INTRO = [].concat(D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG);
+    var replikker = [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_TOM, D.BEM_MORK, D.AEG_PRAECIS];
+    var tekster = introTekster(INTRO).concat(replikker, [D.TITRER_HINT, D.AFLAES_HINT],
         D.TRIN.map(function (x) { return x.navn + " " + x.hint + " " + x.formelHint; }),
         D.SITUATIONER.map(function (s) { return s.titel + " " + s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" ") + " " + s.valg.join(" ") + " " + s.aendring; }));
     var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
@@ -204,9 +219,14 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (x) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(x); }));
-    var lange = replikker.filter(function (x) { return x.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regel 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og ingen begynder med Her", halve.length === 0, halve[0] && halve[0].tekst);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG].every(function (l) { return l.length >= 2 && l.length <= 4; }));
+    var korte = replikker.filter(function (x) { return x.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(x); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte.join(" | "));
     paastand("hver situation har en forklaring til hvert forkert svar", D.SITUATIONER.every(function (s) {
         return s.valg.length === 3 && s.forkert.every(function (f, i) { return i === s.rigtig ? f === "" : f.length > 10; });
     }));
@@ -370,18 +390,21 @@ function koerTest(W) {
     paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-valg .vaelger.rigtig") && !!d.querySelector("#for-valg .vaelger.forkert"));
     S3.nulstil();
 
-    overskrift("9. Kemichael");
+    overskrift("9. Kemichaels præsentation: ét trin ad gangen (fælles test)");
     ["fane-titrering", "fane-beregning", "fane-forbrug"].forEach(function (id) {
         klik('[data-fane="' + id + '"]');
         var sim = NK.sims[id];
         sim.tilpas();
+        tik(sim, 2.5);
+        NK.Praesentation.selvtest(sim, function (sek) { sim.tilpas(); tik(sim, sek); }).forEach(function (r) {
+            paastand(id + ": " + r[0], r[1], r[2]);
+        });
         sim.startIntro(true);
-        tik(sim, 2);
+        tik(sim, 2.5);
         var inde = sim.laererIIntro();
-        var spring = !d.getElementById(sim.springId).hidden;
         sim.springIntro();
         tik(sim, 4);
-        paastand(id + ": præsentationen kan vises og sendes ud med Esc", inde && spring && !sim.laererIIntro() && d.getElementById(sim.springId).hidden);
+        paastand(id + ": Esc (springIntro) sender ham ud midt i præsentationen", inde && !sim.laererIIntro());
     });
     try { W.localStorage.removeItem("nk-sc6.3-intro-titrering"); } catch (e) { /* ingen hukommelse */ }
     S1.startIntro(false);
@@ -503,9 +526,10 @@ function koerTest(W) {
     d.dispatchEvent(tast);
     paastand("tasten I skifter tilbage til dichlorfluorescein", K.indikator === "dcf" && S1.pr.ind === "dcf");
 
-    var replikkerD = [].concat(D.INTRO_TITRERING, [D.ROS_TITRERING, D.BEM_MORK]);
-    paastand("Kemichaels replikker siger lyserød og hindbærsmoothie og er højst ca. 60 tegn", /lyserød/.test(D.INTRO_TITRERING.join(" ")) &&
-        /Lyserød/.test(D.ROS_TITRERING) && /hindbærsmoothie/.test(D.BEM_MORK) && replikkerD.every(function (x) { return x.length <= 62; }));
+    var replikkerD = D.INTRO_TITRERING.map(function (x) { return x.tekst; }).concat([D.ROS_TITRERING]);
+    paastand("Kemichaels præsentation og ros siger dichlorfluorescein, gulgrøn og lyserød og intet om rødbrun", /dichlorfluorescein/.test(replikkerD.join(" ")) &&
+        /gulgrøn/.test(replikkerD.join(" ")) && /svagt lyserød/.test(replikkerD.join(" ")) && /lyserød/.test(D.ROS_TITRERING) &&
+        !/rødbrun|chromat/.test(replikkerD.join(" ")) && D.ROS_TITRERING.length <= 130, replikkerD.join(" | ").slice(0, 120));
     var synligTeori = tDcf.map(function (e) { return e.textContent; }).join(" ");
     paastand("teorien om dichlorfluorescein siger gulgrøn og lyserød og ikke rødbrun", /gulgrøn/.test(synligTeori) && /lyserød/.test(synligTeori) && !/rødbrun/.test(synligTeori));
     paastand("ingen tankestreger i de nye tekster", ![d.querySelector(".indikatorvalg").textContent, synligTeori, D.TITRER_HINT].concat(replikkerD).some(function (x) { return /[–—]/.test(x); }));

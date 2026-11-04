@@ -92,7 +92,6 @@ bliver Labyrintmester, og mærket står på Mix i emnerne bagefter.
 | `js/tegning.js` | labyrinten, rummene, Pacman, spøgelserne og skjoldet på lærredet |
 | `js/sprites.js` | lager til Kemichaels sprites |
 | `js/laerer.js` | Kemichael præsenterer og kommer forbi til Labyrintmester |
-| `js/praesentation.js` | tilbuddet Start præsentation / Nej tak (samme fil i alle mapper) |
 | `js/rundvisning.js` | rundvisningen bag ? |
 | `js/lyd.js` | baggrundsmusikken: henter loopet, spiller det uden hak og følger pausen |
 | `js/app.js` | skærmene, knapperne, tastaturet og tegneløkken |
@@ -193,10 +192,18 @@ I menuen fra 26. sept. 2026 som spil.pacman (nr. 1) i
 `kemi-c-filer/arkiv/c_spil_pacman_emner_oldversion.html`. Selvtesten finder den
 gamle fil i arkivet.
 
-## Tilbuddet om præsentationen
+## Kemichael
 
-Første gang står der Start præsentation og Nej tak midt foroven på startskærmen.
-Kemichael siger tre korte linjer og peger på valgene, mens startskærmen rykker til
-højre for at give ham plads. Han kommer aldrig, mens der spilles. Et spil, der går
-i gang, er det samme som Nej tak. Koden er `js/praesentation.js` koblet med
-`NK.Praesentation.kobl` i `js/laerer.js`.
+**Præsentationen** (fælles kode fra 4. nov. 2026, `../kemichael/praesentation.js`
+og `praesentation.css`). Første gang står der Start præsentation og Nej tak midt
+foroven på startskærmen; K viser den igen. Kemichael siger fire trin (`D.INTRO` i
+`js/data.js`) i hele sætninger: spillet, sværhedsgraderne, emnerne og hintet
+med knapperne Regler og ?. Han peger på det, der blinker med en gul ramme. Taleboblen har
+knapperne Næste (på sidste trin Afslut) og Spring præsentationen over; Enter og
+pil til højre er Næste, og Esc springer over. Han går aldrig videre af sig selv.
+Mens han taler, rykker startskærmen til højre på en bred skærm. Han kommer aldrig,
+mens der spilles, og et spil, der går i gang, er det samme som Nej tak.
+
+**Af sig selv** kommer han kun én gang: når nogen bliver Labyrintmester (Mix på
+Svær gennemført), med én af replikkerne i `D.MESTER_REPLIK` ved kortet Tillykke.
+Ellers er han der kun, når eleven klikker på ham.

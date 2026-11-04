@@ -94,7 +94,7 @@
         { id: "fotosyntese", navn: "Fotosyntese", venstre: [["CO2", 6], ["H2O", 6]], hoejre: [["C6H12O6", 1], ["O2", 6]] },
         { id: "saltsyre", navn: "Magnesium og saltsyre", venstre: [["Mg", 1], ["HCl", 2]], hoejre: [["MgCl2", 1], ["H2", 1]] },
         { id: "knaldgas", navn: "Knaldgas", venstre: [["H2", 2], ["O2", 1]], hoejre: [["H2O", 2]] },
-        { id: "aluminiumchlorid", navn: "Aluminium og chlor", venstre: [["Al", 2], ["Cl2", 3]], hoejre: [["AlCl3", 2]] }
+        { id: "aluminiumchlorid", navn: "Aluminium og dichlor", venstre: [["Al", 2], ["Cl2", 3]], hoejre: [["AlCl3", 2]] }
     ];
     D.REAKTIONER = R.map(function (r) {
         var led = [];
@@ -182,7 +182,7 @@
        ====================================================================== */
     D.SKEMA = [
         { id: "kul", r: "kul", givet: "C", n: [2, 3, 4, 5, 6, 8],
-          tekst: "Kul brænder i rigeligt oxygen. Hvor meget CO₂ dannes der? O₂ regner vi ikke på.",
+          tekst: "Kul brænder i rigeligt dioxygen. Hvor meget CO₂ dannes der? O₂ regner vi ikke på.",
           spoerg: [["C", "M"], ["CO2", "M"], ["C", "n"], ["CO2", "n"], ["CO2", "m"]] },
         { id: "ammoniak", r: "ammoniak", givet: "N2", n: [0.5, 1, 1.5, 2], afstem: true,
           tekst: "Ammoniak laves af N₂ og rigeligt H₂. Afstem skemaet, og find massen af NH₃.",
@@ -219,7 +219,7 @@
         { id: "methan", r: "methan", a: "CH4", b: "O2", p: "CO2", std: { L: "O2", saet: 1, rest: 1 },
           tekst: "Methan brænder i en lukket beholder. Hvor meget CO₂ dannes der?" },
         { id: "aluminiumchlorid", r: "aluminiumchlorid", a: "Al", b: "Cl2", p: "AlCl3", std: { L: "Cl2", saet: 1, rest: 1 },
-          tekst: "Aluminium reagerer med chlor. Hvor meget aluminiumchlorid dannes der?" }
+          tekst: "Aluminium reagerer med dichlor. Hvor meget aluminiumchlorid dannes der?" }
     ];
     /* Hoejst saa mange poser af hvert stof paa bakken */
     D.BEGR_MAKS = 6;

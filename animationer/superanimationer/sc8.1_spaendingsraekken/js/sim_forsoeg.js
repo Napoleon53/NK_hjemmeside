@@ -786,7 +786,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forsoeg", tilbud: "fs-tilbud", spring: "fs-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forsoeg", tilbud: "fs-tilbud" });
 
     NK.SimForsoeg = SimForsoeg;
 }());

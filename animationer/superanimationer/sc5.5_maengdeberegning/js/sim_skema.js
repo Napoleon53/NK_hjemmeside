@@ -84,10 +84,10 @@
         return { r: D.reaktion(o.r), givet: givet, kilde: o.givet, spoerg: o.spoerg, afstem: !!o.afstem };
     };
 
-    P.promptHTML = function () {
+    /* Opgaven paa kortet: den kendte masse og spoergsmaalet */
+    P.kortTekst = function () {
         var o = this.x.o;
-        return '<p class="opgave-prompt">' + D.tekstMasse(this.x.m) + " g " + D.stof(o.givet).formel + "</p>" +
-            '<p class="opgave-spm">' + NK.html(o.tekst) + "</p>";
+        return "Givet: <b>" + D.tekstMasse(this.x.m) + "\u00a0g " + D.stof(o.givet).formel + "</b>. " + NK.html(o.tekst);
     };
 
     P.nyOpgave = function () {
@@ -158,7 +158,9 @@
         lay.vaegt = vaegt;
         /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
         lay.bordY = Math.round(H - NK.klamp(H * 0.06, 18, 44));
-        var top = NK.klamp(H * 0.02, 8, 18);
+        /* Kortet staar oeverst; tavlen begynder under det */
+        lay.zone = this.kortZone();
+        var top = this.top();
         var tH = vaegt ? NK.klamp((lay.bordY - top) * 0.6, 200, 420) : NK.klamp(lay.bordY - top - 18, 200, 600);
         lay.tavle = { x: kant + 6, y: top, b: W - 2 * kant - 12, h: tH };
         var ind = NK.klamp(lay.tavle.b * 0.03, 8, 22);

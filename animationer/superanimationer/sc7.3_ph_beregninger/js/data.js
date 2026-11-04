@@ -96,37 +96,65 @@
     };
 
     /* ----- Kemichael -----------------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. Linje 1: hvad man skal
-       paa fanen, sagt ligeud. Linje 2: hvordan (han peger). Linje 3: en
-       toer bemaerkning, som en svag elev ogsaa forstaar. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (de
+       usynlige .anker over laerredet, opgavekortet og lommeregneren).
+       Ingen vittigheder i praesentationen. */
     D.INTRO = {
         ph: [
-            "Her finder du pH, når du kender [H₃O⁺].",
-            "Følg trinene i opgaven, og brug lommeregneren.",
-            "Til sidst tjekker pH-metret dit svar. Det snyder ikke."
+            { tekst: "I denne fane beregner du pH ud fra koncentrationen af oxoniumioner, [H₃O⁺]. " +
+                "Etiketten ved stoffet viser [H₃O⁺], og dit svar bliver skrevet på den samme etiket.",
+              sel: ["#ph-anker-etiket", "#ph-anker-glas"] },
+            { tekst: "Regnevejen øverst viser, hvad du kender, og hvad du skal finde. " +
+                "Opgavekortet deler beregningen op i små trin, hvor du vælger formlen, taster udregningen på lommeregneren og skriver svaret. " +
+                "Under det, du taster, viser lommeregneren, hvordan den har læst udtrykket.",
+              sel: ["#ph-anker-vej", "#ph-kort", "#regner"] },
+            { tekst: "Når svaret er rigtigt, måler pH-metret pH, så du kan se, at tallene passer. " +
+                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
+              sel: ["#ph-anker-meter", "#ph-knap"] }
         ],
         konc: [
-            "Her kender du pH og skal finde koncentrationerne.",
-            "Først [H₃O⁺], så [OH⁻]. Følg trinene i opgaven.",
-            "Svarene skrives på kortet. Det gamle faldt af."
+            { tekst: "I denne fane kender du pH og skal beregne koncentrationerne [H₃O⁺] og [OH⁻]. " +
+                "pH-metret har allerede målt pH i opløsningen. " +
+                "Dine svar bliver skrevet på etiketten ved stoffet.",
+              sel: ["#konc-anker-meter", "#konc-anker-etiket"] },
+            { tekst: "Først beregner du [H₃O⁺] ud fra pH, og derefter beregner du [OH⁻] ud fra [H₃O⁺]. " +
+                "Regnevejen øverst viser, hvor langt du er nået.",
+              sel: "#konc-anker-vej" },
+            { tekst: "Opgavekortet deler hvert trin op. Du vælger formlen, taster udregningen på lommeregneren og skriver svaret. " +
+                "En koncentration skriver du med tallet i det store felt og eksponenten i det lille felt. " +
+                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
+              sel: ["#konc-kort", "#regner"] }
         ],
         staerk: [
-            "Her står koncentrationen på flasken. Du skal finde pH.",
-            "Det tager flere trin. Regnevejen viser, hvor du er.",
-            "Rør ikke flaskerne. Tallene ætser ikke."
+            { tekst: "I denne fane beregner du pH i en opløsning af en stærk syre eller en stærk base. " +
+                "Flasken viser stoffet og dets koncentration. " +
+                "Dine svar bliver skrevet på etiketten ved siden af flasken.",
+              sel: ["#staerk-anker-glas", "#staerk-anker-etiket"] },
+            { tekst: "En stærk base kræver flere trin end en stærk syre, fordi du først skal beregne [OH⁻]. " +
+                "Regnevejen øverst viser, hvor langt du er nået frem mod pH.",
+              sel: "#staerk-anker-vej" },
+            { tekst: "Opgavekortet deler beregningen op i små trin, og du taster udregningerne på lommeregneren. " +
+                "Til sidst måler pH-metret pH i opløsningen. " +
+                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
+              sel: ["#staerk-kort", "#regner", "#staerk-anker-meter"] }
         ]
     };
 
-    /* Ros efter fem opgaver paa en fane (én gang) */
+    /* Ros efter fem opgaver, som eleven selv har regnet paa en fane (én
+       gang pr. browser). Det er sammen med paaskeaegget de eneste gange,
+       han kommer ind af sig selv (brugerens regel 4. nov. 2026). */
     D.ROS = {
-        ph: "Fem gange rigtigt. pH-metret keder sig.",
-        konc: "Fem kort udfyldt. Lageret er ryddeligt igen.",
-        staerk: "Fem flasker, og ingen er åbnet. Sådan."
+        ph: "Du har selv regnet pH rigtigt i fem opgaver. pH-metret er begyndt at kede sig.",
+        konc: "Du har udfyldt fem etiketter rigtigt. Så mange korrekte etiketter har kemikalielageret aldrig haft.",
+        staerk: "Du har regnet pH for fem flasker uden at åbne en eneste. Sådan skal stærke syrer og baser behandles."
     };
     D.ROS_ANTAL = 5;
 
-    /* Paaskeaeg: lommeregneren giver 42 */
-    D.AEG_42 = "42. Det er svaret, bare ikke på den her opgave.";
+    /* Paaskeaeg: lommeregneren giver 42 (én gang pr. besoeg) */
+    D.AEG_42 = "Lommeregneren viser 42. Det er svaret på alt, men ikke på denne opgave.";
 
     NK.Data = D;
 }());

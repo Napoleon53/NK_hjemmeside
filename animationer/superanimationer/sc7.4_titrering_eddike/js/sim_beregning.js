@@ -177,7 +177,6 @@
             if (o.over <= D.PRAECIS + 1e-9) t += " Titreringen var præcis.";
             else t += " Du titrerede " + NK.betydende(o.over, 2) + " mL forbi omslaget, så forbruget og resultatet blev for store.";
             if (Math.abs(dit - o.p) < 0.005 && !vist && this.laererReplik) this.ventAeg = 1.0;
-            else if (f.pct > o.p * 1.25 && this.laererGlimt) this.ventGlimt = 1.0;
         } else {
             t = "Masseprocenten er " + NK.betydende(f.pct, 3) + " %. Husholdningseddike har typisk mellem 4 og 5,5 %.";
         }
@@ -230,7 +229,6 @@
             raekker: NK.el("ber-raekker")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("ber-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.bygRaekker = function () {
@@ -356,7 +354,6 @@
         }
         vent("ventRos", function () { if (mig.laererReplik) mig.laererReplik(D.ROS_BEREGNING, true); });
         vent("ventAeg", function () { if (mig.laererReplik) mig.laererReplik(D.AEG_PRAECIS, false); });
-        vent("ventGlimt", function () { if (mig.laererGlimt) mig.laererGlimt("titrering"); });
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
     };
@@ -510,13 +507,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-beregning", tilbud: "ber-tilbud", spring: "ber-spring" });
-
-    /* Mens han siger, hvor man skriver, lyser feltet */
-    P.pegPaaFelt = function (til) {
-        var f = this.aktivtFelt();
-        if (f && f.feltEl) f.feltEl.classList.toggle("peg", !!til);
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-beregning", tilbud: "ber-tilbud" });
 
     NK.SimBeregning = SimBeregning;
 }());

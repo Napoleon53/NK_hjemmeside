@@ -7,8 +7,9 @@
      intro    Opgaven praesenteres: formlen, og hvilken ion der er ukendt.
               Begge ioners kort er foldet sammen med "?". Knappen hedder
               "Start opgave".
-     kendt    Kemichael peger paa den ion, eleven kender: "Start med O."
-              Dens kort lyser. Eleven vaelger ladningen.
+     kendt    Kemichael peger paa den ion, eleven kender, og siger, at
+              ladningen paa den ukendte ion kan regnes ud. Dens kort
+              lyser. Eleven vaelger ladningen.
      ladning  Kortene folder sig ud, og den ukendte ion starter uden
               ladning, saa lynlaasen staar tydeligt aaben. Eleven traekker
               i kortet (eller bruger knapperne), til lynlaasen lukker. En
@@ -16,8 +17,12 @@
               mangler, eller om der er for meget.
      partner  Kun ved en ukendt sammensat ion: den skal bruges i et nyt
               salt, og foerst skal ladningen paa partneren slaas op (Ca²⁺).
+              Lidt efter at lynlaasen er lukket, skifter bordet til det
+              nye salt: Na gaar ud, og Ca kommer ind med "?" og lyser.
      valg     Et ukendt metal skal have det rigtige romertal i navnet; en
-              ukendt sammensat ion skal i det nye salt.
+              ukendt sammensat ion skal i det nye salt. Her virker bordet
+              som paa fane 1, saa eleven kan bygge saltet med + og −,
+              foer formlen vaelges.
 
    Et loest trin viser svaret og en kort forklaring i trinlisten, saa
    beskeden og hintet forneden kun handler om det trin, man er i gang
@@ -58,7 +63,6 @@
         this.musPlakat = null;
 
         NK.el("ukendt-opgaveknap").addEventListener("click", function () { mig.opgaveKnap(); });
-        NK.el("ukendt-spring").addEventListener("click", function () { mig.springIntro(); });
         /* Linket i hintet aabner plakaten igen. */
         NK.el("ukendt-hint").addEventListener("click", function (e) {
             if (e.target && e.target.getAttribute("data-opslag") !== null) mig.aabnOpslag(mig.hintIon);
@@ -160,6 +164,7 @@
         this.vist = false;
         this.senestLoest = null;
         this.plakatPuls = null;
+        this.skift = null;              /* ventetiden, foer bordet skifter til partneren */
         if (this.laererNyt) this.laererNyt();
         NK.Opslag.luk();
 
@@ -301,24 +306,40 @@
             NK.el("ukendt-valg").className = "valg navne";
             this.svar.vis(D.romertalValg(s.kat, s.an));
         } else {
-            /* Den nye salt kraever partnerens ladning: slaa den op foerst. */
+            /* Den nye salt kraever partnerens ladning: slaa den op foerst.
+               Bordet skifter til det nye salt lidt efter, saa eleven naar
+               at se lynlaasen lukke. */
             this.fase = "partner";
             this.aktivTrin(2);
             NK.saetHTML("ukendt-opgavetekst", "Nu skal " + D.ionTekst(this.ion) + " bruges i "
                 + D.saltnavn(this.partner, s.an) + ". Slå først ladningen op for <b>" + this.partner.formel + "</b>.");
             this.stilKendtSpm(this.partner);
+            this.skift = { t: 1.4 };
         }
+    };
+
+    /* Bordet viser det nye salt: partneren foldet sammen med "?" og den
+       fundne ion. Formlen over bordet er "?", for den er sidste trin. */
+    NK.SimUkendt.prototype.skiftTilPartner = function () {
+        if (!this.skift) return;
+        this.skift = null;
+        this.bord.nyPartner(this.partner);
+        NK.saetHTML("ukendt-uf", '<span class="uq">?</span>');
+        NK.saetTekst("ukendt-un", D.saltnavn(this.partner, this.salt.an));
     };
 
     /* Partneren er fundet: nu formlen for det nye salt. */
     NK.SimUkendt.prototype.partnerFundet = function (forklaring) {
         var s = this.salt;
         NK.Opslag.luk();
+        this.skiftTilPartner();
         this.loesTrin(2, D.ionTekst(this.partner), forklaring);
         this.fase = "valg";
         this.aktivTrin(3);
+        this.bord.fritByg();
         NK.saetHTML("ukendt-opgavetekst", "Nu kender du begge ladninger: " + D.ionTekst(this.partner) + " og "
-            + D.ionTekst(this.ion) + ".");
+            + D.ionTekst(this.ion) + ". Byg " + D.saltnavn(this.partner, s.an)
+            + " på bordet med <b>+</b> og <b>−</b>, og vælg så formlen.");
         NK.saetHTML("ukendt-spm", "Hvad er formlen for <b>" + D.saltnavn(this.partner, s.an) + "</b>?");
         NK.el("ukendt-valg").className = "valg";
         this.svar.vis(D.formelValg(this.partner, s.an));
@@ -377,6 +398,7 @@
         var p = this.partner;
         return "Du har " + D.ionTekst(p) + " og " + D.ionTekst(an) + ". Hver " + p.formel + " giver " + NK.fortegn(p.q)
             + ", og hver " + an.formel + " giver " + NK.fortegn(an.q) + ". Tag så mange af hver, at plus og minus går lige op."
+            + " Prøv det på bordet med + og −."
             + (an.sammensat ? " Er der flere " + an.formel + ", skal de i parentes." : "");
     };
 
@@ -421,11 +443,19 @@
         this.loesTrin(sidste, v ? v.tekst : "", "");
         this.besked((loest ? "<b>Rigtigt.</b> " : "") + (v ? v.forklaring : ""), loest ? "god" : "gul");
         NK.saetTekst("ukendt-un", this.salt.navn);
+        if (this.partner) {
+            /* Det nye salt: bordet faar det rigtige antal af hver, og
+               formlen staar over bordet. */
+            var ny = D.forhold(this.partner, this.salt.an);
+            this.bord.antalTil(ny.p, ny.n);
+            this.bord.laas(true);
+            NK.saetHTML("ukendt-uf", D.formelHTML(this.partner, this.salt.an));
+            NK.saetTekst("ukendt-un", D.saltnavn(this.partner, this.salt.an));
+        }
         NK.saetHTML("ukendt-opgavetekst", loest ? "Opgaven er løst." : "Sådan skulle det være.");
         if (loest && !this.vist) {
             this.loeste++;
             NK.saetTekst("ukendt-loest", String(this.loeste));
-            if (this.loeste % 3 === 0 && this.laererRos) this.laererRos();
         }
         this.saetKnap("ny");
     };
@@ -472,6 +502,7 @@
         this.bord.opdater(dt);
         this.plakater = this.plakatLayout();
         if (this.plakatPuls) this.plakatPuls.t += dt;
+        if (this.skift && (this.skift.t -= dt) <= 0) this.skiftTilPartner();
         /* Beskeden staar lige under bordet (den er forskudt op med sin
            egen hoejde, se .scene-note). */
         var gg = this.bord.g;

@@ -11,8 +11,8 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc og Start på
-       samlebåndet er det samme som Nej tak. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc og
+       Start på samlebåndet er det samme som Nej tak. */
     function tilbud(P, noegle, id) {
         NK.Praesentation.pakInd(P, {
             tilbud: id,
@@ -40,6 +40,14 @@
             knapper[i].classList.toggle("aktiv", valgt);
             knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
         }
+        /* Praesentationen paa den fane, man forlader, slutter, saa hans
+           taleboble ikke staar tilbage, naar man kommer igen */
+        Object.keys(sims).forEach(function (navn) {
+            var s = sims[navn];
+            if (navn === id || !s) return;
+            s.introVent = 0;
+            if (s.laererIIntro && s.laererIIntro()) s.laererIntroVaek();
+        });
         /* Spillet holder pause, naar man forlader det */
         var baand = sims["fane-baand"];
         if (baand && id !== "fane-baand" && baand.tilstand === "koerer") {

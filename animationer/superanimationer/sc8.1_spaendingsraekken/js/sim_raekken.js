@@ -463,7 +463,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-raekken", tilbud: "rk-tilbud", spring: "rk-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-raekken", tilbud: "rk-tilbud" });
 
     NK.SimRaekken = SimRaekken;
 }());

@@ -108,7 +108,12 @@ async function koer() {
     paastand("ingen for lange tekster", lange.length === 0, lange.join(", "));
     paastand("tungtopløselig følger sidens grænse på 1 g pr. 100 mL", /1 g/.test(kemi.ord.filter(function (p) { return p.ord === "TUNGTOPLØSELIG"; })[0].ledetraad));
     var linjerKem = NK.Laerer.REPLIKKER.plask.concat(NK.Laerer.REPLIKKER.opgivet);
-    paastand("Kemichaels replikker er højst 60 tegn", linjerKem.every(function (l) { return l.length <= 60; }), linjerKem.filter(function (l) { return l.length > 60; }).join(" | "));
+    /* Brugerens regel 4. nov. 2026: hele saetninger i formelt sprog, hoejst ca. 130 tegn */
+    var kemDaarlige = linjerKem.filter(function (t) {
+        return t.length > 130 || !/^[A-ZÆØÅ].*[.?!]$/.test(t) || /^Her\b/.test(t) ||
+            t.split(/[.?!] /).some(function (st) { return st.split(" ").length < 3 || /^(Og|Men|Hvis|Ikke|Ligesom|Knap|Bare|Som)\b/.test(st); });
+    });
+    paastand("Kemichaels replikker er hele sætninger på højst 130 tegn", kemDaarlige.length === 0, kemDaarlige.join(" | "));
     paastand("han har mindst 20 replikker efter et plask og 6 efter Vis ordet", NK.Laerer.REPLIKKER.plask.length >= 20 && NK.Laerer.REPLIKKER.opgivet.length >= 6);
     paastand("ingen replik står to gange i samme pulje", ["plask", "opgivet"].every(function (p) {
         var a = NK.Laerer.REPLIKKER[p];
@@ -221,6 +226,12 @@ async function koer() {
     paastand("plasket står i hans uheldsregnskab", JSON.parse(w.localStorage.getItem("nk-kemichael") || "{}").uheld === 1);
     frem(w, 9);
     paastand("han går igen af sig selv", !laerer.synlig());
+    /* Brugerens valg 4. nov. 2026: foerste tabte ord og derefter hvert tredje */
+    var komme = [laerer.plask(false), laerer.plask(false), laerer.plask(false)];
+    paastand("han kommer ved første tabte ord og derefter ved hvert tredje (2. og 3. nej, 4. ja)",
+        komme[0] === null && komme[1] === null && typeof komme[2] === "string", JSON.stringify(komme));
+    frem(w, 9);
+    paastand("replikken om brillerne er med", NK.Laerer.REPLIKKER.plask.indexOf("Sådan går det, når man glemmer brillerne.") >= 0);
 
     /* Enter giver et nyt ord, og en ny klassekammerat gaar ind */
     var gammel = kar.elev;

@@ -315,29 +315,43 @@
         return b ? "ét lag" : "to lag";
     };
 
-    /* ----- Kemichael ---------------------------------------------------- */
+    /* ----- Kemichael ----------------------------------------------------
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; tingene paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_FORSOEG = [
-        "Her tester du, hvad stofferne blandes med.",
-        "Træk pipetten ned i et glas, og klik for at ryste.",
-        "Nye glas til hvert stof. Opvasken tager jeg."
+        { tekst: "I denne fane undersøger du, om seks stoffer blandes med vand eller med heptan. Glasset med vand og glasset med heptan står i stativet, og mærket over hvert glas viser, om væsken er polær eller upolær.",
+          sel: "#forsoeg-anker-glas" },
+        { tekst: "Du trækker pipetten eller spatlen med stoffet ned i et af glassene og klikker på glasset for at ryste det. Når indholdet i glasset har lagt sig, står iagttagelsen ved glasset og i skemaet til højre.",
+          sel: ["#forsoeg-anker-proeve", "#forsoeg-skema"] },
+        { tekst: "Kortet med stoffets formel stiller spørgsmålene, og til sidst klikker du på de polære grupper i formlen. Den gule knap på kortet giver et hint og derefter svaret.",
+          sel: "#forsoeg-anker-kort" }
     ];
     D.INTRO_GAET = [
-        "Her gætter du, før forsøget viser svaret.",
-        "Find de polære grupper, og svar polært eller upolært.",
-        "Gæt gerne forkert. Glassene bliver ikke sure."
+        { tekst: "I denne fane gætter du, om et stof er polært eller upolært, før forsøget viser svaret. Først klikker du på de polære grupper i formlen, og søjlen på kortet tæller C-atomerne og de polære grupper.",
+          sel: "#gaet-anker-kort" },
+        { tekst: "Derefter svarer du polært eller upolært og tester svaret ved at trække pipetten ned i det glas, som svaret passer til. Forsøget i glasset afgør, om svaret var rigtigt.",
+          sel: ["#gaet-anker-proeve", "#gaet-anker-glas"] },
+        { tekst: "En runde består af ti stoffer, og panelet til højre viser dine rigtige svar, din rekord og de sorterede stoffer. Den gule knap på kortet giver et hint og derefter svaret.",
+          sel: ["#gaet-tb", "#gaet-runde", "#gaet-sorteret"] }
     ];
-    D.SKEMA_FULDT = "Tolv forsøg og ingen knuste glas. Det noterer jeg.";
+
+    /* Han kommer kun ind af sig selv, naar en hel fane er klaret, eller ved
+       paaskeaegget (brugerens regel 4. nov. 2026). Fane 2: én gang pr.
+       besoeg, naar en runde er slut med mindst RUNDE_GOD rigtige. */
+    D.SKEMA_FULDT = "Du har udført alle tolv forsøg uden at knuse et eneste glas. Det skriver jeg ned.";
     D.RYST_FOR_MEGET = {
-        blandes: "Det er blandet. Det bliver ikke mere blandet.",
-        ikke: "Det bliver ved med at være to lag. Jeg har prøvet."
+        blandes: "Glassets indhold er allerede blandet. Det bliver ikke mere blandet af, at du ryster glasset igen.",
+        ikke: "Stofferne i glasset blandes ikke, uanset hvor meget du ryster glasset. Det har jeg selv prøvet."
     };
-    D.RUNDE_REPLIK = [
-        [0, "Glassene var uenige med dig. Tag en runde til."],
-        [5, "Halvdelen. Carbonkæden snyder stadig."],
-        [8, "Godt gættet. Forsøget havde ikke meget at sige."],
-        [10, "Ti rigtige. Glassene kunne være blevet hjemme."]
-    ];
-    D.REKORD_REPLIK = "Ny rekord. Den skriver jeg ikke på tavlen.";
+    D.RUNDE_GOD = 8;
+    D.RUNDE_ALLE = 10;
+    D.RUNDE_REPLIK = "Du har gættet rigtigt på de fleste stoffer, så forsøget havde ikke meget at tilføje.";
+    D.RUNDE_ALLE_REPLIK = "Du har ti rigtige ud af ti. Glassene kunne være blevet stående i skabet.";
+    D.REKORD_REPLIK = "Det er en ny rekord. Den skriver jeg ikke på tavlen.";
 
     NK.Data = D;
 }());

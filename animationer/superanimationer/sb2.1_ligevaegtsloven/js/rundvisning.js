@@ -14,20 +14,18 @@
 
     var TURE = {
         "fane-br": [
-            { sel: "#br-skema", titel: "Skemaet", tekst: "Ligevægten, du skal skrive reaktionsbrøken for. Klik på et stof, så står der, hvad tilstandsformen betyder." },
+            { sel: "#br-skort", titel: "Kortet", tekst: "Opgaven står på kortet. Indsend svar tjekker brøken. Giv et hint giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#br-skema", titel: "Skemaet", tekst: "Ligevægten, du skal skrive reaktionsbrøken for. Klik på et stof, så står der på kortet, hvad tilstandsformen betyder." },
             { sel: "#br-broek", titel: "Brøken", tekst: "Tælleren over brøkstregen og nævneren under. Klik på tælleren eller nævneren for at vælge, hvor en brik lander, når du klikker på den. Den valgte er blå." },
             { sel: "#br-bakke", titel: "Brikkerne", tekst: "Træk en brik op i brøken. Den grønne streg viser, hvor den lander. Ikke alle stofferne skal bruges. Træk en brik ud af brøken, eller klik på den, for at fjerne den." },
-            { sel: "#br-tjek", titel: "Tjek brøken", tekst: "Tjekker brøken. Enter gør det samme." },
-            { sel: "#br-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#br-opgaver", titel: "Reaktionerne", tekst: "Tolv reaktioner. En reaktion, du skriver uden at se svaret, får en stjerne." },
+            { sel: "#br-opgaver", titel: "Reaktionerne", tekst: "Tolv reaktioner. En reaktion, du skriver uden at se svaret, får en stjerne. Knappen under listen begynder reaktionen forfra." },
             { sel: "#quizknap", titel: "Quizzen", tekst: "Fem spørgsmål om ligevægtsloven." },
             { sel: ".faneknapper", titel: "Find fejlen", tekst: "På den anden fane har en elev skrevet reaktionsbrøken. Du skal finde fejlen." }
         ],
         "fane-ff": [
-            { sel: "#ff-skema", titel: "Skemaet", tekst: "Ligevægten. Klik på et stof, så står der, hvad tilstandsformen betyder." },
-            { sel: "#ff-broek", titel: "Elevens brøk", tekst: "Klik på den del af brøken, der er forkert. En del, der er rigtig, får et grønt flueben." },
-            { sel: "#ff-ingen", titel: "Ingen fejl", tekst: "Nogle af brøkerne er rigtige. Så trykker du her." },
-            { sel: "#ff-status", titel: "Linjen forneden", tekst: "Her står, hvorfor en del er rigtig, og hvad fejlen var. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#ff-skort", titel: "Kortet", tekst: "Spørgsmålet står på kortet. Vælg en del af brøken eller Der er ingen fejl, og tryk Indsend svar. Giv et hint giver ét hint ad gangen." },
+            { sel: "#ff-skema", titel: "Skemaet", tekst: "Ligevægten. Klik på et stof, så står der på kortet, hvad tilstandsformen betyder." },
+            { sel: "#ff-broek", titel: "Elevens brøk", tekst: "Klik på den del af brøken, der er forkert. Den valgte del er blå. En del, der er rigtig, får et grønt flueben, når du har sendt den ind." },
             { sel: "#ff-opgaver", titel: "Tavlerne", tekst: "Tolv tavler. Ikke alle har en fejl. En tavle, du retter uden at se svaret, får en stjerne." }
         ]
     };

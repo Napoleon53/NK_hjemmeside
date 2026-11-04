@@ -85,6 +85,13 @@
             vis("hjaelp", !NK.el("hjaelp").classList.contains("vis"));
             return;
         }
+        /* Enter: Indsend svar paa kortet, eller Naeste, naar kortet er groent */
+        if (e.key === "Enter" && !(e.target && e.target.tagName === "BUTTON") &&
+            !document.querySelector(".overlay.vis")) {
+            var s = sims[aktivFane];
+            if (s && s.opgaver) { s.opgaver.enter(); e.preventDefault(); }
+            return;
+        }
         if (e.key === "r" || e.key === "R") {
             var sim = sims[aktivFane];
             if (sim && sim.nulstil) sim.nulstil();
@@ -99,7 +106,8 @@
 
         sims["fane-oploes"] = new NK.SimOploes();
         sims["fane-maetning"] = new NK.SimMaetning();
-        NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */
+        NK.sims = sims;
+        NK.visFane = visFane;        /* kortets knap "Videre til ..." skifter fane */              /* saa modellerne kan pilles ved fra konsollen */
 
         var knapper = document.querySelectorAll(".faneknap");
         function bindFane(knap) {

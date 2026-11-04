@@ -640,7 +640,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forudsig", tilbud: "fu-tilbud", spring: "fu-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forudsig", tilbud: "fu-tilbud" });
 
     NK.SimForudsig = SimForudsig;
 }());

@@ -1,22 +1,25 @@
 /* =====================================================================
-   fane.js - statuslinjen og hinttrappen
+   fane.js - papirkortet og hinttrappen
 
    Der er ingen laerer i denne animation (som sc1.4_afstemning og
-   sc_spil9_kemikort). Al hjaelp staar i statuslinjen nederst i scenen,
-   lige under kolben og tavlen, og hjaelpeknappen sidder i samme linje.
+   sc_spil9_kemikort). Al tekst staar paa ét lyst papirkort oeverst i
+   midten af scenen (papirkortet, 4. nov. 2026; foer stod ordren over
+   kolben og beskederne i en statuslinje nederst).
 
    NK.Fane.paa(P, navn) laegger metoderne paa spillets prototype:
 
-     * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
-       hvad der skete, og et ryst ved en fejl
-     * den ene knap: Giv et hint > Naeste hint > Vis svaret > Naeste ordre.
+     * kortet: ordren og naeste skridt, og i nederste raekke fejl, hint
+       og ros med farve efter hvad der skete, og et ryst ved en fejl.
+       Efter en levering bliver kortet paa den leverede ordre med
+       forklaringen og knappen Naeste ordre (blivPaa, naesteOrdre), og
+       reaktoren er laast, til eleven trykker videre (spaer).
+     * den stille hintknap: Giv et hint > Naeste hint > Vis svaret.
        Den lyser stille op, naar eleven lige har lavet noget forkert.
      * hintTekster(maal): trappen paa tre trin til et stof, ud fra den
        vej, NK.Kemi.rute finder (syre og alkohol, og om syren skal laves
        ved oxidation)
 
-   Spillet selv har: maalNu(), trinLinje(), visSvar(), knapVidere(),
-   faerdigNu().
+   Spillet selv har: maalNu(), ordreHTML(), trinLinje() og visSvar().
    ===================================================================== */
 (function () {
     "use strict";
@@ -100,12 +103,19 @@
             this.brugtSvar = false;
             this.svarVist = false;
             this.el = this.el || {};
+            this.el.skort = el("skort");
+            this.el.opgave = el("opgave");
             this.el.knap = el("knap");
             this.el.besked = el("besked");
             this.el.status = el("status");
+            this.el.bliv = el("bliv");
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
+            this.bliv = null;
             this.el.knap.addEventListener("click", function () { mig.knap(); });
+            this.el.skort.addEventListener("click", function (e) {
+                if (e.target.closest && e.target.closest("[data-videre]")) mig.naesteOrdre();
+            });
         };
 
         /* ----- Knappen: ét skridt hjaelp ad gangen --------------------------- */
@@ -117,27 +127,20 @@
         };
 
         P.visKnap = function () {
-            var tekst, klasse;
-            if (this.faerdigNu()) {
-                klasse = "knap videre banker";
-                tekst = this.knapVidere();
-            } else {
-                var h = this.hintNu();
-                klasse = "knap hjaelp";
-                if (this.svarVist) tekst = "Svaret er vist";
-                else if (this.hjaelp === 0) tekst = "Giv et hint";
-                else if (this.hjaelp < h.trin.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.trin.length + ")";
-                else tekst = "Vis svaret";
-                if (this.pegKnap) klasse += " peg";
-            }
+            var h = this.hintNu(), tekst, klasse = "knap hjaelp";
+            if (this.svarVist) tekst = "Svaret er vist";
+            else if (this.hjaelp === 0) tekst = "Giv et hint";
+            else if (this.hjaelp < h.trin.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.trin.length + ")";
+            else tekst = "Vis svaret";
+            if (this.pegKnap) klasse += " peg";
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
-            this.el.knap.disabled = !!(this.svarVist && !this.faerdigNu()) || !!(this.R && this.R.auto);
+            this.el.knap.disabled = this.svarVist || !!(this.R && this.R.auto);
         };
 
         P.knap = function () {
             if (this.R && this.R.auto) return;
-            if (this.faerdigNu()) { this.videre(); return; }
+            if (this.bliv) { this.naesteOrdre(); return; }
             var h = this.hintNu();
             this.pegKnap = false;
             if (this.hjaelp < h.trin.length) {
@@ -159,7 +162,61 @@
             this.pegKnap = false;
         };
 
-        /* ----- Statuslinjen ---------------------------------------------------- */
+        /* ----- Kortet ------------------------------------------------------------
+           Kortet viser den valgte ordre og naeste skridt. Beskeden (hint, fejl,
+           ros og svaret paa et klik) staar i kortets nederste raekke ved
+           hintknappen. Efter en levering bliver kortet paa den leverede ordre
+           (papirkortet, brugerens valg 3. nov. 2026): forklaringen staar i en
+           groen boks, og knappen Naeste ordre staar, hvor hintknappen stod. Saa
+           staar rosen aldrig under den naeste ordre. */
+        P.visOpgave = function () {
+            var html;
+            if (this.bliv) html = '<span class="sk-chip">Ordre</span>' + this.bliv.ordre;
+            else {
+                var o = this.ordreHTML ? this.ordreHTML() : "";
+                html = '<span class="sk-chip">Ordre</span>' + o + (this.trinLinje ? ' <span class="sk-trin">' + NK.html(this.trinLinje()) + "</span>" : "");
+            }
+            this.el.opgave.innerHTML = html;
+            this.el.status.hidden = !!this.bliv;
+            this.el.bliv.hidden = !this.bliv;
+            this.el.bliv.innerHTML = this.bliv ? NK.Papir.bliv(this.bliv.tekst, "Leveret", "Næste ordre →", false) : "";
+            this.el.skort.classList.toggle("loest", !!this.bliv);
+        };
+
+        /* Kortet bliver paa ordren, eleven lige har leveret */
+        P.blivPaa = function (ordreHtml, tekstHtml) {
+            this.bliv = { ordre: ordreHtml, tekst: tekstHtml };
+            this.kortT = 0;
+            this.fast = { html: "", klasse: "" };
+            this.visBesked(this.fast);
+            this.visOpgave();
+        };
+
+        /* Naeste ordre: kortet viser den ordre, der nu er valgt */
+        P.naesteOrdre = function () {
+            if (!this.bliv) return;
+            this.bliv = null;
+            this.naesteLinje();
+            this.visKnap();
+        };
+
+        /* Kortet blinker: eleven greb ud efter reaktoren, men skal foerst
+           trykke Naeste ordre (saa blinker den groenne knap) */
+        P.kortBlink = function () {
+            var e = this.el.skort;
+            e.classList.remove("blink");
+            void e.offsetWidth;
+            e.classList.add("blink");
+        };
+
+        /* Laasen: mens kortet bliver paa en leveret ordre, saetter et klik paa
+           reaktoren eller lageret intet i gang. Kortet blinker i stedet. */
+        P.spaer = function () {
+            if (!this.bliv) return false;
+            this.kortBlink();
+            return true;
+        };
+
         P.besked = function (html, klasse) {
             if (klasse === "kort") { this.kortBesked(html, 4); return; }
             this.fast = { html: html || "", klasse: klasse || "" };
@@ -176,13 +233,22 @@
         P.visBesked = function (b) {
             if (!this.el.besked) return;
             this.el.besked.innerHTML = b.html;
-            this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "");
+            this.el.status.className = "sk-bund" + (b.klasse ? " " + b.klasse : "");
+            /* Skridtet foelger med, saa det altid passer til kolben */
+            if (this.el.opgave && this.R) this.visOpgave();
         };
 
-        P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
+        /* Teksten paa kortet: ordren, skridtet og beskeden (eller forklaringen) */
+        P.beskedTekst = function () {
+            if (!this.el.opgave) return "";
+            var bund = this.bliv ? this.el.bliv.querySelector(".st-tekst") : this.el.besked;
+            return this.el.opgave.textContent + " " + (bund ? bund.textContent : "");
+        };
 
+        /* Naeste skridt staar paa kortet efter ordren; beskeden toemmes */
         P.naesteLinje = function () {
-            this.besked(this.trinLinje(), "");
+            this.besked("", "");
+            this.visOpgave();
         };
 
         P.fejlLinje = function (tekst) {
@@ -210,6 +276,7 @@
         /* Den naeste linje, naar pladserne er tomme, et stof eller to */
         P.standardTrin = function (foerste) {
             var p = this.R.plads, n = (p[0] ? 1 : 0) + (p[1] ? 1 : 0);
+            if (this.R.auto) return "";
             if (this.R.iKolben) return "Blandingen står i kolben. Ret det, der mangler, og tryk Start igen.";
             if (n === 0) return "Find de to stoffer, og læg dem i kolben.";
             if (n === 1) return "Læg et stof mere i kolben.";

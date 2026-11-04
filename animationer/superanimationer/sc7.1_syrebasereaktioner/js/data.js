@@ -164,31 +164,51 @@
           hint: "OH⁻ kan kun tage imod. Så må HCO₃⁻ give sit H." }
     ];
 
-    /* ----- Kemichael --------------------------------------------------------------- */
+    /* ----- Kemichael ---------------------------------------------------------------
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       sel: det, han peger paa, og som faar en gul ramme, der blinker
+       (CSS-selectorer; felterne paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_HYDRON = [
-        "Her flytter du hydroner. H⁺, altså.",
-        "Træk et H fra syren, og slip det på basen.",
-        "Hydroner er små. Tab dem ikke på gulvet."
+        { tekst: "I denne fane flytter du en hydron fra syren til basen i ti forskellige reaktioner. Du tager fat i et H på syren og slipper det på basen. De gule prikker på partiklerne er frie elektronpar.",
+          sel: "#hydron-anker-mol" },
+        { tekst: "Når hydronen er flyttet, viser reaktionsskemaet under partiklerne produkterne og de to syre-basepar. Kortet Syre-basepar samler parrene fra alle de reaktioner, du har løst.",
+          sel: ["#hydron-anker-skema", "#hydron-par-kort"] },
+        { tekst: "Kortet Reaktion stiller opgaven, og tallene på kortet viser de ti reaktioner. Et klik på et tal skifter til en anden reaktion, og knappen på kortet giver først et hint og derefter svaret.",
+          sel: "#hydron-kort" }
     ];
     D.INTRO_PRODUKTER = [
-        "Tavlen. Her skriver du produkterne.",
-        "Træk to formler op på pladserne efter pilen.",
-        "Kridtet er gratis. Fejlene også."
+        { tekst: "I denne fane finder du produkterne i en syre-base-reaktion. Reaktanterne står på tavlen, og efter pilen er der to tomme pladser til produkterne.",
+          sel: "#prod-anker-lign" },
+        { tekst: "Formlerne nederst på tavlen er mulige produkter, men kun to af dem er rigtige. Du trækker en formel op på en plads eller klikker på den. En forkert formel hopper tilbage, og opgavekortet forklarer fejlen.",
+          sel: "#prod-anker-brikker" },
+        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 3. Opgavekortet tæller, hvor mange reaktioner du har løst i træk uden fejl, og knappen på kortet giver først et hint og derefter svaret.",
+          sel: ["#prod-niveau", "#prod-kort"] }
     ];
     D.INTRO_PAR = [
-        "Her finder du parrene i en reaktion.",
-        "Sæt syre, base og deres makkere på plads.",
-        "Makkerne hører sammen. Som mig og kaffen."
+        { tekst: "I denne fane finder du de to syre-basepar i en reaktion. Hele reaktionen står på tavlen, og under hver formel er der en tom plads til et mærkat.",
+          sel: "#par-anker-lign" },
+        { tekst: "De fire mærkater nederst på tavlen er syre, base, korresponderende base og korresponderende syre. Du trækker hvert mærkat hen under den rigtige formel, eller du klikker først på mærkatet og derefter på formlen.",
+          sel: "#par-anker-brikker" },
+        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 2. Opgavekortet tæller, hvor mange reaktioner du har løst i træk uden fejl, og knappen på kortet giver først et hint og derefter svaret.",
+          sel: ["#par-niveau", "#par-kort"] }
     ];
 
-    D.HYDRON_FAERDIG = "Ti hydroner flyttet. Ingen tabt på gulvet.";
-    D.TI_I_TRAEK = "Ti i træk. Det skriver jeg op.";
+    /* Ros, foerste gang en fane er klaret. Fane 2 og 3 har ingen ende, saa
+       deres maal er ti i traek uden fejl. Det er de eneste gange, han
+       kommer ind af sig selv, ud over paaskeaegget (brugerens regler
+       4. nov. 2026). */
+    D.HYDRON_FAERDIG = "Du har flyttet en hydron i alle ti reaktioner. Ingen af hydronerne er blevet tabt på gulvet.";
+    D.ROS_PRODUKTER = "Du har fundet produkterne i ti reaktioner i træk uden fejl. Den rekord skriver jeg op.";
+    D.ROS_PAR = "Du har fundet parrene i ti reaktioner i træk uden fejl. Den rekord skriver jeg op.";
 
     /* Paaskeaegget: en hydron sluppet i kaffen */
     D.KAFFE_SUR = [
-        "Min kaffe er sur nok i forvejen.",
-        "Nej tak. Den er sur uden din hjælp.",
-        "Smager den surt i morgen, ved jeg, hvem det var."
+        "Hydronen skal ikke ned i min kaffe. Kaffen er sur nok i forvejen.",
+        "Min kaffe har ikke brug for flere hydroner. Kaffen er sur nok uden din hjælp.",
+        "Smager min kaffe surt i morgen, ved jeg, hvem der har lagt en hydron i den."
     ];
 
     NK.Data = D;

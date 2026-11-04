@@ -233,7 +233,6 @@
             opgave: NK.el("lup-opgave")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("lup-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.besked = function (html, klasse) {
@@ -345,7 +344,7 @@
         var overSkala = this.over && (this.over.slags === "skala" || this.over.slags === "maerke");
         Tg.skala(ctx, lay.skala, { px: lay.px, ord: "ender", lys: overSkala ? 0.5 : 0 });
         var vent = m && m.slags !== "valg" && !this.naaet && Math.abs(this.ph - m.start) < 0.04 && !this.traek && !this.glid;
-        Tg.phMaerke(ctx, lay.skala, this.ph, { lys: overSkala || !!this.traek, puls: vent || this.pegMaerke ? puls : 0 });
+        Tg.phMaerke(ctx, lay.skala, this.ph, { lys: overSkala || !!this.traek, puls: vent ? puls : 0 });
 
         /* Koppen */
         var kop = this.g.kaffekop;
@@ -363,7 +362,7 @@
         Tg.zoomKegle(ctx, px, py, L.cx, L.cy, L.R);
 
         /* Luppen */
-        this.lup.tegn(ctx, L.cx, L.cy, L.R, this.tid, { farve: K.farveCss(this.ph, 0.1), lys: this.pegLup ? puls : 0 });
+        this.lup.tegn(ctx, L.cx, L.cy, L.R, this.tid, { farve: K.farveCss(this.ph, 0.1), lys: 0 });
         NK.tekst(ctx, "1 prik = 1 ion", L.cx, L.cy - L.R - 12, {
             font: Tg.font("700", NK.klamp(lay.px - 1, 12, 14)), justering: "center", farve: "#c8ced6", kant: true
         });
@@ -469,10 +468,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-lup", tilbud: "lup-tilbud", spring: "lup-spring" });
-
-    /* Mens han siger, at man traekker maerket, og at luppen zoomer, lyser de */
-    P.pegPaaFelt = function (til) { this.pegMaerke = til; this.pegLup = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-lup", tilbud: "lup-tilbud" });
 
     NK.SimLup = SimLup;
 }());

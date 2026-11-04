@@ -47,7 +47,11 @@ Nyt:
   valg 24. sept. 2026). Han præsenterer ikke spillet, og der er intet tilbud om en
   præsentation. Plasket skrives i hans uheldsregnskab. Replikkerne er tørre og
   morbide (brugerens ønske 3. okt. 2026) og holder sig til kemien: 0,1 M saltsyre
-  er mest farligt for øjnene.
+  er mest farligt for øjnene. Fra 4. nov. 2026 er alle replikkerne hele sætninger
+  i formelt sprog som i Kemibogen (se `../kemichael/README.md`); tørheden og det
+  morbide er bevaret. Han giver ikke råd, når eleven giver op. Han kommer ved første
+  tabte ord og derefter ved hvert tredje i samme besøg, og "Sådan går det, når man
+  glemmer brillerne." er med igen (begge brugerens valg 4. nov. 2026).
 * Hele tal i pointene, dansk i toplinjen, og teksten "Du afstemte reaktionen korrekt"
   fra et andet spil er væk.
 
@@ -71,7 +75,8 @@ _selvtest.html      udviklerværktøj, kræver en lokal server
 * **Ord:** `js/ordlister.js`. Formatet står øverst i filen:
   `ORD ; ledetråd ; forklaring`, og `Område id: Navn` begynder et nyt område.
   Ledetråden må ikke nævne ordet; selvtesten fanger det.
-* **Kemichaels replikker:** `REPLIKKER` i `js/laerer.js`, højst ca. 60 tegn.
+* **Kemichaels replikker:** `REPLIKKER` i `js/laerer.js`, hele sætninger på højst
+  ca. 130 tegn.
 * **Rosen ved Syreimmun:** `ROS` i `js/app.js`.
 * **Skridt og point:** `SKRIDT` og `vind()` i `js/spil.js`.
 * **Tønden:** `VAND`, `TOENDE` og `LAEK` øverst i `js/kar.js`. Mængderne regnes

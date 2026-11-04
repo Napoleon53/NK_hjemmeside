@@ -715,7 +715,9 @@ function koer() {
     for (var i3 = 0; i3 < 60 * 4; i3++) L.opdater(1 / 60);
     paastand("K viser præsentationen uden at spørge", L.laererIIntro());
     L.opdater(1 / 60);
-    paastand("knappen Spring præsentationen over vises", synlig("spring-over"));
+    var kmB = d.querySelector(".km-boble");
+    paastand("taleboblen med Næste og Spring præsentationen over vises",
+        !!kmB && !kmB.hidden && !!kmB.querySelector(".km-naeste") && !!kmB.querySelector(".km-spring"));
     tast("Escape");
     for (var i4 = 0; i4 < 60 * 3; i4++) L.opdater(1 / 60);
     paastand("Esc sender ham ud", !L.laererIIntro());
@@ -728,14 +730,28 @@ function koer() {
     L.mesterBesoeg();
     for (var i5 = 0; i5 < 60; i5++) L.opdater(1 / 60);
     paastand("han kan komme forbi til Labyrintmester", L.iScene("mester"));
+    for (var i6 = 0; i6 < 60 * 12; i6++) L.opdater(1 / 60);
+    A.render();
+
+    /* Den faelles praesentation (../kemichael/praesentation.js) paa
+       startskaermen: trinnene, Naeste, Afslut, rammen og Spring over */
+    overskrift("8b. Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    var lr = NK.laerer.L;
+    NK.Praesentation.selvtest(L, function (sek) {
+        for (var n = 0; n < Math.round(sek * 60); n++) { lr.tilpas(); L.opdater(1 / 60); }
+    }).forEach(function (r) { paastand(r[0], r[1], r[2]); });
 
     /* --------------------------------------------------------------- */
     overskrift("9. Sproget");
-    var lange = D.INTRO.start.filter(function (l) { return l.length > 60; }).concat(D.MESTER_REPLIK.filter(function (l) { return l.length > 60; }));
-    paastand("Kemichaels linjer er højst 60 tegn", lange.length === 0, lange.join(" | "));
+    /* Brugerens regler 4. nov. 2026: han taler formelt og siger mere ad gangen */
+    var INTRO = D.INTRO.map(function (l) { return l.tekst; });
+    var lange = INTRO.filter(function (t) { var n = t.split(/[.?] /).length; return t.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0]);
+    var halve = D.MESTER_REPLIK.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 6; });
+    paastand("replikkerne til Labyrintmester er hele sætninger på højst 130 tegn", halve.length === 0, halve[0]);
     var sideTekst = d.body.innerText;
     var alt = alleTekster.concat([sideTekst, D.MESTER.tekst], Object.keys(D.GUIDE).map(function (k) { return D.GUIDE[k]; }),
-        Object.keys(D.BESKED).map(function (k) { return D.BESKED[k]; }), D.INTRO.start, D.MESTER_REPLIK).join("\n");
+        Object.keys(D.BESKED).map(function (k) { return D.BESKED[k]; }), INTRO, D.MESTER_REPLIK).join("\n");
     var dash = alt.match(/.{0,20}[–—].{0,20}/);
     paastand("ingen tankestreger", !dash, dash && dash[0]);
     var enEr = alt.match(/.{0,12}(¹⁺|¹⁻|[A-Za-z₀-₉)]1[+−]).{0,12}/);

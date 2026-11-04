@@ -25,12 +25,21 @@
     function byggeopgave(id, tekst, hint, svar, ekstra) {
         return function () {
             var maal = B.kendtMedId(id);
+            var maalF = NK.formel(maal.formel);
             return {
                 tekst: tekst, hint: hint, svar: svar,
                 start: function (sim) { sim.ryd(); },
+                kan: harAtomer,
                 tjek: function (sim) {
                     if (B.noegle(sim.s) !== B.noegle(B.fraSpec(maal))) return false;
                     return ekstra ? ekstra.tjek(sim) : true;
+                },
+                /* Forklaringen til et forkert svar: det, eleven har bygget */
+                fejl: function (sim) {
+                    if (B.noegle(sim.s) === B.noegle(B.fraSpec(maal))) return ekstra.fejl;
+                    var kendt = B.kendt(sim.s);
+                    if (kendt) return "Du har bygget " + kendt.navn + ", " + NK.formel(kendt.formel) + ". Opgaven er " + maal.navn + ", " + maalF + ".";
+                    return "Molekylet " + NK.formel(B.formel(sim.s)) + " er ikke " + maal.navn + ". Sammenlign atomerne og bindingerne med " + maalF + ".";
                 },
                 visSvar: function (sim) {
                     sim.saetStruktur(B.fraSpec(maal));
@@ -40,8 +49,11 @@
         };
     }
 
+    function harAtomer(sim) { return sim.s.atomer.length > 0; }
+
     /* Vinklen C-O-H i ethanol */
     var COH = {
+        fejl: "Molekylet er ethanol. Slå vinkelmåleren til, og mål vinklen mellem C, O og H.",
         tjek: function (sim) {
             var m = sim.maaling();
             if (!m) return false;
@@ -82,6 +94,11 @@
                 hint: "Nitrogen med tre enkeltbindinger har ét frit elektronpar.",
                 svar: "Fx NH₃ eller CH₃NH₂. Tre bindinger og ét frit elektronpar giver en pyramide.",
                 start: function (sim) { sim.ryd(); },
+                kan: harAtomer,
+                fejl: function (sim) {
+                    if (!B.antal(sim.s, "N")) return "Molekylet har intet nitrogenatom. Sæt et N på.";
+                    return "Intet nitrogenatom i molekylet er pyramideformet. Se formen omkring N i panelet.";
+                },
                 tjek: function (sim) {
                     var at = sim.maal ? sim.maal.atomer : [];
                     return at.some(function (a, i) { return a.el === "N" && B.formRundt(at, i) === "pyramide"; });
@@ -95,6 +112,12 @@
                 hint: "En tripelbinding giver hvert carbonatom to retninger.",
                 svar: "Fx ethyn, H-C≡C-H. Hvert carbonatom har to retninger, 180° fra hinanden.",
                 start: function (sim) { sim.ryd(); },
+                kan: harAtomer,
+                fejl: function (sim) {
+                    var c = sim.s.atomer.filter(function (a) { return a.el === "C"; }).length;
+                    if (c !== 2) return "Molekylet skal have præcis to carbonatomer. Det har " + c + ".";
+                    return "Bindingen mellem de to carbonatomer giver ikke en ret linje. Prøv en anden binding.";
+                },
                 tjek: function (sim) {
                     var c = sim.s.atomer.filter(function (a) { return a.el === "C"; });
                     var bd = c.length === 2 ? B.binding(sim.s, c[0].id, c[1].id) : null;
@@ -108,6 +131,10 @@
                 tekst: "Her er ethen. Hvilken form har atomerne omkring et af carbonatomerne?",
                 valg: D.FORM_ORDEN.map(function (f) { return D.FORMER[f].knap; }),
                 rigtig: D.FORM_ORDEN.indexOf("plan"),
+                laas: true,
+                fejlValg: function (i) {
+                    return D.FORMER[D.FORM_ORDEN[i]].knap + " passer ikke. Tæl retningerne omkring ét carbonatom.";
+                },
                 hint: "Tæl retningerne omkring ét carbonatom. En dobbeltbinding tæller som én retning.",
                 svar: "Carbon har tre retninger og ingen frie elektronpar. Formen er plan med 120° mellem bindingerne.",
                 start: function (sim) { sim.saetStruktur(B.fraSpec(B.kendtMedId("C2H4"))); }
@@ -134,7 +161,12 @@
         this.hoverBinding = null;
         this.traek = null;
         this.sidsteFormel = "";
-        this.opgaver = new NK.Opgaver("byg", OPGAVER, this);
+        this.opgaver = new NK.Opgaver("byg", OPGAVER, this, {
+            fast: true,
+            intro: "Byg molekyler med atomerne i panelet. Opgaverne beder dig bygge bestemte molekyler og se på deres form.",
+            naesteFane: "fane-molekyler",
+            naesteNavn: "Molekylerne"
+        });
         this.OPGAVER = OPGAVER;
         this._bindPanel();
         this._bindMus();
@@ -292,11 +324,11 @@
     P._bindPanel = function () {
         var mig = this;
         Array.prototype.forEach.call(document.querySelectorAll("#byg-palette .atomknap"), function (k) {
-            k.addEventListener("click", function () { mig.tilfoej(k.getAttribute("data-el")); });
+            k.addEventListener("click", function () { if (!mig.opgaver.spaer()) mig.tilfoej(k.getAttribute("data-el")); });
         });
         NK.el("byg-bindingsliste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("button[data-orden]") : null;
-            if (!k || k.disabled) return;
+            if (!k || k.disabled || mig.opgaver.spaer()) return;
             mig.saetOrden(+k.getAttribute("data-a"), +k.getAttribute("data-b"), +k.getAttribute("data-orden"));
         });
         NK.el("byg-bindingsliste").addEventListener("mouseover", function (e) {
@@ -305,8 +337,8 @@
         });
         NK.el("byg-bindingsliste").addEventListener("mouseleave", function () { mig.fremhaevRaekke = null; });
         NK.el("byg-frie").addEventListener("change", function () { mig.visFrie = this.checked; });
-        NK.el("byg-fjern").addEventListener("click", function () { mig.fjernValgt(); });
-        NK.el("byg-nulstil").addEventListener("click", function () { mig.ryd(); });
+        NK.el("byg-fjern").addEventListener("click", function () { if (!mig.opgaver.spaer()) mig.fjernValgt(); });
+        NK.el("byg-nulstil").addEventListener("click", function () { if (!mig.opgaver.spaer()) mig.ryd(); });
         NK.el("byg-vinkelknap").addEventListener("click", function () { mig.skiftVinkelmaaler(); });
     };
 
@@ -364,14 +396,10 @@
         NK.saetTekst("byg-form", form ? D.FORMER[form].navn : "-");
     };
 
+    /* Korte beskeder (vinkelmaaleren, et atom uden plads) staar i kortets
+       nederste raekke, ikke nederst i scenen */
     P.besked = function (tekst) {
-        var e = NK.el("byg-besked");
-        e.textContent = tekst;
-        e.classList.remove("vis");
-        void e.offsetWidth;
-        e.classList.add("vis");
-        window.clearTimeout(this._beskedUr);
-        this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 2800);
+        this.opgaver.besked(tekst, 2.8);
     };
 
     /* ----- Musen: traek drejer, klik vaelger atom eller binding --------- */
@@ -415,7 +443,7 @@
             return;
         }
         var bd = this.bindingVed(x, y);
-        if (bd) this.naesteOrden(bd[0], bd[1]);
+        if (bd && !this.opgaver.spaer()) this.naesteOrden(bd[0], bd[1]);
     };
 
     P._bindMus = function () {
@@ -476,6 +504,7 @@
     /* ----- Faelles graenseflade: tilpas / opdater / tegn / nulstil ------- */
     P.tilpas = function () {
         var nyt = this.laerred.tilpas();
+        this.vis.top = NK.saetKortZone(this.laerred.canvas);
         this.vis.tilpas(this.laerred.b, this.laerred.h, this.radius, nyt && !this._tilpasset);
         if (this.laerred.b > 10) this._tilpasset = true;
     };
@@ -513,7 +542,7 @@
         ctx.fillRect(0, 0, b, h);
 
         if (!this.s.atomer.length) {
-            NK.tekst(ctx, "Vælg det første atom i panelet.", b / 2, h / 2, { font: "600 16px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9aa1ab" });
+            NK.tekst(ctx, "Vælg det første atom i panelet.", b / 2, this.vis.cy, { font: "600 16px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9aa1ab" });
             this.proj = [];
             return;
         }

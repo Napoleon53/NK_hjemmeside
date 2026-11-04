@@ -99,7 +99,6 @@
             var p = mig.L.punkt(e);
             cv.style.cursor = mig.laererUnder && mig.laererUnder(p.x, p.y) ? "pointer" : "default";
         });
-        NK.el("temp-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.visPanel = function () {
@@ -159,7 +158,7 @@
         return k;
     };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-temp", tilbud: "temp-tilbud", spring: "temp-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-temp", tilbud: "temp-tilbud" });
 
     NK.SimTemp = SimTemp;
 }());

@@ -91,8 +91,13 @@ man er i gang med.
    foldet sammen med "?", og der er intet regnskab ved lynlåsen, for det
    ville røbe svaret. Knappen hedder "Start opgave".
 1. **Den kendte ion.** Kemichael kommer ind i sit hjørne, den ion, eleven
-   kender, får en gul ramme, og han siger en tør linje ("Start med O. Den
-   kender du.").
+   kender, får en gul ramme, og han siger én replik i to sætninger: hvorfor
+   den anden ion er ukendt, og at dens ladning kan regnes ud ("Du har ikke
+   mødt sulfit endnu, men du kender ladningen på Na. Derfor kan du regne
+   ladningen på sulfit ud."; for et metal "Tin kan have flere ladninger,
+   men du kender ladningen på O. ..."). Brugeren 4. nov. 2026: sulfit var
+   forvirrende uden den forklaring. Samme dag blev replikken skrevet om til
+   formelt sprog med samme indhold.
    Kortene lyser gult. En linje i opgavekortet siger, at ladningen kan
    udledes af det periodiske system (grundstof i en hovedgruppe), eller at
    en sammensat ions ladning skal man kende. Eleven vælger blandt fire
@@ -127,11 +132,21 @@ man er i gang med.
      om, ikke forkortet). Hintet nævner begge ladninger og parentesen.
      Partnerne er alle metaller fra hovedgruppe 1 og 2.
 
+     Bordet følger med (brugeren 4. nov. 2026: det var forvirrende at blive
+     spurgt om calcium uden noget at se på). Lidt efter at lynlåsen er
+     lukket, går Na ud, og én Ca kommer ind med "?" og gul ramme ved siden
+     af én SO₃²⁻. Over bordet står navnet calciumsulfit og "?" i stedet for
+     formlen. Når ladningen på Ca er fundet, folder kortet sig ud, og bordet
+     virker som på fane 1: + og − ved kortene lægger flere af hver på, så
+     eleven kan bygge saltet, før formlen vælges. Den sidste ion af en
+     slags kan ikke fjernes, for der er ingen hylde. Til sidst ligger det
+     rigtige salt låst på bordet med formlen over.
+
 Oxiderne SnO₂, PbO₂, MnO₂ og TiO₂ er med med vilje: det lille tal ved O er
 antallet af oxidioner, og krydsreglen baglæns giver den forkerte ladning.
 Hintet til trin 2 tæller den kendte ladning op og siger, hvor mange ioner
-den skal deles mellem. Hver tredje opgave, eleven løser selv, kommer
-Kemichael med en kort ros.
+den skal deles mellem. Kemichael roser ikke længere hver tredje opgave
+(brugerens regel 4. nov. 2026, se nedenfor).
 
 **Kemichael** hentes fra `../../v2/kemichael/kemichael.js` som i sc2.1 og
 rettes ikke her (mappen er frosset). `js/sprites.js` giver ham de sprites, han
@@ -150,17 +165,28 @@ Klik på ham giver de fælles svar, når man prikker til ham.
   ikke plads, rykker de til venstre, og i en smal scene bliver bordets
   felter lidt mindre, dog ikke under 60 px. Ved 1024 px bredde kan boblen
   stadig dække kanten af mærket "0 neutral", mens han taler.
-* **Præsentationen.** Når eleven har sagt ja (se nedenfor), siger han tre
-  eller fire korte, saglige linjer (`D.INTRO` i `js/data.js`): hvad fanen er
-  til, og hvor tingene er. Det, han taler om, får en gul ramme
-  (`NK.Fremhaev`): bordet, hylderne, glasset, saltkortet, formlen, trinene,
-  plakaterne og knappen Start opgave. Til venstre for ham peger han ikke
-  (armen ville gå hen over ansigtet), han kigger derhen; mod panelet peger han.
-  Fanen er ikke låst imens. Han går, når eleven vil det: knappen "Spring over"
-  over boblen, to klik på ham eller Esc. Det huskes pr. fane i browseren
-  (`nk-sc2.2-intro-<fane>`), og <kbd>K</kbd> får ham til at præsentere fanen
-  igen. Trykker man Start opgave på fane 3, mens han præsenterer, går han
-  direkte over til at vise, hvor man starter.
+* **Præsentationen** (fælles kode fra 4. nov. 2026,
+  `../kemichael/praesentation.js` og `praesentation.css`). Når eleven har
+  sagt ja (se nedenfor), siger han tre trin pr. fane (`D.INTRO` i
+  `js/data.js`), hvert med to til fire hele sætninger i Kemibogens sprog:
+  hvad fanen træner, og hvordan tingene bruges. Teksten står i et lyst
+  papirkort ved hans hoved med to knapper, "Næste" (på sidste trin
+  "Afslut") og "Spring præsentationen over". Han går aldrig videre af sig
+  selv; Enter og pil til højre er Næste, og Esc springer over. Det, trinnet
+  handler om, får en gul ramme, der blinker: hylderne, bordet, Afstem for
+  mig, opgavekortene, glasset, saltkortet, formlen, trinene, plakaterne og
+  knappen på fane 3. Til venstre for ham peger han ikke (armen ville gå hen
+  over ansigtet), han kigger derhen; mod panelet peger han. Fanen er ikke
+  låst imens. Det huskes pr. fane i browseren (`nk-sc2.2-intro-<fane>`), og
+  <kbd>K</kbd> får ham til at præsentere fanen igen. Et faneskift eller en
+  ny opgave sender ham ud. Trykker man Start opgave på fane 3, mens han
+  præsenterer, går han direkte over til at vise, hvor man starter.
+* **Replikkerne ellers** (brugerens regel 4. nov. 2026: han kommer kun ind
+  af sig selv, når noget er helt gennemført, eller når eleven gør noget
+  vildt). Tilbage er kun replikken ved Start opgave på fane 3 (se ovenfor),
+  som brugeren selv har bedt om, og de fælles svar, når man klikker på ham.
+  Rosen hver tredje opgave på fane 3 er taget ud. Animationen har ingen
+  kaffekop og intet påskeæg.
 * **Størrelsen.** Han tegnes med 0,55 × lærredets højde / 600 (0,4-0,8), og
   scenens gulv (`NK.Scene.GULV`) sættes hvert billede til gulvet i hjørnet, så
   kitlen stopper dér og ikke bliver til lange ben. Den fælles fil røres ikke.
@@ -277,8 +303,9 @@ js/opslag.js        plakaterne i stort format: det periodiske system og de
                     sammensatte ioner (samme som i sc2.3)
 js/sim_ukendt.js    fane 3: trinene, bordet uden hylder og plakaterne
 js/sprites.js       indlæser Kemichaels sprites (samme opbygning som sc2.1)
-js/laerer.js        Kemichael: præsentationen på alle faner, og på fane 3
-                    viser han, hvor man starter, og roser
+js/laerer.js        Kemichael: præsentationen på alle faner (den fælles
+                    ../kemichael/praesentation.js), og på fane 3 viser han,
+                    hvor man starter
 js/rundvisning.js   rundvisningen bag ?
 js/app.js           faneskift, tastatur, tegneløkke
 sprites/            bægerglasset
@@ -348,10 +375,13 @@ alle 77 salte i vælgeren (forholdet, ingen ens ladninger, der rører hinanden,
 og hver ion rører en modsat), fane 3 (præcis én ladning lukker lynlåsen i
 alle 27 opgaver, svarmulighederne, hints, træk i kortet, plakaterne,
 partnertrinnet, svarene i trinlisten og hele forløbet), Kemichaels
-præsentation (første gang, ikke anden gang, K, Esc, knappen og to klik på
-ham, hjørnet, ind og ud ad højre kant, de gule rammer, og at boblen er fri af
-bordet, mærket, formlen, glasset og plakaterne, også med Al₂(SO₄)₃), at teksterne er uden tankestreger og 1+/1−, og at rundvisningen peger
-på noget, der findes.
+præsentation (første gang, ikke anden gang, K, Esc, pil til højre, Spring
+præsentationen over, et klik på ham, faneskift, hjørnet, ind og ud ad højre
+kant, de gule rammer, trinenes længde og den fælles test fra
+`../kemichael/praesentation.js` på alle tre faner), at lærredets taleboble
+er fri af bordet, mærket, formlen, glasset og plakaterne, også med
+Al₂(SO₄)₃, at teksterne er uden tankestreger og 1+/1−, og at rundvisningen
+peger på noget, der findes.
 
 ## I menuen
 
@@ -366,6 +396,6 @@ Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
 højre hjørne, hvor han selv kommer til at stå, og på fane 1 oven på den
 nederste hylde; ellers er reglen midt foroven). Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker fanernes `startIntro` ind (`NK.Praesentation.pakInd`).
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".

@@ -19,6 +19,13 @@
    taler til klassekammeraten i karret og holder sig til kemien: karret
    ender paa 0,1 M saltsyre, og pH 1 er mest farligt for oejnene.
 
+   4. nov. 2026 (brugerens regel): alle replikker er hele saetninger i
+   formelt sprog som i Kemibogen. Raadet "Man maa gerne gaette, foer man
+   giver op" er taget ud, for han giver ikke naeste skridt. Samme dag
+   valgte brugeren, at han kommer ved foerste tabte ord og derefter ved
+   hvert tredje, og at "Saadan gaar det, naar man glemmer brillerne."
+   skal blive.
+
    Scenen laaser ikke spillet. Baggrundslivet er slaaet fra.
    ===================================================================== */
 (function () {
@@ -34,41 +41,43 @@
 
     var UDE = K.UDE;
 
-    /* Hoejst ca. 60 tegn. Ingen teori. */
+    /* Brugerens regel 4. nov. 2026: hele saetninger i formelt sprog som i
+       Kemibogen, hoejst ca. 130 tegn. Ingen teori. Toerheden og det
+       morbide maa blive. \u00a0 er et haardt mellemrum, saa "pH 1" og
+       "0,1 M" ikke deles over to linjer i taleboblen. */
     var REPLIKKER = {
         plask: [
-            "Skynd dig op, inden du får syre i øjnene.",
-            "Slap af. pH 1 er kun farligt for øjnene. Og åbne sår.",
-            "Da jeg gik i skole, skulle vi alle smage på 0,1 M saltsyre.",
+            "Skynd dig op af karret, før du får syre i øjnene.",
+            "Du kan roligt slappe af, for saltsyre med pH\u00a01 er kun farlig for øjnene og for åbne sår.",
+            "Da jeg gik i skole, skulle vi alle smage på 0,1\u00a0M saltsyre.",
             "Sådan går det, når man glemmer brillerne.",
-            "Brillerne sidder på panden. Det tæller ikke.",
-            "Brillerne klarede den. Det gør de altid.",
-            "Først vand, så syre. Ikke elev i syre.",
-            "Den planke har jeg bedt om at få fjernet siden 2014.",
-            "pH 1. Det kunne man have regnet ud.",
-            "Mavesyre har også pH 1. Den plejer bare at være indeni.",
-            "Luk munden dernede. Tandemalje tåler ikke pH 1.",
-            "Nødbruseren hænger lige derovre. Hvis du kan se den.",
+            "Sikkerhedsbrillerne sad på panden, og dér tæller de ikke.",
+            "Sikkerhedsbrillerne klarede sig. Det gør de altid.",
+            "Huskereglen hedder først vand, så syre. Elever står der ikke noget om.",
+            "Planken har jeg bedt om at få fjernet siden 2014.",
+            "Karret har nu pH\u00a01, og det kunne man have regnet ud.",
+            "Mavesyre har også pH\u00a01, men den plejer at være inden i kroppen.",
+            "Hold munden lukket nede i karret, for tandemalje tåler ikke pH\u00a01.",
+            "Nødbruseren hænger ved døren, hvis du stadig kan se den.",
             "Kitlen går i opløsning før dig. Det er en trøst.",
-            "Det er kun 0,1 M. Jeg har set elever overleve værre.",
+            "Saltsyren er kun 0,1\u00a0M, og jeg har set elever overleve værre.",
             "Skyl øjnene i 15 minutter. Vi ses i næste modul.",
-            "Det tæller som fravær, hvis du bliver dernede.",
+            "Det tæller som fravær, hvis du bliver nede i karret.",
             "Tag det roligt. Jeg har flere elever.",
-            "Så blev der en ledig plads ved vinduet.",
-            "Op med dig. Karret skal bruges igen i næste modul.",
-            "Det svier kun de første ti minutter. Siger de.",
+            "Nu er der en ledig plads ved vinduet.",
+            "Kom op af karret, for det skal bruges igen i næste modul.",
+            "Saltsyren svier kun de første ti minutter. Det har jeg i hvert fald hørt.",
             "Tønden er tom. Regningen sender jeg til dine forældre.",
-            "Huden klarer pH 1. Det gør dit tøj ikke.",
+            "Huden klarer pH\u00a01. Det gør dit tøj ikke.",
             "Sidst tog det tre uger at få en ny elev.",
-            "Jeg noterer det som en fejlkilde.",
+            "Jeg noterer plasket som en fejlkilde.",
             "Du afleverer stadig rapporten på fredag."
         ],
         opgivet: [
-            "At give op er også et valg. Et vådt et.",
-            "Man må gerne gætte, før man giver op.",
-            "Du gav op. Det var din klassekammerat, der blev våd.",
-            "Det gik hurtigt. Fik du i det mindste sagt farvel?",
-            "Nemt at give op, når det ikke er en selv i karret.",
+            "At give op er også et valg, men det er et vådt valg.",
+            "Du gav op, men det var din klassekammerat, der blev våd.",
+            "Du gav hurtigt op. Fik du i det mindste sagt farvel?",
+            "Det er nemt at give op, når man ikke selv ligger i karret.",
             "Tønden er tom. Regningen sender jeg til dine forældre.",
             "Tag det roligt. Jeg har flere elever."
         ]
@@ -130,8 +139,12 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.5; }
 
-    /* opgivet: eleven trykkede Vis ordet i stedet for at gaette faerdig */
+    /* opgivet: eleven trykkede Vis ordet i stedet for at gaette faerdig.
+       Han kommer ved foerste tabte ord og derefter ved hvert tredje (1., 4.,
+       7. ...) i samme besoeg (brugerens valg 4. nov. 2026); ellers null. */
     P.plask = function (opgivet) {
+        this.plaskTal = (this.plaskTal || 0) + 1;
+        if ((this.plaskTal - 1) % 3 !== 0) return null;
         var linje = opgivet
             ? K.replik("syregalgen:opgivet", REPLIKKER.opgivet)
             : K.replik("syregalgen:plask", REPLIKKER.plask);

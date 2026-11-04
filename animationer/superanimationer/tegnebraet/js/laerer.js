@@ -13,7 +13,11 @@
    er paaskeaegget.
 
    Scener:
-     intro     praesentationen (D.INTRO_TEGN), naar eleven vil
+     intro     praesentationen (D.INTRO_TEGN), naar eleven vil: ét trin ad
+               gangen med Naeste og Spring praesentationen over. Han
+               peger paa det, der blinker, og gaar aldrig videre af sig
+               selv. Koden er faelles: ../kemichael/praesentation.js.
+   Ellers kommer han kun, naar eleven klikker paa ham eller koppen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -26,7 +30,7 @@
     NK.Scene = NK.Scene || { BREDDE: 1000, HOEJDE: 600, ANKER: {} };
     Object.keys(K.ANKER).forEach(function (navn) { NK.Scene.ANKER[navn] = K.ANKER[navn]; });
 
-    var UDE = K.UDE, HAENGER = K.HAENGER;
+    var UDE = K.UDE;
 
     function scenemaal(sim) {
         var s = sim.laererLaerredSkala();
@@ -50,9 +54,7 @@
     }
 
     function kobl(P) {
-        var v = kaffeValg();
-        v.fredet = ["faerdig"];
-        K.paa(P, v);
+        K.paa(P, kaffeValg());
 
         P.laererLaerredSkala = function () {
             return NK.klamp(this.L.h / 600 * 0.92, 0.45, 1.25);
@@ -87,122 +89,36 @@
         P.laererPlads = function () {
             return Math.max(150, this.laererPladsPx() / this.laererLaerredSkala());
         };
-
-        P.laererFaerdig = function (replik) {
-            if (!this.laerer) return;
-            this.laererKoer("faerdig", rosTrin(this, replik), false);
-        };
-
-        introVaek(P);
     }
 
-    function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
-
-    /* Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke. */
-    function introTrin(sim, linjer, peg) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: function () { return sim.laererPlads(); } },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            var v = peg && peg[i];
-            trin.push({ kald: function () { sim.introTrin = i + 1; } });
-            if (v) trin.push({ arm: v, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { sim.introTrin = 0; } },
-            { gaa: UDE }
-        ]);
-    }
-
-    function introVaek(P) {
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(this.pre + "-spring");
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
-
-    /* Peg paa panelet til hoejre */
-    function pegPaaPanelet(sim) {
-        return function () {
-            var s = sim.laererLaerredSkala();
-            return sim.pegVinkel(sim.L.b / s + 60, sim.L.h * 0.3 / s);
-        };
-    }
-
-    /* Peg paa et punkt i pixels */
-    function pegPaa(sim, punkt) {
-        return function () {
-            var s = sim.laererLaerredSkala(), p = punkt();
-            return p ? sim.pegVinkel(p.x / s, p.y / s) : 0.5;
-        };
-    }
-
-    function rosTrin(sim, replik) {
-        return [
-            { udtryk: { vrede: 0, humoer: 0.8, roed: 0, skeptisk: 0, briller: 0 } },
-            { gaa: function () { return sim.laererPlads(); } },
-            { tid: 0.3 },
-            { arm: 0.3, tid: 0.5 },
-            { sig: replik, vis: replikTid(replik), tid: replikTid(replik),
-              hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 4; } },
-            { kald: function () { this.laerer.nik = 0; } },
-            { arm: HAENGER, tid: 0.4 }
-        ].concat(K.ros(), [
-            { taleFaerdig: true },
-            { gaa: UDE }
-        ]);
-    }
-
-    /* Tavlens midte */
-    function tavlensMidte(sim) {
-        return function () {
-            var t = sim.lay && sim.lay.tavle;
-            return t ? { x: t.x + t.b * 0.6, y: t.y + t.h * 0.45 } : null;
-        };
-    }
-
-    /* ----- Tegnebraettet ------------------------------------------------------ */
+    /* ----- Tegnebraettet ------------------------------------------------------
+       Praesentationen er faelles (../kemichael/praesentation.js) */
     var PT = NK.SimTegn.prototype;
     kobl(PT);
-    PT.laererIntro = function () {
-        if (!this.laerer) return;
-        this.laererKoer("intro", introTrin(this, D.INTRO_TEGN, {
-            0: pegPaa(this, tavlensMidte(this)),
-            1: pegPaaPanelet(this)
-        }), false);
+    PT.introLinjer = function () { return D.INTRO_TEGN; };
+
+    /* Det, han peger paa paa tavlen, i laerredets pixels. "start":
+       startpunktet med det lille traek, der viser, hvordan en kaede
+       tegnes. Staar der allerede noget paa tavlen, er det tegningen,
+       og er tavlen helt tom, er det hele tavlen. */
+    PT.introFelt = function (navn) {
+        if (navn !== "start" || !this.lay) return null;
+        var b = this.braet, mol = b.mol, s = b.s(), f = this.felt();
+        var start = mol.atomer.filter(function (a) { return a.start && !mol.grad(a.id); });
+        var atomer = start.length ? start : mol.atomer;
+        if (!atomer.length) return { x: f.x, y: f.y, b: f.b, h: f.h };
+        var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        atomer.forEach(function (a) {
+            var p = b.px(a);
+            x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y);
+            x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+        });
+        /* Traekket gaar tre bindinger mod hoejre og har "traek" over sig */
+        if (start.length) { x1 += 2.7 * s + 30; y0 -= 0.5 * s + 22; }
+        x0 = Math.max(f.x, x0 - 24); y0 = Math.max(f.y, y0 - 24);
+        x1 = Math.min(f.x + f.b, x1 + 24); y1 = Math.min(f.y + f.h, y1 + 24);
+        return x1 > x0 && y1 > y0 ? { x: x0, y: y0, b: x1 - x0, h: y1 - y0 } : { x: f.x, y: f.y, b: f.b, h: f.h };
     };
+
+    NK.Praesentation.trin(PT);
 }());

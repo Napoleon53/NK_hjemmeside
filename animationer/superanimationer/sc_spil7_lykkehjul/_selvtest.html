@@ -402,11 +402,17 @@ async function koer() {
     overskrift("9. Sproget");
     var alleTekster = [d.body.innerText, d.getElementById("regler").textContent, d.getElementById("egne").textContent,
         F.aiVejledning()].concat(D.INDBYGGEDE.map(function (x) { return x.tekst; }))
-        .concat(D.INTRO.titel);
+        .concat(D.INTRO.titel.map(function (l) { return l.tekst; }));
     var samlet = alleTekster.join("\n");
     paastand("ingen tankestreger", !/[\u2013\u2014]/.test(samlet), (samlet.match(/.{0,20}[\u2013\u2014].{0,20}/) || [""])[0]);
     paastand("ingen 1+ eller 1− i ladninger", !/¹[⁺⁻]/.test(samlet));
-    paastand("Kemichaels replikker er højst 60 tegn", D.INTRO.titel.every(function (l) { return l.length <= 60; }));
+    /* Brugerens regler 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var introFejl = D.INTRO.titel.filter(function (l) {
+        var n = l.tekst.split(/[.?] /).length;
+        return l.tekst.length > 420 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst);
+    });
+    paastand("præsentationen har to til fire trin, hvert med to til fire hele sætninger (højst 420 tegn)",
+        D.INTRO.titel.length >= 2 && D.INTRO.titel.length <= 4 && introFejl.length === 0, introFejl[0] && introFejl[0].tekst);
     paastand("ingen engelske ord fra skabelonen", !/\b(BANKRUPT|LOSE A TURN|SPIN|SOLVE|TOSS UP)\b/.test(d.body.innerText));
 
     /* ----------------------------------------------------------------- */
@@ -423,7 +429,22 @@ async function koer() {
         paastand("næste gang kommer tilbuddet ikke igen", d.getElementById("tilbud").hidden);
         tast("k", "KeyK");
         paastand("K viser præsentationen uden at spørge", await til(function () { return L.laererIIntro(); }, 3000));
-        paastand("knappen Spring præsentationen over står der", await til(function () { return !d.getElementById("spring-over").hidden; }, 1500));
+        var lb = d.getElementById("laerred-boble");
+        paastand("taleboblen med Næste og Spring præsentationen over står der", await til(function () {
+            lb = d.getElementById("laerred-boble");
+            return !!lb && !lb.hidden && !!lb.querySelector(".km-naeste") && !!lb.querySelector(".km-spring");
+        }, 3500));
+        paastand("den gamle knap Spring præsentationen over er væk", !d.getElementById("spring-over"));
+        lb.querySelector(".km-spring").click();
+        paastand("Spring præsentationen over sender ham ud", await til(function () { return !L.laererIIntro() && lb.hidden; }, 1500));
+        /* Den faelles test kalder startIntro(tving); her tager den (skaerm, tving) */
+        await vent(2500);
+        var korL = function (sek) { for (var j = 0; j < Math.round(sek * 60); j++) L.opdater(1 / 60); };
+        var startIntro = L.startIntro;
+        L.introId = "titel";
+        L.startIntro = function (tving) { return startIntro.call(this, "titel", tving); };
+        NK.Praesentation.selvtest(L, korL).forEach(function (r) { paastand("fælles test: " + r[0], r[1], r[2]); });
+        delete L.startIntro;
         L.stopIntro();
         NK.glem("nk-lykkehjul-intro");
         A.visTitel();

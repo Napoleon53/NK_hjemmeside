@@ -666,7 +666,6 @@
             opskrifter: NK.el("hotdog-opskrifter")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("hotdog-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
 
         D.GRUPPER.forEach(function (g, nr) {
             var knap = document.createElement("button");
@@ -1033,7 +1032,7 @@
         this.ids().forEach(function (id) {
             var b = lay.beholdere[id];
             var over = mig.over && mig.over.slags === "beholder" && mig.over.id === id;
-            var lys = over ? 0.7 : (mig.pegBeholdere ? puls : 0);
+            var lys = over ? 0.7 : 0;
             if (b.navn === "agurkglas") {
                 var n = mig.beholdning.agurk === Infinity ? 12 : mig.beholdning.agurk;
                 if (lys) {
@@ -1287,10 +1286,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-hotdog", tilbud: "hotdog-tilbud", spring: "hotdog-spring" });
-
-    /* Mens han siger, at man traekker tingene hen paa brættet, lyser beholderne */
-    P.pegPaaFelt = function (til) { this.pegBeholdere = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-hotdog", tilbud: "hotdog-tilbud" });
 
     NK.SimHotdog = SimHotdog;
 }());

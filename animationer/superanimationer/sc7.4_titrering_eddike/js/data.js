@@ -121,30 +121,64 @@
     ];
 
     /* ----- Kemichael --------------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (de
+       usynlige .anker over laerredet og kortene i panelet). felt: kolberne
+       paa fane 3, tegnet paa laerredet (introFelt i js/laerer.js). Ingen
+       vittigheder i praesentationen. */
     D.INTRO_TITRERING = [
-        "Titreringen. Eddike i kolben, NaOH i buretten.",
-        "Åbn hanen, og luk den, når kolben bliver lyserød.",
-        "Den lille magnet hedder en loppe. Den bider ikke."
+        { tekst: "I denne fane titrerer du eddike med natriumhydroxid for at bestemme, hvor meget eddikesyre eddiken indeholder. " +
+            "Kolben indeholder 2,00 g eddike, 20 mL vand og to dråber phenolphthalein. " +
+            "Buretten indeholder natriumhydroxid.",
+          sel: ["#tit-anker-buret", "#tit-anker-kolbe"] },
+        { tekst: "Du åbner hanen ved at trække skyderen mod højre, og knappen 1 dråbe tilsætter én dråbe ad gangen. " +
+            "Du lukker hanen, så snart kolben er svagt lyserød og forbliver det. " +
+            "Luppen viser imens, hvordan hver OH⁻ reagerer med et eddikesyremolekyle.",
+          sel: ["#tit-anker-hane", "#tit-anker-lup"] },
+        { tekst: "Når kolben er blevet lyserød, aflæser du forbruget på buretten ved menisken og skriver tallet på opgavekortet. " +
+            "Titreringskurven viser undervejs, hvordan pH i kolben ændrer sig. " +
+            "Knappen Tabel viser målingerne bag kurven, så du kan bruge dem i Excel. " +
+            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
+          sel: ["#tit-kort", "#tit-buretkort", "#tit-kurvekort"] }
     ];
     D.INTRO_BEREGNING = [
-        "Beregningen. Fra forbruget til masseprocenten.",
-        "Skriv først formlen og så tallet i feltet til højre.",
-        "Enhederne skal med. Også når ingen kigger."
+        { tekst: "I denne fane beregner du masseprocenten af eddikesyre i eddiken ud fra forbruget af natriumhydroxid. " +
+            "Tavlen viser de fire trin i beregningen, og hvert trin bliver skrevet færdigt, når du har regnet det.",
+          sel: "#ber-anker-tavle" },
+        { tekst: "Målingen øverst i panelet er din egen fra fane 1. " +
+            "Har du ikke titreret selv, regner du på en klassekammerats måling. " +
+            "Når beregningen er færdig, giver knappen Ny opgave en ny måling.",
+          sel: "#ber-data" },
+        { tekst: "I hvert af de fire trin skriver du først formlen og derefter tallet i feltet på opgavekortet. " +
+            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
+          sel: "#ber-kort" }
     ];
     D.INTRO_FORBRUG = [
-        "To kolber. Én ting er ændret ved kolbe B.",
-        "Gæt, hvad der sker. Så titrerer jeg dem begge.",
-        "Jeg titrerer hurtigt. Jeg har haft mange år til at øve."
+        { tekst: "I denne fane undersøger du, hvordan en ændring ved titreringen påvirker forbruget og masseprocenten. " +
+            "Kolbe A er som på fane 1, mens én ting er ændret ved kolbe B. " +
+            "Skiltet under kolbe B viser ændringen.",
+          felt: ["kolbeA", "kolbeB"] },
+        { tekst: "På opgavekortet vælger du, hvordan forbruget af natriumhydroxid eller masseprocenten bliver for kolbe B i forhold til kolbe A. " +
+            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
+          sel: "#for-kort" },
+        { tekst: "Når du har valgt et svar, bliver begge kolber titreret til omslaget. " +
+            "Tabellen viser bagefter forbruget og masseprocenten for begge kolber, og opgavekortet forklarer resultatet.",
+          sel: "#for-tabelkort" }
     ];
 
-    D.ROS_TITRERING = "Lyserød på én dråbe. Det tager nogle et helt år.";
-    D.ROS_BEREGNING = "Masseprocenten er i hus. Med enheder.";
-    D.ROS_FORBRUG = "Tolv kolber. Opvasken tager jeg ikke.";
+    /* Ros, foerste gang en hel fane er klaret (én gang pr. browser). Det
+       er sammen med paaskeaeggene de eneste gange, han kommer ind af sig
+       selv (brugerens regel 4. nov. 2026). */
+    D.ROS_TITRERING = "Kolben blev lyserød på den sidste dråbe. Nogle elever bruger et helt år på at nå den præcision.";
+    D.ROS_BEREGNING = "Du har beregnet masseprocenten af eddikesyre ud fra forbruget. Sådan kontrollerer et laboratorium tallet på eddikens etiket.";
+    D.ROS_FORBRUG = "Du har gennemført alle seks opgaver med de to kolber. Det blev til tolv kolber, og opvasken tager jeg ikke.";
 
-    D.BEM_MORK = "Det er ikke lyserødt længere. Det er pink.";
-    D.BEM_TOM = "Hele buretten. Kolben fik det hele.";
-    D.AEG_PRAECIS = "På hundrededelen. Det har jeg aldrig ramt.";
+    /* Paaskeaeggene: buretten er loebet tom, og et resultat, der rammer
+       eddikens masseprocent paa hundrededelen */
+    D.BEM_TOM = "Du har tømt hele buretten ned i kolben. Eddikesyren var brugt op for længe siden.";
+    D.AEG_PRAECIS = "Dit resultat rammer eddikens masseprocent på hundrededelen. Det har jeg aldrig selv gjort.";
 
     NK.Data = D;
 }());

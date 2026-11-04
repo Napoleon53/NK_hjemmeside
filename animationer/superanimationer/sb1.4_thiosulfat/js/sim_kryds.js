@@ -335,7 +335,6 @@
             k.textContent = D.KRYDS_BLANDINGER[i] + " mL";
             k.addEventListener("click", function () { mig.vaelg(i); });
         });
-        NK.el("kryds-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     /* ----- Panel og status --------------------------------------------------- */
@@ -413,13 +412,11 @@
         lay.mg = { x: cx + b / 2 + mgH * 0.23 + 34, y: staa - b * 0.04, h: mgH };
         if (lay.graf.y1 - lay.graf.y0 < 120) lay.graf.y0 = lay.graf.y1 - 120;
         this.lay = lay;
-        /* Tilbuddet om praesentationen og knappen, der springer den over,
-           staar foroven i mellemrummet mellem krydset set oppefra og uret */
+        /* Tilbuddet om praesentationen staar foroven i mellemrummet
+           mellem krydset set oppefra og uret */
         var midt = Math.round((cx + opR * 0.72 + ur.x - urR * 0.8) / 2);
-        ["kryds-tilbud", "kryds-spring"].forEach(function (id) {
-            var e = NK.el(id);
-            if (e) e.style.left = midt + "px";
-        });
+        var tilbud = NK.el("kryds-tilbud");
+        if (tilbud) tilbud.style.left = midt + "px";
     };
 
     P.tegn = function () {
@@ -573,7 +570,7 @@
     };
 
     /* Kemichaels praesentation: tilbuddet med Start praesentation / Nej tak */
-    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-kryds", tilbud: "kryds-tilbud", spring: "kryds-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sb1.4-intro-kryds", tilbud: "kryds-tilbud" });
 
     NK.SimKryds = SimKryds;
 }());

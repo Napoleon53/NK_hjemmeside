@@ -36,7 +36,6 @@
             });
             this.koblMus();
             this.bygTilbud();
-            NK.el(pre + "-spring").addEventListener("click", function () { mig.springIntro(); });
             if (this.laererStart) this.laererStart();
         };
 

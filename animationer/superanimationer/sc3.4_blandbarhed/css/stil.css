@@ -147,51 +147,6 @@ main { flex: 1; position: relative; min-height: 0; }
    deres placering efter tegningen. */
 .anker { position: absolute; pointer-events: none; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen.
-   Samme som i sc2.3 og sc2.4. */
-.spring-over {
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 10px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over[hidden] { display: none; }
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Det, Kemichael peger paa, mens han taler om det */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.peg { outline: 2px solid var(--gul); outline-offset: 2px; animation: peg 1.2s ease-out infinite; }
-
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */
@@ -618,8 +573,9 @@ input:focus-visible {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen. Selve
+   praesentationen staar i hans taleboble med Naeste og Spring
+   praesentationen over (../kemichael/praesentation.js og .css). */
 .tilbud {
     position: absolute;
     top: 16px;

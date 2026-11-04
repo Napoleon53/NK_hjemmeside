@@ -173,7 +173,7 @@
         /* Serien er klaret: klistermaerket kraever, at hoejst tre svar er vist */
         if (s.status.every(function (x) { return x > 0; })) {
             var vistAntal = s.status.filter(function (x) { return x === 2; }).length;
-            this.klaret("zz-" + this.retning, vistAntal <= 3, D.ROS[this.retning]);
+            this.klaret("zz-" + this.retning, vistAntal <= 3, D.KLISTER_KRAV.serie);
         }
         this.visPanel();
     };
@@ -270,8 +270,8 @@
         var r = NK.Tjek.formel(inp.value, this.braet.mol.atomer.length, this.totalH(), this.maal.res.antalDobbelt > 0);
         var felt = NK.el("zz-felt");
         if (r.ok) {
-            this.loes(this.maal.res, this.visteSvar);
             this.besked("<b>Rigtigt: " + this.maal.formel + ".</b> " + (r.note ? NK.html(r.note) + " " : "") + "Molekylet hedder " + NK.html(this.maal.navnUden) + ".", "god");
+            this.loes(this.maal.res, this.visteSvar);
             felt.classList.add("ok");
             inp.disabled = true;
             this.visPanel();
@@ -321,8 +321,8 @@
         this.forkerte = null;
         this.trin = 3;
         NK.el("zz-input").value = this.maal.formel.replace(/[₀-₉]/g, function (c) { return String(c.charCodeAt(0) - 8320); });
-        this.loes(this.maal.res, true);
         this.besked("Svaret: <b>" + this.maal.formel + "</b>. Molekylet hedder " + NK.html(this.maal.navnUden) + ".", "gul");
+        this.loes(this.maal.res, true);
         this.visPanel();
     };
 
@@ -500,8 +500,7 @@
     };
 
     /* Kemichaels praesentation */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-zigzag", tilbud: "zz-tilbud", spring: "zz-spring" });
-    P.pegPaaFelt = function () {};
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-zigzag", tilbud: "zz-tilbud" });
 
     NK.SimZigzag = SimZigzag;
 }());

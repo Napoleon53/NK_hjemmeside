@@ -2,7 +2,7 @@
 
 Superanimation om at skrive ionforbindelser: fra navn til formel og fra formel
 til navn. Åbn `index.html`. Mappen henter kun filer inde fra sig selv, bortset
-fra Kemichael (`../../v2/kemichael/kemichael.js`). Ingen `fetch` og ingen
+fra Kemichael (`../../v2/kemichael/kemichael.js` og `../kemichael/`). Ingen `fetch` og ingen
 moduler, så den virker fra harddisken.
 
 ## Bestillingen
@@ -84,19 +84,24 @@ af de to og får intet mærke. Klassificeringen står i `FARE` i `js/data.js`: C
 bilag VI, hvor stoffet står der, ellers leverandørernes sikkerhedsdatablade for
 det rene, faste stof.
 
-**Kemichael** præsenterer fanen første gang, den åbnes i en browser: på lageret
-tre korte replikker (han peger over på panelet, mens han siger, at svarene
-skrives dér, og feltet lyser op), ved samlebåndet to. Scenen låser ikke: man kan
-klikke og skrive, mens han taler. Han går kun ved den store knap "Spring
-præsentationen over", to klik direkte på ham (det første får knappen til at
-blinke) eller Esc, og på samlebåndet også ved Start. På samlebåndet står
-tilbuddet og "Spring præsentationen over" nederst i panelet i stedet for midt
-foroven i scenen, hvor de dækkede hylden (brugerens valg 27. sept. 2026). <kbd>K</kbd> viser
-præsentationen igen. Det er reglen for alle superanimationer (se
-`../README.md`, "Kemichael præsenterer hvert rum"). Replikkerne står i `D.INTRO` og
-`D.INTRO_BAAND` i `js/data.js`. Ellers kommer han på besøg, når en hylde er
-færdig, og når spillet er slut. Kaffekoppen på arbejdsbordet er det fælles
-påskeæg.
+**Kemichael** præsenterer fanen, når eleven vil (tilbuddet første gang og
+<kbd>K</kbd>). Præsentationen er den fælles (`../kemichael/praesentation.js`,
+brugerens regler 4. nov. 2026): tre trin på hver fane med to til fire hele
+sætninger i Kemibogens sprog, en taleboble ved hans hoved med knapperne
+**Næste** (på sidste trin **Afslut**) og **Spring præsentationen over**, og
+en gul ramme om det, han peger på. Han går aldrig videre af sig selv. Enter
+(også i feltet, hvor markøren står), pil til højre og Næste går videre, og Esc
+sender ham ud. På samlebåndet sender Start ham også ud. Et faneskift midt i
+præsentationen afslutter den. På lageret står han mellem det store glas og
+etiketmaskinen, ved samlebåndet mellem maskinen og kassen. Trinnene står i
+`D.INTRO_LAGER` og `D.INTRO_BAAND` i `js/data.js`.
+
+Ellers kommer han kun ind af sig selv to steder. Når alle 30 glas på lageret
+har fået etiketter, siger han `D.LAGER_FAERDIGT` (én gang pr. gennemførelse).
+Når spillet på samlebåndet er slut, siger han kun noget ved ny rekord eller
+når alle glas endte i kassen uden et eneste rigtigt svar (`D.SLUT_REPLIK`).
+Rosen af en enkelt hylde og replikkerne efter et almindeligt spil er taget ud
+4. nov. 2026. Kaffekoppen på arbejdsbordet er det fælles påskeæg.
 
 **Plakaterne** med det periodiske system og de sammensatte ioner hænger på
 væggen i begge faner og åbnes i stort format med et klik (eller <kbd>P</kbd> og
@@ -203,7 +208,9 @@ tab, at faremærkerne kun er de to piktogrammer, at over 50 typiske fejl giver
 den rigtige besked, at der er hint og svar til alle 165 felter, at sproget
 holder reglerne, at begge faner kan gennemføres, at løste glas på hylden har
 formlen på etiketten, at samlebåndets hylde har plads til otte glas, at
-præsentationens knapper står i panelet på samlebåndet, og at layoutet holder
+præsentationen virker på begge faner (den fælles test fra
+`../kemichael/praesentation.js`), at tilbuddet står i panelet på
+samlebåndet, og at layoutet holder
 fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
 bagefter.
@@ -231,9 +238,11 @@ Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
 åbnes, står der Start præsentation og Nej tak midt foroven i scenen (på
 samlebåndet nederst i panelet). Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
-spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
-`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
-Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
+spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
+`js/app.js` pakker fanernes egen `startIntro` ind (`NK.Praesentation.pakInd`),
+og som i `js/laerer.js` lægger præsentationen på fanerne
+(`NK.Praesentation.trin`). Den gamle `js/praesentation.js` og knappen
+"Spring præsentationen over" midt i scenen er fjernet 4. nov. 2026.
 
 ## I menuen
 

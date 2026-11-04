@@ -98,7 +98,9 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        lay.p = Tg.plakatLay(kant, kant, W - 2 * kant, H * 0.42);
+        /* Plakaten begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.p = Tg.plakatLay(kant, lay.zone, W - 2 * kant, (H - lay.zone) * 0.44);
         var zoneTop = lay.p.y + lay.p.h + NK.klamp(H * 0.02, 6, 16);
         lay.zoneTop = zoneTop;
         var vb = NK.klamp(Math.min(W * 0.34, (lay.bordY - zoneTop) * 1.1), 150, 340);
@@ -133,6 +135,7 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* ----- Atomerne paa vaegten ---------------------------------------------------
@@ -272,16 +275,21 @@
     /* ----- Panelet ---------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
+        this.kort = new NK.SceneKort("vaegt", {
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         this.el = {
             raekker: NK.el("vaegt-raekker"),
-            besked: NK.el("vaegt-besked"),
-            knap: NK.el("vaegt-knap"),
-            kort: NK.el("vaegt-kort"),
+            besked: this.kort.beskedEl,
+            knap: this.kort.hintEl,
+            indsend: this.kort.indsendEl,
             niveauer: NK.el("vaegt-niveauer"),
-            nulstil: NK.el("vaegt-nulstil")
+            nulstil: NK.el("vaegt-nulstil"),
+            igen: NK.el("vaegt-igen")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("vaegt-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
+        this.el.igen.addEventListener("click", function () { mig.nyOpgave(false); });
 
         D.NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -360,13 +368,11 @@
             this.opg.faerdig = true;
             if (this.lay) this.bygStraks();
             this.enMol = { t: 99 };
-            this.besked(this.status[this.valgt].stjerne ? "Løst uden hjælp. ★" : "Løst.", "god");
         } else {
             felter[0].status = "aktiv";
         }
         this.bygRaekker();
         this.visKort();
-        this.visStatus();
         if (!gennemsyn) this.fokus();
     };
 
@@ -442,16 +448,15 @@
                         ' aria-label="' + (f.slags === "masse" ? "Atommassen for " + f.s : "Molarmassen") + '"' +
                         ' placeholder="' + (f.slags === "masse" ? "atommasse" : "molarmasse") + '"' +
                         (f.status === "aktiv" ? "" : " disabled") + '>' +
-                        '<span class="felt-efter">g/mol</span>' +
-                        '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' +
-                        (f.status === "aktiv" ? "" : " disabled") + '>↵</button>';
+                        '<span class="felt-efter">g/mol</span>';
                     var inp = fe.querySelector("input");
+                    /* Enter i feltet er det samme som Indsend svar paa kortet */
                     inp.addEventListener("keydown", function (e) {
                         if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
                     });
+                    inp.addEventListener("input", function () { mig.visKnap(); });
                     inp.addEventListener("focus", function () { mig.fokuseret = true; });
                     inp.addEventListener("blur", function () { mig.fokuseret = false; });
-                    fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                     f.input = inp;
                 }
             }
@@ -478,47 +483,114 @@
         }
     };
 
+    /* ----- Papirkortet ----------------------------------------------------------
+       Opgaven, linjen med naeste skridt, fejl og hint, Giv hint og Indsend
+       svar staar paa kortet oeverst i scenen. Felterne, eleven skriver i,
+       staar i regnestykket i panelet; Enter i et felt er Indsend svar.
+       Naar molarmassen er rigtig, bliver kortet staaende med det, 1 mol
+       er, og knappen Naeste stof. */
     P.visKort = function () {
         var o = this.opg, st = o.st, o2 = D.VAEGT[this.valgt];
-        var nv = D.NIVEAUER[o2.niveau];
-        NK.saetHTML("vaegt-niveau", '<span class="hyldeprik" style="background:' + nv.farve + '"></span>' + nv.navn);
-        NK.saetTekst("vaegt-nr", String(o2.plads + 1));
-        NK.saetTekst("vaegt-antal-i-niveau", String(this.iNiveau(o2.niveau)));
-        NK.saetTekst("vaegt-prompt", st.tekst);
-        NK.saetTekst("vaegt-spm", st.Navn + ". Byg molekylet, og find molarmassen.");
-        this.el.kort.classList.toggle("sejr", o.faerdig && !o.gennemsyn);
+        var salt = o2.niveau === 2;
+        NK.saetTekst("vaegt-formel", st.tekst);
+        NK.el("vaegt-igen").hidden = !o.gennemsyn;
+        var tekst = '<span class="sk-formel">' + NK.html(st.tekst) + "</span> " + NK.html(st.Navn + ". Byg " +
+            (salt ? "formelenheden" : "molekylet") + " på vægten med grundstofferne i det periodiske system, og find molarmassen.");
+        this.kort.vis({ kl: o.faerdig ? "loest" + (o.brugtSvar && !o.gennemsyn ? " svar" : "") : "opgave",
+            chip: "Stof " + (o2.plads + 1) + " af " + this.iNiveau(o2.niveau), tekst: tekst });
+        if (o.faerdig) {
+            var forkl = "<b>" + NK.html(D.enMol(st)) + "</b> " + NK.html(st.fakta);
+            var naeste = this.naesteUloesteEllerIngen();
+            if (naeste < 0) forkl += " " + NK.html("Alle tolv stoffer er vejet.");
+            var maerke = o.gennemsyn ? (this.status[this.valgt].stjerne ? "Løst uden hjælp ★" : "Løst") :
+                (o.brugtSvar ? "Svaret" : "Rigtigt");
+            this.kort.bliv(forkl, maerke, naeste >= 0 ? "Næste stof →" : null, o.brugtSvar && !o.gennemsyn ? "svar" : "god");
+        } else {
+            this.kort.bliv(null);
+            if (!this.fast || !this.fast.html) this.kort.besked(this.trinLinje(), "peger");
+        }
         this.visKnap();
         this.opdaterFremskridt();
+        this.tjekZone();
+    };
+
+    /* Det naeste skridt, naar linjen ikke har en besked */
+    P.trinLinje = function () {
+        var f = this.aktivtFelt();
+        if (!f) return "";
+        if (f.slags === "byg") return "Klik på grundstofferne i det periodiske system. Et klik på en kugle på vægten fjerner den igen.";
+        if (f.slags === "masse") {
+            return (f.i === 1 ? "Vægten kan ikke mærke ét molekyle. " : "") + "Skriv atommassen for " + f.s +
+                " i regnestykket i panelet, og tryk Indsend svar.";
+        }
+        return "Læg rækkerne sammen, og skriv molarmassen i regnestykket i panelet.";
     };
 
     P.visKnap = function () {
-        var o = this.opg, tekst, klasse = "knap blaa";
-        if (o.faerdig) {
-            if (o.gennemsyn) tekst = "Vej stoffet igen";
-            else { tekst = "Næste stof →"; klasse += " banker"; }
-        } else {
-            tekst = o.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            klasse = "knap";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-    };
-
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
-
-    P.visStatus = function () {
         var o = this.opg;
         if (!o) return;
-        if (o.faerdig && this.enMol) {
-            NK.saetHTML("vaegt-status", "<b>" + NK.html(D.enMol(o.st)) + "</b> " + NK.html(o.st.fakta));
-        } else if (this.dannet) {
-            NK.saetHTML("vaegt-status", "Ét molekyle vejer for lidt til, at vægten kan mærke det.");
-        } else {
-            NK.saetHTML("vaegt-status", "Klik på grundstofferne i det periodiske system. Klik på en kugle for at fjerne den.");
+        if (o.faerdig) { this.kort.knapper({}); return; }
+        var f = this.aktivtFelt();
+        var felt = f && f.slags !== "byg";
+        var vaerdi = felt && f.input ? f.input.value.trim() : "";
+        this.kort.knapper({
+            hint: o.hjaelp === 0 ? "Giv hint" : "Vis svaret",
+            peg: this.pegKnap && o.hjaelp === 0,
+            indsend: felt, klar: !!vaerdi,
+            indsendTekst: vaerdi ? "Indsend svar: " + vaerdi + " g/mol" : "Indsend svar"
+        });
+    };
+
+    /* besked: linjen paa kortet. Tom: naeste skridt. Et forkert svar faar
+       maerket Ikke endnu, og hintknappen lyser stille op. */
+    P.besked = function (html, klasse) {
+        this.fast = { html: html || "", klasse: klasse || "" };
+        this.pegKnap = klasse === "skidt";
+        if (!html) { this.kort.besked(this.opg && !this.opg.faerdig ? this.trinLinje() : "", "peger"); }
+        else if (klasse === "skidt") this.kort.besked('<span class="b-maerke">Ikke endnu</span> ' + html, "skidt");
+        else this.kort.besked(html, klasse);
+        if (this.opg) this.visKnap();
+    };
+
+    P.naesteUloesteEllerIngen = function () {
+        var n = D.VAEGT.length;
+        for (var d = 1; d <= n; d++) {
+            var i = (this.valgt + d) % n;
+            if (!this.status[i].loest) return i;
         }
+        return -1;
+    };
+
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
+    };
+
+    /* Indsend svar: tjekker det aktive felt i regnestykket */
+    P.indsend = function () {
+        var f = this.aktivtFelt();
+        if (!f) { this.kort.blink(); return; }
+        if (f.slags === "byg") {
+            this.kort.blink();
+            this.besked("Byg først " + (D.VAEGT[this.valgt].niveau === 2 ? "formelenheden" : "molekylet") + " på vægten.", "peger");
+            return;
+        }
+        if (!f.input || !f.input.value.trim()) {
+            this.kort.blink();
+            this.besked("Skriv først tallet i regnestykket i panelet.", "peger");
+            this.fokus();
+            return;
+        }
+        this.tjek();
+    };
+
+    P.videre = function () {
+        var o = this.opg;
+        if (!o || !o.faerdig) return;
+        var i = this.naesteUloesteEllerIngen();
+        if (i >= 0) this.vaelg(i);
     };
 
     P.hjaelp = function (f) {
@@ -541,16 +613,12 @@
 
     P.knap = function () {
         var o = this.opg;
-        if (o.faerdig) {
-            if (o.gennemsyn) this.nyOpgave(false);
-            else this.vaelg(this.naesteUloeste(this.valgt));
-            return;
-        }
+        if (o.faerdig) { this.videre(); return; }
         var f = this.aktivtFelt();
         var h = this.hjaelp(f);
         if (o.hjaelp === 0) {
             o.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + h.hint, "gul");
+            this.besked('<span class="b-maerke">Hint</span> ' + h.hint, "gul");
             this.fremhaev = h.fremhaev || null;
             this.visKnap();
             this.fokus();
@@ -559,10 +627,10 @@
             if (f.slags === "byg") {
                 o.visteByg = true;
                 this.bygSvar();
-                this.besked(h.svar, "gul");
+                this.besked('<span class="b-maerke">Svaret</span> ' + h.svar, "gul");
             } else {
                 this.feltRigtigt(f, "svar");
-                this.besked(h.svar, "gul");
+                this.besked('<span class="b-maerke">Svaret</span> ' + h.svar, "gul");
             }
         }
     };
@@ -587,7 +655,7 @@
         if (!f || f.slags === "byg") return;
         var raa = f.input ? f.input.value : "";
         var res = f.slags === "masse" ? Tj.atommasse(raa, f.s, o.st.antal[f.s]) : Tj.molarmasse(raa, o.st);
-        if (res.tom) { this.besked(res.besked, ""); this.fokus(); return; }
+        if (res.tom) { this.besked(res.besked, "peger"); this.fokus(); return; }
         if (res.ok) {
             this.feltRigtigt(f, "ok");
             if (res.note) this.besked(res.note, "gul");
@@ -620,7 +688,6 @@
         }
         this.bygRaekker();
         this.visKort();
-        this.visStatus();
         this.fokus();
     };
 
@@ -655,7 +722,9 @@
         this.vaelg(0);
     };
 
-    /* ----- Kemichaels praesentation ---------------------------------------- */
+    /* ----- Kemichaels praesentation ----------------------------------------
+       Trinnene og boblen er faelles (NK.Praesentation.trin i js/laerer.js);
+       js/app.js viser foerst tilbuddet (NK.Praesentation.pakInd). */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
         if (!tving && NK.hent("nk-sc5.1-intro-vaegt", false)) return;
@@ -673,17 +742,16 @@
             this.introVent -= dt;
             if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
         }
-        var iIntro = !!(this.laererIIntro && this.laererIIntro());
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("vaegt-spring").hidden = !iIntro;
-        }
-        var f = this.aktivtFelt();
-        if (f && f.feltEl) f.feltEl.classList.toggle("peg", iIntro && this.introTrin === 2);
+        /* Taleboblen med Naeste og Spring praesentationen over og den gule
+           ramme (../kemichael/praesentation.js) */
+        if (this.kmIntro && this.introOpdaterBoble) this.introOpdaterBoble();
     };
 
+    /* Enter uden for feltet: videre, naar stoffet er vejet */
     P.enter = function () {
-        if (this.opg && this.opg.faerdig && !this.opg.gennemsyn) this.knap();
+        if (this.opg && this.opg.faerdig) this.videre();
+        else if (this.aktivtFelt() && this.aktivtFelt().slags !== "byg") this.indsend();
+        else this.kort.blink();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------ */
@@ -709,7 +777,6 @@
         if (this.enMol && this.enMol.t < 99) {
             var foer = this.enMol.t;
             this.enMol.t += dt;
-            if (foer < 0.5 && this.enMol.t >= 0.5) this.visStatus();
             if (this.enMol.t > 3) this.enMol.t = 99;
         }
         if (this.ventRos) {

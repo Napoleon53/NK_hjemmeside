@@ -559,17 +559,55 @@ function tests() {
     try { NK.laerer.startIntro("let", true); for (var kt = 0; kt < 400; kt++) NK.app.trin(1 / 60); } catch (e) { kFejl = String(e); }
     paastand("Kemichaels præsentation kører uden fejl (også når han taler)", !kFejl, kFejl);
     NK.laerer.stopIntro();
+    for (kt = 0; kt < 300; kt++) NK.app.trin(1 / 60);
+
+    /* Den faelles praesentation (../kemichael/praesentation.js) paa alle
+       tre sværhedsgrader. Laererens startIntro tager sværhedsgraden
+       foerst; testen kalder startIntro(true), saa den peges paa den her. */
+    D.NIVEAU_ORDEN.forEach(function (id, nr) {
+        overskrift("11" + "bcd".charAt(nr) + ". Kemichaels præsentation på " + D.NIVEAUER[id].navn + " (fælles test)");
+        NK.app.visNiveau(id);
+        if (NK.spil[id].tilstand === "koerer") NK.spil[id].pause();
+        var Lr = NK.laerer;
+        Lr.introId = id;
+        Lr.startIntro = function () { return NK.Laerer.prototype.startIntro.call(this, id, true); };
+        NK.Praesentation.selvtest(Lr, function (sek) {
+            for (var n = 0; n < Math.round(sek * 60); n++) NK.app.trin(1 / 60);
+        }).forEach(function (r) { paastand(r[0], r[1], r[2]); });
+        delete Lr.startIntro;
+    });
+    NK.app.visNiveau("let");
+
+    /* Brugerens valg 4. nov. 2026: et tabt spil giver kun en replik foerste
+       gang og derefter hver fjerde; et vundet spil altid */
+    var Ls = NK.laerer, tabtSvar = [];
+    Ls.tabtTal = 0;
+    for (var ti = 0; ti < 5; ti++) tabtSvar.push(Ls.laererSlut(ti % 2 ? "mange" : "faa"));
+    var vundetSvar = Ls.laererSlut("vundet");
+    Ls.laererSlutVaek();
+    Ls.tabtTal = 0;
+    paastand("et tabt spil: han kommer første gang og derefter hver fjerde (1. og 5.), et vundet spil altid",
+        tabtSvar.join() === "true,false,false,false,true" && vundetSvar === true, tabtSvar.join() + " / " + vundetSvar);
 
     /* ----------------------------------------------------------------- */
     overskrift("12. Sproget");
     var tekster = [];
-    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { tekster.push(l); }); });
+    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { tekster.push(l.tekst); }); });
     Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { tekster.push(l); }); });
     Object.keys(D.BESKED).forEach(function (k) { tekster.push(D.BESKED[k]); });
+    /* Brugerens regler 4. nov. 2026: han taler formelt og siger mere ad gangen */
     var introLange = [];
-    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { if (l.length > 62) introLange.push(l); }); });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", !introLange.length, introLange.join(" | "));
-    paastand("tre replikker pr. sværhedsgrad", D.NIVEAU_ORDEN.every(function (k) { return D.INTRO[k].length === 3; }));
+    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) {
+        var n = l.tekst.split(/[.?] /).length;
+        if (l.tekst.length > 420 || n < 2 || n > 4) introLange.push(l.tekst);
+    }); });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", !introLange.length, introLange[0]);
+    var halve = [];
+    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) {
+        if (l.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(l) || l.split(" ").length < 6) halve.push(l);
+    }); });
+    paastand("replikkerne, når spillet er slut, er hele sætninger på højst 130 tegn", !halve.length, halve[0]);
+    paastand("to til fire trin pr. sværhedsgrad", D.NIVEAU_ORDEN.every(function (k) { var n = D.INTRO[k].length; return n >= 2 && n <= 4; }));
     var sideTekst = d.body.innerText + "\n" + tekster.join("\n");
     paastand("ingen tankestreger", !/[–—]/.test(sideTekst), (sideTekst.match(/.{0,20}[–—].{0,20}/) || [""])[0]);
     paastand("ingen ladning skrevet som 1+ eller 1−", !/(¹[⁺⁻])|([A-Za-z₀-₉)]1[+−-](?![0-9]))/.test(sideTekst), (sideTekst.match(/.{0,10}(¹[⁺⁻]|[A-Za-z₀-₉)]1[+−-]).{0,10}/) || [""])[0]);

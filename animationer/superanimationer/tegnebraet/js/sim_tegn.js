@@ -626,8 +626,7 @@
     /* Delete: den valgte pil */
     P.slet = function () { var b = this.braet; if (b.valgtObj) { b.sletObjekt(b.valgtObj); return true; } return false; };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-tegnebraet-intro", tilbud: "tb-tilbud", spring: "tb-spring" });
-    P.pegPaaFelt = function (til) { NK.el("tb-rapport").classList.toggle("peg", !!til); };
+    NK.Praesentation.kobl(P, { noegle: "nk-tegnebraet-intro", tilbud: "tb-tilbud" });
 
     NK.SimTegn = SimTegn;
 }());

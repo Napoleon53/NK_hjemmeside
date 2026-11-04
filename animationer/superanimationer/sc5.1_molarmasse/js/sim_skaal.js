@@ -60,13 +60,13 @@
     P.nytPar = function () {
         this.par = this.runde[this.nr];
         this.svar = null;
+        this.valgt = null;
         this.hjaelp = 0;
         this.visteSvar = false;
         this.laast = true;
         this.laasT = 0;
         this.vinkel = 0;
         this.fart = 0;
-        this.besked("", "");
         if (this.lay) this.skalaMolekyler();
         this.visPanel();
     };
@@ -86,18 +86,41 @@
         return (d > 0 ? 1 : -1) * grader * Math.PI / 180;
     };
 
+    /* ----- Svaret ---------------------------------------------------------
+       Brugerens regel 24. okt. 2026: svarknapperne (og piletasterne) vaelger
+       kun. Svaret bedoemmes foerst med Indsend svar. Hvert par har ét svar,
+       for runden taeller rigtige: saa slippes laasen, og kortet bliver paa
+       spoergsmaalet med det valgte svar groent (eller roedt og det rigtige
+       groent) og forklaringen under svarene. */
+    P.vaelg = function (s) {
+        if (this.slut || this.svar || !this.par) return;
+        if (["v", "l", "h"].indexOf(s) < 0) return;
+        this.valgt = s;
+        this.visPanel();
+    };
+
+    P.indsend = function () {
+        if (this.slut || this.svar || !this.par) { this.kort.blink(); return; }
+        if (!this.valgt) {
+            this.kort.blink();
+            this.kort.besked("Vælg først Venstre, Står lige eller Højre på kortet.", "peger");
+            return;
+        }
+        this.vaelgSvar(this.valgt);
+    };
+
+    var ORD = { v: "Venstre skål synker", h: "Højre skål synker", l: "Vægten står lige" };
+
+    /* Bedoemmer svaret s (efter Indsend svar eller Vis svaret) */
     P.vaelgSvar = function (s) {
         if (this.slut || this.svar || !this.par) return;
         this.svar = s;
+        this.valgt = s;
         var rigtigt = s === this.facit() && !this.visteSvar;
         this.rigtigt = rigtigt;
         if (rigtigt) { this.point++; this.stime++; } else { this.stime = 0; }
         this.laast = false;
         this.laasT = 0;
-        var f = this.facit();
-        var ord = { v: "venstre skål synker", h: "højre skål synker", l: "vægten står lige" };
-        var start = this.visteSvar ? "Svaret: " + ord[f] + "." : (rigtigt ? "Rigtigt, " + ord[f] + "." : "Nej, " + ord[f] + ".");
-        this.besked("<b>" + start + "</b> " + NK.html(this.par.hvorfor), this.visteSvar ? "gul" : (rigtigt ? "god" : "skidt"));
         if (this.nr === this.runde.length - 1) this.afslut();
         this.visPanel();
     };
@@ -111,22 +134,24 @@
         this.slutVent = { t: 2.4, rekord: ny && this.point > 0 };
     };
 
-    P.knap = function () {
-        if (this.slut) { this.nyRunde(); return; }
-        if (this.svar) {
-            if (this.nr >= this.runde.length - 1) {
-                this.slut = true;
-                this.besked("<b>Runden er slut: " + this.point + " af " + this.runde.length + " rigtige.</b>", this.point >= 6 ? "god" : "");
-                this.visPanel();
-                return;
-            }
-            this.nr++;
-            this.nytPar();
+    /* Knappen, der foerer videre: Naeste par, Se resultatet */
+    P.videre = function () {
+        if (this.slut || !this.svar) return;
+        if (this.nr >= this.runde.length - 1) {
+            this.slut = true;
+            this.visPanel();
             return;
         }
+        this.nr++;
+        this.nytPar();
+    };
+
+    /* Giv hint, saa Vis svaret */
+    P.hint = function () {
+        if (this.slut || this.svar) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> Skiltet viser nu atommasserne. Regn massen af 1 mol ud for begge stoffer. Det tungeste stof synker.", "gul");
+            this.hintTekst = "Skiltet på bordet viser nu atommasserne. Regn massen af 1 mol ud for begge stoffer. Det tungeste stof synker.";
             this.visPanel();
         } else {
             this.visteSvar = true;
@@ -134,71 +159,108 @@
         }
     };
 
-    P.nulstil = function () { this.nyRunde(); };
-
-    /* ----- Panelet ---------------------------------------------------------- */
-    P.bygPanel = function () {
-        var mig = this;
-        this.el = {
-            knap: NK.el("skaal-knap"),
-            besked: NK.el("skaal-besked"),
-            valg: document.querySelectorAll("#skaal-valg .valgknap")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        Array.prototype.forEach.call(this.el.valg, function (k) {
-            k.addEventListener("click", function () { mig.vaelgSvar(k.getAttribute("data-svar")); });
-        });
-        NK.el("skaal-spring").addEventListener("click", function () { mig.springIntro(); });
+    /* Den gamle knap (selvtesten og Enter): videre, ellers hint */
+    P.knap = function () {
+        if (this.slut) return;
+        if (this.svar) { this.videre(); return; }
+        this.hint();
     };
 
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+    P.nulstil = function () { this.nyRunde(); };
+
+    /* ----- Kortet og panelet --------------------------------------------------- */
+    P.bygPanel = function () {
+        var mig = this;
+        this.kort = new NK.SceneKort("skaal", {
+            valg: function (j) { mig.vaelg(j); },
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el = { besked: this.kort.beskedEl, knap: this.kort.hintEl, indsend: this.kort.indsendEl };
+        NK.el("skaal-nulstil").addEventListener("click", function () { mig.nyRunde(); });
     };
 
     P.visPanel = function () {
-        var mig = this, f = this.par ? this.facit() : null;
         NK.saetTekst("skaal-point", String(this.point));
-        NK.saetTekst("skaal-nr", String(Math.min(this.nr + 1, this.runde.length)));
-        NK.saetTekst("skaal-antal", String(this.runde.length));
+        NK.saetTekst("skaal-par", Math.min(this.nr + 1, this.runde.length) + "/" + this.runde.length);
         NK.saetTekst("skaal-stime", String(this.stime));
         NK.saetTekst("skaal-rekord", String(this.rekord));
-        Array.prototype.forEach.call(this.el.valg, function (k) {
-            var s = k.getAttribute("data-svar");
-            k.disabled = !!mig.svar || mig.slut;
-            k.classList.toggle("rigtig", !!mig.svar && s === f);
-            k.classList.toggle("forkert", !!mig.svar && s === mig.svar && s !== f);
-        });
-        var tekst, klasse = "knap";
-        if (this.slut) { tekst = "Ny runde"; klasse = "knap blaa banker"; }
-        else if (this.svar) { tekst = this.nr >= this.runde.length - 1 ? "Se resultatet" : "Næste par →"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        NK.el("skaal-kort").classList.toggle("sejr", this.slut && this.point >= 6);
-        this.visStatus();
+        this.visKort();
     };
 
-    P.visStatus = function () {
-        if (!this.par) return;
-        if (this.svar) {
-            NK.saetHTML("skaal-status", NK.html("1 mol " + this.par.v.tekst + " vejer " + NK.komma(this.par.v.M) + " g, og 1 mol " +
-                this.par.h.tekst + " vejer " + NK.komma(this.par.h.M) + " g."));
-        } else {
-            NK.saetHTML("skaal-status", "Svar med knapperne i panelet: Venstre, Står lige eller Højre. Piletasterne virker også.");
+    P.visKort = function () {
+        var k = this.kort, mig = this;
+        if (this.slut) {
+            var tekst = "Du fik " + this.point + " af " + this.runde.length + " rigtige. Din rekord er " + this.rekord +
+                " rigtige. Knappen Ny runde i panelet giver ni nye par.";
+            k.vis({ kl: "loest", chip: "Runden er slut", tekst: NK.html(tekst) });
+            k.bliv(null);
+            k.besked("", "");
+            k.knapper({});
+            this.tjekZone();
+            return;
         }
+        if (!this.par) return;
+        var f = this.facit();
+        var svar = [["v", "←", "Venstre"], ["l", "↓", "Står lige"], ["h", "→", "Højre"]].map(function (r) {
+            var s = r[0], sendt = !!mig.svar;
+            return {
+                j: s, t: '<span class="pil">' + r[1] + "</span>" + r[2],
+                valgt: !sendt && mig.valgt === s,
+                rigtig: sendt && s === f && !mig.visteSvar,
+                svarVist: sendt && s === f && mig.visteSvar,
+                forkert: sendt && s === mig.svar && s !== f,
+                dim: sendt && s !== f && s !== mig.svar
+            };
+        });
+        k.vis({
+            kl: this.svar ? "loest" + (this.rigtigt ? "" : " svar") : "spm",
+            chip: "Par " + (this.nr + 1) + " af " + this.runde.length,
+            tekst: NK.html("I hver skål ligger 1 mol af et stof, og skiltet på bordet viser stofferne. Vægten er låst. " +
+                "Hvilken skål synker, når låsen slippes?"),
+            svar: svar,
+            laast: !!this.svar
+        });
+        if (this.svar) {
+            var knap = this.nr >= this.runde.length - 1 ? "Se resultatet →" : "Næste par →";
+            var forkl = NK.html(ORD[f] + ". " + this.par.hvorfor);
+            if (this.visteSvar) k.bliv(forkl, "Svaret", knap, "svar");
+            else if (this.rigtigt) k.bliv(forkl, "Rigtigt", knap, "god");
+            else k.bliv(forkl, "Ikke rigtigt", knap, "nej");
+        } else {
+            k.bliv(null);
+            if (this.hjaelp > 0) k.besked('<span class="b-maerke">Hint</span> ' + NK.html(this.hintTekst), "gul");
+            else k.besked("", "");
+            k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: !!this.valgt,
+                indsendTekst: this.valgt ? "Indsend svar: " + { v: "Venstre", l: "Står lige", h: "Højre" }[this.valgt] : "Indsend svar" });
+        }
+        this.tjekZone();
     };
 
-    /* Tastatur: pilene svarer, mens vaegten er laast */
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [150, 132];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
+    };
+
+    /* Tastatur: pilene vaelger, mens vaegten er laast */
     P.tast = function (key) {
         if (this.svar || this.slut) return false;
-        if (key === "ArrowLeft") { this.vaelgSvar("v"); return true; }
-        if (key === "ArrowRight") { this.vaelgSvar("h"); return true; }
-        if (key === "ArrowDown") { this.vaelgSvar("l"); return true; }
+        if (key === "ArrowLeft") { this.vaelg("v"); return true; }
+        if (key === "ArrowRight") { this.vaelg("h"); return true; }
+        if (key === "ArrowDown") { this.vaelg("l"); return true; }
         return false;
     };
 
-    P.enter = function () { if (this.svar || this.slut) this.knap(); };
+    /* Enter: Indsend svar, naar et svar er valgt, ellers videre */
+    P.enter = function () {
+        if (this.slut) return;
+        if (this.svar) { this.videre(); return; }
+        if (this.valgt) this.indsend();
+        else this.kort.blink();
+    };
     P.fokus = function () {};
 
     /* ----- Layout --------------------------------------------------------------- */
@@ -209,7 +271,9 @@
         /* Bordet staar lidt hoejere end paa de andre faner, saa skiltet med
            beregningerne kan sidde paa bordets forside */
         lay.bordY = Math.round(H - NK.klamp(H * 0.16, 58, 120));
-        lay.p = Tg.plakatLay(kant, kant, W - 2 * kant, H * 0.34);
+        /* Plakaten begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.p = Tg.plakatLay(kant, lay.zone, W - 2 * kant, (H - lay.zone) * 0.36);
         var zoneTop = lay.p.y + lay.p.h + NK.klamp(H * 0.02, 6, 16);
         /* Ved 14,5 grader loefter armen sig 0,25 L og saenker sig lige saa
            meget, og skaalen haenger 0,985 L under krogen (medregnet bunden).
@@ -247,6 +311,7 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* Samme stoerrelse paa begge molekyler, saa de kan sammenlignes */
@@ -445,11 +510,16 @@
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
             if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
-            if (mig.laererKlik) mig.laererKlik(pt.x, pt.y);
+            if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
+            /* Vaegten er laast, til svaret er sendt: et klik paa den faar kortet til at blinke */
+            var u = mig.hvadErUnder(pt);
+            if (!mig.svar && !mig.slut && !(u && u.slags === "celle")) mig.kort.blink();
         });
     };
 
-    /* ----- Kemichaels praesentation ---------------------------------------- */
+    /* ----- Kemichaels praesentation ----------------------------------------
+       Trinnene og boblen er faelles (NK.Praesentation.trin i js/laerer.js);
+       js/app.js viser foerst tilbuddet (NK.Praesentation.pakInd). */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
         if (!tving && NK.hent("nk-sc5.1-intro-skaal", false)) return;
@@ -467,12 +537,9 @@
             this.introVent -= dt;
             if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
         }
-        var iIntro = !!(this.laererIIntro && this.laererIIntro());
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("skaal-spring").hidden = !iIntro;
-        }
-        NK.el("skaal-valg").classList.toggle("peg", iIntro && this.introTrin === 2);
+        /* Taleboblen med Naeste og Spring praesentationen over og den gule
+           ramme (../kemichael/praesentation.js) */
+        if (this.kmIntro && this.introOpdaterBoble) this.introOpdaterBoble();
     };
 
     NK.SimSkaal = SimSkaal;

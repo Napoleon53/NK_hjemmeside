@@ -254,7 +254,7 @@
        massefylden i g/mL for vaeskerne og en linje om stoffet. */
     var S = [
         ["H2O", "vand", "vaeske", "#9fd3ff", 1.00, "En mundfuld."],
-        ["O2", "oxygen", "gas", "#6fa8ff", 0, "Det er den del af luften, vi ånder for."],
+        ["O2", "dioxygen", "gas", "#6fa8ff", 0, "Det er den del af luften, vi ånder for."],
         ["CO2", "carbondioxid", "gas", "#ff7a6b", 0, "Boblerne i sodavand."],
         ["SO2", "svovldioxid", "gas", "#f2d45c", 0, "Lugten af en tændstik, der lige er tændt."],
         ["CH4", "methan", "gas", "#7ed492", 0, "Naturgas er mest methan."],
@@ -265,8 +265,8 @@
         ["CaCO3", "calciumcarbonat", "pulver", "#f1ede2", 0, "Kridt og marmor er calciumcarbonat."],
         ["Ca(OH)2", "calciumhydroxid", "pulver", "#f7f7f1", 0, "Opløst i vand bliver det til kalkvand."],
         ["Al2(SO4)3", "aluminiumsulfat", "pulver", "#f4f4f6", 0, "Bruges til at rense drikkevand."],
-        ["H2", "hydrogen"], ["He", "helium"], ["NH3", "ammoniak"], ["Cl2", "chlor"], ["CO", "carbonmonoxid"],
-        ["N2", "nitrogen"], ["C2H4", "ethen"], ["Fe", "jern"], ["C4H10", "butan"], ["Cu", "kobber"],
+        ["H2", "dihydrogen"], ["He", "helium"], ["NH3", "ammoniak"], ["Cl2", "dichlor"], ["CO", "carbonmonoxid"],
+        ["N2", "dinitrogen"], ["C2H4", "ethen"], ["Fe", "jern"], ["C4H10", "butan"], ["Cu", "kobber"],
         ["C3H8", "propan"], ["NO2", "nitrogendioxid"], ["H2SO4", "svovlsyre"], ["H3PO4", "phosphorsyre"],
         ["Ar", "argon"], ["K", "kalium"], ["O3", "ozon"],
         ["KCl", "kaliumchlorid"], ["CaCl2", "calciumchlorid"], ["NaOH", "natriumhydroxid"],
@@ -353,13 +353,9 @@
     D.FOELSOMHED = 5;
     D.RUNDE = [3, 3, 3];   /* par fra hvert niveau i en runde */
 
-    D.RUNDE_REPLIK = [
-        [0, "Flest atomer betyder ikke flest gram. Se på atommasserne."],
-        [3, "Det er atommasserne, der afgør det, ikke antallet af atomer."],
-        [6, "Mere end halvdelen rigtige. Du ser på atommasserne."],
-        [9, "Ni rigtige af ni. Du ved, hvad der gør et stof tungt."]
-    ];
-    D.REKORD_REPLIK = "Ny rekord. Prøv at slå den i næste runde.";
+    /* Kemichael kommer kun efter en runde med alle par rigtige (brugerens
+       regel 4. nov. 2026). Resultatet af runden staar paa papirkortet i scenen. */
+    D.RUNDE_FULDT = "Du har svaret rigtigt på alle ni par. Du ved, hvad der gør 1 mol af et stof tungt.";
 
     /* ----- Fane 3: ukendt stof ---------------------------------------------------
        Etiketten er faldet af flasken. Kun molarmassen er tilbage. Det
@@ -392,38 +388,41 @@
     });
 
     /* ----- Kemichael ----------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik. Almindeligt dansk, der kan forstaas
-       uden at kende scenen: ingen gaader og ingen halve saetninger
-       (brugerens oenske 29. sept. 2026). */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       Ingen teori og ingen vittigheder. sel: det, han peger paa, og som
+       faar en gul ramme, der blinker (de usynlige .anker fra rundvisningen
+       papirkortet i scenen og kortene i panelet). */
     D.INTRO_VAEGT = [
-        "Her bygger du et molekyle og finder dets molarmasse.",
-        "Klik på grundstofferne, og skriv atommasserne til højre.",
-        "Atommassen står nederst i feltet. Atomnummeret står øverst."
+        { tekst: "I denne fane bygger du et molekyle og finder stoffets molarmasse. Du bygger molekylet ved at klikke på grundstofferne i det periodiske system, og et klik på en kugle fjerner atomet igen.",
+          sel: "#vaegt-anker-plakat" },
+        { tekst: "Hvert felt i det periodiske system viser atomnummeret øverst og atommassen nederst. Molarmassen regnes ud med atommasserne.",
+          sel: "#vaegt-anker-felt" },
+        { tekst: "Kortet øverst i scenen viser stoffet, og i regnestykket i panelet skriver du atommassen for hvert grundstof og til sidst molarmassen. Når molarmassen er rigtig, kommer 1 mol af stoffet på vægten. Knappen Giv hint giver et hint og derefter svaret.",
+          sel: ["#vaegt-skort", "#vaegt-regn"] }
     ];
     D.INTRO_SKAAL = [
-        "Her ligger 1 mol af et stof i hver skål.",
-        "Gæt til højre, hvilken skål der synker.",
-        "1 mol vejer lige så mange gram som stoffets molarmasse."
+        { tekst: "I denne fane sammenligner du massen af 1 mol af to forskellige stoffer. I hver skål ligger 1 mol af et stof, og vægten er låst, til du har svaret.",
+          sel: "#skaal-anker-vaegt" },
+        { tekst: "Skiltet på bordet viser, hvilke stoffer der ligger i skålene, og pilene peger mod skålene. Efter dit svar viser skiltet massen af 1 mol af hvert stof.",
+          sel: "#skaal-anker-kort" },
+        { tekst: "Du vælger Venstre, Står lige eller Højre på kortet øverst i scenen og trykker Indsend svar. Knappen Giv hint skriver atommasserne på skiltet. En runde består af ni par, og din rekord bliver husket.",
+          sel: ["#skaal-skort", "#skaal-runden"] }
     ];
     D.INTRO_UKENDT = [
-        "Her er etiketten faldet af flasken.",
-        "Molarmassen står på mærket. Find etiketten, der passer.",
-        "Regn med to decimaler. Nogle af stofferne ligger meget tæt."
+        { tekst: "I denne fane er etiketten faldet af en flaske, og du skal finde ud af, hvilket stof flasken indeholder. Mærket ved flasken viser kun stoffets molarmasse.",
+          sel: "#ukendt-anker-maerke" },
+        { tekst: "Tavlen viser fire etiketter. Du regner molarmassen ud for stofferne på etiketterne, klikker på den etiket, der passer til mærket, og trykker Indsend svar. En forkert etiket falder af igen og får sin molarmasse skrevet på.",
+          sel: "#ukendt-anker-tavle" },
+        { tekst: "Kortet øverst i scenen viser molarmassen, og knappen Giv hint hjælper, hvis du sidder fast. Flaskerne er delt i tre niveauer, og på det sidste niveau ligger stofferne så tæt, at du skal regne med to decimaler.",
+          sel: ["#ukendt-skort", "#ukendt-fremskridt"] }
     ];
 
-    D.NIVEAU_ROS = [
-        "Fire stoffer vejet. Du har styr på tallene i formlen.",
-        "Mange atomer i formlerne, og du glemte ikke et eneste.",
-        "Du husker at gange ind i parenteserne. Det glemmer mange."
-    ];
-    D.VAEGT_FAERDIG = "Alle tolv stoffer er vejet. Du kan regne molarmasser.";
-
-    D.GAADE_ROS = [
-        "Fire flasker har fået den rigtige etiket.",
-        "Godt regnet. Du fandt den rigtige, selv om de lå tæt.",
-        "Uden to decimaler kunne du ikke have skilt dem ad."
-    ];
-    D.GAADER_FAERDIG = "Alle tolv flasker har fået den rigtige etiket.";
+    /* Han kommer kun ind af sig selv, naar hele fanen er loest (brugerens
+       regel 4. nov. 2026), ikke efter hvert niveau */
+    D.VAEGT_FAERDIG = "Du har vejet alle tolv stoffer og kan nu regne molarmassen ud for et stof ud fra formlen.";
+    D.GAADER_FAERDIG = "Alle tolv flasker har fået den rigtige etiket, og du fandt hvert stof ud fra molarmassen.";
 
     NK.Data = D;
 }());

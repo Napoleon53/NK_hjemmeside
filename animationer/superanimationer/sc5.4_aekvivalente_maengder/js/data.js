@@ -313,34 +313,46 @@
     };
 
     /* ----- Kemichael ----------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
+       Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
+       det, han peger paa, og som faar en gul ramme, der blinker (CSS-
+       selectorer; tingene paa laerredet er de usynlige .anker fra
+       rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_HOTDOG = [
-        "Pølsevognen. Opskriften hænger på væggen.",
-        "Træk tingene hen på brættet, og ring med klokken.",
-        "Kunderne tæller efter. Det gør jeg også."
+        { tekst: "I denne fane laver du hotdogs og dobbeltburgere efter en opskrift. Opskriften på væggen viser forholdet mellem tingene, og bonen viser den ordre, du skal lave.",
+          sel: ["#hotdog-anker-skilt", "#hotdog-anker-bon"] },
+        { tekst: "Du trækker tingene fra beholderne hen på skærebrættet, og et klik på en ting på brættet lægger tingen tilbage. Når du ringer med klokken, bliver retterne samlet efter opskriften, og overskuddet bliver liggende på brættet.",
+          sel: ["#hotdog-anker-beholdere", "#hotdog-anker-braet", "#hotdog-anker-klokke"] },
+        { tekst: "Opgavekortet viser ordren og spørgsmålene, og knappen på kortet giver et hint og derefter svaret. Med kortet Ordrerne kan du springe til hotdogs, dobbeltburgere eller frit valg.",
+          sel: ["#hotdog-kort", "#hotdog-ordrer"] }
     ];
     D.INTRO_MOLEKYLER = [
-        "Samme slags opskrift, bare med molekyler.",
-        "Træk dem ind i kammeret, og tryk Start.",
-        "Atomer forsvinder ikke. Heller ikke her."
+        { tekst: "I denne fane laver du molekyler efter et reaktionsskema. Skemaet viser koefficienterne og lige så mange figurer under hver formel, og plakaten viser, hvad én figur står for.",
+          sel: ["#molekyler-anker-skilt", "#molekyler-anker-plakat"] },
+        { tekst: "Du trækker figurer fra kasserne ind i kammeret og trykker på Start. Figurerne reagerer i hele sæt efter skemaet, og figurer i overskud får en orange ring. Panelet til højre viser, hvor meget der er af hvert stof før og efter reaktionen.",
+          sel: ["#molekyler-anker-kasser", "#molekyler-anker-kammer", "#molekyler-maaling"] },
+        { tekst: "Opgavekortet giver dig fem mål, og fra det fjerde mål er hver figur 1 mol. Knappen på kortet giver et hint og derefter svaret.",
+          sel: "#molekyler-kort" }
     ];
     D.INTRO_REGN = [
-        "Tavlen. Én stofmængde er kendt.",
-        "Skriv de andre under formlerne.",
-        "Søjlerne viser, om forholdet holder."
+        { tekst: "I denne fane finder du stofmængden af hvert stof i et reaktionsskema, når du kender stofmængden af ét af stofferne. Den grønne boks viser den kendte stofmængde, og du skriver de andre stofmængder i felterne under formlerne.",
+          felt: "kendt", sel: ["#regn-anker-skema", "#regn-felter .tavlefelt"] },
+        { tekst: "Under hver formel står en søjle, hvor de stiplede blokke viser koefficienten. Et rigtigt svar fylder netop sine blokke og bliver blåt, mens et forkert svar bliver rødt og står for højt eller for lavt.",
+          sel: "#regn-anker-soejler" },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Når et svar er rigtigt, står beregningen i panelet. På niveauet Svær skriver du selv koefficienterne først.",
+          sel: ["#regn-kort", "#regn-beregninger"] }
     ];
 
     /* Paaskeaegget: en hotdog af lutter agurker */
-    D.AEG_AGURK = "Kun agurker. Det er en salat, ikke en hotdog.";
+    D.AEG_AGURK = "Der ligger kun agurker på brættet. Det er en salat og ikke en hotdog.";
 
-    D.HOTDOG_FAERDIG = "Ti ordrer. Opskriften holder, også når noget slipper op.";
-    D.MAAL_FAERDIG = "Molekyler eller mol. Opskriften er den samme.";
-    D.NIVEAU_ROS = [
-        "Let klaret. Koefficienterne gjorde arbejdet.",
-        "Decimaltal og produkter. Godt regnet.",
-        "Afstemt og regnet. Det er hele opgaven."
-    ];
-    D.OPGAVER_FAERDIG = "Tolv opgaver. Jeg skriver det i regnskabet.";
+    /* Han kommer kun ind af sig selv, naar en hel fane er klaret (brugerens
+       regel 4. nov. 2026): alle ti ordrer, alle fem maal eller alle tolv
+       opgaver paa tavlen. */
+    D.HOTDOG_FAERDIG = "Du har lavet alle ti ordrer. Opskriften holder, også når noget slipper op.";
+    D.MAAL_FAERDIG = "Du har nået alle fem mål. Opskriften er den samme for molekyler og for mol.";
+    D.OPGAVER_FAERDIG = "Du har løst alle tolv opgaver på tavlen. Jeg skriver det ind i regnskabet.";
 
     NK.Data = D;
 }());

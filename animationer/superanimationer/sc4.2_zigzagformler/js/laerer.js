@@ -13,8 +13,15 @@
    er det faelles paaskeaeg.
 
    Scener:
-     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil
-     faerdig   en serie eller et niveau er klaret (D.ROS)
+     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil.
+               Ét trin ad gangen med Naeste og Spring praesentationen
+               over; han peger paa det, der blinker, og gaar aldrig
+               videre af sig selv. Koden er faelles:
+               ../kemichael/praesentation.js (NK.Praesentation.trin).
+     faerdig   en hel fane er klaret (D.ROS): paa fane 1 til 3, naar
+               fanens sidste klistermaerke er laast op, paa fane 4, naar
+               hele bunken er sorteret. Det er de eneste gange, han kommer
+               ind af sig selv (brugerens regel 4. nov. 2026).
    ===================================================================== */
 (function () {
     "use strict";
@@ -48,6 +55,31 @@
                 return lay ? this.pegVinkel(lay.kop.x / s, (lay.kop.y - 24) / s) : 2;
             }
         };
+    }
+
+    function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
+
+    function rosTrin(sim, replik) {
+        return [
+            { udtryk: { vrede: 0, humoer: 0.8, roed: 0, skeptisk: 0, briller: 0 } },
+            { gaa: function () { return sim.laererPlads(); } },
+            { tid: 0.3 },
+            { arm: 0.3, tid: 0.5 },
+            { sig: replik, vis: replikTid(replik), tid: replikTid(replik),
+              hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 4; } },
+            { kald: function () { this.laerer.nik = 0; } },
+            { arm: HAENGER, tid: 0.4 }
+        ].concat(K.ros(), [
+            { taleFaerdig: true },
+            { gaa: UDE }
+        ]);
+    }
+
+    /* Er alle fanens klistermaerker laast op? Fanen kendes paa quizzens
+       forstavelse: zz (Zigzag), nv (Navne) eller is (Isomerer). */
+    function faneKlaret(pre) {
+        var liste = NK.Skuffe.ALLE.filter(function (k) { return k.quiz.indexOf(pre + "-") === 0; });
+        return liste.length > 0 && liste.every(function (k) { return NK.Skuffe.aaben(k.navn); });
     }
 
     function kobl(P) {
@@ -89,173 +121,79 @@
             return Math.max(150, this.laererPladsPx() / this.laererLaerredSkala());
         };
 
+        /* Praesentationen: ét trin ad gangen med Naeste og Spring
+           praesentationen over (faelles, ../kemichael/praesentation.js) */
+        NK.Praesentation.trin(P);
+
+        /* Det, der er tegnet paa tavlen, i laerredets pixels: kassen om
+           atomerne, saa den gule ramme ogsaa kan ses om et enkelt C-atom */
+        P.introFelt = function (navn) {
+            if (navn !== "tegning" || !this.braet || !this.braet.mol) return null;
+            var b = this.braet, atomer = b.mol.atomer;
+            if (!atomer.length) return null;
+            var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+            atomer.forEach(function (a) {
+                var p = b.px(a);
+                x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y);
+                x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+            });
+            var luft = 26, bb = Math.max(x1 - x0 + 2 * luft, 64), hh = Math.max(y1 - y0 + 2 * luft, 64);
+            return { x: (x0 + x1) / 2 - bb / 2, y: (y0 + y1) / 2 - hh / 2, b: bb, h: hh };
+        };
+
+        /* En hel fane er klaret. Staar praesentationen, venter rosen, til
+           han er faerdig med den. */
         P.laererFaerdig = function (replik) {
-            if (!this.laerer) return;
+            if (!this.laerer || !replik) return;
+            if (this.kmIntro) { this.rosVenter = replik; return; }
             this.laererKoer("faerdig", rosTrin(this, replik), false);
         };
 
-        introVaek(P);
-    }
-
-    function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
-
-    /* Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke. */
-    function introTrin(sim, linjer, peg) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: function () { return sim.laererPlads(); } },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            var v = peg && peg[i];
-            trin.push({ kald: function () { sim.introTrin = i + 1; } });
-            if (v) trin.push({ arm: v, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { sim.introTrin = 0; } },
-            { gaa: UDE }
-        ]);
-    }
-
-    function introVaek(P) {
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(this.pre + "-spring");
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
+        var opdater = P.opdaterLaerer;
+        P.opdaterLaerer = function (dt) {
+            opdater.apply(this, arguments);
+            if (this.rosVenter && !this.kmIntro) {
+                var replik = this.rosVenter;
+                this.rosVenter = null;
+                this.laererFaerdig(replik);
             }
-            return true;
         };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
 
-    /* Peg paa panelet til hoejre */
-    function pegPaaPanelet(sim) {
-        return function () {
-            var s = sim.laererLaerredSkala();
-            return sim.pegVinkel(sim.L.b / s + 60, sim.L.h * 0.3 / s);
-        };
-    }
-
-    /* Peg paa et punkt i pixels */
-    function pegPaa(sim, punkt) {
-        return function () {
-            var s = sim.laererLaerredSkala(), p = punkt();
-            return p ? sim.pegVinkel(p.x / s, p.y / s) : 0.5;
-        };
-    }
-
-    function rosTrin(sim, replik) {
-        return [
-            { udtryk: { vrede: 0, humoer: 0.8, roed: 0, skeptisk: 0, briller: 0 } },
-            { gaa: function () { return sim.laererPlads(); } },
-            { tid: 0.3 },
-            { arm: 0.3, tid: 0.5 },
-            { sig: replik, vis: replikTid(replik), tid: replikTid(replik),
-              hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 4; } },
-            { kald: function () { this.laerer.nik = 0; } },
-            { arm: HAENGER, tid: 0.4 }
-        ].concat(K.ros(), [
-            { taleFaerdig: true },
-            { gaa: UDE }
-        ]);
-    }
-
-    /* Tavlens midte og det foerste atom */
-    function tavlensMidte(sim) {
-        return function () {
-            var t = sim.lay && sim.lay.tavle;
-            return t ? { x: t.x + t.b * 0.6, y: t.y + t.h * 0.45 } : null;
-        };
-    }
-    function foersteAtom(sim) {
-        return function () {
-            var a = sim.braet.mol.atomer[0];
-            return a ? sim.braet.px(a) : null;
+        /* Kaldes fra klaret i opgavefane.js, naar en quiz har givet et nyt
+           klistermaerke. Han kommer kun, naar det var fanens sidste. */
+        P.laererFaneKlaret = function (quiz) {
+            var pre = String(quiz).split("-")[0];
+            if (faneKlaret(pre)) this.laererFaerdig(D.ROS[pre]);
         };
     }
 
     /* ----- Fane 1: zigzag ---------------------------------------------------- */
     var PZ = NK.SimZigzag.prototype;
     kobl(PZ);
-    PZ.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_ZIGZAG, {
-            0: pegPaa(this, function () {
-                var p = mig.papir;
-                return p ? { x: p.r.x + p.r.b / 2, y: p.r.y + p.r.h / 2 } : tavlensMidte(mig)();
-            }),
-            1: pegPaa(this, foersteAtom(this))
-        }), false);
-    };
+    PZ.introLinjer = function () { return this.retning === "atomer" ? D.INTRO_ZIGZAG_ATOMER : D.INTRO_ZIGZAG; };
 
     /* ----- Fane 2: navne ----------------------------------------------------- */
     var PN = NK.SimNavne.prototype;
     kobl(PN);
-    PN.laererIntro = function () {
-        if (!this.laerer) return;
-        this.laererKoer("intro", introTrin(this, D.INTRO_NAVNE, {
-            0: pegPaa(this, tavlensMidte(this)),
-            1: pegPaaPanelet(this)
-        }), false);
-    };
+    PN.introLinjer = function () { return D.INTRO_NAVNE; };
 
     /* ----- Fane 3: isomerer -------------------------------------------------- */
     var PI = NK.SimIsomerer.prototype;
     kobl(PI);
-    PI.laererIntro = function () {
-        if (!this.laerer) return;
-        this.laererKoer("intro", introTrin(this, D.INTRO_ISOMERER, {
-            0: pegPaaPanelet(this),
-            1: pegPaa(this, foersteAtom(this))
-        }), false);
-    };
+    PI.introLinjer = function () { return D.INTRO_ISOMERER; };
 
     /* ----- Fane 4: opløselighed ------------------------------------------------ */
     var PO = NK.SimOploes && NK.SimOploes.prototype;
     if (PO) {
         kobl(PO);
-        PO.laererIntro = function () {
-            if (!this.laerer) return;
-            var mig = this;
-            this.laererKoer("intro", introTrin(this, D.INTRO_OPLOES, {
-                0: pegPaa(this, function () {
-                    var g = mig.zoner && mig.zoner.glas;
-                    return g ? { x: g.x + g.b * 0.55, y: g.y + g.h * 0.4 } : null;
-                }),
-                1: pegPaa(this, function () {
-                    var f = mig.fig;
-                    return f && f.sted === "tavle" ? { x: f.x, y: f.y } : null;
-                })
-            }), false);
+        PO.introLinjer = function () { return D.INTRO_OPLOES; };
+        /* Under praesentationen staar han til hoejre for etiketterne heptan
+           og vand, saa de kan ses, mens han fortaeller om lagene */
+        var plads = PO.laererPlads;
+        PO.laererPlads = function () {
+            var g = this.zoner && this.zoner.glas;
+            if (this.kmIntro && g) return Math.max(plads.call(this), (g.x + (this.etiketB || 90) + 150) / this.laererLaerredSkala());
+            return plads.apply(this, arguments);
         };
     }
 }());

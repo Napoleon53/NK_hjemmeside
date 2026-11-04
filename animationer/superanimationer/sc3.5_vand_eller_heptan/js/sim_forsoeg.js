@@ -551,7 +551,6 @@
         });
         NK.saetTekst("forsoeg-felter", String(D.FORSOEG.length * D.OPL.length));
         NK.el("forsoeg-nulstil").addEventListener("click", function () { mig.startForfra(); });
-        NK.el("forsoeg-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.visPanel = function () {
@@ -594,7 +593,7 @@
     P.fokus = function () {};
 
     /* ----- Kemichaels praesentation --------------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc3.5-intro-forsoeg", tilbud: "forsoeg-tilbud", spring: "forsoeg-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc3.5-intro-forsoeg", tilbud: "forsoeg-tilbud" });
 
     /* Mens spoergsmaalene om vand og heptan staar, tilbydes praesentationen
        ikke (den handler om pipetten, der ikke er fremme endnu). */

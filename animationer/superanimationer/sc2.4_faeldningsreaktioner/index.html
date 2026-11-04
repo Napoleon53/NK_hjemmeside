@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fældningsreaktioner</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body data-niveau="tabel">
+<body data-niveau="tabel" class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Fældningsreaktioner</h1>
@@ -28,47 +30,53 @@
 
 <main>
 <section class="fane aktiv" id="fane" role="tabpanel" aria-label="Opgave">
+    <!-- Scenen er en soejle: tekstboksen med opgaven oeverst, tavlen med
+         reaktionsskemaet lige under og baegerglassene forneden. Al tekst
+         (spoergsmaal, svar, hint og besked) staar i tekstboksen. -->
     <div class="scene">
+        <div class="tekstboks scenekort" id="tekstboks" aria-live="polite"></div>
+
+        <div class="arbejdsbord" id="arbejdsbord">
+            <div class="tavle" id="tavle"></div>
+            <div class="ab-valg" id="ab-valg"></div>
+        </div>
+
         <div class="baeger-omraade" id="baeger-omraade">
             <canvas id="laerred" aria-label="To opløsninger, der blandes"></canvas>
             <div class="tilbud" id="tilbud" hidden>
                 <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
                 <button class="tilbud-nej" type="button">Nej tak</button>
             </div>
-            <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        </div>
-
-        <div class="arbejdsbord" id="arbejdsbord">
-            <div class="ab-hoved">
-                <span class="ab-trin" id="ab-trin">Trin 1</span>
-                <span class="ab-spm" id="ab-spm"></span>
-            </div>
-            <div class="tavle" id="tavle"></div>
-            <div class="ab-valg" id="ab-valg"></div>
-            <div class="ab-bund">
-                <p class="besked" id="besked" aria-live="polite"></p>
-                <button class="knap blaa tjekknap" id="tjek" type="button" hidden>Tjek</button>
-            </div>
         </div>
     </div>
 
     <aside class="panel">
         <div class="kort opgavekort" id="opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="loest">0</b></span></h2>
-            <p class="opgavetekst" id="opgavetekst"></p>
+            <h2>Trinene <span class="taeller">løst: <b id="loest">0</b></span></h2>
             <ol class="trinliste" id="trinliste"></ol>
-            <button class="knap stor blaa" id="opgaveknap" type="button">Giv hint</button>
+            <button class="knap nyknap" id="nyknap" type="button" title="En anden blanding (R)">Ny opgave</button>
         </div>
 
         <div class="kort tabelkort" id="tabelkort">
             <h2>Fældningstabel</h2>
-            <div id="tabel"></div>
-            <p class="tabelinfo" id="tabelinfo"></p>
+            <div id="tabel-hjem"><div id="tabel"></div><p class="tabelinfo" id="tabelinfo"></p></div>
             <p class="tabelnoegle"><span><b>L</b> letopløseligt</span><span><b>T</b> tungtopløseligt</span><span><b>÷</b> findes ikke</span></p>
         </div>
     </aside>
 </section>
 </main>
+
+<!-- Opslaget: fældningstabellen i næsten fuld skærm sammen med
+     reaktionsskemaet (js/opgave.js). Tabellen flyttes herind, mens
+     opslaget er åbent, og tilbage i panelet bagefter. -->
+<div class="opslag" id="opslag" hidden>
+    <div class="opslag-boks" id="opslag-boks" role="dialog" aria-modal="true" aria-label="Fældningstabellen">
+        <div class="scenekort opslag-kort" id="opslag-kort" aria-live="polite"></div>
+        <div class="tavle opslag-skema" id="opslag-skema"></div>
+        <div class="opslag-tabel" id="opslag-tabel"></div>
+        <p class="tabelnoegle"><span><b>L</b> letopløseligt</span><span><b>T</b> tungtopløseligt</span><span><b>÷</b> findes ikke</span></p>
+    </div>
+</div>
 
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
@@ -77,7 +85,7 @@
         <p>Når to opløsninger af salte blandes, svømmer alle ionerne rundt mellem hinanden. Kan en positiv og en negativ ion danne et tungtopløseligt salt, falder saltet ud som et fast stof: et <b>bundfald</b>.</p>
 
         <h3>De fire trin</h3>
-        <p>Opgaven er den samme på alle tre sværhedsgrader. På <b>Let</b> finder du bundfaldet i tabellen, og resten vises. På <b>Middel</b> vælger du svarene, og på <b>Svær</b> skriver du dem selv.</p>
+        <p>Opgaven er den samme på alle tre sværhedsgrader. På <b>Let</b> finder du bundfaldet i tabellen, og resten vises. På <b>Middel</b> vælger du svarene, og på <b>Svær</b> skriver du dem selv. Knappen <b>Slå op i fældningstabellen</b> viser tabellen i stor udgave sammen med reaktionsskemaet.</p>
         <ol>
             <li><b>Ionerne.</b> Del hvert salt op i den positive og den negative ion.</li>
             <li><b>Bundfaldet.</b> Byt partnere, og slå de nye par op i fældningstabellen. Et par med T falder ud.</li>
@@ -96,7 +104,7 @@
         <p>Tal efter et symbol bliver sænket af sig selv, og store og små bogstaver rettes: ag3po4 bliver til Ag₃PO₄. Skriv + eller − til sidst for ladningen: fe3+ bliver til Fe³⁺ og no3- til NO₃⁻. Parenteserne kommer også af sig selv: ca3po42 bliver til Ca₃(PO₄)₂. Ladningsknapperne sætter ladningen på.</p>
 
         <h3>Genveje</h3>
-        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>R</kbd> ny opgave &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk &nbsp;·&nbsp; <kbd>Enter</kbd> tjek</p>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>R</kbd> ny opgave &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar</p>
 
         <div class="knapper" style="margin-top:18px;">
             <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
@@ -123,18 +131,19 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/data.js"></script>
 <script src="js/formel.js"></script>
 <script src="js/tabel.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
 <script src="js/baeger.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/niveauer.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
-<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -158,7 +158,8 @@
     NK.Baeger.prototype.layout = function (W, H) {
         var lbl = 40, top = 34;
         var hMax = H - lbl - top;
-        var wM = Math.min(hMax / 1.2, W * 0.32, 320);
+        /* Glassene er skaleret lidt ned (brugeren 4. nov. 2026: "fylder lidt for meget") */
+        var wM = Math.min(hMax / 1.2 * 0.82, W * 0.27, 260);
         var wA = Math.min(wM * 0.8, W * 0.25);
         /* Glassene staar midt i den plads, der er, med bue-pilene over. */
         var bund = Math.min(H - lbl, (H + wM * 1.2 + top - lbl) / 2);

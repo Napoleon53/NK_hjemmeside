@@ -188,8 +188,9 @@ function koerTest(W) {
     paastand("et tomt felt er ikke en fejl", T("", m3).tom === true && T("  ", m3).tom === true);
 
     overskrift("6. Sproget");
-    var replikker = [].concat(D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND, D.HYLDE_ROS,
-        [D.LUP_FAERDIG, D.FORTYND_BASISK, D.FORTYND_FAERDIG, D.AEG_PRAECIS]);
+    var INTRO = [].concat(D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND);
+    var ROS = [D.ROS_SKALA, D.LUP_FAERDIG, D.FORTYND_FAERDIG, D.AEG_PRAECIS];
+    var replikker = INTRO.map(function (l) { return l.tekst; }).concat(ROS);
     var tekster = replikker.concat(
         D.STOFFER.map(function (s) { return s.navn + " " + s.note; }),
         D.HYLDER.map(function (h) { return h.navn + " " + h.hint; }),
@@ -203,9 +204,14 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
-    var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regler 4. nov. 2026: han siger mere ad gangen, i hele saetninger */
+    var lange = INTRO.filter(function (l) { var n = l.tekst.split(/[.?] /).length; return l.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst); });
+    paastand("præsentationens trin er hele sætninger, og intet begynder med Her", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = ROS.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*[.?]$/.test(t); });
+    paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
+    paastand("hver præsentation har to til fire trin", [D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND].every(function (l) { return l.length >= 2 && l.length <= 4; }));
     paastand("ordet natronlud står ingen steder (natriumhydroxid)", !tekster.concat([krop]).some(function (t) { return /natronlud/i.test(t); }));
     paastand("ingen zoomknapper nævnes (luppen zoomer selv)", !tekster.concat([krop]).some(function (t) { return /[Zz]oom med|klik ud|klik ind|med \+ og/.test(t); }),
         tekster.filter(function (t) { return /[Zz]oom med|klik ud|klik ind/.test(t); }).join(" | "));
@@ -263,7 +269,7 @@ function koerTest(W) {
     paastand("hylde 1 er målt: 6/6, besked og Næste hylde", S.naaet && S.antalMaalt() === 6 && S.el.knap.textContent === "Næste hylde →" &&
         /Alle seks er målt. 2 af dine 6 gæt/.test(S.el.besked.textContent), S.el.besked.textContent);
     tik(S, 2.5);
-    paastand("efter hylde 1 roser Kemichael", !!(S.laerer.scene && S.laerer.scene.navn === "faerdig"));
+    paastand("efter hylde 1 kommer Kemichael ikke (kun en del af fanen)", !(S.laerer.scene && S.laerer.scene.navn === "faerdig"));
     var baner = S.stoffer.every(function (s) { return s.bane >= 0 && s.bane < 5; });
     var roerer = S.stoffer.some(function (a) {
         return S.stoffer.some(function (b) { return a !== b && a.bane === b.bane && Math.abs(a.x - b.x) < lay.ikonH * 0.9; });
@@ -276,8 +282,12 @@ function koerTest(W) {
         S.stoffer.filter(function (s) { return s.status === "hylde"; }).length === 6);
     S.knap();
     paastand("Giv hint giver hyldens hint", /Maven skal kunne nedbryde maden/.test(S.el.besked.textContent) && S.el.knap.textContent === "Vis svaret");
+    var scener = [];
+    S.laererKoer = function (navn) { scener.push(navn); return NK.SimSkala.prototype.laererKoer.apply(this, arguments); };
     S.knap();
     tik(S, 12);
+    delete S.laererKoer;
+    paastand("efter hylde 2 er hele fanen målt, og Kemichael roser én gang", scener.join() === "faerdig", scener.join());
     paastand("Vis svaret måler resten uden gæt", S.naaet && S.antalMaalt() === 6 && S.denneHylde().every(function (s) { return s.gaet === null; }));
     paastand("knappen går videre til luppen", S.el.knap.textContent === "Videre til luppen →");
     tik(S, 8);
@@ -441,7 +451,7 @@ function koerTest(W) {
     paastand("tæt ved 7 zoomer luppen ikke længere ud, og til sidst er der 10 af hver", zNaer7.join(",") === "8,8,8,8,8" &&
         F.lup.synlige("h3o") === 10 && F.lup.synlige("oh") === 10, zNaer7.join(","));
     tik(F, 2.5);
-    paastand("Kemichael: det er vand nu", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
+    paastand("ved det basiske mål kommer Kemichael ikke (kun en del af fanen)", !(F.laerer.scene && F.laerer.scene.navn === "sig"));
     F.fortynd("syre");
     paastand("en tiende fortynding giver en besked om pladsen", /ikke plads/.test(F.el.besked.textContent) && F.antalFortyndinger("syre") === D.MAKS_GLAS);
     var fejlSide = F.serier.syre.some(function (g) { return g.k > 0 && g.x > Tg.skalaX(lf.skala, 7); });
@@ -474,26 +484,24 @@ function koerTest(W) {
     paastand("Vis svaret på mål 2 fortynder selv til pH 5", F.naaet && F.antalFortyndinger("syre") >= 4);
     F.nr = 0; F.toemBordet(); F.startMaal();
 
-    overskrift("10. Kemichaels præsentation og rundvisningen");
+    overskrift("10. Kemichaels præsentation: ét trin ad gangen (fælles test) og rundvisningen");
     [["fane-skala", S, "skala"], ["fane-lup", L, "lup"], ["fane-fortynd", F, "fortynd"]].forEach(function (x) {
         klik('[data-fane="' + x[0] + '"]');
         var sim = x[1];
-        sim.startIntro(true);
-        tik(sim, 1);
-        paastand(x[2] + ": K viser præsentationen, og knappen Spring over står der",
-            !!(sim.laerer.scene && sim.laerer.scene.navn === "intro") && !d.getElementById(x[2] + "-spring").hidden,
-            (sim.laerer.scene && sim.laerer.scene.navn) + " / vent " + sim.introVent + " / skjult " + d.getElementById(x[2] + "-spring").hidden);
-        sim.springIntro();
-        paastand(x[2] + ": Spring over sender ham ud", sim.laerer.scene && sim.laerer.scene.navn === "introUd");
         tik(sim, 3);
+        /* Laerredet tegnes ogsaa, saa det tegnede (skiltet paa fane 3) har sin plads */
+        NK.Praesentation.selvtest(sim, function (sek) { tik(sim, sek); sim.tegn(); }).forEach(function (r) {
+            paastand(x[2] + ": " + r[0], r[1], r[2]);
+        });
         sim.visTilbud(true); sim.afvisTilbud();
         paastand(x[2] + ": tilbuddet skjules med display: none efter Nej tak", W.getComputedStyle(d.getElementById(x[2] + "-tilbud")).display === "none");
     });
     klik('[data-fane="fane-lup"]');
     L.startIntro(true); tik(L, 0.5);
     L.saetPh(5); tik(L, 0.3);
-    paastand("man kan flytte pH, mens han taler", L.ph === 5 && L.laerer.scene.navn === "intro");
+    paastand("man kan flytte pH, mens han taler", L.ph === 5 && L.laererIIntro());
     L.springIntro(); tik(L, 3);
+    paastand("Esc og Spring præsentationen over sender ham ud", !L.laererIIntro());
     L.nr = 0; L.startMaal();
     var tur = ["#skala-anker-skala", "#skala-anker-stoffer", "#skala-anker-meter", "#skala-anker-baner", "#skala-kort",
         "#lup-anker-skala", "#lup-anker-glas", "#lup-anker-lup", "#lup-anker-zoom", "#lup-maaling", "#lup-kort",

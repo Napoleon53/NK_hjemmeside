@@ -16,7 +16,9 @@
        udstyr i butikken.
      * Er kassen og lageret tomme, laaner banken eleven 200 kr.
 
-   Fabrikken huskes i browseren. Forfra kraever to tryk.
+   Fabrikken huskes i browseren. Forfra (i panelet) kraever to tryk.
+   Efter en levering bliver kortet paa den leverede ordre (blivPaa i
+   fane.js), til eleven trykker Naeste ordre.
    ===================================================================== */
 (function () {
     "use strict";
@@ -207,6 +209,8 @@
     /* ----- Butikken -------------------------------------------------------------------- */
     P.aabnButik = function () {
         if (this.R.auto) return;
+        /* Gaar eleven i butikken, er det videre til naeste ordre */
+        if (this.bliv) this.naesteOrdre();
         this.tjekLaan();
         this.butik.aabn();
     };
@@ -241,12 +245,20 @@
         return o ? o.maal : null;
     };
 
-    P.faerdigNu = function () { return false; };
-    P.knapVidere = function () { return ""; };
-    P.videre = function () { };
+    /* Ordren paa kortet: kunden, stoffet og hvad det skal bruges til */
+    P.ordreHTML = function (o) {
+        o = o || this.ordrer[this.aktiv];
+        if (!o) return "";
+        var s = K.stofEfterNavn(o.maal);
+        var k = D.KUNDER[o.kunde];
+        return NK.html(k.navn) + " vil have " + '<b class="maalnavn">' + NK.html(s ? s.navn : o.maal) + "</b>" +
+            NK.html(D.BRUG[o.maal] ? " " + D.BRUG[o.maal] : "") + ".";
+    };
 
+    /* Et klik paa en ordre i panelet goer ogsaa det samme som Naeste ordre */
     P.vaelgOrdre = function (i) {
-        if (this.aktiv === i) return;
+        if (this.aktiv === i && !this.bliv) return;
+        this.bliv = null;
         this.aktiv = i;
         this.nulstilHjaelp();
         this.visOrdrer();
@@ -292,13 +304,7 @@
             }
             boks.appendChild(kort);
         });
-        var o = this.ordrer[this.aktiv];
-        if (o) {
-            var s = K.stofEfterNavn(o.maal);
-            var k = D.KUNDER[o.kunde];
-            NK.saetHTML("fb-ordrelinje", '<span class="ol-ikon">' + k.ikon + "</span> " + NK.html(k.navn) + " vil have " +
-                '<b class="maalnavn">' + NK.html(s ? s.navn : o.maal) + "</b>" + NK.html(D.BRUG[o.maal] ? " " + D.BRUG[o.maal] : "") + ".");
-        }
+        if (this.el.opgave) this.visOpgave();
         NK.saetTekst("fb-leveret", String(this.leveret));
     };
 
@@ -356,9 +362,10 @@
 
     P.trinLinje = function () {
         var p = this.R.plads, n = (p[0] ? 1 : 0) + (p[1] ? 1 : 0);
+        if (this.R.auto) return "";
         if (!this.R.iKolben && n === 0) {
             var harNoget = Object.keys(this.lager).some(function (id) { return this.lager[id] > 0; }, this);
-            return harNoget ? "Læg to stoffer fra lageret i kolben." : "Køb de to stoffer, ordren skal laves af, i butikken.";
+            return harNoget ? "Læg to stoffer fra lageret i kolben." : "Køb de to stoffer til ordren i butikken.";
         }
         return this.standardTrin(this.leveret === 0);
     };
@@ -466,8 +473,9 @@
         var nyTitel = this.tjen(pris + bonus);
         this.leveret++;
         this.serie++;
-        var html = '<span class="b-maerke stor">Leveret ✓</span> ' + NK.html(tekst + " " + k.navn + " har betalt " + pris + " kr." +
+        var forklaring = NK.html(tekst + " " + k.navn + " har betalt " + pris + " kr." +
             (bonus ? " Serien gav " + bonus + " kr. oveni." : "") + (ekstra || ""));
+        var leveretOrdre = this.ordreHTML(o);
         NK.Fx.moenter(kortEl, NK.el("fb-kasse"), 4 + Math.round(pris / 80));
         NK.Fx.tal(NK.el("fb-kasse"), "+" + (pris + bonus) + " kr", "plus");
         this.ordrer.splice(i, 1, this.nyOrdre());
@@ -475,7 +483,8 @@
         this.nulstilHjaelp();
         this.gem();
         this.R.bygHylde();
-        this.besked(html, "god");
+        /* Kortet bliver paa den leverede ordre, til eleven trykker Naeste ordre */
+        this.blivPaa(leveretOrdre, forklaring);
         this.visAlt();
         this.visOrdrer(i);
         this.visKnap();
@@ -508,6 +517,7 @@
         this.bekraeft = 0;
         e.textContent = "Forfra ↺";
         e.classList.remove("advar");
+        this.bliv = null;
         this.R.nulstil();
         this.R.saetBet(false, false);
         this.nyFabrik();
@@ -521,7 +531,10 @@
         this.visKnap();
     };
 
-    P.enter = function () { this.R.start(); };
+    P.enter = function () {
+        if (this.bliv) { this.naesteOrdre(); return; }
+        this.R.start();
+    };
     P.fokus = function () { };
     P.tilpas = function () { this.R.tilpas(); };
     P.layout = function () { this.R.tilpas(); };

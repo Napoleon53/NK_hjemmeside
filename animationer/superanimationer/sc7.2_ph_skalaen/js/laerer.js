@@ -17,11 +17,17 @@
      laererPladsPx()       hvor laereren stiller sig, i pixels fra venstre
 
    Scener:
-     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil
-     faerdig   fane 1: en hylde er maalt; fane 2: det sidste maal
-     sig       fane 3: syren blev ikke basisk, og det sidste maal
-     aeg       fane 1: et gaet, der rammer inden for 0,1
-   Kaffen staar paa bordet i alle tre faner og er det faelles paaskeaeg.
+     intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil.
+               Ét trin ad gangen med to til fire saetninger: han peger
+               paa det, der blinker, og bliver staaende, til eleven
+               trykker Naeste. Koden er faelles: NK.Praesentation.trin
+               (../kemichael/praesentation.js).
+     faerdig   fane 1: den sidste hylde er maalt; fane 2: det sidste maal
+     sig       fane 3: det sidste maal
+     aeg       fane 1: et gaet, der rammer inden for 0,1 (én gang pr. besoeg)
+   Han kommer kun ind af sig selv, naar en hel fane er gennemfoert, og ved
+   paaskeaegget (brugerens regler 4. nov. 2026). Kaffen staar paa bordet i
+   alle tre faner og er det faelles paaskeaeg.
    ===================================================================== */
 (function () {
     "use strict";
@@ -86,72 +92,6 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen (som sc5.4) ----------------------------------------- */
-    function introTrin(sim, linjer, standX, peg) {
-        var trin = [
-            { kald: function () { sim.introKlikTal = 0; } },
-            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-            { gaa: standX },
-            { tid: 0.2 }
-        ];
-        linjer.forEach(function (l, i) {
-            var v = peg && peg[i];
-            trin.push({ kald: function () { sim.introTrin = i + 1; } });
-            if (v) trin.push({ arm: v, tid: 0.45 });
-            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-            if (v) trin.push({ arm: HAENGER, tid: 0.35 });
-        });
-        return trin.concat([
-            { taleFaerdig: true },
-            { udtryk: { skeptisk: 0, humoer: 0 } },
-            { kald: function () { sim.introTrin = 0; } },
-            { gaa: UDE }
-        ]);
-    }
-
-    /* knapId: knappen Spring praesentationen over paa fanen */
-    function introVaek(P, knapId) {
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(knapId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!L || !L.scene || L.scene.navn !== "intro") return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-    }
-
-    /* Peg paa et punkt i pixels */
-    function pegPaa(sim, punkt) {
-        return function () {
-            var s = sim.laererLaerredSkala(), p = punkt();
-            return p ? sim.pegVinkel(p.x / s, p.y / s) : 0.5;
-        };
-    }
-
     /* Toer ros: han loefter fingeren, nikker og siger replikken */
     function rosTrin(P, replik, udenRos) {
         return [
@@ -205,32 +145,20 @@
         return this.lay ? Math.max(90, this.lay.kop.x + 70) : 150;
     };
 
-    PS.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_SKALA,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: (lay.skala.x0 + lay.skala.x1) / 2, y: lay.skala.y + lay.skala.h / 2 } : null;
-                }),
-                1: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: lay.pladser[3], y: lay.bordY - lay.hi * 0.5 } : null;
-                })
-            }), false);
-    };
-    introVaek(PS, "skala-spring");
+    PS.introLinjer = function () { return D.INTRO_SKALA; };
+    NK.Praesentation.trin(PS);
 
+    /* nr: den hylde, der lige er maalt. Kun den sidste hylde er hele
+       fanen; efter den foerste kommer han ikke. */
     PS.laererFaerdig = function (nr) {
-        if (!this.laerer) return;
-        this.laererKoer("faerdig", rosTrin(PS, D.HYLDE_ROS[nr] || D.HYLDE_ROS[0]), false);
+        if (!this.laerer || nr < D.HYLDER.length - 1) return;
+        this.laererKoer("faerdig", rosTrin(PS, D.ROS_SKALA), false);
     };
 
-    /* Paaskeaegget: et gaet, der rammer inden for 0,1. Én gang pr. besoeg. */
+    /* Paaskeaegget: et gaet, der rammer inden for 0,1. Én gang pr. besoeg,
+       og ikke midt i praesentationen. */
     PS.laererAeg = function () {
-        if (!this.laerer || this.aegVist || this.laerer.scene) return;
+        if (!this.laerer || this.aegVist || this.laerer.scene || this.kmIntro) return;
         this.aegVist = true;
         this.laererKoer("aeg", bemaerkning(PS, D.AEG_PRAECIS), false);
     };
@@ -245,23 +173,8 @@
         return this.lay ? Math.max(90, this.lay.kop.x + 70) : 150;
     };
 
-    PL.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_LUP,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: lay.lup.cx - lay.lup.R * 0.7, y: lay.lup.cy } : null;
-                }),
-                1: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: NK.Tegn.skalaX(lay.skala, mig.ph), y: lay.skala.y + lay.skala.h / 2 } : null;
-                })
-            }), false);
-    };
-    introVaek(PL, "lup-spring");
+    PL.introLinjer = function () { return D.INTRO_LUP; };
+    NK.Praesentation.trin(PL);
 
     PL.laererFaerdig = function () {
         if (!this.laerer) return;
@@ -274,28 +187,25 @@
     vf.fredet = ["sig"];
     kobl(PF, vf);
 
+    /* Under praesentationen staar han midt paa bordet ved pH 8,5. Ude til
+       venstre ville han daekke saltsyren, knappen under den og luppen,
+       som han netop taler om. */
     PF.laererPladsPx = function () {
-        return this.lay ? Math.max(90, this.lay.kop.x + 70) : 150;
+        if (!this.lay) return 150;
+        if (this.kmIntro) return NK.Tegn.skalaX(this.lay.skala, 8.5);
+        return Math.max(90, this.lay.kop.x + 70);
     };
 
-    PF.laererIntro = function () {
-        if (!this.laerer) return;
-        var mig = this;
-        this.laererKoer("intro", introTrin(this, D.INTRO_FORTYND,
-            function () { return mig.laererPlads(); },
-            {
-                0: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay && lay.skilt.h ? { x: lay.skilt.x + 20, y: lay.skilt.y + lay.skilt.h * 0.5 } :
-                        (lay ? { x: NK.Tegn.skalaX(lay.skala, 7), y: lay.skala.y + 10 } : null);
-                }),
-                1: pegPaa(this, function () {
-                    var lay = mig.lay;
-                    return lay ? { x: lay.knapSyre.x + lay.knapSyre.b * 0.6, y: lay.knapSyre.y } : null;
-                })
-            }), false);
+    PF.introLinjer = function () { return D.INTRO_FORTYND; };
+
+    /* Skiltet med "Hvert nyt glas" er tegnet paa laerredet og kun, naar
+       der er plads til det (tegnSkilt i sim_fortynd.js saetter hoejden) */
+    PF.introFelt = function (navn) {
+        var lay = this.lay, s = lay && lay.skilt;
+        if (navn !== "skilt" || !s || !s.h || s.b < 120 || s.y + s.h > lay.bordY - lay.gh * 1.2 - 8) return null;
+        return { x: s.x, y: s.y, b: s.b, h: s.h };
     };
-    introVaek(PF, "fortynd-spring");
+    NK.Praesentation.trin(PF);
 
     /* En replik efter et maal. ros: den sidste, med ros-regnskabet */
     PF.laererReplik = function (tekst, ros) {

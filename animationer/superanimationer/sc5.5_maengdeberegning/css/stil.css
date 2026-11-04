@@ -752,3 +752,54 @@ select:focus-visible {
 }
 
 .knap.hjaelp.peg { animation: knap-peg 1.9s ease-in-out infinite; }
+
+/* ---------------------------------------------------------------------
+   SCENEKORTET (papirkortet, 4. nov. 2026): opgaven, valget paa fane 3,
+   linjen med naeste skridt, fejl og hint, Giv hint og Indsend svar
+   staar paa ét kort oeverst midt i scenen. Udseendet kommer fra
+   ../faelles/papirkort.css; her staar kun pladsen og opbygningen.
+   Tavlen begynder under kortet (kortZone i js/fane.js).
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(900px, calc(100% - 24px));
+}
+
+.sk-tekst { margin: 0; }
+.sk-svar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; margin-left: auto; margin-right: auto; }
+.sk-knap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.98rem;
+    line-height: 1.22;
+    cursor: pointer;
+}
+.sk-knap:disabled { cursor: default; }
+
+.sk-bund { display: flex; align-items: center; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .st-tekst[hidden] { display: none; }
+.sk-bund .st-tekst .broek { font-size: 0.82em; }
+.sk-bund .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 0;
+    font-size: 0.95rem;
+}
+.sk-bund .knap[hidden] { display: none; }
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-bund .knap.indsend { min-width: 150px; }
+.sk-bund.bliv .st-tekst .broek { font-size: 0.82em; }
+
+@media (max-width: 1100px) {
+    .sk-bund .knap.indsend { min-width: 130px; }
+}

@@ -231,51 +231,6 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 11px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.felt.peg { border-color: var(--gul); animation: peg 1.2s ease-out infinite; }
-
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */
@@ -863,8 +818,9 @@ select:focus-visible {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen. Selve
+   praesentationen staar i hans taleboble med Naeste og Spring
+   praesentationen over (../kemichael/praesentation.js og .css). */
 .tilbud {
     position: absolute;
     top: 16px;
@@ -909,25 +865,16 @@ select:focus-visible {
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
 
-/* Paa samlebaandet staar tilbuddet og Spring over nederst i panelet
-   (brugerens valg 27. sept. 2026: i scenen daekkede de hylden) */
+/* Paa samlebaandet staar tilbuddet nederst i panelet
+   (brugerens valg 27. sept. 2026: i scenen daekkede det hylden) */
 .panel-bund { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
 
-.tilbud.i-panel,
-.spring-over.i-panel {
+.tilbud.i-panel {
     position: static;
     transform: none;
     box-shadow: none;
     justify-content: center;
+    white-space: normal;
+    flex-wrap: wrap;
+    border-radius: var(--radius);
 }
-
-.tilbud.i-panel { white-space: normal; flex-wrap: wrap; border-radius: var(--radius); }
-.spring-over.i-panel { width: 100%; white-space: normal; }
-
-@keyframes puf-panel {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: scale(1); }
-    40%  { transform: scale(1.04); }
-    100% { box-shadow: 0 0 0 14px rgba(242, 197, 61, 0); transform: scale(1); }
-}
-
-.spring-over.i-panel.puf { animation: puf-panel 0.7s ease-out 2; }

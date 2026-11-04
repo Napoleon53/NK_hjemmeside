@@ -10,9 +10,9 @@
     var NK = window.NK;
 
     /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. Faneskift og Spring over (stopIntro) skjuler
-       tilbuddet uden at huske det. */
+       præsentation og Nej tak (../kemichael/praesentation.js). Esc er
+       det samme som Nej tak. stopIntro skjuler tilbuddet uden at huske
+       det. */
     if (NK.Laerer) {
         NK.Praesentation.pakInd(NK.Laerer.prototype, {
             tilbud: "tilbud",
@@ -108,8 +108,8 @@
         if (NK.Laerer) {
             laerer = new NK.Laerer(bassin.L);
             NK.laerer = laerer;
-            NK.el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
-            /* Klik paa Kemichael fanges, foer bassinet faar dem */
+            /* Klik paa Kemichael fanges, foer bassinet faar dem. Under
+               praesentationen viser et klik paa ham, hvor Naeste er. */
             bassin.klikFoerst = function (x, y) {
                 return laerer.laererIntroKlik(x, y) || laerer.laererKlik(x, y);
             };

@@ -397,7 +397,6 @@
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
         NK.el("hydron-forfra").addEventListener("click", function () { mig.nulstil(); });
-        NK.el("hydron-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("hydron-pips").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-nr]") : null;
             if (!k || mig.hold || mig.flyv) return;
@@ -640,9 +639,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.1-intro-hydron", tilbud: "hydron-tilbud", spring: "hydron-spring" });
-
-    P.pegPaaFelt = function () {};
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.1-intro-hydron", tilbud: "hydron-tilbud" });
 
     NK.SimHydron = SimHydron;
 }());

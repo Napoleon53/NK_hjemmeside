@@ -409,27 +409,39 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------ */
-    /* Første gang en sværhedsgrad åbnes i en browser. Højst ca. 60 tegn pr.
-       replik og ingen teori. Den linje, der står i PEG, siger han, mens
-       han peger på det, den handler om. */
+    /* Første gang en sværhedsgrad åbnes i en browser, hvis eleven siger ja
+       (../kemichael/praesentation.js og js/laerer.js). Ét trin ad gangen,
+       og eleven trykker Næste. Hvert trin er to til fire hele sætninger i
+       Kemibogens sprog: hvad sværhedsgraden træner, og hvordan tingene
+       bruges. Ingen teori og ingen vittigheder. sel: det på siden, der får
+       en gul ramme (CSS-selectorer); felt: glassene på lærredet ("A" og
+       "B", introFelt i js/laerer.js). */
     D.INTRO = {
         tabel: [
-            "To opløsninger. Blandes de, bytter ionerne partner.",
-            "Slå de nye par op i tabellen til højre.",
-            "Står der T, falder det ud. Jeg holder øje."
+            { tekst: "På sværhedsgraden Let blander du to saltopløsninger og finder ud af, om der dannes et bundfald. Bægerglassene viser ionerne i de to opløsninger. Når glassene bliver hældt sammen, kan ionerne danne nye par.",
+              felt: ["A", "B"] },
+            { tekst: "Reaktionsskemaet på tavlen viser de to salte og deres ioner, og de nye par kommer frem efter pilen. I fældningstabellen står L for letopløseligt og T for tungtopløseligt, og et par med T falder ud som bundfald.",
+              sel: ["#tavle", "#tabelkort"] },
+            { tekst: "Tekstboksen øverst fortæller, hvad du skal gøre. Knappen Slå op i fældningstabellen viser tabellen i stor udgave sammen med skemaet, og dér klikker du på de nye par. Knappen Giv et hint hjælper, hvis du sidder fast.",
+              sel: "#tekstboks" }
         ],
         vaelg: [
-            "Samme opgave. Nu vælger du selv svarene.",
-            "Fire trin. De står i panelet til højre.",
-            "De forkerte svar har jeg rettet før. Mange gange."
+            { tekst: "På sværhedsgraden Middel løser du den samme opgave som på Let, men nu vælger du selv svarene. Opgaven har fire trin, og trinene står i panelet til højre.",
+              sel: "#opgavekort" },
+            { tekst: "Reaktionsskemaet på tavlen bliver bygget op ét trin ad gangen. Når du har fundet ionerne i et salt, kommer ionerne frem i saltets bægerglas. I trinet med bundfaldet klikker du på det tungtopløselige par i fældningstabellen.",
+              sel: "#tavle", felt: ["A", "B"] },
+            { tekst: "Tekstboksen øverst viser spørgsmålet og svarmulighederne. Du vælger et svar og trykker Indsend svar, og et forkert svar får en forklaring. Knappen Giv et hint hjælper, hvis du sidder fast.",
+              sel: "#tekstboks" }
         ],
         skriv: [
-            "Samme opgave. Nu skriver du det hele selv.",
-            "Skriv på tavlen. Tallene sætter sig selv.",
-            "Rødpennen er klar. Den er altid klar."
+            { tekst: "På sværhedsgraden Svær løser du den samme opgave som på Let, men nu skriver du selv ionerne, formlen og ionskemaet. Du skriver i felterne på tavlen, og trinene står i panelet til højre.",
+              sel: ["#tavle", "#opgavekort"] },
+            { tekst: "Skrivefelterne sænker selv tal efter et symbol og retter store og små bogstaver. Et + eller − til sidst bliver til ladningen, så no3- bliver til NO₃⁻. Ladningsknapperne under tavlen sætter ladningen på det felt, du står i.",
+              sel: "#arbejdsbord" },
+            { tekst: "Tekstboksen øverst fortæller, hvad du skal skrive. Knappen Indsend svar tjekker det, du har skrevet, og Enter i et felt gør det samme. Knappen Giv et hint hjælper, hvis du sidder fast.",
+              sel: "#tekstboks" }
         ]
     };
-    D.INTRO_PEG = 1;
 
     /* ----- Forkerte ioner paa niveau 2 --------------------------------------- */
     function ladningsForklaring(ion, S) {

@@ -226,74 +226,10 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .scene > canvas { display: block; width: 100%; height: 100%; }
-.scene.medtekst { padding-bottom: 50px; }
 
-.scene-mrk {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    min-height: 50px;
-    display: block;
-    padding: 15px 20px 10px;
-    background: linear-gradient(to top, rgba(8, 8, 13, 0.97) 60%, rgba(8, 8, 13, 0.6));
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: #dde3ea;
-    text-align: center;
-    pointer-events: none;
-    z-index: 4;
-}
-
-.scene-mrk b { color: #ffffff; }
-
-/* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
+/* Usynlige felter oven paa laerredet, som rundvisningen og Kemichaels
+   praesentation peger paa */
 .anker { position: absolute; pointer-events: none; }
-
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 11px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.felt.peg { border-color: var(--gul); animation: peg 1.2s ease-out infinite; }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -833,8 +769,9 @@ select:focus-visible {
 }
 
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen
+   (../kemichael/praesentation.js). Taleboblen og den gule ramme staar i
+   ../kemichael/praesentation.css. */
 .tilbud {
     position: absolute;
     top: 16px;
@@ -917,8 +854,6 @@ select:focus-visible {
 .vaelger.rigtig  { background-color: rgba(63, 174, 114, 0.25); border-color: var(--groen); color: #b8f0cf; }
 .vaelger.forkert { background-color: rgba(224, 84, 70, 0.2); border-color: var(--roed); color: #f7b9b2; }
 
-#for-valg.peg .vaelger { border-color: var(--gul); animation: peg 1.2s ease-out infinite; }
-
 /* Tabellen med kolbe A og B */
 .ab-tabel { display: flex; flex-direction: column; gap: 3px; }
 
@@ -958,3 +893,71 @@ select:focus-visible {
 }
 
 .felt.formelfelt input { font-family: inherit; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (4. nov. 2026): opgaven staar paa ét kort oeverst midt i
+   scenen, og panelet har intet opgavekort. Udseendet (papir, Lexend,
+   knapperne) staar i ../faelles/papirkort.css; her er kun pladsen og
+   raekkerne. Kortet skal kunne vaere i zonen oeverst (js/scenekort.js,
+   zone), som fanerne saetter af foer tegningen; selvtesten maaler det.
+   Linjen nederst i scenen (scene-mrk) er vaek.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+}
+
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scenekort .sk-knap {
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+.scenekort .sk-knap:disabled { cursor: default; }
+
+.scenekort .sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.scenekort .sk-bund[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.scenekort .sk-bund .st-tekst[hidden] { display: none; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.scenekort .sk-bund .knap[hidden] { display: none; }
+.scenekort .sk-videre { cursor: pointer; font-family: inherit; white-space: nowrap; }
+
+/* Feltet paa kortet (fane 1 og 2): lyst som papiret */
+.scenekort .sk-felt { display: flex; margin-top: 8px; }
+.scenekort .sk-felt .felt { flex: 0 1 460px; min-height: 40px; background-color: #ffffff; border: 1.5px solid #c9c3b3; }
+.scenekort .sk-felt .felt.aktiv { border-color: #2a76ac; }
+.scenekort .sk-felt .felt.aktiv:focus-within { border-color: #2a76ac; box-shadow: 0 0 0 2px rgba(42, 118, 172, 0.25); }
+.scenekort .sk-felt .felt.ok { border-color: #2b7d51; background-color: #e3f3ea; }
+.scenekort .sk-felt .felt.svar { border-color: #c9a640; background-color: #fdf5dc; }
+.scenekort .sk-felt .felt-pre { color: #1d2433; font-weight: 600; }
+.scenekort .sk-felt .felt input { color: #1d2433; font-family: inherit; font-weight: 500; }
+.scenekort .sk-felt .felt input::placeholder { color: #9a9483; }
+.scenekort .sk-felt .felt-efter { color: #5b6170; }
+.scenekort .sk-felt .felt-svar,
+.scenekort .sk-felt .felt-svar b { color: #1f4d35; }
+.scenekort .sk-felt .felt.svar .felt-svar,
+.scenekort .sk-felt .felt.svar .felt-svar b { color: #5a4510; }
+.scenekort .sk-felt .felt-maerke { color: #2b7d51; }
+.scenekort .sk-felt .felt.svar .felt-maerke { color: #a07d1c; }
+
+/* Tilbuddet om Kemichaels praesentation staar nederst, saa det ikke
+   daekker kortet */
+.tilbud { top: auto; bottom: 16px; }
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .scenekort .sk-felt { margin-top: 6px; }
+    .scenekort .sk-felt .felt { min-height: 34px; }
+    .scenekort .sk-felt .felt input { padding: 5px 9px; font-size: 0.95rem; }
+    .scenekort .sk-knap { padding: 6px 9px; font-size: 0.93rem; }
+}

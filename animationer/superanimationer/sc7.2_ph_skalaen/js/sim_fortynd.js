@@ -48,7 +48,6 @@
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.nr = NK.klamp(gemt.maal || 0, 0, D.FORTYND_MAAL.length);
         this.rost = this.nr >= D.FORTYND_MAAL.length;
-        this.sagtBasisk = !!gemt.basisk;
 
         this.bygPanel();
         this.bygTilbud();
@@ -312,11 +311,6 @@
         if (this.afvisTilbud) this.afvisTilbud();
         var gemt = NK.hent(NOEGLE, {}) || {};
         gemt.maal = Math.max(this.nr + 1, gemt.maal || 0);
-        if (m.slags === "basisk" && !this.sagtBasisk) {
-            this.sagtBasisk = true;
-            gemt.basisk = true;
-            this.ventReplik = { t: 1.2, tekst: D.FORTYND_BASISK };
-        }
         NK.gem(NOEGLE, gemt);
         if (this.nr >= D.FORTYND_MAAL.length - 1 && !this.rost) {
             this.rost = true;
@@ -438,7 +432,6 @@
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
         NK.el("fortynd-nulstil").addEventListener("click", function () { mig.nulstil(); });
-        NK.el("fortynd-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.besked = function (html, klasse) {
@@ -727,7 +720,7 @@
             var gy = g.k === 0 ? g.bund - lay.fb * 0.5 : (Tg.baegerOverflade(g.x, g.bund, lay.gw * g.skala, g.fyld) + g.bund) / 2;
             Tg.zoomKegle(ctx, g.x, gy, L.cx, L.cy, L.R);
         }
-        this.lup.tegn(ctx, L.cx, L.cy, L.R, this.tid, { farve: g ? K.farveCss(g.farvePh, 0.1) : null, lys: this.pegLup ? puls : 0 });
+        this.lup.tegn(ctx, L.cx, L.cy, L.R, this.tid, { farve: g ? K.farveCss(g.farvePh, 0.1) : null, lys: 0 });
         NK.tekst(ctx, "1 prik = 1 ion", L.cx, L.cy - L.R - 10, { font: Tg.font("700", NK.klamp(lay.px - 1, 12, 14)), justering: "center", farve: "#c8ced6", kant: true });
         if (g) NK.Lup.taelling(ctx, L.cx, lay.tekstY, L.R, this.lup, NK.klamp(lay.px - 1, 12, 14), lay.W);
 
@@ -735,11 +728,11 @@
         var aabenSyre = !this.spaerret("syre"), aabenBase = !this.spaerret("base");
         Tg.knap(ctx, lay.knapSyre, "Fortynd 10 gange ▸", {
             lys: aabenSyre && this.over && this.over.slags === "knapSyre", slukket: !aabenSyre,
-            puls: (m && aabenSyre && !this.anim && !this.auto) || this.pegKnapper ? puls : 0
+            puls: m && aabenSyre && !this.anim && !this.auto ? puls : 0
         });
         Tg.knap(ctx, lay.knapBase, "◂ Fortynd 10 gange", {
             lys: aabenBase && this.over && this.over.slags === "knapBase", slukket: !aabenBase,
-            puls: (m && aabenBase && !this.anim && !this.auto) || this.pegKnapper ? puls : 0
+            puls: m && aabenBase && !this.anim && !this.auto ? puls : 0
         });
 
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -840,10 +833,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-fortynd", tilbud: "fortynd-tilbud", spring: "fortynd-spring" });
-
-    /* Mens han siger, hvor man trykker, lyser knapperne */
-    P.pegPaaFelt = function (til) { this.pegKnapper = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.2-intro-fortynd", tilbud: "fortynd-tilbud" });
 
     NK.SimFortynd = SimFortynd;
 }());

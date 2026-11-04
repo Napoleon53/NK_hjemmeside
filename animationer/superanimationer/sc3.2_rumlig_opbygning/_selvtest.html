@@ -42,7 +42,8 @@ window.addEventListener("load", function () { setTimeout(koer, 1500); });
 function koer() {
     try { koerTest(); }
     catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
-    skriv("\n" + (antal - fejl) + " af " + antal + " påstande holder." + (fejl ? "" : " Alt ok."), fejl ? "fejl" : "ok");
+    skriv("\n" + (antal - fejl) + " af " + antal + " påstande holder.", fejl ? "fejl" : "ok");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK (" + antal + " påstande)", fejl ? "fejl" : "ok");
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
@@ -159,12 +160,15 @@ function koerTest() {
     var rest = byg.maal.atomer.map(function (a) { return V.laengde(V.minus(byg.disp[a.id], byg.maal.pos[a.id])); });
     paastand("atomerne glider helt på plads", Math.max.apply(null, rest) < 0.01 && (B.kendt(byg.s) || {}).id === "CH3OH");
 
-    overskrift("4. Opgaverne kan løses");
+    overskrift("4. Opgaverne kan løses (Indsend svar)");
+    /* Et svar vaelges kun; Indsend svar sender det ind. Byg-opgaver: svaret
+       stilles op i scenen (visSvar) og sendes ind med Indsend svar. */
     function loestOpgave(sim, o, loes) {
         sim.opgaver.startOpgave(o);
         loes(o);
+        sim.opgaver.indsendKlik();
         sim.opdater(1 / 60);
-        return o.afsluttet && d.getElementById(sim.opgaver.id("knap")).textContent === "Ny opgave";
+        return o.afsluttet && o.maade === "selv" && sim.opgaver.tilstand() === "loest";
     }
     NK.visFane("fane-byg");
     byg.OPGAVER.forEach(function (lav, i) {
@@ -175,6 +179,7 @@ function koerTest() {
         });
         paastand("fane 1, opgave " + (i + 1) + ": " + o.tekst, ok);
     });
+    byg.opgaver.nulstil();
     byg.skiftVinkelmaaler(false);
 
     ["fane-molekyler"].forEach(function (fane) {
@@ -189,11 +194,14 @@ function koerTest() {
                 if (fane === "fane-molekyler" && i === 0) ok = ok && o.valg[o.rigtig] === D.FORMER[mol.form].knap;
                 if (fane === "fane-molekyler" && i === 1) ok = ok && o.valg[o.rigtig] === NK.grader(mol.vinkelGrader);
                 if (fane === "fane-molekyler" && i === 2) ok = ok && o.rigtig === mol.frieAntal[mol.centrum];
-                ok = ok && !sim.menuLaast() && sim.molId() === o.mol;
+                /* Kortet venter paa Naeste: menuen er laast, og molekylet staar */
+                ok = ok && sim.menuLaast() && sim.molId() === o.mol;
                 if (!ok) { alleOk = false; note = o.mol + ": " + o.tekst; break; }
             }
             paastand(fane.replace("fane-", "") + ", opgavetype " + (i + 1) + " (10 tilfældige)", alleOk, note);
         });
+        sim.opgaver.nulstil();
+        paastand("Start forfra låser menuen op igen", !sim.menuLaast());
     });
 
     overskrift("5. Tekster og skrift");
@@ -225,6 +233,7 @@ function koerTest() {
     });
     NK.visFane("fane-byg");
     paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 6).join(", "));
+    papirkortTest(d, W, NK, D, B);
 }
 </script>
 </body>

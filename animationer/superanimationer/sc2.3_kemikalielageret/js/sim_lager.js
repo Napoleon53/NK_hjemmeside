@@ -247,7 +247,6 @@
             nulstil: NK.el("lager-nulstil")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("lager-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
 
         /* Fremskridtet: én linje pr. hylde. Et klik henter det naeste
            uloeste glas fra den hylde. */
@@ -398,7 +397,11 @@
                         (f.status === "aktiv" ? "" : " disabled") + '>↵</button>';
                     var inp = fe.querySelector("input");
                     inp.addEventListener("keydown", function (e) {
-                        if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        /* Under praesentationen er Enter Naeste (feltet har markoeren) */
+                        if (mig.laererIIntro && mig.laererIIntro()) { mig.introNaeste(); return; }
+                        mig.tjek();
                     });
                     inp.addEventListener("input", function () { mig.tast(); });
                     inp.addEventListener("focus", function () { mig.fokuseret = true; });
@@ -580,9 +583,11 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------
-       Foerste gang fanen aabnes i en browser (og igen med K). Knappen Spring
-       praesentationen over, to klik paa ham og Esc sender ham ud. Man kan
-       skrive og klikke paa scenen, mens han taler, uden at han gaar. */
+       Foerste gang fanen aabnes i en browser, staar tilbuddet (js/app.js
+       pakker startIntro ind), og K viser den igen. Selve praesentationen
+       er den faelles (../kemichael/praesentation.js): trinnene staar i
+       hans taleboble med Naeste og Spring praesentationen over. Esc sender
+       ham ud. Man kan skrive og klikke paa scenen, mens han taler. */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
         if (!tving && NK.hent("nk-sc2.3-intro", false)) return;
@@ -595,18 +600,13 @@
         return !!(this.laererIntroVaek && this.laererIntroVaek());
     };
 
+    /* Hvert billede: ventetiden og taleboblen */
     P.opdaterIntro = function (dt) {
         if (this.introVent > 0) {
             this.introVent -= dt;
             if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
         }
-        var iIntro = !!(this.laererIIntro && this.laererIIntro());
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("lager-spring").hidden = !iIntro;
-        }
-        var f = this.aktivtFelt();
-        if (f && f.feltEl) f.feltEl.classList.toggle("peg", iIntro && this.introTrin === 2);
+        if (this.introOpdaterBoble && (this.kmIntro || this.kmBobleAktiv)) this.introOpdaterBoble();
     };
 
     /* Enter uden for et felt: videre til naeste glas, naar det er loest */

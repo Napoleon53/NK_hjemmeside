@@ -85,6 +85,22 @@ Tegningen huskes i browseren (`nk-tegnebraet`; en tegning fra sc4.2 under
 `nk-sc4.2-tegnebraet` hentes, hvis der ikke er en ny). Kemichael tilbyder at
 præsentere (`nk-tegnebraet-intro`), og kaffekoppen i hjørnet er påskeægget.
 
+## Kemichael
+
+**Præsentationen** er den fælles fra 4. nov. 2026 (`../kemichael/praesentation.js`
+og `praesentation.css`): tre trin (`D.INTRO_TEGN` i `js/data.js`) med to til tre
+hele sætninger hver, om tavlen og startpunktet, kortene Tegn med og Skriv et navn
+og til sidst kortet Molekyler på tavlen med Kopiér billede og Gem som SVG. Han
+peger på det, der blinker med en gul ramme (startpunktet findes af `introFelt` i
+`js/laerer.js`). Taleboblen har Næste (på sidste trin Afslut) og Spring
+præsentationen over; Enter og pil til højre er Næste, Esc springer over, og han
+går aldrig videre af sig selv. Tilbuddet Start præsentation / Nej tak kommer første
+gang, og K viser den igen.
+
+**Af sig selv** kommer han aldrig: tegnebrættet har ingen opgaver at gennemføre.
+Han kommer kun, når eleven klikker på ham eller på kaffekoppen (de fælles
+replikker i `../kemichael/superanimation.js`).
+
 ## Filer
 
 ```
@@ -94,8 +110,7 @@ js/kerne.js         NK-navnerum, tekst, tal, laerred (samme som sc4.2)
 js/data.js          Kemichaels præsentation og linjen under scenen
 js/fane.js          rammen: lærredet, tavlen, musen, beskeder, kaffekoppen
 js/sim_tegn.js      tegnebrættet: panelet, navn til tegning, billedet, skuffen
-js/laerer.js        Kemichael (samme som i sc4.2)
-js/praesentation.js tilbuddet om præsentationen (ens i alle mapper)
+js/laerer.js        Kemichael og hans præsentation (fælles kode i ../kemichael/)
 js/rundvisning.js   rundvisningen bag ?
 js/sprites.js       lageret til Kemichaels sprites
 js/app.js           opstart, tastatur, tegneløkken, #klister=
@@ -116,7 +131,7 @@ piletasterne flytter udsnittet, + og − zoomer, 0 viser alt. Esc lukker det, de
   `../../molekylemotor/README.md`.
 * **Grundene til, at et molekyle ikke får navn,** står i `GRUND` øverst i
   `js/sim_tegn.js`.
-* **Kemichaels replikker** står i `js/data.js`.
+* **Kemichaels præsentation** står i `js/data.js`.
 
 ## Selvtest
 

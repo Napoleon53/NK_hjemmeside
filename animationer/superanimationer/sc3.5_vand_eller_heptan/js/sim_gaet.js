@@ -348,9 +348,8 @@
             this.plan = null;
             return;
         }
-        var intro = this.laererIIntro && this.laererIIntro() && this.introTrin === 2;
         var spoerg = this.fase === "grp" && this.antalMarkeret() === 0;
-        var lys = intro || spoerg ? 0.5 + 0.5 * Math.sin(this.tid * 5) : 0;
+        var lys = spoerg ? 0.5 + 0.5 * Math.sin(this.tid * 5) : 0;
         T.kort(ctx, lay.kort, s, { lys: lys });
         this.plan = M.plan(this.mol, lay.formel, 46);
         var facit = this.fase === "test2" || this.fase === "faerdig";
@@ -419,10 +418,7 @@
     };
 
     /* ----- Panelet: runden og de sorterede stoffer ------------------------------------- */
-    P.bygPanel = function () {
-        var mig = this;
-        NK.el("gaet-spring").addEventListener("click", function () { mig.springIntro(); });
-    };
+    P.bygPanel = function () {};
 
     P.visPanel = function () {
         NK.saetTekst("gaet-point", String(this.point));
@@ -461,9 +457,7 @@
     P.fokus = function () {};
 
     /* ----- Kemichaels praesentation ----------------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc3.5-intro-gaet", tilbud: "gaet-tilbud", spring: "gaet-spring" });
-
-    P.pegPaaFelt = function () {};
+    NK.Praesentation.kobl(P, { noegle: "nk-sc3.5-intro-gaet", tilbud: "gaet-tilbud" });
 
     NK.SimGaet = SimGaet;
 }());

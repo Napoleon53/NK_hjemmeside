@@ -40,7 +40,6 @@
         this.g = { kaffekop: { skjult: false, iHaand: false } };
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.maalNr = Math.max(0, Math.floor(gemt.maal || 0));
-        this.rost = this.maalNr >= O.MAAL.length;
         this.sidstP = {};
         this.hjaelp = 0;
         this.naaet = false;
@@ -311,10 +310,6 @@
         var o = this.opg;
         if (this.naaet) {
             this.maalNr++;
-            if (this.maalNr >= O.MAAL.length && !this.rost) {
-                this.rost = true;
-                this.ventRos = 1.0;
-            }
             this.nyOpgave();
             return;
         }
@@ -361,7 +356,6 @@
             kort: NK.el("vaegt-kort")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("vaegt-spring").addEventListener("click", function () { mig.springIntro(); });
     };
 
     P.besked = function (html, klasse) {
@@ -444,10 +438,6 @@
             this.visMaaling();
             this.tjekMaal();
         }
-        if (this.ventRos > 0) {
-            this.ventRos -= dt;
-            if (this.ventRos <= 0 && this.laererFaerdig) this.laererFaerdig();
-        }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
     };
@@ -479,7 +469,7 @@
             var over = mig.over && mig.over.slags === "krukke" && mig.over.i === i;
             Tg.krukke(ctx, kr.x, kr.y, lay.krukkeH, st, {
                 valgt: !!paaTal[st.s],
-                lys: over || mig.pegHylde,
+                lys: over,
                 fremhaev: mig.fremhaeves(st) ? puls : 0
             });
         });
@@ -646,10 +636,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-vaegt", tilbud: "vaegt-tilbud", spring: "vaegt-spring" });
-
-    /* Mens han siger, at man skifter stof paa hylden, lyser krukkerne */
-    P.pegPaaFelt = function (til) { this.pegHylde = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-vaegt", tilbud: "vaegt-tilbud" });
 
     NK.SimVaegt = SimVaegt;
 }());

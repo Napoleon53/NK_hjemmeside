@@ -834,7 +834,7 @@
         this.status(this.hjaelp && this.m.grupper.length ? S.oploesHint : S.oploesStart);
     };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-oploeselighed", tilbud: "op-tilbud", spring: "op-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-oploeselighed", tilbud: "op-tilbud" });
 
     NK.SimOploes = SimOploes;
 }());

@@ -843,10 +843,16 @@ function koerTest(W) {
     tekst = tekst.replace(/[–—](?=[A-Z(=])/g, "");
     paastand("ingen tankestreger (– og —)", !/[–—]/.test(tekst), (tekst.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
     paastand("ingen 1+ eller 1−", !/\b1[+−-]\s/.test(tekst));
-    var lange = NK.Data.INTRO_TEGN.filter(function (x) { return x.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    /* Brugerens regler 4. nov. 2026: han taler formelt og siger mere ad gangen */
+    var lange = NK.Data.INTRO_TEGN.filter(function (x) { var n = x.tekst.split(/[.?] /).length; return x.tekst.length > 420 || n < 2 || n > 4; });
+    paastand("hvert trin i præsentationen er to til fire sætninger (højst 420 tegn)", lange.length === 0, lange[0] && lange[0].tekst);
     var noter = rund.slice(0, 40).map(function (nv) { return NL.laes(nv).note || ""; }).concat(FEJLNAVNE.map(function (v) { return NL.laes(v[0]).fejl || ""; }));
     paastand("noterne og beskederne har ingen tankestreger", !noter.some(function (x) { return /[–—]/.test(x); }));
+
+    overskrift("14b. Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    NK.Praesentation.selvtest(T, function (sek) {
+        for (var n = 0; n < Math.round(sek * 60); n++) { T.tilpas(); T.opdater(1 / 60); T.tegn(); }
+    }).forEach(function (r) { paastand(r[0], r[1], r[2]); });
 
     overskrift("15. Layout");
     var ramme = document.getElementById("ramme");

@@ -271,25 +271,37 @@ function koer() {
         paastand("første gang titelskærmen vises, står der Start præsentation og Nej tak, og han kommer ikke af sig selv",
             !tilbud.hidden && !lr.laererIIntro() && !(lr.introVent > 0));
         tilbud.querySelector(".tilbud-start").click();
-        korL(1.5);
-        paastand("Start præsentation: han går ind, og knappen Spring over kommer frem",
-            lr.laererIIntro() && !d.getElementById("spring-over").hidden);
-        korL(6);
-        paastand("han peger på opsætningen, som lyser op", d.getElementById("opsaetning").classList.contains("peg") || lr.introTrin >= 2);
-        korL(14);
-        paastand("han går af sig selv, og knappen forsvinder", !lr.laererIIntro() && d.getElementById("spring-over").hidden
-            && !d.getElementById("opsaetning").classList.contains("peg"));
+        korL(2.5);
+        var jb = d.getElementById("laerred-boble");
+        paastand("Start præsentation: han går ind, og taleboblen med Næste og Spring præsentationen over kommer frem",
+            lr.laererIIntro() && !!jb && !jb.hidden && !!jb.querySelector(".km-naeste") && !!jb.querySelector(".km-spring"));
+        korL(25);
+        paastand("han går ikke af sig selv (25 s)", lr.laererIIntro() && lr.introStatus().nr === 0 && !jb.hidden);
+        jb.querySelector(".km-spring").click(); korL(2);
         A.fortsaet(); A.visTitel(); korL(1.5);
         paastand("anden gang præsenterer han ikke igen", !lr.laererIIntro());
-        tast("k", "KeyK"); korL(1);
+        tast("k", "KeyK"); korL(2.5);
         paastand("K viser præsentationen igen", lr.laererIIntro());
         tast("Escape", "Escape"); korL(0.2);
-        paastand("Esc sender ham ud", !lr.laererIIntro());
-        lr.startIntro("titel", true); korL(1);
-        d.getElementById("spring-over").click(); korL(0.2);
-        paastand("Spring over sender ham ud", !lr.laererIIntro());
-        var lange = D.INTRO.titel.filter(function (l) { return l.length > 60; });
-        paastand("tre replikker på højst 60 tegn", D.INTRO.titel.length === 3 && lange.length === 0, lange.join(" | "));
+        paastand("Esc sender ham ud", !lr.laererIIntro() && jb.hidden);
+        /* Den faelles test kalder startIntro(tving); her tager den (skaerm, tving) */
+        korL(3);
+        var startIntro = lr.startIntro;
+        lr.introId = "titel";
+        lr.startIntro = function (tving) { return startIntro.call(this, "titel", tving); };
+        NK.Praesentation.selvtest(lr, korL).forEach(function (r) { paastand("fælles test: " + r[0], r[1], r[2]); });
+        delete lr.startIntro;
+        lr.startIntro("titel", true); korL(2.5);
+        A.fortsaet(); korL(0.5);
+        paastand("titelskærmen forlades (Fortsæt spillet): han går ud, og boblen forsvinder", !lr.laererIIntro() && jb.hidden);
+        A.visTitel(); korL(0.5);
+        paastand("den gamle knap Spring præsentationen over er væk", !d.getElementById("spring-over"));
+        var introFejl = D.INTRO.titel.filter(function (l) {
+            var n = l.tekst.split(/[.?] /).length;
+            return l.tekst.length > 420 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst);
+        });
+        paastand("to til fire trin, hvert med to til fire hele sætninger (højst 420 tegn)",
+            D.INTRO.titel.length >= 2 && D.INTRO.titel.length <= 4 && introFejl.length === 0, introFejl[0] && introFejl[0].tekst);
         A.fortsaet();
     }
 
@@ -301,7 +313,7 @@ function koer() {
         QZ.runder.forEach(function (R) { R.kategorier.forEach(function (K) { tekster.push(ren(K.navn)); K.felter.forEach(function (x) { tekster.push(ren(x.ledetraad), ren(x.svar)); }); }); });
         tekster.push(QZ.final.kategori, QZ.final.ledetraad, QZ.final.svar);
     });
-    tekster = tekster.concat(D.INTRO.titel);
+    tekster = tekster.concat(D.INTRO.titel.map(function (l) { return l.tekst; }));
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
     paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−,])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);

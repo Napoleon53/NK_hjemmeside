@@ -63,7 +63,6 @@
         this.hjaelp = 0;
         this.aflaest = null;
         this.info = null;
-        this.bemMork = false;
         this.bemTom = false;
         this.lup.nulstil();
         this.kurve.nulstil();
@@ -133,10 +132,6 @@
         if (v < this.vAek && this.skyer.length < 40) {
             this.skyer.push({ u: NK.r(-0.15, 0.15), w: 0, alder: 0, liv: 0.35 + 2.4 * naer * naer, retning: Math.random() < 0.5 ? -1 : 1 });
         }
-        if (this.forbi() > 1.0 && !this.bemMork) {
-            this.bemMork = true;
-            if (this.laererReplik) this.laererReplik(D.BEM_MORK);
-        }
     };
 
     /* ----- Tegneloekken: draaberne ------------------------------------------------------ */
@@ -160,7 +155,7 @@
                 this.a = 0;
                 if (!this.bemTom) {
                     this.bemTom = true;
-                    if (this.laererReplik) this.laererReplik(D.BEM_TOM, true);
+                    if (this.laererReplik) this.laererReplik(D.BEM_TOM);
                 }
             } else {
                 this.acc += FART * this.a * this.a * dt;
@@ -280,7 +275,6 @@
             felt: NK.el("tit-felt")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("tit-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("tit-nulstil").addEventListener("click", function () { mig.nulstil(); });
         NK.el("tit-tabelknap").addEventListener("click", function () { mig.aabnTabel(); });
         NK.el("tabel-trin").addEventListener("change", function () { mig.fyldTabel(); });
@@ -547,7 +541,7 @@
         var lukNu = this.fase === "titrer" && this.a > 0 && this.lyserod();
         Tg.skyder(ctx, lay.skyder, this.a, DRYP, {
             lys: this.over && this.over.slags === "skyder" || !!this.traek,
-            puls: vent || lukNu || this.pegHane ? puls : 0
+            puls: vent || lukNu ? puls : 0
         });
         Tg.pilleKnap(ctx, lay.draabe, "1 dråbe", {
             lys: this.over && this.over.slags === "draabe",
@@ -671,10 +665,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-titrering", tilbud: "tit-tilbud", spring: "tit-spring" });
-
-    /* Mens han siger, hvad man goer, banker skyderen */
-    P.pegPaaFelt = function (til) { this.pegHane = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-titrering", tilbud: "tit-tilbud" });
 
     NK.SimTitrering = SimTitrering;
 }());

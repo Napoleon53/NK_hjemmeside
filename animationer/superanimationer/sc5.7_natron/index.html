@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Natron i diglen</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Natron i diglen</h1>
@@ -36,18 +37,21 @@
         <div class="anker" id="forsoeg-anker-zoom"></div>
         <div class="anker" id="forsoeg-anker-graf"></div>
         <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny digel med natron (R)">Start forfra ↺</button>
+        <!-- Kortet oeverst midt i scenen: opgaven, gaettet eller spoergsmaalet,
+             svarene, hint, forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="forsoeg-kort">
+            <div class="sk-hoved"><span class="sk-chip" id="forsoeg-titel">Opgave</span></div>
+            <div class="sk-prompt" id="forsoeg-prompt"></div>
+            <div class="sk-valg" id="forsoeg-valg" hidden></div>
+            <div class="sk-bund">
+                <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="forsoeg-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Videre -->
-        <div class="kort opgavekort" id="forsoeg-kort">
-            <h2><span id="forsoeg-titel">Opgave</span></h2>
-            <div id="forsoeg-prompt"></div>
-            <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
-            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="forsoeg-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="forsoeg-skema">
             <h2>Vejningerne</h2>
             <table class="skema vejeskema">
@@ -67,16 +71,25 @@
         <canvas id="hypoteser-laerred"></canvas>
         <div class="anker" id="hypoteser-anker-tavle"></div>
         <div class="anker" id="hypoteser-anker-graf"></div>
+        <!-- Kortet oeverst midt i scenen: opgaven, gaettet eller spoergsmaalet,
+             svarene, hint, forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="hypoteser-kort">
+            <div class="sk-hoved"><span class="sk-chip" id="hypoteser-titel">Opgave</span><span class="sk-nr">opgave <b id="hypoteser-nr">1</b> af <span id="hypoteser-antal">5</span></span></div>
+            <div class="sk-prompt" id="hypoteser-prompt"></div>
+            <div class="sk-valg" id="hypoteser-valg" hidden></div>
+            <div class="sk-bund">
+                <p class="besked" id="hypoteser-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="hypoteser-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="hypoteser-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="hypoteser-kort">
-            <h2><span id="hypoteser-titel">Opgave</span><span class="taeller">opgave <b id="hypoteser-nr">1</b>/<span id="hypoteser-antal">5</span></span></h2>
-            <div id="hypoteser-prompt"></div>
+        <!-- Regnestykket: felterne, eleven skriver i. Opgaven, linjen og knapperne staar paa kortet i scenen -->
+        <div class="kort regnekort" id="hypoteser-regn">
+            <h2>Regnestykket</h2>
             <div class="raekker" id="hypoteser-raekker"></div>
-            <div class="knaprad valgrad" id="hypoteser-valg" hidden></div>
-            <p class="besked" id="hypoteser-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="hypoteser-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="hypoteser-opgaver">
@@ -96,17 +109,21 @@
         <div class="anker" id="fejl-anker-g1"></div>
         <div class="anker" id="fejl-anker-g2"></div>
         <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
+        <!-- Kortet oeverst midt i scenen: opgaven, gaettet eller spoergsmaalet,
+             svarene, hint, forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="fejl-kort">
+            <div class="sk-hoved"><span class="sk-chip" id="fejl-titel">Opgave</span><span class="sk-nr">opgave <b id="fejl-nr">1</b> af <span id="fejl-antal">6</span></span></div>
+            <div class="sk-prompt" id="fejl-prompt"></div>
+            <div class="sk-valg" id="fejl-valg" hidden></div>
+            <div class="sk-bund">
+                <p class="besked" id="fejl-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fejl-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="fejl-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="fejl-kort">
-            <h2><span id="fejl-titel">Opgave</span><span class="taeller">opgave <b id="fejl-nr">1</b>/<span id="fejl-antal">6</span></span></h2>
-            <div id="fejl-prompt"></div>
-            <div class="knaprad valgrad" id="fejl-valg" hidden></div>
-            <p class="besked" id="fejl-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="fejl-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="fejl-resultat">
             <h2>Resultaterne</h2>
             <table class="skema tal" id="fejl-tabel">
@@ -198,6 +215,7 @@
 <script src="js/tjek.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_forsoeg.js"></script>

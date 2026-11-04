@@ -57,9 +57,24 @@ C₅H₁₂, C₆H₁₄ og C₇H₁₆. Samme navn er samme stof, bare tegnet a
 plads i listen ryster. Alle formler kan vælges (i den gamle var de låst).
 
 Fane 1-3 har én knap i opgavekortet: Giv hint → Vis svaret → Næste molekyle.
-Tegningen tjekkes af sig selv, når alle C-atomer er brugt. Kemichael tilbyder at
-præsentere hver fane (Start præsentation / Nej tak) og roser, når en serie er
-klaret.
+Tegningen tjekkes af sig selv, når alle C-atomer er brugt.
+
+**Kemichael** tilbyder at præsentere hver fane (Start præsentation / Nej tak,
+<kbd>K</kbd> igen). Præsentationen er den fælles fra 4. nov. 2026
+(`../kemichael/praesentation.js`, reglerne i `../kemichael/README.md`): tre trin
+pr. fane med to til fire hele sætninger, en taleboble med Næste og Spring
+præsentationen over, og en gul ramme om det, han peger på (knapperne i
+panelet, papiret, kortene eller kassen om det, der er tegnet på tavlen). På
+Zigzag er trin 2 forskelligt i de to retninger. På Opløselighed står han under
+præsentationen til højre for etiketterne heptan og vand.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret (`D.ROS`):
+på Zigzag, Navne og Isomerer, når fanens sidste klistermærke bliver låst op, og
+på Opløselighed, når hele bunken er sorteret (`oploes` med højst tre viste
+svar, ellers `oploesVist`). Han roser ikke en enkelt serie eller et enkelt
+isomer-niveau; klistermærket og vinduet fra skuffen er rosen dér. Under
+præsentationen venter rosen, til han er færdig. Kaffekoppen er det fælles
+påskeæg.
 
 Kæder tegnes ved at trække fra et atom, eller ved at klikke på enden: hvert klik
 gør kæden ét C længere og fortsætter zigzaggen. Et startpunkt har en lille
@@ -92,7 +107,8 @@ med antallet af polære grupper; under 4 opløses stoffet i vand, over 4 i hepta
   har set, først. Prikkerne er grønne (rigtigt), gule (vist) og røde (forkert); et
   klik viser molekylet, regnestykket og det lag, eleven valgte. Point: 100, 70 med
   hint, 0 for et vist svar. Rekorden huskes (`nk-sc4.2-oploeselighed-rekord`).
-  Hele bunken med højst tre viste svar giver stor konfetti og ros fra Kemichael.
+  Hele bunken med højst tre viste svar giver stor konfetti og ros fra Kemichael;
+  med flere viste svar siger han noget andet.
   Fanen giver ikke et klistermærke.
 
 Fra den gamle 6.5 er alle 17 molekyler med, med samme svar, samme regel (4 C pr.
@@ -113,10 +129,15 @@ kommer med i billedet: kaffekoppen, gloøjne, festhatten, Bunsen (kaktussen),
 overskægget, stemplet "Godkendt af Michael", chipsposen, navneskiltet med "KE",
 øjenbrynet fra 1994 og til sidst Kemichael selv (C₇H₁₆). En serie tæller, når
 højst tre svar er vist; et isomer-niveau, når højst halvdelen er vist. Ellers
-siger Kemichael, at skuffen kun åbner for dem, der selv svarer.
+åbner skuffen sig ikke, og opgavekortets besked slutter med kravet
+(`D.KLISTER_KRAV`): "Serien er klaret, men klistermærket kræver, at du højst
+har set tre af svarene." eller "Isomererne af C₅H₁₂ er fundet, men
+klistermærket kræver, at du højst har set halvdelen af svarene." Kemichael kommer kun, når fanens sidste klistermærke er
+låst op (se ovenfor); klistermærkernes egne replikker i
+`../../molekylemotor/js/klistermaerker.js` bliver ikke sagt længere.
 
 Et rigtigt svar giver en lille konfetti. En klaret quiz giver stor konfetti over
-tavlen, Kemichael med en replik om klistermærket og et vindue med det og knappen
+tavlen og et vindue med klistermærket og knappen
 **Prøv den på tegnebrættet ↗**, der åbner tegnebrættet i en ny fane med
 klistermærket klar (`../tegnebraet/index.html#klister=kaffekop`). Quizzen bliver
 stående. Det, der er låst op, huskes i browseren under `nk-skuffe`, som begge
@@ -150,8 +171,8 @@ js/sim_navne.js       fane 2
 js/sim_isomerer.js    fane 3
 js/oploeselighed.js   fane 4: molekylerne, de polære grupper og reglen om 4 C
 js/sim_oploeselighed.js  fane 4: spillet, bægerglasset og panelet
-js/laerer.js          Kemichael på alle fire faner
-js/praesentation.js   tilbuddet om præsentationen (ens i alle mapper)
+js/laerer.js          Kemichael på alle fire faner (præsentationen er fælles:
+                      ../kemichael/praesentation.js og praesentation.css)
 js/rundvisning.js     rundvisningen bag ?
 js/sprites.js         lageret til Kemichaels sprites (animationen har ingen egne)
 js/app.js             faneskift, teori, tastatur, tegneløkken
@@ -202,10 +223,11 @@ molekylformel og molarmasse, seks serier af hvert sværhedstrin, tjekkets besked
 ved de typiske fejl, tavlens regler på quizfanerne, at alle fire faner kan
 gennemføres, klistermærkerne (også at vinduet åbner tegnebrættet med det nye
 klistermærke), opløselighedsspillet (reglen giver de 17 svar fra den gamle 6.5,
-bunken er blandet rigtigt, point, liv, grænsetilfælde, træk og klik), sproget og
-layoutet fra 520 × 380 til 1500 × 900. Slutlinjen skal være ALT OK
-(25. september 2026: 105 påstande). Tegnebrættet og resten af motoren testes i
-`../tegnebraet/_selvtest.html`.
+bunken er blandet rigtigt, point, liv, grænsetilfælde, træk og klik),
+Kemichaels præsentation på alle fire faner (den fælles test i
+`../kemichael/praesentation.js`), sproget og layoutet fra 520 × 380 til
+1500 × 900. Slutlinjen skal være ALT OK (4. november 2026: 174 påstande).
+Tegnebrættet og resten af motoren testes i `../tegnebraet/_selvtest.html`.
 
 ## I menuen
 

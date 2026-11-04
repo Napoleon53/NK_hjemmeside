@@ -78,18 +78,30 @@ så den samme runde ikke starter igen; <kbd>R</kbd> starter forfra.
 **Det harske smør** (påskeæg, fane 2). Står smørret 12 sekunder i solen, går
 der tre uger: vand spalter noget af fedtet, der dannes smørsyre (grønne
 stanklinjer, frie fedtsyrer og smørsyre i zoomvinduet), og Kemichael kommer:
-"Smørsyre. Nu lugter køkkenet af surströmming." Han sætter nyt smør på bordet
-og går. Det tæller i hans regnskab over uheld. Kemichael antyder det i
-præsentationen ("Lad ikke smørret stå i solen. Tro mig.").
+"Smørret er blevet harskt, og der er dannet smørsyre. Nu lugter køkkenet af
+surströmming." Han sætter nyt smør på bordet ("Det nye smør hører til i
+køleskabet.") og går. De næste gange siger han en af `D.HARSK_IGEN`. Det tæller
+i hans regnskab over uheld. Præsentationen nævner ikke påskeægget.
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`): fabrikken tre replikker (han peger på panelet og
-glycerol), køkkenet tre (han peger på køleskabet og zoomvinduet). Han går
-kun ved den store knap, to klik på ham eller Esc. <kbd>K</kbd> viser
-præsentationen igen. Ellers roser han efter fem ordrer ("Fem ordrer
-leveret. Det glider.") og efter hvorfor ("Du har styr på køkkenet. Mere end
-jeg har."), men kun første gang i browseren. Kaffekoppen på fane 1 er det
-fælles påskeæg.
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles fra 4. nov. 2026 (`../kemichael/praesentation.js`,
+reglerne i `../kemichael/README.md`): tre trin pr. fane med to til fire hele
+sætninger, en taleboble med Næste og Spring præsentationen over, og en gul
+ramme om det, han peger på. Han går aldrig videre af sig selv. <kbd>K</kbd>
+viser præsentationen igen. Under præsentationen står han mellem
+fedtsyrernes ender og glasset på fane 1 og foran køleskabet på fane 2, og han
+går lidt raskere ind. På fane 1 står han altid bag bordet: bordkanten og
+fliserne tegnes oven på ham, så fedtsyrerne ikke er skjult bag hans ben.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret (begge kun
+første gang i browseren), og ved det harske smør:
+
+* fane 1, alle fem ordrer er leveret: "Du har leveret alle fem ordrer, og
+  fabrikken kører som smurt."
+* fane 2, hvorfor er besvaret: "Du har bedre styr på køkkenet, end jeg har."
+
+Under præsentationen venter rosen, til han er færdig, og det harske smør
+bliver skiftet uden ham. Kaffekoppen på fane 1 er det fælles påskeæg.
 
 Direkte link: `index.html#koele`.
 
@@ -129,10 +141,10 @@ js/fedt.js          smeltepunkterne, kæderne og NK.Proeve (molekylerne i zoomvi
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, formlerne, fliserne, glasset, køleskabet, vinduet,
                     skiltene og zoomvinduet
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_fabrik.js    fane 1
 js/sim_koele.js     fane 2
-js/laerer.js        Kemichael på begge faner og det harske smør
+js/laerer.js        Kemichael på begge faner og det harske smør (præsentationen
+                    er fælles: ../kemichael/praesentation.js og praesentation.css)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -162,11 +174,12 @@ fedtstoffer er faste og flydende de rigtige steder og passer med opgavernes
 svar, at zoomvinduet har det rigtige antal faste molekyler (dem med det
 højeste smeltepunkt) og holder de flydende inde, at begge faner kan
 gennemføres (med musen: klik og træk på fliser, byt, tag af, træk et glas i
-køleskabet), at det harske smør og Kemichael virker, at sproget holder
-reglerne, og at layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en
-lokal server eller Chrome med `--allow-file-access-from-files` og lægger
-elevens gemte fremskridt tilbage bagefter. Sidst kørt 24. september 2026: ALT
-OK (99 påstande).
+køleskabet), at det harske smør og Kemichael virker, at Kemichaels
+præsentation virker på begge faner (den fælles test i
+`../kemichael/praesentation.js`), at sproget holder reglerne, og at layoutet
+holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome
+med `--allow-file-access-from-files` og lægger elevens gemte fremskridt
+tilbage bagefter. Sidst kørt 4. november 2026: ALT OK (129 påstande).
 
 ## Forenklinger
 

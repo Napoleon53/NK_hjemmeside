@@ -173,7 +173,6 @@
             valg: NK.el("for-valg")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("for-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("for-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
@@ -408,9 +407,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-forbrug", tilbud: "for-tilbud", spring: "for-spring" });
-
-    P.pegPaaFelt = function (til) { this.el.valg.classList.toggle("peg", !!til); };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc7.4-intro-forbrug", tilbud: "for-tilbud" });
 
     NK.SimForbrug = SimForbrug;
 }());

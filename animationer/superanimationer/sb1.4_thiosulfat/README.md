@@ -151,16 +151,17 @@ index.html            toplinje, tre faner, teori og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js           NK-navnerum, tal med komma, NK.bet og NK.laesTal, canvas
 js/model.js           kemien: blandinger, hastigheden, forløbet og krydset
-js/data.js            Kemichaels replikker, blandingerne og opgaverne
+js/data.js            Kemichaels præsentation, blandingerne og opgaverne
 js/sprites.js         lageret til udstyret og Kemichaels sprites
-js/praesentation.js   tilbuddet Start præsentation / Nej tak (samme fil som sc1.2)
 js/opgave.js          opgavekortet med den ene knap (som sb1.1) og quizzen på fane 1
 js/glas.js            tegningen: bord, papir, glas, måleglas, termometer, krydset oppefra, stopur, akser
 js/raekke.js          det, fane 2 og 3 deler: forsøg med ur, der stopper selv, og grafens punkter
 js/sim_kryds.js       fane 1
 js/sim_konc.js        fane 2
 js/sim_temp.js        fane 3
-js/laerer.js          Kemichaels præsentation af hver fane
+js/laerer.js          Kemichael på hver fane: hvor han står, og det tegnede, han
+                      peger på (præsentationen er fælles:
+                      ../kemichael/praesentation.js og .css)
 js/rundvisning.js     rundvisningen bag ?
 js/app.js             faneskift, tastatur, tegneløkke
 sprites/              bægerglas (100 mL), måleglas (10 mL) og termometer
@@ -186,17 +187,27 @@ opgaver har præcis ét rigtigt svar, at quizzens tal er forsøgets, scenens
 opstilling og forløbet på fane 1 med knap, klik og træk, tidlige og sene tryk,
 quizzen (forkert svar kommer igen, nye tal, fejringen, Videre til Koncentration),
 tabellens svar på de typiske fejl på fane 2, fane 3, Kemichaels tilbud og
-præsentation og sproget. 5. okt. 2026: ALT OK.
+præsentation (den fælles test, `NK.Praesentation.selvtest`, på alle tre faner)
+og sproget. 4. nov. 2026: ALT OK.
 
 ## Kemichael
 
-Kemichael præsenterer hver fane med tre replikker (`D.INTRO` i `js/data.js`) og
-peger under anden replik på kortet i panelet, som lyser op. Han kommer ikke af sig
-selv: første gang en fane åbnes, står der Start præsentation og Nej tak. Valget
-huskes under `nk-sb1.4-intro-kryds`, `-konc` og `-temp`. Tilbuddet forsvinder
-også, når eleven er gået i gang (syren er hældt i, et tal er rigtigt, eller en
-opgave er løst). K viser præsentationen igen. Mønsteret er det samme som i sc1.2
-(`NK.Praesentation.kobl`), og figuren kommer fra `../../v2/kemichael/kemichael.js`.
+Kemichael præsenterer hver fane, når eleven beder om det (`D.INTRO` i
+`js/data.js`). Præsentationen er den fælles fra 4. nov. 2026
+(`../kemichael/praesentation.js`): fire trin på fane 1 og tre på fane 2 og 3,
+hvert med to til fire hele sætninger, en taleboble med Næste og Spring
+præsentationen over, og en gul ramme om det, han peger på. Det tegnede på
+lærredet (glasset med måleglasset, krydset set oppefra, uret og grafen) finder
+`introFelt` i `js/laerer.js`. Under præsentationen står han på fane 1 lige til
+højre for måleglasset og på fane 2 og 3 foran glasset oppefra, så grafen kan
+ses.
+
+Han kommer ikke af sig selv: første gang en fane åbnes, står der Start
+præsentation og Nej tak. Valget huskes under `nk-sb1.4-intro-kryds`, `-konc`
+og `-temp`. Tilbuddet forsvinder også, når eleven er gået i gang (syren er
+hældt i, et tal er rigtigt, eller en opgave er løst). K viser præsentationen
+igen. Han har ingen andre replikker i denne animation; et prik på ham er
+elevens eget valg og er det fælles.
 
 ## I menuen
 

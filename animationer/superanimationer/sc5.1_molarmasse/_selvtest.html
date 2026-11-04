@@ -254,9 +254,9 @@ function koerTest(W) {
     paastand("12 gåder med fire forskellige etiketter, og afstanden passer til niveauet", D.GAADER.length === 12 && gFejl.length === 0, gFejl.join(", "));
 
     overskrift("9. Sproget");
-    var tekster = [].concat(D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT, D.NIVEAU_ROS, D.GAADE_ROS,
-        [D.VAEGT_FAERDIG, D.GAADER_FAERDIG, D.REKORD_REPLIK],
-        D.RUNDE_REPLIK.map(function (r) { return r[1]; }),
+    var introTekster = [].concat(D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT).map(function (l) { return l.tekst; });
+    var replikker = [D.VAEGT_FAERDIG, D.GAADER_FAERDIG, D.RUNDE_FULDT];
+    var tekster = [].concat(introTekster, replikker,
         D.PAR.map(function (p) { return p.hvorfor; }),
         D.GAADE_NIVEAUER.map(function (n) { return n.hint; }),
         D.STOFFER.map(function (s) { return s.fakta; }),
@@ -266,11 +266,19 @@ function koerTest(W) {
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
-    var lange = [].concat(D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT, D.NIVEAU_ROS, D.GAADE_ROS,
-        [D.VAEGT_FAERDIG, D.GAADER_FAERDIG, D.REKORD_REPLIK], D.RUNDE_REPLIK.map(function (r) { return r[1]; }))
-        .filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
-    paastand("hver præsentation har to eller tre replikker", [D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    /* Brugerens regler 4. nov. 2026: hele saetninger, og i praesentationen
+       to til fire saetninger pr. trin */
+    var lange = replikker.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
+    paastand("Kemichaels replikker på lærredet er hele sætninger på højst 130 tegn", lange.length === 0, lange.join(" | "));
+    var forkerte = introTekster.filter(function (t) {
+        var n = t.split(/[.?] /).length;
+        return t.length > 420 || t.length < 100 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(t) || /^Her\b/.test(t);
+    });
+    paastand("hver præsentation har tre trin, og hvert trin er to til fire hele sætninger (højst 420 tegn)",
+        [D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT].every(function (l) { return l.length === 3; }) && forkerte.length === 0,
+        forkerte.join(" | "));
+    paastand("rosen efter hvert niveau og kommentarerne efter hver runde er taget ud",
+        !D.NIVEAU_ROS && !D.GAADE_ROS && !D.RUNDE_REPLIK && !D.REKORD_REPLIK);
     var teori = d.getElementById("teori");
     paastand("teorien er lukket fra start", !teori.classList.contains("vis"));
 
@@ -293,6 +301,9 @@ function koerTest(W) {
         if (!V.status[i].loest || !V.status[i].stjerne) ikkeLoest.push(o.st.f);
     });
     paastand("alle 12 stoffer kan vejes med tabellens tal og får en stjerne", ikkeLoest.length === 0, ikkeLoest.join(", "));
+    for (var t0 = 0; t0 < 600 && !V.laerer.tale; t0++) V.opdater(1 / 60);
+    paastand("alle tolv stoffer er vejet: Kemichael kommer med én replik",
+        !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "niveau") && V.laerer.tale === D.VAEGT_FAERDIG, V.laerer.tale);
     V.nulstilAlt();
     V.vaelg(0);
     V.tilfoej("H", true); V.tilfoej("N", true);
@@ -311,7 +322,8 @@ function koerTest(W) {
     V.aktivtFelt().input.value = "18,02"; V.tjek();
     for (i = 0; i < 60 * 3; i++) V.opdater(1 / 60);
     paastand("bagefter viser vægten 18,02 g for 1 mol", V.displayTekst().t === "18,02 g" && V.displayTekst().etiket === "1 mol");
-    paastand("statuslinjen siger, hvad 1 mol vand er", /18 mL/.test(d.getElementById("vaegt-status").textContent));
+    paastand("kortet bliver på stoffet og siger, hvad 1 mol vand er, med Næste stof", /18\s*mL/.test(d.getElementById("vaegt-bliv").textContent)
+        && !d.getElementById("vaegt-bliv").hidden && !!d.querySelector("#vaegt-bliv [data-videre]") && d.getElementById("vaegt-bund").hidden);
     V.vaelg(2);
     V.knap(); V.knap();
     for (i = 0; i < 60; i++) V.opdater(1 / 60);
@@ -322,9 +334,11 @@ function koerTest(W) {
     paastand("hintet til O₂ handler om tallet efter symbolet", /Tallet efter et symbol/.test(V.el.besked.textContent));
     loesVaegt(1); loesVaegt(3);
     for (i = 0; i < 200; i++) V.opdater(1 / 60);
-    paastand("fire stoffer i niveau 1: Kemichael roser", V.rost[0] === true && !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "niveau"));
+    paastand("fire stoffer i niveau 1: Kemichael kommer ikke (kun når alle tolv er vejet)",
+        V.rost[0] === true && !(V.laerer && V.laerer.scene && V.laerer.scene.navn === "niveau"));
     V.vaelg(0);
-    paastand("et løst stof vises med 1 mol på vægten", V.opg.gennemsyn && V.opg.faerdig && V.el.knap.textContent === "Vej stoffet igen");
+    paastand("et løst stof vises med 1 mol på vægten", V.opg.gennemsyn && V.opg.faerdig && !d.getElementById("vaegt-igen").hidden
+        && !d.querySelector("#vaegt-skort #vaegt-igen"));
     V.nulstilAlt();
     paastand("Start forfra nulstiller alt", V.antalLoest() === 0);
 
@@ -349,13 +363,21 @@ function koerTest(W) {
     S.knap();
     var forkert = S.facit() === "v" ? "h" : "v";
     S.vaelgSvar(forkert);
-    paastand("et forkert svar nulstiller stimen og giver en forklaring", S.point === 1 && S.stime === 0 && S.el.besked.textContent.length > 20);
+    paastand("et forkert svar nulstiller stimen og giver en forklaring", S.point === 1 && S.stime === 0 && d.getElementById("skaal-bliv").textContent.length > 20
+        && !!d.querySelector("#skaal-bliv .bliv.nej"));
     S.knap();
     S.knap(); S.knap();
     paastand("Vis svaret giver intet point", S.point === 1 && S.visteSvar);
     while (!S.slut) { if (!S.svar) S.vaelgSvar(S.facit()); S.knap(); }
     paastand("runden kan spilles til ende", S.slut && S.point === 7);
     paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc5.1-skaal")) || {}).rekord >= 7);
+    for (i = 0; i < 60 * 3; i++) S.opdater(1 / 60);
+    paastand("7 af 9 i runden: Kemichael kommer ikke", !(S.laerer.scene && S.laerer.scene.navn === "slut"));
+    S.nyRunde();
+    while (!S.slut) { if (!S.svar) S.vaelgSvar(S.facit()); S.knap(); }
+    for (i = 0; i < 600 && !S.laerer.tale; i++) S.opdater(1 / 60);
+    paastand("9 af 9 i runden: Kemichael kommer med én replik", S.point === 9 && !!(S.laerer.scene && S.laerer.scene.navn === "slut")
+        && S.laerer.tale === D.RUNDE_FULDT, S.point + " / " + S.laerer.tale);
     S.runde = [{ v: D.stof("CO"), h: D.stof("N2"), niveau: 2, hvorfor: "" }];
     S.nr = 0; S.slut = false; S.nytPar();
     S.vaelgSvar("l");
@@ -369,12 +391,12 @@ function koerTest(W) {
     U.nulstilAlt();
     U.vaelg(8);
     var g = U.opg.g;
-    paastand("gåden C₂H₄ har mærket 28,06 g/mol", g.st.f === "C2H4" && d.getElementById("ukendt-prompt").textContent === "M = 28,06 g/mol");
+    paastand("gåden C₂H₄ har mærket 28,06 g/mol", g.st.f === "C2H4" && /M = 28,06 g\/mol/.test(d.getElementById("ukendt-ind").textContent.replace(/\u00a0/g, " ")));
     var fk = U.opg.kort.filter(function (k) { return k.st.f === "N2"; })[0];
     U.send(fk);
     for (i = 0; i < 90; i++) U.opdater(1 / 60);
     paastand("en forkert etiket falder af og bliver streget ud", fk.kryds && !fk.paaFlasken && U.opg.forsoeg === 1 && !U.flyv);
-    paastand("beskeden siger, hvor langt den er fra", /28,02 g\/mol\. Det er 0,04 g\/mol for lidt/.test(U.el.besked.textContent));
+    paastand("beskeden siger, hvor langt den er fra", /28,02 g\/mol\. Det er 0,04 g\/mol for lidt/.test(U.kort.beskedTekst()));
     U.send(fk);
     paastand("en streget etiket kan ikke sendes igen", !U.flyv);
     var rk = U.opg.kort.filter(function (k) { return k.st === g.st; })[0];
@@ -391,20 +413,50 @@ function koerTest(W) {
     U.vaelg(11);
     U.send(U.opg.kort.filter(function (k) { return k.st === U.opg.g.st; })[0]);
     for (i = 0; i < 200; i++) U.opdater(1 / 60);
-    paastand("fire flasker i niveau 3: Kemichael roser", U.rost[2] === true && !!(U.laerer && U.laerer.scene && U.laerer.scene.navn === "niveau"));
+    paastand("fire flasker i niveau 3: Kemichael kommer ikke (kun når alle tolv har etiket)",
+        U.rost[2] === true && !(U.laerer && U.laerer.scene && U.laerer.scene.navn === "niveau"));
+    U.nulstilAlt();
+    D.GAADER.forEach(function (gd, gi) {
+        U.vaelg(gi);
+        U.send(U.opg.kort.filter(function (k) { return k.st === U.opg.g.st; })[0]);
+        for (var k = 0; k < 60; k++) U.opdater(1 / 60);
+    });
+    for (i = 0; i < 600 && !U.laerer.tale; i++) U.opdater(1 / 60);
+    paastand("alle tolv flasker har etiket: Kemichael kommer med én replik", U.antalLoest() === 12
+        && !!(U.laerer.scene && U.laerer.scene.navn === "niveau") && U.laerer.tale === D.GAADER_FAERDIG, U.antalLoest() + " / " + U.laerer.tale);
     U.nulstilAlt();
     paastand("Tag etiketterne af igen nulstiller alt", U.antalLoest() === 0);
 
     overskrift("13. Kemichaels præsentation");
     klik('[data-fane="fane-vaegt"]');
-    V.startIntro(true);
-    for (i = 0; i < 60; i++) V.opdater(1 / 60);
-    paastand("K viser præsentationen igen", !!(V.laerer.scene && V.laerer.scene.navn === "intro") && !d.getElementById("vaegt-spring").hidden);
-    V.tilfoej("O", true);
-    paastand("man kan bygge, mens han taler", V.atomer.length === 1 && V.laerer.scene.navn === "intro");
     V.springIntro();
-    paastand("Spring over sender ham ud", V.laerer.scene && V.laerer.scene.navn === "introUd");
+    for (i = 0; i < 120; i++) V.opdater(1 / 60);
+    V.startIntro(true);
+    for (i = 0; i < 150; i++) V.opdater(1 / 60);
+    var bobleV = d.getElementById("vaegt-laerred-boble");
+    paastand("K viser præsentationen igen med Næste og Spring præsentationen over", V.laererIIntro() && !!bobleV && !bobleV.hidden
+        && !!bobleV.querySelector(".km-naeste") && !!bobleV.querySelector(".km-spring"));
+    paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
+    V.tilfoej("O", true);
+    paastand("man kan bygge, mens han taler", V.atomer.length === 1 && V.laererIIntro());
+    var iIntroV = V.laererIIntro();
+    klik('[data-fane="fane-skaal"]');
+    paastand("et faneskift midt i præsentationen sender ham ud", iIntroV && !V.laererIIntro());
+    klik('[data-fane="fane-vaegt"]');
     V.nulstilAlt();
+
+    overskrift("13b. Kemichaels præsentation: ét trin ad gangen (fælles test)");
+    [["fane-vaegt", V], ["fane-skaal", S], ["fane-ukendt", U]].forEach(function (p) {
+        klik('[data-fane="' + p[0] + '"]');
+        var sim = p[1];
+        sim.tilpas();
+        sim.springIntro();
+        for (var k = 0; k < 150; k++) sim.opdater(1 / 60);
+        NK.Praesentation.selvtest(sim, function (sek) { for (var j = 0; j < sek * 60; j++) sim.opdater(1 / 60); }).forEach(function (r) {
+            paastand(p[0] + ": " + r[0], r[1], r[2]);
+        });
+    });
+    klik('[data-fane="fane-vaegt"]');
 
     overskrift("14. Layoutet");
     var ramme = document.getElementById("ramme");

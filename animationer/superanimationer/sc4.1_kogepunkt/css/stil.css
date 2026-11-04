@@ -182,52 +182,8 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .scene-mrk b { color: #ffffff; }
 
-/* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
+/* Usynlige felter oven paa laerredet, som rundvisningen og Kemichael peger paa */
 .anker { position: absolute; pointer-events: none; }
-
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 11px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -605,7 +561,6 @@ select:focus-visible {
 }
 
 .valgliste:empty { display: none; }
-.valgliste.peg { animation: peg 1.2s ease-out infinite; }
 
 .valglinje {
     display: flex;
@@ -683,8 +638,9 @@ canvas.kurve {
 
 .scene > canvas { touch-action: none; }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen
+   (../kemichael/praesentation.js). Taleboblen med Naeste og Spring
+   praesentationen over staar i ../kemichael/praesentation.css. */
 .tilbud {
     position: absolute;
     top: 16px;
@@ -740,3 +696,100 @@ canvas.par-laerred {
     background-color: rgba(0, 0, 0, 0.22);
     border-radius: var(--radius-lil);
 }
+
+/* =====================================================================
+   Papirkortet i scenen (4. nov. 2026, brugerens beslutning: alle aktive
+   animationer faar papirkortet). Opgaven, spoergsmaalet, svarene, hint,
+   beskeden ved et forkert svar, forklaringen og knapperne staar paa ét
+   kort oeverst midt i scenen (js/skort.js). Statuslinjen nederst og
+   opgavekortet i panelet er vaek. Her staar kun kortets opbygning
+   (placering, raekker og gitter); farverne og skriften kommer fra
+   ../faelles/papirkort.css, der indlaeses efter denne fil.
+   Hoejden maa ikke overstige kortZone (zone i js/skort.js); selvtesten
+   maaler det. Decimaltal med PUNKTUM i CSS.
+   ===================================================================== */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    box-sizing: border-box;
+}
+
+.scenekort[hidden] { display: none; }
+.sk-tekst { margin: 0; }
+.sk-chip { white-space: nowrap; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 600px; margin-left: auto; margin-right: auto; }
+.sk-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+.sk-knap .sk-formel { margin-left: auto; padding-left: 6px; color: #5d6474; font-size: 0.9em; white-space: nowrap; }
+
+.v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.v-prik { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.25); }
+
+/* Kortets nederste raekke: beskeden til venstre, knapperne til hoejre */
+.sk-bund { display: flex; align-items: center; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; margin: 0; }
+.sk-bund .st-tekst[hidden] { display: none; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; white-space: nowrap; cursor: pointer; font-family: inherit; font-size: 0.95rem; }
+.sk-bund .knap[hidden] { display: none; }
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-bund .st-tekst:not([hidden]) + .knap { margin-left: 0; }
+.sk-bund .knap.indsend { font-variant-numeric: tabular-nums; }
+.sk-bund .knap.indsend.ikke-klar { cursor: default; }
+
+.sk-videre { font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+@keyframes st-ryst {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+}
+
+/* Smal scene: fire svar i to raekker */
+@media (max-width: 1320px) {
+    .sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Lave skaerme (rammen i menuen paa en baerbar): kortet fylder mindre */
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.88rem; line-height: 1.18; }
+    .sk-bund .knap { font-size: 0.88rem; }
+}
+
+/* Tilbuddet om Kemichaels praesentation staar nederst i scenen, saa det
+   ikke daekker kortet */
+.tilbud { top: auto; bottom: 16px; }

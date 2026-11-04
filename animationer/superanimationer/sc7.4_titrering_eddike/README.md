@@ -82,14 +82,34 @@ titreres begge kolber til omslaget. Tabellen i panelet viser mL NaOH og
 masseprocent for A og B, og et forkert gæt får en forklaring, der passer til
 netop det svar. Til sidst står antallet af rigtige gæt i første forsøg.
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`), tre replikker pr. fane. Han roser første gang en
-titrering er præcis, første gang en beregning er færdig og efter den sjette
-situation. Han bemærker det, når kolben er langt forbi omslaget ("Det er
-pink."), og når buretten er løbet tom. Påskeæg: et resultat, der rammer eddikens
-masseprocent på hundrededelen ("På hundrededelen. Det har jeg aldrig ramt."), og
-glimtet om hans første titrering (140 %), når elevens resultat er langt for højt.
-Kaffekoppen er det fælles påskeæg.
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles (`../kemichael/praesentation.js`, brugerens regler
+4. nov. 2026): tre trin pr. fane med to til fire hele sætninger i Kemibogens sprog,
+en taleboble med Næste og Spring præsentationen over, og en gul ramme om det, han
+peger på (de usynlige `.anker` over lærredet, kortene i panelet og på fane 3
+kolberne med skiltene, `introFelt` i `js/laerer.js`). Han går
+aldrig videre af sig selv. Teksterne står i `D.INTRO_*` i `js/data.js`.
+
+Ellers kommer han kun ind, når en fane er klaret første gang i browseren, og ved
+to påskeæg:
+
+* Fane 1, første præcise titrering: "Kolben blev lyserød på den sidste dråbe.
+  Nogle elever bruger et helt år på at nå den præcision."
+* Fane 2, første færdige beregning: "Du har beregnet masseprocenten af
+  eddikesyre ud fra forbruget. Sådan kontrollerer et laboratorium tallet på
+  eddikens etiket."
+* Fane 3, efter den sjette situation: "Du har gennemført alle seks opgaver med
+  de to kolber. Det blev til tolv kolber, og opvasken tager jeg ikke."
+* Påskeæg, buretten løbet tom: "Du har tømt hele buretten ned i kolben.
+  Eddikesyren var brugt op for længe siden." (en tør bemærkning, ikke ros)
+* Påskeæg, elevens egen måling rammer eddikens masseprocent på hundrededelen:
+  "Dit resultat rammer eddikens masseprocent på hundrededelen. Det har jeg
+  aldrig selv gjort."
+
+Taget ud 4. nov. 2026: bemærkningen, når kolben er 1 mL forbi omslaget ("Det er
+ikke lyserødt længere. Det er pink."), og glimtet om hans første titrering
+(140 %), når resultatet er over 25 % for højt. Begge kommenterede en fejl, der er
+almindelig. Kaffekoppen er det fælles påskeæg.
 
 Direkte links: `index.html#beregning` og `index.html#kolber` (også `#forbrug`).
 
@@ -98,7 +118,8 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>R</kbd> ny prøve eller forfra · <kbd>Enter</kbd> videre ·
 <kbd>mellemrum</kbd> åbn og luk hanen · <kbd>D</kbd> én dråbe ·
 <kbd>←</kbd> <kbd>→</kbd> hanen mindre og mere åben · <kbd>Esc</kbd> luk eller
-send Kemichael ud.
+spring præsentationen over · under præsentationen er <kbd>Enter</kbd> og
+<kbd>→</kbd> Næste.
 
 ### Det nye i forhold til den gamle animation
 
@@ -133,7 +154,6 @@ js/tegning.js       rummet, opstillingen (stativ, burette, hane, kolbe, omrører
                     dråberne, skyderen, eddikeflasken, keglen og skiltene
 js/lup.js           luppen med de 8 figurer (fane 1)
 js/graf.js          titreringskurven og luppen på menisken i panelet
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_titrering.js fane 1
 js/sim_beregning.js fane 2
 js/sim_forbrug.js   fane 3
@@ -162,10 +182,11 @@ forbruget, at 13 skrivemåder af et tal og 32 skrivemåder og fejl i formlerne
 behandles rigtigt, at aflæsningen og de fire regnetrin giver den rigtige besked ved de typiske fejl, at sproget holder
 reglerne, at fane 1 kan gennemføres med musen (skyderen, hanen, én dråbe), at
 Vis svaret, overtitrering og en tom burette opfører sig rigtigt, at fane 2 og 3
-kan gennemføres, at Kemichael kan vises og sendes ud på alle faner, og at
+kan gennemføres, at Kemichaels præsentation viser trinnene ét ad gangen med
+Næste og Spring præsentationen over på alle faner (den fælles test), og at
 layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller
 Chrome med `--allow-file-access-from-files`, og den lægger elevens valg tilbage
-bagefter. Sidst kørt 25. september 2026: ALT OK (88 påstande).
+bagefter. Sidst kørt 4. november 2026: ALT OK (126 påstande).
 
 ## Forenklinger
 
@@ -190,9 +211,9 @@ bagefter. Sidst kørt 25. september 2026: ALT OK (88 påstande).
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
 præsentation og Nej tak midt foroven i scenen. Start sender ham ind, Nej tak og
 Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
-forsvinder også, når eleven har gjort noget på fanen. Koden er
-`js/praesentation.js` (samme fil som i sc1.2), koblet med
-`NK.Praesentation.kobl` i hver `sim_*.js`.
+forsvinder også, når eleven har gjort noget på fanen. Koden er den fælles
+`../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` i hver
+`sim_*.js` og `NK.Praesentation.trin` i `js/laerer.js`.
 
 ## I menuen
 

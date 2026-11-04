@@ -9,16 +9,19 @@
    saa kitlen slutter der. Moenstret er det samme som i sc1.2.
 
    Hver fane har sin egen laerer. Han kommer ikke af sig selv: foerste
-   gang fanen aabnes, staar der Start praesentation og Nej tak
-   (js/praesentation.js). Under anden replik peger han paa kortet i
-   panelet (D.PEG), og det lyser op. Scenen laaser ikke. Knappen Spring
-   praesentationen over, to klik paa ham og Esc sender ham ud; K viser
-   praesentationen igen.
+   gang fanen aabnes, staar der Start praesentation og Nej tak. K viser
+   praesentationen igen. Praesentationen er den faelles fra 4. nov. 2026
+   (NK.Praesentation.trin i ../kemichael/praesentation.js): to til fire
+   trin med to til fire saetninger, en taleboble med Naeste og Spring
+   praesentationen over, og en gul ramme om det, han peger paa (kortene
+   i panelet med sel og det tegnede paa laerredet med felt, se
+   introFelt nedenfor). Han har ingen andre replikker i denne animation.
 
    Hver fane skal have:
      this.tid              et ur, der altid gaar (sekunder)
      this.L                laerredet
-     laererPladsPx()       hvor laereren stiller sig, i pixels fra venstre
+     this.lay              laerredets maal (glas, ur, graf), som pladsen
+                           og felterne regnes ud fra
    ===================================================================== */
 (function () {
     "use strict";
@@ -31,11 +34,11 @@
     NK.Scene = NK.Scene || { BREDDE: 1000, HOEJDE: 600, ANKER: {} };
     Object.keys(K.ANKER).forEach(function (navn) { NK.Scene.ANKER[navn] = K.ANKER[navn]; });
 
-    var UDE = K.UDE, HAENGER = K.HAENGER;
+    var UDE = K.UDE;
 
-    function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
-
-    function kobl(P, fane, springId, plads) {
+    /* plads: hvor han staar under praesentationen (en funktion af fanen,
+       i pixels fra venstre). Han er kun paa scenen, mens han praesenterer. */
+    function kobl(P, fane, plads) {
         K.paa(P, { fredet: [] });
 
         P.aendret = function () {};
@@ -45,7 +48,7 @@
         };
 
         P.laererPladsPx = function () {
-            return this.lay ? this.lay.W * plads : 400;
+            return this.lay ? plads(this.lay) : 400;
         };
 
         P.laererPlads = function () {
@@ -77,87 +80,53 @@
             return this.klikLaerer();
         };
 
-        /* Armens vinkel mod kortet i panelet */
-        P.pegPaaKort = function () {
-            var s = this.laererLaerredSkala();
-            var el = NK.el(D.PEG[fane]), cv = this.L.canvas;
-            if (!el || !cv) return this.pegVinkel(this.L.b / s + 60, this.L.h * 0.3 / s);
-            var r = el.getBoundingClientRect(), c = cv.getBoundingClientRect();
-            var x = r.left + r.width / 2 - c.left, y = r.top + Math.min(r.height / 2, 60) - c.top;
-            return this.pegVinkel(x / s, y / s);
-        };
-
-        /* Kortet lyser op, mens han taler om det (kaldes fra opdaterIntro) */
-        P.pegPaaFelt = function (til) {
-            if (!!til === !!this.pegerNu) return;
-            this.pegerNu = !!til;
-            var el = NK.el(D.PEG[fane]);
-            if (el) el.classList.toggle("peg", !!til);
-        };
-
-        P.laererIntro = function () {
-            if (!this.laerer) return;
-            var mig = this, linjer = D.INTRO[fane];
-            var trin = [
-                { kald: function () { mig.introKlikTal = 0; } },
-                { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
-                { gaa: function () { return mig.laererPlads(); } },
-                { tid: 0.2 }
-            ];
-            linjer.forEach(function (l, i) {
-                trin.push({ kald: function () { mig.introTrin = i + 1; } });
-                if (i === D.INTRO_PEG) trin.push({ arm: function () { return mig.pegPaaKort(); }, tid: 0.45 });
-                trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
-                if (i === D.INTRO_PEG) trin.push({ arm: HAENGER, tid: 0.35 });
-            });
-            this.laererKoer("intro", trin.concat([
-                { taleFaerdig: true },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { kald: function () { mig.introTrin = 0; } },
-                { gaa: UDE }
-            ]), false);
-        };
-
-        P.laererIIntro = function () {
-            var L = this.laerer;
-            return !!(L && L.scene && L.scene.navn === "intro");
-        };
-
-        P.laererIntroVaek = function () {
-            var L = this.laerer;
-            if (!this.laererIIntro()) return false;
-            L.tale = "";
-            L.taleUr = 0;
-            L.taleAlfa = 0;
-            this.introTrin = 0;
-            this.laererKoer("introUd", [
-                { arm: HAENGER, tid: 0.15 },
-                { udtryk: { skeptisk: 0, humoer: 0 } },
-                { gaa: UDE, loeb: true }
-            ], false);
-            return true;
-        };
-
-        /* Et klik under praesentationen: rammer det ham, taeller det. Andet
-           klik paa ham sender ham ud, det foerste faar knappen til at blinke. */
-        P.laererIntroKlik = function (px, py) {
-            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
-            this.introKlikTal = (this.introKlikTal || 0) + 1;
-            if (this.introKlikTal >= 2) {
-                this.laererIntroVaek();
-            } else {
-                var k = NK.el(springId);
-                k.classList.remove("puf");
-                void k.offsetWidth;
-                k.classList.add("puf");
-            }
-            return true;
-        };
+        P.introLinjer = function () { return D.INTRO[fane]; };
+        NK.Praesentation.trin(P);
     }
 
-    /* Han staar mellem glasset og grafen paa fane 1 og midt paa grafen
-       paa fane 2 og 3. */
-    kobl(NK.SimKryds.prototype, "kryds", "kryds-spring", 0.5);
-    kobl(NK.SimKonc.prototype, "konc", "konc-spring", 0.55);
-    kobl(NK.SimTemp.prototype, "temp", "temp-spring", 0.55);
+    /* Grafen med aksernes tal og navne */
+    function grafFelt(g) {
+        return { x: g.x0 - 58, y: g.y0 - 28, b: g.x1 - g.x0 + 66, h: g.y1 - g.y0 + 62 };
+    }
+
+    /* ----- Fane 1: krydset. Han staar lige til hoejre for maaleglasset ved
+       grafens venstre kant, saa han hverken daekker glasset, maaleglasset
+       eller uret, og saa vejen ind fra venstre ikke bliver for lang. ----- */
+    var PK = NK.SimKryds.prototype;
+    kobl(PK, "kryds", function (lay) { return lay.graf.x0 + 40; });
+    PK.introFelt = function (navn) {
+        var lay = this.lay;
+        if (!lay) return null;
+        if (navn === "glas") {
+            var bg = lay.bg, mg = this.mgRekt();
+            var x0 = Math.min(bg.x, mg.x) - 6, y0 = Math.min(bg.y, mg.y) - 24;
+            var x1 = Math.max(bg.x + bg.b, mg.x + mg.b) + 6, y1 = bg.y + bg.h + 6;
+            return { x: x0, y: y0, b: x1 - x0, h: y1 - y0 };
+        }
+        if (navn === "oppefra") {
+            var op = lay.op;
+            return { x: op.x - op.r - 6, y: op.y - op.r - 26, b: 2 * op.r + 12, h: 2 * op.r + 32 };
+        }
+        if (navn === "ur") {
+            var u = lay.ur;
+            return { x: u.x - u.r * 1.15, y: u.y - u.r * 1.45, b: u.r * 2.3, h: u.r * 2.45 + 44 };
+        }
+        if (navn === "graf") return grafFelt(lay.graf);
+        return null;
+    };
+
+    /* ----- Fane 2 og 3: han staar foran glasset oppefra til venstre, saa
+       grafen, han taler om, kan ses hele tiden ----------------------------- */
+    function vedVis(lay) { return lay.vis.x + lay.vis.b / 2; }
+    var PC = NK.SimKonc.prototype;
+    kobl(PC, "konc", vedVis);
+    PC.introFelt = function (navn) {
+        return this.lay && navn === "graf" ? grafFelt(this.lay.graf) : null;
+    };
+
+    var PT = NK.SimTemp.prototype;
+    kobl(PT, "temp", vedVis);
+    PT.introFelt = function (navn) {
+        return this.lay && navn === "graf" ? grafFelt(this.lay.graf) : null;
+    };
 }());

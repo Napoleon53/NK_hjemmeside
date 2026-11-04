@@ -15,6 +15,10 @@
    Uheldet skrives i hans uheldsregnskab (K.uheld), der foelger
    browseren paa tvaers af animationerne.
 
+   Brugerens regel 4. nov. 2026: han kommer kun ind af sig selv ved
+   paaskeaeggene og taler altid formelt, i hele saetninger som i
+   Kemibogen (D.PAATALE). Glimtet om oejenbrynene er faelles.
+
    Scenen laaser ikke forsoeget. Baggrundslivet er slaaet fra.
    ===================================================================== */
 (function () {

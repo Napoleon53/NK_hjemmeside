@@ -33,7 +33,7 @@
             var s = gemt[o.nr];
             return { loest: !!(s && s.l), stjerne: !!(s && s.s) };
         });
-        this.rost = {};
+        this.rost = false;
         this.over = null;
         this.lay = null;
         this.g = { kaffekop: { skjult: false, iHaand: false } };
@@ -141,7 +141,6 @@
             nulstil: NK.el("afvej-nulstil")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("afvej-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
 
         D.ORDRE_NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -402,10 +401,10 @@
         s.loest = true;
         s.stjerne = s.stjerne || !o.brugtSvar;
         this.gem();
-        var nv = D.ORDRER[i].niveau;
-        if (!foer && this.antalLoest(nv) === this.iNiveau(nv) && !this.rost[nv]) {
-            this.rost[nv] = true;
-            this.ventRos = { t: 2.2, niveau: nv, alt: this.antalLoest() === D.ORDRER.length };
+        /* Alle tolv ordrer er afvejet: Kemichael kommer én gang */
+        if (!foer && this.antalLoest() === D.ORDRER.length && !this.rost) {
+            this.rost = true;
+            this.ventRos = 2.2;
         }
     };
 
@@ -417,7 +416,8 @@
 
     P.nulstilAlt = function () {
         this.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-        this.rost = {};
+        this.rost = false;
+        this.ventRos = 0;
         this.gem();
         this.valgt = -1;
         this.opg = null;
@@ -436,13 +436,9 @@
             if (this.nulstilSikker <= 0) { this.nulstilSikker = 0; this.visNulstil(); }
         }
         if (this.haeldT >= 0 && this.haeldT < 99) this.haeldT = Math.min(99, this.haeldT + dt);
-        if (this.ventRos) {
-            this.ventRos.t -= dt;
-            if (this.ventRos.t <= 0 && this.laererNiveau) {
-                var v = this.ventRos;
-                this.ventRos = null;
-                this.laererNiveau(v.niveau, v.alt);
-            }
+        if (this.ventRos > 0) {
+            this.ventRos -= dt;
+            if (this.ventRos <= 0 && this.laererFaerdig) this.laererFaerdig();
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
@@ -511,7 +507,6 @@
         ctx.rotate(kp.v);
         Tg.krukke(ctx, 0, lay.krukkeH / 2, lay.krukkeH, o.st, {
             fremhaev: this.fremhaev === "krukke" ? puls : 0,
-            lys: this.pegKrukke ? 1 : 0,
             udenLaag: kp.i,
             udenSkygge: kp.u > 0.02
         });
@@ -581,10 +576,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-afvej", tilbud: "afvej-tilbud", spring: "afvej-spring" });
-
-    /* Mens han siger, at molarmassen staar paa krukken, lyser krukken */
-    P.pegPaaFelt = function (til) { this.pegKrukke = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-afvej", tilbud: "afvej-tilbud" });
 
     NK.SimAfvej = SimAfvej;
 }());

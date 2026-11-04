@@ -1,9 +1,9 @@
 /* =====================================================================
-   data.js - tekster: Kemichaels replikker, linjerne under scenen og
-   rosen, naar en serie er klaret
+   data.js - tekster: Kemichaels praesentation, rosen, naar en hel fane
+   er klaret, og linjerne under scenen
 
-   Replikkerne er hoejst ca. 60 tegn og uden teori. Sarkasmen rammer
-   handlingen, aldrig eleven.
+   Kemichael taler formelt i hele saetninger som i Kemibogen (brugerens
+   regel 4. nov. 2026). Sarkasmen rammer handlingen, aldrig eleven.
    ===================================================================== */
 (function () {
     "use strict";
@@ -11,40 +11,72 @@
     var NK = window.NK;
     var D = {};
 
-    /* ----- Kemichaels praesentation af hver fane ----------------------------- */
+    /* ----- Kemichaels praesentation af hver fane -----------------------------
+       ../kemichael/praesentation.js: ét trin ad gangen, og eleven trykker
+       Naeste. Hvert trin er to til fire hele saetninger: hvad fanen
+       traener, og hvordan tingene bruges. sel: det, han peger paa, og som
+       faar en gul ramme (CSS-selectorer; tavlen og papiret er de usynlige
+       .anker fra rundvisningen). felt "tegning": kassen om atomerne paa
+       tavlen (introFelt i laerer.js). Ingen vittigheder i praesentationen.
+       Fane 1 har et andet trin 2 i retningen Zigzag -> strukturformel. */
+    var ZZ_START = { tekst: "I denne fane øver du dig i at skifte mellem strukturformler og zigzagformler. Knapperne øverst i panelet vælger, om du tegner zigzagformlen ud fra strukturformlen eller omvendt. Hver retning er en serie på ti molekyler, der bliver sværere.",
+                     sel: "#zz-retning" };
+    var ZZ_SLUT = { tekst: "Opgavekortet viser opgaven, og knappen på kortet giver et hint og derefter svaret. Serien viser, hvilke af de ti molekyler du har løst. En serie giver et klistermærke til tegnebrættet, når du højst har set tre af svarene.",
+                    sel: ["#zz-kort", "#zz-serie"] };
     D.INTRO_ZIGZAG = [
-        "Zigzag. Opgaven hænger på tavlen.",
-        "Træk fra C-atomet. Kæden knækker af sig selv.",
-        "H-atomerne tegner vi ikke. Det sparer tusch."
+        ZZ_START,
+        { tekst: "Strukturformlen hænger på papiret øverst på tavlen. Du tegner samme molekyle som zigzagformel ved at trække fra C-atomet, og kæden knækker af sig selv. Et klik på en binding gør den til en dobbeltbinding.",
+          sel: "#zz-anker-papir", felt: "tegning" },
+        ZZ_SLUT
+    ];
+    D.INTRO_ZIGZAG_ATOMER = [
+        ZZ_START,
+        { tekst: "Zigzagformlen står på tavlen. Du klikker på hvert knæk og hver ende for at sætte et C-atom og derefter på C-atomerne for at sætte H-atomer på. Til sidst skriver du molekylformlen i feltet på opgavekortet.",
+          felt: "tegning" },
+        ZZ_SLUT
     ];
     D.INTRO_NAVNE = [
-        "Navne. Byg molekylet, eller giv det navn.",
-        "Navnet skriver du i feltet til højre.",
-        "Bindestreger tæller. Kemikere er pedantiske."
+        { tekst: "I denne fane øver du dig i at give alkaner og alkener navne. Knapperne øverst i panelet vælger, om du bygger molekylet ud fra navnet eller giver molekylet på tavlen et navn. Knapperne lige under vælger alkaner eller alkener.",
+          sel: ["#nv-retning", "#nv-slags"] },
+        { tekst: "Du bygger molekylet ved at trække fra C-atomet på tavlen, og et klik på en binding gør den dobbelt. De sidste alkener har cis eller trans, så tegningen skal vende rigtigt. Navnet skriver du i feltet på opgavekortet, og Enter tjekker navnet.",
+          felt: "tegning" },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Serien viser, hvilke af de ti molekyler du har løst. En serie giver et klistermærke til tegnebrættet, når du højst har set tre af svarene.",
+          sel: ["#nv-kort", "#nv-serie"] }
     ];
     D.INTRO_ISOMERER = [
-        "Isomerer. Formlen står til højre.",
-        "Tegn alle de molekyler, der passer til den.",
-        "Vendt om er ikke nyt. Det har jeg prøvet."
+        { tekst: "I denne fane finder du alle isomerer af en alkan, altså alle molekyler med samme molekylformel. Knapperne øverst i panelet vælger formlen, fra C₄H₁₀ med to isomerer til C₇H₁₆ med ni isomerer.",
+          sel: "#is-niveau" },
+        { tekst: "Du tegner et molekyle med formlen ved at trække fra C-atomet på tavlen, og tegningen bliver tjekket, når alle C-atomer er brugt. Et stof, du ikke har fundet før, kommer på listen Isomererne. Tegner du et stof, du allerede har fundet, ryster stoffets plads i listen.",
+          sel: "#is-liste-kort", felt: "tegning" },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Hver formel giver et klistermærke til tegnebrættet, når du højst har set halvdelen af svarene.",
+          sel: "#is-kort" }
     ];
     D.INTRO_OPLOES = [
-        "Opløselighed. Heptan øverst, vand nederst.",
-        "Træk molekylet ned i det lag, det opløses i.",
-        "Tager du fejl, flytter molekylet selv. Det er stædigt."
+        { tekst: "I denne fane afgør du, om et molekyle opløses i vand eller i heptan. Molekylet står på tavlen, og bægerglasset har heptan øverst og vand nederst.",
+          sel: ["#op-anker-mol", "#op-anker-glas"] },
+        { tekst: "Du trækker molekylet ned i det lag, det opløses i, eller du klikker på laget. Er svaret forkert, flytter molekylet selv over i det rigtige lag, og du mister et af dine tre liv.",
+          sel: ["#op-anker-glas", "#op-liv"] },
+        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret, men et vist svar giver ikke point. Bunken viser de 15 molekyler, du skal sortere. Knapperne øverst i panelet tegner molekylet som zigzagformel eller med alle atomer.",
+          sel: ["#op-kort", "#op-bunke", "#op-tegning"] }
     ];
 
-    /* ----- Ros, naar en serie eller et niveau er klaret ------------------------ */
+    /* ----- Ros, naar en hel fane er klaret -------------------------------------
+       zz, nv, is: fanens sidste klistermaerke er laast op (laerer.js).
+       oploes: hele bunken er sorteret med hoejst tre viste svar,
+       oploesVist: med flere viste svar. */
     D.ROS = {
-        tegn: "Ti zigzagformler. Ikke én lige kæde.",
-        atomer: "Ti formler. Hvert eneste H talt med.",
-        byg: "Ti molekyler. Præcis som navnene sagde.",
-        navn: "Ti navne. Alle bindestreger på plads.",
-        isomer: "Alle isomerer. Ingen talt to gange.",
-        isomerAlle: "C₇ klaret. Ni isomerer. Jeg tæller efter.",
-        oploes: "Hele bunken sorteret. Ikke en dråbe spildt.",
-        oploesVist: "Bunken er igennem. Næste gang uden facitlisten.",
-        /* Klaret, men med for mange viste svar: intet fra skuffen */
-        forMangeSvar: "Klaret. Skuffen åbner kun, når du selv svarer."
+        zz: "Du har klaret begge serier på fanen, og ikke én af kæderne er blevet tegnet lige.",
+        nv: "Du har klaret alle fire serier med navne, og alle bindestreger står på deres plads.",
+        is: "Du har fundet alle isomerer fra C₄H₁₀ til C₇H₁₆. Jeg tæller dem efter senere.",
+        oploes: "Du har sorteret hele bunken, og der er ikke spildt en eneste dråbe.",
+        oploesVist: "Du er igennem hele bunken. Næste gang klarer du den uden at se svarene."
+    };
+
+    /* ----- Opgavekortet, naar en quiz er klaret med for mange viste svar ---------
+       (tidligere Kemichaels "Skuffen aabner kun, naar du selv svarer") */
+    D.KLISTER_KRAV = {
+        serie: "Serien er klaret, men klistermærket kræver, at du højst har set tre af svarene.",
+        isomer: "Isomererne af {formel} er fundet, men klistermærket kræver, at du højst har set halvdelen af svarene."
     };
 
     /* ----- Linjen under scenen: naeste skridt ----------------------------------- */

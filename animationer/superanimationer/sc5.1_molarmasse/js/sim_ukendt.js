@@ -90,7 +90,9 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.bordY = Math.round(H * 0.9);
-        lay.p = Tg.plakatLay(kant, kant, W - 2 * kant, H * 0.36);
+        /* Plakaten begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.p = Tg.plakatLay(kant, lay.zone, W - 2 * kant, (H - lay.zone) * 0.38);
         var zoneTop = lay.p.y + lay.p.h + NK.klamp(H * 0.025, 8, 18);
         lay.zoneTop = zoneTop;
         var zoneH = lay.bordY - zoneTop;
@@ -148,20 +150,26 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* ----- Panelet ---------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
+        this.kort = new NK.SceneKort("ukendt", {
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         this.el = {
-            besked: NK.el("ukendt-besked"),
-            knap: NK.el("ukendt-knap"),
-            kort: NK.el("ukendt-kort"),
+            besked: this.kort.beskedEl,
+            knap: this.kort.hintEl,
+            indsend: this.kort.indsendEl,
             niveauer: NK.el("ukendt-niveauer"),
-            nulstil: NK.el("ukendt-nulstil")
+            nulstil: NK.el("ukendt-nulstil"),
+            igen: NK.el("ukendt-igen")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("ukendt-spring").addEventListener("click", function () { mig.springIntro(); });
+        this.el.igen.addEventListener("click", function () { mig.nyOpgave(false); });
 
         D.GAADE_NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -226,76 +234,118 @@
         });
         this.opg = { g: g, kort: kort, hjaelp: 0, brugtSvar: false, faerdig: false, gennemsyn: !!gennemsyn, forsoeg: 0 };
         this.flyv = null;
+        this.valgtKort = null;
         this.besked("", "");
         if (gennemsyn) {
             kort.forEach(function (k) { if (k.st === g.st) k.paaFlasken = true; });
             this.opg.faerdig = true;
-            this.besked(this.status[this.valgt].stjerne ? "Løst i første forsøg. ★" : "Løst.", "god");
         }
         this.visKort();
-        this.visStatus();
     };
 
+    /* ----- Papirkortet ----------------------------------------------------------
+       Opgaven staar paa kortet oeverst i scenen. Et klik paa en etiket paa
+       tavlen vaelger den kun (blaa ramme); Indsend svar sender den hen til
+       flasken. Efter det rigtige svar bliver kortet staaende med
+       forklaringen og Naeste flaske. */
     P.visKort = function () {
-        var o = this.opg, g = o.g, nv = D.GAADE_NIVEAUER[g.niveau];
-        NK.saetHTML("ukendt-niveau", '<span class="hyldeprik" style="background:' + nv.farve + '"></span>' + nv.navn);
-        NK.saetTekst("ukendt-nr", String(g.plads + 1));
-        NK.saetTekst("ukendt-antal-i-niveau", String(this.iNiveau(g.niveau)));
-        NK.saetTekst("ukendt-prompt", "M = " + NK.komma(g.st.M) + " g/mol");
-        NK.saetTekst("ukendt-spm", "Etiketten er faldet af flasken. Klik på den etiket på tavlen, der passer.");
-        this.el.kort.classList.toggle("sejr", o.faerdig && !o.gennemsyn);
-        this.visKnap();
+        var o = this.opg, g = o.g, k = this.kort;
+        NK.el("ukendt-igen").hidden = !o.gennemsyn;
+        var tekst = "Etiketten er faldet af den brune flaske, og mærket viser kun molarmassen: <b>M = " + NK.komma(g.st.M) +
+            " g/mol</b>. Hvilken etiket på tavlen passer til flasken?";
+        k.vis({ kl: o.faerdig ? "loest" + (o.brugtSvar ? " svar" : "") : "opgave",
+            chip: "Flaske " + (g.plads + 1) + " af " + this.iNiveau(g.niveau), tekst: tekst });
+        if (o.faerdig) {
+            var andre = o.kort.filter(function (kk) { return kk.st !== g.st; }).map(function (kk) {
+                return kk.st.tekst + " " + NK.komma(kk.st.M);
+            });
+            var forkl = "<b>" + NK.html(g.st.tekst + " " + g.st.navn + " har M = " + NK.komma(g.st.M) + " g/mol.") + "</b> " +
+                NK.html("De andre: " + andre.join(" · ") + ".");
+            var naeste = this.naesteUloesteEllerIngen();
+            var knap = naeste >= 0 ? "Næste flaske →" : null;
+            if (!knap) forkl += " " + NK.html("Alle tolv flasker har fået etiket.");
+            var maerke = o.gennemsyn ? (this.status[this.valgt].stjerne ? "Løst i første forsøg ★" : "Løst") :
+                (o.brugtSvar ? "Svaret" : "Rigtigt");
+            k.bliv(forkl, maerke, knap, o.brugtSvar && !o.gennemsyn ? "svar" : "god");
+            k.knapper({});
+        } else {
+            k.bliv(null);
+            var v = this.valgtKort;
+            k.knapper({ hint: o.hjaelp === 0 ? "Giv hint" : "Vis svaret", peg: this.pegKnap,
+                indsend: true, klar: !!v && !this.flyv, indsendTekst: v ? "Indsend svar: " + v.st.tekst : "Indsend svar" });
+        }
         this.opdaterFremskridt();
+        this.tjekZone();
     };
 
-    P.visKnap = function () {
-        var o = this.opg, tekst, klasse = "knap blaa";
-        if (o.faerdig) {
-            if (o.gennemsyn) tekst = "Tag etiketten af igen";
-            else { tekst = "Næste flaske →"; klasse += " banker"; }
-        } else {
-            tekst = o.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            klasse = "knap";
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [118, 104];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
+    };
+
+    P.naesteUloesteEllerIngen = function () {
+        var n = D.GAADER.length;
+        for (var d = 1; d <= n; d++) {
+            var i = (this.valgt + d) % n;
+            if (!this.status[i].loest) return i;
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
+        return -1;
     };
 
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.pegKnap = klasse === "skidt";
+        this.kort.besked(html, klasse);
+        if (this.opg && !this.opg.faerdig) {
+            this.el.knap.classList.toggle("peg", this.pegKnap && this.opg.hjaelp === 0);
+        }
     };
 
-    P.visStatus = function () {
+    /* Et klik paa en etiket paa tavlen vaelger den kun */
+    P.vaelgKort = function (kk) {
         var o = this.opg;
-        if (!o) return;
-        if (o.faerdig) {
-            var andre = o.kort.filter(function (k) { return k.st !== o.g.st; }).map(function (k) {
-                return k.st.tekst + " " + NK.komma(k.st.M);
-            });
-            NK.saetHTML("ukendt-status", "<b>" + NK.html(o.g.st.tekst + " " + o.g.st.navn + ": " + NK.komma(o.g.st.M) + " g/mol.") + "</b> " +
-                NK.html("De andre: " + andre.join(" · ") + "."));
-        } else {
-            NK.saetHTML("ukendt-status", "Regn molarmassen for etiketterne, og sammenlign med mærket. Det periodiske system står øverst.");
+        if (!o || o.faerdig || this.flyv || !kk || kk.kryds) return;
+        this.valgtKort = kk;
+        this.visKort();
+    };
+
+    /* Indsend svar: den valgte etiket flyver hen til flasken */
+    P.indsend = function () {
+        var o = this.opg;
+        if (!o || o.faerdig || this.flyv) { this.kort.blink(); return; }
+        if (!this.valgtKort) {
+            this.kort.blink();
+            this.besked("Klik først på en etiket på tavlen. Så kan du sende den.", "peger");
+            return;
         }
+        var kk = this.valgtKort;
+        this.valgtKort = null;
+        this.send(kk);
+        this.visKort();
+    };
+
+    P.videre = function () {
+        var o = this.opg;
+        if (!o || !o.faerdig) return;
+        var i = this.naesteUloesteEllerIngen();
+        if (i >= 0) this.vaelg(i);
     };
 
     P.knap = function () {
         var o = this.opg;
-        if (o.faerdig) {
-            if (o.gennemsyn) this.nyOpgave(false);
-            else this.vaelg(this.naesteUloeste(this.valgt));
-            return;
-        }
+        if (o.faerdig) { this.videre(); return; }
         if (this.flyv) return;
         if (o.hjaelp === 0) {
             o.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + D.GAADE_NIVEAUER[o.g.niveau].hint, "gul");
-            this.visKnap();
+            this.besked('<span class="b-maerke">Hint</span> ' + NK.html(D.GAADE_NIVEAUER[o.g.niveau].hint), "gul");
+            this.visKort();
         } else {
             o.brugtSvar = true;
-            var rigtig = o.kort.filter(function (k) { return k.st === o.g.st; })[0];
+            this.valgtKort = null;
+            var rigtig = o.kort.filter(function (kk) { return kk.st === o.g.st; })[0];
             this.send(rigtig);
+            this.visKort();
         }
     };
 
@@ -311,15 +361,13 @@
         if (k.st === g.st) {
             k.paaFlasken = true;
             this.flyv = null;
+            this.besked("", "");
             this.loes();
-            var linje = k.st.tekst + " har M = " + NK.komma(k.st.M) + " g/mol.";
-            if (o.brugtSvar) this.besked("Svaret: " + NK.html(linje), "gul");
-            else this.besked("<b>Rigtigt.</b> " + NK.html(linje), "god");
         } else {
             o.forsoeg++;
             k.kryds = true;
             var d = k.st.M - g.st.M;
-            this.besked(NK.html(k.st.tekst + " har M = " + NK.komma(k.st.M) + " g/mol. Det er " +
+            this.besked('<span class="b-maerke">Ikke endnu</span> ' + NK.html(k.st.tekst + " har M = " + NK.komma(k.st.M) + " g/mol. Det er " +
                 NK.komma(Math.abs(d)) + " g/mol for " + (d > 0 ? "meget." : "lidt.")), "skidt");
             this.flyv.tilbage = true;
             this.flyv.t = 0;
@@ -335,7 +383,6 @@
         s.stjerne = s.stjerne || (!o.brugtSvar && o.forsoeg === 0);
         this.gem();
         this.visKort();
-        this.visStatus();
         var nv = o.g.niveau;
         if (!foer && this.antalLoest(nv) === this.iNiveau(nv) && !this.rost[nv]) {
             this.rost[nv] = true;
@@ -358,12 +405,19 @@
         this.vaelg(0);
     };
 
+    /* Enter: Indsend svar, naar en etiket er valgt, ellers videre */
     P.enter = function () {
-        if (this.opg && this.opg.faerdig && !this.opg.gennemsyn) this.knap();
+        var o = this.opg;
+        if (!o) return;
+        if (o.faerdig) { this.videre(); return; }
+        if (this.valgtKort) this.indsend();
+        else this.kort.blink();
     };
     P.fokus = function () {};
 
-    /* ----- Kemichaels praesentation ---------------------------------------- */
+    /* ----- Kemichaels praesentation ----------------------------------------
+       Trinnene og boblen er faelles (NK.Praesentation.trin i js/laerer.js);
+       js/app.js viser foerst tilbuddet (NK.Praesentation.pakInd). */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
         if (!tving && NK.hent("nk-sc5.1-intro-ukendt", false)) return;
@@ -381,11 +435,9 @@
             this.introVent -= dt;
             if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
         }
-        var iIntro = !!(this.laererIIntro && this.laererIIntro());
-        if (iIntro !== this.visesSpring) {
-            this.visesSpring = iIntro;
-            NK.el("ukendt-spring").hidden = !iIntro;
-        }
+        /* Taleboblen med Naeste og Spring praesentationen over og den gule
+           ramme (../kemichael/praesentation.js) */
+        if (this.kmIntro && this.introOpdaterBoble) this.introOpdaterBoble();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------ */
@@ -401,6 +453,7 @@
                 if (this.flyv.tilbage) {
                     this.flyv.k.ryst = 0.5;
                     this.flyv = null;
+                    this.visKort();
                 } else {
                     this.lander(this.flyv.k);
                 }
@@ -441,6 +494,15 @@
             var r = mig.kortRekt(k);
             var lys = mig.over && mig.over.slags === "kort" && mig.over.k === k;
             Tg.etiket(ctx, r.x, r.y, r.b, r.h, k.st, { kryds: k.kryds, lys: lys, farve: farve, M: o.faerdig });
+            /* Den valgte etiket (sendes med Indsend svar): blaa ramme */
+            if (mig.valgtKort === k) {
+                ctx.save();
+                ctx.strokeStyle = "#3d9ee0";
+                ctx.lineWidth = 4;
+                NK.rundtRekt(ctx, r.x - 5, r.y - 5, r.b + 10, r.h + 10, 7);
+                ctx.stroke();
+                ctx.restore();
+            }
             /* Tegnestiften */
             ctx.fillStyle = "#c0392b";
             ctx.beginPath();
@@ -527,9 +589,10 @@
             if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
             var u = mig.hvadErUnder(pt);
-            if (!u) return;
+            /* Et klik ved siden af etiketterne: kortet blinker og viser opgaven */
+            if (!u) { if (mig.opg && !mig.opg.faerdig) mig.kort.blink(); return; }
             if (u.slags === "kop" && mig.klikKop) { mig.klikKop(); return; }
-            if (u.slags === "kort") mig.send(u.k);
+            if (u.slags === "kort") mig.vaelgKort(u.k);
         });
     };
 

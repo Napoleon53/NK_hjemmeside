@@ -3,7 +3,7 @@
 Superanimation om ækvivalente mængder: koefficienterne i et afstemt
 reaktionsskema er forholdet mellem stofmængderne. Åbn `index.html`. Mappen
 henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`). Ingen `fetch` og ingen moduler, så den
+(`../../v2/kemichael/kemichael.js` og de fælles filer i `../kemichael/`). Ingen `fetch` og ingen moduler, så den
 virker fra harddisken.
 
 ## Bestillingen
@@ -87,15 +87,26 @@ tal), *Middel* (decimaltal og kendte produkter) og *Svær* (skemaet står uden
 koefficienter, og eleven afstemmer det først). En opgave, der er løst uden
 at se svaret, får en stjerne.
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`): pølsevognen tre replikker (han peger på opskriften,
-brættet og klokken), molekylerne tre (skiltet og kammeret, og kasserne lyser),
-tavlen tre (han peger på den grønne boks, felterne og søjlerne). Han går kun
-ved den store knap, to klik på ham eller Esc. <kbd>K</kbd> viser
-præsentationen igen. Ellers roser han tørt efter den sidste ordre, det sidste
-mål og hvert niveau på tavlen. Kaffekoppen på disken og bordet er det fælles
-påskeæg. **Påskeæg:** ringer eleven med lutter agurker på brættet, kommer
-Kemichael: "Kun agurker. Det er en salat, ikke en hotdog."
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen er den fælles (`../kemichael/praesentation.js`, se
+`../kemichael/README.md`): tre trin pr. fane med to til fire hele sætninger i
+hvert, og taleboblen har knapperne Næste (på sidste trin Afslut) og Spring
+præsentationen over. Han går aldrig videre af sig selv, og det, han peger på,
+får en gul ramme, der blinker (på tavlen også den grønne boks, `introFelt` i
+`js/laerer.js`). På tavlen står han mellem de to første søjler, så han ikke
+dækker en hel søjle. <kbd>K</kbd> viser præsentationen igen, og <kbd>Esc</kbd>
+springer den over.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret (brugerens
+regel 4. nov. 2026), én gang: efter alle ti ordrer ("Du har lavet alle ti
+ordrer. Opskriften holder, også når noget slipper op."), efter alle fem mål
+("Du har nået alle fem mål. Opskriften er den samme for molekyler og for
+mol.") og efter alle tolv opgaver på tavlen ("Du har løst alle tolv opgaver
+på tavlen. Jeg skriver det ind i regnskabet."). Rosen efter hvert niveau på
+tavlen er fjernet. Kaffekoppen på disken og bordet er det fælles påskeæg.
+**Påskeæg:** ringer eleven med lutter agurker på brættet, kommer Kemichael én
+gang pr. besøg: "Der ligger kun agurker på brættet. Det er en salat og ikke en
+hotdog."
 
 Direkte links: `index.html#molekyler` og `index.html#regn`.
 
@@ -139,11 +150,11 @@ js/tjek.js          tjek af antal, koefficienter og stofmængder; beskederne ved
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, opskriften, bonen, disken, tingene og hotdoggen, molekylerne,
                     poserne med 1 mol, kasserne, kammeret, skiltet, plakaten, tavlen og søjlerne
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_hotdog.js    fane 1 (pølsevognen)
 js/sim_molekyler.js fane 2
 js/sim_regn.js      fane 3
-js/laerer.js        Kemichael på alle tre faner og påskeægget
+js/laerer.js        Kemichael på alle tre faner og påskeægget (præsentationen er den
+                    fælles i ../kemichael/praesentation.js)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -174,10 +185,12 @@ at ingen ordre bruger over 12 af en ting, at 11 typiske fejl i stofmængden og
 alle tre faner kan gennemføres (fane 1 og 2 også med musen), at 12 af hver
 ting ligger på brættet uden at røre hinanden, at atomerne i kammeret er de
 samme før og efter reaktionen, at
-Kemichael kan vises og sendes ud på alle faner, og at layoutet holder fra
-520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
+Kemichael kun kommer ind af sig selv, når en hel fane er klaret, at
+præsentationen virker på alle faner (den fælles test
+`NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
+1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 25. september 2026: ALT OK (136 påstande).
+bagefter. Sidst kørt 4. november 2026: ALT OK (169 påstande).
 
 ## Forenklinger
 
@@ -198,10 +211,10 @@ bagefter. Sidst kørt 25. september 2026: ALT OK (136 påstande).
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
 præsentation og Nej tak midt foroven i scenen. Start sender ham ind, Nej tak og
 Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
-forsvinder også, når eleven har løst noget på fanen. Koden er
-`js/praesentation.js` (samme fil som i sc1.2), koblet med
-`NK.Praesentation.kobl` i hver `sim_*.js`. Skiltene står under tilbuddet, så
-det ikke dækker dem.
+forsvinder også, når eleven har løst noget på fanen. Koden er den fælles
+`../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` i hver
+`sim_*.js` og `NK.Praesentation.trin` i `js/laerer.js`. Skiltene står under
+tilbuddet, så det ikke dækker dem.
 
 ## I menuen
 

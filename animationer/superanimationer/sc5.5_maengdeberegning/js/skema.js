@@ -175,7 +175,7 @@
             } else if (mig.erAaben(id)) {
                 e.className = "skemafelt aktiv" + (c.forkert ? " forkert" : "");
                 e.innerHTML = '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="' + navn + ' i ' + enhed + '">' +
-                    '<span class="sf-enhed">' + enhed + '</span><button type="button" class="sf-ok" tabindex="-1" aria-label="Tjek svaret">↵</button>';
+                    '<span class="sf-enhed">' + enhed + "</span>";
                 var inp = e.querySelector("input");
                 if (c.udkast) inp.value = c.udkast;
                 inp.addEventListener("keydown", function (ev) {
@@ -188,7 +188,6 @@
                     if (mig.kald.skriver) mig.kald.skriver(id);
                 });
                 inp.addEventListener("focus", function () { mig.aktiv = id; });
-                e.querySelector(".sf-ok").addEventListener("click", function () { if (mig.kald.tjek) mig.kald.tjek(id); });
                 c.input = inp;
             } else {
                 e.className = "skemafelt laast";

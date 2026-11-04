@@ -20,29 +20,38 @@
     var D = {};
 
     /* ----- Kemichael ----------------------------------------------------
-       To eller tre replikker pr. fane, hoejst ca. 60 tegn: hvor man er,
-       hvad man goer, og en toer bemaerkning. Ikke det, eleven selv kan se
-       paa scenen. Under linjen INTRO_PEG peger han paa elementet i PEG,
-       og det lyser op. */
+       Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
+       og eleven trykker Naeste. Hvert trin er to til fire hele saetninger
+       i Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges.
+       sel: et kort i panelet, felt: noget, der er tegnet paa laerredet
+       (introFelt i js/laerer.js). Det, han peger paa, faar en gul ramme,
+       der blinker. Ingen vittigheder i praesentationen. */
     D.INTRO = {
         kurve: [
-            "Her måler du, hvor hurtigt en reaktion går.",
-            "Afspil den herovre, og læg så sekant og tangent på kurven.",
-            "Pas på linealen. Den er lånt fra matematik."
+            { tekst: "I denne fane måler du reaktionshastigheden som hældningen på en koncentrationskurve. Bægerglasset til venstre bliver gult, efterhånden som der dannes Br₂. Grafen viser koncentrationen af Br₂ og BrO₃⁻ som funktion af tiden.",
+              felt: ["glas", "graf"] },
+            { tekst: "Knappen Afspil sætter reaktionen i gang, og du kan også trække i grafen for at gå frem og tilbage i tiden. Værktøjet Aflæs viser koncentrationerne, og Sekant viser gennemsnitshastigheden mellem to tidspunkter. Med Tangent lægger du en lineal gennem et punkt på kurven og drejer linealen i enderne, til den er en tangent.",
+              sel: ["#kurve-reaktion", "#kurve-vaerktoej"] },
+            { tekst: "Opgavekortet stiller spørgsmål om kurverne, og en opgave begynder, når du trykker på knappen Start opgave. Under opgaven giver den samme knap først et hint og derefter svaret.",
+              sel: "#kurve-opgavekort" }
         ],
         sammenstoed: [
-            "Her er partiklerne bag kurven.",
-            "Skru på antallet herovre, og hold øje med tælleren.",
-            "Det ligner gangen i frikvarteret. Bare mere ordentligt."
+            { tekst: "I denne fane ser du partiklerne bag reaktionshastigheden. Partiklerne A og B bevæger sig rundt i kassen, og nogle af deres sammenstød danner produktet C. Grafen til højre tæller, hvor mange C der er dannet.",
+              felt: ["kasse", "graf"] },
+            { tekst: "I kortet Opstilling vælger du antallet af A og B. Du kan også skifte til metal i syre, hvor magnesium ligger som en klump, i stykker eller som pulver. Kortet Måling viser antallet af sammenstød pr. sekund, og det forrige forsøg bliver stående stiplet på grafen.",
+              sel: ["#sam-opstilling", "#sam-maaling"] },
+            { tekst: "Opgaverne beder dig forudsige, hvad der sker, når opstillingen ændres, og bagefter kan du prøve forudsigelsen i kassen. En opgave begynder, når du trykker på knappen Start opgave, og den samme knap giver derefter først et hint og så svaret.",
+              sel: "#sam-opgavekort" }
         ],
         udtryk: [
-            "En ukendt reaktion. Du laver forsøgene, jeg holder kaffen.",
-            "Vælg koncentrationer herovre, og mål starthastigheden.",
-            "Tallene i reaktionsskemaet er ikke svaret. Alle prøver."
+            { tekst: "I denne fane finder du hastighedsudtrykket for en reaktion ud fra dine egne forsøg og ikke ud fra reaktionsskemaet. Opgavekortet viser reaktionen, og der er otte reaktioner i alt.",
+              sel: "#udtryk-opgavekort" },
+            { tekst: "I kortet Nyt forsøg vælger du startkoncentrationerne og trykker på Mål starthastigheden. Hvert forsøg giver en kurve på grafen med tangenten i t = 0 og en række i tabellen med starthastigheden v₀.",
+              sel: ["#udtryk-forsoeg", "#udtryk-tabel"], felt: "graf" },
+            { tekst: "Under tabellen klikker du eksponenterne frem i hastighedsudtrykket og trykker på Tjek. Knappen Giv hint på opgavekortet giver et hint, der bygger på dine egne forsøg.",
+              sel: ["#udtryk-udtryk", "#udtryk-opgaveknap"] }
         ]
     };
-    D.INTRO_PEG = 1;
-    D.PEG = { kurve: "kurve-reaktion", sammenstoed: "sam-opstilling", udtryk: "udtryk-forsoeg" };
 
     function ms(v) { return NK.sci(v, 2) + " M/s"; }
 

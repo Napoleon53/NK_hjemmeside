@@ -362,11 +362,36 @@ function koer() {
     paastand("quizzen kan gennemføres med 5/5", Q.slut && Q.point === 5 && /5 ud af 5/.test(d.getElementById("quiz-spm").textContent));
 
     overskrift("11. Kemichael");
-    paastand("præsentationen har to eller tre linjer på højst 60 tegn",
-        D.INTRO.length >= 2 && D.INTRO.length <= 3 && D.INTRO.every(function (l) { return l.length <= 60; }));
+    /* Brugerens regler 4. nov. 2026: to til fire trin med to til fire hele
+       saetninger, den faelles boble med Naeste og Spring over, og han
+       kommer kun ind af sig selv ved noget vildt (paaskeaegget) */
+    var introFejl = D.INTRO.filter(function (l) {
+        var n = l.tekst.split(/[.?] /).length;
+        return l.tekst.length > 420 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst);
+    });
+    paastand("præsentationen har to til fire trin, hvert med to til fire hele sætninger (højst 420 tegn)",
+        D.INTRO.length >= 2 && D.INTRO.length <= 4 && introFejl.length === 0, introFejl[0] && introFejl[0].tekst);
     paastand("han kommer kun forbi ved påskeægget", Object.keys(D.REPLIK).join(",") === "svaever");
-    paastand("hans replikker er højst 60 tegn",
-        Object.keys(D.REPLIK).every(function (k) { return D.REPLIK[k].every(function (l) { return l.length <= 60; }); }));
+    paastand("hans replikker er hele sætninger på højst 130 tegn",
+        Object.keys(D.REPLIK).every(function (k) { return D.REPLIK[k].every(function (l) { return l.length <= 130 && /^[A-ZÆØÅ].*\.$/.test(l) && l.split(" ").length >= 6; }); }));
+    paastand("den gamle knap Spring præsentationen over er væk", !d.getElementById("spring-over"));
+    var KL = NK.laerer;
+    for (i = 0; i < 240; i++) KL.opdater(1 / 60);
+    NK.Praesentation.selvtest(KL, function (sek) { for (var n = 0; n < Math.round(sek * 60); n++) KL.opdater(1 / 60); }).forEach(function (r) {
+        paastand(r[0], r[1], r[2]);
+    });
+    KL.besoegt = {};             /* afsnittene foer kan have lavet paaskeaegget */
+    KL.startIntro(true);
+    for (i = 0; i < 150; i++) KL.opdater(1 / 60);
+    KL.besoeg("svaever");
+    paastand("påskeægget venter, mens han præsenterer", KL.laererIIntro() && !KL.besoegt.svaever);
+    KL.stopIntro();
+    for (i = 0; i < 240; i++) KL.opdater(1 / 60);
+    KL.besoeg("svaever");
+    for (i = 0; i < 180; i++) KL.opdater(1 / 60);
+    paastand("påskeægget: han kommer forbi med én replik i hele sætninger", KL.besoegt.svaever &&
+        D.REPLIK.svaever.indexOf(KL.laerer.tale) >= 0, KL.laerer.tale);
+    for (i = 0; i < 900; i++) KL.opdater(1 / 60);
 
     overskrift("12. Sproget");
     d.getElementById("teori").classList.add("vis");
@@ -379,7 +404,7 @@ function koer() {
         tekster.push(q.spm, q.forklaring);
         q.svar.forEach(function (v) { tekster.push(v.tekst, v.fejl || ""); });
     });
-    tekster = tekster.concat(D.INTRO);
+    tekster = tekster.concat(D.INTRO.map(function (l) { return l.tekst; }));
     Object.keys(D.REPLIK).forEach(function (k) { tekster = tekster.concat(D.REPLIK[k]); });
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);

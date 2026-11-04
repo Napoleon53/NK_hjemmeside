@@ -1076,3 +1076,161 @@ select:focus-visible {
 
 /* Fane 3: spoergsmaalet, der gaettes paa, staar tydeligt over knapperne */
 .opgave-spm.skarp { margin: 6px 0 4px; font-size: 1rem; font-weight: 700; line-height: 1.4; color: var(--gul); }
+
+/* ---------------------------------------------------------------------
+   4. nov. 2026: scenekortet (papirkortet). Opgaven, gaettet, spoergsmaalet
+   med svarene, linjen med hint, fejl og forklaringen, den gule hintknap og
+   Indsend svar staar paa ét kort oeverst midt i scenen, ligesom i sc5.11
+   (brugerens valg 9. okt., 24. okt. og 3.-4. nov. 2026). Panelet har kun
+   tal, skemaer og opgavelisten. ../faelles/papirkort.css goer kortet lyst
+   med skriften Lexend; her staar kun det, kortet i denne animation har
+   ud over det faelles. Kortet skal kunne vaere i kortZone() i js/fane.js;
+   selvtesten maaler det. Intet pulserer.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(820px, calc(100% - 24px));
+}
+
+.scenekort .sk-hoved { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 4px; }
+.scenekort .sk-nr { font-size: 0.86rem; }
+.scenekort .sk-prompt > :first-child { margin-top: 0; }
+.scenekort .sk-prompt > :last-child { margin-bottom: 0; }
+.scenekort .maal-tekst,
+.scenekort .opgave-spm { margin: 0 0 4px; font-size: 1.06rem; line-height: 1.42; font-weight: 400; }
+.scenekort .opgave-spm.skarp { font-weight: 600; }
+.scenekort .sk-prompt .note { margin: 2px 0 0; font-size: 0.86rem; }
+
+/* Trinnene i en maaling paa én linje: klaret, nu og senere */
+.scenekort .trinliste { flex-direction: row; flex-wrap: wrap; gap: 5px; margin: 4px 0 0; }
+.scenekort .trinliste li { padding: 3px 10px 3px 4px; border-radius: 999px; font-size: 0.86rem; align-items: center; }
+.scenekort .trinliste li::before { flex: 0 0 18px; height: 18px; font-size: 0.7rem; }
+.scenekort .trinliste li.nu { font-size: 0.86rem; }
+.scenekort .gaet-linje { margin: 0 0 2px; font-size: 0.92rem; }
+
+/* Svarene: tre side om side, ét svar ad gangen */
+.scenekort .sk-valg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.scenekort .sk-valg[hidden] { display: none; }
+.scenekort .sk-valg.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scenekort .sk-knap,
+.scenekort .gk-knap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 0.96rem;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+}
+.scenekort .sk-knap:disabled { cursor: default; }
+.scenekort .v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+/* Kortets nederste raekke: linjen, hintknappen og Indsend svar (eller knappen videre) */
+.scenekort .sk-bund { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.scenekort .sk-bund .besked { flex: 1; margin: 0; }
+.scenekort .sk-bund .besked:empty { display: block; visibility: hidden; padding: 0; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; white-space: nowrap; }
+.scenekort .sk-bund .knap[hidden] { display: none; }
+
+html body.papirkort.papirkort .scenekort .sk-hoved .sk-chip { margin: 0; font-size: 1.02rem; }
+html body.papirkort.papirkort .scenekort.sejr .sk-hoved .sk-chip { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort.sejr.svar .sk-hoved .sk-chip { color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .sk-nr { color: var(--pk-mat); }
+html body.papirkort.papirkort .scenekort .sk-nr b { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .maal-tekst,
+html body.papirkort.papirkort .scenekort .opgave-spm { color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .sk-spm,
+html body.papirkort.papirkort .scenekort .opgave-spm.skarp { color: #0f1522; font-weight: 600; }
+html body.papirkort.papirkort .scenekort .note { color: var(--pk-mat); }
+html body.papirkort.papirkort .scenekort .gaet-linje { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .gaet-linje b { color: var(--pk-tekst); }
+
+html body.papirkort.papirkort .scenekort .trinliste li { background-color: #f0ede4; color: var(--pk-mat); box-shadow: none; font-weight: 500; }
+html body.papirkort.papirkort .scenekort .trinliste li::before { background-color: #e2ddd0; color: #4b5363; }
+html body.papirkort.papirkort .scenekort .trinliste li.nu {
+    background-color: var(--pk-gul-lys);
+    box-shadow: inset 0 0 0 1.5px #d8bd6a;
+    color: var(--pk-gul-tekst);
+    font-weight: 600;
+}
+html body.papirkort.papirkort .scenekort .trinliste li.nu::before { background-color: #c9a640; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .trinliste li.gjort { background-color: transparent; color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .trinliste li.gjort::before { background-color: var(--pk-groen); color: #ffffff; }
+
+/* Linjen: hint, fejl, ros og forklaringen i en bloed boks */
+html body.papirkort.papirkort .scenekort .sk-bund .besked {
+    padding: 6px 10px;
+    border-left: 3px solid transparent;
+    border-radius: 2px 8px 8px 2px;
+    background-color: transparent;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--pk-tekst-svag);
+    animation: none;
+}
+html body.papirkort.papirkort .scenekort .sk-bund .besked.god { background-color: #e6f4ec; border-left-color: var(--pk-groen); color: var(--pk-groen-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked.skidt { background-color: var(--pk-roed-lys); border-left-color: var(--pk-roed); color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked.gul { background-color: var(--pk-gul-lys); border-left-color: #d4a72c; color: var(--pk-gul-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked b { color: inherit; }
+html body.papirkort.papirkort .scenekort .sk-bund .besked .broek { font-size: 0.8em; }
+
+/* Knappen videre, naar opgaven er loest: groen, uden puls, dér hvor Indsend svar stod */
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa,
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa.banker {
+    min-width: 0;
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--pk-groen);
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    box-shadow: none;
+    animation: none;
+}
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa:hover:not(:disabled) { background-color: #33925f; }
+html body.papirkort.papirkort .scenekort .sk-bund .knap.hjaelp,
+html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { font-size: 0.95rem; }
+
+/* Start forfra og Koer igen staar i scenens hjoerne, aldrig paa kortet */
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .scenekort .sk-hoved { margin-bottom: 2px; }
+    .scenekort .maal-tekst,
+    .scenekort .opgave-spm { font-size: 0.96rem; line-height: 1.34; }
+    .scenekort .trinliste li { padding: 2px 8px 2px 3px; font-size: 0.8rem; }
+    .scenekort .trinliste li.nu { font-size: 0.8rem; }
+    .scenekort .sk-valg { gap: 6px; margin-top: 6px; }
+    .scenekort .sk-knap,
+    .scenekort .gk-knap { padding: 5px 8px; font-size: 0.88rem; }
+    .scenekort .sk-bund { margin-top: 6px; }
+    html body.papirkort.papirkort .scenekort .sk-hoved .sk-chip { font-size: 0.94rem; }
+    html body.papirkort.papirkort .scenekort .sk-bund .besked { padding: 4px 9px; font-size: 0.86rem; line-height: 1.3; }
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa { padding: 7px 14px; font-size: 0.92rem; }
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.hjaelp,
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { font-size: 0.88rem; }
+}
+
+/* Smalle scener: svarene under hinanden */
+@media (max-width: 760px) {
+    .scenekort .sk-valg { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+}

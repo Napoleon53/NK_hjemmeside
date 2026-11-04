@@ -125,10 +125,17 @@ for svært, er næste trin 1.5 (også felterne på skrå). Den perfekte robot vi
 
 ## Kemichael
 
-Præsenterer hver sværhedsgrad med tilbuddet Start præsentation / Nej tak
-(`js/praesentation.js`, ens i alle superanimationer). Tre replikker i `D.INTRO`; på
-anden replik peger han på saltene i panelet. Når spillet er slut, går han ind og
-siger én replik (`D.SLUT`: rekord, vundet, mindst halvdelen af saltene eller færre).
+Præsenterer hver sværhedsgrad med tilbuddet Start præsentation / Nej tak (K viser
+den igen). Præsentationen er den fælles fra 4. nov. 2026
+(`../kemichael/praesentation.js` og `praesentation.css`): tre trin pr. sværhedsgrad
+i `D.INTRO`, to til fire hele sætninger hver, og han peger på det, der blinker med
+en gul ramme (brættet, kortet Salte, Styring og Regler på Let, køen og gem på Middel,
+køen på Svær). Taleboblen har Næste (på sidste trin Afslut) og Spring præsentationen
+over; Enter og pil til højre er Næste, Esc springer over, og han går aldrig videre
+af sig selv. Af sig selv kommer han kun, når spillet er slut: én replik (`D.SLUT`:
+rekord, vundet, mindst halvdelen af saltene eller færre). Et tabt spil giver kun en
+replik første gang og derefter hver fjerde gang i samme besøg (brugerens valg 4. nov.
+2026); et vundet spil og en rekord giver altid én.
 Baggrundslivet er slået fra, så han aldrig går hen over brættet under spillet.
 
 ## Filer
@@ -146,7 +153,7 @@ Baggrundslivet er slået fra, så han aldrig går hen over brættet under spille
 | `js/lyd.js` | små lyde lavet i koden og baggrundsmusikken (`NK.Spillyd`; `NK.Lyd` er Kemichaels) |
 | `_robot.js` | robotspilleren til balancen (udviklerværktøj, køres med node) |
 | `musik.mp3` | baggrundsmusikken, klippet til en løkke på 80 takter (se Musik) |
-| `js/laerer.js`, `js/praesentation.js`, `js/sprites.js` | Kemichael |
+| `js/laerer.js`, `js/sprites.js` | Kemichael (præsentationen er fælles: `../kemichael/praesentation.js`) |
 | `js/rundvisning.js` | rundvisningen bag ? |
 | `js/app.js` | faner, taster, knapper, panel og tegneløkken |
 | `_selvtest.html` | selvtesten |

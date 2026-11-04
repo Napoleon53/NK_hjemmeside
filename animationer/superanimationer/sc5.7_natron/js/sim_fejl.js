@@ -35,12 +35,13 @@
     }
 
     var P = SimFejl.prototype;
-    NK.Fane.paa(P, { navn: "fejl" });
+    NK.Fane.paa(P, { navn: "fejl", naesteTekst: "Næste fejlkilde →" });
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {
         this.opg = D.FEJL[i];
         this.valgt = null;
+        this.valgJ = null;
         this.res = null;
         this.auto = null;
         this.forklaring = "";
@@ -70,29 +71,28 @@
 
     P.promptHTML = function () {
         var o = this.opg;
-        return '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>" +
-            (this.faerdig ? "" : '<p class="opgave-spm skarp">' + NK.html(D.FEJL_SPM) + "</p>");
+        return '<p class="maal-tekst">' + this.papirTekst(NK.html(o.tekst) + " " + NK.html(D.FEJL_SPM)) + "</p>";
     };
 
+    /* Svarene paa kortet vaelger kun; Indsend svar saetter de to forsoeg i
+       gang. Bagefter bliver kortet paa spoergsmaalet: det rigtige svar er
+       groent, et forkert valg roedt. */
     P.visKortEkstra = function () {
-        var mig = this, e = this.el.valg, o = this.opg;
-        e.hidden = false;
-        e.innerHTML = "";
-        D.FEJL_SVAR.forEach(function (s, j) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "knap";
-            b.textContent = s.t;
-            if (mig.valgt !== null) {
-                b.disabled = true;
-                if (j === mig.valgt) b.classList.add("valgt");
-                if (mig.faerdig && s.id === o.rigtig) b.classList.add("rigtig");
-                if (mig.faerdig && j === mig.valgt && s.id !== o.rigtig) b.classList.add("forkert");
-            }
-            b.addEventListener("click", function () { mig.vaelgSvar(j, "gaet"); });
-            e.appendChild(b);
+        var mig = this, o = this.opg;
+        var svar = D.FEJL_SVAR.map(function (s, j) {
+            return { t: s.t, ok: s.id === o.rigtig, forkert: mig.faerdig && j === mig.valgt && s.id !== o.rigtig };
         });
+        var valgtJ = this.valgt !== null ? this.valgt : this.valgJ;
+        this.svarKnapper(this.el.valg, svar, valgtJ, function (j) { mig.valgJ = j; });
+        /* Mens forsoegene koerer, er svarene laast */
+        if (this.valgt !== null && !this.faerdig) {
+            [].forEach.call(this.el.valg.querySelectorAll("button"), function (b) { b.disabled = true; });
+        }
     };
+
+    P.harIndsend = function () { return this.valgt === null; };
+    P.kanIndsende = function () { return this.valgJ !== null; };
+    P.indsend = function () { this.vaelgSvar(this.valgJ, "gaet"); };
 
     P.vaelgSvar = function (j, maade) {
         if (this.valgt !== null) return;
@@ -128,7 +128,7 @@
     P.opgaveFaerdig = function () { return this.res !== null; };
 
     P.trinLinje = function () {
-        if (this.valgt === null) return "Gæt først: vælg et af svarene herunder.";
+        if (this.valgt === null) return "";
         if (this.koerer) return "Begge grupper laver forsøget. Hold øje med uret og vægtene.";
         return "";
     };
@@ -245,8 +245,7 @@
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
         if (this.valgt === null && (u === "g1" || u === "g2")) {
-            this.kortBesked("Gæt først: vælg et af svarene i kortet.");
-            this.pegT = 1.6;
+            this.kortBlink();
         } else if (u === "g1") this.kortBesked(D.FEJL_1);
         else if (u === "g2") this.kortBesked(this.opg.tekst);
         return false;
@@ -261,7 +260,9 @@
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.08, 26, 48));
         lay.px = NK.klamp(Math.min(W / 58, Hs / 30), 12, 17);
-        lay.skiltY = 14;
+        /* De to forsoeg begynder under den plads, kortet har faaet sat af */
+        lay.top = this.top();
+        lay.skiltY = lay.top;
         lay.skiltH = Math.round(lay.px * 5.4);
         /* Trefoden saa stor, som hoejden og den halve bredde tillader */
         var gap = NK.klamp(W * 0.02, 8, 26), MT = NK.Sprites.MAAL.trefod;
@@ -282,7 +283,7 @@
         });
         /* Skiltet er lige saa bredt som opstillingen, men mindst 240 px, og
            haenger over den med plads til diglen, naar den flyttes */
-        lay.skiltY = Math.round(Math.max(14, lay.st[0].op.top - th * 0.5 - lay.skiltH));
+        lay.skiltY = Math.round(Math.max(lay.top, lay.st[0].op.top - th * 0.5 - lay.skiltH));
         lay.st.forEach(function (st) {
             var b = Math.min(W / 2 - 16, Math.max(240, st.x1 - st.x0));
             st.skilt = { x: st.x - b / 2, y: lay.skiltY, b: b, h: lay.skiltH };

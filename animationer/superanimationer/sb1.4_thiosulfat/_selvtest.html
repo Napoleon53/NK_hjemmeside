@@ -377,13 +377,16 @@ function koer() {
     NK.tilf = function () { return Math.random(); };
 
     overskrift("8. Kemichael og fanerne");
-    var intro = true;
+    /* Brugerens regler 4. nov. 2026: to til fire trin med to til fire hele saetninger */
+    var intro = true, introNote = "";
     Object.keys(D.INTRO).forEach(function (k) {
-        if (D.INTRO[k].length < 2 || D.INTRO[k].length > 3) intro = false;
-        D.INTRO[k].forEach(function (l) { if (l.length > 62) intro = false; });
-        if (!d.getElementById(D.PEG[k])) intro = false;
+        if (D.INTRO[k].length < 2 || D.INTRO[k].length > 4) { intro = false; introNote = k; }
+        D.INTRO[k].forEach(function (l) {
+            var n = l.tekst.split(/[.?] /).length;
+            if (l.tekst.length > 420 || n < 2 || n > 4 || !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || /^Her\b/.test(l.tekst)) { intro = false; introNote = l.tekst.slice(0, 50); }
+        });
     });
-    paastand("to eller tre replikker pr. fane, højst ca. 60 tegn, og det, han peger på, findes", intro);
+    paastand("to til fire trin pr. fane, og hvert trin er to til fire hele sætninger (højst 420 tegn)", intro, introNote);
     try { w.localStorage.removeItem("nk-sb1.4-intro-konc"); } catch (e) {}
     NK.visFane("konc");
     var tb = d.getElementById("konc-tilbud");
@@ -392,14 +395,18 @@ function koer() {
     paastand("Nej tak skjuler det og huskes", tb.hidden && w.getComputedStyle(tb).display === "none" && NK.hent("nk-sb1.4-intro-konc", false) === true);
     NK.visFane("temp"); NK.visFane("konc");
     paastand("tilbuddet kommer ikke igen", tb.hidden);
-    C.startIntro(true);
-    for (i = 0; i < 240; i++) C.opdater(1 / 60);
-    paastand("K viser præsentationen, og knappen Spring over vises", C.laererIIntro() && !d.getElementById("konc-spring").hidden);
-    for (i = 0; i < 60 * 4; i++) C.opdater(1 / 60);
-    paastand("under anden replik lyser kortet, han peger på", C.introTrin !== 2 || d.getElementById("konc-forsoeg").classList.contains("peg"));
-    d.getElementById("konc-spring").click();
-    for (i = 0; i < 120; i++) C.opdater(1 / 60);
-    paastand("Spring over sender ham ud, og kortet slukker", !C.laererIIntro() && d.getElementById("konc-spring").hidden && !d.getElementById("konc-forsoeg").classList.contains("peg"));
+    /* Den faelles test af praesentationen paa hver fane. Laerredet tegnes
+       ogsaa, saa felterne paa det har deres plads. */
+    ["kryds", "konc", "temp"].forEach(function (id) {
+        NK.visFane(id);
+        var sim = S[id];
+        sim.tilpas();
+        NK.Praesentation.selvtest(sim, function (sek) {
+            for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60);
+            sim.tegn();
+        }).forEach(function (r) { paastand(id + ": " + r[0], r[1], r[2]); });
+    });
+    NK.visFane("konc");
     ["kryds", "konc", "temp"].forEach(function (id) {
         NK.visFane(id);
         paastand("fanen " + id + " vises alene", d.getElementById("fane-" + id).classList.contains("aktiv") && d.querySelectorAll(".fane.aktiv").length === 1);
@@ -418,7 +425,7 @@ function koer() {
             (o.valg || []).forEach(function (v) { tekster.push(v.tekst + " " + v.forklaring); });
         });
     });
-    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k]); });
+    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k].map(function (l) { return l.tekst; })); });
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
     paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−,])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);

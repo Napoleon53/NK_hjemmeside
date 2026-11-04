@@ -20,6 +20,8 @@
      ejer.lagerIds()           de stoffer, der skal staa en flaske af
      ejer.mangler(id)          eleven klikker paa et stof, der er sluppet op
      ejer.aendret()            pladserne eller kontakterne er aendret
+     ejer.spaer()              true, naar kortet venter paa Naeste ordre:
+                               saa saetter et klik intet i gang (kortet blinker)
    ===================================================================== */
 (function () {
     "use strict";
@@ -96,6 +98,7 @@
 
     P.skift = function (k) {
         if (this.auto) return;
+        if (this.ejer.spaer && this.ejer.spaer()) return;
         this.bet[k] = !this.bet[k];
         if (k === "hplus" && this.bet.hplus && this.niveau > 0.05) this.draabe("#f5dd8a");
         this.visKontakter();
@@ -174,6 +177,7 @@
     /* ----- Pladserne ------------------------------------------------------------- */
     P.laeg = function (id, i) {
         if (this.auto) return false;
+        if (this.ejer.spaer && this.ejer.spaer()) return false;
         var s = K.stof(id);
         if (this.iKolben) {
             this.ejer.besked("Kolben er i brug. Tryk Start, eller tøm kolben først.", "kort");
@@ -196,6 +200,7 @@
 
     P.klikPlads = function (i) {
         if (this.auto) return;
+        if (this.ejer.spaer && this.ejer.spaer()) return;
         if (this.iKolben) {
             this.ejer.besked("Stofferne er hældt i kolben. Tryk Start, eller tøm kolben.", "kort");
             return;
@@ -241,6 +246,7 @@
     /* Tom kolben: blandingen haeldes ud */
     P.toem = function (afEleven) {
         if (this.auto) return;
+        if (afEleven && this.ejer.spaer && this.ejer.spaer()) return;
         var var_ = this.iKolben;
         this.plads = [null, null];
         this.iKolben = false;
@@ -273,6 +279,7 @@
 
     P.start = function () {
         if (this.auto) return;
+        if (this.ejer.spaer && this.ejer.spaer()) return;
         var u = this.udfaldNu();
         if (u.slags === "tom" || u.slags === "en") {
             this.ejer.udfald(u, "start");

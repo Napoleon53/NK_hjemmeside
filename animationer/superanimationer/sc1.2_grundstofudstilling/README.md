@@ -3,7 +3,8 @@
 Superanimation om grundstofferne: navn, symbol, plads i det periodiske system
 og elektronstruktur, og hvordan symbolerne tælles i en formel. Åbn
 `index.html`. Mappen henter kun filer inde fra sig selv, bortset fra
-Kemichael (`../../v2/kemichael/kemichael.js`). Ingen `fetch` og ingen moduler,
+Kemichael (`../../v2/kemichael/kemichael.js` og de fælles filer i
+`../kemichael/`). Ingen `fetch` og ingen moduler,
 så den virker fra harddisken.
 
 ## Bestillingen
@@ -105,16 +106,30 @@ slutter, når alle 20 er fundet. Point og stime som i opråbet, egen rekord, og
 "Øv dem her" viser gåden under navnet.
 
 **Kemichael** kommer ikke af sig selv. Første gang en fane åbnes i en browser,
-står der to knapper midt foroven: Start præsentation og Nej tak (`js/praesentation.js`,
-reglen i `../README.md`). Så kan eleven kigge sig omkring først. Tilbuddet
-forsvinder også, når den første opgave er løst eller spillet startet. Trykker
-eleven Start, præsenterer han: udstillingen og formlerne tre replikker, hvor han
-peger på panelet, opråbet to, hvor han peger op på udstillingen. Han går kun ved
-knappen Spring præsentationen over, to klik på ham eller Esc, og på opråbet også
-ved Start. <kbd>K</kbd> viser
-præsentationen igen. Ellers roser han tørt, når en periode er fyldt, når et
-niveau af flasker er talt, og når spillet er slut. Replikkerne står nederst i
-`js/data.js`. Kaffekoppen på bordet er det fælles påskeæg.
+står der to knapper midt foroven: Start præsentation og Nej tak. Så kan eleven
+kigge sig omkring først. Tilbuddet forsvinder også, når den første opgave er
+løst eller spillet startet. Præsentationen er den fælles
+(`../kemichael/praesentation.js`, se `../kemichael/README.md`): tre trin pr.
+fane med to til fire hele sætninger i hvert, og taleboblen har knapperne Næste
+(på sidste trin Afslut) og Spring præsentationen over. Han går aldrig videre af
+sig selv, og det, han peger på, får en gul ramme, der blinker (på fane 1 også
+prøven og mærket på bordet, `introFelt` i `js/laerer.js`). På fane 1 står han
+foran kassen og på fane 2 foran den store flaske, så tavlen kan ses. På
+opråbet går han også ved Start. <kbd>K</kbd> viser præsentationen igen, og
+<kbd>Esc</kbd> springer den over.
+
+Ellers kommer han kun ind af sig selv, når en hel fane er klaret (brugerens
+regel 4. nov. 2026): når alle 36 prøver står i udstillingen ("Alle 36 prøver
+står i udstillingen. Nu tør jeg vise den til rektor."), når alle tolv flasker
+er talt ("Du har talt atomerne i alle tolv flasker. Jeg skriver det ind i
+regnskabet.") og én gang pr. besøg for hvert spil på fane 3, når spillet er
+gået godt: ny rekord ("Det er en ny rekord. Jeg skriver den ned et sted."),
+mange point ("Du er hurtigere end kaffemaskinen, men det er heller ikke
+svært.") eller alle tyve gåder i Hvem er jeg? ("Du har fundet alle tyve
+grundstoffer. Nu kender du dem bedre end rektor."). Rosen efter hver periode og
+hvert niveau af flasker og replikkerne efter et svagt spil er fjernet.
+Replikkerne står nederst i `js/data.js`. Kaffekoppen på bordet er det fælles
+påskeæg.
 
 **Navnetavlen** midt i udstillingen åbner det periodiske system i stort format med
 atomnumrene og alle 36 navne i alfabetisk orden (også <kbd>P</kbd>). Hintet til
@@ -182,11 +197,11 @@ js/tjek.js          tjek af navn, symbol, elektronstruktur og antal atomer; besk
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       udstillingen, prøverne, kassen, mærket, tavlen, atommodellen, flasken, kuglerne
 js/opslag.js        navnetavlen i stort format
-js/praesentation.js tilbuddet Start præsentation / Nej tak på alle tre faner
 js/sim_montre.js    fane 1 (udstillingen)
 js/sim_formler.js   fane 2
 js/sim_opraab.js    fane 3: opråbet og Hvem er jeg?
-js/laerer.js        Kemichael på alle tre faner
+js/laerer.js        Kemichael på alle tre faner (præsentationen er den fælles i
+                    ../kemichael/praesentation.js)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -233,11 +248,13 @@ hovedgruppen, at de 12 formler tælles rigtigt, at alle rigtige svar godkendes,
 at over 70 typiske fejl giver den rigtige besked, at der er hint og svar til
 alle 145 felter uden at hintet siger svaret, at opråbets svarmuligheder er
 fire forskellige med ét rigtigt, at gåderne ikke siger svaret, at sproget
-holder reglerne, at alle tre faner og Hvem er jeg? kan gennemføres, og at
-layoutet holder fra 520 × 380 til 1500 × 900 (også skiltet og gåderne på
-tavlen). Den
-kræver en lokal server eller Chrome med `--allow-file-access-from-files`. Den
-lægger elevens gemte fremskridt tilbage bagefter.
+holder reglerne, at alle tre faner og Hvem er jeg? kan gennemføres, at
+Kemichael kun kommer ind af sig selv, når en hel fane er klaret, at
+præsentationen virker på alle faner (den fælles test
+`NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
+1500 × 900 (også skiltet og gåderne på tavlen). Den kræver en lokal server
+eller Chrome med `--allow-file-access-from-files`. Den lægger elevens gemte
+fremskridt tilbage bagefter. Sidst kørt 4. november 2026: ALT OK (231 påstande).
 
 ## Forenklinger
 

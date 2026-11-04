@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kemikalielageret</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
 <body>
 
@@ -44,7 +45,6 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <button class="spring-over" id="lager-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         <div class="scene-mrk" id="lager-status"></div>
     </div>
 
@@ -106,14 +106,14 @@
             <ul class="kasseliste" id="baand-kasseliste"></ul>
         </div>
 
-        <!-- Kemichaels praesentation staar paa denne fane nederst i panelet,
-             ikke i scenen, hvor den daekkede hylden (brugerens valg) -->
+        <!-- Tilbuddet om Kemichaels praesentation staar paa denne fane nederst
+             i panelet, ikke i scenen, hvor det daekkede hylden (brugerens
+             valg). Selve praesentationen staar i hans taleboble i scenen. -->
         <div class="panel-bund">
             <div class="tilbud i-panel" id="baand-tilbud" hidden>
                 <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
                 <button class="tilbud-nej" type="button">Nej tak</button>
             </div>
-            <button class="spring-over i-panel" id="baand-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         </div>
     </aside>
 </section>
@@ -177,13 +177,13 @@
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
+<script src="../kemichael/praesentation.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/opslag.js"></script>
 <script src="js/sim_lager.js"></script>
 <script src="js/sim_baand.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
-<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

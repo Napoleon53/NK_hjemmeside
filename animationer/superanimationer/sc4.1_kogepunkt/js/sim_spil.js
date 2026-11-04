@@ -175,7 +175,6 @@
             valg: NK.el("spil-valg")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("spil-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("spil-nulstil").addEventListener("click", function () { mig.nyRunde(); });
         this.el.valg.addEventListener("click", function (e) {
             var b = e.target.closest ? e.target.closest("button") : null;
@@ -243,7 +242,8 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        var luft = NK.klamp(H * 0.085, 40, 64);
+        /* Alt tegnes under papirkortet oeverst i scenen (js/skort.js) */
+        var luft = this.skort.top();
         var vB = Math.round(NK.klamp(W * 0.21, 140, 260));
         /* Forklaringen af stofferne oeverst i venstre kolonne: én raekke pr. stof */
         var rh = Math.round(NK.klamp(H * 0.07, 38, 58));
@@ -429,13 +429,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-spil", tilbud: "spil-tilbud", spring: "spil-spring" });
-
-    /* Mens han siger, hvor man gaetter, lyser svarene */
-    P.pegPaaFelt = function () {
-        var i = this.laererIIntro && this.laererIIntro() ? this.introTrin : 0;
-        NK.el("spil-valg").classList.toggle("peg", i === 2);
-    };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-spil", tilbud: "spil-tilbud" });
 
     NK.SimSpil = SimSpil;
 }());

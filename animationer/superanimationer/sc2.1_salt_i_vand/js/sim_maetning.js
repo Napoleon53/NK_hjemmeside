@@ -69,7 +69,7 @@
         this.tilpas();
         this.tid = 0;               /* et ur, der altid gaar (bruges af laereren) */
         if (this.laererStart) this.laererStart();
-        this.opgaver = new NK.Opgaver("maet", OPGAVER, this, "Hvor meget kan der være?");
+        this.opgaver = new NK.Opgaver("maet", OPGAVER, this, "Hvor meget kan der være?", "om mættede opløsninger");
         this.opdaterPanel();
     };
 
@@ -147,13 +147,15 @@
         var L = this.L;
         this.todelt = L.b >= 640;
 
+        /* Papirkortet har pladsen oeverst i scenen (NK.kortZone i js/opgave.js) */
+        var top = NK.kortTop() - 6, H = L.h - top;
         var glasFelt, grafFelt;
         if (this.todelt) {
-            glasFelt = { x: 0, y: 0, b: L.b * 0.44, h: L.h };
-            grafFelt = { x: L.b * 0.44, y: 0, b: L.b * 0.56, h: L.h };
+            glasFelt = { x: 0, y: top, b: L.b * 0.44, h: H };
+            grafFelt = { x: L.b * 0.44, y: top, b: L.b * 0.56, h: H };
         } else {
-            glasFelt = { x: 0, y: 0, b: L.b, h: L.h * 0.50 };
-            grafFelt = { x: 0, y: L.h * 0.50, b: L.b, h: L.h * 0.50 };
+            glasFelt = { x: 0, y: top, b: L.b, h: H * 0.50 };
+            grafFelt = { x: 0, y: top + H * 0.50, b: L.b, h: H * 0.50 };
         }
         this.felt = glasFelt;
 
@@ -447,7 +449,10 @@
         NK.saetTekst("maet-skala-knap", this.autoSkala ? "Fælles skala" : "Skaler til stoffet");
 
         var besked, klasse = "besked";
-        if (this.tilsat === 0) {
+        if (this.varsel) {
+            besked = this.varsel;
+            klasse = "besked gul";
+        } else if (this.tilsat === 0) {
             besked = "100 mL vand. Hæld salt i, og se, hvor meget der kan være.";
         } else if (!maettet) {
             besked = "Det hele er opløst. Der er plads til " + NK.gram(graense - this.tilsat) + " g mere.";
@@ -459,20 +464,8 @@
         }
         NK.saetTekst("maet-besked", besked);
         NK.saetKlasse("maet-besked", klasse);
-
-        NK.saetTekst("maet-status", this.varsel || this.statusTekst(salt, tung, maettet));
     };
 
-    P.statusTekst = function (salt, tung, maettet) {
-        if (this.tilsat === 0) {
-            return tung
-                ? "Der kan kun opløses " + NK.gram(this.graense()) + " g " + salt.formel + " i 100 mL vand."
-                : "Der kan opløses " + NK.gram(this.graense()) + " g " + salt.formel + " i 100 mL vand ved " +
-                  Math.round(this.temp) + " °C.";
-        }
-        if (maettet) return "Alt over kurven bliver liggende i bunden.";
-        return "Under kurven: der er stadig plads til mere salt i vandet.";
-    };
 
     /* ----- Tegning ---------------------------------------------------------------- */
     P.tegn = function () {
@@ -963,12 +956,15 @@
                 sim.saetTemp(startTemp);
                 sim.saetTilsat(gram);
             },
+            /* Temperaturen sendes ind med Indsend svar; skyderen loeser ikke opgaven */
             tjek: function (sim) {
                 if (NK.Valg.saltId !== salt.id || Math.abs(sim.tilsat - gram) > 0.001) return false;
-                if (sim.bundfald() > 0) return false;
+                var t = Math.round(sim.temp);
+                if (sim.bundfald() > 0) return "Ved " + t + " °C ligger der stadig bundfald i glasset. Prøv en højere temperatur.";
                 if (sim.temp <= graense + 2) return true;
-                return "Alt er opløst, men det kan klares ved en lavere temperatur.";
+                return "Ved " + t + " °C er alt opløst, men det kan klares ved en lavere temperatur.";
             },
+            indsendTekst: function (sim) { return "Indsend svar: " + Math.round(sim.temp) + " °C"; },
             visSvar: function (sim) { sim.saetTemp(graense); }
         };
     }

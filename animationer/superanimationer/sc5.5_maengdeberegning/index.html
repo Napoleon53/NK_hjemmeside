@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mængdeberegning</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇄</span> Mængdeberegning</h1>
@@ -29,20 +30,22 @@
 <section class="fane aktiv" id="fane-vej" role="tabpanel" aria-label="Vejen">
     <div class="scene">
         <canvas id="vej-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, valget, hint, fejl,
+             forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="vej-skort">
+            <div class="sk-ind" id="vej-ind"></div>
+            <div class="sk-bund" id="vej-status">
+                <p class="st-tekst" id="vej-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="vej-knap" type="button">Giv hint</button>
+                <button class="knap indsend" id="vej-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="vej-anker-skema"></div>
         <div class="anker" id="vej-anker-vaegte"></div>
         <div class="skema-felter" id="vej-felter"></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="vej-kort">
-            <h2><span id="vej-titel">Opgave</span><span class="taeller">opgave <b id="vej-nr">1</b>/<span id="vej-antal">4</span></span></h2>
-            <div id="vej-prompt"></div>
-            <p class="besked" id="vej-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="vej-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="vej-beregninger">
             <h2>Beregningerne</h2>
             <div class="regn-linjer" id="vej-linjer"></div>
@@ -62,19 +65,22 @@
 <section class="fane" id="fane-skema" role="tabpanel" aria-label="Skemaet">
     <div class="scene">
         <canvas id="skema-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, valget, hint, fejl,
+             forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="skema-skort">
+            <div class="sk-ind" id="skema-ind"></div>
+            <div class="sk-bund" id="skema-status">
+                <p class="st-tekst" id="skema-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="skema-knap" type="button">Giv hint</button>
+                <button class="knap indsend" id="skema-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="skema-anker-skema"></div>
         <div class="anker" id="skema-anker-vaegt"></div>
         <div class="skema-felter" id="skema-felter"></div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="skema-kort">
-            <h2><span id="skema-titel">Opgave</span><span class="taeller">opgave <b id="skema-nr">1</b>/<span id="skema-antal">5</span></span></h2>
-            <div id="skema-prompt"></div>
-            <p class="besked" id="skema-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="skema-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="skema-beregninger">
             <h2>Beregningerne</h2>
             <div class="regn-linjer" id="skema-linjer"></div>
@@ -98,20 +104,22 @@
 <section class="fane" id="fane-begr" role="tabpanel" aria-label="Begrænsende mængde">
     <div class="scene">
         <canvas id="begr-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, valget, hint, fejl,
+             forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
+        <div class="scenekort" id="begr-skort">
+            <div class="sk-ind" id="begr-ind"></div>
+            <div class="sk-bund" id="begr-status">
+                <p class="st-tekst" id="begr-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="begr-knap" type="button">Giv hint</button>
+                <button class="knap indsend" id="begr-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="begr-anker-skema"></div>
         <div class="anker" id="begr-anker-bord"></div>
         <div class="skema-felter" id="begr-felter"></div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="begr-kort">
-            <h2><span id="begr-titel">Opgave</span><span class="taeller">opgave <b id="begr-nr">1</b>/<span id="begr-antal">6</span></span></h2>
-            <div id="begr-prompt"></div>
-            <p class="besked" id="begr-besked" aria-live="polite"></p>
-            <div class="knaprad valgrad" id="begr-valg" hidden></div>
-            <div class="knaprad"><button class="knap hjaelp" id="begr-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="begr-beregninger">
             <h2>Beregningerne</h2>
             <div class="regn-linjer" id="begr-linjer"></div>
@@ -179,6 +187,7 @@
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/skema.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_vej.js"></script>
 <script src="js/sim_skema.js"></script>

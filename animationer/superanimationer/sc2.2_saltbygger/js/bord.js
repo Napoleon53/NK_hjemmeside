@@ -245,7 +245,45 @@
        foldet sammen, til eleven har fundet dens ladning (visKendt). */
     NK.Bord.prototype.saetUkendt = function (kat, nKat, an, nAn, side) {
         this.ukendt = { side: side, q: 0, fundet: false, kendtFundet: false };
+        this.mindst = 0;
         this.saet(kat, nKat, an, nAn);
+    };
+
+    /* Fane 3, naar en ukendt sammensat ion er fundet og skal i et nyt
+       salt: den kendte ion skiftes ud med partneren (fx Na med Ca), og
+       der bliver én af hver. Partneren er foldet sammen med "?" og lyser,
+       til eleven har fundet dens ladning; den fundne ion beholder sin. */
+    NK.Bord.prototype.nyPartner = function (ion) {
+        var side = ion.q > 0 ? "kat" : "an", anden = side === "kat" ? "an" : "kat";
+        this.demo = null;
+        this.fjernAlle(side);
+        this[side] = ion;
+        this.tilfoejIntern(side);
+        while (this.antal(anden) > 1) this.fjernIntern(anden, null);
+        this.ukendt = { side: anden, q: Math.abs(this[anden].q), fundet: true, kendtFundet: false, marker: true };
+        this.mindst = 0;
+        this.laas(false);
+        this.aendret("partner", side);
+    };
+
+    /* Fane 3, sidste trin: begge ladninger er kendt, og bordet virker som
+       paa fane 1. Eleven laegger flere af hver med + og −, men kan ikke
+       fjerne den sidste af en slags, for der er ingen hylde at hente den
+       fra igen. */
+    NK.Bord.prototype.fritByg = function () {
+        this.ukendt = null;
+        this.mindst = 1;
+        this.laas(false);
+        this.aendret("frit");
+    };
+
+    /* Saet antallet af hver ion uden at skifte ionerne ud (svaret). */
+    NK.Bord.prototype.antalTil = function (nKat, nAn) {
+        while (this.nKat < nKat && this.tilfoejIntern("kat")) { /* én mere */ }
+        while (this.nKat > nKat && this.fjernIntern("kat", null)) { /* én mindre */ }
+        while (this.nAn < nAn && this.tilfoejIntern("an")) { /* én mere */ }
+        while (this.nAn > nAn && this.fjernIntern("an", null)) { /* én mindre */ }
+        this.aendret("saet");
     };
 
     NK.Bord.prototype.visKendt = function () {
@@ -340,6 +378,7 @@
 
     NK.Bord.prototype.fjern = function (side, kort) {
         if (this.laast) return;
+        if (this.mindst && this.antal(side) <= this.mindst) return;
         this.demo = null;
         if (this.fjernIntern(side, kort)) this.aendret("faerre", side);
     };
@@ -449,7 +488,7 @@
             }
             s.el.classList.remove("ladning");
             s.antal.textContent = n + " ×";
-            s.minus.disabled = this.laast || n <= 0;
+            s.minus.disabled = this.laast || n <= (this.mindst || 0);
             s.plus.disabled = this.laast || n >= MAKS || !this[side];
             s.el.style.display = this[side] ? "" : "none";
         }
@@ -808,7 +847,7 @@
             c.stroke();
         }
 
-        if (over && !this.ukendt) {
+        if (over && !this.ukendt && !(this.mindst && this.antal(k.side) <= this.mindst)) {
             /* Et lille kryds i yderhjoernet: klik fjerner ionen. */
             var kx = k.x + k.b - 9, ky = kat ? k.y + 9 : k.y + k.h - 9;
             c.fillStyle = "rgba(20, 20, 26, 0.9)";

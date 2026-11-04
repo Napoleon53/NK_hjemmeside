@@ -586,36 +586,36 @@
     };
 
     /* ----- Kemichaels praesentation af fanerne --------------------------
-       Naar eleven har sagt ja til den (js/laerer.js). Hoejst ca. 60 tegn
-       pr. replik, kort og sagligt: hvad fanen er til, og hvor tingene
-       er. Ingen teori og ingen sjove bemaerkninger. maal er det, der faar
-       en gul ramme, mens linjen siges. */
+       Naar eleven har sagt ja til den (../kemichael/praesentation.js og
+       js/laerer.js). Ét trin ad gangen, og eleven trykker Naeste. Hvert
+       trin er to til fire hele saetninger i Kemibogens sprog: hvad fanen
+       traener, og hvordan tingene bruges. Ingen teori og ingen
+       vittigheder. sel: det paa siden, der faar en gul ramme (CSS-
+       selectorer); felt: det paa laerredet (introFelt i js/laerer.js). */
     D.INTRO = {
-        "fane-bord": {
-            linjer: [
-                "Her bygger du salte af positive og negative ioner.",
-                "Træk ionerne fra hylderne ind på bordet.",
-                "Når lynlåsen lukker, går plus og minus op.",
-                "Opgaverne starter du her."
-            ],
-            maal: ["bord", "hylder", "bord", "opgave"]
-        },
-        "fane-vand": {
-            linjer: [
-                "Her ser du ionerne gå fra hinanden, når saltet opløses.",
-                "Vælg ionerne her, og læg saltet i vandet.",
-                "Opgaverne starter du her."
-            ],
-            maal: ["glas", "salt", "opgave"]
-        },
-        "fane-ukendt": {
-            linjer: [
-                "Her finder du ladningen på en ukendt ion ud fra formlen.",
-                "Opgaven er delt i trin. De står her.",
-                "Mangler du en ladning, så klik på plakaterne.",
-                "Tryk Start opgave, så viser jeg, hvor du begynder."
-            ],
-            maal: ["formel", "trin", "plakater", "opgave"]
-        }
+        "fane-bord": [
+            { tekst: "I denne fane bygger du salte af positive og negative ioner. Du trækker en ion fra en af hylderne ned på bordet eller klikker på ionen. De positive ioner står på den øverste hylde, og de negative ioner står på den nederste hylde.",
+              sel: ["#bord-scene .hylde.top .hylde-gruppe", "#bord-scene .hylde.bund .hylde-gruppe"] },
+            { tekst: "Hvert kort på bordet er lige så bredt, som ionen har ladning. De positive og de negative ladninger mødes i lynlåsen midt på bordet. Når lynlåsen lukker hele vejen, er saltet neutralt, og formlen og navnet står under bordet.",
+              felt: "bord" },
+            { tekst: "Knappen Afstem for mig viser trin for trin, hvordan lynlåsen lukkes. Knappen Start opgave i opgavekortet giver dig en opgave, og bagefter giver den samme knap et hint, hvis du sidder fast.",
+              sel: ["#byg-afstem", "#bord-opgavekort"] }
+        ],
+        "fane-vand": [
+            { tekst: "I denne fane lægger du et salt i vand og ser, hvad der sker med ionerne, når saltet opløses. Bægerglasset viser hver ion som en kugle med ionens formel på.",
+              felt: "glas" },
+            { tekst: "Du vælger saltet med en positiv og en negativ ion i kortet Vælg et salt. Knappen Læg det i vandet lægger saltet i bægerglasset. Knappen Opløs det i vand i fane 1 lægger dit eget salt fra bordet i bægerglasset.",
+              sel: "#vand-saltkort" },
+            { tekst: "Opgavekortet stiller to slags opgaver. Enten forudsiger du, hvilke ioner der kommer ud i vandet, eller du tæller ionerne i bægerglasset og finder saltet. Knappen Start opgave giver dig en opgave, og bagefter giver den samme knap et hint.",
+              sel: "#vand-opgavekort" }
+        ],
+        "fane-ukendt": [
+            { tekst: "I denne fane finder du ladningen på en ukendt ion ud fra saltets formel. Formlen står øverst i scenen, og bordet under formlen viser ionerne i det antal, formlen angiver. Kortene er foldet sammen, til du har fundet ionernes ladning.",
+              felt: "formel" },
+            { tekst: "Opgaven er delt i trin, og trinene står i opgavekortet. Først finder du ladningen på den kendte ion og derefter ladningen på den ukendte ion. Til sidst bruger du den ukendte ion i et navn eller i en formel.",
+              sel: "#ukendt-opgavekort .trin" },
+            { tekst: "Plakaterne på væggen viser det periodiske system og de sammensatte ioner. Et klik på en plakat viser plakaten i stort format. Når du trykker Start opgave, får du at vide, hvilken ion du skal begynde med. Bagefter giver knappen et hint.",
+              felt: ["pt", "ioner"], sel: "#ukendt-opgaveknap" }
+        ]
     };
 }());

@@ -498,7 +498,6 @@
             fri: NK.el("molekyler-frit")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("molekyler-spring").addEventListener("click", function () { mig.springIntro(); });
 
         var rk = NK.el("molekyler-reaktioner");
         D.REAKTIONER.forEach(function (r) {
@@ -721,7 +720,7 @@
             var st = D.stof(k.s);
             var m = enhed === "mol" ? Math.min(lay.R, k.b * 0.19) : Math.min(lay.s, k.b * 0.15 / st.radius);
             var over = mig.over && mig.over.slags === "kasse" && mig.over.s === k.s;
-            Tg.kasse(ctx, k.x, k.y, k.b, k.h, st, enhed, m, { lys: over ? 0.7 : (mig.pegKasser ? puls : 0) });
+            Tg.kasse(ctx, k.x, k.y, k.b, k.h, st, enhed, m, { lys: over ? 0.7 : 0 });
         });
 
         /* Kammeret: det moerke indre, figurerne og til sidst glasset og knappen */
@@ -923,10 +922,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-molekyler", tilbud: "molekyler-tilbud", spring: "molekyler-spring" });
-
-    /* Mens han siger, at man traekker dem ind i kammeret, lyser kasserne */
-    P.pegPaaFelt = function (til) { this.pegKasser = til; };
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-molekyler", tilbud: "molekyler-tilbud" });
 
     NK.SimMolekyler = SimMolekyler;
 }());
