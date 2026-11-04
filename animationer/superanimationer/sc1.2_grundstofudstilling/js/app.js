@@ -123,8 +123,13 @@
             if (Object.prototype.hasOwnProperty.call(sims, navn)) sims[navn].tilpas();
         }
 
-        /* Man kan linke direkte til en fane med  index.html#formler  */
+        /* Man kan linke direkte til en fane med  index.html#formler  og
+           til tillaegsoevelsen i opraabet med  index.html#hvem  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+        if (oenske === "hvem") {
+            sims["fane-opraab"].vaelgSpil("hvem");
+            oenske = "opraab";
+        }
         visFane(sims["fane-" + oenske] ? "fane-" + oenske : faner[0]);
 
         window.requestAnimationFrame(function (ts) {

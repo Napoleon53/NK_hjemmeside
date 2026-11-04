@@ -34,7 +34,8 @@
         "fane-opraab": [
             { sel: "#opraab-anker-tavle", titel: "Tavlen", tekst: "Her står opråbet: et navn, en elektronstruktur eller et spørgsmål om det rum, der blinker. Kridtstregen er tiden." },
             { sel: "#opraab-anker-montre", titel: "Udstillingen", tekst: "Klik på det grundstof, tavlen siger." },
-            { sel: "#opraab-kort", titel: "Point", tekst: "Hurtige svar giver flere point, og en stime ganger dem op. En fejl eller en tid, der løber ud, koster et liv." }
+            { sel: "#opraab-kort", titel: "Point", tekst: "Hurtige svar giver flere point, og en stime ganger dem op. En fejl eller en tid, der løber ud, koster et liv." },
+            { sel: "#opraab-hvem", titel: "Hvem er jeg?", tekst: "En ekstra runde med 20 gåder om grundstoffer, du kender. Der er ingen liv: et forkert svar kommer igen senere." }
         ]
     };
 

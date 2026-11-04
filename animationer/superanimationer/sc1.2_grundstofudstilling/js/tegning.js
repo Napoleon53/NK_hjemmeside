@@ -1089,6 +1089,76 @@
         ctx.restore();
     };
 
+    /* Teksten delt i linjer, der hver er hoejst b brede med ctx's skrift.
+       "30 °C" og "78 %" deles ikke. */
+    T.ombryd = function (ctx, tekst, b) {
+        var ord = tekst.replace(/ (°|%)/g, " $1").split(" ");
+        var linjer = [], linje = "";
+        ord.forEach(function (o) {
+            var proeve = linje ? linje + " " + o : o;
+            if (linje && ctx.measureText(proeve).width > b) {
+                linjer.push(linje);
+                linje = o;
+            } else {
+                linje = proeve;
+            }
+        });
+        if (linje) linjer.push(linje);
+        return linjer;
+    };
+
+    /* ----- Skiltet paa bordet ---------------------------------------------
+       Et museumsskilt med symbolet, navnet og linjen om stoffet. Det staar
+       paa bordet, naar proeven er loest. m kommer fra SimMontre.skiltMaal:
+       { x, y, b, h, pad, titelPx, px, linjer }. a er 0-1 (det toner frem). */
+    T.skilt = function (ctx, m, g, a) {
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(a, 0, 1);
+        var x = m.x, y = m.y, b = m.b, h = m.h;
+        /* Foden, som skiltet staar i */
+        var fb = b * 0.44, fh = 9;
+        ctx.fillStyle = "#101116";
+        NK.rundtRekt(ctx, x + (b - fb) / 2, y + h - 4, fb, fh, 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.fillRect(x + (b - fb) / 2 + 2, y + h - 4, fb - 4, 1.5);
+        /* Selve skiltet */
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetY = 4;
+        ctx.fillStyle = "#f2ede1";
+        NK.rundtRekt(ctx, x, y, b, h - 2, 5);
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.strokeStyle = "rgba(90, 70, 40, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        /* Symbolet og navnet */
+        var ty = y + m.pad + m.titelPx * 0.5;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        ctx.font = font("800", m.titelPx);
+        ctx.fillStyle = "#1d1f24";
+        ctx.fillText(g.s, x + m.pad, ty);
+        var sb = ctx.measureText(g.s).width;
+        ctx.font = font("600", Math.round(m.titelPx * 0.82));
+        ctx.fillStyle = "#4a4d55";
+        ctx.fillText(g.navn, x + m.pad + sb + m.titelPx * 0.4, ty);
+        /* Stregen i stoffets farve, som under skiltene i udstillingen */
+        var sy = y + m.pad + m.titelPx * 1.25;
+        ctx.fillStyle = T.SLAGS_FARVE[g.slags];
+        ctx.fillRect(x + m.pad, sy, b - 2 * m.pad, 3);
+        /* Linjen om stoffet */
+        ctx.font = font("500", m.px);
+        ctx.fillStyle = "#2b2d33";
+        var ly = sy + 10 + m.px * 0.62;
+        m.linjer.forEach(function (l) {
+            ctx.fillText(l, x + m.pad, ly);
+            ly += m.px * 1.35;
+        });
+        ctx.restore();
+    };
+
     /* En taleboble-agtig forklaring over punktet (x, y). Er der ikke plads
        over det, kommer den under yUnder i stedet, med pilen opad.
        linjer: [{ t, px, vaegt, farve }] */

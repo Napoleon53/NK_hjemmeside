@@ -375,11 +375,21 @@ function koerTest(W) {
             return true;
         });
     }()));
+    paastand("Hvem er jeg? har 20 gåder", D.HVEM.length === 20);
+    var gaadeFejl = [];
+    D.HVEM.forEach(function (gg) {
+        var t = gg.gaade, lav = t.toLowerCase();
+        if (t.length > 70) gaadeFejl.push(gg.s + " har " + t.length + " tegn");
+        [gg.navn].concat(gg.alt).forEach(function (n) { if (lav.indexOf(n.toLowerCase()) >= 0) gaadeFejl.push(gg.s + " siger navnet " + n); });
+        if (new RegExp("(^|[^A-Za-zæøåÆØÅ])" + gg.s + "($|[^a-zæøå])").test(t)) gaadeFejl.push(gg.s + " siger symbolet");
+    });
+    paastand("ingen gåde siger navnet eller symbolet, og de har højst 70 tegn", gaadeFejl.length === 0, gaadeFejl.join("; "));
 
     overskrift("9. Sproget");
     var tekster = [];
     D.GRUNDSTOFFER.forEach(function (gg) {
         tekster.push(gg.fakta);
+        if (gg.gaade) tekster.push(gg.gaade);
         [gg.mangler, "plads"].concat(gg.ovg ? [] : ["struktur"]).forEach(function (sl) {
             var h = D.hjaelp(gg, sl);
             tekster.push(h.hint, h.svar);
@@ -430,6 +440,10 @@ function koerTest(W) {
     M.aktivtFelt().input.value = "2,8,1";
     M.tjek();
     paastand("rigtig struktur løser prøven med stjerne", M.opg.faerdig && M.status[11].loest && M.status[11].stjerne);
+    paastand("løst: skiltet med linjen om stoffet står på bordet, og linjen under scenen er tom",
+        !!M.skiltMaal(M.opg.g) && d.getElementById("montre-status").textContent === "");
+    for (i = 0; i < 30; i++) M.opdater(1 / 60);
+    paastand("skiltet er tonet frem", M.skiltT === 1);
     paastand("fremskridtet huskes i browseren", (JSON.parse(W.localStorage.getItem("nk-sc1.2-montre")) || {})["11"] !== undefined);
     M.knap();
     paastand("Næste prøve tager den næste uløste, magnesium", M.valgt === 12);
@@ -457,9 +471,10 @@ function koerTest(W) {
     for (i = 0; i < 200; i++) M.opdater(1 / 60);
     paastand("første periode fuld: Kemichael roser", M.rost[1] === true && !!(M.laerer && M.laerer.scene && M.laerer.scene.navn === "periode"));
     M.vaelg(11);
-    paastand("en løst prøve vises med facit", M.opg.gennemsyn && M.opg.faerdig && M.el.knap.textContent === "Øv prøven igen");
+    paastand("en løst prøve vises med facit og skiltet", M.opg.gennemsyn && M.opg.faerdig && M.el.knap.textContent === "Øv prøven igen" && !!M.skiltMaal(M.opg.g));
     M.knap();
-    paastand("Øv prøven igen tager den ned på bordet, og den er stadig løst", !M.opg.placeret && M.status[11].loest);
+    for (i = 0; i < 5; i++) M.opdater(1 / 60);
+    paastand("Øv prøven igen tager den ned på bordet, den er stadig løst, og skiltet er væk", !M.opg.placeret && M.status[11].loest && M.skiltT === 0);
     var kasseFoer = M.iKassen().length;
     M.vaelg(3);
     for (i = 0; i < 60; i++) M.opdater(1 / 60);
@@ -560,9 +575,41 @@ function koerTest(W) {
     paastand("fem rigtige giver niveau 2", O.nivNr === 1);
     O.nulstil();
 
+    overskrift("12b. Hvem er jeg?");
+    O.rekorder.hvem = 0;
+    d.getElementById("opraab-hvem").click();
+    paastand("knappen Hvem er jeg? starter det andet spil, og livene er væk",
+        O.spil === "hvem" && O.tilstand === "koerer" && d.getElementById("opraab-liv-raekke").style.display === "none" &&
+        d.getElementById("opraab-niveau-navn").textContent === "Fundet" && d.getElementById("opraab-knap").style.display === "none");
+    for (i = 0; i < 100; i++) O.opdater(1 / 60);
+    var gaade1 = O.opraab;
+    paastand("spillet går i gang med en gåde", !!gaade1 && gaade1.slags === "hvem" && O.bunke.length === 19);
+    O.klikRum(gaade1.g.z === 1 ? 2 : 1);
+    paastand("et forkert svar koster intet liv, og gåden lægges bagest", O.liv === 3 && O.bunke.length === 20 && O.bunke[19] === gaade1.g && O.fundet === 0);
+    paastand("forklaringen siger det rigtige grundstof", !!O.svar && O.svar.tekst.indexOf("Det var " + gaade1.g.s + ",") === 0);
+    for (i = 0; i < 200; i++) O.opdater(1 / 60);
+    var gaade2 = O.opraab;
+    for (i = 0; i < 60 * 22; i++) { O.opdater(1 / 60); if (O.svar) break; }
+    paastand("når tiden løber ud, kommer gåden igen senere", !!O.svar && !O.svar.rigtigt && O.bunke[O.bunke.length - 1] === gaade2.g && O.liv === 3);
+    var skridt = 0;
+    while (O.tilstand === "koerer" && skridt < 60 * 200) {
+        skridt++;
+        if (O.opraab && !O.svar) O.klikRum(O.opraab.g.z);
+        O.opdater(1 / 60);
+    }
+    paastand("når alle 20 er fundet, er spillet slut", O.tilstand === "slut" && O.fundet === 20 && O.bunke.length === 0 && O.liv === 3);
+    var log = d.getElementById("opraab-log");
+    paastand("de to, der kom igen, står én gang hver i listen med gåden", log.children.length === 2 && log.querySelectorAll("em").length === 2);
+    paastand("rekorden gemmes for sig", (JSON.parse(W.localStorage.getItem("nk-sc1.2-opraab")) || {}).hvem === O.point && O.point > 0);
+    paastand("knappen siger Hvem er jeg? igen, og opråbet kan startes", d.getElementById("opraab-hvem").textContent.indexOf("Hvem er jeg? igen") >= 0 &&
+        d.getElementById("opraab-knap").style.display === "");
+    O.vaelgSpil("opraab");
+    paastand("tilbage til opråbet: livene er der igen", O.spil === "opraab" && O.tilstand === "klar" && d.getElementById("opraab-liv-raekke").style.display === "");
+
     overskrift("13. Layoutet");
     var ramme = document.getElementById("ramme");
     var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    var skiltNoter = [];
     stoerrelser.forEach(function (st) {
         ramme.style.width = st[0] + "px";
         ramme.style.height = st[1] + "px";
@@ -590,6 +637,20 @@ function koerTest(W) {
                 if (hoejre > lay.tavle.x + 2) problemer.push(id + ": mærket går ind over tavlen");
                 if (bp.x - proeveB / 2 < lay.kasse.x + lay.kasse.b - 2) problemer.push(id + ": prøven står i kassen");
                 if (bp.y - bp.h < m.y + m.h) problemer.push(id + ": prøven går op i montren");
+                var udenSkilt = [];
+                D.GRUNDSTOFFER.forEach(function (gg) {
+                    var sk = sim.skiltMaal(gg);
+                    if (!sk) { udenSkilt.push(gg.s); return; }
+                    if (sk.x < lay.kasse.x + lay.kasse.b + 4 || sk.x + sk.b > lay.tavle.x - 4 || sk.y < lay.zoneTop || sk.y + sk.h > lay.bordY + 1 || sk.px < 13) {
+                        problemer.push(id + ": skiltet til " + gg.s + " står forkert");
+                    }
+                });
+                if (udenSkilt.length) skiltNoter.push(st[0] + " × " + st[1] + ": linjen under scenen i stedet for skiltet for " + udenSkilt.length);
+            }
+            if (id === "fane-opraab") {
+                var ti = sim.tavleIndre();
+                var gFejl = D.HVEM.filter(function (gg) { return !sim.gaadeMaal(gg.gaade, ti.ind, ti.lille).passer; });
+                if (gFejl.length) problemer.push(id + ": gåderne til " + gFejl.map(function (gg) { return gg.s; }).join(",") + " kan ikke stå på tavlen");
             }
             if (id === "fane-formler") {
                 var fb = NK.Tegn.flaskeBredde(lay.storH);
@@ -601,6 +662,7 @@ function koerTest(W) {
         });
         paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
     });
+    skiltNoter.forEach(note);
     ramme.style.width = "";
     ramme.style.height = "";
     klik('[data-fane="fane-montre"]');

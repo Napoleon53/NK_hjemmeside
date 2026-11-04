@@ -60,7 +60,7 @@
         [16, "S", "svovl", [], 3, 16, "i", "symbol", { b: "kube", form: "krystal", farve: "#e6cf35" },
             "Gult og lugtfrit. Rådne æg lugter af hydrogensulfid."],
         [17, "Cl", "chlor", ["klor"], 3, 17, "i", "symbol", { b: "ampul", fyld: "gas", farve: "#c6de58" },
-            "Giftig gulgrøn gas. Chlorid er i køkkensalt."],
+            "Giftig gulgrøn gas. Holder vandet i svømmehaller rent."],
         [18, "Ar", "argon", [], 3, 18, "a", "navn", { b: "ampul", fyld: "klar", farve: "#ffffff" },
             "Knap 1 % af luften er argon."],
         [19, "K", "kalium", [], 4, 1, "m", "symbol", { b: "olie", farve: "#c7cbd1" },
@@ -72,19 +72,19 @@
         [22, "Ti", "titan", ["titanium"], 4, 4, "m", "navn", { b: "kube", form: "blok", farve: "#8e959d" },
             "Stærkt og let. I hofteproteser."],
         [23, "V", "vanadium", [], 4, 5, "m", "symbol", { b: "kube", form: "klump", farve: "#a2a7ad" },
-            "Gør stål sejt, fx i skruenøgler."],
+            "Står der Cr-V på en skruenøgle, er der chrom og vanadium i stålet."],
         [24, "Cr", "chrom", ["krom"], 4, 6, "m", "navn", { b: "kube", form: "blok", farve: "#dfe4ea" },
             "Det blanke lag på forkromede vandhaner."],
         [25, "Mn", "mangan", [], 4, 7, "m", "symbol", { b: "kube", form: "klump", farve: "#a8a399" },
-            "I stål og i batterier."],
+            "Gør stål hårdt. Der er også mangan i almindelige batterier."],
         [26, "Fe", "jern", [], 4, 8, "m", "symbol", { b: "kube", form: "klump", farve: "#7a7e85" },
             "Det mest brugte metal. I stål og i blodet."],
         [27, "Co", "cobalt", ["kobolt"], 4, 9, "m", "symbol", { b: "kube", form: "klump", farve: "#8c95a4" },
             "Giver den dybe koboltblå farve i glas."],
         [28, "Ni", "nikkel", [], 4, 10, "m", "navn", { b: "kube", form: "klump", farve: "#bdb7ab" },
-            "I mønter og i rustfrit stål."],
+            "I mønter og rustfrit stål. Mange får allergi af nikkel i øreringe."],
         [29, "Cu", "kobber", [], 4, 11, "m", "symbol", { b: "kube", form: "klump", farve: "#c86f3e" },
-            "I elledninger og vandrør."],
+            "I elledninger. Frihedsgudinden er grøn, fordi hun er af kobber."],
         [30, "Zn", "zink", [], 4, 12, "m", "symbol", { b: "kube", form: "klump", farve: "#a8b2bc" },
             "Et lag zink beskytter stål mod rust."],
         [31, "Ga", "gallium", [], 4, 13, "m", "navn", { b: "kube", form: "draabe", farve: "#c4c9d0" },
@@ -139,6 +139,35 @@
 
     var efterSymbol = {};
     D.GRUNDSTOFFER.forEach(function (g) { efterSymbol[g.s] = g; });
+
+    /* ----- Hvem er jeg? (opraabet) ----------------------------------------
+       20 gaader om grundstoffer, eleverne kan forholde sig til. Hver gaade
+       bygger paa linjen om stoffet, som staar paa skiltet paa fane 1, men
+       siger hverken navnet eller symbolet. Hoejst ca. 70 tegn. */
+    var GAADER = {
+        H: "Solen består mest af mig.",
+        He: "Jeg får balloner til at svæve, og jeg kan ikke brænde.",
+        Li: "Jeg er i batteriet i din telefon.",
+        C: "Jeg er både grafit i blyanter og diamant.",
+        N: "Jeg er 78 % af luften.",
+        O: "Du trækker vejret for at få mig.",
+        F: "Jeg er i tandpasta og beskytter dine tænder.",
+        Ne: "Jeg lyser rødorange i gamle reklameskilte.",
+        Na: "Jeg er metallet i køkkensalt.",
+        Al: "Sodavandsdåser og køkkenfolie er lavet af mig.",
+        Si: "Computerchips er lavet af mig. Sand og glas er fulde af mig.",
+        P: "Jeg sidder på siden af tændstikæsken.",
+        S: "Jeg er et gult stof. Folk tror, at jeg lugter af rådne æg.",
+        Cl: "Jeg er en giftig, gulgrøn gas. Jeg holder svømmehallens vand rent.",
+        K: "Bananer er fulde af mig.",
+        Ca: "Knogler, tænder og kridt er fulde af mig.",
+        Fe: "Jeg ruster, og jeg er i dit blod.",
+        Cu: "Frihedsgudinden er lavet af mig. Derfor er hun grøn.",
+        Ga: "Jeg er et metal, der smelter i din hånd.",
+        Kr: "Supermans hjemplanet hedder det samme som mig."
+    };
+    D.GRUNDSTOFFER.forEach(function (g) { g.gaade = GAADER[g.s] || ""; });
+    D.HVEM = D.GRUNDSTOFFER.filter(function (g) { return g.gaade; });
 
     D.grundstof = function (s) { return efterSymbol[s] || null; };
     D.efterZ = function (z) { return D.GRUNDSTOFFER[z - 1] || null; };
@@ -453,7 +482,8 @@
         ingen: "Nul point. Udstillingen står der stadig. Den venter.",
         faa: "Der var flere grundstoffer, end du nåede. Det er der altid.",
         mange: "Hurtigere end kaffemaskinen. Det er ikke svært.",
-        rekord: "Ny rekord. Jeg skriver det ned. Et sted."
+        rekord: "Ny rekord. Jeg skriver det ned. Et sted.",
+        hvem: "Alle tyve fundet. Nu kender du dem bedre end rektor."
     };
 
     NK.Data = D;

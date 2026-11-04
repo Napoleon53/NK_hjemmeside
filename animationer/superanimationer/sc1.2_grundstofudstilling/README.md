@@ -42,7 +42,7 @@ bordet. Hver prøve har et mærke, hvor enten symbolet eller navnet mangler.
 |---|------|--------------|--------|
 | 1 | Udstillingen | skriver navnet eller symbolet, trækker prøven op på sin plads og skriver elektronstrukturen | pladsen giver strukturen: perioden er antallet af skaller, hovedgruppen er antallet af elektroner i den yderste |
 | 2 | Formlerne | tæller atomerne af hvert grundstof i et stof og til sidst dem alle | tallet efter et symbol tæller dets atomer, og tallet efter en parentes ganger alt indeni |
-| 3 | Opråbet | finder grundstofferne i udstillingen på tid | navn, symbol og plads skal sidde |
+| 3 | Opråbet | finder grundstofferne i udstillingen på tid; tillægsøvelsen Hvem er jeg? har 20 gåder | navn, symbol og plads skal sidde; stofferne knyttes til noget, man kender |
 
 **Udstillingen.** Et klik på en prøve i kassen tager den op på bordet. Panelet
 har tre rækker: navnet eller symbolet, pladsen og elektronstrukturen. Det, eleven
@@ -65,8 +65,16 @@ Prøverne ligner dem i en rigtig grundstofsamling: de farveløse gasser H, He, N
 O, Ne, Ar og Kr står i klare glasampuller, fluor og chlor er farvet gas i en
 ampul, brom er en rødbrun væske i en ampul, lithium, natrium og kalium ligger i olie, og
 resten er faste stoffer i akrylkuber (svovlkrystaller, rødt phosphor, et
-magnesiumbånd, en galliumdråbe, kobber, grafit osv.). Under scenen står én
-linje om, hvor man møder stoffet.
+magnesiumbånd, en galliumdråbe, kobber, grafit osv.).
+
+**Skiltet.** Når prøven er løst, toner et lille museumsskilt frem på bordet
+mellem kassen og tavlen med symbolet, navnet og én linje om stoffet (hvor man
+møder det, eller hvad det bruges til). Det samme sker, når man klikker på en prøve
+i udstillingen. Eleven skal ikke gøre noget ved det, så det bryder ikke
+flowet. Er der ikke plads til skiltet (de mindste skærme), står linjen under
+scenen i stedet. Kemichael roser foran kassen, så han ikke dækker skiltet.
+Bestilt 4. nov. 2026 efter en elevs ønske om "en sjov fakta om hvert
+grundstof".
 
 **Formlerne.** Tolv flasker i tre niveauer: *Tal efter symbolet*, *Samme
 symbol flere steder* og *Parenteser og ladning*. Formlen står stort på
@@ -85,6 +93,17 @@ koster et liv, og efter tre er spillet slut. Et forkert svar forklares ("K er
 kalium. Kulstof er C."), og det, man ikke nåede, står bagefter i panelet under
 "Øv dem her". Rekorden huskes.
 
+**Hvem er jeg?** er en tillægsøvelse med sin egen knap under Start opråbet
+(og linket `index.html#hvem`). Tavlen viser en gåde ("Frihedsgudinden er lavet
+af mig. Derfor er hun grøn."), og man klikker på grundstoffet i udstillingen.
+De 20 gåder handler om stoffer, eleverne kan forholde sig til (H, He, Li, C, N,
+O, F, Ne, Na, Al, Si, P, S, Cl, K, Ca, Fe, Cu, Ga, Kr), og bygger på linjen
+på skiltet på fane 1; de siger hverken navnet eller symbolet. Der er ingen
+liv og 20 sekunder pr. gåde: et forkert svar eller en tid, der løber ud, viser
+det rigtige og lægger gåden bagest i bunken, så den kommer igen. Spillet
+slutter, når alle 20 er fundet. Point og stime som i opråbet, egen rekord, og
+"Øv dem her" viser gåden under navnet.
+
 **Kemichael** kommer ikke af sig selv. Første gang en fane åbnes i en browser,
 står der to knapper midt foroven: Start præsentation og Nej tak (`js/praesentation.js`,
 reglen i `../README.md`). Så kan eleven kigge sig omkring først. Tilbuddet
@@ -102,7 +121,8 @@ atomnumrene og alle 36 navne i alfabetisk orden (også <kbd>P</kbd>). Hintet til
 et navn eller symbol får den til at lyse, men den peger ikke selv på
 grundstoffet, for så ville den give svaret.
 
-Direkte links: `index.html#formler` og `index.html#opraab`.
+Direkte links: `index.html#formler`, `index.html#opraab` og `index.html#hvem`
+(opråbet med Hvem er jeg? valgt).
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>P</kbd> navnetavlen ·
 <kbd>R</kbd> start prøven, flasken eller spillet forfra · <kbd>H</kbd> rundvisning ·
@@ -165,7 +185,7 @@ js/opslag.js        navnetavlen i stort format
 js/praesentation.js tilbuddet Start præsentation / Nej tak på alle tre faner
 js/sim_montre.js    fane 1 (udstillingen)
 js/sim_formler.js   fane 2
-js/sim_opraab.js    fane 3
+js/sim_opraab.js    fane 3: opråbet og Hvem er jeg?
 js/laerer.js        Kemichael på alle tre faner
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, genveje, tegneløkke
@@ -176,8 +196,14 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 
 **Grundstofferne** står i `G` øverst i `js/data.js`: atomnummer, symbol, navn,
 andre navne, der godkendes, periode, søjle, slags, den halvdel af mærket, der
-mangler, prøven og linjen om stoffet. Elektronstrukturen regnes ud af
-`D.skaller`, så den kan ikke komme til at sige noget andet end pladsen.
+mangler, prøven og linjen om stoffet (den står på skiltet). Elektronstrukturen
+regnes ud af `D.skaller`, så den kan ikke komme til at sige noget andet end
+pladsen.
+
+**Gåderne til Hvem er jeg?** står i `GAADER` lige under `G` i `js/data.js`. Ret
+linjen på skiltet med, når en gåde ændres, så de to passer sammen. Højst ca. 70
+tegn, og selvtesten afviser en gåde, der siger navnet eller symbolet. Tiden pr.
+gåde er `HVEM_TID` i `js/sim_opraab.js`.
 
 **Prøvernes udseende** er beholderen (`ampul`, `olie` eller `kube`), en
 form for de faste stoffer (`klump`, `blok`, `krystal`, `pulver`, `baand`,
@@ -206,8 +232,10 @@ tabel, at antallet af skaller altid er perioden og elektronerne i den yderste
 hovedgruppen, at de 12 formler tælles rigtigt, at alle rigtige svar godkendes,
 at over 70 typiske fejl giver den rigtige besked, at der er hint og svar til
 alle 145 felter uden at hintet siger svaret, at opråbets svarmuligheder er
-fire forskellige med ét rigtigt, at sproget holder reglerne, at alle tre faner
-kan gennemføres, og at layoutet holder fra 520 × 380 til 1500 × 900. Den
+fire forskellige med ét rigtigt, at gåderne ikke siger svaret, at sproget
+holder reglerne, at alle tre faner og Hvem er jeg? kan gennemføres, og at
+layoutet holder fra 520 × 380 til 1500 × 900 (også skiltet og gåderne på
+tavlen). Den
 kræver en lokal server eller Chrome med `--allow-file-access-from-files`. Den
 lægger elevens gemte fremskridt tilbage bagefter.
 

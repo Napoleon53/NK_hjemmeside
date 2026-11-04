@@ -117,15 +117,19 @@
         <div class="kort maaling" id="opraab-kort">
             <h2>Point <span class="taeller">rekord <b id="opraab-rekord">0</b></span></h2>
             <div class="storttal" id="opraab-point">0</div>
-            <div class="talraekke"><span>Niveau</span><span class="tal" id="opraab-niveau">1</span></div>
+            <div class="talraekke"><span id="opraab-niveau-navn">Niveau</span><span class="tal" id="opraab-niveau">1</span></div>
             <div class="talraekke"><span>Stime</span><span class="tal gul" id="opraab-stime">×1</span></div>
-            <div class="talraekke"><span>Liv</span><span class="tal roed" id="opraab-liv">♥♥♥</span></div>
-            <button class="knap stor blaa banker" id="opraab-knap" type="button" style="margin-top:10px;"><span>Start opråbet</span><span class="tegn">▶</span></button>
+            <div class="talraekke" id="opraab-liv-raekke"><span>Liv</span><span class="tal roed" id="opraab-liv">♥♥♥</span></div>
+            <!-- To spil: Opraabet og tillaegsoevelsen Hvem er jeg? (js/sim_opraab.js) -->
+            <div class="knapper" style="margin-top:10px;">
+                <button class="knap stor blaa banker" id="opraab-knap" type="button"><span>Start opråbet</span><span class="tegn">▶</span></button>
+                <button class="knap stor" id="opraab-hvem" type="button"><span>Hvem er jeg?</span><span class="tegn">▶</span></button>
+            </div>
         </div>
 
         <div class="kort">
             <h2>Sådan</h2>
-            <p class="note" style="margin-top:0;">Tavlen siger et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Blinker et rum, vælger du navnet på tavlen. En fejl koster et liv.</p>
+            <p class="note" id="opraab-saadan" style="margin-top:0;">Tavlen siger et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Blinker et rum, vælger du navnet på tavlen. En fejl koster et liv.</p>
         </div>
 
         <div class="kort" id="opraab-log-kort" hidden>

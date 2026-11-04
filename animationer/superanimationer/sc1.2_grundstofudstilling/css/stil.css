@@ -548,6 +548,8 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .kasseliste b { color: var(--tekst); margin-right: 6px; }
+/* Hvem er jeg?: gaaden under navnet */
+.kasseliste em { display: block; margin-top: 2px; font-style: normal; font-size: 0.82rem; line-height: 1.4; color: var(--tekst-mat); }
 
 /* ---------------------------------------------------------------------
    OVERLAYS: de to plakater i stort format

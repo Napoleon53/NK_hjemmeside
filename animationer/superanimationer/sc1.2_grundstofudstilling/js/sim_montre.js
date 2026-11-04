@@ -15,7 +15,9 @@
         springer den over.
 
    Hvert klik giver et svar, og linjen under scenen siger, hvad der skal
-   ske nu.
+   ske nu. Naar proeven er loest (eller man klikker paa en proeve i
+   udstillingen), staar et skilt paa bordet med linjen om stoffet. Er
+   der ikke plads til skiltet, staar linjen under scenen i stedet.
 
    Mens elektronstrukturen skrives, lyser periodens og hovedgruppens
    nummer i udstillingen. Det er pointen: pladsen giver strukturen.
@@ -166,6 +168,31 @@
         this.saetAnker("montre-anker-tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("montre-anker-kasse", lay.kasse.x, lay.kasse.y - lay.kasse.h * 0.2, lay.kasse.b, lay.kasse.h * 1.2);
         this.saetAnker("montre-anker-navne", lay.m.tavle.x, lay.m.tavle.y, lay.m.tavle.b, lay.m.tavle.h);
+        /* Om skiltet kan vaere der, afhaenger af stoerrelsen */
+        if (this.opg) this.visStatus();
+    };
+
+    /* Skiltet paa bordet mellem kassen og tavlen: maalene, eller null,
+       hvis der ikke er plads. Skriften bliver mindre, foer det opgives. */
+    P.skiltMaal = function (g) {
+        var lay = this.lay;
+        if (!lay || !g) return null;
+        var ctx = this.L.ctx;
+        var x0 = lay.kasse.x + lay.kasse.b + 16, x1 = lay.tavle.x - 16;
+        var b = Math.min(x1 - x0, 300);
+        if (b < 150) return null;
+        var bund = lay.bordY - 3, top = lay.zoneTop + 6;
+        var pad = NK.klamp(b * 0.06, 10, 16);
+        var titelPx = NK.klamp(Math.round(b * 0.075), 16, 22);
+        for (var px = NK.klamp(Math.round(b * 0.062), 14, 18); px >= 13; px--) {
+            ctx.font = Tg.font("500", px);
+            var linjer = Tg.ombryd(ctx, g.fakta, b - 2 * pad);
+            var h = pad + titelPx * 1.25 + 3 + 10 + linjer.length * px * 1.35 + pad * 0.6 + 2;
+            if (bund - h >= top) {
+                return { x: x0 + (x1 - x0 - b) / 2, y: bund - h, b: b, h: h, pad: pad, titelPx: titelPx, px: px, linjer: linjer };
+            }
+        }
+        return null;
     };
 
     P.saetAnker = function (id, x, y, b, h) {
@@ -655,12 +682,14 @@
     };
 
     /* Linjen under scenen siger, hvad der skal ske nu. Er proeven loest,
-       staar der i stedet, hvor man moeder stoffet. */
+       staar linjen om stoffet paa skiltet paa bordet, og linjen her er
+       tom. Kun hvis skiltet ikke kan vaere der, staar den her. */
     P.visStatus = function () {
         var o = this.opg;
         if (!o) return;
         if (o.faerdig) {
-            NK.saetHTML("montre-status", "<b>" + NK.html(o.g.s + " " + o.g.navn) + "</b> · " + NK.html(o.g.fakta));
+            NK.saetHTML("montre-status", this.skiltMaal(o.g) ? "" :
+                "<b>" + NK.html(o.g.s + " " + o.g.navn) + "</b> · " + NK.html(o.g.fakta));
             return;
         }
         var g = o.g, mangler = !klaret(o.felter[0]);
@@ -728,6 +757,8 @@
             if (mig.blink[z].a <= 0) delete mig.blink[z];
         });
         if (this.tavlePuls) this.tavlePuls.t += dt;
+        /* Skiltet toner frem, naar proeven er loest */
+        this.skiltT = this.opg && this.opg.faerdig ? Math.min(1, (this.skiltT || 0) + dt * 3) : 0;
         if (this.nulstilSikker > 0) {
             this.nulstilSikker -= dt;
             if (this.nulstilSikker <= 0) { this.nulstilSikker = 0; this.visNulstil(); }
@@ -806,6 +837,12 @@
                 NK.rundtRekt(ctx, lay.kop.x - 22 * kk, lay.kop.y - 44 * kk, 50 * kk, 46 * kk, 6);
                 ctx.stroke();
             }
+        }
+
+        /* Skiltet med linjen om stoffet, naar proeven er loest */
+        if (o && o.faerdig) {
+            var sk = this.skiltMaal(o.g);
+            if (sk) Tg.skilt(ctx, sk, o.g, NK.blod(this.skiltT || 0));
         }
 
         /* Proeven paa bordet og dens maerke. Kan den flyttes, lyser den

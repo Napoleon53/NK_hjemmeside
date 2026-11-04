@@ -13,6 +13,12 @@
    et liv, og efter tre er spillet slut. Hvert femte rigtige svar giver
    et nyt niveau; fra niveau 4 er det hele blandet, og tiden bliver
    kortere. Rekorden huskes i browseren.
+
+   Hvem er jeg? er en tillaegsoevelse med sin egen knap (this.spil er
+   "hvem"). Tavlen viser en gaade (D.HVEM, bygget paa linjen om stoffet
+   paa fane 1), og man klikker paa grundstoffet. Der er ingen liv: et
+   forkert svar eller en tid, der loeber ud, laegger gaaden bagest i
+   bunken, og spillet slutter, naar alle 20 er fundet. Egen rekord.
    ===================================================================== */
 (function () {
     "use strict";
@@ -24,6 +30,15 @@
     var NOEGLE = "nk-sc1.2-opraab";
     var PR_NIVEAU = 5;
     var LIV = 3;
+    var HVEM_TID = 20;
+
+    /* De to spil: knappen i panelet og det, kortet Sådan siger */
+    var SPIL = {
+        opraab: { knap: "opraab-knap", start: "Start opråbet", igen: "Spil igen", titel: "Opråb",
+            saadan: "Tavlen siger et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Blinker et rum, vælger du navnet på tavlen. En fejl koster et liv." },
+        hvem: { knap: "opraab-hvem", start: "Hvem er jeg?", igen: "Hvem er jeg? igen", titel: "Hvem er jeg?",
+            saadan: "Tavlen fortæller noget om et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Svarer du forkert, kommer det igen senere. Find alle 20." }
+    };
 
     var ALMINDELIGE = D.GRUNDSTOFFER.filter(function (g) { return g.z <= 20 || g.z === 26 || g.z === 29 || g.z === 30; });
     var HOVED_20 = D.GRUNDSTOFFER.filter(function (g) { return g.z <= 20; });
@@ -61,7 +76,10 @@
     function SimOpraab() {
         this.L = new NK.Laerred(NK.el("opraab-laerred"));
         this.tid = 0;
-        this.rekord = NK.hent(NOEGLE, { rekord: 0 }).rekord || 0;
+        var gemt = NK.hent(NOEGLE, { rekord: 0 });
+        this.rekorder = { opraab: gemt.rekord || 0, hvem: gemt.hvem || 0 };
+        this.spil = "opraab";
+        this.rekord = this.rekorder.opraab;
         this.lay = null;
         this.over = null;
         this.blink = {};
@@ -90,6 +108,9 @@
         this.nyRekord = false;
         this.blink = {};
         this.floats = [];
+        /* Hvem er jeg?: gaaderne, der mangler, og dem, der er fundet */
+        this.bunke = this.spil === "hvem" ? NK.bland(D.HVEM.slice()) : [];
+        this.fundet = 0;
         this.visValg(false);
         var liste = NK.el("opraab-log");
         if (liste) liste.innerHTML = "";
@@ -148,7 +169,8 @@
     /* ----- Panelet og knapperne ----------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        NK.el("opraab-knap").addEventListener("click", function () { mig.startKnap(); });
+        NK.el("opraab-knap").addEventListener("click", function () { mig.spilKnap("opraab"); });
+        NK.el("opraab-hvem").addEventListener("click", function () { mig.spilKnap("hvem"); });
         NK.el("opraab-spring").addEventListener("click", function () { mig.springIntro(); });
         this.bygTilbud();
         this.valgKnapper = [];
@@ -170,18 +192,45 @@
     };
 
     P.visPanel = function () {
+        var hvem = this.spil === "hvem";
         NK.saetTekst("opraab-point", String(this.point));
         NK.saetTekst("opraab-rekord", String(this.rekord));
-        NK.saetTekst("opraab-niveau", (this.nivNr + 1) + " · " + niveau(this.nivNr).navn);
+        NK.saetTekst("opraab-niveau-navn", hvem ? "Fundet" : "Niveau");
+        NK.saetTekst("opraab-niveau", hvem ? this.fundet + "/" + D.HVEM.length : (this.nivNr + 1) + " · " + niveau(this.nivNr).navn);
         NK.saetTekst("opraab-stime", "×" + this.gange());
         var hjerter = "";
         for (var i = 0; i < LIV; i++) hjerter += i < this.liv ? "♥" : "♡";
         NK.saetTekst("opraab-liv", hjerter);
-        var knap = NK.el("opraab-knap");
-        var tekst = { klar: "Start opråbet", koerer: "Pause", pause: "Fortsæt", slut: "Spil igen" }[this.tilstand];
-        var tegn = this.tilstand === "koerer" ? "❚❚" : "▶";
-        NK.saetHTML("opraab-knap", "<span>" + tekst + "</span><span class=\"tegn\">" + tegn + "</span>");
-        knap.classList.toggle("banker", this.tilstand !== "koerer");
+        NK.el("opraab-liv-raekke").style.display = hvem ? "none" : "";
+        NK.saetTekst("opraab-saadan", SPIL[this.spil].saadan);
+        /* Det valgte spils knap er blaa og siger Pause, Fortsaet eller Spil
+           igen. Den anden starter det andet spil og er vaek, mens der spilles. */
+        var mig = this;
+        Object.keys(SPIL).forEach(function (navn) {
+            var knap = NK.el(SPIL[navn].knap);
+            var valgt = navn === mig.spil;
+            var tekst = valgt ? { klar: SPIL[navn].start, koerer: "Pause", pause: "Fortsæt", slut: SPIL[navn].igen }[mig.tilstand] : SPIL[navn].start;
+            var tegn = valgt && mig.tilstand === "koerer" ? "❚❚" : "▶";
+            knap.innerHTML = "<span>" + tekst + "</span><span class=\"tegn\">" + tegn + "</span>";
+            knap.className = "knap stor" + (valgt ? " blaa" : "") + (valgt && mig.tilstand !== "koerer" ? " banker" : "");
+            knap.style.display = !valgt && mig.tilstand === "koerer" ? "none" : "";
+        });
+    };
+
+    /* Et klik paa et spils knap: det valgte spil pauser eller fortsaetter,
+       det andet starter forfra */
+    P.spilKnap = function (spil) {
+        if (spil !== this.spil) this.vaelgSpil(spil);
+        this.startKnap();
+    };
+
+    /* Skift mellem Opraab og Hvem er jeg? (ogsaa fra linket index.html#hvem) */
+    P.vaelgSpil = function (spil) {
+        if (!SPIL[spil] || spil === this.spil) return;
+        this.spil = spil;
+        this.rekord = this.rekorder[spil];
+        this.nulstilSpil();
+        this.visPanel();
     };
 
     P.gange = function () { return Math.min(4, 1 + Math.floor(this.stime / 3)); };
@@ -193,7 +242,7 @@
         if (this.afvisTilbud) this.afvisTilbud();
         this.nulstilSpil();
         this.tilstand = "koerer";
-        this.banner = { tekst: "Niveau 1 · " + niveau(0).navn, t: 0 };
+        this.banner = { tekst: this.spil === "hvem" ? "Hvem er jeg?" : "Niveau 1 · " + niveau(0).navn, t: 0 };
         this.opraab = null;
         this.venter = 1.3;
         this.visPanel();
@@ -206,6 +255,12 @@
 
     /* ----- Opraabene ---------------------------------------------------------- */
     P.nytOpraab = function () {
+        if (this.spil === "hvem") {
+            this.visValg(false);
+            this.opraab = { slags: "hvem", g: this.bunke.shift(), tid: HVEM_TID, t: 0 };
+            this.svar = null;
+            return;
+        }
         var nv = niveau(this.nivNr);
         var slags = NK.tilfaeldig(nv.slags);
         var mig = this;
@@ -267,16 +322,19 @@
             this.stime++;
             var faar = Math.round((100 + 100 * rest / o.tid) * this.gange() / 10) * 10;
             this.point += faar;
-            this.rigtigeINiveau++;
+            if (o.slags === "hvem") this.fundet++;
+            else this.rigtigeINiveau++;
             this.blink[g.z] = { farve: "63, 174, 114", a: 1.2 };
             this.floats.push({ tekst: "+" + faar, x: rum.x + rum.b / 2, y: rum.y, t: 0 });
-            this.svar = { rigtigt: true, t: 0, varighed: 0.9, tekst: "Rigtigt · " + g.s + " " + g.navn };
+            this.svar = { rigtigt: true, t: 0, varighed: o.slags === "hvem" ? 1.4 : 0.9, tekst: "Rigtigt · " + g.s + " " + g.navn };
         } else {
             this.stime = 0;
-            this.liv--;
+            /* Hvem er jeg?: ingen liv, gaaden kommer igen til sidst */
+            if (o.slags === "hvem") this.bunke.push(g);
+            else this.liv--;
             this.blink[g.z] = { farve: "63, 174, 114", a: 2.4 };
             if (typeof hvad === "number" && o.slags !== "symbol" && hvad !== g.z) this.blink[hvad] = { farve: "224, 84, 70", a: 1.6 };
-            this.svar = { rigtigt: false, t: 0, varighed: 2.3, tekst: this.forklaring(o, hvad) };
+            this.svar = { rigtigt: false, t: 0, varighed: o.slags === "hvem" ? 2.8 : 2.3, tekst: this.forklaring(o, hvad) };
             this.logFejl(o);
         }
         this.visPanel();
@@ -297,14 +355,22 @@
     };
 
     P.logFejl = function (o) {
+        var g = o.g;
+        /* En gaade, der kommer igen, staar kun én gang i listen */
+        if (o.slags === "hvem" && this.fejlListe.some(function (x) { return x.g === g; })) return;
         this.fejlListe.push(o);
         var li = document.createElement("li");
-        var g = o.g;
-        li.innerHTML = "<b>" + g.s + "</b>" + NK.html(g.navn) + (o.slags === "struktur" ? " · " + g.struktur : "");
+        li.innerHTML = "<b>" + g.s + "</b>" + NK.html(g.navn) + (o.slags === "struktur" ? " · " + g.struktur : "") +
+            (o.slags === "hvem" ? "<em>" + NK.html(g.gaade) + "</em>" : "");
         NK.el("opraab-log").appendChild(li);
     };
 
     P.naesteEfterSvar = function () {
+        if (this.spil === "hvem") {
+            if (!this.bunke.length) this.slut();
+            else this.nytOpraab();
+            return;
+        }
         if (this.liv <= 0) { this.slut(); return; }
         if (this.rigtigeINiveau >= PR_NIVEAU) {
             this.nivNr++;
@@ -326,11 +392,13 @@
         if (this.point > this.rekord) {
             this.nyRekord = this.rekord > 0 || this.point > 0;
             this.rekord = this.point;
-            NK.gem(NOEGLE, { rekord: this.rekord });
+            this.rekorder[this.spil] = this.point;
+            NK.gem(NOEGLE, { rekord: this.rekorder.opraab, hvem: this.rekorder.hvem });
         }
         NK.el("opraab-log-kort").hidden = this.fejlListe.length === 0;
         this.visPanel();
         var art = this.point === 0 ? "ingen" : (this.nyRekord ? "rekord" : (this.point >= 1500 ? "mange" : "faa"));
+        if (this.spil === "hvem") art = this.nyRekord ? "rekord" : "hvem";
         if (this.laererSlut) this.laererSlut(art);
     };
 
@@ -432,8 +500,8 @@
         if (this.tilstand === "klar" || (this.tilstand === "slut" && !this.laererTaler())) {
             ctx.fillStyle = Tg.KRIDT;
             if (this.tilstand === "klar") {
-                ctx.font = Tg.font("700", stor);
-                ctx.fillText("Opråb", cx, midt);
+                NK.passendeSkrift(ctx, SPIL[this.spil].titel, ind.b - 30, stor, 14, "700");
+                ctx.fillText(SPIL[this.spil].titel, cx, midt);
                 ctx.font = Tg.font("600", lille);
                 ctx.fillStyle = "rgba(238, 242, 234, 0.7)";
                 ctx.fillText(this.rekord ? "Rekord: " + this.rekord + " point" : "Tryk Start i panelet", cx, midt + stor * 0.8);
@@ -442,7 +510,9 @@
                 ctx.fillText(this.point + " point", cx, midt);
                 ctx.font = Tg.font("600", lille);
                 ctx.fillStyle = this.nyRekord ? "#f7d774" : "rgba(238, 242, 234, 0.7)";
-                ctx.fillText(this.nyRekord ? "Ny rekord" : "Niveau " + (this.nivNr + 1) + " nået", cx, midt + stor * 0.75);
+                var under = this.spil === "hvem" ? "Alle " + D.HVEM.length + " fundet" + (this.nyRekord ? " · ny rekord" : "")
+                    : (this.nyRekord ? "Ny rekord" : "Niveau " + (this.nivNr + 1) + " nået");
+                ctx.fillText(under, cx, midt + stor * 0.75);
             }
             ctx.restore();
             return;
@@ -459,6 +529,7 @@
             return;
         }
         if (!o) { ctx.restore(); return; }
+        if (o.slags === "hvem") { this.tegnGaade(ctx, ind, o, lille); ctx.restore(); return; }
 
         var spm = o.slags === "symbol" ? "Hvad hedder det, der blinker?" : (o.slags === "struktur" ? "Find grundstoffet med elektronstrukturen" : "Find");
         ctx.font = Tg.font("600", lille);
@@ -485,6 +556,60 @@
             ctx.fillText(this.svar.tekst, cx, Math.min(fy, ind.y + ind.h - 12));
         }
         ctx.restore();
+    };
+
+    /* Hvem er jeg?: overskriften, gaaden i hoejst tre linjer, kridtstregen
+       og svaret. Det hele centreres paa tavlen; skriften bliver mindre,
+       til det kan vaere der. gaadeMaal giver skriften og linjerne (og om
+       det passede), saa selvtesten kan proeve alle gaader. */
+    P.gaadeMaal = function (tekst, ind, lille) {
+        var ctx = this.L.ctx, bredde = ind.b - 50;
+        var px, linjer, hoejde, passer = false;
+        for (px = NK.klamp(Math.round(ind.h * 0.15), 16, 34); px >= 13; px--) {
+            ctx.font = Tg.font("700", px);
+            linjer = Tg.ombryd(ctx, tekst, bredde);
+            hoejde = lille * 1.5 + linjer.length * px * 1.28 + px * 0.5 + 5 + lille * 2;
+            if (linjer.length <= 3 && hoejde <= ind.h - 14) { passer = true; break; }
+        }
+        return { px: Math.max(px, 13), linjer: linjer, hoejde: hoejde, passer: passer };
+    };
+
+    /* Tavlens indre og den lille skrift, som tegnTavle regner dem ud */
+    P.tavleIndre = function () {
+        var t = this.lay.tavle;
+        var ind = { x: t.x + 7, y: t.y + 7, b: t.b - 14, h: t.h - 14 };
+        return { ind: ind, lille: NK.klamp(ind.h * 0.11, 13, 18) };
+    };
+
+    P.tegnGaade = function (ctx, ind, o, lille) {
+        var cx = ind.x + ind.b / 2;
+        var mg = this.gaadeMaal(o.g.gaade, ind, lille);
+        var px = mg.px, linjer = mg.linjer, hoejde = mg.hoejde;
+        var y = ind.y + Math.max(6, (ind.h - hoejde) / 2);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = Tg.font("600", lille);
+        ctx.fillStyle = "rgba(238, 242, 234, 0.75)";
+        ctx.fillText("Hvem er jeg?", cx, y + lille * 0.6);
+        y += lille * 1.5;
+        ctx.font = Tg.font("700", px);
+        ctx.fillStyle = Tg.KRIDT;
+        linjer.forEach(function (l) {
+            ctx.fillText(l, cx, y + px * 0.64);
+            y += px * 1.28;
+        });
+        /* Tiden: en kridtstreg, der bliver kortere */
+        var rest = this.svar ? 0 : NK.klamp(1 - o.t / o.tid, 0, 1);
+        var sb = ind.b * 0.5, sy = y + px * 0.5;
+        ctx.fillStyle = "rgba(238, 242, 234, 0.15)";
+        ctx.fillRect(cx - sb / 2, sy, sb, 5);
+        ctx.fillStyle = rest < 0.3 ? "#f0776a" : "rgba(238, 242, 234, 0.8)";
+        ctx.fillRect(cx - sb / 2, sy, sb * rest, 5);
+        if (this.svar) {
+            ctx.fillStyle = this.svar.rigtigt ? "#b8f0cf" : "#f5b0a9";
+            NK.passendeSkrift(ctx, this.svar.tekst, ind.b - 30, NK.klamp(lille * 1.05, 14, 19), 12, "700");
+            ctx.fillText(this.svar.tekst, cx, Math.min(sy + 5 + lille * 1.2, ind.y + ind.h - 12));
+        }
     };
 
     P.laererTaler = function () {

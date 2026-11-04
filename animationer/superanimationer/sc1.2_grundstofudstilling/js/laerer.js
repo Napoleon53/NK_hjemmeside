@@ -176,8 +176,11 @@
         }
     });
 
+    /* Han roser foran kassen, saa skiltet med linjen om stoffet kan ses */
     PM.laererPladsPx = function () {
-        return this.lay ? this.lay.W * 0.3 : 300;
+        var lay = this.lay;
+        if (!lay) return 300;
+        return Math.max(lay.kasse.x + lay.kasse.b * 0.5, 100 * this.laererLaerredSkala());
     };
 
     PM.laererIntro = function () {
@@ -251,7 +254,7 @@
     PO.laererSlut = function (art) {
         if (!this.laerer) return;
         var replik = D.SLUT_REPLIK[art] || D.SLUT_REPLIK.faa;
-        var god = art === "rekord" || art === "mange";
+        var god = art === "rekord" || art === "mange" || art === "hvem";
         this.laererKoer("slut", [
             { udtryk: god ? { vrede: 0, humoer: 0.8, roed: 0 } : { vrede: 0.2, humoer: -0.2, skeptisk: 1, briller: 1 } },
             { gaa: PO.laererPlads },
