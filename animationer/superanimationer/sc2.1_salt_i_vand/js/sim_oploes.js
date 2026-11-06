@@ -38,7 +38,7 @@
     var MAKS_HOLD = 4;           /* hold af vandmolekyler, der kan arbejde paa én gang */
     var MAKS_SYNLIGE = 6;        /* frie ioner i lupen, foer de aeldste driver videre ud i glasset */
     var FART_ENHED = 34;         /* hastighederne er afstemt til en celle paa 34 px */
-    var GRAENSE_SEK = 13;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet */
+    var GRAENSE_SEK = 10;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet (13 -> 10 6. nov. 2026, lupen blev lavere under papirkortet) */
     var KOGE_OVER_SEK = 30;      /* saa laenge paa max, foer opløsningen koger over */
     var LAERER_EFTER_SEK = 5;    /* saa laenge efter kommer laereren */
     var SLUKKET = -2.2;          /* knappernes vinkel, naar de er slukket */
@@ -1757,7 +1757,7 @@
             valg: alle,
             rigtig: alle.indexOf(ret),
             skjulLigning: true,
-            hint: "Se på krystallen i lupen. Hvor mange negative ioner er der for hver positiv, og hvilken ladning har de?",
+            hint: "Tæl ionerne i lupen. Hvor mange negative ioner er der for hver positiv, og hvilken ladning har de?",
             svar: D.venstreLed(salt) + " → " + ret + ". Ionerne kommer fra hinanden, men ændrer sig ikke.",
             start: function (sim) {
                 NK.Valg.saet(salt.id);

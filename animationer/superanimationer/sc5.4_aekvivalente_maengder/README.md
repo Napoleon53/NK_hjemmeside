@@ -56,8 +56,8 @@ serverer. *Begrænsende*: 10/10/10 (den gamles spørgsmål; her kommer
 begreberne), 8 pølser/10 brød/12 skiver (færrest pølser, men agurkerne
 slipper op), 12/5/12, 5 boller/8 bøffer/9 skiver ost og 6/7/12, hvor også den
 begrænsende har rest (1 bøf er ikke nok til en burger mere). I de
-begrænsende vælger eleven først ingrediensen (knapperne i panelet eller et
-klik på rækken på brættet), og rækken markeres "begrænsende". Så skriver
+begrænsende vælger eleven først ingrediensen (svarene på papirkortet eller et
+klik på rækken på brættet) og trykker på Indsend svar, og rækken markeres "begrænsende". Så skriver
 eleven antallet og overskuddet, og brættet serverer. Et forkert valg får at
 vide, hvor langt ingrediensen rækker ("Der er færrest pølser, men de rækker
 til 8 hotdogs"). Kortet Ordrerne springer til hotdogs, burgere eller frit
@@ -135,6 +135,34 @@ klokken, Start eller næste · <kbd>Esc</kbd> luk eller send Kemichael ud.
 * **Ti ordrer ved pølsevognen og tolv opgaver på tavlen** i stedet for fire og otte, heraf tre, hvor et produkt er kendt.
 * **Hjælpen er én knap:** Giv hint, så Vis svaret. Pointtavlen er væk.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`,
+samme fil som i sc5.2, og `../faelles/papirkort.css/js`). Opgavekortene i
+panelet og statuslinjen nederst er fjernet. Kortet har opgaven med en etiket
+("Ordre 4 af 10", "Mål 1 af 5", "Svær, opgave 2 af 4"), linjen med næste
+skridt, fejl og hint, Giv hint (gul kant, derefter Vis svaret) og Indsend svar
+(grå, til der er noget at sende). Et rigtigt svar lægger ikke kortet om: ordren,
+målet eller opgaven bliver stående med forklaringen, og Næste står, hvor
+Indsend svar stod.
+
+- Pølsevognen: Indsend svar ringer med klokken (brættet sendes ind), sender
+  feltet i panelet ind (Enter virker også) eller sender valget af den
+  begrænsende ingrediens. Valget står som svar på kortet; et klik på kortet
+  eller på en række på brættet vælger kun. Felterne bliver i panelet (kortet
+  Dine svar). Mens der regnes, er brættet låst, og kortet blinker.
+- Molekylerne: Indsend svar sætter reaktionen i gang og bedømmer den (samme
+  som Start på kammeret). Start målene forfra står i panelet under frit valg.
+- Tavlen: felterne bliver på tavlen; Enter eller Indsend svar sender feltet
+  (eller koefficienterne) ind. Regn opgaven igen står i panelet, når en løst
+  opgave vises.
+
+Skiltene, bonen, plakaten og tavlen begynder under kortet (`kortZone` i hver
+sim). Selvtesten tjekker kortet i scenen, Indsend svar grå og klar, at et valg
+ikke bedømmer, Næste samme sted og kortZone ved 1400 × 860 og 1280 × 640.
+Molekylnavnene var allerede dihydrogen, dioxygen og dinitrogen; synlig tekst
+bruger ellers kun formler.
+
 ## Filer
 
 ```
@@ -150,6 +178,7 @@ js/tjek.js          tjek af antal, koefficienter og stofmængder; beskederne ved
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, opskriften, bonen, disken, tingene og hotdoggen, molekylerne,
                     poserne med 1 mol, kasserne, kammeret, skiltet, plakaten, tavlen og søjlerne
+js/kort.js          papirkortet øverst i scenen (NK.SceneKort, samme fil som i sc5.2)
 js/sim_hotdog.js    fane 1 (pølsevognen)
 js/sim_molekyler.js fane 2
 js/sim_regn.js      fane 3
@@ -190,7 +219,7 @@ præsentationen virker på alle faner (den fælles test
 `NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 4. november 2026: ALT OK (169 påstande).
+bagefter. Sidst kørt 6. november 2026: ALT OK (198 påstande, med papirkortet).
 
 ## Forenklinger
 

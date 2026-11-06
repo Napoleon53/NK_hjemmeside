@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blandbarhed</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Blandbarhed</h1>
@@ -24,6 +25,16 @@
         <div class="anker" id="anker-bassin"></div>
         <div class="anker" id="anker-glas"></div>
         <div class="anker" id="anker-koeler"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgaver.js, papirkortet 6. nov. 2026) -->
+        <div class="scenekort opgave" id="skort">
+            <div class="sk-ind" id="opg-ind"></div>
+            <div class="sk-bund tom" id="opg-status">
+                <p class="st-tekst" id="opg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="opg-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="opg-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="tilbud" id="tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
@@ -62,14 +73,11 @@
             <button class="knap lille" id="toem" type="button" title="Tøm bassinet og forlaget (R)">Tøm bassinet</button>
         </div>
 
-        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
+        <!-- Opgaven staar paa papirkortet i scenen; her kun tallet og Start forfra -->
         <div class="kort opgavekort" id="opgavekort">
-            <h2>Opgave <span class="taeller">løst <b id="opg-loest">0</b>/6</span></h2>
-            <p class="opgavetekst" id="opg-tekst"></p>
-            <div class="valg" id="opg-valg"></div>
-            <p class="besked" id="opg-hint"></p>
-            <p class="besked" id="opg-svar" aria-live="polite"></p>
-            <button class="knap stor blaa" id="opg-knap" type="button">Start opgave</button>
+            <h2>Opgaver <span class="taeller">løst <b id="opg-loest">0</b>/6</span></h2>
+            <p class="opgavetekst">Opgaven på kortet: <b id="opg-nr">ikke startet</b></p>
+            <button class="knap lille" id="opg-forfra" type="button">Start forfra ↺</button>
         </div>
     </aside>
 </section>
@@ -145,6 +153,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/tekster.js"></script>

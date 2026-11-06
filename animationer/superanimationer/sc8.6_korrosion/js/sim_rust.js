@@ -2,9 +2,9 @@
    sim_rust.js - fane 3: Rusten
 
    En jernplade set helt taet paa, med en draabe vand og luft over. Tre
-   kontakter: Vand, Ilt og Salt. Naar der baade er vand og ilt, forlader
+   kontakter: Vand, Dioxygen og Salt. Naar der baade er vand og dioxygen, forlader
    jernatomerne pladen midt under draaben som Fe²⁺, elektronerne gaar
-   gennem jernet ud til draabens kant, hvor ilt og vand optager dem og
+   gennem jernet ud til draabens kant, hvor dioxygen og vand optager dem og
    bliver til OH⁻, og Fe²⁺ og OH⁻ moedes og bliver til Fe(OH)₂ og videre
    til rust. Med salt gaar det tre gange saa hurtigt.
 
@@ -34,14 +34,12 @@
         this.cyklus = 0;
         this.tomT = 0;
         ["vand", "ilt", "salt"].forEach(function (navn) {
-            mig.knap3[navn].addEventListener("click", function () { mig.skift(navn); mig.fokus(); });
+            mig.knap3[navn].addEventListener("click", function () { if (mig.spaer()) return; mig.skift(navn); mig.fokus(); });
         });
-        this.tavle.addEventListener("click", function (e) {
-            if (e.target && e.target.id === "j-tjek") mig.tjek();
-        });
-        this.tavle.addEventListener("input", function () { mig.nulstilHjaelp(); });
+        /* Felterne paa tavlen: Indsend svar paa kortet (eller Enter i et felt) tjekker skemaet */
+        this.tavle.addEventListener("input", function () { mig.nulstilHjaelp(); mig.visIndsend(); });
         this.tavle.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); mig.tjek(); }
+            if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); mig.indsendKlik(); }
         });
         this.startFane(D.J_MAAL);
         if (this.erLoest("krav")) D.KOMBI.forEach(function (k) { mig.set[mig.noegle(k)] = SET_SEK; });
@@ -59,11 +57,11 @@
         this.brugTil();
         this.akk = Math.max(this.akk, 0.6);      /* det foerste atom kommer hurtigt */
         this.nulstilHjaelp();
-        if (!this.faerdig) this.naesteLinje("", "");
+        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
     /* Paa tavlen skrives der tal: saa skifter et tal paa tastaturet ikke fane */
-    P.tagerTal = function () { return !this.faerdig && this.opg.fase === "felter"; };
+    P.tagerTal = function () { return !this.faerdig && !this.venter && this.opg.fase === "felter"; };
 
     P.brugTil = function () {
         var mig = this;
@@ -155,23 +153,23 @@
     P.sceneLinje = function () {
         var g = this.opg, id = g.o.id, t = this.til;
         if (g.fase === "felter") {
-            return (t.vand && t.ilt ? "" : "Slå Vand og Ilt til, så du kan se, hvad der sker. ") + "Skriv tallene på tavlen, og tryk på Tjek.";
+            return (t.vand && t.ilt ? "" : "Slå Vand og Dioxygen til, så du kan se, hvad der sker. ") + "Skriv tallene på tavlen, og tryk på Indsend svar.";
         }
         if (id === "krav") {
             var mangler = this.mangler();
             if (this.set[this.noegle(t)] >= SET_SEK && mangler) {
-                return "Den mulighed er prøvet. Skift Vand eller Ilt med kontakterne. Der mangler " + mangler + ".";
+                return "Den mulighed er prøvet. Skift Vand eller Dioxygen med kontakterne. Der mangler " + mangler + ".";
             }
-            return "Se, om jernatomerne forlader pladen. Skift så Vand eller Ilt med kontakterne øverst til venstre.";
+            return "Se, om jernatomerne forlader pladen. Skift så Vand eller Dioxygen med kontakterne til venstre.";
         }
-        if (!t.vand || !t.ilt) return "Slå både Vand og Ilt til.";
+        if (!t.vand || !t.ilt) return "Slå både Vand og Dioxygen til.";
         var s = this.saltSet;
-        if (t.salt) return s.med < SALT_SEK ? "Salt er slået til. Se på tælleren øverst til højre." : "Slå nu Salt fra, og sammenlign.";
-        return s.uden < SALT_SEK && s.med >= SALT_SEK ? "Salt er slået fra. Se på tælleren øverst til højre." : "Slå Salt til med kontakten øverst til venstre.";
+        if (t.salt) return s.med < SALT_SEK ? "Salt er slået til. Se på tælleren til højre." : "Slå nu Salt fra, og sammenlign.";
+        return s.uden < SALT_SEK && s.med >= SALT_SEK ? "Salt er slået fra. Se på tælleren til højre." : "Slå Salt til med kontakten til venstre.";
     };
 
     P.spmLinje = function () {
-        return this.opg.o.id === "salt" && !this.til.salt ? "Slå Salt til, og se, hvor Na⁺ og Cl⁻ bevæger sig hen. Vælg så et svar i opgavekortet til højre." : "";
+        return this.opg.o.id === "salt" && !this.til.salt ? "Slå Salt til, og se, hvor Na⁺ og Cl⁻ bevæger sig hen. Vælg så et svar på kortet." : "";
     };
 
     P.mangler = function () {
@@ -219,7 +217,6 @@
         });
         html += "</div>";
         if (loest) html += '<span class="st-stempel">AFSTEMT ✓</span>';
-        else html += '<button class="tjekknap" id="j-tjek" type="button">Tjek</button>';
         this.tavle.innerHTML = html;
         this.tavle.classList.toggle("faerdig", !!loest);
         if (this.lay) this.layout();
@@ -228,14 +225,25 @@
     P.felter = function () { return this.tavle.querySelectorAll("input.st-felt"); };
 
     P.fokusFelt = function () {
-        if (this.faerdig || this.opg.fase !== "felter") return;
+        if (this.faerdig || this.venter || this.opg.fase !== "felter") return;
         var f = this.felter();
         if (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains("st-felt")) return;
         for (var i = 0; i < f.length; i++) if (!f[i].value) { f[i].focus(); return; }
     };
 
+    /* Indsend svar paa kortet: graa, til der staar et tal i hvert felt */
+    P.kanIndsende = function () {
+        var f = this.felter();
+        for (var i = 0; i < f.length; i++) if (!f[i].value.trim()) return false;
+        return f.length > 0;
+    };
+
+    P.ikkeKlarTekst = function () { return D.TOMT_FELT; };
+
+    P.indsend = function () { this.tjek(); };
+
     P.tjek = function () {
-        if (this.faerdig || this.opg.fase !== "felter") return;
+        if (this.faerdig || this.venter || this.opg.fase !== "felter") return;
         var id = this.skemaId(), f = this.felter(), tal = [], tomt = false, i;
         for (i = 0; i < f.length; i++) {
             var tekst = NK.ascii(f[i].value).trim();
@@ -263,12 +271,12 @@
         this.loest("svar", K.skemaTekst(o.felter.skema) + ". " + o.loest);
     };
 
-    P.enter = function () { if (this.opg.fase === "felter") this.tjek(); };
+    P.enter = function () { this.enterKort(); };
 
     /* ----- Panelet --------------------------------------------------------------------- */
     P.visPanel = function () {
         var mig = this, html = "";
-        var NAVN = { "vi": "Vand og ilt", "v-": "Vand, men ingen ilt", "-i": "Ilt, men intet vand", "--": "Hverken vand eller ilt" };
+        var NAVN = { "vi": "Vand og dioxygen", "v-": "Vand, men intet dioxygen", "-i": "Dioxygen, men intet vand", "--": "Hverken vand eller dioxygen" };
         D.KOMBI.forEach(function (k) {
             var n = mig.noegle(k), set = mig.set[n] >= SET_SEK, ruster = K.rustFart(k.vand, k.ilt, false) > 0;
             html += '<div class="talraekke"><span>' + NAVN[n] + '</span><span class="tal' + (set && ruster ? " roed" : "") + '">' +
@@ -287,18 +295,27 @@
     };
 
     /* ----- Scenen -------------------------------------------------------------------- */
+    /* Kortet staar oeverst (top() i js/fane.js). Partikelbilledet begynder under
+       det, kontakterne og jernpladen staar i luften over draaben, og tavlen
+       staar nederst. */
     P.layout = function () {
-        var W = this.L.b, baand = this.baand(), Hs = baand.y;
-        var lay = { W: W, H: this.L.h, Hs: Hs };
+        var W = this.L.b, Hs = this.L.h;
+        var lay = { W: W, H: this.L.h, Hs: Hs, zone: this.kortZone() };
+        var T = 10 + lay.zone + 10;
+        lay.top = T;
         var tavleH = this.tavle.hidden ? 0 : (this.tavle.offsetHeight || 92);
-        this.tavle.style.bottom = (baand.h + 10) + "px";
-        lay.rekt = { x: 0, y: 0, b: W, h: Hs - (tavleH ? tavleH + 20 : 0) };
-        var s = NK.klamp(W / 27, 25, 34);
+        this.tavle.style.bottom = "10px";
+        lay.rekt = { x: 0, y: T, b: W, h: Hs - T - (tavleH ? tavleH + 20 : 0) };
+        /* Atomerne er saa smaa, at der er luft nok over draaben, ogsaa naar tavlen
+           staar fremme (regnet med en tavle paa 100 px, saa pladen ikke skiftes
+           ud, hver gang tavlen kommer eller gaar) */
+        var s = Math.min(NK.klamp(W / 27, 25, 34), (Hs - T - 120) / (RAEK + 4.8));
         lay.kol = Math.max(16, Math.round(W / s));
         lay.s = W / lay.kol;
         lay.over = lay.rekt.h / lay.s - RAEK;
         lay.y0 = lay.rekt.y + lay.rekt.h - RAEK * lay.s;
-        lay.boks = { x: W - 232, y: 12, b: 220, h: 116 };
+        lay.boks = { x: W - 242, y: T + 2, b: 230, h: 68 };
+        NK.el("j-kontakter").style.top = Math.round(T + 4) + "px";
         this.lay = lay;
         if (!this.M || this.M.kol !== lay.kol) {
             if (this.M) this.gammelTael = this.M.tael;
@@ -343,12 +360,12 @@
         this.set[n] = foer + dt;
         if (foer < SET_SEK && this.set[n] >= SET_SEK) {
             this.visPanel();
-            if (!this.faerdig && g.o.id === "krav" && g.fase === "forsoeg") {
+            if (g.o.id === "krav" && this.iForsoeg()) {
                 if (!this.mangler()) this.forsoegKlaret("");
                 else this.naesteLinje("", "");
             }
         }
-        if (!this.faerdig && g.o.id === "salt" && g.fase === "forsoeg" && this.til.vand && this.til.ilt) {
+        if (g.o.id === "salt" && this.iForsoeg() && this.til.vand && this.til.ilt) {
             if (this.til.salt) this.saltSet.med += dt; else this.saltSet.uden += dt;
             if (this.saltSet.med >= SALT_SEK && this.saltSet.uden >= SALT_SEK) this.forsoegKlaret(g.o.forsoeg.set);
         }
@@ -368,7 +385,7 @@
 
     P.tegnTekster = function (ctx, lay) {
         var M = this.M, d = M.draabe, s = lay.s, y0 = lay.y0, t = this.til;
-        Tg.maerkat(ctx, t.ilt ? "luft" : "luft uden ilt", 14, 78, { justering: "left" });
+        Tg.maerkat(ctx, t.ilt ? "luft" : "luft uden dioxygen", 14, lay.top + 66, { justering: "left" });
         if (t.vand) Tg.maerkat(ctx, t.salt ? "saltvand" : "vand", d.cx * s, y0 - (d.h - 0.6) * s, { farve: "#a8d4f5" });
         Tg.maerkat(ctx, "jern", 14, y0 + RAEK * s - 16, { justering: "left" });
         /* Naar skemaet er afstemt, faar stedet sit navn */
@@ -380,7 +397,8 @@
         }
     };
 
-    /* Pladen i almindelig stoerrelse og taelleren, oeverst til hoejre */
+    /* Pladen i almindelig stoerrelse og taelleren, til hoejre under kortet.
+       Kassen er lav, saa den kan staa i luften over draaben. */
     P.tegnBoks = function (ctx, lay) {
         var B = lay.boks, tael = this.M.tael, t = this.til;
         NK.rundtRekt(ctx, B.x, B.y, B.b, B.h, 10);
@@ -389,7 +407,7 @@
         ctx.lineWidth = 1;
         ctx.strokeStyle = "#3d4150";
         ctx.stroke();
-        NK.tekst(ctx, "JERNPLADEN", B.x + 12, B.y + 20, { font: Tg.font("700", 12), farve: "#f2c53d" });
+        NK.tekst(ctx, "JERNPLADEN", B.x + 12, B.y + 18, { font: Tg.font("700", 12), farve: "#f2c53d" });
         /* Pladen med draaben og rusten */
         var px = B.x + 14, py = B.y + 50, pb = 78;
         ctx.fillStyle = "#7b8695";
@@ -412,11 +430,11 @@
             ctx.strokeStyle = "rgba(190, 225, 255, 0.7)";
             ctx.stroke();
         }
-        var x = B.x + 106;
-        NK.tekst(ctx, "Jernatomer væk", x, B.y + 40, { font: Tg.font("600", 12), farve: "#a9b0ba" });
-        NK.tekst(ctx, String(tael.afgivet), x, B.y + 62, { font: Tg.font("700", 20), farve: "#f2f3f5" });
-        NK.tekst(ctx, "Pr. minut", x, B.y + 84, { font: Tg.font("600", 12), farve: "#a9b0ba" });
-        NK.tekst(ctx, String(Math.round(this.fart() * 60)), x, B.y + 106, { font: Tg.font("700", 20), farve: this.fart() > 0 ? "#f0a070" : "#f2f3f5" });
+        var x = B.x + 106, xh = B.x + B.b - 12;
+        NK.tekst(ctx, "Jernatomer væk", x, B.y + 30, { font: Tg.font("600", 12), farve: "#a9b0ba", linje: "middle" });
+        NK.tekst(ctx, String(tael.afgivet), xh, B.y + 30, { font: Tg.font("700", 18), farve: "#f2f3f5", justering: "right", linje: "middle" });
+        NK.tekst(ctx, "Pr. minut", x, B.y + 52, { font: Tg.font("600", 12), farve: "#a9b0ba", linje: "middle" });
+        NK.tekst(ctx, String(Math.round(this.fart() * 60)), xh, B.y + 52, { font: Tg.font("700", 18), farve: this.fart() > 0 ? "#f0a070" : "#f2f3f5", justering: "right", linje: "middle" });
     };
 
     /* ----- Musen: et klik paa en partikel siger, hvad den er ------------------------------ */
@@ -430,10 +448,10 @@
         var p;
         if (ved(M.el, 0.5)) this.kortBesked("En elektron, e⁻. Den går gennem jernet fra midten ud til dråbens kant.", 5);
         else if (ved(M.ion, 0.6)) this.kortBesked("En jernion, Fe²⁺. Den var et jernatom i pladen og har afgivet to elektroner.", 5);
-        else if (ved(M.oh, 0.6)) this.kortBesked("En hydroxidion, OH⁻. Den er dannet af ilt, vand og elektroner ved dråbens kant.", 5);
+        else if (ved(M.oh, 0.6)) this.kortBesked("En hydroxidion, OH⁻. Den er dannet af dioxygen, vand og elektroner ved dråbens kant.", 5);
         else if ((p = ved(M.salt, 0.6))) this.kortBesked(p.type === "Na" ? "En natriumion, Na⁺, fra saltet. Den bliver ikke brugt." : "En chloridion, Cl⁻, fra saltet. Den bliver ikke brugt.", 5);
-        else if ((p = ved(M.gas, 0.8))) this.kortBesked(p.type === "o2" ? "Et iltmolekyle, O₂, fra luften." : "Et nitrogenmolekyle, N₂. Det reagerer ikke med jern.", 5);
-        else if ((p = ved(M.dep, 0.45))) this.kortBesked(p.type === "rust" ? "Rust, FeO(OH)." : "Fe(OH)₂. Ilt gør det til rust.", 5);
+        else if ((p = ved(M.gas, 0.8))) this.kortBesked(p.type === "o2" ? "Et dioxygenmolekyle, O₂, fra luften." : "Et dinitrogenmolekyle, N₂. Det reagerer ikke med jern.", 5);
+        else if ((p = ved(M.dep, 0.45))) this.kortBesked(p.type === "rust" ? "Rust, FeO(OH)." : "Fe(OH)₂. Dioxygen gør det til rust.", 5);
         else if (y > 0) this.kortBesked("Jernatomer, Fe, i pladen.", 4);
     };
 

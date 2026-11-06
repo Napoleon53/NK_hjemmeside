@@ -133,7 +133,7 @@
         {
             id: "k-gaet", gruppe: "kaede", type: "gaet", navn: "Gæt først", n: 2,
             tekst: "Buta-1,3-dien absorberer ved 217 nm. Hvor absorberer stoffet med én konjugeret dobbeltbinding mere?",
-            svar: ["Ved en kortere bølgelængde", "Ved den samme bølgelængde", "Ved en længere bølgelængde"],
+            svar: ["Kortere bølgelængde", "Samme bølgelængde", "Længere bølgelængde"],
             rigtig: 2
         },
         { id: "k-farve", gruppe: "kaede", type: "byg", navn: "Giv den farve", n: 3, maal: "farvet",
@@ -146,13 +146,13 @@
         { id: "t-find", gruppe: "tomat", type: "find", navn: "Find chromoforen",
             tekst: "Klik på de konjugerede dobbeltbindinger i lycopen." },
         { id: "t-gul", gruppe: "tomat", type: "brom", navn: "Gør den gul", maal: "Gul",
-            tekst: "Klik på en dobbeltbinding for at addere brom til den. Gør opløsningen gul." },
+            tekst: "Klik på en dobbeltbinding for at addere dibrom til den. Gør opløsningen gul." },
         { id: "t-farveloes", gruppe: "tomat", type: "brom", navn: "Gør den farveløs", maal: "Farveløs",
-            tekst: "Gør opløsningen farveløs med ét brommolekyle." },
+            tekst: "Gør opløsningen farveløs med ét dibrommolekyle." },
         {
             id: "t-regnbue", gruppe: "tomat", type: "regnbue", navn: "Tomatregnbuen",
-            tekst: "Bromvand hældes oven i tomatsaften og trænger langsomt ned. Hvilke farver kommer der, set oppefra?",
-            svar: ["Farveløs øverst, så gul, og orange nederst", "Orange øverst, så gul, og farveløs nederst", "Hele glasset bliver gult"],
+            tekst: "Bromvand hældes i tomatsaft og trænger langsomt ned. Hvilke farver får saften fra top til bund?",
+            svar: ["Farveløs, gul, orange", "Orange, gul, farveløs", "Hele glasset bliver gult"],
             rigtig: 0
         }
     ];
@@ -270,9 +270,9 @@
             hvorfor: "Elektronerne i et langt konjugeret system kan exciteres med mindre energi. Mindre energi svarer til længere bølgelængde. Ved omkring 8 konjugerede dobbeltbindinger når toppen ind i det synlige lys."
         },
         {
-            q: "Brom adderes til dobbeltbindingen midt i lycopen. Hvad sker der med farven?",
-            svar: ["Den forsvinder, fordi chromoforen deles i to korte stykker.", "Den bliver brun af bromen.", "Den bliver mere rød, fordi molekylet bliver større.", "Intet, for der er stadig 12 dobbeltbindinger."],
-            nej: ["", "Bromen bliver bundet. Det er chromoforen, der ændrer sig.", "Farven kommer fra chromoforen, ikke fra molekylets størrelse.", "Kun de konjugerede tæller. To stykker med fem hver er for korte til at absorbere synligt lys."],
+            q: "Dibrom adderes til dobbeltbindingen midt i lycopen. Hvad sker der med farven?",
+            svar: ["Den forsvinder, fordi chromoforen deles i to korte stykker.", "Den bliver brun af dibromen.", "Den bliver mere rød, fordi molekylet bliver større.", "Intet, for der er stadig 12 dobbeltbindinger."],
+            nej: ["", "Dibromen bliver bundet. Det er chromoforen, der ændrer sig.", "Farven kommer fra chromoforen, ikke fra molekylets størrelse.", "Kun de konjugerede tæller. To stykker med fem hver er for korte til at absorbere synligt lys."],
             hvorfor: "Efter additionen er der to systemer med fem konjugerede dobbeltbindinger. Hvert af dem absorberer ved ca. 334 nm i UV, så opløsningen bliver farveløs."
         },
         {

@@ -23,7 +23,6 @@
     function SimChrom() {
         var mig = this;
         this.valg = NK.el("ch-valg");
-        this.linjeEl = NK.el("ch-opgave");
         this.molekyler = D.CH.map(function (o) {
             var mol = M.byg(o.mol, o.n);
             var konj = M.konjugering(mol);
@@ -37,7 +36,7 @@
     }
 
     var P = SimChrom.prototype;
-    NK.Fane.paa(P, { navn: "ch" });
+    NK.Fane.paa(P, { navn: "ch", zone: 196, zoneLav: 194 });
 
     P.chipTekst = function (o, i) { return String(i + 1); };
 
@@ -55,8 +54,7 @@
         this.over = null;
         this.hover = null;
         this.trin = "find";
-        this.bygValg();
-        this.visOpgavelinje();
+        this.layout();
     };
 
     P.antalMarker = function () { return Object.keys(this.marker).length; };
@@ -71,33 +69,26 @@
         return 0;
     };
 
-    P.bygValg = function () {
-        var mig = this;
-        this.valg.innerHTML = "";
-        this.knapper = {};
-        if (this.trin !== "farve") { this.layout(); return; }
-        SVAR.forEach(function (navn) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap farveknap";
-            var f = D.FARVER.filter(function (x) { return x.navn === navn; })[0];
-            k.innerHTML = '<span class="fk-proeve' + (f ? "" : " tom") + '"' + (f ? ' style="background:' + f.css + '"' : "") + "></span>" + NK.html(navn);
-            k.addEventListener("click", function () { mig.svarFarve(navn); mig.fokus(); });
-            if (mig.forkerte[navn]) { k.classList.add("forkert"); k.disabled = true; }
-            if (mig.faerdig) k.disabled = true;
-            mig.valg.appendChild(k);
-            mig.knapper[navn] = k;
-        });
-        this.layout();
+    /* ----- Papirkortet ------------------------------------------------------------ */
+    P.kortData = function () {
+        var N = this.N;
+        if (this.trin === "find") return { tekst: "Markér chromoforen i " + this.o.navn.toLowerCase() +
+            ". Klik på dobbeltbindingerne i det største konjugerede system, og tryk Indsend svar." };
+        return {
+            tekst: "Chromoforen har " + N + " konjugerede dobbeltbinding" + (N === 1 ? "" : "er") + ". Hvilken farve har stoffet?",
+            farver: true,
+            svar: SVAR.map(function (navn) {
+                var f = D.FARVER.filter(function (x) { return x.navn === navn; })[0];
+                return { t: navn, css: f ? f.css : null };
+            })
+        };
     };
 
-    P.visOpgavelinje = function () {
-        var t;
-        if (this.faerdig) t = "Hold musen over grafen for at se, hvor stoffet absorberer.";
-        else if (this.trin === "find") t = "Markér chromoforen: klik på dobbeltbindingerne i det største konjugerede system.";
-        else t = "Chromoforen har " + this.N + " konjugerede dobbeltbinding" + (this.N === 1 ? "" : "er") + ". Hvilken farve har stoffet?";
-        NK.saetTekst("ch-opgave", t);
-    };
+    P.kanIndsende = function () { return this.trin === "find" && this.antalMarker() > 0; };
+
+    P.indsend = function () { if (this.trin === "find") this.tjekFind(false); };
+
+    P.svarValgt = function (j, d) { this.svarFarve(d.svar[j].t, j); };
 
     P.promptHTML = function () {
         var o = this.o;
@@ -107,13 +98,7 @@
             '<p class="note-tekst">Chromoforen er den del af molekylet, der absorberer lyset: det største system af konjugerede dobbeltbindinger. C=O og N=N tæller med.</p>' +
             '<ol class="trinliste"><li class="' + trin1 + '">Markér chromoforen' + (this.trin !== "find" ? ": " + this.N : "") + "</li>" +
             '<li class="' + trin2 + '">Vælg farven' + (this.faerdig ? ": " + NK.html(o.farve.toLowerCase()) : "") + "</li></ol>";
-        if (this.faerdig) h += '<div class="forklaring"><p>' + NK.html(o.fakta) + "</p></div>";
         return h;
-    };
-
-    P.trinLinje = function () {
-        if (this.trin === "find") return "Klik på en dobbeltbinding i molekylet. Markeret: " + this.antalMarker() + ".";
-        return "Vælg farven med knapperne under tavlen.";
     };
 
     /* ----- Hinttrappen og svaret ---------------------------------------------------- */
@@ -152,78 +137,81 @@
         var mig = this;
         this.lysB = {};
         if (this.trin === "find") {
+            this.system = null;
             this.system = this.maalSystem();
+            this.marker = {};
             this.konj.systemer[this.system].dob.forEach(function (bi) { mig.marker[bi] = true; });
             this.tjekFind(true);
             return;
         }
-        this.svarFarve(this.o.farve);
+        this.valgt = this.svarIndeks(this.kortData(), this.o.farve);
+        this.svarFarve(this.o.farve, this.valgt);
     };
 
     /* ----- Elevens handlinger --------------------------------------------------------- */
+    /* Et klik markerer kun; Indsend svar bedoemmer markeringen */
     P.klikBinding = function (bi) {
         var si = this.konj.afBinding[bi];
         if (si === undefined) return;
-        var stoer = this.konj.systemer[si].dob.length;
-        if (this.marker[bi]) {
-            delete this.marker[bi];
-            if (!this.antalMarker()) this.system = null;
-            this.nulstilHjaelp();
-            this.naesteLinje("", "");
-            return;
-        }
-        if (stoer < this.N) {
-            this.roed[bi] = 1;
-            this.fejlLinje(stoer === 1 ?
-                "Den dobbeltbinding er ikke konjugeret med de andre. Mellem dem sidder et C-atom med kun enkeltbindinger." :
-                "Den dobbeltbinding hører til et mindre system. Find det største.");
-            return;
-        }
-        if (this.system !== null && si !== this.system) {
-            this.roed[bi] = 1;
-            this.fejlLinje("Den er ikke konjugeret med dem, du har markeret. Mellem dem sidder et C-atom med kun enkeltbindinger.");
-            return;
-        }
-        this.system = si;
-        this.marker[bi] = true;
+        if (this.marker[bi]) delete this.marker[bi];
+        else this.marker[bi] = true;
         this.lysB = {};
         this.nulstilHjaelp();
-        this.tjekFind(false);
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.visIndsend();
     };
 
     P.tjekFind = function (svar) {
-        if (this.antalMarker() < this.N) { this.naesteLinje("", ""); return; }
-        this.trin = "farve";
-        this.hjaelp = 0;
-        this.bygValg();
-        this.visKort();
-        this.visOpgavelinje();
-        var t = "Chromoforen har " + this.N + " konjugerede dobbeltbinding" + (this.N === 1 ? "" : "er") + ". " + this.trinLinje();
-        if (svar) this.besked('<span class="b-maerke">Svaret</span> ' + NK.html(t), "gul");
-        else this.godLinje("Chromoforen har " + this.N + " konjugerede dobbeltbinding" + (this.N === 1 ? "" : "er") + ".");
-    };
-
-    P.svarFarve = function (navn) {
-        var o = this.o;
-        if (this.faerdig || this.trin !== "farve") return;
-        if (navn === o.farve) {
-            if (this.knapper[navn]) this.knapper[navn].classList.add("rigtig");
-            this.trin = "faerdig";
-            this.loest(o.fakta);
-            this.bygValg();
-            this.visOpgavelinje();
+        var mig = this, N = this.N, konj = this.konj;
+        var marker = Object.keys(this.marker).map(Number);
+        /* Det system, eleven har markeret mest af blandt de stoerste */
+        var bedst = null, flest = -1;
+        konj.systemer.forEach(function (sy, si) {
+            if (sy.dob.length !== N) return;
+            var n = marker.filter(function (bi) { return konj.afBinding[bi] === si; }).length;
+            if (n > flest) { flest = n; bedst = si; }
+        });
+        var forkerte = marker.filter(function (bi) { return konj.afBinding[bi] !== bedst; });
+        if (forkerte.length) {
+            var lille = forkerte.some(function (bi) { return konj.systemer[konj.afBinding[bi]].dob.length === 1; });
+            forkerte.forEach(function (bi) { delete mig.marker[bi]; mig.roed[bi] = 1; });
+            this.system = this.antalMarker() ? bedst : null;
+            this.fejlLinje(lille ?
+                "Den røde dobbeltbinding er ikke konjugeret med de andre. Mellem dem sidder et C-atom med kun enkeltbindinger." :
+                "Den røde dobbeltbinding hører til et mindre konjugeret system. Find det største.");
             return;
         }
-        this.forkerte[navn] = true;
-        if (this.knapper[navn]) { this.knapper[navn].classList.add("forkert"); this.knapper[navn].disabled = true; }
+        this.system = bedst;
+        if (this.antalMarker() < N) {
+            this.fejlLinje("Du har markeret " + this.antalMarker() + " dobbeltbinding" + (this.antalMarker() === 1 ? "" : "er") +
+                ". Chromoforen har flere. Følg skiftet mellem dobbelt- og enkeltbinding.");
+            return;
+        }
+        if (svar) this.vistDel = true;
+        this.mellem("Chromoforen har " + N + " konjugerede dobbeltbinding" + (N === 1 ? "" : "er") + ".", this.tilFarve);
+    };
+
+    P.tilFarve = function () {
+        this.trin = "farve";
+        this.lysB = {};
+        this.layout();
+    };
+
+    P.svarFarve = function (navn, j) {
+        var o = this.o;
+        if (this.faerdig || this.trin !== "farve") return;
+        if (j === undefined) j = this.svarIndeks(this.kortData(), navn);
+        if (navn === o.farve) {
+            this.loest(o.fakta, undefined, j);
+            this.trin = "faerdig";
+            return;
+        }
         var t = o.nej && o.nej[navn];
         if (!t && o.farve === "Farveløs") t = "Med " + this.N + " konjugerede dobbeltbinding" + (this.N === 1 ? "" : "er") + " ligger toppen i UV, under 400 nm. Stoffet absorberer intet synligt lys.";
         if (!t && navn === "Farveløs") t = this.N + " konjugerede dobbeltbindinger er nok til, at toppen når ind i det synlige lys.";
         if (!t) t = "Toppen ligger i det synlige lys, men et andet sted. Jo længere chromoforen er, jo længere bølgelængde bliver absorberet, og farven går fra gul over orange og rød mod lilla og blå.";
-        this.fejlLinje(t);
+        this.forkertValg(j, t);
     };
-
-    P.enter = function () { if (this.faerdig) this.knap(); };
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
@@ -231,10 +219,9 @@
         this.L.tilpas();
         var W = this.L.b;
         var band = this.baand();
-        var linjeBund = this.linjeEl ? this.linjeEl.offsetTop + this.linjeEl.offsetHeight : 40;
         var valgH = this.valg && this.valg.children.length ? this.valg.offsetHeight + 14 : 0;
         if (this.valg) this.valg.style.bottom = (band.h + 12) + "px";
-        var top0 = linjeBund + 12;
+        var top0 = this.top();
         var bund = band.y - (valgH ? valgH + 8 : 14);
         var avail = Math.max(240, bund - top0);
         var r1h = NK.klamp(avail * 0.52, 150, 330);
@@ -304,7 +291,7 @@
     P.klikScene = function (pt) {
         if (this.trin !== "find" || !this.vis) return;
         var bi = M.bindingVed(this.mol, this.vis, pt, true);
-        if (bi !== null) this.klikBinding(bi);
+        if (bi !== null && !this.spaer()) this.klikBinding(bi);
     };
 
     NK.SimChrom = SimChrom;

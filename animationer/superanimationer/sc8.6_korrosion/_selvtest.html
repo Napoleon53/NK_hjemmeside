@@ -23,10 +23,17 @@
    fra det første rør), at tallene for rørene og skibet passer med modellen, at de
    fire skemaer er afstemt i atomer og ladning, at partikelbilledet
    følger skemaerne (afgivne elektroner = optagne), at jern kun ruster
-   med både vand og ilt og tre gange så hurtigt med salt, at alle mål
-   på de tre faner kan løses (selv og med Vis svaret), at de forkerte
-   svar giver en rød linje med forklaringen, at sproget holder
+   med både vand og dioxygen og tre gange så hurtigt med salt, at alle
+   opgaver på de tre faner kan løses (selv og med Vis svaret), at de
+   forkerte svar giver en rød linje med forklaringen, at sproget holder
    reglerne, og at tingene kan være der fra 1100 × 700 til 1600 × 950.
+   Papirkortet (6. nov. 2026): kortet står øverst i scenen og ikke i
+   panelet, der er ingen statuslinje nederst, et svar vælger kun, og
+   Indsend svar er grå, til der er valgt. Tiden løser ikke en opgave af
+   sig selv. Efter et rigtigt svar bliver kortet på spørgsmålet med
+   Næste, dér hvor Indsend svar stod, og forfra står i panelet. Kortet
+   holder sig i den plads, der er sat af (kortZone), i alle dele af alle
+   opgaver i 1400 × 860, 1366 × 700 og 1100 × 700.
 
    Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
    fremskridt og lægger det tilbage bagefter.
@@ -85,13 +92,19 @@ function koerTest(W) {
     var d = W.document;
     var NK = W.NK, D = NK.Data, K = NK.Kemi;
     var R = NK.sims["fane-r"], S = NK.sims["fane-s"], J = NK.sims["fane-j"];
-    function linje(F) { return F.beskedTekst(); }
+    /* Alt, hvad kortet siger: opgaven, svarene, forklaringen og linjen i bunden */
+    function linje(F) { return F.kortTekst(); }
     function klasse(F) { return F.el.status.className; }
     function roed(F) { return /skidt/.test(klasse(F)); }
-    /* Tryk på hjælpeknappen, til målet er løst (hint, hint, hint, Vis svaret ...) */
+    function gul(F) { return F.el.skort.classList.contains("svar") && F.faerdig; }
+    /* Et gæt er gratis og går videre med det samme */
+    function gaet(F, j) { F.valgKlik(j); }
+    /* Et svar vælges på kortet og sendes ind med Indsend svar */
+    function svar(F, j) { F.valgKlik(j); F.indsendKlik(); }
+    /* Tryk på hjælpeknappen, til opgaven er løst (gæt, hint, hint, hint, Vis svaret, Næste ...) */
     function visSvaret(F, i) {
         F.vaelg(i);
-        for (var n = 0; n < 16 && !F.faerdig; n++) F.knap();
+        for (var n = 0; n < 24 && !F.faerdig; n++) { if (F.gaetNu()) F.valgKlik(0); else F.knap(); }
         return F.faerdig;
     }
 
@@ -158,7 +171,7 @@ function koerTest(W) {
     paastand("skemaerne som tekst", K.skemaTekst("ox") === "Fe → Fe²⁺ + 2 e⁻" && K.skemaTekst("red") === "O₂ + 2 H₂O + 4 e⁻ → 4 OH⁻" &&
         K.skemaTekst("samlet") === "2 Fe + O₂ + 2 H₂O → 2 Fe²⁺ + 4 OH⁻" && K.skemaTekst("rust") === "4 Fe(OH)₂ + O₂ → 4 FeO(OH) + 2 H₂O",
         K.skemaTekst("rust"));
-    paastand("i det samlede skema afgiver jern lige så mange elektroner, som ilt optager", 2 * K.facit("samlet")[0] === K.facit("red")[0]);
+    paastand("i det samlede skema afgiver jern lige så mange elektroner, som dioxygen optager", 2 * K.facit("samlet")[0] === K.facit("red")[0]);
     var P0 = K.PARTIKEL, alt = { Fe: 4 * P0.Fe.Fe, O: 3 * 2 + 2 * 1, H: 2 * 2 };
     paastand("teoriens 4 Fe + 3 O₂ + 2 H₂O → 4 FeO(OH) er afstemt", alt.Fe === 4 && alt.O === 4 * P0["FeO(OH)"].O && alt.H === 4 * P0["FeO(OH)"].H);
     var typiske = [["ox", [3]], ["ox", [1]], ["red", [4, 2]], ["red", [2, 4]], ["samlet", [1, 1, 4]], ["samlet", [2, 1, 4]], ["samlet", [4, 4, 4]],
@@ -181,7 +194,7 @@ function koerTest(W) {
     J.brugTil();
     koerF(J, 45);
     var T = J.M.tael;
-    paastand("med vand og ilt forlader jernatomerne pladen (0,4 pr. sekund)", T.afgivet >= 14 && T.afgivet <= 20, T.afgivet);
+    paastand("med vand og dioxygen forlader jernatomerne pladen (0,4 pr. sekund)", T.afgivet >= 14 && T.afgivet <= 20, T.afgivet);
     paastand("hvert jernatom afgiver 2 elektroner", T.eAfgivet === 2 * T.afgivet);
     paastand("afgivne elektroner = optagne + dem, der er på vej", T.eAfgivet === T.eOptaget + J.M.elektronerUndervejs(), T.eAfgivet + " / " + T.eOptaget + " + " + J.M.elektronerUndervejs());
     paastand("ét O₂ optager 4 elektroner og giver 4 OH⁻", T.oh === T.eOptaget && T.o2 === T.eOptaget / 4 + T.rust / 4, JSON.stringify(T));
@@ -198,8 +211,8 @@ function koerTest(W) {
     paastand("uden vand ruster jernet ikke", J.M.tael.afgivet === foer && J.fart() === 0);
     J.skift("vand"); J.skift("ilt");
     koerF(J, 12);
-    paastand("uden ilt ruster jernet ikke", J.M.tael.afgivet === foer && J.fart() === 0);
-    paastand("uden ilt er der kun N₂ i luften", J.M.gas.every(function (g) { return g.type === "n2"; }) && J.M.gas.length === 14, J.M.gas.length);
+    paastand("uden dioxygen ruster jernet ikke", J.M.tael.afgivet === foer && J.fart() === 0);
+    paastand("uden dioxygen er der kun N₂ i luften", J.M.gas.every(function (g) { return g.type === "n2"; }) && J.M.gas.length === 14, J.M.gas.length);
     J.skift("ilt");
     J.nulstilScene();
     koerF(J, 30);
@@ -224,52 +237,77 @@ function koerTest(W) {
     function afsatKobber() { return R.M.dep.filter(function (p) { return p.type === "metal" && p.sym === "Cu"; }); }
     R.vaelg(0);
     paastand("mål 1 begynder med et gæt, og rørene er kobber og jern", R.opg.fase === "gaet" && R.a === "Cu" && R.b === "Fe");
-    R.svarValg(0);
-    paastand("efter gættet skal det prøves", R.opg.fase === "forsoeg" && /Lad tiden gå/.test(linje(R)), linje(R));
+    var tidFoer = R.t;
+    R.tidKlik();
+    paastand("under gættet er forsøget låst: Lad tiden gå sætter intet i gang, og kortet blinker", !R.koerer && R.t === tidFoer && R.el.skort.classList.contains("blink") && /Gæt først/.test(linje(R)), linje(R));
+    gaet(R, 0);
+    paastand("efter gættet skal det prøves", R.opg.fase === "forsoeg" && /Lad tiden gå/.test(linje(R)) && /Dit gæt: Kobberrøret/.test(linje(R)), linje(R));
     lyt();
     R.tidKlik();
     koerF(R, 3);
     paastand("mens tiden går, står det i linjen, og knappen er låst", R.koerer && /Tiden går/.test(linje(R)) && R.tidknap.disabled);
     koerF(R, 9);
-    paastand("mål 1 løses af forsøget: hul i jernrøret efter 10 år", R.faerdig && R.slut && taet(R.t, 10.0, 0.05) && /tæret igennem ved samlingen/.test(linje(R)), linje(R));
+    paastand("opgave 1 er at gøre forsøget: hul i jernrøret efter 10 år, og kortet bliver med Næste", R.faerdig && R.slut && taet(R.t, 10.0, 0.05) && /tæret igennem ved samlingen/.test(linje(R)) &&
+        !!R.el.skort.querySelector(".sk-bund.bliv .sk-videre") && /^Godt/.test(R.el.skort.querySelector(".bliv .st-tekst").textContent), linje(R));
     paastand("gættet får sin dom", /Dit gæt holdt ikke/.test(linje(R)));
     paastand("luppen følger væggen: atomerne mangler nærmest samlingen", R.M.top[6] === 4 && R.M.top[6] >= R.M.top[8] && R.M.top[8] >= R.M.top[11] && R.M.top.slice(0, 6).every(function (t) { return t === 0; }), R.M.top.join(","));
     paastand("elektronerne går fra jernet over i kobberet", afg.length >= 10 && afg.every(function (p) { return p[0] >= 6 && p[1] < 6; }), afg.length);
     paastand("kobberionerne vises ikke, før målet om vandets retning", !R.visIoner() && R.M.gaest.length === 0 && R.M.tael.afsat === 0);
     paastand("forsøget står under Rør, der er prøvet", /hul i jernrøret efter 10 år/.test(d.getElementById("r-proevet").textContent));
     R.vaelg(1);
-    R.svarValg(1);
-    paastand("mål 2: et forkert svar giver en rød linje med forklaringen", roed(R) && /jernatom forlader/.test(linje(R)) && !R.faerdig, linje(R));
-    R.svarValg(0);
-    paastand("mål 2: det rigtige svar løser målet", R.faerdig && /mindre ædelt/.test(linje(R)));
+    paastand("opgave 2: Indsend svar er grå, til der er valgt et svar", !R.el.indsend.hidden && R.el.indsend.classList.contains("ikke-klar"));
+    R.indsendKlik();
+    paastand("opgave 2: Indsend svar uden valg bedømmer intet, men kortet blinker", !R.faerdig && !roed(R) && R.el.skort.classList.contains("blink"));
+    R.valgKlik(0);
+    paastand("opgave 2: et klik på et svar vælger det bare (blåt), og Indsend svar bliver klar", !R.faerdig && R.el.skort.querySelector('[data-valg="0"]').classList.contains("valgt") &&
+        R.el.indsend.classList.contains("klar"));
+    R.valgKlik(1);
+    R.indsendKlik();
+    paastand("opgave 2: et forkert svar giver en rød linje med forklaringen, og svaret bliver rødt", roed(R) && /jernatom forlader/.test(linje(R)) && !R.faerdig &&
+        R.el.skort.querySelector('[data-valg="1"]').classList.contains("forkert") && R.el.skort.querySelector('[data-valg="1"]').disabled, linje(R));
+    svar(R, 0);
+    var rigtigKnap = R.el.skort.querySelector('[data-valg="0"]'), videre = R.el.skort.querySelector(".sk-videre");
+    paastand("opgave 2: det rigtige svar løser opgaven, og kortet bliver på spørgsmålet", R.faerdig && /mindre ædelt/.test(linje(R)) && /Hvilken vej går de\?/.test(linje(R)) &&
+        rigtigKnap.classList.contains("rigtig") && R.el.skort.querySelector('[data-valg="1"]').classList.contains("forkert"));
+    paastand("forklaringen står under svarene, og Næste står, hvor Indsend svar stod", !!videre && /Næste opgave/.test(videre.textContent) && R.el.indsend.hidden && R.el.knap.hidden &&
+        videre.getBoundingClientRect().top > rigtigKnap.getBoundingClientRect().bottom - 1);
+    paastand("Start forfra står ikke på kortet, men i panelet", !/forfra/i.test(R.el.skort.innerText) && !!d.querySelector("#fane-r .panel #r-forfra"));
     R.vaelg(2);
+    paastand("opgave 3: Indsend svar er grå, før de 20 år er gået", !R.el.indsend.hidden && R.el.indsend.classList.contains("ikke-klar"));
     R.tidKlik(); koerF(R, 12);
-    paastand("mål 3: to forskellige rør giver en rød linje", roed(R) && R.opg.fase === "forsoeg" && /jernrøret er tæret mest/i.test(linje(R)), linje(R));
+    paastand("opgave 3: tiden bedømmer ikke rørene; de sendes ind med Indsend svar", !roed(R) && R.opg.fase === "forsoeg" && !R.venter && R.el.indsend.classList.contains("klar") && /Indsend svar/.test(linje(R)), linje(R));
+    R.indsendKlik();
+    paastand("opgave 3: to forskellige rør sendt ind giver en rød linje", roed(R) && R.opg.fase === "forsoeg" && /jernrøret er tæret mest/i.test(linje(R)), linje(R));
     R.saetRoer("Fe", "Fe", false);
     lyt();
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 3: to jernrør holder i 20 år, og så kommer spørgsmålet", R.opg.fase === "spm" && R.t === 20 && /Vælg et svar/.test(linje(R)), linje(R));
+    paastand("opgave 3: to jernrør holder i 20 år, men tiden løser ikke opgaven", R.opg.fase === "forsoeg" && !R.venter && !R.faerdig && R.t === 20, R.opg.fase);
+    R.indsendKlik();
+    paastand("opgave 3: rørene sendt ind er rigtige, og kortet bliver på opgaven med Næste", R.venter && /Samlingen er ikke tæret mere/.test(linje(R)) && /Næste/.test(linje(R)), linje(R));
+    R.knap();
+    paastand("opgave 3: Næste giver spørgsmålet, og rosen står ikke under det", R.opg.fase === "spm" && !/Samlingen er ikke tæret mere/.test(linje(R)), linje(R));
     paastand("to ens rør: ingen elektroner over samlingen", afg.length > 0 && afg.every(function (p) { return (p[0] < 6) === (p[1] < 6); }), afg.length);
-    R.svarValg(0);
-    paastand("mål 3 er løst", R.faerdig);
+    svar(R, 0);
+    paastand("opgave 3 er løst", R.faerdig);
     R.vaelg(3);
-    paastand("mål 4: zink og jern, og et gæt først", R.a === "Zn" && R.b === "Fe" && R.opg.fase === "gaet");
-    R.svarValg(1);
+    paastand("opgave 4: zink og jern, og et gæt først", R.a === "Zn" && R.b === "Fe" && R.opg.fase === "gaet");
+    gaet(R, 1);
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 4: zinkrøret tæres, jernrøret er beskyttet", R.faerdig && R.par.anode === "Zn" && /Dit gæt holdt\./.test(linje(R)) && R.M.top.slice(6).every(function (t) { return t === 0; }) && R.M.top[5] > 0, R.M.top.join(","));
+    paastand("opgave 4: zinkrøret tæres, jernrøret er beskyttet", R.faerdig && R.par.anode === "Zn" && /Dit gæt holdt\./.test(linje(R)) && R.M.top.slice(6).every(function (t) { return t === 0; }) && R.M.top[5] > 0, R.M.top.join(","));
     paastand("spændingsrækken kommer frem i panelet", !d.getElementById("r-raekkekort").hidden && /Zink står til venstre for jern/.test(d.getElementById("r-raekke").textContent));
 
     R.vaelg(4);
-    paastand("mål 5: vandets retning. Jernrøret sidder først, og der gættes", R.a === "Fe" && R.b === "Cu" && R.opg.fase === "gaet" && R.visIoner());
-    R.svarValg(2);
+    paastand("opgave 5: vandets retning. Jernrøret sidder først, og der gættes", R.a === "Fe" && R.b === "Cu" && R.opg.fase === "gaet" && R.visIoner());
+    gaet(R, 2);
     R.saetRoer("Cu", "Fe", false);
     R.tidKlik(); koerF(R, 12);
-    paastand("mål 5: med kobberrøret først giver forsøget en rød linje om rækkefølgen", roed(R) && R.opg.fase === "forsoeg" && /gennem jernrøret først/.test(linje(R)) && /Jern til venstre rør/.test(linje(R)), linje(R));
+    paastand("opgave 5: med kobberrøret først giver forsøget en rød linje om rækkefølgen", roed(R) && R.opg.fase === "forsoeg" && /gennem jernrøret først/.test(linje(R)) && /Jern til venstre rør/.test(linje(R)), linje(R));
     R.saetRoer("Fe", "Cu", false);
     lyt();
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 5: med jernrøret først går der hul efter 20 år, og så kommer spørgsmålet", R.opg.fase === "spm" && R.t === 20 && R.par.hul === 20 && R.par.svag === "v" &&
+    paastand("opgave 5: med jernrøret først går der hul efter 20 år, og kortet bliver på forsøget med Næste", R.venter && R.opg.fase === "forsoeg" && R.t === 20 && R.par.hul === 20 && R.par.svag === "v" &&
         /dobbelt så længe/.test(linje(R)) && /Dit gæt holdt\./.test(linje(R)), linje(R));
+    R.knap();
     paastand("med jernrøret først er der ingen kobberioner i luppen, kun elektroner over samlingen", R.M.gaest.length === 0 && R.M.tael.afsat === 0 && afg.length >= 10 &&
         afg.every(function (p) { return p[0] < 6 && p[1] >= 6; }), afg.length);
     paastand("linjen beder om kobberrøret først igen", /Vælg Kobber til venstre rør og Jern til højre rør/.test(linje(R)), linje(R));
@@ -287,36 +325,41 @@ function koerTest(W) {
     paastand("der er stadig tre kobberioner i vandet, og de bliver i vandet", R.M.gaest.length === 3 && R.M.gaest.every(function (g) { return g.maal === null && g.x > 0.2 && g.x < 11.8 && g.y < 0; }),
         JSON.stringify(R.M.gaest));
     paastand("hullet kommer efter 10 år som før", R.slut && taet(R.t, 10.0, 0.05));
-    R.svarValg(0);
+    svar(R, 0);
     var roedRetning = roed(R) && /Elektronerne bliver i metallet/.test(linje(R));
-    R.svarValg(1);
-    paastand("mål 5: forkert svar rødt, rigtigt svar løser med skemaet", roedRetning && R.faerdig && /Cu²⁺ \+ Fe → Cu \+ Fe²⁺/.test(linje(R)), linje(R));
+    svar(R, 1);
+    paastand("opgave 5: forkert svar rødt, rigtigt svar løser med skemaet", roedRetning && R.faerdig && /Cu²⁺ \+ Fe → Cu \+ Fe²⁺/.test(linje(R)), linje(R));
 
     R.vaelg(5);
-    paastand("mål 6: plastmuffen kommer frem, og jernrøret sidder først", !R.plastknap.hidden && R.opg.fase === "forsoeg" && R.a === "Fe" && R.b === "Cu");
+    paastand("opgave 6: plastmuffen kommer frem, og jernrøret sidder først", !R.plastknap.hidden && R.opg.fase === "forsoeg" && R.a === "Fe" && R.b === "Cu");
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 6: uden muffe går der hul, og linjen siger det", roed(R) && /plastmuffen/i.test(linje(R)), linje(R));
+    paastand("opgave 6: uden muffe går der hul, og linjen siger det", roed(R) && /plastmuffen/i.test(linje(R)), linje(R));
     R.saetRoer("Cu", "Fe", true);
     lyt();
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 6: plastmuffe med kobberrøret først: kobberionerne giver hul efter 13 år, og linjen siger hvorfor", roed(R) && R.opg.fase === "forsoeg" && D.aar(R.t) === 13 &&
+    paastand("opgave 6: plastmuffe med kobberrøret først: kobberionerne giver hul efter 13 år, og linjen siger hvorfor", roed(R) && R.opg.fase === "forsoeg" && D.aar(R.t) === 13 &&
         /kobberioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById("r-proevet").textContent), linje(R));
     paastand("plasten standser elektronerne, men ikke kobberionerne", R.M.tael.afsat >= 3 && afg.every(function (p) { return p[0] >= 7 && p[1] >= 7; }), afg.length + " / " + R.M.tael.afsat);
     R.saetRoer("Fe", "Cu", true);
     lyt();
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 6: med plastmuffe og jernrøret først holder jernrøret i 20 år", R.opg.fase === "spm" && R.t === 20 && R.par.hul === null && /holdt i alle 20 år/.test(linje(R)), linje(R));
+    paastand("opgave 6: med plastmuffe og jernrøret først holder jernrøret i 20 år", R.venter && R.t === 20 && R.par.hul === null && /holdt i alle 20 år/.test(linje(R)), linje(R));
+    R.knap();
     paastand("med plastmuffe går ingen elektroner over samlingen", afg.length > 0 && afg.every(function (p) { return p[0] <= 4 && p[1] <= 4; }) && R.M.tael.afsat === 0, JSON.stringify(afg));
-    R.svarValg(1);
+    svar(R, 1);
     var roed6 = roed(R);
-    R.svarValg(0);
-    paastand("mål 6: forkert svar rødt, rigtigt svar løser", roed6 && R.faerdig && /jernrøret først og plast imellem/.test(linje(R)) && R.antalLoest() === 6, linje(R));
-    var svarOk = [0, 1, 2, 3, 4, 5].every(function (i) { return visSvaret(R, i) && /gul/.test(klasse(R)); });
-    paastand("alle seks mål kan løses med Vis svaret (gul linje)", svarOk);
+    svar(R, 0);
+    paastand("opgave 6: forkert svar rødt, rigtigt svar løser", roed6 && R.faerdig && /jernrøret først og plast imellem/.test(linje(R)) && R.antalLoest() === 6, linje(R));
+    paastand("alle opgaver på fanen er løst: knappen går videre til Skibet", /Videre til Skibet/.test(R.el.skort.querySelector(".sk-videre").textContent) && /Alle seks opgaver er løst/.test(linje(R)));
+    var svarOk = [0, 1, 2, 3, 4, 5].every(function (i) { return visSvaret(R, i) && gul(R); });
+    paastand("alle seks opgaver kan løses med Vis svaret (gult kort)", svarOk);
     R.vaelg(4);
-    for (var n5 = 0; n5 < 6; n5++) R.knap();
-    paastand("Vis svaret i mål 5 stiller jernrøret først og viser hullet efter 20 år", R.opg.fase === "spm" && R.a === "Fe" && R.b === "Cu" && R.t === 20 && R.slut, R.opg.fase + " " + R.a + R.b + " " + R.t);
-    R.vaelg(0); R.svarValg(1); R.tidKlik(); koerF(R, 14);
+    gaet(R, 0);
+    for (var n5 = 0; n5 < 4; n5++) R.knap();
+    var vistMellem = R.venter && R.el.skort.classList.contains("svar");
+    R.knap();
+    paastand("Vis svaret i opgave 5 stiller jernrøret først og viser hullet efter 20 år", vistMellem && R.opg.fase === "spm" && R.a === "Fe" && R.b === "Cu" && R.t === 20 && R.slut, R.opg.fase + " " + R.a + R.b + " " + R.t);
+    R.vaelg(0); gaet(R, 1); R.tidKlik(); koerF(R, 14);
     R.tegn();
     R.klikScene({ x: R.pyt.x, y: R.pyt.y });
     paastand("påskeægget: et klik på vandpytten", /VVS/.test(linje(R)) && NK.paaskeaeg >= 1, linje(R));
@@ -328,24 +371,26 @@ function koerTest(W) {
     function aar(n) { for (var i = 0; i < n; i++) { S.sejlKlik(); koerF(S, 2.8); } }
     S.vaelg(0);
     aar(1);
-    paastand("mål 1: efter et år er skroget rustet 12 %, og der er sendt elektroner og Fe²⁺", taet(S.rust, 12, 0.1) && S.aar === 1 && !S.sejler, S.rust);
+    paastand("opgave 1: efter et år er skroget rustet 12 %, og der er sendt elektroner og Fe²⁺", taet(S.rust, 12, 0.1) && S.aar === 1 && !S.sejler, S.rust);
     aar(2);
-    paastand("mål 1: efter 3 år kommer spørgsmålet", S.opg.fase === "spm" && taet(S.rust, 36, 0.1), S.opg.fase + " " + S.rust);
-    S.svarValg(0);
+    paastand("opgave 1: efter 3 år bliver kortet på forsøget med Næste", S.venter && taet(S.rust, 36, 0.1) && /rustet omkring propellen/.test(linje(S)), S.opg.fase + " " + S.rust);
+    S.knap();
+    paastand("opgave 1: Næste giver spørgsmålet", S.opg.fase === "spm");
+    svar(S, 0);
     var r1 = roed(S) && /fane 1/.test(linje(S));
-    S.svarValg(1);
-    paastand("mål 1: forkert svar peger på rørene, rigtigt svar løser", r1 && S.faerdig);
+    svar(S, 1);
+    paastand("opgave 1: forkert svar peger på rørene, rigtigt svar løser", r1 && S.faerdig);
     S.vaelg(1);
     aar(1);
-    paastand("mål 2: uden klods ruster skroget, og linjen siger hvorfor", roed(S) && /ikke sad en klods/.test(linje(S)), linje(S));
+    paastand("opgave 2: uden klods ruster skroget, og linjen siger hvorfor", roed(S) && /ikke sad en klods/.test(linje(S)), linje(S));
     S.monter(0, "Cu");
     var rustFoer = S.rust;
     aar(1);
-    paastand("mål 2: en kobberklods gør det værre (20 % på et år)", roed(S) && /Kobber er mere ædelt/.test(linje(S)) && taet(S.rust - rustFoer, 20, 0.1), S.rust - rustFoer);
+    paastand("opgave 2: en kobberklods gør det værre (20 % på et år)", roed(S) && /Kobber er mere ædelt/.test(linje(S)) && taet(S.rust - rustFoer, 20, 0.1), S.rust - rustFoer);
     S.tagAf(0);
     S.monter(0, "Mg");
     aar(2);
-    paastand("mål 2: magnesiumklodsen bliver brugt op, og så ruster skroget igen", roed(S) && /magnesium blev brugt op/.test(linje(S)) && S.klodser[0] === null, linje(S));
+    paastand("opgave 2: magnesiumklodsen bliver brugt op, og så ruster skroget igen", roed(S) && /magnesium blev brugt op/.test(linje(S)) && S.klodser[0] === null, linje(S));
     /* Træk en zinkklods fra kajen ned på plads 1 */
     var st = S.lay.stak.Zn, pl = S.lay.plads[0];
     var greb = S.nedScene({ x: st.x + st.b / 2, y: st.y });
@@ -354,33 +399,41 @@ function koerTest(W) {
     paastand("en klods kan trækkes fra kajen ned på skroget", greb && S.klodser[0] && S.klodser[0].metal === "Zn" && S.klodser[0].rest === 100);
     rustFoer = S.rust;
     aar(3);
-    paastand("mål 2: zinkklodsen beskytter skroget i 3 år", S.faerdig && S.rust === rustFoer && S.klodser[0].rest < 20 && /offeranode/.test(linje(S)), linje(S));
+    paastand("opgave 2: zinkklodsen beskytter skroget i 3 år, men Sejl 1 år løser ikke opgaven", !S.faerdig && S.rust === rustFoer && S.klodser[0].rest < 20 && S.el.indsend.classList.contains("klar"), linje(S));
+    S.indsendKlik();
+    paastand("opgave 2: klodsen sendt ind med Indsend svar løser opgaven", S.faerdig && /offeranode/.test(linje(S)), linje(S));
     paastand("spændingsrækken kommer frem i panelet", !d.getElementById("s-raekkekort").hidden && /Zink er det mindst ædle/.test(d.getElementById("s-raekke").textContent));
     S.vaelg(2);
-    S.svarValg(2);
+    svar(S, 2);
     var r3 = roed(S);
-    S.svarValg(0);
-    paastand("mål 3: Zn → Zn²⁺ + 2 e⁻ er det rigtige svar", r3 && S.faerdig);
+    svar(S, 0);
+    paastand("opgave 3: Zn → Zn²⁺ + 2 e⁻ er det rigtige svar", r3 && S.faerdig);
     S.vaelg(3);
-    S.svarValg(0);
+    var aarFoer = S.aar;
+    S.el.skort.classList.remove("blink");
+    S.sejlKlik();
+    paastand("opgave 4: under gættet er Sejl 1 år låst", !S.sejler && S.aar === aarFoer && S.el.skort.classList.contains("blink"));
+    gaet(S, 0);
     S.klikScene({ x: S.lay.stak.Mg.x + 5, y: S.lay.stak.Mg.y });   /* intet: et klik på stablen går gennem nedScene */
     S.nedScene({ x: S.lay.stak.Mg.x + 5, y: S.lay.stak.Mg.y }); S.opScene({ x: S.lay.stak.Mg.x + 5, y: S.lay.stak.Mg.y });
     paastand("et klik på en stabel vælger klodsen", S.valgt === "Mg");
     S.klikScene({ x: S.lay.plads[1].x + 10, y: S.lay.plads[1].y + 10 });
     paastand("og et klik på en tom plads sætter den på", S.klodser[1] && S.klodser[1].metal === "Mg" && S.valgt === null);
     aar(2);
-    paastand("mål 4: magnesiumklodsen er væk efter to år, og gættet får sin dom", S.faerdig && /Dit gæt holdt ikke/.test(linje(S)) && /halvandet år/.test(linje(S)), linje(S));
+    paastand("opgave 4: magnesiumklodsen er væk efter to år, og gættet får sin dom", S.faerdig && /Dit gæt holdt ikke/.test(linje(S)) && /halvandet år/.test(linje(S)), linje(S));
     S.vaelg(4);
-    paastand("mål 5 begynder med et nyt skrog", S.aar === 0 && S.rust === 0 && S.antalKlodser() === 0 && S.brugt === 0);
+    paastand("opgave 5 begynder med et nyt skrog", S.aar === 0 && S.rust === 0 && S.antalKlodser() === 0 && S.brugt === 0);
     aar(1);
-    paastand("mål 5: rust giver en rød linje, der peger på På værft", roed(S) && /På værft/.test(linje(S)));
+    paastand("opgave 5: rust giver en rød linje, der peger på På værft", roed(S) && /På værft/.test(linje(S)));
     S.forfra();
     S.monter(0, "Zn"); aar(3);
     S.monter(1, "Zn"); aar(3);
     S.monter(S.friPlads(), "Zn"); aar(4);
-    paastand("mål 5: ti år uden rust med 3 klodser", S.faerdig && S.aar === 10 && S.rust === 0 && S.brugt === 3 && /med 3 klodser/.test(linje(S)) && /Færre kan det ikke/.test(linje(S)), linje(S));
-    var svarS = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(S, i) && /gul/.test(klasse(S)); });
-    paastand("alle fem mål kan løses med Vis svaret", svarS && S.antalLoest() === 5);
+    paastand("opgave 5: efter ti år uden rust løser Sejl 1 år ikke opgaven", !S.faerdig && S.aar === 10 && S.el.indsend.classList.contains("klar") && /Indsend svar/.test(linje(S)), linje(S));
+    S.indsendKlik();
+    paastand("opgave 5: ti år uden rust med 3 klodser, sendt ind", S.faerdig && S.aar === 10 && S.rust === 0 && S.brugt === 3 && /med 3 klodser/.test(linje(S)) && /Færre kan det ikke/.test(linje(S)), linje(S));
+    var svarS = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(S, i) && gul(S); });
+    paastand("alle fem opgaver kan løses med Vis svaret", svarS && S.antalLoest() === 5);
     S.vaelg(0);
     S.rust = 99; S.sejlKlik(); koerF(S, 2.8);
     paastand("ved 100 % rust er skroget tæret igennem, og knappen er låst", S.hul() && S.tidknap.disabled && /På værft/.test(linje(S)));
@@ -396,24 +449,30 @@ function koerTest(W) {
     function felter(v) {
         var f = J.felter();
         for (var i = 0; i < f.length; i++) f[i].value = v[i];
-        J.tjek();
+        J.indsendKlik();
     }
     J.vaelg(0);
-    J.svarValg(0);
-    paastand("mål 1: efter gættet prøves de fire muligheder", J.opg.fase === "forsoeg" && J.mangler() === 4 && J.knap3.salt.hidden, J.mangler());
+    var vandFoer = J.til.vand;
+    J.knap3.vand.click();
+    paastand("under gættet er kontakterne låst, og kortet blinker", J.til.vand === vandFoer && J.el.skort.classList.contains("blink"));
+    gaet(J, 0);
+    paastand("opgave 1: efter gættet prøves de fire muligheder", J.opg.fase === "forsoeg" && J.mangler() === 4 && J.knap3.salt.hidden, J.mangler());
     koerF(J, 5); J.skift("ilt"); koerF(J, 5);
     paastand("skemaet i panelet husker, hvad der er prøvet", J.mangler() === 2 && /ruster ikke/.test(d.getElementById("j-forsoeg").textContent) && /ikke prøvet/.test(d.getElementById("j-forsoeg").textContent));
     J.skift("vand"); koerF(J, 5); J.skift("ilt"); koerF(J, 5);
-    paastand("mål 1 er løst, når alle fire er prøvet", J.faerdig && /Dit gæt holdt ikke/.test(linje(J)) && /både er vand og ilt/.test(linje(J)), linje(J));
+    paastand("opgave 1 er løst, når alle fire er prøvet", J.faerdig && /Dit gæt holdt ikke/.test(linje(J)) && /både er vand og dioxygen/.test(linje(J)), linje(J));
     J.skift("vand");
     J.vaelg(1);
-    paastand("mål 2: tavlen kommer frem med ét felt", !J.tavle.hidden && J.felter().length === 1 && /Fe/.test(J.tavle.textContent));
+    paastand("opgave 2: tavlen kommer frem med ét felt og uden egen knap", !J.tavle.hidden && J.felter().length === 1 && /Fe/.test(J.tavle.textContent) && !J.tavle.querySelector("button"));
+    paastand("opgave 2: Indsend svar på kortet er grå, til der står et tal i feltet", !J.el.indsend.hidden && J.el.indsend.classList.contains("ikke-klar"));
     felter([""]);
-    paastand("et tomt felt er intet svar", roed(J) && /mangler et tal/.test(linje(J)) && !J.faerdig);
+    paastand("et tomt felt er intet svar", /mangler et tal/.test(linje(J)) && !J.faerdig && !roed(J), linje(J));
     felter(["3"]);
-    paastand("mål 2: 3 e⁻ giver en rød linje om ladningen", roed(J) && /Ladningen passer ikke/.test(linje(J)), linje(J));
-    felter(["2"]);
-    paastand("mål 2: 2 e⁻ løser målet, og skemaet står i linjen", J.faerdig && /Fe → Fe²⁺ \+ 2 e⁻/.test(linje(J)) && /oxidation/.test(linje(J)), linje(J));
+    paastand("opgave 2: 3 e⁻ giver en rød linje om ladningen", roed(J) && /Ladningen passer ikke/.test(linje(J)), linje(J));
+    var ef = J.felter()[0];
+    ef.value = "2";
+    ef.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("opgave 2: Enter i feltet er Indsend svar: 2 e⁻ løser opgaven, og skemaet står på kortet", J.faerdig && /Fe → Fe²⁺ \+ 2 e⁻/.test(linje(J)) && /oxidation/.test(linje(J)), linje(J));
     paastand("tavlen får stemplet, og skemaet kommer i panelet", /AFSTEMT/.test(J.tavle.textContent) && !d.getElementById("j-skemakort").hidden);
     J.vaelg(2);
     felter(["4", "2"]);
@@ -421,37 +480,39 @@ function koerTest(W) {
     felter(["2", "4"]);
     var a2 = roed(J) && /Ladningen passer ikke/.test(linje(J));
     felter(["4", "4"]);
-    paastand("mål 3: O-atomerne, så ladningen, så løst", a1 && a2 && J.faerdig && /reduktion/.test(linje(J)), linje(J));
+    paastand("opgave 3: O-atomerne, så ladningen, så løst", a1 && a2 && J.faerdig && /reduktion/.test(linje(J)), linje(J));
     J.vaelg(3);
     felter(["1", "1", "4"]);
     var b1 = roed(J) && /Elektronerne passer ikke/.test(linje(J));
     felter(["2", "1", "4"]);
     var b2 = roed(J) && /forsvinder ikke/.test(linje(J));
     felter(["2", "2", "4"]);
-    paastand("mål 4: elektronerne, så jernatomerne, så løst", b1 && b2 && J.faerdig, linje(J));
+    paastand("opgave 4: elektronerne, så jernatomerne, så løst", b1 && b2 && J.faerdig, linje(J));
     J.vaelg(4);
     felter(["4", "4", "1"]);
     var c1 = roed(J) && /Tæl O-atomerne/.test(linje(J));
     felter(["2", "2", "2"]);
     var c2 = roed(J) && /Tæl H-atomerne/.test(linje(J));
     felter(["4", "4", "2"]);
-    paastand("mål 5: O-atomerne, H-atomerne, så løst", c1 && c2 && J.faerdig && /4 FeO\(OH\)/.test(linje(J)), linje(J));
+    paastand("opgave 5: O-atomerne, H-atomerne, så løst", c1 && c2 && J.faerdig && /4 FeO\(OH\)/.test(linje(J)), linje(J));
     paastand("panelet har de fire skemaer og Fe(OH)₂ i dråben", d.querySelectorAll("#j-skemaer .regn-linje").length === 5);
     J.vaelg(5);
-    paastand("mål 6: Salt er skjult, til der er gættet", J.knap3.salt.hidden);
-    J.svarValg(1);
-    paastand("mål 6: efter gættet kommer kontakten Salt frem", !J.knap3.salt.hidden && J.opg.fase === "forsoeg");
+    paastand("opgave 6: Salt er skjult, til der er gættet", J.knap3.salt.hidden);
+    gaet(J, 1);
+    paastand("opgave 6: efter gættet kommer kontakten Salt frem", !J.knap3.salt.hidden && J.opg.fase === "forsoeg");
     J.skift("salt"); koerF(J, 6);
     paastand("med salt viser tælleren 72 pr. minut", Math.round(J.fart() * 60) === 72 && /Slå nu Salt fra/.test(linje(J)), linje(J));
     J.skift("salt"); koerF(J, 6);
-    paastand("mål 6: efter sammenligningen kommer spørgsmålet", J.opg.fase === "spm" && Math.round(J.fart() * 60) === 24, J.opg.fase);
-    J.svarValg(1);
+    paastand("opgave 6: efter sammenligningen bliver kortet på forsøget med Næste", J.venter && /tre gange så mange/.test(linje(J)) && Math.round(J.fart() * 60) === 24, J.opg.fase);
+    J.knap();
+    paastand("opgave 6: Næste giver spørgsmålet", J.opg.fase === "spm" && !J.venter);
+    svar(J, 1);
     var d1 = roed(J) && /Hverken Na⁺ eller Cl⁻/.test(linje(J));
-    J.svarValg(0);
-    paastand("mål 6: saltet reagerer ikke med jernet; det rigtige svar løser", d1 && J.faerdig && J.antalLoest() === 6, linje(J));
+    svar(J, 0);
+    paastand("opgave 6: saltet reagerer ikke med jernet; det rigtige svar løser", d1 && J.faerdig && J.antalLoest() === 6, linje(J));
     paastand("uden vand kan der ikke være saltvand", (function () { J.til.salt = true; J.brugTil(); J.skift("vand"); var ok = !J.til.salt; J.skift("vand"); return ok; }()));
-    var svarJ = [0, 1, 2, 3, 4, 5].every(function (i) { return visSvaret(J, i) && /gul/.test(klasse(J)); });
-    paastand("alle seks mål kan løses med Vis svaret", svarJ);
+    var svarJ = [0, 1, 2, 3, 4, 5].every(function (i) { return visSvaret(J, i) && gul(J); });
+    paastand("alle seks opgaver kan løses med Vis svaret", svarJ);
     J.vaelg(1);
     paastand("på tavlen skifter et tal ikke fane", J.tagerTal() === true && S.tagerTal === undefined);
     J.nulstilScene();
@@ -477,7 +538,7 @@ function koerTest(W) {
             if (!o.loest || !o.navn) opbyg.push(o.id + " tekst");
         });
     });
-    paastand("17 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.length === 0, opbyg.join(", "));
+    paastand("17 opgaver: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.length === 0, opbyg.join(", "));
     var tekster = [];
     (function saml(x) {
         if (typeof x === "string") tekster.push(x);
@@ -494,6 +555,32 @@ function koerTest(W) {
     var m = alt2.match(ASCII_ORD);
     paastand("æ, ø og å er skrevet rigtigt i teksterne", !m, m ? m[0] : "");
     paastand("propel, ikke skrue, og ingen natronlud", !/skruen|natronlud/i.test(alt2));
+    var ilt = alt2.match(/\b(ilt|ilten|iltmolekyle\w*|nitrogenmolekyle\w*)\b/i);
+    /* Et klik på et molekyle i luften over dråben på fane 3 */
+    NK.visFane("fane-j");
+    J.vaelg(1);
+    J.tegn();
+    var gasNavne = [];
+    ["o2", "n2"].forEach(function (type) {
+        var g = J.M.gas.filter(function (q) { return q.type === type; })[0];
+        if (!g) return;
+        J.klikScene({ x: g.x * J.lay.s, y: J.lay.y0 + g.y * J.lay.s });
+        gasNavne.push(J.beskedTekst());
+    });
+    paastand("stoffet O₂ hedder dioxygen og N₂ dinitrogen (ikke ilt), også i luften over dråben", !ilt && /dioxygen/.test(alt2) &&
+        /dioxygenmolekyle, O₂/.test(gasNavne.join(" ")) && /dinitrogenmolekyle, N₂/.test(gasNavne.join(" ")), (ilt ? ilt[0] + " " : "") + gasNavne.join(" | "));
+    paastand("ingen statuslinje og intet opgavekort i panelet", !d.querySelector(".statuslinje") && !d.querySelector(".panel .opgavekort") && !d.querySelector(".panel .scenekort"));
+    paastand("hver fane har ét papirkort i scenen med Giv et hint og Indsend svar", ["r", "s", "j"].every(function (x) {
+        var k = d.getElementById(x + "-skort");
+        return k && k.parentNode.classList.contains("scene") && d.body.classList.contains("papirkort") && !!k.querySelector("#" + x + "-knap.hjaelp") && !!k.querySelector("#" + x + "-indsend.indsend");
+    }));
+    paastand("Start forfra står i panelet på alle tre faner", ["r", "s", "j"].every(function (x) { return d.getElementById(x + "-forfra").parentNode.classList.contains("panel"); }));
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "js/rundvisning.js", false);
+    xhr.send();
+    var sels = (xhr.responseText.match(/sel: "[^"]+"/g) || []).map(function (x) { return x.slice(6, -1); });
+    var mangler = sels.filter(function (x) { return x.split(",").some(function (y) { return !d.querySelector(y.trim()); }); });
+    paastand("rundvisningen peger kun på ting, der findes (og ikke på statuslinjen)", sels.length >= 15 && !mangler.length, mangler.join(", "));
     paastand("rørenes resultater er hele sætningsled", D.roerResultat(cufe) === "hul i jernrøret efter 10 år" && D.roerResultat(znfe) === "zinkrøret tæret ved samlingen" &&
         D.roerResultat(cucu) === "ingen tæring" && /samlingen holder/.test(D.roerResultat(fefe)) && D.roerResultat(fecu) === "hul i jernrøret efter 20 år" &&
         D.roerResultat(cuplast) === "hul i jernrøret efter 13 år" && /samlingen holder/.test(D.roerResultat(plast)), D.roerResultat(fefe));
@@ -504,7 +591,48 @@ function koerTest(W) {
 
     /* ------------------------------------------------------------------ */
     overskrift("10. Layoutet");
-    var stoerrelser = [[1100, 700], [1300, 760], [1600, 950]];
+    /* Kortets hoejde i alle dele af alle opgaver: med hvert hint, hver
+       forklaring til et forkert svar og forklaringen, naar kortet bliver */
+    function kortMaks() {
+        var maks = { h: 0, hvor: "" };
+        ["fane-r", "fane-s", "fane-j"].forEach(function (fid) {
+            NK.visFane(fid);
+            var F = NK.sims[fid], gemtStatus = F.status.map(function (x) { return { loest: x.loest, stjerne: x.stjerne }; });
+            F.opgaver.forEach(function (o, i) {
+                F.vaelg(i);
+                var g = F.opg;
+                g.faser.forEach(function (fase, k) {
+                    if (fase === "gaet") return;
+                    function saet() {
+                        F.faerdig = false; F.venter = false; F.slut = null; F.mellem = null; F.valgt = null;
+                        g.fi = k; g.fase = fase; g.forkert = {};
+                        if (F.nyFase) F.nyFase(fase);
+                        F.visKort(); F.besked("", "");
+                    }
+                    function m(n) { var h = F.el.skort.offsetHeight; if (h > maks.h) maks = { h: h, hvor: fid.slice(5) + " " + o.id + "." + fase + " " + n }; }
+                    var del = o[fase];
+                    saet(); F.naesteLinje("", ""); m("start");
+                    (del.hint || []).forEach(function (h, j) {
+                        saet(); F.hjaelp = j + 1; F.besked('<span class="b-maerke">Hint 3 af 3</span> ' + NK.html(h), "hint"); F.visKnap(); m("hint " + (j + 1));
+                    });
+                    F.hjaelp = 0;
+                    if (fase === "spm") del.svar.forEach(function (sv, j) { if (sv.ok) return; saet(); g.forkert[j] = true; F.visKort(); F.fejlLinje(sv.f); m("forkert " + j); });
+                    if (fase === "forsoeg" && o.id === "ens") { saet(); F.fejlLinje(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, cuplast)); m("roerForkert"); }
+                    if (fase === "forsoeg" && o.id === "klods") { saet(); F.fejlLinje(D.SKIB.kobber); m("kobber"); }
+                    saet();
+                    var foer = o.gaet ? "Dit gæt holdt ikke. " : "";
+                    if (k === g.faser.length - 1) F.loest("selv", foer + (fase === "felter" ? K.skemaTekst(del.skema) + ". " : "") + (o.id === "ti" ? D.SKIB.tiLoest(5) : o.loest) + " " + D.FAERDIG[F.navn]);
+                    else F.mellemsvar("selv", foer + (del.set || ""), "Godt");
+                    m("bliv");
+                });
+            });
+            F.status = gemtStatus;
+            F.gem();
+            F.vaelg(0);
+        });
+        return maks;
+    }
+    var stoerrelser = [[1100, 700, "lavSmal"], [1300, 760, "hoej"], [1366, 700, "lav"], [1400, 860, "hoej"], [1600, 950, "hoej"]];
     stoerrelser.forEach(function (st2) {
         ramme.style.width = st2[0] + "px";
         ramme.style.height = st2[1] + "px";
@@ -512,45 +640,60 @@ function koerTest(W) {
         function rk(e) { return e.getBoundingClientRect(); }
         function over(a, b) { return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom; }
 
+        /* Kortet holder sig i den plads, der er sat af (kortZone) */
+        NK.visFane("fane-r"); R.tilpas();
+        var zone = W.NK.Fane.ZONE[st2[2]], km = kortMaks();
+        paastand(navn + "kortet holder sig i sin plads (" + zone + " px) i alle dele af alle opgaver", km.h <= zone && R.zoneBasis() === zone, km.h + " px i " + km.hvor);
+
         NK.visFane("fane-r");
         R.vaelg(5); R.tilpas(); R.layout();
-        var l = R.lay, scene = rk(d.querySelector("#fane-r .scene")), status = rk(d.getElementById("r-status"));
+        var l = R.lay, scene = rk(d.querySelector("#fane-r .scene")), kort = rk(R.el.skort);
+        if (kort.bottom > scene.top + l.top - 6) pr.push("kortet når ned i rørenes scene");
+        if (Math.abs((kort.left + kort.right) / 2 - (scene.left + scene.right) / 2) > 2 || kort.top > scene.top + 14) pr.push("kortet står ikke øverst i midten");
+        if (l.lup.y - 16 < l.top) pr.push("luppens titel er under kortet");
         if (l.lup.y + l.lup.h > l.roerY - l.Ro - 8) pr.push("luppen rører rørene");
         if (l.lup.x < 4 || l.lup.x + l.lup.b > l.W - 4) pr.push("luppen er for bred");
         if (l.over < 2.6) pr.push("for lidt vand i luppen " + l.over.toFixed(2));
         if (l.lup.b / 12 < 24) pr.push("atomerne i luppen er for små " + (l.lup.b / 12).toFixed(1));
         var v1 = rk(R.valg.v), v2 = rk(R.valg.h), vk = rk(d.getElementById("r-vaerktoej"));
         if (over(v1, v2)) pr.push("metalvalgene overlapper");
-        if (v1.left < scene.left || v2.right > scene.right || v1.bottom > status.top || v2.bottom > status.top) pr.push("metalvalg uden for scenen");
+        if (v1.left < scene.left || v2.right > scene.right || v1.bottom > scene.bottom - 2 || v2.bottom > scene.bottom - 2) pr.push("metalvalg uden for scenen");
         if (v1.top < scene.top + l.roerY + l.Ro) pr.push("metalvalg oven i røret");
-        if (vk.bottom > scene.top + l.lup.y - 14 && vk.right > scene.left + l.lup.x) pr.push("tidsknappen dækker luppen");
-        if (vk.right > scene.right) pr.push("værktøjet er for bredt");
+        if (vk.right > scene.left + l.lup.x - 8) pr.push("tidsknappen dækker luppen");
+        if (vk.top < kort.bottom + 4) pr.push("tidsknappen er under kortet");
+        if (vk.bottom > scene.top + l.roerY - l.Ro - 4) pr.push("tidsknappen og muffen rører rørene");
 
         NK.visFane("fane-s");
         S.tilpas(); S.layout();
-        var ls = S.lay;
+        var ls = S.lay, sc2 = rk(d.querySelector("#fane-s .scene")), svk = rk(d.getElementById("s-vaerktoej")), kort2 = rk(S.el.skort);
         ls.plads.forEach(function (p, i) {
             if (p.x < ls.Dp.x + 10 || p.x + p.b > ls.W - 6 || p.y < ls.yv + 8 || p.y + p.h + 26 > ls.rust.y0) pr.push("plads " + (i + 1));
         });
         if (ls.plads[0].x + ls.plads[0].b > ls.plads[1].x - 10) pr.push("pladserne overlapper");
-        K.SKIB.klodser.forEach(function (mm) { var s2 = ls.stak[mm]; if (s2.x < 2 || s2.x + s2.b > ls.kajX || s2.y - s2.h - 44 < 62) pr.push("stak " + mm); });
+        K.SKIB.klodser.forEach(function (mm) { var s2 = ls.stak[mm]; if (s2.x < 2 || s2.x + s2.b > ls.kajX || s2.y - s2.h - 44 < ls.top + 2) pr.push("stak " + mm); });
         if (ls.prop.x - ls.prop.r * 0.3 < ls.ror.x + ls.ror.b || ls.prop.y + ls.prop.r > ls.yb) pr.push("propellen");
-        if (ls.yd < 58) pr.push("dækket ligger under knapperne");
+        if (svk.top < kort2.bottom + 4) pr.push("tiden er under kortet");
+        if (svk.bottom > sc2.top + ls.yd - 10) pr.push("tiden står på dækket");
+        if (svk.left < sc2.left + ls.xs + 0.32 * ls.W + 4 && svk.bottom > sc2.top + ls.yd - 38) pr.push("tiden dækker overbygningen");
+        if (svk.right > sc2.right) pr.push("tiden er for bred");
         if (ls.yb > ls.Hs - 40) pr.push("ingen plads til fisken");
 
         NK.visFane("fane-j");
         J.vaelg(4); J.tilpas(); J.layout();
-        var lj = J.lay, dj = J.M.draabe, tv = rk(J.tavle), stj = rk(d.getElementById("j-status")), sc3 = rk(d.querySelector("#fane-j .scene"));
-        if (tv.bottom > stj.top - 4) pr.push("tavlen rører statuslinjen");
-        if (tv.top < sc3.top + lj.rekt.h + 4) pr.push("tavlen dækker jernet");
+        var lj = J.lay, dj = J.M.draabe, tv = rk(J.tavle), sc3 = rk(d.querySelector("#fane-j .scene")), kort3 = rk(J.el.skort);
+        if (tv.bottom > sc3.bottom - 4) pr.push("tavlen går ud over scenen");
+        if (tv.top < sc3.top + lj.rekt.y + lj.rekt.h + 4) pr.push("tavlen dækker jernet");
         if (tv.height > 150) pr.push("skemaet brækker over for mange linjer " + Math.round(tv.height));
         if (dj.cx - dj.R < 1 || dj.cx + dj.R > lj.kol - 1) pr.push("dråben er for bred");
         if (dj.h < 2.4 || lj.over - dj.h < 2.2) pr.push("for lidt luft over dråben " + (lj.over - dj.h).toFixed(2));
         if (lj.s < 24) pr.push("atomerne er for små " + lj.s.toFixed(1));
+        J.knap3.salt.hidden = false;
         var kt = rk(d.getElementById("j-kontakter"));
         if (kt.right > sc3.left + lj.boks.x - 6) pr.push("kontakterne rører boksen");
+        if (kt.top < kort3.bottom + 4 || sc3.top + lj.boks.y < kort3.bottom + 2) pr.push("kontakterne eller boksen er under kortet");
         if (lj.boks.y + lj.boks.h > lj.y0 - dj.h * lj.s * 0.75) pr.push("boksen dækker dråben");
-        paastand(navn + "tingene kan være der på alle tre faner", pr.length === 0, pr.join("; "));
+        J.visEkstra();
+        paastand(navn + "tingene kan være der på alle tre faner, under kortet", pr.length === 0, pr.join("; "));
     });
     ramme.style.width = "";
     ramme.style.height = "";

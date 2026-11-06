@@ -142,6 +142,21 @@ luk eller send Kemichael ud.
   stof og flaske, og fremskridtet huskes i browseren.
 * **Hjælpen er én knap:** Giv hint, så Vis svaret.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`,
+`../faelles/papirkort.css/js`). Kortet har opgaven, svarene, Giv hint (gul kant),
+Indsend svar (grå, til der er noget at sende), beskeden og forklaringen. Efter et
+rigtigt svar bliver kortet på spørgsmålet, og Næste står, hvor Indsend svar stod.
+Skålvægtens svarknapper og etiketterne på tavlen vælger kun. På vægten skriver
+eleven tallene i regnestykket i panelet, og Enter eller Indsend svar tjekker
+feltet. Panelet har regnestykket, fremskridtet og Start forfra. Ingen statuslinje
+nederst. Lærredet begynder under kortet (`kortZone()`, ZONE i hver `sim_*.js`).
+Når panelet står under scenen (højst 860 px bred), er scenen mindst 590 px høj,
+så kortet, plakaten og vægten kan stå under hinanden; siden ruller da.
+Molekylnavnene var allerede dioxygen, dihydrogen, dinitrogen og dichlor.
+Selvtestens afsnit 13c tjekker kortet.
+
 ## Filer
 
 ```

@@ -2,9 +2,10 @@
    fig_redox.js - figuren til 8.1 Redoxreaktioner
 
    Øverst bogens delreaktioner: 2 Mg + O₂ → 2 Mg²⁺ + 2 O²⁻ med den orange
-   klamme over (magnesium afgiver 4 elektroner) og den blaa under (oxygen
-   optager 4 elektroner). Bogens "oxidation:" og "reduktion:" foran
-   teksterne er taget af, saa de ikke afsloerer pladserne.
+   klamme over (magnesium afgiver 4 elektroner) og den blaa under (dioxygen
+   optager 4 elektroner; bogens figur siger stadig oxygen, 6. nov. 2026).
+   Bogens "oxidation:" og "reduktion:" foran teksterne er taget af, saa
+   de ikke afsloerer pladserne.
    Nederst til venstre de to delreaktioner fra afsnittet uden navnene
    foran, til hoejre luppen fra mg-trin-2: to magnesiumatomer, der hver
    afgiver 2 elektroner til et oxygenatom.
@@ -38,7 +39,7 @@
         vb: [1200, 690],
         lag: [
             { navn: "Reaktionen", pladser: ["redoxreaktion", "oxidation", "reduktion"],
-              ros: "Magnesium afgiver elektroner og oxideres. Oxygen optager dem og reduceres. Tilsammen er det en redoxreaktion." },
+              ros: "Magnesium afgiver elektroner og oxideres. Dioxygen optager dem og reduceres. Tilsammen er det en redoxreaktion." },
             { navn: "Hvert stof for sig", pladser: ["delreaktion", "reduktionsmiddel", "oxidationsmiddel"],
               ros: "Delreaktionerne viser hvert stof for sig. Magnesium er reduktionsmidlet, og dioxygen er oxidationsmidlet." }
         ],
@@ -55,8 +56,8 @@
                       reduktionsmiddel: "<b>reduktionsmiddel</b> er navnet på et stof. Pladsen er navnet på det, der sker: at afgive elektroner." } },
             { id: "reduktion", ord: ["reduktion"], x: 1088, y: 256, maal: [790, 252], dele: ["red"],
               omr: [{ r: [X.o2 - 12, 194, X.o3 - X.o2 + 24, 76, 8] }],
-              fejl: { oxidation: "<b>oxidation</b> er at afgive elektroner. Den blå klamme viser, at oxygen optager elektroner.",
-                      redoxreaktion: "<b>redoxreaktion</b> er hele reaktionen. Pladsen peger kun på det, der sker med oxygen.",
+              fejl: { oxidation: "<b>oxidation</b> er at afgive elektroner. Den blå klamme viser, at dioxygen optager elektroner.",
+                      redoxreaktion: "<b>redoxreaktion</b> er hele reaktionen. Pladsen peger kun på det, der sker med dioxygen.",
                       oxidationsmiddel: "<b>oxidationsmiddel</b> er navnet på et stof. Pladsen er navnet på det, der sker: at optage elektroner." } },
 
             { id: "delreaktion", ord: ["delreaktion"], x: KB.x + KB.b / 2, y: 612, maal: [KB.x + KB.b / 2, D2 + 16], dele: ["delr"],
@@ -72,13 +73,13 @@
             { id: "oxidationsmiddel", ord: ["oxidationsmiddel"], x: 752, y: 440, maal: [O[0][0] - O_R - 2, O[0][1]], dele: ["o"],
               omr: [{ r: [O[0][0] - O_R - 6, O[0][1] - O_R - 6, O[1][0] - O[0][0] + 2 * O_R + 12, 2 * O_R + 12, 10] }],
               fejl: { reduktionsmiddel: "<b>reduktionsmiddel</b> afgiver elektroner. Oxygenatomerne her optager elektroner.",
-                      reduktion: "<b>reduktion</b> er det, der sker med oxygen. Pladsen er navnet på selve stoffet, der optager elektroner.",
+                      reduktion: "<b>reduktion</b> er det, der sker med dioxygen. Pladsen er navnet på selve stoffet, der optager elektroner.",
                       delreaktion: "<b>delreaktion</b> er et skema med e⁻. Pladsen peger på atomerne, der optager elektroner." } }
         ],
 
         tegn: function (api) {
             /* Prikkerne ved klammerne sidder lige efter teksten, som foerst kan maales nu */
-            var bo = NK.tekstBredde("magnesium afgiver 4 elektroner", 18, 700), br = NK.tekstBredde("oxygen optager 4 elektroner", 18, 700);
+            var bo = NK.tekstBredde("magnesium afgiver 4 elektroner", 18, 700), br = NK.tekstBredde("dioxygen optager 4 elektroner", 18, 700);
             this.pladser.forEach(function (p) {
                 if (p.id === "oxidation") { p.maal = [(X.m1 + X.m2) / 2 + bo / 2 + 9, 101]; p.omr[0].r[2] = Math.max(p.omr[0].r[2], p.maal[0] - p.omr[0].r[0] + 6); }
                 if (p.id === "reduktion") { p.maal = [(X.o2 + X.o3) / 2 + br / 2 + 9, 252]; p.omr[0].r[2] = Math.max(p.omr[0].r[2], p.maal[0] - p.omr[0].r[0] + 6); }
@@ -127,7 +128,7 @@
                     var gg = SV.g(g);
                     var s = SV.el("path", { d: "M" + X.o2 + "," + (EQ + 12) + " V226 H" + X.o3 + " V" + (EQ + 22), fill: "none", stroke: BLAA, "stroke-width": 2.6 }, gg);
                     spids(gg, X.o3, EQ + 10, -1, BLAA);
-                    SV.tekst(gg, (X.o2 + X.o3) / 2, 258, "oxygen optager 4 elektroner", { "font-size": 18, "font-weight": 700, fill: BLAA });
+                    SV.tekst(gg, (X.o2 + X.o3) / 2, 258, "dioxygen optager 4 elektroner", { "font-size": 18, "font-weight": 700, fill: BLAA });
                     return { s: s, g: gg };
                 },
                 byg: function (g, r, an) { an.streg(r.s, 0, 600); an.fade(r.g, 0, 500); }

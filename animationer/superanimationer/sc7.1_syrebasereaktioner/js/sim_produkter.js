@@ -4,15 +4,18 @@
    Paa tavlen staar to reaktanter og en pil med to tomme pladser.
    Nederst sidder formler som brikker: de to rigtige produkter og de
    fejl, elever faktisk laver (NK.Syrebase.forkerte). Eleven traekker
-   en brik op paa en plads (et klik saetter den paa den foerste ledige).
-   Et forkert svar hopper tilbage med en forklaring, der passer til
-   fejlen. Naar begge produkter staar der, flyver hydronen fra syren til
-   basen, og parrene kommer frem.
+   en brik op paa en plads (et klik saetter den paa den foerste ledige,
+   og et klik paa en plads toemmer den). En brik paa en plads vaelger
+   kun: Indsend svar bedoemmer begge (papirkortet, 6. nov. 2026, se
+   js/skort.js). Et forkert svar ryger af pladsen med en forklaring, der
+   passer til fejlen; et rigtigt bliver staaende. Naar begge er rigtige,
+   flyver hydronen fra syren til basen, og parrene kommer frem.
 
    Opgaverne laves af modellen ud fra sværhedsgraden (Let, Middel,
    Svaer), saa der er altid en ny. Tavlen taeller, hvor mange der er
-   loest i traek uden fejl og uden Vis svaret. Knappen: Giv hint ->
-   Vis svaret -> Ny reaktion.
+   loest i traek uden fejl og uden Vis svaret. Paa kortet: Giv hint ->
+   Vis svaret; efter et rigtigt svar bliver kortet med forklaringen og
+   Ny reaktion.
    ===================================================================== */
 (function () {
     "use strict";
@@ -35,6 +38,7 @@
         this.iTraek = 0;
         this.seneste = [];
         this.stjerner = [];
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -57,6 +61,8 @@
         S.forkerte(o).forEach(function (f) { brikker.push({ tekst: f.f, rigtig: false, hvorfor: f.hvorfor }); });
         this.brikker = NK.bland(brikker);
         this.pladser = [null, null];
+        this.ok = [false, false];
+        this.pegKnap = false;
         this.loest = false;
         this.fejl = false;
         this.vist = false;
@@ -80,9 +86,12 @@
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
-        this.lay = Tv.layout(this.L.b, this.L.h);
+        this.lay = Tv.layout(this.L.b, this.L.h, this.kortZone());
         this.stil();
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 142); };
 
     /* Ligningen og brikkerne. Er ligningen for bred, bliver alt mindre. */
     P.stil = function () {
@@ -142,24 +151,46 @@
         return ud;
     };
 
+    /* En brik paa en plads vaelger kun. Sluppet paa en fyldt plads skifter
+       den formlen ud; et klik saetter den paa den foerste ledige. */
     P.placer = function (i, s) {
-        if (this.loest) return;
-        if (s === null || s === undefined || this.pladser[s]) s = !this.pladser[0] ? 0 : (!this.pladser[1] ? 1 : null);
-        if (s === null) return;
-        var bk = this.brikker[i];
-        var rest = this.rigtige.slice();
-        this.pladser.forEach(function (p) { if (p) rest.splice(rest.indexOf(p), 1); });
-        if (this.afvisTilbud) this.afvisTilbud();
-        if (rest.indexOf(bk.tekst) >= 0) {
-            this.pladser[s] = bk.tekst;
-            if (this.pladser[0] && this.pladser[1]) { this.loes(); return; }
-            this.besked("<b>" + NK.html(bk.tekst) + "</b> passer. Find det andet produkt.", "god");
+        if (this.loest) { this.kort.blink(); return; }
+        if (s === null || s === undefined || this.ok[s]) s = !this.pladser[0] ? 0 : (!this.pladser[1] ? 1 : null);
+        if (s === null) {
+            this.besked("Begge pladser er fyldt. Klik på en plads for at tømme den, eller tryk Indsend svar.", "peger");
             return;
         }
+        if (this.afvisTilbud) this.afvisTilbud();
+        this.pladser[s] = this.brikker[i].tekst;
+        this.besked("", "");
+        this.visOpgave();
+    };
+
+    /* Indsend svar: begge pladser bedoemmes. Et rigtigt produkt bliver
+       staaende, et forkert ryger af med sin forklaring. */
+    P.indsend = function () {
+        if (this.loest || !this.pladser[0] || !this.pladser[1]) { this.kort.blink(); return; }
+        var mig = this, rest = this.rigtige.slice(), fejl = null, nFejl = 0;
+        [0, 1].forEach(function (s) { if (mig.ok[s]) rest.splice(rest.indexOf(mig.pladser[s]), 1); });
+        [0, 1].forEach(function (s) {
+            if (mig.ok[s]) return;
+            var t = mig.pladser[s], k = rest.indexOf(t);
+            if (k >= 0) { rest.splice(k, 1); mig.ok[s] = true; return; }
+            var bk = mig.brikker.filter(function (b) { return b.tekst === t; })[0];
+            nFejl++;
+            if (!fejl) {
+                fejl = bk && !bk.rigtig ? bk.hvorfor : t + " står der allerede. Find det andet produkt.";
+                mig.glimt = { s: s, t: 0 };
+            }
+            mig.pladser[s] = null;
+        });
+        if (!fejl) { this.loes(); return; }
         this.fejl = true;
-        this.glimt = { s: s, t: 0 };
-        if (this.iTraek) this.iTraek = 0;
-        this.besked(NK.html(bk.hvorfor), "skidt");
+        this.iTraek = 0;
+        this.pegKnap = true;
+        var andet = nFejl > 1 ? " Det andet produkt passede heller ikke." : (this.ok[0] || this.ok[1] ? " Det andet produkt passer." : "");
+        this.besked(NK.Skort.maerke("Ikke endnu", NK.html(fejl + andet)), "skidt");
+        this.kort.ryst();
         this.visOpgave();
     };
 
@@ -167,8 +198,9 @@
         this.loest = true;
         this.bueT = 0;
         this.parT = 0;
-        var A = NK.html(S.formel(this.opg.syre)), B = NK.html(S.formel(this.opg.base));
         var talt = !this.fejl && !this.vist;
+        this.ok = [true, true];
+        this.besked("", "");
         if (talt) {
             this.iTraek++;
             var n = S.niveau;
@@ -178,11 +210,9 @@
                 this.ventRos = 1.4;
             }
             NK.gem(NOEGLE, this.rekord);
-            this.besked("<b>Rigtigt.</b> " + A + " gav en hydron til " + B + ".", "god");
             this.fejr();
         } else {
             this.iTraek = 0;
-            this.besked((this.vist ? "Sådan. " : "<b>Rigtigt.</b> ") + A + " gav en hydron til " + B + ".", this.vist ? "gul" : "god");
         }
         this.visOpgave();
     };
@@ -196,12 +226,14 @@
         return R;
     };
 
-    P.knap = function () {
-        if (this.loest) { this.nyOpgave(); return; }
+    /* Hintknappen paa kortet: Giv hint -> Vis svaret */
+    P.hjaelpKlik = function () {
+        if (this.loest) return;
+        this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             var A = NK.html(S.formel(this.opg.syre)), B = NK.html(S.formel(this.opg.base));
-            this.besked("<b>Hint:</b> " + A + " er syren, og " + B + " er basen. Hydronen H⁺ går fra " + A + " til " + B + ".", "gul");
+            this.besked(NK.Skort.maerke("Hint", A + " er syren, og " + B + " er basen. Hydronen H⁺ går fra " + A + " til " + B + "."), "gul");
             this.visOpgave();
             return;
         }
@@ -210,46 +242,83 @@
         this.loes();
     };
 
+    /* Kortets groenne knap */
+    P.videre = function () { if (this.loest) this.nyOpgave(); };
+
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
+    P.knap = function () {
+        if (this.loest) this.videre(); else this.hjaelpKlik();
+    };
+
     P.nulstil = function () {
         this.iTraek = 0;
         this.nyOpgave();
     };
 
-    P.enter = function () { if (this.loest) this.knap(); };
+    P.enter = function () {
+        if (this.loest) this.videre();
+        else if (this.pladser[0] && this.pladser[1]) this.indsend();
+    };
     P.fokus = function () {};
     P.tast = function () { return false; };
 
     /* ----- Panelet --------------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = { knap: NK.el("prod-knap"), besked: NK.el("prod-besked"), kort: NK.el("prod-kort") };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { knap: NK.el("prod-knap"), besked: NK.el("prod-besked"), indsend: NK.el("prod-indsend"), status: NK.el("prod-status"), skort: NK.el("prod-skort") };
+        this.kort = new NK.Skort("prod", {
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         Tv.bindNiveau("prod-niveau", this);
     };
 
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort && this.opg) this.visKort();
     };
 
     P.visOpgave = function () {
         var rek = this.rekord[S.niveau] || 0;
-        NK.saetHTML("prod-taeller", "<b>" + this.iTraek + "</b> i træk · rekord " + rek);
-        var tekst, klasse = "knap";
-        if (this.loest) { tekst = "Ny reaktion"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.loest && !this.vist);
+        NK.saetHTML("prod-taeller", "<b>" + this.iTraek + "</b> · rekord " + rek);
+        this.visKort();
     };
 
-    P.visStatus = function () {
-        var t, tr = this.traek, n = (this.pladser[0] ? 1 : 0) + (this.pladser[1] ? 1 : 0);
-        if (tr && tr.flyttet) t = this.overPlads !== null ? "Slip formlen på pladsen." : "Træk formlen op på en plads efter pilen.";
-        else if (this.loest) t = "Syren og dens korresponderende base står i blåt. Basen og dens korresponderende syre i lilla.";
-        else if (n === 1) t = "Ét produkt mangler.";
-        else t = "Træk de to produkter op på pladserne efter pilen.";
-        NK.saetHTML("prod-status", t);
+    /* Papirkortet: opgaven, beskeden, Giv hint og Indsend svar. Naar begge
+       produkter er rigtige, bliver kortet med forklaringen og Ny reaktion. */
+    P.visKort = function () {
+        if (!this.kort || !this.opg) return;
+        var A = S.formel(this.opg.syre), B = S.formel(this.opg.base), bliv = null;
+        if (this.loest) {
+            bliv = {
+                vist: this.vist,
+                tekst: NK.html(A + " gav en hydron til " + B + ". " + (this.vist ? "Produkterne er " + this.rigtige.join(" og ") + "." :
+                    "Syren og dens korresponderende base står i blåt, basen og dens korresponderende syre i lilla.")),
+                knap: "Ny reaktion →"
+            };
+        }
+        var b = this.fast;
+        if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
+        this.kort.vis({
+            chip: "Produkterne",
+            tekst: "Hvad dannes? Træk de to produkter op på pladserne efter pilen.",
+            bliv: bliv,
+            besked: b,
+            hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap },
+            indsend: { tekst: "Indsend svar", klar: !!(this.pladser[0] && this.pladser[1]) }
+        });
+    };
+
+    /* Det, kortet siger, mens der ikke er en besked (der er ingen linje nederst) */
+    P.linje = function () {
+        var tr = this.traek, n = (this.pladser[0] ? 1 : 0) + (this.pladser[1] ? 1 : 0);
+        if (this.loest) return "";
+        if (tr && tr.flyttet) return this.overPlads !== null ? "Slip formlen på pladsen." : "Træk formlen op på en plads efter pilen.";
+        if (n === 1) return "Ét produkt mangler.";
+        if (n === 2) return "Tryk Indsend svar, når begge produkter står efter pilen.";
+        return "";
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------------ */
@@ -268,7 +337,7 @@
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
         if (this.opdaterFri && this.opdaterFri(dt)) this.stil();
-        this.visStatus();
+        this.visKort();
     };
 
     P.tegn = function () {
@@ -329,7 +398,7 @@
     /* Den plads, en brik med midten i (x, y) er over */
     P.pladsVed = function (x, y) {
         for (var s = 0; s < 2; s++) {
-            if (!this.pladser[s] && Tv.inde({ x: x, y: y }, this.pladsR[s], this.fs * 0.6)) return s;
+            if (!this.ok[s] && Tv.inde({ x: x, y: y }, this.pladsR[s], this.fs * 0.6)) return s;
         }
         return null;
     };
@@ -343,7 +412,7 @@
             if (!u) return;
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "kop") { if (mig.klikKop) mig.klikKop(); return; }
-            if (mig.loest) { mig.besked("Tryk Ny reaktion for en ny.", ""); return; }
+            if (mig.loest) { mig.kort.blink(); return; }
             if (u.slags === "brik") {
                 var r = mig.brikker[u.i].r;
                 mig.traek = { i: u.i, x0: pt.x, y0: pt.y, x: pt.x, y: pt.y, dx: r.x - pt.x, dy: r.y - pt.y, flyttet: false };
@@ -351,10 +420,12 @@
                 return;
             }
             if (u.slags === "plads") {
-                mig.besked(mig.pladser[u.s] ? "Den plads er fyldt." : "Træk en formel herop, eller klik på den.", "");
+                /* Et klik paa en fyldt plads toemmer den (et rigtigt produkt bliver) */
+                if (mig.pladser[u.s] && !mig.ok[u.s]) { mig.pladser[u.s] = null; mig.besked("", ""); mig.visOpgave(); return; }
+                mig.besked(mig.ok[u.s] ? "Det produkt er rigtigt og bliver stående." : "Træk en formel herop, eller klik på den.", "peger");
                 return;
             }
-            if (u.slags === "reaktant") mig.besked("Det er en reaktant. Produkterne skal stå efter pilen.", "");
+            if (u.slags === "reaktant") mig.besked("Det er en reaktant. Produkterne skal stå efter pilen.", "peger");
         });
         c.addEventListener("pointermove", function (e) {
             var pt = mig.L.punkt(e), tr = mig.traek;

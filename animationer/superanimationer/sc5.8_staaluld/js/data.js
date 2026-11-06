@@ -4,8 +4,8 @@
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
    de to reaktionsskemaer (Let og Svær), klumperne af ståluld, hvor meget
    af jernet der naar at reagere, hvor hurtigt det braender, det gratis
-   gaet, regnetrinene paa fane 2, spoergsmaalet til sidst og linjerne i
-   statuslinjen. Kemien regnes i kemi.js; tegningen kender kun
+   gaet, regnetrinene paa fane 2, spoergsmaalet til sidst og linjerne paa
+   papirkortet. Kemien regnes i kemi.js; tegningen kender kun
    resultatet.
    ===================================================================== */
 (function () {
@@ -57,18 +57,19 @@
     D.FORSOEG = [
         { id: "m1", titel: "Måling 1", gaet: true,
           tekst: "Brænd en klump ståluld på vægten. Aflæs massen før og efter.",
-          efter: "Ilt fra luften har bundet sig til jernet." },
+          efter: "Dioxygen fra luften har bundet sig til jernet." },
         { id: "m2", titel: "Måling 2",
           tekst: "En ny klump ståluld. Gør det samme igen.",
           efter: "To målinger. Regn på dem på fanen Beregningen." }
     ];
 
     /* ----- Det gratis gaet (maaling 1) -----------------------------------------------
-       Startskaermen: en kort indledning, spoergsmaalet og tre kort med
-       hvert sit billede (sprites/gaet_*.svg). Den daekker hele scenen, saa
-       intet sker bag den, mens eleven svarer (brugerens oenske 5. okt.
-       2026). forkl: det, linjen siger, naar forsoeget har vist, at gaettet
-       ikke holdt. */
+       Papirkortet oeverst i scenen: en kort indledning (med noten bagefter),
+       spoergsmaalet og tre knapper med hvert sit billede
+       (sprites/gaet_*.svg). Intet sker i scenen, mens eleven svarer
+       (brugerens oenske 5. okt. 2026), og et klik i scenen faar kortet til
+       at blinke. forkl: det, forklaringen siger, naar forsoeget har vist,
+       at gaettet ikke holdt. */
     D.GAET = {
         etiket: "Gæt først",
         intro: "Ståluld er tynde tråde af jern, og de kan brænde. Om lidt sætter du ild til en klump, der ligger på en vægt.",
@@ -77,32 +78,33 @@
         svar: [
             { id: "lettere", t: "Lettere", pil: "↓", billede: "gaet_lettere.svg",
               tekst: "Den går op i røg som brændet på et bål.",
-              forkl: "Brænde bliver lettere, fordi gasserne fra det forsvinder op i luften. Her binder ilt fra luften sig til jernet, og ilten vejer med." },
+              forkl: "Brænde bliver lettere, fordi gasserne fra det forsvinder op i luften. Her binder dioxygen fra luften sig til jernet, og dioxygenet vejer med." },
             { id: "samme", t: "Det samme", pil: "=", billede: "gaet_samme.svg",
               tekst: "Den bliver sort, men det er det samme jern.",
-              forkl: "Jernet er det samme, ja. Men ilt fra luften binder sig til jernet, og ilten vejer med." },
+              forkl: "Jernet er det samme, ja. Men dioxygen fra luften binder sig til jernet, og dioxygenet vejer med." },
             { id: "tungere", t: "Tungere", pil: "↑", billede: "gaet_tungere.svg", ok: true,
               tekst: "Den tager noget til sig som et søm, der ruster." }
         ]
     };
 
-    /* Linjen i statuslinjen i hver fase af en maaling: det naeste skridt */
+    /* Linjen paa kortet i hver fase af en maaling: det naeste skridt.
+       valg staar kun, naar eleven klikker i scenen under gaettet. */
     D.LINJE = {
-        valg: "Gæt først: klik på et af de tre billeder.",
+        valg: "Gæt først: klik på et af de tre billeder på kortet.",
         foer: "Aflæs vægten, og skriv tallet i feltet.",
         taend: "Klik på bunsenbrænderen. Så tænder flammen stålulden.",
-        vent: "Stålulden gløder, og vægten stiger. Klik på iltflasken, så mere af jernet reagerer.",
+        vent: "Stålulden gløder, og vægten stiger. Klik på flasken med dioxygen, så mere af jernet reagerer.",
         efter: "Vægten står stille. Aflæs den, og skriv tallet i feltet."
     };
 
-    /* Det, feltet i statuslinjen hedder, og de smaa skilte ved pilene i scenen */
+    /* Det, feltet paa kortet hedder, og de smaa skilte ved pilene i scenen */
     D.FELT = { foer: "m(før)", efter: "m(efter)" };
-    D.SKILT = { taend: "Klik for at tænde", ilt: "Klik for mere ilt" };
+    D.SKILT = { taend: "Klik for at tænde", ilt: "Klik for mere dioxygen" };
 
     D.HINT = {
         foer: "Tallet står på displayet på vægten. Skriv det med to decimaler, fx 4,25.",
         taend: "Bunsenbrænderen står til venstre for vægten. Klik på den. Du kan også trække den hen, så flammen rører stålulden.",
-        vent: "Uden ekstra ilt går stålulden ud, før alt jernet har reageret. Klik på iltflasken flere gange, mens den gløder.",
+        vent: "Uden ekstra dioxygen går stålulden ud, før alt jernet har reageret. Klik på flasken med dioxygen flere gange, mens den gløder.",
         efter: "Tallet står på displayet på vægten."
     };
 
@@ -114,7 +116,7 @@
     };
 
     /* Er stålulden gaaet ud uden ilt fra flasken, siger linjen det bagefter */
-    D.UDEN_ILT = "Uden iltflasken gik den ud, før alt jernet havde reageret.";
+    D.UDEN_ILT = "Uden flasken med dioxygen gik den ud, før alt jernet havde reageret.";
 
     /* Eksempler, hvis eleven ikke har maalt selv (samme model: 4,00 g
        med ilt til sidst og 82 % af jernet, 3,00 g uden ilt og 80 %) */
@@ -173,7 +175,7 @@
         fe_m: "Massen af stålulden, før den brændte. Stålulden regnes som rent jern.",
         fe_M: "Molarmassen af jern: 1 mol jern vejer {MFe} g.",
         ox_M: "Molarmassen af {ox}: 1 mol {ox} vejer {MOx} g.",
-        o2: "Ilten kommer fra luften. Dens masse skal du ikke bruge her.",
+        o2: "Dioxygenet kommer fra luften. Dets masse skal du ikke bruge her.",
         skjult: "Det tal finder du i trin {nr}.",
         fundet: "Det har du regnet ud i trin {nr}."
     };
@@ -181,18 +183,18 @@
     /* Spoergsmaalet efter maaling 1: de forkerte svar er det, elever tror */
     D.HVORFOR = {
         spm: "Vægten viste mindre, end du har regnet ud. Hvorfor?",
-        hint: "Kan ilten komme helt ind til jernet midt i klumpen? Se luppen på fanen Forsøget.",
+        hint: "Kan dioxygenet komme helt ind til jernet midt i klumpen? Se luppen på fanen Forsøget.",
         svar: [
             { t: "Jernet fordampede i varmen.", forkl: "Jern koger først ved næsten 3000 °C. Så varm bliver stålulden ikke." },
             { t: "Ikke alt jernet nåede at reagere.", ok: true },
-            { t: "Vægten kan ikke veje ilten.", forkl: "Jo. Det er netop ilten, der gør stålulden tungere." }
+            { t: "Vægten kan ikke veje dioxygenet.", forkl: "Jo. Det er netop dioxygenet, der gør stålulden tungere." }
         ],
-        efter: "Ilten når ikke ind til alt jernet. Her reagerede ca. {p} % af det."
+        efter: "Dioxygenet når ikke ind til alt jernet. Her reagerede ca. {p} % af det."
     };
 
     /* ----- Linjerne ----------------------------------------------------------------------
        Der er ingen laerer i animationen (brugerens valg 5. okt. 2026).
-       Statuslinjen siger naeste skridt, fejl, hint og ros. */
+       Linjen paa kortet siger naeste skridt, fejl, hint og ros. */
     D.FAERDIG = {
         forsoeg: "Begge målinger er i skemaet.",
         beregning: "Begge målinger er regnet. Vægten viste mindre, fordi ikke alt jernet reagerede."

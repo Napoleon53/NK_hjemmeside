@@ -54,8 +54,8 @@
     /* dele: de to dele, molekylet deler sig i (numre i atomer). Den foerste
        i hver del er det atom, der binder sig til carbonatomet. */
     K.REAGENS = {
-        Br2: { navn: "brom", formel: "Br₂", atomer: [["Br", -0.62, 0], ["Br", 0.62, 0]], bindinger: [[0, 1, 1]], dele: [[0], [1]], delNavn: "to bromatomer" },
-        H2: { navn: "hydrogen", formel: "H₂", atomer: [["H", -0.45, 0], ["H", 0.45, 0]], bindinger: [[0, 1, 1]], dele: [[0], [1]], delNavn: "to hydrogenatomer" },
+        Br2: { navn: "dibrom", formel: "Br₂", atomer: [["Br", -0.62, 0], ["Br", 0.62, 0]], bindinger: [[0, 1, 1]], dele: [[0], [1]], delNavn: "to bromatomer" },
+        H2: { navn: "dihydrogen", formel: "H₂", atomer: [["H", -0.45, 0], ["H", 0.45, 0]], bindinger: [[0, 1, 1]], dele: [[0], [1]], delNavn: "to hydrogenatomer" },
         H2O: { navn: "vand", formel: "H₂O", atomer: [["H", -0.78, 0.28], ["O", 0, -0.12], ["H", 0.78, 0.28]], bindinger: [[0, 1, 1], [1, 2, 1]], dele: [[0], [1, 2]], delNavn: "H og OH" }
     };
 

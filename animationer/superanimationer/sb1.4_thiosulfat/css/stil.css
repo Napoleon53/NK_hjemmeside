@@ -880,3 +880,85 @@ button:focus-visible {
     80%  { opacity: 1; }
     100% { transform: translate(var(--dx), var(--ned)) rotate(var(--rot)); opacity: 0; }
 }
+
+/* =====================================================================
+   PAPIRKORTET (6. nov. 2026). Opgaven staar paa ét lyst kort oeverst i
+   midten af scenen (js/opgave.js); udseendet og skriften
+   kommer fra ../faelles/papirkort.css, som indlaeses efter denne fil.
+   Her er kun kortets plads og layout. Laerredet (fane 1) og grafen
+   (fane 2 og 3) begynder under kortets zone (--kortzone), saa kortet
+   aldrig daekker glasset, uret eller graferne. Selvtesten maaler, at kortet
+   holder sig i zonen paa en almindelig og en lav skaerm.
+   ===================================================================== */
+:root { --kortzone: 220px; }
+
+.scenekort {
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(900px, calc(100% - 24px));
+    box-sizing: border-box;
+}
+
+.laerred-omraade { position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--kortzone) + 20px); }
+.laerred-omraade > canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.scene.soejle.medkort { padding-top: calc(var(--kortzone) + 20px); }
+.scene.medkort .tilbud { top: 8px; z-index: 7; }
+
+.sk-tekst { margin: 0; }
+.sk-ligning { margin: 4px 0 0; font-size: 1.12rem; font-weight: 600; text-align: center; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sk-svar.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 560px; margin-left: auto; margin-right: auto; }
+.sk-svar.n4.lang { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 10px;
+    border-radius: 9px;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+
+.v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.sk-bund { display: flex; align-items: center; gap: 10px; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; margin: 0; }
+.sk-bund .st-tekst[hidden] { display: block; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.92rem; }
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-bund .knap[hidden] { display: none; }
+
+.sk-videre { cursor: pointer; font-family: inherit; white-space: nowrap; }
+
+/* Lave skaerme (rammen i menuen paa en baerbar): kortet fylder mindre */
+@media (max-height: 720px) {
+    :root { --kortzone: 196px; }
+    .scenekort { top: 8px; }
+    html body.papirkort.papirkort .scenekort .sk-tekst { font-size: 0.98rem; line-height: 1.34; }
+    html body.papirkort.papirkort .scenekort .sk-svar { margin-top: 7px; gap: 6px; }
+    .sk-knap { padding: 4px 9px; font-size: 0.9rem; }
+    html body.papirkort.papirkort .scenekort .sk-bund { margin-top: 7px; }
+    .sk-ligning { font-size: 1.02rem; }
+}

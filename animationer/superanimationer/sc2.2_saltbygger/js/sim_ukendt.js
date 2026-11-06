@@ -46,11 +46,15 @@
             hylder: false,
             top: 96,
             visFormel: false,
-            lyt: function (hvad) { if (hvad === "aendret") mig.aendret(); }
+            lyt: function (hvad, p) {
+                if (hvad === "aendret") mig.aendret();
+                else if (hvad === "laast" && (mig.fase === "valg" || mig.fase === "partner") && !mig.plakatVed(p)) NK.kortBlink("ukendt-skort");
+            }
         });
         this.L = this.bord.l;            /* laerredet, som Kemichael tegnes paa */
         this.tid = 0;                    /* et ur, der altid gaar (Kemichael) */
         this.svar = new NK.Svarknapper(NK.el("ukendt-valg"), function (v, rigtig) { mig.svaret(v, rigtig); });
+        this.svar.vedValg = function () { mig.visIndsend(); };
         this.vaelgere = {
             kat: new NK.Opgavevaelger(D.UKENDT_OPGAVER.filter(function (o) { return o.side === "kat"; }), 6),
             an: new NK.Opgavevaelger(D.UKENDT_OPGAVER.filter(function (o) { return o.side === "an"; }), 5)
@@ -63,6 +67,7 @@
         this.musPlakat = null;
 
         NK.el("ukendt-opgaveknap").addEventListener("click", function () { mig.opgaveKnap(); });
+        NK.el("ukendt-indsend").addEventListener("click", function () { mig.indsendKlik(); });
         /* Linket i hintet aabner plakaten igen. */
         NK.el("ukendt-hint").addEventListener("click", function (e) {
             if (e.target && e.target.getAttribute("data-opslag") !== null) mig.aabnOpslag(mig.hintIon);
@@ -99,7 +104,10 @@
         NK.saetKnaptrin("ukendt-opgaveknap", trin);
     };
 
+    /* Kortet viser én besked ad gangen: en ny besked afloeser hintet og
+       forklaringen til det forrige trin */
     NK.SimUkendt.prototype.besked = function (html, klasse) {
+        if (html) { NK.saetHTML("ukendt-hint", ""); NK.saetHTML("ukendt-forkl", ""); }
         NK.saetHTML("ukendt-besked", html || "");
         NK.saetKlasse("ukendt-besked", "besked" + (klasse ? " " + klasse : ""));
     };
@@ -148,6 +156,9 @@
         this.senestLoest = i;
         if (forrige !== undefined && forrige !== null && forrige !== i) this.tegnTrin(forrige);
         this.tegnTrin(i);
+        /* Paa papirkortet staar forklaringen til det senest loeste trin i
+           sin egen groenne linje under trinene */
+        NK.saetHTML("ukendt-forkl", forkl ? "<b>" + svar + ".</b> " + forkl : "");
         NK.saetTrin("ukendt-t" + (i + 1), "ok");
     };
 
@@ -184,6 +195,9 @@
             NK.saetTrin("ukendt-t" + (i + 1), "");
         }
         this.trinNr = -1;
+        this.roert = false;
+        NK.saetHTML("ukendt-forkl", "");
+        NK.saetTekst("ukendt-chip", "Opgave " + this.nr);
 
         NK.saetHTML("ukendt-uf", D.formelHTML(kat, an));
         NK.saetTekst("ukendt-un", o.side === "an" ? salt.navn : "");
@@ -201,6 +215,31 @@
         this.bord.laas(false);
         this.bord.saetUkendt(kat, salt.p, an, salt.n, o.side);
         this.saetNote("");
+        this.visIndsend();
+    };
+
+    /* ----- Indsend svar --------------------------------------------------------
+       Svarknapperne vaelger kun, og lynlaasen bedoemmer ikke af sig selv:
+       Indsend svar sender det valgte svar eller kortets bredde ind. */
+    NK.SimUkendt.prototype.visIndsend = function () {
+        var aktiv = this.fase === "kendt" || this.fase === "partner" || this.fase === "ladning" || this.fase === "valg";
+        var klar = this.fase === "ladning" ? !!this.roert : this.svar.harValgt();
+        NK.visIndsend("ukendt-indsend", aktiv, aktiv && klar);
+    };
+
+    NK.SimUkendt.prototype.indsendKlik = function () {
+        if (this.fase === "ladning") {
+            if (!this.roert) {
+                NK.kortBlink("ukendt-skort");
+                this.besked("Træk i kortet med ?, eller brug knapperne ved siden af, før du sender.");
+                return;
+            }
+            this.roert = false;
+            if (this.bord.neutral()) this.fundet();
+            else { this.skub(); this.visIndsend(); }
+            return;
+        }
+        if (!this.svar.sendInd()) NK.kortBlink("ukendt-skort");
     };
 
     /* ----- Trin 1: den kendte ion ----------------------------------------- */
@@ -213,6 +252,7 @@
             : "Det er en sammensat ion, og dens ladning skal man kende."));
         this.stilKendtSpm(k);
         this.bord.markerKendt(true);
+        this.visIndsend();
         if (this.laererVisStart) {
             this.laererVisStart(function () { return mig.bord.kortMidt(mig.o.side === "kat" ? "an" : "kat"); }, k);
         }
@@ -221,7 +261,7 @@
     /* Spoergsmaalet om en kendt ions ladning (trin 1, og partneren). */
     NK.SimUkendt.prototype.stilKendtSpm = function (ion) {
         NK.saetHTML("ukendt-spm", "Hvilken ladning har <b>" + ion.formel + "</b>?");
-        NK.el("ukendt-valg").className = "valg";
+        NK.el("ukendt-valg").className = "valg sk-svar";
         this.svar.vis(D.kendtValg(ion));
     };
 
@@ -244,35 +284,46 @@
         this.loesTrin(0, D.ionTekst(this.kendt), forklaring);
         this.fase = "ladning";
         this.aktivTrin(1);
-        NK.saetHTML("ukendt-opgavetekst", "Nu kender du ladningen på " + this.kendt.formel
-            + ". Træk i kortet med <b>?</b>, til lynlåsen lukker.");
         this.bord.markerKendt(false);
-        this.bord.visKendt();          /* kortene folder sig ud: -> aendret() -> skub() */
+        this.bord.visKendt();          /* kortene folder sig ud */
+        NK.saetHTML("ukendt-opgavetekst", "Nu kender du ladningen på " + this.kendt.formel + ". "
+            + this.opvejTekst() + " Træk i kortet med <b>?</b>, til lynlåsen lukker. Tryk så Indsend svar.");
+        this.roert = false;
+        this.visIndsend();
     };
 
     /* ----- Trin 2: den ukendte ion ----------------------------------------- */
     NK.SimUkendt.prototype.aendret = function (hvad) {
         if (hvad === "laerer" || this.fase !== "ladning") return;
-        if (this.bord.neutral()) this.fundet();
-        else this.skub();
+        /* Lynlaasen bedoemmer ikke af sig selv: det goer Indsend svar */
+        this.roert = true;
+        if (/skidt/.test(NK.el("ukendt-besked").className)) this.besked("");
+        this.visIndsend();
+    };
+
+    /* Hvad den ukendte ion skal opveje (fx "Sn skal opveje −4."). Det staar
+       i kortets opgavetekst, naar trin 2 begynder. */
+    NK.SimUkendt.prototype.opvejTekst = function () {
+        var s = this.salt, kat = this.o.side === "kat";
+        var modsat = kat ? s.n * s.an.q : s.p * s.kat.q;
+        return "<b>" + this.ion.formel + "</b> skal opveje <b>" + NK.fortegn(modsat) + "</b>.";
     };
 
     /* Et lille skub efter hvert forsoeg: hvor langt er der igen? */
     NK.SimUkendt.prototype.skub = function () {
-        var s = this.salt, u = this.bord.ukendt, ion = this.ion;
+        var s = this.salt, u = this.bord.ukendt;
         var kat = this.o.side === "kat";
         var plus = s.p * (kat ? u.q : s.kat.q), minus = s.n * (kat ? -s.an.q : u.q);
         var tegn = kat ? "plus" : "minus";
         var tekst;
         if (u.q === 0) {
-            tekst = "<b>" + ion.formel + "</b> skal opveje <b>" + (kat ? NK.fortegn(-minus) : NK.fortegn(plus))
-                + "</b>. Træk i kortet med ?, eller tryk på +.";
+            tekst = this.opvejTekst() + " Træk i kortet med ?, eller tryk på +.";
         } else {
             var mangler = kat ? plus < minus : minus < plus;
             tekst = "<b>" + NK.fortegn(plus) + "</b> og <b>" + NK.fortegn(-minus) + "</b>: "
                 + (mangler ? "der mangler " + tegn + ". Træk kortet bredere." : "for meget " + tegn + ". Træk kortet smallere.");
         }
-        this.saetNote(tekst);
+        this.besked("<b>Ikke endnu.</b> " + tekst, "skidt");
     };
 
     NK.SimUkendt.prototype.saetNote = function (html) {
@@ -297,13 +348,14 @@
         this.bord.ukendt.fundet = true;
         this.bord.laas(true);
         this.saetNote("");
+        this.besked("");
         this.loesTrin(1, D.ionTekst(this.ion), this.regnskab());
         if (o.side === "kat") {
             this.fase = "valg";
             this.aktivTrin(2);
             NK.saetHTML("ukendt-opgavetekst", "Ladningen er fundet. Nu skal saltet have et navn.");
             NK.saetHTML("ukendt-spm", "Hvad hedder <b>" + s.formel + "</b>?");
-            NK.el("ukendt-valg").className = "valg navne";
+            NK.el("ukendt-valg").className = "valg navne sk-svar";
             this.svar.vis(D.romertalValg(s.kat, s.an));
         } else {
             /* Den nye salt kraever partnerens ladning: slaa den op foerst.
@@ -316,6 +368,7 @@
             this.stilKendtSpm(this.partner);
             this.skift = { t: 1.4 };
         }
+        this.visIndsend();
     };
 
     /* Bordet viser det nye salt: partneren foldet sammen med "?" og den
@@ -341,7 +394,7 @@
             + D.ionTekst(this.ion) + ". Byg " + D.saltnavn(this.partner, s.an)
             + " på bordet med <b>+</b> og <b>−</b>, og vælg så formlen.");
         NK.saetHTML("ukendt-spm", "Hvad er formlen for <b>" + D.saltnavn(this.partner, s.an) + "</b>?");
-        NK.el("ukendt-valg").className = "valg";
+        NK.el("ukendt-valg").className = "valg sk-svar";
         this.svar.vis(D.formelValg(this.partner, s.an));
     };
 
@@ -349,7 +402,7 @@
     NK.SimUkendt.prototype.svaret = function (v, rigtig) {
         if (this.fase === "kendt" || this.fase === "partner") {
             if (!rigtig) {
-                this.besked(v.forklaring, "skidt");
+                this.besked("<b>Ikke rigtigt.</b> " + v.forklaring, "skidt");
                 NK.saetTrin("ukendt-t" + (this.trinNr + 1), "fejl");
             } else if (this.fase === "kendt") this.kendtFundet(v.forklaring);
             else this.partnerFundet(v.forklaring);
@@ -357,7 +410,7 @@
         }
         if (rigtig) this.afslut(true, v);
         else {
-            this.besked(v.forklaring, "skidt");
+            this.besked("<b>Ikke rigtigt.</b> " + v.forklaring, "skidt");
             NK.saetTrin("ukendt-t" + (this.trinNr + 1), "fejl");
         }
     };
@@ -404,6 +457,8 @@
 
     NK.SimUkendt.prototype.visHint = function () {
         if (this.fase === "faerdig" || this.fase === "intro") return;
+        this.besked("");
+        NK.saetHTML("ukendt-forkl", "");
         NK.saetHTML("ukendt-hint", "<b>Hint:</b> " + this.hint());
         this.saetKnap("svar");
         /* Paa de trin, hvor en ladning skal slaas op, lyser plakaten, og
@@ -427,7 +482,8 @@
             return;
         }
         if (this.fase === "ladning") {
-            this.bord.saetGaet(Math.abs(this.ion.q));   /* -> fundet() */
+            this.bord.saetGaet(Math.abs(this.ion.q));
+            this.fundet();
             return;
         }
         this.svar.visRigtig();
@@ -441,7 +497,8 @@
         NK.Opslag.luk();
         NK.saetHTML("ukendt-hint", "");
         this.loesTrin(sidste, v ? v.tekst : "", "");
-        this.besked((loest ? "<b>Rigtigt.</b> " : "") + (v ? v.forklaring : ""), loest ? "god" : "gul");
+        NK.saetHTML("ukendt-forkl", "");
+        this.besked((loest ? "<b>Rigtigt.</b> " : "<b>Svaret.</b> ") + (v ? v.forklaring : ""), loest ? "god" : "gul");
         NK.saetTekst("ukendt-un", this.salt.navn);
         if (this.partner) {
             /* Det nye salt: bordet faar det rigtige antal af hver, og
@@ -458,6 +515,7 @@
             NK.saetTekst("ukendt-loest", String(this.loeste));
         }
         this.saetKnap("ny");
+        this.visIndsend();
     };
 
     /* ----- Plakaterne paa vaeggen ----------------------------------------- */
@@ -497,8 +555,15 @@
     /* ----- Faneskift, tegning og tastatur ----------------------------------- */
     NK.SimUkendt.prototype.tilpas = function () { this.bord.tilpas(); };
 
+    NK.SimUkendt.prototype.kortZone = function () { return NK.kortZone("ukendt-skort", [300, 320]); };
+
     NK.SimUkendt.prototype.opdater = function (dt) {
         this.tid += dt;
+        /* Formlen staar lige under papirkortet, og bordet under formlen */
+        var zone = this.kortZone(), f = NK.el("ukendt-formel");
+        var ft = Math.round(10 + zone + 4) + "px";
+        if (f.style.top !== ft) f.style.top = ft;
+        this.bord.top = 10 + zone + 4 + (f.offsetHeight || 40);
         this.bord.opdater(dt);
         this.plakater = this.plakatLayout();
         if (this.plakatPuls) this.plakatPuls.t += dt;

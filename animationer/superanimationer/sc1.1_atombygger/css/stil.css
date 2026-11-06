@@ -1319,3 +1319,85 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* =====================================================================
+   Papirkortet (6. nov. 2026): opgaven, spoergsmaalet, svarene, hintet,
+   beskeden og knapperne staar paa ét lyst kort oeverst midt i scenen.
+   Farver og skrift ligger i ../faelles/papirkort.css (indlaeses efter
+   denne fil). Her er kun placeringen og raekkernes opstilling.
+   ===================================================================== */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    box-sizing: border-box;
+}
+.scenekort[hidden] { display: none; }
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-svar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.scenekort .sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scenekort .sk-svar.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scenekort .sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+.scenekort .sk-knap:disabled { cursor: default; }
+.scenekort .v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.scenekort .sk-bund { display: flex; align-items: center; gap: 10px; }
+.scenekort .sk-bund[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.scenekort .sk-bund .st-tekst:empty::before { content: none; }
+.scenekort .sk-bund .st-tekst[hidden] { display: none; }
+.scenekort .sk-bund .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.scenekort .sk-bund .knap[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst[hidden] + .knap { margin-left: auto; }
+.scenekort .sk-videre { flex: 0 0 auto; font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+/* sc1.1: startkortet paa fane 1 (opgaverne begynder foerst, naar eleven beder om dem),
+   atomsymbolet i hintet og Start forfra i panelet */
+.scenekort .sk-start { display: flex; align-items: center; gap: 14px; }
+.scenekort .sk-start .sk-tekst { flex: 1; min-width: 0; }
+.scenekort .sk-nuklid { display: inline-flex; align-items: center; margin: 0 2px; font-weight: 700; font-size: 1.15em; vertical-align: middle; }
+.scenekort .sk-nuklid .sn-tal { display: inline-flex; flex-direction: column; align-items: flex-end; margin-right: 1px; font-size: 0.62em; line-height: 1; }
+.scenekort .sk-nuklid sup { font-size: 0.62em; align-self: flex-start; margin-top: -0.4em; }
+.panel .forfraknap {
+    display: block;
+    margin: 8px 0 0 auto;
+    padding: 5px 12px;
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.panel .forfraknap:hover { color: var(--tekst); border-color: #6e6e80; }

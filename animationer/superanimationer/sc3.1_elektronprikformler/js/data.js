@@ -58,7 +58,7 @@
        facit.b er bindingerne [atom, atom, antal elektronpar]. */
     D.MOLEKYLER = [
         {
-            id: "h2", f: "H₂", navn: "hydrogen", atomer: [1, 1], om: 0,
+            id: "h2", f: "H₂", navn: "dihydrogen", atomer: [1, 1], om: 0,
             bygt: "Alle elektroner er parret. De to hydrogenatomer deler 1 elektronpar: en enkeltbinding.",
             facit: { pos: [[0, 0], [1, 0]], b: [[0, 1, 1]] },
             hint: ["Hvert hydrogenatom har 1 uparret elektron. Træk den ene hen på den anden, så deler de to atomer et elektronpar."]
@@ -83,7 +83,7 @@
             hint: ["Carbon har 4 uparrede elektroner og danner derfor 4 bindinger. Der er ét hydrogenatom til hver uparret elektron."]
         },
         {
-            id: "br2", f: "Br₂", navn: "brom", atomer: [35, 35], om: 0,
+            id: "br2", f: "Br₂", navn: "dibrom", atomer: [35, 35], om: 0,
             bygt: "Alle elektroner er parret. De to bromatomer deler 1 elektronpar, og hvert bromatom har 3 frie elektronpar.",
             facit: { pos: [[0, 0], [1, 0]], b: [[0, 1, 1]] },
             hint: ["Hvert bromatom har 1 uparret elektron. De to bromatomer deler dem i ét fælles elektronpar."]
@@ -103,7 +103,7 @@
                 "Med to hydrogenatomer har carbon 2 uparrede elektroner tilbage, og oxygen har 2. Carbon og oxygen deler 2 elektronpar: en dobbeltbinding."]
         },
         {
-            id: "n2", f: "N₂", navn: "nitrogen", atomer: [7, 7], om: 0,
+            id: "n2", f: "N₂", navn: "dinitrogen", atomer: [7, 7], om: 0,
             bygt: "Alle elektroner er parret. De to nitrogenatomer deler 3 elektronpar: en tripelbinding.",
             facit: { pos: [[0, 0], [1, 0]], b: [[0, 1, 3]] },
             hint: ["Hvert nitrogenatom har 3 uparrede elektroner. Hvor mange elektronpar skal de to nitrogenatomer så dele?",

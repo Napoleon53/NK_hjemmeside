@@ -108,38 +108,47 @@ function koer() {
     rig = o.valg.filter(function (v) { return v.rigtig; })[0].tekst;
     paastand("koefficienten: det rigtige svar er v(Br₂)/3 (" + rig + ")", rig === "v(BrO₃⁻) = " + NK.sci(B.v("br2", 100) / 3, 2) + " M/s");
 
-    overskrift("4. Opgavekortet og værktøjet på fane 1");
+    overskrift("4. Papirkortet og værktøjet på fane 1");
     NK.visFane("kurve");
     var K1 = S.kurve, kort = K1.kort;
     kort.naesteNr = 0;
-    paastand("knappen starter som Start opgave", d.getElementById("kurve-opgaveknap").textContent === "Start opgave");
-    kort.tryk();
-    paastand("første opgave er 'hurtigst' med fire svar", kort.opgave.id === "hurtigst" && d.querySelectorAll("#kurve-valg .valgknap").length === 4);
-    paastand("knappen er nu Giv hint", d.getElementById("kurve-opgaveknap").textContent === "Giv hint");
+    function synlig(el) { return !!el && !el.hidden && el.offsetWidth > 0 && w.getComputedStyle(el).display !== "none"; }
+    var sk = d.getElementById("kurve-skort"), ind = d.getElementById("kurve-indsend"), hj = d.getElementById("kurve-hjaelp");
+    paastand("kortet står i scenen og ikke i panelet", sk.parentNode.classList.contains("scene") && !d.querySelector(".panel .scenekort") && d.body.classList.contains("papirkort"));
+    paastand("ingen statuslinje nederst og ingen opgavetekst i panelet", !d.querySelector(".scene .status") && !d.querySelector(".panel .opgavetekst") && !d.querySelector(".panel .valgknap"));
+    paastand("før første opgave: Start opgave på kortet, intet hint", ind.textContent === "Start opgave" && !synlig(hj));
+    ind.click();
+    paastand("første opgave er 'hurtigst' med fire svar på kortet", kort.opgave.id === "hurtigst" && sk.querySelectorAll(".sk-knap").length === 4);
+    paastand("Indsend svar er grå uden valg", ind.textContent === "Indsend svar" && ind.classList.contains("ikke-klar"));
     var forkert = kort.opgave.valg.map(function (v, i) { return v.rigtig ? -1 : i; }).filter(function (i) { return i >= 0; })[0];
-    kort.knapper[forkert].click();
-    paastand("et forkert svar giver forklaringen på fejlen og kan ikke vælges igen",
-        d.getElementById("kurve-besked").className.indexOf("skidt") >= 0 && kort.knapper[forkert].disabled
-        && d.getElementById("kurve-besked").textContent === kort.opgave.valg[forkert].forklaring);
-    var loestFoer = kort.antalLoest;
-    kort.knapper[kort.opgave.valg.map(function (v) { return v.rigtig; }).indexOf(true)].click();
-    paastand("et rigtigt svar tæller og giver Ny opgave", kort.antalLoest === loestFoer + 1 && d.getElementById("kurve-opgaveknap").textContent === "Ny opgave");
-    kort.tryk();
-    paastand("anden opgave er gennemsnittet, og værktøjet er låst", kort.opgave.id === "gennemsnit" && K1.laas && K1.vaerktoej === "sekant"
+    var rigtigNr = kort.opgave.valg.map(function (v) { return v.rigtig; }).indexOf(true);
+    sk.querySelectorAll(".sk-knap")[rigtigNr].click();
+    paastand("et svar vælger kun: intet er bedømt, Indsend er klar", !kort.opgave.loest && kort.valgt === rigtigNr && ind.classList.contains("klar"));
+    sk.querySelectorAll(".sk-knap")[forkert].click();
+    ind.click();
+    paastand("et forkert svar giver forklaringen på kortet og kan ikke vælges igen",
+        d.getElementById("kurve-status").className.indexOf("skidt") >= 0 && sk.querySelectorAll(".sk-knap")[forkert].disabled
+        && d.getElementById("kurve-besked").textContent.indexOf(kort.opgave.valg[forkert].forklaring) >= 0);
+    var loestFoer = kort.antalLoest, spm = sk.querySelector(".sk-tekst").textContent;
+    sk.querySelectorAll(".sk-knap")[rigtigNr].click(); ind.click();
+    var videre = sk.querySelector(".sk-videre");
+    paastand("rigtigt svar: kortet bliver på spørgsmålet, svaret er grønt, Næste opgave står i stedet for Indsend",
+        kort.antalLoest === loestFoer + 1 && sk.querySelector(".sk-tekst").textContent === spm && sk.querySelectorAll(".sk-knap")[rigtigNr].classList.contains("rigtig")
+        && videre && videre.textContent === "Næste opgave" && !synlig(ind) && sk.querySelector(".sk-bund.bliv"));
+    paastand("Start forfra står ikke på kortet", sk.textContent.indexOf("forfra") < 0 && sk.textContent.indexOf("Forfra") < 0);
+    videre.click();
+    paastand("anden opgave er gennemsnittet, rosen er væk, og værktøjet er låst", kort.opgave.id === "gennemsnit" && !sk.querySelector(".sk-bund.bliv") && K1.laas && K1.vaerktoej === "sekant"
         && d.querySelector("#kurve-vaerktoej [data-vaerktoej='aflaes']").disabled && d.getElementById("kurve-afspil").disabled);
     paastand("facit er skjult i aflæsningen", d.getElementById("kurve-aflaesning").textContent.indexOf("?") >= 0
         && d.getElementById("kurve-aflaesning").textContent.indexOf("Δt") < 0);
-    kort.tryk(); kort.tryk();
-    paastand("Giv hint og Vis svaret: det rigtige svar lyser, og det tæller ikke",
-        kort.opgave.vist && d.querySelector("#kurve-valg .rigtig") && kort.antalLoest === loestFoer + 1 && d.getElementById("kurve-hint").textContent.indexOf("Hint:") === 0);
-    kort.tryk();
-    paastand("tredje opgave er tangenten", kort.opgave.id === "tangent" && K1.vaerktoej === "tangent" && K1.lineal === 0);
+    hj.click();
+    paastand("Giv et hint: hintet står på kortet, knappen bliver Vis svaret", d.getElementById("kurve-besked").textContent.indexOf(kort.opgave.hint) >= 0 && hj.textContent === "Vis svaret");
+    hj.click();
+    paastand("Vis svaret: det rigtige svar er gult, og det tæller ikke",
+        kort.opgave.vist && sk.querySelector(".sk-knap.svar-vist") && kort.antalLoest === loestFoer + 1 && sk.classList.contains("svar"));
+    sk.querySelector(".sk-videre").click();
+    paastand("tredje opgave er tangenten, Indsend er grå, til linealen er drejet", kort.opgave.id === "tangent" && K1.vaerktoej === "tangent" && K1.lineal === 0 && ind.classList.contains("ikke-klar"));
     var sand = B.haeldning("br2", K1.tT);
-    K1.lineal = sand * 1.3; K1.tjekLineal();
-    paastand("for stejl lineal: ikke godkendt, besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("For stejl") === 0);
-    K1.lineal = sand * 0.7; K1.tjekLineal();
-    paastand("for flad lineal: besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("For flad") === 0);
-    /* Traek i linealens ende langs den rigtige tangent, som eleven ville */
     K1.tilpas();
     K1.lineal = 0;
     var e = K1.linealEnder(), r = K1.L.canvas.getBoundingClientRect(), lay = K1.lay;
@@ -148,8 +157,39 @@ function koer() {
         K1.L.canvas.dispatchEvent(new w.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, isPrimary: true }));
     }
     pil("pointerdown", e.b.x, e.b.y); pil("pointermove", maalX, maalY); pil("pointerup", maalX, maalY);
-    paastand("træk linealen på plads med musen: godkendt som tangent (" + NK.sci(K1.lineal, 3) + " mod " + NK.sci(sand, 3) + ")",
-        kort.opgave.loest && Math.abs(K1.lineal / sand - 1) < 0.02);
+    paastand("træk linealen på plads med musen: intet bedømt endnu, Indsend er klar (" + NK.sci(K1.lineal, 3) + " mod " + NK.sci(sand, 3) + ")",
+        !kort.opgave.loest && Math.abs(K1.lineal / sand - 1) < 0.02 && ind.classList.contains("klar"));
+    var rigtigLineal = K1.lineal;
+    K1.lineal = sand * 1.3; ind.click();
+    paastand("for stejl lineal: ikke godkendt, besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("for stejl") >= 0);
+    K1.lineal = sand * 0.7; ind.click();
+    paastand("for flad lineal: besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("for flad") >= 0);
+    K1.lineal = rigtigLineal; ind.click();
+    paastand("Indsend svar med linealen som tangent: godkendt, Næste opgave på kortet", kort.opgave.loest && sk.querySelector(".sk-videre"));
+
+    /* Kortet holder sig i sin zone: alle opgaver, med hint og forkert svar */
+    function zoneTjek(navn, sim, p) {
+        var kortet = sim.kort, skort = d.getElementById(p + "-skort"), zone = parseFloat(w.getComputedStyle(skort.parentNode).getPropertyValue("--kortzone"));
+        var scene = skort.parentNode.getBoundingClientRect(), hoejst = 0, hvor = "";
+        function maal(t) { var h = skort.getBoundingClientRect().bottom - scene.top; if (h > hoejst) { hoejst = h; hvor = t; } }
+        kortet.afslut(); kortet.naesteNr = 0; maal("start");
+        for (var n = 0; n < kortet.liste.length; n++) {
+            kortet.ny();
+            var o = kortet.opgave;
+            maal(o.id);
+            d.getElementById(p + "-hjaelp").click(); maal(o.id + " hint");
+            if (o.valg) {
+                var lang = 0, j = 0;
+                o.valg.forEach(function (v, i) { if (!v.rigtig && v.forklaring.length > lang) { lang = v.forklaring.length; j = i; } });
+                kortet.vaelg(j); kortet.indsendKlik(); maal(o.id + " forkert");
+                kortet.vaelg(o.valg.map(function (v) { return v.rigtig; }).indexOf(true)); kortet.indsendKlik(); maal(o.id + " rigtig");
+            } else { kortet.hjaelpKlik(); maal(o.id + " svar"); }
+        }
+        kortet.afslut();
+        paastand(navn + ": kortet holder sig i zonen (" + Math.round(hoejst) + " px af " + (zone + 10) + ", " + hvor + ")", hoejst <= zone + 10);
+    }
+    zoneTjek("fane 1", K1, "kurve");
+    NK.visFane("sammenstoed"); zoneTjek("fane 2", S.sammenstoed, "sam"); NK.visFane("kurve");
     kort.afslut();
     paastand("Afslut låser værktøjet op", !K1.laas && !d.querySelector("#kurve-vaerktoej [data-vaerktoej='aflaes']").disabled);
     K1.saetVaerktoej("tangent"); K1.stof = "bro3"; K1.lineal = B.haeldning("bro3", K1.tT); K1.visPanel();
@@ -245,13 +285,16 @@ function koer() {
         D.udtrykTekst(D.REAKTIONER[0], D.REAKTIONER[0].orden) === "v(N₂) = k·[NO]²·[H₂]" && D.udtrykTekst(D.REAKTIONER[3], D.REAKTIONER[3].orden) === "v(CO₂) = k·[NO₂]²");
 
     NK.visFane("udtryk");
-    var U = S.udtryk;
+    var U = S.udtryk, uInd = d.getElementById("udtryk-indsend"), uSk = d.getElementById("udtryk-skort");
     U.nyOpgave(0);
+    paastand("fane 3: kortet står i scenen med reaktionen, Tjek-knappen er væk", uSk.parentNode.classList.contains("scene") && /2\sNO/.test(uSk.textContent) && !d.getElementById("udtryk-tjek"));
     paastand("uden forsøg siger hintet: lav to forsøg", U.hint().indexOf("Lav to forsøg") === 0);
-    U.tjek();
-    paastand("tjek uden eksponenter beder om dem", d.getElementById("udtryk-besked").textContent.indexOf("Vælg en eksponent") === 0);
-    U.eksp.NO = 2; U.eksp.H2 = 2;
-    paastand("koefficienterne fra skemaet genkendes som fejlen", U.tjek().grund === "skema");
+    paastand("Indsend svar er grå, til alle eksponenter er valgt", uInd.classList.contains("ikke-klar"));
+    uInd.click();
+    paastand("Indsend uden eksponenter bedømmer intet", !U.loest && d.getElementById("udtryk-besked").textContent === "");
+    U.eksp.NO = 2; U.eksp.H2 = 2; U.visPanel();
+    paastand("med alle eksponenter er Indsend klar", uInd.classList.contains("klar"));
+    paastand("koefficienterne fra skemaet genkendes som fejlen", U.tjek().grund === "skema" && d.getElementById("udtryk-status").className.indexOf("skidt") >= 0);
     U.maal({ NO: 0.1, H2: 0.1 }); U.maal({ NO: 0.1, H2: 0.2 });
     U.eksp.NO = 2; U.eksp.H2 = 0;
     var svar = U.tjek(), besked = d.getElementById("udtryk-besked").textContent;
@@ -260,16 +303,32 @@ function koer() {
     paastand("hintet peger på det par", U.hint().indexOf("Sammenlign forsøg 1 og 2") === 0);
     U.eksp.NO = 1; U.eksp.H2 = 1;
     paastand("forkert eksponent for NO uden et par: bed om forsøget", U.tjek().id === "NO" && d.getElementById("udtryk-besked").textContent.indexOf("Lav to forsøg") >= 0);
-    U.eksp.NO = 2;
+    U.eksp.NO = 2; U.visPanel();
     var loest = U.antalLoest;
-    paastand("det rigtige svar godkendes og tæller", U.tjek().rigtig && U.antalLoest === loest + 1 && d.getElementById("udtryk-opgaveknap").textContent === "Ny opgave");
-    U.tryk();
-    paastand("Ny opgave giver næste reaktion med tom tabel", U.R.id === "h2_i2" && U.forsoeg.length === 0 && U.eksp.H2 === null);
-    U.tryk(); U.tryk();
-    paastand("Giv hint og Vis svaret fylder eksponenterne ud uden at tælle", U.vist && U.eksp.H2 === 1 && U.eksp.I2 === 1 && U.antalLoest === loest + 1);
+    uInd.click();
+    paastand("det rigtige svar godkendes og tæller, kortet bliver med Næste reaktion", U.loest && U.antalLoest === loest + 1 && uSk.querySelector(".sk-videre") && uSk.querySelector(".sk-videre").textContent === "Næste reaktion" && d.getElementById("udtryk-status").hidden);
+    uSk.querySelector(".sk-videre").click();
+    paastand("Næste reaktion giver næste reaktion med tom tabel, og rosen er væk", U.R.id === "h2_i2" && U.forsoeg.length === 0 && U.eksp.H2 === null && !uSk.querySelector(".sk-videre"));
+    d.getElementById("udtryk-hjaelp").click(); d.getElementById("udtryk-hjaelp").click();
+    paastand("Giv et hint og Vis svaret fylder eksponenterne ud uden at tælle", U.vist && U.eksp.H2 === 1 && U.eksp.I2 === 1 && U.antalLoest === loest + 1 && uSk.classList.contains("svar"));
     U.nyOpgave(3);
     U.eksp.NO2 = 2; U.eksp.CO = 0;
-    paastand("en eksponent på 0 nævnes i svaret", U.tjek().rigtig && d.getElementById("udtryk-besked").textContent.indexOf("[CO] er ikke med") >= 0);
+    paastand("en eksponent på 0 nævnes i svaret", U.tjek().rigtig && uSk.textContent.indexOf("[CO] er ikke med") >= 0);
+    function zone3(navn) {
+        var zone = parseFloat(w.getComputedStyle(uSk.parentNode).getPropertyValue("--kortzone")), hoejst = 0, hvor = "";
+        var scene = uSk.parentNode.getBoundingClientRect();
+        function maal(t) { var h = uSk.getBoundingClientRect().bottom - scene.top; if (h > hoejst) { hoejst = h; hvor = t; } }
+        D.REAKTIONER.forEach(function (R, n) {
+            U.nyOpgave(n); maal(R.id);
+            U.maal(); U.hjaelpKlik(); maal(R.id + " hint");
+            R.reaktanter.forEach(function (x) { U.eksp[x.id] = 1; }); U.tjek(); maal(R.id + " forkert");
+            U.visSvar(); U.visPanel(); maal(R.id + " svar");
+        });
+        paastand(navn + ": kortet holder sig i zonen (" + Math.round(hoejst) + " px af " + (zone + 10) + ", " + hvor + ")", hoejst <= zone + 10);
+        var graf = d.querySelector("#fane-udtryk .graf-omraade").getBoundingClientRect();
+        paastand(navn + ": grafen begynder under kortet", graf.top >= uSk.getBoundingClientRect().bottom - 1);
+    }
+    zone3("fane 3");
     U.nyOpgave(0);
     for (i = 0; i < 8; i++) U.maal({ NO: 0.1, H2: 0.1 });
     paastand("højst " + D.MAKS_FORSOEG + " forsøg i tabellen", U.forsoeg.length === D.MAKS_FORSOEG && d.querySelectorAll("#udtryk-tabel tbody tr").length === D.MAKS_FORSOEG);
@@ -304,7 +363,7 @@ function koer() {
     });
     NK.visFane("sammenstoed");
     L.startIntro("sammenstoed", true);
-    for (i = 0; i < 180; i++) L.opdater(1 / 60);
+    for (i = 0; i < 360; i++) L.opdater(1 / 60);
     var samBoble = d.getElementById("sam-laerred-boble");
     paastand("K viser præsentationen igen med taleboblen", L.laererIIntro() && samBoble && !samBoble.hidden);
     NK.visFane("kurve");
@@ -315,7 +374,7 @@ function koer() {
     NK.visFane("udtryk");
     paastand("første gang på en fane står Start præsentation og Nej tak", ses("udtryk-tilbud"));
     d.querySelector("#udtryk-tilbud .tilbud-start").click();
-    for (i = 0; i < 180; i++) L.opdater(1 / 60);
+    for (i = 0; i < 360; i++) L.opdater(1 / 60);
     paastand("efter Start er tilbuddet væk, og han taler", !ses("udtryk-tilbud") && L.laererIIntro() && ses("udtryk-laerred-boble"));
     for (i = 0; i < 1800; i++) L.opdater(1 / 60);
     paastand("han går ikke af sig selv, men venter på Næste", L.laererIIntro() && ses("udtryk-laerred-boble"));
@@ -330,7 +389,17 @@ function koer() {
             && d.querySelectorAll(".fane.aktiv").length === 1);
     });
 
-    overskrift("8. Sproget");
+    overskrift("8. Lav skærm (1400 x 680)");
+    ramme.style.height = "680px";
+    d.body.offsetHeight;
+    paastand("den lave skærm giver en mindre kortzone", parseFloat(w.getComputedStyle(d.documentElement).getPropertyValue("--kortzone")) < 220);
+    NK.visFane("kurve"); zoneTjek("lav, fane 1", S.kurve, "kurve");
+    NK.visFane("sammenstoed"); zoneTjek("lav, fane 2", S.sammenstoed, "sam");
+    NK.visFane("udtryk"); zone3("lav, fane 3"); U.nyOpgave(0);
+    ramme.style.height = "860px";
+    d.body.offsetHeight;
+
+    overskrift("9. Sproget");
     var tekster = [d.getElementById("teori").innerText];
     ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
         NK.visFane(id);

@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stofmængde</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚖</span> Stofmængde</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: VAEGTEN                                                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-vaegt" role="tabpanel" aria-label="Vægten">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="vaegt-laerred"></canvas>
         <div class="anker" id="vaegt-anker-hylde"></div>
         <div class="anker" id="vaegt-anker-vaegt"></div>
@@ -38,24 +39,26 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="vaegt-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="vaegt-skort">
+            <div id="vaegt-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="vaegt-bund">
+                <p class="st-tekst" id="vaegt-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="vaegt-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="vaegt-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="vaegt-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="vaegt-kort">
-            <h2><span id="vaegt-maal-titel">Opvarmning</span><span class="taeller" id="vaegt-taeller">opgave <b id="vaegt-nr">1</b></span></h2>
-            <p class="maal-tekst" id="vaegt-prompt"></p>
-            <p class="besked" id="vaegt-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="vaegt-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="vaegt-maaling">
             <h2>På vægten <span class="taeller" id="vaegt-stof"></span></h2>
             <div class="regn"><span class="regn-navn">Stofmængde</span><span class="regn-linje" id="vaegt-regn-n"></span></div>
             <div class="regn"><span class="regn-navn">Masse</span><span class="regn-linje" id="vaegt-regn-m"></span></div>
             <div class="regn"><span class="regn-navn">Antal atomer</span><span class="regn-linje" id="vaegt-regn-N"></span></div>
             <div class="talraekke"><span>Klumperne fylder</span><span class="tal" id="vaegt-V"></span></div>
+            <button class="knap nulstil" id="vaegt-nulstil" type="button"><span>Tøm vægten</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -64,7 +67,7 @@
 <!-- FANE 2: FLEST ATOMER                                               -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-atomer" role="tabpanel" aria-label="Flest atomer">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="atomer-laerred"></canvas>
         <div class="anker" id="atomer-anker-vaegte"></div>
         <div class="anker" id="atomer-anker-skilt"></div>
@@ -73,36 +76,35 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="atomer-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort spm" id="atomer-skort">
+            <div id="atomer-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="atomer-bund">
+                <p class="st-tekst" id="atomer-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="atomer-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="atomer-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="atomer-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="atomer-kort">
-            <h2><span id="atomer-niveau"></span><span class="taeller">par <b id="atomer-nr">1</b>/<span id="atomer-antal">9</span></span></h2>
-            <p class="opgave-spm">Hvor er der flest atomer? Gæt, før vægtene tæller.</p>
-            <div class="valgrad" id="atomer-valg">
-                <button class="valgknap" type="button" data-svar="v"><span class="pil">←</span>Venstre</button>
-                <button class="valgknap" type="button" data-svar="l"><span class="pil">↓</span>Lige mange</button>
-                <button class="valgknap" type="button" data-svar="h"><span class="pil">→</span>Højre</button>
-            </div>
-            <p class="besked" id="atomer-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="atomer-knap" type="button">Giv hint</button></div>
-        </div>
-
-        <div class="kort maaling">
+        <div class="kort maaling" id="atomer-runden">
             <h2>Runden <span class="taeller">rekord <b id="atomer-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Par</span><span class="tal" id="atomer-par">1/9</span></div>
             <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="atomer-point">0</span></div>
             <div class="talraekke"><span>I træk</span><span class="tal" id="atomer-stime">0</span></div>
+            <button class="knap nulstil" id="atomer-nulstil" type="button"><span>Ny runde</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
 
 <!-- ================================================================= -->
 <!-- FANE 3: AFVEJNING                                                  -->
-<!-- Raekkerne i opgavekortet bygges af sim_afvej.js                    -->
+<!-- Raekkerne i regnestykket bygges af sim_afvej.js                    -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-afvej" role="tabpanel" aria-label="Afvejning">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="afvej-laerred"></canvas>
         <div class="anker" id="afvej-anker-krukke"></div>
         <div class="anker" id="afvej-anker-vaegt"></div>
@@ -111,23 +113,30 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="afvej-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="afvej-skort">
+            <div id="afvej-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="afvej-bund">
+                <p class="st-tekst" id="afvej-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="afvej-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="afvej-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="afvej-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
-        <div class="kort opgavekort" id="afvej-kort">
-            <h2><span id="afvej-niveau"></span><span class="taeller">ordre <b id="afvej-nr">1</b>/<span id="afvej-antal-i-niveau">4</span></span></h2>
-            <div class="opgave-prompt" id="afvej-prompt"></div>
-            <p class="opgave-spm" id="afvej-spm"></p>
+        <!-- Regnestykket: eleven skriver massen her.
+             Ordren, beskeden og knapperne staar paa kortet i scenen. -->
+        <div class="kort regnekort" id="afvej-regn">
+            <h2>Regnestykket <span class="taeller" id="afvej-ordre"></span></h2>
             <div class="raekker" id="afvej-raekker"></div>
-            <p class="besked" id="afvej-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="afvej-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="afvej-fremskridt">
             <h2>Ordrerne <span class="taeller">afvejet <b id="afvej-loest">0</b>/12</span></h2>
             <div class="hyldeliste" id="afvej-niveauer"></div>
+            <button class="knap igen" id="afvej-igen" type="button" hidden><span>Afvej ordren igen</span><span class="tegn">↺</span></button>
             <button class="knap nulstil" id="afvej-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
@@ -180,6 +189,8 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/data.js"></script>
 <script src="js/opgaver.js"></script>
 <script src="js/tjek.js"></script>

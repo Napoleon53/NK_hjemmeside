@@ -35,8 +35,9 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
 4. **Loftet:** 3 faner. Fane 1: 1 burette, 1 kolbe, 1 lup med 8 Cl⁻ og 2 CrO₄²⁻,
    1 kurve med 3 linjer. Fane 2: 4 regnetrin og 1 tavle. Fane 3: 2 opstillinger
    (A og B) og 6 situationer. Havvand fra 6 steder.
-5. **Layoutet:** scene plus panel, som `sc7.4`. Panelet har opgavekortet med én
-   knap (Giv hint, Vis svaret, videre).
+5. **Layoutet:** scene plus panel, som `sc7.4`. Opgaven står på papirkortet
+   øverst i scenen (se Papirkortet nedenfor); panelet har målingerne, kurven,
+   tabellen og Ny prøve eller Start forfra.
 
 ## Hvad den viser
 
@@ -51,7 +52,7 @@ demineraliseret vand og lidt indikator (her beskrevet med kaliumchromat, der
 farver den gul; den nye indikator står under Indikatoren nedenfor), og buretten er
 fyldt med 0,050 M sølvnitrat til 0,00 mL. Havvandet er hentet et af seks steder
 (Vesterhavet, Skagerrak, Kattegat, Lillebælt, Middelhavet og Det Røde Hav), og
-stedet står i opgavekortet. Eleven åbner hanen med skyderen (lukket, dryp, løb);
+stedet står på papirkortet. Eleven åbner hanen med skyderen (lukket, dryp, løb);
 et klik på hanen åbner og lukker, og knappen 1 dråbe giver én dråbe. Sølvnitraten
 løber i dråber på 0,05 mL. Hvidt AgCl gør kolben uklar, og hvide fnug hvirvler
 rundt med loppen. Hvor dråben rammer, kommer en rødbrun sky, der forsvinder igen,
@@ -101,7 +102,7 @@ anden koncentration.
 forbrug), 0,50 g havvand (mindre forbrug) og masseprocenten for den (den samme),
 0,100 M sølvnitrat (mindre forbrug), postevand i stedet for demineraliseret vand
 (masseprocenten for høj, fordi postevand indeholder chlorid) og spildt havvand
-(for lav). Hver situation har en titel i opgavekortet. Spørgsmålene bruger
+(for lav). Hver situation har en titel på papirkortet. Spørgsmålene bruger
 fagordene forbrug, stofmængde og rumfang, ikke "hvor mange mL der skal til"
 (brugerens ønske 28. sept. 2026). Eleven vælger et svar, og så titrerer Kemichael
 begge kolber til omslaget.
@@ -203,7 +204,7 @@ koncentration, prøvens masse, vand, chromat, chlorid i postevand, dråbestørre
 antallet af figurer i luppen og de seks steder) og grænserne for en præcis
 titrering og aflæsningen øverst i `js/data.js`. **Situationerne på fane 3** står i
 `D.SITUATIONER`: hvad der er ændret ved B (`m`, `vand`, `c`, `post`, `spild`),
-titlen i opgavekortet, spørgsmålet, de tre svar, forklaringen til hvert forkert svar, hintet og
+titlen på papirkortet, spørgsmålet, de tre svar, forklaringen til hvert forkert svar, hintet og
 forklaringen bagefter. **Regnetrinene** står i `D.TRIN`, og de godkendte formler og
 beskederne til de typiske fejl i `FORMLER` og resten af `js/tjek.js`.
 
@@ -224,7 +225,27 @@ kaliumchromat. Afsnit 11 kører dichlorfluorescein: knapperne og teorien, modell
 med), fane 1 med luppen og kurven, overtitrering, et skift midt i en titrering,
 tasten I, replikkerne, rundvisningen og fane 3. Den kræver en lokal server eller
 Chrome med `--allow-file-access-from-files`, og den lægger elevens valg tilbage
-bagefter. Sidst kørt 4. november 2026: ALT OK (168 påstande).
+bagefter. Afsnit 12 tjekker papirkortet (se nedenfor). Sidst kørt 6. november 2026: ALT OK (184 påstande).
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`). På alle
+tre faner står opgaven, feltet eller svarene, hintet, beskeden ved en fejl,
+forklaringen og knapperne på ét lyst kort øverst i midten af scenen (`#tit-skort`,
+`#ber-skort`, `#for-skort`, bygget af `js/scenekort.js`). Der er ingen linje
+nederst og intet opgavekort i panelet. Feltet til aflæsningen (fane 1) og felterne
+til formel og tal (fane 2) står på kortet, og Enter i feltet er Indsend svar. På
+fane 3 vælger et klik på et svar kun; Indsend svar er gråt, til der er valgt, og
+sender svaret, og så titrerer Kemichael kolberne. Giv hint er en stille knap med
+gul kant (Giv hint, Vis svaret). Efter svaret bliver kortet på spørgsmålet med
+det valgte svar i grønt (eller tallet i feltet), forklaringen under det og
+knappen videre (Til beregningen, Næste trin, Næste fejlkilde), hvor Indsend svar
+stod. Ny prøve og Start forfra ligger i panelet. Lærredet sætter pladsen øverst
+af til kortet (`zone()`: 176/150 px på fane 1 og 2, 196/172 px på fane 3, den
+lave værdi ved en skærmhøjde på højst 720 px). Når panelet står under scenen
+(under 860 px), er scenen mindst 580 px høj, så opstillingen ikke bliver for
+lille. Ingen molekylenavne at rette (stoffer som O₂ og Cl₂ nævnes ikke).
 
 ## Forenklinger
 

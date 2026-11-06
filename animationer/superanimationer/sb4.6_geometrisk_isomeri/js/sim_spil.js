@@ -10,9 +10,13 @@
    data (EMNER): svarknapperne, teksterne og modellen (NK.CT eller NK.EZ
    i js/ez.js).
 
-   Al tekst staar paa kortet oeverst i scenen: spoergsmaalet, og under
-   det forklaringen efter et svar. Efter en fejl venter spillet, til
-   eleven trykker Naeste, saa forklaringen kan laeses.
+   Al tekst staar paa det lyse papirkort oeverst i scenen (6. nov. 2026):
+   spoergsmaalet og svarknapperne. Et svar vaelges og sendes med Indsend
+   svar (Enter); uret stopper ved Indsend svar. Efter svaret bliver kortet
+   paa molekylet: svaret er groent (eller roedt, og det rigtige groent),
+   forklaringen staar under svarene, og Naeste molekyle staar, hvor
+   Indsend svar stod. Spillet venter altid paa Naeste. Spil igen ligger i
+   panelet, aldrig paa kortet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -47,8 +51,16 @@
         this.navn = "sp";
         this.L = new NK.Laerred(NK.el("sp-laerred"));
         this.tid = 0;
-        this.el = { knap: NK.el("sp-knap"), besked: NK.el("sp-besked"), status: NK.el("sp-status"), valg: NK.el("sp-valg") };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { kort: NK.el("sp-skort"), besked: NK.el("sp-besked"), status: NK.el("sp-status"), valg: NK.el("sp-valg"),
+                    indsend: NK.el("sp-indsend"), bliv: NK.el("sp-bliv"), forfra: NK.el("sp-forfra") };
+        this.el.indsend.addEventListener("click", function () { mig.indsendKlik(); });
+        this.el.forfra.addEventListener("click", function () { mig.start(); });
+        this.el.kort.addEventListener("click", function (e) {
+            if (e.target.closest && e.target.closest("[data-videre]")) mig.knap();
+        });
+        this.L.canvas.addEventListener("click", function () {
+            if (mig.tilstand === "svar" || mig.tilstand === "start") mig.kortBlink();
+        });
         var eb = document.querySelectorAll("#sp-emnekort [data-emne]");
         for (var i = 0; i < eb.length; i++) {
             (function (b) {
@@ -78,10 +90,11 @@
         this.e.svar.forEach(function (s) {
             var k = document.createElement("button");
             k.type = "button";
-            k.className = "valgknap" + (s[0] === "ingen" ? "" : " stor-bogstav");
+            k.className = "sk-knap" + (s[0] === "ingen" ? "" : " stor-bogstav");
             k.textContent = s[1];
             k.title = s[3];
-            k.addEventListener("click", function () { mig.svar(s[0]); });
+            /* Svarknappen vaelger kun; Indsend svar sender svaret */
+            k.addEventListener("click", function () { mig.vaelgSvar(s[0]); });
             mig.el.valg.appendChild(k);
             mig.knapper[s[0]] = k;
         });
@@ -111,18 +124,34 @@
         this.tilstand = "spil";
         this.svaret = null;
         this.startTid = this.tid;
-        this.autoT = 0;
         this.stempel = null;
-        for (var k in this.knapper) this.knapper[k].classList.remove("rigtig", "forkert");
+        this.valgt = null;
+        for (var k in this.knapper) this.knapper[k].classList.remove("rigtig", "forkert", "valgt");
         this.visPanel();
         this.visStatus();
+    };
+
+    /* Et svar vaelges (klik eller tast); Indsend svar sender det */
+    P.vaelgSvar = function (s) {
+        if (this.tilstand !== "spil" || !this.knapper[s]) return;
+        this.valgt = s;
+        for (var k in this.knapper) this.knapper[k].classList.toggle("valgt", k === s);
+        this.visKnap();
+    };
+
+    P.indsendKlik = function () {
+        if (this.tilstand !== "spil") return;
+        if (!this.valgt) { this.besked("Vælg først et svar på kortet. Tryk så Indsend svar.", "peger"); return; }
+        this.svar(this.valgt);
     };
 
     P.svar = function (s) {
         if (this.tilstand !== "spil") return;
         var r = this.r, sek = this.tid - this.startTid, model = this.e.model;
         this.svaret = s;
+        this.valgt = null;
         this.tilstand = "svar";
+        for (var v in this.knapper) this.knapper[v].classList.remove("valgt");
         if (s === r.type) {
             var bonus = 0, ord = "";
             D.SPIL.bonus.some(function (b) {
@@ -135,8 +164,7 @@
             this.rigtige++;
             this.stempel = { tekst: "+" + p, farve: T.GROEN, t: 0.001 };
             this.knapper[s].classList.add("rigtig");
-            this.autoT = 1.6;
-            this.besked('<span class="b-maerke stor">Rigtigt +' + p + "</span> " + (ord ? NK.html(ord) + ". " : "") + NK.html(model.dom(r)), "god");
+            this.forklaring = { maerke: "Rigtigt +" + p, tekst: (ord ? NK.html(ord) + ". " : "") + NK.html(model.dom(r)), god: true };
         } else {
             this.stime = 0;
             this.stempel = { tekst: "Forkert", farve: T.ROED, t: 0.001 };
@@ -144,11 +172,10 @@
             this.knapper[r.type].classList.add("rigtig");
             /* Forklaringen til cis og trans slutter selv med svaret */
             var hoved = r.type === "ingen" || this.emne === "ct" ? "" : "Svaret er " + r.type + ". ";
-            this.besked('<span class="b-maerke">Forkert</span> ' + NK.html(hoved + model.fejl(r, s)), "skidt");
-            this.ryst();
+            this.forklaring = { maerke: "Forkert", tekst: NK.html(hoved + model.fejl(r, s)), god: false };
         }
         this.visPanel();
-        this.visKnap();
+        this.visStatus();
     };
 
     P.slut = function () {
@@ -159,26 +186,38 @@
         D.SPIL.rang.forEach(function (r) { if (mig.score >= r[0]) mig.rang = r; });
         this.nyRekord = this.score > this.rekord;
         if (this.nyRekord) { this.rekord = this.score; NK.gem(this.e.rekord, this.rekord); }
+        this.forklaring = { maerke: this.rang[1], tekst: this.rigtige + " af " + D.SPIL.runder + " rigtige og " +
+            this.score + " point. " + NK.html(this.rang[2]) + (this.nyRekord ? " Ny rekord." : "") + " Spil igen med knappen i panelet.",
+            god: this.rigtige >= 12 };
         this.visPanel();
         this.visStatus();
-        this.besked('<span class="b-maerke stor">' + NK.html(this.rang[1]) + "</span> " + this.rigtige + " af " + D.SPIL.runder + " rigtige og " +
-            this.score + " point. " + NK.html(this.rang[2]) + (this.nyRekord ? " Ny rekord." : ""), this.rigtige >= 12 ? "god" : "gul");
     };
 
+    /* Den groenne knap paa kortet foerer altid fremad: Start spillet eller
+       Naeste molekyle. Efter sidste molekyle er der ingen knap paa kortet. */
     P.knap = function () {
-        if (this.tilstand === "start" || this.tilstand === "slut") { this.start(); return; }
+        if (this.tilstand === "start") { this.start(); return; }
         if (this.tilstand === "svar") { this.naeste(); return; }
     };
 
-    P.enter = function () { this.knap(); };
+    P.enter = function () {
+        if (this.tilstand === "spil") this.indsendKlik(); else this.knap();
+    };
 
     P.tast = function (k) {
         var m = null;
         k = k.toLowerCase();
         this.e.svar.forEach(function (s) { if (s[2] === k) m = s[0]; });
         if (!m) return false;
-        if (this.tilstand === "spil") this.svar(m);
+        this.vaelgSvar(m);
         return true;
+    };
+
+    P.kortBlink = function () {
+        var e = this.el.kort;
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
     };
 
     P.nulstil = function () {
@@ -187,7 +226,8 @@
         this.stime = 0;
         this.runde = 0;
         this.stempel = null;
-        for (var k in this.knapper) this.knapper[k].classList.remove("rigtig", "forkert");
+        this.valgt = null;
+        for (var k in this.knapper) this.knapper[k].classList.remove("rigtig", "forkert", "valgt");
         this.visPanel();
         this.visStatus();
     };
@@ -195,10 +235,14 @@
     /* ----- Kortet oeverst i scenen og panelet --------------------------------------------- */
     P.besked = function (html, klasse) {
         this.el.besked.innerHTML = html;
-        this.el.status.className = "statuslinje" + (klasse ? " " + klasse : "");
+        this.el.status.className = "sk-bund" + (klasse ? " " + klasse : "");
     };
 
-    P.beskedTekst = function () { return this.el.besked.textContent; };
+    /* Teksten nederst paa kortet: beskeden, eller forklaringen efter et svar */
+    P.beskedTekst = function () {
+        if (!this.el.bliv.hidden) { var t = this.el.bliv.querySelector(".st-tekst"); return t ? t.textContent : ""; }
+        return this.el.besked.textContent;
+    };
 
     P.ryst = function () {
         var e = this.el.status;
@@ -207,26 +251,39 @@
         e.classList.add("ryster");
     };
 
-    /* Spoergsmaalet staar stille paa kortet gennem hele spillet; kun linjen
-       under det skifter */
+    /* Spoergsmaalet staar stille paa kortet gennem hele spillet. Under det:
+       Indsend svar, eller (efter et svar) forklaringen og Naeste molekyle */
     P.visStatus = function () {
         var e = this.e, t = this.tilstand;
-        NK.saetTekst("sp-titel", e.titel);
-        NK.saetTekst("sp-taeller", this.runde && t !== "slut" ? "molekyle " + this.runde + " af " + D.SPIL.runder : "");
-        var prompt = t === "start" ? e.start : (t === "slut" ? "" : e.spm);
-        NK.saetHTML("sp-prompt", prompt ? '<p class="maal-tekst">' + NK.html(prompt) + "</p>" : "");
-        if (t === "start" || t === "spil") this.besked("", "");
+        var etiket = t === "start" || t === "slut" ? e.titel : "Molekyle " + this.runde + " af " + D.SPIL.runder;
+        var prompt = t === "start" ? e.start : (t === "slut" ? "Spillet er slut." : e.spm);
+        NK.saetHTML("sp-prompt", '<span class="sk-chip">' + NK.html(etiket) + "</span>" + NK.Papir.tekst(NK.html(prompt)));
+        this.el.valg.hidden = t === "start" || t === "slut";
+        if (t === "spil") this.besked("", "");
+        var blivNu = t !== "spil";
+        this.el.status.hidden = blivNu;
+        this.el.bliv.hidden = !blivNu;
+        var html = "";
+        if (t === "start") {
+            html = '<div class="sk-bund bliv start"><p class="st-tekst">Rekord: ' + this.rekord + " point. Svar så hurtigt, du kan.</p>" +
+                '<button type="button" class="sk-videre" data-videre="1">Start spillet</button></div>';
+        } else if (t === "svar") {
+            var f = this.forklaring;
+            html = NK.Papir.bliv(f.tekst, NK.html(f.maerke), this.runde >= D.SPIL.runder ? "Se resultatet →" : "Næste molekyle →", !f.god);
+            if (!f.god) html = html.replace("sk-bund bliv svar", "sk-bund bliv forkert");
+        } else if (t === "slut") {
+            html = NK.Papir.bliv(this.forklaring.tekst, NK.html(this.forklaring.maerke), "-", !this.forklaring.god).replace(/<button[\s\S]*?<\/button>/, "");
+        }
+        this.el.bliv.innerHTML = html;
+        this.el.kort.classList.toggle("loest", t === "svar" && this.forklaring && this.forklaring.god);
         this.visKnap();
     };
 
     P.visKnap = function () {
-        var k = this.el.knap, t = this.tilstand;
-        k.textContent = t === "start" ? "Start spillet" : (t === "slut" ? "Spil igen ↺" : "Næste molekyle →");
-        k.className = "knap videre banker";
-        k.hidden = t === "spil";
+        var t = this.tilstand;
         var aktiv = t === "spil";
         for (var n in this.knapper) this.knapper[n].disabled = !aktiv;
-        this.el.valg.classList.toggle("slukket", !aktiv);
+        this.el.indsend.classList.toggle("ikke-klar", !this.valgt);
     };
 
     P.visPanel = function () {
@@ -238,7 +295,7 @@
 
     /* ----- Fanens kontrakt med app.js ------------------------------------------------------ */
     P.tilpas = function () {
-        var h = this.el.status.offsetHeight;
+        var h = this.el.kort.offsetHeight;
         if (this.L.tilpas() || !this.lay || h !== this._baandH) {
             this._baandH = h;
             this.layout();
@@ -247,11 +304,10 @@
 
     P.layout = function () {
         var L = this.L;
-        var top = NK.kortZone(this.el.status);
-        var bund = L.h - 62 - 16;
+        var top = NK.kortZone(this.el.kort);
+        var bund = L.h - 16;   /* svarknapperne staar paa kortet */
         var tavle = { x: 18, y: top, b: L.b - 36, h: Math.max(200, bund - top) };
         this.lay = { tavle: tavle, cx: tavle.x + tavle.b / 2, cy: tavle.y + tavle.h / 2 + 4, u: Math.min(tavle.b * 0.15, tavle.h * 0.26) };
-        this.el.valg.style.bottom = "12px";
         var a = NK.el("sp-anker-tavle");
         a.style.left = tavle.x + "px";
         a.style.top = tavle.y + "px";
@@ -264,10 +320,7 @@
     P.opdater = function (dt) {
         this.tid += dt;
         if (this.stempel && this.stempel.t < 1) this.stempel.t = Math.min(1, this.stempel.t + dt);
-        if (this.tilstand === "svar" && this.autoT > 0) {
-            this.autoT -= dt;
-            if (this.autoT <= 0) this.naeste();
-        }
+        /* Spillet venter altid paa Naeste molekyle (papirkortet, 6. nov. 2026) */
     };
 
     P.tegn = function () {

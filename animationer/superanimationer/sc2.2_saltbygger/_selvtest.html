@@ -262,7 +262,7 @@ function koer() {
     var knap = d.getElementById("bord-opgaveknap");
     fb.visFrit();
     paastand("sandkassen viser Start opgave og knapperne til bordet",
-        knap.textContent === "Start opgave" && !d.getElementById("byg-knapper").hidden && d.getElementById("bord-afslut").hidden);
+        /Start opgave/.test(knap.textContent) && !d.getElementById("byg-knapper").hidden && d.getElementById("bord-afslut").hidden);
     knap.click();
     paastand("Start opgave giver en opgave og knappen Giv hint",
         !!fb.opgave && fb.fase === "byg" && knap.textContent === "Giv hint" && d.getElementById("byg-knapper").hidden,
@@ -273,38 +273,43 @@ function koer() {
     var loestFoer = fb.loeste;
     knap.click();
     paastand("Vis svaret løser opgaven uden at tælle med", fb.fase === "faerdig" && fb.loeste === loestFoer
-        && knap.textContent === "Ny opgave");
+        && /Næste opgave/.test(knap.textContent));
     knap.click();
     paastand("Ny opgave giver en ny opgave i den anden retning", fb.fase === "byg" && knap.textContent === "Giv hint"
         && fb.retning === "formel", fb.retning);
     d.getElementById("bord-afslut").click();
-    paastand("Afslut fører tilbage til sandkassen", !fb.opgave && knap.textContent === "Start opgave"
+    paastand("Afslut fører tilbage til sandkassen", !fb.opgave && /Start opgave/.test(knap.textContent)
         && !d.getElementById("byg-knapper").hidden);
 
     overskrift("13. Opgave: fra navn til formel");
     fb.startOpgave(D.salt("Al", "SO4"), "navn");
     paastand("formlen under bordet er slået fra under opgaven", !fb.bord.visFormel);
     fb.bord.vaelg(D.ion("S"));
+    fb.indsendKlik();
     var besked = d.getElementById("bord-besked").textContent;
     paastand("sulfid i stedet for sulfat giver en besked om forskellen", /sulfid/.test(besked) && /sulfat/.test(besked), besked);
     fb.bord.saet(D.ion("Al"), 4, D.ion("SO4"), 6);
+    fb.indsendKlik();
     paastand("4 : 6 åbner ikke formelvalget", fb.fase === "byg");
     fb.bord.saet(D.ion("Al"), 2, D.ion("SO4"), 3);
+    fb.indsendKlik();
     paastand("de rigtige ioner åbner formelvalget", fb.fase === "valg" && fb.svar.knapper.length === 4);
     var rigtig2 = -1;
     for (i = 0; i < fb.svar.valg.length; i++) if (fb.svar.valg[i].rigtig) rigtig2 = i;
     loestFoer = fb.loeste;
-    fb.svar.knapper[rigtig2].click();
+    fb.svar.knapper[rigtig2].click(); fb.indsendKlik();
     paastand("rigtigt svar tæller med, og knappen bliver Ny opgave",
-        fb.fase === "faerdig" && fb.loeste === loestFoer + 1 && knap.textContent === "Ny opgave", "løst: " + fb.loeste);
+        fb.fase === "faerdig" && fb.loeste === loestFoer + 1 && /Næste opgave/.test(knap.textContent), "løst: " + fb.loeste);
 
     overskrift("13b. Opgave: fra formel til navn");
     fb.startOpgave(D.salt("Fe3", "SO4"), "formel");
     fb.bord.saet(D.ion("Fe2"), 2, D.ion("SO4"), 3);
+    fb.indsendKlik();
     besked = d.getElementById("bord-besked").textContent;
     paastand("Fe²⁺ med formlens tal giver besked om ladningen", fb.fase === "byg" && /Jern findes/.test(besked), besked);
     paastand("hintet spørger efter ladningen", /ladning/.test(fb.hint()), fb.hint());
     fb.bord.saet(D.ion("Fe3"), 2, D.ion("SO4"), 3);
+    fb.indsendKlik();
     paastand("Fe³⁺ åbner navnevalget", fb.fase === "valg");
     var rigtig3 = -1;
     for (i = 0; i < fb.svar.valg.length; i++) if (fb.svar.valg[i].rigtig) rigtig3 = i;
@@ -319,6 +324,7 @@ function koer() {
         fb.startOpgave(s, "navn");
         if (!fb.hint()) tommeHints.push(s.formel + " byg");
         fb.bord.saet(s.kat, s.p, s.an, s.n);
+        fb.indsendKlik();
         if (fb.fase !== "valg" || !fb.hint()) tommeHints.push(s.formel + " valg");
     });
     D.FORMEL_OPGAVER.forEach(function (o) {
@@ -326,6 +332,7 @@ function koer() {
         fb.startOpgave(s, "formel");
         if (!fb.hint()) tommeHints.push(s.formel + " byg");
         fb.bord.saet(s.kat, s.p, s.an, s.n);
+        fb.indsendKlik();
         if (fb.fase !== "valg" || !fb.hint()) tommeHints.push(s.formel + " valg");
     });
     paastand("hint og formel- eller navnevalg for " + (D.NAVN_OPGAVER.length + D.FORMEL_OPGAVER.length) + " opgaver",
@@ -340,6 +347,7 @@ function koer() {
     paastand("en ions tooltip viser kun formlen", fb.bord.chips["Na"].title === "Na⁺", fb.bord.chips["Na"].title);
     fb.startOpgave(D.salt("Na", "Cl"), "navn");
     fb.bord.vaelg(D.ion("O"));
+    fb.indsendKlik();
     besked = d.getElementById("bord-besked").textContent;
     paastand("fejlbeskeden nævner ikke ionernes navne", !!besked && besked.indexOf("oxid") < 0 && besked.indexOf("chlorid") < 0, besked);
     navneBoks.checked = true;
@@ -394,13 +402,13 @@ function koer() {
     var rv = -1;
     for (i = 0; i < f4.svar.valg.length; i++) if (f4.svar.valg[i].rigtig) rv = i;
     loestFoer = f4.loeste;
-    f4.svar.knapper[rv].click();
+    f4.svar.knapper[rv].click(); f4.indsendKlik();
     koerVand(6);
     paastand("rigtigt svar tæller, og vandet fordamper til en krystal", f4.loeste === loestFoer + 1 && f4.fase === "inddampet"
-        && f4.niveau < 0.02 && vknap.textContent === "Ny opgave", f4.fase);
+        && f4.niveau < 0.02 && /Næste opgave/.test(vknap.textContent), f4.fase);
     d.getElementById("vand-afslut").click();
     paastand("Afslut fører tilbage til sandkassen", !f4.opgave && !d.getElementById("vand-saltkort").hidden
-        && vknap.textContent === "Start opgave");
+        && /Start opgave/.test(vknap.textContent));
 
     overskrift("16. Krystalgitteret for alle salte i vælgeren");
     var gitterFejl = [], ikkeRoer = [], forhold = [];
@@ -437,7 +445,7 @@ function koer() {
     if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
     /* Gå gennem trin 1 (den kendte ion) ved at vælge det rigtige svar. */
     function vaelgRigtig(sim) {
-        for (var ii = 0; ii < sim.svar.valg.length; ii++) if (sim.svar.valg[ii].rigtig) { sim.svar.knapper[ii].click(); return true; }
+        for (var ii = 0; ii < sim.svar.valg.length; ii++) if (sim.svar.valg[ii].rigtig) { sim.svar.knapper[ii].click(); sim.indsendKlik(); return true; }
         return false;
     }
     var entydig = [], iHylden = [], daarligValg = [], daarligKendt = [], tommeHint3 = [];
@@ -466,6 +474,7 @@ function koer() {
         vaelgRigtig(fu);
         if (fu.fase !== "ladning" || !fu.hint()) tommeHint3.push(s.formel + " trin 2");
         fu.bord.saetGaet(Math.abs(fu.ion.q));
+        fu.indsendKlik();
         if (o.side === "an") {
             var fejlP = tjekValg(D.ion(o.partner).formel, D.kendtValg(D.ion(o.partner)), D.ionTekst(D.ion(o.partner)));
             if (fejlP) daarligKendt.push(fejlP);
@@ -503,7 +512,7 @@ function koer() {
     fu.startOpgave(snOpg);
     koerU(1);
     paastand("opgaven præsenteres først: SnO₂, Start opgave og ingen svarmuligheder endnu", fu.fase === "intro"
-        && ukn.textContent === "Start opgave" && fu.svar.knapper.length === 0
+        && /Start opgave/.test(ukn.textContent) && fu.svar.knapper.length === 0
         && /SnO₂/.test(d.getElementById("ukendt-opgavetekst").textContent), d.getElementById("ukendt-opgavetekst").textContent);
     paastand("alle kort er foldet sammen uden plus og minus, og der er ingen knapper",
         fu.bord.plus() === 0 && fu.bord.kort.every(function (k) { return fu.bord.tandKort(k) === 0; })
@@ -545,7 +554,7 @@ function koer() {
     d.querySelector("#opslag-pt [data-luk]").click();
     var forkertK = -1;
     for (i = 0; i < fu.svar.valg.length; i++) if (fu.svar.valg[i].tekst === "O⁶⁺") forkertK = i;
-    fu.svar.knapper[forkertK].click();
+    fu.svar.knapper[forkertK].click(); fu.indsendKlik();
     paastand("O⁶⁺ giver en forklaring og bliver på trin 1", fu.fase === "kendt"
         && /lettere at optage 2/.test(d.getElementById("ukendt-besked").textContent), d.getElementById("ukendt-besked").textContent);
     vaelgRigtig(fu);
@@ -558,11 +567,14 @@ function koer() {
         trinSvar(1) + " / " + trinForkl(1) + " / " + d.getElementById("ukendt-hint").textContent);
     paastand("knappen ved Sn viser Sn ?, og beskeden siger, hvad Sn skal opveje",
         fu.bord.styr.kat.el.style.display === "" && fu.bord.styr.kat.antal.textContent === "Sn ?"
-        && /skal opveje/.test(d.getElementById("ukendt-note").textContent), d.getElementById("ukendt-note").textContent);
+        && /Sn<\/b> skal opveje <b>−4/.test(d.getElementById("ukendt-opgavetekst").innerHTML) && d.getElementById("ukendt-note").hidden,
+        d.getElementById("ukendt-opgavetekst").textContent);
     fu.bord.saetGaet(2);
-    paastand("Sn²⁺: beskeden siger, at der mangler plus", /mangler plus/.test(d.getElementById("ukendt-note").textContent)
-        && fu.fase === "ladning", d.getElementById("ukendt-note").textContent);
+    fu.indsendKlik();
+    paastand("Sn²⁺: beskeden på kortet siger, at der mangler plus", /mangler plus/.test(d.getElementById("ukendt-besked").textContent)
+        && fu.fase === "ladning", d.getElementById("ukendt-besked").textContent);
     fu.bord.saetGaet(1);
+    fu.indsendKlik();
     koerU(0.5);
     /* Træk i kortets kant: tre felter til højre giver ladningen 4. */
     var uk = fu.bord.ukendtKortVed({ x: fu.bord.kort.filter(function (k) { return k.side === "kat" && !k.doer; })[0].x + 5,
@@ -576,6 +588,9 @@ function koer() {
     fu.bord.canvas.dispatchEvent(upe("pointerdown", kx, ky));
     fu.bord.canvas.dispatchEvent(upe("pointermove", kx + fu.bord.g.U * 3, ky));
     fu.bord.canvas.dispatchEvent(upe("pointerup", kx + fu.bord.g.U * 3, ky));
+    paastand("lynlåsen bedømmer ikke af sig selv: Sn⁴⁺ venter på Indsend svar", fu.bord.ukendt.q === 4 && fu.fase === "ladning"
+        && d.getElementById("ukendt-indsend").classList.contains("klar"), fu.fase);
+    fu.indsendKlik();
     paastand("et træk på tre felter giver Sn⁴⁺, og lynlåsen lukker", fu.bord.ukendt.q === 4 && fu.fase === "valg"
         && fu.svar.knapper.length === 4 && d.getElementById("ukendt-note").hidden, "q=" + fu.bord.ukendt.q + " / " + fu.fase);
     paastand("kortet viser nu ladningen i stedet for ?", fu.bord.ukendt.fundet && fu.bord.laast);
@@ -588,15 +603,15 @@ function koer() {
     var rigtigU = -1;
     for (i = 0; i < fu.svar.valg.length; i++) if (fu.svar.valg[i].rigtig) rigtigU = i;
     loestFoer = fu.loeste;
-    fu.svar.knapper[rigtigU].click();
+    fu.svar.knapper[rigtigU].click(); fu.indsendKlik();
     paastand("tin(IV)oxid tæller med, og navnet vises over bordet", fu.loeste === loestFoer + 1
-        && d.getElementById("ukendt-un").textContent === "tin(IV)oxid" && ukn.textContent === "Ny opgave");
+        && d.getElementById("ukendt-un").textContent === "tin(IV)oxid" && /Næste opgave/.test(ukn.textContent));
     paastand("efter det rigtige svar: hintet er væk, beskeden siger Rigtigt, og trin 3 viser navnet",
         tomt("ukendt-hint") && /Rigtigt/.test(d.getElementById("ukendt-besked").textContent) && trinSvar(3) === "tin(IV)oxid",
         d.getElementById("ukendt-hint").textContent);
     ukn.click();
     paastand("Ny opgave skifter til en ukendt sammensat ion og præsenterer den først", fu.o.side === "an"
-        && fu.fase === "intro" && ukn.textContent === "Start opgave" && !trinSvar(1) && tomt("ukendt-besked"), fu.o.an);
+        && fu.fase === "intro" && /Start opgave/.test(ukn.textContent) && !trinSvar(1) && tomt("ukendt-besked"), fu.o.an);
     paastand("opgaven med den sammensatte ion har fire trin", !d.getElementById("ukendt-t4").hidden
         && new RegExp(fu.partner.formel).test(d.getElementById("ukendt-t3").textContent), d.getElementById("ukendt-t3").textContent);
     /* Start, og saa hint og svar ét trin ad gangen. */
@@ -647,7 +662,7 @@ function koer() {
         sidsteHint.indexOf(D.ionTekst(pa)) >= 0 && sidsteHint.indexOf(D.ionTekst(fu.ion)) >= 0 && /lige op/.test(sidsteHint), sidsteHint);
     ukn.click();
     paastand("trin 4: Vis svaret afslutter uden at tælle med og rydder hintet", fu.fase === "faerdig" && fu.loeste === loestFoer + 1
-        && ukn.textContent === "Ny opgave" && tomt("ukendt-hint") && trinSvar(4) === D.formel(pa, fu.ion));
+        && /Næste opgave/.test(ukn.textContent) && tomt("ukendt-hint") && trinSvar(4) === D.formel(pa, fu.ion));
     var nyF = D.forhold(pa, fu.ion);
     paastand("bagefter ligger " + D.formel(pa, fu.ion) + " på bordet, låst, og formlen står over bordet",
         bu.nKat === nyF.p && bu.nAn === nyF.n && bu.laast && bu.neutral()
@@ -657,6 +672,7 @@ function koer() {
     fu.begynd();
     vaelgRigtig(fu);
     fu.bord.saetGaet(1);
+    fu.indsendKlik();
     paastand("ladningen 1 vises som ClO⁻, ikke som et løst minus", fu.bord.styr.an.antal.textContent === "ClO⁻",
         fu.bord.styr.an.antal.textContent);
     d.querySelector('.faneknap[data-fane="fane-bord"]').click();
@@ -876,7 +892,7 @@ function koer() {
         if (o.partner) D.kendtValg(D.ion(o.partner)).forEach(function (v) { saml(v.tekst + " " + v.forklaring, o.partner + " partner"); });
         fu3.startOpgave(o);
         saml(fu3.laererStartReplik(), s.formel + " Kemichael");
-        saml(d.getElementById("ukendt-opgavetekst").textContent + " " + d.querySelector("#ukendt-opgavekort .trin").textContent, s.formel + " intro");
+        saml(d.getElementById("ukendt-opgavetekst").textContent + " " + d.querySelector("#ukendt-skort .trin").textContent, s.formel + " intro");
         fu3.begynd();
         saml(fu3.hint() + " " + d.getElementById("ukendt-opgavetekst").textContent, s.formel + " trin 1");
         vaelgRigtig(fu3);
@@ -885,7 +901,8 @@ function koer() {
         for (var gq = 1; gq <= D.UKENDT_MAKS; gq++) {
             if (fu3.fase !== "ladning") break;
             fu3.bord.saetGaet(gq);
-            saml(d.getElementById("ukendt-note").textContent, s.formel + " skub " + gq);
+            fu3.indsendKlik();
+            saml(d.getElementById("ukendt-besked").textContent, s.formel + " skub " + gq);
         }
         if (fu3.fase === "partner") {
             saml(fu3.hint() + " " + d.getElementById("ukendt-opgavetekst").textContent + " "
@@ -894,7 +911,7 @@ function koer() {
         }
         saml(fu3.hint() + " " + d.getElementById("ukendt-besked").textContent + " "
             + d.getElementById("ukendt-spm").textContent + " " + d.getElementById("ukendt-opgavetekst").textContent + " "
-            + d.querySelector("#ukendt-opgavekort .trin").textContent, s.formel + " sidste trin");
+            + d.querySelector("#ukendt-skort .trin").textContent, s.formel + " sidste trin");
         vaelgRigtig(fu3);
         saml(d.getElementById("ukendt-besked").textContent, s.formel + " løst");
     });
@@ -913,7 +930,169 @@ function koer() {
     });
     paastand("alle trin i rundvisningen har et mål", mangler.length === 0, mangler.join(", "));
 
+    overskrift("20. Papirkortet (6. nov. 2026)");
+    papirkort(d, NK, ramme);
+
     vis();
+}
+
+/* Papirkortet: opgaven, svarene, hint, beskeden, Indsend svar og knappen
+   videre staar paa ét kort oeverst i scenen paa alle tre faner. */
+function papirkort(d, NK, ramme) {
+    var D = NK.Data, i;
+    var fb = NK.sims["fane-bord"], f4 = NK.sims["fane-vand"], fu = NK.sims["fane-ukendt"];
+    if (NK.Kemichael && NK.Kemichael.baggrundsliv) NK.Kemichael.baggrundsliv(false);
+    function rigtigIdx(sim) { for (var k = 0; k < sim.svar.valg.length; k++) if (sim.svar.valg[k].rigtig) return k; return -1; }
+    function forkertIdx(sim) { for (var k = 0; k < sim.svar.valg.length; k++) if (!sim.svar.valg[k].rigtig) return k; return -1; }
+    function graa(id) { var e = d.getElementById(id); return !e.hidden && /ikke-klar/.test(e.className); }
+
+    paastand("kortene står i scenen, ikke i panelet",
+        ["bord", "vand", "ukendt"].every(function (n) {
+            return d.querySelector("#fane-" + n + " .scene #" + n + "-skort #" + n + "-indsend") !== null
+                && d.querySelector("#fane-" + n + " .scene #" + n + "-skort #" + n + "-opgaveknap") !== null
+                && d.querySelector("#fane-" + n + " .panel .valgknap, #fane-" + n + " .panel .besked.hint, #fane-" + n + " .panel #" + n + "-opgaveknap") === null;
+        }) && d.querySelector(".opgavekort") === null);
+    paastand("ingen statuslinje nederst", d.querySelector(".statuslinje") === null);
+    paastand("Afslut opgaverne står i panelet, ikke på kortet", d.querySelector("#fane-bord .panel #bord-afslut") !== null
+        && d.querySelector("#fane-vand .panel #vand-afslut") !== null && d.querySelector(".scenekort .forfraknap, .scenekort #bord-afslut, .scenekort #vand-afslut") === null);
+
+    /* Fane 1 */
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
+    fb.visFrit();
+    fb.startOpgave(D.salt("Ca", "Cl"), "navn");
+    paastand("fane 1: Indsend svar er gråt, før der ligger noget på bordet", graa("bord-indsend"));
+    fb.indsendKlik();
+    paastand("fane 1: gråt Indsend svar bedømmer intet, men kortet blinker", fb.fase === "byg" && /blink/.test(d.getElementById("bord-skort").className));
+    fb.bord.saet(D.ion("Ca"), 1, D.ion("Cl"), 2);
+    paastand("fane 1: bordet bedømmer ikke af sig selv", fb.fase === "byg" && !graa("bord-indsend"));
+    fb.indsendKlik();
+    paastand("fane 1: Indsend svar åbner formelvalget, og Indsend er gråt igen", fb.fase === "valg" && graa("bord-indsend"));
+    d.getElementById("bord-skort").classList.remove("blink");
+    fb.bord.canvas.dispatchEvent(new ramme.contentWindow.PointerEvent("pointerdown", { bubbles: true, button: 0, clientX: 10, clientY: 300, pointerId: 3, isPrimary: true }));
+    paastand("fane 1: et klik på det låste bord får kortet til at blinke", /blink/.test(d.getElementById("bord-skort").className));
+    var lf = fb.loeste;
+    fb.svar.knapper[rigtigIdx(fb)].click();
+    paastand("fane 1: et klik på et svar vælger kun", fb.fase === "valg" && fb.loeste === lf && !graa("bord-indsend"));
+    fb.indsendKlik();
+    var bk = d.querySelector("#bord-skort .valgknap.rigtig");
+    paastand("fane 1: rigtigt svar bliver på spørgsmålet, svaret er grønt, og Næste står, hvor Indsend svar stod",
+        fb.fase === "faerdig" && !!bk && /Rigtigt/.test(d.getElementById("bord-besked").textContent) && /god/.test(d.getElementById("bord-besked").className)
+        && d.getElementById("bord-indsend").hidden && /Næste opgave/.test(d.getElementById("bord-opgaveknap").textContent)
+        && /sk-videre/.test(d.getElementById("bord-opgaveknap").className));
+    d.getElementById("bord-opgaveknap").click();
+    paastand("fane 1: Næste giver en ny opgave uden rosen", fb.fase === "byg" && !d.getElementById("bord-besked").textContent
+        && !d.querySelector("#bord-skort .valgknap"));
+
+    /* Fane 2 */
+    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
+    f4.visFrit();
+    d.getElementById("vand-opgaveknap").click();
+    paastand("fane 2: Indsend svar er gråt uden valgt svar", graa("vand-indsend") && f4.svar.knapper.length > 0);
+    lf = f4.loeste;
+    f4.svar.knapper[forkertIdx(f4)].click();
+    paastand("fane 2: et klik på et svar vælger kun", f4.loeste === lf && !d.getElementById("vand-besked").textContent && !graa("vand-indsend"));
+    f4.indsendKlik();
+    paastand("fane 2: forkert svar giver en rød besked på kortet", /Ikke rigtigt/.test(d.getElementById("vand-besked").textContent)
+        && /skidt/.test(d.getElementById("vand-besked").className));
+    f4.svar.knapper[rigtigIdx(f4)].click(); f4.indsendKlik();
+    paastand("fane 2: rigtigt svar bliver på spørgsmålet med Næste opgave, hvor Indsend svar stod",
+        f4.loeste === lf + 1 && !!d.querySelector("#vand-skort .valgknap.rigtig") && d.getElementById("vand-indsend").hidden
+        && /Næste opgave/.test(d.getElementById("vand-opgaveknap").textContent));
+    d.getElementById("vand-opgaveknap").click();
+    paastand("fane 2: Næste giver en ny opgave uden rosen", !d.getElementById("vand-besked").textContent && graa("vand-indsend"));
+    d.getElementById("vand-afslut").click();
+
+    /* Fane 3 */
+    d.querySelector('.faneknap[data-fane="fane-ukendt"]').click();
+    fu.startOpgave(D.UKENDT_OPGAVER.filter(function (o) { return o.side === "kat"; })[0]);
+    fu.begynd();
+    paastand("fane 3: Indsend svar er gråt uden valgt svar", graa("ukendt-indsend") && fu.fase === "kendt");
+    fu.svar.knapper[rigtigIdx(fu)].click();
+    paastand("fane 3: et klik på et svar vælger kun", fu.fase === "kendt" && !graa("ukendt-indsend"));
+    fu.indsendKlik();
+    paastand("fane 3: lynlåsen venter på Indsend svar", fu.fase === "ladning" && graa("ukendt-indsend"));
+    fu.bord.saetGaet(Math.abs(fu.ion.q));
+    paastand("fane 3: den rigtige ladning bedømmes ikke af sig selv", fu.fase === "ladning" && !graa("ukendt-indsend"));
+    fu.indsendKlik();
+    fu.svar.knapper[rigtigIdx(fu)].click(); fu.indsendKlik();
+    paastand("fane 3: rigtigt navn bliver på spørgsmålet med Næste opgave, hvor Indsend svar stod", fu.fase === "faerdig"
+        && !!d.querySelector("#ukendt-skort .valgknap.rigtig") && d.getElementById("ukendt-indsend").hidden
+        && /Næste opgave/.test(d.getElementById("ukendt-opgaveknap").textContent));
+
+    /* Kortet i den plads, der er sat af: almindelig og lav skaerm. Hver
+       opgave og hvert trin maales med hint og en besked fremme. */
+    var zFejl = [], maks = {}, geo = {}, gw = ramme.style.width, gh = ramme.style.height;
+    function maal(navn, id, basis, under) {
+        var h = d.getElementById(id).offsetHeight;
+        if (!maks[navn] || h > maks[navn][0]) maks[navn] = [h, under];
+        if (h > basis) zFejl.push(navn + " " + h + ">" + basis + " " + under);
+    }
+    [[1400, 860, 0], [1280, 680, 1]].forEach(function (m) {
+        ramme.style.width = m[0] + "px"; ramme.style.height = m[1] + "px";
+        var skaerm = m[0] + "×" + m[1];
+
+        d.querySelector('.faneknap[data-fane="fane-bord"]').click();
+        D.NAVN_OPGAVER.concat(D.FORMEL_OPGAVER).forEach(function (o, k) {
+            var s = D.salt(o.kat, o.an);
+            fb.startOpgave(s, k < D.NAVN_OPGAVER.length ? "navn" : "formel");
+            fb.visHint();
+            fb.bord.saet(s.kat, s.p * 2, s.an, s.n * 2); fb.indsendKlik();
+            maal(skaerm + " fane 1", "bord-skort", [214, 204][m[2]], s.formel + " byg");
+            fb.bord.saet(s.kat, s.p, s.an, s.n); fb.indsendKlik();
+            fb.visHint();
+            fb.svar.knapper[forkertIdx(fb)].click(); fb.indsendKlik();
+            maal(skaerm + " fane 1", "bord-skort", [214, 204][m[2]], s.formel + " valg");
+        });
+        fb.tilpas(); fb.opdater(1 / 60);
+        var kb = d.getElementById("bord-skort").getBoundingClientRect(), cb = fb.bord.canvas.getBoundingClientRect();
+        if (kb.bottom - cb.top > fb.bord.g.y0) zFejl.push(skaerm + " fane 1: bordet under kortet");
+        if (fb.bord.g.y1 - fb.bord.g.y0 < 180) zFejl.push(skaerm + " fane 1: bordet er klemt " + Math.round(fb.bord.g.y1 - fb.bord.g.y0));
+        geo[skaerm + " fane 1"] = Math.round(fb.bord.g.y1 - fb.bord.g.y0);
+        fb.visFrit();
+
+        d.querySelector('.faneknap[data-fane="fane-vand"]').click();
+        D.VAND_OPGAVER.forEach(function (o) {
+            ["forudsig", "hvilket"].forEach(function (type) {
+                f4.startOpgave(D.salt(o.kat, o.an), type);
+                f4.visHint();
+                f4.svar.knapper[forkertIdx(f4)].click(); f4.indsendKlik();
+                maal(skaerm + " fane 2", "vand-skort", [226, 212][m[2]], o.kat + o.an + " " + type);
+            });
+        });
+        f4.tilpas(); f4.opdater(1 / 60);
+        var kv = d.getElementById("vand-skort").getBoundingClientRect(), cv = f4.l.canvas.getBoundingClientRect();
+        if (f4.G && kv.bottom - cv.top > f4.G.top - 34) zFejl.push(skaerm + " fane 2: ligningen under kortet");
+        if (f4.G && f4.G.y + f4.G.h > f4.G.H) zFejl.push(skaerm + " fane 2: glasset går ud over scenen");
+        geo[skaerm + " fane 2"] = f4.G ? Math.round(f4.G.h) + " / " + Math.round(f4.G.H - f4.G.y - f4.G.h) : "";
+        d.getElementById("vand-afslut").click();
+
+        d.querySelector('.faneknap[data-fane="fane-ukendt"]').click();
+        D.UKENDT_OPGAVER.forEach(function (o) {
+            fu.startOpgave(o);
+            maal(skaerm + " fane 3", "ukendt-skort", [300, 320][m[2]], o.kat + o.an + " intro");
+            fu.begynd();
+            for (var trin = 0; trin < 6 && fu.fase !== "faerdig"; trin++) {
+                fu.visHint();
+                if (fu.fase === "ladning") { fu.bord.saetGaet(1); fu.indsendKlik(); }
+                else if (fu.svar.knapper.length) { fu.svar.knapper[forkertIdx(fu)].click(); fu.indsendKlik(); }
+                maal(skaerm + " fane 3", "ukendt-skort", [300, 320][m[2]], o.kat + o.an + " " + fu.fase);
+                if (fu.fase === "ladning") { fu.bord.saetGaet(Math.abs(fu.ion.q)); fu.indsendKlik(); }
+                else if (fu.svar.knapper.length) { fu.svar.knapper[rigtigIdx(fu)].click(); fu.indsendKlik(); }
+                maal(skaerm + " fane 3", "ukendt-skort", [300, 320][m[2]], o.kat + o.an + " " + fu.fase + " løst");
+            }
+            NK.Opslag.luk();
+        });
+        fu.tilpas(); fu.opdater(1 / 60);
+        var ku = d.getElementById("ukendt-skort").getBoundingClientRect(), fo = d.getElementById("ukendt-formel").getBoundingClientRect();
+        if (fo.top < ku.bottom) zFejl.push(skaerm + " fane 3: formlen under kortet");
+        if (fu.bord.g.y1 - fu.bord.g.y0 < 180) zFejl.push(skaerm + " fane 3: bordet er klemt " + Math.round(fu.bord.g.y1 - fu.bord.g.y0));
+        geo[skaerm + " fane 3"] = Math.round(fu.bord.g.y1 - fu.bord.g.y0);
+    });
+    ramme.style.width = gw; ramme.style.height = gh;
+    paastand("kortene holder sig i kortZone på en almindelig og en lav skærm", zFejl.length === 0,
+        zFejl.slice(0, 5).join(", ") + " | højst: " + JSON.stringify(maks) + " | plads: " + JSON.stringify(geo));
+    skriv("        højst: " + JSON.stringify(maks) + "; plads under kortet: " + JSON.stringify(geo));
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
 }
 
 function vis() {

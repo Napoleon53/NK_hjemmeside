@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idealgasligningen</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇕</span> Idealgasligningen</h1>
@@ -34,17 +35,24 @@
         <div class="anker" id="stempel-anker-flaske"></div>
         <div class="anker" id="stempel-anker-hylde"></div>
         <div class="anker" id="stempel-anker-graf"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort spm" id="stempel-skort">
+            <div id="stempel-ind" aria-live="polite"></div>
+            <p class="sk-note" id="stempel-note" hidden></p>
+            <div class="sk-bund tom" id="stempel-bund">
+                <p class="st-tekst" id="stempel-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="stempel-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="stempel-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="stempel-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="stempel-kort">
-            <h2><span id="stempel-titel">Forudsig</span><span class="taeller">opgave <b id="stempel-nr">1</b>/7</span></h2>
-            <p class="maal-tekst" id="stempel-spm"></p>
-            <div class="valgliste" id="stempel-valg"></div>
-            <p class="besked" id="stempel-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="stempel-knap" type="button">Giv hint</button></div>
+        <div class="kort" id="stempel-opgaver">
+            <h2>Opgaverne <span class="taeller">opgave <b id="stempel-nr">1</b>/7</span></h2>
             <div class="prikrad" id="stempel-prikker" aria-label="Opgaverne"></div>
+            <button class="knap igen" id="stempel-forfra" type="button"><span>Start opgaven forfra</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort styr" id="stempel-styr">
@@ -88,16 +96,23 @@
         <div class="anker" id="regn-anker-cylinder"></div>
         <div class="anker" id="regn-anker-tavle"></div>
         <div class="tavle-tekst" id="regn-tavle"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="regn-skort">
+            <div id="regn-ind" aria-live="polite"></div>
+            <p class="sk-note" id="regn-note" hidden></p>
+            <div class="sk-bund tom" id="regn-bund">
+                <p class="st-tekst" id="regn-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="regn-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="regn-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="regn-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="regn-kort">
-            <h2><span id="regn-titel">Opgave</span><span class="taeller" id="regn-taeller"></span></h2>
-            <p class="maal-tekst" id="regn-prompt"></p>
+        <div class="kort regnekort" id="regn-kort">
+            <h2>Beregningen <span class="taeller" id="regn-taeller"></span></h2>
             <div class="raekker" id="regn-raekker"></div>
-            <p class="besked" id="regn-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="regn-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="regn-opgaver">
@@ -159,6 +174,8 @@
 <script src="js/data.js"></script>
 <script src="js/gas.js"></script>
 <script src="js/tjek.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/sim_stempel.js"></script>

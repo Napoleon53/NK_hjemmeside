@@ -324,24 +324,24 @@
           sel: ["#hotdog-anker-skilt", "#hotdog-anker-bon"] },
         { tekst: "Du trækker tingene fra beholderne hen på skærebrættet, og et klik på en ting på brættet lægger tingen tilbage. Når du ringer med klokken, bliver retterne samlet efter opskriften, og overskuddet bliver liggende på brættet.",
           sel: ["#hotdog-anker-beholdere", "#hotdog-anker-braet", "#hotdog-anker-klokke"] },
-        { tekst: "Opgavekortet viser ordren og spørgsmålene, og knappen på kortet giver et hint og derefter svaret. Med kortet Ordrerne kan du springe til hotdogs, dobbeltburgere eller frit valg.",
-          sel: ["#hotdog-kort", "#hotdog-ordrer"] }
+        { tekst: "Kortet øverst i midten viser ordren og spørgsmålene. Du sender dit svar med Indsend svar, og knappen med gul kant giver et hint og derefter svaret. Med kortet Ordrerne i panelet kan du springe til hotdogs, dobbeltburgere eller frit valg.",
+          sel: ["#hotdog-skort", "#hotdog-ordrer"] }
     ];
     D.INTRO_MOLEKYLER = [
         { tekst: "I denne fane laver du molekyler efter et reaktionsskema. Skemaet viser koefficienterne og lige så mange figurer under hver formel, og plakaten viser, hvad én figur står for.",
           sel: ["#molekyler-anker-skilt", "#molekyler-anker-plakat"] },
         { tekst: "Du trækker figurer fra kasserne ind i kammeret og trykker på Start. Figurerne reagerer i hele sæt efter skemaet, og figurer i overskud får en orange ring. Panelet til højre viser, hvor meget der er af hvert stof før og efter reaktionen.",
           sel: ["#molekyler-anker-kasser", "#molekyler-anker-kammer", "#molekyler-maaling"] },
-        { tekst: "Opgavekortet giver dig fem mål, og fra det fjerde mål er hver figur 1 mol. Knappen på kortet giver et hint og derefter svaret.",
-          sel: "#molekyler-kort" }
+        { tekst: "Kortet øverst i midten giver dig fem mål, og fra det fjerde mål er hver figur 1 mol. Du sender kammeret ind med Indsend svar, og knappen med gul kant giver et hint og derefter svaret.",
+          sel: "#molekyler-skort" }
     ];
     D.INTRO_REGN = [
         { tekst: "I denne fane finder du stofmængden af hvert stof i et reaktionsskema, når du kender stofmængden af ét af stofferne. Den grønne boks viser den kendte stofmængde, og du skriver de andre stofmængder i felterne under formlerne.",
           felt: "kendt", sel: ["#regn-anker-skema", "#regn-felter .tavlefelt"] },
         { tekst: "Under hver formel står en søjle, hvor de stiplede blokke viser koefficienten. Et rigtigt svar fylder netop sine blokke og bliver blåt, mens et forkert svar bliver rødt og står for højt eller for lavt.",
           sel: "#regn-anker-soejler" },
-        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Når et svar er rigtigt, står beregningen i panelet. På niveauet Svær skriver du selv koefficienterne først.",
-          sel: ["#regn-kort", "#regn-beregninger"] }
+        { tekst: "Kortet øverst i midten viser opgaven. Du sender et felt ind med Enter eller Indsend svar, og knappen med gul kant giver et hint og derefter svaret. Når et svar er rigtigt, står beregningen i panelet, og på niveauet Svær skriver du selv koefficienterne først.",
+          sel: ["#regn-skort", "#regn-beregninger"] }
     ];
 
     /* Paaskeaegget: en hotdog af lutter agurker */

@@ -1,7 +1,9 @@
 /* =====================================================================
    regning.js - regnetrinene paa fane 2 (som sc5.3)
 
-   Hvert trin er et lille regnestykke i opgavekortet, der vokser nedad
+   Hvert trin er et lille regnestykke i kortet Regnestykket i panelet
+   (opgaven og bedoemmelsen staar paa papirkortet i scenen, og Indsend
+   svar dér eller Enter i et felt tjekker det aktive trin), der vokser nedad
    med lighedstegnene ud for hinanden, saadan som eleverne skal skrive
    det (brugerens oenske 27. sept. 2026):
 
@@ -98,10 +100,6 @@
         g.appendChild(h);
     }
 
-    function okKnap(fra) {
-        return '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
-    }
-
     P.byg = function () {
         var mig = this, o = this.opg, sk = o.sk, vaert = this.vaert;
         vaert.innerHTML = "";
@@ -151,12 +149,13 @@
         fe.style.flex = "1";
         fe.innerHTML = '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="' +
             NK.html((slags === "formel" ? "Formlen for " : "Resultatet med enhed for ") + t.navn.toLowerCase()) + '" placeholder="' +
-            (slags === "formel" ? "skriv formlen" : "tal og enhed") + '"' + fra + ">" + okKnap(fra);
+            (slags === "formel" ? "skriv formlen" : "tal og enhed") + '"' + fra + ">";
         var inp = fe.querySelector("input");
+        /* Enter er Indsend svar paa kortet i scenen */
         inp.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+            if (e.key === "Enter") { e.preventDefault(); mig.fane.indsendKlik(); }
         });
-        fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+        inp.addEventListener("input", function () { mig.fane.visIndsend(); });
         f.feltEl = fe;
         f.input = inp;
         return fe;
@@ -199,19 +198,14 @@
                 var inp = del.querySelector("input");
                 inp.value = f.tekst[i] || "";
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(i); }
+                    if (e.key === "Enter") { e.preventDefault(); mig.tjekEnter = i; mig.fane.indsendKlik(); mig.tjekEnter = undefined; }
                 });
-                inp.addEventListener("input", function () { f.tekst[i] = inp.value; });
+                inp.addEventListener("input", function () { f.tekst[i] = inp.value; mig.fane.visIndsend(); });
                 f.inputs[i] = inp;
             }
             holder.appendChild(del);
         });
         fe.appendChild(krop);
-        var knap = document.createElement("div");
-        knap.innerHTML = okKnap(fra);
-        var ok = knap.firstChild;
-        ok.addEventListener("click", function () { mig.tjek(); });
-        fe.appendChild(ok);
         f.feltEl = fe;
         return fe;
     };
@@ -243,12 +237,23 @@
         el.classList.add("ryst");
     };
 
+    /* Er der noget at sende i det aktive trin (Indsend svar er graa uden) */
+    P.kanSendes = function () {
+        var f = this.aktivt();
+        if (!f) return false;
+        if (f.fase === "indsaet") {
+            return !!f.inputs && [0, 1].some(function (i) { return f.plads[i] === null && f.inputs[i] && String(f.inputs[i].value).trim() !== ""; });
+        }
+        return !!f.input && String(f.input.value).trim() !== "";
+    };
+
     /* ----- Tjek ------------------------------------------------------------------
        hvor: det af mellemregningens felter, der blev trykket Enter i.
-       Knappen (↵) tjekker dem begge. */
+       Indsend svar tjekker dem begge. */
     P.tjek = function (hvor) {
         var f = this.aktivt();
         if (!f || this.fane.auto) return;
+        if (hvor === undefined) hvor = this.tjekEnter;
         if (f.fase === "indsaet") { this.tjekLed(f, hvor); return; }
         if (!f.input) return;
         var raa = f.input.value, svar;

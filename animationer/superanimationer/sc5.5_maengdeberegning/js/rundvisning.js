@@ -17,9 +17,9 @@
     var TURE = {
         "fane-vej": [
             { sel: "#vej-anker-skema", titel: "Skemaet", tekst: "Under hver formel: massen m, molarmassen M og stofmængden n. Den grønne boks er den kendte masse." },
-            { sel: "#vej-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Enter. Kun det næste felt er åbent. Pilene viser vejen, når et tal er rigtigt." },
+            { sel: "#vej-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Indsend svar eller Enter. Kun det næste felt er åbent. Pilene viser vejen, når et tal er rigtigt." },
             { sel: "#vej-anker-vaegte", titel: "Vægtene", tekst: "Hvert rigtigt tal sker også her: pulveret bliver til poser med 1 mol, poserne går gennem pilen, og det nye stof vejes." },
-            { sel: "#vej-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt." },
+            { sel: "#vej-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen viser opgaven. Det siger også, hvad du skal nu, og hvad der gik galt." },
             { sel: "#vej-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#vej-beregninger", titel: "Beregningerne", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." },
             { sel: "#vej-opgaver", titel: "Opgaverne", tekst: "Fire reaktioner. En opgave, du løser uden at se svaret, får en stjerne. Nye tal giver samme opgave med andre tal." },
@@ -27,16 +27,16 @@
         ],
         "fane-skema": [
             { sel: "#skema-anker-skema", titel: "Skemaet", tekst: "Afstem først. Så molarmasserne, stofmængderne og masserne. Felter med en grå streg skal ikke bruges." },
-            { sel: "#skema-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Enter." },
+            { sel: "#skema-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Indsend svar eller Enter." },
             { sel: "#skema-anker-vaegt", titel: "Skålvægten", tekst: "Ved methan og propan: reaktanterne til venstre, produkterne til højre. Hver masse, du finder, lægges i skålen." },
             { sel: "#skema-tilstand", titel: "Trinvis eller frit", tekst: "Trinvis åbner ét felt ad gangen. Frit åbner dem alle." },
-            { sel: "#skema-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Den gule knap giver et hint og derefter svaret." },
+            { sel: "#skema-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen siger, hvad du skal nu, og hvad der gik galt. Den gule knap giver et hint og derefter svaret." },
             { sel: "#skema-beregninger", titel: "Beregningerne", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." }
         ],
         "fane-begr": [
             { sel: "#begr-anker-skema", titel: "Skemaet", tekst: "To masser er kendt. Molarmasserne står der allerede." },
             { sel: "#begr-anker-bord", titel: "Bordet", tekst: "Hvert stof står som poser med 1 mol, når stofmængden er fundet. Poserne reagerer i hele sæt efter skemaet." },
-            { sel: "#begr-kort", titel: "Opgaven", tekst: "Når begge stofmængder er fundet, vælger du, hvem der slipper op først. Klik på poserne, eller brug knapperne her. Linjen i kortet siger, hvad der skete. Den gule knap giver et hint og derefter svaret." },
+            { sel: "#begr-skort", titel: "Opgaven", tekst: "Når begge stofmængder er fundet, vælger du, hvilket stof der slipper op først. Klik på poserne eller på svarene på kortet, og tryk Indsend svar. Kortet siger, hvad der skete. Den gule knap giver et hint og derefter svaret." },
             { sel: "#begr-beregninger", titel: "Beregningerne", tekst: "Beregningerne og begrundelsen for valget, som de skal skrives." },
             { sel: "#begr-opgaver", titel: "Opgaverne", tekst: "Seks reaktioner. Nye tal giver samme reaktion med andre masser." }
         ]
@@ -158,7 +158,8 @@
     NK.Rundvisning = {
         start: start,
         luk: luk,
-        aktiv: function () { return erAktiv; }
+        aktiv: function () { return erAktiv; },
+        ture: TURE
     };
 
     function init() {

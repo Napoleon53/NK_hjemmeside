@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Polære molekyler</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1>Polære molekyler</h1>
@@ -29,7 +30,16 @@
 <section class="fane aktiv" id="fane-en" role="tabpanel" aria-label="Elektronegativitet">
     <div class="scene">
         <canvas id="en-laerred" aria-label="To atomer, der deler et elektronpar, og en skala for forskellen i elektronegativitet"></canvas>
-        <div class="scenebesked" id="en-besked" aria-live="polite"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, papirkortet 6. nov. 2026) -->
+        <div class="scenekort opgave" id="en-skort">
+            <div class="sk-ind" id="en-ind"></div>
+            <div class="sk-bund tom" id="en-status">
+                <p class="st-tekst" id="en-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="en-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="en-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -57,14 +67,10 @@
             </div>
         </div>
 
-        <!-- Én knap: Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
         <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="en-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="en-opg-tekst"></p>
-            <div class="valg" id="en-opg-valg" hidden></div>
-            <p class="besked" id="en-opg-hint"></p>
-            <p class="besked" id="en-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="en-opg-knap" type="button">Start opgave</button></div>
+            <h2>Opgaver <span class="taeller">løst: <b id="en-opg-loest">0</b></span></h2>
+            <p class="opgave-nr">Opgaven på kortet: <b id="en-opg-nr">ikke startet</b></p>
+            <div class="knaprad"><button class="knap nulstil" id="en-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
         </div>
     </aside>
 </section>
@@ -79,7 +85,16 @@
             <div class="prik-titel">Prikformel</div>
             <canvas id="pol-prik"></canvas>
         </div>
-        <div class="scenebesked" id="pol-besked" aria-live="polite"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, papirkortet 6. nov. 2026) -->
+        <div class="scenekort opgave" id="pol-skort">
+            <div class="sk-ind" id="pol-ind"></div>
+            <div class="sk-bund tom" id="pol-status">
+                <p class="st-tekst" id="pol-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="pol-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="pol-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -105,12 +120,9 @@
         </div>
 
         <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="pol-opg-tekst"></p>
-            <div class="valg" id="pol-opg-valg" hidden></div>
-            <p class="besked" id="pol-opg-hint"></p>
-            <p class="besked" id="pol-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="pol-opg-knap" type="button">Start opgave</button></div>
+            <h2>Opgaver <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
+            <p class="opgave-nr">Opgaven på kortet: <b id="pol-opg-nr">ikke startet</b></p>
+            <div class="knaprad"><button class="knap nulstil" id="pol-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
         </div>
     </aside>
 </section>
@@ -121,13 +133,21 @@
 <section class="fane" id="fane-vand" role="tabpanel" aria-label="Forsøg: vandstrålen">
     <div class="scene">
         <canvas id="vand-laerred" aria-label="Laboratoriebord med tre haner over en vask, en plastikstav, en glasstav og en uldklud"></canvas>
-        <div class="scenebesked" id="vand-besked" aria-live="polite"></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, papirkortet 6. nov. 2026) -->
+        <div class="scenekort opgave" id="vand-skort">
+            <div class="sk-ind" id="vand-ind"></div>
+            <div class="sk-bund tom" id="vand-status">
+                <p class="st-tekst" id="vand-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="vand-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="vand-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev" id="vand-forloeb">
             <h2>Resultater <span class="taeller" id="vand-taeller"></span></h2>
-            <p class="naeste" id="vand-naeste" aria-live="polite"></p>
             <div id="vand-skema"></div>
             <div class="knaprad">
                 <button class="knap nulstil" id="vand-forfra" type="button">Start forfra <span class="tegn">↺</span></button>
@@ -141,12 +161,8 @@
         </div>
 
         <div class="kort opgavekort" id="vand-opgave">
-            <h2>Opgave <span class="taeller">løst: <b id="vand-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="vand-opg-tekst"></p>
-            <div class="valg" id="vand-opg-valg" hidden></div>
-            <p class="besked" id="vand-opg-hint"></p>
-            <p class="besked" id="vand-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="vand-opg-knap" type="button">Start opgave</button></div>
+            <h2>Opgaver <span class="taeller">løst: <b id="vand-opg-loest">0</b></span></h2>
+            <p class="opgave-nr">Opgaven på kortet: <b id="vand-opg-nr">ikke startet</b></p>
         </div>
     </aside>
 </section>
@@ -197,6 +213,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/sprites.js"></script>

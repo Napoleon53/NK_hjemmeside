@@ -50,6 +50,7 @@
         this.nr = this.naesteUloeste(-1);
 
         this.bygPanel();
+        this.bygKort();
         this.bygTilbud();
         this.koblMus();
         if (this.laererStart) this.laererStart();
@@ -84,15 +85,17 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
-        lay.y0 = Math.round(H * 0.46);
         lay.y1 = Math.round(H * 0.9);
-        /* Skiltene staar under tilbuddet om praesentationen, der er midt foroven */
-        var luft = NK.klamp(H * 0.1, 10, 74);
+        /* Skiltet og bonen staar under papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var luft = lay.zone;
         var bonB = NK.klamp(W * 0.19, 104, 180);
         lay.bon = { x: W - kant - bonB - 6, y: luft + 6, b: bonB, h: Math.round(bonB * 0.62) };
         var sb = Math.min(W * 0.62, lay.bon.x - kant - 24, 620);
         lay.skilt = { x: kant, y: luft, b: sb, h: 0 };
         lay.skilt.h = this.opskriftHoejde(sb);
+        /* Disken begynder under skiltet, saa beholderne har plads mellem dem */
+        lay.y0 = Math.round(Math.max(H * 0.46, Math.min(lay.skilt.y + lay.skilt.h + 52, H * 0.56)));
 
         /* Beholderne staar bag paa disken */
         var dd = lay.y1 - lay.y0;
@@ -190,7 +193,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Tingene paa brættet ------------------------------------------------------
        En ting er { id, x, y, fra, t, maal, venter, hjem, produkt, plads, rest }.
@@ -256,7 +264,7 @@
         if (this.serv) { this.besked("Vent, til kunden har fået sin bestilling.", "gul"); return false; }
         var o = this.ordre();
         if (!tving && o && o.slags !== "disk" && !this.naaet) {
-            this.besked("Brættet viser opgaven. Skriv svaret til højre.", "gul");
+            this.besked("Brættet viser opgaven. Skriv svaret i panelet til højre.", "gul"); this.kort.blink();
             return false;
         }
         this.ryddRester();
@@ -285,7 +293,7 @@
         if (!t || t.hjem || this.serv) return;
         var o = this.ordre();
         if (o && o.slags !== "disk" && !this.naaet) {
-            this.besked("Brættet viser opgaven. Skriv svaret til højre.", "gul");
+            this.besked("Brættet viser opgaven. Skriv svaret i panelet til højre.", "gul"); this.kort.blink();
             return;
         }
         this.ryddRester();
@@ -455,6 +463,7 @@
         this.ids().forEach(function (id) { mig.beholdning[id] = Infinity; });
         this.trin = [];
         this.k = 0;
+        this.valgtBegr = null;
         this.besked("", "");
         if (o) {
             (o.tomt || []).forEach(function (id) { mig.beholdning[id] = 0; });
@@ -494,7 +503,7 @@
         this.fremhaev = null;
         this.bonOk = 0.001;
         var o = this.ordre();
-        this.besked(NK.html(o.efter), "god");
+        this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         this.loest[this.nr] = true;
         NK.gem(NOEGLE, { l: this.loest.map(function (x) { return x ? 1 : 0; }) });
@@ -508,15 +517,40 @@
         this.visStatus();
     };
 
-    P.knap = function () {
+    /* Naeste ordre (knappen, der staar, hvor Indsend svar stod) */
+    P.videre = function () {
         var o = this.ordre();
         if (!o) { if (NK.visFane) NK.visFane("fane-molekyler"); return; }
-        if (this.naaet) {
-            var naeste = this.naesteUloeste(this.nr);
-            this.vaelgOrdre(naeste);
-            if (naeste >= D.ORDRER.length && NK.visFane) NK.visFane("fane-molekyler");
-            return;
-        }
+        if (!this.naaet) return;
+        var naeste = this.naesteUloeste(this.nr);
+        this.vaelgOrdre(naeste);
+        if (naeste >= D.ORDRER.length && NK.visFane) NK.visFane("fane-molekyler");
+    };
+
+    /* Indsend svar: brættet ringer med klokken, ellers sendes valget eller feltet */
+    P.kanSende = function () {
+        var o = this.ordre(), t = this.aktivtTrin(), mig = this;
+        if (!o) return true;
+        if (this.naaet) return false;
+        if (o.slags === "disk") return !this.serv && this.ids().some(function (id) { return mig.antal(id); });
+        if (!t) return false;
+        if (t.art === "begr") return !!this.valgtBegr;
+        return !!(t.input && t.input.value.trim());
+    };
+
+    P.indsend = function () {
+        var o = this.ordre(), t = this.aktivtTrin();
+        if (!o) { this.videre(); return; }
+        if (this.naaet || !this.kanSende()) return;
+        if (o.slags === "disk") { this.server(); return; }
+        if (t.art === "begr") { this.sendBegr(this.valgtBegr); return; }
+        this.tjek();
+    };
+
+    /* Giv hint, derefter Vis svaret */
+    P.knap = function () {
+        var o = this.ordre();
+        if (!o || this.naaet) return;
         var t = this.aktivtTrin();
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
@@ -589,6 +623,7 @@
         t.status = maade;
         this.hjaelp = 0;
         this.fremhaev = null;
+        this.valgtBegr = null;
         if (maade === "svar") this.brugtSvar = true;
         if (this.afvisTilbud) this.afvisTilbud();
         if (t.art === "begr") {
@@ -632,17 +667,26 @@
         this.fokus();
     };
 
-    /* Eleven vaelger den begraensende ingrediens (knap i panelet eller brættet) */
+    /* Eleven vaelger den begraensende ingrediens (paa kortet eller brættet).
+       Valget bedoemmes foerst, naar eleven trykker Indsend svar. */
     P.vaelg = function (id) {
-        var t = this.aktivtTrin(), o = this.ordre();
+        var t = this.aktivtTrin();
         if (!t || t.art !== "begr") return false;
+        this.valgtBegr = id;
+        this.visKort();
+        return true;
+    };
+
+    P.sendBegr = function (id) {
+        var t = this.aktivtTrin(), o = this.ordre();
+        if (!t || t.art !== "begr" || !id) return false;
         var res = Tj.begr(id, o);
         if (res.ok) { this.trinRigtigt(t, "ok"); return true; }
         t.forsoeg++;
         t.forkert = id;
+        this.valgtBegr = null;
         this.besked(NK.html(res.besked), "skidt");
         this.bygTrin();
-        this.ryst(t.el);
         return true;
     };
 
@@ -657,16 +701,12 @@
     P.bygPanel = function () {
         var mig = this;
         this.el = {
-            knap: NK.el("hotdog-knap"),
-            besked: NK.el("hotdog-besked"),
-            kort: NK.el("hotdog-kort"),
+            svar: NK.el("hotdog-svar"),
             raekker: NK.el("hotdog-raekker"),
             grupper: NK.el("hotdog-grupper"),
             nulstil: NK.el("hotdog-nulstil"),
             opskrifter: NK.el("hotdog-opskrifter")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-
         D.GRUPPER.forEach(function (g, nr) {
             var knap = document.createElement("button");
             knap.type = "button";
@@ -741,9 +781,53 @@
         });
     };
 
+    /* Beskeden paa papirkortet. Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKort();
+    };
+
+    /* ----- Papirkortet oeverst i scenen (js/kort.js) ------------------------------------ */
+    P.bygKort = function () {
+        var mig = this;
+        this.kort = new NK.SceneKort("hotdog", {
+            valg: function (id) { mig.vaelg(id); },
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
+    };
+
+    P.visKort = function () {
+        var k = this.kort;
+        if (!k) return;
+        var o = this.ordre(), t = this.aktivtTrin(), mig = this;
+        var d = { chip: o ? "Ordre " + (this.nr + 1) + " af " + D.ORDRER.length : "Frit valg",
+            tekst: NK.html(o ? o.tekst : "Læg på brættet, og ring med klokken.") };
+        if (o && !this.naaet && t && t.art === "begr") {
+            d.svar = o.ops.led.map(function (l) {
+                return { j: l[0], t: NK.html(D.stort(D.ingrediens(l[0]).flertal)), valgt: mig.valgtBegr === l[0],
+                    forkert: t.forkert === l[0] && mig.valgtBegr !== l[0] };
+            });
+        }
+        k.vis(d);
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (this.naaet && o) {
+            var sidste = this.naesteUloeste(this.nr) >= D.ORDRER.length;
+            k.bliv(NK.html(o.efter), null, sidste ? "Videre til molekylerne" : "Næste ordre", this.brugtSvar ? "svar" : "god");
+        } else {
+            k.bliv(null);
+            if (!o) k.knapper({ indsend: true, klar: true, indsendTekst: "Videre til molekylerne" });
+            else k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: this.kanSende() });
+        }
     };
 
     var ETIKET = { antal: "Det skal du bruge", begr: "Hvad slipper op først?", produkter: "Så mange kan du lave", overskud: "Overskud" };
@@ -765,23 +849,17 @@
             sidsteArt = t.art;
             t.input = null;
             if (t.art === "begr") {
-                var rad = document.createElement("div");
-                rad.className = "valgrad";
-                o.ops.led.forEach(function (l) {
-                    var b = document.createElement("button");
-                    b.type = "button";
-                    b.className = "valgknap";
-                    b.setAttribute("data-id", l[0]);
-                    b.textContent = D.stort(D.ingrediens(l[0]).flertal);
-                    var klaret = t.status === "ok" || t.status === "svar";
-                    if (klaret && l[0] === t.svar) b.classList.add("rigtig");
-                    else if (!klaret && t.forkert === l[0]) b.classList.add("forkert");
-                    b.disabled = t.status !== "aktiv";
-                    b.addEventListener("click", function () { mig.vaelg(l[0]); });
-                    rad.appendChild(b);
-                });
-                t.el = rad;
-                rk.appendChild(rad);
+                t.el = null;
+                var klar = t.status === "ok" || t.status === "svar";
+                var fb = document.createElement("div");
+                fb.className = "felter";
+                if (klar) {
+                    fb.innerHTML = '<div class="felt ' + t.status + '"><span class="felt-pre">' + NK.html(D.stort(D.ingrediens(t.svar).flertal)) +
+                        '</span><span class="felt-svar"><b>slipper op</b></span><span class="felt-maerke">' + (t.status === "ok" ? "✓" : "↩") + "</span></div>";
+                } else {
+                    fb.innerHTML = '<p class="note">' + (t.status === "aktiv" ? "Vælg på kortet, og tryk på Indsend svar." : "Kommer bagefter.") + "</p>";
+                }
+                rk.appendChild(fb);
                 vaert.appendChild(rk);
                 return;
             }
@@ -803,6 +881,7 @@
                 inp.addEventListener("keydown", function (e) {
                     if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
                 });
+                inp.addEventListener("input", function () { mig.visKort(); });
                 fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                 t.input = inp;
             }
@@ -832,24 +911,9 @@
         Array.prototype.forEach.call(this.el.opskrifter.querySelectorAll(".vaelger"), function (b) {
             b.classList.toggle("valgt", b.getAttribute("data-ops") === mig.ops().id);
         });
-        var tekst, klasse = "knap";
-        if (!o) {
-            NK.saetTekst("hotdog-titel", "Frit valg");
-            NK.saetTekst("hotdog-prompt", "Læg på brættet, og ring med klokken.");
-            tekst = "Videre til molekylerne →";
-        } else {
-            NK.saetTekst("hotdog-titel", "Ordre");
-            NK.saetTekst("hotdog-prompt", o.tekst);
-            if (this.naaet) {
-                tekst = this.naesteUloeste(this.nr) >= D.ORDRER.length ? "Videre til molekylerne →" : "Næste ordre →";
-                klasse = "knap blaa banker";
-            } else {
-                tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            }
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.naaet);
+        /* Panelets kort med felterne: kun naar ordren har noget at skrive, og i frit valg */
+        this.el.svar.hidden = !!o && !(this.trin && this.trin.length);
+        this.visKort();
     };
 
     P.visDisken = function () {
@@ -872,12 +936,13 @@
         if (this.traek && this.traek.flyttet) t = "Slip over skærebrættet.";
         else if (this.serv && !this.serv.faerdig) t = "Retterne samles efter opskriften.";
         else if (this.serv && this.serv.retur > 0) t = "Kunden tæller efter og sender dem tilbage.";
-        else if (o && trin && trin.art === "begr") t = "Klik på den ingrediens, der slipper op først: på brættet eller til højre.";
-        else if (o && o.slags !== "disk" && !this.naaet) t = "Skriv svaret til højre. Opskriften hænger på væggen.";
+        else if (o && trin && trin.art === "begr") t = "Vælg den ingrediens, der slipper op først, på kortet eller på brættet.";
+        else if (o && o.slags !== "disk" && !this.naaet) t = "Skriv svaret i panelet til højre. Opskriften hænger på væggen.";
         else if (tom && !this.serv) t = "Træk en ting fra en beholder hen på skærebrættet. Klik på en ting for at tage den af igen.";
-        else if (this.naaet && o) t = "Ordren er klar. Tryk på knappen til højre for at gå videre.";
-        else t = "Ring med klokken, når brættet er klar. Klik på en ting for at tage den af.";
-        NK.saetHTML("hotdog-status", t);
+        else if (this.naaet && o) t = "";
+        else t = "Tryk på Indsend svar eller ring med klokken, når brættet er klar.";
+        this.trinTekst = t;
+        this.visKort();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------- */
@@ -1248,7 +1313,7 @@
         if (u.slags === "ting") { this.tagAf(u.t); this.over = null; return; }
         if (u.slags === "klokke") {
             var o = this.ordre();
-            if (o && o.slags !== "disk" && !this.naaet) { this.ding = 0.001; this.besked("Skriv svaret til højre først.", "gul"); return; }
+            if (o && o.slags !== "disk" && !this.naaet) { this.ding = 0.001; this.besked("Skriv svaret i panelet til højre først.", "gul"); this.kort.blink(); return; }
             this.server();
             return;
         }
@@ -1281,7 +1346,7 @@
 
     P.enter = function () {
         var o = this.ordre();
-        if (this.naaet) { this.knap(); return; }
+        if (this.naaet) { this.videre(); return; }
         if (!o || o.slags === "disk") { if (this.klarTilKlokke() && !this.serv) this.server(); }
     };
 

@@ -88,7 +88,8 @@
         a = NK.klamp(a, 0, 1);
         if (a < 0.02) a = 0;
         if (this.fase === "faerdig" && a > 0) {
-            this.info = { tekst: "Prøven er færdig. Tryk på <b>Ny prøve</b> for at titrere igen.", tid: 4 };
+            /* Proeven er faerdig: kortets knap videre blinker (Ny proeve staar i panelet) */
+            if (this.kort) this.kort.blink();
             a = 0;
         }
         if (this.vUd() >= TOM - 1e-9) a = 0;
@@ -108,7 +109,7 @@
     /* Én draabe (knappen, D eller klik paa spidsen) */
     P.enDraabe = function () {
         if (this.fase === "faerdig") {
-            this.info = { tekst: "Prøven er færdig. Tryk på <b>Ny prøve</b> for at titrere igen.", tid: 4 };
+            if (this.kort) this.kort.blink();
             return;
         }
         if (this.vUd() >= TOM - 1e-9) return;
@@ -201,7 +202,7 @@
     /* ----- Aflaesningen ---------------------------------------------------------------- */
     P.tjekAflaesning = function () {
         var inp = this.el.felt.querySelector("input");
-        if (!inp) return;
+        if (!inp || this.fase !== "aflaes") return;
         var svar = NK.Tjek.aflaesning(inp.value, this.vUd(), D.AFLAES_TOL);
         if (svar.ok) {
             this.godkend(NK.Tjek.tal(inp.value).v, false);
@@ -223,8 +224,11 @@
         var tekst;
         if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev lyserød på den sidste dråbe.";
         else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er tydeligt lyserød, så der kom lidt for meget NaOH i.";
-        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er mørk lyserød: omslaget kom tidligere, så forbruget er for stort.";
-        this.besked((vist ? "<b>Svar:</b> " : "") + NK.html(tekst), vist ? "gul" : "god");
+        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er mørk lyserød. Omslaget kom tidligere, så forbruget er for stort.";
+        /* Kortet bliver paa spoergsmaalet: forklaringen og knappen videre (visKnap) */
+        this.slutTekst = NK.html(tekst);
+        this.slutVist = !!vist;
+        this.besked("", "");
         NK.maaling = { V: v, m: this.pr.m, c: this.pr.c, p: this.pr.p, egen: true, over: over, nr: this.nr, brugt: false };
         if (this.afvisTilbud) this.afvisTilbud();
         this.bygFelt();
@@ -236,12 +240,36 @@
         }
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Til beregningen ------------------------ */
-    P.knap = function () {
-        if (this.fase === "faerdig") {
-            if (NK.visFane) NK.visFane("fane-beregning");
+    /* ----- Kortets knapper: Giv hint -> Vis svaret, Indsend svar og videre ------------ */
+    P.videre = function () {
+        if (this.fase === "faerdig" && NK.visFane) NK.visFane("fane-beregning");
+    };
+
+    /* Indsend svar: aflaesningen i feltet under luppen i panelet */
+    P.kanSende = function () {
+        var inp = this.el.felt.querySelector("input");
+        return this.fase === "aflaes" && !!inp && inp.value.trim() !== "";
+    };
+
+    P.indsend = function () {
+        if (this.fase !== "aflaes") return;
+        var inp = this.el.felt.querySelector("input");
+        if (!inp || !inp.value.trim()) {
+            this.besked("Skriv forbruget i feltet under luppen i panelet.", "gul");
+            this.fokus();
             return;
         }
+        this.tjekAflaesning();
+    };
+
+    /* Enter og den gamle ene knap: videre, naar proeven er faerdig, ellers hjaelpen */
+    P.knap = function () {
+        if (this.fase === "faerdig") { this.videre(); return; }
+        this.hjaelpKnap();
+    };
+
+    P.hjaelpKnap = function () {
+        if (this.fase === "faerdig") return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked("<b>Hint:</b> " + NK.html(this.fase === "titrer" ? D.TITRER_HINT : D.AFLAES_HINT), "gul");
@@ -254,7 +282,7 @@
             this.auto = { ur: 0 };
             this.a = 0.8;
             this.hjaelp = 0;
-            this.besked("Se buretten. Den drypper til sidst og stopper, når kolben bliver lyserød.", "gul");
+            this.besked("Buretten titrerer selv. Den drypper til sidst og stopper, når kolben bliver lyserød.", "gul");
             this.visKort();
             return;
         }
@@ -268,13 +296,16 @@
     /* ----- Panelet --------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("tit-knap"),
-            besked: NK.el("tit-besked"),
-            kort: NK.el("tit-kort"),
-            felt: NK.el("tit-felt")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { felt: NK.el("tit-felt") };
+        this.kort = new NK.SceneKort("tit", {
+            hint: function () { mig.hjaelpKnap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
         NK.el("tit-nulstil").addEventListener("click", function () { mig.nulstil(); });
         NK.el("tit-tabelknap").addEventListener("click", function () { mig.aabnTabel(); });
         NK.el("tabel-trin").addEventListener("change", function () { mig.fyldTabel(); });
@@ -294,9 +325,10 @@
             '<span class="felt-efter">mL</span><button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1">↵</button></div>';
         var inp = vaert.querySelector("input");
         inp.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); mig.tjekAflaesning(); }
+            if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); mig.indsend(); }
         });
-        vaert.querySelector(".felt-ok").addEventListener("click", function () { mig.tjekAflaesning(); });
+        inp.addEventListener("input", function () { vaert.querySelector(".felt").classList.remove("ryst"); mig.visKnap(); });
+        vaert.querySelector(".felt-ok").addEventListener("click", function () { mig.indsend(); });
     };
 
     P.fokus = function () {
@@ -307,37 +339,43 @@
         }
     };
 
+    /* Beskeden paa papirkortet (hint, fejl). Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKnap();
     };
 
     P.visKort = function () {
-        NK.saetTekst("tit-titel", "Prøve " + this.nr);
-        var prompt, tekst, klasse = "knap";
-        if (this.fase === "titrer") {
-            prompt = "Titrér eddiken, til kolben bliver svagt lyserød.";
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        } else if (this.fase === "aflaes") {
-            prompt = "Aflæs buretten. Hvor meget NaOH er løbet ned?";
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        } else {
-            prompt = "Forbruget er aflæst.";
-            tekst = "Til beregningen →";
-            klasse = "knap blaa banker";
+        var tekst = this.fase === "titrer" ? "Titrér eddiken, til kolben bliver svagt lyserød." :
+            "Aflæs buretten ved menisken. Hvor meget NaOH er løbet ned?";
+        this.kort.vis({ chip: "Prøve " + this.nr, tekst: NK.html(tekst) });
+        this.visKnap();
+    };
+
+    /* Beskeden, Giv hint og Indsend svar, eller forklaringen og Til beregningen */
+    P.visKnap = function () {
+        var k = this.kort;
+        if (!k) return;
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (this.fase === "faerdig") {
+            k.bliv(this.slutTekst || "", this.slutVist ? "Svaret" : "Rigtigt", "Til beregningen", this.slutVist ? "svar" : "god");
+            return;
         }
-        NK.saetTekst("tit-prompt", prompt);
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.fase === "faerdig");
+        k.bliv(null);
+        k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", peg: false,
+            indsend: this.fase === "aflaes", klar: this.kanSende() });
     };
 
     P.visStatus = function () {
         var t;
         var v = this.vUd();
         if (this.info && this.info.tid > 0) t = this.info.tekst;
-        else if (this.fase === "faerdig") t = "Forbruget er " + K.mL(this.aflaest) + " mL. Gå videre til beregningen, eller tag en <b>ny prøve</b>.";
-        else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke()) + ". Aflæs buretten i luppen til højre, og skriv forbruget.";
+        else if (this.fase === "faerdig") t = "";
+        else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke()) + ". Aflæs bunden af menisken i luppen i panelet, og skriv forbruget i feltet under den.";
         else if (this.auto) t = "Buretten titrerer selv. Hurtigt først, så dråbe for dråbe.";
         else if (this.lyserod() && this.a > 0) t = "<b>Luk hanen!</b> Kolben er lyserød.";
         else if (this.lyserod()) t = "Kolben er lyserød.";
@@ -348,7 +386,7 @@
         else if (this.a > 0) t = "NaOH løber ned. Luk hanen, så snart kolben bliver lyserød.";
         else if (v > 0) t = "Kolben er farveløs. Der er stadig syre tilbage. Åbn hanen igen.";
         else t = "Træk skyderen ved hanen mod højre for at åbne den.";
-        NK.saetHTML("tit-status", t);
+        if (t !== this.trinTekst) { this.trinTekst = t; this.visKnap(); }
     };
 
     /* ----- Datatabellen ------------------------------------------------------------------ */
@@ -403,7 +441,9 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.bordY = Math.round(H - NK.klamp(H * 0.1, 30, 70));
-        var topY = NK.klamp(H * 0.035, 10, 28);
+        /* Opstillingen og luppen begynder under papirkortets plads */
+        lay.zone = this.kortZone();
+        var topY = lay.zone + NK.klamp(H * 0.012, 4, 10);
         var cx = NK.klamp(W * 0.33, 170, 360);
         var g = Tg.opstilling(cx, lay.bordY, topY, 1.1);
         lay.g = g;
@@ -456,7 +496,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [96, 88];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Opdater og tegn ---------------------------------------------------------------- */
     P.opdater = function (dt) {
@@ -640,7 +685,7 @@
         if (s === "hane") { this.skiftHane(); return; }
         if (s === "draabe") { this.enDraabe(); return; }
         var tekst = {
-            buret: "Natriumhydroxid, NaOH, 0,100 M. Forbruget aflæses ved menisken i luppen til højre.",
+            buret: "Natriumhydroxid, NaOH, 0,100 M. Forbruget aflæses ved menisken i luppen i panelet.",
             kolbe: "2,00 g eddike, 20 mL vand og to dråber phenolphthalein. Magnetloppen rører rundt.",
             lup: "1 figur = 1/8 af eddikesyren i kolben. Hver OH⁻ tager én H⁺ fra en CH₃COOH.",
             eddike: "Husholdningseddike. Masseprocenten er dækket til. Den skal du finde."

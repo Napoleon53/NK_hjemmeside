@@ -20,6 +20,14 @@
    skal bruge, virker (spaerret), buddet kommer foer fortyndingen, og der
    kan ikke fortyndes forbi maalet. Hvor langt eleven er naaet, huskes
    under NOEGLE.
+
+   Papirkortet (6. nov. 2026, js/skort.js): maalet staar paa kortet
+   oeverst i scenen. Buddet og tallet vaelges og skrives paa kortet og
+   sendes med Indsend svar (Enter i feltet). Et indsendt bud bedoemmes,
+   naar glasset er lavet, og luppen har zoomet. Maalene "glas" og
+   "basisk" er forsoeg: de er naaet, naar fortyndingen er gjort. Efter
+   et rigtigt svar bliver kortet med forklaringen og Naeste maal. Start
+   maalene forfra ligger i panelet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -48,7 +56,7 @@
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.nr = NK.klamp(gemt.maal || 0, 0, D.FORTYND_MAAL.length);
         this.rost = this.nr >= D.FORTYND_MAAL.length;
-
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -65,7 +73,7 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
-        lay.luft = NK.klamp(H * 0.1, 10, 70);
+        lay.luft = 10 + this.kortZone() + 4;      /* skalaen staar under papirkortet */
         lay.px = NK.klamp(W * 0.017, 12, 15);
         var bandH = NK.klamp(H * 0.05, 22, 36);
         var inde = NK.klamp(W * 0.06, 40, 64);
@@ -112,6 +120,9 @@
         e.style.width = Math.round(b) + "px";
         e.style.height = Math.round(h) + "px";
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 152, 158); };
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
@@ -177,18 +188,19 @@
         if (this.antalFortyndinger(serie) >= D.MAKS_GLAS) return "Der er ikke plads til flere glas i den række. Tryk R for at tømme bordet.";
         var m = this.maal();
         if (!m) return "";
-        if (this.naaet) return "Målet er nået. Tryk på knappen til højre for at gå videre.";
-        if (!m.serie) return "Du skal ikke fortynde nu. Skriv tallet til højre.";
+        if (this.naaet) return "Målet er nået. Tryk Næste mål på kortet.";
+        if (!m.serie) return "Du skal ikke fortynde nu. Skriv tallet i feltet på kortet.";
         if (m.serie !== serie) return "I dette mål skal du fortynde " + (m.serie === "syre" ? "saltsyren" : "natriumhydroxiden") + ".";
-        if (m.slags === "valg" && this.valgNr < 0) return "Vælg dit bud til højre først.";
         var til = m.slags === "basisk" ? D.MAKS_GLAS : m.k;
-        if (this.antalFortyndinger(serie) >= til) return m.slags === "valg" ? "Glasset er lavet. Vælg igen til højre." : "Du har fortyndet nok.";
+        if (this.antalFortyndinger(serie) >= til) return m.slags === "valg" ? "Glasset er lavet. Vælg igen på kortet, og tryk Indsend svar." : "Du har fortyndet nok.";
+        if (m.slags === "valg" && this.budNr < 0) return "Vælg dit bud på kortet, og tryk Indsend svar først.";
         return "";
     };
 
     P.fortynd = function (serie, stille) {
         if (this.anim) {
-            if (!stille) this.besked("Vent, til glasset er fyldt.", "gul");
+            /* Kortet siger allerede, hvad pipetten goer: kortet blinker */
+            if (!stille) this.kort.blink();
             return false;
         }
         var grund = stille ? (this.antalFortyndinger(serie) >= D.MAKS_GLAS ? "fuld" : "") : this.spaerret(serie);
@@ -277,6 +289,9 @@
         this.naaet = false;
         this.hjaelp = 0;
         this.valgNr = -1;
+        this.budNr = -1;
+        this.forkert = {};
+        this.pegKnap = false;
         this.brugtSvar = false;
         this.besked("", "");
         this.bygOpgave();
@@ -290,10 +305,16 @@
         var m = this.maal();
         if (!m || this.naaet) return;
         if (m.slags === "valg") {
-            if (this.antalFortyndinger(m.serie) < m.k || this.valgNr < 0) return;
-            if (this.valgNr === m.rigtig) this.maalNaaet();
+            if (this.antalFortyndinger(m.serie) < m.k || this.budNr < 0) return;
+            if (this.budNr === m.rigtig) this.maalNaaet();
             else {
-                this.besked(NK.html(m.valg[this.valgNr][1]) + " Vælg igen.", "skidt");
+                var i = this.budNr;
+                this.forkert[i] = true;
+                this.budNr = -1;
+                this.valgNr = -1;
+                this.besked(NK.Skort.maerke("Ikke endnu", NK.html(m.valg[i][1]) + " Vælg igen."), "skidt");
+                this.kort.ryst();
+                this.pegKnap = true;
                 this.bygOpgave();
             }
             return;
@@ -307,7 +328,8 @@
         this.naaet = true;
         this.hjaelp = 0;
         this.auto = null;
-        this.besked(NK.html(m.efter), "god");
+        this.pegKnap = false;
+        this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         var gemt = NK.hent(NOEGLE, {}) || {};
         gemt.maal = Math.max(this.nr + 1, gemt.maal || 0);
@@ -321,22 +343,38 @@
         this.visStatus();
     };
 
-    /* Et valg i en valg-opgave */
+    /* Et valg i en valg-opgave vaelger kun. Indsend svar sender buddet. */
     P.vaelg = function (i) {
         var m = this.maal();
-        if (!m || m.slags !== "valg" || this.naaet) return;
+        if (!m || m.slags !== "valg" || this.naaet || this.forkert[i] || this.budNr >= 0) return;
         this.valgNr = i;
         if (this.afvisTilbud) this.afvisTilbud();
-        var set = this.antalFortyndinger(m.serie) >= m.k;
-        if (!set) {
-            this.besked("Dit bud: <b>" + NK.html(m.valg[i][0]) + "</b>. Tryk på Fortynd 10 gange under " +
-                (m.serie === "syre" ? "saltsyren" : "natriumhydroxiden") + " for at se det.", "");
-        } else if (i !== m.rigtig) {
-            this.besked(NK.html(m.valg[i][1]) + " Vælg igen.", "skidt");
-        }
-        this.bygOpgave();
+        this.besked("", "");
+        this.visKort();
+    };
+
+    /* Kan der trykkes Indsend svar? */
+    P.kanSendes = function () {
+        var m = this.maal();
+        if (!m || this.naaet || this.hjaelp === 2) return false;
+        if (m.slags === "valg") return this.valgNr >= 0 && this.budNr < 0;
+        if (m.slags === "tal") return !!(this.input && this.input.value.trim());
+        return false;
+    };
+
+    /* Indsend svar: buddet (bedoemmes, naar glasset er lavet) eller tallet */
+    P.indsend = function () {
+        var m = this.maal();
+        if (!this.kanSendes()) { this.kort.blink(); return; }
+        this.pegKnap = false;
+        if (m.slags === "tal") { this.tjekFelt(); return; }
+        this.budNr = this.valgNr;
+        if (this.antalFortyndinger(m.serie) < m.k) {
+            this.besked("Dit bud: <b>" + NK.html(m.valg[this.budNr][0]) + "</b>. Tryk på Fortynd 10 gange under " +
+                (m.serie === "syre" ? "saltsyren" : "natriumhydroxiden") + " for at se det.", "peger");
+        } else this.besked("", "");
         this.tjekMaal();
-        this.visStatus();
+        this.visKort();
     };
 
     /* Det, eleven skriver i tal-opgaven */
@@ -372,41 +410,53 @@
         var m = this.maal();
         if (!m || m.slags !== "tal" || this.naaet || !this.input) return;
         var r = SimFortynd.tjekTal(this.input.value, m);
-        if (r.tom) { this.besked(r.besked, ""); this.fokus(); return; }
+        if (r.tom) { this.besked(r.besked, "peger"); this.fokus(); return; }
         if (r.ok) { this.maalNaaet(); return; }
-        this.besked(NK.html(r.besked), "skidt");
-        var fe = this.feltEl;
-        if (fe) { fe.classList.remove("ryst"); void fe.offsetWidth; fe.classList.add("ryst"); }
+        this.besked(NK.Skort.maerke("Ikke endnu", NK.html(r.besked)), "skidt");
+        this.kort.ryst();
+        this.pegKnap = true;
+        this.visKort();
         this.fokus();
     };
 
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
     P.knap = function () {
+        if (this.naaet) this.videre(); else this.hjaelpKlik();
+    };
+
+    /* Start maalene forfra (knappen i panelet) */
+    P.forfra = function () {
+        this.nr = 0;
+        this.toemBordet();
+        this.startMaal();
+    };
+
+    /* Kortets groenne knap: naeste maal (efter det sidste: frit valg) */
+    P.videre = function () {
+        if (!this.maal() || !this.naaet) return;
+        this.nr++;
+        this.startMaal();
+    };
+
+    /* Hintknappen paa kortet: Giv hint -> Vis svaret */
+    P.hjaelpKlik = function () {
         var m = this.maal();
-        if (!m) {
-            this.nr = 0;
-            this.toemBordet();
-            this.startMaal();
-            return;
-        }
-        if (this.naaet) {
-            this.nr++;
-            this.startMaal();
-            return;
-        }
+        if (!m || this.naaet || this.hjaelp === 2) return;
+        this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(m.hint), "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(m.hint)), "gul");
             this.visMaal();
             return;
         }
         /* Vis svaret */
         this.brugtSvar = true;
+        this.besked("", "");
         if (m.slags === "tal") {
             this.maalNaaet();
-            this.besked("<b>Svar:</b> " + NK.html(m.efter), "gul");
             return;
         }
-        if (m.slags === "valg") this.valgNr = m.rigtig;
+        if (m.slags === "valg") { this.valgNr = m.rigtig; this.budNr = m.rigtig; }
         var til = m.slags === "basisk" ? D.MAKS_GLAS : m.k;
         if (this.antalFortyndinger(m.serie) >= til) { this.tjekMaal(); return; }
         this.auto = { serie: m.serie, til: til };
@@ -427,62 +477,33 @@
         this.el = {
             knap: NK.el("fortynd-knap"),
             besked: NK.el("fortynd-besked"),
-            kort: NK.el("fortynd-kort"),
-            opgave: NK.el("fortynd-opgave")
+            status: NK.el("fortynd-status"),
+            indsend: NK.el("fortynd-indsend"),
+            skort: NK.el("fortynd-skort")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.Skort("fortynd", {
+            valg: function (j) { mig.vaelg(j); },
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        /* Feltet til tallet staar paa kortet: Enter er Indsend svar */
+        this.el.skort.addEventListener("input", function () { mig.visKort(); });
+        this.el.skort.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); mig.indsend(); }
+        });
         NK.el("fortynd-nulstil").addEventListener("click", function () { mig.nulstil(); });
+        NK.el("fortynd-forfra").addEventListener("click", function () { mig.forfra(); });
     };
 
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort && this.serier) this.visKort();
     };
 
-    /* Valgknapperne eller feltet til tallet */
-    P.bygOpgave = function () {
-        var m = this.maal(), mig = this, v = this.el.opgave;
-        v.innerHTML = "";
-        this.input = null;
-        this.feltEl = null;
-        if (!m) return;
-        if (m.slags === "valg") {
-            var rad = document.createElement("div");
-            rad.className = "vaelgerrad";
-            m.valg.forEach(function (x, i) {
-                var b = document.createElement("button");
-                b.type = "button";
-                b.className = "vaelger";
-                if (i === mig.valgNr) {
-                    var vist = mig.antalFortyndinger(m.serie) >= m.k;
-                    b.className += vist ? (i === m.rigtig ? " rigtig" : " forkert") : " valgt";
-                }
-                b.textContent = x[0];
-                b.disabled = mig.naaet;
-                b.addEventListener("click", function () { mig.vaelg(i); });
-                rad.appendChild(b);
-            });
-            v.appendChild(rad);
-        } else if (m.slags === "tal") {
-            var fe = document.createElement("div");
-            if (this.naaet) {
-                fe.className = "felt " + (this.brugtSvar ? "svar" : "ok");
-                fe.innerHTML = '<span class="felt-svar"><b>' + K.tusind(m.svar) + '</b> gange</span><span class="felt-maerke">' + (this.brugtSvar ? "↩" : "✓") + "</span>";
-            } else {
-                fe.className = "felt aktiv";
-                fe.innerHTML = '<input type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Antal gange">' +
-                    '<span class="felt-efter">gange</span><button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1">↵</button>';
-                var inp = fe.querySelector("input");
-                inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjekFelt(); }
-                });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjekFelt(); });
-                this.input = inp;
-            }
-            this.feltEl = fe;
-            v.appendChild(fe);
-        }
-    };
+    /* Valgknapperne og feltet til tallet staar paa papirkortet (visKort) */
+    P.bygOpgave = function () { this.visKort(); };
 
     P.fokus = function () {
         if (this.input && NK.el("fane-fortynd").classList.contains("aktiv") &&
@@ -493,27 +514,52 @@
 
     P.visMaal = function () {
         var m = this.maal();
-        NK.saetTekst("fortynd-nr", String(Math.min(this.nr + 1, D.FORTYND_MAAL.length)));
-        NK.el("fortynd-taeller").hidden = !m;
-        var tekst, klasse = "knap";
+        NK.saetHTML("fortynd-taeller", m ? "mål <b>" + (this.nr + 1) + "</b>/" + D.FORTYND_MAAL.length : "alle " + D.FORTYND_MAAL.length + " nået");
+        this.visKort();
+    };
+
+    /* Papirkortet: maalet, buddene eller feltet, beskeden, Giv hint og Indsend
+       svar. Naar maalet er naaet, bliver kortet med forklaringen og Naeste maal. */
+    P.visKort = function () {
+        if (!this.kort || !this.serier) return;
+        var m = this.maal(), mig = this;
+        var b = this.fast;
+        if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
         if (!m) {
-            NK.saetTekst("fortynd-titel", "Frit valg");
-            NK.saetTekst("fortynd-prompt", "Fortynd saltsyren og natriumhydroxiden, og klik på et glas for at se det i luppen.");
-            tekst = "Start målene forfra";
-        } else {
-            NK.saetTekst("fortynd-titel", "Mål");
-            NK.saetTekst("fortynd-prompt", m.tekst);
-            if (this.naaet) {
-                tekst = this.nr >= D.FORTYND_MAAL.length - 1 ? "Til frit valg →" : "Næste mål →";
-                klasse = "knap blaa banker";
-            } else if (this.hjaelp === 0) tekst = "Giv hint";
-            else if (this.hjaelp === 1) tekst = "Vis svaret";
-            else tekst = "Fortynder …";
+            this.kort.vis({ chip: "Frit valg", tekst: "Fortynd saltsyren og natriumhydroxiden, og klik på et glas for at se det i luppen.",
+                besked: b, hint: null, indsend: null });
+            this.input = null;
+            return;
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = !!m && this.hjaelp === 2 && !this.naaet;
-        this.el.kort.classList.toggle("sejr", this.naaet);
+        var svar = null, ekstra = "";
+        if (m.slags === "valg") {
+            svar = m.valg.map(function (x, j) {
+                var kl = "";
+                if (mig.naaet) kl = j === m.rigtig ? (mig.brugtSvar ? "svar-vist" : "rigtig") : (mig.forkert[j] ? "forkert" : "dim");
+                else if (mig.forkert[j]) kl = "forkert";
+                else if (mig.valgNr === j) kl = "valgt";
+                return { html: NK.html(x[0]), kl: kl };
+            });
+        }
+        if (m.slags === "tal" && !this.naaet) {
+            ekstra = '<div class="sk-felt"><input type="text" id="fortynd-tal" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Antal gange">' +
+                '<span class="sk-felt-efter">gange</span></div>';
+        }
+        var forsoeg = m.slags === "glas" || m.slags === "basisk";
+        this.kort.vis({
+            chip: "Mål " + (this.nr + 1) + " af " + D.FORTYND_MAAL.length,
+            tekst: NK.html(m.tekst),
+            ekstra: ekstra,
+            svar: svar,
+            laast: this.naaet || this.budNr >= 0,
+            bliv: this.naaet ? { tekst: NK.html(m.efter), vist: this.brugtSvar,
+                knap: this.nr >= D.FORTYND_MAAL.length - 1 ? "Til frit valg →" : "Næste mål →" } : null,
+            besked: b,
+            hint: { tekst: this.hjaelp === 0 ? "Giv hint" : (this.hjaelp === 1 ? "Vis svaret" : "Fortynder …"),
+                svar: this.hjaelp > 0, peg: this.pegKnap, laast: this.hjaelp === 2 },
+            indsend: forsoeg ? null : { tekst: "Indsend svar", klar: this.kanSendes() }
+        });
+        this.input = NK.el("fortynd-tal");
     };
 
     P.visGlas = function () {
@@ -529,17 +575,19 @@
         NK.saetTekst("fortynd-ch", NK.potens(g.h3o, 2) + " M");
     };
 
-    P.visStatus = function () {
-        var m = this.maal(), t;
+    /* Det, kortet siger, mens der ikke er en besked (der er ingen linje nederst) */
+    P.visStatus = function () { this.visKort(); };
+
+    P.linje = function () {
+        var m = this.maal(), t = "";
         var g = this.valgt;
         var serieNavn = m && m.serie === "base" ? "natriumhydroxiden" : "saltsyren";
         var zm = this.lup.zoomerMod(), ion = g && g.serie === "base" ? "OH⁻" : "H₃O⁺";
         if (this.anim) t = "Pipetten tager 1 mL fra glasset før, og sprøjteflasken fylder op med 9 mL vand.";
         else if (zm > 0) t = "10 gange mere vand: 10 gange færre " + ion + " i luppen. Den zoomer ud til et 10 gange større rum.";
         else if (zm < 0) t = "Luppen zoomer ind på et 10 gange mindre rum.";
-        else if (m && this.naaet) t = "Målet er nået. Tryk på knappen til højre for at gå videre.";
-        else if (m && m.slags === "valg" && this.valgNr < 0) t = "Vælg dit bud til højre. Tryk så på <b>Fortynd 10 gange</b> under " + serieNavn + ".";
-        else if (m && m.slags === "tal") t = "Skriv tallet til højre. Glassene står på bordet.";
+        else if (m && this.naaet) t = "";
+        else if (m && ((m.slags === "valg" && this.budNr < 0) || m.slags === "tal")) t = "";      /* kortet siger det selv */
         else if (m && m.slags === "basisk" && g && g.serie === "syre" && g.k >= 5) {
             t = "pH " + K.phTekst(g.ph, 2) + ". " + (K.surhed(g.ph, 2) === "sur" ? "Stadig sur. Fortynd igen." : "Neutral, men ikke basisk. Fortynd igen.");
         } else if (m && m.serie && this.spaerret(m.serie)) {
@@ -549,7 +597,7 @@
             t = "Tryk på <b>Fortynd 10 gange</b> under " + serieNavn + "." + (k > 1 && n > 0 && n < k ? " " + n + " af " + k + " gange." : "");
         }
         else t = "Klik på et glas for at se det i luppen.";
-        NK.saetHTML("fortynd-status", t);
+        return t;
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------ */
@@ -811,9 +859,9 @@
         if (u.slags === "knapSyre") { this.fortynd("syre"); return; }
         if (u.slags === "knapBase") { this.fortynd("base"); return; }
         if (u.slags === "glas") { this.vaelgGlas(u.g); return; }
-        if (u.slags === "lup") { this.besked("Luppen viser det nyeste glas, eller det du har klikket på. Den zoomer selv, så der er 10 til 100 af den ion, der er flest af.", ""); return; }
-        if (u.slags === "skilt") { this.besked("1 del fra glasset før og 9 dele vand: 10 gange så meget væske og 10 gange lavere koncentration.", ""); return; }
-        if (u.slags === "skala") this.besked("Hvert glas står under sin pH. Stregen viser hvor.", "");
+        if (u.slags === "lup") { this.besked("Luppen viser det nyeste glas eller det glas, du har klikket på. Den zoomer selv til 10 til 100 af den ion, der er flest af.", "peger"); return; }
+        if (u.slags === "skilt") { this.besked("1 del fra glasset før og 9 dele vand: 10 gange så meget væske og 10 gange lavere koncentration.", "peger"); return; }
+        if (u.slags === "skala") this.besked("Hvert glas står under sin pH. Stregen viser hvor.", "peger");
     };
 
     P.tast = function (e) {
@@ -827,8 +875,9 @@
 
     P.enter = function () {
         var m = this.maal();
-        if (this.naaet || !m) { this.knap(); return; }
-        if (m.slags === "tal") { this.tjekFelt(); return; }
+        if (!m) return;
+        if (this.naaet) { this.videre(); return; }
+        if (this.kanSendes()) { this.indsend(); return; }
         if (m.serie) this.fortynd(m.serie);
     };
 

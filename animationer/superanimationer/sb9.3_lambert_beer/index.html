@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lambert-Beers lov</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">λ</span> Lambert-Beers lov</h1>
@@ -28,16 +29,19 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-lys" role="tabpanel" aria-label="Lyset">
     <div class="scene">
-        <div class="sp-top">
-            <p class="opgavelinje" id="lys-spm"></p>
-            <div class="valgrad" id="lys-valg"></div>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="lys-skort">
+                <div class="sk-ind" id="lys-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="lys-status">
+                    <p class="st-tekst" id="lys-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="lys-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="lys-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
         </div>
         <div class="laerred-ramme"><canvas id="lys-laerred"></canvas></div>
-        <div class="statuslinje" id="lys-status">
-            <p class="st-tekst" id="lys-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="lys-forfra" type="button" title="Samme forudsigelse forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="lys-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -70,6 +74,8 @@
         <div class="kort" id="lys-opgaver">
             <h2>Forudsigelserne <span class="taeller">prøvet <b id="lys-loest">0</b>/6</span></h2>
             <div class="opg-liste" id="lys-liste"></div>
+            <p class="faerdig-tekst" id="lys-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="lys-forfra" type="button" title="Samme forudsigelse forfra (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -79,15 +85,19 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-kurve" role="tabpanel" aria-label="Standardkurven">
     <div class="scene">
-        <div class="sp-top">
-            <p class="opgavelinje" id="kurve-linje"></p>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="kurve-skort">
+                <div class="sk-ind" id="kurve-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="kurve-status">
+                    <p class="st-tekst" id="kurve-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="kurve-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="kurve-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
         </div>
         <div class="laerred-ramme"><canvas id="kurve-laerred"></canvas></div>
-        <div class="statuslinje" id="kurve-status">
-            <p class="st-tekst" id="kurve-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="kurve-forfra" type="button" title="Samme opgave forfra med en ny prøve (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="kurve-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -104,6 +114,8 @@
         <div class="kort" id="kurve-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="kurve-loest">0</b>/4</span></h2>
             <div class="opg-liste" id="kurve-liste"></div>
+            <p class="faerdig-tekst" id="kurve-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="kurve-forfra" type="button" title="Samme opgave forfra med en ny prøve (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -113,8 +125,19 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-regn" role="tabpanel" aria-label="Beregningen">
     <div class="scene">
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="regn-skort">
+                <div class="sk-ind" id="regn-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="regn-status">
+                    <p class="st-tekst" id="regn-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="regn-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="regn-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
+        </div>
         <div class="arbejde" id="regn-arbejde">
-            <p class="opgavelinje" id="regn-linje"></p>
 
             <div class="tavle" id="regn-tavle">
                 <div class="tv-navn" id="regn-navn"></div>
@@ -143,11 +166,6 @@
             </div>
         </div>
 
-        <div class="statuslinje" id="regn-status">
-            <p class="st-tekst" id="regn-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="regn-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="regn-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
@@ -159,6 +177,8 @@
         <div class="kort" id="regn-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/8</span></h2>
             <div class="opg-liste" id="regn-liste"></div>
+            <p class="faerdig-tekst" id="regn-faerdig"></p>
+            <div class="forfra-raekke"><button class="forfraknap" id="regn-forfra" type="button" title="Samme opgave forfra (R)">Start forfra ↺</button></div>
         </div>
     </aside>
 </section>
@@ -194,7 +214,7 @@
         <div class="eksempel">A = a · c &nbsp;&nbsp;hvor&nbsp;&nbsp; a = ε · l</div>
         <p>Prøvens koncentration aflæses på linjen eller beregnes som c = A / a. Prøven skal måles i samme kuvette og ved samme bølgelængde som standarderne.</p>
 
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -225,6 +245,7 @@
 <script src="js/lb.js"></script>
 <script src="js/data.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_lys.js"></script>

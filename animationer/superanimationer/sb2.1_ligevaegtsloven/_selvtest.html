@@ -573,7 +573,9 @@ function koerTest(W) {
             facitBrikker(B, Fa.num).forEach(function (t) { S.tilfoej("num", t); });
             facitBrikker(B, Fa.den).forEach(function (t) { S.tilfoej("den", t); });
             S.indsend(); maal(S, o.id + " rigtigt");
+            var foerKl = S.kortTekst();
             S.klikArt(B.alle(o)[0]); maal(S, o.id + " rigtigt og klik i skemaet");
+            if (S.kortTekst() !== foerKl || !S.el.skort.classList.contains("blink")) zFejl.push(o.id + " klik i skemaet efter rigtigt svar ændrer kortet eller blinker ikke");
             S.nulstil();
         });
         NK.visFane("fane-ff");
@@ -585,7 +587,7 @@ function koerTest(W) {
             F.knap(); maal(F, o.id + " svaret");
         });
     });
-    paastand("kortet holder sig i kortZone og over tavlen i 1400 × 860 og 1100 × 700 (højst " + Math.round(hoejst) + " px)", zFejl.length === 0, zFejl.slice(0, 4).join(", "));
+    paastand("kortet holder sig i kortZone og over tavlen i 1400 × 860 og 1100 × 700 (højst " + Math.round(hoejst) + " px)", zFejl.length === 0, zFejl.slice(0, 40).join(", "));
     S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
     F.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
     ramme.style.width = "1300px";

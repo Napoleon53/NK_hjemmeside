@@ -149,11 +149,15 @@ function koerAlt() {
     var niv = NK.niveauer.middel;
     NK.visNiveau("middel");
     function tilReaktion(n, id) { n.start(n.liste.map(function (R) { return R.id; }).indexOf(id)); }
+    /* Papirkortet: efter et rigtigt svar bliver kortet på trinnet (n.bliv),
+       til Næste trin (n.videre). rigtigt() går først videre fra et løst trin
+       og løser så det næste. */
     function rigtigt(n) {
         var R = n.R;
+        if (n.bliv && !n.faerdig) n.videre();
         switch (n.trin) {
         case T.OX: R.led.forEach(function (l, i) { n.f.o[i] = X.ox(l.st.ox[l.st.ukendt]); }); n.tjek(); break;
-        case T.PAR: var L = n.parListe(); n.valgKlik(1, L[1].type); n.valgKlik(0, L[0].type); break;
+        case T.PAR: var L = n.parListe(); n.valgKlik(1, L[1].type); n.valgKlik(0, L[0].type); n.tjek(); break;
         case T.E: n.f.eox = String(R.ox.delta); n.f.ered = "-" + R.red.delta; n.tjek(); break;
         case T.K: R.koef.forEach(function (v, i) { n.f.k[i] = String(v); }); n.tjek(); break;
         case T.LAD: n.f.lv = X.lad(R.ladning.v); n.f.lh = String(R.ladning.h); n.tjek(); break;
@@ -161,8 +165,10 @@ function koerAlt() {
         case T.VAND: n.f[R.vand.side === "v" ? "wv" : "wh"] = String(R.vand.antal); n.tjek(); break;
         }
     }
-    function til(n, trin) { var g = 0; while (n.trin < trin && !n.faerdig && g++ < 12) rigtigt(n); }
-    function besked(n) { return n.besked.tekst; }
+    function nu(n) { return n.bliv && !n.faerdig ? n.bliv.til : n.trin; }
+    function til(n, trin) { var g = 0; while (nu(n) < trin && !n.faerdig && g++ < 12) rigtigt(n); if (n.bliv && !n.faerdig) n.videre(); }
+    /* Det, kortets nederste række siger: beskeden, eller Rigtigt og forklaringen, når kortet bliver på trinnet */
+    function besked(n) { return n.bliv ? ((n.bliv.vist ? "" : "Rigtigt. ") + n.bliv.tekst).trim() : n.besked.tekst; }
 
     tilReaktion(niv, "M1");
     niv.f.o = { 0: "+8", 1: "+II", 2: "+II", 3: "" }; niv.tjek();
@@ -172,11 +178,18 @@ function koerAlt() {
     til(niv, T.PAR);
     var L = niv.parListe(), forkert = L[0].type === "ox" ? "red" : "ox";
     niv.valgKlik(0, forkert);
-    paastand("trin 2: forkert valg forklarer, om tallet stiger eller falder", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv)) && !!niv.parFejl, besked(niv));
-    niv.valgKlik(0, L[0].type);
-    paastand("trin 2: ét rigtigt valg er ikke nok; begge par skal have et navn", niv.trin === T.PAR && niv.parOk[0] && !niv.parOk[1] && besked(niv) === "");
+    paastand("trin 2: et valg på en klamme vælger kun, og ét valg er ikke nok til Indsend svar", niv.trin === T.PAR && !niv.bliv && niv.parValg[0] === forkert && !niv.parOk[0]
+        && besked(niv) === "" && !niv.kanSendes(), besked(niv));
     niv.valgKlik(1, L[1].type);
-    paastand("trin 2: når begge er valgt, går det videre med et kort Rigtigt", niv.trin === T.E && besked(niv) === "Rigtigt.", besked(niv));
+    paastand("trin 2: med et valg ved begge klammer er Indsend svar klar, men intet er bedømt", niv.kanSendes() && !niv.parOk[1] && !niv.bliv);
+    niv.tjek();
+    paastand("trin 2: Indsend svar bedømmer; forkert valg forklarer, om tallet stiger eller falder, og skal vælges om", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv))
+        && !!niv.parFejl && niv.parOk[1] && !niv.parOk[0] && !niv.parValg[0] && !niv.kanSendes(), besked(niv));
+    niv.valgKlik(0, L[0].type);
+    niv.tjek();
+    paastand("trin 2: når begge er rigtige, bliver kortet på trin 2 med et kort Rigtigt", niv.trin === T.PAR && !!niv.bliv && niv.bliv.til === T.E && besked(niv) === "Rigtigt.", besked(niv));
+    niv.videre();
+    paastand("Næste trin går videre til trin 3, og rosen står ikke under det nye spørgsmål", niv.trin === T.E && !niv.bliv && niv.besked.tekst === "", niv.besked.tekst);
     niv.f.eox = "3"; niv.f.ered = "7"; niv.tjek();
     paastand("trin 3: et oxidationstal i stedet for forskellen", /forskellen/.test(besked(niv)), besked(niv));
     niv.f.eox = "5"; niv.f.ered = "1"; niv.tjek();
@@ -191,6 +204,8 @@ function koerAlt() {
     niv.f.k = { 0: "", 1: "5", 2: "", 3: "5" }; niv.tjek();
     paastand("trin 4: tomme felter tæller ikke som 1; eleven skriver også 1", niv.trin === T.K && /også når det er 1/.test(besked(niv)) && niv.fejlF.k0 && niv.fejlF.k2 && !niv.fejlF.k1, besked(niv));
     niv.f.k = { 0: "1", 1: "5", 2: "1", 3: "5" }; niv.tjek();
+    paastand("trin 4: rigtigt bliver på trinnet med forklaringen, og Enter er Næste trin", niv.trin === T.K && besked(niv) === "Rigtigt. Elektronerne går lige op.", besked(niv));
+    niv.tjek();
     niv.f.lv = "1"; niv.f.lh = "+17"; niv.tjek();
     paastand("trin 5: koefficienterne glemt, med et eksempel", /husk koefficienterne\. 5 Fe²⁺ har ladningen 5 · \(\+2\) = \+10/.test(besked(niv)), besked(niv));
     til(niv, T.ION);
@@ -201,6 +216,7 @@ function koerAlt() {
     niv.f.ih = ""; niv.f.iv = "6"; niv.tjek();
     paastand("trin 6: for få, med ladningen, som den er nu", /\+15 før pilen og \+17 efter\. Der er 2 H⁺ for få/.test(besked(niv)), besked(niv));
     niv.f.iv = "8"; niv.tjek();
+    niv.videre();
     niv.f.wv = "4"; niv.tjek();
     paastand("trin 7: vand på den forkerte side", /mangler O/.test(besked(niv)), besked(niv));
     niv.f.wv = ""; niv.f.wh = "3"; niv.tjek();
@@ -229,6 +245,7 @@ function koerAlt() {
             n.start(i);
             var g = 0, trinSet = [];
             while (!n.faerdig && g++ < 12) {
+                if (n.bliv) n.videre();
                 trinSet.push(n.trin);
                 var h = n.hint();
                 n.hintFelt = null;
@@ -236,8 +253,8 @@ function koerAlt() {
                 tekster.push(h);
                 var foer = n.trin;
                 rigtigt(n);
-                tekster.push(n.besked.tekst);
-                if (n.trin === foer && !n.faerdig) { ustabil.push(R.id + " trin " + (foer + 1) + ": " + n.besked.tekst); break; }
+                tekster.push(besked(n));
+                if (!n.bliv && !n.faerdig) { ustabil.push(R.id + " trin " + (foer + 1) + ": " + n.besked.tekst); break; }
             }
             if (!n.faerdig || n.vist) ikkeFaerdig.push(R.id);
             var forvent = X.skemaTekst(R.slut), noten = d.querySelector("#tavle .tavle-note");
@@ -267,12 +284,14 @@ function koerAlt() {
             n.start(i);
             var g = 0;
             while (!n.faerdig && g++ < 12) {
+                if (n.bliv) n.videre();
                 n.knap();
                 if (n.besked.klasse !== "gul" || !/^Hint: /.test(n.besked.tekst)) { svarFejl.push(R.id + " hint"); break; }
                 tekster.push(n.besked.tekst);
                 n.knap();
-                tekster.push(n.besked.tekst);
-                if (/undefined|NaN/.test(n.besked.tekst)) svarFejl.push(R.id + ": " + n.besked.tekst);
+                tekster.push(besked(n));
+                if (!n.bliv || !n.bliv.vist) svarFejl.push(R.id + " bliver ikke på trinnet efter Vis svaret");
+                if (/undefined|NaN/.test(besked(n))) svarFejl.push(R.id + ": " + besked(n));
             }
             if (!n.faerdig || !n.vist) svarFejl.push(R.id + " ikke færdig");
         });
@@ -356,7 +375,11 @@ function koerAlt() {
     function felt(key) { return d.querySelector('[data-felt="' + key + '"]'); }
     function vaelgFelt(key) { var el = felt(key); ev(el, "pointerdown"); ev(el, "focusin"); return el; }
     function tast(t) { var kn = d.querySelector('#taster .tast[data-tast="' + t + '"]'); if (kn) kn.click(); return !!kn; }
-    var ta = d.getElementById("taster"), tjek = d.getElementById("tjek"), hintknap = d.getElementById("opgaveknap"), arket = d.getElementById("tavle");
+    var ta = d.getElementById("taster"), arket = d.getElementById("tavle"), skort = d.getElementById("skort"), kplads = d.getElementById("kortplads");
+    /* Kortets knapper tegnes om ved hvert svar, så de hentes hver gang */
+    function tjekK() { return d.getElementById("tjek"); }
+    function hintK() { return d.getElementById("opgaveknap"); }
+    function naesteK() { return skort.querySelector("[data-videre]"); }
     function tastNavne() { return Array.prototype.map.call(ta.querySelectorAll(".tast"), function (kn) { return kn.textContent; }); }
     function klamme(nr) { return arket.querySelector('.klamme[data-par="' + nr + '"]'); }
     function klTekst(nr) { return klamme(nr).textContent.replace(/\s+/g, " ").trim(); }
@@ -372,7 +395,7 @@ function koerAlt() {
         var hale = parseFloat(ta.style.getPropertyValue("--hale"));
         return !ta.classList.contains("uden-hale") && Math.abs(r.left + hale - (f.left + f.width / 2)) <= 3;
     }
-    /* Hvor står tingene? De fire stoffer, tasterne, knapperne og beskeden. */
+    /* Hvor står tingene? De fire stoffer, tasterne, kortet og arket. */
     function aftryk() {
         var a = { fs: skrift(), led: [] };
         for (var i = 0; i < 4; i++) {
@@ -380,8 +403,7 @@ function koerAlt() {
             a.led.push([Math.round(r.left), Math.round(r.top)]);
         }
         a.taster = Math.round(ta.getBoundingClientRect().top);
-        a.knapper = Math.round(d.querySelector(".ab-knapper").getBoundingClientRect().top);
-        a.besked = Math.round(d.getElementById("besked").getBoundingClientRect().top);
+        a.kort = Math.round(skort.getBoundingClientRect().top);
         a.ark = Math.round(arket.getBoundingClientRect().height);
         return a;
     }
@@ -390,11 +412,11 @@ function koerAlt() {
         for (var i = 0; i < 4; i++) storst = Math.max(storst, Math.abs(a.led[i][0] - b.led[i][0]), Math.abs(a.led[i][1] - b.led[i][1]));
         return storst > tol || a.fs !== b.fs;
     }
-    function nedeFlyttet(a, b) { return a.taster !== b.taster || a.knapper !== b.knapper || a.besked !== b.besked || a.ark !== b.ark; }
+    function nedeFlyttet(a, b) { return a.taster !== b.taster || a.kort !== b.kort || a.ark !== b.ark; }
 
-    paastand("Kemichael er ikke med: ingen figur, ingen præsentation og ingen filer uden for mappen",
+    paastand("Kemichael er ikke med: ingen figur, ingen præsentation og ingen filer uden for mappen ud over papirkortet i ../faelles/",
         !NK.laerer && !NK.Laerer && !NK.Kemichael && !NK.Praesentation && !d.getElementById("tilbud") && !d.getElementById("spring-over")
-        && Array.prototype.every.call(d.querySelectorAll("script[src], link[href]"), function (e) { return (e.getAttribute("src") || e.getAttribute("href")).indexOf("..") < 0; }));
+        && Array.prototype.every.call(d.querySelectorAll("script[src], link[href]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return u.indexOf("..") < 0 || /^\.\.\/faelles\/papirkort\.(css|js)$/.test(u); }));
     d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "k", bubbles: true }));
     paastand("? står stadig i hjørnet", !!d.getElementById("hjaelpknap").offsetWidth && d.getElementById("hjaelpknap").textContent === "?");
 
@@ -404,19 +426,36 @@ function koerAlt() {
     var fsSk = skrift(), of = felt("o0").getBoundingClientRect();
     paastand("skemaet er stort: mindst 40 px i trin 1 ved 1400 × 860 (den første udgave havde 33,6 px)", fsSk >= 40, fsSk + " px");
     paastand("felterne er til at ramme: mindst 50 × 34 px", of.width >= 50 && of.height >= 34, Math.round(of.width) + " x " + Math.round(of.height));
-    var ot = d.getElementById("opgavetekst"), spm = d.getElementById("ab-spm"), rammeTop = tramme.getBoundingClientRect().top;
-    paastand("opgaven og trinnets spørgsmål står over tavlen med stor skrift",
-        !!ot.closest(".scene") && !d.querySelector(".panel #opgavetekst") && ot.getBoundingClientRect().bottom <= rammeTop && spm.getBoundingClientRect().bottom <= rammeTop
-        && parseFloat(w.getComputedStyle(ot).fontSize) >= 18 && parseFloat(w.getComputedStyle(spm).fontSize) >= 18 && /surt miljø/.test(ot.textContent) && /permanganat/.test(d.getElementById("kontekst").textContent),
-        w.getComputedStyle(ot).fontSize + " og " + w.getComputedStyle(spm).fontSize);
-
-    var kr = hintknap.getBoundingClientRect(), tr = tjek.getBoundingClientRect();
-    paastand("Giv hint står på tavlen ved siden af Tjek, ikke i panelet", !!hintknap.closest("#tavleramme") && !d.querySelector(".panel #opgaveknap") && hintknap.textContent === "Giv hint"
-        && Math.abs(kr.top - tr.top) < 12 && kr.right <= tr.left && tr.left - kr.right < 30, Math.round(tr.left - kr.right) + " px imellem");
-    niv.f.o = { 0: "+8" }; niv.tjek();
-    var lyser = hintknap.classList.contains("lys");
-    hintknap.click();
-    paastand("efter et forkert svar lyser hintknappen op, til hintet er givet", lyser && !hintknap.classList.contains("lys") && hintknap.textContent === "Vis svaret" && /^Hint: /.test(besked(niv)), besked(niv));
+    /* Papirkortet (6. nov. 2026) */
+    var scR = d.getElementById("scene").getBoundingClientRect(), skR0 = skort.getBoundingClientRect(), rammeTop = tramme.getBoundingClientRect().top;
+    var stilark = Array.prototype.map.call(d.querySelectorAll("link[rel=stylesheet]"), function (e) { return e.getAttribute("href"); });
+    paastand("papirkortet er slået til: body.papirkort, papirkort.css efter stil.css og papirkort.js før opgave.js",
+        d.body.classList.contains("papirkort") && stilark.indexOf("../faelles/papirkort.css") > stilark.indexOf("css/stil.css") && !!NK.Papir
+        && w.getComputedStyle(skort).fontFamily.indexOf("Lexend") >= 0, stilark.join(", ") + " / " + w.getComputedStyle(skort).fontFamily);
+    paastand("kortet står øverst i midten af scenen over arket, ikke i panelet",
+        !!skort.closest(".scene") && !d.querySelector(".panel .scenekort") && Math.abs((skR0.left + skR0.right) / 2 - (scR.left + scR.right) / 2) <= 3
+        && skR0.top - scR.top <= 16 && skR0.bottom <= rammeTop, Math.round(skR0.left) + "-" + Math.round(skR0.right) + " i " + Math.round(scR.left) + "-" + Math.round(scR.right));
+    paastand("på kortet står trinnet som indlejret overskrift, opgaven og trinnets spørgsmål",
+        /^Trin 1 af 7$/.test(skort.querySelector(".sk-chip").textContent) && /surt miljø/.test(skort.textContent) && /permanganat/.test(skort.textContent)
+        && /Skriv oxidationstallene i felterne over atomerne\./.test(skort.querySelector(".sk-spm").textContent), skort.textContent);
+    paastand("ingen statuslinje eller besked under arket: beskeden og knapperne står på kortet",
+        !d.querySelector(".ab-bund, .statuslinje, .opgavelinje, .ab-hoved") && !!skort.querySelector("#besked") && !!skort.querySelector("#tjek") && !!skort.querySelector("#opgaveknap"));
+    paastand("Start forfra står i panelet, ikke på kortet", !!d.querySelector(".panel #forfra") && !skort.querySelector("#forfra") && !/forfra/i.test(skort.textContent));
+    var kr = hintK().getBoundingClientRect(), tr = tjekK().getBoundingClientRect();
+    paastand("Giv et hint står ved siden af Indsend svar på kortet, og Indsend svar er grå uden noget at sende",
+        hintK().textContent === "Giv et hint" && tjekK().textContent === "Indsend svar" && Math.abs(kr.top - tr.top) < 12 && kr.right <= tr.left && tr.left - kr.right < 30
+        && tjekK().classList.contains("ikke-klar") && !niv.kanSendes(), Math.round(tr.left - kr.right) + " px imellem");
+    tjekK().click();
+    paastand("Indsend svar uden noget at sende bedømmer ikke, men får kortet til at blinke og siger, hvad der mangler",
+        niv.trin === T.OX && !niv.bliv && niv.besked.klasse === "peger" && /Skriv først/.test(besked(niv)) && skort.classList.contains("blink") && !Object.keys(niv.fejlF).length, besked(niv));
+    niv.f.o = { 0: "+8" }; niv.visIndsend();
+    paastand("Indsend svar bliver klar, når der står noget i et felt", tjekK().classList.contains("klar") && !tjekK().classList.contains("ikke-klar"));
+    niv.tjek();
+    var lyser = hintK().classList.contains("peg");
+    paastand("et forkert svar står på kortet som Ikke rigtigt, og hintknappen lyser stille op", lyser && skort.querySelector(".sk-bund.skidt .b-maerke").textContent === "Ikke rigtigt", skort.textContent);
+    hintK().click();
+    paastand("efter hintet hedder knappen Vis svaret, og hintet står på kortet", !hintK().classList.contains("peg") && hintK().textContent === "Vis svaret" && /^Hint: /.test(besked(niv))
+        && !!skort.querySelector(".sk-bund.gul"), besked(niv));
     tilReaktion(niv, "M1");
 
     /* Trin 1 */
@@ -433,8 +472,17 @@ function koerAlt() {
     vaelgFelt("o0"); tast("−II");
     paastand("et klik på et felt vælger det, og et nyt tryk afløser tallet", niv.f.o[0] === "−II" && NK.Taster.valgt() === "o0" && felt("o0").classList.contains("valgt"));
     tast("+VII");
-    tjek.click();
-    paastand("trin 1 kan løses med tasterne alene, og svaret er kun et kort Rigtigt", niv.trin === T.PAR && besked(niv) === "Rigtigt.", besked(niv));
+    var indsendR = tjekK().getBoundingClientRect();
+    tjekK().click();
+    var naesteR = naesteK() ? naesteK().getBoundingClientRect() : { right: 0, top: 0 };
+    paastand("trin 1 kan løses med tasterne alene; kortet bliver på trin 1 med et kort Rigtigt og Næste trin, dér hvor Indsend svar stod",
+        niv.trin === T.OX && !!niv.bliv && besked(niv) === "Rigtigt." && skort.classList.contains("loest") && /^Trin 1 af 7$/.test(skort.querySelector(".sk-chip").textContent)
+        && !tjekK() && !!naesteK() && naesteK().textContent === "Næste trin" && Math.abs(naesteR.right - indsendR.right) <= 3 && Math.abs(naesteR.top - indsendR.top) <= 20,
+        besked(niv) + " / " + Math.round(naesteR.right) + " mod " + Math.round(indsendR.right));
+    paastand("mens kortet bliver, er tasterne væk, og et klik på arket får kortet til at blinke", ta.classList.contains("tom") && (function () {
+        skort.classList.remove("blink"); arket.querySelector(".skema").click(); return skort.classList.contains("blink") && !!niv.bliv; }()));
+    naesteK().click();
+    paastand("Næste trin går til trin 2, og rosen står ikke under det nye spørgsmål", niv.trin === T.PAR && !niv.bliv && !skort.querySelector(".sk-bund.god") && /^Trin 2 af 7$/.test(skort.querySelector(".sk-chip").textContent));
 
     /* Trin 2: en klamme pr. par, to knapper på hver */
     var a2 = aftryk(), par = niv.parListe();
@@ -443,16 +491,23 @@ function koerAlt() {
     paastand("trin 2: en klamme over og en under skemaet, fra atomet før pilen til det samme atom efter",
         k0.bottom <= skR.top + 0.3 * skrift() && k1.top >= skR.bottom - 6 && Math.abs(k0.left - atomMidt(par[0].v)) <= 3 && Math.abs(k0.right - atomMidt(par[0].h)) <= 3
         && Math.abs(k1.left - atomMidt(par[1].v)) <= 3 && Math.abs(k1.right - atomMidt(par[1].h)) <= 3);
-    paastand("på hver klamme står to knapper, tasterne er væk, men beholder deres plads", klamme(0).querySelectorAll(".valgknap").length === 2 && klamme(1).querySelectorAll(".valgknap").length === 2
-        && ta.classList.contains("tom") && w.getComputedStyle(ta).visibility === "hidden" && tjek.hidden);
+    paastand("på hver klamme står to knapper, tasterne er væk, men beholder deres plads, og Indsend svar er grå", klamme(0).querySelectorAll(".valgknap").length === 2 && klamme(1).querySelectorAll(".valgknap").length === 2
+        && ta.classList.contains("tom") && w.getComputedStyle(ta).visibility === "hidden" && tjekK().classList.contains("ikke-klar"));
     klamme(0).querySelector('.valgknap[data-valg="' + par[0].type + '"]').click();
     var a2b = aftryk();
-    paastand("første valg farver sin klamme og skriver navnet, og resten af arket står, som det stod",
-        niv.trin === T.PAR && klamme(0).querySelectorAll(".valgknap").length === 0 && /^(Oxidation|Reduktion)$/.test(klTekst(0)) && klamme(0).classList.contains(par[0].type === "ox" ? "r-ox" : "r-red")
-        && klamme(1).querySelectorAll(".valgknap").length === 2 && !flyttet(a2, a2b, 0) && besked(niv) === "", klTekst(0) + " / " + besked(niv));
+    paastand("første valg markerer kun knappen: intet er bedømt, og arket står, som det stod",
+        niv.trin === T.PAR && !niv.parOk[0] && !!klamme(0).querySelector('.valgknap.valgt[data-valg="' + par[0].type + '"]') && klamme(0).querySelectorAll(".valgknap").length === 2
+        && !flyttet(a2, a2b, 0) && besked(niv) === "" && tjekK().classList.contains("ikke-klar"), klTekst(0) + " / " + besked(niv));
     klamme(1).querySelector('.valgknap[data-valg="' + par[0].type + '"]').click();
-    paastand("samme navn på begge klammer får en forklaring", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv)) && !!klamme(1).querySelector(".valgknap.forkert"), besked(niv));
+    paastand("med et valg ved begge klammer bliver Indsend svar klar", tjekK().classList.contains("klar") && niv.trin === T.PAR && besked(niv) === "");
+    tjekK().click();
+    paastand("samme navn på begge klammer: Indsend svar giver en forklaring, det rigtige valg farver sin klamme, og det forkerte bliver rødt",
+        niv.trin === T.PAR && !niv.bliv && /(stiger|falder), så det er en/.test(besked(niv)) && !!klamme(1).querySelector(".valgknap.forkert")
+        && /^(Oxidation|Reduktion)$/.test(klTekst(0)) && klamme(0).classList.contains(par[0].type === "ox" ? "r-ox" : "r-red"), besked(niv));
     klamme(1).querySelector('.valgknap[data-valg="' + par[1].type + '"]').click();
+    tjekK().click();
+    paastand("trin 2: begge rigtige, og kortet bliver på trinnet", niv.trin === T.PAR && !!niv.bliv && besked(niv) === "Rigtigt.", besked(niv));
+    naesteK().click();
 
     /* Trin 3: feltet står på klammen */
     var a3 = aftryk(), foerste = par[0].type === "ox" ? "eox" : "ered";
@@ -460,8 +515,12 @@ function koerAlt() {
         niv.trin === T.E && !!klamme(0).querySelector("input") && !!klamme(1).querySelector("input") && /^Reduktion falder med pr\. atom$/.test(klTekst(0)) && /^Oxidation stiger med pr\. atom$/.test(klTekst(1))
         && tastNavne().join("") === "1234567890⌫" && NK.Taster.valgt() === foerste, klTekst(0) + " | " + klTekst(1) + " / " + NK.Taster.valgt());
     vaelgFelt("eox"); tast("1"); vaelgFelt("ered"); tast("5");
-    tjek.click();
-    paastand("trin 3 kan løses med tasterne", niv.trin === T.K && besked(niv) === "Rigtigt.", besked(niv));
+    tjekK().click();
+    paastand("trin 3 kan løses med tasterne; felterne bliver grønne og låst, mens kortet bliver", niv.trin === T.E && besked(niv) === "Rigtigt."
+        && klamme(0).querySelector("input").classList.contains("rigtig") && klamme(0).querySelector("input").readOnly && klamme(1).querySelector("input").readOnly, besked(niv));
+    var laastFoer = niv.f.eox;
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter er Næste trin, når kortet bliver på et løst trin", niv.trin === T.K && !niv.bliv && niv.f.eox === laastFoer);
 
     /* Trin 4: felterne kommer i de pladser, der har stået der fra start */
     var a4 = aftryk();
@@ -476,8 +535,10 @@ function koerAlt() {
     vaelgFelt("k1"); tast("5");
     paastand("et klik i feltet og et nyt ciffer afløser det gamle", niv.f.k[1] === "5" && klTekst(1) === "Oxidation afgiver 5 · 1 e⁻ = 5 e⁻", niv.f.k[1]);
     vaelgFelt("k2"); tast("1"); vaelgFelt("k3"); tast("5");
-    tjek.click();
-    paastand("trin 4 kan løses med tasterne", niv.trin === T.LAD, besked(niv));
+    tjekK().click();
+    paastand("trin 4 kan løses med tasterne", niv.trin === T.K && !!niv.bliv && niv.bliv.til === T.LAD, besked(niv));
+    paastand("plus og minus på vægten skriver ikke i de låste felter", !niv.vaegtKlik("v", 1) && niv.f.k[1] === "5");
+    naesteK().click();
 
     /* Trin 5: ladningen i rækken under skemaet */
     var a5 = aftryk();
@@ -491,8 +552,9 @@ function koerAlt() {
     tast("+");
     paastand("fortegnet kan sættes efter tallet og skiftes", medMinus === "−9" && niv.f.lv === "+9", medMinus + " / " + niv.f.lv);
     vaelgFelt("lh"); tast("+"); tast("1"); tast("7");
-    tjek.click();
-    paastand("trin 5 kan løses med tasterne", niv.trin === T.ION, besked(niv));
+    tjekK().click();
+    paastand("trin 5 kan løses med tasterne", niv.trin === T.LAD && !!niv.bliv && niv.bliv.til === T.ION, besked(niv));
+    naesteK().click();
 
     /* Trin 6 og 7: skemaet bliver langt én gang, og derefter står det stille igen */
     var a6 = aftryk();
@@ -505,22 +567,27 @@ function koerAlt() {
     paastand("ladningen følger med, mens der skrives: +15 ≠ +17", /\+15\s*≠\s*Ladning\s*\+17/.test(raekker()[0]) && !!arket.querySelector(".rrk.nej"), raekker()[0]);
     vaelgFelt("iv"); tast("8");
     paastand("og bliver grøn, når den er ens: +17 = +17", /\+17\s*=\s*Ladning\s*\+17/.test(raekker()[0]) && !!arket.querySelector(".rrk.ok"), raekker()[0]);
-    tjek.click();
+    tjekK().click();
+    naesteK().click();
     var a7 = aftryk();
     paastand("trin 7: heller ikke her er et felt valgt på forhånd, og rækken med O er kommet", niv.trin === T.VAND && NK.Taster.valgt() === null && /O\s*4\s*≠\s*O\s*0/.test(raekker()[1]), raekker()[1]);
     vaelgFelt("wh"); tast("4");
-    tjek.click();
+    indsendR = tjekK().getBoundingClientRect();
+    tjekK().click();
     var aSlut = aftryk();
     paastand("fra trin 6 til det færdige skema står stofferne samme sted", !flyttet(a6, a7, 3) && !flyttet(a6, aSlut, 3) && !nedeFlyttet(a6, a7) && !nedeFlyttet(a6, aSlut), JSON.stringify(a6.led) + " mod " + JSON.stringify(aSlut.led));
-    paastand("M1 kan afstemmes med tasterne alene, og den gule knap bliver til en grøn Ny opgave", niv.faerdig && !niv.vist && ta.classList.contains("tom") && tjek.hidden
-        && hintknap.textContent === "Ny opgave" && hintknap.classList.contains("groen") && !!hintknap.offsetWidth && besked(niv) === "Rigtigt. Reaktionen er afstemt.", hintknap.textContent + " / " + besked(niv));
+    naesteR = naesteK() ? naesteK().getBoundingClientRect() : { right: 0, top: 0 };
+    paastand("M1 kan afstemmes med tasterne alene; kortet bliver på trin 7 med Rigtigt og en grøn Næste opgave, dér hvor Indsend svar stod",
+        niv.faerdig && !niv.vist && ta.classList.contains("tom") && !tjekK() && !hintK() && /^Trin 7 af 7$/.test(skort.querySelector(".sk-chip").textContent)
+        && !!naesteK() && naesteK().textContent === "Næste opgave" && Math.abs(naesteR.right - indsendR.right) <= 3 && besked(niv) === "Rigtigt. Reaktionen er afstemt.",
+        (naesteK() ? naesteK().textContent : "-") + " / " + besked(niv));
     var ettaller = arket.querySelectorAll(".skema .koeftal.en");
     paastand("det færdige skema står på arket: 1-tallerne er væk, og ladning, O og H er ens på begge sider",
         ettaller.length === 2 && w.getComputedStyle(ettaller[0]).visibility === "hidden" && skemaSomTekst() === "MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ ⟶ Mn²⁺ + 5 Fe³⁺ + 4 H₂O"
         && arket.querySelectorAll(".rrk.ok").length === 2 && /O\s*4\s*H\s*8\s*=\s*O\s*4\s*H\s*8/.test(raekker()[1]), skemaSomTekst() + " / " + raekker()[1]);
     var foerNr = niv.nr;
-    hintknap.click();
-    paastand("Ny opgave på tavlen går videre til næste reaktion", niv.nr !== foerNr && !niv.faerdig && !tjek.hidden && hintknap.textContent === "Giv hint" && !hintknap.classList.contains("groen"));
+    naesteK().click();
+    paastand("Næste opgave på kortet går videre til næste reaktion", niv.nr !== foerNr && !niv.faerdig && !!tjekK() && hintK().textContent === "Giv et hint" && !naesteK());
 
     /* Et stof, der står to gange, og basisk miljø med OH⁻ efter pilen */
     NK.visNiveau("svaer");
@@ -547,20 +614,20 @@ function koerAlt() {
     d.getElementById("hjaelpknap").click();
     var stop = [], g2 = 0;
     while (NK.Rundvisning.aktiv() && g2++ < 12) { stop.push(d.getElementById("rv-titel").textContent + " " + d.getElementById("rv-tal").textContent); d.getElementById("rv-naeste").click(); }
-    paastand("? viser rundt: opgaven, arket, tasterne, knapperne, trinene, reaktionerne og elektronvægten",
-        stop.join(", ") === "Opgaven 1/7, Arket 2/7, Tasterne 3/7, Tjek og hint 4/7, Trinene 5/7, Reaktionerne 6/7, Elektronvægten 7/7", stop.join(", "));
+    paastand("? viser rundt: kortet, arket, tasterne, trinene, reaktionerne og elektronvægten",
+        stop.join(", ") === "Kortet 1/6, Arket 2/6, Tasterne 3/6, Trinene 4/6, Reaktionerne 5/6, Elektronvægten 6/6", stop.join(", "));
     til(niv, T.PAR);
     d.getElementById("hjaelpknap").click();
     stop = []; g2 = 0;
     while (NK.Rundvisning.aktiv() && g2++ < 12) { stop.push(d.getElementById("rv-titel").textContent); d.getElementById("rv-naeste").click(); }
-    paastand("i trin 2 springer rundvisningen de usynlige taster over", stop.indexOf("Tasterne") < 0 && stop.length === 6, stop.join(", "));
+    paastand("i trin 2 springer rundvisningen de usynlige taster over", stop.indexOf("Tasterne") < 0 && stop.length === 5, stop.join(", "));
 
     try { w.localStorage.removeItem("nk-sc8.4-ros"); w.localStorage.removeItem("nk-sc8.4-loest"); } catch (e) {}
     NK.visNiveau("let");
     var nl = NK.niveauer.let;
     nl.liste.forEach(function (R, i) { nl.start(i); til(nl, 99); });
     paastand("første gang alle lette er løst, står det i beskeden, og knappen går til næste sværhedsgrad",
-        /Alle reaktioner på Let er afstemt\./.test(besked(nl)) && tjek.hidden && hintknap.textContent === "Næste sværhedsgrad", besked(nl));
+        /Alle reaktioner på Let er afstemt\./.test(besked(nl)) && !tjekK() && !!naesteK() && naesteK().textContent === "Næste sværhedsgrad", besked(nl));
     tekster.push(besked(nl));
     nl.start(0); til(nl, 99);
     paastand("den besked kommer kun første gang", nl.faerdig && !/Alle reaktioner/.test(besked(nl)), besked(nl));
@@ -639,6 +706,7 @@ function koerAlt() {
                 n.start(i);
                 var g = 0;
                 while (!n.faerdig && g++ < 12) {
+                    if (n.bliv) n.videre();
                     var navn = R.id + " t" + (n.trin + 1);
                     if (!enLinje()) ombrudt.push(navn);
                     var fs = skrift();
@@ -672,6 +740,62 @@ function koerAlt() {
             r.ombrudt.length === 0 && !r.bredt && r.lille.length === 0 && r.daekker.length === 0 && r.toRaekker.length === 0 && r.rul <= 1,
             r.ombrudt.slice(0, 4).join(", ") + (r.bredt ? " bredt" : "") + " " + r.daekker.slice(0, 3).join(" | ") + (r.rul > 1 ? " ruller " + r.rul + " px ved " + r.rulVed : ""));
     });
+
+    /* Papirkortet holder sig inden for sin plads (kortZone) i alle trin:
+       trinnet, et forkert svar, hintet, Vis svaret (den længste forklaring)
+       og den færdige reaktion. Arket står under pladsen, så kortet dækker
+       aldrig noget på arket. */
+    function forkertSvar(n) {
+        var R = n.R, f = n.f;
+        switch (n.trin) {
+        case T.OX: R.led.forEach(function (l, i) { f.o[i] = "+V"; }); break;
+        case T.PAR: var L = n.parListe(); n.parValg = { 0: L[0].type === "ox" ? "red" : "ox", 1: L[1].type === "ox" ? "red" : "ox" }; break;
+        case T.E: f.eox = "9"; f.ered = "9"; break;
+        case T.K: R.led.forEach(function (l, i) { f.k[i] = "9"; }); break;
+        case T.LAD: f.lv = "+9"; f.lh = "−9"; break;
+        case T.ION: f[R.ion.side === "v" ? "ih" : "iv"] = "2"; break;
+        case T.VAND: f[R.vand.side === "v" ? "wh" : "wv"] = "2"; break;
+        }
+        n.tjek();
+    }
+    function kortGennemgang(st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        w.dispatchEvent(new w.Event("resize"));
+        NK.saetVaegt(false);
+        var ude = [], hoejst = 0, hoejstVed = "", plads = 0;
+        function maal(navn) {
+            var k = skort.getBoundingClientRect(), p = kplads.getBoundingClientRect(), a = tramme.getBoundingClientRect();
+            plads = p.height;
+            if (k.height > hoejst) { hoejst = k.height; hoejstVed = navn; }
+            if (k.bottom > p.bottom + 0.5 || k.bottom > a.top) ude.push(navn + " " + Math.round(k.bottom - p.bottom) + " px");
+        }
+        ["let", "middel", "svaer"].forEach(function (id) {
+            NK.visNiveau(id);
+            var n = NK.niveauer[id];
+            n.liste.forEach(function (R, i) {
+                n.start(i);
+                var g = 0;
+                while (!n.faerdig && g++ < 12) {
+                    if (n.bliv) n.videre();
+                    var navn = R.id + " t" + (n.trin + 1);
+                    maal(navn);
+                    forkertSvar(n); maal(navn + " forkert");
+                    n.knap(); maal(navn + " hint");
+                    n.knap(); maal(navn + " svaret");
+                }
+                maal(R.id + " færdig");
+            });
+        });
+        return { ude: ude, hoejst: Math.round(hoejst), hoejstVed: hoejstVed, plads: Math.round(plads) };
+    }
+    [[1400, 860], [1280, 720], [1100, 650], [900, 650]].forEach(function (st) {
+        var r = kortGennemgang(st);
+        paastand(st[0] + " × " + st[1] + ": papirkortet holder sig inden for sin plads over arket i alle trin, også med fejl, hint og Vis svaret",
+            r.ude.length === 0, r.ude.slice(0, 4).join(", "));
+        skriv("        højeste kort: " + r.hoejst + " px (" + r.hoejstVed + ") i en plads på " + r.plads + " px");
+    });
+    try { w.localStorage.removeItem("nk-sc8.4-loest"); } catch (e) {}
     ramme.style.width = "1400px";
     ramme.style.height = "860px";
     w.dispatchEvent(new w.Event("resize"));

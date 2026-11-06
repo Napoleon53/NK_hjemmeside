@@ -36,7 +36,7 @@
   <rect x="21" y="112" width="38" height="44" rx="4" fill="#f4f5f7" stroke="#8a9098" stroke-width="0.8"/>
   <g font-family="Segoe UI, sans-serif" text-anchor="middle">
     <text x="40" y="138" font-size="17" font-weight="800" fill="#1d2330">O₂</text>
-    <text x="40" y="150" font-size="8" font-weight="700" fill="#4a5261" letter-spacing="1">ILT</text>
+    <text x="40" y="150" font-size="7" font-weight="700" fill="#4a5261" textLength="32" lengthAdjust="spacingAndGlyphs">DIOXYGEN</text>
   </g>
 
   <!-- Halsen, ventilen og udtaget -->

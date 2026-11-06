@@ -41,6 +41,13 @@ window.NK = NK;
         return a;
     };
 
+    /* Pladsen oeverst i scenen til papirkortet: mindst 164 px, saa figuren
+       ikke flytter sig, naar der kommer et hint */
+    NK.kortZone = function (kort) {
+        var h = kort ? kort.offsetHeight : 0;
+        return 12 + Math.max(h, 164) + 6;
+    };
+
     NK.tilfaeldig = function (liste) {
         return liste[Math.floor(Math.random() * liste.length)];
     };

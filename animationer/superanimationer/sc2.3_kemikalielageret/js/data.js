@@ -187,7 +187,7 @@
         ["Al", "O", "formel", 0, "#eeeeea", "pulver", "Rubin og safir er aluminiumoxid med lidt urenheder."],
         ["K", "S", "formel", 0, "#e6d59a", "pulver", "Giver sølv en mørk, antik overflade."],
         ["Ba", "F", "formel", 0, "#f3f3f3", "pulver", "Linser, der lukker infrarødt lys igennem."],
-        ["Li", "N", "formel", 0, "#b8485e", "pulver", "Dannes, når lithium reagerer med luftens nitrogen."],
+        ["Li", "N", "formel", 0, "#b8485e", "pulver", "Dannes, når lithium reagerer med luftens dinitrogen."],
         ["Ca", "Cl", "formel", 0, "#f5f4f0", "krystal", "Vejsalt, der virker ved lavere temperatur end køkkensalt."],
         ["Mg", "O", "formel", 0, "#f3f3ef", "pulver", "Magnesia: tabletter mod halsbrand og forstoppelse."],
         ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Nødblus til søs: med vand dannes en gas, der selv tager fyr."],
@@ -222,7 +222,7 @@
         ["Be", "O", "formel", 0, "#f0f0ec", "pulver", "Keramik, der leder varme næsten som et metal.", 8],
         ["Pb4", "O", "navn", 1, "#3b2718", "pulver", "Sidder på pluspolen i et bilbatteri.", 7],
         ["Sn2", "F", "navn", 1, "#f5f5f2", "pulver", "Fluoren i nogle tandpastaer.", 8],
-        ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik ilt ud af det i 1774.", 9],
+        ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik dioxygen ud af det i 1774.", 9],
         ["K", "MnO4", "navn", 2, "#5a2168", "krystal", "Violette krystaller. Bruges i fodbad mod svamp.", 1],
         ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Fjerner sølv(I)bromid fra fotopapir, så billedet tåler lys.", 2],
         ["Na", "HCO3", "navn", 2, "#f7f7f4", "pulver", "Natron: hævemiddel i bagepulver.", 3],
@@ -469,8 +469,8 @@
           sel: "#lager-anker-reol" },
         { tekst: "Hver ion, du finder, lægger sig som en kugle ved glasset på arbejdsbordet. Når formlen eller navnet er rigtigt, viser kuglerne, hvor mange af hver ion der skal til, for at ladningerne tilsammen giver nul. Et klik på en af plakaterne på væggen viser det periodiske system eller de sammensatte ioner i stort format.",
           sel: ["#lager-anker-bord", "#lager-anker-plakater"] },
-        { tekst: "Opgavekortet til højre har ét felt til hver ion og ét til formlen eller navnet, og du trykker Enter efter hvert felt. Knappen nederst på opgavekortet giver først et hint og derefter svaret. Et glas, du løser uden at se svaret, får en stjerne i oversigten over hylderne.",
-          sel: ["#lager-kort", "#lager-fremskridt"] }
+        { tekst: "Kortet øverst i scenen siger, hvad du skal skrive. Panelet til højre har ét felt til hver ion og ét til formlen eller navnet, og du trykker Indsend svar eller Enter efter hvert felt. Knappen Giv et hint på kortet giver først et hint og derefter svaret, og et glas, du løser uden at se svaret, får en stjerne.",
+          sel: ["#lager-skort", "#lager-kort"] }
     ];
     D.INTRO_BAAND = [
         { tekst: "I denne fane skriver du de samme slags etiketter som på lageret, men nu på tid. Glassene kører på samlebåndet hen mod kassen, og hvert glas mangler halvdelen af etiketten. Et glas, der når kassen, koster et liv, og spillet slutter, når alle tre liv er brugt.",

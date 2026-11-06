@@ -72,7 +72,8 @@
     }
 
     var P = SimLys.prototype;
-    NK.Fane.paa(P, { navn: "lys", naesteFane: "fane-kurve", naesteNavn: "Standardkurven", naesteTekst: "Næste forudsigelse →" });
+    NK.Fane.paa(P, { navn: "lys", naesteFane: "fane-kurve", naesteNavn: "Standardkurven", naesteTekst: "Næste forudsigelse →",
+        chipOrd: "Forudsigelse", gaetHint: true });
 
     /* ----- Modellen ----------------------------------------------------------------- */
     P.A = function () { return LB.A(this.stof.eps, this.l, this.c); };
@@ -87,6 +88,8 @@
     /* ----- Skyderne og stoffet ---------------------------------------------------------- */
     P.saetC = function (v, afEleven) {
         var s = this.stof;
+        /* Under gaettet og naar kortet viser Naeste, er kuvetten laast */
+        if (afEleven && this.spaer()) { this.cSkyder.value = this.c; return; }
         this.c = NK.klamp(Math.round(v / s.cTrin) * s.cTrin, 0, s.cMax);
         if (Math.abs(parseFloat(this.cSkyder.value) - this.c) > 1e-9) this.cSkyder.value = this.c;
         if (afEleven) this.skruet();
@@ -94,6 +97,7 @@
     };
 
     P.saetL = function (v, afEleven) {
+        if (afEleven && this.spaer()) { this.lSkyder.value = this.l; return; }
         this.l = NK.klamp(Math.round(v / D.L_TRIN) * D.L_TRIN, D.L_MIN, D.L_MAX);
         if (Math.abs(parseFloat(this.lSkyder.value) - this.l) > 1e-9) this.lSkyder.value = this.l;
         if (afEleven) this.skruet();
@@ -104,6 +108,7 @@
         var s = D.STOFFER[id];
         if (!s) return;
         var f = this.forud();
+        if (afEleven && this.spaer()) return;
         if (afEleven && this.fase === "proev" && id !== f.start.stof) {
             this.kortBesked("Forudsigelsen handler om " + D.STOFFER[f.start.stof].navn + ". Vælg det stof igen for at prøve den.", 5);
         }
@@ -124,20 +129,17 @@
         NK.saetTekst("lys-l-tal", this.lTekst());
     };
 
-    /* Eleven har skruet paa noget */
+    /* Eleven har skruet paa noget: Indsend svar bliver klar. Intet bliver
+       bedoemt, foer eleven trykker Indsend svar. */
     P.skruet = function () {
-        if (this.auto) return;
-        if (this.fase === "gaet" && !this.sagtSkru) {
-            this.sagtSkru = true;
-            this.kortBesked("Du kan skrue frit. Når du vælger et svar, stilles kuvetten tilbage til start.", 5);
-        }
+        if (this.auto || this.fase !== "proev") return;
+        this.proevet = true;
+        this.nulstilHjaelp();
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.visIndsend();
     };
 
-    /* Skyderen er sluppet, eller kuvetten er trukket: er maalet naaet? */
-    P.sluppet = function () {
-        if (this.fase !== "proev" || this.faerdig || this.auto) return;
-        if (this.naaet()) this.dom(false);
-    };
+    P.sluppet = function () { this.visIndsend(); };
 
     P.naaet = function () {
         var f = this.forud(), m = f.maal, e = 1e-9;
@@ -157,11 +159,9 @@
         this.fase = "gaet";
         this.valgt = null;
         this.auto = null;
-        this.sagtSkru = false;
+        this.proevet = false;
         this.briller = false;
         this.tilStart();
-        NK.saetTekst("lys-spm", f.spm);
-        this.bygValg();
     };
 
     P.tilStart = function () {
@@ -173,47 +173,47 @@
         this.pust = [];
     };
 
-    P.bygValg = function () {
-        var mig = this, f = this.forud(), raekke = NK.el("lys-valg");
-        raekke.innerHTML = "";
-        f.valg.forEach(function (v, j) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valg-kort";
-            k.innerHTML = '<span class="vk-t">' + NK.html(v.t) + '</span><span class="vk-n">' + NK.html(v.n) + "</span>";
-            k.addEventListener("click", function () { mig.vaelgSvar(j); });
-            raekke.appendChild(k);
-        });
-        this.visValg();
+    /* ----- Papirkortet ---------------------------------------------------------- */
+    P.svarListe = function () {
+        return this.forud().valg.map(function (v) { return { t: v.t, n: v.n }; });
     };
 
-    P.visValg = function () {
-        var f = this.forud(), mig = this;
-        var kort = NK.el("lys-valg").querySelectorAll(".valg-kort");
-        Array.prototype.forEach.call(kort, function (k, j) {
-            var slut = mig.fase === "slut";
-            k.classList.toggle("valgt", j === mig.valgt);
-            k.classList.toggle("rigtig", slut && !!f.valg[j].ok);
-            k.classList.toggle("forkert", slut && j === mig.valgt && !f.valg[j].ok);
-            k.classList.toggle("laast", mig.fase !== "gaet");
-            k.setAttribute("aria-pressed", j === mig.valgt ? "true" : "false");
-        });
+    P.kortData = function () {
+        var f = this.forud();
+        if (this.fase === "gaet") return { gaet: true, tekst: f.spm, svar: this.svarListe() };
+        if (this.fase === "slut") return { tekst: f.spm, svar: this.svarListe() };
+        var v = f.valg[this.valgt];
+        return { tekst: "Dit gæt: " + v.t + ". " + f.handling + " Tryk så Indsend svar." };
+    };
+
+    P.gaetValg = function (j) { this.vaelgSvar(j); };
+
+    P.kanIndsende = function () { return this.fase === "proev" && this.proevet && !this.auto; };
+
+    /* Indsend svar: staar kuvetten, som forudsigelsen siger? */
+    P.indsend = function () {
+        if (this.fase !== "proev") return;
+        if (this.naaet()) { this.dom(false); return; }
+        var f = this.forud();
+        if (this.stof.id !== f.start.stof) {
+            this.fejlLinje("Forudsigelsen handler om " + NK.html(D.STOFFER[f.start.stof].navn) + ". Vælg det stof i panelet.");
+            return;
+        }
+        var goer = f.handling.replace(/^Prøv det: /, "");
+        goer = goer.charAt(0).toUpperCase() + goer.slice(1);
+        this.fejlLinje(NK.html("Kuvetten står ikke, som opgaven siger: c = " + this.cTekst() + " og l = " + this.lTekst() + ". " + goer));
     };
 
     P.vaelgSvar = function (j) {
-        if (this.fase !== "gaet") {
-            if (this.fase === "proev") this.kortBesked("Dit gæt står. Prøv det nu i scenen.", 4);
-            return;
-        }
+        if (this.fase !== "gaet") return;
         this.valgt = j;
         this.fase = "proev";
+        this.proevet = false;
         this.tilStart();
         this.hjaelp = 0;
         this.hintLys = null;
-        this.visValg();
-        this.visKort();
         this.visHintLys();
-        this.naesteLinje('<span class="b-maerke">Dit gæt: ' + NK.html(this.forud().valg[j].t) + "</span>", "");
+        this.naesteLinje('<span class="b-maerke">Dit gæt</span> ' + NK.html(this.forud().valg[j].t), "");
     };
 
     /* Det, detektoren viser, som en saetning */
@@ -224,36 +224,31 @@
         return "Detektoren viser A = " + NK.dk(A, 3) + ".";
     };
 
+    /* Kortet bliver paa forudsigelsen: det rigtige svar groent, et forkert
+       gaet roedt, og forklaringen under */
     P.dom = function (vist) {
-        var f = this.forud(), v = f.valg[this.valgt];
+        var f = this.forud(), v = f.valg[this.valgt], rigtig = 0;
+        f.valg.forEach(function (x, k) { if (x.ok) rigtig = k; });
         this.fase = "slut";
-        var tekst = (v.ok || vist ? "" : "Du gættede " + v.t + ". ") + this.resultatTekst() + " " + f.forklaring;
-        this.loest(vist ? "svar" : (v.ok ? "ok" : "gaet"), NK.html(tekst), vist ? "Svaret" : (v.ok ? "Rigtigt ✓" : "Prøvet"));
-        this.visValg();
+        this.gaetForkert = !v.ok && !vist ? this.valgt : undefined;
+        var tekst = this.resultatTekst() + " " + f.forklaring;
+        this.loest(vist ? "svar" : (v.ok ? "ok" : "gaet"), NK.html(tekst), vist ? "Svaret" : (v.ok ? "Rigtigt" : "Prøvet"), rigtig);
     };
 
     P.promptHTML = function () {
         var f = this.forud();
         if (this.fase === "gaet") {
-            return '<p class="note-tekst">Gæt først: klik på et af de tre svar over scenen. Så prøver du det selv med skyderne.</p>';
+            return '<p class="note-tekst">Gæt først på kortet. Så prøver du det selv med skyderne her i panelet.</p>';
         }
         var v = f.valg[this.valgt];
-        var html = '<p class="note-tekst">Dit gæt: <b>' + NK.html(v.t) + "</b> (" + NK.html(v.n) + ")" +
+        return '<p class="note-tekst">Dit gæt: <b>' + NK.html(v.t) + "</b> (" + NK.html(v.n) + ")" +
             (this.fase === "slut" ? (v.ok ? " ✓" : "") : "") + "</p>";
-        if (this.fase === "proev") return html + '<p class="note-tekst">' + NK.html(f.handling) + "</p>";
-        return html + '<div class="forklaring"><p>' + NK.html(f.forklaring) + "</p></div>";
-    };
-
-    P.trinLinje = function () {
-        if (this.fase === "gaet") return "Gæt først: klik på det svar over scenen, du tror på.";
-        if (this.fase === "proev") return NK.html(this.forud().handling);
-        return "";
     };
 
     /* ----- Hint og svar ------------------------------------------------------------------- */
     P.hintTrin = function () {
         var f = this.forud();
-        if (this.fase === "gaet") return { trin: f.hint.map(NK.html), lys: "valg" };
+        if (this.fase === "gaet") return { trin: f.hint.map(NK.html), lys: null };
         if (this.fase !== "proev") return null;
         var m = f.maal, trin, lys;
         if (this.stof.id !== f.start.stof) {
@@ -304,7 +299,6 @@
         NK.el("lys-c-boks").classList.toggle("lys", lys === "c" || lys === "begge");
         NK.el("lys-l-boks").classList.toggle("lys", lys === "l" || lys === "begge");
         NK.el("lys-stoffer").classList.toggle("lys", lys === "stof");
-        NK.el("lys-valg").classList.toggle("lys", lys === "valg");
     };
 
     P.visSvar = function () {
@@ -315,7 +309,6 @@
             this.valgt = j;
             this.fase = "proev";
             this.tilStart();
-            this.visValg();
             this.visKort();
             this.svarVist = true;
         } else {
@@ -324,11 +317,9 @@
         if (this.stof.id !== f.start.stof) this.vaelgStof(f.start.stof, false);
         /* Skyderne glider hen til maalet, og saa kommer svaret */
         this.auto = { t: 0, c0: this.c, l0: this.l, c1: this.maalC(), l1: this.maalL() };
-        this.besked("Se detektoren …", "gul");
+        this.besked("Se detektoren …", "hint");
+        this.visKnap();
     };
-
-    P.enter = function () { if (this.faerdig) this.knap(); };
-    P.nulstil = function () { this.vaelg(this.nr); };
 
     /* ----- Geometrien paa laerredet ----------------------------------------------------- */
     P.tilpas = function () {
@@ -388,6 +379,7 @@
         var p = this.laerred.punkt(e);
         var h = this.hvad(p);
         this.traek = { hvad: h, x: p.x, y: p.y, flyttet: false };
+        if (h === "vaeg" && (this.gaetNu() || this.slutNu())) { this.spaer(); this.traek = null; return; }
         if (h === "vaeg") {
             try { this.laerred.canvas.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
             e.preventDefault();

@@ -49,6 +49,9 @@
         var mig = this;
         this.tb = new NK.Tekstboks("forsoeg");
         this.tb.vedKnap = function () { mig.knap(); };
+        this.tb.vedIndsend = function () { mig.indsendGrupper(); };
+        /* Ingen polaere grupper er valgt: markeringerne i formlen fjernes */
+        this.tb.vedValg = function (id) { if (id === "ingen") mig.markeret = {}; };
 
         this.bordStart();
         this.bygPanel();
@@ -271,6 +274,7 @@
         var g = this.glas[i];
         if (this.fase === "start") {
             this.visBesked("Glasset med " + D.navn(D.OPL[i]) + ". Svar på spørgsmålet på kortet.");
+            this.tb.blink();
             return;
         }
         if (g.optaget()) return;
@@ -297,10 +301,11 @@
 
     /* Klik paa kortet: i fasen grp markeres de polaere grupper */
     P.klikKort = function (pt) {
-        if (this.fase === "start") { this.visBesked("Svar med knapperne på kortet."); return; }
+        if (this.fase === "start") { this.visBesked("Svar med knapperne på kortet."); this.tb.blink(); return; }
         if (this.fase !== "grp" || this.spm.loest) {
             if (this.fase === "test") this.visBesked("Først tester du " + D.navn(this.stof) + " i glassene.");
-            else if (this.fase === "pol") this.visBesked("Svar først: er " + D.navn(this.stof) + " polært eller upolært?");
+            else if (this.fase === "pol") { this.visBesked("Svar først: er " + D.navn(this.stof) + " polært eller upolært?"); this.tb.blink(); }
+            else if (this.spm.loest) this.tb.blink();
             return;
         }
         var a = this.plan ? M.atomVed(this.mol, this.plan, pt.x, pt.y) : -1;
@@ -309,18 +314,27 @@
         this.grupper.forEach(function (g, j) { if (g.atomer.indexOf(a) >= 0) k = j; });
         if (k >= 0) {
             if (this.afvisTilbud) this.afvisTilbud();
-            var ny = !this.markeret[k];
-            this.markeret[k] = true;
+            /* Et klik markerer gruppen eller fjerner markeringen; Indsend svar bedoemmer */
+            if (this.markeret[k]) delete this.markeret[k]; else this.markeret[k] = true;
+            this.tb.fravaelg();
             this.spm.linje = null;
-            if (this.antalMarkeret() === this.grupper.length) { this.loes(null, false); return; }
-            if (!ny) this.visBesked(M.GRUPPENAVN[this.grupper[k].slags] + " er allerede markeret.");
-            else this.besked = null;
+            this.besked = null;
         } else {
             this.blink = { atom: a, t: 1 };
             var el = this.mol.atomer[a].el;
             this.visBesked(el === "I" ? "I₂ har to ens atomer. Bindingen er upolær."
                                       : (el === "C" ? "C-atomet hører til carbonkæden. Den er upolær." : "H på et C-atom er upolært."));
         }
+    };
+
+    /* Indsend svar med grupperne markeret i formlen */
+    P.indsendGrupper = function () {
+        if (this.fase !== "grp" || this.spm.loest) return;
+        var n = this.antalMarkeret(), mangler = this.grupper.length - n;
+        if (n > 0 && mangler === 0) { this.loes(null, false); return; }
+        this.spm.linje = { html: D.F1.mangler(this.stof, mangler), klasse: "skidt" };
+        this.besked = null;
+        this.tb.ryst();
     };
 
     P.kortMarkoer = function (pt) {
@@ -486,15 +500,16 @@
     P.visTb = function () {
         var tb = this.tb, spm = this.spm, fase = this.fase, s = this.stof, mig = this;
         var tekst, linje = "", klasse = "";
+        var chip = fase === "start" ? "Spørgsmål " + (this.startNr + 1) + " af " + D.START.length :
+            (fase === "fuldt" ? "Skemaet" : "Stof " + (D.FORSOEG.indexOf(s) + 1) + " af " + D.FORSOEG.length);
         if (fase === "start") {
-            tekst = D.START[this.startNr].spm;
-            linje = D.START[this.startNr].kontekst;
+            /* Indledningen staar foerst, spoergsmaalet halvfedt efter den */
+            tekst = D.START[this.startNr].kontekst + " " + D.START[this.startNr].spm;
         } else if (fase === "test") {
             tekst = D.F1.test(s);
             linje = this.testLinje();
         } else if (fase === "pol") {
-            tekst = D.F1.pol(s);
-            linje = D.obsSaetning(s);
+            tekst = D.obsSaetning(s) + " " + D.F1.pol(s);
         } else if (fase === "grp") {
             tekst = D.F1.grp(s);
             linje = D.F1.fundet(this.antalMarkeret());
@@ -507,13 +522,15 @@
         }
         if (spm.linje) { linje = spm.linje.html; klasse = spm.linje.klasse; }
         if (this.besked && !(spm.linje && spm.loest)) { linje = this.besked.html; klasse = ""; }
+        tb.chip(chip);
         tb.tekst(tekst);
         tb.linje(linje, klasse);
         tb.svar(this.svarListe(), function (id) { mig.svar(id); });
         var tilstande = {};
         Object.keys(spm.forkert).forEach(function (id) { tilstande[id] = "forkert"; });
-        if (spm.loest && spm.valgt) tilstande[spm.valgt] = spm.visteSvar ? "valgt" : "rigtig";
+        if (spm.loest && spm.valgt) tilstande[spm.valgt] = spm.visteSvar ? "svar-vist" : "rigtig";
         tb.svarTilstand(tilstande, spm.loest);
+        tb.indsend((fase === "start" || fase === "pol" || fase === "grp") && !spm.loest, fase === "grp" && this.antalMarkeret() > 0);
         if (fase === "test") tb.knap(null);
         else if (fase === "fuldt") tb.knap("Til fane 2 →", "naeste");
         else if (fase === "faerdig" || spm.loest) tb.knap(fase === "start" && this.startNr === D.START.length - 1 ? "Test stofferne →" : "Næste →", "naeste");
@@ -588,6 +605,7 @@
     /* Enter: Naeste, naar knappen siger det */
     P.enter = function () {
         if (this.fase === "faerdig" || this.fase === "fuldt" || this.spm.loest) this.knap();
+        else this.tb.indsendKlik();
     };
 
     P.fokus = function () {};

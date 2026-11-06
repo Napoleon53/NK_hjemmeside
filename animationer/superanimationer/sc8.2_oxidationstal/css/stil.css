@@ -1389,3 +1389,106 @@ kbd {
 .eksempel-hoved .f { text-transform: none; letter-spacing: 0.02em; }
 .teori-trin li { margin: 0 0 5px; font-size: 0.95rem; line-height: 1.5; color: #dde3ea; }
 .teori-trin li::marker { color: var(--gul); font-weight: 700; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST I SCENEN (brugerens valg 4. nov. 2026: alle aktive
+   animationer har papirkortet; lavet her 6. nov. 2026). Det afloeser
+   arbejdsfeltet paa tavlen (.arb ovenfor bruges ikke laengere). Kortet
+   har stoffets navn, opgaven og spoergsmaalet med feltet ved siden af,
+   linjen med fejl og hint, Giv hint og Indsend svar, og naar opgaven er
+   loest, forklaringen og Naeste opgave (js/fane.js). Udseendet er
+   ../faelles/papirkort.css; her staar kun pladsen og felterne paa det
+   lyse papir. Tavlen begynder under kortets plads (kortZone i fane.js).
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border-radius: 12px;
+}
+
+.scenekort .sk-top { display: flex; align-items: center; gap: 8px 14px; }
+.scenekort .sk-top .sk-tekst { flex: 1 1 auto; min-width: 0; margin: 0; }
+.scenekort .sk-top .arb-felter:empty { display: none; }
+
+.sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
+
+/* Svaret i kortets tekst, naar opgaven er loest */
+html body.papirkort.papirkort .scenekort .sk-svaret { color: var(--pk-groen); font-weight: 700; }
+html body.papirkort.papirkort .scenekort.opgave.loest.svar .sk-svaret { color: #8a6d12; }
+.scenekort .arb-ok { margin-right: 2px; }
+
+/* Felterne paa papiret: hvide felter med moerk tekst */
+.scenekort .arb-felt,
+.scenekort .felt {
+    border: 1.5px solid var(--pk-knapkant);
+    border-radius: 9px;
+    background-color: #ffffff;
+    animation: none;
+}
+.scenekort .arb-felt:focus-within,
+.scenekort .felt.aktiv:focus-within { border-color: var(--pk-blaa); box-shadow: 0 0 0 2px var(--pk-blaa-lys); }
+.scenekort .arb-felt.fejl,
+.scenekort .felt.ryst { border-color: var(--pk-roed); background-color: var(--pk-roed-lys); animation: ryst 0.35s; }
+.scenekort .oxfelt,
+.scenekort .felt input {
+    width: 4em;
+    padding: 6px 6px;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: var(--pk-tekst);
+    font-family: inherit;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+}
+.scenekort .felt { display: inline-flex; align-items: center; min-height: 40px; }
+.scenekort .felt-svar { padding: 5px 10px; font-size: 1.05rem; white-space: nowrap; color: var(--pk-tekst); }
+.scenekort .felt.gaettet { border-color: var(--pk-kant); background-color: #f3f0e8; }
+.scenekort .felt.gaettet .felt-svar { color: var(--pk-tekst); }
+.scenekort .felt.ok { border-color: var(--pk-groen); background-color: var(--pk-groen-lys); }
+.scenekort .felt.ok .felt-svar { color: #1d5a3a; }
+.scenekort .felt.forkert { border-color: #e0a59d; background-color: #fbf1ef; }
+.scenekort .felt.forkert .felt-svar,
+.scenekort .felt.forkert .felt-svar b { color: #9a3a2e; }
+.scenekort .felt.laast { opacity: 0.6; }
+.scenekort .felt-svar b { color: inherit; }
+.scenekort .gaet-etiket { font-size: 0.95rem; font-weight: 600; color: var(--pk-tekst-svag); }
+.scenekort .gaet-s { font-size: 1.2rem; }
+
+/* Opgaven og navnet staar paa kortet, ikke oeverst paa tavlen */
+#rg-tavle .tv-top { display: none; }
+
+/* Beregningen nederst paa tavlen paa fane 2 (fk-regn ovenfor) */
+.arb-forklar.paa-tavle { position: absolute; z-index: 3; background-color: rgba(12, 17, 15, 0.86); }
+.arb-forklar.paa-tavle.svar { border-left-color: rgba(242, 197, 61, 0.7); }
+.arb-forklar.svar .fk-saa b { color: #f5dd8a; }
+
+/* Paa en smal scene (fx 1100 px vindue) er beregningen for en ion bred: lidt
+   mindre skrift og luft, saa linjen med summen kan vaere der */
+@media (max-width: 1150px) {
+    .arb-forklar.paa-tavle { padding: 5px 10px 6px; }
+    .arb-forklar.paa-tavle .fk-regn { font-size: 0.9rem; column-gap: 5px; }
+    .arb-forklar.paa-tavle .fk-regn > .fk-saa { padding-left: 6px; }
+}
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .scenekort .oxfelt, .scenekort .felt input { font-size: 1.08rem; padding: 4px 5px; }
+    .scenekort .felt { min-height: 34px; }
+}
+
+/* Paa en smal skaerm staar panelet under scenen, og siden kan rulle. Scenen
+   er saa hoejere, saa tavlen har plads under papirkortet. */
+@media (max-width: 860px) {
+    .scene { height: 82vh; min-height: 640px; }
+}

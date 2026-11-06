@@ -149,7 +149,7 @@
             this.visPanel();
             if (maalet && rk.reagens === "Br2") { this.afvistSet = true; this.forsoegKlaret(""); return; }
             if (this.afvistN === 3) { this.kortBesked(D.PAASKE.ethan, 6); return; }
-            this.kortBesked(rk.tekst + (maalet ? " Prøv også med brom." : ""), 7);
+            this.kortBesked(rk.tekst + (maalet ? " Prøv også med dibrom." : ""), 7);
             return;
         }
         this.produkt = rk.reagens;

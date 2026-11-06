@@ -15,13 +15,18 @@
    Fane 1 og 3: pH-metret maaler, naar pH er regnet ud, og viser det
    samme tal. Fane 2: pH-metret maaler foerst.
 
-   Opgavekortet: hvert trin er delt i smaa bider, én ad gangen:
-     1 Vaelg formlen      knapper; de forkerte er de typiske fejl
-     2 Tast udregningen   lommeregneren siger til, naar tallet er rigtigt
-                          (og hvad der er galt, hvis det er en typisk fejl)
-     3 Skriv svaret       rund af, og skriv det i feltet
-   Knappen giver hjaelp til den bid, man er ved: Giv hint, og saa Vis
-   formlen, Vis tasterne eller Vis svaret. Til sidst Ny opgave.
+   Papirkortet oeverst i scenen (6. nov. 2026, js/skort.js) har opgaven,
+   trinet og den bid, eleven er ved. Hvert trin er delt i smaa bider:
+     1 Vaelg formlen      svarknapper paa kortet, der kun vaelger; Indsend
+                          svar sender. De forkerte er de typiske fejl.
+     2 Tast udregningen   lommeregneren i panelet siger til, naar tallet er
+                          rigtigt (og hvad der er galt ved en typisk fejl)
+     3 Skriv svaret       rund af, og skriv det i feltet i panelet (kortet
+                          Regnestykket); Indsend svar eller Enter sender
+   Giv hint paa kortet hjaelper med den bid, man er ved: Giv hint, og saa
+   Vis formlen, Vis tasterne eller Vis svaret. Efter en rigtig formel og et
+   rigtigt trin bliver kortet staaende med forklaringen og Naeste; efter
+   det sidste trin Ny opgave.
    ===================================================================== */
 (function () {
     "use strict";
@@ -67,6 +72,7 @@
         this.nr = 0;
         this.pose = [];
         this.sidste = null;
+        this.fast = { html: "", klasse: "" };
 
         this.bygPanel();
         this.bygTilbud();
@@ -180,6 +186,9 @@
         this.maalt = false;
         this.visning = "--,--";
         this.info = null;
+        this.venter = null;
+        this.vistNogen = false;
+        this.trinNr = -1;      /* startTrin(0) nedenfor saetter trinet; kortet venter til da */
         R.stopDemo();
         if (this.opg.maalFoer !== undefined) this.maaling = { t: -0.35, ph: this.opg.maalFoer };
         this.besked("", "");
@@ -207,6 +216,9 @@
         this.formelOk = !t.formler;
         this.tastVist = null;
         this.forkerteFormler = {};
+        this.valgtFormel = null;
+        this.venter = null;
+        this.pegKnap = false;
         this.bygRaekker();
         this.visKort();
     };
@@ -231,34 +243,88 @@
         return null;
     }
 
-    /* ----- Bid 1: formlen ----------------------------------------------------------------- */
-    P.vaelgFormel = function (nr, vist) {
-        if (this.faerdig || this.bid !== "formel") return;
+    /* ----- Bid 1: formlen -----------------------------------------------------------------
+       En formel paa kortet vaelger kun; Indsend svar sender den (indsend). */
+    P.vaelgFormel = function (nr) {
+        if (this.faerdig || this.venter || this.bid !== "formel") return;
         var t = this.trin();
-        var f = t.formler[nr];
+        if (!t.formler[nr] || this.forkerteFormler[nr]) return;
+        this.valgtFormel = nr;
+        this.besked("", "");
+    };
+
+    P.formelSvar = function (nr) {
+        var t = this.trin(), f = t.formler[nr];
         if (!f) return;
         if (!f.rigtig) {
             this.forkerteFormler[nr] = true;
-            this.visBider();
-            this.besked(K.formelHtml(f.forkl), "skidt");
+            this.valgtFormel = null;
+            this.pegKnap = true;
+            this.besked(NK.Skort.maerke("Ikke endnu", K.formelHtml(f.forkl)), "skidt");
+            this.kort.ryst();
             return;
         }
-        this.formelValgt(vist);
+        this.valgtFormel = nr;
+        this.formelValgt(false);
     };
 
+    /* Formlen er rigtig (eller vist): kortet bliver med formlen i groent og
+       Naeste, dér hvor Indsend svar stod */
     P.formelValgt = function (vist) {
         var t = this.trin();
         this.formelOk = true;
+        this.formelVist = !!vist;
+        if (vist) this.vistNogen = true;
         this.kendte[this.pilNoegle(t)] = true;
-        this.besked((vist ? "Formlen er " : "Rigtigt. Formlen er ") + K.formelHtml(rigtigFormel(t).f) +
-            ". Den står nu på pilen i regnevejen.", vist ? "gul" : "god");
-        this.naesteBid();
+        this.venter = "formel";
+        this.pegKnap = false;
+        this.besked("", "");
+        this.visBider();
+    };
+
+    /* Kortets groenne knap: videre fra formlen, til naeste trin eller ny opgave */
+    P.videre = function () {
+        if (this.venter === "formel") {
+            this.venter = null;
+            this.naesteBid();
+            return;
+        }
+        if (this.venter === "trin") {
+            this.venter = null;
+            this.startTrin(this.trinNr + 1);
+            return;
+        }
+        if (this.faerdig) {
+            if (this.maaling) { this.kort.blink(); return; }
+            this.nyOpgave();
+        }
+    };
+
+    /* Indsend svar: formlen, der er valgt, eller tallet i feltet i panelet */
+    P.indsend = function () {
+        if (!this.kanSendes()) { this.kort.blink(); return; }
+        this.pegKnap = false;
+        if (this.bid === "formel") { this.formelSvar(this.valgtFormel); return; }
+        this.tjek();
+    };
+
+    P.feltInput = function () {
+        var raekke = this.el.raekker.querySelector('[data-i="' + this.trinNr + '"]');
+        return raekke ? raekke.querySelectorAll(".trin-felt:not([hidden]) input") : [];
+    };
+
+    P.kanSendes = function () {
+        if (this.faerdig || this.venter || R.iDemo()) return false;
+        if (this.bid === "formel") return this.valgtFormel !== null;
+        var ind = this.feltInput();
+        return ind.length > 0 && !!ind[0].value.trim();
     };
 
     /* ----- Bid 2: lommeregneren --------------------------------------------------------------
        Kaldes fra app.js, hver gang eleven (eller Vis tasterne) trykker =. */
     P.lommeregnerSvar = function (v) {
-        if (this.faerdig) return;
+        if (this.faerdig || this.venter === "trin") return;
+        if (this.venter === "formel") this.venter = null;
         var t = this.trin();
         if (!t.taster) return;
         var rigtig = t.felt === "ph" ? Math.abs(v - t.facit) < 0.006 :
@@ -279,24 +345,26 @@
         if (fejl && this.formelOk) this.besked("Lommeregneren viser <b>" + NK.html(vis) + "</b>. " + fejl, "gul");
     };
 
-    /* ----- Knappen: hjaelp til den bid, man er ved ------------------------------------------ */
+    /* ----- Hintknappen paa kortet: hjaelp til den bid, man er ved -------------------------------- */
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
     P.knap = function () {
+        if (this.faerdig || this.venter) this.videre(); else this.hjaelpKlik();
+    };
+
+    P.hjaelpKlik = function () {
         this.el.knap.blur();
-        if (this.faerdig) {
-            if (this.maaling) return;
-            this.nyOpgave();
-            return;
-        }
+        if (this.faerdig || this.venter || R.iDemo()) return;
+        this.pegKnap = false;
         var t = this.trin();
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             var hint = this.bid === "formel" ? t.formelHint : (this.bid === "tast" ? t.tastHint : t.skrivHint);
-            this.besked("<b>Hint:</b> " + K.formelHtml(hint) + (this.bid === "tast" ? this.mapleLinje(t, false) : ""), "gul");
+            this.besked(NK.Skort.maerke("Hint", K.formelHtml(hint)) + (this.bid === "tast" ? this.mapleLinje(t, false) : ""), "gul");
         } else if (this.bid === "formel") {
             this.formelValgt(true);
             return;
         } else if (this.bid === "tast") {
-            this.besked("Se lommeregneren. Den taster selv, én tast ad gangen.", "gul");
+            this.besked("Se lommeregneren i panelet. Den taster selv, én tast ad gangen.", "gul");
             R.demo(t.taster);
         } else {
             this.visSvar();
@@ -315,21 +383,25 @@
         var t = this.trin();
         var i = this.trinNr;
         this.status[i] = vist ? "vist" : "loest";
+        if (vist) this.vistNogen = true;
+        this.trinNote = note || "";
         /* Kun et trin med formler laaser pilen op (afstemningen deler pil med
            det naeste trin, og dets formel maa ikke staa der for tidligt) */
         if (t.formler) this.kendte[this.pilNoegle(t)] = true;
         this.nyt[i] = 0;
         var sidste = i >= this.opg.trin.length - 1;
-        var videre = sidste ? "" : " Nu kommer næste trin.";
-        if (vist) this.besked("Svaret står i feltet." + videre, "gul");
-        else this.besked("Rigtigt." + (note ? " " + note : "") + videre, "god");
+        this.pegKnap = false;
+        this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         if (sidste) {
             this.opgaveFaerdig();
             this.bygRaekker();
             this.visKort();
         } else {
-            this.startTrin(i + 1);
+            /* Kortet bliver paa trinet med beregningen og Naeste trin */
+            this.venter = "trin";
+            this.bygRaekker();
+            this.visKort();
         }
     };
 
@@ -350,7 +422,7 @@
 
     /* ----- Bid 3: tjekket af feltet ------------------------------------------------------ */
     P.tjek = function () {
-        if (this.faerdig) return;
+        if (this.faerdig || this.venter) return;
         var t = this.trin();
         var raekke = this.el.raekker.querySelector('[data-i="' + this.trinNr + '"]');
         if (!raekke) return;
@@ -359,11 +431,11 @@
         if (!ind.length) return;
         var tal;
         if (t.felt === "konc") {
-            if (!ind[0].value.trim()) { this.besked("Skriv tallet foran · 10 i det store felt og eksponenten i det lille felt.", "gul"); return; }
+            if (!ind[0].value.trim()) { this.besked("Skriv tallet foran · 10 i det store felt og eksponenten i det lille felt.", "peger"); return; }
             tal = K.laesKonc(ind[0].value, ind[1].value);
             if (!tal) { this.fejl(felt, "Det kan ikke læses som et tal. Skriv fx 3,8 i det store felt og −4 i det lille."); return; }
         } else {
-            if (!ind[0].value.trim()) { this.besked("Skriv svaret i feltet.", "gul"); return; }
+            if (!ind[0].value.trim()) { this.besked("Skriv svaret i feltet i panelet.", "peger"); return; }
             tal = K.laesTal(ind[0].value);
             if (!tal) { this.fejl(felt, "Det kan ikke læses som et tal. Skriv fx " + (t.felt === "ph" ? "2,30." : "2.")); return; }
             if (t.felt === "tal" && tal.v !== Math.round(tal.v)) { this.fejl(felt, "Skriv et helt tal."); return; }
@@ -378,7 +450,9 @@
     };
 
     P.fejl = function (felt, tekst) {
-        this.besked(tekst, "skidt");
+        this.pegKnap = true;
+        this.besked(NK.Skort.maerke("Ikke endnu", tekst), "skidt");
+        this.kort.ryst();
         if (!felt) return;
         felt.classList.remove("ryst");
         void felt.offsetWidth;
@@ -391,25 +465,29 @@
         this.el = {
             knap: NK.el(p + "-knap"),
             besked: NK.el(p + "-besked"),
+            status: NK.el(p + "-status"),
+            indsend: NK.el(p + "-indsend"),
+            skort: NK.el(p + "-skort"),
             kort: NK.el(p + "-kort"),
             raekker: NK.el(p + "-raekker")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.Skort(p, {
+            valg: function (j) { mig.vaelgFormel(mig.formelOrden(mig.trin())[j]); },
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        /* Feltet i panelet: Enter er Indsend svar */
         this.el.raekker.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); mig.tjek(); }
+            if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); mig.indsend(); }
         });
-        this.el.raekker.addEventListener("click", function (e) {
-            if (!e.target.closest) return;
-            if (e.target.closest(".felt-ok")) { mig.tjek(); return; }
-            var f = e.target.closest("[data-formel]");
-            if (f && !f.disabled) mig.vaelgFormel(parseInt(f.getAttribute("data-formel"), 10));
-        });
+        this.el.raekker.addEventListener("input", function () { mig.visKort(); });
     };
 
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = K.hel(html);
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-        this.rulNed();
+        this.fast = { html: html ? K.hel(html) : "", klasse: klasse || "" };
+        if (this.kort && this.opg) this.visKort();
     };
 
     /* Maple-linjen under et hint eller et svar. Den ses kun med Maple slaaet til. */
@@ -429,7 +507,7 @@
     };
 
     function feltHtml(t) {
-        var ok = '<button class="felt-ok" type="button" aria-label="Tjek svaret" title="Tjek (Enter)">✓</button>';
+        var ok = "";      /* Indsend svar paa kortet (og Enter) sender feltet */
         var ind = '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false"';
         if (t.felt === "konc") {
             return '<div class="felt aktiv felt-konc"><span class="felt-pre">' + t.stoerrelse + ' =</span>' +
@@ -447,34 +525,17 @@
             ind + ' placeholder="fx 2,30" aria-label="pH">' + ok + "</div>";
     }
 
-    /* Det aktuelle trin: overskrift og de tre bider. Bidderne vises efterhaanden
-       (visBider), saa feltet ikke bygges om, mens eleven skriver i det. */
+    /* Det aktuelle trin i panelet: overskrift, evt. skemaet og feltet. Formlen
+       og det, der skal tastes, staar paa kortet i scenen. Feltet kommer frem,
+       saa snart formlen er valgt (visBider), og bygges ikke om, mens eleven
+       skriver i det. */
     P.trinHtml = function (t, i) {
-        var mig = this;
         var flere = this.opg.trin.length > 1;
-        /* Har opgaven kun ét trin, siger spoergsmaalet det hele */
         var html = flere ? '<div class="trin-hoved"><span class="trin-nr">Trin ' + (i + 1) + " af " + this.opg.trin.length + "</span>" +
             '<span class="trin-spm">' + t.spm + "</span></div>" : "";
         if (t.skema) html += '<div class="trin-skema">' + t.skema + "</div>";
-        html += '<ol class="bider">';
-        this.bider.forEach(function (b, n) {
-            html += '<li class="bid" data-bid="' + b + '"><span class="bid-nr">' + (n + 1) + '</span><div class="bid-krop">';
-            if (b === "formel") {
-                html += '<div class="bid-tekst">Vælg formlen, der går fra ' + mig.stationNavn(mig.fraNoegle(t)) + " til " + NAVN[t.til] + ".</div>";
-                html += '<div class="formelvalg">';
-                var orden = mig.formelOrden(t);
-                orden.forEach(function (k) {
-                    html += '<button type="button" class="formelknap" data-formel="' + k + '">' + K.formelHtml(t.formler[k].f) + "</button>";
-                });
-                html += '</div><div class="bid-klar-tekst"></div>';
-            } else if (b === "tast") {
-                html += '<div class="bid-tekst">' + K.formelHtml(t.tastTekst) + '</div><div class="bid-klar-tekst"></div>';
-            } else {
-                html += '<div class="bid-tekst">' + K.formelHtml(t.skrivTekst) + "</div>" + feltHtml(t);
-            }
-            html += "</div></li>";
-        });
-        return html + "</ol>";
+        return html + '<p class="note trin-vent"' + (this.formelOk ? " hidden" : "") + ">Feltet til svaret kommer her, når formlen er valgt på kortet.</p>" +
+            '<div class="trin-felt"' + (this.formelOk ? "" : " hidden") + ">" + feltHtml(t) + "</div>";
     };
 
     /* Formlerne i en fast, blandet raekkefoelge pr. trin */
@@ -506,35 +567,17 @@
         this.visBider();
     };
 
-    /* Hvilke bider der ses, hvilken der er i gang, og hvad der staar i de faerdige */
+    /* Feltet i panelet ses, saa snart formlen er valgt */
     P.visBider = function () {
-        if (this.faerdig) { this.rulNed(); return; }
-        var raekke = this.el.raekker.querySelector('[data-i="' + this.trinNr + '"]');
-        if (!raekke) return;
-        var mig = this, t = this.trin();
-        var nu = this.bider.indexOf(this.bid);
-        Array.prototype.forEach.call(raekke.querySelectorAll(".bid"), function (li) {
-            var b = li.getAttribute("data-bid");
-            var n = mig.bider.indexOf(b);
-            var klar = (b === "formel" && mig.formelOk) || (b === "tast" && mig.tastVist !== null);
-            /* Feltet kan bruges, saa snart formlen er valgt */
-            var ses = n <= nu || (b === "skriv" && mig.formelOk);
-            li.classList.toggle("kommer", !ses);
-            li.classList.toggle("nu", b === mig.bid);
-            li.classList.toggle("klar", klar && b !== mig.bid);
-            var kt = li.querySelector(".bid-klar-tekst");
-            if (b === "formel") {
-                if (kt) kt.innerHTML = mig.formelOk ? "Formlen: <b>" + K.formelHtml(rigtigFormel(t).f) + "</b>" : "";
-                Array.prototype.forEach.call(li.querySelectorAll("[data-formel]"), function (k) {
-                    var nr = parseInt(k.getAttribute("data-formel"), 10);
-                    k.classList.toggle("forkert", !!mig.forkerteFormler[nr]);
-                    k.disabled = !!mig.forkerteFormler[nr] || mig.formelOk;
-                });
-            } else if (b === "tast" && kt) {
-                kt.innerHTML = mig.tastVist !== null ? "Lommeregneren viser <b>" + NK.html(mig.tastVist) + "</b>" : "";
-            }
-        });
+        if (!this.faerdig) {
+            var raekke = this.el.raekker.querySelector('[data-i="' + this.trinNr + '"]');
+            var felt = raekke && raekke.querySelector(".trin-felt");
+            if (felt && felt.hidden === !!this.formelOk) felt.hidden = !this.formelOk;
+            var vent = raekke && raekke.querySelector(".trin-vent");
+            if (vent && vent.hidden !== !!this.formelOk) vent.hidden = !!this.formelOk;
+        }
         this.rulNed();
+        this.visKort();
     };
 
     /* Er kortet for lavt til det hele, ruller det, saa det aktive trin,
@@ -544,45 +587,78 @@
         if (k.scrollHeight > k.clientHeight + 2) k.scrollTop = k.scrollHeight;
     };
 
-    P.visKort = function () {
-        NK.saetTekst(this.p + "-titel", this.opg.navn);
-        NK.saetTekst(this.p + "-loest", String(this.loest));
-        NK.saetHTML(this.p + "-prompt", this.opg.tekst);
-        var k = this.el.knap;
-        var tekst, klasse = "knap stor", laast = false;
-        if (this.faerdig) {
-            tekst = this.maaling ? "Måler …" : "Ny opgave";
-            klasse = "knap stor blaa" + (this.maaling ? "" : " banker");
-            laast = !!this.maaling;
-        } else if (R.iDemo()) {
-            tekst = "Taster …";
-            laast = true;
-        } else tekst = KNAP[this.bid][Math.min(this.hjaelp, 1)];
-        if (k.textContent !== tekst) k.textContent = tekst;
-        if (k.className !== klasse) k.className = klasse;
-        k.disabled = laast;
-        this.visKortIgen = R.iDemo();      /* opdater() tegner kortet igen, naar demoen slutter */
-        this.el.kort.classList.toggle("sejr", this.faerdig && !this.maaling);
+    /* Det, kortet siger om den bid, eleven er ved */
+    P.bidTekst = function () {
+        var t = this.trin();
+        if (this.bid === "formel") return "Vælg formlen, der går fra " + this.stationNavn(this.fraNoegle(t)) + " til " + NAVN[t.til] + ".";
+        if (this.bid === "tast") return K.formelHtml(t.tastTekst) + " Lommeregneren står i panelet.";
+        return K.formelHtml(t.skrivTekst).replace(/ i (feltet|felterne)\.$/, " i $1 i panelet.");
     };
 
-    /* Linjen under scenen: altid det naeste skridt */
-    P.visStatus = function () {
-        var t, F = this.F.status;
-        if (this.info) t = this.info.tekst;
-        else if (R.iDemo()) t = "Lommeregneren taster selv. Se tasterne lyse op én ad gangen.";
-        else if (this.maaling && this.maaling.t > 0) {
-            t = this.faerdig ? F.maaler : "pH-metret måler pH i " + NK.html(this.opg.navn.toLowerCase()) + ".";
-        } else if (this.faerdig) t = F.faerdig.replace("{ph}", "<b>" + K.phTekst(this.opg.slutPh !== undefined ? this.opg.slutPh : 0) + "</b>");
-        else {
-            var tr = this.trin();
-            var foer = this.opg.trin.length > 1 ? "Trin " + (this.trinNr + 1) + " af " + this.opg.trin.length + ": " : "";
-            if (this.bid === "formel") t = foer + "vælg formlen, der går fra " + this.stationNavn(this.fraNoegle(tr)) + " til " + NAVN[tr.til] + ". Knapperne står i opgaven.";
-            else if (this.bid === "tast") t = foer + "tast udregningen på lommeregneren, og tryk =.";
-            else if (tr.felt === "tal") t = foer + "tæl OH i formlen, og skriv tallet i feltet.";
-            else t = foer + (tr.felt === "ph" ? "rund af til to decimaler, og skriv pH i feltet." : "skriv koncentrationen i felterne, og tryk Enter.");
-            t = t.charAt(0).toUpperCase() + t.slice(1);
+    /* Papirkortet: opgaven, trinet og bidden, formlerne, beskeden, Giv hint og
+       Indsend svar. Efter en rigtig formel, et rigtigt trin og den sidste
+       beregning bliver kortet med forklaringen og knappen videre. */
+    P.visKort = function () {
+        NK.saetTekst(this.p + "-loest", String(this.loest));
+        if (!this.kort || !this.opg) return;
+        if (!this.faerdig && !this.opg.trin[this.trinNr]) return;      /* en ny opgave er ved at blive stillet op */
+        var mig = this, opg = this.opg, flere = opg.trin.length > 1;
+        var o = { chip: "Opgave " + this.nr, tekst: opg.tekst, besked: this.fast, hint: null, indsend: null };
+        var l = this.linje();
+        if (l && (this.info || !o.besked.html)) o.besked = { html: l, klasse: "peger" };
+        if (this.faerdig) {
+            var slut = this.opg.trin[this.opg.trin.length - 1];
+            o.bliv = {
+                vist: this.vistNogen,
+                tekst: this.maaling ? K.hel(slut.beregning) + ". " + this.F.status.maaler :
+                    this.F.status.faerdig.replace("{ph}", "<b>" + K.phTekst(opg.slutPh !== undefined ? opg.slutPh : 0) + "</b>"),
+                knap: this.maaling ? "" : "Ny opgave →"
+            };
+            this.kort.vis(o);
+            return;
         }
-        NK.saetHTML(this.p + "-status", t);
+        var t = this.trin();
+        var nrTekst = flere ? '<span class="sk-trin-nr">Trin ' + (this.trinNr + 1) + " af " + opg.trin.length + "</span> " : "";
+        if (this.venter === "trin") {
+            o.ekstra = '<p class="sk-trin">' + nrTekst + K.formelHtml(t.skrivTekst) + "</p>";
+            o.bliv = { vist: this.status[this.trinNr] === "vist", knap: "Næste trin →",
+                tekst: (this.status[this.trinNr] === "vist" ? "Svaret står i feltet. " : "") + K.hel(t.beregning) + "." + (this.trinNote ? " " + this.trinNote : "") };
+            this.kort.vis(o);
+            return;
+        }
+        o.ekstra = '<p class="sk-trin">' + nrTekst + this.bidTekst() + "</p>";
+        if (this.bid === "formel") {
+            o.svar = this.formelOrden(t).map(function (k) {
+                var kl = "";
+                if (mig.venter === "formel") kl = t.formler[k].rigtig ? (mig.formelVist ? "svar-vist" : "rigtig") : (mig.forkerteFormler[k] ? "forkert" : "dim");
+                else if (mig.forkerteFormler[k]) kl = "forkert";
+                else if (mig.valgtFormel === k) kl = "valgt";
+                return { html: K.formelHtml(t.formler[k].f), kl: kl };
+            });
+            o.laast = this.venter === "formel";
+        }
+        if (this.venter === "formel") {
+            o.bliv = { vist: this.formelVist, knap: "Næste →",
+                tekst: "Formlen er " + K.formelHtml(rigtigFormel(t).f) + ". Den står nu på pilen i regnevejen." };
+            this.kort.vis(o);
+            return;
+        }
+        var demo = R.iDemo();
+        o.hint = { tekst: demo ? "Taster …" : KNAP[this.bid][Math.min(this.hjaelp, 1)], svar: this.hjaelp > 0, peg: this.pegKnap, laast: demo };
+        o.indsend = { tekst: "Indsend svar", klar: this.kanSendes() };
+        this.kort.vis(o);
+        this.visKortIgen = demo;
+    };
+
+    /* Det, kortet siger ud over beskeden (der er ingen linje nederst): et svar
+       paa et klik i scenen, lommeregneren, der taster, og pH-metret */
+    P.visStatus = function () { this.visKort(); };
+
+    P.linje = function () {
+        if (this.info) return this.info.tekst;
+        if (R.iDemo()) return "Lommeregneren taster selv. Se tasterne lyse op én ad gangen.";
+        if (this.maaling && this.maaling.t > 0 && !this.faerdig) return "pH-metret måler pH i " + NK.html(this.opg.navn.toLowerCase()) + ".";
+        return "";
     };
 
     P.visInfo = function (tekst) {
@@ -601,10 +677,10 @@
 
         /* Regnevejen: oeverst, med luft til knapperne om praesentationen */
         var sb = NK.klamp(W * 0.13, 76, 140), sh = NK.klamp(H * 0.085, 32, 58);
-        var top = NK.klamp(H * 0.12, 10, 96);
+        /* Under papirkortet */
+        var top = 10 + this.kortZone() + 8;
         var raekkeY = top + lay.px * 1.9 + sh / 2;
         if (this.p === "staerk") {
-            top = NK.klamp(H * 0.14, 10, 110);
             raekkeY = top + sh / 2 + sh + NK.klamp(H * 0.1, 40, 84);
         }
         var xs = { oh: W * 0.17, h: W * 0.5, ph: W * 0.83 };
@@ -658,6 +734,9 @@
         var em = Tg.etiketMaal(ctx, proeve.length ? proeve : [{ navn: "pH", vaerdi: "0" }], lay.etiketPx);
         this.saetAnker(this.p + "-anker-etiket", lay.etiketX - 4, this.etiketY() - 4, em.b + 8, em.h + 8);
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 188, 204); };
 
     P.etiketY = function () {
         var lay = this.lay;
@@ -963,7 +1042,7 @@
             return;
         }
         if (u.slags === "etiket") {
-            this.visInfo("Kortet viser det, du ved. Et ? er det, du skal finde. Dine rigtige svar bliver skrevet på kortet.");
+            this.visInfo("Etiketten viser det, du ved. Et ? er det, du skal finde. Dine rigtige svar bliver skrevet på etiketten.");
             return;
         }
         if (u.slags === "meter") {
@@ -977,7 +1056,7 @@
                 this.visInfo("Flasken med " + NK.html(opg.flaske.navn.toLowerCase()) + ", " + NK.html(opg.flaske.formel) +
                     ". På flasken står koncentrationen: " + K.decimal(opg.c) + " M.");
             } else {
-                this.visInfo("Glasset med " + NK.html(opg.navn.toLowerCase()) + ". Kortet ved siden af viser det, du ved, og et ? ved det, du skal finde.");
+                this.visInfo("Glasset med " + NK.html(opg.navn.toLowerCase()) + ". Etiketten ved siden af viser det, du ved, og et ? ved det, du skal finde.");
             }
         }
     };

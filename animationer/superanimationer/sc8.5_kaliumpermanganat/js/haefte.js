@@ -220,8 +220,9 @@
             mig.rad[r[0]] = { el: rad, celle: celler };
         });
 
-        /* Knappen (Giv hint, Vis svaret, Naeste opgave) staar paa papiret.
-           Den er den samme knap hele tiden og lægges paa igen her. */
+        /* Indtil 6. nov. 2026 stod knappen (Giv hint, Vis svaret, Naeste
+           opgave) paa papiret; nu staar den paa papirkortet oeverst i scenen.
+           Saetter fanen en knap paa haeftet, laegges den paa igen her. */
         if (this.knap) el.appendChild(this.knap);
     };
 
@@ -365,9 +366,11 @@
         this.valg.hidden = !v.valg;
         if (v.valg) {
             v.valg.forEach(function (o) {
-                var k = lav("button", "hf-valgknap" + (o.forkert ? " forkert" : ""), o.tekst);
+                /* Et klik vaelger formlen (blaa); Indsend svar paa kortet bedoemmer */
+                var k = lav("button", "hf-valgknap" + (o.forkert ? " forkert" : "") + (o.valgt ? " valgt" : ""), o.tekst);
                 k.type = "button";
                 k.disabled = !!o.forkert;
+                k.setAttribute("aria-pressed", o.valgt ? "true" : "false");
                 k.addEventListener("click", function () { if (mig.vedValg) mig.vedValg(o.f); });
                 mig.valg.appendChild(k);
             });
@@ -549,7 +552,9 @@
         return ud;
     };
 
-    /* Knappen paa papiret (brugerens oenske 3. okt. 2026). Giv hint og Vis
+    /* Bruges ikke fra 6. nov. 2026: knappen staar paa papirkortet oeverst i
+       scenen, og fanen saetter ingen knap paa haeftet.
+       Knappen paa papiret (brugerens oenske 3. okt. 2026). Giv hint og Vis
        svaret staar i papirets nederste hoejre hjoerne (CSS). Naeste opgave
        staar midt i haeftet: under reaktionspilen, mellem raekkernes to
        sider. Er der ikke plads dér, staar den midt for nederst paa

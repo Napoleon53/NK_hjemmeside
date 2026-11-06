@@ -168,6 +168,7 @@ main { flex: 1; position: relative; min-height: 0; }
 
 /* Scenen er ternet papir */
 .scene {
+    --kortzone: 176px;          /* pladsen til papirkortet; se kortZone() i js/fane.js */
     position: relative;
     min-width: 0;
     min-height: 0;
@@ -183,7 +184,7 @@ main { flex: 1; position: relative; min-height: 0; }
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
+    top: calc(var(--kortzone) + 20px);
     bottom: 0;
     z-index: 2;
     overflow-y: auto;
@@ -191,8 +192,10 @@ main { flex: 1; position: relative; min-height: 0; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: safe center;
-    padding: 18px 22px;
+    /* Tavlen staar lidt under kortet, ikke midt i den resterende plads,
+       saa kortet og tavlen hoerer sammen */
+    justify-content: flex-start;
+    padding: clamp(8px, 6vh, 56px) 22px 18px;
 }
 
 .arbejdsbord {
@@ -202,22 +205,6 @@ main { flex: 1; position: relative; min-height: 0; }
     flex-direction: column;
     align-items: center;
     gap: 12px;
-}
-
-.opg-type {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--blaa);
-}
-
-.spm {
-    margin: -4px 0 2px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    line-height: 1.35;
-    text-align: center;
 }
 
 /* ---------------------------------------------------------------------
@@ -503,36 +490,12 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .svar-enhed { font-size: 1.25rem; font-weight: 600; color: var(--tekst-svag); }
 
-.knap.tjekknap { min-width: 112px; justify-content: center; padding: 12px 22px; font-size: 1rem; }
-.knap.tjekknap.videre { background-color: var(--groen-mork); border-color: var(--groen); }
-.knap.tjekknap.videre:hover:not(:disabled) { background-color: var(--groen); }
-
 /* Maaleren: hvor mange betydende cifre dit eget tal har */
 .maaler { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; color: var(--tekst-mat); }
 .prikker-m { display: inline-flex; gap: 5px; }
 .prikker-m i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #5f5f72; }
 .prikker-m i.fyldt { background-color: var(--blaa); border-color: var(--blaa); }
 .prikker-m i.over { background-color: var(--roed); border-color: var(--roed); }
-
-/* Linjen under svaret: naeste skridt, fejl, ros og hint */
-.besked {
-    margin: 0;
-    max-width: 660px;
-    min-height: 1.5em;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 1rem;
-    line-height: 1.5;
-    text-align: center;
-    color: var(--tekst-svag);
-}
-
-.besked:empty { visibility: hidden; }
-.besked b { color: #ffffff; }
-.besked sup { font-size: 0.72em; }
-.besked.god   { color: var(--groen-lys); background-color: rgba(63, 174, 114, 0.08); }
-.besked.skidt { color: var(--roed-lys); background-color: rgba(224, 84, 70, 0.08); }
-.besked.gul   { color: var(--gul-lys); background-color: rgba(242, 197, 61, 0.07); }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -583,7 +546,7 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .kort > h2 .taeller b { color: var(--tekst); }
-.kort.opgavekort { border-left: 3px solid var(--lilla); }
+.kort.rundevalg { border-left: 3px solid var(--lilla); }
 
 .vaelgerrad { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 
@@ -620,9 +583,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .prikker i.rigtig { background-color: var(--groen); }
 .prikker i.hjulpet { background-color: var(--okker); }
 .prikker i.vist { background-color: var(--roed); }
-
-.kort-slut { margin: 0 0 12px; font-size: 0.95rem; line-height: 1.5; color: var(--groen-lys); }
-.kort-slut b { color: #ffffff; }
 
 /* Listen over de loeste opgaver med facit */
 .rundeliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
@@ -876,7 +836,6 @@ button:focus-visible {
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 7px 10px; font-size: 0.84rem; gap: 6px; }
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.66rem; }
-    .spm { font-size: 1.15rem; }
     .svarfelt { width: 7em; font-size: 1.4rem; }
 }
 
@@ -897,4 +856,49 @@ button:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+
+/* =====================================================================
+   PAPIRKORTET (6. nov. 2026, brugerens beslutning 4. nov. 2026)
+   Opgaven, hintet, beskeden ved et forkert svar, forklaringen og
+   knapperne staar paa ét kort oeverst i midten af scenen. Udseendet
+   (lyst papir, Lexend, knapperne) kommer fra ../faelles/papirkort.css;
+   her staar kun kortets plads og raekkernes opbygning. Kortet maa ikke
+   blive hoejere end --kortzone (176 px, 152 px paa lave skaerme), saa
+   det aldrig daekker tavlen; selvtesten maaler det.
+   ===================================================================== */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(820px, calc(100% - 24px));
+}
+
+.sk-tekst { margin: 0; text-align: left; }
+.sk-tekst sup { font-size: 0.72em; }
+
+.sk-bund { display: flex; align-items: center; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .st-tekst sup,
+.sk-bund.bliv .st-tekst sup { font-size: 0.72em; }
+.scenekort .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; white-space: nowrap; }
+.scenekort .knap[hidden] { display: none; }
+.scenekort .knap.indsend.ikke-klar { cursor: default; }
+
+.sk-videre { font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+/* Runden er slut: resultatet og knappen videre til den naeste fane */
+.sk-slut { display: flex; align-items: center; }
+.sk-slut .sk-tekst { flex: 1; min-width: 0; }
+
+/* Ny runde i panelet: en stille knap under stregerne */
+.rundevalg .knap.forfra { display: inline-flex; }
+
+@media (max-height: 720px) {
+    .scene { --kortzone: 152px; }
 }

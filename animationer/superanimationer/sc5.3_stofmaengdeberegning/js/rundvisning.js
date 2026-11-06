@@ -16,12 +16,12 @@
 
     var TURE = {
         "fane-formel": [
-            { sel: "#formel-anker-opgave", titel: "Opgaven", tekst: "Her står, hvad du skal gøre i opgaven." },
+            { sel: "#formel-skort", titel: "Opgaven", tekst: "Her står, hvad du skal gøre i opgaven. Træk brikkerne op, og tryk på Indsend svar. Linjen nederst på kortet siger, hvad du skal nu, og hvad der gik galt." },
             { sel: "#formel-anker-bunke", titel: "Brikkerne", tekst: "Træk en brik op på en plads på tavlen. Du kan også klikke på en brik og så på pladsen." },
             { sel: "#formel-anker-formel", titel: "Formlen", tekst: "Formlen tjekkes, når alle dens pladser er fyldt. Det, der sidder rigtigt, bliver siddende." },
             { sel: "#formel-anker-skema", titel: "Skemaet", tekst: "Navnet og enheden for n, m og M. I nogle opgaver skal du selv sætte dem på." },
-            { sel: "#formel-kort", titel: "Kortet", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt." },
-            { sel: "#formel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
+            { sel: "#formel-kort", titel: "Om opgaven", tekst: "Hvad opgaverne skal lære dig. I sidste opgave skriver du formlen og enhederne i felterne her." },
+            { sel: "#formel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på Giv hint. Først får du et hint, og et tryk mere viser svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
             { sel: "#formel-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. Hjælpen forsvinder opgave for opgave, og til sidst skriver du det hele selv. En løst opgave bliver grøn." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Vægten: regn med formlen, og se stoffet blive delt i poser på 1 mol. Hurtigrunden: tolv spørgsmål på tid." }
         ],
@@ -30,13 +30,14 @@
             { sel: "#vaegt-raekker", titel: "Regnestykket", tekst: "Tre trin, ét ad gangen: formlen med bogstaver, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed. Linjen øverst viser, hvilket trin du er ved. Tryk Enter efter hver." },
             { sel: "#vaegt-anker-bord", titel: "Bordet", tekst: "Molarmassen står på krukken. Vægten viser massen. Det, du regner, sker her." },
             { sel: "#vaegt-anker-poser", titel: "Poserne", tekst: "Hver pose er 1 mol og vejer M gram. Stofmængden er antallet af poser." },
-            { sel: "#vaegt-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
+            { sel: "#vaegt-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Linjen nederst på kortet siger, hvad du skal nu, og hvad der gik galt. Giv hint giver et hint og derefter svaret." },
+            { sel: "#vaegt-kort", titel: "Regnestykket", tekst: "Skriv formlen, tallene og resultatet i felterne, og tryk på Indsend svar eller Enter." },
             { sel: "#vaegt-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En løst opgave bliver grøn, og løser du den uden at se svaret, får den en stjerne. Nye tal giver samme opgave med andre tal." }
         ],
         "fane-hurtig": [
-            { sel: "#hurtig-anker-tavle", titel: "Spørgsmålet", tekst: "Tolv spørgsmål om formlen, enhederne og navnene, og lidt hovedregning." },
-            { sel: "#hurtig-anker-svar", titel: "Svarene", tekst: "Klik på det rigtige svar, eller tast 1 til 4. Et forkert svar giver tidsstraf, og spørgsmålet kommer igen senere." },
-            { sel: "#hurtig-kort", titel: "Knappen", tekst: "Start runden. Undervejs giver den et hint (det koster lidt tid) og derefter svaret." },
+            { sel: "#hurtig-skort", titel: "Spørgsmålet", tekst: "Tolv spørgsmål om formlen, enhederne og navnene, og lidt hovedregning. Vælg et svar, og tryk på Indsend svar, eller tast 1 til 4 og Enter. Et forkert svar giver tidsstraf, og spørgsmålet kommer igen senere." },
+            { sel: "#hurtig-knap", titel: "Giv hint", tekst: "Giv hint koster lidt tid. Et tryk mere viser svaret." },
+            { sel: "#hurtig-anker-tavle", titel: "Uret", tekst: "Tiden og hvor langt runden er. Uret står stille, mens forklaringen står på kortet." },
             { sel: "#hurtig-data", titel: "Tiden", tekst: "Tiden med tidsstraf, antallet, du fik rigtigt første gang, og din rekord i denne browser." }
         ]
     };

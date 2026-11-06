@@ -658,3 +658,73 @@ svg.formel { display: block; width: 100%; height: auto; margin: 4px 0 12px; }
 }
 .niveauknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 .niveauknap.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
+
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (6. nov. 2026). Opgaven, svarene, hint, beskeden ved et
+   forkert svar, forklaringen og knapperne staar paa ét lyst kort
+   oeverst midt i scenen (js/skort.js). Udseendet kommer fra
+   ../faelles/papirkort.css; her staar kun pladsen og opbygningen.
+   Laerredet saetter pladsen af oeverst (kortZone() i fanens js), og
+   selvtesten maaler, at kortet holder sig i den. Der er ingen linje
+   nederst i scenen. Decimaltal med PUNKTUM.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+    box-sizing: border-box;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-svar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.scenekort .sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 560px; margin-left: auto; margin-right: auto; }
+.scenekort .sk-svar.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.scenekort .sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+
+.scenekort .sk-knap:disabled { cursor: default; }
+
+.scenekort .v-bogstav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.scenekort .sk-bund { display: flex; align-items: center; gap: 10px; }
+.scenekort .sk-bund[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.scenekort .sk-bund .knap[hidden] { display: none; }
+.scenekort .sk-bund .knap.hjaelp { margin-left: auto; }
+.scenekort .sk-videre { font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+/* Tilbuddet om Kemichaels praesentation staar nederst, saa kortet har toppen */
+.tilbud { top: auto; bottom: 16px; }
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; }
+    .scenekort .sk-knap { padding: 4px 9px; font-size: 0.88rem; }
+    .scenekort .sk-bund .knap { font-size: 0.88rem; }
+}

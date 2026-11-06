@@ -41,13 +41,14 @@ der er tre. Resten af bestillingen er skrevet af Claude uden at spørge.
    Fane 3: blindprøve, 4 gule og 4 blå standarder, 1 prøve, 2 bølgelængder,
    4 trin. Hver fane har 2 eller 3 prøver til Ny prøve. Quizzen har 8
    spørgsmål.
-5. **Layoutet:** scene plus panel. Scenen: opgavelinjen øverst, til venstre
-   spektrofotometeret med zoomboblen under, til højre grafen (to på fane 3),
-   nederst stativet med kuvetterne og statuslinjen. Panelet (480 px):
+5. **Layoutet:** scene plus panel. Scenen: papirkortet øverst (fra 6. nov.
+   2026, før opgavelinjen), til venstre spektrofotometeret med zoomboblen
+   under, til højre grafen (to på fane 3), nederst stativet med kuvetterne
+   (statuslinjen er væk). Panelet (480 px):
    spørgsmålet, trinene med regnestykket i det aktive trin, og tabellen med
    målingerne.
 
-Kemichael er ikke med. Hjælpen står i statuslinjen som i `sc1.4_afstemning`.
+Kemichael er ikke med. Hjælpen står på papirkortet.
 
 Grænsen til laboratoriet: forsøgene følges trin for trin, men der hældes
 ikke, og der er ingen uheld. Spektrofotometeret er modellen, eleven skruer på,
@@ -161,7 +162,7 @@ js/scene.js        lærredet: instrumentet, zoomboblen, graferne, stativet,
                    træk og slip
 js/regning.js      regnestykket (formel, tal, resultat) og resultatfelterne
 js/forsoeg.js      motoren for én fane: målingerne, trinene, tabellen,
-                   statuslinjen, hinttrappen og alle beskederne
+                   papirkortet, hinttrappen og alle beskederne
 js/quiz.js         quizzen
 js/rundvisning.js  rundvisningen bag ?
 js/app.js          faneskift, tastatur og løkken
@@ -173,10 +174,32 @@ farvestof er ét objekt i `D.STOFFER` med a ved hver bølgelængde.
 
 ## Genveje
 
-<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> tjek ·
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> Indsend svar eller Næste ·
 <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
 <kbd>Q</kbd> quiz · <kbd>Esc</kbd> luk. Direkte links: `#sodavand`, `#nitrit`,
 `#farvestoffer` og `#quiz`.
+
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har papirkortet øverst midt i scenen (`.scenekort` i en
+`.kortzone` på 176 px, 164 px på lave skærme; `body.papirkort`,
+`../faelles/papirkort.css` og `papirkort.js`). Opgavelinjen og statuslinjen
+er væk, og Start forfra står i panelet under trinene.
+
+- Kortet viser "Trin n af N", trinets opgave med fed og næste skridt.
+  Beskederne (målt, nulstillet, hint, fejl) står i kortets nederste række.
+- Felterne til regnestykkerne bliver i panelet, men Tjek-knapperne er
+  væk: Indsend svar står på kortet (grå, til der står noget i felterne),
+  og Enter i et felt er Indsend svar. Måletrin og reagenstrin har ingen
+  Indsend; de er løst, når alt er målt.
+- Et rigtigt trin, en rigtig bid af et regnestykke og Vis svaret bliver på
+  kortet med Næste (gult ved Vis svaret). Næste fører videre; imens er
+  forsøget låst, og kortet blinker ved et klik på en kuvette, flaske eller
+  knap. Et klik på instrumentet, zoomboblen eller grafen forklarer stadig.
+- Når prøven er færdig, bliver kortet stående med svaret på spørgsmålet og
+  knappen Ny prøve eller Videre til næste fane.
+
+Molekylenavne: ingen at rette (kun ionen NO₂⁻).
 
 ## Selvtest
 
@@ -185,8 +208,9 @@ file://). Den tjekker modellen (absorbanserne, summen ved 427 nm, farverne,
 hældningerne), elevens tal og bogstaver, alle tre forsøg selv og med Vis
 svaret, de typiske fejl, Ny prøve, påskeægget, træk og slip med rigtige
 pointer-hændelser, quizzen, sproget og layoutet fra 1100 × 700 til
-1600 × 950.
-Sidst kørt: ALT OK (113 påstande), 2. oktober 2026.
+1600 × 950. Fra 6. nov. 2026 også papirkortet: kortet i scenen, Indsend
+svar grå uden input, Enter, Næste, låsen og at kortet holder sig i zonen.
+Sidst kørt: ALT OK (122 påstande), 6. november 2026.
 
 ## I menuen
 

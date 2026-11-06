@@ -23,7 +23,9 @@
    bidden. Tomme felter tæller som ikke besvaret, og luppen og
    regnskabet viser kun tal, eleven selv har skrevet.
 
-   NK.Fane.paa (js/fane.js) giver listen, knappen og linjen.
+   NK.Fane.paa (js/fane.js) giver listen og papirkortet oeverst i scenen
+   (6. nov. 2026): kortets tekst er det naeste skridt helt kort
+   (kortLinje), og et valg eller et tal sendes ind med Indsend svar.
    Her er det, der er særligt for afstemningen.
    ===================================================================== */
 (function () {
@@ -61,13 +63,13 @@
         var mig = this, navn = this.cfg.navn;
         var opgaver = D.REAKTIONER.filter(function (r) { return r.fane === navn; });
         this.haefte = new NK.Haefte(NK.el(navn + "-haefte"), navn);
-        /* Knappen (Giv hint, Vis svaret, Næste opgave) står på papiret */
-        this.haefte.knap = NK.el(navn + "-knap");
+        /* Enter i et felt i haeftet er det samme som Indsend svar */
         this.haefte.vedEnter = function () { mig.tjekTrin(); };
         this.haefte.vedInput = function (k, inp) { mig.input(k, inp); };
         this.haefte.vedTast = function (k, e) { return mig.tast(k, e); };
         this.haefte.vedPil = function (t) { mig.vendPil(t); };
-        this.haefte.vedValg = function (f) { mig.valgt(f, "selv"); };
+        /* Formlerne under spoergsmaalstegnet vaelger kun; Indsend svar bedoemmer */
+        this.haefte.vedValg = function (f) { mig.velg(f); };
         /* Ét urglas paa begge faner; fane 1 har fire flasker */
         this.bord = new NK.Bord({ navn: navn, glas: [{ tekst: "", farve: "vand" }],
             flasker: D.FLASKER[navn].map(function (id) { return D.FLASKE[id]; }) });
@@ -122,6 +124,7 @@
             tal: {},                           /* fundne tal: { v, slags } */
             pil: { ox: null, red: null },      /* elevens pile ved klammerne */
             forkert: {},                       /* forkerte valg af manganstoffet */
+            valgt: null,                       /* det manganstof, eleven har valgt (ikke sendt) */
             iGlas: {},                         /* det, eleven har fyldt i det tomme urglas */
             dryppet: false, produkt: false, koefFaerdig: false
         };
@@ -163,23 +166,49 @@
         return mn || miljoe.charAt(0).toUpperCase() + miljoe.slice(1);
     };
 
-    /* ----- Teksterne i opgavekortet ------------------------------------------------------ */
-    F.promptHTML = function () {
-        var d = this.opg.def;
-        return '<p class="maal-tekst">' + NK.html(d.tekst) + "</p>" +
-            (d.kontekst && this.opg.dryppet ? '<p class="opgave-spm">' + NK.html(d.kontekst) + "</p>" : "");
-    };
-
+    /* ----- Panelet: bidderne -----------------------------------------------------------
+       Trinlisten viser de faerdige med ✓ og den, eleven er ved. Mens kortet
+       bliver paa en loest bid, er den naeste ikke begyndt endnu. */
     F.visKortEkstra = function () {
-        var g = this.opg, html = "";
+        var g = this.opg, html = "", venter = !!this.venter;
         var ion = g.R.ionSt.tekst;
         g.trin.forEach(function (t, i) {
             var navn = t === "ion" ? ion : TRIN_NAVN[t];
             if (i < g.nr) html += '<span class="tl-trin ok">✓ ' + NK.html(navn) + "</span>";
-            else if (i === g.nr) html += '<span class="tl-trin nu">' + (i + 1) + ". " + NK.html(navn) + "</span>";
+            else if (i === g.nr && !venter) html += '<span class="tl-trin nu">' + (i + 1) + ". " + NK.html(navn) + "</span>";
         });
-        if (g.nr < g.trin.length) html += '<span class="tl-rest">' + (g.trin.length - g.nr - 1 ? "og " + (g.trin.length - g.nr - 1) + " mere" : "sidste") + "</span>";
+        var rest = g.trin.length - g.nr - (venter ? 0 : 1);
+        if (g.nr < g.trin.length) html += '<span class="tl-rest">' + (rest ? "og " + rest + " mere" : "sidste") + "</span>";
         NK.saetHTML(this.navn + "-trin", html);
+    };
+
+    /* ----- Papirkortet ---------------------------------------------------------------
+       Kortets tekst er det naeste skridt helt kort (kortLinje). Efter et
+       rigtigt svar staar teksten til den bid, der lige er loest. */
+    F.kortTekst = function () {
+        var t = this.faerdig || this.venter ? this.sidsteTrin : this.aktivt();
+        var l = this.kortLinje(t);
+        return /[.?!]$/.test(l) ? l : l + ".";
+    };
+
+    /* Den lange linje under kortets tekst staar kun ved bordet: hvordan man
+       fylder glasset og drypper. I haeftet er kortets korte linje nok. */
+    F.medTrinLinje = function () {
+        var t = this.aktivt();
+        return t === "bland" || t === "dryp";
+    };
+
+    /* Indsend svar er graa, til der er noget at sende: et valgt manganstof,
+       et tal i et af felterne eller en pil, der er vendt */
+    F.kanIndsende = function () {
+        var mig = this, g = this.opg, t = this.aktivt();
+        if (!t || t === "bland" || t === "dryp") return false;
+        if (t === "produkt") return !!g.valgt;
+        return this.noegler(t).some(function (k) {
+            if (g.tal[k]) return false;
+            if (k.indexOf("kl-") === 0 && g.pil[k.slice(3)] !== null) return true;
+            return !!mig.vaerdi(k).trim();
+        });
     };
 
     /* Naeste skridt i hele saetninger */
@@ -189,18 +218,17 @@
         switch (t) {
         case "bland":
             var m = this.mangler().map(function (id) { return D.FLASKE[id]; });
-            if (m.length > 1) return "Urglasset er tomt. Træk flasken med " + m[0].navn + " (" + m[0].tekst + ") hen over urglasset, og slip den. Gør det samme med " +
-                m[1].navn + " (" + m[1].tekst + ").";
-            return "Nu mangler " + m[0].navn + " (" + m[0].tekst + "). Træk flasken hen over urglasset, og slip den.";
+            if (m.length > 1) return "Træk flasken med " + m[0].navn + " hen over urglasset, og slip den. Gør det samme med " + m[1].navn + ".";
+            return "Nu mangler " + m[0].navn + ". Træk flasken hen over urglasset, og slip den.";
         case "dryp":
             var fl = D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]];
-            return "Træk flasken med " + fl.navn + " (" + fl.tekst + ") hen over urglasset, og slip den. Du kan også klikke på glasset.";
+            return "Træk flasken med " + fl.navn + " hen over urglasset, og slip den. Du kan også klikke på glasset.";
         case "produkt":
             return "Hvad blev " + M.tekst + " til? Se på farven i glasset, find den på farvekortet, og vælg formlen i hæftet.";
         case "ox":
             var mangler = this.noegler("ox").filter(function (k) { return !g.tal[k]; }).length;
-            return mangler < 4 ? "Skriv de sidste oxidationstal, og tryk Enter." :
-                "Skriv oxidationstallet over " + R.ox.E + " og " + R.red.E + " på begge sider af pilen, og tryk Enter.";
+            return mangler < 4 ? "Skriv de sidste oxidationstal, og tryk Indsend svar." :
+                "Skriv oxidationstallet over " + R.ox.E + " og " + R.red.E + " på begge sider af pilen, og tryk Indsend svar.";
         case "for":
             var K = R.ox.pv > 1 || R.ox.ph > 1 ? R.ox : R.red;
             var foran = R.led[K.pv > 1 ? K.v : K.h].st;
@@ -227,18 +255,20 @@
         return "";
     };
 
-    /* Den helt korte udgave af naeste skridt. Den staar oeverst i haeftet,
-       hvor oejnene er, og skifter med hver bid (brugerens oenske 3. okt.
-       2026: "Skriv oxidationstallene for S og Mn i skemaet"). Den lange
-       linje staar stadig i opgavekortet. */
-    F.kortLinje = function () {
+    /* Den helt korte udgave af naeste skridt, i bydeform (brugerens oenske
+       3. okt. 2026: "Skriv oxidationstallene for S og Mn i skemaet"). Den
+       stod oeverst i haeftet; fra 6. nov. 2026 er den teksten paa
+       papirkortet, og den staar der, til eleven trykker Naeste trin. Ved
+       dryppet staar opgavens egen tekst ("Fe²⁺ i svovlsyre. Dryp
+       kaliumpermanganat i."), undtagen i det glas, eleven selv har fyldt. */
+    F.kortLinje = function (trin) {
         var g = this.opg, R = g.R, d = g.def;
-        if (this.faerdig) return d.navn + ": afstemt ✓";
-        switch (this.aktivt()) {
+        switch (trin === undefined ? this.aktivt() : trin) {
         case "bland":
             var m = this.mangler().map(function (id) { return D.FLASKE[id].tekst; });
             return m.length > 1 ? "Tilsæt " + m.join(" og ") + " til urglasset" : "Tilsæt også " + m[0] + " til urglasset";
         case "dryp":
+            if (!d.bland) return d.tekst;
             return "Dryp " + D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]].tekst + " i urglasset";
         case "produkt":
             return "Vælg det stof, " + R.led[R.red.v].st.tekst + " blev til";
@@ -284,7 +314,8 @@
         return [];
     };
 
-    F.naaet = function (t) { var i = this.opg.trin.indexOf(t); return i >= 0 && i <= this.opg.nr; };
+    /* Naar kortet bliver paa en loest bid (venter), er den naeste bid ikke naaet endnu */
+    F.naaet = function (t) { var i = this.opg.trin.indexOf(t); return i >= 0 && (i < this.opg.nr || (i === this.opg.nr && !this.venter)); };
     F.forbi = function (t) { var i = this.opg.trin.indexOf(t); return i >= 0 && i < this.opg.nr; };
 
     F.vaerdi = function (k) { var i = this.haefte.inp(k); return i ? i.value : ""; };
@@ -296,14 +327,15 @@
     };
 
     F.visning = function () {
-        var mig = this, g = this.opg, R = g.R, t = this.faerdig ? null : this.aktivt();
+        var mig = this, g = this.opg, R = g.R, t = this.faerdig || this.venter ? null : this.aktivt();
         var aktiv = t ? this.noegler(t).filter(function (k) { return !g.tal[k]; }) : [];
         var fylder = t === "bland";
         /* Formlen for det stof, flasken drypper i (svovlsyre har ingen: H⁺
            kommer først i skemaet, når ladningen afstemmes) */
         var dryppes = D.FLASKE[g.def.flaske || D.FLASKER[this.cfg.navn][0]].giver || null;
         return {
-            navn: this.kortLinje(),
+            /* Overskriften i haeftet: reaktionens navn, som i haandskrift */
+            navn: g.def.navn + (this.faerdig ? ": afstemt ✓" : ""),
             faerdig: this.faerdig,
             aktiv: aktiv,
             kendt: function (i) {
@@ -364,7 +396,7 @@
        nye tal efter en pil: +9 → +17. Mens eleven skriver, er det nye
        tal gult, og det regnes kun af elevens eget tal. */
     F.celle = function (r, side) {
-        var g = this.opg, R = g.R, t = this.faerdig ? null : this.aktivt();
+        var g = this.opg, R = g.R, t = this.faerdig || this.venter ? null : this.aktivt();
         /* O-raekken er kontrollen til sidst: den kommer af sig selv */
         if (r === "ilt") return this.faerdig ? { html: String(R.slut[side].O || 0) + " ✓", slags: "ok" } : null;
         var noegle = r + "-" + side, fundet = g.tal[noegle];
@@ -392,10 +424,6 @@
         this.bord.saetTekst(0, this.glasTekst());
         this.opdaterLup();
     };
-
-    /* Knappen har skiftet rolle (hint, svar eller Næste opgave): hæftet
-       lægger den på plads */
-    F.knapVist = function () { this.haefte.placerKnap(); };
 
     /* ----- Farvekortet i panelet ---------------------------------------------------------- */
     F.bygFarvekort = function () {
@@ -460,13 +488,14 @@
             if (ny !== s) inp.value = ny;
         }
         this.visHaefte();
+        this.visIndsend();
     };
 
     F.tast = function (k, e) {
         if (k.indexOf("kl-") !== 0) return false;
         var t = k.slice(3);
-        if (e.key === "ArrowUp") { this.opg.pil[t] = true; this.visHaefte(); return true; }
-        if (e.key === "ArrowDown") { this.opg.pil[t] = false; this.visHaefte(); return true; }
+        if (e.key === "ArrowUp") { this.opg.pil[t] = true; this.visHaefte(); this.visIndsend(); return true; }
+        if (e.key === "ArrowDown") { this.opg.pil[t] = false; this.visHaefte(); this.visIndsend(); return true; }
         return false;
     };
 
@@ -475,6 +504,7 @@
         if (this.aktivt() !== "klammer" || g.tal["kl-" + t]) return;
         g.pil[t] = g.pil[t] === true ? false : true;
         this.visHaefte();
+        this.visIndsend();
         this.haefte.fokus("kl-" + t);
     };
 
@@ -516,7 +546,8 @@
     F.slipPaaGlas = function (i, nr) {
         var rigtig = this.flaskeNr();
         if (nr === undefined) nr = rigtig;
-        var t = this.faerdig ? null : this.aktivt();
+        var t = this.faerdig || this.venter ? null : this.aktivt();
+        if (this.venter || this.faerdig) this.kortBlink();
         if (t !== "dryp" && t !== "bland") {
             this.bord.hjem(nr);
             if (!this.faerdig) this.kortBesked("Der er dryppet i glasset. Afstem reaktionen i hæftet.", 4);
@@ -592,6 +623,9 @@
         var obs = d.obs || OBS[d.efter] || "";
         if (d.bundfald === "gul") obs += " Der kommer et gult bundfald.";
         if (d.gas) obs += " Der kommer bobler.";
+        /* Det, der er saerligt ved reaktionen, stod i opgavekortet i panelet;
+           nu staar det paa kortet sammen med det, der skete i glasset */
+        if (d.kontekst) obs += " " + d.kontekst;
         this.visHaefte();
         this.visKort();
         this.nytTrin(obs, "");
@@ -601,8 +635,18 @@
     F.valgListe = function () {
         var g = this.opg, R = g.R, reaktant = R.led[R.red.v].st.f;
         return D.MANGAN.filter(function (m) { return m.f !== reaktant; }).map(function (m) {
-            return { f: m.f, tekst: X.stof(m.f).tekst, forkert: !!g.forkert[m.f] };
+            return { f: m.f, tekst: X.stof(m.f).tekst, forkert: !!g.forkert[m.f], valgt: g.valgt === m.f };
         });
+    };
+
+    /* Et klik paa en formel vaelger den (blaa). Indsend svar bedoemmer. */
+    F.velg = function (f) {
+        var g = this.opg;
+        if (this.faerdig || this.venter || this.aktivt() !== "produkt" || g.forkert[f]) return;
+        g.valgt = f;
+        if (this.fast.klasse === "skidt") this.naesteLinje("", "");
+        this.visHaefte();
+        this.visIndsend();
     };
 
     F.valgt = function (f, maade) {
@@ -618,6 +662,7 @@
             return;
         }
         g.forkert[f] = true;
+        g.valgt = null;
         var valgt = D.MANGAN.filter(function (x) { return x.f === f; })[0];
         var t = X.stof(f).tekst + " er " + valgt.ord + ". Glasset er " + GLAS_ORD[d.efter] + ".";
         if (d.kontekst && (d.efter === "iod" || d.efter === "brom" || d.efter === "lysgul")) t += " " + d.kontekst;
@@ -627,11 +672,14 @@
 
     /* ----- Tjek den bid, eleven er ved ------------------------------------------------------ */
     F.tjekTrin = function () {
-        if (this.faerdig || this.auto) return;
+        if (this.faerdig || this.venter || this.auto) return;
         switch (this.aktivt()) {
         case "bland": this.kortBesked("Fyld urglasset først: træk flaskerne hen over det.", 3); return;
         case "dryp": this.kortBesked("Træk flasken hen over urglasset først.", 3); return;
-        case "produkt": this.kortBesked("Vælg formlen i hæftet under spørgsmålstegnet.", 3); return;
+        case "produkt":
+            if (this.opg.valgt) this.valgt(this.opg.valgt, "selv");
+            else this.kortBesked("Vælg formlen i hæftet under spørgsmålstegnet.", 3);
+            return;
         case "ox": this.tjekOx(); return;
         case "for": this.tjekFor(); return;
         case "klammer": this.tjekKlammer(); return;
@@ -871,14 +919,18 @@
     };
 
     /* ----- En bid er loest --------------------------------------------------------------- */
+    /* Bidden er loest: kortet bliver paa den (fane.js), og den naeste bid
+       begynder foerst, naar eleven trykker Naeste trin */
     F.loesTrin = function (maade, ros, svarHTML) {
         var g = this.opg, t = this.aktivt();
         g.nr++;
+        g.valgt = null;
+        this.sidsteTrin = t;
         this.efterTrin(t);
+        this.trinLoest(maade, svarHTML, ros);
         this.visHaefte();
         this.visKort();
-        this.trinLoest(maade, svarHTML, ros);
-        this.startTrin();
+        if (!this.venter) this.startTrin();
     };
 
     /* Det, der sker, naar en bid er klaret */
@@ -990,8 +1042,17 @@
         this.forklaringNu = { trin: this.aktivt(), medSvar: false };
     };
 
-    /* Vis svaret: resten af bidden udfyldes med brunt blaek, og linjen i kortet
-       siger kort, hvad der kom ud. Laes mere regner det hele ud. */
+    /* Det, en bid gav, i én kort saetning: forklaringen paa kortet, naar
+       eleven selv har loest bidden uden en ros med tal (oxidationstallene) */
+    F.trinForklaring = function (t) {
+        var R = this.opg.R, OX = R.ox, RED = R.red;
+        if (t === "ox") return NK.html(OX.E + " går fra " + X.ox(OX.fra) + " til " + X.ox(OX.til) + ", og " +
+            RED.E + " går fra " + X.ox(RED.fra) + " til " + X.ox(RED.til) + ".");
+        return NK.html(NK.tilfaeldig(D.ROS));
+    };
+
+    /* Vis svaret: resten af bidden udfyldes med brunt blaek, og kortet siger
+       kort, hvad der kom ud. Laes mere regner det hele ud. */
     F.visSvar = function (t) {
         var mig = this, g = this.opg, R = g.R, OX = R.ox, RED = R.red, kort = "";
         function vis(k, v) { if (!g.tal[k]) g.tal[k] = { v: v, slags: "vist" }; }
@@ -1059,7 +1120,7 @@
     /* ----- Fokus og taster --------------------------------------------------------------------- */
     F.fokusFelt = function () {
         var g = this.opg, t = this.aktivt();
-        if (!t) return;
+        if (!t || this.venter) return;
         var a = document.activeElement;
         var k = this.noegler(t).filter(function (x) { return !g.tal[x]; });
         if (a && a.getAttribute && k.indexOf(a.getAttribute("data-noegle")) >= 0) return;
@@ -1067,23 +1128,28 @@
     };
 
     F.enter = function () {
-        if (this.faerdig) { this.knap(); return; }
+        if (this.faerdig || this.venter) { this.videre(); return; }
         if (this.aktivt() === "dryp" || this.aktivt() === "bland") { this.dryp(); return; }
         this.tjekTrin();
     };
 
     /* ----- Scenen ---------------------------------------------------------------------------- */
+    /* Oeverst papirkortet (kortZone i js/fane.js), under det bordet med
+       flaskerne, urglasset og luppen, og nederst haeftet. Start forfra
+       ligger i panelet (6. nov. 2026); striben under haeftet er vaek. */
     F.layout = function () {
         var W = this.L.b, H = this.L.h;
-        /* Under haeftet er der en smal stribe til knappen Start forfra */
-        var bund = H - Math.round(NK.klamp(H * 0.055, 38, 46));
         var m = Math.round(NK.klamp(H * 0.016, 6, 14));
-        var tilraadig = bund - m;
-        var bordH = Math.round(NK.klamp(tilraadig * 0.36, 150, 236));
-        this.bord.layout(0, m, W, bordH);
+        var bund = H - m;
+        var top = this.top();
+        var tilraadig = bund - top;
+        /* Mindst 196 px: saa er der plads til teksten under luppen (op til
+           47 px under den), ogsaa naar kortet tager toppen af en lav skaerm */
+        var bordH = Math.round(NK.klamp(tilraadig * 0.38, 196, 236));
+        this.bord.layout(0, top, W, bordH);
         var kant = Math.round(NK.klamp(W * 0.025, 10, 28));
         var hb = Math.min(W - 2 * kant, 1180);
-        var hx = Math.round((W - hb) / 2), hy = m + bordH + 2;
+        var hx = Math.round((W - hb) / 2), hy = top + bordH + 2;
         var hh = Math.round(bund - hy);
         var e = this.haefte.el;
         e.style.left = hx + "px";

@@ -32,7 +32,9 @@
     }
 
     var P = SimIoner.prototype;
-    NK.Fane.paa(P, { navn: "ioner", niveauer: true });
+    /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
+    var ZONE = [150, 132];
+    NK.Fane.paa(P, { navn: "ioner", niveauer: true, zone: ZONE });
     NK.Regning.paa(P);
 
     P.harNyeTal = function () { return false; };
@@ -95,9 +97,18 @@
             s = "En opløsning af " + st.formel + " har c(" + st.formel + ") = " + K.c(o.c) + " M.";
             vej = "Før ionernes aktuelle koncentrationer kan findes, skal opløsningsskemaet afstemmes.";
         }
-        return '<p class="maal-tekst">' + NK.html(s) + '</p><p class="opgave-spm">' + NK.html(st.navn) + '</p><p class="opgave-vej">' +
-            NK.html(vej) + "</p>";
+        return '<p class="maal-tekst">' + NK.html(s) + '</p><p class="opgave-vej">' + NK.html(vej) + "</p>";
     };
+
+    /* Papirkortet: opgavens tal og niveauet */
+    P.kortTekst = function () {
+        var o = this.opg, st = D.salt(o.salt);
+        var t = this.promptHTML().replace(/<\/p>/g, " ").replace(/<[^>]+>/g, "");
+        var e = document.createElement("textarea");
+        e.innerHTML = t;
+        return e.value.replace(/\s+/g, " ").trim();
+    };
+    P.kortChip = function () { return D.NIV[this.nr].titel + ": " + D.salt(this.opg.salt).navn.toLowerCase(); };
 
     P.data = function () {
         var o = this.opg, st = D.salt(o.salt);
@@ -142,10 +153,13 @@
         var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.06, 14, 40));
-        var zr = Math.round(NK.klamp(Math.min(Hs * 0.13, W * 0.09), 44, 92));
-        lay.zoom = { x: 16 + zr + 8, y: 16 + 24 + zr, r: zr };
+        /* Pladsen oeverst er sat af til papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var y0 = 10 + lay.zone, Hr = Hs - y0;
+        var zr = Math.round(NK.klamp(Math.min(Hr * 0.15, W * 0.09), 40, 92));
+        lay.zoom = { x: 16 + zr + 8, y: y0 + 24 + zr, r: zr };
         var tx = lay.zoom.x + zr + NK.klamp(W * 0.04, 24, 50);
-        lay.tavle = { x: tx, y: 16, b: W - tx - 18, h: Math.round(NK.klamp(Hs * 0.42, 160, 320)) };
+        lay.tavle = { x: tx, y: y0, b: W - tx - 18, h: Math.round(NK.klamp(Hr * 0.5, 150, 320)) };
         var top = Math.max(lay.zoom.y + zr + 70, lay.tavle.y + lay.tavle.h + 22);
         var zone = lay.bordY - top;
         var fh = NK.klamp(zone * 0.92, 90, 210);

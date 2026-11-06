@@ -80,28 +80,29 @@
         this.valgt = null;
         this.nulstilHjaelp();
         this.visPanel();
-        if (!this.faerdig) this.naesteLinje("", "");
+        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
     P.tagAf = function (i) {
         this.klodser[i] = null;
+        this.rustfri = 0;
         this.nulstilHjaelp();
         this.visPanel();
-        if (!this.faerdig) this.naesteLinje("", "");
+        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
     P.hul = function () { return this.rust >= 100; };
 
     /* ----- Et aar ---------------------------------------------------------------------- */
     P.sejlKlik = function () {
-        if (this.sejler || this.hul()) return;
+        if (this.sejler || this.hul() || this.spaer()) return;
         this.sejler = true;
         this.sejlT = 0;
         this.rustFoer = this.rust;
         this.klodserFoer = this.klodser.map(function (k) { return k ? k.metal : null; });
         this.brugtOp = null;
         this.nulstilHjaelp();
-        if (!this.faerdig) this.naesteLinje("", "");
+        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
         this.visPanel();
     };
 
@@ -122,7 +123,7 @@
         this.visPanel();
         if (this.hul()) { this.fejlLinje(D.SKIB.hul); return; }
         var g = this.opg;
-        if (this.faerdig || g.fase !== "forsoeg") return;
+        if (!this.iForsoeg()) return;
         var id = g.o.id, havde = this.klodserFoer.filter(function (m) { return !!m; });
         if (id === "uden") {
             if (this.rust >= 30) this.forsoegKlaret(g.o.forsoeg.set);
@@ -132,13 +133,31 @@
                 if (!havde.length) this.fejlLinje(D.SKIB.ingenKlods);
                 else if (this.brugtOp) this.fejlLinje(D.SKIB.brugtOp(this.brugtOp));
                 else this.fejlLinje(D.SKIB.kobber);
-            } else if (this.rustfri >= 3) this.forsoegKlaret("");
+            }
+            /* Efter 3 aar uden rust sender eleven klodsen ind med Indsend svar */
         } else if (id === "mg") {
             if (this.brugtOp === "Mg") this.forsoegKlaret("");
         } else if (id === "ti") {
             if (this.rust > 0.01) this.fejlLinje(D.SKIB.tiRust);
-            else if (this.aar >= 10) this.forsoegKlaret("", D.SKIB.tiLoest(this.brugt));
+            /* Efter 10 aar uden rust sender eleven skibet ind med Indsend svar */
         }
+    };
+
+    /* Indsend svar: klodsen (opgave 2) efter 3 aar uden rust, og skibet
+       (opgave 5) efter 10 aar uden rust. Sejl 1 år loeser ikke opgaven. */
+    P.kanIndsende = function () {
+        if (this.sejler) return false;
+        if (this.opg.o.id === "klods") return this.rustfri >= 3 && this.antalKlodser() > 0;
+        return this.aar >= 10 && this.rust <= 0.01;
+    };
+
+    P.ikkeKlarTekst = function () {
+        return this.opg.o.id === "klods" ? D.SKIB.klodsIkkeKlar : D.SKIB.tiIkkeKlar;
+    };
+
+    P.indsend = function () {
+        if (this.opg.o.id === "klods") this.forsoegKlaret("");
+        else this.forsoegKlaret("", D.SKIB.tiLoest(this.brugt));
     };
 
     /* ----- Maalene ---------------------------------------------------------------- */
@@ -194,10 +213,11 @@
         if (this.hul()) return D.SKIB.hul;
         if (id === "uden") {
             if (n) return "Klik på klodsen på skroget for at tage den af. I denne opgave sejler skibet uden.";
-            return "Tryk på Sejl 1 år øverst i scenen." + (this.aar ? " Der er sejlet " + Math.min(this.aar, 3) + " af 3 år." : "");
+            return "Tryk på Sejl 1 år." + (this.aar ? " Der er sejlet " + Math.min(this.aar, 3) + " af 3 år." : "");
         }
         if (id === "klods") {
             if (!n) return "Træk en klods fra kajen ned på en af de stiplede pladser på skroget.";
+            if (this.rustfri >= 3) return "Skroget har klaret 3 år uden mere rust. Send klodsen ind med Indsend svar.";
             return "Tryk på Sejl 1 år. Skroget skal klare 3 år uden mere rust (" + Math.min(this.rustfri, 3) + " af 3).";
         }
         if (id === "mg") {
@@ -205,18 +225,24 @@
             return "Tryk på Sejl 1 år, til magnesiumklodsen er brugt op.";
         }
         if (this.rust > 0.01) return D.SKIB.tiRust;
+        if (this.aar >= 10) return "Ti år uden rust med " + this.brugt + " klodser. Send skibet ind med Indsend svar.";
         if (!n) return "Sæt en klods på skroget, før skibet sejler.";
         return "Tryk på Sejl 1 år. År " + this.aar + " af 10. Klodser brugt: " + this.brugt + ".";
     };
 
     P.spmLinje = function () {
         if (this.opg.o.id === "zink" && !this.antalKlodser("Zn") && !this.sejler) {
-            return "Sæt en zinkklods på skroget, sejl et år, og vælg så et svar i opgavekortet til højre.";
+            return "Sæt en zinkklods på skroget, sejl et år, og vælg så et svar på kortet.";
         }
         return "";
     };
 
-    P.enter = function () { this.sejlKlik(); };
+    /* Enter: Indsend svar eller Naeste paa kortet, ellers Sejl 1 år */
+    P.enter = function () {
+        if (this.enterKort()) return;
+        if (this.aar >= 10 && this.opg.o.id === "ti" && !this.faerdig) return;
+        this.sejlKlik();
+    };
 
     /* ----- Panelet --------------------------------------------------------------------- */
     P.visPanel = function () {
@@ -248,11 +274,16 @@
     };
 
     /* ----- Scenen -------------------------------------------------------------------- */
+    /* Kortet staar oeverst (top() i js/fane.js), og tiden staar til hoejre
+       lige under det. Kajens klodser og navnene paa dem begynder under kortet,
+       og skroget under vandet har mindst 250 px (pladserne, propellen og rusten). */
     P.layout = function () {
-        var W = this.L.b, baand = this.baand(), Hs = baand.y;
-        var lay = { W: W, H: this.L.h, Hs: Hs };
-        /* Vandlinjen ligger saa lavt, at kajens klodser er fri af knapperne oeverst */
-        var yv = Math.round(Math.max(Hs * 0.3, 190)), yb = Math.round(Hs * 0.8), Dy = yb - yv;
+        var W = this.L.b, Hs = this.L.h;
+        var lay = { W: W, H: this.L.h, Hs: Hs, zone: this.kortZone() };
+        var T = 10 + lay.zone + 10;
+        lay.top = T;
+        var yv = Math.round(T + Math.max(128, 0.28 * (Hs - T)));
+        var yb = Math.round(Math.min(Hs - 44, Math.max(yv + 250, yv + 0.62 * (Hs - yv)))), Dy = yb - yv;
         var xs = W * 0.3;
         lay.yv = yv;
         lay.yb = yb;
@@ -282,6 +313,7 @@
         lay.rust = { x0: lay.Dp.x + 4, x1: Math.min(W - 10, xs + W * 0.62), y0: yv + 0.44 * Dy, y1: yb - 8 };
         lay.aksel = lay.Dp.y;
         this.lay = lay;
+        NK.el("s-vaerktoej").style.top = Math.round(T + 4) + "px";
         this.saetAnker("kaj", 6, lay.kajY - 82, lay.kajX, 96);
         this.saetAnker("pladser", lay.plads[0].x - 8, lay.plads[0].y - 8, lay.plads[lay.plads.length - 1].x + pb - lay.plads[0].x + 16, ph + 40);
         this.saetAnker("propel", lay.prop.x - lay.prop.r * 0.7, lay.prop.y - lay.prop.r - 6, lay.Dp.x - lay.prop.x + lay.prop.r * 0.7 + 60, 2 * lay.prop.r + 12);
@@ -407,7 +439,7 @@
         ctx.fillStyle = g;
         ctx.fillRect(0, yv, W, lay.H - yv);
         /* Fisken */
-        var fx = ((this.tid * 34) % (W + 120)) - 60, fy = Hs * 0.9 + Math.sin(this.tid * 1.3) * 6;
+        var fx = ((this.tid * 34) % (W + 120)) - 60, fy = (lay.yb + Hs) / 2 + 4 + Math.sin(this.tid * 1.3) * 6;
         this.fisk = { x: fx, y: fy };
         ctx.fillStyle = "#e7913c";
         ctx.beginPath();
@@ -442,7 +474,7 @@
         var W = lay.W, yv = lay.yv, yd = lay.yd, xs = lay.xs, mig = this, i;
 
         /* Overbygningen */
-        var ox = xs + W * 0.12, ob = W * 0.2, oh = Math.min(38, yd - 60);
+        var ox = xs + W * 0.12, ob = W * 0.2, oh = Math.min(38, yd - lay.top - 4);
         if (oh > 14) {
             ctx.fillStyle = "#d9dde3";
             ctx.fillRect(ox, yd - oh, ob, oh);
@@ -646,7 +678,7 @@
 
     P.nedScene = function (pt) {
         var m = this.stakVed(pt);
-        if (!m) return false;
+        if (!m || this.spaer()) return false;
         if (this.sejler) { this.kortBesked("Vent, til året er gået.", 3); return false; }
         this.traek = { metal: m, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y, flyttet: false };
         return true;
@@ -683,7 +715,7 @@
             return;
         }
         var j = this.pladsVed(pt);
-        if (j < 0) return;
+        if (j < 0 || this.spaer()) return;
         if (this.sejler) { this.kortBesked("Vent, til året er gået.", 3); return; }
         if (this.klodser[j]) { this.tagAf(j); return; }
         if (this.valgt) this.monter(j, this.valgt);

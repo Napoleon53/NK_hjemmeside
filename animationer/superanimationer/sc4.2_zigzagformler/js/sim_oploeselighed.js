@@ -4,7 +4,8 @@
    Et spil med en bunke paa 15 molekyler: fem lette, fem middel og fem
    svaere. Molekylet staar paa tavlen. Eleven traekker det ned i
    baegerglasset, i heptan (oeverst) eller vand (nederst), eller klikker
-   paa et af lagene.
+   paa et af lagene. Det vaelger kun laget; Indsend svar paa papirkortet
+   bedoemmer (eleven kan flytte molekylet til det andet lag foerst).
      rigtigt   molekylet bliver i laget
      forkert   det flytter selv over i det rigtige lag, og et liv er vaek
      praecis 4 C pr. polaer gruppe: begge svar taeller, og molekylet
@@ -14,7 +15,8 @@
    C-atomerne faar numre, saa regnestykket i panelet kan tjekkes paa
    tegningen.
 
-   Opgavekortet har én knap: Giv hint -> Vis svaret -> Naeste molekyle.
+   Papirkortet har Giv et hint -> Vis svaret og Indsend svar; efter svaret
+   bliver kortet paa molekylet med forklaringen og Naeste molekyle.
    Point: 100 for et rigtigt svar, 70 med hint, 0 for et vist svar. Tre
    liv. Rekorden huskes i browseren. Molekylerne og reglen staar i
    oploeselighed.js; tegningen er motorens (struktur.js), og knappen
@@ -95,6 +97,7 @@
         this.efter = null;
         this.overLag = null;
         this.klikLag = null;
+        this.valgtLag = null;
         this.geoCache = {};
         this.m.rotGraense = graenseVinkel(this.m);
         this.fig = { sted: "tavle", x: 0, y: 0, s: 0.3, rot: 0, fart: 12, traek: false, ny: true };
@@ -105,13 +108,44 @@
     };
 
     P.knap = function () {
+        if (this.slut || this.svaret) { this.videre(); return; }
+        this.hjaelpKlik();
+    };
+
+    P.videre = function () {
         if (this.slut) { this.nytSpil(); return; }
-        if (this.svaret) { this.naeste(); return; }
+        if (this.svaret) this.naeste();
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.slut || this.svaret) return;
         if (this.hjaelp === 0) { this.giveHint(); return; }
         this.visSvaret();
     };
 
-    P.enter = function () { if (this.svaret || this.slut) this.knap(); };
+    P.indsend = function () {
+        if (this.slut || this.svaret || !this.valgtLag) return;
+        this.bedoem(this.valgtLag);
+    };
+
+    P.enter = function () {
+        if (this.svaret || this.slut) this.videre();
+        else if (this.valgtLag) this.indsend(); else this.kortBlink();
+    };
+
+    /* Papirkortet (js/opgavefane.js) */
+    P.kortData = function () {
+        if (!this.m) return null;
+        var m = this.m, r = this.res[this.nr];
+        return {
+            chip: "Molekyle " + Math.min(this.nr + 1, this.bunke.length) + " af " + this.bunke.length,
+            tekst: "Hvor opløses <b>" + NK.html(m.navn) + "</b>" + (m.note ? " (" + NK.html(m.note) + ")" : "") + "?",
+            loest: !!(this.svaret || this.slut), vist: r === 2, fejl: r === 3,
+            videre: this.slut ? "Ny bunke →" : "Næste molekyle →",
+            klar: !!this.valgtLag && !this.svaret && !this.slut,
+            hint: this.hjaelp ? "Vis svaret" : "Giv et hint"
+        };
+    };
 
     P.naeste = function () {
         if (this.nr >= this.bunke.length - 1) return;
@@ -133,8 +167,18 @@
         this.visPanel();
     };
 
-    /* Eleven har valgt et lag */
+    /* Eleven har lagt molekylet i et lag: det er kun et valg */
     P.vaelg = function (lag) {
+        if (this.svaret || this.slut) return;
+        this.valgtLag = lag;
+        this.fig.traek = false;
+        this.fig.sted = lag;
+        this.fig.fart = 9;
+        this.visPanel();
+    };
+
+    /* Indsend svar: laget bedoemmes */
+    P.bedoem = function (lag) {
         if (this.svaret || this.slut) return;
         var m = this.m, f = this.fig;
         var rigtigt = m.svar === "begge" || m.svar === lag;
@@ -153,18 +197,15 @@
             if (this.afvisTilbud) this.afvisTilbud();
             if (m.svar === "begge") {
                 this.efter = { sted: "graense", vent: 0.9 };
-                this.toast("Lige på grænsen. Begge svar tæller.", "advar");
                 this.besked("<b>Rigtigt. +" + p + " point.</b> Molekylet lægger sig i grænsen mellem lagene.", "god");
             } else {
-                this.toast("Rigtigt: " + LAG[lag].navn + ".", "god");
-                this.besked("<b>Rigtigt. +" + p + " point.</b>" + (this.hjaelp ? " (med hint)" : ""), "god");
+                this.besked("<b>Rigtigt. +" + p + " point.</b> " + NK.html(m.navn) + " opløses i " + LAG[lag].navn + "." + (this.hjaelp ? " Med hint giver det færre point." : ""), "god");
             }
         } else {
             this.liv--;
             this.res[this.nr] = 3;
             this.efter = { sted: m.svar, vent: 1.0 };
-            this.toast("Forkert. Det opløses i " + LAG[m.svar].navn + ".", "fejl");
-            this.besked("<b>Forkert.</b> " + OP.fejlBesked(m, lag) + " Et liv mindre.", "skidt");
+            this.besked("<b>Forkert. Det opløses i " + LAG[m.svar].navn + ".</b> " + OP.fejlBesked(m, lag) + " Et liv mindre.", "skidt");
         }
         NK.saetHTML("op-regn", OP.regnestykke(m));
         this.tjekSlut();
@@ -196,15 +237,14 @@
         }
         var fejl = [], mig = this;
         this.res.forEach(function (s, i) { if (s === 3) fejl.push(mig.bunke[i].navn); });
-        var e = NK.el("op-besked");
         if (this.slut === "tabt") {
-            e.innerHTML += " <b>Ingen liv tilbage.</b> Klik på de røde prikker for at se fejlene.";
+            this.besked(this.linje + " <b>Ingen liv tilbage.</b> Klik på de røde prikker for at se fejlene.", this.beskedKlasse);
             return;
         }
         var vist = this.res.filter(function (s) { return s === 2; }).length;
         if (vist <= 3) this.konfetti(true);
         if (this.laererFaerdig) this.laererFaerdig(vist <= 3 ? D.ROS.oploes : D.ROS.oploesVist);
-        e.innerHTML += " <b>Hele bunken er sorteret.</b>" + (fejl.length ? " Klik på de røde prikker for at se fejlene." : "");
+        this.besked(this.linje + " <b>Hele bunken er sorteret.</b>" + (fejl.length ? " Klik på de røde prikker for at se fejlene." : ""), this.beskedKlasse);
     };
 
     /* ----- Tegningen af molekylet ------------------------------------------------ */
@@ -379,7 +419,7 @@
 
     P.paaMol = function (pt) {
         var f = this.fig;
-        if (!f || f.ny || f.sted !== "tavle") return false;
+        if (!f || f.ny || (f.sted !== "tavle" && f.sted !== this.valgtLag)) return false;
         var g = this.geo(f.rot), x = (pt.x - f.x) / f.s, y = (pt.y - f.y) / f.s;
         return x > g.x0 - 16 && x < g.x1 + 16 && y > g.y0 - 16 && y < g.y1 + 16;
     };
@@ -764,7 +804,6 @@
     /* ----- Panelet ------------------------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        NK.el("op-knap").addEventListener("click", function () { mig.knap(); });
         NK.el("op-forfra").addEventListener("click", function () { mig.nytSpil(); });
         Array.prototype.forEach.call(document.querySelectorAll("#op-tegning button"), function (k) {
             k.addEventListener("click", function () {
@@ -775,27 +814,17 @@
         });
     };
 
-    P.besked = function (html, klasse) {
-        var e = NK.el("op-besked");
-        e.innerHTML = html;
-        e.className = "besked" + (klasse ? " " + klasse : "");
-    };
 
     P.visPanel = function () {
         var m = this.m, mig = this, n = this.bunke.length;
         NK.saetTekst("op-nr", String(Math.min(this.nr + 1, n)));
         NK.saetTekst("op-antal", String(n));
-        NK.saetHTML("op-prompt", NK.html(m.navn) + (m.note || this.svaret ?
-            "<small>" + [m.note ? NK.html(m.note) : "", this.svaret ? m.formel : ""].filter(Boolean).join(" · ") + "</small>" : ""));
         NK.saetTekst("op-point", String(this.point));
         var hjerter = "", i;
         for (i = 0; i < LIV; i++) hjerter += i < this.liv ? "❤" : '<span class="tabt-liv">♡</span>';
         NK.saetHTML("op-liv", hjerter);
         NK.saetTekst("op-titel", this.slut === "tabt" ? "Spillet er slut" : (this.slut === "vundet" ? "Bunken er sorteret" : "Hvor opløses det?"));
-        var knap = NK.el("op-knap");
-        if (this.slut) { knap.textContent = "Nyt spil ↺"; knap.className = "knap blaa banker"; }
-        else if (this.svaret) { knap.textContent = "Næste molekyle →"; knap.className = "knap blaa banker"; }
-        else { knap.textContent = this.hjaelp ? "Vis svaret" : "Giv hint"; knap.className = "knap"; }
+        this.visKort();
         NK.el("op-kort").classList.toggle("sejr", this.slut === "vundet");
         NK.saetTekst("op-sorteret", String(this.res.filter(function (s) { return s > 0; }).length));
         NK.saetTekst("op-ialt", String(n));
@@ -831,6 +860,7 @@
         if (this.slut) { this.status(S.oploesSlut); return; }
         if (this.svaret) { this.status(S.loest); return; }
         if (this.fig && this.fig.traek) { this.status(S.oploesTraek); return; }
+        if (this.valgtLag) { this.status(S.oploesValgt.replace("{lag}", LAG[this.valgtLag].navn)); return; }
         this.status(this.hjaelp && this.m.grupper.length ? S.oploesHint : S.oploesStart);
     };
 

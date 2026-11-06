@@ -18,7 +18,7 @@
         "fane-rg": [
             { sel: "#rg-trin", titel: "Trinene", tekst: "De seks første stoffer løses i trin: ladningen, O, H og til sidst det ukendte." },
             { sel: "#rg-formel", titel: "Formlen", tekst: "Oxidationstallet står over atomet med romertal. Det gule ? viser, hvilket atom du er ved." },
-            { sel: "#rg-arb", titel: "Her svarer du", tekst: "Spørgsmålet, feltet og Tjek. Sidder du fast, så tryk på den gule knap: Giv hint hjælper dig videre, og næste tryk viser svaret." },
+            { sel: "#rg-skort", titel: "Her svarer du", tekst: "Kortet øverst har opgaven, spørgsmålet og feltet. Indsend svar sender tallet. Giv hint hjælper dig videre, og næste tryk viser svaret." },
             { sel: "#rg-regn", titel: "Regnestykket", tekst: "Summen af oxidationstallene er stoffets ladning. Mellemregningerne står med almindelige tal." },
             { sel: "#rg-brikker", titel: "Atomerne", tekst: "Ét atom pr. brik. Er der to Cr, får hver sin brik, og de deler summen." },
             { sel: "#rg-opgaver", titel: "Stofferne", tekst: "De seks første gennemgås trin for trin. Et stof, du løser uden at se svaret, får en stjerne." },
@@ -27,7 +27,7 @@
         "fane-ek": [
             { sel: "#ek-anker-molekyle", titel: "Molekylet", tekst: "En elektronprikformel. Prikkens farve viser, hvilket atom elektronen kom fra." },
             { sel: "#ek-anker-en", titel: "Elektronegativiteten", tekst: "Tallet ved hvert atom. Det atom med det største tal trækker hårdest i et elektronpar." },
-            { sel: "#ek-arb", titel: "Her svarer du", tekst: "Først et gæt. Så trækker du parrene i bindingerne hen til det atom, der trækker hårdest. Giv hint hjælper dig videre." },
+            { sel: "#ek-skort", titel: "Her svarer du", tekst: "Først et gæt på kortet. Så trækker du parrene i bindingerne hen til det atom, der trækker hårdest, og trykker på Indsend svar." },
             { sel: "#ek-regnskabkort", titel: "Regnskabet", tekst: "Oxidationstallet er valenselektronerne minus de elektroner, atomet har, når alle par er fordelt." },
             { sel: "#ek-opgaver", titel: "Molekylerne", tekst: "Tolv molekyler og ioner. Et rigtigt gæt uden hjælp giver en stjerne." },
             { sel: "#ek-forfra", titel: "Start forfra", tekst: "Samme molekyle med parrene tilbage i bindingerne." }

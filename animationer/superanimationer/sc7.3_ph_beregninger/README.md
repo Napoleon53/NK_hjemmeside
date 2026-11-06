@@ -195,6 +195,7 @@ js/regner.js        lommeregneren: tokens, parser, regning, linje 2, Maple-koden
 js/kemi.js          modellen: pH og koncentrationerne, trinene, tjekket og de typiske fejl
 js/data.js          stofferne, flaskerne, teksterne under scenen og replikkerne
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
+js/skort.js         papirkortet i scenen (samme fil i sc7.1, sc7.2 og sc7.3)
 js/tegning.js       rummet, regnevejen (stationer og pile), etiketten, stofferne, pH-metret, flasken
 js/sim_regn.js      de tre faner (én klasse, tre underklasser): opgaverne, scenen og opgavekortet
 js/laerer.js        Kemichael på alle tre faner og påskeægget
@@ -227,7 +228,7 @@ og Spring præsentationen over på alle faner (den fælles test), at rammen
 står om lommeregneren, at påskeægget venter under præsentationen, og at
 layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 4. november 2026: ALT OK (205 påstande).
+bagefter. Sidst kørt 6. november 2026: ALT OK (med påstande om papirkortet).
 
 ## Forenklinger
 
@@ -254,6 +255,35 @@ eleven har regnet det første trin. Koden er den fælles
 `../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` på hver
 fanes underklasse nederst i `js/sim_regn.js` og `NK.Praesentation.trin` i
 `js/laerer.js`.
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Kortet bygges af `js/skort.js`; pladsen og opbygningen står sidst i
+`css/stil.css`. Beskrivelserne ovenfor af opgavekortet og linjen under
+scenen gælder den gamle udgave; nu gælder dette:
+
+* Opgaven ("Opgave 3"), trinet ("Trin 2 af 4") og den bid, eleven er ved,
+  står på ét lyst kort øverst i midten af scenen (`#ph-skort`, `#konc-skort`,
+  `#staerk-skort`) med beskeden, Giv hint (gul kant; Vis formlen, Vis
+  tasterne, Vis svaret) og Indsend svar. Der er ingen linje nederst; et klik
+  på regnevejen, etiketten eller pH-metret svarer på kortet.
+* Formlerne er svarknapper på kortet: et klik vælger, Indsend svar sender.
+  En forkert formel streges ud med sin forklaring. Er den rigtig, bliver
+  kortet med formlen i grønt og Næste, og pilen kommer på regnevejen.
+* Lommeregneren og feltet til svaret står i panelet (kortet Regnestykket,
+  som også har de regnede trin). Feltet kommer frem, når formlen er valgt.
+  Indsend svar på kortet eller Enter i feltet sender; ✓-knappen ved feltet
+  er væk. Et rigtigt trin bliver stående med beregningen og Næste trin; efter
+  det sidste trin måler pH-metret, og kortet får Ny opgave.
+* "Kortet" på bordet hedder nu etiketten i teksterne, så det ikke forveksles
+  med papirkortet.
+* Lærredet sætter pladsen øverst af (`kortZone`, 204 px / 188 px på lave
+  skærme, fordi formelhintene er lange); selvtesten måler kortets højde i
+  alle bider af otte opgaver pr. fane ved 1400 × 860 og 1100 × 700. På smalle
+  skærme er scenen mindst 600 px høj.
+* Molekylenavne: ingen at rette.
 
 ## I menuen
 

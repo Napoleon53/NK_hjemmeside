@@ -190,8 +190,40 @@ når opgaven er løst), at opgaveteksten på fane 2 nævner skemaet først, at
 saltene først kommer i vandet og glassene først hældes sammen, når det er
 regnet, at hint og svar kun kommer fra den gule knap og står i
 opgavekortet, at knappen lyser op efter en fejl, og at
-layoutet holder fra 520 × 380 til 1500 × 900. Sidst kørt 9. oktober 2026:
-ALT OK (116 påstande).
+layoutet holder fra 520 × 380 til 1500 × 900. Afsnit 8b tjekker papirkortet.
+Sidst kørt 6. november 2026: ALT OK (128 påstande).
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+`js/fane.js` er hentet fra sc6.1 og har fået niveauerne fra fane 2 med.
+Afsnittene ovenfor om opgavekortet, linjen over knappen og "Beregningen i
+kortet" beskriver den gamle udgave; nu gælder dette:
+
+* På alle tre faner står opgaven, spørgsmålet, svarene, hintet, beskeden ved en
+  fejl, forklaringen og knapperne på ét lyst kort øverst i midten af scenen
+  (`#opl-skort`, `#ioner-skort`, `#bland-skort`). Der er ingen linje nederst og
+  intet opgavekort i panelet. Giv hint er en stille knap med gul kant.
+* Fane 1: gættet står stort på kortet og virker med det samme (et gæt er
+  gratis); et klik i scenen før gættet får kortet til at blinke. En opgave med
+  et mål for en ion ("Lav en opløsning, hvor [Cl⁻] = 0,30 M") løses ikke længere
+  af sig selv: eleven fylder glasset og trykker Indsend svar. Opgaverne med
+  portioner går videre af sig selv, for de er en handling, ikke et svar.
+  Spørgsmålene efter opløsningen vælges på kortet og sendes med Indsend svar.
+  Efter et rigtigt svar bliver kortet på spørgsmålet med svaret grønt,
+  forklaringen under og Næste spørgsmål, hvor Indsend svar stod. Et forkert svar
+  koster stjernen (CLAUDE.md: stjerne kun for første forsøg). Beregningen står
+  i panelet i kortet Beregningen sammen med Start forfra.
+* Fane 2 og 3: felterne bliver i panelet (kortet Regnetrinene), men opgaven og
+  spørgsmålet til det aktive trin står på kortet, fx "Trin 1 af 3 ...
+  Hvilken formel giver n?". Indsend svar er gråt, til der står noget i feltet,
+  og Enter i feltet er det samme. Felternes egen ↵-knap er væk. Efter et trin
+  står der ingen ros; kortet spørger om næste trin. Efter sidste trin bliver
+  kortet med resultatet og Ny opgave eller Næste opgave.
+* Lærredet sætter pladsen øverst af til kortet (`kortZone`, ZONE i
+  `js/sim_*.js`), og kortet får mere plads, hvis teksten kræver det.
+* Ingen molekylenavne at rette (stoffer som O₂ og Cl₂ nævnes ikke).
 
 ## Forenklinger
 

@@ -207,3 +207,7 @@ mens der spilles, og et spil, der går i gang, er det samme som Nej tak.
 **Af sig selv** kommer han kun én gang: når nogen bliver Labyrintmester (Mix på
 Svær gennemført), med én af replikkerne i `D.MESTER_REPLIK` ved kortet Tillykke.
 Ellers er han der kun, når eleven klikker på ham.
+
+**Molekylenavne (6. nov. 2026).** Grundstoflisten bruger Carbon, Nitrogen og Oxygen
+(før Kulstof, Kvælstof og Ilt). Oxidationstallene forklares med Oxygen (O) og Hydrogen (H),
+og Cl₂ i delreaktionen hedder dichlor.

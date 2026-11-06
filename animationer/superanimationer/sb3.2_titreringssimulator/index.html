@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Titreringssimulator</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="draabe">💧</span> Titrering<span class="lang">ssimulator</span></h1>
@@ -286,12 +287,21 @@
             </div>
             <div class="grafboks"><canvas id="ukendt-graf"></canvas></div>
         </div>
+        <!-- Papirkortet oeverst i midten: opgaven, hint, bedoemmelsen og
+             knapperne (js/sim_ukendt.js). Felterne staar i panelet. -->
+        <div class="scenekort opgave" id="ukendt-skort">
+            <div class="sk-ind" id="ukendt-ind"></div>
+            <div class="sk-bund peger" id="ukendt-status">
+                <p class="st-tekst" id="ukendt-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ukendt-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="ukendt-indsend" type="button" aria-disabled="true">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
-            <h2>Opgaven</h2>
-            <p class="besked" id="ukendt-opgave">Tryk på knappen for at få udleveret en ukendt prøve.</p>
+            <h2>Prøven</h2>
             <button class="knap lilla" id="ukendt-ny"><span>Ny ukendt prøve</span><span class="tegn">🧪</span></button>
         </div>
 
@@ -333,11 +343,6 @@
                 <input type="text" id="ukendt-svar-pks" inputmode="decimal">
                 <span class="enhed"></span>
             </div>
-            <div class="knaprad">
-                <button class="knap groen" id="ukendt-tjek">Tjek svar</button>
-                <button class="knap" id="ukendt-facit">Vis facit</button>
-            </div>
-            <div class="besked" id="ukendt-feedback"></div>
         </div>
     </aside>
 </section>
@@ -386,6 +391,7 @@
 
 <script src="js/kemi.js"></script>
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/graf.js"></script>
 <script src="js/indikatorbar.js"></script>
 <script src="js/apparat.js"></script>

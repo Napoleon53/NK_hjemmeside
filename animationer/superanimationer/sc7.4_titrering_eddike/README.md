@@ -33,8 +33,9 @@ rigtige virtuelle laboratorium bygges for sig.
 4. **Loftet:** 3 faner. Fane 1: 1 burette, 1 kolbe, 1 lup med 8 figurer
    (1 figur = 1/8 af syren), 1 kurve. Fane 2: 4 regnetrin og 1 tavle. Fane 3:
    2 opstillinger (A og B) og 6 situationer.
-5. **Layoutet:** scene plus panel, som `sc7.2`. Panelet har opgavekortet med én
-   knap (Giv hint, Vis svaret, videre).
+5. **Layoutet:** scene plus panel, som `sc7.2`. Opgaven står på papirkortet
+   øverst i scenen (se Papirkortet nedenfor), og panelet har målinger, felter
+   og tabeller.
 
 ## Hvad den viser
 
@@ -136,7 +137,7 @@ spring præsentationen over · under præsentationen er <kbd>Enter</kbd> og
   stedet for L, NaOH's molarmasse, brøken uden 100 % osv.).
 * **Fane 3 er ny:** hvad ændrer antallet af mL NaOH, og hvad giver et forkert resultat.
 * **Sproget:** NaOH hedder natriumhydroxid eller NaOH, aldrig natronlud.
-* **Hjælpen er én knap:** Giv hint, så Vis svaret.
+* **Hjælpen er én knap på kortet:** Giv hint, så Vis svaret.
 
 ## Filer
 
@@ -146,6 +147,7 @@ css/stil.css        alt udseende (grundlaget er sc7.2's). NB: decimaltal med PUN
 sprites/            buretten, kolben, magnetomrøreren og eddikeflasken (egne tegninger)
                     og sprøjteflasken (fra sc7.2)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc7.2)
+js/kort.js          papirkortet øverst i scenen (kopi af sc5.4's fil)
 js/kemi.js          modellen: stofmængde, forbrug, pH af ladningsbalancen og phenolphthaleins farve
 js/data.js          grænserne, hintene, de fire regnetrin med formlerne, de seks situationer og replikkerne
 js/tjek.js          tjekket af aflæsningen, formlerne og de fire regnetrin med beskeder til de typiske fejl
@@ -186,7 +188,46 @@ kan gennemføres, at Kemichaels præsentation viser trinnene ét ad gangen med
 Næste og Spring præsentationen over på alle faner (den fælles test), og at
 layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller
 Chrome med `--allow-file-access-from-files`, og den lægger elevens valg tilbage
-bagefter. Sidst kørt 4. november 2026: ALT OK (126 påstande).
+bagefter. Den tjekker også papirkortet (se nedenfor). Sidst kørt 6. november 2026:
+ALT OK (152 påstande).
+
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`,
+kopi af sc5.4's, og `../faelles/papirkort.css/js`). Opgavekortene i panelet og
+statuslinjen nederst er fjernet; det, statuslinjen sagde, står nu i kortets
+linje, når der ikke står et hint eller en fejl. Kortet har etiketten ("Prøve 1",
+"Trin 2 af 4", "Opgave 3 af 6"), opgaven eller spørgsmålet, Giv hint (gul kant,
+derefter Vis svaret) og Indsend svar (grå, til der er noget at sende). Efter et
+rigtigt svar bliver kortet på spørgsmålet med forklaringen, og knappen videre
+står, hvor Indsend svar stod.
+
+- Titreringen: mens der titreres, er der kun Giv hint (skyderen og hanen er selve
+  forsøget, ikke et svar). Aflæsningen skrives i feltet under luppen på menisken
+  i panelet; Indsend svar eller Enter sender den. Til sidst står forbruget og
+  bemærkningen om omslaget på kortet med Til beregningen. Ny prøve står i
+  panelet. Når prøven er færdig, åbner hanen ikke, og kortets knap blinker.
+- Beregningen: felterne til de fire trin står i panelet (kortet De fire trin).
+  Kortet siger, hvilken formel eller hvilket tal der skal skrives; Indsend svar
+  eller Enter sender feltet. En rigtig formel eller et rigtigt tal giver ingen ros
+  under det næste spørgsmål (tavlen og feltet viser det). Til sidst står
+  resultatet på kortet med Ny opgave.
+- To kolber: de tre svar står på kortet og vælger kun. Indsend svar titrerer
+  begge kolber, og så bliver kortet på spørgsmålet: det rigtige svar grønt, et
+  forkert gæt rødt, forklaringen under svarene og Næste kolbe B. Gentager
+  forklaringen det, der er sagt om det forkerte svar, står kun selve svaret. Et
+  klik på en kolbe under gættet får kortet til at blinke.
+
+Opstillingen, luppen, tavlen og de to opstillinger begynder under kortets plads
+(`kortZone` og `ZONE` i hver `sim_*.js`); fane 3 har plads til den længste
+forklaring, så kolberne ikke flytter sig. Tilbuddet om præsentationen står
+nederst i scenen. På en smal skærm er scenen højere (82vh, mindst 640 px).
+Præsentationen og rundvisningen peger på kortet (`#tit-skort`, `#ber-skort`,
+`#for-skort`) og på `#ber-trin`. Selvtesten tjekker kortet i scenen, ingen
+statuslinje, Indsend svar grå og klar, at et valg ikke bedømmer, Enter i
+feltet, kortet på spørgsmålet med knappen videre, at kolberne ikke flytter sig,
+og kortZone ved 1400 × 860 og 1280 × 640. Animationen har ingen molekylnavne
+som dioxygen eller dihydrogen; der var intet at rette.
 
 ## Forenklinger
 

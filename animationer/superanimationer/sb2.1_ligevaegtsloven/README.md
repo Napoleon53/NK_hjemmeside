@@ -33,12 +33,11 @@ Claude uden at spørge, som ved sc1.4.
 4. **Loftet:** to faner. Fane 1 har 12 reaktioner med 6 stoffer i bakken,
    4 tegn og 3 eksponenter. Fane 2 har 12 tavler, hver med én typisk fejl
    eller ingen (to af dem). Quizzen har 5 spørgsmål.
-5. **Layoutet:** scene plus panel. Opgaven står på én linje over tavlen,
-   tavlen har skemaet og brøken, bakken står under tavlen og statuslinjen
-   nederst. Panelet har opgavekortet (forklaringen kommer, når opgaven er
-   løst) og listen.
+5. **Layoutet:** scene plus panel. Papirkortet står øverst i scenen (se
+   "Papirkortet" nedenfor), tavlen har skemaet og brøken, og bakken står
+   under tavlen. Panelet har listen og Samme reaktion forfra.
 
-Kemichael er ikke med. Hjælpen står i statuslinjen som i `sc1.4_afstemning`
+Kemichael er ikke med. Hjælpen står på papirkortet som i `sc1.4_afstemning`
 (brugerens valg dér 30. sept. 2026: hans hint var det svageste led).
 
 ## Fane 1: Brøken
@@ -51,10 +50,26 @@ Når brøken er rigtig, kommer stemplet **Rigtigt ✓**, tavlen bliver grøn, og
 skemaet bliver farvet: produkterne grønne som tælleren, reaktanterne blå som
 nævneren, koefficienterne gule som eksponenterne, og det, der ikke er med,
 er streget ud. Er nævneren tom, står der 1. Forklaringen fra den gamle står
-i kortet i panelet.
+på papirkortet under opgaven.
 
 Et klik på et stof i skemaet siger, hvilken side af pilen det står på, og hvad
-tilstandsformen betyder, men ikke, om det skal med.
+tilstandsformen betyder, men ikke, om det skal med. Efter et rigtigt svar er
+tavlen låst: et klik i skemaet får kortet til at blinke og giver ingen ekstra
+linje under forklaringen.
+
+## Papirkortet (6. nov. 2026)
+
+Begge faner har ét lyst papirkort øverst i midten af scenen (`body.papirkort`,
+`../faelles/papirkort.css` og `.js`). Kortet har etiketten ("Reaktion 2 af
+12", "Tavle 2 af 12"), opgaven, beskeden ved forkert svar, Giv et hint og
+Indsend svar (gråt, til der er noget at sende). En brik i brøken eller et
+klik på en del af tavlen vælger kun; Indsend svar (eller Enter) bedømmer.
+Efter et rigtigt svar bliver kortet på opgaven med forklaringen under og
+Næste, hvor Indsend svar stod. Statuslinjen nederst er væk, og forfra står i
+panelet. Pladsen til kortet er `--kz` i `css/stil.css`: 166 px (150 px på
+lave skærme), og 180 px (160 px) i Find fejlen, hvor spørgsmålet, knappen
+Der er ingen fejl og beskeden fylder tre rækker. Selvtesten måler kortet i
+1400 × 860 og 1100 × 700.
 
 ## Fane 2: Find fejlen
 
@@ -137,7 +152,7 @@ js/kerne.js        NK-navnerum, hævet og sænket skrift (som sc1.4)
 js/data.js         de 12 reaktioner, de 12 tavler med en fejl og quizzen
 js/broek.js        modellen: facit af skemaet, elevens brikker, dommen,
                    beskederne og hinttrappen
-js/fane.js         det fælles: listen, statuslinjen, knappen og skemaet
+js/fane.js         det fælles: listen, papirkortet, knapperne og skemaet
 js/sim_broek.js    fane 1 med træk og slip
 js/sim_fejl.js     fane 2
 js/quiz.js         quizzen
@@ -168,7 +183,7 @@ skrives, træk og slip med rigtige pointer-hændelser (også en brik, der lander
 mellem to andre), at hver tavle på fane 2 har netop sin fejl, og at alle
 andre dele er rigtige, quizzen, sproget og layoutet fra 1100 × 700 til
 1600 × 950.
-Sidst kørt: ALT OK (83 påstande), 9. oktober 2026.
+Sidst kørt: ALT OK, 6. nov. 2026 (Linux, headless Chrome), med papirkortets påstande.
 
 ## I menuen
 

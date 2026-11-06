@@ -66,8 +66,8 @@
     /* De første 20 grundstoffer, de mest almindelige metaller, brom og iod */
     var GRUNDSTOFFER = [
         { navn: "Hydrogen", symbol: "H" }, { navn: "Helium", symbol: "He" }, { navn: "Lithium", symbol: "Li" },
-        { navn: "Beryllium", symbol: "Be" }, { navn: "Bor", symbol: "B" }, { navn: "Kulstof", symbol: "C" },
-        { navn: "Kvælstof", symbol: "N" }, { navn: "Ilt", symbol: "O" }, { navn: "Fluor", symbol: "F" },
+        { navn: "Beryllium", symbol: "Be" }, { navn: "Bor", symbol: "B" }, { navn: "Carbon", symbol: "C" },
+        { navn: "Nitrogen", symbol: "N" }, { navn: "Oxygen", symbol: "O" }, { navn: "Fluor", symbol: "F" },
         { navn: "Neon", symbol: "Ne" }, { navn: "Natrium", symbol: "Na" }, { navn: "Magnesium", symbol: "Mg" },
         { navn: "Aluminium", symbol: "Al" }, { navn: "Silicium", symbol: "Si" }, { navn: "Fosfor", symbol: "P" },
         { navn: "Svovl", symbol: "S" }, { navn: "Chlor", symbol: "Cl" }, { navn: "Argon", symbol: "Ar" },
@@ -392,27 +392,27 @@
         titel: "Redoxreaktioner",
         beskrivelse: "Oxidationstal, oxidation og reduktion",
         niveauer: [
-            { type: "tal", formel: "SO₄²⁻", atom: "S", val: 6, exp: "Ilt (O) har oxidationstal −2. 4 · (−2) + x = −2 (ionens ladning) ⇒ x = +6.", forkerte: [
+            { type: "tal", formel: "SO₄²⁻", atom: "S", val: 6, exp: "Oxygen (O) har oxidationstal −2. 4 · (−2) + x = −2 (ionens ladning) ⇒ x = +6.", forkerte: [
                 [8, "Ionens ladning er −2, ikke 0."],
                 [-6, "O har −2. Så må S være positiv."],
                 [-2, "−2 er ionens ladning, ikke oxidationstallet for S."]] },
             { type: "redox", rxn: "Fe²⁺ → Fe³⁺ + e⁻", rigtig: "Oxidation", exp: "Jern afgiver en elektron (e⁻ er produkt), og oxidationstallet stiger fra +2 til +3. Det er en oxidation." },
-            { type: "tal", formel: "NO₃⁻", atom: "N", val: 5, exp: "Ilt (O) har oxidationstal −2. 3 · (−2) + x = −1 (ionens ladning) ⇒ x = +5.", forkerte: [
+            { type: "tal", formel: "NO₃⁻", atom: "N", val: 5, exp: "Oxygen (O) har oxidationstal −2. 3 · (−2) + x = −1 (ionens ladning) ⇒ x = +5.", forkerte: [
                 [6, "Ionens ladning er −1, ikke 0."],
                 [-5, "O har −2. Så må N være positiv."],
                 [-1, "−1 er ionens ladning, ikke oxidationstallet for N."]] },
-            { type: "redox", rxn: "Cl₂ + 2e⁻ → 2Cl⁻", rigtig: "Reduktion", exp: "Chlor optager elektroner (e⁻ er reaktant), og oxidationstallet falder fra 0 til −1. Det er en reduktion." },
-            { type: "tal", formel: "MnO₄⁻", atom: "Mn", val: 7, exp: "Ilt (O) har oxidationstal −2. 4 · (−2) + x = −1 (ionens ladning) ⇒ x = +7.", forkerte: [
+            { type: "redox", rxn: "Cl₂ + 2e⁻ → 2Cl⁻", rigtig: "Reduktion", exp: "Dichlor optager elektroner (e⁻ er reaktant), og oxidationstallet falder fra 0 til −1. Det er en reduktion." },
+            { type: "tal", formel: "MnO₄⁻", atom: "Mn", val: 7, exp: "Oxygen (O) har oxidationstal −2. 4 · (−2) + x = −1 (ionens ladning) ⇒ x = +7.", forkerte: [
                 [8, "Ionens ladning er −1, ikke 0."],
                 [-7, "O har −2. Så må Mn være positiv."],
                 [-1, "−1 er ionens ladning, ikke oxidationstallet for Mn."]] },
             { type: "redox", rxn: "Zn → Zn²⁺ + 2e⁻", rigtig: "Oxidation", exp: "Zink afgiver elektroner, og oxidationstallet stiger fra 0 til +2. Det er en oxidation." },
-            { type: "tal", formel: "Fe₂O₃", atom: "Fe", val: 3, exp: "Ilt (O) har oxidationstal −2. 3 · (−2) + 2x = 0 (neutralt stof) ⇒ x = +3.", forkerte: [
+            { type: "tal", formel: "Fe₂O₃", atom: "Fe", val: 3, exp: "Oxygen (O) har oxidationstal −2. 3 · (−2) + 2x = 0 (neutralt stof) ⇒ x = +3.", forkerte: [
                 [6, "Der er to Fe-atomer. Del med 2."],
                 [-3, "O har −2. Så må Fe være positiv."],
                 [2, "Fe₂O₃ er neutral: 2x + 3 · (−2) = 0."]] },
             { type: "redox", rxn: "Cu²⁺ + 2e⁻ → Cu", rigtig: "Reduktion", exp: "Kobberionen optager elektroner, og oxidationstallet falder fra +2 til 0. Det er en reduktion." },
-            { type: "tal", formel: "H₂S", atom: "S", val: -2, exp: "Brint (H) har oxidationstal +1. 2 · (+1) + x = 0 (neutralt molekyle) ⇒ x = −2.", forkerte: [
+            { type: "tal", formel: "H₂S", atom: "S", val: -2, exp: "Hydrogen (H) har oxidationstal +1. 2 · (+1) + x = 0 (neutralt molekyle) ⇒ x = −2.", forkerte: [
                 [2, "H har +1. Så må S være negativ."],
                 [-1, "Der er to H-atomer: 2 · (+1)."],
                 [0, "H₂S er neutral, men S er ikke. H har +1."]] },

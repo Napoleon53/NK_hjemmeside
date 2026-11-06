@@ -5,8 +5,9 @@
    er én scene og ét panel; kun den aktive fane (NK.aktivFane) tegner sig
    og opdateres. Scenen er ren DOM: der er intet laerred. Ingen
    praesentation og ingen Kemichael (brugerens valg 9. okt. 2026): hint
-   og svar staar i linjen under svarfeltet, naar eleven beder om dem med
-   den gule knap.
+   og svar staar paa papirkortet oeverst i scenen, naar eleven beder om
+   dem med den gule knap. Enter er Indsend svar (og Naeste, naar kortet
+   er loest). Ny runde ligger i panelet og paa tasten R.
    ===================================================================== */
 (function () {
     "use strict";
@@ -82,14 +83,7 @@
         if (e.key >= "1" && e.key <= "4") { visFane(D.FANE_RAEKKE[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(f.id); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
-        if (e.key === "r" || e.key === "R") {
-            f.nyRunde();
-            f.saetBesked("Ny runde. " + NK.html(D.INTRO[f.id]), "");
-            f.vis();
-            f.animerNy();
-            f.fokus();
-            return;
-        }
+        if (e.key === "r" || e.key === "R") { f.forfra(); return; }
         if (e.key === "Enter") {
             if (e.target && e.target.tagName === "BUTTON") return;
             e.preventDefault();
@@ -100,7 +94,7 @@
         if (e.key.length === 1 && /[0-9,.\-]/.test(e.key) && f.erIndtastning() && !f.loest) f.fokus();
     }
 
-    /* Taster i svarfeltet: Enter tjekker, e, *, ^ og x skifter til
+    /* Taster i svarfeltet: Enter er Indsend svar, e, *, ^ og x skifter til
        videnskabelig notation og springer til eksponenten, og tilbage i et
        tomt eksponentfelt gaar til tallet. */
     function feltTast(e) {
@@ -149,6 +143,8 @@
 
         el("talrk").addEventListener("click", function (ev) {
             var f = NK.aktivFane, b = ev.target.closest("[data-i]");
+            /* Kortet venter paa Naeste: et klik paa tavlen faar det til at blinke */
+            if (f.loest || f.resultat) { f.kortBlink(); return; }
             if (b) {
                 f.klikBrik(parseInt(b.getAttribute("data-i"), 10));
                 if (f.erIndtastning()) f.fokus();
@@ -158,6 +154,11 @@
         });
         el("tjek").addEventListener("click", function () { NK.aktivFane.tjek(); });
         el("opgaveknap").addEventListener("click", function () { NK.aktivFane.knap(); });
+        /* Knappen videre paa kortet (Naeste opgave, Se resultatet, Videre til) */
+        el("sk-ind").addEventListener("click", function (ev) {
+            if (ev.target.closest("[data-videre]")) NK.aktivFane.naeste();
+        });
+        el("nyrunde").addEventListener("click", function () { NK.aktivFane.forfra(); });
         el("vaelgere").addEventListener("click", function (ev) {
             var b = ev.target.closest("[data-valg]");
             if (b) NK.aktivFane.skiftValg(b.getAttribute("data-valg"));

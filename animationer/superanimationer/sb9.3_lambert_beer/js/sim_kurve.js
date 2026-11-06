@@ -71,11 +71,11 @@
         this.papir = { valgt: false, toerrer: null };
         var bedst = s.eps * 1;
         this.linje = { a: bedst * 0.55, ok: false, flyttet: false };
+        this.aflaesFlyttet = false;
         this.aflaes = { c: null, ok: false };
         this.sagtNy = {};
         this.sidsteTrin = "maal";
         this.fotoner = [];
-        NK.saetTekst("kurve-linje", o.navn + ": find prøvens koncentration med en standardkurve ved " + s.lambda + " nm.");
         this.visTabel();
     };
 
@@ -156,7 +156,7 @@
                 ku.A = null;
             }
             this.visTabel();
-            this.besked('<span class="b-maerke">Tørret af</span> Fingeraftrykket er væk. Mål kuvetten med ' + NK.html(ku.navn) + " mM igen.", "gul");
+            this.besked('<span class="b-maerke">Tørret af</span> Fingeraftrykket er væk. Mål kuvetten med ' + NK.html(ku.navn) + " mM igen.", "hint");
             this.nulstilHjaelp();
             this.visKort();
         } else {
@@ -171,7 +171,7 @@
         if (t !== this.sidsteTrin) { this.sidsteTrin = t; this.nulstilHjaelp(); }
         if (t === "aftryk" && !this.sagtNy.punkt) {
             this.sagtNy.punkt = true;
-            this.besked('<span class="b-maerke">Se på punkterne</span> Ét punkt ligger langt fra de andre. Find ud af hvorfor, før linjen lægges.', "gul");
+            this.besked('<span class="b-maerke">Se på punkterne</span> Ét punkt ligger langt fra de andre. Find ud af hvorfor, før linjen lægges.', "hint");
             return;
         }
         if (t === "slut") return;
@@ -182,22 +182,24 @@
     P.tjekLinje = function () {
         var best = this.bedsteA(), a = this.linje.a;
         if (!this.alleMaalt()) {
-            this.besked("Mål vandet og alle fem standarder først. Linjen skal passe med dem alle.", "gul");
+            this.besked("Mål vandet og alle fem standarder først. Linjen skal passe med dem alle.", "hint");
             return;
         }
         if (Math.abs(a - best) / best <= TOL_LINJE) {
             if (this.aftrykMaalt()) {
                 var ku = this.kuv[this.aftrykI];
                 this.besked('<span class="b-maerke">Næsten</span> Linjen passer med de fleste punkter, men punktet ved ' + NK.html(ku.navn) +
-                    " mM ligger langt over den. Se på den kuvette i bakken.", "gul");
+                    " mM ligger langt over den. Se på den kuvette i bakken.", "hint");
                 return;
             }
+            var d = this.kortData();
             this.linje.ok = true;
             this.linje.a = Math.round(a * 1000) / 1000;
             this.nulstilHjaelp();
-            this.besked('<span class="b-maerke">Linjen passer ✓</span> Hældningen er a = ' + NK.dk(this.linje.a, this.decA()) + " mM⁻¹. " +
-                (this.proeve().A === null ? "Mål nu prøven." : "Aflæs nu prøvens koncentration."), "god");
-            this.visKort();
+            this.venter = null;
+            this.venterDel = d;
+            this.mellem("Linjen passer. Hældningen er a = " + NK.dk(this.linje.a, this.decA()) + " mM⁻¹.");
+            this.venterDel = null;
             return;
         }
         this.linje.ok = false;
@@ -266,6 +268,29 @@
         NK.saetHTML("kurve-tabel", html);
     };
 
+    /* ----- Papirkortet ------------------------------------------------------------ */
+    P.kortData = function () {
+        if (this.venterDel) return this.venterDel;
+        var o = this.opg(), t = this.trin();
+        var tekst = "Find prøvens koncentration med en standardkurve ved " + this.stof.lambda + " nm. " + this.trinLinje();
+        if (t === "linje" || t === "aflaes") return { tekst: tekst + " Tryk så Indsend svar." };
+        if (t === "slut") return { tekst: "Find prøvens koncentration med en standardkurve ved " + this.stof.lambda + " nm.", chip: undefined };
+        return { tekst: tekst, indsend: false };
+    };
+
+    P.kanIndsende = function () {
+        var t = this.trin();
+        if (t === "linje") return this.linje.flyttet;
+        if (t === "aflaes") return this.aflaesFlyttet;
+        return false;
+    };
+
+    P.indsend = function () {
+        var t = this.trin();
+        if (t === "linje") this.tjekLinje();
+        else if (t === "aflaes") this.tjekAflaes();
+    };
+
     P.trinLinje = function () {
         var t = this.trin(), mangler = this.standarder().filter(function (k) { return k.A === null; });
         if (t === "maal") {
@@ -319,18 +344,18 @@
         this.hintLys = null;
         if (t === "maal") {
             this.standarder().forEach(function (k, i) { if (k.A === null && mig.koe.indexOf(i) < 0 && !(mig.maaling && mig.maaling.k === i)) mig.koe.push(i); });
-            this.besked('<span class="b-maerke">Svaret</span> Alle standarderne bliver målt.', "gul");
+            this.besked('<span class="b-maerke">Svaret</span> Alle standarderne bliver målt.', "hint");
         } else if (t === "aftryk") {
             this.toer(this.aftrykI);
             this.koe.push(this.aftrykI);
-            this.besked('<span class="b-maerke">Svaret</span> Fingeraftrykket gav for høj absorbans. Kuvetten er tørret af og bliver målt igen.', "gul");
+            this.besked('<span class="b-maerke">Svaret</span> Fingeraftrykket gav for høj absorbans. Kuvetten er tørret af og bliver målt igen.', "hint");
         } else if (t === "linje") {
             this.linje.a = this.bedsteA();
             this.linje.flyttet = true;
             this.tjekLinje();
         } else if (t === "proeve") {
             if (this.koe.indexOf(this.kuv.length - 1) < 0) this.koe.push(this.kuv.length - 1);
-            this.besked('<span class="b-maerke">Svaret</span> Prøven bliver målt.', "gul");
+            this.besked('<span class="b-maerke">Svaret</span> Prøven bliver målt.', "hint");
         } else if (t === "aflaes") {
             this.aflaes.c = this.facitC();
             this.aflaes.ok = true;
@@ -340,8 +365,6 @@
 
     P.visHintLys = function () {};
 
-    P.enter = function () { if (this.faerdig) this.knap(); };
-    P.nulstil = function () { this.vaelg(this.nr); };
     P.tilpas = function () { this.laerred.tilpas(); };
 
     /* ----- Geometrien ------------------------------------------------------------------- */
@@ -455,6 +478,8 @@
     P.ned = function (e) {
         var p = this.laerred.punkt(e);
         var h = this.hvad(p);
+        /* Naar kortet viser Naeste, er linjerne laast */
+        if (h && (h.slags === "linje" || h.slags === "aflaes") && this.slutNu()) { this.spaer(); this.traek = null; return; }
         this.traek = { h: h, x: p.x, y: p.y, flyttet: false };
         if (h && (h.slags === "linje" || h.slags === "aflaes" || h.slags === "papir")) {
             try { this.laerred.canvas.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
@@ -473,12 +498,15 @@
                     this.linje.a = NK.klamp(Math.max(0, d.A) / d.c, 0.05 * this.stof.eps, 4 * this.stof.eps);
                     this.linje.flyttet = true;
                     if (this.linje.ok) { this.linje.ok = false; this.visKort(); }
+                    this.flyttetNu();
                 }
                 this.laerred.canvas.style.cursor = "grabbing";
                 return;
             }
             if (t.h.slags === "aflaes" && !this.faerdig) {
                 this.aflaes.c = NK.klamp(d.c, 0, gr.xMax);
+                this.aflaesFlyttet = true;
+                this.flyttetNu();
                 this.laerred.canvas.style.cursor = "ew-resize";
                 return;
             }
@@ -502,8 +530,8 @@
         try { this.laerred.canvas.releasePointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
         var s = t.h.slags;
         if (t.flyttet) {
-            if (s === "linje" && !this.faerdig) { this.tjekLinje(); return; }
-            if (s === "aflaes" && !this.faerdig) { this.tjekAflaes(); return; }
+            /* Et traek bedoemmes ikke, naar det slippes: eleven trykker Indsend svar */
+            if (s === "linje" || s === "aflaes") { this.visIndsend(); return; }
             if (s === "papir") {
                 var h = this.hvad(p);
                 if (h && h.slags === "kuvette") this.toer(h.k);
@@ -511,6 +539,13 @@
             }
         }
         this.klik(t.h);
+    };
+
+    /* Eleven har flyttet en linje: Indsend bliver klar, og en gammel besked forsvinder */
+    P.flyttetNu = function () {
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.nulstilHjaelp();
+        this.visIndsend();
     };
 
     P.klik = function (h) {

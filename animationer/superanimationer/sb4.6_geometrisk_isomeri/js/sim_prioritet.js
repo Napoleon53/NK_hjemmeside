@@ -43,6 +43,7 @@
         this.r = o.slags === "byg" ? null : EZ.analyser(this.pos);
         this.side = { v: null, h: null };     /* den gruppe, eleven har fundet som vinder */
         this.forkert = null;                  /* den gruppe, eleven lige har klikket forkert paa */
+        this.valgtGruppe = null;              /* den gruppe, eleven har valgt (Indsend svar sender den) */
         this.zVist = { v: false, h: false };
         this.svar = null;
         this.stempelT = 0;
@@ -51,45 +52,61 @@
         this.bygValg();
     };
 
+    /* Svarknapperne paa kortet vaelger kun; Indsend svar sender ind.
+       Byg selv har ingen svarknapper: Indsend svar tjekker molekylet. */
     P.bygValg = function () {
         var mig = this;
         this.valg.innerHTML = "";
         this.knapper = {};
-        function knap(tekst, noegle, klasse, fn, titel) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap" + (klasse ? " " + klasse : "");
-            k.textContent = tekst;
-            if (titel) k.title = titel;
-            k.addEventListener("click", function () { fn(); mig.fokus(); });
-            mig.valg.appendChild(k);
-            mig.knapper[noegle] = k;
-        }
         if (this.o.slags === "afgoer") {
-            knap("E", "E", "stor-bogstav", function () { mig.svarEZ("E"); }, "E: på hver sin side (tast E)");
-            knap("Z", "Z", "stor-bogstav", function () { mig.svarEZ("Z"); }, "Z: på samme side (tast Z)");
-            knap("Ingen E/Z-isomeri", "ingen", "", function () { mig.svarEZ("ingen"); }, "Tast I");
-        } else {
-            knap("Tjek molekylet", "tjek", "tjek", function () { mig.tjek(); }, "Enter");
+            this.lavKnap("E", "E", function () { mig.svarEZ("E"); }, "svar", "E: på hver sin side (tast E)", "stor-bogstav");
+            this.lavKnap("Z", "Z", function () { mig.svarEZ("Z"); }, "svar", "Z: på samme side (tast Z)", "stor-bogstav");
+            this.lavKnap("Ingen E/Z-isomeri", "ingen", function () { mig.svarEZ("ingen"); }, "svar", "Tast I");
         }
+        this.visValg();
+    };
+
+    /* Svarene staar kun fremme i det sidste skridt */
+    P.visValg = function () {
+        var vis = this.o.slags === "afgoer" && (this.trinNu() === "svar" || this.faerdig);
+        for (var n in this.knapper) this.knapper[n].hidden = !vis;
+        this.valg.hidden = !vis;
+    };
+
+    P.trinEtiket = function () {
+        if (this.o.slags === "byg") return "";
+        return "trin " + { v: 1, h: 2, svar: 3 }[this.trinNu()] + " af 3";
     };
 
     /* Kortet viser kun det skridt, eleven er ved */
     P.promptHTML = function () {
         var o = this.o;
         if (o.slags === "byg") {
-            return '<p class="maal-tekst">' + NK.html(o.maal) + "</p>" +
-                '<p class="note-tekst">Træk grupperne fra rækken under tavlen hen på pladserne, og tryk Tjek molekylet.</p>';
+            return NK.html(o.maal + " Træk grupperne fra rækken under tavlen hen på pladserne, og tryk Indsend svar.");
         }
-        var nr = { v: 1, h: 2, svar: 3 }[this.trinNu()];
-        return '<p class="maal-tekst"><span class="b-maerke">Trin ' + nr + " af 3</span> " + NK.html(this.trinLinje()) + "</p>";
+        return NK.html(this.trinLinje());
     };
 
     P.trinLinje = function () {
         if (this.o.slags === "byg") return this.o.maal;
-        if (this.side.v === null) return "Klik på den gruppe, der har højest prioritet på det venstre C-atom.";
-        if (this.side.h === null) return "Klik på den gruppe, der har højest prioritet på det højre C-atom.";
+        if (this.side.v === null) return "Klik på den gruppe, der har højest prioritet på det venstre C-atom, og tryk Indsend svar.";
+        if (this.side.h === null) return "Klik på den gruppe, der har højest prioritet på det højre C-atom, og tryk Indsend svar.";
         return "Er molekylet E, Z eller uden E/Z-isomeri?";
+    };
+
+    /* Det, Indsend svar sender uden et valgt svar: den valgte gruppe,
+       eller molekylet, eleven har bygget */
+    P.indsendScene = function () {
+        var mig = this, t = this.trinNu();
+        if (t === "byg") {
+            return { klar: this.pos.indexOf(null) < 0, mangler: "Sæt en gruppe på alle fire pladser. Tryk så Indsend svar.",
+                fn: function () { mig.tjek(); } };
+        }
+        if (t === "v" || t === "h") {
+            return { klar: this.valgtGruppe !== null, mangler: "Klik først på en gruppe ved det " + (t === "v" ? "venstre" : "højre") + " C-atom.",
+                fn: function () { var i = mig.valgtGruppe; mig.valgtGruppe = null; mig.klikGruppe(i); } };
+        }
+        return null;
     };
 
     /* ----- Hinttrappen og Vis svaret ------------------------------------------------- */
@@ -130,8 +147,25 @@
         var tekst = EZ.hvorfor(this.pos[i], this.pos[i + 1]);
         if (this.side[side] === "ens") tekst += " Så er der ingen E/Z-isomeri.";
         this.hjaelp = 0;
+        this.valgtGruppe = null;
         if (vist) { this.besked('<span class="b-maerke">Svaret</span> ' + NK.html(tekst), "gul"); this.visKort(); }
         else this.godLinje(tekst);
+    };
+
+    /* Et klik paa en gruppe vaelger den kun. Indsend svar sender den (klikGruppe). */
+    P.vaelgGruppe = function (i) {
+        if (this.faerdig) return;
+        var side = i < 2 ? "v" : "h";
+        var t = this.trinNu();
+        if (t === "svar") { this.kortBesked("Begge C-atomer er afgjort. Vælg E, Z eller Ingen på kortet.", 4); return; }
+        if (side !== t) {
+            this.kortBesked(this.side[side] !== null ? "Det " + (side === "v" ? "venstre" : "højre") + " C-atom er afgjort." :
+                "Find først vinderen på det venstre C-atom.", 4);
+            return;
+        }
+        this.valgtGruppe = i;
+        this.nulstilHjaelp();
+        this.visIndsend();
     };
 
     P.klikGruppe = function (i) {
@@ -167,6 +201,7 @@
             this.svar = svar;
             this.stempelT = 0.001;
             this.markerValg(svar, true);
+            if (this.brugtSvar) this.knapper[svar].classList.add("svar-vist");
             this.loest(EZ.dom(r));
             return;
         }
@@ -188,6 +223,7 @@
         this.nulstilHjaelp();
         if (this.pos.every(function (x) { return x === "H"; })) this.kortBesked(D.ETHEN, 6);
         else this.naesteLinje("", "");
+        this.visIndsend();
     };
 
     P.tjek = function () {
@@ -202,29 +238,25 @@
         }
     };
 
-    P.enter = function () {
-        if (this.o.slags === "byg") this.tjek();
-    };
-
+    /* Tasterne E, Z og I vaelger et svar; Enter sender det (fane.js) */
     P.tast = function (k) {
         if (this.o.slags !== "afgoer") return false;
         var m = { e: "E", z: "Z", i: "ingen" }[k.toLowerCase()];
         if (!m) return false;
-        this.svarEZ(m);
+        this.vaelgSvar(m);
         return true;
     };
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
         var L = this.L;
-        var valgH = 62, paletH = this.o && this.o.slags === "byg" ? 74 : 0;
+        var valgH = 0, paletH = this.o && this.o.slags === "byg" ? 74 : 0;
         var top = this.kortZone(), side = 18;
         var bund = this.L.h - valgH - paletH - 16;
         var tavle = { x: side, y: top, b: L.b - side * 2, h: Math.max(200, bund - top) };
         var u = Math.min(tavle.b * 0.15, tavle.h * 0.26);
         this.lay = { tavle: tavle, cx: tavle.x + tavle.b / 2, cy: tavle.y + tavle.h / 2 + 4, u: u };
         this.lay.palet = { y: tavle.y + tavle.h + 10 + paletH / 2, h: paletH };
-        this.valg.style.bottom = "12px";
         this.saetAnker("tavle", tavle.x, tavle.y, tavle.b, tavle.h);
         this.saetAnker("palet", side, tavle.y + tavle.h + 6, L.b - side * 2, paletH);
         this.bygPalet();
@@ -330,7 +362,7 @@
     P.klikScene = function (pt) {
         if (this.o.slags !== "afgoer") return;
         var f = this.feltVed(pt, 6);
-        if (f !== null) { this.klikGruppe(f); return; }
+        if (f !== null) { this.vaelgGruppe(f); return; }
     };
 
     /* ----- Tiden og tegningen ---------------------------------------------------------- */
@@ -359,6 +391,7 @@
                 else if (mig.side[s] !== null) opt.ring[mig.side[s]] = T.GROEN;
             });
             if (this.forkert !== null) opt.ring[this.forkert] = T.ROED;
+            if (this.valgtGruppe !== null && !this.faerdig) opt.ring[this.valgtGruppe] = T.BLAA;
             if (r.type !== "ingen" && (this.faerdig || (trin === "svar" && this.hjaelp >= 2))) {
                 opt.linje = [r.v, r.h];
             }

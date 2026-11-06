@@ -20,21 +20,22 @@
             { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Natriumhydroxid, NaOH, 0,100 M. Den tæller oppefra: 0 står øverst." },
             { sel: "#tit-anker-hane", titel: "Hanen", tekst: "Træk skyderen for at åbne hanen. Dryp til sidst, eller brug knappen til én dråbe." },
             { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Syren i kolben som 8 figurer. Hver OH⁻, der kommer ned, tager en H⁺ fra en CH₃COOH." },
-            { sel: "#tit-kort", titel: "Prøven", tekst: "Luk hanen, når kolben bliver lyserød, og skriv så forbruget. Knappen giver et hint og derefter svaret." },
-            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken." },
+            { sel: "#tit-skort", titel: "Kortet", tekst: "Opgaven til prøven. Giv hint giver et hint og derefter svaret. Indsend svar sender aflæsningen." },
+            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken, og skriv forbruget i feltet under den." },
             { sel: "#tit-kurvekort", titel: "Kurven", tekst: "pH i kolben, mens der løber NaOH ned. Tabellen kan kopieres til Excel." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionen, omslaget og beregningen kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. To kolber: hvad ændrer resultatet?" }
         ],
         "fane-beregning": [
             { sel: "#ber-data", titel: "Målingen", tekst: "Din aflæsning fra titreringen, eller en klassekammerats." },
-            { sel: "#ber-kort", titel: "De fire trin", tekst: "Skriv først formlen og så tallet. Knappen giver et hint og derefter svaret." },
+            { sel: "#ber-skort", titel: "Kortet", tekst: "Trinnet, du er ved. Giv hint giver et hint og derefter svaret. Indsend svar sender feltet." },
+            { sel: "#ber-trin", titel: "De fire trin", tekst: "Skriv først formlen og så tallet i feltet. Enter sender det også." },
             { sel: "#ber-anker-tavle", titel: "Tavlen", tekst: "Formlen kommer på tavlen, når du har skrevet den, og tallene, når trinnet er løst." }
         ],
         "fane-forbrug": [
             { sel: "#for-anker-a", titel: "Kolbe A", tekst: "Som på fane 1: 2,00 g eddike, 20 mL vand og 0,100 M NaOH." },
             { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret. Skiltet på bordet siger hvad." },
-            { sel: "#for-kort", titel: "Dit gæt", tekst: "Gæt først. Så titreres begge kolber til omslaget." },
+            { sel: "#for-skort", titel: "Dit gæt", tekst: "Vælg dit gæt, og tryk på Indsend svar. Så titreres begge kolber til omslaget." },
             { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Hvor mange mL NaOH der gik til, og den masseprocent, man ville regne ud." }
         ]
     };

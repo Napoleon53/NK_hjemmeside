@@ -1,9 +1,9 @@
 # sc8.6 Korrosion
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
-filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
-Der er ingen Kemichael: hjælpen står i statuslinjen nederst i scenen, som i
-`sc1.4_afstemning`.
+filer inde fra sig selv og papirkortet fra `../faelles/` (`papirkort.css`,
+`papirkort.js` og skriften Lexend). Der er ingen Kemichael: hjælpen står på
+kortet øverst i scenen (se "Papirkortet" nedenfor).
 
 Den er bygget fra bunden og afløser ingen gammel animation. I menuen er den
 knap 6 i `kemi-c-filer/samling_c8.html` (c8.6). Forsøget "Jern i ståluld" i
@@ -60,7 +60,7 @@ rør), så det venstre rør er det første. Eleven vælger metal under hvert rø
 rør tæres indefra, mest ved samlingen, og er forskellen stor nok, går der hul:
 vandet sprøjter ud, og tiden standser. Luppen over samlingen viser atomerne i
 rørenes væg med vandet over: et atom går i vandet som en ion og efterlader to
-elektroner, der går gennem metallet til det ædle rør, hvor ilt og vand optager
+elektroner, der går gennem metallet til det ædle rør, hvor dioxygen og vand optager
 dem og bliver til OH⁻.
 
 Sidder kobberrøret først, har vandet kobberioner med. Tre Cu²⁺ følger vandet
@@ -117,20 +117,20 @@ igennem.
 ## Fane 3: Rusten
 
 En jernplade set helt tæt på: jernatomerne i et gitter, en dråbe vand og luft
-med O₂ og N₂. Tre kontakter: Vand, Ilt og Salt (Salt kommer frem i det sidste
-mål). Med både vand og ilt forlader jernatomerne pladen midt under dråben som
+med O₂ og N₂. Tre kontakter: Vand, Dioxygen og Salt (Salt kommer frem i den
+sidste opgave). Med både vand og dioxygen forlader jernatomerne pladen midt under dråben som
 Fe²⁺, elektronerne går gennem jernet ud til dråbens kant, hvor ét O₂ optager
 fire ad gangen og bliver til 4 OH⁻, Fe²⁺ og 2 OH⁻ mødes og bliver til Fe(OH)₂,
 og for hver fire Fe(OH)₂ kommer ét O₂ mere og gør dem til rust. Et klik på en
-partikel siger, hvad den er. Boksen øverst til højre viser pladen i almindelig
-størrelse og tælleren.
+partikel siger, hvad den er. Boksen til højre under kortet viser pladen i
+almindelig størrelse og tælleren.
 
 Seks mål:
 
-1. **Vand og ilt.** Et gæt, så de fire muligheder med de to kontakter.
+1. **Vand og dioxygen.** Et gæt, så de fire muligheder med de to kontakter.
    Skemaet i panelet husker, hvad der er prøvet.
 2. **Jern afgiver elektroner.** Fe → Fe²⁺ + _ e⁻
-3. **Ilt optager elektroner.** O₂ + 2 H₂O + _ e⁻ → _ OH⁻
+3. **Dioxygen optager elektroner.** O₂ + 2 H₂O + _ e⁻ → _ OH⁻
 4. **Det samlede skema.** _ Fe + O₂ + 2 H₂O → _ Fe²⁺ + _ OH⁻
 5. **Fra Fe²⁺ til rust.** _ Fe(OH)₂ + O₂ → _ FeO(OH) + _ H₂O
 6. **Salt.** Et gæt, så sammenligningen med og uden salt (24 og 72 jernatomer
@@ -142,13 +142,54 @@ hvor mange der står på hver side). Et tomt felt er intet svar. Når et skema e
 afstemt, kommer det i panelet, og stedet i scenen får sit navn (oxidation
 midt under dråben, reduktion ved kanten).
 
-## Hjælpen
+## Papirkortet (6. nov. 2026)
 
-Som sc1.4: statuslinjen nederst i scenen siger næste skridt, bliver rød og
-ryster ved et forkert svar og grøn ved et rigtigt. Knappen i samme linje giver
-ét hint ad gangen (tre trin) og til sidst svaret. Et mål kan have et gratis
-gæt, et forsøg og et spørgsmål efter hinanden; gættet får sin dom, når
-forsøget er gjort. Teorien ligger bag knappen Teori, rundvisningen bag `?`.
+Niels' beslutning 4. nov. 2026: alle aktive animationer får papirkortet. Al
+tekst står nu på ét lyst kort øverst i midten af hver fanes scene: opgaven
+("Opgave 2 af 6" som indlejret overskrift), gættet, spørgsmålet med svarene,
+hint, forklaringen til et forkert svar, forklaringen til det rigtige svar og
+knapperne Giv et hint og Indsend svar. Statuslinjen nederst og opgavekortet i
+panelet er væk. Panelet har målingerne, opgavelisten og forfra-knappen (Nye
+rør, På værft, Ny plade). Tiden (Lad tiden gå, Sejl 1 år) står under kortet:
+som en søjle til venstre for luppen på fane 1 og til højre over skibet på fane
+2. Kontakterne og jernpladen står under kortet på fane 3, og jernpladens boks
+er gjort lav, så den kan stå i luften over dråben.
+
+* **Gættet** er gratis og går videre med det samme. Imens er forsøget låst:
+  tiden, metalvalget, klodserne og kontakterne sætter intet i gang, og kortet
+  blinker blødt.
+* **Spørgsmål:** et svar vælger kun, Indsend svar sender det ind (grå, til der
+  er valgt). Et forkert svar bliver rødt og kan ikke vælges igen.
+* **Tiden løser aldrig en opgave af sig selv.** Er opgaven at finde noget, sender
+  eleven det ind med Indsend svar: to rør, der ikke tæres ved samlingen
+  (opgave 3 på fane 1), klodsen efter 3 år uden rust (opgave 2 på fane 2) og
+  skibet efter 10 år uden rust (opgave 5 på fane 2). Er opgaven at gøre noget i
+  forsøget og se, hvad der sker (lad tiden gå med de rør, der står der, sejl 3
+  år, sæt magnesium på, prøv de fire muligheder, slå salt til og fra), er den
+  klaret, når det er gjort. Der er intet at sende ind, og kortet siger "Godt"
+  i stedet for "Rigtigt".
+* **Tavlen** på fane 3 har ingen Tjek-knap mere: Indsend svar på kortet (eller
+  Enter i et felt) tjekker skemaet. Indsend svar er grå, til der står et tal i
+  hvert felt.
+* **Bliv på spørgsmålet:** efter et rigtigt svar bliver kortet stående, svaret
+  bliver grønt, forklaringen står under svarene, og Næste står, hvor Indsend
+  svar stod. Har opgaven en del mere (et forsøg og så et spørgsmål), står der
+  Næste, og spørgsmålet kommer først, når eleven trykker. Rosen står aldrig
+  under det næste spørgsmål. Kortets grønne knap går altid fremad.
+* **Pladsen:** scenen begynder under den plads, kortet har fået (`ZONE` i
+  `js/fane.js`: 212 px, 176 px på en lav skærm og 200 px på en lav, smal skærm).
+  For at kortet kan være der, er nogle svar og forklaringer gjort kortere
+  (fx "Ens metaller holder lige godt på elektronerne"), og tre spørgsmål har
+  mistet en indledende sætning.
+
+Teorien ligger bag knappen Teori, rundvisningen bag `?`.
+
+Molekylenavnene (6. nov. 2026): stoffet O₂ hedder dioxygen overalt i den
+synlige tekst (kontakten Dioxygen, "Vand og dioxygen", "Dioxygen optager
+elektroner", "luft uden dioxygen", "dioxygenmolekyle"), og N₂ hedder
+dinitrogen. Ordet ilt er ikke brugt mere. Grundstofnavnene bliver, hvor
+atomerne menes ("Tæl O-atomerne", "NaCl består af natrium og chlor", svaret
+"Salt indeholder oxygen").
 
 Påskeæg: et klik på vandpytten under det utætte rør og et klik på fisken
 under skibet.
@@ -184,15 +225,15 @@ under skibet.
   halvt år, magnesium knap halvandet. Rækkefølgen passer med praksis
   (magnesium bruges for hurtigt i havvand), tallene er valgt.
 * **Elektroner og ioner på skibet** er tegnet i overstørrelse oven på skibet.
-* **Dråben:** jernet opløses midt under dråben og ilten optager elektronerne
+* **Dråben:** jernet opløses midt under dråben og dioxygenet optager elektronerne
   ved kanten, hvor den lettest når ind (dråbeforsøget). Vandmolekylerne er
   ikke tegnet enkeltvis.
 * **Rust skrives FeO(OH)**, jern(III)oxidhydroxid. Fe₂O₃·H₂O er det samme
   skrevet på en anden måde. Vejen fra Fe²⁺ til rust er ét skema.
 * **Salt:** tre gange så hurtigt er valgt, så forskellen kan ses. At chlorid
   også nedbryder beskyttende lag, er ikke med.
-* **Uden ilt** er luften ren nitrogen. **Uden vand** sker der intet: at jern
-  reagerer med ilt ved høj temperatur, ejer `sc5.8`.
+* **Uden dioxygen** er luften ren dinitrogen. **Uden vand** sker der intet: at jern
+  reagerer med dioxygen ved høj temperatur, ejer `sc5.8`.
 
 ## Filer
 
@@ -209,7 +250,8 @@ js/mikro.js         partikelbilledet: gitteret, vandet, elektronerne,
                     ionerne, O₂, rusten og kobberionerne fra det første rør
                     (luppen på fane 1, scenen på fane 3)
 js/tegning.js       farver, mærkater, zoomrammen og spændingsrækken til panelet
-js/fane.js          det fælles: listen, målenes dele, statuslinjen, knappen, musen
+js/fane.js          det fælles: listen, opgavernes dele, papirkortet, Indsend
+                    svar, hintknappen, låsen under gættet, musen
 js/sim_roer.js      fane 1
 js/sim_skib.js      fane 2
 js/sim_rust.js      fane 3
@@ -224,8 +266,8 @@ og `K.RUST`. Et mål er én post i `D.R_MAAL`, `D.S_MAAL` eller `D.J_MAAL`.
 
 ## Genveje
 
-<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> lad tiden gå,
-sejl et år eller tjek · <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning ·
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> indsend svar,
+næste, lad tiden gå eller sejl et år · <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning ·
 <kbd>T</kbd> teori · <kbd>Esc</kbd> luk. Direkte links: `#roerene`, `#skibet`
 og `#rusten`.
 
@@ -236,10 +278,18 @@ Den tjekker spændingsrækken, tallene for rørene (også de to rækkefølger og
 kobberionerne i luppen) og skibet, at de fire skemaer
 er afstemt i atomer og ladning, at partikelbilledet følger skemaerne (afgivne
 elektroner = optagne, 4 OH⁻ pr. O₂, rust fire ad gangen), at jern kun ruster
-med både vand og ilt og tre gange så hurtigt med salt, alle 17 mål (selv, med
-forkerte svar og med Vis svaret), at en klods kan trækkes ned på skroget,
-sproget og layoutet fra 1100 × 700 til 1600 × 950. Sidst kørt 5. oktober
-2026: ALT OK (138 påstande).
+med både vand og dioxygen og tre gange så hurtigt med salt, alle 17 opgaver
+(selv, med forkerte svar og med Vis svaret), at en klods kan trækkes ned på
+skroget, sproget og layoutet fra 1100 × 700 til 1600 × 950. Papirkortet (6.
+nov. 2026): kortet står i scenen og ikke i panelet, ingen statuslinje, Indsend
+svar er grå uden valg, et valg bedømmer ikke af sig selv, tiden løser ikke en
+opgave, forsøget er låst under gættet, rigtigt svar bliver på spørgsmålet med
+Næste samme sted, forfra står i panelet, rundvisningen peger på ting, der
+findes, og kortet holder sig i sin plads i alle dele af alle opgaver i 1100 ×
+700, 1300 × 760, 1366 × 700, 1400 × 860 og 1600 × 950. Sidst kørt 6. november
+2026: ALT OK (168 påstande). Påstanden "der er stadig tre kobberioner i vandet"
+fejler af og til (en kobberion i et tæret hul i væggen); modellen er ikke
+ændret.
 
 ## Menuen
 

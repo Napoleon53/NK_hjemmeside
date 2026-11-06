@@ -27,7 +27,7 @@
     }
 
     var P = SimSkema.prototype;
-    NK.Fane.paa(P, { navn: "sk" });
+    NK.Fane.paa(P, { navn: "sk", zone: [156, 124] });
 
     P.chipTekst = function (o) { return String(this.opgaver.indexOf(o) + 1); };
 
@@ -64,14 +64,24 @@
 
     P.opgaveFaerdig = function () { return this.opg.loest; };
 
-    P.promptHTML = function () {
-        return '<p class="maal-tekst">Skriv tallene foran stofferne, så reaktionen er afstemt.</p>' +
-            '<p class="note-tekst">Et tomt felt tæller som 1.</p>';
+    /* Opgaven paa papirkortet */
+    P.kortTekst = function () {
+        return "Skriv tallene foran stofferne i felterne på tavlen, så reaktionen er afstemt. Et tomt felt tæller som 1.";
     };
 
     P.trinLinje = function () {
-        return "Skriv tallene i felterne på tavlen, og tryk Enter. Tæl selv atomerne på hver side.";
+        return "Skriv tallene i felterne på tavlen, og tryk Indsend svar. Tæl selv atomerne på hver side.";
     };
+
+    /* Indsend svar (og Enter) tjekker tallene. Graa, til der staar et tal i et felt. */
+    P.kanSendes = function () {
+        if (!this.opg || this.opg.loest || !this.felter) return false;
+        return this.felter.some(function (inp) { return inp.value.trim() !== ""; });
+    };
+
+    P.ikkeKlarTekst = function () { return "Skriv først tallene foran stofferne i felterne på tavlen."; };
+
+    P.indsend = function () { this.tjek(); };
 
     P.slutLinje = function () {
         var k = this.tal();
@@ -99,7 +109,7 @@
             return { e: null, trin: [
                 "Se på felterne. Et af tallene kan ikke bruges.",
                 "Der skal stå et helt tal foran hvert stof. Et tomt felt tæller som 1.",
-                "Ret feltet, og tryk Enter igen."
+                "Ret feltet, og tryk Indsend svar igen."
             ] };
         }
         return A.hintTrin(this.opg.o.r, this.opg.o.p, k.cr, k.cp);
@@ -155,11 +165,6 @@
         s.textContent = this.opg.vist ? "Svaret" : "Afstemt ✓";
         if (this.opg.vist) s.classList.add("gul");
         this.tavle.appendChild(s);
-    };
-
-    P.enter = function () {
-        if (this.faerdig) this.knap();
-        else this.tjek();
     };
 
     P.rystFelt = function (inp) {
@@ -282,7 +287,8 @@
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
         var lay = { W: W, H: H, baand: baand };
-        var kant = NK.klamp(W * 0.03, 12, 34), top = NK.klamp(H * 0.035, 10, 26);
+        var kant = NK.klamp(W * 0.03, 12, 34), top = this.top();
+        lay.zone = this.kortZone();
         var b = Math.min(W - 2 * kant, 1040);
         /* Tavlen skal ikke vaere et stort tomt felt: hoejden foelger skemaets
            egen stoerrelse, og resten af pladsen er luft omkring den */

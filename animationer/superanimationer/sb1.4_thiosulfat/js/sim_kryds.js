@@ -52,6 +52,7 @@
             videreTekst: "Videre til Koncentration",
             videre: function () { NK.visFane("konc"); }
         });
+        if (this.foersteStatus) this.saetStatus(this.foersteStatus[0], this.foersteStatus[1]);
         this.bind();
         if (this.laererStart) this.laererStart();
         this.bygTilbud();
@@ -338,16 +339,15 @@
     };
 
     /* ----- Panel og status --------------------------------------------------- */
+    /* Forsoegets beskeder staar i papirkortets nederste raekke (js/opgave.js);
+       der er ingen statuslinje nederst i scenen */
     P.saetStatus = function (tekst, art) {
-        NK.saetTekst("kryds-status", tekst);
-        NK.saetKlasse("kryds-status", "status" + (art ? " " + art : ""));
+        if (!this.kort) { this.foersteStatus = [tekst, art]; return; }
+        this.kort.melding(tekst, art);
     };
 
     P.blinkStatus = function () {
-        var e = NK.el("kryds-status");
-        e.classList.remove("blink");
-        void e.offsetWidth;
-        e.classList.add("blink");
+        if (this.kort) this.kort.blink();
     };
 
     P.visUr = function () {

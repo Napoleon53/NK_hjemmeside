@@ -15,6 +15,12 @@
    Niveauerne foelger hylderne: foerst formler, saa navne, saa de
    sammensatte ioner, og derefter det hele blandet i begge retninger og
    hurtigere og hurtigere. Rekorden huskes i browseren.
+
+   Papirkortet (6. nov. 2026) staar oeverst over hylden: opgaven, svaret
+   paa det sidste glas og Indsend svar (det samme som Enter). Kortet
+   bliver ikke staaende paa et loest glas, og der er ingen hintknap: det
+   er et spil paa tid, og baandet koerer videre. Hjaelpen er plakaterne
+   og lageret paa fane 1.
    ===================================================================== */
 (function () {
     "use strict";
@@ -93,8 +99,9 @@
         lay.bordY = Math.round(H * 0.93);
         /* Glassene paa hylden er store nok til, at navnet kan laeses, og
            smaa nok til, at der er plads til otte ved siden af hinanden */
-        lay.lilleH = NK.klamp(H * 0.147, 64, 118);
-        lay.hyldeY = Math.round(Math.max(H * 0.18, lay.lilleH + 16));
+        lay.lilleH = NK.klamp(H * 0.13, 60, 108);
+        /* Hylden begynder under papirkortet */
+        lay.hyldeY = Math.round(Math.max(H * 0.18, this.top() + lay.lilleH + 6));
         lay.baandY = Math.round(H * 0.56);
         lay.x0 = 0;
         lay.x1 = Math.round(W * 0.8);
@@ -132,17 +139,11 @@
         e.style.width = Math.round(mm.lcd.b) + "px";
         e.style.height = Math.round(mm.lcd.h) + "px";
 
-        var bb = NK.el("baand-besked");
-        var bx = lay.maskine.x + mb + 16;
-        var bredde = W - bx - 14;
-        if (bredde < 170) {
-            bb.style.left = "14px";
-            bb.style.width = Math.max(160, W - 28) + "px";
-            bb.style.top = Math.round(lay.baandY + 26) + "px";
-        } else {
-            bb.style.left = Math.round(bx) + "px";
-            bb.style.width = Math.round(bredde) + "px";
-            bb.style.top = Math.round(Math.max(lay.kasseBund + 12, lay.maskine.y + 8)) + "px";
+        /* Papirkortet staar over hylden, til venstre for plakaterne */
+        var sk = NK.el("baand-skort");
+        if (sk) {
+            sk.style.left = "12px";
+            sk.style.width = Math.round(Math.max(200, lay.hyldeX1 - 20)) + "px";
         }
 
         this.saetAnker("baand-anker-baand", 0, lay.baandY - lay.glasH - 30, lay.x1, lay.glasH + 60);
@@ -179,13 +180,60 @@
             (this.tilstand === "koerer" ? "❚❚" : "▶") + "</span>");
         knap.classList.toggle("banker", this.tilstand === "klar" || this.tilstand === "slut");
         knap.classList.toggle("blaa", this.tilstand !== "koerer");
+        this.visSkort();
     };
 
+    P.kortZone = function () {
+        return window.innerHeight <= 720 ? 108 : 116;
+    };
+
+    P.top = function () { return 10 + this.kortZone() + 10; };
+
     P.besked = function (html, klasse) {
-        var e = NK.el("baand-besked");
+        this.beskedH = html || "";
+        this.beskedK = html ? (klasse || "") : "";
+        this.visSkort();
+    };
+
+    P.kanSendes = function () {
+        return this.tilstand === "koerer" && !!(this.input && this.input.value.trim());
+    };
+
+    /* Papirkortet: opgaven efter spillets tilstand og svaret paa det
+       sidste glas. Start, Pause og Spil igen ligger i panelet. */
+    P.visSkort = function () {
+        var e = NK.el("baand-skort");
         if (!e) return;
-        e.innerHTML = html;
-        e.className = "baand-besked" + (klasse ? " " + klasse : "") + (html ? "" : " tom");
+        var n = niveau(this.nivNr), chip, tekst;
+        var opg = "Skriv den manglende halvdel af etiketten på det forreste glas.";
+        if (this.tilstand === "klar") {
+            chip = "Samlebåndet";
+            tekst = opg + " Tryk Start samlebåndet i panelet for at begynde.";
+        } else if (this.tilstand === "pause") {
+            chip = "Pause";
+            tekst = "Samlebåndet holder pause. Tryk Fortsæt i panelet for at køre videre.";
+        } else if (this.tilstand === "slut") {
+            chip = "Spillet er slut";
+            tekst = "Samlebåndet er stoppet med " + this.point + " point. Tryk Spil igen i panelet for at spille igen.";
+        } else {
+            chip = "Niveau " + (this.nivNr + 1) + " · " + n.navn;
+            tekst = opg;
+        }
+        var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + NK.html(tekst) + "</p>" +
+            '<div class="sk-bund' + (this.beskedK ? " " + this.beskedK : "") + (this.beskedH ? "" : " tom") + '">' +
+            '<p class="st-tekst">' + (this.beskedH || "") + "</p>" +
+            (this.tilstand === "koerer" ? '<button type="button" class="knap indsend ' + (this.kanSendes() ? "klar" : "ikke-klar") +
+                '">Indsend svar</button>' : "") + "</div>";
+        if (e.className !== "scenekort opgave") e.className = "scenekort opgave";
+        if (e.innerHTML !== html) e.innerHTML = html;
+    };
+
+    P.visIndsend = function () {
+        var b = document.querySelector("#baand-skort .indsend");
+        if (!b) return;
+        var klar = this.kanSendes();
+        b.classList.toggle("klar", klar);
+        b.classList.toggle("ikke-klar", !klar);
     };
 
     P.gange = function () {
@@ -253,8 +301,8 @@
         var res = g.retning === "formel" ? Tj.formel(raa, g.st) : Tj.navn(raa, g.st);
         if (res.tom) return;
         if (res.ok) {
-            this.rigtigt(g, res.note);
             this.input.value = "";
+            this.rigtigt(g, res.note);
             return;
         }
         g.ryst = 0.45;
@@ -563,6 +611,13 @@
         });
         this.input.addEventListener("input", function () {
             mig.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
+            mig.visIndsend();
+        });
+        NK.el("baand-skort").addEventListener("click", function (e) {
+            var b = e.target.closest ? e.target.closest(".indsend") : null;
+            if (!b) return;
+            if (mig.kanSendes()) mig.tjek();
+            mig.fokus();
         });
         this.input.addEventListener("focus", function () { mig.fokuseret = true; });
         this.input.addEventListener("blur", function () { mig.fokuseret = false; });

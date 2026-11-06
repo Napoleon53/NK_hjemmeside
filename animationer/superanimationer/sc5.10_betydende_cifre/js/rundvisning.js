@@ -14,20 +14,20 @@
 
     var TAVLE_TAEL = { sel: "#tavle", titel: "Tavlen", tekst: "Tallet i opgaven. Klik på de cifre, der er betydende. Et klik mere fjerner dem igen." };
     var TAVLE = { sel: "#tavle", titel: "Tavlen", tekst: "Tallet i opgaven. Du kan klikke på cifrene for at tælle dem. Når svaret er rigtigt, viser tavlen hvorfor." };
-    var TJEK_TAEL = { sel: "#svarrad", titel: "Tjek", tekst: "Her står, hvor mange cifre du har valgt. Tryk Tjek, eller Enter." };
-    var SVAR = { sel: "#svarrad", titel: "Svaret", tekst: "Skriv tallet med komma, og tryk Tjek eller Enter. Over feltet vælger du almindeligt tal eller videnskabelig notation. Eksponenten skrives i det lille, hævede felt; ± skifter fortegnet." };
-    var LINJE = { sel: "#besked", titel: "Linjen", tekst: "Her står, hvad der gik galt, og hvorfor et svar er rigtigt." };
-    var KORT = { sel: "#opgavekort", titel: "Opgaven", tekst: "Ti opgaver i en runde. Sidder du fast, så tryk på den gule knap: først et hint, så svaret og til sidst en ny opgave." };
+    var TJEK_TAEL = { sel: "#svarrad", titel: "Dit valg", tekst: "Her står, hvor mange cifre du har valgt. Når du er klar, trykker du Indsend svar på kortet eller Enter." };
+    var SVAR = { sel: "#svarrad", titel: "Svaret", tekst: "Skriv tallet med komma, og tryk Indsend svar på kortet eller Enter. Over feltet vælger du almindeligt tal eller videnskabelig notation. Eksponenten skrives i det lille, hævede felt; ± skifter fortegnet." };
+    var KORT = { sel: "#skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Indsend svar sender dit svar. Sidder du fast, så tryk på den gule knap: først et hint og så svaret. Kortet siger også, hvad der gik galt, og hvorfor et svar er rigtigt." };
+    var PANEL = { sel: "#rundevalg", titel: "Ti opgaver", tekst: "Ti opgaver i en runde. De ti streger viser, hvor langt du er i runden. Ny runde giver ti nye opgaver på denne fane." };
     var VAELG_AFRUND = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Måletal, der skal afrundes, eller regnestykker, hvor svaret skal afrundes. Et skift starter en ny runde." };
     var VAELG_KOMMA = { sel: "#vaelgere, #niveauer, #niveaunote", titel: "To slags opgaver", tekst: "Videnskabelig notation begge veje, eller enheder. Enhederne har fire niveauer; Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på de tre andre. Et skift starter en ny runde." };
     var RUNDE = { sel: "#rundekort", titel: "Runden", tekst: "De løste opgaver med facit. Grøn er rigtigt i første forsøg, gul med hjælp og rød, når svaret blev vist." };
     var FANER = { sel: ".faneknapper", titel: "De andre faner", tekst: "Flyt kommaet, Afrund og Blandet, hvor alle slags opgaver er med." };
 
     var TURE = {
-        "tael": [TAVLE_TAEL, TJEK_TAEL, LINJE, KORT, RUNDE, FANER],
-        "afrund": [TAVLE, SVAR, LINJE, KORT, VAELG_AFRUND, RUNDE],
-        "komma": [TAVLE, SVAR, LINJE, KORT, VAELG_KOMMA, RUNDE],
-        "blandet": [TAVLE, SVAR, LINJE, KORT, RUNDE]
+        "tael": [KORT, TAVLE_TAEL, TJEK_TAEL, PANEL, RUNDE, FANER],
+        "afrund": [KORT, TAVLE, SVAR, PANEL, VAELG_AFRUND, RUNDE],
+        "komma": [KORT, TAVLE, SVAR, PANEL, VAELG_KOMMA, RUNDE],
+        "blandet": [KORT, TAVLE, SVAR, PANEL, RUNDE]
     };
 
     var trin = [];

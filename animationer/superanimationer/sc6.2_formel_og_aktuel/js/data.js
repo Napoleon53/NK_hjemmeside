@@ -290,6 +290,8 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
+    /* Et klik i scenen, foer der er gaettet (papirkortet, 6. nov. 2026) */
+    D.GAET_LINJE = "Gæt først. Vælg et af svarene på kortet.";
 
     NK.Data = D;
 }());

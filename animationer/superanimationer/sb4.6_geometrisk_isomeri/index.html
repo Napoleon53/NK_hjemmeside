@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Geometrisk isomeri</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇅</span> Geometrisk isomeri</h1>
@@ -28,26 +29,21 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-dr" role="tabpanel" aria-label="Dobbeltbindingen">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og skridtet,
+             svarknapperne og nederst beskeden, hintknappen og Indsend svar.
+             Loest: forklaringen og knappen videre i dr-bliv -->
+        <div class="scenekort" id="dr-skort">
+            <p class="sk-tekst" id="dr-prompt"></p>
+            <div class="sk-svar" id="dr-valg"></div>
+            <div class="sk-bund" id="dr-status">
+                <p class="st-tekst" id="dr-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="dr-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="dr-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="dr-bliv" hidden></div>
+        </div>
         <canvas id="dr-laerred"></canvas>
         <div class="anker" id="dr-anker-model"></div>
-        <!-- Knapperne til opgaven (js/sim_drej.js) -->
-        <div class="scene-valg" id="dr-valg" hidden></div>
-
-        <!-- Kortet med al teksten: opgaven, skridtet, hint, fejl og forklaring (js/fane.js) -->
-        <div class="statuslinje" id="dr-status">
-            <div class="sk-hoved">
-                <span class="sk-titel" id="dr-titel">Opgave</span>
-                <span class="taeller">opgave <b id="dr-nr">1</b> af <span id="dr-antal">6</span></span>
-                <button class="forfraknap" id="dr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            </div>
-            <div class="sk-krop">
-                <div class="sk-tekst">
-                    <div id="dr-prompt"></div>
-                    <p class="st-tekst" id="dr-besked" aria-live="polite"></p>
-                </div>
-                <button class="knap hjaelp" id="dr-knap" type="button">Giv et hint</button>
-            </div>
-        </div>
     </div>
 
     <aside class="panel">
@@ -55,6 +51,9 @@
             <h2>Opgaverne <span class="taeller">løst <b id="dr-loest">0</b>/6</span></h2>
             <div class="opg-liste" id="dr-liste"></div>
         </div>
+
+        <!-- Forfra ligger i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+        <button class="forfraknap panel-forfra" id="dr-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 
@@ -63,26 +62,22 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-pr" role="tabpanel" aria-label="E og Z (ekstra)">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og skridtet,
+             svarknapperne og nederst beskeden, hintknappen og Indsend svar.
+             Loest: forklaringen og knappen videre i pr-bliv -->
+        <div class="scenekort" id="pr-skort">
+            <p class="sk-tekst" id="pr-prompt"></p>
+            <div class="sk-svar" id="pr-valg"></div>
+            <div class="sk-bund" id="pr-status">
+                <p class="st-tekst" id="pr-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="pr-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="pr-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="pr-bliv" hidden></div>
+        </div>
         <canvas id="pr-laerred"></canvas>
         <div class="anker" id="pr-anker-tavle"></div>
         <div class="anker" id="pr-anker-palet"></div>
-        <div class="scene-valg" id="pr-valg"></div>
-
-        <!-- Kortet med al teksten: opgaven, skridtet, hint, fejl og forklaring (js/fane.js) -->
-        <div class="statuslinje" id="pr-status">
-            <div class="sk-hoved">
-                <span class="sk-titel" id="pr-titel">Opgave</span>
-                <span class="taeller">opgave <b id="pr-nr">1</b> af <span id="pr-antal">12</span></span>
-                <button class="forfraknap" id="pr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            </div>
-            <div class="sk-krop">
-                <div class="sk-tekst">
-                    <div id="pr-prompt"></div>
-                    <p class="st-tekst" id="pr-besked" aria-live="polite"></p>
-                </div>
-                <button class="knap hjaelp" id="pr-knap" type="button">Giv et hint</button>
-            </div>
-        </div>
     </div>
 
     <aside class="panel">
@@ -98,6 +93,8 @@
             <h2>Opgaverne <span class="taeller">løst <b id="pr-loest">0</b>/12</span></h2>
             <div class="opg-liste" id="pr-liste"></div>
         </div>
+
+        <button class="forfraknap panel-forfra" id="pr-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 
@@ -106,25 +103,20 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-sp" role="tabpanel" aria-label="Cis eller trans?">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og skridtet,
+             svarknapperne og nederst beskeden, Indsend svar.
+             Loest: forklaringen og knappen videre i sp-bliv -->
+        <div class="scenekort" id="sp-skort">
+            <p class="sk-tekst" id="sp-prompt"></p>
+            <div class="sk-svar" id="sp-valg"></div>
+            <div class="sk-bund" id="sp-status">
+                <p class="st-tekst" id="sp-besked" aria-live="polite"></p>
+                <button class="knap indsend" id="sp-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="sp-bliv" hidden></div>
+        </div>
         <canvas id="sp-laerred"></canvas>
         <div class="anker" id="sp-anker-tavle"></div>
-        <!-- Svarknapperne bygges efter emnet (js/sim_spil.js) -->
-        <div class="scene-valg" id="sp-valg"></div>
-
-        <!-- Kortet med al teksten: spørgsmålet og forklaringen efter et svar -->
-        <div class="statuslinje" id="sp-status">
-            <div class="sk-hoved">
-                <span class="sk-titel" id="sp-titel">Cis eller trans?</span>
-                <span class="taeller" id="sp-taeller"></span>
-            </div>
-            <div class="sk-krop">
-                <div class="sk-tekst">
-                    <div id="sp-prompt"></div>
-                    <p class="st-tekst" id="sp-besked" aria-live="polite"></p>
-                </div>
-                <button class="knap videre" id="sp-knap" type="button">Start spillet</button>
-            </div>
-        </div>
     </div>
 
     <aside class="panel">
@@ -156,6 +148,9 @@
                 <div><span>Nobelpris-kandidat</span><b>1350</b></div>
             </div>
         </div>
+
+        <!-- Spil igen ligger i panelet, aldrig paa kortet -->
+        <button class="forfraknap panel-forfra" id="sp-forfra" type="button" title="Start spillet forfra">Spil igen ↺</button>
     </aside>
 </section>
 
@@ -182,7 +177,7 @@
             <li>Er det det samme atom, ser man på de atomer, der sidder på det, det største først. CH₂CH₃ har C, H, H og slår CH₃ med H, H, H. En C=O tæller som to O.</li>
         </ol>
         <p><b>Z</b> (zusammen, sammen): de to grupper med højest prioritet sidder på samme side af dobbeltbindingen. <b>E</b> (entgegen, modsat): de sidder på hver sin side. Z er ikke altid det samme som cis: sidder to CH₃ på samme side, men vinder Br over CH₃ på det ene C-atom, er det E.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>C</kbd> <kbd>T</kbd> <kbd>I</kbd> svar (<kbd>E</kbd> <kbd>Z</kbd> <kbd>I</kbd> med E og Z) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>C</kbd> <kbd>T</kbd> <kbd>I</kbd> vælg svar (<kbd>E</kbd> <kbd>Z</kbd> <kbd>I</kbd> med E og Z) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -213,6 +208,7 @@
 <script src="js/data.js"></script>
 <script src="js/ez.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_drej.js"></script>
 <script src="js/sim_prioritet.js"></script>

@@ -218,16 +218,20 @@ function koerTest(W) {
 
     overskrift("6. Varm op kan gennemføres");
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function kt(navn) { return d.getElementById(navn + "-skort").textContent; }
+    function graa(navn) { var e = d.getElementById(navn + "-indsend"); return !e.hidden && e.classList.contains("ikke-klar"); }
+    function klar(navn) { var e = d.getElementById(navn + "-indsend"); return !e.hidden && e.classList.contains("klar"); }
     klik('[data-fane="fane-varm"]');
     V.tilpas();
     V.afvisTilbud();
     V.maalNr = 0; V.fundet = []; V.gaet = null; V.naaet = false; V.hjaelp = 0; V.rost = false;
     V.termo.saet(20); V.termo.roert = false;
     V.proeve = V.lavProeve(V.valgt);
+    V.skort.besked("", "");
     V.visMaal();
-    paastand("pentan står i kammeret ved 20 °C, og mål 1 er at få det til at koge",
-        V.stof().id === "pentan" && /pentan til at koge/.test(d.getElementById("varm-prompt").textContent));
-    paastand("linjen under scenen siger, at man skal trække i termometeret", /Træk i termometeret/.test(d.getElementById("varm-status").textContent));
+    paastand("pentan står i kammeret ved 20 °C, og mål 1 på kortet er at få det til at koge",
+        V.stof().id === "pentan" && /pentan til at koge/.test(kt("varm")), kt("varm"));
+    paastand("Indsend svar er grå, før termometeret er rørt", graa("varm"));
     var c = d.getElementById("varm-laerred"), rc = c.getBoundingClientRect(), lay = V.lay;
     function mus(type, x, y) {
         c.dispatchEvent(new W.PointerEvent(type, { clientX: rc.left + x, clientY: rc.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
@@ -239,10 +243,13 @@ function koerTest(W) {
     mus("pointerup", TM.x, TM.yFor(48));
     paastand("termometeret kan trækkes op med musen", Math.abs(V.termo.T - 48) <= 2, V.termo.T);
     tik(V, 4);
-    paastand("pentan koger, mål 1 er nået, og kogepunktet er på kurven", V.naaet && V.fundet.indexOf("pentan") >= 0 &&
-        V.proeve.makro().ballon > 0.5 && /36,1/.test(V.el.besked.textContent));
-    V.knap();
-    paastand("Næste mål: mål 2", V.maalNr === 1 && !V.naaet);
+    paastand("termometeret løser ikke målet af sig selv, men Indsend svar er klar", !V.naaet && V.fundet.indexOf("pentan") >= 0 && klar("varm"));
+    klik("#varm-indsend");
+    paastand("Indsend svar: pentan koger, mål 1 er nået, og kortet bliver stående med forklaringen",
+        V.naaet && V.proeve.makro().ballon > 0.5 && /36,1/.test(kt("varm")) && !!d.querySelector("#varm-skort [data-videre]") && d.getElementById("varm-indsend").hidden, kt("varm"));
+    paastand("kortet har ingen Start forfra", !/forfra/i.test(kt("varm")));
+    klik("#varm-skort [data-videre]");
+    paastand("Næste mål: mål 2", V.maalNr === 1 && !V.naaet && !/Rigtigt/.test(kt("varm")));
     /* Traek metan fra hylden ned i kammeret */
     mus("pointerdown", lay.hyldeGlas[0].x, lay.hyldeGlas[0].y - lay.hyldeGlasH * 0.4);
     mus("pointermove", lay.glas.x - 30, lay.glas.top + 60);
@@ -259,11 +266,12 @@ function koerTest(W) {
     paastand("et klik på et glas på hylden sætter det i", V.stof().id === "hexan");
     V.termo.saet(80); tik(V, 4);
     V.skift(7); tik(V, 1); V.termo.saet(140); tik(V, 4);
-    paastand("tre andre kogepunkter: mål 2 er nået", V.naaet && V.fundet.length === 4, V.fundet.join(","));
+    klik("#varm-indsend");
+    paastand("tre andre kogepunkter og Indsend svar: mål 2 er nået", V.naaet && V.fundet.length === 4, V.fundet.join(","));
     V.knap();
-    paastand("mål 3 gætter på decan", V.maalNr === 2 && V.gaet && V.gaet.id === "decan" && /decan/.test(d.getElementById("varm-prompt").textContent));
+    paastand("mål 3 gætter på decan", V.maalNr === 2 && V.gaet && V.gaet.id === "decan" && /decan/.test(kt("varm")));
     V.knap();
-    paastand("hintet nævner octan", /octan/.test(V.el.besked.textContent), V.el.besked.textContent);
+    paastand("hintet på kortet nævner octan", /octan/.test(kt("varm")), kt("varm"));
     /* Gaettet traekkes paa kurven */
     var kc = d.getElementById("varm-kurve"), krc = kc.getBoundingClientRect();
     var K = NK.Tegn.kurveMaal(V.KL.b, V.KL.h);
@@ -275,15 +283,16 @@ function koerTest(W) {
     kmus("pointerup", K.xFor(10), K.yFor(160));
     paastand("gættet kan trækkes på kurven", V.gaet.sat && Math.abs(V.gaet.t - 160) <= 5, V.gaet.t);
     V.skift(9); tik(V, 1); V.termo.saet(190); tik(V, 4);
-    paastand("decan måles: mål 3 er nået, og beskeden sammenligner med gættet", V.naaet && /Du gættede 160 °C/.test(V.el.besked.textContent) &&
-        /174,1/.test(V.el.besked.textContent), V.el.besked.textContent);
+    klik("#varm-indsend");
+    paastand("decan måles: mål 3 er nået, og kortet sammenligner med gættet", V.naaet && /Du gættede 160 °C/.test(kt("varm")) &&
+        /174,1/.test(kt("varm")), kt("varm"));
     V.knap();
     V.hjaelp = 1; V.knap();
     tik(V, 6);
     paastand("Vis svaret på mål 4 sætter icosan i og koger det", V.stof().id === "icosan" && V.fundet.indexOf("icosan") >= 0 && V.naaet);
     V.knap(); tik(V, 3);
-    paastand("efter de fire mål er der frit valg, og Kemichael roser", !V.maal() && /forfra/.test(V.el.knap.textContent) &&
-        !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    paastand("efter de fire mål er der frit valg, forfra ligger i panelet, og Kemichael roser", !V.maal() && !d.getElementById("varm-forfra").hidden &&
+        !/forfra/i.test(kt("varm")) && !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "faerdig"));
     tik(V, 8);
     /* Taendstikken: en fuld ballon braender, og Kemichael saetter en ny i */
     V.skift(0); tik(V, 1); V.termo.saet(20); tik(V, 2);
@@ -310,12 +319,12 @@ function koerTest(W) {
     bf = V.ballonFelt();
     mus("pointermove", bf.x, bf.y + 4);
     tik(V, 0.1);
-    paastand("en tom ballon brænder ikke, men får et svar", !V.brand && /Ballonen er tom/.test(V.el.besked.textContent));
+    paastand("en tom ballon brænder ikke, men får et svar på kortet", !V.brand && /Ballonen er tom/.test(kt("varm")));
     mus("pointerup", bf.x, bf.y + 4);
     tik(V, 0.2);
     paastand("tændstikken slukkes, når den slippes", !V.stik);
-    V.knap();
-    paastand("Start målene forfra", V.maalNr === 0 && V.fundet.length === 0);
+    klik("#varm-forfra");
+    paastand("Start målene forfra i panelet", V.maalNr === 0 && V.fundet.length === 0);
 
     overskrift("7. Formen kan gennemføres");
     klik('[data-fane="fane-form"]');
@@ -328,30 +337,45 @@ function koerTest(W) {
     paastand("vandbadet starter ved 0 °C, og alle tre er væsker", F.termo.T === 0 && F.proever.every(function (p) {
         var t = tael(p); return t[0] === 0 && t[2] <= p.dampMaks(p.grupper[0]);
     }));
+    paastand("gættet står på kortet med tre svar, og Indsend svar er grå", /Hvilken ballon fyldes først/.test(kt("form")) &&
+        d.querySelectorAll("#form-skort [data-valg]").length === 3 && graa("form"));
     var cf = d.getElementById("form-laerred"), rcf = cf.getBoundingClientRect(), fl = F.lay;
     function fmus(type, x, y) {
         cf.dispatchEvent(new W.PointerEvent(type, { clientX: rcf.left + x, clientY: rcf.top + y, pointerId: 9, bubbles: true, isPrimary: true }));
     }
+    d.getElementById("form-skort").classList.remove("blink");
+    fmus("pointerdown", fl.termo.x, fl.termo.yFor(0));
+    fmus("pointerup", fl.termo.x, fl.termo.yFor(0));
+    paastand("under gættet er termometeret låst, og kortet blinker", !F.traek && F.termo.T === 0 && d.getElementById("form-skort").classList.contains("blink"));
     fmus("pointerdown", fl.glas[0].x, fl.glas[0].bund - 20);
     fmus("pointerup", fl.glas[0].x, fl.glas[0].bund - 20);
-    paastand("et klik på et glas er et gæt", F.gaettet === 0 && F.trin === "varm");
+    paastand("et klik på et glas vælger kun gættet", F.valgt === 0 && F.trin === "gaet" && klar("form") &&
+        d.querySelector('#form-skort [data-valg="0"]').classList.contains("valgt"));
+    klik("#form-indsend");
+    paastand("Indsend svar sender gættet", F.gaettet === 0 && F.trin === "varm");
     F.termo.animerTil(45, 8); tik(F, 9);
     paastand("ved jævn opvarmning koger de i rækkefølgen 2,2-dimethylpropan, 2-methylbutan, pentan", F.raekke.join() === "2,1,0", F.raekke.join());
-    paastand("gættet på pentan får et svar, der siger, hvem der kogte først", /Du gættede pentan/.test(F.el.besked.textContent) && /2,2-dimethylpropan koger først/.test(F.el.besked.textContent));
+    paastand("gættet på pentan får et svar på kortet, der siger, hvem der kogte først", /Du gættede pentan/.test(kt("form")) && /2,2-dimethylpropan koger først/.test(kt("form")), kt("form"));
     tik(F, 2);
-    paastand("så kommer spørgsmålet hvorfor, med fire svar", F.trin === "hvorfor" && d.querySelectorAll("#form-valg button").length === 4);
-    klik('#form-valg button[data-nr="3"]');
-    paastand("svaret om bindingerne inde i molekylet forklarer fejlen", /Molekylerne selv er hele/.test(F.el.besked.textContent) && F.trin === "hvorfor");
-    klik('#form-valg button[data-nr="0"]');
+    paastand("så kommer spørgsmålet hvorfor, med fire svar på kortet", F.trin === "hvorfor" && d.querySelectorAll("#form-skort [data-valg]").length === 4 && graa("form"));
+    klik('#form-skort [data-valg="3"]');
+    paastand("et svar vælger kun", F.trin === "hvorfor" && !/Molekylerne selv er hele/.test(kt("form")) && klar("form"));
+    klik("#form-indsend");
+    paastand("svaret om bindingerne inde i molekylet forklarer fejlen", /Ikke endnu/.test(kt("form")) && /Molekylerne selv er hele/.test(kt("form")) && F.trin === "hvorfor");
+    klik('#form-skort [data-valg="0"]');
+    klik("#form-indsend");
     tik(F, 2);
     paastand("det rigtige svar afslutter, og Kemichael roser", F.trin === "faerdig" && !!(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
-    paastand("til sidst går knappen videre til fane 3, ikke forfra", /Videre til Hvem koger først/.test(F.el.knap.textContent));
+    paastand("kortet bliver på spørgsmålet: svaret er grønt, forklaringen står under, og Videre står, hvor Indsend svar stod",
+        d.querySelector('#form-skort [data-valg="0"]').classList.contains("rigtig") && /berøringsflade/.test(kt("form")) &&
+        /Videre til Hvem koger først/.test(d.querySelector("#form-skort [data-videre]").textContent) && d.getElementById("form-indsend").hidden);
+    paastand("kortet har ingen Start forfra", !/forfra/i.test(kt("form")));
     tik(F, 10);
     F.nulstil();
     F.termo.saet(45); tik(F, 3);
     paastand("trukket op i ét hug står de stadig i kogepunkternes rækkefølge", F.raekke.join() === "2,1,0", F.raekke.join());
     tik(F, 2);
-    klik('#form-valg button[data-nr="0"]');
+    klik('#form-skort [data-valg="0"]'); klik("#form-indsend");
     tik(F, 3);
     paastand("anden gang roser Kemichael ikke igen", F.trin === "faerdig" && !(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
     klik("#form-beroering");
@@ -359,10 +383,11 @@ function koerTest(W) {
     paastand("knappen åbner boksen med de tre par", bl.classList.contains("vis") && F.BL && F.BL.b > 100);
     klik("#beroering [data-luk]");
     paastand("boksen lukkes igen", !bl.classList.contains("vis"));
-    F.knap();
+    klik("#form-skort [data-videre]");
     paastand("knappen Videre åbner fane 3", d.querySelector('[data-fane="fane-spil"]').classList.contains("aktiv"));
     klik('[data-fane="fane-form"]');
-    F.nulstil();
+    klik("#form-forfra");
+    paastand("Forsøget forfra i panelet", F.trin === "gaet" && F.raekke.length === 0);
 
     overskrift("8. Hvem koger først kan spilles");
     klik('[data-fane="fane-spil"]');
@@ -371,21 +396,30 @@ function koerTest(W) {
     S.nyRunde();
     paastand("en runde er ni blandinger, tre fra hvert niveau",
         S.runde.length === 9 && [0, 1, 2].every(function (nv) { return S.runde.filter(function (b) { return b.niveau === nv; }).length === 3; }));
+    paastand("spørgsmålet står på kortet, og Indsend svar er grå", /koger først/.test(kt("spil")) && graa("spil"));
+    klik('#spil-skort [data-valg="0"]');
+    tik(S, 1);
+    paastand("et svar vælger kun: kammeret varmer ikke op", S.fase === "gaet" && S.valgt === 0 && klar("spil"));
     var rigtige = 0;
     for (i = 0; i < 9; i++) {
         var b = S.b, ret = i % 3 !== 2;
         var k = ret ? b.st.indexOf(b.foerst) : (b.st.indexOf(b.foerst) + 1) % b.st.length;
-        klik('#spil-valg button[data-nr="' + k + '"]');
+        klik('#spil-skort [data-valg="' + k + '"]');
+        klik("#spil-indsend");
         tik(S, 16);
         if (S.fase !== "svar") { paastand("blanding " + (i + 1) + " bliver færdig", false, b.stoffer.join("+")); break; }
         if (ret) rigtige++;
-        if (i < 8) S.knap();
+        if (i === 0) paastand("rigtigt svar: kortet bliver på spørgsmålet med Næste blanding", /Rigtigt/.test(kt("spil")) &&
+            d.querySelector('#spil-skort [data-valg="' + k + '"]').classList.contains("rigtig") && !!d.querySelector("#spil-skort [data-videre]"));
+        if (i < 8) klik("#spil-skort [data-videre]");
     }
     paastand("seks rigtige og tre forkerte giver 6 point", S.point === 6 && S.slut, S.point);
+    paastand("resultatkortet har ingen Start forfra og ingen Ny runde-knap", !d.querySelector("#spil-skort [data-videre]") && !/forfra/i.test(kt("spil")));
     paastand("rekorden gemmes", S.rekord >= 6);
     S.nyRunde();
     S.knap(); S.knap(); tik(S, 16);
-    paastand("Vis svaret giver ikke point", S.fase === "svar" && S.point === 0 && /Sådan/.test(S.el.besked.textContent));
+    paastand("Vis svaret giver ikke point", S.fase === "svar" && S.point === 0 && /Svaret/.test(kt("spil")));
+    S.nyRunde();
 
     overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");
     ["fane-varm", "fane-form", "fane-spil"].forEach(function (fane) {
@@ -431,12 +465,71 @@ function koerTest(W) {
     paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
     var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
     paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
-    var tur = ["#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-kort", "#varm-kort",
-        "#form-anker-bad", "#form-anker-zoom", "#form-anker-termometer", "#form-kort", "#form-tabel-kort",
-        "#spil-anker-zoom", "#spil-valg", "#spil-anker-kammer", "#spil-kort", "#spil-runde"];
+    var tur = ["#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-kort", "#varm-skort",
+        "#form-anker-bad", "#form-anker-zoom", "#form-anker-termometer", "#form-skort", "#form-tabel-kort",
+        "#spil-anker-zoom", "#spil-skort", "#spil-anker-kammer", "#spil-runde"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
 
-    overskrift("10. Layoutet");
+    overskrift("10. Papirkortet");
+    var ramme0 = document.getElementById("ramme");
+    ["varm", "form", "spil"].forEach(function (n) {
+        var kortE = d.getElementById(n + "-skort"), fane = d.getElementById("fane-" + n);
+        paastand(n + ": kortet står i scenen, ikke i panelet", !!kortE.closest(".scene") && !kortE.closest(".panel"));
+        paastand(n + ": ingen statuslinje nederst", !d.getElementById(n + "-status") && !fane.querySelector(".status, .statuslinje"));
+    });
+    /* Det hoejeste kort i hver fane skal holde sig i kortZone: almindelig og lav skaerm */
+    function tilstande(n) {
+        var t = [];
+        if (n === "varm") {
+            D.MAAL.forEach(function (m, k) {
+                t.push(function () { V.forfra(); V.maalNr = k; V.naaet = false; V.klargoerGaet(); V.hjaelp = 1; V.skort.hintTekst(NK.html(V.hintTekst(m)), 1, 1); V.visKort(); });
+                t.push(function () { V.forfra(); V.maalNr = k; V.klargoerGaet(); if (V.gaet) { V.gaet.t = 160; V.gaet.sat = true; } V.efter = V.efterTekst(m); V.naaet = true; V.maalNr = k + 1; V.maalVist = k; V.visKort(); });
+            });
+            t.push(function () { V.forfra(); V.skort.fejl("Glasset i kammeret er 2,2-dimethylpropan. Træk glasset med icosan ned i kammeret."); V.visKort(); });
+        } else if (n === "form") {
+            t.push(function () { F.nulstil(); F.knap(); });
+            t.push(function () { F.nulstil(); F.gaet(0); F.kogt([2]); F.visTrin(); });
+            D.HVORFOR.valg.forEach(function (v, k) {
+                t.push(function () { F.nulstil(); F.trin = "hvorfor"; F.hvorforValgt = k; F.svarHvorfor(k); F.visTrin(); });
+            });
+            t.push(function () { F.nulstil(); F.trin = "hvorfor"; F.knap(); F.visTrin(); });
+        } else {
+            t.push(function () { S.nyRunde(); S.knap(); });
+            D.BLANDINGER.forEach(function (b) {
+                b.st.forEach(function (valgt, k) {
+                    t.push(function () {
+                        S.nyRunde(); S.b = b; S.fase = "svar"; S.valgt = k; S.rigtig = valgt === b.foerst; S.sete = false; S.slut = true;
+                        var naeste = b.st.filter(function (x) { return x !== b.foerst; }).sort(function (x, y) { return x.kp - y.kp; })[0];
+                        S.forklaring = S.rigtig ? NK.html(b.foerst.Navn) + " koger ved " + D.gradTekst(b.foerst.kp) + ", " + NK.html(naeste.navn) + " først ved " +
+                            D.gradTekst(naeste.kp) + ". " + NK.html(D.hvorfor(b.foerst, naeste)) :
+                            NK.html(b.foerst.Navn) + " koger først, ved " + D.gradTekst(b.foerst.kp) + ". " + NK.html(valgt.Navn) + " koger ved " +
+                            D.gradTekst(valgt.kp) + ". " + NK.html(D.hvorfor(b.foerst, valgt));
+                        S.forklaring += " Runden er slut. Knappen Ny runde i panelet starter en ny runde.";
+                        S.visOpgave();
+                    });
+                });
+            });
+        }
+        return t;
+    }
+    [[1400, 860], [1100, 700], [860, 700]].forEach(function (st) {
+        ramme0.style.width = st[0] + "px";
+        ramme0.style.height = st[1] + "px";
+        (st[0] < 900 ? ["varm"] : ["varm", "form", "spil"]).forEach(function (n) {
+            klik('[data-fane="fane-' + n + '"]');
+            var sim = NK.sims["fane-" + n];
+            sim.tilpas();
+            var e = d.getElementById(n + "-skort"), maks = 0;
+            tilstande(n).forEach(function (f) { f(); maks = Math.max(maks, e.offsetTop + e.offsetHeight); });
+            paastand(n + ": kortet holder sig i kortZone ved " + st[0] + " × " + st[1] + " (højst " + maks + " px, zonen slutter ved " + (sim.skort.top() - 10) + ")",
+                maks <= sim.skort.top() - 10 + 2);
+        });
+    });
+    V.forfra(); F.nulstil(); S.nyRunde();
+    ramme0.style.width = "";
+    ramme0.style.height = "";
+
+    overskrift("11. Layoutet");
     var ramme = document.getElementById("ramme");
     var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
     stoerrelser.forEach(function (st) {

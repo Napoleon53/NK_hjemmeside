@@ -215,12 +215,16 @@
        det, han peger paa, og som faar en gul ramme, der blinker (CSS-
        selectorer; felterne paa laerredet er de usynlige .anker fra
        rundvisningen). Ingen vittigheder i praesentationen. */
+    /* Papirkortets plads oeverst i scenen i pixels: [almindelig skaerm, lav
+       skaerm (hoejst 720 px)]. Tegningen begynder under den (js/kort.js zone). */
+    D.ZONE = { fabrik: [104, 92], koele: [150, 132] };
+
     D.INTRO_FABRIK = [
         { tekst: "I denne fane bygger du fedtstoffer af glycerol og fedtsyrer. Du trækker en fedtsyre fra bordet hen på en af de tre OH-grupper på glycerol, og ved hver binding dannes der et vandmolekyle. Et klik på en fedtsyre på glycerol tager fedtsyren af igen.",
           sel: ["#fabrik-anker-glycerol", "#fabrik-anker-fliser"] },
-        { tekst: "Kunden på opgavekortet fortæller, hvor fedtet skal være fast eller flydende. Kortet Dit fedtstof viser smeltepunktet og tilstanden fire steder i køkkenet, fra fryseren til solen. Ordren bliver tjekket, så snart der sidder tre fedtsyrer på glycerol.",
-          sel: ["#fabrik-kort", "#fabrik-fedt-kort"] },
-        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Når du har leveret alle fem ordrer, kan du bygge frit. Fedtstoffet i glasset følger med over på fane 2.",
+        { tekst: "Kunden på kortet øverst i scenen fortæller, hvor fedtet skal være fast eller flydende. Kortet Dit fedtstof i panelet viser smeltepunktet og tilstanden fire steder i køkkenet, fra fryseren til solen. Når der sidder tre fedtsyrer på glycerol, trykker du Indsend svar.",
+          sel: ["#fabrik-skort", "#fabrik-fedt-kort"] },
+        { tekst: "Knappen med gul kant på kortet giver et hint og derefter svaret. Når du har leveret alle fem ordrer, kan du bygge frit. Fedtstoffet i glasset følger med over på fane 2.",
           sel: ["#fabrik-knap", "#fabrik-anker-glas"] }
     ];
     D.INTRO_KOELE = [
@@ -228,8 +232,8 @@
           sel: ["#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue"] },
         { tekst: "Zoomvinduet viser molekylerne i det valgte glas helt tæt på. Hver kæde har sin fedtsyres farve, og faste molekyler ligger i rækker. Varedeklarationen viser, hvor mange procent af fedtsyrerne der er mættede, monoumættede og polyumættede.",
           sel: ["#koele-anker-zoom", "#koele-dekl-kort"] },
-        { tekst: "Opgavekortet beder dig gætte, om fedtet er fast, delvist fast eller flydende. Når du har gættet, flytter glasset selv hen til det sted, opgaven nævner. Knappen på kortet giver et hint og derefter svaret. Til sidst spørger opgavekortet, hvorfor smør er fast i køleskabet, når solsikkeolie er flydende.",
-          sel: "#koele-kort" }
+        { tekst: "Kortet øverst i scenen beder dig gætte, om fedtet er fast, delvist fast eller flydende. Når du har valgt og trykket Indsend svar, flytter glasset selv hen til det sted, opgaven nævner. Knappen med gul kant giver et hint og derefter svaret. Til sidst spørger kortet, hvorfor smør er fast i køleskabet, når solsikkeolie er flydende.",
+          sel: "#koele-skort" }
     ];
 
     /* Ros, naar en hel fane er klaret (kun foerste gang i browseren).

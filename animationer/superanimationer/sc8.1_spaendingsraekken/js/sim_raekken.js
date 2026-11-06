@@ -53,6 +53,7 @@
         this.pladser = [null, null, null, null, null, null];
         this.fase = "stil";
         this.hjaelp = 0;
+        this.pegHint = false;
         this.fejlPar = null;
         this.afsloer = 0;
         this.besked("", "");
@@ -99,7 +100,9 @@
         this.pladser[plads] = k;
         k.bane = this.kortPos(k);
         this.fejlPar = null;
-        this.tjek();
+        /* Raekkefoelgen tjekkes foerst, naar eleven trykker Indsend svar */
+        if (this.bKl === "skidt" || this.bKl === "peger") this.besked("", "");
+        this.visKort();
     };
 
     P.hjem = function (k) {
@@ -108,7 +111,7 @@
         k.plads = -1;
         k.bane = this.kortPos(k);
         this.fejlPar = null;
-        this.besked("", "");
+        if (this.bKl === "skidt" || this.bKl === "peger") this.besked("", "");
         this.visKort();
     };
 
@@ -117,6 +120,15 @@
     };
 
     /* ----- Tjekket ------------------------------------------------------------------ */
+    /* Indsend svar: raekkefoelgen paa hylden tjekkes */
+    P.kanSende = function () { return this.fase === "stil" && this.antalPaa() === 6 && !this.fejlPar; };
+
+    P.indsend = function () {
+        if (this.fase !== "stil") return;
+        if (this.antalPaa() < 6) { this.besked("Stil alle seks kort på hylden først.", "peger"); return; }
+        this.tjek();
+    };
+
     P.tjek = function () {
         this.visKort();
         if (this.antalPaa() < 6) { this.besked("", ""); return; }
@@ -134,6 +146,7 @@
                 if (l === "H") set = NK.Skema.get(r, "H") !== undefined;
                 else if (r === "H") set = NK.Skema.get(l, "H") !== undefined;
                 else set = NK.Skema.get(r, l) !== undefined;
+                if (this.hjaelp === 0) this.pegHint = true;
                 this.besked(NK.html(D.rkForkert(l, r, set)), "skidt");
                 break;
             }
@@ -144,7 +157,9 @@
     P.faerdig = function (egen) {
         this.fase = "faerdig";
         this.fejlPar = null;
-        this.besked(NK.html(D.RK_FAERDIG), "god");
+        /* Kortet bliver paa opgaven: forklaringen og Til Forudsig (visKnap) */
+        this.slutVist = !egen;
+        this.besked("", "");
         if (egen && !NK.hent(NOEGLE_ROS, false)) {
             NK.gem(NOEGLE_ROS, true);
             this.ventRos = 1.6;
@@ -152,14 +167,22 @@
         this.visKort();
     };
 
-    /* Knappen: Giv hint -> Vis svaret -> Til Forudsig */
+    /* Kortets knapper: Giv hint -> Vis svaret, Indsend svar og Til Forudsig.
+       knap() er Enter og den gamle ene knap. */
     P.knap = function () {
-        if (this.fase === "faerdig") {
-            if (NK.visFane) NK.visFane("fane-forudsig");
-            return;
-        }
+        if (this.fase === "faerdig") { this.videre(); return; }
+        this.hjaelpKnap();
+    };
+
+    P.videre = function () {
+        if (this.fase === "faerdig" && NK.visFane) NK.visFane("fane-forudsig");
+    };
+
+    P.hjaelpKnap = function () {
+        if (this.fase === "faerdig") return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
+            this.pegHint = false;
             this.besked("<b>Hint:</b> " + NK.html(D.RK_HINT), "gul");
             this.visKort();
             this.visSkema();
@@ -179,29 +202,46 @@
     /* ----- Panelet --------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("rk-knap"),
-            besked: NK.el("rk-besked"),
-            kort: NK.el("rk-kort")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = {};
+        this.sk = new NK.SceneKort("rk", {
+            hint: function () { mig.hjaelpKnap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.sk.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
         NK.el("rk-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
+    /* Beskeden paa papirkortet (hint, fejl). Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKnap();
     };
 
     P.visKort = function () {
-        NK.saetTekst("rk-taeller", this.antalPaa() + "/6 på hylden");
-        NK.saetTekst("rk-prompt", this.fase === "faerdig" ? "Sådan står de i spændingsrækken." : D.RK_PROMPT);
-        var tekst, klasse = "knap";
-        if (this.fase === "faerdig") { tekst = "Til Forudsig →"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.fase === "faerdig");
+        if (!this.sk) return;
+        this.sk.vis({ chip: "Rækken", tekst: NK.html(D.RK_PROMPT) });
+        this.visKnap();
+    };
+
+    /* Beskeden, Giv hint og Indsend svar, eller forklaringen og Til Forudsig */
+    P.visKnap = function () {
+        var k = this.sk;
+        if (!k) return;
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (this.fase === "faerdig") {
+            k.bliv(NK.html(D.RK_FAERDIG), this.slutVist ? "Svaret" : "Rigtigt", "Til Forudsig", this.slutVist ? "svar" : "god");
+            return;
+        }
+        k.bliv(null);
+        k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", peg: this.pegHint, indsend: true, klar: this.kanSende() });
     };
 
     P.visSkema = function () {
@@ -215,14 +255,15 @@
     /* Kaldes, naar fanen vises: skemaet kan vaere aendret paa fane 1 */
     P.vises = function () { this.visSkema(); };
 
+    /* Det naeste skridt i kortets linje, naar der ikke staar en besked */
     P.visStatus = function () {
-        var t;
+        var t, n = this.antalPaa();
         if (this.traek && this.traek.flyttet) t = "Slip kortet på en plads på hylden.";
-        else if (this.fase === "faerdig") t = "Rækken foroven er spændingsrækken med flere metaller.";
-        else if (this.fejlPar) t = "Ikke rigtigt endnu. Se på de to røde kort.";
-        else if (this.antalPaa() === 0) t = "Træk kortene op på hylden, fra uædel til ædel.";
-        else t = "Træk resten op. Kort på hylden kan flyttes igen.";
-        NK.saetHTML("rk-status", t);
+        else if (this.fase === "faerdig") t = "";
+        else if (n === 0) t = "Træk kortene op på hylden, eller klik på dem.";
+        else if (n < 6) t = n + " af 6 kort står på hylden. Kort på hylden kan flyttes igen.";
+        else t = "Alle seks kort står på hylden. Tryk på Indsend svar.";
+        if (t !== this.trinTekst) { this.trinTekst = t; this.visKnap(); }
     };
 
     /* ----- Layout ---------------------------------------------------------------------------- */
@@ -233,7 +274,9 @@
         lay.bordY = Math.round(H - NK.klamp(H * 0.1, 36, 64));
         lay.kop = { x: kant + 22, y: lay.bordY };
         var rk = kant + Tg.RAEKKE_KANT;
-        lay.raekke = { x: rk, y: 72, b: W - 2 * rk, h: NK.klamp(H * 0.06, 28, 42) };
+        /* Den lange raekke (naar hylden er rigtig) begynder under papirkortets plads */
+        lay.zone = this.kortZone();
+        lay.raekke = { x: rk, y: lay.zone + 34, b: W - 2 * rk, h: NK.klamp(H * 0.06, 28, 42) };
         var kb = NK.klamp(Math.min((W - 2 * kant - 60) / (6 * 1.25), H * 0.15), 58, 116);
         var kh = kb * 1.28;
         lay.kb = kb;
@@ -270,7 +313,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [120, 110];
+    P.kortZone = function () { return this.sk ? this.sk.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Opdater og tegn -------------------------------------------------------------------- */
     P.opdater = function (dt) {

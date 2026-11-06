@@ -15,24 +15,24 @@
 
     var TURE = {
         "fane-sb": [
-            { sel: "#sb-anker-molekyle", titel: "Molekylet", tekst: "Træk i molekylet for at dreje det. Slipper du tæt på spejlbilledets stilling, klikker det på plads." },
+            { sel: "#sb-anker-molekyle", titel: "Molekylet", tekst: "Træk i molekylet for at dreje det. Slipper du tæt på spejlbilledets stilling, klikker det på plads. Tryk så Indsend svar." },
             { sel: "#sb-anker-spejl", titel: "Spejlbilledet", tekst: "Molekylet set i et spejl. Det står stille. Grønne ringe viser de grupper, der passer." },
-            { sel: "#sb-valg", titel: "Det kan ikke lade sig gøre", tekst: "Tryk her, hvis molekylet aldrig kan komme til at passe med sit spejlbillede." },
-            { sel: "#sb-status", titel: "Linjen forneden", tekst: "Næste skridt, og hvad der skete. Knappen giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#sb-valg", titel: "Det kan ikke lade sig gøre", tekst: "Vælg dette svar, hvis molekylet aldrig kan komme til at passe med sit spejlbillede. Tryk så Indsend svar." },
+            { sel: "#sb-skort", titel: "Kortet", tekst: "Opgaven, det næste skridt og hvad der skete. Knappen med gul kant giver ét hint ad gangen og til sidst svaret." },
             { sel: "#sb-opgaver", titel: "Opgaverne", tekst: "Seks molekyler. En opgave, du løser uden at se svaret, får en stjerne." }
         ],
         "fane-fi": [
             { sel: "#fi-anker-tavle", titel: "Tavlen", tekst: "Klik på de C-atomer, der har fire forskellige grupper. De får en stjerne." },
-            { sel: "#fi-valg", titel: "Knapperne", tekst: "Vis alle H tegner alle atomer. Tjek, når du har sat dine stjerner, eller Intet asymmetrisk C-atom." },
-            { sel: "#fi-status", titel: "Linjen forneden", tekst: "Hvad der gik galt. Knappen giver ét hint ad gangen." },
+            { sel: "#fi-valg", titel: "Knapperne", tekst: "Vis alle H tegner alle atomer. Sæt dine stjerner, eller vælg Intet asymmetrisk C-atom, og tryk Indsend svar." },
+            { sel: "#fi-skort", titel: "Kortet", tekst: "Opgaven og hvad der gik galt. Knappen med gul kant giver ét hint ad gangen." },
             { sel: "#fi-opgaver", titel: "Opgaverne", tekst: "13 molekyler fra let til svær. Nogle har intet asymmetrisk C-atom, ét har to." }
         ],
         "fane-rs": [
-            { sel: "#rs-anker-molekyle", titel: "Molekylet", tekst: "Klik på grupperne i prioritetens rækkefølge. Træk så i molekylet for at dreje det." },
-            { sel: "#rs-kort", titel: "Trinene", tekst: "Tre trin: nummer, drej, R eller S. Det trin, du er ved, står med fed." },
-            { sel: "#rs-valg", titel: "R eller S", tekst: "Med uret er R, mod uret er S, når gruppe 4 peger væk." },
+            { sel: "#rs-anker-molekyle", titel: "Molekylet", tekst: "Klik på den gruppe, der skal have det næste nummer, og tryk Indsend svar. Træk så i molekylet for at dreje det." },
+            { sel: "#rs-skort", titel: "Kortet", tekst: "Tre trin: nummer, drej, R eller S. Kortet viser det trin, du er ved, og hvad der gik galt." },
+            { sel: "#rs-indsend", titel: "Indsend svar", tekst: "Indsend svar sender det, du har valgt. I sidste trin vælger du R eller S på kortet. Med uret er R, mod uret er S." },
             { sel: "#rs-zkort", titel: "Atomnumrene", tekst: "Det første atom i gruppen afgør prioriteten. Det højeste atomnummer vinder." },
-            { sel: "#rs-status", titel: "Linjen forneden", tekst: "Næste skridt, og hvad der gik galt. Knappen hjælper med det trin, du er ved." }
+            { sel: "#rs-opgaver", titel: "Opgaverne", tekst: "Under listen kan du tage samme opgave forfra." }
         ]
     };
     var trin = [];

@@ -19,7 +19,8 @@
         "fane-montre": [
             { sel: "#montre-anker-montre", titel: "Udstillingen", tekst: "Et skab formet som det periodiske system. Hvert rum har et skilt med atomnummer og symbol. Tallene foroven er hovedgrupperne, tallene til venstre perioderne." },
             { sel: "#montre-anker-kasse", titel: "Kassen", tekst: "De 36 prøver. På mærket mangler enten navnet eller symbolet. Klik på en prøve for at tage den op." },
-            { sel: "#montre-kort", titel: "Opgaven", tekst: "Skriv det, der mangler på mærket, træk prøven op på sin plads, og skriv elektronstrukturen. Knappen giver et hint og derefter svaret." },
+            { sel: "#montre-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst i scenen. Skriv det, der mangler på mærket, træk prøven op på sin plads, og skriv elektronstrukturen. Indsend svar sender svaret, og Giv et hint giver et hint og derefter svaret." },
+            { sel: "#montre-kort", titel: "Prøvens trin", tekst: "Panelet viser, hvilke af prøvens tre trin der er klaret." },
             { sel: "#montre-anker-tavle", titel: "Tavlen", tekst: "Atommodellen tegnes, mens du skriver elektronstrukturen. Elektroner, der ikke er plads til, bliver røde." },
             { sel: "#montre-anker-navne", titel: "Navnetavlen", tekst: "Klik for at slå navnene op." },
             { sel: "#montre-fremskridt", titel: "Perioderne", tekst: "En prøve, du løser uden at se svaret, får en stjerne. Klik på en periode for at tage dens næste prøve." },
@@ -27,7 +28,7 @@
         ],
         "fane-formler": [
             { sel: "#formler-anker-flaske", titel: "Flasken", tekst: "Stoffet og dets formel. Formlen fortæller, hvilke grundstoffer stoffet er lavet af, og hvor mange atomer der er af hvert." },
-            { sel: "#formler-kort", titel: "Opgaven", tekst: "Tæl atomerne af hvert grundstof og til sidst dem alle. Knappen giver et hint og derefter svaret." },
+            { sel: "#formler-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst i scenen. Tæl atomerne af hvert grundstof og til sidst dem alle. Indsend svar sender svaret, og Giv et hint giver et hint og derefter svaret." },
             { sel: "#formler-anker-tavle", titel: "Tavlen", tekst: "Når et grundstof er talt, flyver dets atomer ud af udstillingen og op på tavlen. En parentes bliver til lige så mange kopier, som tallet efter den siger." },
             { sel: "#formler-anker-raekke", titel: "Flaskerne", tekst: "Klik på en flaske for at skifte stof." }
         ],

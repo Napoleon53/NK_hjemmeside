@@ -96,6 +96,7 @@
                 tekst: tekst,
                 valg: orden.map(function (i) { return svar[i]; }),
                 rigtig: orden.indexOf(0),
+                laas: true,
                 hint: hint,
                 svar: forklaring
             };
@@ -104,19 +105,19 @@
 
     var OPGAVER = [
         valgopgave("Hvorfor bøjer vandstrålen mod den ladede stav?",
-            ["Vandmolekylerne er polære og drejer den modsat ladede ende mod staven", "Vandet er elektrisk ladet", "Staven er magnetisk", "Vandet fordamper hen mod staven"],
+            ["Vandmolekylerne er polære", "Vandet er elektrisk ladet", "Staven er magnetisk", "Vandet fordamper hen mod staven"],
             "Tænk på δ+ og δ− i vandmolekylet.",
             "Vandmolekylet er polært. Det drejer, så δ− vender mod en positiv stav og δ+ mod en negativ, og trækkes hen mod staven."),
         valgopgave("Hvorfor bøjer strålen af heptan ikke?",
             ["Heptan er upolært", "Heptan er tungere end vand", "Heptan er positivt ladet", "Heptanstrålen er for tyk"],
             "Heptan består kun af C og H. Hvor stor er forskellen i elektronegativitet?",
             "C og H har næsten samme elektronegativitet, så heptan er upolært. Molekylerne drejer sig ikke mod staven."),
-        valgopgave("Vandstrålen bøjer mod både den positive og den negative stav. Hvad viser det?",
-            ["Vandet er ikke ladet, men molekylerne har en positiv og en negativ ende", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
+        valgopgave("Strålen bøjer mod både den positive og den negative stav. Hvad viser det?",
+            ["Molekylerne er polære, ikke ladede", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
             "Et ladet stof ville blive frastødt af den ene stav.",
-            "Var vandet ladet, ville det blive frastødt af den ene stav. Molekylerne er neutrale, men polære, og drejer sig efter staven."),
+            "Var vandet ladet, ville den ene stav frastøde det. Vandmolekylerne er neutrale, men polære."),
         valgopgave("Hvorfor bøjer ethanol mindre end vand?",
-            ["Ethanol har en upolær carbonkæde og er mindre polært end vand", "Ethanol er helt upolært", "Ethanol har ingen O-H-binding", "Ethanol er tungere end vand"],
+            ["Ethanol har en upolær carbonkæde", "Ethanol er helt upolært", "Ethanol har ingen O-H-binding", "Ethanol er tungere end vand"],
             "Se på, hvilken del af ethanolmolekylet der er polær.",
             "Ethanol har en polær OH-gruppe, men resten af molekylet er upolært. Derfor bøjer strålen mindre end vandstrålen.")
     ];
@@ -128,7 +129,13 @@
         this.ox = 0;
         this.oy = 0;
         this.OPGAVER = OPGAVER;
-        this.opgaver = new NK.Opgaver("vand", OPGAVER, this);
+        /* Kortet viser, hvad eleven skal nu, til skemaet er udfyldt.
+           Derefter kan opgaverne startes. */
+        this.opgaver = new NK.Opgaver("vand", OPGAVER, this, {
+            antal: OPGAVER.length,
+            intro: function (sim) { return sim.resultater ? sim.naeste() : ""; },
+            kanStarte: function (sim) { return !!sim.resultater && sim.slut(); }
+        });
         this.nulstilForsoeg();
         this._bindPanel();
         this._bindMus();
@@ -212,13 +219,8 @@
         noegle = noegle || tekst;
         if (this.sidsteBesked[noegle] !== undefined && this.tid - this.sidsteBesked[noegle] < 4) return;
         this.sidsteBesked[noegle] = this.tid;
-        var e = NK.el("vand-besked");
-        e.textContent = tekst;
-        e.classList.remove("vis");
-        void e.offsetWidth;
-        e.classList.add("vis");
-        window.clearTimeout(this._beskedUr);
-        this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 3000);
+        /* Beskeden staar i kortets nederste raekke, ikke nederst i scenen */
+        this.opgaver.besked(tekst, 3);
     };
 
     /* Aabner hanen med vaesken. En aaben hane lukkes, saa der kun loeber én straale. */
@@ -424,7 +426,6 @@
         var mig = this;
         this.celler = {};
         NK.el("vand-skema").appendChild(resultatTabel(this, this.celler));
-        NK.el("vand-forfra").addEventListener("click", function () { mig.nulstil(); });
     };
 
     P.signatur = function () {
@@ -459,7 +460,6 @@
             });
         });
         NK.saetTekst("vand-taeller", this.antalResultater() + "/6");
-        NK.saetTekst("vand-naeste", this.naeste());
 
         var slut = this.slut();
         var knap = NK.el("vand-serieknap");
@@ -467,9 +467,6 @@
         knap.classList.toggle("banker", slut && !this.serieSet);
         NK.saetTekst("vand-serie-tekst", slut ? "Forsøget er slut." : "Låses op, når skemaet er udfyldt.");
 
-        NK.el("vand-opg-knap").disabled = !slut;
-        if (!slut) NK.saetTekst("vand-opg-tekst", "Låses op, når skemaet er udfyldt.");
-        else if (!this.opgaver.opgave) NK.saetTekst("vand-opg-tekst", "");
     };
 
     /* ----- Musen ------------------------------------------------------------------- */
@@ -496,6 +493,8 @@
         var cvs = this.laerred.canvas;
 
         cvs.addEventListener("pointerdown", function (e) {
+            /* Under et spoergsmaal blinker kortet i stedet */
+            if (mig.opgaver.spaer()) return;
             var p = mig.tilScene(e);
             var g = mig.genstandVed(p.x, p.y);
             if (!g) return;
@@ -534,9 +533,11 @@
     P.tilpas = function () {
         this.laerred.tilpas();
         var b = this.laerred.b, h = this.laerred.h;
-        this.s = Math.min(b / MAAL.W, h / MAAL.H);
+        /* Bordet staar under papirkortet (NK.kortTop i opgave.js) */
+        var top = Math.min(NK.saetKortZone(this.laerred.canvas), h * 0.4);
+        this.s = Math.min(b / MAAL.W, (h - top) / MAAL.H);
         this.ox = (b - MAAL.W * this.s) / 2;
-        this.oy = (h - MAAL.H * this.s) / 2;
+        this.oy = top + (h - top - MAAL.H * this.s) / 2;
     };
 
     P.opdater = function (dt) {

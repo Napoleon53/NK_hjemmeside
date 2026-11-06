@@ -1004,3 +1004,405 @@ select:focus-visible {
     #fane-vaegt .regnestykke.lang > .rs-hoejre { grid-column: 3; }
     #fane-vaegt .regnestykke.lang > .rs-venstre:first-child { grid-column: 1 / 4; }
 }
+
+/* =====================================================================
+   PAPIRKORTET (6. nov. 2026): scenekortet oeverst midt i scenen paa alle
+   tre faner. Reglerne er hentet fra sc6.1/sc6.2 (samme js/fane.js);
+   udseendet ligger i ../faelles/papirkort.css.
+   ===================================================================== */
+/* ---------------------------------------------------------------------
+   SC5.1 (29. sept. 2026): fane 2, c eller n? Tabellen med glassenes tal
+   --------------------------------------------------------------------- */
+.glastabel { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 0.92rem; }
+.glastabel th { font-weight: 600; color: var(--tekst-mat); text-align: left; padding: 0 6px 0 0; font-size: 0.8rem; }
+.glastabel thead th { text-align: center; color: var(--tekst-svag); font-size: 0.82rem; }
+.glastabel thead th:first-child { text-align: left; }
+.glastabel td {
+    text-align: center;
+    padding: 6px 4px;
+    background-color: rgba(255, 255, 255, 0.045);
+    font-weight: 700;
+    color: var(--tekst);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.glastabel td.ukendt { color: var(--gul); }
+/* Tallet fra foer der blev haeldt, under det, der staar nu */
+.glastabel td .foer { display: block; margin-top: 1px; font-size: 0.8rem; font-weight: 600; color: var(--tekst-mat); }
+@keyframes ny-tal {
+    0%   { background-color: rgba(63, 174, 114, 0.55); }
+    100% { background-color: rgba(255, 255, 255, 0.045); }
+}
+.glastabel td.ny { animation: ny-tal 1.6s ease-out 1; color: #b8f0cf; }
+
+/* ---------------------------------------------------------------------
+   SC5.1 (9. okt. 2026): scenekortet paa fane 1 og 2. Hele opgaven staar
+   paa ét kort oeverst midt i scenen, samme sted hele vejen (som sc7.5),
+   fordi eleverne klikker, foer de laeser, og ikke kigger ud i siden
+   (brugerens oenske). Panelet har intet opgavekort. Fire udgaver:
+     .gaet    et gaet foer forsoeget: stort og gult, pulserer stille og
+              blinker, naar eleven klikker i scenen foerst
+     .opgave  det, eleven skal goere i scenen
+     .spm     et spoergsmaal med svarene som knapper side om side
+     .loest   svaret er rigtigt: forklaringen og knappen videre (.svar:
+              svaret blev vist med den gule knap, saa kortet er gult)
+   Kortets nederste raekke (.kt-bund) har linjen med hint, fejl og naeste
+   skridt og den gule knap. Kortet er centreret med margin, ikke med
+   transform. Hoejden uden for gaettet skal holde sig inden for ZONE i
+   js/sim_kar.js og js/sim_glas.js; selvtesten maaler det.
+   Klasserne hedder kt-, fordi sk- er skabelonerne paa fane 3 og 4.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    padding: 9px 14px 11px;
+    border: 2px solid #4a4f5e;
+    border-radius: 12px;
+    background-color: #1d1e26;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.scenekort.spm { border: 3px solid var(--gul); background-color: #25211a; padding: 8px 13px 10px; }
+.scenekort.loest { border-color: var(--groen); background-color: #17241e; }
+
+.kt-intro { margin: 0 0 3px; font-size: 0.98rem; line-height: 1.36; color: #d9d2bf; }
+.kt-tekst { margin: 0; font-size: 1.12rem; line-height: 1.34; font-weight: 700; color: #ffffff; }
+.scenekort.opgave .kt-tekst { font-weight: 600; }
+
+.kt-chip {
+    display: inline-block;
+    margin-right: 9px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background-color: #3d4150;
+    color: #dfe4ea;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    white-space: nowrap;
+}
+
+.scenekort.spm .kt-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest .kt-chip { background-color: var(--groen); color: #ffffff; }
+
+/* Loest: forklaringen til venstre og knappen, der foerer videre, til hoejre */
+.kt-slut { display: flex; align-items: center; gap: 14px; }
+.kt-slut-t { flex: 1; min-width: 0; }
+.kt-slut .kt-tekst { font-size: 1.02rem; line-height: 1.34; font-weight: 600; color: #e9f7ef; }
+.kt-svaret { color: #9af0c0; font-weight: 800; }
+
+@keyframes bank-groen {
+    0%   { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(95, 207, 146, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0); }
+}
+
+.kt-videre {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1px solid #5fcf92;
+    border-radius: 10px;
+    background-color: var(--groen-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    animation: bank-groen 1.7s ease-out infinite;
+}
+
+.kt-videre:hover { background-color: var(--groen); }
+.kt-videre:active { transform: scale(0.97); }
+
+/* Svaret er vist med den gule knap: gult i stedet for groent */
+.scenekort.loest.svar { border-color: var(--gul); background-color: #23201a; }
+.scenekort.loest.svar .kt-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest.svar .kt-tekst { color: #f7ecd0; }
+.scenekort.loest.svar .kt-svaret { color: #ffdf6b; }
+
+/* Gaettet paa fane 1, naar det er valgt: groent eller roedt, naar karret har vist svaret */
+.kt-gaet { margin: 4px 0 0; font-size: 0.95rem; line-height: 1.35; color: #c8ced6; }
+.kt-gaet b { color: #ffffff; }
+.kt-slut .kt-gaet { margin: 0 0 3px; }
+.kt-gaet.rigtig, .kt-gaet.rigtig b { color: #7ee0a8; }
+.kt-gaet.forkert, .kt-gaet.forkert b { color: #f0918a; }
+
+/* Regnestykket i opgaven Enhederne (fane 2): enheden er et gult ?, og naar
+   svaret er rigtigt, streges de enheder ud, der gaar ud */
+.kt-regn { margin: 0 0 3px; font-size: 1.3rem; line-height: 1.3; font-weight: 700; color: #ffffff; font-variant-numeric: tabular-nums; }
+.kt-ukendt {
+    display: inline-block;
+    min-width: 1.7em;
+    margin-left: 0.15em;
+    padding: 0 0.3em;
+    border: 2px solid var(--gul);
+    border-radius: 6px;
+    background-color: rgba(242, 197, 61, 0.16);
+    color: var(--gul);
+    text-align: center;
+}
+.kt-enhed { color: #7ee0a8; }
+.scenekort.svar .kt-enhed { color: #ffdf6b; }
+.kt-enheder { margin: 0 0 4px; font-size: 1.05rem; line-height: 1.35; font-weight: 600; color: #cfd6de; }
+.kt-enheder b { color: #7ee0a8; }
+.kt-enheder .streg { position: relative; display: inline-block; color: #9fb3c8; }
+.kt-enheder .streg::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    top: 54%;
+    height: 2px;
+    background-color: var(--roed);
+    transform-origin: left center;
+    animation: kt-streg 0.6s ease-out 0.6s both;
+}
+
+@keyframes kt-streg {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
+/* Svarene side om side. Ingen bogstaver foran: glassene hedder A, B og C. */
+.kt-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.kt-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kt-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.kt-knap {
+    padding: 8px 10px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 9px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.22;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.kt-knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.kt-knap:active:not(:disabled) { background-color: rgba(242, 197, 61, 0.42); }
+.kt-knap:disabled { cursor: default; }
+.kt-knap:disabled:not(.rigtig):not(.forkert) { opacity: 0.45; }
+.kt-knap.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.28); }
+.kt-knap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.16); opacity: 0.6; text-decoration: line-through; text-decoration-color: rgba(224, 84, 70, 0.8); }
+
+/* Kortets nederste raekke: linjen (hint, fejl, naeste skridt, svaret paa et
+   klik i scenen) og den gule knap */
+.kt-bund {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.kt-bund.tom { margin-top: 6px; padding-top: 0; border-top: 0; }
+
+.kt-besked { flex: 1; min-width: 0; margin: 0; font-size: 0.98rem; line-height: 1.38; color: #cfd6de; }
+
+.kt-bund .knap {
+    flex: 0 0 auto;
+    margin-left: auto;
+    justify-content: center;
+    min-width: 150px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* Maerket forrest i linjen: Hint, Ikke endnu, Svaret */
+.b-maerke {
+    display: inline-block;
+    margin-right: 7px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #dfe4ea;
+    vertical-align: 1px;
+}
+
+.kt-bund.skidt { border-top-color: var(--roed); }
+.kt-bund.skidt .kt-besked { color: #ffb3aa; }
+.kt-bund.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.3); color: #ffd7d2; }
+.kt-bund.god .kt-besked { color: #b8f0cf; }
+.kt-bund.gul { border-top-color: rgba(242, 197, 61, 0.7); }
+.kt-bund.gul .kt-besked { color: #f7e4ab; }
+.kt-bund.gul .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
+.kt-bund.peger .kt-besked { color: #cfe6fa; }
+
+@keyframes kt-ryst {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+}
+
+.kt-bund.ryster { animation: kt-ryst 0.4s ease-in-out 1; }
+
+/* Gaettet: stoerre, og det eneste fyldte gule paa skaermen. Scenen er
+   daempet imens, og hintknappen er kun et lille omrids (.stille). */
+.scenekort.gaet {
+    top: 16px;
+    width: min(660px, calc(100% - 36px));
+    max-height: calc(100% - 28px);
+    overflow-y: auto;
+    padding: 14px 18px 16px;
+    border: 3px solid var(--gul);
+    border-radius: 14px;
+    background-color: #25211a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    animation: gk-puls 2.2s ease-in-out infinite;
+}
+
+.gk-maerke {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background-color: var(--gul);
+    color: #33290a;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.gk-intro { margin: 10px 0 0; font-size: 1rem; line-height: 1.4; color: #d9d2bf; }
+.gk-tekst { margin: 6px 0 12px; font-size: 1.4rem; line-height: 1.25; font-weight: 700; color: #ffffff; }
+
+.gk-svar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+
+.gk-knap {
+    padding: 12px 10px 13px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 10px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gk-knap:hover { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.gk-knap:active { background-color: rgba(242, 197, 61, 0.42); }
+
+.scenekort.gaet .kt-bund { margin-top: 10px; padding-top: 0; border-top: 0; }
+.scenekort.gaet .kt-bund .knap { min-width: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: 600; }
+
+@keyframes gk-puls {
+    0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 0 rgba(242, 197, 61, 0); }
+    50%      { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 9px rgba(242, 197, 61, 0.24); }
+}
+
+@keyframes gk-blink {
+    0%, 33%, 66%   { background-color: #6b5510; box-shadow: 0 0 0 16px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { background-color: #25211a; box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.scenekort.gaet.blink { animation: gk-blink 1s ease-in-out 1, gk-puls 2.2s ease-in-out 1s infinite; }
+
+/* Hintknappen, mens der gaettes: kun et omrids, saa gaettekortet er det eneste fyldte gule */
+.knap.hjaelp.stille {
+    border-color: rgba(242, 197, 61, 0.7);
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #f7e4ab;
+}
+
+.knap.hjaelp.stille:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
+
+/* Lave skaerme (rammen i menuen paa en baerbar): kortet fylder mindre */
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .scenekort.spm { padding: 6px 11px 7px; }
+    .kt-intro { font-size: 0.92rem; line-height: 1.3; margin-bottom: 2px; }
+    .kt-tekst { font-size: 1.02rem; line-height: 1.3; }
+    .kt-chip { font-size: 0.72rem; padding: 2px 9px; }
+    .kt-slut { gap: 10px; }
+    .kt-slut .kt-tekst { font-size: 0.95rem; line-height: 1.3; }
+    .kt-videre { padding: 9px 14px; font-size: 0.95rem; }
+    .kt-gaet { font-size: 0.9rem; margin-top: 3px; }
+    .kt-regn { font-size: 1.15rem; }
+    .kt-enheder { font-size: 0.98rem; margin-bottom: 3px; }
+    .kt-svar { gap: 6px; margin-top: 6px; }
+    .kt-knap { padding: 6px 9px; font-size: 0.93rem; line-height: 1.2; }
+    .kt-bund { margin-top: 6px; padding-top: 5px; gap: 10px; }
+    .kt-besked { font-size: 0.9rem; line-height: 1.3; }
+    .kt-bund .knap { min-width: 138px; padding: 6px 13px; font-size: 0.9rem; }
+    .scenekort.gaet { top: 10px; padding: 10px 14px 12px; }
+    .scenekort.gaet .kt-bund { margin-top: 7px; }
+    .gk-maerke { font-size: 0.82rem; padding: 3px 12px; }
+    .gk-intro { margin-top: 7px; font-size: 0.93rem; line-height: 1.32; }
+    .gk-tekst { margin: 4px 0 9px; font-size: 1.2rem; }
+    .gk-knap { padding: 8px 8px 9px; font-size: 0.93rem; line-height: 1.25; }
+}
+
+/* Smalle skaerme: fire svar staar to og to, og knappen videre under forklaringen */
+@media (max-width: 700px) {
+    .kt-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kt-slut { flex-wrap: wrap; }
+    .kt-slut-t { flex-basis: 100%; }
+}
+
+/* Start forfra lyser op, naar hverken stof, vand eller hanen kan redde karret */
+
+/* ---------------------------------------------------------------------
+   Papirkortet (brugerens valg 3. nov. 2026). Udseendet ligger i
+   ../faelles/papirkort.css; elementerne paa kortet har ogsaa de faelles
+   klasser (js/fane.js). Her er kun det, der er saerligt for kortet her:
+   gaettet under opgaven, regnestykket i opgaven Enhederne og den gule
+   forklaring, naar karret har vist svaret. Det, der var lyst paa det
+   moerke kort, bliver moerkt paa papiret.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .scenekort .kt-intro { margin: 0; font-size: inherit; line-height: inherit; color: inherit; }
+html body.papirkort.papirkort .scenekort .kt-gaet { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .kt-gaet b { color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .kt-gaet.rigtig,
+html body.papirkort.papirkort .scenekort .kt-gaet.rigtig b { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .kt-gaet.forkert,
+html body.papirkort.papirkort .scenekort .kt-gaet.forkert b { color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .kt-slut-t .kt-gaet { margin: 0 0 5px; }
+html body.papirkort.papirkort .scenekort .kt-regn { line-height: 1.22; color: var(--pk-tekst); font-weight: 600; }
+html body.papirkort.papirkort .scenekort .kt-ukendt { border-color: var(--pk-gul); background-color: var(--pk-gul-lys); color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .kt-enhed { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort.svar .kt-enhed { color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .kt-enheder { margin-bottom: 2px; line-height: 1.3; color: var(--pk-tekst-svag); font-weight: 500; }
+html body.papirkort.papirkort .scenekort .kt-enheder b { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .kt-enheder .streg { color: var(--pk-tekst-svag); }
+/* Et forkert svar er roedt som paa de andre papirkort, ikke streget over */
+html body.papirkort.papirkort .scenekort .kt-knap.forkert { text-decoration: none; }
+/* Karret har vist svaret: forklaringen staar i en gul boks */
+html body.papirkort.papirkort .scenekort.loest.svar .sk-slut-tekst > .sk-tekst {
+    border-left-color: #d4a72c;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+}
+
+/* Lave skaerme: forklaringen paa fane 1 skal kunne vaere i karrets plads
+   (ZONE i js/sim_kar.js). Reglerne har en klasse mere end de faelles, for
+   papirkort.css indlaeses efter denne fil. */
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .kt-regn { font-size: 1.08rem; }
+    html body.papirkort.papirkort .scenekort.loest .sk-slut-tekst > .kt-tekst.sk-tekst { padding: 4px 9px; font-size: 0.88rem; line-height: 1.3; }
+    html body.papirkort.papirkort .scenekort.loest .kt-slut-t .kt-gaet { margin-bottom: 3px; font-size: 0.86rem; }
+}

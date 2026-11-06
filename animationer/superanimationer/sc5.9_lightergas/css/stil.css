@@ -818,3 +818,61 @@ select:focus-visible {
 .alkanrad .knap.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.22); opacity: 1; }
 .alkanrad .knap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.16); }
 .alkanrad .knap:disabled:not(.rigtig) { opacity: 0.4; }
+
+/* =====================================================================
+   PAPIRKORTET (6. nov. 2026)
+   Opgaven, gaettet, svarene, linjen og knapperne staar paa ét kort
+   oeverst midt i scenen (js/fane.js). Udseendet kommer fra
+   ../faelles/papirkort.css; her staar kun pladsen og opstillingen.
+   Hoejden maa ikke overstige kortZone() i js/fane.js; selvtesten maaler det.
+   ===================================================================== */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(820px, calc(100% - 24px));
+}
+
+.scenekort .sk-tekst { margin: 0; }
+
+.scenekort .sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scenekort .sk-svar.n5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+.scenekort .sk-knap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+.scenekort .sk-knap:disabled { cursor: default; }
+.scenekort .sk-svar.n5 { gap: 6px; }
+.scenekort .sk-svar.n5 .sk-knap { gap: 5px; padding: 5px 4px; white-space: nowrap; }
+.scenekort .sk-knap .sk-navn { font-size: 0.8rem; font-weight: 400; color: var(--pk-tekst-svag, #3a4150); }
+
+.scenekort .v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.scenekort .sk-bund { display: flex; align-items: center; }
+.scenekort .sk-bund .st-tekst { flex: 1; margin: 0; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.scenekort .sk-videre { font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+/* Start forfra og Koer igen staar i panelet under listen */
+.knap.forfra { width: 100%; margin-top: 9px; }

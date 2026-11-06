@@ -3,8 +3,8 @@
 
    Tre glas med de tre isomerer af C5H12 staar i et lavt vandbad, hvert
    med sin ballon og sit store zoomvindue over sig. Eleven gaetter
-   foerst, hvilken ballon der fyldes foerst (i panelet eller ved at klikke
-   paa et glas), og varmer saa vandbadet op med termometeret. Ballonerne
+   foerst, hvilken ballon der fyldes foerst (paa papirkortet eller ved at
+   klikke paa et glas), og varmer saa vandbadet op med termometeret. Ballonerne
    fyldes én efter én: 2,2-dimethylpropan ved 9,5 °C, 2-methylbutan ved
    27,9 °C og pentan ved 36,1 °C.
 
@@ -64,7 +64,10 @@
         this.raekke = [];
         this.trin = "gaet";
         this.gaettet = null;
+        this.valgt = null;
         this.hvorforForkert = [];
+        this.hvorforValgt = null;
+        this.svarVist = false;
         this.hjaelp = 0;
         this.ventHvorfor = 0;
     };
@@ -126,13 +129,22 @@
     };
 
     /* ----- Forloebet ------------------------------------------------------------------ */
+    /* Et svar paa kortet eller et klik paa et glas vaelger kun gaettet */
+    P.vaelg = function (i) {
+        if (this.trin !== "gaet") return;
+        this.valgt = i;
+        this.visTrin();
+    };
+
+    /* Indsend svar: gaettet er sendt, og vandbadet kan varmes op */
     P.gaet = function (i) {
         if (this.trin !== "gaet") return;
         this.gaettet = i;
+        this.valgt = i;
         this.trin = "varm";
         this.hjaelp = 0;
         if (this.afvisTilbud) this.afvisTilbud();
-        this.besked("Dit gæt: <b>" + NK.html(D.ISOMERER[i].navn) + "</b>. Varm vandbadet op med termometeret.", "");
+        this.besked("Dit gæt: <b>" + NK.html(D.ISOMERER[i].navn) + "</b>. Varm nu vandbadet op med termometeret.", "");
         this.visTrin();
     };
 
@@ -156,7 +168,7 @@
         var foer = this.raekke.length;
         this.raekke = this.raekke.concat(nye);
         if (this.trin === "gaet") {
-            /* Varmet op uden at gaette: saa gaar vi videre uden gaet */
+            /* Kan kun ske, hvis vandbadet var varmt i forvejen */
             this.trin = "varm";
             this.hjaelp = 0;
         }
@@ -164,7 +176,7 @@
             var i = this.raekke[0], st = D.ISOMERER[i];
             var tekst = st.Navn + " koger først, ved " + D.gradTekst(st.kp) + ".";
             if (this.gaettet === null) this.besked(NK.html(tekst), "");
-            else if (this.gaettet === i) this.besked("Rigtigt gættet. " + NK.html(tekst), "god");
+            else if (this.gaettet === i) this.besked("Dit gæt var rigtigt. " + NK.html(tekst), "god");
             else this.besked("Du gættede " + NK.html(D.ISOMERER[this.gaettet].navn) + ". " + NK.html(tekst), "skidt");
         }
         if (this.raekke.length === 3) this.ventHvorfor = 1.4;
@@ -172,13 +184,17 @@
         this.visTrin();
     };
 
-    P.svarHvorfor = function (k) {
+    /* Indsend svar paa spoergsmaalet hvorfor */
+    P.svarHvorfor = function (k, vist) {
         if (this.trin !== "hvorfor") return;
         var v = D.HVORFOR.valg[k];
+        this.hvorforValgt = k;
         if (v.rigtig) {
             this.trin = "faerdig";
             this.hjaelp = 0;
-            this.besked("<b>Rigtigt.</b> " + NK.html(v.svar), "god");
+            this.svarVist = !!vist;
+            this.forklaring = v.svar;
+            this.besked("", "");
             NK.gem(NOEGLE, { loest: true });
             if (!this.rost) {
                 this.rost = true;
@@ -186,7 +202,8 @@
             }
         } else {
             if (this.hvorforForkert.indexOf(k) < 0) this.hvorforForkert.push(k);
-            this.besked(NK.html(v.svar), "skidt");
+            this.hvorforValgt = null;
+            this.skort.fejl(NK.html(v.svar));
         }
         this.visTrin();
     };
@@ -201,7 +218,7 @@
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             var hint = this.trin === "gaet" ? D.FORM_HINT : (this.trin === "varm" ? D.FORM_VARM_HINT : D.HVORFOR.hint);
-            this.besked("<b>Hint:</b> " + NK.html(hint), "gul");
+            this.skort.hintTekst(NK.html(hint), 1, 1);
             this.visTrin();
             return;
         }
@@ -214,10 +231,22 @@
             this.termo.roert = true;
             this.termo.animerTil(45, 8);
         } else if (this.trin === "hvorfor") {
-            this.svarHvorfor(0);
+            this.svarHvorfor(0, true);
         }
         this.visTrin();
     };
+
+    /* Papirkortets knapper (js/skort.js) */
+    P.kortValg = function (j) {
+        if (this.trin === "gaet") this.vaelg(j);
+        else if (this.trin === "hvorfor" && this.hvorforForkert.indexOf(j) < 0) { this.hvorforValgt = j; this.visTrin(); }
+    };
+    P.kortIndsend = function () {
+        if (this.trin === "gaet" && this.valgt !== null) this.gaet(this.valgt);
+        else if (this.trin === "hvorfor" && this.hvorforValgt !== null) this.svarHvorfor(this.hvorforValgt);
+    };
+    P.kortHint = function () { if (this.trin !== "faerdig") this.knap(); };
+    P.kortVidere = function () { if (this.trin === "faerdig") this.knap(); };
 
     P.nulstil = function () {
         this.nytForsoeg();
@@ -228,6 +257,7 @@
 
     P.enter = function () {
         if (this.trin === "faerdig") this.knap();
+        else this.kortIndsend();
     };
 
     P.fokus = function () {};
@@ -241,62 +271,55 @@
         return this.termo.tast(tast, e && e.shiftKey);
     };
 
-    /* ----- Panelet ---------------------------------------------------------------------- */
+    /* ----- Panelet og kortet ------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("form-knap"),
-            besked: NK.el("form-besked"),
-            kort: NK.el("form-kort"),
-            valg: NK.el("form-valg")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.skort = new NK.Skort("form", this, D.ZONE.form);
+        this.el = { besked: NK.el("form-besked") };
         NK.el("form-beroering").addEventListener("click", function () { mig.visBeroering(); });
-        this.el.valg.addEventListener("click", function (e) {
-            var b = e.target.closest ? e.target.closest("button") : null;
-            if (!b || b.disabled) return;
-            var n = parseInt(b.getAttribute("data-nr"), 10);
-            if (mig.trin === "gaet") mig.gaet(n);
-            else if (mig.trin === "hvorfor") mig.svarHvorfor(n);
-        });
+        NK.el("form-forfra").addEventListener("click", function () { mig.nulstil(); });
         this.visTabel();
     };
 
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        if (this.skort) this.skort.besked(html, klasse);
+    };
+
+    /* Kortet oeverst i scenen */
+    P.kortData = function () {
+        var mig = this, t = this.trin;
+        var d = { chip: { gaet: "Gæt", varm: "Varm op", hvorfor: "Spørgsmål", faerdig: "Spørgsmål" }[t] };
+        if (t === "gaet") {
+            d.tekst = "Tre glas med C₅H₁₂ står i vandbadet. " + D.FORM_SPM;
+            d.svar = D.ISOMERER.map(function (st, i) {
+                return { t: st.navn, prik: FARVER[i], kl: mig.valgt === i ? "valgt" : "" };
+            });
+        } else if (t === "varm") {
+            d.tekst = this.raekke.length ? "Varm videre, til alle tre stoffer har kogt." :
+                "Varm vandbadet op ved at trække i termometeret.";
+        } else {
+            d.tekst = D.HVORFOR.spm;
+            d.svar = D.HVORFOR.valg.map(function (v, k) {
+                var kl = "";
+                if (t === "faerdig") kl = v.rigtig ? (mig.svarVist ? "svar-vist" : "rigtig") : "dim";
+                else if (mig.hvorforForkert.indexOf(k) >= 0) kl = "forkert";
+                else if (mig.hvorforValgt === k) kl = "valgt";
+                return { t: v.t, kl: kl, laast: t === "faerdig" || mig.hvorforForkert.indexOf(k) >= 0 };
+            });
+            d.bogstaver = true;
+        }
+        if (t === "faerdig") {
+            d.bliv = { html: NK.html(this.forklaring || ""), maerke: this.svarVist ? "Svaret" : "Rigtigt",
+                       knap: "Videre til Hvem koger først? →", gul: this.svarVist };
+            return d;
+        }
+        d.hint = this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
+        if (t !== "varm") d.indsend = { tekst: "Indsend svar", klar: t === "gaet" ? this.valgt !== null : this.hvorforValgt !== null };
+        return d;
     };
 
     P.visTrin = function () {
-        var mig = this, html = "";
-        var titler = { gaet: "Gæt", varm: "Varm op", hvorfor: "Hvorfor?", faerdig: "Formen" };
-        NK.saetTekst("form-titel", titler[this.trin]);
-        NK.saetTekst("form-trin", "trin " + (["gaet", "varm", "hvorfor", "faerdig"].indexOf(this.trin) + 1) + "/4");
-        if (this.trin === "gaet") {
-            NK.saetTekst("form-spm", D.FORM_SPM);
-            html = D.ISOMERER.map(function (st, i) {
-                return '<button class="valglinje" type="button" data-nr="' + i + '"><span class="prik" style="background:' + FARVER[i] + '"></span>' +
-                    '<span class="vl-navn">' + NK.html(st.navn) + "</span></button>";
-            }).join("");
-        } else if (this.trin === "varm") {
-            NK.saetTekst("form-spm", this.raekke.length ? "Varm videre, til alle tre har kogt." : "Varm vandbadet op. Træk i termometeret.");
-        } else if (this.trin === "hvorfor") {
-            NK.saetTekst("form-spm", D.HVORFOR.spm);
-            html = D.HVORFOR.valg.map(function (v, k) {
-                var forkert = mig.hvorforForkert.indexOf(k) >= 0;
-                return '<button class="valglinje' + (forkert ? " forkert" : "") + '" type="button" data-nr="' + k + '"' + (forkert ? " disabled" : "") + ">" +
-                    '<span class="vl-navn">' + NK.html(v.t) + "</span></button>";
-            }).join("");
-        } else {
-            NK.saetTekst("form-spm", "Samme atomer, forskellig form. Den mest kugleformede koger først.");
-        }
-        NK.saetHTML("form-valg", html);
-        var tekst, klasse = "knap";
-        if (this.trin === "faerdig") { tekst = "Videre til Hvem koger først? →"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.trin === "faerdig");
+        if (this.skort) this.skort.vis();
     };
 
     P.visTabel = function () {
@@ -308,20 +331,6 @@
                 '<span class="hl-tal">' + (nr >= 0 ? D.gradTekst(st.kp) : "?") + "</span></div>";
         }).join("");
         NK.saetHTML("form-tabel", html);
-    };
-
-    P.visStatus = function () {
-        var t, tr = this.traek;
-        if (tr && tr.slags === "termo") t = "Vandbadet er " + D.gradTekst(this.termo.T, 0) + ".";
-        else if (this.trin === "gaet") t = "Hvilken ballon fyldes først? Klik på et glas, eller svar i panelet.";
-        else if (this.trin === "varm") {
-            var koger = [];
-            this.proever.forEach(function (p, i) { if (p.makro().koger > 0) koger.push(D.ISOMERER[i].navn); });
-            t = "Vandbadet er " + D.gradTekst(this.termo.T, 0) + ". " +
-                (koger.length ? NK.html(koger.join(" og ")) + " koger." : "Træk i termometeret.");
-        } else if (this.trin === "hvorfor") t = "Svar i panelet. Se på, hvor tæt molekylerne ligger i vinduerne.";
-        else t = "Køl vandbadet ned og varm op igen, hvis du vil se det en gang til.";
-        NK.saetHTML("form-status", t);
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------ */
@@ -348,7 +357,7 @@
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
-        this.visStatus();
+        this.skort.opdater(dt);
     };
 
     P.tegn = function () {
@@ -448,6 +457,8 @@
             var u = mig.hvadErUnder(pt);
             if (!u) return;
             if (u.slags === "termo") {
+                /* Under gaettet og spoergsmaalet er forsoeget laast */
+                if (mig.trin === "gaet" || mig.trin === "hvorfor") { mig.skort.blink(); return; }
                 if (mig.termo.start(pt, mig.lay.termo)) {
                     mig.traek = { slags: "termo" };
                     try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
@@ -457,12 +468,12 @@
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "kop") { if (mig.klikKop) mig.klikKop(); return; }
             var st = D.ISOMERER[u.i];
-            if (mig.trin === "gaet") { mig.gaet(u.i); return; }
+            if (mig.trin === "gaet") { mig.vaelg(u.i); return; }
             if (u.slags === "zoom") {
-                mig.besked(NK.html(st.Navn) + ", C₅H₁₂. Hver kugle er et C-atom med dets H-atomer. Gule prikker: her rører molekylerne hinanden.", "");
+                mig.skort.kort(NK.html(st.Navn) + ", C₅H₁₂. Hver kugle er et C-atom med dets H-atomer. De gule prikker viser, hvor molekylerne rører hinanden.", 6);
             } else {
                 var nr = mig.raekke.indexOf(u.i);
-                mig.besked(NK.html(st.Navn) + ", C₅H₁₂. " + (nr >= 0 ? "Koger ved " + D.gradTekst(st.kp) + "." : "Har ikke kogt endnu."), "");
+                mig.skort.kort(NK.html(st.Navn) + ", C₅H₁₂. " + (nr >= 0 ? NK.html(st.Navn) + " koger ved " + D.gradTekst(st.kp) + "." : NK.html(st.Navn) + " har ikke kogt endnu."), 5);
             }
         });
         c.addEventListener("pointermove", function (e) {

@@ -87,12 +87,17 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        /* Alt tegnes under papirkortet oeverst i scenen (js/skort.js) */
-        var luft = this.skort.top();
-
-        /* Reolen oeverst i venstre kolonne: fire glas pr. raekke, formlen under */
+        /* Alt tegnes under papirkortet oeverst i scenen (js/skort.js). Paa en
+           lav scene er der ikke plads til baade kortet og reolen over
+           kammeret: saa staar kortet til hoejre for reolen, og reolen
+           begynder helt oppe. */
         var vB = Math.round(NK.klamp(W * 0.27, 170, 320));
         var x0 = kant, x1 = kant + vB;
+        var smal = H < 560;
+        this.skort.saetPlads(smal ? { venstre: x1 + 12, bredde: W - x1 - 24 } : null);
+        var kortTop = this.skort.top();
+        var luft = smal ? NK.klamp(H * 0.085, 40, 64) : kortTop;
+        lay.smal = smal;
         var plads = (vB - 8) / 4;
         var gh = Math.round(NK.klamp(Math.min(plads * 1.15, H * 0.075), 28, 70));
         var skilt = NK.klamp(gh * 0.22, 10.5, 13);
@@ -125,11 +130,11 @@
         lay.kop = { x: kant + 22, y: lay.bordY };
 
         /* Termometeret hoejt til hoejre */
-        lay.termo = Tg.termoMaal(W - kant - 58, lay.bordY - 2, lay.bordY - 2 - (luft + 10), D.T_VARM);
+        lay.termo = Tg.termoMaal(W - kant - 58, lay.bordY - 2, lay.bordY - 2 - (kortTop + 10), D.T_VARM);
 
         /* Zoomvinduet i midten, mellem udstyret og termometeret */
         var zx0 = x1 + 18, zx1 = lay.termo.x - 60;
-        var zTop = luft + 24, zBund = lay.bordY - 14;
+        var zTop = kortTop + 24, zBund = lay.bordY - 14;
         var zb = Math.max(120, zx1 - zx0), zh = zb * KASSE.H / KASSE.W;
         if (zh > zBund - zTop) { zh = zBund - zTop; zb = zh * KASSE.W / KASSE.H; }
         lay.zoom = { x: Math.round(zx0 + (zx1 - zx0 - zb) / 2), y: Math.round(zTop + (zBund - zTop - zh) / 2), b: Math.round(zb), h: Math.round(zh) };

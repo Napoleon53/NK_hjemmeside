@@ -4,7 +4,10 @@
    Bordet er en sandkasse: laeg ioner paa, og se lynlaasen lukke, naar
    ladningerne gaar op. Formlen og navnet staar under bordet.
 
-   Opgavekortet har én knap (se opgave.js). To slags opgaver skiftes:
+   Opgaven staar paa papirkortet oeverst i scenen under hylden med de
+   positive ioner (6. nov. 2026). Bordet bedoemmes foerst, naar eleven
+   trykker Indsend svar, og svarknapperne vaelger kun. Opgaveknappen er
+   hintknappen (se opgave.js). To slags opgaver skiftes:
      navn   -> byg stoffet, og vaelg den rigtige formel
      formel -> laeg ionerne, og vaelg det rigtige navn
    Opgaverne bruger det samme bord. Det er den samme handling, der
@@ -31,9 +34,14 @@
         var mig = this;
         this.bord = new NK.Bord(NK.el("bord-scene"), {
             visFormel: true,
-            lyt: function (hvad) { if (hvad === "aendret") mig.aendret(); }
+            kortZone: function () { return NK.kortZone("bord-skort", [214, 204]); },
+            lyt: function (hvad) {
+                if (hvad === "aendret") mig.aendret();
+                else if (hvad === "laast" && mig.opgave && mig.fase === "valg") NK.kortBlink("bord-skort");
+            }
         });
         this.svar = new NK.Svarknapper(NK.el("opgave-valg"), function (v, rigtig) { mig.svaret(v, rigtig); });
+        this.svar.vedValg = function () { mig.visIndsend(); };
         this.vaelgere = {
             navn: new NK.Opgavevaelger(D.NAVN_OPGAVER, 6),
             formel: new NK.Opgavevaelger(D.FORMEL_OPGAVER, 8)
@@ -58,6 +66,7 @@
         });
         NK.el("bord-opgaveknap").addEventListener("click", function () { mig.opgaveKnap(); });
         NK.el("bord-afslut").addEventListener("click", function () { mig.visFrit(); });
+        NK.el("bord-indsend").addEventListener("click", function () { mig.indsendKlik(); });
 
         /* Kemichael (laerer.js): han tegnes paa bordets laerred, og et klik
            paa ham under praesentationen viser knappen Naeste. */
@@ -84,7 +93,8 @@
         this.fase = null;
         this.svar.ryd();
         NK.el("byg-knapper").hidden = false;
-        NK.el("bord-opgavetekst").hidden = false;
+        NK.saetTekst("bord-chip", "Opgaver");
+        NK.saetHTML("bord-opgavetekst", "Byg frit med ionerne på hylderne. Når du er klar, får du en opgave ad gangen.");
         NK.el("bord-prompt").hidden = true;
         NK.el("bord-trin").hidden = true;
         NK.el("bord-afslut").hidden = true;
@@ -94,6 +104,7 @@
         this.bord.laas(false);
         this.bord.visFormel = true;
         this.opdaterKnapper();
+        this.visIndsend();
     };
 
     /* Bordet er aendret. Kemichael melder sig ogsaa ("laerer"); det er
@@ -101,7 +112,44 @@
     NK.SimBord.prototype.aendret = function (hvad) {
         if (hvad === "laerer") return;
         this.opdaterKnapper();
-        if (this.opgave) this.tjek();
+        /* Bordet bedoemmer ikke af sig selv: det goer Indsend svar */
+        if (this.opgave && this.fase === "byg") {
+            this.roert = true;
+            if (/skidt/.test(NK.el("bord-besked").className)) this.besked("");
+            this.visIndsend();
+        }
+    };
+
+    /* ----- Indsend svar ------------------------------------------------------ */
+    NK.SimBord.prototype.visIndsend = function () {
+        var aktiv = !!this.opgave && (this.fase === "byg" || this.fase === "valg");
+        var klar = this.fase === "byg" ? !!this.roert : this.svar.harValgt();
+        NK.visIndsend("bord-indsend", aktiv, aktiv && klar);
+    };
+
+    NK.SimBord.prototype.indsendKlik = function () {
+        if (!this.opgave || this.fase === "faerdig") { NK.kortBlink("bord-skort"); return; }
+        if (this.fase === "valg") {
+            if (!this.svar.sendInd()) {
+                NK.kortBlink("bord-skort");
+                this.besked("Vælg et af svarene på kortet først.");
+            }
+            return;
+        }
+        if (!this.roert) {
+            NK.kortBlink("bord-skort");
+            this.besked("Læg ionerne på bordet med hylderne først.");
+            return;
+        }
+        this.roert = false;
+        this.tjek();
+        var b = this.bord;
+        if (this.fase === "byg" && !NK.el("bord-besked").innerHTML) {
+            if (!(b.kat && b.an)) this.besked("<b>Ikke endnu.</b> Der skal både en positiv og en negativ ion på bordet.", "skidt");
+            else if (!b.neutral()) this.besked("<b>Ikke endnu.</b> Lynlåsen er ikke lukket. Plus og minus skal gå lige op.", "skidt");
+            else this.besked("<b>Ikke endnu.</b> Ionerne passer ikke.", "skidt");
+        }
+        this.visIndsend();
     };
 
     NK.SimBord.prototype.opdaterKnapper = function () {
@@ -135,12 +183,15 @@
         this.fase = "byg";
         this.vist = false;
         this.svar.ryd();
+        this.roert = false;
         NK.el("byg-knapper").hidden = true;
-        NK.el("bord-opgavetekst").hidden = true;
-        NK.el("bord-prompt").hidden = false;
+        NK.saetTekst("bord-chip", "Opgave " + this.nr);
+        NK.saetHTML("bord-opgavetekst", retning === "navn"
+            ? "Byg <b>" + salt.navn + "</b> på bordet med ionerne fra hylderne, så ladningen går op. Tryk så Indsend svar."
+            : "Læg ionerne i <b>" + salt.formel + "</b> på bordet med hylderne. Tryk så Indsend svar.");
+        NK.el("bord-prompt").hidden = true;
         NK.el("bord-trin").hidden = false;
         NK.el("bord-afslut").hidden = false;
-        NK.saetTekst("bord-prompt", retning === "navn" ? salt.navn : salt.formel);
         NK.saetTekst("opgave-t1", r.trin[0]);
         NK.saetTekst("opgave-t2", r.trin[1]);
         NK.saetTekst("opgave-t3", r.trin[2] || "");
@@ -151,10 +202,14 @@
         this.bord.laas(false);
         /* Formlen under bordet ville roebe svaret, mens opgaven er i gang. */
         this.bord.visFormel = false;
-        this.bord.ryd();                   /* kalder aendret() -> tjek() */
+        this.bord.ryd();
+        this.roert = false;
+        this.visIndsend();
     };
 
+    /* Kortet viser én besked ad gangen: en ny besked afloeser hintet */
     NK.SimBord.prototype.besked = function (html, klasse) {
+        if (html) NK.saetHTML("bord-hint", "");
         NK.saetHTML("bord-besked", html || "");
         NK.saetKlasse("bord-besked", "besked" + (klasse ? " " + klasse : ""));
     };
@@ -176,14 +231,14 @@
             t1 = "fejl";
             var maal = forkert.q > 0 ? o.kat : o.an;
             /* Uden navne paa hylden maa beskeden heller ikke roebe dem. */
-            if (!b.navne) this.besked("<b>" + D.ionTekst(forkert) + "</b> er ikke den rigtige ion her.", "skidt");
-            else this.besked("<b>" + D.ionTekst(forkert) + "</b> hedder " + D.ionNavn(forkert)
+            if (!b.navne) this.besked("<b>Ikke endnu.</b> " + D.ionTekst(forkert) + " er ikke den rigtige ion her.", "skidt");
+            else this.besked("<b>Ikke endnu.</b> " + D.ionTekst(forkert) + " hedder " + D.ionNavn(forkert)
                 + ". Du skal bruge " + D.ionNavn(maal) + ".", "skidt");
         } else if (b.kat && b.an) {
             t1 = "ok";
             t2 = "aktiv";
             if (b.neutral() && b.forkortet()) { this.tilValg(); return; }
-            if (b.neutral()) this.besked("Lynlåsen er lukket, men der ligger flere ens enheder. Fjern nogle ioner.");
+            if (b.neutral()) this.besked("<b>Ikke endnu.</b> Lynlåsen er lukket, men der ligger flere ens enheder. Fjern nogle ioner.", "skidt");
         }
         NK.saetTrin("opgave-t1", t1);
         NK.saetTrin("opgave-t2", t2);
@@ -202,20 +257,20 @@
 
         if (fremmed) {
             t1 = "fejl";
-            this.besked("<b>" + D.ionTekst(fremmed) + "</b> er ikke med i " + o.formel + ".", "skidt");
+            this.besked("<b>Ikke endnu.</b> " + D.ionTekst(fremmed) + " er ikke med i " + o.formel + ".", "skidt");
         } else if (b.kat && b.an) {
             var talPasser = b.nKat === o.p && b.nAn === o.n;
             if (talPasser && b.kat !== o.kat) {
                 /* Rigtigt grundstof og rigtige tal, men forkert ladning. */
                 t1 = "fejl";
                 var former = D.KATIONER.filter(function (k) { return k.formel === o.kat.formel; }).map(D.ionTekst);
-                this.besked("Tallene passer med formlen, men ladningen går ikke op. "
+                this.besked("<b>Ikke endnu.</b> Tallene passer med formlen, men ladningen går ikke op. "
                     + NK.stort(o.kat.grund) + " findes både som " + former.join(" og ") + ".", "skidt");
             } else if (talPasser) {
                 this.tilValg();
                 return;
             } else if (b.neutral()) {
-                this.besked("Lynlåsen er lukket, men tallene passer ikke med <b>" + o.formel + "</b>.");
+                this.besked("<b>Ikke endnu.</b> Lynlåsen er lukket, men tallene passer ikke med " + o.formel + ".", "skidt");
             }
         }
         NK.saetTrin("opgave-t1", t1);
@@ -237,12 +292,18 @@
             NK.saetTrin("opgave-t2", "aktiv");
             this.svar.vis(D.navneValg(o.kat, o.an));
         }
-        NK.el("opgave-valg").className = r.valgKlasse;
-        this.besked("Ionerne passer, og ladningen går op.", "god");
+        NK.el("opgave-valg").className = r.valgKlasse + " sk-svar";
+        NK.saetHTML("bord-opgavetekst", this.retning === "navn"
+            ? "Ionerne passer, og ladningen går op. Hvilken formel har <b>" + o.navn + "</b>?"
+            : "Ionerne passer, og ladningen går op. Hvad hedder <b>" + o.formel + "</b>?");
+        NK.saetHTML("bord-hint", "");
+        this.besked("");
+        if (this.knaptrin === "svar") this.saetKnap("hint");
+        this.visIndsend();
     };
 
     NK.SimBord.prototype.svaret = function (v, rigtig) {
-        this.besked((rigtig ? "<b>Rigtigt.</b> " : "") + v.forklaring, rigtig ? "god" : "skidt");
+        this.besked((rigtig ? "<b>Rigtigt.</b> " : "<b>Ikke rigtigt.</b> ") + v.forklaring, rigtig ? "god" : "skidt");
         if (rigtig) this.afslut(true);
         else NK.saetTrin(this.retning === "navn" ? "opgave-t3" : "opgave-t2", "fejl");
     };
@@ -275,6 +336,7 @@
 
     NK.SimBord.prototype.visHint = function () {
         if (!this.opgave || this.fase === "faerdig") return;
+        this.besked("");
         NK.saetHTML("bord-hint", "<b>Hint:</b> " + this.hint());
         this.saetKnap("svar");
     };
@@ -285,16 +347,19 @@
         var o = this.opgave;
         if (this.fase === "byg") {
             this.bord.laas(false);
-            this.bord.saet(o.kat, o.p, o.an, o.n);     /* -> tjek() -> tilValg() */
+            this.bord.saet(o.kat, o.p, o.an, o.n);
+            this.tilValg();
         }
         this.svar.visRigtig();
         var r = this.svar.rigtig();
-        this.besked(r ? r.forklaring : "", "gul");
+        NK.saetHTML("bord-hint", "");
+        this.besked(r ? "<b>Svaret.</b> " + r.forklaring : "", "gul");
         this.afslut(false);
     };
 
     NK.SimBord.prototype.afslut = function (loest) {
         this.fase = "faerdig";
+        NK.saetHTML("bord-hint", "");
         this.bord.visFormel = true;      /* nu maa formlen gerne staa under bordet */
         NK.saetTrin("opgave-t1", "ok");
         NK.saetTrin("opgave-t2", "ok");
@@ -304,6 +369,7 @@
             NK.saetTekst("bord-loest", String(this.loeste));
         }
         this.saetKnap("ny");
+        this.visIndsend();
     };
 
     /* ----- Faneskift, tegning og tastatur ----------------------------------- */
@@ -311,10 +377,18 @@
 
     NK.SimBord.prototype.opdater = function (dt) {
         this.tid += dt;
+        /* Papirkortet staar lige under hylden med de positive ioner */
+        var ht = this.bord.hyldeTop;
+        if (ht) {
+            var t = Math.round(ht.offsetTop + ht.offsetHeight + 8) + "px", k = NK.el("bord-skort");
+            if (k.style.top !== t) k.style.top = t;
+        }
         this.bord.opdater(dt);
         if (this.opdaterIntro) this.opdaterIntro(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
-        var note = this.bord.note(), el = NK.el("bord-note");
+        /* Under en opgave staar al tekst paa kortet: noten paa bordet viser
+           kun den korte besked om, at der ikke er plads til flere */
+        var note = this.opgave && !this.bord.besked ? "" : this.bord.note(), el = NK.el("bord-note");
         NK.saetHTML("bord-note", note);
         el.hidden = !note;
         if (note && this.bord.g) el.style.top = Math.round(this.bord.g.y1 - 6) + "px";

@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kemikalielageret</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">🏷</span> Kemikalielageret</h1>
@@ -36,8 +37,11 @@
 <!-- Raekkerne i opgavekortet bygges af sim_lager.js                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-lager" role="tabpanel" aria-label="Lageret">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="lager-laerred"></canvas>
+        <!-- Papirkortet (6. nov. 2026): opgaven, hint, bedoemmelsen og
+             knapperne oeverst i scenen; felterne bliver i panelet -->
+        <div class="scenekort opgave" id="lager-skort" aria-live="polite"></div>
         <div class="anker" id="lager-anker-reol"></div>
         <div class="anker" id="lager-anker-bord"></div>
         <div class="anker" id="lager-anker-plakater"></div>
@@ -45,18 +49,17 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="lager-status"></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste glas -->
+        <!-- Felterne, eleven skriver i. Opgaveteksten, hint og bedoemmelsen
+             staar paa papirkortet i scenen. Knappen her er kun Oev glasset
+             igen paa et loest glas (forfra staar aldrig paa kortet). -->
         <div class="kort opgavekort" id="lager-kort">
             <h2><span id="lager-hylde"></span><span class="taeller">glas <b id="lager-nr">1</b>/10</span></h2>
             <div class="opgave-prompt" id="lager-prompt"></div>
-            <p class="opgave-spm" id="lager-spm"></p>
             <div class="raekker" id="lager-raekker"></div>
-            <p class="besked" id="lager-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="lager-knap" type="button">Giv hint</button></div>
+            <div class="knaprad"><button class="knap" id="lager-knap" type="button" hidden>Øv glasset igen</button></div>
         </div>
 
         <div class="kort" id="lager-fremskridt">
@@ -79,7 +82,8 @@
             <input type="text" id="baand-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
                    aria-label="Skriv den halvdel af etiketten, der mangler">
         </div>
-        <div class="baand-besked tom" id="baand-besked" aria-live="polite"></div>
+        <!-- Papirkortet: opgaven og svaret paa det sidste glas (6. nov. 2026) -->
+        <div class="scenekort opgave" id="baand-skort" aria-live="polite"></div>
         <div class="anker" id="baand-anker-baand"></div>
         <div class="anker" id="baand-anker-plakater"></div>
         <div class="anker" id="baand-anker-kasse"></div>
@@ -174,6 +178,7 @@
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/tjek.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>

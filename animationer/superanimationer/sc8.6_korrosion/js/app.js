@@ -2,8 +2,8 @@
    app.js - binder de tre faner sammen (som sc1.4)
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Der er ingen laerer: hjaelpen staar i
-   statuslinjen nederst i scenen.
+   fane opdateres og tegnes. Der er ingen laerer: hjaelpen staar paa
+   kortet oeverst i scenen (js/fane.js).
    ===================================================================== */
 (function () {
     "use strict";

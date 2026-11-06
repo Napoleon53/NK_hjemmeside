@@ -751,3 +751,78 @@ svg.ikon-tilstand { width: 16px; height: 16px; flex-shrink: 0; }
 
 /* Reaktionsskemaet i teorien */
 svg.formel { display: block; width: 100%; height: auto; margin: 2px 0 10px; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST I SCENEN (brugerens valg 4. nov. 2026: alle aktive
+   animationer har papirkortet; lavet her 6. nov. 2026). Hele opgaven
+   staar paa ét kort oeverst midt i scenen: ordren eller spoergsmaalet,
+   svarene, linjen med naeste skridt, Giv hint og Indsend svar, og efter
+   svaret forklaringen og Naeste (js/kort.js). Udseendet er
+   ../faelles/papirkort.css; her staar kun pladsen og opbygningen.
+   Tegningen begynder under kortets plads (D.ZONE i js/data.js).
+   Statuslinjen nederst i scenen er fjernet.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(820px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border-radius: 12px;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-note { margin: 4px 0 0; font-size: 0.92em; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.sk-knap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+.sk-knap svg.ikon-tilstand { width: 18px; height: 18px; flex: 0 0 auto; }
+
+.sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+
+/* Et forkert gaet: forklaringen i en roed boks */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
+    background-color: var(--pk-roed-lys);
+    border-left-color: var(--pk-roed);
+    color: var(--pk-roed-tekst);
+}
+
+.sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
+
+/* Start forfra paa fane 2 staar i panelet, aldrig paa kortet */
+#koele-forfra { margin-top: 10px; }
+
+/* Tilbuddet om praesentationen staar nederst, saa det ikke daekker kortet */
+.tilbud { top: auto; bottom: 16px; }
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.93rem; }
+}
+
+/* Paa en smal skaerm staar panelet under scenen, og siden kan rulle. Scenen er
+   saa hoejere, saa zoomvinduet har plads under papirkortet. */
+@media (max-width: 860px) {
+    .scene { height: 78vh; min-height: 600px; }
+}

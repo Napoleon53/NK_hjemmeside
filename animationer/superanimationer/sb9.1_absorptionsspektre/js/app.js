@@ -3,7 +3,7 @@
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Der er ingen laerer: hjaelpen staar i
-   statuslinjen nederst i scenen.
+   papirkortet oeverst i scenen.
    ===================================================================== */
 (function () {
     "use strict";

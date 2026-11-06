@@ -19,7 +19,8 @@
         "fane-fabrik": [
             { sel: "#fabrik-anker-fliser", titel: "Fedtsyrerne", tekst: "Fire fedtsyrer med 18 C-atomer. Træk en op på glycerol, eller klik på den." },
             { sel: "#fabrik-anker-glycerol", titel: "Glycerol", tekst: "En alkohol med tre OH-grupper. Hver kan binde én fedtsyre. Der dannes ét vandmolekyle pr. binding." },
-            { sel: "#fabrik-kort", titel: "Ordren", tekst: "Kunden siger, hvor fedtet skal være fast eller flydende. Knappen giver et hint og derefter svaret." },
+            { sel: "#fabrik-skort", titel: "Ordren", tekst: "Kunden siger, hvor fedtet skal være fast eller flydende. Tryk Indsend svar, når der sidder tre fedtsyrer på glycerol." },
+            { sel: "#fabrik-ordrer", titel: "Ordrerne", tekst: "De fem ordrer. Et flueben viser, at ordren er leveret." },
             { sel: "#fabrik-fedt-kort", titel: "Dit fedtstof", tekst: "Smeltepunktet og tilstanden fire steder i køkkenet. Grøn: som kunden vil have det." },
             { sel: "#fabrik-anker-glas", titel: "Glasset", tekst: "Dit fedtstof ved 20 °C. Det følger med over på fane 2." },
             { sel: "#fabrik-forfra", titel: "Start forfra", tekst: "Ordre 1 igen, og glycerol bliver tom." },
@@ -31,8 +32,9 @@
             { sel: "#koele-anker-skab", titel: "Fryser og køleskab", tekst: "Fryseren er −18 °C og køleskabet 5 °C. Der er plads til to glas hvert sted." },
             { sel: "#koele-anker-vindue", titel: "I solen", tekst: "I vindueskarmen er det 35 °C." },
             { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Det valgte glas set helt tæt på. Hver kæde er en fedtsyre i sin farve. Faste molekyler ligger i rækker." },
-            { sel: "#koele-kort", titel: "Opgaven", tekst: "Gæt først: fast, delvist fast eller flydende. Så flytter glasset derhen." },
-            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Fedtsyrerne i det valgte glas: mættede, monoumættede og polyumættede." }
+            { sel: "#koele-skort", titel: "Opgaven", tekst: "Gæt først: fast, delvist fast eller flydende. Tryk Indsend svar, så flytter glasset derhen." },
+            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Fedtsyrerne i det valgte glas: mættede, monoumættede og polyumættede." },
+            { sel: "#koele-forfra", titel: "Start forfra", tekst: "Alle opgaver i køkkenet igen, og glassene kommer tilbage på bordet." }
         ]
     };
 

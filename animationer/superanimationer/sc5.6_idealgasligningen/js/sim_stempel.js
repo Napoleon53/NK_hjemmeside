@@ -10,8 +10,14 @@
 
    Opgaverne er forudsigelser: eleven vaelger foerst, hvad der sker, og
    proever det saa. Modellen afgoer svaret, og et forkert gaet faar en
-   forklaring, ikke en afvisning. Hint og svar staar i linjen i
-   opgavekortet, naar eleven beder om dem med den gule knap.
+   forklaring, ikke en afvisning.
+
+   Papirkortet (6. nov. 2026, js/kort.js): spoergsmaalet, svarene, linjen
+   med naeste skridt, hint og Indsend svar staar paa kortet oeverst i
+   scenen. Et svar vaelger kun; Indsend svar sender det. Foer svaret er
+   sendt, er forsoeget laast i opgaver med et forsoeg (et klik faar
+   kortet til at blinke). Efter svaret bliver kortet paa spoergsmaalet
+   med forklaringen og Naeste. Start opgaven forfra staar i panelet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -72,21 +78,31 @@
        ====================================================================== */
     P.bygPanel = function () {
         var mig = this;
+        this.kort = new NK.SceneKort("stempel", {
+            valg: function (j) { mig.vaelgKortSvar(parseInt(j, 10)); },
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         this.el = {
-            kort: NK.el("stempel-kort"), knap: NK.el("stempel-knap"), besked: NK.el("stempel-besked"),
-            valg: NK.el("stempel-valg"), prikker: NK.el("stempel-prikker"), T: NK.el("stempel-T")
+            kort: NK.el("stempel-skort"), knap: NK.el("stempel-knap"), besked: NK.el("stempel-besked"),
+            indsend: NK.el("stempel-indsend"), prikker: NK.el("stempel-prikker"), T: NK.el("stempel-T")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
         this.el.T.min = S.T_MIN;
         this.el.T.max = S.T_MAKS;
         this.el.T.step = 1;
-        this.el.T.addEventListener("input", function () { mig.saetT(parseFloat(mig.el.T.value), "skyder"); });
-        NK.el("stempel-lod-minus").addEventListener("click", function () { mig.lod(-1, "knap"); });
-        NK.el("stempel-lod-plus").addEventListener("click", function () { mig.lod(1, "knap"); });
-        NK.el("stempel-n-minus").addEventListener("click", function () { mig.gas(-1); });
-        NK.el("stempel-n-plus").addEventListener("click", function () { mig.gas(1); });
-        NK.el("stempel-frit").addEventListener("click", function () { mig.laas(false); });
-        NK.el("stempel-laast").addEventListener("click", function () { mig.laas(true); });
+        /* Foer svaret er sendt, er forsoeget laast: kortet blinker i stedet */
+        function styr(f) {
+            return function () { if (mig.laastNu()) { mig.kort.blink(); mig.visStyr(); return; } f(); };
+        }
+        this.el.T.addEventListener("input", styr(function () { mig.saetT(parseFloat(mig.el.T.value), "skyder"); }));
+        NK.el("stempel-lod-minus").addEventListener("click", styr(function () { mig.lod(-1, "knap"); }));
+        NK.el("stempel-lod-plus").addEventListener("click", styr(function () { mig.lod(1, "knap"); }));
+        NK.el("stempel-n-minus").addEventListener("click", styr(function () { mig.gas(-1); }));
+        NK.el("stempel-n-plus").addEventListener("click", styr(function () { mig.gas(1); }));
+        NK.el("stempel-frit").addEventListener("click", styr(function () { mig.laas(false); }));
+        NK.el("stempel-laast").addEventListener("click", styr(function () { mig.laas(true); }));
+        NK.el("stempel-forfra").addEventListener("click", function () { mig.nulstil(); });
         /* Prikkerne: én pr. opgave */
         this.el.prikker.innerHTML = "";
         this.opgaver.forEach(function (o, i) {
@@ -219,6 +235,8 @@
     P.vaelg = function (i) {
         this.nr = i;
         var o = this.opgaver[i];
+        this.kortT = 0;
+        this.kort.note("");
         this.fase = "valg";
         this.valgt = -1;
         this.hjaelp = 0;
@@ -251,48 +269,54 @@
 
     P.opg = function () { return this.opgaver[this.nr]; };
 
+    /* Er forsoeget laast? Kun i opgaver med et forsoeg, foer svaret er sendt */
+    P.laastNu = function () {
+        var o = this.opg();
+        return this.fase === "valg" && !!(o && o.handling);
+    };
+
+    /* Kortet: spoergsmaalet og svarene (vaelg kun) */
     P.bygValg = function () {
         var mig = this, o = this.opg();
-        var vaert = this.el.valg;
-        vaert.innerHTML = "";
-        o.valg.forEach(function (v, j) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "valgknap";
-            b.textContent = v.t;
-            if (mig.fase !== "valg") {
-                b.disabled = true;
-                if (j === mig.valgt) b.classList.add("valgt");
-                if (mig.fase === "faerdig") {
-                    if (v.ok) b.classList.add("rigtig");
-                    else if (j === mig.valgt) b.classList.add("forkert");
-                }
-            }
-            b.addEventListener("click", function () { mig.vaelgSvar(j, false); });
-            vaert.appendChild(b);
+        var lang = o.valg.some(function (v) { return v.t.length > 24; });
+        var svar = o.valg.map(function (v, j) {
+            var r = {
+                j: j, t: NK.html(v.t), valgt: j === mig.valgt && mig.fase !== "faerdig",
+                rigtig: mig.fase === "faerdig" && j === mig.valgt && !!v.ok,
+                forkert: mig.fase === "faerdig" && j === mig.valgt && !v.ok,
+                svarVist: false, dim: false
+            };
+            if (mig.fase === "faerdig" && v.ok && j !== mig.valgt) r.rigtig = true;
+            if (mig.fase === "faerdig" && v.ok && mig.brugtSvar) { r.rigtig = false; r.svarVist = true; }
+            if (mig.fase === "proev" && j !== mig.valgt) r.dim = true;
+            return r;
         });
+        this.kort.vis({
+            kl: "spm" + (lang ? " lange" : ""),
+            chip: "Opgave " + (this.nr + 1) + " af " + this.opgaver.length,
+            tekst: NK.html(o.spm),
+            svar: svar,
+            laast: this.fase !== "valg"
+        });
+        var k = this.el.kort.querySelector(".sk-svar");
+        if (k && lang) k.classList.add("lange");
     };
 
     P.visKort = function () {
-        var o = this.opg();
-        NK.saetTekst("stempel-titel", o.navn);
         NK.saetTekst("stempel-nr", String(this.nr + 1));
-        NK.saetTekst("stempel-spm", o.spm);
-        this.el.kort.classList.toggle("sejr", this.fase === "faerdig");
+        this.bygValg();
         this.visKnap();
     };
 
+    /* Giv hint / Vis svaret og Indsend svar */
     P.visKnap = function () {
-        var tekst, klasse = "knap hjaelp";
-        if (this.fase === "faerdig") {
-            klasse = "knap blaa banker";
-            tekst = this.naesteUloeste(this.nr) >= 0 ? "Næste opgave →" : "Videre til Beregningen →";
-        } else {
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            if (this.hjaelp > 0) klasse += " svar";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
+        if (this.fase === "faerdig") { this.kort.knapper({ hint: null, indsend: false }); return; }
+        this.kort.knapper({
+            hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret",
+            peg: this.el.knap.classList.contains("peg"),
+            indsend: this.fase === "valg",
+            klar: this.valgt >= 0
+        });
         this.el.knap.disabled = !!this.auto;
     };
 
@@ -306,7 +330,7 @@
         });
     };
 
-    /* Linjen i opgavekortet: det naeste skridt */
+    /* Linjen i papirkortet: det naeste skridt */
     P.trinLinje = function () {
         var o = this.opg();
         if (this.fase === "valg") {
@@ -324,6 +348,29 @@
 
     P.naesteLinje = function (foer, slags) {
         this.besked((foer ? foer + " " : "") + this.trinLinje(), slags || "");
+    };
+
+    /* Et klik paa et svar vaelger det kun */
+    P.vaelgKortSvar = function (j) {
+        if (this.fase !== "valg") return;
+        this.valgt = j;
+        this.bygValg();
+        this.visKnap();
+    };
+
+    /* Indsend svar (og Enter): det valgte svar sendes */
+    P.indsend = function () {
+        if (this.fase !== "valg") return;
+        if (this.valgt < 0) { this.kort.blink(); return; }
+        this.vaelgSvar(this.valgt, false);
+    };
+
+    /* Knappen paa kortet efter svaret: naeste opgave eller fane 2 */
+    P.videre = function () {
+        if (this.fase !== "faerdig") return;
+        var i = this.naesteUloeste(this.nr);
+        if (i >= 0) this.vaelg(i);
+        else if (NK.visFane) NK.visFane("fane-regn");
     };
 
     P.vaelgSvar = function (j, vist) {
@@ -417,24 +464,23 @@
         s.loest = true;
         s.stjerne = s.stjerne || (ok && !this.brugtSvar);
         var alle = this.antalLoest() === this.opgaver.length;
-        var tekst = (ok ? "Rigtigt." : "Du gættede: " + v.t.charAt(0).toLowerCase() + v.t.slice(1) + ".") +
-            (res ? " " + res : "") + " " + (!ok && v.svar ? v.svar + " " + o.hvorfor : o.hvorfor);
+        var maerke = ok ? (this.brugtSvar ? "Svaret." : "Rigtigt.") : "";
+        var tekst = (ok ? "" : "Du gættede: " + v.t.charAt(0).toLowerCase() + v.t.slice(1) + ". ") +
+            (res ? res + " " : "") + (!ok && v.svar ? v.svar + " " + o.hvorfor : o.hvorfor);
         if (alle && !this.rostAlt) { this.rostAlt = true; tekst += " " + D.FAERDIG.stempel; }
         this.gem();
-        this.bygValg();
+        this.besked("", "");
+        this.kortT = 0;
+        this.kort.note("");
         this.visKort();
         this.visPrikker();
-        this.besked(NK.html(tekst), ok ? "god" : "skidt");
+        var naeste = this.naesteUloeste(this.nr) >= 0 ? "Næste opgave" : "Videre til Beregningen";
+        this.kort.bliv(NK.html(tekst), maerke, naeste, ok ? (this.brugtSvar ? "svar" : "god") : "nej");
     };
 
     /* ----- Knappen: Giv hint -> Vis svaret -> Naeste opgave ---------------------------- */
     P.knap = function () {
-        if (this.fase === "faerdig") {
-            var i = this.naesteUloeste(this.nr);
-            if (i >= 0) this.vaelg(i);
-            else if (NK.visFane) NK.visFane("fane-regn");
-            return;
-        }
+        if (this.fase === "faerdig") { this.videre(); return; }
         if (this.auto) return;
         var o = this.opg();
         if (this.hjaelp === 0) {
@@ -497,49 +543,64 @@
         if (!this.auto) this.visKnap();
     };
 
-    /* ----- Linjen i opgavekortet (som i sc5.5) ----------------------------------------------
+    /* ----- Linjen i papirkortet (som i sc5.5) ----------------------------------------------
        Efter et forkert svar lyser hintknappen stille op, til linjen skifter igen. */
     P.besked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
-        this.kortT = 0;
-        this.visBesked(this.fast);
+        /* En rigtig besked (fejl, hint, ros) fjerner den korte besked fra scenen */
+        if (klasse) { this.kortT = 0; this.kort.note(""); }
         this.el.knap.classList.toggle("peg", klasse === "skidt" && this.fase !== "faerdig" && this.hjaelp === 0);
+        this.visBesked(this.fast);
     };
 
+    /* En kort besked fra scenen: under teksten paa kortet i nogle sekunder */
     P.kortBesked = function (html, sek) {
         this.kortT = sek || 4;
-        this.visBesked({ html: html, klasse: "" });
+        this.kort.note(html);
     };
 
     P.visBesked = function (b) {
-        var e = this.el.besked;
-        e.innerHTML = b.html;
-        e.className = "besked" + (b.klasse ? " " + b.klasse : "");
+        this.kort.besked(b.html, b.klasse);
+        if (this.fase !== "faerdig") this.kort.bliv(null);
+        this.visKnap();
     };
 
-    P.beskedTekst = function () { return this.el.besked.textContent; };
+    /* Teksten, kortet viser nu: den korte besked, forklaringen eller linjen */
+    P.beskedTekst = function () {
+        var n = NK.el("stempel-note");
+        if (n && !n.hidden) return n.textContent.replace(/\u00a0/g, " ");
+        if (this.kort.blivAaben()) return this.kort.blivTekst();
+        return this.kort.beskedTekst();
+    };
 
     /* Hint og svar: i linjen i kortet, naar eleven beder om det */
-    P.hjaelpVis = function (html) { this.besked(html + " " + this.trinLinje(), "gul"); };
+    /* Under forsoeget staar naeste skridt efter hintet; foer svaret staar spoergsmaalet over det */
+    P.hjaelpVis = function (html) { this.besked(html + (this.fase === "proev" ? " " + this.trinLinje() : ""), "gul"); };
 
     P.svarVis = function (html) { this.besked("<b>Svar:</b> " + html, "gul"); };
 
     P.fokus = function () { };
-    P.enter = function () { if (this.fase === "faerdig") this.knap(); };
+    P.enter = function () {
+        if (this.fase === "faerdig") this.videre();
+        else if (this.fase === "valg" && this.valgt >= 0) this.indsend();
+    };
     P.nulstil = function () { this.vaelg(this.nr); };
 
     /* ======================================================================
        LAYOUT
        ====================================================================== */
     P.tilpas = function () {
-        if (this.L.tilpas() || !this.lay) this.layout();
+        /* Ogsaa naar papirkortet er blevet hoejere eller lavere */
+        if (this.L.tilpas() || !this.lay || this.lay.top !== this.kort.zone(D.ZONE.stempel)) this.layout();
     };
 
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var gammel = this.lay;
         var lay = { W: W, H: H };
-        var top = 12;
+        /* Papirkortet har pladsen oeverst (D.ZONE: almindelig og lav skaerm) */
+        var top = this.kort.zone(D.ZONE.stempel);
+        lay.top = top;
         /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
         lay.bordY = Math.round(H - NK.klamp((H - top) * 0.05, 12, 34));
         var arbH = lay.bordY - top;
@@ -577,8 +638,8 @@
         lay.hane = { x: lay.cyl.x + cylB + 8 + NK.klamp(W * 0.03, 16, 30), y: lay.roerY, r: NK.klamp(cylB * 0.045, 6, 9) };
         /* Grafen oeverst til venstre, over manometeret, hvis der er plads */
         var msG = Tg.manometerStr(lay.mano);
-        var gb = Math.min(lay.cyl.x - 30 - 14, 330), gh = Math.min(msG.y - 44 - 14, 240);
-        lay.graf = gb >= 150 && gh >= 110 ? { x: 14, y: 14, b: gb, h: gh } : null;
+        var gb = Math.min(lay.cyl.x - 30 - 14, 330), gh = Math.min(msG.y - 44 - top - 4, 240);
+        lay.graf = gb >= 150 && gh >= 110 ? { x: 14, y: top + 4, b: gb, h: gh } : null;
         this.lay = lay;
         if (gammel && gammel.cyl) {
             var gi = Tg.indre(gammel.cyl), ni = Tg.indre(lay.cyl);
@@ -711,6 +772,7 @@
         c.addEventListener("pointerdown", function (e) {
             var pt = mig.L.punkt(e);
             var u = mig.under(pt);
+            if (mig.laastNu()) { if (u) mig.kort.blink(); return; }
             if (u === "hylde" || u === "stempelLod") {
                 mig.traek = { fra: u === "hylde" ? "hylde" : "stempel", start: pt, x: pt.x, y: pt.y, flyttet: false, id: e.pointerId };
                 try { c.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
@@ -763,6 +825,7 @@
             var pt = mig.L.punkt(e);
             if (mig.ignorerKlik) { mig.ignorerKlik = false; return; }   /* klaret af pointerup */
             var u = mig.under(pt);
+            if (u && mig.laastNu()) return;     /* blinket kom ved pointerdown */
             if (u) mig.klikScene(u);
         });
     };
@@ -779,7 +842,7 @@
         this.stille += dt;
         if (this.kortT > 0) {
             this.kortT -= dt;
-            if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
+            if (this.kortT <= 0) { this.kortT = 0; this.kort.note(""); }
         }
         if (this.ventAeg > 0) {
             this.ventAeg -= dt;

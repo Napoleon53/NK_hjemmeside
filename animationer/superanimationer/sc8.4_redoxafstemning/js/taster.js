@@ -129,9 +129,8 @@
             void el.offsetWidth;
             el.classList.add("vink");
         });
-        var b = NK.el("besked");
-        b.textContent = "Klik først på det felt, tallet skal stå i.";
-        b.className = "besked gul";
+        var niv = NK.Niveau && NK.Niveau.aktivt();
+        if (niv) niv.kortBesked("Klik først på det felt, tallet skal stå i.", "peger");
     }
 
     function tryk(t) {

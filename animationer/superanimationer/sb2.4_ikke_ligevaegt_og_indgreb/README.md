@@ -196,3 +196,9 @@ og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`.
   `js/sim_regn.js` kalder `mellemsvar`).
 * Selvtesten svarer med `svar(X, j)`, der vælger og trykker Indsend svar, og har
   påstande om Indsend svar, og om at kortet bliver på spørgsmålet (121 påstande).
+
+## Molekylenavne (6. nov. 2026)
+
+O₂ hedder dioxygen og H₂ dihydrogen, når stoffet menes (Niels: "altid dioxygen overalt"):
+fane 2 hedder Dioxygen i blodet, og gæt, forklaringer, teori, rundvisning og klik på
+partikler siger dioxygen. Hashen `#dioxygen` virker ved siden af `#oxygen`.

@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Thiosulfat og syre</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">✕</span> Thiosulfat og syre</h1>
@@ -28,13 +29,25 @@
 <!-- FANE 1: KRYDSET. Glas, ur og graf tegnes af js/sim_kryds.js       -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-kryds" role="tabpanel" aria-label="Krydset">
-    <div class="scene">
-        <canvas id="kryds-laerred" aria-label="Bægerglas på et papir med et kryds, krydset set oppefra, et stopur og kurven for svovlet"></canvas>
-        <div class="tilbud" id="kryds-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
+    <div class="scene medkort">
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen,
+             forsoegets beskeder og knapperne (js/opgave.js, ../faelles/papirkort.css) -->
+        <div class="scenekort opgave start" id="kryds-skort" data-start="Lav et par målinger, og start så quizzen.">
+            <div class="sk-ind" id="kryds-ind"></div>
+            <div class="sk-bund tom" id="kryds-status">
+                <p class="st-tekst" id="kryds-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="kryds-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="kryds-indsend" type="button">Indsend svar</button>
+            </div>
         </div>
-        <p class="status" id="kryds-status" aria-live="polite"></p>
+        <!-- Laerredet begynder under kortets zone (--kortzone i css/stil.css) -->
+        <div class="laerred-omraade">
+            <canvas id="kryds-laerred" aria-label="Bægerglas på et papir med et kryds, krydset set oppefra, et stopur og kurven for svovlet"></canvas>
+            <div class="tilbud" id="kryds-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -56,17 +69,10 @@
             <table class="lilletabel" id="kryds-tabel"></table>
         </div>
 
-        <!-- Quizzen: fem spoergsmaal. Én knap, der aendrer sig:
-             Start quiz -> Giv hint -> Vis svaret -> Naeste spoergsmaal -> Videre til Koncentration.
-             Prikkerne viser, hvor mange der er rigtige (js/opgave.js). -->
+        <!-- Quizzen: fem spoergsmaal paa kortet i scenen. Prikkerne viser,
+             hvor mange der er rigtige (js/opgave.js). -->
         <div class="kort opgavekort" id="kryds-opgavekort">
             <h2><span>Quiz</span><span class="hoved-hoejre"><span class="prikker" id="kryds-prikker" role="img" aria-label="0 af 5 rigtige"></span><button class="afslut" id="kryds-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="kryds-opgavetekst" data-start="Lav et par målinger, og start så quizzen."></p>
-            <div class="valg" id="kryds-valg"></div>
-            <p class="besked hint" id="kryds-hint"></p>
-            <p class="besked" id="kryds-besked" aria-live="polite"></p>
-            <p class="fejring" id="kryds-fejring" aria-live="polite"></p>
-            <button class="knap stor blaa" id="kryds-opgaveknap" type="button">Start quiz</button>
         </div>
     </aside>
 </section>
@@ -76,7 +82,17 @@
 <!-- tabellen bygges af den samme fil.                                  -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-konc" role="tabpanel" aria-label="Koncentration">
-    <div class="scene soejle">
+    <div class="scene soejle medkort">
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen,
+             forsoegets beskeder og knapperne (js/opgave.js, ../faelles/papirkort.css) -->
+        <div class="scenekort opgave start" id="konc-skort" data-start="Lav nogle forsøg, og start så en opgave.">
+            <div class="sk-ind" id="konc-ind"></div>
+            <div class="sk-bund tom" id="konc-status">
+                <p class="st-tekst" id="konc-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="konc-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="konc-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="graf-omraade">
             <canvas id="konc-laerred" aria-label="Krydset set oppefra og grafen for 1/Δt mod koncentrationen"></canvas>
             <div class="grafvalg" id="konc-akse">
@@ -93,7 +109,6 @@
 
         <div class="arbejdsbord">
             <table class="forsoegstabel" id="konc-tabel"></table>
-            <p class="besked" id="konc-tabelbesked" aria-live="polite"></p>
         </div>
     </div>
 
@@ -116,12 +131,7 @@
         </div>
 
         <div class="kort opgavekort" id="konc-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="konc-loest">0</b></span><button class="afslut" id="konc-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="konc-opgavetekst" data-start="Lav nogle forsøg, og start så en opgave."></p>
-            <div class="valg" id="konc-valg"></div>
-            <p class="besked hint" id="konc-hint"></p>
-            <p class="besked" id="konc-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="konc-opgaveknap" type="button">Start opgave</button>
+            <h2><span>Opgaver</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="konc-loest">0</b></span><button class="afslut" id="konc-afslut" type="button" hidden>Afslut</button></span></h2>
         </div>
     </aside>
 </section>
@@ -130,7 +140,17 @@
 <!-- FANE 3: TEMPERATUR. Graf og glas tegnes af js/sim_temp.js         -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-temp" role="tabpanel" aria-label="Temperatur">
-    <div class="scene soejle">
+    <div class="scene soejle medkort">
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen,
+             forsoegets beskeder og knapperne (js/opgave.js, ../faelles/papirkort.css) -->
+        <div class="scenekort opgave start" id="temp-skort" data-start="Mål ved nogle temperaturer, og start så en opgave.">
+            <div class="sk-ind" id="temp-ind"></div>
+            <div class="sk-bund tom" id="temp-status">
+                <p class="st-tekst" id="temp-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="temp-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="temp-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="graf-omraade">
             <canvas id="temp-laerred" aria-label="Krydset set oppefra, termometeret og grafen for 1/Δt mod temperaturen"></canvas>
             <div class="tilbud" id="temp-tilbud" hidden>
@@ -141,7 +161,6 @@
 
         <div class="arbejdsbord">
             <table class="forsoegstabel" id="temp-tabel"></table>
-            <p class="besked" id="temp-tabelbesked" aria-live="polite"></p>
         </div>
     </div>
 
@@ -157,12 +176,7 @@
         </div>
 
         <div class="kort opgavekort" id="temp-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="temp-loest">0</b></span><button class="afslut" id="temp-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="temp-opgavetekst" data-start="Mål ved nogle temperaturer, og start så en opgave."></p>
-            <div class="valg" id="temp-valg"></div>
-            <p class="besked hint" id="temp-hint"></p>
-            <p class="besked" id="temp-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="temp-opgaveknap" type="button">Start opgave</button>
+            <h2><span>Opgaver</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="temp-loest">0</b></span><button class="afslut" id="temp-afslut" type="button" hidden>Afslut</button></span></h2>
         </div>
     </aside>
 </section>
@@ -225,6 +239,7 @@
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
 <script src="../kemichael/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/glas.js"></script>
 <script src="js/raekke.js"></script>

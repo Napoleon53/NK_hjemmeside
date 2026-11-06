@@ -448,6 +448,9 @@ function koerTest(W) {
             d.getElementById("rv-naeste").click();
         }
         paastand("rundvisningen på " + id + " viser alle " + n + " trin", set === n && !r.aktiv());
+        var mangler = [];
+        (W.NK.Rundvisning.ture[id] || []).forEach(function (t) { if (!d.querySelector(t.sel)) mangler.push(t.sel); });
+        paastand("alle rundvisningens ankre på " + id + " findes", mangler.length === 0, mangler.join(", "));
     });
 
     overskrift("11. Papirkortet");

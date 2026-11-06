@@ -132,11 +132,7 @@
             var p = punkt(e), niv = niveauer[aktivId];
             var k = vaegt.knapVed(p.x, p.y);
             if (k) { niv.vaegtKlik(k.side, k.d); return; }
-            if (vaegt.skaalVed(p.x, p.y) && !niv.faerdig) {
-                niv.besked = { tekst: vaegtBesked(niv), klasse: "" };
-                NK.el("besked").textContent = niv.besked.tekst;
-                NK.el("besked").className = "besked";
-            }
+            if (vaegt.skaalVed(p.x, p.y) && !niv.faerdig) niv.kortBesked(vaegtBesked(niv), "peger");
         });
         cv.addEventListener("pointermove", function (e) {
             var p = punkt(e);

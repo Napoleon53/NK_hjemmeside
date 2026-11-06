@@ -41,7 +41,7 @@
                 tekst: "Tryk på Lad tiden gå, og se, hvad der sker med rørene ved samlingen.",
                 krav: { par: ["Cu", "Fe"], plast: false },
                 hint: [
-                    "Knappen Lad tiden gå står øverst i scenen.",
+                    "Knappen Lad tiden gå står til venstre for luppen.",
                     "Det ene rør skal være af kobber og det andet af jern. Metallet vælges under hvert rør.",
                     "Vælg Kobber og Jern, tryk på Lad tiden gå, og vent, til tiden standser."
                 ]
@@ -52,7 +52,7 @@
             id: "elektroner", navn: "Elektronerne",
             opstil: { a: "Cu", b: "Fe", plast: false },
             spm: {
-                tekst: "Luppen viser atomerne i rørenes væg ved samlingen. Lad tiden gå igen, og følg de gule elektroner (e⁻). Hvilken vej går de?",
+                tekst: "Lad tiden gå igen, og følg de gule elektroner (e⁻) i luppen. Hvilken vej går de?",
                 svar: [
                     { t: "Fra jernet over i kobberet", ok: true },
                     { t: "Fra kobberet over i jernet",
@@ -63,7 +63,7 @@
                 hint: [
                     "Tryk på Nye rør og så på Lad tiden gå. Se i luppen imens.",
                     "Følg et jernatom, der forlader røret som Fe²⁺. Det efterlader to gule elektroner.",
-                    "Elektronerne går gennem metallet fra jernet til kobberet. Ved kobberets overflade tager ilt og vand imod dem."
+                    "Elektronerne går gennem metallet fra jernet til kobberet. Der tager dioxygen og vand imod dem."
                 ]
             },
             loest: "Jern er mindre ædelt end kobber. Jernatomerne afgiver elektroner til kobberet og går selv ud i vandet som Fe²⁺. Derfor forsvinder jernrøret."
@@ -71,19 +71,20 @@
         {
             id: "ens", navn: "To ens rør",
             forsoeg: {
-                tekst: "Find to rør, hvor samlingen ikke tæres mere end resten af røret. Skift metal med knapperne under rørene, og lad de 20 år gå.",
+                tekst: "Find to rør, hvor samlingen ikke tæres mere end resten af røret. Lad de 20 år gå, og send rørene ind med Indsend svar.",
                 krav: { ens: true, plast: false },
+                indsend: true,
                 set: "Samlingen er ikke tæret mere end resten af røret.",
                 hint: [
                     "Metallet vælges med knapperne under hvert rør.",
                     "I opgave 1 var rørene af to forskellige metaller. Prøv noget andet.",
-                    "Vælg det samme metal til begge rør, og tryk på Lad tiden gå."
+                    "Vælg det samme metal til begge rør, lad tiden gå, og tryk på Indsend svar."
                 ]
             },
             spm: {
                 tekst: "Hvorfor tæres samlingen ikke ekstra, når de to rør er af samme metal?",
                 svar: [
-                    { t: "To ens metaller holder lige godt på elektronerne, så ingen elektroner går fra det ene rør til det andet", ok: true },
+                    { t: "Ens metaller holder lige godt på elektronerne", ok: true },
                     { t: "Vandet kan ikke komme ind i samlingen",
                       f: "Vandet løber gennem begge rør som før. Se i luppen: går der elektroner over samlingen?" },
                     { t: "Metallet er blevet mere ædelt",
@@ -112,7 +113,7 @@
                 tekst: "Tryk på Lad tiden gå, og se, hvilket rør der tæres ved samlingen.",
                 krav: { par: ["Zn", "Fe"], plast: false },
                 hint: [
-                    "Knappen Lad tiden gå står øverst i scenen.",
+                    "Knappen Lad tiden gå står til venstre for luppen.",
                     "Det ene rør skal være af zink og det andet af jern.",
                     "Vælg Zink og Jern, tryk på Lad tiden gå, og vent, til de 20 år er gået."
                 ]
@@ -135,19 +136,19 @@
                 krav: { par: ["Fe", "Cu"], orden: true, plast: false },
                 set: "Med jernrøret først gik der 20 år, dobbelt så længe.",
                 hint: [
-                    "Knappen Lad tiden gå står øverst i scenen.",
+                    "Knappen Lad tiden gå står til venstre for luppen.",
                     "Jernrøret skal sidde til venstre og kobberrøret til højre. Pilene i rørene viser vandets retning.",
                     "Vælg Jern til venstre rør og Kobber til højre rør, tryk på Lad tiden gå, og vent, til tiden standser."
                 ]
             },
             spm: {
-                tekst: "Sæt kobberrøret først igen, og lad tiden gå. Se i luppen, hvad vandet har med fra kobberrøret. Hvorfor går der hul hurtigere, når vandet kommer fra kobberrøret?",
+                tekst: "Sæt kobberrøret først igen, og se i luppen. Hvorfor går der hul hurtigere, når vandet kommer fra kobberrøret?",
                 krav: { par: ["Cu", "Fe"], orden: true, plast: false },
                 svar: [
                     { t: "Vandet har elektroner med fra kobberrøret",
                       f: "Elektronerne bliver i metallet. Se i luppen, hvad kuglerne med Cu²⁺ gør, når de lander på jernet." },
-                    { t: "Vandet har kobberioner med, og de tager elektroner fra jernet", ok: true },
-                    { t: "Vandet løber hurtigere, når det kommer fra kobberrøret",
+                    { t: "Kobberioner i vandet tager elektroner fra jernet", ok: true },
+                    { t: "Vandet løber hurtigere fra kobberrøret",
                       f: "Vandet løber lige hurtigt i begge rør. Se i luppen, hvad der lander på jernet." }
                 ],
                 hint: [
@@ -156,17 +157,17 @@
                     "Kobber er mere ædelt end jern. En kobberion tager to elektroner fra et jernatom."
                 ]
             },
-            loest: "Vandet tager lidt kobber med fra kobberrøret som Cu²⁺. På jernrøret tager hver kobberion to elektroner fra et jernatom: Cu²⁺ + Fe → Cu + Fe²⁺. Derfor skal vandet løbe gennem jernrøret først."
+            loest: "Vandet har Cu²⁺ med fra kobberrøret. På jernrøret tager hver kobberion to elektroner fra et jernatom: Cu²⁺ + Fe → Cu + Fe²⁺. Derfor sættes jernrøret først."
         },
         {
             id: "plast", navn: "Plastmuffen",
             opstil: { a: "Fe", b: "Cu", plast: false },
             forsoeg: {
-                tekst: "Med jernrøret først gik der stadig hul efter 20 år. Sæt en plastmuffe mellem rørene med kontakten øverst i scenen, og lad de 20 år gå.",
+                tekst: "Med jernrøret først gik der stadig hul efter 20 år. Slå Plastmuffe til, så der sidder plast mellem rørene, og lad de 20 år gå.",
                 krav: { par: ["Fe", "Cu"], orden: true, plast: true },
                 set: "Jernrøret holdt i alle 20 år.",
                 hint: [
-                    "Kontakten Plastmuffe står øverst i scenen, til højre for Lad tiden gå.",
+                    "Kontakten Plastmuffe står under knappen Lad tiden gå.",
                     "Jernrøret skal sidde til venstre, så vandet kommer gennem det først. Plastmuffen sidder mellem rørene.",
                     "Vælg Jern til venstre rør og Kobber til højre rør, slå Plastmuffe til, og tryk på Lad tiden gå."
                 ]
@@ -174,7 +175,7 @@
             spm: {
                 tekst: "Hvorfor holder jernrøret, når der sidder en plastmuffe imellem?",
                 svar: [
-                    { t: "Elektronerne kan ikke komme fra jernet til kobberet gennem plast", ok: true },
+                    { t: "Elektronerne kan ikke komme gennem plast", ok: true },
                     { t: "Plasten holder vandet væk fra rørene",
                       f: "Vandet løber stadig gennem begge rør. Se i luppen, hvad der ikke kommer forbi plasten." },
                     { t: "Plast er mere ædelt end kobber",
@@ -186,7 +187,7 @@
                     "Plast leder ikke strøm, så elektronerne kan ikke komme over i kobberet."
                 ]
             },
-            loest: "Plast leder ikke strøm. Elektronerne kan ikke komme fra jernet til kobberet, så jernrøret ruster kun langsomt, som om det sad alene. Sådan samler en VVS-montør de to slags rør: jernrøret først og plast imellem."
+            loest: "Plast leder ikke strøm, så jernrøret ruster kun langsomt, som om det sad alene. Sådan samler en VVS-montør de to slags rør: jernrøret først og plast imellem."
         }
     ];
 
@@ -230,7 +231,7 @@
                 D.Stort(K.navn(m1)) + " til højre rør.";
         }
         if (krav.plast && !par.plast) return D.Stort(D.roeret(par.svagMetal || "Fe")) + " blev tæret ved samlingen. Sæt plastmuffen imellem, og prøv igen.";
-        return "I denne opgave skal rørene skrues direkte sammen. Slå Plastmuffe fra med kontakten øverst i scenen.";
+        return "I denne opgave skal rørene skrues direkte sammen. Slå Plastmuffe fra med kontakten under Lad tiden gå.";
     };
 
     /* ----- Fane 2: Skibet ---------------------------------------------------------- */
@@ -242,7 +243,7 @@
                 tekst: "Skibets skrog er af jern, og propellen er af bronze, som mest er kobber. Begge dele er i havvand. Sejl 3 år, og se, hvor skroget ruster.",
                 set: "Skroget er rustet omkring propellen.",
                 hint: [
-                    "Knappen Sejl 1 år står øverst i scenen.",
+                    "Knappen Sejl 1 år står til højre under kortet.",
                     "Lad klodserne blive på kajen i denne opgave.",
                     "Tryk tre gange på Sejl 1 år, uden at der sidder en klods på skroget."
                 ]
@@ -250,9 +251,9 @@
             spm: {
                 tekst: "Hvorfor ruster skroget mest ved propellen?",
                 svar: [
-                    { t: "Propellen hvirvler vandet rundt, og det slider på jernet",
+                    { t: "Vandet fra propellen slider på jernet",
                       f: "Skroget ruster også, når skibet ligger stille i havnen. Tænk på rørene på fane 1: to metaller, der rører hinanden i vand." },
-                    { t: "Jernet rører kobberet i propellen, og jern er det mindst ædle af de to", ok: true },
+                    { t: "Jern rører kobber og er det mindst ædle", ok: true },
                     { t: "Havvandet er mest salt ved propellen",
                       f: "Havvandet er lige salt langs hele skroget. Tænk på rørene på fane 1: to metaller, der rører hinanden i vand." }
                 ],
@@ -267,19 +268,20 @@
         {
             id: "klods", navn: "Beskyt skroget",
             forsoeg: {
-                tekst: "På kajen ligger klodser af zink, magnesium og kobber. Træk en klods ned på en af de to pladser på skroget, og sejl 3 år, uden at skroget ruster mere.",
+                tekst: "Træk en klods fra kajen ned på skroget, og sejl 3 år, uden at skroget ruster mere. Send så klodsen ind med Indsend svar.",
+                indsend: true,
                 hint: [
                     "Tag fat i en klods på kajen, og slip den på en af de stiplede pladser på skroget.",
                     "Klodsen skal afgive elektroner i stedet for skroget. Den skal være mindre ædel end jern.",
-                    "Sæt en zinkklods på skroget, og tryk tre gange på Sejl 1 år."
+                    "Sæt en zinkklods på skroget, tryk tre gange på Sejl 1 år, og tryk på Indsend svar."
                 ]
             },
-            loest: "Klodsen er blevet mindre, og skroget er ikke rustet mere. Klodsen er mindre ædel end jern, så den afgiver elektronerne i stedet for skroget. Sådan en klods kaldes en offeranode."
+            loest: "Klodsen er mindre ædel end jern, så den afgiver elektronerne i stedet for skroget. Klodsen bliver mindre, og skroget ruster ikke. Den kaldes en offeranode."
         },
         {
             id: "zink", navn: "Hvor bliver zinken af?",
             spm: {
-                tekst: "En zinkklods bliver mindre for hvert år. Sæt en zinkklods på skroget, sejl et år, og se, hvad der forlader klodsen. Hvad sker der med zinken?",
+                tekst: "Sæt en zinkklods på skroget, sejl et år, og se, hvad der forlader klodsen. Hvad sker der med zinken?",
                 svar: [
                     { t: "Zn → Zn²⁺ + 2 e⁻. Zinkionerne går ud i havvandet.", ok: true },
                     { t: "Zinken slides af, når skibet sejler",
@@ -313,13 +315,14 @@
                     "Sæt en magnesiumklods på, og sejl 2 år."
                 ]
             },
-            loest: "Magnesiumklodsen var væk efter halvandet år. En zinkklods holder i tre et halvt. Magnesium står længere fra kobber i spændingsrækken og afgiver elektronerne hurtigere. I havvand bruger man derfor zink."
+            loest: "Magnesiumklodsen var væk efter halvandet år. En zinkklods holder tre et halvt år. Magnesium afgiver elektronerne hurtigere, så i havvand bruger man zink."
         },
         {
             id: "ti", navn: "Ti år uden rust",
             vaerft: true,
             forsoeg: {
-                tekst: "Skibet har været på værft og er som nyt. Hold skroget fri for rust i 10 år. En klods skal have hjælp af en ny, før den er brugt op. Hvor få klodser kan du nøjes med?",
+                tekst: "Skibet er som nyt fra værftet. Hold skroget fri for rust i 10 år, og tryk så på Indsend svar. Hvor få klodser kan du nøjes med?",
+                indsend: true,
                 hint: [
                     "Sæt en zinkklods på skroget, og hold øje med tallet under den efter hvert år.",
                     "En zinkklods holder tre et halvt år. Sæt en ny på, før den gamle er væk.",
@@ -334,38 +337,40 @@
         ingenKlods: "Skroget rustede, fordi der ikke sad en klods på det. Træk en klods fra kajen ned på en plads.",
         kobber: "Skroget rustede hurtigere end før. Kobber er mere ædelt end jern, så klodsen tager elektroner fra skroget ligesom propellen.",
         brugtOp: function (m) { return "Klodsen af " + K.navn(m) + " blev brugt op, og så rustede skroget igen."; },
-        tiRust: "Skroget rustede, fordi der ikke var mere zink tilbage. Tryk på På værft, og prøv igen.",
+        tiRust: "Skroget rustede, fordi der ikke var mere zink tilbage. Tryk på På værft i panelet, og prøv igen.",
         tiLoest: function (n) {
             return "Ti år uden rust med " + n + " klodser." +
                 (n <= 3 ? " Færre kan det ikke gøres." : " Det kan gøres med 3. Prøv igen med På værft.") +
                 " På rigtige skibe skiftes zinkklodserne, når skibet er i dok.";
         },
-        hul: "Skroget er tæret igennem ved propellen. Tryk på På værft for at få et nyt skrog.",
+        hul: "Skroget er tæret igennem ved propellen. Tryk på På værft i panelet for at få et nyt skrog.",
         fuldt: "Begge pladser er optaget. Klik på en klods på skroget for at tage den af.",
-        tagAf: "Klik på en klods på skroget for at tage den af."
+        tagAf: "Klik på en klods på skroget for at tage den af.",
+        klodsIkkeKlar: "Sæt en klods på skroget, og sejl 3 år uden mere rust. Send så klodsen ind.",
+        tiIkkeKlar: "Skroget skal være fri for rust i 10 år, før skibet sendes ind."
     };
 
     /* ----- Fane 3: Rusten -------------------------------------------------------------- */
     D.J_MAAL = [
         {
-            id: "krav", navn: "Vand og ilt",
+            id: "krav", navn: "Vand og dioxygen",
             gaet: {
-                tekst: "En plade af jern set helt tæt på. Kontakterne øverst bestemmer, om der ligger en dråbe vand på pladen, og om der er ilt i luften. Gæt, hvad der skal til, for at jern ruster.",
+                tekst: "En plade af jern set helt tæt på. Kontakterne bestemmer, om der ligger en dråbe vand på pladen, og om der er dioxygen i luften. Gæt, hvad der skal til, for at jern ruster.",
                 svar: [
                     { t: "Kun vand" },
-                    { t: "Kun ilt" },
-                    { t: "Både vand og ilt", ok: true }
+                    { t: "Kun dioxygen" },
+                    { t: "Både vand og dioxygen", ok: true }
                 ]
             },
             forsoeg: {
-                tekst: "Prøv alle fire muligheder med kontakterne Vand og Ilt, og se, hvornår jernatomerne forlader pladen. Skemaet nedenfor husker, hvad du har prøvet.",
+                tekst: "Prøv alle fire muligheder med kontakterne Vand og Dioxygen, og se, hvornår jernatomerne forlader pladen. Skemaet i panelet husker, hvad du har prøvet.",
                 hint: [
-                    "Kontakterne Vand og Ilt står øverst til venstre i scenen.",
+                    "Kontakterne Vand og Dioxygen står til venstre under kortet.",
                     "Skemaet i panelet viser, hvilke af de fire muligheder der mangler.",
-                    "Prøv: vand og ilt, kun vand, kun ilt og ingen af delene. Vent et par sekunder ved hver."
+                    "Prøv: vand og dioxygen, kun vand, kun dioxygen og ingen af delene. Vent lidt ved hver."
                 ]
             },
-            loest: "Jern ruster kun, når der både er vand og ilt. Tørt jern ruster ikke, og jern i vand uden ilt ruster heller ikke."
+            loest: "Jern ruster kun, når der både er vand og dioxygen. Tørt jern ruster ikke, og jern i vand uden dioxygen ruster heller ikke."
         },
         {
             id: "ox", navn: "Jern afgiver elektroner",
@@ -373,7 +378,7 @@
                 skema: "ox",
                 tekst: "Midt under dråben forlader jernatomerne pladen som Fe²⁺. Se i scenen, hvor mange elektroner hvert jernatom efterlader i pladen, og skriv tallet på tavlen.",
                 hint: [
-                    "Både Vand og Ilt skal være slået til. Følg et jernatom, der forlader pladen.",
+                    "Både Vand og Dioxygen skal være slået til. Følg et jernatom, der forlader pladen.",
                     "Tæl de gule elektroner, der bliver tilbage i pladen efter ét jernatom.",
                     "Ladningen skal være den samme før og efter pilen. Fe²⁺ har ladningen 2+."
                 ]
@@ -381,23 +386,23 @@
             loest: "Jern afgiver elektroner. Det er en oxidation."
         },
         {
-            id: "red", navn: "Ilt optager elektroner",
+            id: "red", navn: "Dioxygen optager elektroner",
             felter: {
                 skema: "red",
-                tekst: "Elektronerne går gennem jernet ud til dråbens kant. Der optages de af ilt og vand, og der dannes OH⁻. Afstem skemaet på tavlen.",
+                tekst: "Elektronerne går gennem jernet ud til dråbens kant. Der optages de af dioxygen og vand, og der dannes OH⁻. Afstem skemaet på tavlen.",
                 hint: [
                     "Begynd med OH⁻. Tæl O-atomerne før pilen.",
                     "Der er 4 O og 4 H før pilen. Hvor mange OH⁻ giver det?",
                     "Ladningen skal være ens på begge sider. Hver OH⁻ har ladningen −."
                 ]
             },
-            loest: "Ilt optager elektroner. Det er en reduktion."
+            loest: "Dioxygen optager elektroner. Det er en reduktion."
         },
         {
             id: "samlet", navn: "Det samlede skema",
             felter: {
                 skema: "samlet",
-                tekst: "Ilt optager de elektroner, jern afgiver. Der skal afgives lige så mange, som der optages. Skriv tallene i det samlede skema.",
+                tekst: "Dioxygen optager de elektroner, jern afgiver. Der skal afgives lige så mange, som der optages. Skriv tallene i det samlede skema.",
                 hint: [
                     "Ét jernatom afgiver 2 e⁻. Ét O₂ optager 4 e⁻.",
                     "Der skal så mange jernatomer til, at de tilsammen afgiver 4 e⁻.",
@@ -410,7 +415,7 @@
             id: "rust", navn: "Fra Fe²⁺ til rust",
             felter: {
                 skema: "rust",
-                tekst: "Fe²⁺ og OH⁻ mødes i dråben og bliver til Fe(OH)₂. Ilt oxiderer det videre til rust, FeO(OH). Afstem skemaet på tavlen.",
+                tekst: "Fe²⁺ og OH⁻ mødes i dråben og bliver til Fe(OH)₂. Dioxygen oxiderer det videre til rust, FeO(OH). Afstem skemaet på tavlen.",
                 hint: [
                     "Begynd med jern. Der skal være lige mange Fe før og efter pilen.",
                     "Prøv med 4 Fe(OH)₂. Det giver 8 H før pilen. Fordel dem på FeO(OH) og H₂O.",
@@ -430,22 +435,22 @@
                 ]
             },
             forsoeg: {
-                tekst: "Slå Salt til og fra med kontakten, og sammenlign. Tælleren øverst til højre viser, hvor mange jernatomer der forlader pladen pr. minut.",
+                tekst: "Slå Salt til og fra, og sammenlign. Tælleren til højre under kortet viser, hvor mange jernatomer der forlader pladen pr. minut.",
                 set: "Med salt forlader tre gange så mange jernatomer pladen.",
                 hint: [
-                    "Kontakten Salt står øverst til venstre, ved siden af Vand og Ilt.",
-                    "Vand og Ilt skal være slået til. Se på tælleren med og uden salt.",
+                    "Kontakten Salt står ved siden af Vand og Dioxygen.",
+                    "Vand og Dioxygen skal være slået til. Se på tælleren med og uden salt.",
                     "Slå Salt til, vent nogle sekunder, slå Salt fra, og vent igen."
                 ]
             },
             spm: {
                 tekst: "Hvorfor ruster jernet hurtigere med salt i vandet?",
                 svar: [
-                    { t: "Ionerne Na⁺ og Cl⁻ får vandet til at lede strøm bedre, så ladningerne i dråben udlignes hurtigere", ok: true },
+                    { t: "Na⁺ og Cl⁻ får vandet til at lede strøm bedre", ok: true },
                     { t: "Saltet reagerer med jernet og bliver til rust",
                       f: "Se på skemaerne i panelet. Hverken Na⁺ eller Cl⁻ er med, og de bliver ikke brugt." },
-                    { t: "Salt indeholder ilt",
-                      f: "NaCl består af natrium og chlor. Ilten kommer fra luften." }
+                    { t: "Salt indeholder oxygen",
+                      f: "NaCl består af natrium og chlor. Dioxygenet kommer fra luften." }
                 ],
                 hint: [
                     "Slå Salt til, og se, hvor Na⁺ og Cl⁻ bevæger sig hen i dråben.",
@@ -453,7 +458,7 @@
                     "Elektronerne går gennem jernet, og ionerne går gennem vandet. Flere ioner i vandet gør den vej lettere."
                 ]
             },
-            loest: "Saltet bliver ikke brugt. Cl⁻ trækkes mod midten, hvor Fe²⁺ hober sig op, og Na⁺ mod kanten, hvor OH⁻ dannes. Ladningerne udlignes hurtigere, og jernet ruster hurtigere. Derfor ruster biler og skibe mest i saltvand."
+            loest: "Saltet bliver ikke brugt. Cl⁻ trækkes mod Fe²⁺ midt i dråben og Na⁺ mod OH⁻ ved kanten, så ladningerne udlignes hurtigere. Derfor ruster biler og skibe mest i saltvand."
         }
     ];
 
@@ -496,13 +501,14 @@
 
     /* ----- Faelles ------------------------------------------------------------------ */
     D.GAET_HINT = ["Det er et gæt. Vælg det, du tror, og prøv det bagefter."];
-    D.GAET_LINJE = "Gæt først i opgavekortet til højre.";
-    D.SPM_LINJE = "Vælg et svar i opgavekortet til højre.";
+    D.GAET_LINJE = "Gæt først. Vælg et af svarene på kortet.";
+    D.VAELG_SVAR = "Vælg et af svarene på kortet først.";
+    D.ROER_IKKE_KLAR = "Lad de 20 år gå med rørene først. Send dem så ind.";
 
     D.FAERDIG = {
-        r: "Alle seks mål er løst. Fortsæt med Skibet.",
-        s: "Alle fem mål er løst. Fortsæt med Rusten.",
-        j: "Alle seks mål er løst."
+        r: "Alle seks opgaver er løst.",
+        s: "Alle fem opgaver er løst.",
+        j: "Alle seks opgaver er løst."
     };
 
     D.ROS = ["Sådan.", "Det passer.", "Netop."];

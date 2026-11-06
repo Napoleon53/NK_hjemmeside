@@ -32,7 +32,9 @@
     }
 
     var P = SimBland.prototype;
-    NK.Fane.paa(P, { navn: "bland" });
+    /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
+    var ZONE = [164, 146];
+    NK.Fane.paa(P, { navn: "bland", zone: ZONE });
     NK.Regning.paa(P);
 
     P.harNyeTal = function () { return true; };
@@ -53,7 +55,8 @@
         this.nyScene();
     };
 
-    P.promptHTML = function () {
+    P.kortChip = function () { return "Opgave " + (this.nr + 1) + " af " + D.BLAND.length; };
+    P.kortTekst = function () {
         var o = this.opg, t = o.tal;
         var s = o.tekst.replace("{A}", D.salt(t.A).formel).replace("{B}", D.salt(t.B).formel)
             .replace("{cA}", t.cA ? K.c(t.cA) : "").replace("{cB}", t.cB ? K.c(t.cB) : "")
@@ -61,7 +64,7 @@
             .replace("{VA}", t.VA ? K.mL(t.VA) + " mL" : "").replace("{VB}", t.VB ? K.mL(t.VB) + " mL" : "")
             .replace("{V}", t.V ? K.mL(t.V) + " mL" : "")
             .replace("{ion}", D.ion(o.ion).t).replace("{ion}", D.ion(o.ion).t).replace("{ion2}", o.ion2 ? D.ion(o.ion2).t : "");
-        return '<p class="maal-tekst">' + NK.html(s) + "</p>";
+        return s;
     };
 
     P.data = function () {
@@ -216,11 +219,14 @@
         var lay = { W: W, H: H, Hs: Hs };
         var samme = this.opg && this.opg.id === "samme";
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.08, 20, 48));
-        var zr = Math.round(NK.klamp(Math.min(Hs * 0.13, W * 0.09), 44, 92));
-        lay.zoom = { x: 16 + zr + 8, y: 16 + 24 + zr, r: zr };
+        /* Pladsen oeverst er sat af til papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var y0 = 10 + lay.zone, Hr = Hs - y0;
+        var zr = Math.round(NK.klamp(Math.min(Hr * 0.15, W * 0.09), 40, 92));
+        lay.zoom = { x: 16 + zr + 8, y: y0 + 24 + zr, r: zr };
         var tx = lay.zoom.x + zr + NK.klamp(W * 0.04, 24, 50);
         /* Den foerste opgave har syv trin, saa tavlen er hoejere */
-        lay.tavle = { x: tx, y: 16, b: W - tx - 18, h: Math.round(samme ? NK.klamp(Hs * 0.5, 180, 380) : NK.klamp(Hs * 0.42, 160, 320)) };
+        lay.tavle = { x: tx, y: y0, b: W - tx - 18, h: Math.round(samme ? NK.klamp(Hr * 0.58, 170, 380) : NK.klamp(Hr * 0.5, 150, 320)) };
         var top = Math.max(lay.zoom.y + zr + 70, lay.tavle.y + lay.tavle.h + 22);
         /* Glassene fylder hoejden ud, men tre glas skal kunne staa ved siden af hinanden */
         var gh = NK.klamp(Math.min((lay.bordY - top) * 0.95, W * 0.33), 90, 220);

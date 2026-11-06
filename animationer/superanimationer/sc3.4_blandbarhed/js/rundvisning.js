@@ -19,7 +19,8 @@
             { sel: "#haeld-kort", titel: "Hæld i", tekst: "Hver knap hælder en portion i gennem tragten. Bassinet rummer elleve. Farven på knappen er farven på kuglerne." },
             { sel: "#energi-kort", titel: "Ryst og varm", tekst: "Ryst blandingen, eller skru op for varmen. De farvede tal under skyderen er kogepunkterne for ethanol og vand." },
             { sel: "#anker-koeler", titel: "Køleren", tekst: "Tilbagesvaleren køler dampen, så den drypper tilbage i bassinet. Vælg Destillation, så løber den over i et forlag." },
-            { sel: "#opgavekort", titel: "Opgaverne", tekst: "Seks opgaver. Knappen giver først et hint, så svaret og til sidst en ny opgave." },
+            { sel: "#skort", titel: "Opgavekortet", tekst: "Seks opgaver. Vælg et svar, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },
+            { sel: "#opgavekort", titel: "Opgaver", tekst: "Her kan du se, hvor mange opgaver du har løst. Start forfra begynder opgaverne forfra." },
             { sel: "#quizknap, #teoriknap", titel: "Quiz og teori", tekst: "Fem spørgsmål, når du har prøvet dig frem. Teorien samler det hele." }
         ]
     };

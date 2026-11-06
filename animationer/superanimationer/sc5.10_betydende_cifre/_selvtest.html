@@ -274,6 +274,8 @@ function koerAlt() {
         }
         return f.runde.slut;
     }
+    function videreKnap() { return d.querySelector("#sk-ind [data-videre]"); }
+    function kortTekst() { return el("skort").textContent.replace(/\s+/g, " "); }
     ["tael", "afrund", "komma", "blandet"].forEach(function (id) {
         NK.visFane(id);
         var f = NK.aktivFane, ok = true, hop = true;
@@ -286,9 +288,15 @@ function koerAlt() {
         }
         paastand(id + ": ti rigtige svar i træk giver 10 af 10", ok && f.runde.slut && f.rigtige() === 10, f.runde.status.join(","));
         paastand(id + ": kommaet hopper færdigt på 3,5 s", hop);
-        paastand(id + ": knappen hedder Ny runde, og listen har ti linjer", el("opgaveknap").textContent.indexOf("Ny runde") === 0 && el("rundeliste").children.length === 10);
-        f.knap();
-        paastand(id + ": Ny runde starter forfra", f.runde.nr === 0 && !f.runde.slut && f.runde.log.length === 0);
+        paastand(id + ": efter den tiende hedder knappen på kortet Se resultatet, og listen har ti linjer",
+            !!videreKnap() && videreKnap().textContent.indexOf("Se resultatet") === 0 && el("rundeliste").children.length === 10);
+        f.naeste();
+        var nf = f.naesteFane();
+        paastand(id + ": kortet viser runden (10 af 10) og " + (nf ? "Videre til " + D.FANER[nf].navn : "ingen knap videre") + ", aldrig Ny runde",
+            /Runden er slut/.test(kortTekst()) && /10 af 10/.test(kortTekst()) && !/Ny runde|forfra/i.test(kortTekst()) &&
+            (nf ? !!videreKnap() && videreKnap().textContent.indexOf("Videre til " + D.FANER[nf].navn) === 0 : !videreKnap()), kortTekst());
+        el("nyrunde").click();
+        paastand(id + ": Ny runde i panelet starter forfra", f.runde.nr === 0 && !f.runde.slut && f.runde.log.length === 0 && !f.resultat && !/Runden er slut/.test(kortTekst()));
     });
     paastand("Blandet: 10 af 10 bliver rekord", Number(w.localStorage.getItem("nk-sc5.10-rekord")) === 10);
     NK.visFane("komma");
@@ -305,7 +313,7 @@ function koerAlt() {
     overskrift("5b. Enhedernes niveauer, og Meget svær låses op");
     function klaretNu() { try { return JSON.parse(w.localStorage.getItem("nk-sc5.10-enheder")) || {}; } catch (e) { return {}; } }
     function niveauKnap(n) { return d.querySelector('#niveauer [data-niveau="' + n + '"]'); }
-    fe.knap();
+    fe.forfra();
     paastand("fire niveauknapper under Enheder, og Let har flueben efter runden med 10 rigtige",
         d.querySelectorAll("#niveauer [data-niveau]").length === 4 && !el("niveauer").hidden && !!niveauKnap("let").querySelector(".flueben") && klaretNu().let === true);
     paastand("Let er valgt, og noten siger kilo og milli", niveauKnap("let").classList.contains("valgt") && /Kilo og milli/.test(el("niveaunote").textContent));
@@ -317,13 +325,14 @@ function koerAlt() {
         JSON.parse(w.localStorage.getItem("nk-sc5.10-valg"))["komma-niveau"] === "middel");
     helRunde(fe, 6);
     paastand("6 rigtige er ikke nok: Middel er ikke klaret", fe.runde.slut && !klaretNu().middel && !niveauKnap("middel").querySelector(".flueben"));
-    fe.knap();
+    fe.forfra();
     helRunde(fe, 10);
     paastand("10 rigtige på Middel: klaret, men Meget svær er stadig låst", klaretNu().middel === true && niveauKnap("meget").classList.contains("laast") && !fe.runde.laastOp);
     niveauKnap("svaer").click();
     helRunde(fe, 7);
-    paastand("7 rigtige på Svær: Meget svær låses op, og runden siger det", klaretNu().svaer === true && fe.runde.laastOp === true &&
-        /låst op/.test(el("kort-slut").textContent) && !niveauKnap("meget").classList.contains("laast"), el("kort-slut").textContent);
+    fe.naeste();
+    paastand("7 rigtige på Svær: Meget svær låses op, og runden på kortet siger det", klaretNu().svaer === true && fe.runde.laastOp === true &&
+        /låst op/.test(kortTekst()) && !niveauKnap("meget").classList.contains("laast"), kortTekst());
     niveauKnap("meget").click();
     paastand("Meget svær kan vælges nu, og opgaverne er Meget svær", fe.niveau === "meget" && fe.opg.niveau === "meget" && /Alle forstavelser/.test(el("niveaunote").textContent));
     var okM = true;
@@ -379,7 +388,7 @@ function koerAlt() {
     paastand("et tomt svar tæller ikke som en fejl", f.fejl === 0 && !f.loest);
     skrivFelt("1", "");
     f.tjek();
-    paastand("et forkert svar giver en rød linje og tæller som fejl", f.fejl === 1 && el("besked").className.indexOf("skidt") >= 0);
+    paastand("et forkert svar giver en rød linje på kortet og tæller som fejl", f.fejl === 1 && el("sk-bund").className.indexOf("skidt") >= 0);
     loesRigtigt(f);
     paastand("rigtigt efter en fejl er gult (med hjælp)", f.runde.status[0] === "hjulpet");
     f.naeste();
@@ -387,7 +396,7 @@ function koerAlt() {
     paastand("Giv hint: knappen bliver til Vis svaret", el("opgaveknap").textContent === "Vis svaret");
     f.knap();
     paastand("Vis svaret: opgaven er løst og rød, og svaret står i feltet", f.loest && f.runde.status[1] === "vist" && el("svar-m").value !== "");
-    paastand("Vis svaret: knappen bliver til Næste opgave", el("opgaveknap").textContent.indexOf("Næste opgave") === 0);
+    paastand("Vis svaret: kortet har Næste opgave, og den gule knap er væk", !!videreKnap() && videreKnap().textContent.indexOf("Næste opgave") === 0 && el("opgaveknap").hidden);
     f.nyRunde();
     opgaveAf(f, function (o) { return C.kanAlmindelig(o.facit); });
     maadeKnap("pot").click();
@@ -420,14 +429,16 @@ function koerAlt() {
     skrivFelt("1", ""); f.tjek(); tid(0.5);
     paastand("et forkert svar giver intet hint af sig selv, men den gule knap lyser op", !/Hint/.test(el("besked").textContent) && hk.classList.contains("peg"));
     f.knap(); tid(0.3);
-    paastand("Giv hint: hintet står i linjen under svaret, og knappen bliver til Vis svaret", /^Hint/.test(el("besked").textContent) &&
-        el("besked").className.indexOf("gul") >= 0 && hk.textContent === "Vis svaret" && hk.classList.contains("svar") && !hk.classList.contains("peg"));
+    paastand("Giv hint: hintet står på kortet, og knappen bliver til Vis svaret", /^Hint/.test(el("besked").textContent) &&
+        el("sk-bund").className.indexOf("gul") >= 0 && hk.textContent === "Vis svaret" && hk.classList.contains("svar") && !hk.classList.contains("peg"));
     loesRigtigt(f); tid(0.3);
-    paastand("opgaven løst: hintet er væk, og knappen er blå", !/Hint/.test(el("besked").textContent) && hk.classList.contains("blaa") && !hk.classList.contains("hjaelp"));
+    paastand("opgaven løst: hintet er væk, den gule knap er væk, og Næste opgave står på kortet", !/Hint/.test(kortTekst()) && hk.hidden &&
+        !!videreKnap() && /Næste opgave/.test(videreKnap().textContent));
     f.naeste();
     f.knap(); f.knap(); tid(0.3);
-    paastand("Vis svaret: svaret står i linjen under svarfeltet", f.loest && f.vist && el("besked").className.indexOf("gul") >= 0 &&
-        el("besked").textContent.length > 5 && !/Kemichael/.test(el("besked").textContent), el("besked").textContent);
+    var blivSvar = d.querySelector("#sk-ind .sk-bund.bliv.svar");
+    paastand("Vis svaret: svaret står gult under opgaven på kortet", f.loest && f.vist && !!blivSvar &&
+        blivSvar.textContent.length > 12 && !/Kemichael/.test(blivSvar.textContent), blivSvar ? blivSvar.textContent : "");
     f.naeste();
     d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "k" })); tid(0.3);
     paastand("tasten K gør ikke noget mere", !/Hint/.test(el("besked").textContent) && hk.textContent === "Giv hint");
@@ -484,11 +495,111 @@ function koerAlt() {
     ramme.style.width = "1400px"; ramme.style.height = "860px";
     paastand("tallene står på én linje på tavlen ved 1400, 1100 og 900 px (også enhederne løst)", overl.length === 0, overl.slice(0, 4).join(" | "));
     var fs = [];
-    ["#spm", ".valgt-info", ".besked", ".rundeliste li", ".note", ".svarmaade button", ".niveaunote"].forEach(function (s) {
+    ["#sk-ind .sk-tekst", ".valgt-info", "#besked", ".rundeliste li", ".note", ".svarmaade button", ".niveaunote"].forEach(function (s) {
         var e = d.querySelector(s);
         if (e && parseFloat(w.getComputedStyle(e).fontSize) < 12.5) fs.push(s);
     });
     paastand("ingen tekst, eleven skal læse, er under 12,5 px", fs.length === 0, fs.join(", "));
+
+    /* ----- 9. Papirkortet (6. nov. 2026) --------------------------------------------- */
+    overskrift("9. Papirkortet: opgaven og svarene øverst i midten af scenen");
+    var sk = el("skort");
+    paastand("papirkortet er slået til (body.papirkort, Lexend, fælles stilark og papirkort.js)", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        /Lexend/.test(w.getComputedStyle(sk).fontFamily) && !!d.querySelector('link[href="../faelles/papirkort.css"]'));
+    paastand("kortet står i scenen og ikke i panelet", !!sk.closest(".scene") && sk.classList.contains("scenekort") &&
+        !d.querySelector(".panel .scenekort, .panel #opgaveknap, .panel #tjek, .panel #besked, .panel .opgavekort, #opgavekort, #kort-slut"));
+    paastand("hint, beskeden og knapperne er på kortet, og der er ingen statuslinje eller linje nederst", sk.contains(el("besked")) &&
+        sk.contains(el("opgaveknap")) && sk.contains(el("tjek")) && !d.querySelector(".statuslinje, .scene .besked, #spm, #opg-type") &&
+        !el("arbejde").querySelector("p, button.knap"));
+    paastand("Start forfra og Ny runde står aldrig som knap på kortet, men Ny runde står i panelet",
+        !Array.prototype.some.call(sk.querySelectorAll("button"), function (k) { return /forfra|Ny runde|↺/i.test(k.textContent); }) &&
+        !!el("nyrunde").closest(".panel") && /Ny runde/.test(el("nyrunde").textContent));
+
+    NK.visFane("tael");
+    f = NK.aktivFane;
+    f.forfra(); tid(0.2);
+    var ind = el("tjek");
+    paastand("Tæl cifrene: Indsend svar er grå, før en brik er valgt", ind.textContent === "Indsend svar" && ind.classList.contains("ikke-klar") && !ind.hidden &&
+        w.getComputedStyle(ind).backgroundColor !== "rgb(42, 118, 172)");
+    ind.click(); tid(0.1);
+    paastand("Indsend svar uden valg: ingen bedømmelse, kortet blinker og siger, hvad der mangler", !f.loest && f.fejl === 0 && sk.classList.contains("blink") &&
+        /Indsend svar/.test(el("besked").textContent));
+    var rigtigeI = f.opg.betydende.slice();
+    rigtigeI.forEach(function (i) { d.querySelector('#talrk [data-i="' + i + '"]').click(); });
+    paastand("et klik på de rigtige brikker vælger kun: intet er bedømt, og Indsend svar er blå", !f.loest && f.runde.status.length === 0 &&
+        ind.classList.contains("klar") && !ind.classList.contains("ikke-klar"));
+    var r0 = ind.getBoundingClientRect();
+    ind.click(); tid(0.2);
+    var vk = videreKnap(), r1 = vk ? vk.getBoundingClientRect() : null;
+    paastand("rigtigt svar: kortet bliver på opgaven med forklaringen under, og Næste opgave står, hvor Indsend svar stod",
+        f.loest && /betydende/.test(d.querySelector("#sk-ind .sk-tekst").textContent) && !!d.querySelector("#sk-ind .sk-bund.bliv.god") &&
+        !!vk && /Næste opgave/.test(vk.textContent) && el("sk-bund").hidden && Math.abs(r1.right - r0.right) < 8 && Math.abs(r1.bottom - r0.bottom) < 30,
+        r1 ? Math.round(r0.right) + "/" + Math.round(r1.right) + ", " + Math.round(r0.bottom) + "/" + Math.round(r1.bottom) : "ingen knap");
+    paastand("de valgte brikker på tavlen er grønne", d.querySelectorAll("#talrk .brik.bet").length === rigtigeI.length);
+    var forkl = d.querySelector("#sk-ind .sk-bund.bliv").textContent;
+    sk.classList.remove("blink");
+    d.querySelector("#talrk .brik").click(); tid(0.1);
+    paastand("et klik på tavlen, mens kortet venter på Næste, får kortet til at blinke og ændrer intet", sk.classList.contains("blink") && f.loest && f.runde.status.length === 1);
+    vk.click(); tid(0.2);
+    paastand("Næste opgave: rosen og forklaringen står ikke under den næste opgave", !f.loest && !d.querySelector("#sk-ind .bliv") &&
+        kortTekst().indexOf(forkl.slice(8, 40)) < 0 && /Opgave 2 af 10/.test(kortTekst()), kortTekst());
+    paastand("etiketten er en indlejret overskrift (Opgave 2 af 10)", !!d.querySelector("#sk-ind .sk-tekst > .sk-chip") &&
+        w.getComputedStyle(d.querySelector("#sk-ind .sk-chip")).display === "inline");
+
+    NK.visFane("komma");
+    f = NK.aktivFane;
+    f.forfra(); tid(0.2);
+    paastand("Flyt kommaet: Indsend svar er grå med et tomt felt", ind.classList.contains("ikke-klar"));
+    skrivFelt("1", "");
+    paastand("noget i feltet gør Indsend svar blå, men bedømmer ikke", ind.classList.contains("klar") && !f.loest && f.fejl === 0);
+    el("svar-m").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); tid(0.2);
+    paastand("Enter i feltet er Indsend svar (et forkert svar giver en rød linje på kortet)", f.fejl === 1 && el("sk-bund").className.indexOf("skidt") >= 0 &&
+        el("opgaveknap").classList.contains("peg"));
+
+    /* Kortets hoejde i kortZone: alle slags opgaver med hint, forkert svar,
+       vist svar og resultatet, paa en almindelig og en lav skaerm */
+    var stoer = [["1400px", "860px"], ["1100px", "660px"]], ud = [], hoejst = {};
+    w.localStorage.setItem("nk-sc5.10-enheder", JSON.stringify({ let: true, middel: true, svaer: true }));
+    var KOMBI = [["tael"], ["afrund", "maaletal"], ["afrund", "regn"], ["komma", "notation"], ["komma", "enhed", "let"], ["komma", "enhed", "svaer"], ["komma", "enhed", "meget"], ["blandet"]];
+    function maal(navn, g) {
+        var kr = sk.getBoundingClientRect(), tv = el("tavle").getBoundingClientRect(), z = g.kortZone();
+        var k = (hoejst[navn.split(" ")[0]] || 0);
+        hoejst[navn.split(" ")[0]] = Math.max(k, Math.round(kr.height));
+        if (kr.height > z + 0.5 || kr.bottom > tv.top - 2 || kr.bottom > el("arbejde").getBoundingClientRect().top) ud.push(navn + " " + Math.round(kr.height) + "/" + z);
+    }
+    stoer.forEach(function (st) {
+        ramme.style.width = st[0]; ramme.style.height = st[1];
+        void ramme.offsetWidth;
+        KOMBI.forEach(function (kb) {
+            NK.visFane(kb[0]);
+            var g = NK.aktivFane;
+            if (kb[1]) g.skiftValg(kb[1]);
+            if (kb[2]) g.skiftNiveau(kb[2]);
+            for (var n = 0; n < 15; n++) {
+                g.nyRunde(); g.vis();
+                maal(st[0] + " " + kb.join("/") + " opgave", g);
+                if (g.erIndtastning()) { skrivFelt("1", ""); g.tjek(); }
+                else { d.querySelector("#talrk [data-i]").click(); if (!g.opg.betydende.length) continue; g.tjek(); }
+                if (!g.loest) maal(st[0] + " " + kb.join("/") + " forkert", g);
+                g.knap();
+                maal(st[0] + " " + kb.join("/") + " hint", g);
+                if (!g.loest) g.knap();
+                g.hopFaerdig();
+                maal(st[0] + " " + kb.join("/") + " svar", g);
+            }
+            helRunde(g, 3); g.naeste();
+            maal(st[0] + " " + kb.join("/") + " resultat", g);
+            g.forfra();
+            if (kb[2]) g.skiftNiveau("let");
+            if (kb[1] && kb[0] === "komma") g.skiftValg("notation");
+            if (kb[1] && kb[0] === "afrund") g.skiftValg("maaletal");
+        });
+    });
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    void ramme.offsetWidth;
+    paastand("kortet holder sig i kortZone og over tavlen (1400 × 860 og 1100 × 660, alle trin)", ud.length === 0,
+        ud.slice(0, 5).join(" | ") + " højest: " + JSON.stringify(hoejst));
+    skriv("        (kortets største højde: " + JSON.stringify(hoejst) + ")");
 }
 </script>
 </body>

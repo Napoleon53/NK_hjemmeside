@@ -116,6 +116,7 @@
             this.nr = i;
             this.hjaelp = 0;
             this.brugtSvar = false;
+            this.sidsteMaade = "";
             this.faerdig = false;
             this.lavOpgave(i, nyeTal);
             this.layout();
@@ -199,7 +200,9 @@
                 var b = document.createElement("button");
                 b.type = "button";
                 var kl = "sk-knap";
-                if (mig.faerdig) kl += sv.ok ? (mig.brugtSvar ? " svar-vist" : " rigtig") : (sv.forkert ? " forkert" : " dim");
+                /* Groent, naar eleven selv valgte det rigtige svar her (ogsaa
+                   efter en fejl tidligere i opgaven); gult, naar svaret blev vist */
+                if (mig.faerdig) kl += sv.ok ? (j === valgtJ && mig.sidsteMaade !== "svar" ? " rigtig" : " svar-vist") : (sv.forkert ? " forkert" : " dim");
                 else if (sv.forkert) kl += " forkert";
                 else if (j === valgtJ) kl += " valgt";
                 b.className = kl;
@@ -277,7 +280,7 @@
             var kan = this.kanSendes();
             var t = (this.indsendTekst && this.indsendTekst()) || "Indsend svar";
             if (e.textContent !== t) e.textContent = t;
-            if (e.classList.contains("klar") !== kan) {
+            if (e.classList.contains("klar") !== kan || e.classList.contains("ikke-klar") === kan) {
                 e.classList.toggle("klar", kan);
                 e.classList.toggle("ikke-klar", !kan);
                 e.setAttribute("aria-disabled", kan ? "false" : "true");
@@ -336,6 +339,7 @@
            naeste skridt */
         P.trinLoest = function (maade, svarHTML) {
             this.hjaelp = 0;
+            this.sidsteMaade = maade;
             if (maade === "svar") this.brugtSvar = true;
             if (this.opgaveFaerdig()) {
                 this.opgaveLoest(maade, maade === "svar" ? svarHTML : null);

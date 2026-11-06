@@ -1,5 +1,5 @@
 /* =====================================================================
-   sim_blod.js - fane 2: Oxygen i blodet
+   sim_blod.js - fane 2: Dioxygen i blodet
 
    Lungerne til venstre og en muskel til hoejre, forbundet af to
    blodaarer: over luppen loeber blodet fra lungerne til musklen, under
@@ -11,7 +11,7 @@
    fast (10 i lungerne, 3 i lungerne i bjergene, 2 i en muskel i hvile og
    1 i en muskel, der arbejder). Naar blodet kommer et nyt sted hen,
    springer [O2], og Y springer vaek fra K. Saa binder eller afgiver Hb
-   oxygen, til Y = K igen. I lungerne kommer der nyt O2 ind fra
+   dioxygen, til Y = K igen. I lungerne kommer der nyt O2 ind fra
    venstre; i musklen forsvinder det frie O2 ud til hoejre.
    ===================================================================== */
 (function () {

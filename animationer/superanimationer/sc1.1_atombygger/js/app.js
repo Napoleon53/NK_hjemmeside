@@ -92,6 +92,7 @@
         sims["fane-salt"] = new NK.SimSalt();
         sims["fane-spil"] = new NK.SimSpil();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */
+        NK.visFane = visFane;     /* fane 1's kort fører videre til spillet */
 
         var knapper = document.querySelectorAll(".faneknap");
         function bindFane(knap) {

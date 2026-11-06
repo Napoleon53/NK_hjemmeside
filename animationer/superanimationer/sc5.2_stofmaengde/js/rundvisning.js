@@ -22,18 +22,19 @@
             { sel: "#vaegt-anker-zoom", titel: "Atomerne", tekst: "Når der ligger noget på vægten, zoomer boblen ind på atomerne i det." },
             { sel: "#vaegt-anker-plakat", titel: "Plakaten", tekst: "1 mol er altid lige mange atomer, uanset stoffet." },
             { sel: "#vaegt-maaling", titel: "På vægten", tekst: "Stofmængden, massen og antallet af atomer for det, der ligger på vægten. Ligger der flere stoffer, regnes massen for hvert af dem." },
-            { sel: "#vaegt-kort", titel: "Opgaven", tekst: "Tre mål som opvarmning, derefter sværere opgaver med nye tal hver gang. Knappen giver et hint og derefter svaret." },
+            { sel: "#vaegt-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen viser opgaven. Tryk Indsend svar, når vægten passer. Giv hint giver et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Stofmængde, masse og antal atomer kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Flest atomer: gæt, hvor der er flest. Afvejning: regn massen ud for en ordre." }
         ],
         "fane-atomer": [
             { sel: "#atomer-anker-vaegte", titel: "Vægtene", tekst: "En prøve på hver vægt. De viser massen, til du har svaret. Så tæller de atomerne." },
-            { sel: "#atomer-valg", titel: "Dit svar", tekst: "Hvor er der flest atomer? Piletasterne virker også." },
+            { sel: "#atomer-skort", titel: "Dit svar", tekst: "Kortet øverst i scenen spørger, hvor der er flest atomer. Vælg et svar, og tryk Indsend svar. Piletasterne vælger også." },
             { sel: "#atomer-anker-skilt", titel: "Skiltet", tekst: "Prøverne står her. Hintet giver molarmasserne, og efter svaret står beregningen der." },
-            { sel: "#atomer-kort", titel: "Runden", tekst: "Ni par. Knappen giver et hint og derefter svaret. Rekorden huskes." }
+            { sel: "#atomer-runden", titel: "Runden", tekst: "Ni par. Her står dine rigtige svar og din rekord. Ny runde giver ni nye par." }
         ],
         "fane-afvej": [
-            { sel: "#afvej-kort", titel: "Ordren", tekst: "Stofmængden, der skal afvejes. Skriv massen. Knappen giver et hint og derefter svaret." },
+            { sel: "#afvej-skort", titel: "Ordren", tekst: "Kortet øverst i scenen viser stofmængden, der skal afvejes. Giv hint giver et hint og derefter svaret." },
+            { sel: "#afvej-regn", titel: "Regnestykket", tekst: "Skriv massen her, og tryk Indsend svar eller Enter." },
             { sel: "#afvej-anker-krukke", titel: "Krukken", tekst: "Molarmassen står på etiketten." },
             { sel: "#afvej-anker-plakat", titel: "Plakaten", tekst: "Formlen for massen. Enhederne går op: mol · g/mol giver g." },
             { sel: "#afvej-anker-vaegt", titel: "Vægten", tekst: "Den afvejer, når massen er rigtig." },

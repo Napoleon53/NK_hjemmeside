@@ -24,14 +24,13 @@
         this.over = null;
         this.opsum = [{}, {}];
         this.startFane(D.BEREGNING);
-        this.el.valg = NK.el("beregning-valg");
         this.regning = new NK.Regning({ vaert: NK.el("beregning-raekker"), fane: this });
         this.introNu = true;
         this.vaelg(0, false);
     }
 
     var P = SimBeregning.prototype;
-    NK.Fane.paa(P, { navn: "beregning", naesteFane: "fane-fejl", naesteNavn: "Fejlkilder" });
+    NK.Fane.paa(P, { navn: "beregning", naesteFane: "fane-fejl", naesteNavn: "Fejlkilder", zone: [204, 180] });
     NK.Regning.paa(P);
 
     /* ----- Opgaven -------------------------------------------------------------- */
@@ -44,7 +43,8 @@
                   maaling: spec.maaling, trin: D.TRIN_ID.slice() };
         o.facit = K.facit(tal);
         this.opg = o;
-        this.alkan = null;          /* elevens valg af soejle */
+        this.alkan = null;          /* den alkan, der er sendt ind og rigtig */
+        this.alkanValgt = null;     /* den, der er valgt, men ikke sendt */
         this.alkanForkert = [];
         this.regning.saet(o);
         if (!o.ukendt) this.opsum[o.maaling] = {};
@@ -59,16 +59,17 @@
         if (this.opg && !this.opg.ukendt && this.regning.k === 0 && !this.faerdig) this.vaelg(this.nr, false);
     };
 
+    /* Kortets tekst. Noten om eksemplets tal staar i panelet over felterne. */
     P.promptHTML = function () {
         var o = this.opg, t = o.tal;
+        NK.saetTekst("beregning-note", !o.ukendt && !t.egen ? "Tallene er et eksempel. Lav forsøget på fanen Forsøget for at regne på dine egne." : "");
         if (o.ukendt) {
-            return '<p class="maal-tekst">' + NK.html("En lukket gasdåse med en ukendt alkan vejer " + K.g2(t.mf) + " g. Der samles " +
-                K.V(t.V) + " mL af gassen over vand ved 20 °C, og dåsen vejer bagefter " + K.g2(t.me) + " g. Hvilken alkan er det?") + "</p>";
+            return NK.html("En lukket gasdåse med en ukendt alkan vejer " + K.g2(t.mf) + " g. Der samles " +
+                K.V(t.V) + " mL af gassen over vand ved 20 °C, og dåsen vejer bagefter " + K.g2(t.me) + " g. Hvilken alkan er det?");
         }
         var s = o.kunTal ? "Find molarmassen i måling 2. Formlerne er de samme som i måling 1, så du skriver kun tallene." :
             "Find gassens molarmasse i måling " + (o.maaling + 1) + ", og find ud af, hvilken alkan det er.";
-        var note = t.egen ? "" : '<p class="note">Tallene er et eksempel. Lav forsøget på fanen Forsøget for at regne på dine egne.</p>';
-        return '<p class="maal-tekst">' + NK.html(s) + "</p>" + note;
+        return NK.html(s);
     };
 
     /* Tavlens linjer */
@@ -100,38 +101,69 @@
         return trinLinjeRegning.call(this);
     };
 
+    /* Et klik paa en knap paa kortet eller paa en soejle vaelger kun */
+    P.vaelgAlkanValg = function (i) {
+        if (!this.skalVaelge() || this.alkanForkert.indexOf(i) >= 0) return;
+        this.alkanValgt = i;
+        this.visKort();
+    };
+
+    /* Indsend svar: regnetrinnet i panelet eller den valgte alkan */
+    P.kanSendes = function () {
+        if (this.faerdig) return false;
+        if (this.skalVaelge()) return this.alkanValgt !== null;
+        var f = this.regning.aktivt();
+        return !!(f && f.input && String(f.input.value).trim());
+    };
+
+    P.indsend = function () {
+        if (this.skalVaelge()) { this.vaelgAlkan(this.alkanValgt, "valg"); return; }
+        this.regning.tjek();
+    };
+
+    P.tomBesked = function () {
+        return this.skalVaelge() ? "Vælg en alkan først. Klik på en søjle eller en knap på kortet." : "Skriv i feltet under Regnestykket først.";
+    };
+
     P.vaelgAlkan = function (i, maade) {
-        if (!this.skalVaelge()) return;
+        if (!this.skalVaelge() || i === null) return;
         var f = this.opg.facit;
         if (i !== f.alkan && maade !== "svar") {
             var a = D.ALKANER[i];
             if (this.alkanForkert.indexOf(i) < 0) this.alkanForkert.push(i);
+            this.alkanValgt = null;
+            this.visKort();
             this.besked(NK.html(a.navn.charAt(0).toUpperCase() + a.navn.slice(1) + " har M = " + K.Mtekst(i) + " g/mol. Din værdi er " +
                 K.Mv(f.M) + " g/mol. Find den søjle, der ligger tættest på den stiplede linje."), "skidt");
             return;
         }
         this.alkan = i;
+        this.alkanValgt = i;
         if (maade === "svar") this.brugtSvar = true;
         this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html("Den nærmeste er " + D.ALKANER[i].navn + ".") : null);
         this.visKort();
     };
 
+    /* De fem alkaner paa kortet, naar molarmassen er regnet ud. Et klik
+       vaelger; Indsend svar sender. Loest: den rigtige er groen (gul, naar
+       svaret blev vist), et forkert valg roedt og resten tonet ned. */
     P.visKortEkstra = function () {
         var mig = this, e = this.el.valg;
-        if (!this.regning.faerdig()) { e.hidden = true; e.innerHTML = ""; return; }
+        if (!this.regning.faerdig()) { e.hidden = true; return; }
         e.hidden = false;
-        e.innerHTML = "";
+        e.className = "sk-svar n5";
+        var vist = this.fast.klasse === "gul";
         D.ALKANER.forEach(function (a, i) {
             var b = document.createElement("button");
             b.type = "button";
-            b.className = "knap";
-            b.textContent = NK.formel(a.formel);
-            b.title = a.navn;
+            b.className = "sk-knap";
+            b.innerHTML = "<span>" + NK.formel(a.formel) + '</span><span class="sk-navn">' + NK.html(a.navn) + "</span>";
             if (mig.alkan !== null) {
                 b.disabled = true;
-                if (i === mig.alkan) b.classList.add("rigtig");
-            } else if (mig.alkanForkert.indexOf(i) >= 0) b.classList.add("forkert");
-            b.addEventListener("click", function () { mig.vaelgAlkan(i, "valg"); });
+                b.classList.add(i === mig.alkan ? (vist ? "svar-vist" : "rigtig") : (mig.alkanForkert.indexOf(i) >= 0 ? "forkert" : "dim"));
+            } else if (mig.alkanForkert.indexOf(i) >= 0) { b.classList.add("forkert"); b.disabled = true; }
+            else if (i === mig.alkanValgt) b.classList.add("valgt");
+            b.addEventListener("click", function () { mig.vaelgAlkanValg(i); });
             e.appendChild(b);
         });
     };
@@ -188,7 +220,7 @@
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
         if (u === null) return false;
-        if (this.skalVaelge()) this.vaelgAlkan(u, "valg");
+        if (this.skalVaelge()) this.vaelgAlkanValg(u);
         else {
             var a = D.ALKANER[u];
             this.kortBesked(NK.html(a.navn.charAt(0).toUpperCase() + a.navn.slice(1) + ", " + NK.formel(a.formel) + ": " + K.Mtekst(u) + " g/mol." +
@@ -202,9 +234,12 @@
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
         lay.bordY = Math.round(H - NK.klamp(H * 0.05, 12, 30));
-        var sh = Math.round(NK.klamp(H * 0.46, 190, 340));
+        /* Tavlen begynder under kortets plads; soejlerne giver plads, saa
+           tavlen har mindst 170 px */
+        lay.top = this.kortZone() + 8;
+        var sh = Math.round(NK.klamp(Math.min(H * 0.46, lay.bordY - lay.top - 30 - 170), 150, 340));
         lay.sh = sh;
-        lay.tavle = { x: 20, y: 16, b: W - 40, h: Math.max(150, lay.bordY - sh - 30 - 16) };
+        lay.tavle = { x: 20, y: lay.top, b: W - 40, h: Math.max(120, lay.bordY - sh - 30 - lay.top) };
         lay.graf = { x: 40, y: lay.bordY - sh, b: W - 80, h: sh - 6 };
         this.lay = lay;
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
@@ -222,7 +257,8 @@
         var loest = this.regning.loest("M");
         lay.soejler = Tg.soejler(ctx, lay.graf, {
             M: loest ? o.facit.M : null, valgt: this.alkan !== null && this.alkan !== o.facit.alkan ? this.alkan : null,
-            rigtig: this.alkan !== null ? this.alkan : null, lys: this.over, aktiv: true, tid: this.tid
+            rigtig: this.alkan !== null ? this.alkan : null,
+            lys: this.skalVaelge() && this.alkanValgt !== null ? this.alkanValgt : this.over, aktiv: true, tid: this.tid
         });
     };
 

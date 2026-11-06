@@ -40,9 +40,9 @@
         [6, "C", "carbon", ["kulstof"], 2, 14, "i", "navn", { b: "kube", form: "klump", farve: "#26272b" },
             "Grafit i blyanter. Diamant er også carbon."],
         [7, "N", "nitrogen", ["kvælstof"], 2, 15, "i", "navn", { b: "ampul", fyld: "klar", farve: "#ffffff" },
-            "78 % af luften er nitrogen."],
+            "78 % af luften er dinitrogen."],
         [8, "O", "oxygen", ["ilt"], 2, 16, "i", "symbol", { b: "ampul", fyld: "klar", farve: "#ffffff" },
-            "21 % af luften. Det er den del, vi ånder for."],
+            "21 % af luften er dioxygen. Det er den del, vi ånder for."],
         [9, "F", "fluor", [], 2, 17, "i", "navn", { b: "ampul", fyld: "gas", farve: "#efe39a" },
             "Fluorid i tandpasta beskytter tænderne."],
         [10, "Ne", "neon", [], 2, 18, "a", "navn", { b: "ampul", fyld: "klar", farve: "#ffffff" },
@@ -457,17 +457,17 @@
     D.INTRO_MONTRE = [
         { tekst: "I denne fane sætter du grundstofferne 1 til 36 på plads i skolens grundstofudstilling. Udstillingen er formet som det periodiske system, og hvert rum har et skilt med atomnummer og symbol. Tallene foroven er hovedgrupperne, og tallene til venstre er perioderne.",
           sel: "#montre-anker-montre" },
-        { tekst: "Prøven på bordet har et mærke, hvor enten navnet eller symbolet mangler. Du skriver navnet eller symbolet på opgavekortet og trækker prøven op i rummet med det rigtige symbol på skiltet.",
-          felt: "proeve", sel: "#montre-kort" },
-        { tekst: "Når prøven står på plads, skriver du elektronstrukturen, og tavlen tegner atommodellen imens. Knappen på opgavekortet giver et hint og derefter svaret. Navnetavlen midt i udstillingen viser alle grundstoffernes navne.",
+        { tekst: "Prøven på bordet har et mærke, hvor enten navnet eller symbolet mangler. Du skriver navnet eller symbolet på kortet øverst i scenen og trækker prøven op i rummet med det rigtige symbol på skiltet.",
+          felt: "proeve", sel: "#montre-skort" },
+        { tekst: "Når prøven står på plads, skriver du elektronstrukturen, og tavlen tegner atommodellen imens. Knappen Giv et hint på kortet giver et hint og derefter svaret. Navnetavlen midt i udstillingen viser alle grundstoffernes navne.",
           sel: ["#montre-anker-tavle", "#montre-knap", "#montre-anker-navne"] }
     ];
     D.INTRO_FORMLER = [
-        { tekst: "I denne fane tæller du atomerne i et stof. Tavlen viser stoffets formel, og på opgavekortet skriver du antallet af atomer af hvert grundstof og til sidst antallet i alt.",
-          sel: ["#formler-anker-tavle", "#formler-kort"] },
+        { tekst: "I denne fane tæller du atomerne i et stof. Tavlen viser stoffets formel, og på kortet øverst i scenen skriver du antallet af atomer af hvert grundstof og til sidst antallet i alt.",
+          sel: ["#formler-anker-tavle", "#formler-skort"] },
         { tekst: "Når et grundstof er talt rigtigt, flyver dets atomer ud af udstillingen og op på tavlen. En parentes i formlen bliver til lige så mange kopier, som tallet efter parentesen siger.",
           sel: "#formler-anker-tavle" },
-        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Du skifter stof ved at klikke på en af de små flasker på bordet, og listen under opgavekortet viser flaskerne i de tre niveauer.",
+        { tekst: "Knappen Giv et hint på kortet giver et hint og derefter svaret. Du skifter stof ved at klikke på en af de små flasker på bordet, og listen i panelet viser flaskerne i de tre niveauer.",
           sel: ["#formler-knap", "#formler-anker-raekke", "#formler-fremskridt"] }
     ];
     D.INTRO_OPRAAB = [

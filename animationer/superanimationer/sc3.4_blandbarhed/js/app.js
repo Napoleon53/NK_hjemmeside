@@ -48,6 +48,15 @@
         bassin.saetT(T);
     }
 
+    /* En handling i panelet eller bassinet: under en forudsigelse er den
+       laast, og kortet blinker (js/opgaver.js). Ellers kan en byg-opgave
+       sendes ind bagefter. */
+    function maa() {
+        if (opgaver.spaer()) return false;
+        opgaver.handlet();
+        return true;
+    }
+
     function loekke(tidsstempel) {
         var dt = (tidsstempel - sidsteTid) / 1000;
         sidsteTid = tidsstempel;
@@ -83,15 +92,21 @@
         if (t === "t") { if (NK.el("teori").classList.contains("vis")) lukOverlay(); else { lukOverlay(); aabn("teori"); } return; }
         if (t === "q") { if (NK.el("quiz").classList.contains("vis")) lukOverlay(); else { lukOverlay(); quiz.aabn(); } return; }
         if (document.querySelector(".overlay.vis")) return;
+        if (e.key === "Enter") {
+            if (e.target && e.target.tagName === "BUTTON") return;
+            e.preventDefault();
+            opgaver.enter();
+            return;
+        }
         if (t === "k" && laerer) { laerer.startIntro(true); return; }
-        if (t === "v") { bassin.haeld("vand"); return; }
-        if (t === "e") { bassin.haeld("ethanol"); return; }
-        if (t === "o") { bassin.haeld("olie"); return; }
-        if (t === "r") { bassin.toem(); return; }
-        if (t === "d") { bassin.skiftKoeler(); return; }
-        if (e.key === " ") { e.preventDefault(); bassin.ryst(1.2); return; }
-        if (e.key === "ArrowUp" || e.key === "ArrowRight") { e.preventDefault(); saetT(bassin.m.T + 5); return; }
-        if (e.key === "ArrowDown" || e.key === "ArrowLeft") { e.preventDefault(); saetT(bassin.m.T - 5); return; }
+        if (t === "v") { if (maa()) bassin.haeld("vand"); return; }
+        if (t === "e") { if (maa()) bassin.haeld("ethanol"); return; }
+        if (t === "o") { if (maa()) bassin.haeld("olie"); return; }
+        if (t === "r") { if (maa()) bassin.toem(); return; }
+        if (t === "d") { if (maa()) bassin.skiftKoeler(); return; }
+        if (e.key === " ") { e.preventDefault(); if (maa()) bassin.ryst(1.2); return; }
+        if (e.key === "ArrowUp" || e.key === "ArrowRight") { e.preventDefault(); if (maa()) saetT(bassin.m.T + 5); return; }
+        if (e.key === "ArrowDown" || e.key === "ArrowLeft") { e.preventDefault(); if (maa()) saetT(bassin.m.T - 5); return; }
     }
 
     function start() {
@@ -102,6 +117,7 @@
 
         opgaver = new NK.Opgaver(bassin, saetT);
         NK.opgaver = opgaver;
+        bassin.laast = function () { return !maa(); };
         quiz = new NK.Quiz();
         NK.quiz = quiz;
 
@@ -122,18 +138,22 @@
         var stofknapper = document.querySelectorAll(".stofknap");
         for (var i = 0; i < stofknapper.length; i++) {
             (function (k) {
-                k.addEventListener("click", function () { bassin.haeld(k.getAttribute("data-stof")); });
+                k.addEventListener("click", function () { if (maa()) bassin.haeld(k.getAttribute("data-stof")); });
             }(stofknapper[i]));
         }
-        NK.el("ryst").addEventListener("click", function () { bassin.ryst(1.2); });
+        NK.el("ryst").addEventListener("click", function () { if (maa()) bassin.ryst(1.2); });
         var koelerknapper = document.querySelectorAll(".koelerknap");
         for (i = 0; i < koelerknapper.length; i++) {
             (function (k) {
-                k.addEventListener("click", function () { bassin.saetKoeler(k.getAttribute("data-koeler")); });
+                k.addEventListener("click", function () { if (maa()) bassin.saetKoeler(k.getAttribute("data-koeler")); });
             }(koelerknapper[i]));
         }
-        NK.el("toem").addEventListener("click", function () { bassin.toem(); });
-        NK.el("temp").addEventListener("input", function () { saetT(parseInt(NK.el("temp").value, 10)); });
+        NK.el("toem").addEventListener("click", function () { if (maa()) bassin.toem(); });
+        /* Skyderen: under en forudsigelse springer den tilbage */
+        NK.el("temp").addEventListener("input", function () {
+            if (!maa()) { saetT(bassin.m.T); return; }
+            saetT(parseInt(NK.el("temp").value, 10));
+        });
 
         /* Toplinjen og vinduerne */
         NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start("bassin"); });

@@ -70,6 +70,9 @@
     D.M_C5H12 = "72,15";
 
     /* ----- Temperatur og tryk ------------------------------------------------- */
+    /* Hoejden, papirkortet har sat af oeverst i scenen: [almindelig skaerm, lav skaerm,
+       smalt kort til hoejre for reolen paa en lav scene (fane 1)] */
+    D.ZONE = { varm: [112, 110, 150], form: [192, 172], spil: [170, 154] };
     D.STUE = 20;                               /* stuetemperatur, °C */
     D.T_VARM = { min: -200, max: 360 };        /* kammeret paa fane 1 og 3 */
     D.T_FORM = { min: 0, max: 50 };            /* vandbadet paa fane 2 */
@@ -137,7 +140,7 @@
               svar: "Alle tre er C₅H₁₂. De har præcis de samme atomer." },
             { t: "Det er lettest",
               svar: "Samme formel giver samme masse. Alle tre har M = 72,15 g/mol." },
-            { t: "Bindingerne inde i molekylet er svagest",
+            { t: "Bindingerne i molekylet er svagest",
               svar: "Når et stof koger, går molekylerne fra hinanden. Molekylerne selv er hele." }
         ]
     };
@@ -208,24 +211,24 @@
           sel: ["#varm-anker-hylde", "#varm-anker-kammer"] },
         { tekst: "Du varmer kammeret op eller køler det ned ved at trække i håndtaget på termometeret. Vinduet i midten viser molekylerne i glasset helt tæt på. Kuglerne er grå i et fast stof, orange i en væske og blå i en gas.",
           sel: ["#varm-anker-termometer", "#varm-anker-zoom"] },
-        { tekst: "Opgavekortet giver dig ét mål ad gangen, og der er fire mål i alt. Knappen på kortet giver et hint og derefter svaret. Kurven under opgavekortet viser de kogepunkter, du har fundet.",
-          sel: ["#varm-kort", "#varm-kurve-kort"] }
+        { tekst: "Papirkortet øverst i scenen giver dig ét mål ad gangen, og der er fire mål i alt. Du trykker Indsend svar, når målet er nået, og den gule knap giver et hint og derefter svaret. Kurven i panelet viser de kogepunkter, du har fundet.",
+          sel: ["#varm-skort", "#varm-kurve-kort"] }
     ];
     D.INTRO_FORM = [
         { tekst: "I denne fane undersøger du, om molekylernes form påvirker kogepunktet. De tre glas i vandbadet indeholder pentan, 2-methylbutan og 2,2-dimethylpropan, som alle har formlen C₅H₁₂. Vinduet over hvert glas viser molekylerne i glasset.",
           sel: ["#form-anker-bad", "#form-anker-zoom"] },
-        { tekst: "Først gætter du på opgavekortet, hvilken ballon der fyldes først. Du kan også gætte ved at klikke på et af glassene. Derefter varmer du vandbadet op ved at trække i håndtaget på termometeret.",
-          sel: ["#form-kort", "#form-anker-termometer"] },
-        { tekst: "Når alle tre stoffer har kogt, spørger opgavekortet, hvorfor ét af stofferne koger før de to andre. Knappen på kortet giver et hint og derefter svaret. Kogepunkterne kommer på listen under opgavekortet, og knappen under listen viser, hvor molekylerne rører hinanden.",
-          sel: ["#form-kort", "#form-tabel-kort"] }
+        { tekst: "Først gætter du på papirkortet, hvilken ballon der fyldes først, og trykker Indsend svar. Du kan også vælge et glas ved at klikke på det. Derefter varmer du vandbadet op ved at trække i håndtaget på termometeret.",
+          sel: ["#form-skort", "#form-anker-termometer"] },
+        { tekst: "Når alle tre stoffer har kogt, spørger papirkortet, hvorfor ét af stofferne koger før de to andre. Den gule knap på kortet giver et hint og derefter svaret. Kogepunkterne kommer på listen i panelet, og knappen under listen viser, hvor molekylerne rører hinanden.",
+          sel: ["#form-skort", "#form-tabel-kort"] }
     ];
     D.INTRO_SPIL = [
         { tekst: "I denne fane gætter du, hvilket stof i en blanding der koger først. Glasset i kammeret indeholder en blanding af to eller tre alkaner. Vinduet viser molekylerne af hvert stof i sin egen farve.",
           sel: ["#spil-anker-kammer", "#spil-anker-zoom"] },
-        { tekst: "Du svarer på opgavekortet eller ved at klikke på et af molekylerne. Derefter varmer kammeret selv op, til det første stof er kogt væk. Opgavekortet forklarer bagefter, hvorfor netop det stof kogte først.",
-          sel: "#spil-valg" },
-        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret, men du får ikke point for et svar, du har set. En runde består af ni blandinger fra tre niveauer. Kortet Runden tæller dine rigtige svar og husker din rekord.",
-          sel: ["#spil-kort", "#spil-runde"] }
+        { tekst: "Du vælger et svar på papirkortet eller klikker på et af molekylerne og trykker Indsend svar. Derefter varmer kammeret selv op, til det første stof er kogt væk. Papirkortet forklarer bagefter, hvorfor netop det stof kogte først.",
+          sel: "#spil-skort" },
+        { tekst: "Den gule knap på papirkortet giver et hint og derefter svaret, men du får ikke point for et svar, du har set. En runde består af ni blandinger fra tre niveauer. Kortet Runden i panelet tæller dine rigtige svar og husker din rekord.",
+          sel: ["#spil-skort", "#spil-runde"] }
     ];
 
     /* Ros, naar en hel fane er klaret. Det er sammen med taendstikken de

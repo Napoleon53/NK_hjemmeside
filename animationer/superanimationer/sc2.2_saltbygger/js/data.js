@@ -598,22 +598,22 @@
               sel: ["#bord-scene .hylde.top .hylde-gruppe", "#bord-scene .hylde.bund .hylde-gruppe"] },
             { tekst: "Hvert kort på bordet er lige så bredt, som ionen har ladning. De positive og de negative ladninger mødes i lynlåsen midt på bordet. Når lynlåsen lukker hele vejen, er saltet neutralt, og formlen og navnet står under bordet.",
               felt: "bord" },
-            { tekst: "Knappen Afstem for mig viser trin for trin, hvordan lynlåsen lukkes. Knappen Start opgave i opgavekortet giver dig en opgave, og bagefter giver den samme knap et hint, hvis du sidder fast.",
-              sel: ["#byg-afstem", "#bord-opgavekort"] }
+            { tekst: "Knappen Afstem for mig viser trin for trin, hvordan lynlåsen lukkes. Knappen Start opgave på kortet over bordet giver dig en opgave. Du sender dit svar med Indsend svar, og knappen Giv hint hjælper, hvis du sidder fast.",
+              sel: ["#byg-afstem", "#bord-skort"] }
         ],
         "fane-vand": [
             { tekst: "I denne fane lægger du et salt i vand og ser, hvad der sker med ionerne, når saltet opløses. Bægerglasset viser hver ion som en kugle med ionens formel på.",
               felt: "glas" },
             { tekst: "Du vælger saltet med en positiv og en negativ ion i kortet Vælg et salt. Knappen Læg det i vandet lægger saltet i bægerglasset. Knappen Opløs det i vand i fane 1 lægger dit eget salt fra bordet i bægerglasset.",
               sel: "#vand-saltkort" },
-            { tekst: "Opgavekortet stiller to slags opgaver. Enten forudsiger du, hvilke ioner der kommer ud i vandet, eller du tæller ionerne i bægerglasset og finder saltet. Knappen Start opgave giver dig en opgave, og bagefter giver den samme knap et hint.",
-              sel: "#vand-opgavekort" }
+            { tekst: "Kortet over bægerglasset stiller to slags opgaver. Enten forudsiger du, hvilke ioner der kommer ud i vandet, eller du tæller ionerne i bægerglasset og finder saltet. Du vælger et svar og sender det med Indsend svar.",
+              sel: "#vand-skort" }
         ],
         "fane-ukendt": [
-            { tekst: "I denne fane finder du ladningen på en ukendt ion ud fra saltets formel. Formlen står øverst i scenen, og bordet under formlen viser ionerne i det antal, formlen angiver. Kortene er foldet sammen, til du har fundet ionernes ladning.",
+            { tekst: "I denne fane finder du ladningen på en ukendt ion ud fra saltets formel. Formlen står under kortet øverst i scenen, og bordet under formlen viser ionerne i det antal, formlen angiver. Kortene er foldet sammen, til du har fundet ionernes ladning.",
               felt: "formel" },
-            { tekst: "Opgaven er delt i trin, og trinene står i opgavekortet. Først finder du ladningen på den kendte ion og derefter ladningen på den ukendte ion. Til sidst bruger du den ukendte ion i et navn eller i en formel.",
-              sel: "#ukendt-opgavekort .trin" },
+            { tekst: "Opgaven er delt i trin, og trinene står på kortet øverst i scenen. Først finder du ladningen på den kendte ion og derefter ladningen på den ukendte ion. Til sidst bruger du den ukendte ion i et navn eller i en formel.",
+              sel: "#ukendt-skort .trin" },
             { tekst: "Plakaterne på væggen viser det periodiske system og de sammensatte ioner. Et klik på en plakat viser plakaten i stort format. Når du trykker Start opgave, får du at vide, hvilken ion du skal begynde med. Bagefter giver knappen et hint.",
               felt: ["pt", "ioner"], sel: "#ukendt-opgaveknap" }
         ]

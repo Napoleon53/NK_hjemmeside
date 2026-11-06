@@ -257,31 +257,49 @@ main { flex: 1; position: relative; min-height: 0; }
     overflow-x: hidden;
 }
 
-/* Opgaven staar over arbejdsfladen, ikke i panelet */
-.opgavelinje {
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (6. nov. 2026): trinnet, opgaven, beskeden, Giv et hint og
+   Indsend svar paa ét lyst kort oeverst i midten af scenen. Udseendet
+   kommer fra ../faelles/papirkort.css; her staar kun pladsen og
+   grundformen. Pladsen har fast hoejde (--kortzone), saa arket staar
+   stille, naar beskeden kommer og gaar. Selvtesten maaler, at kortet
+   holder sig inden for pladsen i alle trin, ogsaa med hint, en lang
+   fejlbesked og forklaringen efter Vis svaret.
+   --------------------------------------------------------------------- */
+:root { --kortzone: 172px; }
+
+.kortplads {
     flex: 0 0 auto;
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 14px 22px 2px;
+    position: relative;
+    height: var(--kortzone);
+    padding: 10px 12px 0;
+    box-sizing: border-box;
 }
 
-.ol-etiket {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--gul);
-    white-space: nowrap;
+.scenekort {
+    position: relative;
+    z-index: 3;
+    width: min(900px, 100%);
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
-.opgavetekst { margin: 0; font-size: 1.15rem; font-weight: 600; line-height: 1.4; color: var(--tekst); }
-.kontekst { margin-left: 6px; font-weight: 400; font-style: italic; color: var(--tekst-svag); }
-.kontekst[hidden] { display: none; }
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-kontekst { font-style: italic; color: #4b5363; }
+.sk-bund { display: flex; align-items: center; gap: 10px; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.sk-videre { flex: 0 0 auto; white-space: nowrap; font-family: inherit; cursor: pointer; }
+.knap.indsend.ikke-klar { cursor: default; }
+
+/* Felterne paa et loest trin: laast og groenne (gule, naar svaret blev vist) */
+.tavle input.laast { cursor: default; }
+.tavle input.laast.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.14); color: #9af0c0; box-shadow: none; }
+.tavle input.laast.vist { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.1); color: #f7e4ab; box-shadow: none; }
 
 .vaegt-omraade {
     flex: 1 1 auto;
-    min-height: 280px;
+    min-height: 250px;
     position: relative;
 }
 
@@ -301,28 +319,6 @@ main { flex: 1; position: relative; min-height: 0; }
 
 body.med-vaegt .arbejdsbord { flex: 0 0 auto; margin: 0 14px 10px; padding: 10px 12px; }
 
-/* Det, trinnet spoerger om: den linje, eleven skal laese */
-.ab-hoved {
-    display: flex;
-    align-items: baseline;
-    gap: 6px 14px;
-    flex-wrap: wrap;
-    border-left: 4px solid var(--gul);
-    padding: 2px 0 2px 12px;
-}
-
-.ab-trin {
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--gul);
-    white-space: nowrap;
-}
-
-.ab-spm { font-size: 1.3rem; font-weight: 600; color: var(--tekst); line-height: 1.35; }
-body.med-vaegt .ab-spm { font-size: 1.08rem; }
-
 /* ---------------------------------------------------------------------
    TAVLEN: ét ark, der staar stille. Skemaet med faste pladser til
    tallene, en klamme pr. par over og under skemaet, rækkerne med
@@ -341,7 +337,7 @@ body.med-vaegt .ab-spm { font-size: 1.08rem; }
 .tavleramme {
     flex: 1 1 auto;
     min-width: 0;
-    margin-top: 12px;
+    margin-top: 0;
     background-color: #101016;
     border: 1px solid #34343f;
     border-radius: var(--radius-lil);
@@ -352,7 +348,7 @@ body.med-vaegt .ab-spm { font-size: 1.08rem; }
     gap: 16px;
 }
 
-body.med-vaegt .tavleramme { margin-top: 8px; padding: 10px; gap: 9px; }
+body.med-vaegt .tavleramme { margin-top: 0; padding: 10px; gap: 9px; }
 
 /* Arket: en række til den øverste klamme, skemaet, en række til den
    nederste klamme og rækkerne med tal. Rækkerne har fast højde fra
@@ -462,6 +458,10 @@ body.med-vaegt .skema { font-size: clamp(1.6rem, 2.9vw, 2.3rem); }
 
 .oxrk.tv { justify-content: flex-end; }
 .oxrk.th { justify-content: flex-start; }
+/* Tallet over naboatomet (fx −II over O) er lidt bredere end atomet; feltet
+   holder et par px afstand, saa det ikke daekker tallet paa en smal skaerm */
+.oxrk.tv .oxfelt { margin-right: 3px; }
+.oxrk.th .oxfelt { margin-left: 3px; }
 
 .oxtal { font-weight: 700; color: var(--tekst); white-space: nowrap; flex-shrink: 0; }
 .oxtal.fast { color: #8a8a99; font-weight: 600; font-size: 0.88em; }
@@ -658,7 +658,7 @@ body.med-vaegt .tast { min-width: 38px; height: 36px; font-size: 1rem; }
 body.med-vaegt .taster.ox .tast { min-width: 46px; }
 
 /* ---------------------------------------------------------------------
-   UNDER ARKET: knapperne paa klammerne, Tjek, hint og beskeden
+   KNAPPERNE PAA KLAMMERNE: de vaelger kun, Indsend svar paa kortet bedoemmer
    --------------------------------------------------------------------- */
 .valgknap {
     background-color: var(--panel-2);
@@ -677,6 +677,8 @@ body.med-vaegt .taster.ox .tast { min-width: 46px; }
 .valgknap[data-valg="red"]:hover { border-color: var(--red); background-color: var(--red-bund); }
 .valgknap:active { transform: scale(0.97); }
 .valgknap.forkert { border-color: var(--roed); color: #f0918a; background-color: rgba(224, 84, 70, 0.1); animation: ryst 0.35s; }
+.valgknap.valgt[data-valg="ox"] { border-color: var(--ox); background-color: var(--ox-bund); color: #ffd2a6; box-shadow: 0 0 0 2px rgba(240, 163, 94, 0.35); }
+.valgknap.valgt[data-valg="red"] { border-color: var(--red); background-color: var(--red-bund); color: #bfe0ff; box-shadow: 0 0 0 2px rgba(108, 182, 255, 0.35); }
 
 body.med-vaegt .valgknap { padding: 2px 10px; font-size: 0.95rem; }
 
@@ -686,57 +688,8 @@ body.med-vaegt .valgknap { padding: 2px 10px; font-size: 0.95rem; }
     75% { transform: translateX(4px); }
 }
 
-/* Knapperne og beskeden staar paa tavlen lige under tasterne. Der er
-   plads til knapperne og to linjers besked fra start, saa tavlen ikke
-   hopper, naar beskeden kommer. Den gule knap er hjaelpen (Giv hint,
-   Vis svaret) og til sidst Ny opgave. */
-.ab-bund {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    min-height: 134px;
-}
-
-.ab-knapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-shrink: 0; }
-
-/* De to knapper er lige høje, så rækken er den samme, når Tjek er væk */
-.knap.tjekknap, .knap.hintknap { height: 48px; padding-top: 0; padding-bottom: 0; }
-.knap.tjekknap { min-width: 190px; justify-content: center; font-size: 1.12rem; padding: 0 22px; }
-.knap.tjekknap[hidden] { display: none; }
-
-.knap.hintknap {
-    min-width: 150px;
-    justify-content: center;
-    padding: 0 20px;
-    font-size: 1.05rem;
-    color: #f6d977;
-    background-color: rgba(242, 197, 61, 0.08);
-    border-color: rgba(242, 197, 61, 0.7);
-}
-
-.knap.hintknap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.18); border-color: var(--gul); }
-.knap.hintknap.lys { box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.22), 0 0 18px rgba(242, 197, 61, 0.45); }
-.knap.hintknap.groen { min-width: 190px; font-size: 1.12rem; color: #ffffff; background-color: var(--groen-mork); border-color: var(--groen); }
-.knap.hintknap.groen:hover:not(:disabled) { background-color: var(--groen); }
-
-.besked { margin: 0; font-size: 1.08rem; line-height: 1.5; color: #c8ced6; }
-.besked.god   { color: #7ee0a8; }
-.besked.skidt { color: #f0918a; }
-.besked.gul   { color: #f0d77a; }
-
-.ab-bund .besked { max-width: 880px; padding: 7px 16px; border: 1px solid transparent; border-radius: 8px; text-align: center; }
-.ab-bund .besked:empty { visibility: hidden; }
-.ab-bund .besked.god   { border-color: rgba(63, 174, 114, 0.5); background-color: rgba(63, 174, 114, 0.1); }
-.ab-bund .besked.skidt { border-color: rgba(224, 84, 70, 0.55); background-color: rgba(224, 84, 70, 0.1); }
-.ab-bund .besked.gul   { border-color: rgba(242, 197, 61, 0.45); background-color: rgba(242, 197, 61, 0.08); }
-
-body.med-vaegt .ab-bund { flex-direction: row-reverse; align-items: flex-start; gap: 12px; min-height: 0; }
-body.med-vaegt .ab-bund .besked { flex: 0 1 auto; margin-right: auto; padding: 5px 12px; text-align: left; font-size: 0.97rem; }
-body.med-vaegt .knap.tjekknap, body.med-vaegt .knap.hintknap { min-width: 96px; height: 38px; font-size: 0.95rem; padding: 0 14px; }
 /* Med vægten er pladsen trang: tasterne fylder kun, når de bruges */
 body.med-vaegt .taster.tom { display: none; }
-body.med-vaegt .ab-knapper { gap: 8px; }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -1064,7 +1017,6 @@ select:focus-visible {
 
 @media (max-width: 1320px) {
     :root { --panel-bredde: 320px; }
-    .ab-spm { font-size: 1.18rem; }
     .taster.ox .tast { min-width: 44px; padding: 0 4px; font-size: 1rem; }
     .kl-tekst, .rc { font-size: 1rem; gap: 6px; }
 }
@@ -1074,7 +1026,6 @@ select:focus-visible {
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 5px 12px 5px 10px; gap: 8px; }
     .niveau-etiket { display: none; }
-    .opgavelinje { padding: 10px 14px 0; }
     .arbejdsbord { margin: 8px 10px 10px; padding: 10px 10px; }
     .tavleramme { padding: 16px 8px; }
     .taster { gap: 4px; padding: 7px 8px; }
@@ -1099,38 +1050,44 @@ select:focus-visible {
    intet skal rulles. Skemaet er stadig det stoerste paa tavlen. */
 @media (max-height: 780px) {
     .skema { font-size: clamp(2rem, 5.4vw, 4.2rem); }
-    .opgavelinje { padding-top: 10px; }
     .arbejdsbord { margin: 8px 12px 10px; padding: 10px 12px; }
-    .tavleramme { margin-top: 9px; padding: 14px 10px; gap: 11px; }
+    .tavleramme { padding: 14px 10px; gap: 11px; }
     .klrk { height: 40px; }
     .rrk { height: 34px; }
     .tavle-note { margin-top: 2px; }
     .tast { height: 38px; }
-    .ab-bund { gap: 9px; min-height: 116px; }
-    .knap.tjekknap, .knap.hintknap { height: 42px; padding: 0 20px; font-size: 1.05rem; }
     .vaegt-omraade { min-height: 228px; }
-    body.med-vaegt .tavleramme { margin-top: 6px; padding: 6px 10px; gap: 5px; }
+    body.med-vaegt .tavleramme { padding: 6px 10px; gap: 5px; }
     body.med-vaegt .arbejdsbord { margin-bottom: 6px; padding: 8px 12px; }
-    body.med-vaegt .opgavelinje { padding-top: 7px; }
     body.med-vaegt .tast { height: 34px; }
     body.med-vaegt .klrk { height: 31px; }
     body.med-vaegt .rrk { height: 25px; }
-    body.med-vaegt .knap.tjekknap, body.med-vaegt .knap.hintknap { height: 36px; }
     body.med-vaegt .tavle-note { margin-top: 0; font-size: 0.88rem; }
 }
 
-/* Endnu lavere: Tjek staar til hoejre for beskeden i stedet for over den */
+/* Endnu lavere: mindre luft paa arket */
 @media (max-height: 700px) {
     .skema { font-size: clamp(1.9rem, 5vw, 3.4rem); }
     .tavleramme { padding: 10px 8px; gap: 8px; }
-    .ab-bund { flex-direction: row-reverse; align-items: flex-start; min-height: 0; }
-    .ab-bund .besked { flex: 0 1 auto; margin-right: auto; padding: 6px 12px; text-align: left; font-size: 1rem; }
-    .knap.tjekknap, .knap.hintknap { min-width: 104px; height: 40px; padding: 0 14px; font-size: 1rem; }
-    .ab-knapper { gap: 8px; }
     .klrk { height: 36px; }
     .rrk { height: 30px; }
     .klamme .koeffelt, .regnskab .koeffelt { height: 30px; font-size: 1.15rem; }
     .valgknap { padding: 2px 12px; font-size: 1rem; }
+}
+
+/* Papirkortets plads foelger kortets skrift: papirkort.css goer kortet
+   mindre under 720 px's hoejde. Paa en smal skaerm bryder teksten oftere
+   om, saa pladsen bliver hoejere (der maa rulles under 1040 px). Med
+   vaegten er pladsen trang, saa vaegten maa blive lidt lavere. */
+@media (max-height: 720px) {
+    :root { --kortzone: 146px; }
+    .kortplads { padding-top: 7px; }
+    .vaegt-omraade { min-height: 196px; }
+}
+
+@media (max-width: 1040px) {
+    :root { --kortzone: 200px; }
+    .taster.ox .tast { min-width: 33px; padding: 0 2px; font-size: 0.86rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

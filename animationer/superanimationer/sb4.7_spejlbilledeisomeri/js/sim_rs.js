@@ -61,6 +61,7 @@
         this.tal = {};
         this.naesteTal = 1;
         this.forkertTal = null;
+        this.valgtGruppe = null;    /* den gruppe, eleven har valgt (Indsend svar giver den nummeret) */
         this.drejOK = false;
         this.svar = null;
         this.hold = null;
@@ -71,20 +72,30 @@
 
     P.facit = function () { return K.rs(this.grupper, R.BASIS); };
 
+    /* R og S paa kortet vaelger kun; Indsend svar sender svaret */
     P.bygValg = function () {
         var mig = this;
         this.valg.innerHTML = "";
         this.knapper = {};
         [["R", "R  (med uret)"], ["S", "S  (mod uret)"]].forEach(function (x) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap";
-            k.textContent = x[1];
-            k.title = "Tast " + x[0];
-            k.addEventListener("click", function () { mig.svarRS(x[0]); mig.fokus(); });
-            mig.valg.appendChild(k);
-            mig.knapper[x[0]] = k;
+            mig.lavKnap(x[1], x[0], function () { mig.svarRS(x[0]); });
         });
+        this.visValg();
+    };
+
+    /* R og S staar kun fremme i det sidste skridt */
+    P.visValg = function () {
+        var vis = this.trinNu() === "svar" || this.faerdig;
+        for (var n in this.knapper) this.knapper[n].hidden = !vis;
+        this.valg.hidden = !vis;
+    };
+
+    /* Det, Indsend svar sender uden et valgt svar: den gruppe, eleven har valgt */
+    P.indsendScene = function () {
+        var mig = this;
+        if (this.trinNu() !== "tal") return null;
+        return { klar: this.valgtGruppe !== null, mangler: "Klik først på den gruppe, der skal have nummer " + this.naesteTal + ".",
+            fn: function () { var i = mig.valgtGruppe; mig.valgtGruppe = null; mig.giv(i); } };
     };
 
     P.trinNu = function () {
@@ -93,24 +104,20 @@
         return "svar";
     };
 
+    P.trinEtiket = function () {
+        return "trin " + { tal: 1, drej: 2, svar: 3 }[this.trinNu()] + " af 3";
+    };
+
     P.promptHTML = function () {
-        var trin = [
-            ["Giv grupperne nummer efter prioritet", this.naesteTal > 4],
-            ["Drej, så gruppe 4 peger væk fra dig", this.drejOK],
-            ["Går 1 → 2 → 3 med uret (R) eller mod uret (S)?", this.faerdig]
-        ];
-        var aktiv = trin.findIndex(function (t) { return !t[1]; });
-        return '<p class="maal-tekst">Er det (R)- eller (S)-' + NK.html(this.m.navn) + "?</p>" +
-            '<ol class="trinliste">' + trin.map(function (t, i) {
-                return '<li class="' + (t[1] ? "ok" : (i === aktiv ? "aktiv" : "")) + '">' + NK.html(t[0]) + (t[1] ? " ✓" : "") + "</li>";
-            }).join("") + "</ol>";
+        return NK.html("Er det (R)- eller (S)-" + this.m.navn + "?" + (this.faerdig ? "" : " " + this.trinLinje()));
     };
 
     P.trinLinje = function () {
         var t = this.trinNu();
-        if (t === "tal") return this.naesteTal === 1 ? "Klik på den gruppe, der har højest prioritet. Den får nummer 1." : "Klik på den gruppe, der får nummer " + this.naesteTal + ".";
+        if (t === "tal") return this.naesteTal === 1 ? "Klik på den gruppe, der har højest prioritet, og tryk Indsend svar. Den får nummer 1." :
+            "Klik på den gruppe, der får nummer " + this.naesteTal + ", og tryk Indsend svar.";
         if (t === "drej") return "Træk i molekylet, så gruppe 4 (" + D.tekst(this.grupper[this.orden[3]]) + ") peger væk fra dig.";
-        return "Følg 1 → 2 → 3. Vælg R eller S under molekylet.";
+        return "Følg 1 → 2 → 3. Vælg R eller S på kortet.";
     };
 
     /* ----- Hinttrappen og Vis svaret ------------------------------------------------- */
@@ -156,6 +163,7 @@
     /* ----- Nummereringen ---------------------------------------------------------------- */
     P.giv = function (i, vist) {
         var g = this.grupper, mig = this;
+        this.valgtGruppe = null;
         if (this.tal[i] !== undefined) { this.kortBesked(D.tekst(g[i]) + " har allerede nummer " + this.tal[i] + ".", 3); return; }
         var rigtig = this.orden[this.naesteTal - 1];
         if (i !== rigtig) {
@@ -210,6 +218,7 @@
             this.drejOK = true;
             this.svar = s;
             this.knapper[s].classList.add("rigtig");
+            if (this.brugtSvar) this.knapper[s].classList.add("svar-vist");
             this.pilT = 0.001;
             this.loest("1 → 2 → 3 går " + (s === "R" ? "med uret" : "mod uret") + ", når 4 peger væk. Det er (" + s + ")-" + this.m.navn + ".");
             void vist;
@@ -225,11 +234,10 @@
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
-        var L = this.L, baand = this.baand();
-        var top = 14, bund = L.h - Math.max(baand.h, 92) - 62 - 4;
+        var L = this.L;
+        var top = this.kortZone(), bund = L.h - 12;
         var h = Math.max(200, bund - top);
         this.lay = { top: top, bund: bund, h: h, cx: L.b / 2, cy: top + h * 0.52, s: Math.min(L.b * 0.15, h * 0.24) };
-        this.valg.style.bottom = (baand.h + 10) + "px";
         this.saetAnker("molekyle", L.b * 0.15, top, L.b * 0.7, h);
     };
 
@@ -277,7 +285,13 @@
             var k = R.ramt(this.model(), this.kam(), pt);
             if (!k) return;
             if (k.i < 0) { this.kortBesked("Det asymmetriske C-atom. Det har fire forskellige grupper.", 3); return; }
-            if (this.naesteTal <= 4) this.giv(k.i);
+            if (this.naesteTal <= 4) {
+                /* Et klik vaelger kun gruppen; Indsend svar giver den nummeret */
+                if (this.tal[k.i] !== undefined) { this.kortBesked(D.tekst(this.grupper[k.i]) + " har allerede nummer " + this.tal[k.i] + ".", 3); return; }
+                this.valgtGruppe = k.i;
+                this.nulstilHjaelp();
+                this.visIndsend();
+            }
             else this.kortBesked(D.tekst(this.grupper[k.i]) + " har nummer " + this.tal[k.i] + ". Træk for at dreje.", 3);
             return;
         }
@@ -312,6 +326,7 @@
         NK.tekst(ctx, D.navn(this.m), lay.cx, lay.top + 24, { font: "700 19px 'Segoe UI', sans-serif", farve: "#cfd6de", justering: "center" });
         var ring = {};
         if (this.forkertTal !== null) ring[this.forkertTal] = T.ROED;
+        if (this.valgtGruppe !== null && !this.faerdig) ring[this.valgtGruppe] = T.BLAA;
         var kug = R.tegn(ctx, this.model(), this.kam(), { tal: this.tal, ring: ring, over: this.faerdig ? null : this.over });
         if (this.drejOK && !this.maalQ) {
             NK.tekst(ctx, "4 peger væk fra dig", lay.cx, lay.bund - 6, { font: "600 15px 'Segoe UI', sans-serif", farve: "#7ee0a8", justering: "center" });

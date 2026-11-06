@@ -244,7 +244,6 @@
         this.vg = { proevet: -1, dom: [], venter: -1, arg: [] };
         NK.Tavle.reaktion(NK.el(this.N + "-reaktion"), o, function (a) { mig.klikArt(a); });
         NK.saetTekst(this.N + "-navn", o.navn + ", " + o.T);
-        NK.saetHTML(this.N + "-linje", NK.kc(NK.html(this.spm())));
         this.bygOplyst();
         this.render();
     };
@@ -336,7 +335,7 @@
             e.preventDefault();
             var tomt = mig.felter.filter(function (f) { return f !== inp && f.tagName === "INPUT" && !f.value.trim(); })[0];
             if (tomt && inp.value.trim()) { tomt.focus(); return; }
-            mig.tjek();
+            mig.indsendKlik();
         });
         this.felter.push(inp);
         return inp;
@@ -370,13 +369,43 @@
         return s;
     };
 
-    F.tjekKnap = function (tekst) {
-        var mig = this;
-        var k = el("button", "tjekknap", tekst || "Tjek");
-        k.type = "button";
-        k.title = "Tjek (Enter)";
-        k.addEventListener("click", function () { mig.tjek(); });
-        return k;
+    /* Tjek-knapperne paa tavlen er afloest af Indsend svar paa papirkortet
+       (Niels 4. nov. 2026). Pladsen i raekken bliver tom. */
+    F.tjekKnap = function () {
+        return el("span", "tjek-plads");
+    };
+
+    /* Et svar, der er valgt med en knap paa tavlen (Kan bruges, Forkast,
+       en negativ koncentration), bedoemmes foerst ved Indsend svar */
+    F.vaelgSvar = function (knap, fn) {
+        if (this.faerdig) return;
+        var gl = this.deleEl.querySelectorAll(".valgt-svar");
+        for (var i = 0; i < gl.length; i++) gl[i].classList.remove("valgt-svar");
+        if (knap) knap.classList.add("valgt-svar");
+        this.valgtSvar = fn;
+        this.visIndsend();
+    };
+
+    F.sendValgt = function () {
+        var f = this.valgtSvar;
+        if (!f) return false;
+        this.valgtSvar = null;
+        f.call(this);
+        return true;
+    };
+
+    /* Indsend svar er klar, naar der er skrevet eller valgt noget i den del,
+       eleven er ved */
+    F.kanIndsende = function () {
+        var d = this.del();
+        if (!d) return false;
+        if (this.valgtSvar) return true;
+        if (d === "cas" || d === "valg" || (d === "svar" && this.fase.svar === "valg")) return false;
+        return (this.felter || []).some(function (f) { return (f.tagName === "INPUT" || f.tagName === "SELECT") && String(f.value).trim(); });
+    };
+
+    F.kortData = function () {
+        return { tekst: NK.html(this.o.tekst), spm: NK.html(this.spm()) };
     };
 
     F.chip = function (vis, tekst, s, klasse) {
@@ -426,8 +455,7 @@
         this.felter = [];
         /* Tekstboksen flyttes med den del, eleven er ved: loeft den ud,
            foer delene ryddes */
-        var boks = this.el.status;
-        if (boks.parentNode) boks.parentNode.removeChild(boks);
+        this.valgtSvar = null;
         this.visOplyst();
         var bar = NK.el(this.N + "-delbar");
         var html = "";
@@ -450,16 +478,8 @@
                     var l = el("div", "rb-linje", '<span class="rl">' + NK.kc(linje) + '</span><span class="rs-maerke' + (this.vist[navn] ? " svar" : "") + '">' + (this.vist[navn] ? "↩" : "✓") + "</span>");
                     blok.appendChild(l);
                 } else blok.appendChild(linje);
-            } else {
-                blok.appendChild(boks);
-                blok.appendChild(this["aktiv_" + navn]());
-            }
+            } else blok.appendChild(this["aktiv_" + navn]());
             this.deleEl.appendChild(blok);
-        }
-        if (this.faerdig) {
-            var slut = el("div", "rb slut");
-            slut.appendChild(boks);
-            this.deleEl.appendChild(slut);
         }
 
         var stempel = NK.el(this.N + "-stempel");
@@ -512,6 +532,7 @@
     F.tjek = function () {
         var d = this.del();
         if (!d) return;
+        if (this.sendValgt()) return;
         this["tjek_" + d]();
     };
 
@@ -535,8 +556,9 @@
     };
 
     F.enter = function () {
-        if (this.faerdig) { this.knap(); return; }
-        this.tjek();
+        if (this.faerdig) { if (this.videreTekst()) this.knap(); return; }
+        if (this.del() === "cas") { this.tjek(); return; }
+        this.indsendKlik();
     };
 
     F.nulstil = function () { this.vaelg(this.nr); };
@@ -772,6 +794,7 @@
                         knap.setAttribute("data-s", a.s);
                         knap.innerHTML = '<span class="ic-u">' + NK.html(tekst) + '</span><span class="ic-ind">' +
                             NK.html(M.indsatTekst(o, a.s, x, false)) + ' <b class="ic-tegn">' + (neg ? "&lt; 0" : "&gt; 0") + "</b></span>";
+                        knap.setAttribute("data-celle", a.s);
                         knap.addEventListener("click", function () { mig.klikCelle(a.s); });
                         td.appendChild(knap);
                     } else if (r === "lig" && tilstand === "klik") {
@@ -1065,10 +1088,10 @@
             else if (mig.vg.proevet === i) {
                 var ja = el("button", "lsn-knap ja", "Kan bruges");
                 ja.type = "button";
-                ja.addEventListener("click", function () { mig.brug(i); });
+                ja.addEventListener("click", function () { mig.vaelgSvar(ja, function () { this.brug(i); }); });
                 var nej = el("button", "lsn-knap nej", "Forkast");
                 nej.type = "button";
-                nej.addEventListener("click", function () { mig.forkast(i); });
+                nej.addEventListener("click", function () { mig.vaelgSvar(nej, function () { this.forkast(i); }); });
                 kort.appendChild(ja);
                 kort.appendChild(nej);
             } else kort.appendChild(el("span", "lsn-dom", "klik for at prøve"));
@@ -1108,7 +1131,7 @@
         }
         this.vg.venter = i;
         this.render();
-        this.besked('<span class="b-maerke">Hvorfor?</span> Klik på den koncentration i skemaet, der bliver negativ. Det er begrundelsen.', "gul");
+        this.besked('<span class="b-maerke">Hvorfor?</span> Klik på den koncentration i skemaet, der bliver negativ, og tryk Indsend svar.', "gul");
     };
 
     F.klikCelle = function (s) {
@@ -1119,6 +1142,12 @@
         var c = M.vaerdi(M.plads(this.o, s), x);
         if (i < 0) {
             this.kortBesked(M.kon(s) + " = " + M.indsatTekst(this.o, s, x) + (c < 0 ? " er negativ." : " er positiv."), 4);
+            return;
+        }
+        if (!this.sendesNu) {
+            var celler = this.deleEl.querySelectorAll('[data-celle="' + s + '"]');
+            this.vaelgSvar(null, function () { this.sendesNu = true; this.klikCelle(s); this.sendesNu = false; });
+            for (var j = 0; j < celler.length; j++) celler[j].classList.add("valgt-svar");
             return;
         }
         if (c >= -1e-12) {
@@ -1191,9 +1220,9 @@
     };
 
     F.trin_valg = function () {
-        if (this.vg.venter >= 0) return "Klik på den koncentration i skemaet, der bliver negativ.";
+        if (this.vg.venter >= 0) return "Klik på den koncentration i skemaet, der bliver negativ, og tryk Indsend svar.";
         if (this.vg.proevet >= 0) {
-            return "Se på rækken Ligevægt med x = " + NK.tal(this.roedder[this.vg.proevet]) + " M. Kan løsningen bruges, eller skal den forkastes?";
+            return "Se på rækken Ligevægt med x = " + NK.tal(this.roedder[this.vg.proevet]) + " M. Vælg Kan bruges eller Forkast, og tryk Indsend svar.";
         }
         return "Prøv hver løsning i skemaet. Klik på en løsning.";
     };
@@ -1625,10 +1654,10 @@
                 else {
                     var ja = el("button", "lsn-knap ja", "Kan bruges");
                     ja.type = "button";
-                    ja.addEventListener("click", function () { mig.domUk(i, "brug"); });
+                    ja.addEventListener("click", function () { mig.vaelgSvar(ja, function () { this.domUk(i, "brug"); }); });
                     var nej = el("button", "lsn-knap nej", "Forkast");
                     nej.type = "button";
-                    nej.addEventListener("click", function () { mig.domUk(i, "forkast"); });
+                    nej.addEventListener("click", function () { mig.vaelgSvar(nej, function () { this.domUk(i, "forkast"); }); });
                     kort.appendChild(ja);
                     kort.appendChild(nej);
                     mig.felter.push(ja);
@@ -1679,7 +1708,7 @@
 
     F.tjek_svar = function () {
         if (this.fase.svar === "valg") {
-            this.besked(NK.html("Tryk Kan bruges eller Forkast ved hver løsning."), "gul");
+            this.besked(NK.html("Vælg Kan bruges eller Forkast ved en løsning, og tryk Indsend svar."), "gul");
             return;
         }
         var t = tjekTal(this.v["us.svar"], this.svarRod());
@@ -1719,12 +1748,11 @@
     };
 
     /* ===================================================================
-       Panelet: opgaven, og naar den er loest, hele besvarelsen
+       Panelet: naar opgaven er loest, hele besvarelsen og kurven
        =================================================================== */
-    F.promptHTML = function () {
+    F.panelHTML = function () {
         var mig = this, o = this.o;
-        var html = '<p class="note-tekst">' + NK.html(o.tekst) + "</p>";
-        html += '<p class="spm"><b>Opgave:</b> ' + NK.html(this.spm()) + "</p>";
+        var html = "";
         if (this.faerdig) {
             html += '<div class="forklaring"><span class="fk-hoved">Besvarelsen</span>';
             html += '<p class="fk-linje">' + NK.html(M.skemaTekst(o)) + " ved " + NK.html(o.T) + "</p>";
@@ -1836,6 +1864,6 @@
     /* Det, fane 1 ogsaa bruger */
     NK.RegnHjaelp = { delAf: delAf, broek: broekHTML, start: tjekStart, aendr: tjekAendr, lig: tjekLig };
 
-    NK.SimUx = lav("ux", D.UX, D.GRUPPER_UX, { navn: "ux", naesteFane: "fane-mx", naesteNavn: "Med x" });
-    NK.SimMx = lav("mx", D.MX, D.GRUPPER_MX, { navn: "mx" });
+    NK.SimUx = lav("ux", D.UX, D.GRUPPER_UX, { navn: "ux", chip: "Opgave", naesteFane: "fane-mx", naesteNavn: "Med x" });
+    NK.SimMx = lav("mx", D.MX, D.GRUPPER_MX, { navn: "mx", chip: "Opgave" });
 }());

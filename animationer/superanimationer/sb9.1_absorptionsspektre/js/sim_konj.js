@@ -79,14 +79,13 @@
     function SimKonj() {
         var mig = this;
         this.valg = NK.el("ko-valg");
-        this.linjeEl = NK.el("ko-opgave");
         this.startFane(D.KO, D.KO_GRUPPER);
         this.vaelg(0);
         window.addEventListener("resize", function () { mig.layout(); });
     }
 
     var P = SimKonj.prototype;
-    NK.Fane.paa(P, { navn: "ko", naesteFane: "fane-ch", naesteNavn: "Chromoforen" });
+    NK.Fane.paa(P, { navn: "ko", naesteFane: "fane-ch", naesteNavn: "Chromoforen", zone: 206, zoneLav: 192 });
 
     P.chipTekst = function (o, i) { return String(i + 1); };
 
@@ -103,6 +102,8 @@
         this.rbT = 0;
         this.rbLag = null;
         this.over = null;
+        this.flyttet = false;
+        this.slutGaet = false;
         if (o.gruppe === "kaede") {
             this.n = o.n;
             this.nVis = o.n;
@@ -116,7 +117,6 @@
             this.opdaterKonj();
         }
         this.bygValg();
-        this.visOpgavelinje();
     };
 
     P.saetPolyen = function () {
@@ -171,11 +171,9 @@
             mig.knapper[noegle] = k;
             return k;
         }
-        if ((this.trin === "gaet" || (this.trin === "regnbue" && this.gaet === null)) && !this.faerdig) {
-            this.valg.classList.add("lodret");
-            o.svar.forEach(function (s, i) { knap(s, "g" + i, "gaetknap", function () { mig.svarGaet(i); }); });
-        } else {
-            this.valg.classList.remove("lodret");
+        /* Gaettet staar paa papirkortet; her er kun knapperne til forsoeget */
+        this.valg.classList.remove("lodret");
+        if (!((this.trin === "gaet" || (this.trin === "regnbue" && this.gaet === null)) && !this.faerdig)) {
             if (o.gruppe === "kaede") {
                 knap("− Kortere kæde", "minus", "", function () { mig.skiftN(-1); });
                 knap("+ Længere kæde", "plus", "vend", function () { mig.skiftN(1); });
@@ -192,41 +190,63 @@
         if (this.knapper.plus) this.knapper.plus.disabled = this.n >= D.KO_MAKS;
     };
 
-    P.visOpgavelinje = function () {
-        var o = this.o, t = o.tekst;
-        if (this.faerdig) {
-            if (o.gruppe === "kaede") t = "Prøv selv med andre længder. Toppen og farven følger med.";
-            else if (o.type === "find") t = "Lycopen har 11 konjugerede dobbeltbindinger. Det er chromoforen.";
-            else if (o.type === "regnbue") t = "Hold musen over glasset for at se et molekyle og spektret fra hvert lag (fortyndet 20 gange).";
-            else t = "Klik på en anden dobbeltbinding, og se farven skifte.";
-        } else if (o.type === "gaet" && this.gaet !== null) t = "Tryk på + Længere kæde, og se, hvor toppen flytter hen.";
-        else if (o.type === "regnbue" && this.gaet !== null) t = this.haeldt ? "Bromvandet trænger ned i saften …" : "Tryk på Hæld bromvand i.";
-        NK.saetTekst("ko-opgave", t);
+    /* ----- Papirkortet ------------------------------------------------------------ */
+    P.kortData = function () {
+        var o = this.o;
+        var gaetSpm = o.type === "gaet" || o.type === "regnbue";
+        /* Efter forsoeget staar gaettet paa kortet igen med det rigtige svar */
+        if (gaetSpm && this.slutGaet) return { tekst: o.tekst, svar: o.svar.map(function (t) { return { t: t }; }) };
+        if (gaetSpm && this.gaet === null) return { gaet: true, tekst: o.tekst, svar: o.svar.map(function (t) { return { t: t }; }) };
+        if (o.type === "gaet") return { tekst: "Tryk på + Længere kæde under grafen, og se, hvor toppen flytter hen.", indsend: false };
+        if (o.type === "regnbue") return { tekst: this.haeldt ? "Bromvandet trænger ned i tomatsaften. Se, hvilke farver der kommer i glasset." :
+            "Tryk på Hæld bromvand i under grafen, og se, hvilke farver der kommer i tomatsaften.", indsend: false };
+        if (o.gruppe === "kaede") return { tekst: o.tekst + " Brug knapperne under grafen, og tryk Indsend svar." };
+        if (o.type === "find") return { tekst: o.tekst + " Tryk Indsend svar, når de er markeret." };
+        return { tekst: o.tekst + " Tryk Indsend svar." };
+    };
+
+    P.gaetValg = function (i) { this.svarGaet(i); };
+
+    P.kanIndsende = function () {
+        var o = this.o;
+        if (o.gruppe === "kaede") return this.flyttet;
+        if (o.type === "find") return this.antalMarker() > 0;
+        if (o.type === "brom") return this.brom !== null && !this.flyv;
+        return false;
+    };
+
+    P.indsendTekst = function () {
+        if (this.o.gruppe === "kaede" && this.flyttet) return "Indsend svar: " + this.n + " dobbeltbindinger";
+        return "Indsend svar";
+    };
+
+    P.indsend = function () {
+        var o = this.o;
+        if (o.gruppe === "kaede") this.tjekN();
+        else if (o.type === "find") this.tjekFind();
+        else if (o.type === "brom") this.tjekBrom();
+    };
+
+    /* Eleven har gjort noget i scenen: Indsend bliver klar, og en gammel besked forsvinder */
+    P.aendret = function () {
+        this.nulstilHjaelp();
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.visIndsend();
     };
 
     P.promptHTML = function () {
         var o = this.o;
-        var h = '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>";
+        var h = "";
         if (o.gruppe === "kaede") {
             h += '<p class="note-tekst">Kæden er H(CH=CH)<sub>n</sub>H. Alle dobbeltbindingerne er konjugerede: der er præcis én enkeltbinding mellem to dobbeltbindinger.</p>';
         } else if (o.type === "find") {
             h += '<p class="note-tekst">Lycopen giver tomater deres farve. Her er det opløst i hexan. Konjugerede dobbeltbindinger har præcis én enkeltbinding imellem sig. Klik igen for at fjerne en markering.</p>';
         } else if (o.type === "brom") {
-            h += '<p class="note-tekst">Br₂ adderes til en dobbeltbinding, så den bliver til en enkeltbinding med et Br på hvert C-atom. Klik på en anden dobbeltbinding for at flytte bromen.</p>';
+            h += '<p class="note-tekst">Br₂ adderes til en dobbeltbinding, så den bliver til en enkeltbinding med et Br på hvert C-atom. Klik på en anden dobbeltbinding for at addere dibrom dér i stedet.</p>';
         } else {
-            h += '<p class="note-tekst">Bromvand er brom opløst i vand. Det lægger sig øverst og trænger langsomt ned i saften. Tomatsaft er ca. 20 gange så koncentreret som opløsningen af lycopen i hexan. Grafen viser saften fortyndet 20 gange.</p>';
+            h += '<p class="note-tekst">Bromvand er dibrom opløst i vand. Det lægger sig øverst og trænger langsomt ned i saften. Tomatsaft er ca. 20 gange så koncentreret som opløsningen af lycopen i hexan. Grafen viser saften fortyndet 20 gange.</p>';
         }
-        if (this.faerdig && this.slutTekst) h += '<div class="forklaring"><p>' + NK.html(this.slutTekst) + "</p></div>";
         return h;
-    };
-
-    P.trinLinje = function () {
-        var o = this.o;
-        if (this.trin === "gaet") return this.gaet === null ? "Vælg et af de tre svar under grafen." : "Tryk på + Længere kæde.";
-        if (o.gruppe === "kaede") return "Brug knapperne under grafen, eller tasterne + og −.";
-        if (o.type === "find") return "Klik på en dobbeltbinding i lycopen. Markeret: " + this.antalMarker() + ".";
-        if (o.type === "brom") return "Klik på en dobbeltbinding i lycopen for at addere brom til den.";
-        return this.gaet === null ? "Vælg et af de tre svar under grafen." : "Tryk på Hæld bromvand i.";
     };
 
     P.antalMarker = function () { return Object.keys(this.marker).length; };
@@ -241,7 +261,7 @@
                     "Jo længere systemet er, jo mindre energi skal der til at excitere en elektron. Mindre energi er længere bølgelængde.",
                     "Toppen flytter mod en længere bølgelængde."
                 ];
-                return ["Tryk på + Længere kæde under grafen.", "Knappen + Længere kæde giver kæden én dobbeltbinding mere.", "Tryk på + Længere kæde."];
+                return ["Tryk på + Længere kæde under grafen.", "Knappen + Længere kæde giver kæden én dobbeltbinding mere.", "Tryk på + Længere kæde under grafen."];
             case "k-farve": return [
                 "Toppen skal ind i det synlige lys, til højre for 400 nm. Gør kæden længere.",
                 "Hver ny dobbeltbinding flytter toppen ca. 20 til 40 nm mod højre.",
@@ -263,22 +283,22 @@
                 "To af de 13 dobbeltbindinger sidder for sig selv, én i hver ende, med to enkeltbindinger før den næste. Alle de andre er konjugerede."
             ];
             case "t-gul": return [
-                "Bromen gør dobbeltbindingen til en enkeltbinding. Chromoforen bliver delt i to stykker, og farven afhænger af det længste.",
+                "Dibrom gør dobbeltbindingen til en enkeltbinding. Chromoforen bliver delt i to stykker, og farven afhænger af det længste.",
                 "Gul kommer, når det længste stykke har 8 til 10 konjugerede dobbeltbindinger.",
-                "Læg bromen på den anden dobbeltbinding fra en af enderne af chromoforen. Den lyser."
+                "Addér dibrom til den anden dobbeltbinding fra en af enderne af chromoforen. Den lyser."
             ];
             case "t-farveloes": return [
                 "Det længste stykke skal have højst 7 konjugerede dobbeltbindinger. Så ligger toppen i UV.",
                 "Chromoforen har 11. Del den nær midten.",
-                "Læg bromen på den midterste dobbeltbinding. Den lyser."
+                "Addér dibrom til den midterste dobbeltbinding. Den lyser."
             ];
             default:
                 if (this.gaet === null) return [
-                    "Bromvandet kommer ovenfra. Hvor er der mest brom?",
-                    "Jo mere brom, jo flere dobbeltbindinger bliver brudt, og jo kortere bliver chromoforerne.",
-                    "Øverst er der mest brom: farveløs. Nederst er lycopen hel: orange."
+                    "Bromvandet kommer ovenfra. Hvor er der mest dibrom?",
+                    "Jo mere dibrom, jo flere dobbeltbindinger bliver brudt, og jo kortere bliver chromoforerne.",
+                    "Øverst er der mest dibrom: farveløs. Nederst er lycopen hel: orange."
                 ];
-                return ["Tryk på Hæld bromvand i.", "Tryk på Hæld bromvand i.", "Tryk på Hæld bromvand i."];
+                return ["Tryk på Hæld bromvand i under grafen.", "Tryk på Hæld bromvand i under grafen.", "Tryk på Hæld bromvand i under grafen."];
         }
     };
 
@@ -301,15 +321,16 @@
                 if (this.gaet === null) { this.svarGaet(o.rigtig); return; }
                 this.skiftN(1);
                 return;
-            case "k-farve": this.saetN(8); return;
-            case "k-orange": this.saetN(11); return;
-            case "k-roed": this.saetN(13); return;
+            case "k-farve": this.saetN(8); this.tjekN(); return;
+            case "k-orange": this.saetN(11); this.tjekN(); return;
+            case "k-roed": this.saetN(13); this.tjekN(); return;
             case "t-find":
+                this.marker = {};
                 LY_LANGS.forEach(function (bi) { mig.marker[bi] = true; });
                 this.tjekFind();
                 return;
-            case "t-gul": this.addér(LY_LANGS[1]); return;
-            case "t-farveloes": this.addér(LY_LANGS[5]); return;
+            case "t-gul": this.svarBrom = LY_LANGS[1]; this.addér(LY_LANGS[1]); return;
+            case "t-farveloes": this.svarBrom = LY_LANGS[5]; this.addér(LY_LANGS[5]); return;
             default:
                 if (this.gaet === null) { this.svarGaet(o.rigtig); return; }
                 this.haeld();
@@ -324,10 +345,12 @@
         this.n = n;
         this.saetPolyen();
         this.visPlusMinus();
+        if (this.o.type === "byg") { this.flyttet = true; this.aendret(); }
         this.efterN(foer);
     };
 
     P.skiftN = function (r) {
+        if (this.spaer()) return;
         if (this.trin === "gaet" && this.gaet === null) return;
         if (r > 0 && this.n >= D.KO_MAKS) { this.kortBesked("Længere bliver kæden ikke her. Den har " + D.KO_MAKS + " konjugerede dobbeltbindinger.", 4); return; }
         this.saetN(this.n + r);
@@ -340,72 +363,73 @@
         return false;
     };
 
+    /* Kun gaettet bedoemmes af forsoeget; de andre kaeder bedoemmes af Indsend svar */
     P.efterN = function (foer) {
         var o = this.o;
         if (this.faerdig) { this.nulstilHjaelp(); return; }
+        if (o.id === "k-gaet" && this.n === 3 && foer === 2) {
+            var t = "Toppen flyttede fra 217 til 258 nm: mod en længere bølgelængde. En længere chromofor absorberer lys med mindre energi.";
+            var forkert = this.gaet !== o.rigtig;
+            if (forkert) { this.brugtSvar = true; this.vistDel = true; }
+            this.slutGaet = true;
+            this.loest(t, forkert ? "Ikke helt" : undefined, o.rigtig);
+        }
+    };
+
+    P.tjekN = function () {
+        var o = this.o;
+        if (this.faerdig || o.type !== "byg") return;
         var lm = Math.round(F.polyenMax(this.n));
         var navn = F.navn(F.farve(F.polyenToppe(this.n)));
-        if (o.id === "k-gaet") {
-            if (this.n === 3 && foer === 2) {
-                var t = "Toppen flyttede fra 217 til 258 nm: mod en længere bølgelængde. En længere chromofor absorberer lys med mindre energi.";
-                if (this.gaet !== o.rigtig) this.brugtSvar = true;
-                this.slutTekst = t;
-                this.loest(t, "Ikke helt");
-                this.visOpgavelinje();
-            }
-            return;
-        }
         var ok = o.maal === "farvet" ? navn !== "Farveløs" : navn === o.maal;
         if (ok) {
-            var lys = F.lysOrd(lm);
-            var tekst = "Med " + this.n + " konjugerede dobbeltbindinger ligger toppen ved " + lm + " nm. Stoffet absorberer " + lys +
+            var tekst = "Med " + this.n + " konjugerede dobbeltbindinger ligger toppen ved " + lm + " nm. Stoffet absorberer " + F.lysOrd(lm) +
                 " lys og er " + navn.toLowerCase() + ".";
-            if (o.id === "k-farve") tekst += " Det passer med tommelfingerreglen: et organisk stof er farvet fra ca. 8 konjugerede dobbeltbindinger.";
+            if (o.id === "k-farve") tekst += " Et organisk stof er farvet fra ca. 8 konjugerede dobbeltbindinger.";
             if (o.id === "k-orange") tekst += " Lycopen i tomater har også 11.";
-            this.slutTekst = tekst;
             this.loest(tekst);
-            this.visOpgavelinje();
-        } else {
-            this.nulstilHjaelp();
+            return;
         }
+        var maalOrd = o.maal === "farvet" ? "farvet" : o.maal.toLowerCase();
+        this.fejlLinje("Med " + this.n + " dobbeltbindinger ligger toppen ved " + lm + " nm, og stoffet er " + navn.toLowerCase() +
+            ". Det skal være " + maalOrd + ".");
     };
 
     P.svarGaet = function (i) {
         if (this.gaet !== null) return;
         this.gaet = i;
+        this.gaetForkert = i !== this.o.rigtig ? i : undefined;
         if (this.o.type === "gaet") this.trin = "byg";
         this.hjaelp = 0;
         this.bygValg();
-        this.visOpgavelinje();
-        this.visKnap();
-        this.besked('<span class="b-maerke">Dit gæt</span> ' + NK.html(this.o.svar[i] + ". " + this.trinLinje()), "");
+        this.visKort();
+        this.besked('<span class="b-maerke">Dit gæt</span> ' + NK.html(this.o.svar[i] + "."), "");
     };
 
     /* ----- Lycopen: find chromoforen ------------------------------------------------ */
+    /* Et klik markerer kun; Indsend svar bedoemmer markeringen */
     P.klikFind = function (bi) {
         var si = this.konj.afBinding[bi];
         if (si === undefined) return;
-        if (si !== 0) {
-            this.roed[bi] = 1;
-            this.fejlLinje("Den dobbeltbinding er ikke konjugeret med de andre. Mellem den og den næste dobbeltbinding er der to enkeltbindinger i træk.");
-            return;
-        }
         if (this.marker[bi]) delete this.marker[bi];
         else this.marker[bi] = true;
         this.lysB = {};
-        this.nulstilHjaelp();
-        this.tjekFind();
+        this.aendret();
     };
 
     P.tjekFind = function () {
-        if (this.antalMarker() === LY_LANGS.length) {
-            var t = "Lycopen har 13 dobbeltbindinger. De 11 i midten er konjugerede og danner chromoforen. Toppen ligger ved 470 nm.";
-            this.slutTekst = t;
-            this.loest(t);
-            this.visOpgavelinje();
-        } else {
-            this.naesteLinje("", "");
+        var mig = this, forkerte = [];
+        Object.keys(this.marker).forEach(function (k) { if (mig.konj.afBinding[k] !== 0) forkerte.push(k); });
+        if (forkerte.length) {
+            forkerte.forEach(function (k) { delete mig.marker[k]; mig.roed[k] = 1; });
+            this.fejlLinje("Den røde dobbeltbinding er ikke konjugeret med de andre. Mellem den og den næste er der to enkeltbindinger i træk.");
+            return;
         }
+        if (this.antalMarker() === LY_LANGS.length) {
+            this.loest("Lycopen har 13 dobbeltbindinger. De 11 i midten er konjugerede og danner chromoforen. Toppen ligger ved 470 nm.");
+            return;
+        }
+        this.fejlLinje("Du har markeret " + this.antalMarker() + " dobbeltbindinger. Chromoforen har flere. Følg kæden til begge sider.");
     };
 
     /* ----- Lycopen: brom ---------------------------------------------------------- */
@@ -415,7 +439,7 @@
             this.brom = null;
             this.mol = LYCOPEN.kopi();
             this.opdaterKonj();
-            this.naesteLinje("", "");
+            this.aendret();
             return;
         }
         var maal = M.midt(LYCOPEN, this.vis, bi);
@@ -423,13 +447,20 @@
         this.lysB = {};
     };
 
+    /* Bromen er landet: farven skifter, men foerst Indsend svar bedoemmer den */
     P.landBrom = function (bi) {
         this.brom = bi;
         this.mol = LYCOPEN.kopi();
         this.mol.addérBrom(bi);
         this.opdaterKonj();
         if (this.faerdig) return;
-        var o = this.o;
+        this.aendret();
+        if (this.svarBrom === bi) { this.svarBrom = null; this.tjekBrom(); }
+    };
+
+    P.tjekBrom = function () {
+        if (this.faerdig || this.brom === null) return;
+        var o = this.o, bi = this.brom;
         var f = this.farve();
         var L = this.konj.stoerst;
         var isoleret = LY_ISOLEREDE.indexOf(bi) >= 0;
@@ -437,36 +468,34 @@
             var t = o.maal === "Gul" ?
                 "Chromoforen er delt, og det længste stykke har " + L + " konjugerede dobbeltbindinger. Toppen er flyttet til " + Math.round(F.polyenMax(L)) + " nm, og opløsningen er gul." :
                 "Chromoforen er delt i to stykker med højst " + L + " konjugerede dobbeltbindinger. Toppene ligger i UV, og opløsningen er farveløs.";
-            this.slutTekst = t;
             this.loest(t);
-            this.visOpgavelinje();
             return;
         }
         if (isoleret) {
-            this.fejlLinje("Den dobbeltbinding er ikke konjugeret, så chromoforen er hel, og farven er den samme.");
+            this.fejlLinje("Den dobbeltbinding er ikke konjugeret. Chromoforen er hel, og farven er den samme.");
         } else if (f.navn === "Farveløs") {
-            this.fejlLinje("Nu er opløsningen farveløs. Det længste stykke har kun " + L + " konjugerede dobbeltbindinger. Læg bromen tættere på en af enderne.");
+            this.fejlLinje("Nu er opløsningen farveløs. Det længste stykke har kun " + L + " konjugerede dobbeltbindinger. Addér dibrom tættere på en ende.");
         } else {
-            this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ". Det længste stykke har stadig " + L + " konjugerede dobbeltbindinger. Læg bromen tættere på midten.");
+            this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ". Det længste stykke har stadig " + L + " konjugerede dobbeltbindinger. Addér dibrom nærmere midten.");
         }
     };
 
     /* ----- Tomatregnbuen ------------------------------------------------------------ */
     P.haeld = function () {
-        if (this.haeldt) return;
+        if (this.haeldt || this.gaetNu()) return;
         this.haeldt = true;
         this.rbT = 0;
         this.bygValg();
-        this.visOpgavelinje();
-        this.naesteLinje("", "");
+        this.visKort();
+        this.besked("", "");
     };
 
     P.regnbueFaerdig = function () {
-        var t = "Øverst er der mest brom, og næsten alle dobbeltbindinger er brudt: saften er farveløs. Længere nede er chromoforerne delt i kortere stykker: gul. Nederst er lycopen hel: orange.";
-        if (this.gaet !== this.o.rigtig) this.brugtSvar = true;
-        this.slutTekst = t;
-        this.loest(t, "Ikke helt");
-        this.visOpgavelinje();
+        var t = "Øverst er der mest dibrom, og næsten alle dobbeltbindinger er brudt: saften er farveløs. Længere nede er chromoforerne delt i kortere stykker: gul. Nederst er lycopen hel: orange.";
+        var forkert = this.gaet !== this.o.rigtig;
+        if (forkert) { this.brugtSvar = true; this.vistDel = true; }
+        this.slutGaet = true;
+        this.loest(t, forkert ? "Ikke helt" : undefined, this.o.rigtig);
     };
 
     /* Et molekyle fra et lag: lycopen med brom paa en brøkdel p af
@@ -486,10 +515,9 @@
         this.L.tilpas();
         var W = this.L.b;
         var band = this.baand();
-        var linjeBund = this.linjeEl ? this.linjeEl.offsetTop + this.linjeEl.offsetHeight : 40;
         var valgH = this.valg && this.valg.children.length ? this.valg.offsetHeight + 14 : 0;
         if (this.valg) this.valg.style.bottom = (band.h + 12) + "px";
-        var top0 = linjeBund + 12;
+        var top0 = this.top();
         var bund = band.y - (valgH ? valgH + 8 : 14);
         var avail = Math.max(220, bund - top0);
         var r1h = NK.klamp(avail * 0.4, 120, 220);
@@ -650,18 +678,16 @@
     P.klikScene = function (pt) {
         var o = this.o;
         if (!this.vis || this.flyv) return;
-        if (o.type === "find" && !this.faerdig) {
+        if (o.type === "find") {
             var bi = M.bindingVed(this.mol, this.vis, pt, true);
-            if (bi !== null) this.klikFind(bi);
+            if (bi !== null && !this.spaer()) this.klikFind(bi);
             return;
         }
         if (o.type === "brom") {
             var b2 = M.bindingVed(this.mol, this.vis, pt, true, true);
-            if (b2 !== null && b2 < LYCOPEN.bindinger.length) this.addér(b2);
+            if (b2 !== null && b2 < LYCOPEN.bindinger.length && !this.spaer()) this.addér(b2);
         }
     };
-
-    P.enter = function () { if (this.faerdig) this.knap(); };
 
     NK.SimKonj = SimKonj;
     NK.SimKonj.regnbueToppe = regnbueToppe;

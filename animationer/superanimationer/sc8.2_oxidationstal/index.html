@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oxidationstal</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">±</span> Oxidationstal</h1>
@@ -28,7 +29,20 @@
 <section class="fane aktiv" id="fane-rg" role="tabpanel" aria-label="Reglerne">
     <div class="scene">
         <canvas id="rg-laerred"></canvas>
-        <!-- Tavlen: opgaven, trinene, formlen, arbejdsfeltet, regnestykket og brikkerne (js/sim_regler.js) -->
+        <!-- Papirkortet oeverst i scenen (brugerens valg 4. nov. 2026): opgaven, spoergsmaalet til trinnet, feltet, linjen med fejl og hint, Giv hint og Indsend svar (js/fane.js) -->
+        <div class="scenekort opgave" id="rg-skort">
+            <div class="sk-top">
+                <p class="sk-tekst" id="rg-spm" aria-live="polite"></p>
+                <div class="arb-felter" id="rg-felter"></div>
+            </div>
+            <div class="sk-bund tom" id="rg-bund">
+                <p class="st-tekst" id="rg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="rg-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="rg-indsend" type="button">Indsend svar</button>
+            </div>
+            <div id="rg-bliv" hidden></div>
+        </div>
+        <!-- Tavlen: trinene, formlen, regnestykket og brikkerne (js/sim_regler.js) -->
         <div class="tavle" id="rg-tavle">
             <div class="tv-top">
                 <span class="tv-maal" id="rg-maal"></span>
@@ -37,15 +51,6 @@
             <div class="tv-stak" id="rg-stak">
                 <div class="tv-chips" id="rg-trin"></div>
                 <div class="tv-formel" id="rg-formel"></div>
-                <!-- Arbejdsfeltet: spoergsmaalet, feltet og hjaelpen samlet ét sted (js/fane.js) -->
-                <div class="arb" id="rg-arb">
-                    <div class="arb-rk">
-                        <div class="arb-spm" id="rg-spm"></div>
-                        <div class="arb-felter" id="rg-felter"></div>
-                        <button class="knap hjaelp" id="rg-knap" type="button">Giv hint</button>
-                    </div>
-                    <p class="arb-besked" id="rg-besked" aria-live="polite"></p>
-                </div>
                 <div class="tv-regn" id="rg-regn"><span class="tv-led"></span><span class="tv-lig">=</span><span class="tv-q"></span><span class="tv-cap venstre">summen af oxidationstallene</span><span></span><span class="tv-cap hoejre">ladningen</span></div>
                 <div class="tv-isol" id="rg-isol"></div>
                 <div class="tv-brikker" id="rg-brikker"></div>
@@ -68,17 +73,21 @@
 <section class="fane" id="fane-ek" role="tabpanel" aria-label="Elektronerne">
     <div class="scene">
         <canvas id="ek-laerred"></canvas>
-        <!-- Arbejdsfeltet nederst paa tavlen: gaettet, hvad der skal traekkes, og hjaelpen.
-             Naar regnskabet er gjort op, staar forklaringen med beregningen i ek-forklar. -->
-        <div class="arb paa-scene" id="ek-arb">
-            <div class="arb-rk">
-                <div class="arb-spm" id="ek-spm"></div>
+        <!-- Papirkortet oeverst i scenen (brugerens valg 4. nov. 2026): opgaven, gaettet, det, der skal traekkes, linjen med fejl og hint, Giv hint og Indsend svar (js/fane.js) -->
+        <div class="scenekort opgave" id="ek-skort">
+            <div class="sk-top">
+                <p class="sk-tekst" id="ek-spm" aria-live="polite"></p>
                 <div class="arb-felter gaet" id="ek-gaet"></div>
-                <button class="knap hjaelp" id="ek-knap" type="button">Giv hint</button>
             </div>
-            <p class="arb-besked" id="ek-besked" aria-live="polite"></p>
-            <div class="arb-forklar" id="ek-forklar" aria-live="polite" hidden></div>
+            <div class="sk-bund tom" id="ek-bund">
+                <p class="st-tekst" id="ek-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ek-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="ek-indsend" type="button">Indsend svar</button>
+            </div>
+            <div id="ek-bliv" hidden></div>
         </div>
+        <!-- Beregningen nederst paa tavlen, naar regnskabet er gjort op (js/sim_elektroner.js) -->
+        <div class="arb-forklar paa-tavle" id="ek-forklar" aria-live="polite" hidden></div>
         <div class="anker" id="ek-anker-molekyle"></div>
         <div class="anker" id="ek-anker-en"></div>
         <button class="forfraknap" id="ek-forfra" type="button" title="Parrene tilbage i bindingerne (R)">Start forfra ↺</button>
@@ -141,7 +150,7 @@
         </div>
         <p>Reglerne passer ikke, når O er bundet til O, som i H₂O₂ (O er −I), eller til F, som i OF₂ (O er +II). Så må man tilbage til elektronerne.</p>
         <p>Oxidationstallet over et atom skrives med romertal og fortegn: +VII, −II og 0. I mellemregningerne bruges almindelige tal. I felterne kan du skrive begge dele.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -169,6 +178,7 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/data.js"></script>
 <script src="js/ox.js"></script>
 <script src="js/tegning.js"></script>

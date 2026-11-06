@@ -308,3 +308,11 @@ Start forfra står aldrig, hvor Næste står (brugeren 3. nov. 2026): når alle 
 opgaver på fanen Plastik er løst, har kortet ingen knap videre (før stod der
 Start forfra ↺ på den grønne knap). Opgaverne kan åbnes igen i panelet
 (`videreTekst` i `js/fane.js`). Kørt 3. nov. 2026: ALT OK (167 påstande).
+
+## Molekylenavne (6. nov. 2026)
+
+Br₂ hedder dibrom og H₂ dihydrogen, når stoffet menes: hylden ("dibrom, Br₂"), opgaverne
+(Dibrom på ethen, Dihydrogen), dibrommolekylet, dibrommet i glassene, luppen og teorien.
+Brom og hydrogen bliver, hvor atomerne menes (en binding til brom, bromatomer). Bromvand
+bliver stående som reagensets navn. `D.REAGENS_FRA` og opgavernes id'er ("brom",
+"hydrogen") er kode og er ikke ændret.

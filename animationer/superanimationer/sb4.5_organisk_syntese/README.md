@@ -90,11 +90,11 @@ Kemien er regler, ikke en opskriftsliste. Molekylerne kommer fra molekylemotoren
 
 ## Hjælpen
 
-Ingen Kemichael (som `sc1.4_afstemning` og `sc_spil9_kemikort`). Statuslinjen nederst siger
-næste skridt, hvad der gik galt, og har den ene knap: tre hint og så svaret. Hintene
+Ingen Kemichael (som `sc1.4_afstemning` og `sc_spil9_kemikort`). Papirkortet øverst i scenen
+siger ordren, næste skridt og hvad der gik galt, og har hintknappen: tre hint og så svaret. Hintene
 bygges af den vej, reglerne finder (`NK.Kemi.rute`): navnets to dele, hvilke stoffer de
 kommer fra, og om syren skal laves først. Hintene gælder den ordre, eleven har valgt i
-panelet. Vis svaret skriver opskriften i linjen og bryder serien. Et klik på tavlen
+panelet. Vis svaret skriver opskriften på kortet og bryder serien. Et klik på tavlen
 springer animationen over.
 
 ## Filerne
@@ -140,6 +140,17 @@ SMILES-streng, motoren kan navngive; selvtesten tjekker navnet.
   æble, ethylbutanoat ananas, pentylbutanoat abrikos, pentylpentanoat grønt æble,
   methylsalicylat vintergrøn. Den gamle kaldte ethylethanoat for pære.
 
+## Papirkortet (6. nov. 2026)
+
+Al tekst står på ét lyst papirkort øverst i midten af scenen (`faelles/papirkort.css` og
+`papirkort.js`): etiketten Ordre, kundens ordre, næste skridt, og nederst hint, fejl og ros
+med hintknappen (gul kant). Ordrelinjen over kolben og statuslinjen nederst er væk. Efter en
+levering bliver kortet på den leverede ordre: forklaringen står i en grøn boks, og Næste
+ordre står, hvor hintknappen stod. Imens er reaktoren låst, og et klik på Start, kontakterne
+eller lageret får kortet til at blinke. Forfra ligger nederst i panelet. Spillet har ingen
+svarknapper: Start ▶ i reaktoren er det, der sender ind. Påbegyndt 4. nov. og gjort færdigt
+6. nov. 2026. Molekylenavnene (dioxygen osv.) er tjekket: ingen steder at rette.
+
 ## Selvtesten
 
 `_selvtest.html` gennem en lokal server med rod i `animationer/` (molekylemotoren ligger
@@ -148,7 +159,9 @@ er syre + alkohol − H₂O atom for atom), oxidationen, de forkerte par, påske
 ordre som en elev (butikken, kurven, klik og træk), de ti første ordrer med hintenes
 opskrift og pengene krone for krone, serien, titlerne, børsen, tilbuddet, udstyret, lånet,
 esterkortet, tavlen, layoutet og butikken fra 1100 × 650 til 1600 × 950, sproget og
-skriftstørrelsen.
+skriftstørrelsen, og papirkortet (i scenen, ikke i panelet, ingen statuslinje, Forfra i
+panelet, bliv på den leverede ordre, låsen og kortZone). Sidst kørt: ALT OK (88 påstande),
+6. nov. 2026.
 
 ## Menulinjen
 

@@ -120,6 +120,8 @@
     /* ================================================================
        BAGGRUND: bordplade og vaeg
        ================================================================ */
+    /* Baggrunden gaar langt ud til siderne, saa den ogsaa fylder laerredet,
+       naar tegningen er lille (fane 4 tegner den under papirkortet). */
     function tegnBaggrund(ctx) {
         var g = ctx.createLinearGradient(0, 0, 0, HOEJDE);
         g.addColorStop(0, "#191a22");
@@ -127,20 +129,20 @@
         g.addColorStop(0.64, "#2a2d39");
         g.addColorStop(1, "#1a1c24");
         ctx.fillStyle = g;
-        ctx.fillRect(-400, -200, BREDDE + 800, HOEJDE + 400);
+        ctx.fillRect(-4000, -200, BREDDE + 8000, HOEJDE + 400);
 
         /* Bordplade */
         ctx.fillStyle = "#33374a";
-        ctx.fillRect(-400, 646, BREDDE + 800, 8);
+        ctx.fillRect(-4000, 646, BREDDE + 8000, 8);
         ctx.fillStyle = "#232633";
-        ctx.fillRect(-400, 654, BREDDE + 800, HOEJDE);
+        ctx.fillRect(-4000, 654, BREDDE + 8000, HOEJDE);
 
         /* Blødt lys bag opstillingen */
         var r = ctx.createRadialGradient(226, 420, 20, 226, 420, 340);
         r.addColorStop(0, "rgba(120, 160, 200, 0.10)");
         r.addColorStop(1, "rgba(120, 160, 200, 0)");
         ctx.fillStyle = r;
-        ctx.fillRect(-400, -200, BREDDE + 800, HOEJDE + 400);
+        ctx.fillRect(-4000, -200, BREDDE + 8000, HOEJDE + 400);
     }
 
     /* ================================================================

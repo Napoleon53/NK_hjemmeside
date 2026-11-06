@@ -14,7 +14,7 @@
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-i" role="tab" aria-selected="true"><span class="nr">1</span>Indgreb</button>
-        <button class="faneknap" data-fane="fane-b" role="tab" aria-selected="false"><span class="nr">2</span>Oxygen i blodet</button>
+        <button class="faneknap" data-fane="fane-b" role="tab" aria-selected="false"><span class="nr">2</span>Dioxygen i blodet</button>
         <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">3</span>Regn på Y</button>
     </div>
 
@@ -58,9 +58,9 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 2: OXYGEN I BLODET                                            -->
+<!-- FANE 2: DIOXYGEN I BLODET                                            -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-b" role="tabpanel" aria-label="Oxygen i blodet">
+<section class="fane" id="fane-b" role="tabpanel" aria-label="Dioxygen i blodet">
     <div class="scene">
         <canvas id="b-laerred"></canvas>
         <div class="scenekort" id="b-skort">
@@ -147,8 +147,8 @@
         <p>Et indgreb er en ændring udefra, som bringer en blanding ud af ligevægt, fx at et stof bliver tilsat eller fjernet. Lige efter indgrebet er <i>Y</i> ikke lig med <i>K</i>, og ligevægten bliver forskudt, til <i>Y</i> = <i>K</i> igen. Tilsættes en reaktant, eller fjernes et produkt, forskydes ligevægten mod højre. <i>K</i> ændrer sig kun, når temperaturen ændres.</p>
         <h3 class="teori-hoved">Le Chateliers princip</h3>
         <p>Bliver en ligevægt udsat for et indgreb, forskydes den i den retning, der modvirker indgrebet. Den ophæver aldrig indgrebet helt.</p>
-        <h3 class="teori-hoved">Oxygen i blodet</h3>
-        <p>Hæmoglobin, Hb, binder oxygen: Hb + O₂ ⇌ HbO₂. Et Hb-molekyle har fire steder, hvor O₂ kan sætte sig, men animationen ser på ét sted ad gangen, som Kemibogen gør. I lungerne er [O₂] høj, så <i>Y</i> bliver mindre end <i>K</i>, og Hb binder O₂. I musklen er [O₂] lav, så <i>Y</i> bliver større end <i>K</i>, og HbO₂ afgiver O₂.</p>
+        <h3 class="teori-hoved">Dioxygen i blodet</h3>
+        <p>Hæmoglobin, Hb, binder dioxygen: Hb + O₂ ⇌ HbO₂. Et Hb-molekyle har fire steder, hvor O₂ kan sætte sig, men animationen ser på ét sted ad gangen, som Kemibogen gør. I lungerne er [O₂] høj, så <i>Y</i> bliver mindre end <i>K</i>, og Hb binder O₂. I musklen er [O₂] lav, så <i>Y</i> bliver større end <i>K</i>, og HbO₂ afgiver O₂.</p>
         <h3 class="teori-hoved">Beholderen og luppen</h3>
         <p>Et molekyle i beholderen på fane 1 står for 0,025 M. Tallene i luppen på fane 2 er antal partikler i en lille portion blod. De er valgt, så blodet i lungerne har omkring 90 % HbO₂, og blodet i en muskel i hvile har omkring 70 %.</p>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>

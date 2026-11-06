@@ -45,7 +45,7 @@
             b.setAttribute("aria-label", mol.navn);
             b.innerHTML = '<span class="mformel"></span>';
             b.querySelector(".mformel").textContent = mol.formel;
-            b.addEventListener("click", function () { if (!sim.menuLaast()) V.saet(mol.id); });
+            b.addEventListener("click", function () { if (sim.menuLaast()) { if (sim.opgaver) sim.opgaver.blink(); return; } V.saet(mol.id); });
             vaert.appendChild(b);
             knapper.push({ el: b, id: mol.id });
         });

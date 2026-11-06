@@ -24,12 +24,17 @@
    fejl får den rigtige besked, at alle reaktioner kan gennemføres ved
    at skrive, med musen og med Vis svaret, at der ikke står et facit,
    før eleven har gjort noget, at eleven selv fylder det tomme urglas på
-   fane 1, at reaktionerne i glasset åbner én ad gangen, at knappen står
-   på papiret, at den korte linje øverst i hæftet følger bidderne, at et
-   hint og svar er én kort sætning i opgavekortet, at Læs mere åbner
-   forklaringen (uden facit efter et hint), at den gule knap lyser op
-   efter en fejl, at sproget holder reglerne, og at hæftet og bordet
-   kan være på skærmen fra 1100 × 700 til 1600 × 950.
+   fane 1, at reaktionerne i glasset åbner én ad gangen, papirkortet
+   øverst i scenen (6. nov. 2026: kortet står i scenen og ikke i
+   panelet, Indsend svar er grå uden noget at sende, et valg bedømmer
+   ikke af sig selv, et rigtigt svar bliver på bidden med Næste trin
+   dér, hvor Indsend svar stod, Start forfra står i panelet, og kortet
+   holder sig i kortZone), at kortets korte linje følger bidderne, at et
+   hint og svar er én kort sætning på kortet, at Læs mere åbner
+   forklaringen (uden facit efter et hint), at hintknappen lyser op
+   efter en fejl, at sproget holder reglerne, og at kortet, hæftet og
+   bordet kan være på skærmen fra 1100 × 700 til 1600 × 950, også i en
+   lav skærm (1280 × 640).
 
    Kræver en lokal server. Testen gemmer elevens fremskridt og lægger det
    tilbage bagefter.
@@ -110,13 +115,18 @@ async function koerTest(W) {
         i.dispatchEvent(new W.Event("input"));
     }
     function besked(S) { return S.beskedTekst(); }
+    /* Kortets tekst uden overskriften (reaktionens navn) */
+    function kortTekst(S) {
+        var p = S.el.ind.querySelector(".sk-tekst"), c = p && p.querySelector(".sk-chip");
+        return p ? p.textContent.slice(c ? c.textContent.length : 0).trim() : "";
+    }
     var tekster = [];
-    var linjer0 = {};      /* de korte linjer øverst i hæftet, pr. bid */
+    var linjer0 = {};      /* de korte linjer på papirkortet, pr. bid */
     function saml(S) {
-        var kl = S.haefte.navnEl.textContent;
+        var kl = kortTekst(S);
         linjer0[kl] = kl.length;
         tekster.push(S.beskedTekst());
-        tekster.push(d.getElementById(S.navn + "-prompt").textContent);
+        tekster.push(S.el.skort.textContent);
         tekster.push(S.haefte.el.textContent);
     }
 
@@ -125,7 +135,11 @@ async function koerTest(W) {
        (også når maskinen har travlt) */
     async function ventKoef(S) { for (var v = 0; v < 150 && !S.opg.koefFaerdig; v++) await vent(20); }
 
-    function loesTrin(S) {
+    /* Efter et rigtigt svar bliver kortet på bidden; Næste trin fører videre.
+       Med bliv står kortet stadig på bidden bagefter. */
+    function loesTrin(S, bliv) {
+        if (S.venter) S.videre();
+        saml(S);
         var g = S.opg, R = g.R, X = NK.Redox, t = S.aktivt();
         switch (t) {
         case "bland": S.dryp(); tik(S, 4); break;          /* én flaske pr. kald */
@@ -147,6 +161,7 @@ async function koerTest(W) {
         case "vand": skrivI(S, "vand-" + R.vand.side, String(R.vand.antal)); S.tjekTrin(); break;
         }
         saml(S);
+        if (S.venter && !bliv) S.videre();
     }
 
     async function loesHele(S) {
@@ -178,6 +193,13 @@ async function koerTest(W) {
     var mangler = ["urglas", "draabeflaske"].filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var A = NK.sims["fane-ug"], B = NK.sims["fane-fl"];
+    /* Den længste besked til et forkert svar, der vises i testen; layoutet
+       måler kortet med den */
+    var LANGFEJL = "";
+    [A, B].forEach(function (S) {
+        var f0 = S.fejlLinje;
+        S.fejlLinje = function (t) { if (String(t).length > LANGFEJL.length) LANGFEJL = String(t); return f0.call(this, t); };
+    });
     paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !A.k && !d.querySelector(".kboble, .kknap"));
     paastand("der er ingen tilbudsknapper", !d.querySelector(".tilbud"));
     /* Siden husker løste opgaver fra før; testen starter forfra */
@@ -298,7 +320,8 @@ async function koerTest(W) {
     /* Eleven fylder selv urglasset (brugerens ønske 3. okt. 2026) */
     paastand("glasset starter tomt, og skiltet siger det", A.aktivt() === "bland" && A.bord.glas[0].tekst === "Tomt urglas" && A.bord.glas[0].farve[3] === 0, A.bord.glas[0].tekst);
     paastand("hæftet er tomt, til der er noget i glasset", A.haefte.led.every(function (L) { return L.el.hidden; }));
-    paastand("den korte linje øverst i hæftet: Tilsæt KMnO₄ og NaOH til urglasset", A.haefte.navnEl.textContent === "Tilsæt KMnO₄ og NaOH til urglasset", A.haefte.navnEl.textContent);
+    paastand("kortets korte linje: Tilsæt KMnO₄ og NaOH til urglasset.", kortTekst(A) === "Tilsæt KMnO₄ og NaOH til urglasset.", kortTekst(A));
+    paastand("hæftets overskrift er reaktionens navn", A.haefte.navnEl.textContent === "Lidt sulfit", A.haefte.navnEl.textContent);
     paastand("farvekortet fremhæver intet manganstof, mens glasset er tomt", !d.querySelector("#ug-farvekort .fk-raekke.nu"));
     A.slipPaaGlas(0, 2);
     tik(A, 4);
@@ -309,7 +332,7 @@ async function koerTest(W) {
     paastand("kaliumpermanganat: glasset bliver violet, og skiltet siger MnO₄⁻", A.opg.iGlas.permanganat === true && A.bord.glas[0].farve[0] === D.FARVE.violet[0] &&
         A.bord.glas[0].tekst === "MnO₄⁻" && A.aktivt() === "bland", A.bord.glas[0].tekst);
     paastand("nu står MnO₄⁻ i hæftet, men ikke SO₃²⁻", !A.haefte.led[1].el.hidden && A.haefte.led[0].el.hidden && A.haefte.skema.children[1].hidden === true);
-    paastand("den korte linje: Tilsæt også NaOH til urglasset", A.haefte.navnEl.textContent === "Tilsæt også NaOH til urglasset", A.haefte.navnEl.textContent);
+    paastand("kortets korte linje: Tilsæt også NaOH til urglasset.", kortTekst(A) === "Tilsæt også NaOH til urglasset.", kortTekst(A));
     A.slipPaaGlas(0, 0);
     tik(A, 2);
     paastand("kaliumpermanganat igen: besked om, at natriumhydroxid mangler", /Nu mangler natriumhydroxid/.test(besked(A)) && A.aktivt() === "bland", besked(A));
@@ -330,11 +353,11 @@ async function koerTest(W) {
     A.valgt("Mn 2+", "selv");
     paastand("et forkert valg: besked om farven, og knappen bliver streget ud", /Glasset er grønt/.test(besked(A)) && A.aktivt() === "produkt" &&
         !!A.haefte.valg.querySelector(".forkert"), besked(A));
-    paastand("efter fejlen lyser den gule hintknap op, og der står intet hint", A.el.knap.classList.contains("peg") && A.el.knap.textContent === "Giv hint" &&
+    paastand("efter fejlen lyser hintknappen op, og der står intet hint", A.el.knap.classList.contains("peg") && A.el.knap.textContent === "Giv et hint" &&
         !/^Hint/.test(besked(A)));
     loesTrin(A);
     paastand("efter valget siger skiltet MnO₄²⁻, basisk", A.bord.glas[0].tekst === "MnO₄²⁻, basisk", A.bord.glas[0].tekst);
-    paastand("den korte linje: Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent === "Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent);
+    paastand("kortets korte linje: Skriv oxidationstallene for S og Mn i skemaet.", kortTekst(A) === "Skriv oxidationstallene for S og Mn i skemaet.", kortTekst(A));
     A.tjekTrin();
     paastand("tomme oxidationstal tæller ikke", A.aktivt() === "ox" && /Skriv et oxidationstal/.test(besked(A)));
     paastand("ingen tal foran formlerne før gangetallene", koefTekster(A).every(function (t) { return t === ""; }));
@@ -354,7 +377,7 @@ async function koerTest(W) {
     paastand("reaktion 1 er afstemt, og O-rækken kommer til sidst som kontrol", A.haefte.rad.ilt.el.hidden === false && /✓/.test(A.haefte.rad.ilt.el.textContent) &&
         /O passer også/.test(besked(A)), besked(A));
     paastand("nu er reaktion 2 åben, og 3 stadig låst", !A.chips[1].classList.contains("laast") && A.chips[2].classList.contains("laast"));
-    A.knap();
+    A.videre();
     paastand("Næste opgave går til reaktion 2 med det grønne glas (MnO₄²⁻, basisk)", A.nr === 1 && A.bord.glas[0].farve[1] === D.FARVE.groen[1] &&
         A.bord.glas[0].tekst === "MnO₄²⁻, basisk" && A.aktivt() === "dryp", A.bord.glas[0].tekst);
 
@@ -371,7 +394,7 @@ async function koerTest(W) {
     skrivI(A, "kl-red", "2"); A.tjekTrin();
     paastand("begge klammer er rigtige, og ordene oxidation og reduktion kommer", A.aktivt() === "gange" && !A.haefte.tag.ox.hidden && !A.haefte.tag.red.hidden);
     await loesHele(A);
-    A.knap();
+    A.videre();
     paastand("reaktion 3: det brune glas (MnO₂, basisk), og nu skal der svovlsyre i", A.nr === 2 && A.bord.glas[0].bundfald && A.flaskeNr() === 3 &&
         A.bord.glas[0].tekst === "MnO₂, basisk", A.bord.glas[0].tekst);
     A.slipPaaGlas(0, 2);
@@ -400,20 +423,19 @@ async function koerTest(W) {
     paastand("farvekortet har manganens oxidationstal", A.kendtOx["MnO4 -"] === 7 && A.kendtOx["Mn 2+"] === 2 && A.kendtOx["MnO2"] === 4 && A.kendtOx["MnO4 2-"] === 6);
 
     overskrift("8. Hint og svar: kort, og Læs mere åbner forklaringen");
-    /* Det, Vis svaret siger, uden næste skridt, der står efter det i linjen */
-    var svarSagt = "", svarVis0 = B.svarVis;
-    B.svarVis = function (h) { var e = d.createElement("div"); e.innerHTML = h; svarSagt = e.textContent; return svarVis0.call(this, h); };
+    /* Det, Vis svaret siger, står i den gule boks, når kortet bliver på bidden */
+    var svarSagt = "";
     NK.visFane("fane-fl");
     var iOx = idx(B, "F9");
     B.vaelg(iOx);
     B.knap();
-    paastand("Giv hint ved dryppet: hintet står kort i opgavekortet", /^Hint/.test(besked(B)) && /flasken/.test(besked(B)) && besked(B).length < 90 &&
-        d.getElementById("fl-besked").className.indexOf("gul") >= 0, besked(B));
+    paastand("Giv et hint ved dryppet: hintet står kort på kortet i den gule boks", /^Hint/.test(besked(B)) && /flasken/.test(besked(B)) && besked(B).length < 90 &&
+        d.getElementById("fl-status").className.indexOf("gul") >= 0 && B.el.skort.contains(d.getElementById("fl-besked")), besked(B));
     B.knap(); tik(B, 4);
     paastand("Dryp for mig drypper og koster ikke stjernen", B.aktivt() === "produkt" && !B.brugtSvar);
     loesTrin(B);
     B.knap();
-    var boble = d.getElementById("fl-besked");      /* linjen i opgavekortet, hvor hint og svar står */
+    var boble = d.getElementById("fl-besked");      /* beskeden på kortet, hvor hintet står */
     paastand("hint ved oxidationstallene er én kort sætning med Læs mere", /^Hint/.test(besked(B)) && besked(B).length < 130 && !!boble.querySelector(".laes-mere"), besked(B));
     boble.querySelector(".laes-mere").click();
     var fx = d.getElementById("forklaring");
@@ -424,15 +446,20 @@ async function koerTest(W) {
     d.querySelector("#forklaring [data-luk]").click();
     paastand("forklaringen lukker igen", !fx.classList.contains("vis"));
     B.knap();
-    paastand("Vis svaret: én kort sætning, ikke regnestykkerne, og Læs mere står i kortet", svarSagt.length > 10 && svarSagt.length < 130 && !/·/.test(svarSagt) &&
-        besked(B).indexOf(svarSagt) === 0 && !!boble.querySelector(".laes-mere"), svarSagt);
-    boble.querySelector(".laes-mere").click();
+    svarSagt = besked(B);
+    var gulBoks = B.el.ind.querySelector(".sk-bund.bliv.svar");
+    paastand("Vis svaret: én kort sætning, ikke regnestykkerne, i den gule boks med Læs mere", svarSagt.length > 10 && svarSagt.length < 130 && !/·/.test(svarSagt) &&
+        !!gulBoks && !!gulBoks.querySelector(".laes-mere") && /^Her er tallene/.test(svarSagt) && /\bSvaret\b/.test(gulBoks.textContent), svarSagt);
+    paastand("efter Vis svaret bliver kortet på bidden, og Næste trin står, hvor Indsend svar stod", !!B.venter && B.el.indsend.hidden && B.el.knap.hidden &&
+        !!B.el.ind.querySelector("[data-videre]") && /Skriv oxidationstallene/.test(kortTekst(B)), kortTekst(B));
+    gulBoks.querySelector(".laes-mere").click();
     var ind = d.getElementById("fx-indhold").textContent;
     paastand("Læs mere efter svaret regner det hele ud med almindelige tal i mellemregningerne", /2 · C \+ 4 · \(−2\) = −2/.test(ind) && /C = \+6 : 2 = \+3/.test(ind) && /er \+III/.test(ind), ind.slice(0, 160));
     tekster.push(d.getElementById("forklaring").textContent);
     d.querySelector("#forklaring [data-luk]").click();
     var runder = 0;
     while (!B.faerdig && runder < 40) {
+        if (B.venter) B.videre();
         var tt = B.aktivt();
         B.knap(); saml(B);
         paastand("hint i " + tt + " er kort og har Læs mere", /^Hint/.test(besked(B)) && besked(B).length < 140 && !!boble.querySelector(".laes-mere"), besked(B));
@@ -440,6 +467,7 @@ async function koerTest(W) {
         paastand("forklaringen efter hintet i " + tt + " har indhold", d.querySelectorAll("#fx-indhold .fx-kort").length > 0);
         d.querySelector("#forklaring [data-luk]").click();
         B.knap(); saml(B);
+        paastand("Vis svaret i " + tt + " står på kortet med Næste trin eller Næste opgave", (!!B.venter || B.faerdig) && !!B.el.ind.querySelector(".bliv [data-videre]"));
         await vent(20);
         tik(B, 1);
         if (B.forklaringNu && B.forklaringNu.medSvar) { B.visForklaring(); tekster.push(fx.textContent); d.querySelector("#forklaring [data-luk]").click(); }
@@ -448,7 +476,6 @@ async function koerTest(W) {
     paastand("oxalat kan gennemføres med Vis svaret", !!B.faerdig);
     paastand("Vis svaret tæller som brugt svar", B.brugtSvar === true);
     paastand("tallene fra Vis svaret står med brunt blæk", !!B.haefte.el.querySelector(".hf-oxtal.vist"));
-    B.svarVis = svarVis0;
     paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText + " " + fx.textContent));
 
     /* Alle forklaringer skal kunne laves og holde sproget */
@@ -512,46 +539,71 @@ async function koerTest(W) {
     klikGlas();
     paastand("et klik på glasset drypper med den rigtige flaske", A.opg.dryppet);
 
-    overskrift("9b. Knappen på papiret og farvekortet");
-    var knap = d.getElementById("ug-knap");
-    function iHjoernet(S) {
-        var kr = S.el.knap.getBoundingClientRect(), hr = S.haefte.el.getBoundingClientRect();
-        return hr.right - kr.right >= 4 && hr.right - kr.right <= 30 && hr.bottom - kr.bottom >= 4 && hr.bottom - kr.bottom <= 30;
-    }
-    /* Knappen må ikke dække noget, der står på papiret */
-    function knapFri(S) {
-        var o = S.haefte.el.getBoundingClientRect(), kr = S.el.knap.getBoundingClientRect();
-        var k = { x: kr.left - o.left, y: kr.top - o.top, b: kr.width, h: kr.height };
-        return S.haefte.optaget(o).every(function (q) { return k.x >= q.x + q.b || k.x + k.b <= q.x || k.y >= q.y + q.h || k.y + k.h <= q.y; });
-    }
-    function knapNote(S) {
-        var o = S.haefte.el.getBoundingClientRect(), kr = S.el.knap.getBoundingClientRect();
-        var k = { x: kr.left - o.left, y: kr.top - o.top, b: kr.width, h: kr.height };
-        var ram = S.haefte.optaget(o).filter(function (q) { return !(k.x >= q.x + q.b || k.x + k.b <= q.x || k.y >= q.y + q.h || k.y + k.h <= q.y); });
-        function r(q) { return [q.x, q.y, q.b, q.h].map(Math.round).join(" "); }
-        return S.el.knap.className + " knap " + r(k) + " papir " + Math.round(o.width) + " " + Math.round(o.height) + " rammer " + ram.map(r).join(" / ");
-    }
-    paastand("knappen står på papiret, ikke i panelet", knap.parentNode === A.haefte.el && !d.querySelector("#ug-kort .knap") && !d.querySelector("#fl-kort .knap"));
-    paastand("Giv hint står i papirets nederste højre hjørne", knap.textContent === "Giv hint" && knap.classList.contains("hint") && iHjoernet(A));
-    loesTrin(A);
-    paastand("før der trykkes, står der intet hint", !/^Hint/.test(besked(A)) && A.hjaelp === 0);
+    overskrift("9b. Papirkortet i scenen");
+    function r_(e) { return e.getBoundingClientRect(); }
+    var skort = A.el.skort, knap = A.el.knap, indsend = A.el.indsend;
+    A.vaelg(0);
+    tik(A, 1);
+    paastand("kortet står i scenen over lærredet, ikke i panelet", skort.parentNode === A.L.canvas.parentNode && skort.parentNode.classList.contains("scene") &&
+        !d.querySelector(".panel .scenekort") && !d.querySelector(".panel .knap.hjaelp") && !d.querySelector(".panel .knap.indsend"));
+    paastand("siden har papirkortet (body.papirkort, papirkort.css og NK.Papir)", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        !!d.querySelector('link[href="../faelles/papirkort.css"]'));
+    paastand("ingen statuslinje nederst og ingen besked eller opgavetekst i panelet", !d.querySelector(".statuslinje") && !d.querySelector(".panel .besked") &&
+        !d.getElementById("ug-prompt") && !d.getElementById("fl-prompt"));
+    paastand("Giv et hint og Indsend svar står på kortet, ikke på papiret", skort.contains(knap) && skort.contains(indsend) && !A.haefte.el.querySelector("button.knap"));
+    paastand("Start forfra står i panelet, ikke på kortet", !skort.contains(A.el.forfra) && !!A.el.forfra.closest(".panel") && !B.el.skort.contains(B.el.forfra) && !!B.el.forfra.closest(".panel"));
+    paastand("mens glasset fyldes, er Indsend svar grå (der er intet at sende)", A.aktivt() === "bland" && indsend.classList.contains("ikke-klar") && !indsend.hidden);
+    indsend.click();
+    paastand("et tryk på den grå Indsend svar får kortet til at blinke og ændrer intet", skort.classList.contains("blink") && A.aktivt() === "bland");
+    loesTrin(A); loesTrin(A); loesTrin(A);
+    paastand("ved spørgsmålstegnet er Indsend svar grå, til en formel er valgt", A.aktivt() === "produkt" && indsend.classList.contains("ikke-klar"));
+    var valgknap = function (tekst) { return [].filter.call(A.haefte.valg.children, function (k) { return k.textContent === tekst; })[0]; };
+    valgknap("Mn²⁺").click();
+    paastand("et klik på en forkert formel vælger den kun: ingen besked, intet streget ud", A.aktivt() === "produkt" && A.opg.valgt === "Mn 2+" &&
+        !A.haefte.valg.querySelector(".forkert") && !!A.haefte.valg.querySelector(".valgt") && !/Glasset er/.test(besked(A)) && indsend.classList.contains("klar"), besked(A));
+    indsend.click();
+    paastand("Indsend svar bedømmer: forkert formel bliver streget ud med en besked om farven", !!A.haefte.valg.querySelector(".forkert") && /Glasset er grønt/.test(besked(A)) &&
+        A.aktivt() === "produkt" && d.getElementById("ug-status").classList.contains("skidt"), besked(A));
+    var irect = r_(indsend);
+    valgknap("MnO₄²⁻").click();
+    paastand("et klik på den rigtige formel løser heller ikke opgaven af sig selv", A.aktivt() === "produkt" && !A.venter && !A.opg.produkt);
+    indsend.click();
+    var vk = A.el.ind.querySelector("[data-videre]");
+    paastand("rigtigt: kortet bliver på spørgsmålet, forklaringen står i den grønne boks", !!A.venter && skort.classList.contains("bliv") && /Vælg det stof/.test(kortTekst(A)) &&
+        !!A.el.ind.querySelector(".sk-bund.bliv.god") && /MnO₄²⁻ er grøn/.test(besked(A)), kortTekst(A) + " / " + besked(A));
+    paastand("Næste trin står, hvor Indsend svar stod, og Indsend svar og hint er væk", !!vk && /Næste trin/.test(vk.textContent) && indsend.hidden && knap.hidden &&
+        Math.abs(r_(vk).right - irect.right) <= 4 && r_(vk).bottom <= r_(skort).bottom, vk && Math.round(r_(vk).right) + " / " + Math.round(irect.right));
+    paastand("det næste skridt er ikke begyndt: ingen klammer eller felter, før Næste trin er trykket", !A.naaet("ox") && A.haefte.inp("ox0") && !A.visning().aktiv.length);
+    tik(A, 1);
+    vk.click();
+    paastand("Næste trin: kortet viser det næste skridt, og rosen står ikke under det", !A.venter && /Skriv oxidationstallene/.test(kortTekst(A)) && !/grøn|Rigtigt/.test(besked(A)) &&
+        !skort.classList.contains("bliv") && !indsend.hidden, kortTekst(A) + " / " + besked(A));
+    paastand("Indsend svar er grå, til der står et tal i et felt", indsend.classList.contains("ikke-klar"));
+    var Rr = A.opg.R;
+    A.noegler("ox").forEach(function (k) { var i = +k.slice(2); skrivI(A, k, NK.Redox.ox(Rr.led[i].st.ox[A.ledK(i).E])); });
+    paastand("med tal i felterne er Indsend svar klar", indsend.classList.contains("klar"));
+    A.haefte.inp("ox0").dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter i feltet er Indsend svar: bidden er løst, og kortet bliver på den", !!A.venter && /Skriv oxidationstallene/.test(kortTekst(A)) && /går fra/.test(besked(A)), besked(A));
+    A.enter();
+    paastand("Enter uden for felterne trykker Næste trin", !A.venter && A.naaet(A.aktivt()));
+    paastand("Giv et hint står på kortet med gul kant (knap hjaelp)", knap.textContent === "Giv et hint" && knap.classList.contains("hjaelp") && !knap.hidden);
     knap.click();
-    paastand("Giv hint giver hintet til bidden i opgavekortet", /^Hint: Se på SO₃²⁻/.test(besked(A)) && A.hjaelp === 1 && A.aktivt() === "ox", besked(A));
-    paastand("knappen hedder nu Vis svaret og står stadig i hjørnet", knap.textContent === "Vis svaret" && knap.classList.contains("svar") && iHjoernet(A));
+    paastand("Giv et hint giver hintet på kortet, og knappen hedder nu Vis svaret", /^Hint/.test(besked(A)) && knap.textContent === "Vis svaret" && knap.classList.contains("svar"), besked(A));
+    A.vaelg(0);
     await loesHele(A);
-    paastand("afstemt: Næste opgave står midt i hæftet", knap.textContent === "Næste opgave →" && knap.classList.contains("naeste") && knap.classList.contains("midt") && (function () {
-        var kr = knap.getBoundingClientRect(), hr = A.haefte.el.getBoundingClientRect();
-        var cx = (kr.left + kr.right) / 2 - hr.left;
-        return cx > hr.width * 0.3 && cx < hr.width * 0.75;
-    }()));
-    paastand("Næste opgave dækker ikke skemaet, klammerne eller rækkerne", knapFri(A), knapNote(A));
-    paastand("den korte linje siger, at skemaet er afstemt", A.haefte.navnEl.textContent === "Lidt sulfit: afstemt ✓", A.haefte.navnEl.textContent);
+    var vk2 = A.el.ind.querySelector("[data-videre]");
+    paastand("afstemt: kortet bliver på det sidste skridt, og Næste opgave står på kortet", A.faerdig && !!vk2 && vk2.textContent === "Næste opgave →" && skort.classList.contains("bliv") &&
+        /O passer også/.test(besked(A)) && indsend.hidden, vk2 && vk2.textContent);
+    paastand("Start forfra står aldrig samme sted som Næste opgave", !skort.contains(A.el.forfra));
+    paastand("hæftets overskrift siger, at skemaet er afstemt", A.haefte.navnEl.textContent === "Lidt sulfit: afstemt ✓", A.haefte.navnEl.textContent);
+    A.slipPaaGlas(0, 2);
+    paastand("et greb i glasset, mens kortet står på Næste opgave, får kortet til at blinke", skort.classList.contains("blink"));
     tik(A, 5);
     var fk = d.getElementById("ug-farvekort").textContent;
     paastand("farvekortet har navnene permanganat, manganat, brunsten og mangan(II)ion", ["permanganat", "manganat", "brunsten", "mangan(II)ion"].every(function (x) { return fk.indexOf(x) >= 0; }), fk);
     paastand("farvekortet på fane 2 har de samme navne", /mangan\(II\)ion/.test(d.getElementById("fl-farvekort").textContent));
-    var lange = Object.keys(linjer0).filter(function (x) { return x.length > 75 || x.length < 8; });
-    paastand("de korte linjer øverst i hæftet er korte (" + Object.keys(linjer0).length + " forskellige, højst 75 tegn)", Object.keys(linjer0).length > 20 && lange.length === 0, lange.join(" | "));
+    var lange = Object.keys(linjer0).filter(function (x) { return x.length > 76 || x.length < 8; });
+    paastand("kortets korte linjer er korte (" + Object.keys(linjer0).length + " forskellige, højst 76 tegn)", Object.keys(linjer0).length > 20 && lange.length === 0, lange.join(" | "));
     tekster = tekster.concat(Object.keys(linjer0));
 
     overskrift("10. Sproget");
@@ -568,9 +620,10 @@ async function koerTest(W) {
     paastand("natriumhydroxid, ikke natronlud", !/natronlud/i.test(alt));
     paastand("ingen romertal i navnene på stofferne før opgaven er løst", !D.REAKTIONER.some(function (x) { return /\((I|II|III|IV|V|VI|VII)\)/.test(x.navn + x.tekst); }));
 
-    overskrift("11. Layoutet");
+    overskrift("11. Layoutet: kortet, bordet og hæftet");
     var ramme = document.getElementById("ramme");
-    var STR = [[1100, 700], [1300, 820], [1600, 950]];
+    /* 1400 × 860 er en almindelig skærm, 1280 × 640 og 1100 × 700 lave */
+    var STR = [[1100, 700], [1280, 640], [1100, 900], [1300, 820], [1400, 860], [1600, 950]];
     for (var z = 0; z < STR.length; z++) {
         ramme.style.width = STR[z][0] + "px";
         ramme.style.height = STR[z][1] + "px";
@@ -578,29 +631,67 @@ async function koerTest(W) {
         for (var f = 0; f < 2; f++) {
             var S2 = [A, B][f];
             NK.visFane(f ? "fane-fl" : "fane-ug");
+            var navn = STR[z][0] + " × " + STR[z][1] + (f ? " fane 2" : " fane 1");
+            /* Kortet maales i alle bidder i alle reaktioner: som det står, med
+               den længste besked til et forkert svar, med hintet, når det
+               bliver på bidden (også med et klik i scenen) og til sidst */
+            var maks = 0, hvor = "", zone = 0, bordTop = Infinity, lupTop = Infinity, kortBund = 0;
+            var maal = function (S, note) {
+                var e = S.el.skort, h = e.offsetTop + e.offsetHeight;
+                if (h > maks) { maks = h; hvor = S.opgaver[S.nr].id + " " + note; }
+            };
+            for (var oi = 0; oi < S2.opgaver.length; oi++) {
+                var sidsteOpg = oi === S2.opgaver.length - 1;
+                S2.introNu = oi === 0;
+                /* Den sidste løses med Vis svaret og får rosen for dem alle: den længste forklaring */
+                if (sidsteOpg) S2.rostAlt = false;
+                S2.vaelg(oi);
+                S2.tilpas(); S2.layout();
+                zone = S2.kortZone();
+                var vagt = 0;
+                maal(S2, "start");
+                while (!S2.faerdig && vagt++ < 30) {
+                    if (S2.venter) S2.videre();
+                    var ff = S2.aktivt();
+                    maal(S2, ff);
+                    if (LANGFEJL) { S2.fejlLinje(LANGFEJL); maal(S2, ff + " forkert"); }
+                    S2.knap(); maal(S2, ff + " hint");
+                    S2.hjaelp = 0; S2.peg = false; S2.naesteLinje("", ""); S2.visKnap();
+                    if (sidsteOpg && S2.opg.nr === S2.opg.trin.length - 1) S2.visSvar(ff);
+                    else loesTrin(S2, true);
+                    if (ff === "gange") await ventKoef(S2);
+                    maal(S2, ff + " løst");
+                    S2.kortBesked("Der er dryppet i glasset. Afstem reaktionen i hæftet.", 4);
+                    maal(S2, ff + " løst og klik i scenen");
+                    S2.kortT = 0; S2.visBesked(S2.fast);
+                }
+                var bl0 = S2.bord.lay;
+                bordTop = Math.min(bordTop, bl0.y, bl0.lup.cy - bl0.lup.r, bl0.hjem[0].y);
+                kortBund = Math.max(kortBund, S2.el.skort.offsetTop + S2.el.skort.offsetHeight);
+            }
+            paastand(navn + ": kortet holder sig i kortZone (" + maks + " af " + (10 + zone) + " px, højest ved " + hvor + ")", maks <= 10 + zone + 1, maks + " / " + (10 + zone));
+            paastand(navn + ": kortet dækker ikke bordet, flaskerne eller luppen", maks <= bordTop, maks + " / " + Math.round(bordTop));
+            /* Hæftet: én reaktion til ende */
             S2.vaelg(f ? idx(B, "F2") : 0);
             S2.tilpas(); S2.layout();
-            var navn = STR[z][0] + " × " + STR[z][1] + (f ? " fane 2" : " fane 1");
-            /* Frem til den sidste bid: dér er hæftet fyldt mest, og Giv hint står i hjørnet */
-            var vagt = 0;
-            while (!S2.faerdig && S2.opg.nr < S2.opg.trin.length - 1 && vagt++ < 30) { var ff = S2.aktivt(); loesTrin(S2); if (ff === "gange") await ventKoef(S2); }
-            S2.haefte.placer();
-            paastand(navn + ": Giv hint står i papirets hjørne og dækker ikke noget", iHjoernet(S2) && knapFri(S2), knapNote(S2));
             await loesHele(S2);
             S2.haefte.placer();
-            var sc = S2.L.canvas.getBoundingClientRect(), he = S2.haefte.el.getBoundingClientRect();
+            var sc = S2.L.canvas.getBoundingClientRect(), he = S2.haefte.el.getBoundingClientRect(), kr = S2.el.skort.getBoundingClientRect();
             var bredde = S2.haefte.indholdBredde(), plads = he.width - S2.haefte.margen();
             var sidste = S2.haefte.rad.ilt.el.getBoundingClientRect();
             var lup = S2.bord.lay.lup, bl = S2.bord.lay;
             var skiltBund = bl.glas[0].bund + bl.glas[0].b * 0.1 + 3 + 21;
             var flaskeH = bl.hjem[bl.hjem.length - 1].x + 32 * bl.flaske.s;
-            var kr2 = S2.el.knap.getBoundingClientRect();
-            paastand(navn + ": knappen efter opgaven er inde i hæftet og dækker ikke noget", kr2.left >= he.left && kr2.right <= he.right && kr2.bottom <= he.bottom && kr2.top >= he.top && knapFri(S2), knapNote(S2));
-            paastand(navn + ": den korte linje kan være i hæftet", S2.haefte.navnEl.scrollWidth <= S2.haefte.navnEl.clientWidth + 1, S2.haefte.navnEl.scrollWidth + " / " + S2.haefte.navnEl.clientWidth);
+            var vk3 = S2.el.ind.querySelector("[data-videre]");
+            paastand(navn + ": kortet står øverst i midten af scenen", Math.abs((kr.left + kr.right) / 2 - (sc.left + sc.right) / 2) <= 2 && kr.top - sc.top <= 12);
+            paastand(navn + ": kortet dækker ikke hæftet", kr.bottom <= he.top, Math.round(kr.bottom) + " / " + Math.round(he.top));
+            paastand(navn + ": knappen efter opgaven står på kortet", !!vk3 && S2.el.skort.contains(vk3) && vk3.getBoundingClientRect().bottom <= kr.bottom);
+            paastand(navn + ": hæftets overskrift kan være i hæftet", S2.haefte.navnEl.scrollWidth <= S2.haefte.navnEl.clientWidth + 1, S2.haefte.navnEl.scrollWidth + " / " + S2.haefte.navnEl.clientWidth);
             paastand(navn + ": hæftet er inde i scenen", he.left >= sc.left && he.right <= sc.right + 0.5 && he.bottom <= sc.bottom);
             paastand(navn + ": skemaet kan være i hæftet (" + Math.round(bredde) + " af " + Math.round(plads) + " px)", bredde <= plads);
             paastand(navn + ": O-rækken (den sidste) er inde i hæftet", sidste.bottom <= he.bottom + 1, Math.round(sidste.bottom - he.bottom));
             paastand(navn + ": luppen er inde i scenen", lup.cx + lup.r * 1.5 <= sc.width && lup.cy - lup.r >= 0);
+            paastand(navn + ": teksten under luppen står over hæftet", lup.cy + lup.r + 47 <= he.top - sc.top, Math.round(lup.cy + lup.r + 47) + " / " + Math.round(he.top - sc.top));
             paastand(navn + ": skiltet under glasset står over hæftet", skiltBund <= he.top - sc.top + 1, Math.round(skiltBund) + " / " + Math.round(he.top - sc.top));
             paastand(navn + ": flaskerne står til venstre for glasset", flaskeH < bl.glas[0].cx - bl.glas[0].b * 0.55, Math.round(flaskeH) + " / " + Math.round(bl.glas[0].cx - bl.glas[0].b * 0.55));
             paastand(navn + ": skriften i skemaet er mindst 17 px", S2.haefte.fs >= 17, S2.haefte.fs.toFixed(1));

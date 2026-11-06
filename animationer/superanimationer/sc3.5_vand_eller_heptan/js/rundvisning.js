@@ -13,7 +13,7 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-tb", titel: "Spørgsmålet", tekst: "Her står det, du skal gøre eller svare på. Den gule knap giver et hint." },
+            { sel: "#forsoeg-tb", titel: "Papirkortet", tekst: "Papirkortet øverst i scenen siger, hvad du skal gøre. Vælg et svar, og tryk Indsend svar. Giv et hint giver et hint." },
             { sel: "#forsoeg-anker-glas", titel: "Glassene", tekst: "Vand til venstre, heptan til højre. Mærket over glasset siger, om væsken er polær eller upolær. Klik på et glas for at ryste det." },
             { sel: "#forsoeg-anker-proeve", titel: "Prøven", tekst: "Træk pipetten (eller spatlen) ned i et af glassene." },
             { sel: "#forsoeg-anker-kort", titel: "Formlen", tekst: "Strukturformlen for stoffet. Her klikker du på de polære grupper." },
@@ -23,7 +23,7 @@
         ],
         "fane-gaet": [
             { sel: "#gaet-anker-kort", titel: "Formlen", tekst: "Klik på de polære grupper. Søjlen tæller dem og C-atomerne." },
-            { sel: "#gaet-tb", titel: "Dit svar", tekst: "Svar polært eller upolært her. Den gule knap giver et hint og derefter svaret." },
+            { sel: "#gaet-tb", titel: "Papirkortet", tekst: "Vælg polært eller upolært på papirkortet, og tryk Indsend svar. Giv et hint giver et hint og derefter svaret." },
             { sel: "#gaet-anker-glas", titel: "Glassene", tekst: "Test dit svar: træk pipetten ned i det glas, svaret passer til. Forsøget viser, om du har ret." },
             { sel: "#gaet-runde", titel: "Runden", tekst: "Ti stoffer, fem af hver slags. Rekorden huskes." },
             { sel: "#gaet-sorteret", titel: "Sorteret", tekst: "Stofferne, du har testet: polære og upolære." }

@@ -520,7 +520,7 @@
         if (f.slags === "navn") return "Mærket på prøven siger " + g.s + ". Hvad hedder grundstoffet med symbolet " + g.s + "?";
         if (f.slags === "symbol") return "Mærket på prøven siger " + g.navn + ". Hvad er symbolet for " + g.navn + "?";
         if (f.slags === "plads") return "Træk prøven med " + g.navn + " op i rummet i udstillingen, hvor skiltet siger " + g.s + ".";
-        return "Prøven med " + g.navn + " står på plads. Hvad er elektronstrukturen for " + g.navn + "?";
+        return "Hvad er elektronstrukturen for " + g.navn + "?";
     };
 
     /* Forklaringen, naar hele proeven er loest: pladsen og strukturen

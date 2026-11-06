@@ -161,16 +161,16 @@ Direkte links: `index.html#beregning` og `index.html#svaer` (Svær på fanen
 Beregningen; `#let` vælger Let igen).
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori ·
-<kbd>H</kbd> rundvisning · <kbd>R</kbd> start forfra · <kbd>Enter</kbd> tjek
-feltet eller næste opgave · <kbd>Esc</kbd> luk. Genvejene med bogstaver
+<kbd>H</kbd> rundvisning · <kbd>R</kbd> start forfra · <kbd>Enter</kbd> Indsend
+svar eller knappen videre · <kbd>Esc</kbd> luk. Genvejene med bogstaver
 virker, når der ikke skrives i et felt.
 
 ## Filer
 
 ```
-index.html          markup for de to faner, statuslinjen, startskærmen, teorien og rundvisningen
-css/stil.css        alt udseende (kopi af sc5.11; nyt nederst: gættets kort, brøkfelterne fra sc5.3,
-                    statuslinjen som sc1.4 og omskifteren som sc5.11).
+index.html          markup for de to faner, papirkortet i scenen, teorien og rundvisningen
+css/stil.css        alt udseende (kopi af sc5.11; nyt nederst: brøkfelterne fra sc5.3, omskifteren
+                    som sc5.11 og papirkortets plads og opstilling; udseendet fra ../faelles/papirkort.css).
                     NB: decimaltal med PUNKTUM i CSS
 sprites/            iltflasken og de tre billeder til gættet (nye);
                     bunsenbrænderen (som sc5.7), vægten og luppen (som sc5.11)
@@ -184,9 +184,9 @@ js/tegning.js       rummet, bordet, tavlen, vægten, pladen, stålulden, der gl�
                     med flammen og gasslangen, iltflasken og slangen, luppen med atomerne, pilen med
                     skiltet, søjlerne og pilene i skemaet
 js/skema.js         mængdeberegningsskemaet på tavlen på fane 2
-js/fane.js          det, fanerne deler: opgavelisten, linjen med hint-knappen og musen
-js/regning.js       regnestykket i kortet (formel, mellemregning i brøkfelter, resultat)
-js/sim_forsoeg.js   fane 1, startskærmen med gættet og målingerne, som fane 2 bruger
+js/fane.js          det, fanerne deler: opgavelisten, papirkortet (linjen, hint, Indsend svar, bliv) og musen
+js/regning.js       regnestykket i panelet (formel, mellemregning i brøkfelter, resultat)
+js/sim_forsoeg.js   fane 1, gættet på kortet og målingerne, som fane 2 bruger
 js/sim_beregning.js fane 2 og omskifteren Let / Svær
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, links, tegneløkke
@@ -240,7 +240,8 @@ spørgsmålet og måling 2, omskifteren Svær med sit eget sæt af opgaver og
 layoutet fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller
 Chrome med `--allow-file-access-from-files` og lægger elevens gemte
 fremskridt tilbage bagefter. Sidst kørt 5. oktober 2026: ALT OK (178
-påstande).
+påstande). Fra 6. nov. 2026 tester den papirkortet i stedet for
+startskærmen og statuslinjen (se nedenfor): ALT OK (193 påstande).
 
 ## Forenklinger
 
@@ -278,3 +279,47 @@ peger på `../superanimationer/sc5.8_staaluld/index.html` (27. sept. 2026).
 Navnet i `FEEDBACK_EMNER` i `animationer/samling_alt.html` er uændret
 ("Afbrænding ståluld"). Den gamle ligger i
 `kemi-c-filer/arkiv/c5.8_eksperiment_ståluld_oldversion.html`.
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Beskrivelserne ovenfor af startskærmen, statuslinjen nederst på fane 1,
+opgavekortet i panelet og spørgsmålet over tavlen gælder den gamle udgave;
+nu gælder dette:
+
+* På begge faner står al tekst på ét lyst kort øverst midt i scenen
+  (`#forsoeg-kort`, `#beregning-kort`): etiketten (Måling 1) som indlejret
+  overskrift, opgaven, linjen med næste skridt, fejl, hint og ros, den gule
+  knap (Giv hint, Vis svaret) og Indsend svar. Statuslinjen nederst og
+  startskærmen er væk, og panelet har intet opgavekort.
+* Gættet før måling 1 står på kortet med de tre billeder (Lettere, Det
+  samme, Tungere). Det er gratis og virker med det samme. Imens står scenen
+  stille, panelet er dæmpet, og et klik i scenen får kortet til at blinke.
+* Fane 1: feltet til m(før) og m(efter) står på kortet ved siden af
+  opgaven. Indsend svar (eller Enter) sender tallet; knappen er grå, til der
+  står noget i feltet. Brænderen og iltflasken bruges i scenen som før.
+* Fane 2: felterne bliver i panelet (kortet Regnestykket) uden ↵-knapper.
+  Indsend svar på kortet eller Enter i et felt tjekker det aktive trin.
+  Spørgsmålet Hvorfor? står på kortet: et svar vælger kun, Indsend svar
+  sender. Et forkert svar bliver rødt og låst, og den gule knap lyser stille
+  op. Når regnestykket er færdigt, står der ingen ros under spørgsmålet.
+  Omskifteren Let / Svær står i panelet under opgavelisten.
+* Efter en løst måling eller et rigtigt svar bliver kortet på opgaven:
+  svaret er grønt (gult ved Vis svaret), forklaringen står under i en grøn
+  boks, og Næste måling, Næste opgave eller Videre til Beregningen står,
+  hvor Indsend svar stod (`NK.Papir.bliv`). Efter sidste opgave på
+  Beregningen er der ingen knap videre. Start forfra står i panelet på
+  Forsøget, aldrig på kortet.
+* Pladsen til kortet er `kortZone()` (Forsøget 210 px, lave skærme 190 px;
+  Beregningen 198 og 172 px). Tegningen begynder under den. Noten om gættet
+  er væk på lave og smalle skærme, så kortet kan være der. Selvtesten måler
+  kortet i alle trin på 1400 × 860 og 1100 × 660.
+
+**Molekylenavnene (6. nov. 2026).** O₂ hedder dioxygen og N₂ dinitrogen
+overalt, hvor eleven kan se det: dioxygen fra luften, flasken med dioxygen,
+skiltet Klik for mere dioxygen, etiketten Dioxygen under flasken og på
+flaskens mærkat (`sprites/iltflaske.svg`), svarene, teorien og
+rundvisningen. Hverdagsordet ilt står ingen steder; selvtesten tjekker det.
+Variabelnavne og filnavne (`ilt`, `iltflaske`, `D.UDEN_ILT`) er uændrede.
+

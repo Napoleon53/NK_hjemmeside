@@ -45,15 +45,32 @@ Bestillingen herunder er skrevet af Claude ud fra det, som ved sb2.1.
    tiden.
 4. **Loftet:** tre faner. Fane 1 har 3 reaktioner, 8 mål og højst 30 molekyler
    (1 molekyle = 0,010 eller 0,020 M). Fane 2 har 5 opgaver, fane 3 har 8.
-5. **Layoutet:** scene plus panel som sb2.1. Fane 1: målet og tekstboksen i en
-   kasse øverst, beholderen og grafen på ét lærred, skyderen under, skemaet og
-   Y nederst. Fane 2 og 3: opgavens handling over tavlen, tavlen med delene
-   (tekstboksen står i den del, eleven er ved), panelet med opgaven, listen og
-   bagefter hele besvarelsen.
+5. **Layoutet:** scene plus panel som sb2.1. Papirkortet står øverst i
+   scenen på alle tre faner (se "Papirkortet" nedenfor). Fane 1: beholderen og
+   grafen på ét lærred, skyderen under, skemaet og Y nederst; panelet har
+   reaktionen med K, listen og forfra. Fane 2 og 3: tavlen med delene; panelet
+   har listen, forfra og bagefter hele besvarelsen med kurven.
 
-Kemichael er ikke med. Hjælpen står i tekstboksen: næste skridt, fejl, hint og
-ros, og den gule hintknap i samme boks (hinttrappen er som i
-`sc1.4_afstemning`).
+Kemichael er ikke med. Hjælpen står på papirkortet: næste skridt, fejl og
+hint (hinttrappen er som i `sc1.4_afstemning`).
+
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen
+(`body.papirkort`, `../faelles/papirkort.css` og `.js`). Kortet har
+etiketten ("Mål 3 af 8", "Opgave 2 af 5"), opgavens tekst og det, eleven skal
+gøre, i fed. Nederst står beskeden (næste skridt, fejl, hint), Giv et hint
+(stille knap med gul kant) og Indsend svar (gråt, til der er noget at sende).
+Tjek-knapperne på tavlen er væk; Indsend svar eller Enter sender den del ind,
+eleven er ved. Skyderen bedømmer aldrig selv: på fane 1 sender Indsend svar
+x ind. Et klik på en løsning, et stof i skemaet, Kan bruges, Forkast eller en
+negativ koncentration vælger kun (blå ring), og Indsend svar bedømmer.
+Knappen Løs ligningen med CAS er et værktøj og virker med det samme. Efter et
+rigtigt svar bliver kortet på opgaven med svaret under og Næste, hvor Indsend
+svar stod; et klik i scenen får kortet til at blinke. Forfra står i panelet.
+Pladsen til kortet er `--kz` i `css/stil.css`: 196 px på fane 2 og 3 og
+158 px på fane 1. Selvtesten måler kortet med alle hint og svar i 1440 × 860
+og 1100 × 700. Opgaveteksten stod før i panelet; nu står den kun på kortet.
 
 ## Rettelser 9. oktober 2026
 
@@ -187,9 +204,8 @@ js/data.js          stofferne, de tre reaktioner og otte mål på fane 1, de
 js/model.js         ligevægtsloven, Kc's enhed, parseren til elevens udtryk,
                     pladserne a + b·x, polynomierne og CAS, dommen over
                     ligevægtsloven (efter sb2.1) og hinttrappen til den
-js/fane.js          det fælles: listen, tekstboksen, knappen og skemaet
-js/regn.js          fane 2 og 3: delene, felterne, tjek, hint og svar;
-                    flytter tekstboksen med den del, eleven er ved
+js/fane.js          det fælles: listen, papirkortet, knapperne og skemaet
+js/regn.js          fane 2 og 3: delene, felterne, tjek, hint og svar
 js/sim_beholder.js  fane 1: molekylerne, grafen, skyderen og målene
 js/rundvisning.js   rundvisningen bag ?
 js/app.js           faneskift, tastatur og løkken
@@ -202,7 +218,7 @@ og teksten); skemaet, ligningen, CAS og facit regnes af modellen. Fane 2 er
 
 ## Genveje
 
-<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> tjek ·
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> indsend svar eller næste ·
 <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
 <kbd>Esc</kbd> luk. Direkte links: `#beholderen`, `#udenx`, `#medx` og `#teori`.
 
@@ -222,7 +238,16 @@ den del, eleven er ved, og i en boks nederst på tavlen, når opgaven er løst;
 at hver beregning af en koncentration står på sin egen linje med
 lighedstegnene under hinanden; at der ingen statuslinje er; og at fane 1 kan
 være i scenen med et hint og med forklaringen i tekstboksen.
-Sidst kørt: ALT OK (599 påstande), 9. oktober 2026 (Linux, headless Chrome).
+Fra 6. nov. 2026 (papirkortet): at kortet står i scenen og ikke i panelet,
+at forfra står i panelet, at der ingen Tjek-knapper og ingen tekstboks er, at
+Indsend svar er gråt uden svar, at skyderen og et klik på en løsning, et stof
+eller Kan bruges kun vælger, at kortet bliver på opgaven med Næste, hvor
+Indsend svar stod, og at kortet holder sig i kortZone.
+Sidst kørt: ALT OK (641 påstande), 6. nov. 2026 (Linux, headless Chrome).
+
+Molekylenavne (6. nov. 2026): "Diiod spaltes til iodatomer" og
+"Diiodmolekyler" (stoffet I₂). Resten brugte allerede dihydrogen, dinitrogen
+og dichlor; grundstofnavne i stofnavne (hydrogenbromid) og iodatomer bliver.
 
 ## I menuen
 

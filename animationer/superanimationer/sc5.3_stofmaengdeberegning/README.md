@@ -221,7 +221,39 @@ en løst opgave er grøn i listen, at Vægten har linjen med de tre trin, et
 bredere panel og større felter, og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 9. oktober 2026: ALT OK (148 påstande).
+bagefter. Sidst kørt 6. november 2026 efter papirkortet: ALT OK (153 påstande).
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+`js/fane.js` er hentet fra sc6.2 (som har sc6.1's) og har fået trekanten, den
+grønne liste og D.DEL_OK med igen. Beskrivelserne ovenfor af teksten over
+tavlen, opgavekortet i panelet og svarene på tavlen i Hurtigrunden gælder den
+gamle udgave; nu gælder dette:
+
+* På alle tre faner står opgaven, spørgsmålet, hintet, beskeden ved en fejl,
+  forklaringen og knapperne på ét lyst kort øverst i midten af scenen
+  (`#formel-skort`, `#vaegt-skort`, `#hurtig-skort`). Der er ingen linje
+  nederst og intet opgavekort i panelet. Giv hint er en stille knap med gul
+  kant (Giv hint, Vis trekanten, Vis svaret).
+* Formlen: opgavens tekst står på kortet i stedet for over tavlen. En brik på
+  en plads vælger kun; Indsend svar tjekker de dele, der er fyldt (også de
+  blege bogstaver i Introduktionen). Når en del af opgaven er rigtig, siger
+  linjen på kortet det i grønt foran næste skridt, som brugeren bad om 29.
+  sept. 2026. Formålet (første og sidste opgave) og felterne i sidste opgave
+  står i panelet i kortet Om opgaven. Enter i et felt er Indsend svar.
+* Vægten: felterne bliver i panelet (kortet Regnestykket) uden ↵-knapper;
+  opgavens spørgsmål står på kortet, og Indsend svar (eller Enter) tjekker det
+  aktive trin. Efter sidste trin bliver kortet med resultatet og Næste opgave.
+* Hurtigrunden: spørgsmålet og svarene står på kortet. Et klik eller tasten 1
+  til 4 vælger, Indsend svar eller Enter sender. Efter svaret bliver kortet på
+  spørgsmålet med det rigtige svar og forklaringen og Næste spørgsmål, og uret
+  står stille imens. Tavlen viser uret stort og hvor langt runden er. Start
+  runden og Ny runde står på kortet; Start runden forfra ligger i panelet.
+* Lærredet sætter pladsen øverst af til kortet (`kortZone`, ZONE i
+  `js/sim_*.js`), og selvtesten måler, at kortet ikke når ned over tavlen.
+* Ingen molekylenavne at rette (stoffer som O₂ og Cl₂ nævnes ikke).
 
 ## Forenklinger
 

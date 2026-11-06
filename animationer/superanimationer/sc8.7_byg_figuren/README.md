@@ -30,7 +30,7 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
 
 | Fane | Figur | Pladser |
 |:--|:--|:--|
-| 8.1 | 2 Mg + O₂ → 2 Mg²⁺ + 2 O²⁻ med den orange klamme "magnesium afgiver 4 elektroner" og den blå "oxygen optager 4 elektroner"; de to delreaktioner; luppen "Mens magnesium brænder" med to magnesiumatomer, der hver afgiver 2 e⁻ til et oxygenatom | redoxreaktion (titel på kortet), oxidation og reduktion (klammerne), delreaktion (de to skemaer), reduktionsmiddel (magnesiumatomerne), oxidationsmiddel (oxygenatomerne) |
+| 8.1 | 2 Mg + O₂ → 2 Mg²⁺ + 2 O²⁻ med den orange klamme "magnesium afgiver 4 elektroner" og den blå "dioxygen optager 4 elektroner"; de to delreaktioner; luppen "Mens magnesium brænder" med to magnesiumatomer, der hver afgiver 2 e⁻ til et oxygenatom | redoxreaktion (titel på kortet), oxidation og reduktion (klammerne), delreaktion (de to skemaer), reduktionsmiddel (magnesiumatomerne), oxidationsmiddel (oxygenatomerne) |
 | 8.2 | spændingsrækken K til Au med H₂ i midten og pilene "afgiver let elektroner" og "afgiver nødigt elektroner" over rækken | spændingsrækken (titel), uædelt (metallerne til venstre for H₂), ædelt (metallerne til højre) |
 | 8.3 | H₂O, CO₂ og SO₄²⁻ med oxidationstallene over atomerne; skalaen fra −IV til +VII med Fe, Fe²⁺ og Fe³⁺, den orange pil "tallet stiger" og den blå "tallet falder" | oxidationstal (tallene over atomerne), oxidation og reduktion (foran teksterne ved pilene, som "oxidation:" i bogen) |
 | 8.4 | fire bægerglas med MnO₄⁻, MnO₄²⁻, MnO₂ og Mn²⁺ med oxidationstallene over og en lang blå pil under | permanganat (navneskilt under det violette glas), oxidationstal (titel over tallene), reduktion (navneskilt under pilen) |
@@ -51,6 +51,10 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
   farveordene under glassene er taget ud, fordi glassene viser farven.
 - Oxygenatomerne i luppen er røde som i C-bogens kuglemodeller (bogens mg-trin-2 har
   dem grå).
+- Molekylenavne (6. nov. 2026, "O₂ er altid dioxygen overalt"): den blå klamme siger
+  "dioxygen optager 4 elektroner", og rosen og forklaringerne i 8.1 siger dioxygen om
+  stoffet O₂. Bogens figur delreaktioner siger stadig "oxygen optager 4 elektroner".
+  Oxygenatomerne i luppen hedder stadig oxygenatomer.
 - Lagenes rækkefølge og figurernes indhold er Claudes valg.
 
 ## Filerne

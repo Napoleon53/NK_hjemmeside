@@ -46,6 +46,9 @@
         var mig = this;
         this.tb = new NK.Tekstboks("gaet");
         this.tb.vedKnap = function () { mig.knap(); };
+        this.tb.vedIndsend = function () { mig.indsendGrupper(); };
+        /* Ingen polaere grupper er valgt: markeringerne i formlen fjernes */
+        this.tb.vedValg = function (id) { if (id === "ingen") mig.markeret = {}; };
 
         this.bordStart();
         this.bygPanel();
@@ -125,7 +128,7 @@
             this.tb.ryst();
             return;
         }
-        if (this.fase === "pol" || this.fase === "test") {
+        if (this.fase === "pol") {
             this.svarPol = id;
             this.fase = "test";
             this.spm.linje = null;
@@ -133,9 +136,19 @@
         }
     };
 
-    /* Den ene knap: Giv hint -> Vis svaret -> Naeste stof */
+    /* Indsend svar med grupperne markeret i formlen */
+    P.indsendGrupper = function () {
+        if (this.fase !== "grp" || this.slut) return;
+        var mangler = this.grupper.length - this.antalMarkeret();
+        if (this.antalMarkeret() > 0 && mangler === 0) { this.spm.linje = null; this.grupperFundet(); return; }
+        this.spm.linje = { html: D.F1.mangler(this.stof, mangler), klasse: "skidt" };
+        this.besked = null;
+        this.tb.ryst();
+    };
+
+    /* Den ene knap: Giv hint -> Vis svaret -> Naeste stof. Ny runde ligger i panelet. */
     P.knap = function () {
-        if (this.slut) { this.nyRunde(); return; }
+        if (this.slut) return;
         if (this.fase === "faerdig" || this.fase === "test2") {
             if (this.nr >= this.runde.length - 1) {
                 this.slut = true;
@@ -235,6 +248,7 @@
         if (this.fase === "test") { this.testGlas(i); return; }
         if (this.fase === "grp" || this.fase === "pol") {
             this.visBesked(this.fase === "grp" ? "Find først de polære grupper i formlen." : "Svar først: er " + D.navn(this.stof) + " polært eller upolært?");
+            this.tb.blink();
             return;
         }
         if (this.glas[i].portioner > 0) this.glas[i].ryst();
@@ -262,13 +276,18 @@
         var mig = this, k = -1;
         this.grupper.forEach(function (g, j) { if (g.atomer.indexOf(a) >= 0) k = j; });
         if (k >= 0) {
-            var ny = !this.markeret[k];
-            this.markeret[k] = true;
             if (this.afvisTilbud) this.afvisTilbud();
             if (this.fase === "grp") {
+                /* Et klik markerer gruppen eller fjerner markeringen; Indsend svar bedoemmer */
+                if (this.markeret[k]) delete this.markeret[k]; else this.markeret[k] = true;
+                this.tb.fravaelg();
                 this.spm.linje = null;
-                if (this.antalMarkeret() === this.grupper.length) { this.grupperFundet(); return; }
+                this.besked = null;
+                mig.visPanel();
+                return;
             }
+            var ny = !this.markeret[k];
+            this.markeret[k] = true;
             this.visBesked(ny ? "<b>" + M.GRUPPENAVN[this.grupper[k].slags] + "</b> er en polær gruppe."
                               : M.GRUPPENAVN[this.grupper[k].slags] + " er allerede markeret.");
         } else {
@@ -368,14 +387,18 @@
         var tekst, linje = "", klasse = "", svar = [], tilstande = {}, laast = false;
         var c = M.antalC(this.mol), n = this.grupper.length;
         if (this.slut) {
+            /* Kortets knap gaar altid fremad; en ny runde ligger i panelet (brugeren 3. nov. 2026) */
             tekst = "Runden er slut: " + this.point + " af " + this.runde.length + " rigtige.";
-            linje = "Tryk på Ny runde for ti nye stoffer.";
+            linje = "Tryk på Ny runde i panelet for ti nye stoffer.";
+            tb.chip("Runden");
             tb.tekst(tekst);
             tb.linje(linje, this.point >= 8 ? "god" : "");
             tb.svar([], null);
-            tb.knap("Ny runde", "naeste");
+            tb.indsend(false, false);
+            tb.knap(null);
             return;
         }
+        tb.chip("Stof " + (this.nr + 1) + " af " + this.runde.length);
         if (this.fase === "grp") {
             tekst = D.F1.grp(s);
             linje = D.F1.fundet(this.antalMarkeret());
@@ -390,12 +413,13 @@
                 (n === 0 ? "ingen polære grupper." : n + (n === 1 ? " polær gruppe." : " polære grupper."));
             if (this.svarPol) {
                 var afgjort = this.fase === "test2" || this.fase === "faerdig";
-                if (!afgjort) tilstande[this.svarPol] = "valgt";
+                if (!afgjort) tilstande[this.svarPol] = this.visteSvar ? "svar-vist" : "valgt";
                 else {
-                    tilstande[this.facit()] = this.visteSvar ? "valgt" : "rigtig";
+                    tilstande[this.facit()] = this.visteSvar ? "svar-vist" : "rigtig";
                     if (this.svarPol !== this.facit()) tilstande[this.svarPol] = "forkert";
                 }
-                laast = this.fase !== "test";
+                /* Svaret er sendt ind: nu er det forsoeget, der afgoer det */
+                laast = true;
             }
             if (this.fase === "test") {
                 var pol = this.svarPol === "polaert" ? "polært" : "upolært";
@@ -411,6 +435,7 @@
         tb.linje(linje, klasse);
         tb.svar(svar, function (id) { mig.svar(id); });
         tb.svarTilstand(tilstande, laast);
+        tb.indsend(this.fase === "grp" || this.fase === "pol", this.fase === "grp" && this.antalMarkeret() > 0);
         if (this.fase === "test1") tb.knap(null);
         else if (this.fase === "test2" || this.fase === "faerdig") {
             tb.knap(this.nr >= this.runde.length - 1 ? "Se resultatet" : "Næste stof →", "naeste");
@@ -418,7 +443,10 @@
     };
 
     /* ----- Panelet: runden og de sorterede stoffer ------------------------------------- */
-    P.bygPanel = function () {};
+    P.bygPanel = function () {
+        var mig = this;
+        NK.el("gaet-nulstil").addEventListener("click", function () { mig.nyRunde(); });
+    };
 
     P.visPanel = function () {
         NK.saetTekst("gaet-point", String(this.point));
@@ -445,13 +473,14 @@
     P.tast = function (key) {
         if (key !== "ArrowLeft" && key !== "ArrowRight") return false;
         var i = key === "ArrowLeft" ? 0 : 1;
-        if (this.fase === "pol") this.svar(D.POL_SVAR[i].id);
+        if (this.fase === "pol") this.tb.vaelg(D.POL_SVAR[i].id);
         else if (this.fase === "test") this.testGlas(i);
         return true;
     };
 
     P.enter = function () {
-        if (this.slut || this.fase === "test2" || this.fase === "faerdig") this.knap();
+        if (this.fase === "test2" || this.fase === "faerdig") this.knap();
+        else if (this.fase === "grp" || this.fase === "pol") this.tb.indsendKlik();
     };
 
     P.fokus = function () {};

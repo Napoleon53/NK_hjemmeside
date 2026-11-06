@@ -109,6 +109,7 @@ js/tegning.js         rum og bord, strukturformler, hydronen, skemaet med
                       klammerne, tavlen, brikker og pladser
 js/sprites.js         lageret til Kemichaels sprites (ingen egne sprites)
 js/tavle.js           det, fane 2 og 3 deler: layout, brikker, sværhedsgrad
+js/skort.js           papirkortet i scenen (samme fil i sc7.1, sc7.2 og sc7.3)
 js/sim_hydron.js      fane 1
 js/sim_produkter.js   fane 2
 js/sim_par.js         fane 3
@@ -177,7 +178,38 @@ par, strukturerne før og efter hver mulig overførsel, de forkerte svar, alle
 mærkater på alle stoffer, forløbet i de tre faner med musen, Kemichael,
 sproget og layoutet fra 520 × 380 til 1500 × 900. Præsentationen tjekkes med
 den fælles test (`NK.Praesentation.selvtest`) på alle tre faner.
-Sidst kørt: ALT OK, 4. november 2026.
+Sidst kørt: ALT OK, 6. november 2026 (med påstande om papirkortet).
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Kortet bygges af `js/skort.js`; pladsen og opbygningen står sidst i
+`css/stil.css`. Beskrivelserne ovenfor af knappen i opgavekortet og linjen
+under scenen gælder den gamle udgave; nu gælder dette:
+
+* På alle tre faner står opgaven, hintet, beskeden ved en fejl, forklaringen
+  og knapperne på ét lyst kort øverst i midten af scenen (`#hydron-skort`,
+  `#prod-skort`, `#par-skort`). Der er ingen linje nederst. Giv hint er en
+  stille knap med gul kant (Giv hint, Vis svaret).
+* **Indsend svar** bedømmer. Fane 1: en hydron sluppet på den anden partikel
+  bliver ved det nærmeste frie elektronpar (lyser gult), til eleven trykker
+  Indsend svar; først da reagerer basen, eller hydronen flyver hjem med
+  forklaringen. Den ventende hydron kan trækkes videre eller klikkes hjem.
+  Fane 2: formlerne på pladserne vælger kun; et klik på en plads tømmer den.
+  Fane 3: mærkaterne vælger kun; et klik på et mærkat under en formel sender
+  det tilbage. Indsend svar er grå, til begge pladser eller alle fire
+  mærkater er fyldt. Et rigtigt svar bliver stående, et forkert ryger af med
+  sin forklaring. Enter er Indsend svar.
+* Efter et rigtigt svar bliver kortet på opgaven med forklaringen, og
+  Næste reaktion eller Ny reaktion står, hvor Indsend svar stod (efter alle
+  ti på fane 1: Videre til Produkterne). Et klik i scenen imens får kortet til
+  at blinke. Start forfra ligger i panelet.
+* Panelet har tallene 1 til 10 (fane 1), sværhedsgraden og tælleren I træk
+  uden fejl (fane 2 og 3). Tilbuddet om præsentationen står nederst i scenen.
+* Lærredet sætter pladsen øverst af til kortet (`kortZone`); selvtesten
+  måler kortets højde i alle tilstande ved 1400 × 860 og 1100 × 700.
+* Molekylenavne: ingen at rette (H₂ står kun som formel på en forkert brik).
 
 ## I menuen
 

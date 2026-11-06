@@ -66,26 +66,22 @@
         this.bygValg();
     };
 
+    /* Knapperne paa kortet: svarene vaelger kun (Indsend svar sender ind),
+       Vend B om er en handling og virker straks */
     P.bygValg = function () {
         var mig = this, o = this.o;
         this.valg.innerHTML = "";
-        function knap(tekst, klasse, fn) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap" + (klasse ? " " + klasse : "");
-            k.textContent = tekst;
-            k.addEventListener("click", function () { fn(); mig.fokus(); });
-            mig.valg.appendChild(k);
-            return k;
-        }
         this.knapper = {};
-        if (o.slags === "to") {
-            this.knapper.samme = knap("Det samme stof", "", function () { mig.svarTo("samme"); });
-            this.knapper.to = knap("To forskellige stoffer", "", function () { mig.svarTo("to"); });
+        if (o.id === "d2") {
+            this.lavKnap("Ja, CH₃ kan drejes op", "ja", function () { mig.svarD2("ja"); });
+            this.lavKnap("Nej, CH₃ fjedrer tilbage", "nej", function () { mig.svarD2("nej"); });
+        } else if (o.slags === "to") {
+            this.lavKnap("Det samme stof", "samme", function () { mig.svarTo("samme"); });
+            this.lavKnap("To forskellige stoffer", "to", function () { mig.svarTo("to"); });
         } else if (o.slags === "byt") {
-            this.knapper.vend = knap("Vend B om ↻", "vend", function () { mig.vend(); });
-            this.knapper.samme = knap("Samme stof", "", function () { mig.svarByt("samme"); });
-            this.knapper.nyt = knap("Nyt stof", "", function () { mig.svarByt("nyt"); });
+            this.lavKnap("Vend B om ↻", "vend", function () { mig.vend(); }, "handling", "", "vend");
+            this.lavKnap("Samme stof", "samme", function () { mig.svarByt("samme"); });
+            this.lavKnap("Nyt stof", "nyt", function () { mig.svarByt("nyt"); });
         }
         this.visValg();
     };
@@ -104,23 +100,55 @@
         if (this.o.slags === "byt") {
             k.vend.hidden = t !== "vend";
             k.samme.hidden = k.nyt.hidden = t !== "svar";
-            k.samme.disabled = k.nyt.disabled = !!this.faerdig;
-        } else if (this.o.slags === "to") {
-            k.samme.disabled = k.to.disabled = !!this.faerdig;
         }
-        this.valg.hidden = this.o.slags === "drej" || t === "byt";
+        var synlig = false;
+        for (var n in k) if (!k[n].hidden) synlig = true;
+        this.valg.hidden = !synlig;
+    };
+
+    /* Skridtet i en byt-opgave paa etiketten */
+    P.trinEtiket = function () {
+        var t = this.trinNu();
+        return t ? "trin " + { byt: 1, vend: 2, svar: 3 }[t] + " af 3" : "";
+    };
+
+    /* Det, Indsend svar sender, naar intet svar er valgt: drejningen af butan */
+    P.indsendScene = function () {
+        var mig = this;
+        if (this.o.id !== "d1") return null;
+        return { klar: this.roert, mangler: "Træk først i den højre halvdel af butan. Tryk så Indsend svar.",
+            fn: function () { mig.tjekD1(); } };
+    };
+
+    P.tjekD1 = function () {
+        if (this.faerdig) return;
+        if (Math.abs(vinkelForskel(this.theta)) < 22 * GRAD) {
+            this.hold = null;
+            this.theta = Math.round(this.theta / (2 * Math.PI)) * 2 * Math.PI;
+            this.thetaVis = this.theta;
+            this.loest("De to CH₃ i butan står nu på samme side. En enkeltbinding kan drejes frit, så det er stadig det samme stof.");
+        } else {
+            this.fejlLinje("De to CH₃ står ikke på samme side endnu. Træk videre i den højre halvdel, til CH₃ står øverst.");
+        }
+    };
+
+    P.svarD2 = function (svar) {
+        if (this.faerdig) return;
+        if (svar === "nej") { this.faerdigD2(); return; }
+        this.markerValg("ja", false);
+        this.fejlLinje("Træk hårdt i CH₃ nederst til højre. Kommer CH₃ helt op, eller fjedrer den tilbage?");
     };
 
     P.promptHTML = function () {
         var o = this.o, t = this.trinNu();
-        if (!t) return '<p class="maal-tekst">' + NK.html(o.maal) + "</p>";
+        if (!t) return NK.html(o.maal);
         var a = D.tekst(o.v[0]), b = D.tekst(o.v[1]);
         var tekst = {
             byt: "B er en kopi af A (" + o.navn.toLowerCase() + "). Klik på " + a + " til venstre i B, så " + a + " og " + b + " bytter plads.",
             vend: "Vend B om, så B ses fra den anden side.",
             svar: "Er B det samme stof som A, eller er B et nyt stof?"
         }[t];
-        return '<p class="maal-tekst"><span class="b-maerke">Trin ' + { byt: 1, vend: 2, svar: 3 }[t] + " af 3</span> " + NK.html(tekst) + "</p>";
+        return NK.html(tekst);
     };
 
     /* ----- Hinttrappen -------------------------------------------------------------- */
@@ -149,7 +177,7 @@
             "Klik på " + a + " yderst til venstre i B."
         ];
         if (t === "vend") return [
-            "Tryk på knappen Vend B om under molekylerne.",
+            "Tryk på knappen Vend B om på kortet.",
             "B er det samme molekyle, når det er vendt. Det ses bare fra den anden side."
         ];
         var hoejre = o.h.map(D.tekst).join(" og ");
@@ -166,6 +194,7 @@
         var o = this.o;
         if (o.id === "d1") { this.autoMaal = 0; this.auto = true; return; }
         if (o.id === "d2") { this.proevet = true; this.ryk = 1; this.faerdigD2(); return; }
+        /* Vis svaret paa butan drejer molekylet og loeser opgaven, naar det er der */
         if (o.slags === "to") { this.svarTo("to", true); return; }
         /* Vis svaret loeser kun det skridt, eleven er ved */
         var t = this.trinNu();
@@ -232,7 +261,7 @@
         var L = this.L;
         /* Pladsen til knapperne er sat af i hele opgaven, saa molekylerne ikke
            flytter sig, naar knapperne kommer frem */
-        var valgH = this.o && this.o.slags !== "drej" ? 70 : 0;
+        var valgH = 0;   /* knapperne staar paa kortet */
         var top = this.kortZone(), bund = L.h - valgH - 12;
         var h = Math.max(160, bund - top);
         this.lay = { cx: L.b / 2, cy: top + h * 0.5, h: h, top: top, bund: bund };
@@ -329,9 +358,9 @@
         var flyttet = Math.hypot(pt.x - g.start.x, pt.y - g.start.y);
         if (g.type === "drej") {
             if (this.o.binding === 2) {
-                if (this.proevet) this.faerdigD2();
+                if (this.proevet) this.besked('<span class="b-maerke">Fast</span> CH₃ fjedrede tilbage. Svar på kortet, og tryk Indsend svar.', "gul");
                 else if (flyttet >= 6) this.kortBesked("Træk længere. Kan du få CH₃ helt op?", 4);
-            }
+            } else this.visIndsend();
             return;
         }
         /* Et klik paa en af de to grupper, eller den ene sluppet paa den anden */
@@ -401,6 +430,7 @@
 
     P.faerdigD2 = function () {
         if (this.faerdig) return;
+        this.markerValg("nej", true);
         this.loest("Dobbeltbindingen i but-2-en kan ikke drejes, for så skulle den ene af de to bindinger brydes. De to CH₃ bliver på hver sin side.");
     };
 
@@ -428,12 +458,10 @@
                 this.thetaVis = this.theta;
                 /* Loest: CH₃ til hoejre (phi 0 + drejning) staar oppe */
                 var v = vinkelForskel(this.theta);
-                if (!this.faerdig && Math.abs(v) < (this.autoMaal !== null ? 2 : 22) * GRAD) {
-                    this.hold = null;
-                    this.theta = Math.round(this.theta / (2 * Math.PI)) * 2 * Math.PI;
-                    this.thetaVis = this.theta;
+                /* Butan loeses med Indsend svar (tjekD1); kun Vis svaret loeser den selv */
+                if (!this.faerdig && this.autoMaal !== null && Math.abs(v) < 2 * GRAD) {
                     this.autoMaal = null;
-                    this.loest("De to CH₃ i butan står nu på samme side. En enkeltbinding kan drejes frit, så det er stadig det samme stof.");
+                    this.tjekD1();
                 }
             }
         }

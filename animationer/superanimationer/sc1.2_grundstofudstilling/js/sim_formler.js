@@ -116,7 +116,7 @@
         lay.bordY = Math.round(H * 0.9);
         /* Udstillingen begynder under papirkortet oeverst i scenen */
         lay.kortTop = this.kortTop();
-        lay.m = Tg.montreLay(kant, lay.kortTop, W - 2 * kant, (lay.bordY - lay.kortTop) * 0.47);
+        lay.m = Tg.montreLay(kant, lay.kortTop, W - 2 * kant, (lay.bordY - lay.kortTop) * 0.53);
         var zoneTop = lay.m.y + lay.m.h + NK.klamp(H * 0.025, 8, 20);
         lay.kop = { x: kant + 24, y: lay.bordY };
         lay.storH = NK.klamp(Math.min(lay.bordY - zoneTop - 16, W * 0.22), 80, 230);

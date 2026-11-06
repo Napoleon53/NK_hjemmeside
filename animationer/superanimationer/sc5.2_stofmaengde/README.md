@@ -143,6 +143,32 @@ eller send Kemichael ud.
 * **Hjælpen er én knap:** Giv hint, så Vis svaret.
 * **Konfettien er væk**, og aluminium er kommet til.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`,
+samme fil som i sc5.1, og `../faelles/papirkort.css/js`). Opgavekortene i
+panelet og statuslinjen nederst er fjernet. Kortet har opgaven med en etiket
+("Opvarmning 1 af 3", "Par 1 af 9", "Ordre 1 af 4"), linjen med næste skridt,
+fejl og hint, Giv hint (gul kant) og Indsend svar (grå, til der er noget at
+sende).
+
+- Vægten: klumperne på vægten løser ikke længere opgaven af sig selv. Indsend
+  svar sender det, der ligger på vægten, ind; et forkert svar får "Ikke endnu"
+  og bemærkningen fra `js/opgaver.js`. Vis svaret lægger svaret på vægten.
+  Panelet har målingen og den nye knap Tøm vægten (samme som R).
+- Flest atomer: svarknapperne og piletasterne vælger kun. Et klik på en vægt
+  før svaret får kortet til at blinke. Panelet har runden og Ny runde.
+- Afvejning: feltet med massen står i Regnestykket i panelet; Enter eller
+  Indsend svar tjekker det. Afvej ordren igen og Start forfra står i panelet.
+
+Efter et rigtigt svar bliver kortet på opgaven med forklaringen, og Næste står,
+hvor Indsend svar stod. Lærredet begynder under kortet (`kortZone()`, ZONE i
+hver `sim_*.js`). Tilbuddet om præsentationen står nu nederst i scenen. Når
+panelet står under scenen (højst 860 px bred), er scenen mindst 590 px høj.
+Rundvisningen og Kemichaels præsentation peger på kortet i scenen. Animationen
+har ingen molekylnavne (kun metaller og carbon). Selvtestens afsnit 10b tjekker
+kortet.
+
 ## Filer
 
 ```
@@ -152,6 +178,7 @@ sprites/            vægten og vejebåden (fra sc5.1; vægten siger Max 2200 g, 
                     guld kan vejes) og pulverglasset (fra sc2.3), som er krukken
 js/kerne.js         NK-navnerum, hævet skrift, hukommelse, lærred, komma, potensform,
                     betydende cifre
+js/kort.js          papirkortet øverst i scenen (samme fil som i sc5.1, 6. nov. 2026)
 js/data.js          grundstofferne, parrene, ordrerne og replikkerne
 js/opgaver.js       målene og de fire slags opgaver på fane 1, med tjek og beskeder
 js/tjek.js          tjek af massen på fane 3; beskederne ved fejl

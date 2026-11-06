@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spejlbilledeisomeri</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇋</span> Spejlbilledeisomeri</h1>
@@ -28,28 +29,32 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-sb" role="tabpanel" aria-label="Spejlbilledet">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og opgaven,
+             svarknapperne og nederst beskeden, hintknappen og Indsend svar.
+             Loest: forklaringen og knappen videre i sb-bliv -->
+        <div class="scenekort" id="sb-skort">
+            <p class="sk-tekst" id="sb-prompt"></p>
+            <div class="sk-svar" id="sb-valg"></div>
+            <div class="sk-bund" id="sb-status">
+                <p class="st-tekst" id="sb-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="sb-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="sb-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="sb-bliv" hidden></div>
+        </div>
         <canvas id="sb-laerred"></canvas>
         <div class="anker" id="sb-anker-molekyle"></div>
         <div class="anker" id="sb-anker-spejl"></div>
-        <div class="scene-valg" id="sb-valg"></div>
-
-        <div class="statuslinje" id="sb-status">
-            <p class="st-tekst" id="sb-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="sb-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="sb-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="sb-kort">
-            <h2><span id="sb-titel">Opgave</span><span class="taeller">opgave <b id="sb-nr">1</b>/<span id="sb-antal">6</span></span></h2>
-            <div id="sb-prompt"></div>
-        </div>
-
         <div class="kort" id="sb-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="sb-loest">0</b>/6</span></h2>
             <div class="opg-liste" id="sb-liste"></div>
         </div>
+
+        <!-- Forfra ligger i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+        <button class="forfraknap panel-forfra" id="sb-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 
@@ -58,27 +63,31 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-fi" role="tabpanel" aria-label="Find C-atomet">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og opgaven,
+             svarknapperne og nederst beskeden, hintknappen og Indsend svar.
+             Loest: forklaringen og knappen videre i fi-bliv -->
+        <div class="scenekort" id="fi-skort">
+            <p class="sk-tekst" id="fi-prompt"></p>
+            <div class="sk-svar" id="fi-valg"></div>
+            <div class="sk-bund" id="fi-status">
+                <p class="st-tekst" id="fi-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fi-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="fi-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="fi-bliv" hidden></div>
+        </div>
         <canvas id="fi-laerred"></canvas>
         <div class="anker" id="fi-anker-tavle"></div>
-        <div class="scene-valg" id="fi-valg"></div>
-
-        <div class="statuslinje" id="fi-status">
-            <p class="st-tekst" id="fi-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="fi-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="fi-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="fi-kort">
-            <h2><span id="fi-titel">Opgave</span><span class="taeller">opgave <b id="fi-nr">1</b>/<span id="fi-antal">13</span></span></h2>
-            <div id="fi-prompt"></div>
-        </div>
-
         <div class="kort" id="fi-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="fi-loest">0</b>/13</span></h2>
             <div class="opg-liste" id="fi-liste"></div>
         </div>
+
+        <!-- Forfra ligger i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+        <button class="forfraknap panel-forfra" id="fi-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 
@@ -87,23 +96,24 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-rs" role="tabpanel" aria-label="R eller S">
     <div class="scene">
+        <!-- Papirkortet oeverst i midten (js/fane.js): etiketten og opgaven,
+             svarknapperne og nederst beskeden, hintknappen og Indsend svar.
+             Loest: forklaringen og knappen videre i rs-bliv -->
+        <div class="scenekort" id="rs-skort">
+            <p class="sk-tekst" id="rs-prompt"></p>
+            <div class="sk-svar" id="rs-valg"></div>
+            <div class="sk-bund" id="rs-status">
+                <p class="st-tekst" id="rs-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="rs-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="rs-indsend" type="button">Indsend svar</button>
+            </div>
+            <div class="sk-blivramme" id="rs-bliv" hidden></div>
+        </div>
         <canvas id="rs-laerred"></canvas>
         <div class="anker" id="rs-anker-molekyle"></div>
-        <div class="scene-valg" id="rs-valg"></div>
-
-        <div class="statuslinje" id="rs-status">
-            <p class="st-tekst" id="rs-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="rs-forfra" type="button" title="Samme molekyle, ny drejning (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="rs-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="rs-kort">
-            <h2><span id="rs-titel">Opgave</span><span class="taeller">opgave <b id="rs-nr">1</b>/<span id="rs-antal">7</span></span></h2>
-            <div id="rs-prompt"></div>
-        </div>
-
         <div class="kort maaling" id="rs-zkort">
             <h2>Atomnumre</h2>
             <div class="zliste">
@@ -116,6 +126,9 @@
             <h2>Opgaverne <span class="taeller">løst <b id="rs-loest">0</b>/7</span></h2>
             <div class="opg-liste" id="rs-liste"></div>
         </div>
+
+        <!-- Forfra ligger i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+        <button class="forfraknap panel-forfra" id="rs-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 
@@ -144,7 +157,7 @@
             <span class="eksempel-hoved">Eksempel: mælkesyre</span>
             Grupperne er OH (1), COOH (2), CH₃ (3) og H (4). Med H vendt væk går OH → COOH → CH₃ enten med uret, (R)-mælkesyre, eller mod uret, (S)-mælkesyre. Musklerne laver (S)-mælkesyre.
         </div>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -181,6 +194,7 @@
 <script src="js/tegning.js"></script>
 <script src="js/rum.js"></script>
 <script src="js/kiral.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_spejl.js"></script>
 <script src="js/sim_find.js"></script>

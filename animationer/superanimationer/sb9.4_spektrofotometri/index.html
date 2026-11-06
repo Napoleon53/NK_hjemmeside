@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spektrofotometri</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">λ</span> Spektrofotometri</h1>
@@ -29,19 +30,26 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-let" role="tabpanel" aria-label="Sodavand">
     <div class="scene">
-        <p class="opgavelinje" id="let-linje"></p>
-        <div class="laerred-ramme"><canvas id="let-laerred"></canvas></div>
-        <div class="statuslinje" id="let-status">
-            <p class="st-tekst" id="let-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="let-forfra" type="button" title="Hele forsøget forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="let-knap" type="button">Giv et hint</button>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): trinet, naeste skridt, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="let-skort">
+                <div class="sk-ind" id="let-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="let-status">
+                    <p class="st-tekst" id="let-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="let-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="let-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
         </div>
+        <div class="laerred-ramme"><canvas id="let-laerred"></canvas></div>
     </div>
     <aside class="panel">
         <div class="kort opgavekort" id="let-kort">
             <h2><span>Spørgsmålet</span><span class="taeller" id="let-proevenr"></span></h2>
             <p class="spoergsmaal" id="let-spm"></p>
             <ol class="trinliste" id="let-trin"></ol>
+            <div class="forfra-raekke"><button class="forfraknap" id="let-forfra" type="button" title="Hele forsøget forfra (R)">Start forfra ↺</button></div>
         </div>
         <div class="kort" id="let-data">
             <h2>Målingerne <span class="taeller">ved 504 nm</span></h2>
@@ -55,19 +63,26 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-mid" role="tabpanel" aria-label="Nitrit">
     <div class="scene">
-        <p class="opgavelinje" id="mid-linje"></p>
-        <div class="laerred-ramme"><canvas id="mid-laerred"></canvas></div>
-        <div class="statuslinje" id="mid-status">
-            <p class="st-tekst" id="mid-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="mid-forfra" type="button" title="Hele forsøget forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="mid-knap" type="button">Giv et hint</button>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): trinet, naeste skridt, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="mid-skort">
+                <div class="sk-ind" id="mid-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="mid-status">
+                    <p class="st-tekst" id="mid-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="mid-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="mid-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
         </div>
+        <div class="laerred-ramme"><canvas id="mid-laerred"></canvas></div>
     </div>
     <aside class="panel">
         <div class="kort opgavekort" id="mid-kort">
             <h2><span>Spørgsmålet</span><span class="taeller" id="mid-proevenr"></span></h2>
             <p class="spoergsmaal" id="mid-spm"></p>
             <ol class="trinliste" id="mid-trin"></ol>
+            <div class="forfra-raekke"><button class="forfraknap" id="mid-forfra" type="button" title="Hele forsøget forfra (R)">Start forfra ↺</button></div>
         </div>
         <div class="kort" id="mid-data">
             <h2>Målingerne <span class="taeller">ved 540 nm</span></h2>
@@ -81,19 +96,26 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-svr" role="tabpanel" aria-label="To farvestoffer">
     <div class="scene">
-        <p class="opgavelinje" id="svr-linje"></p>
-        <div class="laerred-ramme"><canvas id="svr-laerred"></canvas></div>
-        <div class="statuslinje" id="svr-status">
-            <p class="st-tekst" id="svr-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="svr-forfra" type="button" title="Hele forsøget forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="svr-knap" type="button">Giv et hint</button>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): trinet, naeste skridt, hint,
+             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <div class="kortzone">
+            <div class="scenekort opgave" id="svr-skort">
+                <div class="sk-ind" id="svr-ind" aria-live="polite"></div>
+                <div class="sk-bund tom" id="svr-status">
+                    <p class="st-tekst" id="svr-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="svr-knap" type="button">Giv et hint</button>
+                    <button class="knap indsend" id="svr-indsend" type="button">Indsend svar</button>
+                </div>
+            </div>
         </div>
+        <div class="laerred-ramme"><canvas id="svr-laerred"></canvas></div>
     </div>
     <aside class="panel">
         <div class="kort opgavekort" id="svr-kort">
             <h2><span>Spørgsmålet</span><span class="taeller" id="svr-proevenr"></span></h2>
             <p class="spoergsmaal" id="svr-spm"></p>
             <ol class="trinliste" id="svr-trin"></ol>
+            <div class="forfra-raekke"><button class="forfraknap" id="svr-forfra" type="button" title="Hele forsøget forfra (R)">Start forfra ↺</button></div>
         </div>
         <div class="kort" id="svr-data">
             <h2>Målingerne <span class="taeller">ved 427 og 630 nm</span></h2>
@@ -128,7 +150,7 @@
         <p>Absorbanserne lægges sammen: A = A<sub>1</sub> + A<sub>2</sub>. Opsuger kun ét af stofferne ved en bølgelængde, kan dets koncentration findes direkte dér. Så kan dets bidrag ved den anden bølgelængde regnes ud og trækkes fra.</p>
         <h3 class="teori-hoved">Enheden µM</h3>
         <p>1 µM = 10⁻⁶ mol/L. Hældningen a har enheden µM⁻¹, dvs. pr. µM.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar eller Næste &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -170,6 +192,7 @@
 <script src="js/model.js"></script>
 <script src="js/scene.js"></script>
 <script src="js/regning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/forsoeg.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/rundvisning.js"></script>

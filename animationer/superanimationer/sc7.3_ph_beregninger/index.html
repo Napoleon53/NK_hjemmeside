@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>pH-beregninger</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> pH-beregninger</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: FIND PH                                                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-ph" role="tabpanel" aria-label="Find pH">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="ph-laerred"></canvas>
         <div class="anker" id="ph-anker-vej"></div>
         <div class="anker" id="ph-anker-glas"></div>
@@ -38,17 +39,23 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="ph-status"></div>
+        <!-- Papirkortet: opgaven, trinet, formlerne, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="ph-skort">
+            <div class="sk-ind" id="ph-ind"></div>
+            <div class="sk-bund tom" id="ph-status">
+                <p class="st-tekst" id="ph-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="ph-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="ph-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis tasterne -> Vis svaret -> Ny opgave -->
+        <!-- Regnestykket: de regnede trin og feltet til svaret. Opgaven, formlerne
+             og bedoemmelsen staar paa kortet i scenen; Enter er Indsend svar. -->
         <div class="kort opgavekort" id="ph-kort">
-            <h2><span id="ph-titel">Opgave</span><span class="taeller">løst <b id="ph-loest">0</b></span></h2>
-            <p class="maal-tekst" id="ph-prompt"></p>
+            <h2><span>Regnestykket</span><span class="taeller">løst <b id="ph-loest">0</b></span></h2>
             <div class="raekker" id="ph-raekker"></div>
-            <p class="besked" id="ph-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap stor" id="ph-knap" type="button">Giv hint</button></div>
         </div>
         <div class="regner-plads" id="ph-regnerplads">
 
@@ -106,7 +113,7 @@
 <!-- FANE 2: FIND KONCENTRATIONEN                                        -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-konc" role="tabpanel" aria-label="Find koncentrationen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="konc-laerred"></canvas>
         <div class="anker" id="konc-anker-vej"></div>
         <div class="anker" id="konc-anker-glas"></div>
@@ -116,16 +123,23 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="konc-status"></div>
+        <!-- Papirkortet: opgaven, trinet, formlerne, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="konc-skort">
+            <div class="sk-ind" id="konc-ind"></div>
+            <div class="sk-bund tom" id="konc-status">
+                <p class="st-tekst" id="konc-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="konc-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="konc-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
+        <!-- Regnestykket: de regnede trin og feltet til svaret. Opgaven, formlerne
+             og bedoemmelsen staar paa kortet i scenen; Enter er Indsend svar. -->
         <div class="kort opgavekort" id="konc-kort">
-            <h2><span id="konc-titel">Opgave</span><span class="taeller">løst <b id="konc-loest">0</b></span></h2>
-            <p class="maal-tekst" id="konc-prompt"></p>
+            <h2><span>Regnestykket</span><span class="taeller">løst <b id="konc-loest">0</b></span></h2>
             <div class="raekker" id="konc-raekker"></div>
-            <p class="besked" id="konc-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap stor" id="konc-knap" type="button">Giv hint</button></div>
         </div>
         <div class="regner-plads" id="konc-regnerplads"></div>
     </aside>
@@ -135,7 +149,7 @@
 <!-- FANE 3: STAERKE SYRER OG BASER                                      -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-staerk" role="tabpanel" aria-label="Stærke syrer og baser">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="staerk-laerred"></canvas>
         <div class="anker" id="staerk-anker-vej"></div>
         <div class="anker" id="staerk-anker-glas"></div>
@@ -145,16 +159,23 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="staerk-status"></div>
+        <!-- Papirkortet: opgaven, trinet, formlerne, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="staerk-skort">
+            <div class="sk-ind" id="staerk-ind"></div>
+            <div class="sk-bund tom" id="staerk-status">
+                <p class="st-tekst" id="staerk-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="staerk-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="staerk-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
+        <!-- Regnestykket: de regnede trin og feltet til svaret. Opgaven, formlerne
+             og bedoemmelsen staar paa kortet i scenen; Enter er Indsend svar. -->
         <div class="kort opgavekort" id="staerk-kort">
-            <h2><span id="staerk-titel">Opgave</span><span class="taeller">løst <b id="staerk-loest">0</b></span></h2>
-            <p class="maal-tekst" id="staerk-prompt"></p>
+            <h2><span>Regnestykket</span><span class="taeller">løst <b id="staerk-loest">0</b></span></h2>
             <div class="raekker" id="staerk-raekker"></div>
-            <p class="besked" id="staerk-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap stor" id="staerk-knap" type="button">Giv hint</button></div>
         </div>
         <div class="regner-plads" id="staerk-regnerplads"></div>
     </aside>
@@ -219,6 +240,8 @@
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/skort.js"></script>
 <script src="../kemichael/praesentation.js"></script>
 <script src="js/sim_regn.js"></script>
 <script src="js/laerer.js"></script>

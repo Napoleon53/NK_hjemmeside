@@ -85,17 +85,19 @@ næste gang. Uheldet skrives i hans regnskab (`K.uheld()`).
 stille (grønt), når krystallen er væk. Under opgaven "hurtigst" er det stort og
 står over bægerglasset.
 
-Målt af selvtesten for NaCl (tre kørsler hver):
+Målt af selvtesten for NaCl (tre kørsler hver, 6. nov. 2026, efter lupen blev
+lavere under papirkortet):
 
 | | står stille | omrøring |
 |---|---|---|
-| koldt | ca. 60 s | ca. 32 s |
-| lunkent | ca. 34 s | ca. 20 s |
-| varmt | ca. 18 s | ca. 10 s |
-| max | ca. 17 s | |
+| koldt | ca. 48 s | ca. 26 s |
+| lunkent | ca. 25 s | ca. 14 s |
+| varmt | ca. 13 s | ca. 8 s |
+| max | ca. 12 s | |
 
-Derfor er grænsen i opgaven "hurtigst" **13 s** (`GRAENSE_SEK`): den kræver både
-varme og omrøring, også hvis man skruer op på max. Ændres farten, antallet af hold,
+Derfor er grænsen i opgaven "hurtigst" **10 s** (`GRAENSE_SEK`, før 13 s): den kræver både
+varme og omrøring, også hvis man skruer op på max. Målt ved 1100 × 700 til
+1920 × 1050: varmt med omrøring 7,5 til 9 s, alt andet mindst 12 s. Ændres farten, antallet af hold,
 snittene eller pladsreglerne, skal tallet måles igen.
 
 ### Fane 2: hvor meget kan der være?
@@ -121,16 +123,25 @@ aksen rækker, vokser den med. "Skaler til stoffet" zoomer ind på det valgte sa
 
 ### Opgaverne
 
-Hver fane har fire opgaver og et kort med **én knap**:
-Start opgave → Giv hint → Vis svaret → Ny opgave. Løser eleven opgaven selv,
-springer knappen til Ny opgave.
+Hver fane har fire opgaver. En **runde** er hver opgave én gang i tilfældig
+rækkefølge; tælleren i panelet viser fx 2/4. Efter den sidste viser kortet, hvor
+mange der blev løst uden at se svaret, og henviser til den anden fane, hvis den har
+opgaver tilbage. Kemichael kommer med en tør ros, første gang fanen er gennemført i
+dette besøg. Start forfra i panelet begynder en ny runde. Mekanikken ligger i
+`js/opgave.js`; opgaverne selv ligger nederst i hver sim-fil.
 
-En **runde** er hver opgave én gang i tilfældig rækkefølge; tælleren i kortet viser
-fx 2/4. Efter den sidste hedder knappen Se resultatet: kortet får en grøn ramme,
-viser hvor mange der blev løst uden at se svaret og henviser til den anden fane,
-hvis den har opgaver tilbage. Kemichael kommer med en tør ros, første gang fanen er
-gennemført i dette besøg. Start forfra begynder en ny runde. Mekanikken ligger i `js/opgave.js`; opgaverne selv ligger
-nederst i hver sim-fil.
+#### Papirkortet (6. nov. 2026)
+
+Opgaven, svarene, hint, beskeden ved forkert svar og forklaringen står på det
+lyse papirkort øverst i scenen (`../faelles/papirkort.css` og `papirkort.js`).
+Svar, klik i lupen og knapper i billedet vælger kun; **Indsend svar** sender (grå,
+til der er noget at sende). Giv et hint og Vis svaret er den stille knap med gul
+kant. Efter et rigtigt svar bliver kortet stående med det grønne svar og
+forklaringen, og Næste opgave (til sidst Se resultatet) står, hvor Indsend svar
+stod. Start forfra står aldrig på kortet, kun i panelet. Statuslinjen nederst er
+væk. Lupen og grafen begynder under kortet (`NK.kortTop()`), og selvtesten måler
+det på en almindelig og en lav skærm. Fordi lupen blev lavere, gik opløsningen
+hurtigere, og grænsen i opgaven "hurtigst" blev sat ned fra 13 til 10 s.
 
 **Fane 1**
 
@@ -138,7 +149,7 @@ nederst i hver sim-fil.
 |--------|-------------------|
 | Find fejlen: ét vandmolekyle i en vandskal vender forkert | vandet holder op med at starte på nye ioner, holdene ved krystallen giver slip, de ledige molekyler toner ud, og billedet står stille, når ingen ion er på vej ud; eleven klikker på molekylet |
 | Opløsningsligningen for et tilfældigt salt | fire svar; de forkerte er typiske fejl (glemt koefficient, ionerne slået sammen, sammensat ion i stykker, ingen ladning, (s) i stedet for (aq), vendte ladninger) |
-| Opløs NaCl-krystallen på under 13 s | det store ur; eleven skal selv finde varmt vand og omrøring |
+| Opløs NaCl-krystallen på under 10 s | det store ur; eleven skal selv finde varmt vand og omrøring |
 | AgCl: flere ioner ved omrøring? | tre svar; hintet beder eleven prøve det |
 
 **Fane 2**

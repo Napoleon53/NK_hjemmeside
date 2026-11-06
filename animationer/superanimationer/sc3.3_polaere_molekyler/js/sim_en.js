@@ -167,6 +167,9 @@
                 tekst: "Hvilken slags binding er " + binding(p[0], p[1]) + "?",
                 valg: D.TYPE_ORDEN.map(function (t) { return D.TYPER[t].knap; }),
                 rigtig: D.TYPE_ORDEN.indexOf(type),
+                fejlValg: function (i) {
+                    return binding(p[0], p[1]) + " er ikke " + (D.TYPE_ORDEN[i] === "ion" ? "en ionbinding" : D.TYPER[D.TYPE_ORDEN[i]].navn) + ". Beregn ΔEN, og sammenlign med 0,5 og 2,0.";
+                },
                 hint: "Træk den mindste elektronegativitet fra den største. Grænserne er 0,5 og 2,0.",
                 svar: begrund(p[0], p[1]),
                 start: function (s) { s.startOpgavePar(p, { skift: true, type: true }); },
@@ -183,9 +186,10 @@
                 hint: b.hint,
                 svar: b.svar,
                 start: function (s) { start = s.aendringer; },
+                /* Indsend svar bliver klar, naar eleven har skiftet et atom */
+                kan: function (s) { return s.aendringer !== start; },
                 tjek: function (s) {
                     if (b.ok(s.par[0], s.par[1])) return true;
-                    if (s.aendringer === start) return null;
                     return b.fejl(s.par[0], s.par[1]);
                 },
                 visSvar: function (s) { s.saetPar(b.eksempel[0], b.eksempel[1]); }
@@ -207,6 +211,9 @@
                 tekst: "Hvilken binding er mest polær?",
                 valg: navne,
                 rigtig: valgte.indexOf(bedst),
+                fejlValg: function (i) {
+                    return navne[i] + " har ΔEN = " + tal(D.dEN(valgte[i][0], valgte[i][1])) + ". En af de andre bindinger har en større forskel.";
+                },
                 hint: "Beregn ΔEN for hver binding. Jo større forskel, jo mere polær.",
                 svar: navne[valgte.indexOf(bedst)] + ": " + regning(bedst[0], bedst[1]) + " er den største forskel.",
                 visSvar: function (s) { s.saetPar(bedst[0], bedst[1]); }
@@ -230,7 +237,12 @@
         this.vist = { skift: this.maalSkift(), adskil: this.maalAdskil(), dEN: D.dEN(START[0], START[1]) };
         this.OPGAVER = OPGAVER;
         this.BYG = BYG;
-        this.opgaver = new NK.Opgaver("en", OPGAVER, this);
+        this.opgaver = new NK.Opgaver("en", OPGAVER, this, {
+            antal: 6,
+            intro: "Sæt to atomer sammen, og se, hvordan elektronparret i bindingen flytter sig. Opgaverne handler om polære bindinger.",
+            naesteFane: "fane-polaritet",
+            naesteNavn: "Polær eller upolær?"
+        });
         this._bygTabel();
         this._bindMus();
     };
@@ -255,14 +267,9 @@
         return !this.skjul.skift && this.type() === "ion" ? 1 : 0;
     };
 
+    /* Korte beskeder staar i kortets nederste raekke, ikke nederst i scenen */
     P.besked = function (tekst) {
-        var e = NK.el("en-besked");
-        e.textContent = tekst;
-        e.classList.remove("vis");
-        void e.offsetWidth;
-        e.classList.add("vis");
-        window.clearTimeout(this._beskedUr);
-        this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 3000);
+        this.opgaver.besked(tekst, 3);
     };
 
     /* Saetter begge atomer paa én gang (opgaverne og selvtesten). */
@@ -276,10 +283,10 @@
 
     /* Et klik i tabellen: atomet kommer ind paa pladsen med ringen. */
     P.vaelg = function (el) {
-        if (this.fastPar) {
-            this.besked("Opgaven bruger de to atomer, der står nu. Tryk Vis svaret for at komme videre.");
-            return false;
-        }
+        /* Under et spoergsmaal om de to atomer, der staar, og mens kortet
+           venter paa Naeste, blinker kortet i stedet */
+        if (this.fastPar) { this.opgaver.blink(); return false; }
+        if (this.opgaver.spaer()) return false;
         var andet = this.par[1 - this.slot];
         var ok = D.tilladt(el, andet);
         if (ok !== true) { this.besked(ok); return false; }
@@ -387,7 +394,8 @@
             var p = mig._punkt(e);
             var i = mig.atomVed(p.x, p.y);
             if (mig.opgaver.klik(i)) return;
-            if (i >= 0 && !mig.fastPar) {
+            if (i >= 0 && mig.fastPar) { mig.opgaver.blink(); return; }
+            if (i >= 0 && !mig.opgaver.spaer()) {
                 mig.slot = i;
                 mig.opdaterTabel();
             }
@@ -432,6 +440,7 @@
     /* ----- Faelles graenseflade -------------------------------------------------- */
     P.tilpas = function () {
         this.laerred.tilpas();
+        this.top = NK.saetKortZone(this.laerred.canvas);
     };
 
     P.opdater = function (dt) {
@@ -449,8 +458,10 @@
     P.geometri = function () {
         var b = this.laerred.b, h = this.laerred.h;
         var bund = 150;
-        var U = NK.klamp(Math.min(b / 7.4, (h - bund) / 3.4), 34, 100);
-        var cy = (h - bund) * 0.5 + 18;
+        /* top: pladsen oeverst, som papirkortet har (NK.kortTop i opgave.js) */
+        var top = Math.min(this.top || 0, h * 0.4);
+        var U = NK.klamp(Math.min(b / 7.4, (h - bund - top) / 3.4), 34, 100);
+        var cy = top + (h - bund - top) * 0.5 + 18;
         var s = this.vist.skift, ad = this.vist.adskil;
         var R = [0, 1].map(function (i) {
             var g = D.GRUNDSTOFFER[this.par[i]];
@@ -505,8 +516,18 @@
         NK.etiket(ctx, "EN " + tal(en(el)), x, y + R + 24, { font: "700 16px 'Segoe UI', sans-serif", hoejde: 26, kant: "rgba(255, 255, 255, 0.18)" });
         NK.tekst(ctx, navn(el), x, y + R + 52, { font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9aa1ab" });
 
+        /* Det atom, eleven har valgt under en klik-opgave */
+        var o = this.opgaver.opgave;
+        if (o && !o.afsluttet && o.klik && this.opgaver.klikValgt === i) {
+            ctx.save();
+            ctx.strokeStyle = GUL;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, R + 9, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
         /* Ringen om det atom, et klik i tabellen skifter ud */
-        if (i === this.slot && !this.fastPar) {
+        } else if (i === this.slot && !this.fastPar) {
             ctx.save();
             ctx.setLineDash([7, 6]);
             ctx.lineDashOffset = -this.tid * 18;

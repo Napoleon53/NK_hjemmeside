@@ -46,6 +46,7 @@
         this.fri = { r: "vand", enhed: "stk" };
 
         this.bygPanel();
+        this.bygKort();
         this.bygTilbud();
         this.koblMus();
         if (this.laererStart) this.laererStart();
@@ -66,7 +67,9 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.9);
-        var luft = NK.klamp(H * 0.1, 10, 74);
+        /* Skiltet og plakaten staar under papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var luft = lay.zone;
         var pb = NK.klamp(W * 0.22, 130, 230);
         lay.plakat = { x: W - kant - pb, y: luft, b: pb, h: Math.round(pb * 0.42) };
         var sb = lay.plakat.x - kant - 16;
@@ -124,7 +127,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Figurerne i kammeret ----------------------------------------------------------
        En figur er { st, x, y, vx, vy, a, va, fra, t, maal, hjem, rest, skjult }. */
@@ -395,6 +403,7 @@
         var m = this.maal();
         this.naaet = false;
         this.hjaelp = 0;
+        this.brugtSvar = false;
         this.fremhaev = null;
         this.besked("", "");
         this.enheder = [];
@@ -417,7 +426,7 @@
         this.naaet = true;
         this.hjaelp = 0;
         this.fremhaev = null;
-        this.besked(NK.html(this.maal().efter), "god");
+        this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         var gemt = NK.hent(NOEGLE, {}) || {};
         NK.gem(NOEGLE, { maal: Math.max(this.nr + 1, gemt.maal || 0) });
@@ -441,20 +450,36 @@
         return ud;
     };
 
+    /* Naeste maal (knappen, der staar, hvor Indsend svar stod) */
+    P.videre = function () {
+        if (!this.maal() || !this.naaet) return;
+        var sidste = this.nr >= D.MAAL.length - 1;
+        this.nr++;
+        this.startMaal();
+        if (sidste && NK.visFane) NK.visFane("fane-regn");
+    };
+
+    /* Start maalene forfra (knappen i panelet under frit valg, aldrig paa kortet) */
+    P.maalForfra = function () {
+        if (this.fase === "reagerer") return;
+        this.nr = 0;
+        this.startMaal();
+    };
+
+    /* Indsend svar: kammeret reagerer, og resultatet bedoemmes (samme som Start) */
+    P.kanSende = function () {
+        return !!this.maal() && !this.naaet && this.fase === "fyld" && this.i().length > 0 && !this.svarStart;
+    };
+
+    P.indsend = function () {
+        if (!this.kanSende()) return;
+        this.start();
+    };
+
+    /* Giv hint, derefter Vis svaret */
     P.knap = function () {
         var m = this.maal();
-        if (!m) {
-            this.nr = 0;
-            this.startMaal();
-            return;
-        }
-        if (this.naaet) {
-            var sidste = this.nr >= D.MAAL.length - 1;
-            this.nr++;
-            this.startMaal();
-            if (sidste && NK.visFane) NK.visFane("fane-regn");
-            return;
-        }
+        if (!m || this.naaet) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.fremhaev = "skilt";
@@ -464,6 +489,7 @@
         }
         /* Vis svaret: det rigtige i kammeret, og saa Start */
         if (this.fase === "reagerer") return;
+        this.brugtSvar = true;
         this.toem(true);
         var mig = this, ind = this.maalIndhold(m), n = 0;
         Object.keys(ind).forEach(function (s) {
@@ -481,7 +507,7 @@
     };
 
     P.enter = function () {
-        if (this.naaet) { this.knap(); return; }
+        if (this.naaet) { this.videre(); return; }
         if (this.fase !== "reagerer" && this.i().length) this.startKnap();
     };
 
@@ -491,13 +517,10 @@
     P.bygPanel = function () {
         var mig = this;
         this.el = {
-            knap: NK.el("molekyler-knap"),
-            besked: NK.el("molekyler-besked"),
-            kort: NK.el("molekyler-kort"),
             tabel: NK.el("molekyler-tabel"),
             fri: NK.el("molekyler-frit")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        NK.el("molekyler-forfra").addEventListener("click", function () { mig.maalForfra(); });
 
         var rk = NK.el("molekyler-reaktioner");
         D.REAKTIONER.forEach(function (r) {
@@ -521,32 +544,50 @@
         this.startMaal();
     };
 
+    /* Beskeden paa papirkortet. Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKort();
+    };
+
+    /* ----- Papirkortet oeverst i scenen (js/kort.js) ------------------------------------ */
+    P.bygKort = function () {
+        var mig = this;
+        this.kort = new NK.SceneKort("molekyler", {
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
+    };
+
+    P.visKort = function () {
+        var k = this.kort;
+        if (!k) return;
+        var m = this.maal();
+        k.vis({ chip: m ? "Mål " + (this.nr + 1) + " af " + D.MAAL.length : "Frit valg",
+            tekst: NK.html(m ? m.tekst : "Vælg en reaktion i panelet, og fyld kammeret, som du vil.") });
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (m && this.naaet) {
+            k.bliv(NK.html(m.efter), null, this.nr >= D.MAAL.length - 1 ? "Videre til tavlen" : "Næste mål", this.brugtSvar ? "svar" : "god");
+        } else {
+            k.bliv(null);
+            if (!m) k.knapper({});
+            else k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: this.kanSende() });
+        }
     };
 
     P.visMaal = function () {
         var m = this.maal();
-        NK.saetTekst("molekyler-nr", String(Math.min(this.nr + 1, D.MAAL.length)));
-        NK.el("molekyler-taeller").hidden = !m;
-        var tekst, klasse = "knap";
-        if (!m) {
-            NK.saetTekst("molekyler-titel", "Frit valg");
-            NK.saetTekst("molekyler-prompt", "Vælg en reaktion, og fyld kammeret, som du vil.");
-            tekst = "Start målene forfra";
-        } else {
-            NK.saetTekst("molekyler-titel", "Mål");
-            NK.saetTekst("molekyler-prompt", m.tekst);
-            if (this.naaet) {
-                tekst = this.nr >= D.MAAL.length - 1 ? "Videre til tavlen →" : "Næste mål →";
-                klasse = "knap blaa banker";
-            } else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.naaet);
         this.el.fri.hidden = !!m;
+        this.visKort();
         var mig = this;
         Array.prototype.forEach.call(document.querySelectorAll("#molekyler-reaktioner .vaelger"), function (b) {
             b.classList.toggle("valgt", b.getAttribute("data-r") === mig.r().id);
@@ -593,8 +634,9 @@
         else if (this.fase === "efter") t = "Tryk på Tøm for at prøve igen, eller træk mere ind.";
         else if (!this.i().length) t = mol ? "Træk poser med 1 mol fra kasserne ind i kammeret. Tryk så på Start." :
             "Træk molekyler fra kasserne ind i kammeret. Tryk så på Start.";
-        else t = "Tryk på Start, når kammeret er klar. Klik på en figur for at tage den ud.";
-        NK.saetHTML("molekyler-status", t);
+        else t = "Tryk på Indsend svar eller Start, når kammeret er klar. Klik på en figur for at tage den ud.";
+        this.trinTekst = t;
+        this.visKort();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------- */

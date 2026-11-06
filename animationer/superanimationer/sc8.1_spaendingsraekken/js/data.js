@@ -61,7 +61,7 @@
             valg: ["Kobber", "Rust", "Zink, der har skiftet farve"],
             rigtig: 0,
             forkert: [null,
-                "Rust kræver ilt og tager dage. Se i luppen, hvad der sætter sig.",
+                "Rust kræver dioxygen og tager dage. Se i luppen, hvad der sætter sig.",
                 "Zinken går i opløsning. Se i luppen, hvad der sætter sig i stedet."],
             spmHint: "Se i luppen, hvad Cu²⁺ bliver til, når de rammer stangen.",
             efter: "Kobberionerne optager elektroner fra zink og bliver til kobber på stangen."
@@ -97,7 +97,7 @@
             tekst: "Find en stang, der giver bobler i saltsyren (H⁺).",
             hint: "Prøv stængerne én ad gangen i glasset med H⁺. Ikke alle giver bobler.",
             spm: "Hvad er boblerne?",
-            valg: ["Hydrogen, H₂", "Oxygen, O₂", "Vanddamp, fordi syren koger"],
+            valg: ["Dihydrogen, H₂", "Dioxygen, O₂", "Vanddamp, fordi syren koger"],
             rigtig: 0,
             forkert: [null,
                 "Der er ingen O₂ i luppen. Se, hvad H⁺ bliver til.",
@@ -117,7 +117,7 @@
 
     D.RK_PROMPT = "Stil de seks på hylden i rækkefølge, fra uædel til ædel.";
     D.RK_HINT = "Et metal står til venstre for de metaller, hvis ioner det reagerer med. Tæl fluebenene i hver række i skemaet.";
-    D.RK_FAERDIG = "Rigtigt. Øverst står spændingsrækken med flere metaller. Dine seks har deres pladser i den.";
+    D.RK_FAERDIG = "Øverst i scenen står nu spændingsrækken med flere metaller. Dine seks stoffer har deres pladser i den.";
 
     /* Beskeden, naar r staar til hoejre for l, men skulle staa til
        venstre for det. set: har eleven set forsoeget paa fane 1? */
@@ -167,18 +167,18 @@
             K.navn(m) + " kan ikke afgive elektroner til " + K.ionerne(i) + ".";
     };
 
-    D.PRODUKT_SPM = "Hvad dannes? Klik på de to stoffer.";
+    D.PRODUKT_SPM = "Hvad dannes? Vælg de to stoffer.";
 
     D.produktHint = function (r) {
         return "Metallet afgiver elektroner og bliver til en ion. " +
-            (r.gas ? "H⁺ optager elektroner og bliver til hydrogen." : "Ionerne optager elektroner og bliver til metal.");
+            (r.gas ? "H⁺ optager elektroner og bliver til dihydrogen." : "Ionerne optager elektroner og bliver til metal.");
     };
 
     /* Et forkert stof. slags: "m" (stangen selv), "i" (ionen selv), "h" (H som atomer) */
     D.produktForkert = function (r, slags) {
         if (slags === "m") return r.m + "(s) er stangen, som den var. " + K.Navn(r.m) + " afgiver elektroner. Hvad bliver " + K.navn(r.m) + " så til?";
         if (slags === "i") return K.ion(r.i) + " var i glasset før. Ionerne optager elektroner. Hvad bliver de så til?";
-        return "Hydrogen findes som molekyler med to atomer.";
+        return "Gassen dihydrogen, H₂, består af molekyler med to atomer.";
     };
 
     D.KOEF_SPM = "Afstem. Skriv, hvor mange der er af hvert stof, også 1.";
@@ -227,23 +227,23 @@
           sel: ["#fs-anker-holder", "#fs-anker-glas"] },
         { tekst: "Luppen viser metalstangen og ionerne i opløsningen helt tæt på. Du vælger, hvilket glas luppen viser, ved at klikke på glasset.",
           sel: "#fs-anker-lup" },
-        { tekst: "Opgavekortet fortæller, hvad du skal undersøge, og knappen på kortet giver et hint. Hvert forsøg bliver skrevet ind i skemaet, hvor et flueben betyder, at der skete en reaktion.",
-          sel: ["#fs-kort", "#fs-skemakort"] }
+        { tekst: "Kortet øverst i scenen fortæller, hvad du skal undersøge, og knappen Giv hint på kortet giver et hint. Hvert forsøg bliver skrevet ind i skemaet i panelet, hvor et flueben betyder, at der skete en reaktion.",
+          sel: ["#fs-skort", "#fs-skemakort"] }
     ];
     D.INTRO_RAEKKEN = [
         { tekst: "I denne fane stiller du de fem metaller og hydrogen i rækkefølge, fra det mest uædle til det mest ædle. Rækkefølgen skal du finde ud fra dine egne forsøg i fane 1." },
         { tekst: "Du trækker kortene med de seks stoffer op på hylden, som har én plads til hvert kort. Det mest uædle stof skal stå længst til venstre.",
           sel: ["#rk-anker-kort", "#rk-anker-hylde"] },
-        { tekst: "Skemaet viser resultaterne af dine forsøg fra fane 1. Rækkefølgen bliver tjekket, når alle seks kort står på hylden, og knappen på opgavekortet giver et hint.",
-          sel: ["#rk-skemakort", "#rk-kort"] }
+        { tekst: "Skemaet viser resultaterne af dine forsøg fra fane 1. Rækkefølgen bliver tjekket, når alle seks kort står på hylden, og du trykker på Indsend svar. Knappen Giv hint på kortet øverst i scenen giver et hint.",
+          sel: ["#rk-skemakort", "#rk-skort"] }
     ];
     D.INTRO_FORUDSIG = [
         { tekst: "I denne fane bruger du spændingsrækken til at forudsige, om der sker en reaktion, når en metalstang kommer ned i en opløsning. I spændingsrækken står de uædle metaller til venstre.",
           sel: "#fu-anker-raekke" },
-        { tekst: "Du svarer ja eller nej på opgavekortet, før metalstangen kommer ned i glasset. Bagefter kan du selv se, om du havde ret.",
-          sel: ["#fu-valg", "#fu-anker-glas"] },
-        { tekst: "Sker der en reaktion, vælger du på opgavekortet de stoffer, der dannes, og afstemmer reaktionen. Luppen viser imens, hvad der sker med elektronerne.",
-          sel: ["#fu-kort", "#fu-anker-lup"] }
+        { tekst: "Du svarer ja eller nej på kortet øverst i scenen og trykker på Indsend svar, før metalstangen kommer ned i glasset. Bagefter kan du selv se, om du havde ret.",
+          sel: ["#fu-skort", "#fu-anker-glas"] },
+        { tekst: "Sker der en reaktion, vælger du på kortet de stoffer, der dannes, og afstemmer reaktionen i skemaet på kortet. Luppen viser imens, hvad der sker med elektronerne.",
+          sel: ["#fu-skort", "#fu-anker-lup"] }
     ];
 
     /* Ros, foerste gang en hel fane er klaret. Det er de eneste gange,

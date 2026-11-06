@@ -15,29 +15,31 @@
 
     var TURE = {
         "fane-r": [
+            { sel: "#r-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Svaret sendes ind med Indsend svar, og Giv et hint giver ét hint ad gangen og til sidst svaret." },
             { sel: "#r-anker-roer", titel: "Rørene", tekst: "To vandrør, skruet sammen på midten og skåret igennem, så vandet og rørenes væg kan ses. Vandet løber fra venstre mod højre." },
             { sel: "#r-valg-v, #r-valg-h", titel: "Metallet", tekst: "Vælg, hvad hvert rør er lavet af: kobber, jern eller zink." },
-            { sel: "#r-vaerktoej", titel: "Tiden", tekst: "Lad tiden gå lader 20 år gå. Går der hul på et rør, standser tiden." },
+            { sel: "#r-vaerktoej", titel: "Tiden", tekst: "Lad tiden gå lader 20 år gå. Går der hul på et rør, standser tiden. Tiden løser ikke en opgave af sig selv." },
             { sel: "#r-anker-lup", titel: "Luppen", tekst: "Atomerne i rørenes væg ved samlingen, med vandet over. De gule kugler er elektroner." },
-            { sel: "#r-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#r-kort", titel: "Opgaven", tekst: "Seks mål, ét ad gangen. Nogle begynder med et gæt." },
+            { sel: "#r-forfra", titel: "Nye rør", tekst: "Knappen giver to nye rør af samme metal, og tiden begynder forfra." },
+            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Seks opgaver, én ad gangen. Nogle begynder med et gæt." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Skibet handler om offeranoder. Rusten viser, hvordan jern ruster, med reaktionsskemaer." }
         ],
         "fane-s": [
+            { sel: "#s-skort", titel: "Kortet", tekst: "Opgaven, hint og forklaringerne står på kortet øverst. Svaret sendes ind med Indsend svar." },
             { sel: "#s-anker-kaj", titel: "Kajen", tekst: "Klodser af zink, magnesium og kobber. Træk en klods ned på skroget." },
             { sel: "#s-anker-pladser", titel: "Pladserne", tekst: "To pladser til klodser på skroget. Et klik på en klods tager den af igen." },
             { sel: "#s-anker-propel", titel: "Propellen", tekst: "Propellen er af bronze, som mest er kobber. Den sidder på skroget, der er af jern." },
             { sel: "#s-vaerktoej", titel: "Tiden", tekst: "Sejl 1 år lader et år gå. De gule kugler er elektroner, og ionerne går ud i havvandet." },
             { sel: "#s-skibkort", titel: "Skibet", tekst: "Hvor meget skroget er rustet, og hvor meget der er tilbage af hver klods." },
-            { sel: "#s-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu. På værft giver et nyt skrog uden klodser." }
+            { sel: "#s-forfra", titel: "På værft", tekst: "Knappen giver et nyt skrog uden klodser, år 0." }
         ],
         "fane-j": [
             { sel: "#j-anker-draabe", titel: "Dråben", tekst: "En dråbe vand på en jernplade, set helt tæt på. Klik på en partikel for at se, hvad den er." },
-            { sel: "#j-kontakter", titel: "Kontakterne", tekst: "Slå vandet og ilten til og fra. Kontakten Salt kommer frem i den sidste opgave." },
+            { sel: "#j-kontakter", titel: "Kontakterne", tekst: "Slå vandet og dioxygenet til og fra. Kontakten Salt kommer frem i den sidste opgave." },
             { sel: "#j-anker-plade", titel: "Pladen", tekst: "Den samme plade i almindelig størrelse, og hvor mange jernatomer der har forladt den." },
-            { sel: "#j-tavle", titel: "Tavlen", tekst: "Skriv tallene i felterne, og tryk på Tjek. Enter gør det samme." },
-            { sel: "#j-status", titel: "Linjen forneden", tekst: "Passer skemaet ikke, står der her, hvad der skal tælles igen. Knappen giver ét hint ad gangen." },
-            { sel: "#j-forsoegkort", titel: "Vand og ilt", tekst: "Skemaet husker, hvilke af de fire muligheder du har prøvet." }
+            { sel: "#j-tavle", titel: "Tavlen", tekst: "Skriv tallene i felterne, og tryk på Indsend svar på kortet. Enter gør det samme." },
+            { sel: "#j-skort", titel: "Kortet", tekst: "Passer skemaet ikke, står der på kortet, hvad der skal tælles igen. Giv et hint giver ét hint ad gangen." },
+            { sel: "#j-forsoegkort", titel: "Vand og dioxygen", tekst: "Skemaet husker, hvilke af de fire muligheder du har prøvet." }
         ]
     };
     var trin = [];

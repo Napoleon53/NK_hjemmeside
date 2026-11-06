@@ -14,27 +14,24 @@
 
     var TURE = {
         "fane-let": [
-            { sel: "#let-linje", titel: "Opgaven", tekst: "Her står, hvad du skal gøre nu." },
+            { sel: "#let-skort", titel: "Kortet", tekst: "Kortet øverst siger, hvilket trin du er ved, og hvad du skal gøre nu. Her står også, hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
             { sel: "#let-laerred", titel: "Laboratoriet", tekst: "Træk en kuvette op i spektrofotometeret, eller klik på den. Den gule pil viser den næste. Zoomboblen viser lyset gennem kuvetten, og grafen til højre får et punkt for hver standard." },
-            { sel: "#let-kort", titel: "Trinene", tekst: "Forsøget i små trin. Regnestykkerne skriver du her: først formlen med bogstaver, så tallene, så resultatet." },
+            { sel: "#let-kort", titel: "Trinene", tekst: "Forsøget i små trin. Regnestykkerne skriver du her: først formlen med bogstaver, så tallene, så resultatet. Indsend svar står på kortet, og Enter gør det samme. Start forfra begynder hele forsøget forfra." },
             { sel: "#let-data", titel: "Målingerne", tekst: "Hver måling kommer i tabellen. Et tal med ! er målt forkert og skal måles igen." },
-            { sel: "#let-status", titel: "Linjen forneden", tekst: "Her står, hvad der mangler, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
             { sel: "#quizknap", titel: "Quizzen", tekst: "Otte spørgsmål om forsøgene." },
             { sel: ".faneknapper", titel: "Fanerne", tekst: "Nitrit og To farvestoffer bruger samme metode med mindre hjælp undervejs." }
         ],
         "fane-mid": [
-            { sel: "#mid-linje", titel: "Opgaven", tekst: "Her står, hvad du skal gøre nu." },
+            { sel: "#mid-skort", titel: "Kortet", tekst: "Kortet øverst siger, hvilket trin du er ved, og hvad du skal gøre nu. Her står også, hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
             { sel: "#mid-laerred", titel: "Laboratoriet", tekst: "Dråbeflaskerne til højre tilsætter reagenserne til alle kuvetterne. Zoomboblen viser, hvad der sker med nitrit. Træk en kuvette op i spektrofotometeret, eller klik på den." },
             { sel: "#mid-kort", titel: "Trinene", tekst: "Her regner du standardernes koncentration og vandprøvernes nitrit." },
-            { sel: "#mid-data", titel: "Målingerne", tekst: "Rumfanget af stamopløsning, c og A for hver kuvette. Et punkt kommer på grafen, når både c og A er kendt." },
-            { sel: "#mid-status", titel: "Linjen forneden", tekst: "Her står, hvad der mangler, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." }
+            { sel: "#mid-data", titel: "Målingerne", tekst: "Rumfanget af stamopløsning, c og A for hver kuvette. Et punkt kommer på grafen, når både c og A er kendt." }
         ],
         "fane-svr": [
-            { sel: "#svr-linje", titel: "Opgaven", tekst: "Her står, hvad du skal gøre nu." },
+            { sel: "#svr-skort", titel: "Kortet", tekst: "Kortet øverst siger, hvilket trin du er ved, og hvad du skal gøre nu. Her står også, hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
             { sel: "#svr-laerred", titel: "Laboratoriet", tekst: "Skift bølgelængde med de to knapper på spektrofotometeret. Der er en graf for hvert farvestof med en kurve for hver bølgelængde." },
             { sel: "#svr-kort", titel: "Trinene", tekst: "Færre og større trin end på de andre faner. Du skal selv finde vejen, men hintene hjælper." },
-            { sel: "#svr-data", titel: "Målingerne", tekst: "A ved begge bølgelængder for hver kuvette." },
-            { sel: "#svr-status", titel: "Linjen forneden", tekst: "Her står, hvad der mangler, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." }
+            { sel: "#svr-data", titel: "Målingerne", tekst: "A ved begge bølgelængder for hver kuvette." }
         ]
     };
     var trin = [];

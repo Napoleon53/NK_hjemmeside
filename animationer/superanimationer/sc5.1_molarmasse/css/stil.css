@@ -625,7 +625,9 @@ select:focus-visible {
     main { overflow: visible; }
     .fane { position: static; grid-template-columns: minmax(0, 1fr); }
     .fane.aktiv { display: grid; }
-    .scene { height: 66vh; min-height: 440px; }
+    /* Panelet staar under scenen, og siden ruller. Scenen faar plads til
+       papirkortet, plakaten og vaegten under hinanden. */
+    .scene { height: 66vh; min-height: 590px; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
 }
 

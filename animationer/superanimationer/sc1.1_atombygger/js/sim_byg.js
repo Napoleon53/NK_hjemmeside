@@ -31,6 +31,9 @@
         this.beskedTid = 0;
         this.atom.saetStraks(this.p, this.n, this.e);
 
+        this.slut = null;       /* loest opgave: kortet bliver paa den, til eleven trykker Naeste */
+        this.hjaelp = 0;
+        this.besked = { html: "", klasse: "" };
         this.koblKnapper();
         this.opdaterPanel("start");
         this.visOpgaveStart();
@@ -41,7 +44,7 @@
         var mig = this;
 
         function bind(id, slags, retning) {
-            NK.el(id).addEventListener("click", function () { mig.aendr(slags, retning); });
+            NK.el(id).addEventListener("click", function () { if (!mig.laast()) mig.aendr(slags, retning); });
         }
         bind("byg-p-plus", "p", 1);
         bind("byg-p-minus", "p", -1);
@@ -51,7 +54,7 @@
         bind("byg-e-minus", "e", -1);
 
         NK.el("byg-neutral").addEventListener("click", function () {
-            if (mig.e === mig.p) return;
+            if (mig.laast() || mig.e === mig.p) return;
             var forskel = mig.p - mig.e;
             mig.e = mig.p;
             mig.anvend(forskel > 0
@@ -61,7 +64,7 @@
 
         NK.el("byg-almindelig").addEventListener("click", function () {
             var i = D.hyppigsteIsotop(mig.p);
-            if (!i) return;
+            if (mig.laast() || !i) return;
             var nyN = i.a - mig.p;
             if (nyN === mig.n) return;
             mig.n = nyN;
@@ -70,15 +73,21 @@
                 + " er den isotop, der er mest af i naturen (" + NK.tal(i.andel, 2) + " %).");
         });
 
-        NK.el("byg-nulstil").addEventListener("click", function () { mig.ryd(); });
+        NK.el("byg-nulstil").addEventListener("click", function () { if (!mig.laast()) { mig.ryd(); mig.roert = true; mig.visIndsend(); } });
 
-        NK.el("byg-opgave-knap").addEventListener("click", function () { mig.opgaveKnap(); });
+        /* Papirkortet: hintknappen, Indsend svar og knappen, der foerer videre */
+        NK.el("byg-knap").addEventListener("click", function () { mig.hintKnap(); });
+        NK.el("byg-indsend").addEventListener("click", function () { mig.indsendKlik(); });
+        NK.el("byg-skort").addEventListener("click", function (e) {
+            if (e.target && e.target.closest && e.target.closest("[data-videre]")) mig.videre();
+        });
+        NK.el("byg-forfra").addEventListener("click", function () { mig.startForfra(); });
 
         /* Det periodiske system i panelet viser, hvor det byggede atom
            hoerer hjemme. Man kan ogsaa springe direkte til et grundstof
            ved at trykke paa det. */
         this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), {
-            vedKlik: function (z) { mig.vaelgGrundstof(z); }
+            vedKlik: function (z) { if (!mig.laast()) mig.vaelgGrundstof(z); }
         });
     };
 
@@ -142,7 +151,9 @@
         this.atom.saet(this.p, this.n, this.e);
         this.opdaterPanel(slags);
         this.visBesked(besked, "");
-        this.tjekOpgave();
+        this.roert = true;
+        if (this.besked && this.besked.klasse === "skidt") { this.saetBesked("", ""); this.visKort(); }
+        this.visIndsend();
     };
 
     /* ----- Beskederne: hvad skete der, og hvorfor betyder det noget? ------- */
@@ -347,104 +358,114 @@
         }
     ];
 
-    /* Der er kun ÉN knap i opgavekortet, og den viser det naeste skridt:
-
-         start   -> Start opgave    traekker en opgave
-         hint    -> Giv hint        viser opgavens atomsymbol
-         svar    -> Vis svaret      bygger den og forklarer hvorfor
-         ny      -> Ny opgave       rydder scenen og traekker en ny
-         faerdig -> Start forfra    runden er vundet - nulstil og begynd igen
-
-       Loeser man selv opgaven undervejs, springer knappen direkte til
-       "Ny opgave". Trappen er den samme vej hele vejen igennem: man
-       faar aldrig mere hjaelp, end man selv har bedt om. */
-    var KNAPTRIN = {
-        start:   { tekst: "Start opgave", klasse: "knap blaa" },
-        hint:    { tekst: "Giv hint",     klasse: "knap" },
-        svar:    { tekst: "Vis svaret",   klasse: "knap" },
-        ny:      { tekst: "Ny opgave",    klasse: "knap blaa banker" },
-        faerdig: { tekst: "Start forfra", klasse: "knap groen banker" }
-    };
+    /* ----- Papirkortet (6. nov. 2026) ------------------------------------------
+       Opgaven staar paa ét lyst kort oeverst midt i scenen, ikke i panelet.
+       Knapperne i panelet bygger kun. Bedoemmelsen sker, naar eleven trykker
+       Indsend svar (graa, til atomet er aendret siden opgavens start eller
+       sidste forsoeg). Giv et hint viser opgavens atomsymbol, saa kommer Vis
+       svaret. Efter et rigtigt svar bliver kortet paa opgaven: forklaringen
+       staar under den i en groen boks (gul, naar svaret blev vist), og Naeste
+       opgave staar, hvor Indsend svar stod. Imens er knapperne laast, og et
+       klik faar kortet til at blinke. Foer foerste opgave er fanen fri
+       byggeleg, og kortet tilbyder kun at starte opgaverne. Start forfra
+       ligger i panelet. */
 
     /* Maalet for runden: opgaver taeller kun med, naar de er loest selv -
-       hverken forkerte forsoeg eller et afsloeret svar rykker taelleren,
-       men et hint undervejs er stadig en selv-loest opgave. */
+       hverken forkerte forsoeg eller et vist svar rykker taelleren, men et
+       hint undervejs er stadig en selv-loest opgave. */
     var MAAL_RIGTIGE = 6;
 
-    NK.SimByg.prototype.saetOpgaveTrin = function (trin) {
-        this.opgaveTrin = trin;
-        NK.saetTekst("byg-opgave-knap", KNAPTRIN[trin].tekst);
-        NK.saetKlasse("byg-opgave-knap", KNAPTRIN[trin].klasse);
+    function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    /* Atomsymbolet som i bogen: massetal over atomnummer foran symbolet */
+    function nuklidHTML(o) {
+        var g = D.grundstof(o.p), q = o.p - o.e;
+        return '<span class="sk-nuklid"><span class="sn-tal"><span>' + (o.p + o.n) + "</span><span>" + o.p + "</span></span>" +
+            (g ? g.symbol : "?") + (q ? "<sup>" + NK.ladningstekst(q) + "</sup>" : "") + "</span>";
+    }
+
+    NK.SimByg.prototype.laast = function () {
+        if (!this.slut) return false;
+        this.kortBlink();
+        return true;
     };
 
-    NK.SimByg.prototype.opgaveKnap = function () {
-        if (this.opgaveTrin === "hint") { this.visHint(); return; }
-        if (this.opgaveTrin === "svar") { this.visSvar(); return; }
-        if (this.opgaveTrin === "faerdig") { this.startForfra(); return; }
-        if (this.opgaveTrin === "ny") this.ryd();
-        this.nyOpgave();
+    NK.SimByg.prototype.kortBlink = function () {
+        var e = NK.el("byg-skort");
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
     };
 
-    /* Runden er vundet: nulstil taelleren, ryd atomet, og vend tilbage
-       til udgangspunktet, saa naeste runde begynder paa samme maade som
-       den foerste. */
+    /* Den plads, der er sat af til kortet oeverst i scenen */
+    NK.SimByg.prototype.kortZone = function () {
+        var basis = window.innerHeight <= 720 ? 112 : 140;
+        return Math.max(basis, NK.el("byg-skort").offsetHeight || 0);
+    };
+
+    /* Udgangspunktet: ingen opgave er i gang endnu - eleven bygger frit og
+       beder selv om den foerste opgave. */
+    NK.SimByg.prototype.visOpgaveStart = function () {
+        this.opgave = null;
+        this.slut = null;
+        this.hjaelp = 0;
+        this.saetBesked("", "");
+        this.visKort();
+    };
+
     NK.SimByg.prototype.startForfra = function () {
         this.rigtige = 0;
+        this.slut = null;
         this.ryd();
         this.visOpgaveStart();
     };
 
-    /* Udgangspunktet: ingen opgave er i gang endnu - eleven skal selv
-       bede om én, saa opgaven ikke bare dukker op uopfordret. */
-    NK.SimByg.prototype.visOpgaveStart = function () {
-        this.opgave = null;
-        NK.saetTekst("byg-opgave", "Løs " + MAAL_RIGTIGE + " opgaver rigtigt for at gennemføre runden. Tryk på “Start opgave” for at komme i gang.");
-        NK.saetKlasse("byg-opgave", "besked");
-        NK.el("byg-opgave-taeller").style.display = "";
-        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
-        NK.el("byg-opgave-nuklid").hidden = true;
-        this.saetOpgaveTrin("start");
-    };
-
-    /* Hintet: opgavens atomsymbol med massetal, atomnummer og ladning,
-       skrevet ganske som maerkatet over atomet selv (byg-nuklid). Saa
-       er der noget konkret at bygge efter, uden at tallene for
-       protoner, neutroner og elektroner er givet. */
-    NK.SimByg.prototype.visHint = function () {
-        if (!this.opgave) return;
-        this.visOpgaveNuklid(this.opgave);
-        this.saetOpgaveTrin("svar");
-    };
-
-    NK.SimByg.prototype.visOpgaveNuklid = function (o) {
-        var g = D.grundstof(o.p);
-        var a = o.p + o.n;
-        var q = o.p - o.e;
-        NK.saetTekst("byg-opgave-nuklid-sym", g ? g.symbol : "?");
-        NK.saetTekst("byg-opgave-nuklid-a", String(a));
-        NK.saetTekst("byg-opgave-nuklid-z", String(o.p));
-        NK.saetTekst("byg-opgave-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
-        NK.saetKlasse("byg-opgave-nuklid-q", "q" + (q > 0 ? " plus" : (q < 0 ? " minus" : "")));
-        NK.el("byg-opgave-nuklid").hidden = false;
-    };
-
-    /* Taelleren viser "X/6" - hvor mange opgaver, der er loest selv i
-       denne runde. Den staar fast, mens en ny opgave er i gang, og
-       rykker foerst, naar tjekOpgave() godkender et selv-bygget svar. */
     NK.SimByg.prototype.nyOpgave = function () {
         var forsoeg = 0;
         do {
             this.opgave = tilfaeldig(OPGAVETYPER)();
             forsoeg++;
         } while (forsoeg < 8 && this.opgave.p === this.p && this.opgave.n === this.n && this.opgave.e === this.e);
-        this.opgave.loest = false;
-        NK.saetTekst("byg-opgave", this.opgave.tekst);
-        NK.saetKlasse("byg-opgave", "besked");
-        NK.el("byg-opgave-taeller").style.display = "";
-        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
-        NK.el("byg-opgave-nuklid").hidden = true;
-        this.saetOpgaveTrin("hint");
-        this.tjekOpgave();
+        this.slut = null;
+        this.hjaelp = 0;
+        this.pegKnap = false;
+        this.roert = false;
+        this.saetBesked("", "");
+        this.visKort();
+    };
+
+    /* Knappen, der foerer videre: Start opgave, Naeste opgave, Videre til Spil */
+    NK.SimByg.prototype.videre = function () {
+        if (this.opgave && this.slut && this.rigtige >= MAAL_RIGTIGE) {
+            this.rigtige = 0;
+            this.visOpgaveStart();
+            if (NK.visFane) NK.visFane("fane-spil");
+            return;
+        }
+        if (this.opgave) this.ryd();
+        this.nyOpgave();
+    };
+
+    NK.SimByg.prototype.videreTekst = function () {
+        if (!this.opgave) return "Start opgave →";
+        if (this.rigtige >= MAAL_RIGTIGE) return "Videre til Spil →";
+        return "Næste opgave →";
+    };
+
+    /* Giv et hint: atomsymbolet. Naeste tryk: Vis svaret. */
+    NK.SimByg.prototype.hintKnap = function () {
+        if (!this.opgave || this.slut) return;
+        if (this.hjaelp === 0) {
+            this.hjaelp = 1;
+            this.pegKnap = false;
+            this.saetBesked('<span class="b-maerke">Hint</span> Byg ' + nuklidHTML(this.opgave) +
+                ". Det øverste tal er massetallet, det nederste er atomnummeret.", "hint");
+            this.visKort();
+            return;
+        }
+        this.visSvar();
     };
 
     NK.SimByg.prototype.visSvar = function () {
@@ -452,37 +473,100 @@
         this.p = this.opgave.p; this.n = this.opgave.n; this.e = this.opgave.e;
         this.atom.saet(this.p, this.n, this.e);
         this.opdaterPanel("");
-        NK.saetTekst("byg-opgave", this.opgave.tekst + "  →  " + this.opgave.svar);
-        NK.saetKlasse("byg-opgave", "besked gul");
-        this.opgave.loest = true;
-        this.visOpgaveNuklid(this.opgave);
-        this.saetOpgaveTrin("ny");
+        this.slut = { vist: true, html: nuklidHTML(this.opgave) + " " + esc(this.opgave.svar) };
+        this.saetBesked("", "");
+        this.visKort();
     };
 
+    NK.SimByg.prototype.kanSendes = function () {
+        return !!this.opgave && !this.slut && !!this.roert;
+    };
+
+    NK.SimByg.prototype.indsendKlik = function () {
+        if (!this.opgave || this.slut) { this.kortBlink(); return; }
+        if (!this.kanSendes()) {
+            this.kortBlink();
+            this.saetBesked("Byg atomet med knapperne i panelet først.", "peger");
+            return;
+        }
+        this.roert = false;
+        this.tjekOpgave();
+    };
+
+    /* Bedoemmelsen: det byggede atom mod opgaven. Ved en fejl siger beskeden,
+       hvilken slags partikel der ikke passer, uden at give tallet. */
     NK.SimByg.prototype.tjekOpgave = function () {
         var o = this.opgave;
-        if (!o || o.loest) return;
-        if (o.p !== this.p || o.n !== this.n || o.e !== this.e) return;
-        o.loest = true;
+        if (!o || this.slut) return;
+        var fejl = "";
+        if (o.p !== this.p) fejl = "Antallet af protoner passer ikke. Protonerne bestemmer grundstoffet.";
+        else if (o.n !== this.n) fejl = "Grundstoffet passer, men antallet af neutroner gør ikke. Massetallet er protoner plus neutroner.";
+        else if (o.e !== this.e) fejl = "Kernen passer, men antallet af elektroner gør ikke. Elektronerne bestemmer ladningen.";
+        if (fejl) {
+            this.pegKnap = true;
+            this.saetBesked('<span class="b-maerke">Ikke endnu</span> ' + fejl, "skidt");
+            this.visKort();
+            return;
+        }
         this.rigtige++;
-        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
-        this.visOpgaveNuklid(o);
-
+        var html = nuklidHTML(o) + " " + esc(o.svar);
         if (this.rigtige >= MAAL_RIGTIGE) {
-            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar + " Du har nu løst " + MAAL_RIGTIGE + " opgaver rigtigt selv — runden er gennemført.");
-            NK.saetKlasse("byg-opgave", "besked god");
-            this.saetOpgaveTrin("faerdig");
-            /* Hele opgaveturen er klaret - peg kraftigt paa fane 4, saa
-               spillet ikke bliver overset. Blinket stopper selv, naar
-               fanen rent faktisk aabnes (visFane() i app.js). */
+            html += " Du har løst " + MAAL_RIGTIGE + " opgaver selv, og runden er gennemført.";
+            /* Peg paa fane 4, saa spillet ikke bliver overset. Blinket stopper
+               selv, naar fanen aabnes (visFane() i app.js). */
             var faneSpil = NK.el("faneknap-spil");
             if (faneSpil) faneSpil.classList.add("blink-kraftigt");
-        } else {
-            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
-            NK.saetKlasse("byg-opgave", "besked god");
-            this.saetOpgaveTrin("ny");
         }
+        this.slut = { vist: false, html: html };
+        this.saetBesked("", "");
+        this.visKort();
     };
+
+    /* ----- Kortet ------------------------------------------------------------ */
+    NK.SimByg.prototype.saetBesked = function (html, klasse) {
+        this.besked = { html: html || "", klasse: klasse || "" };
+    };
+
+    NK.SimByg.prototype.visKort = function () {
+        var e = NK.el("byg-skort"), ind = NK.el("byg-ind"), html, kl;
+        if (!this.opgave) {
+            kl = "scenekort opgave start";
+            html = '<div class="sk-start"><p class="sk-tekst"><span class="sk-chip">Opgaver</span>' +
+                (this.rigtige ? "Du har løst " + this.rigtige + " af " + MAAL_RIGTIGE + " opgaver. " : "") +
+                "Byg frit med knapperne i panelet. Når du er klar, får du en opgave ad gangen.</p>" +
+                '<button type="button" class="sk-videre" data-videre="1">' + this.videreTekst() + "</button></div>";
+        } else {
+            kl = "scenekort " + (this.slut ? "loest bliv" + (this.slut.vist ? " svar" : "") : "opgave");
+            html = '<p class="sk-tekst"><span class="sk-chip">Opgave ' + Math.min(this.rigtige + (this.slut && !this.slut.vist ? 0 : 1), MAAL_RIGTIGE) +
+                " af " + MAAL_RIGTIGE + "</span>" + NK.Papir.tekst(esc(this.opgave.tekst)) + "</p>";
+            if (this.slut) html += NK.Papir.bliv(this.slut.html, this.slut.vist ? "Svaret" : "Rigtigt", this.videreTekst(), this.slut.vist);
+        }
+        if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        if (ind._html !== html) { ind.innerHTML = html; ind._html = html; }
+
+        /* Kortets nederste raekke: beskeden, Giv et hint og Indsend svar */
+        var status = NK.el("byg-status"), besked = NK.el("byg-besked"), knap = NK.el("byg-knap");
+        var aktiv = !!this.opgave && !this.slut;
+        status.hidden = !aktiv;
+        besked.hidden = !this.besked.html;
+        if (besked._html !== this.besked.html) { besked.innerHTML = this.besked.html; besked._html = this.besked.html; }
+        status.className = "sk-bund" + (this.besked.klasse ? " " + this.besked.klasse : "") + (this.besked.html ? "" : " tom");
+        knap.textContent = this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
+        knap.className = "knap hjaelp" + (this.hjaelp > 0 ? " svar" : "") + (this.pegKnap ? " peg" : "");
+        this.visIndsend();
+
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
+    };
+
+    NK.SimByg.prototype.visIndsend = function () {
+        var k = NK.el("byg-indsend"), kan = this.kanSendes();
+        k.classList.toggle("klar", kan);
+        k.classList.toggle("ikke-klar", !kan);
+        k.setAttribute("aria-disabled", kan ? "false" : "true");
+    };
+
+    /* Tekst til selvtesten */
+    NK.SimByg.prototype.kortTekst = function () { return NK.el("byg-skort").textContent; };
 
     /* ----- Tegning ---------------------------------------------------------- */
     NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
@@ -506,17 +590,19 @@
 
     NK.SimByg.prototype.placering = function () {
         var l = this.l;
-        var noegle = l.b + "x" + l.h;
+        var zone = this.kortZone ? this.kortZone() : 0;
+        var noegle = l.b + "x" + l.h + "x" + zone;
         if (this.stedNoegle === noegle) return this.sted;
         this.stedNoegle = noegle;
 
         var normalPlads = NK.klamp(Math.min(l.b * 0.33, l.h * 0.45), 70, 380);
+        var top = zone ? 10 + zone : 0;
         var R = Math.min(normalPlads * YDRE_ANDEL,
-            (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+            (l.h - top - LUFT - NUKLID_H - KERNE_H - 30) / 2,
             l.b / 2 - SIDE_LUFT);
         R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
 
-        var cyMin = LUFT + NUKLID_H + 14 + R;
+        var cyMin = top + LUFT + NUKLID_H + 14 + R;
         var cyMax = l.h - R - 16 - KERNE_H;
         var cy = NK.klamp(l.h * 0.54, cyMin, Math.max(cyMin, cyMax));
 
@@ -530,6 +616,8 @@
     };
 
     NK.SimByg.prototype.nulstil = function () {
+        if (this.laast()) return;
+        this.roert = true;
         this.p = 1; this.n = 0; this.e = 1;
         this.atom.saet(1, 0, 1);
         this.opdaterPanel("start");

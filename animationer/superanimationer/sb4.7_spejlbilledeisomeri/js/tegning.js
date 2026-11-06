@@ -14,6 +14,7 @@
     T.GUL = "#f2c53d";
     T.GROEN = "#5fcf92";
     T.ROED = "#f0796c";
+    T.BLAA = "#5aa9e6";     /* den gruppe, eleven har valgt (sendes med Indsend svar) */
 
     /* En farve gjort lysere (t > 0) eller moerkere (t < 0) */
     T.lys = function (hex, t) {

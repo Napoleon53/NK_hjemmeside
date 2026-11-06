@@ -35,7 +35,7 @@
     }
 
     var P = SimFejl.prototype;
-    NK.Fane.paa(P, { navn: "fejl", naesteTekst: "Næste fejlkilde →" });
+    NK.Fane.paa(P, { navn: "fejl", naesteTekst: "Næste fejlkilde →", zone: [244, 200] });
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {

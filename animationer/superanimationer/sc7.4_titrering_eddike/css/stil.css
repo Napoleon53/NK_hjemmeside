@@ -161,26 +161,7 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .scene > canvas { display: block; width: 100%; height: 100%; }
-.scene.medtekst { padding-bottom: 50px; }
 
-.scene-mrk {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    min-height: 50px;
-    display: block;
-    padding: 15px 20px 10px;
-    background: linear-gradient(to top, rgba(8, 8, 13, 0.97) 60%, rgba(8, 8, 13, 0.6));
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: #dde3ea;
-    text-align: center;
-    pointer-events: none;
-    z-index: 4;
-}
-
-.scene-mrk b { color: #ffffff; }
 
 /* Usynlige felter oven paa laerredet, som rundvisningen og Kemichaels
    praesentation peger paa */
@@ -916,3 +897,71 @@ select:focus-visible {
 }
 
 .felt.formelfelt input { font-family: inherit; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST I SCENEN (brugerens valg 4. nov. 2026: alle aktive
+   animationer har papirkortet; lavet her 6. nov. 2026). Hele opgaven
+   staar paa ét kort oeverst midt i scenen: opgaven eller spoergsmaalet,
+   svarene, linjen med naeste skridt, fejl og hint, Giv hint og Indsend
+   svar, og efter et rigtigt svar forklaringen og knappen videre
+   (js/kort.js). Udseendet er ../faelles/papirkort.css; her staar kun
+   pladsen og opbygningen. Opstillingen, luppen og tavlen begynder under
+   kortets plads (kortZone i hver sim). Statuslinjen nederst er fjernet.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border-radius: 12px;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.sk-knap {
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+
+.sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
+
+/* Et forkert gaet paa fane 3: forklaringen i en roed boks */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
+    background-color: var(--pk-roed-lys);
+    border-left-color: var(--pk-roed);
+    color: var(--pk-roed-tekst);
+}
+
+/* Feltet til aflaesningen under luppen paa menisken (fane 1) */
+#tit-buretkort .opgave-felt:not(:empty) { margin-top: 10px; }
+
+/* Tilbuddet om praesentationen staar nederst, saa det ikke daekker kortet */
+.tilbud { top: auto; bottom: 16px; }
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.93rem; }
+}
+
+/* Paa en smal skaerm staar panelet under scenen, og siden kan rulle. Scenen
+   er saa hoejere, saa opstillingerne har plads under papirkortet. */
+@media (max-width: 860px) {
+    .scene { height: 82vh; min-height: 640px; }
+}

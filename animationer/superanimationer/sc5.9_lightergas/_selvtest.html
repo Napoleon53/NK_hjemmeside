@@ -73,6 +73,8 @@ function koerTest(W) {
     function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
     function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
     function felt(id, tekst) { var e = d.getElementById(id); e.value = tekst; enter(e); }
+    /* Indsend svar paa kortet (Aflaes vaegten skriver kun tallet i feltet) */
+    function indsend(fane) { d.getElementById((fane || "forsoeg") + "-indsend").click(); }
 
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
@@ -196,9 +198,19 @@ function koerTest(W) {
     paastand("nu banker knappen Aflæs vægten", d.getElementById("forsoeg-aflaes").classList.contains("banker") && /Aflæs vægten/.test(A.beskedTekst()), A.beskedTekst());
     felt("forsoeg-f0", "12,34");
     paastand("et forkert tal afvises", A.noteret.mf === null);
+    ["f0", "v0", "e0"].forEach(function (id) { d.getElementById("forsoeg-" + id).value = ""; });
+    A.visIndsend();
+    var ind1 = d.getElementById("forsoeg-indsend");
+    paastand("Indsend svar er gråt, når intet felt har et tal", !ind1.hidden && ind1.classList.contains("ikke-klar"));
+    indsend();
+    paastand("Indsend svar uden tal sender intet, og kortet blinker", A.noteret.mf === null && A.el.kort.classList.contains("blink"));
     d.getElementById("forsoeg-aflaes").click();
     tik(A, 0.1);
-    paastand("Aflæs vægten skriver m(før) i skemaet", A.noteret.mf === A.lt.m0 && d.getElementById("forsoeg-f0").value === NK.tal2(A.lt.m0));
+    paastand("Aflæs vægten skriver kun tallet i feltet; det er ikke sendt endnu", A.noteret.mf === null && d.getElementById("forsoeg-f0").value === NK.tal2(A.lt.m0) &&
+        ind1.classList.contains("klar") && /Indsend svar/.test(A.beskedTekst()), A.beskedTekst());
+    indsend();
+    tik(A, 0.1);
+    paastand("Indsend svar sender m(før)", A.noteret.mf === A.lt.m0 && d.getElementById("forsoeg-f0").value === NK.tal2(A.lt.m0));
     paastand("m(før) noteres, og næste skridt er vandet", A.noteret.mf === A.lt.m0 && A.fase() === "saenk" && /vandet/.test(A.beskedTekst()), A.beskedTekst());
     veje([midt(), [640, 420]]);
     paastand("lighteren kan trækkes ned under måleglasset", A.sted === "vand");
@@ -218,21 +230,29 @@ function koerTest(W) {
     felt("forsoeg-v0", String(Math.round(V) + 1));
     paastand("V inden for en streg godkendes", A.noteret.V === Math.round(V) + 1);
     tik(A, 0.1);
-    paastand("så kommer gættet med tre svar", A.fase() === "gaet" && d.querySelectorAll("#forsoeg-valg button").length === 3);
+    paastand("så kommer gættet med tre svar på kortet", A.fase() === "gaet" && d.querySelectorAll("#forsoeg-kort #forsoeg-valg button").length === 3);
+    paastand("under gættet er Indsend svar væk (et gæt virker med det samme)", d.getElementById("forsoeg-indsend").hidden);
     felt("forsoeg-e0", "1");
     paastand("m(efter) kan ikke skrives før gættet", A.noteret.me === null);
+    A.el.kort.classList.remove("blink");
+    var pg = midt();
+    mus("pointerdown", pg[0], pg[1]);
+    mus("pointerup", pg[0], pg[1]);
+    paastand("under gættet er forsøget låst, og kortet blinker ved et klik", !A.haand && !A.gasPaa && A.el.kort.classList.contains("blink"));
     d.querySelectorAll("#forsoeg-valg button")[0].click();
     tik(A, 0.1);
     paastand("gættet noteres, og næste skridt er at tørre og veje", A.valgt === 0 && A.fase() === "op");
     veje([midt(), [midt()[0], midt()[1] - 30], [130, 430]]);
     paastand("op af vandet er lighteren våd", A.lt.vaad() && A.fase() === "toer");
     d.getElementById("forsoeg-aflaes").click();
+    indsend();
     paastand("den våde vejning afvises med en forklaring, også med knappen", A.noteret.me === null && /vejer med/.test(A.beskedTekst()), A.beskedTekst());
     veje([midt(), [400, 520]]);
     tik(A, 1.2);
     paastand("papiret tørrer lighteren", A.sted === "papir" && !A.lt.vaad());
     veje([midt(), [130, 430]]);
     d.getElementById("forsoeg-aflaes").click();
+    indsend();
     tik(A, 0.1);
     var mA = NK.maalinger[0];
     paastand("måling 1 er færdig og gemt", A.faerdig && mA && mA.mf === A.noteret.mf && mA.me === A.lt.visning());
@@ -249,7 +269,9 @@ function koerTest(W) {
     A.L.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: rv.left + gv.ox + 130 * gv.k, clientY: rv.top + gv.oy + 560 * gv.k, bubbles: true, pointerId: 1, button: 0 }));
     A.L.canvas.dispatchEvent(new W.PointerEvent("pointerup", { clientX: rv.left + gv.ox + 130 * gv.k, clientY: rv.top + gv.oy + 560 * gv.k, bubbles: true, pointerId: 1, button: 0 }));
     tik(A, 0.1);
-    paastand("et klik på vægten virker som Aflæs vægten", A.noteret.mf === A.lt.m0);
+    paastand("et klik på vægten virker som Aflæs vægten (skriver tallet)", A.noteret.mf === null && d.getElementById("forsoeg-f1").value === NK.tal2(A.lt.m0));
+    enter(d.getElementById("forsoeg-f1"));
+    paastand("Enter i feltet er Indsend svar", A.noteret.mf === A.lt.m0);
     veje([midt(), [640, 420]]);
     p = midt();
     mus("pointerdown", p[0], p[1]);
@@ -260,6 +282,7 @@ function koerTest(W) {
     tik(A, 1.2);
     veje([midt(), [130, 430]]);
     d.getElementById("forsoeg-aflaes").click();
+    indsend();
     tik(A, 0.1);
     paastand("m(efter) kan skrives, før V står der", A.noteret.me !== null && A.noteret.V === null && !A.faerdig && A.fase() === "aflaes");
     felt("forsoeg-v1", String(Math.round(A.glas.V)));
@@ -370,20 +393,53 @@ function koerTest(W) {
         paastand("opgave " + (i + 1) + " kan løses med Vis svaret", B.faerdig && B.alkan === B.opg.facit.alkan, B.beskedTekst());
     });
     paastand("måling 2 har formlerne stående (kun tal)", B.regning && D.BEREGNING[1].kunTal);
+    /* Opgave 2 og 3 som uloeste, saa knappen videre er Naeste opgave */
+    B.status.forEach(function (st) { st.loest = false; });
     B.vaelg(0, false);
     function skrivB(t) { var f = B.regning.aktivt(); f.input.value = t; enter(f.input); }
     skrivB("m(før)-m(efter)"); skrivB(NK.tal2(B.opg.facit.dm));
     skrivB("V/Vm"); skrivB(K.mol(B.opg.facit.n));
     skrivB("m/n"); skrivB(K.Mv(B.opg.facit.M));
     paastand("når M er fundet, skal alkanen vælges", B.skalVaelge() && /søjlen/.test(B.beskedTekst()));
+    var indB = d.getElementById("beregning-indsend");
+    paastand("Indsend svar er gråt, før en alkan er valgt", !indB.hidden && indB.classList.contains("ikke-klar"));
     var forkert = (B.opg.facit.alkan + 1) % 5;
     d.querySelectorAll("#beregning-valg button")[forkert].click();
-    paastand("en forkert alkan forklares ud fra molarmassen", B.skalVaelge() && /Din værdi/.test(B.beskedTekst()));
-    d.querySelectorAll("#beregning-valg button")[B.opg.facit.alkan].click();
+    paastand("et klik på en alkan vælger kun", B.skalVaelge() && B.alkanValgt === forkert && B.alkanForkert.length === 0 &&
+        d.querySelectorAll("#beregning-valg button")[forkert].classList.contains("valgt") && indB.classList.contains("klar"));
+    indsend("beregning");
+    paastand("en forkert alkan forklares ud fra molarmassen", B.skalVaelge() && /Din værdi/.test(B.beskedTekst()) &&
+        d.querySelectorAll("#beregning-valg button")[forkert].classList.contains("forkert"));
+    paastand("efter et forkert svar lyser den gule knap stille op", d.getElementById("beregning-knap").classList.contains("peg"));
+    /* En soejle i scenen vaelger ogsaa kun */
+    B.tilpas(); B.layout(); B.tegn();
+    var sj = B.lay.soejler.filter(function (r) { return r.i === B.opg.facit.alkan; })[0], rb = B.L.canvas.getBoundingClientRect();
+    B.L.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: rb.left + (sj.x0 + sj.x1) / 2, clientY: rb.top + (sj.y0 + sj.y1) / 2, bubbles: true, pointerId: 1, button: 0 }));
+    paastand("et klik på en søjle vælger kun", B.skalVaelge() && B.alkanValgt === B.opg.facit.alkan && !B.faerdig);
+    var indR = indB.getBoundingClientRect();
+    indsend("beregning");
     paastand("den rigtige alkan løser opgaven", B.faerdig && /butan/.test(B.beskedTekst()), B.beskedTekst());
+    var kB = B.el.kort, videreB = kB.querySelector(".sk-bund.bliv .sk-videre");
+    paastand("kortet bliver på spørgsmålet: den rigtige alkan er grøn, og forklaringen står under",
+        kB.classList.contains("loest") && kB.querySelectorAll("#beregning-valg .sk-knap.rigtig").length === 1 &&
+        d.querySelectorAll("#beregning-valg button")[B.opg.facit.alkan].classList.contains("rigtig") &&
+        /butan/.test(kB.querySelector(".sk-bund.bliv").textContent) && d.getElementById("beregning-bund").hidden);
+    var vR = videreB ? videreB.getBoundingClientRect() : { right: -99, top: -99 };
+    paastand("Næste står, hvor Indsend svar stod", !!videreB && Math.abs(vR.right - indR.right) < 3 && Math.abs(vR.top - indR.top) < 40,
+        Math.round(vR.right) + " / " + Math.round(indR.right));
+    videreB.click();
+    paastand("Næste giver næste opgave uden rosen fra den forrige", !B.faerdig && B.nr === 1 && !kB.classList.contains("loest") &&
+        !/butan/.test(B.beskedTekst()) && !/butan/.test(B.kortTekst()), B.kortTekst());
 
     overskrift("8. Fane 3");
     W.NK.visFane("fane-fejl");
+    C.vaelg(0, false);
+    C.el.kort.classList.remove("blink");
+    var ra = d.getElementById("fejl-anker-a").getBoundingClientRect(), rc = C.L.canvas.getBoundingClientRect();
+    C.L.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: ra.left + ra.width / 2, clientY: ra.top + ra.height / 2, bubbles: true, pointerId: 1, button: 0 }));
+    paastand("før gættet er forsøgene låst, og kortet blinker ved et klik", C.valgt === null && !C.koerer && C.el.kort.classList.contains("blink"));
+    paastand("Kør igen står i panelet og ikke før gættet", d.getElementById("fejl-forfra").closest(".panel") && d.getElementById("fejl-forfra").hidden);
+    void rc;
     D.FEJL.forEach(function (o, i) {
         C.vaelg(i, false);
         var ret = D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(o.rigtig);
@@ -393,6 +449,16 @@ function koerTest(W) {
         var vist = tb.classList.contains("hoejere") ? "hoejere" : (tb.classList.contains("lavere") ? "lavere" : "samme");
         paastand(o.titel + ": " + o.rigtig + " (A " + K.Mv(C.res.A.M) + ", B " + K.Mv(C.res.B.M) + ")", C.faerdig && vist === o.rigtig && C.retning() === o.rigtig);
     });
+    paastand("efter sidste fejlkilde bliver kortet på spørgsmålet med svaret grønt og uden knap videre",
+        C.el.kort.classList.contains("loest") && C.el.kort.querySelectorAll("#fejl-valg .sk-knap.rigtig").length === 1 &&
+        !C.el.kort.querySelector("[data-videre]") && !d.getElementById("fejl-forfra").hidden);
+    C.vaelg(0, false);
+    var fk = (D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(D.FEJL[0].rigtig) + 1) % 3;
+    d.querySelectorAll("#fejl-valg button")[fk].click();
+    tik(C, 10);
+    paastand("et forkert gæt: det valgte er rødt, det rigtige grønt, og forklaringen står gult under",
+        C.el.kort.querySelectorAll("#fejl-valg .sk-knap.forkert").length === 1 && C.el.kort.querySelectorAll("#fejl-valg .sk-knap.rigtig").length === 1 &&
+        C.el.kort.querySelector(".sk-bund.bliv.svar") && /Du gættede/.test(C.kortTekst()));
 
     overskrift("9. Sproget");
     var tekster = [];
@@ -426,6 +492,61 @@ function koerTest(W) {
         });
         paastand(s[0] + " × " + s[1] + ": alle tre faner tegnes", ok, noter.join("; "));
     });
+
+    overskrift("11. Papirkortet (6. nov. 2026)");
+    paastand("papirkortet er slået til (body.papirkort, ../faelles/papirkort.css og .js)", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        !!d.querySelector('link[href="../faelles/papirkort.css"]'));
+    var navne = ["forsoeg", "beregning", "fejl"];
+    paastand("de tre kort står i scenen og ikke i panelet", navne.every(function (n) {
+        var k = d.getElementById(n + "-kort");
+        return k && k.classList.contains("scenekort") && k.parentNode.classList.contains("scene") && !k.closest(".panel");
+    }));
+    paastand("intet opgavekort i panelet og ingen statuslinje eller knap nederst i scenen",
+        !d.querySelector(".panel .opgavekort, .statuslinje, .scene .forfraknap, .hjaelpblok"));
+    paastand("Start forfra og Kør igen står i panelet, aldrig på kortet", ["forsoeg-forfra", "fejl-forfra"].every(function (id) {
+        var e = d.getElementById(id);
+        return e && e.closest(".panel") && !e.closest(".scenekort");
+    }) && !Array.prototype.some.call(d.querySelectorAll(".scenekort button"), function (b) { return /forfra|Kør igen/i.test(b.textContent); }));
+    paastand("hintknappen er den stille gule knap på kortet", navne.every(function (n) { return d.getElementById(n + "-knap").classList.contains("hjaelp") && d.getElementById(n + "-knap").closest(".scenekort"); }));
+
+    /* Kortet holder sig inden for kortZone, og det, eleven skal se, begynder under den */
+    function kortBund(sim) { var k = sim.el.kort; return k.offsetTop + k.offsetHeight; }
+    function tjekZone(sim, hvad, noter) {
+        var z = sim.kortZone(), b = kortBund(sim), l = sim.lay, top;
+        if (sim === A) top = l.oy + l.k * (205 - 92 - 34);
+        else if (sim === B) top = l.tavle.y;
+        else top = l.oy + l.k * (Math.min(sim.st[0].geo.glas.y0, sim.st[1].geo.glas.y0) - 30);
+        if (b > z + 0.5 || top < z) noter.push(hvad + ": kort " + b + ", zone " + z + ", scenen fra " + Math.round(top));
+    }
+    [[1400, 860], [1100, 660]].forEach(function (s) {
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        void ramme.offsetWidth;
+        var noter = [];
+        W.NK.visFane("fane-forsoeg"); A.tilpas(); A.layout();
+        A.vaelg(0, false); A.forfra(); tjekZone(A, "fane 1 start", noter);
+        A.noteret.mf = A.lt.m0; A.glas.V = 150; A.sted = "vand"; A.noteret.V = 150; A.lavMuligheder(); tik(A, 0.05); A.visKort();
+        tjekZone(A, "fane 1 gæt", noter);
+        A.vaelgSvar(2, "gaet"); A.lt.vand = 0.4; A.tab = { forbi: 0, luft: 0.05, flamme: 0 }; A.noteret.me = A.lt.visning(); A.afslut("ok", null);
+        tjekZone(A, "fane 1 færdig med to fejl", noter);
+        W.NK.visFane("fane-beregning"); B.tilpas(); B.layout();
+        [0, 1, 2].forEach(function (i) {
+            B.vaelg(i, false); tjekZone(B, "fane 2 opgave " + (i + 1), noter);
+            while (!B.regning.faerdig()) B.regning.visSvar();
+            B.visKort();
+            D.ALKANER.forEach(function (a, j) { if (j !== B.opg.facit.alkan && B.skalVaelge()) { B.vaelgAlkanValg(j); B.indsendKlik(); tjekZone(B, "fane 2 opgave " + (i + 1) + " forkert " + a.navn, noter); } });
+            B.vaelgAlkanValg(B.opg.facit.alkan); B.indsendKlik(); tjekZone(B, "fane 2 opgave " + (i + 1) + " løst", noter);
+        });
+        W.NK.visFane("fane-fejl"); C.tilpas(); C.layout();
+        D.FEJL.forEach(function (o, i) {
+            C.vaelg(i, false); tjekZone(C, "fane 3 " + o.titel, noter);
+            var j = (D.FEJL_SVAR.map(function (x) { return x.id; }).indexOf(o.rigtig) + 1) % 3;
+            C.vaelgSvar(j, "gaet"); tik(C, 10); tjekZone(C, "fane 3 " + o.titel + " forkert gæt", noter);
+        });
+        paastand(s[0] + " × " + s[1] + ": kortet holder sig i kortZone på alle tre faner", noter.length === 0, noter.join("; "));
+    });
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
     W.NK.visFane("fane-forsoeg");
 }
 </script>

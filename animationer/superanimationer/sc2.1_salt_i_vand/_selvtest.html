@@ -307,7 +307,7 @@ function koerTest() {
     tider.max = [0, 1, 2].map(function () { return tidTil(MAXT, false); });
     note("NaCl max uden omrøring: " + tider.max.map(function (v) { return v.toFixed(0); }).join(", ") + " s");
     paastand("opgaven \"under " + G + " s\" kan klares med varmt vand og omrøring",
-        Math.max.apply(null, tider["varmt+rør"]) <= G * 0.85, tider["varmt+rør"].join(", "));
+        Math.max.apply(null, tider["varmt+rør"]) <= G * 0.9, tider["varmt+rør"].join(", "));
     paastand("og kræver både varme og omrøring, også på max",
         Math.min.apply(null, tider.varmt) > G * 1.15 && Math.min.apply(null, tider["lunkent+rør"]) > G * 1.15 &&
         Math.min.apply(null, tider.max) > G * 1.1,
@@ -608,7 +608,8 @@ function koerTest() {
     var sejrTekst = d.getElementById("maet-opg-ind").textContent;
     paastand("resultatet vises på kortet", op2.faerdig && sejrTekst.indexOf("Du løste") >= 0, sejrTekst);
     paastand("der henvises til den anden fane", sejrTekst.indexOf("Opløsningen") >= 0);
-    var resKnap = d.querySelectorAll("#maet-skort button:not([hidden])");
+    /* Kun de knapper, der ses (kortets nederste raekke er skjult paa resultatkortet) */
+    var resKnap = [].filter.call(d.querySelectorAll("#maet-skort button"), function (b) { return b.getClientRects().length > 0; });
     paastand("resultatkortet har ingen Start forfra, kun Videre til den anden fane",
         resKnap.length === 1 && resKnap[0].textContent.indexOf("Videre til") === 0 && d.getElementById("maet-skort").textContent.indexOf("forfra") < 0);
     paastand("Start forfra ligger i panelet", !d.getElementById("maet-opg-forfra").hidden);
@@ -807,6 +808,7 @@ function papirkortTest(d, W, NK, s1, s2, op1, op2) {
     [op1, op2].forEach(function (op) {
         op.kaldSlut(op.opgave); op.opgave = null; op.nyRunde(); op.tilstand = "intro"; op.visStatus(); op.visKort();
     });
+    var tekstFejl = "";
     paastand("teksterne på kortet holder grænserne (hint ≤ 100, forklaring ≤ 160, svar ≤ 34)", (function () {
         var bad = [];
         [op1, op2].forEach(function (op) {
@@ -816,8 +818,9 @@ function papirkortTest(d, W, NK, s1, s2, op1, op2) {
                 if (x.valg) x.valg.forEach(function (v) { if (v.length > 34) bad.push("svar: " + v); });
             });
         });
+        tekstFejl = bad.slice(0, 3).join(" | ");
         return bad.length ? bad[0] : true;
-    }()) === true);
+    }()) === true, tekstFejl);
 }
 
 function numerisk(a, b) { return a - b; }

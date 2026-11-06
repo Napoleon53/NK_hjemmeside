@@ -79,6 +79,7 @@ function koerTest(W) {
     function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
     function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
     function skyder(T) { var e = d.getElementById("stempel-T"); e.value = String(T); e.dispatchEvent(new W.Event("input", { bubbles: true })); }
 
     overskrift("1. Indlæsning");
@@ -263,6 +264,8 @@ function koerTest(W) {
         var bs = sim.besked, kb = sim.kortBesked;
         sim.besked = function (h, kl) { sagt.push(h); return bs.call(this, h, kl); };
         sim.kortBesked = function (h, t) { sagt.push(h); return kb.call(this, h, t); };
+        var bl = sim.kort.bliv;
+        sim.kort.bliv = function (h, m, k, sl) { if (h) sagt.push(h); return bl.call(this, h, m, k, sl); };
     });
 
     /* ------------------------------------------------------------------ */
@@ -273,11 +276,31 @@ function koerTest(W) {
         return s.el.knap.classList.contains("hjaelp") && !/Hint:/.test(s.beskedTekst());
     }));
     paastand("linjen i kortet siger næste skridt", /Vælg det, du tror/.test(S1.beskedTekst()), S1.beskedTekst());
+    function svarKnap(j) { return d.querySelectorAll("#stempel-skort .sk-knap")[j]; }
+    function indsend() { klik("#stempel-indsend"); }
     function vaelgRigtig(i) {
         var o = D.FORUDSIG[i], j = 0;
         o.valg.forEach(function (v, k) { if (v.ok) j = k; });
-        d.querySelectorAll("#stempel-valg .valgknap")[j].click();
+        svarKnap(j).click();
+        indsend();
     }
+    /* Papirkortet (6. nov. 2026) */
+    S1.vaelg(0);
+    var skort = d.getElementById("stempel-skort"), indsendK = d.getElementById("stempel-indsend");
+    paastand("papirkortet står i scenen, ikke i panelet", !!skort.closest(".scene") && !skort.closest(".panel") && d.body.classList.contains("papirkort") &&
+        !d.querySelector(".panel .opgavekort, .panel #stempel-valg, .panel #regn-prompt"));
+    paastand("ingen statuslinje nederst i scenen", !d.querySelector(".scene-mrk, .scene .statuslinje"));
+    paastand("Indsend svar er grå, til der er valgt et svar", vises(indsendK) && indsendK.classList.contains("ikke-klar"));
+    svarKnap(0).click();
+    paastand("et svar vælger kun: det bedømmes ikke af sig selv", S1.fase === "valg" && S1.valgt === 0 && indsendK.classList.contains("klar") &&
+        svarKnap(0).classList.contains("valgt"));
+    var T1 = S1.g.T, b1 = 0, blink0 = skort.classList.contains("blink");
+    skort.classList.remove("blink");
+    klik("#stempel-lod-plus");
+    paastand("før svaret er sendt, er forsøget låst, og kortet blinker", S1.g.lodder === 0 && skort.classList.contains("blink"));
+    skyder(T1 + 80);
+    paastand("… også skyderen", S1.g.T === T1 && S1.fase === "valg");
+    paastand("Start forfra står i panelet og ikke på kortet", !!d.querySelector(".panel #stempel-forfra") && !/forfra/i.test(skort.textContent));
     function goer(o) {
         var g = S1.g;
         if (o.handling === "varm") skyder(g.T + 60);
@@ -303,14 +326,29 @@ function koerTest(W) {
         paastand((i + 1) + ". " + o.navn + ": løst med en stjerne og det rigtige resultat", S1.fase === "faerdig" && S1.status[i].stjerne &&
             /^Rigtigt\./.test(S1.beskedTekst()) && forventet[o.id].test(S1.beskedTekst()), S1.fase + " | " + S1.beskedTekst());
     });
-    paastand("alle syv er løst, og knappen går videre til Beregningen", S1.antalLoest() === 7 && /Videre til Beregningen/.test(S1.el.knap.textContent) && S1.beskedTekst().indexOf(D.FAERDIG.stempel) >= 0);
+    var videreK = skort.querySelector("[data-videre]");
+    paastand("alle syv er løst, og knappen går videre til Beregningen", S1.antalLoest() === 7 && videreK && /Videre til Beregningen/.test(videreK.textContent) && S1.beskedTekst().indexOf(D.FAERDIG.stempel) >= 0);
+    /* Bliv på spørgsmålet */
+    S1.status[1].loest = false;
+    S1.vaelg(0);
+    vaelgRigtig(0);
+    goer(D.FORUDSIG[0]);
+    tik(S1, 3);
+    var gr = skort.querySelector(".sk-knap.rigtig");
+    videreK = skort.querySelector(".sk-bund.bliv [data-videre]");
+    paastand("rigtigt svar: kortet bliver på spørgsmålet, svaret er grønt, og Næste står, hvor Indsend svar stod",
+        S1.fase === "faerdig" && gr && gr === svarKnap(0) && videreK && /Næste opgave/.test(videreK.textContent) &&
+        /Varmere|varmere/.test(skort.querySelector(".sk-tekst").textContent) && !vises(indsendK) && d.getElementById("stempel-bund").hidden);
+    videreK.click();
+    paastand("Næste viser næste spørgsmål uden rosen", S1.nr === 1 && S1.fase === "valg" && !skort.querySelector(".sk-bund.bliv") && !/Rigtigt/.test(skort.textContent));
     /* Et forkert gæt */
     S1.vaelg(0);
-    d.querySelectorAll("#stempel-valg .valgknap")[1].click();
+    svarKnap(1).click();
+    indsend();
     skyder(S1.g.T + 60);
     tik(S1, 3);
     paastand("et forkert gæt: forklaringen og det rigtige svar, ingen afvisning", S1.fase === "faerdig" && /^Du gættede: volumen bliver mindre\. Volumen steg/.test(S1.beskedTekst()) &&
-        S1.el.besked.className.indexOf("skidt") >= 0 && d.querySelector("#stempel-valg .rigtig") && d.querySelector("#stempel-valg .forkert"), S1.beskedTekst());
+        !!skort.querySelector(".sk-bund.bliv.nej") && skort.querySelector(".sk-knap.rigtig") && skort.querySelector(".sk-knap.forkert"), S1.beskedTekst());
     /* To ting på én gang */
     S1.vaelg(0);
     vaelgRigtig(0);
@@ -333,14 +371,15 @@ function koerTest(W) {
     S1.vaelg(1);
     S1.status[1].stjerne = false;
     klik("#stempel-knap");
-    paastand("Giv hint: hintet står i kortet, og knappen bliver til Vis svaret", S1.beskedTekst().indexOf("Hint:") === 0 && S1.el.besked.className.indexOf("gul") >= 0 &&
+    paastand("Giv hint: hintet står i kortet, og knappen bliver til Vis svaret", S1.beskedTekst().indexOf("Hint:") === 0 && d.getElementById("stempel-bund").className.indexOf("gul") >= 0 &&
         S1.el.knap.textContent === "Vis svaret" && S1.el.knap.classList.contains("svar"), S1.beskedTekst());
     klik("#stempel-knap");
     paastand("Vis svaret: svaret står i kortet, og forsøget kører af sig selv", S1.valgt >= 0 && D.FORUDSIG[1].valg[S1.valgt].ok && !!S1.auto);
     tik(S1, 4);
     paastand("… og opgaven er løst uden stjerne", S1.fase === "faerdig" && !S1.status[1].stjerne, S1.fase);
-    /* Scenen */
+    /* Scenen (efter svaret er sendt, er forsøget åbent) */
     S1.vaelg(0);
+    vaelgRigtig(0);
     var n0 = S1.g.n;
     S1.klikScene("flaske");
     paastand("klik på gasflasken: 0,25 mol mere", Math.abs(S1.g.n - n0 - 0.25) < 1e-9 && /0,25 mol gas mere/.test(S1.beskedTekst()));
@@ -402,19 +441,38 @@ function koerTest(W) {
     paastand("til sidst er alt kendt på instrumenterne", sceneOk);
     paastand("flasker og dæk er lukkede, balloner og stempler frie", lukketOk);
     paastand("alle tolv er løst, og rosen for alle kom", R.antalLoest() === 12 && R.beskedTekst().indexOf(D.FAERDIG.regn) >= 0, R.beskedTekst());
+    /* Papirkortet på fane 2 */
+    R.vaelg(0, true);
+    var rk = d.getElementById("regn-skort"), ri = d.getElementById("regn-indsend");
+    paastand("fane 2: kortet står i scenen, felterne i panelet", !!rk.closest(".scene") && !!d.querySelector(".panel #regn-raekker input"));
+    paastand("fane 2: Indsend svar er grå, til der står noget i feltet", vises(ri) && ri.classList.contains("ikke-klar"));
+    var ti = R.aktivt().input;
+    ti.value = "V = nRT/p";
+    ti.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("… og klar, når der står noget", ri.classList.contains("klar"));
+    ri.click();
+    paastand("Indsend svar sender feltet ind", R.aktivt().fase === "tal" && /Rigtig formel/.test(R.beskedTekst()), R.beskedTekst());
+    R.status.forEach(function (st) { st.loest = false; });
+    R.vaelg(0, false);
+    loes(R);
+    var rv = rk.querySelector(".sk-bund.bliv [data-videre]");
+    paastand("fane 2: løst opgave bliver stående med facit og Næste opgave", R.faerdig && rv && /Næste opgave/.test(rv.textContent) && d.getElementById("regn-bund").hidden);
+    rv.click();
+    paastand("fane 2: Næste giver ny opgave uden rosen", !R.faerdig && !rk.querySelector(".sk-bund.bliv") && !/Rigtigt/.test(rk.textContent));
+    paastand("fane 2: Start forfra og Nye tal står ikke på kortet", !/forfra|Nye tal/i.test(rk.textContent));
     /* En forkert formel, så hint og svar */
     R.vaelg(0, true);
     var t0 = R.aktivt();
     t0.input.value = "V = pnRT";
     enter(t0.input);
-    paastand("forkert formel: feltet ryster, og linjen siger hvorfor", /p skal stå under/.test(R.beskedTekst()) && R.el.besked.className.indexOf("skidt") >= 0 && t0.fase === "formel");
+    paastand("forkert formel: feltet ryster, og linjen siger hvorfor", /p skal stå under/.test(R.beskedTekst()) && d.getElementById("regn-bund").className.indexOf("skidt") >= 0 && t0.fase === "formel");
     paastand("… der kommer intet hint af sig selv, men den gule knap lyser op", !/Hint:/.test(R.beskedTekst()) && R.el.knap.classList.contains("peg"));
     klik("#regn-knap");
     paastand("Giv hint: det, man kender, ikke formlen", /^Hint:/.test(R.beskedTekst()) && /Du kender/.test(R.beskedTekst()) && !/nRT|n · R · T/.test(R.beskedTekst()) &&
         !R.el.knap.classList.contains("peg"), R.beskedTekst());
     klik("#regn-knap");
     paastand("Vis svaret: formlen står i kortet, og feltet er nu til tallet", t0.fase === "tal" && /Formlen/.test(R.beskedTekst()) &&
-        R.el.besked.className.indexOf("gul") >= 0, R.beskedTekst());
+        d.getElementById("regn-bund").className.indexOf("gul") >= 0, R.beskedTekst());
     klik("#regn-knap");
     klik("#regn-knap");
     paastand("Vis svaret på tallet: beregningen, opgaven er løst uden stjerne", R.faerdig && !R.status[0].stjerne || R.faerdig && R.brugtSvar, R.beskedTekst());
@@ -458,6 +516,25 @@ function koerTest(W) {
             sim.tilpas();
             sim.layout();
             var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            /* Papirkortet holder sig i sin plads oeverst (kortZone), ogsaa med det hoejeste kort:
+               opgave 5 med fire lange svar og hintet, og det forkerte svar med forklaringen */
+            if (id === "fane-stempel") {
+                [function () { sim.vaelg(4); sim.vaelgKortSvar(1); sim.knap(); },
+                 function () { sim.vaelg(4); sim.vaelgKortSvar(1); sim.indsend(); }].forEach(function (f, k) {
+                    f(); sim.tilpas();
+                    var kr2 = d.getElementById("stempel-skort").getBoundingClientRect(), cr2 = sim.L.canvas.getBoundingClientRect();
+                    if (kr2.bottom - cr2.top > sim.lay.top + 1) problemer.push(id + ": kortet " + (k ? "med forklaringen" : "med hintet") + " går ud over sin plads");
+                    if (sim.lay.cyl.y < sim.lay.top) problemer.push(id + ": cylinderen går op under det høje kort");
+                    if (sim.lay.bordY > sim.lay.H - 10 || sim.lay.cyl.h < 80) problemer.push(id + ": cylinderen bliver for lav under det høje kort (" + Math.round(sim.lay.cyl.h) + " px)");
+                });
+                lay = sim.lay;
+            }
+            var ke = d.getElementById(sim.navn + "-skort"), kr = ke.getBoundingClientRect(), cr = sim.L.canvas.getBoundingClientRect();
+            if (kr.bottom - cr.top > lay.top + 1) problemer.push(id + ": kortet (" + Math.round(kr.bottom - cr.top) + " px) går ud over sin plads (" + lay.top + " px)");
+            if (kr.left < cr.left - 1 || kr.right > cr.right + 1) problemer.push(id + ": kortet er bredere end scenen");
+            if (lay.cyl.y < lay.top) problemer.push(id + ": cylinderen går op under kortet");
+            if (lay.graf && lay.graf.y < lay.top) problemer.push(id + ": grafen går op under kortet");
+            if (lay.tavle && lay.tavle.y < lay.top) problemer.push(id + ": tavlen går op under kortet");
             function inde(r, navn) {
                 if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
             }

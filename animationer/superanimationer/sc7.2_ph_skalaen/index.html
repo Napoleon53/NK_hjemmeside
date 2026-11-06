@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>pH-skalaen</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> pH-skalaen</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: SKALAEN                                                    -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-skala" role="tabpanel" aria-label="Skalaen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="skala-laerred"></canvas>
         <div class="anker" id="skala-anker-skala"></div>
         <div class="anker" id="skala-anker-stoffer"></div>
@@ -38,18 +39,18 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="skala-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="skala-skort">
+            <div class="sk-ind" id="skala-ind"></div>
+            <div class="sk-bund tom" id="skala-status">
+                <p class="st-tekst" id="skala-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="skala-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="skala-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste hylde -->
-        <div class="kort opgavekort" id="skala-kort">
-            <h2><span id="skala-titel">Hylde 1</span><span class="taeller">målt <b id="skala-maalt">0</b>/<span id="skala-ialt">6</span></span></h2>
-            <p class="maal-tekst" id="skala-prompt"></p>
-            <p class="besked" id="skala-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="skala-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="skala-stof" hidden>
             <h2><span id="skala-stofnavn"></span><span class="taeller" id="skala-surhed"></span></h2>
             <p class="storttal" id="skala-stofph"></p>
@@ -59,7 +60,7 @@
         </div>
 
         <div class="kort" id="skala-gaetkort">
-            <h2>Gæt og målt</h2>
+            <h2>Gæt og målt <span class="taeller">målt <b id="skala-maalt">0</b>/<span id="skala-ialt">6</span></span></h2>
             <div class="tabel" id="skala-liste"></div>
             <button class="knap nulstil" id="skala-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
@@ -70,7 +71,7 @@
 <!-- FANE 2: LUPPEN                                                     -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-lup" role="tabpanel" aria-label="Luppen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="lup-laerred"></canvas>
         <div class="anker" id="lup-anker-skala"></div>
         <div class="anker" id="lup-anker-glas"></div>
@@ -80,18 +81,18 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="lup-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="lup-skort">
+            <div class="sk-ind" id="lup-ind"></div>
+            <div class="sk-bund tom" id="lup-status">
+                <p class="st-tekst" id="lup-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="lup-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="lup-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="lup-kort">
-            <h2><span id="lup-titel">Mål</span><span class="taeller" id="lup-taeller">mål <b id="lup-nr">1</b>/5</span></h2>
-            <p class="maal-tekst" id="lup-prompt"></p>
-            <div class="opgave-felt" id="lup-opgave"></div>
-            <p class="besked" id="lup-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="lup-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="lup-maaling">
             <h2>I luppen <span class="taeller">1 prik = 1 ion</span></h2>
             <div class="talraekke"><span>pH</span><span class="tal gul" id="lup-ph"></span></div>
@@ -102,6 +103,12 @@
             <div class="talraekke"><span>Luppens terning</span><span class="tal" id="lup-side"></span></div>
             <p class="note" id="lup-modvand"></p>
         </div>
+
+        <!-- Hvor langt eleven er naaet. Opgaven staar paa kortet i scenen. -->
+        <div class="kort" id="lup-kort">
+            <h2><span>Målene</span><span class="taeller" id="lup-taeller">mål <b id="lup-nr">1</b>/5</span></h2>
+            <button class="knap nulstil" id="lup-forfra" type="button"><span>Start målene forfra</span><span class="tegn">↺</span></button>
+        </div>
     </aside>
 </section>
 
@@ -109,7 +116,7 @@
 <!-- FANE 3: FORTYNDINGEN                                               -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-fortynd" role="tabpanel" aria-label="Fortyndingen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="fortynd-laerred"></canvas>
         <div class="anker" id="fortynd-anker-skala"></div>
         <div class="anker" id="fortynd-anker-flasker"></div>
@@ -120,19 +127,18 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="fortynd-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="fortynd-skort">
+            <div class="sk-ind" id="fortynd-ind"></div>
+            <div class="sk-bund tom" id="fortynd-status">
+                <p class="st-tekst" id="fortynd-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="fortynd-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="fortynd-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste maal -->
-        <div class="kort opgavekort" id="fortynd-kort">
-            <h2><span id="fortynd-titel">Mål</span><span class="taeller" id="fortynd-taeller">mål <b id="fortynd-nr">1</b>/5</span></h2>
-            <p class="maal-tekst" id="fortynd-prompt"></p>
-            <div class="opgave-felt" id="fortynd-opgave"></div>
-            <p class="besked" id="fortynd-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fortynd-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="fortynd-glas">
             <h2>Glasset <span class="taeller" id="fortynd-surhed"></span></h2>
             <p class="glasnavn" id="fortynd-glasnavn"></p>
@@ -141,6 +147,12 @@
             <div class="talraekke"><span>OH⁻ i luppen</span><span class="tal blaa" id="fortynd-no"></span></div>
             <div class="talraekke"><span>[H₃O⁺]</span><span class="tal" id="fortynd-ch"></span></div>
             <button class="knap nulstil" id="fortynd-nulstil" type="button"><span>Tøm bordet</span><span class="tegn">↺</span></button>
+        </div>
+
+        <!-- Hvor langt eleven er naaet. Opgaven staar paa kortet i scenen. -->
+        <div class="kort" id="fortynd-kort">
+            <h2><span>Målene</span><span class="taeller" id="fortynd-taeller">mål <b id="fortynd-nr">1</b>/5</span></h2>
+            <button class="knap nulstil" id="fortynd-forfra" type="button"><span>Start målene forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -199,6 +211,8 @@
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/skort.js"></script>
 <script src="js/lup.js"></script>
 <script src="../kemichael/praesentation.js"></script>
 <script src="js/sim_skala.js"></script>

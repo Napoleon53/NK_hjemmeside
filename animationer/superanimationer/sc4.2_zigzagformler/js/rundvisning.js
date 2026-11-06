@@ -18,7 +18,7 @@
             { sel: "#zz-anker-papir", titel: "Opgaven", tekst: "Strukturformlen med alle atomer. Den grønne kæde kommer med hintet." },
             { sel: "#zz-anker-tavle", titel: "Tavlen", tekst: "Træk fra C-atomet for at tegne. Klik på en binding for dobbeltbinding. Højreklik på en ende sletter den." },
             { sel: "#zz-retning", titel: "Retningen", tekst: "Tegn zigzag ud fra strukturformlen, eller sæt C og H på en zigzag og skriv formlen." },
-            { sel: "#zz-kort", titel: "Opgaven", tekst: "Tegningen tjekkes, når alle C-atomer er brugt. Knappen giver et hint og derefter svaret." },
+            { sel: "#zz-skort", titel: "Opgaven", tekst: "Kortet viser opgaven. Indsend svar tjekker tegningen. Giv et hint giver et hint og derefter svaret." },
             { sel: "#zz-serie", titel: "Serien", tekst: "Ti molekyler, der bliver sværere. Klik på et løst for at se det igen." },
             { sel: ".faneknapper", titel: "Fanerne", tekst: "Zigzag, Navne og Isomerer er quizzer. Hver klaret quiz giver et klistermærke til tegnebrættet. Opløselighed er et spil om vand og heptan." },
             { sel: "#tegnelink", titel: "Tegnebrættet", tekst: "Tegn frit til rapporten, med navne på stofferne. Klistermærkerne fra quizzerne ligger der." },
@@ -28,19 +28,19 @@
             { sel: "#nv-retning", titel: "Retningen", tekst: "Byg molekylet ud fra navnet, eller skriv navnet på det, der står på tavlen." },
             { sel: "#nv-slags", titel: "Alkaner eller alkener", tekst: "Hver er en serie på ti. De sidste alkener har cis eller trans." },
             { sel: "#nv-anker-tavle", titel: "Tavlen", tekst: "Her tegner du, eller her står molekylet, du skal give navn." },
-            { sel: "#nv-kort", titel: "Opgaven", tekst: "Et forkert svar giver en besked om fejlen. Knappen giver et hint og derefter svaret." }
+            { sel: "#nv-skort", titel: "Opgaven", tekst: "Kortet viser opgaven. Et forkert svar giver en besked om fejlen. Giv et hint giver et hint og derefter svaret." }
         ],
         "fane-isomerer": [
             { sel: "#is-niveau", titel: "Formlen", tekst: "Fire formler med 2, 3, 5 og 9 isomerer." },
-            { sel: "#is-anker-tavle", titel: "Tavlen", tekst: "Tegn et molekyle med formlen. Når alle C-atomer er brugt, får det navn." },
+            { sel: "#is-anker-tavle", titel: "Tavlen", tekst: "Tegn et molekyle med formlen. Indsend svar giver det navn." },
             { sel: "#is-liste-kort", titel: "Isomererne", tekst: "Et nyt navn kommer på listen. Samme navn er samme stof, bare tegnet anderledes." },
-            { sel: "#is-kort", titel: "Hjælp", tekst: "Hintet siger, hvor lang hovedkæden er i en, der mangler. Derefter kan den vises." }
+            { sel: "#is-skort", titel: "Opgaven", tekst: "Hintet siger, hvor lang hovedkæden er i en isomer, der mangler. Derefter kan isomeren vises." }
         ],
         "fane-oploeselighed": [
-            { sel: "#op-anker-mol", titel: "Molekylet", tekst: "Træk det ned i bægerglasset. Du kan også klikke på et af lagene." },
+            { sel: "#op-anker-mol", titel: "Molekylet", tekst: "Træk det ned i bægerglasset, eller klik på et af lagene. Indsend svar på kortet tjekker valget." },
             { sel: "#op-anker-glas", titel: "Bægerglasset", tekst: "Heptan øverst, vand nederst. Vælger du forkert, flytter molekylet selv over i det rigtige lag." },
             { sel: "#op-tegning", titel: "Tegningen", tekst: "Zigzag eller alle atomer. Det er det samme molekyle, tegnet på to måder." },
-            { sel: "#op-kort", titel: "Opgaven", tekst: "Knappen giver et hint og derefter svaret. Rigtigt giver 100 point, 70 med hint." },
+            { sel: "#op-skort", titel: "Opgaven", tekst: "Giv et hint giver et hint og derefter svaret. Rigtigt giver 100 point, 70 med hint." },
             { sel: "#op-bunke", titel: "Bunken", tekst: "15 molekyler, der bliver sværere, og tre liv. Klik på en prik for at se molekylet igen." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Reglen om C-atomer pr. polær gruppe." }
         ]

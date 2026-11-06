@@ -225,17 +225,27 @@ function koerTest(W) {
     }
 
     overskrift("7. Skalaen kan gennemføres");
+    function videre(sim) { return sim.el.skort.querySelector("[data-videre]"); }
+    function blivTekst(sim) { var e = sim.el.skort.querySelector(".sk-bund.bliv"); return e ? e.textContent : ""; }
+    function kortTekst(sim) { var e = sim.el.skort.querySelector(".sk-tekst"); return e ? e.textContent : ""; }
+    function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
     klik('[data-fane="fane-skala"]');
     S.tilpas();
     S.afvisTilbud();
     S.nulstil(); tik(S, 0.3);
+    paastand("papirkortet står øverst i scenen, og der er ingen linje nederst og intet opgavekort i panelet", d.body.classList.contains("papirkort") &&
+        !!S.el.skort.closest(".scene") && S.el.skort.offsetTop <= 12 && !d.querySelector(".scene-mrk") && !d.querySelector(".panel .opgavekort") &&
+        !d.querySelector(".panel .knap.hjaelp"));
+    paastand("kortet viser hylden og opgaven, og Start forfra står i panelet", /^Hylde 1 · Køkkenet/.test(kortTekst(S)) && /Træk hvert stof op på skalaen/.test(kortTekst(S)) &&
+        !/forfra/i.test(S.el.skort.textContent) && !!d.querySelector(".panel #skala-nulstil"));
+    paastand("fane 1 har ingen Indsend svar: et gæt er gratis og bedømmes ikke", !vises(S.el.indsend) && vises(S.el.knap));
     var c = d.getElementById("skala-laerred"), lay = S.lay;
     var cit = S.stoffer.filter(function (s) { return s.st.id === "citron"; })[0];
     var tx = Tg.skalaX(lay.skala, 4);
     mus(c, "pointerdown", cit.x, cit.y - cit.h * 0.5);
     mus(c, "pointermove", cit.x + 30, cit.y - 80);
     mus(c, "pointermove", tx, lay.skala.y + lay.skala.h / 2);
-    paastand("mens citronsaften trækkes over skalaen, står gættet i linjen under scenen", /Dit gæt: pH 4,0/.test(d.getElementById("skala-status").textContent));
+    paastand("mens citronsaften trækkes over skalaen, står gættet på kortet", /Dit gæt: pH 4,0/.test(d.getElementById("skala-besked").textContent));
     mus(c, "pointerup", tx, lay.skala.y + lay.skala.h / 2);
     paastand("citronsaften kan trækkes op på skalaen, og gættet er pH 4,0", cit.gaet === 4 && cit.status === "tilMaaler");
     tik(S, 1);
@@ -266,8 +276,8 @@ function koerTest(W) {
         S.gaet(s, 7, { x: s.x, y: s.y, h: s.h });
         tik(S, 3.3);
     });
-    paastand("hylde 1 er målt: 6/6, besked og Næste hylde", S.naaet && S.antalMaalt() === 6 && S.el.knap.textContent === "Næste hylde →" &&
-        /Alle seks er målt. 2 af dine 6 gæt/.test(S.el.besked.textContent), S.el.besked.textContent);
+    paastand("hylde 1 er målt: 6/6, kortet bliver med resultatet og Næste hylde", S.naaet && S.antalMaalt() === 6 && videre(S) && videre(S).textContent === "Næste hylde →" &&
+        /^Færdig\s*Alle seks er målt. 2 af dine 6 gæt/.test(blivTekst(S)) && /^Hylde 1/.test(kortTekst(S)), blivTekst(S));
     tik(S, 2.5);
     paastand("efter hylde 1 kommer Kemichael ikke (kun en del af fanen)", !(S.laerer.scene && S.laerer.scene.navn === "faerdig"));
     var baner = S.stoffer.every(function (s) { return s.bane >= 0 && s.bane < 5; });
@@ -289,7 +299,7 @@ function koerTest(W) {
     delete S.laererKoer;
     paastand("efter hylde 2 er hele fanen målt, og Kemichael roser én gang", scener.join() === "faerdig", scener.join());
     paastand("Vis svaret måler resten uden gæt", S.naaet && S.antalMaalt() === 6 && S.denneHylde().every(function (s) { return s.gaet === null; }));
-    paastand("knappen går videre til luppen", S.el.knap.textContent === "Videre til luppen →");
+    paastand("kortets knap går videre til luppen", videre(S) && videre(S).textContent === "Videre til luppen →");
     tik(S, 8);
     S.knap();
     paastand("og fane 2 vises", d.getElementById("fane-lup").classList.contains("aktiv"));
@@ -304,7 +314,14 @@ function koerTest(W) {
     L.tilpas();
     L.afvisTilbud();
     L.nr = 0; L.startMaal(); tik(L, 0.5);
-    function lupStatus() { return d.getElementById("lup-status").textContent; }
+    function lupStatus() { return d.getElementById("lup-besked").textContent; }
+    paastand("Indsend svar er grå, før mærket er flyttet", vises(L.el.indsend) && L.el.indsend.classList.contains("ikke-klar") && /^Mål 1 af 5/.test(kortTekst(L)));
+    L.saetPh(6.5); tik(L, 0.5);
+    paastand("mærket alene løser ikke målet, og Indsend svar viser pH", !L.naaet && L.el.indsend.classList.contains("klar") && L.el.indsend.textContent === "Indsend svar: pH 6,5");
+    klik("#lup-indsend"); tik(L, 0.2);
+    paastand("Indsend svar på pH 6,5: Ikke endnu, og hvilken vej mærket skal", !L.naaet && /^Ikke endnu/.test(L.el.besked.textContent) && /mod venstre/.test(L.el.besked.textContent) &&
+        /skidt/.test(L.el.status.className), L.el.besked.textContent);
+    L.saetPh(7); tik(L, 0.5);
     paastand("mål 1 starter ved pH 7 med 10 H₃O⁺ og 10 OH⁻, og der er ingen zoomknapper", L.ph === 7 && L.lup.z === 8 &&
         L.lup.synlige("h3o") === 10 && L.lup.synlige("oh") === 10 && !L.lay.ud && !L.lay.ind && !L.zoom);
     var cl = d.getElementById("lup-laerred"), ll = L.lay, sy = ll.skala.y + ll.skala.h / 2;
@@ -316,8 +333,14 @@ function koerTest(W) {
     paastand("mens mærket holdes, er målet ikke nået endnu", !L.naaet);
     mus(cl, "pointerup", x6, sy);
     tik(L, 0.8);
-    paastand("pH-mærket kan trækkes til pH 6: 100 H₃O⁺ og 1 OH⁻ i samme rum, og mål 1 er nået", L.ph === 6 && L.naaet && L.lup.z === 8 &&
+    paastand("sluppet på pH 6 er målet stadig ikke bedømt", L.ph === 6 && !L.naaet);
+    klik("#lup-indsend"); tik(L, 0.3);
+    paastand("Indsend svar: pH 6 giver 100 H₃O⁺ og 1 OH⁻ i samme rum, og mål 1 er nået", L.ph === 6 && L.naaet && L.lup.z === 8 &&
         L.lup.synlige("h3o") === 100 && L.lup.synlige("oh") === 1);
+    paastand("kortet bliver på målet med forklaringen, og Næste mål står, hvor Indsend svar stod", /^Mål 1 af 5/.test(kortTekst(L)) &&
+        /^Rigtigt\s*pH 6/.test(blivTekst(L)) && videre(L).textContent === "Næste mål →" && !vises(L.el.indsend) && !vises(L.el.knap));
+    mus(cl, "pointerdown", x7, sy); mus(cl, "pointerup", x7, sy);
+    paastand("mens kortet venter på Næste, er mærket låst, og kortet blinker", L.ph === 6 && !L.glid && L.el.skort.classList.contains("blink"));
     paastand("panelet viser 10 gange så mange H₃O⁺ og [H₃O⁺] = 1,0 · 10⁻⁶ M", /10 gange så mange H₃O⁺/.test(d.getElementById("lup-modvand").textContent) &&
         d.getElementById("lup-ch").textContent === "1,0 · 10⁻⁶ M");
     L.knap(); tik(L, 0.3);
@@ -330,7 +353,8 @@ function koerTest(W) {
     paastand("luppen har zoomet ind én gang: 13 H₃O⁺ i et 10 gange mindre rum", L.lup.z === 7 && L.lup.synlige("h3o") === 13 && L.lup.rolig());
     paastand("panelet viser luppens nye terning (260 nm)", d.getElementById("lup-side").textContent === "260 nm", d.getElementById("lup-side").textContent);
     L.saetPh(5); tik(L, 0.8);
-    paastand("pH 5: 100 H₃O⁺ i det lille rum, og mål 2 er nået", L.naaet && L.lup.z === 7 && L.lup.synlige("h3o") === 100);
+    L.indsend(); tik(L, 0.1);
+    paastand("pH 5 og Indsend svar: 100 H₃O⁺ i det lille rum, og mål 2 er nået", L.naaet && L.lup.z === 7 && L.lup.synlige("h3o") === 100);
     L.knap(); tik(L, 0.3);
     var x2 = Tg.skalaX(ll.skala, 2);
     mus(cl, "pointerdown", x2, sy); mus(cl, "pointerup", x2, sy);
@@ -342,14 +366,22 @@ function koerTest(W) {
         if (L.lup.z !== zSidst) { zooms++; zSidst = L.lup.z; }
         maksPrikker = Math.max(maksPrikker, L.lup.synlige("h3o"));
     }
-    paastand("fra pH 5 til 2 zoomer luppen tre gange, én ad gangen, og mål 3 er nået", zooms === 3 && L.lup.z === 4 && L.ph === 2 && L.naaet, zooms + " zoom, z " + L.lup.z);
+    L.enter(); tik(L, 0.1);
+    paastand("fra pH 5 til 2 zoomer luppen tre gange, én ad gangen, og Enter (Indsend svar) når mål 3", zooms === 3 && L.lup.z === 4 && L.ph === 2 && L.naaet, zooms + " zoom, z " + L.lup.z);
     paastand("mens mærket gled, tegnede luppen højst " + NK.Lup.MAKS_TEGN + " prikker", maksPrikker <= NK.Lup.MAKS_TEGN, maksPrikker);
     L.knap(); tik(L, 0.3);
-    paastand("mål 4 har fire valg og ingen pH at nå", d.querySelectorAll("#lup-opgave .vaelger").length === 4 && L.maal().slags === "valg");
-    klik("#lup-opgave .vaelger:nth-child(2)");
-    paastand("50 gange giver beskeden om at gange", !L.naaet && /lagt 10 sammen/.test(L.el.besked.textContent) && /Vælg igen/.test(L.el.besked.textContent));
-    klik("#lup-opgave .vaelger:nth-child(4)");
-    paastand("100.000 gange er rigtigt", L.naaet && d.querySelector("#lup-opgave .vaelger:nth-child(4)").classList.contains("rigtig"));
+    paastand("mål 4 har fire svar på kortet og ingen pH at nå", d.querySelectorAll("#lup-skort .sk-knap[data-valg]").length === 4 && L.maal().slags === "valg" &&
+        L.el.indsend.classList.contains("ikke-klar"));
+    mus(cl, "pointerdown", x7, sy); mus(cl, "pointerup", x7, sy);
+    paastand("under spørgsmålet er mærket låst, og kortet blinker", L.ph === 2 && !L.glid && L.el.skort.classList.contains("blink"));
+    klik('#lup-skort .sk-knap[data-valg="1"]');
+    paastand("et svar vælger kun", !L.naaet && L.valgNr === 1 && d.querySelector('#lup-skort .sk-knap[data-valg="1"]').classList.contains("valgt") && L.el.indsend.classList.contains("klar"));
+    klik("#lup-indsend");
+    paastand("Indsend svar: 50 gange giver beskeden om at gange", !L.naaet && /lagt 10 sammen/.test(L.el.besked.textContent) && /Vælg igen/.test(L.el.besked.textContent) &&
+        d.querySelector('#lup-skort .sk-knap[data-valg="1"]').classList.contains("forkert"));
+    klik('#lup-skort .sk-knap[data-valg="3"]'); klik("#lup-indsend");
+    paastand("100.000 gange er rigtigt, og svaret bliver grønt dér, hvor det stod", L.naaet && d.querySelector('#lup-skort .sk-knap[data-valg="3"]').classList.contains("rigtig") &&
+        /100\.000 gange/.test(blivTekst(L)));
     L.knap(); tik(L, 0.3);
     var x12 = Tg.skalaX(ll.skala, 12), zoomUd = 0, zoomInd = 0, zs = L.lup.z;
     mus(cl, "pointerdown", Tg.skalaX(ll.skala, 2), sy);
@@ -364,14 +396,16 @@ function koerTest(W) {
     paastand("fra pH 2 til 12 zoomer luppen 4 gange ud og 4 gange ind", zoomUd === 4 && zoomInd === 4, zoomUd + " ud, " + zoomInd + " ind");
     mus(cl, "pointerup", x12, sy);
     tik(L, 1);
-    paastand("pH 12: 100 OH⁻ og ingen H₃O⁺, og mål 5 er nået", L.naaet && L.lup.z === 4 && L.lup.synlige("oh") === 100 && L.lup.synlige("h3o") === 0);
+    klik("#lup-indsend"); tik(L, 0.1);
+    tik(L, 1);
+    paastand("pH 12 og Indsend svar: 100 OH⁻ og ingen H₃O⁺, og mål 5 er nået", L.naaet && L.lup.z === 4 && L.lup.synlige("oh") === 100 && L.lup.synlige("h3o") === 0);
     tik(L, 1);
     paastand("efter det sidste mål roser Kemichael", !!(L.laerer.scene && L.laerer.scene.navn === "faerdig"));
     tik(L, 8);
     L.knap();
     paastand("knappen går videre til fortyndingen", d.getElementById("fane-fortynd").classList.contains("aktiv"));
     klik('[data-fane="fane-lup"]');
-    paastand("fane 2 har nu frit valg", !L.maal() && L.el.knap.textContent === "Start målene forfra");
+    paastand("fane 2 har nu frit valg uden knapper på kortet", !L.maal() && /^Frit valg/.test(kortTekst(L)) && !vises(L.el.knap) && !vises(L.el.indsend));
     L.glid = null; L.saetPh(7); L.traek = null; L.lup.straks();
     L.tast({ key: "ArrowLeft" });
     paastand("venstre pil sænker pH med 0,1", naer(L.ph, 6.9, 1e-9));
@@ -385,13 +419,13 @@ function koerTest(W) {
         if (Math.max(a1, a2) > 102 || Math.max(a1, a2) < 10) forMange.push(q / 10 + ": " + a1 + "/" + a2);
     }
     paastand("færdigzoomet tegner luppen 10-100 prikker af den ion, der er flest af, ved alle pH", forMange.length === 0, forMange.slice(0, 4).join("; "));
-    L.knap();
-    paastand("Start målene forfra", L.nr === 0 && L.maal() === D.LUP_MAAL[0] && L.ph === 7 && L.lup.z === 8);
+    klik("#lup-forfra");
+    paastand("Start målene forfra (i panelet)", L.nr === 0 && L.maal() === D.LUP_MAAL[0] && L.ph === 7 && L.lup.z === 8);
     L.nr = 2; L.startMaal(); L.knap(); L.knap(); tik(L, 0.1);
     paastand("Vis svaret på mål 3: knappen venter, mens mærket glider", L.el.knap.disabled && !L.naaet);
     tik(L, 5);
     paastand("og så er mærket på pH 2, luppen har zoomet, og svaret står i gult", L.naaet && L.ph === 2 && L.lup.z === 4 &&
-        /Svar:/.test(L.el.besked.innerHTML) && /gul/.test(L.el.besked.className));
+        L.el.skort.classList.contains("svar") && /^Svaret/.test(blivTekst(L)));
     L.nr = 0; L.startMaal();
 
     overskrift("9. Fortyndingen kan gennemføres");
@@ -407,27 +441,30 @@ function koerTest(W) {
     var ks = lf.knapSyre, kb = lf.knapBase;
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
     paastand("kravlegården: før buddet er valgt, virker knappen ikke og siger hvorfor", !F.anim && /Vælg dit bud/.test(F.el.besked.textContent));
-    klik("#fortynd-opgave .vaelger:nth-child(2)");
-    paastand("mål 1: et bud på pH 1,1 bliver husket", F.valgNr === 1 && /Dit bud/.test(F.el.besked.textContent) && !F.naaet);
+    klik('#fortynd-skort .sk-knap[data-valg="1"]');
+    paastand("mål 1: et bud på kortet vælger kun, og knappen virker stadig ikke", F.valgNr === 1 && F.budNr < 0 && F.spaerret("syre") !== "" && F.el.indsend.classList.contains("klar"));
+    klik("#fortynd-indsend");
+    paastand("mål 1: Indsend svar husker buddet pH 1,1", F.budNr === 1 && /Dit bud/.test(F.el.besked.textContent) && !F.naaet && F.spaerret("syre") === "");
     mus(cf, "pointerup", kb.x + kb.b / 2, kb.y + kb.h / 2);
     paastand("kravlegården: natriumhydroxidens knap er spærret i mål 1", !F.anim && /saltsyren/.test(F.el.besked.textContent) && F.spaerret("base") !== "");
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
     paastand("knappen Fortynd 10 gange starter pipetten", !!F.anim && F.animFase() === "suger");
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
-    paastand("et klik mere, mens der fyldes, giver en besked", /Vent/.test(F.el.besked.textContent) && F.serier.syre.length === 2);
+    paastand("et klik mere, mens der fyldes, laver ikke et glas til, og kortet blinker", F.el.skort.classList.contains("blink") && F.serier.syre.length === 2);
     tik(F, 2.0);
     var g1 = F.serier.syre[1];
     paastand("det nye glas har pH 2,00 og står under pH 2", !F.anim && K.phTekst(g1.ph, 2) === "2,00" && Math.abs(g1.x - Tg.skalaX(lf.skala, 2)) < 1 && g1.fyld > 100);
     paastand("luppen viser det nye glas i samme rum: 10 gange færre H₃O⁺", F.valgt === g1 && F.lup.z === 3 && F.lup.synlige("h3o") === 10 &&
-        /10 gange færre H₃O⁺/.test(d.getElementById("fortynd-status").textContent));
+        /10 gange færre H₃O⁺/.test(d.getElementById("fortynd-besked").textContent), d.getElementById("fortynd-besked").textContent);
     paastand("svaret kommer først, når luppen har zoomet", !F.naaet && !/helt trin/.test(F.el.besked.textContent));
     vent(2);
     paastand("så zoomer luppen ud til et 10 gange større rum med 100 H₃O⁺", F.lup.z === 4 && F.lup.synlige("h3o") === 100 && F.lup.rolig());
     paastand("buddet pH 1,1 var forkert og får sin forklaring", !F.naaet && /helt trin/.test(F.el.besked.textContent));
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
     paastand("kravlegården: der kan ikke fortyndes mere i mål 1", !F.anim && F.serier.syre.length === 2 && /Vælg igen/.test(F.el.besked.textContent));
-    klik("#fortynd-opgave .vaelger:nth-child(3)");
-    paastand("pH 2: mål 1 er nået", F.naaet);
+    klik('#fortynd-skort .sk-knap[data-valg="2"]'); klik("#fortynd-indsend");
+    paastand("pH 2 og Indsend svar: mål 1 er nået, og kortet bliver med forklaringen", F.naaet && /^Rigtigt\s*pH 2/.test(blivTekst(F)) &&
+        d.querySelector('#fortynd-skort .sk-knap[data-valg="2"]').classList.contains("rigtig") && videre(F).textContent === "Næste mål →");
     paastand("panelet viser det nye glas", d.getElementById("fortynd-ph").textContent === "2,00" && d.getElementById("fortynd-nh").textContent === "100");
     F.knap();
     for (i = 0; i < 3; i++) { F.fortynd("syre"); vent(); }
@@ -438,10 +475,14 @@ function koerTest(W) {
     F.knap(); tik(F, 0.2);
     F.fortynd("syre");
     paastand("mål 3 (skriv tallet): knapperne er spærret", !F.anim && /Skriv tallet/.test(F.el.besked.textContent));
-    F.input.value = "40"; F.tjekFelt();
+    paastand("mål 3: feltet står på kortet, og Indsend svar er grå, til der står noget", !!F.input && !!F.input.closest("#fortynd-skort") && F.el.indsend.classList.contains("ikke-klar"));
+    F.input.value = "40"; F.input.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("med et tal i feltet er Indsend svar klar", F.el.indsend.classList.contains("klar") && !F.naaet);
+    klik("#fortynd-indsend");
     paastand("mål 3: 40 giver beskeden om at gange", !F.naaet && /lagt 10 sammen/.test(F.el.besked.textContent));
-    F.input.value = "10.000"; F.tjekFelt();
-    paastand("10.000 er rigtigt", F.naaet);
+    F.input.value = "10.000";
+    F.input.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("10.000 og Enter i feltet (Indsend svar) er rigtigt", F.naaet);
     F.knap(); tik(F, 0.2);
     var surt = true, zNaer7 = [];
     for (i = 0; i < 5; i++) { F.fortynd("syre"); vent(); if (!(F.sidste("syre").ph < 7)) surt = false; zNaer7.push(F.lup.z); }
@@ -459,7 +500,7 @@ function koerTest(W) {
     tik(F, 8);
     F.knap(); tik(F, 0.2);
     paastand("mål 5: nu er det natriumhydroxidens knap, der virker", F.spaerret("base") !== "" && /Vælg dit bud/.test(F.spaerret("base")));
-    klik("#fortynd-opgave .vaelger:nth-child(3)");
+    klik('#fortynd-skort .sk-knap[data-valg="2"]'); klik("#fortynd-indsend");
     for (i = 0; i < 3; i++) { F.fortynd("base"); vent(); }
     paastand("mål 5: natriumhydroxiden fortyndet 1.000 gange har pH 10,00, og målet er nået", F.naaet && K.phTekst(F.sidste("base").ph, 2) === "10,00");
     paastand("luppen viser 100 OH⁻ i pH 10-glasset", F.lup.z === 6 && F.lup.synlige("oh") === 100);
@@ -467,7 +508,7 @@ function koerTest(W) {
     paastand("efter det sidste mål roser Kemichael", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
     tik(F, 8);
     F.knap();
-    paastand("frit valg bagefter: basens knap virker, syrens række er fuld", !F.maal() && F.el.knap.textContent === "Start målene forfra" &&
+    paastand("frit valg bagefter: basens knap virker, syrens række er fuld", !F.maal() && /^Frit valg/.test(kortTekst(F)) && !vises(F.el.knap) &&
         F.spaerret("base") === "" && /ikke plads/.test(F.spaerret("syre")));
     var basisk = F.serier.base.every(function (g) { return g.ph > 7; });
     paastand("natriumhydroxiden er basisk i alle glas", basisk);
@@ -478,8 +519,8 @@ function koerTest(W) {
         F.lup.z === 6 && F.lup.synlige("h3o") === 100);
     F.nulstil();
     paastand("Tøm bordet efterlader kun de to flasker", F.serier.syre.length === 1 && F.serier.base.length === 1);
-    F.knap();
-    paastand("Start målene forfra", F.nr === 0);
+    klik("#fortynd-forfra");
+    paastand("Start målene forfra (i panelet)", F.nr === 0 && !/forfra/i.test(F.el.skort.textContent));
     F.nr = 1; F.startMaal(); F.knap(); F.knap(); tik(F, 12);
     paastand("Vis svaret på mål 2 fortynder selv til pH 5", F.naaet && F.antalFortyndinger("syre") >= 4);
     F.nr = 0; F.toemBordet(); F.startMaal();
@@ -503,7 +544,7 @@ function koerTest(W) {
     L.springIntro(); tik(L, 3);
     paastand("Esc og Spring præsentationen over sender ham ud", !L.laererIIntro());
     L.nr = 0; L.startMaal();
-    var tur = ["#skala-anker-skala", "#skala-anker-stoffer", "#skala-anker-meter", "#skala-anker-baner", "#skala-kort",
+    var tur = ["#skala-skort", "#lup-skort", "#fortynd-skort", "#skala-gaetkort", "#skala-anker-skala", "#skala-anker-stoffer", "#skala-anker-meter", "#skala-anker-baner",
         "#lup-anker-skala", "#lup-anker-glas", "#lup-anker-lup", "#lup-anker-zoom", "#lup-maaling", "#lup-kort",
         "#fortynd-anker-knapper", "#fortynd-anker-flasker", "#fortynd-anker-skala", "#fortynd-anker-lup", "#fortynd-glas", "#fortynd-kort"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
@@ -528,6 +569,8 @@ function koerTest(W) {
             }
             var sk = { x: lay.skala.x0, y: lay.skala.y, b: lay.skala.x1 - lay.skala.x0, h: lay.skalaBund - lay.skala.y };
             inde(sk, "skalaen");
+            var top = id === "fane-skala" ? lay.luft : (id === "fane-lup" ? lay.skala.y - 52 : lay.skala.y);
+            if (top < 10 + sim.kortZone() + 2) problemer.push(id + ": skalaen ligger oppe under kortet");
             if (id === "fane-skala") {
                 var bh = Tg.stofBredde(lay.hi);
                 lay.pladser.forEach(function (x, i) {
@@ -566,6 +609,49 @@ function koerTest(W) {
             }
         });
         paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    overskrift("12. Papirkortet holder sig i sin plads (almindelig og lav skærm)");
+    [[1400, 860], [1100, 700]].forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var hoejst = 0, pr = [];
+        function maal(sim, hvor) {
+            sim.tilpas(); sim.visKort();
+            var h = sim.el.skort.offsetHeight;
+            hoejst = Math.max(hoejst, h);
+            if (h > sim.kortZone()) pr.push(hvor + " " + h + " > " + sim.kortZone());
+        }
+        klik('[data-fane="fane-skala"]');
+        S.nulstil(); tik(S, 0.2); maal(S, "skala");
+        S.besked("Under 7 er surt, 7 er neutralt, og over 7 er basisk. Træk et stof herop.", "peger"); maal(S, "skala klik");
+        S.hjaelpKlik(); maal(S, "skala hint 1");
+        S.hylde = 1; S.startHylde(); S.hjaelpKlik(); maal(S, "skala hint 2");
+        S.hjaelpKlik(); tik(S, 14); maal(S, "skala målt");
+        S.nulstil();
+        klik('[data-fane="fane-lup"]');
+        D.LUP_MAAL.forEach(function (m, i) {
+            L.nr = i; L.startMaal(); tik(L, 0.1); maal(L, "lup " + (i + 1));
+            L.hjaelpKlik(); maal(L, "lup hint " + (i + 1));
+            if (m.slags === "valg") {
+                m.valg.forEach(function (v, j) { if (v[1].length > 0) { L.valgNr = j; L.forkert = {}; L.indsend(); maal(L, "lup fejl " + j); } });
+                L.hjaelp = 1;
+            } else { L.saetPh(m.start + (m.ph > m.start ? 0.5 : -0.5)); tik(L, 2); L.indsend(); tik(L, 0.2); maal(L, "lup fejl " + (i + 1)); }
+            L.hjaelpKlik(); tik(L, 5); maal(L, "lup svaret " + (i + 1));
+        });
+        L.nr = D.LUP_MAAL.length; L.startMaal(); maal(L, "lup frit valg");
+        L.nr = 0; L.startMaal();
+        klik('[data-fane="fane-fortynd"]');
+        D.FORTYND_MAAL.forEach(function (m, i) {
+            F.nr = i; F.toemBordet(); F.startMaal(); tik(F, 0.1); maal(F, "fortynd " + (i + 1));
+            F.hjaelpKlik(); maal(F, "fortynd hint " + (i + 1));
+            F.besked(NK.Skort.maerke("Ikke endnu", NK.html("Ti gange mere vand giver ti gange færre H₃O⁺. Det er et helt trin. Vælg igen.")), "skidt"); maal(F, "fortynd fejl " + (i + 1));
+            F.besked(F.spaerret(m.serie === "base" ? "syre" : "base") || "Luppen viser det nyeste glas eller det glas, du har klikket på. Den zoomer selv til 10 til 100 af den ion, der er flest af.", "peger");
+            maal(F, "fortynd besked " + (i + 1));
+            F.besked("", ""); F.hjaelpKlik(); tik(F, 14); maal(F, "fortynd svaret " + (i + 1));
+        });
+        F.nr = D.FORTYND_MAAL.length; F.startMaal(); maal(F, "fortynd frit valg");
+        F.nr = 0; F.toemBordet(); F.startMaal();
+        paastand("ved " + st[0] + " × " + st[1] + " er kortet højst " + hoejst + " px og holder sig i kortZone", pr.length === 0, pr.slice(0, 3).join("; "));
     });
     ramme.style.width = "";
     ramme.style.height = "";

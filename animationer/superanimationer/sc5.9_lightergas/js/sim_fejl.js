@@ -26,13 +26,12 @@
     function SimFejl() {
         this.over = null;
         this.startFane(D.FEJL);
-        this.el.valg = NK.el("fejl-valg");
         this.introNu = true;
         this.vaelg(0, false);
     }
 
     var P = SimFejl.prototype;
-    NK.Fane.paa(P, { navn: "fejl" });
+    NK.Fane.paa(P, { navn: "fejl", naesteTekst: "Næste fejlkilde →", zone: [236, 222] });
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -65,26 +64,31 @@
         this.start();
     };
 
+    /* Spoergsmaalet bliver staaende, ogsaa naar forsoegene har vist svaret */
     P.promptHTML = function () {
-        var o = this.opg;
-        return '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>" +
-            (this.faerdig ? "" : '<p class="opgave-spm">' + NK.html(D.FEJL_SPM) + "</p>");
+        return NK.html(this.opg.tekst) + " " + NK.html(D.FEJL_SPM);
     };
 
+    /* Gaettet: forsoegene er laast, til eleven har valgt */
+    P.gaetNu = function () { return this.valgt === null; };
+
+    /* Svarene paa kortet. Et gaet er gratis og saetter forsoegene i gang med
+       det samme. Bagefter er det rigtige groent (gult, naar svaret blev
+       vist), et forkert gaet roedt og resten tonet ned. */
     P.visKortEkstra = function () {
         var mig = this, e = this.el.valg, o = this.opg;
         e.hidden = false;
-        e.innerHTML = "";
+        e.className = "sk-svar n3";
         D.FEJL_SVAR.forEach(function (s, j) {
             var b = document.createElement("button");
             b.type = "button";
-            b.className = "knap";
-            b.textContent = s.t;
+            b.className = "sk-knap";
+            b.innerHTML = '<span class="v-bogstav">' + "ABC".charAt(j) + "</span><span>" + NK.html(s.t) + "</span>";
             if (mig.valgt !== null) {
                 b.disabled = true;
-                if (j === mig.valgt) b.classList.add("valgt");
-                if (mig.faerdig && s.id === o.rigtig) b.classList.add("rigtig");
-                if (mig.faerdig && j === mig.valgt && s.id !== o.rigtig) b.classList.add("forkert");
+                if (!mig.faerdig) b.classList.add(j === mig.valgt ? "valgt" : "dim");
+                else if (s.id === o.rigtig) b.classList.add(mig.svarVist ? "svar-vist" : "rigtig");
+                else b.classList.add(j === mig.valgt ? "forkert" : "dim");
             }
             b.addEventListener("click", function () { mig.vaelgSvar(j, "gaet"); });
             e.appendChild(b);
@@ -95,6 +99,7 @@
         if (this.valgt !== null) return;
         this.valgt = j;
         this.hjaelp = 0;
+        this.svarVist = maade === "svar";
         if (maade === "svar") {
             this.brugtSvar = true;
             this.svarForud = NK.html("Den rigtige: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene.");
@@ -107,10 +112,12 @@
         this.auto = true;
         this.res = null;
         this.visTabel();
-        this.visKort();
+        /* Koer igen paa en loest opgave: forklaringen bliver staaende */
+        if (this.faerdig) { this.visKort(); return; }
         var pre = this.svarForud || (this.brugtSvar ? "" : "Dit gæt: " + NK.html(D.FEJL_SVAR[this.valgt].t.toLowerCase()) + ".");
         this.svarForud = "";
         this.besked((pre ? pre + " " : "") + this.trinLinje(), this.brugtSvar ? "gul" : "");
+        this.visKort();
     };
 
     /* ----- Knappen og linjen ------------------------------------------------------ */
@@ -124,7 +131,7 @@
     P.opgaveFaerdig = function () { return this.res !== null; };
 
     P.trinLinje = function () {
-        if (this.valgt === null) return "Gæt først: vælg et af svarene herunder.";
+        if (this.valgt === null) return "Et gæt er gratis. Klik på det svar, du tror passer.";
         if (this.koerer) return "Begge grupper laver forsøget. Hold øje med måleglassene og tallene.";
         return "";
     };
@@ -141,14 +148,15 @@
         this.forklaring = NK.html(pre + " " + o.forkl);
         this.visTabel();
         if (this.faerdig) {
-            /* Koer igen efter en loest opgave: kun tabellen og linjen skifter */
-            this.besked(this.forklaring, "god");
+            /* Koer igen efter en loest opgave: kun tabellen og forklaringen skifter */
+            this.besked(this.forklaring, this.slutKlasse || "god");
             this.visKort();
             return;
         }
         /* Et forkert gaet giver ingen stjerne, men opgaven er loest */
         var ret = s.id === o.rigtig, havde = this.status[this.nr].stjerne;
         this.trinLoest(ret && !this.brugtSvar ? "ok" : "svar", null);
+        this.slutKlasse = this.fast.klasse;
         if (!ret) {
             this.status[this.nr].stjerne = havde;
             this.gem();
@@ -209,10 +217,6 @@
             s.bobler.opdater(dt, { flow: flow, fang: 1 - f.forbi, kilde: { x: g.dyse.x, y: g.dyse.y - 3 }, fri: false,
                 mund: { x: gl.cx, y: gl.mund, halv: (gl.ind1 - gl.ind0) / 2 }, niveau: gl.yV(f.Vnu()), overflade: geo.vandY, sk: SK });
         });
-        if (this.pegT > 0) {
-            this.pegT -= dt;
-            this.el.valg.classList.toggle("peg", this.pegT > 0);
-        }
     };
 
     /* Hvor lighteren staar i forloebet: paa bordet, i vandet eller paa vej */
@@ -254,10 +258,9 @@
 
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
-        if (this.valgt === null && (u === "a" || u === "b")) {
-            this.kortBesked("Gæt først: vælg et af svarene i kortet.");
-            this.pegT = 1.6;
-        } else if (u === "a") this.kortBesked(D.FEJL_A);
+        /* Under gaettet er forsoegene laast: kortet blinker */
+        if (this.valgt === null) this.kortBlink();
+        else if (u === "a") this.kortBesked(D.FEJL_A);
         else if (u === "b") this.kortBesked(NK.html(this.opg.tekst));
         return false;
     };
@@ -265,8 +268,11 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var k = Math.min(W / SB, H / SH);
-        var lay = { W: W, H: H, k: k, ox: (W - SB * k) / 2, oy: H - SH * k };
+        /* Det oeverste i scenen (maerket 500 mL over glasset) begynder under kortets plads */
+        var topS = Math.min(this.st[0].geo.glas.y0, this.st[1].geo.glas.y0) - 30;
+        var top = this.kortZone() + 8;
+        var k = Math.min(W / SB, H / SH, (H - top) / (SH - topS));
+        var lay = { W: W, H: H, k: k, ox: (W - SB * k) / 2, oy: H - SH * k, top: top };
         this.lay = lay;
         var mig = this;
         [0, 1].forEach(function (i) {

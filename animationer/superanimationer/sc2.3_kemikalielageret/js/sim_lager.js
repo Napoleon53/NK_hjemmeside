@@ -9,9 +9,12 @@
    printer en ny etiket.
 
    Panelet er ét opgavekort med raekker: en pr. ion og én til sidst.
-   Knappen under raekkerne giver foerst et hint og saa svaret til det
-   felt, man staar i. Et forkert svar giver en besked, der passer til
-   fejlen (js/tjek.js).
+   Opgaven, hint, bedoemmelsen og knapperne staar paa papirkortet
+   oeverst i scenen (6. nov. 2026, visSkort): Giv et hint giver foerst et
+   hint og saa svaret til det felt, man staar i, og Indsend svar (eller
+   Enter i feltet) tjekker feltet. Et forkert svar giver en besked, der
+   passer til fejlen (js/tjek.js). Er glasset loest, bliver kortet paa
+   opgaven med forklaringen, og Naeste glas staar, hvor Indsend svar stod.
 
    Hvad eleven har loest, og om det blev loest uden at se svaret
    (stjernen), huskes i browseren under NOEGLE.
@@ -113,9 +116,9 @@
         this.valgt = -1;
         this.vaelg(plads, true);
         this.over = null;
-        NK.saetHTML("lager-status", NK.indstil.svaer
+        this.besked(NK.indstil.svaer
             ? D.stort(D.SVAER_ANTAL_ORD) + " glas har fået sværere ioner. De nye sammensatte ioner står på plakaten."
-            : "Reolen har igen de almindelige ioner.");
+            : "Reolen har igen de almindelige ioner.", "peger");
     };
 
     P.antalLoest = function (hylde) {
@@ -160,15 +163,18 @@
            dog mindst storMin, saa dets etiket altid kan laeses. */
         var rx = Math.max(10, W * 0.02);
         var rb = W * 0.765 - rx;
-        var ry = Math.max(18, H * 0.045);
+        /* Reolen begynder under papirkortet, som staar over den */
+        var ry = this.top();
         lay.tyk = NK.klamp(H * 0.018, 8, 14);
         lay.slot = (rb - 24) / 10;
         var breddeH = lay.slot * 0.88 / 0.77;
         /* Skiltet sidder paa hyldebraettet og naar lidt under det */
         lay.skiltUnder = 20 + 1 - lay.tyk;
         var luft = lay.skiltUnder + 5;
-        var storMin = NK.klamp(H * 0.25, 100, 150);
-        var rhMax = Math.min(H * 0.62 - ry, lay.bordY - storMin - 34 - ry);
+        /* Papirkortet tager toppen, saa reolen maa gaa lidt laengere ned
+           end foer kortet (H * 0.62 og storMin 150; nu hoejst 130) */
+        var storMin = NK.klamp(H * 0.2, 100, 130);
+        var rhMax = Math.min(H * 0.70 - ry, lay.bordY - storMin - 34 - ry);
         var rh = Math.min(3 * (breddeH + lay.tyk + luft) + lay.tyk, rhMax);
         lay.reol = { x: rx, y: ry, b: rb, h: rh };
         var rum = (rh - lay.tyk) / 3;
@@ -202,6 +208,7 @@
         };
         lay.kop = { x: Math.min(W - 34, lay.maskine.x + mb + 40), y: lay.bordY };
         this.lay = lay;
+        this.kortRamme();
 
         /* Kuglerne springer til deres nye plads, naar vinduet skifter */
         var antal = {}, mig = this;
@@ -238,15 +245,27 @@
         this.el = {
             hylde: NK.el("lager-hylde"),
             prompt: NK.el("lager-prompt"),
-            spm: NK.el("lager-spm"),
             raekker: NK.el("lager-raekker"),
-            besked: NK.el("lager-besked"),
+            skort: NK.el("lager-skort"),
             knap: NK.el("lager-knap"),
             kort: NK.el("lager-kort"),
             hylder: NK.el("lager-hylder"),
             nulstil: NK.el("lager-nulstil")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        /* Panelets knap er kun Oev glasset igen paa et loest glas */
+        this.el.knap.addEventListener("click", function () {
+            if (mig.opg && mig.opg.gennemsyn) mig.nyOpgave(false);
+        });
+        this.beskedH = "";
+        this.beskedK = "";
+        this.el.skort.addEventListener("click", function (e) {
+            var b = e.target.closest ? e.target.closest("button") : null;
+            if (!b) return;
+            b.blur();
+            if (b.hasAttribute("data-videre")) mig.videre();
+            else if (b.classList.contains("hjaelp")) mig.knap();
+            else if (b.classList.contains("indsend")) mig.indsend();
+        });
 
         /* Fremskridtet: én linje pr. hylde. Et klik henter det naeste
            uloeste glas fra den hylde. */
@@ -310,7 +329,6 @@
         var st = this.stoffer[i];
         this.flyv = (straks || !lay) ? null : { fra: { x: lay.pladser[i].x, y: lay.pladser[i].y, h: lay.pladser[i].h }, t: 0 };
         this.nyOpgave(this.status[i].loest);
-        this.visStatus();
         return st;
     };
 
@@ -346,7 +364,6 @@
             this.opg.k = felter.length;
             this.opg.faerdig = true;
             this.fuldeKugler();
-            this.besked(this.status[this.valgt].stjerne ? "Løst uden hjælp. ★" : "Løst.", "god");
         } else {
             felter[0].status = "aktiv";
         }
@@ -390,11 +407,10 @@
                 } else {
                     var ph = PLADSHOLDER[f.slags];
                     if (f.slags === "ionnavn" && r.ion.q < 0) ph = PLADSHOLDER.ionnavnMinus;
+                    /* Feltet sendes med Enter eller Indsend svar paa kortet */
                     fe.innerHTML = '<input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"' +
                         ' aria-label="' + r.etiket + (f.slags === "ionnavn" ? ", navn" : "") + '" placeholder="' + ph + '"' +
-                        (f.status === "aktiv" ? "" : " disabled") + '>' +
-                        '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' +
-                        (f.status === "aktiv" ? "" : " disabled") + '>↵</button>';
+                        (f.status === "aktiv" ? "" : " disabled") + '>';
                     var inp = fe.querySelector("input");
                     inp.addEventListener("keydown", function (e) {
                         if (e.key !== "Enter") return;
@@ -406,7 +422,6 @@
                     inp.addEventListener("input", function () { mig.tast(); });
                     inp.addEventListener("focus", function () { mig.fokuseret = true; });
                     inp.addEventListener("blur", function () { mig.fokuseret = false; });
-                    fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                     f.input = inp;
                     f.feltEl = fe;
                 }
@@ -430,53 +445,122 @@
         NK.saetHTML("lager-hylde", '<span class="hyldeprik" style="background:' + h.farve + '"></span>' + h.navn);
         NK.saetTekst("lager-nr", String(st.pladsPaaHylde + 1));
         NK.saetTekst("lager-prompt", D.kendt(st));
-        NK.saetTekst("lager-spm", st.retning === "formel"
-            ? "Find ionerne, og skriv formlen."
-            : "Find ionerne, og skriv navnet.");
         this.el.kort.classList.toggle("sejr", o.faerdig && !o.gennemsyn);
-        this.visKnap();
+        this.el.knap.hidden = !(o.faerdig && o.gennemsyn);
+        this.el.knap.className = "knap";
+        this.visSkort();
         this.opdaterFremskridt();
     };
 
-    P.visKnap = function () {
-        var o = this.opg, tekst, klasse = "knap blaa";
+    /* ----- Papirkortet ------------------------------------------------------------
+       Den hoejde, kortet har faaet sat af oeverst i scenen. Reolen begynder
+       under top(). Selvtesten maaler kortet med det laengste hint, den
+       laengste fejlbesked og den laengste forklaring i en almindelig og en
+       lav skaerm. */
+    P.kortZone = function () {
+        return window.innerHeight <= 720 ? 136 : 158;
+    };
+
+    P.top = function () { return 10 + this.kortZone() + 10; };
+
+    /* Kortet staar over reolen (ikke over plakaterne) */
+    P.kortRamme = function () {
+        var e = this.el && this.el.skort, r = this.lay && this.lay.reol;
+        if (!e || !r) return;
+        e.style.left = Math.round(r.x) + "px";
+        e.style.width = Math.round(r.b) + "px";
+    };
+
+    P.kanSendes = function () {
+        var f = this.aktivtFelt();
+        return !!(f && f.input && f.input.value.trim());
+    };
+
+    P.visSkort = function () {
+        var o = this.opg, e = this.el && this.el.skort;
+        if (!o || !e) return;
+        var st = o.st;
+        var chip = '<span class="sk-chip">Glas ' + (st.pladsPaaHylde + 1) + " af 10</span>";
+        var kendt = 'Etiketten siger <span class="sk-kendt">' + NK.html(D.kendt(st)) + "</span>. ";
+        var html, kl;
         if (o.faerdig) {
-            if (o.gennemsyn) tekst = "Øv glasset igen";
-            else { tekst = "Næste glas →"; klasse += " banker"; }
+            var stjerne = this.status[this.valgt] && this.status[this.valgt].stjerne;
+            var vist = !o.gennemsyn && o.brugtSvar;
+            var maerke = o.gennemsyn ? (stjerne ? "Løst uden hjælp ★" : "Løst") : (vist ? "Løst med hjælp" : "Rigtigt");
+            /* Svaret paa det sidste felt (uden sit maerke) eller selve svaret, og saa fakta */
+            var note = o.gennemsyn ? "" : (o.slutNote || "").replace(/<span class="b-maerke">[^<]*<\/span>/g, "");
+            var forkl = (note ? note + " " : "<b>" + NK.html(st.retning === "formel" ? st.formelTekst : st.navn) + "</b> er " +
+                (st.retning === "formel" ? "formlen" : "navnet") + ". ") + NK.html(st.fakta);
+            kl = "scenekort loest bliv" + (vist ? " svar" : "");
+            html = '<p class="sk-tekst">' + chip + kendt + (o.gennemsyn ? "Glasset er løst, og facit står i panelet." :
+                (st.retning === "formel" ? "Ionerne og formlen er fundet." : "Ionerne og navnet er fundet.")) + "</p>" +
+                (this.beskedK === "peger" && this.beskedH ? '<p class="sk-trin">' + this.beskedH + "</p>" : "") +
+                NK.Papir.bliv(forkl, maerke, "Næste glas →", vist);
         } else {
-            tekst = o.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            klasse = "knap";
+            var f = this.aktivtFelt();
+            kl = "scenekort opgave";
+            html = '<p class="sk-tekst">' + chip + kendt + (st.retning === "formel" ? "Find ionerne, og skriv formlen." :
+                "Find ionerne, og skriv navnet.") + "</p>" +
+                '<p class="sk-trin"><b>' + NK.html(displayOpgave(f)) + "</b> i feltet i panelet.</p>" +
+                '<div class="sk-bund' + (this.beskedK ? " " + this.beskedK : "") + (this.beskedH ? "" : " tom") + '">' +
+                '<p class="st-tekst">' + this.beskedH + "</p>" +
+                '<button type="button" class="knap hjaelp' + (o.hjaelp ? " svar" : "") + (this.pegHint ? " peg" : "") + '">' +
+                (o.hjaelp ? "Vis svaret" : "Giv et hint") + "</button>" +
+                '<button type="button" class="knap indsend ' + (this.kanSendes() ? "klar" : "ikke-klar") + '">Indsend svar</button></div>';
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
+        if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        e.innerHTML = html;
+    };
+
+    /* Indsend svar er graa, til der staar noget i feltet */
+    P.visIndsend = function () {
+        var b = this.el && this.el.skort.querySelector(".indsend");
+        if (!b) return;
+        var klar = this.kanSendes();
+        b.classList.toggle("klar", klar);
+        b.classList.toggle("ikke-klar", !klar);
+    };
+
+    P.kortBlink = function () {
+        var e = this.el.skort;
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
     };
 
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.beskedH = html || "";
+        this.beskedK = html ? (klasse || "") : "";
+        this.visSkort();
     };
 
-    /* Hint -> svar -> naeste glas, eller: oev det loeste glas igen */
+    /* Indsend svar paa kortet: det samme som Enter i feltet */
+    P.indsend = function () {
+        if (!this.kanSendes()) { this.kortBlink(); this.fokus(); return; }
+        this.tjek();
+    };
+
+    /* Kortets groenne knap gaar altid fremad (brugeren 3. nov. 2026) */
+    P.videre = function () {
+        this.vaelg(this.naesteUloeste(this.valgt));
+    };
+
+    /* Giv et hint -> Vis svaret (til det felt, eleven staar i) */
     P.knap = function () {
         var o = this.opg;
-        if (o.faerdig) {
-            if (o.gennemsyn) this.nyOpgave(false);
-            else this.vaelg(this.naesteUloeste(this.valgt));
-            return;
-        }
+        if (o.faerdig) { this.videre(); return; }
         var f = this.aktivtFelt();
         var h = D.hjaelp(o.st, f.raekke, f);
+        this.pegHint = false;
         if (o.hjaelp === 0) {
             o.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + h.hint, "gul");
             if (h.plakat) this.plakatPuls = { slags: h.plakat, t: 0, fremhaev: h.fremhaev || null };
             if (h.regnskab) this.regnHint = true;
-            this.visKnap();
+            this.besked('<span class="b-maerke">Hint</span>' + h.hint, "hint");
             this.fokus();
         } else {
             o.brugtSvar = true;
-            this.feltRigtigt(f, "svar");
-            this.besked(h.svar, "gul");
+            this.feltRigtigt(f, "svar", '<span class="b-maerke">Svaret</span>' + h.svar);
         }
     };
 
@@ -488,6 +572,7 @@
 
     P.tast = function () {
         this.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
+        this.visIndsend();
     };
 
     P.tjek = function () {
@@ -500,13 +585,13 @@
         else if (f.slags === "formel") res = Tj.formel(raa, st);
         else res = Tj.navn(raa, st);
 
-        if (res.tom) { this.besked(res.besked, ""); this.fokus(); return; }
+        if (res.tom) { this.besked(res.besked, "peger"); this.kortBlink(); this.fokus(); return; }
         if (res.ok) {
-            this.feltRigtigt(f, "ok");
-            if (res.note) this.besked(res.note, "gul");
+            this.feltRigtigt(f, "ok", res.note || "");
             return;
         }
         f.forsoeg++;
+        this.pegHint = true;
         this.besked(res.besked, "skidt");
         if (f.feltEl) {
             f.feltEl.classList.remove("ryst");
@@ -517,14 +602,19 @@
     };
 
     /* Et felt er klaret, enten rigtigt eller ved at se svaret */
-    P.feltRigtigt = function (f, maade) {
+    /* note: svaret eller en bemaerkning til feltet. Den staar under det
+       naeste felt, eller i forklaringen, naar glasset er loest. */
+    P.feltRigtigt = function (f, maade, note) {
         var o = this.opg;
         f.status = maade;
         f.vaerdi = this.korrekt(f);
         if (f.slags === "ion") this.nyKugle(f.raekke.ion);
         o.hjaelp = 0;
+        this.pegHint = false;
         this.plakatPuls = null;
-        this.besked("", "");
+        this.beskedH = note || "";
+        this.beskedK = note ? "gul" : "";
+        o.slutNote = note || "";
         if (o.k >= o.felter.length - 1) {
             o.k = o.felter.length;
             this.loes();
@@ -548,20 +638,10 @@
         s.stjerne = s.stjerne || !o.brugtSvar;
         this.gem();
         this.startRegnskab();
-        this.visStatus();
         var h = o.st.hylde;
         if (!foer && this.antalLoest(h) === 10 && !this.rost[h]) {
             this.rost[h] = true;
             this.ventRos = { t: 3.2, hylde: h, alt: this.antalLoest() === this.stoffer.length };
-        }
-    };
-
-    P.visStatus = function () {
-        var o = this.opg;
-        if (o && o.faerdig) {
-            NK.saetHTML("lager-status", "<b>" + NK.html(o.st.formelTekst) + "</b> · " + NK.html(o.st.fakta));
-        } else {
-            NK.saetHTML("lager-status", "Klik på et andet glas på reolen for at skifte opgave.");
         }
     };
 
@@ -611,7 +691,7 @@
 
     /* Enter uden for et felt: videre til naeste glas, naar det er loest */
     P.enter = function () {
-        if (this.opg && this.opg.faerdig && !this.opg.gennemsyn) this.knap();
+        if (this.opg && this.opg.faerdig) this.videre();
     };
 
     /* ----- Kuglerne og regnskabet -------------------------------------------- */

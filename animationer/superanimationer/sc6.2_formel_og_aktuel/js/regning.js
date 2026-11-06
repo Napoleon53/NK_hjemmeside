@@ -1,7 +1,7 @@
 /* =====================================================================
    regning.js - regnetrinene paa fane 2 og 3
 
-   Raekkerne i opgavekortet: i hvert trin skriver eleven foerst formlen
+   Raekkerne i panelet (kortet Regnetrinene): i hvert trin skriver eleven foerst formlen
    og saa tallet (brugerens oenske fra sc7.4). Trin, hvor formlen er
    tallet foran ionen, har kun tallet; opløsningsskemaet har to felter
    til tallene foran ionerne. Kun det aktive trin er aabent. Som sc6.1,
@@ -11,8 +11,12 @@
    som "n = ?", til formlen er skrevet, saa som "n = c · V = ?", og til
    sidst som den paene beregning.
 
-   NK.Regning.paa(P) giver fanen trinInfo, trinLinje, opgaveFaerdig og
-   de kald, raekkerne bruger (formelOk, regnLoest, regnFejl).
+   NK.Regning.paa(P) giver fanen trinInfo, trinLinje, opgaveFaerdig, de
+   kald, raekkerne bruger (formelOk, regnLoest, regnFejl), og papirkortet
+   (6. nov. 2026): kortData, spmAaben, indsendKlar og indsendSvar. Opgaven,
+   spoergsmaalet til det aktive trin, hint og fejl staar paa kortet oeverst
+   i scenen; eleven skriver i feltet i panelet og trykker Indsend svar
+   eller Enter. Raekkerne har ingen egen knap.
    ===================================================================== */
 (function () {
     "use strict";
@@ -90,13 +94,13 @@
                 fe.innerHTML = '<span class="felt-pre">' + NK.html(pre) + '</span>' +
                     '<input type="text" inputmode="' + (formel ? "text" : "decimal") + '" autocomplete="off" spellcheck="false" aria-label="' +
                     NK.html((formel ? "Formlen for " : "") + navn) + '" placeholder="' + (formel ? "skriv formlen" : "tallet") + '"' + fra + '>' +
-                    (formel ? "" : '<span class="felt-efter">' + NK.html(t.enhed) + '</span>') +
-                    '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
+                    (formel ? "" : '<span class="felt-efter">' + NK.html(t.enhed) + '</span>');
                 var inp = fe.querySelector("input");
+                /* Enter i feltet er det samme som Indsend svar paa kortet */
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+                    if (e.key === "Enter") { e.preventDefault(); mig.fane.indsendKlik(); }
                 });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+                inp.addEventListener("input", function () { mig.fane.visKnap(); });
                 f.input = inp;
             }
             rk.querySelector(".felter").appendChild(fe);
@@ -118,8 +122,7 @@
                 '<input class="koef" type="text" inputmode="numeric" maxlength="2" aria-label="Tallet foran ' + NK.html(kat) + '"' + fra + '>' +
                 '<span class="sk-tekst">' + NK.html(kat) + "(aq) + </span>" +
                 '<input class="koef" type="text" inputmode="numeric" maxlength="2" aria-label="Tallet foran ' + NK.html(an) + '"' + fra + '>' +
-                '<span class="sk-tekst">' + NK.html(an) + "(aq)</span>" +
-                '<button type="button" class="felt-ok" aria-label="Tjek skemaet" tabindex="-1"' + fra + '>↵</button>';
+                '<span class="sk-tekst">' + NK.html(an) + "(aq)</span>";
             var ind = fe.querySelectorAll("input.koef");
             f.input = ind[0];
             f.input2 = ind[1];
@@ -128,10 +131,10 @@
                     if (e.key !== "Enter") return;
                     e.preventDefault();
                     if (j === 0 && !ind[1].value.trim()) { ind[1].focus(); return; }
-                    mig.tjek();
+                    mig.fane.indsendKlik();
                 });
+                inp.addEventListener("input", function () { mig.fane.visKnap(); });
             });
-            fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
         }
         rk.querySelector(".felter").appendChild(fe);
     };
@@ -206,6 +209,38 @@
         if (id === "afstem") return NK.html(T.skemaTekst(this.opg, true));
         var r = T.regning(id, this.opg);
         return NK.html(r[0] + " " + r[1]);
+    };
+
+    /* Har det aktive felt noget at sende? */
+    P.harSvar = function () {
+        var f = this.aktivt();
+        if (!f || !f.input) return false;
+        if (f.fase === "koef") return !!(f.input.value.trim() && f.input2 && f.input2.value.trim());
+        return !!f.input.value.trim();
+    };
+
+    /* Spoergsmaalet paa papirkortet til det aktive trin (ren tekst) */
+    P.trinSpm = function () {
+        var f = this.aktivt();
+        if (!f) return "";
+        var navn = T.navn(f.id, this.opg), v = T.venstre(f.id, this.opg);
+        if (f.fase === "koef") return navn + ". Hvilke tal står foran ionerne?";
+        if (f.fase === "formel") return navn + ". Hvilken formel giver " + v + "?";
+        return navn + ". Hvad er " + v + "?";
+    };
+
+    P.trinChip = function () {
+        var n = this.felter.length;
+        return n > 1 ? "Trin " + Math.min(this.k + 1, n) + " af " + n : "Trin";
+    };
+
+    /* Linjen nederst paa kortet: hvor eleven skriver */
+    P.trinVej = function () {
+        var f = this.aktivt();
+        if (!f) return "";
+        if (f.fase === "koef") return "Skriv tallene foran ionerne i skemaet i panelet, og tryk på Indsend svar.";
+        if (f.fase === "formel") return "Skriv formlen i feltet i panelet, og tryk på Indsend svar.";
+        return "Skriv tallet i feltet i panelet, og tryk på Indsend svar.";
     };
 
     P.trinTekst = function () {
@@ -315,27 +350,54 @@
             if (r.faerdig()) return null;
             return { hint: r.hintHTML(), svar: function () { r.visSvar(); } };
         };
-        P2.trinLinje = function () { return this.regning.trinTekst(); };
+        P2.trinLinje = function () { return this.regning.trinVej(); };
+
+        /* Papirkortet: opgaven, spoergsmaalet til det aktive trin og til sidst
+           resultatet med knappen videre, hvor Indsend svar stod */
+        P2.kortData = function () {
+            var r = this.regning, intro = this.kortTekst();
+            if (r.faerdig()) {
+                return { slags: "loest", bliv: true, gul: this.sidstMaade === "svar", chip: this.kortChip(), intro: "", tekst: intro,
+                         html: (this.slutLinje ? this.slutLinje() : "") + (this.slutEkstra ? " " + NK.html(this.slutEkstra) : ""),
+                         videre: this.videreTekst() };
+            }
+            return { slags: "spm", chip: this.kortChip() + " · " + r.trinChip(), intro: intro, tekst: r.trinSpm() };
+        };
+        P2.spmAaben = function () { return !this.regning.faerdig() && !this.auto; };
+        P2.indsendKlar = function () { return this.regning.harSvar(); };
+        P2.indsendSvar = function () {
+            var r = this.regning;
+            if (!r.harSvar()) {
+                this.blinkKort();
+                this.kortBesked(NK.html(r.trinVej()), 3.5, "gul");
+                r.fokus();
+                return true;
+            }
+            r.tjek();
+            return true;
+        };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
+        /* Formlen er rigtig (eller vist): kortet spoerger nu om tallet i samme
+           trin, og formlen staar i raekken i panelet */
         P2.formelOk = function (vist, note, formel) {
             this.hjaelp = 0;
-            if (vist) {
-                this.besked("<b>Formlen:</b> " + NK.html(formel) + ". Regn nu tallet ud.", "gul");
-            } else {
-                this.besked((note ? NK.html(note) + " <b>" + NK.html(formel) + "</b>." : "Rigtig formel.") + " Regn nu tallet ud.", "god");
-            }
-            this.visKnap();
+            if (vist) this.svarVis("Formlen er <b>" + NK.html(formel) + "</b>.");
+            else this.naesteLinje(note ? NK.html(note) + " <b>" + NK.html(formel) + "</b>." : "", "");
+            this.visKort();
             this.fokus();
         };
 
         P2.regnLoest = function (id, maade) {
+            this.sidstMaade = maade;
             if (this.efterTrin) this.efterTrin(id, maade);
             this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) + "." : null);
+            this.visKort();
         };
 
         P2.regnFejl = function (besked, tom, id, v) {
-            this.besked(NK.html(besked), tom ? "gul" : "skidt");
+            if (tom) this.besked(NK.html(besked), "gul");
+            else this.fejlLinje(NK.html(besked));
             if (!tom && this.efterFejl) this.efterFejl(id, v);
             this.fokus();
         };

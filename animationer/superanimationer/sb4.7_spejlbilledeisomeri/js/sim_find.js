@@ -3,7 +3,7 @@
 
    Molekylet staar paa tavlen som zigzagformel, tegnet af molekylemotoren
    (../../molekylemotor/). Eleven klikker paa de C-atomer, der har fire
-   forskellige grupper (de faar en stjerne, som i bogen), og trykker Tjek,
+   forskellige grupper (de faar en stjerne, som i bogen), og trykker Indsend svar,
    eller trykker Intet asymmetrisk C-atom. Knappen Vis alle H tegner
    strukturformlen med alle H, saa grupperne kan taelles.
 
@@ -55,18 +55,22 @@
         var mig = this;
         this.valg.innerHTML = "";
         this.knapper = {};
-        function knap(tekst, noegle, klasse, fn) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "valgknap" + (klasse ? " " + klasse : "");
-            k.textContent = tekst;
-            k.addEventListener("click", function () { fn(); mig.fokus(); });
-            mig.valg.appendChild(k);
-            mig.knapper[noegle] = k;
-        }
-        knap("Vis alle H", "h", "vend", function () { mig.skiftH(); });
-        knap("Tjek", "tjek", "tjek", function () { mig.tjek(); });
-        knap("Intet asymmetrisk C-atom", "intet", "", function () { mig.intet(); });
+        /* Vis alle H virker straks. Intet asymmetrisk C-atom er et svar, der
+           vaelges; Indsend svar sender det eller stjernerne */
+        this.lavKnap("Vis alle H", "h", function () { mig.skiftH(); }, "handling");
+        this.lavKnap("Intet asymmetrisk C-atom", "intet", function () { mig.intet(); });
+    };
+
+    /* Vaelges Intet asymmetrisk C-atom, forsvinder stjernerne */
+    P.efterValg = function (noegle) {
+        if (noegle === "intet" && this.antalMarker()) { this.marker = {}; this.forkerte = {}; this.lys = null; }
+    };
+
+    /* Det, Indsend svar sender uden et valgt svar: stjernerne */
+    P.indsendScene = function () {
+        var mig = this;
+        return { klar: this.antalMarker() > 0, mangler: "Klik på de asymmetriske C-atomer, eller vælg Intet asymmetrisk C-atom.",
+            fn: function () { mig.tjek(); } };
     };
 
     P.skiftH = function (til) {
@@ -77,14 +81,13 @@
     };
 
     P.promptHTML = function () {
-        return '<p class="maal-tekst">Klik på de asymmetriske C-atomer, og tryk Tjek.</p>' +
-            '<p class="note-tekst">' + NK.html(this.o.visNavn) + ". Et asymmetrisk C-atom har fire forskellige grupper. Måske er der ingen.</p>";
+        return NK.html(this.o.visNavn + ". Klik på de asymmetriske C-atomer, eller vælg Intet asymmetrisk C-atom. Tryk så Indsend svar.");
     };
 
     P.trinLinje = function () {
         var n = this.antalMarker();
-        if (!n) return "Klik på et C-atom med fire forskellige grupper. Er der ingen, så tryk Intet asymmetrisk C-atom.";
-        return "Klik igen for at fjerne en stjerne. Tryk Tjek, når du er færdig.";
+        if (!n) return "Klik på et C-atom med fire forskellige grupper. Er der ingen, så vælg Intet asymmetrisk C-atom.";
+        return "Klik igen for at fjerne en stjerne. Tryk Indsend svar, når du er færdig.";
     };
 
     P.antalMarker = function () { return Object.keys(this.marker).length; };
@@ -112,7 +115,7 @@
         if (forkert.length) t3 = "Se på det C-atom, der lyser. " + K.grund(this.mol, forkert[0]);
         else if (mangler.length) t3 = "Se på det C-atom, der lyser. Det har " + K.grupperTekst(this.mol, mangler[0]) + ": fire forskellige grupper.";
         else if (!asym.length) t3 = "Se på det C-atom, der lyser. " + K.grund(this.mol, this.fristende()) + " Intet C-atom har fire forskellige grupper.";
-        else t3 = "Du har fundet " + (asym.length === 1 ? "det" : "dem alle") + ". Tryk Tjek.";
+        else t3 = "Du har fundet " + (asym.length === 1 ? "det" : "dem alle") + ". Tryk Indsend svar.";
         return [
             "Et asymmetrisk C-atom har fire forskellige grupper. Et C med to H eller med en dobbeltbinding kan ikke være det.",
             "Nu er alle H tegnet. Se på de C-atomer, der har ét H eller slet intet H, og tæl grupperne.",
@@ -155,7 +158,7 @@
         var asym = this.mm.asym, mig = this;
         var valgte = Object.keys(this.marker).map(Number);
         if (!valgte.length) {
-            this.fejlLinje("Du har ikke markeret noget. Klik på de asymmetriske C-atomer, eller tryk Intet asymmetrisk C-atom.");
+            this.fejlLinje("Du har ikke markeret noget. Klik på de asymmetriske C-atomer, eller vælg Intet asymmetrisk C-atom.");
             return;
         }
         var forkert = valgte.filter(function (id) { return asym.indexOf(id) < 0; });
@@ -187,15 +190,13 @@
         this.fejlLinje("Der er " + (asym.length === 1 ? "et asymmetrisk C-atom" : "to asymmetriske C-atomer") + ". Se efter et C-atom med fire forskellige grupper.");
     };
 
-    P.enter = function () { this.tjek(); };
 
     /* ----- Layout og tegningen --------------------------------------------------------- */
     P.layout = function () {
-        var L = this.L, baand = this.baand();
-        var top = 14, side = 18;
-        var bund = L.h - Math.max(baand.h, 92) - 62 - 6;
+        var L = this.L;
+        var top = this.kortZone(), side = 18;
+        var bund = L.h - 14;
         this.lay = { tavle: { x: side, y: top, b: L.b - side * 2, h: Math.max(200, bund - top) } };
-        this.valg.style.bottom = (baand.h + 10) + "px";
         this.saetAnker("tavle", this.lay.tavle.x, top, this.lay.tavle.b, this.lay.tavle.h);
         this.bygTegning();
     };
@@ -254,6 +255,8 @@
         else this.marker[id] = true;
         delete this.forkerte[id];
         this.lys = null;
+        /* En stjerne er et andet svar end Intet asymmetrisk C-atom */
+        if (this.valgt) this.rydValg();
         this.nulstilHjaelp();
         this.naesteLinje("", "");
     };

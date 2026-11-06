@@ -12,6 +12,12 @@
    (tape over skalaen, et spoergsmaalstegn paa manometeret, "?" paa
    displayet). Naar tallet er regnet, kommer det frem. Tavlen viser de
    paene beregninger, som de skal skrives.
+
+   Papirkortet (6. nov. 2026, js/kort.js): opgaveteksten, linjen med
+   naeste skridt, fejlen, hint og Indsend svar staar paa kortet oeverst
+   i scenen. Felterne, eleven skriver i, staar stadig i panelet; Enter
+   eller Indsend svar sender feltet ind. Naar opgaven er regnet, bliver
+   kortet staaende med facit og Naeste opgave. Nye tal staar i panelet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -105,12 +111,16 @@
 
     P.bygPanel = function () {
         var mig = this;
+        this.kort = new NK.SceneKort("regn", {
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.tjek(); },
+            videre: function () { mig.videre(); }
+        });
         this.el = {
-            kort: NK.el("regn-kort"), knap: NK.el("regn-knap"), besked: NK.el("regn-besked"),
+            kort: NK.el("regn-skort"), knap: NK.el("regn-knap"), besked: NK.el("regn-besked"),
             raekker: NK.el("regn-raekker"), liste: NK.el("regn-liste"), nye: NK.el("regn-nye"),
             niveau: NK.el("regn-niveau"), tavle: NK.el("regn-tavle")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
         this.el.nye.addEventListener("click", function () { mig.vaelg(mig.nr, true); });
         this.el.niveau.innerHTML = "";
         D.NIVEAUER.forEach(function (n) {
@@ -158,6 +168,8 @@
         var forrige = this.o && this.o.def === def ? this.o.givet : null;
         this.nr = i;
         this.niveau = def.niveau;
+        this.kortT = 0;
+        this.kort.note("");
         this.o = G.lavOpgave(def, !!nyeTal, forrige);
         this.o.i = 0;
         this.o.trin.forEach(function (t, j) {
@@ -238,7 +250,7 @@
         return l.length === 1 ? l[0] : l[0] + " " + l[1];
     };
 
-    /* ----- Raekkerne i opgavekortet --------------------------------------------------- */
+    /* ----- Raekkerne i panelet ------------------------------------------------------ */
     P.bygRaekker = function () {
         var mig = this, o = this.o, vaert = this.el.raekker;
         vaert.innerHTML = "";
@@ -264,13 +276,12 @@
                 fe.innerHTML = '<span class="felt-pre">' + pre + "</span>" +
                     '<input type="text" inputmode="' + (formel ? "text" : "decimal") + '" autocomplete="off" spellcheck="false" aria-label="' +
                     NK.html((formel ? "Formlen for " : "") + mig.trinNavn(t)) + '" placeholder="' + (formel ? "skriv formlen" : "tallet") + '"' + fra + ">" +
-                    (formel ? "" : '<span class="felt-efter">' + G.ENHED[t.x] + "</span>") +
-                    '<button type="button" class="felt-ok" aria-label="Tjek" tabindex="-1"' + fra + ">↵</button>";
+                    (formel ? "" : '<span class="felt-efter">' + G.ENHED[t.x] + "</span>");
                 var inp = fe.querySelector("input");
                 inp.addEventListener("keydown", function (e) {
                     if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
                 });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+                inp.addEventListener("input", function () { mig.visKnap(); });
                 t.input = inp;
             }
             rk.querySelector(".felter").appendChild(fe);
@@ -280,11 +291,14 @@
 
     P.visKort = function () {
         var o = this.o, def = o.def;
-        NK.saetTekst("regn-titel", def.navn);
         var l = this.iNiveau(def.niveau), niv = D.NIVEAUER.filter(function (n) { return n.id === def.niveau; })[0];
-        NK.saetTekst("regn-taeller", niv.navn + " " + (l.indexOf(this.nr) + 1) + "/" + l.length);
-        NK.saetHTML("regn-prompt", NK.html(this.opgaveTekst()));
-        this.el.kort.classList.toggle("sejr", this.faerdig);
+        var k = l.indexOf(this.nr) + 1;
+        NK.saetTekst("regn-taeller", niv.navn + " " + k + "/" + l.length);
+        this.kort.vis({
+            kl: "opgave",
+            chip: niv.navn + " " + k + " af " + l.length,
+            tekst: "<b>" + NK.html(def.navn) + ".</b> " + NK.html(this.opgaveTekst())
+        });
         this.visKnap();
     };
 
@@ -296,17 +310,23 @@
         });
     };
 
+    /* Giv hint / Vis svaret og Indsend svar (graa, til der staar noget i feltet) */
     P.visKnap = function () {
-        var tekst, klasse = "knap hjaelp";
-        if (this.faerdig) {
-            klasse = "knap blaa banker";
-            tekst = this.naesteUloeste() >= 0 ? "Næste opgave →" : "Forfra med nye tal ↺";
-        } else {
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            if (this.hjaelp > 0) klasse += " svar";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
+        if (this.faerdig) { this.kort.knapper({ hint: null, indsend: false }); return; }
+        var t = this.aktivt();
+        this.kort.knapper({
+            hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret",
+            peg: this.el.knap.classList.contains("peg"),
+            indsend: true,
+            klar: !!(t && t.input && t.input.value.trim())
+        });
+    };
+
+    /* Knappen paa kortet efter opgaven: naeste uloeste opgave */
+    P.videre = function () {
+        if (!this.faerdig) return;
+        var i = this.naesteUloeste();
+        if (i >= 0) this.vaelg(i, false);
     };
 
     /* ----- Tavlen --------------------------------------------------------------------- */
@@ -394,7 +414,7 @@
             this.opgaveLoest();
         }
         if (maade === "svar") {
-            this.svarVis(this.regnHTML(j) + ".");
+            if (!this.faerdig) this.svarVis(this.regnHTML(j) + ".");
         } else {
             if (!this.faerdig) this.naesteLinje(NK.tilfaeldig(D.ROS), "god");
         }
@@ -412,8 +432,11 @@
         var ros = NK.tilfaeldig(D.ROS_OPGAVE);
         if (this.antalLoest() === this.opgaver.length && !this.rostAlt) { this.rostAlt = true; ros = D.FAERDIG.regn; }
         this.gem();
-        this.besked(NK.html(this.slutTekst() + " " + ros), "god");
+        this.besked("", "");
         this.bygListe();
+        var naeste = this.naesteUloeste() >= 0 ? "Næste opgave" : null;
+        if (this.brugtSvar) this.kort.bliv(NK.html(this.slutTekst()), "Svaret.", naeste, "svar");
+        else this.kort.bliv(NK.html(this.slutTekst() + " " + ros), "Rigtigt.", naeste, "god");
     };
 
     /* ----- Linjen i kortet -------------------------------------------------------------- */
@@ -434,22 +457,31 @@
     /* Efter et forkert svar lyser hintknappen stille op, til linjen skifter igen */
     P.besked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
-        this.kortT = 0;
-        this.visBesked(this.fast);
+        /* En rigtig besked (fejl, hint, ros) fjerner den korte besked fra scenen */
+        if (klasse) { this.kortT = 0; this.kort.note(""); }
         this.el.knap.classList.toggle("peg", klasse === "skidt" && !this.faerdig && this.hjaelp === 0);
+        this.visBesked(this.fast);
     };
 
+    /* En kort besked fra scenen: under teksten paa kortet i nogle sekunder */
     P.kortBesked = function (html, sek) {
         this.kortT = sek || 4;
-        this.visBesked({ html: html, klasse: "" });
+        this.kort.note(html);
     };
 
     P.visBesked = function (b) {
-        this.el.besked.innerHTML = b.html;
-        this.el.besked.className = "besked" + (b.klasse ? " " + b.klasse : "");
+        this.kort.besked(b.html, b.klasse);
+        if (!this.faerdig) this.kort.bliv(null);
+        this.visKnap();
     };
 
-    P.beskedTekst = function () { return this.el.besked.textContent; };
+    /* Teksten, kortet viser nu: den korte besked, facit eller linjen */
+    P.beskedTekst = function () {
+        var n = NK.el("regn-note");
+        if (n && !n.hidden) return n.textContent.replace(/\u00a0/g, " ");
+        if (this.kort.blivAaben()) return this.kort.blivTekst();
+        return this.kort.beskedTekst();
+    };
 
     /* ----- Hint og svar: i linjen i kortet, naar eleven beder om det ---------------------- */
     P.hint = function (t) {
@@ -481,12 +513,7 @@
     };
 
     P.knap = function () {
-        if (this.faerdig) {
-            var i = this.naesteUloeste();
-            if (i >= 0) this.vaelg(i, false);
-            else this.vaelg(this.nr, true);
-            return;
-        }
+        if (this.faerdig) { this.videre(); return; }
         var t = this.aktivt();
         if (!t) return;
         if (this.hjaelp === 0) {
@@ -508,14 +535,15 @@
         try { t.input.focus({ preventScroll: true }); } catch (e) { t.input.focus(); }
     };
 
-    P.enter = function () { if (this.faerdig) this.knap(); else this.tjek(); };
+    P.enter = function () { if (this.faerdig) this.videre(); else this.tjek(); };
     P.nulstil = function () { this.vaelg(this.nr, true); };
 
     /* ======================================================================
        LAYOUT
        ====================================================================== */
     P.tilpas = function () {
-        if (this.L.tilpas() || !this.lay) this.layout();
+        /* Ogsaa naar papirkortet er blevet hoejere eller lavere */
+        if (this.L.tilpas() || !this.lay || this.lay.top !== this.kort.zone(D.ZONE.regn)) this.layout();
     };
 
     /* Et paent loft over tallet: 1, 2, 2,5 eller 5 gange en tierpotens */
@@ -529,7 +557,9 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
-        var top = 12;
+        /* Papirkortet har pladsen oeverst (D.ZONE: almindelig og lav skaerm) */
+        var top = this.kort.zone(D.ZONE.regn);
+        lay.top = top;
         /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
         lay.bordY = Math.round(H - NK.klamp((H - top) * 0.05, 12, 34));
         var arbH = lay.bordY - top;
@@ -659,7 +689,7 @@
         this.tid += dt;
         if (this.kortT > 0) {
             this.kortT -= dt;
-            if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
+            if (this.kortT <= 0) { this.kortT = 0; this.kort.note(""); }
         }
         for (var s in this.glimt) this.glimt[s] = Math.max(0, this.glimt[s] - dt);
         var pMaal = this.kendt("p") ? this.o.k.p : 0;

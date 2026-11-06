@@ -49,10 +49,10 @@
         CO: { f: "CO", navn: "carbonmonoxid" },
         H2O: { f: "H₂O", navn: "vanddamp" },
         CO2: { f: "CO₂", navn: "carbondioxid" },
-        H2: { f: "H₂", navn: "hydrogen" },
-        Hb: { f: "Hb", navn: "hæmoglobin uden oxygen" },
-        O2: { f: "O₂", navn: "oxygen" },
-        HbO2: { f: "HbO₂", navn: "hæmoglobin med oxygen" }
+        H2: { f: "H₂", navn: "dihydrogen" },
+        Hb: { f: "Hb", navn: "hæmoglobin uden dioxygen" },
+        O2: { f: "O₂", navn: "dioxygen" },
+        HbO2: { f: "HbO₂", navn: "hæmoglobin med dioxygen" }
     };
 
     var LIGEVAEGT = { CO: 0.10, H2O: 0.10, CO2: 0.20, H2: 0.20 };
@@ -249,7 +249,7 @@
     ];
 
     /* ===================================================================
-       FANE 2: OXYGEN I BLODET
+       FANE 2: DIOXYGEN I BLODET
        opstil.sted: hvor blodet i luppen er fra start (lunge eller muskel).
        bjerg: lungerne er hoejt oppe i bjergene. loeb: musklen arbejder.
        forsoeg.handling: "lunge", "muskel", "loeb" eller "flere" (mere Hb).
@@ -259,11 +259,11 @@
             id: "lunge", navn: "I lungerne",
             opstil: { sted: "muskel" },
             gaet: {
-                intro: "Blodet i luppen kommer fra en muskel. Nu løber det til lungerne, hvor der er meget oxygen.",
+                intro: "Blodet i luppen kommer fra en muskel. Nu løber det til lungerne, hvor der er meget dioxygen.",
                 tekst: "Hvad gør hæmoglobinet i lungerne?",
                 svar: [
-                    { t: "Det binder oxygen", ok: true },
-                    { t: "Det afgiver oxygen" },
+                    { t: "Det binder dioxygen", ok: true },
+                    { t: "Det afgiver dioxygen" },
                     { t: "Ingenting" }
                 ]
             },
@@ -300,11 +300,11 @@
             id: "muskel", navn: "I musklen",
             opstil: { sted: "lunge" },
             gaet: {
-                intro: "Blodet i luppen kommer fra lungerne. Nu løber det til en muskel, som bruger oxygen.",
+                intro: "Blodet i luppen kommer fra lungerne. Nu løber det til en muskel, som bruger dioxygen.",
                 tekst: "Hvad gør hæmoglobinet i musklen?",
                 svar: [
-                    { t: "Det binder oxygen" },
-                    { t: "Det afgiver oxygen", ok: true },
+                    { t: "Det binder dioxygen" },
+                    { t: "Det afgiver dioxygen", ok: true },
                     { t: "Ingenting" }
                 ]
             },
@@ -341,7 +341,7 @@
             id: "loeb", navn: "Musklen arbejder",
             opstil: { sted: "muskel" },
             gaet: {
-                intro: "Når du løber, bruger musklen mere oxygen, så [O₂] i musklen falder endnu mere.",
+                intro: "Når du løber, bruger musklen mere dioxygen, så [O₂] i musklen falder endnu mere.",
                 tekst: "Hvad gør hæmoglobinet i musklen?",
                 svar: [
                     { t: "Det afgiver mere O₂", ok: true },
@@ -375,13 +375,13 @@
                     "Når HbO₂ afgiver O₂, bliver der dannet O₂."
                 ]
             },
-            loest: "Ligevægten modvirker, at [O₂] falder, ved at danne O₂: HbO₂ afgiver O₂. En muskel, der arbejder hårdt, får derfor mere oxygen."
+            loest: "Ligevægten modvirker, at [O₂] falder, ved at danne O₂: HbO₂ afgiver O₂. En muskel, der arbejder hårdt, får derfor mere dioxygen."
         },
         {
             id: "bjerg", navn: "I bjergene",
             opstil: { sted: "muskel", bjerg: true },
             gaet: {
-                intro: "Højt oppe i bjergene er der mindre oxygen i luften, så [O₂] i lungerne er lavere end ved havet.",
+                intro: "Højt oppe i bjergene er der mindre dioxygen i luften, så [O₂] i lungerne er lavere end ved havet.",
                 tekst: "Hvor meget O₂ binder blodet i lungerne?",
                 svar: [
                     { t: "Mindre end ved havet", ok: true },
@@ -393,7 +393,7 @@
                 handling: "lunge",
                 om: ["lunge"],
                 tekst: "Klik på lungerne, så blodet løber derhen. Tæl HbO₂ i luppen bagefter.",
-                set: "I bjergene binder 9 af 12 Hb oxygen i lungerne. Ved havet er det 11 af 12.",
+                set: "I bjergene binder 9 af 12 Hb dioxygen i lungerne. Ved havet er det 11 af 12.",
                 hint: [
                     "Lungerne er tegnet til venstre i scenen, under bjergene.",
                     "Klik på lungerne.",
@@ -433,7 +433,7 @@
                 handling: "flere",
                 om: ["flere"],
                 tekst: "Klik på knappen Mere Hb under lungerne, og tæl HbO₂ i luppen bagefter.",
-                set: "Nu binder 12 Hb oxygen i lungerne. Ved havet var det 11, så blodet bærer mere O₂ end før.",
+                set: "Nu binder 12 Hb dioxygen i lungerne. Ved havet var det 11, så blodet bærer mere O₂ end før.",
                 hint: [
                     "Knappen Mere Hb sidder under lungerne til venstre i scenen.",
                     "Klik på knappen Mere Hb.",
@@ -441,7 +441,7 @@
                 ]
             },
             spm: {
-                tekst: "Hvorfor bærer blodet nu mere oxygen?",
+                tekst: "Hvorfor bærer blodet nu mere dioxygen?",
                 svar: [
                     { t: "Hb er en reaktant, der blev tilsat", ok: true },
                     { t: "K blev større",
@@ -756,10 +756,10 @@
             CO: "CO, carbonmonoxid: en reaktant. [CO] står under brøkstregen i Y.",
             H2O: "H₂O, vanddamp: en reaktant. [H₂O] står under brøkstregen i Y.",
             CO2: "CO₂, carbondioxid: et produkt. [CO₂] står over brøkstregen i Y.",
-            H2: "H₂, hydrogen: et produkt. [H₂] står over brøkstregen i Y.",
-            Hb: "Hb: hæmoglobin uden oxygen, mørkerødt. En reaktant, så [Hb] står under brøkstregen.",
-            O2: "O₂: oxygen, opløst i blodet. En reaktant, så [O₂] står under brøkstregen.",
-            HbO2: "HbO₂: hæmoglobin med oxygen, lysere rødt. Produktet, så [HbO₂] står over brøkstregen."
+            H2: "H₂, dihydrogen: et produkt. [H₂] står over brøkstregen i Y.",
+            Hb: "Hb: hæmoglobin uden dioxygen, mørkerødt. En reaktant, så [Hb] står under brøkstregen.",
+            O2: "O₂: dioxygen, opløst i blodet. En reaktant, så [O₂] står under brøkstregen.",
+            HbO2: "HbO₂: hæmoglobin med dioxygen, lysere rødt. Produktet, så [HbO₂] står over brøkstregen."
         };
         return T[s] || "";
     };

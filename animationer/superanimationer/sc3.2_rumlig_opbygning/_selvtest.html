@@ -235,6 +235,87 @@ function koerTest() {
     paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 6).join(", "));
     papirkortTest(d, W, NK, D, B);
 }
+
+/* Papirkortet (6. nov. 2026): kortet staar i scenen, Indsend svar sender ind,
+   kortet bliver paa spoergsmaalet, og det holder sig i kortZone. */
+function papirkortTest(d, W, NK, D, B) {
+    overskrift("6. Papirkortet");
+    var ramme = document.getElementById("ramme");
+    var byg = NK.sims["fane-byg"], mol = NK.sims["fane-molekyler"];
+    paastand("body har klassen papirkort", d.body.classList.contains("papirkort"));
+    ["byg", "mol"].forEach(function (p) {
+        var k = d.getElementById(p + "-skort");
+        paastand(p + ": kortet står i scenen, ikke i panelet", !!k && !!k.closest(".scene") && !k.closest(".panel"));
+        paastand(p + ": Start forfra står i panelet, ikke på kortet", !!d.getElementById(p + "-forfra") && !!d.getElementById(p + "-forfra").closest(".panel") && !k.querySelector(".nulstil"));
+        paastand(p + ": ingen opgavetekst i panelet", !d.querySelector("#fane-" + (p === "byg" ? "byg" : "molekyler") + " .panel .opgave-spm, #" + p + "-opg-tekst"));
+    });
+    paastand("ingen statuslinje nederst i scenen", !d.querySelector(".scenebesked"));
+
+    /* Et valgspoergsmaal paa fane 2 */
+    NK.visFane("fane-molekyler");
+    var O = mol.opgaver, o = mol.OPGAVER[0](mol);
+    O.startOpgave(o);
+    var ind = d.getElementById("mol-indsend");
+    paastand("Indsend svar er grå uden valg", ind.classList.contains("ikke-klar") && !ind.hidden && ind.textContent === "Indsend svar");
+    paastand("hintknappen står på kortet", !d.getElementById("mol-hjknap").hidden && !!d.getElementById("mol-hjknap").closest(".scenekort"));
+    var forkert = o.rigtig === 0 ? 1 : 0;
+    O.vaelg(forkert);
+    paastand("et valgt svar bedømmes ikke af sig selv", !o.afsluttet && ind.classList.contains("klar"));
+    O.indsendKlik();
+    paastand("forkert svar: forklaringen står på kortet", !o.afsluttet && /Ikke rigtigt/.test(d.getElementById("mol-besked").textContent));
+    O.vaelg(o.rigtig);
+    paastand("det rigtige svar er heller ikke sendt ind af sig selv", !o.afsluttet);
+    O.indsendKlik();
+    var kort = d.getElementById("mol-skort");
+    var groen = kort.querySelector('.sk-knap.rigtig[data-nr="' + o.rigtig + '"]');
+    var bliv = kort.querySelector(".sk-bund.bliv .sk-videre");
+    paastand("rigtigt svar: kortet bliver på spørgsmålet med grønt svar og Næste", o.afsluttet && !!groen && !!bliv && ind.hidden && kort.textContent.indexOf(o.tekst.slice(0, 20)) >= 0,
+        "grøn " + !!groen + ", næste " + !!bliv);
+    paastand("etiketten er en indlejret overskrift", !!kort.querySelector(".sk-tekst .sk-chip"));
+    bliv.click();
+    paastand("Næste går videre til opgave 2 uden rosen", O.nr === 1 && !kort.querySelector(".sk-bund.bliv"));
+    O.nulstil();
+
+    /* En byggeopgave paa fane 1 */
+    NK.visFane("fane-byg");
+    var Ob = byg.opgaver, ob = byg.OPGAVER[0](byg);
+    Ob.startOpgave(ob);
+    byg.opdater(1 / 60);
+    paastand("byg: Indsend svar er grå, før der er bygget noget", d.getElementById("byg-indsend").classList.contains("ikke-klar"));
+    ob.visSvar(byg); byg.opdater(1 / 60);
+    paastand("byg: et færdigt molekyle løser ikke opgaven af sig selv", !ob.afsluttet && d.getElementById("byg-indsend").classList.contains("klar"));
+    Ob.nulstil();
+
+    /* Hoejden: alle opgavetyper med hint, forklaring og det rigtige svar */
+    var fejlH = [];
+    [[1400, 860], [1100, 700]].forEach(function (m) {
+        ramme.style.width = m[0] + "px"; ramme.style.height = m[1] + "px";
+        [["fane-byg", byg, "byg"], ["fane-molekyler", mol, "mol"]].forEach(function (f) {
+            NK.visFane(f[0]); f[1].tilpas();
+            var Q = f[1].opgaver, k = d.getElementById(f[2] + "-skort"), zone = NK.kortZone();
+            function maal(navn) { if (k.offsetHeight > zone) fejlH.push(m.join("x") + " " + f[2] + " " + navn + " " + k.offsetHeight + ">" + zone); }
+            var sc = k.closest(".scene").getBoundingClientRect(), kr = k.getBoundingClientRect();
+            if (kr.top - sc.top < 0) fejlH.push(m.join("x") + " " + f[2] + " kortet over scenen");
+            f[1].OPGAVER.forEach(function (lav, i) {
+                for (var g = 0; g < 4; g++) {
+                    var q = lav(f[1]);
+                    Q.startOpgave(q); maal(i + " opgave");
+                    if (q.hint) { Q.saetFast(q.hint, "hint", "Hint"); Q.vis(); maal(i + " hint"); }
+                    var ft = [];
+                    if (q.fejlValg) q.valg.forEach(function (v, j) { if (j !== q.rigtig) ft.push(q.fejlValg(j)); });
+                    if (q.fejl) { try { var t = q.fejl(f[1]); if (typeof t === "string") ft.push(t); } catch (e) {} }
+                    ft.forEach(function (t) { Q.fejl(t); maal(i + " fejl"); });
+                    Q.loest(); maal(i + " løst");
+                }
+            });
+            Q.nulstil();
+            if (f[1].vis && f[1].vis.top !== NK.kortTop()) fejlH.push(m.join("x") + " " + f[2] + " tegningen begynder ikke under kortet");
+        });
+    });
+    paastand("kortet holder sig i kortZone (1400x860 og 1100x700)", fejlH.length === 0, fejlH.slice(0, 5).join("; "));
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    NK.visFane("fane-byg"); byg.tilpas();
+}
 </script>
 </body>
 </html>

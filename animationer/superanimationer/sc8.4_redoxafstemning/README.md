@@ -108,10 +108,39 @@ til (`js/opgave.js`, afsnittet Arket):
   kortere, og kontrolchips og elektronchips er væk (klammerne og rækkerne
   viser det samme).
 
+## Papirkortet (6. nov. 2026)
+
+Niels' beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+
+* Opgavelinjen, trinnets spørgsmål, beskeden og knapperne under arket er
+  samlet på ét lyst kort øverst i midten af scenen (`#skort` i `#kortplads`,
+  `visKort` i `js/opgave.js`): "Trin 2 af 7" som indlejret overskrift,
+  opgaven ("Afstem reaktionen. Den foregår i surt miljø.", sammenhængen i
+  kursiv) og trinnets spørgsmål i halvfed. Under dem beskeden, Giv et hint og
+  Indsend svar. Der står intet under arket længere.
+* Indsend svar (før Tjek) er grå, til der står noget i et af trinnets felter.
+  Enter i et felt er Indsend svar. Knapperne oxidation og reduktion på
+  klammerne vælger kun; Indsend svar bedømmer begge (`tjekPar`).
+* Et rigtigt svar: kortet bliver på trinnet (`this.bliv`), felterne bliver
+  grønne og låses (gule ved Vis svaret), forklaringen står i en grøn boks,
+  og Næste trin står, hvor Indsend svar stod. Først Næste trin (eller Enter)
+  lægger det næste trins felter på arket, så rosen aldrig står under det
+  næste spørgsmål. Et klik på arket imens får kortet til at blinke.
+* Det sidste trin afstemmer skemaet på arket med det samme, og kortet bliver
+  med Rigtigt og Næste opgave (eller Næste sværhedsgrad).
+* Start forfra ligger i panelet som før. Kortets plads har fast højde, så
+  arket ikke flytter sig, når beskeden kommer og går.
+
+Molekylenavnene (6. nov. 2026): sammenhængen til L2, M3 og S2 siger nu
+dichlor, dibrom og diiod om stofferne Cl₂, Br₂ og I₂. "Klorin" (et
+produktnavn) og "brintoverilte" (S12) er hverdagsord og bliver, mens "uden ilt" under Let og i
+rundvisningen er blevet til "uden oxygen" (reaktionerne har ingen oxygenatomer, 6. nov.).
+
 ## De syv trin
 
-Samme trin på alle sværhedsgrader. Linjen over tavlen siger, hvad trinnet
-spørger om, og Tjek (eller Enter) tjekker det.
+Samme trin på alle sværhedsgrader. Kortet over tavlen siger, hvad trinnet
+spørger om, og Indsend svar (eller Enter) sender det.
 
 1. **Oxidationstal.** Felter over de atomer, der skifter. O og H står med
    gråt. Rigtige felter låses grønne med det samme.
@@ -157,16 +186,16 @@ plads.
 
 ## Hjælpen
 
-Den gule knap ved siden af Tjek er Giv hint → Vis svaret → (næste trin) → Ny
-opgave (grøn, når skemaet er afstemt). Efter et forkert svar lyser den stille
-op, til hintet er givet. Hintet hører til trinnet og reaktionen, fx "I MnO₄⁻ er O −II. Summen af
+Hintknappen på papirkortet er Giv et hint → Vis svaret. Efter et forkert svar
+lyser den stille op, til hintet er givet. Når skemaet er afstemt, fører den
+grønne knap på kortet videre til Næste opgave. Hintet hører til trinnet og reaktionen, fx "I MnO₄⁻ er O −II. Summen af
 oxidationstallene skal være ionens ladning, −1." Vis svaret giver svaret med
 beregningen, fx "Mn + 4 · (−II) = −1, så Mn = +VII." En reaktion, hvor et svar
 er vist, står gul i listen og tæller ikke som løst.
 
 Et forkert svar får en besked, der passer til fejlen (`NK.Redox.oxFejl`,
-`eFejl` og `tjek*` i `js/opgave.js`). Beskeden står i en boks under knapperne:
-rød ved en fejl, grøn ved et rigtigt svar og gul ved et hint.
+`eFejl` og `tjek*` i `js/opgave.js`). Beskeden står i kortets nederste række:
+rød ved en fejl (Ikke rigtigt), grøn ved et rigtigt svar og gul ved et hint.
 
 | Trin | Fejlen | Beskeden |
 |------|--------|----------|
@@ -243,8 +272,9 @@ afstemmes med hele oxidationstal og de mindste tal.
   naboatomet. Et felt, der ville stikke ud over tavlens kant, gør skriften
   mindre (`ombrudt` i `js/opgave.js`).
 * Lave skærme (en bærbar, rammen i menuen) får mindre luft i to trin:
-  `max-height: 780px` og `700px` i `css/stil.css`. Under 700 px står knapperne
-  til højre for beskeden i stedet for over den.
+  `max-height: 780px` og `700px` i `css/stil.css`. Papirkortets plads
+  (`--kortzone`) er 172 px, 146 px under 720 px's højde og 200 px under
+  1040 px's bredde.
 * Med vægten slået til har `body` klassen `med-vaegt`, og arket bruger de
   små mål. Her fylder tasterne kun, når de bruges, for pladsen er trang.
 * Klasserne på klammerne hedder `oppe` og `nede`, fordi `.top` er toplinjens
@@ -283,13 +313,19 @@ med de mindste tal, oxidationstal mod tabelværdier, at felterne læser romertal
 og tal, at de typiske fejl får den rigtige besked, at alle reaktioner kan
 gennemføres med rigtige svar og med Vis svaret, at vægten er slået fra fra
 start og følger med, når den slås til, at en hel reaktion kan afstemmes med
-tasterne alene, at arket står stille (stofferne, skriften, tasterne, knapperne
-og beskeden står samme sted fra trin 1 til 5 og igen fra trin 6 til det
-færdige skema), at Kemichael er væk, og at ? stadig viser rundt, sproget, og
+tasterne alene, at arket står stille (stofferne, skriften, tasterne og kortet
+står samme sted fra trin 1 til 5 og igen fra trin 6 til det færdige skema), at
+Kemichael er væk, og at ? stadig viser rundt, sproget, og
 at skemaet står på én linje, tasterne på én række, intet felt dækker et tal,
 og intet skal rulles fra 1100 × 650 til 1500 × 900 (med vægten: 1280 × 720 og
-1400 × 860).
-Sidst kørt: ALT OK (124 påstande), 4. oktober 2026.
+1400 × 860). Papirkortet: kortet står øverst i midten, ikke i panelet, ingen
+linje under arket, Indsend svar er grå uden noget at sende, knapperne på
+klammerne vælger kun, kortet bliver på trinnet med Næste trin dér, hvor
+Indsend svar stod, Start forfra er ikke på kortet, og kortet holder sig inden
+for sin plads i alle trin af alle 37 reaktioner (også med fejl, hint og Vis
+svaret) ved 1400 × 860, 1280 × 720, 1100 × 650 og 900 × 650.
+Sidst kørt: ALT OK (144 påstande), 6. november 2026. Før papirkortet gav den
+3 fejl om layoutet (900 × 650 og vægten ved 1280 × 720), som også er rettet.
 
 ## I menuen
 

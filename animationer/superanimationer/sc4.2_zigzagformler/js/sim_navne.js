@@ -2,8 +2,8 @@
    sim_navne.js - fane 3: navne (de tre faner fra den gamle 6.4)
 
    Byg ud fra navnet
-     Navnet staar i panelet. Eleven tegner molekylet paa tavlen. Naar alle
-     C-atomer er brugt, tjekkes tegningen (NK.Tjek.tegning). Alkenerne med
+     Navnet staar paa papirkortet. Eleven tegner molekylet paa tavlen og
+     trykker Indsend svar, naar alle C-atomer er brugt (NK.Tjek.tegning). Alkenerne med
      cis/trans skal tegnes rigtigt vendt.
    Giv navnet
      Molekylet staar paa tavlen. Eleven skriver navnet (NK.Tjek.navn).
@@ -108,12 +108,18 @@
     /* ----- Byg ud fra navnet -------------------------------------------------- */
     P.aendret = function (hvad) {
         if (hvad === "laerer" || this.retning !== "byg" || this.loest) return;
-        if (this.braet.antal() === this.maal.antal) {
-            var res = NK.Navn.analyser(this.braet.mol);
-            var r = NK.Tjek.tegning(res, this.maal, true);
-            if (r.ok) { this.loes(res, false); return; }
-            this.besked(NK.html(r.besked), "skidt");
-        } else if (this.beskedKlasse === "skidt") this.besked("", "");
+        /* En forklaring til et forkert svar staar, til tegningen aendres */
+        if (this.beskedKlasse === "skidt") this.besked("", "");
+        this.visPanel();
+    };
+
+    /* Indsend svar paa Byg ud fra navnet */
+    P.tjekTegning = function () {
+        if (this.retning !== "byg" || this.loest) return;
+        var res = NK.Navn.analyser(this.braet.mol);
+        var r = NK.Tjek.tegning(res, this.maal, true);
+        if (r.ok) { this.loes(res, false); return; }
+        this.besked(NK.html(r.besked), "skidt");
         this.visPanel();
     };
 
@@ -168,7 +174,20 @@
 
     /* ----- Knappen ------------------------------------------------------------------ */
     P.knap = function () {
-        if (this.loest) { this.naeste(); return; }
+        if (this.loest) { this.videre(); return; }
+        this.hjaelpKlik();
+    };
+
+    P.videre = function () { if (this.loest) this.naeste(); };
+
+    P.indsend = function () {
+        if (this.loest) return;
+        if (!this.kortData().klar) { this.kortBlink(); return; }
+        if (this.retning === "byg") this.tjekTegning(); else this.tjekNavn();
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.loest) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked("<b>Hint:</b> " + this.hint(), "gul");
@@ -213,10 +232,12 @@
     /* ----- Panelet --------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        NK.el("nv-knap").addEventListener("click", function () { mig.knap(); });
-        NK.el("nv-ok").addEventListener("click", function () { mig.tjekNavn(); });
         NK.el("nv-input").addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); if (mig.loest) mig.knap(); else mig.tjekNavn(); }
+            if (e.key === "Enter") { e.preventDefault(); if (mig.loest) mig.videre(); else mig.tjekNavn(); }
+        });
+        NK.el("nv-input").addEventListener("input", function () {
+            if (mig.beskedKlasse === "skidt") mig.besked("", "");
+            mig.visKort();
         });
         NK.el("nv-forfra").addEventListener("click", function () {
             mig.serier[mig.noegle()] = nySerie(mig.slags);
@@ -236,11 +257,20 @@
         skifter("nv-slags", "slags");
     };
 
-    P.besked = function (html, klasse) {
-        var e = NK.el("nv-besked");
-        e.innerHTML = html;
-        e.className = "besked" + (klasse ? " " + klasse : "");
-        this.beskedKlasse = klasse;
+    /* Papirkortet (js/opgavefane.js) */
+    P.kortData = function () {
+        if (!this.maal) return null;
+        var s = this.serie(), byg = this.retning === "byg";
+        var klar = byg ? this.braet.antal() === this.maal.antal : NK.el("nv-input").value.trim() !== "";
+        return {
+            chip: "Molekyle " + (s.nr + 1) + " af " + s.liste.length,
+            tekst: byg ? "Tegn <b>" + NK.html(this.maal.navn) + "</b> (" + this.maal.formel + ") på tavlen." :
+                "Molekylet står på tavlen. Skriv molekylets navn i feltet til højre.",
+            loest: this.loest, vist: this.visteSvar,
+            videre: s.status.every(function (x) { return x > 0; }) ? "Ny serie →" : "Næste molekyle →",
+            klar: klar && !this.loest,
+            hint: this.hjaelp === 0 ? "Giv et hint" : "Vis svaret"
+        };
     };
 
     P.visPanel = function () {
@@ -252,19 +282,10 @@
         });
         NK.saetTekst("nv-titel", byg ? "Byg molekylet" : "Giv molekylet navn");
         NK.saetTekst("nv-nr", String(s.nr + 1));
-        NK.saetHTML("nv-prompt", byg ? NK.html(this.maal.navn) + "<small>" + this.maal.formel + "</small>" : "");
-        NK.saetTekst("nv-spm", byg ? "Tegn molekylet på tavlen." : "Molekylet står på tavlen. Skriv dets navn.");
         NK.el("nv-taelrad").hidden = !byg;
         NK.saetTekst("nv-tael", this.braet.antal() + " af " + this.maal.antal);
         NK.el("nv-felt").hidden = byg;
-        var knap = NK.el("nv-knap");
-        if (this.loest) {
-            knap.textContent = s.status.every(function (x) { return x > 0; }) ? "Ny serie ↺" : "Næste molekyle →";
-            knap.className = "knap blaa banker";
-        } else {
-            knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            knap.className = "knap";
-        }
+        this.visKort();
         NK.el("nv-kort").classList.toggle("sejr", this.loest && !this.visteSvar);
         NK.saetTekst("nv-loest", String(s.status.filter(function (x) { return x > 0; }).length));
         NK.Fane.prikker("nv-prikker", s.status, s.nr, function (i) { s.mini = i; mig.visMini(); });
@@ -291,6 +312,7 @@
         if (this.retning === "byg" && !this.loest) {
             NK.saetTekst("nv-tael", this.braet.antal() + " af " + this.maal.antal);
             this.visStatus();
+            this.visKort();
         }
     };
 
@@ -299,7 +321,7 @@
         this.braet.tegn(ctx, navn ? { udenHaandtag: true, linje: Math.max(2.6, this.skala() * 0.055) } : null);
     };
 
-    P.enter = function () { if (this.loest) this.knap(); else this.tjekNavn(); };
+    P.enter = function () { if (this.loest) this.videre(); else if (this.kortData().klar) this.indsend(); else this.kortBlink(); };
     P.fokus = function () { if (this.retning === "navn" && !this.loest) NK.el("nv-input").focus(); };
 
     NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-navne", tilbud: "nv-tilbud" });

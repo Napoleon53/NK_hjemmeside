@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - konstanterne, opgaverne og linjerne i opgavekortet
+   data.js - konstanterne, opgaverne og linjerne i papirkortet
 
    Alt, der kan staa som data, staar her. Svarene regnes af modellen i
    js/gas.js; intet facit er skrevet i haanden. Enhederne er dem fra
@@ -19,6 +19,10 @@
     D.R_TEKST = "0,0831 L·bar/(mol·K)";
     D.P_LUFT = 1.013;
     D.KELVIN = 273;
+
+    /* Papirkortets plads oeverst i scenen i px: [almindelig skaerm, lav skaerm].
+       Laerredet begynder tegningen under kortet (js/kort.js, zone). */
+    D.ZONE = { stempel: [150, 128], regn: [128, 112] };
 
     /* ======================================================================
        FANE 1: STEMPLET
@@ -105,12 +109,12 @@
           start: { n: 1, T: 293, lodder: 0, laast: true, V: 24.04 },
           spm: "Hvorfor stiger trykket, når gassen i den låste cylinder bliver varmere?",
           valg: [
-              { t: "Molekylerne bevæger sig hurtigere og rammer væggene oftere og hårdere", ok: true },
-              { t: "Molekylerne bliver større, når de bliver varme",
+              { t: "Molekylerne får mere fart", ok: true },
+              { t: "Molekylerne bliver større",
                 svar: "Molekylerne er lige store ved alle temperaturer. Det er farten, der stiger." },
               { t: "Der dannes flere molekyler",
                 svar: "Tæl dem: der er lige mange før og efter. Stofmængden er den samme." },
-              { t: "Molekylerne klumper sig sammen",
+              { t: "Molekylerne klumper sig",
                 svar: "Så ville trykket falde. Varme molekyler farer rundt hver for sig." }
           ],
           handling: null, maal: "p",
@@ -274,7 +278,7 @@
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst. Pænt skrevet."];
 
-    /* Korte svar i opgavekortet, naar der sker noget i scenen */
+    /* Korte svar i papirkortet, naar der sker noget i scenen */
     D.SCENE = {
         stop: "Stemplet står mod stoppet. Nu stiger trykket i stedet.",
         nMaks: "Cylinderen tager højst 2,00 mol.",

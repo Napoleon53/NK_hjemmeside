@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Afstem reaktioner</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇄</span> Afstem reaktioner</h1>
@@ -30,23 +31,20 @@
         <canvas id="kg-laerred"></canvas>
         <!-- Skemaet med tallene foran stofferne (js/sim_kugler.js) -->
         <div class="tavle skema" id="kg-skema"></div>
-        <button class="reagerknap" id="kg-reager" type="button" title="Lad dem reagere (Enter)">Lad dem reagere</button>
         <div class="anker" id="kg-anker-bakker"></div>
-
-        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og den ene knap -->
-        <div class="statuslinje" id="kg-status">
-            <p class="st-tekst" id="kg-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="kg-forfra" type="button" title="Samme reaktion forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="kg-knap" type="button">Giv et hint</button>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, hint, beskeden, Indsend svar
+             og forklaringen efter et rigtigt svar (brugerens valg 3.-4. nov. 2026) -->
+        <div class="scenekort opgave" id="kg-skort">
+            <div class="sk-ind" id="kg-ind"></div>
+            <div class="sk-bund" id="kg-status">
+                <p class="st-tekst" id="kg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="kg-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="kg-indsend" type="button">Indsend svar</button>
+            </div>
         </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="kg-kort">
-            <h2><span id="kg-titel">Opgave</span><span class="taeller">reaktion <b id="kg-nr">1</b>/<span id="kg-antal">10</span></span></h2>
-            <div id="kg-prompt"></div>
-        </div>
-
         <div class="kort maaling" id="kg-regnskabkort">
             <h2>Atomerne</h2>
             <div class="regnskab" id="kg-regnskab"></div>
@@ -55,6 +53,7 @@
         <div class="kort" id="kg-opgaver">
             <h2>Reaktionerne <span class="taeller">løst <b id="kg-loest">0</b>/10</span></h2>
             <div class="opg-liste" id="kg-liste"></div>
+            <button class="forfraknap" id="kg-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
         </div>
     </aside>
 </section>
@@ -69,23 +68,24 @@
         <div class="tavle" id="sk-tavle"></div>
         <!-- Optaellingen er slaaet fra ved hver ny reaktion (js/sim_skema.js) -->
         <button class="optaelknap" id="sk-optael" type="button">Vis optællingen</button>
-
-        <div class="statuslinje" id="sk-status">
-            <p class="st-tekst" id="sk-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="sk-forfra" type="button" title="Samme reaktion med tomme felter (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="sk-knap" type="button">Giv et hint</button>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, hint, beskeden, Indsend svar
+             og forklaringen efter et rigtigt svar (brugerens valg 3.-4. nov. 2026) -->
+        <div class="scenekort opgave" id="sk-skort">
+            <div class="sk-ind" id="sk-ind"></div>
+            <div class="sk-bund" id="sk-status">
+                <p class="st-tekst" id="sk-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="sk-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="sk-indsend" type="button">Indsend svar</button>
+            </div>
         </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="sk-kort">
-            <h2><span id="sk-titel">Opgave</span><span class="taeller">reaktion <b id="sk-nr">1</b>/<span id="sk-antal">24</span></span></h2>
-            <div id="sk-prompt"></div>
-        </div>
 
         <div class="kort" id="sk-opgaver">
             <h2>Reaktionerne <span class="taeller">løst <b id="sk-loest">0</b>/24</span></h2>
             <div class="opg-liste" id="sk-liste"></div>
+            <button class="forfraknap" id="sk-forfra" type="button" title="Samme reaktion med tomme felter (R)">Start forfra ↺</button>
         </div>
     </aside>
 </section>
@@ -121,7 +121,7 @@
             O: 2 før og 2 + 2 = 4 efter. Sæt 2 foran O₂: CH₄ + 2 O₂ → CO₂ + 2 H₂O
         </div>
         <p>Står man med et ulige antal O og O₂ foran, mangler der et halvt O₂. Gang så alle tallene med 2.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> reager eller tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -148,6 +148,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/afst.js"></script>

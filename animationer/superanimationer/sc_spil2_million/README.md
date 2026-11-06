@@ -82,7 +82,7 @@ Rettet i forhold til den gamle:
 * Tungtopløselig er under 1 g i 100 mL vand, som i `sc2.1` og `sc2.4`. Den gamle
   sagde 2 g.
 * "Idealgasloven" hedder Idealgasligningen som i `sc5.6`, "Prikformel" hedder
-  Elektronprikformel som i `sc3.1`, og H₂ hedder hydrogen (før brint).
+  Elektronprikformel som i `sc3.1`, og gassen H₂ hedder dihydrogen (6. nov. 2026; før hydrogen og brint).
 * Forkerte svar: Formel koncentration i stedet for Stofmængdekoncentration ved
   Aktuel koncentration (den fejl, elever laver), Svovl, Kobber(II)sulfat,
   Carbondioxid og Hydronolyse i stedet for Sulfur, Kobbersulfat, Kuldioxid og

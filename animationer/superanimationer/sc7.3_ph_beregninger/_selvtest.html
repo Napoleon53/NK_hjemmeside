@@ -264,11 +264,17 @@ function koerTest(W) {
 
     overskrift("8. Fanerne kan gennemføres i små bider");
     function raekke(sim) { return sim.el.raekker.querySelector('[data-i="' + sim.trinNr + '"]'); }
-    function bid(sim, b) { return raekke(sim).querySelector('.bid[data-bid="' + b + '"]'); }
+    function feltBoks(sim) { return raekke(sim).querySelector(".trin-felt"); }
+    function kortT(sim) { return sim.el.skort.textContent; }
+    function videre(sim) { return sim.el.skort.querySelector("[data-videre]"); }
+    function knapper(sim) { return sim.el.skort.querySelectorAll(".sk-knap[data-valg]"); }
+    function knapFor(sim, nr) { return knapper(sim)[sim.formelOrden(sim.trin()).indexOf(nr)]; }
+    function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
     function skrivSvar(sim, v) {
-        var ind = raekke(sim).querySelectorAll("input");
+        var ind = raekke(sim).querySelectorAll(".trin-felt input");
         v.forEach(function (x, i) { ind[i].value = x; });
-        sim.tjek();
+        sim.indsend();
     }
     function kor(sim, n) { for (var i = 0; i < n; i++) { R.opdater(1 / 30); sim.opdater(1 / 30); } }
     function felterAf(t) {
@@ -279,10 +285,12 @@ function koerTest(W) {
         for (var i = 0; i < t.formler.length; i++) if (!!t.formler[i].rigtig === rigtig) return i;
         return -1;
     }
+    function vaelgOgSend(sim, nr) { sim.vaelgFormel(nr); sim.indsend(); }
     function loesTrin(sim) {
         var t = sim.trin();
-        if (sim.bid === "formel") sim.vaelgFormel(formelNr(t, true));
+        if (sim.bid === "formel") { vaelgOgSend(sim, formelNr(t, true)); sim.videre(); }
         skrivSvar(sim, felterAf(t));
+        if (sim.venter === "trin") sim.videre();
     }
     function loesOpgave(sim) {
         var n = 0;
@@ -295,38 +303,53 @@ function koerTest(W) {
     kor(S1, 30);
     var foer = S1.loest;
     var tp = S1.trin();
+    paastand("papirkortet står øverst i scenen; panelet har regnestykket og lommeregneren, men ingen opgavetekst eller hintknap",
+        d.body.classList.contains("papirkort") && !!S1.el.skort.closest(".scene") && S1.el.skort.offsetTop <= 12 && !d.querySelector(".scene-mrk") &&
+        !d.querySelector(".panel .knap.hjaelp") && !d.querySelector(".panel .maal-tekst") && !d.querySelector(".panel [data-formel]"));
     paastand("fane 1: kun [H₃O⁺] og pH står på regnevejen, og der er ingen pil", S1.stationSes("h") && S1.stationSes("ph") && !S1.stationSes("oh") && !S1.pilSes("h>ph"));
-    paastand("fane 1: første bid er at vælge formlen; feltet til svaret ses ikke endnu",
-        S1.bid === "formel" && bid(S1, "formel").classList.contains("nu") && bid(S1, "skriv").classList.contains("kommer") && S1.el.knap.textContent === "Giv hint");
-    paastand("formlen vælges blandt 3 knapper med én rigtig", tp.formler.length === 3 && tp.formler.filter(function (f) { return f.rigtig; }).length === 1 &&
-        raekke(S1).querySelectorAll("[data-formel]").length === 3);
-    S1.vaelgFormel(formelNr(tp, false));
-    paastand("en forkert formel giver en forklaring, og knappen streges ud", /skidt/.test(S1.el.besked.className) && S1.bid === "formel" &&
-        raekke(S1).querySelector(".formelknap.forkert").disabled);
-    S1.vaelgFormel(formelNr(tp, true));
+    paastand("fane 1: kortet har opgaven og første bid (vælg formlen); feltet til svaret ses ikke endnu",
+        S1.bid === "formel" && /Hvad er pH\?/.test(kortT(S1)) && /Vælg formlen/.test(kortT(S1)) && feltBoks(S1).hidden && S1.el.knap.textContent === "Giv hint");
+    paastand("formlen vælges blandt 3 knapper på kortet med én rigtig", tp.formler.length === 3 && tp.formler.filter(function (f) { return f.rigtig; }).length === 1 &&
+        knapper(S1).length === 3);
+    paastand("Indsend svar er grå, før en formel er valgt", vises(S1.el.indsend) && S1.el.indsend.classList.contains("ikke-klar"));
+    var fNr = formelNr(tp, false), rNr = formelNr(tp, true);
+    knapFor(S1, fNr).click();
+    paastand("et klik på en formel vælger kun", !/skidt/.test(S1.el.status.className) && knapFor(S1, fNr).classList.contains("valgt") &&
+        S1.el.indsend.classList.contains("klar") && !S1.formelOk);
+    klik("#ph-indsend");
+    paastand("Indsend svar: en forkert formel giver en forklaring, og knappen streges ud", /skidt/.test(S1.el.status.className) && S1.bid === "formel" &&
+        knapFor(S1, fNr).classList.contains("forkert") && knapFor(S1, fNr).disabled && S1.el.knap.classList.contains("peg"));
+    knapFor(S1, rNr).click(); klik("#ph-indsend");
     kor(S1, 30);
-    paastand("den rigtige formel: pilen kommer frem med formlen, og næste bid er lommeregneren",
-        S1.pilSes("h>ph") && S1.pilEtiket("h>ph") === "pH = −log[H₃O⁺]" && S1.bid === "tast" && !bid(S1, "skriv").classList.contains("kommer"));
+    paastand("den rigtige formel: pilen kommer frem, og kortet bliver med formlen i grønt og Næste, hvor Indsend svar stod",
+        S1.pilSes("h>ph") && S1.pilEtiket("h>ph") === "pH = −log[H₃O⁺]" && S1.venter === "formel" && knapFor(S1, rNr).classList.contains("rigtig") &&
+        !!videre(S1) && videre(S1).textContent === "Næste →" && !vises(S1.el.indsend));
+    videre(S1).click();
+    paastand("Næste: næste bid er lommeregneren, og feltet i panelet ses", S1.bid === "tast" && !feltBoks(S1).hidden && /lommeregneren/i.test(kortT(S1)) && !S1.venter);
     R.tryk("AC");
     tp.taster.slice(1).concat(["="]).forEach(function (k) { R.tryk(k); });
-    paastand("lommeregneren uden minus: panelet siger, at minusset mangler", /Minusset/.test(S1.el.besked.innerHTML) && S1.bid === "tast", S1.el.besked.textContent);
+    paastand("lommeregneren uden minus: kortet siger, at minusset mangler", /Minusset/.test(S1.el.besked.innerHTML) && S1.bid === "tast", S1.el.besked.textContent);
     R.tryk("AC");
     tp.taster.concat(["="]).forEach(function (k) { R.tryk(k); });
     paastand("lommeregneren rigtigt: bid 2 er klaret, og næste bid er at skrive svaret",
-        S1.bid === "skriv" && S1.tastVist === R.tiTekst(R.resultat) && bid(S1, "tast").classList.contains("klar") && /Rigtigt regnet/.test(S1.el.besked.innerHTML));
+        S1.bid === "skriv" && S1.tastVist === R.tiTekst(R.resultat) && /Rigtigt regnet/.test(S1.el.besked.innerHTML) && /i panelet/.test(kortT(S1)));
+    paastand("Indsend svar er grå, til der står noget i feltet", S1.el.indsend.classList.contains("ikke-klar"));
     skrivSvar(S1, ["−" + felterAf(tp)[0]]);
-    paastand("fane 1: et forkert svar giver en rød besked og ingen fremgang", !S1.faerdig && /skidt/.test(S1.el.besked.className));
-    skrivSvar(S1, felterAf(tp));
-    paastand("fane 1: det rigtige svar løser opgaven, og løst tæller op", S1.faerdig && S1.loest === foer + 1);
-    paastand("fane 1: pH-metret måler, og knappen er låst imens", !!S1.maaling && S1.el.knap.disabled);
+    paastand("fane 1: et forkert svar giver en rød besked og ingen fremgang", !S1.faerdig && /skidt/.test(S1.el.status.className));
+    var ind1 = raekke(S1).querySelector(".trin-felt input");
+    ind1.value = felterAf(tp)[0];
+    ind1.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("fane 1: det rigtige svar og Enter i feltet (Indsend svar) løser opgaven, og løst tæller op", S1.faerdig && S1.loest === foer + 1);
+    paastand("fane 1: pH-metret måler, og kortet har ingen knap videre imens", !!S1.maaling && !videre(S1) && !vises(S1.el.knap));
     kor(S1, 60);
-    paastand("fane 1: pH-metret viser facit bagefter", S1.visning === K.phTekst(S1.opg.slutPh) && !S1.el.knap.disabled && S1.el.knap.textContent === "Ny opgave");
+    paastand("fane 1: pH-metret viser facit bagefter, og kortet bliver med Ny opgave", S1.visning === K.phTekst(S1.opg.slutPh) && !!videre(S1) &&
+        videre(S1).textContent === "Ny opgave →" && /pH-metret viser/.test(kortT(S1)) && /Hvad er pH\?/.test(kortT(S1)));
     paastand("fane 1: pilen er brugt, og stationen pH er regnet", S1.pilStatus("h>ph") === "brugt" && S1.stationStatus("ph") === "loest");
-    S1.knap();
+    videre(S1).click();
     paastand("fane 1: Ny opgave giver en ny opgave, og pilen er væk igen", !S1.faerdig && S1.trinNr === 0 && !S1.pilSes("h>ph"));
 
     /* En elev med sin egen lommeregner kan skrive svaret, så snart formlen er valgt */
-    S1.vaelgFormel(formelNr(S1.trin(), true));
+    vaelgOgSend(S1, formelNr(S1.trin(), true)); S1.videre();
     skrivSvar(S1, felterAf(S1.trin()));
     paastand("svaret kan skrives uden at bruge lommeregneren", S1.faerdig);
     kor(S1, 60);
@@ -339,12 +362,15 @@ function koerTest(W) {
     S1.nyOpgave();
 
     /* Hjaelpen til hver bid */
+    klik("#ph-knap");
+    paastand("formel: Giv hint giver et hint og så Vis formlen", /^Hint/.test(S1.el.besked.textContent) && S1.el.knap.textContent === "Vis formlen" && !S1.pilSes("h>ph"));
+    klik("#ph-knap");
+    paastand("Vis formlen: formlen står på pilen, og kortet bliver med formlen i gult og Næste", S1.formelOk && S1.pilSes("h>ph") && S1.venter === "formel" &&
+        S1.el.skort.classList.contains("svar") && knapFor(S1, formelNr(S1.trin(), true)).classList.contains("svar-vist"));
     S1.knap();
-    paastand("formel: Giv hint giver et hint og så Vis formlen", /Hint:/.test(S1.el.besked.innerHTML) && S1.el.knap.textContent === "Vis formlen" && !S1.pilSes("h>ph"));
+    paastand("… og Næste går til lommeregneren", S1.bid === "tast" && S1.el.knap.textContent === "Giv hint");
     S1.knap();
-    paastand("Vis formlen: formlen er valgt og står på pilen; næste bid", S1.formelOk && S1.pilSes("h>ph") && S1.bid === "tast" && S1.el.knap.textContent === "Giv hint");
-    S1.knap();
-    paastand("tast: Giv hint viser tallene sat ind og så Vis tasterne", /Hint:/.test(S1.el.besked.innerHTML) && S1.el.knap.textContent === "Vis tasterne");
+    paastand("tast: Giv hint viser tallene sat ind og så Vis tasterne", /^Hint/.test(S1.el.besked.textContent) && S1.el.knap.textContent === "Vis tasterne");
     S1.knap();
     paastand("Vis tasterne: lommeregneren taster selv, og knappen er låst", R.iDemo() && S1.el.knap.disabled);
     R.spolDemo();
@@ -356,17 +382,23 @@ function koerTest(W) {
     var foer2 = S1.loest;
     S1.knap();
     kor(S1, 60);
-    paastand("Vis svaret: trinet er vist, og løst tæller ikke op", S1.status[0] === "vist" && S1.faerdig && S1.loest === foer2);
+    paastand("Vis svaret: trinet er vist, og løst tæller ikke op", S1.status[0] === "vist" && S1.faerdig && S1.loest === foer2 && S1.el.skort.classList.contains("svar"));
 
     NK.visFane("fane-konc");
     S2.nyOpgave();
     kor(S2, 60);
     paastand("fane 2: pH-metret har målt, før eleven regner", S2.maalt && S2.visning === K.phTekst(S2.opg.maalFoer));
     paastand("fane 2: [OH⁻] står ikke på regnevejen endnu", !S2.stationSes("oh"));
-    loesTrin(S2);
-    paastand("fane 2: [H₃O⁺] rigtig, trin 2 kommer, og [OH⁻] kommer på regnevejen", S2.trinNr === 1 && S2.bid === "formel" && S2.stationSes("oh") && !S2.pilSes("h>oh"));
+    vaelgOgSend(S2, formelNr(S2.trin(), true)); S2.videre();
+    skrivSvar(S2, felterAf(S2.trin()));
+    paastand("fane 2: et rigtigt trin bliver stående med beregningen og Næste trin", S2.venter === "trin" && S2.trinNr === 0 && /Trin 1 af 2/.test(kortT(S2)) &&
+        !!videre(S2) && videre(S2).textContent === "Næste trin →" && /\[H₃O⁺\] =/.test(S2.el.skort.querySelector(".sk-bund.bliv").textContent));
+    videre(S2).click();
+    paastand("fane 2: Næste trin: trin 2 kommer, og [OH⁻] kommer på regnevejen", S2.trinNr === 1 && S2.bid === "formel" && S2.stationSes("oh") && !S2.pilSes("h>oh") &&
+        /Trin 2 af 2/.test(kortT(S2)));
     loesTrin(S2);
     paastand("fane 2: [OH⁻] rigtig, og opgaven er løst", S2.faerdig && S2.stationStatus("oh") === "loest" && S2.pilSes("h>oh"));
+    S2.nyOpgave(); kor(S2, 60);
 
     NK.visFane("fane-staerk");
     S3.nyOpgave(); S3.nyOpgave(); S3.nyOpgave();
@@ -490,6 +522,8 @@ function koerTest(W) {
             var ok = lay.vejBund <= sim.etiketY() + 2 && lay.etiketX > lay.glas.x && lay.st.ph.x + lay.st.ph.b / 2 <= lay.W;
             var em = Tg.etiketMaal(sim.L.ctx, sim.opg.etiket.map(function (l) { return { navn: l.navn, vaerdi: "8,8 · 10⁻¹⁴ M" }; }), lay.etiketPx);
             var fri = lay.etiketX + em.b <= lay.meter.x - lay.meter.b / 2 + 4;
+            var vejTop = sim.p === "staerk" ? lay.st.cb.y - lay.st.cb.h / 2 : lay.st.h.y - lay.st.h.h / 2 - lay.px * 1.9;
+            if (vejTop < 10 + sim.kortZone()) ok = false;
             paastand(str[0] + " × " + str[1] + " " + f + ": vejen over etiketten, etiketten mellem glas og pH-meter", ok && fri,
                 "vejBund " + Math.round(lay.vejBund) + ", etiketY " + Math.round(sim.etiketY()) + ", etiket " + Math.round(lay.etiketX + em.b) + " / meter " + Math.round(lay.meter.x - lay.meter.b / 2));
         });
@@ -499,9 +533,49 @@ function koerTest(W) {
             paastand(str[0] + " × " + str[1] + ": lommeregnerens =-tast kan ses", lig.bottom <= str[1] && lig.top > 0, Math.round(lig.bottom));
         }
     });
+    overskrift("13. Papirkortet holder sig i sin plads (almindelig og lav skærm)");
+    [[1400, 860], [1100, 700]].forEach(function (str) {
+        ramme.style.width = str[0] + "px";
+        ramme.style.height = str[1] + "px";
+        var hoejst = 0, hvorH = "", pr = [];
+        function maal(sim, hvor) {
+            sim.tilpas(); sim.visKort();
+            var h = sim.el.skort.offsetHeight;
+            if (h > hoejst) { hoejst = h; hvorH = hvor; }
+            if (h > sim.kortZone()) pr.push(hvor + " " + h + " > " + sim.kortZone());
+        }
+        [["fane-ph", S1], ["fane-konc", S2], ["fane-staerk", S3]].forEach(function (x) {
+            NK.visFane(x[0]);
+            var sim = x[1];
+            for (var g = 0; g < 8; g++) {
+                sim.nyOpgave(); kor(sim, 2);
+                var n = 0;
+                while (!sim.faerdig && n++ < 6) {
+                    var t = sim.trin(), hvor = x[0] + " opgave " + g + " trin " + sim.trinNr;
+                    maal(sim, hvor + " " + sim.bid);
+                    if (sim.bid === "formel") {
+                        sim.hjaelpKlik(); maal(sim, hvor + " formelhint");
+                        t.formler.forEach(function (f, k) { if (!f.rigtig) { sim.forkerteFormler = {}; sim.formelSvar(k); maal(sim, hvor + " forkert formel " + k); } });
+                        sim.hjaelpKlik(); maal(sim, hvor + " formel vist");
+                        sim.videre();
+                    }
+                    maal(sim, hvor + " " + sim.bid);
+                    sim.hjaelp = 0; sim.hjaelpKlik(); maal(sim, hvor + " hint " + sim.bid);
+                    sim.besked(NK.Skort.maerke("Ikke endnu", "Det kan ikke læses som et tal. Skriv fx 3,8 i det store felt og −4 i det lille."), "skidt"); maal(sim, hvor + " fejl");
+                    R.stopDemo();
+                    sim.bid = "skriv"; sim.hjaelp = 1; sim.visSvar(); maal(sim, hvor + " svaret");
+                    if (sim.venter === "trin") sim.videre();
+                }
+                maal(sim, x[0] + " opgave " + g + " måler");
+                kor(sim, 60); maal(sim, x[0] + " opgave " + g + " færdig");
+            }
+        });
+        paastand("ved " + str[0] + " × " + str[1] + " er kortet højst " + hoejst + " px (" + hvorH + ") og holder sig i kortZone", pr.length === 0, pr.slice(0, 3).join("; "));
+    });
     ramme.style.width = "";
     ramme.style.height = "";
     NK.visFane("fane-ph");
+    S1.nyOpgave(); S2.nyOpgave(); S3.nyOpgave();
 }
 </script>
 </body>

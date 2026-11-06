@@ -2,8 +2,8 @@
    app.js - starter spillet (som sc1.4_afstemning, men uden faner)
 
    Overlays (teorien, butikken og esterkortet), tastaturgenveje og
-   tegneloekken. Der er ingen laerer: hjaelpen staar i statuslinjen
-   nederst i scenen (som sc1.4).
+   tegneloekken. Der er ingen laerer: al tekst staar paa papirkortet
+   oeverst i midten af scenen (js/fane.js).
    ===================================================================== */
 (function () {
     "use strict";

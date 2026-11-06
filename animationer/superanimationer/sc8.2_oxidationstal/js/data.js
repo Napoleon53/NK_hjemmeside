@@ -15,15 +15,16 @@
     /* ----- Grundstofferne ------------------------------------------------------
        en: Paulings elektronegativitet med én decimal (Databogen, samme tal
        som den gamle c8.3 og sc3.3). v: valenselektroner. farve: symbolet og
-       dets elektroner paa den moerke tavle. */
+       dets elektroner paa den moerke tavle. papir: samme farve, moerkere,
+       til symbolet ved gaettet paa det lyse papirkort (6. nov. 2026). */
     D.GRUNDSTOF = {
-        H:  { navn: "hydrogen", en: 2.1, v: 1, farve: "#eef2f6" },
-        C:  { navn: "carbon",   en: 2.5, v: 4, farve: "#8e99a8" },
-        N:  { navn: "nitrogen", en: 3.0, v: 5, farve: "#86aaff" },
-        O:  { navn: "oxygen",   en: 3.5, v: 6, farve: "#ff8474" },
-        F:  { navn: "fluor",    en: 4.0, v: 7, farve: "#bfe46e" },
-        S:  { navn: "svovl",    en: 2.5, v: 6, farve: "#f4d661" },
-        Cl: { navn: "chlor",    en: 3.0, v: 7, farve: "#74d886" }
+        H:  { navn: "hydrogen", en: 2.1, v: 1, farve: "#eef2f6", papir: "#3a4150" },
+        C:  { navn: "carbon",   en: 2.5, v: 4, farve: "#8e99a8", papir: "#4b5563" },
+        N:  { navn: "nitrogen", en: 3.0, v: 5, farve: "#86aaff", papir: "#2a5fc4" },
+        O:  { navn: "oxygen",   en: 3.5, v: 6, farve: "#ff8474", papir: "#c4493c" },
+        F:  { navn: "fluor",    en: 4.0, v: 7, farve: "#bfe46e", papir: "#5b8a12" },
+        S:  { navn: "svovl",    en: 2.5, v: 6, farve: "#f4d661", papir: "#9a7a0c" },
+        Cl: { navn: "chlor",    en: 3.0, v: 7, farve: "#74d886", papir: "#2b7d51" }
     };
 
     /* Den ekstra elektron i en negativ ion (OH⁻) */
@@ -101,7 +102,7 @@
        ekstra / mangler: det atom, der har ionens ekstra elektron, eller som
        mangler én.
        forklar: én kort saetning om, hvor elektronparrene endte, i ord og
-       uden regnestykker. Den staar i linjen i arbejdsfeltet. Beregningen
+       uden regnestykker. Den staar i linjen paa kortet. Beregningen
        under linjen (oxidationstal = valenselektroner − elektroner nu, én
        linje pr. grundstof i spoerg, og summen for en ion) bygges af
        modellen i js/sim_elektroner.js, saa tallene ikke staar inde i
@@ -132,12 +133,12 @@
           atomer: [["C", 0, 0], ["C", 1, 0], ["H", 0, -1], ["H", 0, 1], ["H", 1, -1], ["H", 1, 1]],
           bindinger: [[0, 1, 2], [0, 2, 1], [0, 3, 1], [1, 4, 1], [1, 5, 1]],
           forklar: "Hvert C har fået elektronparrene fra sine to H. Dobbeltbindingen mellem de to C er delt ligeligt." },
-        { id: "h2", navn: "Hydrogen", f: "H2", q: 0, spoerg: ["H"],
+        { id: "h2", navn: "Dihydrogen", f: "H2", q: 0, spoerg: ["H"],
           atomer: [["H", 0, 0], ["H", 1, 0]],
           bindinger: [[0, 1, 1]],
           forklar: "To ens atomer trækker lige hårdt, så hvert H har beholdt sin egen elektron.",
           note: "Et grundstof har altid oxidationstallet 0." },
-        { id: "o2", navn: "Oxygen", f: "O2", q: 0, spoerg: ["O"],
+        { id: "o2", navn: "Dioxygen", f: "O2", q: 0, spoerg: ["O"],
           atomer: [["O", 0, 0], ["O", 1, 0]],
           bindinger: [[0, 1, 2]],
           forklar: "To ens atomer trækker lige hårdt, så dobbeltbindingen er delt ligeligt.",
@@ -165,8 +166,8 @@
     /* Ordene i beregningen under forklaringen paa fane 2 (og i teorien) */
     D.REGN_ORD = { ox: "oxidationstal", v: "valenselektroner", nu: "elektroner nu", sum: "summen", ion: "det er ionens ladning" };
 
-    /* ----- Linjerne i arbejdsfeltet ---------------------------------------------------
-       Spoergsmaalet, fejl, hint og ros staar i arbejdsfeltet i scenen, ved
+    /* ----- Linjerne paa kortet ---------------------------------------------------
+       Spoergsmaalet, fejl, hint og ros staar paa kortet i scenen, ved
        feltet (brugerens test 3. okt. 2026). */
     D.FAERDIG = {
         rg: "Alle 31. Summen er ladningen, hver gang.",

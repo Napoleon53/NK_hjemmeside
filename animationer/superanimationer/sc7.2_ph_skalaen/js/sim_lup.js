@@ -10,9 +10,14 @@
 
    Fem maal (D.LUP_MAAL) i smaa bidder: pH 6 (10 gange i samme rum),
    pH 5 (det foerste zoom), pH 2 (tael zoomene), hvor mange gange
-   (valg) og pH 12 (nu er det OH⁻). Et pH-maal er naaet, naar maerket
-   er sluppet paa den rigtige pH, og luppen er faerdig med at zoome.
-   Bagefter er der frit valg. Hvor langt eleven er naaet, huskes under
+   (valg) og pH 12 (nu er det OH⁻). Papirkortet (6. nov. 2026,
+   js/skort.js): maalet staar paa kortet oeverst i scenen. Maerket og
+   svarknapperne vaelger kun; et maal bedoemmes, naar eleven trykker
+   Indsend svar (og luppen er faerdig med at zoome). Efter et rigtigt
+   svar bliver kortet med forklaringen og Naeste maal, og maerket er
+   laast imens (et klik faar kortet til at blinke). Under valg-maalet
+   er maerket ogsaa laast. Bagefter er der frit valg; Start maalene
+   forfra ligger i panelet. Hvor langt eleven er naaet, huskes under
    NOEGLE.
    ===================================================================== */
 (function () {
@@ -40,7 +45,7 @@
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.nr = NK.klamp(gemt.maal || 0, 0, D.LUP_MAAL.length);
         this.rost = this.nr >= D.LUP_MAAL.length;
-
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -56,7 +61,7 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
-        lay.luft = NK.klamp(H * 0.1, 10, 70);
+        lay.luft = 10 + this.kortZone() + 2;      /* pH-maerket staar under papirkortet */
         lay.px = NK.klamp(W * 0.017, 12, 15);
         var bandH = NK.klamp(H * 0.055, 24, 40);
         lay.skala = { x0: kant + 40, x1: W - kant - 40, y: Math.round(lay.luft + 56), h: bandH };
@@ -81,6 +86,9 @@
         this.saetAnker("lup-anker-lup", lay.lup.cx - R - 8, lay.lup.cy - R - 8, 2 * R + 16, 2 * R + 16);
         this.saetAnker("lup-anker-zoom", lay.lup.cx - R, lay.tekstY - 4, 2 * R, 2 * lay.px + 34);
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 132, 158); };
 
     P.saetAnker = function (id, x, y, b, h) {
         var e = NK.el(id);
@@ -129,6 +137,10 @@
         this.naaet = false;
         this.hjaelp = 0;
         this.valgNr = -1;
+        this.forkert = {};
+        this.vist = false;
+        this.venterTjek = false;
+        this.pegKnap = false;
         this.glid = null;
         this.besked("", "");
         if (m) this.ph = m.start;
@@ -141,19 +153,61 @@
         this.visStatus();
     };
 
+    /* Et pH-maal bedoemmes foerst, naar eleven har trykket Indsend svar (eller
+       Vis svaret), og luppen er faerdig med at zoome */
     P.tjekMaal = function () {
         var m = this.maal();
         if (!m || this.naaet || m.slags === "valg") return;
+        if (!this.venterTjek && this.hjaelp !== 2) return;
         if (this.traek || this.glid || !this.lup.rolig()) return;
-        if (Math.abs(this.ph - m.ph) < 0.04) this.maalNaaet();
+        this.venterTjek = false;
+        if (Math.abs(this.ph - m.ph) < 0.04) { this.maalNaaet(); return; }
+        if (this.hjaelp === 2) return;
+        var ret = m.ph < this.ph ? "mod venstre" : "mod højre";
+        this.besked(NK.Skort.maerke("Ikke endnu", "Mærket står på pH " + K.phTekst(this.ph, 1) +
+            ", og det passer ikke med opgaven. Træk mærket " + ret + "."), "skidt");
+        this.kort.ryst();
+        this.pegKnap = true;
+        this.visKort();
+    };
+
+    /* Kan der trykkes Indsend svar? Et pH-maal: maerket er flyttet og staar stille */
+    P.kanSendes = function () {
+        var m = this.maal();
+        if (!m || this.naaet || this.hjaelp === 2) return false;
+        if (m.slags === "valg") return this.valgNr >= 0;
+        return Math.abs(this.ph - m.start) >= 0.04 && !this.traek && !this.glid && !this.venterTjek;
+    };
+
+    /* Indsend svar */
+    P.indsend = function () {
+        var m = this.maal();
+        if (!this.kanSendes()) { this.kort.blink(); return; }
+        this.pegKnap = false;
+        if (m.slags === "valg") {
+            var i = this.valgNr;
+            if (i === m.rigtig) { this.maalNaaet(); return; }
+            this.forkert[i] = true;
+            this.valgNr = -1;
+            this.besked(NK.Skort.maerke("Ikke endnu", NK.html(m.valg[i][1]) + " Vælg igen."), "skidt");
+            this.kort.ryst();
+            this.pegKnap = true;
+            this.visKort();
+            return;
+        }
+        this.venterTjek = true;
+        this.besked("", "");
+        this.tjekMaal();
+        this.visKort();
     };
 
     P.maalNaaet = function () {
         var m = this.maal();
-        var svar = this.hjaelp === 2;
+        this.vist = this.hjaelp === 2;
         this.naaet = true;
         this.hjaelp = 0;
-        this.besked((svar ? "<b>Svar:</b> " : "") + NK.html(m.efter), svar ? "gul" : "god");
+        this.pegKnap = false;
+        this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
         var gemt = NK.hent(NOEGLE, {}) || {};
         NK.gem(NOEGLE, { maal: Math.max(this.nr + 1, gemt.maal || 0) });
@@ -166,25 +220,31 @@
         this.visStatus();
     };
 
-    /* Et valg i en valg-opgave */
+    /* Et valg i en valg-opgave: vaelger kun (Indsend svar sender) */
     P.vaelg = function (i) {
         var m = this.maal();
-        if (!m || m.slags !== "valg" || this.naaet) return;
+        if (!m || m.slags !== "valg" || this.naaet || this.forkert[i]) return;
         this.valgNr = i;
         if (this.afvisTilbud) this.afvisTilbud();
-        if (i === m.rigtig) { this.maalNaaet(); return; }
-        this.besked(NK.html(m.valg[i][1]) + " Vælg igen.", "skidt");
-        this.bygOpgave();
+        this.besked("", "");
+        this.visKort();
     };
 
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
     P.knap = function () {
+        if (this.naaet) this.videre(); else this.hjaelpKlik();
+    };
+
+    /* Start maalene forfra (knappen i panelet) */
+    P.forfra = function () {
+        this.nr = 0;
+        this.startMaal();
+    };
+
+    /* Kortets groenne knap: naeste maal, efter det sidste videre til fortyndingen */
+    P.videre = function () {
         var m = this.maal();
-        if (!m) {
-            this.nr = 0;
-            this.startMaal();
-            return;
-        }
-        if (this.naaet) {
+        if (m && this.naaet) {
             var sidste = this.nr >= D.LUP_MAAL.length - 1;
             this.nr++;
             if (sidste) {
@@ -195,11 +255,17 @@
                 return;
             }
             this.startMaal();
-            return;
         }
+    };
+
+    /* Hintknappen paa kortet: Giv hint -> Vis svaret */
+    P.hjaelpKlik = function () {
+        var m = this.maal();
+        if (!m || this.naaet) return;
+        this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(m.hint), "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(m.hint)), "gul");
             this.visMaal();
             return;
         }
@@ -212,6 +278,7 @@
             return;
         }
         this.traek = null;
+        this.besked("", "");
         this.glidTil(m.ph);
         this.visMaal();
         this.tjekMaal();
@@ -229,59 +296,74 @@
         this.el = {
             knap: NK.el("lup-knap"),
             besked: NK.el("lup-besked"),
-            kort: NK.el("lup-kort"),
-            opgave: NK.el("lup-opgave")
+            status: NK.el("lup-status"),
+            indsend: NK.el("lup-indsend"),
+            skort: NK.el("lup-skort")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-    };
-
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
-
-    /* Valgknapperne i valg-opgaven */
-    P.bygOpgave = function () {
-        var m = this.maal(), mig = this, v = this.el.opgave;
-        v.innerHTML = "";
-        if (!m || m.slags !== "valg") return;
-        var rad = document.createElement("div");
-        rad.className = "vaelgerrad";
-        m.valg.forEach(function (x, i) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "vaelger";
-            if (i === mig.valgNr) b.className += i === m.rigtig ? " rigtig" : " forkert";
-            b.textContent = x[0];
-            b.disabled = mig.naaet;
-            b.addEventListener("click", function () { mig.vaelg(i); });
-            rad.appendChild(b);
+        this.kort = new NK.Skort("lup", {
+            valg: function (j) { mig.vaelg(j); },
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
         });
-        v.appendChild(rad);
+        NK.el("lup-forfra").addEventListener("click", function () { mig.forfra(); });
     };
+
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
+    P.besked = function (html, klasse) {
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort) this.visKort();
+    };
+
+    /* Valgknapperne staar paa papirkortet (visKort) */
+    P.bygOpgave = function () { this.visKort(); };
 
     P.visMaal = function () {
         var m = this.maal();
-        NK.saetTekst("lup-nr", String(Math.min(this.nr + 1, D.LUP_MAAL.length)));
-        NK.el("lup-taeller").hidden = !m;
-        var tekst, klasse = "knap";
+        NK.saetHTML("lup-taeller", m ? "mål <b>" + (this.nr + 1) + "</b>/" + D.LUP_MAAL.length : "alle " + D.LUP_MAAL.length + " nået");
+        this.visKort();
+    };
+
+    /* Papirkortet: maalet, svarene, beskeden, Giv hint og Indsend svar. Naar
+       maalet er naaet, bliver kortet med forklaringen og knappen videre. */
+    P.visKort = function () {
+        if (!this.kort) return;
+        var m = this.maal(), mig = this;
+        var b = this.fast;
+        if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
         if (!m) {
-            NK.saetTekst("lup-titel", "Frit valg");
-            NK.saetTekst("lup-prompt", "Træk pH-mærket, og se luppen zoome.");
-            tekst = "Start målene forfra";
-        } else {
-            NK.saetTekst("lup-titel", "Mål");
-            NK.saetTekst("lup-prompt", m.tekst);
-            if (this.naaet) {
-                tekst = this.nr >= D.LUP_MAAL.length - 1 ? "Videre til fortyndingen →" : "Næste mål →";
-                klasse = "knap blaa banker";
-            } else if (this.hjaelp === 2) tekst = "Viser svaret …";
-            else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            this.kort.vis({ chip: "Frit valg", tekst: "Træk pH-mærket, og se luppen zoome.", besked: b, hint: null, indsend: null });
+            return;
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = !!m && !this.naaet && this.hjaelp === 2;
-        this.el.kort.classList.toggle("sejr", this.naaet);
+        var svar = null;
+        if (m.slags === "valg") {
+            svar = m.valg.map(function (x, j) {
+                var kl = "";
+                if (mig.naaet) kl = j === m.rigtig ? (mig.vist ? "svar-vist" : "rigtig") : (mig.forkert[j] ? "forkert" : "dim");
+                else if (mig.forkert[j]) kl = "forkert";
+                else if (mig.valgNr === j) kl = "valgt";
+                return { html: NK.html(x[0]), kl: kl };
+            });
+        }
+        var klar = this.kanSendes();
+        this.kort.vis({
+            chip: "Mål " + (this.nr + 1) + " af " + D.LUP_MAAL.length,
+            tekst: NK.html(m.tekst),
+            svar: svar,
+            laast: this.naaet,
+            bliv: this.naaet ? { tekst: NK.html(m.efter), vist: this.vist,
+                knap: this.nr >= D.LUP_MAAL.length - 1 ? "Videre til fortyndingen →" : "Næste mål →" } : null,
+            besked: b,
+            hint: { tekst: this.hjaelp === 0 ? "Giv hint" : (this.hjaelp === 1 ? "Vis svaret" : "Viser svaret …"),
+                svar: this.hjaelp > 0, peg: this.pegKnap, laast: this.hjaelp === 2 },
+            indsend: { tekst: klar && m.slags !== "valg" ? "Indsend svar: pH " + K.phTekst(this.ph, 1) : "Indsend svar", klar: klar }
+        });
+    };
+
+    /* Maerket er laast, naar kortet viser et spoergsmaal eller venter paa Naeste */
+    P.laast = function () {
+        var m = this.maal();
+        return !!m && (this.naaet || m.slags === "valg");
     };
 
     P.visMaaling = function () {
@@ -295,15 +377,16 @@
         NK.saetTekst("lup-modvand", K.modVand(this.ph));
     };
 
-    P.visStatus = function () {
-        var m = this.maal(), zm = this.lup.zoomerMod(), t;
-        if (zm < 0) t = "Over 100 at se. Luppen zoomer ind på et 10 gange mindre rum.";
-        else if (zm > 0) t = "Højst 10 at se. Luppen zoomer ud til et 10 gange større rum.";
-        else if (this.naaet && m) t = "Målet er nået. Tryk på knappen til højre for at gå videre.";
-        else if (m && m.slags === "valg") t = "Vælg dit svar til højre. Du kan stadig trække pH-mærket.";
-        else if (m && Math.abs(this.ph - m.start) < 0.04 && !this.glid) t = "Træk pH-mærket på skalaen. Et klik på skalaen virker også.";
-        else t = "pH " + K.phTekst(this.ph, 1) + ". " + K.modVand(this.ph);
-        NK.saetHTML("lup-status", t);
+    /* Det, kortet siger, mens der ikke er en besked (der er ingen linje nederst) */
+    P.visStatus = function () { this.visKort(); };
+
+    P.linje = function () {
+        var m = this.maal(), zm = this.lup.zoomerMod();
+        if (zm < 0) return "Over 100 at se. Luppen zoomer ind på et 10 gange mindre rum.";
+        if (zm > 0) return "Højst 10 at se. Luppen zoomer ud til et 10 gange større rum.";
+        if (m && (this.naaet || m.slags === "valg")) return "";
+        if (m && Math.abs(this.ph - m.start) < 0.04 && !this.glid) return "Træk pH-mærket på skalaen. Et klik på skalaen virker også.";
+        return "pH " + K.phTekst(this.ph, 1) + ". " + K.modVand(this.ph);
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------ */
@@ -397,6 +480,8 @@
             var u = mig.hvadErUnder(pt);
             if (!u || (u.slags !== "maerke" && u.slags !== "skala")) return;
             if (mig.hjaelp === 2 && !mig.naaet) return;
+            if (mig.laast()) { mig.kort.blink(); return; }
+            if (mig.fast.klasse === "skidt") mig.besked("", "");
             if (mig.afvisTilbud) mig.afvisTilbud();
             /* Paa maerket: traek det. Paa skalaen: maerket glider derhen,
                og traekkes der videre, foelger det musen. */
@@ -446,15 +531,16 @@
         if (!u) return;
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "lup") {
-            this.besked("Luppen viser et lille rum af væsken. Den zoomer selv, så der er 10 til 100 af den ion, der er flest af.", "");
+            this.besked("Luppen viser et lille rum af væsken. Den zoomer selv, så der er 10 til 100 af den ion, der er flest af.", "peger");
             return;
         }
-        if (u.slags === "glas") this.besked("Vand med et par dråber universalindikator. Farven følger pH.", "");
+        if (u.slags === "glas") this.besked("Vand med et par dråber universalindikator. Farven følger pH.", "peger");
     };
 
     /* Tastaturet: pilene flytter pH */
     P.tast = function (e) {
         if (this.hjaelp === 2 && !this.naaet) return false;
+        if ((e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") && this.laast()) { this.kort.blink(); return true; }
         var fra = this.glid ? this.glid.til : this.ph;
         if (e.key === "ArrowLeft") { this.glid = null; this.saetPh(this.ph - 0.1); return true; }
         if (e.key === "ArrowRight") { this.glid = null; this.saetPh(this.ph + 0.1); return true; }
@@ -464,7 +550,8 @@
     };
 
     P.enter = function () {
-        if (this.naaet || !this.maal()) this.knap();
+        if (this.naaet) this.videre();
+        else if (this.kanSendes()) this.indsend();
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */

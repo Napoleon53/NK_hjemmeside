@@ -21,17 +21,19 @@
             { sel: "#stempel-anker-hylde", titel: "Lodderne", tekst: "Træk et lod op på stemplet, eller klik på det. Hvert lod trykker med 1 bar oven i luftens 1,013 bar." },
             { sel: "#stempel-anker-flaske", titel: "Gasflasken", tekst: "Klik på flasken for 0,25 mol gas mere. Den røde hane ved cylinderen lukker gas ud." },
             { sel: "#stempel-anker-manometer", titel: "Manometeret", tekst: "Viser trykket i gassen. Klik på stemplet for at låse det, så volumen ikke kan ændre sig." },
-            { sel: "#stempel-kort", titel: "Opgaven", tekst: "Vælg først, hvad du tror, der sker. Prøv det så. Linjen i kortet siger, hvad du skal nu." },
+            { sel: "#stempel-skort", titel: "Opgaven", tekst: "Vælg først, hvad du tror, der sker, og tryk Indsend svar. Prøv det så. Linjen i kortet siger, hvad du skal nu." },
             { sel: "#stempel-anker-graf", titel: "Grafen", tekst: "Tryk mod volumen. Kurven viser alle p og V ved den temperatur og stofmængde, gassen har nu." },
-            { sel: "#stempel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
+            { sel: "#stempel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på knappen med den gule kant. Først får du et hint, og et tryk mere viser svaret." },
+            { sel: "#stempel-opgaver", titel: "Opgaverne", tekst: "De syv opgaver. Klik på et tal for at vælge en opgave. Start opgaven forfra stiller gassen tilbage." },
             { sel: ".faneknapper", titel: "Beregningen", tekst: "På fane 2 regner du med idealgasligningen." }
         ],
         "fane-regn": [
-            { sel: "#regn-kort", titel: "Opgaven", tekst: "Hvert trin: skriv først formlen, så tallet. Tryk Enter for at tjekke. Linjen i kortet siger, hvad der gik galt." },
+            { sel: "#regn-skort", titel: "Opgaven", tekst: "Opgaven og det næste skridt. Linjen i kortet siger, hvad der gik galt." },
+            { sel: "#regn-kort", titel: "Beregningen", tekst: "Hvert trin: skriv først formlen, så tallet. Tryk Enter eller Indsend svar for at tjekke." },
             { sel: "#regn-anker-cylinder", titel: "Cylinderen", tekst: "Opgavens gas. Det, du skal finde, er dækket, til du har regnet det ud." },
             { sel: "#regn-anker-tavle", titel: "Tavlen", tekst: "Beregningerne, som de skal skrives, med enheder. R står i hjørnet." },
             { sel: "#regn-opgaver", titel: "Opgaverne", tekst: "Let: temperaturen i kelvin. Middel: temperaturen i °C. Svær: massen er med. Nye tal giver samme opgave med andre tal." },
-            { sel: "#regn-knap", titel: "Giv hint", tekst: "Den gule knap. Giv hint siger, hvad du kender. Vis svaret viser formlen eller beregningen." }
+            { sel: "#regn-knap", titel: "Giv hint", tekst: "Knappen med den gule kant. Giv hint siger, hvad du kender. Vis svaret viser formlen eller beregningen." }
         ]
     };
     var trin = [];

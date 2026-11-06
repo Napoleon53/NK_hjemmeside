@@ -37,6 +37,34 @@ Det blev til (udformningen er Claudes; brugeren har ikke set den endnu):
 
 Afsnittene nedenfor er rettet til, så de beskriver animationen, som den er nu.
 
+## Papirkortet (6. nov. 2026)
+
+Al tekst står på ét lyst papirkort øverst i midten af scenen (`faelles/papirkort.css` og
+`papirkort.js`, fælles kode i `js/fane.js`): etiketten (Opgave 2 af 6, trin 1 af 3), opgaven,
+svarknapperne og nederst hint, fejl og forklaring med hintknappen (gul kant) og **Indsend
+svar**. Den mørke statuslinje (klassen hed statuslinje, men stod øverst) og knapperne under figuren er væk.
+
+- Svarknapperne vælger kun; Indsend svar (eller Enter) sender. Indsend svar er grå, til der
+  er noget at sende, og skjult i skridt, der er en handling i scenen. Et forkert svar bliver
+  rødt og kan ikke vælges igen. Tasterne vælger kun.
+- Handlinger virker straks og er blå knapper på kortet: Vend B om.
+- Klik i figuren, der var svar, vælger nu kun (blå ring), og Indsend svar sender: vinderen på hvert C-atom i E og Z.
+- Efter et rigtigt svar bliver kortet på opgaven: svaret er grønt, forklaringen står under
+  svarene, og Næste opgave (eller Videre til næste fane) står, hvor Indsend svar stod. Efter
+  sidste opgave på sidste fane er der ingen knap. Et klik i scenen får kortet til at blinke.
+- Samme opgave forfra ligger nederst i panelet.
+- Butan (opgave 1) løses ikke længere af sig selv, når CH₃ står øverst: eleven trykker
+  Indsend svar, som tjekker drejningen. But-2-en (opgave 2) har fået et spørgsmål: "Kan CH₃
+  komme derop?" med svarene Ja, CH₃ kan drejes op og Nej, CH₃ fjedrer tilbage.
+- Byg selv i E og Z: Tjek molekylet er blevet til Indsend svar.
+- Spillet: svaret vælges og sendes med Indsend svar, og uret stopper ved Indsend svar (så
+  bonussen for under 2 s er lidt sværere at få). Spillet går ikke længere selv videre efter
+  et rigtigt svar; kortet bliver på molekylet med forklaringen og Næste molekyle. Start
+  spillet står på kortet; Spil igen ligger i panelet.
+
+Molekylenavnene (dioxygen osv.) er tjekket: kun grundstofnavne (atomnumre, prioritet) og
+navneled (dichlorethen, bromchlormethan), så intet er rettet.
+
 ## Bestillingen (2. oktober 2026)
 
 Brugeren: "Lav sb4.6 om til en superanimation". sb4.6 er knap 6 i B4.
@@ -121,7 +149,7 @@ Alt er regnet af grupperne (`js/ez.js`):
 | E eller Z, når et C-atom har to ens grupper | Det venstre C-atom har to ens grupper … |
 | Ingen, når der er isomeri | Begge C-atomer har to forskellige grupper, så der findes to former |
 
-Hjælpen er hinttrappen fra sc1.4 på kortet øverst i scenen: to eller tre trin
+Hjælpen er hinttrappen fra sc1.4 på papirkortet øverst i scenen: to eller tre trin
 pr. skridt og så Vis svaret, som kun løser det skridt, man er ved. Der er
 ingen lærer.
 
@@ -175,9 +203,10 @@ opgavernes facit og byg-kravene, beskederne til fælderne, at alle opgaver
 kan løses selv (med stjerne) og med Vis svaret (uden), hinttrapperne,
 drejningen, fjederen og bytteopgavernes tre skridt på fane 1, cis og trans
 for alle molekyler, spillets point og fælder i begge emner, sproget, at
-kortet øverst holder sig inden for den plads, der er sat af, og layoutet fra
-1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (154 påstande), 10. oktober 2026.
+kortet øverst holder sig inden for kortZone, papirkortet (Indsend svar, valg
+bedømmer ikke, bliv på spørgsmålet med Næste, forfra i panelet, blink) og
+layoutet fra 1100 × 650 til 1600 × 950.
+Sidst kørt: ALT OK (196 påstande), 6. november 2026.
 
 ## I menuen
 

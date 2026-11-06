@@ -2,7 +2,7 @@
    app.js - binder de to faner sammen
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Ingen praesentation: linjen i opgavekortet
+   fane opdateres og tegnes. Ingen praesentation: linjen i papirkortet
    siger, hvor man er, og hvad man goer.
    ===================================================================== */
 (function () {

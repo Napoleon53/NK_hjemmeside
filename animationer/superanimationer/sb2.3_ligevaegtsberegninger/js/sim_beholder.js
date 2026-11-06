@@ -70,7 +70,7 @@
     }
 
     var P = SimBeholder.prototype;
-    NK.Fane.paa(P, { navn: "bh", naesteFane: "fane-ux", naesteNavn: "Uden x", videreTekst: "Næste mål →" });
+    NK.Fane.paa(P, { navn: "bh", chip: "Mål", naesteFane: "fane-ux", naesteNavn: "Uden x", videreTekst: "Næste mål →" });
 
     P.maal = function () { return this.opgaver[this.nr]; };
 
@@ -94,7 +94,7 @@
         this.skyder.max = String(this.xMax);
         this.saetX(0, true);
         if (nyRx || !this.mol.length) this.nyeMolekyler();
-        NK.saetHTML("bh-linje", NK.kc(NK.html(m.linje)));
+        this.valgtSvar = null;
         NK.saetHTML("bh-xdef", NK.html("koncentrationen af " + M.skriv(rx.xStof) + ", der er " + rx.xOrd));
         this.bygSkema();
         this.bygY();
@@ -102,12 +102,37 @@
         this.tilpasSkema();
     };
 
-    P.promptHTML = function () {
+    /* Papirkortet: maalets tekst og det, eleven skal goere */
+    P.kortData = function () {
         var m = this.maal();
-        var html = '<p class="note-tekst">' + NK.html(m.tekst) + "</p>";
-        html += '<p class="spm"><span class="rx-navn">' + NK.html(this.rx.navn) + ", " + NK.html(this.rx.T) + ":</span> " +
+        return { tekst: NK.html(m.tekst), spm: NK.html(m.linje) };
+    };
+
+    /* Panelet: reaktionen, temperaturen og K */
+    P.panelHTML = function () {
+        return '<p class="spm"><span class="rx-navn">' + NK.html(this.rx.navn) + ", " + NK.html(this.rx.T) + ":</span> " +
             NK.html(M.skemaTekst(this.rx)) + ", K = " + NK.html(M.kTekst(this.rx)) + "</p>";
-        return html;
+    };
+
+    /* Indsend svar er klar, naar der er noget at sende ind */
+    P.kanIndsende = function () {
+        var m = this.maal();
+        if (this.valgtSvar) return true;
+        if (m.type === "ligevaegt") return this.x > 0;
+        if (m.type === "udtryk") return (this.felter || []).some(function (f) { return f.value.trim(); });
+        return false;
+    };
+
+    /* Et svar, der er valgt med et klik (et stof, en loesning), bedoemmes
+       foerst ved Indsend svar */
+    P.vaelgSvar = function (knap, fn) {
+        if (this.faerdig) return;
+        var gl = NK.el("fane-bh").querySelectorAll(".valgt-svar");
+        for (var i = 0; i < gl.length; i++) gl[i].classList.remove("valgt-svar");
+        if (knap) knap.classList.add("valgt-svar");
+        this.valgtSvar = fn;
+        this.paab[this.nr] = true;
+        this.visIndsend();
     };
 
     /* ----- x ---------------------------------------------------------------------- */
@@ -119,25 +144,21 @@
         if (!stille) {
             this.paab[this.nr] = true;
             this.opdaterTal();
+            if (!this.faerdig) this.visIndsend();
             if (this.maal().type === "graense" && !this.faerdig && x >= this.xMax - 1e-9 && !this.naaet) this.naaGraense();
         }
     };
 
-    /* Skyderen er sluppet: er maalet naaet? */
+    /* Skyderen er sluppet. Skyderen bedoemmer aldrig selv; det goer
+       Indsend svar (Niels 24. okt. og 4. nov. 2026). */
     P.slutTraek = function () {
         if (this.faerdig) return;
-        var m = this.maal();
-        if (m.type === "ligevaegt") {
-            var Y = M.Y(this.rx, this.x);
-            if (Math.abs(this.x - this.xEq) <= 0.0015 || Math.abs(Y - this.rx.K) <= 0.04 * this.rx.K) {
-                this.loest("ok", NK.html(m.slut), "Ligevægt ✓");
-            }
-        }
+        this.visIndsend();
     };
 
     P.naaGraense = function () {
         this.naaet = true;
-        this.besked('<span class="b-maerke">Stop</span> ' + NK.html("Skyderen kan ikke komme længere. Hvilket stof er brugt op? Klik på det i skemaet."), "gul");
+        this.besked('<span class="b-maerke">Stop</span> ' + NK.html("Skyderen kan ikke komme længere. Hvilket stof er brugt op? Klik på det i skemaet, og tryk Indsend svar."), "gul");
         this.visKnap();
     };
 
@@ -289,12 +310,6 @@
             tab.appendChild(tr);
         });
         w.appendChild(tab);
-        if (this.maal().type === "udtryk" && !this.faerdig) {
-            var k = el("button", "tjekknap", "Tjek");
-            k.type = "button";
-            k.addEventListener("click", function () { mig.tjek(); });
-            w.appendChild(k);
-        }
     };
 
     P.input = function (key, pladsholder) {
@@ -319,7 +334,7 @@
             e.preventDefault();
             var tomt = mig.felter.filter(function (f) { return f !== inp && !f.value.trim(); })[0];
             if (tomt && inp.value.trim()) { tomt.focus(); return; }
-            mig.tjek();
+            mig.indsendKlik();
         });
         this.felter.push(inp);
         return inp;
@@ -354,12 +369,12 @@
         var m = this.maal();
         if (m.type === "graense" && !this.faerdig) {
             if (!this.naaet) { this.kortBesked("Træk først x helt op, så langt det kan komme.", 3); return; }
-            var c = M.vaerdi(M.plads(this.rx, a.s), this.x);
-            if (Math.abs(c) < 1e-9) {
-                this.loest("ok", NK.html(m.slut), "Rigtigt ✓");
-                return;
-            }
-            this.fejlLinje("Der er stadig " + t3(c) + " M " + M.skriv(a.s) + ". Find det stof, der er 0 i rækken Ligevægt.");
+            var knap = NK.el("bh-skema").querySelector('.ice-stof[data-s="' + a.s + '"]');
+            this.vaelgSvar(knap, function () {
+                var c = M.vaerdi(M.plads(this.rx, a.s), this.x);
+                if (Math.abs(c) < 1e-9) { this.loest("ok", NK.html(m.slut), "Rigtigt"); return; }
+                this.fejlLinje("Der er stadig " + t3(c) + " M " + M.skriv(a.s) + ". Find det stof, der er 0 i rækken Ligevægt.");
+            });
             return;
         }
         var t = M.skriv(a.s) + " står " + (a.side === "r" ? "før pilen og bliver brugt." : "efter pilen og dannes.");
@@ -408,12 +423,17 @@
             w.appendChild(b);
         });
         this.nulstilHjaelp();
-        this.besked('<span class="b-maerke">CAS</span> ' + NK.html("To løsninger. Grafen viser nu begge. I det grå område bliver en koncentration negativ. Klik på den løsning, der ikke kan bruges."), "");
+        this.besked('<span class="b-maerke">CAS</span> ' + NK.html("To løsninger. Grafen viser nu begge. I det grå område bliver en koncentration negativ. Klik på den løsning, der ikke kan bruges, og tryk Indsend svar."), "");
         this.visKnap();
     };
 
     P.vaelgRod = function (i) {
-        if (this.faerdig || !this.roedder) return;
+        if (this.spaer() || !this.roedder) return;
+        var knap = NK.el("bh-roedder").querySelectorAll(".bh-rod")[i];
+        this.vaelgSvar(knap, function () { this.domRod(i); });
+    };
+
+    P.domRod = function (i) {
         var r = this.roedder[i], d = M.dom(this.rx, r);
         if (d.ok) {
             this.fejlLinje("x = " + NK.tal(r) + " M giver positive koncentrationer. Det er ligevægten, skyderen kan nå. Klik på den anden.");
@@ -422,13 +442,29 @@
         this.forkastet = i;
         var b = NK.el("bh-roedder").querySelectorAll(".bh-rod");
         for (var j = 0; j < b.length; j++) b[j].classList.toggle(j === i ? "forkast" : "brug", true);
-        this.loest("ok", NK.html(this.maal().slut), "Forkastet ✓");
+        this.loest("ok", NK.html(this.maal().slut), "Forkastet");
     };
 
     /* ----- Tjek af felterne (maal med udtryk) ------------------------------------------------ */
     P.tjek = function () {
         var m = this.maal();
         if (this.faerdig) return;
+        if (this.valgtSvar) {
+            var f = this.valgtSvar;
+            this.valgtSvar = null;
+            f.call(this);
+            return;
+        }
+        if (m.type === "ligevaegt") {
+            var Y = M.Y(this.rx, this.x);
+            if (Math.abs(this.x - this.xEq) <= 0.0015 || Math.abs(Y - this.rx.K) <= 0.04 * this.rx.K) {
+                this.loest("ok", NK.html(m.slut), "Ligevægt");
+                return;
+            }
+            this.fejlLinje(isFinite(Y) && Y < this.rx.K ? "Y er mindre end K. Der skal mere produkt til, så x skal være større." :
+                "Y er større end K. Der er for meget produkt, så x skal være mindre.");
+            return;
+        }
         if (m.type !== "udtryk") {
             if (m.type === "forkast" && !this.roedder) { this.koerCas(); return; }
             this.besked(NK.html(this.trinLinje()), "gul");
@@ -446,7 +482,7 @@
         });
         if (!forste) {
             m.raekker.forEach(function (r) { mig.kendt[r] = true; });
-            this.loest("ok", NK.html(m.slut), "Rigtigt ✓");
+            this.loest("ok", NK.html(m.slut), "Rigtigt");
             return;
         }
         if (nogen) { this.bygSkema(); this.opdaterTal(); this.tilpasSkema(); }
@@ -477,17 +513,17 @@
        hvordan: det, maalet ikke selv siger. */
     P.trinLinje = function () {
         var m = this.maal();
-        if (m.type === "ligevaegt") return "Træk i skyderen eller på grafen. Y og K står nederst til højre i scenen.";
+        if (m.type === "ligevaegt") return "Træk i skyderen eller på grafen, og tryk Indsend svar. Y og K står nederst til højre.";
         if (m.type === "udtryk") {
             return m.raekker.length > 1 ? "Skriv i felterne i skemaet. Tallet efter = i hvert felt følger skyderen." :
                 "Skriv ændringerne i felterne i skemaets række Ændring.";
         }
         if (m.type === "forkast") {
             if (!this.roedder) return "Ved ligevægt er Y = K. Det er en ligning med x. Knappen Løs ligningen med CAS står nederst til højre.";
-            return "Klik på den løsning, der ikke kan bruges. På grafen er det grå område kemisk umuligt.";
+            return "Klik på den løsning, der ikke kan bruges, og tryk Indsend svar. Det grå område på grafen er umuligt.";
         }
         if (!this.naaet) return "Træk x så langt op, som det kan komme.";
-        return "Klik på det stof i skemaets øverste række, der er brugt op.";
+        return "Klik på det stof i skemaets øverste række, der er brugt op, og tryk Indsend svar.";
     };
 
     P.hintTrin = function () {
@@ -566,8 +602,9 @@
     };
 
     P.enter = function () {
-        if (this.faerdig) { this.knap(); return; }
-        this.tjek();
+        if (this.faerdig) { if (this.videreTekst()) this.knap(); return; }
+        if (this.maal().type === "forkast" && !this.roedder) { this.koerCas(); return; }
+        this.indsendKlik();
     };
 
     P.nulstil = function () {

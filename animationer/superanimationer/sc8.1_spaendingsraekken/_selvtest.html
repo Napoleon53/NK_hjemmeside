@@ -212,6 +212,11 @@ async function koerTest(W, ramme) {
     var korte = [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE].filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t); });
     paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
     paastand("ingen 'natronlud'", tekster.every(function (s) { return !/natronlud/i.test(s); }));
+    /* Niels 4.-6. nov. 2026: H₂ og O₂ som stof hedder dihydrogen og dioxygen. Hydrogen i
+       spaendingsraekken (grundstoffet) bliver staaende. */
+    var gasNavn = tekster.filter(function (s) { return /\b[Hh]ydrogen, H₂|\b[Oo]xygen, O₂|dannes hydrogen|bliver til hydrogen|Hydrogen findes som molekyler/.test(s); });
+    paastand("H₂ og O₂ som stof hedder dihydrogen og dioxygen", gasNavn.length === 0 && tekster.some(function (s) { return /Dihydrogen, H₂/.test(s); }) &&
+        /dannes dihydrogen, H₂/.test(doc.getElementById("teori").textContent), gasNavn[0]);
     paastand("ingen 'undefined' eller 'NaN' i teksterne", tekster.every(function (s) { return !/undefined|NaN/.test(s); }),
         tekster.filter(function (s) { return /undefined|NaN/.test(s); })[0]);
 
@@ -234,11 +239,12 @@ async function koerTest(W, ramme) {
     paastand("skemaet: Zn i Cu²⁺ er en reaktion", NK.Skema.get("Zn", "Cu") === true);
     paastand("mål 1 er nået, og spørgsmålet er fremme", f.maalFase === "spm");
     paastand("zinkstangen har fået et lag", f.stangTegning(zn).belaeg && f.stangTegning(zn).belaeg.x > 0.1);
-    paastand("scenelinjen siger det, man ser", /stangen bliver brun/.test(doc.getElementById("fs-status").textContent), doc.getElementById("fs-status").textContent);
+    paastand("kortets linje siger det, man ser", /stangen bliver brun/.test(doc.getElementById("fs-besked").textContent), doc.getElementById("fs-besked").textContent);
     f.vaelgSvar(1);
     paastand("forkert svar (Rust) giver en forklaring", /Rust/.test(doc.getElementById("fs-besked").textContent));
     f.vaelgSvar(0);
-    paastand("rigtigt svar: Kobber", f.maalFase === "svar" && /optager elektroner/.test(doc.getElementById("fs-besked").textContent));
+    paastand("rigtigt svar: Kobber, og kortet bliver på spørgsmålet med forklaringen", f.maalFase === "svar" && /optager elektroner/.test(doc.getElementById("fs-bliv").textContent) &&
+        /Hvad sætter sig/.test(doc.getElementById("fs-ind").textContent));
     f.knap();
     paastand("Næste: mål 2", f.maalNr === 1 && f.maalFase === "goer");
     /* Et klik paa kobberstangen og saa paa Ag-glasset */
@@ -259,7 +265,7 @@ async function koerTest(W, ramme) {
     paastand("en ny stang i et glas sender den gamle hjem", zn.glas === -1 && f.glas[3].stang === f.staenger[4]);
     koerTid(f, 2.5);
     paastand("skemaet: Ag i Cu²⁺ er ingen reaktion", NK.Skema.get("Ag", "Cu") === false);
-    paastand("scenelinjen: intet sker", /intet sker/.test(doc.getElementById("fs-status").textContent));
+    paastand("kortets linje: intet sker", /intet sker/.test(doc.getElementById("fs-besked").textContent));
     f.vaelgSvar(0);
     f.knap();
     /* Maal 4: syren */
@@ -279,7 +285,7 @@ async function koerTest(W, ramme) {
     koerTid(f, 5);
     var tMg = f.stangTegning(mgS).taeret;
     paastand("Mg i saltsyre: stangen er blevet tyndere under overfladen", !!tMg && tMg.x > 0.5 && Math.abs(tMg.fra - f.lay.glas[5].overflade) < 1, tMg && tMg.x);
-    paastand("scenelinjen siger, at stangen bliver tyndere", /stangen bliver tyndere/.test(doc.getElementById("fs-status").textContent), doc.getElementById("fs-status").textContent);
+    paastand("kortets linje siger, at stangen bliver tyndere", /stangen bliver tyndere/.test(doc.getElementById("fs-besked").textContent), doc.getElementById("fs-besked").textContent);
     paastand("den tynde del er smallere end stangen", NK.Tegn.taeretInd(f.lay.stang.b, tMg.x) > f.lay.stang.b * 0.15);
     f.hjem(0);
     koerTid(f, 0.1);
@@ -301,7 +307,7 @@ async function koerTest(W, ramme) {
     koerTid(f, 6);
     f.knap(); f.knap();
     paastand("Vis svaret fylder skemaet ud", NK.Skema.fuldt() && f.maalFase === "faerdig");
-    paastand("knappen går videre til rækken", /rækken/.test(doc.getElementById("fs-knap").textContent));
+    paastand("knappen videre på kortet går til rækken", /rækken/.test(doc.querySelector("#fs-bliv [data-videre]").textContent));
     var celler = doc.querySelectorAll("#fs-skema td.ja").length;
     paastand("skemaet viser 13 flueben", celler === 13, celler);
 
@@ -320,12 +326,17 @@ async function koerTest(W, ramme) {
     ["Fe", "Zn", "H", "Cu", "Ag"].forEach(function (s, n) {
         rk.saetPaa(rk.kort.filter(function (k) { return k.sym === s; })[0], n + 1);
     });
+    paastand("alle seks på hylden: intet er tjekket, før der trykkes på Indsend svar", rk.fase === "stil" && !rk.fejlPar &&
+        doc.getElementById("rk-indsend").classList.contains("klar"));
+    rk.indsend();
     paastand("forkert rækkefølge: Fe og Zn bliver røde", rk.fejlPar && rk.fejlPar.join() === "Fe,Zn", JSON.stringify(rk.fejlPar));
     paastand("beskeden bruger skemaet: zink reagerede med jernionerne", /Zink står til højre for jern\. Men zink reagerede med jernionerne/.test(doc.getElementById("rk-besked").textContent),
         doc.getElementById("rk-besked").textContent);
     rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "Zn"; })[0], 1);
     paastand("byt: Zn og Fe bytter plads", rk.pladser[1].sym === "Zn" && rk.pladser[2].sym === "Fe");
-    paastand("rigtig rækkefølge: færdig", rk.fase === "faerdig");
+    rk.indsend();
+    paastand("rigtig rækkefølge: færdig, og kortet bliver på opgaven med Til Forudsig", rk.fase === "faerdig" &&
+        /Forudsig/.test(doc.querySelector("#rk-bliv [data-videre]").textContent) && doc.getElementById("rk-bund").hidden);
     koerTid(rk, 3);
     paastand("bogens række er kommet frem", rk.afsloer === 1);
     paastand("Kemichael roser første gang", W.localStorage.getItem("nk-sc8.1-ros-raekken") === "true");
@@ -333,6 +344,7 @@ async function koerTest(W, ramme) {
     rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "Cu"; })[0], 0);
     rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "H"; })[0], 1);
     ["Mg", "Zn", "Fe", "Ag"].forEach(function (s, n) { rk.saetPaa(rk.kort.filter(function (k) { return k.sym === s; })[0], n + 2); });
+    rk.indsend();
     paastand("H til højre for Cu: beskeden om bobler i saltsyren", /kobber giver ingen bobler i saltsyren/.test(doc.getElementById("rk-besked").textContent),
         doc.getElementById("rk-besked").textContent);
     rk.knap();
@@ -352,8 +364,10 @@ async function koerTest(W, ramme) {
         fu.gaet(reag ? 0 : 1);
         koerTid(fu, 3.2);
         if (reag) {
-            if (fu.fase !== "produkt") fejlOpg.push(m + "/" + i + " fase " + fu.fase);
+            if (fu.fase !== "vurderet") fejlOpg.push(m + "/" + i + " fase " + fu.fase);
+            fu.videre();
             fu.chips.forEach(function (c, k) { if (c.rigtig !== undefined) fu.vaelgChip(k); });
+            fu.indsend();
             var felter = doc.querySelectorAll("#fu-skema input");
             fu.r.koef.forEach(function (v, k) { felter[k].value = String(v); });
             fu.tjekKoef();
@@ -373,13 +387,22 @@ async function koerTest(W, ramme) {
     paastand("opgave 8 er Al i kobber(II)sulfat", fu.par.join("/") === "Al/Cu");
     fu.gaet(1);
     koerTid(fu, 3.2);
-    paastand("forkert gæt: rød besked, der forklarer med rækken", /står til venstre for kobber/.test(doc.getElementById("fu-svar").textContent));
+    paastand("forkert gæt: rød forklaring med rækken, og kortet bliver på spørgsmålet", /står til venstre for kobber/.test(doc.getElementById("fu-bliv").textContent) &&
+        /bliv nej/.test(doc.getElementById("fu-bliv").innerHTML) && /Sker der noget/.test(doc.getElementById("fu-ind").textContent));
     paastand("pilen med e⁻ vises på rækken", fu.markeret);
+    fu.videre();
+    paastand("Næste spørgsmål: hvad dannes?", fu.fase === "produkt" && /Hvad dannes/.test(doc.getElementById("fu-ind").textContent));
     var mChip = fu.chips.findIndex(function (c) { return c.slags === "m"; });
+    var rChip = fu.chips.findIndex(function (c) { return c.rigtig === 0; });
     fu.vaelgChip(mChip);
-    paastand("forkert stof: besked om stangen", /stangen/.test(doc.getElementById("fu-besked").textContent));
-    fu.chips.forEach(function (c, k) { if (c.rigtig !== undefined) fu.vaelgChip(k); });
-    paastand("to rigtige stoffer: videre til afstemningen", fu.fase === "koef");
+    paastand("ét valgt stof: Indsend svar er grå, og intet er bedømt", doc.getElementById("fu-indsend").classList.contains("ikke-klar") && !fu.forkerteChips[mChip]);
+    fu.vaelgChip(rChip);
+    fu.indsend();
+    paastand("forkert stof: besked om stangen, det rigtige står i skemaet", /stangen/.test(doc.getElementById("fu-besked").textContent) &&
+        fu.chips[rChip].placeret && fu.forkerteChips[mChip]);
+    fu.chips.forEach(function (c, k) { if (c.rigtig !== undefined && !c.placeret) fu.vaelgChip(k); });
+    fu.indsend();
+    paastand("to rigtige stoffer: videre til afstemningen uden ros under spørgsmålet", fu.fase === "koef" && !/Rigtigt/.test(doc.getElementById("fu-besked").textContent));
     var fl = doc.querySelectorAll("#fu-skema input");
     paastand("felterne er tomme (intet facit før tid)", Array.prototype.every.call(fl, function (x) { return x.value === ""; }));
     var led = doc.querySelectorAll("#fu-skema .skemalinje > *");
@@ -387,22 +410,128 @@ async function koerTest(W, ramme) {
     paastand("skemaet med de fire felter står på én linje", Math.abs(sidst.top - top0) < sidst.height, Math.round(top0) + " / " + Math.round(sidst.top));
     var skrift = parseFloat(W.getComputedStyle(doc.querySelector("#fu-skema .skemalinje")).fontSize);
     paastand("skemaets skrift er mindst 13 px", skrift >= 13, skrift);
-    var panelB = doc.querySelector("#fane-forudsig .panel").getBoundingClientRect().width;
-    var panelA = 0;
-    NK.visFane("fane-forsoeg");
-    panelA = doc.querySelector("#fane-forsoeg .panel").getBoundingClientRect().width;
-    NK.visFane("fane-forudsig");
-    paastand("panelet på fane 3 er bredere end på fane 1", panelB > panelA + 80, panelA + " / " + panelB);
+    paastand("skemaet står på kortet i scenen, ikke i panelet", !!doc.querySelector("#fu-skort #fu-skema .skemalinje") && !doc.querySelector("#fane-forudsig .panel input"));
+    paastand("Indsend svar er grå, til alle fire felter har et tal", doc.getElementById("fu-indsend").classList.contains("ikke-klar"));
     fu.tjekKoef();
     paastand("tomme felter: skriv et tal", /alle fire felter/.test(doc.getElementById("fu-besked").textContent));
     [1, 1, 1, 1].forEach(function (v, k) { fl[k].value = v; });
     fu.tjekKoef();
     paastand("1, 1, 1, 1: ladningen", /ladningen gør ikke/.test(doc.getElementById("fu-besked").textContent));
     fu.knap(); fu.knap();
-    paastand("Giv hint og Vis svaret afstemmer", fu.fase === "faerdig" && /2 Al afgiver 6 e⁻/.test(doc.getElementById("fu-besked").textContent));
+    paastand("Giv hint og Vis svaret afstemmer", fu.fase === "faerdig" && /2 Al afgiver 6 e⁻/.test(doc.getElementById("fu-bliv").textContent));
     fu.nr = 0; fu.nyOpgave();
     fu.tast({ key: "n" });
     paastand("tasten N svarer nej", fu.valgt === 1);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Papirkortet (6. nov. 2026)");
+    [["fane-forsoeg", "fs"], ["fane-raekken", "rk"], ["fane-forudsig", "fu"]].forEach(function (x) {
+        NK.visFane(x[0]);
+        var kort = doc.getElementById(x[1] + "-skort"), fane = doc.getElementById(x[0]);
+        paastand(x[0] + ": kortet står i scenen og ikke i panelet", !!kort && !!kort.closest(".scene") && !kort.closest(".panel"));
+        paastand(x[0] + ": ingen statuslinje nederst og intet opgavekort i panelet", !fane.querySelector(".scene-mrk, .opgavekort, .panel .besked"));
+        paastand(x[0] + ": Start forfra og Bland kortene står ikke på kortet", !kort.querySelector(".nulstil") && !/Start forfra|Bland kortene/.test(kort.textContent));
+    });
+    paastand("papirkortet er slået til (body.papirkort)", doc.body.classList.contains("papirkort"));
+    /* Fane 1: et svar vaelger kun, staengerne er laast under spoergsmaalet */
+    NK.visFane("fane-forsoeg");
+    f.nulstil(); koerTid(f, 1);
+    var fsInd = doc.getElementById("fs-indsend");
+    paastand("forsøget: ingen Indsend svar, mens der skal laves et forsøg", fsInd.hidden && !doc.getElementById("fs-knap").hidden);
+    f.saetI(1, 3); koerTid(f, 2.5);
+    paastand("spørgsmålet står på kortet, og Indsend svar er grå", f.maalFase === "spm" && /Hvad sætter sig/.test(doc.getElementById("fs-ind").textContent) &&
+        !fsInd.hidden && fsInd.classList.contains("ikke-klar"));
+    doc.querySelector('#fs-skort [data-valg="1"]').click();
+    paastand("et svar på kortet vælger kun", f.maalFase === "spm" && !f.forkerte[1] && fsInd.classList.contains("klar") &&
+        !!doc.querySelector('#fs-skort .sk-knap.valgt[data-valg="1"]'));
+    fsInd.click();
+    paastand("Indsend svar: et forkert svar bliver rødt og kan ikke vælges igen", f.forkerte[1] && doc.querySelector('#fs-skort [data-valg="1"]').disabled &&
+        /skidt/.test(doc.getElementById("fs-bund").className));
+    f.kort.e.classList.remove("blink");
+    var zs = f.staenger[2];
+    mus(W, f, "pointerdown", zs.x, zs.top + 30);
+    mus(W, f, "pointerup", zs.x, zs.top + 30);
+    paastand("under spørgsmålet er stængerne låst, og kortet blinker", f.kort.e.classList.contains("blink") && f.valgt === -1 && !f.traek);
+    f.svar(0);
+    paastand("rigtigt svar: grønt dér, hvor eleven klikkede, forklaringen og Næste mål, hvor Indsend svar stod",
+        !!doc.querySelector('#fs-skort .sk-knap.rigtig[data-valg="0"]') && doc.getElementById("fs-bund").hidden &&
+        doc.querySelector("#fs-bliv [data-videre]").textContent === "Næste mål");
+    f.videre();
+    paastand("Næste mål: ingen ros under det nye mål", f.maalNr === 1 && !/optager elektroner/.test(doc.getElementById("fs-skort").textContent));
+    /* Fane 2: Indsend svar er graa, til alle seks staar paa hylden */
+    NK.visFane("fane-raekken");
+    rk.nulstil(); koerTid(rk, 0.5);
+    var rkInd = doc.getElementById("rk-indsend");
+    paastand("rækken: Indsend svar er grå, til alle seks står på hylden", !rkInd.hidden && rkInd.classList.contains("ikke-klar"));
+    /* Fane 3: ja og nej vaelger kun */
+    NK.visFane("fane-forudsig");
+    fu.nr = -1; fu.nyOpgave(); koerTid(fu, 0.3);
+    var fuInd = doc.getElementById("fu-indsend");
+    paastand("forudsig: Indsend svar er grå uden et valg", !fuInd.hidden && fuInd.classList.contains("ikke-klar"));
+    doc.querySelector('#fu-skort [data-valg="0"]').click();
+    koerTid(fu, 3);
+    paastand("ja på kortet vælger kun: stangen bliver oppe", fu.fase === "gaet" && fu.ned === 0 && fuInd.classList.contains("klar"));
+    fu.kort.e.classList.remove("blink");
+    fu.klik({ x: fu.lay.glas.cx, y: fu.lay.glas.y + fu.lay.glas.b * 0.6 });
+    paastand("et klik på glasset før svaret får kortet til at blinke", fu.kort.e.classList.contains("blink") && fu.fase === "gaet");
+    fuInd.click(); koerTid(fu, 3.2);
+    paastand("Indsend svar: stangen kommer ned, og kortet bliver på spørgsmålet med Næste spørgsmål", fu.fase === "vurderet" &&
+        !!doc.querySelector('#fu-skort .sk-knap.rigtig[data-valg="0"]') && doc.querySelector("#fu-bliv [data-videre]").textContent === "Næste spørgsmål");
+    /* Kortet holder sig i kortZone paa en hoej og en lav skaerm, i alle tilstande */
+    for (var st0 = 0; st0 < 2; st0++) {
+        var str = [[1400, 860], [1280, 640]][st0];
+        ramme.style.width = str[0] + "px"; ramme.style.height = str[1] + "px";
+        await vent(250);
+        var fejlZ = [];
+        var maalZ = function (navn, sim, id, oeverst) {
+            sim.tilpas();
+            var kort = doc.getElementById(id + "-skort"), bund = kort.offsetTop + kort.offsetHeight, o = oeverst();
+            if (bund > sim.lay.zone || o < bund) fejlZ.push(navn + ": kortets bund " + bund + ", zone " + sim.lay.zone + ", tegningen fra " + Math.round(o));
+            return sim.lay.zone;
+        };
+        NK.visFane("fane-forsoeg");
+        f.nulstil();
+        /* Staar kortet til venstre for luppen (lav skaerm), maa det ikke naa ind over luppen eller ned til stængerne */
+        var topF = function () {
+            if (!f.lay.ved) return f.lay.lup.cy - f.lay.lup.R;
+            var k = doc.getElementById("fs-skort");
+            if (k.offsetLeft + k.offsetWidth > f.lay.lup.cx - f.lay.lup.R - 4) fejlZ.push("kortet når ind over luppen");
+            return f.lay.stangTop;
+        };
+        maalZ("forsøget", f, "fs", topF);
+        f.maalNr = 2; f.saetI(4, 3); koerTid(f, 2.5);
+        maalZ("spørgsmålet", f, "fs", topF);
+        var zF = Math.round(f.lay.lup.cy) + "/" + Math.round(f.lay.lup.R);
+        f.svar(1);
+        maalZ("forkert svar", f, "fs", topF);
+        f.svar(0);
+        maalZ("forklaringen", f, "fs", topF);
+        if (Math.round(f.lay.lup.cy) + "/" + Math.round(f.lay.lup.R) !== zF) fejlZ.push("forsøget: luppen flytter sig, når forklaringen kommer");
+        NK.visFane("fane-raekken");
+        rk.nulstil(); rk.knap();
+        var topR = function () { return rk.lay.raekke.y - 30; };
+        maalZ("rækken med hint", rk, "rk", topR);
+        rk.knap(); koerTid(rk, 2);
+        maalZ("rækken færdig", rk, "rk", topR);
+        NK.visFane("fane-forudsig");
+        var topU = function () { return fu.lay.raekke.y - 34; };
+        fu.nr = 9; fu.nyOpgave(); fu.knap();
+        var zU = maalZ("forudsig med hint", fu, "fu", topU);
+        fu.gaet(1); koerTid(fu, 3.2);
+        maalZ("forkert gæt", fu, "fu", topU);
+        fu.videre(); fu.knap();
+        maalZ("stofferne med hint", fu, "fu", topU);
+        fu.knap(); fu.knap();
+        maalZ("afstemningen med hint", fu, "fu", topU);
+        fu.knap();
+        if (maalZ("færdig", fu, "fu", topU) !== zU) fejlZ.push("forudsig: rækken flytter sig");
+        paastand("ved " + str[0] + " × " + str[1] + ": kortet holder sig i kortZone, og tegningen begynder under det", fejlZ.length === 0, fejlZ.join("; "));
+        NK.visFane("fane-forsoeg"); f.tilpas();
+        paastand("ved " + str[0] + " × " + str[1] + ": luppen på fane 1 har mindst radius 110", f.lay.lup.R >= 110, Math.round(f.lay.lup.R) + (f.lay.ved ? " (kortet til venstre for luppen)" : ""));
+    }
+    ramme.style.width = ""; ramme.style.height = "";
+    await vent(250);
+    fu.nr = 0; fu.nyOpgave();
 
     /* ----------------------------------------------------------------- */
     overskrift("Kemichaels præsentation: ét trin ad gangen (fælles test)");

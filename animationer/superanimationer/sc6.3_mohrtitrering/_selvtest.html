@@ -239,8 +239,8 @@ function koerTest(W) {
         var r = canvas.getBoundingClientRect();
         canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
     }
-    var tur = ["#tit-anker-buret", "#tit-anker-hane", "#tit-anker-kolbe", "#tit-anker-lup", "#tit-kort", "#tit-buretkort", "#tit-kurvekort",
-        "#ber-data", "#ber-kort", "#ber-anker-tavle", "#for-anker-a", "#for-anker-b", "#for-kort", "#for-tabelkort"];
+    var tur = ["#tit-anker-buret", "#tit-anker-hane", "#tit-anker-kolbe", "#tit-anker-lup", "#tit-skort", "#tit-buretkort", "#tit-kurvekort",
+        "#ber-data", "#ber-skort", "#ber-anker-tavle", "#for-anker-a", "#for-anker-b", "#for-skort", "#for-tabelkort"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
 
     overskrift("5. Titreringen kan gennemføres med musen");
@@ -277,15 +277,15 @@ function koerTest(W) {
     paastand("luppen: alt chlorid er fældet, og der er dannet sølvchromat", S1.lup.clTilbage() === 0 && S1.lup.ag2cro4() === 1, S1.lup.ag2cro4());
     paastand("kurven: sølvchromat først efter ækvivalenspunktet", S1.kurve.punkter.every(function (p) { return p.v > S1.vAek || p.x === 0; }) &&
         S1.kurve.punkter[S1.kurve.punkter.length - 1].x > 0);
-    paastand("feltet til aflæsningen kommer frem", S1.fase === "aflaes" && !!d.querySelector("#tit-felt input"));
-    var inp = d.querySelector("#tit-felt input");
+    paastand("feltet til aflæsningen kommer frem", S1.fase === "aflaes" && !!d.querySelector("#tit-skort input"));
+    var inp = d.querySelector("#tit-skort input");
     inp.value = "3"; S1.tjekAflaesning();
-    paastand("en forkert aflæsning giver en besked og ikke et flueben", S1.fase === "aflaes" && /skidt/.test(d.getElementById("tit-besked").className));
-    inp = d.querySelector("#tit-felt input");
+    paastand("en forkert aflæsning giver en besked og ikke et flueben", S1.fase === "aflaes" && /skidt/.test(d.getElementById("tit-status").className) && !d.querySelector("#tit-skort .bliv"));
+    inp = d.querySelector("#tit-skort input");
     inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
     paastand("den rigtige aflæsning godkendes", S1.fase === "faerdig" && !!NK.maaling && NK.maaling.egen && naer(NK.maaling.V, S1.vUd(), 1e-9));
-    paastand("præcis titrering står i beskeden", /sidste dråbe/.test(d.getElementById("tit-besked").textContent));
-    paastand("knappen går videre til beregningen", d.getElementById("tit-knap").textContent.indexOf("beregningen") >= 0);
+    paastand("præcis titrering står i forklaringen under feltet, og kortet bliver på spørgsmålet", /sidste dråbe/.test(d.getElementById("tit-ind").textContent) && !!d.querySelector("#tit-skort.bliv input, #tit-skort.bliv .felt.ok"));
+    paastand("knappen går videre til beregningen", !!d.querySelector("#tit-ind [data-videre]") && d.querySelector("#tit-ind [data-videre]").textContent.indexOf("beregningen") >= 0 && d.getElementById("tit-indsend").hidden);
     S1.tegn();
     paastand("fane 1 tegnes uden fejl", true);
     var maalingEt = NK.maaling;
@@ -308,16 +308,16 @@ function koerTest(W) {
     S1.saetHane(0); tik(S1, 4);
     paastand("2 mL for langt: mørk rødbrun og luppen har fri Ag⁺", K.farveOrd(S1.styrke(), S1.uklar()) === "mørk rødbrun" && S1.lup.friAg() >= 1 && S1.lup.ag2cro4() === 2,
         K.farveOrd(S1.styrke(), S1.uklar()) + ", fri " + S1.lup.friAg() + ", Ag₂CrO₄ " + S1.lup.ag2cro4());
-    inp = d.querySelector("#tit-felt input");
+    inp = d.querySelector("#tit-skort input");
     inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
-    paastand("beskeden siger, at forbruget er for stort", /for stort/.test(d.getElementById("tit-besked").textContent));
+    paastand("beskeden siger, at forbruget er for stort", /for stort/.test(d.getElementById("tit-ind").textContent));
     S1.nyProeve(2.00, "Kattegat");
     S1.saetHane(1);
     tik(S1, 40);
     paastand("buretten løber tom og lukker ved 26,5 mL", naer(S1.vUd(), 26.5, 0.051) && S1.a === 0, S1.vUd());
     S1.nyProeve();
     paastand("Ny prøve fylder buretten og nulstiller luppen og kurven", S1.vUd() === 0 && S1.lup.clTilbage() === 8 && S1.lup.agcl() === 0 && S1.kurve.punkter.length === 1);
-    paastand("kortet viser stedet og massen", d.getElementById("tit-sted").textContent === S1.pr.sted + ", 1,00 g");
+    paastand("kortet viser stedet og massen", d.getElementById("tit-ind").textContent.indexOf("1,00 g havvand fra " + S1.pr.sted) >= 0);
     NK.maaling = maalingEt; NK.maaling.brugt = false;
 
     overskrift("7. Beregningen kan gennemføres");
@@ -335,10 +335,14 @@ function koerTest(W) {
         f.input.value = skriv2[k]; S2.tjek();
         f = S2.aktivtFelt();
         f.input.value = NK.betydende(x, 4); S2.tjek();
+        if (k < 3) {
+            paastand("trin " + (k + 1) + ": kortet bliver på trinnet med Næste trin, hvor Indsend svar stod", S2.opg.venter && !!d.querySelector("#ber-skort.bliv [data-videre]") && d.getElementById("ber-indsend").hidden);
+            S2.videre();
+        }
     });
     paastand("fire formler og fire rigtige tal løser opgaven", S2.opg.faerdig && S2.opg.felter.every(function (f) { return f.status === "ok"; }));
-    paastand("resultatet sammenlignes med havvandets masseprocent", /Vesterhavet havde 3,10 % NaCl/.test(d.getElementById("ber-besked").textContent),
-        d.getElementById("ber-besked").textContent);
+    paastand("resultatet sammenlignes med havvandets masseprocent", /Vesterhavet havde 3,10 % NaCl/.test(d.getElementById("ber-ind").textContent),
+        d.getElementById("ber-ind").textContent);
     S2.tegn();
     var gl = S2.opg;
     S2.knap();
@@ -347,7 +351,7 @@ function koerTest(W) {
     S2.knap();
     paastand("det første hint hjælper med formlen uden at give den", /koncentrationen og rumfanget/.test(d.getElementById("ber-besked").textContent) &&
         !/c · V/.test(d.getElementById("ber-besked").textContent));
-    for (i = 0; i < 15; i++) S2.knap();
+    for (i = 0; i < 25 && !S2.opg.faerdig; i++) S2.knap();
     paastand("Giv hint og Vis svaret til formel og tal i alle fire trin løser den også", S2.opg.faerdig && S2.opg.felter.every(function (f) { return f.status === "svar"; }));
     S2.tegn();
     paastand("tavlen tegnes uden fejl", true);
@@ -361,11 +365,11 @@ function koerTest(W) {
     S3.afvisTilbud();
     S3.nulstil();
     paastand("fane 3 hedder Fejlkilder, og kortet viser situationens titel",
-        /Fejlkilder/.test(d.querySelector('[data-fane="fane-forbrug"]').textContent) && d.getElementById("for-titel").textContent === D.SITUATIONER[0].titel,
-        d.getElementById("for-titel").textContent);
+        /Fejlkilder/.test(d.querySelector('[data-fane="fane-forbrug"]').textContent) && d.querySelector("#for-ind .sk-chip").textContent.indexOf(D.SITUATIONER[0].titel) >= 0,
+        d.querySelector("#for-ind .sk-chip").textContent);
     var V = {};
     D.SITUATIONER.forEach(function (s, n) {
-        S3.vaelg(s.rigtig);
+        S3.kortValg(s.rigtig); S3.indsend();
         tik(S3, 5);
         V[s.id] = { A: S3.A, B: S3.B, fase: S3.fase };
         if (n < D.SITUATIONER.length - 1) S3.knap();
@@ -384,10 +388,10 @@ function koerTest(W) {
     S3.tegn();
     paastand("fane 3 tegnes uden fejl", true);
     S3.nulstil();
-    S3.vaelg(2);
+    S3.kortValg(2); S3.indsend();
     tik(S3, 5);
-    paastand("et forkert gæt giver forklaringen til netop det svar", /stofmængden af Cl⁻ er den samme/.test(d.getElementById("for-besked").textContent) && S3.rigtige === 0);
-    paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-valg .vaelger.rigtig") && !!d.querySelector("#for-valg .vaelger.forkert"));
+    paastand("et forkert gæt giver forklaringen til netop det svar", /stofmængden af Cl⁻ er den samme/.test(d.getElementById("for-ind").textContent) && S3.rigtige === 0);
+    paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-ind .sk-knap.rigtig") && !!d.querySelector("#for-ind .sk-knap.forkert"));
     S3.nulstil();
 
     overskrift("9. Kemichaels præsentation: ét trin ad gangen (fælles test)");
@@ -433,7 +437,7 @@ function koerTest(W) {
             }
             function opst(g, navn) {
                 inde({ x: g.stang.x - 44 * g.s, y: g.buret.y, b: g.cx - g.stang.x + 110 * g.s, h: g.bordY - g.buret.y }, navn);
-                if (g.s < 0.3) problemer.push(id + ": " + navn + " er for lille");
+                if (g.s < 0.3) problemer.push(id + ": " + navn + " er for lille (s " + g.s.toFixed(2) + ", H " + Hc + ", W " + Wc + ")");
             }
             if (id === "fane-titrering") {
                 opst(lay.g, "opstillingen");
@@ -496,7 +500,7 @@ function koerTest(W) {
     paastand("fane 1: prøven, luppen og kurven har dichlorfluorescein", S1.pr.ind === "dcf" && S1.lup.ind === "dcf" &&
         S1.lup.figurer.filter(function (f) { return f.slags === "ind"; }).length === 2 && S1.lup.figurer.every(function (f) { return f.slags !== "cr"; }) &&
         S1.kurve.serier[2].navn === "Ag⁺");
-    paastand("opgaven og hintet siger lyserød", /svagt lyserød/.test(d.getElementById("tit-prompt").textContent) && /lyserød/.test(D.TITRER_HINT) && !/rødbrun/.test(D.TITRER_HINT));
+    paastand("opgaven og hintet siger lyserød", /svagt lyserød/.test(d.getElementById("tit-ind").textContent) && /lyserød/.test(D.TITRER_HINT) && !/rødbrun/.test(D.TITRER_HINT));
     S1.knap(); S1.knap();
     for (i = 0; i < 8000 && S1.fase !== "aflaes"; i++) S1.opdater(1 / 60);
     tik(S1, 4);
@@ -505,11 +509,11 @@ function koerTest(W) {
         S1.lup.ag2cro4() === 0 && S1.lup.friAg() >= 1, "på bundfaldet " + S1.lup.indPaa() + ", fri Ag⁺ " + S1.lup.friAg());
     var pk = S1.kurve.punkter;
     paastand("kurven: Ag⁺ i opløsning først efter ækvivalenspunktet", pk.every(function (p) { return p.v > S1.vAek || p.x < 0.002; }) && pk[pk.length - 1].x > 0.001);
-    paastand("status siger lyserød, og intet om rødbrun eller chromat", /lyserød/.test(d.getElementById("tit-status").textContent) &&
-        !/rødbrun|chromat/i.test(d.getElementById("tit-status").textContent + d.getElementById("tit-kort").textContent));
-    inp = d.querySelector("#tit-felt input");
+    paastand("kortet siger lyserød, og intet om rødbrun eller chromat", /lyserød/.test(d.getElementById("tit-ind").textContent) &&
+        !/rødbrun|chromat/i.test(d.getElementById("tit-status").textContent + d.getElementById("tit-skort").textContent));
+    inp = d.querySelector("#tit-skort input");
     inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
-    paastand("præcis titrering: lyserød på den sidste dråbe", /lyserød på den sidste dråbe/.test(d.getElementById("tit-besked").textContent));
+    paastand("præcis titrering: lyserød på den sidste dråbe", /lyserød på den sidste dråbe/.test(d.getElementById("tit-ind").textContent));
     S1.nyProeve(2.00, "Kattegat");
     S1.saetHane(1);
     for (i = 0; i < 6000 && S1.vUd() < S1.vAek + 2; i++) S1.opdater(1 / 60);
@@ -545,7 +549,7 @@ function koerTest(W) {
     S3.nulstil();
     var Vd = {};
     D.SITUATIONER.forEach(function (s, n) {
-        S3.vaelg(s.rigtig);
+        S3.kortValg(s.rigtig); S3.indsend();
         tik(S3, 5);
         Vd[s.id] = { A: S3.A, B: S3.B };
         if (n < D.SITUATIONER.length - 1) S3.knap();
@@ -561,6 +565,90 @@ function koerTest(W) {
     paastand("fane 3: et skift regner kolberne om, og de står ved det nye omslag", S3.A.pr.ind === "chromat" && S3.vA === S3.A.v && S3.fase === "vist");
     NK.saetIndikator("dcf");
     S3.nulstil();
+
+    overskrift("12. Papirkortet (6. nov. 2026)");
+    klik('[data-fane="fane-titrering"]');
+    S1.tilpas();
+    S1.nyProeve(3.10, "Vesterhavet");
+    paastand("body er papirkort, og papirkortet står i scenen og ikke i panelet", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        ["tit", "ber", "for"].every(function (px) { var e = d.getElementById(px + "-skort"); return e && !!e.closest(".scene") && !e.closest(".panel"); }));
+    paastand("ingen statuslinje eller hjælpelinje nederst og intet opgavekort i panelet",
+        !d.querySelector(".statuslinje, .hjaelpelinje, .panel .opgavekort, .panel .sk-svar, .panel input"));
+    paastand("Start forfra og Ny prøve står i panelet, ikke på kortet", !!d.querySelector(".panel #tit-nulstil") && !!d.querySelector(".panel #for-nulstil") &&
+        !/forfra|Ny prøve/i.test(d.getElementById("tit-skort").textContent + d.getElementById("for-skort").textContent));
+    S1.knap(); S1.knap();
+    for (i = 0; i < 8000 && S1.fase !== "aflaes"; i++) S1.opdater(1 / 60);
+    var ins1 = d.getElementById("tit-indsend");
+    paastand("fane 1: Indsend svar er gråt, før der står et tal i feltet", !ins1.hidden && ins1.classList.contains("ikke-klar") && !ins1.classList.contains("klar"));
+    var inp1 = d.querySelector("#tit-skort input");
+    inp1.value = String(S1.vUd()).replace(".", ",");
+    inp1.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("fane 1: et tal i feltet gør Indsend svar klar uden at bedømme", ins1.classList.contains("klar") && S1.fase === "aflaes");
+    inp1.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("fane 1: Enter i feltet er Indsend svar, og kortet bliver på spørgsmålet med Til beregningen, hvor Indsend svar stod",
+        S1.fase === "faerdig" && d.getElementById("tit-skort").classList.contains("bliv") && ins1.hidden && !!d.querySelector("#tit-skort [data-videre]"));
+
+    klik('[data-fane="fane-forbrug"]');
+    S3.tilpas();
+    S3.nulstil();
+    var ins3 = d.getElementById("for-indsend");
+    paastand("fane 3: Indsend svar er gråt uden valg", !ins3.hidden && ins3.classList.contains("ikke-klar"));
+    S3.indsend();
+    paastand("fane 3: Indsend svar uden valg bedømmer intet, og kortet blinker", S3.fase === "vaelg" && d.getElementById("for-skort").classList.contains("blink"));
+    klik('#for-ind [data-valg="' + D.SITUATIONER[0].rigtig + '"]');
+    paastand("fane 3: et klik på et svar vælger kun", S3.fase === "vaelg" && ins3.classList.contains("klar") && !!d.querySelector("#for-ind .sk-knap.valgt"));
+    klik("#for-indsend");
+    tik(S3, 5);
+    paastand("fane 3: rigtigt svar bliver grønt, forklaringen står under svarene, og Næste står, hvor Indsend svar stod",
+        S3.fase === "vist" && !!d.querySelector("#for-ind .sk-knap.rigtig") && d.getElementById("for-skort").classList.contains("bliv") &&
+        ins3.hidden && /Næste/.test(d.querySelector("#for-skort [data-videre]").textContent));
+    klik("#for-skort [data-videre]");
+    paastand("fane 3: Næste giver det næste spørgsmål uden rosen", S3.nr === 1 && !d.getElementById("for-skort").classList.contains("bliv") &&
+        d.getElementById("for-ind").textContent.indexOf(D.SITUATIONER[0].efter.slice(0, 30)) < 0);
+    S3.nulstil();
+
+    /* Kortet holder sig i den plads, der er sat af øverst (kortZone), med de længste tekster */
+    var zoneFejl = [];
+    function maalKort(px, navn, top) {
+        var e = d.getElementById(px + "-skort");
+        var bund = e.offsetTop + e.offsetHeight;
+        if (bund > top + 1) zoneFejl.push(ramme.style.width + "×" + ramme.style.height + " " + navn + " " + bund + ">" + Math.round(top));
+    }
+    [[1400, 860], [1280, 700], [1100, 640]].forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        klik('[data-fane="fane-titrering"]');
+        S1.tilpas(); S1.nyProeve(3.10, "Vesterhavet"); S1.tilpas();
+        var top1 = function () { return S1.lay.g.buret.y; };
+        S1.besked('<span class="b-maerke">Hint</span> ' + NK.html(D.TITRER_HINT), "gul"); maalKort("tit", "titrer med hint", top1());
+        S1.besked("", ""); S1.knap(); S1.knap();
+        for (i = 0; i < 8000 && S1.fase !== "aflaes"; i++) S1.opdater(1 / 60);
+        S1.besked('<span class="b-maerke">Hint</span> ' + NK.html(D.AFLAES_HINT), "gul"); maalKort("tit", "aflæs med hint", top1());
+        S1.knap(); S1.knap(); maalKort("tit", "aflæs løst", top1());
+        klik('[data-fane="fane-beregning"]');
+        S2.tilpas(); S2.nyOpgave(S2.kammerat()); S2.tilpas();
+        D.TRIN.forEach(function (t, k) {
+            S2.knap(); maalKort("ber", "trin " + (k + 1) + " formelhint", S2.lay.tavle.y);
+            S2.knap(); S2.knap(); maalKort("ber", "trin " + (k + 1) + " talhint", S2.lay.tavle.y);
+            S2.knap(); maalKort("ber", "trin " + (k + 1) + " løst", S2.lay.tavle.y);
+            if (k < 3) S2.videre();
+        });
+        klik('[data-fane="fane-forbrug"]');
+        S3.tilpas(); S3.nulstil(); S3.tilpas();
+        D.SITUATIONER.forEach(function (sit, n) {
+            var topA = Math.min(S3.lay.gA.buret.y, S3.lay.gB.buret.y);
+            S3.knap(); maalKort("for", (n + 1) + " hint", topA);
+            var forkert = sit.rigtig === 0 ? 1 : 0;
+            if (!sit.samme) {
+                S3.kortValg(forkert); S3.indsend(); tik(S3, 5);
+                maalKort("for", (n + 1) + " forkert svar", topA);
+            }
+            S3.nulstil(); for (var q = 0; q < n; q++) { S3.nr = q; S3.vis(); S3.videre(); }
+        });
+        S3.nulstil();
+    });
+    ramme.style.width = ""; ramme.style.height = "";
+    paastand("kortet holder sig over buretten og tavlen (1400 × 860, 1280 × 700 og 1100 × 640)", zoneFejl.length === 0, zoneFejl.slice(0, 4).join("; "));
 
     klik('[data-fane="fane-titrering"]');
     S1.nyProeve();

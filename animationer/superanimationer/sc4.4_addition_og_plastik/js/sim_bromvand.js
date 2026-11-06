@@ -204,8 +204,8 @@
             /* én linje over luppen: hvad den viser til venstre, hvad der sker til hoejre */
             NK.tekst(ctx, "Det øverste lag i glas " + D.GLAS[lup].b + ": " + v.navn, R.x + 4, R.y - 9, { font: Tg.font("700", 15), farve: "#e6eaef" });
             var a = this.mikro.antal(), under;
-            if (K.affarver(D.GLAS[lup].stof)) under = a.frie ? "Brom finder dobbeltbindingerne" : "Brom har sat sig på dobbeltbindingerne";
-            else under = "Brom, Br₂, er ikke brugt";
+            if (K.affarver(D.GLAS[lup].stof)) under = a.frie ? "Dibrom finder dobbeltbindingerne" : "Dibrom sidder på dobbeltbindingerne";
+            else under = "Dibrom, Br₂, er ikke brugt";
             NK.tekst(ctx, under, R.x + R.b - 4, R.y - 9, { font: Tg.font("600", 14), justering: "right", farve: K.affarver(D.GLAS[lup].stof) ? "#b8f0cf" : "#f7c9a0" });
         }
 

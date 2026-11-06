@@ -142,6 +142,7 @@ js/kemi.js          modellen: pH, koncentrationer, luppens rum, fortyndet syre o
                     universalindikatorens farver og tallene i ord
 js/data.js          stofferne og deres pH, hylderne, målene i fane 2 og 3 og replikkerne
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
+js/skort.js         papirkortet i scenen (samme fil i sc7.1, sc7.2 og sc7.3)
 js/tegning.js       rummet, skalaen og mærket, stofferne, pH-metret, glassene, flasken,
                     pipetten, sprøjteflasken, luppen, ionerne og knapperne
 js/lup.js           luppen med prikkerne og dens autozoom: fælles for fane 2 og 3
@@ -186,7 +187,7 @@ vises og sendes ud på alle faner (den fælles test af præsentationen,
 `NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 4. november 2026: ALT OK (195 påstande).
+bagefter. Sidst kørt 6. november 2026: ALT OK (med påstande om papirkortet).
 
 ## Forenklinger
 
@@ -229,6 +230,40 @@ en lup, der zoomer selv, og fane 3 skulle være mere en kravlegård end fri
 leg. Nu: ingen zoomknapper, intet musehjul, ingen tåge; luppen zoomer selv ét
 trin ad gangen med ring og skilt; fane 2 har nye mål i små bidder, og fane 3
 spærrer de knapper, målet ikke bruger.
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Kortet bygges af `js/skort.js`; pladsen og opbygningen står sidst i
+`css/stil.css`. Beskrivelserne ovenfor af opgavekortet i panelet, knappen og
+linjen under scenen gælder den gamle udgave; nu gælder dette:
+
+* På alle tre faner står hylden eller målet, svarene, hintet, beskeden ved en
+  fejl, forklaringen og knapperne på ét lyst kort øverst i midten af scenen
+  (`#skala-skort`, `#lup-skort`, `#fortynd-skort`). Der er ingen linje
+  nederst; det, linjen sagde (fx at luppen zoomer), står på kortet, når der
+  ikke er en anden besked. Giv hint er en stille knap med gul kant.
+* Skalaen har ingen Indsend svar: et gæt er gratis og bedømmes ikke, og
+  stoffet måles, når det slippes på skalaen. Når hylden er målt, bliver
+  kortet med "Færdig", resultatet og Næste hylde (Videre til luppen).
+* Luppen: pH-mærket og svarknapperne vælger kun. Et pH-mål bedømmes, når
+  eleven trykker Indsend svar (knappen viser "Indsend svar: pH 6,0"), og
+  luppen er færdig med at zoome; et forkert sted siger, hvilken vej mærket
+  skal. Under valg-målet og mens kortet venter på Næste mål, er mærket låst,
+  og kortet blinker ved et klik.
+* Fortyndingen: buddet vælges på kortet og sendes med Indsend svar, før der
+  fortyndes; det bedømmes, når luppen har zoomet. Tallet i mål 3 skrives i
+  et felt på kortet (Enter er Indsend svar). Målene "fortynd til pH 5" og
+  "fortynd til basisk" er forsøg og er nået, når fortyndingen er gjort. Et
+  klik på Fortynd, mens pipetten arbejder, får kortet til at blinke.
+* Efter et rigtigt svar bliver kortet på målet med forklaringen, og Næste
+  mål står, hvor Indsend svar stod. Start målene forfra ligger i panelet
+  (kortet Målene), aldrig på kortet.
+* Lærredet sætter pladsen øverst af (`kortZone`); selvtesten måler kortets
+  højde i alle mål ved 1400 × 860 og 1100 × 700. På smalle skærme er scenen
+  mindst 560 px høj. Tilbuddet om præsentationen står nederst i scenen.
+* Molekylenavne: ingen at rette. Klorin (et rengøringsmiddel) blev stående.
 
 ## I menuen
 

@@ -234,6 +234,8 @@
         var p = this.l.punkt(e);
         var h = this.ramt(p);
         if (!h) return;
+        /* Naar kortet viser Naeste, er forsoeget laast, og kortet blinker */
+        if (h.slags !== "instrument" && h.slags !== "boble" && h.slags !== "graf" && this.fane.spaer && this.fane.spaer()) return;
         if (h.slags === "kuvette" || h.slags === "flaske" || h.slags === "reagens" || h.slags === "holder") {
             this.traek = { slags: h.slags, id: h.id, x: p.x, y: p.y, sx: p.x, sy: p.y, flyttet: false };
             try { this.l.canvas.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }

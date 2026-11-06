@@ -97,7 +97,9 @@
         lay.kant = kant;
         lay.bordY = Math.round(H * 0.88);
         var pb = NK.klamp(W * 0.3, 150, 300);
-        lay.plakat = { x: kant, y: kant, b: pb, h: Math.round(pb * 0.4) };
+        /* Plakaten begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.plakat = { x: kant, y: lay.zone, b: pb, h: Math.round(pb * 0.4) };
         var fri = lay.bordY - lay.plakat.y - lay.plakat.h - 24;
         lay.krukkeH = NK.klamp(Math.min(H * 0.36, fri * 0.8, W * 0.28), 80, 230);
         lay.krukke = { x: Math.round(W * 0.3), y: lay.bordY };
@@ -127,6 +129,7 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* ----- Panelet ---------------------------------------------------------------- */
@@ -134,13 +137,19 @@
         var mig = this;
         this.el = {
             raekker: NK.el("afvej-raekker"),
-            besked: NK.el("afvej-besked"),
-            knap: NK.el("afvej-knap"),
-            kort: NK.el("afvej-kort"),
             niveauer: NK.el("afvej-niveauer"),
-            nulstil: NK.el("afvej-nulstil")
+            nulstil: NK.el("afvej-nulstil"),
+            igen: NK.el("afvej-igen")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.SceneKort("afvej", {
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.el.knap = this.kort.hintEl;
+        this.el.indsend = this.kort.indsendEl;
+        this.el.igen.addEventListener("click", function () { mig.nyOpgave(false); });
 
         D.ORDRE_NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -205,13 +214,13 @@
         this.opg = { o: o, felter: felter, k: 0, hjaelp: 0, brugtSvar: false, faerdig: false, gennemsyn: !!gennemsyn };
         this.fremhaev = null;
         this.haeldT = -1;
-        this.besked("", "");
+        this.fast = null;
+        this.note = "";
         if (gennemsyn) {
             felter.forEach(function (f) { f.status = "ok"; });
             this.opg.k = felter.length;
             this.opg.faerdig = true;
             this.haeldT = 99;
-            this.besked(this.status[this.valgt].stjerne ? "Afvejet uden hjælp. ★" : "Afvejet.", "god");
         } else {
             felter[0].status = "aktiv";
         }
@@ -255,14 +264,14 @@
                 fe.innerHTML = '<span class="felt-pre">m =</span>' +
                     '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen i gram" placeholder="massen"' + fra + '>' +
                     '<span class="felt-efter">g</span>';
-                fe.innerHTML += '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
                 var inputs = fe.querySelectorAll("input");
+                /* Enter i feltet er det samme som Indsend svar paa kortet */
                 Array.prototype.forEach.call(inputs, function (inp) {
                     inp.addEventListener("keydown", function (e) {
-                        if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+                        if (e.key === "Enter") { e.preventDefault(); mig.indsend(); }
                     });
+                    inp.addEventListener("input", function () { mig.visKnap(); });
                 });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                 f.input = inputs[0];
             }
             rk.querySelector(".felter").appendChild(fe);
@@ -278,47 +287,79 @@
         }
     };
 
+    /* ----- Papirkortet ----------------------------------------------------------
+       Ordren, linjen med naeste skridt, fejl og hint, Giv hint og Indsend
+       svar staar paa kortet oeverst i scenen. Feltet, eleven skriver i,
+       staar i regnestykket i panelet; Enter i feltet er Indsend svar.
+       Naar massen er rigtig, bliver kortet staaende med beregningen og
+       knappen Naeste ordre (6. nov. 2026). */
     P.visKort = function () {
         var o = this.opg, ordre = o.o;
         var nv = D.ORDRE_NIVEAUER[ordre.niveau];
-        NK.saetHTML("afvej-niveau", '<span class="hyldeprik" style="background:' + nv.farve + '"></span>' + nv.navn);
-        NK.saetTekst("afvej-nr", String(ordre.plads + 1));
-        NK.saetTekst("afvej-antal-i-niveau", String(this.iNiveau(ordre.niveau)));
-        NK.saetTekst("afvej-prompt", ordre.nTekst + " mol " + ordre.st.navn);
-        NK.saetTekst("afvej-spm", "Hvad skal vægten vise?");
-        this.el.kort.classList.toggle("sejr", o.faerdig && !o.gennemsyn);
+        NK.saetTekst("afvej-ordre", ordre.nTekst + " mol " + ordre.st.s);
+        this.el.igen.hidden = !o.gennemsyn;
+        this.kort.vis({
+            kl: o.faerdig ? "loest" + (o.brugtSvar && !o.gennemsyn ? " svar" : "") : "opgave",
+            chip: "Ordre " + (ordre.plads + 1) + " af " + this.iNiveau(ordre.niveau) + " · " + nv.navn,
+            tekst: NK.html("Afvej " + ordre.nTekst + " mol " + ordre.st.navn + ". Molarmassen står på krukken. Hvad skal vægten vise?")
+        });
+        if (o.faerdig) {
+            var forkl = "<b>" + NK.html(ordre.nTekst + " mol " + ordre.st.navn + " vejer " + ordre.mTekst + " g.") + "</b> " +
+                this.facitTekst() + "." + (this.note ? " " + this.note : "");
+            var naeste = this.naesteUloesteEllerIngen();
+            if (naeste < 0) forkl += " Alle tolv ordrer er afvejet.";
+            var maerke = o.gennemsyn ? (this.status[this.valgt].stjerne ? "Afvejet uden hjælp ★" : "Afvejet") :
+                (o.brugtSvar ? "Svaret" : "Rigtigt");
+            this.kort.bliv(forkl, maerke, naeste >= 0 ? "Næste ordre →" : null, o.brugtSvar && !o.gennemsyn ? "svar" : "god");
+        } else {
+            this.kort.bliv(null);
+            var f = this.fast;
+            if (f && f.klasse === "skidt") this.kort.besked('<span class="b-maerke">Ikke endnu</span> ' + f.html, "skidt");
+            else if (f && f.html) this.kort.besked(f.html, f.klasse);
+            else this.kort.besked("Skriv massen i regnestykket i panelet, og tryk Indsend svar.", "peger");
+        }
         this.visKnap();
         this.opdaterFremskridt();
+        this.tjekZone();
     };
 
     P.visKnap = function () {
-        var o = this.opg, tekst, klasse = "knap blaa";
-        if (o.faerdig) {
-            if (o.gennemsyn) tekst = "Afvej igen";
-            else { tekst = "Næste ordre →"; klasse += " banker"; }
-        } else {
-            tekst = o.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            klasse = "knap";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-    };
-
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
-
-    P.visStatus = function () {
         var o = this.opg;
         if (!o) return;
-        var ordre = o.o;
-        if (o.faerdig) {
-            NK.saetHTML("afvej-status", "<b>" + NK.html(ordre.nTekst + " mol " + ordre.st.navn) + "</b> vejer " +
-                NK.html(ordre.mTekst) + " g.");
-        } else {
-            NK.saetHTML("afvej-status", "Skriv massen til højre. Molarmassen står på krukken.");
+        if (o.faerdig) { this.kort.knapper({}); return; }
+        var f = this.aktivtFelt();
+        var vaerdi = f && f.input ? f.input.value.trim() : "";
+        this.kort.knapper({
+            hint: o.hjaelp === 0 ? "Giv hint" : "Vis svaret",
+            peg: !!(this.fast && this.fast.klasse === "skidt") && o.hjaelp === 0,
+            indsend: true, klar: !!vaerdi,
+            indsendTekst: vaerdi ? "Indsend svar: " + vaerdi + " g" : "Indsend svar"
+        });
+    };
+
+    /* besked: linjen paa kortet. Tom: naeste skridt. */
+    P.besked = function (html, klasse) {
+        this.fast = html ? { html: html, klasse: klasse || "" } : null;
+        if (this.opg) this.visKort();
+    };
+
+    /* Statuslinjen er vaek: alt staar paa kortet */
+    P.visStatus = function () {};
+
+    P.naesteUloesteEllerIngen = function () {
+        var n = D.ORDRER.length;
+        for (var d = 1; d <= n; d++) {
+            var i = (this.valgt + d) % n;
+            if (!this.status[i].loest) return i;
         }
+        return -1;
+    };
+
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
     };
 
     P.hjaelp = function () {
@@ -330,6 +371,45 @@
         };
     };
 
+    /* Giv hint, saa Vis svaret */
+    P.hint = function () {
+        var o = this.opg;
+        if (!o || o.faerdig) return;
+        var f = this.aktivtFelt();
+        var h = this.hjaelp();
+        if (o.hjaelp === 0) {
+            o.hjaelp = 1;
+            this.fremhaev = h.fremhaev;
+            this.besked("<b>Hint:</b> " + h.hint, "gul");
+            this.fokus();
+        } else {
+            o.brugtSvar = true;
+            this.feltRigtigt(f, "svar");
+        }
+    };
+
+    /* Knappen, der foerer videre: Naeste ordre */
+    P.videre = function () {
+        var o = this.opg;
+        if (!o || !o.faerdig) return;
+        var i = this.naesteUloesteEllerIngen();
+        if (i >= 0) this.vaelg(i);
+    };
+
+    /* Indsend svar: tjekker feltet i regnestykket */
+    P.indsend = function () {
+        var o = this.opg, f = this.aktivtFelt();
+        if (!o || o.faerdig || !f) { this.kort.blink(); return; }
+        if (!f.input || !f.input.value.trim()) {
+            this.kort.blink();
+            this.besked("Skriv først massen i regnestykket i panelet.", "peger");
+            this.fokus();
+            return;
+        }
+        this.tjek();
+    };
+
+    /* Den gamle knap (selvtesten): videre eller afvej igen, ellers hint */
     P.knap = function () {
         var o = this.opg;
         if (o.faerdig) {
@@ -337,29 +417,17 @@
             else this.vaelg(this.naesteUloeste(this.valgt));
             return;
         }
-        var f = this.aktivtFelt();
-        var h = this.hjaelp();
-        if (o.hjaelp === 0) {
-            o.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + h.hint, "gul");
-            this.fremhaev = h.fremhaev;
-            this.visKnap();
-            this.fokus();
-        } else {
-            o.brugtSvar = true;
-            this.feltRigtigt(f, "svar");
-            this.besked(h.svar, "gul");
-        }
+        this.hint();
     };
 
     P.tjek = function () {
         var o = this.opg, f = this.aktivtFelt();
         if (!f) return;
         var res = Tj.masse(f.input ? f.input.value : "", o.o);
-        if (res.tom) { this.besked(res.besked, ""); this.fokus(); return; }
+        if (res.tom) { this.besked(res.besked, "peger"); this.fokus(); return; }
         if (res.ok) {
+            this.note = res.note || "";
             this.feltRigtigt(f, "ok");
-            if (res.note) this.besked(res.note, "gul");
             return;
         }
         f.forsoeg++;
@@ -377,7 +445,8 @@
         f.status = maade;
         o.hjaelp = 0;
         this.fremhaev = null;
-        if (maade === "ok") this.besked("", "");
+        if (maade !== "ok") this.note = "";
+        this.fast = null;
         if (this.afvisTilbud) this.afvisTilbud();
         this.haeldT = 0;
         if (o.k >= o.felter.length - 1) {
@@ -424,8 +493,10 @@
         this.vaelg(0);
     };
 
+    /* Enter uden for feltet: videre, naar ordren er afvejet */
     P.enter = function () {
-        if (this.opg && this.opg.faerdig && !this.opg.gennemsyn) this.knap();
+        if (this.opg && this.opg.faerdig) this.videre();
+        else this.indsend();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------ */
@@ -569,7 +640,7 @@
             } else if (u.slags === "krukke") {
                 mig.besked("Krukken: " + NK.html(o.o.st.navn) + ", M = " + NK.komma(o.o.st.M) + " g/mol.", "");
             } else if (u.slags === "vaegt") {
-                if (f) mig.besked("Vægten afvejer, når massen til højre er rigtig.", "");
+                if (f) mig.besked("Vægten afvejer, når massen i regnestykket er rigtig.", "");
             }
             mig.fokus();
         });

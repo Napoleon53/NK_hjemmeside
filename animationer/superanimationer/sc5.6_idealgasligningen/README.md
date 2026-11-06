@@ -52,7 +52,7 @@ Alt kan gøres både i scenen og i kortet Gassen i panelet: træk et lod fra
 hylden op på stemplet (eller klik), klik på et lod på stemplet for at tage
 det af, klik på gasflasken for 0,25 mol mere og på den røde hane for at
 lukke 0,25 mol ud, og brug knapperne på varmepladen (25 K ad gangen) eller
-skyderen. Hvert klik giver et kort svar i opgavekortet. Molekylernes fart
+skyderen. Hvert klik giver et kort svar på papirkortet. Molekylernes fart
 er proportional med kvadratroden af T.
 
 Grafen øverst til venstre viser p mod V med sporet af de sidste
@@ -101,11 +101,41 @@ brøkstregen eller mangler, kommaet, n = m · M og brøken vendt om, 273
 trukket fra i stedet for lagt til, og svaret i °C, når der spørges om
 kelvin.
 
-**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+**Hint og svar.** Knappen med gul kant på papirkortet er hjælpen: Giv hint skriver
 hintet i linjen lige over knappen, og knappen bliver til Vis svaret (kun et
 omrids, så den ikke frister), der skriver svaret og næste skridt i samme
 linje. Efter et forkert svar lyser den gule knap stille op, til linjen
 skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
+
+## Papirkortet (6. nov. 2026)
+
+Begge faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`, kopi
+af sc5.2's med en ekstra notelinje, og `../faelles/papirkort.css/js`).
+Opgavekortene i panelet er fjernet. Kortet har etiketten ("Opgave 2 af 7",
+"Let 1 af 4"), spørgsmålet eller opgaven, svarene, linjen med næste skridt,
+fejl og hint, Giv hint (gul kant, bliver til Vis svaret) og Indsend svar (grå,
+til der er noget at sende). Korte beskeder fra scenen ("0,25 mol gas mere")
+står i en notelinje under teksten i nogle sekunder.
+
+- Stemplet: et svar vælger kun; Indsend svar (eller Enter) sender det. I
+  opgaver med et forsøg er forsøget låst, til svaret er sendt: et klik i
+  scenen eller på panelets knapper får kortet til at blinke. Efter svaret
+  bliver kortet på spørgsmålet: svaret er grønt (rødt ved et forkert gæt og
+  det rigtige grønt), forklaringen står under svarene (rød boks ved et
+  forkert gæt), og Næste opgave eller Videre til Beregningen står, hvor
+  Indsend svar stod. Panelet har kortet Opgaverne med prikkerne og Start
+  opgaven forfra (samme som R). Svarene i opgave 5 (Hvorfor?) er gjort
+  kortere ("Molekylerne får mere fart"), så kortet ikke bliver for højt.
+- Beregningen: felterne, eleven skriver i, står stadig i panelet (kortet
+  Beregningen); Enter eller Indsend svar sender feltet ind (knappen ↵ i
+  feltet er væk). Når opgaven er regnet, står facit og rosen på kortet med
+  Næste opgave; efter den sidste uløste opgave er der ingen knap på kortet,
+  og Nye tal står i panelet.
+
+Tegningen begynder under kortets plads (`D.ZONE` i `js/data.js`, almindelig
+og lav skærm), og lærredet lægges om, hvis kortet bliver højere. På en smal
+skærm er scenen lidt højere (min. 580 px), så cylinderen har plads.
+Molekylnavnene var allerede rigtige (dinitrogen i opgaven Den ukendte gas).
 
 **Påskeæg:** stil gassen på 1,00 mol, 0 °C, uden lodder og med frit
 stempel: 22,4 L, tallet fra de gamle lærebøger.
@@ -144,6 +174,7 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       cylinderen, manometeret, varmepladen, flasken, hylden, skiltene, grafen og tavlen
 js/sim_stempel.js   fane 1
 js/sim_regn.js      fane 2
+js/kort.js          papirkortet øverst i scenen (NK.SceneKort, kopi af sc5.2's)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -160,7 +191,7 @@ mol, 3 lodder à 1 bar, 40 molekyler pr. mol). **Forudsigelserne** står i
 skal prøves (`handling`), hint og forklaring. **Regneopgaverne** står i
 `D.REGN`: de kendte tal første gang (`std`), listerne, nye tal trækkes fra
 (`tal`), og teksten med {n}, {T} osv. Trinene og facit regnes af
-`js/gas.js`; intet facit er skrevet i hånden. **Linjerne i opgavekortet**
+`js/gas.js`; intet facit er skrevet i hånden. **Linjerne i papirkortet**
 står i `D.INTRO`, `D.FAERDIG` og `D.ROS`, og de korte svar fra
 scenen i `D.SCENE`.
 
@@ -175,10 +206,13 @@ besked, de typiske regnefejl, sproget (også alt, der siges undervejs),
 at formlen ikke står på siden uden for teorien, at alle syv
 forudsigelser og alle tolv opgaver kan gennemføres, også med forkert gæt,
 to ting på én gang, åbnet lås, hint og Vis svaret, at hint og svar kun
-kommer fra den gule knap og står i opgavekortet, og at layoutet holder fra 520 × 380 til
+kommer fra den gule knap og står på papirkortet, papirkortet (i scenen, Indsend
+svar grå uden valg, et svar bedømmer ikke af sig selv, låst forsøg før svaret,
+kortet bliver på spørgsmålet med Næste, Start forfra ikke på kortet, kortet i
+sin plads også med det højeste kort), og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt
-tilbage bagefter. Sidst kørt 9. oktober 2026: ALT OK (141 påstande).
+tilbage bagefter. Sidst kørt 6. november 2026: ALT OK (157 påstande).
 
 ## Forenklinger
 

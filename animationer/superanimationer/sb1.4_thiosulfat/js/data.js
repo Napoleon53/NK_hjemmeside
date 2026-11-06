@@ -36,24 +36,24 @@
               felt: ["oppefra", "ur"] },
             { tekst: "Grafen viser bagefter, hvor meget svovl der er dannet. En god måling ender på den stiplede linje, hvor krydset er væk. Kortet Måling samler dine målinger i en tabel med Δt og 1/Δt.",
               felt: "graf", sel: "#kryds-maaling" },
-            { tekst: "Når du har lavet et par målinger, starter du quizzen på kortet Quiz. Quizzen har fem spørgsmål, og knappen på kortet giver først et hint og derefter svaret.",
-              sel: "#kryds-opgavekort" }
+            { tekst: "Når du har lavet et par målinger, starter du quizzen på kortet øverst i scenen. Quizzen har fem spørgsmål, og du sender hvert svar med Indsend svar. Knappen Giv et hint giver først et hint og derefter svaret.",
+              sel: "#kryds-skort" }
         ],
         konc: [
             { tekst: "I denne fane undersøger du, hvordan koncentrationerne af thiosulfat og syre påvirker reaktionshastigheden. Du vælger rumfangene af Na₂S₂O₃, HCl og vand og trykker Bland og mål. Uret stopper selv, når krydset er væk.",
               sel: "#konc-forsoeg" },
             { tekst: "Hvert forsøg bliver en række i tabellen under grafen. Du regner selv [S₂O₃²⁻] og [H₃O⁺] i glasset ud og skriver tallene i tabellen. Efter to rigtige tal i en kolonne regnes resten af kolonnen for dig.",
               sel: "#konc-tabel" },
-            { tekst: "Et rigtigt tal giver et punkt på grafen for 1/Δt. Knapperne over grafen skifter mellem [S₂O₃²⁻] og [H₃O⁺] på den vandrette akse. Opgavekortet stiller opgaver om dine forsøg, og knappen på kortet giver først et hint og derefter svaret.",
-              felt: "graf", sel: ["#konc-akse", "#konc-opgavekort"] }
+            { tekst: "Et rigtigt tal giver et punkt på grafen for 1/Δt. Knapperne over grafen skifter den vandrette akse. Kortet øverst i scenen stiller opgaver om forsøgene.",
+              felt: "graf", sel: ["#konc-akse", "#konc-skort"] }
         ],
         temp: [
             { tekst: "I denne fane undersøger du, hvordan temperaturen påvirker reaktionshastigheden. Blandingen er den samme i alle forsøg, så du vælger kun temperaturen og måler med den grønne knap.",
               sel: "#temp-forsoeg" },
             { tekst: "Hvert forsøg bliver et punkt på grafen og en række i tabellen under grafen. Grafen viser 1/Δt mod temperaturen, og punkterne bliver forbundet med en linje.",
               felt: "graf", sel: "#temp-tabel" },
-            { tekst: "Når du har målt ved nogle temperaturer, starter du en opgave på opgavekortet. Knappen på kortet giver først et hint og derefter svaret.",
-              sel: "#temp-opgavekort" }
+            { tekst: "Når du har målt ved nogle temperaturer, starter du en opgave på kortet øverst i scenen. Du sender dit svar med Indsend svar, og knappen Giv et hint giver først et hint og derefter svaret.",
+              sel: "#temp-skort" }
         ]
     };
 
@@ -395,7 +395,7 @@
                         { tekst: "Nej, hastigheden falder, når det bliver varmere", rigtig: false,
                           forklaring: "Varme gør reaktionen hurtigere: Δt bliver kortere, og 1/Δt større." }
                     ],
-                    hint: "Mål ved 20 °C, 30 °C og 40 °C. Hvor mange gange større bliver 1/Δt for hver 10 °C?",
+                    hint: "Mål ved 20, 30 og 40 °C. Hvor mange gange større bliver 1/Δt pr. 10 °C?",
                     opsaet: null
                 };
             }

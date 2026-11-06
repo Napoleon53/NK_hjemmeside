@@ -1,18 +1,18 @@
 /* =====================================================================
    sim_regler.js - fane 1: reglerne
 
+   Papirkortet oeverst i scenen (6. nov. 2026, js/fane.js): stoffets navn,
+   opgaven (Find oxidationstallet for C i CO₂) og spoergsmaalet til det
+   trin, eleven er ved (Hvilken ladning har CO₂?), feltet, Giv hint og
+   Indsend svar. Foer 6. nov. stod opgaven oeverst paa tavlen og
+   spoergsmaalet i et arbejdsfelt under formlen.
+
    Tavlen, oppefra:
-     * opgaven paa én linje (Find oxidationstallet for C i CO₂) og, for de
-       seks foerste, trinene som smaa maerker (Ladningen, O, H, det ukendte).
+     * for de seks foerste trinene som smaa maerker (Ladningen, O, H, det
+       ukendte).
      * formlen. Over det atom, der spoerges til, staar et gult ?, og det,
        eleven skriver, ses der med det samme. Oxidationstallet over atomet
        skrives med romertal.
-     * arbejdsfeltet: spoergsmaalet til det trin, eleven er ved (Hvilken
-       ladning har CO₂?), feltet, Tjek og Giv hint lige ved siden af, og
-       under dem linjen med fejl, hint og ros. Alt, eleven skal laese og
-       trykke paa, staar her (brugerens test 3. okt. 2026: mindre tekst,
-       tydeligt at det er ladningen, hintknappen ved feltet, ingen
-       ordretekst i panelet).
      * regnestykket: summen af oxidationstallene = ladningen. Det kommer
        frem, naar ladningen er fundet, saa eleven ikke kastes ud i en halv
        beregning (brugerens foerste test, 26. sept. 2026).
@@ -21,7 +21,7 @@
      * atomerne én for én som brikker, naar det foerste tal kendes.
 
    Pladsen til regnestykket, beregningen og brikkerne er sat af fra
-   starten, saa arbejdsfeltet ikke flytter sig, mens der skrives.
+   starten, saa kortet ikke flytter sig, mens der skrives.
 
    De seks foerste stoffer gaas igennem trin for trin som i c8.2:
    ladningen, O, H og til sidst det ukendte. De 25 oevestoffer spoerger
@@ -61,29 +61,17 @@
     }
 
     var P = SimRegler.prototype;
-    NK.Fane.paa(P, { navn: "rg", naesteFane: "fane-ek", naesteNavn: "Elektronerne" });
+    NK.Fane.paa(P, { navn: "rg", naesteFane: "fane-ek", naesteNavn: "Elektronerne", zone: [124, 112] });
 
     P.chipTekst = function (o) { return NK.formel(o.f) + NK.ladningHaevet(o.q); };
 
-    /* Feltets ramme i arbejdsfeltet: det aktive felt og knappen Tjek */
+    /* Feltets ramme paa kortet: det aktive felt. Indsend svar (og Enter) sender det. */
     P.bygFelt = function () {
-        var mig = this;
         var boks = document.createElement("div");
         boks.className = "arb-felt";
         var plads = document.createElement("span");
         plads.className = "arb-inp";
-        var ok = document.createElement("button");
-        ok.type = "button";
-        ok.className = "felt-ok";
-        ok.textContent = "Tjek";
-        ok.title = "Tjek (Enter)";
-        ok.addEventListener("click", function () {
-            var k = mig.aktivt();
-            if (k && !mig.faerdig) mig.tjek(k);
-            mig.fokus();
-        });
         boks.appendChild(plads);
-        boks.appendChild(ok);
         NK.el("rg-felter").appendChild(boks);
         this.feltBoks = boks;
         this.feltPlads = plads;
@@ -114,7 +102,7 @@
     P.aktivt = function () { return this.opg.trin[this.opg.nr]; };
     P.opgaveFaerdig = function () { return this.opg.nr >= this.opg.trin.length; };
 
-    /* Spoergsmaalet i arbejdsfeltet til det trin, eleven er ved */
+    /* Spoergsmaalet paa kortet til det trin, eleven er ved */
     P.spmTekst = function (k) {
         var st = this.opg.st;
         if (k === "ladning") return "Hvilken ladning har " + st.tekst + "?";
@@ -127,14 +115,33 @@
         return k ? this.spmTekst(k) : "";
     };
 
+    /* Kortets tekst: stoffets navn, opgaven og spoergsmaalet til trinnet.
+       Naar opgaven er loest, staar svaret i stedet for spoergsmaalet. */
+    P.maalTekst = function () {
+        var st = this.opg.st;
+        return "Find oxidationstallet for " + st.X + " i " + st.tekst + ".";
+    };
+
     P.visSpm = function () {
         var st = this.opg.st, e = this.el.spm;
+        var chip = '<span class="sk-chip">' + NK.html(this.opg.o.navn) + "</span>";
         if (this.opgaveFaerdig()) {
-            saet(e, '<span class="arb-ok">✓</span> ' + NK.html(st.X + " har oxidationstallet ") + "<b>" + O.ox(st.ox) + "</b>" +
-                NK.html(" i " + st.tekst + "."));
+            saet(e, chip + NK.html(this.maalTekst()) + ' <b class="sk-svaret"><span class="arb-ok">✓</span> ' +
+                NK.html(st.X + " har oxidationstallet ") + O.ox(st.ox) + ".</b>");
             return;
         }
-        saet(e, NK.html(this.spmTekst(this.aktivt())));
+        saet(e, chip + NK.Papir.tekst(NK.html(this.maalTekst() + " " + this.spmTekst(this.aktivt()))));
+    };
+
+    /* Indsend svar: det aktive felt */
+    P.kanSende = function () {
+        var k = this.aktivt();
+        return !!(k && this.felter && this.felter[k] && this.felter[k].value.trim() !== "");
+    };
+
+    P.indsend = function () {
+        var k = this.aktivt();
+        if (k && !this.faerdig) this.tjek(k);
     };
 
     /* ----- Hjaelpen: Giv hint og Vis svaret ------------------------------------------ */
@@ -229,7 +236,7 @@
 
     P.slutLinje = function (maade) {
         var g = this.opg, dele = [];
-        if (maade === "svar" && g.st.slags === "sammensat") dele.push("Beregningen står herunder.");
+        if (maade === "svar" && g.st.slags === "sammensat") dele.push("Beregningen står på tavlen.");
         if (g.o.note) dele.push(g.o.note);
         return NK.html(dele.join(" "));
     };
@@ -282,7 +289,7 @@
         var linjer = st.slags === "ion" ? 0 : O.isolering(st).slice(1).length;
         this.isolEl.style.minHeight = (linjer * 1.3) + "em";
 
-        /* Felterne: ét pr. trin. Det aktive staar i arbejdsfeltet. */
+        /* Felterne: ét pr. trin. Det aktive staar paa kortet. */
         this.felter = {};
         this.feltPlads.innerHTML = "";
         this.feltBoks.classList.remove("fejl");
@@ -300,6 +307,7 @@
                 mig.feltBoks.classList.remove("fejl");
                 mig.visOver();
                 mig.visRegn();
+                mig.visKnap();
             });
             mig.felter[k] = inp;
         });
@@ -317,7 +325,7 @@
 
     P.visTavle = function () {
         var g = this.opg, aktiv = this.faerdig || this.opgaveFaerdig() ? null : this.aktivt();
-        /* Det aktive felt staar i arbejdsfeltet */
+        /* Det aktive felt staar paa kortet */
         var inp = aktiv ? this.felter[aktiv] : null;
         if (inp && inp.parentNode !== this.feltPlads) {
             this.feltPlads.innerHTML = "";
@@ -422,12 +430,13 @@
         if (k && this.felter[k] && document.activeElement !== this.felter[k]) this.felter[k].focus();
     };
 
-    /* ----- Scenen: vaeggen og tavlen. Under tavlen er der en smal stribe til
-       knappen Start forfra. ---------------------------------------------------------- */
+    /* ----- Scenen: vaeggen og tavlen under papirkortet. Under tavlen er der en
+       smal stribe til knappen Start forfra. ------------------------------------------ */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
-        var kant = NK.klamp(W * 0.03, 12, 34), top = NK.klamp(H * 0.035, 10, 26);
+        lay.zone = this.kortZone();
+        var kant = NK.klamp(W * 0.03, 12, 34), top = lay.zone + 4;
         var b = Math.min(W - 2 * kant, 1000);
         var h = Math.max(160, H - top - NK.klamp(H * 0.06, 40, 48));
         lay.tavle = { x: Math.round((W - b) / 2), y: top, b: Math.round(b), h: Math.round(h) };
@@ -438,7 +447,7 @@
         t.style.height = lay.tavle.h + "px";
         /* Skriften foelger tavlens stoerrelse: den stoerste, hvor det hele
            (ogsaa regnestykket, beregningen og brikkerne, der kommer senere)
-           kan vaere der, med plads til en linje mere i arbejdsfeltet */
+           kan vaere der, med lidt luft */
         var stil = window.getComputedStyle(t);
         var indre = t.clientHeight - parseFloat(stil.paddingTop) - parseFloat(stil.paddingBottom) -
             t.querySelector(".tv-top").offsetHeight - (parseFloat(stil.rowGap) || 0);

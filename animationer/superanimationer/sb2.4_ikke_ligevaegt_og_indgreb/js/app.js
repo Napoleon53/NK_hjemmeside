@@ -122,7 +122,7 @@
         var oenske = "";
         try { oenske = decodeURIComponent((window.location.hash || "").replace(/^#/, "")).toLowerCase(); } catch (x) { oenske = ""; }
         var HASH = { indgreb: "fane-i", beholder: "fane-i", gas: "fane-i",
-                     blod: "fane-b", blodet: "fane-b", oxygen: "fane-b", haemoglobin: "fane-b",
+                     blod: "fane-b", blodet: "fane-b", oxygen: "fane-b", dioxygen: "fane-b", haemoglobin: "fane-b",
                      regn: "fane-r", beregning: "fane-r", y: "fane-r" };
         visFane(HASH[oenske] || faner[0]);
 

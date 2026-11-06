@@ -28,8 +28,8 @@ også er kopieret tilbage som den aktive fil.
 | 1 | Byg molekylet | vælger C, N, O og Cl, sætter dem sammen og vælger bindingerne | formen omkring hvert atom følger af bindinger og frie elektronpar |
 | 2 | Molekylerne | drejer 11 rigtige molekyler, sammenligner med prikformlen og måler vinkler | samme regel forklarer CH₄, NH₃, H₂O, CO₂ og resten |
 
-Begge faner har et opgavekort med én knap: Start opgave → Giv hint → Vis svaret →
-Ny opgave. Teorien ligger bag knappen **Teori**, og **?** starter en rundvisning
+Begge faner har opgaverne på papirkortet øverst i scenen (se "Papirkortet" nedenfor).
+Teorien ligger bag knappen **Teori**, og **?** starter en rundvisning
 for den aktive fane.
 
 ### Fane 1: byg molekylet
@@ -91,7 +91,7 @@ js/bygning.js         fane 1: regler, automatisk H, geometri, genkendelse
 js/model3d.js         kameraet og tegningen af atomer, pinde og elektronpar;
                       vinkelbuen og pilene
 js/prikformel.js      prikformlen i hjørnet
-js/opgave.js          opgavekortet med én knap (samme som sc2.1)
+js/opgave.js          papirkortet med opgaverne (samme som sc3.3)
 js/valg.js            det valgte molekyle på fane 2
 js/sim_byg.js         fane 1
 js/sim_molekyler.js   NK.MolSim (grundlaget) og fane 2
@@ -125,3 +125,21 @@ molekyler, plan og lineær form, reglerne for C, antal atomer og bindinger,
 genkendelse, drejningen mellem gammel og ny form); at alle opgaver kan løses; og
 at ingen tekst bruger tankestreger eller er under 12 px. Chrome kræver
 `--allow-file-access-from-files`.
+
+## Papirkortet (6. nov. 2026)
+
+Opgaverne står på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `papirkort.js`, `js/opgave.js`), ikke i panelet.
+Et svar eller et bygget molekyle vælges kun; **Indsend svar** sender ind og er grå,
+til der er noget at sende. **Giv et hint** er en stille knap med gul kant
+(Giv et hint, Vis svaret). Efter et rigtigt svar bliver kortet på opgaven med det
+grønne svar, forklaringen og **Næste opgave**, hvor Indsend svar stod; efter fanens
+sidste opgave fører knappen videre til fane 2. Fane 1 har 9 opgaver i fast
+rækkefølge, fane 2 seks. Under en opgave er menuen og byggesættet låst, og et klik
+får kortet til at blinke. Panelet har kun tallet for løste opgaver og **Start forfra**.
+Beskederne fra vinkelmåleren står i kortets nederste række; statuslinjen nederst i
+scenen er væk. Molekylet og knapperne i hjørnerne står under kortet (`NK.kortZone`).
+Selvtesten (afsnit 6) måler kortet i 1400x860 og 1100x700.
+
+Molekylenavnene (6. nov. 2026): byggesættets kendte molekyler hedder allerede
+dinitrogen, dioxygen og dichlor; resten af teksten handler om atomer.

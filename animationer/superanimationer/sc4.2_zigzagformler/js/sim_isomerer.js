@@ -1,9 +1,10 @@
 /* =====================================================================
    sim_isomerer.js - fane 4: isomerer (den gamle 6.3)
 
-   Formlen staar i panelet: C4H10, C5H12, C6H14 eller C7H16 (2, 3, 5 og 9
-   isomerer). Eleven tegner et molekyle. Naar alle C-atomer er brugt,
-   navngives det. Et nyt navn kommer i listen, og tavlen ryddes. Et navn,
+   Formlen staar paa papirkortet: C4H10, C5H12, C6H14 eller C7H16 (2, 3, 5
+   og 9 isomerer). Eleven tegner et molekyle og trykker Indsend svar, naar
+   alle C-atomer er brugt. Saa navngives det. Et nyt navn kommer i listen,
+   kortet bliver paa fundet, og Tegn den naeste rydder tavlen. Et navn,
    der allerede er fundet, er det samme stof tegnet paa en anden maade:
    dets plads i listen ryster, og tavlen bliver staaende.
 
@@ -47,6 +48,7 @@
         this.n = n;
         this.hjaelp = 0;
         this.ryd = 0;
+        this.venter = false;
         this.sidst = null;
         this.besked("", "");
         this.braet.atomFarve = this.braet.bindingFarve = this.braet.lokanter = null;
@@ -59,18 +61,21 @@
     P.faerdig = function () { return this.fundet[this.n].length >= this.isomerer().length; };
 
     P.nulstil = function () {
-        if (!this.ryd) this.braet.nulstil(true);
+        if (!this.venter && !this.faerdig()) this.braet.nulstil(true);
     };
 
     /* ----- Tegningen tjekkes, naar alle C-atomer er brugt ---------------------- */
     P.aendret = function (hvad) {
-        if (hvad === "laerer" || this.ryd) return;
-        if (this.braet.antal() !== this.n) {
-            if (this.beskedKlasse === "skidt") this.besked("", "");
-            this.sidst = null;
-            this.visPanel();
-            return;
-        }
+        if (hvad === "laerer" || this.ryd || this.venter) return;
+        /* En forklaring til et forkert svar staar, til tegningen aendres */
+        if (this.beskedKlasse === "skidt") this.besked("", "");
+        this.sidst = null;
+        this.visPanel();
+    };
+
+    /* Indsend svar: tegningen navngives og holdes op mod listen */
+    P.indsend = function () {
+        if (this.venter || this.faerdig() || this.braet.antal() !== this.n) return;
         var res = NK.Navn.analyser(this.braet.mol);
         if (!res.navn) { this.besked("Molekylet skal hænge sammen.", "skidt"); return; }
         var liste = this.fundet[this.n], navn = res.navn;
@@ -92,8 +97,8 @@
             this.braet.laast = true;
             this.klaretNiveau();
         } else {
-            this.besked("<b>Ny isomer: " + NK.html(navn) + ".</b> Tavlen ryddes. Tegn en anden.", "god");
-            this.ryd = 1.6;
+            this.besked("<b>Ny isomer: " + NK.html(navn) + ".</b> Den er skrevet på listen.", "god");
+            this.venter = true;
             this.braet.laast = true;
         }
         this.visPanel();
@@ -107,19 +112,24 @@
         b.lokanter = lok;
     };
 
-    P.opdaterEkstra = function (dt) {
-        if (this.ryd > 0) {
-            this.ryd -= dt;
-            if (this.ryd <= 0) {
-                this.ryd = 0;
-                this.braet.bindingFarve = this.braet.lokanter = null;
-                this.braet.laast = false;
-                this.braet.nulstil(true, true);
-                this.braet.hist = [];
-            }
-        }
+    /* Tegn den naeste: tavlen ryddes */
+    P.rydTavlen = function () {
+        this.venter = false;
+        this.ryd = 0;
+        this.hjaelp = 0;
+        this.sidst = null;
+        this.besked("", "");
+        this.braet.bindingFarve = this.braet.lokanter = null;
+        this.braet.laast = false;
+        this.braet.nulstil(true, true);
+        this.braet.hist = [];
+        this.visPanel();
+    };
+
+    P.opdaterEkstra = function () {
         NK.saetTekst("is-tael", this.braet.antal() + " af " + this.n);
         this.visStatus();
+        this.visKort();
     };
 
     /* ----- Knappen: Giv hint -> Vis en isomer -> ------------------------------------ */
@@ -128,12 +138,32 @@
         return this.isomerer().filter(function (m) { return f.indexOf(m.navn) < 0; });
     };
 
-    P.knap = function () {
+    /* Den naeste formel, der ikke er klaret (kortets knap gaar altid fremad) */
+    P.naesteNiveau = function () {
+        var i = NIVEAUER.indexOf(this.n);
+        for (var k = 1; k < NIVEAUER.length; k++) {
+            var n = NIVEAUER[(i + k) % NIVEAUER.length];
+            if (this.fundet[n].length < O.isomerer(n).length) return n;
+        }
+        return 0;
+    };
+
+    P.videre = function () {
         if (this.faerdig()) {
-            var i = NIVEAUER.indexOf(this.n);
-            this.nytNiveau(NIVEAUER[(i + 1) % NIVEAUER.length]);
+            var n = this.naesteNiveau();
+            if (n) this.nytNiveau(n); else if (NK.visFane) NK.visFane("oploeselighed");
             return;
         }
+        if (this.venter) this.rydTavlen();
+    };
+
+    P.knap = function () {
+        if (this.faerdig() || this.venter) { this.videre(); return; }
+        this.hjaelpKlik();
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.faerdig() || this.venter) return;
         var mangler = this.mangler();
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
@@ -152,7 +182,7 @@
         this.braet.saet(vis.mol.kopi(), true);
         this.farv(NK.Navn.analyser(this.braet.mol));
         this.braet.laast = true;
-        this.ryd = this.faerdig() ? 0 : 2.6;
+        this.venter = !this.faerdig();
         this.besked("Her er en: <b>" + NK.html(vis.navn) + "</b>. Den er skrevet på listen.", "gul");
         if (this.faerdig()) {
             this.besked("Her er den sidste: <b>" + NK.html(vis.navn) + "</b>. Alle isomerer af " + this.formel() + " er på listen.", "gul");
@@ -173,7 +203,6 @@
     /* ----- Panelet --------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        NK.el("is-knap").addEventListener("click", function () { mig.knap(); });
         NK.el("is-forfra").addEventListener("click", function () {
             mig.fundet[mig.n] = [];
             mig.vist[mig.n] = {};
@@ -184,11 +213,22 @@
         });
     };
 
-    P.besked = function (html, klasse) {
-        var e = NK.el("is-besked");
-        e.innerHTML = html;
-        e.className = "besked" + (klasse ? " " + klasse : "");
-        this.beskedKlasse = klasse;
+    /* Papirkortet (js/opgavefane.js) */
+    P.kortData = function () {
+        var iso = this.isomerer(), f = this.fundet[this.n], faerdig = this.faerdig();
+        var videre = "Tegn den næste →";
+        if (faerdig) {
+            var n = this.naesteNiveau();
+            videre = n ? "Videre til C" + NK.saenket(n) + "H" + NK.saenket(2 * n + 2) + " →" : "Videre til Opløselighed →";
+        }
+        return {
+            chip: "Fundet " + f.length + " af " + iso.length,
+            tekst: "Tegn en isomer af <b>" + this.formel() + "</b>. Find alle " + iso.length + " isomerer.",
+            loest: faerdig || this.venter, vist: this.beskedKlasse === "gul",
+            videre: videre,
+            klar: !faerdig && !this.venter && this.braet.antal() === this.n,
+            hint: this.hjaelp === 0 ? "Giv et hint" : "Vis en isomer"
+        };
     };
 
     P.visPanel = function () {
@@ -200,19 +240,11 @@
             k.classList.toggle("banker", mig.faerdig() && n === NIVEAUER[NIVEAUER.indexOf(mig.n) + 1]);
             k.innerHTML = "C" + NK.saenket(n) + "H" + NK.saenket(2 * n + 2) + (klar ? '<span class="flueben">✓</span>' : "");
         });
-        NK.saetHTML("is-prompt", this.formel());
         NK.saetTekst("is-fundet", String(f.length));
         NK.saetTekst("is-antal", String(iso.length));
         NK.saetTekst("is-tael", this.braet.antal() + " af " + this.n);
         NK.saetTekst("is-liste-t", f.length + " af " + iso.length);
-        var knap = NK.el("is-knap");
-        if (this.faerdig()) {
-            knap.textContent = this.n === 7 ? "Forfra med C₄H₁₀ ↺" : "Næste formel →";
-            knap.className = "knap blaa banker";
-        } else {
-            knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis en isomer";
-            knap.className = "knap";
-        }
+        this.visKort();
         NK.el("is-kort").classList.toggle("sejr", this.faerdig());
 
         /* Listen: de fundne med tegning, resten som tomme pladser */
@@ -236,14 +268,17 @@
     };
 
     P.visStatus = function () {
-        if (this.faerdig()) { this.status("Alle isomerer er fundet. Vælg en ny formel til højre."); return; }
-        if (this.ryd) { this.status("Tavlen ryddes …"); return; }
-        this.status(this.braet.antal() <= 1 ? D.STATUS.isomer : D.STATUS.tegnVidere);
+        if (this.faerdig() || this.venter) return;
+        var n = this.braet.antal();
+        this.status(n <= 1 ? D.STATUS.isomer : (n >= this.n ? D.STATUS.tegnFuld : D.STATUS.tegnVidere));
     };
 
     P.tegnFane = function (ctx) { this.braet.tegn(ctx); };
 
-    P.enter = function () { if (this.faerdig()) this.knap(); };
+    P.enter = function () {
+        if (this.faerdig() || this.venter) this.videre();
+        else if (this.kortData().klar) this.indsend(); else this.kortBlink();
+    };
     P.fokus = function () {};
 
     NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-isomerer", tilbud: "is-tilbud" });

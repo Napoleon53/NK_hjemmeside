@@ -131,7 +131,7 @@
               efterOx: "Fe er +II før og efter. Jernet skifter ikke her.",
               slut: "Svovlet gik fra −I til +VI. Der blev dannet H⁺, så vandet bliver surt." },
             { id: "jern", type: "afstem", navn: "Jernet oxideres", kort: "Jernet",
-              tekst: "Fe²⁺ i vandet møder mere oxygen. Jernet bliver til Fe(OH)₃, et rødbrunt stof, der ikke kan opløses i vand.",
+              tekst: "Fe²⁺ i vandet møder mere dioxygen. Jernet bliver til Fe(OH)₃, et rødbrunt stof, der ikke kan opløses i vand.",
               v: ["Fe 2+", "O2"], h: ["Fe(OH)3"],
               klammer: [{ E: "Fe", fra: 0, til: 2 }, { E: "O", fra: 1, til: 2, fri: true }],
               miljoe: "surt",

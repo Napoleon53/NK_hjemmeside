@@ -51,7 +51,7 @@
         this.q = Q0.slice();
         this.maalQ = null;
         this.match = null;
-        this.valgt = null;
+        this.bytValgt = null;
         this.byttet = false;
         this.hold = null;
         this.over = null;
@@ -60,36 +60,54 @@
         this.bygValg();
     };
 
+    /* Svaret paa kortet: Det kan ikke lade sig goere (vaelges, og Indsend svar
+       sender det). Uden det valgt sender Indsend svar drejningen (tjekDrejning). */
     P.bygValg = function () {
         var mig = this;
         this.valg.innerHTML = "";
-        var k = document.createElement("button");
-        k.type = "button";
-        k.className = "valgknap";
-        k.textContent = "Det kan ikke lade sig gøre";
-        k.addEventListener("click", function () { mig.umuligt(); mig.fokus(); });
-        this.valg.appendChild(k);
-        this.umuligKnap = k;
+        this.knapper = {};
+        this.umuligKnap = this.lavKnap("Det kan ikke lade sig gøre", "umulig", function () { mig.umuligt(); });
     };
 
+    /* Kortet: molekylets navn, spoergsmaalet og en kort linje om, hvad man goer.
+       Grupperne staar paa kuglerne, saa de staar ikke ogsaa paa kortet. */
     P.promptHTML = function () {
-        var o = this.o;
-        var t = o.byt ? "Byt om på to af grupperne. Kan molekylet så drejes, så det passer med spejlbilledet?" :
-            "Kan du dreje molekylet, så det passer med spejlbilledet?";
-        return '<p class="maal-tekst">' + NK.html(t) + "</p>" +
-            '<p class="note-tekst">' + NK.html(D.navn(this.m)) + ": " + NK.html(this.m.g.map(D.tekst).join(", ")) + "</p>";
+        var o = this.o, navn = D.navn(this.m);
+        navn = navn.charAt(0).toUpperCase() + navn.slice(1) + ". ";
+        if (o.byt && !this.byttet) {
+            return NK.html(navn + (this.bytValgt === null ? "Klik på to af grupperne til venstre, så de bytter plads." :
+                "Klik på den gruppe, " + D.tekst(this.grupper[this.bytValgt]) + " skal bytte plads med.") +
+                " Kan molekylet så drejes, så det passer med spejlbilledet?");
+        }
+        var n = this.match ? this.antalMatch() : 0;
+        var slut = this.faerdig ? "" : (n === 4 ? " Alle fire grupper passer. Tryk Indsend svar." : " Træk i molekylet til venstre, og tryk Indsend svar.");
+        return NK.html(navn + "Kan du dreje molekylet, så det passer med spejlbilledet?" + slut);
+    };
+
+    /* Det, Indsend svar sender uden et valgt svar: molekylet, som det er drejet */
+    P.indsendScene = function () {
+        var mig = this;
+        return { klar: !!this.match, mangler: "Drej molekylet til venstre, til det ligner spejlbilledet. Eller vælg Det kan ikke lade sig gøre.",
+            fn: function () { mig.tjekDrejning(); } };
+    };
+
+    P.tjekDrejning = function () {
+        if (this.faerdig || !this.match) return;
+        var n = this.antalMatch();
+        if (n === 4 && this.o.kan) { this.loest(this.slutTekst()); return; }
+        this.fejlLinje(n + " af 4 grupper passer. Drej videre, til alle fire passer, eller vælg Det kan ikke lade sig gøre.");
     };
 
     P.trinLinje = function () {
         if (this.o.byt && !this.byttet) {
-            return this.valgt === null ? "Klik på to af grupperne til venstre for at bytte dem." : "Klik på den gruppe, " + D.tekst(this.grupper[this.valgt]) + " skal bytte plads med.";
+            return this.bytValgt === null ? "Klik på to af grupperne til venstre for at bytte dem." : "Klik på den gruppe, " + D.tekst(this.grupper[this.bytValgt]) + " skal bytte plads med.";
         }
         if (this.match) {
             var n = this.antalMatch();
             if (n === 4) return "";
-            return n + " af 4 grupper passer. Drej videre, eller tryk Det kan ikke lade sig gøre.";
+            return n + " af 4 grupper passer. Drej videre, eller vælg Det kan ikke lade sig gøre.";
         }
-        return "Træk i molekylet til venstre for at dreje det. Slip, når det ligner spejlbilledet.";
+        return "Træk i molekylet til venstre for at dreje det. Slip, når det ligner spejlbilledet, og tryk Indsend svar.";
     };
 
     /* ----- Hinttrappen og Vis svaret ------------------------------------------------- */
@@ -119,7 +137,7 @@
 
     P.visSvar = function () {
         var o = this.o;
-        if (!o.kan) { this.umuligt(true); return; }
+        if (!o.kan) { this.umuligKnap.classList.add("svar-vist"); this.umuligt(true); return; }
         if (o.byt && !this.byttet) this.byt(1, 2);
         this.maalQ = this.bedsteJustering(true).q;
         this.auto = true;
@@ -152,18 +170,22 @@
     P.vurder = function (j) {
         this.match = { perm: j.perm };
         var n = this.antalMatch();
-        if (n === 4) {
-            if (this.o.kan) { this.loest(this.slutTekst()); return; }
+        /* Alle fire passer: opgaven loeses foerst med Indsend svar (Vis svaret loeser den selv) */
+        if (n === 4 && this.o.kan) {
+            if (this.brugtSvar) { this.loest(this.slutTekst()); return; }
+            this.naesteLinje("", "");
+            return;
         }
         var g = this.grupper, s = this.m.g, mig = this;
         var galt = [0, 1, 2, 3].filter(function (i) { return g[i] !== s[j.perm[i]]; });
-        if (n === 4) return;
+        if (n === 4) { this.visKort(); return; }
         if (n === 2 && galt.length === 2) {
             this.besked('<span class="b-maerke">' + n + " af 4</span> " + NK.html(D.tekst(g[galt[0]]) + " og " + D.tekst(g[galt[1]]) +
-                " sidder byttet om i forhold til spejlbilledet. Drej videre, eller tryk Det kan ikke lade sig gøre."), "gul");
+                " sidder byttet om i forhold til spejlbilledet. Drej videre, eller vælg Det kan ikke lade sig gøre."), "gul");
         } else {
             this.besked('<span class="b-maerke">' + n + " af 4</span> " + NK.html(mig.trinLinje()), "gul");
         }
+        this.visKort();
     };
 
     P.slutTekst = function () {
@@ -198,19 +220,18 @@
         g[i] = g[j];
         g[j] = t;
         this.byttet = true;
-        this.valgt = null;
+        this.bytValgt = null;
         this.match = null;
         this.nulstilHjaelp();
     };
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
-        var L = this.L, baand = this.baand();
-        var top = 14, bund = L.h - Math.max(baand.h, 92) - 62 - 4;
+        var L = this.L;
+        var top = this.kortZone(), bund = L.h - 12;
         var h = Math.max(200, bund - top);
         var s = Math.min(L.b * 0.115, h * 0.2);
         this.lay = { top: top, bund: bund, h: h, s: s, cy: top + h * 0.52, vx: L.b * 0.26, hx: L.b * 0.74, mx: L.b / 2 };
-        this.valg.style.bottom = (baand.h + 10) + "px";
         this.saetAnker("molekyle", 0, top, L.b * 0.48, h);
         this.saetAnker("spejl", L.b * 0.52, top, L.b * 0.48, h);
     };
@@ -267,9 +288,9 @@
         if (!k) return;
         if (k.i < 0) { this.kortBesked("Det midterste C-atom. Det har fire grupper.", 3); return; }
         if (this.o.byt && !this.byttet) {
-            if (this.valgt === null) { this.valgt = k.i; this.naesteLinje("", ""); return; }
-            if (this.valgt === k.i) { this.valgt = null; this.naesteLinje("", ""); return; }
-            this.byt(this.valgt, k.i);
+            if (this.bytValgt === null) { this.bytValgt = k.i; this.naesteLinje("", ""); return; }
+            if (this.bytValgt === k.i) { this.bytValgt = null; this.naesteLinje("", ""); return; }
+            this.byt(this.bytValgt, k.i);
             this.naesteLinje("", "");
             return;
         }
@@ -322,7 +343,7 @@
                 ringH[perm[i]] = f;
             });
         }
-        if (this.valgt !== null) ringV[this.valgt] = T.GUL;
+        if (this.bytValgt !== null) ringV[this.bytValgt] = T.GUL;
         R.tegn(ctx, this.venstre(), this.kamV(), { ring: ringV, over: this.faerdig ? null : this.over });
         R.tegn(ctx, this.hoejre(), this.kamH(), { ring: ringH });
 

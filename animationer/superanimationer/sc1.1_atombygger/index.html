@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atomets opbygning</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚛</span> Atomets opbygning</h1>
@@ -50,6 +51,16 @@
              saa svaret er dér, hvor man kigger. Placeres af sim_byg.js. -->
         <div class="kernekort" id="byg-kerne" aria-live="polite"></div>
 
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, beskeden,
+             Indsend svar og forklaringen efter svaret (6. nov. 2026) -->
+        <div class="scenekort opgave" id="byg-skort">
+            <div class="sk-ind" id="byg-ind"></div>
+            <div class="sk-bund tom" id="byg-status">
+                <p class="st-tekst" id="byg-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="byg-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="byg-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <button class="knap scene-knap" id="byg-nulstil" type="button"><span>Genstart</span><span class="tegn">↺</span></button>
     </div>
 
@@ -98,26 +109,11 @@
             </div>
         </div>
 
-        <div class="kort opgavekort" id="opgave-boks">
-            <h2>Opgave <span class="taeller" id="byg-opgave-taeller" style="display:none;">1/5</span></h2>
-            <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
-
-            <!-- Hintet: det fulde atomsymbol med massetal, atomnummer og
-                 ladning, praecis som i kemibogen. Vises foerst naar eleven
-                 beder om et hint eller om svaret - se opgaveKnap() i
-                 sim_byg.js. -->
-            <div class="nuklid nuklid-svar" id="byg-opgave-nuklid" hidden>
-                <span class="a" id="byg-opgave-nuklid-a"></span>
-                <span class="z" id="byg-opgave-nuklid-z"></span>
-                <span class="sym" id="byg-opgave-nuklid-sym"></span>
-                <span class="q" id="byg-opgave-nuklid-q"></span>
-            </div>
-
-            <!-- Én knap, der aendrer sig med, hvor langt man er:
-                 Start opgave -> Giv hint -> Vis svaret -> Ny opgave. -->
-            <div class="knaprad">
-                <button class="knap blaa" id="byg-opgave-knap" type="button">Start opgave</button>
-            </div>
+        <!-- Opgaverne staar paa kortet i scenen; her er kun taelleren og Start forfra -->
+        <div class="kort" id="opgave-boks">
+            <h2>Opgaverne <span class="taeller" id="byg-opgave-taeller">0/6</span></h2>
+            <p class="note" id="byg-opgave-note">Løs seks opgaver selv for at gennemføre runden.</p>
+            <button class="forfraknap" id="byg-forfra" type="button">Start forfra ↺</button>
         </div>
     </aside>
 </section>
@@ -241,6 +237,15 @@
             <span>Niels Bohr er imponeret<br>5/5 i alle tre baner</span>
         </div>
 
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, beskeden,
+             Indsend svar og forklaringen efter svaret (6. nov. 2026) -->
+        <div class="scenekort opgave" id="spil-skort">
+            <div class="sk-ind" id="spil-ind"></div>
+            <div class="sk-bund tom" id="spil-status">
+                <p class="st-tekst" id="spil-besked" aria-live="polite" hidden></p>
+                <button class="knap indsend ikke-klar" id="spil-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <button class="knap scene-knap-pertabel" id="spil-pertabel-knap" type="button"><span>Periodisk system</span><span class="tegn">⊞</span></button>
     </div>
 
@@ -248,14 +253,6 @@
         <div class="kort" id="spil-panel-baner">
             <h2>Baner</h2>
             <div id="spil-baner"></div>
-        </div>
-
-        <div class="kort fremhaev" id="spil-boks">
-            <h2><span id="spil-banenavn">Atomets partikler</span> <span class="taeller" id="spil-taeller">1/5</span></h2>
-            <p class="gaetsp" id="spil-sp"></p>
-            <div class="spilvalg" id="spil-svarvalg"></div>
-            <p class="besked" id="spil-svar"></p>
-            <button class="knap stor groen" id="spil-naeste" type="button" style="display:none;"><span>Næste spørgsmål</span><span class="tegn">→</span></button>
         </div>
 
         <div class="kort maaling" id="spil-resultat" style="display:none;">
@@ -332,6 +329,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/atom.js"></script>

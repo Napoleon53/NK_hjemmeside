@@ -105,6 +105,19 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 * **Hjælpen er én gul knap:** Giv hint, så Vis svaret. En opgave, der er løst
   uden at se svaret, får en stjerne.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i midten af scenen (`js/fane.js`,
+`../faelles/papirkort.css/js`). Kortet har opgaven med etiketten "Opgave 2 af 4",
+næste skridt, fejlen, Giv hint (gul kant) og Indsend svar (grå, til der står et
+tal i feltet). Tallene skrives stadig i felterne i skemaet; Enter eller Indsend
+svar sender feltet ind. På fanen Begrænsende mængde vælger svarene og poserne kun.
+Når opgaven eller valget er klaret, bliver kortet stående med forklaringen, og
+Næste står, hvor Indsend svar stod. Panelet har beregningerne, opgavelisten og
+Nye tal. Ingen statuslinje nederst. Rundvisningen peger nu på kortet i scenen
+(`#vej-skort` osv.; de gamle ankre `#vej-kort` fandtes ikke længere).
+Molekylnavnene var allerede dioxygen, dinitrogen, dihydrogen og dichlor.
+
 ## Filer
 
 ```

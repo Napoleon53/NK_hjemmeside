@@ -75,11 +75,11 @@ er dem, forsøget bør give (0,10 M og 20 s, 0,20 M og 10 s, 0,40 M og 5 s). Hve
 spørgsmål får ét svar. Et forkert svar viser forklaringen på fejlen og det
 rigtige svar, og spørgsmålet kommer igen til sidst, med nye tal, hvis det har
 flere sæt (`par` og `nr` i `D.KRYDS_OPGAVER`), ellers det samme. Vis svaret
-tæller som forkert. Prikkerne i kortets hoved viser de rigtige. Når alle fem er
+tæller som forkert. Prikkerne i panelets kort Quiz viser de rigtige. Når alle fem er
 rigtige, kommer der konfetti og linjen "Alle 5 rigtige", og knappen hedder Videre
-til Koncentration. Den lille knap i hovedet hedder så Tag quizzen igen. Logikken
-står i `js/opgave.js` (quiz) og bruges kun på fane 1; fane 2 og 3 har stadig
-opgavekortet.
+til Koncentration. Den lille knap i panelet hedder så Tag quizzen igen. Logikken
+står i `js/opgave.js` (quiz) og bruges kun på fane 1; fane 2 og 3 har
+almindelige opgaver på det samme papirkort.
 
 ### Fane 2: Koncentration
 
@@ -108,6 +108,29 @@ Samme blanding hver gang (10 mL Na₂S₂O₃, 5 mL HCl, 35 mL vand: 0,10 M og 2
 ved 20 °C), fra 5 °C til
 60 °C i trin på 5 °C. Termometeret står ved glasset. Grafen viser 1/Δt mod
 temperaturen, og punkterne forbindes, så kurven ses blive stejlere.
+
+## Papirkortet (6. nov. 2026)
+
+Quizzen og opgaverne står på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `.js`), ikke i panelet. Svarknapperne vælger
+kun; **Indsend svar** sender ind og er grå, til der er valgt et svar. **Giv et
+hint** er en stille knap med gul kant (Giv et hint → Vis svaret). Efter et svar
+bliver kortet på spørgsmålet: det rigtige svar er grønt (gult, når det blev
+vist, eller når quizzens ene svar var forkert), forklaringen står under
+svarene, og Næste spørgsmål / Næste opgave / Videre til Koncentration står,
+hvor Indsend svar stod. Før første opgave står Start quizzen / Start opgave på
+kortet. Statuslinjen nederst på fane 1 og beskeden under tabellen på fane 2 og
+3 er væk: forsøgets beskeder ("Kig på krydset oppefra ...", svaret på et tal i
+tabellen) står i kortets nederste række, og kommer en besked, mens kortet står
+på et besvaret spørgsmål, står den i stedet for forklaringen. Tallene i
+tabellen bedømmes stadig, når feltet forlades eller Enter trykkes. Panelet har
+tælleren (prikkerne) og Afslut / Tag quizzen igen. Lærredet og graferne
+begynder under kortets zone (`--kortzone` i `css/stil.css`: 220 px, 196 px på
+lave skærme). Selvtesten måler kortet i alle spørgsmål og opgaver på en
+almindelig og en lav skærm.
+
+Molekylenavne (6. nov. 2026): animationen skriver kun formler (H₂O, SO₂), ingen
+navne på grundstofmolekyler, så der var intet at rette.
 
 ## Modellen og forenklingerne
 
@@ -153,7 +176,7 @@ js/kerne.js           NK-navnerum, tal med komma, NK.bet og NK.laesTal, canvas
 js/model.js           kemien: blandinger, hastigheden, forløbet og krydset
 js/data.js            Kemichaels præsentation, blandingerne og opgaverne
 js/sprites.js         lageret til udstyret og Kemichaels sprites
-js/opgave.js          opgavekortet med den ene knap (som sb1.1) og quizzen på fane 1
+js/opgave.js          papirkortet i scenen (som sb1.1) og quizzen på fane 1
 js/glas.js            tegningen: bord, papir, glas, måleglas, termometer, krydset oppefra, stopur, akser
 js/raekke.js          det, fane 2 og 3 deler: forsøg med ur, der stopper selv, og grafens punkter
 js/sim_kryds.js       fane 1

@@ -104,3 +104,7 @@ I menuen fra 26. sept. 2026: spil.hangman (nr. 5) i
 med `index.html#historie`. De gamle ligger i
 `kemi-c-filer/arkiv/c_spil_hangman_oldversion.html` og
 `kemi-c-filer/arkiv/2.3.6_syregalgen_ideologier_oldversion.html`.
+
+**Molekylenavne (6. nov. 2026).** Ledetråde og forklaringer skriver dihydrogen, dinitrogen,
+dioxygen, dichlor og dibrom, hvor stoffet menes. Ord som NITROGEN og CHLOR er grundstoffer og
+bliver. Hverdagsnavnene brintoverilte og bromvand bliver.

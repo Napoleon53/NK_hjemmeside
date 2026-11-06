@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - fanerne, runderne og linjerne under svarfeltet
+   data.js - fanerne, runderne og linjerne paa papirkortet
 
    Opgaverne selv laves af js/cifre.js. Her staar kun, hvilke typer hver
    fane bruger, og de faste saetninger. Hoejst ca. 60 tegn pr. replik,
@@ -14,7 +14,7 @@
     /* Ti opgaver i en runde, som i den gamle */
     D.RUNDE = 10;
 
-    /* Fanerne. valg: de to knapper i opgavekortet (fane 2 og 3). typer:
+    /* Fanerne. valg: de to knapper i panelet (fane 2 og 3). typer:
        hvilke opgaver valget giver. Blandet tager de fem fra den gamle
        med lige stor sandsynlighed. */
     D.FANER = {
@@ -47,13 +47,13 @@
     };
     D.FANE_RAEKKE = ["tael", "komma", "afrund", "blandet"];
 
-    /* Linjen under svarfeltet, naar en fane aabnes: hvor man er, og hvad
+    /* Linjen paa kortet, naar en fane aabnes: hvor man er, og hvad
        man goer. Den gamle stod paa startskaermen: "Mestér de betydende
        cifre." */
     D.INTRO = {
-        tael: "Tryk Tjek, når du har valgt dem.",
-        afrund: "Skriv svaret, og tryk Tjek.",
-        komma: "Skriv svaret, og tryk Tjek.",
+        tael: "Tryk Indsend svar, når du har valgt cifrene på tavlen.",
+        afrund: "Skriv svaret i feltet under tavlen, og tryk Indsend svar.",
+        komma: "Skriv svaret i feltet under tavlen, og tryk Indsend svar.",
         blandet: "Ti blandede opgaver. Kun første forsøg tæller."
     };
 
@@ -63,7 +63,7 @@
     D.LAAST = "Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på Let, Middel og Svær.";
     D.LAAST_OP = "Meget svær er låst op.";
 
-    /* Foran forklaringen ved et rigtigt svar */
+    /* Maerket foran forklaringen ved et rigtigt svar (punktummet tages af) */
     D.ROS = ["Rigtigt.", "Ja.", "Det passer.", "Præcis."];
 
     /* Slutningen af en runde, efter antallet rigtige i foerste forsoeg */

@@ -82,8 +82,21 @@
 
     var P = Skort.prototype;
 
-    /* Hoejden, kortet har sat af oeverst i scenen */
-    P.zoneH = function () { return this.zone[window.innerHeight <= 720 ? 1 : 0]; };
+    /* Hoejden, kortet har sat af oeverst i scenen. Staar kortet smalt til
+       hoejre for reolen (fane 1 paa en lav scene), er det hoejere: zone[2]. */
+    P.zoneH = function () {
+        if (this.plads && this.zone[2]) return this.zone[2];
+        return this.zone[window.innerHeight <= 720 ? 1 : 0];
+    };
+
+    /* Kortet kan flyttes til hoejre for noget, der skal staa oeverst til
+       venstre: p = { venstre, bredde } i px, eller null (midt i scenen) */
+    P.saetPlads = function (p) {
+        this.plads = p || null;
+        var st = this.el.kort.style;
+        if (p) { st.left = Math.round(p.venstre) + "px"; st.right = "auto"; st.width = Math.round(p.bredde) + "px"; st.margin = "0"; }
+        else { st.left = ""; st.right = ""; st.width = ""; st.margin = ""; }
+    };
     P.top = function () { return 10 + this.zoneH() + 10; };
 
     P.svarHTML = function (d) {

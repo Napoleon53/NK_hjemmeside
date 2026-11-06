@@ -121,7 +121,7 @@
     };
 
     P.afspil = function () {
-        if (this.laas) return;
+        if (this.laas) { this.kort.blink(); return; }
         if (this.spiller) { this.spiller = false; this.visPanel(); return; }
         if (this.t >= B.T_MAKS) { this.t = 0; this.vist = 0; }
         if (this.vaerktoej !== "aflaes") this.saetVaerktoej("aflaes");
@@ -130,7 +130,7 @@
     };
 
     P.forfra = function () {
-        if (this.laas) return;
+        if (this.laas) { this.kort.blink(); return; }
         this.spiller = false;
         this.t = 0;
         this.vist = 0;
@@ -180,21 +180,30 @@
         }
     };
 
-    /* Linealen er sluppet under tangentopgaven: er den en tangent? */
-    P.tjekLineal = function () {
-        var o = this.kort.opgave;
-        if (!o || !o.tangent || o.loest || o.vist) return;
+    /* Tangentopgaven: linealen skal vaere drejet, foer der kan sendes ind.
+       At slippe linealen bedoemmer intet; det goer Indsend svar paa kortet
+       (brugerens regel 24. okt. 2026). */
+    P.kanIndsende = function (o) {
+        return !!(o && o.tangent && o.drejet);
+    };
+
+    P.tjekOpgave = function (o) {
         var sand = B.haeldning(this.stof, this.tT);
         var fejl = (this.lineal - sand) / sand;
         if (Math.abs(fejl) <= TOLERANCE) {
             this.skjul = false;
-            this.kort.klaret("Rigtigt. " + o.rigtigTekst);
             this.visPanel();
-        } else if (fejl > 0) {
-            this.kort.saet("besked", "For stejl. Linealen skærer kurven lige efter punktet.", "besked skidt");
-        } else {
-            this.kort.saet("besked", "For flad. Linealen skærer kurven lige før punktet.", "besked skidt");
+            return { ok: true };
         }
+        if (fejl > 0) return { ok: false, tekst: "Linealen er for stejl. Den skærer kurven lige efter punktet." };
+        return { ok: false, tekst: "Linealen er for flad. Den skærer kurven lige før punktet." };
+    };
+
+    P.tjekLineal = function () {
+        var o = this.kort.opgave;
+        if (!o || !o.tangent || o.loest || o.vist) return;
+        o.drejet = true;
+        this.kort.vis();
     };
 
     /* ----- Mus og finger -------------------------------------------------- */
@@ -234,7 +243,7 @@
             mig.visPanel();
         });
         Array.prototype.forEach.call(document.querySelectorAll("#kurve-vaerktoej [data-vaerktoej]"), function (k) {
-            k.addEventListener("click", function () { if (!mig.laas) mig.saetVaerktoej(k.getAttribute("data-vaerktoej")); });
+            k.addEventListener("click", function () { if (mig.laas) mig.kort.blink(); else mig.saetVaerktoej(k.getAttribute("data-vaerktoej")); });
         });
         Array.prototype.forEach.call(document.querySelectorAll("#kurve-vaerktoej [data-stof]"), function (k) {
             k.addEventListener("click", function () {

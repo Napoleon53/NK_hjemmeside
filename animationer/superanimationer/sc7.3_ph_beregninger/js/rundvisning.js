@@ -17,9 +17,10 @@
     var TURE = {
         "fane-ph": [
             { sel: "#ph-anker-vej", titel: "Regnevejen", tekst: "Her står det, du kender, og det, du skal finde (med ?). Når du har valgt den rigtige formel, kommer den på en pil." },
-            { sel: "#ph-anker-etiket", titel: "Kortet", tekst: "Kortet viser det, du ved. Dine rigtige svar bliver skrevet her." },
+            { sel: "#ph-anker-etiket", titel: "Etiketten", tekst: "Etiketten viser det, du ved. Dine rigtige svar bliver skrevet her." },
             { sel: "#ph-anker-meter", titel: "pH-metret", tekst: "Det måler glasset, når du har regnet pH ud. Tallet passer med dit svar." },
-            { sel: "#ph-kort", titel: "Opgaven", tekst: "Opgaven er delt i små trin: vælg formlen, tast på lommeregneren, skriv svaret. Knappen nederst hjælper med det trin, du er ved." },
+            { sel: "#ph-skort", titel: "Opgaven", tekst: "Opgaven er delt i små trin: vælg formlen, tast på lommeregneren, skriv svaret. Giv hint hjælper med det trin, du er ved." },
+            { sel: "#ph-kort", titel: "Regnestykket", tekst: "Her skriver du svaret i feltet. Indsend svar eller Enter sender det. De regnede trin står her bagefter." },
             { sel: "#regner", titel: "Lommeregneren", tekst: "Øverst står det, du taster. Linjen under viser, hvordan den har læst det. Tastaturet virker også: L er log, Enter er =." },
             { sel: "#r-maple", titel: "Maple", tekst: "Viser det samme som Maple-kode. Hint og svar får også Maple-linjen med." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Formlerne og afrundingen kort." },
@@ -28,14 +29,14 @@
         "fane-konc": [
             { sel: "#konc-anker-meter", titel: "pH-metret", tekst: "Det har målt glasset. Koncentrationerne skal du selv regne ud." },
             { sel: "#konc-anker-vej", titel: "Regnevejen", tekst: "Fra pH til [H₃O⁺] og videre til [OH⁻]. Pilene kommer, efterhånden som du vælger formlerne." },
-            { sel: "#konc-anker-etiket", titel: "Kortet", tekst: "Koncentrationerne bliver skrevet på kortet, når de er rigtige." },
-            { sel: "#konc-kort", titel: "Opgaven", tekst: "Små trin: vælg formlen, tast på lommeregneren, skriv svaret. Tallet foran · 10 skrives i det store felt, eksponenten i det lille." },
+            { sel: "#konc-anker-etiket", titel: "Etiketten", tekst: "Koncentrationerne bliver skrevet på etiketten, når de er rigtige." },
+            { sel: "#konc-skort", titel: "Opgaven", tekst: "Små trin: vælg formlen, tast på lommeregneren, skriv svaret. Tallet foran · 10 skrives i det store felt, eksponenten i det lille." },
             { sel: "#regner", titel: "Lommeregneren", tekst: "10ˣ-tasten skriver 10^( . Husk at lukke parentesen, før du ganger videre." }
         ],
         "fane-staerk": [
             { sel: "#staerk-anker-glas", titel: "Flasken", tekst: "Koncentrationen står på flasken. Syren eller basen er stærk, så den reagerer fuldstændigt." },
             { sel: "#staerk-anker-vej", titel: "Regnevejen", tekst: "Fra flasken til pH. Hvert trin er en pil, og den kommer, når du har valgt formlen." },
-            { sel: "#staerk-kort", titel: "Trinene", tekst: "Hvert trin er delt i små bider. Det næste trin kommer, når svaret er rigtigt." },
+            { sel: "#staerk-skort", titel: "Trinene", tekst: "Hvert trin er delt i små bider. Det næste trin kommer, når svaret er rigtigt." },
             { sel: "#staerk-anker-meter", titel: "pH-metret", tekst: "Det måler flasken, når du har regnet pH ud." },
             { sel: "#regner", titel: "Lommeregneren", tekst: "Ans er det sidste resultat. Så behøver du ikke taste det igen." }
         ]

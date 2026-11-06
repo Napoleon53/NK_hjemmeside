@@ -18,7 +18,8 @@
     var TURE = {
         "fane-lager": [
             { sel: "#lager-anker-reol", titel: "Reolen", tekst: "Tredive glas har mistet halvdelen af etiketten. Klik på et glas for at tage det ned på bordet." },
-            { sel: "#lager-kort", titel: "Opgaven", tekst: "Find først ionerne og så formlen eller navnet. Skriv i feltet, og tryk Enter. Knappen giver et hint og derefter svaret." },
+            { sel: "#lager-skort", titel: "Opgaven", tekst: "Kortet siger, hvad du skal skrive: først ionerne og så formlen eller navnet. Giv et hint giver et hint og derefter svaret." },
+            { sel: "#lager-kort", titel: "Felterne", tekst: "Skriv i feltet, og tryk Indsend svar på kortet eller Enter." },
             { sel: "#lager-anker-bord", titel: "Arbejdsbordet", tekst: "De ioner, du finder, lægger sig ved glasset. Er svaret rigtigt, printer etiketmaskinen en ny etiket." },
             { sel: "#lager-anker-plakater", titel: "Plakaterne", tekst: "Det periodiske system og de sammensatte ioner. Klik for at se dem i stort format." },
             { sel: "#lager-fremskridt", titel: "Hylderne", tekst: "Et glas, du løser uden at se svaret, får en stjerne." },
@@ -27,6 +28,7 @@
         ],
         "fane-baand": [
             { sel: "#baand-anker-baand", titel: "Samlebåndet", tekst: "Glassene kører mod kassen. Pilen viser det forreste glas." },
+            { sel: "#baand-skort", titel: "Kortet", tekst: "Kortet øverst viser opgaven og forklaringen, når et svar er forkert." },
             { sel: "#baand-lcd", titel: "Etiketmaskinen", tekst: "Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter." },
             { sel: "#baand-anker-kasse", titel: "Kassen", tekst: "Et glas, der når kassen, koster et liv. Efter tre er spillet slut." },
             { sel: "#baand-anker-plakater", titel: "Plakaterne", tekst: "De samme som på lageret. Klik for at slå op, men båndet kører imens." },

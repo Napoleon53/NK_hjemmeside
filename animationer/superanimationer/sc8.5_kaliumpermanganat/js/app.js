@@ -72,7 +72,6 @@
         if (e.key === "Escape") {
             lukAlle();
             if (NK.Rundvisning) NK.Rundvisning.luk();
-            if (sim && sim.valgt) sim.valgt = null;
             return;
         }
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;

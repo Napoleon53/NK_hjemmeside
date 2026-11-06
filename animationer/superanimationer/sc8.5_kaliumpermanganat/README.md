@@ -34,11 +34,12 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
 4. **Loftet:** to faner. Fane 1 har ét urglas og 3 reaktioner efter
    hinanden, fane 2 ét urglas og 14 reaktioner. Mangan reduceres i alle, og
    hver reaktion har to reaktanter og to produkter før afstemningen.
-5. **Layoutet:** scene plus panel. Øverst i scenen laboratoriebordet med
-   flaskerne, urglasset og luppen, under det hæftet på ternet papir og en
-   smal stribe til Start forfra (Kemichael ved katederet sad nederst til
-   9. okt. 2026). Panelet har opgavekortet, farvekortet og listen.
-   Den ene knap stod først i opgavekortet; fra 3. oktober står den på papiret.
+5. **Layoutet:** scene plus panel. Øverst i scenen papirkortet (fra 6. nov.
+   2026), under det laboratoriebordet med flaskerne, urglasset og luppen, og
+   nederst hæftet på ternet papir (Kemichael ved katederet sad nederst til
+   9. okt. 2026). Panelet har reaktionen med bidderne og Start forfra,
+   farvekortet og listen. Den ene knap stod først i opgavekortet i panelet,
+   fra 3. oktober på papiret og fra 6. november på papirkortet.
 
 ### Rettet efter brugerens første test (26. september 2026)
 
@@ -71,8 +72,9 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
   mangan(III)ion; Mn²⁺ er mangan(II)ion.
 * "Kan det ikke være sådan, at han giver et hint, når man trykker på ham."
   Sådan var det, til Kemichael blev taget helt ud 9. okt. 2026 (brugerens
-  valg: han hører til i laboratoriet). Hintet kommer nu kun fra den gule knap
-  på papiret og står i opgavekortet.
+  valg: han hører til i laboratoriet). Hintet kommer nu kun fra knappen Giv et
+  hint og står på papirkortet (til 6. nov. 2026: den gule knap på papiret og
+  opgavekortet i panelet).
 * "En ultrakort midlertidig beskrivelse til hvert trin (gerne med samme
   skrifttype og placering, som der hvor der står Lidt sulfit). Fx: Skriv
   oxidationstallene for S og Mn i skemaet." Linjen øverst i hæftet viser nu
@@ -82,6 +84,50 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
   hint og Vis svaret i papirets nederste højre hjørne, Næste opgave midt i
   hæftet under reaktionspilen (eller midt for nederst, når der ikke er plads).
 
+## Papirkortet (6. nov. 2026)
+
+Niels' beslutning 4. nov. 2026: alle aktive animationer har papirkortet.
+Kortet står øverst i midten af scenen (`.scenekort` i `.scene`, mønstret fra
+sb4.4, udseendet fra `../faelles/papirkort.css` og `papirkort.js`):
+
+* **Teksten** er det næste skridt helt kort i bydeform, den linje, der før
+  stod øverst i hæftet (`kortLinje` i `js/sim.js`), fx "Skriv
+  oxidationstallene for S og Mn i skemaet." Ved dryppet står opgavens egen
+  tekst ("Fe²⁺ i svovlsyre. Dryp kaliumpermanganat i."). Reaktionens navn er
+  den indlejrede overskrift (`.sk-chip`).
+* **Beskeden** under teksten: ved bordet (fyld og dryp) hvordan man trækker
+  flasken, efter dryppet det, der skete i glasset (og det særlige ved
+  reaktionen, `kontekst`), og ellers fejl og hint. Den lange linje til
+  bidderne i hæftet er væk; kortets korte linje er nok.
+* **Giv et hint** (stille knap med gul kant) og **Indsend svar** står på
+  kortet. Hintknappen stod før i papirets nederste højre hjørne; nu står den
+  ved siden af Indsend svar. Indsend svar er grå, til der er noget at sende
+  (et tal i et felt, en vendt pil eller en valgt formel). Enter i et felt er
+  det samme som Indsend svar.
+* **Formlerne under spørgsmålstegnet vælger kun** (blå); Indsend svar
+  bedømmer. Pilen ved klammen vælger også kun.
+* **Bliv på bidden:** et rigtigt svar lægger ikke kortet om. Teksten bliver
+  stående, forklaringen står i en grøn boks (gul efter Vis svaret, med Læs
+  mere), og **Næste trin** står, hvor Indsend svar stod (Enter virker også).
+  Den næste bid begynder først, når eleven trykker. Når skemaet er afstemt,
+  står **Næste opgave** samme sted (før midt i hæftet).
+* **Start forfra** ligger i panelet under bidderne; striben nederst i scenen
+  er væk. Panelets kort har kun reaktionen, trinlisten og Start forfra.
+* Et greb i glasset, mens kortet står på Næste, får kortet til at blinke.
+* **Plads:** bordet begynder under `kortZone()` (`js/fane.js`), og bordet er
+  mindst 196 px højt, så teksten under luppen står over hæftet. Selvtesten
+  måler kortet i alle bidder af alle 17 reaktioner (med den længste fejl,
+  med hint, når det bliver på bidden og til sidst) ved 1100 × 700,
+  1280 × 640, 1100 × 900, 1300 × 820, 1400 × 860 og 1600 × 950.
+
+Hæftets overskrift er nu reaktionens navn ("Lidt sulfit", til sidst "Lidt
+sulfit: afstemt ✓"). Reaktionsskemaet følger stadig glasset: en formel
+skrives først, når stoffet er kommet i.
+
+**Molekylenavne (6. nov. 2026):** stoffet hedder diiod og dibrom ("Det brune
+er diiod, I₂", "Det orange er dibrom, Br₂"). Hverdagsordene svovlbrinte og
+brintoverilte bliver stående.
+
 ## Hæftet
 
 Skemaet står på ternet papir med en rød margenlinje. Det, eleven skriver,
@@ -89,12 +135,11 @@ står med blåt blæk i håndskrift, det givne med blyant, og
 et svar fra Vis svaret med brunt blæk. Reaktionspilen er lang, som i hånden,
 så der er plads til "5 ↑1" under den.
 
-Øverst i hæftet står det næste skridt helt kort, fx "Skriv oxidationstallene
-for S og Mn i skemaet". Når skemaet er afstemt, står der "Lidt sulfit:
-afstemt ✓".
+Øverst i hæftet står reaktionens navn. Det næste skridt står helt kort på
+papirkortet (se ovenfor). Når skemaet er afstemt, står der "Lidt sulfit:
+afstemt ✓" i hæftet.
 
-Bidderne (linjen i opgavekortet siger altid næste skridt i hele sætninger,
-og trinlisten over den viser de færdige med ✓):
+Bidderne (trinlisten i panelet viser de færdige med ✓):
 
 0. **Fyld urglasset** (kun den første reaktion på fane 1). Glasset er tomt.
    Eleven trækker flaskerne med kaliumpermanganat og natriumhydroxid hen
@@ -114,7 +159,8 @@ og trinlisten over den viser de færdige med ✓):
    skemaet (`giver` i `D.FLASKE`); H⁺ kommer, når ladningen afstemmes.
 2. **Hvad blev mangan til?** Et spørgsmålstegn står, hvor manganstoffet skal
    stå, og under det tre formler. Farvekortet i panelet viser farverne. Et
-   forkert valg streges ud og får en besked om farven.
+   klik vælger en formel, og Indsend svar bedømmer. Et forkert valg streges
+   ud og får en besked om farven.
 3. **Oxidationstal** over de atomer, der skifter (fire felter). O og H
    spørges ikke om.
 4. **Lige mange atomer** (kun med indekstal: C₂O₄²⁻ ⟶ CO₂, I⁻ ⟶ I₂ og
@@ -151,11 +197,12 @@ til der er dryppet (se `feedback-ingen-facit-foer-tid` i noterne).
 
 ## Hjælpen
 
-Den ene knap står på papiret i scenen: Giv hint → Vis svaret (Dryp for mig
-ved dryppet, det koster ikke stjernen) i papirets nederste højre hjørne, og
-Næste opgave midt i hæftet (`placerKnap` i `js/haefte.js`). Efter et forkert
-svar lyser knappen stille op. Hintet og svaret står i linjen i opgavekortet
-som én kort sætning i almindelige ord, fx "Se på SO₃²⁻. Alle tallene skal give ionens ladning, −2.
+Knappen står på papirkortet: Giv et hint → Vis svaret (Dryp for mig ved
+dryppet, det koster ikke stjernen). Fra 3. okt. til 6. nov. 2026 stod den i
+papirets nederste højre hjørne og Næste opgave midt i hæftet (`placerKnap` i
+`js/haefte.js`, nu ubrugt). Efter et forkert svar lyser knappen stille op.
+Hintet står på kortet og svaret i den gule boks, når kortet bliver på
+bidden, som én kort sætning i almindelige ord, fx "Se på SO₃²⁻. Alle tallene skal give ionens ladning, −2.
 Hvad skal S så være?" eller "Her er tallene. S går fra +IV til +VI, og Mn
 går fra +VII til +VI." Bagefter står knappen **Læs mere**, der åbner
 forklaringen i fuld skærm (`js/forklaring.js`): et kort pr. stof eller klamme
@@ -241,10 +288,11 @@ js/redox.js         modellen: oxidationstal, klammer, gangetal, afstemning
                     og beskederne til klammerne
 js/sprites.js       urglasset og dråbeflasken
 js/tegning.js       bordet, klinken, væsken, flasken, dråberne og luppen
-js/fane.js          det fælles: listen, knappen, linjen (også hint og svar)
-                    og musen (som sc8.2)
-js/haefte.js        hæftet: skemaet, felterne, klammerne (SVG), rækkerne, den
-                    korte linje øverst og knappen på papiret
+js/fane.js          det fælles: listen, papirkortet (tekst, besked, Giv et
+                    hint, Indsend svar, bliv på bidden, Næste), kortZone og
+                    musen (som sc8.2)
+js/haefte.js        hæftet: skemaet, felterne, klammerne (SVG), rækkerne og
+                    overskriften
 js/bord.js          bordet: glassene, flasken, dryppet og luppen
 js/forklaring.js    forklaringen bag Læs mere (kort, tallinje,
                     gangetabeller og tabeller)
@@ -260,7 +308,7 @@ _selvtest.html      udviklerværktøj, se nedenfor
 
 <kbd>1</kbd> <kbd>2</kbd> fane · <kbd>R</kbd> start forfra · <kbd>H</kbd>
 rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd>
-tjek · <kbd>↑</kbd> <kbd>↓</kbd> vend pilen · <kbd>Esc</kbd> luk. Direkte
+indsend svar eller næste · <kbd>↑</kbd> <kbd>↓</kbd> vend pilen · <kbd>Esc</kbd> luk. Direkte
 links: `#urglas` og `#flere`.
 
 ## Selvtest
@@ -270,14 +318,17 @@ tegningens), klammerne og gangetallene, at felterne læser romertal og tal,
 beskederne til de typiske fejl, at der ikke står et facit før tid, at
 eleven selv fylder det tomme urglas (i begge rækkefølger), at skiltet under
 glasset følger med, at reaktionerne i glasset på fane 1 åbner én ad gangen
-og kræver den rigtige flaske, at knappen står på papiret uden at dække
-noget, at den korte linje følger bidderne, at hintknappen lyser op efter
-en fejl, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
+og kræver den rigtige flaske, papirkortet (i scenen og ikke i panelet,
+Indsend svar grå uden noget at sende, et valg bedømmer ikke af sig selv,
+rigtigt svar bliver på bidden med Næste trin, hvor Indsend svar stod,
+Start forfra i panelet, kortet i kortZone), at kortets korte linje følger
+bidderne, at hintknappen lyser op efter en fejl, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
 kan gennemføres ved at skrive, med musen og med Vis svaret, at hint og svar
-er én kort sætning i opgavekortet, og at Læs mere åbner forklaringen (uden
+er én kort sætning på papirkortet, og at Læs mere åbner forklaringen (uden
 facit efter et hint), sproget (også i alle forklaringerne) og
-layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (266 påstande), 9. oktober 2026.
+layoutet fra 1100 × 700 til 1600 × 950 (også 1280 × 640 og 1100 × 900,
+med teksten under luppen over hæftet).
+Sidst kørt: ALT OK (400 påstande), 6. november 2026 (før papirkortet: 266).
 
 ## I menuen
 

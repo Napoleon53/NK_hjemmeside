@@ -141,9 +141,12 @@
         f.formelVist = !!vist;
         o.hjaelp = 0;
         var formel = NK.html(this.formelTekst(o.k));
-        if (vist) this.besked("<b>Formlen:</b> " + formel + ". Regn nu tallet ud.", "gul");
-        else if (note) this.besked(NK.html(note) + " <b>" + formel + "</b>. Regn nu tallet ud.", "god");
-        else this.besked("Rigtig formel. Regn nu tallet ud.", "god");
+        /* Formlen staar nu i feltet i panelet og paa tavlen. Linjen siger kun
+           noget, naar formlen blev vist, eller naar en omskrevet formel er
+           godkendt (rosen staar aldrig under det naeste spoergsmaal). */
+        if (vist) this.besked("<b>Formlen:</b> " + formel + ".", "gul");
+        else if (note) this.besked(NK.html(note) + " <b>" + formel + "</b>.", "peger");
+        else this.besked("", "");
         this.bygRaekker();
         this.visKort();
         this.visStatus();
@@ -160,7 +163,7 @@
             this.slut(vist);
         } else {
             o.felter[o.k].status = "aktiv";
-            this.besked(vist ? "" : "Rigtigt.", vist ? "" : "god");
+            this.besked("", "");
         }
         this.bygRaekker();
         this.visKort();
@@ -180,21 +183,49 @@
         } else {
             t = "Masseprocenten er " + NK.betydende(f.pct, 3) + " %. Husholdningseddike har typisk mellem 4 og 5,5 %.";
         }
-        this.besked(NK.html(t), vist ? "gul" : "god");
+        /* Kortet bliver paa opgaven: forklaringen og Ny opgave (visKnap) */
+        this.slutTekst = NK.html(t);
+        this.slutVist = !!vist;
+        this.besked("", "");
         if (!vist && !NK.hent(NOEGLE_ROS, false)) {
             NK.gem(NOEGLE_ROS, true);
             if (!this.ventAeg) this.ventRos = 1.0;
         }
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Ny opgave -------------------------------- */
-    P.knap = function () {
-        var o = this.opg;
-        if (o.faerdig) {
-            this.nyOpgave(this.kammerat());
+    /* ----- Kortets knapper: Giv hint -> Vis svaret, Indsend svar og Ny opgave --------- */
+    P.videre = function () {
+        if (!this.opg.faerdig) return;
+        this.nyOpgave(this.kammerat());
+        this.fokus();
+    };
+
+    P.kanSende = function () {
+        var f = this.aktivtFelt();
+        return !!(f && f.input && f.input.value.trim() !== "");
+    };
+
+    /* Indsend svar sender det aktive felt i panelet (Enter i feltet goer det samme) */
+    P.indsend = function () {
+        var f = this.aktivtFelt();
+        if (!f || !f.input) return;
+        if (!f.input.value.trim()) {
+            this.besked("Skriv " + (f.fase === "formel" ? "formlen" : "tallet") + " i feltet i panelet først.", "gul");
             this.fokus();
             return;
         }
+        this.tjek();
+    };
+
+    /* Enter og den gamle ene knap: Ny opgave, naar beregningen er faerdig, ellers hjaelpen */
+    P.knap = function () {
+        if (this.opg.faerdig) { this.videre(); return; }
+        this.hjaelpKnap();
+    };
+
+    P.hjaelpKnap = function () {
+        var o = this.opg;
+        if (o.faerdig) return;
         var f = this.aktivtFelt(), t = D.TRIN[o.k];
         if (o.hjaelp === 0) {
             o.hjaelp = 1;
@@ -222,13 +253,16 @@
     /* ----- Panelet --------------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("ber-knap"),
-            besked: NK.el("ber-besked"),
-            kort: NK.el("ber-kort"),
-            raekker: NK.el("ber-raekker")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { raekker: NK.el("ber-raekker") };
+        this.kort = new NK.SceneKort("ber", {
+            hint: function () { mig.hjaelpKnap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
     };
 
     P.bygRaekker = function () {
@@ -260,9 +294,10 @@
                     '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
                 var inp = fe.querySelector("input");
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+                    if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); mig.indsend(); }
                 });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+                inp.addEventListener("input", function () { fe.classList.remove("ryst"); mig.visKnap(); });
+                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.indsend(); });
                 f.input = inp;
             }
             rk.querySelector(".felter").appendChild(fe);
@@ -278,22 +313,38 @@
         }
     };
 
+    /* Beskeden paa papirkortet (hint, fejl). Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKnap();
     };
 
     P.visKort = function () {
         var o = this.opg;
         NK.saetTekst("ber-titel", o.egen ? "Din måling" : "En klassekammerats måling");
         NK.saetTekst("ber-nr", String(Math.min(o.k + 1, 4)));
-        NK.saetTekst("ber-prompt", o.faerdig ? "Masseprocenten er regnet ud." : "Regn eddikens masseprocent ud.");
-        var tekst, klasse = "knap";
-        if (o.faerdig) { tekst = "Ny opgave →"; klasse = "knap blaa banker"; }
-        else tekst = o.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", o.faerdig);
+        this.kort.vis({ chip: o.faerdig ? "Masseprocenten" : "Trin " + (o.k + 1) + " af 4",
+            tekst: NK.html("Regn eddikens masseprocent ud." +
+                (o.faerdig ? "" : " " + D.TRIN[o.k].navn + ": Hvad er " +
+                (o.felter[o.k].fase === "formel" ? "formlen" : "tallet") + " for " + this.venstre(o.k) + "?")) });
+        this.visKnap();
+    };
+
+    /* Beskeden, Giv hint og Indsend svar, eller forklaringen og Ny opgave */
+    P.visKnap = function () {
+        var o = this.opg, k = this.kort;
+        if (!o || !k) return;
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (o.faerdig) {
+            k.bliv(this.slutTekst || "", this.slutVist ? "Svaret" : "Rigtigt", "Ny opgave", this.slutVist ? "svar" : "god");
+            return;
+        }
+        k.bliv(null);
+        k.knapper({ hint: o.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: this.kanSende() });
     };
 
     P.visData = function () {
@@ -305,12 +356,13 @@
             "Du har ikke en ny måling fra titreringen, så her er en klassekammerats.");
     };
 
+    /* Det naeste skridt i kortets linje, naar der ikke staar en besked */
     P.visStatus = function () {
         var o = this.opg, t;
-        if (o.faerdig) t = "Beregningen står på tavlen. Tryk på <b>Ny opgave</b> for en ny måling.";
-        else t = "Trin " + (o.k + 1) + " af 4: " + D.TRIN[o.k].navn + ". Skriv " +
-            (o.felter[o.k].fase === "formel" ? "<b>formlen</b>" : "<b>tallet</b>") + " i feltet til højre.";
-        NK.saetHTML("ber-status", t);
+        if (o.faerdig) t = "";
+        else t = "Skriv " + (o.felter[o.k].fase === "formel" ? "formlen" : "tallet") + " i feltet ved " +
+            NK.html(this.venstre(o.k)) + " i panelet.";
+        if (t !== this.trinTekst) { this.trinTekst = t; this.visKnap(); }
     };
 
     /* ----- Layout ---------------------------------------------------------------------------- */
@@ -320,7 +372,8 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.bordY = Math.round(H - NK.klamp(H * 0.1, 30, 70));
         var x0 = NK.klamp(W * 0.25, 110, 260);   /* plads til Kemichael foran tavlen */
-        lay.tavle = { x: x0, y: NK.klamp(H * 0.04, 10, 30), b: W - kant - 6 - x0 };
+        lay.zone = this.kortZone();
+        lay.tavle = { x: x0, y: lay.zone + NK.klamp(H * 0.01, 2, 8), b: W - kant - 6 - x0 };
         lay.tavle.h = lay.bordY - 24 - lay.tavle.y;
         lay.f = NK.klamp(Math.min(lay.tavle.h / 17, lay.tavle.b / 38), 13, 21);
         lay.kop = { x: kant + 22, y: lay.bordY };
@@ -340,7 +393,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [120, 110];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Opdater og tegn ------------------------------------------------------------------ */
     P.opdater = function (dt) {

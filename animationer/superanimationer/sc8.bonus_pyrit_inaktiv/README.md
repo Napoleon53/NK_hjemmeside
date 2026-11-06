@@ -333,3 +333,11 @@ Skal den tilbage, skal den først gøres mindre indforstået (brugerens
 begrundelse), og så sættes knappen og linjen i `FEEDBACK_EMNER` ind igen.
 Elevens fremskridt huskes under `nk-sc8.bonus-u`, `-p` og `-r`. Afsnittene
 nederst i `css/stil.css` hedder stadig SC8.7.
+
+## Molekylenavne (6. nov. 2026)
+
+Stoffet O₂ hedder dioxygen: jernets skema siger "Fe²⁺ i vandet møder mere
+dioxygen" (`js/data.js`). "O går fra 0 i O₂ til −II. Oxygen optager
+elektronerne ..." bliver stående, fordi spørgsmålet handler om atomet, der
+bliver reduceret. Ordene brint og ilt i koden er nøgler for rækkerne
+H-atomer og O-atomer i hæftet og ses ikke af eleven.

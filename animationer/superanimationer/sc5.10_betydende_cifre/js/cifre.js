@@ -573,15 +573,15 @@
 
     /* =================================================================================
        TJEK
-       Giver { tom, ok, besked, note }. besked er HTML til linjen under
-       svarfeltet. Et forkert svar faar en besked, der passer til fejlen,
+       Giver { tom, ok, besked, note }. besked er HTML til linjen paa
+       kortet. Et forkert svar faar en besked, der passer til fejlen,
        uden at facit staar i den.
        ================================================================================= */
     function rigtigt(opg) { return C.forklaring(opg); }
 
     /* Optaelling: valgt er en liste med cifrenes numre fra venstre */
     function tjekTael(opg, valgt) {
-        if (!valgt || !valgt.length) return { tom: true, besked: "Klik på de cifre, der er betydende. Tryk så Tjek." };
+        if (!valgt || !valgt.length) return { tom: true, besked: "Klik på de cifre på tavlen, der er betydende. Tryk så Indsend svar." };
         var ret = {}, cif = opg.vis.replace(/[^\d]/g, "");
         opg.betydende.forEach(function (i) { ret[i] = true; });
         var v = {};
@@ -724,7 +724,7 @@
     C.tjek = function (opg, svar) {
         if (opg.type === "tael") return tjekTael(opg, svar && svar.valgt);
         var sv = C.laesSvar(svar && svar.mantisse, svar && svar.eksp);
-        if (sv.tom) return { tom: true, besked: "Skriv dit svar i feltet, og tryk Tjek." };
+        if (sv.tom) return { tom: true, besked: "Skriv dit svar i feltet under tavlen, og tryk Indsend svar." };
         if (sv.fejl) return { tom: true, besked: sv.fejl };
         var r;
         if (opg.type === "afrund") r = tjekAfrund(opg, sv, opg.tal, opg.n, null);

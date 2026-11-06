@@ -1545,3 +1545,53 @@ button:focus-visible {
     .bh-y { width: 200px; font-size: 0.9rem; padding: 6px 9px; }
     .bh-xlab { min-width: 12em; }
 }
+
+/* =====================================================================
+   PAPIRKORTET (Niels 4. nov. 2026): opgaven, beskeden, hint og Indsend
+   svar staar paa ét kort oeverst midt i scenen. Her staar kun
+   opbygningen; udseendet kommer fra ../faelles/papirkort.css, som
+   indlaeses efter denne fil. Arbejdet begynder under --kz, saa kortet
+   aldrig daekker det (kortZone i js/fane.js, selvtesten maaler det).
+   ===================================================================== */
+.scene { --kz: 196px; }
+#fane-bh .scene { --kz: 158px; }
+
+.scenekort {
+    position: absolute;
+    z-index: 3;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(900px, calc(100% - 24px));
+}
+
+.arbejde, .bh-arbejde { margin-top: var(--kz); }
+.arbejde { --fs: clamp(20px, min(3.7cqw, calc((100cqh - var(--kz)) * 0.066)), 46px); }
+
+.sk-tekst { margin: 0; }
+.sk-chip { white-space: nowrap; }
+.sk-bund { display: flex; align-items: center; }
+.sk-bund .st-tekst { flex: 1; margin: 0; min-width: 0; }
+.sk-bund .st-tekst:empty::before { content: none; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-videre { white-space: nowrap; font-family: inherit; cursor: pointer; }
+.sk-videre:active { transform: scale(0.97); }
+
+/* Tjek-knapperne paa tavlen er afloest af Indsend svar paa kortet */
+.tjek-plads { display: none; }
+
+/* Et svar, der er valgt paa tavlen, men ikke sendt ind endnu */
+.valgt-svar,
+.lsn-knap.valgt-svar,
+.ice-stof.valgt-svar,
+.ice-celle.valgt-svar {
+    outline: 3px solid var(--blaa);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px rgba(61, 158, 224, 0.3);
+}
+
+/* Panelets knap til at begynde forfra */
+.panel > .forfraknap { align-self: flex-start; }
+

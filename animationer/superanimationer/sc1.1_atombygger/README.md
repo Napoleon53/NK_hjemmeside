@@ -87,6 +87,28 @@ Genveje: <kbd>1</kbd>–<kbd>4</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</
 læg en partikel i · <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud ·
 <kbd>R</kbd> nulstil fanen · <kbd>H</kbd> rundvisning på den aktive fane.
 
+## Papirkortet (6. nov. 2026)
+
+Fane 1 (Atommodellen) og fane 4 (Spil) har opgaver. De står på ét lyst
+papirkort øverst i midten af scenen (`#byg-skort` og `#spil-skort`) med
+`../faelles/papirkort.css` og `papirkort.js`. Opgaven, beskeden ved et forkert
+svar, hintet og forklaringen står på kortet. Der er ingen statuslinje nederst.
+
+* Knapperne i panelet (+ og −, Gør det neutralt, Almindelig isotop og det
+  periodiske system) bygger kun atomet. **Indsend svar** bedømmer det og er
+  gråt, til atomet er ændret. I spillet vælger et klik kun et svar.
+* **Giv et hint** er en stille knap med gul kant. Den viser først
+  atomsymbolet og derefter svaret.
+* Efter et rigtigt svar bliver kortet på opgaven. Forklaringen står i en grøn
+  boks, og Næste opgave eller Næste spørgsmål står, hvor Indsend svar stod.
+* Start forfra står i panelet under Opgaverne, aldrig på kortet.
+* Fane 2 (Isotoper) og fane 3 (Ioner) er ren udforskning og har intet kort.
+
+Selvtesten (afsnit 11) måler kortet i 1400 × 860 og 1280 × 680.
+
+**Molekylenavne (6. nov. 2026):** animationen handler om atomer og ioner, så
+grundstoffernes navne bliver. Den nævner ikke O₂, H₂ eller Cl₂ som stof.
+
 ## Filer
 
 ```

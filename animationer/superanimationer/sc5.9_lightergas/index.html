@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lightergas</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Lightergas</h1>
@@ -33,18 +34,22 @@
         <div class="anker" id="forsoeg-anker-glas"></div>
         <div class="anker" id="forsoeg-anker-lup"></div>
         <div class="anker" id="forsoeg-anker-papir"></div>
-        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny lighter og et måleglas fyldt med vand (R)">Start forfra ↺</button>
+
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, gaettet,
+             svarene, linjen med naeste skridt, hint og fejl, Giv hint, Indsend svar
+             og forklaringen med knappen videre (js/fane.js) -->
+        <div class="scenekort" id="forsoeg-kort">
+            <div class="sk-ind" id="forsoeg-ind"></div>
+            <div class="sk-bund" id="forsoeg-bund">
+                <p class="st-tekst" id="forsoeg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="forsoeg-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div class="sk-blivplads" id="forsoeg-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="forsoeg-kort">
-            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
-            <div id="forsoeg-prompt"></div>
-            <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
-            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="forsoeg-knap" type="button">Giv hint</button></div>
-        </div>
 
         <div class="kort maaling" id="forsoeg-skema">
             <h2>Skemaet</h2>
@@ -69,6 +74,8 @@
         <div class="kort" id="forsoeg-opgaver">
             <h2>Målingerne <span class="taeller">løst <b id="forsoeg-loest">0</b>/2</span></h2>
             <div class="hyldeliste" id="forsoeg-liste"></div>
+            <!-- Start forfra staar i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+            <button class="knap forfra" id="forsoeg-forfra" type="button" title="En ny lighter og et måleglas fyldt med vand (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -81,16 +88,28 @@
         <canvas id="beregning-laerred"></canvas>
         <div class="anker" id="beregning-anker-tavle"></div>
         <div class="anker" id="beregning-anker-graf"></div>
+
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, gaettet,
+             svarene, linjen med naeste skridt, hint og fejl, Giv hint, Indsend svar
+             og forklaringen med knappen videre (js/fane.js) -->
+        <div class="scenekort" id="beregning-kort">
+            <div class="sk-ind" id="beregning-ind"></div>
+            <div class="sk-bund" id="beregning-bund">
+                <p class="st-tekst" id="beregning-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="beregning-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="beregning-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div class="sk-blivplads" id="beregning-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="beregning-kort">
-            <h2><span id="beregning-titel">Opgave</span><span class="taeller">opgave <b id="beregning-nr">1</b>/<span id="beregning-antal">3</span></span></h2>
-            <div id="beregning-prompt"></div>
+        <!-- Felterne, eleven skriver formlen og tallet i (js/regning.js). Opgaven
+             og bedoemmelsen staar paa kortet i scenen; Enter er Indsend svar. -->
+        <div class="kort regnekort" id="beregning-regn">
+            <h2>Regnestykket</h2>
+            <p class="note" id="beregning-note"></p>
             <div class="raekker" id="beregning-raekker"></div>
-            <div class="knaprad alkanrad" id="beregning-valg" hidden></div>
-            <p class="besked" id="beregning-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="beregning-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort maaling" id="beregning-opsum">
@@ -122,17 +141,22 @@
         <canvas id="fejl-laerred"></canvas>
         <div class="anker" id="fejl-anker-a"></div>
         <div class="anker" id="fejl-anker-b"></div>
-        <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
+
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, gaettet,
+             svarene, linjen med naeste skridt, hint og fejl, Giv hint, Indsend svar
+             og forklaringen med knappen videre (js/fane.js) -->
+        <div class="scenekort" id="fejl-kort">
+            <div class="sk-ind" id="fejl-ind"></div>
+            <div class="sk-bund" id="fejl-bund">
+                <p class="st-tekst" id="fejl-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fejl-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="fejl-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div class="sk-blivplads" id="fejl-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="fejl-kort">
-            <h2><span id="fejl-titel">Opgave</span><span class="taeller">opgave <b id="fejl-nr">1</b>/<span id="fejl-antal">6</span></span></h2>
-            <div id="fejl-prompt"></div>
-            <div class="knaprad valgrad" id="fejl-valg" hidden></div>
-            <p class="besked" id="fejl-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fejl-knap" type="button">Giv hint</button></div>
-        </div>
 
         <div class="kort maaling" id="fejl-resultat">
             <h2>Resultaterne</h2>
@@ -152,6 +176,7 @@
         <div class="kort" id="fejl-opgaver">
             <h2>Fejlkilderne <span class="taeller">løst <b id="fejl-loest">0</b>/6</span></h2>
             <div class="hyldeliste" id="fejl-liste"></div>
+            <button class="knap forfra" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)" hidden><span>Kør forsøgene igen</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -204,6 +229,7 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/data.js"></script>
 <script src="js/kemi.js"></script>
 <script src="js/tjek.js"></script>

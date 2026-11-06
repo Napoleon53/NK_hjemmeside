@@ -32,6 +32,7 @@
         this.over = null;
         this.startFane(D.FORMEL);
         this.el.raekker = NK.el("formel-raekker");
+        this.el.om = NK.el("formel-om");
         /* Fokus i sidste runde: det aktive felt */
         this.regning = { fokus: function () { mig.skrivFokus(); } };
         this.introNu = true;
@@ -39,7 +40,9 @@
     }
 
     var P = SimFormel.prototype;
-    NK.Fane.paa(P, { navn: "formel", naesteFane: "fane-vaegt", naesteNavn: "Vægten" });
+    /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
+    var ZONE = [118, 104];
+    NK.Fane.paa(P, { navn: "formel", naesteFane: "fane-vaegt", naesteNavn: "Vægten", zone: ZONE });
 
     /* ----- Opgaven ------------------------------------------------------------------ */
     P.lavOpgave = function (i) {
@@ -96,10 +99,73 @@
     P.harNyeTal = function () { return false; };
     P.nulstil = function () { this.vaelg(this.nr, true); };
 
-    /* Opgavens tekst staar over tavlen (brugerens oenske 27. sept. 2026:
-       i kortet blev den overset). Kortet har kun det, der staar i om. */
-    P.promptHTML = function () {
-        return this.runde.om ? '<p class="om-tekst">' + NK.html(this.runde.om) + "</p>" : "";
+    /* Opgavens tekst staar paa papirkortet oeverst midt i scenen (6. nov.
+       2026; foer stod den over tavlen, fordi den blev overset i panelet).
+       Panelet har formaalet (om) og felterne i sidste opgave. */
+    P.kortData = function () {
+        var r = this.runde, chip = "Opgave " + (this.nr + 1) + " af " + D.FORMEL.length;
+        if (this.faerdig) {
+            return { slags: "loest", bliv: true, gul: this.brugtSvar, chip: chip, tekst: r.tekst,
+                     html: NK.html(this.slutLinje() || "") + (this.slutEkstra ? " " + NK.html(this.slutEkstra) : ""), videre: this.videreTekst() };
+        }
+        return { slags: "opgave", chip: chip, tekst: r.tekst };
+    };
+
+    P.visKortEkstra = function () {
+        var om = this.runde && this.runde.om;
+        if (this.el.om) this.el.om.innerHTML = om ? '<p class="om-tekst">' + NK.html(om) + "</p>" : "";
+        if (this.el.raekker) NK.el("formel-kort").hidden = !om && this.el.raekker.hidden;
+    };
+
+    /* ----- Indsend svar: brikkerne vaelger kun; Indsend svar tjekker
+       (brugeren 24. okt. 2026: en brik paa en plads loeser aldrig selv opgaven) */
+    P.spmAaben = function () { return !this.faerdig && !this.opgaveFaerdig(); };
+    P.indsendKlar = function () {
+        if (this.runde.ramme === "skriv") { var f = this.skrivAktivt(); return !!(f && f.input && f.input.value.trim()); }
+        var mig = this;
+        return Object.keys(this.pl).some(function (id) { var p = mig.pl[id]; return p.aaben && p.brik && !mig.brik(p.brik).laast; });
+    };
+    P.indsendSvar = function () {
+        if (this.runde.ramme === "skriv") {
+            if (!this.indsendKlar()) { this.blinkKort(); this.kortBesked("Skriv i feltet i panelet først.", 3.5, "gul"); this.skrivFokus(); return true; }
+            this.skrivTjek();
+            return true;
+        }
+        if (!this.indsendKlar()) { this.blinkKort(); this.kortBesked("Træk brikkerne op på pladserne først.", 3.5, "gul"); return true; }
+        this.vurderAlle();
+        this.visKnap();
+        return true;
+    };
+
+    /* Indsend svar: de blege bogstaver tjekkes brik for brik; ellers
+       vurderes hver del, der er fyldt */
+    P.vurderAlle = function () {
+        var mig = this, r = this.runde;
+        if (r.skygge) {
+            var fejl = null;
+            this.pladserI("formel").forEach(function (p) {
+                if (!p.brik) return;
+                var b = mig.brik(p.brik);
+                if (b.laast) return;
+                if (b.tekst === p.facit) { b.laast = true; b.groen = 1; return; }
+                if (!fejl) fejl = (b.tekst === "m" && p.facit === "M") || (b.tekst === "M" && p.facit === "m") ?
+                    "Lille m og stort M er to forskellige ting. Se det blege bogstav." : "Den passer ikke der. Se det blege bogstav.";
+                mig.hjem(b, true);
+            });
+            if (fejl) { this.rystT = 0.4; this.fejlLinje(NK.html(fejl)); return; }
+            if (this.pladserI("formel").every(function (q) { return !!q.brik; })) this.delLoest("formel", "ok");
+            else this.besked("De brikker, der står der, passer. " + this.trinLinje(), "god");
+            return;
+        }
+        var fyldte = Object.keys(this.dele).filter(function (del) {
+            return !mig.dele[del] && mig.pladserI(del).every(function (q) { return !!q.brik; });
+        });
+        if (!fyldte.length) {
+            this.blinkKort();
+            this.kortBesked("Fyld alle pladserne i " + Object.keys(this.dele).filter(function (k) { return !mig.dele[k]; }).map(function (k) { return DELNAVN[k]; }).join(" eller ") + " først.", 4, "gul");
+            return;
+        }
+        fyldte.forEach(function (del) { if (!mig.faerdig) mig.vurder(del); });
     };
 
     P.opgaveFaerdig = function () {
@@ -113,13 +179,13 @@
         var r = this.runde, d = this.dele;
         if (r.ramme === "skriv") {
             var f = this.skrivAktivt();
-            return f ? "Skriv " + (f.id === "formel" ? "<b>formlen</b> for n." : "<b>enheden</b> for " + f.id + ".") : "";
+            return f ? "Skriv " + (f.id === "formel" ? "<b>formlen</b> for n" : "<b>enheden</b> for " + f.id) + " i feltet i panelet, og tryk på Indsend svar." : "";
         }
-        if (r.skygge) return "Træk n, m og M fra bunden op på de blege bogstaver.";
+        if (r.skygge) return "Træk n, m og M fra bunden op på de blege bogstaver, og tryk på Indsend svar.";
         var mangler = Object.keys(d).filter(function (k) { return !d[k]; }).map(function (k) { return DELNAVN[k]; });
         if (!mangler.length) return "";
-        if (r.ramme === "linje") return "Træk brikkerne op på de tomme pladser efter lighedstegnet.";
-        return "Træk brikkerne op: " + mangler.join(" og ") + ".";
+        if (r.ramme === "linje") return "Træk brikkerne op på de tomme pladser efter lighedstegnet, og tryk på Indsend svar.";
+        return "Træk brikkerne op: " + mangler.join(" og ") + ". Tryk så på Indsend svar.";
     };
 
     /* ----- Knappen: hint, trekant og svar -------------------------------------------- */
@@ -217,25 +283,11 @@
         else { b.x = x; b.y = y; b.fly = null; }
     };
 
-    /* En brik er sat paa en plads: de blege bogstaver tjekkes med det samme,
-       ellers vurderes delen, naar den er fyldt */
+    /* En brik er sat paa en plads: den vaelger kun. Indsend svar tjekker
+       (vurderAlle); foer 6. nov. 2026 tjekkede delen sig selv, naar den var fyldt. */
     P.placeret = function (b, p) {
         this.pilT = -1;
-        if (this.runde.skygge) {
-            if (b.tekst === p.facit) {
-                b.laast = true; b.groen = 1;
-                if (this.pladserI("formel").every(function (q) { return !!q.brik; })) this.delLoest("formel", "ok");
-                else this.besked("Den passer. " + this.trinLinje(), "god");
-            } else {
-                this.hjem(b, true);
-                var mM = (b.tekst === "m" && p.facit === "M") || (b.tekst === "M" && p.facit === "m");
-                this.besked(mM ? "Lille m og stort M er to forskellige ting. Se det blege bogstav." :
-                    "Den passer ikke der. Se det blege bogstav.", "skidt");
-            }
-            return;
-        }
-        var del = p.del;
-        if (this.pladserI(del).every(function (q) { return !!q.brik; })) this.vurder(del);
+        this.visKnap();
     };
 
     /* ----- Vurderingen af en fyldt del ---------------------------------------------------- */
@@ -310,7 +362,7 @@
         }
         if (besked) {
             this.rystT = 0.4;
-            this.besked(NK.html(besked), "skidt");
+            this.fejlLinje(NK.html(besked));
         }
     };
 
@@ -378,11 +430,11 @@
                 var fra = f.status === "aktiv" ? "" : " disabled";
                 fe.className = "felt " + f.status;
                 fe.innerHTML = '<span class="felt-pre">' + NK.html(d.pre) + '</span><input type="text" autocomplete="off" spellcheck="false" aria-label="' +
-                    NK.html(d.navn) + '" placeholder="' + (f.id === "formel" ? "skriv formlen" : "skriv enheden") + '"' + fra + '>' +
-                    '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
+                    NK.html(d.navn) + '" placeholder="' + (f.id === "formel" ? "skriv formlen" : "skriv enheden") + '"' + fra + '>';
                 var inp = fe.querySelector("input");
-                inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); mig.skrivTjek(); } });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.skrivTjek(); });
+                /* Enter i feltet er det samme som Indsend svar paa kortet */
+                inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); mig.indsendKlik(); } });
+                inp.addEventListener("input", function () { mig.visKnap(); });
                 f.input = inp;
             }
             rk.querySelector(".felter").appendChild(fe);
@@ -427,7 +479,8 @@
             void f.feltEl.offsetWidth;
             f.feltEl.classList.add("ryst");
         }
-        this.besked(NK.html(svar.besked), svar.tom ? "gul" : "skidt");
+        if (svar.tom) this.besked(NK.html(svar.besked), "gul");
+        else this.fejlLinje(NK.html(svar.besked));
         this.skrivFokus();
     };
 
@@ -443,7 +496,7 @@
         else if (f.id === "formel") this.dele.formel = true;
         if (faerdigt || f.id === "formel") { this.okT = 0; this.okDel = faerdigt ? "enhed" : "formel"; }
         if (maade === "svar") this.deleVist[f.id === "formel" ? "formel" : "enhed"] = true;
-        var svarHTML = maade === "svar" ? "<b>Svaret:</b> " + NK.html(f.id === "formel" ? "n = m / M" : "enheden for " + f.id + " er " + D.ENHED_TEKST[f.id]) + "." : null;
+        var svarHTML = maade === "svar" ? NK.html(f.id === "formel" ? "n = m / M" : "enheden for " + f.id + " er " + D.ENHED_TEKST[f.id]) + "." : null;
         this.trinLoest(maade, svarHTML, f.id === "formel" ? "formel" : (faerdigt ? "enhed" : "enhed1"));
         if (note && maade === "ok" && !faerdigt) this.besked(NK.html(note) + " <b>n = m / M</b>. " + this.trinLinje(), "god");
     };
@@ -599,12 +652,12 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h, r = this.runde, ctx = this.L.ctx, mig = this;
-        /* Opgavens tekst over tavlen, saa tavlen under den */
-        var opg = Tg.overTavle(ctx, r.tekst, W - 32 - 14, NK.klamp(Math.min(W / 44, H / 26), 15, 20), 15);
-        var opgY = 12;
-        var ry = opgY + opg.h + 16;
+        /* Opgavens tekst staar paa papirkortet; tavlen begynder under pladsen,
+           der er sat af til det (kortZone) */
+        var zone = this.kortZone();
+        var ry = 10 + zone + 8;
         var R = { x: 16, y: ry, b: W - 32, h: Math.max(160, H - ry - 24) };
-        var lay = { W: W, H: H, Hs: H, tavle: R, opg: opg, opgY: opgY };
+        var lay = { W: W, H: H, Hs: H, tavle: R, zone: zone };
         var navne = RAEKKER.map(function (s) { return FACIT_NAVN[s]; });
         var enheder = RAEKKER.map(function (s) { return D.ENHED_TEKST[s]; });
         this.brikker.forEach(function (b) {
@@ -706,7 +759,7 @@
             else { b.x = b.hx; b.y = b.hy; }
         });
         this.lay = lay;
-        this.saetAnker("opgave", R.x, opgY, R.b, opg.h);
+        this.saetAnker("opgave", R.x, 10, R.b, zone);
         this.saetAnker("formel", R.x, R.y, tx0 - R.x - 8, topH);
         this.saetAnker("skema", tx0 - 6, R.y + 4, R.x + R.b - tx0 + 2, topH - 4);
         this.saetAnker("bunke", lay.tray.x, lay.tray.y, lay.tray.b, lay.tray.h);
@@ -760,7 +813,6 @@
         var s = lay.s, R = lay.tavle;
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.Hs);
-        Tg.tegnOverTavle(ctx, lay.opg, R.x, lay.opgY);
         Tg.tavle(ctx, R);
 
         /* Bunken med brikker: et lidt moerkere felt nederst paa tavlen */

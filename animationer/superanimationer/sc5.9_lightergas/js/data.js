@@ -100,26 +100,27 @@
         hoej: "Så meget er der ikke. Lighteren blev {m} g lettere."
     };
 
-    /* Linjen i opgavekortet i hver fase af en maaling */
+    /* Linjen paa kortet i scenen i hver fase af en maaling. Aflaes vaegten
+       skriver kun tallet; Indsend svar sender det (brugerens regel 24. okt. 2026). */
     D.LINJE = {
         foer: "Træk lighteren op på vægten.",
-        foerVaegt: "Tryk på Aflæs vægten, så står m(før) i skemaet.",
+        foerVaegt: "Skriv m(før) i skemaet, eller tryk på Aflæs vægten. Tryk så på Indsend svar.",
         saenk: "Træk lighteren ned i vandet under måleglasset.",
         gas: "Hold musen nede på lighteren, så gassen bobler op i måleglasset. Slip ved ca. 150 mL.",
-        aflaes: "Aflæs rumfanget i luppen, og skriv V i skemaet.",
-        gaet: "Gæt først: vælg et af svarene herunder.",
+        aflaes: "Aflæs rumfanget i luppen, skriv V i skemaet, og tryk på Indsend svar.",
+        gaet: "Et gæt er gratis. Klik på det svar, du tror passer.",
         op: "Tag lighteren op af vandet, tør den på papiret, og stil den på vægten.",
         toer: "Lighteren er våd. Tør den på papiret, før den vejes.",
-        efter: "Tryk på Aflæs vægten, så står m(efter) i skemaet."
+        efter: "Skriv m(efter) i skemaet, eller tryk på Aflæs vægten. Tryk så på Indsend svar."
     };
 
     D.HINT = {
-        foer: "Træk lighteren hen på vægten, og tryk på Aflæs vægten under skemaet. Du kan også skrive tallet fra displayet selv.",
+        foer: "Træk lighteren hen på vægten. Skriv tallet fra displayet, eller tryk på Aflæs vægten under skemaet.",
         saenk: "Slip lighteren i vandet lige under måleglassets åbning. Stedet lyser op, mens du holder den.",
         gas: "Tryk på lighteren, og hold musen nede. Mellemrumstasten virker også.",
         aflaes: "Luppen viser måleglasset ved vandet. Læs ud for bunden af den buede vandoverflade. Hver streg er 2 mL.",
         op: "Træk lighteren op af vandet og hen på papiret. Den er tør, når dråberne er væk.",
-        efter: "Tryk på Aflæs vægten under skemaet, eller skriv tallet fra displayet."
+        efter: "Skriv tallet fra displayet, eller tryk på Aflæs vægten under skemaet. Send det med Indsend svar."
     };
 
     D.SVAR = {
@@ -161,7 +162,7 @@
              formelHint: "Molarmassen er massen af 1 mol. Du kender massen og stofmængden." }
     };
 
-    D.ALKAN_LINJE = "Hvilken alkan er det? Klik på søjlen, der passer.";
+    D.ALKAN_LINJE = "Hvilken alkan er det? Vælg søjlen eller knappen, der passer, og tryk på Indsend svar.";
     D.ALKAN_HINT = "Find den søjle, hvis molarmasse ligger tættest på den stiplede linje.";
 
     /* ----- Fane 3: fejlkilderne --------------------------------------------------------
@@ -233,7 +234,7 @@
        Brugerens regel 4. nov. 2026: hele saetninger i formelt sprog som i
        Kemibogen, hoejst ca. 130 tegn. Ingen teori, og sarkasmen rammer
        handlingen. forfra kommer kun, naar maalingen er i gang og nu er
-       oedelagt; knappen Start forfra staar nederst til hoejre i scenen
+       oedelagt; knappen Start forfra staar i panelet til hoejre (6. nov. 2026)
        (\u00a0 er et haardt mellemrum, saa navnet ikke deles i taleboblen). */
     D.PAATALE = {
         stik: [
@@ -255,7 +256,7 @@
         ],
         forfra: [
             "Start forfra med en ny lighter. Det går hurtigere end at forklare fejlen.",
-            "Målingen kan ikke bruges længere. Knappen Start\u00a0forfra står nederst til højre.",
+            "Målingen kan ikke bruges længere. Knappen Start\u00a0forfra står i panelet til højre.",
             "En ny lighter er billigere end en ny rapport."
         ]
     };

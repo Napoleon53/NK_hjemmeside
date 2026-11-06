@@ -432,7 +432,7 @@ function koerTest(W) {
     paastand("natrium: tre felter, symbolet først", o.felter.map(function (x) { return x.slags; }).join(",") === "symbol,plads,struktur");
     o.felter[0].input.value = "NA";
     M.tjek();
-    paastand("et forkert symbol giver en rød besked, og feltet bliver", /skidt/.test(M.el.besked.className) && M.aktivtFelt().slags === "symbol");
+    paastand("et forkert symbol giver en rød besked på kortet, og feltet bliver", /skidt/.test(M.el.status.className) && !M.el.status.hidden && M.aktivtFelt().slags === "symbol");
     M.aktivtFelt().input.value = "Na";
     M.tjek();
     paastand("det rigtige symbol åbner pladsen", M.aktivtFelt().slags === "plads");
@@ -450,17 +450,22 @@ function koerTest(W) {
     for (i = 0; i < 30; i++) M.opdater(1 / 60);
     paastand("skiltet er tonet frem", M.skiltT === 1);
     paastand("fremskridtet huskes i browseren", (JSON.parse(W.localStorage.getItem("nk-sc1.2-montre")) || {})["11"] !== undefined);
-    M.knap();
+    M.videre();
     paastand("Næste prøve tager den næste uløste, magnesium", M.valgt === 12);
     M.knap();
-    paastand("første klik på knappen giver et hint", /gul/.test(M.el.besked.className) && M.el.knap.textContent === "Vis svaret");
+    paastand("første klik på hintknappen giver et hint på kortet", /hint/.test(M.el.status.className) && M.el.knap.textContent === "Vis svaret");
     M.knap();
-    paastand("andet klik viser svaret og går videre til pladsen", M.opg.felter[0].status === "svar" && M.aktivtFelt().slags === "plads");
-    M.knap(); M.knap();
+    paastand("andet klik viser svaret, kortet bliver på trinnet, og Næste fører videre til pladsen",
+        M.opg.felter[0].status === "svar" && !!M.opg.venter && /bliv/.test(M.el.skort.className) && !!M.el.bliv.querySelector("[data-videre]"));
+    M.videre();
+    paastand("efter Næste er pladsen det aktive trin", !M.opg.venter && M.aktivtFelt().slags === "plads");
+    M.knap(); M.knap(); M.videre();
     M.knap(); M.knap();
     paastand("med svarene vist er prøven løst, men uden stjerne", M.status[12].loest && !M.status[12].stjerne);
     M.vaelg(1);
     M.aktivtFelt().input.value = "brint"; M.tjek();
+    paastand("brint godkendes med en bemærkning, og kortet bliver på trinnet", !!M.opg.venter && /hydrogen/.test(M.kortTekst()));
+    M.videre();
     M.klikPlads(1);
     M.aktivtFelt().input.value = "1"; M.tjek();
     paastand("hydrogen kan løses med navnet brint", M.status[1].loest);
@@ -476,8 +481,8 @@ function koerTest(W) {
     for (i = 0; i < 200; i++) M.opdater(1 / 60);
     paastand("første periode fuld: Kemichael kommer ikke (kun når alle 36 står der)", !M.laerer.scene);
     M.vaelg(11);
-    paastand("en løst prøve vises med facit og skiltet", M.opg.gennemsyn && M.opg.faerdig && M.el.knap.textContent === "Øv prøven igen" && !!M.skiltMaal(M.opg.g));
-    M.knap();
+    paastand("en løst prøve vises med facit og skiltet", M.opg.gennemsyn && M.opg.faerdig && !M.el.oev.hidden && M.el.skort.querySelector("[data-videre]") && !!M.skiltMaal(M.opg.g));
+    M.el.oev.click();
     for (i = 0; i < 5; i++) M.opdater(1 / 60);
     paastand("Øv prøven igen tager den ned på bordet, den er stadig løst, og skiltet er væk", !M.opg.placeret && M.status[11].loest && M.skiltT === 0);
     var kasseFoer = M.iKassen().length;
@@ -500,7 +505,7 @@ function koerTest(W) {
     M.aktivtFelt().input.value = "2 8 7"; M.tjek();
     paastand("chlor er løst i den rækkefølge", M.status[17].loest && M.status[17].stjerne);
     M.vaelg(18);
-    paastand("linjen under scenen siger, hvad der skal ske", d.getElementById("montre-status").textContent.indexOf("træk prøven op på sin plads") >= 0);
+    paastand("kortet siger, hvad der skal skrives, og panelet nævner, at prøven skal trækkes op", M.kortTekst().indexOf(M.opg.g.mangler === "navn" ? "symbolet Ar" : "argon") >= 0 && M.el.raekker.textContent.indexOf("Træk prøven op på sin plads") >= 0);
     M.nulstilAlt();
     Object.keys(M.status).forEach(function (z) { if (Number(z) !== 2) M.status[z].loest = true; });
     M.vaelg(2);
@@ -556,7 +561,7 @@ function koerTest(W) {
     paastand("flasken er løst med stjerne", F.opg.faerdig && F.status[9].loest && F.status[9].stjerne);
     paastand("17 kugler står på tavlen", F.kugler.length === 17 && F.kugler.every(function (k) { return k.synlig && k.t >= 1; }));
     paastand("tre stiplede rammer om SO₄", F.rammer.length === 3);
-    F.knap();
+    F.videre();
     paastand("Næste flaske tager en uløst", F.valgt !== 9 && !F.status[F.valgt].loest);
     paastand("én flaske: Kemichael kommer ikke", !F.laerer.scene);
     F.nulstilAlt();
@@ -648,6 +653,72 @@ function koerTest(W) {
         });
     });
     paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
+
+    overskrift("12d. Papirkortet");
+    var Mo = NK.sims["fane-montre"], Fo = NK.sims["fane-formler"];
+    [["fane-montre", Mo, "montre"], ["fane-formler", Fo, "formler"]].forEach(function (x) {
+        var sk = d.getElementById(x[2] + "-skort"), fane = d.getElementById(x[0]);
+        paastand(x[2] + ": kortet står i scenen og ikke i panelet", !!sk && sk.parentNode === fane.querySelector(".scene") && !fane.querySelector(".panel").contains(sk));
+        paastand(x[2] + ": hintknap og Indsend svar står på kortet, Start forfra står i panelet",
+            sk.contains(x[1].el.knap) && sk.contains(x[1].el.indsend) && !sk.querySelector(".nulstil") && fane.querySelector(".panel .nulstil"));
+    });
+    paastand("ingen statuslinje under scenen", !d.querySelector(".scene > .status, .scene > .statuslinje, .statuslinje"));
+    klik('[data-fane="fane-montre"]');
+    Mo.nulstilAlt();
+    Mo.vaelg(11);
+    paastand("udstillingen: Indsend svar er grå, til der står noget i feltet", Mo.el.indsend.classList.contains("ikke-klar") && !Mo.el.indsend.hidden);
+    Mo.el.input.value = "Na"; Mo.el.input.dispatchEvent(new W.Event("input"));
+    paastand("udstillingen: at skrive bedømmer ikke af sig selv, Indsend svar bliver klar", Mo.el.indsend.classList.contains("klar") && Mo.aktivtFelt().slags === "symbol");
+    var indsendPos = Mo.el.indsend.getBoundingClientRect();
+    Mo.el.indsend.click();
+    Mo.klikPlads(11);
+    Mo.el.input.value = "2,8,1"; Mo.el.indsend.click();
+    var videreKnap = Mo.el.skort.querySelector("[data-videre]");
+    paastand("udstillingen: rigtigt svar bliver på prøven, svaret står grønt, og knappen videre står på kortet",
+        Mo.opg.faerdig && /bliv/.test(Mo.el.skort.className) && !Mo.el.facit.hidden && /rigtig/.test(Mo.el.facit.className) && !!videreKnap && Mo.valgt === 11);
+    videreKnap.click();
+    paastand("udstillingen: knappen videre tager den næste prøve", Mo.valgt !== 11 && !Mo.opg.faerdig);
+    /* Kortet holder sig over udstillingen: alle trin med hint, fejl og svar */
+    var ud2 = [];
+    function maalKort(sim, hvad) {
+        var sc = sim.el.skort.parentNode.getBoundingClientRect(), r = sim.el.skort.getBoundingClientRect();
+        var bund = Math.round(r.bottom - sc.top);
+        if (bund > sim.kortTop() + 1) ud2.push(hvad + " " + bund + " > " + sim.kortTop() + " dele " + [].map.call(sim.el.skort.children, function (c) { return c.id + ":" + c.offsetHeight; }).join(",") + " | " + sim.el.skort.innerText.replace(/\n/g, " / "));
+    }
+    [[1400, 860], [1100, 660]].forEach(function (st) {
+        var ramme0 = document.getElementById("ramme");
+        ramme0.style.width = st[0] + "px"; ramme0.style.height = st[1] + "px";
+        var nv = st[0] + "×" + st[1] + " ";
+        klik('[data-fane="fane-montre"]'); Mo.tilpas();
+        D.GRUNDSTOFFER.forEach(function (g) {
+            Mo.nulstilAlt(); Mo.vaelg(g.z, true);
+            for (var n = 0; n < 4 && !Mo.opg.faerdig; n++) {
+                var f = Mo.aktivtFelt();
+                maalKort(Mo, nv + g.s + " " + f.slags);
+                if (f.slags === "plads") Mo.klikPlads(g.z === 1 ? 2 : 1);
+                else { Mo.el.input.value = "xq"; Mo.tjek(); }
+                maalKort(Mo, nv + g.s + " " + f.slags + " fejl");
+                Mo.knap(); maalKort(Mo, nv + g.s + " " + f.slags + " hint");
+                Mo.knap(); maalKort(Mo, nv + g.s + " " + f.slags + " svar");
+                Mo.videre();
+            }
+        });
+        klik('[data-fane="fane-formler"]'); Fo.tilpas();
+        D.FORMLER.forEach(function (fo, i) {
+            Fo.nulstilAlt(); Fo.vaelg(i);
+            for (var n = 0; n < 8 && !Fo.opg.faerdig; n++) {
+                var f = Fo.aktivtFelt();
+                maalKort(Fo, nv + fo.formelTekst + " " + f.slags);
+                Fo.el.input.value = "99"; Fo.tjek(); maalKort(Fo, nv + fo.formelTekst + " fejl");
+                Fo.knap(); maalKort(Fo, nv + fo.formelTekst + " hint");
+                Fo.knap(); maalKort(Fo, nv + fo.formelTekst + " svar");
+                Fo.videre();
+            }
+        });
+    });
+    paastand("kortet holder sig over tegningen på 1400 × 860 og 1100 × 660 (spørgsmål, fejl, hint og svar)", ud2.length === 0, ud2.slice(0, 6).join("; "));
+    Mo.nulstilAlt(); Fo.nulstilAlt();
+    document.getElementById("ramme").style.width = ""; document.getElementById("ramme").style.height = "";
 
     overskrift("13. Layoutet");
     var ramme = document.getElementById("ramme");

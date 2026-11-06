@@ -19,8 +19,17 @@
    nedenfor). Et rigtigt svar får kun et kort Rigtigt; forklaringen
    kommer ved en fejl, et hint og Vis svaret.
 
-   Trin 5 og 6 springes over, når der intet skal til (Let). Den gule
-   knap ved siden af Tjek er Giv hint -> Vis svaret -> ... -> Ny opgave. Et
+   Papirkortet (6. nov. 2026): trinnet, opgaven, beskeden, Giv et hint
+   og Indsend svar står på ét lyst kort øverst i midten af scenen
+   (visKort). Indsend svar er grå, til der er noget at sende, og
+   knapperne på klammerne vælger kun. Efter et rigtigt svar bliver
+   kortet på trinnet (this.bliv): felterne bliver grønne og låses, og
+   Næste trin står, hvor Indsend svar stod. Først Næste trin lægger det
+   næste trins felter på arket.
+
+   Trin 5 og 6 springes over, når der intet skal til (Let). Hintknappen
+   er Giv et hint -> Vis svaret, og når reaktionen er afstemt, fører den
+   grønne knap videre til næste opgave. Et
    forkert svar får en besked, der passer til netop den fejl
    (NK.Redox.oxFejl, eFejl og fejlene nedenfor). Felterne kan også
    udfyldes med tasterne under dem (js/taster.js).
@@ -88,6 +97,8 @@
         this.f = { o: {}, k: {}, eox: "", ered: "", lv: "", lh: "", iv: "", ih: "", wv: "", wh: "" };
         this.ok = {};
         this.parOk = {};          /* trin 2: hvilke par eleven har sat navn på */
+        this.parValg = {};        /* trin 2: det, eleven har valgt, men ikke sendt */
+        this.bliv = null;         /* kortet bliver på et løst trin, til Næste trin */
         this.skrift = {};         /* skemaets skrift, husket pr. bredde */
         this.fejlF = {};
         this.parFejl = null;
@@ -160,6 +171,9 @@
     };
 
     /* ----- Forløbet --------------------------------------------------------- */
+    /* Et løst trin: kortet bliver på trinnet med forklaringen og Næste
+       trin (this.bliv). Det sidste trin afslutter reaktionen med det
+       samme, så det færdige skema står på arket, mens kortet bliver. */
     P.loes = function (vist, tekst) {
         this.status[this.trin] = vist ? "vist" : "gjort";
         if (vist) this.vist = true;
@@ -168,21 +182,32 @@
         this.hintFelt = null;
         this.fejlF = {};
         this.parFejl = null;
-        var t = [tekst];
-        this.trin++;
+        tekst = String(tekst || "").replace(/^Rigtigt\.\s*/, "");
+        var t = tekst ? [tekst] : [], loest = this.trin, til = this.trin + 1;
         /* H⁺ og vand springes over, når der intet skal til */
-        if (this.trin === T_ION && !this.R.ion.antal) {
+        if (til === T_ION && !this.R.ion.antal) {
             this.status[T_ION] = "unoedig";
             if (this.R.ionSt) t.push("Ladningen passer allerede. Der skal ingen " + ionTekst(this.R) + " til.");
-            this.trin++;
+            til++;
         }
-        if (this.trin === T_VAND && !this.R.vand.antal) {
+        if (til === T_VAND && !this.R.vand.antal) {
             this.status[T_VAND] = "unoedig";
             if (this.R.ionSt) t.push("Der er lige mange O på hver side, så der skal ikke vand til.");
-            this.trin++;
+            til++;
         }
-        if (this.trin >= ANTAL_TRIN) this.afslut(t);
-        this.besked = { tekst: t.join(" "), klasse: vist ? "gul" : "god" };
+        if (til >= ANTAL_TRIN) { this.trin = til; this.afslut(t); }
+        this.bliv = { trin: loest, til: til, vist: vist, tekst: t.join(" ") };
+        this.besked = { tekst: "", klasse: "" };
+        this.vis();
+    };
+
+    /* Næste trin: først nu kommer det næste trins felter på arket */
+    P.videre = function () {
+        if (this.faerdig) { this.naeste(); return; }
+        if (!this.bliv) return;
+        this.trin = this.bliv.til;
+        this.bliv = null;
+        this.besked = { tekst: "", klasse: "" };
         this.vis();
     };
 
@@ -236,9 +261,9 @@
         this.start((this.nr + 1 + Math.floor(Math.random() * (this.liste.length - 1))) % this.liste.length);
     };
 
-    /* ----- Den ene knap ------------------------------------------------------ */
+    /* ----- Hintknappen på kortet: Giv et hint, så Vis svaret ---------------- */
     P.knap = function () {
-        if (this.faerdig) { this.naeste(); return; }
+        if (this.faerdig || this.bliv) { this.videre(); return; }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked = { tekst: "Hint: " + this.hint(), klasse: "gul" };
@@ -249,10 +274,21 @@
         this.visSvar();
     };
 
+    /* Indsend svar (og Enter i et felt). Mens kortet bliver på et løst
+       trin, er det Næste trin. Er der intet at sende, blinker kortet. */
     P.tjek = function () {
         if (this.faerdig) return;
+        if (this.bliv) { this.videre(); return; }
+        if (!this.kanSendes()) {
+            this.besked = { tekst: this.trin === T_PAR ? "Vælg oxidation eller reduktion ved begge klammer, og send så svaret."
+                : "Skriv først i felterne på arket, og send så svaret.", klasse: "peger" };
+            this.visKort();
+            this.kortBlink();
+            return;
+        }
         var t = this.trin;
         if (t === T_OX) this.tjekOx();
+        else if (t === T_PAR) this.tjekPar();
         else if (t === T_E) this.tjekE();
         else if (t === T_K) this.tjekK();
         else if (t === T_LAD) this.tjekLad();
@@ -300,22 +336,30 @@
         return linje(R.ox, "oxideres", "stoffet afgiver elektroner") + " " + linje(R.red, "reduceres", "stoffet optager elektroner");
     };
 
-    /* Begge par skal have et navn. Det første rigtige valg farver sin
-       klamme; først når det andet også er valgt, går trinnet videre. */
+    /* Begge par skal have et navn. Knapperne på klammerne vælger kun;
+       Indsend svar bedømmer begge valg (tjekPar). Et rigtigt valg farver
+       sin klamme, et forkert bliver rødt og skal vælges om. */
     P.valgKlik = function (i, valg) {
-        if (this.faerdig || this.trin !== T_PAR || this.parOk[i]) return;
-        var Pp = this.parListe()[i];
-        if (Pp.type === valg) {
-            this.parOk[i] = true;
-            this.parFejl = null;
-            if (this.parOk[0] && this.parOk[1]) { this.loes(false, "Rigtigt."); return; }
-            this.fejlF = {};
-            this.besked = { tekst: "", klasse: "" };
-            this.vis();
-            return;
-        }
-        this.parFejl = i + "-" + valg;
-        var stiger = Pp.til > Pp.fra;
+        if (this.faerdig || this.bliv || this.trin !== T_PAR || this.parOk[i]) return;
+        this.parValg[i] = valg;
+        if (this.parFejl) delete this.parFejl[i];
+        this.vis();
+    };
+
+    P.harParValg = function (i) { return !!(this.parOk[i] || this.parValg[i]); };
+
+    P.tjekPar = function () {
+        var L = this.parListe(), mig = this, fejlI = -1;
+        this.parFejl = {};
+        [0, 1].forEach(function (i) {
+            if (mig.parOk[i]) return;
+            if (mig.parValg[i] === L[i].type) { mig.parOk[i] = true; return; }
+            mig.parFejl[i] = mig.parValg[i];
+            delete mig.parValg[i];
+            if (fejlI < 0) fejlI = i;
+        });
+        if (fejlI < 0) { this.loes(false, "Rigtigt."); return; }
+        var Pp = L[fejlI], stiger = Pp.til > Pp.fra;
         this.fejl(Pp.E + " går fra " + X.ox(Pp.fra) + " til " + X.ox(Pp.til) + ". Oxidationstallet " + (stiger ? "stiger" : "falder")
             + ", så det er en " + (stiger ? "oxidation" : "reduktion") + ".", []);
     };
@@ -554,7 +598,7 @@
 
     /* Plus og minus under vægtskålene: koefficienten foran reaktanten */
     P.vaegtKlik = function (side, d) {
-        if (this.faerdig || this.trin !== T_K) return false;
+        if (this.faerdig || this.bliv || this.trin !== T_K) return false;
         var Pp = side === "v" ? this.R.ox : this.R.red, i = Pp.v;
         var n = X.laesTal(this.f.k[i] || "");
         if (n === null || isNaN(n)) n = 0;
@@ -564,6 +608,7 @@
         var el = NK.el("tavle").querySelector('[data-felt="k' + i + '"]');
         if (el) { el.value = this.f.k[i]; el.classList.remove("fejl"); }
         this.visKontrol();
+        this.visIndsend();
         return true;
     };
 
@@ -590,9 +635,11 @@
     P.felt = function (key, klasse, pladsholder, vaerdi) {
         var v = vaerdi !== undefined ? vaerdi : this.feltVaerdi(key);
         var fejl = this.fejlF[key], hint = this.hintFelt === key && !fejl;
-        return '<input type="text" class="' + klasse + (fejl ? " fejl" : "") + (hint ? " hint" : "") + '" data-felt="' + key + '" value="'
+        /* Mens kortet bliver på et løst trin, er felterne låst og grønne (gule, når svaret blev vist) */
+        var laast = this.bliv ? (this.bliv.vist ? " laast vist" : " laast rigtig") : "";
+        return '<input type="text" class="' + klasse + (fejl ? " fejl" : "") + (hint ? " hint" : "") + laast + '" data-felt="' + key + '" value="'
             + NK.html(v) + '" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="' + (GROV ? "none" : (klasse === "oxfelt" ? "text" : "numeric"))
-            + '"' + (pladsholder ? ' placeholder="' + pladsholder + '"' : "") + ' aria-label="Skriv her">';
+            + '"' + (pladsholder ? ' placeholder="' + pladsholder + '"' : "") + (laast ? " readonly" : "") + ' aria-label="Skriv her">';
     };
 
     P.feltVaerdi = function (key) {
@@ -707,8 +754,9 @@
         if (this.trin < T_PAR && !this.faerdig) return "";
         if (!this.rolleKendt(Pp.type)) {
             var knap = function (valg, tekst) {
-                var fejl = mig.parFejl === nr + "-" + valg;
-                return '<button type="button" class="valgknap' + (fejl ? " forkert" : "") + '" data-par="' + nr + '" data-valg="' + valg + '">' + tekst + "</button>";
+                var fejl = !!mig.parFejl && mig.parFejl[nr] === valg, valgt = mig.parValg[nr] === valg;
+                return '<button type="button" class="valgknap' + (fejl ? " forkert" : "") + (valgt ? " valgt" : "") + '" data-par="' + nr + '" data-valg="' + valg
+                    + '" aria-pressed="' + (valgt ? "true" : "false") + '">' + tekst + "</button>";
             };
             return '<span class="kl-tekst valg">' + knap("ox", "oxidation") + knap("red", "reduktion") + "</span>";
         }
@@ -800,35 +848,102 @@
 
     P.vis = function () {
         if (aktiv !== this) return;
-        var R = this.R, t = TRIN[Math.min(this.trin, ANTAL_TRIN - 1)];
-        NK.el("ab-trin").textContent = this.faerdig ? "Færdig" : "Trin " + (this.trin + 1) + " af " + ANTAL_TRIN;
-        NK.el("ab-spm").textContent = this.faerdig ? "Reaktionen er afstemt." : t.spm(R);
+        var R = this.R;
         NK.el("tavle").innerHTML = this.arkHTML();
         NK.el("tavle").classList.toggle("faerdig", this.faerdig);
+        NK.el("tavle").classList.toggle("laast", !!this.bliv);
         tilpasSkema();
-        NK.el("tjek").hidden = this.faerdig || this.trin === T_PAR;
         NK.el("tavleramme").classList.toggle("faerdig", this.faerdig);
-        NK.el("opgavetekst").textContent = this.opgaveTekst();
-        var kt = NK.el("kontekst");
-        kt.textContent = R.def.kontekst || "";
-        kt.hidden = !R.def.kontekst;
-        var b = NK.el("besked");
-        b.textContent = this.besked.tekst;
-        b.className = "besked " + this.besked.klasse;
+        this.visKort();
         this.visPanel();
-        NK.Taster.opdater(this.tasteSlags(), R.id + "/" + this.trin + (this.faerdig ? "f" : ""));
+        NK.Taster.opdater(this.tasteSlags(), R.id + "/" + this.trin + (this.faerdig ? "f" : (this.bliv ? "b" : "")));
         this.fokus();
     };
 
-    /* Den gule knap ved siden af Tjek */
+    /* ----- Papirkortet øverst i midten af scenen ------------------------------
+       Etiketten (Trin 2 af 7), opgaven og trinnets spørgsmål. Under dem
+       beskeden, Giv et hint og Indsend svar, eller, når trinnet er løst,
+       forklaringen i en grøn boks og Næste trin, dér hvor Indsend svar stod. */
+    P.kortTrin = function () { return this.bliv ? this.bliv.trin : Math.min(this.trin, ANTAL_TRIN - 1); };
+
+    P.kortHTML = function () {
+        var R = this.R, nr = this.kortTrin(), t = TRIN[nr];
+        var opg = NK.html(this.opgaveTekst()) + (R.def.kontekst ? ' <span class="sk-kontekst">' + NK.html(R.def.kontekst) + "</span>" : "");
+        var html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + (nr + 1) + " af " + ANTAL_TRIN + "</span>" + opg
+            + ' <span class="sk-spm">' + NK.html(t.spm(R)) + "</span></p>";
+        if (this.bliv) {
+            return html + NK.Papir.bliv(NK.html(this.bliv.tekst), this.bliv.vist ? "Svaret" : "Rigtigt", NK.html(this.knapTekst()), this.bliv.vist);
+        }
+        var b = this.besked, tekst = b.tekst || "", maerke = "";
+        if (b.klasse === "skidt") maerke = "Ikke rigtigt";
+        else if (b.klasse === "gul" && /^Hint: /.test(tekst)) { maerke = "Hint"; tekst = tekst.replace(/^Hint: /, ""); }
+        var hj = this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
+        var peg = this.hjaelp === 0 && b.klasse === "skidt";
+        return html + '<div class="sk-bund' + (b.klasse ? " " + b.klasse : "") + (tekst ? "" : " tom") + '" id="sk-bund">'
+            + '<p class="st-tekst" id="besked">' + (maerke ? '<span class="b-maerke">' + maerke + "</span> " : "") + NK.html(tekst) + "</p>"
+            + '<button class="knap hjaelp' + (this.hjaelp ? " svar" : "") + (peg ? " peg" : "") + '" id="opgaveknap" type="button">' + hj + "</button>"
+            + '<button class="knap indsend" id="tjek" type="button">Indsend svar</button></div>';
+    };
+
+    P.visKort = function () {
+        if (aktiv !== this) return;
+        var k = NK.el("skort");
+        k.className = "scenekort " + (this.bliv ? "loest" + (this.bliv.vist ? " svar" : "") : "opgave");
+        k.innerHTML = this.kortHTML();
+        this.visIndsend();
+    };
+
+    /* En kort besked på kortet uden at tegne arket om (et klik på arket, en tast uden felt) */
+    P.kortBesked = function (tekst, klasse) {
+        if (this.bliv || this.faerdig) { this.kortBlink(); return; }
+        this.besked = { tekst: tekst, klasse: klasse || "peger" };
+        this.visKort();
+    };
+
+    P.kortBlink = function () {
+        var e = NK.el("skort");
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
+    };
+
+    /* Indsend svar er grå, til der står noget i et af trinnets felter
+       (trin 2: til der er valgt ved begge klammer) */
+    P.kanSendes = function () {
+        if (this.faerdig || this.bliv) return false;
+        var f = this.f, mig = this;
+        function fyldt(v) { return !!String(v || "").trim(); }
+        switch (this.trin) {
+        case T_OX: return this.R.led.some(function (l, i) { return !mig.ok[i] && fyldt(f.o[i]); });
+        case T_PAR: return this.harParValg(0) && this.harParValg(1);
+        case T_E: return fyldt(f.eox) || fyldt(f.ered);
+        case T_K: return this.R.led.some(function (l, i) { return fyldt(f.k[i]); });
+        case T_LAD: return fyldt(f.lv) || fyldt(f.lh);
+        case T_ION: return fyldt(f.iv) || fyldt(f.ih);
+        case T_VAND: return fyldt(f.wv) || fyldt(f.wh);
+        }
+        return false;
+    };
+
+    P.visIndsend = function () {
+        var e = NK.el("tjek");
+        if (!e || aktiv !== this) return;
+        var kan = this.kanSendes();
+        e.classList.toggle("klar", kan);
+        e.classList.toggle("ikke-klar", !kan);
+        e.setAttribute("aria-disabled", kan ? "false" : "true");
+    };
+
+    /* Den grønne knap på kortet */
     P.knapTekst = function () {
-        if (this.faerdig) return this.naesteNr() === null && this.naesteNiveau() ? "Næste sværhedsgrad" : "Ny opgave";
-        return this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+        if (this.faerdig) return this.naesteNr() === null && this.naesteNiveau() ? "Næste sværhedsgrad" : "Næste opgave";
+        if (this.bliv) return "Næste trin";
+        return this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
     };
 
     /* Hvilke taster trinnet har brug for under felterne */
     P.tasteSlags = function () {
-        if (this.faerdig || this.trin === T_PAR) return null;
+        if (this.faerdig || this.bliv || this.trin === T_PAR) return null;
         return this.trin === T_OX ? "ox" : (this.trin === T_LAD ? "ladning" : "tal");
     };
 
@@ -852,18 +967,12 @@
         });
         NK.el("nrknapper").innerHTML = knapper.join("");
         NK.el("loest").textContent = n + " af " + this.liste.length;
-
-        var k = NK.el("opgaveknap");
-        k.textContent = this.knapTekst();
-        k.classList.toggle("banker", this.faerdig);
-        k.classList.toggle("groen", this.faerdig);
-        /* Efter et forkert svar lyser knappen stille op, til hintet er givet */
-        k.classList.toggle("lys", !this.faerdig && this.hjaelp === 0 && this.besked.klasse === "skidt");
         NK.el("opgavekort").classList.toggle("sejr", this.faerdig && !this.vist);
     };
 
     /* Markøren i det første felt, der mangler, så man kan skrive med det samme */
     P.fokus = function () {
+        if (this.bliv || this.faerdig) { this.fokusFelt = null; return; }
         var alle = Array.prototype.slice.call(NK.el("tavle").querySelectorAll("input")), maal = null;
         for (var i = 0; i < alle.length; i++) {
             if (this.fokusFelt && alle[i].getAttribute("data-felt") === this.fokusFelt) { maal = alle[i]; break; }
@@ -1027,6 +1136,7 @@
             el.classList.remove("fejl");
             delete aktiv.fejlF[key];
             aktiv.visKontrol();
+            aktiv.visIndsend();
         }
         function enter(e) {
             if (e.key === "Enter" && aktiv && e.target.tagName === "INPUT") {
@@ -1039,19 +1149,27 @@
         tavle.addEventListener("keydown", enter);
 
         /* Knapperne på klammerne. Et klik på selve skemaet i et trin, hvor
-           der svares et andet sted på arket, siger hvor. */
+           der svares et andet sted på arket, siger hvor. Mens kortet
+           bliver på et løst trin, blinker kortet i stedet. */
         tavle.addEventListener("click", function (e) {
-            if (!aktiv || aktiv.faerdig || e.target.tagName === "INPUT") return;
+            if (!aktiv) return;
+            if (aktiv.faerdig || aktiv.bliv) { aktiv.kortBlink(); return; }
+            if (e.target.tagName === "INPUT") return;
             var b = e.target.closest ? e.target.closest("button[data-par]") : null;
             if (b) { aktiv.valgKlik(parseInt(b.getAttribute("data-par"), 10), b.getAttribute("data-valg")); return; }
             if (!e.target.closest || !e.target.closest(".skema")) return;
             var t = aktiv.trin;
-            if (t === T_PAR) aktiv.besked = { tekst: "Vælg på klammerne, hvad der er oxidation, og hvad der er reduktion.", klasse: "" };
-            else if (t === T_E) aktiv.besked = { tekst: "Skriv svaret i felterne på klammerne.", klasse: "" };
-            else if (t === T_LAD) aktiv.besked = { tekst: "Skriv ladningen i felterne under skemaet.", klasse: "" };
-            else return;
-            NK.el("besked").textContent = aktiv.besked.tekst;
-            NK.el("besked").className = "besked";
+            if (t === T_PAR) aktiv.kortBesked("Vælg på klammerne, hvad der er oxidation, og hvad der er reduktion.");
+            else if (t === T_E) aktiv.kortBesked("Skriv svaret i felterne på klammerne.");
+            else if (t === T_LAD) aktiv.kortBesked("Skriv ladningen i felterne under skemaet.");
+        });
+
+        /* Knapperne på kortet tegnes om hver gang, så klikket fanges på kortet */
+        NK.el("skort").addEventListener("click", function (e) {
+            if (!aktiv || !e.target.closest) return;
+            if (e.target.closest("[data-videre]")) { aktiv.videre(); return; }
+            if (e.target.closest("#tjek")) { aktiv.tjek(); return; }
+            if (e.target.closest("#opgaveknap")) aktiv.knap();
         });
 
         NK.el("nrknapper").addEventListener("click", function (e) {
@@ -1062,8 +1180,6 @@
 
         window.addEventListener("resize", tilpasSkema);
 
-        NK.el("tjek").addEventListener("click", function () { if (aktiv) aktiv.tjek(); });
-        NK.el("opgaveknap").addEventListener("click", function () { if (aktiv) aktiv.knap(); });
         NK.el("forfra").addEventListener("click", function () { if (aktiv) aktiv.forfra(); });
     };
 }());

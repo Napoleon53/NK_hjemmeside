@@ -117,6 +117,12 @@
         if (/^[1-3]$/.test(e.key)) { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         var sim = sims[aktivFane];
         if (!sim) return;
+        if (e.key === "Enter") {
+            if (e.target && e.target.tagName === "BUTTON") return;
+            e.preventDefault();
+            sim.opgaver.enter();
+            return;
+        }
         if (e.key === "r" || e.key === "R") sim.nulstil();
         else if ((e.key === "s" || e.key === "S") && aktivFane === "fane-vand") aabnSerie();
     }

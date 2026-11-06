@@ -36,7 +36,7 @@
     }
 
     var P = SimIndgreb.prototype;
-    NK.Fane.paa(P, { navn: "i", naesteFane: "fane-b", naesteNavn: "Oxygen i blodet" });
+    NK.Fane.paa(P, { navn: "i", naesteFane: "fane-b", naesteNavn: "Dioxygen i blodet" });
 
     /* ----- Maalene ------------------------------------------------------------------ */
     P.nyOpgave = function (o) {

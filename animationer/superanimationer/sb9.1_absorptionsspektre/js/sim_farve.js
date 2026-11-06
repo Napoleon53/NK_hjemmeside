@@ -33,7 +33,7 @@
     }
 
     var P = SimFarve.prototype;
-    NK.Fane.paa(P, { navn: "fa", naesteFane: "fane-ko", naesteNavn: "Konjugeringen", zone: 196, zoneLav: 178 });
+    NK.Fane.paa(P, { navn: "fa", naesteFane: "fane-ko", naesteNavn: "Konjugeringen", zone: 196, zoneLav: 194 });
 
     P.chipTekst = function (o, i) { return String(i + 1); };
 

@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Syre-base-reaktioner</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">◆</span> Syre-base-reaktioner</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: HYDRONEN                                                   -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-hydron" role="tabpanel" aria-label="Hydronen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="hydron-laerred"></canvas>
         <div class="anker" id="hydron-anker-mol"></div>
         <div class="anker" id="hydron-anker-skema"></div>
@@ -36,17 +37,22 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="hydron-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="hydron-skort">
+            <div class="sk-ind" id="hydron-ind"></div>
+            <div class="sk-bund tom" id="hydron-status">
+                <p class="st-tekst" id="hydron-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="hydron-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="hydron-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste reaktion -->
-        <div class="kort opgavekort" id="hydron-kort">
-            <h2><span>Reaktion</span><span class="taeller" id="hydron-taeller"></span></h2>
+        <!-- De ti reaktioner: et klik paa et tal springer til reaktionen -->
+        <div class="kort" id="hydron-kort">
+            <h2><span>Reaktionerne</span><span class="taeller" id="hydron-taeller"></span></h2>
             <div class="pips" id="hydron-pips"></div>
-            <p class="maal-tekst" id="hydron-tekst"></p>
-            <p class="besked" id="hydron-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="hydron-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort maaling" id="hydron-par-kort">
@@ -63,7 +69,7 @@
 <!-- FANE 2: PRODUKTERNE                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-produkter" role="tabpanel" aria-label="Produkterne">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="prod-laerred"></canvas>
         <div class="anker" id="prod-anker-lign"></div>
         <div class="anker" id="prod-anker-brikker"></div>
@@ -71,7 +77,15 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="prod-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="prod-skort">
+            <div class="sk-ind" id="prod-ind"></div>
+            <div class="sk-bund tom" id="prod-status">
+                <p class="st-tekst" id="prod-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="prod-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="prod-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -85,13 +99,9 @@
             <p class="note niveau-tekst"></p>
         </div>
 
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny reaktion -->
-        <div class="kort opgavekort" id="prod-kort">
-            <h2><span>Produkterne</span><span class="taeller" id="prod-taeller"></span></h2>
-            <p class="maal-tekst">Hvad dannes?</p>
-            <p class="opgave-spm">Træk de to produkter op på pladserne efter pilen.</p>
-            <p class="besked" id="prod-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="prod-knap" type="button">Giv hint</button></div>
+        <!-- Hvor mange der er loest i traek uden fejl (opgaven staar paa kortet i scenen) -->
+        <div class="kort" id="prod-kort">
+            <h2><span>I træk uden fejl</span><span class="taeller" id="prod-taeller"></span></h2>
         </div>
     </aside>
 </section>
@@ -100,7 +110,7 @@
 <!-- FANE 3: PARRENE                                                    -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-par" role="tabpanel" aria-label="Parrene">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="par-laerred"></canvas>
         <div class="anker" id="par-anker-lign"></div>
         <div class="anker" id="par-anker-brikker"></div>
@@ -108,7 +118,15 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="par-status"></div>
+        <!-- Papirkortet: opgaven, svaret, hint og knapperne staar her (js/skort.js) -->
+        <div class="scenekort opgave" id="par-skort">
+            <div class="sk-ind" id="par-ind"></div>
+            <div class="sk-bund tom" id="par-status">
+                <p class="st-tekst" id="par-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="par-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="par-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -122,13 +140,9 @@
             <p class="note niveau-tekst"></p>
         </div>
 
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny reaktion -->
-        <div class="kort opgavekort" id="par-kort">
-            <h2><span>Parrene</span><span class="taeller" id="par-taeller"></span></h2>
-            <p class="maal-tekst">Hvem er hvem?</p>
-            <p class="opgave-spm">Sæt syre, base og de to korresponderende under de rigtige formler.</p>
-            <p class="besked" id="par-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="par-knap" type="button">Giv hint</button></div>
+        <!-- Hvor mange der er loest i traek uden fejl (opgaven staar paa kortet i scenen) -->
+        <div class="kort" id="par-kort">
+            <h2><span>I træk uden fejl</span><span class="taeller" id="par-taeller"></span></h2>
         </div>
     </aside>
 </section>
@@ -206,6 +220,8 @@
 <script src="js/data.js"></script>
 <script src="js/model.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/skort.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>

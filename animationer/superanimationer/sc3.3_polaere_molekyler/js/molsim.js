@@ -20,7 +20,7 @@
     NK.MolSim = function () {};
     var B = NK.MolSim.prototype;
 
-    B.init = function (prefix, opgaver, tjekIds) {
+    B.init = function (prefix, opgaver, tjekIds, opgValg) {
         this.p = prefix;
         this.laerred = new NK.Laerred(NK.el(prefix + "-laerred"));
         this.prik = new NK.Laerred(NK.el(prefix + "-prik"));
@@ -36,7 +36,7 @@
         this.sidstDrejet = -10;
         this.sidsteId = null;
         this.prikNoegle = "";
-        this.opgaver = new NK.Opgaver(prefix, opgaver, this);
+        this.opgaver = new NK.Opgaver(prefix, opgaver, this, opgValg);
         this.OPGAVER = opgaver;
 
         NK.Valg.byg(NK.el(prefix + "-menu"), this);
@@ -45,7 +45,8 @@
 
     B.molId = function () { return this.opgaveMol || NK.Valg.molId; };
     B.mol = function () { return D.molekyle(this.molId()); };
-    B.menuLaast = function () { return this.opgaver.igang(); };
+    /* Menuen er laast under en opgave, og mens kortet venter paa Naeste */
+    B.menuLaast = function () { return this.opgaver.igang() || this.opgaver.venter(); };
 
     /* En visning, som en opgave kan have slaaet fra eller til. */
     B.flag = function (id) {
@@ -84,14 +85,18 @@
         return D.molekyle(NK.tilfaeldig(andre.length ? andre : pulje));
     };
 
+    /* Korte beskeder staar i kortets nederste raekke, ikke nederst i scenen */
     B.besked = function (tekst) {
-        var e = NK.el(this.p + "-besked");
-        e.textContent = tekst;
-        e.classList.remove("vis");
-        void e.offsetWidth;
-        e.classList.add("vis");
-        window.clearTimeout(this._beskedUr);
-        this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 2600);
+        this.opgaver.besked(tekst, 2.6);
+    };
+
+    /* Det atom, eleven har valgt under en klik-opgave, faar en gul ring */
+    B.markeret = function () {
+        var o = this.opgaver.opgave, i = this.opgaver.klikValgt;
+        if (!o || o.afsluttet || !o.klik || !(i >= 0)) return null;
+        var m = {};
+        m[i] = "#f2c53d";
+        return m;
     };
 
     /* ----- Musen: traek drejer, klik vaelger et atom ---------------------- */
@@ -150,6 +155,7 @@
 
     B.tilpas = function () {
         var nyt = this.laerred.tilpas();
+        this.vis.top = NK.saetKortZone(this.laerred.canvas);
         if (this.prik.tilpas()) this.prikNoegle = "";
         this.vis.tilpas(this.laerred.b, this.laerred.h, this.radius(), nyt && !this._tilpasset);
         if (this.laerred.b > 10) this._tilpasset = true;

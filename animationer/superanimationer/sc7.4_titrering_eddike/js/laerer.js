@@ -27,7 +27,7 @@
      intro   hver fane: praesentationen (D.INTRO_*), naar eleven vil.
              Ét trin ad gangen: han siger to til fire saetninger, peger
              paa det, der blinker (sel: de usynlige .anker over laerredet
-             og kortene i panelet; felt: kolberne paa fane 3), og bliver
+             papirkortet og kortene i panelet; felt: kolberne paa fane 3), og bliver
              staaende, til eleven trykker Naeste. Han gaar aldrig videre
              af sig selv. Koden er faelles: NK.Praesentation.trin.
      sig     en replik: ros, naar en fane er klaret foerste gang (med

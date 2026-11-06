@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kaliumpermanganat</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇅</span> Kaliumpermanganat</h1>
@@ -28,21 +29,29 @@
 <section class="fane aktiv" id="fane-ug" role="tabpanel" aria-label="Urglassene">
     <div class="scene">
         <canvas id="ug-laerred"></canvas>
-        <!-- Hæftet: skemaet, klammerne og rækkerne (js/haefte.js). Knappen står på papiret:
-             Giv hint og Vis svaret i nederste højre hjørne, Næste opgave midt i hæftet -->
-        <div class="haefte" id="ug-haefte"><button class="knap hf-knap hint" id="ug-knap" type="button">Giv hint</button></div>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): det naeste skridt helt kort,
+             beskeden (fejl, hint og svar), Giv et hint og Indsend svar. Efter et rigtigt
+             svar bliver kortet staaende med forklaringen og Naeste, hvor Indsend svar stod -->
+        <div class="scenekort opgave" id="ug-skort">
+            <div class="sk-ind" id="ug-ind"></div>
+            <div class="sk-bund" id="ug-status">
+                <p class="st-tekst" id="ug-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ug-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="ug-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Haeftet: skemaet, klammerne og raekkerne (js/haefte.js) -->
+        <div class="haefte" id="ug-haefte"></div>
         <div class="anker" id="ug-anker-bord"></div>
         <div class="anker" id="ug-anker-lup"></div>
-        <button class="forfraknap" id="ug-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
     </div>
 
     <aside class="panel">
-        <!-- Opgavekortet: hvor man er, næste skridt, fejl og ros. Knappen står på papiret i scenen -->
+        <!-- Hvor man er: reaktionen og bidderne. Teksten til opgaven staar paa kortet i scenen -->
         <div class="kort opgavekort" id="ug-kort">
-            <h2><span id="ug-titel">Opgave</span><span class="taeller">reaktion <b id="ug-nr">1</b>/<span id="ug-antal">3</span></span></h2>
-            <div id="ug-prompt"></div>
+            <h2><span id="ug-titel">Reaktion</span><span class="taeller">reaktion <b id="ug-nr">1</b>/<span id="ug-antal">3</span></span></h2>
             <div class="trinliste" id="ug-trin"></div>
-            <p class="besked" id="ug-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="ug-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
         </div>
 
         <div class="kort farvekort" id="ug-farvekortet">
@@ -63,18 +72,29 @@
 <section class="fane" id="fane-fl" role="tabpanel" aria-label="Flere reaktioner">
     <div class="scene">
         <canvas id="fl-laerred"></canvas>
-        <div class="haefte" id="fl-haefte"><button class="knap hf-knap hint" id="fl-knap" type="button">Giv hint</button></div>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): det naeste skridt helt kort,
+             beskeden (fejl, hint og svar), Giv et hint og Indsend svar. Efter et rigtigt
+             svar bliver kortet staaende med forklaringen og Naeste, hvor Indsend svar stod -->
+        <div class="scenekort opgave" id="fl-skort">
+            <div class="sk-ind" id="fl-ind"></div>
+            <div class="sk-bund" id="fl-status">
+                <p class="st-tekst" id="fl-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fl-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="fl-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Haeftet: skemaet, klammerne og raekkerne (js/haefte.js) -->
+        <div class="haefte" id="fl-haefte"></div>
         <div class="anker" id="fl-anker-bord"></div>
         <div class="anker" id="fl-anker-lup"></div>
-        <button class="forfraknap" id="fl-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
     </div>
 
     <aside class="panel">
+        <!-- Hvor man er: reaktionen og bidderne. Teksten til opgaven staar paa kortet i scenen -->
         <div class="kort opgavekort" id="fl-kort">
-            <h2><span id="fl-titel">Opgave</span><span class="taeller">reaktion <b id="fl-nr">1</b>/<span id="fl-antal">14</span></span></h2>
-            <div id="fl-prompt"></div>
+            <h2><span id="fl-titel">Reaktion</span><span class="taeller">reaktion <b id="fl-nr">1</b>/<span id="fl-antal">14</span></span></h2>
             <div class="trinliste" id="fl-trin"></div>
-            <p class="besked" id="fl-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="fl-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
         </div>
 
         <div class="kort farvekort" id="fl-farvekortet">
@@ -116,7 +136,7 @@
         <p>Kaliumpermanganat, KMnO₄, er violet. Hvor langt mangan falder, afhænger af miljøet: i surt miljø til Mn²⁺, der er næsten farveløs, i neutralt miljø til brunsten, MnO₂, og i stærkt basisk miljø først til grønt manganat, MnO₄²⁻, og med mere at reagere med videre til brunsten.</p>
         <p>K⁺ og Na⁺ skrives ikke med i skemaerne. De er med i opløsningen, men de reagerer ikke.</p>
         <p>Oxidationstal skrives med romertal og fortegn: +VII, −II og 0. Du kan også skrive +7 og −2.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> vend pilen &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar eller næste &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> vend pilen &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -166,6 +186,7 @@
 <script src="js/redox.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/haefte.js"></script>
 <script src="js/bord.js"></script>

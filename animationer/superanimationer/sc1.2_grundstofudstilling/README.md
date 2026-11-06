@@ -45,11 +45,12 @@ bordet. Hver prøve har et mærke, hvor enten symbolet eller navnet mangler.
 | 2 | Formlerne | tæller atomerne af hvert grundstof i et stof og til sidst dem alle | tallet efter et symbol tæller dets atomer, og tallet efter en parentes ganger alt indeni |
 | 3 | Opråbet | finder grundstofferne i udstillingen på tid; tillægsøvelsen Hvem er jeg? har 20 gåder | navn, symbol og plads skal sidde; stofferne knyttes til noget, man kender |
 
-**Udstillingen.** Et klik på en prøve i kassen tager den op på bordet. Panelet
-har tre rækker: navnet eller symbolet, pladsen og elektronstrukturen. Det, eleven
+**Udstillingen.** Et klik på en prøve i kassen tager den op på bordet. Prøven
+har tre trin: navnet eller symbolet, pladsen og elektronstrukturen. Eleven skriver
+på papirkortet øverst i scenen, og panelet viser trinene som en oversigt. Det, eleven
 skriver, står med blæk på mærket. Prøven trækkes op i det rum, hvis skilt har
 symbolet (et klik på rummet virker også), og det kan ske før eller efter navnet.
-En gul pil over prøven viser, at den kan flyttes, og linjen under scenen siger
+En gul pil over prøven viser, at den kan flyttes, og kortet siger
 hele tiden, hvad der skal ske nu. Hvert klik giver et svar: et klik på prøven
 siger "Træk prøven op på sin plads i udstillingen", og et forkert rum giver
 "Skiltet siger K. Find skiltet med Na.", hvorefter prøven flyver tilbage på
@@ -72,8 +73,8 @@ magnesiumbånd, en galliumdråbe, kobber, grafit osv.).
 mellem kassen og tavlen med symbolet, navnet og én linje om stoffet (hvor man
 møder det, eller hvad det bruges til). Det samme sker, når man klikker på en prøve
 i udstillingen. Eleven skal ikke gøre noget ved det, så det bryder ikke
-flowet. Er der ikke plads til skiltet (de mindste skærme), står linjen under
-scenen i stedet. Kemichael roser foran kassen, så han ikke dækker skiltet.
+flowet. Er der ikke plads til skiltet (de mindste skærme), står linjen på
+kortet i stedet. Kemichael roser foran kassen, så han ikke dækker skiltet.
 Bestilt 4. nov. 2026 efter en elevs ønske om "en sjov fakta om hvert
 grundstof".
 
@@ -130,6 +131,22 @@ grundstoffer. Nu kender du dem bedre end rektor."). Rosen efter hver periode og
 hvert niveau af flasker og replikkerne efter et svagt spil er fjernet.
 Replikkerne står nederst i `js/data.js`. Kaffekoppen på bordet er det fælles
 påskeæg.
+
+**Papirkortet (6. nov. 2026).** På fane 1 og 2 står opgaven, feltet, eleven
+skriver i, hintet, beskeden ved et forkert svar og forklaringen ved et rigtigt
+svar på ét lyst kort øverst midt i scenen (`js/kort.js`, udseendet fra
+`../faelles/papirkort.css`). Indsend svar er grå, til der står noget i feltet,
+og Enter er Indsend svar. Giv et hint er en stille knap med gul kant; andet tryk
+viser svaret. Efter et rigtigt svar bliver kortet på trinnet med svaret i grønt og
+forklaringen under, og Næste står, hvor Indsend svar stod. Tøm udstillingen,
+Stil flaskerne tilbage og Øv prøven igen står i panelet. Linjen under scenen er
+væk. Udstillingen og flaskerne begynder under kortet (`kortZone()`, 150 px eller
+132 px på lave skærme), og selvtesten måler kortet i alle trin på 1400 × 860 og
+1100 × 660. Opråbet (fane 3) er et spil på tid, hvor eleven klikker i
+udstillingen, og det har intet papirkort. På fane 1 siger skiltene til N og O nu
+dinitrogen og dioxygen, fordi det er stoffet i luften; resten af animationen
+handler om grundstofferne og bruger grundstoffernes navne. Brint, kvælstof, ilt
+og klor godkendes stadig som svar.
 
 **Navnetavlen** midt i udstillingen åbner det periodiske system i stort format med
 atomnumrene og alle 36 navne i alfabetisk orden (også <kbd>P</kbd>). Hintet til
@@ -254,7 +271,7 @@ præsentationen virker på alle faner (den fælles test
 `NK.Praesentation.selvtest`), og at layoutet holder fra 520 × 380 til
 1500 × 900 (også skiltet og gåderne på tavlen). Den kræver en lokal server
 eller Chrome med `--allow-file-access-from-files`. Den lægger elevens gemte
-fremskridt tilbage bagefter. Sidst kørt 4. november 2026: ALT OK (231 påstande).
+fremskridt tilbage bagefter. Sidst kørt 6. november 2026: ALT OK (243 påstande).
 
 ## Forenklinger
 

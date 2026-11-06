@@ -30,6 +30,33 @@ Brugeren: "lav sb.4.7 om til en superanimation". sb4.7 er knap 7 i B4.
 5. **Layoutet:** scene plus panel som sc1.4, svarknapperne i scenen over
    statuslinjen.
 
+## Papirkortet (6. nov. 2026)
+
+Al tekst står på ét lyst papirkort øverst i midten af scenen (`faelles/papirkort.css` og
+`papirkort.js`, fælles kode i `js/fane.js`): etiketten (Opgave 2 af 6, trin 1 af 3), opgaven,
+svarknapperne og nederst hint, fejl og forklaring med hintknappen (gul kant) og **Indsend
+svar**. Den mørke statuslinje nederst, opgavekortet i panelet og knapperne under figuren er væk.
+
+- Svarknapperne vælger kun; Indsend svar (eller Enter) sender. Indsend svar er grå, til der
+  er noget at sende, og skjult i skridt, der er en handling i scenen. Et forkert svar bliver
+  rødt og kan ikke vælges igen. Tasterne vælger kun.
+- Handlinger virker straks og er blå knapper på kortet: Vis alle H.
+- Klik i figuren, der var svar, vælger nu kun (blå ring), og Indsend svar sender: grupperne, der skal have nummer, i R eller S.
+- Efter et rigtigt svar bliver kortet på opgaven: svaret er grønt, forklaringen står under
+  svarene, og Næste opgave (eller Videre til næste fane) står, hvor Indsend svar stod. Efter
+  sidste opgave på sidste fane er der ingen knap. Et klik i scenen får kortet til at blinke.
+- Samme opgave forfra ligger nederst i panelet.
+- Spejlbilledet: når alle fire grupper passer, løses opgaven ikke længere af sig selv;
+  kortet siger "Alle fire grupper passer. Tryk Indsend svar." Det kan ikke lade sig gøre
+  er et svar, der vælges.
+- Find C-atomet: Tjek er blevet til Indsend svar. Intet asymmetrisk C-atom vælges og fjerner
+  stjernerne; en stjerne fjerner valget.
+- R eller S: R og S står først på kortet i sidste trin. Drejningen klikker stadig selv på
+  plads, når gruppe 4 peger væk; det er et mellemtrin, ikke svaret.
+
+Molekylenavnene (dioxygen osv.) er tjekket: kun grundstofnavne (atomnumre, prioritet) og
+navneled (dichlorethen, bromchlormethan), så intet er rettet.
+
 ## Fane 1: Spejlbilledet
 
 Til venstre molekylet, til højre spejlbilledet og et spejl imellem. Eleven
@@ -100,7 +127,7 @@ js/data.js         grupperne, molekylerne og opgaverne
 js/tegning.js      tavlen, stemplet og kuglerne (som sb4.6)
 js/rum.js          kvaternioner, tetraederet, justeringerne og tegningen
 js/kiral.js        prioriteten, R og S og de asymmetriske C-atomer
-js/fane.js         statuslinjen, knappen, listen og musen (som sb4.6)
+js/fane.js         papirkortet, Indsend svar, hintknappen, listen og musen (som sb4.6)
 js/sim_spejl.js    fane 1
 js/sim_find.js     fane 2
 js/sim_rs.js       fane 3
@@ -115,7 +142,7 @@ Fra molekylemotoren: `molekyle.js`, `navngivning.js`, `smiles.js`,
 ## Genveje
 
 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>R</kbd> forfra ·
-<kbd>H</kbd> rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> tjek ·
+<kbd>H</kbd> rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> indsend svar eller næste ·
 <kbd>Esc</kbd> luk. Direkte links: `#spejl`, `#find` og `#rs`.
 
 ## Selvtest
@@ -125,9 +152,10 @@ Den tjekker prioriteten, at R er med uret på skærmen i 300 tilfældige
 stillinger, at R og S ikke ændrer sig ved en drejning men skifter i et spejl og
 ved et bytte, de 12 justeringer, at fire forskellige grupper højst giver 2 af 4,
 startstillingen, de asymmetriske C-atomer og grundene på fane 2, at alle
-opgaver kan løses selv og med Vis svaret, sproget og layoutet fra 1100 × 700
-til 1600 × 950.
-Sidst kørt: ALT OK (89 påstande), 2. oktober 2026.
+opgaver kan løses selv og med Vis svaret, sproget, papirkortet (Indsend svar,
+valg bedømmer ikke, bliv på spørgsmålet med Næste, forfra i panelet, blink,
+kortZone med alle hint) og layoutet fra 1100 × 650 til 1600 × 950.
+Sidst kørt: ALT OK (136 påstande), 6. november 2026.
 
 ## I menuen
 

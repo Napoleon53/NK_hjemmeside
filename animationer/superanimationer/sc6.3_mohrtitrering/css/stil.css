@@ -672,7 +672,8 @@ select:focus-visible {
     main { overflow: visible; }
     .fane { position: static; grid-template-columns: minmax(0, 1fr); }
     .fane.aktiv { display: grid; }
-    .scene { height: 66vh; min-height: 440px; }
+    /* Papirkortet tager plads oeverst: scenen er hoejere, naar panelet staar under den */
+    .scene { height: 72vh; min-height: 580px; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
 }
 

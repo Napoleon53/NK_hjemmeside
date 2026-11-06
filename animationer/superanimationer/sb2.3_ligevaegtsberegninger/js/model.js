@@ -727,7 +727,7 @@
     M.lovHint = function (opg, num, den) {
         var d = M.lovDom(opg, num, den);
         var F = M.lovFacit(opg);
-        if (d.ok) return { s: null, trin: ["Ligevægtsloven er klar. Tryk Tjek."] };
+        if (d.ok) return { s: null, trin: ["Ligevægtsloven er klar. Tryk Indsend svar."] };
         var zn = ZN[d.z], K = d.s ? M.kon(d.s) : "", f = d.s ? M.skriv(d.s) : "";
         function begynd(z) {
             var side = z === "num" ? "p" : "r";

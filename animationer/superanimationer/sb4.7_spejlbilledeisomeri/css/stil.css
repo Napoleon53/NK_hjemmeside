@@ -1329,3 +1329,60 @@ kbd {
 
 /* SB4.7: knappen Vis alle H paa fane 2, naar den er slaaet til */
 .valgknap.vend.til { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (6. nov. 2026): al tekst paa ét lyst kort oeverst i midten
+   af scenen. Udseendet (papir, Lexend, knapperne) kommer fra
+   ../faelles/papirkort.css; her er kun placeringen og raekkerne.
+   x-skort er kortet, x-valg svarknapperne, x-status den nederste raekke
+   (besked, hint, Indsend svar), x-bliv forklaringen og Naeste, naar
+   opgaven er loest. Kortet maa ikke vaere hoejere end kortZone.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 12px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(900px, calc(100% - 28px));
+    box-sizing: border-box;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+
+.scenekort .sk-svar { display: flex; flex-wrap: wrap; justify-content: center; }
+.scenekort .sk-svar[hidden], .scenekort .sk-svar:empty { display: none; }
+
+.scenekort .sk-knap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 7px 16px;
+    font-family: inherit;
+    font-size: 0.98rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.scenekort .sk-knap[hidden] { display: none; }
+.scenekort .sk-knap.stor-bogstav { min-width: 84px; font-size: 1.25rem; font-weight: 600; }
+.scenekort .sk-knap:disabled { cursor: default; }
+
+/* En handling (Vend B om, Vis alle H): virker straks, saa den er blaa og ikke et svar */
+html body.papirkort.papirkort .scenekort .sk-knap.handling { border-color: #7fb2d9; background-color: #eef5fb; color: #1f4f75; }
+
+.scenekort .sk-bund { display: flex; align-items: center; }
+.scenekort .sk-bund[hidden], .scenekort .sk-blivramme[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst { flex: 1; margin: 0; }
+.scenekort .sk-bund .knap { flex: 0 0 auto; justify-content: center; }
+.scenekort .sk-bund .knap[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst:empty + .knap { margin-left: auto; }
+
+/* Spillet: et forkert svar faar en roed forklaring */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.forkert .st-tekst { background-color: var(--pk-roed-lys); border-left-color: var(--pk-roed); color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.start .st-tekst { background-color: #f0eee8; border-left-color: #a8a293; color: var(--pk-tekst-svag); }
+
+/* Forfra og Spil igen nederst i panelet, aldrig paa kortet */
+.panel-forfra { align-self: flex-start; margin-top: auto; }

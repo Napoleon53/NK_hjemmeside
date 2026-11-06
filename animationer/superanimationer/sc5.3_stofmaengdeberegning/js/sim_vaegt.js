@@ -34,7 +34,9 @@
     }
 
     var P = SimVaegt.prototype;
-    NK.Fane.paa(P, { navn: "vaegt", naesteFane: "fane-hurtig", naesteNavn: "Hurtigrunden" });
+    /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
+    var ZONE = [124, 110];
+    NK.Fane.paa(P, { navn: "vaegt", naesteFane: "fane-hurtig", naesteNavn: "Hurtigrunden", zone: ZONE });
     NK.Regning.paa(P);
 
     /* ----- Opgaven -------------------------------------------------------------- */
@@ -78,6 +80,13 @@
             .replace("{navn}", st.navn)
             .replace("{kendt}", st.kendt || st.navn);
         return '<p class="maal-tekst">' + NK.html(s) + "</p>";
+    };
+
+    /* Papirkortet: opgavens tekst (spoergsmaalet bliver halvfedt) */
+    P.kortTekst = function () {
+        var o = this.opg, t = o.tal, st = o.st;
+        return o.tekst.replace("{m}", t.m !== undefined ? T.g(t.m) : "").replace("{n}", t.n !== undefined ? T.mol(t.n) : "")
+            .replace("{navn}", st.navn).replace("{kendt}", st.kendt || st.navn);
     };
 
     /* Tavlens linjer med opgavens tal */
@@ -268,6 +277,9 @@
         var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.1, 30, 50));
+        /* Pladsen oeverst er sat af til papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var y0 = 10 + lay.zone;
         /* Tavlen faar den hoejde, regnestykket skal bruge (broeker er
            hoejere end en linje); resten gaar til bordet. Plads til
            trekanten i hoejre side, hvis formlen skal vendes. */
@@ -275,12 +287,12 @@
         var vend = o && o.trin.some(function (id) { return D.TRIN[id].vend; });
         var tsFri = vend ? NK.klamp((W - 32) * 0.3, 80, 150) + 14 : 0;
         var tm = this.regning.tavleMaal(this.L.ctx, W - 32, this.data(), lay.f, tsFri);
-        while (tm.h > Hs * 0.5 && lay.f > 13) {
+        while (tm.h > (Hs - y0) * 0.5 && lay.f > 13) {
             lay.f -= 0.5;
             tm = this.regning.tavleMaal(this.L.ctx, W - 32, this.data(), lay.f, tsFri);
         }
         var tavleH = Math.round(Math.max(140, tm.h));
-        var fri = lay.bordY - (16 + tavleH + 34);
+        var fri = lay.bordY - (y0 + tavleH + 34);
         var vb = NK.klamp(Math.min(W * 0.25, fri * 1.35), 120, 290);
         var vh = Tg.vaegtHoejde(vb);
         var krH = NK.klamp(Math.min(vb * 0.78, fri * 0.95), 78, 190);
@@ -307,7 +319,7 @@
         lay.gb = gb;
         for (i = 0; i < grupper; i++) lay.grupper.push(px0 + gb * (i + 0.5));
         var objH = Math.max(vh, krH, lay.poseS * 1.1);
-        lay.tavle = { x: 16, y: 16, b: W - 32, h: Math.max(120, Math.min(tavleH, lay.bordY - objH - 36 - 16)) };
+        lay.tavle = { x: 16, y: y0, b: W - 32, h: Math.max(120, Math.min(tavleH, lay.bordY - objH - 36 - y0)) };
         this.lay = lay;
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("bord", 8, lay.bordY - objH - 8, W - 16, objH + 8);

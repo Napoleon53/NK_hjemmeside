@@ -461,8 +461,10 @@
         };
 
         /* Et klik paa et stof i skemaet siger, hvad der staar, ikke hvad man
-           skal. At se naermere paa skemaet er altid i orden. */
+           skal. Efter et rigtigt svar er tavlen laast: kortet blinker og
+           peger paa Naeste, og forklaringen faar ingen ekstra linje. */
         P.klikArt = function (a) {
+            if (this.spaer()) return;
             var t = B.skriv(a.s) + " står " + (a.side === "r" ? "før" : "efter") + " pilen. (" + a.t + ") betyder " +
                 B.TILSTAND[a.t] + ".";
             if (a.k > 1) t += " Tallet foran er " + a.k + ".";
@@ -477,6 +479,7 @@
                 void p.offsetWidth;
                 p.classList.add("koerer");
             }
+            if (this.spaer()) return;
             this.kortBesked("Reaktionen løber begge veje på én gang og lige hurtigt. Derfor står der ⇌ og ikke →.", 6);
         };
 

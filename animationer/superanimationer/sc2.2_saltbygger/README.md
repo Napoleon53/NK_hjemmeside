@@ -230,6 +230,38 @@ det stadig gjaldt). Plakaterne fra sc2.3 hænger på væggen og kan altid
 på Ca", før formlen skal vælges, og det sidste hint er mere hjælpsomt.
 Kemichael præsenterer hver fane første gang og er ikke længere langbenet.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har opgaverne på ét lyst papirkort øverst i midten af scenen
+med `../faelles/papirkort.css` og `papirkort.js`: `#bord-skort` under hylden
+med de positive ioner, `#vand-skort` over glasset og `#ukendt-skort` mellem
+plakaterne. Kortet har etiketten (Opgave 3), opgaven, trinene, spørgsmålet,
+svarknapperne, én besked ad gangen (hint, Ikke endnu, Ikke rigtigt eller
+forklaringen), opgaveknappen (Start opgave, Giv hint, Vis svaret, Næste
+opgave) og **Indsend svar**. Panelet har tallet for løste opgaver og Afslut
+opgaverne.
+
+* Bordet, lynlåsen og svarknapperne bedømmer ikke af sig selv. Indsend svar
+  sender bordet, kortets bredde eller det valgte svar ind og er gråt, til der
+  er noget at sende.
+* Et klik på det låste bord under et spørgsmål får kortet til at blinke.
+* Efter et rigtigt svar bliver kortet på spørgsmålet. Svaret bliver grønt, og
+  Næste opgave står, hvor Indsend svar stod.
+* En ny besked afløser hintet, så kortet kun har én besked ad gangen.
+* Fane 3: "Sn skal opveje −4" står i kortets opgavetekst i stedet for i en
+  note ved kortene. Forklaringen til det seneste trin står i en grøn linje
+  under trinene, til der kommer et hint eller en ny besked.
+* Fane 1: under en opgave viser bordet ingen note nederst. Kun beskeden om,
+  at der ikke er plads til flere ioner, kan stå dér.
+
+Pladsen til kortet (`kortZone`) er 214/204 px på fane 1, 226/212 px på fane 2
+og 300/320 px på fane 3 (almindelig/lav skærm). Selvtesten (afsnit 20) måler
+alle opgaver og trin med hint og besked i 1400 × 860 og 1280 × 680 og tjekker,
+at bordet, glasset og formlen står under kortet.
+
+**Molekylenavne (6. nov. 2026):** ingen ændringer. "Oxygen" står kun om
+atomet ("Oxygen står i hovedgruppe 6", "med ét oxygen mindre").
+
 ## Krystalgitteret
 
 Krystallen bygges af `NK.lavGitter` i `js/gitter.js`. Hver krystal er et

@@ -125,7 +125,8 @@
        og eleven trykker Naeste. Hvert trin er to til fire hele saetninger i
        Kemibogens sprog: hvad fanen traener, og hvordan tingene bruges. sel:
        det, han peger paa, og som faar en gul ramme, der blinker (de
-       usynlige .anker over laerredet og kortene i panelet). felt: kolberne
+       usynlige .anker over laerredet, papirkortet oeverst i scenen og kortene
+       i panelet). felt: kolberne
        paa fane 3, tegnet paa laerredet (introFelt i js/laerer.js). Ingen
        vittigheder i praesentationen. */
     D.INTRO_TITRERING = [
@@ -137,11 +138,11 @@
             "Du lukker hanen, så snart kolben er svagt lyserød og forbliver det. " +
             "Luppen viser imens, hvordan hver OH⁻ reagerer med et eddikesyremolekyle.",
           sel: ["#tit-anker-hane", "#tit-anker-lup"] },
-        { tekst: "Når kolben er blevet lyserød, aflæser du forbruget på buretten ved menisken og skriver tallet på opgavekortet. " +
-            "Titreringskurven viser undervejs, hvordan pH i kolben ændrer sig. " +
-            "Knappen Tabel viser målingerne bag kurven, så du kan bruge dem i Excel. " +
-            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
-          sel: ["#tit-kort", "#tit-buretkort", "#tit-kurvekort"] }
+        { tekst: "Når kolben er blevet lyserød, aflæser du forbruget ved menisken i panelet og skriver tallet i feltet under den. " +
+            "Kortet øverst i scenen viser opgaven, og knappen Indsend svar sender aflæsningen. " +
+            "Titreringskurven viser undervejs, hvordan pH i kolben ændrer sig, og knappen Tabel viser målingerne til Excel. " +
+            "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
+          sel: ["#tit-skort", "#tit-buretkort", "#tit-kurvekort"] }
     ];
     D.INTRO_BEREGNING = [
         { tekst: "I denne fane beregner du masseprocenten af eddikesyre i eddiken ud fra forbruget af natriumhydroxid. " +
@@ -151,20 +152,21 @@
             "Har du ikke titreret selv, regner du på en klassekammerats måling. " +
             "Når beregningen er færdig, giver knappen Ny opgave en ny måling.",
           sel: "#ber-data" },
-        { tekst: "I hvert af de fire trin skriver du først formlen og derefter tallet i feltet på opgavekortet. " +
-            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
-          sel: "#ber-kort" }
+        { tekst: "I hvert af de fire trin skriver du først formlen og derefter tallet i feltet i panelet. " +
+            "Kortet øverst i scenen siger, hvad du skal skrive, og knappen Indsend svar sender feltet. " +
+            "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
+          sel: ["#ber-skort", "#ber-trin"] }
     ];
     D.INTRO_FORBRUG = [
         { tekst: "I denne fane undersøger du, hvordan en ændring ved titreringen påvirker forbruget og masseprocenten. " +
             "Kolbe A er som på fane 1, mens én ting er ændret ved kolbe B. " +
             "Skiltet under kolbe B viser ændringen.",
           felt: ["kolbeA", "kolbeB"] },
-        { tekst: "På opgavekortet vælger du, hvordan forbruget af natriumhydroxid eller masseprocenten bliver for kolbe B i forhold til kolbe A. " +
-            "Knappen Giv hint på opgavekortet hjælper dig, hvis du sidder fast.",
-          sel: "#for-kort" },
+        { tekst: "På kortet øverst i scenen vælger du, hvordan forbruget af natriumhydroxid eller masseprocenten bliver for kolbe B i forhold til kolbe A. " +
+            "Knappen Indsend svar sender dit gæt, og knappen Giv hint hjælper dig, hvis du sidder fast.",
+          sel: "#for-skort" },
         { tekst: "Når du har valgt et svar, bliver begge kolber titreret til omslaget. " +
-            "Tabellen viser bagefter forbruget og masseprocenten for begge kolber, og opgavekortet forklarer resultatet.",
+            "Tabellen viser bagefter forbruget og masseprocenten for begge kolber, og kortet forklarer resultatet.",
           sel: "#for-tabelkort" }
     ];
 

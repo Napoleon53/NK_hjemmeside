@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Byg et fedtstof</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">◆</span> Byg et fedtstof</h1>
@@ -27,7 +28,7 @@
 <!-- FANE 1: FABRIKKEN                                                  -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-fabrik" role="tabpanel" aria-label="Fabrikken">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="fabrik-laerred"></canvas>
         <div class="anker" id="fabrik-anker-glycerol"></div>
         <div class="anker" id="fabrik-anker-fliser"></div>
@@ -36,18 +37,24 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="fabrik-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="fabrik-skort">
+            <div id="fabrik-ind" aria-live="polite"></div>
+            <p class="sk-note" id="fabrik-note" hidden></p>
+            <div class="sk-bund tom" id="fabrik-bund">
+                <p class="st-tekst" id="fabrik-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="fabrik-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="fabrik-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="fabrik-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
-        <div class="kort opgavekort" id="fabrik-kort">
-            <h2><span id="fabrik-titel">Ordre</span><span class="taeller" id="fabrik-taeller"></span></h2>
-            <p class="maal-tekst" id="fabrik-kunde"></p>
-            <p class="opgave-spm" id="fabrik-tekst"></p>
+        <!-- Ordrerne: fremskridtet (opgaven staar paa papirkortet i scenen) -->
+        <div class="kort opgavekort" id="fabrik-ordrer">
+            <h2><span id="fabrik-titel">Ordrer</span><span class="taeller" id="fabrik-taeller"></span></h2>
             <div class="pips" id="fabrik-pips"></div>
-            <p class="besked" id="fabrik-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fabrik-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort maaling" id="fabrik-fedt-kort">
@@ -64,7 +71,7 @@
 <!-- FANE 2: KOELESKABET                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-koele" role="tabpanel" aria-label="Køleskabet">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="koele-laerred"></canvas>
         <div class="anker" id="koele-anker-skab"></div>
         <div class="anker" id="koele-anker-vindue"></div>
@@ -74,24 +81,27 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="koele-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="koele-skort">
+            <div id="koele-ind" aria-live="polite"></div>
+            <p class="sk-note" id="koele-note" hidden></p>
+            <div class="sk-bund tom" id="koele-bund">
+                <p class="st-tekst" id="koele-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="koele-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="koele-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="koele-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="koele-kort">
-            <h2><span id="koele-titel">Gæt</span><span class="taeller" id="koele-taeller"></span></h2>
-            <p class="maal-tekst" id="koele-spm"></p>
-            <p class="opgave-spm" id="koele-under"></p>
-            <div class="valgliste" id="koele-valg"></div>
-            <p class="besked" id="koele-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="koele-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="koele-dekl-kort">
             <h2>Varedeklaration <span class="taeller" id="koele-dekl-navn"></span></h2>
             <div id="koele-dekl"></div>
         </div>
+
+        <!-- Alle opgaver i koekkenet forfra (samme som R), aldrig paa kortet -->
+        <button class="knap nulstil" id="koele-forfra" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
     </aside>
 </section>
 
@@ -180,6 +190,8 @@
 
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/fedt.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>

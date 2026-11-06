@@ -287,15 +287,20 @@ function koerTest(W) {
     /* Tal og enhed staar med haardt mellemrum i panelet */
     function tekst(e) { return e.textContent.replace(/ /g, " "); }
     function besked() { return tekst(V.el.besked); }
+    function blivT(n) { return tekst(d.getElementById(n + "-bliv")); }
+    function videreT(n) { var e = d.querySelector("#" + n + "-bliv [data-videre]"); return e ? e.textContent : ""; }
     klik('[data-fane="fane-vaegt"]');
     V.tilpas();
     V.afvisTilbud();
     V.tomVaegten(); tik(V, 1.5);
     V.maalNr = 0; V.opg = O.opgave(0); V.naaet = false; V.hjaelp = 0; V.valgt = D.STOFFER.indexOf(cu); V.visMaal();
     var cuI = D.STOFFER.indexOf(cu), auI = D.STOFFER.indexOf(D.stof("Au"));
-    paastand("første opgave: 3 mol kobber, og knappen giver et hint", tekst(d.getElementById("vaegt-prompt")) === "Læg 3 mol kobber på vægten." &&
-        d.getElementById("vaegt-prompt").innerHTML.indexOf("3&nbsp;mol") >= 0 &&
-        V.el.knap.textContent === "Giv hint" && d.getElementById("vaegt-maal-titel").textContent === "Opvarmning");
+    paastand("første opgave: 3 mol kobber på kortet, og knappen giver et hint", /Læg 3 mol kobber på vægten\./.test(tekst(V.kort.ind)) &&
+        V.kort.ind.innerHTML.indexOf("3&nbsp;mol") >= 0 &&
+        V.el.knap.textContent === "Giv hint" && V.kort.ind.querySelector(".sk-chip").textContent === "Opvarmning 1 af 3");
+    paastand("Indsend svar er gråt, mens vægten er tom", !V.el.indsend.hidden && V.el.indsend.classList.contains("ikke-klar"));
+    V.indsend();
+    paastand("Indsend svar med en tom vægt bedømmer intet, men kortet blinker", !V.naaet && V.kort.e.classList.contains("blink"));
     /* Musen: traek fra krukken med kobber op paa vaegten */
     var c = d.getElementById("vaegt-laerred"), rc = c.getBoundingClientRect(), lay = V.lay;
     function mus(type, x, y) {
@@ -319,8 +324,14 @@ function koerTest(W) {
     paastand("en klump sluppet uden for vægten lægges ikke på, men får et svar", V.landet() === 2 && /Slip klumpen over vægten/.test(besked()));
     mus("pointerdown", lay.krukker[cuI].x, lay.hylde.y - lay.krukkeH / 2); mus("pointerup", lay.krukker[cuI].x, lay.hylde.y - lay.krukkeH / 2);
     tik(V, 1);
-    paastand("et klik på krukken lægger en klump på: 3 mol kobber, målet er nået", V.landet() === 3 && V.naaet &&
-        V.el.knap.textContent === "Næste opgave →" && /190,65 g/.test(besked()));
+    paastand("et klik på krukken lægger en klump på: 3 mol kobber løser ikke opgaven af sig selv", V.landet() === 3 && !V.naaet &&
+        V.el.indsend.classList.contains("klar"));
+    var rInd = V.el.indsend.getBoundingClientRect();
+    V.indsend();
+    var rNae = d.querySelector("#vaegt-bliv [data-videre]").getBoundingClientRect();
+    paastand("Indsend svar: målet er nået, kortet bliver på opgaven med forklaringen og Næste opgave, hvor Indsend svar stod", V.naaet &&
+        videreT("vaegt") === "Næste opgave →" && /190,65 g/.test(blivT("vaegt")) && d.getElementById("vaegt-bund").hidden &&
+        Math.abs(rNae.right - rInd.right) < 30, Math.round(rNae.right) + " / " + Math.round(rInd.right));
     V.knap();
     tik(V, 1);
     paastand("mål 2: kobberet bliver liggende", V.maalNr === 1 && !V.naaet && V.landet() === 3 && V.komp().tal.Cu === 3);
@@ -330,7 +341,7 @@ function koerTest(W) {
     tik(V, 1);
     paastand("en klump guld lægges ved siden af kobberet (klumperne blandes)", V.komp().tal.Cu === 3 && V.komp().tal.Au === 1 &&
         d.getElementById("vaegt-stof").textContent === "Cu + Au");
-    V.laegPaa(auI); V.laegPaa(auI); tik(V, 1);
+    V.laegPaa(auI); V.laegPaa(auI); tik(V, 1); V.indsend();
     var mTekst = d.getElementById("vaegt-regn-m").innerText.replace(/ /g, " ");
     paastand("3 kobber og 3 guld: mål 2 er nået, og massen regnes for hvert stof og i alt", V.naaet &&
         /m\(Cu\) = 3 mol · 63,55 g\/mol = 190,65 g/.test(mTekst) && /m\(Au\) = 3 mol · 196,97 g\/mol = 590,91 g/.test(mTekst) &&
@@ -344,26 +355,26 @@ function koerTest(W) {
     V.knap();
     paastand("mål 3 begynder med en tom vægt", V.maalNr === 2 && V.paaVaegten().length === 0);
     tik(V, 1);
-    V.laegPaa(auI); V.laegPaa(auI); V.laegPaa(auI); tik(V, 1);
-    paastand("3 mol guld: \"3 mol guld vejer 590,91 g. Det kan gøres lettere.\"", !V.naaet && besked() === "3 mol guld vejer 590,91 g. Det kan gøres lettere.", besked());
+    V.laegPaa(auI); V.laegPaa(auI); V.laegPaa(auI); tik(V, 1); V.indsend();
+    paastand("3 mol guld sendt ind: \"Ikke endnu 3 mol guld vejer 590,91 g. Det kan gøres lettere.\"", !V.naaet && besked() === "Ikke endnu 3 mol guld vejer 590,91 g. Det kan gøres lettere.", besked());
     V.tagAf(V.paaVaegten()[2]); tik(V, 1);
-    paastand("tages en klump af, forsvinder bemærkningen", besked() === "", besked());
+    paastand("tages en klump af, forsvinder bemærkningen", !/lettere/.test(besked()), besked());
     V.knap();
     paastand("hintet lyser alle krukker op", V.fremhaev === "alle" && /mindste molarmasse/.test(besked()));
     V.knap(); tik(V, 2);
     paastand("Vis svaret lægger 3 mol carbon på, og guldet flyver hjem", V.naaet && V.landet() === 3 && V.komp().tal.C === 3 &&
-        V.el.knap.textContent === "Til de sværere opgaver →");
+        videreT("vaegt") === "Til de sværere opgaver →" && /^Svaret/.test(blivT("vaegt")));
     V.knap(); tik(V, 3);
     paastand("så kommer opgaverne, og Kemichael kommer ikke (opvarmningen er ikke hele fanen)", V.maalNr === 3 && V.opg.navn === "To klumper" &&
         V.paaVaegten().length === 0 && !V.laerer.scene);
     V.opg = O.opgave(3, pFe); V.visMaal();
-    V.laegPaa(cuI); V.laegPaa(D.STOFFER.indexOf(D.stof("Ag"))); tik(V, 1);
-    paastand("to klumper: kobber og sølv er for meget", !V.naaet && besked() === "Kobber og sølv vejer 171,42 g. Det er for meget.", besked());
+    V.laegPaa(cuI); V.laegPaa(D.STOFFER.indexOf(D.stof("Ag"))); tik(V, 1); V.indsend();
+    paastand("to klumper: kobber og sølv er for meget", !V.naaet && besked() === "Ikke endnu Kobber og sølv vejer 171,42 g. Det er for meget.", besked());
     V.knap();
     paastand("hintet siger den ene klump og lyser sølvet op", /Den ene klump er sølv/.test(besked()) && V.fremhaev.join() === "Ag");
-    V.tagAf(V.paaVaegten()[0]); V.laegPaa(D.STOFFER.indexOf(D.stof("Fe"))); tik(V, 1);
-    paastand("jern og sølv: løst, og beskeden viser regnestykket", V.naaet &&
-        besked() === "Jern og sølv: m = 55,85 g + 107,87 g = 163,72 g.", besked());
+    V.tagAf(V.paaVaegten()[0]); V.laegPaa(D.STOFFER.indexOf(D.stof("Fe"))); tik(V, 1); V.indsend();
+    paastand("jern og sølv: løst, og forklaringen viser regnestykket", V.naaet &&
+        blivT("vaegt").indexOf("Jern og sølv: m = 55,85 g + 107,87 g = 163,72 g.") >= 0, blivT("vaegt"));
     V.knap(); tik(V, 1);
     paastand("næste opgave: to stoffer, med en tom vægt", V.maalNr === 4 && V.opg.navn === "To stoffer" && V.paaVaegten().length === 0);
     V.knap(); V.knap(); tik(V, 2);
@@ -371,10 +382,10 @@ function koerTest(W) {
     V.knap(); tik(V, 1);
     V.opg = O.opgave(5, O.GRAENSER.indexOf(500)); V.visMaal();
     for (i = 0; i < 4; i++) V.laegPaa(auI);
-    tik(V, 1);
+    tik(V, 1); V.indsend();
     paastand("over 500 g med 4 mol guld: det kan gøres med færre", !V.naaet && /færre/.test(besked()), besked());
-    V.tagAf(V.paaVaegten()[3]); tik(V, 1);
-    paastand("3 mol guld: løst", V.naaet && /Med 2 mol kan vægten højst vise 393,94 g/.test(besked()), besked());
+    V.tagAf(V.paaVaegten()[3]); tik(V, 1); V.indsend();
+    paastand("3 mol guld: løst", V.naaet && /Med 2 mol kan vægten højst vise 393,94 g/.test(blivT("vaegt")), blivT("vaegt"));
     V.knap(); tik(V, 1);
     paastand("fjerde slags: tre stoffer", V.opg.navn === "Tre stoffer");
     V.knap(); V.knap(); tik(V, 2);
@@ -412,7 +423,15 @@ function koerTest(W) {
     paastand("en runde er ni par, tre fra hvert niveau",
         A.runde.length === 9 && [0, 1, 2].every(function (nv) { return A.runde.filter(function (p) { return p.niveau === nv; }).length === 3; }));
     paastand("vægtene viser gram før svaret", /g$/.test(A.display(A.par.v).t) && !A.display(A.par.v).etiket);
-    A.vaelgSvar(A.facit());
+    paastand("Indsend svar er gråt uden valg", !A.el.indsend.hidden && A.el.indsend.classList.contains("ikke-klar"));
+    A.vaelg(A.facit());
+    paastand("et valg bedømmer ikke af sig selv", !A.svar && A.point === 0 && A.el.indsend.classList.contains("klar"));
+    var rIndA = A.el.indsend.getBoundingClientRect();
+    A.indsend();
+    var naeA = d.querySelector("#atomer-bliv [data-videre]"), rNaeA = naeA ? naeA.getBoundingClientRect() : null;
+    paastand("rigtigt svar: kortet bliver på spørgsmålet, svaret er grønt, Næste par står, hvor Indsend svar stod",
+        !!naeA && d.getElementById("atomer-bund").hidden && !!d.querySelector("#atomer-ind .sk-knap.rigtig") &&
+        /^Rigtigt/.test(blivT("atomer")) && Math.abs(rNaeA.right - rIndA.right) < 30);
     tik(A, 2);
     paastand("et rigtigt svar giver et point, og vægtene tæller atomer", A.point === 1 && A.stime === 1 &&
         A.display(A.par.v).etiket === "atomer" && A.display(A.par.v).t === NK.Tegn.displayAntal(D.antal(A.par.v.n)));
@@ -421,7 +440,8 @@ function koerTest(W) {
     A.knap();
     var forkert = A.facit() === "v" ? "h" : "v";
     A.vaelgSvar(forkert);
-    paastand("et forkert svar nulstiller stimen og giver en forklaring", A.point === 1 && A.stime === 0 && A.el.besked.textContent.length > 20);
+    paastand("et forkert svar nulstiller stimen og giver en forklaring", A.point === 1 && A.stime === 0 && blivT("atomer").length > 20 &&
+        !!d.querySelector("#atomer-bliv .bliv.nej"));
     A.knap(); A.knap(); A.knap();
     paastand("Vis svaret giver intet point", A.point === 1 && A.visteSvar);
     while (!A.slut) { if (!A.svar) A.vaelgSvar(A.facit()); A.knap(); }
@@ -468,18 +488,21 @@ function koerTest(W) {
     F.vaelg(0);
     paastand("ordren har kun ét felt, massen, og intet om atomer", F.opg.felter.length === 1 &&
         !d.querySelector("#afvej-raekker input.eks") && !/atom/i.test(d.getElementById("fane-afvej").querySelector(".panel").innerText) &&
-        d.getElementById("afvej-spm").textContent === "Hvad skal vægten vise?");
+        /Hvad skal vægten vise\?/.test(F.kort.ind.textContent) && !!F.kort.ind.querySelector(".sk-chip"));
+    paastand("Indsend svar er gråt, før der står et tal i feltet", F.el.indsend.classList.contains("ikke-klar"));
+    F.indsend();
+    paastand("Indsend svar uden tal bedømmer intet", !F.opg.faerdig && F.aktivtFelt().forsoeg === 0);
     F.aktivtFelt().input.value = "63,55"; F.tjek();
-    paastand("massen af 1 mol giver den rigtige besked", /massen af 1 mol/.test(F.el.besked.textContent) && !F.opg.faerdig);
+    paastand("massen af 1 mol giver den rigtige besked", /massen af 1 mol/.test(tekst(F.el.besked)) && !F.opg.faerdig, F.el.besked.textContent + " / " + F.opg.faerdig);
     F.aktivtFelt().input.value = "127"; F.tjek();
     paastand("en rigtig masse sætter hældningen i gang og løser ordren", F.haeldT === 0 && F.opg.faerdig && F.status[0].loest && F.status[0].stjerne);
     tik(F, 3);
     paastand("bagefter viser vægten 127,10 g, og krukken står på bordet igen",
         F.display().t === "127,10 g" && F.krukkePositur().u === 0 && !F.krukkePositur().i);
-    paastand("linjen under scenen siger massen", /vejer 127 g\.$/.test(d.getElementById("afvej-status").textContent), d.getElementById("afvej-status").textContent);
+    paastand("kortet bliver på ordren og siger massen, med Næste ordre", /vejer 127 g\./.test(blivT("afvej")) && videreT("afvej") === "Næste ordre →", blivT("afvej"));
     F.vaelg(1);
     F.knap();
-    paastand("hintet peger på krukken og giver regnestykket", F.fremhaev === "krukke" && /m = n · M = 3,00 mol · 26,98 g\/mol/.test(F.el.besked.textContent));
+    paastand("hintet peger på krukken og giver regnestykket", F.fremhaev === "krukke" && /m = n · M = 3,00 mol · 26,98 g\/mol/.test(tekst(F.el.besked)), F.el.besked.textContent);
     F.knap();
     tik(F, 3);
     paastand("Vis svaret løser ordren, men uden stjerne", F.status[1].loest && !F.status[1].stjerne && F.display().t === "80,94 g");
@@ -487,7 +510,8 @@ function koerTest(W) {
     tik(F, 4);
     paastand("fire ordrer i niveau 1: Kemichael kommer ikke (kun når alle tolv er afvejet)", !F.laerer.scene);
     F.vaelg(0);
-    paastand("en afvejet ordre vises færdig", F.opg.gennemsyn && F.opg.faerdig && F.el.knap.textContent === "Afvej igen");
+    paastand("en afvejet ordre vises færdig, og Afvej ordren igen står i panelet", F.opg.gennemsyn && F.opg.faerdig && !d.getElementById("afvej-igen").hidden &&
+        !d.querySelector("#afvej-skort #afvej-igen"));
     D.ORDRER.forEach(function (o, i) { if (!F.status[i].loest) loesOrdre(i); });
     tik(F, 3);
     paastand("alle tolv ordrer er afvejet: Kemichael kommer", !!(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
@@ -511,10 +535,42 @@ function koerTest(W) {
     paastand("man kan lægge klumper på, mens han præsenterer", V.landet() >= 1 && V.laererIIntro());
     V.springIntro(); tik(V, 3);
     paastand("den gamle knap Spring præsentationen over i scenen er væk", !d.querySelector(".spring-over"));
-    var tur = ["#vaegt-anker-hylde", "#vaegt-anker-vaegt", "#vaegt-anker-zoom", "#vaegt-anker-plakat", "#vaegt-maaling", "#vaegt-kort",
-        "#atomer-anker-vaegte", "#atomer-valg", "#atomer-anker-skilt", "#atomer-kort",
-        "#afvej-kort", "#afvej-anker-krukke", "#afvej-anker-plakat", "#afvej-anker-vaegt", "#afvej-fremskridt"];
+    var tur = ["#vaegt-anker-hylde", "#vaegt-anker-vaegt", "#vaegt-anker-zoom", "#vaegt-anker-plakat", "#vaegt-maaling", "#vaegt-skort",
+        "#atomer-anker-vaegte", "#atomer-skort", "#atomer-anker-skilt", "#atomer-runden",
+        "#afvej-skort", "#afvej-regn", "#afvej-anker-krukke", "#afvej-anker-plakat", "#afvej-anker-vaegt", "#afvej-fremskridt"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("10b. Papirkortet (6. nov. 2026)");
+    [["fane-vaegt", "vaegt", V], ["fane-atomer", "atomer", A], ["fane-afvej", "afvej", F]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var kort = d.getElementById(x[1] + "-skort"), fane = d.getElementById(x[0]);
+        paastand(x[0] + ": kortet står i scenen og ikke i panelet", !!kort && !!kort.closest(".scene") && !kort.closest(".panel"));
+        paastand(x[0] + ": ingen statuslinje nederst og intet opgavekort i panelet", !fane.querySelector(".scene-mrk, .opgavekort, .panel .besked"));
+        paastand(x[0] + ": Start forfra står ikke på kortet", !kort.querySelector(".nulstil, .igen") && !/Start forfra|Ny runde|Tøm vægten/.test(kort.textContent));
+    });
+    paastand("papirkortet er slået til (body.papirkort)", d.body.classList.contains("papirkort"));
+    /* Et klik i scenen, mens svaret ikke er sendt: kortet blinker */
+    klik('[data-fane="fane-atomer"]');
+    A.nyRunde(); A.tilpas();
+    A.kort.e.classList.remove("blink");
+    var ca = A.L.canvas, rca = ca.getBoundingClientRect();
+    ca.dispatchEvent(new W.MouseEvent("click", { bubbles: true, clientX: rca.left + A.lay.vaegte[0].x, clientY: rca.top + A.lay.bordY - 30 }));
+    paastand("flest atomer: et klik på en vægt før svaret får kortet til at blinke og svarer ikke", A.kort.e.classList.contains("blink") && !A.svar);
+    /* Kortet holder sig i kortZone paa en hoej og en lav skaerm */
+    var rammeK = document.getElementById("ramme");
+    [[1400, 860], [1280, 640]].forEach(function (st) {
+        rammeK.style.width = st[0] + "px"; rammeK.style.height = st[1] + "px";
+        [["fane-vaegt", "vaegt", V], ["fane-atomer", "atomer", A], ["fane-afvej", "afvej", F]].forEach(function (x) {
+            klik('[data-fane="' + x[0] + '"]');
+            var sim = x[2]; sim.tilpas();
+            var kort = d.getElementById(x[1] + "-skort");
+            var bund = kort.offsetTop + kort.offsetHeight;
+            paastand(x[0] + " ved " + st[0] + " × " + st[1] + ": kortet holder sig i kortZone", bund <= sim.lay.zone && sim.lay.plakat.y >= bund,
+                "kortets bund " + bund + ", zone " + sim.lay.zone);
+        });
+    });
+    rammeK.style.width = ""; rammeK.style.height = "";
+    A.nyRunde();
 
     overskrift("11. Layoutet");
     var ramme = document.getElementById("ramme");
@@ -535,6 +591,8 @@ function koerTest(W) {
                 if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
             }
             inde(lay.plakat, "plakaten");
+            var skort = d.querySelector("#" + id + " .scenekort");
+            if (lay.plakat.y < skort.offsetTop + skort.offsetHeight) problemer.push(id + ": kortet dækker plakaten");
             var vh = NK.Tegn.vaegtHoejde(lay.vaegtB);
             if (id === "fane-vaegt") {
                 var kb = NK.Tegn.krukkeBredde(lay.krukkeH);
@@ -557,7 +615,7 @@ function koerTest(W) {
                 var stakB = { x: lay.skaal.x - 3 * cAu, y: toppen, b: 6 * cAu, h: lay.skaal.y - toppen };
                 over(stakB, zr, "klumperne under zoomboblen");
                 if (lay.slip.y < lay.hylde.y) problemer.push(id + ": slipfeltet går op i hylden");
-                if (Hc >= 700 && lay.hylde.y - lay.krukkeH < 74) problemer.push(id + ": tilbuddet dækker krukkerne");
+                if (lay.hylde.y - lay.krukkeH < lay.zone) problemer.push(id + ": kortet dækker krukkerne");
             }
             if (id === "fane-atomer") {
                 var v0 = { x: lay.vaegte[0].x - lay.vaegtB / 2, y: lay.bordY - vh, b: lay.vaegtB, h: vh };

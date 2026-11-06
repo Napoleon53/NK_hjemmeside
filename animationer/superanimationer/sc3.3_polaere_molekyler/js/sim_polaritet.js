@@ -35,6 +35,9 @@
                 tekst: "Er " + mol.formel + " polært eller upolært?",
                 valg: ["Polært", "Upolært"],
                 rigtig: mol.polaer ? 0 : 1,
+                fejlValg: function () {
+                    return mol.formel + " er ikke " + (mol.polaer ? "upolært" : "polært") + ". Se på det samlede træk i bindingerne.";
+                },
                 hint: mol.hintPol,
                 svar: mol.svarPol,
                 start: function (s) { s.startOpgaveMol(mol.id, { polaer: true }, { "pol-samlet": false }); },
@@ -62,10 +65,10 @@
         function (sim) {
             var mol = sim.nytMolekyle(["CO2", "CCl4"]);
             var svar = [
-                "Trækkene er lige store og ophæver hinanden",
-                "Atomerne har samme elektronegativitet",
-                "Bindingerne er for korte til at være polære",
-                "Molekylet har ingen frie elektronpar"
+                "Trækkene ophæver hinanden",
+                "Atomerne trækker lige hårdt",
+                "Bindingerne er for korte",
+                "Der er ingen frie elektronpar"
             ];
             var orden = NK.bland([0, 1, 2, 3]);
             return {
@@ -73,6 +76,9 @@
                 tekst: "Bindingerne i " + mol.formel + " er polære. Hvorfor er molekylet alligevel upolært?",
                 valg: orden.map(function (i) { return svar[i]; }),
                 rigtig: orden.indexOf(0),
+                fejlValg: function () {
+                    return "Det forklarer ikke, at " + mol.formel + " er upolært. Se, hvilken vej trækkene i bindingerne peger.";
+                },
                 hint: "Se på trækkene i bindingerne, mens molekylet drejer. Hvilken vej peger de?",
                 svar: mol.svarPol,
                 start: function (s) { s.startOpgaveMol(mol.id, { polaer: true }, { "pol-samlet": false }); },
@@ -82,7 +88,12 @@
     ];
 
     NK.SimPolaritet = function () {
-        this.init("pol", OPGAVER, ["pol-delta", "pol-traek", "pol-samlet", "pol-drej"]);
+        this.init("pol", OPGAVER, ["pol-delta", "pol-traek", "pol-samlet", "pol-drej"], {
+            antal: 6,
+            intro: "Drej molekylerne, og se, hvordan bindingerne trækker i elektronerne. Opgaverne spørger, om et molekyle er polært.",
+            naesteFane: "fane-vand",
+            naesteNavn: "Vandstrålen"
+        });
     };
 
     NK.SimPolaritet.prototype = Object.create(NK.MolSim.prototype);
@@ -188,7 +199,7 @@
     P.tegn = function () {
         var ctx = this.tegnBaggrund();
         var mol = this.mol();
-        this.proj = M.tegn(ctx, this.vis, mol.model, { visFrie: false, hover: this.hover });
+        this.proj = M.tegn(ctx, this.vis, mol.model, { visFrie: false, hover: this.hover, markeret: this.markeret() });
         if (this.flag("pol-traek")) this.tegnTraek(ctx, mol);
         if (this.flag("pol-delta")) this.tegnDelta(ctx, mol);
         if (this.flag("pol-samlet")) this.tegnSamlet(ctx, mol);

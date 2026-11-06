@@ -165,3 +165,9 @@ scenen og får som før forklaringen alene med knappen videre.
 Kortets knap går altid fremad: når alle tegninger er løst, hedder den Næste tegning, ikke
 Start forfra (`videreTekst`). Selvtesten: ALT OK (77), 3. nov. 2026, med påstande om
 Indsend svar, kortet, der bliver på spørgsmålet, og kortets højde i de nye tilstande.
+
+## Molekylenavne (6. nov. 2026)
+
+Molekylerne H₂, Br₂ og N₂ på fanen Byg hedder dihydrogen, dibrom og dinitrogen (stoffet).
+Atomernes navne (hydrogen, brom, nitrogen, oxygen, chlor) bliver i hint, forklaringer og
+tabellen, fordi de handler om atomerne og elektronerne.

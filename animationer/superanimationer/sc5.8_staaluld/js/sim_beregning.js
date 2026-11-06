@@ -5,11 +5,13 @@
    staar et maengdeberegningsskema (js/skema.js): reaktionsskemaet med m,
    M og n under hvert stof. I panelet skriver eleven hvert trin som en
    paen beregning: formlen, mellemregningen i felter (med rigtig
-   broekstreg) og resultatet med enhed. Linjen med naeste skridt, fejl
-   og hint staar lige under det felt, eleven er ved, med hint-knappen.
+   broekstreg) og resultatet med enhed. Opgaven, linjen med naeste
+   skridt, fejl og hint, den gule hintknap og Indsend svar staar paa
+   papirkortet oeverst i scenen (6. nov. 2026); Indsend svar eller Enter
+   i et felt tjekker det aktive trin.
 
-   Omskifteren over tavlen vaelger reaktionsskemaet (brugerens oenske
-   5. okt. 2026):
+   Omskifteren i panelet (kortet Opgaverne) vaelger reaktionsskemaet
+   (brugerens oenske 5. okt. 2026):
      Let:  2 Fe + O₂ → 2 FeO, forholdet 1 : 1 (som den gamle c5.8)
      Svær: 3 Fe + 2 O₂ → Fe₃O₄, forholdet 3 : 1 (det oxid, der mest dannes)
    Linket index.html#svaer vaelger Svær. Hvert skema har sit eget saet
@@ -17,7 +19,9 @@
 
    I maaling 2 staar formlerne der i forvejen. Maaling 1 slutter med
    spoergsmaalet, hvorfor vaegten viste mindre end beregnet (som i den
-   gamle c5.8).
+   gamle c5.8). Spoergsmaalet staar paa kortet: et svar vaelger kun, og
+   Indsend svar sender det. Efter det rigtige svar bliver kortet paa
+   spoergsmaalet med forklaringen under.
 
    Paa bordet staar tre soejler: stålulden foer, det vaegten viste efter,
    og det, der er regnet ud. Den graa del er jernet, den roede ilten. Den
@@ -43,9 +47,7 @@
         this.statusFor = {};
         D.SKEMAER.forEach(function (id, i) { mig.statusFor[id] = i === 0 ? mig.status : mig.hentStatus("_" + id); });
         this.status = this.statusFor[this.variant];
-        this.el.valg = NK.el("beregning-valg");
         this.el.skift = NK.el("beregning-skift");
-        this.el.hjaelp = NK.el("beregning-hjaelp");
         this.skema = new NK.Skema();
         this.regning = new NK.Regning({ vaert: NK.el("beregning-raekker"), fane: this });
         this.bygSkift();
@@ -53,7 +55,8 @@
     }
 
     var P = SimBeregning.prototype;
-    NK.Fane.paa(P, { navn: "beregning", naesteFane: "fane-forsoeg", naesteNavn: "Forsøget", slutTekst: "Tilbage til Forsøget →" });
+    /* Efter den sidste opgave er der ingen knap videre paa kortet */
+    NK.Fane.paa(P, { navn: "beregning", zone: [198, 172] });
     NK.Regning.paa(P);
 
     /* ----- Omskifteren Let / Svær ---------------------------------------------------- */
@@ -104,10 +107,10 @@
         this.opg = o;
         this.spmOk = false;
         this.spmForkert = [];
+        this.spmValgt = null;
         this.regning.saet(o);
         this.skema.saet(o, this.regning);
         this.nyScene();
-        this.placerHjaelp();
     };
 
     P.harForfra = function () { return false; };
@@ -123,6 +126,7 @@
         return f.fase !== (this.opg.kunTal ? "indsaet" : "formel") || f.plads[0] !== null || f.plads[1] !== null;
     };
 
+    /* Noterne i panelet over regnestykket */
     P.promptHTML = function () {
         var o = this.opg;
         return (o.kunTal ? '<p class="note stor">' + NK.html(D.KUN_TAL) + "</p>" : "") +
@@ -130,35 +134,6 @@
     };
 
     P.overTavle = function () { return D.OVER_TAVLE.replace("{ox}", this.opg.sk.oxid); };
-
-    /* Linjen og knappen staar lige under det trin, eleven er ved; naar
-       regnestykket er faerdigt, staar de nederst i kortet */
-    P.placerHjaelp = function () {
-        var blok = this.el.hjaelp, aktiv = this.regning.vaert.querySelector(".raekke.aktiv");
-        if (!blok) return;
-        var sted = aktiv || this.el.kort;
-        if (blok.parentNode !== sted) sted.appendChild(blok);
-    };
-
-    /* Linjen og knappen skal kunne ses, ogsaa naar kortet er blevet langt */
-    P.visHjaelp = function () {
-        var blok = this.el.hjaelp;
-        if (!blok || !blok.scrollIntoView || !NK.el("fane-beregning").classList.contains("aktiv")) return;
-        try { blok.scrollIntoView({ block: "nearest" }); } catch (x) { /* gammel browser */ }
-    };
-
-    var beskedFaelles = P.besked;
-    P.besked = function (html, klasse) {
-        this.placerHjaelp();
-        beskedFaelles.call(this, html, klasse);
-        this.visHjaelp();
-    };
-
-    var visKnapFaelles = P.visKnap;
-    P.visKnap = function () {
-        this.placerHjaelp();
-        visKnapFaelles.call(this);
-    };
 
     /* ----- Spoergsmaalet til sidst i maaling 1 --------------------------------------------- */
     var trinInfoRegning = P.trinInfo, trinLinjeRegning = P.trinLinje;
@@ -168,7 +143,7 @@
     P.opgaveFaerdig = function () { return this.regning.faerdig() && (!this.opg.spm || this.spmOk); };
 
     P.trinLinje = function () {
-        if (this.spmAabent()) return "Vælg et af svarene.";
+        if (this.spmAabent()) return "Vælg et svar, og tryk på Indsend svar.";
         return trinLinjeRegning.call(this);
     };
 
@@ -181,41 +156,89 @@
         return trinInfoRegning.call(this);
     };
 
-    P.visKortEkstra = function () {
-        var e = this.el.valg, mig = this, H = D.HVORFOR;
-        if (!this.opg.spm || !this.regning.faerdig()) { e.hidden = true; e.innerHTML = ""; return; }
-        e.hidden = false;
-        e.innerHTML = '<p class="opgave-spm">' + NK.html(H.spm) + "</p>";
+    /* Er spoergsmaalet paa kortet (aabent eller besvaret) */
+    P.spmVist = function () { return this.opg.spm && this.regning.faerdig(); };
+
+    /* ----- Papirkortet ---------------------------------------------------------------- */
+    P.kortKlasse = function () { return this.spmAabent() ? "spm" : "opgave"; };
+
+    /* Opgaven over tavlen, eller spoergsmaalet med de tre svar. Naar det er
+       besvaret, er svarene laast: det rigtige er groent (gult, naar det blev
+       vist), de forkerte er roede, og resten er tonet ned. */
+    P.kortIndHTML = function () {
+        var o = this.opg, mig = this, H = D.HVORFOR;
+        var chip = '<span class="sk-chip">' + NK.html(o.titel) + "</span>";
+        if (!this.spmVist()) return '<p class="sk-tekst">' + chip + this.papirTekst(NK.html(this.overTavle())) + "</p>";
+        var vist = this.faerdig && this.fast.klasse === "gul";
+        var html = '<p class="sk-tekst">' + chip + this.papirTekst(NK.html(H.spm)) + '</p><div class="sk-svar n' + H.svar.length + '">';
         H.svar.forEach(function (s, j) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "knap";
-            b.textContent = s.t;
-            var brugt = mig.spmForkert.indexOf(j) >= 0;
-            if (mig.spmOk || brugt) b.disabled = true;
-            if (brugt) b.classList.add("forkert");
-            if (mig.spmOk && s.ok) b.classList.add("rigtig");
-            b.addEventListener("click", function () { mig.vaelgSvar(j, "ok"); });
-            e.appendChild(b);
+            var kl = "sk-knap", fra = false;
+            if (mig.spmForkert.indexOf(j) >= 0) { kl += " forkert"; fra = true; }
+            else if (mig.spmOk) { kl += s.ok ? (vist ? " svar-vist" : " rigtig") : " dim"; fra = true; }
+            else if (mig.spmValgt === j) kl += " valgt";
+            html += '<button type="button" class="' + kl + '" data-valg="' + j + '"' + (fra ? " disabled" : "") + '><span class="v-bogstav">' +
+                "ABC".charAt(j) + "</span><span>" + NK.html(s.t) + "</span></button>";
         });
+        return html + "</div>";
+    };
+
+    /* Panelet: maalingen og noterne over regnestykket */
+    P.visKortEkstra = function () {
+        NK.saetTekst("beregning-titel", this.opg.titel);
+        NK.saetHTML("beregning-prompt", this.promptHTML());
+    };
+
+    /* Et klik paa et svar vaelger kun */
+    P.kortKlik = function (t) {
+        if (!t.hasAttribute("data-valg") || !this.spmAabent()) return;
+        var j = parseInt(t.getAttribute("data-valg"), 10);
+        if (this.spmForkert.indexOf(j) >= 0) return;
+        this.spmValgt = j;
+        this.visKort();
+    };
+
+    P.harIndsend = function () { return this.spmAabent() || !this.regning.faerdig(); };
+    P.kanSendes = function () { return this.spmAabent() ? this.spmValgt !== null : this.regning.kanSendes(); };
+    P.indsend = function () {
+        if (this.spmAabent()) this.vaelgSvar(this.spmValgt, "ok");
+        else this.regning.tjek();
+    };
+    P.tomBesked = function () {
+        return this.spmAabent() ? "Vælg et af svarene først." : "Skriv først i feltet i regnestykket i panelet.";
     };
 
     P.vaelgSvar = function (j, maade) {
-        if (!this.spmAabent()) return;
+        if (!this.spmAabent() || j === null || j === undefined) return;
         var s = D.HVORFOR.svar[j];
+        this.spmValgt = null;
         if (s.ok) {
             this.spmOk = true;
             this.s.forskel = true;
-            this.visKortEkstra();
-            this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html("Den rigtige: " + s.t.toLowerCase()) : null);
+            this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html("Det rigtige svar: " + s.t.toLowerCase()) : null);
             return;
         }
         this.brugtSvar = true;
         this.spmForkert.push(j);
         this.hjaelp = 0;
+        this.visKort();
         this.besked(NK.html(s.forkl + " Prøv et af de andre."), "skidt");
-        this.visKortEkstra();
-        this.visKnap();
+    };
+
+    /* Er regnestykket lige blevet faerdigt, og kommer spoergsmaalet nu, staar
+       der ingen ros under spoergsmaalet; svaret staar i panelet og paa tavlen */
+    var trinLoestFaelles = P.trinLoest;
+    P.trinLoest = function (maade, svarHTML) {
+        if (this.spmAabent() && this.regning.faerdig() && this.spmForkert.length === 0 && this.spmValgt === null && !this.spmSet) {
+            this.spmSet = true;
+            this.hjaelp = 0;
+            this.pegKnap = false;
+            if (maade === "svar") this.brugtSvar = true;
+            this.visKort();
+            this.naesteLinje(maade === "svar" && svarHTML ? '<span class="b-maerke">Svaret</span> ' + svarHTML : "", maade === "svar" ? "gul" : "");
+            this.visKnap();
+            return;
+        }
+        trinLoestFaelles.call(this, maade, svarHTML);
     };
 
     P.slutLinje = function () {
@@ -233,12 +256,12 @@
     /* ----- Scenen: skemaet og de tre soejler ------------------------------------------------- */
     P.nyScene = function () {
         this.s = { teori: false, pop: 1, forskel: false };
+        this.spmSet = false;
     };
 
     P.efterTrin = function (id) {
         if (id === "m_ox") { this.s.teori = true; this.s.pop = 0; }
         this.skema.loest(id);
-        this.visKortEkstra();
     };
 
     P.opdaterScene = function (dt) {
@@ -278,9 +301,9 @@
     P.nedScene = function (pt) {
         var u = this.hvad(pt), o = this.opg, t = o.tal, f = o.facit;
         if (u === "s0") this.kortBesked("Stålulden før: " + K.g2(t.mf) + " g jern.");
-        else if (u === "s1") this.kortBesked("Vægten efter: " + K.g2(t.mf) + " g jern og " + K.g2(K.r2(t.me - t.mf)) + " g ilt, der har bundet sig.");
+        else if (u === "s1") this.kortBesked("Vægten efter: " + K.g2(t.mf) + " g jern og " + K.g2(K.r2(t.me - t.mf)) + " g dioxygen, der har bundet sig.");
         else if (u === "s2") {
-            this.kortBesked(this.s.teori ? "Hvis alt jernet bliver til " + o.sk.oxid + ": " + K.g2(f.m) + " g. Den røde del er ilten." :
+            this.kortBesked(this.s.teori ? "Hvis alt jernet bliver til " + o.sk.oxid + ": " + K.g2(f.m) + " g. Den røde del er det dioxygen, der binder sig." :
                 "Den kommer, når du har regnet massen af " + o.sk.oxid + " ud.");
         } else if (u) this.kortBesked(NK.html(this.celleTekst(u)));
         return false;
@@ -289,16 +312,12 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h, ctx = this.L.ctx;
-        var Hs = this.baand().y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.08, 26, 44));
-        /* Linjen over tavlen deler plads med omskifteren til hoejre */
-        var skift = this.el.skift;
-        var skiftB = skift ? skift.offsetWidth : 0, skiftH = skift ? skift.offsetHeight : 0;
-        lay.ot = Tg.overTavle(ctx, this.overTavle(), Math.max(160, W - 46 - skiftB - (skiftB ? 26 : 0)), NK.klamp(W / 44, 15, 20), 13);
-        var linjeH = Math.max(lay.ot.h, skiftH);
-        lay.otY = 12 + (linjeH - lay.ot.h) / 2;
-        var top = 12 + linjeH + 14;
+        /* Opgaven staar paa kortet; tavlen begynder under kortets plads */
+        var top = this.top();
+        lay.top = top;
         /* Tavlen faar den hoejde, skemaet skal bruge; resten gaar til soejlerne */
         var rh = NK.klamp(Math.min(W / 19, Hs / 12.5), 26, 58);
         while (lay.bordY - (top + NK.Skema.hoejde(rh) + 22) < 110 && rh > 24) rh -= 1;
@@ -311,7 +330,6 @@
         var sb = NK.klamp(Math.min(W * 0.1, lay.sh * 0.6), 40, 104);
         lay.soejler = [0.24, 0.5, 0.76].map(function (a) { return { x: W * a, b: sb }; });
         this.lay = lay;
-        this.saetAnker("opgave", 10, 8, Math.max(100, W - 30 - skiftB - (skiftB ? 16 : 0)), linjeH + 8);
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("soejler", W * 0.12, lay.bordY - lay.sh - 30, W * 0.76, lay.sh + 60);
     };
@@ -322,7 +340,6 @@
         if (!lay || !s) return;
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
-        Tg.tegnOverTavle(ctx, lay.ot, 16, lay.otY);
         Tg.tavle(ctx, lay.tavle);
         this.skema.tegn(ctx, this.tid, { hint: this.hjaelp > 0, over: this.over });
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);

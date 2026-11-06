@@ -20,6 +20,7 @@
     T.GUL = "#f2c53d";
     T.GROEN = "#5fcf92";
     T.ROED = "#f0796c";
+    T.BLAA = "#5aa9e6";     /* den gruppe, eleven har valgt (sendes med Indsend svar) */
 
     /* En farve gjort lysere (t > 0) eller moerkere (t < 0) */
     T.lys = function (hex, t) {
@@ -150,7 +151,8 @@
                 ctx.save();
                 ctx.strokeStyle = opt.ring[i];
                 ctx.lineWidth = 3;
-                ctx.fillStyle = opt.ring[i] === T.ROED ? "rgba(240,121,108,0.16)" : (opt.ring[i] === T.GROEN ? "rgba(95,207,146,0.16)" : "rgba(242,197,61,0.16)");
+                ctx.fillStyle = opt.ring[i] === T.ROED ? "rgba(240,121,108,0.16)" : (opt.ring[i] === T.GROEN ? "rgba(95,207,146,0.16)" :
+                    (opt.ring[i] === T.BLAA ? "rgba(90,169,230,0.2)" : "rgba(242,197,61,0.16)"));
                 NK.rundtRekt(ctx, boks.x, boks.y, boks.b, boks.h, fs * 0.3);
                 ctx.fill();
                 ctx.stroke();

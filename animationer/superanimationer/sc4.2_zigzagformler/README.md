@@ -56,8 +56,30 @@ når de to andre faner var 10/10. Nu kan de også navngives, og intet er låst.)
 C₅H₁₂, C₆H₁₄ og C₇H₁₆. Samme navn er samme stof, bare tegnet anderledes: dets
 plads i listen ryster. Alle formler kan vælges (i den gamle var de låst).
 
-Fane 1-3 har én knap i opgavekortet: Giv hint → Vis svaret → Næste molekyle.
-Tegningen tjekkes af sig selv, når alle C-atomer er brugt.
+### Papirkortet (6. nov. 2026)
+
+Alle fire faner har opgaver, så alle fire har ét lyst papirkort øverst midt i
+scenen (`.scenekort`, `../faelles/papirkort.css` og `papirkort.js`). Kortet
+har opgaveteksten med "Molekyle 3 af 10" (Isomerer: "Fundet 2 af 5") som
+indlejret overskrift, en nederste række med det næste skridt, hint eller
+forklaringen til et forkert svar, en stille hintknap med gul kant (Giv et hint
+→ Vis svaret, på Isomerer Vis en isomer) og **Indsend svar** som hovedknap.
+Indsend svar er grå, til der er noget at sende: alle C-atomer tegnet, H-atomer
+sat, et svar i feltet eller molekylet lagt i et lag. Tegningen, H-atomerne og
+laget bedømmes aldrig af sig selv. Felterne til formlen og navnet står stadig
+i panelet, og Enter i feltet er Indsend svar. Efter et rigtigt svar (eller et
+vist svar, i gult) bliver kortet på opgaven med forklaringen under teksten og
+den grønne knap (Næste molekyle, Ny serie, Tegn den næste, Videre til C₆H₁₄,
+Ny bunke) dér, hvor Indsend svar stod. På Opløselighed bliver kortet også på et
+forkert svar (rødt), fordi et liv er brugt. Start forfra (Nye molekyler, Nyt
+spil) ligger kun i panelet. Statuslinjen nederst i scenen er væk; dens tekster
+(`D.STATUS`) står i kortets nederste række. Tavlen begynder under
+`kortZone()` (`js/opgavefane.js`), tilbuddet om præsentationen står nederst, og
+et klik på tavlen, mens kortet er løst, får kortet til at blinke. Panelet
+beholder tællerne, regnestykket, serien/bunken og forfra-knappen.
+
+Molekylenavne (6. nov. 2026): animationen har ingen grundstofmolekyler (O₂,
+H₂ osv.); fluor, chlor, brom og iod står kun som navneled i tjekket af navne.
 
 **Kemichael** tilbyder at præsentere hver fane (Start præsentation / Nej tak,
 <kbd>K</kbd> igen). Præsentationen er den fælles fra 4. nov. 2026
@@ -129,7 +151,7 @@ kommer med i billedet: kaffekoppen, gloøjne, festhatten, Bunsen (kaktussen),
 overskægget, stemplet "Godkendt af Michael", chipsposen, navneskiltet med "KE",
 øjenbrynet fra 1994 og til sidst Kemichael selv (C₇H₁₆). En serie tæller, når
 højst tre svar er vist; et isomer-niveau, når højst halvdelen er vist. Ellers
-åbner skuffen sig ikke, og opgavekortets besked slutter med kravet
+åbner skuffen sig ikke, og forklaringen på papirkortet slutter med kravet
 (`D.KLISTER_KRAV`): "Serien er klaret, men klistermærket kræver, at du højst
 har set tre af svarene." eller "Isomererne af C₅H₁₂ er fundet, men
 klistermærket kræver, at du højst har set halvdelen af svarene." Kemichael kommer kun, når fanens sidste klistermærke er
@@ -162,7 +184,7 @@ index.html            markup: fire faner, panelerne, teorien, rundvisningen
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js           NK-navnerum, tekst, tal, laerred (samme som sc5.2)
 js/opgaver.js         sværhedstrinnene (de gamle 6.2 og 6.4) og isomerlisterne
-js/data.js            Kemichaels replikker, rosen, linjerne under scenen
+js/data.js            Kemichaels replikker, rosen, det næste skridt på papirkortet
 js/tjek.js            tjek af formel, navn og tegning med beskeder til fejlene
 js/opgavefane.js      det, fanerne har til fælles (mus, besked, tegning, konfetti,
                       vinduet med et nyt klistermærke)
@@ -184,7 +206,7 @@ _selvtest.html        udviklerværktøj, se nedenfor
 * **Sværhedsgraden** står i trinnene i `js/opgaver.js` (`ZIGZAG`, `ATOMER`,
   `ALKANER`, `ALKENER`): kædelængde, antal og størrelse af sidegrupper, og om
   dobbeltbindingen sidder for enden eller har cis/trans.
-* **Replikker og linjen under scenen** står i `js/data.js`.
+* **Replikker og det næste skridt på papirkortet** står i `js/data.js`.
 * **Beskederne ved fejl** står i `js/tjek.js`.
 * **Navngivningen og tegningens udseende** står i motoren
   (`../../molekylemotor/js/navngivning.js` og `struktur.js`) og gælder også
@@ -225,8 +247,11 @@ gennemføres, klistermærkerne (også at vinduet åbner tegnebrættet med det ny
 klistermærke), opløselighedsspillet (reglen giver de 17 svar fra den gamle 6.5,
 bunken er blandet rigtigt, point, liv, grænsetilfælde, træk og klik),
 Kemichaels præsentation på alle fire faner (den fælles test i
-`../kemichael/praesentation.js`), sproget og layoutet fra 520 × 380 til
-1500 × 900. Slutlinjen skal være ALT OK (4. november 2026: 174 påstande).
+`../kemichael/praesentation.js`), sproget, layoutet fra 520 × 380 til
+1500 × 900 og papirkortet (i scenen, ingen statuslinje, Indsend svar grå uden
+svar, intet bedømmes af sig selv, kortet bliver på opgaven, Start forfra ikke
+på kortet, blink, og kortets højde i kortZone ved 1400 × 860, 1400 × 640 og
+1024 × 640). Slutlinjen skal være ALT OK (6. november 2026: 194 påstande).
 Tegnebrættet og resten af motoren testes i `../tegnebraet/_selvtest.html`.
 
 ## I menuen

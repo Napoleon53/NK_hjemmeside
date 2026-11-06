@@ -38,11 +38,11 @@
         this.plastknap = NK.el("r-plast");
         this.valg = { v: NK.el("r-valg-v"), h: NK.el("r-valg-h") };
         this.tidknap.addEventListener("click", function () { mig.tidKlik(); mig.fokus(); });
-        this.plastknap.addEventListener("click", function () { mig.saetRoer(mig.a, mig.b, !mig.plast); });
+        this.plastknap.addEventListener("click", function () { if (!mig.spaer()) mig.saetRoer(mig.a, mig.b, !mig.plast); });
         ["v", "h"].forEach(function (side) {
             mig.valg[side].addEventListener("click", function (e) {
                 var k = e.target.closest ? e.target.closest("[data-metal]") : null;
-                if (!k) return;
+                if (!k || mig.spaer()) return;
                 var m = k.getAttribute("data-metal");
                 mig.saetRoer(side === "v" ? m : mig.a, side === "h" ? m : mig.b, mig.plast);
             });
@@ -84,7 +84,7 @@
         this.nyeRoer();
         this.nulstilHjaelp();
         if (this.lay) this.layout();
-        if (!this.faerdig && this.opg) this.naesteLinje("", "");
+        if (this.opg && !this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
     P.nulstilScene = function () { this.nyeRoer(); };
@@ -116,7 +116,7 @@
         var tekst = this.koerer ? "Tiden går …" : (this.slut ? "Nye rør ↺" : "Lad tiden gå ▶");
         if (this.tidknap.textContent !== tekst) this.tidknap.textContent = tekst;
         this.tidknap.disabled = this.koerer;
-        this.tidknap.classList.toggle("banker", !this.koerer && !this.slut && !this.faerdig && this.opg && this.klarTilTid());
+        this.tidknap.classList.toggle("banker", !this.koerer && !this.slut && !this.faerdig && !this.venter && !!this.opg && this.klarTilTid());
     };
 
     /* Staar roerene, som maalet beder om? (saa banker knappen) */
@@ -128,11 +128,11 @@
     };
 
     P.tidKlik = function () {
-        if (this.koerer) return;
-        if (this.slut) { this.nyeRoer(); if (!this.faerdig) this.naesteLinje("", ""); return; }
+        if (this.koerer || this.spaer()) return;
+        if (this.slut) { this.nyeRoer(); if (!this.faerdig && !this.venter) this.naesteLinje("", ""); return; }
         this.koerer = true;
         this.nulstilHjaelp();
-        if (!this.faerdig) this.naesteLinje("", "");
+        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
         this.visTid();
     };
 
@@ -249,17 +249,31 @@
         NK.el("r-proevetkort").hidden = false;
     };
 
-    /* De 20 aar er gaaet, eller der er gaaet hul */
+    /* De 20 aar er gaaet, eller der er gaaet hul. Skal eleven finde to roer
+       (forsoeg.indsend), sender eleven dem selv ind med Indsend svar: tiden
+       loeser ikke opgaven. Ellers er forsoeget klaret, naar roerene var de
+       rigtige, og linjen siger, hvad der var galt, naar de ikke var. */
     P.forsoegSlut = function () {
         this.koerer = false;
         this.slut = true;
         this.gemProevet();
         this.visTid();
-        var g = this.opg;
-        if (this.faerdig || g.fase !== "forsoeg") return;
-        var krav = g.o.forsoeg.krav;
-        if (this.opfylder(krav)) this.forsoegKlaret(g.o.forsoeg.set || "");
-        else this.fejlLinje(D.roerForkert(krav, this.par));
+        if (!this.iForsoeg()) return;
+        var f = this.opg.o.forsoeg;
+        if (f.indsend) { this.naesteLinje("", ""); return; }
+        if (this.opfylder(f.krav)) this.forsoegKlaret(f.set || "");
+        else this.fejlLinje(D.roerForkert(f.krav, this.par));
+    };
+
+    /* Indsend svar sender de to roer ind, naar de 20 aar er gaaet med dem */
+    P.kanIndsende = function () { return this.slut && !this.koerer; };
+
+    P.ikkeKlarTekst = function () { return D.ROER_IKKE_KLAR; };
+
+    P.indsend = function () {
+        var f = this.opg.o.forsoeg;
+        if (this.opfylder(f.krav)) this.forsoegKlaret(f.set || "");
+        else this.fejlLinje(D.roerForkert(f.krav, this.par));
     };
 
     P.forsoegSvar = function (o) {
@@ -274,39 +288,48 @@
     };
 
     P.sceneLinje = function () {
-        var krav = this.opg.o.forsoeg.krav;
+        var f = this.opg.o.forsoeg, krav = f.krav;
         if (this.koerer) return "Tiden går. Se på rørene ved samlingen og i luppen.";
+        if (this.slut && f.indsend) return "Send de to rør ind med Indsend svar, eller prøv to andre.";
         if (this.slut) return "Tryk på Nye rør, og prøv igen.";
-        if (this.opfylder(krav)) return "Tryk på Lad tiden gå øverst i scenen.";
+        if (this.opfylder(krav)) return "Tryk på Lad tiden gå.";
         if (krav.ens) return "Vælg metal med knapperne under rørene, og tryk på Lad tiden gå.";
         if (!this.rigtigeRoer(krav)) return this.vaelgLinje(krav);
-        return krav.plast ? "Slå Plastmuffe til med kontakten øverst i scenen." : "Slå Plastmuffe fra med kontakten øverst i scenen.";
+        return krav.plast ? "Slå Plastmuffe til med kontakten under Lad tiden gå." : "Slå Plastmuffe fra med kontakten under Lad tiden gå.";
     };
 
     P.spmLinje = function () {
         var krav = this.opg.o.spm.krav;
-        if (this.koerer) return "Se i luppen, og vælg et svar i opgavekortet til højre.";
+        if (this.koerer) return "Se i luppen, og vælg et svar på kortet.";
         if (krav && !this.opfylder(krav)) return this.vaelgLinje(krav).replace(/\.$/, "") + ", og lad tiden gå.";
-        if (this.t === 0) return "Tryk på Lad tiden gå, og se i luppen. Vælg så et svar i opgavekortet til højre.";
+        if (this.t === 0) return "Tryk på Lad tiden gå, og se i luppen. Vælg så et svar på kortet.";
         return "";
     };
 
-    P.enter = function () { if (!this.koerer) this.tidKlik(); };
+    /* Enter: Indsend svar eller Naeste paa kortet, ellers Lad tiden gaa */
+    P.enter = function () {
+        if (this.enterKort()) return;
+        if (!this.koerer) this.tidKlik();
+    };
 
     /* ----- Scenen -------------------------------------------------------------------- */
+    /* Kortet staar oeverst (top() i js/fane.js). Luppen begynder under det, og
+       tiden og plastmuffen staar i en soejle til venstre for luppen. */
     P.layout = function () {
-        var W = this.L.b, baand = this.baand(), Hs = baand.y;
-        var lay = { W: W, H: this.L.h, Hs: Hs };
+        var W = this.L.b, Hs = this.L.h;
+        var lay = { W: W, H: this.L.h, Hs: Hs, zone: this.kortZone() };
         lay.gulv = Hs - 12;
         lay.Ro = NK.klamp(Hs * 0.075, 28, 40);
         lay.vaeg = Math.round(lay.Ro * 0.42);
-        lay.roerY = Hs - lay.Ro - NK.klamp(Hs * 0.2, 98, 124);
+        lay.roerY = Hs - lay.Ro - NK.klamp(Hs * 0.16, 90, 118);
         lay.xJ = W / 2;
         lay.muffe = this.plast ? 15 : 0;
-        var top = 92;
-        var lh = NK.klamp(lay.roerY - lay.Ro - 30 - top, 140, 340);
+        var top = 10 + lay.zone + 10;
+        lay.top = top;
+        /* Luppens titel staar 9 px over den */
+        var lh = NK.klamp(lay.roerY - lay.Ro - 24 - top - 16, 140, 340);
         var lb = Math.min(NK.klamp(W * 0.62, 320, 680), KOL * lh / 8.2);
-        lay.lup = { x: lay.xJ - lb / 2, y: top, b: lb, h: lh };
+        lay.lup = { x: lay.xJ - lb / 2, y: top + 16, b: lb, h: lh };
         lay.over = lh / (lb / KOL) - RAEK;
         lay.fra = { x: lay.xJ - 34, y: lay.roerY + lay.Ro - lay.vaeg - 6, b: 68, h: lay.vaeg + 12 };
         this.lay = lay;
@@ -318,6 +341,8 @@
             e.style.left = Math.round(side === "v" ? W * 0.25 : W * 0.75) + "px";
             e.style.top = Math.round(lay.roerY + lay.Ro + 30) + "px";
         });
+        var vk = NK.el("r-vaerktoej");
+        vk.style.top = Math.round(top + 16) + "px";
         this.saetAnker("lup", lay.lup.x, lay.lup.y, lay.lup.b, lay.lup.h);
         this.saetAnker("roer", 8, lay.roerY - lay.Ro - 14, W - 16, 2 * lay.Ro + 28);
     };

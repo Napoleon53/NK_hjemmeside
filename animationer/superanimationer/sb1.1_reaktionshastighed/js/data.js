@@ -32,24 +32,24 @@
               felt: ["glas", "graf"] },
             { tekst: "Knappen Afspil sætter reaktionen i gang, og du kan også trække i grafen for at gå frem og tilbage i tiden. Værktøjet Aflæs viser koncentrationerne, og Sekant viser gennemsnitshastigheden mellem to tidspunkter. Med Tangent lægger du en lineal gennem et punkt på kurven og drejer linealen i enderne, til den er en tangent.",
               sel: ["#kurve-reaktion", "#kurve-vaerktoej"] },
-            { tekst: "Opgavekortet stiller spørgsmål om kurverne, og en opgave begynder, når du trykker på knappen Start opgave. Under opgaven giver den samme knap først et hint og derefter svaret.",
-              sel: "#kurve-opgavekort" }
+            { tekst: "Kortet øverst i scenen stiller spørgsmål om kurverne, og en opgave begynder, når du trykker på knappen Start opgave. Du vælger et svar og trykker på Indsend svar. Knappen Giv et hint giver først et hint og derefter svaret.",
+              sel: "#kurve-skort" }
         ],
         sammenstoed: [
-            { tekst: "I denne fane ser du partiklerne bag reaktionshastigheden. Partiklerne A og B bevæger sig rundt i kassen, og nogle af deres sammenstød danner produktet C. Grafen til højre tæller, hvor mange C der er dannet.",
+            { tekst: "I denne fane ser du partiklerne bag reaktionshastigheden. Nogle sammenstød mellem A og B i kassen danner produktet C, og grafen tæller C.",
               felt: ["kasse", "graf"] },
             { tekst: "I kortet Opstilling vælger du antallet af A og B. Du kan også skifte til metal i syre, hvor magnesium ligger som en klump, i stykker eller som pulver. Kortet Måling viser antallet af sammenstød pr. sekund, og det forrige forsøg bliver stående stiplet på grafen.",
               sel: ["#sam-opstilling", "#sam-maaling"] },
-            { tekst: "Opgaverne beder dig forudsige, hvad der sker, når opstillingen ændres, og bagefter kan du prøve forudsigelsen i kassen. En opgave begynder, når du trykker på knappen Start opgave, og den samme knap giver derefter først et hint og så svaret.",
-              sel: "#sam-opgavekort" }
+            { tekst: "Opgaverne på kortet øverst i scenen beder dig forudsige, hvad der sker, når opstillingen ændres. Bagefter kan du prøve forudsigelsen i kassen. En opgave begynder, når du trykker på knappen Start opgave, og du sender dit svar med Indsend svar.",
+              sel: "#sam-skort" }
         ],
         udtryk: [
-            { tekst: "I denne fane finder du hastighedsudtrykket for en reaktion ud fra dine egne forsøg og ikke ud fra reaktionsskemaet. Opgavekortet viser reaktionen, og der er otte reaktioner i alt.",
-              sel: "#udtryk-opgavekort" },
-            { tekst: "I kortet Nyt forsøg vælger du startkoncentrationerne og trykker på Mål starthastigheden. Hvert forsøg giver en kurve på grafen med tangenten i t = 0 og en række i tabellen med starthastigheden v₀.",
+            { tekst: "I denne fane finder du hastighedsudtrykket for en reaktion ud fra dine egne forsøg og ikke ud fra reaktionsskemaet. Kortet øverst i scenen viser reaktionen, og der er otte reaktioner i alt.",
+              sel: "#udtryk-skort" },
+            { tekst: "I kortet Nyt forsøg vælger du startkoncentrationerne og trykker på Mål starthastigheden. Hvert forsøg giver en kurve og en række i tabellen.",
               sel: ["#udtryk-forsoeg", "#udtryk-tabel"], felt: "graf" },
-            { tekst: "Under tabellen klikker du eksponenterne frem i hastighedsudtrykket og trykker på Tjek. Knappen Giv hint på opgavekortet giver et hint, der bygger på dine egne forsøg.",
-              sel: ["#udtryk-udtryk", "#udtryk-opgaveknap"] }
+            { tekst: "Under tabellen klikker du eksponenterne frem i hastighedsudtrykket og trykker på Indsend svar på kortet. Knappen Giv et hint på kortet giver et hint, der bygger på dine egne forsøg.",
+              sel: "#udtryk-udtryk" }
         ]
     };
 

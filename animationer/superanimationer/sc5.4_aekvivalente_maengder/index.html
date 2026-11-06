@@ -6,8 +6,9 @@
 <title>Ækvivalente mængder</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⟶</span> Ækvivalente mængder</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: POELSEVOGNEN                                               -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-hotdog" role="tabpanel" aria-label="Pølsevognen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="hotdog-laerred"></canvas>
         <div class="anker" id="hotdog-anker-skilt"></div>
         <div class="anker" id="hotdog-anker-bon"></div>
@@ -40,18 +41,24 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="hotdog-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="hotdog-skort">
+            <div id="hotdog-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="hotdog-bund">
+                <p class="st-tekst" id="hotdog-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="hotdog-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="hotdog-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="hotdog-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
-        <div class="kort opgavekort" id="hotdog-kort">
-            <h2><span id="hotdog-titel">Ordre</span><span class="taeller" id="hotdog-taeller">ordre <b id="hotdog-nr">1</b>/<span id="hotdog-antal">10</span></span></h2>
-            <p class="maal-tekst" id="hotdog-prompt"></p>
+
+        <div class="kort" id="hotdog-svar">
+            <h2>Dine svar <span class="taeller" id="hotdog-taeller">ordre <b id="hotdog-nr">1</b>/<span id="hotdog-antal">10</span></span></h2>
             <div class="vaelgerrad" id="hotdog-opskrifter" role="group" aria-label="Opskrift" hidden></div>
             <div class="raekker" id="hotdog-raekker"></div>
-            <p class="besked" id="hotdog-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="hotdog-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort maaling" id="hotdog-disken">
@@ -77,7 +84,7 @@
 <!-- FANE 2: MOLEKYLERNE                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-molekyler" role="tabpanel" aria-label="Molekylerne">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="molekyler-laerred"></canvas>
         <div class="anker" id="molekyler-anker-skilt"></div>
         <div class="anker" id="molekyler-anker-plakat"></div>
@@ -87,16 +94,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="molekyler-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="molekyler-skort">
+            <div id="molekyler-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="molekyler-bund">
+                <p class="st-tekst" id="molekyler-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="molekyler-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="molekyler-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="molekyler-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="molekyler-kort">
-            <h2><span id="molekyler-titel">Mål</span><span class="taeller" id="molekyler-taeller">mål <b id="molekyler-nr">1</b>/5</span></h2>
-            <p class="maal-tekst" id="molekyler-prompt"></p>
-            <p class="besked" id="molekyler-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="molekyler-knap" type="button">Giv hint</button></div>
-        </div>
 
         <div class="kort maaling" id="molekyler-maaling">
             <h2>I kammeret <span class="taeller" id="molekyler-enhedstekst">antal molekyler</span></h2>
@@ -111,6 +121,7 @@
                 <button class="vaelger" type="button" data-enhed="stk">1 figur = 1 molekyle</button>
                 <button class="vaelger" type="button" data-enhed="mol">1 figur = 1 mol</button>
             </div>
+            <button class="knap igen" id="molekyler-forfra" type="button">Start målene forfra</button>
         </div>
     </aside>
 </section>
@@ -120,7 +131,7 @@
 <!-- Felterne under formlerne bygges af sim_regn.js                     -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-regn" role="tabpanel" aria-label="Tavlen">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="regn-laerred"></canvas>
         <div class="anker" id="regn-anker-skema"></div>
         <div class="anker" id="regn-anker-soejler"></div>
@@ -129,18 +140,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="regn-status"></div>
+        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort opgave" id="regn-skort">
+            <div id="regn-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="regn-bund">
+                <p class="st-tekst" id="regn-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="regn-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="regn-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="regn-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="regn-kort">
-            <h2><span id="regn-niveau"></span><span class="taeller">opgave <b id="regn-nr">1</b>/<span id="regn-antal">4</span></span></h2>
-            <div class="opgave-prompt" id="regn-prompt"></div>
-            <p class="opgave-spm" id="regn-spm"></p>
-            <p class="besked" id="regn-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="regn-knap" type="button">Giv hint</button></div>
-        </div>
 
         <div class="kort maaling" id="regn-beregninger">
             <h2>Beregningerne</h2>
@@ -150,6 +162,7 @@
         <div class="kort" id="regn-fremskridt">
             <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/12</span></h2>
             <div class="hyldeliste" id="regn-niveauer"></div>
+            <button class="knap igen" id="regn-igen" type="button" hidden>Regn opgaven igen</button>
             <button class="knap nulstil" id="regn-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
@@ -214,6 +227,8 @@
 <script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
 <script src="../kemichael/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/sim_hotdog.js"></script>
 <script src="js/sim_molekyler.js"></script>
 <script src="js/sim_regn.js"></script>

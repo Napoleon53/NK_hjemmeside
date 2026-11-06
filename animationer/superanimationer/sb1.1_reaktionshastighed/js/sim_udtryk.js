@@ -6,8 +6,12 @@
    Hvert forsoeg giver en kurve for produktet med den stiplede tangent
    i t = 0: dens hældning er starthastigheden, som i fane 1.
 
-   Kortet har den ene knap (Giv hint -> Vis svaret -> Ny opgave). Hintet
-   bygges ud fra elevens egne forsoeg: har man to forsoeg, hvor kun ét
+   Papirkortet oeverst i scenen (6. nov. 2026) har reaktionen, opgaven,
+   hintet, beskeden og knapperne Giv et hint (-> Vis svaret) og Indsend
+   svar (graa, til alle eksponenter er valgt). Eksponenterne klikkes frem
+   i udtrykket under tabellen. Efter et rigtigt svar bliver kortet paa
+   opgaven med forklaringen og Naeste reaktion, hvor Indsend svar stod.
+   Hintet bygges ud fra elevens egne forsoeg: har man to forsoeg, hvor kun ét
    stof er aendret, peges der paa dem, ellers bedes man lave dem.
    Tallene kommer fra NK.Model.udtryk og reaktionerne fra D.REAKTIONER.
    ===================================================================== */
@@ -49,13 +53,13 @@
         this.T = M.tidsakse(R, grund);
         this.forsoeg = [];
         this.naesteNr = 1;
-        this.trin = "hint";
+        this.hjaelp = 0;
+        this.slut = null;
+        this.fast = { html: "", klasse: "" };
         this.vist = false;
         this.loest = false;
         this.bygVaelgere();
         this.bygUdtryk();
-        this.besked("", "");
-        this.saetHint("");
         this.visPanel();
     };
 
@@ -117,11 +121,10 @@
         if (!forkerte.length) {
             this.loest = true;
             this.antalLoest++;
-            this.trin = "ny";
             var nul = R.reaktanter.filter(function (r) { return R.orden[r.id] === 0; });
-            var tekst = "Rigtigt: " + D.udtrykTekst(R, R.orden) + ".";
-            if (nul.length) tekst += " [" + nul[0].formel + "] er ikke med: den påvirker ikke hastigheden.";
-            this.besked(tekst, "god");
+            var tekst = D.udtrykTekst(R, R.orden) + ".";
+            if (nul.length) tekst += " [" + nul[0].formel + "] er ikke med, fordi [" + nul[0].formel + "] ikke påvirker hastigheden.";
+            this.slut = { tekst: tekst, maade: "rigtig" };
             this.visPanel();
             return { rigtig: true };
         }
@@ -143,16 +146,37 @@
         return { rigtig: false, grund: "forkert", id: r.id };
     };
 
-    /* ----- Den ene knap ------------------------------------------------------ */
-    P.tryk = function () {
-        if (this.trin === "ny") { this.nyOpgave(this.nr + 1); return; }
-        if (this.trin === "hint") {
-            this.saetHint("Hint: " + this.hint());
-            this.trin = "svar";
-        } else if (this.trin === "svar") {
-            this.visSvar();
+    /* ----- Knapperne paa kortet ------------------------------------------------ */
+    P.kanSendes = function () {
+        var mig = this;
+        if (this.loest || this.vist) return false;
+        return this.R.reaktanter.every(function (r) { return mig.eksp[r.id] !== null; });
+    };
+
+    P.indsendKlik = function () {
+        if (this.loest || this.vist) return;
+        if (!this.kanSendes()) { this.blink(); return; }
+        this.tjek();
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.loest || this.vist) return;
+        if (this.hjaelp === 0) {
+            this.hjaelp = 1;
+            this.fast = { html: '<span class="b-maerke">Hint</span>' + NK.html(this.hint()), klasse: "hint", ny: true };
+            this.visPanel();
+            return;
         }
-        this.visPanel();
+        this.visSvar();
+    };
+
+    P.naeste = function () { this.nyOpgave(this.nr + 1); };
+
+    P.blink = function () {
+        var e = NK.el("udtryk-skort");
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
     };
 
     P.hint = function () {
@@ -171,22 +195,25 @@
     P.visSvar = function () {
         var R = this.R;
         this.vist = true;
-        this.trin = "ny";
         R.reaktanter.forEach(function (r) { this.eksp[r.id] = R.orden[r.id]; }, this);
         var dele = R.reaktanter.map(function (r) {
             return "[" + r.formel + "] × 2 giver v₀ × " + Math.pow(2, R.orden[r.id]);
         });
-        this.besked("Svaret er " + D.udtrykTekst(R, R.orden) + ". " + dele.join(". ") + ".", "gul");
+        this.slut = { tekst: D.udtrykTekst(R, R.orden) + ". " + dele.join(". ") + ".", maade: "svar" };
         this.bygUdtryk();
     };
 
     /* ----- Panelet og arbejdsbordet -------------------------------------------- */
     P.bind = function () {
         var mig = this;
-        NK.el("udtryk-opgaveknap").addEventListener("click", function () { mig.tryk(); });
+        NK.el("udtryk-hjaelp").addEventListener("click", function () { mig.hjaelpKlik(); });
+        NK.el("udtryk-indsend").addEventListener("click", function () { mig.indsendKlik(); });
+        NK.el("udtryk-skort").addEventListener("click", function (e) {
+            var k = e.target.closest ? e.target.closest("[data-videre]") : null;
+            if (k) mig.naeste();
+        });
         NK.el("udtryk-maal").addEventListener("click", function () { mig.maal(); });
         NK.el("udtryk-ryd").addEventListener("click", function () { mig.nulstil(); });
-        NK.el("udtryk-tjek").addEventListener("click", function () { mig.tjek(); });
         var cv = this.L.canvas;
         cv.addEventListener("pointerdown", function (e) {
             var p = mig.L.punkt(e);
@@ -260,22 +287,48 @@
         this.visPanel();
     };
 
+    /* Beskeden i kortets nederste raekke: skidt (forkert svar) eller gul */
     P.besked = function (tekst, art) {
-        NK.saetTekst("udtryk-besked", tekst);
-        NK.saetKlasse("udtryk-besked", "besked" + (art ? " " + art : ""));
+        if (!tekst) { if (this.fast.klasse !== "hint") this.fast = { html: "", klasse: "" }; return; }
+        var maerke = art === "skidt" ? "Ikke endnu" : "Bemærk";
+        this.fast = { html: '<span class="b-maerke">' + maerke + "</span>" + NK.html(tekst), klasse: art, ny: true };
+        this.visKort();
     };
 
-    P.saetHint = function (tekst) {
-        NK.saetTekst("udtryk-hint", tekst);
+    /* Papirkortet: reaktionen og opgaven, efter et rigtigt svar forklaringen og Naeste reaktion */
+    P.visKort = function () {
+        var R = this.R, e = NK.el("udtryk-skort"), bliv = !!this.slut;
+        var kl = "scenekort " + (bliv ? "loest bliv" + (this.slut.maade === "svar" ? " svar" : "") : "opgave");
+        if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        /* Tallet foran et stof maa ikke staa alene for enden af en linje */
+        var html = '<p class="sk-tekst"><span class="sk-chip">Reaktion ' + (this.nr + 1) + " af " + D.REAKTIONER.length + "</span>" +
+            NK.Papir.tekst(NK.html("Find hastighedsudtrykket for reaktionen. Vælg eksponenterne under tabellen.")) + "</p>" +
+            '<p class="sk-ligning">' + NK.html(R.ligning.replace(/(\d) /g, "$1\u00a0")) + "</p>";
+        if (bliv) {
+            var svar = this.slut.maade === "svar";
+            html += NK.Papir.bliv(NK.html(this.slut.tekst), svar ? "Svaret" : "Rigtigt", "Næste reaktion", svar);
+        }
+        NK.saetHTML("udtryk-ind", html);
+        var f = this.fast, st = NK.el("udtryk-status"), b = NK.el("udtryk-besked");
+        st.hidden = bliv;
+        b.innerHTML = f.html;
+        b.hidden = !f.html;
+        st.className = "sk-bund" + (f.klasse ? " " + f.klasse : "") + (f.html ? "" : " tom") + (f.ny ? " ryster" : "");
+        f.ny = false;
+        var hj = NK.el("udtryk-hjaelp");
+        hj.textContent = this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
+        hj.className = "knap hjaelp" + (this.hjaelp === 0 ? "" : " svar") + (f.klasse === "skidt" ? " peg" : "");
+        var kan = this.kanSendes(), ind = NK.el("udtryk-indsend");
+        ind.classList.toggle("klar", kan);
+        ind.classList.toggle("ikke-klar", !kan);
+        ind.setAttribute("aria-disabled", kan ? "false" : "true");
     };
 
     P.visPanel = function () {
         var mig = this, R = this.R;
-        /* Tallet foran et stof maa ikke staa alene for enden af en linje */
-        NK.saetTekst("udtryk-ligning", R.ligning.replace(/(\d) /g, "$1 "));
         NK.saetTekst("udtryk-loest", String(this.antalLoest));
         NK.saetTekst("udtryk-nr", (this.nr + 1) + "/" + D.REAKTIONER.length);
-        NK.saetKnaptrin("udtryk-opgaveknap", this.trin);
+        this.visKort();
 
         Array.prototype.forEach.call(document.querySelectorAll("#udtryk-vaelgere button"), function (k) {
             var id = k.getAttribute("data-id");
@@ -287,7 +340,6 @@
             k.classList.toggle("tom", n === null);
             k.disabled = mig.loest || mig.vist;
         });
-        NK.el("udtryk-tjek").disabled = this.loest || this.vist;
 
         /* Tabellen over forsoegene */
         var h = "<thead><tr><th>Nr.</th>";

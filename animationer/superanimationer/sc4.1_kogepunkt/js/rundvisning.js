@@ -20,9 +20,9 @@
             { sel: "#varm-anker-hylde", titel: "Hylden", tekst: "Elleve alkaner ved stuetemperatur. Gasserne har fyldt deres ballon. Træk et glas ned i kammeret, eller klik på det." },
             { sel: "#varm-anker-kammer", titel: "Kammeret", tekst: "Glasset i kammeret har den temperatur, termometeret viser. Når stoffet koger, fylder gassen ballonen." },
             { sel: "#varm-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme op eller køle ned. Piletasterne flytter én grad, med Skift ti." },
-            { sel: "#varm-anker-zoom", titel: "Molekylerne", tekst: "Hver kugle er et C-atom med dets H-atomer. Grå er fast stof, orange væske og blå gas. Gule prikker: her rører molekylerne hinanden." },
+            { sel: "#varm-anker-zoom", titel: "Molekylerne", tekst: "Hver kugle er et C-atom med dets H-atomer. Grå er fast stof, orange væske og blå gas. De gule prikker viser, hvor molekylerne rører hinanden." },
             { sel: "#varm-kurve-kort", titel: "Kurven", tekst: "Hvert kogepunkt, du finder, kommer på kurven. Den grønne linje er stuetemperatur." },
-            { sel: "#varm-kort", titel: "Målene", tekst: "Fire små mål. Knappen giver et hint og derefter svaret." },
+            { sel: "#varm-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen giver fire små mål. Indsend svar sender, og den gule knap giver et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Kogepunkt, London-kræfter, kædelængde og form kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Formen: tre stoffer med samme formel. Hvem koger først: gæt i blandinger." }
         ],
@@ -30,15 +30,14 @@
             { sel: "#form-anker-bad", titel: "Vandbadet", tekst: "Tre glas med C₅H₁₂ i samme vand. Hvert har sin ballon." },
             { sel: "#form-anker-zoom", titel: "Molekylerne", tekst: "Et vindue ind i hvert glas. Samme atomer, forskellig form." },
             { sel: "#form-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme vandbadet op." },
-            { sel: "#form-kort", titel: "Opgaven", tekst: "Gæt først, hvilken ballon der fyldes først. Så varmer du op, og til sidst: hvorfor?" },
+            { sel: "#form-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen beder dig gætte, hvilken ballon der fyldes først. Derefter varmer du op, og kortet spørger hvorfor." },
             { sel: "#form-tabel-kort", titel: "Kogepunkterne", tekst: "Her kommer stofferne i den rækkefølge, de koger. Knappen under dem viser, hvor molekylerne rører hinanden." }
         ],
         "fane-spil": [
             { sel: "#spil-anker-zoom", titel: "Blandingen", tekst: "To eller tre alkaner i samme glas, hver i sin farve." },
-            { sel: "#spil-valg", titel: "Dit gæt", tekst: "Hvem koger først? Du kan også klikke på et molekyle." },
-            { sel: "#spil-anker-kammer", titel: "Kammeret", tekst: "Når du har gættet, varmer det op til det første stof er kogt væk." },
-            { sel: "#spil-kort", titel: "Knappen", tekst: "Et hint og derefter svaret. Et svar, du har set, giver ikke point." },
-            { sel: "#spil-runde", titel: "Runden", tekst: "Ni blandinger på tre niveauer. Rekorden huskes." }
+            { sel: "#spil-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen spørger, hvilket stof der koger først. Du kan også vælge ved at klikke på et molekyle." },
+            { sel: "#spil-anker-kammer", titel: "Kammeret", tekst: "Når du har indsendt dit svar, varmer kammeret op, til det første stof er kogt væk." },
+                        { sel: "#spil-runde", titel: "Runden", tekst: "Ni blandinger på tre niveauer. Rekorden huskes." }
         ]
     };
 

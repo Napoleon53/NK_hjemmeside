@@ -78,11 +78,13 @@
         this.boble = 0;
         this.produkter = [null, null];
         this.forkerteChips = {};
+        this.chipValg = {};
+        this.svarVist = false;
+        this.skemaNoegle = null;
         this.chips = this.reag ? this.lavChips() : [];
         this.koef = ["", "", "", ""];
         this.lup.saet(null, i);
         this.besked("", "");
-        this.svar("", "");
         this.visKort();
     };
 
@@ -100,7 +102,19 @@
         return NK.bland(liste);
     };
 
-    /* ----- Forudsigelsen ------------------------------------------------------------------ */
+    /* ----- Forudsigelsen ------------------------------------------------------------------
+       Ja og nej paa kortet vaelger kun (vaelg); Indsend svar sender gaettet (gaet). */
+    P.vaelg = function (n) {
+        if (this.fase === "gaet") {
+            if (this.afvisTilbud) this.afvisTilbud();
+            this.valgt = n;
+            if (this.bKl === "peger") this.bH = "";
+            this.visKort();
+            return;
+        }
+        if (this.fase === "produkt") this.vaelgChip(n);
+    };
+
     P.gaet = function (n) {
         if (this.fase !== "gaet") return;
         if (this.afvisTilbud) this.afvisTilbud();
@@ -117,10 +131,14 @@
         this.besvarede++;
         if (this.forste === rigtigSvar) this.rigtige++;
         this.markeret = true;
-        this.svar(NK.html(D.fuSvar(this.par[0], this.par[1], rigtigt)), rigtigt ? "god" : "skidt");
+        /* Kortet bliver paa spoergsmaalet med svaret: Naeste spoergsmaal
+           (stofferne), eller Naeste opgave, naar intet sker */
+        this.svarTekst = NK.html(D.fuSvar(this.par[0], this.par[1], rigtigt && this.forste !== -2));
+        this.svarRigtigt = rigtigt;
         this.hjaelp = 0;
+        this.pegHint = false;
         if (this.reag) {
-            this.fase = "produkt";
+            this.fase = "vurderet";
         } else {
             this.fase = "faerdig";
             this.tilLog("intet sker", rigtigt);
@@ -129,23 +147,47 @@
         this.visKort();
     };
 
-    /* ----- Produkterne -------------------------------------------------------------------- */
+    /* ----- Produkterne --------------------------------------------------------------------
+       Et klik paa et stof vaelger det (eller fravaelger det). Indsend svar
+       sender de valgte: de rigtige saettes i skemaet, de forkerte bliver
+       roede og faar en besked. */
     P.vaelgChip = function (n) {
         if (this.fase !== "produkt") return;
         var c = this.chips[n];
         if (!c || c.placeret || this.forkerteChips[n]) return;
-        if (c.rigtig === undefined) {
-            this.forkerteChips[n] = true;
-            this.besked(NK.html(D.produktForkert(this.r, c.slags)), "skidt");
-            this.visKort();
-            return;
-        }
-        c.placeret = true;
-        this.produkter[c.rigtig] = c.tekst;
-        this.besked("", "");
+        if (this.chipValg[n]) delete this.chipValg[n];
+        else if (this.antalChipValg() + this.antalPlaceret() < 2) this.chipValg[n] = true;
+        else return;
+        if (this.bKl === "peger") this.bH = "";
+        this.visKort();
+    };
+
+    P.antalChipValg = function () { return Object.keys(this.chipValg).length; };
+    P.antalPlaceret = function () { return this.chips.filter(function (c) { return c.placeret; }).length; };
+
+    P.sendChips = function () {
+        var mig = this, forkert = null;
+        Object.keys(this.chipValg).map(Number).forEach(function (n) {
+            var c = mig.chips[n];
+            if (c.rigtig === undefined) {
+                mig.forkerteChips[n] = true;
+                if (!forkert) forkert = c;
+            } else {
+                c.placeret = true;
+                mig.produkter[c.rigtig] = c.tekst;
+            }
+        });
+        this.chipValg = {};
+        if (forkert) {
+            if (this.hjaelp === 0) this.pegHint = true;
+            this.besked(NK.html(D.produktForkert(this.r, forkert.slags)), "skidt");
+        } else this.besked("", "");
         if (this.produkter[0] && this.produkter[1]) {
+            /* Ingen ros under det naeste spoergsmaal: stofferne staar nu i skemaet */
             this.fase = "koef";
             this.hjaelp = 0;
+            this.pegHint = false;
+            this.besked("", "");
         }
         this.visKort();
         if (this.fase === "koef") this.fokus();
@@ -167,13 +209,18 @@
         var t = this.laesKoef();
         var svar = K.tjekKoef(this.r, t);
         if (svar.ok) {
+            /* Kortet bliver paa opgaven: skemaet groent, forklaringen og Naeste opgave */
             this.fase = "faerdig";
-            this.besked(NK.html((this.hjaelp < 2 ? "Rigtigt. " : "") + D.koefBesked(this.r, svar)), "god");
+            this.svarVist = this.hjaelp >= 2;
+            this.svarTekst = NK.html(D.koefBesked(this.r, svar));
+            this.svarRigtigt = true;
+            this.besked("", "");
             this.tilLog(K.skemaTekst(this.r, null, true), this.forste === 0);
             this.tjekRos();
             this.visKort();
             return;
         }
+        if (this.hjaelp === 0) this.pegHint = true;
         this.besked(NK.html(D.koefBesked(this.r, svar)), "skidt");
         var s = this.el.skema.querySelector(".skemalinje");
         if (s) {
@@ -196,12 +243,52 @@
         }
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Naeste opgave ----------------------------------------- */
+    /* ----- Kortets knapper: Giv hint -> Vis svaret, Indsend svar og videre ------------------------
+       knap() er Enter og den gamle ene knap. */
     P.knap = function () {
+        if (this.fase === "faerdig" || this.fase === "vurderet") { this.videre(); return; }
+        this.hjaelpKnap();
+    };
+
+    P.videre = function () {
         if (this.fase === "faerdig") { this.nyOpgave(); return; }
-        if (this.fase === "koerer") return;
+        if (this.fase === "vurderet") {
+            this.fase = "produkt";
+            this.hjaelp = 0;
+            this.besked("", "");
+            this.visKort();
+        }
+    };
+
+    P.kanSende = function () {
+        if (this.fase === "gaet") return this.valgt >= 0;
+        if (this.fase === "produkt") return this.antalChipValg() > 0 && this.antalChipValg() + this.antalPlaceret() === 2;
+        if (this.fase === "koef") {
+            var felter = this.el.skema.querySelectorAll("input");
+            return felter.length === 4 && Array.prototype.every.call(felter, function (f) { return f.value.trim() !== ""; });
+        }
+        return false;
+    };
+
+    P.indsend = function () {
+        if (this.fase === "gaet") {
+            if (this.valgt < 0) { this.besked("Vælg ja eller nej først.", "peger"); return; }
+            this.gaet(this.valgt);
+            return;
+        }
+        if (this.fase === "produkt") {
+            if (this.antalChipValg() + this.antalPlaceret() < 2) { this.besked("Vælg to stoffer, der dannes.", "peger"); return; }
+            this.sendChips();
+            return;
+        }
+        if (this.fase === "koef") this.tjekKoef();
+    };
+
+    P.hjaelpKnap = function () {
+        if (this.fase === "faerdig" || this.fase === "vurderet" || this.fase === "koerer") return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
+            this.pegHint = false;
             var t;
             if (this.fase === "gaet") { t = D.fuHint(this.par[0], this.par[1]); this.markeret = true; }
             else if (this.fase === "produkt") t = D.produktHint(this.r);
@@ -221,12 +308,16 @@
             this.chips.forEach(function (c) {
                 if (c.rigtig !== undefined) { c.placeret = true; mig.produkter[c.rigtig] = c.tekst; }
             });
+            this.chipValg = {};
             this.fase = "koef";
+            this.hjaelp = 0;
             this.besked("", "");
             this.visKort();
+            this.fokus();
             return;
         }
         this.koef = this.r.koef.map(String);
+        this.skemaNoegle = null;   /* felterne bygges om med svaret i */
         this.visKort();
         this.tjekKoef();
     };
@@ -245,100 +336,93 @@
     /* ----- Panelet ---------------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("fu-knap"),
-            besked: NK.el("fu-besked"),
-            svar: NK.el("fu-svar"),
-            kort: NK.el("fu-kort"),
-            valg: NK.el("fu-valg"),
-            skema: NK.el("fu-skema"),
-            chips: NK.el("fu-chips")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { skema: NK.el("fu-skema") };
+        this.kort = new NK.SceneKort("fu", {
+            valg: function (j) { mig.vaelg(parseInt(j, 10)); },
+            hint: function () { mig.hjaelpKnap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
         NK.el("fu-nulstil").addEventListener("click", function () { mig.nulstil(); });
         this.visLog();
     };
 
+    /* Beskeden paa papirkortet (hint, fejl). Uden besked staar det, man ser, dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
-
-    P.svar = function (html, klasse) {
-        this.el.svar.innerHTML = html;
-        this.el.svar.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKnap();
     };
 
     P.visKort = function () {
         var mig = this, fase = this.fase, m = this.par[0], i = this.par[1];
-        NK.saetTekst("fu-titel", "Opgave " + (this.nr + 1));
-        NK.saetTekst("fu-taeller", this.nr < D.OPGAVER.length ? (this.nr + 1) + "/" + D.OPGAVER.length : "ekstra");
-        NK.saetTekst("fu-prompt", D.opgaveTekst(m, i));
-        /* Spoergsmaalet over ja og nej, og det naeste over skemaet */
-        var spm2 = "";
-        if (fase === "produkt") spm2 = D.PRODUKT_SPM;
-        else if (fase === "koef") spm2 = D.KOEF_SPM;
-        NK.saetTekst("fu-spm", D.FU_SPM);
-        NK.saetTekst("fu-spm2", spm2);
-
-        /* Ja og nej */
-        var vaert = this.el.valg;
-        vaert.innerHTML = "";
-        var rad = document.createElement("div");
-        rad.className = "vaelgerrad";
-        D.FU_VALG.forEach(function (tekst, n) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "vaelger";
-            b.textContent = tekst;
-            var rigtig = (mig.reag ? 0 : 1) === n;
-            if (mig.markeret && fase !== "gaet" && fase !== "koerer") {
-                if (rigtig) b.className += " rigtig";
-                else if (n === mig.valgt || n === mig.forste) b.className += " forkert";
-                b.disabled = true;
-            } else if (n === mig.valgt) {
-                b.className += " valgt";
-                b.disabled = true;
-            } else if (fase !== "gaet") b.disabled = true;
-            b.addEventListener("click", function () { mig.gaet(n); });
-            rad.appendChild(b);
-        });
-        vaert.appendChild(rad);
-
-        /* Skemaet, der bygges op */
-        this.bygSkema();
-
-        /* Stofferne at vaelge imellem */
-        var ch = this.el.chips;
-        ch.innerHTML = "";
-        if (fase === "produkt") {
-            this.chips.forEach(function (c, n) {
-                var b = document.createElement("button");
-                b.type = "button";
-                b.className = "chip" + (c.placeret ? " brugt" : "") + (mig.forkerteChips[n] ? " forkert" : "");
-                b.textContent = c.tekst;
-                b.disabled = !!(c.placeret || mig.forkerteChips[n]);
-                b.addEventListener("click", function () { mig.vaelgChip(n); });
-                ch.appendChild(b);
+        if (!this.kort) return;
+        var chip = this.nr < D.OPGAVER.length ? "Opgave " + (this.nr + 1) + " af " + D.OPGAVER.length : "Ekstra opgave";
+        var spm = D.FU_SPM;
+        if (fase === "produkt") spm = D.PRODUKT_SPM;
+        else if (fase === "koef" || (fase === "faerdig" && this.reag)) spm = D.KOEF_SPM;
+        var d = { kl: "spm", chip: chip, tekst: NK.html(D.opgaveTekst(m, i) + " " + spm) };
+        if (fase === "gaet" || fase === "koerer" || fase === "vurderet" || (fase === "faerdig" && !this.reag)) {
+            /* Ja og nej: vaelger kun. Bagefter er svaret groent, et forkert gaet roedt. */
+            var rigtigSvar = this.reag ? 0 : 1, vist = fase === "vurderet" || fase === "faerdig";
+            d.laast = fase !== "gaet";
+            d.svar = D.FU_VALG.map(function (t, n) {
+                return { j: n, t: NK.html(t), valgt: !vist && n === mig.valgt,
+                    rigtig: vist && n === rigtigSvar && mig.forste !== -2, svarVist: vist && n === rigtigSvar && mig.forste === -2,
+                    forkert: vist && n !== rigtigSvar && (n === mig.valgt || n === mig.forste) };
+            });
+        } else if (fase === "produkt") {
+            /* Stofferne at vaelge imellem */
+            d.svar = this.chips.map(function (c, n) {
+                return { j: n, t: NK.html(c.tekst), valgt: !!mig.chipValg[n], rigtig: !!c.placeret, forkert: !!mig.forkerteChips[n] };
             });
         }
-
-        var tekst, klasse = "knap";
-        if (fase === "faerdig") { tekst = "Næste opgave →"; klasse = "knap blaa banker"; }
-        else if (fase === "koerer") tekst = "Stangen går ned …";
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = fase === "koerer";
-        this.el.kort.classList.toggle("sejr", fase === "faerdig");
+        this.kort.vis(d);
+        if (fase === "produkt") {
+            this.chips.forEach(function (c, n) {
+                var b = mig.kort.ind.querySelector('[data-valg="' + n + '"]');
+                if (b) b.disabled = !!(c.placeret || mig.forkerteChips[n]);
+            });
+        }
+        /* Skemaet, der bygges op */
+        this.bygSkema();
+        this.visKnap();
     };
 
-    /* Skemaet i panelet: foerst reaktanterne og to tomme pladser, saa
-       felter til koefficienterne, til sidst det faerdige skema */
+    /* Beskeden, Giv hint og Indsend svar, eller forklaringen og knappen videre */
+    P.visKnap = function () {
+        var k = this.kort, fase = this.fase;
+        if (!k) return;
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
+        if (fase === "vurderet" || fase === "faerdig") {
+            var vist = fase === "faerdig" && this.reag ? this.svarVist : this.forste === -2;
+            k.bliv(this.svarTekst || "", vist && this.reag && fase === "faerdig" ? "Svaret" : null,
+                fase === "vurderet" ? "Næste spørgsmål" : "Næste opgave",
+                vist ? "svar" : (this.svarRigtigt ? "god" : "nej"));
+            return;
+        }
+        k.bliv(null);
+        k.knapper({ hint: fase === "koerer" ? null : (this.hjaelp === 0 ? "Giv hint" : "Vis svaret"), peg: this.pegHint,
+            indsend: true, klar: this.kanSende() });
+    };
+
+    /* Skemaet paa kortet: foerst reaktanterne og to tomme pladser, saa
+       felter til koefficienterne, til sidst det faerdige skema. Det bygges
+       kun om, naar noget i det skifter, saa felterne beholder fokus. */
     P.bygSkema = function () {
         var vaert = this.el.skema, fase = this.fase, r = this.r, mig = this;
+        var noegle = this.nr + "|" + fase + "|" + this.produkter.join("/");
+        if (noegle === this.skemaNoegle) return;
+        this.skemaNoegle = noegle;
         vaert.innerHTML = "";
-        if (!r || fase === "gaet" || fase === "koerer") return;
+        if (!r || fase === "gaet" || fase === "koerer" || fase === "vurderet") return;
         var linje = document.createElement("div");
         linje.className = "skemalinje";
         function led(tekst, n) {
@@ -353,9 +437,9 @@
                 inp.value = mig.koef[n];
                 inp.setAttribute("aria-label", "Koefficient foran " + tekst);
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjekKoef(); }
+                    if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); mig.indsend(); }
                 });
-                inp.addEventListener("input", function () { mig.koef[n] = inp.value; });
+                inp.addEventListener("input", function () { mig.koef[n] = inp.value; mig.visKnap(); });
                 s.appendChild(inp);
             } else if (fase === "faerdig" && r.koef[n] !== 1) {
                 var k = document.createElement("b");
@@ -386,18 +470,6 @@
         led(fase === "produkt" ? this.produkter[1] : r.stoffer[3], 3);
         if (fase === "faerdig") linje.classList.add("faerdig");
         vaert.appendChild(linje);
-        /* Tjek paa sin egen linje, saa skemaet har hele bredden */
-        if (fase === "koef") {
-            var rad = document.createElement("div");
-            rad.className = "skematjek";
-            var ok = document.createElement("button");
-            ok.type = "button";
-            ok.className = "felt-ok lille";
-            ok.textContent = "Tjek";
-            ok.addEventListener("click", function () { mig.tjekKoef(); });
-            rad.appendChild(ok);
-            vaert.appendChild(rad);
-        }
     };
 
     P.visLog = function () {
@@ -419,13 +491,15 @@
         if (felter.length) felter[0].focus();
     };
 
+    /* Det, man ser, i kortets linje, naar der ikke staar en besked */
     P.visStatus = function () {
         var m = this.par[0], i = this.par[1], t;
         if (this.info) t = this.info.tekst;
-        else if (this.fase === "gaet") t = "Stangen med " + m + " venter over glasset med " + K.ion(i) + ". Sker der noget, når den kommer ned?";
+        else if (this.fase === "gaet") t = "Stangen med " + m + " venter over glasset med " + K.ion(i) + ".";
         else if (this.ned < 1 || this.gTid < 0.8) t = "Stangen går ned i glasset.";
+        else if (this.fase === "koef") t = "Skriv et tal i hvert af de fire felter i skemaet, også 1.";
         else t = "<b>" + m + " i " + K.ion(i) + ":</b> " + D.iagttagelse(m, i) + ".";
-        NK.saetHTML("fu-status", t);
+        if (t !== this.trinTekst) { this.trinTekst = t; this.visKnap(); }
     };
 
     /* ----- Layout ----------------------------------------------------------------------------------- */
@@ -436,7 +510,9 @@
         lay.bordY = Math.round(H - NK.klamp(H * 0.12, 44, 80));
         lay.kop = { x: kant + 22, y: lay.bordY };
         var rk = kant + Tg.RAEKKE_KANT;
-        lay.raekke = { x: rk, y: 96, b: W - 2 * rk, h: NK.klamp(H * 0.058, 28, 40) };
+        /* Raekken (med maerkerne over den) begynder under papirkortets plads */
+        lay.zone = this.kortZone();
+        lay.raekke = { x: rk, y: lay.zone + 40, b: W - 2 * rk, h: NK.klamp(H * 0.058, 28, 40) };
         var under = lay.raekke.y + lay.raekke.h + 52;
         var R = NK.klamp(Math.min(W * 0.2, (lay.bordY - under - 40) / 2), 70, 185);
         lay.lup = { cx: W - kant - R - 8, cy: under + 6 + R, R: R };
@@ -474,7 +550,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) this.layout();
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [206, 192];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Opdater og tegn ----------------------------------------------------------------------------- */
     P.opdater = function (dt) {
@@ -516,9 +597,6 @@
             this.info.tid -= dt;
             if (this.info.tid <= 0 || this.fase !== "gaet") this.info = null;
         }
-        /* Et klik paa glasset foer svaret: ja og nej blinker lidt */
-        if (this.pegValg > 0) this.pegValg -= dt;
-        this.el.valg.classList.toggle("peg", this.pegValg > 0);
         if (this.ventRos > 0) {
             this.ventRos -= dt;
             if (this.ventRos <= 0 && this.laererReplik) this.laererReplik(D.ROS_FORUDSIG, true);
@@ -620,8 +698,9 @@
         if (!u) return;
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "glas" && this.fase === "gaet") {
-            this.info = { tekst: "Svar først i panelet: sker der noget? Så kommer stangen ned.", tid: 3 };
-            this.pegValg = 1.6;
+            /* Stangen kommer foerst ned, naar gaettet er sendt: kortet blinker */
+            this.info = { tekst: "Svar først på kortet: sker der noget? Så kommer stangen ned.", tid: 3 };
+            this.kort.blink();
         } else if (u.slags === "raekke") {
             this.info = { tekst: "Spændingsrækken: uædel til venstre, ædel til højre.", tid: 3 };
         }
@@ -630,13 +709,13 @@
     /* J og N svarer ja og nej */
     P.tast = function (e) {
         if (this.fase !== "gaet") return false;
-        if (e.key === "j" || e.key === "J") { this.gaet(0); return true; }
-        if (e.key === "n" || e.key === "N") { this.gaet(1); return true; }
+        if (e.key === "j" || e.key === "J") { this.vaelg(0); return true; }
+        if (e.key === "n" || e.key === "N") { this.vaelg(1); return true; }
         return false;
     };
 
     P.enter = function () {
-        if (this.fase === "faerdig") this.knap();
+        if (this.fase === "faerdig" || this.fase === "vurderet") this.videre();
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */

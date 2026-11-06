@@ -37,10 +37,13 @@
     var VP = NK.Visning.prototype;
 
     /* Laerredets midte og en skala, saa en kugle med radius r kan vaere der. */
+    /* top: pladsen oeverst, som papirkortet har (NK.kortTop i opgave.js).
+       Molekylet staar midt i resten af laerredet. */
     VP.tilpas = function (b, h, radius, straks) {
+        var top = Math.min(this.top || 0, h * 0.45);
         this.cx = b / 2;
-        this.cy = h / 2;
-        this.skalaMaal = NK.klamp(Math.min(b, h) * 0.4 / Math.max(radius, 0.8), 30, 240);
+        this.cy = top + (h - top) / 2;
+        this.skalaMaal = NK.klamp(Math.min(b, h - top) * 0.4 / Math.max(radius, 0.8), 30, 240);
         if (straks) this.skala = this.skalaMaal;
     };
 

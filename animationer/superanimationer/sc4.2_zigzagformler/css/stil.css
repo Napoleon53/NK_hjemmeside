@@ -1039,3 +1039,65 @@ a.knap { text-decoration: none; box-sizing: border-box; }
 .regn-konkl.vand { color: #9fd0f5; }
 .regn-konkl.heptan { color: #f3d27f; }
 .regn-konkl.begge { color: #f0d77a; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET (6. nov. 2026): opgaven, hint, forklaringen og knapperne
+   staar paa ét kort oeverst midt i scenen (js/opgavefane.js, visKort).
+   Grundformen er kopieret fra sb4.4; udseendet kommer fra
+   ../faelles/papirkort.css, der indlaeses efter denne fil. Tavlen
+   begynder under kortZone(), saa kortet ikke daekker tegningen.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 3;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    padding: 9px 14px 11px;
+    border: 2px solid #4a4f5e;
+    border-radius: 12px;
+    background-color: #1d1e26;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.sk-tekst { margin: 0; font-size: 1.1rem; line-height: 1.34; font-weight: 600; color: #ffffff; }
+.sk-chip { display: inline; margin-right: 9px; font-weight: 700; white-space: nowrap; }
+
+.sk-videre {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1px solid #5fcf92;
+    border-radius: 10px;
+    background-color: var(--groen-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.sk-videre:active { transform: scale(0.97); }
+
+.sk-bund {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.sk-bund .st-tekst { flex: 1; margin: 0; font-size: 0.98rem; line-height: 1.38; }
+.sk-bund .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 0;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.sk-bund .knap:first-of-type { margin-left: auto; }
+.sk-bund.tom .st-tekst { display: none; }
+
+/* Tilbuddet om praesentationen staar nederst, saa det ikke daekker kortet */
+.tilbud { top: auto; bottom: 14px; }

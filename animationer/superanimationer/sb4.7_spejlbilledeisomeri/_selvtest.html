@@ -134,7 +134,9 @@ function koerTest(W) {
     var bj = SB.bedsteJustering(true);
     SB.q = bj.q;
     SB.vurder(bj);
-    paastand("bromchlormethan: drejet på plads løser opgaven med stjerne", SB.faerdig && SB.status[0].stjerne);
+    paastand("bromchlormethan: drejet på plads løser ikke opgaven af sig selv", !SB.faerdig && /Tryk Indsend svar/.test(SB.el.kort.textContent));
+    SB.indsendKlik();
+    paastand("bromchlormethan: drejet på plads og Indsend svar løser opgaven med stjerne", SB.faerdig && SB.status[0].stjerne);
     SB.vaelg(1);
     var j2 = SB.bedsteJustering(false);
     SB.q = j2.q; SB.vurder(j2);
@@ -149,7 +151,8 @@ function koerTest(W) {
     var j3 = SB.bedsteJustering(true);
     paastand("opgave 3 efter byttet: alle fire kan passe", !!j3);
     SB.q = j3.q; SB.vurder(j3);
-    paastand("opgave 3: drejet på plads løser opgaven", SB.faerdig);
+    SB.enter();
+    paastand("opgave 3: drejet på plads og Enter løser opgaven", SB.faerdig);
     SB.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
     var sbSvar = true, sbTre = true;
     D.SPEJL.forEach(function (o, i) {
@@ -268,6 +271,81 @@ function koerTest(W) {
     paastand("Vis svaret fører alle syv igennem uden stjerne", rsSvar);
 
     /* ----------------------------------------------------------------- */
+    overskrift("Papirkortet (6. nov. 2026)");
+    paastand("papirkortet er slået til (body.papirkort, faelles/papirkort.css og papirkort.js)", d.body.classList.contains("papirkort") &&
+        !!d.querySelector('link[href="../faelles/papirkort.css"]') && !!(W.NK.Papir && W.NK.Papir.bliv));
+    paastand("der er ingen statuslinje, ingen knapper nederst i scenen og intet opgavekort i panelet", !d.querySelector(".statuslinje") && !d.querySelector(".scene-valg") && !d.querySelector(".opgavekort"));
+    ["sb", "fi", "rs"].forEach(function (n) {
+        var kort = d.getElementById(n + "-skort");
+        paastand(n + ": kortet står i scenen og ikke i panelet", !!kort.closest(".scene") && !kort.closest(".panel"));
+        paastand(n + ": forfra står i panelet og ikke på kortet", !!d.getElementById(n + "-forfra").closest(".panel") && !kort.querySelector(".forfraknap") && !/forfra/i.test(kort.textContent));
+        paastand(n + ": Indsend svar er hovedknappen på kortet", !!kort.querySelector("#" + n + "-indsend.knap.indsend"));
+    });
+    NK.visFane("fane-sb");
+    SB.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    SB.vaelg(1);
+    var sbInd = d.getElementById("sb-indsend"), sbKort = d.getElementById("sb-skort");
+    paastand("Spejlbilledet: Indsend svar er grå, før der er valgt eller drejet", !sbInd.hidden && sbInd.classList.contains("ikke-klar"));
+    SB.indsendKlik();
+    paastand("Spejlbilledet: Indsend svar uden valg bedømmer ikke", !SB.faerdig && !SB.el.status.classList.contains("skidt"));
+    SB.umuligKnap.click();
+    paastand("Spejlbilledet: et klik på Det kan ikke lade sig gøre vælger det kun", !SB.faerdig && SB.umuligKnap.classList.contains("valgt") && !sbInd.classList.contains("ikke-klar"));
+    sbInd.click();
+    var sbBliv = d.getElementById("sb-bliv");
+    paastand("Spejlbilledet: Indsend svar løser opgaven, og kortet bliver på spørgsmålet med Næste, hvor Indsend svar stod", SB.faerdig && SB.umuligKnap.classList.contains("rigtig") &&
+        /spejlbilledet\?/.test(d.getElementById("sb-prompt").textContent) && !sbBliv.hidden && d.getElementById("sb-status").hidden && !!sbBliv.querySelector(".sk-videre"));
+    sbKort.classList.remove("blink");
+    SB.L.canvas.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 300, clientY: 450 }));
+    paastand("Spejlbilledet: et klik i scenen, mens kortet bliver på opgaven, får kortet til at blinke", sbKort.classList.contains("blink"));
+    sbBliv.querySelector(".sk-videre").click();
+    paastand("Spejlbilledet: Næste viser den næste opgave, og rosen står ikke under den", SB.nr !== 1 && !SB.faerdig && sbBliv.hidden && !/Rigtigt/.test(sbKort.textContent));
+    SB.vaelg(0);
+    SB.vaelgSvar("umulig");
+    SB.indsendKlik();
+    paastand("Spejlbilledet: et forkert svar bliver rødt og kan ikke vælges igen", !SB.faerdig && SB.umuligKnap.classList.contains("forkert") && SB.umuligKnap.disabled);
+    SB.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    SB.gem();
+
+    NK.visFane("fane-fi");
+    FI.vaelg(0);
+    var fiInd = d.getElementById("fi-indsend");
+    paastand("Find C-atomet: Indsend svar er grå uden stjerner og uden valg", fiInd.classList.contains("ikke-klar"));
+    FI.marker[FI.mm.asym[0]] = true;
+    FI.naesteLinje("", "");
+    paastand("Find C-atomet: en stjerne bedømmes ikke af sig selv", !FI.faerdig && !fiInd.classList.contains("ikke-klar"));
+    FI.vaelgSvar("intet");
+    paastand("Find C-atomet: Intet asymmetrisk C-atom fjerner stjernerne og vælger kun", !FI.faerdig && FI.antalMarker() === 0 && FI.knapper.intet.classList.contains("valgt"));
+    FI.rydValg();
+    FI.marker[FI.mm.asym[0]] = true;
+    FI.enter();
+    paastand("Find C-atomet: Enter sender stjernerne og løser opgaven", FI.faerdig && !d.getElementById("fi-bliv").hidden);
+    FI.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    FI.gem();
+
+    NK.visFane("fane-rs");
+    RS.vaelg(0);
+    RS.lavOpgave(0, "R");
+    RS.visKort();
+    var rsInd = d.getElementById("rs-indsend");
+    paastand("R eller S: R og S står først fremme i sidste trin", d.getElementById("rs-valg").hidden && /trin 1 af 3/i.test(d.getElementById("rs-prompt").textContent));
+    RS.valgtGruppe = RS.orden[0];
+    RS.visIndsend();
+    paastand("R eller S: en valgt gruppe får ikke nummer, før der er trykket Indsend svar", RS.naesteTal === 1 && !rsInd.classList.contains("ikke-klar"));
+    rsInd.click();
+    paastand("R eller S: Indsend svar giver gruppen nummer 1", RS.naesteTal === 2 && RS.valgtGruppe === null);
+    RS.giv(RS.orden[1]); RS.giv(RS.orden[2]);
+    RS.maalQ = RS.vaekDrejning();
+    for (var f9 = 0; f9 < 300 && RS.maalQ; f9++) RS.opdater(1 / 60);
+    paastand("R eller S: i sidste trin står R og S på kortet", !d.getElementById("rs-valg").hidden && /trin 3 af 3/i.test(d.getElementById("rs-prompt").textContent));
+    RS.vaelgSvar("R");
+    paastand("R eller S: et valgt svar løser ikke opgaven af sig selv", !RS.faerdig);
+    RS.indsendKlik();
+    paastand("R eller S: Indsend svar løser opgaven, og R bliver grønt", RS.faerdig && RS.knapper.R.classList.contains("rigtig"));
+    RS.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    RS.gem();
+    NK.visFane("fane-sb");
+
+    /* ----------------------------------------------------------------- */
     overskrift("Sproget");
     var tekster = [];
     (function saml(x) {
@@ -289,7 +367,7 @@ function koerTest(W) {
     /* ----------------------------------------------------------------- */
     overskrift("Layoutet");
     var ramme = document.getElementById("ramme");
-    [[1100, 700], [1300, 820], [1600, 950]].forEach(function (mm) {
+    [[1100, 650], [1300, 820], [1400, 860], [1600, 950]].forEach(function (mm) {
         ramme.style.width = mm[0] + "px";
         ramme.style.height = mm[1] + "px";
         ["fane-sb", "fane-fi", "fane-rs"].forEach(function (f) {
@@ -297,18 +375,48 @@ function koerTest(W) {
             var sim = NK.sims[f];
             sim.tilpas();
             sim.layout();
-            var valg = d.querySelector("#" + f + " .scene-valg");
-            var status = d.querySelector("#" + f + " .statuslinje");
-            var rv = valg.getBoundingClientRect(), rst = status.getBoundingClientRect();
-            paastand(mm[0] + " × " + mm[1] + " " + f + ": knapperne står over statuslinjen", rv.bottom <= rst.top + 1);
+            var status = d.querySelector("#" + f + " .scenekort");
+            var scene = d.querySelector("#" + f + " .scene").getBoundingClientRect();
+            var anker = d.querySelector("#" + f + " .anker").getBoundingClientRect();
+            var rs = status.getBoundingClientRect();
+            paastand(mm[0] + " × " + mm[1] + " " + f + ": kortet står øverst i midten af scenen, over figuren (i kortZone)", rs.top - scene.top < 20 && rs.bottom <= anker.top + 1 &&
+                rs.bottom - scene.top <= sim.kortZone() + 0.5 && Math.abs((rs.left + rs.right) / 2 - (scene.left + scene.right) / 2) < 2, Math.round(rs.bottom) + " mod " + Math.round(anker.top));
+            paastand(mm[0] + " × " + mm[1] + " " + f + ": figuren er mindst 250 px høj", anker.height >= 250, Math.round(anker.height));
             var panel = d.querySelector("#" + f + " .panel");
-            paastand(mm[0] + " × " + mm[1] + " " + f + ": panelet har plads uden at rulle", panel.scrollHeight <= panel.clientHeight + 2);
+            if (mm[1] >= 700) paastand(mm[0] + " × " + mm[1] + " " + f + ": panelet har plads uden at rulle", panel.scrollHeight <= panel.clientHeight + 2);
         });
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
+    /* Kortet med alle hint og forklaringer: altid inden for kortZone, hoejst én linje over pladsen, der er sat af */
+    var hoejest = 0, hvor = "", over = [];
+    function maal(sim, navn) {
+        var h = sim.el.kort.offsetHeight;
+        if (h > hoejest) { hoejest = h; hvor = navn + ": " + sim.beskedTekst().slice(0, 50); }
+        sim.tilpas();
+        var rk = sim.el.kort.getBoundingClientRect(), sc = sim.el.kort.parentNode.getBoundingClientRect();
+        if (rk.bottom - sc.top > sim.kortZone() + 0.5) over.push(navn);
+    }
+    [["fane-sb", SB], ["fane-fi", FI], ["fane-rs", RS]].forEach(function (x) {
+        NK.visFane(x[0]);
+        var S = x[1];
+        S.opgaver.forEach(function (o, i) {
+            S.vaelg(i);
+            for (var k = 0; k < 30 && !S.faerdig; k++) {
+                S.knap(); maal(S, x[0] + " " + i);
+                for (var f = 0; f < 900 && (S.maalQ || S.auto); f++) S.opdater(1 / 60);
+                maal(S, x[0] + " " + i);
+            }
+        });
+        S.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+        S.gem();
+    });
+    paastand("kortet bliver højst én linje højere end pladsen, der er sat af (164 px)", hoejest <= 170 + 24, hoejest + " px ved " + hvor);
+    paastand("kortet står altid inden for kortZone", !over.length, over.join(", "));
+    paastand("der er ingen tekst nederst i scenen: kortet er det eneste tekstfelt", Array.prototype.every.call(d.querySelectorAll(".scene .st-tekst"), function (e) { return !!e.closest(".scenekort"); }) &&
+        !d.querySelector(".statuslinje") && !d.querySelector(".scene-valg") && !d.querySelector(".panel .opgavekort"));
     var smaa = [];
-    d.querySelectorAll(".panel *, .statuslinje *, .scene-valg *").forEach(function (e) {
+    d.querySelectorAll(".panel *, .scenekort *").forEach(function (e) {
         if (!e.offsetWidth) return;
         var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
         if (egen && parseFloat(W.getComputedStyle(e).fontSize) < 11.5) smaa.push(e.textContent.trim().slice(0, 30));

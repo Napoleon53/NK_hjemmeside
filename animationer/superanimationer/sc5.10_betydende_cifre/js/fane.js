@@ -12,10 +12,19 @@
    Tallet "rigtige i foerste forsoeg" er de groenne, som i den gamle,
    hvor kun foerste svar talte.
 
-   Knappen i opgavekortet er Giv hint, Vis svaret og Naeste opgave (til
-   sidst Ny runde). Tjek staar ved svarfeltet, og Enter goer det samme.
-   Hint og svar staar i linjen under svarfeltet. Efter et forkert svar
-   lyser den gule knap stille op, til linjen skifter igen.
+   Papirkortet (brugerens beslutning 4. nov. 2026): opgaven, hintet,
+   beskeden ved et forkert svar, forklaringen og knapperne staar paa ét
+   lyst kort oeverst i midten af scenen (#skort, udseendet fra
+   ../faelles/papirkort.css). Tavlen og svarfeltet staar under kortet,
+   og kortZone() er pladsen, kortet har. Et klik paa en brik eller en
+   indtastning vaelger kun; Indsend svar (eller Enter) sender svaret og
+   er graa, til der er noget at sende. Den gule knap er Giv hint og Vis
+   svaret. Efter et rigtigt svar bliver kortet paa opgaven: tavlen og
+   feltet er groenne, forklaringen staar under opgaven, og Naeste opgave
+   staar, hvor Indsend svar stod (NK.Papir.bliv). Efter den tiende opgave
+   hedder knappen Se resultatet, og kortet viser runden med Videre til
+   den naeste fane. Ny runde staar kun i panelet (og tasten R), aldrig
+   paa kortet. Efter et forkert svar lyser den gule knap stille op.
    ===================================================================== */
 (function () {
     "use strict";
@@ -61,7 +70,17 @@
     /* ----- Runden og opgaven -------------------------------------------------------- */
     P.nyRunde = function () {
         this.runde = { nr: 0, status: [], log: [], enCiffer: false, slut: false };
+        this.resultat = false;
         this.lavOpgave();
+    };
+
+    /* Ny runde fra panelet eller tasten R (aldrig fra kortet) */
+    P.forfra = function () {
+        this.nyRunde();
+        this.saetBesked("Ny runde. " + NK.html(D.INTRO[this.id]), "");
+        this.vis();
+        this.animerNy();
+        this.fokus();
     };
 
     P.lavOpgave = function () {
@@ -79,12 +98,20 @@
         this.mant = "";
         this.eksp = "";
         this.hop = null;
+        this.blivTekst = "";
+        this.rosOrd = "Rigtigt";
     };
 
+    /* Knappen, der foerer videre paa kortet: naeste opgave, efter den tiende
+       resultatet og derfra den naeste fane. Den begynder aldrig forfra. */
     P.naeste = function () {
+        if (this.resultat) { this.videre(); return; }
         if (this.runde.slut) {
-            this.nyRunde();
-            this.saetBesked("Ny runde. " + NK.html(D.INTRO[this.id]), "");
+            this.resultat = true;
+            this.saetBesked("", "");
+            this.vis();
+            this.fokus();
+            return;
         } else {
             this.runde.nr++;
             this.lavOpgave();
@@ -93,6 +120,18 @@
         this.vis();
         this.animerNy();
         this.fokus();
+    };
+
+    /* Den naeste fane efter resultatet (ingen efter Blandet) */
+    P.naesteFane = function () {
+        var i = D.FANE_RAEKKE.indexOf(this.id);
+        return i >= 0 && i < D.FANE_RAEKKE.length - 1 ? D.FANE_RAEKKE[i + 1] : null;
+    };
+
+    P.videre = function () {
+        var n = this.naesteFane();
+        if (n && NK.visFane) NK.visFane(n);
+        else this.kortBlink();
     };
 
     /* En ny opgave glider let ind, saa man kan se, at tallet er skiftet */
@@ -159,11 +198,20 @@
         return Object.keys(this.valgt).filter(function (i) { return mig.valgt[i]; }).map(Number).sort(function (a, b) { return a - b; });
     };
 
+    /* Er der noget at sende: mindst én brik valgt, eller noget i feltet */
+    P.kanSendes = function () {
+        if (this.loest || this.resultat) return false;
+        if (this.opg.type === "tael") return this.valgteListe().length > 0;
+        return String(this.mant || "").replace(/\s+/g, "") !== "";
+    };
+
+    /* Indsend svar (og Enter). Paa et loest kort er det knappen videre. */
     P.tjek = function () {
-        if (this.loest) { this.naeste(); return; }
+        if (this.loest || this.resultat) { this.naeste(); return; }
         var svar = this.opg.type === "tael" ? { valgt: this.valgteListe() } :
             { mantisse: this.mant, eksp: this.maade === "pot" ? this.eksp : "" };
         var r = C.tjek(this.opg, svar);
+        if (!this.kanSendes()) { this.saetBesked(r.besked || "", ""); this.kortBlink(); this.fokus(); return; }
         if (r.tom) { this.saetBesked(r.besked, ""); this.fokus(); return; }
         if (r.ok) { this.loes("ok", r); return; }
         this.fejl++;
@@ -172,13 +220,13 @@
         this.fokus();
     };
 
-    /* Knappen i opgavekortet */
+    /* Den gule knap paa kortet: Giv hint, saa Vis svaret */
     P.knap = function () {
-        if (this.loest) { this.naeste(); return; }
+        if (this.loest || this.resultat) { this.naeste(); return; }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.saetBesked("<b>Hint:</b> " + C.hint(this.opg), "gul");
-            this.visPanel();
+            this.saetBesked('<span class="b-maerke">Hint</span>' + C.hint(this.opg), "gul");
+            this.visKnapper();
             this.fokus();
             return;
         }
@@ -207,15 +255,17 @@
                 this.mant = C.skillerum(C.almindelig(o.facit));
                 this.eksp = "";
             }
-            this.saetBesked(C.svar(o), "gul");
+            this.blivTekst = C.svar(o);
         } else {
-            this.saetBesked(NK.tilfaeldig(D.ROS) + " " + r.besked + (r.note ? " " + r.note : ""), "god");
+            /* Rosen er maerket foran forklaringen; den staar kun paa dette kort */
+            this.rosOrd = NK.tilfaeldig(D.ROS).replace(/\.$/, "");
+            this.blivTekst = r.besked + (r.note ? " " + r.note : "");
         }
+        this.saetBesked("", "");
         this.startHop();
         if (this.runde.status.length >= D.RUNDE) this.rundeSlut();
         this.vis();
-        var tjek = el("tjek");
-        if (tjek && this.aktiv() && !this.erIndtastning()) tjek.focus();
+        this.fokus();
     };
 
     P.rigtige = function () {
@@ -300,13 +350,81 @@
 
     P.vis = function () {
         if (!this.aktiv()) return;
-        NK.saetTekst("opg-type", C.TYPENAVN[this.opg.type]);
-        NK.saetHTML("spm", this.opg.spm);
+        this.visKort();
         this.visTavle();
         this.visSvarrad();
         this.visMaaler();
         this.visBesked();
         this.visPanel();
+    };
+
+    /* ----- Papirkortet -------------------------------------------------------------------
+       Pladsen til kortet oeverst i scenen (--kortzone i css/stil.css, mindre
+       paa lave skaerme). Tavlen begynder under den, saa kortet aldrig daekker
+       cifrene. Selvtesten maaler kortet med det laengste hint og svar. */
+    P.kortZone = function () {
+        var v = parseFloat(window.getComputedStyle(el("scene")).getPropertyValue("--kortzone"));
+        return isFinite(v) && v > 0 ? v : 170;
+    };
+
+    /* Etiketten: Opgave 3 af 10 (i Blandet med opgavens slags foran) */
+    P.chip = function () {
+        var t = "Opgave " + Math.min(this.runde.nr + 1, D.RUNDE) + " af " + D.RUNDE;
+        return this.id === "blandet" ? C.TYPENAVN[this.opg.type] + ", " + t.toLowerCase() : t;
+    };
+
+    P.kortHTML = function () {
+        if (this.resultat) {
+            var rig = this.rigtige(), n = this.naesteFane();
+            var t = "<b>" + rig + " af " + D.RUNDE + "</b> rigtige i første forsøg. " + D.SLUT(rig, D.RUNDE);
+            if (this.id === "blandet" && rig === D.RUNDE) t += " " + D.TI_AF_TI;
+            if (this.runde.laastOp) t += " <b>" + D.LAAST_OP + "</b>";
+            return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">Runden er slut</span>' + t + "</p>" +
+                (n ? '<button type="button" class="sk-videre" data-videre="1">Videre til ' + NK.html(D.FANER[n].navn) + " →</button>" : "") + "</div>";
+        }
+        var spm = NK.Papir ? NK.Papir.tekst(this.opg.spm) : this.opg.spm;
+        var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(this.chip()) + "</span>" + spm + "</p>";
+        if (this.loest) {
+            var knap = this.runde.slut ? "Se resultatet →" : "Næste opgave →";
+            html += NK.Papir ? NK.Papir.bliv(this.blivTekst, this.vist ? "Svaret" : this.rosOrd, knap, this.vist) :
+                '<p class="st-tekst">' + this.blivTekst + '</p><button type="button" class="sk-videre" data-videre="1">' + knap + "</button>";
+        }
+        return html;
+    };
+
+    P.visKort = function () {
+        if (!this.aktiv()) return;
+        var e = el("skort");
+        var kl = "scenekort " + (this.resultat ? "loest" : (this.loest ? "loest bliv" + (this.vist ? " svar" : "") : "opgave"));
+        if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        NK.saetHTML("sk-ind", this.kortHTML());
+        this.visKnapper();
+    };
+
+    /* Kortets nederste raekke: beskeden, den gule knap og Indsend svar. Naar
+       opgaven er loest, er raekken vaek (forklaringen og knappen videre staar
+       i kortets oeverste del), medmindre et klik lige har faaet et svar. */
+    P.visKnapper = function () {
+        if (!this.aktiv()) return;
+        var knap = el("opgaveknap"), ind = el("tjek"), slut = this.loest || this.resultat;
+        knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+        knap.className = "knap hjaelp" + (this.hjaelp ? " svar" : "") + (this.peg && !slut && this.hjaelp === 0 ? " peg" : "");
+        var kan = this.kanSendes();
+        ind.classList.toggle("klar", kan);
+        ind.classList.toggle("ikke-klar", !kan);
+        ind.setAttribute("aria-disabled", kan ? "false" : "true");
+        knap.hidden = ind.hidden = slut;
+        el("sk-bund").hidden = slut && !(this.kortT > 0);
+    };
+
+    /* Kortet blinker blødt: eleven klikkede paa tavlen, mens kortet venter
+       paa Naeste, eller trykkede Indsend svar uden noget at sende */
+    P.kortBlink = function () {
+        var e = el("skort");
+        if (!e || !this.aktiv()) return;
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
     };
 
     /* ----- Brikkerne ------------------------------------------------------------------ */
@@ -459,9 +577,7 @@
             el("felter").classList.toggle("ok", this.loest && !this.vist);
             el("felter").classList.toggle("vist", this.vist);
         }
-        var tjek = el("tjek");
-        tjek.textContent = this.loest ? (this.runde.slut ? "Ny runde ↺" : "Næste →") : "Tjek";
-        tjek.classList.toggle("videre", this.loest);
+        this.visKnapper();
     };
 
     /* Maaleren under feltet: hvor mange betydende cifre dit eget tal har.
@@ -486,29 +602,29 @@
         NK.saetHTML("maaler", '<span class="prikker-m">' + html + "</span><span>" + tekst + "</span>");
     };
 
-    /* ----- Linjen under svarfeltet -----------------------------------------------------
-       saetBesked: den faste linje (naeste skridt, fejl, ros, hint og svar).
-       Efter et forkert svar lyser hintknappen stille op. kortBesked: et
-       svar paa et klik, der forsvinder igen efter sek sekunder. */
+    /* ----- Linjen paa kortet -------------------------------------------------------------
+       saetBesked: den faste linje (naeste skridt, fejl og hint). Efter et
+       forkert svar lyser hintknappen stille op. kortBesked: et svar paa et
+       klik, der forsvinder igen efter sek sekunder. */
     P.saetBesked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
         this.kortT = 0;
+        this.peg = klasse === "skidt" && !this.loest && this.hjaelp === 0;
         this.visBesked();
-        if (this.aktiv()) el("opgaveknap").classList.toggle("peg", klasse === "skidt" && !this.loest && this.hjaelp === 0);
     };
 
     P.kortBesked = function (html, sek) {
         this.kortT = sek || 4;
-        this.kortHTML = html;
+        this.kortTekst = html;
         this.visBesked();
     };
 
     P.visBesked = function () {
         if (!this.aktiv()) return;
-        var b = this.kortT > 0 ? { html: this.kortHTML, klasse: "" } : this.fast;
-        var e = el("besked");
-        e.innerHTML = b.html;
-        e.className = "besked" + (b.klasse ? " " + b.klasse : "");
+        var b = this.kortT > 0 ? { html: this.kortTekst, klasse: "" } : this.fast;
+        el("besked").innerHTML = b.html;
+        el("sk-bund").className = "sk-bund" + (b.klasse ? " " + b.klasse : "") + (b.html ? "" : " tom");
+        this.visKnapper();
     };
 
     P.beskedTekst = function () { return el("besked").textContent; };
@@ -554,21 +670,6 @@
         }
         NK.saetHTML("prikker", ph);
 
-        var slut = el("kort-slut");
-        if (r.slut) {
-            var rig = this.rigtige();
-            var t = "Runden er slut: <b>" + rig + " af " + D.RUNDE + "</b> rigtige i første forsøg. " + D.SLUT(rig, D.RUNDE);
-            if (this.id === "blandet" && rig === D.RUNDE) t += " " + D.TI_AF_TI;
-            if (r.laastOp) t += " <b>" + D.LAAST_OP + "</b>";
-            slut.innerHTML = t;
-        }
-        slut.hidden = !r.slut;
-
-        var knap = el("opgaveknap");
-        if (this.loest) knap.textContent = r.slut ? "Ny runde ↺" : "Næste opgave →";
-        else knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        knap.className = "knap stor" + (this.loest ? " blaa banker" : " hjaelp" + (this.hjaelp ? " svar" : ""));
-
         NK.saetTekst("rigtige", String(this.rigtige()));
         var lh = r.log.map(function (l, n) {
             return '<li class="' + l.status + '"><span class="rl-nr">' + (n + 1) + '</span><span class="rl-opg">' + mig.kortOpgave(l.opg) +
@@ -592,7 +693,7 @@
 
     /* ----- Klik og taster ------------------------------------------------------------- */
     P.klikBrik = function (i) {
-        if (this.opg.type === "tael" && this.loest) return;
+        if (this.loest || this.resultat) { this.kortBlink(); return; }
         this.valgt[i] = !this.valgt[i];
         if (this.opg.type !== "tael" && !this.markeretSagt) {
             this.markeretSagt = true;
@@ -613,6 +714,7 @@
         this.mant = mant;
         this.eksp = eksp;
         this.visMaaler();
+        this.visKnapper();
     };
 
     P.ryst = function () {
@@ -624,7 +726,11 @@
 
     P.fokus = function () {
         if (!this.aktiv() || document.querySelector(".overlay.vis") || (NK.Rundvisning && NK.Rundvisning.aktiv())) return;
-        if (this.loest) { el("tjek").focus(); return; }
+        if (this.loest || this.resultat) {
+            var v = document.querySelector("#sk-ind [data-videre]");
+            if (v) v.focus();
+            return;
+        }
         if (this.erIndtastning()) el("svar-m").focus();
     };
 

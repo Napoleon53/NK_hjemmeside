@@ -85,6 +85,15 @@ function koerTest(W) {
         mus(sim, "pointerup", x1, y1);
     }
     function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
+    /* Papirkortet (6. nov. 2026): teksten paa kortet og kortets knap videre/hint */
+    function bt(sim) { return sim.beskedTekst(); }
+    function knapT(sim) {
+        if (sim.sk.blivAaben()) { var v = sim.sk.blivEl.querySelector("[data-videre]"); return v ? v.textContent : ""; }
+        if (!sim.sk.hintEl.hidden) return sim.sk.hintEl.textContent;
+        return sim.sk.indsendEl.textContent;
+    }
+    function indsendGraa(sim) { return sim.sk.indsendEl.classList.contains("ikke-klar"); }
+    function svarKnap(navn, j) { return d.querySelector("#" + navn + '-ind [data-valg="' + j + '"]'); }
 
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
@@ -227,18 +236,20 @@ function koerTest(W) {
     mus(A, "pointerdown", pk[8].x, pk[8].y);
     mus(A, "pointerup", pk[8].x, pk[8].y);
     tik(A, 1);
-    paastand("et klik på en kæde tager den af igen", A.slots[1].syre === null && /Vand spaltede/.test(A.el.besked.textContent));
+    paastand("et klik på en kæde tager den af igen", A.slots[1].syre === null && /Vand spaltede/.test(bt(A)));
     /* Forkert vare */
     A.nyOrdre(); tik(A, 1);
     ["O", "O", "O"].forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
     tik(A, 1.5);
-    paastand("triolein til fuglehuset afvises med et råd", !A.loest && A.el.besked.className.indexOf("skidt") >= 0 && /rette kæder/.test(A.el.besked.textContent));
+    paastand("tre fedtsyrer bedømmes ikke af sig selv, men Indsend svar bliver klar", !A.loest && !/Ikke endnu/.test(bt(A)) && !indsendGraa(A) && !vises(A.sk.blivEl));
+    klik("#fabrik-indsend"); tik(A, 0.2);
+    paastand("triolein til fuglehuset afvises med et råd", !A.loest && A.sk.bundEl.className.indexOf("skidt") >= 0 && /rette kæder/.test(bt(A)));
     paastand("panelet viser smeltepunktet og de fire steder", /5 °C/.test(d.getElementById("fabrik-fedt").textContent) && d.querySelectorAll("#fabrik-fedt .stedlinje").length === 4);
     /* Knappen: hint, svaret */
     A.knap();
-    paastand("knappen giver først et hint", /Hint/.test(A.el.besked.textContent) && A.el.knap.textContent === "Vis svaret");
+    paastand("knappen giver først et hint", /Hint/.test(bt(A)) && knapT(A) === "Vis svaret");
     A.knap(); tik(A, 4);
-    paastand("Vis svaret bygger tristearin og leverer ordren", A.loest && A.kaeder() && A.kaeder().join() === "S,S,S" && A.el.knap.textContent === "Næste ordre");
+    paastand("Vis svaret bygger tristearin og leverer ordren", A.loest && A.kaeder() && A.kaeder().join() === "S,S,S" && knapT(A) === "Næste ordre");
     paastand("NK.ditFedt er det byggede fedt", NK.ditFedt && NK.ditFedt.join() === "S,S,S");
     /* Resten af ordrerne */
     var leveret = 1;
@@ -247,13 +258,20 @@ function koerTest(W) {
         var o = A.ordre();
         o.svar.forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
         tik(A, 1.5);
+        if (n === 1) paastand("det rigtige fedt bedømmes først med Indsend svar", !A.loest);
+        klik("#fabrik-indsend"); tik(A, 0.2);
+        if (n === 1) {
+            var videreKnap = A.sk.blivEl.querySelector("[data-videre]");
+            paastand("et rigtigt svar bliver på ordren med rosen og Næste ordre", A.loest && /Leveret/.test(bt(A)) && !!videreKnap &&
+                videreKnap.textContent === "Næste ordre" && A.sk.bundEl.hidden && /Salatbaren/.test(A.sk.ind.textContent));
+        }
         if (A.loest) leveret++;
     }
     paastand("alle fem ordrer kan leveres", leveret === 5 && A.leveret.length === 5, leveret);
     tik(A, 1.5);
     paastand("Kemichael kommer med ros efter fem ordrer", A.laerer && A.laerer.scene && A.laerer.scene.navn === "faerdig");
     A.knap();
-    paastand("så er det fri leg, og knappen går videre", A.frileg && A.el.knap.textContent === "Til køleskabet");
+    paastand("så er det fri leg, og knappen går videre", A.frileg && knapT(A) === "Til køleskabet" && !/Leveret/.test(bt(A)));
     tik(A, 8);
     A.knap();
     paastand("knappen i fri leg åbner køleskabet", d.getElementById("fane-koele").classList.contains("aktiv"));
@@ -263,14 +281,16 @@ function koerTest(W) {
     for (n = 0; n < D.ORDRER.length; n++) {
         A.ordre().svar.forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
         tik(A, 1.5);
-        A.knap(); tik(A, 1.2);
+        A.indsend(); A.knap(); tik(A, 1.2);
     }
     tik(A, 1.5);
     paastand("anden gang roser Kemichael ikke igen", A.leveret.length === 5 && !(A.laerer.scene && A.laerer.scene.navn === "faerdig"));
     A.saetPaa(0, "S", { x: 100, y: 100 }); tik(A, 1.2);
     klik("#fabrik-forfra"); tik(A, 1);
     paastand("Start forfra giver ordre 1, ingen leveret og en tom glycerol", !A.frileg && A.leveret.length === 0 && A.ordreNr === 0 &&
-        A.slots.every(function (s) { return !s.syre; }) && A.el.knap.textContent === "Giv hint");
+        A.slots.every(function (s) { return !s.syre; }) && knapT(A) === "Giv hint" && indsendGraa(A));
+    paastand("Start forfra står i panelet og ikke på kortet", !!d.querySelector(".panel #fabrik-forfra") && !d.querySelector("#fabrik-skort #fabrik-forfra") &&
+        !/forfra/i.test(d.getElementById("fabrik-skort").textContent));
 
     overskrift("8. Fane 2: Køleskabet");
     klik('[data-fane="fane-koele"]');
@@ -287,28 +307,42 @@ function koerTest(W) {
     traek(B, Gs.x, Gs.bund - Gs.h * 0.4, Z.x + Z.b / 2, Z.y + Z.h * 0.6);
     tik(B, 2);
     paastand("smørret kan trækkes ind i køleskabet", smoer.sted === "koele");
-    paastand("så viser opgaven svaret: fast", B.trin === "set" && /fast/.test(B.el.besked.textContent));
+    paastand("så viser opgaven svaret: fast", B.trin === "set" && /fast/.test(bt(B)));
     paastand("zoomvinduet viser smørret", B.valgt === smoer && smoer.proeve.T === 5);
     B.knap();
     /* De naeste opgaver med et gaet */
     var rigtige = 0;
     for (n = 1; n < D.KOELE_OPGAVER.length; n++) {
         var og = B.opgave();
-        B.gaet(n === 2 ? "fast" : og.svar);
+        if (n === 1) {
+            paastand("Indsend svar er gråt uden valg", indsendGraa(B));
+            klik("#koele-indsend");
+            paastand("Indsend svar uden valg bedømmer ikke", B.trin === "gaet");
+        }
+        svarKnap("koele", n === 2 ? "fast" : og.svar).click();
+        if (n === 1) paastand("et svar vælger kun og bedømmer ikke af sig selv", B.trin === "gaet" && !indsendGraa(B) &&
+            svarKnap("koele", og.svar).classList.contains("valgt"));
+        klik("#koele-indsend");
         tik(B, 1.5);
+        if (n === 1) paastand("et rigtigt gæt bliver på spørgsmålet: svaret grønt, forklaringen og Næste opgave", B.trin === "set" &&
+            svarKnap("koele", og.svar).classList.contains("rigtig") && knapT(B) === "Næste opgave" && B.sk.bundEl.hidden && /Rigtigt/.test(bt(B)));
         var gl = B.glasMedId(og.fedt);
         if (gl.sted === og.sted && B.trin === "set") rigtige++;
-        if (n === 2) paastand("et forkert gæt giver svaret og forklaringen", B.el.besked.className.indexOf("skidt") >= 0 && /Du gættede fast/.test(B.el.besked.textContent));
+        if (n === 2) paastand("et forkert gæt giver svaret og forklaringen", !!B.sk.blivEl.querySelector(".bliv.nej") && /Du gættede fast/.test(bt(B)) &&
+            svarKnap("koele", "fast").classList.contains("forkert"));
         B.knap();
+        if (n === 1) paastand("Næste opgave viser ikke rosen under det næste spørgsmål", B.trin === "gaet" && !/Rigtigt/.test(bt(B)) && !vises(B.sk.blivEl));
     }
     paastand("alle seks opgaver flytter glasset og viser svaret", rigtige === D.KOELE_OPGAVER.length - 1, rigtige);
-    paastand("til sidst: hvorfor?", B.trin === "hvorfor" && d.querySelectorAll("#koele-valg button").length === 4);
-    B.svarHvorfor(1);
-    paastand("et forkert svar på hvorfor bliver gråt og forklares", d.querySelectorAll("#koele-valg button:disabled").length === 1 && /plante/.test(B.el.besked.textContent));
-    B.svarHvorfor(0);
+    paastand("til sidst: hvorfor?", B.trin === "hvorfor" && d.querySelectorAll("#koele-ind [data-valg]").length === 4);
+    svarKnap("koele", 1).click();
+    paastand("et valg på hvorfor bedømmer ikke af sig selv", B.trin === "hvorfor" && B.forkert.length === 0);
+    klik("#koele-indsend");
+    paastand("et forkert svar på hvorfor bliver rødt og forklares", svarKnap("koele", 1).classList.contains("forkert") && /plante/.test(bt(B)));
+    svarKnap("koele", 0).click(); klik("#koele-indsend");
     tik(B, 1.2);
     paastand("det rigtige svar afslutter fanen, og Kemichael roser", B.trin === "faerdig" && B.laerer.scene && B.laerer.scene.navn === "faerdig");
-    paastand("så går knappen videre til fabrikken", B.el.knap.textContent === "Byg dit eget fedt");
+    paastand("så går knappen videre til fabrikken", knapT(B) === "Byg dit eget fedt" && svarKnap("koele", 0).classList.contains("rigtig"));
     tik(B, 8);
     B.nulstil(); tik(B, 0.5);
     B.opgNr = D.KOELE_OPGAVER.length; B.nyOpgave();
@@ -378,11 +412,20 @@ function koerTest(W) {
     paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
     var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
     paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
-    var tur = ["#fabrik-anker-fliser", "#fabrik-anker-glycerol", "#fabrik-kort", "#fabrik-fedt-kort", "#fabrik-anker-glas", "#fabrik-forfra",
-        "#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue", "#koele-anker-zoom", "#koele-kort", "#koele-dekl-kort"];
+    var tur = ["#fabrik-anker-fliser", "#fabrik-anker-glycerol", "#fabrik-skort", "#fabrik-ordrer", "#fabrik-fedt-kort", "#fabrik-anker-glas", "#fabrik-forfra",
+        "#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue", "#koele-anker-zoom", "#koele-skort", "#koele-dekl-kort", "#koele-forfra"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
 
-    overskrift("10. Layoutet");
+    overskrift("10. Papirkortet");
+    ["fabrik", "koele"].forEach(function (n) {
+        var k = d.getElementById(n + "-skort");
+        paastand(n + ": kortet står i scenen og ikke i panelet", !!k && !!k.closest(".scene") && !d.querySelector(".panel .scenekort") &&
+            !d.getElementById(n + "-kort"));
+        paastand(n + ": ingen statuslinje nederst i scenen", !d.getElementById(n + "-status") && !d.querySelector("#fane-" + n + " .scene-mrk"));
+    });
+    paastand("siden har papirkortet", d.body.classList.contains("papirkort") && !!NK.Papir && !!NK.SceneKort);
+
+    overskrift("11. Layoutet");
     A.nyOrdre();
     ["S", "L", "Ln"].forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
     var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
@@ -395,6 +438,11 @@ function koerTest(W) {
             var sim = NK.sims[id];
             tik(sim, 1.5);
             var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            /* Papirkortet holder sig i sin plads oeverst (kortZone) */
+            var kEl = sim.sk.e, kB = kEl.offsetTop + kEl.offsetHeight;
+            var kR = { x: kEl.offsetLeft, y: kEl.offsetTop, b: kEl.offsetWidth, h: kEl.offsetHeight };
+            if (kB > sim.kortZone() - 6) problemer.push(id + ": kortet går ud over sin plads (" + kB + " > " + sim.kortZone() + ")");
+            if (lay.zone !== sim.kortZone()) problemer.push(id + ": tegningen følger ikke kortets plads");
             function indeR(r, navn) {
                 if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
             }
@@ -416,12 +464,16 @@ function koerTest(W) {
                 indeR(mr, "molekylet");
                 if (mr.y + mr.h > lay.bordY + 2) problemer.push(id + ": molekylet går ned i bordet");
                 over(mr, gr, "molekylet over glasset");
+                over(mr, kR, "kortet over molekylet");
                 if (g2.px < 12) problemer.push(id + ": atomerne er skrevet med " + g2.px.toFixed(1) + " px");
             } else {
                 var K = lay.K, V = lay.V, z = lay.zoom;
                 indeR({ x: K.x, y: K.top, b: K.b, h: K.h }, "køleskabet");
                 indeR({ x: V.x, y: V.top, b: V.b, h: V.h }, "vinduet");
                 indeR(z, "zoomvinduet");
+                over({ x: K.x, y: K.top, b: K.b, h: K.h }, kR, "kortet over køleskabet");
+                over({ x: V.x, y: V.top, b: V.b, h: V.h }, kR, "kortet over vinduet");
+                over(z, kR, "kortet over zoomvinduet");
                 over(z, { x: K.x, y: K.top, b: K.b, h: K.h }, "zoomvinduet over køleskabet");
                 over(z, { x: V.x, y: V.top, b: V.b, h: V.h }, "zoomvinduet over vinduet");
                 over(z, { x: K.x + K.b, y: lay.bordY - lay.gh, b: Wc, h: lay.gh }, "zoomvinduet over glassene på bordet");

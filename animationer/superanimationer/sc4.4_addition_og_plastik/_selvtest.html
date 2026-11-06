@@ -283,7 +283,7 @@ function koerTest(W) {
     paastand("et klik på ethen før gættet får også kortet til at blinke", blinker(A));
     kA.querySelector('[data-valg="1"]').click();
     koerF(A, 0.6);
-    paastand("et svar på kortet er gættet, og opgaven står samme sted med den gule hintknap", A.opg.gaet === 1 && A.iForsoeg() && kA.classList.contains("opgave") && /Træk brommolekylet/.test(kortT(A)) && /Dit gæt:\s*To stoffer/.test(kA.textContent) &&
+    paastand("et svar på kortet er gættet, og opgaven står samme sted med den gule hintknap", A.opg.gaet === 1 && A.iForsoeg() && kA.classList.contains("opgave") && /Træk dibrommolekylet/.test(kortT(A)) && /Dit gæt:\s*To stoffer/.test(kA.textContent) &&
         A.peger() === "Br2" && statuslinje(A) === "" && !A.el.knap.hidden && knaptekst(A) === "Giv et hint" && kA.contains(A.el.knap), kA.textContent);
     mp = A.maalPunkt();
     mus(A, "pointermove", bx, by);
@@ -341,7 +341,7 @@ function koerTest(W) {
     klik(A, bx, by);
     koerF(A, 3.8);
     paastand("bruger eleven brom i stedet, sker additionen, og kortet siger, hvad der skal gøres; knappen Nyt molekyle kommer frem og banker",
-        A.produkt === "Br2" && !A.faerdig && A.iForsoeg() && /Det var brom, og produktet er 1,2-dibromethan/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)) && !ffA.hidden && /banker/.test(ffA.className), linje(A));
+        A.produkt === "Br2" && !A.faerdig && A.iForsoeg() && /Det var dibrom, og produktet er 1,2-dibromethan/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)) && !ffA.hidden && /banker/.test(ffA.className), linje(A));
     klik(A, bx, by);
     paastand("på et produkt kan intet sætte sig: kortet blinker", !A.reak && A.produkt === "Br2" && blinker(A));
     ffA.click();
@@ -380,10 +380,10 @@ function koerTest(W) {
     traek(A, bx, by, mp.x, mp.y - 10);
     var afv = !!A.reak && A.reak.afvist === true;
     koerF(A, 2.2);
-    paastand("brom kan ikke sætte sig på ethan: det kommer tilbage, og opgaven er løst", afv && A.faerdig && !A.produkt && /Dit gæt holdt\./.test(kortT(A)) && /ingen dobbeltbinding/.test(kortT(A)) && /ethan \+ brom/.test(d.getElementById("a-regnskab").textContent), kortT(A));
+    paastand("brom kan ikke sætte sig på ethan: det kommer tilbage, og opgaven er løst", afv && A.faerdig && !A.produkt && /Dit gæt holdt\./.test(kortT(A)) && /ingen dobbeltbinding/.test(kortT(A)) && /ethan \+ dibrom/.test(d.getElementById("a-regnskab").textContent), kortT(A));
     A.vaelg(4); svar(A, 0); koerF(A, 0.3);
     A.reager("H2", { x: 200, y: 400 }); koerF(A, 2.2);
-    var andet = /Hydrogen kan ikke sætte sig på ethan/.test(linje(A)) && /Prøv også med brom/.test(linje(A)) && !A.faerdig;
+    var andet = /Dihydrogen kan ikke sætte sig på ethan/.test(linje(A)) && /Prøv også med dibrom/.test(linje(A)) && !A.faerdig;
     A.reager("H2O", { x: 200, y: 400 }); koerF(A, 2.2);
     A.reager("H2", { x: 200, y: 400 }); koerF(A, 2.2);
     paastand("hydrogen og vand kan heller ikke, og tredje forsøg er et påskeæg", andet && linje(A) === D.PAASKE.ethan && !A.faerdig, linje(A));
@@ -404,7 +404,7 @@ function koerTest(W) {
     klik(A, mp.x, mp.y + 0.3 * A.u);
     paastand("et klik på molekylet siger, hvad det er", /Ethen, C₂H₄/.test(linje(A)) && /dobbeltbinding/.test(linje(A)), linje(A));
     traek(A, bx, by, 30, 300);
-    paastand("slippes molekylet ved siden af, siger kortet, hvor det skal hen", !A.reak && /Slip brommolekylet oven på molekylet/.test(linje(A)), linje(A));
+    paastand("slippes molekylet ved siden af, siger kortet, hvor det skal hen", !A.reak && /Slip dibrommolekylet oven på molekylet/.test(linje(A)), linje(A));
 
     /* ------------------------------------------------------------------ */
     overskrift("5. Fane 2: Bromvand");
@@ -619,7 +619,7 @@ function koerTest(W) {
     paastand("brom kan ikke trækkes hen til kæden før gættet", !P.afvis && !P.traek && blinker(P));
     kP.querySelector('[data-valg="0"]').click();
     koerF(P, 0.4);
-    paastand("efter gættet peger skiltet på brommolekylet, og opgaven står på kortet", P.iForsoeg() && P.peger() === "brom" && /Træk brommolekylet hen til kæden af polyethen/.test(kortT(P)), kortT(P));
+    paastand("efter gættet peger skiltet på brommolekylet, og opgaven står på kortet", P.iForsoeg() && P.peger() === "brom" && /Træk dibrommolekylet hen til kæden af polyethen/.test(kortT(P)), kortT(P));
     Bp = P.lay.brom;
     traek(P, Bp.x + Bp.b / 2, Bp.y + Bp.h / 2, P.lay.W / 2, P.cyK - 10);
     var afvP = !!P.afvis;

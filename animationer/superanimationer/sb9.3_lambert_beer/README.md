@@ -45,12 +45,12 @@ skrevet af Claude uden at spørge, som ved sb2.1.
 5. **Layoutet:** scene plus panel. På fane 1 og 2 står spørgsmålet over
    scenen, og scenen er et lærred. På fane 3 står regnestykket med felterne
    på tavlen i scenen og formens form, bogstaverne og tallene i en bakke
-   under den. Statuslinjen er nederst i scenen; panelet har opgavekortet,
-   skyderne eller målingerne og listen.
+   under den. Fra 6. nov. 2026 står opgaven, svarene og hjælpen på
+   papirkortet øverst i scenen (se Papirkortet nedenfor); panelet har
+   oplysningerne, skyderne eller målingerne og listen.
 
-Kemichael er ikke med. Hjælpen står i statuslinjen som i `sc1.4_afstemning`
-og `sb2.1_ligevaegtsloven`: Giv et hint › Næste hint › Vis svaret, og
-knappen lyser stille op efter en fejl.
+Kemichael er ikke med. Hjælpen står på papirkortet: Giv et hint › Næste
+hint › Vis svaret, og knappen lyser stille op efter en fejl.
 
 ## Fane 1: Lyset
 
@@ -175,7 +175,7 @@ js/lb.js           modellen: A, T, I(x), dybden for en absorberet foton,
 js/data.js         stofferne, forudsigelserne, standardkurverne og
                    regnestykkerne
 js/tegning.js      lampen, strålen, kuvetten, detektoren, displayet og tavlen
-js/fane.js         det fælles: listen, statuslinjen og den ene knap
+js/fane.js         det fælles: listen, papirkortet, Indsend svar og hintknappen
 js/regning.js      fane 3: facit, tjek af formel, tal og resultat, beskeder
                    og hint
 js/sim_lys.js      fane 1
@@ -193,9 +193,34 @@ regnestykke er ét objekt i `D.REGN` med tallene som tekst og trinene fra
 
 ## Genveje
 
-<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> tjek ·
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>Enter</kbd> Indsend svar eller Næste ·
 <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
 <kbd>Esc</kbd> luk. Direkte links: `#lys`, `#kurve`, `#regn` og `#teori`.
+
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har papirkortet øverst midt i scenen (`.scenekort` i en
+`.kortzone` med fast højde, `body.papirkort`, `../faelles/papirkort.css` og
+`papirkort.js`). Statuslinjen, opgavelinjen, valgkortene over lærredet og
+Tjek-knapperne på tavlen er væk. `js/fane.js` er bygget efter sb9.1's.
+
+- Lyset: gættet står på kortet (svar med den korte note). Under gættet er
+  skyderne og kuvetten låst, og kortet blinker. Hinttrappen i gættet er
+  bevaret. Bagefter skruer eleven og trykker Indsend svar; en skyder, der
+  slippes ved målet, bedømmer ikke selv. Kortet bliver på forudsigelsen
+  med det rigtige svar grønt og et forkert gæt rødt.
+- Standardkurven: målingerne er klik i bakken (ingen Indsend). Linjen og
+  den lodrette aflæsning bedømmes først ved Indsend svar. En linje, der
+  passer, bliver på kortet med Næste.
+- Beregningen: Indsend svar på kortet afløser Tjek på tavlen; Enter i et
+  felt er Indsend svar. Formlen, tallene og hver del bliver på kortet med
+  Næste. Spørgsmålet ("Beregn …") står på kortet, resten af opgaveteksten
+  i panelet.
+- Zonens højde: Lyset 270/252, Standardkurven 180/172, Beregningen
+  168/166 px (almindelig/lav skærm). Selvtesten måler kortet med det
+  længste hint, en lang fejl og forklaringen.
+
+Molekylenavne: ingen at rette (ingen O₂, H₂, Cl₂ osv. i teksterne).
 
 ## Selvtest
 
@@ -206,8 +231,11 @@ forudsigelser kan prøves med skyderne og ved at trække kuvetten, alle fire
 standardkurver med klik og træk (også fingeraftrykket og papiret) og alle
 otte regnestykker på tavlen, at Vis svaret fører gennem det hele, de
 typiske fejl, hinttrappen, sproget og layoutet fra 1100 × 700 til
-1600 × 950.
-Sidst kørt: ALT OK, 2. oktober 2026.
+1600 × 950. Fra 6. nov. 2026 også papirkortet: kortet i scenen, Indsend
+svar grå, at skydere og træk ikke bedømmer selv, låsen under gættet,
+Næste, at kortet holder sig i zonen, og at alle opgaver kan løses med
+hintknappen.
+Sidst kørt: ALT OK (73 påstande), 6. november 2026.
 
 ## I menuen
 

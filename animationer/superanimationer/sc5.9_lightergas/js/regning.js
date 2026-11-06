@@ -1,7 +1,9 @@
 /* =====================================================================
    regning.js - regnetrinene paa fane 2 (som sc5.11)
 
-   Raekkerne i opgavekortet: i hvert trin skriver eleven foerst formlen
+   Raekkerne i kortet Regnestykket i panelet (opgaven og bedoemmelsen
+   staar paa kortet i scenen, og Indsend svar der eller Enter i feltet
+   tjekker det aktive trin): i hvert trin skriver eleven foerst formlen
    og saa tallet (brugerens oenske fra sc7.4). I maaling 2 staar
    formlerne der i forvejen, og eleven skriver kun tallene. Kun det
    aktive trin er aabent.
@@ -72,13 +74,13 @@
                 fe.innerHTML = '<span class="felt-pre">' + NK.html(pre) + '</span>' +
                     '<input type="text" inputmode="' + (formel ? "text" : "decimal") + '" autocomplete="off" spellcheck="false" aria-label="' +
                     NK.html((formel ? "Formlen for " : "") + t.navn) + '" placeholder="' + (formel ? "skriv formlen" : "tallet") + '"' + fra + '>' +
-                    (formel ? "" : '<span class="felt-efter">' + NK.html(t.enhed) + '</span>') +
-                    '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
+                    (formel ? "" : '<span class="felt-efter">' + NK.html(t.enhed) + '</span>');
                 var inp = fe.querySelector("input");
+                /* Enter er Indsend svar paa kortet i scenen */
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(); mig.fane.visKnap(); }
                 });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+                inp.addEventListener("input", function () { mig.fane.visIndsend(); });
                 f.input = inp;
             }
             rk.querySelector(".felter").appendChild(fe);

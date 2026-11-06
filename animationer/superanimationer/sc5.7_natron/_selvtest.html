@@ -278,7 +278,7 @@ function koerTest(W) {
     var inp = d.getElementById("forsoeg-inp");
     A.opdater(0);
     paastand("Indsend svar står på kortet og er grå, til der står et tal i skemaet", !A.el.indsend.hidden && A.el.indsend.classList.contains("ikke-klar") &&
-        A.el.kort.contains(A.el.indsend));
+        A.el.kort.contains(A.el.indsend), "hidden=" + A.el.indsend.hidden + " cls=" + A.el.indsend.className + " i kort=" + A.el.kort.contains(A.el.indsend));
     A.el.indsend.click();
     paastand("Indsend svar uden et tal: intet bliver bedømt, kortet blinker", A.vejninger.length === 0 && A.el.kort.classList.contains("blink"));
     inp.value = komma(A.proeve + 0.1); A.opdater(0);
@@ -414,7 +414,7 @@ function koerTest(W) {
     paastand("C regnet: 2,48 g", B.faerdig && Math.abs(NK.forventet.C - 2.48) < 0.01, besked(B));
     B.knap();
     paastand("dommen: tre svar på kortet, Indsend svar er grå", B.opg.dom && d.querySelectorAll("#hypoteser-valg .sk-knap").length === 3 &&
-        !B.el.indsend.hidden && B.el.indsend.classList.contains("ikke-klar"));
+        !B.el.indsend.hidden && B.el.indsend.classList.contains("ikke-klar"), "dom=" + B.opg.dom + " n=" + d.querySelectorAll("#hypoteser-valg .sk-knap").length + " hidden=" + B.el.indsend.hidden + " cls=" + B.el.indsend.className);
     d.querySelectorAll("#hypoteser-valg .sk-knap")[2].click();
     paastand("et svar vælges kun: intet bedømt, Indsend svar er klar", !B.faerdig && !/Forskellen/.test(besked(B)) &&
         d.querySelectorAll("#hypoteser-valg .sk-knap")[2].classList.contains("valgt") && B.el.indsend.classList.contains("klar"), besked(B));
@@ -426,7 +426,7 @@ function koerTest(W) {
     paastand("B er dommen: reaktionen og gættet står der", B.faerdig && NK.dommen && /Na₂CO₃ \+ CO₂ \+ H₂O/.test(besked(B)) && /gæt/.test(besked(B)), besked(B));
     paastand("kortet bliver på spørgsmålet: B er grønt, forklaringen står under, og knappen videre står, hvor Indsend svar stod",
         d.querySelectorAll("#hypoteser-valg .sk-knap")[1].classList.contains("rigtig") && B.el.indsend.hidden && !B.el.knap.hidden &&
-        /Fejlkilder/.test(B.el.knap.textContent) && B.el.knap.parentNode === B.el.indsend.parentNode && /Hvilken|passer/.test(d.getElementById("hypoteser-prompt").textContent));
+        /Fejlkilder/.test(B.el.knap.textContent) && B.el.knap.parentNode === B.el.indsend.parentNode && /Hvilken|passer/.test(d.getElementById("hypoteser-prompt").textContent), d.querySelectorAll("#hypoteser-valg .sk-knap")[1].className + " ih=" + B.el.indsend.hidden + " kh=" + B.el.knap.hidden + " kt=" + B.el.knap.textContent + " par=" + (B.el.knap.parentNode === B.el.indsend.parentNode) + " p=" + d.getElementById("hypoteser-prompt").textContent.slice(0,80));
     var j = NK.journalHTML();
     paastand("journalen har gættet, vejningerne, de tre masser og konklusionen", /Hypotese B/.test(j) && /3,29 g/.test(j) && /1,92 g/.test(j) &&
         /2,48 g/.test(j) && /passer med hypotese B/.test(j));
@@ -465,14 +465,16 @@ function koerTest(W) {
     paastand("tabellen: slutmasser og hypoteser for begge grupper", /Na₂CO₃|ingen/.test(d.getElementById("fejl-t-hyp-2").textContent) &&
         d.getElementById("fejl-t-slut-1").textContent === komma(g1) + " g", d.getElementById("fejl-t-slut-1").textContent);
     C.status[0].stjerne = false;
+    C.status[1].loest = false;
     C.vaelg(0, false);
-    d.querySelectorAll("#fejl-valg .sk-knap")[2].click();
+    var ret0 = D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(D.FEJL[0].rigtig), forkert0 = ret0 === 2 ? 1 : 2;
+    d.querySelectorAll("#fejl-valg .sk-knap")[forkert0].click();
     C.el.indsend.click();
     for (i = 0; i < 200 && C.koerer; i++) tik(C, 1);
     paastand("forkert gæt: forklaringen tager fat i gættet, og der er ingen stjerne", /Du gættede: det samme/.test(besked(C)) && !C.status[0].stjerne, besked(C));
     paastand("forkert svar: kortet bliver på spørgsmålet, det valgte er rødt og det rigtige gult, Næste fejlkilde står, hvor Indsend svar stod",
-        d.querySelectorAll("#fejl-valg .sk-knap")[2].classList.contains("forkert") && d.querySelectorAll("#fejl-valg .sk-knap")[1].classList.contains("svar-vist") &&
-        C.el.indsend.hidden && /Næste fejlkilde/.test(C.el.knap.textContent));
+        d.querySelectorAll("#fejl-valg .sk-knap")[forkert0].classList.contains("forkert") && d.querySelectorAll("#fejl-valg .sk-knap")[ret0].classList.contains("svar-vist") &&
+        C.el.indsend.hidden && /Næste fejlkilde/.test(C.el.knap.textContent), [].map.call(d.querySelectorAll("#fejl-valg .sk-knap"), function (b) { return b.className; }).join("|") + " ih=" + C.el.indsend.hidden + " kt=" + C.el.knap.textContent);
     paastand("Kør igen kører de samme to forsøg", (function () { d.getElementById("fejl-forfra").click(); var ok = C.koerer; for (var q = 0; q < 200 && C.koerer; q++) tik(C, 1); return ok && !C.koerer && C.res; }()));
 
     /* ================================================================ */

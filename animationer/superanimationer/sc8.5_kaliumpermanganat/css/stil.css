@@ -1427,3 +1427,83 @@ kbd {
 .fx-farve.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.15); }
 .fx-prik { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.45); flex-shrink: 0; }
 .fx-svar.spoerg { border-left-color: var(--gul); background-color: rgba(242, 197, 61, 0.1); color: #f5dd8a; }
+
+
+/* ---------------------------------------------------------------------
+   SC8.5: papirkortet oeverst midt i scenen (6. nov. 2026)
+   Grundreglerne er kopieret fra sb4.4. Udseendet (lyst papir, Lexend,
+   knapperne) kommer fra ../faelles/papirkort.css, der indlaeses efter
+   denne fil. Kortet har det naeste skridt helt kort (kortLinje i
+   js/sim.js), beskeden, Giv et hint og Indsend svar. Efter et rigtigt
+   svar bliver det paa bidden med forklaringen og Naeste trin, hvor
+   Indsend svar stod. Hoejden maa ikke overstige kortZone() i js/fane.js;
+   selvtesten maaler det med den laengste besked.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 6;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    box-sizing: border-box;
+}
+
+.scenekort [hidden],
+.scenekort[hidden] { display: none !important; }
+
+.sk-tekst { margin: 0; }
+
+.sk-bund {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+
+.sk-bund .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.sk-bund .knap.hjaelp { margin-left: auto; }
+
+.sk-videre {
+    flex: 0 0 auto;
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.98rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* Laes mere i forklaringen paa kortet: en lille blaa pille paa papiret */
+.scenekort .laes-mere { margin-left: 6px; font-size: 0.82em; }
+
+/* Start forfra i panelet, under bidderne (foer 6. nov. 2026 nederst i scenen) */
+.opgavekort .forfraknap {
+    position: static;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+/* Formlerne under spoergsmaalstegnet: den valgte er blaa og pulserer ikke */
+.hf-valgknap.valgt,
+.hf-valgknap.valgt:hover:not(:disabled) {
+    border-color: #2a76ac;
+    background-color: #e7f1fa;
+    color: #12395c;
+    box-shadow: inset 0 0 0 1px #2a76ac, 0 2px 6px rgba(0, 0, 0, 0.18);
+    animation: none;
+}
+
+.hf-valg:has(.valgt) .hf-valgknap { animation: none; }

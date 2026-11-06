@@ -92,7 +92,7 @@ forfra) og går igen. Uheldet skrives i hans uheldsregnskab. Replikkerne
 står i `D.PAATALE`. Han kommer ikke ind af andre grunde. Alt, hvad han siger, er
 hele sætninger i formelt sprog som i Kemibogen (brugerens regel 4. nov. 2026, se
 `../kemichael/README.md`); tørheden er bevaret, og replikken om at starte forfra
-nævner knappen Start forfra nederst til højre.
+nævner knappen Start forfra i panelet til højre (flyttet dertil 6. nov. 2026).
 
 * **Stikflammen:** hjulet på en tunet lighter. Første gang i en browser
   kommer glimtet om øjenbrynene fra 1994.
@@ -149,8 +149,8 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, bordet, tavlen, vægten, lighteren, flammen, brandkuglen, papiret, karret med måleglas og
                     stativ, boblerne, luppen og søjlerne med alkanerne
 js/laerer.js        Kemichael, der kun kommer ved påskeæggene (som sc_spil5_syregalgen)
-js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet og musen
-js/regning.js       regnetrinene i kortet (formlen og tallet) og tavlen på fane 2
+js/fane.js          det, fanerne deler: opgavelisten, papirkortet i scenen (linjen, Giv hint, Indsend svar, kortZone) og musen
+js/regning.js       regnetrinene i panelets kort Regnestykket (formlen og tallet) og tavlen på fane 2
 js/sim_forsoeg.js   fane 1, målingerne, som fane 2 bruger, tuningen og påskeæggene
 js/sim_beregning.js fane 2
 js/sim_fejl.js      fane 3
@@ -182,8 +182,46 @@ vand med terningen, én gang pr. tur, brandkugle, almindelig flamme uden
 Kemichael), fane 2 og 3 hele vejen, sproget (og at tuningen ikke står
 nogen steder) og layoutet fra 520 × 380 til 1500 × 900. Den kræver en
 lokal server eller Chrome med `--allow-file-access-from-files` og lægger
-elevens gemte fremskridt tilbage bagefter. Sidst kørt 27. september 2026:
-ALT OK (86 påstande).
+elevens gemte fremskridt tilbage bagefter. Sidst kørt 6. november 2026:
+ALT OK (119 påstande, med papirkortet i afsnit 11).
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Opgavekortene i panelet er fjernet. På alle tre faner står opgaven, gættet,
+svarene, linjen med næste skridt, hint, fejl og ros, den gule knap Giv hint
+(bliver til Vis svaret) og Indsend svar på ét lyst kort øverst midt i scenen
+(`visKort`, `visBliv`, `visIndsend` og `indsendKlik` i `js/fane.js`).
+
+* Forsøget: felterne bliver i skemaet i panelet. Indsend svar sender det tal,
+  der står i målingens felt (det felt, der er næste skridt, først), og er gråt,
+  til der står et tal. Enter i feltet er Indsend svar. Aflæs vægten og et klik
+  på vægten skriver kun tallet i feltet. Gættet på massen er gratis og virker
+  med det samme; imens er forsøget låst, og et klik i scenen eller på
+  mellemrumstasten får kortet til at blinke. Når målingen er færdig, står
+  forklaringen i en grøn boks (gul ved Vis svaret) med Næste måling eller
+  Videre til Beregningen, hvor Indsend svar stod.
+* Beregningen: felterne står i panelets kort Regnestykket uden ↵-knapper, og
+  noten om eksemplets tal står dér. Opgaven og bedømmelsen står på kortet. Til
+  sidst står de fem alkaner som svar på kortet; et klik på en knap eller en
+  søjle vælger kun, og Indsend svar sender. Et forkert svar bliver rødt og
+  lukket. Det rigtige bliver grønt, kortet bliver på spørgsmålet, og
+  forklaringen og Næste opgave står under svarene.
+* Fejlkilder: gættet (Højere, Lavere, Det samme) er gratis og sætter begge
+  forsøg i gang med det samme. Før gættet er forsøgene låst, og et klik i
+  scenen får kortet til at blinke. Bagefter bliver spørgsmålet stående med
+  det rigtige svar grønt, et forkert gæt rødt og forklaringen under.
+* Start forfra og Kør forsøgene igen står i panelet under listen, aldrig på
+  kortet. Efter den sidste fejlkilde er der ingen knap videre på kortet.
+* Pladsen til kortet er `kortZone()` (`zone` i `NK.Fane.paa` i hver
+  `js/sim_*.js`): fane 1 182 px (162 px på lave skærme), fane 2 204 (180) og
+  fane 3 236 (222). Scenen på fane 1 og 3 bliver skaleret, så det øverste i
+  den begynder under kortet; tavlen på fane 2 begynder under kortet, og
+  søjlerne giver plads. Selvtesten måler alle trin på 1400 × 860 og 1100 × 660.
+* Kemichaels replik om at starte forfra siger nu, at knappen står i panelet.
+* Molekylenavne (dioxygen osv.): ingen at rette. Animationen nævner kun
+  alkanerne, luft og vand.
 
 ## Forenklinger
 

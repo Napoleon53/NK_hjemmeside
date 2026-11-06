@@ -5,25 +5,27 @@
    Hver prik har farven fra det atom, elektronen kom fra, og tallet ved
    hvert atom er elektronegativiteten. Opgaven har tre bidder:
 
-     1. Gaet: eleven skriver sit gaet paa oxidationstallet i arbejdsfeltet
-        nederst paa tavlen (med reglerne fra fane 1).
+     1. Gaet: eleven skriver sit gaet paa oxidationstallet i felterne paa
+        papirkortet oeverst i scenen (med reglerne fra fane 1) og trykker
+        Indsend svar.
      2. Fordel: eleven traekker hvert elektronpar i en binding hen til det
         atom, der traekker hårdest. Parrene, der skal flyttes, blinker, og
         en pil peger mod hvert af de to atomer. Et par mellem to ens
-        atomer deles. Et par, der ender hos det forkerte atom, bliver
-        roedt, og linjen siger hvorfor. Man kan ogsaa klikke paa parret og
-        saa paa atomet.
+        atomer deles. Naar alle par er flyttet, sender Indsend svar
+        fordelingen: et par hos det forkerte atom bliver roedt, og linjen
+        siger hvorfor (et traek bedoemmer ikke af sig selv, 6. nov. 2026).
+        Man kan ogsaa klikke paa parret og saa paa atomet.
      3. Regnskabet: naar alle par er paa plads, faar hvert atom en ring om
         sine elektroner og sit oxidationstal (valenselektroner minus de
-        elektroner, det har nu), og gaettet sammenlignes. Linjen i
-        arbejdsfeltet siger i ord, hvor parrene endte, og under den staar
-        beregningen paa sine egne linjer med formlen i ord oeverst
-        (brugerens test 5. okt. 2026: regnestykker inde i teksten var
-        indforstaaede og svaere at laese).
+        elektroner, det har nu), og gaettet sammenlignes. Kortet siger i
+        ord, hvor parrene endte, og nederst paa tavlen staar beregningen
+        paa sine egne linjer med formlen i ord oeverst (brugerens test
+        5. okt. 2026: regnestykker inde i teksten var indforstaaede og
+        svaere at laese).
 
-   Alt, eleven skal laese og trykke paa, staar i arbejdsfeltet i scenen
-   (brugerens test 3. okt. 2026: opgaveteksten i panelets hjoerne var for
-   lille, og det, der skal traekkes, skal blinke eller have pile).
+   Alt, eleven skal laese og trykke paa, staar paa papirkortet oeverst i
+   scenen (brugerens test 3. okt. 2026: opgaveteksten i panelets hjoerne
+   var for lille, og det, der skal traekkes, skal blinke eller have pile).
 
    Undtagelserne fra reglerne (H₂, O₂, H₂O₂, OF₂) og ionerne (OH⁻ med en
    ekstra elektron, NH₄⁺ med én for lidt) kommer af sig selv af modellen i
@@ -47,7 +49,7 @@
     }
 
     var P = SimElektroner.prototype;
-    NK.Fane.paa(P, { navn: "ek" });
+    NK.Fane.paa(P, { navn: "ek", zone: [136, 124] });
 
     P.chipTekst = function (o) { return NK.formel(o.f) + NK.ladningHaevet(o.q); };
 
@@ -104,7 +106,7 @@
         return ord.slice(0, -1).join(", ") + " og " + ord[ord.length - 1];
     }
 
-    /* Det, eleven skal nu: staar som spoergsmaalet i arbejdsfeltet */
+    /* Det, eleven skal nu: staar som spoergsmaalet paa kortet */
     P.trinLinje = function () {
         if (this.trin === "gaet") {
             var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
@@ -116,14 +118,35 @@
         return "Træk " + hvad + " hen til det atom, der trækker hårdest.";
     };
 
+    /* Kortets tekst: molekylets navn, opgaven og det, eleven skal nu.
+       Naar regnskabet er gjort op, staar svaret i stedet. */
+    P.maalTekst = function () {
+        return "Find oxidationstallet for " + liste(this.spurgte()) + " i " + this.m.tekst + ".";
+    };
+
     P.visSpm = function () {
-        var m = this.m, html;
+        var m = this.m, html = '<span class="sk-chip">' + NK.html(m.def.navn) + "</span>";
         if (this.regnVist) {
-            html = '<span class="arb-ok">✓</span> ' + liste(this.spurgte().map(function (s) {
-                return NK.html(s + " er ") + "<b>" + O.ox(O.oxFor(m, s)) + "</b>";
-            })) + NK.html(" i " + m.tekst + ".");
-        } else html = NK.html(this.trinLinje());
+            html += NK.html(this.maalTekst()) + ' <b class="sk-svaret"><span class="arb-ok">✓</span> ' + liste(this.spurgte().map(function (s) {
+                return NK.html(s + " er ") + O.ox(O.oxFor(m, s));
+            })) + ".</b>";
+        } else html += NK.Papir.tekst(NK.html(this.maalTekst() + " " + this.trinLinje()));
         NK.saetHTML("ek-spm", html);
+    };
+
+    /* Indsend svar: gaettet, eller fordelingen, naar alle par er flyttet */
+    P.kanSende = function () {
+        var mig = this;
+        if (this.trin === "gaet") {
+            return this.spurgte().every(function (s) { return mig.gaet[s] !== undefined || mig.gaetFelter[s].inp.value.trim() !== ""; });
+        }
+        if (this.trin === "fordel") return this.enheder.every(function (u) { return u.hos !== null && !u.forkert; });
+        return false;
+    };
+
+    P.indsend = function () {
+        if (this.trin === "gaet") { this.gaetAlle(); return; }
+        if (this.trin === "fordel") this.fordelTjek();
     };
 
     /* Linjen, naar parrene skal fordeles: hvad tallene ved atomerne er */
@@ -148,7 +171,7 @@
         return null;
     };
 
-    /* ----- Gaettet i arbejdsfeltet ---------------------------------------------------
+    /* ----- Gaettet paa kortet ---------------------------------------------------
        Ét lille felt pr. grundstof, der spoerges til, og én knap. Naar der
        er gaettet, staar gaettet der som en brik, der bliver groen eller
        roed, naar regnskabet er gjort op. */
@@ -167,7 +190,7 @@
             var navn = document.createElement("span");
             navn.className = "gaet-s";
             navn.textContent = s;
-            navn.style.color = D.GRUNDSTOF[s].farve;
+            navn.style.color = D.GRUNDSTOF[s].papir || D.GRUNDSTOF[s].farve;
             var felt = document.createElement("div");
             felt.className = "felt aktiv";
             var inp = document.createElement("input");
@@ -178,10 +201,17 @@
             var svar = document.createElement("span");
             svar.className = "felt-svar";
             svar.hidden = true;
+            /* Enter er Indsend svar. Mangler et andet felt, gaar Enter dertil. */
             inp.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") { e.preventDefault(); mig.gaetTjek(s); }
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                e.stopPropagation();
+                var tom = mig.spurgte().filter(function (x) { return mig.gaet[x] === undefined && !mig.gaetFelter[x].inp.value.trim(); })[0];
+                if (tom && tom !== s && inp.value.trim()) { mig.gaetFelter[tom].inp.focus(); return; }
+                mig.gaetAlle();
+                mig.visKnap();
             });
-            inp.addEventListener("input", function () { felt.classList.remove("ryst"); });
+            inp.addEventListener("input", function () { felt.classList.remove("ryst"); mig.visKnap(); });
             felt.appendChild(inp);
             felt.appendChild(svar);
             rk.appendChild(navn);
@@ -189,14 +219,6 @@
             mig.gaetEl.appendChild(rk);
             mig.gaetFelter[s] = { felt: felt, inp: inp, svar: svar };
         });
-        var ok = document.createElement("button");
-        ok.type = "button";
-        ok.className = "felt-ok gaet-ok";
-        ok.textContent = "Gæt";
-        ok.title = "Gæt (Enter)";
-        ok.addEventListener("click", function () { mig.gaetAlle(); mig.fokus(); });
-        this.gaetEl.appendChild(ok);
-        this.gaetKnap = ok;
         this.visGaet();
     };
 
@@ -240,7 +262,6 @@
     P.visGaet = function () {
         var mig = this, iGaet = this.trin === "gaet";
         this.gaetEtiket.hidden = iGaet;
-        this.gaetKnap.hidden = !iGaet;
         /* Mens parrene fordeles, er gaettet kun en paamindelse (skjules paa en smal scene) */
         this.el.arb.classList.toggle("fordeler", !iGaet && !this.regnVist);
         this.spurgte().forEach(function (s) {
@@ -276,28 +297,46 @@
 
     P.enNavn = function (a) { return a.en.toFixed(1).replace(".", ","); };
 
-    /* Parret u gives til atom i (eleven har sluppet det der) */
+    /* Parret u gives til atom i (eleven har sluppet det der). Det bedoemmes
+       foerst, naar eleven trykker Indsend svar (fordelTjek). Et par mellem
+       to ens atomer deles af sig selv: det er modellen, ikke et svar. */
     P.tildel = function (u, i, stille) {
-        var m = this.m, til = m.atomer[i], mod = m.atomer[i === u.b.a ? u.b.b : u.b.a];
+        var m = this.m, til = m.atomer[i];
         this.valgt = null;
+        u.forkert = false;
         if (u.b.mest === -1) {
             u.hos = "delt";
-            u.forkert = false;
             if (!stille) this.besked(NK.html("To " + til.s + " trækker lige hårdt. Parret deles: " +
-                (u.b.orden > 1 ? "to elektroner" : "én elektron") + " til hver."), "god");
-        } else if (u.b.mest === i) {
-            u.hos = i;
-            u.forkert = false;
-            if (!stille) this.besked(NK.html("Rigtigt. " + til.s + " (" + this.enNavn(til) + ") trækker hårdere end " + mod.s +
-                " (" + this.enNavn(mod) + ")."), "god");
+                (u.b.orden > 1 ? "to elektroner" : "én elektron") + " til hver."), "peger");
         } else {
             u.hos = i;
-            u.forkert = true;
-            u.blink = 1;
-            if (!stille) this.fejlLinje(til.s + " har " + this.enNavn(til) + ", og " + mod.s + " har " + this.enNavn(mod) + ". " +
-                mod.s + " trækker hårdest, så parret skal hen til " + mod.s + ".");
+            if (!stille) {
+                var mangler = this.enheder.filter(function (x) { return x.hos === null; }).length;
+                this.besked(mangler ? "" : "Alle par er flyttet. Tryk på Indsend svar.", mangler ? "" : "peger");
+            }
         }
         if (this.afvisTilbud) this.afvisTilbud();
+        this.visKnap();
+    };
+
+    /* Indsend svar: er alle par hos det atom, der traekker hårdest? Et par
+       hos det forkerte atom bliver roedt, og linjen siger hvorfor. */
+    P.fordelTjek = function () {
+        var mig = this, m = this.m, forste = null;
+        if (this.enheder.some(function (u) { return u.hos === null; })) {
+            this.besked("Flyt alle elektronparrene først. Parrene, der blinker, mangler.", "peger");
+            return;
+        }
+        this.enheder.forEach(function (u) {
+            if (!mig.paaPlads(u)) { u.forkert = true; u.blink = 1; if (!forste) forste = u; }
+        });
+        if (forste) {
+            var til = m.atomer[forste.hos], mod = m.atomer[forste.hos === forste.b.a ? forste.b.b : forste.b.a];
+            this.fejlLinje(til.s + " har " + this.enNavn(til) + ", og " + mod.s + " har " + this.enNavn(mod) + ". " +
+                mod.s + " trækker hårdest, så parret skal hen til " + mod.s + ".");
+            this.visKnap();
+            return;
+        }
         this.tjekFordelt();
     };
 
@@ -329,6 +368,7 @@
         });
         this.svarHTML = NK.html(dele.join(" "));
         this.svarMaade = "svar";
+        this.tjekFordelt();
     };
 
     /* Regnskabet: kaldes, naar alle par er paa plads og lidt tid er gaaet */
@@ -367,7 +407,7 @@
         return NK.html(dele.join(" "));
     };
 
-    /* ----- Beregningen under linjen i arbejdsfeltet -------------------------------------
+    /* ----- Beregningen nederst paa tavlen ----------------------------------------------
        En paen beregning: formlen med ord oeverst og én linje pr. grundstof,
        der spoerges til, med tallene lige under de ord, de hoerer til, og
        lighedstegnene under hinanden. For en ion kommer summen til sidst. */
@@ -398,6 +438,7 @@
         if (!e) return;
         e.innerHTML = this.regnVist ? this.forklaringHTML() : "";
         e.hidden = !this.regnVist;
+        e.classList.toggle("svar", !!this.brugtSvar);
     };
 
     /* ----- Regnskabet i panelet ---------------------------------------------------------- */
@@ -427,31 +468,34 @@
     };
 
     /* ----- Geometrien -------------------------------------------------------------------- */
-    /* Pladsen, arbejdsfeltet faar nederst paa tavlen. Det kan blive hoejere
-       (en lang forklaring til sidst), saa molekylet staar over det. */
-    var ARB_H = 124;
+    /* Pladsen til beregningen nederst paa tavlen, naar regnskabet er gjort op:
+       formlen med ord, én linje pr. grundstof, summen for en ion og noten.
+       Den er sat af fra starten, saa molekylet ikke flytter sig. */
+    P.forklarPlads = function () {
+        var def = this.m.def, linjer = 1 + this.spurgte().length + (this.m.q ? 1 : 0);
+        return Math.round(16 + linjer * 26 + (def.note ? 26 : 0));
+    };
 
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var kant = NK.klamp(W * 0.025, 10, 30), top = NK.klamp(H * 0.03, 8, 22);
+        /* Tavlen begynder under papirkortets plads */
+        var zone = this.kortZone();
+        var kant = NK.klamp(W * 0.025, 10, 30), top = zone + 4;
         /* Under tavlen er der en smal stribe til knappen Start forfra */
         var tv = { x: kant, y: top, b: W - 2 * kant, h: Math.max(180, H - top - NK.klamp(H * 0.06, 40, 48)) };
         var ramme = NK.klamp(tv.b * 0.012, 7, 12);
-        var hoved = 34;
-        /* Arbejdsfeltet: spoergsmaalet, gaettet og knappen */
-        var arb = this.el.arb;
+        var hoved = 30;
+        /* Beregningen nederst paa tavlen */
+        var fk = this.forklarEl;
         var bund = tv.y + tv.h - ramme - 10;
-        arb.style.left = Math.round(tv.x + ramme + 10) + "px";
-        arb.style.width = Math.round(tv.b - 2 * ramme - 20) + "px";
-        arb.style.bottom = Math.round(H - bund) + "px";
-        /* Paa en smal scene er der ikke plads til baade gaettet og knappen
-           paa linjen, naar opgaven er loest (se .arb.smal.sejr i stilarket) */
-        arb.classList.toggle("smal", tv.b - 2 * ramme - 20 < (this.spurgte().length > 1 ? 720 : 620));
-        var arbH = Math.max(ARB_H, arb.offsetHeight || 0);
-        this.arbBrugt = arbH;
+        fk.style.left = Math.round(tv.x + ramme + 10) + "px";
+        fk.style.width = Math.round(tv.b - 2 * ramme - 20) + "px";
+        fk.style.bottom = Math.round(H - bund) + "px";
+        var fkH = Math.max(this.forklarPlads(), fk.hidden ? 0 : fk.offsetHeight || 0);
+        this.fkBrugt = fkH;
         var ind = { x: tv.x + ramme + 16, y: tv.y + ramme + hoved, b: tv.b - 2 * ramme - 32,
-            h: Math.max(120, bund - arbH - 8 - (tv.y + ramme + hoved)) };
-        this.lay = { W: W, H: H, tv: tv, ramme: ramme, ind: ind, hoved: hoved };
+            h: Math.max(120, bund - fkH - 8 - (tv.y + ramme + hoved)) };
+        this.lay = { W: W, H: H, tv: tv, ramme: ramme, ind: ind, hoved: hoved, zone: zone };
         this.geometri();
         this.snap = true;
         var g = this.geo;
@@ -560,9 +604,9 @@
     P.opdaterScene = function (dt) {
         var mig = this;
         if (!this.geo) return;
-        /* Arbejdsfeltet er blevet hoejere eller lavere (en lang forklaring):
-           molekylet faar den plads, der er */
-        if (Math.max(ARB_H, this.el.arb.offsetHeight || 0) !== this.arbBrugt) this.layout();
+        /* Beregningen fylder mere end den plads, der er sat af: molekylet
+           faar den plads, der er */
+        if (!this.forklarEl.hidden && this.forklarEl.offsetHeight > this.fkBrugt) this.layout();
         var hurtig = this.snap ? 1e6 : 12;
         this.frie.forEach(function (e) {
             var p = mig.maalFri(e);
@@ -640,13 +684,15 @@
         var u = this.enhedUnder(pt);
         if (!u) return false;
         if (this.trin === "gaet") {
-            this.kortBesked("Gæt først. Skriv dit gæt i feltet her, og tryk Gæt.", 4, "gul");
+            this.kortBesked("Gæt først. Skriv dit gæt i felterne på kortet, og tryk på Indsend svar.", 4, "gul");
+            this.kortBlink();
             this.fokus();
             this.ignorerKlik = true;
             return false;
         }
         if (this.trin !== "fordel") {
-            this.kortBesked("Parrene er fordelt. Start forfra, hvis du vil prøve igen.", 4);
+            /* Parrene er fordelt: kortets knap videre blinker */
+            this.kortBlink();
             this.ignorerKlik = true;
             return false;
         }
@@ -883,25 +929,15 @@
         }
     };
 
-    /* Oeverst paa tavlen: opgaven til venstre og stoffets navn til hoejre */
+    /* Oeverst paa tavlen: for en ion, hvad den ekstra eller manglende
+       elektron er. Opgaven og navnet staar paa papirkortet (6. nov. 2026). */
     P.tegnHoved = function (ctx) {
         var lay = this.lay, tv = lay.tv, r = lay.ramme, m = this.m;
         var x = tv.x + r + 16, y = tv.y + r + lay.hoved * 0.5;
         ctx.save();
         ctx.textBaseline = "middle";
-        /* Den gule streg foran opgaven */
-        ctx.fillStyle = "#f2c53d";
-        ctx.fillRect(x, y - 10, 4, 20);
-        ctx.textAlign = "left";
-        ctx.font = T.font("700", 18);
-        ctx.fillStyle = T.KRIDT;
-        ctx.fillText("Find oxidationstallet for " + liste(this.spurgte()) + " i " + m.tekst, x + 12, y);
-        ctx.textAlign = "right";
-        ctx.font = T.font("600", 16);
-        ctx.fillStyle = T.KRIDT_SVAG;
-        ctx.fillText(m.def.navn, tv.x + tv.b - r - 16, y);
         /* Ionens ekstra eller manglende elektron */
-        var ex = x, ey = y + lay.hoved * 0.5 + 10;
+        var ex = x, ey = y;
         ctx.textAlign = "left";
         ctx.font = T.font("600", 14);
         m.atomer.forEach(function (a) {

@@ -86,10 +86,6 @@
         g.appendChild(h);
     }
 
-    function okKnap(fra) {
-        return '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
-    }
-
     /* ✓ ved en linje, der er rigtig, ↩ ved en, der er vist med Vis svaret */
     function maerke(vist) {
         return '<span class="rs-maerke' + (vist ? " svar" : "") + '">' + (vist ? "↩" : "✓") + "</span>";
@@ -175,12 +171,13 @@
         fe.style.flex = "1";
         fe.innerHTML = '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="' +
             NK.html((slags === "formel" ? "Formlen for " : "Resultatet med enhed for ") + t.navn.toLowerCase()) + '" placeholder="' +
-            (slags === "formel" ? "formlen med bogstaver" : "resultatet med enhed") + '"' + fra + ">" + okKnap(fra);
+            (slags === "formel" ? "formlen med bogstaver" : "resultatet med enhed") + '"' + fra + ">";
         var inp = fe.querySelector("input");
+        /* Enter i feltet er det samme som Indsend svar paa papirkortet */
         inp.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+            if (e.key === "Enter") { e.preventDefault(); mig.fane.indsendKlik(); }
         });
-        fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+        inp.addEventListener("input", function () { mig.fane.visKnap(); });
         f.feltEl = fe;
         f.input = inp;
         return fe;
@@ -220,21 +217,17 @@
                 var inp = del.querySelector("input");
                 inp.value = f.tekst[i] || "";
                 inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(i); }
+                    if (e.key === "Enter") { e.preventDefault(); mig.fane.indsendKlik(); }
                 });
                 inp.addEventListener("input", function () {
                     f.tekst[i] = inp.value;
+                    mig.fane.visKnap();
                 });
                 f.inputs[i] = inp;
             }
             holder.appendChild(del);
         });
         fe.appendChild(krop);
-        var knap = document.createElement("div");
-        knap.innerHTML = okKnap("");
-        var ok = knap.firstChild;
-        ok.addEventListener("click", function () { mig.tjek(); });
-        fe.appendChild(ok);
         f.feltEl = fe;
         return fe;
     };
@@ -249,6 +242,14 @@
             return null;
         }
         return f.input;
+    };
+
+    /* Har det aktive trin noget at sende? (papirkortets Indsend svar) */
+    P.harSvar = function () {
+        var f = this.aktivt();
+        if (!f) return false;
+        if (f.fase === "indsaet") return !!f.inputs && f.inputs.some(function (x) { return x && x.value.trim(); });
+        return !!(f.input && f.input.value.trim());
     };
 
     P.fokus = function (i) {
@@ -516,6 +517,35 @@
             return { hint: r.hintHTML(), hint2: r.hint2(), svar: function () { r.visSvar(); } };
         };
         P2.trinLinje = function () { return this.regning.trinTekst(); };
+
+        /* Papirkortet (6. nov. 2026): opgavens spoergsmaal staar paa kortet,
+           felterne i panelet. Indsend svar (og Enter) tjekker det aktive trin. */
+        P2.kortData = function () {
+            var chip = "Opgave " + (this.nr + 1) + " af " + this.opgaver.length;
+            if (this.regning.faerdig()) {
+                return { slags: "loest", bliv: true, gul: this.sidstMaade === "svar", chip: chip, tekst: this.kortTekst(),
+                         html: (this.slutLinje ? this.slutLinje() : "") + (this.slutEkstra ? " " + NK.html(this.slutEkstra) : ""),
+                         videre: this.videreTekst() };
+            }
+            return { slags: "spm", chip: chip, tekst: this.kortTekst() };
+        };
+        P2.spmAaben = function () { return !this.regning.faerdig() && !this.auto; };
+        P2.indsendKlar = function () { return this.regning.harSvar(); };
+        P2.indsendSvar = function () {
+            var r = this.regning;
+            if (!r.harSvar()) {
+                this.blinkKort();
+                this.kortBesked("Skriv i feltet i panelet først.", 3.5, "gul");
+                r.fokus();
+                return true;
+            }
+            /* I mellemregningen tjekkes det felt, der er skrevet i (eller begge) */
+            var f = r.aktivt(), fyldt = [];
+            if (f && f.fase === "indsaet" && f.inputs) f.inputs.forEach(function (x, i) { if (x && x.value.trim() && f.plads[i] === null) fyldt.push(i); });
+            r.tjek(fyldt.length === 1 ? fyldt[0] : undefined);
+            this.visKnap();
+            return true;
+        };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
         /* Et trin er gaaet videre: linjen viser det svar, eleven bad om,
@@ -524,7 +554,7 @@
             this.hjaelp = 0;
             this.trekant = null;
             var trin = this.trinLinje();
-            if (vistHTML) this.besked(vistHTML + " " + trin, "gul");
+            if (vistHTML) this.svarVis(vistHTML);
             else this.besked(godHTML + " " + trin, "god");
             this.visKnap();
             this.fokus();
@@ -543,12 +573,14 @@
         };
 
         P2.regnLoest = function (id, maade) {
+            this.sidstMaade = maade;
             if (this.efterTrin) this.efterTrin(id, maade);
             this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) : null, "tal");
         };
 
         P2.regnFejl = function (besked, tom, id, v) {
-            this.besked(NK.html(besked), tom ? "gul" : "skidt");
+            if (tom) this.besked(NK.html(besked), "gul");
+            else this.fejlLinje(NK.html(besked));
             if (!tom && this.efterFejl) this.efterFejl(id, v);
             this.fokus();
         };

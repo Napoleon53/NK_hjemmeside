@@ -35,8 +35,9 @@ op, er pudset, og glasset har frisk opløsning.
    forsøg, 5 mål. Fane 2: 6 kort og 1 hylde. Fane 3: 1 glas, 1 lup, rækken
    med 14 grundstoffer og 12 opgaver, derefter tilfældige par af 8 metaller
    og 9 opløsninger.
-5. **Layoutet:** scene plus panel, som sc7.4. Panelet har opgavekortet med én
-   knap (Giv hint, Vis svaret, videre) og skemaet eller listen over svarene.
+5. **Layoutet:** scene plus panel, som sc7.4. Opgaven står på papirkortet
+   øverst i scenen (se Papirkortet nedenfor), og panelet har skemaet eller
+   listen over svarene.
 
 ## Hvad den viser
 
@@ -55,22 +56,22 @@ der sig et lag på stangen (brunt kobber, sorte jernkorn, grå krystaller af
 sølv), farven skifter (den blå forsvinder, eller væsken bliver blå), eller der
 kommer bobler i syren. I syren bliver stangen også tyndere under overfladen
 (magnesium hurtigst), fordi metallet går i opløsning, uden at noget sætter sig
-på den. Linjen under scenen siger, hvad man ser, uden at navngive stoffet. Luppen viser det valgte glas: stangens atomer i et gitter til højre,
+på den. Linjen på kortet siger, hvad man ser, uden at navngive stoffet. Luppen viser det valgte glas: stangens atomer i et gitter til højre,
 ionerne og tilskuerionerne (SO₄²⁻, NO₃⁻, Cl⁻) til venstre. Hver hændelse er én
 gang den afstemte reaktion, fx ét Zn og én Cu²⁺ med to elektroner, eller ét Cu
 og to Ag⁺. Reagerer parret ikke, svømmer ionerne hen til stangen og videre.
 Efter 1,5 s står forsøget i skemaet (✓ eller –), som fane 2 også bruger.
-Opgavekortet har fem mål: zink i Cu²⁺ (hvad sætter sig?), kobber i Ag⁺ (hvor
+Kortet øverst i scenen har fem mål: zink i Cu²⁺ (hvad sætter sig?), kobber i Ag⁺ (hvor
 kommer den blå farve fra?), sølv i Cu²⁺ (hvad gør ionerne i luppen?), en stang
 med bobler i syren (hvad er boblerne?) og resten af skemaet. De forkerte svar er
-de typiske: rust, farvet zink, sølvnitrat, der bliver blåt af sig selv, oxygen og
+de typiske: rust, farvet zink, sølvnitrat, der bliver blåt af sig selv, dioxygen og
 vanddamp fra kogende syre. Et forkert svar får en forklaring og kan ikke vælges
 igen.
 
 **Rækken.** Seks kort ligger blandet på bordet: de fem metaller og hydrogen.
 Eleven trækker dem op på en hylde med pladser fra uædel til ædel (et klik sender
 et kort op på den første ledige plads og ned igen). Når alle seks står på
-hylden, tjekkes rækkefølgen. Er den forkert, bliver to kort ved siden af
+hylden, og eleven trykker på Indsend svar, tjekkes rækkefølgen. Er den forkert, bliver to kort ved siden af
 hinanden røde, og beskeden forklarer ud fra skemaet, fx "Zink står til højre
 for jern. Men zink reagerede med jernionerne, så zink skal stå til venstre."
 Hintet viser antallet af flueben i hver række af skemaet. Er rækken rigtig,
@@ -82,16 +83,15 @@ Hg Pt Au. Nikkel og tin er taget ud af rækken og opgaverne (brugerens ønske
 stativ over et glas. Eleven svarer ja eller
 nej, stangen kommer ned, og glasset og luppen viser svaret. Rækken får mærkerne
 "stangen" og "ionerne" og en pil med e⁻, når der sker noget. Sker der noget,
-klikker eleven på de to stoffer, der dannes (de forkerte er stangen og ionen,
+vælger eleven de to stoffer, der dannes (de forkerte er stangen og ionen,
 som de var, og H som atomer), og afstemmer til sidst med fire tomme felter.
 Beskederne siger, hvad der ikke passer: atomerne på hver side, ladningen før og
 efter pilen eller tal, der kan forkortes. Et rigtigt svar tæller elektronerne:
 "2 Al afgiver 6 e⁻, og 3 Cu²⁺ optager 6 e⁻." De første tolv opgaver går fra 1 : 1
 over 1 : 2 og H₂ til 2 : 3 og 3 : 2; bagefter kommer tilfældige par. Listen i
 panelet viser de seneste seks og antallet af rigtige gæt i første forsøg.
-Panelet er bredere end på de to andre faner (580 px, 500 px under 1320 px), og
-skemaets skrift følger panelets bredde, så de fire felter og stofferne står på
-én linje med luft omkring. Tjek står på sin egen linje under skemaet.
+Reaktionsskemaet med de fire felter står på kortet øverst i scenen (før 6. nov.
+2026 i et bredere panel), og Indsend svar sender felterne.
 
 **Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
 Præsentationen går ét trin ad gangen (brugerens ønske 3. oktober 2026, reglerne
@@ -130,7 +130,7 @@ også <kbd>→</kbd>) · <kbd>J</kbd> <kbd>N</kbd> ja og nej på fane 3 ·
 * **Fane 3 er ny:** forudsig med den lange række, også aluminium, bly og
   guld, og afstem 1 : 2, 2 : 3 og 3 : 2.
 * **Ingen ventetid:** stængerne kan flyttes hele tiden.
-* **Hjælpen er én knap:** Giv hint, så Vis svaret.
+* **Hjælpen er én knap på kortet:** Giv hint, så Vis svaret.
 
 ## Filer
 
@@ -139,6 +139,7 @@ index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (grundlaget er sc7.4's). NB: decimaltal med PUNKTUM i CSS
 sprites/            bægerglasset (fra sc2.1 og sc7.2)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc7.4)
+js/kort.js          papirkortet øverst i scenen (kopi af sc5.4's fil)
 js/kemi.js          modellen: stofferne med E°, rækken, hvem der reagerer, den afstemte
                     reaktion og tjekket af koefficienterne
 js/data.js          stængerne og glassene, målene med spørgsmålene, de tolv opgaver,
@@ -190,7 +191,8 @@ gå videre, Næste viser hver linje, rammen står om det, han peger på, boblen
 dækker det ikke, Afslut og Spring over sender ham ud), og at layoutet holder
 fra 520 × 380 til 1500 × 900. Den kræver en lokal server
 eller Chrome med `--allow-file-access-from-files`, og den lægger elevens valg
-tilbage bagefter. Sidst kørt 3. oktober 2026: ALT OK (154 påstande).
+tilbage bagefter. Den tjekker også papirkortet (se nedenfor). Sidst kørt 6. november
+2026: ALT OK (188 påstande).
 
 ## Forenklinger
 
@@ -214,10 +216,53 @@ tilbage bagefter. Sidst kørt 3. oktober 2026: ALT OK (154 påstande).
 * Luppen er et udsnit: nye ioner svømmer ind fra venstre, og de nye metalioner
   svømmer ud igen, når der er mere end fem.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har ét lyst papirkort øverst i scenen (`js/kort.js`, kopi af
+sc5.4's, og `../faelles/papirkort.css/js`). Opgavekortene i panelet og
+statuslinjen nederst er fjernet; det, statuslinjen sagde (det, man ser i
+glasset), står nu i kortets linje, når der ikke står et hint eller en fejl.
+Kortet har etiketten ("Mål 2 af 5", "Rækken", "Opgave 3 af 12"), opgaven eller
+spørgsmålet, Giv hint (gul kant, derefter Vis svaret) og Indsend svar (grå, til
+der er noget at sende). Efter et rigtigt svar bliver kortet på spørgsmålet med
+svaret grønt og forklaringen, og knappen videre står, hvor Indsend svar stod.
+Start forfra og Bland kortene står i panelet.
+
+- Forsøget: mens et forsøg skal laves, er der kun Giv hint (at sætte en stang i
+  et glas er forsøget, ikke et svar). Svarene på spørgsmålet vælger kun; Indsend
+  svar bedømmer. Et forkert svar bliver rødt og kan ikke vælges igen. Under
+  spørgsmålet er stængerne låst, og et greb i en stang får kortet til at blinke.
+  På en lav skærm (fx 1366 × 768) ville luppen blive for lille under kortet. Så
+  står luppen helt oppe til højre, og kortet står øverst til venstre for den
+  (`lay.ved` og `placerKort` i `js/sim_forsoeg.js`).
+- Rækken: rækkefølgen tjekkes først, når alle seks står på hylden, og eleven
+  trykker på Indsend svar. Efter et forkert tjek er Indsend svar grå, til et kort
+  er flyttet.
+- Forudsig: ja og nej vælger kun; Indsend svar sender stangen ned. Bagefter
+  bliver kortet på spørgsmålet med svaret (rødt ved et forkert gæt) og Næste
+  spørgsmål, når der sker noget, eller Næste opgave, når intet sker. Stofferne
+  vælges (to ad gangen) og sendes med Indsend svar; de rigtige kommer i skemaet,
+  de forkerte bliver røde. Ingen ros under det næste spørgsmål. Skemaet med de
+  fire felter står på kortet under svarene og bliver stående, når opgaven er
+  løst. Enter i et felt er Indsend svar. Et klik på glasset før svaret får kortet
+  til at blinke. Panelet på fane 3 er nu lige så bredt som på de andre faner.
+
+Luppen, hylden, rækken og glasset begynder under kortets plads (`kortZone` og
+`ZONE` i hver `sim_*.js`), som er sat efter kortets højeste tilstand, så intet
+flytter sig. Tilbuddet om præsentationen står nederst. På en smal skærm er
+scenen højere (82vh, mindst 640 px). Præsentationen og rundvisningen peger på
+kortet (`#fs-skort`, `#rk-skort`, `#fu-skort`).
+
+**Molekylnavnene (6. nov. 2026):** H₂ som stof hedder dihydrogen og O₂ dioxygen
+(svarene "Dihydrogen, H₂" og "Dioxygen, O₂" på fane 1, hintet og beskeden om H som
+atomer på fane 3 og teorien). Hydrogen i spændingsrækken og på kortet på hylden
+er grundstoffet og bliver. "Rust kræver dioxygen" (forklaringen til svaret Rust;
+først "ilt", rettet 6. nov., så O₂ altid hedder dioxygen).
+
 ## Tilbuddet om præsentationen
 
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
-præsentation og Nej tak midt foroven i scenen. Start sender ham ind, Nej tak og
+præsentation og Nej tak nederst i scenen (foroven står papirkortet). Start sender ham ind, Nej tak og
 Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
 forsvinder også, når eleven har gjort noget på fanen. Når han står der, kommer
 taleboblen med Næste, trinnets nummer og Spring over. Koden er

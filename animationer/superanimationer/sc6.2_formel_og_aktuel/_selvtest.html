@@ -278,32 +278,39 @@ function koerTest(W) {
     function vaelgA(i) { A.vaelg(i, false); A.layout(); }
     function krukkePt(j) { var kr = A.lay.krukker[j || 0]; return { x: kr.cx, y: kr.y + kr.h / 2 }; }
     function portion(j) { var p = krukkePt(j); tryk(A, p.x, p.y); tik(A, 2); }
-    function prompt() { return d.getElementById("opl-prompt").textContent; }
+    function prompt() { return d.getElementById("opl-ind").textContent.replace(/\u00a0/g, " "); }
     /* Beregningen i kortet: teksten, med ét mellemrum mellem delene */
     function beregning() {
-        var e = d.querySelector("#opl-prompt .superberegning");
+        var e = d.querySelector("#opl-beregning .superberegning");
         if (!e) return "";
         return [].map.call(e.querySelectorAll(".sb-v, .sb-led, .sb-skema, .sb-konklusion"), function (x) { return x.textContent; }).join(" ");
     }
     vaelgA(0);
     paastand("kortet Glasset er væk: panelet har kun opgaven og opgavelisten",
-        !d.getElementById("opl-data") && d.querySelectorAll("#fane-opl .panel > .kort").length === 2);
+        !d.getElementById("opl-data") && d.querySelectorAll("#fane-opl .panel > .kort").length === 2 && !!d.querySelector("#fane-opl .scene #opl-skort"));
     portion(0);
     paastand("et klik på krukken giver en portion: [Cl⁻] = 0,10 M", Math.abs(A.glas.ion("Cl") - 0.1) < 1e-9 && /målet er 0,30 M/.test(besked(A)), besked(A));
     paastand("før opgaven er løst, står der ingen beregning i kortet", beregning() === "", beregning());
     portion(0); portion(0);
-    paastand("tre portioner NaCl: opgave 1 er løst med stjerne", A.faerdig && A.status[0].stjerne, besked(A));
+    var ins = A.el.indsend;
+    paastand("tre portioner NaCl: glasset løser ikke opgaven af sig selv, men Indsend svar er klar",
+        !A.faerdig && !ins.hidden && ins.classList.contains("klar"), besked(A));
+    A.indsendKlik();
+    paastand("Indsend svar: opgave 1 er løst med stjerne, og kortet bliver med Næste opgave, hvor Indsend svar stod",
+        A.faerdig && A.status[0].stjerne && ins.hidden && !!d.querySelector("#opl-skort.bliv [data-videre]") && /Næste opgave/.test(prompt()), besked(A));
     paastand("beregningen står i kortet: formlen først, så tallene med enheder",
-        /c\(NaCl\) = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M/.test(beregning()) && d.querySelectorAll("#opl-prompt .superberegning .broek").length === 2,
+        /c\(NaCl\) = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M/.test(beregning()) && d.querySelectorAll("#opl-beregning .superberegning .broek").length === 2,
         beregning());
     paastand("så skemaet, [Cl⁻] = c(NaCl) og en konklusion i ord",
         /NaCl\(s\) ⟶ Na⁺\(aq\) \+ Cl⁻\(aq\) \[Cl⁻\] = c\(NaCl\) \[Cl⁻\] = 0,30 M Den aktuelle koncentration af Cl⁻ er 0,30 M\./.test(beregning()), beregning());
-    paastand("linjen roser kort og gentager ikke beregningen", D.ROS_OPGAVE.concat([D.FAERDIG.opl]).indexOf(besked(A)) >= 0, besked(A));
+    paastand("kortet viser konklusionen under opgaven, og linjen nederst er væk", /Den aktuelle koncentration af Cl⁻ er 0,30 M/.test(prompt()) && besked(A) === "", besked(A));
     function valgKnap(t) {
-        return [].filter.call(d.querySelectorAll("#opl-valg .knap"), function (b) { return b.textContent === t; })[0];
+        return [].filter.call(d.querySelectorAll("#opl-ind [data-valg]"), function (b) { return b.textContent.replace(/\u00a0/g, " ") === t; })[0];
     }
+    /* Et svar paa et spoergsmaal: klik paa svaret (vaelger kun) og Indsend svar */
+    function svarA(t) { valgKnap(t).click(); A.indsendKlik(); }
     vaelgA(1);
-    paastand("opgave 2 starter uden spørgsmål: først skal saltet i", d.getElementById("opl-valg").hidden && !/\?/.test(prompt()), prompt());
+    paastand("opgave 2 starter uden spørgsmål: først skal saltet i", !d.querySelector("#opl-ind [data-valg]") && !/\?/.test(prompt()), prompt());
     portion(0);
     tik(A, 2);
     paastand("en portion Na₂SO₄: første spørgsmål er c(Na₂SO₄), og Start forfra er væk",
@@ -312,35 +319,41 @@ function koerTest(W) {
         (A.vis.sNa2SO4 || 0) < 1e-3 && (A.vis.iNa || 0) < 1e-3 && A.part.antal(0) === 0 && beregning() === "", beregning());
     portion(0);
     paastand("mere salt kan ikke komme i, mens spørgsmålene står", Math.abs(A.glas.n.Na2SO4 - 0.1) < 1e-9 && /Svar på spørgsmålet/.test(besked(A)), besked(A));
+    paastand("Indsend svar er gråt, før et svar er valgt", !ins.hidden && ins.classList.contains("ikke-klar"));
     valgKnap("0,10 M").click();
+    paastand("et klik på et svar vælger kun", A.spmFejl.length === 0 && ins.classList.contains("klar") && !!d.querySelector("#opl-ind .sk-knap.valgt"));
+    A.indsendKlik();
     paastand("0,10 M: det er stofmængden n, og knappen er slået fra", /stofmængden n/.test(besked(A)) && valgKnap("0,10 M").disabled && A.spmNr === 0,
         besked(A));
-    valgKnap("0,20 M").click();
+    svarA("0,20 M");
     tik(A, 2);
-    paastand("0,20 M: den grå søjle kommer, og næste spørgsmål er antallet af Na⁺",
-        Math.abs(A.vis.sNa2SO4 - 0.2) < 0.01 && (A.vis.iNa || 0) < 1e-3 && /Hvor mange Na⁺/.test(prompt()), prompt());
+    paastand("0,20 M: kortet bliver på spørgsmålet, svaret er grønt, forklaringen står under, og Næste står, hvor Indsend svar stod",
+        A.venter && !!d.querySelector("#opl-ind .sk-knap.rigtig") && /0,20 M/.test(prompt()) && ins.hidden && /Næste spørgsmål/.test(prompt()), prompt());
+    d.querySelector("#opl-skort [data-videre]").click();
+    paastand("Næste: den grå søjle står, og næste spørgsmål er antallet af Na⁺, uden rosen",
+        Math.abs(A.vis.sNa2SO4 - 0.2) < 0.01 && (A.vis.iNa || 0) < 1e-3 && /Hvor mange Na⁺/.test(prompt()) && !/0,10 mol \/ 0,50 L/.test(prompt()), prompt());
     paastand("beregningen har c(Na₂SO₄) = n / V med tallene, men endnu ikke skemaet og [Na⁺]",
         /c\(Na₂SO₄\) = 0,10 mol\s*0,50 L = 0,20 M/.test(beregning()) && !/⟶|\[Na⁺\]|aktuelle/.test(beregning()), beregning());
-    paastand("linjen roser og siger det næste, uden at gentage tallene", /næste spørgsmål/.test(besked(A)) && !/0,20 M/.test(besked(A)), besked(A));
     A.knap();
-    paastand("Giv hint på spørgsmålet: tallet efter Na", /^Hint:.*tallet efter Na/.test(besked(A)), besked(A));
-    valgKnap("4").click();
+    paastand("Giv hint på spørgsmålet: tallet efter Na", /^Hint\b.*tallet efter Na/.test(besked(A)), besked(A));
+    svarA("4");
     paastand("4: det hører til O i sulfat-ionen", /sulfat-ionen/.test(besked(A)), besked(A));
-    valgKnap("2").click();
+    svarA("2");
+    A.knap();
     tik(A, 2);
     paastand("2: luppen viser ionerne, beregningen får skemaet, og sidste spørgsmål er [Na⁺]",
         A.part.antal(0) === 8 && A.part.antal(1) === 4 && /Na₂SO₄\(s\) ⟶ 2 Na⁺\(aq\) \+ SO₄²⁻\(aq\)$/.test(beregning()) &&
         /Hvad bliver \[Na⁺\]\?/.test(prompt()), A.part.antal(0) + " " + beregning());
-    valgKnap("0,40 M").click();
+    svarA("0,40 M");
     tik(A, 2);
-    paastand("0,40 M: opgave 2 er løst med stjerne, og ionernes søjler står", A.faerdig && A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01, besked(A));
+    paastand("0,40 M: opgave 2 er løst uden stjerne (to forkerte svar først), og ionernes søjler står", A.faerdig && A.status[1].loest && !A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01, besked(A));
     paastand("beregningen slutter med [Na⁺] = 2 · c(Na₂SO₄), tallene og konklusionen",
         /\[Na⁺\] = 2 · c\(Na₂SO₄\) \[Na⁺\] = 2 · 0,20 M = 0,40 M Den aktuelle koncentration af Na⁺ er 0,40 M\./.test(beregning()), beregning());
     vaelgA(1);
     A.knap(); A.knap();
     tik(A, 4);
     paastand("Vis svaret i opgave 2: glasset får saltet, og første spørgsmål står", A.fase === "spm" && Math.abs(A.glas.n.Na2SO4 - 0.1) < 1e-9, A.fase);
-    for (i = 0; i < 3; i++) { A.knap(); A.knap(); tik(A, 1); }
+    for (i = 0; i < 3; i++) { A.knap(); A.knap(); tik(A, 1); if (A.venter) A.knap(); }
     paastand("Vis svaret på alle tre spørgsmål: opgaven er løst", A.faerdig && A.fase === "faerdig", A.fase);
     vaelgA(2);
     portion(0);
@@ -350,37 +363,42 @@ function koerTest(W) {
     var i, gl = A.lay.glas, kp = krukkePt(0);
     traek(A, kp.x, kp.y, gl.cx, gl.ind.top - 20); tik(A, 2);
     traek(A, kp.x, kp.y, gl.cx, gl.ind.top - 20); tik(A, 2);
-    paastand("to portioner trukket ned: [Cl⁻] = 0,60 M, opgave 3 er løst", A.faerdig && Math.abs(A.glas.ion("Cl") - 0.6) < 1e-9, besked(A));
+    A.indsendKlik();
+    paastand("to portioner trukket ned og Indsend svar: [Cl⁻] = 0,60 M, opgave 3 er løst", A.faerdig && Math.abs(A.glas.ion("Cl") - 0.6) < 1e-9, besked(A));
     vaelgA(3);
     portion(0);
+    A.indsendKlik();
     paastand("én portion K₃PO₄ i 0,50 L: [K⁺] = 0,60 M", A.faerdig, besked(A));
     vaelgA(4);
     portion(0);
-    paastand("før gættet kan der ikke komme salt i", A.glas.n["Al2(SO4)3"] === 0 && /Gæt først/.test(besked(A)), besked(A));
+    paastand("før gættet kan der ikke komme salt i", A.glas.n["Al2(SO4)3"] === 0 && /Gæt først/.test(besked(A)) && d.getElementById("opl-skort").classList.contains("blink"), besked(A));
     valgKnap("SO₄²⁻").click();
-    paastand("gættet står i linjen", /Dit gæt: SO₄²⁻/.test(besked(A)), besked(A));
+    paastand("gættet virker med det samme og står på kortet", A.fase === "goer" && /Dit gæt: SO₄²⁻/.test(prompt()), prompt());
     portion(0);
-    paastand("Al₂(SO₄)₃: gættet holdt, [SO₄²⁻] = 0,30 M", A.faerdig && /Dit gæt holdt/.test(besked(A)) && Math.abs(A.glas.ion("SO4") - 0.3) < 1e-9, besked(A));
+    paastand("Al₂(SO₄)₃: gættet holdt, [SO₄²⁻] = 0,30 M", A.faerdig && /Dit gæt holdt/.test(prompt()) && Math.abs(A.glas.ion("SO4") - 0.3) < 1e-9, besked(A));
     paastand("beregningen har begge ioner, og svarknapperne er væk",
         /\[Al³⁺\] = 2 · 0,10 M = 0,20 M \[SO₄²⁻\] = 3 · c\(Al₂\(SO₄\)₃\) \[SO₄²⁻\] = 3 · 0,10 M = 0,30 M Der er flest SO₄²⁻\./.test(beregning()) &&
-        d.getElementById("opl-valg").hidden, beregning());
+        !d.querySelector("#opl-ind [data-valg]"), beregning());
     vaelgA(5);
     for (i = 0; i < 5; i++) portion(0);
+    A.indsendKlik();
     paastand("kun NaCl til 0,50 M: brug begge salte", !A.faerdig && /Brug begge salte/.test(besked(A)), besked(A));
     d.getElementById("opl-forfra").click();
     for (i = 0; i < 4; i++) portion(0);
     portion(1);
+    A.indsendKlik();
     paastand("fire NaCl og én Na₂SO₄: for meget, hver Na₂SO₄ giver 2 Na⁺", !A.faerdig && /giver 2 Na⁺/.test(besked(A)) && /Start forfra/.test(besked(A)), besked(A));
     d.getElementById("opl-forfra").click();
     portion(0); portion(0); portion(0); portion(1);
+    A.indsendKlik();
     paastand("tre NaCl og én Na₂SO₄: [Na⁺] = 0,50 M, opgave 6 er løst", A.faerdig, besked(A));
     paastand("to salte: c = n / V én gang, begge salte med tal, og bidragene lagt sammen",
         /^c = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M c\(Na₂SO₄\) = 0,10 mol\s*1,00 L = 0,10 M \[Na⁺\] = c\(NaCl\) \+ 2 · c\(Na₂SO₄\) \[Na⁺\] = 0,30 M \+ 2 · 0,10 M = 0,50 M Den aktuelle/.test(beregning()) &&
         /lægges sammen\.$/.test(beregning()), beregning());
-    paastand("alle seks er løst, og knappen går videre til Ionerne", A.antalLoest() === 6 && /Ionerne/.test(A.el.knap.textContent), A.el.knap.textContent);
+    paastand("alle seks er løst, og knappen går videre til Ionerne", A.antalLoest() === 6 && /Ionerne/.test(d.querySelector("#opl-skort [data-videre]").textContent), prompt());
     vaelgA(0);
     A.knap();
-    paastand("Giv hint: hintet står i kortet, og knappen bliver til Vis svaret", /^Hint:/.test(besked(A)) && A.el.besked.className.indexOf("gul") >= 0 &&
+    paastand("Giv hint: hintet står i kortet, og knappen bliver til Vis svaret", /^Hint\b/.test(besked(A)) && A.el.status.className.indexOf("gul") >= 0 &&
         A.el.knap.textContent === "Vis svaret" && A.el.knap.classList.contains("svar"), besked(A));
     A.knap();
     tik(A, 8);
@@ -389,7 +407,7 @@ function koerTest(W) {
     overskrift("6. Fane 2: ionerne");
     NK.visFane("fane-ioner");
     B.tilpas(); B.layout();
-    function promptB() { return d.getElementById("ioner-prompt").textContent; }
+    function promptB() { return d.getElementById("ioner-ind").textContent.replace(/\u00a0/g, " "); }
     B.gang = [0, 1, 0];
     B.vaelg(0, false);
     paastand("Let: opgaven siger, at skemaet skal afstemmes, før ionernes koncentrationer kan findes",
@@ -410,7 +428,7 @@ function koerTest(W) {
         loeste.push(loesAlt(B));
     });
     paastand("to opgaver på hvert niveau kan løses (også baglæns og fra massen)", loeste.every(Boolean), loeste.join(","));
-    paastand("knappen hedder Ny opgave, og tallet i listen tæller", /Ny opgave/.test(B.el.knap.textContent) && B.status[2].antal >= 2, B.el.knap.textContent);
+    paastand("knappen hedder Ny opgave, og tallet i listen tæller", /Ny opgave/.test(promptB()) && B.status[2].antal >= 2, B.el.knap.textContent);
     B.vaelg(0, false);
     var saltFoer = B.opg.salt;
     B.knap();
@@ -420,7 +438,7 @@ function koerTest(W) {
     skrivI(B, String(st0.kk + 1), String(st0.ka));
     paastand("forkert tal i skemaet: linjen siger hvorfor, og feltet ryster", /formlen|ladningen/.test(besked(B)), besked(B));
     B.knap();
-    paastand("Giv hint i skemaet", /Tallet efter et grundstof/.test(besked(B)), besked(B));
+    paastand("Giv hint i skemaet", /Tallet efter et grundstof/.test(besked(B)) && /Hvilke tal står foran ionerne\?/.test(promptB()), besked(B));
     B.knap();
     paastand("Vis svaret skriver skemaet", B.regning.loest("afstem"));
     paastand("luppen er tom, til ionerne er fundet", B.part.p.filter(function (q) { return !q.doer; }).length === 0);
@@ -434,7 +452,7 @@ function koerTest(W) {
     paastand("alle fire opgaver kan løses ved at skrive formlen og tallet", bl.every(Boolean), bl.join(","));
     C.vaelg(0, false);
     paastand("første opgave: syv trin, stofmængderne først, så koncentrationerne",
-        C.opg.trin.join(",") === "nSA,nSB,cSA,cSB,bidragA,bidragB,total" && /Stofmængden af CaCl₂/.test(besked(C)), besked(C));
+        C.opg.trin.join(",") === "nSA,nSB,cSA,cSB,bidragA,bidragB,total" && /Stofmængden af CaCl₂/.test(d.getElementById("bland-ind").textContent), d.getElementById("bland-ind").textContent);
     skrivI(C, "n = m/M"); skrivI(C, "0,0500"); skrivI(C, "n = m/M"); skrivI(C, "0,0300");
     tik(C, 2);
     paastand("saltene ligger på vægtene, til koncentrationen er regnet", C.s.bunke.A === 1 && C.s.bunke.B === 1 && !C.s.iGlas.CaCl2);
@@ -468,16 +486,77 @@ function koerTest(W) {
 
     overskrift("8. Hjælpen");
     B.vaelg(1, false);
-    paastand("der står intet hint, når opgaven vælges", !/Hint:/.test(besked(B)) && !B.el.knap.classList.contains("peg"));
+    paastand("der står intet hint, når opgaven vælges", !/^Hint\b/.test(besked(B)) && !B.el.knap.classList.contains("peg"));
     skrivI(B, "9", "9");
-    paastand("en fejl giver intet hint af sig selv, men den gule knap lyser op", !/Hint:/.test(besked(B)) && B.el.knap.classList.contains("peg"), besked(B));
+    paastand("en fejl giver intet hint af sig selv, men den gule knap lyser op", !/^Hint\b/.test(besked(B)) && B.el.knap.classList.contains("peg"), besked(B));
     B.knap();
-    paastand("hintet står i kortet, og knappen lyser ikke mere", /^Hint:/.test(besked(B)) && !B.el.knap.classList.contains("peg"), besked(B));
+    paastand("hintet står i kortet, og knappen lyser ikke mere", /^Hint\b/.test(besked(B)) && !B.el.knap.classList.contains("peg"), besked(B));
     B.knap();
-    paastand("Vis svaret: svaret og næste skridt står i kortet", B.el.besked.className.indexOf("gul") >= 0 && !/Hint:/.test(besked(B)) && B.el.knap.textContent === "Giv hint", besked(B));
+    paastand("Vis svaret: skemaet står i panelet, og kortet spørger om næste trin uden svaret under det",
+        B.regning.loest("afstem") && !/^Hint\b|^Svaret\b/.test(besked(B)) && B.el.knap.textContent === "Giv hint" && /Trin 2 af/.test(promptB()), besked(B));
     paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText));
     window.document.getElementById("ramme").contentDocument.dispatchEvent(new W.KeyboardEvent("keydown", { key: "k", bubbles: true }));
-    paastand("tasten K gør ikke noget mere", !/Hint:/.test(besked(B)));
+    paastand("tasten K gør ikke noget mere", !/^Hint\b/.test(besked(B)));
+
+    overskrift("8b. Papirkortet (6. nov. 2026)");
+    paastand("body er papirkort, og hver fane har kortet i scenen og ikke i panelet", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        ["opl", "ioner", "bland"].every(function (px) { var e = d.getElementById(px + "-skort"); return e && !!e.closest(".scene") && !e.closest(".panel"); }));
+    paastand("ingen statuslinje nederst og intet opgavekort, hint eller besked i panelet",
+        !d.querySelector(".statuslinje, .panel .opgavekort, .panel .besked, .panel .knap.hjaelp, .felt-ok"));
+    paastand("Start forfra står i panelet og aldrig på kortet", !!d.querySelector("#fane-opl .panel #opl-forfra") &&
+        !/forfra/i.test(d.getElementById("opl-skort").textContent + d.getElementById("ioner-skort").textContent + d.getElementById("bland-skort").textContent));
+    NK.visFane("fane-ioner");
+    B.tilpas(); B.vaelg(0, false);
+    var insB = B.el.indsend;
+    paastand("regnefanen: Indsend svar er gråt, før der står noget i feltet", !insB.hidden && insB.classList.contains("ikke-klar"));
+    B.indsendKlik();
+    paastand("Indsend svar uden svar bedømmer intet, og kortet blinker", !B.regning.loest("afstem") && d.getElementById("ioner-skort").classList.contains("blink"));
+    var fB = B.regning.aktivt(), stB = D.salt(B.opg.salt);
+    fB.input.value = String(stB.kk); fB.input2.value = String(stB.ka);
+    fB.input.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("tal i felterne gør Indsend svar klar uden at bedømme", insB.classList.contains("klar") && !B.regning.loest("afstem"));
+    B.indsendKlik();
+    paastand("Indsend svar bedømmer: skemaet er løst, og kortet spørger om næste trin uden ros under det",
+        B.regning.loest("afstem") && /Trin 2 af/.test(d.getElementById("ioner-ind").textContent) && !/Rigtigt|Den sidder|Præcis/.test(besked(B)), besked(B));
+    loesAlt(B);
+    paastand("sidste trin: kortet bliver med resultatet og Ny opgave, hvor Indsend svar stod",
+        B.faerdig && d.getElementById("ioner-skort").classList.contains("bliv") && insB.hidden && /Ny opgave/.test(d.querySelector("#ioner-skort [data-videre]").textContent));
+    /* Kortet holder sig over det, eleven skal se paa (almindelig og lav skaerm) */
+    var ramme0 = window.document.getElementById("ramme"), zf = [];
+    function maalK(sim, navn, top) {
+        var e = sim.el.skort, bund = e.offsetTop + e.offsetHeight;
+        if (bund > top + 1) zf.push(ramme0.style.width + "×" + ramme0.style.height + " " + navn + " " + bund + ">" + Math.round(top));
+    }
+    [[1400, 860], [1280, 700], [1100, 640]].forEach(function (st) {
+        ramme0.style.width = st[0] + "px"; ramme0.style.height = st[1] + "px";
+        NK.visFane("fane-opl"); A.tilpas();
+        D.OPL.forEach(function (o, k) {
+            A.vaelg(k, false); A.tilpas();
+            var topA = function () { return Math.min(A.lay.zoom.y - A.lay.zoom.r - 24, A.lay.glas.y0); };
+            if (A.fase === "valg") { A.knap(); A.kortValg(0); }
+            A.knap(); maalK(A, "opl " + (k + 1) + " hint", topA());
+            A.knap(); tik(A, 8);
+            for (var q = 0; q < 4 && A.fase === "spm"; q++) {
+                A.knap(); maalK(A, "opl " + (k + 1) + " spm-hint", topA());
+                A.knap(); tik(A, 1); maalK(A, "opl " + (k + 1) + " spm-svar", topA());
+                if (A.venter) A.knap();
+            }
+            maalK(A, "opl " + (k + 1) + " løst", topA());
+        });
+        [[B, "fane-ioner", [0, 1, 2]], [C, "fane-bland", [0, 1, 2, 3]]].forEach(function (x) {
+            var sim = x[0];
+            NK.visFane(x[1]); sim.tilpas();
+            x[2].forEach(function (k) {
+                sim.vaelg(k, false); sim.tilpas();
+                for (var t = 0; t < 30 && !sim.faerdig; t++) {
+                    sim.knap(); maalK(sim, x[1] + " " + (k + 1) + " trin " + t, sim.lay.tavle.y);
+                }
+                maalK(sim, x[1] + " " + (k + 1) + " løst", sim.lay.tavle.y);
+            });
+        });
+    });
+    paastand("kortet holder sig over glasset, luppen og tavlen (1400 × 860, 1280 × 700 og 1100 × 640)", zf.length === 0, zf.slice(0, 4).join("; "));
+    ramme0.style.width = "1300px"; ramme0.style.height = "820px";
 
     overskrift("9. Layout");
     var ramme = window.document.getElementById("ramme");

@@ -1179,6 +1179,11 @@ button:focus-visible {
 /* Panelets knap til at begynde forfra */
 .panel > .forfraknap { align-self: flex-start; }
 
+/* Find fejlen: spoergsmaalet, svarknappen og beskeden fylder tre raekker,
+   og tavlen er lav, saa kortet faar lidt mere plads her */
+#fane-ff .scene { --kz: 180px; }
+
 @media (max-height: 720px) {
     .scene { --kz: 150px; }
+    #fane-ff .scene { --kz: 160px; }
 }

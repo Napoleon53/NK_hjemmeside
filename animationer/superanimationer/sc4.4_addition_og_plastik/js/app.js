@@ -118,7 +118,7 @@
         var oenske = "";
         try { oenske = decodeURIComponent((window.location.hash || "").replace(/^#/, "")).toLowerCase(); } catch (x) { oenske = ""; }
         var HASH = { addition: "fane-a", ethen: "fane-a", dobbeltbinding: "fane-a",
-                     bromvand: "fane-b", brom: "fane-b", "mættet": "fane-b", maettet: "fane-b", "umættet": "fane-b",
+                     bromvand: "fane-b", brom: "fane-b", dibrom: "fane-b", "mættet": "fane-b", maettet: "fane-b", "umættet": "fane-b",
                      plastik: "fane-p", polyethen: "fane-p", polymer: "fane-p", polymerisation: "fane-p" };
         visFane(HASH[oenske] || faner[0]);
 

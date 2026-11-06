@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formel og aktuel koncentration</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Formel og aktuel koncentration</h1>
@@ -33,16 +34,24 @@
         <div class="anker" id="opl-anker-krukke"></div>
         <div class="anker" id="opl-anker-zoom"></div>
         <div class="anker" id="opl-anker-soejler"></div>
-        <button class="forfraknap" id="opl-forfra" type="button" title="Tøm glasset (R)">Start forfra ↺</button>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (6. nov. 2026):
+             teksten, svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="opl-skort">
+            <div id="opl-ind" aria-live="polite"></div>
+            <div class="kt-bund sk-bund tom" id="opl-status">
+                <p class="kt-besked st-tekst" id="opl-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="opl-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="opl-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="opl-kort">
-            <h2><span id="opl-titel">Opgave</span><span class="taeller">opgave <b id="opl-nr">1</b>/<span id="opl-antal">6</span></span></h2>
-            <div id="opl-prompt"></div>
-            <div class="knaprad valgrad" id="opl-valg" hidden></div>
-            <p class="besked" id="opl-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="opl-knap" type="button">Giv hint</button></div>
+        <div class="kort maaling" id="opl-kort">
+            <h2>Beregningen</h2>
+            <div id="opl-beregning"></div>
+            <p class="note" id="opl-note">Beregningen kommer her, når opgaven er løst.</p>
+            <button class="knap nulstil" id="opl-forfra" type="button" title="Tøm glasset (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort" id="opl-opgaver">
@@ -61,15 +70,22 @@
         <div class="anker" id="ioner-anker-tavle"></div>
         <div class="anker" id="ioner-anker-soejler"></div>
         <div class="anker" id="ioner-anker-zoom"></div>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (6. nov. 2026):
+             teksten, svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="ioner-skort">
+            <div id="ioner-ind" aria-live="polite"></div>
+            <div class="kt-bund sk-bund tom" id="ioner-status">
+                <p class="kt-besked st-tekst" id="ioner-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="ioner-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="ioner-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="ioner-kort">
-            <h2><span id="ioner-titel">Let</span><span class="taeller">niveau <b id="ioner-nr">1</b>/<span id="ioner-antal">3</span></span></h2>
-            <div id="ioner-prompt"></div>
+        <div class="kort maaling" id="ioner-kort">
+            <h2>Regnetrinene</h2>
             <div class="raekker" id="ioner-raekker"></div>
-            <p class="besked" id="ioner-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="ioner-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="ioner-opgaver">
@@ -88,15 +104,22 @@
         <div class="anker" id="bland-anker-tavle"></div>
         <div class="anker" id="bland-anker-glas"></div>
         <div class="anker" id="bland-anker-zoom"></div>
+        <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (6. nov. 2026):
+             teksten, svarene, beskeden, hint og Indsend svar -->
+        <div class="scenekort opgave" id="bland-skort">
+            <div id="bland-ind" aria-live="polite"></div>
+            <div class="kt-bund sk-bund tom" id="bland-status">
+                <p class="kt-besked st-tekst" id="bland-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="bland-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="bland-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="bland-kort">
-            <h2><span id="bland-titel">Opgave</span><span class="taeller">opgave <b id="bland-nr">1</b>/<span id="bland-antal">4</span></span></h2>
-            <div id="bland-prompt"></div>
+        <div class="kort maaling" id="bland-kort">
+            <h2>Regnetrinene</h2>
             <div class="raekker" id="bland-raekker"></div>
-            <p class="besked" id="bland-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap hjaelp" id="bland-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="bland-opgaver">
@@ -161,6 +184,7 @@
 <script src="js/tjek.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_opl.js"></script>

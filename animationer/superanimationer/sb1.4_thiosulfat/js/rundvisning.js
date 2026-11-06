@@ -14,7 +14,7 @@
             { sel: "#kryds-laerred", titel: "Forsøget", tekst: "Træk måleglasset med syre hen over bægerglasset. Uret starter, når syren rammer." },
             { sel: "#kryds-maaling", titel: "Uret", tekst: "Kig på krydset oppefra, og tryk Stop, når du ikke kan se det. Målingerne samles her." },
             { sel: "#kryds-blanding", titel: "Blandingen", tekst: "Vælg, hvor meget Na₂S₂O₃ der er i glasset. Koncentrationen fordobles fra knap til knap." },
-            { sel: "#kryds-opgavekort", titel: "Quizzen", tekst: "Fem spørgsmål om forsøget. Knappen giver et hint og derefter svaret." },
+            { sel: "#kryds-skort", titel: "Quizzen", tekst: "Fem spørgsmål om forsøget på kortet. Vælg et svar, og tryk Indsend svar." },
             { sel: "#teoriknap", titel: "Teorien", tekst: "Reaktionen, og hvorfor 1/Δt er et mål for hastigheden." },
             { sel: ".faneknapper", titel: "Næste fane", tekst: "Koncentration: find ud af, hvad hastigheden afhænger af." }
         ],
@@ -23,13 +23,13 @@
             { sel: "#konc-tabel", titel: "Tabellen", tekst: "Regn [S₂O₃²⁻] og [H₃O⁺] i glasset ud, og skriv dem ind. Efter to rigtige i en kolonne regnes resten for dig." },
             { sel: "#konc-laerred", titel: "Grafen", tekst: "Et punkt for hvert tal, du har regnet ud. 1/Δt er et mål for hastigheden." },
             { sel: "#konc-akse", titel: "Vandret akse", tekst: "Skift mellem [S₂O₃²⁻] og [H₃O⁺]." },
-            { sel: "#konc-opgavekort", titel: "Opgaven", tekst: "Gæt først, og prøv det så med et forsøg." }
+            { sel: "#konc-skort", titel: "Opgaven", tekst: "Svar på kortet, og prøv det så med et forsøg." }
         ],
         "fane-temp": [
             { sel: "#temp-forsoeg", titel: "Temperaturen", tekst: "Samme blanding hver gang. Vælg temperaturen, og mål." },
             { sel: "#temp-laerred", titel: "Grafen", tekst: "1/Δt mod temperaturen. Hvor meget større bliver den for hver 10 °C?" },
             { sel: "#temp-tabel", titel: "Tabellen", tekst: "Alle forsøg samles her." },
-            { sel: "#temp-opgavekort", titel: "Opgaven", tekst: "Tjek tommelfingerreglen om en fordobling pr. 10 °C." }
+            { sel: "#temp-skort", titel: "Opgaven", tekst: "Tjek tommelfingerreglen om en fordobling pr. 10 °C." }
         ]
     };
 

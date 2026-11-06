@@ -145,24 +145,24 @@
           sel: "#skala-anker-skala" },
         { tekst: "Du trækker et stof fra bordet op på skalaen, der hvor du tror, at stoffet hører til. pH-metret måler derefter stoffet, og stoffet flyver hen til sin rigtige plads over skalaen. En gul trekant under skalaen viser dit gæt.",
           sel: ["#skala-anker-stoffer", "#skala-anker-meter"] },
-        { tekst: "Der er to hylder med seks stoffer på hver, og opgavekortet viser, hvilken hylde du er nået til. Knappen på kortet giver først et hint og derefter svaret. Tabellen Gæt og målt samler dine gæt og de målte værdier.",
-          sel: ["#skala-kort", "#skala-gaetkort"] }
+        { tekst: "Der er to hylder med seks stoffer på hver, og kortet øverst i scenen viser, hvilken hylde du er nået til. Knappen Giv hint på kortet giver først et hint og derefter svaret. Tabellen Gæt og målt samler dine gæt og de målte værdier.",
+          sel: ["#skala-skort", "#skala-gaetkort"] }
     ];
     D.INTRO_LUP = [
         { tekst: "I denne fane ser du, hvordan antallet af H₃O⁺ og OH⁻ ændrer sig, når pH ændrer sig. Du flytter pH ved at trække pH-mærket på skalaen eller klikke på skalaen. Piletasterne på tastaturet flytter også pH-mærket.",
           sel: "#lup-anker-skala" },
         { tekst: "Luppen viser et lille rum af væsken i glasset, og hver prik er én ion. De røde prikker er H₃O⁺, og de blå prikker er OH⁻. Bliver der mere end 100 af én slags, zoomer luppen selv ind på et rum, der er 10 gange mindre.",
           sel: ["#lup-anker-lup", "#lup-anker-zoom"] },
-        { tekst: "Opgavekortet giver dig fem mål ét ad gangen, og knappen på kortet giver først et hint og derefter svaret. Kortet I luppen viser antallet af ioner og koncentrationerne ved den pH, du har valgt.",
-          sel: ["#lup-kort", "#lup-maaling"] }
+        { tekst: "Kortet øverst i scenen giver dig fem mål ét ad gangen. Du flytter mærket og trykker Indsend svar, og knappen Giv hint giver først et hint og derefter svaret. Kortet I luppen viser antallet af ioner og koncentrationerne ved den pH, du har valgt.",
+          sel: ["#lup-skort", "#lup-maaling"] }
     ];
     D.INTRO_FORTYND = [
         { tekst: "I denne fane undersøger du, hvad der sker med pH, når saltsyre og natriumhydroxid bliver fortyndet med vand. Saltsyren har pH 1, og natriumhydroxiden har pH 13. Hvert nyt glas står under sin pH på skalaen.",
           sel: ["#fortynd-anker-flasker", "#fortynd-anker-skala"] },
-        { tekst: "Knappen Fortynd 10 gange laver et nyt glas med 1\u00a0mL fra glasset før og 9\u00a0mL vand. Den venstre knap fortynder saltsyren, og den højre knap fortynder natriumhydroxiden. Knappen virker kun, når målet på opgavekortet skal bruge den.",
+        { tekst: "Knappen Fortynd 10 gange laver et nyt glas med 1\u00a0mL fra glasset før og 9\u00a0mL vand. Den venstre knap fortynder saltsyren, og den højre knap fortynder natriumhydroxiden. Knappen virker kun, når målet på kortet øverst i scenen skal bruge den.",
           felt: "skilt", sel: "#fortynd-anker-knapper" },
-        { tekst: "Luppen viser ionerne i det nyeste glas, og et klik på et andet glas viser det glas i luppen. Opgavekortet giver dig fem mål ét ad gangen, og knappen på kortet giver først et hint og derefter svaret.",
-          sel: ["#fortynd-anker-lup", "#fortynd-kort"] }
+        { tekst: "Luppen viser ionerne i det nyeste glas, og et klik på et andet glas viser det glas i luppen. Kortet øverst i scenen giver dig fem mål ét ad gangen, og knappen Giv hint giver først et hint og derefter svaret.",
+          sel: ["#fortynd-anker-lup", "#fortynd-skort"] }
     ];
 
     /* Ros, foerste gang en hel fane er klaret. Det er de eneste gange, han

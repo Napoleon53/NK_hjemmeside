@@ -41,6 +41,7 @@
         this.opg = null;
 
         this.bygPanel();
+        this.bygKort();
         this.bygTilbud();
         this.koblMus();
         if (this.laererStart) this.laererStart();
@@ -93,7 +94,9 @@
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
-        var luft = NK.klamp(H * 0.1, 12, 74);
+        /* Tavlen begynder under papirkortet (kortZone) */
+        lay.zone = this.kortZone();
+        var luft = lay.zone;
         lay.tavle = { x: kant + 6, y: luft, b: W - 2 * kant - 12, h: H - luft - 24 };
         this.lay = lay;
         this.layoutSkema();
@@ -142,7 +145,12 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else if (this.kortZone() !== this.lay.zone) { this.layout(); this.placerFelter(); }
     };
+
+    /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* Stofmaengden pr. blok: den kendte stofmaengde delt paa dens koefficient */
     P.pr = function () {
@@ -156,13 +164,11 @@
         this.el = {
             felter: NK.el("regn-felter"),
             linjer: NK.el("regn-linjer"),
-            besked: NK.el("regn-besked"),
-            knap: NK.el("regn-knap"),
-            kort: NK.el("regn-kort"),
+            igen: NK.el("regn-igen"),
             niveauer: NK.el("regn-niveauer"),
             nulstil: NK.el("regn-nulstil")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el.igen.addEventListener("click", function () { if (mig.opg && mig.opg.gennemsyn) mig.nyOpgave(false); });
 
         D.NIVEAUER.forEach(function (nv, nr) {
             var knap = document.createElement("button");
@@ -240,7 +246,6 @@
         if (gennemsyn) {
             og.felter.forEach(function (f) { if (!f.kendt) { f.status = "ok"; f.v = o.svar[f.j].v; } });
             og.faerdig = true;
-            this.besked(this.status[this.valgt].stjerne ? "Løst uden hjælp. ★" : "Løst.", "god");
         }
         this.layoutSkema();
         this.bygFelter();
@@ -277,7 +282,7 @@
             inp.addEventListener("keydown", function (ev) {
                 if (ev.key === "Enter") { ev.preventDefault(); mig.tjekKoef(j); }
             });
-            inp.addEventListener("input", function () { e.classList.remove("forkert"); });
+            inp.addEventListener("input", function () { e.classList.remove("forkert"); mig.visKnap(); });
             k.el = e;
             k.input = inp;
             vaert.appendChild(e);
@@ -300,7 +305,8 @@
                 inp.addEventListener("keydown", function (ev) {
                     if (ev.key === "Enter") { ev.preventDefault(); mig.tjek(f.j); }
                 });
-                inp.addEventListener("focus", function () { og.aktiv = f.j; });
+                inp.addEventListener("focus", function () { og.aktiv = f.j; mig.visKnap(); });
+                inp.addEventListener("input", function () { mig.visKnap(); });
                 e.querySelector(".tf-ok").addEventListener("click", function () { mig.tjek(f.j); });
                 f.input = inp;
             }
@@ -432,7 +438,7 @@
         s.loest = true;
         s.stjerne = s.stjerne || !og.brugtSvar;
         this.gem();
-        this.besked(og.brugtSvar ? "Alle stofmængderne er fundet." : "Alle stofmængderne passer med forholdet " + D.forhold(og.o.r) + ".", "god");
+        this.besked("", "");
         /* Alle tolv opgaver er loest: Kemichael kommer én gang */
         if (!foer && this.antalLoest() === D.OPGAVER.length && !this.rost) {
             this.rost = true;
@@ -441,13 +447,33 @@
     };
 
     /* ----- Knappen: Giv hint, Vis svaret, Naeste opgave ------------------------------------ */
+    /* Naeste opgave (knappen, der staar, hvor Indsend svar stod) */
+    P.videre = function () {
+        var og = this.opg;
+        if (!og || !og.faerdig) return;
+        this.vaelg(this.naesteUloeste(this.valgt));
+    };
+
+    /* Indsend svar: koefficienterne eller feltet, eleven staar i (samme som Enter) */
+    P.kanSende = function () {
+        var og = this.opg;
+        if (!og || og.faerdig) return false;
+        if (!og.afstemt) return og.koef.every(function (k) { return k.input && k.input.value.trim(); });
+        var f = this.aktivtFelt();
+        return !!(f && f.input && f.input.value.trim());
+    };
+
+    P.indsend = function () {
+        var og = this.opg;
+        if (!this.kanSende()) return;
+        if (!og.afstemt) { this.tjekKoef(-1); return; }
+        this.tjek(this.aktivtFelt().j);
+    };
+
+    /* Giv hint, derefter Vis svaret */
     P.knap = function () {
         var og = this.opg;
-        if (og.faerdig) {
-            if (og.gennemsyn) this.nyOpgave(false);
-            else this.vaelg(this.naesteUloeste(this.valgt));
-            return;
-        }
+        if (!og || og.faerdig) return;
         var r = og.o.r;
         if (!og.afstemt) {
             if (og.hjaelp === 0) {
@@ -510,36 +536,56 @@
         NK.saetHTML("regn-linjer", html);
     };
 
+    /* ----- Papirkortet oeverst i scenen (js/kort.js) ------------------------------------ */
+    P.bygKort = function () {
+        var mig = this;
+        this.kort = new NK.SceneKort("regn", {
+            hint: function () { mig.knap(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el.besked = this.kort.beskedEl;
+        this.bH = "";
+        this.bKl = "";
+        this.trinTekst = "";
+    };
+
     P.visKort = function () {
         var og = this.opg, o = og.o;
         var nv = D.NIVEAUER[o.niveau];
-        NK.saetHTML("regn-niveau", '<span class="hyldeprik" style="background:' + nv.farve + '"></span>' + nv.navn);
-        NK.saetTekst("regn-nr", String(o.plads + 1));
-        NK.saetTekst("regn-antal", String(this.iNiveau(o.niveau)));
-        NK.saetTekst("regn-prompt", o.nTekst + " mol " + D.stof(o.r.led[o.kendt].s).formel);
-        NK.saetTekst("regn-spm", og.afstemt ? o.r.navn + ". Find de andre stofmængder, og skriv dem under formlerne."
-            : o.r.navn + ". Afstem skemaet først: skriv koefficienterne foran formlerne.");
-        this.el.kort.classList.toggle("sejr", og.faerdig && !og.gennemsyn);
+        var kendt = "Du kender " + o.nTekst + " mol " + D.stof(o.r.led[o.kendt].s).formel + ".";
+        this.kort.vis({ chip: nv.navn + ", opgave " + (o.plads + 1) + " af " + this.iNiveau(o.niveau),
+            tekst: NK.html(o.r.navn + ". " + kendt + (og.afstemt ? " Find de andre stofmængder, og skriv dem under formlerne."
+                : " Afstem skemaet først: skriv koefficienterne foran formlerne.")) });
+        this.el.igen.hidden = !og.gennemsyn;
         this.visKnap();
         this.opdaterFremskridt();
     };
 
+    /* Beskeden, Giv hint og Indsend svar, eller forklaringen og Naeste opgave */
     P.visKnap = function () {
-        var og = this.opg, tekst, klasse = "knap blaa";
+        var og = this.opg, k = this.kort;
+        if (!og || !k) return;
+        var bh = this.bH || this.trinTekst || "", bkl = this.bH ? this.bKl : "";
+        var noegle = bh + "|" + bkl;
+        if (noegle !== this.kortBesked) { this.kortBesked = noegle; k.besked(bh, bkl); }
         if (og.faerdig) {
-            if (og.gennemsyn) tekst = "Regn den igen";
-            else { tekst = "Næste opgave →"; klasse += " banker"; }
+            var t = og.gennemsyn ? (this.status[this.valgt].stjerne ? "Løst uden hjælp. ★" : "Løst.") :
+                (og.brugtSvar ? "Alle stofmængderne er fundet." : "Alle stofmængderne passer med forholdet " + D.forhold(og.o.r) + ".") +
+                " Alle søjler fylder netop deres blokke.";
+            k.bliv(NK.html(t), null, "Næste opgave", og.brugtSvar && !og.gennemsyn ? "svar" : "god");
         } else {
-            tekst = og.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            klasse = "knap";
+            k.bliv(null);
+            k.knapper({ hint: og.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: this.kanSende() });
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
     };
 
+    /* Beskeden paa papirkortet. Uden besked staar det naeste skridt dér. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.bH = html || "";
+        this.bKl = klasse || "";
+        if (this.bKl === "skidt") this.kortBesked = null;
+        this.visKnap();
     };
 
     P.visStatus = function () {
@@ -548,7 +594,8 @@
         if (og.faerdig) t = "Alle søjler fylder netop deres blokke. Det er det, forholdet betyder.";
         else if (!og.afstemt) t = "Skriv koefficienterne i felterne foran formlerne. Skriv 1, hvor der kun skal være én.";
         else t = "Skriv stofmængderne i felterne. Søjlerne viser, om de passer.";
-        NK.saetHTML("regn-status", t);
+        this.trinTekst = og.faerdig ? "" : t;
+        this.visKnap();
     };
 
     P.nulstil = function () {
@@ -568,7 +615,7 @@
     };
 
     P.enter = function () {
-        if (this.opg && this.opg.faerdig && !this.opg.gennemsyn) this.knap();
+        if (this.opg && this.opg.faerdig) this.videre();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------ */

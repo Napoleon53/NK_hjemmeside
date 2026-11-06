@@ -24,9 +24,14 @@
    formellæseren klarer parenteser, at de typiske fejl får den rigtige
    besked, at alle opgaver kan løses (kuglerne med + og − og reaktionen,
    skemaet ved at skrive, begge med Vis svaret), at et ændret lille tal
-   aldrig godtages, at hjælpen er en trappe på tre trin i statuslinjen,
+   aldrig godtages, at hjælpen er en trappe på tre trin på papirkortet,
    at et forkert og et rigtigt svar er tydelige, at sproget holder
    reglerne, og at tingene kan være der fra 1100 × 700 til 1600 × 950.
+   Papirkortet (6. nov. 2026): opgaven, beskeden, hintet og Indsend svar
+   står på ét kort øverst i scenen, Indsend svar er gråt uden noget at
+   sende, + og − og felterne bedømmer ikke selv, kortet bliver på opgaven
+   efter et rigtigt svar med Næste samme sted, Start forfra står i
+   panelet, og kortet holder sig i den plads, der er sat af til det.
 
    Animationen henter ikke filer uden for sin egen mappe, men iframen
    skal stadig åbnes gennem en lokal server. Testen gemmer elevens
@@ -67,6 +72,10 @@ function koer() {
 }
 
 /* Koer reaktionen paa fane 1 til ende */
+function kortVidere(n) {
+    var k = document.getElementById("ramme").contentDocument.querySelector("#" + n + "-ind [data-videre]");
+    return k ? k.textContent : "";
+}
 function reagerHelt(S) {
     S.reager();
     for (var i = 0; i < 400 && S.opg.fase === "reagerer"; i++) S.opdater(1 / 60);
@@ -230,7 +239,7 @@ function koerTest(W) {
     paastand("Vis svaret: reaktionen løses og viser skemaet",
         K.opg.loest && K.beskedTekst().indexOf("C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O") >= 0, K.beskedTekst());
     paastand("Vis svaret: ingen stjerne", K.status[9].loest && !K.status[9].stjerne);
-    paastand("knappen går videre", /Næste opgave/.test(K.el.knap.textContent));
+    paastand("knappen går videre og står på kortet", /Næste opgave/.test(kortVidere("kg")));
     K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
 
     /* ------------------------------------------------------------------ */
@@ -294,28 +303,56 @@ function koerTest(W) {
     overskrift("7. Hjælpen og statuslinjen");
     paastand("ingen lærer i animationen", !W.NK.Kemichael && !W.NK.RoligLaerer && !d.querySelector(".kboble, .kknap"));
     S.vaelg(1);
-    paastand("statuslinjen står i scenen, ikke i panelet",
-        d.querySelector("#fane-sk .scene #sk-status") !== null && d.querySelector("#fane-sk .panel #sk-knap") === null);
-    paastand("linjen siger næste skridt uden farve og uden tal", S.el.status.className === "statuslinje" &&
-        /Skriv tallene/.test(S.beskedTekst()), S.beskedTekst());
+    paastand("kortet står i scenen, ikke i panelet",
+        d.querySelector("#fane-sk .scene #sk-skort #sk-indsend") !== null && d.querySelector("#fane-sk .panel #sk-knap, #fane-kg .panel #kg-knap") === null &&
+        d.querySelector("#fane-kg .scene #kg-skort #kg-indsend") !== null);
+    paastand("ingen statuslinje nederst og intet opgavekort i panelet", d.querySelector(".statuslinje, .opgavekort, #kg-reager") === null);
+    paastand("Start forfra står i panelet, ikke på kortet", d.querySelector("#fane-sk .panel #sk-forfra") !== null &&
+        d.querySelector("#fane-kg .panel #kg-forfra") !== null && d.querySelector(".scenekort .forfraknap") === null);
+    paastand("kortet har etiketten og opgaven", /^Reaktion 2 af 24/.test(S.el.ind.textContent) && /Skriv tallene/.test(S.el.ind.textContent), S.el.ind.textContent);
+    paastand("beskeden er tom fra start", S.beskedTekst() === "" && S.el.besked.hidden, S.beskedTekst());
+    paastand("Indsend svar er gråt med tomme felter", /ikke-klar/.test(S.el.indsend.className) && !S.el.indsend.hidden);
+    S.indsendKlik();
+    paastand("gråt Indsend svar bedømmer intet, men kortet blinker", !S.opg.loest && /blink/.test(S.el.skort.className) && /Skriv først/.test(S.beskedTekst()), S.beskedTekst());
     paastand("knappen inviterer til ét hint", S.el.knap.textContent === "Giv et hint" && !/peg/.test(S.el.knap.className));
-    S.felter[0].value = "9"; S.enter();
-    paastand("forkert: linjen bliver rød og ryster", /skidt/.test(S.el.status.className) && /ryster/.test(S.el.status.className));
-    paastand("forkert: linjen begynder med et mærke", /^Ikke endnu/.test(S.beskedTekst()), S.beskedTekst());
+    S.felter[0].value = "9"; S.felter[0].dispatchEvent(new W.Event("input")); S.visIndsend();
+    paastand("et tal i et felt gør Indsend svar klar, men bedømmer intet selv", /klar/.test(S.el.indsend.className) && !/ikke-klar/.test(S.el.indsend.className) && !S.opg.loest);
+    S.enter();
+    paastand("forkert: beskeden bliver rød og ryster", /skidt/.test(S.el.status.className) && /ryster/.test(S.el.status.className));
+    paastand("forkert: beskeden begynder med et mærke", /^Ikke endnu/.test(S.beskedTekst()), S.beskedTekst());
     paastand("forkert: knappen lyser stille op", /peg/.test(S.el.knap.className), S.el.knap.className);
     S.knap();
-    paastand("hint 1: linjen bliver gul og tæller trinnene", /hint/.test(S.el.status.className) && /^Hint 1 af 3/.test(S.beskedTekst()), S.beskedTekst());
+    paastand("hint 1: beskeden bliver gul og tæller trinnene", /hint/.test(S.el.status.className) && /^Hint 1 af 3/.test(S.beskedTekst()), S.beskedTekst());
     paastand("knappen holder op med at lyse, når hintet er givet", !/peg/.test(S.el.knap.className));
     paastand("knappen fører videre i trappen", /Næste hint \(2 af 3\)/.test(S.el.knap.textContent), S.el.knap.textContent);
     S.felter[0].value = "";
     S.felter[0].dispatchEvent(new W.Event("input"));
     paastand("et nyt tal: trappen begynder forfra", S.hjaelp === 0 && S.el.knap.textContent === "Giv et hint");
     S.vaelg(1);
-    S.felter[0].value = "1"; S.felter[1].value = "1"; S.felter[2].value = "2"; S.enter();
-    paastand("rigtigt: linjen bliver grøn og siger Afstemt", /god/.test(S.el.status.className) && /^Afstemt ✓/.test(S.beskedTekst()), S.beskedTekst());
+    S.felter[0].value = "1"; S.felter[1].value = "1"; S.felter[2].value = "2"; S.indsendKlik();
+    var bliv = d.querySelector("#sk-ind .sk-bund.bliv");
+    paastand("rigtigt: kortet bliver på opgaven med en grøn forklaring", bliv !== null && /god/.test(bliv.className) &&
+        /^Afstemt/.test(S.beskedTekst()) && /Skriv tallene/.test(S.el.ind.textContent) && /bliv/.test(S.el.skort.className), S.beskedTekst());
+    paastand("rigtigt: Indsend svar og hintknappen er væk, Næste står i kortets nederste række",
+        S.el.indsend.hidden && S.el.status.hidden && /Næste opgave/.test(kortVidere("sk")));
     paastand("rigtigt: skemaet får et stempel", d.querySelector("#sk-tavle .tv-stempel") !== null);
-    paastand("rigtigt: knappen går videre og banker", /Næste opgave/.test(S.el.knap.textContent) && /banker/.test(S.el.knap.className));
+    S.knap();
+    paastand("Næste fører til næste reaktion, og rosen står ikke under den", S.nr === 2 && !S.faerdig && S.beskedTekst() === "" &&
+        d.querySelector("#sk-ind .bliv") === null);
     S.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+
+    NK.visFane("fane-kg");
+    K.vaelg(0);
+    paastand("fane 1: Indsend svar er gråt, før et tal er rettet", /ikke-klar/.test(K.el.indsend.className));
+    K.indsendKlik();
+    paastand("fane 1: gråt Indsend svar sætter ingen reaktion i gang", K.opg.fase === "klar" && !K.reagerer);
+    K.aendr("r", 0, 1);
+    paastand("fane 1: + bedømmer ikke selv, men gør Indsend svar klar", K.opg.fase === "klar" && !K.faerdig && K.kanSendes());
+    K.indsendKlik();
+    paastand("fane 1: Indsend svar lader molekylerne reagere", K.opg.fase === "reagerer");
+    for (var n2 = 0; n2 < 400 && K.opg.fase === "reagerer"; n2++) K.opdater(1 / 60);
+    paastand("fane 1: efter reaktionen er Indsend svar gråt igen", !K.kanSendes() && !K.faerdig);
+    K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
 
     NK.visFane("fane-kg");
     K.vaelg(4);
@@ -385,9 +422,9 @@ function koerTest(W) {
             K.hoejre.atomer.forEach(function (a) {
                 if (a.x - a.r < R.x || a.x + a.r > R.x + R.b || a.y - a.r < R.y || a.y + a.r > R.y + R.h) lFejl.push(m.join("×") + " plads uden for " + o.id);
             });
-            if (L.y + L.h > K.lay.baand.y) lFejl.push(m.join("×") + " bakken bag statuslinjen");
-            var kn = d.getElementById("kg-reager").getBoundingClientRect(), sc = d.querySelector("#fane-kg .scene").getBoundingClientRect();
-            if (kn.bottom > sc.top + K.lay.baand.y) lFejl.push(m.join("×") + " reagerknappen bag statuslinjen");
+            if (L.y + L.h > K.lay.baand.y) lFejl.push(m.join("×") + " bakken uden for scenen");
+            var skemaTop = parseFloat(sk.style.top);
+            if (skemaTop < K.kortZone() + 10) lFejl.push(m.join("×") + " skemaet under kortet " + o.id);
         });
         NK.visFane("fane-sk");
         D.SKEMA.forEach(function (o, i) {
@@ -395,6 +432,7 @@ function koerTest(W) {
             S.tilpas(); S.layout();
             var t = d.getElementById("sk-tavle");
             if (t.scrollHeight > t.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1) lFejl.push(m.join("×") + " tavlen " + o.id);
+            if (parseFloat(t.style.top) < S.kortZone() + 10) lFejl.push(m.join("×") + " tavlen under kortet " + o.id);
             var fs = parseFloat(t.style.getPropertyValue("--fs"));
             if (fs < 22) lFejl.push(m.join("×") + " lille skrift " + o.id + " " + fs);
         });
@@ -405,6 +443,35 @@ function koerTest(W) {
         });
     });
     paastand("skema, bakker og tavle kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 4).join(", "));
+
+    /* Kortet i den plads, der er sat af (almindelig 1400 × 860 og lav 1280 × 680),
+       med den længste opgave, det længste hint, den længste fejl og forklaringen */
+    var zFejl = [];
+    [[1400, 860, 0], [1280, 680, 1]].forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        [[K, "fane-kg", D.KUGLER], [S, "fane-sk", D.SKEMA]].forEach(function (x) {
+            var F = x[0], basis = m[2] ? 124 : 156, hoejst = 0, hvor = "";
+            NK.visFane(x[1]);
+            x[2].forEach(function (o, i) {
+                F.vaelg(i);
+                var cr = o.r.map(function () { return 1; }), cp = o.p.map(function () { return 1; });
+                var tekster = A.hintTrin(o.r, o.p, cr, cp).trin.map(function (t, k) { return '<span class="b-maerke">Hint ' + (k + 1) + " af 3</span> " + NK.html(t); });
+                tekster.push('<span class="b-maerke">Ikke endnu</span> 2 atomer tilovers og 1 tom plads. ' + NK.html(A.fejl(o.r, o.p, cr, cp)));
+                tekster.forEach(function (t) {
+                    F.besked(t, "skidt");
+                    var h = F.el.skort.offsetHeight;
+                    if (h > hoejst) { hoejst = h; hvor = o.id; }
+                });
+                F.besked("", "");
+                F.loest("selv");
+                if (F.el.skort.offsetHeight > hoejst) { hoejst = F.el.skort.offsetHeight; hvor = o.id + " løst"; }
+                F.status[i].loest = false; F.status[i].stjerne = false;
+            });
+            if (hoejst > basis) zFejl.push(m[0] + "×" + m[1] + " " + x[1] + " " + hoejst + ">" + basis + " " + hvor);
+        });
+    });
+    paastand("kortet holder sig i kortZone på en almindelig og en lav skærm", zFejl.length === 0, zFejl.join(", "));
     paastand("kuglerne er mindst 4 px i radius med 10 af hvert stof", mindst >= 4, mindst.toFixed(1));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";

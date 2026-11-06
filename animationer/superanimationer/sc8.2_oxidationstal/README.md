@@ -37,11 +37,51 @@ blev han taget helt ud (brugerens valg: han hører til i laboratoriet).
    Her er elektronegativiteten et tal ved atomet, og prikformlerne er givet.
 4. **Loftet:** to faner, 31 stoffer på fane 1 (6 trin for trin og 25 til
    øvelse) og 12 molekyler på fane 2. Én formel eller ét molekyle ad gangen.
-5. **Layoutet:** scene plus panel. Scenen er en tavle med arbejdsfeltet,
-   og under den en smal stribe til Start forfra; panelet har kun listen med
-   formlerne (og regnskabet på fane 2).
+5. **Layoutet:** scene plus panel. Øverst i scenen står papirkortet (fra 6.
+   nov. 2026, se Papirkortet nedenfor), under det en tavle, og under den en
+   smal stribe til Start forfra; panelet har kun listen med formlerne (og
+   regnskabet på fane 2).
 
-## Arbejdsfeltet (brugerens test 3. oktober 2026)
+## Papirkortet (6. nov. 2026)
+
+Arbejdsfeltet nedenfor er afløst af det lyse papirkort øverst i midten af
+scenen (`../faelles/papirkort.css/js`, kortet i `js/fane.js`): etiketten er
+stoffets navn ("Carbondioxid", "Vand"), teksten er opgaven og spørgsmålet til
+trinnet ("Find oxidationstallet for C i CO₂. Hvilken ladning har CO₂?"), og
+feltet eller gættets felter står ved siden af. Under dem står linjen med fejl
+og hint (Ikke endnu rød, Hint og Svaret gul), Giv hint (gul kant, derefter Vis
+svaret eller Spring gættet over) og Indsend svar (grå, til der er noget at
+sende). Tjek og Gæt er væk; Indsend svar og Enter sender. Opgaven øverst på
+tavlen (fane 1) og på lærredets tavle (fane 2) er flyttet op på kortet.
+
+- Et rigtigt mellemtrin på fane 1 giver ingen ros under det næste spørgsmål;
+  tavlen viser tallet. Et vist svar står gult i linjen.
+- Når opgaven er løst, bliver kortet på opgaven: svaret står efter opgaven
+  (fx "✓ C har oxidationstallet +IV."), forklaringen med mærket Løst eller
+  Svaret står under, og Næste opgave (eller Videre til Elektronerne) står, hvor
+  Indsend svar stod. Efter den sidste opgave på fane 2 er der ingen knap; Start
+  forfra står under tavlen og aldrig på kortet.
+- Fane 2: et træk med et elektronpar bedømmer ikke af sig selv. Når alle par er
+  flyttet, sender Indsend svar fordelingen: et par hos det forkerte atom bliver
+  rødt med en pil mod det rigtige atom, og linjen siger hvorfor
+  (`fordelTjek` i `js/sim_elektroner.js`). Et par mellem to ens atomer deles
+  stadig af sig selv (det er modellen). Et greb i et par før gættet får kortet
+  til at blinke. Grundstofsymbolerne ved gættet har en mørkere udgave af
+  deres farve på papiret (`papir` i `D.GRUNDSTOF`).
+- Beregningen med formlen i ord står nederst på tavlen på fane 2 (ikke på
+  kortet), med pladsen sat af fra starten, så molekylet ikke flytter sig.
+
+Tavlen begynder under kortets plads (`kortZone` i `js/fane.js`, `zone` i
+`NK.Fane.paa`), som er sat efter kortets højeste tilstand. På en smal skærm
+(under 1150 px) er beregningen for en ion lidt mindre, så den kan være der;
+det løste fejlen fra 9. oktober (se Selvtest). Rundvisningen peger på kortet.
+
+**Molekylnavnene (6. nov. 2026):** H₂ og O₂ hedder Dihydrogen og Dioxygen i
+listen og på kortet (`D.MOLEKYLER`). Hydrogen, oxygen og nitrogen som
+grundstof (`D.GRUNDSTOF`, gruppen Nitrogen, "oxidationstal for oxygen") og
+navneled som Hydrogenperoxid og Oxygendifluorid bliver.
+
+## Arbejdsfeltet (brugerens test 3. oktober 2026, afløst af papirkortet 6. nov. 2026)
 
 Brugeren om fane 1: stilladseringen er god, men den blev "lidt kluntet og
 uklar for den svage elev". Der skulle være mindre tekst, det skulle være
@@ -248,9 +288,13 @@ fane 2 har pile, at beregningen på fane 2 står på egne linjer under formlen
 i ord (og at linjen over ikke har regnestykker), at hint og svar kun kommer
 fra den gule knap, og at den lyser op efter en fejl, sproget og
 layoutet fra 1100 × 700 til 1600 × 950 (fane 2 også ved 1366 × 650).
-Sidst kørt 9. oktober 2026: 133 påstande, 1 fejl. Fejlen er layoutet på fane
-2 ved 1100 × 700 ("beregningen er for bred" for OH⁻ og NH₄⁺); den var der
-også før Kemichael blev taget ud (dengang med to steder mere).
+Fra 6. nov. 2026 tjekker den også papirkortet: kortet i scenen og ikke i
+panelet, intet arbejdsfelt, Indsend svar grå og klar, at et træk ikke
+bedømmer af sig selv, ingen ros under det næste spørgsmål, at kortet bliver
+på opgaven med knappen videre, og at kortet holder sig i kortZone, og tavlen
+står stille, ved 1400 × 860 og 1280 × 640. Sidst kørt 6. november 2026: ALT OK
+(148 påstande). Fejlen fra 9. oktober ("beregningen er for bred" for OH⁻ og
+NH₄⁺ ved 1100 × 700) er løst.
 
 ## I menuen
 

@@ -46,6 +46,7 @@
            paa den ukendte ion, og kortene bliver bredere eller smallere. */
         this.ukendt = null;
         this.top = opt.top || 0;         /* luft over bordet, naar der ikke er hylder */
+        this.kortZone = opt.kortZone || null;   /* papirkortet under hylden (fane 1) */
 
         if (opt.hylder !== false) this.bygHylder();
         else this.chips = {};
@@ -135,8 +136,10 @@
         }
         /* Et kort kan baade klikkes vaek og traekkes vaek. */
         this.canvas.addEventListener("pointerdown", function (e) {
-            if (mig.laast || e.button > 0) return;
+            if (e.button > 0) return;
             var p = pos(e);
+            /* Et klik paa det laaste bord: kortet med spoergsmaalet blinker */
+            if (mig.laast) { mig.lyt("laast", p); return; }
             if (mig.ukendt) {
                 /* Fane 3: traek i et ukendt kort for at goere det bredere
                    eller smallere. Kortene staar ellers fast, og foerst
@@ -516,7 +519,7 @@
         if (this.hyldeTop) {
             var tr = this.hyldeTop.getBoundingClientRect();
             var br = this.hyldeBund.getBoundingClientRect();
-            y0 = tr.bottom - cr.top + 16;
+            y0 = tr.bottom - cr.top + 16 + (this.kortZone ? this.kortZone() + 8 : 0);
             y1 = Math.min(br.top - cr.top, H) - 16;
         } else {
             y0 = this.top + 16;

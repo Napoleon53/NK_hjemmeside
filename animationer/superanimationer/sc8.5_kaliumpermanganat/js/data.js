@@ -160,12 +160,12 @@
           tekst: "Iodid, I⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["I -", "MnO4 -"], h: ["I2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "I⁻ + H₂SO₄", foer: "vand", efter: "iod",
-          kontekst: "Det brune er iod, I₂. Det er opløst og ligger ikke på bunden." },
+          kontekst: "Det brune er diiod, I₂. Det er opløst og ligger ikke på bunden." },
         { id: "F12", fane: "fl", gruppe: "indeks", navn: "Bromid i syre", kort: "Br⁻",
           tekst: "Bromid, Br⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["Br -", "MnO4 -"], h: ["Br2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "Br⁻ + H₂SO₄", foer: "vand", efter: "brom",
-          kontekst: "Det orange er brom, Br₂." }
+          kontekst: "Det orange er dibrom, Br₂." }
     ];
 
     D.GRUPPER = {
@@ -192,9 +192,12 @@
         "Br -": "#e0b99a", "Br2": "#d9722a"
     };
 
-    /* ----- Linjerne i opgavekortet ------------------------------------------------ */
+    /* ----- Linjerne paa papirkortet ------------------------------------------------
+       INTRO staar under kortets tekst ved den foerste reaktion paa fanen. Paa
+       fane 1 siger den ogsaa, hvordan man fylder glasset (6. nov. 2026: den
+       lange linje om at traekke flaskerne kom ikke med, da kortet kom i scenen). */
     D.INTRO = {
-        ug: "Ét urglas og fire flasker. Fyld glasset, dryp i, og afstem det, der sker.",
+        ug: "Ét urglas og fire flasker. Fyld glasset ved at trække flaskerne hen over det. Dryp så i, og afstem det, der sker.",
         fl: "Permanganat dryppes i andre stoffer. Afstem på samme måde, med klammer under skemaet."
     };
     D.FAERDIG = {

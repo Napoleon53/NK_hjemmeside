@@ -929,3 +929,41 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; }
 }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET paa fane 4 (6. nov. 2026): opgaven, hint, bedoemmelsen og
+   knapperne staar oeverst i midten af scenen. Udseendet kommer fra
+   ../faelles/papirkort.css; her staar kun placeringen og raekkerne.
+   Apparatet tegnes under kortZone() i js/sim_ukendt.js.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+}
+
+.sk-ind .sk-tekst { margin: 0; }
+.sk-bund { display: flex; align-items: center; gap: 10px; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.92rem; }
+
+/* Felterne i panelet efter Indsend svar: groent passer, roedt passer ikke */
+.felt input.ok { border-color: var(--groen); }
+.felt input.fejl { border-color: var(--roed); }
+
+/* Smalle scener: knapperne under beskeden */
+@media (max-width: 600px) {
+    .sk-bund { flex-wrap: wrap; }
+    .sk-bund .st-tekst { flex-basis: 100%; }
+}
+
+/* Lave skaerme: kurven paa fane 4 er lidt lavere, saa apparatet under
+   papirkortet ikke bliver for lille */
+@media (max-height: 720px) and (min-width: 861px) {
+    #fane-ukendt .labscene { grid-template-rows: minmax(0, 1fr) 196px; }
+}

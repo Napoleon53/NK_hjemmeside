@@ -2,8 +2,8 @@
    opgavefane.js - det, de fire faner har til faelles
 
    Hver fane har sit eget laerred med tavlen, et tegnebraet (NK.Tegnebraet),
-   en besked oeverst paa scenen (toast), en linje under scenen, der siger
-   naeste skridt, og Kemichael. NK.Fane.bland(P, "zz") laegger metoderne
+   en besked under papirkortet (toast), papirkortet oeverst i scenen med
+   opgaven, hint, forklaringen og knapperne, og Kemichael. NK.Fane.bland(P, "zz") laegger metoderne
    paa fanens prototype; "zz" er forstavelsen paa fanens elementer i
    index.html (zz-laerred, zz-toast, zz-status ...).
 
@@ -40,6 +40,10 @@
                 aendret: function (hvad) { mig.aendret(hvad); },
                 toast: function (t, s) { mig.toast(t, s); }
             });
+            this.linje = "";
+            this.beskedKlasse = "";
+            this.pegerTekst = "";
+            this.bygKort();
             this.koblMus();
             this.bygTilbud();
             if (this.laererStart) this.laererStart();
@@ -53,6 +57,12 @@
         P.layout = function () {
             this.lay = NK.Tavle.layout(this.L.b, this.L.h);
             var t = this.lay.tavle;
+            /* Tavlen begynder under papirkortet */
+            var dy = Math.max(0, this.kortTop() - t.y);
+            t.y += dy;
+            t.h -= dy;
+            var toast = NK.el(pre + "-toast");
+            if (toast) toast.style.top = Math.round(this.kortTop() + 4) + "px";
             this.saetAnker(pre + "-anker-tavle", t.x, t.y, t.b, t.h);
             if (this.layoutEkstra) this.layoutEkstra(this.lay);
         };
@@ -89,7 +99,89 @@
             this.toastUr = 2.2;
         };
 
-        P.status = function (html) { NK.saetHTML(pre + "-status", html); };
+        /* Det naeste skridt: staar i kortets nederste raekke, naar der ikke
+           er et hint eller en forklaring (statuslinjen nederst er vaek) */
+        P.status = function (html) {
+            if (this.pegerTekst === html) return;
+            this.pegerTekst = html;
+            this.visKort();
+        };
+
+        /* ----- Papirkortet (6. nov. 2026) ---------------------------------------
+           Fanen giver kortData(): { chip, tekst (html), loest, vist, fejl,
+           videre (knappens tekst), klar (Indsend svar kan trykkes), hint
+           (hjaelpeknappens tekst eller null) } og har indsend(), hjaelpKlik()
+           og videre(). Svarknapper, tegningen og felter vaelger kun; Indsend
+           svar bedoemmer. Et rigtigt svar bliver paa opgaven: forklaringen
+           staar under teksten, og knappen, der foerer videre, staar dér, hvor
+           Indsend svar stod. Start forfra ligger i panelet. */
+        /* Kortets plads oeverst i scenen; i en smal scene bliver teksten til
+           flere linjer. Selvtesten maaler kortet i hoeje, lave og smalle skaerme. */
+        P.kortZone = function () {
+            var z = window.innerHeight <= 720 ? 128 : 142;
+            return this.L && this.L.b < 760 ? z + 24 : z;
+        };
+        P.kortTop = function () { return 10 + this.kortZone() + 8; };
+
+        P.bygKort = function () {
+            var mig = this, e = NK.el(pre + "-skort");
+            this.skort = e;
+            this.kortHtml = null;
+            e.addEventListener("click", function (ev) {
+                var b = ev.target.closest ? ev.target.closest("button") : null;
+                if (!b) return;
+                b.blur();
+                if (b.hasAttribute("data-videre")) { mig.videre(); return; }
+                if (b.classList.contains("hjaelp")) { mig.hjaelpKlik(); return; }
+                if (b.classList.contains("indsend")) {
+                    var k = mig.kortData();
+                    if (!k.klar) { mig.kortBlink(); return; }
+                    mig.indsend();
+                }
+            });
+        };
+
+        P.besked = function (html, klasse) {
+            this.linje = html || "";
+            this.beskedKlasse = klasse || "";
+            this.pegHjaelp = klasse === "skidt";
+            this.visKort();
+        };
+
+        P.visKort = function () {
+            var e = this.skort;
+            if (!e || !this.kortData) return;
+            var k = this.kortData();
+            if (!k) return;
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + NK.Papir.tekst(k.tekst) + "</p>";
+            if (k.loest) {
+                if (k.fejl) {
+                    html += '<div class="sk-bund bliv skidt"><p class="st-tekst">' + this.linje + "</p>" +
+                        '<button type="button" class="sk-videre" data-videre="1">' + NK.html(k.videre) + "</button></div>";
+                } else html += NK.Papir.bliv(this.linje, null, NK.html(k.videre), k.vist);
+            } else {
+                var lt = this.linje || this.pegerTekst || "";
+                var kl = this.linje ? this.beskedKlasse : "peger";
+                html += '<div class="sk-bund' + (kl ? " " + kl : "") + (lt ? "" : " tom") + '"><p class="st-tekst" aria-live="polite">' + lt + "</p>";
+                if (k.hint) html += '<button type="button" class="knap hjaelp' + (/^Vis/.test(k.hint) ? " svar" : "") + (this.pegHjaelp ? " peg" : "") + '">' + NK.html(k.hint) + "</button>";
+                html += '<button type="button" class="knap indsend ' + (k.klar ? "klar" : "ikke-klar") + '" aria-disabled="' + (k.klar ? "false" : "true") + '">Indsend svar</button></div>';
+            }
+            var kl2 = "scenekort " + (k.loest ? "loest bliv" + (k.vist ? " svar" : "") : "opgave");
+            if (e.className.replace(" blink", "") !== kl2) e.className = kl2;
+            if (html !== this.kortHtml) { this.kortHtml = html; e.innerHTML = html; }
+        };
+
+        /* Kortet blinker: eleven greb ud efter tavlen, men skal foerst trykke
+           paa kortet (Naeste eller Indsend svar) */
+        P.kortBlink = function () {
+            var e = this.skort;
+            if (!e) return;
+            e.classList.remove("blink");
+            void e.offsetWidth;
+            e.classList.add("blink");
+        };
+
+        P.kortLaast = function () { var k = this.kortData && this.kortData(); return !!(k && k.loest); };
 
         /* ----- Musen ------------------------------------------------------------- */
         P.overKop = function (pt) {
@@ -104,6 +196,7 @@
                 var pt = mig.L.punkt(e);
                 mig.paaLaerer = !!(mig.laererUnder && mig.laererUnder(pt.x, pt.y));
                 if (mig.paaLaerer || mig.overKop(pt)) return;
+                if (mig.kortLaast()) { mig.kortBlink(); return; }
                 if (mig.musKrog && mig.musKrog("ned", pt, e)) return;
                 try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
                 mig.braet.ned(pt, e);
@@ -217,16 +310,16 @@
            og ikke bare set svarene. Er quizzens klistermaerke nyt, kommer det
            frem. Kemichael kommer kun, naar det var fanens sidste klistermaerke,
            saa hele fanen er klaret (brugerens regel 4. nov. 2026).
-           krav: saetningen, der staar sidst i opgavekortets besked, naar for
+           krav: saetningen, der staar sidst i forklaringen paa papirkortet, naar for
            mange svar er vist, saa eleven ved, hvorfor klistermaerket udebliver.
-           Opgavekortets besked skal derfor vaere skrevet, foer klaret kaldes. */
+           Forklaringen skal derfor vaere skrevet, foer klaret kaldes. */
         P.klaret = function (quiz, egne, krav) {
             if (!egne) {
                 /* Efter svaret til den sidste opgave; et gammelt hint eller en
                    fejl bliver ikke staaende foran kravet */
-                var e = NK.el(pre + "-besked"), gammel = e ? e.innerHTML : "";
-                if (e && krav) {
-                    if (gammel && !/^<b>Hint:/.test(gammel) && this.beskedKlasse !== "skidt") e.innerHTML = gammel + " " + NK.html(krav);
+                var gammel = this.linje;
+                if (krav) {
+                    if (gammel && !/^<b>Hint:/.test(gammel) && this.beskedKlasse !== "skidt") this.besked(gammel + " " + NK.html(krav), this.beskedKlasse);
                     else this.besked(NK.html(krav), "gul");
                 }
                 return null;

@@ -71,9 +71,9 @@
     P.opsaetOpgave = function () {};
     P.slutOpgave = function () {};
 
+    /* Forsoegets og tabellens beskeder staar i papirkortets nederste raekke */
     P.besked = function (tekst, art) {
-        NK.saetTekst("temp-tabelbesked", tekst);
-        NK.saetKlasse("temp-tabelbesked", "besked" + (art ? " " + art : ""));
+        if (this.kort) this.kort.melding(tekst, art);
     };
 
     P.bind = function () {

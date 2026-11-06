@@ -63,7 +63,7 @@ Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddis
   kogepunkterne for ethanol (78 °C) og vand (100 °C) i stoffernes farver.
   Tilbagesvaling eller destillation, og under knapperne, hvor meget der er i
   destillatet. Tøm.
-* **Opgavekortet** har én knap: Start opgave, Giv hint, Vis svaret, Ny opgave.
+* **Opgaverne** står på papirkortet øverst i scenen (se "Papirkortet" nedenfor).
   De seks opgaver kommer i rækkefølge, fordi de bygger på hinanden:
   1. olie i vand (forudsig)
   2. ethanol i vand (forudsig)
@@ -221,7 +221,7 @@ js/apparat.js         målene på låget, køleren og forlaget, rørets vej til
 js/sprites.js         indlæser glasset; Kemichael lægger sine sprites her
 js/tegning.js         kuglerne som stempler, det lille glas, navneskiltet
 js/scene.js           placering, tegning, musen og hændelserne til Kemichael
-js/opgaver.js         opgavekortet med én knap og tjekket til byg-opgaven
+js/opgaver.js         papirkortet med opgaverne og tjekket til byg-opgaven
 js/quiz.js            quizzen
 js/laerer.js          Kemichaels præsentation og besøg
 js/rundvisning.js     rundvisningen bag ?
@@ -279,3 +279,23 @@ spørge. Koden er den fælles `../kemichael/praesentation.js`, som i
 gamle `js/praesentation.js` og knappen "Spring præsentationen over" midt i
 scenen er fjernet 4. nov. 2026.
 Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
+
+## Papirkortet (6. nov. 2026)
+
+De seks opgaver står på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `papirkort.js`, `js/opgaver.js`), ikke i panelet.
+Et svar vælges kun; **Indsend svar** sender ind og er grå, til der er noget at
+sende. Under en forudsigelse er panelet og bassinet låst, og et klik får kortet til
+at blinke. Ved det første Indsend svar sker det i bassinet, rigtigt eller ej; et
+forkert svar giver forklaringen til netop den fejl, og eleven vælger igen. Byg-opgaven
+(olien nederst) løses ikke længere af sig selv: eleven trykker Indsend svar, når
+olien ligger nederst. **Giv et hint** er en stille knap med gul kant (Giv et hint, Vis
+svaret). Efter et rigtigt svar bliver kortet på opgaven med forklaringen og **Næste
+opgave** (til sidst **Afslut opgaverne**). En opgave tæller som løst, når det første
+svar var rigtigt og uden hint. Panelet har tallet og **Start forfra**. Bassinet står
+under kortet (`NK.kortZone`), og Kemichaels tilbud om præsentationen står under
+kortet. Fire svarmuligheder er kortet ned til højst 34 tegn. Quizzen i vinduet er
+uændret. Selvtesten (afsnit 9 og 9b) måler kortet i 1400x860 og 1100x700.
+
+Molekylenavnene (6. nov. 2026): ingen ændringer; hydrogen står kun i
+hydrogenbindinger.

@@ -26,8 +26,8 @@
         ],
         "fane-b": [
             { sel: "#b-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene med svarknapper. Vælg et svar, og tryk Indsend svar. Det, opgaven handler om, har en gul ring." },
-            { sel: "#b-anker-lunge", titel: "Lungerne", tekst: "I lungerne kommer der oxygen ind i blodet fra luften. Når opgaven beder om det, sender et klik på lungerne blodet derhen." },
-            { sel: "#b-anker-muskel", titel: "Musklen", tekst: "Musklen bruger oxygen. Når opgaven beder om det, sender et klik på musklen blodet derhen." },
+            { sel: "#b-anker-lunge", titel: "Lungerne", tekst: "I lungerne kommer der dioxygen ind i blodet fra luften. Når opgaven beder om det, sender et klik på lungerne blodet derhen." },
+            { sel: "#b-anker-muskel", titel: "Musklen", tekst: "Musklen bruger dioxygen. Når opgaven beder om det, sender et klik på musklen blodet derhen." },
             { sel: "#b-anker-lup", titel: "Luppen", tekst: "En lille portion af blodet: 12 Hb og de frie O₂. En Hb med O₂ på er lysere rød og hedder HbO₂. For at gøre det enkelt har hver Hb kun ét sted, hvor et O₂ kan sætte sig." },
             { sel: "#b-anker-tallinje", titel: "Tallinjen", tekst: "Reaktionsbrøken Y = [HbO₂] / ([Hb] · [O₂]) og ligevægtskonstanten K. Når [O₂] springer, springer Y væk fra K, og reaktionen går tilbage mod K." },
             { sel: "#b-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },

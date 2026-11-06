@@ -97,6 +97,32 @@ Alt er regnet af formlerne og elevens tal (`js/afst.js`):
 | Fane 1: det lille tal er ændret | Det er ikke det stof, der skal laves |
 | Fane 2: 0, et kommatal eller tekst | Hver sin |
 
+## Papirkortet (6. nov. 2026)
+
+Begge faner har opgaven på ét lyst papirkort øverst i midten af scenen
+(`#kg-skort` og `#sk-skort`) med `../faelles/papirkort.css` og
+`papirkort.js`. Kortet har etiketten (Reaktion 2 af 10), reaktionens korte
+historie og opgaven, beskeden (Ikke endnu, Hint 1 af 3, Afstemt), knappen
+**Giv et hint** med gul kant og **Indsend svar**. Statuslinjen nederst og
+opgavekortet i panelet er væk. Panelet har regnskabet, listen med
+reaktionerne og Start forfra.
+
+* På fane 1 ændrer + og − kun tallene. Indsend svar lader molekylerne
+  reagere, og først da bedømmes reaktionen.
+* På fane 2 står felterne på tavlen. Enter i et felt gør det samme som
+  Indsend svar.
+* Indsend svar er gråt, til der er ændret noget.
+* Efter et rigtigt svar bliver kortet på reaktionen med den grønne
+  forklaring, og Næste opgave står, hvor Indsend svar stod.
+
+Afsnittet herunder om statuslinjen beskriver beskederne og hinttrappen. De
+står nu på kortet i stedet for i linjen. Selvtesten måler kortet i
+1400 × 860 og 1280 × 680 med den længste tekst for alle reaktioner.
+
+**Molekylenavne (6. nov. 2026):** historierne siger dichlor, dihydrogen,
+dioxygen og dinitrogen, når stoffet menes. "Tæl O" i hintene handler om
+atomerne og bliver.
+
 ## Hjælpen: statuslinjen og hinttrappen
 
 Der er ingen lærer. Hele hjælpen ligger i **statuslinjen** nederst i scenen,

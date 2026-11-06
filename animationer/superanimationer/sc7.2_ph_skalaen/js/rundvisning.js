@@ -16,29 +16,32 @@
 
     var TURE = {
         "fane-skala": [
+            { sel: "#skala-skort", titel: "Opgaven", tekst: "Kortet øverst viser hylden og opgaven. Hint og svar står også her." },
             { sel: "#skala-anker-skala", titel: "pH-skalaen", tekst: "Her fra −1 til 15, for skalaen stopper ikke ved 0 og 14. Under 7 er surt, 7 er neutralt, og over 7 er basisk. Farverne er universalindikatorens." },
             { sel: "#skala-anker-stoffer", titel: "Stofferne", tekst: "Træk et stof op på skalaen, der hvor du tror, det hører til." },
             { sel: "#skala-anker-meter", titel: "pH-metret", tekst: "Det måler stoffet, når du slipper det. Så flyver stoffet hen til sin rigtige plads." },
             { sel: "#skala-anker-baner", titel: "De målte stoffer", tekst: "Den gule trekant under skalaen er dit gæt. Klik på et stof for at se det igen." },
-            { sel: "#skala-kort", titel: "Hylden", tekst: "To hylder med seks stoffer. Knappen giver et hint og derefter svaret." },
+            { sel: "#skala-gaetkort", titel: "Gæt og målt", tekst: "To hylder med seks stoffer. Tabellen samler dine gæt og de målte værdier." },
             { sel: "#teoriknap", titel: "Teori", tekst: "pH-skalaen kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Luppen: tæl ionerne ved hver pH. Fortyndingen: se, hvad vand gør ved pH." }
         ],
         "fane-lup": [
+            { sel: "#lup-skort", titel: "Opgaven", tekst: "Kortet øverst viser målet. Dit svar tæller først, når du trykker Indsend svar." },
             { sel: "#lup-anker-skala", titel: "pH-mærket", tekst: "Træk mærket, eller klik på skalaen. Pilene på tastaturet virker også." },
             { sel: "#lup-anker-glas", titel: "Glasset", tekst: "Vand med universalindikator. Farven følger pH." },
             { sel: "#lup-anker-lup", titel: "Luppen", tekst: "Et lille rum af væsken. 1 prik er 1 ion: røde er H₃O⁺, blå er OH⁻." },
             { sel: "#lup-anker-zoom", titel: "Luppen zoomer selv", tekst: "Bliver der over 100 af én slags, zoomer den ind på et 10 gange mindre rum. Linjen her viser, hvor mange gange den har zoomet." },
             { sel: "#lup-maaling", titel: "I luppen", tekst: "Antallet af ioner og koncentrationerne ved den pH, du har valgt." },
-            { sel: "#lup-kort", titel: "Målene", tekst: "Fem små mål. Knappen giver et hint og derefter svaret." }
+            { sel: "#lup-kort", titel: "Målene", tekst: "Fem små mål. Her kan du også starte målene forfra." }
         ],
         "fane-fortynd": [
+            { sel: "#fortynd-skort", titel: "Opgaven", tekst: "Kortet øverst viser målet. Et bud eller et tal tæller først, når du trykker Indsend svar." },
             { sel: "#fortynd-anker-knapper", titel: "Fortynd 10 gange", tekst: "Hvert tryk laver et nyt glas: 1 mL fra glasset før og 9 mL vand. Knappen virker, når målet skal bruge den." },
             { sel: "#fortynd-anker-flasker", titel: "Glassene", tekst: "Saltsyren og natriumhydroxiden står ved pH 1 og 13. Hvert nyt glas står under sin pH. Klik på et glas for at se det i luppen." },
             { sel: "#fortynd-anker-skala", titel: "Skalaen", tekst: "Stregerne viser, hvor på skalaen glassene hører til." },
             { sel: "#fortynd-anker-lup", titel: "Luppen", tekst: "Ionerne i det nyeste glas, eller det du klikker på. Luppen zoomer selv, så der er 10 til 100 af den ion, der er flest af." },
             { sel: "#fortynd-glas", titel: "Glasset", tekst: "pH, og hvor mange ioner der er i luppen." },
-            { sel: "#fortynd-kort", titel: "Målene", tekst: "Fem mål. Knappen giver et hint og derefter svaret." }
+            { sel: "#fortynd-kort", titel: "Målene", tekst: "Fem mål. Her kan du også starte målene forfra." }
         ]
     };
 

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Betydende cifre</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body data-fane="tael">
+<body class="papirkort" data-fane="tael">
 
 <header class="top">
     <h1><span class="ikon">≈</span> Betydende cifre</h1>
@@ -25,12 +26,21 @@
 <main>
 <section class="fane aktiv" id="fane" role="tabpanel">
     <div class="scene" id="scene">
-        <!-- Arbejdet: spørgsmålet, tavlen med cifrene, svaret og linjen -->
+        <!-- Papirkortet oeverst i midten (brugerens beslutning 4. nov. 2026):
+             opgaven, hint, beskeden ved et forkert svar, forklaringen og
+             knapperne. Kortets oeverste del tegnes af kortHTML i js/fane.js. -->
+        <div class="scenekort opgave" id="skort">
+            <div class="sk-ind" id="sk-ind"></div>
+            <div class="sk-bund" id="sk-bund">
+                <p class="st-tekst" id="besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="opgaveknap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="tjek" type="button" aria-disabled="true">Indsend svar</button>
+            </div>
+        </div>
+
+        <!-- Arbejdet under kortet: tavlen med cifrene og svarfeltet -->
         <div class="arbejde" id="arbejde">
             <div class="arbejdsbord">
-                <span class="opg-type" id="opg-type"></span>
-                <p class="spm" id="spm"></p>
-
                 <div class="tavle" id="tavle">
                     <div class="talrk" id="talrk"></div>
                     <div class="efter" id="efter"></div>
@@ -52,25 +62,22 @@
                         </span>
                         <span class="svar-enhed" id="svar-enhed" hidden></span>
                     </div>
-                    <button class="knap blaa tjekknap" id="tjek" type="button">Tjek</button>
                 </div>
                 <div class="maaler" id="maaler" hidden></div>
-                <p class="besked" id="besked" aria-live="polite"></p>
             </div>
         </div>
 
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der ændrer sig: Giv hint -> Vis svaret -> Næste opgave -->
-        <div class="kort opgavekort" id="opgavekort">
+        <!-- Runden: hvilke opgaver, hvor langt, og Ny runde (aldrig paa kortet) -->
+        <div class="kort rundevalg" id="rundevalg">
             <h2><span id="kort-titel">Tæl cifrene</span><span class="taeller">opgave <b id="kort-nr">1</b>/10</span></h2>
             <div class="vaelgerrad" id="vaelgere" hidden></div>
             <div class="vaelgerrad niveaurad" id="niveauer" hidden></div>
             <p class="niveaunote" id="niveaunote" hidden></p>
             <div class="prikker" id="prikker" aria-hidden="true"></div>
-            <p class="kort-slut" id="kort-slut" hidden></p>
-            <button class="knap stor hjaelp" id="opgaveknap" type="button">Giv hint</button>
+            <button class="knap forfra" id="nyrunde" type="button" title="Ti nye opgaver på denne fane (R)">Ny runde ↺</button>
         </div>
 
         <div class="kort" id="rundekort">
@@ -116,7 +123,7 @@
         <div class="eksempel">2,5 · 4,00 = 10 (2 betydende cifre, lige som 2,5)</div>
 
         <h3>Genveje</h3>
-        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet skifter <kbd>e</kbd> eller <kbd>^</kbd> til videnskabelig notation og springer til eksponenten.</p>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet skifter <kbd>e</kbd> eller <kbd>^</kbd> til videnskabelig notation og springer til eksponenten.</p>
 
         <div class="knapper" style="margin-top:16px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
@@ -142,6 +149,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/cifre.js"></script>

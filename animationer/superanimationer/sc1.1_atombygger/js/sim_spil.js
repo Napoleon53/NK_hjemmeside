@@ -360,8 +360,18 @@
 
     NK.SimSpil.prototype.koblKnapper = function () {
         var mig = this;
-        NK.el("spil-naeste").addEventListener("click", function () { mig.naeste(); });
         NK.el("spil-igen").addEventListener("click", function () { mig.igen(); });
+
+        /* Papirkortet: svarene vaelger kun, Indsend svar bedoemmer, og
+           knappen, der foerer videre, staar, hvor Indsend svar stod */
+        NK.el("spil-indsend").addEventListener("click", function () { mig.indsendKlik(); });
+        NK.el("spil-skort").addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest("[data-videre]")) { mig.videre(); return; }
+            var k = t.closest("[data-valg]");
+            if (k && !k.disabled) mig.vaelgSvar(parseInt(k.getAttribute("data-valg"), 10));
+        });
 
         /* Opslagstabellen: ren visning, men med atomnummeret med, saa den
            kan bruges til at slaa protontal op midt i et spoergsmaal. */
@@ -441,13 +451,47 @@
         b.brugte.push(noegle);
         b.opgave = opgave;
         b.valgt = -1;
+        b.markeret = -1;
         b.nr++;
+    };
+
+    /* Et klik paa et svar vaelger kun; Indsend svar sender det ind */
+    NK.SimSpil.prototype.vaelgSvar = function (nr) {
+        var b = this.baner[this.aktiv];
+        if (b.faerdig || b.valgt !== -1) return;
+        b.markeret = nr;
+        this.visBane();
+    };
+
+    NK.SimSpil.prototype.indsendKlik = function () {
+        var b = this.baner[this.aktiv];
+        if (b.faerdig || b.valgt !== -1) return;
+        if (b.markeret === undefined || b.markeret < 0) { this.kortBlink(); return; }
+        this.svar(b.markeret);
+    };
+
+    NK.SimSpil.prototype.kortBlink = function () {
+        var e = NK.el("spil-skort");
+        e.classList.remove("blink");
+        void e.offsetWidth;
+        e.classList.add("blink");
+    };
+
+    /* Knappen, der foerer videre: naeste spoergsmaal, resultatet, naeste bane */
+    NK.SimSpil.prototype.videre = function () {
+        var b = this.baner[this.aktiv];
+        if (b.faerdig) {
+            if (this.aktiv + 1 < BANER.length) this.vaelgBane(this.aktiv + 1);
+            return;
+        }
+        this.naeste();
     };
 
     NK.SimSpil.prototype.svar = function (nr) {
         var b = this.baner[this.aktiv];
         var o = b.opgave;
         if (b.valgt !== -1) return;
+        b.markeret = -1;
         b.valgt = nr;
         if (nr === o.rigtig) {
             b.rigtige++;
@@ -522,8 +566,8 @@
             this.baneknapper[i].status.textContent = banestatustekst(this.baner[i]);
         }
 
-        NK.el("spil-boks").style.display = b.faerdig ? "none" : "";
         NK.el("spil-resultat").style.display = b.faerdig ? "" : "none";
+        this.visKort();
 
         if (b.faerdig) {
             NK.el("spil-stat").hidden = true;
@@ -556,43 +600,70 @@
             this.visStat(b.opgave.nuklid.z, b.opgave.nuklid.z, b.opgave.skjulStat);
         }
 
-        NK.saetTekst("spil-banenavn", BANER[this.aktiv].navn);
-        NK.saetTekst("spil-taeller", b.nr + "/" + SPOERGSMAAL_PR_BANE);
-        NK.saetTekst("spil-sp", b.opgave.tekst);
+    };
 
-        var boks = NK.el("spil-svarvalg");
-        boks.innerHTML = "";
-        for (i = 0; i < b.opgave.valg.length; i++) {
-            var knap = document.createElement("button");
-            knap.className = "spilknap";
-            knap.type = "button";
-            knap.textContent = b.opgave.valg[i];
-            knap.setAttribute("data-nr", String(i));
-            if (b.valgt === -1) {
-                knap.addEventListener("click", function () {
-                    mig.svar(parseInt(this.getAttribute("data-nr"), 10));
-                });
-            } else {
-                knap.disabled = true;
-                if (i === b.opgave.rigtig) knap.classList.add("rigtig");
-                else if (i === b.valgt) knap.classList.add("forkert");
-            }
-            boks.appendChild(knap);
-        }
+    function esc(t) {
+        return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
 
-        var naeste = NK.el("spil-naeste");
-        if (b.valgt === -1) {
-            NK.saetTekst("spil-svar", "");
-            NK.saetKlasse("spil-svar", "besked");
-            naeste.style.display = "none";
+    /* ----- Papirkortet (6. nov. 2026) --------------------------------------------
+       Spoergsmaalet og de fire svar staar paa ét lyst kort oeverst midt i
+       scenen. Et svar vaelges (blaat) og sendes med Indsend svar, der er
+       graa, til et svar er valgt. Spillet giver ét forsoeg: et rigtigt svar
+       bliver groent, et forkert roedt med det rigtige svar i gult. Kortet
+       bliver paa spoergsmaalet med begrundelsen under svarene og Naeste
+       spoergsmaal, hvor Indsend svar stod. Der er intet hint, for spillet
+       taeller rigtige svar; opslaget i det periodiske system er hjaelpen.
+       Naar banen er slut, staar resultatet paa kortet med knappen til naeste
+       bane. Spil banen igen ligger i panelet. */
+    NK.SimSpil.prototype.visKort = function () {
+        var b = this.baner[this.aktiv], o = b.opgave, html, kl;
+        var e = NK.el("spil-skort"), ind = NK.el("spil-ind");
+        if (b.faerdig) {
+            kl = "scenekort loest" + (b.rigtige === SPOERGSMAAL_PR_BANE ? "" : " svar");
+            html = '<div class="sk-start"><p class="sk-tekst"><span class="sk-chip">' + esc(BANER[this.aktiv].navn) + "</span>" +
+                "Banen er slut med " + b.rigtige + " af " + SPOERGSMAAL_PR_BANE + " rigtige. " + esc(dom(b.rigtige)) + "</p>" +
+                (this.aktiv + 1 < BANER.length ? '<button type="button" class="sk-videre" data-videre="1">Næste bane →</button>' : "") + "</div>";
         } else {
-            var traf = (b.valgt === b.opgave.rigtig);
-            NK.saetTekst("spil-svar", (traf ? "Rigtigt. " : "Ikke helt. ") + b.opgave.forklaring);
-            NK.saetKlasse("spil-svar", "besked " + (traf ? "god" : "skidt"));
-            naeste.style.display = "";
-            naeste.firstChild.textContent =
-                b.nr >= SPOERGSMAAL_PR_BANE ? "Se resultatet" : "Næste spørgsmål";
+            var svaret = b.valgt !== -1, traf = svaret && b.valgt === o.rigtig;
+            kl = "scenekort " + (svaret ? "loest bliv" + (traf ? "" : " svar") : "spm");
+            html = '<p class="sk-tekst"><span class="sk-chip">Spørgsmål ' + b.nr + " af " + SPOERGSMAAL_PR_BANE + "</span>" +
+                NK.Papir.tekst(esc(o.tekst)) + '</p><div class="sk-svar n' + o.valg.length + '">';
+            for (var i = 0; i < o.valg.length; i++) {
+                var k = "sk-knap";
+                if (svaret) k += i === o.rigtig ? (traf ? " rigtig" : " svar-vist") : (i === b.valgt ? " forkert" : " dim");
+                else if (i === b.markeret) k += " valgt";
+                html += '<button type="button" class="' + k + '" data-valg="' + i + '"' + (svaret ? " disabled" : "") + ">" +
+                    '<span class="v-bogstav">' + "ABCD".charAt(i) + "</span><span>" + esc(o.valg[i]) + "</span></button>";
+            }
+            html += "</div>";
+            if (svaret) {
+                html += NK.Papir.bliv(esc(o.forklaring), traf ? "Rigtigt" : "Ikke rigtigt",
+                    b.nr >= SPOERGSMAAL_PR_BANE ? "Se resultatet →" : "Næste spørgsmål →", !traf);
+            }
         }
+        if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        if (ind._html !== html) { ind.innerHTML = html; ind._html = html; }
+        var aaben = !b.faerdig && b.valgt === -1;
+        NK.el("spil-status").hidden = !aaben;
+        var k2 = NK.el("spil-indsend"), klar = aaben && b.markeret >= 0;
+        k2.classList.toggle("klar", klar);
+        k2.classList.toggle("ikke-klar", !klar);
+        k2.setAttribute("aria-disabled", klar ? "false" : "true");
+        this.placerUnderKort();
+    };
+
+    /* Boksen med tallene og knappen til det periodiske system staar under kortet */
+    NK.SimSpil.prototype.placerUnderKort = function () {
+        var top = 10 + this.kortZone() + 16;
+        NK.el("spil-stat").style.top = top + "px";
+        NK.el("spil-pertabel-knap").style.top = top + "px";
+    };
+
+    /* Den plads, der er sat af til kortet oeverst i scenen */
+    NK.SimSpil.prototype.kortZone = function () {
+        var basis = window.innerHeight <= 720 ? 150 : 166;
+        return Math.max(basis, NK.el("spil-skort").offsetHeight || 0);
     };
 
     /* ----- Tegning ----------------------------------------------------------- */
@@ -633,8 +704,10 @@
     NK.SimSpil.prototype.tegn = function () {
         var l = this.l, c = l.ctx;
         l.ryd("#14141a");
-        var cx = l.b / 2, cy = l.h / 2;
+        var top = 10 + this.kortZone() + 10;
+        var cx = l.b / 2, cy = top + (l.h - top) / 2;
         var b = this.baner[this.aktiv];
+        this.placerUnderKort();
 
         if (b.faerdig) {
             var fuldtHus = (b.rigtige === SPOERGSMAAL_PR_BANE);
@@ -659,7 +732,7 @@
                haevet) og ladningsskaeret vises kun, naar hverken
                identiteten eller ladningen er hemmelig lige nu - se
                skjulStat paa den enkelte opgave og visStat(). */
-            var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
+            var plads = NK.klamp(Math.min(l.b / 2 - 40, (l.h - top) * 0.44), 60, 300);
             var skjul = o.skjulStat || [];
             var q = this.atom.p - this.atom.e;
             var visQ = skjul.indexOf("q") === -1;

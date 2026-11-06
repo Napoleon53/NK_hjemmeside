@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reaktionshastighed</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⏱</span> Reaktionshastighed</h1>
@@ -28,11 +29,24 @@
 <!-- FANE 1: KURVEN. Glas og graf tegnes af js/sim_kurve.js            -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-kurve" role="tabpanel" aria-label="Kurven">
-    <div class="scene">
-        <canvas id="kurve-laerred" aria-label="Bægerglas og kurver for Br₂ og BrO₃⁻"></canvas>
-        <div class="tilbud" id="kurve-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
+    <div class="scene medkort">
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, ../faelles/papirkort.css) -->
+        <div class="scenekort opgave start" id="kurve-skort" data-start="Afspil reaktionen, og start så en opgave.">
+            <div class="sk-ind" id="kurve-ind"></div>
+            <div class="sk-bund tom" id="kurve-status">
+                <p class="st-tekst" id="kurve-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="kurve-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="kurve-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Laerredet begynder under kortets zone (--kortzone i css/stil.css) -->
+        <div class="laerred-omraade">
+            <canvas id="kurve-laerred" aria-label="Bægerglas og kurver for Br₂ og BrO₃⁻"></canvas>
+            <div class="tilbud" id="kurve-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
         </div>
     </div>
 
@@ -64,14 +78,8 @@
             <button class="knap lille" id="kurve-tangentknap" type="button" hidden><span>Læg linealen som tangent</span><span class="tegn">⟋</span></button>
         </div>
 
-        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
         <div class="kort opgavekort" id="kurve-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="kurve-loest">0</b></span><button class="afslut" id="kurve-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="kurve-opgavetekst" data-start="Afspil reaktionen, og start så en opgave."></p>
-            <div class="valg" id="kurve-valg"></div>
-            <p class="besked hint" id="kurve-hint"></p>
-            <p class="besked" id="kurve-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="kurve-opgaveknap" type="button">Start opgave</button>
+            <h2><span>Opgaver</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="kurve-loest">0</b></span><button class="afslut" id="kurve-afslut" type="button" hidden>Afslut</button></span></h2>
         </div>
     </aside>
 </section>
@@ -80,11 +88,24 @@
 <!-- FANE 2: SAMMENSTØD. Kassen og kurven tegnes af sim_sammenstoed.js -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-sammenstoed" role="tabpanel" aria-label="Sammenstød">
-    <div class="scene">
-        <canvas id="sam-laerred" aria-label="Partikler, der støder sammen, og en kurve over produktet"></canvas>
-        <div class="tilbud" id="sam-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
+    <div class="scene medkort">
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
+             og knapperne (js/opgave.js, ../faelles/papirkort.css) -->
+        <div class="scenekort opgave start" id="sam-skort" data-start="Skru på opstillingen, og start så en opgave.">
+            <div class="sk-ind" id="sam-ind"></div>
+            <div class="sk-bund tom" id="sam-status">
+                <p class="st-tekst" id="sam-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="sam-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="sam-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Laerredet begynder under kortets zone (--kortzone i css/stil.css) -->
+        <div class="laerred-omraade">
+            <canvas id="sam-laerred" aria-label="Partikler, der støder sammen, og en kurve over produktet"></canvas>
+            <div class="tilbud" id="sam-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
         </div>
     </div>
 
@@ -119,12 +140,7 @@
         </div>
 
         <div class="kort opgavekort" id="sam-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="sam-loest">0</b></span><button class="afslut" id="sam-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="sam-opgavetekst" data-start="Skru på opstillingen, og start så en opgave."></p>
-            <div class="valg" id="sam-valg"></div>
-            <p class="besked hint" id="sam-hint"></p>
-            <p class="besked" id="sam-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="sam-opgaveknap" type="button">Start opgave</button>
+            <h2><span>Opgaver</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="sam-loest">0</b></span><button class="afslut" id="sam-afslut" type="button" hidden>Afslut</button></span></h2>
         </div>
     </aside>
 </section>
@@ -134,7 +150,17 @@
 <!-- tabellen og udtrykket bygges af den samme fil.                    -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-udtryk" role="tabpanel" aria-label="Hastighedsudtryk">
-    <div class="scene soejle">
+    <div class="scene soejle medkort">
+        <!-- Papirkortet: reaktionen, opgaven, hint, beskeden og Indsend svar.
+             Eksponenterne vaelges i udtrykket under tabellen (js/sim_udtryk.js). -->
+        <div class="scenekort opgave" id="udtryk-skort">
+            <div class="sk-ind" id="udtryk-ind"></div>
+            <div class="sk-bund tom" id="udtryk-status">
+                <p class="st-tekst" id="udtryk-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="udtryk-hjaelp" type="button">Giv et hint</button>
+                <button class="knap indsend" id="udtryk-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="graf-omraade">
             <canvas id="udtryk-laerred" aria-label="Kurver for forsøgene med tangenten i t = 0"></canvas>
             <div class="tilbud" id="udtryk-tilbud" hidden>
@@ -147,19 +173,13 @@
             <table class="forsoegstabel" id="udtryk-tabel"></table>
             <div class="udtryk" id="udtryk-udtryk">
                 <div class="formel" id="udtryk-formel"></div>
-                <button class="knap blaa tjekknap" id="udtryk-tjek" type="button">Tjek</button>
             </div>
-            <p class="besked" id="udtryk-besked" aria-live="polite"></p>
         </div>
     </div>
 
     <aside class="panel">
         <div class="kort opgavekort" id="udtryk-opgavekort">
-            <h2><span>Opgave <span class="taeller" id="udtryk-nr">1/8</span></span><span class="taeller">løst: <b id="udtryk-loest">0</b></span></h2>
-            <p class="opgavetekst">Find hastighedsudtrykket for reaktionen.</p>
-            <div class="ligning" id="udtryk-ligning"></div>
-            <p class="besked hint" id="udtryk-hint"></p>
-            <button class="knap stor" id="udtryk-opgaveknap" type="button">Giv hint</button>
+            <h2><span>Reaktion <span class="taeller" id="udtryk-nr">1/8</span></span><span class="taeller">løst: <b id="udtryk-loest">0</b></span></h2>
         </div>
 
         <div class="kort" id="udtryk-forsoeg">
@@ -232,6 +252,7 @@
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>
 <script src="../kemichael/praesentation.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/sim_kurve.js"></script>
 <script src="js/sim_sammenstoed.js"></script>

@@ -10,10 +10,13 @@
    molekylerne i det valgte glas (NK.Proeve): de faste ligger i raekker,
    de flydende bevaeger sig.
 
-   Opgaverne i panelet: gaet foerst (fast, delvist fast eller flydende),
-   saa flytter glasset derhen og viser svaret. Til sidst: hvorfor?
-   Knappen: Giv hint -> Vis svaret -> Naeste opgave. Til sidst gaar
-   den videre til fabrikken (fane 1); R starter forfra. Kemichael roser
+   Opgaverne staar paa papirkortet oeverst i scenen (js/kort.js): gaet
+   foerst (fast, delvist fast eller flydende). Et svar vaelger kun, og
+   Indsend svar sender gaettet; saa flytter glasset derhen og viser
+   svaret, og kortet bliver staaende med forklaringen og Naeste opgave.
+   Til sidst: hvorfor? Giv hint -> Vis svaret (stille knap med gul kant).
+   Til sidst gaar kortets knap videre til fabrikken (fane 1); Start
+   forfra i panelet og R starter forfra. Kemichael roser
    kun foerste gang.
 
    Paaskeaegget: staar smoerret i solen i 12 sekunder, gaar der tre uger.
@@ -121,14 +124,16 @@
         var gh = NK.klamp(H * 0.13, 56, 86);
         lay.gh = gh;
         /* Koeleskabet staar paa gulvet til venstre */
-        var fh = Math.min(H - 6, W * 0.24 * 520 / 220);
+        var zone = this.sk ? this.kortZone() : 10;
+        lay.zone = zone;
+        var fh = Math.min(H - zone - 4, W * 0.24 * 520 / 220);
         lay.K = Tg.koeleskabMaal(kant, H - 1 - 4 * fh / 520, fh);
         var K = lay.K;
         /* Vinduet til hoejre, med karmen et stykke over bordet */
         var vb = NK.klamp(W * 0.21, 140, 250);
         var karmY = lay.bordY - Math.max(gh + 48, H * 0.2);
         var vs = vb / 240;
-        if (karmY - 306 * vs < 10) { vs = (karmY - 10) / 306; vb = 240 * vs; }
+        if (karmY - 306 * vs < zone) { vs = (karmY - zone) / 306; vb = 240 * vs; }
         lay.V = Tg.vindueMaal(W - kant - vb, karmY, vb);
         var V = lay.V;
         /* Pladserne */
@@ -156,7 +161,7 @@
         };
         /* Zoomvinduet over bordet, mellem skabet og vinduet */
         var zx0 = K.x + K.b + 24, zx1 = V.x - 24;
-        var zy0 = 34, zy1 = lay.bordY - lay.gh - 44;
+        var zy0 = zone + 24, zy1 = lay.bordY - lay.gh - 44;
         var zb = Math.min(zx1 - zx0, (zy1 - zy0) * 36 / 34);
         var zh = zb * 34 / 36;
         lay.zoom = { x: Math.round(zx0 + (zx1 - zx0 - zb) / 2), y: Math.round(zy0 + (zy1 - zy0 - zh) / 2), b: Math.round(zb), h: Math.round(zh) };
@@ -180,7 +185,7 @@
     };
 
     P.tilpas = function () {
-        if (this.L.tilpas() || !this.lay) {
+        if (this.L.tilpas() || !this.lay || this.lay.zone !== this.kortZone()) {
             this.layout();
             var mig = this;
             this.glas.forEach(function (gl) { var p = mig.pladsPos(gl); gl.x = p.x; gl.y = p.y; });
@@ -235,7 +240,7 @@
     P.efterFlyt = function (gl) {
         var o = this.opgave();
         if (!o || this.trin !== "gaet") return;
-        if (gl.id === o.fedt && gl.sted === o.sted) this.afslor(null);
+        if (gl.id === o.fedt && gl.sted === o.sted) this.afslor(null, true);
     };
 
     /* ----- Opgaverne ------------------------------------------------------------------------ */
@@ -248,7 +253,9 @@
         this.trin = o ? "gaet" : "hvorfor";
         this.hjaelp = 0;
         this.gaettet = null;
+        this.valgtSvar = null;
         this.forkert = [];
+        this.selv = false;
         this.besked("", "");
         if (o) {
             var gl = this.glasMedId(o.fedt);
@@ -267,6 +274,24 @@
         this.visOpgave();
     };
 
+    /* Et svar paa kortet vaelger kun; Indsend svar sender det */
+    P.vaelgSvar = function (v) {
+        if (this.trin === "gaet") this.valgtSvar = v;
+        else if (this.trin === "hvorfor") {
+            var k = parseInt(v, 10);
+            if (this.forkert.indexOf(k) >= 0) return;
+            this.valgtSvar = k;
+            if (this.beskedKlasse === "skidt") this.besked("", "");
+        } else return;
+        this.visOpgave();
+    };
+
+    P.indsend = function () {
+        if (this.valgtSvar === null || this.valgtSvar === undefined) { this.sk.blink(); return; }
+        if (this.trin === "gaet") this.gaet(this.valgtSvar);
+        else if (this.trin === "hvorfor") this.svarHvorfor(this.valgtSvar);
+    };
+
     P.gaet = function (svar) {
         if (this.trin !== "gaet") return;
         this.gaettet = svar;
@@ -275,17 +300,23 @@
     };
 
     /* Glasset flytter derhen, og svaret vises */
-    P.afslor = function (svar) {
+    P.afslor = function (svar, selv) {
         var o = this.opgave(), gl = this.glasMedId(o.fedt);
         if (gl.sted !== o.sted) this.flyt(gl, o.sted);
         this.vaelg(gl);
         this.trin = "set";
-        var rigtigt = D.TILSTANDE[o.svar].navn;
-        var hvor = D.fedt(o.fedt).Navn + " " + D.sted(o.sted).i + ": " + rigtigt + ".";
-        if (svar === null) this.besked("<b>" + NK.html(hvor) + "</b> " + NK.html(o.efter), "");
-        else if (svar === o.svar) this.besked("<b>Rigtigt.</b> " + NK.html(hvor) + " " + NK.html(o.efter), "god");
-        else this.besked("Du gættede " + NK.html(D.TILSTANDE[svar].navn) + ". " + NK.html(hvor) + " " + NK.html(o.efter), "skidt");
+        this.selv = !!selv;
+        this.besked("", "");
         this.visOpgave();
+    };
+
+    /* Forklaringen, mens kortet bliver paa gaettet */
+    P.efterTekst = function () {
+        var o = this.opgave(), svar = this.gaettet;
+        var hvor = NK.html(D.fedt(o.fedt).Navn + " " + D.sted(o.sted).i + ": " + D.TILSTANDE[o.svar].navn + ".");
+        if (svar === null) return { t: "<b>" + hvor + "</b> " + NK.html(o.efter), slags: this.selv ? "god" : "svar" };
+        if (svar === o.svar) return { t: "<b>Rigtigt.</b> " + hvor + " " + NK.html(o.efter), slags: "god" };
+        return { t: "Du gættede " + NK.html(D.TILSTANDE[svar].navn) + ". " + hvor + " " + NK.html(o.efter), slags: "nej" };
     };
 
     P.svarHvorfor = function (k) {
@@ -293,19 +324,23 @@
         var v = D.KOELE_HVORFOR.valg[k];
         if (v.rigtig) {
             this.trin = "faerdig";
+            this.hvorforVist = this.hjaelp === 2;
             this.hjaelp = 0;
-            this.besked("<b>Rigtigt.</b> " + NK.html(v.svar), "god");
+            this.valgtSvar = k;
+            this.besked("", "");
             /* Rosen kommer kun foerste gang */
             if (!NK.hent(NOEGLE, {}).rost) this.ventRos = 0.8;
             NK.gem(NOEGLE, { loest: true, rost: true });
         } else {
             if (this.forkert.indexOf(k) < 0) this.forkert.push(k);
-            this.besked(NK.html(v.svar), "skidt");
+            this.valgtSvar = null;
+            this.besked("<b>Ikke rigtigt.</b> " + NK.html(v.svar), "skidt");
         }
         this.visOpgave();
     };
 
-    P.knap = function () {
+    /* Naeste (staar paa kortet, hvor Indsend svar stod) */
+    P.videre = function () {
         if (this.trin === "set") {
             this.opgNr++;
             this.nyOpgave();
@@ -315,8 +350,12 @@
             /* Videre til fabrikken: byg et fedt og proev det her */
             var fane = document.querySelector('[data-fane="fane-fabrik"]');
             if (fane) fane.click();
-            return;
         }
+    };
+
+    /* Giv hint -> Vis svaret (stille knap med gul kant) */
+    P.hint = function () {
+        if (this.trin !== "gaet" && this.trin !== "hvorfor") return;
         var o = this.opgave();
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
@@ -324,12 +363,19 @@
             this.visOpgave();
             return;
         }
-        if (this.trin === "gaet") this.afslor(null);
-        else if (this.trin === "hvorfor") {
+        this.hjaelp = 2;
+        if (this.trin === "gaet") { this.gaettet = null; this.afslor(null); }
+        else {
             for (var k = 0; k < D.KOELE_HVORFOR.valg.length; k++) {
                 if (D.KOELE_HVORFOR.valg[k].rigtig) { this.svarHvorfor(k); break; }
             }
         }
+    };
+
+    /* Den gamle ene knap (selvtesten): Naeste, ellers hint */
+    P.knap = function () {
+        if (this.trin === "set" || this.trin === "faerdig") this.videre();
+        else this.hint();
     };
 
     P.nulstil = function () {
@@ -346,7 +392,8 @@
     };
 
     P.enter = function () {
-        if (this.trin === "set" || this.trin === "faerdig") this.knap();
+        if (this.trin === "set" || this.trin === "faerdig") this.videre();
+        else this.indsend();
     };
 
     P.tast = function (tast) {
@@ -363,7 +410,7 @@
         gl.proeve.bliverHarsk();
         this.harskTekst = 3.2;
         this.vaelg(gl);
-        this.besked("Tre uger senere. Vand har spaltet noget af fedtet, og der er dannet smørsyre. Smørret er harskt.", "gul");
+        this.besked("<b>Tre uger senere.</b> Vand har spaltet noget af fedtet, og der er dannet smørsyre. Smørret er harskt.", "");
         if (this.laererHarsk) this.laererHarsk(gl);
         else this.harskVent = 4;
     };
@@ -384,68 +431,76 @@
     /* ----- Panelet ---------------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("koele-knap"),
-            besked: NK.el("koele-besked"),
-            kort: NK.el("koele-kort"),
-            valg: NK.el("koele-valg")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        this.el.valg.addEventListener("click", function (e) {
-            var b = e.target.closest ? e.target.closest("button") : null;
-            if (!b || b.disabled) return;
-            var v = b.getAttribute("data-svar");
-            if (mig.trin === "gaet") mig.gaet(v);
-            else if (mig.trin === "hvorfor") mig.svarHvorfor(parseInt(v, 10));
+        this.sk = new NK.SceneKort("koele", {
+            valg: function (v) { mig.vaelgSvar(v); },
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
         });
+        this.noteTxt = "";
+        this.noteTid = 0;
+        this.valgtSvar = null;
+        NK.el("koele-forfra").addEventListener("click", function () { mig.nulstil(); });
         this.visDeklaration();
     };
 
+    /* klasse "": en kort besked fra scenen (notelinjen i nogle sekunder);
+       "gul" (hint), "skidt" (forkert) og tom tekst: kortets nederste raekke */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        if (!klasse && html) {
+            this.noteTxt = html;
+            this.noteTid = 7;
+            this.visStatus();
+            return;
+        }
+        this.beskedKlasse = klasse;
+        if (this.sk) this.sk.besked(html, klasse);
     };
 
+    P.beskedTekst = function () {
+        var t = this.sk.blivAaben() ? this.sk.blivTekst() : this.sk.beskedTekst();
+        return t + " " + (this.sk.noteEl.textContent || "");
+    };
+
+    P.kortZone = function () { return this.sk.zone(D.ZONE.koele); };
+
     P.visOpgave = function () {
-        var o = this.opgave(), mig = this, html = "";
+        var o = this.opgave(), mig = this;
         var antal = D.KOELE_OPGAVER.length + 1;
-        NK.saetHTML("koele-taeller", "<b>" + Math.min(antal, this.opgNr + 1) + "</b>/" + antal);
+        var chip = "Opgave " + Math.min(antal, this.opgNr + 1) + " af " + antal;
         if (this.trin === "gaet" || this.trin === "set") {
             var f = D.fedt(o.fedt), st = D.sted(o.sted);
-            NK.saetTekst("koele-titel", "Gæt");
-            NK.saetTekst("koele-spm", f.Navn + " " + st.i + " (" + D.gradTekst(st.T) + ")");
-            NK.saetTekst("koele-under", this.trin === "gaet" ? "Fast, delvist fast eller flydende? Gæt først." : "");
-            html = SVAR.map(function (s) {
-                var kl = "valglinje";
-                if (mig.trin === "set") {
-                    if (s === o.svar) kl += " rigtig";
-                    else if (s === mig.gaettet) kl += " forkert";
-                }
-                return '<button class="' + kl + '" type="button" data-svar="' + s + '"' + (mig.trin === "set" ? " disabled" : "") + ">" +
-                    Tg.tilstandSvg(s) + '<span class="vl-navn">' + NK.html(D.TILSTANDE[s].Navn) + "</span></button>";
-            }).join("");
-        } else if (this.trin === "hvorfor") {
-            NK.saetTekst("koele-titel", "Hvorfor?");
-            NK.saetTekst("koele-spm", D.KOELE_HVORFOR.spm);
-            NK.saetTekst("koele-under", "");
-            html = D.KOELE_HVORFOR.valg.map(function (v, k) {
-                var forkert = mig.forkert.indexOf(k) >= 0;
-                return '<button class="valglinje' + (forkert ? " forkert" : "") + '" type="button" data-svar="' + k + '"' + (forkert ? " disabled" : "") + ">" +
-                    '<span class="vl-navn">' + NK.html(v.t) + "</span></button>";
-            }).join("");
-        } else {
-            NK.saetTekst("koele-titel", "Køkkenet");
-            NK.saetTekst("koele-spm", "Rette kæder pakker tæt. Knæk holder molekylerne fra hinanden.");
-            NK.saetTekst("koele-under", "Flyt glassene rundt, og se molekylerne.");
+            this.sk.vis({ kl: "spm", chip: chip,
+                tekst: NK.html(f.Navn + " " + st.i + " (" + D.gradTekst(st.T) + ")") + ". Er det fast, delvist fast eller flydende?",
+                laast: this.trin === "set",
+                svar: SVAR.map(function (s) {
+                    var set = mig.trin === "set";
+                    return { j: s, t: Tg.tilstandSvg(s) + NK.html(D.TILSTANDE[s].Navn),
+                        valgt: !set && mig.valgtSvar === s,
+                        rigtig: set && s === o.svar && mig.gaettet !== null,
+                        svarVist: set && s === o.svar && mig.gaettet === null,
+                        forkert: set && s === mig.gaettet && s !== o.svar };
+                }) });
+        } else if (this.trin === "hvorfor" || this.trin === "faerdig") {
+            var faerdig = this.trin === "faerdig";
+            this.sk.vis({ kl: "spm", chip: chip, tekst: NK.html(D.KOELE_HVORFOR.spm), laast: faerdig,
+                svar: D.KOELE_HVORFOR.valg.map(function (v, k) {
+                    return { j: k, t: NK.html(v.t), valgt: !faerdig && mig.valgtSvar === k,
+                        rigtig: faerdig && v.rigtig && !mig.hvorforVist, svarVist: faerdig && v.rigtig && mig.hvorforVist,
+                        forkert: mig.forkert.indexOf(k) >= 0 };
+                }) });
         }
-        NK.saetHTML("koele-valg", html);
-        var tekst, klasse = "knap";
-        if (this.trin === "set") { tekst = this.opgNr + 1 >= D.KOELE_OPGAVER.length ? "Til hvorfor" : "Næste opgave"; klasse = "knap blaa banker"; }
-        else if (this.trin === "faerdig") { tekst = "Byg dit eget fedt"; klasse = "knap blaa"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.trin === "faerdig");
+        if (this.trin === "set") {
+            var e = this.efterTekst();
+            this.sk.bliv(e.t, null, this.opgNr + 1 >= D.KOELE_OPGAVER.length ? "Til hvorfor" : "Næste opgave", e.slags);
+        } else if (this.trin === "faerdig") {
+            var rigtig = D.KOELE_HVORFOR.valg.filter(function (v) { return v.rigtig; })[0];
+            this.sk.bliv("<b>Rigtigt.</b> " + NK.html(rigtig.svar), null, "Byg dit eget fedt", this.hvorforVist ? "svar" : "god");
+        } else {
+            this.sk.bliv(null);
+            var klar = this.valgtSvar !== null && this.valgtSvar !== undefined;
+            this.sk.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: klar });
+        }
     };
 
     /* Varedeklarationen for det valgte glas */
@@ -481,12 +536,16 @@
                 "Sæt glasset i fryseren, i køleskabet, på bordet eller i solen.";
         } else if (this.trin === "gaet") {
             var o = this.opgave();
-            t = "Gæt i panelet, eller sæt " + NK.html(D.fedt(o.fedt).navn) + " " + NK.html(D.sted(o.sted).i) + " og se selv.";
+            t = "Gæt på kortet, eller sæt " + NK.html(D.fedt(o.fedt).navn) + " " + NK.html(D.sted(o.sted).i) + " og se selv.";
         } else if (this.valgt && !this.valgt.fedt.tom) {
             var gl = this.valgt, st = D.sted(gl.sted);
             t = NK.html(gl.fedt.Navn) + " " + NK.html(st.i) + ": <b>" + NK.html(D.TILSTANDE[D.tilstand(this.fastMaal(gl))].navn) + "</b>. Træk glasset et andet sted hen.";
         } else t = "Træk et glas hen et andet sted.";
-        NK.saetHTML("koele-status", t);
+        if (this.noteTid > 0 && !(tr && tr.flyttet) && !(this.harskTekst > 0)) t = this.noteTxt;
+        /* Kortet holdes lavt: ingen linje med naeste skridt, mens et hint
+           eller et forkert svar staar paa kortet, eller under hvorfor */
+        else if (!tr && !(this.harskTekst > 0) && (this.trin === "hvorfor" || this.beskedKlasse === "gul" || this.beskedKlasse === "skidt")) t = "";
+        this.sk.note(t);
     };
 
     P.fastMaal = function (gl) {
@@ -519,6 +578,7 @@
         if (this.traek) this.traek.vx *= Math.exp(-dt * 6);
         if (this.valgt && this.valgt.proeve) this.valgt.proeve.opdater(dt);
         if (this.harskTekst > 0) this.harskTekst -= dt;
+        if (this.noteTid > 0) this.noteTid -= dt;
         if (this.harskVent > 0) {
             this.harskVent -= dt;
             if (this.harskVent <= 0) this.nytSmoer();

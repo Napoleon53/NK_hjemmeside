@@ -13,9 +13,15 @@
    Reaktionsskemaet under scenen faar produkterne og parrene foerst,
    naar hydronen er flyttet.
 
-   Knappen: Giv hint -> Vis svaret -> Naeste reaktion. Efter alle ti
-   gaar den videre til fane 2. Kemichael roser kun foerste gang. En
-   hydron i kaffen er et paaskeaeg.
+   Papirkortet (6. nov. 2026, js/skort.js): opgaven staar paa kortet
+   oeverst i scenen. En hydron sluppet paa den anden partikel bliver
+   ved det frie elektronpar (parkeret), indtil eleven trykker Indsend
+   svar; foerst da bedoemmes den. Et H fra basen flyver saa hjem med en
+   forklaring. Den parkerede hydron kan trækkes videre eller klikkes
+   hjem. Giv hint -> Vis svaret paa kortet; efter et rigtigt svar bliver
+   kortet med forklaringen og Naeste reaktion (efter alle ti: videre
+   til fane 2). Kemichael roser kun foerste gang. En hydron i kaffen er
+   et paaskeaeg.
    ===================================================================== */
 (function () {
     "use strict";
@@ -28,6 +34,7 @@
 
     var NOEGLE = "nk-sc7.1-hydron";
     var GAB = 1.7;               /* bindingslaengder mellem de to partikler */
+    var INSTRUKS = "Træk et H over på den anden partikel.";
 
     function SimHydron() {
         this.L = new NK.Laerred(NK.el("hydron-laerred"));
@@ -40,6 +47,7 @@
         this.stjerner = [];
         this.kaffeNr = 0;
         this.brugtPil = this.loeste.length > 0;
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -78,6 +86,9 @@
         this.nyH = null;
         this.ryst = null;
         this.loest = false;
+        this.vist = false;
+        this.parkeret = null;
+        this.pegKnap = false;
         this.hjaelp = 0;
         this.skemaT = 0;
         this.parT = 0;
@@ -98,13 +109,16 @@
         lay.fs = NK.klamp(Math.min(W / 34, H / 24), 17, 30);
         lay.capFs = NK.klamp(lay.fs * 0.78, 14, 21);
         lay.skemaY = lay.bordY - lay.fs * 2.05;
-        var top = 14, bund = lay.skemaY - lay.fs * 1.3 - lay.capFs * 1.7;
+        var top = 10 + this.kortZone() + 8, bund = lay.skemaY - lay.fs * 1.3 - lay.capFs * 1.7;
         lay.mol = { x: lay.kant + 6, y: top, b: W - 2 * lay.kant - 12, h: Math.max(60, bund - top) };
         lay.maxB = NK.klamp(H * 0.15, 44, 112);
         this.lay = lay;
         this.placer();
         this.saetAnker("hydron-anker-skema", W * 0.18, lay.skemaY - lay.fs * 1.3, W * 0.64, lay.fs * 3.1);
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 142); };
 
     /* Hvor de to partikler staar. Pladsen regnes ud fra reaktanterne med
        plads til et H paa hvert frit par, saa intet flytter sig, naar
@@ -238,7 +252,7 @@
         if (!hold.flyttet) {
             M.tilbage(this.mols[hold.side], hold.info);
             this.spor = null;
-            this.besked("Træk H'et over på den anden partikel.", "");
+            this.besked("Træk H'et over på den anden partikel.", "peger");
             return;
         }
         var fra = { x: hold.x, y: hold.y };
@@ -247,16 +261,13 @@
             this.flyvTil(fra, lay.kop.x, lay.kop.y - 30, { type: "kop", hold: hold }, 0.35, 20);
             return;
         }
+        /* Sluppet paa den anden partikel: hydronen bliver ved det naermeste frie
+           par, til eleven trykker Indsend svar. Intet bedoemmes endnu. */
         var s2 = this.molUnder(pt);
         if (s2 !== null && s2 !== hold.side) {
             var par = this.parVed(s2, pt);
-            if (par && hold.side === this.syreSide) {
-                this.flyvTil(fra, par.x, par.y, { type: "hos", hold: hold, side: s2, atom: par.atom, v: par.v }, 0.3, 10);
-                return;
-            }
             if (par) {
-                this.besked(this.forkertVej(), "skidt");
-                this.flyvTil(fra, par.x, par.y, { type: "retur", hold: hold, hjem: hjem }, 0.3, 10);
+                this.flyvTil(fra, par.x, par.y, { type: "park", hold: hold, side: s2, atom: par.atom, v: par.v }, 0.25, 10);
                 return;
             }
         }
@@ -279,8 +290,10 @@
             this.loes();
             return;
         }
-        if (s.type === "retur") {
-            this.flyvTil({ x: f.x1, y: f.y1 }, s.hjem.x, s.hjem.y, { type: "hjem", hold: s.hold }, 0.55, 40);
+        if (s.type === "park") {
+            this.flyv = null;
+            this.parkeret = { hold: s.hold, side: s.side, atom: s.atom, v: s.v };
+            if (this.fast.klasse === "peger") this.besked("", "");
             return;
         }
         if (s.type === "kop") {
@@ -303,9 +316,8 @@
         this.skemaT = 0;
         this.parT = 0;
         if (this.loeste.indexOf(this.opgNr) < 0) this.loeste.push(this.opgNr);
-        var A = S.formel(this.opg.syre), B = S.formel(this.opg.base);
-        this.besked("<b>Rigtigt.</b> " + NK.html(A) + " afgav en hydron, og " + NK.html(B) + " tog imod den.", "god");
-        this.fejr();
+        this.besked("", "");
+        if (!this.vist) this.fejr();
         if (this.alleLoest() && !this.rostFoer) {
             this.rostFoer = true;
             this.ventRos = 1.4;
@@ -325,6 +337,12 @@
     /* Vis svaret: et H fra syren flyver over paa basens frie par */
     P.visSvar = function () {
         if (this.loest || this.hold || this.flyv) return;
+        if (this.parkeret) {
+            M.tilbage(this.mols[this.parkeret.hold.side], this.parkeret.hold.info);
+            this.parkeret = null;
+            this.spor = null;
+        }
+        this.vist = true;
         var mig = this, s = this.syreSide, s2 = 1 - s, m = this.mols[s];
         var mod = this.pos[s2].ox;
         var hs = M.loseH(m).sort(function (a, b) {
@@ -336,31 +354,73 @@
         var par = this.parVed(s2, fra);
         this.hjaelp = 2;
         this.flyvTil(fra, par.x, par.y, { type: "hos", hold: { side: s, info: info }, side: s2, atom: par.atom, v: par.v }, 1.1, 70);
-        this.besked("Sådan: et H fra " + NK.html(S.formel(this.opg.syre)) + " over på " + NK.html(S.formel(this.opg.base)) + ".", "gul");
+        this.besked("", "");
         this.visOpgave();
     };
 
-    P.knap = function () {
-        if (this.loest) {
-            if (this.alleLoest()) {
-                var n = this.naesteUloesteEfter();
-                if (n === null) {
-                    var fane = document.querySelector('[data-fane="fane-produkter"]');
-                    if (fane) fane.click();
-                    return;
-                }
-            }
-            this.nyOpgave(this.naesteUloeste(this.opgNr + 1));
+    /* Indsend svar: den parkerede hydron bedoemmes */
+    P.indsend = function () {
+        var pk = this.parkeret;
+        if (this.loest || !pk || this.flyv || this.hold) { this.kort.blink(); return; }
+        this.parkeret = null;
+        this.pegKnap = false;
+        if (pk.hold.side === this.syreSide) {
+            var h = M.tilfoejH(this.mols[pk.side], pk.atom, pk.v);
+            this.nyH = { side: pk.side, h: h, t: 0 };
+            this.loes();
             return;
         }
-        if (this.hold || this.flyv) return;
+        /* Et H fra basen: forklaringen, og hydronen flyver hjem */
+        var p = this.parkPx(pk), hjem = this.hjemPx(pk.hold.side, pk.hold.info);
+        this.besked(NK.Skort.maerke("Ikke endnu", NK.html(this.forkertVej())), "skidt");
+        this.kort.ryst();
+        this.pegKnap = true;
+        this.flyvTil(p, hjem.x, hjem.y, { type: "hjem", hold: pk.hold }, 0.55, 40);
+    };
+
+    /* Den parkerede hydron flyver hjem (et klik et andet sted paa partiklerne) */
+    P.sendHjem = function () {
+        var pk = this.parkeret;
+        if (!pk) return;
+        this.parkeret = null;
+        var p = this.parkPx(pk), hjem = this.hjemPx(pk.hold.side, pk.hold.info);
+        this.flyvTil(p, hjem.x, hjem.y, { type: "hjem", hold: pk.hold }, 0.4, 30);
+    };
+
+    /* Hvor den parkerede hydron staar (regnes igen ved hvert billede, saa den
+       foelger med, naar scenen skifter stoerrelse) */
+    P.parkPx = function (pk) {
+        var m = this.mols[pk.side], p = this.pos[pk.side];
+        return Tg.parPx(this.L.ctx, m, pk.atom, pk.v, p.ox, p.oy, Tg.molMaal(this.b));
+    };
+
+    /* Kortets groenne knap: naeste reaktion, efter alle ti videre til fane 2 */
+    P.videre = function () {
+        if (!this.loest) return;
+        if (this.alleLoest() && this.naesteUloesteEfter() === null) {
+            var fane = document.querySelector('[data-fane="fane-produkter"]');
+            if (fane) fane.click();
+            return;
+        }
+        this.nyOpgave(this.naesteUloeste(this.opgNr + 1));
+    };
+
+    /* Hintknappen paa kortet: Giv hint -> Vis svaret */
+    P.hjaelpKlik = function () {
+        if (this.loest || this.hold || this.flyv) return;
+        this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(D.HYDRON[this.opgNr].hint), "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(D.HYDRON[this.opgNr].hint)), "gul");
             this.visOpgave();
             return;
         }
         this.visSvar();
+    };
+
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
+    P.knap = function () {
+        if (this.loest) this.videre(); else this.hjaelpKlik();
     };
 
     /* Efter alle ti: der er ingen uloeste, saa knappen gaar videre */
@@ -381,7 +441,8 @@
     };
 
     P.enter = function () {
-        if (this.loest) this.knap();
+        if (this.loest) this.videre();
+        else if (this.parkeret) this.indsend();
     };
 
     P.fokus = function () {};
@@ -393,9 +454,15 @@
         this.el = {
             knap: NK.el("hydron-knap"),
             besked: NK.el("hydron-besked"),
-            kort: NK.el("hydron-kort")
+            indsend: NK.el("hydron-indsend"),
+            status: NK.el("hydron-status"),
+            skort: NK.el("hydron-skort")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.Skort("hydron", {
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         NK.el("hydron-forfra").addEventListener("click", function () { mig.nulstil(); });
         NK.el("hydron-pips").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-nr]") : null;
@@ -404,33 +471,50 @@
         });
     };
 
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
     P.besked = function (html, klasse) {
         this.beskedKlasse = klasse;
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort) this.visKort();
     };
 
     P.visOpgave = function () {
         var mig = this;
-        NK.saetHTML("hydron-taeller", "<b>" + (this.opgNr + 1) + "</b>/" + D.HYDRON.length);
-        NK.saetTekst("hydron-tekst", D.HYDRON[this.opgNr].tekst);
+        NK.saetHTML("hydron-taeller", "løst <b>" + this.loeste.length + "</b>/" + D.HYDRON.length);
         NK.saetHTML("hydron-pips", D.HYDRON.map(function (o, i) {
             var klar = mig.loeste.indexOf(i) >= 0, nu = i === mig.opgNr;
             var titel = S.formel(o.a) + " + " + S.formel(o.b);
             return '<button type="button" class="pip' + (klar ? " klar" : "") + (nu ? " nu" : "") + '" data-nr="' + i +
                 '" title="' + NK.html(titel) + '">' + (klar ? "✓" : (i + 1)) + "</button>";
         }).join(""));
-        var tekst, klasse = "knap";
+        this.visKort();
+    };
+
+    /* Papirkortet: reaktionen, beskeden, Giv hint og Indsend svar. Naar
+       hydronen er flyttet, bliver kortet med forklaringen og knappen videre. */
+    P.visKort = function () {
+        if (!this.kort || !this.opg) return;
+        var o = this.opg, n = this.opgNr;
+        var bliv = null;
         if (this.loest) {
-            tekst = this.alleLoest() && this.naesteUloesteEfter() === null ? "Videre til Produkterne" : "Næste reaktion";
-            klasse = "knap blaa banker";
-        } else {
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            var A = S.formel(o.syre), B = S.formel(o.base), dannet = S.formel(o.kb) + " og " + S.formel(o.ks) + " er dannet.";
+            bliv = {
+                vist: this.vist,
+                tekst: NK.html(this.vist ? "Et H fra " + A + " er flyttet over på " + B + ". " + dannet :
+                    A + " afgav en hydron, og " + B + " tog imod den. " + dannet + " Skemaet viser parrene."),
+                knap: this.alleLoest() && this.naesteUloesteEfter() === null ? "Videre til Produkterne →" : "Næste reaktion →"
+            };
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = !this.loest && this.hjaelp === 2;
-        this.el.kort.classList.toggle("sejr", this.loest);
+        var b = this.fast;
+        if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
+        this.kort.vis({
+            chip: "Reaktion " + (n + 1) + " af " + D.HYDRON.length,
+            tekst: NK.html(D.HYDRON[n].tekst + " " + INSTRUKS),
+            bliv: bliv,
+            besked: b,
+            hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap, laast: this.hjaelp === 2 },
+            indsend: { tekst: "Indsend svar", klar: !!this.parkeret && !this.flyv && !this.hold }
+        });
     };
 
     /* Kortet med parrene: ét par af hver farve for hver loest reaktion */
@@ -452,19 +536,15 @@
             }).join(""));
     };
 
-    P.visStatus = function () {
-        var t;
+    /* Det, kortet siger, mens der ikke er en besked: kun under et traek og
+       naar hydronen venter paa Indsend svar (der er ingen linje nederst) */
+    P.linje = function () {
         if (this.hold && this.hold.flyttet) {
-            t = this.maal ? "Slip: det frie elektronpar tager imod hydronen." :
+            return this.maal ? "Slip hydronen. Det frie elektronpar tager imod den." :
                 "Hydronen er et H uden sin elektron. Slip den på den anden partikel.";
-        } else if (this.loest) {
-            t = "<b>" + NK.html(S.formel(this.opg.kb)) + "</b> og <b>" + NK.html(S.formel(this.opg.ks)) + "</b> er dannet. Skemaet viser parrene.";
-        } else if (this.opgNr === 0 && !this.brugtPil) {
-            t = "Tag fat i H'et på HCl, og slip det på vandmolekylet.";
-        } else {
-            t = "Tag fat i et H, og slip det på den anden partikel.";
         }
-        NK.saetHTML("hydron-status", t);
+        if (this.parkeret && !this.flyv) return "Hydronen sidder ved et frit elektronpar. Tryk Indsend svar, eller træk den et andet sted hen.";
+        return "";
     };
 
     /* ----- Tegneloekken -------------------------------------------------------------------- */
@@ -502,7 +582,7 @@
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
         if (this.opdaterFri && this.opdaterFri(dt)) this.placer();
-        this.visStatus();
+        this.visKort();
     };
 
     P.tegn = function () {
@@ -532,6 +612,7 @@
             var p = this.pos[s], o = {};
             if (this.over && this.over.slags === "H" && this.over.side === s && !this.hold && !this.loest && !this.flyv) o.lysH = this.over.i;
             if (this.maal && this.hold && this.maalSide === s) o.lysPar = { atom: this.maal.atom, v: this.maal.v };
+            if (this.parkeret && this.parkeret.side === s) o.lysPar = { atom: this.parkeret.atom, v: this.parkeret.v };
             if (this.ryst && this.ryst.side === s) o.ryst = this.ryst;
             if (this.spor && this.spor.side === s) o.spor = this.spor;
             if (this.nyH && this.nyH.side === s) o.nyH = this.nyH;
@@ -543,6 +624,7 @@
 
         /* Hydronen i haanden eller paa vej */
         var hr = NK.klamp(b * 0.3, 13, 24);
+        if (this.parkeret) { var pp = this.parkPx(this.parkeret); Tg.hydron(ctx, pp.x, pp.y, hr, 1, true); }
         if (this.hold && this.hold.flyttet) Tg.hydron(ctx, this.hold.x, this.hold.y, hr, 1, !!this.maal);
         else if (this.hold) Tg.hydron(ctx, this.hold.x, this.hold.y, hr, 0.9, false);
         if (this.flyv) {
@@ -555,7 +637,7 @@
         });
 
         /* Foerste gang: en pil fra syrens H til basens frie par */
-        if (this.opgNr === 0 && !this.brugtPil && !this.loest && !this.hold && !this.flyv) {
+        if (this.opgNr === 0 && !this.brugtPil && !this.loest && !this.hold && !this.flyv && !this.parkeret) {
             var sa = this.syreSide, hH = M.loseH(this.mols[sa])[0];
             if (hH !== undefined) {
                 var fra = this.atomPx(sa, hH), til = this.parVed(1 - sa, fra);
@@ -596,20 +678,35 @@
             if (!u) return;
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "kop") { if (mig.klikKop && !mig.hold) mig.klikKop(); return; }
-            if (mig.loest) { mig.besked("Reaktionen er færdig. Tryk Næste reaktion.", ""); return; }
+            if (mig.loest) { mig.kort.blink(); return; }
             if (mig.flyv || mig.hold) return;
+            /* Den parkerede hydron kan tages igen; et klik et andet sted paa
+               partiklerne sender den hjem */
+            var pk = mig.parkeret;
+            if (pk) {
+                var pp = mig.parkPx(pk);
+                mig.parkeret = null;
+                if (Math.hypot(pt.x - pp.x, pt.y - pp.y) < Math.max(18, mig.b * 0.42)) {
+                    mig.hold = { side: pk.hold.side, info: pk.hold.info, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y, flyttet: false };
+                    try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
+                    return;
+                }
+                mig.parkeret = pk;
+                mig.sendHjem();
+                return;
+            }
             if (u.slags === "H") {
                 var m = mig.mols[u.side];
                 if (M.fasteH(m).indexOf(u.i) >= 0) {
                     mig.ryst = { side: u.side, h: u.i, t: 0 };
-                    mig.besked("Et H bundet til C bliver siddende. Det sure H sidder på O.", "");
+                    mig.besked("Et H bundet til C bliver siddende. Det sure H sidder på O.", "peger");
                     return;
                 }
                 mig.tagH(u.side, u.i, pt);
                 try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
                 return;
             }
-            mig.besked("Tag fat i et H, og træk det over på den anden partikel.", "");
+            mig.besked("Tag fat i et H, og træk det over på den anden partikel.", "peger");
         });
         c.addEventListener("pointermove", function (e) {
             var pt = mig.L.punkt(e), hold = mig.hold;

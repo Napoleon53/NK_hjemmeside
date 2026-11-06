@@ -19,7 +19,7 @@
             { sel: "#fs-anker-holder", titel: "Stængerne", tekst: "Fem metaller. Træk en stang ned i et glas. Et klik på en stang i et glas sender den hjem." },
             { sel: "#fs-anker-glas", titel: "Glassene", tekst: "Opløsninger med fem slags metalioner og saltsyre, H⁺. Ionen står på skiltet." },
             { sel: "#fs-anker-lup", titel: "Luppen", tekst: "Stangen og opløsningen, set helt tæt på. Klik på et glas for at se det." },
-            { sel: "#fs-kort", titel: "Målet", tekst: "Hvad du skal nu. Knappen giver et hint og derefter svaret." },
+            { sel: "#fs-skort", titel: "Kortet", tekst: "Målet, du er ved. Giv hint giver et hint og derefter svaret. Indsend svar sender dit svar." },
             { sel: "#fs-skemakort", titel: "Skemaet", tekst: "Hvert forsøg bliver skrevet ind: ✓ for en reaktion, – for ingen." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Spændingsrækken kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Rækken: stil metallerne i rækkefølge. Forudsig: brug rækken, før stangen kommer ned." }
@@ -27,14 +27,14 @@
         "fane-raekken": [
             { sel: "#rk-anker-kort", titel: "Kortene", tekst: "De fem metaller fra forsøget og hydrogen." },
             { sel: "#rk-anker-hylde", titel: "Hylden", tekst: "Seks pladser fra uædel til ædel. Træk kortene derop." },
-            { sel: "#rk-kort", titel: "Opgaven", tekst: "Rækkefølgen bliver tjekket, når alle seks står på hylden." },
-            { sel: "#rk-skemakort", titel: "Skemaet", tekst: "Dine forsøg fra fane 1. Knappen giver et hint og derefter svaret." }
+            { sel: "#rk-skort", titel: "Kortet", tekst: "Rækkefølgen bliver tjekket, når alle seks står på hylden, og du trykker på Indsend svar." },
+            { sel: "#rk-skemakort", titel: "Skemaet", tekst: "Dine forsøg fra fane 1. Giv hint på kortet viser antallet af flueben i hver række." }
         ],
         "fane-forudsig": [
             { sel: "#fu-anker-raekke", titel: "Spændingsrækken", tekst: "Uædel til venstre, ædel til højre." },
             { sel: "#fu-anker-glas", titel: "Glasset", tekst: "Stangen kommer ned, når du har svaret." },
             { sel: "#fu-anker-lup", titel: "Luppen", tekst: "Det samme glas, set helt tæt på." },
-            { sel: "#fu-kort", titel: "Opgaven", tekst: "Sker der noget? Hvis ja: hvad dannes, og hvor mange af hver?" },
+            { sel: "#fu-skort", titel: "Kortet", tekst: "Sker der noget? Hvis ja: hvad dannes, og hvor mange af hver? Indsend svar sender dit svar." },
             { sel: "#fu-logkort", titel: "Dine svar", tekst: "De seneste opgaver og antallet af rigtige gæt i første forsøg." }
         ]
     };

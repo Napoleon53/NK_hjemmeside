@@ -401,24 +401,47 @@ function koerTest(W) {
     L.nulstilAlt();
     paastand("efter nulstilling er intet løst", L.antalLoest() === 0);
     paastand("glas 1 står på bordet med første felt aktivt", L.valgt === 0 && L.aktivtFelt() && L.aktivtFelt().status === "aktiv");
+    var sk = d.getElementById("lager-skort");
+    function skBund() { return sk.querySelector(".sk-bund"); }
+    function skKnap(sel) { return sk.querySelector(sel); }
+    overskrift("9a. Papirkortet på lageret");
+    paastand("kortet står i scenen og ikke i panelet", !!sk.closest(".scene") && !sk.closest(".panel") && d.body.classList.contains("papirkort"));
+    paastand("ingen statuslinje nederst i scenen", !d.getElementById("lager-status") && !d.querySelector(".scene-mrk") && !d.getElementById("lager-besked"));
+    paastand("kortet har opgaven, Giv et hint og Indsend svar", /Etiketten siger/.test(sk.textContent) && /Skriv ionen for natrium/.test(sk.textContent) &&
+        !!skKnap(".knap.hjaelp") && /Giv et hint/.test(skKnap(".knap.hjaelp").textContent) && !!skKnap(".knap.indsend"));
+    paastand("Indsend svar er grå, når feltet er tomt", skKnap(".indsend").classList.contains("ikke-klar"));
+    L.aktivtFelt().input.value = "Na+";
+    L.aktivtFelt().input.dispatchEvent(new W.Event("input"));
+    paastand("at skrive i feltet gør Indsend svar klar, men bedømmer ikke", skKnap(".indsend").classList.contains("klar") && L.opg.k === 0);
+    L.aktivtFelt().input.value = "";
+    L.aktivtFelt().input.dispatchEvent(new W.Event("input"));
+    skKnap(".indsend").click();
+    paastand("Indsend svar uden svar gør intet", L.opg.k === 0 && L.aktivtFelt().forsoeg === 0);
+    paastand("Start forfra står ikke på kortet", !/forfra|tilbage|Øv glasset/i.test(sk.textContent));
     svar("NaO");
-    paastand("et forkert svar giver en besked og flytter ikke videre", L.opg.k === 0 && /skidt/.test(L.el.besked.className));
-    paastand("knappen starter på Giv hint", L.el.knap.textContent === "Giv hint");
-    L.knap();
-    paastand("første tryk giver et hint, og knappen bliver til Vis svaret", /Hint/.test(L.el.besked.innerHTML) && L.el.knap.textContent === "Vis svaret");
+    paastand("et forkert svar giver en besked på kortet og flytter ikke videre", L.opg.k === 0 && /skidt/.test(skBund().className) &&
+        skKnap(".knap.hjaelp").classList.contains("peg"));
+    paastand("knappen starter på Giv et hint", skKnap(".knap.hjaelp").textContent === "Giv et hint");
+    skKnap(".knap.hjaelp").click();
+    paastand("første tryk giver et hint, og knappen bliver til Vis svaret", /Hint/.test(skBund().innerHTML) && skKnap(".knap.hjaelp").textContent === "Vis svaret");
     paastand("hintet får plakaten med det periodiske system til at lyse og peger på Na", L.fremhaevning("pt") === "Na");
-    L.knap();
+    skKnap(".knap.hjaelp").click();
     paastand("andet tryk viser svaret og går videre", L.opg.felter[0].status === "svar" && L.opg.k === 1 && L.opg.brugtSvar);
-    paastand("knappen er Giv hint igen i det næste felt", L.el.knap.textContent === "Giv hint");
-    svar("O2-");
+    paastand("knappen er Giv et hint igen i det næste felt", skKnap(".knap.hjaelp").textContent === "Giv et hint" && /Skriv ionen for oxid/.test(sk.textContent));
+    L.aktivtFelt().input.value = "O2-";
+    L.aktivtFelt().input.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter i feltet er Indsend svar", L.opg.k === 2, L.opg.k);
     paastand("kuglerne for Na⁺ og O²⁻ ligger ved glasset", L.kugler.length === 2);
     svar("Na2O");
     paastand("glasset er løst, men uden stjerne, fordi svaret blev vist", L.status[0].loest && !L.status[0].stjerne);
     paastand("regnskabet lægger 2 Na⁺ og 1 O²⁻", L.kugler.length === 3 && L.regn && L.regn.fase === "viser");
     for (var t = 0; t < 400; t++) L.opdater(1 / 60);
     paastand("kuglerne ender i glasset, og etiketten bliver printet", L.regn.fase === "faerdig");
-    paastand("knappen er Næste glas", /Næste glas/.test(L.el.knap.textContent));
-    paastand("fakta-linjen står under scenen", /vinduesglas/.test(d.getElementById("lager-status").textContent));
+    paastand("kortet bliver på opgaven med forklaringen og Næste glas, hvor Indsend svar stod",
+        sk.classList.contains("loest") && /Etiketten siger/.test(sk.textContent) && !!sk.querySelector(".sk-bund.bliv [data-videre]") &&
+        /Næste glas/.test(sk.querySelector("[data-videre]").textContent) && !sk.querySelector(".indsend"));
+    paastand("fakta-linjen står i forklaringen på kortet", /vinduesglas/.test(sk.querySelector(".sk-bund.bliv").textContent));
+    paastand("Næste glas står ikke i panelet, og panelets knap er skjult", d.getElementById("lager-knap").hidden);
 
     var i, loeste = 1;
     var hyldeRos = null;
@@ -458,7 +481,7 @@ function koerTest(W) {
     paastand("sværere ioner: elleve glas er byttet ud og står uløste", NK.indstil.svaer && L.antalLoest() === 19 &&
         L.stoffer[8].id === "BeO" && L.stoffer[17].id === "PbO2" && L.stoffer[21].id === "KMnO4" &&
         L.stoffer[23].id === "NaHCO3" && L.stoffer[26].id === "K2Cr2O7", L.antalLoest());
-    paastand("kontakten fortæller, at det er elleve glas", /^Elleve glas/.test(d.getElementById("lager-status").textContent) &&
+    paastand("kontakten fortæller, at det er elleve glas", /Elleve glas/.test(sk.textContent) &&
         /^Elleve glas/.test(d.getElementById("svaer-kontakt").title));
     paastand("sværere ioner huskes i browseren", W.localStorage.getItem("nk-sc2.3-svaer") === "true");
     paastand("samlebåndet trækker også sværere stoffer", (function () {
@@ -470,9 +493,10 @@ function koerTest(W) {
     svaerKnap.click();
     paastand("slået fra igen: de 30 løste glas er tilbage", !NK.indstil.svaer && L.antalLoest() === 30 && L.stoffer[17].id === "CuO");
     L.vaelg(12, true);
-    paastand("et løst glas viser facit og Øv glasset igen", L.opg.gennemsyn && L.opg.felter.every(function (f) { return f.status === "ok"; }) &&
-        L.el.knap.textContent === "Øv glasset igen");
-    L.knap();
+    paastand("et løst glas viser facit, kortet har Næste glas, og Øv glasset igen står i panelet", L.opg.gennemsyn &&
+        L.opg.felter.every(function (f) { return f.status === "ok"; }) && !L.el.knap.hidden && L.el.knap.textContent === "Øv glasset igen" &&
+        !!sk.querySelector("[data-videre]") && !/Øv glasset/.test(sk.textContent));
+    L.el.knap.click();
     paastand("Øv glasset igen giver en tom opgave", !L.opg.gennemsyn && L.opg.k === 0 && L.aktivtFelt().status === "aktiv");
 
     overskrift("10. Samlebåndet");
@@ -485,9 +509,20 @@ function koerTest(W) {
     paastand("et glas kører ind", !!g && g.status === "paa");
     B.input.value = "noget helt forkert";
     B.tjek();
-    paastand("et forkert svar koster stimen, ikke et liv", B.liv === 3 && B.stime === 0 && /skidt/.test(d.getElementById("baand-besked").className));
+    var bsk = d.getElementById("baand-skort");
+    paastand("et forkert svar koster stimen, ikke et liv, og forklaringen står på kortet", B.liv === 3 && B.stime === 0 &&
+        /skidt/.test(bsk.querySelector(".sk-bund").className));
+    paastand("samlebåndet: kortet står i scenen, og den gamle beskedboks er væk", !!bsk.closest(".scene") && !d.getElementById("baand-besked"));
+    B.input.value = "";
+    B.input.dispatchEvent(new W.Event("input"));
+    paastand("samlebåndet: Indsend svar er grå uden tekst i feltet", B.input.value === "" && bsk.querySelector(".indsend").classList.contains("ikke-klar"));
+    B.input.value = g.retning === "formel" ? g.st.formel : g.st.navn;
+    B.input.dispatchEvent(new W.Event("input"));
+    paastand("samlebåndet: tekst i feltet gør Indsend svar klar", bsk.querySelector(".indsend").classList.contains("klar") && B.forreste() === g);
+    bsk.querySelector(".indsend").click();
+    paastand("samlebåndet: Indsend svar sender svaret på det forreste glas", g.status === "loest" && B.input.value === "");
     var point = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 4; i++) {
         var vagt2 = 0;
         while (!B.forreste() && vagt2++ < 600) B.opdater(1 / 60);
         g = B.forreste();
@@ -508,8 +543,67 @@ function koerTest(W) {
     B.nulstil();
     d.querySelector('.faneknap[data-fane="fane-lager"]').click();
 
+    overskrift("10a. Papirkortet holder sig i kortZone");
+    (function () {
+        var ramme = W.frameElement, gemB = ramme.style.width, gemH = ramme.style.height;
+        var lang = { hint: "", fejl: "", forkl: "" };
+        D.STOFFER.forEach(function (s) {
+            D.trin(s).forEach(function (r) { r.felter.forEach(function (f) {
+                var h = D.hjaelp(s, r, f);
+                if (h.hint.length > lang.hint.length) lang.hint = h.hint;
+                if (h.svar.length > lang.fejl.length) lang.fejl = h.svar;
+            }); });
+            var fo = "<b>" + s.formelTekst + "</b> " + s.navn + ". " + s.fakta;
+            if (fo.length > lang.forkl.length) { lang.forkl = fo; lang.forklSt = s; }
+        });
+        alleBeskeder.forEach(function (b) { if (b.length > lang.fejl.length) lang.fejl = b; });
+        [[1400, 860], [1280, 640]].forEach(function (m) {
+            ramme.style.width = m[0] + "px"; ramme.style.height = m[1] + "px";
+            L.L.b = 0; L.tilpas();
+            /* det laengste stofnavn paa kortet */
+            var lyst = 0, hoejeste = 0, hvad = "";
+            [["hint", lang.hint, "hint"], ["fejl", lang.fejl, "skidt"]].forEach(function (x) {
+                L.vaelg(L.stoffer.indexOf(lang.forklSt) >= 0 ? L.stoffer.indexOf(lang.forklSt) : 5, true);
+                if (L.opg.gennemsyn) L.nyOpgave(false);
+                L.besked(x[1], x[2]);
+                var h = sk.getBoundingClientRect().height;
+                if (h > hoejeste) { hoejeste = h; hvad = x[0]; }
+            });
+            var ix = L.stoffer.indexOf(lang.forklSt);
+            if (ix >= 0) {
+                L.vaelg(ix, true);
+                if (L.opg.gennemsyn) L.nyOpgave(false);
+                L.opg.brugtSvar = true; L.opg.slutNote = '<span class="b-maerke">Svaret</span>' + lang.fejl;
+                L.opg.faerdig = true; L.visKort();
+                var h2 = sk.getBoundingClientRect().height;
+                if (h2 > hoejeste) { hoejeste = h2; hvad = "forklaring"; }
+            }
+            paastand(m[0] + " x " + m[1] + ": lagerets kort er i kortZone med det længste " + hvad,
+                10 + hoejeste <= 10 + L.kortZone() + 1 && L.lay.reol.y >= 10 + hoejeste + 4, Math.round(hoejeste) + " px, zone " + L.kortZone());
+            var kr = sk.getBoundingClientRect(), sr = sk.parentNode.getBoundingClientRect();
+            paastand(m[0] + " x " + m[1] + ": lagerets kort dækker ikke plakaterne", kr.right - sr.left <= L.lay.plakater.pt.x + 1);
+            /* samlebaandet */
+            d.querySelector('.faneknap[data-fane="fane-baand"]').click();
+            B.L.b = 0; B.tilpas(); B.start();
+            B.besked(lang.fejl, "skidt");
+            var hb = bsk.getBoundingClientRect().height;
+            paastand(m[0] + " x " + m[1] + ": samlebåndets kort er i kortZone med den længste fejlbesked",
+                hb <= B.kortZone() + 1 && B.lay.hyldeY - B.lay.lilleH >= 10 + hb + 2, Math.round(hb) + " px, zone " + B.kortZone());
+            var bkr = bsk.getBoundingClientRect(), bsr = bsk.parentNode.getBoundingClientRect();
+            paastand(m[0] + " x " + m[1] + ": samlebåndets kort dækker ikke plakaterne", bkr.right - bsr.left <= B.lay.plakater.pt.x + 1);
+            B.nulstil();
+            d.querySelector('.faneknap[data-fane="fane-lager"]').click();
+        });
+        ramme.style.width = gemB; ramme.style.height = gemH;
+        L.L.b = 0; L.tilpas();
+        L.nulstilAlt();
+    }());
+
     overskrift("11. Layoutet på små og store skærme");
-    [[520, 380], [700, 560], [980, 760], [1500, 900]].forEach(function (m) {
+    /* 520 x 380 er skiftet til 520 x 480 (6. nov. 2026): papirkortet tager
+       toppen af scenen, og en scene paa 380 px har ikke plads til baade
+       kortet og reolen. */
+    [[520, 480], [700, 560], [980, 760], [1500, 900]].forEach(function (m) {
         L.L.b = m[0]; L.L.h = m[1];
         L.layout();
         var lay = L.lay;

@@ -144,7 +144,55 @@ farveløs og har derfor 0.
 **`_selvtest.html`** regner ca. 40 pH-værdier ud og sammenligner med tal, der
 er regnet i hånden eller slået op, og skriver resultatet på skærmen med en
 begrundelse for hver linje. Kør den efter ændringer i `kemi.js`. Filen bruges
-ikke af animationen og kan slettes.
+ikke af animationen og kan slettes. Fra 6. nov. 2026 skriver den også de
+fejlede tests og en slutlinje "ALT OK" eller "N FEJL" i `<pre id="ud">`, så den
+kan køres automatisk i headless Chrome som de andre selvtests. Den åbner også
+`index.html` i en iframe og tester papirkortet på fane 4 (se nedenfor): kortet
+står øverst i midten af scenen og ikke i panelet, der er ingen statuslinje,
+Indsend svar er grå uden tal i felterne, et tal bedømmes ikke af sig selv,
+forkerte og manglende tal giver en besked på kortet, hint-trinene ender i Vis
+svaret, Enter er Indsend svar, et rigtigt svar bliver på opgaven med Ny ukendt
+prøve dér, hvor Indsend svar stod, Tøm og start forfra står ikke på kortet, og
+kortet holder sig i `kortZone()` med de længste tekster ved 1400 × 860,
+1280 × 640, 1100 × 700 og 700 × 560. ALT OK 6. nov. 2026.
+
+## Papirkortet (6. nov. 2026)
+
+Kun fane 4 (Ukendt prøve) har en opgave. Fane 1-3 er værktøjer, hvor eleven
+selv vælger, hvad der skal undersøges, og de har intet kort.
+
+På fane 4 står opgaven på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `papirkort.js`, logikken i `js/sim_ukendt.js`):
+"Du har fået 25,0 mL af en ukendt svag syre. I buretten står 0,1000 M NaOH.
+Hvad er ækvivalensvolumenet, koncentrationen og pKs?" Felterne til tallene
+bliver i panelet ("Dit svar"), men knapperne Tjek svar og Vis facit og
+beskeden i panelet er væk.
+
+* **Indsend svar** på kortet er grå, til der står et tal i et felt, og Enter i
+  et felt er det samme. Kun de udfyldte felter bedømmes: et felt, der passer,
+  får grøn kant i panelet, et forkert rød kant, og kortet siger, hvad der
+  passer, og giver et råd til det første, der ikke passer ("Koncentrationen
+  passer ikke. Brug n = c · V for NaOH ved ækvivalenspunktet."). Mangler et
+  felt, beder kortet om det.
+* **Giv et hint** (stille knap med gul kant) giver to hint (tre ved en svag
+  syre eller base: ækvivalenspunktet, n = c · V og pKs ved det halve
+  ækvivalensvolumen) og derefter **Vis svaret**. Efter et forkert tal lyser
+  den stille op.
+* **Alt rigtigt** eller **Vis svaret**: kortet bliver på opgaven, forklaringen
+  står i en grøn boks (gul ved Vis svaret) med stoffet, koncentrationen, pKs og
+  ækvivalensvolumenet, felterne låses, kurven viser ækvivalenspunktet, og
+  **Ny ukendt prøve →** står, hvor Indsend svar stod.
+* **Ny ukendt prøve** (springer prøven over) og **Tøm og start forfra** ligger
+  i panelet, aldrig på kortet.
+* Apparatet tegnes under kortet: `kortZone()` er 132 px (112 px på lave
+  skærme, mere på smalle), og tegningen må gå 40 enheder op under kortet, hvor
+  den er tom (`LEDIG_TOP`). Apparatets baggrund går derfor langt ud til siderne
+  (`tegnBaggrund` i `js/apparat.js`). På lave skærme er kurven på fane 4 196 px
+  høj i stedet for 236 px, så apparatet ikke bliver for lille.
+
+Molekylenavne (6. nov. 2026): stofnavnene i listen er navne på forbindelser
+(hydrogenfluorid, natriumhydrogencarbonat, bromthymolblåt) med grundstoffet
+som navneled, og formlerne står som formler, så der var intet at rette.
 
 ## Hvis den skal ind i menuen
 

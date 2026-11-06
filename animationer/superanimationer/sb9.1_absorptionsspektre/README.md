@@ -35,13 +35,11 @@ uden at spørge, som ved sb2.1.
 4. **Loftet:** tre faner. Fane 1 har 4 + 5 opgaver, fane 2 har 4 + 4, og
    fane 3 har 8 molekyler. Quizzen har 6 spørgsmål. Kæden i fane 2 har
    højst 14 konjugerede dobbeltbindinger.
-5. **Layoutet:** scene plus panel. Scenen er et lærred med opgaven på én
-   linje foroven, knapperne lige over statuslinjen og statuslinjen
-   nederst. Panelet har opgavekortet (forklaringen kommer, når opgaven er
-   løst) og listen.
+5. **Layoutet:** scene plus panel. Fra 6. nov. 2026 står opgaven, svarene
+   og hjælpen på papirkortet øverst i scenen (se Papirkortet nedenfor).
+   Panelet har oplysningerne om stoffet og listen.
 
-Kemichael er ikke med. Hjælpen står i statuslinjen med hint i tre trin som i
-`sc1.4_afstemning` og de andre nye B-animationer.
+Kemichael er ikke med. Hjælpen står på papirkortet med hint i tre trin.
 
 ## Fane 1: Farven
 
@@ -80,11 +78,11 @@ farven.
 | Gør den rød | Fra 11 til 13 (497 nm). |
 | Find chromoforen | Klik på de 11 konjugerede blandt lycopens 13 dobbeltbindinger. De to i enderne giver Ikke endnu. |
 | Gør den gul | Klik på en dobbeltbinding, så Br₂ flyver ned og adderes. Gul, når det længste stykke har 8 til 10. |
-| Gør den farveløs | Ét brommolekyle: det længste stykke må højst have 7. |
+| Gør den farveløs | Ét dibrommolekyle: det længste stykke må højst have 7. |
 | Tomatregnbuen | Gæt rækkefølgen af farverne, hæld bromvand i, og se lagene komme frem i 9 sekunder. Musen over glasset viser et molekyle og spektret fra laget. |
 
-Ét brommolekyle ad gangen: et klik på en anden dobbeltbinding flytter bromen,
-og et klik på den bromerede binding fjerner den.
+Ét dibrommolekyle ad gangen: et klik på en anden dobbeltbinding adderer
+dibrom dér i stedet, og et klik på den bromerede binding fjerner det.
 
 ## Fane 3: Chromoforen
 
@@ -189,7 +187,7 @@ js/molekyle.js     zigzagformlerne (egen tegning, fordi flere molekyler har
                    to eller sammensatte ringe), konjugeringen og brom
 js/tegning.js      grafen, kuvetten, glasset, lampen, øjet, farvecirklen og
                    tavlen
-js/fane.js         det fælles: listen, statuslinjen og knappen (som sb4.7)
+js/fane.js         det fælles: listen, papirkortet, Indsend svar og hintknappen
 js/sim_farve.js    fane 1
 js/sim_konj.js     fane 2 med tomatregnbuen
 js/sim_chrom.js    fane 3
@@ -212,6 +210,31 @@ den er løst · <kbd>R</kbd> forfra · <kbd>H</kbd> rundvisning · <kbd>T</kbd>
 teori · <kbd>Q</kbd> quiz · <kbd>Esc</kbd> luk. Direkte links: `#farve`,
 `#konjugering`, `#chromofor` og `#quiz`.
 
+## Papirkortet (6. nov. 2026)
+
+Alle tre faner har papirkortet øverst midt i scenen (`.scenekort`, `body.papirkort`,
+`../faelles/papirkort.css` og `papirkort.js`). Statuslinjen, opgavelinjen og
+knapperne under grafen til gæt og farver er væk. Kortet har opgaven, gæt- og
+farvesvarene, hint, beskeden ved forkert svar og forklaringen. Panelet har
+oplysningerne om stoffet, opgavelisten og Start forfra.
+
+- Indsend svar bedømmer alt. Et træk i toppen, et klik på grafen, + og − i
+  kæden, markeringer i molekylet og bromen bedømmes ikke af sig selv.
+  Enter er Indsend svar.
+- Et gæt (Gæt først, Tomatregnbuen) vælges på kortet uden Indsend. Forsøget
+  bagefter viser svaret, og kortet bliver på gættet med det rigtige svar
+  grønt og et forkert gæt rødt.
+- Trin 1 og trin 2 (Find toppen og Vælg farven, Markér chromoforen og Vælg
+  farven): et rigtigt trin 1 bliver på kortet med Næste.
+- Efter et rigtigt svar er forsøget låst, og kortet blinker ved et klik.
+- `kortZone()` pr. fane: Farven 196/194, Konjugeringen 206/192, Chromoforen
+  196/194 px (almindelig/lav skærm). Selvtesten måler kortet med det længste
+  hint, en lang fejlbesked og forklaringen i fire skærmstørrelser.
+- Svarene i Gæt først og Tomatregnbuen blev kortet til én linje.
+
+Molekylenavne (6. nov. 2026): Br₂ hedder dibrom overalt, hvor stoffet menes
+(adderes, dibrommolekyle, mest dibrom). "Bromvand" og "bromeret" bliver.
+
 ## Selvtest
 
 `_selvtest.html` skal åbnes gennem en lokal server (iframen afvises på
@@ -221,8 +244,11 @@ regner, at toppen ligger ved λmax fra teksten, at alle opgaver kan løses med
 rigtige museklik og træk, hinttrappen og Vis svaret, fotonerne, brom på hver
 af lycopens 11 dobbeltbindinger, regnbuens lag, antallet af konjugerede i de
 otte molekyler, quizzen, sproget (ingen tankestreger, ASCII-ord eller
-Lambert-Beer) og layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (74 påstande), 2. oktober 2026.
+Lambert-Beer, dibrom) og layoutet fra 1100 × 700 til 1600 × 950. Fra 6. nov.
+2026 også papirkortet: kortet i scenen, Indsend svar grå uden valg, at valg,
+træk og klik ikke bedømmer af sig selv, at kortet bliver med Næste, låsen,
+at kortet holder sig i kortZone, og at alle opgaver kan løses med hintknappen.
+Sidst kørt: ALT OK (106 påstande), 6. november 2026.
 
 ## I menuen
 

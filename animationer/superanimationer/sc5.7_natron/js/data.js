@@ -4,7 +4,7 @@
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
    de tre hypoteser, proeverne paa fane 1, digelens opvarmning,
    regnetrinene paa fane 2, de seks fejlkilder paa fane 3 og linjerne i
-   opgavekortet. Kemien regnes i kemi.js; tegningen kender kun resultatet.
+   papirkortet i scenen. Kemien regnes i kemi.js; tegningen kender kun resultatet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -98,7 +98,7 @@
                   svar: [{ id: "A", t: "A: Na₂O" }, { id: "B", t: "B: Na₂CO₃" }, { id: "C", t: "C: NaOH" }] } }
     ];
 
-    /* Linjen i opgavekortet i hver fase */
+    /* Linjen paa papirkortet i hver fase */
     D.LINJE = {
         valg: "",
         foer: "Aflæs vægten under diglen. Skriv massen af natron i skemaet til højre.",
@@ -216,7 +216,7 @@
           hint: "Er al natronen nået at blive til fast stof og gas efter 2 minutter?",
           forkl: "Efter 2 minutter er der stadig natron i diglen, og der er forsvundet mindre gas. Slutmassen bliver for høj.",
           fejl: { lavere: "Der er ikke forsvundet mere gas hos gruppe 2. Der er forsvundet mindre, fordi de stoppede for tidligt.",
-                  samme: "Efter 2 minutter er der stadig natron i diglen, som ikke har afgivet sin gas." } },
+                  samme: "Det samme ville kun passe, hvis al natronen var omdannet efter 2 minutter." } },
         { id: "varm", titel: "Vejet varm", kort: "vejer diglen varm", rigtig: "lavere", B: { varmVejning: true },
           tekst: "Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.",
           hint: "Den varme digel varmer luften omkring sig. Varm luft stiger op.",
@@ -250,7 +250,7 @@
     ];
 
     /* ----- Replikkerne ------------------------------------------------------------------
-       Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
+       Linjen paa papirkortet siger, hvor man er (INTRO), naeste skridt,
        fejl og ros, og hintet eller svaret, naar eleven beder om det. Et
        klik paa krukken giver en kort linje (KRUKKE). */
     D.INTRO = {

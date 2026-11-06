@@ -39,8 +39,8 @@ formel), *Skriv navnet* (metaller, hvis ladning skal regnes ud af formlen) og
 Panelet har én række pr. ion og én til sidst. Hver ion, eleven finder, lægger
 sig som en kugle ved glasset. Er formlen eller navnet rigtigt, kommer der
 kugler til, så der står 2 Al³⁺ og 3 O²⁻ med +6 og −6, i alt 0. Kuglerne ryger
-ned i glasset, etiketmaskinen printer en ny etiket, og under scenen står, hvor
-man møder stoffet. Et glas løst uden at se svaret får en stjerne. Tilbage på
+ned i glasset, etiketmaskinen printer en ny etiket, og papirkortet øverst i
+scenen siger, hvor man møder stoffet. Et glas løst uden at se svaret får en stjerne. Tilbage på
 hylden har glasset den nye etiket med formlen på. Er glassene store nok,
 står navnet der også; ellers står formlen alene, og musen over glasset viser
 begge dele. Reolen fylder så meget af scenen, som arbejdsbordet tillader, og
@@ -211,9 +211,41 @@ formlen på etiketten, at samlebåndets hylde har plads til otte glas, at
 præsentationen virker på begge faner (den fælles test fra
 `../kemichael/praesentation.js`), at tilbuddet står i panelet på
 samlebåndet, og at layoutet holder
-fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
+fra 520 × 480 til 1500 × 900, og at papirkortet virker og holder sig i kortZone
+ved 1400 × 860 og 1280 × 640. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
 bagefter.
+
+## Papirkortet (6. nov. 2026)
+
+Opgaven står på ét lyst papirkort øverst i scenen (`../faelles/papirkort.css`
+og `papirkort.js`). Statuslinjen nederst og beskeden i panelet er væk.
+
+* **Lageret:** kortet står over reolen (ikke over plakaterne) og siger, hvad
+  etiketten siger, og hvad der skal skrives nu ("Skriv ionen for natrium i
+  feltet i panelet"). Felterne bliver i panelet. **Indsend svar** på kortet er
+  grå, til der står noget i feltet, og Enter i feltet er det samme. **Giv et
+  hint** (stille, gul kant) giver hintet og bliver til **Vis svaret**; efter et
+  forkert svar lyser den stille op. Fejl, hint og svar står i kortets
+  nederste række. Er glasset løst, bliver kortet på opgaven: forklaringen
+  (svaret og fakta-linjen) står i en grøn boks (gul, når et svar blev vist), og
+  **Næste glas** står, hvor Indsend svar stod. Et løst glas, man klikker på,
+  har også Næste glas på kortet; **Øv glasset igen** står i panelet, og **Sæt
+  alle glas tilbage** står også dér. Reolen begynder under kortet
+  (`kortZone()` i `js/sim_lager.js`: 158 px, 136 px på lave skærme), og det
+  store glas må være lidt mindre end før. Felternes lille ↵-knap er væk.
+  Tilbuddet om præsentationen står nederst i scenen.
+* **Samlebåndet:** kortet står over hylden, til venstre for plakaterne, med
+  niveauet og opgaven. Forklaringen til et forkert svar og "Et glas røg i
+  kassen" står i kortets nederste række, og **Indsend svar** er det samme som
+  Enter (grå uden tekst). Kortet bliver ikke stående på et løst glas, og der
+  er ingen hintknap: det er et spil på tid, og båndet kører videre. Start,
+  Pause og Spil igen er i panelet. Hylden begynder under kortet (`kortZone()`
+  i `js/sim_baand.js`: 116 px, 108 px på lave skærme).
+
+Molekylenavne (6. nov. 2026): "luftens dinitrogen" i fakta-linjen om Li₃N.
+Resten af animationen nævner grundstofferne (oxygen i SO₄²⁻, N er nitrogen),
+og de bliver.
 
 ## Forenklinger
 

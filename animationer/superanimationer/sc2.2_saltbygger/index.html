@@ -6,8 +6,9 @@
 <title>Saltbyggeren</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚖</span> Salt<span class="lang">byggeren</span></h1>
@@ -32,6 +33,26 @@
     <div class="scene" id="bord-scene">
         <canvas id="bord-laerred" aria-label="Arbejdsbordet med lynlåsen"></canvas>
         <div class="scene-note" id="bord-note" hidden></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, trinene, spoergsmaalet,
+             svarene, hint, beskeden, Indsend svar og knappen videre (6. nov. 2026) -->
+        <div class="scenekort opgave" id="bord-skort">
+            <p class="sk-tekst"><span class="sk-chip" id="bord-chip">Opgaver</span><span id="bord-opgavetekst">Byg frit med ionerne på hylderne. Når du er klar, får du en opgave ad gangen.</span></p>
+            <div class="opgave-prompt" id="bord-prompt" hidden></div>
+            <ol class="trin" id="bord-trin" hidden>
+                <li class="trin-punkt" id="opgave-t1"></li>
+                <li class="trin-punkt" id="opgave-t2"></li>
+                <li class="trin-punkt" id="opgave-t3"></li>
+            </ol>
+            <div class="valg sk-svar" id="opgave-valg"></div>
+            <div class="sk-bund" id="bord-status">
+                <div class="sk-beskeder">
+                    <p class="besked hint" id="bord-hint"></p>
+                    <p class="besked" id="bord-besked" aria-live="polite"></p>
+                </div>
+                <button class="sk-videre" id="bord-opgaveknap" type="button">Start opgave →</button>
+                <button class="knap indsend ikke-klar" id="bord-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
         <div class="tilbud" id="bord-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
@@ -44,21 +65,11 @@
             <button class="knap stor" id="byg-vand" type="button"><span>Opløs det i vand</span><span class="tegn">→</span></button>
         </div>
 
-        <div class="kort opgavekort" id="bord-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="bord-loest">0</b></span><button class="afslut" id="bord-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="bord-opgavetekst">Byg et stof ud fra navnet eller formlen.</p>
-            <div class="opgave-prompt" id="bord-prompt" hidden></div>
-            <ol class="trin" id="bord-trin" hidden>
-                <li class="trin-punkt" id="opgave-t1"></li>
-                <li class="trin-punkt" id="opgave-t2"></li>
-                <li class="trin-punkt" id="opgave-t3"></li>
-            </ol>
-            <div class="valg" id="opgave-valg"></div>
-            <p class="besked hint" id="bord-hint"></p>
-            <p class="besked" id="bord-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="bord-opgaveknap" type="button">Start opgave</button>
-        </div>
 
+        <div class="kort" id="bord-opgaver">
+            <h2>Opgaverne <span class="taeller">løst: <b id="bord-loest">0</b></span></h2>
+            <button class="forfraknap" id="bord-afslut" type="button" hidden>Afslut opgaverne</button>
+        </div>
         <div class="kort bundlinje">
             <label class="tjek"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
             <button class="knap lille" id="byg-ryd" type="button" title="Ryd bordet (R)">Ryd <span class="tegn">↺</span></button>
@@ -72,6 +83,21 @@
 <section class="fane" id="fane-vand" role="tabpanel" aria-label="Opløs i vand">
     <div class="scene" id="vand-scene">
         <canvas id="vand-laerred" aria-label="Bægerglas med vand"></canvas>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, trinene, spoergsmaalet,
+             svarene, hint, beskeden, Indsend svar og knappen videre (6. nov. 2026) -->
+        <div class="scenekort opgave" id="vand-skort">
+            <p class="sk-tekst"><span class="sk-chip" id="vand-chip">Opgaver</span><span id="vand-opgavetekst">Læg et salt i vandet med valgene i panelet. Når du er klar, får du en opgave ad gangen.</span></p>
+            <div class="opgave-spm" id="vand-spm"></div>
+            <div class="valg sk-svar" id="vand-valg"></div>
+            <div class="sk-bund" id="vand-status">
+                <div class="sk-beskeder">
+                    <p class="besked hint" id="vand-hint"></p>
+                    <p class="besked" id="vand-besked" aria-live="polite"></p>
+                </div>
+                <button class="sk-videre" id="vand-opgaveknap" type="button">Start opgave →</button>
+                <button class="knap indsend ikke-klar" id="vand-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
         <div class="tilbud" id="vand-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
@@ -86,16 +112,11 @@
             <button class="knap stor groen" id="vand-haeld" type="button"><span>Læg det i vandet</span><span class="tegn">↓</span></button>
             <p class="besked" id="vand-note"></p>
         </div>
-
-        <div class="kort opgavekort" id="vand-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="vand-loest">0</b></span><button class="afslut" id="vand-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="vand-opgavetekst">Forudsig, hvad der kommer ud i vandet.</p>
-            <div class="opgave-spm" id="vand-spm"></div>
-            <div class="valg en-spalte" id="vand-valg"></div>
-            <p class="besked hint" id="vand-hint"></p>
-            <p class="besked" id="vand-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="vand-opgaveknap" type="button">Start opgave</button>
+        <div class="kort" id="vand-opgaver">
+            <h2>Opgaverne <span class="taeller">løst: <b id="vand-loest">0</b></span></h2>
+            <button class="forfraknap" id="vand-afslut" type="button" hidden>Afslut opgaverne</button>
         </div>
+
     </aside>
 </section>
 
@@ -108,6 +129,28 @@
         <canvas id="ukendt-laerred" aria-label="Bordet med den ukendte ion"></canvas>
         <div class="ukendt-formel" id="ukendt-formel"><div class="uf" id="ukendt-uf"></div><div class="un" id="ukendt-un"></div></div>
         <div class="scene-note" id="ukendt-note" hidden></div>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, trinene, spoergsmaalet,
+             svarene, hint, beskeden, Indsend svar og knappen videre (6. nov. 2026) -->
+        <div class="scenekort opgave" id="ukendt-skort">
+            <p class="sk-tekst"><span class="sk-chip" id="ukendt-chip">Opgave</span><span id="ukendt-opgavetekst"></span></p>
+            <ol class="trin">
+                <li class="trin-punkt" id="ukendt-t1"></li>
+                <li class="trin-punkt" id="ukendt-t2"></li>
+                <li class="trin-punkt" id="ukendt-t3"></li>
+                <li class="trin-punkt" id="ukendt-t4"></li>
+            </ol>
+            <p class="besked god" id="ukendt-forkl"></p>
+            <p class="opgave-spm" id="ukendt-spm"></p>
+            <div class="valg sk-svar" id="ukendt-valg"></div>
+            <div class="sk-bund" id="ukendt-status">
+                <div class="sk-beskeder">
+                    <p class="besked hint" id="ukendt-hint"></p>
+                    <p class="besked" id="ukendt-besked" aria-live="polite"></p>
+                </div>
+                <button class="sk-videre" id="ukendt-opgaveknap" type="button">Start opgave →</button>
+                <button class="knap indsend ikke-klar" id="ukendt-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="ukendt-anker-plakater"></div>
         <div class="tilbud" id="ukendt-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
@@ -116,20 +159,9 @@
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="ukendt-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="ukendt-loest">0</b></span></span></h2>
-            <p class="opgavetekst" id="ukendt-opgavetekst"></p>
-            <ol class="trin">
-                <li class="trin-punkt" id="ukendt-t1"></li>
-                <li class="trin-punkt" id="ukendt-t2"></li>
-                <li class="trin-punkt" id="ukendt-t3"></li>
-                <li class="trin-punkt" id="ukendt-t4"></li>
-            </ol>
-            <p class="opgave-spm" id="ukendt-spm"></p>
-            <div class="valg" id="ukendt-valg"></div>
-            <p class="besked hint" id="ukendt-hint"></p>
-            <p class="besked" id="ukendt-besked" aria-live="polite"></p>
-            <button class="knap stor" id="ukendt-opgaveknap" type="button">Giv hint</button>
+        <div class="kort" id="ukendt-opgaver">
+            <h2>Opgaverne <span class="taeller">løst: <b id="ukendt-loest">0</b></span></h2>
+            <p class="note">Plakaterne på væggen kan klikkes op i stort format.</p>
         </div>
     </aside>
 </section>
@@ -224,6 +256,7 @@
     </div>
 </div>
 
+<script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/sprites.js"></script>

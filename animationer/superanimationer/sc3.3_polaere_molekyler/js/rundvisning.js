@@ -20,10 +20,11 @@
         { sel: "#pol-en", titel: "Elektronegativitet", tekst: "En binding er polær, når forskellen er mindst 0,5." },
 
         { sel: "#fane-vand.aktiv .scene", titel: "Laboratoriebordet", tekst: "Klik på en hane for at åbne eller lukke den. Tag fat i en stav, og gnid den på uldkluden." },
-        { sel: "#vand-forloeb", titel: "Resultater", tekst: "Et felt bliver udfyldt, når du har holdt en ladet stav ved strålen. Linjen over skemaet siger, hvad du skal nu." },
+        { sel: "#vand-forloeb", titel: "Resultater", tekst: "Et felt bliver udfyldt, når du har holdt en ladet stav ved strålen. Kortet øverst i scenen siger, hvad du skal nu." },
         { sel: "#vand-serie", titel: "Tegneserie", tekst: "Når skemaet er udfyldt, kan du se forsøget som en tegneserie." },
 
-        { sel: ".fane.aktiv .opgavekort", titel: "Opgave", tekst: "Én knap: start en opgave, få et hint, se svaret eller tag en ny." },
+        { sel: ".fane.aktiv .scenekort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst i scenen. Vælg et svar, eller klik på et atom, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },
+        { sel: ".fane.aktiv .opgavekort", titel: "Opgaver", tekst: "Her kan du se, hvor mange opgaver du har løst. Start forfra begynder forfra på fanen." },
         { sel: "#teoriknap", titel: "Teori", tekst: "Korte afsnit om elektronegativitet, polære molekyler og forsøget. De er ikke nødvendige for at bruge animationen." }
     ];
 

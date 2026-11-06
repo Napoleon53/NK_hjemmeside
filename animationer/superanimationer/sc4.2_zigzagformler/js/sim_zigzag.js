@@ -13,7 +13,9 @@
 
    Hver retning er en serie paa ti molekyler med stigende svaerhed
    (NK.Opgaver.ZIGZAG og ATOMER, de samme trin som i den gamle 6.2).
-   Opgavekortet har én knap: Giv hint -> Vis svaret -> Naeste molekyle.
+   Papirkortet oeverst i scenen har opgaven, Giv et hint -> Vis svaret og
+   Indsend svar. Tegningen, H-atomerne og formlen bedoemmes foerst, naar
+   eleven trykker Indsend svar (eller Enter i feltet).
    ===================================================================== */
 (function () {
     "use strict";
@@ -145,15 +147,18 @@
     /* ----- Aendringer paa tavlen ------------------------------------------------------ */
     P.aendret = function (hvad) {
         if (hvad === "laerer" || this.retning !== "tegn" || this.loest) return;
-        var n = this.braet.antal();
-        if (n === this.maal.antal) {
-            var res = NK.Navn.analyser(this.braet.mol);
-            var r = NK.Tjek.tegning(res, this.maal, false);
-            if (r.ok) { this.loes(res, false); return; }
-            this.besked(r.besked, "skidt");
-        } else if (this.beskedKlasse === "skidt") {
-            this.besked("", "");
-        }
+        /* En forklaring til et forkert svar staar, til tegningen aendres */
+        if (this.beskedKlasse === "skidt") this.besked("", "");
+        this.visPanel();
+    };
+
+    /* Indsend svar: tegningen holdes op mod molekylet paa papiret */
+    P.tjekTegning = function () {
+        if (this.retning !== "tegn" || this.loest) return;
+        var res = NK.Navn.analyser(this.braet.mol);
+        var r = NK.Tjek.tegning(res, this.maal, false);
+        if (r.ok) { this.loes(res, false); return; }
+        this.besked(r.besked, "skidt");
         this.visPanel();
     };
 
@@ -237,13 +242,13 @@
             this.h[a.id] = n;
             this.forkerte = null;
             if (this.beskedKlasse === "skidt") this.besked("", "");
-            if (this.antalH() === this.totalH()) this.tjekH();
         }
         this.visPanel();
         return true;
     };
 
     P.tjekH = function () {
+        if (this.retning !== "atomer" || this.trin !== 2 || this.loest) return;
         var mig = this, forkerte = {};
         var n = 0;
         this.braet.mol.atomer.forEach(function (a) {
@@ -260,6 +265,7 @@
             return;
         }
         this.forkerte = forkerte;
+        this.visPanel();
         this.besked(n === 1 ? "Ét C-atom har forkert antal H. Det er markeret med rødt. Hvert C har fire bindinger i alt."
             : n + " C-atomer har forkert antal H. De er markeret med rødt. Hvert C har fire bindinger i alt.", "skidt");
     };
@@ -285,7 +291,22 @@
 
     /* ----- Knappen: Giv hint -> Vis svaret -> Naeste molekyle -------------------------------- */
     P.knap = function () {
-        if (this.loest) { this.naeste(); return; }
+        if (this.loest) { this.videre(); return; }
+        this.hjaelpKlik();
+    };
+
+    P.videre = function () { if (this.loest) this.naeste(); };
+
+    P.indsend = function () {
+        if (this.loest) return;
+        if (!this.kortData().klar) { this.kortBlink(); return; }
+        if (this.retning === "tegn") this.tjekTegning();
+        else if (this.trin === 2) this.tjekH();
+        else if (this.trin === 3) this.tjekFormel();
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.loest) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked("<b>Hint:</b> " + this.hint(), "gul");
@@ -329,10 +350,12 @@
     /* ----- Panelet ------------------------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        NK.el("zz-knap").addEventListener("click", function () { mig.knap(); });
-        NK.el("zz-ok").addEventListener("click", function () { mig.tjekFormel(); });
         NK.el("zz-input").addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); if (mig.loest) mig.knap(); else mig.tjekFormel(); }
+            if (e.key === "Enter") { e.preventDefault(); if (mig.loest) mig.videre(); else mig.tjekFormel(); }
+        });
+        NK.el("zz-input").addEventListener("input", function () {
+            if (mig.beskedKlasse === "skidt") mig.besked("", "");
+            mig.visKort();
         });
         NK.el("zz-forfra").addEventListener("click", function () {
             mig.serier[mig.retning] = nySerie(mig.retning === "tegn" ? O.ZIGZAG : O.ATOMER);
@@ -347,11 +370,22 @@
         });
     };
 
-    P.besked = function (html, klasse) {
-        var e = NK.el("zz-besked");
-        e.innerHTML = html;
-        e.className = "besked" + (klasse ? " " + klasse : "");
-        this.beskedKlasse = klasse;
+    /* Papirkortet (js/opgavefane.js) */
+    P.kortData = function () {
+        if (!this.maal) return null;
+        var s = this.serie(), tegn = this.retning === "tegn", klar = false;
+        if (tegn) klar = this.braet.antal() === this.maal.antal;
+        else if (this.trin === 2) klar = this.antalH() > 0;
+        else if (this.trin === 3) klar = NK.el("zz-input").value.trim() !== "";
+        return {
+            chip: "Molekyle " + (s.nr + 1) + " af " + s.liste.length,
+            tekst: tegn ? "Strukturformlen hænger på tavlen. Tegn samme molekyle som zigzagformel." :
+                "Sæt C og H på zigzagformlen, og skriv molekylformlen.",
+            loest: this.loest, vist: this.visteSvar,
+            videre: s.status.every(function (x) { return x > 0; }) ? "Ny serie →" : "Næste molekyle →",
+            klar: klar && !this.loest,
+            hint: this.hjaelp === 0 ? "Giv et hint" : "Vis svaret"
+        };
     };
 
     P.visPanel = function () {
@@ -362,8 +396,6 @@
         });
         NK.saetTekst("zz-titel", tegn ? "Tegn zigzagformlen" : "Sæt atomerne på");
         NK.saetTekst("zz-nr", String(s.nr + 1));
-        NK.saetTekst("zz-spm", tegn ? "Strukturformlen hænger på tavlen. Tegn samme molekyle som zigzagformel." :
-            "Sæt C og H på zigzagformlen, og skriv molekylformlen.");
         NK.el("zz-trinrad").hidden = tegn;
         if (!tegn) {
             Array.prototype.forEach.call(document.querySelectorAll("#zz-trinrad .trinprik"), function (p) {
@@ -387,14 +419,7 @@
         felt.hidden = tegn || this.trin < 3;
         if (!this.loest) { felt.classList.remove("ok"); NK.el("zz-input").disabled = false; }
 
-        var knap = NK.el("zz-knap");
-        if (this.loest) {
-            knap.textContent = s.status.every(function (x) { return x > 0; }) ? "Ny serie ↺" : "Næste molekyle →";
-            knap.className = "knap blaa banker";
-        } else {
-            knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-            knap.className = "knap";
-        }
+        this.visKort();
         NK.el("zz-kort").classList.toggle("sejr", this.loest && !this.visteSvar);
 
         NK.saetTekst("zz-loest", String(s.status.filter(function (x) { return x > 0; }).length));
@@ -422,7 +447,7 @@
         this.status(this.trin === 1 ? D.STATUS.atomerC : (this.trin === 2 ? D.STATUS.atomerH : D.STATUS.atomerFormel));
     };
 
-    P.enter = function () { if (this.loest) this.knap(); else if (this.retning === "atomer" && this.trin === 3) this.tjekFormel(); };
+    P.enter = function () { if (this.loest) this.videre(); else if (this.kortData().klar) this.indsend(); else this.kortBlink(); };
     P.fokus = function () { if (this.retning === "atomer" && this.trin === 3 && !this.loest) NK.el("zz-input").focus(); };
 
     /* ----- Tegning ----------------------------------------------------------------------- */
@@ -433,6 +458,7 @@
     P.visPanelTael = function () {
         NK.saetTekst("zz-tael", this.braet.antal() + " af " + this.maal.antal);
         this.visStatus();
+        this.visKort();
     };
 
     P.tegnFane = function (ctx) {

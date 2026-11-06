@@ -87,14 +87,17 @@
         this.rekord = gemt.r || 0;
         this.introNu = true;
         this.tilstand = "klar";
+        this.faerdig = true;
         this.nulstilRunde();
-        this.besked(D.INTRO.hurtig + " " + this.trinLinje(), "");
+        this.besked("", "");
         this.visKnap();
         this.visTal();
     }
 
     var P = SimHurtig.prototype;
-    NK.Fane.paa(P, { navn: "hurtig" });
+    /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
+    var ZONE = [176, 156];
+    NK.Fane.paa(P, { navn: "hurtig", zone: ZONE });
 
     P.nulstilRunde = function () {
         this.koe = [];
@@ -105,12 +108,14 @@
         this.fejl = 0;
         this.rigtige = 0;
         this.antal = 0;
-        this.pause = 0;
         this.flash = null;
         this.strafT = 0;
         this.hjaelp = 0;
         this.nyRekord = false;
         this.prikker = [];
+        this.venter = false;
+        this.res = null;
+        this.valgtSvar = null;
     };
 
     /* ----- Runden ------------------------------------------------------------------- */
@@ -121,40 +126,57 @@
         this.antal = this.koe.length;
         this.prikker = this.koe.map(function () { return 0; });
         this.tilstand = "koerer";
+        this.faerdig = false;
         this.naeste();
-        this.besked(this.trinLinje(), "");
-        this.visKnap();
     };
+
+    P.harForfra = function () { return true; };
+    P.forfra = function () { this.start(); };
 
     P.naeste = function () {
         this.hjaelp = 0;
         this.flash = null;
+        this.venter = false;
+        this.res = null;
+        this.valgtSvar = null;
         if (!this.koe.length) { this.slut(); return; }
         this.nuv = this.koe.shift();
         if (this.nuv.forkert) this.nuv.igen = true;
         var idx = NK.bland(this.nuv.svar.map(function (s, i) { return i; }));
         var q = this.nuv;
         this.valg = idx.map(function (i) { return { tekst: q.svar[i], ok: i === 0, fejl: q.fejl[i] }; });
+        this.besked(this.trinLinje(), "");
         this.layout();
         this.visKnap();
     };
 
+    P.retIndeks = function () {
+        var ret = 0;
+        this.valg.forEach(function (v, j) { if (v.ok) ret = j; });
+        return ret;
+    };
+
+    /* Svaret er sendt med Indsend svar (et klik paa et svar vaelger kun).
+       Kortet bliver paa spoergsmaalet, til eleven trykker Naeste; uret
+       staar stille imens. */
     P.svar = function (i) {
-        if (this.tilstand !== "koerer" || this.pause > 0 || !this.valg[i]) return;
+        if (this.tilstand !== "koerer" || this.venter || !this.valg[i]) return;
         var v = this.valg[i], q = this.nuv;
         if (v.ok) {
             this.rigtige++;
             if (!q.forkert) this.prikker[q.nr] = 1;
             this.flash = { i: i, ok: true, t: 0 };
-            this.besked("<b>Rigtigt.</b> " + NK.html(q.forkl), "god");
-            this.pause = 0.7;
+            this.res = { i: i, ok: true, html: NK.html(q.forkl) };
+            this.venter = true;
+            this.besked("", "");
         } else {
-            this.forkert(i, "<b>Nej.</b> " + NK.html(v.fejl) + " " + NK.html(q.forkl));
+            this.forkert(i, NK.html(v.fejl) + " " + NK.html(q.forkl));
         }
+        this.visKnap();
         this.visTal();
     };
 
-    /* Forkert eller Vis svaret: det rigtige lyser, og spoergsmaalet kommer igen */
+    /* Forkert eller Vis svaret: det rigtige vises, og spoergsmaalet kommer igen */
     P.forkert = function (i, html) {
         var q = this.nuv;
         this.fejl++;
@@ -162,18 +184,21 @@
         this.strafT = 1.2;
         q.forkert = true;
         this.prikker[q.nr] = -1;
-        var ret = 0;
-        this.valg.forEach(function (v, j) { if (v.ok) ret = j; });
+        var ret = this.retIndeks();
         this.flash = { i: i, ok: false, ret: ret, t: 0 };
-        this.besked(html, "skidt");
+        this.res = { i: i, ok: false, ret: ret, html: html };
+        this.venter = true;
+        this.besked("", "");
         /* Tilbage i koeen, helst mindst tre spoergsmaal senere */
         var pos = Math.min(this.koe.length, 3);
         this.koe.splice(pos, 0, q);
-        this.pause = 2.2;
     };
+
+    P.naesteSpm = function () { if (this.venter) this.naeste(); };
 
     P.slut = function () {
         this.tilstand = "slut";
+        this.faerdig = true;
         this.nuv = null;
         this.valg = [];
         var samlet = Math.round(this.tidBrugt) + this.straf;
@@ -183,37 +208,68 @@
             this.rekord = samlet;
             NK.gem(NOEGLE, { r: samlet });
         }
-        var t = "Runden er slut: " + samlet + " s" + (this.straf ? " (heraf " + this.straf + " s i tidsstraf)" : "") + ".";
-        this.besked(t + (this.nyRekord ? " <b>Ny rekord.</b>" : " Rekorden er " + this.rekord + " s."), "god");
+        this.besked("", "");
+        this.layout();
         this.visKnap();
         this.visTal();
     };
 
-    /* ----- Knappen: Start, Giv hint, Vis svaret, Ny runde ----------------------------- */
-    P.visKnap = function () {
-        var e = this.el.knap;
-        if (this.tilstand !== "koerer") {
-            e.textContent = this.tilstand === "klar" ? "Start runden" : "Ny runde ↺";
-            e.className = "knap blaa banker";
-        } else {
-            e.textContent = this.hjaelp === 0 ? "Giv hint (koster tid)" : "Vis svaret";
-            e.className = this.hjaelp === 0 ? "knap hjaelp" : "knap hjaelp svar";
+    /* ----- Papirkortet (6. nov. 2026): spoergsmaalet, svarene, hint og
+       Indsend svar; foer runden og efter den teksten og knappen videre ------ */
+    P.kortData = function () {
+        var mig = this;
+        if (this.tilstand === "klar") {
+            return { slags: "opgave", chip: "Hurtigrunden", videre: "Start runden →",
+                     tekst: D.HURTIG_ANTAL + " spørgsmål om stofmængde, masse og molarmasse. Svar så hurtigt, du kan. Et forkert svar giver tidsstraf, og spørgsmålet kommer igen." };
         }
+        if (this.tilstand === "slut") {
+            var t = "Runden er slut: " + this.samlet + " s" + (this.straf ? " (heraf " + this.straf + " s i tidsstraf)" : "") + ". " +
+                (this.nyRekord ? "Ny rekord." : "Rekorden er " + this.rekord + " s.");
+            return { slags: "opgave", chip: "Hurtigrunden", tekst: t, videre: "Ny runde →" };
+        }
+        var q = this.nuv, n = this.antal;
+        var chip = (q.igen ? "Igen: s" : "S") + "pørgsmål " + (q.nr + 1) + " af " + n;
+        if (this.venter) {
+            var r = this.res;
+            return { slags: "loest", bliv: true, gul: !r.ok, chip: chip, tekst: q.spm, html: r.html,
+                     videre: this.koe.length ? "Næste spørgsmål →" : "Se resultatet →",
+                     svar: this.valg.map(function (v, j) {
+                         return { j: j, t: v.tekst, rigtig: r.ok && j === r.i, svarVist: !r.ok && j === r.ret, forkert: !r.ok && j === r.i,
+                                  dim: j !== r.i && !(!r.ok && j === r.ret), laast: true };
+                     }) };
+        }
+        return { slags: "spm", chip: chip, tekst: q.spm,
+                 svar: this.valg.map(function (v, j) { return { j: j, t: v.tekst, valgt: mig.valgtSvar === j }; }) };
+    };
+
+    P.kortValg = function (j) { this.vaelgKortSvar(j); };
+    P.spmAaben = function () { return this.tilstand === "koerer" && !this.venter; };
+    P.sendSvar = function (j) { this.svar(j); };
+
+    /* ----- Knappen: Giv hint (koster tid), Vis svaret; videre paa kortet ----- */
+    P.visKnap = function () {
+        var e = this.el.knap, koerer = this.tilstand === "koerer" && !this.venter;
+        this.visSceneKort();
+        e.hidden = !koerer;
+        e.textContent = this.hjaelp === 0 ? "Giv hint (koster tid)" : "Vis svaret";
+        e.className = this.hjaelp === 0 ? "knap hjaelp" : "knap hjaelp svar";
         e.disabled = false;
+        this.visIndsend();
+        this.visBund();
     };
 
     P.knap = function () {
         if (this.tilstand !== "koerer") { this.start(); return; }
-        if (this.pause > 0 || !this.nuv) return;
+        if (this.venter) { this.naesteSpm(); return; }
+        if (!this.nuv) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.straf += D.STRAF_HINT;
             this.strafT = 1.2;
-            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.nuv.hint));
+            this.hjaelpVis(NK.html(this.nuv.hint));
         } else {
-            var ret = 0;
-            this.valg.forEach(function (v, j) { if (v.ok) ret = j; });
-            this.forkert(-1, "<b>Svaret:</b> " + NK.html(this.nuv.svar[0]) + ". " + NK.html(this.nuv.forkl));
+            this.valgtSvar = null;
+            this.forkert(-1, NK.html(this.nuv.svar[0]) + ". " + NK.html(this.nuv.forkl));
         }
         this.visKnap();
         this.visTal();
@@ -222,20 +278,23 @@
     P.trinInfo = function () { return null; };
     P.opgaveFaerdig = function () { return this.tilstand === "slut"; };
     P.trinLinje = function () {
-        if (this.tilstand === "klar") return "Tryk på Start runden.";
-        if (this.tilstand === "koerer") return "Klik på det rigtige svar, eller tast 1 til " + this.valg.length + ".";
+        if (this.tilstand === "koerer" && !this.venter) return "Vælg et svar, og tryk på Indsend svar. Tast 1 til " + this.valg.length + " og Enter går også.";
         return "";
     };
-    P.enter = function () { if (this.tilstand !== "koerer") this.start(); };
+    P.enter = function () {
+        if (this.tilstand !== "koerer") { this.start(); return; }
+        if (this.venter) { this.naesteSpm(); return; }
+        this.indsendKlik();
+    };
     P.nulstil = function () { this.start(); };
     P.fokus = function () { };
     P.harNyeTal = function () { return false; };
 
-    /* Tallene 1 til 4 svarer, mens runden koerer */
+    /* Tallene 1 til 4 vaelger et svar, mens runden koerer */
     P.tast = function (key) {
-        if (this.tilstand !== "koerer") return false;
+        if (this.tilstand !== "koerer" || this.venter) return false;
         var i = parseInt(key, 10);
-        if (i >= 1 && i <= this.valg.length) { this.svar(i - 1); return true; }
+        if (i >= 1 && i <= this.valg.length) { this.kortValg(i - 1); return true; }
         return false;
     };
 
@@ -251,50 +310,21 @@
 
     /* ----- Tid ------------------------------------------------------------------------ */
     P.opdaterScene = function (dt) {
-        if (this.tilstand === "koerer") {
+        if (this.tilstand === "koerer" && !this.venter) {
             this.tidBrugt += dt;
-            if (this.pause > 0) {
-                this.pause -= dt;
-                if (this.pause <= 0) { this.pause = 0; this.naeste(); }
-            }
             this.visTal();
         }
         if (this.flash) this.flash.t += dt;
         if (this.strafT > 0) this.strafT = Math.max(0, this.strafT - dt);
     };
 
-    /* ----- Musen ------------------------------------------------------------------ */
-    P.valgUnder = function (pt) {
-        for (var i = 0; i < this.valg.length; i++) {
-            var v = this.valg[i];
-            if (v.r && pt.x >= v.r.x && pt.x <= v.r.x + v.r.b && pt.y >= v.r.y && pt.y <= v.r.y + v.r.h) return i;
-        }
-        return -1;
-    };
+    /* ----- Musen: svarene staar paa kortet; et klik i scenen faar det til at blinke */
+    P.overScene = function () { this.over = null; return null; };
 
-    P.overScene = function (pt) {
-        this.over = null;
-        if (!pt || !this.lay) return null;
-        if (this.tilstand !== "koerer") {
-            var s = this.lay.start;
-            if (s && pt.x >= s.x && pt.x <= s.x + s.b && pt.y >= s.y && pt.y <= s.y + s.h) { this.over = "start"; return "knap"; }
-            return null;
-        }
-        var i = this.valgUnder(pt);
-        if (i >= 0 && this.pause <= 0) { this.over = i; return "knap"; }
-        return null;
-    };
-
-    P.nedScene = function (pt) {
-        if (this.tilstand !== "koerer") {
-            var s = this.lay.start;
-            if (s && pt.x >= s.x && pt.x <= s.x + s.b && pt.y >= s.y && pt.y <= s.y + s.h) this.start();
-            else this.kortBesked("Tryk på Start for at begynde runden.");
-            return false;
-        }
-        var i = this.valgUnder(pt);
-        if (i >= 0) this.svar(i);
-        else if (this.pause <= 0) this.kortBesked("Klik på et af svarene.", 2.5);
+    P.nedScene = function () {
+        this.blinkKort();
+        if (this.tilstand !== "koerer") this.kortBesked("Tryk på knappen på kortet for at begynde.", 3);
+        else if (!this.venter) this.kortBesked("Vælg et svar på kortet, og tryk på Indsend svar.", 3);
         return false;
     };
 
@@ -302,35 +332,15 @@
     function erFormel(t) { return /^[nmM =·\/]+$/.test(t); }
 
     P.layout = function () {
-        var W = this.L.b, H = this.L.h, ctx = this.L.ctx;
-        var R = { x: 16, y: 16, b: W - 32, h: Math.max(160, H - 16 - 24) };
-        var lay = { W: W, H: H, Hs: H, tavle: R };
-        lay.bh = Math.round(NK.klamp(Math.min(R.h * 0.16, R.b * 0.1), 42, 78));
+        var W = this.L.b, H = this.L.h;
+        var zone = this.kortZone();
+        var y0 = 10 + zone + 8;
+        var R = { x: 16, y: y0, b: W - 32, h: Math.max(140, H - y0 - 24) };
+        var lay = { W: W, H: H, Hs: H, tavle: R, zone: zone };
         lay.spmPx = NK.klamp(Math.min(R.h * 0.1, R.b / 20), 18, 40);
-        var bh = lay.bh;
-        /* Svarene: paa én raekke, hvis der er plads, ellers to og to */
-        var bredder = this.valg.map(function (v) {
-            ctx.font = erFormel(v.tekst) ? Tg.matte(Math.round(bh * 0.46)) : Tg.font("700", Math.round(NK.klamp(bh * 0.36, 14, 26)));
-            return Math.max(bh * 2.2, ctx.measureText(v.tekst).width + 44);
-        });
-        var gap = 16;
-        var samlet = bredder.reduce(function (a, b) { return a + b + gap; }, -gap);
-        var y0 = R.y + R.h * 0.56;
-        if (samlet <= R.b - 40) {
-            var x = R.x + (R.b - samlet) / 2;
-            this.valg.forEach(function (v, i) { v.r = { x: x, y: y0, b: bredder[i], h: bh }; x += bredder[i] + gap; });
-        } else {
-            var bmax = Math.min((R.b - 40 - gap) / 2, Math.max.apply(null, bredder.concat([0])));
-            this.valg.forEach(function (v, i) {
-                var c = i % 2, rk = Math.floor(i / 2);
-                v.r = { x: R.x + R.b / 2 + (c === 0 ? -gap / 2 - bmax : gap / 2), y: y0 - bh * 0.3 + rk * (bh + 12), b: bmax, h: bh };
-            });
-        }
-        var sb = Math.max(bh * 2.6, 160);
-        lay.start = { x: R.x + (R.b - sb) / 2, y: R.y + R.h * 0.58, b: sb, h: bh };
         this.lay = lay;
         this.saetAnker("tavle", R.x, R.y, R.b, R.h);
-        this.saetAnker("svar", R.x + 20, y0 - bh * 0.35, R.b - 40, bh * 2.4);
+        this.saetAnker("svar", R.x, 10, R.b, zone);
     };
 
     /* ----- Tegn ----------------------------------------------------------------------- */
@@ -354,9 +364,6 @@
                 NK.tekst(ctx, t, R.x + R.b / 2, R.y + R.h * (0.34 + i * 0.1), { font: Tg.font("600", px), justering: "center", linje: "middle",
                     farve: i === 1 && mig.nyRekord ? "#1d7a48" : "#3a4150" });
             });
-            var s = lay.start;
-            Tg.brik(ctx, { x: s.x, y: s.y, b: s.b, h: s.h, tekst: this.tilstand === "klar" ? "Start" : "Ny runde", slags: "sym_start" },
-                { over: this.over === "start" });
             return;
         }
 
@@ -377,40 +384,21 @@
                 ctx.stroke();
             }
         }
-        /* Uret */
         var tid = Math.floor(this.tidBrugt) + this.straf;
-        NK.tekst(ctx, tid + " s", R.x + R.b - 20, py, { font: "700 " + Math.round(NK.klamp(lay.spmPx * 0.8, 16, 30)) + "px Consolas, monospace", justering: "right", linje: "middle", farve: moerk });
+        /* Spoergsmaalet og svarene staar paa papirkortet. Tavlen viser, hvor
+           langt runden er, og uret (stort, saa det kan ses fra bagerste raekke). */
+        var k = this.prikker.filter(function (p) { return p !== 0; }).length;
+        var stor = Math.round(NK.klamp(Math.min(R.h * 0.3, R.b / 8), 30, 110));
+        NK.tekst(ctx, tid + " s", R.x + R.b / 2, R.y + R.h * 0.5, { font: "700 " + stor + "px Consolas, monospace", justering: "center", linje: "middle", farve: moerk });
+        NK.tekst(ctx, k + " af " + n + " besvaret" + (this.venter ? ". Uret står stille." : ""), R.x + R.b / 2, R.y + R.h * 0.5 + stor * 0.75,
+            { font: Tg.font("600", NK.klamp(lay.spmPx * 0.6, 14, 22)), justering: "center", linje: "middle", farve: "#3a4150" });
         if (this.strafT > 0) {
             ctx.save();
             ctx.globalAlpha = Math.min(1, this.strafT);
-            NK.tekst(ctx, "Tidsstraf", R.x + R.b - 20, py + lay.spmPx * 0.9 - (1.2 - this.strafT) * 10,
-                { font: Tg.font("800", Math.round(NK.klamp(lay.spmPx * 0.6, 14, 22))), justering: "right", linje: "middle", farve: "#c0392b" });
+            NK.tekst(ctx, "Tidsstraf", R.x + R.b / 2, R.y + R.h * 0.5 - stor * 0.8 - (1.2 - this.strafT) * 10,
+                { font: Tg.font("800", Math.round(NK.klamp(lay.spmPx * 0.7, 16, 26))), justering: "center", linje: "middle", farve: "#c0392b" });
             ctx.restore();
         }
-        Tg.etiket(ctx, this.nuv && this.nuv.igen ? "Igen" : "Spørgsmål", R.x + 24, py + lay.spmPx * 1.1, lille, this.nuv && this.nuv.igen ? "#c0392b" : svag);
-
-        /* Spoergsmaalet */
-        if (this.nuv) {
-            var t = this.nuv.spm;
-            var px = NK.passendeSkrift(ctx, t, R.b - 48, lay.spmPx, 15, "700");
-            NK.tekst(ctx, t, R.x + R.b / 2, R.y + R.h * 0.36, { font: Tg.font("700", px), justering: "center", linje: "middle", farve: moerk });
-        }
-
-        /* Svarene */
-        this.valg.forEach(function (v, i) {
-            if (!v.r) return;
-            var f = mig.flash, groen = 0, roed = 0;
-            if (f && f.ok && f.i === i) groen = 1;
-            if (f && !f.ok && f.i === i) roed = 1;
-            if (f && !f.ok && f.ret === i) groen = 0.6 + 0.4 * Math.sin(f.t * 8);
-            var ryst = f && !f.ok && f.i === i && f.t < 0.4 ? Math.sin(f.t * 60) * 4 : 0;
-            ctx.save();
-            ctx.translate(ryst, 0);
-            Tg.brik(ctx, { x: v.r.x, y: v.r.y, b: v.r.b, h: v.r.h, tekst: v.tekst, slags: erFormel(v.tekst) ? "sym_svar" : "svar" },
-                { over: mig.over === i && mig.pause <= 0, roed: roed, groen: groen });
-            NK.tekst(ctx, String(i + 1), v.r.x + 9, v.r.y + 13, { font: Tg.font("700", 12), linje: "middle", farve: "#7b8594" });
-            ctx.restore();
-        });
     };
 
     NK.SimHurtig = SimHurtig;

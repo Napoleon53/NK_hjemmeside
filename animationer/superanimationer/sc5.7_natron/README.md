@@ -127,8 +127,23 @@ de forventede masser, konklusionen og et mærke: snydebevis, eller "uden
 en eneste fejl", hvis eleven har regnet alt uden fejl og uden Vis svaret.
 Den kan udskrives eller gemmes som PDF.
 
-**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
-hintet i linjen lige over knappen, og knappen bliver til Vis svaret (kun et
+**Papirkortet (6. nov. 2026).** På alle tre faner står opgaven, gættet,
+spørgsmålet med svarene, hintet, beskeden ved et forkert svar, forklaringen og
+knapperne på ét lyst kort øverst midt i scenen (`js/fane.js`, udseendet fra
+`../faelles/papirkort.css`). Panelet har kun tal, skemaer, regnestykket og
+opgavelisten. Svarknapper vælger kun; Indsend svar sender ind og er grå, til der
+er valgt et svar eller skrevet et tal (Enter i et felt er Indsend svar). Efter
+svaret bliver kortet på spørgsmålet: det valgte rigtige svar er grønt, et
+forkert valg rødt og det rigtige gult, når svaret blev vist, og knappen videre
+står, hvor Indsend svar stod. Start forfra og Kør igen står aldrig på kortet.
+Linjen nederst i scenen er væk. Pladsen til kortet er `kortZone()` (196 px
+eller 170 px på lave skærme; Fejlkilder har 244 og 200 px, fordi spørgsmålet
+og forklaringen er længere, og opstillingerne står lidt længere nede).
+Selvtesten måler kortet i alle trin på 1400 × 860 og 1100 × 660. Ingen
+molekylenavne skulle rettes (6. nov. 2026).
+
+**Hint og svar.** Den gule knap på kortet er hjælpen: Giv hint skriver
+hintet i kortets linje ved siden af knappen, og knappen bliver til Vis svaret (kun et
 omrids, så den ikke frister), der skriver svaret og næste skridt i samme
 linje. Efter et forkert svar lyser den gule knap stille op, til linjen
 skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
@@ -210,7 +225,7 @@ journalen og snydebeviset, fane 3 uden graf med spørgsmålet, alle seks,
 uret og tempoet, hjælpen fra den gule knap og layoutet (også skiltene på fane 3) fra
 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt
-tilbage bagefter. Sidst kørt 9. oktober 2026: ALT OK (91 påstande).
+tilbage bagefter. Sidst kørt 6. november 2026: ALT OK (105 påstande).
 
 ## Forenklinger
 

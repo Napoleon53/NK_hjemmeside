@@ -51,12 +51,13 @@ trækker hen. Værktøjet virker på den kurve, der er valgt under "Mål på":
   viser linealens hældning og v = hældningen (Br₂) eller v = −hældningen
   (BrO₃⁻). Knappen "Læg linealen som tangent" gør det for én i frit spil.
 
-Opgaverne (én knap: Start opgave → Giv hint → Vis svaret → Ny opgave) kommer
+Opgaverne (på papirkortet øverst i scenen, se nedenfor) kommer
 første gang i denne rækkefølge: hvornår hastigheden er størst, gennemsnit
 (først bogens 80-120 s), tangenten, koefficienterne, sekant mod tangent og
 enheden. Under gennemsnits- og tangentopgaven er værktøjet låst, og facit er
 skjult. Tangenten godkendes, når linealens hældning er inden for 10 % af den
-rigtige; ellers siger beskeden, om den er for stejl eller for flad.
+rigtige, og først når eleven trykker Indsend svar (at slippe linealen
+bedømmer intet); ellers siger kortet, om den er for stejl eller for flad.
 
 ### Fane 2: Sammenstød
 
@@ -75,7 +76,7 @@ fordobl begge, hvorfor kurven flader ud, klump mod pulver.
 En reaktion ad gangen, i rækkefølgen i `D.REAKTIONER`. Eleven vælger 0,10,
 0,20 eller 0,30 M af hver reaktant og trykker Mål. Hvert forsøg giver en kurve
 for produktet med den stiplede tangent i t = 0, og en række i tabellen. Så
-klikkes eksponenterne frem (0, 1, 2), og Tjek svarer på fejlen:
+klikkes eksponenterne frem (0, 1, 2), og Indsend svar på kortet svarer på fejlen:
 
 * eksponenterne er koefficienterne fra reaktionsskemaet: det siges direkte
 * én eksponent er forkert, og der er to forsøg, hvor kun det stof er ændret:
@@ -97,6 +98,28 @@ Hintet bygges på samme måde ud fra elevens egne forsøg.
 
 Formerne er de kendte fra litteraturen (lærebøger i fysisk kemi; NO₂ + CO
 under ca. 225 °C, (CH₃)₃CBr som SN1 og CH₃CH₂Br som SN2).
+
+## Papirkortet (6. nov. 2026)
+
+Opgaverne står på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `.js`), ikke i panelet. Kortet har opgaven,
+svarene, hintet, forklaringen til et forkert svar og forklaringen til det
+rigtige. Svarknapperne vælger kun; **Indsend svar** sender ind og er grå,
+til der er valgt noget (på tangentopgaven: til linealen er drejet, på fane 3:
+til alle eksponenter er valgt). **Giv et hint** er en stille knap med gul
+kant (Giv et hint → Vis svaret). Efter et rigtigt svar bliver kortet på
+spørgsmålet: svaret bliver grønt, forklaringen står under svarene, og
+**Næste opgave** (Næste reaktion) står, hvor Indsend svar stod. Før første
+opgave står Start opgave på kortet. Panelet har kun tælleren og Afslut;
+Forfra og Ryd tabellen ligger i panelet som før. Lærredet (fane 1 og 2) og
+grafen (fane 3) begynder under kortets zone (`--kortzone` i `css/stil.css`:
+220 px, 196 px på lave skærme, 168/156 px på fane 3), så kortet aldrig dækker
+kurverne. Er værktøjet låst af en opgave, blinker kortet ved et klik.
+Selvtesten måler kortet i alle opgaver med hint og forkert svar på en
+almindelig og en lav skærm.
+
+Molekylenavne (6. nov. 2026): animationen skriver kun formler (Br₂, H₂, O₂,
+N₂), ingen navne på grundstofmolekyler, så der var intet at rette.
 
 ## Forenklinger
 
@@ -127,7 +150,7 @@ js/kerne.js           NK-navnerum, tal med komma og tierpotens, canvas
 js/model.js           kemien: bogens reaktion og hastighedsudtrykkene
 js/data.js            Kemichaels præsentation, opgaverne og de otte reaktioner
 js/sprites.js         lageret til bægerglasset og Kemichaels sprites
-js/opgave.js          opgavekortet med den ene knap (fane 1 og 2)
+js/opgave.js          papirkortet i scenen på fane 1 og 2
 js/sim_kurve.js       fane 1
 js/sim_sammenstoed.js fane 2
 js/sim_udtryk.js      fane 3

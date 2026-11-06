@@ -9,12 +9,14 @@
    kaede tager den af igen (vand spalter bindingen), og en fedtsyre,
    der slippes paa en optaget plads, bytter pladsen.
 
-   Kunderne bestiller i panelet: fast i solen, flydende i koeleskabet
-   osv. Naar alle tre pladser er fyldt, tjekkes ordren med det samme,
-   og panelet viser, hvor fedtet er fast (NK.Fedt.stederne).
+   Kunderne bestiller paa papirkortet oeverst i scenen (js/kort.js):
+   fast i solen, flydende i koeleskabet osv. Panelet viser, hvor fedtet
+   er fast (NK.Fedt.stederne). Ordren bedoemmes, naar eleven trykker
+   Indsend svar (graa, til der sidder tre fedtsyrer). Efter et rigtigt
+   svar bliver kortet staaende med rosen og Naeste ordre.
 
-   Knappen: Giv hint -> Vis svaret -> Naeste ordre. Efter fem ordrer
-   er det fri leg, og knappen gaar videre til koekkenet (fane 2).
+   Giv hint -> Vis svaret (stille knap med gul kant). Efter fem ordrer
+   er det fri leg, og kortets knap gaar videre til koekkenet (fane 2).
    Knappen Start forfra i panelet (og R) begynder forfra med ordre 1 og
    en tom glycerol. Kemichael roser kun foerste gang.
    ===================================================================== */
@@ -92,7 +94,9 @@
         var gh = NK.klamp(H * 0.15, 66, 100);
         lay.glas = Tg.glasMaal(W - kant - 46, lay.bordY, gh);
         lay.kop = { x: kant + 32, y: lay.bordY };
-        lay.omr = { x: kant + 10, y: 16, b: lay.glas.venstre - 24 - kant - 10, h: lay.bordY - 16 - 18 };
+        var zone = this.sk ? this.kortZone() : 16;
+        lay.zone = zone;
+        lay.omr = { x: kant + 10, y: zone, b: lay.glas.venstre - 24 - kant - 10, h: lay.bordY - zone - 18 };
         this.lay = lay;
         this.maalMolekyle(!this.b);
         this.saetAnker("fabrik-anker-fliser", x0 - 4, lay.fliseY - 4, 4 * fb + 3 * gab + 8, fh + 8);
@@ -109,7 +113,7 @@
     };
 
     P.tilpas = function () {
-        if (this.L.tilpas() || !this.lay) this.layout();
+        if (this.L.tilpas() || !this.lay || this.lay.zone !== this.kortZone()) this.layout();
     };
 
     /* ----- Molekylets form --------------------------------------------------------
@@ -274,6 +278,10 @@
     /* ----- Ordren ------------------------------------------------------------------------- */
     P.ordre = function () { return this.frileg ? null : D.ORDRER[this.ordreNr]; };
 
+    /* Ordren bedoemmes foerst, naar eleven trykker Indsend svar (brugerens
+       regel 24. okt. 2026). Tjek holder kun panelet og kortet ajour, og et
+       raad fra et forkert svar forsvinder, naar fedtet bliver aendret.
+       Har Vis svaret bygget loesningen, leveres den med det samme (gul). */
     P.tjek = function () {
         var k = this.kaeder();
         var noegle = k ? k.join(",") : "";
@@ -281,28 +289,45 @@
         this.sidstTjekket = noegle;
         NK.ditFedt = k ? k.slice() : NK.ditFedt;
         this.visFedt();
-        if (!k) {
-            if (this.beskedKlasse === "skidt") this.besked("", "");
+        if (this.beskedKlasse === "skidt") this.besked("", "");
+        var o = this.ordre();
+        if (k && o && !this.loest && this.hjaelp === 2 && !this.koe.length && o.svar.join(",") === noegle) {
+            this.lever(k, true);
             return;
         }
-        var o = this.ordre();
-        if (!o || this.loest) return;
-        var res = F.tjekOrdre(o, k);
-        if (res.ok) {
-            this.loest = true;
-            if (this.leveret.indexOf(this.ordreNr) < 0) this.leveret.push(this.ordreNr);
-            this.besked("<b>Leveret.</b> " + NK.html(this.ros(k)), "god");
-            this.fejr();
-            /* Rosen for alle fem kommer kun foerste gang */
-            if (this.leveret.length >= D.ORDRER.length && !this.rostFoer) {
-                this.rostFoer = true;
-                this.ventRos = 1.0;
-            }
-            this.gemFremskridt();
-        } else {
-            this.besked(NK.html(this.fejlTekst(o, k)), "skidt");
-        }
         this.visOrdre();
+    };
+
+    P.lever = function (k, vist) {
+        this.loest = vist ? "svar" : "god";
+        if (this.leveret.indexOf(this.ordreNr) < 0) this.leveret.push(this.ordreNr);
+        this.besked("", "");
+        this.fejr();
+        /* Rosen for alle fem kommer kun foerste gang */
+        if (this.leveret.length >= D.ORDRER.length && !this.rostFoer) {
+            this.rostFoer = true;
+            this.ventRos = 1.0;
+        }
+        this.gemFremskridt();
+        this.visOrdre();
+    };
+
+    /* Indsend svar: ordren bedoemmes. I fri leg gaar knappen til koekkenet. */
+    P.indsend = function () {
+        if (this.frileg) {
+            var fane = document.querySelector('[data-fane="fane-koele"]');
+            if (fane) fane.click();
+            return;
+        }
+        var k = this.kaeder(), o = this.ordre();
+        if (this.loest || !o) return;
+        if (!k) { this.sk.blink(); return; }
+        var res = F.tjekOrdre(o, k);
+        if (res.ok) this.lever(k, false);
+        else {
+            this.besked("<b>Ikke endnu.</b> " + NK.html(this.fejlTekst(o, k)), "skidt");
+            this.visOrdre();
+        }
     };
 
     P.ros = function (k) {
@@ -338,29 +363,26 @@
         NK.gem(NOEGLE, { leveret: this.leveret, rost: this.rostFoer });
     };
 
-    P.knap = function () {
-        if (this.frileg && !this.loest) {
-            /* Videre til koekkenet med det fedt, der er bygget */
-            var fane = document.querySelector('[data-fane="fane-koele"]');
-            if (fane) fane.click();
+    /* Naeste (staar paa kortet, hvor Indsend svar stod) */
+    P.videre = function () {
+        if (!this.loest) return;
+        if (this.leveret.length >= D.ORDRER.length) {
+            this.frileg = true;
+            this.loest = false;
+            this.hjaelp = 0;
+            this.besked("", "");
+            this.visOrdre();
             return;
         }
-        if (this.loest) {
-            if (this.leveret.length >= D.ORDRER.length) {
-                this.frileg = true;
-                this.loest = false;
-                this.hjaelp = 0;
-                this.besked("Byg, hvad du vil. Panelet viser, hvor fedtet er fast.", "");
-                this.visOrdre();
-                return;
-            }
-            this.ordreNr = (this.ordreNr + 1) % D.ORDRER.length;
-            this.naesteLedige();
-            this.nyOrdre();
-            return;
-        }
+        this.ordreNr = (this.ordreNr + 1) % D.ORDRER.length;
+        this.naesteLedige();
+        this.nyOrdre();
+    };
+
+    /* Giv hint -> Vis svaret (stille knap med gul kant) */
+    P.hint = function () {
         var o = this.ordre();
-        if (!o) return;
+        if (!o || this.loest) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked("<b>Hint:</b> " + NK.html(o.hint), "gul");
@@ -373,6 +395,13 @@
         this.visOrdre();
     };
 
+    /* Den gamle ene knap (selvtesten og Enter): Naeste, ellers hint */
+    P.knap = function () {
+        if (this.loest) this.videre();
+        else if (this.frileg) this.indsend();
+        else this.hint();
+    };
+
     P.visSvar = function (svar) {
         var mig = this;
         this.koe = [];
@@ -381,7 +410,8 @@
             mig.koe.push({ nr: i, id: id });
         });
         this.koeVent = 0.1;
-        this.besked("Sådan kan den bygges.", "gul");
+        this.sidstTjekket = "";
+        this.besked("<b>Sådan kan den bygges.</b>", "gul");
     };
 
     P.nyOrdre = function () {
@@ -407,62 +437,75 @@
     };
 
     P.enter = function () {
-        if (this.loest || this.frileg) this.knap();
+        if (this.loest) this.videre();
+        else this.indsend();
     };
 
     P.fokus = function () {};
 
     P.tast = function () { return false; };
 
-    /* ----- Panelet --------------------------------------------------------------------------- */
+    /* ----- Papirkortet og panelet ------------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("fabrik-knap"),
-            besked: NK.el("fabrik-besked"),
-            kort: NK.el("fabrik-kort")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.sk = new NK.SceneKort("fabrik", {
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.noteTxt = "";
+        this.noteTid = 0;
         NK.el("fabrik-forfra").addEventListener("click", function () { mig.nulstil(); });
     };
 
+    /* klasse "": en kort besked fra scenen (notelinjen i nogle sekunder);
+       "gul" (hint), "skidt" (forkert) og "" med tom tekst: kortets nederste raekke */
     P.besked = function (html, klasse) {
+        if (!klasse && html) {
+            this.noteTxt = html;
+            this.noteTid = 7;
+            this.visStatus();
+            return;
+        }
         this.beskedKlasse = klasse;
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.beskedHtml = html;
+        if (this.sk) this.sk.besked(html, klasse);
     };
+
+    P.beskedTekst = function () {
+        var t = this.sk.blivAaben() ? this.sk.blivTekst() : this.sk.beskedTekst();
+        return t + " " + (this.sk.noteEl.textContent || "");
+    };
+
+    /* Den plads, kortet har oeverst i scenen ([almindelig, lav skaerm]) */
+    P.kortZone = function () { return this.sk.zone(D.ZONE.fabrik); };
 
     P.visOrdre = function () {
         var o = this.ordre(), mig = this;
+        var k = this.kaeder();
         if (o) {
-            NK.saetTekst("fabrik-titel", "Ordre");
-            NK.saetHTML("fabrik-taeller", "<b>" + (this.ordreNr + 1) + "</b>/" + D.ORDRER.length);
-            NK.saetTekst("fabrik-kunde", o.kunde);
-            NK.saetTekst("fabrik-tekst", o.tekst);
+            this.sk.vis({ kl: "opgave", chip: "Ordre " + (this.ordreNr + 1) + " af " + D.ORDRER.length,
+                tekst: "<b>" + NK.html(o.kunde) + ".</b> " + NK.html(o.tekst) });
         } else {
-            NK.saetTekst("fabrik-titel", "Fri leg");
-            NK.saetHTML("fabrik-taeller", "alle " + D.ORDRER.length + " leveret");
-            NK.saetTekst("fabrik-kunde", "Byg, hvad du vil");
-            NK.saetTekst("fabrik-tekst", "Prøv at finde et fedt, der er fast i køleskabet, men flydende på bordet.");
+            this.sk.vis({ kl: "opgave", chip: "Fri leg",
+                tekst: "Alle " + D.ORDRER.length + " ordrer er leveret. Byg et fedt, der er fast i køleskabet, men flydende på bordet." });
         }
+        if (this.loest) {
+            this.sk.bliv("<b>Leveret.</b> " + NK.html(this.ros(k || o.svar)), null,
+                this.leveret.length >= D.ORDRER.length ? "Fri leg" : "Næste ordre", this.loest === "svar" ? "svar" : "god");
+        } else {
+            this.sk.bliv(null);
+            this.sk.knapper(this.frileg ? { indsend: true, klar: true, indsendTekst: "Til køleskabet" } : {
+                hint: this.hjaelp === 0 ? "Giv hint" : (this.hjaelp === 1 ? "Vis svaret" : null),
+                indsend: true, klar: !!k && !this.koe.length
+            });
+        }
+        NK.saetHTML("fabrik-taeller", this.frileg ? "alle " + D.ORDRER.length + " leveret" : "<b>" + this.leveret.length + "</b>/" + D.ORDRER.length + " leveret");
         var pips = D.ORDRER.map(function (od, i) {
             var klar = mig.leveret.indexOf(i) >= 0, nu = !mig.frileg && i === mig.ordreNr;
             return '<span class="pip' + (klar ? " klar" : "") + (nu ? " nu" : "") + '" title="' + NK.html(od.kunde) + '">' + (klar ? "✓" : (i + 1)) + "</span>";
         }).join("");
         NK.saetHTML("fabrik-pips", pips);
-        var tekst, klasse = "knap";
-        if (this.loest) {
-            tekst = this.leveret.length >= D.ORDRER.length ? "Fri leg" : "Næste ordre";
-            klasse = "knap blaa banker";
-        } else if (this.frileg) {
-            tekst = "Til køleskabet";
-            klasse = "knap blaa";
-        } else {
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.loest);
     };
 
     /* Kortet "Dit fedtstof": smeltepunktet og tilstanden de fire steder */
@@ -506,7 +549,8 @@
             var k = this.kaeder();
             t = k ? "Dit fedtstof smelter ved " + NK.html(F.smpTekst(k)) + ". Klik på en kæde for at tage den af." : "Fedtsyren bindes.";
         }
-        NK.saetHTML("fabrik-status", t);
+        if (this.noteTid > 0 && !tr) t = this.noteTxt;
+        this.sk.note(t);
     };
 
     /* ----- Tegneloekken --------------------------------------------------------------------- */
@@ -554,6 +598,7 @@
             return f.t < 1;
         });
         this.stjerner = this.stjerner.filter(function (s) { s.t += dt; return s.t < 1.2; });
+        if (this.noteTid > 0) this.noteTid -= dt;
         this.tjek();
         if (this.ventRos > 0) {
             this.ventRos -= dt;

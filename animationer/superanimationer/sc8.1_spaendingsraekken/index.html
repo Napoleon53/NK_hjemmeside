@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spændingsrækken</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚡</span> Spændingsrækken</h1>
@@ -28,7 +29,7 @@
 <!-- FANE 1: FORSOEGET                                                  -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="fs-laerred"></canvas>
         <div class="anker" id="fs-anker-holder"></div>
         <div class="anker" id="fs-anker-glas"></div>
@@ -37,19 +38,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="fs-status"></div>
+        <!-- Papirkortet oeverst i scenen (brugerens valg 4. nov. 2026): maalet, spoergsmaalet og svarene, linjen med det, man ser, Giv hint og Indsend svar -->
+        <div class="scenekort opgave" id="fs-skort">
+            <div id="fs-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="fs-bund">
+                <p class="st-tekst" id="fs-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fs-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="fs-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="fs-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste -->
-        <div class="kort opgavekort" id="fs-kort">
-            <h2><span>Forsøget</span><span class="taeller" id="fs-taeller">mål 1/5</span></h2>
-            <p class="maal-tekst" id="fs-prompt"></p>
-            <div class="opgave-felt" id="fs-valg"></div>
-            <p class="besked" id="fs-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fs-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="fs-skemakort">
             <h2>Skemaet <span class="taeller"><b id="fs-antal">0</b>/25 forsøg</span></h2>
             <div class="skema" id="fs-skema"></div>
@@ -63,7 +64,7 @@
 <!-- FANE 2: RAEKKEN                                                    -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-raekken" role="tabpanel" aria-label="Rækken">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="rk-laerred"></canvas>
         <div class="anker" id="rk-anker-hylde"></div>
         <div class="anker" id="rk-anker-kort"></div>
@@ -71,18 +72,19 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="rk-status"></div>
+        <!-- Papirkortet oeverst i scenen (brugerens valg 4. nov. 2026): opgaven, linjen med fejl og hint, Giv hint og Indsend svar (rækkefølgen tjekkes, naar eleven sender den) -->
+        <div class="scenekort opgave" id="rk-skort">
+            <div id="rk-ind" aria-live="polite"></div>
+            <div class="sk-bund tom" id="rk-bund">
+                <p class="st-tekst" id="rk-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="rk-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="rk-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="rk-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Til Forudsig -->
-        <div class="kort opgavekort" id="rk-kort">
-            <h2><span>Rækken</span><span class="taeller" id="rk-taeller">0/6 på hylden</span></h2>
-            <p class="maal-tekst" id="rk-prompt"></p>
-            <p class="besked" id="rk-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="rk-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="rk-skemakort">
             <h2>Skemaet fra forsøget <span class="taeller"><b id="rk-antal">0</b>/25 forsøg</span></h2>
             <div class="skema" id="rk-skema"></div>
@@ -96,7 +98,7 @@
 <!-- FANE 3: FORUDSIG                                                   -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-forudsig" role="tabpanel" aria-label="Forudsig">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="fu-laerred"></canvas>
         <div class="anker" id="fu-anker-raekke"></div>
         <div class="anker" id="fu-anker-glas"></div>
@@ -105,24 +107,21 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <div class="scene-mrk" id="fu-status"></div>
+        <!-- Papirkortet oeverst i scenen (brugerens valg 4. nov. 2026): opgaven, ja og nej, stofferne, reaktionsskemaet med de fire felter, Giv hint og Indsend svar -->
+        <div class="scenekort opgave" id="fu-skort">
+            <div id="fu-ind" aria-live="polite"></div>
+            <!-- Reaktionsskemaet: bygges op under svarene og bliver staaende, ogsaa naar opgaven er loest -->
+            <div class="fu-skema" id="fu-skema"></div>
+            <div class="sk-bund tom" id="fu-bund">
+                <p class="st-tekst" id="fu-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="fu-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="fu-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="fu-bliv" hidden></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="fu-kort">
-            <h2><span id="fu-titel">Opgave 1</span><span class="taeller" id="fu-taeller"></span></h2>
-            <p class="maal-tekst" id="fu-prompt"></p>
-            <p class="opgave-spm" id="fu-spm"></p>
-            <div class="opgave-felt" id="fu-valg"></div>
-            <p class="besked" id="fu-svar" aria-live="polite"></p>
-            <p class="opgave-spm" id="fu-spm2"></p>
-            <div class="skemafelt" id="fu-skema"></div>
-            <div class="chips" id="fu-chips"></div>
-            <p class="besked" id="fu-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fu-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="fu-logkort">
             <h2>Dine svar <span class="taeller"><b id="fu-rigtige">0 af 0</b> gættet rigtigt</span></h2>
             <div class="logliste" id="fu-log"></div>
@@ -152,7 +151,7 @@
             Cu²⁺ + 2 e⁻ ⟶ Cu<br>
             Zn(s) + Cu²⁺(aq) ⟶ Zn²⁺(aq) + Cu(s)
         </div>
-        <p>Metaller til venstre for H afgiver elektroner til H⁺ i en syre. Der dannes hydrogen, H₂, som bobler op.</p>
+        <p>Metaller til venstre for H afgiver elektroner til H⁺ i en syre. Der dannes dihydrogen, H₂, som bobler op.</p>
         <p>I en afstemt reaktion afgives lige så mange elektroner, som der optages. Derfor står der 2 foran Ag⁺, når kobber reagerer med sølvioner: Cu(s) + 2 Ag⁺(aq) ⟶ Cu²⁺(aq) + 2 Ag(s).</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
@@ -181,6 +180,8 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
 <script src="js/kemi.js"></script>
 <script src="js/data.js"></script>
 <script src="js/sprites.js"></script>

@@ -55,6 +55,9 @@ slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
 </p>
 
 <div id="dom">Regner …</div>
+<!-- Til den automatiske koersel (headless Chrome): fejlede tests og en
+     slutlinje "ALT OK" eller "N FEJL" (6. nov. 2026) -->
+<pre id="ud" style="font-size:12px;color:#9aa3ad;"></pre>
 
 <h2>pH i enkeltopløsninger</h2>
 <table id="tabel-ph"><thead><tr>
@@ -81,13 +84,13 @@ slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
     "use strict";
     var Kemi = NK.Kemi;
     var s = function (id) { return Kemi.findStof(id); };
-    var fejl = 0;
+    var fejl = 0, fejlNavne = [];
 
     function rad(tabel, navn, faktisk, ventet, tol, hvorfor, decimaler) {
         decimaler = decimaler === undefined ? 2 : decimaler;
         var afvig = Math.abs(faktisk - ventet);
         var ok = afvig <= tol;
-        if (!ok) fejl++;
+        if (!ok) { fejl++; fejlNavne.push("FEJL  " + navn + " (beregnet " + faktisk + ", ventet " + ventet + ")"); }
         var tr = document.createElement("tr");
         tr.className = ok ? "ok" : "fejl";
         function td(tekst, klasse) {
@@ -183,6 +186,145 @@ slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
     dom.textContent = fejl
         ? fejl + (fejl === 1 ? " test fejlede" : " tests fejlede")
         : "Alle tests er i orden";
+    /* Slutlinjen skrives, naar papirkortet paa fane 4 ogsaa er testet (nedenfor) */
+    window.kemiTest = { fejl: fejl, navne: fejlNavne };
+}());
+</script>
+
+<h2>Papirkortet på fane 4 (Ukendt prøve)</h2>
+<table id="tabel-kort"><thead><tr><th>Påstand</th><th>Detalje</th></tr></thead><tbody></tbody></table>
+<iframe id="app" src="index.html" style="width:1400px;height:860px;border:0;display:block;margin-top:14px;"></iframe>
+
+<script>
+/* Papirkortet (6. nov. 2026): opgaven, hint, bedoemmelsen og knapperne staar
+   paa et kort oeverst i midten af scenen; felterne i panelet. */
+(function () {
+    "use strict";
+    var fejl = 0, navne = [];
+    var tbody = document.querySelector("#tabel-kort tbody");
+    function paastand(navn, ok, detalje) {
+        if (!ok) { fejl++; navne.push("FEJL  " + navn + (detalje !== undefined ? " (" + detalje + ")" : "")); }
+        var tr = document.createElement("tr");
+        tr.className = ok ? "ok" : "fejl";
+        tr.innerHTML = "<td></td><td></td>";
+        tr.children[0].textContent = (ok ? "✓  " : "✗  ") + navn;
+        tr.children[1].textContent = detalje === undefined ? "" : String(detalje);
+        tbody.appendChild(tr);
+    }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function slut() {
+        var k = window.kemiTest || { fejl: 1, navne: ["FEJL  kemitesten kørte ikke"] };
+        var alle = k.fejl + fejl;
+        document.getElementById("ud").textContent = k.navne.concat(navne, [alle ? alle + " FEJL" : "ALT OK"]).join("\n");
+        var dom = document.getElementById("dom");
+        dom.className = alle ? "skidt" : "god";
+        dom.textContent = alle ? alle + (alle === 1 ? " test fejlede" : " tests fejlede") : "Alle tests er i orden";
+    }
+
+    async function koer() {
+        var ramme = document.getElementById("app");
+        if (!ramme.contentWindow.NK || !ramme.contentWindow.NK.sims) await new Promise(function (r) { ramme.addEventListener("load", r); });
+        await vent(300);
+        var W = ramme.contentWindow, d = W.document, NK = W.NK;
+        d.querySelector('[data-fane="fane-ukendt"]').click();
+        await vent(100);
+        var U = NK.sims["fane-ukendt"];
+        var sk = d.getElementById("ukendt-skort"), ind = d.getElementById("ukendt-indsend"), knap = d.getElementById("ukendt-knap");
+        var status = d.getElementById("ukendt-status");
+        var fV = d.getElementById("ukendt-svar-v"), fC = d.getElementById("ukendt-svar-c"), fP = d.getElementById("ukendt-svar-pks");
+        function skriv(e, v) { e.value = typeof v === "number" ? String(v).replace(".", ",") : v; e.dispatchEvent(new W.Event("input")); }
+        function svag() { var n = 0; while (!U.opgave.svag && n++ < 200) U.nyOpgave(); }
+
+        paastand("kortet står i scenen og ikke i panelet", !!sk.closest(".scene") && !sk.closest(".panel") && d.body.classList.contains("papirkort"));
+        paastand("kortet er et papirkort med Lexend", /Lexend/.test(W.getComputedStyle(sk).fontFamily));
+        var sc = sk.parentNode, midt = sk.offsetLeft + sk.offsetWidth / 2 - sc.clientWidth / 2;
+        paastand("kortet står øverst i midten af scenen", sk.offsetTop <= 12 && Math.abs(midt) <= 2, sk.offsetTop + " / " + Math.round(midt));
+        paastand("ingen statuslinje og ingen opgavetekst eller svarknapper i panelet", !d.querySelector("#fane-ukendt .scene-mrk") &&
+            !d.getElementById("ukendt-feedback") && !d.getElementById("ukendt-opgave") && !d.getElementById("ukendt-tjek") && !d.getElementById("ukendt-facit"));
+        svag();
+        paastand("kortet har opgaven med spørgsmålet halvfedt og etiketten Ukendt prøve",
+            /Hvad er ækvivalensvolumenet, koncentrationen og pKs\?/.test((sk.querySelector(".sk-spm") || {}).textContent || "") &&
+            sk.querySelector(".sk-chip").textContent === "Ukendt prøve" && /I buretten står/.test(sk.textContent));
+        paastand("kortet har Giv et hint og Indsend svar", knap.textContent === "Giv et hint" && !!ind.closest("#ukendt-skort"));
+        paastand("Indsend svar er grå, når felterne er tomme", ind.classList.contains("ikke-klar") && !ind.classList.contains("klar"));
+        ind.click();
+        paastand("Indsend svar uden svar bedømmer intet, men kortet blinker", U.loest === null && U.besked === null && sk.classList.contains("blink"));
+        paastand("Start forfra og Tøm står ikke på kortet, men i panelet", !/forfra|Tøm/i.test(sk.textContent) && !!d.getElementById("ukendt-nulstil").closest(".panel"));
+
+        skriv(fV, U.opgave.Vae);
+        paastand("at skrive i et felt gør Indsend svar klar, men bedømmer ikke", ind.classList.contains("klar") && U.loest === null &&
+            U.besked === null && !fV.classList.contains("ok"));
+        skriv(fC, U.opgave.c * 3);
+        ind.click();
+        paastand("et forkert tal: rødt på kortet, felterne farves, og hintknappen lyser stille", status.classList.contains("skidt") &&
+            /Ækvivalensvolumenet passer\. Koncentrationen passer ikke/.test(d.getElementById("ukendt-besked").textContent) &&
+            fV.classList.contains("ok") && fC.classList.contains("fejl") && knap.classList.contains("peg") && U.loest === null);
+        skriv(fC, U.opgave.c);
+        ind.click();
+        paastand("mangler pKs: kortet beder om det", /Skriv også pKs i panelet/.test(d.getElementById("ukendt-besked").textContent) && U.loest === null);
+
+        var nHint = U.hint().length;
+        knap.click();
+        paastand("Giv et hint giver det første hint, og knappen hedder Næste hint", /^Hint:/.test(d.getElementById("ukendt-besked").textContent) &&
+            status.classList.contains("hint") && knap.textContent === "Næste hint (2 af " + nHint + ")");
+        for (var i = 1; i < nHint; i++) knap.click();
+        paastand("efter " + nHint + " hint hedder knappen Vis svaret", knap.textContent === "Vis svaret" && U.loest === null);
+
+        skriv(fP, U.opgave.pKs);
+        fP.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+        paastand("Enter i feltet er Indsend svar, og alt rigtigt løser opgaven", U.loest === "rigtig" && U.afsloeret);
+        var videre = sk.querySelector(".sk-bund.bliv [data-videre]");
+        paastand("kortet bliver på opgaven med forklaringen, og Ny ukendt prøve står, hvor Indsend svar stod",
+            sk.classList.contains("bliv") && sk.classList.contains("loest") && status.hidden && !!videre &&
+            /Ny ukendt prøve/.test(videre.textContent) && /Hvad er ækvivalensvolumenet/.test(sk.textContent) &&
+            /^Rigtigt\.? Prøven var /.test(sk.querySelector(".sk-bund.bliv .st-tekst").textContent));
+        paastand("felterne er låst, og stoffets navn står med lille forbogstav", fV.disabled && fC.disabled &&
+            !/M [A-ZÆØ][a-zæøå]/.test(sk.querySelector(".sk-bund.bliv .st-tekst").textContent.replace(/M Tris/, "")));
+        videre.click();
+        paastand("Ny ukendt prøve: en ny opgave uden ros, tomme felter og Indsend svar grå", U.loest === null && !sk.classList.contains("bliv") &&
+            !status.hidden && !/Rigtigt/.test(sk.textContent) && fV.value === "" && !fV.disabled && !fV.classList.contains("ok") &&
+            ind.classList.contains("ikke-klar") && knap.textContent === "Giv et hint");
+
+        for (i = 0; i <= U.hint().length; i++) knap.click();
+        paastand("Vis svaret: kortet bliver på opgaven med svaret i gult", U.loest === "svar" && sk.classList.contains("svar") &&
+            /^Svaret\.? Prøven er /.test(sk.querySelector(".sk-bund.bliv .st-tekst").textContent) && U.afsloeret);
+        sk.querySelector("[data-videre]").click();
+
+        /* Kortet holder sig i kortZone med de laengste tekster, og apparatet begynder under det */
+        var tilstande = [
+            function () { svag(); return "opgaven"; },
+            function () { svag(); U.besked = { html: "<b>Hint:</b> " + U.hint()[1], klasse: "hint" }; U.visKort(); return "det længste hint"; },
+            function () {
+                svag(); skriv(fV, U.opgave.Vae); skriv(fP, U.opgave.pKs); skriv(fC, U.opgave.c * 3); U.tjek();
+                return "den længste fejl";
+            },
+            function () {
+                var n = 0; while ((U.opgave.stof.id !== "acetylsalicylsyre") && n++ < 6000) U.nyOpgave();
+                U.facit(); return "svaret med det længste navn";
+            }
+        ];
+        var maal = [[1400, 860], [1280, 640], [1100, 700], [700, 560]];
+        for (var m = 0; m < maal.length; m++) {
+            ramme.style.width = maal[m][0] + "px";
+            ramme.style.height = maal[m][1] + "px";
+            W.dispatchEvent(new W.Event("resize"));
+            await vent(250);
+            var hoejest = 0, hvad = "", ude = [];
+            for (var t = 0; t < tilstande.length; t++) {
+                U.nyOpgave();
+                var navn = tilstande[t]();
+                U.tilpas(); U.tegn();
+                var h = sk.offsetHeight;
+                if (h > hoejest) { hoejest = h; hvad = navn; }
+                if (h > U.kortZone() + 1 || !isFinite(U.apparatTop) || U.apparatTop < 10 + h + 2) ude.push(navn + " " + h + " px");
+            }
+            paastand(maal[m][0] + " x " + maal[m][1] + ": kortet holder sig i kortZone, og apparatet begynder under det", ude.length === 0,
+                (ude.join(", ") || "højest " + hoejest + " px ved " + hvad) + ", zone " + U.kortZone());
+        }
+        U.nyOpgave();
+    }
+
+    koer().catch(function (e) { paastand("testen af papirkortet kørte uden fejl", false, e && e.message); }).then(slut);
 }());
 </script>
 </body>

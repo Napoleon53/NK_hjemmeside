@@ -112,7 +112,11 @@
         this.L.tilpas();
         var W = this.L.b, H = this.L.h, K = A.KASSE;
         var bred = K.x1 - K.x0, hoej = K.y1 - K.y0;
-        var k = Math.max(0.2, Math.min((W - 24) / bred, (H - 16) / hoej));
+        /* Papirkortet har pladsen oeverst (NK.kortTop i js/opgaver.js) */
+        var top = NK.kortTop ? Math.min(NK.kortTop(), H * 0.4) : 0;
+        var scene = this.L.canvas.parentNode;
+        if (scene && scene.style.getPropertyValue("--kortzone") !== top + "px") scene.style.setProperty("--kortzone", top + "px");
+        var k = Math.max(0.2, Math.min((W - 24) / bred, (H - 16 - top) / hoej));
         var ox = Math.round((W - bred * k) / 2 - K.x0 * k);
         var oy = Math.round(H - 8 - K.y1 * k);
         var FL = A.FORLAG;
@@ -478,6 +482,8 @@
             var p = punkt(e);
             if (mig.klikFoerst && mig.klikFoerst(p.x, p.y)) return;
             if (!mig.iBassin(p.x, p.y)) return;
+            /* Under en forudsigelse er bassinet laast, og kortet blinker */
+            if (mig.laast && mig.laast()) return;
             mig.greb = { x0: p.x, ryk0: mig.ryk, sidst: p.x, t: performance.now() };
             try { c.setPointerCapture(e.pointerId); } catch (fejl) { /* ingen fangst */ }
             c.style.cursor = "grabbing";

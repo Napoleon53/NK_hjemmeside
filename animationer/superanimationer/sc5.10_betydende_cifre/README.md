@@ -163,9 +163,7 @@ til tre cifre er 1,01 og 100 422 med ét ciffer er 1 · 10⁵.
 
 ## Hjælpen
 
-Den ene knap i opgavekortet er Giv hint → Vis svaret → Næste opgave (til
-sidst Ny runde). Tjek står ved svarfeltet, og Enter gør det samme; efter et
-rigtigt svar hedder den Næste. Et tomt svar tæller ikke som et forsøg. Et
+(Fra 6. nov. 2026 står knapperne på papirkortet; se nedenfor.) Et tomt svar tæller ikke som et forsøg. Et
 forkert svar giver en besked, der passer til fejlen, uden facit
 (`js/cifre.js`, `tjek*`):
 
@@ -191,10 +189,10 @@ notation står ét ciffer foran kommaet.
 
 ## Hjælpen
 
-Den gule knap i opgavekortet: Giv hint skriver hintet i linjen under
-svarfeltet (den står, til opgaven er løst), og knappen bliver til Vis svaret
-(kun et omrids), der skriver svaret i felterne og forklaringen i linjen.
-Fejl, ros og næste skridt står i samme linje. Efter et forkert svar lyser den
+Den gule knap på papirkortet: Giv hint skriver hintet i kortets linje (det
+står, til opgaven er løst), og knappen bliver til Vis svaret (kun et omrids),
+der skriver svaret i felterne og forklaringen på kortet. Fejl og næste skridt
+står i samme linje. Efter et forkert svar lyser den
 gule knap stille op. Der er ingen Kemichael: scenen er ren DOM uden lærred
 og sprites.
 
@@ -238,7 +236,7 @@ _selvtest.html      udviklerværktøj, se nedenfor
 
 ## Genveje
 
-<kbd>1</kbd> til <kbd>4</kbd> fane · <kbd>Enter</kbd> tjek og næste ·
+<kbd>1</kbd> til <kbd>4</kbd> fane · <kbd>Enter</kbd> Indsend svar og Næste ·
 <kbd>R</kbd> ny runde · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
 <kbd>Esc</kbd> luk. Direkte links: `#tael`,
 `#afrund`, `#komma`, `#blandet`.
@@ -256,7 +254,41 @@ hævet, `e` skifter), hint, Vis svaret og tomme svar, at hint og svar kun
 kommer fra den gule knap, og at den lyser op efter en fejl, sproget, og at tallene står på én linje
 fra 900 til 1400 px, også løste enhedsopgaver på Svær og Meget svær.
 Elevens gemte valg, rekord og klarede niveauer lægges tilbage bagefter.
-Sidst kørt: ALT OK (125 påstande), 9. oktober 2026.
+Fra 6. nov. 2026 tjekker den også papirkortet (afsnit 9). Sidst kørt: ALT OK
+(145 påstande), 6. november 2026.
+
+## Papirkortet (6. nov. 2026)
+
+Brugerens beslutning 4. nov. 2026: alle aktive animationer har papirkortet
+(`../faelles/papirkort.css` og `papirkort.js`, `<body class="papirkort">`).
+Alle fire faner har opgaver, så alle fire har kortet. Det gamle opgavekort i
+panelet, spørgsmålet over tavlen, knappen Tjek ved feltet og linjen under
+svarfeltet er væk; nu gælder:
+
+* Ét lyst kort øverst i midten af scenen (`#skort`, `kortHTML`, `visKort` og
+  `visKnapper` i `js/fane.js`): etiketten "Opgave 3 af 10" (i Blandet med
+  opgavens slags foran) som indlejret overskrift, opgaven, linjen med næste
+  skridt, fejl og hint, den gule knap (Giv hint, Vis svaret) og Indsend svar.
+* Tavlen og svarfeltet står under kortet. Et klik på en brik vælger kun, og
+  en indtastning bedømmes ikke. Indsend svar (eller Enter) sender og er grå,
+  til der er valgt en brik eller skrevet noget i feltet; et tryk på den grå
+  knap bedømmer intet, men kortet blinker og siger, hvad der mangler.
+* Efter et rigtigt svar bliver kortet på opgaven: brikkerne og feltet er
+  grønne, forklaringen står under opgaven med mærket (Rigtigt, Ja, Det passer
+  eller Præcis), og Næste opgave står, hvor Indsend svar stod. Ved Vis svaret
+  er forklaringen gul. Et klik på tavlen imens får kortet til at blinke.
+  Rosen står aldrig under den næste opgave.
+* Efter den tiende opgave hedder knappen Se resultatet. Så viser kortet runden
+  (antal rigtige i første forsøg, rekorden i Blandet og om Meget svær er låst
+  op) med Videre til den næste fane; efter Blandet er der ingen knap. Ny runde
+  står kun i panelet (og på tasten R), aldrig på kortet.
+* Panelet har fanens valg (Måletal/Regnestykker, Notation/Enheder og
+  niveauerne med låsen), de ti streger, Ny runde og listen over runden.
+* Pladsen til kortet er `--kortzone` i `css/stil.css` (176 px, 152 px på lave
+  skærme), læst af `kortZone()`. Kortet var højst 154 px (1400 × 860) og 129 px
+  (1100 × 660) i selvtesten med alle slags opgaver, hint, fejl, svar og
+  resultat. Påskeægget (klik på kommaet) svarer på kortet.
+* Ingen molekylenavne at rette (animationen nævner ingen stoffer).
 
 ## I menuen
 

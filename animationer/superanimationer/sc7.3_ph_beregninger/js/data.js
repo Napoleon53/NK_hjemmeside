@@ -68,21 +68,21 @@
             titel: "Find pH",
             status: {
                 maaler: "pH-metret måler pH.",
-                faerdig: "pH-metret viser {ph}. Dit svar passer. Tryk på Ny opgave."
+                faerdig: "pH-metret viser {ph}. Dit svar passer."
             }
         },
         konc: {
             titel: "Find koncentrationen",
             status: {
                 maaler: "pH-metret måler pH.",
-                faerdig: "Begge koncentrationer står nu på kortet. Tryk på Ny opgave."
+                faerdig: "Begge koncentrationer står nu på etiketten ved glasset."
             }
         },
         staerk: {
             titel: "Stærke syrer og baser",
             status: {
                 maaler: "pH-metret måler pH.",
-                faerdig: "pH-metret viser {ph}. Dit svar passer. Tryk på Ny opgave."
+                faerdig: "pH-metret viser {ph}. Dit svar passer."
             }
         }
     };
@@ -108,11 +108,11 @@
                 "Etiketten ved stoffet viser [H₃O⁺], og dit svar bliver skrevet på den samme etiket.",
               sel: ["#ph-anker-etiket", "#ph-anker-glas"] },
             { tekst: "Regnevejen øverst viser, hvad du kender, og hvad du skal finde. " +
-                "Opgavekortet deler beregningen op i små trin, hvor du vælger formlen, taster udregningen på lommeregneren og skriver svaret. " +
+                "Kortet øverst i scenen deler beregningen op i små trin, hvor du vælger formlen, taster udregningen på lommeregneren og skriver svaret i panelet. " +
                 "Under det, du taster, viser lommeregneren, hvordan den har læst udtrykket.",
-              sel: ["#ph-anker-vej", "#ph-kort", "#regner"] },
+              sel: ["#ph-anker-vej", "#ph-skort", "#regner"] },
             { tekst: "Når svaret er rigtigt, måler pH-metret pH, så du kan se, at tallene passer. " +
-                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
+                "Knappen Giv hint på kortet øverst hjælper dig med det trin, du er i gang med.",
               sel: ["#ph-anker-meter", "#ph-knap"] }
         ],
         konc: [
@@ -123,10 +123,10 @@
             { tekst: "Først beregner du [H₃O⁺] ud fra pH, og derefter beregner du [OH⁻] ud fra [H₃O⁺]. " +
                 "Regnevejen øverst viser, hvor langt du er nået.",
               sel: "#konc-anker-vej" },
-            { tekst: "Opgavekortet deler hvert trin op. Du vælger formlen, taster udregningen på lommeregneren og skriver svaret. " +
+            { tekst: "Kortet øverst i scenen deler hvert trin op. Du vælger formlen, taster udregningen på lommeregneren og skriver svaret i panelet. " +
                 "En koncentration skriver du med tallet i det store felt og eksponenten i det lille felt. " +
-                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
-              sel: ["#konc-kort", "#regner"] }
+                "Knappen Giv hint på kortet øverst hjælper dig med det trin, du er i gang med.",
+              sel: ["#konc-skort", "#konc-kort", "#regner"] }
         ],
         staerk: [
             { tekst: "I denne fane beregner du pH i en opløsning af en stærk syre eller en stærk base. " +
@@ -136,10 +136,10 @@
             { tekst: "En stærk base kræver flere trin end en stærk syre, fordi du først skal beregne [OH⁻]. " +
                 "Regnevejen øverst viser, hvor langt du er nået frem mod pH.",
               sel: "#staerk-anker-vej" },
-            { tekst: "Opgavekortet deler beregningen op i små trin, og du taster udregningerne på lommeregneren. " +
+            { tekst: "Kortet øverst i scenen deler beregningen op i små trin, og du taster udregningerne på lommeregneren. " +
                 "Til sidst måler pH-metret pH i opløsningen. " +
-                "Knappen Giv hint på opgavekortet hjælper dig med det trin, du er i gang med.",
-              sel: ["#staerk-kort", "#regner", "#staerk-anker-meter"] }
+                "Knappen Giv hint på kortet øverst hjælper dig med det trin, du er i gang med.",
+              sel: ["#staerk-skort", "#regner", "#staerk-anker-meter"] }
         ]
     };
 

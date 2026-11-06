@@ -42,13 +42,13 @@ ligger fire fliser med fedtsyrerne. En flise trækkes hen på en OH-gruppe (et
 klik sætter den på den første ledige), og fedtsyrens OH og glycerolens H
 bliver til et vandmolekyle, der svæver væk. Et klik på en kæde tager den af
 igen (vand spalter bindingen), og en fedtsyre, der slippes på en optaget
-plads, bytter den ud. Panelet viser kunden og kortet "Dit fedtstof":
+plads, bytter den ud. Papirkortet øverst i scenen viser kunden, og panelet kortet "Dit fedtstof":
 smeltepunktet og om fedtet er fast, delvist fast eller flydende i fryseren
 (−18 °C), køleskabet (5 °C), på køkkenbordet (20 °C) og i solen (35 °C).
-Rækkerne, kunden stiller krav til, bliver grønne eller røde. Ordren tjekkes,
-så snart der sidder tre fedtsyrer; et forkert fedt giver et råd, der passer
-til fejlen ("Brug flere rette kæder"). Knappen: Giv hint, Vis svaret (bygger
-løsningen), Næste ordre. Under kortene står knappen Start forfra (samme som
+Rækkerne, kunden stiller krav til, bliver grønne eller røde. Ordren bedømmes,
+når eleven trykker Indsend svar; et forkert fedt giver et råd, der passer
+til fejlen ("Brug flere rette kæder"). Giv hint, Vis svaret (bygger
+løsningen), og efter et rigtigt svar Næste ordre. Under kortene står knappen Start forfra (samme som
 <kbd>R</kbd>): ordre 1 igen og en tom glycerol. De fem kunder: Fuglehuset (fast i solen),
 Salatbaren (flydende i køleskabet), Restauranten (flydende på bordet, stivner
 i køleskabet), Chokoladefabrikken (fast på bordet, smelter i solen) og
@@ -103,6 +103,35 @@ første gang i browseren), og ved det harske smør:
 Under præsentationen venter rosen, til han er færdig, og det harske smør
 bliver skiftet uden ham. Kaffekoppen på fane 1 er det fælles påskeæg.
 
+### Papirkortet (6. nov. 2026)
+
+Begge faner har ét lyst papirkort øverst i midten af scenen (`js/kort.js`,
+kopi af sc5.6's med en notelinje, og `../faelles/papirkort.css/js`).
+Opgavekortene i panelet og statuslinjen nederst er fjernet. Kortet har
+etiketten ("Ordre 2 af 5", "Opgave 3 af 7"), ordren eller spørgsmålet,
+svarene, en kort linje med næste skridt eller en besked fra scenen, hint
+(gul kant: Giv hint, Vis svaret), beskeden ved et forkert svar og Indsend svar
+(grå, til der er noget at sende).
+
+* Fabrikken: tre fedtsyrer på glycerol bedømmes ikke længere af sig selv.
+  Indsend svar sender fedtet; et forkert fedt får "Ikke endnu" og rådet.
+  Vis svaret bygger løsningen og leverer den (gul). Efter et rigtigt svar
+  bliver kortet på ordren med rosen, og Næste ordre står, hvor Indsend svar
+  stod. Panelet har Ordrer (fremskridtet), Dit fedtstof og Start forfra.
+* Køleskabet: svarene (fast, delvist fast, flydende og de fire på hvorfor)
+  vælger kun; Indsend svar sender. Glasset kan stadig sættes det rigtige
+  sted, og det tæller som svar. Et forkert gæt giver forklaringen i en rød
+  boks, et rigtigt i en grøn, og Næste opgave står samme sted. Panelet har
+  varedeklarationen og en ny knap Start forfra (samme som R).
+* Tegningen begynder under kortets plads (`D.ZONE` i `js/data.js`):
+  molekylet på fane 1, køleskabet, vinduet og zoomvinduet på fane 2. Tilbuddet
+  om præsentationen står nederst i scenen. På en smal skærm er scenen højere.
+* Præsentationen og rundvisningen peger på `#fabrik-skort`, `#koele-skort`,
+  `#fabrik-ordrer` og `#koele-forfra`.
+
+Molekylenavnene: animationen nævner ingen stoffer som O₂, H₂ eller N₂, så der
+var intet at rette (6. nov. 2026).
+
 Direkte link: `index.html#koele`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori · <kbd>H</kbd>
@@ -145,6 +174,7 @@ js/sim_fabrik.js    fane 1
 js/sim_koele.js     fane 2
 js/laerer.js        Kemichael på begge faner og det harske smør (præsentationen
                     er fælles: ../kemichael/praesentation.js og praesentation.css)
+js/kort.js          papirkortet øverst i scenen (NK.SceneKort)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -179,7 +209,10 @@ præsentation virker på begge faner (den fælles test i
 `../kemichael/praesentation.js`), at sproget holder reglerne, og at layoutet
 holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome
 med `--allow-file-access-from-files` og lægger elevens gemte fremskridt
-tilbage bagefter. Sidst kørt 4. november 2026: ALT OK (129 påstande).
+tilbage bagefter. Den tjekker også papirkortet (kortet i scenen, ingen
+statuslinje, Indsend svar grå uden valg, et valg bedømmer ikke af sig selv,
+kortet bliver på spørgsmålet med Næste, Start forfra i panelet, kortets plads
+i alle størrelser). Sidst kørt 6. november 2026: ALT OK.
 
 ## Forenklinger
 

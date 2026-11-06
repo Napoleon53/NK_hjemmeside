@@ -2,7 +2,7 @@
    app.js - binder de tre faner sammen (som sb2.1)
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres. Der er ingen laerer: hjaelpen staar i statuslinjen
+   fane opdateres. Der er ingen laerer: hjaelpen staar paa papirkortet
    nederst i scenen.
    ===================================================================== */
 (function () {

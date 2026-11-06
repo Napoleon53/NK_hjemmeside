@@ -23,7 +23,7 @@
             { sel: "#quizknap", titel: "Quizzen", tekst: "Seks spørgsmål om farver, spektre og chromoforer." }
         ],
         "fane-ko": [
-            { sel: "#ko-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Når du har svaret i scenen, trykker du Indsend svar. Giv et hint giver ét hint ad gangen." },
+            { sel: "#ko-skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Et gæt vælger du på kortet. Ellers løser du opgaven i scenen og trykker Indsend svar. Giv et hint giver ét hint ad gangen." },
             { sel: "#ko-anker-tavle", titel: "Molekylet", tekst: "Den gule skygge viser de konjugerede dobbeltbindinger. På fanen Tomaten kan du klikke på dobbeltbindingerne." },
             { sel: "#ko-anker-graf", titel: "Spektret", tekst: "Fra 150 nm. Til venstre for 400 nm er UV, som øjet ikke kan se. Kun en top i det synlige lys giver farve." },
             { sel: "#ko-anker-glas", titel: "Glasset", tekst: "Farven, regnet af spektret." },

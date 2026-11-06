@@ -59,6 +59,7 @@
     P.nytPar = function () {
         this.par = this.runde[this.nr];
         this.svar = null;
+        this.valgt = null;
         this.hjaelp = 0;
         this.visteSvar = false;
         this.taelT = 0;
@@ -74,18 +75,41 @@
         return b > a ? "h" : "v";
     };
 
+    /* Brugerens regel 24. okt. 2026: svarknapperne (og piletasterne)
+       vaelger kun. Svaret bedoemmes foerst med Indsend svar. Saa taeller
+       vaegtene, og kortet bliver paa spoergsmaalet med det valgte svar
+       groent (eller roedt og det rigtige groent) og forklaringen under
+       svarene (papirkortet, 6. nov. 2026). */
+    P.vaelg = function (s) {
+        if (this.slut || this.svar || !this.par) return;
+        if (["v", "l", "h"].indexOf(s) < 0) return;
+        this.valgt = s;
+        this.visPanel();
+    };
+
+    P.indsend = function () {
+        if (this.slut || this.svar || !this.par) { this.kort.blink(); return; }
+        if (!this.valgt) {
+            this.kort.blink();
+            this.kort.besked("Vælg først Venstre, Lige mange eller Højre på kortet.", "peger");
+            return;
+        }
+        this.vaelgSvar(this.valgt);
+    };
+
+    var ORD = { v: "Flest atomer til venstre", h: "Flest atomer til højre", l: "Lige mange atomer" };
+
+    /* Bedoemmer svaret s (efter Indsend svar eller Vis svaret) */
     P.vaelgSvar = function (s) {
         if (this.slut || this.svar || !this.par) return;
         this.svar = s;
+        this.valgt = s;
         var f = this.facit();
         var rigtigt = s === f && !this.visteSvar;
         this.rigtigt = rigtigt;
         if (rigtigt) { this.point++; this.stime++; } else { this.stime = 0; }
         this.taelT = 0;
         if (this.afvisTilbud) this.afvisTilbud();
-        var ord = { v: "flest atomer til venstre", h: "flest atomer til højre", l: "lige mange atomer" };
-        var start = this.visteSvar ? "Svaret: " + ord[f] + "." : (rigtigt ? "Rigtigt, " + ord[f] + "." : "Nej, " + ord[f] + ".");
-        this.besked("<b>" + start + "</b> " + NK.html(this.par.hvorfor), this.visteSvar ? "gul" : (rigtigt ? "god" : "skidt"));
         if (this.nr === this.runde.length - 1) this.afslut();
         this.visPanel();
     };
@@ -99,22 +123,23 @@
         this.slutVent = { t: 2.4, rekord: ny && this.point > 0 };
     };
 
-    P.knap = function () {
-        if (this.slut) { this.nyRunde(); return; }
-        if (this.svar) {
-            if (this.nr >= this.runde.length - 1) {
-                this.slut = true;
-                this.besked("<b>Runden er slut: " + this.point + " af " + this.runde.length + " rigtige.</b>", this.point >= 6 ? "god" : "");
-                this.visPanel();
-                return;
-            }
-            this.nr++;
-            this.nytPar();
+    /* Knappen, der foerer videre: Naeste par, Se resultatet */
+    P.videre = function () {
+        if (this.slut || !this.svar) return;
+        if (this.nr >= this.runde.length - 1) {
+            this.slut = true;
+            this.visPanel();
             return;
         }
+        this.nr++;
+        this.nytPar();
+    };
+
+    /* Giv hint, saa Vis svaret */
+    P.hint = function () {
+        if (this.slut || this.svar) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(D.PAR_NIVEAUER[this.par.niveau].hint), "gul");
             this.visPanel();
         } else {
             this.visteSvar = true;
@@ -122,67 +147,110 @@
         }
     };
 
+    /* Den gamle knap (selvtesten): videre, ellers hint. Efter runden: ny runde. */
+    P.knap = function () {
+        if (this.slut) { this.nyRunde(); return; }
+        if (this.svar) { this.videre(); return; }
+        this.hint();
+    };
+
     P.nulstil = function () { this.nyRunde(); };
 
-    /* ----- Panelet ---------------------------------------------------------- */
+    /* ----- Kortet og panelet ---------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("atomer-knap"),
-            besked: NK.el("atomer-besked"),
-            valg: document.querySelectorAll("#atomer-valg .valgknap")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
-        Array.prototype.forEach.call(this.el.valg, function (k) {
-            k.addEventListener("click", function () { mig.vaelgSvar(k.getAttribute("data-svar")); });
+        this.kort = new NK.SceneKort("atomer", {
+            valg: function (j) { mig.vaelg(j); },
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
         });
+        this.el = { besked: this.kort.beskedEl, knap: this.kort.hintEl, indsend: this.kort.indsendEl };
+        NK.el("atomer-nulstil").addEventListener("click", function () { mig.nyRunde(); });
     };
 
-    P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
-    };
+    /* Beskeden nulstilles ved et nyt par; resten styrer visKort */
+    P.besked = function () {};
 
     P.visPanel = function () {
-        var mig = this, f = this.par ? this.facit() : null;
         NK.saetTekst("atomer-point", String(this.point));
-        NK.saetTekst("atomer-nr", String(Math.min(this.nr + 1, this.runde.length)));
-        NK.saetTekst("atomer-antal", String(this.runde.length));
+        NK.saetTekst("atomer-par", Math.min(this.nr + 1, this.runde.length) + "/" + this.runde.length);
         NK.saetTekst("atomer-stime", String(this.stime));
         NK.saetTekst("atomer-rekord", String(this.rekord));
-        NK.saetTekst("atomer-niveau", this.par ? D.PAR_NIVEAUER[this.par.niveau].navn : "");
-        Array.prototype.forEach.call(this.el.valg, function (k) {
-            var s = k.getAttribute("data-svar");
-            k.disabled = !!mig.svar || mig.slut;
-            k.classList.toggle("rigtig", !!mig.svar && s === f);
-            k.classList.toggle("forkert", !!mig.svar && s === mig.svar && s !== f);
-        });
-        var tekst, klasse = "knap";
-        if (this.slut) { tekst = "Ny runde"; klasse = "knap blaa banker"; }
-        else if (this.svar) { tekst = this.nr >= this.runde.length - 1 ? "Se resultatet" : "Næste par →"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        NK.el("atomer-kort").classList.toggle("sejr", this.slut && this.point >= 6);
-        this.visStatus();
+        this.visKort();
     };
 
-    P.visStatus = function () {
+    P.visKort = function () {
+        var k = this.kort, mig = this;
+        if (this.slut) {
+            var tekst = "Du fik " + this.point + " af " + this.runde.length + " rigtige. Din rekord er " + this.rekord +
+                " rigtige. Knappen Ny runde i panelet giver ni nye par.";
+            k.vis({ kl: "loest", chip: "Runden er slut", tekst: NK.html(tekst) });
+            k.bliv(null);
+            k.besked("", "");
+            k.knapper({});
+            this.tjekZone();
+            return;
+        }
         if (!this.par) return;
-        if (this.svar) NK.saetHTML("atomer-status", "Vægtene tæller atomerne: <b>N = n · N<sub>A</sub></b>");
-        else NK.saetHTML("atomer-status", "Hvor er der flest atomer? Svar til højre, eller brug piletasterne.");
+        var f = this.facit();
+        var svar = [["v", "←", "Venstre"], ["l", "↓", "Lige mange"], ["h", "→", "Højre"]].map(function (r) {
+            var s = r[0], sendt = !!mig.svar;
+            return {
+                j: s, t: '<span class="pil">' + r[1] + "</span>" + r[2],
+                valgt: !sendt && mig.valgt === s,
+                rigtig: sendt && s === f && !mig.visteSvar,
+                svarVist: sendt && s === f && mig.visteSvar,
+                forkert: sendt && s === mig.svar && s !== f,
+                dim: sendt && s !== f && s !== mig.svar
+            };
+        });
+        k.vis({
+            kl: this.svar ? "loest" + (this.rigtigt ? "" : " svar") : "spm",
+            chip: "Par " + (this.nr + 1) + " af " + this.runde.length + " · " + D.PAR_NIVEAUER[this.par.niveau].navn,
+            tekst: NK.html("Skiltet på bordet viser de to prøver, og vægtene viser massen. Hvor er der flest atomer?"),
+            svar: svar,
+            laast: !!this.svar
+        });
+        if (this.svar) {
+            var knap = this.nr >= this.runde.length - 1 ? "Se resultatet →" : "Næste par →";
+            var forkl = NK.html(ORD[f] + ". " + this.par.hvorfor);
+            if (this.visteSvar) k.bliv(forkl, "Svaret", knap, "svar");
+            else if (this.rigtigt) k.bliv(forkl, "Rigtigt", knap, "god");
+            else k.bliv(forkl, "Ikke rigtigt", knap, "nej");
+        } else {
+            k.bliv(null);
+            if (this.hjaelp > 0) k.besked('<span class="b-maerke">Hint</span> ' + NK.html(D.PAR_NIVEAUER[this.par.niveau].hint), "gul");
+            else k.besked("", "");
+            k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: !!this.valgt,
+                indsendTekst: this.valgt ? "Indsend svar: " + { v: "Venstre", l: "Lige mange", h: "Højre" }[this.valgt] : "Indsend svar" });
+        }
+        this.tjekZone();
     };
 
-    /* Tastatur: pilene svarer */
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [132, 118];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
+    };
+
+    /* Tastatur: pilene vaelger */
     P.tast = function (key) {
         if (this.svar || this.slut) return false;
-        if (key === "ArrowLeft") { this.vaelgSvar("v"); return true; }
-        if (key === "ArrowRight") { this.vaelgSvar("h"); return true; }
-        if (key === "ArrowDown") { this.vaelgSvar("l"); return true; }
+        if (key === "ArrowLeft") { this.vaelg("v"); return true; }
+        if (key === "ArrowRight") { this.vaelg("h"); return true; }
+        if (key === "ArrowDown") { this.vaelg("l"); return true; }
         return false;
     };
 
-    P.enter = function () { if (this.svar || this.slut) this.knap(); };
+    /* Enter: Indsend svar, naar et svar er valgt, ellers videre */
+    P.enter = function () {
+        if (this.slut) return;
+        if (this.svar) { this.videre(); return; }
+        if (this.valgt) this.indsend();
+        else this.kort.blink();
+    };
     P.fokus = function () {};
 
     /* ----- Layout --------------------------------------------------------------- */
@@ -192,7 +260,9 @@
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
         var pb = NK.klamp(W * 0.3, 150, 300);
-        lay.plakat = { x: kant, y: kant, b: pb, h: Math.round(pb * 0.4) };
+        /* Plakaten begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.plakat = { x: kant, y: lay.zone, b: pb, h: Math.round(pb * 0.4) };
         /* Bordet staar lidt hoejt, saa skiltet med beregningerne kan sidde paa forsiden */
         lay.bordY = Math.round(H - NK.klamp(H * 0.2, 70, 150));
         var vb = NK.klamp(Math.min(W * 0.34, (lay.bordY - lay.plakat.y - lay.plakat.h) * 0.75), 130, 320);
@@ -221,6 +291,7 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* ----- Tegneloekken ------------------------------------------------------ */
@@ -405,20 +476,10 @@
             var pt = mig.L.punkt(e);
             if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
-            var p = mig.lay && mig.lay.plakat;
-            if (p && pt.x >= p.x && pt.x <= p.x + p.b && pt.y >= p.y && pt.y <= p.y + p.h) {
-                NK.saetHTML("atomer-status", "1 mol er 6,02 · 10²³ atomer, uanset hvilket stof det er.");
-                return;
-            }
-            /* Et klik paa en vaegt foer svaret: svarknapperne blinker. Det
-               er ikke et svar, for saa kunne man ikke svare lige mange. */
-            if (!mig.svar && !mig.slut && mig.overVaegt(pt) >= 0) {
-                var v = NK.el("atomer-valg");
-                v.classList.remove("blink");
-                void v.offsetWidth;
-                v.classList.add("blink");
-                NK.saetHTML("atomer-status", "Svar med knapperne til højre: venstre, lige mange eller højre.");
-            }
+            /* Foer svaret er sendt, er vaegtene laast: et klik i scenen faar
+               kortet til at blinke. Et klik paa en vaegt er ikke et svar,
+               for saa kunne man ikke svare lige mange. */
+            if (!mig.svar && !mig.slut) mig.kort.blink();
         });
     };
 

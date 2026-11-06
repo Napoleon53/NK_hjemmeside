@@ -23,7 +23,8 @@
         "fane-byg": [
             { sel: "#byg-panel-partikler", titel: "Tilføj elementarpartikler", tekst: "Læg protoner, neutroner og elektroner i én ad gangen, og se hvad hvert tal styrer." },
             { sel: "#fane-byg .pertabel-boks", titel: "Det periodiske system", tekst: "Viser, hvor dit atom hører hjemme. Tryk på et felt for at springe direkte til det grundstof." },
-            { sel: "#opgave-boks", titel: "Opgaven", tekst: "Få en opgave, du selv skal bygge. Knappen giver først et hint og derefter svaret, hvis du går i stå." },
+            { sel: "#byg-skort", titel: "Opgavekortet", tekst: "Kortet øverst giver en opgave ad gangen. Byg atomet med knapperne i panelet, og tryk Indsend svar. Giv et hint viser atomsymbolet og derefter svaret." },
+            { sel: "#opgave-boks", titel: "Opgaverne", tekst: "Her står, hvor mange opgaver du har løst selv. Start forfra begynder runden forfra." },
             { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Massetal, atomnummer, symbol og ladning — skrevet på samme måde som i kemibogen." },
             { sel: "#byg-nulstil", titel: "Genstart", tekst: "Nulstil til det simpleste atom: én proton og én elektron." },
             { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, salte og et afsluttende quizspil bygger videre på det samme." }
@@ -41,7 +42,7 @@
         ],
         "fane-spil": [
             { sel: "#spil-panel-baner", titel: "Baner", tekst: "Tre baner med fem spørgsmål hver. Du kan frit hoppe mellem dem." },
-            { sel: "#spil-boks", titel: "Spørgsmålet", tekst: "Svar, og få begrundelsen med — også når du rammer rigtigt." },
+            { sel: "#spil-skort", titel: "Spørgsmålet", tekst: "Vælg et svar på kortet, og tryk Indsend svar. Begrundelsen står under svarene, også når svaret er rigtigt." },
             { sel: "#spil-pertabel-knap", titel: "Periodisk system", tekst: "Slå op, hvis du er i tvivl om et atomnummer." }
         ]
     };

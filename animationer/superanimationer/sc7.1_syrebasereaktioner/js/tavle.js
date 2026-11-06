@@ -16,11 +16,12 @@
 
     var Tv = {};
 
-    Tv.layout = function (W, H) {
+    /* zone: den plads, papirkortet har oeverst i scenen; tavlen begynder under den */
+    Tv.layout = function (W, H, zone) {
         var lay = { W: W, H: H };
         lay.kant = NK.klamp(W * 0.02, 10, 22);
         var bund = NK.klamp(H * 0.1, 36, 64);
-        var R = { x: lay.kant + NK.klamp(W * 0.025, 6, 26), y: NK.klamp(H * 0.04, 14, 30) };
+        var R = { x: lay.kant + NK.klamp(W * 0.025, 6, 26), y: zone ? 10 + zone + 8 : NK.klamp(H * 0.04, 14, 30) };
         R.b = W - 2 * R.x;
         R.h = H - R.y - bund - 16;
         lay.R = R;

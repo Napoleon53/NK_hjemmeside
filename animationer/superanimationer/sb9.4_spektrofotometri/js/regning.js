@@ -18,7 +18,8 @@
    NK.TalFelter: kun resultater, én raekke pr. tal (standard 3 til 6,
    spildevandet, de to farvestoffer). Hvert felt tjekkes for sig.
 
-   Begge faar en spec af fanen og melder tilbage med
+   Felterne staar i panelet; Indsend svar paa papirkortet (og Enter)
+   kalder tjek(). Begge faar en spec af fanen og melder tilbage med
    fane.delOk(tekst), fane.fejl(tekst) og fane.regnLoest(...).
    ===================================================================== */
 (function () {
@@ -123,9 +124,7 @@
             h += "</div>";
         }
         h += "</div>";
-        if (this.fase !== "faerdig" && (this.fase !== "formel" || this.sk)) {
-            h += '<div class="regn-knapper"><button type="button" class="knap blaa tjek">Tjek ' + (this.fase === "formel" ? "formlen" : (this.fase === "tal" ? "tallene" : "resultatet")) + "</button></div>";
-        }
+        /* Ingen Tjek-knap her: Indsend svar staar paa papirkortet i scenen (6. nov. 2026) */
         this.boks.innerHTML = h;
         this.bindEl();
     };
@@ -141,6 +140,7 @@
             inp.addEventListener("input", function () {
                 mig.bogst[parseInt(inp.getAttribute("data-i"), 10)] = inp.value;
                 inp.classList.remove("forkert");
+                if (mig.fane.visIndsend) mig.fane.visIndsend();
             });
         });
         Array.prototype.forEach.call(b.querySelectorAll(".tal-felt"), function (inp) {
@@ -148,6 +148,7 @@
                 if (inp.classList.contains("res-felt")) mig.res = inp.value;
                 else mig.tal[parseInt(inp.getAttribute("data-i"), 10)] = inp.value;
                 inp.classList.remove("forkert");
+                if (mig.fane.visIndsend) mig.fane.visIndsend();
             });
         });
         var tj = b.querySelector(".tjek");
@@ -349,12 +350,12 @@
             h += "</div>";
         });
         h += "</div>";
-        if (!this.faerdig()) h += '<div class="regn-knapper"><button type="button" class="knap blaa tjek">Tjek</button></div>';
         this.boks.innerHTML = h;
         Array.prototype.forEach.call(this.boks.querySelectorAll(".tal-felt"), function (inp) {
             inp.addEventListener("input", function () {
                 mig.vaerdi[parseInt(inp.getAttribute("data-i"), 10)] = inp.value;
                 inp.classList.remove("forkert");
+                if (mig.fane.visIndsend) mig.fane.visIndsend();
             });
         });
         var tj = this.boks.querySelector(".tjek");

@@ -56,16 +56,18 @@ ballonen fyldes (mere, jo varmere gassen er). Første gang et stof koger eller
 fortætter, kommer kogepunktet på kurven i panelet, og termometeret får et
 mærke (også for smeltepunktet). Fire mål: få pentan til at koge, find tre
 andre kogepunkter, gæt decans kogepunkt ved at trække et ? på kurven og mål
-det, og kog icosan. Knappen giver et hint og derefter svaret.
+det, og kog icosan. Eleven trykker Indsend svar på papirkortet, når målet er
+nået; termometeret løser aldrig et mål af sig selv.
 
 **Formen.** Pentan, 2-methylbutan og 2,2-dimethylpropan står i hver sit glas
 i et lavt vandbad, hvert med sit store zoomvindue over sig og sin ballon i hver
-sin farve. Varmt vand får små varmebølger over sig. Eleven gætter først (i
-panelet eller ved at klikke på et glas) og varmer så vandbadet fra 0 til 50 °C
+sin farve. Varmt vand får små varmebølger over sig. Eleven gætter først (på
+papirkortet eller ved at klikke på et glas, og så Indsend svar) og varmer så vandbadet fra 0 til 50 °C
 med termometeret. Ballonerne fyldes i rækkefølgen 9,5, 27,9 og 36,1 °C. Så
 kommer spørgsmålet hvorfor. De forkerte svar er de typiske fejl: færre atomer,
-lettere og "bindingerne inde i molekylet er svagest". Til sidst går knappen
-videre til fane 3; <kbd>R</kbd> starter forsøget forfra.
+lettere og "bindingerne inde i molekylet er svagest". Til sidst går knappen på
+kortet videre til fane 3; Forsøget forfra i panelet og <kbd>R</kbd> starter
+forfra.
 
 Parrene er en valgfri boks bag knappen "Se, hvor molekylerne rører hinanden"
 under kogepunkterne: to molekyler af hvert stof, lagt så tæt sammen, som de
@@ -74,8 +76,8 @@ syntes, at "berøringer" midt i scenen var for indforstået (24. september
 2026).
 
 **Hvem koger først?** En blanding af to eller tre alkaner i kammeret,
-molekylerne i hver sin farve. Eleven gætter i panelet eller ved at klikke på
-et molekyle. Så varmer kammeret op til midt mellem de to laveste kogepunkter,
+molekylerne i hver sin farve. Eleven vælger på papirkortet eller ved at klikke på
+et molekyle og trykker Indsend svar. Så varmer kammeret op til midt mellem de to laveste kogepunkter,
 og det første stof koger væk og fylder ballonen. Tre niveauer: *Kædelængde*,
 *Formen* (kun C₅H₁₂) og *Begge dele*, hvor en forgrenet med flere C-atomer
 står mod en kortere lige kæde (butan mod 2,2-dimethylpropan). En runde er ni
@@ -121,6 +123,23 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>↑</kbd> <kbd>↓</kbd> temperaturen (med Skift ti grader) · <kbd>P</kbd>
 pause · <kbd>R</kbd> nyt glas, forfra eller ny runde · <kbd>Enter</kbd> næste
 · <kbd>Esc</kbd> luk eller send Kemichael ud.
+
+### Papirkortet (6. nov. 2026)
+
+Alle tre faner har det lyse papirkort øverst i scenen (`js/skort.js`, fælles
+`../faelles/papirkort.css` og `papirkort.js`): målet eller spørgsmålet, svarene,
+hint (gul kant: Giv et hint, Vis svaret), beskeden ved forkert svar og
+forklaringen. Svar og klik i scenen vælger kun; **Indsend svar** sender (grå,
+til der er noget at sende). Efter et rigtigt svar bliver kortet stående med
+forklaringen, og Næste står, hvor Indsend svar stod. Start forfra står aldrig
+på kortet, men i panelet (Start målene forfra, Forsøget forfra, Ny runde).
+Statuslinjen nederst er væk. Under gættet og spørgsmålet på fane 2 og 3 er
+termometeret låst, og et klik på det får kortet til at blinke.
+
+Lærredet giver plads øverst efter `D.ZONE` (almindelig og lav skærm).
+På en lav scene (under 560 px, fx en smal skærm) står kortet på fane 1 til
+højre for reolen, så reolen kan begynde helt oppe. Selvtesten måler det
+højeste kort i hver fane mod zonen ved 1400 × 860 og 1100 × 700.
 
 ### Det nye i forhold til den gamle animation
 

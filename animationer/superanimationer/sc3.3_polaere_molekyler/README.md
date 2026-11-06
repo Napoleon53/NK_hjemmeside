@@ -31,8 +31,8 @@ moduler og virker derfor også, når den åbnes direkte fra harddisken.
 | 2 | Polær eller upolær? | ser trækket i hver polær binding og det samlede træk i 11 molekyler | et molekyle med polære bindinger kan være upolært, hvis det er symmetrisk |
 | 3 | Forsøg: vandstrålen | lader en stav og holder den ved en stråle af vand, ethanol og heptan | polære væsker bøjer mod staven, uanset om den er positiv eller negativ |
 
-Alle faner har et opgavekort med én knap: Start opgave → Giv hint → Vis svaret →
-Ny opgave. På fane 3 er opgaverne låst, til skemaet er udfyldt. Teorien ligger bag
+Alle faner har opgaverne på papirkortet øverst i scenen (se "Papirkortet" nedenfor).
+På fane 3 er opgaverne låst, til skemaet er udfyldt. Teorien ligger bag
 knappen **Teori**, og **?** starter en rundvisning for den aktive fane.
 
 Der er ingen præsentation og ingen Kemichael (brugerens ønske 27. sept. 2026).
@@ -112,7 +112,7 @@ js/sprites.js         indlæser sprites/*.svg
 js/frastoedning.js    placerer de frie elektronpar (samme som sc3.2)
 js/model3d.js         kameraet og tegningen af molekylerne; pilene
 js/prikformel.js      prikformlen i hjørnet på fane 2
-js/opgave.js          opgavekortet med én knap
+js/opgave.js          papirkortet med opgaverne (samme som sc3.2)
 js/valg.js            det valgte molekyle på fane 2
 js/sim_en.js          fane 1: tovtrækningen, tabellen og opgaverne
 js/molsim.js          NK.MolSim: et molekyle i 3D (fra sc3.2 uden vinkelmåler)
@@ -156,3 +156,22 @@ Når brugeren siger til, skiftes linjen for c3.3 i `kemi-c-filer/samling_c3.html
 (og `samling_NV.html`, hvis den har den) til
 `../superanimationer/sc3.3_polaere_molekyler/index.html` med titlen
 "Polære molekyler".
+
+## Papirkortet (6. nov. 2026)
+
+Opgaverne står på ét lyst papirkort øverst i midten af scenen
+(`../faelles/papirkort.css` og `papirkort.js`, `js/opgave.js`, samme kode som
+sc3.2), ikke i panelet. Et svar, et atom eller et atompar vælges kun; **Indsend
+svar** sender ind og er grå, til der er noget at sende. Det valgte atom får en gul
+ring. **Giv et hint** er en stille knap med gul kant (Giv et hint, Vis svaret). Efter
+et rigtigt svar bliver kortet på opgaven med det grønne svar, forklaringen og
+**Næste opgave**; efter fanens sidste opgave fører knappen videre til næste fane.
+Fane 1 og 2 har seks opgaver, fane 3 fire. Under et spørgsmål er tabellen, menuen
+og forsøget låst, og et klik får kortet til at blinke. På fane 3 står forsøgets
+næste skridt på kortet (linjen over skemaet er væk), og Start opgave 1 kommer
+frem, når skemaet er udfyldt. Statuslinjen nederst i scenen er væk; korte
+beskeder står i kortets nederste række. Svarmulighederne er kortet ned til højst
+ca. 34 tegn. Selvtesten (afsnit 7) måler kortet i 1400x860 og 1100x700.
+
+Molekylenavnene (6. nov. 2026): ingen ændringer; oxygen, hydrogen, chlor osv.
+står kun om atomer og elektronegativitet.

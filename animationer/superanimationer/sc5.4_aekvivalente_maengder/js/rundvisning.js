@@ -21,7 +21,7 @@
             { sel: "#hotdog-anker-beholdere", titel: "Beholderne", tekst: "Træk en ting hen på brættet. Et klik virker også." },
             { sel: "#hotdog-anker-braet", titel: "Skærebrættet", tekst: "Plads til 12 af hver ting. Klik på en ting for at lægge den tilbage." },
             { sel: "#hotdog-anker-klokke", titel: "Klokken", tekst: "Ring, når brættet er klar. Så samles retterne efter opskriften, og overskuddet bliver liggende." },
-            { sel: "#hotdog-kort", titel: "Ordren", tekst: "Knappen giver et hint og derefter svaret." },
+            { sel: "#hotdog-skort", titel: "Ordren", tekst: "Ordren og spørgsmålene. Indsend svar sender dit svar. Giv hint giver et hint og derefter svaret." },
             { sel: "#hotdog-ordrer", titel: "Ordrerne", tekst: "Seks med hotdogs og fire med dobbeltburgere. Klik for at springe til dem, eller vælg frit." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Ækvivalente mængder kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Molekylerne: samme slags opskrift med molekyler og mol. Tavlen: regn stofmængderne ud." }
@@ -32,13 +32,13 @@
             { sel: "#molekyler-anker-kasser", titel: "Kasserne", tekst: "Træk en figur ind i kammeret. Et klik på kassen virker også." },
             { sel: "#molekyler-anker-kammer", titel: "Kammeret", tekst: "Tryk på Start. Figurerne reagerer i hele sæt efter skemaet. Overskuddet får en orange ring." },
             { sel: "#molekyler-maaling", titel: "I kammeret", tekst: "Hvor meget der er af hvert stof før og efter reaktionen." },
-            { sel: "#molekyler-kort", titel: "Målene", tekst: "Fem mål. Knappen giver et hint og derefter svaret." }
+            { sel: "#molekyler-skort", titel: "Målene", tekst: "Fem mål. Indsend svar sender kammeret ind. Giv hint giver et hint og derefter svaret." }
         ],
         "fane-regn": [
             { sel: "#regn-anker-skema", titel: "Skemaet", tekst: "På Svær skriver du selv koefficienterne først." },
             { sel: "#regn-anker-soejler", titel: "Søjlerne", tekst: "De stiplede blokke er koefficienterne. Den grønne søjle er den kendte stofmængde. Et rigtigt svar fylder netop sine blokke." },
-            { sel: "#regn-felter", titel: "Felterne", tekst: "Skriv stofmængden i mol under hver formel, og tryk Enter." },
-            { sel: "#regn-kort", titel: "Opgaven", tekst: "Knappen giver et hint og derefter svaret." },
+            { sel: "#regn-felter", titel: "Felterne", tekst: "Skriv stofmængden i mol under hver formel, og tryk Enter eller Indsend svar." },
+            { sel: "#regn-skort", titel: "Opgaven", tekst: "Indsend svar eller Enter sender feltet ind. Giv hint giver et hint og derefter svaret." },
             { sel: "#regn-beregninger", titel: "Beregningerne", tekst: "Når et svar er rigtigt, står beregningen her, som den skal skrives." },
             { sel: "#regn-fremskridt", titel: "Opgaverne", tekst: "En opgave, du løser uden at se svaret, får en stjerne. Klik på et niveau for at tage dets næste opgave." }
         ]

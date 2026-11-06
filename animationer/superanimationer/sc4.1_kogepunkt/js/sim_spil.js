@@ -3,7 +3,7 @@
 
    Et glas med en blanding af to eller tre alkaner staar i kammeret, og
    zoomvinduet viser molekylerne i hver sin farve. Eleven gaetter, hvilket
-   stof der koger foerst (i panelet eller ved at klikke paa et molekyle).
+   stof der koger foerst (paa papirkortet eller ved at klikke paa et molekyle).
    Saa varmer kammeret op til midt mellem de to laveste kogepunkter, og
    det stof, der koger foerst, forlader vaesken og fylder ballonen.
 
@@ -88,7 +88,7 @@
         this.termo.animerTil(this.b.maal, D.OPVARMNING);
         this.termo.laast = true;
         if (this.afvisTilbud) this.afvisTilbud();
-        this.besked("Dit gæt: <b>" + NK.html(this.b.st[k].navn) + "</b>. Kammeret varmer op.", "");
+        this.besked("Dit svar: <b>" + NK.html(this.b.st[k].navn) + "</b>. Kammeret varmer op.", "");
         this.visOpgave();
     };
 
@@ -109,14 +109,17 @@
             this.stime = 0;
         }
         var tekst;
+        this.rigtig = rigtig;
         if (rigtig) {
-            tekst = "<b>" + (this.sete ? "Sådan." : "Rigtigt.") + "</b> " + NK.html(b.foerst.Navn) + " koger ved " + D.gradTekst(b.foerst.kp) +
+            tekst = NK.html(b.foerst.Navn) + " koger ved " + D.gradTekst(b.foerst.kp) +
                 ", " + NK.html(naeste.navn) + " først ved " + D.gradTekst(naeste.kp) + ". " + NK.html(D.hvorfor(b.foerst, naeste));
         } else {
-            tekst = "<b>Nej.</b> " + NK.html(b.foerst.Navn) + " koger først, ved " + D.gradTekst(b.foerst.kp) + ". " +
+            tekst = NK.html(b.foerst.Navn) + " koger først, ved " + D.gradTekst(b.foerst.kp) + ". " +
                 NK.html(valgt.Navn) + " koger ved " + D.gradTekst(valgt.kp) + ". " + NK.html(D.hvorfor(b.foerst, valgt));
         }
-        this.besked(tekst, rigtig ? "god" : "skidt");
+        if (this.nr === this.runde.length - 1) tekst += " Runden er slut. Knappen Ny runde i panelet starter en ny runde.";
+        this.forklaring = tekst;
+        this.besked("", "");
         if (this.nr === this.runde.length - 1) this.rundeSlut();
         this.visOpgave();
         this.visRunde();
@@ -141,7 +144,7 @@
         if (this.fase !== "gaet") return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(D.SPIL_NIVEAUER[this.b.niveau].hint), "gul");
+            this.skort.hintTekst(NK.html(D.SPIL_NIVEAUER[this.b.niveau].hint), 1, 1);
             this.visOpgave();
             return;
         }
@@ -155,8 +158,21 @@
     };
 
     P.enter = function () {
-        if (this.fase === "svar") this.knap();
+        if (this.fase === "svar") { if (!this.slut) this.knap(); }
+        else this.kortIndsend();
     };
+
+    /* Papirkortets knapper (js/skort.js): et svar vaelger kun, Indsend sender */
+    P.kortValg = function (k) {
+        if (this.fase !== "gaet") return;
+        this.valgt = k;
+        this.visOpgave();
+    };
+    P.kortIndsend = function () {
+        if (this.fase === "gaet" && this.valgt !== null) this.svar(this.valgt);
+    };
+    P.kortHint = function () { if (this.fase === "gaet") this.knap(); };
+    P.kortVidere = function () { if (this.fase === "svar" && !this.slut) this.knap(); };
 
     P.fokus = function () {};
 
@@ -165,72 +181,55 @@
         return this.termo.tast(tast, e && e.shiftKey);
     };
 
-    /* ----- Panelet ---------------------------------------------------------------------- */
+    /* ----- Panelet og kortet ------------------------------------------------------ */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("spil-knap"),
-            besked: NK.el("spil-besked"),
-            kort: NK.el("spil-kort"),
-            valg: NK.el("spil-valg")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.skort = new NK.Skort("spil", this, D.ZONE.spil);
+        this.el = { besked: NK.el("spil-besked") };
         NK.el("spil-nulstil").addEventListener("click", function () { mig.nyRunde(); });
-        this.el.valg.addEventListener("click", function (e) {
-            var b = e.target.closest ? e.target.closest("button") : null;
-            if (!b || b.disabled) return;
-            mig.svar(parseInt(b.getAttribute("data-nr"), 10));
-        });
     };
 
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        if (this.skort) this.skort.besked(html, klasse);
+    };
+
+    /* Kortet oeverst i scenen */
+    P.kortData = function () {
+        var mig = this, b = this.b;
+        var d = {
+            chip: "Blanding " + (this.nr + 1) + " af " + this.runde.length + ": " + D.SPIL_NIVEAUER[b.niveau].navn,
+            tekst: "Glasset indeholder en blanding. Hvilket stof koger først?"
+        };
+        d.svar = b.st.map(function (st, k) {
+            var kl = "";
+            if (mig.fase === "svar") {
+                if (st === b.foerst) kl = mig.rigtig && !mig.sete ? "rigtig" : "svar-vist";
+                else if (k === mig.valgt) kl = "forkert";
+                else kl = "dim";
+            } else if (k === mig.valgt) kl = "valgt";
+            return { t: st.navn, prik: D.SPIL_FARVER[k], formel: D.formel(st), kl: kl, laast: mig.fase !== "gaet" };
+        });
+        if (this.fase === "svar") {
+            var god = this.rigtig && !this.sete;
+            d.bliv = { html: this.forklaring || "", maerke: god ? "Rigtigt" : (this.sete ? "Svaret" : "Ikke rigtigt"),
+                       knap: this.slut ? null : "Næste blanding →", gul: !god };
+            return d;
+        }
+        if (this.fase === "gaet") {
+            d.hint = this.hjaelp === 0 ? "Giv et hint" : "Vis svaret";
+            d.indsend = { tekst: "Indsend svar", klar: this.valgt !== null };
+        }
+        return d;
     };
 
     P.visOpgave = function () {
-        var mig = this, b = this.b;
-        NK.saetTekst("spil-niveau", D.SPIL_NIVEAUER[b.niveau].navn);
-        NK.saetTekst("spil-nr", String(this.nr + 1));
-        NK.saetTekst("spil-antal", String(this.runde.length));
-        var html = b.st.map(function (st, k) {
-            var klasse = "valglinje";
-            if (mig.fase === "svar") {
-                if (st === b.foerst) klasse += " rigtig";
-                else if (k === mig.valgt) klasse += " forkert";
-            } else if (k === mig.valgt) klasse += " valgt";
-            return '<button class="' + klasse + '" type="button" data-nr="' + k + '"' + (mig.fase !== "gaet" ? " disabled" : "") + ">" +
-                '<span class="prik" style="background:' + D.SPIL_FARVER[k] + '"></span>' +
-                '<span class="vl-navn">' + NK.html(st.navn) + "</span>" +
-                '<span class="vl-formel">' + D.formel(st) + "</span></button>";
-        }).join("");
-        NK.saetHTML("spil-valg", html);
-        var tekst, klasse = "knap";
-        if (this.fase === "svar") {
-            tekst = this.slut ? "Ny runde ↺" : "Næste blanding →";
-            klasse = "knap blaa banker";
-        } else if (this.fase === "varmer") tekst = "Kammeret varmer op …";
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = this.fase === "varmer";
-        this.el.kort.classList.toggle("sejr", this.fase === "svar" && this.b.st[this.valgt] === b.foerst && !this.sete);
+        if (this.skort) this.skort.vis();
     };
 
     P.visRunde = function () {
         NK.saetTekst("spil-point", String(this.point));
         NK.saetTekst("spil-stime", String(this.stime));
         NK.saetTekst("spil-rekord", String(this.rekord));
-    };
-
-    P.visStatus = function () {
-        var t, tr = this.traek;
-        if (tr && tr.slags === "termo") t = "Kammeret er " + D.gradTekst(this.termo.T, 0) + ".";
-        else if (this.fase === "gaet") t = "Hvem koger først? Svar i panelet, eller klik på et af molekylerne.";
-        else if (this.fase === "varmer") t = "Kammeret varmer op: " + D.gradTekst(this.termo.T, 0) + ".";
-        else t = this.slut ? "Runden er slut. Træk i termometeret for at koge resten." :
-            "Træk i termometeret for at koge resten, eller gå videre i panelet.";
-        NK.saetHTML("spil-status", t);
     };
 
     /* ----- Layout ------------------------------------------------------------------
@@ -289,7 +288,7 @@
         this.tjekKogt();
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
-        this.visStatus();
+        this.skort.opdater(dt);
     };
 
     P.tegn = function () {
@@ -390,10 +389,12 @@
             if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
             var u = mig.hvadErUnder(pt);
             if (!u) {
-                if (mig.termo.laast && mig.termo.rammer(pt, mig.lay.termo)) mig.besked("Kammeret varmer op af sig selv lige nu.", "");
+                if (mig.termo.laast && mig.termo.rammer(pt, mig.lay.termo)) mig.skort.kort("Kammeret varmer op af sig selv lige nu.", 4);
                 return;
             }
             if (u.slags === "termo") {
+                /* Under spoergsmaalet er forsoeget laast */
+                if (mig.fase === "gaet") { mig.skort.blink(); return; }
                 if (mig.termo.start(pt, mig.lay.termo)) {
                     mig.traek = { slags: "termo" };
                     try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
@@ -404,15 +405,16 @@
             if (u.slags === "kop") { if (mig.klikKop) mig.klikKop(); return; }
             if (u.slags === "pause") { mig.proeve.pause = !mig.proeve.pause; return; }
             if (u.slags === "molekyle") {
-                if (mig.fase === "gaet") mig.svar(u.k);
+                if (mig.fase === "gaet") mig.kortValg(u.k);
                 else {
                     var st = mig.b.st[u.k];
-                    mig.besked(NK.html(st.Navn + ", " + D.formel(st) + ", koger ved " + D.gradTekst(st.kp) + "."), "");
+                    mig.skort.kort(NK.html(st.Navn) + ", " + D.formel(st) + ", koger ved " + D.gradTekst(st.kp) + ".", 5);
                 }
                 return;
             }
             if (u.slags === "kammer") {
-                mig.besked(mig.fase === "gaet" ? "Kammeret varmer op, når du har gættet i panelet." : "Kammeret har den temperatur, termometeret viser.", "");
+                if (mig.fase === "gaet") mig.skort.blink();
+                else mig.skort.kort("Kammeret har den temperatur, termometeret viser.", 4);
             }
         });
         c.addEventListener("pointermove", function (e) {

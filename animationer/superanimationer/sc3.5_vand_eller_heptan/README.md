@@ -93,11 +93,41 @@ facit. En runde er ti stoffer, fem af hver slags; de seks nye er altid med. Knap
 Giv hint (markerer alle polære grupper og siger tommelfingerreglen), Vis svaret,
 Næste stof. Rekorden huskes.
 
-**Kortet og tekstboksen.** Kortet har navnet foroven, formlen og tekstboksen.
-Tekstboksen står under formlen, eller til højre for den, når kortet er bredt og
-lavt; søjlen på fane 2 viger, når der ikke er plads (tallene står også i
-tekstboksen). Bliver formlen for lille på et bredt layout, bruges det smalle med
-kortet foroven (`beregnLayout` og `kortDele` i `js/bord.js`).
+**Kortet med formlen og papirkortet.** Kortet på væggen har navnet foroven og
+formlen, på fane 2 også søjlen (den viger, når der ikke er plads). Spørgsmålene
+og svarene står på papirkortet øverst i scenen (se "Papirkortet" nedenfor).
+Bliver formlen for lille på et bredt layout, bruges det smalle med kortet
+foroven (`beregnLayout` og `kortDele` i `js/bord.js`).
+
+### Papirkortet (6. nov. 2026)
+
+Opgaven, spørgsmålet, svarknapperne, hint, fejl og forklaring står på ét lyst
+papirkort øverst i midten af scenen på begge faner (`../faelles/papirkort.css`
+og `papirkort.js`; delene styres af `js/tekstboks.js`). Tekstboksen under
+formlen og linjen nederst er væk, og alt på tegningen begynder under
+`kortZone()` i `js/bord.js` (166 px, 140 px på lave skærme, mere på smalle).
+
+* **Indsend svar** er hovedknappen. Et klik på Polært, Upolært, Vand, Heptan
+  eller Ingen polære grupper vælger kun svaret, og Indsend svar er grå, til der
+  er valgt noget. De polære grupper markeres i formlen (et nyt klik fjerner
+  markeringen) og bedømmes først ved Indsend svar; mangler der grupper, siger
+  kortet hvor mange, i rødt. Enter er Indsend svar eller Næste, og ← → vælger
+  kun på fane 2.
+* **Giv et hint** er den stille knap med gul kant: hint, derefter Vis svaret.
+* **Efter et rigtigt svar** bliver kortet på spørgsmålet: det valgte svar er
+  grønt, forklaringen står under svarene, og Næste (Test stofferne, Næste stof,
+  Se resultatet) står, hvor Indsend svar stod. Det næste spørgsmål har ingen ros.
+* Et klik på glassene eller prøven under et spørgsmål tilsætter intet, og
+  kortet blinker blødt.
+* **Start forfra** (fane 1) og **Ny runde** (fane 2) ligger i panelet, aldrig på
+  kortet. Etiketten ("Spørgsmål 1 af 3", "Stof 1 af 10") er kortets chip.
+* Kemichaels præsentation og rundvisningen peger på papirkortet og nævner
+  Indsend svar og Giv et hint.
+
+Molekylenavne (6. nov. 2026): stoffet I₂ hedder **diiod** i skemaet, på
+etiketten og i alle tekster om stoffet ("Diiod opløses i heptan"). "Oxygen
+trækker elektronerne til sig" og "Heptan består kun af carbon og hydrogen"
+handler om grundstofferne og bliver.
 
 **Kemichael** tilbyder at præsentere hver fane (Start præsentation / Nej tak).
 Præsentationen er den fælles (`../kemichael/praesentation.js`, se
@@ -125,7 +155,7 @@ efter en svag runde er fjernet.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>↑</kbd> <kbd>↓</kbd> stof og
 <kbd>mellemrum</kbd> ryst (fane 1) · <kbd>←</kbd> polært eller vandglasset,
-<kbd>→</kbd> upolært eller heptanglasset (fane 2) · <kbd>Enter</kbd> Næste · <kbd>R</kbd> nye glas eller ny runde ·
+<kbd>→</kbd> upolært eller heptanglasset (fane 2) · <kbd>Enter</kbd> Indsend svar eller Næste · <kbd>R</kbd> nye glas eller ny runde ·
 <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd> præsentation ·
 <kbd>Esc</kbd> luk.
 
@@ -239,10 +269,13 @@ gruppen, svaret, glasset, der ikke passer, hintet og en hel runde, at
 Kemichael kun kommer ind af sig selv, når en hel fane er klaret, eller ved
 påskeægget, præsentationen på begge faner (den fælles test
 `NK.Praesentation.selvtest`), sproget (hver tekst nævner selv stoffet) og
-layoutet fra 390 × 844 til 1500 × 900, også at hver tekst kan være i
-tekstboksen. 152 kontroller 4. nov. 2026; de tre fejl i layoutet (tekstboksen
-ruller på fane 2 ved 520 × 380, 860 × 640 og 1100 × 700) fandtes også før
-Kemichael blev bygget om. Chrome kræver `--allow-file-access-from-files` eller
+layoutet fra 390 × 844 (og 520 × 480) til 1500 × 900. Papirkortet: det står i
+scenen øverst i midten, ikke i panelet, der er ingen linje nederst, Indsend svar
+er grå uden valg, et valg og markerede grupper bedømmes ikke af sig selv, et
+rigtigt svar bliver på spørgsmålet med Næste i samme række, rosen står ikke
+under det næste spørgsmål, Start forfra og Ny runde står ikke på kortet, og
+kortet holder sig i `kortZone()` med de længste tekster uden at dække formlen,
+glassene eller prøven (også ved 1400 × 860 og 1280 × 640). ALT OK 6. nov. 2026. Chrome kræver `--allow-file-access-from-files` eller
 en lokal server.
 
 ## I menuen

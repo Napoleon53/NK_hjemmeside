@@ -176,24 +176,24 @@
           sel: "#hydron-anker-mol" },
         { tekst: "Når hydronen er flyttet, viser reaktionsskemaet under partiklerne produkterne og de to syre-basepar. Kortet Syre-basepar samler parrene fra alle de reaktioner, du har løst.",
           sel: ["#hydron-anker-skema", "#hydron-par-kort"] },
-        { tekst: "Kortet Reaktion stiller opgaven, og tallene på kortet viser de ti reaktioner. Et klik på et tal skifter til en anden reaktion, og knappen på kortet giver først et hint og derefter svaret.",
-          sel: "#hydron-kort" }
+        { tekst: "Kortet øverst i scenen stiller opgaven, og knappen Giv hint giver først et hint og derefter svaret. Når hydronen er flyttet, trykker du Indsend svar. Tallene i panelet viser de ti reaktioner, og et klik på et tal skifter til en anden reaktion.",
+          sel: ["#hydron-skort", "#hydron-kort"] }
     ];
     D.INTRO_PRODUKTER = [
         { tekst: "I denne fane finder du produkterne i en syre-base-reaktion. Reaktanterne står på tavlen, og efter pilen er der to tomme pladser til produkterne.",
           sel: "#prod-anker-lign" },
-        { tekst: "Formlerne nederst på tavlen er mulige produkter, men kun to af dem er rigtige. Du trækker en formel op på en plads eller klikker på den. En forkert formel hopper tilbage, og opgavekortet forklarer fejlen.",
+        { tekst: "Formlerne nederst på tavlen er mulige produkter, men kun to af dem er rigtige. Du trækker en formel op på en plads eller klikker på den. Når du trykker Indsend svar, ryger en forkert formel af pladsen, og kortet øverst forklarer fejlen.",
           sel: "#prod-anker-brikker" },
-        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 3. Opgavekortet tæller, hvor mange reaktioner du har løst i træk uden fejl, og knappen på kortet giver først et hint og derefter svaret.",
-          sel: ["#prod-niveau", "#prod-kort"] }
+        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 3. Panelet tæller, hvor mange reaktioner du har løst i træk uden fejl. Knappen Giv hint på kortet øverst giver først et hint og derefter svaret.",
+          sel: ["#prod-niveau", "#prod-kort", "#prod-skort"] }
     ];
     D.INTRO_PAR = [
         { tekst: "I denne fane finder du de to syre-basepar i en reaktion. Hele reaktionen står på tavlen, og under hver formel er der en tom plads til et mærkat.",
           sel: "#par-anker-lign" },
         { tekst: "De fire mærkater nederst på tavlen er syre, base, korresponderende base og korresponderende syre. Du trækker hvert mærkat hen under den rigtige formel, eller du klikker først på mærkatet og derefter på formlen.",
           sel: "#par-anker-brikker" },
-        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 2. Opgavekortet tæller, hvor mange reaktioner du har løst i træk uden fejl, og knappen på kortet giver først et hint og derefter svaret.",
-          sel: ["#par-niveau", "#par-kort"] }
+        { tekst: "Sværhedsgraden vælger du øverst i panelet, og den gælder også i fane 2. Panelet tæller, hvor mange reaktioner du har løst i træk uden fejl. Når alle fire mærkater sidder, trykker du Indsend svar på kortet øverst.",
+          sel: ["#par-niveau", "#par-kort", "#par-skort"] }
     ];
 
     /* Ros, foerste gang en fane er klaret. Fane 2 og 3 har ingen ende, saa

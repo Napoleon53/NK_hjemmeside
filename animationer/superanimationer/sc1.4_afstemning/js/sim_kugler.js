@@ -31,12 +31,10 @@
     function SimKugler() {
         var mig = this;
         this.skema = NK.el("kg-skema");
-        this.reagerKnap = NK.el("kg-reager");
         this.regnskabEl = NK.el("kg-regnskab");
         this.lysE = null;
         this.startFane(D.KUGLER, D.GRUPPER);
         this.skema.addEventListener("click", function (e) { mig.klikSkema(e); });
-        this.reagerKnap.addEventListener("click", function () { mig.reager(); });
         this.regnskabEl.addEventListener("pointerover", function (e) {
             var r = e.target.closest ? e.target.closest("[data-e]") : null;
             mig.lysE = r ? r.getAttribute("data-e") : null;
@@ -48,7 +46,7 @@
     }
 
     var P = SimKugler.prototype;
-    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Skemaet" });
+    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Skemaet", zone: [156, 124] });
 
     P.chipTekst = function (o) { return NK.html(o.navn); };
 
@@ -83,15 +81,29 @@
 
     P.opgaveFaerdig = function () { return this.opg.loest; };
 
-    P.promptHTML = function () {
-        return '<p class="maal-tekst">Afstem reaktionen, så der er lige mange af hvert atom før og efter pilen.</p>' +
-            '<p class="note-tekst">' + NK.html(this.opg.o.tekst) + "</p>";
+    /* Opgaven paa papirkortet: det, reaktionen handler om, og hvad der skal goeres */
+    P.kortTekst = function () {
+        return this.opg.o.tekst + " Afstem reaktionen med + og − foran stofferne, og tryk Indsend svar.";
     };
 
     P.trinLinje = function () {
-        if (this.opg.fase === "reageret") return "Ret tallene, og lad dem reagere igen.";
-        return "Ret tallene foran stofferne med + og −. Tryk så Lad dem reagere.";
+        if (this.opg.fase === "reageret") return "Ret tallene foran stofferne, og send igen.";
+        return "Ret tallene foran stofferne med + og −. Tryk så Indsend svar.";
     };
+
+    /* Indsend svar: molekylerne reagerer, og saa bedoemmes resultatet.
+       Graa, til eleven har rettet et tal (efter en reaktion: rettet igen). */
+    P.kanSendes = function () {
+        var g = this.opg;
+        return !!g && !g.loest && !this.reagerer && g.fase === "klar" && !!g.roert;
+    };
+
+    P.ikkeKlarTekst = function () {
+        if (this.opg.fase === "reageret") return "Molekylerne har allerede reageret. Ret et tal foran et stof, og send igen.";
+        return "Ret først tallene foran stofferne med + og −.";
+    };
+
+    P.indsend = function () { this.reager(); };
 
     P.slutLinje = function () {
         return A.ligning(this.formlerR(), this.formlerP(), this.opg.cr, this.opg.cp) + ".";
@@ -140,7 +152,7 @@
     P.laast = function () {
         if (this.reagerer) return true;
         if (this.opg.loest) {
-            this.kortBesked("Opgaven er løst. Tryk på knappen for at gå videre, eller R for at starte forfra.", 4);
+            this.kortBlink();
             return true;
         }
         return false;
@@ -149,6 +161,7 @@
     /* Efter en reaktion staar molekylerne klar igen, saa snart der rettes */
     P.klarIgen = function () {
         var g = this.opg;
+        g.roert = true;
         if (g.fase !== "klar") {
             g.fase = "klar";
             this.naesteLinje("", "");
@@ -234,7 +247,6 @@
         }
         this.skema.classList.toggle("faerdig", !!g.loest);
         this.skema.classList.toggle("laast", !!g.loest || !!mig.reagerer);
-        this.reagerKnap.disabled = !!g.loest || !!mig.reagerer;
     };
 
     /* Skriften paa tavlen bliver mindre, hvis skemaet ikke kan vaere der */
@@ -271,7 +283,7 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
-        var kant = NK.klamp(W * 0.022, 10, 26), top = NK.klamp(H * 0.025, 8, 18);
+        var kant = NK.klamp(W * 0.022, 10, 26), top = this.top();
         var sb = Math.min(W - 2 * kant, 1040);
         var t = this.skema;
         t.style.left = Math.round((W - sb) / 2) + "px";
@@ -284,15 +296,11 @@
         var y1 = baand.y - NK.klamp(H * 0.02, 8, 14);
         var midt = NK.klamp(W * 0.12, 100, 150);
         var bb = (W - 2 * kant - midt) / 2;
-        var lay = { W: W, H: H, baand: baand };
+        var lay = { W: W, H: H, baand: baand, zone: this.kortZone() };
         lay.L = { x: kant, y: y0, b: bb, h: Math.max(120, y1 - y0) };
         lay.R = { x: kant + bb + midt, y: y0, b: bb, h: lay.L.h };
         lay.midt = { x: kant + bb, b: midt, cy: y0 + lay.L.h / 2 };
         this.lay = lay;
-        var k = this.reagerKnap;
-        k.style.width = Math.round(midt - 12) + "px";
-        k.style.left = Math.round(lay.midt.x + 6) + "px";
-        k.style.top = Math.round(lay.midt.cy + 14) + "px";
         this.saetAnker("bakker", lay.L.x, lay.L.y, lay.R.x + lay.R.b - lay.L.x, lay.L.h);
         this.byg();
     };
@@ -476,11 +484,6 @@
             t = t.charAt(0).toUpperCase() + t.slice(1);
         }
         this.fejlLinje(t);
-    };
-
-    P.enter = function () {
-        if (this.faerdig) { this.knap(); return; }
-        this.reager();
     };
 
     P.opdaterScene = function (dt) {

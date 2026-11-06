@@ -122,7 +122,7 @@
             hvorfor: "Tre COOH-grupper og en OH-gruppe til seks C-atomer."
         },
         iod: {
-            navn: "iod", etiket: "iod", formel: "I2", sum: "I2",
+            navn: "diiod", etiket: "diiod", formel: "I2", sum: "I2",
             tilstand: "fast", blandes: "heptan", korn: "#3b3046", farveI: { heptan: [138, 42, 150], vand: [176, 122, 48] },
             obs: { vand: "opløses næsten ikke" },
             mol: ["I-I"],
@@ -253,8 +253,8 @@
        markere polaere grupper, og fane 1 begynder med, at eleven selv siger,
        at vand er polaert. Ordene er Kemibogens (afsnit 3.4).
 
-       D.START: de tre spoergsmaal, der aabner fane 1. kontekst staar i linjen
-       under svarknapperne, til der er svaret. */
+       D.START: de tre spoergsmaal, der aabner fane 1. kontekst staar foerst
+       paa papirkortet og spoergsmaalet halvfedt efter den. */
     D.POL_SVAR = [{ id: "polaert", tekst: "Polært" }, { id: "upolaert", tekst: "Upolært" }];
     D.polId = function (stofId) { return D.polaer(stofId) ? "polaert" : "upolaert"; };
 
@@ -301,7 +301,12 @@
         grpRos: function (id) { return "Rigtigt. " + D.stof(id).hvorfor; },
         ingen: "Ingen polære grupper",
         ingenFejl: function (id) { return "Nej. Der er polære grupper i " + D.navn(id) + ". Kig efter O og N."; },
-        fundet: function (n) { return n === 0 ? "Klik på en polær gruppe i formlen." : (n === 1 ? "Fundet: 1 polær gruppe." : "Fundet: " + n + " polære grupper."); },
+        fundet: function (n) { return n === 0 ? "Klik på en polær gruppe i formlen. Et nyt klik fjerner markeringen." :
+            (n === 1 ? "Markeret: 1 polær gruppe. Tryk Indsend svar, når alle er markeret." : "Markeret: " + n + " polære grupper. Tryk Indsend svar, når alle er markeret."); },
+        mangler: function (id, n) {
+            return n === 1 ? "Der mangler 1 polær gruppe i " + D.navn(id) + ". Kig efter O og N." :
+                "Der mangler " + n + " polære grupper i " + D.navn(id) + ". Kig efter O og N.";
+        },
         fuldt: "Skemaet er fuldt.",
         fuldtLinje: "Alle seks stoffer er testet. På fane 2 gætter du, før du tester."
     };
@@ -327,15 +332,15 @@
           sel: "#forsoeg-anker-glas" },
         { tekst: "Du trækker pipetten eller spatlen med stoffet ned i et af glassene og klikker på glasset for at ryste det. Når indholdet i glasset har lagt sig, står iagttagelsen ved glasset og i skemaet til højre.",
           sel: ["#forsoeg-anker-proeve", "#forsoeg-skema"] },
-        { tekst: "Kortet med stoffets formel stiller spørgsmålene, og til sidst klikker du på de polære grupper i formlen. Den gule knap på kortet giver et hint og derefter svaret.",
-          sel: "#forsoeg-anker-kort" }
+        { tekst: "Papirkortet øverst i scenen stiller spørgsmålene. Du vælger et svar og trykker Indsend svar. Til sidst klikker du på de polære grupper i stoffets formel. Knappen Giv et hint på papirkortet giver et hint og derefter svaret.",
+          sel: ["#forsoeg-tb", "#forsoeg-anker-kort"] }
     ];
     D.INTRO_GAET = [
-        { tekst: "I denne fane gætter du, om et stof er polært eller upolært, før forsøget viser svaret. Først klikker du på de polære grupper i formlen, og søjlen på kortet tæller C-atomerne og de polære grupper.",
+        { tekst: "I denne fane gætter du, om et stof er polært eller upolært, før forsøget viser svaret. Først klikker du på de polære grupper i formlen og trykker Indsend svar. Søjlen ved formlen tæller C-atomerne og de polære grupper.",
           sel: "#gaet-anker-kort" },
-        { tekst: "Derefter svarer du polært eller upolært og tester svaret ved at trække pipetten ned i det glas, som svaret passer til. Forsøget i glasset afgør, om svaret var rigtigt.",
+        { tekst: "Derefter vælger du polært eller upolært på papirkortet og trykker Indsend svar. Så tester du svaret ved at trække pipetten ned i det glas, som svaret passer til. Forsøget i glasset afgør, om svaret var rigtigt.",
           sel: ["#gaet-anker-proeve", "#gaet-anker-glas"] },
-        { tekst: "En runde består af ti stoffer, og panelet til højre viser dine rigtige svar, din rekord og de sorterede stoffer. Den gule knap på kortet giver et hint og derefter svaret.",
+        { tekst: "En runde består af ti stoffer, og panelet til højre viser dine rigtige svar, din rekord og de sorterede stoffer. Knappen Giv et hint på papirkortet giver et hint og derefter svaret.",
           sel: ["#gaet-tb", "#gaet-runde", "#gaet-sorteret"] }
     ];
 

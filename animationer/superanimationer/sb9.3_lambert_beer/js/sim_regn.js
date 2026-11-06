@@ -50,8 +50,6 @@
         });
         var s = D.STOFFER[o.stof];
         NK.saetTekst("regn-navn", s.Navn + ", " + s.formel);
-        var spm = /Beregn[^.]*\./.exec(o.tekst);
-        NK.saetTekst("regn-linje", spm ? spm[0] : o.navn);
         this.bygTal();
         this.bygBogstaver();
         this.render();
@@ -232,16 +230,8 @@
         this.tavle.classList.toggle("faerdig", this.faerdig && !this.brugtSvarNogen);
         this.tavle.classList.toggle("vist", this.faerdig && !!this.brugtSvarNogen);
         this.visHintLys();
+        if (this.el && this.el.indsend) this.visIndsend();
         this.tilpas();
-    };
-
-    P.tjekKnap = function () {
-        var mig = this;
-        var k = el("button", "tjekknap", "Tjek");
-        k.type = "button";
-        k.title = "Tjek (Enter)";
-        k.addEventListener("click", function () { mig.tjek(); });
-        return k;
     };
 
     P.nytInput = function (klasse, vaerdi, etiket, onInput, i) {
@@ -254,14 +244,15 @@
         inp.value = vaerdi || "";
         inp.setAttribute("aria-label", etiket);
         inp.addEventListener("focus", function () { mig.fokusInput = inp; });
-        inp.addEventListener("input", function () { onInput(inp.value); inp.classList.remove("fejl"); });
+        inp.addEventListener("input", function () { onInput(inp.value); inp.classList.remove("fejl"); mig.visIndsend(); });
         inp.addEventListener("keydown", function (e) {
             if (e.key !== "Enter") return;
             e.preventDefault();
-            /* Enter i et felt: videre til det naeste tomme, ellers tjek */
+            /* Enter i et felt: videre til det naeste tomme, ellers Indsend svar
+               (eller Naeste, naar kortet viser den) */
             var tomt = mig.felter.filter(function (f) { return f !== inp && !f.value.trim(); })[0];
-            if (tomt && inp.value.trim() && klasse.indexOf("rs-in") < 0) { tomt.focus(); return; }
-            mig.tjek();
+            if (!mig.slutNu() && tomt && inp.value.trim() && klasse.indexOf("rs-in") < 0) { tomt.focus(); return; }
+            mig.enter();
         });
         if (i !== undefined) inp.setAttribute("data-i", i);
         this.felter.push(inp);
@@ -279,7 +270,6 @@
             d.appendChild(mig.nytInput("bf-in bogstav", st.bogst[j], "Bogstav " + (j + 1), function (v) { st.bogst[j] = v; }, j));
             return d;
         }));
-        omr.appendChild(this.tjekKnap());
         return omr;
     };
 
@@ -298,7 +288,6 @@
             d.appendChild(inp);
             return d;
         }));
-        omr.appendChild(this.tjekKnap());
         return omr;
     };
 
@@ -309,7 +298,6 @@
         inp.placeholder = b === "A" ? "uden enhed" : (b === "eps" ? "tallet" : "tal og enhed");
         omr.appendChild(inp);
         if (b === "eps") omr.appendChild(el("span", "rs-enhed", "mM⁻¹·cm⁻¹"));
-        omr.appendChild(this.tjekKnap());
         return omr;
     };
 
@@ -317,6 +305,7 @@
     P.vaelgSkabelon = function (sk) {
         var st = this.aktivt();
         if (!st || st.fase !== "formel" || this.faerdig) return;
+        if (this.spaer()) return;
         st.sk = sk;
         this.render();
         this.naesteLinje("", "");
@@ -326,6 +315,7 @@
     P.indsaet = function (tekst, fase) {
         var st = this.aktivt();
         if (!st || this.faerdig) return;
+        if (this.spaer()) return;
         if (st.fase !== fase) return;
         if (fase === "formel" && !st.sk) {
             this.kortBesked("Vælg først formens form. Så kommer der felter til bogstaverne.", 4);
@@ -347,13 +337,12 @@
         if (!st || this.faerdig) return;
         var o = this.opg();
         if (st.fase === "formel") {
-            if (!st.sk) { this.besked("Vælg først formens form under tavlen. Så kommer der felter til bogstaverne.", "gul"); return; }
+            if (!st.sk) { this.besked("Vælg først formens form under tavlen. Så kommer der felter til bogstaverne.", "hint"); return; }
             var bogst = st.bogst.slice(0, R.ANTAL[st.sk]).map(function (b) { return R.bogstav(b, o); });
             var svar = R.tjekFormel(st.id, st.sk, bogst);
             if (svar.ok) {
                 st.bogstL = bogst;
-                st.fase = "tal";
-                this.videre("Rigtig formel: " + R.vis(D.TRIN[st.id].maal) + " = " + R.formelHTML(st.id, bogst) + ".");
+                this.videre("Rigtig formel: " + R.vis(D.TRIN[st.id].maal) + " = " + R.formelHTML(st.id, bogst) + ".", function () { st.fase = "tal"; });
                 return;
             }
             this.fejlFelt(svar, svar.felt);
@@ -368,8 +357,7 @@
                 else if (!forste) forste = { svar: s, j: j };
             }
             if (!forste) {
-                st.fase = "res";
-                this.videre("Rigtigt. Tallene står på deres plads.");
+                this.videre("Rigtigt. Tallene står på deres plads.", function () { st.fase = "res"; });
                 return;
             }
             if (nogen) this.render();
@@ -382,7 +370,7 @@
     };
 
     P.fejlFelt = function (svar, j) {
-        if (svar.tom) this.besked(svar.besked, "gul");
+        if (svar.tom) this.besked(svar.besked, "hint");
         else this.fejlLinje(svar.besked);
         var inp = j !== undefined ? this.felter.filter(function (f) { return f.getAttribute("data-i") === String(j); })[0] : null;
         if (!inp) inp = this.felter[0];
@@ -394,14 +382,13 @@
         if (inp) inp.focus();
     };
 
-    /* Et skridt i trinnet er rigtigt: tegn tavlen igen, og sig det naeste */
-    P.videre = function (html) {
+    /* Et skridt i trinnet er rigtigt: kortet bliver paa skridtet med Naeste
+       (gult, naar svaret blev vist). fn foerer til naeste skridt. */
+    P.videre = function (html, fn) {
         this.hjaelp = 0;
         this.hintLys = null;
         this.render();
-        this.naesteLinje('<span class="b-maerke">✓</span> ' + html, "god");
-        this.visKnap();
-        this.fokusFelt();
+        this.mellem(html, function () { fn.call(this); this.render(); this.fokusFelt(); });
     };
 
     P.trinLoest = function (maade) {
@@ -411,12 +398,13 @@
         st.res = R.facitTekst(o, this.k);
         this.k++;
         if (this.k < this.ts.length) {
-            this.ts[this.k].status = "aktiv";
-            this.hjaelp = 0;
-            this.render();
-            this.naesteLinje('<span class="b-maerke">✓</span> ' + R.vis(D.TRIN[st.id].maal) + " = " + NK.html(R.facitTekst(o, this.k - 1)) + ".", "god");
-            this.visKnap();
-            this.fokusFelt();
+            var k = this.k;
+            this.k--;
+            var mig = this;
+            this.videre(R.vis(D.TRIN[st.id].maal) + " = " + NK.html(R.facitTekst(o, k - 1)) + ".", function () {
+                mig.k = k;
+                mig.ts[k].status = "aktiv";
+            });
             return;
         }
         var sidst = this.ts.length - 1;
@@ -426,10 +414,33 @@
         this.render();
     };
 
+    /* ----- Papirkortet -------------------------------------------------------------------- */
+    P.spm = function () {
+        var o = this.opg(), m = /Beregn[^.]*\./.exec(o.tekst);
+        return m ? m[0] : o.navn + ".";
+    };
+
+    P.kortData = function () {
+        var tekst = "<b>" + NK.html(this.spm()) + "</b>";
+        if (this.faerdig) return { tekst: tekst, html: true };
+        return { tekst: tekst + " " + this.trinLinje(), html: true };
+    };
+
+    /* Indsend svar er graa, til der staar noget i det, der skal tjekkes */
+    P.kanIndsende = function () {
+        var st = this.aktivt();
+        if (!st || this.faerdig) return false;
+        if (st.fase === "formel") return !!st.sk && st.bogst.slice(0, R.ANTAL[st.sk]).some(function (b) { return String(b || "").trim(); });
+        if (st.fase === "tal") return st.tal.some(function (t, j) { return !st.talOk[j] && String(t || "").trim(); });
+        return !!String(st.res || "").trim();
+    };
+
+    P.indsend = function () { this.tjek(); };
+
     /* ----- Panelet og linjen ------------------------------------------------------------------ */
     P.promptHTML = function () {
         var o = this.opg();
-        var html = '<p class="note-tekst">' + NK.html(o.tekst) + "</p>";
+        var html = '<p class="note-tekst">' + NK.html(o.tekst.replace(this.spm(), "").trim()) + "</p>";
         if (this.faerdig) {
             html += '<div class="forklaring">';
             this.ts.forEach(function (st, i) { html += '<p class="fk-linje">' + R.linjeHTML(o, i, st.bogstL, st.talTekst) + "</p>"; });
@@ -481,13 +492,9 @@
             st.sk = t.form;
             st.bogstL = R.facitBogstaver(st.id);
             st.bogst = st.bogstL.map(R.vis);
-            st.fase = "tal";
             st.vistFormel = true;
             this.brugtSvarNogen = true;
-            this.hjaelp = 0;
-            this.render();
-            this.naesteLinje('<span class="b-maerke">Formlen</span> ' + R.vis(t.maal) + " = " + R.formelHTML(st.id) + ".", "gul");
-            this.fokusFelt();
+            this.videre("Formlen er " + R.vis(t.maal) + " = " + R.formelHTML(st.id) + ".", function () { st.fase = "tal"; });
             return;
         }
         if (st.fase === "tal") {
@@ -496,13 +503,9 @@
                 st.talOk[j] = true;
                 st.talTekst[j] = R.talMedEnhed(b, V.tal[b].tekst);
             });
-            st.fase = "res";
             st.vistTal = true;
             this.brugtSvarNogen = true;
-            this.hjaelp = 0;
-            this.render();
-            this.naesteLinje('<span class="b-maerke">Tallene</span> ' + R.vis(t.maal) + " = " + R.talHTML(o, this.k, st.bogstL, st.talTekst) + ".", "gul");
-            this.fokusFelt();
+            this.videre("Tallene: " + R.vis(t.maal) + " = " + R.talHTML(o, this.k, st.bogstL, st.talTekst) + ".", function () { st.fase = "res"; });
             return;
         }
         this.trinLoest("svar");
@@ -515,12 +518,6 @@
         this.faneVaelg(i);
     };
 
-    P.enter = function () {
-        if (this.faerdig) { this.knap(); return; }
-        this.tjek();
-    };
-
-    P.nulstil = function () { this.vaelg(this.nr); };
 
     P.fokusFelt = function () {
         if (!NK.el("fane-regn").classList.contains("aktiv")) return;

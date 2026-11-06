@@ -530,7 +530,7 @@
             var B = lay.brom, ude = (this.traek && this.traek.slags === "brom") || this.afvis;
             Tg.brik(ctx, B.x, B.y, B.b, B.h, { over: this.over === "brom" && !ude, alfa: ude ? 0.45 : 1 });
             this.tegnBrom(ctx, B.x + B.b / 2, B.y + B.h * 0.4, Math.min(34, B.h * 0.34), ude ? 0.3 : 1);
-            NK.tekst(ctx, "brom, Br₂", B.x + B.b / 2, B.y + B.h - 13, { font: Tg.font("600", 15), justering: "center", farve: ude ? "#7e8590" : "#dfe5ec" });
+            NK.tekst(ctx, "dibrom, Br₂", B.x + B.b / 2, B.y + B.h - 13, { font: Tg.font("600", 15), justering: "center", farve: ude ? "#7e8590" : "#dfe5ec" });
             if (peger === "brom") {
                 Tg.ring(ctx, B.x, B.y, B.b, B.h, this.tid);
                 Tg.skilt(ctx, "Træk hen til kæden", B.x + B.b / 2, B.y - 12, 8, lay.W - 8);
@@ -701,7 +701,7 @@
                 this.nulstilHjaelp();
                 this.afvis = { t: 0, fra: klik ? { x: B.x + B.b / 2, y: B.y + B.h * 0.4 } : { x: pt.x, y: pt.y } };
                 this.naesteLinje("", "");
-            } else this.kortBesked("Slip brommolekylet oven på kæden.", 5);
+            } else this.kortBesked("Slip dibrommolekylet oven på kæden.", 5);
             return;
         }
         var p = this.pulje[t.i];

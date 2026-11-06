@@ -316,35 +316,90 @@ function koer() {
             return x.valg.filter(function (v) { return v.rigtig; }).length === 1 && x.valg.every(function (v) { return v.rigtig || (v.fejl && v.fejl.length > 20); });
         }));
     paastand("hver opgave har hint og svar", OP.every(function (x) { return x.hint && x.svar; }));
-    var G = NK.opgaver, loest = 0;
-    function klasse(id) { return d.getElementById(id).className; }
+    var G = NK.opgaver;
+    function txt(id) { return d.getElementById(id).textContent; }
+    function kort() { return d.getElementById("skort"); }
+    /* Papirkortet: svar og byg vaelges kun, Indsend svar sender ind,
+       og kortet bliver paa opgaven med Naeste (6. nov. 2026) */
+    G.forfra();
+    paastand("kortet starter med indledningen og Start opgave 1", G.tilstand() === "start" && txt("opg-indsend") === "Start opgave 1");
+    G.indsendKlik();
     for (i = 0; i < OP.length; i++) {
-        G.knap();
+        paastand("opgave " + (i + 1) + ": kortet viser opgaven med etiketten", G.nr === i && kort().querySelector(".sk-tekst .sk-chip").textContent === "Opgave " + (i + 1) + " af 6");
+        paastand("opgave " + (i + 1) + ": Indsend svar er grå, før der er noget at sende", /ikke-klar/.test(d.getElementById("opg-indsend").className));
         if (OP[i].valg) {
             var rigtig = OP[i].valg.findIndex(function (v) { return v.rigtig; });
             var forkert = OP[i].valg.findIndex(function (v) { return !v.rigtig; });
             if (i === 0) {
+                var foer = NK.bassin.m.opgoer().alt.join(",");
+                d.querySelector('.stofknap[data-stof="vand"]').click();
+                d.getElementById("ryst").click();
+                paastand("opgave 1: bassinet er låst under forudsigelsen", NK.bassin.m.opgoer().alt.join(",") === foer && !NK.bassin.m.haelder());
                 G.vaelg(forkert);
-                paastand("opgave 1: et forkert svar giver forklaringen til fejlen",
-                    d.getElementById("opg-hint").textContent === OP[0].valg[forkert].fejl && /skidt/.test(klasse("opg-hint")));
-                paastand("opgave 1: knappen er nu Ny opgave", d.getElementById("opg-knap").textContent === "Ny opgave");
-                G.nr--; G.knap();
+                paastand("opgave 1: et valgt svar bedømmes ikke af sig selv", !G.o.afsluttet && !G.o.udfoert && /klar/.test(d.getElementById("opg-indsend").className));
+                G.indsendKlik();
+                paastand("opgave 1: et forkert svar giver forklaringen til fejlen på kortet",
+                    txt("opg-besked").indexOf(OP[0].valg[forkert].fejl) >= 0 && /skidt/.test(d.getElementById("opg-status").className) && !G.o.afsluttet && G.o.udfoert);
             }
             G.vaelg(rigtig);
-            paastand("opgave " + (i + 1) + ": det rigtige svar giver grøn forklaring", /god/.test(klasse("opg-svar")));
+            G.indsendKlik();
         } else {
             NK.bassin.haeld("ethanol"); NK.bassin.haeld("ethanol"); NK.bassin.haeld("ethanol");
+            G.handlet();
             for (var s = 0; s < 4 * 60; s++) { NK.bassin.opdater(1 / 60); G.opdater(1 / 60); }
             NK.bassin.ryst(1.2);
-            for (s = 0; s < 45 * 60 && !G.o.afsluttet; s++) { NK.bassin.opdater(1 / 60); G.opdater(1 / 60); }
-            paastand("opgave " + (i + 1) + " (byg): løst ved at hælde ethanol i og ryste", /god/.test(klasse("opg-svar")), (s / 60).toFixed(0) + " s");
+            for (s = 0; s < 45 * 60; s++) {
+                NK.bassin.opdater(1 / 60); G.opdater(1 / 60);
+                if (s % 30 === 0 && !NK.bassin.m.haelder() && NK.Opgaver.TJEK.olieNederst(NK.bassin.analyse(), NK.bassin.m)) break;
+            }
+            paastand("opgave " + (i + 1) + " (byg): ikke løst af sig selv", !G.o.afsluttet, (s / 60).toFixed(0) + " s");
+            G.indsendKlik();
         }
+        var gr = kort().querySelector(".sk-knap.rigtig");
+        paastand("opgave " + (i + 1) + ": rigtigt svar bliver på opgaven med forklaring og Næste",
+            G.tilstand() === "loest" && !!kort().querySelector(".sk-bund.bliv .sk-videre") && d.getElementById("opg-indsend").hidden &&
+            (!OP[i].valg || !!gr) && kort().textContent.indexOf(OP[i].svar.slice(0, 20)) >= 0);
+        if (i < OP.length - 1) G.videre();
     }
-    paastand("tælleren viser 6 løste", d.getElementById("opg-loest").textContent === "6");
+    paastand("tælleren viser 5 løste (opgave 1 blev løst i andet forsøg)", txt("opg-loest") === "5");
     paastand("en opgave sætter tilbagesvaleren på igen", NK.bassin.koelerNavn === "tilbagesvaler");
     paastand("opgave 6 satte temperaturen til 90 °C", NK.bassin.m.T === 90 && d.getElementById("temp").value === "90");
-    G.knap();
-    paastand("efter sidste opgave: Start forfra", d.getElementById("opg-knap").textContent === "Start forfra");
+    paastand("sidste opgave: knappen hedder Afslut opgaverne", /Afslut/.test(kort().querySelector(".sk-videre").textContent));
+    G.videre();
+    paastand("efter sidste opgave: kortet peger på quizzen, uden Start forfra på kortet", G.tilstand() === "slut" && /Quiz/.test(kort().textContent) && !/forfra/i.test(kort().textContent));
+
+    overskrift("9b. Papirkortet");
+    paastand("kortet står i scenen, ikke i panelet", !!kort().closest(".scene") && !kort().closest(".panel"));
+    paastand("Start forfra står i panelet", !!d.getElementById("opg-forfra").closest(".panel"));
+    paastand("ingen opgavetekst, valg eller beskeder i panelet", !d.getElementById("opg-tekst") && !d.getElementById("opg-valg") && !d.getElementById("opg-hint") && !d.getElementById("opg-knap"));
+    paastand("ingen statuslinje nederst i scenen", !d.querySelector(".scenebesked, .statuslinje"));
+    G.forfra();
+    paastand("Start forfra går tilbage til indledningen", G.tilstand() === "start" && txt("opg-loest") === "0");
+    /* Hoejden: hver opgave med hint, hver fejl og forklaringen */
+    var ramme = document.getElementById("ramme"), fejlH = [];
+    [[1400, 860], [1100, 700]].forEach(function (m) {
+        ramme.style.width = m[0] + "px"; ramme.style.height = m[1] + "px";
+        NK.bassin.tilpas();
+        var zone = NK.kortZone();
+        function maal(navn) { if (kort().offsetHeight > zone) fejlH.push(m.join("x") + " " + navn + " " + kort().offsetHeight + ">" + zone); }
+        G.forfra(); maal("start");
+        G.indsendKlik();
+        for (var k = 0; k < OP.length; k++) {
+            maal((k + 1) + " opgave");
+            G.hjaelpKlik(); maal((k + 1) + " hint");
+            (OP[k].valg || []).forEach(function (v) { if (!v.rigtig) { G.fejl(v.fejl); maal((k + 1) + " fejl"); } });
+            G.visSvar(); maal((k + 1) + " svar");
+            G.o.maade = "selv"; G.vis(); maal((k + 1) + " rigtigt");
+            G.videre();
+        }
+        maal("slut");
+        var top = NK.bassin.lay.y0 + 20 * NK.bassin.lay.k;
+        if (top < NK.kortTop() - 4) fejlH.push(m.join("x") + " bassinet under kortet " + Math.round(top));
+    });
+    paastand("kortet holder sig i kortZone, og bassinet står under det (1400x860 og 1100x700)", fejlH.length === 0, fejlH.slice(0, 5).join("; "));
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    NK.bassin.tilpas();
+    G.forfra();
 
     overskrift("10. Quizzen");
     paastand("fem spørgsmål", D.QUIZ.length === 5);

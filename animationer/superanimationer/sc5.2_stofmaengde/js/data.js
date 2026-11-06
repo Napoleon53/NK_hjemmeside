@@ -157,23 +157,23 @@
           sel: "#vaegt-anker-hylde" },
         { tekst: "Du trækker en klump op på vægten eller klikker på krukken, og klumper af forskellige grundstoffer må gerne ligge sammen. Panelet til højre viser stofmængden, massen og antallet af atomer for klumperne på vægten. Plakaten viser, at 1 mol altid er 6,02 · 10²³ atomer.",
           sel: ["#vaegt-anker-vaegt", "#vaegt-maaling", "#vaegt-anker-plakat"] },
-        { tekst: "Opgavekortet giver først tre opgaver som opvarmning og derefter sværere opgaver med nye tal hver gang. Knappen på kortet giver et hint og derefter svaret.",
-          sel: "#vaegt-kort" }
+        { tekst: "Kortet øverst i scenen giver først tre opgaver som opvarmning og derefter sværere opgaver med nye tal hver gang. Når vægten passer med opgaven, trykker du Indsend svar. Knappen Giv hint giver et hint og derefter svaret.",
+          sel: "#vaegt-skort" }
     ];
     D.INTRO_ATOMER = [
         { tekst: "I denne fane gætter du, hvor der er flest atomer, når to prøver står på hver sin vægt. Skiltet på bordet viser prøverne i mol eller i gram, og vægtene viser massen af prøverne.",
           sel: ["#atomer-anker-vaegte", "#atomer-anker-skilt"] },
-        { tekst: "Du svarer venstre, lige mange eller højre med knapperne på opgavekortet eller med piletasterne. Bagefter tæller vægtene atomerne, og skiltet viser beregningen.",
-          sel: "#atomer-valg" },
-        { tekst: "En runde består af ni par fra tre niveauer, og panelet viser dine rigtige svar og din rekord. Knappen på opgavekortet giver et hint og derefter svaret.",
-          sel: ["#atomer-knap", "#fane-atomer .maaling"] }
+        { tekst: "Du vælger venstre, lige mange eller højre på kortet øverst i scenen eller med piletasterne. Så trykker du Indsend svar. Bagefter tæller vægtene atomerne, og skiltet viser beregningen.",
+          sel: "#atomer-skort" },
+        { tekst: "En runde består af ni par fra tre niveauer, og panelet viser dine rigtige svar og din rekord. Knappen Giv hint på kortet giver et hint og derefter svaret.",
+          sel: ["#atomer-knap", "#atomer-runden"] }
     ];
     D.INTRO_AFVEJ = [
-        { tekst: "I denne fane regner du massen ud for en ordre og skriver massen på opgavekortet. Ordren viser stofmængden af et grundstof, og vægten skal vise massen af netop den stofmængde.",
-          sel: "#afvej-kort" },
+        { tekst: "I denne fane regner du massen ud for en ordre. Kortet øverst i scenen viser stofmængden af et grundstof, og vægten skal vise massen af netop den stofmængde. Du skriver massen i regnestykket i panelet og trykker Indsend svar.",
+          sel: ["#afvej-skort", "#afvej-regn"] },
         { tekst: "Etiketten på krukken viser grundstoffets molarmasse, og plakaten viser formlen m = n · M med enhederne. Når massen er rigtig, bliver stoffet fra krukken hældt i vejebåden, og vægten viser massen.",
           sel: ["#afvej-anker-plakat", "#afvej-anker-krukke", "#afvej-anker-vaegt"] },
-        { tekst: "Knappen på opgavekortet giver et hint og derefter svaret. Du får en stjerne for hver ordre, som du løser uden at se svaret, og listen under opgavekortet viser ordrerne i de tre niveauer.",
+        { tekst: "Knappen Giv hint på kortet giver et hint og derefter svaret. Du får en stjerne for hver ordre, som du løser uden at se svaret, og listen i panelet viser ordrerne i de tre niveauer.",
           sel: ["#afvej-knap", "#afvej-fremskridt"] }
     ];
 

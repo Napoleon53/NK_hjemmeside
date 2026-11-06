@@ -177,9 +177,9 @@
     P.slutOpgave = function () {};
 
     /* ----- Panel --------------------------------------------------------------- */
+    /* Forsoegets og tabellens beskeder staar i papirkortets nederste raekke */
     P.besked = function (tekst, art) {
-        NK.saetTekst("konc-tabelbesked", tekst);
-        NK.saetKlasse("konc-tabelbesked", "besked" + (art ? " " + art : ""));
+        if (this.kort) this.kort.melding(tekst, art);
     };
 
     P.bind = function () {

@@ -56,10 +56,10 @@
     D.DREJ = [
         { id: "d1", navn: "Butan", slags: "drej", binding: 1,
           v: ["CH3", "H", "H"], h: ["CH3", "H", "H"], drej: 180,
-          maal: "Træk i den højre halvdel af butan, så de to CH₃ står på samme side." },
+          maal: "Træk i den højre halvdel af butan, så de to CH₃ står på samme side. Tryk så Indsend svar." },
         { id: "d2", navn: "But-2-en", slags: "drej", binding: 2,
           v: ["CH3", "H"], h: ["H", "CH3"], drej: 0,
-          maal: "Prøv det samme med but-2-en: træk den højre CH₃ op på samme side som den venstre." },
+          maal: "Prøv det samme med but-2-en: træk den højre CH₃ op på samme side som den venstre. Kan CH₃ komme derop?" },
         { id: "d3", navn: "1,2-dichlorethen", slags: "to", binding: 2,
           a: { v: ["Cl", "H"], h: ["Cl", "H"] }, b: { v: ["Cl", "H"], h: ["H", "Cl"] },
           kog: [60, 48], smelt: [-81, -49],

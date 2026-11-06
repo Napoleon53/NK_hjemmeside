@@ -8,9 +8,12 @@
    korresponderende syre lilla). Eleven traekker et maerkat hen under en
    formel, eller klikker paa maerkatet og saa paa formlen.
 
-   Et forkert maerkat hopper tilbage med en forklaring, der passer til
-   fejlen (NK.Syrebase.maerkeFejl): syre og base efter pilen, syre paa
-   en amfolyt, der her tager imod, osv. Produkterne staar i tilfaeldig
+   Et maerkat under en formel vaelger kun; et klik paa det sender det
+   tilbage. Indsend svar bedoemmer alle fire (papirkortet, 6. nov. 2026,
+   js/skort.js): et forkert maerkat hopper tilbage med en forklaring,
+   der passer til fejlen (NK.Syrebase.maerkeFejl): syre og base efter
+   pilen, syre paa en amfolyt, der her tager imod, osv. De rigtige
+   bliver siddende. Produkterne staar i tilfaeldig
    orden, saa parrene ikke altid staar over hinanden. Naar alle fire
    sidder, flyver hydronen, og klammerne viser parrene.
    ===================================================================== */
@@ -34,6 +37,7 @@
         this.iTraek = 0;
         this.seneste = [];
         this.stjerner = [];
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -51,7 +55,8 @@
         var prod = Math.random() < 0.5 ? o.produkter.slice() : o.produkter.slice().reverse();
         this.arter = o.reaktanter.concat(prod);
         this.kol = [null, null, null, null];
-        this.brikker = S.MAERKER.map(function (mk) { return { mk: mk, tekst: S.MAERKE_TEKST[mk], kol: null }; });
+        this.brikker = S.MAERKER.map(function (mk) { return { mk: mk, tekst: S.MAERKE_TEKST[mk], kol: null, ok: false }; });
+        this.pegKnap = false;
         this.valgt = null;
         this.loest = false;
         this.fejl = false;
@@ -76,9 +81,12 @@
 
     /* ----- Layout ------------------------------------------------------------------- */
     P.layout = function () {
-        this.lay = Tv.layout(this.L.b, this.L.h);
+        this.lay = Tv.layout(this.L.b, this.L.h, this.kortZone());
         this.stil();
     };
+
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 142); };
 
     P.stil = function () {
         var lay = this.lay;
@@ -140,28 +148,62 @@
     };
 
     /* ----- Handlingerne ---------------------------------------------------------------- */
+    /* Et maerkat under en formel vaelger kun. Er pladsen taget, ryger det
+       gamle maerkat tilbage (et rigtigt bliver siddende). */
     P.saet = function (i, k) {
-        if (this.loest || k === null || k === undefined) return;
+        if (this.loest) { this.kort.blink(); return; }
+        if (k === null || k === undefined) return;
         var bk = this.brikker[i];
-        if (bk.kol !== null) return;
+        if (bk.ok) return;
         if (this.afvisTilbud) this.afvisTilbud();
         this.valgt = null;
+        if (bk.kol === k) return;
         if (this.kol[k]) {
-            this.besked(NK.html(S.formel(this.arter[k])) + " har allerede et mærkat.", "");
-            return;
+            var gl = this.brikker.filter(function (b) { return b.kol === k; })[0];
+            if (gl && gl.ok) {
+                this.besked(NK.html(S.formel(this.arter[k])) + " har allerede det rigtige mærkat.", "peger");
+                return;
+            }
+            if (gl) gl.kol = null;
         }
-        var fejl = S.maerkeFejl(this.opg, bk.mk, this.arter[k], k < 2);
-        if (!fejl) {
-            bk.kol = k;
-            this.kol[k] = bk.mk;
-            if (this.kol.every(function (m) { return m; })) { this.loes(); return; }
-            this.besked("<b>" + NK.html(S.formel(this.arter[k])) + "</b> er " + S.MAERKE_LANG[bk.mk] + ".", "god");
-            return;
-        }
+        if (bk.kol !== null) this.kol[bk.kol] = null;
+        bk.kol = k;
+        this.kol[k] = bk.mk;
+        this.besked("", "");
+        this.visOpgave();
+    };
+
+    /* Et maerkat tilbage til sin plads nederst paa tavlen */
+    P.tilbage = function (i) {
+        var bk = this.brikker[i];
+        if (bk.ok || bk.kol === null) return;
+        this.kol[bk.kol] = null;
+        bk.kol = null;
+        this.besked("", "");
+        this.visOpgave();
+    };
+
+    /* Indsend svar: alle fire bedoemmes. De rigtige bliver siddende, de
+       forkerte hopper tilbage, og den foerste fejl forklares. */
+    P.indsend = function () {
+        if (this.loest || !this.kol.every(function (m) { return m; })) { this.kort.blink(); return; }
+        var mig = this, fejl = null, nFejl = 0;
+        this.brikker.forEach(function (bk) {
+            if (bk.ok) return;
+            var f = S.maerkeFejl(mig.opg, bk.mk, mig.arter[bk.kol], bk.kol < 2);
+            if (!f) { bk.ok = true; return; }
+            nFejl++;
+            if (!fejl) { fejl = f; mig.glimt = { k: bk.kol, t: 0 }; }
+            mig.kol[bk.kol] = null;
+            bk.kol = null;
+        });
+        if (!fejl) { this.loes(); return; }
         this.fejl = true;
-        this.glimt = { k: k, t: 0 };
-        if (this.iTraek) this.iTraek = 0;
-        this.besked(NK.html(fejl), "skidt");
+        this.iTraek = 0;
+        this.pegKnap = true;
+        var flere = nFejl > 1 ? " " + (nFejl - 1) + (nFejl === 2 ? " mærkat mere passede" : " mærkater mere passede") + " ikke." : "";
+        this.besked(NK.Skort.maerke("Ikke endnu", NK.html(fejl + flere)), "skidt");
+        this.kort.ryst();
         this.visOpgave();
     };
 
@@ -183,9 +225,8 @@
         } else {
             this.iTraek = 0;
         }
-        var o = this.opg;
-        this.besked((this.vist ? "Sådan. " : "<b>Rigtigt.</b> ") + NK.html(S.formel(o.syre) + " og " + S.formel(o.kb)) +
-            " er det ene par, " + NK.html(S.formel(o.base) + " og " + S.formel(o.ks)) + " det andet.", this.vist ? "gul" : "god");
+        this.brikker.forEach(function (bk) { bk.ok = true; });
+        this.besked("", "");
         this.visOpgave();
     };
 
@@ -206,20 +247,31 @@
         return ud;
     };
 
-    P.knap = function () {
-        if (this.loest) { this.nyOpgave(); return; }
+    /* Hintknappen paa kortet: Giv hint -> Vis svaret */
+    P.hjaelpKlik = function () {
+        if (this.loest) return;
         var o = this.opg;
+        this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(S.formel(o.syre) + " og " + S.formel(o.kb)) +
-                " er det ene par. De er ens bortset fra én H⁺.", "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(S.formel(o.syre) + " og " + S.formel(o.kb)) +
+                " er det ene par. De er ens bortset fra én H⁺."), "gul");
             this.visOpgave();
             return;
         }
         this.vist = true;
         var f = this.facit(), mig = this;
+        this.kol = [null, null, null, null];
         this.brikker.forEach(function (bk) { bk.kol = f[bk.mk]; mig.kol[f[bk.mk]] = bk.mk; });
         this.loes();
+    };
+
+    /* Kortets groenne knap */
+    P.videre = function () { if (this.loest) this.nyOpgave(); };
+
+    /* Den gamle ene knap (selvtesten bruger den): videre eller hjaelp */
+    P.knap = function () {
+        if (this.loest) this.videre(); else this.hjaelpKlik();
     };
 
     P.nulstil = function () {
@@ -227,43 +279,72 @@
         this.nyOpgave();
     };
 
-    P.enter = function () { if (this.loest) this.knap(); };
+    P.enter = function () {
+        if (this.loest) this.videre();
+        else if (this.kol.every(function (m) { return m; })) this.indsend();
+    };
     P.fokus = function () {};
     P.tast = function () { return false; };
 
     /* ----- Panelet --------------------------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = { knap: NK.el("par-knap"), besked: NK.el("par-besked"), kort: NK.el("par-kort") };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.el = { knap: NK.el("par-knap"), besked: NK.el("par-besked"), indsend: NK.el("par-indsend"), status: NK.el("par-status"), skort: NK.el("par-skort") };
+        this.kort = new NK.Skort("par", {
+            hjaelp: function () { mig.hjaelpKlik(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
         Tv.bindNiveau("par-niveau", this);
     };
 
+    /* Beskeden nederst paa kortet: hint, fejl eller et svar paa et klik */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort && this.opg) this.visKort();
     };
 
     P.visOpgave = function () {
         var rek = this.rekord[S.niveau] || 0;
-        NK.saetHTML("par-taeller", "<b>" + this.iTraek + "</b> i træk · rekord " + rek);
-        var tekst, klasse = "knap";
-        if (this.loest) { tekst = "Ny reaktion"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.loest && !this.vist);
+        NK.saetHTML("par-taeller", "<b>" + this.iTraek + "</b> · rekord " + rek);
+        this.visKort();
     };
 
-    P.visStatus = function () {
-        var t, tr = this.traek;
+    /* Papirkortet: opgaven, beskeden, Giv hint og Indsend svar. Naar alle
+       fire sidder rigtigt, bliver kortet med forklaringen og Ny reaktion. */
+    P.visKort = function () {
+        if (!this.kort || !this.opg) return;
+        var o = this.opg, bliv = null;
+        if (this.loest) {
+            bliv = {
+                vist: this.vist,
+                tekst: NK.html(S.formel(o.syre) + " og " + S.formel(o.kb) + " er det ene par, " + S.formel(o.base) + " og " +
+                    S.formel(o.ks) + " det andet. Klammerne viser parrene."),
+                knap: "Ny reaktion →"
+            };
+        }
+        var b = this.fast;
+        if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
+        this.kort.vis({
+            chip: "Parrene",
+            tekst: "Hvem er hvem? Sæt de fire mærkater under de rigtige formler.",
+            bliv: bliv,
+            besked: b,
+            hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap },
+            indsend: { tekst: "Indsend svar", klar: this.kol.every(function (m) { return m; }) }
+        });
+    };
+
+    /* Det, kortet siger, mens der ikke er en besked (der er ingen linje nederst) */
+    P.linje = function () {
+        var tr = this.traek;
         var n = this.kol.filter(function (m) { return m; }).length;
-        if (tr && tr.flyttet) t = this.overKol !== null ? "Slip mærkatet under formlen." : "Træk mærkatet hen under en formel.";
-        else if (this.loest) t = "Klammen over viser syren og dens korresponderende base. Klammen under basen og dens korresponderende syre.";
-        else if (this.valgt !== null) t = "Klik nu på den formel, mærkatet hører til.";
-        else if (n === 0) t = "Træk hvert mærkat hen under den formel, det passer til.";
-        else t = (4 - n) + (4 - n === 1 ? " mærkat" : " mærkater") + " mangler.";
-        NK.saetHTML("par-status", t);
+        if (this.loest) return "";
+        if (tr && tr.flyttet) return this.overKol !== null ? "Slip mærkatet under formlen." : "Træk mærkatet hen under en formel.";
+        if (this.valgt !== null) return "Klik nu på den formel, mærkatet hører til.";
+        if (n === 0) return "";
+        if (n === 4) return "Tryk Indsend svar, når alle fire mærkater sidder.";
+        return (4 - n) + (4 - n === 1 ? " mærkat" : " mærkater") + " mangler. Et klik på et mærkat sender det tilbage.";
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------------ */
@@ -282,7 +363,7 @@
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
         if (this.opdaterFri && this.opdaterFri(dt)) this.stil();
-        this.visStatus();
+        this.visKort();
     };
 
     P.tegn = function () {
@@ -359,18 +440,18 @@
             if (!u) { mig.valgt = null; return; }
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "kop") { if (mig.klikKop) mig.klikKop(); return; }
-            if (mig.loest) { mig.besked("Tryk Ny reaktion for en ny.", ""); return; }
+            if (mig.loest) { mig.kort.blink(); return; }
             if (u.slags === "brik") {
                 var bk = mig.brikker[u.i];
-                if (bk.kol !== null) { mig.besked("Det mærkat sidder rigtigt.", ""); return; }
-                var r = mig.hjem[u.i];
-                mig.traek = { i: u.i, x0: pt.x, y0: pt.y, x: pt.x, y: pt.y, dx: r.x - pt.x, dy: r.y - pt.y, flyttet: false };
+                if (bk.ok) { mig.besked("Det mærkat sidder rigtigt og bliver siddende.", "peger"); return; }
+                var r = mig.brikR(u.i);
+                mig.traek = { i: u.i, x0: pt.x, y0: pt.y, x: pt.x, y: pt.y, dx: r.x - pt.x, dy: r.y - pt.y, flyttet: false, fraKol: bk.kol };
                 try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
                 return;
             }
             if (u.slags === "kol") {
                 if (mig.valgt !== null) { mig.saet(mig.valgt, u.k); return; }
-                mig.besked("Træk et mærkat hen under " + NK.html(S.formel(mig.arter[u.k])) + ".", "");
+                mig.besked("Træk et mærkat hen under " + NK.html(S.formel(mig.arter[u.k])) + ".", "peger");
             }
         });
         c.addEventListener("pointermove", function (e) {
@@ -386,7 +467,7 @@
             }
             mig.over = mig.hvadErUnder(pt);
             var s = mig.over && mig.over.slags;
-            var fri = s === "brik" && mig.brikker[mig.over.i].kol === null && !mig.loest;
+            var fri = s === "brik" && !mig.brikker[mig.over.i].ok && !mig.loest;
             c.style.cursor = fri ? "grab" : (s === "laerer" || s === "kop" || (s === "kol" && mig.valgt !== null) ? "pointer" : "default");
         });
         c.addEventListener("pointerleave", function () { if (!mig.traek) { mig.over = null; c.style.cursor = "default"; } });
@@ -397,11 +478,15 @@
             var k = mig.overKol;
             mig.overKol = null;
             if (!tr.flyttet) {
+                /* Et klik paa et maerkat under en formel sender det tilbage */
+                if (tr.fraKol !== null) { mig.tilbage(tr.i); return; }
                 mig.valgt = mig.valgt === tr.i ? null : tr.i;
-                if (mig.valgt !== null) mig.besked("Klik på den formel, <b>" + NK.html(S.MAERKE_TEKST[mig.brikker[tr.i].mk]) + "</b> hører til.", "");
+                if (mig.valgt !== null) mig.besked("Klik på den formel, <b>" + NK.html(S.MAERKE_TEKST[mig.brikker[tr.i].mk]) + "</b> hører til.", "peger");
+                else mig.besked("", "");
                 return;
             }
             if (k !== null) mig.saet(tr.i, k);
+            else if (tr.fraKol !== null) mig.tilbage(tr.i);
         }
         c.addEventListener("pointerup", slip);
         c.addEventListener("pointercancel", slip);

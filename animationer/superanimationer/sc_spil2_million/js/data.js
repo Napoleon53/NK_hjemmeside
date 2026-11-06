@@ -255,7 +255,7 @@
         sp("c8_9", 8, "Navnet for forbindelsen H₂O₂, der ofte bruges i redoxreaktioner", "The name for the compound H₂O₂, often used in redox reactions",
             ["Hydrogenperoxid", "Hydrogenchlorid", "Dihydrogenoxid", "Carbondioxid"], ["Hydrogen peroxide", "Hydrogen chloride", "Dihydrogen monoxide", "Carbon dioxide"]),
         sp("c8_10", 8, "Navnet for gassen H₂, som indgår i spændingsrækken", "The name for the gas H₂, which appears in the activity series",
-            ["Hydrogen", "Oxygen", "Nitrogen", "Helium"], ["Hydrogen", "Oxygen", "Nitrogen", "Helium"])
+            ["Dihydrogen", "Dioxygen", "Dinitrogen", "Helium"], ["Hydrogen", "Oxygen", "Nitrogen", "Helium"])
     ];
 
     /* ----- Rosen til den, der vinder ----------------------------------- */

@@ -458,6 +458,66 @@ function koerTest(W) {
     });
     klik('[data-fane="fane-vaegt"]');
 
+    overskrift("13c. Papirkortet (6. nov. 2026)");
+    var faner = [["fane-vaegt", "vaegt", V], ["fane-skaal", "skaal", S], ["fane-ukendt", "ukendt", U]];
+    faner.forEach(function (f) {
+        klik('[data-fane="' + f[0] + '"]');
+        f[2].springIntro();
+        var kort = d.getElementById(f[1] + "-skort");
+        paastand(f[0] + ": kortet står i scenen og ikke i panelet", !!kort && !!kort.closest(".scene") && !kort.closest(".panel"));
+        var fane = d.getElementById(f[0]);
+        paastand(f[0] + ": ingen statuslinje nederst i scenen", !fane.querySelector(".scene-mrk, .statuslinje, .hjaelpelinje"));
+        paastand(f[0] + ": Start forfra står ikke på kortet", !kort.querySelector(".nulstil, .igen") && !/Start forfra/.test(kort.textContent));
+        paastand(f[0] + ": opgaveteksten står ikke i panelet", !fane.querySelector(".panel .sk-tekst, .panel .besked"));
+    });
+    /* Skaalvaegten: valget bedoemmer ikke, Indsend svar er graa uden valg */
+    klik('[data-fane="fane-skaal"]');
+    S.nyRunde(); S.springIntro();
+    var ind = d.getElementById("skaal-indsend");
+    paastand("skålvægten: Indsend svar er grå uden valg", !ind.hidden && ind.classList.contains("ikke-klar"));
+    var p0 = S.point;
+    S.vaelg(S.facit());
+    paastand("skålvægten: et valg bedømmer ikke af sig selv", !S.svar && S.point === p0 && ind.classList.contains("klar"));
+    var rInd = ind.getBoundingClientRect();
+    S.indsend();
+    var nae = d.querySelector("#skaal-bliv [data-videre]");
+    var rNae = nae ? nae.getBoundingClientRect() : null;
+    paastand("skålvægten: rigtigt svar bliver på spørgsmålet med Næste, hvor Indsend svar stod",
+        S.point === p0 + 1 && !!nae && d.getElementById("skaal-bund").hidden && !!d.querySelector("#skaal-ind .sk-knap.rigtig")
+        && Math.abs(rNae.right - rInd.right) < 30, rNae ? Math.round(rNae.right) + " / " + Math.round(rInd.right) : "ingen Næste");
+    S.videre();
+    paastand("skålvægten: rosen står ikke under det næste spørgsmål", d.getElementById("skaal-bliv").hidden && !S.svar);
+    /* Ukendt stof: et klik paa en etiket vaelger kun */
+    klik('[data-fane="fane-ukendt"]');
+    U.nulstilAlt(); U.vaelg(0);
+    var uind = d.getElementById("ukendt-indsend");
+    paastand("ukendt stof: Indsend svar er grå uden valgt etiket", !uind.hidden && uind.classList.contains("ikke-klar"));
+    U.vaelgKort(U.opg.kort.filter(function (k) { return k.st === U.opg.g.st; })[0]);
+    paastand("ukendt stof: et klik på en etiket bedømmer ikke af sig selv", !U.flyv && !U.opg.faerdig && uind.classList.contains("klar"));
+    U.nulstilAlt();
+    /* Vaegten: Indsend uden tal bedoemmer intet */
+    klik('[data-fane="fane-vaegt"]');
+    V.nulstilAlt(); V.vaelg(0);
+    var vind = d.getElementById("vaegt-indsend");
+    V.indsend();
+    paastand("vægten: Indsend svar uden molekyle bedømmer intet", !V.opg.faerdig && V.antalLoest() === 0);
+    V.nulstilAlt();
+    /* Kortet holder sig inden for kortZone paa en hoej og en lav skaerm */
+    var rammeK = document.getElementById("ramme");
+    [[1400, 860], [1280, 640]].forEach(function (st) {
+        rammeK.style.width = st[0] + "px"; rammeK.style.height = st[1] + "px";
+        faner.forEach(function (f) {
+            klik('[data-fane="' + f[0] + '"]');
+            var sim = f[2]; sim.tilpas();
+            var kort = d.getElementById(f[1] + "-skort");
+            var bund = kort.offsetTop + kort.offsetHeight;
+            paastand(f[0] + " ved " + st[0] + " × " + st[1] + ": kortet holder sig i kortZone", bund <= sim.lay.zone && sim.lay.p.y >= bund,
+                "kortets bund " + bund + ", zone " + sim.lay.zone);
+        });
+    });
+    rammeK.style.width = ""; rammeK.style.height = "";
+    klik('[data-fane="fane-vaegt"]');
+
     overskrift("14. Layoutet");
     var ramme = document.getElementById("ramme");
     var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];

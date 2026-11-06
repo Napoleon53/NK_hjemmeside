@@ -9,8 +9,13 @@
 
    To hylder (D.HYLDER) med seks stoffer hver. Stofferne fra hylde 1
    bliver staaende lidt blegere, mens hylde 2 maales, saa skalaen til
-   sidst har alle tolv. Knappen giver et hint og saa svaret (resten
-   maales uden gaet). Hvor langt eleven er naaet, huskes under NOEGLE.
+   sidst har alle tolv. Hvor langt eleven er naaet, huskes under NOEGLE.
+
+   Papirkortet (6. nov. 2026, js/skort.js): hylden og opgaven staar paa
+   kortet oeverst i scenen, med Giv hint -> Vis svaret (resten maales
+   uden gaet). Et gaet er gratis og bedoemmes ikke, saa fanen har ingen
+   Indsend svar: stoffet maales, naar det slippes paa skalaen. Naar
+   hylden er maalt, bliver kortet med resultatet og Naeste hylde.
    ===================================================================== */
 (function () {
     "use strict";
@@ -38,6 +43,7 @@
         this.hylde = NK.klamp(gemt.hylde || 0, 0, D.HYLDER.length);
         this.rost = gemt.rost || [];
 
+        this.fast = { html: "", klasse: "" };
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
@@ -53,7 +59,7 @@
         var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.014, 8, 16);
         lay.kant = kant;
-        lay.luft = NK.klamp(H * 0.1, 10, 70);
+        lay.luft = 10 + this.kortZone() + 8;      /* under papirkortet */
         lay.bordY = Math.round(H * 0.84);
         lay.px = NK.klamp(W * 0.017, 12, 15);
         var bandH = NK.klamp(H * 0.06, 24, 42);
@@ -109,6 +115,9 @@
     /* ----- Stofferne --------------------------------------------------------------------
        Et stof er { st, status, x, y, h, gaet, fra, t, bane, hylde }.
        status: hylde, traekkes, tilMaaler, maales, op, placeret */
+    /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 140); };
+
     P.startHylde = function () {
         var mig = this;
         this.stoffer = [];
@@ -251,7 +260,8 @@
         var h = Math.min(this.hylde, D.HYLDER.length - 1);
         var t = "Alle seks er målt.";
         if (gaettet) t += " " + taet + " af dine " + gaettet + " gæt var højst 1 fra.";
-        this.besked(t, "god");
+        this.slutTekst = t;
+        this.besked("", "");
         var gemt = NK.hent(NOEGLE, {}) || {};
         gemt.hylde = Math.max(h + 1, gemt.hylde || 0);
         if (this.rost.indexOf(h) < 0) {
@@ -263,8 +273,14 @@
         NK.gem(NOEGLE, gemt);
     };
 
-    /* ----- Knappen: Giv hint -> Vis svaret -> Naeste hylde --------------------------------- */
+    /* ----- Kortets knapper: Giv hint -> Vis svaret, og videre --------------------------- */
     P.knap = function () {
+        if (this.naaet) { this.videre(); return; }
+        this.hjaelpKlik();
+    };
+
+    /* Kortets groenne knap: naeste hylde, efter den sidste videre til luppen */
+    P.videre = function () {
         if (this.naaet) {
             var sidste = this.hylde >= D.HYLDER.length - 1;
             if (sidste) {
@@ -274,17 +290,20 @@
             }
             this.hylde++;
             this.startHylde();
-            return;
         }
+    };
+
+    P.hjaelpKlik = function () {
+        if (this.naaet || this.hjaelp === 2) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(this.aktivHylde().hint), "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(this.aktivHylde().hint)), "gul");
             this.visKort();
             return;
         }
         this.brugtSvar = true;
         this.hjaelp = 2;
-        this.besked("Resten måles uden gæt.", "gul");
+        this.besked(NK.Skort.maerke("Svaret", "Resten af hylden måles uden gæt."), "gul");
         if (!this.maaling) this.naesteUdenGaet();
         this.visKort();
     };
@@ -301,10 +320,15 @@
         this.el = {
             knap: NK.el("skala-knap"),
             besked: NK.el("skala-besked"),
-            kort: NK.el("skala-kort"),
+            status: NK.el("skala-status"),
+            indsend: NK.el("skala-indsend"),
+            skort: NK.el("skala-skort"),
             liste: NK.el("skala-liste")
         };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.Skort("skala", {
+            hjaelp: function () { mig.hjaelpKlik(); },
+            videre: function () { mig.videre(); }
+        });
         NK.el("skala-nulstil").addEventListener("click", function () { mig.nulstil(); });
         this.el.liste.addEventListener("click", function (e) {
             var r = e.target.closest ? e.target.closest("[data-id]") : null;
@@ -314,30 +338,38 @@
         });
     };
 
+    /* Beskeden nederst paa kortet: hint eller et svar paa et klik */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = { html: html || "", klasse: klasse || "" };
+        if (this.kort && this.stoffer) this.visKort();
     };
 
+    /* Papirkortet: hylden, opgaven, beskeden og Giv hint. Naar hylden er
+       maalt, bliver kortet med resultatet og knappen videre. */
     P.visKort = function () {
         var alle = this.hylde >= D.HYLDER.length;
         var h = Math.min(this.hylde, D.HYLDER.length - 1);
-        NK.saetTekst("skala-titel", alle ? "Alle tolv stoffer" : "Hylde " + (h + 1) + " · " + D.HYLDER[h].navn);
         NK.saetTekst("skala-maalt", String(alle ? 12 : this.antalMaalt()));
         NK.saetTekst("skala-ialt", String(alle ? 12 : this.denneHylde().length));
-        NK.saetTekst("skala-prompt", alle ? "Skalaen er fyldt. Klik på et stof for at se det igen." :
-            "Træk hvert stof op på skalaen, der hvor du tror, det hører til.");
-        var tekst, klasse = "knap";
-        if (this.naaet) {
-            tekst = this.hylde >= D.HYLDER.length - 1 ? "Videre til luppen →" : "Næste hylde →";
-            klasse = "knap blaa banker";
-        } else if (this.hjaelp === 0) tekst = "Giv hint";
-        else if (this.hjaelp === 1) tekst = "Vis svaret";
-        else { tekst = "Måler …"; }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.knap.disabled = this.hjaelp === 2 && !this.naaet;
-        this.el.kort.classList.toggle("sejr", this.naaet && this.hylde < D.HYLDER.length);
+        if (!this.kort) return;
+        var bliv = null;
+        if (this.naaet && !alle) {
+            bliv = { tekst: NK.html(this.slutTekst || "Alle seks er målt."), maerke: "Færdig", vist: this.brugtSvar,
+                knap: this.hylde >= D.HYLDER.length - 1 ? "Videre til luppen →" : "Næste hylde →" };
+        }
+        /* Under et traek og en maaling siger kortet, hvad der sker */
+        var b = this.fast, l = this.linje();
+        if (l) b = { html: l, klasse: "peger" };
+        this.kort.vis({
+            chip: alle ? "Alle tolv stoffer" : "Hylde " + (h + 1) + " · " + D.HYLDER[h].navn,
+            tekst: alle ? "Skalaen er fyldt. Klik på et stof for at se det igen." :
+                "Træk hvert stof op på skalaen, der hvor du tror, det hører til. pH-metret måler det bagefter.",
+            bliv: bliv,
+            besked: b,
+            hint: alle ? null : { tekst: this.hjaelp === 0 ? "Giv hint" : (this.hjaelp === 1 ? "Vis svaret" : "Måler …"),
+                svar: this.hjaelp > 0, laast: this.hjaelp === 2 },
+            indsend: null
+        });
     };
 
     /* Listen med gaet og maalt for hylden */
@@ -386,20 +418,19 @@
         this.valgt = s;
         this.visStof();
         this.visListe();
-        if (s.status === "hylde") this.besked("Træk " + NK.html(s.st.navn.toLowerCase()) + " op på skalaen, der hvor du tror, det hører til.", "");
+        if (s.status === "hylde") this.besked("Træk " + NK.html(s.st.navn.toLowerCase()) + " op på skalaen, der hvor du tror, det hører til.", "peger");
     };
 
-    P.visStatus = function () {
-        var t;
+    /* Det, kortet siger, mens der ikke er en besked (der er ingen linje nederst) */
+    P.visStatus = function () { this.visKort(); };
+
+    P.linje = function () {
+        var t = "";
         var tr = this.traek;
         if (tr && tr.flyttet) {
             t = this.overSkala(tr) ? "Dit gæt: <b>pH " + K.phTekst(this.gaetVed(tr.x), 1) + "</b>. Slip for at måle." : "Træk op på skalaen, og slip der, hvor du tror, stoffet hører til.";
         } else if (this.maaling) t = "pH-metret måler " + NK.html(this.maaling.st.navn.toLowerCase()) + ".";
-        else if (this.naaet && this.hylde < D.HYLDER.length) t = "Hylden er målt. Tryk på knappen til højre for at gå videre.";
-        else if (this.hylde >= D.HYLDER.length) t = "Klik på et stof på skalaen for at se det igen.";
-        else if (!this.antalMaalt()) t = "Træk et stof fra bordet op på skalaen, der hvor du tror, det hører til.";
-        else t = "Træk det næste stof op på skalaen.";
-        NK.saetHTML("skala-status", t);
+        return t;
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------ */
@@ -689,16 +720,16 @@
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "hylde" || u.slags === "placeret") { this.vaelg(u.s); return; }
         if (u.slags === "meter") {
-            this.besked("pH-metret måler de stoffer, du slipper på skalaen.", "");
+            this.besked("pH-metret måler de stoffer, du slipper på skalaen.", "peger");
             return;
         }
         if (u.slags === "skala") {
-            this.besked("Under 7 er surt, 7 er neutralt, og over 7 er basisk. Træk et stof herop.", "");
+            this.besked("Under 7 er surt, 7 er neutralt, og over 7 er basisk. Træk et stof herop.", "peger");
         }
     };
 
     P.enter = function () {
-        if (this.naaet) this.knap();
+        if (this.naaet) this.videre();
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */

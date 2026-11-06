@@ -123,7 +123,7 @@
         var svar = D.HYP_IDS.map(function (h) {
             return { t: T.P(h), ok: h === ret, forkert: !!mig.forkertDom[h] };
         });
-        var valgtJ = this.domValg ? D.HYP_IDS.indexOf(this.domValg) : -1;
+        var valgtJ = this.faerdig && this.valgt ? D.HYP_IDS.indexOf(this.valgt) : (this.domValg ? D.HYP_IDS.indexOf(this.domValg) : -1);
         this.svarKnapper(e, svar, valgtJ, function (j) { mig.domValg = D.HYP_IDS[j]; });
     };
 

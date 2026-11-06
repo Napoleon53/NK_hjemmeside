@@ -49,7 +49,7 @@ function koer() {
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["byg-nuklid-sym", "byg-nuklid-a", "byg-nuklid-z", "byg-kerne",
-        "byg-opgave", "iso-regnestykke",
+        "byg-ind", "iso-regnestykke",
         "salt-formel", "salt-navn", "salt-knap-tekst"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
@@ -190,7 +190,123 @@ function koer() {
     }
     spil.nulstil();
 
+    overskrift("11. Papirkortet (6. nov. 2026)");
+    papirkort(d, NK, ramme);
+
     vis();
+}
+
+function papirkort(d, NK, ramme) {
+    var W = ramme.contentWindow;
+    var byg = NK.sims["fane-byg"], spil = NK.sims["fane-spil"];
+    d.querySelector('.faneknap[data-fane="fane-byg"]').click();
+    paastand("kortene står i scenen, ikke i panelet", d.querySelector("#fane-byg .scene #byg-skort #byg-indsend") !== null &&
+        d.querySelector("#fane-spil .scene #spil-skort #spil-indsend") !== null &&
+        d.querySelector(".panel #byg-indsend, .panel #spil-indsend, .panel .valgknap, .panel .spilknap, #spil-boks, #byg-opgave-knap") === null);
+    paastand("ingen statuslinje nederst", d.querySelector(".statuslinje, #byg-hint") === null);
+    paastand("Start forfra står i panelet, ikke på kortet", d.querySelector("#fane-byg .panel #byg-forfra") !== null &&
+        d.querySelector(".scenekort .forfraknap, .scenekort #byg-forfra") === null);
+    byg.startForfra();
+    paastand("fane 1 begynder med fri byggeleg og en knap til opgaverne", !byg.opgave && /Start opgave/.test(byg.kortTekst()) &&
+        d.getElementById("byg-status").hidden);
+    d.querySelector("#byg-ind [data-videre]").click();
+    var o = byg.opgave;
+    paastand("Start opgave: opgaven står på kortet med etiketten", !!o && /^Opgave 1 af 6/.test(byg.kortTekst().trim()) &&
+        byg.kortTekst().indexOf(o.tekst) >= 0, byg.kortTekst());
+    paastand("Indsend svar er gråt, før atomet er ændret", /ikke-klar/.test(d.getElementById("byg-indsend").className));
+    byg.indsendKlik();
+    paastand("gråt Indsend svar bedømmer intet", !byg.slut && byg.rigtige === 0);
+    /* Byg svaret med knapperne: det bedoemmes ikke af sig selv */
+    byg.p = o.p; byg.n = o.n; byg.e = o.e - 1 < 0 ? o.e + 1 : o.e - 1;
+    byg.anvend("", "");
+    paastand("knapperne i panelet bedømmer ikke af sig selv", !byg.slut && /klar/.test(d.getElementById("byg-indsend").className) &&
+        !/ikke-klar/.test(d.getElementById("byg-indsend").className));
+    byg.indsendKlik();
+    paastand("forkert antal elektroner: rød besked om elektronerne", !byg.slut && /skidt/.test(d.getElementById("byg-status").className) &&
+        /elektroner/.test(d.getElementById("byg-besked").textContent), d.getElementById("byg-besked").textContent);
+    paastand("efter et forkert svar lyser hintknappen stille", /peg/.test(d.getElementById("byg-knap").className));
+    d.getElementById("byg-knap").click();
+    paastand("Giv et hint viser atomsymbolet på kortet", d.querySelector("#byg-besked .sk-nuklid") !== null &&
+        d.getElementById("byg-knap").textContent === "Vis svaret");
+    byg.e = o.e; byg.anvend("", "");
+    byg.indsendKlik();
+    var bliv = d.querySelector("#byg-ind .sk-bund.bliv");
+    paastand("rigtigt: kortet bliver på opgaven med forklaringen og Næste", byg.slut && bliv && /god/.test(bliv.className) &&
+        byg.kortTekst().indexOf(o.tekst) >= 0 && /Næste opgave/.test(bliv.textContent) && d.getElementById("byg-status").hidden && byg.rigtige === 1);
+    var n0 = byg.n;
+    d.getElementById(n0 > 0 ? "byg-n-minus" : "byg-n-plus").click();
+    paastand("efter et rigtigt svar er knapperne låst, og kortet blinker", byg.n === n0 && /blink/.test(d.getElementById("byg-skort").className), byg.n + " " + n0 + " " + d.getElementById("byg-skort").className);
+    d.querySelector("#byg-ind [data-videre]").click();
+    paastand("Næste giver en ny opgave uden rosen fra den forrige", byg.opgave !== o && !byg.slut && d.querySelector("#byg-ind .bliv") === null &&
+        /^Opgave 2 af 6/.test(byg.kortTekst().trim()));
+    byg.hintKnap(); byg.hintKnap();
+    paastand("Vis svaret: gult kort, tæller ikke med", byg.slut && byg.slut.vist && /svar/.test(d.getElementById("byg-skort").className) && byg.rigtige === 1);
+    byg.startForfra();
+    paastand("Start forfra i panelet nulstiller runden", byg.rigtige === 0 && !byg.opgave);
+
+    d.querySelector('.faneknap[data-fane="fane-spil"]').click();
+    spil.nulstil();
+    var b = spil.baner[0];
+    paastand("spillet: spørgsmålet og fire svar står på kortet", d.querySelectorAll("#spil-ind .sk-knap").length === 4 &&
+        d.getElementById("spil-ind").textContent.indexOf(b.opgave.tekst) >= 0);
+    paastand("Indsend svar er gråt uden valgt svar", /ikke-klar/.test(d.getElementById("spil-indsend").className));
+    spil.indsendKlik();
+    paastand("gråt Indsend svar bedømmer intet", b.valgt === -1);
+    d.querySelectorAll("#spil-ind .sk-knap")[b.opgave.rigtig].click();
+    paastand("et klik på et svar vælger kun", b.valgt === -1 && d.querySelector("#spil-ind .sk-knap.valgt") !== null &&
+        !/ikke-klar/.test(d.getElementById("spil-indsend").className));
+    d.getElementById("spil-indsend").click();
+    var sb = d.querySelector("#spil-ind .sk-bund.bliv");
+    paastand("rigtigt: grønt svar, begrundelsen og Næste spørgsmål på kortet", b.valgt === b.opgave.rigtig &&
+        d.querySelector("#spil-ind .sk-knap.rigtig") !== null && sb && /Næste spørgsmål/.test(sb.textContent) && d.getElementById("spil-status").hidden);
+    sb.querySelector("[data-videre]").click();
+    paastand("Næste: nyt spørgsmål uden rosen", b.nr === 2 && b.valgt === -1 && d.querySelector("#spil-ind .bliv") === null);
+    var forkert = (b.opgave.rigtig + 1) % 4;
+    spil.vaelgSvar(forkert); spil.indsendKlik();
+    paastand("forkert: rødt svar, det rigtige i gult og begrundelsen", d.querySelector("#spil-ind .sk-knap.forkert") !== null &&
+        d.querySelector("#spil-ind .sk-knap.svar-vist") !== null && /svar/.test(d.getElementById("spil-skort").className));
+    spil.nulstil();
+
+    /* Kortet i den plads, der er sat af: almindelig og lav skaerm */
+    var zFejl = [];
+    var gw = ramme.style.width, gh = ramme.style.height;
+    [[1400, 860], [1280, 680]].forEach(function (m) {
+        ramme.style.width = m[0] + "px"; ramme.style.height = m[1] + "px";
+        d.querySelector('.faneknap[data-fane="fane-byg"]').click();
+        var basis = m[1] <= 720 ? 112 : 140, hoejst = 0, hvor = "";
+        for (var n = 0; n < 60; n++) {
+            byg.startForfra(); byg.nyOpgave();
+            byg.p = 0; byg.anvend("", ""); byg.indsendKlik();
+            if (d.getElementById("byg-skort").offsetHeight > hoejst) { hoejst = d.getElementById("byg-skort").offsetHeight; hvor = "fejl " + byg.opgave.tekst; }
+            byg.hintKnap();
+            if (d.getElementById("byg-skort").offsetHeight > hoejst) { hoejst = d.getElementById("byg-skort").offsetHeight; hvor = "hint " + byg.opgave.tekst; }
+            byg.hintKnap();
+            if (d.getElementById("byg-skort").offsetHeight > hoejst) { hoejst = d.getElementById("byg-skort").offsetHeight; hvor = "svar " + byg.opgave.tekst; }
+        }
+        if (hoejst > basis) zFejl.push(m.join("×") + " fane 1 " + hoejst + ">" + basis + " " + hvor.slice(0, 50));
+        var sted = byg.placering(), geo = byg.atom.sidsteGeo;
+        if (sted.cy - sted.plads < 10 + byg.kortZone()) zFejl.push(m.join("×") + " atomet under kortet");
+        byg.startForfra();
+
+        d.querySelector('.faneknap[data-fane="fane-spil"]').click();
+        var basisS = m[1] <= 720 ? 150 : 166, hS = 0, hvorS = "";
+        for (var bn = 0; bn < 3; bn++) {
+            for (var k = 0; k < 40; k++) {
+                spil.aktiv = bn; spil.baner[bn] = { nr: 0, rigtige: 0, opgave: null, valgt: -1, faerdig: false, perfekt: false, sidsteSlags: null, brugte: [] };
+                spil.nytSpoergsmaal(); spil.visBane();
+                spil.vaelgSvar((spil.baner[bn].opgave.rigtig + 1) % 4); spil.indsendKlik();
+                var h = d.getElementById("spil-skort").offsetHeight;
+                if (h > hS) { hS = h; hvorS = spil.baner[bn].opgave.tekst; }
+            }
+        }
+        if (hS > basisS) zFejl.push(m.join("×") + " spillet " + hS + ">" + basisS + " " + hvorS.slice(0, 50));
+        var st = d.getElementById("spil-stat").getBoundingClientRect(), kort = d.getElementById("spil-skort").getBoundingClientRect();
+        if (!d.getElementById("spil-stat").hidden && st.top < kort.bottom) zFejl.push(m.join("×") + " tallene under kortet");
+        spil.nulstil();
+    });
+    ramme.style.width = gw; ramme.style.height = gh;
+    paastand("kortene holder sig i kortZone på en almindelig og en lav skærm", zFejl.length === 0, zFejl.join(", "));
+    d.querySelector('.faneknap[data-fane="fane-byg"]').click();
 }
 
 function vis() {

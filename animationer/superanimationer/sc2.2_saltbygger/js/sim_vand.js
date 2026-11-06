@@ -35,6 +35,7 @@
         var mig = this;
         this.l = new NK.Laerred(NK.el("vand-laerred"));
         this.svar = new NK.Svarknapper(NK.el("vand-valg"), function (v, rigtig) { mig.svaret(v, rigtig); });
+        this.svar.vedValg = function () { mig.visIndsend(); };
         this.vaelger = new NK.Opgavevaelger(D.VAND_OPGAVER, 8);
         this.loeste = 0;
         this.nr = 0;
@@ -52,6 +53,7 @@
         NK.el("vand-haeld").addEventListener("click", function () { mig.haeldFrit(); });
         NK.el("vand-opgaveknap").addEventListener("click", function () { mig.opgaveKnap(); });
         NK.el("vand-afslut").addEventListener("click", function () { mig.visFrit(); mig.haeldFrit(); });
+        NK.el("vand-indsend").addEventListener("click", function () { mig.indsendKlik(); });
         /* Kemichael (laerer.js) tegnes paa samme laerred. Et klik paa ham
            gaar til ham, ikke til glasset. */
         this.L = this.l;
@@ -89,7 +91,9 @@
         NK.saetKnaptrin("vand-opgaveknap", trin);
     };
 
+    /* Kortet viser én besked ad gangen: en ny besked afloeser hintet */
     NK.SimVand.prototype.besked = function (id, html, klasse) {
+        if (html && id === "vand-besked") NK.saetHTML("vand-hint", "");
         NK.saetHTML(id, html || "");
         NK.saetKlasse(id, "besked" + (klasse ? " " + klasse : ""));
     };
@@ -99,12 +103,24 @@
         this.opgave = null;
         this.svar.ryd();
         NK.el("vand-saltkort").hidden = false;
-        NK.el("vand-opgavetekst").hidden = false;
+        NK.saetTekst("vand-chip", "Opgaver");
+        NK.saetTekst("vand-opgavetekst", "Læg et salt i vandet med valgene i panelet. Når du er klar, får du en opgave ad gangen.");
         NK.el("vand-afslut").hidden = true;
         NK.saetHTML("vand-spm", "");
         this.besked("vand-besked", "");
         NK.saetHTML("vand-hint", "");
         this.saetKnap("start");
+        this.visIndsend();
+    };
+
+    /* ----- Indsend svar: svarknapperne vaelger kun ------------------------------ */
+    NK.SimVand.prototype.visIndsend = function () {
+        var aktiv = !!this.opgave && !this.opgave.faerdig;
+        NK.visIndsend("vand-indsend", aktiv, aktiv && this.svar.harValgt());
+    };
+
+    NK.SimVand.prototype.indsendKlik = function () {
+        if (!this.opgave || this.opgave.faerdig || !this.svar.sendInd()) NK.kortBlink("vand-skort");
     };
 
     NK.SimVand.prototype.haeldFrit = function () {
@@ -163,7 +179,7 @@
         this.opgave = { salt: salt, type: type, vist: false, faerdig: false };
         this.saetSalt(salt);
         NK.el("vand-saltkort").hidden = true;
-        NK.el("vand-opgavetekst").hidden = false;
+        NK.saetTekst("vand-chip", "Opgave " + (this.nr + 1));
         NK.el("vand-afslut").hidden = false;
         this.besked("vand-besked", "");
         NK.saetHTML("vand-hint", "");
@@ -172,20 +188,23 @@
         if (type === "forudsig") {
             NK.saetTekst("vand-opgavetekst", "Der hældes vand på saltet. Hvad kommer der ud i vandet?");
             NK.saetHTML("vand-spm", '<span class="lign-v">' + D.oploesVenstre(salt) + "  →</span>");
+            NK.el("vand-valg").className = "valg sk-svar en-spalte";
             this.svar.vis(D.oploesValg(salt));
             this.niveau = this.niveauMaal = 0;
             this.lavKrystal("vent");
         } else {
             NK.saetTekst("vand-opgavetekst", "Tæl ionerne i glasset. Hvilket salt er opløst?");
             NK.saetHTML("vand-spm", "");
+            NK.el("vand-valg").className = "valg sk-svar";
             this.svar.vis(D.saltValg(salt, this.k));
             this.niveau = this.niveauMaal = 1;
             this.lavFrie();
         }
+        this.visIndsend();
     };
 
     NK.SimVand.prototype.svaret = function (v, rigtig) {
-        this.besked("vand-besked", (rigtig ? "<b>Rigtigt.</b> " : "") + v.forklaring, rigtig ? "god" : "skidt");
+        this.besked("vand-besked", (rigtig ? "<b>Rigtigt.</b> " : "<b>Ikke rigtigt.</b> ") + v.forklaring, rigtig ? "god" : "skidt");
         if (rigtig) this.afslut(true);
     };
 
@@ -201,6 +220,7 @@
 
     NK.SimVand.prototype.visHint = function () {
         if (!this.opgave || this.opgave.faerdig) return;
+        this.besked("vand-besked", "");
         NK.saetHTML("vand-hint", "<b>Hint:</b> " + this.hint());
         this.saetKnap("svar");
     };
@@ -210,7 +230,8 @@
         this.opgave.vist = true;
         this.svar.visRigtig();
         var r = this.svar.rigtig();
-        this.besked("vand-besked", r ? r.forklaring : "", "gul");
+        NK.saetHTML("vand-hint", "");
+        this.besked("vand-besked", r ? "<b>Svaret.</b> " + r.forklaring : "", "gul");
         this.afslut(false);
     };
 
@@ -222,6 +243,7 @@
             NK.saetTekst("vand-loest", String(this.loeste));
         }
         this.saetKnap("ny");
+        this.visIndsend();
         if (o.type === "forudsig") this.startFyld();
         else this.startInddampning();
     };
@@ -310,7 +332,8 @@
     /* ----- Glasset ---------------------------------------------------------- */
     NK.SimVand.prototype.maal = function () {
         var W = Math.max(this.l.b, 320), H = Math.max(this.l.h, 320);
-        var top = 64, bundLuft = 18;
+        /* Glasset begynder under papirkortet og ligningen over glasset */
+        var top = 10 + this.kortZone() + 44, bundLuft = 18;
         var h = Math.min(H - top - bundLuft, (W - 40) * SPRITE.h / SPRITE.b, 660);
         var b = h * SPRITE.b / SPRITE.h;
         var x = (W - b) / 2;
@@ -321,10 +344,12 @@
         var vl = x + SPRITE.venstre * sk, vh = x + SPRITE.hoejre * sk;
         var vb = y + SPRITE.bund * sk, vt = y + SPRITE.fuld * sk;
         var iw = vh - vl;
-        return { W: W, H: H, x: x, y: y, b: b, h: h, sk: sk, vl: vl, vh: vh, vb: vb, hFuld: vb - vt, iw: iw,
+        return { W: W, H: H, top: top, x: x, y: y, b: b, h: h, sk: sk, vl: vl, vh: vh, vb: vb, hFuld: vb - vt, iw: iw,
                  cx: (vl + vh) / 2, s: NK.klamp(iw * 0.64 / 13.5, 10, 24),
                  wy: vb - (vb - vt) * this.niveau, klar: this.l.b > 50 };
     };
+
+    NK.SimVand.prototype.kortZone = function () { return NK.kortZone("vand-skort", [226, 212]); };
 
     NK.SimVand.prototype.radius = function (ion) {
         return NK.ionRadiusVand(ion.ion) * this.G.s;
@@ -562,7 +587,7 @@
                 { t: D.ionLed(s.kat, s.p), farve: "#f39a8f" },
                 { t: "  +  ", farve: "#7e8590" },
                 { t: D.ionLed(s.an, s.n), farve: "#8fcaf0" }
-            ], G.W / 2, 34, { font: font, kant: true });
+            ], G.W / 2, G.top - 22, { font: font, kant: true });
         }
         var fast = this.fase === "falder" || this.fase === "krystal" || this.fase === "tung" || this.fase === "fylder"
             || this.fase === "inddampet" || (this.fase === "inddamper" && this.inddampTid > 2);

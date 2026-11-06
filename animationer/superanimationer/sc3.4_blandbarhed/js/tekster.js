@@ -23,8 +23,8 @@
           sel: ["#anker-bassin", "#anker-glas"] },
         { tekst: "I kortet Hæld i hælder du vand, ethanol eller olie i bassinet. I kortet Ryst og varm ryster du bassinet, skruer op for temperaturen og vælger mellem tilbagesvaling og destillation. Knappen Tøm bassinet tømmer både bassinet og forlaget.",
           sel: ["#haeld-kort", "#energi-kort"] },
-        { tekst: "Opgavekortet har seks opgaver om det, der sker i bassinet, og en opgave begynder, når du trykker på knappen Start opgave. Den samme knap giver derefter først et hint og så svaret. Knappen Quiz øverst til højre giver fem spørgsmål om blandbarhed.",
-          sel: ["#opgavekort", "#quizknap"] }
+        { tekst: "Kortet øverst i scenen har seks opgaver om det, der sker i bassinet. Du vælger et svar og trykker Indsend svar. Knappen Giv et hint hjælper, når du sidder fast. Knappen Quiz øverst til højre giver fem spørgsmål om blandbarhed.",
+          sel: ["#skort", "#quizknap"] }
     ];
 
     D.REPLIK = {
@@ -66,7 +66,7 @@
             valg: [
                 { tekst: "Ét lag", rigtig: true },
                 { tekst: "To lag med ethanol øverst", fejl: "Tætheden afgør kun rækkefølgen, når der er to lag. Ethanol og vand er begge polære." },
-                { tekst: "Uklart, som når man ryster olie og vand", fejl: "Uklart bliver det kun, når to væsker ikke kan blandes. Ethanol og vand er begge polære." }
+                { tekst: "Uklart som rystet olie og vand", fejl: "Uklart bliver det kun, når to væsker ikke kan blandes. Ethanol og vand er begge polære." }
             ],
             handling: { haeld: "ethanol" },
             hint: "Ethanol har en OH-gruppe ligesom vand.",
@@ -79,7 +79,7 @@
             valg: [
                 { tekst: "To lag med olien øverst", fejl: "Olie ligger øverst på vand, fordi vand er tungere. Ethanol er lettere end olie: 0,79 mod 0,92 g/mL." },
                 { tekst: "To lag med olien nederst", rigtig: true },
-                { tekst: "Ét lag, for ethanol har også en upolær del", fejl: "Den upolære del er kort. OH-gruppen gør ethanol så polær, at den ikke blandes med olie." }
+                { tekst: "Ét lag, ethanol har en upolær del", fejl: "Den upolære del er kort. OH-gruppen gør ethanol så polær, at den ikke blandes med olie." }
             ],
             handling: { haeld: "olie" },
             hint: "Ethanol vejer 0,79 g/mL. Olie vejer 0,92 g/mL.",
@@ -112,8 +112,8 @@
             start: { fyld: [["vand", 2], ["ethanol", 2]], blandet: true },
             tekst: "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C. Hvad sker der?",
             valg: [
-                { tekst: "Det koger, og dampen er mest ethanol", rigtig: true },
-                { tekst: "Begge koger lige meget, for de er blandet til ét stof", fejl: "De er blandet, men molekylerne er stadig to stoffer med hvert sit kogepunkt. Se, hvilke der stiger op." },
+                { tekst: "Det koger, dampen er mest ethanol", rigtig: true },
+                { tekst: "Begge koger lige meget", fejl: "De er blandet, men molekylerne er stadig to stoffer med hvert sit kogepunkt. Se, hvilke der stiger op." },
                 { tekst: "Intet, før blandingen når 100 °C", fejl: "Ethanol koger ved 78 °C. Blandingen koger allerede ved ca. 83 °C, for ethanol fordamper let." }
             ],
             handling: { T: 90 },

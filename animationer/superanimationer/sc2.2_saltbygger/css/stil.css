@@ -978,3 +978,128 @@ select:focus-visible {
 }
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* =====================================================================
+   Papirkortet (6. nov. 2026): opgaven, spoergsmaalet, svarene, hintet,
+   beskeden og knapperne staar paa ét lyst kort oeverst midt i scenen.
+   Farver og skrift ligger i ../faelles/papirkort.css (indlaeses efter
+   denne fil). Her er kun placeringen og raekkernes opstilling.
+   ===================================================================== */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    box-sizing: border-box;
+}
+.scenekort[hidden] { display: none; }
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-svar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.scenekort .sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scenekort .sk-svar.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scenekort .sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+}
+.scenekort .sk-knap:disabled { cursor: default; }
+.scenekort .v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.scenekort .sk-bund { display: flex; align-items: center; gap: 10px; }
+.scenekort .sk-bund[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.scenekort .sk-bund .st-tekst:empty::before { content: none; }
+.scenekort .sk-bund .st-tekst[hidden] { display: none; }
+.scenekort .sk-bund .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.scenekort .sk-bund .knap[hidden] { display: none; }
+.scenekort .sk-bund .st-tekst[hidden] + .knap { margin-left: auto; }
+.scenekort .sk-videre { flex: 0 0 auto; font-family: inherit; white-space: nowrap; cursor: pointer; }
+
+/* ----- sc2.2: kortets egne dele ------------------------------------------
+   Trinene staar paa én linje, svarknapperne er kortets svarknapper (de
+   gamle valgknapper faar papirkortets udseende), og hint og besked staar
+   over hinanden til venstre for knapperne i kortets nederste raekke. */
+.scenekort .sk-tekst b { font-weight: 600; }
+.scenekort .trin { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 7px 0 0; padding: 0; }
+.scenekort .trin[hidden] { display: none; }
+.scenekort .trin-punkt { padding: 0; background: none; font-size: 0.86rem; color: #6f6a5c; }
+.scenekort .trin-punkt + .trin-punkt { margin-top: 0; }
+.scenekort .trin-punkt[hidden] { display: none; }
+.scenekort .trin-punkt.aktiv { color: var(--pk-tekst, #1d2433); font-weight: 600; background: none; }
+.scenekort .trin-punkt.ok { color: var(--pk-groen, #2b7d51); }
+.scenekort .trin-punkt.fejl { color: var(--pk-roed, #c4493c); background: none; }
+.scenekort .trin-svar { margin-left: 6px; color: var(--pk-groen, #2b7d51); }
+.scenekort .trin-forkl { display: none; }
+.scenekort .opgave-spm { margin: 8px 0 0; font-size: 1.02rem; line-height: 1.4; color: var(--pk-tekst, #1d2433); }
+.scenekort .opgave-spm b { font-weight: 600; }
+.scenekort .lign-v { color: var(--pk-tekst, #1d2433); }
+.scenekort .valg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.scenekort .valg:empty { display: none; }
+.scenekort .valg.navne,
+.scenekort .valg.en-spalte { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scenekort .valgknap { min-height: 0; padding: 6px 10px; font-family: inherit; font-size: 0.95rem; text-align: left; }
+.scenekort .valg.navne .valgknap,
+.scenekort .valg.en-spalte .valgknap { font-size: 0.92rem; padding: 6px 10px; }
+.scenekort .valgknap:active:not(:disabled) { transform: none; }
+.scenekort .sk-beskeder { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.scenekort .besked {
+    margin: 0;
+    padding: 5px 10px;
+    border-left: 3px solid #a8a293;
+    border-radius: 2px 8px 8px 2px;
+    background-color: #f0eee8;
+    font-size: 0.92rem;
+    line-height: 1.38;
+    color: var(--pk-tekst-svag, #3a4150);
+}
+.scenekort .besked:empty { display: none; }
+.scenekort .besked.god { background-color: #e6f4ec; border-left-color: var(--pk-groen, #2b7d51); color: var(--pk-groen-tekst, #1f4d35); }
+.scenekort .besked.skidt { background-color: var(--pk-roed-lys, #fbeceb); border-left-color: var(--pk-roed, #c4493c); color: var(--pk-roed-tekst, #7a2a21); }
+.scenekort .besked.gul,
+.scenekort .besked.hint { background-color: var(--pk-gul-lys, #fdf5dc); border-left-color: #d4a72c; color: var(--pk-gul-tekst, #5a4510); }
+.scenekort .besked.peger { background-color: #f0eee8; border-left-color: #a8a293; }
+.scenekort #ukendt-forkl { margin-top: 7px; }
+.scenekort .linkknap { color: #2a76ac; }
+.scenekort .sk-bund .sk-videre { padding: 9px 18px; }
+.scenekort .sk-bund.tom { margin-top: 9px; }
+/* Fane 3: kortet staar mellem plakaterne paa vaeggen */
+#ukendt-skort { width: min(660px, calc(100% - 400px)); min-width: 460px; }
+.panel .forfraknap {
+    display: block;
+    margin: 8px 0 0 auto;
+    padding: 5px 12px;
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.panel .forfraknap[hidden] { display: none; }
+.panel .forfraknap:hover { color: var(--tekst); border-color: #6e6e80; }

@@ -30,7 +30,7 @@
         { id: "L1", niveau: "let", v: ["Cu", "Ag +"], h: ["Cu 2+", "Ag"], ox: [0, 0], red: [1, 1], miljoe: null,
           kontekst: "Sølvtræet: kobbertråd i sølvnitrat." },
         { id: "L2", niveau: "let", v: ["Cl2", "Br -"], h: ["Cl -", "Br2"], ox: [1, 1], red: [0, 0], miljoe: null,
-          kontekst: "Klor frigør brom fra bromid." },
+          kontekst: "Dichlor frigør dibrom fra bromid." },
         { id: "L3", niveau: "let", v: ["Al", "Cu 2+"], h: ["Al 3+", "Cu"], ox: [0, 0], red: [1, 1], miljoe: null },
         { id: "L4", niveau: "let", v: ["Fe 3+", "I -"], h: ["Fe 2+", "I2"], ox: [1, 1], red: [0, 0], miljoe: null },
         { id: "L5", niveau: "let", v: ["Zn", "Cu 2+"], h: ["Zn 2+", "Cu"], ox: [0, 0], red: [1, 1], miljoe: null,
@@ -46,7 +46,7 @@
         { id: "M2", niveau: "middel", v: ["Cu", "NO3 -"], h: ["Cu 2+", "NO2"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           kontekst: "Kobber i koncentreret salpetersyre." },
         { id: "M3", niveau: "middel", v: ["MnO2", "Cl -"], h: ["Mn 2+", "Cl2"], ox: [1, 1], red: [0, 0], miljoe: "surt",
-          kontekst: "Sådan fremstillede Scheele klor i 1774." },
+          kontekst: "Sådan fremstillede Scheele dichlor i 1774." },
         { id: "M4", niveau: "middel", v: ["Cr2O7 2-", "Fe 2+"], h: ["Cr 3+", "Fe 3+"], ox: [1, 1], red: [0, 0], miljoe: "surt" },
         { id: "M5", niveau: "middel", v: ["Cu", "NO3 -"], h: ["Cu 2+", "NO"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           kontekst: "Kobber i fortyndet salpetersyre." },
@@ -64,7 +64,7 @@
         /* ----- Svær: basisk miljø, H⁺ efter pilen og samme grundstof begge veje --- */
         { id: "S1", niveau: "svaer", v: ["MnO4 -", "I -"], h: ["MnO2", "IO3 -"], ox: [1, 1], red: [0, 0], miljoe: "basisk" },
         { id: "S2", niveau: "svaer", v: ["ClO -", "I -"], h: ["Cl -", "I2"], ox: [1, 1], red: [0, 0], miljoe: "basisk",
-          kontekst: "Klorin frigør iod fra iodid." },
+          kontekst: "Klorin frigør diiod fra iodid." },
         { id: "S3", niveau: "svaer", v: ["MnO4 -", "SO3 2-"], h: ["MnO2", "SO4 2-"], ox: [1, 1], red: [0, 0], miljoe: "basisk" },
         { id: "S4", niveau: "svaer", v: ["MnO4 -", "C2O4 2-"], h: ["MnO2", "CO3 2-"], ox: [1, 1], red: [0, 0], miljoe: "basisk" },
         { id: "S5", niveau: "svaer", v: ["NO2", "NO2"], h: ["NO3 -", "NO2 -"], ox: [0, 0], red: [1, 1], miljoe: "basisk", samme: "v",
@@ -85,7 +85,7 @@
     ];
 
     D.NIVEAUER = {
-        "let":    { navn: "Let",    lille: "uden ilt" },
+        "let":    { navn: "Let",    lille: "uden oxygen" },
         "middel": { navn: "Middel", lille: "surt miljø" },
         "svaer":  { navn: "Svær",   lille: "basisk og særlige" }
     };

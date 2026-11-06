@@ -54,7 +54,6 @@
         if (this.opg.start) this.laegStraks(this.opg.start);
         this.visMaal();
         this.visMaaling();
-        this.visStatus();
     }
 
     var P = SimVaegt.prototype;
@@ -71,14 +70,16 @@
            Plakaten er lidt smallere end paa de andre faner, saa krukkerne kan
            vaere stoerre. */
         var pb = NK.klamp(W * 0.26, 150, 280);
-        lay.plakat = { x: W - kant - pb, y: kant, b: pb, h: Math.round(pb * 0.4) };
+        /* Alt begynder under papirkortet */
+        lay.zone = this.kortZone();
+        lay.plakat = { x: W - kant - pb, y: lay.zone, b: pb, h: Math.round(pb * 0.4) };
         var hx0 = kant, hx1 = lay.plakat.x - Math.max(14, W * 0.02);
         var plads = (hx1 - hx0) / D.STOFFER.length;
         var kh = Math.min(plads * 0.92 * 1.3, H * 0.24, 170);
         lay.krukkeH = kh;
-        /* Krukkerne staar under tilbuddet om praesentationen, der er midt foroven */
-        var luft = NK.klamp(H * 0.09, 8, 64);
-        lay.hylde = { x0: hx0, x1: hx1, y: Math.round(kant + luft + kh + 4) };
+        /* Krukkerne staar under papirkortet */
+        var luft = NK.klamp(H * 0.02, 4, 14);
+        lay.hylde = { x0: hx0, x1: hx1, y: Math.round(lay.zone + luft + kh + 4) };
         lay.krukker = D.STOFFER.map(function (st, i) { return { x: hx0 + plads * (i + 0.5), y: lay.hylde.y }; });
 
         /* Vaegten paa bordet */
@@ -122,6 +123,7 @@
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();
+        else this.tjekZone();
     };
 
     /* Klumpens kant i px: terningen med rumfanget af 1 mol, i vaegtens maalestok */
@@ -207,6 +209,7 @@
         if (paa.length >= D.KLUMPER_MAKS) {
             this.besked("Der er ikke plads til flere. 10 mol er nok.", "gul");
             this.naerBesked = true;
+            if (this.kort) this.kort.blink();
             return false;
         }
         var st = D.STOFFER[i];
@@ -257,39 +260,52 @@
         this.maalKlumper(true);
     };
 
-    /* Efter hver handling: statuslinjen og panelet. Om opgaven er loest,
-       ses foerst, naar klumperne er landet (opdater). */
+    /* Efter hver handling: kortet og panelet. En bemaerkning om det, der
+       laa paa vaegten, passer ikke laengere, naar vaegten aendres. */
     P.efterHandling = function () {
+        if (this.naerBesked) { this.fast = null; this.naerBesked = false; }
         this.visStatus();
         this.visMaaling();
     };
 
-    /* ----- Opgaverne ------------------------------------------------------------------- */
+    /* ----- Opgaverne -------------------------------------------------------------------
+       Brugerens regel 24. okt. 2026: det, eleven goer paa vaegten, loeser
+       aldrig opgaven af sig selv. Indsend svar paa kortet sender det, der
+       ligger paa vaegten, ind (papirkortet, 6. nov. 2026). */
     P.maal = function () { return this.opg; };
 
-    P.tjekMaal = function () {
+    /* Alt, der ligger eller er paa vej op paa vaegten */
+    P.kompAlle = function () {
+        var tal = {};
+        this.paaVaegten().forEach(function (k) { tal[k.st.s] = (tal[k.st.s] || 0) + 1; });
+        return O.komp(tal);
+    };
+
+    P.indsend = function () {
         var o = this.opg;
-        if (!o || this.naaet || this.iLuften()) return;
-        var k = this.komp(), r = o.tjek(k);
-        if (r && r.ok) {
-            this.naaet = true;
-            this.hjaelp = 0;
-            this.fremhaev = null;
-            this.naerBesked = false;
-            this.besked(ubrudt(O.efter(o, k)), "god");
-            if (this.afvisTilbud) this.afvisTilbud();
-            NK.gem(NOEGLE, { maal: Math.max(this.maalNr + 1, (NK.hent(NOEGLE, {}) || {}).maal || 0) });
-            this.visMaal();
+        if (!o || this.naaet) { this.kort.blink(); return; }
+        if (!this.paaVaegten().length) {
+            this.kort.blink();
+            this.besked("Læg først klumper på vægten. Så kan du sende svaret.", "peger");
             return;
         }
-        if (r && r.besked) {
-            this.besked(ubrudt(r.besked), "gul");
-            this.naerBesked = true;
-        } else if (this.naerBesked) {
-            /* Den gamle bemaerkning passer ikke laengere */
-            this.besked("", "");
-            this.naerBesked = false;
-        }
+        var k = this.kompAlle(), r = o.tjek(k);
+        if (r && r.ok) { this.loes(k, false); return; }
+        this.besked(ubrudt(r && r.besked ? r.besked : "Det, der ligger på vægten, passer ikke med opgaven endnu."), "skidt");
+        this.naerBesked = true;
+    };
+
+    P.loes = function (k, vist) {
+        this.naaet = true;
+        this.visteSvar = !!vist;
+        this.hjaelp = 0;
+        this.fremhaev = null;
+        this.naerBesked = false;
+        this.fast = null;
+        this.efterTekst = ubrudt(O.efter(this.opg, k));
+        if (this.afvisTilbud) this.afvisTilbud();
+        NK.gem(NOEGLE, { maal: Math.max(this.maalNr + 1, (NK.hent(NOEGLE, {}) || {}).maal || 0) });
+        this.visMaal();
     };
 
     P.nyOpgave = function () {
@@ -297,22 +313,27 @@
         this.opg = O.opgave(this.maalNr, null, ty ? this.sidstP[ty.navn] : undefined);
         if (ty) this.sidstP[ty.navn] = this.opg.p;
         this.naaet = false;
+        this.visteSvar = false;
         this.hjaelp = 0;
         this.fremhaev = null;
         this.naerBesked = false;
-        this.besked("", "");
+        this.fast = null;
         if (this.opg.start) this.saetTil(this.opg.start);
         else this.tomVaegten();
         this.visMaal();
     };
 
-    P.knap = function () {
+    /* Knappen, der foerer videre: Naeste opgave */
+    P.videre = function () {
+        if (!this.naaet) return;
+        this.maalNr++;
+        this.nyOpgave();
+    };
+
+    /* Giv hint, saa Vis svaret: svaret laegges paa vaegten */
+    P.hint = function () {
         var o = this.opg;
-        if (this.naaet) {
-            this.maalNr++;
-            this.nyOpgave();
-            return;
-        }
+        if (this.naaet) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.fremhaev = o.fremhaev || null;
@@ -320,8 +341,15 @@
             this.besked("<b>Hint:</b> " + ubrudt(o.hint), "gul");
         } else {
             this.saetTil(o.svar);
+            this.loes(this.kompAlle(), true);
         }
         this.visMaal();
+    };
+
+    /* Den gamle knap (selvtesten): videre, ellers hint */
+    P.knap = function () {
+        if (this.naaet) { this.videre(); return; }
+        this.hint();
     };
 
     P.tomVaegten = function () {
@@ -331,12 +359,15 @@
 
     P.nulstil = function () {
         this.tomVaegten();
-        this.besked("", "");
+        this.fast = null;
         this.naerBesked = false;
+        this.visMaal();
     };
 
+    /* Enter: videre, Indsend svar, eller kortet blinker */
     P.enter = function () {
-        if (this.naaet) this.knap();
+        if (this.naaet) { this.videre(); return; }
+        this.indsend();
     };
 
     P.fokus = function () {};
@@ -347,37 +378,65 @@
         return f === "alle" || (Array.isArray(f) && f.indexOf(st.s) >= 0);
     };
 
-    /* ----- Panelet ---------------------------------------------------------------------- */
+    /* ----- Kortet og panelet ----------------------------------------------------------- */
     P.bygPanel = function () {
         var mig = this;
-        this.el = {
-            knap: NK.el("vaegt-knap"),
-            besked: NK.el("vaegt-besked"),
-            kort: NK.el("vaegt-kort")
-        };
-        this.el.knap.addEventListener("click", function () { mig.knap(); });
+        this.kort = new NK.SceneKort("vaegt", {
+            hint: function () { mig.hint(); },
+            indsend: function () { mig.indsend(); },
+            videre: function () { mig.videre(); }
+        });
+        this.el = { besked: this.kort.beskedEl, knap: this.kort.hintEl, indsend: this.kort.indsendEl };
+        NK.el("vaegt-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
+    /* besked: linjen paa kortet. Tom: naeste skridt. Et forkert svar faar
+       maerket Ikke endnu. */
     P.besked = function (html, klasse) {
-        this.el.besked.innerHTML = html;
-        this.el.besked.className = "besked" + (klasse ? " " + klasse : "");
+        this.fast = html ? { html: html, klasse: klasse || "" } : null;
+        this.visMaal();
     };
 
     P.visMaal = function () {
-        var o = this.opg;
-        NK.saetTekst("vaegt-nr", String(this.maalNr + 1));
-        NK.saetTekst("vaegt-maal-titel", o.navn);
-        NK.saetHTML("vaegt-prompt", ubrudt(o.tekst));
-        var tekst, klasse = "knap";
+        var o = this.opg, k = this.kort;
+        if (!o || !k) return;
+        var opv = this.maalNr < O.MAAL.length;
+        k.vis({
+            kl: this.naaet ? "loest" + (this.visteSvar ? " svar" : "") : "opgave",
+            chip: opv ? "Opvarmning " + (this.maalNr + 1) + " af " + O.MAAL.length : "Opgave " + (this.maalNr + 1) + " · " + o.navn,
+            tekst: ubrudt(o.tekst)
+        });
         if (this.naaet) {
-            tekst = this.maalNr === O.MAAL.length - 1 ? "Til de sværere opgaver →" : "Næste opgave →";
-            klasse = "knap blaa banker";
+            var knap = this.maalNr === O.MAAL.length - 1 ? "Til de sværere opgaver →" : "Næste opgave →";
+            k.bliv(this.efterTekst || "", this.visteSvar ? "Svaret" : "Rigtigt", knap, this.visteSvar ? "svar" : "god");
+            k.knapper({});
         } else {
-            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            k.bliv(null);
+            var f = this.fast;
+            if (f && f.klasse === "skidt") k.besked('<span class="b-maerke">Ikke endnu</span> ' + f.html, "skidt");
+            else if (f) k.besked(f.html, f.klasse);
+            else k.besked(this.trinLinje(), "peger");
+            var n = this.paaVaegten().length;
+            k.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", peg: !!(f && f.klasse === "skidt") && this.hjaelp === 0,
+                indsend: true, klar: n > 0 });
         }
-        this.el.knap.textContent = tekst;
-        this.el.knap.className = klasse;
-        this.el.kort.classList.toggle("sejr", this.naaet);
+        this.tjekZone();
+    };
+
+    /* Det naeste skridt, naar linjen ikke har en besked */
+    P.trinLinje = function () {
+        var n = this.paaVaegten().length;
+        if (this.traek && this.traek.flyttet) return "Slip klumpen over vægten.";
+        if (n === 0) return "Træk en klump fra en krukke op på vægten. Hver klump er 1 mol.";
+        if (n >= D.KLUMPER_MAKS) return "Vægten er fuld. Klik på en klump for at tage den af.";
+        return "Klik på en klump for at tage den af. Tryk Indsend svar, når vægten passer.";
+    };
+
+    /* Kortets plads oeverst i scenen: [almindelig skaerm, lav skaerm] */
+    var ZONE = [104, 94];
+    P.kortZone = function () { return this.kort.zone(ZONE); };
+    P.tjekZone = function () {
+        if (this.lay && this.kortZone() !== this.lay.zone) this.layout();
     };
 
     /* Beregningerne for det, der er landet paa vaegten. Ligger der flere
@@ -404,14 +463,8 @@
         NK.saetTekst("vaegt-V", k.n ? NK.betydende(V, 3) + " cm³" : "0 cm³");
     };
 
-    P.visStatus = function () {
-        var n = this.paaVaegten().length, t;
-        if (this.traek && this.traek.flyttet) t = "Slip klumpen over vægten.";
-        else if (n === 0) t = "Træk en klump fra en krukke op på vægten. Hver klump er 1 mol.";
-        else if (n >= D.KLUMPER_MAKS) t = "Vægten er fuld. Klik på en klump for at tage den af.";
-        else t = "Klumper fra forskellige krukker kan blandes. Klik på en klump for at tage den af.";
-        NK.saetHTML("vaegt-status", t);
-    };
+    /* Statuslinjen er vaek: linjen med naeste skridt staar paa kortet */
+    P.visStatus = function () { this.visMaal(); };
 
     /* ----- Tegneloekken ------------------------------------------------------------------- */
     P.opdater = function (dt) {
@@ -436,7 +489,7 @@
         this.klumper = this.klumper.filter(function (k) { return !(k.hjem && !k.fra); });
         if (landede || foer !== this.klumper.length) {
             this.visMaaling();
-            this.tjekMaal();
+            this.visMaal();
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
@@ -603,6 +656,7 @@
                 } else {
                     mig.besked("Slip klumpen over vægten.", "gul");
                     mig.naerBesked = true;
+                    return;
                 }
                 mig.visStatus();
                 return;

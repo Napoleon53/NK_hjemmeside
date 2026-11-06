@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Afbrænding af ståluld</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Afbrænding af ståluld</h1>
@@ -32,33 +33,31 @@
         <div class="anker" id="forsoeg-anker-braender"></div>
         <div class="anker" id="forsoeg-anker-flaske"></div>
         <div class="anker" id="forsoeg-anker-zoom"></div>
-        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny klump ståluld med samme masse (R)">Start forfra ↺</button>
 
-        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, feltet til det tal,
-             der skal aflaeses, og den ene knap (js/fane.js og js/sim_forsoeg.js) -->
-        <div class="statuslinje" id="forsoeg-status">
-            <p class="st-tekst" id="forsoeg-besked" aria-live="polite"></p>
-            <div class="felt st-felt" id="forsoeg-aflaes" hidden>
-                <span class="felt-pre" id="forsoeg-aflaesnavn">m(før) =</span>
-                <input id="forsoeg-tal" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før) i gram">
-                <span class="felt-efter">g</span>
-                <button type="button" class="felt-ok" id="forsoeg-talok" aria-label="Tjek tallet" tabindex="-1">↵</button>
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): gaettet, opgaven,
+             naeste skridt, feltet til det tal, der aflaeses, hint, fejl,
+             Indsend svar og forklaringen med knappen videre (js/fane.js og
+             js/sim_forsoeg.js). Der er ingen statuslinje nederst. -->
+        <div class="scenekort" id="forsoeg-kort">
+            <div class="sk-top">
+                <div class="sk-ind" id="forsoeg-ind"></div>
+                <div class="felt sk-felt" id="forsoeg-aflaes" hidden>
+                    <span class="felt-pre" id="forsoeg-aflaesnavn">m(før) =</span>
+                    <input id="forsoeg-tal" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før) i gram">
+                    <span class="felt-efter">g</span>
+                </div>
             </div>
-            <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv hint</button>
+            <div class="sk-bund" id="forsoeg-bund">
+                <p class="st-tekst" id="forsoeg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="forsoeg-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div class="sk-blivplads" id="forsoeg-bliv"></div>
         </div>
-
-        <!-- Det gratis gaet: startskaermen, som sim_forsoeg.js bygger ud fra D.GAET.
-             Den daekker hele scenen, saa intet sker bag den, mens eleven svarer. -->
-        <div class="gaet" id="forsoeg-gaet" hidden></div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="forsoeg-kort">
-            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">måling <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
-            <div id="forsoeg-prompt"></div>
-        </div>
-
-        <!-- De tal, eleven har aflaest. Tallene skrives i feltet i statuslinjen. -->
+        <!-- De tal, eleven har aflaest. Tallene skrives i feltet paa kortet i scenen. -->
         <div class="kort maaling" id="forsoeg-skema">
             <h2>Skemaet</h2>
             <table class="skema">
@@ -79,6 +78,8 @@
         <div class="kort" id="forsoeg-opgaver">
             <h2>Målingerne <span class="taeller">løst <b id="forsoeg-loest">0</b>/2</span></h2>
             <div class="hyldeliste" id="forsoeg-liste"></div>
+            <!-- Start forfra staar i panelet, aldrig paa kortet (brugeren 3. nov. 2026) -->
+            <button class="knap forfra" id="forsoeg-forfra" type="button" title="En ny klump ståluld med samme masse (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -89,30 +90,38 @@
 <section class="fane" id="fane-beregning" role="tabpanel" aria-label="Beregningen">
     <div class="scene">
         <canvas id="beregning-laerred"></canvas>
-        <div class="anker" id="beregning-anker-opgave"></div>
         <div class="anker" id="beregning-anker-tavle"></div>
         <div class="anker" id="beregning-anker-soejler"></div>
-        <!-- Omskifteren Let / Svær: hvilket reaktionsskema der regnes med (js/sim_beregning.js) -->
-        <div class="skift" id="beregning-skift"></div>
+
+        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, det
+             naeste trin, spoergsmaalet med svarene, hint, fejl, Indsend svar og
+             forklaringen med knappen videre (js/fane.js og js/sim_beregning.js) -->
+        <div class="scenekort" id="beregning-kort">
+            <div class="sk-ind" id="beregning-ind"></div>
+            <div class="sk-bund" id="beregning-bund">
+                <p class="st-tekst" id="beregning-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="beregning-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="beregning-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div class="sk-blivplads" id="beregning-bliv"></div>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="beregning-kort">
-            <h2><span id="beregning-titel">Opgave</span><span class="taeller">opgave <b id="beregning-nr">1</b>/<span id="beregning-antal">2</span></span></h2>
+        <!-- Felterne, eleven skriver formlen, tallene og resultatet i (js/regning.js).
+             Opgaven og bedoemmelsen staar paa kortet i scenen; Indsend svar
+             eller Enter i et felt tjekker det aktive trin. -->
+        <div class="kort regnekort" id="beregning-regn">
+            <h2>Regnestykket <span class="taeller" id="beregning-titel">Måling 1</span></h2>
             <div id="beregning-prompt"></div>
             <div class="raekker" id="beregning-raekker"></div>
-            <div class="knaprad valgrad" id="beregning-valg" hidden></div>
-            <!-- Linjen med naeste skridt, fejl og hint og den ene knap.
-                 sim_beregning.js flytter blokken hen under det trin, eleven er ved. -->
-            <div class="hjaelpblok" id="beregning-hjaelp">
-                <p class="besked" id="beregning-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="beregning-knap" type="button">Giv hint</button>
-            </div>
         </div>
 
         <div class="kort" id="beregning-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="beregning-loest">0</b>/2</span></h2>
             <div class="hyldeliste" id="beregning-liste"></div>
+            <!-- Omskifteren Let / Svær: hvilket reaktionsskema der regnes med (js/sim_beregning.js) -->
+            <div class="skift" id="beregning-skift"></div>
         </div>
     </aside>
 </section>
@@ -125,12 +134,12 @@
 <div class="overlay" id="teori">
     <div class="overlay-boks">
         <h2>Afbrænding af ståluld</h2>
-        <p>Ståluld er tynde tråde af jern. Når den brænder, reagerer jernet med ilt fra luften, og der dannes jernoxid.</p>
+        <p>Ståluld er tynde tråde af jern. Når den brænder, reagerer jernet med dioxygen fra luften, og der dannes jernoxid.</p>
         <div class="eksempel">
             <span class="eksempel-hoved">Reaktionen</span>
             2 Fe(s) + O₂(g) → 2 FeO(s)
         </div>
-        <p>Ilten fra luften bliver bundet i et fast stof. Derfor vejer stålulden mere, når den har brændt. Massen af jernoxiden er massen af jernet plus massen af den ilt, der er bundet.</p>
+        <p>Dioxygenet fra luften bliver bundet i et fast stof. Derfor vejer stålulden mere, når den har brændt. Massen af jernoxiden er massen af jernet plus massen af det dioxygen, der er bundet.</p>
         <p>Brænde bliver lettere, når det brænder, fordi produkterne CO₂ og vanddamp er gasser, der forsvinder op i luften. Fra stålulden bliver produktet liggende på vægten.</p>
         <div class="eksempel">
             <span class="eksempel-hoved">Beregningen</span>
@@ -139,7 +148,7 @@
             m(FeO) = n(FeO) · M(FeO)
         </div>
         <p>Forholdet er 2 : 2, altså 1 : 1, fordi der står 2 foran både Fe og FeO i reaktionsskemaet.</p>
-        <p>Vægten viser mindre, end beregningen giver, fordi ilten ikke når ind til alt jernet. Luft er kun 21 % ilt, og stålulden går ud, før alt jernet har reageret. Ren ilt fra en flaske holder den gloende længere. Midt i klumpen og inderst i de tykkeste tråde bliver noget af jernet alligevel ikke til oxid. Gnister og stumper, der falder ned ved siden af vægten, trækker også ned.</p>
+        <p>Vægten viser mindre, end beregningen giver, fordi dioxygenet ikke når ind til alt jernet. Luft er kun 21 % dioxygen, og stålulden går ud, før alt jernet har reageret. Ren dioxygen fra en flaske holder den gloende længere. Midt i klumpen og inderst i de tykkeste tråde bliver noget af jernet alligevel ikke til oxid. Gnister og stumper, der falder ned ved siden af vægten, trækker også ned.</p>
         <p>I virkeligheden dannes en blanding af jernoxider, mest Fe₃O₄. Animationen regner først med FeO, så forholdet bliver 1 : 1. Omskifteren Svær på fanen Beregningen regner med Fe₃O₄.</p>
         <div class="eksempel">
             <span class="eksempel-hoved">Svær</span>
@@ -173,6 +182,7 @@
 </div>
 
 <script src="js/kerne.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/data.js"></script>
 <script src="js/kemi.js"></script>
 <script src="js/tjek.js"></script>
