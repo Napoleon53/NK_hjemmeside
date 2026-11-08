@@ -33,8 +33,8 @@ op, er pudset, og glasset har frisk opløsning.
    ladningerne, uden oxidationstal. c2.x ejer ionerne og saltenes navne.
 4. **Loftet:** 3 faner. Fane 1: 5 stænger, 6 glas, 1 lup, et skema med 25
    forsøg, 5 mål. Fane 2: 6 kort og 1 hylde. Fane 3: 1 glas, 1 lup, rækken
-   med 14 grundstoffer og 12 opgaver, derefter tilfældige par af 8 metaller
-   og 9 opløsninger.
+   med 15 grundstoffer (14 før 7. nov. 2026, se Lithium nedenfor) og 12
+   opgaver, derefter tilfældige par af 8 metaller og 9 opløsninger.
 5. **Layoutet:** scene plus panel, som sc7.4. Opgaven står på papirkortet
    øverst i scenen (se Papirkortet nedenfor), og panelet har skemaet eller
    listen over svarene.
@@ -77,8 +77,8 @@ for jern. Men zink reagerede med jernionerne, så zink skal stå til venstre."
 Hintet viser antallet af flueben i hver række af skemaet. Er rækken rigtig,
 kommer den lange spændingsrække frem foroven, og de seks får deres plads i den.
 
-**Forudsig.** Spændingsrækken hænger foroven: K Ca Na Mg Al Zn Fe Pb H Cu Ag
-Hg Pt Au. Nikkel og tin er taget ud af rækken og opgaverne (brugerens ønske
+**Forudsig.** Spændingsrækken hænger foroven: Li K Ca Na Mg Al Zn Fe Pb H Cu
+Ag Hg Pt Au. Nikkel og tin er taget ud af rækken og opgaverne (brugerens ønske
 3. oktober 2026: de bruges sjældent i undervisningen). En stang hænger i et
 stativ over et glas. Eleven svarer ja eller
 nej, stangen kommer ned, og glasset og luppen viser svaret. Rækken får mærkerne
@@ -178,7 +178,8 @@ står øverst i `js/tegning.js`, og ordene for det, man ser, i `D.BELAEG` og
 `D.FARVE`.
 
 **`_selvtest.html`** åbner index.html i en iframe og tjekker, at rækken følger
-E° og er uden nikkel og tin, at skemaet har 25 forsøg med 13 reaktioner (Mg 5,
+E°, begynder med lithium og er uden nikkel og tin, at lithium hverken er stang,
+glas, kort på hylden eller opgave, at skemaet har 25 forsøg med 13 reaktioner (Mg 5,
 Zn 4, Fe 3, Cu 1, Ag 0), koefficienterne for ni reaktioner, at alle 63 mulige
 opgaver har de mindste tal og lige mange elektroner begge veje, tjekket af
 koefficienterne ved de typiske fejl, at luppen afgiver lige så mange
@@ -191,12 +192,12 @@ gå videre, Næste viser hver linje, rammen står om det, han peger på, boblen
 dækker det ikke, Afslut og Spring over sender ham ud), og at layoutet holder
 fra 520 × 380 til 1500 × 900. Den kræver en lokal server
 eller Chrome med `--allow-file-access-from-files`, og den lægger elevens valg
-tilbage bagefter. Den tjekker også papirkortet (se nedenfor). Sidst kørt 6. november
-2026: ALT OK (188 påstande).
+tilbage bagefter. Den tjekker også papirkortet (se nedenfor). Sidst kørt 7. november
+2026: ALT OK (189 påstande).
 
 ## Forenklinger
 
-* Rækkefølgen er standardreduktionspotentialerne ved 25 °C (Databogen): Mg −2,37,
+* Rækkefølgen er standardreduktionspotentialerne ved 25 °C (Databogen): Li −3,04, Mg −2,37,
   Al −1,66, Zn −0,76, Fe −0,44, Pb −0,13, H 0, Cu +0,34, Ag +0,80, Au +1,50 V.
   Eleven ser dem ikke. Koncentrationen spiller ingen rolle.
 * Et metal reagerer, når det står til venstre for ionernes metal, og ikke ellers.
@@ -215,6 +216,19 @@ tilbage bagefter. Den tjekker også papirkortet (se nedenfor). Sidst kørt 6. no
   der er blevet tyndere i syren, er først hel igen, når den står i holderen.
 * Luppen er et udsnit: nye ioner svømmer ind fra venstre, og de nye metalioner
   svømmer ud igen, når der er mere end fem.
+
+## Lithium (7. nov. 2026)
+
+Lithium står først i rækken efter brugerens ønske ("Vi skal have lithium ind i
+vores spændingsrække (gælder alle steder)"), som i bogen: Li K Ca Na Mg Al Zn Fe
+Pb H Cu Ag Hg Pt Au, i rækken på fane 2 og 3 og i teorien. Lithium er kun med i
+rækken, ligesom kalium, calcium og natrium: det reagerer selv med vandet, så det
+er hverken stang, glas, kort på hylden eller opgave (`K.STAENGER`,
+`K.OPLOESNINGER` og `D.RAEKKEN` er uændrede). Med 15 felter er kasserne lidt
+smallere, så mærkerne "stangen" og "ionerne" rørte hinanden, når stangen og
+ionerne står ved siden af hinanden (fx kobber i saltsyre). Nu skubbes de to
+mærker fra hinanden, og spidsen peger stadig på kassen (`T.raekke` i
+`js/tegning.js`).
 
 ## Papirkortet (6. nov. 2026)
 

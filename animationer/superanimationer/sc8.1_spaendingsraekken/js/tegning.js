@@ -608,15 +608,24 @@
             ctx.textBaseline = "middle";
             ctx.fillText(v.pil.tekst || "e⁻", mx - 4, my);
         }
-        /* Maerkerne over kasserne */
-        (v.maerker || []).forEach(function (m) {
-            var c = midter[m.sym];
-            if (!c) return;
+        /* Maerkerne over kasserne. Staar stangen og ionerne ved siden af
+           hinanden i raekken, skubbes de to maerker lige meget til hver side,
+           saa de ikke overlapper (spidsen peger stadig paa kassen). */
+        ctx.font = font("700", 12);
+        var mk = (v.maerker || []).filter(function (m) { return midter[m.sym]; }).map(function (m) {
+            return { m: m, c: midter[m.sym], x: midter[m.sym].x, tb: ctx.measureText(m.tekst).width + 10 };
+        });
+        if (mk.length === 2) {
+            var ve = mk[0].x < mk[1].x ? mk[0] : mk[1], ho = ve === mk[0] ? mk[1] : mk[0];
+            var over = ve.x + ve.tb / 2 + 4 - (ho.x - ho.tb / 2);
+            if (over > 0) { ve.x -= over / 2; ho.x += over / 2; }
+        }
+        mk.forEach(function (k) {
+            var m = k.m, c = k.c, tb = k.tb;
             ctx.font = font("700", 12);
-            var tb = ctx.measureText(m.tekst).width + 10;
             var y = r.y - 30;
             ctx.fillStyle = m.farve;
-            NK.rundtRekt(ctx, c.x - tb / 2, y, tb, 18, 5);
+            NK.rundtRekt(ctx, k.x - tb / 2, y, tb, 18, 5);
             ctx.fill();
             ctx.beginPath();
             ctx.moveTo(c.x - 5, y + 18);
@@ -627,7 +636,7 @@
             ctx.fillStyle = "#15151b";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(m.tekst, c.x, y + 9.5);
+            ctx.fillText(m.tekst, k.x, y + 9.5);
         });
         ctx.restore();
         return midter;

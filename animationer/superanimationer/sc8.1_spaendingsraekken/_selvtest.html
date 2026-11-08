@@ -93,8 +93,11 @@ async function koerTest(W, ramme) {
     overskrift("Modellen: rækken og reaktionerne");
     var sorteret = K.RAEKKE.slice().sort(function (a, b) { return K.STOF[a].E - K.STOF[b].E; });
     paastand("spændingsrækken står efter E°", sorteret.join() === K.RAEKKE.join(), K.RAEKKE.join(" "));
-    paastand("rækken er K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au (uden nikkel og tin)",
-        K.RAEKKE.join(" ") === "K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au");
+    paastand("rækken er Li K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au (uden nikkel og tin)",
+        K.RAEKKE.join(" ") === "Li K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au");
+    paastand("lithium står i rækken, men ikke som stang, glas eller opgave (det reagerer med vandet)",
+        K.STAENGER.indexOf("Li") < 0 && K.OPLOESNINGER.indexOf("Li") < 0 && D.STAENGER.indexOf("Li") < 0 && D.GLAS.indexOf("Li") < 0 &&
+        D.RAEKKEN.indexOf("Li") < 0 && !D.OPGAVER.concat(K.alleOpgaver()).some(function (p) { return p[0] === "Li" || p[1] === "Li"; }));
     var tal = {};
     D.STAENGER.forEach(function (m) { tal[m] = D.GLAS.filter(function (i) { return K.reagerer(m, i); }).length; });
     paastand("fane 1: Mg reagerer med 5, Zn 4, Fe 3, Cu 1, Ag 0", tal.Mg === 5 && tal.Zn === 4 && tal.Fe === 3 && tal.Cu === 1 && tal.Ag === 0, JSON.stringify(tal));

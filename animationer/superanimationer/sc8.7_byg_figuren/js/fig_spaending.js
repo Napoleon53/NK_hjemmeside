@@ -1,12 +1,16 @@
 /* =====================================================================
    fig_spaending.js - figuren til 8.2 Spændingsrækken
 
-   Bogens spaendingsraekken: K til Au i kasser med H₂ i midten, en orange
+   Bogens spaendingsraekken: Li til Au i kasser med H₂ i midten, en orange
    pil mod venstre (afgiver let elektroner) og en blaa mod hoejre (afgiver
    nødigt elektroner). Bogens "uædle metaller" og "ædle metaller" ved
    pilene er taget af, saa de ikke afsloerer pladserne. Pilene staar over
    raekken, saa pladserne under den kan pege op uden at krydse dem.
    Tre fagord i ét lag.
+
+   7. nov. 2026: lithium staar foerst som i bogen (brugerens oenske), saa
+   der er 15 kasser. De er 56 brede med 7 imellem (foer 58 og 8), saa
+   raekken ikke kommer helt ud til kortets kant.
    ===================================================================== */
 (function () {
     "use strict";
@@ -18,8 +22,8 @@
 
     var ORANGE = "#b4530a", BLAA = "#1d4ed8";
     var K = { x: 40, y: 50, b: 1020, h: 300 };
-    var MET = ["K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Pb", "H_2", "Cu", "Ag", "Hg", "Pt", "Au"];
-    var BB = 58, GAB = 8, X0 = 550 - (MET.length * BB + (MET.length - 1) * GAB) / 2, RY = 150, RH = 60;
+    var MET = ["Li", "K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Pb", "H_2", "Cu", "Ag", "Hg", "Pt", "Au"];
+    var BB = 56, GAB = 7, X0 = 550 - (MET.length * BB + (MET.length - 1) * GAB) / 2, RY = 150, RH = 60;
     function bx(i) { return X0 + i * (BB + GAB); }
     var H = MET.indexOf("H_2");
 

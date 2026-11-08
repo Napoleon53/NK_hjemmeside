@@ -73,10 +73,12 @@ resultatet med eddikens rigtige masseprocent, og en overtitrering forklares.
 Ny opgave giver en klassekammerats måling med en anden prøvemasse og en anden
 koncentration.
 
-**To kolber.** To opstillinger, A som på fane 1 og B med én ting ændret. Seks
+**To kolber.** To opstillinger, A som på fane 1 og B med én ting ændret. Fem
 situationer: 60 mL vand (lige så mange mL NaOH), 1,00 g eddike (færre mL), og
-masseprocenten for den (den samme), 0,200 M NaOH (færre mL), en burette, der var
-våd indvendig (masseprocenten for høj), og spildt eddike (for lav). Spørgsmålene
+masseprocenten for den (den samme), 0,200 M NaOH (færre mL) og spildt eddike (for
+lav). En sjette situation med en burette, der var våd indvendig (masseprocenten for
+høj), er taget ud 7. nov. 2026, fordi Kemibogens afsnit 7.5 og slidesene ikke længere
+har vand i buretten (Niels om bogens tabel: "Det er fjollet"). Spørgsmålene
 spørger om mL NaOH, fordi det er det, buretten viser, og teksterne er skrevet
 konkret efter brugerens ønske om mindre indforstået sprog. Eleven gætter, og så
 titreres begge kolber til omslaget. Tabellen i panelet viser mL NaOH og
@@ -99,8 +101,8 @@ to påskeæg:
 * Fane 2, første færdige beregning: "Du har beregnet masseprocenten af
   eddikesyre ud fra forbruget. Sådan kontrollerer et laboratorium tallet på
   eddikens etiket."
-* Fane 3, efter den sjette situation: "Du har gennemført alle seks opgaver med
-  de to kolber. Det blev til tolv kolber, og opvasken tager jeg ikke."
+* Fane 3, efter den femte situation: "Du har gennemført alle fem opgaver med
+  de to kolber. Det blev til ti kolber, og opvasken tager jeg ikke."
 * Påskeæg, buretten løbet tom: "Du har tømt hele buretten ned i kolben.
   Eddikesyren var brugt op for længe siden." (en tør bemærkning, ikke ros)
 * Påskeæg, elevens egen måling rammer eddikens masseprocent på hundrededelen:
@@ -149,7 +151,7 @@ sprites/            buretten, kolben, magnetomrøreren og eddikeflasken (egne te
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc7.2)
 js/kort.js          papirkortet øverst i scenen (kopi af sc5.4's fil)
 js/kemi.js          modellen: stofmængde, forbrug, pH af ladningsbalancen og phenolphthaleins farve
-js/data.js          grænserne, hintene, de fire regnetrin med formlerne, de seks situationer og replikkerne
+js/data.js          grænserne, hintene, de fire regnetrin med formlerne, de fem situationer og replikkerne
 js/tjek.js          tjekket af aflæsningen, formlerne og de fire regnetrin med beskeder til de typiske fejl
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, opstillingen (stativ, burette, hane, kolbe, omrører),

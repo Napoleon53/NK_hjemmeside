@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNPH og Tollens' test</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>DNPH og Tollens' test</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-t" role="tab" aria-selected="true"><span class="nr">1</span>Hvad viser testene?</button>
+        <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">2</span>Reaktionerne</button>
+        <button class="faneknap" data-fane="fane-u" role="tab" aria-selected="false"><span class="nr">3</span>Ukendte stoffer</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: HVAD VISER TESTENE?                                        -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-t" role="tabpanel" aria-label="Hvad viser testene?">
+    <div class="scene">
+        <canvas id="t-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="t-skort">
+            <div class="sk-ind" id="t-ind"></div>
+            <div class="sk-bund" id="t-status">
+                <p class="st-tekst" id="t-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="t-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="t-anker-tavle"></div>
+        <div class="anker" id="t-anker-glas"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="t-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="t-loest">0</b>/<span id="t-ialt">0</span></span></h2>
+            <div class="opg-liste" id="t-liste"></div>
+            <button class="knap igenknap" id="t-forfra" type="button">↺ Begynd forfra med alle ti</button>
+        </div>
+
+        <div class="kort" id="t-fundkort">
+            <h2>Det har du fundet</h2>
+            <div class="fundtabel" id="t-fundet"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: REAKTIONERNE                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-r" role="tabpanel" aria-label="Reaktionerne">
+    <div class="scene">
+        <canvas id="r-laerred"></canvas>
+        <div class="scenekort" id="r-skort">
+            <div class="sk-ind" id="r-ind"></div>
+            <div class="sk-bund" id="r-status">
+                <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="r-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="r-anker-tavle"></div>
+        <div class="anker" id="r-anker-skema"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="r-opgaver">
+            <h2>Reaktionerne <span class="taeller">løst <b id="r-loest">0</b>/3</span></h2>
+            <div class="opg-chips lodret" id="r-liste"></div>
+            <button class="knap igenknap" id="r-forfra" type="button">↺ Begynd forfra med alle tre</button>
+        </div>
+
+        <div class="kort" id="r-om">
+            <h2>De to reaktioner</h2>
+            <p class="note-tekst">DNPH reagerer med carbonylgruppen i en kondensation: to molekyler går sammen, og der fraspaltes vand. I Tollens' test bliver aldehydet oxideret, og sølv(I)ionerne bliver reduceret til sølv.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: UKENDTE STOFFER (Basiskemi B, Xperimentér 25)              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-u" role="tabpanel" aria-label="Ukendte stoffer">
+    <div class="scene">
+        <canvas id="u-laerred"></canvas>
+        <div class="scenekort" id="u-skort">
+            <div class="sk-ind" id="u-ind"></div>
+            <div class="sk-bund" id="u-status">
+                <p class="st-tekst" id="u-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="u-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="u-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="u-anker-tavle"></div>
+        <div class="anker" id="u-anker-glas"></div>
+        <div class="anker" id="u-anker-stoffer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="u-trin">
+            <h2>Forsøget <span class="taeller">runder løst <b id="u-runder">0</b></span></h2>
+            <div class="opg-chips lodret" id="u-trinliste"></div>
+            <button class="knap igenknap" id="u-forfra" type="button">↺ Begynd forfra med en ny runde</button>
+        </div>
+
+        <div class="kort" id="u-om">
+            <h2>Om forsøget</h2>
+            <p class="note-tekst">DNPH: 0,5 mL DNPH-opløsning og en dråbe af stoffet i et lille reagensglas. Tollens' test: 5 dråber Tollens' reagens og en dråbe af stoffet, varmet et minut i et vandbad med varmt vand.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>DNPH og Tollens' test</h2>
+        <div class="teori-glas">
+            <figure><img src="sprites/reagensglas_dnph.svg" alt=""><figcaption><b>DNPH</b> med en alkohol: ingen ændring</figcaption></figure>
+            <figure><img src="sprites/reagensglas_dnph_bundfald.svg" alt=""><figcaption><b>DNPH</b> med et aldehyd eller en keton: gult eller orange bundfald</figcaption></figure>
+            <figure><img src="sprites/reagensglas_tollens.svg" alt=""><figcaption><b>Tollens' test</b> med en keton: ingen ændring</figcaption></figure>
+            <figure><img src="sprites/reagensglas_soelvspejl.svg" alt=""><figcaption><b>Tollens' test</b> med et aldehyd: sølvspejl</figcaption></figure>
+        </div>
+        <h3 class="teori-hoved">Test med DNPH</h3>
+        <p>DNPH er en forkortelse for 2,4-dinitrophenylhydrazin. Det reagerer med carbonylgruppen i både aldehyder og ketoner og danner et gult eller orange bundfald. Alkoholer, carboxylsyrer og estere giver ikke bundfald. Reaktionen er en kondensation: oxygenatomet fra C=O og to hydrogenatomer fra DNPH går af som vand, og C=O bliver til C=N.</p>
+        <h3 class="teori-hoved">Tollens' test</h3>
+        <p>Tollens' reagens indeholder sølv(I)ioner i en basisk opløsning med ammoniak. Et aldehyd bliver oxideret til en carboxylsyre, som straks afgiver sin hydron og bliver til en carboxylat-ion. Sølv(I)ionerne bliver reduceret til frit sølv, som sætter sig som et spejl på glasset. En keton kan ikke oxideres videre, fordi carbonatomet i carbonylgruppen ikke har noget hydrogenatom.</p>
+        <p class="teori-skema">CH₃CHO + 2 Ag⁺ + 3 OH⁻ → CH₃COO⁻ + 2 Ag + 2 H₂O</p>
+        <p>Ammoniakken holder sølv(I)ionerne opløst. Uden ammoniak ville de danne et tungtopløseligt bundfald i den basiske opløsning.</p>
+        <h3 class="teori-hoved">De to test i rækkefølge</h3>
+        <p>Med de to test kan man afgøre, om et ukendt stof er et aldehyd, en keton eller ingen af delene. Rutediagrammet er det samme som i bogens afsnit B4.3.</p>
+        <figure class="teori-rute"><img src="sprites/rutediagram.svg" alt="Rutediagram: Giver stoffet bundfald med DNPH, er det et aldehyd eller en keton. Giver det også sølvspejl i Tollens' test, er det et aldehyd, og ellers er det en keton. Uden bundfald med DNPH er det hverken et aldehyd eller en keton."></figure>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/glas.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_test.js"></script>
+<script src="js/sim_reaktion.js"></script>
+<script src="js/sim_ukendt.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

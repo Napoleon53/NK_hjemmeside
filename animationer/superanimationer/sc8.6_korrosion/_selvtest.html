@@ -115,6 +115,7 @@ function koerTest(W) {
     paastand("E°: Mg −2,37, Zn −0,76, Fe −0,44, Cu 0,34 V", M.Mg.E === -2.37 && M.Zn.E === -0.76 && M.Fe.E === -0.44 && M.Cu.E === 0.34);
     paastand("metallerne står i bogens række i samme rækkefølge",
         K.RAEKKE.indexOf("Mg") < K.RAEKKE.indexOf("Zn") && K.RAEKKE.indexOf("Zn") < K.RAEKKE.indexOf("Fe") && K.RAEKKE.indexOf("Fe") < K.RAEKKE.indexOf("Cu"));
+    paastand("rækken er bogens: Li K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au", K.RAEKKE.join(" ") === "Li K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au", K.RAEKKE.join(" "));
     paastand("det mindst ædle af kobber og jern er jern, af zink og jern er det zink", K.mindstAedel("Cu", "Fe") === "Fe" && K.mindstAedel("Fe", "Zn") === "Zn" && K.mindstAedel("Fe", "Fe") === null);
     paastand("ionerne skrives Fe²⁺, Zn²⁺, Mg²⁺", K.ion("Fe") === "Fe²⁺" && K.ion("Zn") === "Zn²⁺" && K.ion("Mg") === "Mg²⁺");
 

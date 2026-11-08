@@ -31,7 +31,7 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
 | Fane | Figur | Pladser |
 |:--|:--|:--|
 | 8.1 | 2 Mg + O₂ → 2 Mg²⁺ + 2 O²⁻ med den orange klamme "magnesium afgiver 4 elektroner" og den blå "dioxygen optager 4 elektroner"; de to delreaktioner; luppen "Mens magnesium brænder" med to magnesiumatomer, der hver afgiver 2 e⁻ til et oxygenatom | redoxreaktion (titel på kortet), oxidation og reduktion (klammerne), delreaktion (de to skemaer), reduktionsmiddel (magnesiumatomerne), oxidationsmiddel (oxygenatomerne) |
-| 8.2 | spændingsrækken K til Au med H₂ i midten og pilene "afgiver let elektroner" og "afgiver nødigt elektroner" over rækken | spændingsrækken (titel), uædelt (metallerne til venstre for H₂), ædelt (metallerne til højre) |
+| 8.2 | spændingsrækken Li til Au med H₂ i midten og pilene "afgiver let elektroner" og "afgiver nødigt elektroner" over rækken | spændingsrækken (titel), uædelt (metallerne til venstre for H₂), ædelt (metallerne til højre) |
 | 8.3 | H₂O, CO₂ og SO₄²⁻ med oxidationstallene over atomerne; skalaen fra −IV til +VII med Fe, Fe²⁺ og Fe³⁺, den orange pil "tallet stiger" og den blå "tallet falder" | oxidationstal (tallene over atomerne), oxidation og reduktion (foran teksterne ved pilene, som "oxidation:" i bogen) |
 | 8.4 | fire bægerglas med MnO₄⁻, MnO₄²⁻, MnO₂ og Mn²⁺ med oxidationstallene over og en lang blå pil under | permanganat (navneskilt under det violette glas), oxidationstal (titel over tallene), reduktion (navneskilt under pilen) |
 
@@ -56,6 +56,10 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
   stoffet O₂. Bogens figur delreaktioner siger stadig "oxygen optager 4 elektroner".
   Oxygenatomerne i luppen hedder stadig oxygenatomer.
 - Lagenes rækkefølge og figurernes indhold er Claudes valg.
+- Lithium (7. nov. 2026): spændingsrækken i 8.2 begynder med lithium efter
+  brugerens ønske ("gælder alle steder"), ligesom bogens figur `spaendingsraekken`,
+  der samme dag fik 15 felter. Kasserne er 56 brede med 7 imellem (før 58 og 8), så
+  rækken ikke kommer helt ud til kortets kant. Pladsen uædelt peger nu op på Mg.
 
 ## Filerne
 
@@ -63,7 +67,8 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
 holdes ens. `js/lab.js` er en kopi af sc7.6's tegnehjælp (kort, pile, bægerglas, lup).
 Kapitlets egne filer er `js/data.js` (forklaringerne fra `Kemibogen/fagord/kapitel-8.qmd`,
 lavet med et lille script) og `js/fig_redox.js`, `fig_spaending.js`, `fig_ot.js` og
-`fig_mangan.js`. `_selvtest.html` åbnes direkte fra disken; ALT OK (453) 1. nov. 2026.
+`fig_mangan.js`. `_selvtest.html` åbnes direkte fra disken; ALT OK (453) 1. nov. 2026
+og igen 7. nov. 2026 efter lithium.
 Skærmbilleder af hvert lag, den svære udgave og de færdige figurer ved 1500 × 950 er set
 igennem.
 

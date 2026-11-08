@@ -323,11 +323,11 @@ function koerTest(W) {
         V[s.id] = { A: S3.A, B: S3.B, fase: S3.fase };
         if (n < D.SITUATIONER.length - 1) S3.knap();
     });
-    paastand("alle seks situationer kan gennemføres, og alle gæt var rigtige", S3.fase === "vist" && S3.rigtige === 6, S3.rigtige);
+    paastand("alle fem situationer kan gennemføres, og alle gæt var rigtige", S3.fase === "vist" && S3.rigtige === 5, S3.rigtige);
+    paastand("vand i buretten er ikke med (taget ud 7. nov. 2026)", D.SITUATIONER.length === 5 && !V.skyllet);
     paastand("mere vand: samme forbrug", naer(V.vand.A.v, V.vand.B.v, 1e-9));
     paastand("halvt så meget eddike: halvt forbrug, samme masseprocent", naer(V.halv.B.v, V.halv.A.v / 2, 0.051) && naer(V.halvProcent.B.procent, V.halvProcent.A.procent, 0.05));
     paastand("0,200 M: halvt forbrug og samme masseprocent", naer(V.base.B.v, V.base.A.v / 2, 0.051) && naer(V.base.B.procent, V.base.A.procent, 0.03));
-    paastand("burette skyllet med vand: større forbrug og for høj masseprocent", V.skyllet.B.v > V.skyllet.A.v && V.skyllet.B.procent > V.skyllet.A.procent + 0.3);
     paastand("spildt eddike: mindre forbrug og for lav masseprocent", V.spild.B.v < V.spild.A.v && V.spild.B.procent < V.spild.A.procent - 0.3);
     paastand("alle forbrug er under 25 mL", D.SITUATIONER.every(function (s) { return V[s.id].B.v < 25 && V[s.id].A.v < 25; }));
     S3.nulstil();
@@ -409,7 +409,7 @@ function koerTest(W) {
     });
     });
     rammeF.style.width = ""; rammeF.style.height = "";
-    paastand("opstillingerne flytter sig ikke, når forklaringen kommer (alle seks, rigtigt og forkert)", flytter.length === 0, flytter.join("; "));
+    paastand("opstillingerne flytter sig ikke, når forklaringen kommer (alle fem, rigtigt og forkert)", flytter.length === 0, flytter.join("; "));
     S3.nulstil();
     /* Kortet holder sig i kortZone paa en hoej og en lav skaerm, ogsaa med den laengste forklaring */
     var rammeK = document.getElementById("ramme");

@@ -22,6 +22,7 @@
        formlen skrevet med almindelige tal (NK.formel saenker dem).
        anion: tilskuerionen i oploesningen og dens ladning. */
     K.STOF = {
+        Li: { navn: "lithium",   E: -3.04, q: 1 },
         K:  { navn: "kalium",    E: -2.93, q: 1 },
         Ca: { navn: "calcium",   E: -2.87, q: 2 },
         Na: { navn: "natrium",   E: -2.71, q: 1 },
@@ -43,12 +44,13 @@
     /* Spaendingsraekken: uaedel til venstre. Nikkel og tin er taget ud
        (brugerens oenske 3. okt. 2026: de bruges sjaeldent i undervisningen).
        De staar stadig i K.STOF og kan saettes ind igen her og i de to
-       lister nedenfor; raekken skal staa efter E°. */
-    K.RAEKKE = ["K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
+       lister nedenfor; raekken skal staa efter E°. Lithium staar foerst
+       (brugerens oenske 7. nov. 2026, som i bogen). */
+    K.RAEKKE = ["Li", "K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
 
     /* De metaller, der findes som stang, og de oploesninger, der findes
-       som glas (fane 3). Kalium, calcium og natrium reagerer med vandet
-       og er kun med i raekken. */
+       som glas (fane 3). Lithium, kalium, calcium og natrium reagerer med
+       vandet og er kun med i raekken. */
     K.STAENGER = ["Mg", "Al", "Zn", "Fe", "Pb", "Cu", "Ag", "Au"];
     K.OPLOESNINGER = ["Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Au"];
 
@@ -90,7 +92,7 @@
         return K.STOF[i].E - K.STOF[m].E;
     };
 
-    /* Pladsen i raekken (0 = kalium) */
+    /* Pladsen i raekken (0 = lithium) */
     K.plads = function (s) { return K.RAEKKE.indexOf(s); };
 
     /* Den afstemte reaktion: m(s) + i-ion(aq) ⟶ m-ion(aq) + i(s) eller H₂(g).

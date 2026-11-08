@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 200" width="60" height="200">
+  <!-- Tollens' reagens med et aldehyd efter opvarmning: soelvet har sat sig som
+       et blankt spejl paa indersiden af glasset, saa langt op som vaesken naar -->
+  <defs>
+    <linearGradient id="soelv" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#5f666e"/>
+      <stop offset="0.18" stop-color="#9aa1a9"/>
+      <stop offset="0.32" stop-color="#f4f6f8"/>
+      <stop offset="0.48" stop-color="#a7aeb6"/>
+      <stop offset="0.75" stop-color="#6f767e"/>
+      <stop offset="1" stop-color="#4c5259"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <path d="M13 90 L47 90 L47 172 A17 17 0 0 1 13 172 Z" fill="url(#soelv)"/>
+  <ellipse cx="30" cy="90" rx="17" ry="3" fill="#c9ced4"/>
+  <path d="M40 112 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4 Z" fill="#ffffff"/>
+  <path d="M22 150 l1 2.6 2.6 1 -2.6 1 -1 2.6 -1 -2.6 -2.6 -1 2.6 -1 Z" fill="#ffffff" opacity="0.85"/>
+  <path d="M13 12 L13 172 A17 17 0 0 0 47 172 L47 12" fill="url(#glas)" stroke="#6b7685" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M8 10 Q8 6 12 6 L48 6 Q52 6 52 10 L52 13 L8 13 Z" fill="#e9edf1" stroke="#6b7685" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 22 L19 165" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" opacity="0.75"/>
+</svg>

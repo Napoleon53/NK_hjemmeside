@@ -2,8 +2,9 @@
    sim_forbrug.js - fane 3: to kolber (hvad aendrer forbruget?)
 
    To opstillinger side om side. A er som paa fane 1. Ved B er én ting
-   aendret: mere vand, mindre eddike, staerkere NaOH, en burette
-   skyllet med vand eller noget spildt eddike (D.SITUATIONER). Eleven
+   aendret: mere vand, mindre eddike, staerkere NaOH eller noget
+   spildt eddike (D.SITUATIONER). Vand i buretten er taget ud 7. nov.
+   2026, som i Kemibogens afsnit 7.5 (Niels: "Det er fjollet"). Eleven
    gaetter foerst, hvad der sker med forbruget eller masseprocenten. Saa
    titreres begge kolber til omslaget paa samme tid, og tabellen i
    panelet viser forbruget og den masseprocent, man ville regne ud.
@@ -374,10 +375,6 @@
             ctx.fill();
             ctx.stroke();
             ctx.restore();
-        }
-        /* Sproejteflasken ved buretten, der blev skyllet med vand */
-        if (erB && sit && sit.id === "skyllet") {
-            Tg.sproejteflaske(ctx, g.cx + 60 * g.s, g.bordY - 110 * g.k * 0.9, 110 * g.k * 0.9);
         }
         /* Aflaesningen over buretten */
         var vist = this.fase === "vist" || (sit && sit.samme && this.koert);

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 120" width="30" height="120">
+  <!-- Plastpipette med en draabe af stoffet. Spidsen er nederst i (15, 118) -->
+  <defs>
+    <linearGradient id="plast" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#dfe6ee"/>
+      <stop offset="0.35" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfd8e2"/>
+    </linearGradient>
+  </defs>
+  <path d="M15 2 C7 2 4 9 4 18 L4 34 C4 40 9 43 11 46 L11 100 L13.5 117 L16.5 117 L19 100 L19 46 C21 43 26 40 26 34 L26 18 C26 9 23 2 15 2 Z"
+        fill="url(#plast)" stroke="#7d8896" stroke-width="1.6" stroke-linejoin="round" opacity="0.95"/>
+  <path d="M11.8 78 L18.2 78 L18.2 100 L16 115 L14 115 L11.8 100 Z" fill="#cfe0ee" opacity="0.9"/>
+  <path d="M9 12 L9 32" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+</svg>

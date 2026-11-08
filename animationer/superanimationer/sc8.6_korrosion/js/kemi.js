@@ -32,8 +32,10 @@
         Cu: { navn: "kobber",    E: 0.34,  q: 2, egen: 0,    farve: "#cf7b41", kant: "#7b4019", belaeg: "#4f9a86", tekst: "#2a1407" }
     };
 
-    /* Spaendingsraekken, som den staar i bogen: uaedel til venstre */
-    K.RAEKKE = ["K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Ni", "Sn", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
+    /* Spaendingsraekken, som den staar i bogen: uaedel til venstre.
+       Lithium staar foerst (brugerens oenske 7. nov. 2026). Antallet af
+       kolonner i .rk i css/stil.css skal passe med raekkens laengde. */
+    K.RAEKKE = ["Li", "K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Ni", "Sn", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
 
     K.navn = function (s) { return K.METAL[s].navn; };
 

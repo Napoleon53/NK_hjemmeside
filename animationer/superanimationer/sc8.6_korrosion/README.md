@@ -191,6 +191,13 @@ dinitrogen. Ordet ilt er ikke brugt mere. Grundstofnavnene bliver, hvor
 atomerne menes ("Tæl O-atomerne", "NaCl består af natrium og chlor", svaret
 "Salt indeholder oxygen").
 
+Lithium (7. nov. 2026): spændingsrækken i panelet og i teorien begynder med
+lithium efter brugerens ønske ("gælder alle steder"), som i bogen: Li K Ca Na
+Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au (`K.RAEKKE` i `js/kemi.js`). Rækken i
+panelet har derfor 17 kolonner (`.rk` i `css/stil.css`), og i det smalle panel
+under 1320 px er skriften og mellemrummet lidt mindre, så Mg, Na og Hg kan være
+i deres felt. Lithium er kun med i rækken; metallerne i forsøgene er de samme.
+
 Påskeæg: et klik på vandpytten under det utætte rør og et klik på fisken
 under skibet.
 
@@ -286,8 +293,9 @@ svar er grå uden valg, et valg bedømmer ikke af sig selv, tiden løser ikke en
 opgave, forsøget er låst under gættet, rigtigt svar bliver på spørgsmålet med
 Næste samme sted, forfra står i panelet, rundvisningen peger på ting, der
 findes, og kortet holder sig i sin plads i alle dele af alle opgaver i 1100 ×
-700, 1300 × 760, 1366 × 700, 1400 × 860 og 1600 × 950. Sidst kørt 6. november
-2026: ALT OK (168 påstande). Påstanden "der er stadig tre kobberioner i vandet"
+700, 1300 × 760, 1366 × 700, 1400 × 860 og 1600 × 950. Den tjekker også, at
+rækken er bogens med lithium først. Sidst kørt 7. november 2026: ALT OK (169
+påstande). Påstanden "der er stadig tre kobberioner i vandet"
 fejler af og til (en kobberion i et tæret hul i væggen); modellen er ikke
 ændret.
 

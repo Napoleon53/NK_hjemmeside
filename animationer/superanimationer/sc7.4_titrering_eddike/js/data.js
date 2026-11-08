@@ -98,16 +98,6 @@
           ],
           hint: "Hvor mange OH⁻ er der i 1 mL, når koncentrationen er dobbelt så stor?",
           efter: "Halvt så mange. Hver mL indeholder dobbelt så mange OH⁻." },
-        { id: "skyllet", spm: "procent", B: { c: 0.090, cTror: 0.100 }, aendring: "vand i buretten",
-          tekst: "Buretten ved kolbe B var våd indvendig, da den blev fyldt. Derfor er NaOH kun 0,090 M, men du regner med 0,100 M. Bliver masseprocenten for høj, rigtig eller for lav?",
-          valg: D.PROCENT_VALG, rigtig: 0,
-          forkert: [
-              "",
-              "Der løber flere mL ned, og du regner, som om hver mL var 0,100 M.",
-              "Den fortyndede NaOH har færre OH⁻ pr. mL, så der skal flere mL til, ikke færre."
-          ],
-          hint: "Skal der flere eller færre mL af den fortyndede NaOH til? Hvad sker der så med n(NaOH), når du regner med 0,100 M?",
-          efter: "For høj. Der løber flere mL ned, og du regner, som om hver mL var 0,100 M. Så ser det ud, som om der var mere syre." },
         { id: "spild", spm: "procent", B: { spild: 0.15 }, aendring: "noget eddike spildt",
           tekst: "Du spilder lidt af eddiken til kolbe B, efter at du har vejet den. Bliver masseprocenten for høj, rigtig eller for lav?",
           valg: D.PROCENT_VALG, rigtig: 2,
@@ -175,7 +165,7 @@
        selv (brugerens regel 4. nov. 2026). */
     D.ROS_TITRERING = "Kolben blev lyserød på den sidste dråbe. Nogle elever bruger et helt år på at nå den præcision.";
     D.ROS_BEREGNING = "Du har beregnet masseprocenten af eddikesyre ud fra forbruget. Sådan kontrollerer et laboratorium tallet på eddikens etiket.";
-    D.ROS_FORBRUG = "Du har gennemført alle seks opgaver med de to kolber. Det blev til tolv kolber, og opvasken tager jeg ikke.";
+    D.ROS_FORBRUG = "Du har gennemført alle fem opgaver med de to kolber. Det blev til ti kolber, og opvasken tager jeg ikke.";
 
     /* Paaskeaeggene: buretten er loebet tom, og et resultat, der rammer
        eddikens masseprocent paa hundrededelen */
