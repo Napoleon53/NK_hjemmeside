@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.7 Indikatorer</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at farvernes navne ved hver hel pH er de samme
+   som i Kemibogens figur over fem indikatorer (afsnit 7.3), at
+   hverdagstingene på fane 2 ligger tydeligt inde i et farveområde, at
+   hver prøve kan findes, og med hvor få indikatorer, at begge faner kan
+   gennemføres, at forkerte svar får den rigtige forklaring og koster
+   stjernen, at intet løses uden Indsend svar, at scenen er låst uden for
+   forsøget, at teksterne er korte og uden tankestreger og ASCII-dansk,
+   og at kortet aldrig dækker tavlen fra 1100 × 620 til 1600 × 950.
+
+   Kan åbnes direkte fra harddisken eller gennem en lokal server. Testen
+   gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function note(t) { skriv("        " + t, "note"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc7.7-skift", "nk-sc7.7-proeve"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|maelk|oel|saebe\w*|kaal\w*|laes|bjaelke)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var s1 = NK.sims["fane-s"], p2 = NK.sims["fane-p"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function kort(sim) { return el(sim.navn + "-ind").textContent; }
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : ""; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function kortTekst(sim) { return sim.kortData().tekst; }
+    function svarTekster(sim) { return (sim.kortData().svar || []).map(function (s) { return s.t; }); }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: farvernes navne er bogens (figuren i afsnit 7.3)");
+    /* farver_ved() fra indikatorer() i Kemibogen/vaerktoej/lav_figurer.py */
+    function bogen(id, p) {
+        if (id === "lakmus") return p <= 5 ? "rød" : p <= 7 ? "violet" : "blå";
+        if (id === "btb") return p <= 6 ? "gul" : p === 7 ? "grøn" : "blå";
+        if (id === "thymol") return p <= 1 ? "rød" : p === 2 ? "orange" : p <= 8 ? "gul" : p === 9 ? "grøn" : "blå";
+        if (id === "phph") return p < 0 ? "rød" : (p <= 8 || p >= 13) ? "farveløs" : p === 9 ? "svagt lyserød" : "lyserød";
+        return ["rød", "rød", "rød", "rødviolet", "rødviolet", "violet", "violet", "blåviolet", "blå", "blågrøn",
+                "grøn", "grøn", "gulgrøn", "gul", "gul"][Math.min(Math.max(p, 0), 14)];
+    }
+    var uenig = [];
+    D.KORT_ORDEN.forEach(function (id) {
+        for (var p = -1; p <= 15; p++) if (K.navn(id, p) !== bogen(id, p)) uenig.push(id + " pH " + p + ": " + K.navn(id, p) + " / " + bogen(id, p));
+    });
+    samlet("farvens navn ved hver hel pH fra −1 til 15 er det samme som i bogens figur (5 × 17)", uenig);
+    paastand("farverne ved stoppene er bogens farvekoder", K.farve("btb", 6) === "#f2c94c" && K.farve("btb", 7.6) === "#2f6fde" &&
+        K.farve("lakmus", 2) === "#d9534f" && K.farve("phph", 11) === "#e84a9c" && K.farve("kaal", 10.5) === "#2e9e4f" && K.farve("thymol", 5) === "#f2c94c");
+    paastand("farveløs phenolphthalein ser ud som rent vand i glasset", K.vaeske("phph", 5) === D.VAND && K.farve("phph", 5) === "#ffffff");
+    paastand("thymolblåt er orange ved pH 2 (blandet rød og gul)", K.vaeske("thymol", 2) === K.bland("#d9534f", "#f2c94c", 0.5));
+
+    /* ================================================================= */
+    overskrift("2. Modellen: glassene på fane 1");
+    function skift(id) {
+        var ud = [];
+        for (var i = 0; i + 1 < D.GLAS_PH.length; i++) if (K.navn(id, D.GLAS_PH[i]) !== K.navn(id, D.GLAS_PH[i + 1])) ud.push(D.GLAS_PH[i] + "-" + D.GLAS_PH[i + 1]);
+        return ud.join(" ");
+    }
+    paastand("glassene står ved pH 0, 2, 4, 6, 8, 10 og 12", D.GLAS_PH.join() === "0,2,4,6,8,10,12");
+    paastand("BTB skifter kun farve mellem glassene med pH 6 og 8", skift("btb") === "6-8", skift("btb"));
+    paastand("BTB er gul ved pH 4 (gættet)", K.navn("btb", 4) === "gul");
+    paastand("phenolphthalein er farveløs i glassene med pH 0 til 8 og lyserød ved 10 og 12",
+        [0, 2, 4, 6, 8].every(function (p) { return K.navn("phph", p) === "farveløs"; }) && K.navn("phph", 10) === "lyserød" && K.navn("phph", 12) === "lyserød");
+    paastand("lakmus er rød ved pH 0, 2 og 4 og ikke ved 6", [0, 2, 4].every(function (p) { return K.navn("lakmus", p) === "rød"; }) && K.navn("lakmus", 6) === "violet");
+    paastand("thymolblåt skifter farve omkring pH 2 og omkring pH 9", skift("thymol") === "0-2 2-4 8-10", skift("thymol"));
+    paastand("rødkålssaft får 5 eller flere farver i de syv glas, og kun glasset med pH 10 er grønt",
+        K.antalFarver("kaal") >= 5 && D.GLAS_PH.filter(function (p) { return K.navn("kaal", p) === "grøn"; }).join() === "10", K.antalFarver("kaal"));
+    paastand("gættene: BTB-svaret gul findes, og rødkålssaftens rigtige svar er 5 eller flere",
+        D.SKIFT[0].gaet.svar.indexOf("gul") >= 0 && D.SKIFT[4].gaet.svar[2] === "5 eller flere");
+
+    /* ================================================================= */
+    overskrift("3. Modellen: prøverne på fane 2");
+    var naer = [], navnFejl = [];
+    Object.keys(D.TING).forEach(function (t) {
+        var ph = D.TING[t].ph;
+        D.PROEVE_IND.forEach(function (id) {
+            var ind = D.ind(id);
+            ind.tolk.forEach(function (o) {
+                [o.fra, o.til].forEach(function (g) { if (Math.abs(g) < 50 && Math.abs(ph - g) < 0.3) naer.push(t + " " + id + " " + g); });
+            });
+            var nr = K.tolk(id, ph);
+            if (nr < 0 || ind.tolk[nr].farve !== K.navn(id, ph)) navnFejl.push(t + " " + id + ": " + K.navn(id, ph));
+        });
+    });
+    samlet("ingen ting ligger nærmere end 0,3 fra et sted, hvor en indikator skifter farve", naer);
+    samlet("glassets farvenavn er det samme som farven i det rigtige svar", navnFejl);
+    var FORV_MIN = { A: 1, B: 1, C: 1, D: 1, E: 2 };
+    D.RUNDER.forEach(function (r) {
+        var alle = K.passer(r, K.testFor(r, D.PROEVE_IND));
+        paastand("prøve " + r.bogstav + " (" + r.ting.join(", ") + "): med alle fire indikatorer passer kun " + r.hemmelig, alle.length === 1 && alle[0] === r.hemmelig, alle.join());
+        paastand("prøve " + r.bogstav + ": det kan gøres med " + FORV_MIN[r.bogstav] + " indikator(er)", K.minTest(r) === FORV_MIN[r.bogstav], K.minTest(r));
+        paastand("prøve " + r.bogstav + ": den hemmelige ting er en af tingene", r.ting.indexOf(r.hemmelig) >= 0);
+    });
+    var hem = D.RUNDER.map(function (r) { return r.hemmelig; });
+    paastand("de fem prøver er fem forskellige ting", hem.filter(function (h, i) { return hem.indexOf(h) === i; }).length === 5);
+    paastand("prøve C kan kun findes med én indikator, hvis det er thymolblåt", K.alene(D.RUNDER[2]).join() === "thymol", K.alene(D.RUNDER[2]).join());
+    paastand("prøve D kan findes med thymolblåt eller phenolphthalein, men ikke med BTB alene", K.alene(D.RUNDER[3]).indexOf("btb") < 0 &&
+        K.alene(D.RUNDER[3]).indexOf("thymol") >= 0 && K.alene(D.RUNDER[3]).indexOf("phph") >= 0, K.alene(D.RUNDER[3]).join());
+
+    /* ================================================================= */
+    overskrift("4. Fane 1: Farveskiftet");
+    NK.visFane("fane-s");
+    s1.forfra();
+    paastand("fanen begynder ved opgave 1 (BTB) med et gæt", s1.nr === 0 && s1.fase === "gaet" && s1.ind === "btb");
+    paastand("glassene med pH 0 og 12 har BTB fra start, de andre er klare", s1.glas[0].farve && s1.glas[6].farve && !s1.glas[3].farve);
+    husk("kort gaet", kortTekst(s1));
+    paastand("under gættet er hintknappen og flasken ikke i brug", el("s-knap").hidden);
+    s1.indsendKlik();
+    paastand("Indsend svar uden et gæt gør intet", s1.fase === "gaet");
+    s1.klikScene({ x: s1.k.hjem.x, y: s1.k.hjem.y + 20 });
+    paastand("et klik på flasken under gættet starter intet", s1.drypT === null && s1.fase === "gaet");
+    s1.svarValg(1);
+    paastand("et valgt gæt sendes ikke af sig selv", s1.fase === "gaet" && /Indsend svar: grøn/.test(el("s-indsend").textContent));
+    s1.indsendKlik();
+    paastand("gættet er gratis: forsøget kommer, og der er ingen fejl", s1.fase === "forsoeg" && s1.gaetNr === 1 && !s1.fejl);
+    paastand("under forsøget er Indsend svar væk, og kortet har knappen Dryp BTB", el("s-indsend").hidden && /Dryp BTB/.test(kort(s1)));
+    husk("kort forsoeg", kortTekst(s1));
+    s1.klikScene({ x: s1.lay.tavle.x + s1.lay.tavle.b - 8, y: s1.lay.tavle.y + s1.lay.tavle.h - 8 });
+    paastand("et klik ved siden af flasken starter intet", s1.drypT === null);
+    s1.klikScene({ x: s1.k.hjem.x, y: s1.k.hjem.y + 20 });
+    paastand("et klik på flasken drypper", s1.drypT !== null);
+    tid(s1, 1.2);
+    paastand("midt i forsøget er nogle glas blandet og andre ikke", s1.glas[1].blandet > 0 && s1.glas[5].blandet === 0, s1.glas.map(function (g) { return g.blandet.toFixed(1); }).join());
+    tid(s1, 4);
+    paastand("efter forsøget er alle syv glas blandet, og spørgsmålet kommer", s1.fase === "spm" && s1.glas.every(function (g) { return g.blandet === 1 && g.farve; }));
+    paastand("glasset med pH 4 er gult (som maerket siger)", K.navn("btb", 4) === "gul");
+    s1.klikScene({ x: s1.k.hjem.x, y: s1.k.hjem.y + 20 });
+    paastand("under spørgsmålet drypper flasken ikke igen", s1.drypT !== null && s1.fase === "spm");
+    husk("kort spm", kortTekst(s1));
+    svarTekster(s1).forEach(function (t) { husk("svar", t); });
+    s1.svarValg(0);
+    paastand("et valgt svar løser intet", !s1.groen && s1.fase === "spm");
+    s1.indsendKlik();
+    husk("forkert s1", besked(s1));
+    paastand("forkert svar: forklaringen nævner glassene med pH 2 og pH 4", /pH 2 og pH 4/.test(besked(s1)) && s1.forkert[0] && s1.fejl, besked(s1));
+    paastand("efter en fejl lyser hintknappen stille op", /peg/.test(el("s-knap").className));
+    s1.svarValg(1); s1.indsendKlik();
+    paastand("rigtigt svar: kortet bliver grønt, og BTB er løst uden stjerne", !!s1.groen && s1.status[0].loest && !s1.status[0].stjerne);
+    husk("rigtigt s1", bliv(s1));
+    paastand("kortets knap går fremad: Næste indikator", /Næste indikator/.test(s1.groen.knap) && !/forfra/i.test(s1.groen.knap));
+    paastand("bjælken males på farvekortet", s1.barT === 0);
+    tid(s1, 1.5);
+    paastand("bjælken er malet færdig", s1.barT > 1.1);
+    s1.klikScene({ x: s1.k.hjem.x, y: s1.k.hjem.y + 20 });
+    paastand("et klik i scenen, mens kortet er grønt, ændrer intet", !!s1.groen && s1.nr === 0);
+    s1.videreKlik();
+    paastand("opgave 2 er phenolphthalein og begynder med forsøget", s1.nr === 1 && s1.ind === "phph" && s1.fase === "forsoeg");
+
+    function loesSkift(svar) {
+        if (s1.fase === "gaet") { s1.svarValg(svar.gaet); s1.indsendKlik(); }
+        husk("kort forsoeg", kortTekst(s1));
+        s1.udfoer(); tid(s1, 6);
+        husk("kort spm", kortTekst(s1));
+        svarTekster(s1).forEach(function (t) { husk("svar", t); });
+        (svar.valg || []).forEach(function (j) { s1.svarValg(j); });
+        s1.indsendKlik();
+        husk("rigtigt s1", bliv(s1));
+    }
+    loesSkift({ valg: [2] });
+    paastand("phenolphthalein løst i første forsøg giver en stjerne", s1.status[1].loest && s1.status[1].stjerne);
+    s1.videreKlik();
+    paastand("opgave 3 er lakmus", s1.ind === "lakmus");
+    s1.udfoer(); tid(s1, 6);
+    s1.svarValg(0); s1.indsendKlik();
+    husk("forkert s1", besked(s1));
+    paastand("lakmus, svaret pH er 2: forklaringen nævner glassene med pH 0 og pH 4", /pH 0 og pH 4/.test(besked(s1)), besked(s1));
+    s1.knap(); husk("hint s1", besked(s1));
+    s1.knap(); husk("hint s1", besked(s1));
+    paastand("hinttrappen har to hint og så Vis svaret", /Vis svaret/.test(el("s-knap").textContent));
+    s1.knap();
+    paastand("Vis svaret løser lakmus uden stjerne", !!s1.groen && s1.groen.maade === "svar" && s1.status[2].loest && !s1.status[2].stjerne);
+    husk("rigtigt s1", bliv(s1));
+    s1.videreKlik();
+    paastand("opgave 4 er thymolblåt med to rigtige svar", s1.ind === "thymol" && s1.flere);
+    s1.udfoer(); tid(s1, 6);
+    husk("kort spm", kortTekst(s1));
+    svarTekster(s1).forEach(function (t) { husk("svar", t); });
+    s1.svarValg(0); s1.indsendKlik();
+    husk("forkert s1", besked(s1));
+    paastand("kun ét af de to steder: forklaringen siger, at der er ét sted mere", /ét sted mere/.test(besked(s1)) && !s1.groen, besked(s1));
+    paastand("det rigtige valg bliver valgt efter fejlen", s1.erValgt(0));
+    s1.svarValg(1); s1.indsendKlik();
+    husk("forkert s1", besked(s1));
+    paastand("omkring pH 5 valgt: forklaringen nævner glassene med pH 4 og pH 6, og svaret er slået fra", /pH 4 og pH 6/.test(besked(s1)) && s1.forkert[1] && s1.erValgt(0) && !s1.erValgt(1), besked(s1));
+    s1.svarValg(2); s1.indsendKlik();
+    paastand("begge steder valgt: thymolblåt er løst", !!s1.groen && s1.status[3].loest && !s1.status[3].stjerne);
+    husk("rigtigt s1", bliv(s1));
+    s1.videreKlik();
+    paastand("opgave 5 er rødkålssaft med et gæt", s1.ind === "kaal" && s1.fase === "gaet");
+    husk("kort gaet", kortTekst(s1));
+    svarTekster(s1).forEach(function (t) { husk("svar", t); });
+    loesSkift({ gaet: 2, valg: [1] });
+    paastand("rødkålssaft løst: alle fem er løst, og knappen fører til fane 2", s1.antalLoest() === 5 && /Den ukendte prøve/.test(s1.groen.knap));
+    paastand("forklaringen til sidst siger, at farvekortet er fuldt", bliv(s1).indexOf(D.SKIFT_FAERDIG) >= 0, bliv(s1));
+    var gemS = JSON.stringify(s1.status);
+    s1.hentStatus();
+    paastand("det løste huskes", JSON.stringify(s1.status) === gemS);
+    s1.videreKlik();
+    paastand("knappen åbner fane 2", el("fane-p").classList.contains("aktiv"));
+    D.SKIFT.forEach(function (o) {
+        if (o.gaet) { husk("kort gaet", o.gaet.tekst); o.gaet.svar.forEach(function (s) { husk("svar", s); }); }
+        husk("kort forsoeg", o.forsoeg);
+        husk("kort spm", o.spm.tekst);
+        o.spm.svar.forEach(function (s) { husk("svar", s); });
+        o.spm.fejl.forEach(function (s) { husk("forkert", s); });
+        husk("forkert", o.spm.halv);
+        o.spm.hint.forEach(function (s) { husk("hint", s); });
+        husk("rigtigt", o.spm.forkl);
+        paastand(D.ind(o.ind).navn + ": hvert forkert svar har en forklaring", o.spm.svar.every(function (s, j) { return o.spm.rigtig.indexOf(j) >= 0 || !!o.spm.fejl[j]; }));
+    });
+
+    /* ================================================================= */
+    overskrift("5. Fane 2: Den ukendte prøve");
+    NK.visFane("fane-p");
+    p2.forfra();
+    paastand("fanen begynder ved prøve A med testen", p2.nr === 0 && p2.fase === "test" && p2.tests.length === 0);
+    husk("kort test", kortTekst(p2));
+    paastand("kortet nævner de tre ting", /citronsaft, mælk eller maskinopvask/.test(kortTekst(p2)), kortTekst(p2));
+    paastand("under testen er Indsend svar væk", el("p-indsend").hidden);
+    p2.indsendKlik();
+    paastand("Indsend svar gør intet under testen", p2.fase === "test");
+    p2.knap(); husk("hint p2", besked(p2));
+    p2.knap(); husk("hint p2", besked(p2));
+    paastand("andet hint nævner farverne ved tingene", /ved citronsaft/.test(besked(p2)), besked(p2));
+    paastand("hintet anbefaler en indikator, der kan finde prøve A alene", K.alene(p2.runde).indexOf(p2.bedsteInd()) >= 0, p2.bedsteInd());
+    p2.nulstilHjaelp(); p2.besked("", "");
+    var rk = p2.raekke("phph");
+    p2.klikScene({ x: rk.flaske.x, y: rk.flaske.y + 20 });
+    paastand("et klik på phenolphthaleins flaske tester prøven", p2.fase === "dryp" && p2.nuInd === "phph");
+    p2.klikScene({ x: p2.raekke("btb").flaske.x, y: p2.raekke("btb").flaske.y + 20 });
+    paastand("under dryppet kan der ikke testes med en anden", p2.nuInd === "phph" && !p2.brugt.btb);
+    tid(p2, 2.5);
+    paastand("efter dryppet spørger kortet, hvad farven viser", p2.fase === "tolk" && /blev farveløs i prøve A/.test(kortTekst(p2)), kortTekst(p2));
+    husk("kort tolk", kortTekst(p2));
+    svarTekster(p2).forEach(function (t) { husk("svar", t); });
+    p2.klikScene({ x: p2.raekke("btb").flaske.x, y: p2.raekke("btb").flaske.y + 20 });
+    paastand("under spørgsmålet kan der ikke testes", !p2.brugt.btb && p2.fase === "tolk");
+    p2.svarValg(1);
+    paastand("et valgt svar løser intet", p2.fase === "tolk" && !p2.groen);
+    p2.indsendKlik();
+    husk("forkert p2", besked(p2));
+    paastand("forkert svar: forklaringen siger, hvilken farve det svar hører til", /svagt lyserød ved pH mellem 8,2 og 10, men prøve A blev farveløs/.test(besked(p2)), besked(p2));
+    p2.knap(); husk("hint p2", besked(p2));
+    p2.knap(); husk("hint p2", besked(p2));
+    paastand("hintet peger på den farveløse del af phenolphthaleins bjælke", /farveløse del af phenolphthaleins bjælke/.test(besked(p2)), besked(p2));
+    p2.nulstilHjaelp();
+    p2.svarValg(0); p2.indsendKlik();
+    paastand("rigtigt: maskinopvask er udelukket, citronsaft og mælk passer stadig", !!p2.groen && p2.passer().join() === "citron,maelk" &&
+        /Maskinopvask passer ikke/.test(bliv(p2)) && /Citronsaft og mælk passer stadig/.test(bliv(p2)), bliv(p2));
+    husk("rigtigt p2", bliv(p2));
+    paastand("knappen går fremad: test med en indikator mere", /Test med en indikator mere/.test(p2.groen.knap));
+    p2.videreKlik();
+    paastand("kortet nævner kun de to ting, der passer", p2.fase === "test" && /citronsaft eller mælk/.test(kortTekst(p2)), kortTekst(p2));
+    husk("kort test", kortTekst(p2));
+    p2.klikScene({ x: rk.flaske.x, y: rk.flaske.y + 20 });
+    paastand("en brugt flaske kan ikke bruges igen", p2.fase === "test" && /allerede brugt/.test(besked(p2)), besked(p2));
+    husk("kort besked", besked(p2));
+    p2.test("btb"); tid(p2, 2.5);
+    p2.svarValg(1); p2.indsendKlik();
+    paastand("BTB er grøn: prøve A er mælk, og pH-metret måler", !!p2.groen && p2.passer().join() === "maelk" && p2.meterT === 0 && /pH-metret viser 6,7/.test(bliv(p2)), bliv(p2));
+    paastand("to indikatorer, hvor én kunne gøre det: ingen stjerne, og kortet siger det", p2.status[0].loest && !p2.status[0].stjerne && /én indikator/.test(bliv(p2)));
+    husk("rigtigt p2", bliv(p2));
+    tid(p2, 2);
+    paastand("pH-metret har målt", p2.meterT > 1.2);
+    p2.videreKlik();
+    paastand("knappen fører til prøve B", p2.nr === 1 && p2.fase === "test");
+
+    function findMed(liste) {
+        liste.forEach(function (id) {
+            p2.test(id); tid(p2, 2.5);
+            husk("kort tolk", kortTekst(p2));
+            svarTekster(p2).forEach(function (t) { husk("svar", t); });
+            p2.svarValg(K.tolk(id, D.TING[p2.runde.hemmelig].ph)); p2.indsendKlik();
+            husk("rigtigt p2", bliv(p2));
+            if (p2.groen && p2.groen.naeste) p2.videreKlik();
+        });
+    }
+    findMed(["phph"]);
+    paastand("prøve B med phenolphthalein: maskinopvask og en stjerne", p2.status[1].stjerne && p2.passer().join() === "opvask");
+    p2.videreKlik();
+    husk("kort test", kortTekst(p2));
+    findMed(["thymol"]);
+    paastand("prøve C med thymolblåt: citronsaft og en stjerne", p2.status[2].stjerne && p2.passer().join() === "citron");
+    p2.videreKlik();
+    findMed(["thymol"]);
+    paastand("prøve D med thymolblåt: sæbevand og en stjerne", p2.status[3].stjerne && p2.passer().join() === "saebe");
+    p2.videreKlik();
+    husk("kort test", kortTekst(p2));
+    paastand("prøve E har fire ting", p2.runde.ting.length === 4 && /citronsaft, øl, mælk eller sæbevand/.test(kortTekst(p2)), kortTekst(p2));
+    findMed(["lakmus", "thymol"]);
+    paastand("prøve E med lakmus og thymolblåt: øl og en stjerne", p2.status[4].stjerne && p2.passer().join() === "oel");
+    paastand("efter den sidste prøve hedder knappen Afslut", /Afslut/.test(p2.groen.knap));
+    p2.videreKlik();
+    paastand("slutkortet: fire af fem med stjerne, ingen hint og intet Indsend svar", p2.fase === "slut" && /fandt 4 af dem/.test(kort(p2)) &&
+        el("p-knap").hidden && el("p-indsend").hidden && !el("p-ind").querySelector("[data-videre]"), kort(p2));
+    husk("kort slut", kortTekst(p2));
+    p2.klikScene({ x: rk.flaske.x, y: rk.flaske.y + 20 }); p2.indsendKlik();
+    paastand("klik og Indsend svar ændrer intet på slutkortet", p2.fase === "slut");
+    p2.forfra();
+    paastand("Begynd forfra giver prøve A igen", p2.nr === 0 && p2.fase === "test" && p2.antalLoest() === 0);
+    p2.visSvar();
+    paastand("Vis svaret under testen tester med den bedste indikator", p2.fase === "dryp" && K.alene(p2.runde).indexOf(p2.nuInd) >= 0 && p2.sv);
+    tid(p2, 2.5);
+    p2.visSvar();
+    paastand("Vis svaret under spørgsmålet giver svaret uden stjerne", !!p2.groen && p2.status[0].loest && !p2.status[0].stjerne);
+
+    /* Alle tekster, fane 2 kan skrive: hver ting i hver prøve med hver indikator */
+    D.RUNDER.forEach(function (r, i) {
+        p2.vaelg(i);
+        husk("kort test", kortTekst(p2));
+        D.PROEVE_IND.forEach(function (id) {
+            p2.vaelg(i);
+            p2.test(id); tid(p2, 2.5);
+            husk("kort tolk", kortTekst(p2));
+            p2.hintNu().forEach(function (h) { husk("hint", h); });
+            D.ind(id).tolk.forEach(function (o, j) {
+                if (j === K.tolk(id, D.TING[r.hemmelig].ph)) return;
+                p2.valgt = j; p2.indsend();
+                husk("forkert", besked(p2));
+            });
+            p2.valgt = K.tolk(id, D.TING[r.hemmelig].ph); p2.indsend();
+            husk("rigtigt", bliv(p2));
+        });
+    });
+    p2.vaelg(0);
+
+    /* ================================================================= */
+    overskrift("6. Teksterne");
+    var html = d.body.innerText;
+    var streger = [], ascii = [], ladning = [], lange = [];
+    var GRAENSE = { svar: 34, hint: 110, forkert: 125, rigtigt: 175, kort: 150 };
+    var laengst = {};
+    tekster.forEach(function (x) {
+        if (/[–—]/.test(x.t)) streger.push(x.hvad);
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.match(ASCII_ORD)[0]);
+        if (/\b1[+−]/.test(x.t)) ladning.push(x.hvad);
+        var slags = x.hvad.split(" ")[0], g = GRAENSE[slags];
+        if (g && x.t.length > g) lange.push(x.hvad + " (" + x.t.length + "): " + x.t.slice(0, 60));
+        if (g && (!laengst[slags] || x.t.length > laengst[slags])) laengst[slags] = x.t.length;
+    });
+    samlet("ingen tankestreger (" + tekster.length + " tekster)", streger);
+    samlet("intet ASCII-dansk", ascii);
+    samlet("teksterne er korte (svar 34, hint 110, forkert 125, rigtigt 175, kort 150 tegn)", lange);
+    note("længst: " + Object.keys(laengst).map(function (k) { return k + " " + laengst[k]; }).join(", "));
+    samlet("ingen ladning skrevet som 1+ eller 1−", ladning);
+    paastand("siden har ingen tankestreger", !/[–—]/.test(html));
+    paastand("ingen natronlud", !/natronlud/i.test(html + tekster.map(function (x) { return x.t; }).join(" ")));
+    paastand("ingen Kemichael", !d.querySelector('script[src*="kemichael"]'));
+    paastand("teorien er lukket fra start", !el("teori").classList.contains("vis"));
+    paastand("teoriens farvekort har fem bjælker og en akse fra −1 til 15", el("teori-kort").querySelectorAll(".tk-bjaelke").length === 5 &&
+        el("teori-kort").querySelectorAll(".tk-tal i").length === 17);
+
+    /* ================================================================= */
+    overskrift("7. Kortet dækker aldrig tavlen, og tegningerne er inden for tavlen");
+    var daekker = [], raekke = [], uden = [];
+    [[1100, 620], [1300, 800], [1600, 950]].forEach(function (str) {
+        ramme.style.width = str[0] + "px";
+        ramme.style.height = str[1] + "px";
+        var tilf = [
+            ["s gaet", function () { NK.visFane("fane-s"); s1.vaelg(0); }],
+            ["s thymol", function () { NK.visFane("fane-s"); s1.vaelg(3); s1.udfoer(); tid(s1, 6); s1.svarValg(1); }],
+            ["s groen", function () { NK.visFane("fane-s"); s1.vaelg(4); s1.svarValg(2); s1.indsendKlik(); s1.udfoer(); tid(s1, 6); s1.svarValg(1); s1.indsendKlik(); }],
+            ["p test", function () { NK.visFane("fane-p"); p2.vaelg(4); }],
+            ["p tolk thymol", function () { NK.visFane("fane-p"); p2.vaelg(4); p2.test("thymol"); tid(p2, 2.5); p2.svarValg(1); p2.indsendKlik(); }],
+            ["p groen", function () { NK.visFane("fane-p"); p2.vaelg(4); p2.test("lakmus"); tid(p2, 2.5); p2.svarValg(0); p2.indsendKlik(); p2.videreKlik(); p2.test("thymol"); tid(p2, 2.5); p2.svarValg(2); p2.indsendKlik(); }]
+        ];
+        tilf.forEach(function (tf) {
+            tf[1]();
+            var sim = tf[0].charAt(0) === "s" ? s1 : p2;
+            sim.lay = null; sim.tilpas(); sim.layout();
+            sim.visKort();
+            var kortR = el(sim.navn + "-skort").getBoundingClientRect(), c = sim.L.canvas.getBoundingClientRect();
+            var tv = sim.lay.tavle, tavleTop = c.top + tv.y;
+            if (kortR.bottom > tavleTop + 1) daekker.push(str.join("×") + " " + tf[0] + " (" + Math.round(kortR.bottom - tavleTop) + " px)");
+            var k = el(sim.navn + "-knap"), ind = el(sim.navn + "-indsend");
+            if (!k.hidden && !ind.hidden && Math.abs(k.getBoundingClientRect().top - ind.getBoundingClientRect().top) > 4) raekke.push(str.join("×") + " " + tf[0]);
+            /* Det, der tegnes, skal vaere paa tavlen */
+            var bund = tv.y + tv.h + 2, top = tv.y - 2;
+            if (sim === s1) {
+                var k1 = s1.k;
+                if (k1.glasTop - k1.fz + 6 < top) uden.push(str.join("×") + " glassenes zone over tavlen");
+                if (k1.kortTop + 5 * k1.rowH > bund) uden.push(str.join("×") + " farvekortet under tavlen (" + Math.round(k1.kortTop + 5 * k1.rowH - bund) + ")");
+                if (k1.hjem.y < top) uden.push(str.join("×") + " flasken over tavlen");
+            } else {
+                var k2 = p2.k, sidst = p2.raekke("phph");
+                if (sidst.y + k2.rowH > bund) uden.push(str.join("×") + " sidste række under tavlen");
+                var by = k2.akseY - 8 - k2.baandH;
+                if (by - 10 - 40 - 34 < top) uden.push(str.join("×") + " tingene over tavlen (" + Math.round(top - (by - 84)) + ")");
+                if (k2.baeger.y - 0.32 * k2.baeger.h < top) uden.push(str.join("×") + " pH-metret over tavlen");
+                if (k2.baeger.x + k2.baeger.b + 10 + 50 > p2.akse.x0 - 24) uden.push(str.join("×") + " prøvens navn rammer tingene");
+                if (k2.rowH < 36) uden.push(str.join("×") + " rækkerne er for lave");
+            }
+            sim.tegn();
+        });
+    });
+    samlet("kortet slutter over tavlen (" + "3 størrelser × 6 kort)", daekker);
+    samlet("hint og Indsend svar står på samme række", raekke);
+    samlet("glas, flasker, ting og rækker er inden for tavlen", uden);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>

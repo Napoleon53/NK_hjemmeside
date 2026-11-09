@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="140" viewBox="0 0 120 140">
+  <!-- Lille baegerglas til den lyse tavle (fane 2: proeven). Animationen
+       tegner vaesken BAG filen, klippet til det indre: x 16-104, fra
+       vaeskens top ned til bunden y 130 (hjoerneradius 7). Vaesken staar
+       normalt fra y 62. Tuden sidder oeverst til venstre. Bunden staar
+       paa y 134. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="0.18" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.32" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.18"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="60" cy="135" rx="50" ry="3" fill="#000000" fill-opacity="0.12"/>
+  <path d="M16 14 L16 124 Q16 131 23 131 L97 131 Q104 131 104 124 L104 14 Z" fill="url(#glas)"/>
+  <path d="M8 9 Q15 10 16 16 L16 124 Q16 132 24 132 L96 132 Q104 132 104 124 L104 16 Q104 11 110 10"
+        fill="none" stroke="#6b7685" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#6b7685" stroke-opacity="0.55" stroke-width="1.4" stroke-linecap="round">
+    <path d="M17 104 h14 M17 83 h14 M17 62 h14 M17 41 h14"/>
+  </g>
+  <path d="M24 26 L24 120" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" opacity="0.7"/>
+</svg>
