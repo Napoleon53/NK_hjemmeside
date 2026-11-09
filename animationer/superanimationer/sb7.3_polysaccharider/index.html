@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polysaccharider</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>Polysaccharider</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-k" role="tab" aria-selected="true"><span class="nr">1</span>Byg kæden</button>
+        <button class="faneknap" data-fane="fane-g" role="tab" aria-selected="false"><span class="nr">2</span>Forgreninger</button>
+        <button class="faneknap" data-fane="fane-i" role="tab" aria-selected="false"><span class="nr">3</span>Spyt og iod</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BYG KAEDEN                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-k" role="tabpanel" aria-label="Byg kæden">
+    <div class="scene">
+        <canvas id="k-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="k-skort">
+            <div class="sk-ind" id="k-ind"></div>
+            <div class="sk-bund" id="k-status">
+                <p class="st-tekst" id="k-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="k-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="k-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="k-anker-kaede"></div>
+        <div class="anker" id="k-anker-glucose"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="k-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="k-loest">0</b>/2</span></h2>
+            <div class="opg-chips lodret" id="k-liste"></div>
+            <button class="knap igenknap" id="k-forfra" type="button">↺ Begynd forfra med begge</button>
+        </div>
+
+        <div class="kort" id="k-trinkort">
+            <h2>Trinnene <span class="taeller" id="k-trin-navn">Amylose</span></h2>
+            <ol class="trinliste" id="k-trin"></ol>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORGRENINGER                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-g" role="tabpanel" aria-label="Forgreninger">
+    <div class="scene">
+        <canvas id="g-laerred"></canvas>
+        <div class="scenekort" id="g-skort">
+            <div class="sk-ind" id="g-ind"></div>
+            <div class="sk-bund" id="g-status">
+                <p class="st-tekst" id="g-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="g-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="g-anker-mol"></div>
+        <div class="anker" id="g-anker-tal"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="g-trinkort">
+            <h2>Forløbet <span class="taeller maerke-tekst" id="g-maerke"></span></h2>
+            <ol class="trinliste" id="g-trin"></ol>
+            <button class="knap igenknap" id="g-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="g-om">
+            <h2>Om molekylerne</h2>
+            <p class="note-tekst">Hver sekskant er en glucoseenhed. De tre molekyler har 30 enheder hver. Rigtige molekyler har tusinder af enheder, og tiden er trykket sammen.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: SPYT OG IOD                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-i" role="tabpanel" aria-label="Spyt og iod">
+    <div class="scene">
+        <canvas id="i-laerred"></canvas>
+        <div class="scenekort" id="i-skort">
+            <div class="sk-ind" id="i-ind"></div>
+            <div class="sk-bund" id="i-status">
+                <p class="st-tekst" id="i-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="i-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="i-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="i-anker-proever"></div>
+        <div class="anker" id="i-anker-lupper"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="i-trinkort">
+            <h2>Forløbet <span class="taeller maerke-tekst" id="i-maerke"></span></h2>
+            <ol class="trinliste" id="i-trin"></ol>
+            <button class="knap igenknap" id="i-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="i-om">
+            <h2>Om lupperne</h2>
+            <p class="note-tekst">Lupperne viser molekylerne meget forstørret. Hver sekskant er en glucoseenhed, og de røde prikker mellem cellulosekæderne er hydrogenbindinger.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Polysaccharider</h2>
+        <canvas id="teori-kaeder" class="teori-kaeder" width="660" height="210" aria-label="Et stykke amylose og et stykke cellulose som haworthformler"></canvas>
+        <h3 class="teori-hoved">Glykosidbindingen</h3>
+        <p>To glucoseenheder bindes sammen ved en kondensation. En OH-gruppe fra hver enhed reagerer, og der fraspaltes et vandmolekyle. Bindingen C−O−C mellem to sukkerenheder kaldes en glykosidbinding og får navn efter de to carbonatomer, den forbinder.</p>
+        <h3 class="teori-hoved">Stivelse og glykogen</h3>
+        <p>Amylose er en lang kæde med α-1,4-glykosidbindinger, som snor sig som en spiral. Amylopectin har også α-1,4-bindinger, men kæden deler sig ved α-1,6-glykosidbindinger. Glykogen er bygget som amylopectin med endnu flere forgreninger, og de mange ender gør, at kroppen hurtigt kan frigive glucose.</p>
+        <h3 class="teori-hoved">Cellulose</h3>
+        <p>Cellulose har β-1,4-glykosidbindinger, og hver anden glucoseenhed er vendt om. Kæderne bliver lige og holdes sammen af hydrogenbindinger til stærke fibre, som ikke kan opløses i vand. Formlen for både stivelse og cellulose skrives (C₆H₁₀O₅)<sub>n</sub>.</p>
+        <h3 class="teori-hoved">Fordøjelsen og iodprøven</h3>
+        <p>Amylase i spyttet klipper α-bindingerne i stivelse, så der dannes maltose. Mennesket har ingen enzymer, der kan spalte β-bindingerne i cellulose, så cellulose går ufordøjet gennem tarmen som kostfibre. Iodopløsning er gulbrun, men triiodidionerne, I₃⁻, sætter sig inde i spiralen af amylose, og så bliver farven blåsort.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/enhed.js"></script>
+<script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_kaede.js"></script>
+<script src="js/sim_gren.js"></script>
+<script src="js/sim_iod.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

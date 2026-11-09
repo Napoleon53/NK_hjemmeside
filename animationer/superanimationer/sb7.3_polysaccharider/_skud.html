@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Skærmbilleder: sb7.3 Polysaccharider</title>
+<style>
+    html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+    iframe { border: 0; display: block; }
+</style>
+</head>
+<body>
+<!--
+    Udviklerværktøj. Indgår ikke i animationen.
+    Åbner index.html i en ramme med fast størrelse og stiller animationen i et
+    bestemt trin, så det kan ses som skærmbillede:
+      _skud.html?b=1400&h=860&s=<scenarie>
+    Kræver en lokal server med mappen animationer/ som rod.
+-->
+<script>
+var q = {};
+location.search.replace(/^\?/, "").split("&").forEach(function (p) { var a = p.split("="); if (a[0]) q[a[0]] = decodeURIComponent(a[1] || ""); });
+var B = parseInt(q.b || "1400", 10), H = parseInt(q.h || "860", 10);
+var f = document.createElement("iframe");
+f.width = B; f.height = H;
+f.src = "index.html";
+document.body.appendChild(f);
+
+function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+function k(NK) { NK.visFane("fane-k"); return NK.sims["fane-k"]; }
+function g(NK) { NK.visFane("fane-g"); return NK.sims["fane-g"]; }
+function io(NK) { NK.visFane("fane-i"); return NK.sims["fane-i"]; }
+/* Fane 1 til et bestemt sted */
+function kTil(NK, opg, trin) {
+    var s = k(NK); s.vaelg(opg); tid(s, 0.5);
+    if (trin >= 1) { s.binValg = s.trin.rigtig; s.indsendKlik(); tid(s, 1.2); s.videreKlik(); tid(s, 0.4); }
+    if (trin >= 2) {
+        if (s.fase === "oh") { s.valg = ["e1", "n4"]; s.indsendKlik(); tid(s, 2); s.videreKlik(); }
+        else { s.ny.vend = 1; s.startKond(); tid(s, 2); s.valgt = 0; s.indsendKlik(); s.videreKlik(); }
+        tid(s, 0.5);
+    }
+    return s;
+}
+
+var SCENARIER = {
+    "k-start": function (NK) { kTil(NK, 0, 0); },
+    "k-valgt": function (NK) { var s = kTil(NK, 0, 0); s.binValg = "beta"; s.indsendKlik(); s.binValg = "alfa"; s.visKort(); },
+    "k-flyv": function (NK) { var s = kTil(NK, 0, 0); s.binValg = "alfa"; s.indsendKlik(); tid(s, 0.4); },
+    "k-oh": function (NK) { var s = kTil(NK, 0, 1); s.valg = ["e1", "n2"]; s.visKort(); },
+    "k-oh-fejl": function (NK) { var s = kTil(NK, 0, 1); s.valg = ["e1", "n6"]; s.indsendKlik(); s.knap(); },
+    "k-kond1": function (NK) { var s = kTil(NK, 0, 1); s.valg = ["e1", "n4"]; s.indsendKlik(); tid(s, 0.3); },
+    "k-kond2": function (NK) { var s = kTil(NK, 0, 1); s.valg = ["e1", "n4"]; s.indsendKlik(); tid(s, 0.75); },
+    "k-kond3": function (NK) { var s = kTil(NK, 0, 1); s.valg = ["e1", "n4"]; s.indsendKlik(); tid(s, 2); },
+    "k-voks": function (NK) { var s = kTil(NK, 0, 2); },
+    "k-voks1": function (NK) { var s = kTil(NK, 0, 2); s.udfoer(); tid(s, 1.2); },
+    "k-voks2": function (NK) { var s = kTil(NK, 0, 2); s.udfoer(); tid(s, 3.6); },
+    "k-voks3": function (NK) { var s = kTil(NK, 0, 2); s.udfoer(); tid(s, 4.6); },
+    "k-spiral": function (NK) { var s = kTil(NK, 0, 2); s.udfoer(); tid(s, 10); },
+    "k-spiral-ok": function (NK) { var s = kTil(NK, 0, 2); s.udfoer(); tid(s, 10); s.valgt = 1; s.indsendKlik(); },
+    "c-start": function (NK) { kTil(NK, 1, 0); },
+    "c-traek": function (NK) { kTil(NK, 1, 1); },
+    "c-traek40": function (NK) { var s = kTil(NK, 1, 1); s.ny.vend = 0.4; s.trukket = true; },
+    "c-traek70": function (NK) { var s = kTil(NK, 1, 1); s.ny.vend = 0.7; s.trukket = true; },
+    "c-kond": function (NK) { var s = kTil(NK, 1, 1); s.ny.vend = 1; s.startKond(); tid(s, 0.8); },
+    "c-spm": function (NK) { var s = kTil(NK, 1, 1); s.ny.vend = 1; s.startKond(); tid(s, 2); },
+    "c-voks": function (NK) { var s = kTil(NK, 1, 2); s.udfoer(); tid(s, 2.4); },
+    "c-fibre-midt": function (NK) { var s = kTil(NK, 1, 2); s.udfoer(); tid(s, 4.4); },
+    "c-fibre": function (NK) { var s = kTil(NK, 1, 2); s.udfoer(); tid(s, 10); },
+    "g-start": function (NK) { var s = g(NK); s.vaelg(0); tid(s, 1); },
+    "g-ok": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); tid(s, 1); },
+    "g-gaet": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); s.videreKlik(); tid(s, 1.5); s.valgt = 2; s.visKort(); },
+    "g-start-race": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); tid(s, 1.5); },
+    "g-race": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); tid(s, 1.5); s.udfoer(); tid(s, 1.55); },
+    "g-race2": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); tid(s, 1.5); s.udfoer(); tid(s, 3.2); },
+    "g-slut": function (NK) { var s = g(NK); s.vaelg(0); s.valgt = 1; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); tid(s, 1.5); s.udfoer(); tid(s, 9); },
+    "i-start": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.visKort(); },
+    "i-iod1": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 0.3); },
+    "i-iod2": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 1.4); },
+    "i-spm": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); },
+    "i-gaet2": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); tid(s, 1.5); s.valgt = 0; s.visKort(); },
+    "i-spyt1": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 1); s.udfoer(); tid(s, 1.3); },
+    "i-spyt2": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 1); s.udfoer(); tid(s, 2.15); },
+    "i-spyt3": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 1); s.udfoer(); tid(s, 3.8); },
+    "i-spyt4": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 1); s.udfoer(); tid(s, 5.3); },
+    "i-slut": function (NK) { var s = io(NK); s.vaelg(0); s.valgt = 0; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 1); s.udfoer(); tid(s, 8); s.valgt = 0; s.indsendKlik(); },
+    "teori": function (NK, W) { W.document.getElementById("teoriknap").click(); }
+};
+
+f.addEventListener("load", function () {
+    var W = f.contentWindow;
+    try { W.localStorage.clear(); } catch (e) { /* ingen hukommelse */ }
+    setTimeout(function () {
+        var NK = W.NK;
+        try { (SCENARIER[q.s] || function () {})(NK, W); } catch (e) { document.title = "FEJL " + e.message; console.log("FEJL " + e.message + " " + e.stack); }
+        NK.tid.skala = 0;
+        var sims = NK.sims;
+        Object.keys(sims).forEach(function (k) { sims[k].tilpas(); });
+        setTimeout(function () { Object.keys(sims).forEach(function (k) { try { sims[k].tegn(); } catch (e) { document.title = "FEJL " + e.message; console.log("FEJL tegn " + e.message + " " + e.stack); } }); }, 50);
+    }, 400);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb7.3 Polysaccharider</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at kæderne følger bogen (afsnit B7.3), at der
+   fraspaltes ét vandmolekyle pr. binding, at spiralen har seks enheder
+   pr. omgang, at de tre molekyler i kapløbet har lige mange enheder og
+   1, 3 og 9 ender og bliver færdige i rækkefølgen glykogen, amylopectin,
+   amylose, at triiodidionerne kun lægger sig i spiralen, at amylase kun
+   klipper stivelse, at alle tre faner kan gennemføres, at forkerte svar
+   får den rigtige forklaring og koster stjernen, at intet løses uden
+   Indsend svar, at teksterne er korte og uden tankestreger og
+   ASCII-dansk, og at kortet aldrig dækker tavlen fra 1100 × 620 til
+   1600 × 950. Kræver en lokal server med mappen animationer/ som rod.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb7.3-kaede", "nk-sb7.3-gren", "nk-sb7.3-iod"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|blaasort|traek\w*|kaede\w*|baade|laengere|oejeblik|vaeske|loekke\w*|proeve\w*|maengde)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, E = NK.Enhed;
+    var k1 = NK.sims["fane-k"], g2 = NK.sims["fane-g"], i3 = NK.sims["fane-i"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : ""; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function tegn(sim) { sim.tilpas(); sim.tegn(); }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: kæderne er bogens (afsnit B7.3)");
+    paastand("amylose er bygget af α-glucose og cellulose af β-glucose", D.KAEDE[0].form === "alfa" && D.KAEDE[1].form === "beta");
+    paastand("OH-gruppen på carbonatom 1 peger ned i α-glucose og op i β-glucose", E.retning1("alfa") === 1 && E.retning1("beta") === -1);
+    NK.visFane("fane-k");
+    k1.vaelg(0);
+    var dirA = [1, 2].map(function (i) { return E.retning1(k1.form) * (k1.enh[i - 1].vend ? -1 : 1); });
+    paastand("amylose: alle oxygenatomerne i glykosidbindingerne sidder under ringene, og ingen ring er vendt",
+        dirA.every(function (x) { return x === 1; }) && k1.enh.every(function (u) { return u.vend === 0; }));
+    k1.vaelg(1);
+    var dirC = [1, 2].map(function (i) { return E.retning1(k1.form) * (k1.enh[i - 1].vend ? -1 : 1); });
+    paastand("cellulose: hver anden ring er vendt om, og oxygenatomerne sidder skiftevis over og under ringene",
+        k1.enh.map(function (u) { return u.vend; }).join() === "0,1,0" && dirC.join() === "-1,1");
+    var ringA = E.hjoerner({ X: 0, Y: 0, s: 10, vend: 0 }), ringV = E.hjoerner({ X: 0, Y: 0, s: 10, vend: 1 });
+    paastand("haworthformlen: ringens O bagest til højre og carbonatom 1 yderst til højre; vendt om er O forrest",
+        ringA.O.x > 0 && ringA.O.y < 0 && ringA[1].x === Math.max(ringA[1].x, ringA[2].x, ringA[3].x, ringA[4].x, ringA[5].x) && ringV.O.y > 0 && ringV[1].x === ringA[1].x);
+    var glucose = { C: 6, H: 12, O: 6 }, enhed = { C: 6, H: 10, O: 5 };
+    paastand("en enhed i kæden er glucose minus vand: C₆H₁₀O₅ (det rigtige svar på formlen)",
+        glucose.H - 2 === enhed.H && glucose.O - 1 === enhed.O && D.KAEDE[0].trin[2].svar[D.KAEDE[0].trin[2].rigtig] === "(C₆H₁₀O₅)ₙ");
+    var p0 = D.spiralPunkt(0, 1), p6 = D.spiralPunkt(D.PR_OMGANG, 1), p3 = D.spiralPunkt(3, 1);
+    paastand("spiralen har seks glucoseenheder pr. omgang", D.PR_OMGANG === 6 && Math.abs(p6.y - p0.y) < 1e-9 && Math.abs(p6.x - p0.x - 6 * D.SPIRAL.dx) < 1e-9 && p3.y > p0.y);
+
+    var antalE = [], ender = [], overlap = [], boern = [];
+    var mols = D.MOLEKYLER.map(function (m) { return g2.bygMolekyle(m); });
+    mols.forEach(function (mol) {
+        antalE.push(mol.enh.length);
+        ender.push(g2.ender(mol).length);
+        mol.enh.forEach(function (u, i) {
+            if (u.boern.length > 2) boern.push(mol.def.id + " " + i);
+            if (mol.def.spiral) return;
+            mol.enh.forEach(function (v, j) {
+                if (j <= i) return;
+                var dd = Math.sqrt((u.x - v.x) * (u.x - v.x) + (u.y - v.y) * (u.y - v.y));
+                if (dd < 0.99) overlap.push(mol.def.id + " " + i + "/" + j);
+                if (v.p === i && Math.abs(dd - 1) > 0.01) overlap.push(mol.def.id + " binding " + i + "-" + j);
+            });
+        });
+    });
+    paastand("de tre molekyler i kapløbet har lige mange glucoseenheder (" + D.ANTAL_GREN + ")", antalE.every(function (n) { return n === D.ANTAL_GREN; }), antalE.join());
+    paastand("amylose har 1 ende, amylopectin 3 og glykogen 9 (glykogen har flest forgreninger)", ender.join() === "1,3,9", ender.join());
+    samlet("ingen enheder ligger oven i hinanden, og alle bindinger er lige lange", overlap);
+    samlet("en enhed har højst to ting bundet på sig (carbonatom 4 og carbonatom 6)", boern);
+
+    /* ================================================================= */
+    overskrift("2. Fane 1: Byg kæden");
+    k1.forfra();
+    tegn(k1);
+    paastand("fane 1 begynder med amylose: tre α-glucose i kæden og trin 1 er at vælge glucosen",
+        k1.opg.id === "amylose" && k1.enh.length === 3 && k1.fase === "vaelg" && !k1.ny);
+    k1.indsendKlik();
+    paastand("Indsend svar uden valg giver en besked og bedømmer intet", /Klik på α-glucose/.test(besked(k1)) && !k1.groen, besked(k1));
+    var b = k1.bins.beta;
+    k1.klikScene({ x: b.x + b.b / 2, y: b.y + b.h / 2 });
+    paastand("et klik på β-glucose vælger den, men bedømmer intet", k1.binValg === "beta" && !k1.groen);
+    k1.indsendKlik();
+    paastand("β-glucose til amylose: forklaringen siger, at OH-gruppen peger op", /carbonatom 1 op/.test(besked(k1)) && k1.forkert.beta && !k1.groen, besked(k1));
+    var konf0 = d.querySelectorAll(".konfetti").length;
+    k1.binValg = "alfa"; k1.indsendKlik();
+    paastand("α-glucose er rigtigt, og glucosen flyver op ved siden af kæden", !!k1.groen && k1.ny && k1.ny.form === "alfa" && k1.ny.fly);
+    paastand("et rigtigt svar midt i en opgave giver ingen konfetti", d.querySelectorAll(".konfetti").length === konf0);
+    tid(k1, 1); k1.videreKlik(); tid(k1, 0.5); tegn(k1);
+    paastand("trin 2: OH-grupperne kan klikkes på begge ringe", k1.fase === "oh" && ["e1", "e6", "n4", "n6"].every(function (id) { return !!k1.kasser[id]; }));
+    var kn = k1.kasser.n4;
+    k1.klikScene({ x: kn.x + kn.w / 2, y: kn.y + kn.h / 2 });
+    paastand("et klik på OH-gruppen på carbonatom 4 i den nye ring vælger den", k1.valg.join() === "n4" && !k1.groen);
+    function ohProev(valg, maal) {
+        k1.valg = valg.slice(); k1.indsendKlik();
+        var b2 = besked(k1);
+        return { ok: b2.indexOf(maal) >= 0 && !k1.groen, b: b2 };
+    }
+    var t2 = D.KAEDE[0].trin[1], r;
+    r = ohProev(["e1", "n6"], t2.fejl6); paastand("carbonatom 6: forgrening, amylose har ingen", r.ok, r.b);
+    r = ohProev(["e2", "n4"], t2.fejl23); paastand("carbonatom 2: navnet 1,4 fortæller, hvilke carbonatomer", r.ok, r.b);
+    r = ohProev(["e1", "e2"], t2.fejlSamme); paastand("to OH-grupper på samme ring: hver sin glucose", r.ok, r.b);
+    r = ohProev(["n1", "e1"], t2.fejlVej); paastand("carbonatom 1 og carbonatom 1: kæden vokser fra 1 til 4", r.ok, r.b);
+    k1.valg = ["n4", "e1"]; k1.indsendKlik();
+    paastand("carbonatom 1 i kæden og carbonatom 4 i den nye ring er rigtigt, og kondensationen begynder", !!k1.groen && !!k1.kond);
+    tid(k1, 2);
+    paastand("efter kondensationen er der fire enheder i kæden, og der er fraspaltet et vandmolekyle mere", k1.enh.length === 4 && !k1.kond && !k1.ny);
+    k1.videreKlik();
+    paastand("trin 3 begynder med knappen Byg videre: Indsend svar og hint er skjult", k1.fase === "forsoeg" && el("k-indsend").hidden && el("k-knap").hidden);
+    k1.svarValg(1);
+    paastand("svarene kan ikke vælges, før kæden er vokset", k1.valgt === null);
+    k1.udfoer();
+    tid(k1, 12); tegn(k1);
+    paastand("kæden vokser til " + D.KAEDE[0].voks + " enheder, bliver til sekskanter og en spiral, og så kommer spørgsmålet",
+        k1.enh.length === D.KAEDE[0].voks && k1.skema === 1 && k1.formU === 1 && k1.fase === "spm");
+    k1.svarValg(0);
+    paastand("et svar på kortet vælger kun", k1.valgt === 0 && !k1.groen);
+    k1.indsendKlik();
+    paastand("(C₆H₁₂O₆)ₙ: glucose, hver enhed har afgivet vand", /afgivet et vandmolekyle/.test(besked(k1)), besked(k1));
+    k1.valgt = 1; k1.indsendKlik();
+    paastand("(C₆H₁₀O₅)ₙ er rigtigt; opgaven er løst uden stjerne, og knappen fører til cellulose",
+        k1.status[0].loest && !k1.status[0].stjerne && k1.groen.knap === "Næste opgave →" && /spiral/.test(bliv(k1)));
+    k1.videreKlik();
+    paastand("opgave 2 er cellulose med tre β-glucose", k1.opg.id === "cellulose" && k1.enh.length === 3 && k1.fase === "vaelg");
+    k1.binValg = "beta"; k1.indsendKlik(); tid(k1, 1); k1.videreKlik(); tid(k1, 0.6); tegn(k1);
+    paastand("trin 2 i cellulose: den nye ring skal vendes, og Indsend svar er skjult", k1.fase === "traek" && el("k-indsend").hidden && k1.ny && k1.ny.vend === 0);
+    var c = k1.nyPlads;
+    k1.nedScene({ x: c.X, y: c.Y }); k1.flytScene({ x: c.X, y: c.Y + c.s * 0.4 }); k1.opScene({ x: c.X, y: c.Y + c.s * 0.4 });
+    tid(k1, 1);
+    paastand("slippes ringen før halvvejen, drejer den tilbage, og kortet beder om at trække længere", k1.ny && k1.ny.vend < 0.02 && !k1.kond && /længere/.test(besked(k1) + k1.el.besked.textContent));
+    k1.nedScene({ x: c.X, y: c.Y }); k1.flytScene({ x: c.X, y: c.Y + c.s * 1.6 });
+    paastand("trækkes ringen helt om, reagerer OH-grupperne", !!k1.kond && k1.ny.vend === 1);
+    tid(k1, 2.2);
+    paastand("bagefter er den nye ring vendt om i kæden, og spørgsmålet kommer", k1.fase === "spm" && k1.enh.length === 4 && k1.enh[3].vend === 1);
+    k1.valgt = 2; k1.indsendKlik();
+    paastand("'så kæden kan sno sig': cellulosekæden snor sig ikke", /snor sig ikke/.test(besked(k1)), besked(k1));
+    k1.valgt = 0; k1.indsendKlik(); k1.videreKlik();
+    k1.udfoer(); tid(k1, 10); tegn(k1);
+    paastand("cellulose vokser til " + D.KAEDE[1].voks + " enheder, og hydrogenbindingerne mellem kæderne ses", k1.enh.length === D.KAEDE[1].voks && k1.fase === "spm" && !!k1.hbFelt);
+    var konf1 = d.querySelectorAll(".konfetti").length;
+    k1.valgt = 0; k1.indsendKlik();
+    paastand("begge opgaver er løst, og knappen fører videre til Forgreninger", k1.antalLoest() === 2 && k1.groen.knap === "Videre til Forgreninger →");
+    paastand("konfetti, når en hel opgave er løst", d.querySelectorAll(".konfetti").length > konf1);
+
+    /* ================================================================= */
+    overskrift("3. Fane 2: Forgreninger");
+    NK.visFane("fane-g");
+    g2.forfra(); tegn(g2);
+    paastand("trin 1 viser et stykke amylopectin og spørger om bindingen i forgreningen", g2.trinNr === 0 && g2.fase === "spm" && !!g2.grenKasse);
+    g2.valgt = 0; g2.indsendKlik();
+    paastand("α-1,4: bindingerne i kæderne", /inde i kæderne/.test(besked(g2)), besked(g2));
+    g2.valgt = 1; g2.indsendKlik();
+    paastand("α-1,6 er rigtigt", !!g2.groen && /carbonatom 6/.test(bliv(g2)));
+    g2.videreKlik();
+    paastand("trin 2 er et gæt uden hint", g2.fase === "gaet" && el("g-knap").hidden);
+    g2.valgt = 0; g2.indsendKlik();
+    paastand("et gæt er gratis: forsøget kommer uden fejl", g2.fase === "forsoeg" && g2.gaet.gaet === 0 && !g2.groen);
+    g2.klikScene({ x: 1, y: 1 });
+    g2.udfoer();
+    paastand("et enzym på hver ende: 1, 3 og 9", g2.mol.map(function (m) { return m.enzymer.length; }).join() === "1,3,9");
+    var faerdigTid = {}, tt = 0;
+    for (tt = 0; tt < 12 && g2.trinNr === 2; tt += 1 / 60) {
+        g2.opdater(1 / 60);
+        g2.mol.forEach(function (m) { if (m.nr && faerdigTid[m.def.id] === undefined) faerdigTid[m.def.id] = tt; });
+    }
+    paastand("alle tre molekyler frigiver alle " + D.ANTAL_GREN + " enheder", g2.mol.every(function (m) { return m.frigivet === D.ANTAL_GREN; }));
+    paastand("glykogen bliver færdig først, så amylopectin og til sidst amylose", g2.mol[2].nr === 1 && g2.mol[1].nr === 2 && g2.mol[0].nr === 3,
+        JSON.stringify(faerdigTid));
+    paastand("amylose tager under 8 sekunder", faerdigTid.amylose < 8, faerdigTid.amylose);
+    paastand("efter kapløbet kommer spørgsmålet, og gættet får ✗ (amylose)", g2.trinNr === 3 && g2.fase === "spm");
+    g2.valgt = 1; g2.indsendKlik();
+    paastand("'flere glucoseenheder': de tre har lige mange", /lige mange/.test(besked(g2)), besked(g2));
+    g2.valgt = 0; g2.indsendKlik();
+    paastand("forløbet er gennemført uden stjerne, og knappen fører til Spyt og iod", g2.status.loest && !g2.status.stjerne && g2.groen.knap === "Videre til Spyt og iod →");
+
+    /* ================================================================= */
+    overskrift("4. Fane 3: Spyt og iod");
+    NK.visFane("fane-i");
+    i3.forfra(); tegn(i3);
+    paastand("trin 1 er et gæt med kartoffel og vat", i3.fase === "gaet" && !i3.saetB());
+    i3.valgt = 0; i3.indsendKlik();
+    paastand("trin 2 venter på knappen Tilsæt iodopløsning", i3.fase === "forsoeg" && i3.tA === null);
+    i3.udfoer(); tid(i3, 2);
+    var pk = i3.plet("A", true), pv = i3.plet("A", false);
+    paastand("kartoflen bliver blåsort, og vattet bliver gulbrunt", pk.navn === "blåsort" && pv.navn === "gulbrun");
+    var ioner = i3.ionerStivelse(i3.r[0], "A");
+    paastand("tre triiodidioner ligger inde i spiralen af amylose", ioner.filter(function (x) { return x.inde; }).length === 3);
+    tid(i3, 2);
+    paastand("efter iodprøven kommer spørgsmålet", i3.trinNr === 2 && i3.fase === "spm");
+    i3.valgt = 1; i3.indsendKlik();
+    paastand("'kun stivelse er bygget af glucose': cellulose er også glucose", /også bygget af glucose/.test(besked(i3)), besked(i3));
+    i3.valgt = 0; i3.indsendKlik(); i3.videreKlik();
+    paastand("trin 4 er et gæt med kogt stivelse og vat i skåle", i3.fase === "gaet" && i3.saetB());
+    i3.valgt = 2; i3.indsendKlik();
+    i3.udfoer(); tid(i3, 3.2);
+    paastand("amylase har klippet spiralen fire steder til fem stykker maltose", [1, 3, 5, 7].every(function (n) { return i3.klippet(n, "B"); }) && ![0, 2, 4, 6, 8].some(function (n) { return i3.klippet(n, "B"); }));
+    tid(i3, 4);
+    paastand("efter spyttet er begge prøver gulbrune med iodopløsning, og spørgsmålet kommer",
+        i3.plet("B", true).navn === "gulbrun" && i3.plet("B", false).navn === "gulbrun" && i3.trinNr === 5 && i3.fase === "spm");
+    paastand("ingen triiodidioner ligger inde i noget efter spyttet", i3.ionerStivelse(i3.r[0], "B").every(function (x) { return !x.inde; }));
+    i3.valgt = 2; i3.indsendKlik();
+    paastand("'cellulose er ikke bygget af glucose': forskellen er bindingerne", /bindingerne/.test(besked(i3)), besked(i3));
+    i3.knap(); i3.knap(); i3.knap();
+    paastand("hintknappen giver to hint og til sidst svaret, som koster stjernen", !!i3.groen && i3.groen.maade === "svar" && i3.status.loest && !i3.status.stjerne);
+
+    /* ================================================================= */
+    overskrift("5. Teksterne");
+    D.KAEDE.forEach(function (o) {
+        o.trin.forEach(function (t) {
+            husk("tekst", t.tekst); husk("forkl", t.forkl);
+            (t.hint || []).forEach(function (x) { husk("hint", x); });
+            if (t.forsoeg) husk("forsøg", t.forsoeg.tekst);
+            if (t.traek) husk("forsøg", t.traek.tekst);
+            (t.svar || []).forEach(function (x) { husk("svar", x); });
+            Object.keys(t.fejl || {}).forEach(function (k) { husk("fejl", t.fejl[k]); });
+            ["fejlSamme", "fejl6", "fejl23", "fejlVej"].forEach(function (k) { husk("fejl", t[k]); });
+        });
+    });
+    D.GREN.concat(D.IOD).forEach(function (t) {
+        husk("tekst", t.tekst); husk("forkl", t.forkl); husk("forsøg", t.koerer);
+        (t.hint || []).forEach(function (x) { husk("hint", x); });
+        (t.svar || []).forEach(function (x) { husk("svar", x); });
+        Object.keys(t.fejl || {}).forEach(function (k) { husk("fejl", t.fejl[k]); });
+    });
+    var GR = { tekst: 165, forkl: 185, hint: 125, "forsøg": 150, svar: 55, fejl: 125 };
+    var lange = [], streger = [], ascii = [];
+    tekster.forEach(function (x) {
+        var g = GR[x.hvad] || 220;
+        if (x.t.length > g) lange.push(x.hvad + " " + x.t.length + ": " + x.t.slice(0, 40));
+        if (/[–—]|\s-\s/.test(x.t)) streger.push(x.t.slice(0, 50));
+        if (ASCII_ORD.test(x.t)) ascii.push(x.t.slice(0, 50));
+    });
+    samlet("teksterne er korte (spørgsmål 165, svar 55, hint 125 tegn)", lange);
+    samlet("ingen tankestreger", streger);
+    samlet("ingen ASCII-dansk (ae, oe, aa)", ascii);
+    var hele = d.body.innerText;
+    paastand("ingen 1+ eller 1− på siden", !/1[+−]/.test(hele));
+    var alt = d.body.textContent;
+    paastand("siden skriver triiodidion og I₃⁻ som bogen", /triiodidion/.test(alt) && /I₃⁻/.test(alt));
+
+    /* ================================================================= */
+    overskrift("6. Kortet dækker aldrig tavlen");
+    var stoer = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]], daek = [];
+    /* Kortene med mest tekst: forklaringen efter det sidste svar */
+    var tilstande = {
+        "fane-k": function () { k1.vaelg(0); k1.binValg = "alfa"; k1.indsendKlik(); },
+        "fane-g": function () { g2.vaelg(0); g2.valgt = 1; g2.indsendKlik(); },
+        "fane-i": function () { i3.vaelg(0); i3.startTrin(5); i3.valgt = 0; i3.indsendKlik(); }
+    };
+    stoer.forEach(function (bh) {
+        ramme.style.width = bh[0] + "px"; ramme.style.height = bh[1] + "px";
+        ["fane-k", "fane-g", "fane-i"].forEach(function (id) {
+            NK.visFane(id);
+            var s = NK.sims[id];
+            tilstande[id]();
+            s.tilpas(); s.layout();
+            var k = el(s.navn + "-skort").getBoundingClientRect(), c = s.L.canvas.getBoundingClientRect();
+            if (k.bottom - c.top > s.lay.tavle.y + 2) daek.push(bh.join("x") + " " + id + ": kort " + Math.round(k.bottom - c.top) + " > tavle " + Math.round(s.lay.tavle.y));
+            try { s.tegn(); } catch (e) { daek.push(bh.join("x") + " " + id + " tegn: " + e.message); }
+        });
+    });
+    samlet("kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes", daek);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>
