@@ -1,10 +1,10 @@
 /* =====================================================================
-   sb4.11 - DNPH og Tollens' test
-   Stilark. Kopieret fra sb4.3 Oxidation af alkoholer, som har det fra
-   sb3.3, sb4.8, sc4.4 og sc7.5 (scenekortet med al tekst oeverst i
-   scenen, listen, den gule hjaelpeknap og Indsend svar). Det, der hoerer
-   til denne animation, staar allernederst under SB4.11: tabellen paa
-   fane 1, listen paa fane 2 og 3 og glassene i teorien.
+   sb7.2 - Ringslutning
+   Stilark. Kopieret fra sb4.11 (som har det fra sb4.3, sb3.3,
+   sb4.8, sc4.4 og sc7.5: scenekortet med al tekst oeverst i scenen,
+   listen, den gule hjaelpeknap og Indsend svar). Det, der hoerer til
+   denne animation, staar allernederst under SB7.2: trinlisten i panelet
+   og ringene i teorien. Afsnittet SB4.11 er laant med.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
    ===================================================================== */
@@ -2457,36 +2457,31 @@ sub { font-size: 0.74em; line-height: 0; vertical-align: -0.24em; }
 .scenekort .sk-note { margin: 8px 0 0; font-size: 0.94rem; line-height: 1.35; font-weight: 500; color: #5d6878; }
 
 /* =====================================================================
-   SC7.7 - Indikatorer
+   SB7.2 - Ringslutning
    ===================================================================== */
-
-/* Panelet: linjen med antal brugte indikatorer under proeverne */
-.p-brugt { margin: 8px 2px 0; }
-.p-brugt:empty { display: none; }
-
-/* Fane 1: kortets svar er korte, saa de staar paa én linje */
-#s-ind .sk-knap.brik, #p-ind .sk-knap.brik { white-space: normal; line-height: 1.25; }
-/* Fane 2: thymolblaat har fem omraader */
-#p-ind .sk-svar.brikker { gap: 6px; }
-
-/* ----- Teorien: farvekortet som i bogens figur -------------------------- */
-.teori-kort {
-    margin: 8px 0 12px;
-    padding: 12px 14px 8px;
-    background: #ffffff;
-    border-radius: 10px;
-    color: #1d2433;
+/* Trinnene i en opgave (fane 1) og i forloebet (fane 3) */
+.trinliste { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.trinliste li {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #9aa6b6; font-size: 0.92rem; font-weight: 600;
 }
-.tk-raekke {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 7px;
+.trinliste li .tr-nr {
+    flex: none; width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.08); color: #c9d2de; font-size: 0.8rem; font-weight: 800;
 }
-.tk-navn { text-align: right; font-weight: 700; font-size: 0.9rem; }
-.tk-bjaelke { height: 22px; border-radius: 6px; border: 1px solid #8a94a3; }
-.tk-akse { margin-top: 2px; margin-bottom: 0; }
-.tk-akse .tk-navn { color: #6b7685; }
-.tk-tal { display: flex; justify-content: space-between; font-size: 0.78rem; color: #6b7685; font-weight: 600; }
-.tk-tal i { font-style: normal; width: 0; display: flex; justify-content: center; }
+.trinliste li.nu { color: #ffffff; border-color: #f2c53d; background: rgba(242, 197, 61, 0.10); }
+.trinliste li.nu .tr-nr { background: #f2c53d; color: #2b2100; }
+.trinliste li.faerdig { color: #bfe8cf; }
+.trinliste li.faerdig .tr-nr { background: #3fae72; color: #ffffff; }
+.trinliste li.faerdig .tr-nr::after { content: ""; }
+#l-maerke { font-weight: 700; color: #f2c53d; }
+
+/* Svarene paa kortet kan vaere en hel saetning */
+#r-ind .sk-knap.brik, #l-ind .sk-knap.brik { white-space: normal; line-height: 1.25; }
+
+/* Teorien: α-glucose og β-glucose tegnet af molekylemodellen */
+.teori-ringe { display: block; width: 100%; max-width: 640px; height: auto; margin: 6px auto 4px; background: #ffffff; border-radius: 10px; }

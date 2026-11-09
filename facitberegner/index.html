@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facitberegner &ndash; Kemiformler</title>
+<meta name="description" content="Skriv opgavens tal ind, og få facit med hele beregningen til termodynamik, empirisk formel og syrer og baser.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../assets/img/logo.png" type="image/png">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="css/facit.css?v=6">
+</head>
+<body>
+
+<a class="spring-link" href="#indhold">Spring til indhold</a>
+
+<header class="site-header">
+  <div class="header-inder">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo.svg" alt="" width="68" height="68">
+      <span>Kemiformler</span>
+    </a>
+    <button class="menu-knap" type="button" aria-expanded="false" aria-controls="hovedmenu" aria-label="Vis menu"><span></span></button>
+    <nav class="hovedmenu" id="hovedmenu" aria-label="Hovedmenu">
+      <ul>
+        <li><a href="../index.html">Forside</a></li>
+        <li><a href="../animationer.html">Animationer</a></li>
+        <li class="har-undermenu">
+          <a href="../downloads.html">Downloads</a>
+          <ul class="undermenu">
+            <li><a href="../autocorrect.html">Autocorrect</a></li>
+            <li><a href="../tastatur.html">Tastaturlayout</a></li>
+            <li><a href="../opgaver.html">Selvrettende opgaver</a></li>
+            <li><a href="../formelsamling.html">Formelsamling</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="indhold" class="facit">
+  <section class="sidehoved">
+    <div class="indpak">
+      <h1>Facitberegner</h1>
+      <p class="manchet">Skriv opgavens tal ind, og få facit med hele beregningen. Besvarelsen kan kopieres til Word.</p>
+    </div>
+  </section>
+
+  <section class="sektion">
+    <div class="indpak">
+
+      <div class="valg" role="tablist" aria-label="Vælg beregning">
+        <button type="button" class="valg-flise" role="tab" aria-selected="false" aria-controls="termodynamik" data-maal="termodynamik">
+          <span class="valg-navn">Termodynamik</span>
+          <span class="valg-tekst">Δ<i>H</i><sup>⊖</sup>, Δ<i>S</i><sup>⊖</sup>, Δ<i>G</i><sup>⊖</sup>, <i>K</i> og <i>Y</i> ud fra et reaktionsskema</span>
+        </button>
+        <button type="button" class="valg-flise" role="tab" aria-selected="false" aria-controls="empirisk" data-maal="empirisk">
+          <span class="valg-navn">Empirisk formel</span>
+          <span class="valg-tekst">Empirisk formel og molekylformel ud fra masseprocenter</span>
+        </button>
+        <button type="button" class="valg-flise" role="tab" aria-selected="false" aria-controls="syrebase" data-maal="syrebase">
+          <span class="valg-navn">Syre og base</span>
+          <span class="valg-tekst">pH, <i>K</i><sub>s</sub>, syrebrøk og fordelingsdiagram for syrer, baser og puffere</span>
+        </button>
+        <button type="button" class="valg-flise" role="tab" aria-selected="false" aria-controls="kinetik" data-maal="kinetik">
+          <span class="valg-navn">Kinetik</span>
+          <span class="valg-tekst">Reaktionens orden, hastighedskonstant, halveringstid og aktiveringsenergi ud fra målinger</span>
+        </button>
+      </div>
+      <p class="vaelg-foerst" id="vaelg-foerst">Vælg den slags opgave, du vil have facit til.</p>
+
+      <!-- ============================== Termodynamik ============================== -->
+      <div class="beregner" id="termodynamik" role="tabpanel" hidden>
+
+        <div class="ramme">
+          <div class="ramme-etiket">1 · Reaktionsskemaet</div>
+          <div class="skema-linje">
+            <label for="td-skema-tekst" class="skjult">Reaktionsskema</label>
+            <input type="text" id="td-skema-tekst" placeholder="Skriv eller indsæt skemaet, fx N2(g) + 3 H2(g) → 2 NH3(g)" autocomplete="off" spellcheck="false">
+            <button type="button" class="knap knap-primaer" id="td-skema-knap">Sæt ind i skemaet</button>
+          </div>
+          <p class="besked" id="td-skema-besked" aria-live="polite"></p>
+          <div class="tabel-rul">
+            <table class="stoftabel" id="td-stoffer">
+              <thead>
+                <tr>
+                  <th>Koef.</th><th>Formel eller navn</th><th>Tilstand</th>
+                  <th><i>H</i><sup>⊖</sup><span class="enhed">kJ/mol</span></th>
+                  <th><i>S</i><sup>⊖</sup><span class="enhed">J/(mol · K)</span></th>
+                  <th><i>G</i><sup>⊖</sup><span class="enhed">kJ/mol</span></th>
+                  <th><i>p</i> eller [A]<span class="enhed">bar eller M</span></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="note">Grå tal er databogens værdier. Skriv et tal i feltet for at bruge opgavens værdi i stedet. Partialtryk og koncentrationer skal kun skrives, hvis opgaven spørger om <i>Y</i> eller Δ<i>G</i>.</p>
+        </div>
+
+        <div class="ramme td-forhold">
+          <div class="ramme-etiket">2 · Opgavens oplysninger</div>
+          <div class="felt-gitter">
+            <label><span class="feltnavn">Temperatur</span>
+              <span class="med-enhed"><input type="text" id="td-temp" inputmode="decimal" autocomplete="off" placeholder="25 °C">
+              <select id="td-temp-enhed" aria-label="Enhed for temperaturen"><option value="C">°C</option><option value="K">K</option></select></span>
+            </label>
+            <label><span class="feltnavn">Betydende cifre</span>
+              <input type="text" id="td-cifre" inputmode="numeric" value="3" autocomplete="off">
+            </label>
+            <label><span class="feltnavn">Tabelværdier fra</span>
+              <select id="td-kilde"><option value="db">databogen (superskabelonen)</option><option value="kb">Kemibogen A's tabel</option></select>
+            </label>
+          </div>
+          <details class="flere">
+            <summary>Står Δ<i>H</i><sup>⊖</sup>, Δ<i>S</i><sup>⊖</sup> eller <i>K</i> i opgaven?</summary>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Δ<i>H</i><sup>⊖</sup></span> <span class="med-enhed"><input type="text" id="td-oH" autocomplete="off"><span>kJ/mol</span></span></label>
+              <label><span class="feltnavn">Δ<i>S</i><sup>⊖</sup></span> <span class="med-enhed"><input type="text" id="td-oS" autocomplete="off"><span>J/(mol · K)</span></span></label>
+              <label><span class="feltnavn"><i>K</i></span> <span class="med-enhed"><input type="text" id="td-oK" autocomplete="off"><span>uden enhed</span></span></label>
+            </div>
+          </details>
+          <details class="flere">
+            <summary>Er der data fra en graf eller målinger af <i>K</i>?</summary>
+            <p class="note">Hældning <i>a</i> og skæring <i>b</i> fra en graf over Δ<i>G</i><sup>⊖</sup> som funktion af <i>T</i> eller fra en van 't Hoff-graf (ln <i>K</i> som funktion af 1/<i>T</i>). Brug kun én af graferne.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Δ<i>G</i><sup>⊖</sup>-graf, <i>a</i></span> <span class="med-enhed"><input type="text" id="td-gA" autocomplete="off"><span>kJ/(mol · K)</span></span></label>
+              <label><span class="feltnavn">Δ<i>G</i><sup>⊖</sup>-graf, <i>b</i></span> <span class="med-enhed"><input type="text" id="td-gB" autocomplete="off"><span>kJ/mol</span></span></label>
+              <label><span class="feltnavn">Van 't Hoff, <i>a</i></span> <span class="med-enhed"><input type="text" id="td-vA" autocomplete="off"><span>K</span></span></label>
+              <label><span class="feltnavn">Van 't Hoff, <i>b</i></span> <span class="med-enhed"><input type="text" id="td-vB" autocomplete="off"><span>uden enhed</span></span></label>
+            </div>
+            <p class="note">Eller indsæt målinger af <i>K</i> ved flere temperaturer, fx kopieret fra to kolonner i Excel: temperaturen og <i>K</i> på hver linje. Siden laver van 't Hoff-grafen og regressionen.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Målinger</span> <textarea id="td-kdata" rows="5" placeholder="700  8,67e4&#10;800  1250&#10;900  45,6&#10;1000  3,25" spellcheck="false"></textarea></label>
+              <label><span class="feltnavn">Temperaturen er i</span> <select id="td-kdata-enhed"><option value="K">K</option><option value="C">°C</option></select></label>
+            </div>
+          </details>
+        </div>
+
+        <ul class="fejl" id="td-fejl" hidden></ul>
+
+        <p class="vaelg-foerst" id="td-ingen">Facit kommer her, når reaktionsskemaet er udfyldt.</p>
+        <div class="ramme resultat" id="td-resultatboks" hidden>
+          <div class="ramme-etiket">3 · Facit</div>
+          <div class="tabel-rul"><table class="restabel"><tbody id="td-resultater"></tbody></table></div>
+          <div class="grafer" id="td-grafer" hidden>
+            <figure id="td-graf-g"></figure>
+            <figure id="td-graf-k"></figure>
+            <figure id="td-graf-o" hidden></figure>
+          </div>
+        </div>
+        <div class="ramme" id="td-besvarelsesboks" hidden>
+          <div class="ramme-etiket">4 · Hele besvarelsen</div>
+          <div class="besvarelse-knapper">
+            <button type="button" class="knap knap-sekundaer" id="td-kopier">Kopiér til Word</button>
+          </div>
+          <div class="besvarelse" id="td-besvarelse"></div>
+        </div>
+        <p class="ryd-linje"><button type="button" class="knap-lille" id="td-ryd">Ryd alle felter</button></p>
+      </div>
+
+      <!-- ============================== Empirisk formel ============================== -->
+      <div class="beregner" id="empirisk" role="tabpanel" hidden>
+        <div class="underfaner" role="tablist" aria-label="Retning">
+          <button type="button" class="underfane" role="tab" data-fane="frem" aria-selected="true">Fra masseprocent til formel</button>
+          <button type="button" class="underfane" role="tab" data-fane="omvendt" aria-selected="false">Fra formel til masseprocent</button>
+        </div>
+        <div class="underpanel" data-fane="frem">
+        <div class="ramme">
+          <div class="ramme-etiket">1 · Opgavens oplysninger</div>
+          <p class="note">Skriv grundstofferne i samme rækkefølge som i opgaven. Står det sidste grundstof som "resten", så lad tallet stå tom.</p>
+          <div class="felt-gitter">
+            <label><span class="feltnavn">Opgaven giver</span>
+              <select id="ea-type"><option value="pct">masseprocenter</option><option value="g">masser i gram</option></select>
+            </label>
+            <label id="ea-mprove-felt" hidden><span class="feltnavn">Prøvens masse, hvis den er oplyst</span> <span class="med-enhed"><input type="text" id="ea-mprove" autocomplete="off"><span>g</span></span></label>
+          </div>
+          <table class="stoftabel smal" id="ea-tabel">
+            <thead><tr><th>Grundstof</th><th><span id="ea-maengde-navn">Masseprocent</span><span class="enhed" id="ea-maengde-enhed">%</span></th><th></th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p><button type="button" class="knap-lille" id="ea-plus">+ Grundstof</button></p>
+          <div class="felt-gitter">
+            <label><span class="feltnavn">Molarmasse, hvis den er oplyst</span>
+              <span class="med-enhed"><input type="text" id="ea-M" autocomplete="off"><span>g/mol</span></span>
+            </label>
+          </div>
+        </div>
+        <ul class="fejl" id="ea-fejl" hidden></ul>
+        <p class="vaelg-foerst" id="ea-ingen">Facit kommer her, når mindst to grundstoffer er udfyldt.</p>
+        <div class="ramme resultat" id="ea-resultatboks" hidden>
+          <div class="ramme-etiket">2 · Facit</div>
+          <div class="tabel-rul"><table class="restabel"><tbody id="ea-resultater"></tbody></table></div>
+        </div>
+        <div class="ramme" id="ea-besvarelsesboks" hidden>
+          <div class="ramme-etiket">3 · Hele besvarelsen</div>
+          <div class="besvarelse-knapper">
+            <button type="button" class="knap knap-sekundaer" id="ea-kopier">Kopiér til Word</button>
+          </div>
+          <div class="besvarelse" id="ea-besvarelse"></div>
+        </div>
+        <p class="ryd-linje"><button type="button" class="knap-lille" id="ea-ryd">Ryd alle felter</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="omvendt" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Formlen</div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Kemisk formel</span> <input type="text" id="eo-formel" class="bred" placeholder="fx C6H12O6 eller CuSO4·5H2O" autocomplete="off" spellcheck="false"></label>
+            </div>
+          </div>
+          <ul class="fejl" id="eo-fejl" hidden></ul>
+          <div class="ramme resultat" id="eo-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="eo-resultater"></tbody></table></div>
+          </div>
+          <div class="ramme" id="eo-besvarelsesboks" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" id="eo-kopier">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="eo-besvarelse"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== Syre og base ============================== -->
+      <div class="beregner" id="syrebase" role="tabpanel" hidden>
+        <div class="underfaner" role="tablist" aria-label="Slags opløsning">
+          <button type="button" class="underfane" role="tab" data-fane="en" aria-selected="true">Én syre eller base</button>
+          <button type="button" class="underfane" role="tab" data-fane="puffer" aria-selected="false">Puffer</button>
+          <button type="button" class="underfane" role="tab" data-fane="fordeling" aria-selected="false">Syrebrøk og fordeling</button>
+          <button type="button" class="underfane" role="tab" data-fane="poly" aria-selected="false">Polyhydron syre</button>
+          <button type="button" class="underfane" role="tab" data-fane="titrering" aria-selected="false">Titrering</button>
+        </div>
+
+        <div class="underpanel" data-fane="en">
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Det, opgaven oplyser</div>
+            <p class="note">Udfyld kun de felter, opgaven giver tal til. Resten regnes ud. Koncentrationer i M.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Stoffets navn, hvis du vil have det med i besvarelsen</span> <input type="text" id="sb-navn" class="bred" placeholder="fx mælkesyre" autocomplete="off"></label>
+            </div>
+            <div class="to-sider">
+              <div class="felt-gitter lodret">
+                <div class="side-navn">Syren</div>
+                <label><span class="feltnavn"><i>c</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="sb-cs" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn"><i>K</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="sb-Ks" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn">p<i>K</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="sb-pKs" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">pH</span> <span class="med-enhed"><input type="text" id="sb-pH" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">[H<sub>3</sub>O<sup>+</sup>]</span> <span class="med-enhed"><input type="text" id="sb-H" autocomplete="off"><span>M</span></span></label>
+                <label class="flueben"><input type="checkbox" id="sb-staerk-s"> Stærk syre</label>
+              </div>
+              <div class="felt-gitter lodret">
+                <div class="side-navn">Basen</div>
+                <label><span class="feltnavn"><i>c</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="sb-cb" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn"><i>K</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="sb-Kb" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn">p<i>K</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="sb-pKb" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">pOH</span> <span class="med-enhed"><input type="text" id="sb-pOH" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">[OH<sup>−</sup>]</span> <span class="med-enhed"><input type="text" id="sb-OH" autocomplete="off"><span>M</span></span></label>
+                <label class="flueben"><input type="checkbox" id="sb-staerk-b"> Stærk base</label>
+              </div>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Betydende cifre</span> <span class="med-enhed"><input type="text" id="sb-cifre" value="3" inputmode="numeric" autocomplete="off"><span></span></span></label>
+            </div>
+          </div>
+          <ul class="fejl" id="sb-fejl" hidden></ul>
+          <div class="ramme resultat" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="sb-resultater"></tbody></table></div>
+            <p class="note">Med <i>K</i><sub>w</sub> = 1,0 · 10<sup>−14</sup> M<sup>2</sup> ved 25 °C. pH, pOH og p<i>K</i> har én decimal færre end antallet af betydende cifre.</p>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#sb-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="sb-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille sb-ryd">Ryd felterne</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="puffer" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Det, opgaven oplyser</div>
+            <p class="note">Brug koncentrationer eller stofmængder af syren og den korresponderende base, efter at en eventuel reaktion er forløbet.</p>
+            <div class="to-sider">
+              <div class="felt-gitter lodret">
+                <div class="side-navn">Syren</div>
+                <label><span class="feltnavn">[S]</span> <span class="med-enhed"><input type="text" id="pu-S" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn"><i>n</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="pu-ns" autocomplete="off"><span>mol</span></span></label>
+                <label><span class="feltnavn"><i>K</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="pu-Ks" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn">p<i>K</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="pu-pKs" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">pH</span> <span class="med-enhed"><input type="text" id="pu-pH" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">[H<sub>3</sub>O<sup>+</sup>]</span> <span class="med-enhed"><input type="text" id="pu-H" autocomplete="off"><span>M</span></span></label>
+              </div>
+              <div class="felt-gitter lodret">
+                <div class="side-navn">Basen</div>
+                <label><span class="feltnavn">[B]</span> <span class="med-enhed"><input type="text" id="pu-B" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn"><i>n</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="pu-nb" autocomplete="off"><span>mol</span></span></label>
+                <label><span class="feltnavn"><i>K</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="pu-Kb" autocomplete="off"><span>M</span></span></label>
+                <label><span class="feltnavn">p<i>K</i><sub>b</sub></span> <span class="med-enhed"><input type="text" id="pu-pKb" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">pOH</span> <span class="med-enhed"><input type="text" id="pu-pOH" autocomplete="off"><span></span></span></label>
+                <label><span class="feltnavn">[OH<sup>−</sup>]</span> <span class="med-enhed"><input type="text" id="pu-OH" autocomplete="off"><span>M</span></span></label>
+              </div>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Betydende cifre</span> <span class="med-enhed"><input type="text" id="pu-cifre" value="3" inputmode="numeric" autocomplete="off"><span></span></span></label>
+            </div>
+          </div>
+          <ul class="fejl" id="pu-fejl" hidden></ul>
+          <div class="ramme resultat" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="pu-resultater"></tbody></table></div>
+            <p class="note">Med <i>K</i><sub>w</sub> = 1,0 · 10<sup>−14</sup> M<sup>2</sup> ved 25 °C. pH, pOH og p<i>K</i> har én decimal færre end antallet af betydende cifre.</p>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#pu-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="pu-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille sb-ryd">Ryd felterne</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="fordeling" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Det, opgaven oplyser</div>
+            <p class="note">Skriv p<i>K</i><sub>s</sub> for hvert trin. En monohydron syre har ét trin, en dihydron to og en trihydron tre. Skriv pH for at få syrebrøken og basebrøken, eller skriv en andel på syreform for at få pH.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 1</span> <input type="text" id="fo-pK1" autocomplete="off"></label>
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 2</span> <input type="text" id="fo-pK2" autocomplete="off"></label>
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 3</span> <input type="text" id="fo-pK3" autocomplete="off"></label>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">pH</span> <input type="text" id="fo-pH" autocomplete="off"></label>
+              <label><span class="feltnavn">Andel på syreform</span> <span class="med-enhed"><input type="text" id="fo-andel" autocomplete="off"><span>%</span></span></label>
+              <label><span class="feltnavn">Betydende cifre</span> <input type="text" id="fo-cifre" value="3" inputmode="numeric" autocomplete="off"></label>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Formlerne, hvis du vil have dem med (adskilt med komma)</span> <input type="text" id="fo-formler" class="bred" placeholder="fx CH3COOH, CH3COO-" autocomplete="off" spellcheck="false"></label>
+            </div>
+          </div>
+          <ul class="fejl" id="fo-fejl" hidden></ul>
+          <div class="ramme resultat" id="fo-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="fo-resultater"></tbody></table></div>
+            <figure class="fordelingsfigur" id="fo-diagram"></figure>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#fo-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="fo-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille sb-ryd">Ryd felterne</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="poly" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Det, opgaven oplyser</div>
+            <p class="note">pH i en opløsning af en di- eller trihydron syre, fx kulsyre eller phosphorsyre. Skriv p<i>K</i><sub>s</sub> for hvert trin.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn"><i>c</i><sub>s</sub></span> <span class="med-enhed"><input type="text" id="po-cs" autocomplete="off"><span>M</span></span></label>
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 1</span> <input type="text" id="po-pK1" autocomplete="off"></label>
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 2</span> <input type="text" id="po-pK2" autocomplete="off"></label>
+              <label><span class="feltnavn">p<i>K</i><sub>s</sub>, trin 3</span> <input type="text" id="po-pK3" autocomplete="off"></label>
+              <label><span class="feltnavn">Betydende cifre</span> <input type="text" id="po-cifre" value="3" inputmode="numeric" autocomplete="off"></label>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Syrens navn, hvis du vil have det med</span> <input type="text" id="po-navn" class="bred" placeholder="fx phosphorsyre" autocomplete="off"></label>
+              <label><span class="feltnavn">Formlerne, hvis du vil have dem med (adskilt med komma)</span> <input type="text" id="po-formler" class="bred" placeholder="fx H3PO4, H2PO4-, HPO4 2-, PO4 3-" autocomplete="off" spellcheck="false"></label>
+            </div>
+          </div>
+          <ul class="fejl" id="po-fejl" hidden></ul>
+          <div class="ramme resultat" id="po-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="po-resultater"></tbody></table></div>
+            <figure class="fordelingsfigur" id="po-diagram"></figure>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#po-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="po-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille sb-ryd">Ryd felterne</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="titrering" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Det, opgaven oplyser</div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">I kolben</span>
+                <select id="ti-type">
+                  <option value="svag-syre">svag syre, titreret med stærk base</option>
+                  <option value="staerk-syre">stærk syre, titreret med stærk base</option>
+                  <option value="svag-base">svag base, titreret med stærk syre</option>
+                  <option value="staerk-base">stærk base, titreret med stærk syre</option>
+                </select>
+              </label>
+              <label><span class="feltnavn">Stoffets navn, hvis du vil have det med</span> <input type="text" id="ti-navn" class="bred" placeholder="fx ethansyre" autocomplete="off"></label>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Volumen i kolben</span> <span class="med-enhed"><input type="text" id="ti-V0" autocomplete="off"><span>mL</span></span></label>
+              <label><span class="feltnavn">Koncentration i kolben</span> <span class="med-enhed"><input type="text" id="ti-c0" autocomplete="off"><span>M</span></span></label>
+              <label id="ti-pk-felt"><span class="feltnavn" id="ti-pk-navn">p<i>K</i><sub>s</sub> for syren</span> <input type="text" id="ti-pKs" autocomplete="off"></label>
+              <label><span class="feltnavn">Koncentration i buretten</span> <span class="med-enhed"><input type="text" id="ti-cB" autocomplete="off"><span>M</span></span></label>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Ækvivalensvolumen, hvis koncentrationen i kolben er ukendt</span> <span class="med-enhed"><input type="text" id="ti-Veq" autocomplete="off"><span>mL</span></span></label>
+              <label><span class="feltnavn">Tilsatte volumener (adskilt med mellemrum)</span> <span class="med-enhed"><input type="text" id="ti-V" class="bred" placeholder="tom: start, halvækvivalens, ækvivalens og efter" autocomplete="off"><span>mL</span></span></label>
+              <label><span class="feltnavn">Betydende cifre</span> <input type="text" id="ti-cifre" value="3" inputmode="numeric" autocomplete="off"></label>
+            </div>
+          </div>
+          <ul class="fejl" id="ti-fejl" hidden></ul>
+          <div class="ramme resultat" id="ti-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="ti-resultater"></tbody></table></div>
+            <figure class="fordelingsfigur" id="ti-kurve"></figure>
+            <p class="note">Kurven er regnet med alle ligevægte. Punkterne er de tilsatte volumener, de stiplede linjer viser halvækvivalens og ækvivalens, og det gule bånd er indikatorens omslagsområde.</p>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#ti-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="ti-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille sb-ryd">Ryd felterne</button></p>
+        </div>
+      </div>
+
+
+      <!-- ============================== Kinetik ============================== -->
+      <div class="beregner" id="kinetik" role="tabpanel" hidden>
+        <div class="underfaner" role="tablist" aria-label="Slags beregning">
+          <button type="button" class="underfane" role="tab" data-fane="orden" aria-selected="true">Reaktionens orden</button>
+          <button type="button" class="underfane" role="tab" data-fane="arrhenius" aria-selected="false">Arrhenius</button>
+        </div>
+
+        <div class="underpanel" data-fane="orden">
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Målingerne</div>
+            <p class="note">Indsæt tiden og koncentrationen, fx kopieret fra to kolonner i Excel: én måling pr. linje.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Målinger</span> <textarea id="ki-data" rows="7" placeholder="0  10,0&#10;100  6,52&#10;200  4,78&#10;400  3,18&#10;600  2,35&#10;800  1,89&#10;1200  1,33" spellcheck="false"></textarea></label>
+              <div class="felt-gitter lodret">
+                <label><span class="feltnavn">Stoffet</span> <input type="text" id="ki-stof" value="A" autocomplete="off" spellcheck="false"></label>
+                <label><span class="feltnavn">Enhed for koncentrationen</span> <input type="text" id="ki-cenhed" value="M" autocomplete="off" spellcheck="false"></label>
+                <label><span class="feltnavn">Enhed for tiden</span> <input type="text" id="ki-tenhed" value="s" autocomplete="off" spellcheck="false"></label>
+              </div>
+            </div>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Opgaven</span>
+                <select id="ki-opgave">
+                  <option value="bestem">Bestem ordenen (alle tre undersøges)</option>
+                  <option value="0">Vis, at reaktionen er af nulte orden</option>
+                  <option value="1">Vis, at reaktionen er af første orden</option>
+                  <option value="2">Vis, at reaktionen er af anden orden</option>
+                </select>
+              </label>
+              <label><span class="feltnavn">Betydende cifre</span> <input type="text" id="ki-cifre" value="3" inputmode="numeric" autocomplete="off"></label>
+            </div>
+            <details class="flere">
+              <summary>Skal modellen bruges til at beregne en koncentration eller et tidspunkt?</summary>
+              <div class="felt-gitter">
+                <label><span class="feltnavn">Koncentrationen efter tiden</span> <input type="text" id="ki-tny" autocomplete="off"></label>
+                <label><span class="feltnavn">Tidspunktet for koncentrationen</span> <input type="text" id="ki-cny" autocomplete="off"></label>
+              </div>
+            </details>
+          </div>
+          <ul class="fejl" id="ki-fejl" hidden></ul>
+          <div class="ramme resultat" id="ki-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="ki-resultater"></tbody></table></div>
+            <div class="kin-grafer" id="ki-grafer"></div>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#ki-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="ki-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille kin-ryd">Ryd felterne</button></p>
+        </div>
+
+        <div class="underpanel" data-fane="arrhenius" hidden>
+          <div class="ramme">
+            <div class="ramme-etiket">1 · Målingerne</div>
+            <p class="note">Indsæt temperaturen og hastighedskonstanten, fx kopieret fra to kolonner i Excel: én måling pr. linje.</p>
+            <div class="felt-gitter">
+              <label><span class="feltnavn">Målinger</span> <textarea id="ar-data" rows="6" placeholder="20  0,48e-5&#10;30  2,00e-5&#10;40  8,3e-5&#10;50  28,2e-5&#10;60  98,0e-5" spellcheck="false"></textarea></label>
+              <div class="felt-gitter lodret">
+                <label><span class="feltnavn">Temperaturen er i</span> <select id="ar-tenhed"><option value="C">°C</option><option value="K">K</option></select></label>
+                <label><span class="feltnavn">Enhed for <i>k</i></span> <input type="text" id="ar-kenhed" value="s-1" autocomplete="off" spellcheck="false"></label>
+                <label><span class="feltnavn">Betydende cifre</span> <input type="text" id="ar-cifre" value="3" inputmode="numeric" autocomplete="off"></label>
+              </div>
+            </div>
+            <details class="flere">
+              <summary>Skal <i>k</i> beregnes ved en ny temperatur?</summary>
+              <div class="felt-gitter">
+                <label><span class="feltnavn">Ny temperatur (samme enhed som målingerne)</span> <input type="text" id="ar-Tny" autocomplete="off"></label>
+              </div>
+            </details>
+          </div>
+          <ul class="fejl" id="ar-fejl" hidden></ul>
+          <div class="ramme resultat" id="ar-resultatboks" hidden>
+            <div class="ramme-etiket">2 · Facit</div>
+            <div class="tabel-rul"><table class="restabel"><tbody id="ar-resultater"></tbody></table></div>
+            <div class="kin-grafer" id="ar-grafer"></div>
+          </div>
+          <div class="ramme" hidden>
+            <div class="ramme-etiket">3 · Hele besvarelsen</div>
+            <div class="besvarelse-knapper">
+              <button type="button" class="knap knap-sekundaer" data-kopier="#ar-besvarelse">Kopiér til Word</button>
+            </div>
+            <div class="besvarelse" id="ar-besvarelse"></div>
+          </div>
+          <p class="ryd-linje"><button type="button" class="knap-lille kin-ryd">Ryd felterne</button></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="indpak">
+    <div class="footer-bund">
+      <p>&copy; Niels Kr&aelig;mmer</p>
+      <p>Indholdet m&aring; bruges gratis efter licensen <a href="../licens.html">CC BY-NC 4.0</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script src="js/grundstoffer.js?v=1"></script>
+<script src="js/termodata.js?v=1"></script>
+<script src="js/termodata-kemibogen.js?v=1"></script>
+<script src="js/faelles.js?v=3"></script>
+<script src="js/termodynamik.js?v=5"></script>
+<script src="js/empirisk.js?v=2"></script>
+<script src="js/syrebase.js?v=4"></script>
+<script src="js/fordeling.js?v=2"></script>
+<script src="js/titrering.js?v=2"></script>
+<script src="js/kinetik.js?v=1"></script>
+<script src="js/side.js?v=2"></script>
+</body>
+</html>

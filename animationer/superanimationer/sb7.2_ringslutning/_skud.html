@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Skærmbilleder: sb7.2 Ringslutning</title>
+<style>
+    html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+    iframe { border: 0; display: block; }
+</style>
+</head>
+<body>
+<!--
+    Udviklerværktøj. Indgår ikke i animationen.
+    Åbner index.html i en ramme med fast størrelse og stiller animationen i et
+    bestemt trin, så det kan ses som skærmbillede:
+      _skud.html?b=1400&h=860&s=<scenarie>
+    Kræver en lokal server med mappen animationer/ som rod.
+-->
+<script>
+var q = {};
+location.search.replace(/^\?/, "").split("&").forEach(function (p) { var a = p.split("="); if (a[0]) q[a[0]] = decodeURIComponent(a[1] || ""); });
+var B = parseInt(q.b || "1400", 10), H = parseInt(q.h || "860", 10);
+var f = document.createElement("iframe");
+f.width = B; f.height = H;
+f.src = "index.html";
+document.body.appendChild(f);
+
+function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+
+var SCENARIER = {
+    "r-start": function (NK) { NK.visFane("fane-r"); NK.sims["fane-r"].vaelg(0); },
+    "r-ilt": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.valgt = "O4"; s.indsendKlik(); s.valgt = "O5"; s.visKort(); },
+    "r-ilt-ok": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.valgt = "O5"; s.indsendKlik(); },
+    "r-vip": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); },
+    "r-traek": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); },
+    "r-traek-40": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.4; s.trukket = true; },
+    "r-traek-80": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.8; s.trukket = true; },
+    "r-luk-midt": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.75; s.lukRing(); tid(s, 0.12); },
+    "r-luk-k1": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.75; s.lukRing(); tid(s, 0.4); },
+    "r-luk-spm": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.lukRing(); tid(s, 5); },
+    "r-alfa": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.ramme = "K2"; s.startTrin(2); s.valgt = 0; s.indsendKlik(); },
+    "r-u1": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.1; s.trukket = true; },
+    "r-u2": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.2; s.trukket = true; },
+    "r-u3": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.3; s.trukket = true; },
+    "r-u4": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.4; s.trukket = true; },
+    "r-u5": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.5; s.trukket = true; },
+    "r-u6": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.6; s.trukket = true; },
+    "r-u7": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.7; s.trukket = true; },
+    "r-u8": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.8; s.trukket = true; },
+    "r-u9": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(0); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.9; s.trukket = true; },
+    "f-u2": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.2; s.trukket = true; },
+    "f-u4": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.4; s.trukket = true; },
+    "f-u6": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.6; s.trukket = true; },
+    "f-u8": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.8; s.trukket = true; },
+    "f-start": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.valgt = "O5"; s.visKort(); },
+    "f-traek": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); },
+    "f-traek-60": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.traekU = 0.6; s.trukket = true; },
+    "f-luk-spm": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.startTrin(1); s.udfoer(); tid(s, 2); s.lukRing(); tid(s, 5); },
+    "f-alfa-ok": function (NK) { var s = NK.sims["fane-r"]; NK.visFane("fane-r"); s.vaelg(1); s.ramme = "K2"; s.startTrin(2); s.valgt = 0; s.indsendKlik(); },
+    "h-numre": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(0); s.numre = ["C1", "C2", "C3"]; s.visKort(); },
+    "h-ring": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(1); s.valg = { 1: "op", 3: "ned" }; s.visKort(); },
+    "h-ring-hint": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(1); s.valg = { 1: "op", 2: "ned", 3: "ned", 4: "ned", 5: "op" }; s.indsendKlik(); s.knap(); },
+    "h-ring-ok": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(3); s.valg = s.facit(); s.indsendKlik(); },
+    "h-kaede": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(4); s.valg = { 2: "H", 3: "V" }; s.visKort(); },
+    "h-kaede-ok": function (NK) { var s = NK.sims["fane-h"]; NK.visFane("fane-h"); s.vaelg(4); s.valg = s.facit(); s.indsendKlik(); },
+    "l-start": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.visKort(); },
+    "l-midt": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 3); },
+    "l-lige": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 30); },
+    "l-kaede": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 30); s.valgt = 0; s.indsendKlik(); s.videreKlik(); },
+    "l-feh": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 30); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 5); },
+    "l-slut": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 30); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 25); s.valgt = 0; s.indsendKlik(); },
+    "l-aabner": function (NK) { var s = NK.sims["fane-l"]; NK.visFane("fane-l"); s.vaelg(0); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 30); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 25); },
+    "teori": function (NK, W) { W.document.getElementById("teoriknap").click(); }
+};
+
+f.addEventListener("load", function () {
+    var W = f.contentWindow;
+    try { W.localStorage.clear(); } catch (e) { /* ingen hukommelse */ }
+    setTimeout(function () {
+        var NK = W.NK;
+        try { (SCENARIER[q.s] || function () {})(NK, W); } catch (e) { document.title = "FEJL " + e.message; }
+        NK.tid.skala = 0;
+        var sims = NK.sims;
+        Object.keys(sims).forEach(function (k) { sims[k].tilpas(); });
+        setTimeout(function () { Object.keys(sims).forEach(function (k) { try { sims[k].tegn(); } catch (e) { document.title = "FEJL " + e.message; } }); }, 50);
+    }, 400);
+});
+</script>
+</body>
+</html>

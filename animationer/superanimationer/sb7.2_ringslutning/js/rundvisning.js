@@ -14,19 +14,23 @@
     var NK = window.NK;
 
     var TURE = {
-        "fane-s": [
-            { sel: "#s-skort", titel: "Kortet øverst", tekst: "Al tekst står her: gættet, forsøget og spørgsmålet. Vælg et svar, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#s-anker-glas", titel: "Glassene", tekst: "Syv glas med kendt pH. Hvert glas står over sin pH på aksen, og farven står over glasset, når indikatoren er dryppet i." },
-            { sel: "#s-anker-flaske", titel: "Dråbeflasken", tekst: "Klik på flasken, når kortet beder om det. Så drypper den indikatoren i glassene." },
-            { sel: "#s-anker-kort", titel: "Farvekortet", tekst: "Når et spørgsmål er besvaret, kommer indikatorens farver på farvekortet. Kortet er det samme som i bogen og bruges i fane 2." },
-            { sel: "#s-opgaver", titel: "Indikatorerne", tekst: "Fem indikatorer, én ad gangen. En løst indikator får et flueben og en stjerne, hvis den blev løst i første forsøg." }
+        "fane-r": [
+            { sel: "#r-skort", titel: "Kortet øverst", tekst: "Al tekst står her. Klik på tavlen eller vælg et svar, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#r-anker-mol", titel: "Molekylet", tekst: "Sukkeret står som en fischerprojektion med numre på carbonatomerne. Kæden lægges på siden, og du lukker selv ringen ved at trække det orange oxygenatom på plads." },
+            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Glucose og fructose. En løst opgave får et flueben og en stjerne, hvis den blev løst uden fejl." },
+            { sel: "#r-trinkort", titel: "Trinnene", tekst: "Listen viser, hvor langt du er nået i opgaven." }
         ],
-        "fane-p": [
-            { sel: "#p-skort", titel: "Kortet øverst", tekst: "Kortet siger, hvad prøven kan være. Når en indikator er dryppet i, spørger kortet, hvad farven viser om pH." },
-            { sel: "#p-anker-proeve", titel: "Prøven", tekst: "Tingene står over pH-aksen ved deres pH. Det gule bånd viser, hvor prøvens pH kan være, og det bliver kortere for hver indikator." },
-            { sel: "#p-anker-flasker", titel: "Indikatorerne", tekst: "Klik på en dråbeflaske for at teste prøven. Glasset i rækken får prøvens farve med den indikator." },
-            { sel: "#p-anker-kort", titel: "Farvekortet", tekst: "Find farven i indikatorens række, og læs pH under den på aksen." },
-            { sel: "#p-opgaver", titel: "Prøverne", tekst: "Fem prøver. En prøve giver en stjerne, når den er fundet uden fejl og med så få indikatorer som muligt." }
+        "fane-h": [
+            { sel: "#h-skort", titel: "Kortet øverst", tekst: "Kortet siger, hvilken ring du skal tegne. Tryk Indsend svar, når alle grupperne er sat." },
+            { sel: "#h-anker-fischer", titel: "Fischerprojektionen", tekst: "Sukkeret som åben kæde. Se, om hver OH-gruppe står til højre eller til venstre." },
+            { sel: "#h-anker-ring", titel: "Ringen", tekst: "Klik på en grå cirkel over eller under et carbonatom for at sætte gruppen dér. Klik igen for at fjerne den." },
+            { sel: "#h-opgaver", titel: "Opgaverne", tekst: "Fem opgaver. Den sidste går den anden vej, fra ringen til fischerprojektionen." }
+        ],
+        "fane-l": [
+            { sel: "#l-skort", titel: "Kortet øverst", tekst: "Gæt først. Gættet er gratis. Bagefter kører forsøget, og kortet stiller spørgsmål til det, du ser." },
+            { sel: "#l-anker-vindue", titel: "Vinduet", tekst: "100 glucosemolekyler i vand. α-glucose er blå, β-glucose er lilla, og en åben kæde er grøn." },
+            { sel: "#l-anker-tal", titel: "Tallene", tekst: "Antallet af hver form lige nu, og dine gæt med svaret, når forsøget har vist det." },
+            { sel: "#l-trinkort", titel: "Trinnene", tekst: "Forløbet har syv trin. Begynd forfra nederst i panelet." }
         ]
     };
     var trin = [];

@@ -1,21 +1,21 @@
 /* =====================================================================
-   app.js - de to faner, teorien, tastaturgenveje og tegneloekken
+   app.js - de tre faner, teorien, tastaturgenveje og tegneloekken
 
    Kun den aktive fane opdateres og tegnes. Der er ingen laerer: hjaelpen
    er den gule knap paa kortet.
 
    Man kan linke direkte til en fane:
-     index.html#farveskift   fane 1 Farveskiftet
-     index.html#proeve       fane 2 Den ukendte prøve
+     index.html#ring        fane 1 Ringen lukker sig
+     index.html#haworth     fane 2 Fra fischer til haworth
+     index.html#ligevaegt   fane 3 Ligevægten
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
-    var D = NK.Data;
 
     var sims = {};
-    var faner = ["fane-s", "fane-p"];
+    var faner = ["fane-r", "fane-h", "fane-l"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
@@ -48,24 +48,25 @@
     function aabnTeori() {
         lukAlle();
         NK.el("teori").classList.add("vis");
+        tegnTeori();
     }
 
-    /* Farvekortet i teorien: de fem indikatorer som i bogens figur, lavet af
-       de samme farver som paa tavlen (CSS-gradienter fra data.js) */
-    function bygTeoriKort() {
-        var html = "";
-        D.KORT_ORDEN.forEach(function (id) {
-            var ind = D.ind(id);
-            var stop = ind.stop.map(function (s) {
-                return s[1] + " " + ((s[0] - D.PH_MIN) / (D.PH_MAKS - D.PH_MIN) * 100).toFixed(2) + "%";
-            }).join(", ");
-            html += '<div class="tk-raekke"><span class="tk-navn">' + NK.html(ind.navn) + '</span><span class="tk-bjaelke" style="background: linear-gradient(to right, ' +
-                stop + ');"></span></div>';
+    /* α-glucose og β-glucose i teorien, tegnet af samme model som fanerne */
+    function tegnTeori() {
+        var c = NK.el("teori-ringe");
+        if (!c) return;
+        var dpr = window.devicePixelRatio || 1, W = 640, H = 190;
+        c.width = W * dpr; c.height = H * dpr;
+        var ctx = c.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, W, H);
+        var su = NK.Data.SUKKER.glucose, M = NK.Sukker.model("glucose", su.sider, false);
+        [["K2", "α-glucose", 170, "OH-gruppen på carbonatom 1 peger ned"], ["K2b", "β-glucose", 470, "OH-gruppen på carbonatom 1 peger op"]].forEach(function (r) {
+            NK.Sukker.tegn(ctx, M, NK.Sukker.tilstand(M.rammer[r[0]]), { cx: r[2], cy: 82, s: 46 }, { numre: true, farve: { O1: "#0f766e", H5: "#0f766e" } });
+            NK.Tegning.billedtekst(ctx, r[2], 160, r[1]);
+            NK.Tegning.billedtekst(ctx, r[2], 179, r[3], { vaegt: "500", str: 12, farve: "#5d6878" });
         });
-        html += '<div class="tk-raekke tk-akse"><span class="tk-navn">pH</span><span class="tk-tal">';
-        for (var p = D.PH_MIN; p <= D.PH_MAKS; p++) html += "<i>" + D.tal(p) + "</i>";
-        html += "</span></div>";
-        NK.el("teori-kort").innerHTML = html;
     }
 
     /* ----- Tegneloekken ------------------------------------------------- */
@@ -98,7 +99,7 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
+        if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") { if (sim) sim.nulstil(); return; }
@@ -115,10 +116,10 @@
 
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
-        sims["fane-s"] = new NK.SimSkift();
-        sims["fane-p"] = new NK.SimProeve();
+        sims["fane-r"] = new NK.SimRing();
+        sims["fane-h"] = new NK.SimHaworth();
+        sims["fane-l"] = new NK.SimLige();
         NK.sims = sims;              /* saa fanerne kan pilles ved fra konsollen og selvtesten */
-        bygTeoriKort();
 
         var knapper = document.querySelectorAll(".faneknap");
         function bindFane(knap) {
@@ -140,7 +141,7 @@
         document.addEventListener("keydown", tastatur);
         window.addEventListener("resize", function () { var s = sims[aktivFane]; if (s) { s.tilpas(); s.layout(); } });
 
-        /* Hver fane begynder ved det foerste, der ikke er klaret */
+        /* Fane 1 og 2 begynder ved det foerste, der ikke er klaret; fane 3 forfra */
         faner.forEach(function (id) {
             var s = sims[id];
             s.tilpas();
@@ -151,8 +152,9 @@
 
         var oenske = "";
         try { oenske = decodeURIComponent((window.location.hash || "").replace(/^#/, "")).toLowerCase(); } catch (x) { oenske = ""; }
-        var HASH = { farveskift: "fane-s", farveskiftet: "fane-s", skift: "fane-s", "1": "fane-s",
-                     proeve: "fane-p", "prøve": "fane-p", ukendt: "fane-p", "2": "fane-p" };
+        var HASH = { ring: "fane-r", ringslutning: "fane-r", "1": "fane-r",
+                     haworth: "fane-h", fischer: "fane-h", "2": "fane-h",
+                     ligevaegt: "fane-l", "ligevægt": "fane-l", "3": "fane-l" };
         visFane(HASH[oenske] || faner[0]);
 
         window.requestAnimationFrame(function (ts) {
