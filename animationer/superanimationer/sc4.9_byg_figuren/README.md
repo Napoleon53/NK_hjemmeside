@@ -16,7 +16,7 @@ i C4-menuen.
    substitution-glas, ethan-ethen-ethyn, addition, bromvand-test, polyethen, ringe,
    funktionelle-grupper, fedtsyrer, triglycerid og haerdning.
 3. **Naboerne.** `sc4.1_kogepunkt`, `sc4.2_zigzagformler`, `sc4.4_addition_og_plastik`
-   og `sc4.6_fedtstoffer` ejer at bygge og regne. Her sættes kun ord på.
+   og `sc4.5_fedtstoffer` ejer at bygge og regne. Her sættes kun ord på.
 4. **Loftet.** Seks faner, én pr. afsnit, og alle 43 fagord. Hver figur har 6 til
    10 fagord.
 5. **Layoutet.** Som sc1.5: kortet øverst, figuren på et lyst ark, panelet til højre.

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aminosyrer</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>Aminosyrer</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-f" role="tab" aria-selected="true"><span class="nr">1</span>Tre former</button>
+        <button class="faneknap" data-fane="fane-d" role="tab" aria-selected="false"><span class="nr">2</span>Fordelingsdiagrammet</button>
+        <button class="faneknap" data-fane="fane-e" role="tab" aria-selected="false"><span class="nr">3</span>Det elektriske felt</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: TRE FORMER                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-f" role="tabpanel" aria-label="Tre former">
+    <div class="scene">
+        <canvas id="f-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="f-skort">
+            <div class="sk-ind" id="f-ind"></div>
+            <div class="sk-bund" id="f-status">
+                <p class="st-tekst" id="f-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="f-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="f-anker-mol"></div>
+        <div class="anker" id="f-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="f-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="f-maerke"></span></h2>
+            <ol class="trinliste" id="f-trin"></ol>
+            <button class="knap igenknap" id="f-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="f-om">
+            <h2>Om formlen</h2>
+            <p class="note-tekst">Valin har en carboxylgruppe og en aminogruppe på det samme carbonatom. Den orange kugle er en hydron, H⁺.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORDELINGSDIAGRAMMET                                       -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-d" role="tabpanel" aria-label="Fordelingsdiagrammet">
+    <div class="scene">
+        <canvas id="d-laerred"></canvas>
+        <div class="scenekort" id="d-skort">
+            <div class="sk-ind" id="d-ind"></div>
+            <div class="sk-bund" id="d-status">
+                <p class="st-tekst" id="d-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="d-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="d-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="d-anker-vindue"></div>
+        <div class="anker" id="d-anker-dia"></div>
+        <div class="anker" id="d-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="d-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="d-maerke"></span></h2>
+            <ol class="trinliste" id="d-trin"></ol>
+            <button class="knap igenknap" id="d-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="d-om">
+            <h2>Om molekylerne</h2>
+            <p class="note-tekst">Hver pille er et valinmolekyle. Et rødt plus er gruppen −NH₃⁺, og et blåt minus er gruppen −COO⁻. Kanten er rød for syreformen, grøn for amfoionen og blå for baseformen.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: DET ELEKTRISKE FELT                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-e" role="tabpanel" aria-label="Det elektriske felt">
+    <div class="scene">
+        <canvas id="e-laerred"></canvas>
+        <div class="scenekort" id="e-skort">
+            <div class="sk-ind" id="e-ind"></div>
+            <div class="sk-bund" id="e-status">
+                <p class="st-tekst" id="e-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="e-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="e-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="e-anker-formler"></div>
+        <div class="anker" id="e-anker-papir"></div>
+        <div class="anker" id="e-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="e-trinkort">
+            <h2>Forløbet <span class="taeller maerke-tekst" id="e-maerke"></span></h2>
+            <ol class="trinliste" id="e-trin"></ol>
+            <button class="knap igenknap" id="e-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="e-om">
+            <h2>Om forsøget</h2>
+            <p class="note-tekst">Papiret er fugtet med en opløsning med en bestemt pH. Når strømmen er sluttet, er der et elektrisk felt mellem de to poler.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Aminosyrer og pH</h2>
+        <canvas id="teori-former" class="teori-former" width="660" height="206" aria-label="Valins tre former: syreformen med ladningen +1, amfoionen med ladningen 0 og baseformen med ladningen −1"></canvas>
+        <h3 class="teori-hoved">Amfoionen</h3>
+        <p>En aminosyre har en aminogruppe og en carboxylgruppe på det samme carbonatom. Carboxylgruppen kan afgive en hydron, og aminogruppen kan optage en. I vand og i fast form findes aminosyren derfor næsten kun som en amfoion, som har en positiv og en negativ ladning og den samlede ladning 0.</p>
+        <h3 class="teori-hoved">Tre former</h3>
+        <p>I sur opløsning optager gruppen −COO⁻ en hydron, og det giver syreformen med ladningen +1. I basisk opløsning afgiver gruppen −NH₃⁺ en hydron, og det giver baseformen med ladningen −1.</p>
+        <h3 class="teori-hoved">Fordelingsdiagrammet</h3>
+        <p>Et fordelingsdiagram viser, hvor stor en del af molekylerne der findes på hver form ved en bestemt pH. Hvor to kurver krydser, er der lige meget af de to former, og dér er pH lig med pK<sub>s</sub>.</p>
+        <h3 class="teori-hoved">Det isoelektriske punkt</h3>
+        <p>Midt mellem de to pK<sub>s</sub>-værdier er næsten alle molekyler amfoioner. Den pH kaldes aminosyrens isoelektriske punkt: pH<sub>iso</sub> = ½ · (pK<sub>s</sub>(syreform) + pK<sub>s</sub>(amfoion)). Formlen gælder for aminosyrer, hvor sidekæden hverken er sur eller basisk. Ved det isoelektriske punkt er den samlede ladning 0, og aminosyren vandrer ikke i et elektrisk felt.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> pH &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/molekyle.js"></script>
+<script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_former.js"></script>
+<script src="js/sim_fordeling.js"></script>
+<script src="js/sim_felt.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

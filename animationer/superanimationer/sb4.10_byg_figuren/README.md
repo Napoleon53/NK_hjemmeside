@@ -2,7 +2,7 @@
 
 Ny 2. nov. 2026 (brugeren godkendte B3 med "Super" og bad om kapitel B4 Funktionelle grupper).
 Bygget efter opskriften i `../sc1.5_byg_figuren/README.md` ("Opskrift: Byg figuren til et nyt
-kapitel") som kopi af `../sb3.5_byg_figuren` (kapitel B3). Mappen hedder sb4.10, fordi sb4.4 til
+kapitel") som kopi af `../sb3.6_byg_figuren` (kapitel B3). Mappen hedder sb4.10, fordi sb4.4 til
 sb4.9 er optaget af andre animationer.
 
 **I menuen:** ikke endnu, da mappen blev lavet. Den skal have en knap i B-panelets fane "byg"

@@ -16,7 +16,7 @@ på en konisk kolbe.
 2. **Hvad den afløser.** Intet. Figurerne efterligner bogens densitet,
    betydende-cifre, molarmasse-vand, et-mol, ammoniak-forhold, begraensende,
    skema-vej og gas-cylinder.
-3. **Naboerne.** `sc5.1_molarmasse` til `sc5.12_et_mol` ejer at regne og veje. Her
+3. **Naboerne.** `sc5.1_molarmasse` til `sc5.3_et_mol` ejer at regne og veje. Her
    sættes kun ord på.
 4. **Loftet.** Seks faner, én pr. afsnit, og 19 af de 20 fagord fra bogens liste
    (vejeanalyse er taget ud, se nedenfor). Fem ord

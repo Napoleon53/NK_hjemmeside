@@ -37,9 +37,9 @@ anbefalingen) frem for to: "Hvad viser testene?", "Reaktionerne" og
    de atomer, der bliver til vand, afstemmer Tollens' reaktion i bogens trin
    og finder stofklassen i seks flasker ved at tænke over, hvad bundfaldet
    og sølvspejlet betyder (rutediagrammet fra bogen står i teorien).
-3. **Naboerne:** `sb4.3_oxidation_af_alkoholer` ejer oxidationen af
+3. **Naboerne:** `sb4.4_oxidation_af_alkoholer` ejer oxidationen af
    alkoholer og afstemningen med permanganat; her er det kun aldehydet, der
-   oxideres af Ag⁺. `sb4.8_organiske_navne` ejer navnene; her giver motoren
+   oxideres af Ag⁺. `sb4.1_organiske_navne` ejer navnene; her giver motoren
    dem. `sb4.5_organisk_syntese` ejer syntesen og estere. Kondensationen er
    kendt fra estere (B4.5) og bliver kun navngivet her.
 4. **Loftet:** tre faner. Fane 1: ti stoffer med to spørgsmål hver. Fane 2:

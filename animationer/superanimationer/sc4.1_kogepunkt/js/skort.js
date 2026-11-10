@@ -5,7 +5,7 @@
    papirkortet. Opgaven, spoergsmaalet, svarene, hint, beskeden ved et
    forkert svar, forklaringen og knapperne staar paa ét lyst kort oeverst
    midt i scenen, ikke i panelet og ikke i en statuslinje nederst.
-   Moenstrene er sb4.4_intermolekylaere_bindinger og sc6.1_koncentration.
+   Moenstrene er sb3.2_intermolekylaere_bindinger og sc6.1_koncentration.
 
    new NK.Skort(navn, sim, zone) kobler kortet til en fane. I index.html:
      <div class="scenekort" id="x-skort">

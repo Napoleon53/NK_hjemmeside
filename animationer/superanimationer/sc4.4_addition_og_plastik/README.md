@@ -33,7 +33,7 @@ forslaget sat ind:
    bromvand i reagensglas, og polyethen med ét felt for hvert
    ethenmolekyle) og opgaverne 6.4.5 til 6.4.7 og 6.4.mad.2.
 3. **Naboerne:** `c4.7` "Umættet fedt?" (nr. 6 i menuen) ejer bromvand på
-   fedtstoffer og at tælle dråber. `sc4.6_fedtstoffer` ejer fedtsyrer, knæk
+   fedtstoffer og at tælle dråber. `sc4.5_fedtstoffer` ejer fedtsyrer, knæk
    og hærdning; derfor er der ingen fedtstoffer her, og addition af
    hydrogen vises kun på ethen og propen. `v2/superlab/sc4.8_substitution`
    ejer bromvand og hexan i lys og mørke, HBr og substitutionens gang;

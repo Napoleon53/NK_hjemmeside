@@ -6,7 +6,7 @@
    stedet staa meget tydeligt oeverst i midten, og man skal sjaeldent
    kunne loese opgaver ved tilfaeldigt at klikke paa slidere og knapper.
    Der skal som minimum vaere et indsend svar"). Moenstret er
-   scenekortet i sb4.4_intermolekylaere_bindinger.
+   scenekortet i sb3.2_intermolekylaere_bindinger.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype.
    valg: navn (forstavelsen paa fanens id'er), naesteFane og naesteNavn.

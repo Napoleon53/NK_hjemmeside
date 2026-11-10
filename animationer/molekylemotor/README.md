@@ -11,7 +11,7 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
   produkterne bygges som grafer og navngives af motoren, og tavlen tegner
   atomerne, mens de flytter sig (molekyle, navngivning, smiles, trivialnavne,
   layout og struktur; ikke tavlen)
-* `../superanimationer/sb4.7_spejlbilledeisomeri/`: zigzagformlerne på fanen Find
+* `../superanimationer/sb3.5_spejlbilledeisomeri/`: zigzagformlerne på fanen Find
   C-atomet (molekyle, navngivning, smiles, layout og struktur)
 * `../superanimationer/sb3.1_navngivning/`: navngivning med hele kemi C (alkaner,
   alkener, alkyner, halogenalkaner, alkoholer og carboxylsyrer) til afsnit B3.1.
@@ -24,11 +24,11 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
   ny isomer eller det samme stof igen. Hylden og whiteboardet tegnes af struktur ud fra
   navnelæserens molekyler. Animationen lægger sin egen `klik` på sin tavle og bruger
   `regler.forbudt` (to oxygenatomer må ikke sidde sammen)
-* `../superanimationer/sb4.3_oxidation_af_alkoholer/`: oxidation af alkoholer. Fane 1
+* `../superanimationer/sb4.4_oxidation_af_alkoholer/`: oxidation af alkoholer. Fane 1
   tegner sine egne strukturformler med alle H (stilen "alle") og navngiver dem uden H;
   fane 2 bygger alkoholerne og de fire svar af navnet og navngiver modellens produkt
   (molekyle, navngivning, navnelæser, layout, struktur og tavle). Motoren er ikke ændret
-* `../superanimationer/sb4.8_organiske_navne/`: navne på alkoholer, aldehyder,
+* `../superanimationer/sb4.1_organiske_navne/`: navne på alkoholer, aldehyder,
   ketoner, carboxylsyrer, estere og aminer. Molekylerne bygges af navnet
   (navnelæseren), tegnes af struktur, og på fanen Tegn molekylet tegner eleven på
   tavlen, og navngivningen er facit. Animationen lægger sin egen `klik` på sin

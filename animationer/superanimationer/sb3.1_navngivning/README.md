@@ -22,10 +22,10 @@ Den skal være bundet lidt op til kemibogen Bs kapitel 3.1".
 
 1. **Pointen:** som ovenfor.
 2. **Afløser intet.** Opbygningen (scenekortet, kontakterne, listen, tegnefanen)
-   er kopieret fra `sb4.8_organiske_navne`. Navnets tre dele (forled, stamme,
+   er kopieret fra `sb4.1_organiske_navne`. Navnets tre dele (forled, stamme,
    endelse), deres farver og de fire trin er bogens, afsnit B3.1.
 3. **Naboerne:** `sc4.2_zigzagformler` har quizzer om alkaner og alkener uden
-   tavle. `sb4.8_organiske_navne` ejer aldehyder, ketoner, estere og aminer og
+   tavle. `sb4.1_organiske_navne` ejer aldehyder, ketoner, estere og aminer og
    har ingen carbonhydrider; her er det kemi C's stofklasser. `tegnebraet` er
    værktøjet til rapporter; her har tavlen en opgave og et facit. Knappen
    Tegnebræt ↗ i toppen åbner det i en ny fane.

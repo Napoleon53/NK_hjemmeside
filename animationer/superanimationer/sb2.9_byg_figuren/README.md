@@ -3,7 +3,7 @@
 Ny 2. nov. 2026 (brugeren: "Kan du lave byg figuren til kemi B niveau, så den også findes i
 kapitel 2 og 3?"). Bygget efter opskriften i `../sc1.5_byg_figuren/README.md` ("Opskrift: Byg
 figuren til et nyt kapitel") som kopi af `../sb1.5_byg_figuren` (B1). Nummeret 9 kommer efter de
-otte animationer i B2-menuen. Kapitel B3 blev lavet samtidig i `sb3.5_byg_figuren`.
+otte animationer i B2-menuen. Kapitel B3 blev lavet samtidig i `sb3.6_byg_figuren`.
 
 **I menuen:** B-panelets fane "byg" som B2 "Ligevægt" (`?emne=b2.byg`), sat i af en anden
 session 2. nov. 2026.
@@ -51,8 +51,8 @@ Det blev lavet om:
 2. **Hvad den afløser.** Intet. Figurerne efterligner bogens dynamisk-ligevaegt,
    ligevaegt-kurver, reaktionsbroek, k-stoerrelse, indgreb-tallinje, blyiodid-faeldning,
    maettet-oploesning og y-mod-ko.
-3. **Naboerne.** `sb2.0_ligevaegt_intro`, `sb2.1_ligevaegtsloven`, `sb2.3_ligevaegtsberegninger`,
-   `sb2.4_ikke_ligevaegt_og_indgreb` og forsøgene i B2-menuen ejer at regne og forskyde. Her
+3. **Naboerne.** `sb2.0_ligevaegt_intro`, `sb2.1_ligevaegtsloven`, `sb2.4_ligevaegtsberegninger`,
+   `sb2.2_ikke_ligevaegt_og_indgreb` og forsøgene i B2-menuen ejer at regne og forskyde. Her
    sættes kun ord på.
 4. **Loftet.** Fire faner, én pr. afsnit med fagord (B2.3, B2.5 og B2.6 har ingen), og alle 21
    fagord.

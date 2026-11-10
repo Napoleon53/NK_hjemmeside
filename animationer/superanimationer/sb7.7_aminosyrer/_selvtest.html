@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb7.7 Aminosyrer</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at tallene følger bogen (afsnit B7.7: valins
+   pKₛ 2,32 og 9,62 og pHᵢₛₒ 5,97, lige meget af to former ved pH = pKₛ),
+   at ladningerne af asparaginsyre, valin og lysin passer ved pH 1, 6 og
+   13, at alle tre faner kan gennemføres (også trækket med hydronen), at
+   forkerte svar får den rigtige forklaring og koster stjernen, at intet
+   løses uden Indsend svar, at skyderen er låst, til fanen er løst, at en
+   positiv aminosyre vandrer mod minuspolen, at teksterne er korte og uden
+   tankestreger og ASCII-dansk, at glycin ikke er med, og at kortet aldrig
+   dækker tavlen fra 1100 × 620 til 1600 × 950. Kræver en lokal server med
+   mappen animationer/ som rod. Testen gemmer elevens fremskridt og
+   lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb7.7-former", "nk-sb7.7-fordeling", "nk-sb7.7-felt"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|traek\w*|kaede\w*|baade|laengere|oejeblik|vaeske|loekke\w*|proeve\w*|maengde|oploesning|saenk\w*|haev\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, A = D.AMINOSYRER;
+    var f1 = NK.sims["fane-f"], d2 = NK.sims["fane-d"], e3 = NK.sims["fane-e"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : ""; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function tegn(sim) { sim.tilpas(); sim.tegn(); }
+    function midt(k) { return { x: k.x + k.w / 2, y: k.y + k.h / 2 }; }
+    function naer(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: tallene er bogens (afsnit B7.7)");
+    paastand("valin: pKₛ 2,32 for syreformen og 9,62 for amfoionen", D.PKS1 === 2.32 && D.PKS2 === 9.62);
+    paastand("valins isoelektriske punkt er 5,97 (bogens regneeksempel)", D.komma2(D.ISO) === "5,97" && D.FORDELING[2].maal === 5.97);
+    var summer = [], ph;
+    for (ph = 0; ph <= 14; ph += 0.5) { var a = D.andele(ph); if (!naer(a.syre + a.amfo + a.base, 1, 1e-9)) summer.push(ph); }
+    samlet("de tre andele giver tilsammen 100 % ved alle pH", summer);
+    var a1 = D.andele(D.PKS1), a2 = D.andele(D.PKS2), ai = D.andele(D.ISO);
+    paastand("ved pH = pKₛ for syreformen er der lige meget syreform og amfoion", naer(a1.syre, a1.amfo, 0.002) && naer(a1.syre, 0.5, 0.01));
+    paastand("ved pH = pKₛ for amfoionen er der lige meget amfoion og baseform", naer(a2.base, a2.amfo, 0.002));
+    paastand("ved det isoelektriske punkt er over 99,9 % amfoioner, og der er lige lidt syreform og baseform", ai.amfo > 0.999 && naer(ai.syre, ai.base, 1e-6));
+    var q6 = {}, q1 = {}, q13 = {};
+    ["asp", "val", "lys"].forEach(function (id) { q6[id] = D.ladning(A[id], 6); q1[id] = D.ladning(A[id], 1); q13[id] = D.ladning(A[id], 13); });
+    paastand("ved pH 6: asparaginsyre −1, valin 0 og lysin +1", naer(q6.asp, -1, 0.05) && naer(q6.val, 0, 0.01) && naer(q6.lys, 1, 0.05), JSON.stringify(q6));
+    paastand("ved pH 1 er alle tre positive, og lysin har +2", q1.asp > 0.85 && q1.val > 0.85 && q1.lys > 1.85, JSON.stringify(q1));
+    paastand("ved pH 13 er alle tre negative, og asparaginsyre har −2", q13.lys < -0.9 && naer(q13.val, -1, 0.01) && naer(q13.asp, -2, 0.01), JSON.stringify(q13));
+    var uens = [];
+    [1, 6, 13].forEach(function (p) {
+        ["asp", "val", "lys"].forEach(function (id) {
+            var hel = D.tilstandLadning(A[id], D.tilstand(A[id], p));
+            if (hel !== Math.round(D.ladning(A[id], p))) uens.push(id + " pH " + p);
+        });
+    });
+    samlet("ladningen på formlerne passer med den gennemsnitlige ladning (pH 1, 6 og 13)", uens);
+    var n1 = d2.antal(D.PKS1), ni = d2.antal(D.ISO), n0 = d2.antal(0);
+    paastand("20 molekyler: 10 syreform og 10 amfoioner ved pKₛ, 20 amfoioner ved pHᵢₛₒ og 20 syreform ved pH 0",
+        n1.syre === 10 && n1.amfo === 10 && ni.amfo === 20 && n0.syre === 20, JSON.stringify([n1, ni, n0]));
+    paastand("formnavnene og ladningerne: syreform +1, amfoion 0, baseform −1",
+        D.formNavn({ amino: 1, carboxyl: 1 }) === "syreform" && D.tilstandLadning(A.val, { amino: 1, carboxyl: 1 }) === 1 &&
+        D.formNavn({ amino: 1, carboxyl: 0 }) === "amfoion" && D.tilstandLadning(A.val, { amino: 1, carboxyl: 0 }) === 0 &&
+        D.formNavn({ amino: 0, carboxyl: 0 }) === "baseform" && D.tilstandLadning(A.val, { amino: 0, carboxyl: 0 }) === -1);
+
+    /* ================================================================= */
+    overskrift("2. Fane 1: Tre former");
+    NK.visFane("fane-f");
+    f1.forfra(); tegn(f1);
+    paastand("fane 1 begynder med den uladede formel H₂N−CH−COOH, og hydronen skal trækkes", f1.fase === "traek" && f1.tilst.amino === 0 && f1.tilst.carboxyl === 1 && !!f1.kasser.hydron);
+    paastand("Indsend svar er skjult, mens hydronen skal trækkes, og ladningen står ikke under formlen", el("f-indsend").hidden && !f1.visLadning);
+    var s1 = f1.skala;
+    f1.klikScene({ x: s1.x + s1.b * 0.9, y: s1.y });
+    paastand("skyderen er låst: et klik ændrer ikke pH og giver en besked", f1.ph === 7 && /låst/.test(besked(f1)), besked(f1));
+    var h = midt(f1.kasser.hydron);
+    paastand("hydronen kan gribes", f1.nedScene(h) === true && !!f1.haand);
+    f1.flytScene({ x: h.x + 40, y: h.y + 120 }); f1.opScene({ x: h.x + 40, y: h.y + 120 });
+    tid(f1, 0.6); tegn(f1);
+    paastand("slippes hydronen et forkert sted, glider den tilbage, og kortet siger, hvor den skal slippes",
+        f1.fase === "traek" && f1.tilst.carboxyl === 1 && /aminogruppen/.test(besked(f1)), besked(f1));
+    h = midt(f1.kasser.hydron);
+    var am = midt(f1.kasser.amino);
+    f1.nedScene(h); f1.flytScene(am); f1.opScene(am);
+    tid(f1, 0.6); tegn(f1);
+    paastand("slippes hydronen på aminogruppen, dannes amfoionen ⁺H₃N−CH−COO⁻, og spørgsmålet kommer",
+        f1.tilst.amino === 1 && f1.tilst.carboxyl === 0 && f1.fase === "spm");
+    f1.indsendKlik();
+    paastand("Indsend svar uden valg bedømmer intet", !f1.groen && /Vælg/.test(besked(f1)), besked(f1));
+    f1.svarValg(0);
+    paastand("et svar på kortet vælger kun", f1.valgt === 0 && !f1.groen);
+    f1.indsendKlik();
+    paastand("+1: ionen har også en negativ ladning", /negativ ladning/.test(besked(f1)) && !f1.groen, besked(f1));
+    var konf0 = d.querySelectorAll(".konfetti").length;
+    f1.valgt = 1; f1.indsendKlik();
+    paastand("0 er rigtigt: forklaringen nævner amfoion, og ladningen står nu under formlen", !!f1.groen && /amfoion/.test(bliv(f1)) && f1.visLadning);
+    paastand("et rigtigt svar midt i fanen giver ingen konfetti", d.querySelectorAll(".konfetti").length === konf0);
+    f1.videreKlik(); tegn(f1);
+    paastand("trin 2: saltsyre, og eleven skal klikke på en gruppe", f1.trinNr === 1 && f1.fase === "klik" && f1.tilst.amino === 1 && f1.tilst.carboxyl === 0);
+    f1.klikScene(midt(f1.kasser.amino));
+    paastand("et klik på −NH₃⁺ vælger den, men bedømmer intet", f1.valgtGruppe === "amino" && !f1.groen && /−NH3⁺/.test(el("f-indsend").textContent), el("f-indsend").textContent);
+    f1.indsendKlik();
+    paastand("−NH₃⁺: har allerede optaget en hydron", /allerede optaget/.test(besked(f1)) && f1.forkert.amino, besked(f1));
+    f1.klikScene(midt(f1.kasser.carboxyl)); f1.indsendKlik();
+    paastand("−COO⁻ er rigtigt, og en oxoniumion kommer med hydronen", !!f1.groen && !!f1.reak && f1.reak.partner === "H3O");
+    tid(f1, 2.2); tegn(f1);
+    paastand("bagefter er valin syreformen med ladningen +1 ved pH 1", f1.tilst.amino === 1 && f1.tilst.carboxyl === 1 && f1.ph === 1 && !f1.reak);
+    f1.videreKlik(); tegn(f1);
+    paastand("trin 3 begynder med en hydroxidion, der tager hydronen fra −COOH; Indsend svar er skjult imens", f1.fase === "anim" && f1.reak && f1.reak.partner === "OH" && el("f-indsend").hidden);
+    tid(f1, 2.2); tegn(f1);
+    paastand("ved pH 7 er valin igen en amfoion, og eleven skal klikke", f1.fase === "klik" && f1.tilst.amino === 1 && f1.tilst.carboxyl === 0 && f1.ph === 7);
+    f1.valgtGruppe = "carboxyl"; f1.indsendKlik();
+    paastand("−COO⁻: har allerede afgivet sin hydron", /allerede afgivet/.test(besked(f1)), besked(f1));
+    var konf1 = d.querySelectorAll(".konfetti").length;
+    f1.valgtGruppe = "amino"; f1.indsendKlik();
+    paastand("−NH₃⁺ er rigtigt; fanen er løst uden stjerne, og knappen fører til Fordelingsdiagrammet",
+        f1.status.loest && !f1.status.stjerne && f1.groen.knap === "Videre til Fordelingsdiagrammet →");
+    paastand("konfetti, når fanen er løst første gang", d.querySelectorAll(".konfetti").length > konf1);
+    tid(f1, 2.2);
+    paastand("bagefter er valin baseformen ved pH 13, og skyderen er fri", f1.tilst.amino === 0 && f1.tilst.carboxyl === 0 && f1.ph === 13 && f1.fri);
+    f1.saetPh(2.0); var t2 = D.formNavn(f1.tilst);
+    f1.saetPh(6.0); var t6 = D.formNavn(f1.tilst);
+    f1.saetPh(10.0); var t10 = D.formNavn(f1.tilst);
+    paastand("den frie skyder: syreform ved pH 2, amfoion ved pH 6 og baseform ved pH 10", t2 === "syreform" && t6 === "amfoion" && t10 === "baseform", [t2, t6, t10].join());
+
+    /* ================================================================= */
+    overskrift("3. Fane 2: Fordelingsdiagrammet");
+    NK.visFane("fane-d");
+    d2.forfra(); tegn(d2);
+    paastand("trin 1: diagrammet skal tegnes, og Indsend svar er skjult", d2.fase === "spor" && el("d-indsend").hidden && d2.daekning() < 0.05);
+    for (ph = 7; ph >= 0; ph -= 0.3) d2.saetPh(ph);
+    paastand("kun den del af diagrammet, skyderen har været ved, er tegnet", d2.daekning() > 0.45 && d2.daekning() < 0.55, d2.daekning());
+    d2.saetPh(14);
+    paastand("et spring hen over skalaen tegner også det, skyderen gik forbi", d2.daekning() > 0.99);
+    tid(d2, 1);
+    paastand("når diagrammet er tegnet, kommer trin 2", d2.trinNr === 1 && d2.fase === "find");
+    d2.saetPh(3.5); d2.indsendKlik();
+    paastand("pH 3,5: forklaringen siger 6 % syreform og 94 % amfoion", /6 % syreform og 94 % amfoion/.test(besked(d2)) && !d2.groen, besked(d2));
+    d2.saetPh(2.3);
+    paastand("Indsend svar viser skyderens pH", /pH 2,3/.test(el("d-indsend").textContent), el("d-indsend").textContent);
+    d2.indsendKlik();
+    paastand("pH 2,3 er rigtigt, og krydspunkterne med pKₛ kommer på diagrammet", !!d2.groen && d2.visPks && /2,32/.test(bliv(d2)));
+    d2.videreKlik();
+    var felt = el("d-felt");
+    paastand("trin 3 har et felt på kortet, og pHᵢₛₒ står med sænket skrift", d2.fase === "tal" && !!felt && /<sub>iso<\/sub>/.test(el("d-ind").innerHTML));
+    function skrivTal(t) { d2.talTekst = t; d2.indsendKlik(); return besked(d2); }
+    var t3 = D.FORDELING[2];
+        function norm(x) { return String(x).replace(/ₛ/g, "s"); }
+    paastand("11,94: summen, del med 2", skrivTal("11,94").indexOf(norm(t3.fejlSum)) >= 0, besked(d2));
+    paastand("7,30: forskellen, ikke gennemsnittet", skrivTal("7,30").indexOf(norm(t3.fejlDiff)) >= 0, besked(d2));
+    paastand("6,0: tæt på, regn med to decimaler", skrivTal("6,0").indexOf(norm(t3.fejlAfrund)) >= 0, besked(d2));
+    d2.talTekst = "abc"; d2.indsendKlik();
+    paastand("et felt uden tal bedømmes ikke", !d2.groen && /Skriv et tal/.test(besked(d2)), besked(d2));
+    d2.talTekst = "5.97";
+    paastand("tallet kan skrives med punktum eller komma", d2.tal() === 5.97);
+    var konf2 = d.querySelectorAll(".konfetti").length;
+    d2.talTekst = "5,97"; d2.indsendKlik();
+    paastand("5,97 er rigtigt; fanen er løst uden stjerne, og linjen ved det isoelektriske punkt kommer",
+        !!d2.groen && d2.visIso && d2.status.loest && !d2.status.stjerne && d2.groen.knap === "Videre til Det elektriske felt →");
+    paastand("konfetti, når fanen er løst første gang", d.querySelectorAll(".konfetti").length > konf2);
+    tid(d2, 2);
+    paastand("skyderen glider til pH 5,97, og alle 20 molekyler er amfoioner", naer(d2.ph, 5.97, 0.001) && d2.mol.every(function (m) { return m.form === "amfoion"; }));
+
+    /* ================================================================= */
+    overskrift("4. Fane 3: Det elektriske felt");
+    NK.visFane("fane-e");
+    e3.forfra(); tegn(e3);
+    paastand("trin 1 er et gæt uden hint, og formlerne står uladede som i bogen", e3.fase === "gaet" && el("e-knap").hidden && e3.vis === "bog");
+    e3.klikScene({ x: e3.strimmel.x + 20, y: e3.strimmel.y + 20 });
+    paastand("et klik på papiret før gættet starter intet", e3.fase === "gaet" && !e3.koer);
+    e3.svarValg(1);
+    paastand("Indsend svar viser gættet", /Valin/.test(el("e-indsend").textContent));
+    e3.indsendKlik();
+    paastand("et gæt er gratis: forsøget kommer uden fejl", e3.fase === "forsoeg" && e3.gaet.gaet === 1 && !e3.fejl);
+    var s3 = e3.skala;
+    e3.klikScene({ x: s3.x + 10, y: s3.y });
+    paastand("skyderen er låst under forsøget", e3.ph === 6 && /låst/.test(besked(e3)));
+    e3.klikScene({ x: e3.strimmel.x + 20, y: e3.strimmel.y + 20 });
+    paastand("et klik på papiret slutter strømmen, og formlerne viser formerne ved pH 6", !!e3.koer && e3.vis === "ion");
+    tid(e3, 3.5); tegn(e3);
+    paastand("lysin vandrer mod minuspolen, asparaginsyre mod pluspolen, og valin bliver liggende",
+        e3.d.lys > 0.3 && e3.d.asp < -0.3 && Math.abs(e3.d.val) < 0.01, JSON.stringify(e3.d));
+    var s = e3.strimmel, xL = s.x + s.b / 2 - e3.d.lys * s.b / 2;
+    paastand("på tavlen ligger lysin til venstre ved minuspolen", xL < s.x + s.b / 2 - 40);
+    paastand("efter forsøget kommer spørgsmålet om lysin, og gættet (valin) var forkert", e3.trinNr === 2 && e3.fase === "spm");
+    e3.valgt = 1; e3.indsendKlik();
+    paastand("'carboxylgruppe uden hydron': det er asparaginsyre", /asparaginsyre/.test(besked(e3)), besked(e3));
+    e3.valgt = 2; e3.indsendKlik();
+    paastand("'det største': retningen afhænger af ladningen", /ladningen/.test(besked(e3)), besked(e3));
+    e3.valgt = 0; e3.indsendKlik(); e3.videreKlik();
+    paastand("trin 4: ved hvilken pH vandrer alle tre mod minuspolen?", e3.trinNr === 3 && e3.fase === "spm");
+    e3.valgt = 2; e3.indsendKlik();
+    paastand("pH 13: alle tre er negative", /negative/.test(besked(e3)), besked(e3));
+    e3.knap(); e3.knap(); e3.knap();
+    paastand("hintknappen giver to hint og til sidst svaret, som koster stjernen; knappen åbner teorien",
+        !!e3.groen && e3.groen.maade === "svar" && e3.status.loest && !e3.status.stjerne && e3.groen.knap === "Se teorien →");
+    tid(e3, 3.5);
+    paastand("forsøget kører igen ved pH 1: alle tre vandrer mod minuspolen, og lysin længst",
+        e3.ph === 1 && e3.d.asp > 0.3 && e3.d.val > 0.3 && e3.d.lys > 1.8 * e3.d.val, JSON.stringify(e3.d));
+    paastand("bagefter er skyderen fri", e3.fri);
+    e3.nedScene({ x: T13(e3), y: e3.skala.y }); e3.opScene({ x: T13(e3), y: e3.skala.y });
+    tid(e3, 3.5);
+    paastand("ved pH 13 vandrer alle tre mod pluspolen", naer(e3.ph, 13, 0.01) && e3.d.asp < -0.3 && e3.d.val < -0.3 && e3.d.lys < -0.3, JSON.stringify(e3.d) + " pH " + e3.ph);
+    function T13(sim) { return sim.skala.x + sim.skala.b * 13 / 14; }
+
+    /* ================================================================= */
+    overskrift("5. Teksterne");
+    D.FORMER.forEach(function (t) {
+        husk("tekst", t.traekTekst); husk("tekst", t.tekst); husk("tekst", t.forTekst); husk("forkl", t.forkl);
+        (t.traekHint || []).concat(t.hint || []).forEach(function (x) { husk("hint", x); });
+        (t.svar || []).forEach(function (x) { husk("svar", x); });
+        Object.keys(t.fejl || {}).forEach(function (k) { husk("fejl", t.fejl[k]); });
+    });
+    D.FORDELING.concat(D.FELT).forEach(function (t) {
+        husk("tekst", t.tekst); husk("forkl", t.forkl); husk("forsøg", t.koerer);
+        (t.hint || []).forEach(function (x) { husk("hint", x); });
+        (t.svar || []).forEach(function (x) { husk("svar", x); });
+        Object.keys(t.fejl || {}).forEach(function (k) { husk("fejl", t.fejl[k]); });
+        ["fejlSum", "fejlDiff", "fejlAfrund", "fejlAndet", "fejlIntet"].forEach(function (k) { husk("fejl", t[k]); });
+    });
+    husk("fejl", D.findFejl(12.3));
+    [D.FORMER_FAERDIG, D.FORDELING_FAERDIG, D.FELT_FAERDIG].forEach(function (x) { husk("hint", x); });
+    var GR = { tekst: 165, forkl: 185, hint: 125, "forsøg": 150, svar: 55, fejl: 125 };
+    var lange = [], streger = [], ascii = [];
+    tekster.forEach(function (x) {
+        var g = GR[x.hvad] || 220;
+        if (x.t.length > g) lange.push(x.hvad + " " + x.t.length + ": " + x.t.slice(0, 40));
+        if (/[–—]|\s-\s/.test(x.t)) streger.push(x.t.slice(0, 50));
+        if (ASCII_ORD.test(x.t)) ascii.push(x.t.slice(0, 50));
+    });
+    samlet("teksterne er korte (spørgsmål 165, forklaring 185, svar 55, hint og fejl 125 tegn)", lange);
+    samlet("ingen tankestreger", streger);
+    samlet("ingen ASCII-dansk (ae, oe, aa)", ascii);
+    var hele = d.body.innerText;
+    paastand("ingen 1+ eller 1− på siden", !/1[+−]/.test(hele));
+    paastand("glycin er ikke med (hans isoelektriske punkt er elevernes forsøg)", !/glycin/i.test(d.body.textContent + JSON.stringify(D.FORMER) + JSON.stringify(D.FORDELING) + JSON.stringify(D.FELT)));
+    paastand("siden bruger bogens ord: amfoion, syreform, baseform, fordelingsdiagram, isoelektrisk",
+        ["amfoion", "syreform", "baseform", "ordelingsdiagram", "isoelektrisk"].every(function (o) { return d.body.textContent.indexOf(o) >= 0; }));
+
+    /* ================================================================= */
+    overskrift("6. Kortet dækker aldrig tavlen");
+    var stoer = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]], daek = [];
+    /* Kortene med mest tekst */
+    var tilstande = {
+        "fane-f": function () { f1.vaelg(0); f1.startTrin(2); tid(f1, 2.2); f1.valgtGruppe = "amino"; f1.indsendKlik(); },
+        "fane-d": function () { d2.vaelg(0); d2.startTrin(2); d2.talTekst = "11,94"; d2.indsendKlik(); },
+        "fane-e": function () { e3.vaelg(0); e3.startTrin(3); e3.valgt = 0; e3.indsendKlik(); }
+    };
+    stoer.forEach(function (bh) {
+        ramme.style.width = bh[0] + "px"; ramme.style.height = bh[1] + "px";
+        ["fane-f", "fane-d", "fane-e"].forEach(function (id) {
+            NK.visFane(id);
+            var sim = NK.sims[id];
+            tilstande[id]();
+            sim.tilpas(); sim.layout();
+            var k = el(sim.navn + "-skort").getBoundingClientRect(), c = sim.L.canvas.getBoundingClientRect();
+            if (k.bottom - c.top > sim.lay.tavle.y + 2) daek.push(bh.join("x") + " " + id + ": kort " + Math.round(k.bottom - c.top) + " > tavle " + Math.round(sim.lay.tavle.y));
+            try { sim.tegn(); } catch (e) { daek.push(bh.join("x") + " " + id + " tegn: " + e.message); }
+        });
+    });
+    samlet("kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes", daek);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>

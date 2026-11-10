@@ -16,7 +16,7 @@ når bogen bygges næste gang). Brugeren har ikke set figurerne endnu.
 2. **Hvad den afløser.** Intet. Figurerne efterligner bogens delreaktioner, mg-trin-2
    (luppen), spaendingsraekken, oxidationstal-eksempler, ot-skala og mangan-farver.
 3. **Naboerne.** `sc8.1_spaendingsraekken`, `sc8.2_oxidationstal`,
-   `sc8.4_redoxafstemning`, `sc8.5_kaliumpermanganat` og `sc8.6_korrosion` ejer at regne,
+   `sc8.3_redoxafstemning`, `sc8.4_kaliumpermanganat` og `sc8.6_korrosion` ejer at regne,
    afstemme og lave forsøg. Her sættes kun ord på.
 4. **Loftet.** Fire faner, én pr. afsnit, og alle 11 fagord.
    - 8.1 Redoxreaktioner: 6 fagord i to lag.

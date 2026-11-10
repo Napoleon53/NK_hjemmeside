@@ -70,6 +70,9 @@ body {
 
 .faneknapper { display: flex; gap: 6px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .faneknapper::-webkit-scrollbar { display: none; }
+/* To lige lange raekker, naar fanerne ikke kan staa paa én (js/app.js, brugeren 10. nov. 2026) */
+.faneknapper.to-raekker { flex-wrap: wrap; row-gap: 6px; }
+.faneknapper.to-raekker .faneskel { flex-basis: 100%; height: 0; }
 
 .faneknap {
     background-color: var(--panel-2);

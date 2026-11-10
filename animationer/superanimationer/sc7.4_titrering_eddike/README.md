@@ -26,7 +26,7 @@ rigtige virtuelle laboratorium bygges for sig.
    rækkefølge (afvej, vand, indikator, fyld buretten), beregningen i en pop-up
    og genstart ved at genindlæse siden.
 3. **Naboerne:** `c7.1` ejer syre-base-reaktionerne, `c7.2` pH-skalaen, `c7.3`
-   pH-beregningerne med log, og `sb3.2_titreringssimulator` (B-niveau) ejer
+   pH-beregningerne med log, og `sb6.2_titreringssimulator` (B-niveau) ejer
    titrerkurverne i dybden (halvtitrerpunkt, pKs, indikatorvalg). Her er kurven
    et billede af springet ved omslaget og analyseres ikke. `c5.x` ejer
    stofmængde og molarmasse; de bruges her uden at blive forklaret igen.

@@ -16,7 +16,7 @@ og kan deles direkte.
 1. **Pointen i én sætning.** En tierpotens, en forstavelse og en enhed er tre
    måder at skrive den samme størrelse på, og man skifter mellem dem ved at
    flytte kommaet.
-2. **Hvad den bygger på.** Motoren fra kemiens `sc5.10_betydende_cifre`: tal
+2. **Hvad den bygger på.** Motoren fra kemiens `sc5.11_betydende_cifre`: tal
    regnet på cifferstrenge, cifrene som brikker på en tavle, kommaet der hopper
    plads for plads, en runde på ti opgaver, og en besked pr. typisk fejl uden
    facit i. Selve indholdet (betydende cifre, afrunding) er ikke med.

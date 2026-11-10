@@ -41,6 +41,7 @@
         var f = faner.filter(function (x) { return x.id === id; })[0];
         if (!f) return;
         f.knap.querySelector(".faerdig").textContent = faerdig ? "★" : "";
+        if (NK.fanerIRaekker) NK.fanerIRaekker();      /* stjernen goer fanen bredere */
         if (faerdig) {
             var i = faner.indexOf(f);
             if (i + 1 < faner.length) faner[i + 1].knap.classList.add("kald");
@@ -113,6 +114,25 @@
             sektion.classList.remove("aktiv");
         });
         NK.byggere = byggere;
+
+        /* Kan fanerne ikke staa paa én raekke, gaar de over to lige lange
+           raekker, saa alle navne kan ses (brugeren 10. nov. 2026, B7 med
+           otte faner). Rullebjaelken er skjult, saa en fane uden for
+           skaermen var usynlig. */
+        var skel = document.createElement("span");
+        skel.className = "faneskel";
+        function fanerIRaekker() {
+            knapper.classList.remove("to-raekker");
+            if (skel.parentNode) skel.parentNode.removeChild(skel);
+            if (knapper.scrollWidth <= knapper.clientWidth + 1) return;
+            knapper.classList.add("to-raekker");
+            var midt = faner[Math.ceil(faner.length / 2)];
+            if (midt) knapper.insertBefore(skel, midt.knap);
+        }
+        NK.fanerIRaekker = fanerIRaekker;
+        fanerIRaekker();
+        window.addEventListener("resize", fanerIRaekker);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fanerIRaekker);
 
         document.addEventListener("keydown", tastatur);
 

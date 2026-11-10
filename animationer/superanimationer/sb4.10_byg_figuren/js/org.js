@@ -2,7 +2,7 @@
    org.js - tegnehjaelp til kapitel B4: stregformler, zigzagformler,
    reaktionsskemaer, benzenringe, reagensglas og perlekaeder
 
-   Kopieret fra sb3.5_byg_figuren (kapitel B3) den 2. nov. 2026; delen
+   Kopieret fra sb3.6_byg_figuren (kapitel B3) den 2. nov. 2026; delen
    "Kapitel B4" nederst er lagt til her.
 
    Kun for dette kapitel (ikke en del af den faelles motor). Den foerste

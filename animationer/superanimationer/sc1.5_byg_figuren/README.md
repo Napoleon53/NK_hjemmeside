@@ -211,7 +211,7 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
 
 **Filerne til et nyt kapitel**
 
-Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`), B2 (sb2.9, fanerne B2.1, B2.2, B2.4 og B2.7 med numrene i `NK.AFSNIT`, som selvtesten læser) B3 (sb3.5, strukturformler i `js/org.js`) B4 (sb4.10, syv faner; sb4.4 til sb4.9 var optaget) og B5 (sb5.6, lys, spektre og kuvetter i `js/b5.js`). Et kapitel med
+Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`), B2 (sb2.9, fanerne B2.1, B2.2, B2.4 og B2.7 med numrene i `NK.AFSNIT`, som selvtesten læser) B3 (sb3.5, strukturformler i `js/org.js`) B4 (sb4.10, syv faner; sb4.4 til sb4.9 var optaget) B5 (sb5.6, lys, spektre og kuvetter i `js/b5.js`), B6 (sb6.3), B7 (sb7.4, otte faner, lavet i to halvdele af to hjælpere og lagt sammen) og B8 (sb8.7), alle 10. nov. 2026. Alle kapitler i C- og B-bogen har nu Byg figuren. Et kapitel med
 mange formler kan have sin egen tegnehjælp (`js/org.js` i sc4.9). En ny mappe `scN.x_byg_figuren`
 (eller `sbN.x_...`) som kopi af denne, nummeret efter kapitlets menu. `svg.js`,
 `motor.js`, `ps.js`, `app.js` og stilarket kan tages, som de er. Ret `js/data.js`
@@ -245,6 +245,12 @@ sender alle koder, der ender på `.byg`, til panelet. Ikke i kapitlernes egne me
 plads pr. animation. På Kemibogens fagordliste skrives mappen i `BYG_FIGUREN` i
 `NK_Undervisning/Kemibogen/stil/fagord.html`, så kapitlet får flisen Byg figuren.
 
+**To rækker faner (10. nov. 2026):** B7 har otte faner, og B7.7 og B7.8 var skjult uden for skærmen,
+fordi fanelinjens rullebjælke er skjult. Brugeren valgte to rækker: kan fanerne ikke stå på én række,
+deler `fanerIRaekker` i `js/app.js` dem i to lige lange rækker (klassen `to-raekker` og et skel i
+stilarket). Det sker kun, når fanerne ikke kan være der, og måles igen ved ny vinduesstørrelse og ny
+stjerne på en fane. Kopieret til alle 16 mapper, alle selvtests ALT OK.
+
 **Fejl rettet 2. nov. 2026:** et ord, der blev trukket lidt og sluppet på sin egen
 plads, forsvandt fra pladsen, til næste ord blev sat på (`placer` tegnede ikke
 pladsen igen). Selvtesten tjekker det nu.
@@ -252,7 +258,6 @@ pladsen igen). Selvtesten tjekker det nu.
 ## Ikke lavet
 
 - Udskrift af figuren som noteark (tom og med facit).
-- B-bogens kapitel B6 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
 - Den svære udgave kan ikke vælges med et link.
 
 ## Papirkortet (3. nov. 2026)

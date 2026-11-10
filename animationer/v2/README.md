@@ -37,7 +37,7 @@ viser de gamle udgaver.
 | Mappe | I menuen | Note |
 |-------|----------|------|
 | `../superanimationer/sb2.0_ligevaegt_intro` | nej | |
-| `../superanimationer/sb3.2_titreringssimulator` | ja | |
+| `../superanimationer/sb6.2_titreringssimulator` | ja | |
 | `../superanimationer/sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
 | `../superanimationer/sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
 | `../superanimationer/sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
@@ -128,7 +128,7 @@ opstilling.
   `nulstil()`, og kun den aktive fane kører. Kemien og tallene ligger for sig
   selv, adskilt fra tegningen.
 * Mønster: `../superanimationer/sc1.1_atombygger` og
-  `../superanimationer/sb3.2_titreringssimulator`.
+  `../superanimationer/sb6.2_titreringssimulator`.
 
 ## Superlab-animation
 

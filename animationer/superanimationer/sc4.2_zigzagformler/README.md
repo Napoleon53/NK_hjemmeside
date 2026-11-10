@@ -263,6 +263,6 @@ Ja, fra 25. september 2026 som c4.2 i `animationer/kemi-c-filer/samling_c4.html`
 `c4.5_spil_polaritet_oldversion.html`. Fane 4 har ingen egen knap.
 
 26. sept. 2026 blev C4 (dengang C6) omnummereret uden huller: 1 Alkaners kogepunkt, 2
-Zigzagformler, 3 Tegnebræt, 4 Byg et fedtstof (`sc4.6_fedtstoffer`), 5
+Zigzagformler, 3 Tegnebræt, 4 Byg et fedtstof (`sc4.5_fedtstoffer`), 5
 Umættet fedt?, 6 Substitution i benzin (`sc4.8`), 7 Fedt i chips (`sc4.9`).
 Mappenavnene har beholdt de gamle numre.

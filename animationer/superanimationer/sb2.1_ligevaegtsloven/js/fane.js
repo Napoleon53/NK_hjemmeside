@@ -4,7 +4,7 @@
    Al tekst staar paa ét lyst papirkort oeverst midt i scenen, over
    tavlen (Niels' beslutning 4. nov. 2026: alle aktive animationer har
    papirkortet). Der er ingen statuslinje nederst og intet opgavekort i
-   panelet. Moenstret er sb4.4_intermolekylaere_bindinger og
+   panelet. Moenstret er sb3.2_intermolekylaere_bindinger og
    faelles/papirkort.css og papirkort.js.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:

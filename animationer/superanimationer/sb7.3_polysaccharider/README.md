@@ -157,11 +157,10 @@ dækker tavlen fra 1100 × 620 til 1600 × 950. 9. nov. 2026: ALT OK (70).
 
 ## I menuen
 
-Ikke i menuen endnu. Når brugeren siger til: en ny knap nr. 2 i
-`kemi-b-filer/samling_b7.html` (fx koden `b7.poly`, så delte links til
-knapperne efter den stadig virker), `FEEDBACK_EMNER` følger med, og kolonnen
-"I menuen" i `../README.md` rettes. Kemibogen B (B7.3) har endnu ingen Prøv
-selv-linje til den.
+I menuen fra 10. nov. 2026 (brugeren: "Den skal bare ind i menuen og på
+kemibogen"): knap nr. 2 i `kemi-b-filer/samling_b7.html` med koden `b7.3`
+(afsnittets nummer, som `b8.6` for TLC), også i `FEEDBACK_EMNER`. Kemibogen B
+har en Prøv selv-linje til den i B7.3.
 
 ## Papirkortet
 

@@ -24,7 +24,7 @@ isomererne i rækkefølge efter kogepunkt, så B3.2 og B3.3 hænger sammen.
 
 1. **Pointen:** som ovenfor.
 2. **Afløser intet.** Scenekortet, tavlen og musen er fra `sb3.1_navngivning`,
-   knappen Indsend svar, konfettien og medaljen fra `sb4.4_intermolekylaere_bindinger`.
+   knappen Indsend svar, konfettien og medaljen fra `sb3.2_intermolekylaere_bindinger`.
 3. **Naboerne:** `sc4.2_zigzagformler` fane 3 ejer kædeisomerer af alkaner
    (C₄H₁₀ til C₇H₁₆); her er kun C₅H₁₂ med som første jagt, resten har oxygen.
    `sb4.4` ejer kogepunkterne (Rangér); her er de kun afslutningen på hver jagt.

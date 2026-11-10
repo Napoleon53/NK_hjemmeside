@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_standard.js - figuren til B5.4 Standardkurven
+   fig_standard.js - figuren til B5.3 Standardkurven (B5.4 til 10. nov. 2026)
 
    Øverst bogens standardraekke: blindproeven og de fem standardopløsninger
    af E129 i et kuvettestativ og proeven i sit eget stativ, med
@@ -24,7 +24,9 @@
     var B5 = NK.B5;
     var F = KV.F;
 
-    var STANDARDER = [[5.0, 0.131], [10.0, 0.259], [15.0, 0.391], [20.0, 0.519], [25.0, 0.651]];
+    /* Bogens maalinger fra 10. nov. 2026 med b-led: y = 0,0260x + 0,012 (STANDARDER og B5M_PROEVE i lav_figurer.py) */
+    var STANDARDER = [[5.0, 0.143], [10.0, 0.271], [15.0, 0.402], [20.0, 0.531], [25.0, 0.663]];
+    var B = 0.012, PROEVE = 0.350;
     function dk(v, d) { return v.toFixed(d).replace(".", ","); }
 
     /* ----- Lag 1: opløsningerne -------------------------------------------- */
@@ -128,7 +130,7 @@
                     st2.over(g);
                     B5.kuvette(g, PX, KBUND, KB, KH, { farve: B5.fortyndet(B5.F.roed, 0.42), niveau: 0.8 });
                     st2.foran(g);
-                    under(g, PX, "ukendt", "0,338", true);
+                    under(g, PX, "ukendt", "0,350", true);
                     return {};
                 },
                 byg: function (g, r, an) { an.fade(g, 0, 600); }
@@ -140,13 +142,13 @@
                 fuld: function (g) {
                     KV.kort(g, RB.x, RB.y, RB.b, RB.h);
                     var D = KV.diagram(g, { xa: GA.xa, xb: GA.xb, ya: GA.ya, yb: GA.yb, xmax: 30, ymax: 0.8, xtrin: 5, ytrin: 0.2, xtitel: "koncentration i µM", ytitel: "absorbans", yafst: 46 });
-                    KV.kurve(g, [[AX(0), AY(0)], [AX(29), AY(0.026 * 29)]], F.accent, 2.4);
-                    KV.kurve(g, [[AX(0), AY(0.338)], [AX(13), AY(0.338)]], F.serieB, 2, { streg: "6 4", skygge: false });
-                    KV.pil(g, AX(13), AY(0.338) + 7, AX(13), AY(0) - 1, F.serieB, 2, 11);
+                    KV.kurve(g, [[AX(0), AY(B)], [AX(29), AY(0.026 * 29 + B)]], F.accent, 2.4);
+                    KV.kurve(g, [[AX(0), AY(PROEVE)], [AX(13), AY(PROEVE)]], F.serieB, 2, { streg: "6 4", skygge: false });
+                    KV.pil(g, AX(13), AY(PROEVE) + 7, AX(13), AY(0) - 1, F.serieB, 2, 11);
                     var pk = SV.g(g);
                     STANDARDER.forEach(function (s) { KV.punkt(pk, AX(s[0]), AY(s[1]), "a"); });
-                    KV.punkt(pk, AX(13), AY(0.338), "b", 5);
-                    KV.tekst(g, AX(0.6), AY(0.338) - 10, "prøven: A = 0,338", { fs: 14.5, fed: true, anker: "start", farve: F.serieB, halo: "#f4f8f7" });
+                    KV.punkt(pk, AX(13), AY(PROEVE), "b", 5);
+                    KV.tekst(g, AX(0.6), AY(PROEVE) - 10, "prøven: A = 0,350", { fs: 14.5, fed: true, anker: "start", farve: F.serieB, halo: "#f4f8f7" });
                     KV.tekst(g, AX(13) + 10, AY(0.07), "c = 13,0 µM", { fs: 14.5, fed: true, anker: "start", farve: F.serieB, halo: "#f4f8f7" });
                     return { pk: pk, D: D };
                 },

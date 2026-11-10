@@ -30,7 +30,7 @@ blandt tre forslag. Det, der var galt i den gamle udgave fra september:
 
 Nu følger fanen Byg bogens fremgangsmåde trin for trin, eleven gør selv det, der
 skal læres, intet bedømmes før **Indsend svar**, og al tekst står på kortet øverst
-i midten (mønstret fra `sb4.4_intermolekylaere_bindinger`). Kemichael er taget ud.
+i midten (mønstret fra `sb3.2_intermolekylaere_bindinger`). Kemichael er taget ud.
 
 ## To faner
 

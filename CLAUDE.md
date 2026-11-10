@@ -20,7 +20,7 @@ gav brugeren lov til at omdøbe `superlab/sc6.8_substitution` og
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
 (bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.4_blandbarhed`,
-`sc3.4_blandbarhed_inaktiv`, `sc5.1_molarmasse`, `sc5.2_stofmaengde`, `sc5.4_aekvivalente_maengder`, `sc5.9_lightergas`, `sc6.3_mohrtitrering`, `sc4.1_kogepunkt`, `sc4.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.1_spaendingsraekken`),
+`sc3.4_blandbarhed_inaktiv`, `sc5.1_molarmasse`, `sc5.2_stofmaengde`, `sc5.5_aekvivalente_maengder`, `sc5.10_lightergas`, `sc6.3_mohrtitrering`, `sc4.1_kogepunkt`, `sc4.5_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.1_spaendingsraekken`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
 
@@ -76,7 +76,7 @@ sync; denne er færdig.
   **Indsend svar**: en skyder, et termometer eller en kontakt løser aldrig
   en opgave af sig selv, og svarknapper vælger kun. Stjerne kun for første
   forsøg; gerne "vælg alle, der passer". Et gæt er gratis. Mønster:
-  `animationer/superanimationer/sb4.4_intermolekylaere_bindinger/js/fane.js`.
+  `animationer/superanimationer/sb3.2_intermolekylaere_bindinger/js/fane.js`.
 - "Start forfra" står aldrig samme sted som "Næste opgave" (brugeren 3. nov.
   2026, "husk det"). Det grønne korts knap går altid fremad (næste opgave,
   næste fane); at begynde forfra ligger på en knap et andet sted, fx i
