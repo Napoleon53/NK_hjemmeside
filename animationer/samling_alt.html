@@ -614,7 +614,7 @@
                     if (knap.getAttribute('onclick').includes(emneSide)) {
                         let filsti = emneSide;
                         if (emneFil) {
-                            filsti += '?emne=' + encodeURIComponent(emneFil);
+                            filsti += '?emne=' + encodeURIComponent(emneFil) + window.location.hash;
                         }
                         visKategori(knap, filsti);
                     }

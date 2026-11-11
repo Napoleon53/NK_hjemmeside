@@ -330,10 +330,15 @@
         // ignoreres blur kortvarigt lige efter et menuskift.
         let ignorerBlurIndtil = Date.now() + 1200;
 
+        // Fanen fra et direkte link (fx #c7) følger med til animationen (11. nov. 2026).
+        var startFane = '';
+
         function visAnimation(knap, filsti) {
             var iframe = document.getElementById('visningsVindue');
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
+            if (startFane && filsti.indexOf('#') === -1) filsti += startFane;
+            startFane = '';
             iframe.src = filsti;
             // Ingen automatisk fuld skaerm: menuen bliver staaende, indtil man selv
             // trykker paa knappen i panelets hoved.
@@ -423,6 +428,7 @@
             const emneFil = urlParams.get('emne');
 
             if (emneFil) {
+                startFane = window.location.hash;
                 const knapper = document.querySelectorAll('.tab-btn');
                 const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === emneFil);
                 if (aliasKnap) {
@@ -441,6 +447,9 @@
                 if (window.parent !== window) {
                     window.parent.postMessage('animationFocus', '*');
                 }
+                // Et link til en bestemt animation åbner den i fuld skærm (11. nov. 2026).
+                // Klik i panelet gør det ikke (kollegernes ønske 20. sept.).
+                if (document.querySelector('.tab-btn.active')) fuldSkaerm(true);
             }
         });
 

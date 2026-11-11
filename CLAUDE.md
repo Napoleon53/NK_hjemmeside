@@ -16,6 +16,8 @@ i dem ud af commit'en igen. Synkroniser committer alt, så mapperne skal
 holdes urørte. Eneste undtagelse indtil nu: ved kapitelbyttet 16. okt. 2026
 gav brugeren lov til at omdøbe `superlab/sc6.8_substitution` og
 `sc6.9_fedt_i_chips` til `sc4.8_substitution` og `sc4.9_fedt_i_chips`.
+11. nov. 2026 fik de otte forsøg i `superlab/` én linje øverst i `<head>`
+(`til_panelet.js`, se fuld skærm nedenfor), også med brugerens lov.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
@@ -128,7 +130,7 @@ sync; denne er færdig.
   forsøg, laboratoriet og uheld gælder superlab-animationerne.
 - En ny superanimation eller superlab-animation ligger kun i sin egen mappe, til
   brugeren siger til. Først da kommer den i samlingsfilerne (`samling_*.html`) og
-  `FEEDBACK_EMNER`, og først da flyttes en gammel animation, den afløser, til
+  `FEEDBACK_EMNER` og får linjen til `til_panelet.js` (se fuld skærm nedenfor), og først da flyttes en gammel animation, den afløser, til
   `arkiv/`. Ret samtidig kolonnen "I menuen" i superanimationernes README.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
@@ -162,11 +164,21 @@ sync; denne er færdig.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
   Prøvebordet har 473 px, fordi zoomboblen står i panelet.
 - Samlingssiderne (`samling_*.html`) kan give fuld skærm: sidepanelerne
-  skjules i begge lag, og knappen ☰ nederst til venstre gendanner dem. **Ingen
-  animation starter i fuld skærm af sig selv** (rettet 20. september efter
+  skjules i begge lag, og knappen ☰ øverst til venstre gendanner dem. **Klik i
+  panelet giver aldrig fuld skærm** (rettet 20. september efter
   kollegers tilbagemelding: det var forvirrende, at menuen forsvandt). Fuld
   skærm vælges med ⛶ i panelets hoved (`fuldSkaerm` i de indre sider,
   beskederne `fuldSkaerm` og `gendanPanel` til de ydre).
+- Undtagelsen er links (brugeren 11. nov. 2026): et link til en bestemt
+  animation (`samling_alt.html?emne=c7.1`, som 🔗 laver) åbner i fuld skærm, og
+  fanen (`#c7`) følger med. Et direkte link til animationen selv (fx fra
+  Kemibogen) sendes videre dertil af `animationer/til_panelet.js`, som hver
+  animation i menuen indlæser øverst i `<head>`:
+  `<script src="../../til_panelet.js" data-panel="samling_alt.html" data-emne="c7.1"></script>`.
+  Kommer en ny animation i menuen, får den linjen med sin `data-emne`. Det sker
+  kun på kemiformler.dk og ikke inde i panelet; `index.html?alene` viser
+  animationen alene, og `?tilpanel` afprøver videresendelsen lokalt. De otte
+  forsøg i den frosne `v2/superlab/` har også linjen (brugerens lov 11. nov. 2026).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i
