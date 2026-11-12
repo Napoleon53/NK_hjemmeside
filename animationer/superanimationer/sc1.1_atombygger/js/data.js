@@ -57,7 +57,7 @@
         { z: 6, symbol: "C", navn: "Carbon", type: "ikkemetal", ion: null, masse: 12.011,
           isotoper: [ { a: 12, masse: 12.000000, andel: 98.93 },
                       { a: 13, masse: 13.003355, andel: 1.07 } ],
-          andre: [ { a: 14, navn: "carbon-14", note: "kendt fra kulstof-14-datering af oldtidsfund" } ] },
+          andre: [ { a: 14, navn: "carbon-14", note: "er kendt fra kulstof-14-datering af oldtidsfund" } ] },
 
         { z: 7, symbol: "N", navn: "Nitrogen", type: "ikkemetal", ion: -3, masse: 14.007,
           isotoper: [ { a: 14, masse: 14.003074, andel: 99.636 },

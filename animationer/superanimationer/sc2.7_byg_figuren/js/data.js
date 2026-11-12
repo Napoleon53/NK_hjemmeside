@@ -28,7 +28,7 @@ window.NK = NK;
         "natriumion": "Partiklen Na⁺, som findes i maden. Den er ufarlig og livsnødvendig, mens selve metallet reagerer voldsomt med vand.",
         "jern(II)ion": "Partiklen Fe²⁺. Tallet i parentesen viser, at ladningen er +2.",
         "jern(III)ion": "Partiklen Fe³⁺. Tallet i parentesen viser, at ladningen er +3.",
-        "-id": "De to bogstaver, som navnet på en negativ ion ender på. Ordet ion behøver så ikke at komme med.",
+        "-id": "De to bogstaver, som navnet på en negativ ion ender på. Ordet ion udelades da.",
         "fluorid": "Den negative ion F⁻. Den er harmløs og findes i tandpasta.",
         "chlorid": "Den negative ion Cl⁻. Sammen med Na⁺ danner den køkkensalt.",
         "oxid": "Den negative ion af oxygen, O²⁻. Atomet har optaget to elektroner.",
@@ -52,9 +52,9 @@ window.NK = NK;
         "tungtopløselig": "Siges om et salt, der næsten ikke kan opløses i vand, for eksempel kalk. Normalt kan der opløses under 2 g i 100 mL vand, og i fældningstabellen står der T.",
         "fældningstabel": "Oversigt med positive ioner øverst og negative ioner i venstre side. Et T viser, at de to danner et tungtopløseligt salt.",
         "bundfald": "Fast stof, der dannes, når to saltopløsninger hældes sammen. To af ionerne danner et tungtopløseligt salt.",
-        "fældningsreaktion": "Det, der sker, når to saltopløsninger hældes sammen, og der kommer et bundfald.",
+        "fældningsreaktion": "Det, der sker, når to saltopløsninger hældes sammen, og der dannes et bundfald.",
         "tilskuerion": "Partikel med ladning, der ikke er med i bundfaldet. Den bliver i opløsningen og deltager ikke i reaktionen.",
-        "ionskema": "Sådan skrives en fældningsreaktion op med formler og en pil. Kun de partikler, der danner bundfaldet, er med."
+        "ionskema": "Opskrivning af en fældningsreaktion med formler og en pil. Kun de partikler, der danner bundfaldet, er med."
     };
 
     /* Fagord fra listen, der med vilje ikke er paa en figur */

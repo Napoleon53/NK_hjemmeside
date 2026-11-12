@@ -14,24 +14,24 @@
 
     var TURE = {
         "fane-bord": [
-            { sel: "#bord-scene .hylde.top, #bord-scene .hylde.bund", titel: "Ionerne", tekst: "Positive ioner øverst, negative nederst. Træk en ion ned på bordet, eller klik på den. En stiplet kant betyder, at ionen er sammensat." },
+            { sel: "#bord-scene .hylde.top, #bord-scene .hylde.bund", titel: "Ionerne", tekst: "De positive ioner står på den øverste hylde og de negative på den nederste. Træk en ion ned på bordet, eller klik på den. En stiplet kant betyder, at ionen er sammensat." },
             { sel: "#bord-laerred", titel: "Lynlåsen", tekst: "Hvert kort er lige så bredt, som ionen har ladning. Plus og minus mødes på midten. Lukker lynlåsen hele vejen, er saltet neutralt, og formlen står under bordet." },
             { sel: "#bord-scene .styr", titel: "Én mere eller færre", tekst: "Læg en ion mere, eller tag én væk. Et klik på et kort fjerner det også." },
-            { sel: "#byg-afstem", titel: "Afstem for mig", tekst: "Viser fremgangsmåden: giv den korteste række én ion mere, til lynlåsen lukker." },
-            { sel: "#bord-skort", titel: "Opgaver", tekst: "Kortet over bordet giver en opgave ad gangen: byg et stof ud fra navnet, eller find ionerne i en formel. Indsend svar sender bordet eller det valgte svar ind. Giv hint giver først et hint og så svaret." },
-            { sel: "#teoriknap", titel: "Teori", tekst: "Reglerne for formler og navne, samlet ét sted." }
+            { sel: "#byg-afstem", titel: "Afstem for mig", tekst: "Knappen viser fremgangsmåden: Giv den korteste række én ion mere, til lynlåsen lukker." },
+            { sel: "#bord-skort", titel: "Opgaver", tekst: "Kortet over bordet giver én opgave ad gangen. Du bygger et stof ud fra navnet eller finder ionerne i en formel. Indsend svar sender bordet eller det valgte svar ind. Giv hint giver først et hint og så svaret." },
+            { sel: "#teoriknap", titel: "Teori", tekst: "Teorien samler reglerne for formler og navne ét sted." }
         ],
         "fane-vand": [
-            { sel: "#vand-laerred", titel: "Glasset", tekst: "Saltet ligger som et krystalgitter. I vandet går ionerne fra hinanden, men en sammensat ion holder sammen." },
+            { sel: "#vand-laerred", titel: "Glasset", tekst: "Saltet ligger som et iongitter. I vandet går ionerne fra hinanden, men en sammensat ion holder sammen." },
             { sel: "#vand-saltkort", titel: "Vælg et salt", tekst: "Læg et hvilket som helst salt i vandet. Et salt, du har bygget på fane 1, kan tages med herover." },
-            { sel: "#vand-skort", titel: "Opgaver", tekst: "Kortet over glasset giver en opgave ad gangen: forudsig, hvad der kommer ud i vandet, eller tæl ionerne og find saltet. Vælg et svar, og tryk Indsend svar." }
+            { sel: "#vand-skort", titel: "Opgaver", tekst: "Kortet over glasset giver én opgave ad gangen. Du forudsiger, hvad der kommer ud i vandet, eller tæller ionerne og finder saltet. Vælg et svar, og tryk Indsend svar." }
         ],
         "fane-ukendt": [
             { sel: "#ukendt-formel", titel: "Saltet", tekst: "Formlen er givet. Den ene ion ligger ikke på hylden, og dens ladning er ukendt." },
-            { sel: "#ukendt-anker-plakater", titel: "Plakaterne", tekst: "Det periodiske system og de sammensatte ioner. Klik på en plakat for at se den stort." },
+            { sel: "#ukendt-anker-plakater", titel: "Plakaterne", tekst: "Plakaterne viser det periodiske system og de sammensatte ioner. Klik på en plakat for at se den stort." },
             { sel: "#ukendt-laerred", titel: "Bordet", tekst: "Ionerne ligger i det antal, formlen siger. Kortene er foldet sammen, til du har fundet deres ladning." },
-            { sel: "#ukendt-scene .styr", titel: "Knapperne", tekst: "Gør det samme som at trække i kortet: ladningen én op eller én ned." },
-            { sel: "#ukendt-skort", titel: "Trin for trin", tekst: "Kortet øverst tager ét trin ad gangen: først den ion, du kender, så den ukendte, og til sidst skal den bruges. Indsend svar sender svaret eller kortets bredde ind. Et løst trin viser svaret." }
+            { sel: "#ukendt-scene .styr", titel: "Knapperne", tekst: "Knapperne gør det samme som at trække i kortet og ændrer ladningen én op eller én ned." },
+            { sel: "#ukendt-skort", titel: "Trin for trin", tekst: "Kortet øverst tager ét trin ad gangen. Først finder du ladningen på den ion, du kender, så på den ukendte ion, og til sidst bruger du den ukendte ion i et navn eller en formel. Indsend svar sender svaret eller kortets bredde ind. Et løst trin viser svaret." }
         ]
     };
 

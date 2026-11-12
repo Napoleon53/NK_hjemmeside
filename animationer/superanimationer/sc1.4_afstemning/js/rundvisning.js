@@ -16,19 +16,19 @@
 
     var TURE = {
         "fane-kg": [
-            { sel: "#kg-skema", titel: "Skemaet", tekst: "Reaktionen på tavlen. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker." },
-            { sel: "#kg-anker-bakker", titel: "Bakkerne", tekst: "Til venstre molekylerne før pilen. Til højre de pladser, produkterne skal bruge." },
-            { sel: "#kg-regnskabkort", titel: "Atomerne", tekst: "Regnskabet tæller hvert atom før og efter pilen. Hold musen over en række, så lyser de atomer." },
+            { sel: "#kg-skema", titel: "Skemaet", tekst: "Tavlen viser reaktionsskemaet. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker." },
+            { sel: "#kg-anker-bakker", titel: "Bakkerne", tekst: "Bakken til venstre viser molekylerne før pilen. Bakken til højre viser de pladser, som produkterne skal bruge." },
+            { sel: "#kg-regnskabkort", titel: "Atomerne", tekst: "Regnskabet tæller hvert atom før og efter pilen. Hold musen over en række, så lyser atomerne af den slags op." },
             { sel: "#kg-skort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst. Indsend svar lader molekylerne reagere, og så kan du se, om reaktionen er afstemt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#kg-opgaver", titel: "Reaktionerne", tekst: "Ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne." },
+            { sel: "#kg-opgaver", titel: "Reaktionerne", tekst: "Listen har ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne." },
             { sel: ".faneknapper", titel: "Skemaet", tekst: "Den anden fane har kun formlerne. Der skriver du selv tallene." }
         ],
         "fane-sk": [
             { sel: "#sk-linje", titel: "Skemaet", tekst: "Skriv tallet foran hvert stof i feltet. Et tomt felt tæller som 1. Enter gør det samme som Indsend svar." },
             { sel: "#sk-optael", titel: "Optællingen", tekst: "Her tæller du selv. Knappen viser optællingen med dine egne tal, men den er slået fra igen ved næste reaktion." },
             { sel: "#sk-skort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst. Indsend svar tjekker tallene, og kortet viser, hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#sk-opgaver", titel: "Reaktionerne", tekst: "24 reaktioner i tre grupper. Svær har parenteser og store tal." },
-            { sel: "#sk-forfra", titel: "Start forfra", tekst: "Samme reaktion med tomme felter. Knappen står under listen." }
+            { sel: "#sk-opgaver", titel: "Reaktionerne", tekst: "Listen har 24 reaktioner i tre grupper. Gruppen Svær har parenteser og store tal." },
+            { sel: "#sk-forfra", titel: "Start forfra", tekst: "Start forfra giver samme reaktion med tomme felter. Knappen står under listen." }
         ]
     };
     var trin = [];

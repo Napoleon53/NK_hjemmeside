@@ -126,7 +126,7 @@
             if (this.rigtige[stof] >= 2 && !this.auto[stof]) {
                 this.auto[stof] = true;
                 this.forsoeg.forEach(function (x) { if (!x.svar[stof]) x.svar[stof] = { v: x[stof], auto: true }; });
-                this.besked("Rigtigt. To rigtige i kolonnen " + s.navn + ": resten af den regnes for dig.", "god");
+                this.besked("Rigtigt. Der er to rigtige tal i kolonnen " + s.navn + ", så resten af kolonnen regnes for dig.", "god");
             } else {
                 this.besked("Rigtigt: " + this.beregning(r, stof) + ".", "god");
             }
@@ -139,16 +139,16 @@
         var andre = [r.vVand, r.vThio + r.vSyre, r[s.vol] + r.vVand, r.v - r[s.vol]];
         var delt = andre.some(function (x) { return x > 0 && x !== r.v && naer(v, s.flaske * r[s.vol] / x, 0.03); });
         if (naer(v, s.flaske, 0.03)) {
-            tekst2 = "Det er koncentrationen i flasken. I glasset er den fortyndet til " + r.v + " mL.";
+            tekst2 = "Dit tal er koncentrationen i flasken. I bægerglasset er stoffet fortyndet til et samlet rumfang på " + r.v + " mL.";
             grund = "flaske";
         } else if (delt) {
-            tekst2 = "Del med det samlede rumfang: " + r.vThio + " + " + r.vSyre + " + " + r.vVand + " = " + r.v + " mL.";
+            tekst2 = "Divider med det samlede rumfang: " + r.vThio + " + " + r.vSyre + " + " + r.vVand + " = " + r.v + " mL.";
             grund = "rumfang";
         } else if (r[s.vol] > 0 && naer(v, s.flaske * r.v / r[s.vol], 0.03)) {
             tekst2 = "Brøken er vendt om. Gang med V(stof) / V(i alt).";
             grund = "vendt";
         } else if (naer(v, r[stof === "c" ? "h" : "c"], 0.03) && r.c !== r.h) {
-            tekst2 = "Det er den anden koncentration. Tjek, hvilken flaske du skal bruge.";
+            tekst2 = "Dit tal er koncentrationen af det andet stof. Tjek, hvilken flaske du skal bruge.";
             grund = "anden";
         } else if (naer(v, sand, 0.12)) {
             tekst2 = "Tæt på. Skriv tallet med to betydende cifre.";
@@ -246,7 +246,7 @@
         NK.saetTekst("konc-vand", v.vand + " mL");
         NK.saetTekst("konc-ialt", iAlt + " mL");
         NK.saetKlasse("konc-ialt-raekke", "raekke" + (iAlt !== M.V_REF ? " advar" : ""));
-        NK.saetTekst("konc-ialt-note", iAlt !== M.V_REF ? "Ikke " + M.V_REF + " mL: lyset går gennem " +
+        NK.saetTekst("konc-ialt-note", iAlt !== M.V_REF ? "Ikke " + M.V_REF + " mL i alt, så lyset går gennem " +
             (iAlt < M.V_REF ? "mindre" : "mere") + " væske." : "");
         Array.prototype.forEach.call(document.querySelectorAll("#konc-forsoeg [data-stof]"), function (k) {
             k.disabled = !!mig.koersel;

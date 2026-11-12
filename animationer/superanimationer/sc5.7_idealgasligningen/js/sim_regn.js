@@ -494,7 +494,7 @@
         }
         if (t.rel === "gas") {
             var ekstra = [];
-            if (this.o.givet.VmL !== undefined) ekstra.push("volumen i liter");
+            if (this.o.givet.VmL !== undefined) ekstra.push("volumenet i liter");
             if (this.o.givet.t !== undefined && t.x !== "T") ekstra.push("T i kelvin");
             return "Sæt tallene ind i formlen" + (ekstra.length ? " med " + liste(ekstra) : "") + ". R = " + D.R_TEKST + ".";
         }
@@ -646,7 +646,7 @@
 
     P.klikScene = function (u) {
         var o = this.o, k = o.k;
-        var navn = { p: "Trykket", V: "Volumen", T: "Temperaturen", n: "Stofmængden" }[u];
+        var navn = { p: "Trykket", V: "Volumenet", T: "Temperaturen", n: "Stofmængden" }[u];
         if (!navn) return false;
         var sym = u;
         if (u === "T" && !this.kendt("T") && this.kendt("t")) {
@@ -657,7 +657,7 @@
             var v = sym === "V" && o.givet.VmL !== undefined && !this.kendtRegnet("V") ? G.fmt("VmL", o.givet.VmL) : G.fmt(sym, k[sym]);
             this.kortBesked(navn + " er " + v + ".");
         } else {
-            this.kortBesked(navn + " er ukendt. Det kommer frem, når du har regnet det ud.");
+            this.kortBesked(navn + " er ukendt. Tallet kommer frem, når du har regnet det ud.");
         }
         return true;
     };

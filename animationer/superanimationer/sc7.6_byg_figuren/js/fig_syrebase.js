@@ -87,8 +87,8 @@
             /* ----- Lag 3: vand begge veje ---------------------------------------- */
             { id: "amfolyt", ord: ["amfolyt"], x: 420, y: RD, maal: [BX.vand, BY + BH / 2 + 4], dele: ["vandboks"],
               omr: [boksFelt(BX.vand)],
-              fejl: { base: "<b>base</b> optager kun en hydron. Vandet her gør begge dele: det optager én og afgiver én.",
-                      syre: "<b>syre</b> afgiver kun en hydron. Vandet her gør begge dele: det optager én og afgiver én.",
+              fejl: { base: "<b>base</b> optager kun en hydron. Vandet her gør begge dele, for det optager én og afgiver én.",
+                      syre: "<b>syre</b> afgiver kun en hydron. Vandet her gør begge dele, for det optager én og afgiver én.",
                       hydroxidion: "<b>hydroxidion</b> er OH⁻ til højre. Pladsen peger på vandet i midten." } },
             { id: "hydroxidion", ord: ["hydroxidion"], x: 806, y: RD, maal: [BX.oh, BY + BH / 2 + 4], dele: ["ohboks"],
               omr: [boksFelt(BX.oh)],

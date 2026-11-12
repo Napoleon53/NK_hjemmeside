@@ -16,26 +16,26 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Kortet siger hele tiden, hvad du skal nu: først et gæt, så de fire skridt i målingen. Forklaringen kommer også på kortet." },
-            { sel: "#forsoeg-anker-baad", titel: "Vejebåden", tekst: "Vægten viser massen af pulveret. Klik på vægten for at aflæse m(før). Klik så på pulveret: hver gang kommer en spatelfuld i kolben." },
+            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Kortet siger hele tiden, hvad du skal gøre nu: først et gæt, så de fire skridt i målingen. Forklaringen kommer også på kortet." },
+            { sel: "#forsoeg-anker-baad", titel: "Vejebåden", tekst: "Vægten under vejebåden viser massen af pulveret. Klik på vægten for at aflæse m(før). Klik så på pulveret, og for hvert klik kommer der en spatelfuld i kolben." },
             { sel: "#forsoeg-anker-kolbe", titel: "Kolben", tekst: "20 mL saltsyre på en vægt, der er sat til 0,00 g. Når pulveret er i, falder vægten, fordi CO₂ forsvinder op i luften. Klik på vægten, når den står stille." },
             { sel: "#forsoeg-knap", titel: "Den gule knap", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#forsoeg-forfra", titel: "Start forfra", tekst: "En ny kolbe med saltsyre og den samme prøve, hvis noget gik galt." },
             { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "m(før) og m(efter) for begge målinger. Tallene skrives, når du klikker på vægten, og de bruges på fanen Beregningen." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra CO₂ til kalkindholdet. Fejlkilder: hvad sker der, når noget går galt?" }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra CO₂ til kalkindholdet. Fejlkilder: Hvad sker der, når noget går galt?" }
         ],
         "fane-beregning": [
             { sel: "#beregning-anker-tavle", titel: "Tavlen", tekst: "Reaktionen, opgavens tal og beregningerne. En beregning står der, når den er rigtig." },
             { sel: "#beregning-raekker", titel: "Formlen og tallet", tekst: "Hvert trin har to dele: først formlen, så tallet. Kun det trin, du er ved, er åbent." },
             { sel: "#beregning-knap", titel: "Den gule knap", tekst: "Først et hint, og et tryk mere viser svaret." },
-            { sel: "#beregning-anker-kaede", titel: "Kæden", tekst: "CO₂, kalken og prøven. Den bliver udfyldt, efterhånden som du regner." },
-            { sel: ".niveau", titel: "Uden mol eller med mol", tekst: "Uden mol vælger du formlen blandt tre og ganger med 2,27. Med mol skriver du selv formlerne, og vejen går over stofmængden." },
+            { sel: "#beregning-anker-kaede", titel: "Kæden", tekst: "Kæden viser CO₂, kalken og prøven og bliver udfyldt, efterhånden som du regner." },
+            { sel: ".niveau", titel: "Uden mol eller med mol", tekst: "Uden mol vælger du formlen blandt tre og ganger med 2,27. Med mol skriver du selv formlerne og regner over stofmængden." },
             { sel: "#beregning-opsum", titel: "Opsummeringen", tekst: "Vejledningens skema for de to målinger." }
         ],
         "fane-fejl": [
             { sel: "#fejl-kort", titel: "Gæt først", tekst: "Kortet siger, hvad gruppe B gør anderledes. Får de et højere eller et lavere kalkindhold end gruppe A? Så laver begge grupper forsøget." },
-            { sel: "#fejl-anker-a", titel: "Gruppe A", tekst: "Følger vejledningen: 1,00 g tørt pulver lidt ad gangen i 20 mL saltsyre." },
-            { sel: "#fejl-anker-b", titel: "Gruppe B", tekst: "Gør én ting anderledes. Kalkindholdet står under kolben, når forsøget er slut." },
+            { sel: "#fejl-anker-a", titel: "Gruppe A", tekst: "Gruppe A følger vejledningen: 1,00 g tørt pulver lidt ad gangen i 20 mL saltsyre." },
+            { sel: "#fejl-anker-b", titel: "Gruppe B", tekst: "Gruppe B gør én ting anderledes. Kalkindholdet står under kolben, når forsøget er slut." },
             { sel: "#fejl-resultat", titel: "Resultaterne", tekst: "Det, de to grupper skriver, og det, de regner ud." },
             { sel: "#fejl-opgaver", titel: "Fejlkilderne", tekst: "Seks ting, der kan gå galt. Et rigtigt gæt første gang giver en stjerne." }
         ]

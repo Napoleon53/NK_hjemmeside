@@ -147,7 +147,7 @@
         if (this.fase === "byg" && !NK.el("bord-besked").innerHTML) {
             if (!(b.kat && b.an)) this.besked("<b>Ikke endnu.</b> Der skal både en positiv og en negativ ion på bordet.", "skidt");
             else if (!b.neutral()) this.besked("<b>Ikke endnu.</b> Lynlåsen er ikke lukket. Plus og minus skal gå lige op.", "skidt");
-            else this.besked("<b>Ikke endnu.</b> Ionerne passer ikke.", "skidt");
+            else this.besked("<b>Ikke endnu.</b> Ionerne på bordet passer ikke til opgaven.", "skidt");
         }
         this.visIndsend();
     };
@@ -318,13 +318,13 @@
                     : "Tæl kortene på bordet. Antallet af hver ion bliver til det lille tal.";
             }
             if (b.kat !== o.kat || b.an !== o.an) {
-                return NK.stort(o.kat.navn) + " er " + D.ionTekst(o.kat) + ". " + NK.stort(o.an.navn) + " er " + D.ionTekst(o.an) + ".";
+                return "I navnet står " + o.kat.navn + " for " + D.ionTekst(o.kat) + " og " + o.an.navn + " for " + D.ionTekst(o.an) + ".";
             }
             return "Giv den korteste række én ion mere, til lynlåsen lukker.";
         }
         if (this.fase === "valg") {
             return "Den positive ion nævnes først, uden endelsen -ion."
-                + (o.kat.variabel ? " Ladningen på " + o.kat.grund + " skrives med romertal." : "");
+                + (o.kat.variabel ? " Ladningen på " + o.kat.grund + "ionen skrives med romertal." : "");
         }
         if (b.kat && b.an && b.kat.formel === o.kat.formel && b.an === o.an && b.nKat === o.p && b.nAn === o.n) {
             return o.n + " " + D.ionTekst(o.an) + " giver " + NK.fortegn(o.n * o.an.q)

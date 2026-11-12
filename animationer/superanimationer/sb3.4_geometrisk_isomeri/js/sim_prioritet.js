@@ -145,7 +145,7 @@
         this.forkert = null;
         var i = side === "v" ? 0 : 2;
         var tekst = EZ.hvorfor(this.pos[i], this.pos[i + 1]);
-        if (this.side[side] === "ens") tekst += " Så er der ingen E/Z-isomeri.";
+        if (this.side[side] === "ens") tekst += " Derfor er der ingen E/Z-isomeri.";
         this.hjaelp = 0;
         this.valgtGruppe = null;
         if (vist) { this.besked('<span class="b-maerke">Svaret</span> ' + NK.html(tekst), "gul"); this.visKort(); }
@@ -157,9 +157,9 @@
         if (this.faerdig) return;
         var side = i < 2 ? "v" : "h";
         var t = this.trinNu();
-        if (t === "svar") { this.kortBesked("Begge C-atomer er afgjort. Vælg E, Z eller Ingen på kortet.", 4); return; }
+        if (t === "svar") { this.kortBesked("Vinderen er fundet på begge C-atomer. Vælg E, Z eller Ingen E/Z-isomeri på kortet.", 4); return; }
         if (side !== t) {
-            this.kortBesked(this.side[side] !== null ? "Det " + (side === "v" ? "venstre" : "højre") + " C-atom er afgjort." :
+            this.kortBesked(this.side[side] !== null ? "Vinderen på det " + (side === "v" ? "venstre" : "højre") + " C-atom er fundet." :
                 "Find først vinderen på det venstre C-atom.", 4);
             return;
         }
@@ -174,7 +174,7 @@
         var side = i < 2 ? "v" : "h";
         var navn = side === "v" ? "venstre" : "højre";
         if (this.side[side] !== null) {
-            this.kortBesked("Det " + navn + " C-atom er afgjort.", 4);
+            this.kortBesked("Vinderen på det " + navn + " C-atom er fundet.", 4);
             return;
         }
         var ens = side === "v" ? r.ensV : r.ensH;

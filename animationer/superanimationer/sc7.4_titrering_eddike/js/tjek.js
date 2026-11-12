@@ -73,7 +73,7 @@
         if (Math.abs(x - v) <= tol + 1e-9) return { ok: true };
         if (Math.abs(x - v / 1000) <= (tol + 1e-9) / 1000) return { besked: "Det er rumfanget i liter. Skriv det i mL her." };
         if (Math.abs(x - (K.BURET - v)) <= 0.15) return { besked: "Buretten tæller oppefra. 0 står øverst, så tallet ved menisken er forbruget." };
-        if (Math.abs(x - v) <= 0.25) return { besked: "Tæt på. Se på bunden af menisken, og tæl de korte streger: hver er 0,1 mL." };
+        if (Math.abs(x - v) <= 0.25) return { besked: "Tæt på. Se på bunden af menisken, og tæl de korte streger. Hver kort streg er 0,1 mL." };
         if (Math.abs(Math.abs(x - v) - 1) <= 0.1) return { besked: "Tjek de hele mL. De står ved de lange streger." };
         return { besked: "Aflæs tallet ved bunden af menisken i luppen." };
     };
@@ -114,10 +114,10 @@
     function nSyre(v, o, f) {
         var n = f.ns;
         if (naer(v, n)) return { ok: true };
-        if (naer(v, n / 2) || naer(v, n * 2)) return { besked: "Der står 1 foran både CH₃COOH og OH⁻ i skemaet. Forholdet er 1 : 1." };
+        if (naer(v, n / 2) || naer(v, n * 2)) return { besked: "Der står 1 foran både CH₃COOH og OH⁻ i reaktionsskemaet. Forholdet er 1 : 1." };
         if (naer(v, n * K.M_SYRE) || naer(v, n * K.M_NAOH)) return { besked: "Det er en masse. Her skal du bruge stofmængden." };
         if (kommaFlyttet(v, n)) return { besked: "Tjek potensen. Stofmængden er den samme som i trinnet før." };
-        if (taetPaa(v, n)) return { besked: "Tæt på. Det er præcis den samme stofmængde som n(NaOH)." };
+        if (taetPaa(v, n)) return { besked: "Tæt på. n(CH₃COOH) er præcis den samme stofmængde som n(NaOH)." };
         return { besked: "Én OH⁻ reagerer med én CH₃COOH. Hvor mange mol NaOH fandt du?" };
     }
 
@@ -126,7 +126,7 @@
         if (naer(v, m)) return { ok: true };
         if (naer(v, n * K.M_NAOH)) return { besked: "40,00 g/mol er molarmassen for NaOH. Her skal du bruge eddikesyrens, 60,05 g/mol." };
         if (naer(v, n / K.M_SYRE) || naer(v, K.M_SYRE / n)) return { besked: "Du har divideret. m = n · M." };
-        if (naer(v, o.m)) return { besked: "Det er hele prøvens masse. Her er det kun eddikesyren." };
+        if (naer(v, o.m)) return { besked: "Det er hele prøvens masse. Her skal du kun finde massen af eddikesyren." };
         if (naer(v, n)) return { besked: "Det er stofmængden. Gang den med molarmassen." };
         if (kommaFlyttet(v, m)) return { besked: "Tjek kommaet. Tallet er for " + (v > m ? "stort." : "lille.") };
         if (taetPaa(v, m)) return { besked: "Tæt på. Regn med alle cifrene: " + K.mol(n) + " mol · 60,05 g/mol." };
@@ -173,8 +173,8 @@
                      [/^m(_b)?\/M(_b)?$/, "Den formel bruges, når man kender massen. Her kender du koncentration og rumfang."]] },
         ns: { rigtig: /^(n_b|c(_b)?v(_b)?|v(_b)?c(_b)?)$/,
               omskrevet: [[/^n_b$/, /^n(_s)?$/]],
-              fejl: [[/^n$/, "Skriv hvilken stofmængde: n(NaOH)."],
-                     [/(^2|2$|\/2)/, "Der står 1 foran både CH₃COOH og OH⁻ i skemaet. Forholdet er 1 : 1."],
+              fejl: [[/^n$/, "Skriv, hvilken stofmængde du mener, altså n(NaOH)."],
+                     [/(^2|2$|\/2)/, "Der står 1 foran både CH₃COOH og OH⁻ i reaktionsskemaet. Forholdet er 1 : 1."],
                      [/^m/, "Her skal du finde stofmængden, ikke massen."]] },
         ms: { rigtig: /^(n(_s)?M(_s)?|M(_s)?n(_s)?)$/,
               omskrevet: [[/^n(_s)?$/, /^m(_s)?\/M(_s)?$/], [/^M(_s)?$/, /^m(_s)?\/n(_s)?$/]],

@@ -63,7 +63,7 @@
             { navn: "Grafen", pladser: ["indstille sig", "ligevægt"],
               ros: "Kurverne bøjer af, mens ligevægten indstiller sig. Når de er blevet vandrette, er reaktionen i ligevægt." },
             { navn: "Begge veje", pladser: ["reversibel", "dynamisk ligevægt"],
-              ros: "Reaktionen er reversibel og skrives med en dobbeltpil. Ved ligevægt går begge veje lige hurtigt: en dynamisk ligevægt." }
+              ros: "Reaktionen er reversibel og skrives med en dobbeltpil. Ved en dynamisk ligevægt forløber begge reaktioner lige hurtigt." }
         ],
         pladser: [
             { id: "indstille sig", ord: ["indstille sig"], x: X(22), y: Y(0.022), maal: [X(19), Y(P20[1])], dele: ["graf"],
@@ -79,12 +79,12 @@
 
             { id: "reversibel", ord: ["reversibel"], x: SK.x, y: SK.y - 62, maal: [SK.x, PIL.y - 13], dele: ["skema"],
               omr: [{ r: [PIL.x0 - 6, PIL.y - 13, PIL.x1 - PIL.x0 + 12, 26, 8] }],
-              fejl: { "dynamisk ligevægt": "<b>dynamisk ligevægt</b> er en tilstand, hvor begge veje går lige hurtigt. Pladsen peger på dobbeltpilen i reaktionsskemaet.",
+              fejl: { "dynamisk ligevægt": "<b>dynamisk ligevægt</b> er en tilstand, hvor begge reaktioner forløber lige hurtigt. Pladsen peger på dobbeltpilen i reaktionsskemaet.",
                       ligevægt: "<b>ligevægt</b> er en tilstand. Pladsen peger på dobbeltpilen, som viser, at reaktionen kan gå begge veje.",
                       "indstille sig": "<b>indstille sig</b> siges om koncentrationerne, der når deres endelige værdier. Pladsen peger på dobbeltpilen." } },
             { id: "dynamisk ligevægt", ord: ["dynamisk ligevægt"], x: KD.x + KD.b / 2, y: KD.y, maal: [KD.x + KD.b / 2, KD.y], titel: true, dele: ["inde"],
               omr: [{ r: [KD.x - 5, KD.y - 5, KD.b + 10, KD.h + 10, 18], tom: true }],
-              fejl: { reversibel: "<b>reversibel</b> siges om en reaktion, der kan gå begge veje. Kortet viser mere: begge veje sker hele tiden, lige hurtigt.",
+              fejl: { reversibel: "<b>reversibel</b> siges om en reaktion, der kan gå begge veje. Kortet viser mere, nemlig at begge reaktioner forløber hele tiden og lige hurtigt.",
                       ligevægt: "<b>ligevægt</b> ses på grafen, hvor kurverne er vandrette. Kortet viser, at begge reaktioner hele tiden sker lige hurtigt.",
                       "indstille sig": "<b>indstille sig</b> handler om kurverne, der bøjer af. Kortet viser gassen, når kurverne er vandrette." } }
         ],

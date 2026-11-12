@@ -39,7 +39,7 @@
         if (this.koersel) return;
         var ny = this.T + d;
         if (ny < D.TEMP_MIN || ny > D.TEMP_MAKS) {
-            this.besked(ny < D.TEMP_MIN ? "Koldere kan isvandet ikke gøre det." : "Varmere bliver det ikke her. Syren damper.", "gul");
+            this.besked(ny < D.TEMP_MIN ? "Isvandet kan ikke køle blandingen mere ned." : "Højere temperatur kan ikke vælges, fordi syren damper.", "gul");
             return;
         }
         this.T = ny;
@@ -104,7 +104,7 @@
     P.visPanel = function () {
         var b = D.TEMP_BLANDING;
         NK.saetTekst("temp-blanding", b.thio + " mL " + M.THIO_TEKST + " Na₂S₂O₃, " + b.syre + " mL 1,0 M HCl og " + b.vand +
-            " mL vand. Begge opløsninger står først i vandbad ved temperaturen.");
+            " mL vand. Begge opløsninger står først i vandbad ved den valgte temperatur.");
         NK.saetTekst("temp-T", this.T + " °C");
         NK.el("temp-ned").disabled = !!this.koersel;
         NK.el("temp-op").disabled = !!this.koersel;

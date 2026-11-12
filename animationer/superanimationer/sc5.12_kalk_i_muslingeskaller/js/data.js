@@ -66,7 +66,7 @@
                          { t: "Mere, end pulveret vejede" }] },
           efter: "Vægten under kolben viser mindre, end pulveret vejede. Forskellen er gassen CO₂, der er boblet op og ud af kolben." },
         { id: "m2", titel: "Måling 2",
-          start: "En ny prøve og en ny kolbe med 20 mL saltsyre. Gør det samme en gang til.",
+          start: "En ny prøve og en ny kolbe med 20 mL saltsyre står klar. Mål m(før) og m(efter) en gang til.",
           efter: "Nu har du to målinger. På fanen Beregningen regner du ud, hvor meget kalk der var i skallerne." }
     ];
 
@@ -90,10 +90,10 @@
                 efter: "Klik for at aflæse" };
 
     D.HINT = {
-        foer: "Tallet står på displayet på vægten under vejebåden. Klik på vægten, eller skriv tallet i skemaet til højre.",
+        foer: "Massen står på displayet på vægten under vejebåden. Klik på vægten, eller skriv tallet i skemaet til højre.",
         haeld: "Klik på det lyse pulver i vejebåden. Du kan også trække spatlen hen over kolben.",
         vent: "Vægten falder, så længe der dannes CO₂. Den står stille, når al kalken har reageret.",
-        efter: "Tallet står på displayet på vægten under kolben. Klik på vægten."
+        efter: "Massen står på displayet på vægten under kolben. Klik på vægten."
     };
 
     D.SVAR = {
@@ -105,7 +105,7 @@
 
     /* Svar paa klik i den forkerte raekkefoelge: én linje med forklaringen */
     D.FOERST = {
-        gaet: "Gæt først: vælg et af de tre svar på det gule kort.",
+        gaet: "Gæt først. Vælg et af de tre svar på kortet.",
         foer: "Aflæs først vægten under vejebåden. Når pulveret er i kolben, kan du ikke se, hvad det vejede.",
         falder: "Vægten under kolben falder stadig. Aflæser du den nu, bliver kalkindholdet for lavt. Vent, til den står stille.",
         pulver: "Der er stadig pulver i vejebåden. Alt pulveret skal i kolben, før m(efter) aflæses.",
@@ -195,14 +195,14 @@
           tekst: "Gruppe B har travlt. De aflæser vægten under kolben, mens det stadig bruser.",
           hint: "Hvor meget CO₂ er forsvundet fra kolben, når det stadig bruser?",
           forkl: "Ikke al kalken havde reageret, da gruppe B aflæste vægten. Der var forsvundet for lidt CO₂, så kalkindholdet bliver for lavt.",
-          fejl: { hoejere: "Vægten falder stadig, da gruppe B aflæser. m(efter) er for stor, så forskellen bliver for lille.",
+          fejl: { hoejere: "Vægten falder stadig, da gruppe B aflæser. m(efter) er for stor, så forskellen m(før) − m(efter) bliver for lille.",
                   samme: "Vægten faldt stadig, da gruppe B aflæste. Resten af CO₂ nåede ikke at forsvinde." } },
         { id: "sproejt", titel: "Det hele på én gang", kort: "alt på én gang", rigtig: "hoejere", B: { paaEnGang: true },
           tekst: "Gruppe B hælder alt pulveret i kolben på én gang. Det bruser voldsomt, og det sprøjter.",
           hint: "Vægten kan ikke se forskel på CO₂ og de dråber, der sprøjter ud af kolben.",
           forkl: "Dråber af syren sprøjter ud af kolben. Vægten kan ikke se, at det ikke er CO₂, så kalkindholdet bliver for højt. Det kan ende over 100 %.",
           fejl: { lavere: "Der forsvinder mere fra kolben, ikke mindre: både CO₂ og dråber.",
-                  samme: "Dråberne, der sprøjter ud, forsvinder også fra vægten. Det ligner mere CO₂." } },
+                  samme: "Dråberne, der sprøjter ud, forsvinder også fra vægten, så det ser ud, som om der er dannet mere CO₂." } },
         { id: "fugt", titel: "Fugtigt pulver", kort: "fugtigt pulver", rigtig: "lavere", B: { vand: 0.10 },
           tekst: "Gruppe B har ikke tørret skallerne. Af deres 1,00 g pulver er 0,10 g vand.",
           hint: "Vandet vejer med i m(før). Giver vandet CO₂?",
@@ -212,20 +212,20 @@
         { id: "grov", titel: "Grove stykker", kort: "grove stykker", rigtig: "samme", B: { grov: true },
           tekst: "Gruppe B knuser kun skallerne til grove stykker. De venter, til vægten under kolben står stille.",
           hint: "Reagerer store stykker også, hvis man venter længe nok?",
-          forkl: "Grove stykker reagerer langsommere, fordi syren kun når overfladen. Når gruppe B venter, reagerer al kalken alligevel. Det tager bare længere tid.",
+          forkl: "Grove stykker reagerer langsommere, fordi syren kun når overfladen. Når gruppe B venter, reagerer al kalken alligevel. Det tager blot længere tid.",
           fejl: { hoejere: "Stykkerne giver ikke mere CO₂. Der er lige så meget kalk i dem.",
-                  lavere: "Det ville passe, hvis gruppe B stoppede for tidligt. Men de venter, til vægten står stille." } },
+                  lavere: "Et lavere kalkindhold ville passe, hvis gruppe B stoppede for tidligt. Men de venter, til vægten står stille." } },
         { id: "syre", titel: "Mere syre", kort: "40 mL syre", rigtig: "samme", B: { syreV: 40 },
           tekst: "Gruppe B hælder 40 mL saltsyre i kolben i stedet for 20 mL. Vægten sættes til 0,00 g med kolben og syren på.",
           hint: "Er der syre nok hos gruppe A? Hvad bestemmer, hvor meget CO₂ der kan dannes?",
           forkl: "Der er rigeligt syre i begge kolber. Det er kalken, der bestemmer, hvor meget CO₂ der dannes, og vægten er sat til 0,00 g med syren i.",
           fejl: { hoejere: "Mere syre giver ikke mere CO₂. Når al kalken har reageret, sker der ikke mere.",
-                  lavere: "Al kalken reagerer stadig. Den ekstra syre bliver bare i kolben." } },
+                  lavere: "Al kalken reagerer stadig, og den ekstra syre bliver i kolben." } },
         { id: "spild", titel: "Spildt pulver", kort: "spilder pulver", rigtig: "hoejere", B: { spild: 0.10 },
           tekst: "Gruppe B spilder 0,10 g pulver på bordet, da de hælder. De skriver stadig m(før) = 1,00 g.",
           hint: "Det spildte pulver kommer aldrig op på vægten under kolben. Hvad sker der så med m(efter)?",
           forkl: "Det spildte pulver kom aldrig i kolben, men det tæller med i m(før). Vægten under kolben ender for lavt, og forskellen ligner mere CO₂. Kalkindholdet bliver for højt.",
-          fejl: { lavere: "Der dannes lidt mindre CO₂, ja. Men vægten under kolben mangler også de 0,10 g, der aldrig kom i. Forskellen m(før) − m(efter) bliver større.",
+          fejl: { lavere: "Der dannes lidt mindre CO₂, men vægten under kolben mangler også de 0,10 g, der aldrig kom i. Forskellen m(før) − m(efter) bliver større.",
                   samme: "m(før) er 0,10 g for stor. Den masse tæller med i forskellen, som om den var CO₂." } }
     ];
 
@@ -235,12 +235,12 @@
        klik paa morteren eller muslingen giver en kort linje. */
     D.INTRO = {
         forsoeg: "",
-        beregning: "Massen, kolben tabte, er CO₂. Fra den regnes kalken.",
+        beregning: "Kolben tabte massen af CO₂. Ud fra den masse regnes massen af kalk.",
         fejl: ""
     };
     D.FAERDIG = {
         forsoeg: "",
-        beregning: "Alle opgaverne er løst. Fra CO₂ til kalkindholdet.",
+        beregning: "Alle opgaverne er løst. Du har regnet fra massen af CO₂ til kalkindholdet.",
         fejl: "Alle seks fejlkilder er løst. Vægten ser kun det, der forlader kolben."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
@@ -248,7 +248,7 @@
 
     /* Paaskeaegget: den hele hjertemusling paa bordet. Morteren svarer ogsaa. */
     D.MUSLING = [
-        "En hel skal reagerer også. Den er bare længe om det.",
+        "En hel skal reagerer også. Den er blot længe om det.",
         "Knust er den færdig på et par minutter. Hel tager den en eftermiddag.",
         "Muslingen brugte fire år på den skal. Syren skal bruge en eftermiddag."
     ];

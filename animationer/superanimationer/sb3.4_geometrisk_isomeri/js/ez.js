@@ -55,7 +55,7 @@
         var la = zListe(v), lb = zListe(t), i = 0;
         while (i < la.length && (la[i] || 0) === (lb[i] || 0)) i++;
         var navnV = sym(la[i]), navnT = lb[i] ? sym(lb[i]) : "ingenting";
-        return "Begge starter med " + g(v).atom + " (" + D.Z[g(v).atom] + "). Så ser man på atomerne på " + g(v).atom + ": " +
+        return "Begge grupper begynder med " + g(v).atom + " (" + D.Z[g(v).atom] + "). Derfor ser man på atomerne bundet til " + g(v).atom + ": " +
             D.tekst(v) + " har " + naesteTekst(v) + ", og " + D.tekst(t) + " har " + naesteTekst(t) + ". " +
             navnV + " slår " + navnT + ".";
     };
@@ -85,7 +85,7 @@
         if (r.type === "ingen") {
             var side = r.ensV ? 0 : 2;
             return "Det " + (side === 0 ? "venstre" : "højre") + " C-atom har to ens grupper (" + D.tekst(r.pos[side]) + " og " +
-                D.tekst(r.pos[side + 1]) + "). Så er der ingen E/Z-isomeri.";
+                D.tekst(r.pos[side + 1]) + "). Derfor er der ingen E/Z-isomeri.";
         }
         var a = D.tekst(r.pos[r.v]), b = D.tekst(r.pos[r.h]);
         var par = a === b ? "De to " + a : a + " og " + b;
@@ -114,7 +114,7 @@
             if (p[pr[0]] === p[pr[1]] && !(pr[0] === r.v && pr[1] === r.h)) faelde = pr;
         });
         var vinderTekst = "De to vindere er " + D.tekst(vinderV) + " til venstre og " + D.tekst(vinderH) + " til højre";
-        var sideTekst = r.type === "Z" ? "De sidder på samme side: Z." : "De sidder på hver sin side: E.";
+        var sideTekst = r.type === "Z" ? "De sidder på samme side, så molekylet er Z." : "De sidder på hver sin side, så molekylet er E.";
         if (faelde) {
             var ens = D.tekst(p[faelde[0]]);
             var tabSide = faelde[0] !== r.v ? 0 : 2;
@@ -143,14 +143,14 @@
         var d = EZ.sammenlign(a, b);
         var t2;
         if (d === 0) t2 = "Til " + navn + " står " + D.tekst(a) + " og " + D.tekst(b) + ". De er ens.";
-        else if (EZ.foersteAtom(a, b)) t2 = "Til " + navn + ": " + atomDel(a) + " og " + atomDel(b) + ".";
+        else if (EZ.foersteAtom(a, b)) t2 = "Til " + navn + " står " + atomDel(a) + " og " + atomDel(b) + ".";
         else t2 = "Til " + navn + " starter begge grupper med " + g(a).atom + ". Se på atomerne på " + g(a).atom + ": " +
             D.tekst(a) + " har " + naesteTekst(a) + ", og " + D.tekst(b) + " har " + naesteTekst(b) + ".";
         var vinder = d > 0 ? a : b;
         return [
-            "Se kun på det " + navn + " C-atom. Find atomnummeret på det atom i hver gruppe, der sidder på C-atomet. Det højeste vinder.",
+            "Se kun på det " + navn + " C-atom. I hver gruppe skal du finde atomnummeret på det atom, der sidder direkte på C-atomet. Det højeste atomnummer vinder.",
             t2,
-            d === 0 ? "Klik på en af dem. To ens grupper betyder, at der ikke er nogen E/Z-isomeri." :
+            d === 0 ? "Klik på en af de to grupper. To ens grupper betyder, at der ikke er nogen E/Z-isomeri." :
                 "Klik på " + D.tekst(vinder) + ". Den har højest prioritet til " + navn + "."
         ];
     };
@@ -165,7 +165,7 @@
         }
         var a = D.tekst(r.pos[r.v]), b = D.tekst(r.pos[r.h]);
         return [
-            "Z (zusammen) betyder, at de to vindere sidder på samme side. E (entgegen) betyder på hver sin side.",
+            "Z (zusammen) betyder, at de to vindere sidder på samme side. E (entgegen) betyder, at de sidder på hver sin side.",
             "Følg den stiplede linje mellem " + a + " og " + b + ". Går den lige over, eller går den på skrå?",
             r.type === "Z" ? a + " og " + b + " sidder på samme side. Vælg Z." : a + " og " + b + " sidder på hver sin side. Vælg E."
         ];
@@ -184,18 +184,18 @@
         if (o.krav === "brcl") {
             if (!((harPaa(pos, "Br", "v") && harPaa(pos, "Cl", "h")) || (harPaa(pos, "Cl", "v") && harPaa(pos, "Br", "h"))))
                 return { ok: false, tekst: "Der skal være Br på det ene C-atom og Cl på det andet." + nu };
-            if (r.type !== "Z") return { ok: false, tekst: EZ.dom(r) + " Der skal stå Z." };
+            if (r.type !== "Z") return { ok: false, tekst: EZ.dom(r) + " Molekylet skal være Z." };
         } else if (o.krav === "ch3e") {
             var ens = (pos[0] === "CH3" && pos[2] === "CH3") || (pos[1] === "CH3" && pos[3] === "CH3");
-            if (!ens) return { ok: false, tekst: "De to CH₃ skal sidde på hvert sit C-atom og på samme side, fx begge øverst." + nu };
-            if (r.type !== "E") return { ok: false, tekst: EZ.dom(r) + " Der skal stå E, selv om CH₃ sidder på samme side." };
+            if (!ens) return { ok: false, tekst: "De to CH₃ skal sidde på hvert sit C-atom og på samme side, for eksempel begge øverst." + nu };
+            if (r.type !== "E") return { ok: false, tekst: EZ.dom(r) + " Molekylet skal være E, selv om de to CH₃ sidder på samme side." };
         } else if (o.krav === "ingenH") {
             if (pos.indexOf("H") >= 0) return { ok: false, tekst: "Ingen af grupperne må være H." + nu };
             if (r.type !== "ingen") return { ok: false, tekst: "Begge C-atomer har to forskellige grupper, så der er E/Z-isomeri." + nu };
         } else if (o.krav === "fireZ") {
             var forsk = pos.filter(function (x, i) { return pos.indexOf(x) === i; }).length === 4;
             if (!forsk) return { ok: false, tekst: "De fire grupper skal være forskellige." + nu };
-            if (r.type !== "Z") return { ok: false, tekst: EZ.dom(r) + " Der skal stå Z." };
+            if (r.type !== "Z") return { ok: false, tekst: EZ.dom(r) + " Molekylet skal være Z." };
         }
         return { ok: true, tekst: EZ.dom(r), r: r };
     };
@@ -214,11 +214,11 @@
             ],
             ingenH: [
                 "Der er ingen E/Z-isomeri, når det ene C-atom har to ens grupper.",
-                "Sæt to ens grupper på det samme C-atom, fx to CH₃.",
+                "Sæt to ens grupper på det samme C-atom, for eksempel to CH₃.",
                 "Sæt CH₃ og CH₃ til venstre og Cl og Br til højre."
             ],
             fireZ: [
-                "Fire forskellige grupper, og de to vindere skal sidde på samme side.",
+                "Molekylet skal have fire forskellige grupper, og de to vindere skal sidde på samme side.",
                 "Find vinderen på hvert C-atom med atomnumrene. Br (35) slår C (6) i CH₃, og Cl (17) slår H (1).",
                 "Sæt Br og CH₃ til venstre og Cl og H til højre, med Br og Cl øverst."
             ]
@@ -279,7 +279,7 @@
         if (r.type === "ingen") {
             var side = r.ensV ? 0 : 2;
             return "Det " + (side === 0 ? "venstre" : "højre") + " C-atom har to ens grupper (" + D.tekst(r.pos[side]) + " og " +
-                D.tekst(r.pos[side + 1]) + "). Så er der ingen cis/trans-isomeri.";
+                D.tekst(r.pos[side + 1]) + "). Derfor er der ingen cis-trans-isomeri.";
         }
         var a = D.tekst(r.pos[r.par[0]]);
         return r.type === "cis" ?

@@ -352,7 +352,7 @@
         if (id === "n_p") {
             var EN = "Der står 1 foran både NaHCO₃ og " + P + " i skemaet. Forholdet er 1 : 1.";
             var fejl = r === 1 ?
-                [["c/2", EN], ["2*c", EN], ["a", "Det er en masse. Forholdet i skemaet gælder stofmængder."]] :
+                [["c/2", EN], ["2*c", EN], ["a", "m(NaHCO₃) er en masse, men forholdet i skemaet gælder stofmængder."]] :
                 [["2*c", "Omvendt. Der skal 2 NaHCO₃ til 1 " + P + ", så der bliver halvt så mange mol " + P + "."],
                  ["c", "Forholdet er ikke 1 : 1. Se tallene foran NaHCO₃ og " + P + " i skemaet."],
                  ["a/2", "Forholdet gælder stofmængder, ikke masser. Brug n(NaHCO₃)."]];
@@ -445,7 +445,7 @@
             if (p && naer(v, regn(p, U), 1e-6)) return { besked: r.fejl[i][1] };
         }
         if (ukendt) return { besked: ukendt };
-        return { besked: "Den formel passer ikke her. Tryk på Giv hint, hvis du sidder fast." };
+        return { besked: "Den formel passer ikke her. Tryk på Giv et hint, hvis du sidder fast." };
     }
 
     /* ----- Tallet ------------------------------------------------------------------
@@ -457,7 +457,7 @@
             return { facit: f.n_nat, enhed: "mol", fejl: [
                 [mf * Mn, "Du har ganget. Del massen med molarmassen."],
                 [Mn / mf, "Brøken er vendt om. Massen står øverst."],
-                [mf, "Det er massen. Del den med molarmassen."]] };
+                [mf, "Det er massen af natron. Del den med molarmassen."]] };
         }
         var P = T.P(o.hyp), n0 = K.r3(f.n_nat), Mp = D.STOF[D.HYP[o.hyp].produkt].Mv;
         if (id === "n_p") {
@@ -472,7 +472,7 @@
             [n / Mp, "Du har divideret. Gang stofmængden med molarmassen."],
             [Mp / n, "Du har divideret. Gang stofmængden med molarmassen."],
             [n * Mn, "Brug molarmassen for " + P + ", ikke for natron."],
-            [Mp, "Det er massen af 1 mol. Gang med stofmængden."]];
+            [Mp, "Det er molarmassen, altså massen af 1 mol. Gang den med stofmængden."]];
         if (f.forhold !== 1) liste.push([n0 * Mp, "Brug stofmængden af " + P + ", ikke af natron."]);
         return { facit: f.m_p, enhed: "g", fejl: liste };
     }
@@ -507,7 +507,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (naer(v, k.facit, 0.04)) return { besked: "Tæt på. Regn med alle cifrene." };
-        return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
+        return { besked: "Det tal passer ikke. Tryk på Giv et hint, hvis du sidder fast." };
     };
 
     /* ----- Den paene beregning ------------------------------------------------------ */

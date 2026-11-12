@@ -352,7 +352,7 @@ function koerTest(W) {
     paastand("spørgsmålet, gættet og knapperne står på kortet i scenen, ikke i panelet", !!d.querySelector("#fane-ek .scene #ek-skort #ek-knap") &&
         !!d.querySelector("#fane-ek .scene #ek-skort input") && !!d.querySelector("#ek-skort #ek-indsend") && !d.querySelector("#fane-ek .panel input") &&
         !d.querySelector("#fane-ek .panel .knap") &&
-        spm2() === "Find oxidationstallet for O og H i H₂O. Gæt først: hvilke oxidationstal har O og H?", spm2());
+        spm2() === "Find oxidationstallet for O og H i H₂O. Gæt først: Hvilke oxidationstal har O og H?", spm2());
     paastand("gættet: Indsend svar er grå, til der står noget i felterne", NK.el("ek-indsend").classList.contains("ikke-klar"));
     paastand("ingen pile, før der er gættet", pile() === 0, pile());
     var u0 = B.enheder[0], c0 = B.midte(u0), pO = B.geo.pos[1];
@@ -362,7 +362,7 @@ function koerTest(W) {
         B.el.arb.classList.contains("blink"), B.beskedTekst());
     B.gaetFelter.O.inp.value = "-II";
     B.gaetTjek("O");
-    paastand("efter det første gæt: spørgsmålet gælder nu kun H", B.trin === "gaet" && /Gæt først: hvilket oxidationstal har H\?$/.test(spm2()) &&
+    paastand("efter det første gæt: spørgsmålet gælder nu kun H", B.trin === "gaet" && /Gæt først: Hvilket oxidationstal har H\?$/.test(spm2()) &&
         /−II/.test(B.gaetFelter.O.svar.textContent), spm2());
     B.gaetFelter.H.inp.value = "+1";
     B.gaetFelter.H.inp.dispatchEvent(new W.Event("input"));

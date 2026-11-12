@@ -27,7 +27,7 @@
         ],
         "fane-vaegt": [
             { sel: "#vaegt-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og regnestykket, efterhånden som du skriver det rigtigt." },
-            { sel: "#vaegt-raekker", titel: "Regnestykket", tekst: "Tre trin, ét ad gangen: formlen med bogstaver, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed. Linjen øverst viser, hvilket trin du er ved. Tryk Enter efter hver." },
+            { sel: "#vaegt-raekker", titel: "Regnestykket", tekst: "Tre trin, ét ad gangen: formlen med bogstaver, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed. Linjen øverst viser, hvilket trin du er ved. Tryk Enter efter hvert trin." },
             { sel: "#vaegt-anker-bord", titel: "Bordet", tekst: "Molarmassen står på krukken. Vægten viser massen. Det, du regner, sker her." },
             { sel: "#vaegt-anker-poser", titel: "Poserne", tekst: "Hver pose er 1 mol og vejer M gram. Stofmængden er antallet af poser." },
             { sel: "#vaegt-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Linjen nederst på kortet siger, hvad du skal nu, og hvad der gik galt. Giv hint giver et hint og derefter svaret." },

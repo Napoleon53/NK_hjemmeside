@@ -143,7 +143,7 @@
         this.brugtSvar = false;
         this.visKort();
         this.visListe();
-        this.besked("En ny kolbe med 20 mL saltsyre og den samme prøve.", "");
+        this.besked("En ny kolbe med 20 mL saltsyre og den samme prøve står klar.", "");
         this.sidsteLinje = this.trinLinje();
         this.visSkema();
         this.fokus();
@@ -381,9 +381,9 @@
             if (v === Math.round(this.proeve * 100)) { this.noterFoer(); return; }
             ryst(e);
             if (this.kolbe.ind > 0 && v === kolbeV) {
-                this.besked("Det er vægten under kolben. m(før) står under vejebåden.", "skidt");
+                this.besked("Du har skrevet det, vægten under kolben viser. m(før) står på vægten under vejebåden.", "skidt");
             } else {
-                this.besked("Det står der ikke på vægten under vejebåden. Skriv tallet med to decimaler.", "skidt");
+                this.besked("Det tal står der ikke på vægten under vejebåden. Skriv tallet med to decimaler.", "skidt");
             }
             return;
         }
@@ -394,11 +394,11 @@
         if (v === kolbeV) {
             this.fejl(D.FOERST.falder);
         } else if (v === Math.round(this.proeve * 100)) {
-            this.besked("Det er m(før). m(efter) står under kolben, når det er holdt op med at bruse.", "skidt");
+            this.besked("Du har skrevet m(før). m(efter) står på vægten under kolben, når det er holdt op med at bruse.", "skidt");
         } else if (!stille) {
             this.fejl(D.FOERST.falder);
         } else {
-            this.besked("Det står der ikke på vægten under kolben.", "skidt");
+            this.besked("Det tal står der ikke på vægten under kolben.", "skidt");
         }
     };
 
@@ -511,7 +511,7 @@
             this.kortBesked("Vægten under kolben blev sat til 0,00 g med kolben og saltsyren på. Den viser det, der er kommet i kolben, minus det, der er forsvundet.");
         }
         if (u === "kolbe") this.kortBesked("Kolben har 20 mL saltsyre. Vægten under den blev sat til 0,00 g med kolben og syren på.");
-        if (u === "zoom") this.kortBesked("Luppen viser bunden af kolben. H₃O⁺ fra syren tager carbonat-ionerne fra kalken, og de bliver til CO₂ og vand.");
+        if (u === "zoom") this.kortBesked("Luppen viser bunden af kolben. H₃O⁺ fra syren overfører hydroner til carbonationerne i kalken, og carbonationerne bliver til CO₂ og vand.");
         return false;
     };
 

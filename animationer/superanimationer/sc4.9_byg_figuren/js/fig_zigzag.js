@@ -36,7 +36,7 @@
         vb: [1000, 460],
         lag: [
             { navn: "Kæder og grene", pladser: ["zigzagformel", "uforgrenet", "forgrenet"],
-              ros: "I en zigzagformel er hver ende og hvert knæk et C. Butan er én lang kæde, og 2-methylpropan har en gren." },
+              ros: "I en zigzagformel er hver ende og hvert knæk et C. Butan er én lang kæde, og 2-methylpropan har en forgrening." },
             { navn: "Isomerer og navne", pladser: ["isomerer", "hovedkæde", "sidegruppe"],
               ros: "Butan og 2-methylpropan er isomerer. Hovedkæden giver den sidste del af navnet og sidegruppen den første." }
         ],

@@ -62,7 +62,7 @@
                 { t: "0 %", n: "intet" }
             ],
             facit: { T: 1 },
-            handling: "Prøv det: træk koncentrationen ned til 0.",
+            handling: "Prøv det: Træk koncentrationen ned til 0.",
             maal: { c: [0, 0.0001] },
             hint: [
                 "Det er permanganatet, der absorberer det grønne lys. Vand er farveløst.",
@@ -74,78 +74,78 @@
         {
             id: "dobbeltA", navn: "Dobbelt koncentration: A",
             start: { stof: "mno4", c: 0.20, l: 1.00 },
-            spm: "Lige nu er A = 0,490. Hvad bliver A, når koncentrationen fordobles til 0,40 mM?",
+            spm: "Ved 0,20 mM er A = 0,490. Hvad bliver A, når koncentrationen fordobles til 0,40 mM?",
             valg: [
                 { t: "0,980", n: "det dobbelte", ok: true },
                 { t: "0,490", n: "det samme" },
                 { t: "0,245", n: "det halve" }
             ],
             facit: { A: 0.980 },
-            handling: "Prøv det: træk koncentrationen op til 0,40 mM.",
+            handling: "Prøv det: Træk koncentrationen op til 0,40 mM.",
             maal: { c: [0.395, 0.405] },
             hint: [
-                "Tænk på, hvor mange molekyler lyset møder på vejen gennem kuvetten.",
-                "Ved den dobbelte koncentration møder lyset dobbelt så mange molekyler.",
+                "Tænk på, hvor mange permanganationer lyset møder på vejen gennem kuvetten.",
+                "Ved den dobbelte koncentration møder lyset dobbelt så mange permanganationer.",
                 "A er ligefrem proportional med c, så A bliver det dobbelte: 0,980."
             ],
-            forklaring: "Ved den dobbelte koncentration møder lyset dobbelt så mange molekyler, og A bliver dobbelt så stor. A er ligefrem proportional med c."
+            forklaring: "Ved den dobbelte koncentration møder lyset dobbelt så mange permanganationer, og A bliver dobbelt så stor. A er ligefrem proportional med c."
         },
         {
             id: "dobbeltT", navn: "Dobbelt koncentration: lyset",
             start: { stof: "mno4", c: 0.20, l: 1.00 },
-            spm: "Lige nu slipper 32 % af lyset igennem. Hvor meget slipper igennem, når koncentrationen fordobles til 0,40 mM?",
+            spm: "Ved 0,20 mM slipper 32 % af lyset igennem. Hvor meget slipper igennem, når koncentrationen fordobles til 0,40 mM?",
             valg: [
                 { t: "16 %", n: "halvdelen af 32 %" },
                 { t: "10 %", n: "32 % af 32 %", ok: true },
                 { t: "64 %", n: "det dobbelte" }
             ],
             facit: { T: 0.10 },
-            handling: "Prøv det: træk koncentrationen op til 0,40 mM.",
+            handling: "Prøv det: Træk koncentrationen op til 0,40 mM.",
             maal: { c: [0.395, 0.405] },
             hint: [
-                "Det nye permanganat møder kun det lys, der er tilbage.",
-                "Hvert lag af molekyler lader den samme brøkdel af det lys, der kommer ind i laget, slippe igennem.",
-                "Det nye permanganat lader 32 % af de 32 % slippe igennem. Det er ca. 10 %."
+                "De ekstra permanganationer møder kun det lys, der er tilbage.",
+                "Hvert lag af permanganationer lader den samme brøkdel af det lys, der kommer ind i laget, slippe igennem.",
+                "De ekstra permanganationer lader 32 % af de 32 % slippe igennem. Det er ca. 10 %."
             ],
-            forklaring: "Det nye permanganat lader også kun 32 % slippe igennem, men af det lys, der er tilbage: 32 % af 32 % ≈ 10 %. A fordobles (0,490 → 0,980), men T bliver ikke halveret. Derfor regner man med A og ikke med T."
+            forklaring: "De ekstra permanganationer lader også kun 32 % slippe igennem, men af det lys, der er tilbage: 32 % af 32 % ≈ 10 %. A fordobles (0,490 → 0,980), men T bliver ikke halveret. Derfor regner man med A og ikke med T."
         },
         {
             id: "toCm", navn: "Én centimeter mere",
             start: { stof: "mno4", c: 0.12, l: 1.00 },
-            spm: "Lige nu slipper ca. halvdelen af lyset gennem 1,00 cm. Hvor meget slipper igennem, når kuvetten er 2,00 cm?",
+            spm: "Ved 0,12 mM slipper ca. halvdelen af lyset gennem en kuvette på 1,00 cm. Hvor meget slipper gennem 2,00 cm?",
             valg: [
-                { t: "0 %", n: "den anden centimeter tager resten" },
-                { t: "26 %", n: "den anden centimeter tager halvdelen af resten", ok: true },
+                { t: "0 %", n: "den anden centimeter absorberer resten" },
+                { t: "26 %", n: "den anden centimeter absorberer halvdelen af resten", ok: true },
                 { t: "51 %", n: "det samme som før" }
             ],
             facit: { T: 0.26 },
-            handling: "Prøv det: træk kuvetten ud til 2,00 cm med skyderen eller i kuvettens højre side.",
+            handling: "Prøv det: Træk kuvetten ud til 2,00 cm med skyderen eller i kuvettens højre side.",
             maal: { l: [1.995, 2.005] },
             hint: [
                 "Se på kurven over strålen. Den viser, hvor meget lys der er tilbage inde i kuvetten.",
                 "Den anden centimeter indeholder lige så meget permanganat som den første.",
-                "Den anden centimeter tager også halvdelen af det lys, der kommer ind i den. Der er ca. 26 % tilbage."
+                "Den anden centimeter absorberer også halvdelen af det lys, der kommer ind i den. Der er ca. 26 % tilbage."
             ],
-            forklaring: "Hver centimeter tager den samme brøkdel af det lys, der kommer ind i den. Kurven over strålen falder fra 100 % til 51 % til 26 %. A bliver dobbelt så stor: 0,294 → 0,588."
+            forklaring: "Hver centimeter absorberer den samme brøkdel af det lys, der kommer ind i den. Kurven over strålen falder fra 100 % til 51 % til 26 %. A bliver dobbelt så stor: 0,294 → 0,588."
         },
         {
             id: "halvDobbelt", navn: "Halv koncentration, dobbelt vej",
             start: { stof: "mno4", c: 0.40, l: 1.00 },
-            spm: "Lige nu er A = 0,980. Koncentrationen halveres til 0,20 mM, og kuvetten bliver 2,00 cm. Hvad sker der med A?",
+            spm: "Ved 0,40 mM og 1,00 cm er A = 0,980. Koncentrationen halveres til 0,20 mM, og kuvettebredden bliver 2,00 cm. Hvad bliver A?",
             valg: [
                 { t: "Det samme", n: "A = 0,980", ok: true },
                 { t: "Det dobbelte", n: "A = 1,96" },
                 { t: "Det halve", n: "A = 0,490" }
             ],
             facit: { A: 0.980 },
-            handling: "Prøv det: træk koncentrationen ned til 0,20 mM og kuvetten ud til 2,00 cm.",
+            handling: "Prøv det: Træk koncentrationen ned til 0,20 mM og kuvetten ud til 2,00 cm.",
             maal: { c: [0.195, 0.205], l: [1.995, 2.005] },
             hint: [
-                "Tænk igen på, hvor mange molekyler lyset møder på vejen.",
-                "Molekylerne står halvt så tæt, men vejen er dobbelt så lang.",
-                "l · c er det samme: 2,00 cm · 0,20 mM = 1,00 cm · 0,40 mM. A bliver ved med at være 0,980."
+                "Tænk på, hvor mange permanganationer lyset møder på vejen gennem kuvetten.",
+                "Permanganationerne står halvt så tæt, men lysvejen er dobbelt så lang.",
+                "l · c er det samme: 2,00 cm · 0,20 mM = 1,00 cm · 0,40 mM. A er stadig 0,980."
             ],
-            forklaring: "Lyset møder lige mange molekyler: de står halvt så tæt, men vejen er dobbelt så lang. A = ε · l · c er 0,980 i begge tilfælde."
+            forklaring: "Lyset møder lige mange permanganationer. Ionerne står halvt så tæt, men lysvejen er dobbelt så lang. A = ε · l · c er 0,980 i begge tilfælde."
         },
         {
             id: "Aen", navn: "Absorbansen 1",
@@ -157,14 +157,14 @@
                 { t: "0 %", n: "intet" }
             ],
             facit: { T: 0.10 },
-            handling: "Prøv det: skru på koncentrationen og kuvetten, til A er mellem 0,98 og 1,02.",
+            handling: "Prøv det: Ændr koncentrationen og kuvettebredden, til A er mellem 0,98 og 1,02.",
             maal: { A: [0.98, 1.02] },
             hint: [
-                "Ved A = 0 slipper 100 % igennem. Ved A = 0,30 slipper ca. 50 % igennem.",
+                "Ved A = 0 slipper 100 % af lyset igennem. Ved A = 0,30 slipper ca. 50 % igennem.",
                 "Hver gang A vokser med 1, bliver lyset 10 gange svagere.",
-                "A = 1 er 10 gange svagere end 100 %: T = 10 %."
+                "Ved A = 1 er lyset 10 gange svagere end ved A = 0, så T = 10 %."
             ],
-            forklaring: "A = 1 betyder, at lyset er 10 gange svagere: T = 10 %. Ved A = 2 er det 100 gange svagere: T = 1 %. Sammenhængen er A = −log(T)."
+            forklaring: "A = 1 betyder, at lyset er blevet 10 gange svagere, så T = 10 %. Ved A = 2 er lyset 100 gange svagere, så T = 1 %. Sammenhængen er A = −log(T)."
         }
     ];
 
@@ -183,18 +183,18 @@
         {
             id: "fescn", navn: "Jern(III) farvet rødt", stof: "fescn",
             std: [0.040, 0.080, 0.120, 0.160, 0.200], proeve: [0.05, 0.19],
-            tekst: "Jern(III) i en prøve er farvet blodrødt som FeSCN²⁺. Mål ved 447 nm, og find prøvens koncentration af FeSCN²⁺."
+            tekst: "Jern(III)ionerne i en prøve er omdannet til det blodrøde FeSCN²⁺. Mål ved 447 nm, og find prøvens koncentration af FeSCN²⁺."
         },
         {
             id: "fephen", navn: "Jern i en tablet", stof: "fephen",
             std: [0.010, 0.020, 0.030, 0.040, 0.050], proeve: [0.012, 0.048],
-            tekst: "Jernet fra en kosttilskudstablet er omdannet til det orangerøde [Fe(phen)₃]²⁺. Mål ved 510 nm, og find prøvens koncentration."
+            tekst: "Jernet fra en kosttilskudstablet er omdannet til det orangerøde [Fe(phen)₃]²⁺. Mål ved 510 nm, og find prøvens koncentration af [Fe(phen)₃]²⁺."
         },
         {
             id: "aftryk", navn: "Et punkt, der ikke passer", stof: "mno4",
             std: [0.10, 0.20, 0.30, 0.40, 0.50], proeve: [0.14, 0.46],
             aftryk: { i: 2, A: 0.12 },
-            tekst: "En ny permanganatprøve. Se godt efter, om alle punkterne ligger på linjen."
+            tekst: "En prøve med permanganat har en ukendt koncentration. Se godt efter, om alle punkterne ligger på linjen."
         }
     ];
 
@@ -237,7 +237,7 @@
         },
         {
             id: "r2", gruppe: "let", navn: "Find koncentrationen", stof: "fescn",
-            tekst: "En prøve med FeSCN²⁺ har absorbansen 0,611 ved 447 nm i en kuvette på 1,00 cm. ε = 4,70 mM⁻¹·cm⁻¹. Beregn koncentrationen af FeSCN²⁺.",
+            tekst: "En prøve med FeSCN²⁺ har absorbansen 0,611 ved 447 nm i en kuvette på 1,00 cm. Ekstinktionskoefficienten er ε = 4,70 mM⁻¹·cm⁻¹. Beregn koncentrationen af FeSCN²⁺.",
             tal: { A: "0,611", eps: "4,70", l: "1,00" }, trin: ["c"]
         },
         {
@@ -247,7 +247,7 @@
         },
         {
             id: "r4", gruppe: "middel", navn: "En kort kuvette", stof: "fescn",
-            tekst: "En prøve med FeSCN²⁺ måles i en kuvette på kun 0,500 cm. Absorbansen er 0,282, og ε = 4,70 mM⁻¹·cm⁻¹. Beregn koncentrationen.",
+            tekst: "En prøve med FeSCN²⁺ måles i en kuvette på kun 0,500 cm. Absorbansen er 0,282, og ε = 4,70 mM⁻¹·cm⁻¹. Beregn koncentrationen af FeSCN²⁺.",
             tal: { A: "0,282", eps: "4,70", l: "0,500" }, trin: ["c"]
         },
         {
@@ -257,7 +257,7 @@
         },
         {
             id: "r6", gruppe: "middel", navn: "En lang kuvette", stof: "fephen",
-            tekst: "Jernet fra en tablet er omdannet til [Fe(phen)₃]²⁺ og måles i en kuvette på 2,00 cm. Absorbansen er 0,999, og ε = 11,1 mM⁻¹·cm⁻¹. Beregn koncentrationen.",
+            tekst: "Jernet fra en tablet er omdannet til [Fe(phen)₃]²⁺ og måles i en kuvette på 2,00 cm. Absorbansen er 0,999, og ε = 11,1 mM⁻¹·cm⁻¹. Beregn koncentrationen af [Fe(phen)₃]²⁺.",
             tal: { A: "0,999", eps: "11,1", l: "2,00" }, trin: ["c"]
         },
         {
@@ -282,8 +282,8 @@
     D.ROS_OPGAVE = ["Flot.", "Godt.", "Sådan.", "Præcist.", "Det holder."];
 
     D.FAERDIG = {
-        lys: "Alle seks forudsigelser er prøvet. På Standardkurven bliver det til målinger.",
-        kurve: "Alle fire standardkurver er færdige. På Beregningen er det de samme sammenhænge med tal.",
+        lys: "Alle seks forudsigelser er prøvet. På fanen Standardkurven bruger du de samme sammenhænge på målinger.",
+        kurve: "Alle fire standardkurver er færdige. På fanen Beregningen regner du med de samme sammenhænge.",
         regn: "Alle otte regnestykker er løst."
     };
 

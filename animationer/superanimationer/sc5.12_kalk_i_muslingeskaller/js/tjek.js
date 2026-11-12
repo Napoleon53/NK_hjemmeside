@@ -264,7 +264,7 @@
        fejl: typiske formler (internt) og beskeden til dem. */
     var HUNDRED = "Det giver brøkdelen. Gang med 100 % for at få procent.";
     var EN_EN = "Der står 1 foran både CaCO₃ og CO₂ i reaktionsskemaet. Forholdet er 1 : 1.";
-    var GENVEJ = "Det er genvejen med 2,27. Her går vejen over stofmængden.";
+    var GENVEJ = "Den formel bruger 2,27 som regnemåden uden mol. Med mol skal du regne over stofmængden.";
     /* kendt er alt det, der er kendt, naar trinnet begynder. I vejen med
        mol maa 2,27 ikke staa i formlen (genvej). */
     var F = {
@@ -286,7 +286,7 @@
                         ["c/h", "Brug molarmassen for CO₂."]] },
         n_kalk: { maal: "f", kendt: ["a", "b", "c", "e", "g", "h"], alias: {},
                   fejl: [["2*e", EN_EN], ["e/2", EN_EN],
-                         ["c", "Det er en masse. Forholdet i skemaet gælder stofmængder."]] },
+                         ["c", "m(CO₂) er en masse, men forholdet i reaktionsskemaet gælder stofmængder."]] },
         mk_n: { maal: "d", kendt: ["a", "b", "c", "e", "f", "g", "h"], alias: { "?n": "f", "?M": "h" }, genvej: true,
                 fejl: [["f/h", "Massen er stofmængde gange molarmasse, ikke divideret."],
                        ["h/f", "Massen er stofmængde gange molarmasse, ikke divideret."],
@@ -304,7 +304,7 @@
                        ["d/g", "Brug molarmassen for CaCO₃."]] },
         nc_k: { maal: "e", kendt: ["p", "a", "d", "f", "g", "h"], alias: {},
                 fejl: [["2*f", EN_EN], ["f/2", EN_EN],
-                       ["d", "Det er en masse. Forholdet i skemaet gælder stofmængder."]] },
+                       ["d", "m(CaCO₃) er en masse, men forholdet i reaktionsskemaet gælder stofmængder."]] },
         mc_n: { maal: "c", kendt: ["p", "a", "d", "e", "f", "g", "h"], alias: { "?n": "e", "?M": "g" }, genvej: true,
                 fejl: [["e/g", "Massen er stofmængde gange molarmasse, ikke divideret."],
                        ["g/e", "Massen er stofmængde gange molarmasse, ikke divideret."],
@@ -432,7 +432,7 @@
                 [dm * M1, "Du har ganget. n = m / M."],
                 [M1 / dm, "Brøken er vendt om. n = m / M."],
                 [dm / M2, "Brug molarmassen for CO₂, " + K.Mtekst("CO2") + " g/mol."],
-                [dm, "Det er massen. Del med molarmassen."]] };
+                [dm, "Det er massen af CO₂. Del den med molarmassen af CO₂."]] };
         case "n_kalk":
             return { facit: f.n_kalk, fejl: [[2 * f.n_kalk, EN_EN], [f.n_kalk / 2, EN_EN],
                 [dm, "Det er massen af CO₂. Her skal du bruge stofmængden."]] };
@@ -486,7 +486,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (naer(v, k.facit, 0.04)) return { besked: "Tæt på. Regn med alle cifrene." };
-        return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
+        return { besked: "Det tal passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };
 
     /* ----- Den paene beregning: [formlen, tallene] ------------------------------------ */
@@ -555,7 +555,7 @@
     T.talHint = function (id, o) {
         var r = T.regning(id, o);
         var dele = r[1].slice(2).split(" = ");
-        if (dele.length < 2) return "Forholdet er 1 : 1, så tallet er det samme som i trinnet før.";
+        if (dele.length < 2) return "Forholdet er 1 : 1, så stofmængden er den samme som i trinnet før.";
         return "Sæt tallene ind: " + D.TRIN[id].venstre + " = " + dele[0] + ".";
     };
 

@@ -394,7 +394,7 @@
         if (ks) {
             var pct = 100 * D.andel(ks, D.LUP_C);
             var pt = pct >= 99.95 ? "100 %" : (pct < 0.01 ? "under 0,01 %" : NK.betydende(pct, 2) + " %");
-            var lt = "Andel, der har afgivet hydronen: " + pt;
+            var lt = "Omdannelsesgrad: " + pt;
             NK.tekst(ctx, lt, R.x + 4, y + 22, { font: "600 13px " + T.FONT, farve: T.DAEMPET, linje: "middle" });
         }
         void p;

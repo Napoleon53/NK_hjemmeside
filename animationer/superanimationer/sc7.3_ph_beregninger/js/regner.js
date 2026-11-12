@@ -355,7 +355,7 @@
     /* Maples svar som HTML, og en note, naar det ikke er et kommatal */
     function mapleSvar(ast, v, ans) {
         if (harKommatal(ast)) return { ud: mapleTal(v), note: "" };
-        var note = "Uden komma regner Maple eksakt. Skriv fx 5.0 i stedet for 5, eller pak det ind i evalf( ).";
+        var note = "Uden decimalpunktum regner Maple eksakt. Skriv fx 5.0 i stedet for 5, eller pak udtrykket ind i evalf( ).";
         if (!erRational(ast, ans)) {
             return { ud: '<span class="r-eksakt">et eksakt udtryk med ln</span>', note: note };
         }

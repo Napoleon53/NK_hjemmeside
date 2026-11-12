@@ -66,7 +66,7 @@
             { navn: "Koncentrationerne", pladser: ["aktuel koncentration af hydroxid", "vands ionprodukt", "aktuel koncentration af oxonium"],
               ros: "[OH⁻] er det samme som c(NaOH). Vands ionprodukt giver så [H₃O⁺], den aktuelle koncentration af oxonium." },
             { navn: "Fra koncentration til pH", pladser: ["pH", "log"],
-              ros: "pH regnes ud som −log₁₀[H₃O⁺]. Tasten log giver −12,00, så pH er 12,00." }
+              ros: "pH regnes ud som −log₁₀[H₃O⁺]. Tasten log giver −12,00 for 1,0 · 10⁻¹², så pH er 12,00." }
         ],
         pladser: [
             { id: "aktuel koncentration af hydroxid", ord: ["aktuel koncentration af hydroxid"], x: 192, y: R1, maal: [XL - LV.oh - 8, R1 - 6], dele: ["oh"],

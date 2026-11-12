@@ -23,14 +23,14 @@
         ],
         "fane-g": [
             { sel: "#g-skort", titel: "Kortet øverst", tekst: "Kortet stiller spørgsmålene. Gæt først, når kortet beder om det. Et gæt er gratis." },
-            { sel: "#g-anker-mol", titel: "Molekylerne", tekst: "Amylose, amylopectin og glykogen med lige mange glucoseenheder. Enzymerne klipper én enhed af ad gangen fra enderne." },
-            { sel: "#g-anker-tal", titel: "Tællerne", tekst: "Hvor meget glucose hvert molekyle har frigivet, og hvilket der blev færdigt først." },
+            { sel: "#g-anker-mol", titel: "Molekylerne", tekst: "Amylose, amylopectin og glykogen med lige mange glucoseenheder. Enzymerne spalter én glucoseenhed af ad gangen fra enderne." },
+            { sel: "#g-anker-tal", titel: "Tællerne", tekst: "Tællerne viser, hvor meget glucose hvert molekyle har frigivet, og hvilket molekyle der blev færdigt først." },
             { sel: "#g-trinkort", titel: "Trinnene", tekst: "Forløbet har fire trin. Begynd forfra nederst i panelet." }
         ],
         "fane-i": [
             { sel: "#i-skort", titel: "Kortet øverst", tekst: "Gæt først. Bagefter kører forsøget, og kortet stiller spørgsmål til det, du ser." },
             { sel: "#i-anker-proever", titel: "Prøverne", tekst: "Det, du ser i laboratoriet: kartoflen og vattet, senere kogt stivelse og vat med spyt. Farven står under prøven." },
-            { sel: "#i-anker-lupper", titel: "Lupperne", tekst: "Molekylerne i prøverne. Stivelse er en spiral af amylose, og cellulose er lige kæder side om side." },
+            { sel: "#i-anker-lupper", titel: "Lupperne", tekst: "Molekylerne i prøverne. I stivelse snor amylose sig som en spiral, og cellulose består af lige kæder side om side." },
             { sel: "#i-trinkort", titel: "Trinnene", tekst: "Forløbet har seks trin. Begynd forfra nederst i panelet." }
         ]
     };

@@ -447,7 +447,7 @@
         else {
             var gi = this.lupGlas, g = this.glas[gi], st = gi >= 0 ? this.stangIGlas(gi) : null;
             if (st && g.tid > 0.8) {
-                if (st.metal === g.ion) t = "<b>" + st.metal + " i " + K.ion(g.ion) + ":</b> intet sker. Det er det samme metal.";
+                if (st.metal === g.ion) t = "<b>" + st.metal + " i " + K.ion(g.ion) + ":</b> intet sker. Stangen og ionerne er af samme metal.";
                 else t = "<b>" + st.metal + " i " + K.ion(g.ion) + ":</b> " + D.iagttagelse(st.metal, g.ion) + ".";
             } else if (st) {
                 t = "<b>" + st.metal + " i " + K.ion(g.ion) + "</b>";

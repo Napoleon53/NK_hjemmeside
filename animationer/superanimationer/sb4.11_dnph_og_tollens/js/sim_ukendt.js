@@ -164,8 +164,8 @@
         }
         var f = this.find(), tekst, svar;
         if (f === "syre") tekst = "Hvilken flaske indeholder ethansyre? Klik på flasken eller på bogstavet, og tryk Indsend svar.";
-        else if (f === "sprit") tekst = "Propanon og husholdningssprit viser begge en keton. Hvilken flaske er husholdningssprit?";
-        else tekst = "Ethanal, benzaldehyd og vanillin viser alle et aldehyd. Hvilken flaske er ethanal?";
+        else if (f === "sprit") tekst = "Testene viser en keton i flasken med propanon og i flasken med husholdningssprit. Hvilken flaske indeholder husholdningssprit?";
+        else tekst = "Testene viser et aldehyd i flaskerne med ethanal, benzaldehyd og vanillin. Hvilken flaske indeholder ethanal?";
         svar = this.findValg().map(function (i, j) { return { t: "Flaske " + B[i], valgt: mig.valgt === j, forkert: !!mig.forkert[j] }; });
         return { slags: "spm", chip: "Spørgsmål " + (this.findNr + 1) + " af 3", tekst: tekst, svar: svar };
     };
@@ -293,13 +293,13 @@
             var ud = L + " gav " + K.dnphTekst(r) + " med DNPH";
             if (r.dnph === "lidt") ud += ". Også lidt bundfald viser en carbonylgruppe. ";
             else ud += ", så stoffet har en carbonylgruppe. ";
-            if (k === "aldehyd") return ud + "Sølvspejlet viser, at Tollens' reagens kan oxidere stoffet. Det er et aldehyd.";
-            if (r.dnph === "lidt") return ud + "Uden sølvspejl er det en keton.";
-            return ud + "Uden sølvspejl kan stoffet ikke oxideres af Tollens' reagens. Det er en keton.";
+            if (k === "aldehyd") return ud + "Sølvspejlet viser, at Tollens' reagens kan oxidere stoffet. Stoffet er derfor et aldehyd.";
+            if (r.dnph === "lidt") return ud + "Uden sølvspejl er stoffet en keton.";
+            return ud + "Uden sølvspejl kan stoffet ikke oxideres af Tollens' reagens. Stoffet er derfor en keton.";
         }
         var f = this.find();
         if (f === "syre") return "Flaske " + B[this.flaskeMed("ethansyre")] + " er den eneste uden aldehyd og keton. Ethansyre er en carboxylsyre og reagerer ikke i de to test.";
-        if (f === "sprit") return "Flaske " + B[this.flaskeMed("sprit")] + " gav kun lidt bundfald. Husholdningssprit er mest ethanol, men der er tilsat lidt butanon, så den ikke kan drikkes.";
+        if (f === "sprit") return "Flaske " + B[this.flaskeMed("sprit")] + " gav kun lidt bundfald. Husholdningssprit består mest af ethanol, men der er tilsat lidt butanon, så den ikke kan drikkes.";
         return "Flaske " + B[this.flaskeMed("ethanal")] + " gav gult bundfald. Benzaldehyd og vanillin har begge carbonylgruppen på en benzenring og giver orange bundfald.";
     };
 
@@ -319,7 +319,7 @@
         }
         if (f === "sprit") {
             var jj = this.findValg()[nr];
-            return "Flaske " + B[jj] + " gav meget bundfald. Husholdningssprit er mest ethanol, som ikke reagerer med DNPH.";
+            return "Flaske " + B[jj] + " gav meget bundfald. Husholdningssprit består mest af ethanol, som ikke reagerer med DNPH.";
         }
         var valg = this.findValg(), v = valg[nr], mage = valg.filter(function (i) { return i !== v && i !== mig.flaskeMed("ethanal"); })[0];
         return "Flaske " + B[v] + " gav orange bundfald ligesom flaske " + B[mage] + ". Ethanal er det aldehyd, der skiller sig ud fra de to andre.";
@@ -341,7 +341,7 @@
         }
         var f = this.find();
         if (f === "syre") return ["Ethansyre er en carboxylsyre. Giver en carboxylsyre bundfald med DNPH?", "Find flasken, der hverken gav bundfald med DNPH eller et sølvspejl."];
-        if (f === "sprit") return ["Husholdningssprit er mest ethanol. Ethanol reagerer ikke med DNPH.", "Se på mængden af bundfald i de to glas med DNPH."];
+        if (f === "sprit") return ["Husholdningssprit består mest af ethanol, som ikke reagerer med DNPH.", "Se på mængden af bundfald i de to glas med DNPH."];
         return ["Se på molekylerne nederst på tavlen. Benzaldehyd og vanillin har en benzenring, men det har ethanal ikke.",
             "To af de tre aldehyder gav samme farve bundfald med DNPH. Hvilken flaske skiller sig ud?"];
     };

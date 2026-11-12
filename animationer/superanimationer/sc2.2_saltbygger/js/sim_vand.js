@@ -146,7 +146,7 @@
         } else if (this.art === "reagerer") {
             this.ioner = [];
             this.fase = "tom";
-            this.besked("vand-note", "<b>" + salt.formel + "</b> reagerer med vandet. Det viser denne animation ikke.", "gul");
+            this.besked("vand-note", "<b>" + salt.formel + "</b> reagerer med vandet. Reaktionen vises ikke i denne animation.", "gul");
         } else {
             this.besked("vand-note", this.art === "tung"
                 ? "<b>" + salt.formel + "</b> er tungtopløseligt. Det bliver liggende."
@@ -215,7 +215,7 @@
             return s.formel + " er " + s.p + " " + s.kat.formel + " og " + s.n + " " + s.an.formel + "."
                 + (sam ? " " + D.ionTekst(sam) + " går ikke i stykker." : "");
         }
-        return "Tæl de røde og de blå hver for sig. Formlen viser det mindste forhold.";
+        return "Tæl de røde positive ioner og de blå negative ioner hver for sig. Formlen viser det mindste forhold.";
     };
 
     NK.SimVand.prototype.visHint = function () {

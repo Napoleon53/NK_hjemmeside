@@ -35,7 +35,7 @@
     D.IONER = [
         { id: "Na",   formel: "Na",   q: 1,  navn: "natrium", grundstof: "natrium", gruppe: 1 },
         { id: "K",    formel: "K",    q: 1,  navn: "kalium", grundstof: "kalium", gruppe: 1 },
-        { id: "Ag",   formel: "Ag",   q: 1,  navn: "sølv" },
+        { id: "Ag",   formel: "Ag",   q: 1,  navn: "sølv(I)" },
         { id: "NH4",  formel: "NH₄",  q: 1,  navn: "ammonium", sammensat: true,
           atomer: [["N", 0, 0], ["H", -0.64, -0.64, 0], ["H", 0.64, -0.64, 0], ["H", 0.64, 0.64, 0], ["H", -0.64, 0.64, 0]] },
         { id: "Mg",   formel: "Mg",   q: 2,  navn: "magnesium", grundstof: "magnesium", gruppe: 2 },
@@ -471,16 +471,16 @@
                 s.laeg(med(-v), navn + " er et metal. Metaller afgiver elektroner og bliver positive.");
                 s.laeg(med(-m), navn + " har " + elektroner(v) + " i yderste skal. Det er lettere at afgive "
                     + v + " end at optage " + m + ".");
-                s.laeg(med(v + 1), navn + " har kun " + elektroner(v) + " i yderste skal, så den kan kun afgive " + v + ".");
+                s.laeg(med(v + 1), navn + " har kun " + elektroner(v) + " i yderste skal, så atomet kan kun afgive " + v + ".");
                 hvorfor = navn + " står i hovedgruppe " + ion.gruppe + " og har " + elektroner(v) + " i yderste skal. "
-                    + "Den afgiver " + (v === 1 ? "den" : "dem") + " og bliver " + rigtig + ".";
+                    + "Atomet afgiver " + (v === 1 ? "den" : "dem") + " og bliver til " + rigtig + ".";
             } else {
                 s.laeg(med(v), navn + " har " + elektroner(v) + " i yderste skal. Det er lettere at optage "
                     + m + " end at afgive " + v + ".");
                 s.laeg(med(m), navn + " er et ikke-metal. Ikke-metaller optager elektroner og bliver negative.");
-                s.laeg(med(-v), navn + " optager kun " + m + ". Så har den 8 elektroner i yderste skal.");
+                s.laeg(med(-v), navn + " optager kun " + m + ", og så har atomet 8 elektroner i yderste skal.");
                 hvorfor = navn + " står i hovedgruppe " + ion.gruppe + " og har " + elektroner(v) + " i yderste skal. "
-                    + "Den optager " + m + " og bliver " + rigtig + ".";
+                    + "Atomet optager " + m + " og bliver til " + rigtig + ".";
             }
         } else {
             var a = Math.abs(ion.q), fortegn = ion.q > 0 ? 1 : -1;
@@ -554,7 +554,7 @@
         }
         s.laeg(salt.formel + "(aq)", "Et salt er ikke et molekyle. Når det opløses, går ionerne fra hinanden.");
         if (p > 1 || n > 1) {
-            s.laeg(D.ionLed(kat, 1) + " + " + D.ionLed(an, 1), "Tæl efter: formlen har " + begge + ", og de kommer alle ud i vandet.");
+            s.laeg(D.ionLed(kat, 1) + " + " + D.ionLed(an, 1), "Tæl efter. Formlen har " + begge + ", og de kommer alle ud i vandet.");
         }
         if (p !== n) s.laeg(D.ionLed(kat, n) + " + " + D.ionLed(an, p), "Tallene er byttet om. Formlen har " + begge + ".");
         var sam = D.sammensaetning(an);
@@ -562,10 +562,10 @@
             var foerste = sam[0][0] + (sam[0][1] > 1 ? NK.saenket(sam[0][1]) : "");
             var rest = an.formel.slice(foerste.length);
             s.laeg(kat.formel + foerste + NK.ladningHaevet(kat.q) + "(aq) + " + rest + NK.ladningHaevet(an.q) + "(aq)",
-                "Delt det forkerte sted. " + an.formel + " hører sammen og er én ion: " + D.ionTekst(an) + ".");
+                "Formlen er delt det forkerte sted. " + an.formel + " hører sammen og er én ion: " + D.ionTekst(an) + ".");
         }
         s.laeg(led(p, kat.formel + NK.ladningHaevet(-kat.q)) + "(aq) + " + led(n, an.formel + NK.ladningHaevet(-an.q)) + "(aq)",
-            "Fortegnene er byttet om: " + D.ionTekst(kat) + " er positiv, og " + D.ionTekst(an) + " er negativ.");
+            "Fortegnene er byttet om, for " + D.ionTekst(kat) + " er positiv, og " + D.ionTekst(an) + " er negativ.");
 
         var hvorfor = (p + n === 2 ? "Begge ioner" : "Alle " + (p + n) + " ioner") + " kommer ud i vandet hver for sig: " + begge + ".";
         return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
@@ -578,7 +578,7 @@
         var s = samler(salt.formel);
         if (k > 1) {
             s.laeg(D.formel(kat, an, k * salt.p, k * salt.n),
-                "Det er alle ionerne i glasset. Formlen viser det mindste forhold: " + salt.p + " : " + salt.n + ".");
+                "Den formel tæller alle ionerne i glasset. En formel viser kun det mindste forhold, her " + salt.p + " : " + salt.n + ".");
         }
         D.formelValg(kat, an).forEach(function (v) { if (!v.rigtig) s.laeg(v.tekst, v.forklaring); });
         var hvorfor = "Der er " + salt.p + " " + D.ionTekst(kat) + " for hver " + (salt.n > 1 ? salt.n + " " : "") + D.ionTekst(an) + ".";

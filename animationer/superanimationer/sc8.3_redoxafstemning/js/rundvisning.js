@@ -13,12 +13,12 @@
     var NK = window.NK;
 
     var SPM = { sel: "#skort", titel: "Kortet", tekst: "Kortet øverst siger, hvad trinnet spørger om. Svaret sendes med Indsend svar. Giv et hint giver først et hint og derefter svaret." };
-    var TAVLE = { sel: "#tavle", titel: "Arket", tekst: "Reaktionen, der skal afstemmes. Hvert trin lægger sit eget til: tal over atomerne, klammer ved parrene og tal foran stofferne." };
+    var TAVLE = { sel: "#tavle", titel: "Arket", tekst: "Reaktionen, der skal afstemmes. Hvert trin lægger sit eget til: tal over atomerne, klammer over og under skemaet og tal foran stofferne." };
     var TASTER = { sel: "#taster", titel: "Tasterne", tekst: "Klik på et felt, og vælg tallet her. Du kan også skrive på tastaturet." };
     var OPGAVE = { sel: "#opgavekort", titel: "Trinene", tekst: "De samme syv trin hver gang. Det blå trin er det, du er nået til." };
     var LISTE = { sel: "#listekort", titel: "Reaktionerne", tekst: "Alle reaktioner på denne sværhedsgrad. Grøn er løst, gul betyder, at svaret blev vist." };
-    var VAEGT = { sel: "#vaegtknap", titel: "Elektronvægten", tekst: "Slå vægten til, hvis du vil se elektronerne blive vejet. Den står lige, når der afgives lige så mange, som der optages." };
-    var NIVEAU = { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Let har ingen reaktioner med oxygen. Middel foregår i surt miljø. Svær har basisk miljø, H⁺ efter pilen og grundstoffer, der både oxideres og reduceres." };
+    var VAEGT = { sel: "#vaegtknap", titel: "Elektronvægten", tekst: "Slå vægten til, hvis du vil se elektronerne blive vejet. Den står lige, når der afgives lige så mange elektroner, som der optages." };
+    var NIVEAU = { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Let har ingen stoffer med oxygen. Middel foregår i surt miljø. Svær har basisk miljø, H⁺ efter pilen og grundstoffer, der både oxideres og reduceres." };
 
     /* Et trin, der ikke kan ses lige nu (tasterne i trin 2, en tom
        kontrol), springes over. */

@@ -165,7 +165,7 @@
             ctx.font = font("italic 400", 12);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText("Kurverne tegnes, når der løber sølvnitrat ned.", (r.l + r.r) / 2, (r.t + r.b) / 2 + 8);
+            ctx.fillText("Kurverne tegnes, når der løber sølv(I)nitrat ned.", (r.l + r.r) / 2, (r.t + r.b) / 2 + 8);
         }
 
         /* Aflaesning af et punkt under musen */

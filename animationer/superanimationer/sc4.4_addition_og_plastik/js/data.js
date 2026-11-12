@@ -56,7 +56,7 @@
             id: "brom", navn: "Dibrom på ethen",
             opstil: { stof: "ethen" },
             gaet: {
-                intro: "Ethen har en dobbeltbinding. Om lidt trækker du et dibrommolekyle, Br₂, hen til den.",
+                intro: "Ethen har en dobbeltbinding. Om lidt trækker du et dibrommolekyle, Br₂, hen til dobbeltbindingen.",
                 tekst: "Hvor mange stoffer bliver der dannet af ethen og dibrom?",
                 svar: [
                     { t: "Ét stof", ok: true },
@@ -69,7 +69,7 @@
                 krav: "Br2",
                 hint: traekHint("dibrommolekylet", "Br₂", "til venstre", "de to streger mellem carbonatomerne i ethen")
             },
-            loest: "Dobbeltbindingen i ethen åbnede sig, og et bromatom satte sig på hvert carbonatom. Der blev kun ét stof: 1,2-dibromethan. Det er en addition."
+            loest: "Dobbeltbindingen i ethen åbnede sig, og et bromatom satte sig på hvert carbonatom. Der blev kun ét stof: 1,2-dibromethan. Reaktionen kaldes en addition."
         },
         {
             id: "bindinger", navn: "Fire bindinger",
@@ -124,7 +124,7 @@
                 ],
                 hint: [
                     "Et stof er mættet, når der ikke er plads til flere hydrogenatomer.",
-                    "Se på ethan midt i scenen: er der en dobbeltbinding tilbage?",
+                    "Se på ethan midt i scenen. Er der en dobbeltbinding tilbage?",
                     "Ethan har kun enkeltbindinger. Ethan er mættet."
                 ]
             },
@@ -142,7 +142,7 @@
                 om: ["mol"],
                 tekst: "Vandmolekylet delte sig i to dele, som satte sig på ethen. Hvilke to dele?",
                 svar: [
-                    { t: "H₂ og O", f: "Se på produktet af ethen og vand: på det ene carbonatom sidder et O med et H på." },
+                    { t: "H₂ og O", f: "Se på produktet af ethen og vand. På det ene carbonatom sidder et O med et H på." },
                     { t: "H og OH", ok: true },
                     { t: "H, H og O hver for sig", f: "Dobbeltbindingen i ethen gav kun to ledige pladser, én på hvert carbonatom." }
                 ],
@@ -191,7 +191,7 @@
                 tekst: "Propen er C₃H₆, og dibrom er Br₂. Hvad er formlen for produktet af propen og dibrom?",
                 svar: [
                     { t: "C₃H₆Br₂", ok: true },
-                    { t: "C₃H₅Br", f: "Så skulle der også dannes HBr. I en addition bliver intet tilovers: læg atomerne sammen." },
+                    { t: "C₃H₅Br", f: "Med den formel skulle der også dannes HBr. I en addition bliver intet tilovers, så læg atomerne sammen." },
                     { t: "C₃H₈Br₂", f: "Tæl hydrogenatomerne i propen. Der kommer ingen nye hydrogenatomer, kun to bromatomer." }
                 ],
                 hint: [
@@ -215,7 +215,7 @@
 
     /* Eleven brugte et andet molekyle end det, opgaven beder om */
     D.andet = function (brugt, produkt, bedt, stof) {
-        return "Det var " + brugt + ", og produktet er " + produkt + ". Tryk på Nyt molekyle, og træk " + bedt + "molekylet hen til " + stof + ".";
+        return "Du brugte " + brugt + ", og produktet er " + produkt + ". Tryk på Nyt molekyle, og træk " + bedt + "molekylet hen til " + stof + ".";
     };
 
     /* ----- Fane 2: Bromvand ---------------------------------------------------------
@@ -246,17 +246,17 @@
         {
             id: "a", navn: "Glas A", glas: 0,
             forsoeg: {
-                tekst: "Fem glas med et farveløst carbonhydrid over orange bromvand. Klik på glas A for at ryste det.",
+                tekst: "Fem glas har et farveløst carbonhydrid over orange bromvand. Klik på glas A for at ryste det.",
                 set: setTekst("A", "forsvandt"),
                 hint: rystHint("A", "længst til venstre")
             },
             spm: {
                 om: [0],
-                tekst: "Glas A: den orange farve fra dibrom, Br₂, er væk. Hvor er dibrommet blevet af?",
+                tekst: "I glas A er den orange farve fra dibrom, Br₂, væk. Hvor er dibrommet blevet af?",
                 svar: [
                     { t: "Dibrom har reageret med stoffet", ok: true },
                     { t: "Dibrom er flyttet op i øverste lag",
-                      f: "Så ville det øverste lag i glas A være orange. Begge lag i glas A er farveløse." },
+                      f: "Hvis dibrom var flyttet op, ville det øverste lag i glas A være orange. Begge lag i glas A er farveløse." },
                     { t: "Dibrom er fordampet fra glasset",
                       f: "Der er prop i glas A, så intet kan slippe ud." }
                 ],
@@ -280,7 +280,7 @@
                     "Dibrom lavede en addition i glas A, så stoffet har en dobbeltbinding. Det er umættet."
                 ]
             },
-            loest: "Glas A er hex-1-en, C₆H₁₂, en alken. Dibrom satte sig på dobbeltbindingen: C₆H₁₂ + Br₂ → C₆H₁₂Br₂. Luppen viser det øverste lag i glas A."
+            loest: "Glas A indeholder hex-1-en, C₆H₁₂, som er en alken. Dibrom satte sig på dobbeltbindingen: C₆H₁₂ + Br₂ → C₆H₁₂Br₂. Luppen viser det øverste lag i glas A."
         },
         {
             id: "b", navn: "Glas B", glas: 1,
@@ -291,7 +291,7 @@
             },
             spm: {
                 om: [1],
-                tekst: "Glas B: farven er flyttet op i det øverste lag. Har dibrom reageret med stoffet i glas B?",
+                tekst: "I glas B er farven flyttet op i det øverste lag. Har dibrom reageret med stoffet i glas B?",
                 svar: [
                     { t: "Ja, nederste lag er farveløst",
                       f: "Farven er der stadig. Den er flyttet op i carbonhydridet i glas B, så dibrommet er ikke brugt." },
@@ -311,7 +311,7 @@
                 tekst: "Dibrom reagerede ikke med stoffet i glas B. Er stoffet i glas B mættet eller umættet?",
                 svar: [
                     { t: "Stoffet er mættet", ok: true },
-                    { t: "Stoffet er umættet", f: "Dibrom sætter sig på en dobbeltbinding. Så ville farven i glas B være forsvundet." }
+                    { t: "Stoffet er umættet", f: "Hvis stoffet havde en dobbeltbinding, ville dibrom sætte sig på den, og farven i glas B ville være forsvundet." }
                 ],
                 hint: [
                     "Dibrom sætter sig på en dobbeltbinding. Skete det i glas B?",
@@ -319,7 +319,7 @@
                     "Stoffet i glas B har ingen dobbeltbinding. Det er mættet."
                 ]
             },
-            loest: "Glas B er hexan, C₆H₁₄, en alkan. En alkan har ingen dobbeltbinding, som dibrom kan sætte sig på, så farven forsvinder ikke."
+            loest: "Glas B indeholder hexan, C₆H₁₄, som er en alkan. En alkan har ingen dobbeltbinding, som dibrom kan sætte sig på, så farven forsvinder ikke."
         },
         {
             id: "c", navn: "Glas C", glas: 2,
@@ -330,7 +330,7 @@
             },
             spm: {
                 om: [2],
-                tekst: "Glas C: den orange farve er væk. Er stoffet i glas C mættet eller umættet?",
+                tekst: "I glas C er den orange farve væk. Er stoffet i glas C mættet eller umættet?",
                 svar: [
                     { t: "Stoffet er mættet", f: "I glas B med et mættet stof flyttede farven op. Hvad skete der med farven i glas C?" },
                     { t: "Det kan man ikke se på farven", f: "Farven i glas C forsvandt, så dibrom har reageret. Det sker kun med en dobbeltbinding." },
@@ -342,7 +342,7 @@
                     "Dibrom lavede en addition i glas C, så stoffet har en dobbeltbinding. Det er umættet."
                 ]
             },
-            loest: "Glas C er cyclohexen, C₆H₁₀: en ring med én dobbeltbinding. Dibrom sætter sig på dobbeltbindingen, også i en ring."
+            loest: "Glas C indeholder cyclohexen, C₆H₁₀, som er en ring med én dobbeltbinding. Dibrom sætter sig på dobbeltbindingen, også i en ring."
         },
         {
             id: "d", navn: "Glas D", glas: 3, kendt: true,
@@ -364,7 +364,7 @@
             },
             spm: {
                 om: [3],
-                tekst: "Cyclohexan i glas D er C₆H₁₂ ligesom hex-1-en. Hvorfor affarver cyclohexan ikke bromvand?",
+                tekst: "Cyclohexan i glas D har formlen C₆H₁₂ ligesom hex-1-en. Hvorfor affarver cyclohexan ikke bromvand?",
                 svar: [
                     { t: "Ingen dobbeltbinding i cyclohexan", ok: true },
                     { t: "For få hydrogenatomer",
@@ -406,7 +406,7 @@
 
     /* Et klik paa et glas, opgaven ikke handler om */
     D.andetGlas = function (b, opgaveB, navn, hvad) {
-        if (navn) return "Glas " + b + " er " + navn + ". " + hvad + " Denne opgave handler om glas " + opgaveB + ".";
+        if (navn) return "Glas " + b + " indeholder " + navn + ". " + hvad + " Denne opgave handler om glas " + opgaveB + ".";
         return "Glas " + b + " hører til en anden opgave. Denne opgave handler om glas " + opgaveB + ".";
     };
 
@@ -416,8 +416,8 @@
 
     D.lupBrom = "Et dibrommolekyle, Br₂. Det er dibrom, der giver den orange farve.";
     D.lupStof = function (v, reageret) {
-        if (reageret) return "Et molekyle " + v.produkt + ", " + v.pFormel + ". Dobbeltbindingen har åbnet sig, og der sidder et bromatom på hvert af de to carbonatomer.";
-        return "Et molekyle " + v.navn + ", " + v.formel + ". Hvert hjørne og hver ende i tegningen er et carbonatom.";
+        if (reageret) return "Et molekyle af " + v.produkt + ", " + v.pFormel + ". Dobbeltbindingen har åbnet sig, og der sidder et bromatom på hvert af de to carbonatomer.";
+        return "Et molekyle af " + v.navn + ", " + v.formel + ". Hvert hjørne og hver ende i tegningen er et carbonatom.";
     };
 
     /* ----- Fane 3: Plastik -------------------------------------------------------------
@@ -441,7 +441,7 @@
                 tekst: "To ethenmolekyler har sat sig sammen. Hvad skete der med deres dobbeltbindinger?",
                 svar: [
                     { t: "De er der stadig",
-                      f: "Se på kæden af de to ethenmolekyler: der er kun én streg mellem hvert par af carbonatomer." },
+                      f: "Se på kæden af de to ethenmolekyler. Der er kun én streg mellem hvert par af carbonatomer." },
                     { t: "De åbnede sig og bandt dem sammen", ok: true },
                     { t: "De blev til hydrogenatomer",
                       f: "Tæl hydrogenatomerne i kæden. Hvert carbonatom har to, præcis som i ethen." }
@@ -463,7 +463,7 @@
                 hint: [
                     "Kæden har en ledig plads i hver ende: de gule, stiplede cirkler.",
                     "Træk et ethenmolekyle hen til en af kædens ender, og slip.",
-                    "Et klik på et ethenmolekyle sætter det på kæden. Bliv ved, til kæden er lavet af 6."
+                    "Et klik på et ethenmolekyle sætter det på kæden. Bliv ved, til kæden er lavet af 6 ethenmolekyler."
                 ]
             },
             spm: {
@@ -476,7 +476,7 @@
                 ],
                 hint: [
                     "Ét ethenmolekyle har 2 carbonatomer og 4 hydrogenatomer.",
-                    "Gang med 6. Intet er blevet tilovers, og intet er kommet til.",
+                    "Gang begge tal med 6. Intet er blevet tilovers, og intet er kommet til.",
                     "6 · 2 = 12 og 6 · 4 = 24."
                 ]
             },
@@ -491,7 +491,7 @@
                 set: "Den lange streg er én kæde i polyethen. Det lille gule stykke er kæden på 6 ethenmolekyler.",
                 hint: [
                     "Den grønne knap Zoom ud står til venstre under kortet.",
-                    "Zoomet ud viser scenen en hel kæde. Kæden på 6 er det lille gule stykke.",
+                    "Zoomet ud viser scenen en hel kæde. Kæden på 6 ethenmolekyler er det lille gule stykke.",
                     "Tryk på Zoom ud, og vent, til billedet står stille."
                 ]
             },
@@ -539,7 +539,7 @@
             opstil: { led: 6 },
             spm: {
                 om: ["kaede"],
-                tekst: "Polyethen er for lang til at tegne. Man tegner det udsnit, der gentager sig. Hvilket udsnit?",
+                tekst: "En kæde i polyethen er for lang til at tegne. Man tegner det udsnit, der gentager sig. Hvilket udsnit?",
                 svar: [
                     { t: "−CH=CH−", f: "Dobbeltbindingerne åbnede sig, da ethenmolekylerne satte sig sammen. Kæden har kun enkeltbindinger." },
                     { t: "−CH₂−CH₂−", ok: true },

@@ -73,7 +73,7 @@
        Grupperne staar paa kuglerne, saa de staar ikke ogsaa paa kortet. */
     P.promptHTML = function () {
         var o = this.o, navn = D.navn(this.m);
-        navn = navn.charAt(0).toUpperCase() + navn.slice(1) + ". ";
+        navn = "Til venstre står " + navn + ". ";
         if (o.byt && !this.byttet) {
             return NK.html(navn + (this.bytValgt === null ? "Klik på to af grupperne til venstre, så de bytter plads." :
                 "Klik på den gruppe, " + D.tekst(this.grupper[this.bytValgt]) + " skal bytte plads med.") +
@@ -114,7 +114,7 @@
     P.hintTrin = function () {
         var o = this.o, g = this.m.g;
         if (o.byt && !this.byttet) return [
-            "Klik på to af grupperne til venstre, fx Cl og F. Så bytter de plads.",
+            "Klik på to af grupperne til venstre, for eksempel Cl og F. Så bytter de plads.",
             "Når to grupper har byttet plads, er molekylet blevet til sit spejlbillede.",
             "Klik på Cl og så på F, og drej bagefter molekylet, til alle fire passer."
         ];
@@ -190,8 +190,8 @@
 
     P.slutTekst = function () {
         return {
-            s1: "Bromchlormethan har to H og passer med sit spejlbillede. Det er det samme molekyle, og det er ikke kiralt.",
-            s3: "Et bytte af to grupper gav spejlbilledet. Molekylet til venstre er nu den anden enantiomer.",
+            s1: "Bromchlormethan har to H og passer med sit spejlbillede. Spejlbilledet er det samme molekyle, og bromchlormethan er ikke kiralt.",
+            s3: "Et bytte af to grupper gav spejlbilledet. Molekylet til venstre er nu den anden spejlbilledisomer.",
             s4: "Propan-2-ol har to CH₃ og passer med sit spejlbillede. Det er ikke kiralt."
         }[this.o.id] || "Molekylet passer med sit spejlbillede.";
     };
@@ -202,14 +202,14 @@
         if (!o.kan) {
             this.umuligKnap.classList.add("rigtig");
             this.loest({
-                s2: "To grupper kan komme til at passe, men så har de to andre byttet plads. Molekylet og spejlbilledet er to forskellige stoffer. De kaldes enantiomerer.",
-                s5: "Butan-2-ol har fire forskellige grupper: OH, CH₂CH₃, CH₃ og H. Det midterste C-atom er asymmetrisk, og der findes to enantiomerer.",
-                s6: "Alanin har fire forskellige grupper på det midterste C-atom. Aminosyrer findes i to enantiomerer, og kroppen bruger kun den ene."
+                s2: "To grupper kan komme til at passe, men så har de to andre byttet plads. Molekylet og spejlbilledet hører til to forskellige stoffer, som kaldes spejlbilledisomerer.",
+                s5: "Butan-2-ol har fire forskellige grupper: OH, CH₂CH₃, CH₃ og H. Det midterste C-atom er asymmetrisk, og butan-2-ol findes som to spejlbilledisomerer.",
+                s6: "Alanin har fire forskellige grupper på det midterste C-atom. Aminosyrer findes i to spejlbilledformer, og kroppen bruger kun den ene."
             }[o.id]);
             return;
         }
         this.umuligKnap.classList.add("forkert");
-        if (o.byt && !this.byttet) this.fejlLinje("Byt først to af grupperne. Så kan det godt lade sig gøre.");
+        if (o.byt && !this.byttet) this.fejlLinje("Byt først to af grupperne. Derefter kan molekylet drejes, så det passer med spejlbilledet.");
         else this.fejlLinje("Det kan godt lade sig gøre. " + (o.byt ? "Efter byttet er molekylet spejlbilledet. Drej, til alle fire passer." :
             "Molekylet har to ens grupper. Drej, til de to andre passer."));
         void vist;
@@ -286,7 +286,7 @@
     P.klikPaa = function (pt) {
         var k = R.ramt(this.venstre(), this.kamV(), pt);
         if (!k) return;
-        if (k.i < 0) { this.kortBesked("Det midterste C-atom. Det har fire grupper.", 3); return; }
+        if (k.i < 0) { this.kortBesked("Det midterste C-atom har fire grupper.", 3); return; }
         if (this.o.byt && !this.byttet) {
             if (this.bytValgt === null) { this.bytValgt = k.i; this.naesteLinje("", ""); return; }
             if (this.bytValgt === k.i) { this.bytValgt = null; this.naesteLinje("", ""); return; }
@@ -294,7 +294,7 @@
             this.naesteLinje("", "");
             return;
         }
-        this.kortBesked(D.tekst(this.grupper[k.i]) + ". Træk for at dreje molekylet.", 3);
+        this.kortBesked("Du har klikket på " + D.tekst(this.grupper[k.i]) + ". Træk for at dreje molekylet.", 3);
     };
 
     P.klikScene = function (pt) {

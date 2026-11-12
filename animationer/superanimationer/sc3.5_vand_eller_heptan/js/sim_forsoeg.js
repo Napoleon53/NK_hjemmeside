@@ -468,8 +468,8 @@
         var s = D.stof(this.stof), g = this.glas;
         var redskab = this.redskabNavn();
         if (this.pip.tilstand === "traek") {
-            return this.over >= 0 ? "Slip, så " + (s.tilstand === "fast" ? "kommer stoffet" : "drypper den") + " ned i " + glasNavn(D.OPL[this.over]) + "."
-                                  : "Hen over et af glassene.";
+            return this.over >= 0 ? "Slip, så " + (s.tilstand === "fast" ? "kommer stoffet" : "drypper stoffet") + " ned i " + glasNavn(D.OPL[this.over]) + "."
+                                  : "Træk " + redskab + " hen over et af glassene.";
         }
         var i;
         for (i = 0; i < 2; i++) {
@@ -479,7 +479,7 @@
             if (g[i].portioner > 0 && !g[i].rystet && !g[i].optaget()) return "<b>Klik på " + glasNavn(g[i].opl) + "</b> for at ryste det.";
         }
         for (i = 0; i < 2; i++) {
-            if (g[i].optaget() || (g[i].rystet && !g[i].resultat)) return "Vent, til det har lagt sig.";
+            if (g[i].optaget() || (g[i].rystet && !g[i].resultat)) return "Vent, til indholdet i glasset har lagt sig.";
         }
         for (i = 0; i < 2; i++) {
             if (g[i].resultat && !g[1 - i].resultat) {

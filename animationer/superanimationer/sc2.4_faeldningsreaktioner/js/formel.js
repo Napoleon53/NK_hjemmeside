@@ -295,7 +295,7 @@
         var o = ktx.o, alle = o.ioner;
         var rigtigSkrevet = forkertStort(tekst, alle.map(function (i) { return i.formel; })
             .concat([o.A.formel, o.B.formel]).concat(o.P ? [o.P.formel] : []));
-        if (rigtigSkrevet) return svar(false, "Store og små bogstaver: skriv " + rigtigSkrevet + ".");
+        if (rigtigSkrevet) return svar(false, "Tjek store og små bogstaver. Skriv " + rigtigSkrevet + ".");
         if (r.fejl) return svar(false, r.tekst);
 
         var i, ion, S;
@@ -325,7 +325,7 @@
             if (r.koef !== null && !ktx.skema) {
                 var antal = ion === S.kat ? S.p : S.n;
                 if (r.koef !== antal) {
-                    return svar(false, "Tallet foran passer ikke. Skriv bare ionen uden tal foran.");
+                    return svar(false, "Tallet foran passer ikke. Skriv kun ionen uden tal foran.");
                 }
             }
             return svar(true, "", { ion: ion });
@@ -350,9 +350,9 @@
         }
         if (r.krop === o.A.ascii || r.krop === o.B.ascii) {
             return svar(false, ktx.skema ? "Skriv ionerne hver for sig. Ionskemaet har kun de ioner, der danner bundfaldet."
-                : "Det er hele saltet. Del det op i den positive og den negative ion.");
+                : "Du har skrevet hele saltet. Del det op i den positive og den negative ion.");
         }
-        if (o.P && r.krop === o.P.ascii) return svar(false, "Det er bundfaldet. Det skal stå efter pilen.");
+        if (o.P && r.krop === o.P.ascii) return svar(false, "Du har skrevet bundfaldet, og det skal stå efter pilen.");
         for (i = 0; i < ktx.forventet.length; i++) {
             ion = ktx.forventet[i];
             S = ktx.salt || D.saltMed(o, ion);
@@ -386,7 +386,7 @@
         if (r.tom) return svar(false, "Feltet er tomt.");
         var katalog = D.formelKatalog(P);
         var rigtigSkrevet = forkertStort(tekst, [P.formel].concat(o.bliver.map(function (s) { return s.formel; })));
-        if (rigtigSkrevet) return svar(false, "Store og små bogstaver: skriv " + rigtigSkrevet + ".");
+        if (rigtigSkrevet) return svar(false, "Tjek store og små bogstaver. Skriv " + rigtigSkrevet + ".");
         if (r.fejl === "ladningInde" || (r.fejl === "fortegn" && r.ladning !== null)) {
             return svar(false, "Et salt er neutralt, så ladningerne skrives ikke i formlen.");
         }
@@ -436,7 +436,7 @@
             return svar(false, (kP > 1 ? kP + " " : "") + P.formel + " indeholder " + (kP * P.p) + " " + katT + " og "
                 + (kP * P.n) + " " + anT + ". Til venstre står der " + kKat + " " + katT + " og " + kAn + " " + anT + ".", { koef: true });
         }
-        if (kP > 1) return svar(false, "Skemaet passer, men tallene kan forkortes. Brug de mindste hele tal.", { koef: true });
+        if (kP > 1) return svar(false, "Ionskemaet passer, men tallene kan forkortes. Brug de mindste hele tal.", { koef: true });
         var mangler = [], forkert = [];
         for (i = 0; i < 3; i++) {
             if (!tilst[i]) mangler.push(i);

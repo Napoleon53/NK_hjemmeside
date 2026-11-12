@@ -25,42 +25,42 @@ window.NK = NK;
 
     NK.FORKLARING = {
         /* B6.1 Syre-basereaktioner */
-        "hydron": "Ionen H⁺, som kun er en proton, fordi atomet har mistet sin elektron. Syrer afgiver den, og baser optager den.",
+        "hydron": "Ionen H⁺, som kun består af en proton, fordi H-atomet har afgivet sin elektron. Syrer afgiver den, og baser optager den.",
         "syre": "Stof, der kan afgive en hydron, for eksempel HCl.",
         "base": "Stof, der kan optage en hydron, for eksempel NH₃.",
-        "syre-basereaktion": "En hydron flytter fra det stof, der afgiver den, til det stof, der optager den.",
-        "korresponderende syre-basepar": "To stoffer med præcis én hydron til forskel, for eksempel NH₄⁺ og NH₃. Det ene bliver til det andet ved at afgive hydronen.",
+        "syre-basereaktion": "Overførsel af en hydron fra det stof, der afgiver den, til det stof, der optager den.",
+        "korresponderende syre-basepar": "To partikler, der adskiller sig med præcis én hydron, for eksempel NH₄⁺ og NH₃. Den ene bliver til den anden ved at afgive en hydron.",
         "amfolyt": "Stof, der både kan afgive og optage en hydron. Vand er det vigtigste eksempel.",
         "monohydron": "Siges om en syre, der kun kan afgive én H⁺. Det gælder saltsyre, salpetersyre og ethansyre.",
         "polyhydron": "Siges om en syre, der kan afgive flere H⁺, én ad gangen. Svovlsyre og phosphorsyre er eksempler.",
         /* B6.2 Vands selvionisering og pH */
         "vands selvionisering": "To H₂O-molekyler reagerer med hinanden, så det ene afgiver en hydron til det andet. Der dannes en oxoniumion og en hydroxidion.",
-        "vands ionprodukt": "Koncentrationen af oxonium ganget med koncentrationen af hydroxid. Konstanten hedder Kv og er 1,0 · 10⁻¹⁴ M² ved 25 °C.",
+        "vands ionprodukt": "Koncentrationen af oxoniumioner ganget med koncentrationen af hydroxidioner. Konstanten har symbolet Kv og er 1,0 · 10⁻¹⁴ M² ved 25 °C.",
         "pH": "Minus logaritmen til koncentrationen af oxoniumioner. Rent vand har værdien 7,00 ved 25 °C.",
-        "pOH": "Minus logaritmen til koncentrationen af hydroxidioner. Lagt sammen med pH giver den 14,00 ved 25 °C.",
+        "pOH": "Minus logaritmen til koncentrationen af hydroxidioner. Summen af den og pH er 14,00 ved 25 °C.",
         /* B6.3 Syrestyrke */
-        "syrestyrkekonstant": "Tallet Ks, der fås, når ligevægtsloven bruges på et stof, der afgiver en hydron til vand. Jo større tallet er, jo længere ligger ligevægten mod højre.",
+        "syrestyrkekonstant": "Størrelsen Ks fra ligevægtsloven for et stof, der afgiver en hydron til vand. Jo større Ks er, jo længere ligger ligevægten mod højre.",
         "syrestyrkeeksponent": "Tallet pKs, som er minus logaritmen til Ks. Jo lavere det er, jo lettere afgiver stoffet sin hydron.",
-        "stærk syre": "Har pKs under 0 og reagerer fuldstændigt med vand, så der ingen hele molekyler er tilbage. HCl er et eksempel.",
-        "svag syre": "Har pKs mellem 4 og 10. Kun en lille del af molekylerne har afgivet deres hydron, og reaktionen med vand er en ligevægt.",
+        "stærk syre": "Har pKs under 0 og reagerer fuldstændigt med vand, så alle molekyler afgiver en hydron. HCl er et eksempel.",
+        "svag syre": "Har pKs mellem 4 og 10. Typisk har kun en lille del af molekylerne afgivet deres hydron, og reaktionen med vand er en ligevægt.",
         "middelstærk syre": "Har pKs mellem 0 og 4. Hydrogenfluorid, HF, er et eksempel.",
         "formel koncentration": "Stofmængden pr. liter af en syre, hvis ingen molekyler havde reageret. Det er tallet på flasken, og symbolet er cs.",
         "aktuel koncentration": "Stofmængden pr. liter af de syremolekyler, der faktisk er i opløsningen ved ligevægt. Skrives [S].",
-        "omdannelsesgrad": "Den brøkdel af en syre, der har afgivet sin hydron. Symbolet er α, og tallet stiger, når opløsningen fortyndes.",
+        "omdannelsesgrad": "Den brøkdel af en syre, der har afgivet sin hydron. Symbolet er α, og brøkdelen stiger, når opløsningen fortyndes.",
         /* B6.4 Basestyrke */
-        "basestyrkekonstant": "Tallet Kb, der fås, når ligevægtsloven bruges på et stof, der optager en hydron fra vand. Jo større tallet er, jo flere hydroxidioner dannes der.",
-        "basestyrkeeksponent": "Tallet pKb, som er minus logaritmen til Kb. Lagt sammen med pKs for den korresponderende syre giver det 14,00.",
+        "basestyrkekonstant": "Størrelsen Kb fra ligevægtsloven for et stof, der optager en hydron fra vand. Jo større Kb er, jo flere hydroxidioner dannes der.",
+        "basestyrkeeksponent": "Tallet pKb, som er minus logaritmen til Kb. Summen af pKb og pKs for den korresponderende syre er 14,00.",
         "stærk base": "Har pKb under 0. Den vigtigste er hydroxidionen, OH⁻, som findes i natriumhydroxid og kaliumhydroxid.",
         /* B6.7 Puffersystemer */
-        "puffersystem": "Opløsning med en svag syre og dens korresponderende base i mængder, der ligner hinanden. pH ændrer sig næsten ikke, når der tilsættes lidt syre eller base.",
-        "pufferligningen": "Formel til at beregne pH, når der både er en svag syre og dens korresponderende base. pH er pKs plus logaritmen til forholdet mellem base og syre.",
+        "puffersystem": "Opløsning med en svag syre og dens korresponderende base i omtrent lige store stofmængder. pH ændrer sig næsten ikke, når der tilsættes lidt syre eller base.",
+        "pufferligningen": "Formel til at beregne pH, når der både er en svag syre og dens korresponderende base. pH er pKs plus logaritmen til forholdet mellem stofmængderne af base og syre.",
         /* B6.8 Titrering af en svag syre */
-        "titrering": "Metode, hvor en opløsning med kendt koncentration tilsættes fra en burette. Der stoppes, når stoffet i kolben netop er brugt op.",
-        "ækvivalenspunkt": "Stedet på kurven, hvor tilsat base og syre har samme stofmængde. Det ligger midt på det lodrette spring.",
-        "titrerkurve": "Graf, der viser pH, mens der dryppes base ned i kolben. For en svag syre har den fire dele og et lodret spring.",
-        "halvækvivalenspunkt": "Her er der tilsat 50 % af den base, der skal til for at bruge al syren. pH er lig med syrens pKs.",
-        "indikator": "Svag syre, hvor syren og dens korresponderende base har hver sin farve. Phenolphthalein og methylrødt er eksempler.",
-        "omslagsområde": "Det pH-interval, hvor en indikator skifter farve. Det skal ligge inde i kurvens lodrette spring."
+        "titrering": "Metode, hvor en opløsning med kendt koncentration tilsættes fra en burette. Tilsætningen stoppes, når stoffet i kolben netop har reageret fuldstændigt.",
+        "ækvivalenspunkt": "Stedet på titrerkurven, hvor tilsat base og syren i kolben har samme stofmængde. Det ligger midt på det lodrette spring.",
+        "titrerkurve": "Graf over pH som funktion af rumfanget af tilsat base. For en svag syre har den fire dele og et lodret spring.",
+        "halvækvivalenspunkt": "Her er der tilsat halvdelen af den stofmængde base, der kræves for at omdanne al syren. pH er lig med syrens pKs.",
+        "indikator": "Svag syre, hvor syreformen og baseformen har hver sin farve. Phenolphthalein og methylrødt er eksempler.",
+        "omslagsområde": "Det pH-interval, hvor en indikator skifter farve. Ved en titrering skal det ligge inden for titrerkurvens lodrette spring."
     };
 
     /* Afsnittenes numre: B6.5 og B6.6 har ingen fagord */

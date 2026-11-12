@@ -219,7 +219,7 @@
         if (pr) hvad += " " + D.stor(fra) + " bliver oxideret til " + pr.navn + (D.KLASSER[pr.klasse] ? ", " + D.KLASSER[pr.klasse].ental : "") + ".";
         if (this.fase === "anim") return { slags: "opgave", chip: "Oxidation", tekst: hvad };
         return {
-            slags: "opgave", chip: "Oxidation", tekst: hvad + " Tryk på knappen, og se det ske.",
+            slags: "opgave", chip: "Oxidation", tekst: hvad + " Tryk på Oxidér, og se oxidationen.",
             ekstra: '<div class="sk-handling"><button type="button" class="knap blaa" data-handling="oxider">Oxidér ' + NK.html(navn) + "</button></div>"
         };
     };
@@ -338,7 +338,7 @@
         var tekst = (foran ? foran + " " : "") + "Carbonatomet med " + (t.length > 1 ? "den funktionelle gruppe" : "OH-gruppen") + " har ingen hydrogenatomer, så " + navn +
             (t.length > 1 ? " kan ikke oxideres videre." : " kan ikke oxideres.");
         if (t.length > 1) {
-            tekst += " Oxidationstallet steg fra " + t.map(function (x) { return D.rom(x.ox); }).join(" til ") + ", altså 2 ved hver oxidation.";
+            tekst += " Oxidationstallet steg fra " + t.map(function (x) { return D.rom(x.ox); }).join(" til ") + ", en stigning på 2 ved hver oxidation.";
         }
         tekst += " " + { primaer: "En primær alkohol kan oxideres to gange.", sekundaer: "En sekundær alkohol kan oxideres én gang.",
             tertiaer: "En tertiær alkohol kan ikke oxideres." }[this.serie.type];

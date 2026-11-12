@@ -18,10 +18,10 @@
         "fane-ug": [
             { sel: "#ug-anker-bord", titel: "Urglasset", tekst: "Urglasset er tomt. Træk flaskerne med kaliumpermanganat og natriumhydroxid hen over glasset, og dryp så natriumsulfit i. Til sidst skal der svovlsyre i." },
             { sel: "#ug-skort", titel: "Kortet", tekst: "Kortet øverst siger det næste skridt. Skriv i hæftet, og tryk Indsend svar. Et rigtigt svar får en kort forklaring på kortet, og Næste trin fører videre." },
-            { sel: "#ug-haefte", titel: "Hæftet", tekst: "Her afstemmer du, som du ville gøre i hånden: oxidationstal over atomerne og klammer under skemaet med ↑ og ↓ under pilen." },
+            { sel: "#ug-haefte", titel: "Hæftet", tekst: "Her afstemmer du, som du ville gøre i hånden: oxidationstal over atomerne og klammer under skemaet med ↑ og ↓ under reaktionspilen." },
             { sel: "#ug-knap", titel: "Giv et hint", tekst: "Sidder du fast, så tryk Giv et hint på kortet. Et tryk mere viser svaret. Læs mere åbner en grundig forklaring. Når skemaet er afstemt, står Næste opgave på kortet." },
-            { sel: "#ug-anker-lup", titel: "Luppen", tekst: "Når du skriver gangetallene, viser luppen elektronerne. Går de op, flytter elektronerne over." },
-            { sel: "#ug-kort", titel: "Bidderne", tekst: "Her står reaktionen og de bidder, du har klaret. Start forfra giver den samme reaktion med et frisk glas og et tomt hæfte." },
+            { sel: "#ug-anker-lup", titel: "Luppen", tekst: "Når du skriver gangetallene, viser luppen elektronerne. Når gangetallene er rigtige, overføres elektronerne." },
+            { sel: "#ug-kort", titel: "Trinene", tekst: "Her står reaktionen og de trin, du har klaret. Start forfra giver den samme reaktion med et frisk glas og et tomt hæfte." },
             { sel: "#ug-farvekortet", titel: "Farvekortet", tekst: "Farven viser, hvad mangan er blevet til. Navnet står ved formlen, og oxidationstallet kommer på, når du har fundet det." },
             { sel: "#ug-opgaver", titel: "Reaktionerne", tekst: "Tre reaktioner i samme glas. Den næste åbner, når skemaet er afstemt. En reaktion uden Vis svaret giver en stjerne." },
             { sel: ".faneknapper", titel: "Flere reaktioner", tekst: "Den anden fane har 14 reaktioner mere med permanganat, afstemt på samme måde." }
@@ -32,7 +32,7 @@
             { sel: "#fl-haefte", titel: "Hæftet", tekst: "Samme metode som på den første fane. Står et grundstof ikke lige mange gange på begge sider, sætter du først et tal foran." },
             { sel: "#fl-knap", titel: "Giv et hint", tekst: "Knappen Giv et hint på kortet giver et hint og derefter svaret." },
             { sel: "#fl-anker-lup", titel: "Luppen", tekst: "Viser elektronerne med de gangetal, du skriver." },
-            { sel: "#fl-kort", titel: "Bidderne", tekst: "Her står reaktionen og de bidder, du har klaret. Start forfra giver den samme reaktion med et frisk glas og et tomt hæfte." },
+            { sel: "#fl-kort", titel: "Trinene", tekst: "Her står reaktionen og de trin, du har klaret. Start forfra giver den samme reaktion med et frisk glas og et tomt hæfte." },
             { sel: "#fl-opgaver", titel: "Reaktionerne", tekst: "Surt miljø, basisk miljø og reaktioner med indekstal. Den første er den fra titreringen af jern." }
         ]
     };

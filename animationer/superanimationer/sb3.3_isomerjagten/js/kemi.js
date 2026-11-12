@@ -214,7 +214,7 @@
                 ". Det er kædeisomeri.";
         }
         return K.stor(a.navn) + " og " + b.navn + " har samme carbonkæde, men " + gruppe(a) + (a.klasse === "alken" ? " går fra nr. " : " sidder på nr. ") +
-            a.lok + " og nr. " + b.lok + ". Det er stillingsisomeri.";
+            a.lok + " i den første og nr. " + b.lok + " i den anden. Det er stillingsisomeri.";
     };
 
     /* Forklaringen til et forkert svar (valgt er "kaede", "stilling" eller "funktion") */
@@ -229,7 +229,7 @@
             return K.stor(a.navn) + " og " + b.navn + " er begge " + gruppeNavn(a) + ". De har samme funktionelle gruppe.";
         }
         if (r === "kaede") {
-            return "Se på carbonkæden: " + a.navn + " har " + kaedeTekst(a) + ", og " + b.navn + " har " + kaedeTekst(b) + ".";
+            return "Se på carbonkæderne. " + K.stor(a.navn) + " har " + kaedeTekst(a) + ", og " + b.navn + " har " + kaedeTekst(b) + ".";
         }
         return "Carbonkæden er den samme i " + a.navn + " og " + b.navn + ". Kun " + gruppe(a, true) + " plads er forskellig.";
     };
@@ -265,23 +265,23 @@
     /* Eleven valgte S som den med det hoejeste kogepunkt */
     K.hoejestFejl = function (jagt, S) {
         var s = K.isomer(S);
-        if (s.klasse === "ether") return K.stor(S) + " er en ether og kan ikke danne hydrogenbindinger med sig selv. Vælg en alkohol.";
+        if (s.klasse === "ether") return K.stor(S) + " er en ether, og dens molekyler kan ikke danne hydrogenbindinger med hinanden. Vælg en alkohol.";
         if (s.grene) return K.stor(S) + " har en forgrenet kæde. Kontaktfladen er mindre end i det stof, der koger højest.";
-        return "I " + S + " sidder OH-gruppen inde på kæden. Molekylet er mere kugleformet end det stof, der koger højest.";
+        return "I " + S + " sidder OH-gruppen inde på kæden. Molekylet er mere kugleformet end i det stof, der koger højest.";
     };
 
     /* ----- Teksterne, naar tegningen ikke er en ny isomer ------------------------- */
     K.sammeTekst = function (navn) {
-        return "Det er " + navn + " igen, og den står allerede på hylden. Et molekyle må vendes og drejes: det er stadig samme stof.";
+        return "Det er " + navn + " igen, og stoffet står allerede på hylden. Et vendt eller drejet molekyle er stadig samme stof.";
     };
 
     /* Cis og trans af en isomer, der allerede er paa hylden */
     K.sammeStereo = function (navn, stereoNavn) {
-        return K.stor(navn) + " står allerede på hylden. Din tegning er " + stereoNavn + ". Cis og trans tæller som ét stof her.";
+        return K.stor(navn) + " står allerede på hylden. Din tegning er " + stereoNavn + ". Cis- og trans-formen tæller som ét stof.";
     };
 
     K.kunAlkohol = function (navn) {
-        return K.stor(navn) + " er en ether: O sidder mellem to carbonatomer. Her skal du kun finde alkoholerne.";
+        return K.stor(navn) + " er en ether med O mellem to carbonatomer. I denne jagt skal du kun finde alkoholerne.";
     };
 
     NK.Kemi = K;

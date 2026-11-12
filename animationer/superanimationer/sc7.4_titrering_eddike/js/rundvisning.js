@@ -16,12 +16,12 @@
 
     var TURE = {
         "fane-titrering": [
-            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: "2,00 g eddike, 20 mL vand og phenolphthalein. Den er farveløs, så længe der er syre tilbage." },
-            { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Natriumhydroxid, NaOH, 0,100 M. Den tæller oppefra: 0 står øverst." },
+            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: "2,00 g eddike, 20 mL vand og phenolphthalein. Opløsningen i kolben er farveløs, så længe der er syre tilbage." },
+            { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Natriumhydroxid, NaOH, 0,100 M. Skalaen på buretten tæller oppefra, så 0 står øverst." },
             { sel: "#tit-anker-hane", titel: "Hanen", tekst: "Træk skyderen for at åbne hanen. Dryp til sidst, eller brug knappen til én dråbe." },
-            { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Syren i kolben som 8 figurer. Hver OH⁻, der kommer ned, tager en H⁺ fra en CH₃COOH." },
+            { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Luppen viser eddikesyren i kolben som 8 figurer. Hver OH⁻ fra buretten tager en H⁺ fra en CH₃COOH." },
             { sel: "#tit-skort", titel: "Kortet", tekst: "Opgaven til prøven. Giv hint giver et hint og derefter svaret. Indsend svar sender aflæsningen." },
-            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken, og skriv forbruget i feltet under den." },
+            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken, og skriv forbruget i feltet nedenunder." },
             { sel: "#tit-kurvekort", titel: "Kurven", tekst: "pH i kolben, mens der løber NaOH ned. Tabellen kan kopieres til Excel." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionen, omslaget og beregningen kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. To kolber: hvad ændrer resultatet?" }
@@ -34,8 +34,8 @@
         ],
         "fane-forbrug": [
             { sel: "#for-anker-a", titel: "Kolbe A", tekst: "Som på fane 1: 2,00 g eddike, 20 mL vand og 0,100 M NaOH." },
-            { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret. Skiltet på bordet siger hvad." },
-            { sel: "#for-skort", titel: "Dit gæt", tekst: "Vælg dit gæt, og tryk på Indsend svar. Så titreres begge kolber til omslaget." },
+            { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret i forhold til kolbe A. Skiltet på bordet viser ændringen." },
+            { sel: "#for-skort", titel: "Dit gæt", tekst: "Vælg dit gæt, og tryk på Indsend svar. Derefter titreres begge kolber til omslaget." },
             { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Hvor mange mL NaOH der gik til, og den masseprocent, man ville regne ud." }
         ]
     };

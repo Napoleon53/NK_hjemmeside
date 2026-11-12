@@ -500,8 +500,8 @@
             var A = S.formel(o.syre), B = S.formel(o.base), dannet = S.formel(o.kb) + " og " + S.formel(o.ks) + " er dannet.";
             bliv = {
                 vist: this.vist,
-                tekst: NK.html(this.vist ? "Et H fra " + A + " er flyttet over på " + B + ". " + dannet :
-                    A + " afgav en hydron, og " + B + " tog imod den. " + dannet + " Skemaet viser parrene."),
+                tekst: NK.html(this.vist ? "Et H fra " + A + " er overført til " + B + ". " + dannet :
+                    A + " afgav en hydron, og " + B + " tog imod den. " + dannet + " Reaktionsskemaet viser parrene."),
                 knap: this.alleLoest() && this.naesteUloesteEfter() === null ? "Videre til Produkterne →" : "Næste reaktion →"
             };
         }
@@ -699,7 +699,7 @@
                 var m = mig.mols[u.side];
                 if (M.fasteH(m).indexOf(u.i) >= 0) {
                     mig.ryst = { side: u.side, h: u.i, t: 0 };
-                    mig.besked("Et H bundet til C bliver siddende. Det sure H sidder på O.", "peger");
+                    mig.besked("Et H bundet til C bliver siddende. Det H, der kan afgives, sidder på O.", "peger");
                     return;
                 }
                 mig.tagH(u.side, u.i, pt);

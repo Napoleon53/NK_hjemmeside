@@ -60,7 +60,7 @@
         },
         {
             id: "so3", gruppe: "gas", navn: "Kontaktprocessen",
-            tekst: "Et trin i fremstillingen af svovlsyre.",
+            tekst: "Svovldioxid og dioxygen danner svovltrioxid i et trin i fremstillingen af svovlsyre.",
             r: [[2, "SO2", "g"], [1, "O2", "g"]],
             p: [[2, "SO3", "g"]],
             stoffer: ["SO2", "O2", "SO3", "S", "SO", "H2SO4"],
@@ -68,7 +68,7 @@
         },
         {
             id: "vandgas", gruppe: "gas", navn: "Vandgasskiftreaktionen",
-            tekst: "Carbonmonooxid og vanddamp reagerer ved høj temperatur.",
+            tekst: "Carbonmonoxid og vanddamp reagerer ved høj temperatur.",
             r: [[1, "CO", "g"], [1, "H2O", "g"]],
             p: [[1, "CO2", "g"], [1, "H2", "g"]],
             stoffer: ["CO", "H2O", "CO2", "H2", "O2", "CH4"],
@@ -91,7 +91,7 @@
             forklaring: "Basen står i nævneren og de to ioner i tælleren. [H₂O] er ikke med, fordi vand er opløsningsmiddel. Brøken er basestyrkekonstanten K<sub>b</sub>."
         },
         {
-            id: "autoprotolyse", gruppe: "vand", navn: "Vands autoprotolyse", ksub: "v",
+            id: "autoprotolyse", gruppe: "vand", navn: "Vands selvionisering", ksub: "v",
             tekst: "Vand reagerer med sig selv.",
             r: [[2, "H2O", "l"]],
             p: [[1, "H3O^+", "aq"], [1, "OH^-", "aq"]],
@@ -100,7 +100,7 @@
         },
         {
             id: "fescn", gruppe: "vand", navn: "Jernthiocyanat",
-            tekst: "Jern(III)-ioner og thiocyanat-ioner danner en blodrød ion.",
+            tekst: "Jern(III)ioner og thiocyanationer danner en blodrød ion.",
             r: [[1, "Fe^3+", "aq"], [1, "SCN^-", "aq"]],
             p: [[1, "FeSCN^2+", "aq"]],
             stoffer: ["Fe^3+", "SCN^-", "FeSCN^2+", "Fe^2+", "Fe", "SCN"],
@@ -112,11 +112,11 @@
             r: [[1, "CaCO3", "s"]],
             p: [[1, "Ca^2+", "aq"], [1, "CO3^2-", "aq"]],
             stoffer: ["CaCO3", "Ca^2+", "CO3^2-", "Ca", "CO2", "OH^-"],
-            forklaring: "CaCO₃ er et fast stof (s). Koncentrationen ændrer sig ikke, så det er ikke med. Nævneren bliver 1, og brøken er opløselighedsproduktet."
+            forklaring: "CaCO₃ er et fast stof (s). Koncentrationen af et fast stof ændrer sig ikke, så CaCO₃ er ikke med. Nævneren bliver 1, og brøken er opløselighedsproduktet."
         },
         {
-            id: "pbi2", gruppe: "fast", navn: "Blyiodid i vand",
-            tekst: "Det gule salt blyiodid opløses en smule i vand.",
+            id: "pbi2", gruppe: "fast", navn: "Bly(II)iodid i vand",
+            tekst: "Det gule salt bly(II)iodid opløses en smule i vand.",
             r: [[1, "PbI2", "s"]],
             p: [[1, "Pb^2+", "aq"], [2, "I^-", "aq"]],
             stoffer: ["PbI2", "Pb^2+", "I^-", "I2", "Pb", "I"],
@@ -179,7 +179,7 @@
             num: [L("SO3", 2)], den: [L("SO2", 2), PRIK, L("O2")],
             maal: [], lys: null,
             hint: ["Tjek siderne: produkterne i tælleren og reaktanterne i nævneren.",
-                "Tjek eksponenterne: 2 foran SO₂ og SO₃ og ingenting foran O₂.",
+                "Tjek eksponenterne. Der står 2 foran SO₂ og SO₃ og intet tal foran O₂.",
                 "Siderne, eksponenterne og tegnene passer. Alle tre stoffer er gasser."],
             forklaring: "Der er ingen fejl. SO₃ står i tælleren, SO₂ og O₂ i nævneren, og koefficienterne er blevet til eksponenter."
         },
@@ -254,7 +254,7 @@
             forklaring: "Kul er et fast stof og er ikke med. Nævneren skal kun være [CO₂], så K = [CO]² / [CO₂]."
         },
         {
-            id: "autoprotolyse", navn: "Vands autoprotolyse", slags: "udeladt", ksub: "v",
+            id: "autoprotolyse", navn: "Vands selvionisering", slags: "udeladt", ksub: "v",
             r: [[2, "H2O", "l"]], p: [[1, "H3O^+", "aq"], [1, "OH^-", "aq"]],
             num: [L("H3O^+"), PRIK, L("OH^-")], den: [L("H2O", 2)],
             maal: [["den", 0]], lys: "H2O",
@@ -272,8 +272,8 @@
         {
             q: "Hvad betyder [H₂] i en reaktionsbrøk?",
             svar: ["Koncentrationen af H₂ i mol/L", "Stofmængden af H₂ i mol", "Massen af H₂ i gram", "Antallet af H₂-molekyler"],
-            nej: [null, "Stofmængden alene er ikke nok. Den deles med rumfanget.", "Massen bruges ikke i reaktionsbrøken.", "Antallet af molekyler bruges ikke i reaktionsbrøken."],
-            hvorfor: "Kantede parenteser betyder koncentration, altså stofmængde pr. liter: mol/L."
+            nej: [null, "Stofmængden skal divideres med rumfanget.", "Massen bruges ikke i reaktionsbrøken.", "Antallet af molekyler bruges ikke i reaktionsbrøken."],
+            hvorfor: "Kantede parenteser betyder koncentration, som er stofmængde pr. liter med enheden mol/L."
         },
         {
             q: "N₂(g) + 3H₂(g) ⇌ 2NH₃(g). Hvordan står dihydrogen i reaktionsbrøken?",
@@ -282,10 +282,10 @@
             hvorfor: "Koefficienten 3 bliver til eksponenten 3, så leddet er [H₂]³."
         },
         {
-            q: "Hvordan står et fast stof, fx CaCO₃(s), i reaktionsbrøken?",
+            q: "Hvordan står et fast stof som CaCO₃(s) i reaktionsbrøken?",
             svar: ["Det er ikke med", "I nævneren som [CaCO₃]", "I tælleren som [CaCO₃]", "Med massen af det faste stof"],
             nej: [null, "Et fast stof er ikke med, heller ikke når det står før pilen.", "Et fast stof er ikke med, heller ikke når det står efter pilen.", "Massen bruges ikke i reaktionsbrøken."],
-            hvorfor: "Et fast stof har samme koncentration hele tiden. Den er gemt i K, så stoffer med (s) er ikke med. Det samme gælder vand som opløsningsmiddel, H₂O(l). Er der ikke noget tilbage i nævneren, skriver man 1."
+            hvorfor: "Et fast stof har samme koncentration hele tiden. Den konstante koncentration indgår i K, så stoffer mærket (s) er ikke med. Det samme gælder vand som opløsningsmiddel, H₂O(l). Er der ikke noget tilbage i nævneren, skriver man 1."
         },
         {
             q: "Hvad kan ændre værdien af ligevægtskonstanten K?",
@@ -296,8 +296,8 @@
         {
             q: "Hvilken enhed har ligevægtskonstanten K?",
             svar: ["Det afhænger af reaktionsbrøken", "Altid mol/L", "K har aldrig en enhed", "Altid (mol/L)²"],
-            nej: [null, "Enheden afhænger af, hvor mange led der står over og under brøkstregen.", "K har kun ingen enhed, når der er lige mange led over og under brøkstregen.", "Enheden afhænger af, hvor mange led der står over og under brøkstregen."],
-            hvorfor: "Enheden regnes af brøken. I H₂ + I₂ ⇌ 2HI er der lige mange led over og under brøkstregen, så enhederne går ud, og K har ingen enhed. I K<sub>v</sub> = [H₃O⁺]·[OH⁻] er nævneren 1, så enheden er (mol/L)²."
+            nej: [null, "Enheden afhænger af, hvor mange led der står over og under brøkstregen.", "K er kun uden enhed, når der er lige mange led over og under brøkstregen.", "Enheden afhænger af, hvor mange led der står over og under brøkstregen."],
+            hvorfor: "Enheden for K findes ved at regne med enhederne i brøken. I H₂ + I₂ ⇌ 2HI er der lige mange led over og under brøkstregen, så enhederne går ud, og K har ingen enhed. I K<sub>v</sub> = [H₃O⁺]·[OH⁻] er nævneren 1, så enheden er (mol/L)²."
         }
     ];
 

@@ -157,7 +157,7 @@
         var bad = d.rows.filter(function (x) { return x.v !== x.h; });
         var dele = bad.slice(0, 2).map(function (x) { return x.v + " " + x.e + " før pilen og " + x.h + " efter"; });
         return "Det går ikke op. Der er " + dele.join(", og ") + "." +
-            (bad.length > 2 ? " Der er flere, der ikke passer." : "");
+            (bad.length > 2 ? " Flere slags atomer passer heller ikke." : "");
     };
 
     /* ----- Hintet: en trappe -----------------------------------------------------
@@ -201,7 +201,7 @@
                     A.ligning(r, p, cr.map(function (v) { return v / d.divisor; }), cp.map(function (v) { return v / d.divisor; })) + "."
             ] };
         }
-        if (d.gaarOp) return { e: null, trin: ["Det går op. Der er lige mange af hvert atom på begge sider."] };
+        if (d.gaarOp) return { e: null, trin: ["Reaktionsskemaet er afstemt. Der er lige mange af hvert slags atom på begge sider."] };
 
         /* Der mangler et halvt O2: alle de andre tal skal ganges med 2 */
         var u = A.ulige(r, p, cr, cp, d.rows);
@@ -252,7 +252,7 @@
     A.svarTekst = function (o) {
         var cr = o.facit.slice(0, o.r.length), cp = o.facit.slice(o.r.length);
         var rows = A.regnskab(o.r, o.p, cr, cp);
-        return A.ligning(o.r, o.p, cr, cp) + ". Så er der " +
+        return A.ligning(o.r, o.p, cr, cp) + ". Der er " +
             rows.map(function (x) { return x.v + " " + x.e; }).join(", ").replace(/, ([^,]*)$/, " og $1") +
             " på hver side.";
     };

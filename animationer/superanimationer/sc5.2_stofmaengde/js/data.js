@@ -80,23 +80,23 @@
        rammer fejlen, parret er valgt for: tungest er ikke flest. */
     D.PAR_NIVEAUER = [
         { navn: "Mol mod mol", hint: "Stofmængden tæller atomerne. Sammenlign antallet af mol, ikke massen." },
-        { navn: "Samme masse", hint: "Samme masse på begge vægte. Hvilke atomer er lettest? Så skal der flest af dem til." },
+        { navn: "Samme masse", hint: "Begge vægte viser samme masse. Hvilke atomer er lettest? Der skal flest af de letteste atomer til." },
         { navn: "Gram mod mol", hint: "Regn gram om til mol: n = m / M. Molarmasserne står nu på skiltet." }
     ];
 
     D.PAR = [
-        [["Au", 1, "mol"], ["C", 1, "mol"], 0, "Samme stofmængde, lige mange atomer. Guldatomerne vejer bare mere."],
+        [["Au", 1, "mol"], ["C", 1, "mol"], 0, "Samme stofmængde betyder lige mange atomer. Guldatomerne vejer blot mere."],
         [["Al", 2, "mol"], ["Au", 1, "mol"], 0, "2 mol er dobbelt så mange atomer som 1 mol, selv om guldet vejer mest."],
         [["Ag", 1, "mol"], ["Cu", 1, "mol"], 0, "1 mol af hver. Sølvet vejer mest, men atomerne er lige mange."],
         [["C", 3, "mol"], ["Fe", 2, "mol"], 0, "3 mol mod 2 mol. Jernet vejer mest, men carbon har flest atomer."],
-        [["Au", 10, "g"], ["C", 10, "g"], 1, "Samme masse. Carbonatomerne er 16 gange lettere, så der er 16 gange flere."],
+        [["Au", 10, "g"], ["C", 10, "g"], 1, "Samme masse. Carbonatomerne er 16 gange lettere end guldatomerne, så der er 16 gange flere."],
         [["Cu", 50, "g"], ["Ag", 50, "g"], 1, "Samme masse. Kobberatomerne er lettest, så der er flest af dem."],
         [["Al", 100, "g"], ["Fe", 100, "g"], 1, "Samme masse. Aluminiumatomerne er lettest, så der er flest af dem."],
-        [["Au", 20, "g"], ["Ag", 20, "g"], 1, "Et sølvatom vejer lidt over det halve af et guldatom. Så er der næsten dobbelt så mange."],
+        [["Au", 20, "g"], ["Ag", 20, "g"], 1, "Et sølvatom vejer lidt over det halve af et guldatom, og derfor er der næsten dobbelt så mange sølvatomer."],
         [["Al", 1, "mol"], ["Au", 100, "g"], 2, "100 g guld er kun 0,508 mol. Aluminiummet vejer mindst, men har flest atomer."],
-        [["Cu", 63.55, "g"], ["Cu", 1, "mol"], 2, "63,55 g kobber er netop 1 mol. Det er molarmassen."],
+        [["Cu", 63.55, "g"], ["Cu", 1, "mol"], 2, "63,55 g kobber er netop 1 mol, fordi molarmassen for kobber er 63,55 g/mol."],
         [["Fe", 50, "g"], ["Fe", 1, "mol"], 2, "1 mol jern vejer 55,85 g. 50 g er lidt mindre end 1 mol."],
-        [["C", 2, "mol"], ["Ag", 100, "g"], 2, "100 g sølv er 0,927 mol. 2 mol carbon vejer kun 24,02 g, men er flest."],
+        [["C", 2, "mol"], ["Ag", 100, "g"], 2, "100 g sølv er 0,927 mol. 2 mol carbon vejer kun 24,02 g, men har flest atomer."],
         [["Au", 0.5, "mol"], ["Cu", 100, "g"], 2, "100 g kobber er 1,57 mol. Det er mere end 0,5 mol guld."]
     ].map(function (r) {
         function side(x) {

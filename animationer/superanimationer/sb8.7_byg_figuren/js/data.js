@@ -22,43 +22,43 @@ window.NK = NK;
     NK.FORKLARING = {
         /* B8.1 Lægemidler og receptorer */
         "lægemiddel": "Stof, der bruges til at forebygge, lindre eller helbrede sygdom.",
-        "virksomt stof": "Den del af en tablet, der gør arbejdet mod sygdommen, for eksempel paracetamol i Panodil. Resten holder tabletten sammen.",
+        "virksomt stof": "Den del af en tablet, der virker mod sygdommen, for eksempel paracetamol i Panodil. Resten holder tabletten sammen.",
         "acetylsalicylsyre": "Det smertestillende stof i Aspirin og Magnyl. Molekylet har en benzenring med en carboxylgruppe og en estergruppe.",
         "paracetamol": "Det smertestillende stof i Panodil og Pinex. Molekylet har en hydroxygruppe på benzenringen og en amidgruppe.",
         "ibuprofen": "Det smertestillende stof i Ipren. Molekylet har en carboxylgruppe og en lang, upolær del.",
-        "signalstof": "Lille molekyle, som en celle sender afsted, og en anden celle opfanger. Adrenalin og dopamin er eksempler.",
+        "signalstof": "Lille molekyle, som en celle udskiller, og en anden celle opfanger. Adrenalin og dopamin er eksempler.",
         "receptor": "Protein, oftest i cellens membran, med en lomme, hvor netop ét signalstof passer ind.",
-        "bindingslomme": "Det sted i en receptor, hvor signalstoffet eller lægemidlet sætter sig. Proteinet er foldet, så netop ét stof passer ind.",
+        "bindingslomme": "Det sted i en receptor, hvor signalstoffet eller lægemidlet bindes. Proteinet er foldet, så netop ét stof passer ind.",
         "agonist": "Stof, der ligner signalstoffet så meget, at det tænder receptoren og giver samme virkning. Morfin er et eksempel.",
-        "antagonist": "Stof, der passer i receptorens lomme uden at tænde den. Det optager pladsen, så signalstoffet ikke kan komme til, og virkningen dæmpes.",
+        "antagonist": "Stof, der passer i receptorens lomme uden at tænde den. Det optager pladsen, så signalstoffet ikke kan bindes, og virkningen dæmpes.",
         /* B8.2 Kiralitet */
-        "kiral": "Siges om et molekyle, der ikke kan dække sit eget spejlbillede. To hænder er på samme måde spejlbilleder uden at være ens.",
-        "kiralt center": "Carbonatom med fire forskellige grupper. Det samme som et asymmetrisk carbonatom.",
-        "spejlbilledformer": "De to udgaver af et molekyle med ét asymmetrisk carbonatom. De ligner hinanden som højre og venstre hånd og kan virke forskelligt i kroppen.",
-        "racemisk blanding": "Lige meget af de to spejlbilledformer af et stof. Det får man normalt, når stoffet laves i laboratoriet.",
+        "kiral": "Siges om et molekyle, der ikke kan bringes til at dække sit eget spejlbillede. To hænder er på samme måde spejlbilleder uden at være ens.",
+        "kiralt center": "Carbonatom bundet til fire forskellige grupper. Det samme som et asymmetrisk carbonatom.",
+        "spejlbilledformer": "De to udgaver af et molekyle med ét asymmetrisk carbonatom. De forholder sig til hinanden som højre og venstre hånd og kan virke forskelligt i kroppen.",
+        "racemisk blanding": "Lige meget af de to spejlbilledformer af et stof. Det dannes normalt, når stoffet fremstilles i laboratoriet.",
         /* B8.3 Lægemidler som syrer og baser */
         "carboxylgruppe": "Atomerne −COOH i et molekyle. De gør et lægemiddel til en svag syre, for eksempel acetylsalicylsyre og ibuprofen.",
         "aminogruppe": "Atomerne −NH₂ i et molekyle. De gør et lægemiddel til en svag base, for eksempel adrenalin, amfetamin og morfin.",
         "hydrochlorid": "Salt, der dannes, når en amin reagerer med saltsyre. Saltet opløses let i vand, og derfor sælges mange lægemidler sådan.",
         /* B8.4 Log P og log D */
-        "fordelingskonstant": "Koncentrationen af et stof i octan-1-ol divideret med koncentrationen i vand. Stoffet er rystet med de to væsker, og tallet skrives KF.",
-        "log P": "Tal for, hvor hydrofobt den uladede form af et stof er. Ved 2 er koncentrationen 100 gange større i octanol end i vand.",
-        "fordelingsforhold": "Koncentrationen af uladet form i octanol divideret med den samlede koncentration i vand. Begge former tæller med i vandlaget, og tallet skrives D.",
-        "log D": "Viser, hvordan en syre eller base fordeler sig mellem octanol og vand ved en bestemt pH. Den ladede form tælles med.",
+        "fordelingskonstant": "Koncentrationen af et stof i octan-1-ol divideret med koncentrationen i vand. Stoffet er rystet med de to væsker, og symbolet er KF.",
+        "log P": "Mål for, hvor hydrofob den uladede form af et stof er. Ved værdien 2 er koncentrationen 100 gange så stor i octanol som i vand.",
+        "fordelingsforhold": "Koncentrationen af uladet form i octanol divideret med den samlede koncentration i vand. Begge former medregnes i vandlaget, og symbolet er D.",
+        "log D": "Viser, hvordan en syre eller base fordeler sig mellem octanol og vand ved en bestemt pH. Den ladede form medregnes.",
         /* B8.5 Fremstilling af acetylsalicylsyre */
-        "ethansyreanhydrid": "Stoffet, der sammen med salicylsyre giver acetylsalicylsyre. To molekyler af syren i eddike, sat sammen under fraspaltning af vand.",
+        "ethansyreanhydrid": "Stoffet, der reagerer med salicylsyre og danner acetylsalicylsyre. To molekyler af syren i eddike, bundet sammen under fraspaltning af vand.",
         "filtrering": "Metode, der skiller et fast stof fra en væske. Krystallerne suges fri for væske på en tragt.",
         "råprodukt": "Krystallerne lige efter filtreringen, før de er renset. De indeholder stadig lidt salicylsyre.",
-        "omkrystallisering": "Rensning af et fast stof: Det opløses varmt og falder ud igen ved afkøling. Urenhederne bliver i væsken.",
-        "separation": "Fælles navn for metoder, der skiller stoffer fra hinanden. Filtrering og chromatografi er eksempler, og hver metode udnytter én egenskab.",
+        "omkrystallisering": "Rensning af et fast stof, der opløses varmt og udfældes igen ved afkøling. Urenhederne bliver i opløsningen.",
+        "separation": "Fælles navn for metoder, der skiller stoffer fra hinanden. Filtrering og chromatografi er eksempler, og hver metode udnytter en forskel i én egenskab.",
         "destillation": "Metode, der skiller væsker ad efter kogepunkt. Blandingen koges, og dampen køles til væske igen i en svaler.",
         "destillat": "Væsken, der drypper ud af svaleren. Den indeholder mest af det stof, der har det laveste kogepunkt.",
         /* B8.6 TLC */
         "chromatografi": "Fælles navn for metoder, der skiller en blanding ad ved at lade den vandre med en væske. Væsken løber hen over et fast stof.",
         "tyndtlagschromatografi": "Metode, hvor en væske suges op gennem kiselgel på en plade og skiller stofferne ad. Forkortes TLC.",
-        "TLC": "Forkortelse for metoden, hvor pletter af prøver sættes på en plade med kiselgel. En væske trækker dem med op.",
-        "stationær fase": "Laget på pladen, som stofferne hænger fast på. For det meste kiselgel, som er polær.",
-        "mobil fase": "Væsken, der suges op gennem laget på pladen og tager stofferne med sig. Et organisk opløsningsmiddel eller en blanding af flere.",
+        "TLC": "Forkortelse for metoden, hvor pletter af prøver sættes på en plade med kiselgel. En væske fører dem med op ad pladen.",
+        "stationær fase": "Laget på pladen, som stofferne bindes til. For det meste kiselgel, som er polær.",
+        "mobil fase": "Væsken, der suges op gennem laget på pladen og fører stofferne med sig. Et organisk opløsningsmiddel eller en blanding af flere.",
         "løbevæske": "Et andet ord for den mobile fase. Den står i bunden af karret, og dens overflade skal være under startlinjen.",
         "væskefront": "Den øverste kant af den mobile fase på pladen. Her tegnes en streg, straks pladen tages op af karret.",
         "Rf-værdi": "Plettens afstand fra startlinjen divideret med væskefrontens afstand fra startlinjen. Et tal mellem 0 og 1 uden enhed.",
@@ -75,16 +75,16 @@ window.NK = NK;
        Forklaringen er ordret fra det kapitels fagordliste. */
     NK.TIDLIGERE = {
         /* B3.4: det samme som kiralt center og spejlbilledformer (par i B8.2) */
-        "asymmetrisk carbonatom": "C-atom med fire forskellige grupper på sig. Det mærkes med en stjerne, og molekylet findes i to former, der er hinandens spejlbilleder.",
-        "spejlbilledisomerer": "To stoffer, der ligner hinanden som en højre og en venstre hånd. Molekylerne kan ikke drejes, så de bliver ens.",
+        "asymmetrisk carbonatom": "C-atom bundet til fire forskellige grupper. Det mærkes med en stjerne, og molekylet findes i to former, der er hinandens spejlbilleder.",
+        "spejlbilledisomerer": "To stoffer, der forholder sig til hinanden som en højre og en venstre hånd. Molekylerne kan ikke bringes til at dække hinanden.",
         /* B4.5: estergruppen i acetylsalicylsyre (B8.3) og syntesen (B8.5) */
-        "estergruppe": "Atomerne −COO−, som holder delen fra syren og delen fra alkoholen sammen. De opstår ved en kondensation.",
-        "kondensation": "Reaktion, hvor to molekyler sættes sammen, og der fraspaltes et lille molekyle. Det er næsten altid vand.",
+        "estergruppe": "Atomerne −COO−, som binder syredelen og alkoholdelen sammen. De dannes ved en kondensation.",
+        "kondensation": "Reaktion, hvor to molekyler bindes sammen, og der fraspaltes et lille molekyle. Det er næsten altid vand.",
         /* B4.5: trin 1 i maalingen (B8.7 henviser til B4.5) */
         "forsæbning": "Spaltning af en ester i stærkt basisk miljø. Syren bliver straks til sin baseform, så reaktionen forløber fuldstændig.",
         /* B5.2 og B5.4: maalingen i B8.7 */
-        "absorbans": "Tal uden enhed med symbolet A. Jo mere lys opløsningen optager, jo større er tallet.",
-        "standardkurve": "Graf med koncentrationen på den vandrette akse og absorbansen på den lodrette. Punkterne fra opløsninger med kendt koncentration ligger på en ret linje."
+        "absorbans": "Størrelse uden enhed med symbolet A. Jo mere lys opløsningen optager, jo større er den.",
+        "standardkurve": "Graf over absorbansen af en række kendte opløsninger som funktion af koncentrationen. I det lineære område ligger punkterne på en ret linje."
     };
     Object.keys(NK.TIDLIGERE).forEach(function (o) { NK.FORKLARING[o] = NK.TIDLIGERE[o]; });
 

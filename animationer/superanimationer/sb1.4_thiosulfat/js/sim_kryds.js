@@ -124,18 +124,18 @@
 
         var tekst, art = "";
         if (vurdering === "tidlig") {
-            tekst = "For tidligt: krydset kunne stadig ses. Punktet ligger under stregen.";
+            tekst = "For tidligt. Krydset kunne stadig ses, og kurven ender under den stiplede linje.";
             art = "skidt";
         } else if (vurdering === "sen") {
-            tekst = "For sent: krydset var væk ved ca. " + Math.round(sand) + " s. Punktet ligger over stregen.";
+            tekst = "For sent. Krydset var væk ved ca. " + Math.round(sand) + " s, og kurven ender over den stiplede linje.";
             art = "skidt";
         } else if (vurdering === "auto") {
-            tekst = "Uret er stoppet. Krydset var væk ved ca. " + Math.round(sand) + " s. Stop det, så snart krydset er væk.";
+            tekst = "Uret er stoppet. Krydset var væk ved ca. " + Math.round(sand) + " s. Stop uret, så snart krydset er væk.";
             art = "skidt";
         } else {
             var andre = this.maalinger.filter(function (x) { return x.vurdering === "god" && x.ml !== m.ml; });
             tekst = "Godt målt: Δt = " + NK.tal(stopT, 1) + " s. " + (andre.length
-                ? "Kurverne ender samme sted: der er dannet lige meget svovl."
+                ? "Kurverne ender samme sted, fordi der er dannet lige meget svovl."
                 : "Prøv en anden blanding, og sammenlign kurverne.");
             art = "god";
         }
@@ -175,7 +175,7 @@
                 this.tilstand = "koerer";
                 this.t = this.haeldT - start;
                 this.rt = this.t;
-                this.saetStatus("Kig på krydset oppefra. Stop uret, når du ikke kan se det.", "");
+                this.saetStatus("Kig på krydset oppefra. Stop uret, når du ikke længere kan se krydset.", "");
                 this.visPanel();
             } else if (this.tilstand !== "haelder") {
                 this.t += this.tilstand === "koerer" ? dt : 0;

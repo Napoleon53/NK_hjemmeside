@@ -327,7 +327,7 @@
         if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
         this.kort.vis({
             chip: "Parrene",
-            tekst: "Hvem er hvem? Sæt de fire mærkater under de rigtige formler.",
+            tekst: "Find de to syre-basepar. Sæt de fire mærkater under de rigtige formler.",
             bliv: bliv,
             besked: b,
             hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap },

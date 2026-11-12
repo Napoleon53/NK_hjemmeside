@@ -18,7 +18,7 @@
         "fane-vej": [
             { sel: "#vej-anker-skema", titel: "Skemaet", tekst: "Under hver formel: massen m, molarmassen M og stofmængden n. Den grønne boks er den kendte masse." },
             { sel: "#vej-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Indsend svar eller Enter. Kun det næste felt er åbent. Pilene viser vejen, når et tal er rigtigt." },
-            { sel: "#vej-anker-vaegte", titel: "Vægtene", tekst: "Hvert rigtigt tal sker også her: pulveret bliver til poser med 1 mol, poserne går gennem pilen, og det nye stof vejes." },
+            { sel: "#vej-anker-vaegte", titel: "Vægtene", tekst: "Hvert rigtigt tal vises også her: pulveret bliver til poser med 1 mol, poserne går gennem pilen, og det nye stof vejes." },
             { sel: "#vej-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen viser opgaven. Det siger også, hvad du skal nu, og hvad der gik galt." },
             { sel: "#vej-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#vej-beregninger", titel: "Beregningerne", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." },
@@ -26,9 +26,9 @@
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Skemaet: hele skemaet med afstemning og molarmasser. Begrænsende mængde: to kendte masser." }
         ],
         "fane-skema": [
-            { sel: "#skema-anker-skema", titel: "Skemaet", tekst: "Afstem først. Så molarmasserne, stofmængderne og masserne. Felter med en grå streg skal ikke bruges." },
+            { sel: "#skema-anker-skema", titel: "Skemaet", tekst: "Afstem skemaet først, og skriv derefter molarmasserne, stofmængderne og masserne. Felter med en grå streg skal ikke bruges." },
             { sel: "#skema-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Indsend svar eller Enter." },
-            { sel: "#skema-anker-vaegt", titel: "Skålvægten", tekst: "Ved methan og propan: reaktanterne til venstre, produkterne til højre. Hver masse, du finder, lægges i skålen." },
+            { sel: "#skema-anker-vaegt", titel: "Skålvægten", tekst: "Ved methan og propan står reaktanterne til venstre og produkterne til højre. Hver masse, du finder, lægges i sin skål." },
             { sel: "#skema-tilstand", titel: "Trinvis eller frit", tekst: "Trinvis åbner ét felt ad gangen. Frit åbner dem alle." },
             { sel: "#skema-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen siger, hvad du skal nu, og hvad der gik galt. Den gule knap giver et hint og derefter svaret." },
             { sel: "#skema-beregninger", titel: "Beregningerne", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." }

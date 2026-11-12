@@ -88,8 +88,8 @@
           tekst: "Vej lighteren, saml gassen i måleglasset, og vej lighteren igen.",
           efter: "Lighteren blev lettere med præcis den gas, der er i måleglasset. Regn på det på fanen Beregningen." },
         { id: "m2", titel: "Måling 2",
-          tekst: "En ny lighter og et måleglas fyldt med vand. Gør det samme igen.",
-          efter: "To målinger. Regn dem ud på fanen Beregningen." }
+          tekst: "En ny lighter og et måleglas fyldt med vand står klar. Mål m(før), V og m(efter) en gang til.",
+          efter: "Begge målinger er færdige. Regn på dem på fanen Beregningen." }
     ];
 
     /* Gaettet i maaling 1, naar rumfanget staar i skemaet */
@@ -97,7 +97,7 @@
         spm: "Gassen i måleglasset fylder {V} mL. Hvor meget lettere er lighteren blevet?",
         hint: "1 L luft vejer ca. 1,2 g. Butan er tungere end luft, men der er kun {V} mL.",
         lav: "Gas er let, men ikke vægtløs. {V} mL butan vejer {m} g.",
-        hoej: "Så meget er der ikke. Lighteren blev {m} g lettere."
+        hoej: "Så meget vejer gassen ikke. Lighteren blev {m} g lettere."
     };
 
     /* Linjen paa kortet i scenen i hver fase af en maaling. Aflaes vaegten
@@ -171,7 +171,7 @@
        150 mL ud. Gruppe B goer én ting anderledes (B). rigtig: hvordan
        B's molarmasse bliver. fejl: forklaringen til de to forkerte gaet. */
     D.FEJL_SPM = "Hvordan bliver gruppe B's molarmasse i forhold til gruppe A's?";
-    D.FEJL_SVAR = [{ id: "hoejere", t: "Højere" }, { id: "lavere", t: "Lavere" }, { id: "samme", t: "Det samme" }];
+    D.FEJL_SVAR = [{ id: "hoejere", t: "Højere" }, { id: "lavere", t: "Lavere" }, { id: "samme", t: "Den samme" }];
     D.FEJL_A = "Gruppe A gør det rigtigt: tør lighter, alle bobler i måleglasset, glasset fyldt helt med vand og 20 °C.";
     D.FEJL_START = { mf: 17.84, V: 150, t: 20 };
 
@@ -185,7 +185,7 @@
         { id: "taendt", titel: "Tændt lighter", kort: "tænder den først", rigtig: "hoejere", B: { flamme: 0.06 },
           tekst: "Gruppe B vejer lighteren og tænder den så et par sekunder for at se, om den virker. Så samler de gassen.",
           hint: "Den gas, der brændte, forlod lighteren. Kom den i måleglasset?",
-          forkl: "Lighteren tabte også den gas, der brændte, men den kom aldrig i måleglasset. m(gas) er for stor i forhold til V, så molarmassen bliver for høj.",
+          forkl: "Lighteren tabte også den gas, der brændte, men gassen kom aldrig i måleglasset. m(gas) er for stor i forhold til V, så molarmassen bliver for høj.",
           fejl: { lavere: "Der forsvinder mere masse, ikke mindre. Rumfanget i måleglasset er det samme.",
                   samme: "Den gas, der brændte, vejede også noget. Den er med i m(gas), men ikke i V." } },
         { id: "forbi", titel: "Bobler ved siden af", kort: "bobler slipper forbi", rigtig: "hoejere", B: { forbi: 1 / 6 },
@@ -203,7 +203,7 @@
         { id: "dobbelt", titel: "Dobbelt så meget gas", kort: "300 mL gas", rigtig: "samme", B: { V: 300 },
           tekst: "Gruppe B bruger et måleglas på 500 mL og slipper 300 mL gas ud i stedet for 150 mL.",
           hint: "Hvad sker der med m(gas), når V bliver dobbelt så stort?",
-          forkl: "Dobbelt så meget gas vejer dobbelt så meget. Massen og stofmængden vokser lige meget, så molarmassen er den samme. Den bliver bare lidt mere præcis.",
+          forkl: "Dobbelt så meget gas vejer dobbelt så meget. Massen og stofmængden vokser lige meget, så molarmassen er den samme. Molarmassen bliver blot bestemt lidt mere præcist.",
           fejl: { hoejere: "Massen bliver dobbelt så stor, men det gør stofmængden også.",
                   lavere: "Stofmængden bliver dobbelt så stor, men det gør massen også." } },
         { id: "varm", titel: "Varmt lokale", kort: "30 °C i lokalet", rigtig: "lavere", B: { t: 30 },
@@ -222,8 +222,8 @@
     };
     D.FAERDIG = {
         forsoeg: "Begge målinger er i skemaet.",
-        beregning: "Alle tre. Molarmassen afslører gassen.",
-        fejl: "Alle seks. Vægten og måleglasset skal se den samme gas."
+        beregning: "Alle tre opgaver er løst. Molarmassen afslører, hvilken gas det er.",
+        fejl: "Alle seks opgaver er løst. Vægten og måleglasset skal måle den samme gas."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];

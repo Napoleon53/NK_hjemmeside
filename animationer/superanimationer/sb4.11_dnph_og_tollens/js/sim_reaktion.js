@@ -188,11 +188,11 @@
         if (tr === "vand")
             return { slags: "opgave", chip: chip, tekst: "Når " + st + " reagerer med DNPH, fraspaltes der vand. Klik på de tre atomer, der bliver til vand, og tryk Indsend svar." };
         if (tr === "reaktion")
-            return { slags: "opgave", chip: "Reaktionen", tekst: "Oxygenatomet og de to hydrogenatomer går af som vand, og nitrogenatomet binder sig til carbonatomet." };
+            return { slags: "opgave", chip: "Reaktionen", tekst: "Oxygenatomet fra C=O og de to hydrogenatomer fra NH₂-gruppen fraspaltes som vand, og nitrogenatomet binder sig til carbonatomet." };
         var s = this.sk;
         if (tr === "oxFra") tekst = "Hvad er oxidationstallet for carbonatomet i carbonylgruppen i " + st + "? Vælg, og tryk Indsend svar.";
         else if (tr === "oxTil") tekst = D.stor(st) + " oxideres til " + s.produkt + "-ionen. Hvad er oxidationstallet for det samme carbonatom nu?";
-        else if (tr === "ag") tekst = "Oxidationstallet for carbonatomet stiger " + s.stigning + ", og for sølv falder det " + s.fald + ". Hvor mange Ag⁺ skal der til pr. " + st + "?";
+        else if (tr === "ag") tekst = "Oxidationstallet for carbonatomet stiger " + s.stigning + ", og for sølv falder det " + s.fald + ". Hvor mange Ag⁺ skal der til pr. " + st + "molekyle?";
         else if (tr === "oh") tekst = "Ladningen afstemmes med OH⁻. Hvor mange OH⁻ skal der stå til venstre i skemaet?";
         else if (tr === "h2o") tekst = "Hydrogen afstemmes med H₂O. Hvor mange H₂O skal der stå til højre i skemaet?";
         else tekst = this.ekstra().spm;
@@ -307,7 +307,7 @@
         this.kendt.reaktion = true;
         if (this.trinNr === this.opg.trin.length - 1) {
             var f = this.sc.farve === "orange" ? "orange" : "gult";
-            this.loest(null, D.stor(this.opg.stof) + " og DNPH er gået sammen, og der er fraspaltet vand. Produktet er tungtopløseligt og falder ud som et " + f + " bundfald.", false);
+            this.loest(null, D.stor(this.opg.stof) + " og DNPH er bundet sammen, og der er fraspaltet vand. Produktet er tungtopløseligt og falder ud som et " + f + " bundfald.", false);
             return;
         }
         this.naesteTrin();
@@ -324,15 +324,15 @@
         }
         this.kendt.vand = true;
         this.sejrT = 0;
-        this.rigtigt(undefined, "Oxygenatomet fra C=O og de to hydrogenatomer fra NH₂-gruppen bliver til H₂O. Tryk på knappen, og se reaktionen.", vist);
+        this.rigtigt(undefined, "Oxygenatomet fra C=O og de to hydrogenatomer fra NH₂-gruppen bliver til H₂O. Tryk på Lad molekylerne reagere, og se reaktionen.", vist);
     };
 
     /* Forklaringerne til det rigtige svar */
     P.forklaring = function (tr) {
         var s = this.sk;
         if (tr === "oxFra") return K.regnestykke(s.ald.mol, s.cA) + ". Oxidationstallet er " + D.rom(s.cFra) + ".";
-        if (tr === "oxTil") return K.regnestykke(s.prod.mol, s.cP) + ". Tallet stiger fra " + D.rom(s.cFra) + " til " + D.rom(s.cTil) + ", så aldehydet er oxideret.";
-        if (tr === "ag") return "Carbonatomet stiger " + s.stigning + ", og hvert sølvatom falder " + s.fald + " fra Ag⁺ til Ag. Der skal " + s.kAg + " Ag⁺ til, og der dannes " + s.kAg + " Ag.";
+        if (tr === "oxTil") return K.regnestykke(s.prod.mol, s.cP) + ". Oxidationstallet stiger fra " + D.rom(s.cFra) + " til " + D.rom(s.cTil) + ", så aldehydet er oxideret.";
+        if (tr === "ag") return "Oxidationstallet stiger " + s.stigning + " for carbonatomet og falder " + s.fald + " for hvert sølvatom fra Ag⁺ til Ag. Der skal " + s.kAg + " Ag⁺ til, og der dannes " + s.kAg + " Ag.";
         if (tr === "oh") return "Til venstre giver " + s.kAg + " Ag⁺ ladningen " + D.fortegn(s.ladV0) + ". Til højre er ladningen " + D.fortegn(s.ladH) + ". Med " + s.oh + " OH⁻ er ladningen " + D.fortegn(s.ladH) + " på begge sider.";
         if (tr === "h2o") return "Til venstre er der " + s.hAld + " + " + s.oh + " = " + s.hV + " H. Med " + s.h2o + " H₂O er der også " + s.hV + " til højre. Oxygen passer: " + s.oV + " på hver side.";
         if (tr === "ekstra") return this.ekstra().forklaring;
@@ -344,7 +344,7 @@
         if (tr === "oxFra") return K.oxFejl(s.ald.mol, s.cA, v);
         if (tr === "oxTil") return K.oxFejl(s.prod.mol, s.cP, v);
         if (tr === "ag") {
-            if (v < s.kAg) return "Ét Ag⁺ falder kun " + s.fald + ", og carbonatomet stiger " + s.stigning + ". Der skal flere sølvioner til.";
+            if (v < s.kAg) return "Oxidationstallet falder kun " + s.fald + " for ét Ag⁺, men stiger " + s.stigning + " for carbonatomet. Der skal flere sølv(I)ioner til.";
             return "Stigningen og faldet skal være lige store: " + s.stigning + " = antallet af Ag⁺ · " + s.fald + ".";
         }
         if (tr === "oh") return "Tæl ladningen: til venstre " + D.fortegn(s.ladV0) + " fra Ag⁺ og −1 for hvert OH⁻. Til højre " + D.fortegn(s.ladH) + ".";

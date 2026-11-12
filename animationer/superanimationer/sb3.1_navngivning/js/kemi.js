@@ -308,39 +308,39 @@
     K.tegneHints = function (stof) {
         var p = stof.p, h = [], n = p.n, e = p.endelse, u = p.umaettet;
         /* 1. Stammen */
-        if (p.cyclo) h.push("Stammen " + p.stammeTekst + " er en ring med " + K.antalC(n) + ". Vælg Ring, og klik på tavlen.");
+        if (p.cyclo) h.push("Stammen " + p.stammeTekst + " betyder en ring med " + K.antalC(n) + ". Vælg Ring, og klik på tavlen.");
         else if (e && e.type === "syre" && n > 1) {
-            h.push("Stammen " + p.stammeTekst + " er " + K.antalC(n) + " i træk. Carbonatomet i COOH er det sidste af dem.");
-        } else if (n === 1) h.push("Stammen " + stammeVist(p) + " er ét carbonatom. Det står allerede på tavlen.");
-        else h.push("Stammen " + stammeVist(p) + " er " + K.antalC(n) + " i træk. Tegn kæden først.");
+            h.push("Stammen " + p.stammeTekst + " betyder " + K.antalC(n) + " i en kæde. Carbonatomet i COOH er det sidste i kæden.");
+        } else if (n === 1) h.push("Stammen " + stammeVist(p) + " betyder ét carbonatom. Carbonatomet står allerede på tavlen.");
+        else h.push("Stammen " + stammeVist(p) + " betyder " + K.antalC(n) + " i en kæde. Tegn kæden først.");
         /* 2. Endelsen */
         if (e && e.type === "ol") {
             var flere = MULT[e.mult] > 1;
             var paa = e.loks ? " på carbonatom " + nummer(e.loks) : (p.cyclo ? " på ringen" : "");
-            h.push("Endelsen " + K.medStreg(e.tekst) + " er " + (flere ? D.TAL[MULT[e.mult]] + " OH-grupper" : "en OH-gruppe") + paa +
+            h.push("Endelsen " + K.medStreg(e.tekst) + " betyder " + (flere ? D.TAL[MULT[e.mult]] + " OH-grupper" : "en OH-gruppe") + paa +
                 ". Vælg −OH, og klik på carbonatomet.");
         } else if (e && e.type === "syre") {
-            if (e.mult === "di") h.push("Endelsen -disyre er en COOH-gruppe i hver ende af kæden. Vælg −COOH, og klik på begge ender.");
+            if (e.mult === "di") h.push("Endelsen -disyre betyder en COOH-gruppe i hver ende af kæden. Vælg −COOH, og klik på begge ender.");
             else if (n === 1) h.push("Methansyre er kun COOH-gruppen. Vælg −COOH, og klik på carbonatomet, der står på tavlen.");
-            else h.push("Endelsen -syre er en COOH-gruppe for enden af kæden. Vælg −COOH, og klik på carbonatomet for enden.");
+            else h.push("Endelsen -syre betyder en COOH-gruppe for enden af kæden. Vælg −COOH, og klik på carbonatomet for enden.");
         } else if (u) {
             var tri = u.type === "yn";
-            h.push("Endelsen " + K.medStreg(u.tekst) + " er en " + (tri ? "tripelbinding" : "dobbeltbinding") +
+            h.push("Endelsen " + K.medStreg(u.tekst) + " betyder en " + (tri ? "tripelbinding" : "dobbeltbinding") +
                 (u.loks ? " mellem carbonatom " + u.loks[0] + " og " + (u.loks[0] + 1) : "") +
-                ". Vælg = Binding, og klik på " + (u.loks ? "den" : "en binding") + (tri ? " to gange." : "."));
+                ". Vælg = Binding, og klik på " + (u.loks ? "bindingen" : "en binding") + (tri ? " to gange." : "."));
         }
         /* 3. Forleddet: én gruppe ad gangen */
         p.forled.forEach(function (g) {
             var antal = antalIGruppe(g), d = forledDel(g), klik = klikTekst(g);
             if (ALKYL_C[g.navn]) {
                 var c = ALKYL_C[g.navn];
-                h.push("Forleddet " + d + " er " + gruppeOrd(g.navn, antal) + " med " + K.antalC(c) + (antal > 1 ? " hver" : "") +
+                h.push("Forleddet " + d + " betyder " + gruppeOrd(g.navn, antal) + " med " + K.antalC(c) + (antal > 1 ? " hver" : "") +
                     ". Vælg Kæde, og klik " + klik + (c > 1 ? " og så på det nye carbonatom." : "."));
             } else if (g.navn === "hydroxy") {
-                h.push("Forleddet " + d + " er en OH-gruppe. Vælg −OH, og klik " + klik + ".");
+                h.push("Forleddet " + d + " betyder en OH-gruppe. Vælg −OH, og klik " + klik + ".");
             } else {
                 var sym = g.navn === "brom" ? "−Br" : "−Cl";
-                h.push("Forleddet " + d + " er " + gruppeOrd(g.navn, antal) + ". Vælg " + sym + ", og klik " + klik + ".");
+                h.push("Forleddet " + d + " betyder " + gruppeOrd(g.navn, antal) + ". Vælg " + sym + ", og klik " + klik + ".");
             }
         });
         return h;
@@ -360,16 +360,16 @@
         if (X.andet) return du + "Tegningen har atomer, som " + stof.navn + " ikke har. Tryk Fortryd.";
         if (T.COOH !== X.COOH) {
             if (T.COOH > X.COOH) {
-                if (X.CO && X.OH) return du + "=O og −OH skal sidde på det samme carbonatom. Så er de én COOH-gruppe.";
-                return du + (T.COOH > 1 ? "Endelsen -disyre er en COOH-gruppe i hver ende af kæden." : "Endelsen -syre er en COOH-gruppe for enden af kæden.");
+                if (X.CO && X.OH) return du + "=O og −OH danner kun en COOH-gruppe, når de sidder på det samme carbonatom.";
+                return du + (T.COOH > 1 ? "Endelsen -disyre betyder en COOH-gruppe i hver ende af kæden." : "Endelsen -syre betyder en COOH-gruppe for enden af kæden.");
             }
             return du + stof1 + " " + harKun(T.COOH, "COOH-gruppe", "COOH-grupper") + ".";
         }
         if (X.CO) return du + (T.COOH ? "=O skal sidde på det samme carbonatom som −OH." : stof1 + " har intet =O.");
         if (T.OH !== X.OH) {
             if (T.OH > X.OH) {
-                if (e && e.type === "ol") return du + "Endelsen " + K.medStreg(e.tekst) + " er " + (T.OH > 1 ? D.TAL[T.OH] + " OH-grupper." : "en OH-gruppe.");
-                return du + "Forleddet hydroxy er en OH-gruppe på kæden.";
+                if (e && e.type === "ol") return du + "Endelsen " + K.medStreg(e.tekst) + " betyder " + (T.OH > 1 ? D.TAL[T.OH] + " OH-grupper." : "en OH-gruppe.");
+                return du + "Forleddet hydroxy betyder en OH-gruppe på kæden.";
             }
             if (T.COOH && !T.OH) return du + "OH skal sidde i COOH-gruppen sammen med =O, ikke for sig selv.";
             return du + stof1 + " " + harKun(T.OH, "OH-gruppe", "OH-grupper") + ".";
@@ -378,7 +378,7 @@
         for (var i = 0; i < halo.length; i++) {
             var sym = halo[i][0], ord = halo[i][1];
             if (T[sym] === X[sym]) continue;
-            if (T[sym] > X[sym]) return du + "Forleddet " + ord + " betyder et " + ord + "atom" + (T[sym] > 1 ? ". Med " + MULT_ORD[T[sym]] + ord + " er der " + D.TAL[T[sym]] + "." : ".");
+            if (T[sym] > X[sym]) return du + "Forleddet " + ord + " betyder et " + ord + "atom" + (T[sym] > 1 ? ". Med " + MULT_ORD[T[sym]] + ord + " er der " + D.TAL[T[sym]] + " " + ord + "atomer." : ".");
             return du + stof1 + (T[sym] ? " " + harKun(T[sym], ord + "atom", ord + "atomer", true) + "." : " har intet " + ord + "atom.");
         }
         if (T.ring !== X.ring) {
@@ -387,20 +387,20 @@
         }
         if (T.tri !== X.tri) {
             if (T.tri > X.tri) {
-                if (X.dbl > T.dbl) return du + "Klik på dobbeltbindingen igen. Så bliver den til en tripelbinding.";
-                return du + "Endelsen " + K.medStreg(u.tekst) + " er en tripelbinding. Vælg = Binding, og klik to gange på bindingen.";
+                if (X.dbl > T.dbl) return du + "Klik på dobbeltbindingen igen for at gøre den til en tripelbinding.";
+                return du + "Endelsen " + K.medStreg(u.tekst) + " betyder en tripelbinding. Vælg = Binding, og klik to gange på en binding.";
             }
-            return du + stof1 + " har ingen tripelbinding. Klik på den, til den er enkelt" + (T.dbl ? " eller dobbelt." : ".");
+            return du + stof1 + " har ingen tripelbinding. Klik på tripelbindingen, til den er enkelt" + (T.dbl ? " eller dobbelt." : ".");
         }
         if (T.dbl !== X.dbl) {
-            if (T.dbl > X.dbl) return du + "Endelsen " + K.medStreg(u.tekst) + " er en dobbeltbinding. Vælg = Binding, og klik på bindingen.";
-            return du + stof1 + " har ingen dobbeltbinding. Klik på den, til den er enkelt.";
+            if (T.dbl > X.dbl) return du + "Endelsen " + K.medStreg(u.tekst) + " betyder en dobbeltbinding. Vælg = Binding, og klik på en binding.";
+            return du + stof1 + " har ingen dobbeltbinding. Klik på dobbeltbindingen, til den er enkelt.";
         }
         /* 2. Kaeden */
         if (X.n !== T.n) {
             if (T.ring) return du + "Ringen skal have " + K.antalC(T.n) + ".";
-            if (T.COOH && X.n === T.n + 1) return du + "Carbonatomet i COOH tæller med i stammen. " + K.stor(p.stammeTekst) + " er " + K.antalC(T.n) + " i alt.";
-            return du + "Stammen " + stammeVist(p) + " er " + K.antalC(T.n) + " i den længste kæde. Din længste kæde har " + D.TAL[X.n] + ".";
+            if (T.COOH && X.n === T.n + 1) return du + "Carbonatomet i COOH tæller med i stammen. " + "Stammen " + p.stammeTekst + " betyder " + K.antalC(T.n) + " i alt.";
+            return du + "Stammen " + stammeVist(p) + " betyder " + K.antalC(T.n) + " i den længste kæde. Din længste kæde har " + K.antalC(X.n) + ".";
         }
         /* 3. Numrene paa hovedgruppen og dobbelt- og tripelbindingen */
         if (e && e.type === "ol" && X.lokOH.join() !== T.lokOH.join()) {
@@ -412,18 +412,18 @@
         }
         /* 4. Sidegrupperne */
         if (subNoegle(X.subs) !== subNoegle(T.subs)) {
-            if (!p.forled.length) return du + stof1 + " har intet forled. Så har kæden ingen sidegrupper.";
+            if (!p.forled.length) return du + stof1 + " har intet forled, og derfor har kæden ingen sidegrupper.";
             var g = null;
             p.forled.forEach(function (gr) {
                 var mine = T.subs.filter(function (x) { return x.navn === gr.navn; }).map(function (x) { return x.lok; }).sort().join();
                 var dine = X.subs.filter(function (x) { return x.navn === gr.navn; }).map(function (x) { return x.lok; }).sort().join();
                 if (!g && mine !== dine) g = gr;
             });
-            if (!g) return du + "Der er en sidegruppe for meget. Forleddet " + p.forledTekst + " siger, hvilke der skal være.";
+            if (!g) return du + "Der er en sidegruppe for meget. Forleddet " + p.forledTekst + " viser, hvilke sidegrupper der skal være.";
             var antal = antalIGruppe(g);
             return du + "Forleddet " + forledDel(g) + " betyder " + gruppeOrd(g.navn, antal) + placering(g.loks, !ALKYL_C[g.navn] && g.navn !== "hydroxy") + ".";
         }
-        return du + "Sammenlign med navnet, del for del.";
+        return du + "Sammenlign tegningen med navnet, del for del.";
     };
 
     /* ----- Fane 2: hintene -----------------------------------------------------------------
@@ -436,7 +436,7 @@
         /* 1. Stammen */
         var t;
         if (p.cyclo) t = "Carbonatomerne sidder i en ring med " + K.antalC(n) + ". Stammen er " + stammeVist(p) + ".";
-        else if (e && e.type === "syre") t = "Den længste kæde er gul. Den har " + K.antalC(n) + " med carbonatomet i COOH. Stammen er " + p.stammeTekst + ".";
+        else if (e && e.type === "syre") t = "Den længste kæde er gul. Den har " + K.antalC(n) + ", medregnet carbonatomet i COOH. Stammen er " + p.stammeTekst + ".";
         else if (u) t = "Den længste kæde med " + (u.type === "en" ? "dobbeltbindingen" : "tripelbindingen") + " er gul. Den har " + K.antalC(n) + ". Stammen er " + p.stammeTekst + ".";
         else if (n === 1) t = "Der er kun ét carbonatom. Stammen er " + p.stammeTekst + ".";
         else t = "Den længste kæde er gul. Den har " + K.antalC(n) + ". Stammen er " + p.stammeTekst + ".";
@@ -448,7 +448,7 @@
             h.push({ tekst: e.loks ? (MULT[e.mult] > 1 ? "OH-grupperne sidder på carbonatom " : "OH-gruppen sidder på carbonatom ") + nummer(e.loks) + ". " +
                 "Endelsen er " + K.medStreg(e.tekst) + "." : "OH-gruppen giver endelsen -ol. Der står intet tal, når den kun kan sidde ét sted.", vis: "gruppe" });
         } else if (e && e.type === "syre") {
-            h.push({ tekst: "COOH-gruppen giver endelsen " + K.medStreg(e.tekst) + ". Den er altid nummer 1, så der står intet tal.", vis: "gruppe" });
+            h.push({ tekst: "COOH-gruppen giver endelsen " + K.medStreg(e.tekst) + ". Carbonatomet i COOH er altid nummer 1, så der står intet tal.", vis: "gruppe" });
         } else if (u) {
             var ord = u.type === "en" ? "Dobbeltbindingen" : "Tripelbindingen";
             h.push({ tekst: (u.loks ? ord + " begynder ved carbonatom nummer " + u.loks[0] + ". " : ord + " kan kun sidde ét sted. ") +
@@ -460,7 +460,7 @@
                 var antal = antalIGruppe(g);
                 return gruppeOrd(g.navn, antal) + placering(g.loks, !ALKYL_C[g.navn] && g.navn !== "hydroxy").replace("carbonatom ", "");
             });
-            var tekst = (dele.length > 1 ? "Sidegrupperne står i alfabetisk rækkefølge: " : K.stor(dele[0]) + " giver ") + "forleddet " + p.forledTekst + ".";
+            var tekst = (dele.length > 1 ? "Sidegrupperne står i alfabetisk rækkefølge i " : K.stor(dele[0]) + " giver ") + "forleddet " + p.forledTekst + ".";
             if (dele.length === 1 && p.forled[0].navn !== "hydroxy" && !ALKYL_C[p.forled[0].navn] && !p.forled[0].loks) tekst = K.stor(dele[0]) + " giver forleddet " + p.forledTekst + ".";
             h.push({ tekst: tekst, vis: "side" });
         }
@@ -479,8 +479,8 @@
         if (!g) return { tom: true };
         var ud = { ok: false, note: "", tekst: "", mol: null, navn: null, skrevet: String(raa).trim(), same: false };
         /* Det, navnelaeseren ikke kan laese, men som er nemt at sige noget om */
-        if (/\d[a-zæøå(]|[a-zæøå)]\d/.test(g)) { ud.tekst = "Sæt en bindestreg mellem tal og bogstaver, fx 2-methyl og butan-2-ol."; return ud; }
-        if (/\d\.\d/.test(g)) { ud.tekst = "Numrene skrives med komma imellem, fx 2,3-dimethyl."; return ud; }
+        if (/\d[a-zæøå(]|[a-zæøå)]\d/.test(g)) { ud.tekst = "Sæt en bindestreg mellem tal og bogstaver, som i 2-methyl og butan-2-ol."; return ud; }
+        if (/\d\.\d/.test(g)) { ud.tekst = "Numrene skrives med komma imellem, som i 2,3-dimethyl."; return ud; }
         if (/-\d[\d,]*-(di)?syre$/.test(g)) { ud.tekst = "I en carboxylsyre er carbonatomet i COOH altid nummer 1. Der står intet tal foran -syre."; return ud; }
         var r = NK.NavnLaeser.laes(raa);
         if (r.fejl) {
@@ -505,9 +505,9 @@
         }
         var udenStereo = g.replace(/^(cis|trans)-/, "");
         if (udenStereo === T.navnUdenStereo) { ud.ok = true; return ud; }
-        if (/^På dansk/.test(note)) { ud.tekst = "Det er det engelske navn. Skriv det med de danske endelser."; return ud; }
+        if (/^På dansk/.test(note)) { ud.tekst = "Du har skrevet det engelske navn. Skriv det med de danske endelser."; return ud; }
         if (/^Den nyere skrivemåde/.test(note)) { ud.ok = true; ud.note = "Den nyere skrivemåde er " + T.navnUdenStereo + "."; return ud; }
-        if (/Kaldes også/.test(note)) { ud.ok = true; ud.note = "Det skrives normalt kortere: " + T.navnUdenStereo + "."; return ud; }
+        if (/Kaldes også/.test(note)) { ud.ok = true; ud.note = "Navnet skrives normalt kortere: " + T.navnUdenStereo + "."; return ud; }
         ud.tekst = K.regelFejl(stof, g);
         return ud;
     };
@@ -517,13 +517,13 @@
         var S = K.laesNavn(g), T = stof.p;
         var nok = "Navnet passer på formlen, men det er ikke skrevet efter reglerne. Brug hintet.";
         function ren(t) { return t.replace(/^(cis|trans)-/, "").replace(/[-,]/g, ""); }
-        if (ren(g) === ren(stof.navn)) return "Næsten rigtigt. Tjek bindestregerne: der står kun bindestreg ved et tal.";
+        if (ren(g) === ren(stof.navn)) return "Næsten rigtigt. Tjek bindestregerne. Der står kun bindestreg ved et tal.";
         if (!S.ok) return nok;
-        if (S.n && S.n < T.n) return "Det er ikke den længste kæde. Find en længere; den må gerne knække ved en sidegruppe.";
+        if (S.n && S.n < T.n) return "Stammen i dit navn svarer ikke til den længste kæde. Find en længere kæde. Den må gerne knække ved en sidegruppe.";
         var Se = S.endelse || S.umaettet, Te = T.endelse || T.umaettet;
         if (Te && Se && !Te.loks && Se.loks) {
             if (T.endelse && T.endelse.type === "syre") return "I en carboxylsyre er carbonatomet i COOH altid nummer 1. Der står intet tal foran -syre.";
-            return "Tallet foran endelsen skal ikke stå der. Gruppen kan kun sidde ét sted.";
+            return "Tallet foran endelsen skal ikke stå der, fordi " + foerstOrd(T) + " kun kan sidde ét sted.";
         }
         if (Te && Se && Te.loks && !Se.loks) return "Tallet mangler foran endelsen. Det viser, hvor " + foerstOrd(T) + " sidder.";
         /* Ens sidegrupper skrives samlet */
@@ -553,7 +553,7 @@
                 return l;
             };
             var a = lok(S).sort().join(), b = lok(T).sort().join(), c = spejl(S).sort().join();
-            if (a !== b && c === b) return "Nummerér fra den anden ende af kæden. Så får " + foerstOrd(T) + " " + (/erne$/.test(foerstOrd(T)) ? "lavere tal." : "et lavere tal.");
+            if (a !== b && c === b) return "Nummerér fra den anden ende af kæden, så " + foerstOrd(T) + " får " + (/erne$/.test(foerstOrd(T)) ? "lavere tal." : "et lavere tal.");
             if (a !== b) return "Tjek numrene. Nummerér fra den ende, der giver " + foerstOrd(T) + " det laveste tal.";
         }
         return nok;
@@ -563,8 +563,8 @@
        gaa gennem den; ellers er der bare talt for faa carbonatomer. */
     function laengereKaede(T) {
         var gren = T.subs.some(function (x) { return ALKYL_C[x.navn]; });
-        return gren ? "Det er ikke den længste kæde. Find en længere; den må gerne knække ved en sidegruppe."
-            : "Kæden er længere. Tæl hvert knæk og hver ende i zigzagformlen.";
+        return gren ? "Stammen i dit navn svarer ikke til den længste kæde. Find en længere kæde. Den må gerne knække ved en sidegruppe."
+            : "Den længste kæde i formlen er længere, end stammen i dit navn angiver. Tæl hvert knæk og hver ende i zigzagformlen.";
     }
 
     /* Navnet giver et andet stof: hvad i formlen er laest forkert? */
@@ -573,13 +573,13 @@
         /* Det, eleven skrev: stammen og numrene, som de staar i navnet */
         var S = K.laesNavn(skrevet || ""), Se = S.ok ? (S.endelse || S.umaettet) : null, Te = p.endelse || p.umaettet;
         if (X.COOH !== T.COOH) {
-            if (T.COOH > X.COOH) return "Molekylet har " + (T.COOH > 1 ? "to COOH-grupper" : "en COOH-gruppe") + ": =O og OH på samme carbonatom. Så ender navnet på " + (T.COOH > 1 ? "-disyre." : "-syre.");
+            if (T.COOH > X.COOH) return "Molekylet har " + (T.COOH > 1 ? "to COOH-grupper" : "en COOH-gruppe") + " med =O og OH på samme carbonatom. Derfor ender navnet på " + (T.COOH > 1 ? "-disyre." : "-syre.");
             return "Molekylet " + harKun(T.COOH, "COOH-gruppe", "COOH-grupper") + ".";
         }
         if (X.OH !== T.OH) {
             if (T.OH > X.OH) {
                 if (T.COOH) return "Molekylet har også en OH-gruppe på kæden. Den står som hydroxy foran stammen.";
-                return "Molekylet har " + (T.OH > 1 ? D.TAL[T.OH] + " OH-grupper" : "en OH-gruppe") + " på kæden. Så ender navnet på " + (T.OH > 1 ? "-" + MULT_ORD[T.OH] + "ol." : "-ol.");
+                return "Molekylet har " + (T.OH > 1 ? D.TAL[T.OH] + " OH-grupper" : "en OH-gruppe") + " på kæden. Derfor ender navnet på " + (T.OH > 1 ? "-" + MULT_ORD[T.OH] + "ol." : "-ol.");
             }
             return "Molekylet " + harKun(T.OH, "OH-gruppe", "OH-grupper") + " på kæden." + (T.COOH ? " OH i COOH-gruppen tæller ikke med." : "");
         }
@@ -588,16 +588,16 @@
             var sym = halo[i][0], ord = halo[i][1];
             if (T[sym] === X[sym]) continue;
             if (!T[sym]) return "Molekylet har intet " + ord + "atom.";
-            return "Molekylet har " + (T[sym] > 1 ? D.TAL[T[sym]] + " " + ord + "atomer. Så står der " + MULT_ORD[T[sym]] + ord + " foran." : "ét " + ord + "atom. Så står der " + ord + " foran.");
+            return "Molekylet har " + (T[sym] > 1 ? D.TAL[T[sym]] + " " + ord + "atomer. Derfor står der " + MULT_ORD[T[sym]] + ord + " foran." : "ét " + ord + "atom. Derfor står der " + ord + " foran.");
         }
-        if (X.ring !== T.ring) return T.ring ? "Carbonatomerne sidder i en ring. Så begynder stammen med cyclo." : "Molekylet har ingen ring.";
+        if (X.ring !== T.ring) return T.ring ? "Carbonatomerne sidder i en ring. Derfor begynder stammen med cyclo." : "Molekylet har ingen ring.";
         if (X.tri !== T.tri) {
-            if (T.tri) return "Molekylet har en tripelbinding mellem to carbonatomer. Så ender navnet på -yn.";
-            return T.dbl ? "Molekylet har en dobbeltbinding, ikke en tripelbinding. Så ender navnet på -en." : "Molekylet har ingen tripelbinding.";
+            if (T.tri) return "Molekylet har en tripelbinding mellem to carbonatomer. Derfor ender navnet på -yn.";
+            return T.dbl ? "Molekylet har en dobbeltbinding, ikke en tripelbinding. Derfor ender navnet på -en." : "Molekylet har ingen tripelbinding.";
         }
         if (X.dbl !== T.dbl) {
-            if (T.dbl) return T.tri ? "Molekylet har ingen dobbeltbinding." : "Molekylet har en dobbeltbinding mellem to carbonatomer. Så ender navnet på -en.";
-            return "Molekylet har ingen dobbeltbinding. Så ender stammen på -an.";
+            if (T.dbl) return T.tri ? "Molekylet har ingen dobbeltbinding." : "Molekylet har en dobbeltbinding mellem to carbonatomer. Derfor ender navnet på -en.";
+            return "Molekylet har ingen dobbeltbinding. Derfor ender navnet på -an.";
         }
         /* Stammen i elevens navn er kortere end den længste kaede (2-ethylbutan) */
         if (S.ok && S.n < T.n && !(T.COOH && S.n === T.n - 1) && !T.ring) return laengereKaede(T);
@@ -605,20 +605,20 @@
             if (T.COOH && X.n === T.n - 1) return "Husk carbonatomet i COOH. Det tæller med i stammen.";
             if (T.ring) return "Tæl carbonatomerne i ringen igen.";
             if (X.n < T.n) return laengereKaede(T);
-            return "Den længste kæde har færre carbonatomer. Tæl hvert knæk og hver ende én gang.";
+            return "Den længste kæde har færre carbonatomer, end stammen i dit navn angiver. Tæl hvert knæk og hver ende én gang.";
         }
-        if (X.nC !== T.nC) return X.nC < T.nC ? "Molekylet har flere carbonatomer i sidegrupperne end dit navn." : "Molekylet har færre carbonatomer i sidegrupperne end dit navn.";
+        if (X.nC !== T.nC) return X.nC < T.nC ? "Molekylet har flere carbonatomer i sidegrupperne, end dit navn angiver." : "Molekylet har færre carbonatomer i sidegrupperne, end dit navn angiver.";
         var olForkert = p.endelse && p.endelse.type === "ol" && X.lokOH.join() !== T.lokOH.join();
         var tekstForkert = Se && Te && Se.loks && Te.loks && Se.loks.join() !== Te.loks.join();
-        if (p.endelse && p.endelse.type === "ol" && (olForkert || tekstForkert)) return "Tæl igen, hvor OH-gruppen sidder. Nummerér fra den ende, der er nærmest den.";
+        if (p.endelse && p.endelse.type === "ol" && (olForkert || tekstForkert)) return "Tæl igen, hvor OH-gruppen sidder. Nummerér fra den ende af kæden, der er nærmest OH-gruppen.";
         if (X.dobbelt.join() !== T.dobbelt.join() || X.tripel.join() !== T.tripel.join() || (p.umaettet && tekstForkert)) {
-            return "Tæl igen, hvor " + (T.tri ? "tripelbindingen" : "dobbeltbindingen") + " begynder. Nummerér fra den ende, der er nærmest den.";
+            return "Tæl igen, hvor " + (T.tri ? "tripelbindingen" : "dobbeltbindingen") + " begynder. Nummerér fra den ende af kæden, der er nærmest bindingen.";
         }
         var Ts = T.subs.length, Xs = X.subs.length;
-        if (Ts !== Xs) return Ts > Xs ? "Molekylet har flere sidegrupper end dit navn." : "Molekylet har færre sidegrupper end dit navn.";
+        if (Ts !== Xs) return Ts > Xs ? "Molekylet har flere sidegrupper, end dit navn angiver." : "Molekylet har færre sidegrupper, end dit navn angiver.";
         var navneT = T.subs.map(function (x) { return x.navn; }).sort().join(), navneX = X.subs.map(function (x) { return x.navn; }).sort().join();
-        if (navneT !== navneX) return "Tæl carbonatomerne i sidegrupperne: ét er methyl, to er ethyl.";
-        return "Sidegrupperne sidder et andet sted. Tjek numrene på dem.";
+        if (navneT !== navneX) return "Tæl carbonatomerne i sidegrupperne. En methylgruppe har ét carbonatom, og en ethylgruppe har to.";
+        return "Sidegrupperne i formlen sidder et andet sted, end dit navn angiver. Tjek numrene på sidegrupperne.";
     };
 
     /* ----- Forklaringen paa det groenne kort ------------------------------------------------ */

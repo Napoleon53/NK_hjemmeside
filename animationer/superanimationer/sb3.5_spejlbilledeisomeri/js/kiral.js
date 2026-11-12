@@ -71,7 +71,7 @@
         if (g(v).atom !== g(t).atom) return atomDel(v) + " slår " + atomDel(t) + ".";
         var la = zListe(v), lb = zListe(t), i = 0;
         while (i < la.length && (la[i] || 0) === (lb[i] || 0)) i++;
-        return "Begge starter med " + g(v).atom + ". Atomerne på " + g(v).atom + ": " + D.tekst(v) + " har " + naesteTekst(v) +
+        return "Begge grupper begynder med " + g(v).atom + ". Se på atomerne bundet til " + g(v).atom + ": " + D.tekst(v) + " har " + naesteTekst(v) +
             ", og " + D.tekst(t) + " har " + naesteTekst(t) + ". " + sym(la[i]) + " slår " + (lb[i] ? sym(lb[i]) : "ingenting") + ".";
     };
 

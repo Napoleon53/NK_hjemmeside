@@ -309,7 +309,7 @@ function koerTest(W) {
     overskrift("Fane 2: spillet med cis og trans");
     NK.visFane("fane-sp");
     function svarKnapper() { return Array.prototype.map.call(SP.el.valg.querySelectorAll("button"), function (b) { return b.textContent; }).join("|"); }
-    paastand("spillet begynder med cis og trans", SP.emne === "ct" && svarKnapper() === "cis|trans|Ingen cis/trans-isomeri", svarKnapper());
+    paastand("spillet begynder med cis og trans", SP.emne === "ct" && svarKnapper() === "cis|trans|Ingen cis-trans-isomeri", svarKnapper());
     paastand("før start står Start spillet på kortet, og svarene er slukket", !SP.el.bliv.hidden && /Start spillet/.test(SP.el.bliv.textContent) && SP.knapper.cis.disabled);
     SP.start();
     var ctIngen = SP.molekyler.filter(function (m) { return CT.analyser(m).type === "ingen"; }).length;

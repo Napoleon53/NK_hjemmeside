@@ -22,15 +22,15 @@
             { sel: "#f-trinkort", titel: "Trinnene", tekst: "Fanen har tre trin. Begynd forfra nederst i panelet." }
         ],
         "fane-d": [
-            { sel: "#d-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Stil skyderen, eller skriv et tal, og tryk Indsend svar." },
+            { sel: "#d-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Træk i skyderen, eller skriv et tal, og tryk Indsend svar." },
             { sel: "#d-anker-vindue", titel: "Vinduet", tekst: "20 valinmolekyler i opløsningen. Kanten viser formen, og tallene under vinduet viser, hvor mange der er af hver form." },
             { sel: "#d-anker-dia", titel: "Diagrammet", tekst: "Fordelingsdiagrammet bliver tegnet dér, hvor skyderen har været. Prikkerne viser andelen af hver form ved skyderens pH." },
             { sel: "#d-anker-skyder", titel: "pH-skyderen", tekst: "Træk i knappen. Skyderen har samme pH-akse som diagrammet." }
         ],
         "fane-e": [
             { sel: "#e-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Klik på grupperne i formlerne eller vælg et svar, og tryk Indsend svar." },
-            { sel: "#e-anker-formler", titel: "Formlerne", tekst: "De tre aminosyrer. Et klik på en gruppe giver eller tager en hydron. Under formlen står ladningen, når formerne passer til papirets pH." },
-            { sel: "#e-anker-papir", titel: "Papiret", tekst: "Aminosyrerne sættes på startlinjen. En positiv aminosyre vandrer mod minuspolen og en negativ mod pluspolen." },
+            { sel: "#e-anker-formler", titel: "Formlerne", tekst: "De tre aminosyrer. Et klik på en gruppe tilføjer eller fjerner en hydron. Under formlen står ladningen, når formerne passer til papirets pH." },
+            { sel: "#e-anker-papir", titel: "Papiret", tekst: "Aminosyrerne sættes på startlinjen. En positivt ladet aminosyre vandrer mod minuspolen og en negativt ladet mod pluspolen." },
             { sel: "#e-trinkort", titel: "Trinnene", tekst: "Forløbet har fire trin. Begynd forfra nederst i panelet." }
         ]
     };

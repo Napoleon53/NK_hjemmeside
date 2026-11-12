@@ -192,8 +192,8 @@
                 Tg.konc(h0) + " til " + Tg.konc(h1) + ".");
             return;
         }
-        var hvorfor = this.handling === "-H2" ? "Ligevægten dannede noget H₂ igen, men ikke det hele." :
-            "Ligevægten blev forskudt mod venstre, og H₂ blev brugt.";
+        var hvorfor = this.handling === "-H2" ? "Forskydningen mod højre dannede noget H₂ igen, men ikke det hele." :
+            "Ligevægten blev forskudt mod venstre, og H₂ blev forbrugt.";
         this.fejlLinje("Du " + navn + ". " + hvorfor + " [H₂] endte på " + Tg.konc(h1) + ". Prøv et andet indgreb.");
         this.opstil();
     };

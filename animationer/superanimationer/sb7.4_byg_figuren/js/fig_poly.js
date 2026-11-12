@@ -79,9 +79,9 @@
 
     var POLYFEJL = {
         amylose: "<b>amylose</b> er en lang kæde uden forgreninger, der snor sig som en spiral.",
-        amylopectin: "<b>amylopectin</b> er den del af stivelse, hvor kæden deler sig med jævne mellemrum.",
+        amylopectin: "<b>amylopectin</b> er den del af stivelse, hvor kæden forgrener sig med jævne mellemrum.",
         glykogen: "<b>glykogen</b> har mange forgreninger og er dyrenes lager. Det er ikke en del af stivelse.",
-        cellulose: "<b>cellulose</b> er lige kæder side om side, som holdes sammen af hydrogenbindinger."
+        cellulose: "<b>cellulose</b> består af lige kæder side om side, som holdes sammen af hydrogenbindinger."
     };
     function polyFejl(selv) {
         var f = {};
@@ -95,21 +95,21 @@
             { navn: "Glykosidbindingen", pladser: ["kondensation", "hydrolyse", "glykosidbinding"],
               ros: "Ved kondensationen dannes glykosidbindingen, og der fraspaltes vand. Ved hydrolysen spalter vand bindingen igen." },
             { navn: "Tre disaccharider", pladser: ["maltose", "lactose", "saccharose"],
-              ros: "Maltose er to glucose, lactose er galactose og glucose, og saccharose er glucose og fructose." },
+              ros: "Maltose består af to glucoseenheder, lactose af galactose og glucose og saccharose af glucose og fructose." },
             { navn: "Stivelse", pladser: ["stivelse", "amylose", "amylopectin"],
               ros: "Stivelse er en blanding af amylose, der snor sig, og amylopectin, der har forgreninger." },
             { navn: "Glykogen og cellulose", pladser: ["glykogen", "cellulose", "polysaccharid"],
-              ros: "Glykogen har mange forgreninger, og cellulose er lige kæder. Alle fire er polysaccharider af glucose." }
+              ros: "Glykogen har mange forgreninger, og cellulose består af lige kæder. De fire stoffer i figuren er alle polysaccharider af glucose." }
         ],
         pladser: [
             /* Lag 1 */
             { id: "kondensation", ord: ["kondensation"], x: (PX1 + PX2) / 2, y: 96, maal: [(PX1 + PX2) / 2, PYK - 6], dele: ["pilK"],
               omr: [{ r: [PX1 - 6, PYK - 13, PX2 - PX1 + 12, 26, 9] }],
-              fejl: { hydrolyse: "<b>hydrolyse</b> spalter en binding med vand. Pilen her går fra to glucose til maltose og vand.",
+              fejl: { hydrolyse: "<b>hydrolyse</b> spalter en binding med vand. Pilen her går fra to glucosemolekyler til maltose og vand.",
                       glykosidbinding: "<b>glykosidbinding</b> er broen C−O−C. Pladsen peger på pilen fra to glucose til maltose og vand." } },
             { id: "hydrolyse", ord: ["hydrolyse"], x: (PX1 + PX2) / 2, y: 232, maal: [(PX1 + PX2) / 2, PYH + 6], dele: ["pilH"],
               omr: [{ r: [PX1 - 6, PYH - 13, PX2 - PX1 + 12, 26, 9] }],
-              fejl: { kondensation: "<b>kondensation</b> sætter to molekyler sammen og fraspalter vand. Pilen her går fra maltose og vand.",
+              fejl: { kondensation: "<b>kondensation</b> sætter to molekyler sammen og fraspalter vand. Pilen her går fra maltose og vand til to glucosemolekyler.",
                       glykosidbinding: "<b>glykosidbinding</b> er broen C−O−C. Pladsen peger på pilen, hvor vand spalter maltose." } },
             { id: "glykosidbinding", ord: ["glykosidbinding"], x: BRO[0], y: 26, maal: [BRO[0], BRO[1] - 14], dele: ["bro"],
               omr: [{ r: [BRO[0] - 26, CY1 - 8, 52, 50, 12] }],
@@ -118,7 +118,7 @@
 
             /* Lag 2 */
             navn("maltose", KB, ["malt"], {
-                lactose: "<b>lactose</b> er galactose og glucose. Maltose dannes af de to glucose til venstre.",
+                lactose: "<b>lactose</b> er galactose og glucose. Maltose dannes af de to glucosemolekyler til venstre.",
                 saccharose: "<b>saccharose</b> har en ring med fem atomer. Begge ringe i dette disaccharid har seks atomer." }),
             navn("lactose", KC, ["lact"], {
                 maltose: "<b>maltose</b> er to glucoseenheder. Se navnene under ringene i dette kort.",
@@ -142,7 +142,7 @@
             navn("cellulose", KCEL, ["cell"], polyFejl("cellulose")),
             { id: "polysaccharid", ord: ["polysaccharid"], x: 124, y: BAAND.y + BAAND.h / 2, maal: [BAAND.x, BAAND.y + BAAND.h / 2], titel: true, dele: ["baand"],
               omr: [{ r: [BAAND.x - 4, BAAND.y - 4, BAAND.b + 8, BAAND.h + 8, 18], tom: true }],
-              fejl: { stivelse: "<b>stivelse</b> er kun amylose og amylopectin. Overskriften gælder alle fire kæder af sukkerenheder.",
+              fejl: { stivelse: "<b>stivelse</b> består kun af amylose og amylopectin. Overskriften gælder alle fire kæder af sukkerenheder.",
                       glykogen: "<b>glykogen</b> er kun det ene kort. Overskriften gælder alle fire lange kæder af sukkerenheder.",
                       cellulose: "<b>cellulose</b> er kun det ene kort. Overskriften gælder alle fire lange kæder af sukkerenheder." } }
         ],

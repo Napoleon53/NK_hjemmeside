@@ -21,18 +21,18 @@
             { sel: "#lager-skort", titel: "Opgaven", tekst: "Kortet siger, hvad du skal skrive: først ionerne og så formlen eller navnet. Giv et hint giver et hint og derefter svaret." },
             { sel: "#lager-kort", titel: "Felterne", tekst: "Skriv i feltet, og tryk Indsend svar på kortet eller Enter." },
             { sel: "#lager-anker-bord", titel: "Arbejdsbordet", tekst: "De ioner, du finder, lægger sig ved glasset. Er svaret rigtigt, printer etiketmaskinen en ny etiket." },
-            { sel: "#lager-anker-plakater", titel: "Plakaterne", tekst: "Det periodiske system og de sammensatte ioner. Klik for at se dem i stort format." },
+            { sel: "#lager-anker-plakater", titel: "Plakaterne", tekst: "Plakaterne viser det periodiske system og de sammensatte ioner. Klik på en plakat for at se den i stort format." },
             { sel: "#lager-fremskridt", titel: "Hylderne", tekst: "Et glas, du løser uden at se svaret, får en stjerne." },
-            { sel: "#svaer-kontakt", titel: "Sværere ioner", tekst: "Slå til, så elleve glas får sværere ioner, bl.a. Be²⁺, Hg²⁺, MnO₄⁻ og S₂O₃²⁻. Det gælder også samlebåndet." },
-            { sel: ".faneknapper", titel: "Samlebåndet", tekst: "De samme stoffer på tid." }
+            { sel: "#svaer-kontakt", titel: "Sværere ioner", tekst: "Slå kontakten til, så elleve glas får sværere ioner, blandt andet Be²⁺, Hg²⁺, MnO₄⁻ og S₂O₃²⁻. De sværere ioner kommer også på samlebåndet." },
+            { sel: ".faneknapper", titel: "Samlebåndet", tekst: "Fanen Samlebåndet har de samme stoffer, men på tid." }
         ],
         "fane-baand": [
             { sel: "#baand-anker-baand", titel: "Samlebåndet", tekst: "Glassene kører mod kassen. Pilen viser det forreste glas." },
             { sel: "#baand-skort", titel: "Kortet", tekst: "Kortet øverst viser opgaven og forklaringen, når et svar er forkert." },
             { sel: "#baand-lcd", titel: "Etiketmaskinen", tekst: "Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter." },
-            { sel: "#baand-anker-kasse", titel: "Kassen", tekst: "Et glas, der når kassen, koster et liv. Efter tre er spillet slut." },
-            { sel: "#baand-anker-plakater", titel: "Plakaterne", tekst: "De samme som på lageret. Klik for at slå op, men båndet kører imens." },
-            { sel: "#baand-knap", titel: "Start", tekst: "Hvert femte rigtige svar giver et nyt niveau. Til sidst går det hurtigere." }
+            { sel: "#baand-anker-kasse", titel: "Kassen", tekst: "Et glas, der når kassen, koster et liv. Efter tre mistede liv er spillet slut." },
+            { sel: "#baand-anker-plakater", titel: "Plakaterne", tekst: "Plakaterne er de samme som på lageret. Klik på en plakat for at slå op, men båndet kører imens." },
+            { sel: "#baand-knap", titel: "Start", tekst: "Hvert femte rigtige svar giver et nyt niveau. Til sidst kører båndet hurtigere." }
         ]
     };
 

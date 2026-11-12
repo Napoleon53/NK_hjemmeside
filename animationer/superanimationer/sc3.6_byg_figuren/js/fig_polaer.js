@@ -62,7 +62,7 @@
         vb: [1000, 610],
         lag: [
             { navn: "Molekylerne", pladser: ["polært molekyle", "polær gruppe"],
-              ros: "Vand har en positiv og en negativ ende. I et større molekyle er det −OH-gruppen, der er polær." },
+              ros: "Vandmolekylet har en positiv og en negativ ende. I et større molekyle er det −OH-gruppen, der er polær." },
             { navn: "Ét lag eller to", pladser: ["blandbarhed", "upolært stof", "polært stof"],
               ros: "Polære stoffer blandes med hinanden, og upolære med hinanden. Et polært og et upolært stof giver to lag." }
         ],
@@ -78,8 +78,8 @@
                (brugeren 1. nov. 2026) */
             { id: "blandbarhed", ord: ["blandbarhed"], x: (GA + GB) / 2, y: RA.y, maal: [(GA + GB) / 2, RA.y], titel: true, dele: ["glas"],
               omr: [{ r: [RA.x - 6, RA.y - 6, RA.b + 12, RA.h + 12, 18], tom: true }],
-              fejl: { "polært stof": "<b>polært stof</b> er ét af stofferne. Overskriften gælder begge glas: bliver de to væsker til én?",
-                      "upolært stof": "<b>upolært stof</b> er ét af stofferne. Overskriften gælder begge glas: bliver de to væsker til én?" } },
+              fejl: { "polært stof": "<b>polært stof</b> er ét af stofferne. Overskriften gælder begge glas: Bliver de to væsker til én?",
+                      "upolært stof": "<b>upolært stof</b> er ét af stofferne. Overskriften gælder begge glas: Bliver de to væsker til én?" } },
             { id: "upolært stof", ord: ["upolært stof"], x: 770, y: (GL + GS) / 2, maal: [GB + GR + 6, (GL + GS) / 2], dele: ["heptan"],
               omr: [{ r: [GB - GR - 2, GL - 2, 2 * GR + 4, GS - GL + 2, 4] }],
               fejl: { "polært stof": "<b>polært stof</b> kan opløses i vand. Heptan lægger sig som et lag oven på vandet.",

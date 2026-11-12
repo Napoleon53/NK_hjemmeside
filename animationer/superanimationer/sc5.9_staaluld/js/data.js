@@ -59,8 +59,8 @@
           tekst: "Brænd en klump ståluld på vægten. Aflæs massen før og efter.",
           efter: "Dioxygen fra luften har bundet sig til jernet." },
         { id: "m2", titel: "Måling 2",
-          tekst: "En ny klump ståluld. Gør det samme igen.",
-          efter: "To målinger. Regn på dem på fanen Beregningen." }
+          tekst: "En ny klump ståluld ligger på vægten. Brænd den, og aflæs massen før og efter.",
+          efter: "Begge målinger er færdige. Regn på dem på fanen Beregningen." }
     ];
 
     /* ----- Det gratis gaet (maaling 1) -----------------------------------------------
@@ -73,7 +73,7 @@
     D.GAET = {
         etiket: "Gæt først",
         intro: "Ståluld er tynde tråde af jern, og de kan brænde. Om lidt sætter du ild til en klump, der ligger på en vægt.",
-        spm: "Hvad viser vægten, når stålulden har brændt?",
+        spm: "Bliver stålulden lettere eller tungere, når den brænder?",
         note: "Gættet koster ingenting. Forsøget viser, om det holder.",
         svar: [
             { id: "lettere", t: "Lettere", pil: "↓", billede: "gaet_lettere.svg",
@@ -81,7 +81,7 @@
               forkl: "Brænde bliver lettere, fordi gasserne fra det forsvinder op i luften. Her binder dioxygen fra luften sig til jernet, og dioxygenet vejer med." },
             { id: "samme", t: "Det samme", pil: "=", billede: "gaet_samme.svg",
               tekst: "Den bliver sort, men det er det samme jern.",
-              forkl: "Jernet er det samme, ja. Men dioxygen fra luften binder sig til jernet, og dioxygenet vejer med." },
+              forkl: "Jernet er det samme, men dioxygen fra luften binder sig til jernet, og dioxygenet vejer med." },
             { id: "tungere", t: "Tungere", pil: "↑", billede: "gaet_tungere.svg", ok: true,
               tekst: "Den tager noget til sig som et søm, der ruster." }
         ]
@@ -90,7 +90,7 @@
     /* Linjen paa kortet i hver fase af en maaling: det naeste skridt.
        valg staar kun, naar eleven klikker i scenen under gaettet. */
     D.LINJE = {
-        valg: "Gæt først: klik på et af de tre billeder på kortet.",
+        valg: "Gæt først. Klik på et af de tre billeder på kortet.",
         foer: "Aflæs vægten, og skriv tallet i feltet.",
         taend: "Klik på bunsenbrænderen. Så tænder flammen stålulden.",
         vent: "Stålulden gløder, og vægten stiger. Klik på flasken med dioxygen, så mere af jernet reagerer.",
@@ -102,10 +102,10 @@
     D.SKILT = { taend: "Klik for at tænde", ilt: "Klik for mere dioxygen" };
 
     D.HINT = {
-        foer: "Tallet står på displayet på vægten. Skriv det med to decimaler, fx 4,25.",
+        foer: "Massen står på displayet på vægten. Skriv den med to decimaler, for eksempel 4,25.",
         taend: "Bunsenbrænderen står til venstre for vægten. Klik på den. Du kan også trække den hen, så flammen rører stålulden.",
         vent: "Uden ekstra dioxygen går stålulden ud, før alt jernet har reageret. Klik på flasken med dioxygen flere gange, mens den gløder.",
-        efter: "Tallet står på displayet på vægten."
+        efter: "Massen står på displayet på vægten."
     };
 
     D.SVAR = {
@@ -116,7 +116,7 @@
     };
 
     /* Er stålulden gaaet ud uden ilt fra flasken, siger linjen det bagefter */
-    D.UDEN_ILT = "Uden flasken med dioxygen gik den ud, før alt jernet havde reageret.";
+    D.UDEN_ILT = "Uden flasken med dioxygen gik stålulden ud, før alt jernet havde reageret.";
 
     /* Eksempler, hvis eleven ikke har maalt selv (samme model: 4,00 g
        med ilt til sidst og 82 % af jernet, 3,00 g uden ilt og 80 %) */
@@ -158,7 +158,7 @@
                 talHint: "Tast {a0} ÷ {b0} på lommeregneren. Svaret er i mol." },
         n_ox_ens: { navn: "Stofmængden af {ox}", venstre: "n({ox})", enhed: "mol", op: null, led: ["n(Fe)"],
                     formelHint: "Se på tallene foran Fe og {ox} i reaktionsskemaet på tavlen. Der står {kfe} foran begge.",
-                    talHint: "Forholdet er {kfe} : {kox}, altså 1 : 1. Tallet er det samme som i trin 1: {a}." },
+                    talHint: "Forholdet er {kfe} : {kox}, altså 1 : 1. Stofmængden af {ox} er den samme som stofmængden af jern i trin 1: {a}." },
         n_ox_del: { navn: "Stofmængden af {ox}", venstre: "n({ox})", enhed: "mol", op: "/", led: ["n(Fe)", "{del}"],
                     formelHint: "Se på tallene foran Fe og {ox} i reaktionsskemaet på tavlen. Forholdet er {kfe} : {kox}. Formlen begynder: n({ox}) = n(Fe) / …",
                     indsaetHint: ["Over brøkstregen står stofmængden af jern fra trin 1: {a}.", "Under brøkstregen står tallet {b}. Det har ingen enhed."],
@@ -187,9 +187,9 @@
         svar: [
             { t: "Jernet fordampede i varmen.", forkl: "Jern koger først ved næsten 3000 °C. Så varm bliver stålulden ikke." },
             { t: "Ikke alt jernet nåede at reagere.", ok: true },
-            { t: "Vægten kan ikke veje dioxygenet.", forkl: "Jo. Det er netop dioxygenet, der gør stålulden tungere." }
+            { t: "Vægten kan ikke veje dioxygenet.", forkl: "Vægten vejer også dioxygenet, og det gør stålulden tungere." }
         ],
-        efter: "Dioxygenet når ikke ind til alt jernet. Her reagerede ca. {p} % af det."
+        efter: "Dioxygenet når ikke ind til alt jernet. Her reagerede ca. {p} % af jernet."
     };
 
     /* ----- Linjerne ----------------------------------------------------------------------

@@ -25,14 +25,14 @@ window.NK = NK;
         "syre": "Stof, der kan afgive en hydron. Hydrogenchlorid, HCl, er et eksempel.",
         "base": "Stof, der kan optage en hydron. Ammoniak, NH₃, er et eksempel.",
         "oxoniumion": "Partiklen H₃O⁺. Den dannes, når et vandmolekyle optager en hydron.",
-        "hydroxidion": "Partiklen OH⁻. Den er tilbage, når et vandmolekyle har afgivet H⁺ til en base.",
+        "hydroxidion": "Partiklen OH⁻. Den dannes, når et vandmolekyle afgiver H⁺ til en base.",
         "syre/base-reaktion": "En hydron overføres fra ét stof til et andet. Det ene stof afgiver den, og det andet optager den.",
         "korresponderende syre/base-par": "To stoffer, hvis formler er ens bortset fra én hydron, for eksempel NH₄⁺ og NH₃. Det ene bliver til det andet ved at afgive hydronen.",
         "amfolyt": "Stof, der både kan afgive og optage en hydron. Vand er et eksempel.",
         /* 7.2 Stærke og svage syrer */
-        "stærk syre": "Stof, der afgiver alle sine hydroner, når det kommer i vand, for eksempel HCl. Reaktionen skrives med en enkelt pil.",
+        "stærk syre": "Stof, der afgiver alle sine hydroner i vand, for eksempel HCl. Reaktionen skrives med en enkelt pil.",
         "svag syre": "Stof, der kun afgiver få af sine hydroner i vand, for eksempel CH₃COOH. Reaktionen skrives med en dobbeltpil.",
-        "stærk base": "Stof, der optager en hydron, så snart det møder en syre. Hydroxidionen er et eksempel.",
+        "stærk base": "Stof, der straks optager en hydron fra en syre. Hydroxidionen er et eksempel.",
         "svag base": "Stof, hvor kun få af molekylerne har optaget en hydron i vand. Ammoniak er et eksempel.",
         "neutralisation": "Reaktion mellem en syre og en base, der gør blandingen mindre sur eller mindre basisk. Hældes ammoniakvand i saltsyre, dannes ammoniumioner, som kun er en svag syre.",
         /* 7.3 pH-skalaen */

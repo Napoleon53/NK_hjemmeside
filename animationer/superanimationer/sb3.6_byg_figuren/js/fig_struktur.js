@@ -44,9 +44,9 @@
         vb: [1130, 500],
         lag: [
             { navn: "Tre slags", pladser: ["kædeisomerer", "stillingsisomerer", "funktionsisomerer"],
-              ros: "Kædeisomerer har forskellig kæde. Stillingsisomerer har gruppen to steder. Funktionsisomerer har hver sin gruppe." },
+              ros: "Kædeisomerer har forskellig kæde. I stillingsisomerer har gruppen forskellig placering. Funktionsisomerer har hver sin gruppe." },
             { navn: "Overblikket", pladser: ["isomerer", "strukturisomerer", "ether"],
-              ros: "Isomerer har samme molekylformel. Strukturisomerer har atomerne i forskellig rækkefølge. En ether har O midt i kæden." }
+              ros: "Isomerer har samme molekylformel. I strukturisomerer er atomerne bundet sammen i forskellig rækkefølge. En ether har O midt i kæden." }
         ],
         pladser: [
             titel("kædeisomerer", 0, ["hoved0"], {
@@ -58,12 +58,12 @@
             titel("stillingsisomerer", 1, ["hoved1"], {
                 kædeisomerer: "<b>kædeisomerer</b> har forskellig carbonkæde. De to propanoler har samme kæde, men OH sidder to forskellige steder.",
                 funktionsisomerer: "<b>funktionsisomerer</b> hører til hver sin stofklasse. De to propanoler er begge alkoholer.",
-                strukturisomerer: "<b>strukturisomerer</b> er fællesnavnet for alle tre kort. Her er navnet på den slags, hvor gruppen flytter sig.",
+                strukturisomerer: "<b>strukturisomerer</b> er fællesnavnet for alle tre kort. Her er navnet på den slags, hvor den funktionelle gruppe sidder forskellige steder.",
                 isomerer: "<b>isomerer</b> er fællesnavnet øverst. Her er navnet på den slags, hvor gruppen sidder to forskellige steder.",
                 ether: "<b>ether</b> har O midt i kæden. De to propanoler har begge en OH-gruppe." }),
             titel("funktionsisomerer", 2, ["hoved2"], {
                 kædeisomerer: "<b>kædeisomerer</b> hører til samme stofklasse. Ethanol er en alkohol, og stoffet ved siden af har O midt i kæden.",
-                stillingsisomerer: "<b>stillingsisomerer</b> har samme gruppe to steder. De to stoffer her har hver sin funktionelle gruppe.",
+                stillingsisomerer: "<b>stillingsisomerer</b> har den samme funktionelle gruppe forskellige steder. De to stoffer her har hver sin funktionelle gruppe.",
                 strukturisomerer: "<b>strukturisomerer</b> er fællesnavnet for alle tre kort. Her er navnet på den slags med forskellige grupper.",
                 isomerer: "<b>isomerer</b> er fællesnavnet øverst. Her er navnet på den slags, hvor stofferne har forskellige grupper.",
                 ether: "<b>ether</b> er kun det ene stof. Kortets titel gælder parret, der hører til hver sin stofklasse." }),

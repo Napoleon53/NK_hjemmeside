@@ -318,7 +318,7 @@
         if (this.spaer()) return;
         if (st.fase !== fase) return;
         if (fase === "formel" && !st.sk) {
-            this.kortBesked("Vælg først formens form. Så kommer der felter til bogstaverne.", 4);
+            this.kortBesked("Vælg først formens form, og derefter kommer der felter til bogstaverne.", 4);
             return;
         }
         var inp = this.fokusInput && this.felter.indexOf(this.fokusInput) >= 0 && !this.fokusInput.value.trim() ? this.fokusInput : null;
@@ -337,7 +337,7 @@
         if (!st || this.faerdig) return;
         var o = this.opg();
         if (st.fase === "formel") {
-            if (!st.sk) { this.besked("Vælg først formens form under tavlen. Så kommer der felter til bogstaverne.", "hint"); return; }
+            if (!st.sk) { this.besked("Vælg først formens form under tavlen, og derefter kommer der felter til bogstaverne.", "hint"); return; }
             var bogst = st.bogst.slice(0, R.ANTAL[st.sk]).map(function (b) { return R.bogstav(b, o); });
             var svar = R.tjekFormel(st.id, st.sk, bogst);
             if (svar.ok) {

@@ -64,9 +64,9 @@
 
     function begrund(a, b) {
         var t = D.bindingstype(a, b);
-        var grund = t === "upolaer" ? "Det er under 0,5, så bindingen er upolær."
-            : t === "polaer" ? "Det er mellem 0,5 og 2,0, så bindingen er polær."
-            : "Det er 2,0 eller mere, så det er en ionbinding.";
+        var grund = t === "upolaer" ? "ΔEN er under 0,5, så bindingen er upolær."
+            : t === "polaer" ? "ΔEN er mellem 0,5 og 2,0, så bindingen er polær."
+            : "ΔEN er 2,0 eller mere, så bindingen er en ionbinding.";
         return "ΔEN = " + regning(a, b) + ". " + grund;
     }
 
@@ -92,7 +92,7 @@
             },
             hint: "Carbon har elektronegativiteten 2,5. Hvilke atomer har mindst 0,5 mere?",
             eksempel: ["C", "O"],
-            svar: "Fx C-O. Oxygen trækker hårdere end carbon (3,5 mod 2,5), så carbon bliver δ+. N, F og Cl virker også."
+            svar: "C-O er et eksempel. Oxygen trækker hårdere end carbon (3,5 mod 2,5), så carbon bliver δ+. Carbon bliver også δ+ sammen med N, F og Cl."
         },
         {
             tekst: "Byg en upolær binding mellem to forskellige atomer.",
@@ -103,7 +103,7 @@
             },
             hint: "Find to forskellige atomer, hvis elektronegativitet højst er 0,4 fra hinanden.",
             eksempel: ["C", "H"],
-            svar: "Fx C-H: 2,5 − 2,1 = 0,4, som er under 0,5. N-Cl virker også: 3,0 − 3,0 = 0."
+            svar: "C-H er et eksempel, for ΔEN = 2,5 − 2,1 = 0,4 er under 0,5. N-Cl er også upolær med ΔEN = 3,0 − 3,0 = 0."
         },
         {
             tekst: "Byg den mest polære binding, der har hydrogen med.",
@@ -111,11 +111,11 @@
             fejl: function (a, b) {
                 if (!har(a, b, "H")) return "Hydrogen skal være med.";
                 if (a === b) return "H-H er upolær.";
-                return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Der findes en, der er mere polær.";
+                return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Der findes en binding med hydrogen, der er mere polær.";
             },
-            hint: "Jo større forskel i elektronegativitet, jo mere polær er bindingen. Hvilket atom har den største?",
+            hint: "Jo større forskel i elektronegativitet, jo mere polær er bindingen. Hvilket atom har den største elektronegativitet?",
             eksempel: ["H", "F"],
-            svar: "H-F: 4,0 − 2,1 = 1,9. Fluor har den største elektronegativitet."
+            svar: "Fluor har den største elektronegativitet, så H-F er den mest polære binding med ΔEN = 4,0 − 2,1 = 1,9."
         },
         {
             tekst: "Byg en ionbinding.",
@@ -123,9 +123,9 @@
             fejl: function (a, b) {
                 return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Forskellen skal være 2,0 eller mere.";
             },
-            hint: "Sæt et atom med lav elektronegativitet sammen med et, der har høj.",
+            hint: "Sæt et atom med lav elektronegativitet sammen med et atom med høj elektronegativitet.",
             eksempel: ["Na", "Cl"],
-            svar: "Fx Na-Cl: 3,0 − 0,9 = 2,1. Chlor tager elektronerne helt, og der dannes ioner."
+            svar: "Na-Cl er et eksempel med ΔEN = 3,0 − 0,9 = 2,1. Chlor tager elektronerne helt, og der dannes ioner."
         },
         {
             tekst: "Byg en binding, hvor oxygen bliver δ+.",
@@ -134,9 +134,9 @@
                 if (!har(a, b, "O")) return "Oxygen skal være med.";
                 return "I " + binding(a, b) + " trækker oxygen hårdest. Find et atom, der trækker endnu hårdere.";
             },
-            hint: "Oxygen har 3,5. Kun ét atom i tabellen trækker hårdere.",
+            hint: "Oxygen har elektronegativiteten 3,5. Kun ét atom i tabellen trækker hårdere.",
             eksempel: ["O", "F"],
-            svar: "O-F: fluor trækker hårdere end oxygen (4,0 mod 3,5), så oxygen bliver δ+. Det sker sjældent."
+            svar: "I O-F trækker fluor hårdere end oxygen (4,0 mod 3,5), så oxygen bliver δ+. Det sker sjældent."
         }
     ];
 
@@ -214,8 +214,8 @@
                 fejlValg: function (i) {
                     return navne[i] + " har ΔEN = " + tal(D.dEN(valgte[i][0], valgte[i][1])) + ". En af de andre bindinger har en større forskel.";
                 },
-                hint: "Beregn ΔEN for hver binding. Jo større forskel, jo mere polær.",
-                svar: navne[valgte.indexOf(bedst)] + ": " + regning(bedst[0], bedst[1]) + " er den største forskel.",
+                hint: "Beregn ΔEN for hver binding. Jo større ΔEN, jo mere polær er bindingen.",
+                svar: navne[valgte.indexOf(bedst)] + " har den største forskel i elektronegativitet: ΔEN = " + regning(bedst[0], bedst[1]) + ".",
                 visSvar: function (s) { s.saetPar(bedst[0], bedst[1]); }
             };
         }
@@ -239,7 +239,7 @@
         this.BYG = BYG;
         this.opgaver = new NK.Opgaver("en", OPGAVER, this, {
             antal: 6,
-            intro: "Sæt to atomer sammen, og se, hvordan elektronparret i bindingen flytter sig. Opgaverne handler om polære bindinger.",
+            intro: "Sæt to atomer sammen, og se, hvor elektronparret i bindingen ligger. Opgaverne handler om polære bindinger.",
             naesteFane: "fane-polaritet",
             naesteNavn: "Polær eller upolær?"
         });

@@ -297,7 +297,7 @@ async function koerTest(W) {
         if (!Dd.faerdig) svar(Dd, rigtigt(Dd));
         paastand(o.navn + ": løst", Dd.faerdig && Dd.status[i].loest);
     });
-    paastand("alle fem er løst, og forklaringen siger det", Dd.antalLoest() === 5 && /Alle fem glas/.test(Dd.el.skort.textContent));
+    paastand("alle fem er løst, og forklaringen siger det", Dd.antalLoest() === 5 && /alle fem glas/.test(Dd.el.skort.textContent));
     paastand("skemaet har kolonnen minus glas 5 med 3 for olivenolie", /Minus glas 5/.test(NK.el("d-skema").innerHTML) && /olivenolie<\/td><td>4<\/td><td>3/.test(NK.el("d-skema").innerHTML));
     paastand("kortets knap går videre til fane 3", /Ukendte fedtstoffer/.test(Dd.videreTekst()));
 
@@ -339,7 +339,7 @@ async function koerTest(W) {
     paastand("mens dibrom flyver, er markeringer låst", (function () { var x = M.overScene({ x: 10, y: 10 }); return x === null; })());
     koerF(M, 3);
     paastand("dibrom har adderet til alle tre", M.dobbelte().every(function (n) { return M.brom[n] === 1; }));
-    paastand("det grønne kort siger tre dibrommolekyler", M.venter && /Tre dobbeltbindinger/.test(M.el.skort.textContent));
+    paastand("det grønne kort siger tre dibrommolekyler", M.venter && /har tre dobbeltbindinger/.test(M.el.skort.textContent));
     frem(M);
     svar(M, rigtigt(M));
     paastand("olivenolie løst", M.faerdig && M.status[0].stjerne);

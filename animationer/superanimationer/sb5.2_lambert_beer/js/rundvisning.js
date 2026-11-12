@@ -14,17 +14,17 @@
 
     var TURE = {
         "fane-lys": [
-            { sel: "#lys-skort", titel: "Kortet", tekst: "Forudsigelsen står på kortet øverst. Gæt først ved at klikke på det svar, du tror på. Så prøver du det selv og trykker Indsend svar." },
+            { sel: "#lys-skort", titel: "Kortet", tekst: "Forudsigelsen står på kortet øverst. Gæt først ved at klikke på det svar, du tror på. Derefter prøver du det selv og trykker Indsend svar." },
             { sel: "#lys-laerred", titel: "Kuvetten i lyset", tekst: "Lampen sender lys med én bølgelængde gennem kuvetten. Prikkerne er fotoner. Kurven over strålen viser, hvor meget lys der er tilbage. Træk i grebet på kuvettens højre side for at gøre den bredere." },
             { sel: "#lys-skruer", titel: "Skyderne", tekst: "Her ændrer du koncentrationen c og kuvettebredden l. Du kan også vælge et andet stof og få lyset til at gå langsomt." },
             { sel: "#lys-opgaver", titel: "Forudsigelserne", tekst: "Seks forudsigelser. En forudsigelse, du gætter rigtigt uden at se svaret, får en stjerne. Start forfra begynder forudsigelsen forfra." },
-            { sel: ".faneknapper", titel: "Standardkurven", tekst: "På næste fane bliver det til målinger: standarder, en linje gennem (0, 0) og en ukendt prøve." }
+            { sel: ".faneknapper", titel: "Standardkurven", tekst: "På fanen Standardkurven måler du standarder, lægger en linje gennem (0, 0) og bestemmer koncentrationen af en ukendt prøve." }
         ],
         "fane-kurve": [
             { sel: "#kurve-laerred", titel: "Spektrofotometret og bakken", tekst: "Klik på en kuvette i bakken, så bliver den målt. Hver måling bliver et punkt på grafen til højre." },
-            { sel: "#kurve-maalinger", titel: "Målingerne", tekst: "Koncentrationen og absorbansen for hver kuvette. Prøvens koncentration står som ?, til du har aflæst den." },
+            { sel: "#kurve-maalinger", titel: "Målingerne", tekst: "Tabellen viser koncentrationen og absorbansen for hver kuvette. Prøvens koncentration står som ?, til du har aflæst den." },
             { sel: "#kurve-skort", titel: "Kortet", tekst: "Kortet øverst siger næste skridt. Når du har lagt linjen eller aflæst prøven, trykker du Indsend svar. Giv et hint giver ét hint ad gangen." },
-            { sel: "#kurve-kort", titel: "Opgaven", tekst: "Opgaven og de fire skridt. Et skridt, der er gjort, bliver grønt." },
+            { sel: "#kurve-kort", titel: "Opgaven", tekst: "Panelet viser opgaven og de fire skridt. Et skridt, der er gjort, bliver grønt." },
             { sel: "#kurve-opgaver", titel: "Opgaverne", tekst: "Fire standardkurver. Prøvens koncentration er ny, hver gang du begynder forfra." }
         ],
         "fane-regn": [

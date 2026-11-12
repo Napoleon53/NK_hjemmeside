@@ -16,20 +16,20 @@
     var TURE = {
         "fane-d": [
             { sel: "#d-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Den gule knap giver ét hint ad gangen og til sidst svaret. Der er fem opgaver, én for hvert glas." },
-            { sel: "#d-anker-glas", titel: "De fem glas", tekst: "Som i øvelse 4.6b: et fedtstof opløst i heptan i glas 1 til 4 og kun heptan i glas 5. Den hvide plade bag glassene gør farven let at se. Pipetten hænger over det glas, opgaven handler om. Klik på pipetten for at dryppe én dråbe bromvand i." },
+            { sel: "#d-anker-glas", titel: "De fem glas", tekst: "Glassene er som i øvelse 4.6b. Glas 1 til 4 indeholder et fedtstof opløst i heptan, og glas 5 indeholder kun heptan. Den hvide plade bag glassene gør farven let at se. Pipetten hænger over det glas, opgaven handler om. Klik på pipetten for at dryppe én dråbe bromvand i." },
             { sel: "#d-anker-lup", titel: "Luppen", tekst: "Luppen viser det øverste lag i glasset helt tæt på: ét fedtstofmolekyle, det samme som på fane 1, og dibrom fra dråberne. Klik på en kæde eller et dibrommolekyle for at se, hvad det er." },
             { sel: "#d-skemakort", titel: "Skemaet", tekst: "Her står antallet af dråber for hvert glas, når du har indsendt det." }
         ],
         "fane-m": [
             { sel: "#m-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er fire opgaver, én for hvert fedtstof." },
             { sel: "#m-anker-tavle", titel: "Tavlen", tekst: "Fedtstoffet er tegnet som i bogen: glycerol til venstre og tre fedtsyrer som zigzag. Klik på en binding for at markere den, og klik igen for at fjerne markeringen." },
-            { sel: "#m-fedtkort", titel: "Fedtsyrerne", tekst: "Her står fedtsyrernes navne og, når du har fundet dem, antallet af dobbeltbindinger mellem to carbonatomer (C=C)." }
+            { sel: "#m-fedtkort", titel: "Fedtsyrerne", tekst: "Her står fedtsyrernes navne og antallet af dobbeltbindinger mellem to carbonatomer (C=C), når du har fundet dem." }
         ],
         "fane-u": [
             { sel: "#u-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er fire opgaver, én for hver flaske." },
             { sel: "#u-anker-glas", titel: "De fire flasker", tekst: "Hver flaske har et ukendt fedtstof opløst i heptan. Klik på pipetten for at dryppe bromvand i den flaske, opgaven handler om." },
-            { sel: "#u-deklkort", titel: "Varedeklarationerne", tekst: "Fire fedtstoffer og deres andel af mættede, monoumættede og polyumættede fedtsyrer. Brug dem til at finde fedtstoffet i hver flaske." },
-            { sel: "#u-skemakort", titel: "Flaskerne", tekst: "Antallet af dråber for hver flaske og, når du har fundet det, fedtstoffets navn. Luppen viser en flaske, når fedtstoffet er fundet." }
+            { sel: "#u-deklkort", titel: "Varedeklarationerne", tekst: "Varedeklarationerne viser fire fedtstoffer og deres andel af mættede, monoumættede og polyumættede fedtsyrer. Brug dem til at finde fedtstoffet i hver flaske." },
+            { sel: "#u-skemakort", titel: "Flaskerne", tekst: "Her står antallet af dråber for hver flaske og fedtstoffets navn, når du har fundet det. Luppen viser en flaske, når fedtstoffet er fundet." }
         ]
     };
     var trin = [];

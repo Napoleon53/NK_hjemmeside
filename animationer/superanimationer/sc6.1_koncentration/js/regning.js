@@ -412,7 +412,7 @@
         if (!f || this.fane.auto) return;
         var svar;
         if (f.fase === "formel") {
-            if (!f.sk) { this.fane.regnFejl("Vælg først formlens form: klik på en af knapperne.", true, f.id, null); return; }
+            if (!f.sk) { this.fane.regnFejl("Vælg først formlens form. Klik på en af knapperne.", true, f.id, null); return; }
             svar = T.formelFelter(f.id, f.sk, f.bogst.slice(0, T.ANTAL_FELTER[f.sk]));
             if (svar.ok) { this.formelOk(false, svar.note); return; }
             if (!svar.tom) this.ryst(svar.felt !== undefined && f.delEl ? f.delEl[svar.felt] : f.feltEl);

@@ -47,14 +47,14 @@
             { navn: "Vand reagerer med vand", pladser: ["vands selvionisering", "vands ionprodukt"],
               ros: "Ét vandmolekyle afgiver en hydron til et andet. [H₃O⁺] · [OH⁻] er altid 1,0 · 10⁻¹⁴ M² ved 25 °C." },
             { navn: "Skalaerne", pladser: ["pH", "pOH"],
-              ros: "pH hører til [H₃O⁺], og pOH hører til [OH⁻]. Læst lodret giver pH og pOH altid 14 tilsammen." }
+              ros: "pH hører til [H₃O⁺], og pOH hører til [OH⁻]. Læst lodret er summen af pH og pOH altid 14." }
         ],
         pladser: [
             { id: "vands selvionisering", ord: ["vands selvionisering"], x: RA.x + RA.b / 2, y: RA.y, maal: [RA.x + RA.b / 2, RA.y], titel: true, dele: ["selv"],
               omr: [{ r: [RA.x - 4, RA.y - 4, RA.b + 8, RA.h + 8, 18], tom: true }],
               fejl: { "vands ionprodukt": "<b>vands ionprodukt</b> er en konstant. Overskriften gælder reaktionen, hvor to vandmolekyler danner to ioner.",
-                      "pH": "<b>pH</b> er et tal for en opløsning. Overskriften gælder reaktionen mellem to vandmolekyler.",
-                      "pOH": "<b>pOH</b> er et tal for en opløsning. Overskriften gælder reaktionen mellem to vandmolekyler." } },
+                      "pH": "<b>pH</b> beskriver en opløsning. Overskriften gælder reaktionen mellem to vandmolekyler.",
+                      "pOH": "<b>pOH</b> beskriver en opløsning. Overskriften gælder reaktionen mellem to vandmolekyler." } },
             { id: "vands ionprodukt", ord: ["vands ionprodukt"], x: FX, y: 96, maal: [FX, FY1 - 30], dele: ["ion"],
               omr: [{ r: [RB.x + 16, FY1 - 32, RB.b - 32, FY2 - FY1 + 46, 8] }],
               fejl: { "vands selvionisering": "<b>vands selvionisering</b> er selve reaktionen. Pladsen peger på formlen, hvor to koncentrationer ganges sammen.",
@@ -86,7 +86,7 @@
                     KV.tekst(g, (XS[0] + XS[1]) / 2, MY + 9, "+", { fs: 26, farve: C.daempet });
                     KV.tekst(g, (XS[2] + XS[3]) / 2, MY + 9, "+", { fs: 26, farve: C.daempet });
                     B6.ligevaegt(g, 352, 412, MY);
-                    var pil = B6.hydronpil(g, M.a.hyd, M.b.fri, 92, { tekst: "hydronen flytter", tx: (XS[0] + XS[1]) / 2 });
+                    var pil = B6.hydronpil(g, M.a.hyd, M.b.fri, 92, { tekst: "hydronen overføres", tx: (XS[0] + XS[1]) / 2 });
                     [["H_2O", "syre", C.syre], ["H_2O", "base", C.base], ["H_3O^+", "oxoniumion", C.syre], ["OH^−", "hydroxidion", C.base]].forEach(function (t, k) {
                         KV.tekst(g, XS[k], NY, t[0], { fs: 25, fed: true, farve: t[2] });
                         KV.tekst(g, XS[k], NY + 24, t[1], { fs: 15, farve: t[2] });

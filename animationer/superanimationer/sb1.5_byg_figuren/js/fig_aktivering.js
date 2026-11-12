@@ -59,9 +59,9 @@
         vb: [1100, 720],
         lag: [
             { navn: "Bakken", pladser: ["energiprofil", "det aktiverede kompleks", "aktiveringsenergi"],
-              ros: "Energiprofilen går over en bakke. Aktiveringsenergien er højden op til det aktiverede kompleks på toppen." },
+              ros: "Energiprofilen går over en bakke. Aktiveringsenergien er højden fra reaktanterne op til det aktiverede kompleks på toppen." },
             { navn: "Afgiver eller optager", pladser: ["exoterm", "endoterm"],
-              ros: "Exoterm: produkterne har mindst energi, og det bliver varmt. Endoterm: produkterne har mest energi, og det bliver koldt." }
+              ros: "Exoterm: Produkterne har mindst energi, og omgivelserne opvarmes. Endoterm: Produkterne har mest energi, og omgivelserne afkøles." }
         ],
         pladser: [
             { id: "energiprofil", ord: ["energiprofil"], x: K1.x + K1.b / 2, y: K1.y, maal: [K1.x + K1.b / 2, K1.y], titel: true, dele: ["profil"],

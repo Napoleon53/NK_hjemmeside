@@ -431,7 +431,7 @@
         if (this.fase !== "felt") return;
         var f = el("felt"), v = tal(f ? f.value : "");
         var t = this.tal();
-        if (isNaN(v)) { this.fejlLinje("Skriv massen som et tal, fx 1,52."); return; }
+        if (isNaN(v)) { this.fejlLinje("Skriv massen som et tal, for eksempel 1,52."); return; }
         if (Math.abs(v - t.svar) <= 0.011) {
             this.S.feltSvar = t.svar;
             this.bliv = { slags: "felt", vist: false };

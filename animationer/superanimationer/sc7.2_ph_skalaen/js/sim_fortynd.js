@@ -584,7 +584,7 @@
         var serieNavn = m && m.serie === "base" ? "natriumhydroxiden" : "saltsyren";
         var zm = this.lup.zoomerMod(), ion = g && g.serie === "base" ? "OH⁻" : "H₃O⁺";
         if (this.anim) t = "Pipetten tager 1 mL fra glasset før, og sprøjteflasken fylder op med 9 mL vand.";
-        else if (zm > 0) t = "10 gange mere vand: 10 gange færre " + ion + " i luppen. Den zoomer ud til et 10 gange større rum.";
+        else if (zm > 0) t = "10 gange mere vand giver 10 gange færre " + ion + " i luppen, og luppen zoomer ud til et 10 gange større rum.";
         else if (zm < 0) t = "Luppen zoomer ind på et 10 gange mindre rum.";
         else if (m && this.naaet) t = "";
         else if (m && ((m.slags === "valg" && this.budNr < 0) || m.slags === "tal")) t = "";      /* kortet siger det selv */
@@ -860,7 +860,7 @@
         if (u.slags === "knapBase") { this.fortynd("base"); return; }
         if (u.slags === "glas") { this.vaelgGlas(u.g); return; }
         if (u.slags === "lup") { this.besked("Luppen viser det nyeste glas eller det glas, du har klikket på. Den zoomer selv til 10 til 100 af den ion, der er flest af.", "peger"); return; }
-        if (u.slags === "skilt") { this.besked("1 del fra glasset før og 9 dele vand: 10 gange så meget væske og 10 gange lavere koncentration.", "peger"); return; }
+        if (u.slags === "skilt") { this.besked("1 del fra glasset før og 9 dele vand giver 10 gange så meget væske og 10 gange lavere koncentration.", "peger"); return; }
         if (u.slags === "skala") this.besked("Hvert glas står under sin pH. Stregen viser hvor.", "peger");
     };
 

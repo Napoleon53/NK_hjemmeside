@@ -84,7 +84,7 @@
         enkeltbinding: "<b>enkeltbinding</b> passer også på Cl₂, men ordet skal sidde nederst, hvor stregerne tælles. Her spørges om navnet på de to elektroner i midten."
     };
 
-    var TAEL = function (n) { return "Tæl stregerne mellem de to atomer, pladsen peger på. Her er der " + n + "."; };
+    var TAEL = function (n) { return "Tæl stregerne mellem de to atomer, pladsen peger på. Antallet af streger er " + n + "."; };
 
     NK.FIGURER.binding = {
         vb: [1000, 660],
@@ -111,8 +111,8 @@
               omr: [{ r: [PARX - 9, AY - 19, 18, 38, 7] }], fejl: PARFEJL },
             { id: "molekyle", ord: ["molekyle"], x: KC.x + KC.b / 2, y: KC.y, maal: [KC.x + KC.b / 2, KC.y], titel: true, dele: ["clatomer"],
               omr: [{ r: [CL1 - CLR - 12, KC.y + 8, CL2 - CL1 + 2 * CLR + 24, AY + CLR + 12 - (KC.y + 8), 12] }],
-              fejl: { ionbinding: "<b>ionbinding</b> holder ioner sammen. Skiltet siger, hvad hele Cl₂ er, ligesom ionforbindelse ved siden af.",
-                      elektronparbinding: "<b>elektronparbinding</b> er de to elektroner i midten. Skiltet siger, hvad hele Cl₂ er, ligesom ionforbindelse ved siden af.",
+              fejl: { ionbinding: "<b>ionbinding</b> holder ioner sammen. Skiltet siger, hvad hele Cl₂ er, ligesom ordet ionforbindelse ved siden af.",
+                      elektronparbinding: "<b>elektronparbinding</b> er de to elektroner i midten. Skiltet siger, hvad hele Cl₂ er, ligesom ordet ionforbindelse ved siden af.",
                       "fælles elektronpar": "<b>fælles elektronpar</b> er kun de to elektroner i midten. Skiltet gælder hele Cl₂ med begge atomer." } },
 
             /* ----- Lag 2: prikker og streger ------------------------------------ */

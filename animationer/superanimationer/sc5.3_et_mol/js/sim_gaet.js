@@ -142,7 +142,7 @@
     P.intro = function () {
         this.fase = "intro";
         this.kort.vis("info intro", NK.Kort.slut("Et mol",
-            NK.htmlPotens("Et dusin er 12 stk. Et mol er også et antal, bare meget større: 1 mol er 6,02 · 10²³ stk. " +
+            NK.htmlPotens("Et dusin er 12 stk. Et mol er også et antal, blot meget større: 1 mol er 6,02 · 10²³ stk. " +
             "Gæt, hvor meget 1 mol er af " + TAL[D.GAET.length] + " forskellige ting."), "Start →"));
         this.kort.indsend(false);
         this.kort.knap(null);

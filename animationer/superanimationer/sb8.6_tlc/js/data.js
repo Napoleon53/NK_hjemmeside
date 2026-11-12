@@ -67,7 +67,7 @@
         ibuprofen:   { navn: "ibuprofen", farve: null, uv: true, rf: { eta: 0.75, he11: 0.52 } },
         naproxen:    { navn: "naproxen", farve: null, uv: true, rf: { eta: 0.75, he11: 0.34 } },
         salicylsyre: { navn: "salicylsyre", farve: null, uv: true, rf: { eta: 0.76, he11: 0.42 } },
-        aminofenol:  { navn: "4-aminofenol", farve: null, uv: true, rf: { eta: 0.22, he11: 0.06 } },
+        aminofenol:  { navn: "4-aminophenol", farve: null, uv: true, rf: { eta: 0.22, he11: 0.06 } },
         kaffeA:      { navn: "et andet stof i kaffe", farve: null, uv: true, rf: { ee91: 0.10 } },
         kaffeB:      { navn: "et andet stof i kaffe", farve: null, uv: true, rf: { ee91: 0.70 } },
         energi:      { navn: "et andet stof i energidrikken", farve: null, uv: true, rf: { ee91: 0.25 } }
@@ -104,7 +104,7 @@
                          { t: "Fire", ok: true }],
                   hint: ["Hver plet i banen med spinat er et farvestof. Tæl dem."],
                   godt: "Spinat indeholder mindst fire farvestoffer. Pladen har skilt den grønne blanding ad." },
-                { slags: "spm", tekst: "Gulerod indeholder kun caroten. Hvilken plet i banen med spinat er caroten?", om: ["bane:0", "bane:1"],
+                { slags: "spm", tekst: "Farvestoffet i gulerod er caroten. Hvilken plet i banen med spinat er caroten?", om: ["bane:0", "bane:1"],
                   svar: [{ t: "Den øverste orange plet", ok: true },
                          { t: "Den nederste gule plet", f: "Caroten fra gulerod er løbet næsten op til væskefronten. Find pletten fra spinat i samme højde." },
                          { t: "Den blågrønne plet", f: "Den blågrønne plet er ikke løbet lige så langt som caroten fra gulerod." }],
@@ -117,11 +117,11 @@
             dele: [
                 { slags: "opgave", maal: "plade",
                   tekst: "Den stationære fase står stille. Klik på den stationære fase i karret, og tryk Indsend svar.",
-                  hint: ["Den stationære fase er det faste stof, som stofferne vandrer hen over.", "Det er det tynde, hvide lag på TLC-pladen."],
-                  godt: "Den stationære fase er laget på TLC-pladen: kiselgel, et hvidt pulver af SiO₂ med OH-grupper på overfladen." },
+                  hint: ["Den stationære fase er det faste stof, som stofferne vandrer hen over.", "Den stationære fase er det tynde, hvide lag på TLC-pladen."],
+                  godt: "Den stationære fase er laget af kiselgel på TLC-pladen. Kiselgel er et hvidt pulver af SiO₂ med OH-grupper på overfladen." },
                 { slags: "opgave", maal: "loeb",
                   tekst: "Den mobile fase bevæger sig. Klik på den mobile fase i karret, og tryk Indsend svar.",
-                  hint: ["Den mobile fase er den væske, der suges op gennem laget på pladen.", "Det er løbevæsken i bunden af karret."] }
+                  hint: ["Den mobile fase er den væske, der suges op gennem laget på pladen.", "Den mobile fase er løbevæsken i bunden af karret."] }
             ],
             loest: "Den mobile fase er løbevæsken. Den suges op gennem laget på pladen og tager stofferne med sig."
         },
@@ -131,7 +131,7 @@
                 { slags: "spm", om: ["lup"],
                   tekst: "Luppen viser caroten og lutein på pladen. Hvorfor løber lutein kortere end caroten?",
                   svar: [{ t: "Hydrogenbindinger til pladen", ok: true },
-                         { t: "Lutein er et tungere molekyle", f: "Lutein og caroten vejer næsten det samme. Se i luppen, hvad luteins OH-grupper gør." },
+                         { t: "Lutein er et tungere molekyle", f: "Lutein og caroten har næsten samme molare masse. Se i luppen, hvad luteins OH-grupper gør." },
                          { t: "Lutein opløses bedst i løbevæsken", f: "Et stof, der opløses godt i løbevæsken, følger med og løber langt. Det gør caroten." }],
                   hint: ["Se i luppen, hvilke molekyler der sidder fast på pladen, og hvilke der følger med væsken.", "Lutein har en OH-gruppe i hver ende. Caroten har ingen."] }
             ],
@@ -150,8 +150,8 @@
                 { slags: "spm", om: ["bane:1"],
                   tekst: "Hvorfor bliver lutein og klorofyl ved startlinjen, når løbevæsken er ren heptan?",
                   svar: [{ t: "Heptan kan ikke trække dem løs", ok: true },
-                         { t: "Heptan løber ikke op ad pladen", f: "Væskefronten nåede toppen. Heptan løb fint, men tog ikke de polære stoffer med." },
-                         { t: "Pletterne var for små", f: "Caroten fra den samme plet løb fint. Det er stofferne, der er forskellige." }],
+                         { t: "Heptan løber ikke op ad pladen", f: "Væskefronten nåede toppen. Heptan løb op ad pladen, men tog ikke de polære stoffer med." },
+                         { t: "Pletterne var for små", f: "Caroten fra den samme plet løb langt. Det er stofferne, der er forskellige." }],
                   hint: ["Heptan er upolær. Lutein og klorofyl er polære og holder fast på den polære plade."] }
             ],
             loest: "Heptan er upolær og sætter sig ikke på pladens OH-grupper. Lutein og klorofyl bliver siddende på den polære plade."
@@ -231,7 +231,7 @@
                   tekst: "Hvordan regnes Rf-værdien for pletten?",
                   svar: [{ t: "plettens afstand / væskefrontens afstand", ok: true, broek: ["plettens afstand", "væskefrontens afstand"] },
                          { t: "væskefrontens afstand / plettens afstand", broek: ["væskefrontens afstand", "plettens afstand"],
-                           f: "Så bliver Rf større end 1. Pletten løber aldrig længere end fronten, så plettens afstand står øverst." },
+                           f: "Med den brøk bliver Rf større end 1. Pletten løber aldrig længere end fronten, så plettens afstand står øverst." },
                          { t: "væskefrontens afstand − plettens afstand",
                            f: "Rf er en brøk, ikke en forskel. Den siger, hvor stor en del af frontens vej pletten er løbet." }],
                   hint: ["Rf-værdien siger, hvor stor en del af væskefrontens vej pletten er løbet."],
@@ -386,7 +386,7 @@
                 { slags: "spm", om: ["visning"],
                   tekst: "TLC-pladen er tør, men der ses ingen pletter. Hvad skal du gøre?",
                   svar: [{ t: "Se på pladen i UV-lys", ok: true },
-                         { t: "Køre pladen en gang til", f: "Stofferne er løbet fint. De er bare farveløse, så pletterne kan ikke ses i dagslys." },
+                         { t: "Køre pladen en gang til", f: "Stofferne er løbet op ad pladen, men de er farveløse, så pletterne kan ikke ses i dagslys." },
                          { t: "Sætte større pletter", f: "Store pletter flyder sammen. Stofferne er der, men de er farveløse." }],
                   hint: ["De fleste lægemidler er farveløse."],
                   godt: "Laget på pladen lyser grønt i UV-lys. Stoffer med en benzenring absorberer lyset og ses som mørke pletter." },
@@ -424,25 +424,25 @@
                   svar: [{ t: "Efter 5 minutter", f: "Bane 2 har stadig en stor plet i samme højde som salicylsyre." },
                          { t: "Efter 15 minutter", f: "Bane 3 har stadig en svag plet i samme højde som salicylsyre." },
                          { t: "Efter 30 minutter", ok: true }],
-                  hint: ["Reaktionen er færdig, når pletten fra startstoffet salicylsyre er væk."] }
+                  hint: ["Reaktionen er forløbet fuldstændig, når pletten fra startstoffet salicylsyre er væk."] }
             ],
             loest: "Efter 30 minutter er pletten fra salicylsyre væk. Al salicylsyre har reageret, og reaktionen er forløbet fuldstændig."
         },
         {
             id: "rent", navn: "Er produktet rent?", loeb: "eta", uv: true,
-            baner: [b("4-aminofenol", [p("aminofenol")]), b("paracetamol", [p("paracetamol")]),
+            baner: [b("4-aminophenol", [p("aminofenol")]), b("paracetamol", [p("paracetamol")]),
                     b("dit produkt", [p("paracetamol"), p("aminofenol", 0.5)]), b("omkrystalliseret", [p("paracetamol")])],
             dele: [
                 { slags: "forsoeg", trin: ["koer", "uv"], om: ["plade", "lampe"],
-                  tekst: "Paracetamol fremstilles af 4-aminofenol. Bane 3 er dit produkt. Kør pladen, og tænd UV-lampen.",
+                  tekst: "Paracetamol fremstilles af 4-aminophenol. Bane 3 er dit produkt. Kør pladen, og tænd UV-lampen.",
                   hint: ["Klik på TLC-pladen over karret. Når pladen er løbet, klikker du på UV-lampen."] },
                 { slags: "spm", om: ["bane:2"],
                   tekst: "Er dit produkt i bane 3 rent paracetamol?",
                   svar: [{ t: "Ja, en plet er ud for paracetamol", f: "Bane 3 har to pletter. Et rent stof giver kun én plet." },
-                         { t: "Nej, der er også 4-aminofenol", ok: true },
+                         { t: "Nej, der er også 4-aminophenol", ok: true },
                          { t: "Nej, det er slet ikke paracetamol", f: "Den øverste plet i bane 3 er i samme højde som paracetamol i bane 2." }],
                   hint: ["Et rent stof giver én plet. Sammenlign pletterne i bane 3 med bane 1 og 2."],
-                  godt: "Den nederste plet i bane 3 er i samme højde som 4-aminofenol. Produktet indeholder rester af startstoffet." },
+                  godt: "Den nederste plet i bane 3 er i samme højde som 4-aminophenol. Produktet indeholder rester af startstoffet." },
                 { slags: "spm", om: ["bane:3"],
                   tekst: "Bane 4 er produktet, efter det er renset ved omkrystallisation. Hvad viser bane 4?",
                   svar: [{ t: "Produktet er rent nu", ok: true },
@@ -503,7 +503,7 @@
                          { t: "Ja, ud fra Rf-værdien", f: "Rf-værdien siger, hvilket stof det er, ikke hvor meget der er af det." }],
                   hint: ["TLC er en kvalitativ metode."] }
             ],
-            loest: "TLC er en kvalitativ metode: den viser, hvilke stoffer der er i en prøve. Hvor meget koffein der er, måles med en kvantitativ metode."
+            loest: "TLC er en kvalitativ metode. Den viser, hvilke stoffer der er i en prøve. Hvor meget koffein der er, måles med en kvantitativ metode."
         }
     ];
 

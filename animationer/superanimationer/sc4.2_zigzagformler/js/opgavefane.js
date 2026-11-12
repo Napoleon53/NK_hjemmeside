@@ -350,7 +350,7 @@
             '<img src="' + k.adresse + '" alt="">' +
             '<div class="gave-navn">' + NK.html(k.titel) + "</div>" +
             '<p class="gave-tekst">' + (antal >= alle ? "Skuffen er tom. Alle ti klistermærker er dine." :
-                "Ligger nu på tegnebrættet. " + antal + " af " + alle + ".") + "</p>" +
+                "Klistermærket ligger nu på tegnebrættet. Du har " + antal + " af " + alle + " klistermærker.") + "</p>" +
             '<a class="knap blaa gave-proev" href="' + TEGNEBRAET + "#klister=" + encodeURIComponent(k.navn) +
             '" target="_blank" rel="noopener"><span>Prøv den på tegnebrættet</span><span class="tegn">↗</span></a>';
         sim.L.canvas.parentElement.appendChild(e);

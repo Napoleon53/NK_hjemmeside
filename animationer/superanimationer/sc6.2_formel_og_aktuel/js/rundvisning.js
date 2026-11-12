@@ -19,24 +19,24 @@
             { sel: "#opl-anker-krukke", titel: "Krukken", tekst: "Træk en portion salt ned i glasset, eller klik på krukken. En portion er 0,10 mol." },
             { sel: "#opl-anker-glas", titel: "Glasset", tekst: "Rumfanget står fast i hver opgave. Saltet deler sig i ioner, når det opløses." },
             { sel: "#opl-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." },
-            { sel: "#opl-anker-soejler", titel: "Søjlerne", tekst: "Den grå søjle er saltets koncentration. De farvede er ionernes. Den stiplede linje er målet." },
+            { sel: "#opl-anker-soejler", titel: "Søjlerne", tekst: "Den grå søjle er saltets koncentration. De farvede søjler er ionernes koncentrationer. Den stiplede linje er målet." },
             { sel: "#opl-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Nogle opgaver starter med et gæt, og nogle har spørgsmål, når saltet er opløst. Vælg et svar, og tryk på Indsend svar." },
             { sel: "#opl-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på Giv hint. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#opl-kort", titel: "Beregningen", tekst: "Når opgaven er løst, står beregningen her. Start forfra tømmer glasset." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Ionerne: regn ionernes koncentrationer ud. Blandinger: en ion, der kommer fra to salte." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Ionerne: Regn ionernes koncentrationer ud. Blandinger: en ion, der kommer fra to salte." }
         ],
         "fane-ioner": [
-            { sel: "#ioner-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal, opløsningsskemaet og beregningerne." },
+            { sel: "#ioner-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser opgavens tal, opløsningsskemaet og beregningerne." },
             { sel: "#ioner-skort", titel: "Opgaven", tekst: "Opgaven og spørgsmålet til trinnet står på kortet øverst. Giv hint giver et hint og derefter svaret." },
-            { sel: "#ioner-raekker", titel: "Skemaet og tallene", tekst: "Skriv først tallene foran ionerne i opløsningsskemaet. Så ionernes koncentrationer. Tryk på Indsend svar eller Enter." },
-            { sel: "#ioner-anker-soejler", titel: "Søjlerne", tekst: "En søjle kommer, når du har fundet tallet. Luppen fyldes til sidst." },
-            { sel: "#ioner-opgaver", titel: "Niveauerne", tekst: "Let, Middel og Svær. Middel er af og til baglæns. Svær starter fra massen. Ny opgave giver et nyt salt." }
+            { sel: "#ioner-raekker", titel: "Skemaet og tallene", tekst: "Skriv først tallene foran ionerne i opløsningsskemaet og derefter ionernes koncentrationer. Tryk på Indsend svar eller Enter." },
+            { sel: "#ioner-anker-soejler", titel: "Søjlerne", tekst: "En søjle kommer frem, når du har fundet koncentrationen. Luppen fyldes til sidst." },
+            { sel: "#ioner-opgaver", titel: "Niveauerne", tekst: "Let, Middel og Svær. I Middel kender du af og til en ions koncentration og regner baglæns. Svær starter fra saltets masse. Ny opgave giver et nyt salt." }
         ],
         "fane-bland": [
-            { sel: "#bland-anker-glas", titel: "Glassene", tekst: "I første opgave kommer saltet fra vægten i vandet, når du har regnet dets koncentration. Ellers hældes A og B i blandingen, når du har regnet det samlede rumfang." },
-            { sel: "#bland-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne." },
+            { sel: "#bland-anker-glas", titel: "Glassene", tekst: "I første opgave kommer saltet fra vægten i vandet, når du har regnet dets koncentration. I de andre opgaver hældes glas A og B sammen, når du har regnet det samlede rumfang." },
+            { sel: "#bland-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser opgavens tal og beregningerne." },
             { sel: "#bland-skort", titel: "Opgaven", tekst: "Opgaven og spørgsmålet til trinnet står på kortet øverst. Giv hint giver et hint og derefter svaret." },
-            { sel: "#bland-kort", titel: "Regnetrinene", tekst: "Skriv formlen og så tallet, og tryk på Indsend svar. I stofmængden skal tallet foran ionen med, fx n = 2 · c · V." },
+            { sel: "#bland-kort", titel: "Regnetrinene", tekst: "Skriv formlen og så tallet, og tryk på Indsend svar. I stofmængden skal tallet foran ionen med, for eksempel n = 2 · c · V." },
             { sel: "#bland-anker-zoom", titel: "Luppen", tekst: "Ionerne i blandingen kommer, når koncentrationen er fundet." },
             { sel: "#bland-opgaver", titel: "Opgaverne", tekst: "Fire opgaver. Nye tal giver samme opgave med andre salte og tal." }
         ]

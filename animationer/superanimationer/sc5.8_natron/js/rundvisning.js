@@ -16,26 +16,26 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Kortet øverst i scenen viser opgaven. Gæt først, hvad der bliver tilbage i diglen. Bagefter viser kortet trinnene, og linjen i kortet siger, hvad du skal nu." },
-            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Den er nulstillet med den tomme digel, så den viser massen af det, der er i diglen. En varm digel vejer for lidt." },
+            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Kortet øverst i scenen viser opgaven. Gæt først, hvad der bliver tilbage i diglen. Bagefter viser kortet trinnene, og linjen i kortet siger, hvad du skal gøre nu." },
+            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Vægten er nulstillet med den tomme digel og viser derfor massen af det, der er i diglen. En varm digel vejer for lidt." },
             { sel: "#forsoeg-anker-opstilling", titel: "Trefoden og brænderen", tekst: "Træk diglen hen på trefoden, eller klik på den. Diglen står i porcelænstrekanten over flammen." },
-            { sel: "#forsoeg-anker-knapper", titel: "Flammen", tekst: "Sluk, Lav og Høj. Start med lav flamme, ellers sprøjter pulveret ud af diglen." },
+            { sel: "#forsoeg-anker-knapper", titel: "Flammen", tekst: "Brænderen har tre knapper: Sluk, Lav og Høj. Start med lav flamme, ellers sprøjter pulveret ud af diglen." },
             { sel: "#forsoeg-skema", titel: "Vejningerne", tekst: "Skriv startmassen og hver vejning i skemaet, og tryk på Indsend svar på kortet. Massen er konstant, når to vejninger i træk giver det samme." },
             { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Natronen består af Na⁺ og HCO₃⁻. Gas forsvinder. Det, der bliver tilbage, står som ?, til du har fundet det på fanen Hypoteserne." },
             { sel: "#forsoeg-anker-graf", titel: "Grafen", tekst: "Dine vejninger. Kurven bliver vandret, når massen er konstant." },
             { sel: "#forsoeg-kort", titel: "Giv et hint", tekst: "Sidder du fast, så tryk på Giv et hint på kortet. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#journalknap", titel: "Journalen", tekst: "Dit gæt, dine vejninger, beregningerne og konklusionen på én side, som kan udskrives." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Hypoteserne: regn ud, hvad diglen skal veje i hver hypotese. Fejlkilder: hvad sker der, når noget går galt?" }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Hypoteserne: Regn ud, hvad diglen skal veje i hver hypotese. Fejlkilder: Hvad sker der, når noget går galt?" }
         ],
         "fane-hypoteser": [
             { sel: "#hypoteser-anker-tavle", titel: "Tavlen", tekst: "Opgaven står på kortet over tavlen. På tavlen står skemaet med dine tal, atomtællingen og beregningen, efterhånden som du skriver den." },
-            { sel: "#hypoteser-raekker", titel: "Afstem, formel og tal", tekst: "Afstem skemaet først. Skriv så formlen med symboler, fx n(Na₂O) = n(NaHCO₃) / 2, sæt tallene ind og regn resultatet ud. Tryk på Indsend svar på kortet, eller tryk Enter." },
+            { sel: "#hypoteser-raekker", titel: "Afstem, formel og tal", tekst: "Afstem skemaet først. Skriv så formlen med symboler, for eksempel n(Na₂O) = n(NaHCO₃) / 2. Sæt derefter tallene ind, og regn resultatet ud. Tryk på Indsend svar på kortet, eller tryk Enter." },
             { sel: "#hypoteser-anker-graf", titel: "Grafen", tekst: "Dine vejninger fra forsøget. Hver hypotese, du har regnet, får en stiplet streg ved sin forventede masse." },
-            { sel: "#hypoteser-opgaver", titel: "Opgaverne", tekst: "Natronen, de tre hypoteser og til sidst dommen: hvilken streg ender kurven på?" }
+            { sel: "#hypoteser-opgaver", titel: "Opgaverne", tekst: "Først regner du stofmængden af natron og de tre hypoteser. Til sidst afgør du, hvilken streg på grafen kurven ender på." }
         ],
         "fane-fejl": [
-            { sel: "#fejl-anker-g1", titel: "Gruppe 1", tekst: "Gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af." },
-            { sel: "#fejl-anker-g2", titel: "Gruppe 2", tekst: "Gør én ting anderledes. Den står på kortet øverst i scenen. Skiltet viser uret og til sidst slutmassen." },
+            { sel: "#fejl-anker-g1", titel: "Gruppe 1", tekst: "Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af." },
+            { sel: "#fejl-anker-g2", titel: "Gruppe 2", tekst: "Gruppe 2 gør én ting anderledes, og kortet øverst i scenen siger hvilken. Skiltet viser uret og til sidst slutmassen." },
             { sel: "#fejl-kort", titel: "Spørgsmålet", tekst: "Vejer diglen hos gruppe 2 til sidst mere, mindre eller det samme som hos gruppe 1? Vælg et svar, og tryk på Indsend svar. Så laver begge grupper forsøget." },
             { sel: "#fejl-resultat", titel: "Resultaterne", tekst: "Slutmassen, tabet og den hypotese, massen passer med, for begge grupper." },
             { sel: "#fejl-opgaver", titel: "Fejlkilderne", tekst: "Seks ting, der kan gå galt. Et rigtigt svar første gang giver en stjerne." }

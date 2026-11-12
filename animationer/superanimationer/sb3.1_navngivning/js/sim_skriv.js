@@ -259,7 +259,7 @@
         if (!d) {
             ctx.font = "600 " + fs + "px 'Segoe UI', Arial, sans-serif";
             ctx.fillStyle = "#94a3b8";
-            linjer(ctx, "Når du trykker Tjek, tegner tavlen det navn, du har skrevet, her.", k.x + k.b / 2, k.y + k.h / 2, k.b - 40, fs * 1.35);
+            linjer(ctx, "Her tegner tavlen molekylet ud fra dit navn, når du trykker Tjek.", k.x + k.b / 2, k.y + k.h / 2, k.b - 40, fs * 1.35);
             ctx.restore();
             return;
         }

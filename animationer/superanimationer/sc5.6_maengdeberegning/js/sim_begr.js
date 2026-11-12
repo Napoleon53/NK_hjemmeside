@@ -140,7 +140,7 @@
         var r = this.opg.r, o = this.x.o;
         var kA = r.led[this.jA].k, kB = r.led[this.jB].k;
         return "Del hver stofmængde med sin koefficient: n(" + D.stof(o.a).formel + ") / " + kA + " og n(" +
-            D.stof(o.b).formel + ") / " + kB + ". Det mindste tal slipper op først.";
+            D.stof(o.b).formel + ") / " + kB + ". Det stof, der giver det mindste tal, slipper op først.";
     };
 
     /* Den paene begrundelse til panelet */

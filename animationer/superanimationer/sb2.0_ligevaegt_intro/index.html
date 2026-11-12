@@ -37,7 +37,7 @@
 <section class="fane aktiv" id="fane-bro" role="tabpanel" aria-label="Lillebæltsbroerne">
     <div class="scene">
         <canvas id="bro-laerred"></canvas>
-        <div class="scene-mrk">Bilerne kører hele tiden, men fordelingen mellem broerne falder til ro: <b>dynamisk</b> balance.</div>
+        <div class="scene-mrk">Bilerne kører hele tiden, men fordelingen mellem broerne falder til ro. Det er en <b>dynamisk</b> balance.</div>
     </div>
 
     <aside class="panel">
@@ -108,14 +108,14 @@
 <section class="fane" id="fane-natur" role="tabpanel" aria-label="Rensdyr og føde">
     <div class="scene">
         <canvas id="nat-laerred"></canvas>
-        <div class="scene-mrk">Bestanden står stille, fordi der fødes lige så mange, som der dør. To modsatrettede processer i balance.</div>
+        <div class="scene-mrk">Bestanden af rensdyr er konstant, fordi der fødes lige så mange rensdyr, som der dør. To modsatrettede processer er i balance.</div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
             <h2>Balance i naturen</h2>
-            <p>Rensdyrene formerer sig, når der er føde nok, og dør hurtigere, når der er mangel. Bestanden lander dér, hvor fødsler og dødsfald går lige op — en <b>stationær tilstand</b>.</p>
-            <p>Pas på: her findes ingen ligevægtskonstant. Balancen flytter sig, hvis bæreevnen ændres. Det er forskellen på den her balance og en rigtig kemisk ligevægt.</p>
+            <p>Rensdyrene formerer sig, når der er føde nok, og dør hurtigere, når der er mangel på føde. Bestanden indstiller sig dér, hvor fødsler og dødsfald går lige op. Det kaldes en <b>stationær tilstand</b>.</p>
+            <p>Bemærk, at der ikke findes nogen ligevægtskonstant for rensdyrene. Balancen flytter sig, hvis bæreevnen ændres. Den manglende ligevægtskonstant er forskellen på denne balance og en kemisk ligevægt.</p>
             <div class="ligning"><span class="frem">Fødsler</span> <span class="hj">⇌</span> <span class="tilbage">Dødsfald</span></div>
         </div>
 
@@ -172,14 +172,14 @@
 <section class="fane" id="fane-marked" role="tabpanel" aria-label="Torvet">
     <div class="scene">
         <canvas id="mrk-laerred"></canvas>
-        <div class="scene-mrk">Prisen flytter sig, indtil udbud og efterspørgsel er lige store. Et indgreb giver en <b>ny</b> ligevægt — ikke den gamle.</div>
+        <div class="scene-mrk">Prisen flytter sig, indtil udbud og efterspørgsel er lige store. Et indgreb giver en <b>ny</b> ligevægt og ikke den gamle.</div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
             <h2>Udbud og efterspørgsel</h2>
-            <p>Er prisen høj, vil mange sælge og få købe. Er den lav, er det omvendt. Prisen skubbes af forskellen mellem de to og lander, hvor kurverne krydser.</p>
-            <p>Prisen spiller samme rolle som reaktionsbrøken: den er det tal, der indstiller sig, indtil de to modsatrettede strømme er lige store.</p>
+            <p>Er prisen høj, vil mange sælge og få købe. Er den lav, er det omvendt. Prisen skubbes af forskellen mellem udbud og efterspørgsel og indstiller sig, hvor de to kurver krydser hinanden.</p>
+            <p>Prisen spiller samme rolle som reaktionsbrøken. Begge ændrer sig, indtil de to modsatrettede strømme er lige store.</p>
             <div class="ligning"><span class="frem">Udbud</span> <span class="hj">⇌</span> <span class="tilbage">Efterspørgsel</span></div>
         </div>
 
@@ -234,14 +234,14 @@
 <section class="fane kemi" id="fane-kemi" role="tabpanel" aria-label="Kemien">
     <div class="scene">
         <canvas id="kem-laerred"></canvas>
-        <div class="scene-mrk">Nu med rigtige molekyler. Farven står stille, når ligevægten er indstillet — men molekylerne reagerer stadig begge veje.</div>
+        <div class="scene-mrk">I denne fane reagerer rigtige molekyler. Farven ændrer sig ikke, når ligevægten har indstillet sig, men molekylerne reagerer stadig begge veje.</div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
             <h2>N₂O₄ ⇌ 2 NO₂</h2>
-            <p>Farveløs N₂O₄ spaltes til rødbrun NO₂. Frem afhænger af [N₂O₄], tilbage af [NO₂]² — for der skal <b>to</b> NO₂-molekyler til at danne ét N₂O₄.</p>
-            <p>Sæt de to hastigheder lig hinanden, og ligevægtsloven falder ud af sig selv.</p>
+            <p>Farveløs N₂O₄ spaltes til rødbrun NO₂. <i>v</i>(frem) afhænger af [N₂O₄], og <i>v</i>(tilbage) afhænger af [NO₂]², fordi der skal <b>to</b> NO₂-molekyler til at danne ét N₂O₄.</p>
+            <p>Når de to hastigheder sættes lig hinanden, fås ligevægtsloven.</p>
             <div class="ligning"><span class="frem">k(frem)·[N₂O₄]</span> <span class="hj">=</span> <span class="tilbage">k(tilbage)·[NO₂]²</span></div>
         </div>
 
@@ -299,10 +299,10 @@
                 <input type="range" id="kem-temp" min="250" max="350" step="1" value="298">
             </div>
             <div class="skyder lilla">
-                <label><span>Volumen (stemplet)</span><b id="kem-vol-vis">1,00 L</b></label>
+                <label><span>Rumfang (stemplet)</span><b id="kem-vol-vis">1,00 L</b></label>
                 <input type="range" id="kem-vol" min="0.5" max="1.4" step="0.05" value="1">
             </div>
-            <div class="kformel">Frem er endoterm (ΔH = +57 kJ/mol): varme flytter K opad. Volumen ændrer <i>ikke</i> K — kun koncentrationerne.</div>
+            <div class="kformel">Reaktionen frem er endoterm (ΔH = +57 kJ/mol), så K stiger, når temperaturen stiger. Rumfanget ændrer <i>ikke</i> K, kun koncentrationerne.</div>
         </div>
 
         <div class="kort">
@@ -320,12 +320,12 @@
                 <table class="oversaet-tabel">
                     <tr><th>Lillebælt</th><th>N₂O₄ ⇌ 2 NO₂</th></tr>
                     <tr><td>Trafik over begge broer hele tiden</td><td>Reaktion begge veje hele tiden</td></tr>
-                    <tr><td>Fordelingen mellem broerne står stille</td><td>Koncentrationerne står stille</td></tr>
+                    <tr><td>Fordelingen mellem broerne står stille</td><td>Koncentrationerne er konstante</td></tr>
                     <tr><td>Rejsetiderne bliver lige lange</td><td><i>v</i>(frem) = <i>v</i>(tilbage)</td></tr>
                     <tr><td>Myldretid eller storm giver en ny fordeling</td><td>Tilsat stof, tryk eller temperatur giver en ny ligevægt</td></tr>
                     <tr><td>Ingen ligevægtskonstant</td><td>K = [NO₂]²/[N₂O₄]</td></tr>
                 </table>
-                <p class="kort" style="border:none;padding:8px 0 0 0;background:none;font-size:0.78rem;color:#8d95a1;">Broerne viser, hvordan en balance indstiller sig. Kemien har desuden en ligevægtskonstant, og koefficienten i reaktionsskemaet bliver til en eksponent i ligevægtsloven.</p>
+                <p class="kort" style="border:none;padding:8px 0 0 0;background:none;font-size:0.78rem;color:#8d95a1;">Broerne viser, hvordan en balance indstiller sig. En kemisk ligevægt har desuden en ligevægtskonstant, og koefficienterne i reaktionsskemaet bliver til eksponenter i ligevægtsloven.</p>
             </details>
         </div>
     </aside>
@@ -337,22 +337,22 @@
 <div class="overlay" id="hjaelp">
     <div class="overlay-boks">
         <h2>Dynamisk ligevægt — introduktion</h2>
-        <p>Fire modeller af den samme idé: <b>når to modsatrettede processer kører lige hurtigt, står tallene stille, selvom der stadig sker noget.</b></p>
+        <p>Fire modeller af den samme idé: <b>Når to modsatrettede processer forløber lige hurtigt, ændrer tallene sig ikke, selv om der stadig sker noget.</b></p>
 
         <h3>De fire faner</h3>
         <ul>
-            <li><b>Lillebæltsbroerne</b>: bilisterne vælger den hurtigste bro. Fordelingen falder til ro, når rejsetiderne er lige lange, og flytter sig med døgnets trafik og vejret.</li>
-            <li><b>Rensdyr og føde</b> — en balance af samme slags, men uden ligevægtskonstant. Her flytter balancen sig, når bæreevnen ændres.</li>
-            <li><b>Torvet</b> — prisen indstiller sig, hvor udbud og efterspørgsel krydser. Et indgreb giver en ny ligevægt.</li>
-            <li><b>Kemien</b> — den rigtige reaktion N₂O₄ ⇌ 2 NO₂, med temperatur, volumen og farveskift.</li>
+            <li><b>Lillebæltsbroerne</b>: Bilisterne vælger den hurtigste bro. Fordelingen falder til ro, når rejsetiderne er lige lange, og flytter sig med døgnets trafik og vejret.</li>
+            <li><b>Rensdyr og føde</b>: en balance af samme slags, men uden ligevægtskonstant. Her flytter balancen sig, når bæreevnen ændres.</li>
+            <li><b>Torvet</b>: Prisen indstiller sig, hvor udbud og efterspørgsel krydser. Et indgreb giver en ny ligevægt.</li>
+            <li><b>Kemien</b>: den rigtige reaktion N₂O₄ ⇌ 2 NO₂ med temperatur, rumfang og farveskift.</li>
         </ul>
 
         <h3>Prøv det her</h3>
         <ul>
-            <li>Stop uret i myldretiden på fane 1. Hvor mange tager den gamle bro, og hvad viser rejsetidstavlerne?</li>
-            <li>Slå storm til om natten og i myldretiden på fane 1. Hvornår giver det kø?</li>
-            <li>Varm gassen op på fane 4. Bliver den brunere eller lysere — og hvad siger det om, hvilken vej der er endoterm?</li>
-            <li>Klem stemplet sammen. K står stille, men farven ændrer sig. Hvorfor?</li>
+            <li>Stop uret i myldretiden på fane 1. Hvor mange procent af bilisterne tager den gamle bro, og hvad viser rejsetidstavlerne?</li>
+            <li>Slå storm til om natten og i myldretiden på fane 1. Hvornår giver stormen kø?</li>
+            <li>Varm gassen op på fane 4. Bliver gassen brunere eller lysere, og hvad siger farven om, hvilken retning af reaktionen der er endoterm?</li>
+            <li>Klem stemplet sammen på fane 4. K ændrer sig ikke, men farven ændrer sig. Hvorfor?</li>
         </ul>
 
         <h3>Genveje</h3>

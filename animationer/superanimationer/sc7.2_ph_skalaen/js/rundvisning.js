@@ -16,10 +16,10 @@
 
     var TURE = {
         "fane-skala": [
-            { sel: "#skala-skort", titel: "Opgaven", tekst: "Kortet øverst viser hylden og opgaven. Hint og svar står også her." },
-            { sel: "#skala-anker-skala", titel: "pH-skalaen", tekst: "Her fra −1 til 15, for skalaen stopper ikke ved 0 og 14. Under 7 er surt, 7 er neutralt, og over 7 er basisk. Farverne er universalindikatorens." },
+            { sel: "#skala-skort", titel: "Opgaven", tekst: "Kortet øverst viser hylden, opgaven, hint og svar." },
+            { sel: "#skala-anker-skala", titel: "pH-skalaen", tekst: "Skalaen går her fra −1 til 15, for pH stopper ikke ved 0 og 14. Under 7 er surt, 7 er neutralt, og over 7 er basisk. Farverne er universalindikatorens." },
             { sel: "#skala-anker-stoffer", titel: "Stofferne", tekst: "Træk et stof op på skalaen, der hvor du tror, det hører til." },
-            { sel: "#skala-anker-meter", titel: "pH-metret", tekst: "Det måler stoffet, når du slipper det. Så flyver stoffet hen til sin rigtige plads." },
+            { sel: "#skala-anker-meter", titel: "pH-metret", tekst: "pH-metret måler stoffet, når du slipper stoffet på skalaen. Derefter flyver stoffet hen til sin rigtige plads." },
             { sel: "#skala-anker-baner", titel: "De målte stoffer", tekst: "Den gule trekant under skalaen er dit gæt. Klik på et stof for at se det igen." },
             { sel: "#skala-gaetkort", titel: "Gæt og målt", tekst: "To hylder med seks stoffer. Tabellen samler dine gæt og de målte værdier." },
             { sel: "#teoriknap", titel: "Teori", tekst: "pH-skalaen kort forklaret." },
@@ -30,7 +30,7 @@
             { sel: "#lup-anker-skala", titel: "pH-mærket", tekst: "Træk mærket, eller klik på skalaen. Pilene på tastaturet virker også." },
             { sel: "#lup-anker-glas", titel: "Glasset", tekst: "Vand med universalindikator. Farven følger pH." },
             { sel: "#lup-anker-lup", titel: "Luppen", tekst: "Et lille rum af væsken. 1 prik er 1 ion: røde er H₃O⁺, blå er OH⁻." },
-            { sel: "#lup-anker-zoom", titel: "Luppen zoomer selv", tekst: "Bliver der over 100 af én slags, zoomer den ind på et 10 gange mindre rum. Linjen her viser, hvor mange gange den har zoomet." },
+            { sel: "#lup-anker-zoom", titel: "Luppen zoomer selv", tekst: "Bliver der over 100 ioner af én slags, zoomer den ind på et 10 gange mindre rum. Linjen her viser, hvor mange gange den har zoomet." },
             { sel: "#lup-maaling", titel: "I luppen", tekst: "Antallet af ioner og koncentrationerne ved den pH, du har valgt." },
             { sel: "#lup-kort", titel: "Målene", tekst: "Fem små mål. Her kan du også starte målene forfra." }
         ],

@@ -286,7 +286,7 @@
         if (!o || this.naaet) { this.kort.blink(); return; }
         if (!this.paaVaegten().length) {
             this.kort.blink();
-            this.besked("Læg først klumper på vægten. Så kan du sende svaret.", "peger");
+            this.besked("Læg først klumper på vægten, og tryk derefter Indsend svar.", "peger");
             return;
         }
         var k = this.kompAlle(), r = o.tjek(k);
@@ -683,7 +683,7 @@
             var oeverst = null;
             this.paaVaegten().forEach(function (k) { if (!oeverst || k.y < oeverst.y) oeverst = k; });
             if (oeverst) {
-                this.besked("Atomerne i " + NK.html(oeverst.st.navn) + ". Hver klump er 6,02 · 10²³ af dem.", "");
+                this.besked("Atomerne i " + NK.html(oeverst.st.navn) + ". Hver klump indeholder 6,02 · 10²³ af dem.", "");
                 this.naerBesked = true;
             }
         }

@@ -53,7 +53,7 @@
             { navn: "Opløsningerne", pladser: ["stamopløsning", "standardopløsning", "blindprøve"],
               ros: "Standardopløsningerne laves ved at fortynde stamopløsningen. Med blindprøven nulstilles apparatet." },
             { navn: "Graferne", pladser: ["standardkurve", "lineært område"],
-              ros: "På standardkurven aflæses prøvens koncentration. Den kan kun bruges i det lineære område." }
+              ros: "På standardkurven aflæses prøvens koncentration. Standardkurven kan kun bruges i det lineære område." }
         ],
         pladser: [
             { id: "stamopløsning", ord: ["stamopløsning"], x: KO.cx, y: 50, maal: [KO.cx, 86], dele: ["kolbe"],

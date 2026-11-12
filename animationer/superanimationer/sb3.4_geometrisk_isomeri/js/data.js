@@ -56,14 +56,14 @@
     D.DREJ = [
         { id: "d1", navn: "Butan", slags: "drej", binding: 1,
           v: ["CH3", "H", "H"], h: ["CH3", "H", "H"], drej: 180,
-          maal: "Træk i den højre halvdel af butan, så de to CH₃ står på samme side. Tryk så Indsend svar." },
+          maal: "Træk i den højre halvdel af butanmolekylet, så de to CH₃-grupper står på samme side. Tryk så Indsend svar." },
         { id: "d2", navn: "But-2-en", slags: "drej", binding: 2,
           v: ["CH3", "H"], h: ["H", "CH3"], drej: 0,
-          maal: "Prøv det samme med but-2-en: træk den højre CH₃ op på samme side som den venstre. Kan CH₃ komme derop?" },
+          maal: "Træk den højre CH₃-gruppe i but-2-en op på samme side som den venstre CH₃-gruppe. Kan CH₃-gruppen komme derop?" },
         { id: "d3", navn: "1,2-dichlorethen", slags: "to", binding: 2,
           a: { v: ["Cl", "H"], h: ["Cl", "H"] }, b: { v: ["Cl", "H"], h: ["H", "Cl"] },
           kog: [60, 48], smelt: [-81, -49],
-          maal: "A og B har begge formlen C₂H₂Cl₂. Er A og B det samme stof?" },
+          maal: "A og B har begge molekylformlen C₂H₂Cl₂. Er A og B det samme stof?" },
         /* byt: A er molekylet, B er en kopi, hvor eleven bytter de to grupper til
            venstre og vender molekylet. foer og efter: navnene, naar B er et nyt stof */
         { id: "d4", navn: "Propen", slags: "byt", binding: 2,
@@ -128,13 +128,13 @@
     };
 
     D.FAERDIG = {
-        dr: "Alle seks er løst. Der er kun to former, når begge C-atomer har to forskellige grupper.",
-        pr: "Alle tolv er løst. Du kan bestemme E og Z ud fra prioriteterne."
+        dr: "Alle seks opgaver er løst. Der er kun to former, når begge C-atomer har to forskellige grupper.",
+        pr: "Alle tolv opgaver er løst. Du kan bestemme E og Z ud fra prioriteterne."
     };
     D.ROS = ["Rigtigt.", "Sådan.", "Det passer.", "Godt set."];
 
     /* Paaskeaegget: fire H giver ethen */
-    D.ETHEN = "Fire H er ethen. Det sidder i bananer og får dem til at modne.";
+    D.ETHEN = "Med fire H er molekylet ethen. Ethen dannes i bananer og får dem til at modne.";
 
     NK.Data = D;
 }());

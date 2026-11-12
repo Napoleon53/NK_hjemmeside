@@ -182,7 +182,7 @@
                 return { besked: "Koefficienterne gælder mol, ikke gram. Gå over stofmængden n(" + f(st) + ")." };
             }
             if (c.kilde !== st && naer(v, c.n * c.kilde.Mv) && !naer(c.kilde.Mv, M)) {
-                return { besked: "Det er molarmassen for " + K + ". Brug M for " + f(st) + "." };
+                return { besked: "Du har brugt molarmassen for " + K + ". Brug M for " + f(st) + "." };
             }
             if (c.mKilde !== undefined && naer(v, c.mKilde) && !naer(c.mKilde, facit)) {
                 return { besked: "Det er massen af " + K + ". Stofferne vejer ikke det samme pr. mol." };

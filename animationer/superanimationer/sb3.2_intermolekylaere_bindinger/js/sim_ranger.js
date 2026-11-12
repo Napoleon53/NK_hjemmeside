@@ -66,7 +66,7 @@
 
     P.delNu = function () {
         return { slags: "opgave", chip: this.opg.o.navn,
-            tekst: "Sæt stofferne i rækkefølge efter kogepunkt, det laveste til venstre.",
+            tekst: "Sæt stofferne i rækkefølge efter kogepunkt med det laveste kogepunkt til venstre.",
             ekstra: '<p class="sk-gaet">' + NK.html(this.gruppe[this.opg.o.gruppe].fokus) + "</p>" };
     };
 

@@ -339,7 +339,7 @@ function koerTest(W) {
     lyt();
     R.tidKlik(); koerF(R, 18);
     paastand("opgave 6: plastmuffe med kobberrøret først: kobberionerne giver hul efter 13 år, og linjen siger hvorfor", roed(R) && R.opg.fase === "forsoeg" && D.aar(R.t) === 13 &&
-        /kobberioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById("r-proevet").textContent), linje(R));
+        /kobber\(II\)ioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById("r-proevet").textContent), linje(R));
     paastand("plasten standser elektronerne, men ikke kobberionerne", R.M.tael.afsat >= 3 && afg.every(function (p) { return p[0] >= 7 && p[1] >= 7; }), afg.length + " / " + R.M.tael.afsat);
     R.saetRoer("Fe", "Cu", true);
     lyt();
@@ -588,7 +588,7 @@ function koerTest(W) {
     paastand("beskederne om rækkefølgen og muffen", /Vandet skal komme gennem jernrøret først/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, cufe)) &&
         /Slå Plastmuffe fra/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, plast)) &&
         /Sæt plastmuffen imellem/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, fecu)) &&
-        /kobberioner med hen til jernrøret\. Sæt jernrøret til venstre/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, cuplast)));
+        /kobber\(II\)ioner med hen til jernrøret\. Sæt jernrøret til venstre/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, cuplast)));
 
     /* ------------------------------------------------------------------ */
     overskrift("10. Layoutet");

@@ -168,7 +168,7 @@ async function koerTest(W) {
             k1.indsendKlik();
             var b = besked(k1);
             husk("fejl fortegn " + f.id, b);
-            if (!/(lille|stort) Ks giver/.test(b)) flaskeFejl.push(f.id + " fortegn: " + b);
+            if (!/(lille|stor) Ks giver/.test(b)) flaskeFejl.push(f.id + " fortegn: " + b);
         }
         k1.saetP(Math.round((s.pks + 0.8) * 10) / 10);
         if (k1.groen) flaskeFejl.push(f.id + " løst uden Indsend");

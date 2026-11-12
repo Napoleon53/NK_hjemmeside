@@ -193,10 +193,10 @@ function koerTest(W) {
         rB2 && rB2.besked === "To klumper kobber vejer 127,10 g. Det er for lidt.", (rB && rB.besked) + " | " + (rB2 && rB2.besked));
     var pC = O.TYPER[1].alle().findIndex(function (p) { return D.STOFFER[p[0]].s === "Cu" && D.STOFFER[p[1]].s === "Au" && p[2] === 4 && p[3] === 2; });
     var oC = O.opgave(4, pC);
-    paastand("to stoffer: \"Bland kobber og guld: 4 mol i alt, og vægten skal vise 521,04 g.\"",
-        oC.tekst === "Bland kobber og guld: 4 mol i alt, og vægten skal vise 521,04 g.", oC.tekst);
+    paastand("to stoffer: \"Bland kobber og guld, så der er 4 mol i alt, og vægten viser 521,04 g.\"",
+        oC.tekst === "Bland kobber og guld, så der er 4 mol i alt, og vægten viser 521,04 g.", oC.tekst);
     var rC = oC.tjek(kompAf({ Cu: 3, Au: 1 })), rC2 = oC.tjek(kompAf({ Cu: 2, Ag: 1 }));
-    paastand("to stoffer: for lidt, og et forkert stof får besked", rC && rC.besked === "4 mol og 387,62 g. Det er for lidt." &&
+    paastand("to stoffer: for lidt, og et forkert stof får besked", rC && rC.besked === "4 mol vejer 387,62 g. Det er for lidt." &&
         rC2 && rC2.besked === "Brug kun kobber og guld.", (rC && rC.besked) + " | " + (rC2 && rC2.besked));
     var oD = O.opgave(5, O.GRAENSER.indexOf(500));
     var rD = oD.tjek(kompAf({ Au: 4 })), rD2 = oD.tjek(kompAf({ Au: 2, Ag: 1 }));

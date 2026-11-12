@@ -101,7 +101,7 @@
         var r = rens(raa);
         if (!r) return tom("Skriv navnet på " + g.s + " i feltet.");
         if (r === g.navn || g.alt.indexOf(r) >= 0) {
-            if (g.alt.indexOf(r) >= 0 && r === "titanium") return ok("På dansk hedder det titan.");
+            if (g.alt.indexOf(r) >= 0 && r === "titanium") return ok("På dansk hedder grundstoffet titan.");
             return ok(g.alt.indexOf(r) >= 0 ? "Rigtigt. Navnet i kemi er " + g.navn + "." : "");
         }
         if (/^[0-9]+$/.test(r)) return nej("Skriv navnet med bogstaver.");
@@ -109,7 +109,7 @@
         /* Symbolet i stedet for navnet */
         if (r.length <= 2) {
             var sym = findSymbol(r);
-            if (sym === g.s) return nej("Det er symbolet. Skriv navnet.");
+            if (sym === g.s) return nej("Du har skrevet symbolet. Skriv navnet.");
             if (sym) return nej("Skriv navnet på " + g.s + ", ikke et symbol.");
         }
 
@@ -139,7 +139,7 @@
                 var bedreAndet = Object.keys(ALLE_NAVNE).some(function (x) {
                     return ALLE_NAVNE[x] !== g.s && afstand(r, x) <= tae;
                 });
-                if (!bedreAndet) return ok("Staves " + n + ".");
+                if (!bedreAndet) return ok("Navnet staves " + n + ".");
             }
         }
         /* Taet paa et andet grundstofs navn */
@@ -151,7 +151,7 @@
         });
         if (naermest) {
             var s2 = ALLE_NAVNE[naermest.navn];
-            return nej("Det ligner " + naermest.navn + ", og det har symbolet " + s2 + ".");
+            return nej("Dit svar ligner " + naermest.navn + ", som har symbolet " + s2 + ".");
         }
         return nej("Det er ikke navnet på " + g.s + ". Navnet står på navnetavlen i udstillingen.");
     };
@@ -168,10 +168,10 @@
                 ? "Symbolet skrives med stort bogstav."
                 : "Et symbol skrives med stort første bogstav og lille andet.");
         }
-        if (r === "0" && g.s === "O") return nej("Det er et nul. Symbolet er et bogstav.");
+        if (r === "0" && g.s === "O") return nej("Du har skrevet et nul. Symbolet er et bogstav.");
         if (/^[0-9]+$/.test(r)) return nej("Skriv symbolet med bogstaver.");
         var rl = rens(r);
-        if (rl === g.navn || g.alt.indexOf(rl) >= 0) return nej("Det er navnet. Skriv symbolet.");
+        if (rl === g.navn || g.alt.indexOf(rl) >= 0) return nej("Du har skrevet navnet. Skriv symbolet.");
         if (r.length > 2) {
             if (ALLE_NAVNE[rl]) return nej("Skriv symbolet, ikke et navn." + latin);
             return nej("Et symbol har ét eller to bogstaver." + latin);
@@ -221,7 +221,7 @@
         }
         if (sum !== g.z) {
             if (liste.length === 1 && liste[0] === yderst) {
-                return nej("Det er kun den yderste skal. Skriv alle skallerne, fra den inderste.");
+                return nej("Du har kun skrevet den yderste skal. Skriv alle skallerne, fra den inderste.");
             }
             if (sum < g.z) return nej("Du har fordelt " + talform(sum, "elektron", "elektroner") + ". " + g.Navn + " har " + g.z + ".");
             return nej("Du har fordelt " + sum + " elektroner. " + g.Navn + " har kun " + g.z + ".");
@@ -242,10 +242,10 @@
         for (var i = 0; i < liste.length - 1; i++) {
             var loft = D.skalLoft(i, g.z);
             if (liste[i] < loft) {
-                return nej((i + 1) + ". skal skal være fuld (" + loft + "), før " + (i + 2) + ". skal får flere.");
+                return nej((i + 1) + ". skal skal være fuld med " + loft + " elektroner, før " + (i + 2) + ". skal får flere.");
             }
         }
-        return nej("Ikke helt. Se på pladsen: " + D.pladsTekst(g) + ".");
+        return nej("Ikke helt. " + g.Navn + " står i " + D.pladsTekst(g) + ".");
     };
 
     /* ----- Atomer i en formel --------------------------------------------- */
@@ -277,7 +277,7 @@
 
         var rigtig = fo.antal[felt];
         if (v === rigtig) return ok();
-        if (v === 0) return nej(felt + " står i formlen, så der er mindst ét.");
+        if (v === 0) return nej(felt + " står i formlen, så der er mindst ét " + felt + "-atom.");
 
         var fk = D.forekomster(fo, felt);
         var udenGange = 0, iGruppe = false;
@@ -288,7 +288,7 @@
         if (fk.length > 1) {
             for (var k = 0; k < fk.length; k++) {
                 if (v === fk[k].led.n * fk[k].gange) {
-                    return nej(felt + " står " + fk.length + " steder i formlen. Du har kun talt det ene.");
+                    return nej(felt + " står " + fk.length + " steder i formlen. Du har kun talt ét af stederne.");
                 }
             }
         }
@@ -314,7 +314,7 @@
         var produkt = fk.some(function (o) {
             return led.some(function (l) { return l !== o.led && l.harTal && l.n * o.led.n * o.gange === v; });
         });
-        if (produkt) return nej("Tallene ganges ikke sammen. Kun tallet efter en parentes ganger.");
+        if (produkt) return nej("Tallene i formlen ganges ikke med hinanden. Kun tallet efter en parentes ganger alt i parentesen.");
 
         return nej("Ikke rigtigt. Find alle steder, hvor " + felt + " står, og se på tallet lige efter.");
     };
@@ -325,7 +325,7 @@
             return nej("Ladningen " + NK.ladningHaevet(fo.q) + " er ikke et atom. Tæl kun atomerne.");
         }
         if (v === fo.orden.length) {
-            return nej("Det er antallet af grundstoffer. Tæl alle atomerne.");
+            return nej("Dit tal er antallet af grundstoffer. Tæl alle atomerne.");
         }
         var skrevet = 0;
         atomled(fo.struktur).forEach(function (l) { skrevet += l.n; });

@@ -158,7 +158,7 @@
         if (id === "krav") {
             var mangler = this.mangler();
             if (this.set[this.noegle(t)] >= SET_SEK && mangler) {
-                return "Den mulighed er prøvet. Skift Vand eller Dioxygen med kontakterne. Der mangler " + mangler + ".";
+                return "Den mulighed er prøvet. Skift Vand eller Dioxygen med kontakterne. Der mangler " + mangler + (mangler === 1 ? " mulighed." : " muligheder.");
             }
             return "Se, om jernatomerne forlader pladen. Skift så Vand eller Dioxygen med kontakterne til venstre.";
         }
@@ -447,7 +447,7 @@
         }
         var p;
         if (ved(M.el, 0.5)) this.kortBesked("En elektron, e⁻. Den går gennem jernet fra midten ud til dråbens kant.", 5);
-        else if (ved(M.ion, 0.6)) this.kortBesked("En jernion, Fe²⁺. Den var et jernatom i pladen og har afgivet to elektroner.", 5);
+        else if (ved(M.ion, 0.6)) this.kortBesked("En jern(II)ion, Fe²⁺. Den var et jernatom i pladen og har afgivet to elektroner.", 5);
         else if (ved(M.oh, 0.6)) this.kortBesked("En hydroxidion, OH⁻. Den er dannet af dioxygen, vand og elektroner ved dråbens kant.", 5);
         else if ((p = ved(M.salt, 0.6))) this.kortBesked(p.type === "Na" ? "En natriumion, Na⁺, fra saltet. Den bliver ikke brugt." : "En chloridion, Cl⁻, fra saltet. Den bliver ikke brugt.", 5);
         else if ((p = ved(M.gas, 0.8))) this.kortBesked(p.type === "o2" ? "Et dioxygenmolekyle, O₂, fra luften." : "Et dinitrogenmolekyle, N₂. Det reagerer ikke med jern.", 5);

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc8.0 Redoxreaktioner</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at teksterne er korte, ikke er skrevet uden æ,
+   ø og å, ikke bruger 1+ eller 1−, "ilt", "brint" eller "flytter", at
+   forklaringerne til forkerte delreaktioner passer til fejlen, at alle 13
+   opgaver kan løses med musen (også med forkerte svar først og med Vis
+   svaret), at scenen er låst uden for et forsøg, og at kortet og
+   tegningerne kan være der fra 1100 × 620 til 1600 × 950 (kortet måles i
+   alle dele af alle opgaver, også med hvert hint og et forkert svar).
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+var NOEGLER = ["nk-sc8.0-b", "nk-sc8.0-d", "nk-sc8.0-s"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|maal|spoerg\w*|faa|saa|naar|draabe\w*|maerkat\w*|braend\w*|aendr\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1000); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    koerTest(W).catch(function (e) {
+        fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl");
+    }).then(function () {
+        try {
+            NOEGLER.forEach(function (n) {
+                if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+            });
+        } catch (e) { /* ingen hukommelse */ }
+        vis();
+    });
+}
+
+function koerF(X, sek) { for (var t = 0; t < sek; t += 1 / 60) X.opdater(1 / 60); }
+
+async function koerTest(W) {
+    var d = W.document, NK = W.NK, D = NK.Data, Tg = NK.Tegn;
+    var B = NK.sims["fane-b"], Dd = NK.sims["fane-d"], S = NK.sims["fane-s"];
+
+    function del(X) { return X.opg.o[X.opg.fase]; }
+    function rigtigt(X) { var j = -1; del(X).svar.forEach(function (s, i) { if (s.ok) j = i; }); return j; }
+    function forkert(X) { var j = -1; del(X).svar.forEach(function (s, i) { if (!s.ok && j < 0) j = i; }); return j; }
+    function svar(X, j) { X.svarValg(j); X.indsendKlik(); }
+    function roed(X) { return /skidt/.test(X.el.status.className); }
+    function besked(X) { return X.el.besked.textContent; }
+    function blinker(X) { return X.el.skort.classList.contains("blink"); }
+    function nulBlink(X) { X.el.skort.classList.remove("blink"); }
+    function mus(X, type, x, y) {
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.PointerEvent(type, { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0, pointerId: 1 }));
+    }
+    function klik(X, x, y) {
+        mus(X, "pointermove", x, y); mus(X, "pointerdown", x, y); mus(X, "pointerup", x, y);
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.MouseEvent("click", { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0 }));
+    }
+    function traek(X, a, b) {
+        mus(X, "pointermove", a.x, a.y); mus(X, "pointerdown", a.x, a.y);
+        for (var i = 1; i <= 8; i++) mus(X, "pointermove", a.x + (b.x - a.x) * i / 8, a.y + (b.y - a.y) * i / 8);
+        mus(X, "pointerup", b.x, b.y);
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.MouseEvent("click", { bubbles: true, cancelable: true, clientX: r.left + b.x, clientY: r.top + b.y, button: 0 }));
+    }
+    function midt(f) { return { x: f.x + f.b / 2, y: f.y + f.h / 2 }; }
+    function frem(X) { for (var n = 0; n < 3 && X.venter; n++) X.knap(); }
+
+    /* ================================================================ */
+    overskrift("1. Teksterne");
+    var alle = [];
+    function saml(liste, fane) {
+        liste.forEach(function (o) {
+            ["forsoeg", "spm", "spm2"].forEach(function (f) {
+                var x = o[f];
+                if (!x) return;
+                alle.push({ t: x.tekst, g: f === "forsoeg" ? 95 : 105, hvor: fane + " " + o.id + " " + f });
+                if (x.set) alle.push({ t: x.set, g: 160, hvor: fane + " " + o.id + " set" });
+                if (x.godt) alle.push({ t: x.godt, g: 160, hvor: fane + " " + o.id + " godt" });
+                (x.hint || []).forEach(function (h, i) { alle.push({ t: h, g: 100, hvor: fane + " " + o.id + " " + f + " hint " + (i + 1) }); });
+                (x.svar || []).forEach(function (s) {
+                    alle.push({ t: s.t, g: 34, hvor: fane + " " + o.id + " svar" });
+                    if (s.f) alle.push({ t: s.f, g: 110, hvor: fane + " " + o.id + " forkert" });
+                });
+                paastand(fane + " " + o.id + " " + f + ": tre hint", !x.hint || x.hint.length === 3);
+                if (x.svar) paastand(fane + " " + o.id + " " + f + ": præcis ét rigtigt svar af tre", x.svar.length === 3 && x.svar.filter(function (s) { return s.ok; }).length === 1);
+                if (x.svar) paastand(fane + " " + o.id + " " + f + ": hvert forkert svar har en forklaring", x.svar.every(function (s) { return s.ok || !!s.f; }));
+            });
+            alle.push({ t: o.loest, g: 160, hvor: fane + " " + o.id + " loest" });
+        });
+    }
+    saml(D.B_MAAL, "b"); saml(D.D_MAAL, "d"); saml(D.S_MAAL, "s");
+    D.SORTER.forEach(function (k) { alle.push({ t: k.fejl, g: 110, hvor: "sortér " + k.id }); });
+    ["mg", "fe"].forEach(function (r) {
+        [{ v: 0, h: 1 }, { v: 2, h: 0 }, { v: 0, h: 5 }, { v: 1, h: 1 }].forEach(function (e) { alle.push({ t: D.eFejl(r, "ox", e), g: 110, hvor: "eFejl " + r + " ox" }); });
+        [{ v: 2, h: 0 }, { v: 0, h: 4 }, { v: 6, h: 0 }].forEach(function (e) { alle.push({ t: D.eFejl(r, "red", e), g: 110, hvor: "eFejl " + r + " red" }); });
+    });
+    [D.navneFejl({ ox: "reduktion" }), D.midlerFejl({ ox: "oxidationsmiddel" }), D.giverFejl({ hcl: "oxidationsmiddel" }),
+     D.giverFejl({ mg: "syre" }), D.giverFejl({ hcl: "base" }), D.giverFejl({ mg: "oxidationsmiddel" })].forEach(function (t) { alle.push({ t: t, g: 110, hvor: "mærkatfejl" }); });
+    Object.keys(D.FAERDIG).forEach(function (k) { alle.push({ t: D.FAERDIG[k], g: 160, hvor: "FAERDIG " + k }); });
+    var lange = alle.filter(function (x) { return !x.t || x.t.length > x.g; });
+    paastand("alle " + alle.length + " tekster findes og holder grænserne", !lange.length, lange.map(function (x) { return x.hvor + " " + (x.t ? x.t.length : "mangler"); }).join("; "));
+    var ascii = alle.filter(function (x) { return ASCII_ORD.test(x.t); });
+    paastand("ingen tekst er skrevet uden æ, ø og å", !ascii.length, ascii.map(function (x) { return x.hvor + ": " + x.t; }).join(" | "));
+    var forbudt = alle.filter(function (x) { return /\b1[+−-]|[—–]|\bilt\b|\bbrint\b|flytte|flytter|\bher\b|ovenfor/i.test(x.t); });
+    paastand("ingen 1+ eller 1−, tankestreger, ilt, brint, flytter eller her", !forbudt.length, forbudt.map(function (x) { return x.hvor + ": " + x.t; }).join(" | "));
+    paastand("alle sætninger slutter med punktum eller spørgsmålstegn (ikke svarene)",
+        alle.every(function (x) { return x.g === 34 || /[.?]$/.test(x.t); }), alle.filter(function (x) { return x.g !== 34 && !/[.?]$/.test(x.t); }).map(function (x) { return x.hvor; }).join(", "));
+    paastand("formel-markup bliver til tekst: O₂ + 4 e⁻ → 2 O²⁻", D.uni("O_2 + 4 e^− → 2 O^{2−}") === "O₂ + 4 e⁻ → 2 O²⁻", D.uni("O_2 + 4 e^− → 2 O^{2−}"));
+
+    overskrift("2. Forklaringerne til forkerte delreaktioner");
+    paastand("Mg med elektroner til venstre: højre for pilen", /højre/.test(D.eFejl("mg", "ox", { v: 2, h: 0 })));
+    paastand("Mg med 1 elektron: Mg²⁺ har ladningen +2", /Mg²⁺ har ladningen \+2/.test(D.eFejl("mg", "ox", { v: 0, h: 1 })));
+    paastand("Mg rigtigt: ingen fejl", D.eFejl("mg", "ox", { v: 0, h: 2 }) === "");
+    paastand("O₂ med 2 elektroner: 2 oxygenatomer i O₂", /2 oxygenatomer/.test(D.eFejl("mg", "red", { v: 2, h: 0 })));
+    paastand("O₂ med elektroner til højre: til venstre for pilen", /venstre/.test(D.eFejl("mg", "red", { v: 0, h: 4 })));
+    paastand("O₂ rigtigt: ingen fejl", D.eFejl("mg", "red", { v: 4, h: 0 }) === "");
+    paastand("Fe med 2 elektroner: Fe³⁺ har ladningen +3", /Fe³⁺ har ladningen \+3/.test(D.eFejl("fe", "ox", { v: 0, h: 2 })));
+    paastand("elektroner på begge sider: kun den ene side", /kun stå på den ene side/.test(D.eFejl("mg", "ox", { v: 1, h: 1 })));
+    paastand("lige mange: 2 Mg afgiver 4 og O₂ optager 4", D.REAK.mg.ox.gange * D.REAK.mg.ox.rigtig.n === D.REAK.mg.red.gange * D.REAK.mg.red.rigtig.n);
+    paastand("lige mange: 4 Fe afgiver 12 og 3 O₂ optager 12", D.REAK.fe.ox.gange * D.REAK.fe.ox.rigtig.n === 12 && D.REAK.fe.red.gange * D.REAK.fe.red.rigtig.n === 12);
+
+    /* ================================================================ */
+    overskrift("3. Fane 1: Magnesium brænder");
+    NK.visFane("fane-b");
+    await vent(120);
+    B.vaelg(0);
+    paastand("opgave 1 er et forsøg uden Indsend svar", B.opg.fase === "forsoeg" && B.el.indsend.hidden);
+    paastand("båndet er helt, og luppen viser før", B.tidS < 0 && B.lupT() === 0);
+    paastand("knapperne Før, Brænder og Efter er skjult, før båndet har brændt", !B.visFaner());
+    var lp = B.lay.lup;
+    klik(B, lp.cx, lp.cy);
+    paastand("et klik på luppen før antændelsen giver en forklaring og antænder ikke", !B.spiller && /magnesiumbåndet/.test(besked(B)));
+    var sp = B.baandPunkt(0.96);
+    klik(B, sp.x, sp.y);
+    paastand("et klik på enden af båndet antænder det", B.spiller && B.tidS >= 0);
+    koerF(B, 2.6);
+    paastand("midt i forløbet er elektronerne på vej, og lyset er tændt", B.lysStyrke() > 0.5 && B.lupT() > 1.2 && B.lupT() < NK.MgLup.T_SLUT);
+    koerF(B, 6);
+    paastand("efter forløbet står den grønne tekst, og knapperne kommer", B.venter && B.visFaner() && /hvidt pulver/.test(B.mellem.tekst));
+    frem(B);
+    paastand("spørgsmålet om elektronerne kommer", B.opg.fase === "spm");
+    svar(B, forkert(B));
+    paastand("forkert svar: rød linje med forklaring", roed(B) && besked(B).length > 20);
+    var kb = B.lay.faner[1];
+    klik(B, kb.x + kb.b / 2, kb.y + kb.h / 2);
+    paastand("Brænder under luppen viser forløbet igen, mens spørgsmålet står", B.spiller && B.opg.fase === "spm");
+    koerF(B, 7);
+    svar(B, rigtigt(B));
+    paastand("rigtigt svar løser opgave 1", B.faerdig && B.status[0].loest);
+    var forsoegt = 0;
+    for (var i = 1; i < 4; i++) {
+        B.vaelg(i);
+        paastand("opgave " + (i + 1) + ": båndet er brændt, og luppen viser efter", B.braendt && B.lupT() === NK.MgLup.T_SLUT);
+        while (!B.faerdig && forsoegt < 20) {
+            forsoegt++;
+            if (B.venter) { frem(B); continue; }
+            svar(B, forkert(B));
+            svar(B, rigtigt(B));
+        }
+        paastand("opgave " + (i + 1) + " kan løses", B.status[i].loest);
+    }
+    paastand("alle fire er løst, og kortet peger videre til fane 2", B.antalLoest() === 4 && B.videreTekst() === "Videre til Delreaktioner →");
+    paastand("teksten om, at alt er løst, står på kortet", (B.slut.tekst || "").indexOf(D.FAERDIG.b) >= 0);
+
+    /* ================================================================ */
+    overskrift("4. Fane 2: Delreaktioner");
+    NK.visFane("fane-d");
+    await vent(120);
+    Dd.vaelg(0);
+    function eBrik() { var f = null; Dd.bakkeFelter().forEach(function (x) { if (x.brik === "e") f = x; }); return f; }
+    function brik(navn) { var f = null; Dd.bakkeFelter().forEach(function (x) { if (x.brik === navn) f = x; }); return f; }
+    paastand("opgave 1: kun elektroner i bakken", Dd.bakkeFelter().length === 1 && !!eBrik());
+    Dd.indsendKlik();
+    paastand("Indsend svar uden elektroner: forklaring, intet bedømt", !Dd.faerdig && /elektroner/.test(besked(Dd)));
+    traek(Dd, { x: eBrik().cx, y: eBrik().cy }, midt(Dd.plads("ox.v")));
+    paastand("en elektron trukket til venstre for pilen", Dd.ark.e.ox.v === 1);
+    traek(Dd, { x: eBrik().cx, y: eBrik().cy }, midt(Dd.plads("red.h")));
+    paastand("delreaktionen for dioxygen er låst i opgave 1", Dd.ark.e.red.h === 0);
+    Dd.indsendKlik();
+    paastand("elektroner til venstre: forklaringen siger højre for pilen", roed(Dd) && /højre/.test(besked(Dd)));
+    var mr = Dd.minusRekt(Dd.plads("ox.v"));
+    klik(Dd, mr.x + mr.b / 2, mr.y + mr.b / 2);
+    paastand("minus tager elektronen af igen", Dd.ark.e.ox.v === 0);
+    traek(Dd, { x: eBrik().cx, y: eBrik().cy }, midt(Dd.plads("ox.h")));
+    Dd.indsendKlik();
+    paastand("1 elektron til højre: forklaringen nævner Mg²⁺ og +2", /Mg²⁺ har ladningen \+2/.test(besked(Dd)));
+    var pH = midt(Dd.plads("ox.h"));
+    klik(Dd, pH.x, pH.y);
+    paastand("et klik på pladsen giver én elektron mere", Dd.ark.e.ox.h === 2);
+    Dd.indsendKlik();
+    paastand("Mg → Mg²⁺ + 2 e⁻ løser opgave 1", Dd.faerdig && Dd.ark.loest.ox);
+
+    Dd.vaelg(1);
+    paastand("opgave 2: delreaktionen for magnesium står færdig", Dd.ark.loest.ox && Dd.ark.e.ox.h === 2);
+    var pRV = midt(Dd.plads("red.v"));
+    klik(Dd, pRV.x, pRV.y); klik(Dd, pRV.x, pRV.y);
+    Dd.indsendKlik();
+    paastand("2 elektroner til dioxygen: forklaringen nævner de 2 oxygenatomer", /2 oxygenatomer/.test(besked(Dd)));
+    klik(Dd, pRV.x, pRV.y); klik(Dd, pRV.x, pRV.y);
+    Dd.indsendKlik();
+    paastand("O₂ + 4 e⁻ → 2 O²⁻ løser opgave 2", Dd.faerdig);
+
+    Dd.vaelg(2);
+    paastand("opgave 3: et spørgsmål, ingen brikker", Dd.opg.fase === "spm" && Dd.bakkeFelter().length === 0);
+    nulBlink(Dd);
+    klik(Dd, Dd.lay.ark.x + 30, Dd.lay.ark.y + 30);
+    paastand("et klik på arket under et spørgsmål får kortet til at blinke", blinker(Dd));
+    svar(Dd, forkert(Dd));
+    paastand("forkert svar: rød linje", roed(Dd));
+    svar(Dd, rigtigt(Dd));
+    paastand("rigtigt svar: arket får tallene 2 og 4 e⁻", Dd.faerdig && Dd.ark.gange);
+
+    Dd.vaelg(3);
+    paastand("opgave 4: bakken har Oxidation og Reduktion", !!brik("oxidation") && !!brik("reduktion") && !eBrik());
+    traek(Dd, { x: brik("reduktion").cx, y: brik("reduktion").cy }, midt(Dd.plads("ox.navn")));
+    traek(Dd, { x: brik("oxidation").cx, y: brik("oxidation").cy }, midt(Dd.plads("red.navn")));
+    paastand("begge mærkater sidder på arket", Dd.ark.navne.ox === "reduktion" && Dd.ark.navne.red === "oxidation");
+    Dd.indsendKlik();
+    paastand("byttede mærkater: forklaringen siger, at at afgive elektroner er en oxidation", roed(Dd) && /oxidation/.test(besked(Dd)));
+    traek(Dd, midt(Dd.plads("ox.navn")), midt(Dd.plads("red.navn")));
+    paastand("en mærkat kan trækkes fra én plads til en anden", Dd.ark.navne.red === "reduktion" && !Dd.ark.navne.ox);
+    traek(Dd, { x: brik("oxidation").cx, y: brik("oxidation").cy }, midt(Dd.plads("ox.navn")));
+    Dd.indsendKlik();
+    paastand("Oxidation øverst og Reduktion nederst løser opgave 4", Dd.faerdig && Dd.ark.navneLoest);
+
+    Dd.vaelg(4);
+    var mOx = midt(Dd.plads("middel.ox")), mRed = midt(Dd.plads("middel.red"));
+    klik(Dd, brik("oxidationsmiddel").cx, brik("oxidationsmiddel").cy);
+    klik(Dd, mOx.x, mOx.y);
+    paastand("klik på en mærkat og så på en plads sætter den på", Dd.ark.midler.ox === "oxidationsmiddel");
+    traek(Dd, { x: brik("reduktionsmiddel").cx, y: brik("reduktionsmiddel").cy }, mRed);
+    Dd.indsendKlik();
+    paastand("byttede midler: forklaringen siger, at navnene kan virke omvendte", roed(Dd) && /omvendte/.test(besked(Dd)));
+    Dd.nulstil();
+    paastand("Tag brikkerne af arket tager midlerne af", !Dd.ark.midler.ox && !Dd.ark.midler.red);
+    traek(Dd, { x: brik("reduktionsmiddel").cx, y: brik("reduktionsmiddel").cy }, mOx);
+    traek(Dd, { x: brik("oxidationsmiddel").cx, y: brik("oxidationsmiddel").cy }, mRed);
+    Dd.indsendKlik();
+    paastand("Reduktionsmiddel under Mg og Oxidationsmiddel under O₂ løser opgave 5", Dd.faerdig);
+
+    Dd.vaelg(5);
+    paastand("opgave 6: jern og dioxygen, begge delreaktioner er tomme", Dd.ark.reak === "fe" && !Dd.ark.loest.ox && !Dd.ark.loest.red);
+    var fH = midt(Dd.plads("ox.h")), fV = midt(Dd.plads("red.v"));
+    for (var k = 0; k < 3; k++) klik(Dd, fH.x, fH.y);
+    Dd.indsendKlik();
+    paastand("kun jern udfyldt: delreaktionen for dioxygen mangler elektroner", /dioxygen mangler/.test(besked(Dd)));
+    for (k = 0; k < 4; k++) klik(Dd, fV.x, fV.y);
+    Dd.indsendKlik();
+    paastand("begge rigtige: grøn tekst, før spørgsmålet kommer", Dd.venter && /Begge delreaktioner/.test(Dd.mellem.tekst));
+    frem(Dd);
+    paastand("forklaringen efter et rigtigt svar, når der kommer et spørgsmål mere, findes", !!del(Dd).godt);
+    svar(Dd, rigtigt(Dd));
+    paastand("4 jernatomer: arket får 4 Fe og 12 e⁻", Dd.venter && Dd.ark.gange && /12/.test(Dd.mellem.tekst));
+    frem(Dd);
+    svar(Dd, forkert(Dd));
+    svar(Dd, rigtigt(Dd));
+    paastand("jern er reduktionsmidlet: opgave 6 er løst, og midlerne står på arket", Dd.faerdig && Dd.ark.midlerLoest);
+    paastand("alle seks er løst, og kortet peger videre til fane 3", Dd.antalLoest() === 6 && /Syre\/base/.test(Dd.videreTekst()));
+
+    /* Vis svaret i et forsoeg med brikker */
+    Dd.vaelg(0);
+    for (k = 0; k < 4; k++) Dd.knap();
+    paastand("Vis svaret i opgave 1 skriver delreaktionen rigtigt", Dd.faerdig && Dd.ark.e.ox.h === 2 && Dd.ark.e.ox.v === 0);
+
+    /* ================================================================ */
+    overskrift("5. Fane 3: Syre/base og redox");
+    NK.visFane("fane-s");
+    await vent(120);
+    S.vaelg(0);
+    var sbL = S.lay.kort.sb.lup, rxL = S.lay.kort.rx.lup;
+    klik(S, sbL.x + sbL.b / 2, sbL.y + sbL.h / 2);
+    paastand("et klik på den venstre lup viser syre/base-reaktionen", S.spiller.sb);
+    koerF(S, 4);
+    paastand("efter én lup: spørgsmålet kommer ikke endnu", !S.venter && S.opg.fase === "forsoeg");
+    klik(S, rxL.x + rxL.b / 2, rxL.y + rxL.h / 2);
+    koerF(S, 7);
+    paastand("efter begge lupper: grøn tekst om hydron og elektroner", S.venter && /hydron/.test(S.mellem.tekst) && /elektroner/.test(S.mellem.tekst));
+    frem(S);
+    svar(S, 1);
+    paastand("Et hydrogenatom, H: forklaringen nævner elektronen hos chlor", roed(S) && /chlor/.test(besked(S)));
+    svar(S, rigtigt(S));
+    paastand("En hydron, H⁺ løser opgave 1", S.faerdig);
+
+    S.vaelg(1);
+    function sBrik(navn) { var f = null; S.bakkeFelter().forEach(function (x) { if (x.brik === navn) f = x; }); return f; }
+    function sPlads(id) { var p = null; S.pladser.forEach(function (x) { if (x.id === id) p = x; }); return p; }
+    var par = ["hcl", "h2o", "mg", "o2"].map(sPlads);
+    paastand("mærkatpladserne overlapper ikke og er inde i kortene",
+        par[0].x + par[0].b <= par[1].x && par[2].x + par[2].b <= par[3].x &&
+        par.every(function (p) { var R = S.lay.kort[p.side].R; return p.x >= R.x && p.x + p.b <= R.x + R.b; }));
+    traek(S, { x: sBrik("base").cx, y: sBrik("base").cy }, midt(sPlads("hcl")));
+    traek(S, { x: sBrik("syre").cx, y: sBrik("syre").cy }, midt(sPlads("h2o")));
+    traek(S, { x: sBrik("reduktionsmiddel").cx, y: sBrik("reduktionsmiddel").cy }, midt(sPlads("mg")));
+    traek(S, { x: sBrik("oxidationsmiddel").cx, y: sBrik("oxidationsmiddel").cy }, midt(sPlads("o2")));
+    S.indsendKlik();
+    paastand("syre og base byttet: forklaringen siger, at syren afgiver hydronen", roed(S) && /Syren afgiver hydronen/.test(besked(S)));
+    traek(S, midt(sPlads("h2o")), midt(sPlads("hcl")));
+    paastand("syre trukket over på base: base kommer tilbage i bakken", S.maerker.hcl === "syre" && !S.maerker.h2o && !!sBrik("base"));
+    traek(S, { x: sBrik("base").cx, y: sBrik("base").cy }, midt(sPlads("h2o")));
+    S.indsendKlik();
+    paastand("alle fire rigtige: grøn tekst og spørgsmålet bagefter", S.venter);
+    frem(S);
+    svar(S, rigtigt(S));
+    paastand("Begge afgiver en partikel løser opgave 2", S.faerdig);
+
+    S.vaelg(2);
+    paastand("opgave 3: lupperne er skjult, og fire reaktioner ligger i bakken", S.bakkeFelter().length === 4);
+    var zSb = S.zone("sb"), zRx = S.zone("rx");
+    function kortF(id) { var f = null; S.bakkeFelter().forEach(function (x) { if (x.kortId === id) f = x; }); return f; }
+    traek(S, midt(kortF("nh3")), midt(zSb));
+    traek(S, midt(kortF("zn")), midt(zSb));
+    traek(S, midt(kortF("eddike")), midt(zSb));
+    traek(S, midt(kortF("na")), midt(zRx));
+    paastand("alle fire er sat i et kort", S.kanIndsendes());
+    S.indsendKlik();
+    paastand("zink i syre/base-kortet: forklaringen nævner elektroner, og kortet er rødt", roed(S) && /elektroner/.test(besked(S)) && S.forkertKort === "zn");
+    var znF = null; S.zoneFelter("sb").forEach(function (f) { if (f.kortId === "zn") znF = f; });
+    traek(S, midt(znF), midt(zRx));
+    S.indsendKlik();
+    paastand("rigtigt sorteret løser opgave 3", S.faerdig && S.antalLoest() === 3);
+    paastand("sidste fane: ingen knap videre, og Start forfra står ikke på kortet", S.videreTekst() === "" && !/forfra/i.test(S.el.skort.textContent));
+
+    /* ================================================================ */
+    overskrift("6. Låsen og Vis svaret");
+    NK.visFane("fane-b");
+    await vent(80);
+    B.vaelg(1);
+    nulBlink(B);
+    paastand("et spørgsmål på fane 1: et klik på luppen viser forløbet igen (at se nærmere)", (function () { klik(B, B.lay.lup.cx, B.lay.lup.cy); return B.spiller; })());
+    B.vaelg(0);
+    for (k = 0; k < 4; k++) B.knap();
+    paastand("Vis svaret i opgave 1 på fane 1 antænder båndet", B.spiller && B.braendt && B.venter);
+    NK.visFane("fane-s");
+    await vent(80);
+    S.vaelg(0);
+    for (k = 0; k < 4; k++) S.knap();
+    paastand("Vis svaret i opgave 1 på fane 3 viser begge lupper", S.spiller.sb && S.spiller.rx && S.venter);
+    S.vaelg(1);
+    nulBlink(S);
+    S.knap(); S.knap(); S.knap(); S.knap();
+    paastand("Vis svaret i opgave 2 på fane 3 sætter mærkaterne", S.maerkerLoest);
+
+    /* ================================================================ */
+    overskrift("7. Kortet og tegningerne på fire skærmstørrelser");
+    var STR = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]];
+    for (var si = 0; si < STR.length; si++) {
+        ramme.style.width = STR[si][0] + "px";
+        ramme.style.height = STR[si][1] + "px";
+        await vent(250);
+        var navn = STR[si][0] + " × " + STR[si][1];
+        var faner = [["fane-b", B], ["fane-d", Dd], ["fane-s", S]];
+        for (var fi = 0; fi < faner.length; fi++) {
+            NK.visFane(faner[fi][0]);
+            await vent(60);
+            var X = faner[fi][1], hoejst = 0, hvor = "";
+            for (var oi = 0; oi < X.opgaver.length; oi++) {
+                X.vaelg(oi);
+                var n = 0, forkertGivet = {};
+                while (n < 30) {
+                    n++;
+                    X.tilpas();
+                    var h = X.el.skort.getBoundingClientRect().height;
+                    if (h > hoejst) { hoejst = h; hvor = X.opg.o.id + " " + X.opg.fase; }
+                    if (X.faerdig) break;
+                    var g = X.opg;
+                    if (!X.venter && (g.fase === "spm" || g.fase === "spm2") && !forkertGivet[g.fase]) {
+                        forkertGivet[g.fase] = true;
+                        svar(X, forkert(X));
+                        continue;
+                    }
+                    X.knap();
+                }
+                koerF(X, 0.1);
+            }
+            var zone = X.kortZone();
+            paastand(navn + " " + faner[fi][0] + ": kortet er højst " + zone + " px (højst " + Math.round(hoejst) + " i " + hvor + ")", hoejst <= zone + 1);
+        }
+        /* Fane 1: luppen og makroniveauet */
+        NK.visFane("fane-b"); await vent(40); B.vaelg(0); B.tilpas();
+        var l1 = B.lay, top1 = 10 + B.kortZone() + 8;
+        paastand(navn + " fane 1: luppen er under kortet og inde i scenen (R = " + Math.round(l1.lup.R) + ")",
+            l1.lup.cy - l1.lup.R >= top1 && l1.lup.cx + l1.lup.R <= l1.W && l1.faner[0].y + 30 <= l1.bordY + 2 && l1.lup.R >= 80);
+        paastand(navn + " fane 1: båndet og skålen er til venstre for luppen", l1.bue.b.x + 20 < l1.lup.cx - l1.lup.R && l1.skaal.cx + l1.skaal.b / 2 < l1.lup.cx - l1.lup.R + 40);
+        /* Fane 2: arket og bakken */
+        NK.visFane("fane-d"); await vent(40); Dd.vaelg(5); Dd.tilpas();
+        var l2 = Dd.lay, X2 = Dd.raekkeX();
+        paastand(navn + " fane 2: delreaktionerne er inde på arket (skrift " + Math.round(l2.F) + " px)",
+            X2.label >= l2.ark.x && X2.slut <= l2.ark.x + l2.ark.b && l2.y.red + l2.F * 0.8 <= l2.ark.y + l2.ark.h && l2.F >= 20);
+        paastand(navn + " fane 2: bakken er inde i scenen", l2.bakke.y + l2.bakke.h <= l2.H);
+        /* Fane 3: kortene */
+        NK.visFane("fane-s"); await vent(40); S.vaelg(1); S.tilpas();
+        var l3 = S.lay;
+        paastand(navn + " fane 3: lupperne er mindst 90 px høje (" + Math.round(l3.kort.sb.lup.h) + ")", l3.kort.sb.lup.h >= 90);
+        paastand(navn + " fane 3: bakken er inde i scenen", l3.bakke.y + l3.bakke.h <= l3.H);
+        var pl3 = S.pladser;
+        paastand(navn + " fane 3: mærkatpladserne overlapper ikke", pl3[0].x + pl3[0].b <= pl3[1].x && pl3[2].x + pl3[2].b <= pl3[3].x);
+        S.vaelg(2); S.tilpas();
+        var zf = 0; ["nh3", "zn", "eddike", "na"].forEach(function (id) { S.saetKort(id, "rx"); });
+        var fz = S.zoneFelter("rx"), z3 = S.zone("rx");
+        paastand(navn + " fane 3: fire reaktioner kan være i ét kort", fz.length === 4 && fz.every(function (f) { return f.y + f.h <= z3.y + z3.h + 1 && f.h >= 26; }));
+        void zf;
+    }
+    ramme.style.width = "1400px";
+    ramme.style.height = "860px";
+}
+</script>
+</body>
+</html>

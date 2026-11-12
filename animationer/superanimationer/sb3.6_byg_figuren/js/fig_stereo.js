@@ -123,7 +123,7 @@
             { navn: "Spejlbilleder", pladser: ["spejlbilledisomerer", "asymmetrisk carbonatom", "prioritet"],
               ros: "Mælkesyre har et asymmetrisk carbonatom med fire forskellige grupper og findes som to spejlbilledisomerer." },
             { navn: "R og S", pladser: ["R-form", "S-form", "stereoisomerer"],
-              ros: "Følger 1, 2 og 3 hinanden med uret, er det R-form, og mod uret S-form. Begge dele viser stereoisomerer." }
+              ros: "Går 1 → 2 → 3 med uret, er det R-formen, og mod uret S-formen. Spejlbilledisomerer og cis-trans-isomerer er stereoisomerer." }
         ],
         pladser: [
             { id: "cis-trans-isomeri", ord: ["cis-trans-isomeri"], x: KM, y: FR.y, maal: [KM, FR.y], titel: true, dele: ["ramme"],

@@ -113,7 +113,7 @@
     D.FORMER = [
         {
             id: "amfoion", slags: "traek", navn: "Amfoionen",
-            traekTekst: "En aminosyre har en sur og en basisk gruppe og kan reagere med sig selv. Træk hydronen fra carboxylgruppen over til aminogruppen.",
+            traekTekst: "En aminosyre har en sur og en basisk gruppe, så der kan ske en hydronoverførsel inden i molekylet. Træk hydronen fra carboxylgruppen over til aminogruppen.",
             traekHint: ["Hydronen er det orange H i carboxylgruppen til højre.",
                         "Træk det orange H hen på gruppen −NH₂ til venstre, og slip det dér."],
             tekst: "Hvilken samlet ladning har den ion, der er dannet?",
@@ -122,28 +122,28 @@
                     2: "Ionen har også en positiv ladning på gruppen −NH₃⁺. Læg de to ladninger sammen." },
             hint: ["Find ladningen på hver af de to grupper.",
                    "Gruppen −NH₃⁺ har ladningen +1, og gruppen −COO⁻ har ladningen −1."],
-            forkl: "Ionen har en positiv og en negativ ladning, så den samlede ladning er 0. Sådan en ion kaldes en amfoion. I vand findes valin næsten kun som amfoion."
+            forkl: "Ionen har en positiv og en negativ ladning, så den samlede ladning er 0. En sådan ion kaldes en amfoion. I vand findes valin næsten kun som amfoion."
         },
         {
             id: "sur", slags: "klik", navn: "Sur opløsning",
-            tekst: "Der kommer saltsyre i opløsningen, så pH falder til 1. Hvilken gruppe optager en hydron? Klik på den, og tryk Indsend svar.",
+            tekst: "Der tilsættes saltsyre til opløsningen, så pH falder til 1. Hvilken gruppe optager en hydron? Klik på den, og tryk Indsend svar.",
             rigtig: "carboxyl",
             fejl: { amino: "Gruppen −NH₃⁺ har allerede optaget en hydron. Find den gruppe, der kan optage en." },
             hint: ["Kun en gruppe, der har afgivet sin hydron, kan optage en ny.",
                    "Gruppen −COO⁻ kan optage en hydron og blive til −COOH."],
-            forkl: "Gruppen −COO⁻ optager en hydron fra en oxoniumion og bliver til −COOH. Det giver syreformen med den samlede ladning +1.",
+            forkl: "Gruppen −COO⁻ optager en hydron fra en oxoniumion og bliver til −COOH. Derved dannes syreformen med den samlede ladning +1.",
             reak: { slags: "giv", partner: "H3O", ph0: 7, ph1: 1 }
         },
         {
             id: "basisk", slags: "klik", navn: "Basisk opløsning",
-            forTekst: "Der kommer natriumhydroxid i opløsningen, og pH stiger. Først afgiver gruppen −COOH sin hydron til en hydroxidion.",
+            forTekst: "Der tilsættes natriumhydroxid til opløsningen, og pH stiger. Først afgiver gruppen −COOH sin hydron til en hydroxidion.",
             for: { slags: "tag", partner: "OH", ph0: 1, ph1: 7, gruppe: "carboxyl" },
             tekst: "Ved pH 7 er valin igen en amfoion. Hvilken gruppe afgiver en hydron, når pH stiger til 13? Klik på den, og tryk Indsend svar.",
             rigtig: "amino",
             fejl: { carboxyl: "Gruppen −COO⁻ har allerede afgivet sin hydron. Find den gruppe, der stadig har en hydron at afgive." },
             hint: ["Kun en gruppe, der har en ekstra hydron, kan afgive en.",
                    "Gruppen −NH₃⁺ kan afgive en hydron og blive til −NH₂."],
-            forkl: "Gruppen −NH₃⁺ afgiver en hydron til en hydroxidion og bliver til −NH₂. Det giver baseformen med den samlede ladning −1.",
+            forkl: "Gruppen −NH₃⁺ afgiver en hydron til en hydroxidion og bliver til −NH₂. Derved dannes baseformen med den samlede ladning −1.",
             reak: { slags: "tag", partner: "OH", ph0: 7, ph1: 13 }
         }
     ];
@@ -162,24 +162,24 @@
             id: "spor", slags: "spor", navn: "Tegn diagrammet",
             tekst: "Vinduet viser 20 valinmolekyler. Træk pH-skyderen fra pH 0 til pH 14, og se diagrammet blive tegnet.",
             hint: ["Træk den mørke knap på skyderen under diagrammet mod højre.",
-                   "Diagrammet er færdigt, når du har været hele vejen fra pH 0 til pH 14."],
-            forkl: "Diagrammet viser, hvor stor en del af molekylerne der er på hver form ved alle pH-værdier fra 0 til 14."
+                   "Diagrammet er færdigt, når du har trukket skyderen fra pH 0 til pH 14."],
+            forkl: "Fordelingsdiagrammet viser andelen af valinmolekylerne på hver form som funktion af pH fra 0 til 14."
         },
         {
             id: "pks", slags: "find", navn: "Find pKₛ",
-            tekst: "Ved hvilken pH er der lige meget syreform og amfoion? Stil skyderen dér, og tryk Indsend svar.",
+            tekst: "Ved hvilken pH er koncentrationerne af syreformen og amfoionen lige store? Træk skyderen dertil, og tryk Indsend svar.",
             maal: D.PKS1, tol: 0.25,
-            hint: ["Find det sted, hvor den røde og den grønne kurve krydser hinanden.",
-                   "Kurverne krydser lidt over pH 2. Dér er 10 molekyler syreform og 10 amfoioner."],
-            forkl: "Kurverne krydser ved pH 2,32, og dér er pH lig med pKₛ for syreformen. Det andet krydspunkt ved pH 9,62 er pKₛ for amfoionen."
+            hint: ["Find det sted, hvor den røde og den grønne kurve skærer hinanden.",
+                   "Kurverne skærer hinanden lidt over pH 2. Dér er 10 molekyler på syreformen og 10 amfoioner."],
+            forkl: "Kurverne skærer hinanden ved pH 2,32, og dér er pH lig med pKₛ for syreformen. Det andet skæringspunkt ved pH 9,62 giver pKₛ for amfoionen."
         },
         {
             id: "iso", slags: "tal", navn: "Det isoelektriske punkt",
             tekst: "De to pKₛ-værdier er 2,32 og 9,62. Hvad er valins isoelektriske punkt, pHᵢₛₒ? Skriv tallet, og tryk Indsend svar.",
             maal: Math.round(D.ISO * 100) / 100,
-            fejlSum: "Du har lagt de to pKₛ-værdier sammen. Det isoelektriske punkt er gennemsnittet, så del med 2.",
+            fejlSum: "Du har lagt de to pKₛ-værdier sammen. Det isoelektriske punkt er gennemsnittet, så summen skal divideres med 2.",
             fejlDiff: "Det isoelektriske punkt er gennemsnittet af de to pKₛ-værdier, ikke forskellen.",
-            fejlAfrund: "Det er tæt på. Regn med to decimaler.",
+            fejlAfrund: "Dit svar er tæt på. Angiv pH med to decimaler.",
             fejlAndet: "Det isoelektriske punkt ligger midt mellem de to pKₛ-værdier, 2,32 og 9,62.",
             fejlIntet: "Skriv et tal, for eksempel 4,50.",
             hint: ["Det isoelektriske punkt er gennemsnittet af de to pKₛ-værdier.",
@@ -192,7 +192,7 @@
     /* Beskeden til et forkert sted paa skyderen */
     D.findFejl = function (ph) {
         var a = D.andele(ph), s = Math.round(a.syre * 100), m = Math.round(a.amfo * 100);
-        return "Ved pH " + D.komma1(ph) + " er der " + s + " % syreform og " + m + " % amfoion. Find stedet, hvor den røde og den grønne kurve krydser.";
+        return "Ved pH " + D.komma1(ph) + " er der " + s + " % syreform og " + m + " % amfoion. Find stedet, hvor den røde og den grønne kurve skærer hinanden.";
     };
 
     /* =====================================================================
@@ -232,7 +232,7 @@
         },
         {
             id: "stroem", slags: "forsoeg", navn: "Strømmen", ph: 6,
-            tekst: "Tryk Slut strømmen, og se, om det passer.",
+            tekst: "Tryk Slut strømmen, og se, om din forudsigelse passer.",
             koerer: "Strømmen er sluttet. Se, hvor aminosyrerne vandrer hen.",
             efter: "Lysin vandrede mod minuspolen og asparaginsyre mod pluspolen, mens valin blev liggende ved startlinjen.",
             knap: "Slut strømmen"
@@ -242,8 +242,8 @@
             tekst: "Valin blev liggende, fordi pH 6 er tæt på valins isoelektriske punkt. Ved hvilken pH vandrer alle tre aminosyrer mod minuspolen?",
             svar: ["pH 1", "pH 6", "pH 13"], rigtig: 0,
             fejl: { 1: "Ved pH 6 vandrede asparaginsyre mod pluspolen, og valin blev liggende.",
-                    2: "Ved pH 13 har grupperne afgivet deres hydroner, så alle tre er negative." },
-            hint: ["Alle tre skal have en positiv samlet ladning.",
+                    2: "Ved pH 13 har grupperne afgivet deres hydroner, så alle tre aminosyrer er negativt ladede." },
+            hint: ["Alle tre aminosyrer skal have en positiv samlet ladning.",
                    "I sur opløsning har alle grupperne en hydron."],
             forkl: "Ved pH 1 har alle grupperne en hydron. Valin og asparaginsyre har ladningen +1, og lysin har ladningen +2 og vandrer længst."
         },
@@ -251,7 +251,7 @@
             id: "ukendt", slags: "forsoeg", ukendt: true, navn: "To ukendte", ph: 6,
             tekst: "To ukendte aminosyrer, X og Y, sættes på et papir med pH 6. Tryk Slut strømmen, og se, hvor de vandrer hen.",
             koerer: "Strømmen er sluttet. Se, hvor X og Y vandrer hen.",
-            efter: "X vandrede mod pluspolen, og Y vandrede mod minuspolen. Brug det til at finde enden af deres sidekæder.",
+            efter: "X vandrede mod pluspolen, og Y vandrede mod minuspolen. Brug vandringen til at finde gruppen for enden af hver sidekæde.",
             knap: "Slut strømmen"
         },
         {
@@ -264,7 +264,7 @@
             fejlNeutral: "Med {gruppe} i sidekæden har {navn} ladningen 0 ved pH 6 og bliver liggende.",
             fejlAmino: "Med −NH₂ i sidekæden får {navn} ladningen +1 ved pH 6 og vandrer mod minuspolen.",
             fejlCarboxyl: "Med −COOH i sidekæden får {navn} ladningen −1 ved pH 6 og vandrer mod pluspolen.",
-            forkl: "X har en carboxylgruppe i sidekæden og ladningen −1 ved pH 6. Det er glutaminsyre. Y har en aminogruppe og ladningen +1. Det er lysin."
+            forkl: "X er glutaminsyre med en carboxylgruppe i sidekæden og ladningen −1 ved pH 6. Y er lysin med en aminogruppe i sidekæden og ladningen +1."
         }
     ];
     D.FELT_FAERDIG = "Træk nu selv i pH-skyderen. X og Y vandrer igen, når du slipper den.";

@@ -69,7 +69,7 @@
                 aldehyd: "<b>aldehyd</b> er en stofklasse. Titlen er navnet på stoffet, der giver orange bundfald med C=O.",
                 carbonylgruppe: "<b>carbonylgruppe</b> er C=O i et molekyle. Titlen er navnet på stoffet i de to glas." }),
             titel("Tollens' test", T2, ["glas2"], {
-                DNPH: "<b>DNPH</b> giver bundfald med både aldehyder og ketoner. Her giver propanal et sølvspejl, men propanon gør ikke.",
+                DNPH: "<b>DNPH</b> giver bundfald med både aldehyder og ketoner. Her giver propanal et sølvspejl, men propanon giver intet.",
                 aldehyd: "<b>aldehyd</b> er en stofklasse. Titlen er navnet på testen, der giver sølvspejl.",
                 keton: "<b>keton</b> er en stofklasse. Titlen er navnet på testen, der giver sølvspejl med et aldehyd.",
                 carbonylgruppe: "<b>carbonylgruppe</b> er C=O i et molekyle. Titlen er navnet på testen i de to glas." })

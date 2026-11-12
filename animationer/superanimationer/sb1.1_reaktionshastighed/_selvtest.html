@@ -313,7 +313,7 @@ function koer() {
     paastand("Giv et hint og Vis svaret fylder eksponenterne ud uden at tælle", U.vist && U.eksp.H2 === 1 && U.eksp.I2 === 1 && U.antalLoest === loest + 1 && uSk.classList.contains("svar"));
     U.nyOpgave(3);
     U.eksp.NO2 = 2; U.eksp.CO = 0;
-    paastand("en eksponent på 0 nævnes i svaret", U.tjek().rigtig && uSk.textContent.indexOf("[CO] er ikke med") >= 0);
+    paastand("en eksponent på 0 nævnes i svaret", U.tjek().rigtig && uSk.textContent.indexOf("[CO] indgår ikke i udtrykket") >= 0);
     function zone3(navn) {
         var zone = parseFloat(w.getComputedStyle(uSk.parentNode).getPropertyValue("--kortzone")), hoejst = 0, hvor = "";
         var scene = uSk.parentNode.getBoundingClientRect();

@@ -433,8 +433,8 @@
         var side = p < m ? "kat" : "an";
         this.tilfoejIntern(side);
         this.demo.t = 0.9;
-        this.demo.tekst = "<b>" + NK.fortegn(p) + "</b> og <b>" + NK.fortegn(-m) + "</b>: der mangler " + (side === "kat" ? "plus" : "minus")
-            + ". Én " + D.ionTekst(this[side]) + " mere.";
+        this.demo.tekst = "<b>" + NK.fortegn(p) + "</b> og <b>" + NK.fortegn(-m) + "</b>. Der mangler " + (side === "kat" ? "plus" : "minus")
+            + ", så der kommer én " + D.ionTekst(this[side]) + " mere.";
         this.aendret("demo");
     };
 
@@ -505,7 +505,7 @@
         if (this.demo) return this.demo.tekst;
         if (!this.neutral() || this.land.kat !== this.plus() || this.land.an !== this.minus()) return "";
         var g = NK.gcd(this.nKat, this.nAn);
-        if (g > 1) return "<b>" + g + " ens enheder</b> på bordet. Formlen viser kun én.";
+        if (g > 1) return "Der ligger <b>" + g + " ens enheder</b> på bordet. Formlen viser kun én enhed.";
         return this.visFormel ? D.findesIkke(this.kat, this.an) : "";
     };
 

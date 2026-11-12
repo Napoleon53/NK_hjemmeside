@@ -91,7 +91,7 @@
         }
         if (g.fase === "maal") {
             var n = this.st[g.maaler].navn;
-            return { slags: "opgave", chip: "Mål", tekst: "Find kogepunktet for " + n + ": stil termometeret på den temperatur, hvor " + n + " begynder at koge.",
+            return { slags: "opgave", chip: "Mål", tekst: "Find kogepunktet for " + n + ". Indstil termometeret på den temperatur, hvor " + n + " begynder at koge.",
                 ekstra: '<p class="sk-gaet">Dit gæt: <b>' + NK.html(D.Stort(this.st[g.gaet].navn)) + " koger ved den højeste temperatur.</b></p>" };
         }
         return { slags: "spm", tekst: o.spm, svar: o.svar, forkert: g.forkert };
@@ -99,7 +99,7 @@
 
     P.sceneLinje = function () {
         var g = this.opg;
-        if (g.fase === "maal" && this.roertTermo) return "Stil termometeret på kogepunktet for " + this.st[g.maaler].navn + ", og tryk Indsend svar.";
+        if (g.fase === "maal" && this.roertTermo) return "Indstil termometeret på kogepunktet for " + this.st[g.maaler].navn + ", og tryk Indsend svar.";
         return "";
     };
 
@@ -537,14 +537,14 @@
         this.valgt = { k: k, m: m };
         this.valgtT = 6;
         if (m.gas) {
-            this.kortBesked("Et molekyle " + st.navn + " i dampen. Det har ingen bindinger til andre molekyler.", 5);
+            this.kortBesked("Et molekyle " + st.navn + " i dampen har ingen bindinger til andre molekyler.", 5);
             return;
         }
         var nh = Pk.hbListe.filter(function (b) { return b.a === m || b.b === m; }).length;
         var nl = Pk.lonListe.filter(function (b) { return b.a === m || b.b === m; }).length;
-        var t = "Et molekyle " + st.navn + " i væsken. Lige nu: ";
+        var t = "Et molekyle " + st.navn + " i væsken har lige nu ";
         t += st.OH ? nh + " hydrogenbinding" + (nh === 1 ? "" : "er") + " og " : "ingen hydrogenbindinger, for der er ingen OH-gruppe, og ";
-        t += nl + " London-kraft" + (nl === 1 ? "" : "er") + ".";
+        t += nl + " londonbinding" + (nl === 1 ? "" : "er") + ".";
         this.kortBesked(t, 6);
     };
 

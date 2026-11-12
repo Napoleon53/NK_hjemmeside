@@ -22,10 +22,10 @@ window.NK = NK;
         /* 3.1 Elektronparbindinger */
         "fælles elektronpar": "To elektroner, som to atomer deler. De hører til begge atomer på én gang og holder dem sammen.",
         "elektronparbinding": "Det, der holder atomerne sammen i et molekyle. To ikke-metaller deler elektroner med hinanden.",
-        "molekyle": "Atomer af ikke-metaller, der sidder sammen, for eksempel H₂O og O₂.",
+        "molekyle": "Atomer af ikke-metaller, der er bundet sammen, for eksempel H₂O og O₂.",
         "frit elektronpar": "To elektroner i yderste skal, som sidder sammen uden at være med i en binding. Oxygenatomet i vand har to sådanne par.",
         "elektronprikformel": "Tegning, hvor elektronerne i yderste skal er vist som små punkter omkring atomets symbol.",
-        "stregformel": "Tegning af et molekyle, hvor hvert fælles elektronpar er en linje mellem atomerne. Den viser, hvilke atomer der sidder sammen.",
+        "stregformel": "Tegning af et molekyle, hvor hvert fælles elektronpar er en linje mellem atomerne. Den viser, hvilke atomer der er bundet sammen.",
         "enkeltbinding": "Her deler to atomer kun ét elektronpar. Tegnes med én streg i en stregformel.",
         "dobbeltbinding": "Her deler to atomer to elektronpar. Tegnes med to streger, som mellem C og O i carbondioxid.",
         "tripelbinding": "Her deler to atomer tre elektronpar. Tegnes med tre streger, som i dinitrogenmolekylet N₂.",
@@ -37,7 +37,7 @@ window.NK = NK;
         /* 3.3 Elektronegativitet og polære bindinger */
         "elektronegativitet": "Mål for, hvor kraftigt et atom trækker i de fælles elektroner i en binding. Fluor har den højeste af alle grundstoffer.",
         "upolær binding": "Her deler to atomer elektronparret ligeligt. Forskellen i elektronegativitet er under 0,5, som i C−H.",
-        "polær binding": "Her ligger det fælles elektronpar tættest på det ene atom, som får lidt negativ ladning. O−H i vand er et eksempel.",
+        "polær binding": "Her ligger det fælles elektronpar tættest på det ene atom, som bliver delvist negativt. O−H i vand er et eksempel.",
         /* 3.4 Polære molekyler og blandbarhed */
         "polært molekyle": "Partikel af flere atomer med en positiv og en negativ ende. Vand og ammoniak er eksempler.",
         "polær gruppe": "Del af et stort molekyle med et oxygenatom, for eksempel −OH. Der skal 4 carbonatomer til at ophæve virkningen af én.",

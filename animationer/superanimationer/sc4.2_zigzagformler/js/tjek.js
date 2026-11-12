@@ -39,7 +39,7 @@
         }
         if (c !== C) return { besked: "Tæl C-atomerne igen. Der er ét ved hvert knæk og hver ende." };
         if (alken && h === 2 * C + 2) return { besked: "Det er formlen for en alkan. Dobbeltbindingen giver to H færre." };
-        return { besked: "C-tallet passer. Tæl H igen: hvert C har fire bindinger i alt." };
+        return { besked: "Antallet af C-atomer passer. Tæl H-atomerne igen, for hvert C har fire bindinger i alt." };
     };
 
     /* ----- Navne ------------------------------------------------------------------ */
@@ -97,11 +97,11 @@
         var gUden = gammel ? gammel.replace(/^(cis|trans)-/, "") : null;
         var restRigtig = uUden === maal.navnUden || uUden === gUden;
         if (maal.stereo && restRigtig) {
-            if (!uSt) return { besked: "Resten er rigtigt. Navnet mangler cis eller trans foran." };
+            if (!uSt) return { besked: "Resten af navnet er rigtigt, men det mangler cis eller trans foran." };
             return { besked: "Se på dobbeltbindingen igen. Sidder kædens to dele på samme side (cis) eller på hver sin side (trans)?" };
         }
         if (!maal.stereo && uSt && restRigtig) {
-            return { besked: "Resten er rigtigt, men her er der ingen cis eller trans. Det kræver ét H og én anden gruppe på begge C-atomer i dobbeltbindingen." };
+            return { besked: "Resten af navnet er rigtigt, men her er der ingen cis eller trans. Cis og trans kræver ét H og én anden gruppe på begge C-atomer i dobbeltbindingen." };
         }
         if (maal.stereo && !uSt) {
             /* Kommer til sidst, hvis resten ogsaa er forkert */
@@ -136,7 +136,7 @@
             });
             if (usorteret) return { besked: "Skriv tallene i stigende rækkefølge, fx 2,3 og ikke 3,2." };
             if (lokPar(uUden).join() !== lokPar(fUden).join()) {
-                return { besked: "Begge ender giver de samme numre. Så får den sidegruppe, der står først i alfabetet, det laveste nummer." };
+                return { besked: "Begge ender giver de samme numre, og derfor får den sidegruppe, der står først i alfabetet, det laveste nummer." };
             }
             return { besked: "Tjek tegnsætningen: komma mellem tal, bindestreg mellem tal og bogstaver." };
         }
@@ -145,8 +145,8 @@
         /* Kaeden er det, der staar efter sidegrupperne (pentan, buten) */
         var forstavelser = /^((di|tri|tetra)?(methyl|ethyl|propyl|butyl|pentyl|fluor|chlor|brom|iod))*/.exec(uB)[0];
         var uHale = uB.slice(forstavelser.length);
-        if (alken && /an$/.test(uB)) return { besked: "Molekylet har en dobbeltbinding. Så ender navnet på -en, ikke -an." };
-        if (!alken && /en$/.test(uB)) return { besked: "Der er ingen dobbeltbinding. Så ender navnet på -an." };
+        if (alken && /an$/.test(uB)) return { besked: "Molekylet har en dobbeltbinding, så navnet ender på -en, ikke -an." };
+        if (!alken && /en$/.test(uB)) return { besked: "Molekylet har ingen dobbeltbinding, så navnet ender på -an." };
         if (uHale !== bogstaver(NK.Navn.kaedeNavn(res))) {
             return { besked: "Tjek hovedkæden. Tæl C-atomerne i den længste kæde" + (alken ? " gennem dobbeltbindingen" : "") + "." };
         }
@@ -198,7 +198,7 @@
     T.tegning = function (res, maal, medStereo) {
         if (!res || !res.navn) {
             if (res && res.grund === "flere") return { besked: "Molekylet skal hænge sammen." };
-            return { besked: "Det kan ikke navngives endnu. Tegn videre." };
+            return { besked: "Tegningen kan ikke navngives endnu. Tegn videre." };
         }
         var mr = maal.res;
         var rigtigMolekyle = res.navnUdenStereo === maal.navnUden;
@@ -207,13 +207,13 @@
         if (rigtigMolekyle) {
             if (!res.stereo) return { besked: "Molekylet er rigtigt, men kæden går lige gennem dobbeltbindingen. Tegn den med knæk, så man kan se cis eller trans." };
             return {
-                besked: "Rigtigt molekyle, men det er " + res.stereo + ". Navnet siger " + maal.stereo + ": " +
-                    (maal.stereo === "cis" ? "kædens to dele på samme side af dobbeltbindingen." : "kædens to dele på hver sin side af dobbeltbindingen.") +
+                besked: "Molekylet er rigtigt, men det er " + res.stereo + ". Navnet siger " + maal.stereo + ", så kædens to dele skal sidde " +
+                    (maal.stereo === "cis" ? "på samme side af dobbeltbindingen." : "på hver sin side af dobbeltbindingen.") +
                     " Højreklik på enden, og tegn den om."
             };
         }
         if (mr.antalDobbelt && !res.antalDobbelt) return { besked: "Molekylet mangler dobbeltbindingen. Klik på en binding for at gøre den dobbelt." };
-        if (!mr.antalDobbelt && res.antalDobbelt) return { besked: "Her er der ingen dobbeltbinding. Klik på den for at gøre den enkelt igen." };
+        if (!mr.antalDobbelt && res.antalDobbelt) return { besked: "Molekylet i opgaven har ingen dobbeltbinding. Klik på dobbeltbindingen på tavlen for at gøre den enkelt igen." };
         if (res.kaede.length !== mr.kaede.length) {
             return { besked: "Din længste kæde" + (mr.antalDobbelt ? " gennem dobbeltbindingen" : "") + " har " + res.kaede.length +
                 " C. Den skal have " + mr.kaede.length + " C. " + hedder };

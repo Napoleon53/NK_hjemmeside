@@ -198,7 +198,7 @@ function koer() {
         && d.getElementById("kryds-besked").textContent.indexOf("For tidligt") === 0);
     K.forfra(); K.startHaeld(); K.koer(0.6 + K.forl.dtKryds * 1.5);
     m = K.stop(false);
-    paastand("for sent: genkendt og med den rigtige tid", m.vurdering === "sen" && d.getElementById("kryds-besked").textContent.indexOf("krydset var væk ved ca. " + Math.round(m.sand) + " s") > 0);
+    paastand("for sent: genkendt og med den rigtige tid", m.vurdering === "sen" && d.getElementById("kryds-besked").textContent.indexOf("Krydset var væk ved ca. " + Math.round(m.sand) + " s") > 0);
     K.forfra(); K.startHaeld(); K.koer(0.6 + K.forl.dtKryds * 2.6);
     paastand("glemmer man uret, stopper det selv", K.tilstand === "stoppet" && K.sidste.vurdering === "auto");
     K.forfra();
@@ -376,7 +376,7 @@ function koer() {
     paastand("anden gang forkert: hele beregningen står, og tallet udfyldes", r.rigtig === false && C.forsoeg[1].svar.h && C.forsoeg[1].svar.h.vist
         && d.getElementById("konc-besked").textContent.indexOf("[H₃O⁺] = 1,0 M · 5 mL / 50 mL = 0,10 M") >= 0);
     paastand("to rigtige i kolonnen: resten regnes for eleven", C.tjekFelt(2, "c", String(M.C_THIO * 40 / 50)).rigtig && C.auto.c
-        && d.getElementById("konc-besked").textContent.indexOf("resten af den regnes for dig") >= 0);
+        && d.getElementById("konc-besked").textContent.indexOf("resten af kolonnen regnes for dig") >= 0);
     C.vol = { thio: 10, syre: 5, vand: 35 }; C.maal(); C.spolFrem();
     paastand("et nyt forsøg får [S₂O₃²⁻] med det samme", C.forsoeg[2].svar.c && C.forsoeg[2].svar.c.auto);
     felt = d.querySelector('#konc-tabel .svarfelt[data-stof="h"][data-nr="3"]');

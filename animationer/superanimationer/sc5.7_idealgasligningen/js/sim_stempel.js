@@ -447,7 +447,7 @@
             return G.fmt("n", e.n).replace("mol", "mol gas") + " fylder " + G.fmt("V", e.V) + " ved 20 °C og 1,013 bar.";
         }
         var m = o.maal, a = b[m], z = e[m];
-        var navn = m === "V" ? "Volumen" : "Trykket";
+        var navn = m === "V" ? "Volumenet" : "Trykket";
         var r = z / a, t;
         if (Math.abs(r - 1) < 0.005) t = navn + " er det samme: " + tal(m, z) + ".";
         else t = navn + (r > 1 ? " steg" : " faldt") + " fra " + tal(m, a) + " til " + tal(m, z) + ".";

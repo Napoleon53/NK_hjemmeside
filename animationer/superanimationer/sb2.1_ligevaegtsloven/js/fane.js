@@ -467,7 +467,7 @@
             if (this.spaer()) return;
             var t = B.skriv(a.s) + " står " + (a.side === "r" ? "før" : "efter") + " pilen. (" + a.t + ") betyder " +
                 B.TILSTAND[a.t] + ".";
-            if (a.k > 1) t += " Tallet foran er " + a.k + ".";
+            if (a.k > 1) t += " Koefficienten er " + a.k + ".";
             this.kortBesked(t, 5);
         };
 
@@ -480,7 +480,7 @@
                 p.classList.add("koerer");
             }
             if (this.spaer()) return;
-            this.kortBesked("Reaktionen løber begge veje på én gang og lige hurtigt. Derfor står der ⇌ og ikke →.", 6);
+            this.kortBesked("Ved ligevægt forløber reaktionen begge veje på én gang og lige hurtigt. Derfor står der ⇌ og ikke →.", 6);
         };
 
         /* Efter loesningen: produkterne op, reaktanterne ned, og det, der

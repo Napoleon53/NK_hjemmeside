@@ -95,7 +95,7 @@
         var trin1 = this.trin === "find" ? "aktiv" : "ok";
         var trin2 = this.faerdig ? "ok" : (this.trin === "farve" ? "aktiv" : "");
         var h = '<p class="stofnavn">' + NK.html(o.navn) + "</p>" +
-            '<p class="note-tekst">Chromoforen er den del af molekylet, der absorberer lyset: det største system af konjugerede dobbeltbindinger. C=O og N=N tæller med.</p>' +
+            '<p class="note-tekst">Chromoforen er den del af molekylet, der absorberer lyset, og den består af det største system af konjugerede dobbeltbindinger. Dobbeltbindingerne i C=O og N=N tæller med.</p>' +
             '<ol class="trinliste"><li class="' + trin1 + '">Markér chromoforen' + (this.trin !== "find" ? ": " + this.N : "") + "</li>" +
             '<li class="' + trin2 + '">Vælg farven' + (this.faerdig ? ": " + NK.html(o.farve.toLowerCase()) : "") + "</li></ol>";
         return h;
@@ -113,14 +113,14 @@
             var mangler = this.mangler().length;
             return [
                 "Chromoforen er det største system, hvor dobbelt- og enkeltbindinger skifter, så der er præcis én enkeltbinding mellem to dobbeltbindinger.",
-                "Begynd ved den dobbeltbinding, der lyser. Følg skiftet mellem dobbelt- og enkeltbinding ud til alle sider. Et C-atom med kun enkeltbindinger bryder systemet.",
-                "Der mangler " + mangler + ". De lyser nu."
+                "Begynd ved den dobbeltbinding, der lyser. Følg skiftet mellem dobbelt- og enkeltbinding ud til alle sider. Et C-atom med kun enkeltbindinger afbryder det konjugerede system.",
+                "Du mangler at markere " + mangler + " af dobbeltbindingerne i chromoforen. De manglende lyser nu."
             ];
         }
         return [
             "Chromoforen har " + N + " konjugerede dobbeltbinding" + (N === 1 ? "" : "er") + ".",
             "En kæde af C=C med færre end ca. 8 konjugerede dobbeltbindinger absorberer kun i UV. N=N og C=O i chromoforen flytter toppen mod længere bølgelængde.",
-            "Stoffet er " + o.farve.toLowerCase() + "."
+            "Opløsningen af stoffet er " + o.farve.toLowerCase() + "."
         ];
     };
 
@@ -209,7 +209,7 @@
         var t = o.nej && o.nej[navn];
         if (!t && o.farve === "Farveløs") t = "Med " + this.N + " konjugerede dobbeltbinding" + (this.N === 1 ? "" : "er") + " ligger toppen i UV, under 400 nm. Stoffet absorberer intet synligt lys.";
         if (!t && navn === "Farveløs") t = this.N + " konjugerede dobbeltbindinger er nok til, at toppen når ind i det synlige lys.";
-        if (!t) t = "Toppen ligger i det synlige lys, men et andet sted. Jo længere chromoforen er, jo længere bølgelængde bliver absorberet, og farven går fra gul over orange og rød mod lilla og blå.";
+        if (!t) t = "Toppen ligger i det synlige område, men ved en anden bølgelængde. Jo længere chromoforen er, jo længere bølgelængde bliver absorberet, og farven går fra gul over orange og rød mod lilla og blå.";
         this.forkertValg(j, t);
     };
 
@@ -257,7 +257,7 @@
         for (var lb in this.lysB) opt.marker[lb] = "rgba(255, 225, 120, " + (0.45 + 0.35 * Math.sin(this.tid * 6)) + ")";
         if (this.over !== null && this.trin === "find") opt.over = this.over;
         M.tegn(ctx, this.mol, this.vis, opt);
-        var navn = o.navn + (this.trin === "find" ? "  ·  markeret: " + this.antalMarker() : "  ·  chromoforen: " + this.N + " konjugerede");
+        var navn = o.navn + (this.trin === "find" ? "  ·  markeret: " + this.antalMarker() : "  ·  dobbeltbindinger i chromoforen: " + this.N);
         NK.tekst(ctx, navn, inde.x + inde.b / 2, inde.y + inde.h - 12, { font: "700 14px 'Segoe UI', sans-serif", farve: "#cfe0d6", justering: "center" });
 
         var vis = this.faerdig;

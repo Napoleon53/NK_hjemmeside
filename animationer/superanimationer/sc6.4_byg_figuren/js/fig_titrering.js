@@ -61,7 +61,7 @@
         vb: [1000, 808],
         lag: [
             { navn: "Hvad og hvor meget?", pladser: ["kvalitativ analyse", "kvantitativ analyse", "afvigelse"],
-              ros: "Den kvalitative analyse viser, at der er salt, og den kvantitative hvor meget. Afvigelsen sammenligner med posen." },
+              ros: "Den kvalitative analyse viser, at der er salt, og den kvantitative analyse viser, hvor meget. Afvigelsen sammenligner med posen." },
             { navn: "Opstillingen", pladser: ["titrering", "burette", "indikator"],
               ros: "Opløsningen med kendt koncentration dryppes fra buretten. Indikatoren i kolben viser, hvornår der skal stoppes." },
             { navn: "Mohrtitrering", pladser: ["Mohrtitrering", "omslag", "ækvivalenspunkt"],

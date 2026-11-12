@@ -201,10 +201,10 @@
         var r = this.maal.res, n = r.kaede.length;
         var kaede = NK.Navn.kaedeNavn(r);
         if (this.retning === "byg") {
-            var t = "Start med hovedkæden: " + kaede + " er " + n + " C i træk";
-            if (r.dobbelt.length) t += " med dobbeltbindingen efter C" + r.dobbelt[0];
+            var t = "Start med hovedkæden " + kaede + " med " + n + " C i træk";
+            if (r.dobbelt.length) t += " og dobbeltbindingen efter C" + r.dobbelt[0];
             t += ". Sæt så sidegrupperne på de C-atomer, numrene siger.";
-            if (this.maal.stereo) t += this.maal.stereo === "cis" ? " cis: kædens to dele på samme side af dobbeltbindingen." : " trans: kædens to dele på hver sin side af dobbeltbindingen.";
+            if (this.maal.stereo) t += this.maal.stereo === "cis" ? " Cis: kædens to dele på samme side af dobbeltbindingen." : " Trans: kædens to dele på hver sin side af dobbeltbindingen.";
             return t;
         }
         this.farv(r, false);

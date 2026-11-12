@@ -382,8 +382,8 @@
 
     P.linje = function () {
         var m = this.maal(), zm = this.lup.zoomerMod();
-        if (zm < 0) return "Over 100 at se. Luppen zoomer ind på et 10 gange mindre rum.";
-        if (zm > 0) return "Højst 10 at se. Luppen zoomer ud til et 10 gange større rum.";
+        if (zm < 0) return "Luppen viser over 100 ioner af én slags og zoomer ind på et 10 gange mindre rum.";
+        if (zm > 0) return "Luppen viser højst 10 af den ion, der er flest af, og zoomer ud til et 10 gange større rum.";
         if (m && (this.naaet || m.slags === "valg")) return "";
         if (m && Math.abs(this.ph - m.start) < 0.04 && !this.glid) return "Træk pH-mærket på skalaen. Et klik på skalaen virker også.";
         return "pH " + K.phTekst(this.ph, 1) + ". " + K.modVand(this.ph);

@@ -96,7 +96,7 @@
         if (!this.erGoer()) return regnInfo.call(this);
         if (this.faerdig) return null;
         var mig = this;
-        return { hint: "Ti gange tyndere: kolben skal være ti gange større end det, pipetten tager.",
+        return { hint: "Målekolbens rumfang skal være ti gange så stort som pipettens rumfang.",
                  svar: function () { mig.visGoer(); } };
     };
 
@@ -110,7 +110,7 @@
         if (this.faerdig) return "";
         if (s.iHaand !== null) return "Klik på den målekolbe, pipetten skal tømmes i.";
         var k = this.kolbeMedVaeske();
-        if (k) return "Klik på sprøjteflasken for at fylde op til mærket. Eller tag en portion mere.";
+        if (k) return "Klik på sprøjteflasken for at fylde kolben op til mærket, eller tag mere opløsning med en pipette.";
         return "Klik på en pipette. Den tager opløsning op fra flasken.";
     };
 
@@ -263,7 +263,7 @@
     P.klikKolbe = function (j) {
         var s = this.s, k = s.kolber[j];
         if (this.faerdig) { this.kortBesked("Opgaven er løst. Tryk på Næste opgave."); return; }
-        if (s.iHaand === null) { this.kortBesked("Tag først opløsning op med en pipette. Klik på en af dem."); return; }
+        if (s.iHaand === null) { this.kortBesked("Tag først opløsning op med en pipette. Klik på en af pipetterne."); return; }
         if (k.op) { this.kortBesked("Den kolbe er fyldt op. Vælg en anden, eller tryk på Start forfra."); return; }
         this.toemPipette(s.iHaand, j);
     };
@@ -287,14 +287,14 @@
             this.goerFaerdig = true;
             this.forklaring = NK.sub(regn + " Stoffet fra pipetten fordeler sig i ti gange så meget væske.");
             this.trinLoest(this.maade, this.maade === "svar" ?
-                NK.html("25 mL i en 250 mL kolbe. 10 mL i 100 mL og 50 mL i 500 mL giver det samme.") : null);
+                NK.html("25 mL i en 250 mL kolbe giver en ti gange tyndere opløsning. Det gør 10 mL i 100 mL og 50 mL i 500 mL også.") : null);
             this.visKort();
             return;
         }
         s.forsoeg = true;
         var gange = D.STAM / c;
         var g = Math.abs(gange - Math.round(gange)) < 0.01 ? String(Math.round(gange)) : NK.betydende(gange, 2);
-        this.besked(NK.html("Det gav " + K.c(c) + " M. Det er " + g + " gange tyndere, ikke ti. Klik på en pipette for at prøve igen."), "skidt");
+        this.besked(NK.html("Opløsningen i kolben er " + K.c(c) + " M. Den er " + g + " gange tyndere, ikke ti gange tyndere. Klik på en pipette for at prøve igen."), "skidt");
     };
 
     /* Vis svaret: 25 mL i 250 mL, fra start */
@@ -305,7 +305,7 @@
         this.maade = "svar";
         this.brugtSvar = true;
         this.auto = true;
-        this.svarVis(NK.html("25 mL i en 250 mL kolbe. 10 mL i 100 mL og 50 mL i 500 mL giver det samme."));
+        this.svarVis(NK.html("25 mL i en 250 mL kolbe giver en ti gange tyndere opløsning. Det gør 10 mL i 100 mL og 50 mL i 500 mL også."));
         this.fyldPipette(1);
         this.toemPipette(1, 1);
         this.fyldOp(1, function () { mig.vurder(1); });
@@ -364,7 +364,7 @@
         if (!u) return false;
         if (!this.erGoer()) {
             this.kortBesked(u.slags === "glas" ? "Der kommer vand i, når du har regnet, hvor meget." :
-                "Scenen gør det, når du har regnet rigtigt.");
+                "Scenen viser fortyndingen, når du har regnet rigtigt.");
             return false;
         }
         if (this.travl()) { this.kortBesked("Vent lidt."); return false; }

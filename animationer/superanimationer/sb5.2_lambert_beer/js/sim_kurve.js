@@ -109,7 +109,7 @@
         var ku = this.kuv[k];
         if (ku.aftryk && ku.A !== null && !this.sagtNy.aftryk) {
             this.sagtNy.aftryk = true;
-            this.kortBesked("Kuvetten bliver målt igen, men glasset er det samme.", 4);
+            this.kortBesked("Kuvetten bliver målt igen, men glasset er stadig det samme, så punktet flytter sig næsten ikke.", 4);
         }
         this.koe.push(k);
         this.nulstilHjaelp();
@@ -182,7 +182,7 @@
     P.tjekLinje = function () {
         var best = this.bedsteA(), a = this.linje.a;
         if (!this.alleMaalt()) {
-            this.besked("Mål vandet og alle fem standarder først. Linjen skal passe med dem alle.", "hint");
+            this.besked("Mål vandet og alle fem standarder først. Linjen skal passe med alle punkterne.", "hint");
             return;
         }
         if (Math.abs(a - best) / best <= TOL_LINJE) {
@@ -227,7 +227,7 @@
 
     P.faerdigOpgave = function (vist) {
         var s = this.stof, a = this.linje.a, Ap = this.proeve().A, c = Ap / a;
-        var tekst = "Prøvens koncentration er " + NK.dk(c, s.cDec + (c < 0.1 ? 1 : 0)) + " mM. Det samme giver c = A / a = " +
+        var tekst = "Prøvens koncentration er " + NK.dk(c, s.cDec + (c < 0.1 ? 1 : 0)) + " mM. Beregningen giver det samme: c = A / a = " +
             NK.dk(Ap, 3) + " / " + NK.dk(a, this.decA()) + " mM⁻¹ = " + NK.betydende(c, 3) + " mM.";
         this.visTabel();
         this.loest(vist ? "svar" : "ok", NK.html(tekst), vist ? "Svaret" : "Aflæst ✓");
@@ -295,11 +295,11 @@
         var t = this.trin(), mangler = this.standarder().filter(function (k) { return k.A === null; });
         if (t === "maal") {
             if (this.kuv[0].A === null) return "Klik på kuvetterne i bakken for at måle dem. Begynd med vandet.";
-            return "Mål de næste kuvetter. Der mangler " + mangler.length + ".";
+            return "Mål de næste kuvetter. Kuvetter, der ikke er målt: " + mangler.length + ".";
         }
         if (t === "aftryk") return "Ét punkt ligger langt fra de andre. Find ud af hvorfor.";
         if (t === "linje") return "Træk i den gule prik for enden af linjen, til linjen passer med punkterne.";
-        if (t === "proeve") return "Mål prøven: klik på kuvetten Prøven i bakken.";
+        if (t === "proeve") return "Mål prøven ved at klikke på kuvetten Prøven i bakken.";
         if (t === "aflaes") return "Træk den lodrette linje hen, hvor prøvens absorbans rammer standardkurven.";
         return "";
     };
@@ -560,10 +560,10 @@
             if (this.linje.ok && this.proeve().A !== null && !this.aflaes.ok) {
                 this.kortBesked("Træk i den lodrette linje med den gule trekant på x-aksen.", 4);
             } else {
-                this.kortBesked("Grafen viser absorbansen A mod koncentrationen c. Hver måling bliver et punkt.", 4);
+                this.kortBesked("Grafen viser absorbansen A som funktion af koncentrationen c. Hver måling bliver et punkt.", 4);
             }
         } else if (h.slags === "spekt") {
-            this.kortBesked("Spektrofotometret sender lys med " + s.lambda + " nm gennem kuvetten og måler absorbansen A.", 5);
+            this.kortBesked("Spektrofotometret sender lys med bølgelængden " + s.lambda + " nm gennem kuvetten og måler absorbansen A.", 5);
         }
     };
 

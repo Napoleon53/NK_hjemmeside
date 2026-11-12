@@ -260,7 +260,7 @@ function koerTest(W) {
     function besked(r) { return r.ok ? "OK" + (r.note ? ": " + r.note : "") : r.besked; }
     var fT = [
         ["C5H12", 5, 12, false, "OK"], ["c5h12", 5, 12, false, "OK: Rigtigt. Grundstofsymbolerne"], ["C₅H₁₂", 5, 12, false, "OK"],
-        ["H12C5", 5, 12, false, "Skriv C først"], ["C4H12", 5, 12, false, "Tæl C-atomerne"], ["C5H10", 5, 12, false, "Tæl H igen"],
+        ["H12C5", 5, 12, false, "Skriv C først"], ["C4H12", 5, 12, false, "Tæl C-atomerne"], ["C5H10", 5, 12, false, "Tæl H-atomerne igen"],
         ["C5H12", 5, 10, true, "formlen for en alkan"], ["pentan", 5, 12, false, "Skriv formlen som C og H"]
     ];
     var fFejl = fT.filter(function (x) { return besked(TJ.formel(x[0], x[1], x[2], x[3])).indexOf(x[4]) !== 0 && besked(TJ.formel(x[0], x[1], x[2], x[3])).indexOf(x[4]) < 0; });

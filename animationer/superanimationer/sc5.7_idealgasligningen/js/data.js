@@ -50,21 +50,21 @@
     D.FORUDSIG = [
         { id: "varme", navn: "Varmere gas",
           start: { n: 1, T: 293, lodder: 0, laast: false },
-          spm: "Stemplet glider frit. Hvad sker der med volumen, når gassen bliver varmere?",
+          spm: "Stemplet glider frit. Hvad sker der med volumenet, når gassen bliver varmere?",
           valg: [
-              { t: "Volumen bliver større", ok: true },
-              { t: "Volumen bliver mindre" },
-              { t: "Volumen er det samme" }
+              { t: "Volumenet bliver større", ok: true },
+              { t: "Volumenet bliver mindre" },
+              { t: "Volumenet er det samme" }
           ],
           handling: "varm", maal: "V", forventet: { retning: 1 }, krav: { laast: false },
-          proev: "Prøv det: skru op for temperaturen.",
+          proev: "Prøv det: Skru op for temperaturen.",
           hint: "Se på molekylerne, når det bliver varmere. Skubber de hårdere eller svagere på stemplet?",
           proevHint: "Træk skyderen Temperatur mod højre, eller tryk på den røde knap på varmepladen.",
           hvorfor: "Molekylerne fik mere fart og skubbede stemplet op, til trykket inde igen var det samme som udefra." },
 
         { id: "lod", navn: "Et lod på",
           start: { n: 1, T: 293, lodder: 0, laast: false },
-          spm: "Du lægger et lod på. Trykket udefra stiger fra 1,013 bar til 2,013 bar, næsten det dobbelte. Hvad sker der med volumen?",
+          spm: "Du lægger et lod på stemplet. Trykket udefra stiger fra 1,013 bar til 2,013 bar, næsten det dobbelte. Hvad sker der med volumenet?",
           valg: [
               { t: "Det bliver næsten halvt så stort", ok: true },
               { t: "Det bliver næsten dobbelt så stort" },
@@ -72,35 +72,35 @@
               { t: "Det er det samme" }
           ],
           handling: "lod", maal: "V", forventet: { forhold: 0.5 }, krav: { laast: false },
-          proev: "Prøv det: læg et lod på stemplet.",
-          hint: "Gassen skal skubbe dobbelt så hårdt igen. Så skal molekylerne ramme stemplet dobbelt så tit.",
+          proev: "Prøv det: Læg et lod på stemplet.",
+          hint: "Gassen skal skubbe dobbelt så hårdt tilbage, og derfor skal molekylerne ramme stemplet dobbelt så ofte.",
           proevHint: "Træk et lod fra hylden op på stemplet, eller tryk + ved Lodder.",
-          hvorfor: "Ved samme n og T er p og V omvendt proportionale: dobbelt tryk giver halvt volumen." },
+          hvorfor: "Ved samme n og T er p og V omvendt proportionale, så dobbelt tryk giver halvt volumen." },
 
         { id: "dobbelt", navn: "Dobbelt så meget gas",
           start: { n: 0.5, T: 293, lodder: 0, laast: false },
-          spm: "Du fordobler stofmængden fra 0,50 mol til 1,00 mol. Temperaturen og trykket er de samme. Hvad sker der med volumen?",
+          spm: "Du fordobler stofmængden fra 0,50 mol til 1,00 mol. Temperaturen og trykket er de samme. Hvad sker der med volumenet?",
           valg: [
               { t: "Det bliver dobbelt så stort", ok: true },
               { t: "Det bliver halvt så stort" },
               { t: "Det er det samme" }
           ],
           handling: "dobbeltN", maal: "V", forventet: { forhold: 2 }, krav: { laast: false },
-          proev: "Prøv det: luk gas ind, til der er 1,00 mol.",
+          proev: "Prøv det: Luk gas ind, til der er 1,00 mol.",
           hint: "Dobbelt så mange molekyler skal have plads ved det samme tryk.",
           proevHint: "Klik på gasflasken to gange, eller tryk + ved Gas.",
           hvorfor: "Dobbelt så mange molekyler skal have dobbelt så meget plads, hvis trykket skal være det samme." },
 
         { id: "laast", navn: "Låst stempel",
           start: { n: 1, T: 293, lodder: 0, laast: true },
-          spm: "Stemplet er låst, så volumen ikke kan ændre sig. Hvad sker der med trykket, når gassen bliver varmere?",
+          spm: "Stemplet er låst, så volumenet ikke kan ændre sig. Hvad sker der med trykket, når gassen bliver varmere?",
           valg: [
               { t: "Trykket stiger", ok: true },
               { t: "Trykket falder" },
               { t: "Trykket er det samme" }
           ],
           handling: "varm", maal: "p", forventet: { retning: 1 }, krav: { laast: true },
-          proev: "Prøv det: skru op for temperaturen. Se på manometeret.",
+          proev: "Prøv det: Skru op for temperaturen. Se på manometeret.",
           hint: "Stemplet kan ikke give efter. Hvad gør molekylerne ved væggene, når de får mere fart?",
           proevHint: "Træk skyderen Temperatur mod højre, eller tryk på den røde knap på varmepladen.",
           hvorfor: "Molekylerne rammer væggene oftere og hårdere, og stemplet kan ikke give efter." },
@@ -113,13 +113,13 @@
               { t: "Molekylerne bliver større",
                 svar: "Molekylerne er lige store ved alle temperaturer. Det er farten, der stiger." },
               { t: "Der dannes flere molekyler",
-                svar: "Tæl dem: der er lige mange før og efter. Stofmængden er den samme." },
+                svar: "Tæl molekylerne. Der er lige mange før og efter, så stofmængden er den samme." },
               { t: "Molekylerne klumper sig",
-                svar: "Så ville trykket falde. Varme molekyler farer rundt hver for sig." }
+                svar: "Hvis molekylerne klumpede sig, ville trykket falde. Varme molekyler farer rundt hver for sig." }
           ],
           handling: null, maal: "p",
           hint: "Tæl molekylerne, og se på, hvor hurtigt de bevæger sig. Skru gerne op og ned for varmen.",
-          hvorfor: "Hurtige molekyler rammer væggene oftere og hårdere. Det er det, trykket er." },
+          hvorfor: "Hurtige molekyler rammer væggene oftere og hårdere, og trykket er netop molekylernes stød mod væggene." },
 
         { id: "ud", navn: "Gas ud",
           start: { n: 2, T: 293, lodder: 0, laast: true, V: 24.04 },
@@ -130,7 +130,7 @@
               { t: "Trykket er det samme" }
           ],
           handling: "udN", maal: "p", forventet: { retning: -1 }, krav: { laast: true },
-          proev: "Prøv det: luk 0,25 mol gas ud.",
+          proev: "Prøv det: Luk 0,25 mol gas ud.",
           hint: "Færre molekyler skal ramme de samme vægge.",
           proevHint: "Klik på den røde hane ved cylinderen, eller tryk − ved Gas.",
           hvorfor: "Færre molekyler rammer de samme vægge, så trykket falder." },
@@ -147,10 +147,10 @@
                 svar: "Idealgasligningen har ingen plads til, hvilken gas det er. Kun n, T og p tæller." }
           ],
           handling: "maal", maal: "V", forventet: {},
-          proev: "Prøv det: sæt gassen på 1,00 mol, og tag lodderne af. Temperaturen er 293 K.",
+          proev: "Prøv det: Sæt gassen på 1,00 mol, og tag lodderne af. Temperaturen er 293 K.",
           hint: "Mere end en sodavandsflaske, mindre end et badekar.",
           proevHint: "Tryk + ved Gas to gange, og tryk − ved Lodder, til der ikke er flere.",
-          hvorfor: "Det gælder alle gasser: 1 mol fylder ca. 24 L ved stuetemperatur og 1,013 bar." }
+          hvorfor: "1 mol af enhver gas fylder ca. 24 L ved stuetemperatur og 1,013 bar." }
     ];
 
     /* ======================================================================
@@ -175,7 +175,7 @@
         { id: "L1", niveau: "let", navn: "Gas i et stempel", find: "V", beholder: "stempel",
           std: { n: 1.50, T: 293, p: 1.013 },
           tal: { n: [0.500, 0.750, 1.20, 1.50, 2.00, 2.50], T: [273, 293, 298, 310, 350], p: [1.013, 1.50, 2.00] },
-          tekst: "Der er {n} gas i en cylinder med et stempel ved {T} og {p}. Hvor stort er volumen?",
+          tekst: "Der er {n} gas i en cylinder med et stempel ved {T} og {p}. Hvor stort er volumenet?",
           slut: "Gassen fylder {V}." },
         { id: "L2", niveau: "let", navn: "Ballonen", find: "n", beholder: "stempel",
           std: { V: 5.00, T: 293, p: 1.013 },
@@ -250,7 +250,7 @@
     /* Navnene paa trinene og stoerrelserne */
     D.STR = {
         p: { navn: "Trykket", sym: "p", enhed: "bar", ord: "trykket" },
-        V: { navn: "Volumen", sym: "V", enhed: "L", ord: "volumen" },
+        V: { navn: "Volumen", sym: "V", enhed: "L", ord: "volumenet" },
         n: { navn: "Stofmængden", sym: "n", enhed: "mol", ord: "stofmængden" },
         T: { navn: "Temperaturen i kelvin", sym: "T", enhed: "K", ord: "temperaturen" },
         t: { navn: "Temperaturen i °C", sym: "t", enhed: "°C", ord: "temperaturen i °C" },
@@ -271,8 +271,8 @@
     };
 
     D.FAERDIG = {
-        stempel: "Alle syv. Gassen gør, hvad ligningen siger.",
-        regn: "Alle tolv. Kelvin og R sidder."
+        stempel: "Alle syv opgaver er løst. Gassen gør, hvad ligningen siger.",
+        regn: "Alle tolv opgaver er løst. Kelvin og R sidder."
     };
 
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
@@ -287,11 +287,11 @@
         lodMin: "Der ligger ingen lodder på stemplet.",
         tMaks: "Varmepladen kan ikke blive varmere.",
         tMin: "Kølingen kan ikke blive koldere.",
-        laast: "Stemplet er låst. Volumen kan ikke ændre sig.",
+        laast: "Stemplet er låst. Volumenet kan ikke ændre sig.",
         frit: "Stemplet glider frit. Trykket inde er det samme som udefra.",
         lodLaast: "Stemplet er låst, så loddet trykker på låsen, ikke på gassen.",
         manometer: "Manometeret viser trykket i gassen.",
-        aeg224: "22,4 L ved 0 °C og 1,013 bar. Det tal står i de gamle lærebøger."
+        aeg224: "1 mol gas fylder 22,4 L ved 0 °C og 1,013 bar. Det tal står i de gamle lærebøger."
     };
 
     NK.Data = D;

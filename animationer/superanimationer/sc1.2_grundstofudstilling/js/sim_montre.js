@@ -1030,7 +1030,7 @@
             linjer.push({ t: n + (n === 1 ? " skal" : " skaller"), px: 15, luft: 6 });
             linjer.push({ t: g.periode + ". periode", px: 15, farve: "#f7d774" });
             if (g.z !== 2) {
-                linjer.push({ t: yderst + " i den yderste", px: 15, luft: 6 });
+                linjer.push({ t: yderst + " i yderste skal", px: 15, luft: 6 });
                 linjer.push({ t: "hovedgruppe " + g.hg, px: 15, farve: "#f7d774" });
             } else {
                 linjer.push({ t: "fuld skal", px: 15, luft: 6 });

@@ -16,23 +16,23 @@
     var TURE = {
         "fane-dr": [
             { sel: "#dr-skort", titel: "Kortet", tekst: "Her står opgaven og svarene. Vælg et svar, og tryk Indsend svar. Knappen med gul kant giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#dr-anker-model", titel: "Molekylet", tekst: "To C-atomer og deres grupper som kugler. Tag fat i en kugle med musen, og træk." },
-            { sel: "#dr-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En opgave, du løser uden at se svaret, får en stjerne. Under listen kan du tage samme opgave forfra." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Cis eller trans?: 15 molekyler på tid. E og Z er ekstra." }
+            { sel: "#dr-anker-model", titel: "Molekylet", tekst: "Molekylet er tegnet med to C-atomer og deres grupper som kugler. Tag fat i en kugle med musen, og træk." },
+            { sel: "#dr-opgaver", titel: "Opgaverne", tekst: "Fanen har seks opgaver. En opgave, du løser uden at se svaret, får en stjerne. Under listen kan du tage samme opgave forfra." },
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Fanen Cis eller trans? er et spil med 15 molekyler på tid. Fanen E og Z er ekstra." }
         ],
         "fane-pr": [
             { sel: "#pr-skort", titel: "Kortet", tekst: "Her står det skridt, du er ved, og hvad der gik galt. Knappen med gul kant giver ét hint ad gangen." },
-            { sel: "#pr-anker-tavle", titel: "Tavlen", tekst: "Molekylet som i bogen. Klik på den gruppe, der vinder på hvert C-atom, og tryk Indsend svar." },
+            { sel: "#pr-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser molekylet tegnet som i bogen. Klik på den gruppe, der vinder på hvert C-atom, og tryk Indsend svar." },
             { sel: "#pr-indsend", titel: "Indsend svar", tekst: "Indsend svar sender det, du har valgt. I sidste skridt vælger du E, Z eller Ingen E/Z-isomeri på kortet." },
             { sel: "#pr-zkort", titel: "Atomnumrene", tekst: "Det atom, der sidder på C-atomet, afgør prioriteten. Det højeste atomnummer vinder." },
-            { sel: "#pr-opgaver", titel: "Opgaverne", tekst: "Otte molekyler fra let til svær, og fire, hvor du bygger molekylet selv." }
+            { sel: "#pr-opgaver", titel: "Opgaverne", tekst: "Fanen har otte molekyler fra let til svær og fire opgaver, hvor du selv bygger molekylet." }
         ],
         "fane-sp": [
-            { sel: "#sp-skort", titel: "Kortet", tekst: "Spørgsmålet og svarene. Efter hvert svar står forklaringen på kortet, og spillet venter, til du trykker Næste molekyle." },
-            { sel: "#sp-anker-tavle", titel: "Tavlen", tekst: "Et nyt molekyle hver gang. Stregen forneden viser, hvor lang tid du har brugt." },
+            { sel: "#sp-skort", titel: "Kortet", tekst: "Kortet viser spørgsmålet og svarene. Efter hvert svar står forklaringen på kortet, og spillet venter, til du trykker Næste molekyle." },
+            { sel: "#sp-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser et nyt molekyle hver gang. Stregen forneden viser, hvor lang tid du har brugt." },
             { sel: "#sp-valg", titel: "Svaret", tekst: "Vælg et svar på kortet eller med tasterne C, T og I. Tryk så Indsend svar eller Enter." },
             { sel: "#sp-emnekort", titel: "Cis og trans eller E og Z", tekst: "Spillet handler om cis og trans. Her kan du skifte til E og Z, som er ekstra." },
-            { sel: "#sp-pointkort", titel: "Point", tekst: "50 point for et rigtigt svar, og op til 50 i bonus for et hurtigt svar." }
+            { sel: "#sp-pointkort", titel: "Point", tekst: "Et rigtigt svar giver 50 point, og et hurtigt svar giver op til 50 point mere i bonus." }
         ]
     };
     var trin = [];

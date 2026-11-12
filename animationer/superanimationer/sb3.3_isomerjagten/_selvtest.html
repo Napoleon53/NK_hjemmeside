@@ -409,7 +409,7 @@ function koerTest(W) {
     paastand("under spørgsmålet: et klik på tavlen får kortet til at blinke", el("j-skort").classList.contains("blink") && s.braet.mol.atomer.length === n0);
     s.svarValg(1);
     s.indsendKlik();
-    paastand("rigtigt svar: grønt kort med Stillingsisomerer og forklaringen", s.groen && /Stillingsisomerer/.test(kortTekst()) && /nr\. 2 og nr\. 1/.test(kortTekst()), kortTekst());
+    paastand("rigtigt svar: grønt kort med Stillingsisomerer og forklaringen", s.groen && /Stillingsisomerer/.test(kortTekst()) && /nr\. 2 i .+ og nr\. 1 i /.test(kortTekst()), kortTekst());
     el("j-skort").classList.remove("blink");
     s.fortryd();
     paastand("grønt kort: Fortryd blinker kortet i stedet", el("j-skort").classList.contains("blink"));
@@ -477,7 +477,7 @@ function koerTest(W) {
     paastand("C₄H₁₀O: kortet spørger om det højeste kogepunkt, og tavlen viser syv", s.fase === "kog" && s.celler.length === 7 && /højeste kogepunkt/.test(kortTekst()));
     s.kogKlik(s.kog.navne.indexOf("diethylether"));
     s.indsendKlik();
-    paastand("en ether: kan ikke danne hydrogenbindinger med sig selv", /ether og kan ikke danne hydrogenbindinger/.test(besked()), besked());
+    paastand("en ether: kan ikke danne hydrogenbindinger med sig selv", /ether, og dens molekyler kan ikke danne hydrogenbindinger/.test(besked()), besked());
     s.kogKlik(s.kog.navne.indexOf("diethylether"));
     paastand("den prøvede kan ikke vælges igen", s.kog.valgt === null);
     s.kogKlik(s.kog.navne.indexOf("2-methylpropan-1-ol"));
@@ -671,9 +671,9 @@ function koerTest(W) {
     if (s.fase === "spm") { svarRigtigt(); s.videreKlik(); }
     paastand("pent-2-en er fundet, og stillingsisomeri med dobbeltbindingen er forklaret", s.st.fundet.indexOf("pent-2-en") >= 0);
     indsendTegning("cis-pent-2-en", false);
-    paastand("cis-formen bagefter: samme stof, og kortet siger, at cis og trans tæller som ét", /Samme stof/.test(besked()) && /cis-pent-2-en/.test(besked()) && /Cis og trans tæller som ét stof/.test(besked()), besked());
+    paastand("cis-formen bagefter: samme stof, og kortet siger, at cis og trans tæller som ét", /Samme stof/.test(besked()) && /cis-pent-2-en/.test(besked()) && /Cis- og trans-formen tæller som ét stof/.test(besked()), besked());
     paastand("relationen pent-1-en og pent-2-en er stilling, og teksten nævner dobbeltbindingen",
-        K.relation(K.isomer("pent-1-en"), K.isomer("pent-2-en")) === "stilling" && /dobbeltbindingen går fra nr\. 1 og nr\. 2/.test(K.relForklaring("pent-1-en", "pent-2-en")), K.relForklaring("pent-1-en", "pent-2-en"));
+        K.relation(K.isomer("pent-1-en"), K.isomer("pent-2-en")) === "stilling" && /dobbeltbindingen går fra nr\. 1 i den første og nr\. 2 i den anden/.test(K.relForklaring("pent-1-en", "pent-2-en")), K.relForklaring("pent-1-en", "pent-2-en"));
     loesJagt(6);
     paastand("alkenjagten slutter uden kogepunkter med et grønt kort", s.st.kog && s.groen && /Alle fem alkener er fundet/.test(kortTekst()), kortTekst());
     paastand("whiteboardet viser de fem alkener uden °C, og hylden har ingen kogepunkter",

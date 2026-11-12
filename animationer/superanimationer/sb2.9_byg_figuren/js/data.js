@@ -22,7 +22,7 @@ window.NK = NK;
 
     NK.FORKLARING = {
         /* B2.1 Kemisk ligevægt */
-        "reversibel": "Siges om en reaktion, der kan gå begge veje. Den skrives med en dobbeltpil.",
+        "reversibel": "Siges om en reaktion, der kan forløbe i begge retninger. Reaktionen skrives med en dobbeltpil.",
         "ligevægt": "Tilstand, hvor koncentrationerne af alle stoffer ikke længere ændrer sig. Kurverne på grafen er blevet vandrette.",
         "dynamisk ligevægt": "Balance, hvor reaktionen mod højre og reaktionen mod venstre forløber lige hurtigt. Begge forløber hele tiden.",
         "indstille sig": "Udtryk for, at koncentrationerne når deres endelige værdier. Reaktionen kommer i ligevægt.",
@@ -35,11 +35,11 @@ window.NK = NK;
         /* B2.4 Ikke-ligevægt og indgreb */
         "indgreb": "Ændring udefra, som bringer en blanding ud af ligevægt. Et stof kan for eksempel blive tilsat eller fjernet.",
         "forskudt": "Siges om en ligevægt, der flytter sig efter et indgreb. Reaktionen forløber mod højre eller mod venstre, indtil Y igen er lig med K.",
-        "Le Chateliers princip": "Huskeregel: En ligevægt forskydes i den retning, der modvirker et indgreb. Tilsættes et stof, bliver noget af det brugt.",
+        "Le Chateliers princip": "Huskeregel: En ligevægt forskydes i den retning, der modvirker et indgreb. Tilsættes et stof, bliver noget af stoffet forbrugt.",
         /* B2.7 Opløselighedsprodukt */
         "tungtopløselig": "Siges om et salt, der danner bundfald, fordi vand kun kan rumme meget lidt af det. Bly(II)iodid er et eksempel.",
-        "bundfald": "Fast stof, der samler sig i væsken, når ioner mødes og danner et tungtopløseligt salt. Bly(II)iodid giver et, der er gult.",
-        "fældningsreaktion": "Det, der sker, når to opløsninger blandes, og ioner fra dem danner et bundfald.",
+        "bundfald": "Fast stof, der samler sig i væsken, når ioner mødes og danner et tungtopløseligt salt. Bly(II)iodid danner et gult bundfald.",
+        "fældningsreaktion": "Reaktion, hvor ioner fra to opløsninger danner et bundfald, når opløsningerne blandes.",
         "opløselighedsligevægt": "Balance mellem et fast salt og saltets ioner i væsken omkring. Ioner forlader iongitteret lige så hurtigt, som andre sætter sig på.",
         "mættet": "Siges om en opløsning med så meget salt, som vandet kan rumme ved den temperatur. Den er i ligevægt med det faste salt.",
         "opløselighed": "Den mængde af et salt, som vandet højst kan rumme ved en bestemt temperatur. Den angives i mol pr. liter eller i gram pr. 100 mL.",

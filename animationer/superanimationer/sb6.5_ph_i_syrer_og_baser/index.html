@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pH i syrer og baser</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>pH i syrer og baser</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-s" role="tab" aria-selected="true"><span class="nr">1</span>Skemaet</button>
+        <button class="faneknap" data-fane="fane-v" role="tab" aria-selected="false"><span class="nr">2</span>Vælg vejen</button>
+        <button class="faneknap" data-fane="fane-b" role="tab" aria-selected="false"><span class="nr">3</span>Baser og salte</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: SKEMAET                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-s" role="tabpanel" aria-label="Skemaet">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="s-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-kolbe"></div>
+        <div class="anker" id="s-anker-lup"></div>
+        <div class="anker" id="s-anker-skema"></div>
+        <div class="anker" id="s-anker-rammer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="s-syrekort">
+            <h2>Syrerne</h2>
+            <ol class="trinliste valgliste" id="s-syrer"></ol>
+            <button class="knap igenknap" id="s-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="s-trinkort">
+            <h2 id="s-titel">Methansyre</h2>
+            <ol class="trinliste" id="s-trin"></ol>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: VAELG VEJEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-v" role="tabpanel" aria-label="Vælg vejen">
+    <div class="scene">
+        <canvas id="v-laerred"></canvas>
+        <div class="scenekort" id="v-skort">
+            <div class="sk-ind" id="v-ind"></div>
+            <div class="sk-bund" id="v-status">
+                <p class="st-tekst" id="v-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="v-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="v-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="v-anker-skala"></div>
+        <div class="anker" id="v-anker-lup"></div>
+        <div class="anker" id="v-anker-rammer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="v-syrekort">
+            <h2>Syrerne</h2>
+            <ol class="trinliste valgliste" id="v-syrer"></ol>
+            <button class="knap igenknap" id="v-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="v-trinkort">
+            <h2 id="v-titel">Salpetersyre</h2>
+            <ol class="trinliste" id="v-trin"></ol>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: BASER OG SALTE                                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-b" role="tabpanel" aria-label="Baser og salte">
+    <div class="scene">
+        <canvas id="b-laerred"></canvas>
+        <div class="scenekort" id="b-skort">
+            <div class="sk-ind" id="b-ind"></div>
+            <div class="sk-bund" id="b-status">
+                <p class="st-tekst" id="b-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="b-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="b-anker-reak"></div>
+        <div class="anker" id="b-anker-kolbe"></div>
+        <div class="anker" id="b-anker-rammer"></div>
+        <div class="anker" id="b-anker-skala"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="b-basekort">
+            <h2>Baserne</h2>
+            <ol class="trinliste valgliste" id="b-baser"></ol>
+            <button class="knap igenknap" id="b-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="b-trinkort">
+            <h2 id="b-titel">Natriumhydroxid</h2>
+            <ol class="trinliste" id="b-trin"></ol>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>pH i syrer og baser</h2>
+        <h3 class="teori-hoved">Stærke syrer</h3>
+        <p>En stærk syre reagerer fuldstændigt med vand, så [H<sub>3</sub>O<sup>+</sup>] = c<sub>s</sub> og pH = −log c<sub>s</sub>.</p>
+        <h3 class="teori-hoved">Skemaet</h3>
+        <p>For alle andre syrer er reaktionen med vand en ligevægt. x er den koncentration af syren, der har afgivet en hydron fra start til ligevægt. Rækken Ligevægt giver [S] = c<sub>s</sub> − x og [B] = [H<sub>3</sub>O<sup>+</sup>] = x. Udtrykkene indsættes i udtrykket for syrestyrkekonstanten, så K<sub>s</sub> = x<sup>2</sup> / (c<sub>s</sub> − x). Ligningen løses med CAS, og den negative løsning forkastes. Derefter er [H<sub>3</sub>O<sup>+</sup>] = x og pH = −log x.</p>
+        <h3 class="teori-hoved">Genvejen og valget</h3>
+        <p>For en svag syre er x meget mindre end c<sub>s</sub>, og derfor gælder genvejen pH = ½ · (pK<sub>s</sub> − log c<sub>s</sub>). Syrens pK<sub>s</sub> afgør fremgangsmåden:</p>
+        <canvas id="teori-skala" class="teori-skala" width="680" height="176" aria-label="Bogens pKs-skala. Under 0: pH er minus log cs. Fra 0 til 4: løs ligningen. Over 4: genvejen"></canvas>
+        <h3 class="teori-hoved">Baser</h3>
+        <p>For en base findes først [OH<sup>−</sup>], så pOH og til sidst pH = 14,00 − pOH. I en stærk base er [OH<sup>−</sup>] = c<sub>b</sub>, og giver hver formelenhed to hydroxidioner, er [OH<sup>−</sup>] = 2 · c<sub>b</sub>. Genvejen for en svag base er pOH = ½ · (pK<sub>b</sub> − log c<sub>b</sub>). For den korresponderende base til en svag syre er pK<sub>b</sub> = 14,00 − pK<sub>s</sub>.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/trin.js"></script>
+<script src="js/sim_skema.js"></script>
+<script src="js/sim_vej.js"></script>
+<script src="js/sim_base.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

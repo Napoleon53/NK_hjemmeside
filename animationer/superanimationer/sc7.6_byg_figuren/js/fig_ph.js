@@ -48,14 +48,14 @@
         pladser: [
             skilt("sur", K[0], ["sur"], {
                 basisk: "<b>basisk</b> betyder flere hydroxidioner end oxoniumioner. I vinduet her er der flest oxoniumioner.",
-                neutral: "<b>neutral</b> betyder lige mange af hver. I vinduet her er der flest oxoniumioner.",
+                neutral: "<b>neutral</b> betyder lige mange oxoniumioner og hydroxidioner. I vinduet her er der flest oxoniumioner.",
                 pH: "<b>pH</b> er et tal på skalaen nedenfor. Skiltet siger, hvad slags opløsning der er i vinduet." }),
             skilt("neutral", K[1], ["neutral"], {
                 sur: "<b>sur</b> betyder flere oxoniumioner end hydroxidioner. I vinduet her er der lige mange af hver.",
                 basisk: "<b>basisk</b> betyder flere hydroxidioner end oxoniumioner. I vinduet her er der lige mange af hver." }),
             skilt("basisk", K[2], ["basisk"], {
                 sur: "<b>sur</b> betyder flere oxoniumioner end hydroxidioner. I vinduet her er der flest hydroxidioner.",
-                neutral: "<b>neutral</b> betyder lige mange af hver. I vinduet her er der flest hydroxidioner." }),
+                neutral: "<b>neutral</b> betyder lige mange oxoniumioner og hydroxidioner. I vinduet her er der flest hydroxidioner." }),
 
             { id: "pH", ord: ["pH"], x: 256, y: SL, maal: [skalaX(7), SK.y + SK.h + 4], dele: ["skala"],
               omr: [{ r: [skalaX(-1) - 6, SK.y - 6, 17 * SK.c + 12, SK.h + 12, 8] }],

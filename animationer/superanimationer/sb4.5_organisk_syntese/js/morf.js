@@ -632,7 +632,7 @@
                     var ak = NK.klamp((t - 4.8) / 0.4, 0, 1);
                     if (ak > 0) {
                         tekst(ctx, "✗", cPos.x + 0.9 * s, cPos.y - 1.9 * s, rgba(FARVE.roed, ak), 26);
-                        tekst(ctx, "C-atomet med O har intet H. Her stopper det.", R.x + R.b / 2, y3, rgba(FARVE.roed, ak), 16, "600");
+                        tekst(ctx, "C-atomet med O har intet H. Her stopper oxidationen.", R.x + R.b / 2, y3, rgba(FARVE.roed, ak), 16, "600");
                     }
                 }
             }

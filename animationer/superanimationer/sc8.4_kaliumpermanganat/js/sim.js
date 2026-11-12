@@ -764,7 +764,7 @@
         var mangler = ["kl-ox", "kl-red"].filter(function (k) { return !g.tal[k]; });
         if (forste) { this.fejlLinje(forste.tekst); this.haefte.fokus(forste.k); return; }
         if (!noget) { this.fejlLinje("Klik på pilen ved klammen, så den peger op eller ned, og skriv tallet ved siden af."); this.haefte.fokus(mangler[0]); return; }
-        this.besked("Rigtigt. Nu den anden klamme.", "god");
+        this.besked("Rigtigt. Udfyld nu den anden klamme.", "god");
         this.haefte.fokus(mangler[0]);
     };
 
@@ -789,7 +789,7 @@
         }
         var d = NK.gcd(a, b);
         if (d > 1) {
-            this.fejlLinje("Det går op, men begge tal kan deles med " + d + ". Brug de mindste tal.");
+            this.fejlLinje("Stigning og fald er lige store, men begge tal kan deles med " + d + ". Brug de mindste tal.");
             return;
         }
         g.tal["g-ox"] = { v: a, slags: "ok" };
@@ -799,7 +799,7 @@
 
     F.gangeRos = function () {
         var R = this.opg.R, OX = R.ox, RED = R.red;
-        var t = "Rigtigt. " + OX.gange + " · " + OX.tot + " = " + RED.gange + " · " + RED.tot + " = " + R.elektroner + ". Der flytter " + R.elektroner + " elektroner.";
+        var t = "Rigtigt. " + OX.gange + " · " + OX.tot + " = " + RED.gange + " · " + RED.tot + " = " + R.elektroner + ". Der overføres " + R.elektroner + " elektroner.";
         if (R.forafstem) t += " Tallet foran bliver gangetallet gange tallet fra før.";
         return t;
     };
@@ -912,7 +912,7 @@
         var nu = (t0[rig.side].H || 0) + 2 * w[rig.side], andenH = t0[anden].H || 0;
         this.haefte.ryst("vand-" + rig.side);
         if (w[rig.side] === 2 * rig.antal) {
-            this.fejlLinje("Hvert H₂O har 2 H. Så skal der kun halvt så mange H₂O, som der mangler H.");
+            this.fejlLinje("Hvert H₂O har 2 H. Derfor skal der kun halvt så mange H₂O, som der mangler H.");
             return;
         }
         this.fejlLinje("Nu er der " + nu + " H på den ene side og " + andenH + " på den anden. Hvert H₂O giver 2 H.");
@@ -973,7 +973,7 @@
     F.slutLinje = function () {
         var R = this.opg.R;
         return NK.html("O passer også: " + (R.slut.v.O || 0) + " = " + (R.slut.h.O || 0) + ". " + R.red.E + " faldt " + R.red.delta +
-            " trin, og der flyttede " + R.elektroner + " elektroner.");
+            " trin, og der blev overført " + R.elektroner + " elektroner.");
     };
 
     F.efterOpgave = function () {
@@ -1004,9 +1004,9 @@
         case "ox":
             var forste = this.noegler("ox").filter(function (k) { return !g.tal[k]; })[0];
             var st = R.led[+forste.slice(2)].st, E = this.ledK(+forste.slice(2)).E;
-            if (st.slags === "grundstof") hint = st.tekst + " er et grundstof. Så er tallet 0.";
-            else if (st.slags === "ion") hint = st.tekst + " er en ion af ét atom. Tallet er ionens ladning.";
-            else hint = "Se på " + st.tekst + ". Alle tallene skal give " + (st.q ? "ionens ladning, " + X.lad(st.q) : "0") + ". Hvad skal " + E + " så være?";
+            if (st.slags === "grundstof") hint = st.tekst + " er et grundstof, så oxidationstallet er 0.";
+            else if (st.slags === "ion") hint = st.tekst + " er en ion af ét atom. Oxidationstallet er ionens ladning.";
+            else hint = "Se på " + st.tekst + ". Summen af oxidationstallene skal være " + (st.q ? "ionens ladning, " + X.lad(st.q) : "0") + ". Hvad skal " + E + " så være?";
             break;
         case "for":
             var K = OX.pv > 1 || OX.ph > 1 ? OX : RED;
@@ -1014,7 +1014,7 @@
             break;
         case "klammer":
             var Kk = g.tal["kl-ox"] ? RED : OX;
-            hint = Kk.E + " går fra " + X.ox(Kk.fra) + " til " + X.ox(Kk.til) + ". Går det op eller ned, og hvor mange trin?";
+            hint = Kk.E + " går fra " + X.ox(Kk.fra) + " til " + X.ox(Kk.til) + ". Stiger eller falder oxidationstallet, og hvor meget?";
             break;
         case "gange":
             hint = "Find det mindste tal, som både " + OX.tot + " og " + RED.tot + " går op i.";
@@ -1080,7 +1080,7 @@
         case "gange":
             vis("g-ox", OX.gange);
             vis("g-red", RED.gange);
-            kort = OX.gange + " og " + RED.gange + ". Så flytter der " + R.elektroner + " elektroner.";
+            kort = "Gangetallene er " + OX.gange + " og " + RED.gange + ", så der overføres " + R.elektroner + " elektroner.";
             break;
         case "ladning":
             vis("lad-v", R.ladning.v);

@@ -109,7 +109,7 @@
     };
 
     P.promptHTML = function () {
-        return NK.html("Er det (R)- eller (S)-" + this.m.navn + "?" + (this.faerdig ? "" : " " + this.trinLinje()));
+        return NK.html("Er molekylet (R)- eller (S)-" + this.m.navn + "?" + (this.faerdig ? "" : " " + this.trinLinje()));
     };
 
     P.trinLinje = function () {
@@ -126,7 +126,7 @@
         if (t === "tal") {
             var rest = [0, 1, 2, 3].filter(function (i) { return mig.tal[i] === undefined; });
             var naeste = this.orden[this.naesteTal - 1];
-            var t2 = "Tilbage: " + K.tilbageTekst(g, rest) + ".";
+            var t2 = "Grupperne uden nummer er " + K.tilbageTekst(g, rest) + ".";
             if (K.uafgjortVedFoerste(g, rest)) {
                 var c = rest.filter(function (i) { return D.Z[D.G[g[i]].atom] === D.Z[D.G[g[naeste]].atom]; });
                 if (c.length > 1) t2 += " " + K.hvorfor(g[c[0]], g[c[1]]);
@@ -141,7 +141,7 @@
             var t4 = D.tekst(g[this.orden[3]]);
             return [
                 "Drej molekylet, så gruppe 4 (" + t4 + ") peger væk fra dig, ind i skærmen.",
-                "Når 4 peger lige væk, gemmer " + t4 + " sig bag C-atomet, og de tre andre står i en trekant rundt om det.",
+                "Når gruppe 4 peger lige væk, gemmer " + t4 + " sig bag C-atomet, og de tre andre grupper står i en trekant rundt om det.",
                 "Træk langsomt. Er " + t4 + " tæt på at pege væk, klikker molekylet selv på plads."
             ];
         }
@@ -171,7 +171,7 @@
             var rest = [0, 1, 2, 3].filter(function (x) { return mig.tal[x] === undefined; });
             var tekst = D.tekst(g[i]) + " får ikke nummer " + this.naesteTal + ". ";
             if (D.G[g[i]].atom === D.G[g[rigtig]].atom) tekst += K.hvorfor(g[rigtig], g[i]).replace(/ slår .*$/, "") + " Se, hvilken der vinder.";
-            else tekst += "Tilbage: " + K.tilbageTekst(g, rest) + ". Det højeste atomnummer vinder.";
+            else tekst += "Grupperne uden nummer er " + K.tilbageTekst(g, rest) + ". Det højeste atomnummer vinder.";
             this.fejlLinje(tekst);
             return;
         }
@@ -220,14 +220,14 @@
             this.knapper[s].classList.add("rigtig");
             if (this.brugtSvar) this.knapper[s].classList.add("svar-vist");
             this.pilT = 0.001;
-            this.loest("1 → 2 → 3 går " + (s === "R" ? "med uret" : "mod uret") + ", når 4 peger væk. Det er (" + s + ")-" + this.m.navn + ".");
+            this.loest("1 → 2 → 3 går " + (s === "R" ? "med uret" : "mod uret") + ", når gruppe 4 peger væk. Det er (" + s + ")-" + this.m.navn + ".");
             void vist;
             return;
         }
         this.knapper[s].classList.add("forkert");
         var r4 = R.retninger(this.q)[this.orden[3]][2];
         if (this.naesteTal <= 4) this.fejlLinje("Giv først grupperne nummer efter prioritet. Ellers ved du ikke, hvilken vej du skal følge.");
-        else if (r4 < -0.5) this.fejlLinje("Gruppe 4 peger mod dig. Så ser du rundt den modsatte vej. Drej, så 4 peger væk fra dig.");
+        else if (r4 < -0.5) this.fejlLinje("Gruppe 4 peger mod dig, og derfor ser 1 → 2 → 3 ud til at gå den modsatte vej rundt. Drej molekylet, så gruppe 4 peger væk fra dig.");
         else if (!this.drejOK) this.fejlLinje("Drej først molekylet, så gruppe 4 peger væk fra dig. Så kan du se, hvilken vej 1 → 2 → 3 går.");
         else this.fejlLinje("Følg 1 → 2 → 3 igen. Med uret er R, mod uret er S.");
     };
@@ -284,7 +284,7 @@
         if (h.flyttet < 4) {
             var k = R.ramt(this.model(), this.kam(), pt);
             if (!k) return;
-            if (k.i < 0) { this.kortBesked("Det asymmetriske C-atom. Det har fire forskellige grupper.", 3); return; }
+            if (k.i < 0) { this.kortBesked("Det asymmetriske C-atom har fire forskellige grupper.", 3); return; }
             if (this.naesteTal <= 4) {
                 /* Et klik vaelger kun gruppen; Indsend svar giver den nummeret */
                 if (this.tal[k.i] !== undefined) { this.kortBesked(D.tekst(this.grupper[k.i]) + " har allerede nummer " + this.tal[k.i] + ".", 3); return; }

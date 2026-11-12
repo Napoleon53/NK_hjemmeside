@@ -106,7 +106,7 @@
             { navn: "Formel og reaktion", pladser: ["kemisk formel", "kemisk reaktion"], ekstra: ["koefficient"],
               ros: "H₂O viser, at vand består af to hydrogenatomer og ét oxygenatom. I reaktionen bliver atomerne sat sammen på en ny måde." },
             { navn: "Reaktionsskemaet", pladser: ["reaktionsskema", "reaktant", "produkt", "reaktionspil"],
-              ros: "Skemaet læses: to dihydrogenmolekyler og ét dioxygenmolekyle bliver til to vandmolekyler." },
+              ros: "Reaktionsskemaet læses: To dihydrogenmolekyler og ét dioxygenmolekyle bliver til to vandmolekyler." },
             { navn: "Tal og symboler", pladser: ["koefficient", "tilstandssymbol", "afstemt"],
               ros: "Der er 4 hydrogenatomer og 2 oxygenatomer på begge sider af pilen." }
         ],

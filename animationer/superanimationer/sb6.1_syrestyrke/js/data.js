@@ -102,7 +102,7 @@
         tekst: "Methansyre har pKₛ = 3,75, og ethansyre har pKₛ = 4,76. Hvor mange gange større er Kₛ for methansyre?",
         svar: ["1 gang", "10 gange", "100 gange"], rigtig: 1,
         gule: ["hcooh", "eddike"],
-        fejl: { 0: "Kₛ er forskellige, når pKₛ er forskellige. Se på Kₛ-skalaen over de to flasker.",
+        fejl: { 0: "To syrer med forskellig pKₛ har også forskellig Kₛ. Se på Kₛ-skalaen over de to flasker.",
                 2: "Forskellen i pKₛ er kun omkring 1. På Kₛ-skalaen er 10⁻⁴ og 10⁻⁵ ét hak fra hinanden." },
         hint: ["Find de to flasker på skalaen, og se på Kₛ-skalaen lige over dem.",
                "Methansyre har Kₛ = 1,8 · 10⁻⁴ M, og ethansyre har Kₛ = 1,7 · 10⁻⁵ M."],
@@ -130,8 +130,8 @@
     D.skalaFejl = function (id, p) {
         var s = D.SYRER[id], kp = D.ksSkala(p);
         if (Math.abs(p + s.pks) < 0.7 && Math.abs(s.pks) > 1.5) {
-            return s.ks < 1 ? "Kₛ er et lille tal, og pKₛ = −log Kₛ. Et lille Kₛ giver en stor pKₛ, så flyt flasken mod højre." :
-                "Kₛ er et stort tal, og pKₛ = −log Kₛ. Et stort Kₛ giver en lav pKₛ, så flyt flasken mod venstre.";
+            return s.ks < 1 ? "Kₛ er et lille tal, og pKₛ = −log Kₛ. En lille Kₛ giver en stor pKₛ, så flyt flasken mod højre." :
+                "Kₛ er et stort tal, og pKₛ = −log Kₛ. En stor Kₛ giver en lav pKₛ, så flyt flasken mod venstre.";
         }
         if (p > s.pks) return "Ved markøren er Kₛ = " + kp + " M. Det er mindre end " + D.ksTabel(id) + " M, så flyt flasken mod venstre.";
         return "Ved markøren er Kₛ = " + kp + " M. Det er større end " + D.ksTabel(id) + " M, så flyt flasken mod højre.";
@@ -151,8 +151,8 @@
     D.REGN_FOERST = "eddike";        /* bogens eksempel */
 
     D.FEJLTEKST = {
-        ladning: function () { return "Tjek ladningen. Hydronen, H⁺, tager én positiv ladning med, så ladningen falder med 1."; },
-        brint: function () { return "Tjek antallet af H. Syren afgiver ét H-atom."; },
+        ladning: function () { return "Tjek ladningen. Hydronen H⁺ tager én positiv ladning med, så basens ladning er 1 lavere end syrens."; },
+        brint: function () { return "Tjek antallet af H. Basen har ét H færre end syren."; },
         flere: function () { return "Syren afgiver kun én hydron ad gangen."; },
         optag: function (f) { return D.u(f) + " dannes, hvis syren optager en hydron. Her afgiver syren en hydron."; },
         oh: function () { return "OH⁻ dannes, når vand afgiver en hydron. Her optager vand en hydron."; }
@@ -166,8 +166,8 @@
         },
         ks: {
             tekst: function (s) { return "Opstil Kₛ-udtrykket for " + s.navn + ". Træk stofferne fra bakken op i brøken, og tryk Indsend svar."; },
-            hint: function (s) { return ["Kₛ er en ligevægtskonstant: produkterne står over brøkstregen og syren under.",
-                                         "Tæller: " + D.u(s.base) + " og H₃O⁺. Nævner: " + D.u(s.syre) + ". Vand er ikke med."]; },
+            hint: function (s) { return ["Kₛ er en ligevægtskonstant, så produkterne står over brøkstregen og syren under.",
+                                         "I tælleren står " + D.u(s.base) + " og H₃O⁺, og i nævneren står " + D.u(s.syre) + ". Vand er ikke med."]; },
             vand: "Vand er opløsningsmidlet og indgår ikke i Kₛ-udtrykket.",
             plads: "Produkterne står i tælleren, og syren står i nævneren.",
             begge: "Begge produkter skal stå i tælleren.",
@@ -183,7 +183,7 @@
             forkl: "pKₛ = −log(Kₛ), ligesom pH = −log([H₃O⁺])."
         },
         formelKs: {
-            tekst: function (s) { return "Tabellen giver pKₛ = " + D.tal2(s.pks) + " for " + s.navn + ". Hvilken formel giver Kₛ ud fra pKₛ?"; },
+            tekst: function (s) { return "Bogens tabel giver pKₛ = " + D.tal2(s.pks) + " for " + s.navn + ". Hvilken formel giver Kₛ ud fra pKₛ?"; },
             svar: ["Kₛ = 10^{−pKₛ} M", "Kₛ = 10^{pKₛ} M", "Kₛ = −log(pKₛ) M"], rigtig: 0,
             fejl: { 1: "Uden minus bliver Kₛ et stort tal for en svag syre. Eksponenten skal være −pKₛ.",
                     2: "−log bruges den anden vej, fra Kₛ til pKₛ. Her skal 10 opløftes i −pKₛ." },
@@ -191,8 +191,8 @@
             forkl: "Kₛ = 10^{−pKₛ} M er den modsatte vej af pKₛ = −log(Kₛ)."
         },
         tilPks: {
-            tekst: function (s) { return "Beregn pKₛ for " + s.navn + ". Skriv tallet med to decimaler, og tryk Indsend svar."; },
-            hint: function (s) { return ["pKₛ = −log(Kₛ). Brug log, ikke ln.", "Tast −log(" + D.ksTekst(s.pks) + ") på lommeregneren, og afrund til to decimaler."]; },
+            tekst: function (s) { return "Beregn pKₛ for " + s.navn + ". Skriv pKₛ med to decimaler, og tryk Indsend svar."; },
+            hint: function (s) { return ["pKₛ = −log(Kₛ). Brug log, ikke ln.", "Beregn −log(" + D.ksTekst(s.pks) + ") på lommeregneren, og afrund til to decimaler."]; },
             fortegn: "Tjek fortegnet. Husk minus foran log.",
             ln: "Du har brugt ln. pKₛ beregnes med log.",
             eksponent: "Tag hele Kₛ med, ikke kun eksponenten.",
@@ -203,11 +203,11 @@
         },
         tilKs: {
             tekst: function (s) { return "Beregn Kₛ for " + s.navn + ". Skriv tallet foran tierpotensen og eksponenten, og tryk Indsend svar."; },
-            hint: function (s) { return ["Kₛ = 10^{−pKₛ} M.", "Tast 10^{" + D.tal2(-s.pks) + "} på lommeregneren. Skriv svaret som et tal gange en tierpotens."]; },
+            hint: function (s) { return ["Kₛ = 10^{−pKₛ} M.", "Beregn 10^{" + D.tal2(-s.pks) + "} på lommeregneren. Skriv svaret som et tal gange en tierpotens."]; },
             fortegn: "Tjek fortegnet. Eksponenten er −pKₛ, så Kₛ = 10^{−pKₛ} M.",
             e: "Du har brugt e. Kₛ beregnes med 10 opløftet i −pKₛ.",
             eksponent: "Tag decimalerne i pKₛ med. 10^{−4,76} er ikke det samme som 10^{−5}.",
-            tierpot: "Tallet foran er rigtigt. Tjek eksponenten.",
+            tierpot: "Tallet foran tierpotensen er rigtigt. Tjek eksponenten.",
             andet: "Ikke rigtigt. Tjek beregningen på lommeregneren.",
             intet: "Skriv tallet foran tierpotensen og eksponenten, for eksempel 2,5 og −3.",
             forkl: function (s) { return s.pks > 0 ? "pKₛ er positiv, så Kₛ er mindre end 1." : "pKₛ er negativ, så Kₛ er større end 1. Det er en stærk syre."; }
@@ -217,8 +217,8 @@
             svar: ["Stærk", "Middelstærk", "Svag", "Meget svag"],
             hint: ["Jo lavere pKₛ, jo stærkere syre. Skalaen på tavlen viser grænserne.",
                    "Stærk: under 0. Middelstærk: 0 til 4. Svag: 4 til 10. Meget svag: over 10."],
-            svagere: function (s) { return D.Navn(s.id) + " er svagere end det. Find pKₛ = " + D.tal2(s.pks) + " på skalaen."; },
-            staerkere: function (s) { return D.Navn(s.id) + " er stærkere end det. Find pKₛ = " + D.tal2(s.pks) + " på skalaen."; },
+            svagere: function (s) { return D.Navn(s.id) + " er svagere end dit svar. Find pKₛ = " + D.tal2(s.pks) + " på skalaen."; },
+            staerkere: function (s) { return D.Navn(s.id) + " er stærkere end dit svar. Find pKₛ = " + D.tal2(s.pks) + " på skalaen."; },
             forkl: function (s) {
                 var z = D.zone(s.pks);
                 return D.Navn(s.id) + " har pKₛ = " + D.tal2(s.pks) + " og er en " + D.ZONER[z].navn + " syre." +
@@ -239,7 +239,7 @@
         { id: "A", rigtig: "hcooh", c: 0.100, ph: 2.38, fuld: true,
           slut: "Det er methansyre med pKₛ = 3,75. Målingen gav 3,74, og mælkesyre med 3,86 ligger længere væk." },
         { id: "B", rigtig: "ascorbin", c: 0.0500, ph: 2.74,
-          slut: "Det er ascorbinsyre, C-vitamin, med pKₛ = 4,17. Koncentrationen var en anden, men Kₛ er den samme." },
+          slut: "Det er ascorbinsyre, C-vitamin, med pKₛ = 4,17. Koncentrationen er en anden end i flaske A, men Kₛ afhænger ikke af koncentrationen." },
         { id: "C", rigtig: "nh4", c: 0.100, ph: 5.13, kilde: "ammoniumchlorid",
           slut: "Det er ammonium, NH₄⁺, fra ammoniumchlorid med pKₛ = 9,25. En ion kan også være en syre." }
     ];
@@ -250,15 +250,15 @@
                 hint: ["Tryk Mål pH, eller klik på pH-metret.", "pH-metrets elektrode sænkes ned i opløsningen."] },
         oxonium: { navn: "Oxonium", titel: "Oxonium: findes ud fra den målte pH",
                    tekst: function (u) { return "pH-metret viser " + D.tal2(u.ph) + ". Beregn [H₃O⁺] i opløsningen, og tryk Indsend svar."; },
-                   hint: function (u) { return ["[H₃O⁺] findes ud fra pH: [H₃O⁺] = 10^{−pH} M.", "Tast 10^{" + D.tal2(-u.ph) + "} på lommeregneren, og skriv svaret med tre betydende cifre."]; },
+                   hint: function (u) { return ["[H₃O⁺] findes ud fra pH: [H₃O⁺] = 10^{−pH} M.", "Beregn 10^{" + D.tal2(-u.ph) + "} på lommeregneren, og skriv svaret med tre betydende cifre."]; },
                    fortegn: "Tjek fortegnet. [H₃O⁺] = 10^{−pH} M, så eksponenten er negativ.",
                    e: "Du har brugt e. Brug 10 opløftet i −pH.",
                    andet: function (u) { return "Ikke rigtigt. [H₃O⁺] = 10^{" + D.tal2(-u.ph) + "} M. Tjek tallet foran og eksponenten."; },
                    forkl: function (u, r) { return "[H₃O⁺] = " + D.potensU(r.h) + " M. Det er koncentrationen af oxoniumioner i flasken." +
-                       (u.fuld ? "" : " Forholdet er 1 : 1, så [B] er lige så stor."); } },
+                       (u.fuld ? "" : " B og H₃O⁺ dannes i forholdet 1 : 1, så [B] er lige så stor."); } },
         basen: { navn: "Basen", titel: "Basen: forholdet er 1 : 1",
                  tekst: function () { return "Syren har afgivet hydroner til vand. Hvor stor er [B], koncentrationen af syrens korresponderende base?"; },
-                 svar: function (u, r) { return ["Som [H₃O⁺]: " + D.potensU(r.h) + " M", "Som cₛ: " + D.konc(u.c), "Den er 0 M"]; }, rigtig: 0,
+                 svar: function (u, r) { return ["[B] = [H₃O⁺] = " + D.potensU(r.h) + " M", "[B] = cₛ = " + D.konc(u.c), "[B] = 0 M"]; }, rigtig: 0,
                  fejl: { 1: "cₛ er den formelle koncentration af syren. Kun en lille del af syren er blevet til base.",
                          2: "Hver gang der dannes en oxoniumion, dannes der også en korresponderende base." },
                  hint: ["Se på reaktionsskemaet øverst på tavlen: S + H₂O ⇌ B + H₃O⁺.", "Der dannes én B for hver H₃O⁺."],
@@ -267,9 +267,9 @@
                  tekst: function () { return "Beregn den aktuelle koncentration af syren, [S], og tryk Indsend svar."; },
                  hint: function (u, r) { return ["Den del af syren, der har afgivet sin hydron, er blevet til base. Resten er stadig syre.",
                                                  "[S] = cₛ − [B] = " + D.konc(u.c) + " − " + D.lille(r.h) + " M"]; },
-                 cs: "Det er den formelle koncentration, cₛ. Træk den del fra, der er blevet til base.",
-                 plus: "Syren bliver mindre, når den afgiver hydroner. Træk [B] fra cₛ.",
-                 b: "Det er [B]. [S] er resten af syren: [S] = cₛ − [B].",
+                 cs: "Du har skrevet den formelle koncentration, cₛ. Træk [B] fra cₛ.",
+                 plus: "Koncentrationen af syre falder, når syren afgiver hydroner. Træk [B] fra cₛ.",
+                 b: "Du har skrevet [B]. [S] er koncentrationen af den syre, der er tilbage: [S] = cₛ − [B].",
                  andet: "Ikke rigtigt. [S] = cₛ − [B].",
                  forkl: function (u, r) { return r.s === u.c ? "Så lidt syre er blevet til base, at [S] er lig med cₛ med tre betydende cifre." :
                                                   "[S] = " + D.decimal(r.s) + " M. Næsten al syren er der stadig."; } },
@@ -283,7 +283,7 @@
                       forkl: function (u, r) { return "Kₛ = " + D.potensU(r.k) + " M. Jo større Kₛ, jo stærkere syre."; } },
         pks: { navn: "pKₛ", titel: "pKₛ",
                tekst: function () { return "Beregn pKₛ for den ukendte syre, og tryk Indsend svar."; },
-               hint: function (u, r) { return ["pKₛ = −log(Kₛ).", "Tast −log(" + D.potensU(r.k) + ") på lommeregneren, og afrund til to decimaler."]; },
+               hint: function (u, r) { return ["pKₛ = −log(Kₛ).", "Beregn −log(" + D.potensU(r.k) + ") på lommeregneren, og afrund til to decimaler."]; },
                fortegn: "Tjek fortegnet. Husk minus foran log.",
                ln: "Du har brugt ln. pKₛ beregnes med log.",
                andet: "Ikke rigtigt. Tjek beregningen på lommeregneren.",
@@ -301,8 +301,8 @@
                 tekst: function (u) { return "Hvor mange procent af " + D.SYRER[u.rigtig].navn + "n har afgivet sin hydron? Beregn omdannelsesgraden, α."; },
                 hint: function (u, r) { return ["Omdannelsesgraden er den del af syren, der er blevet til base: α = [B] / cₛ.",
                                                 "α = " + D.lille(r.h) + " M / " + D.konc(u.c) + ". Gang med 100 for at få procent."]; },
-                broek: "Det er brøkdelen. Gang med 100 for at få procent.",
-                rest: "Det er den del, der stadig er syre. α er den del, der er blevet til base.",
+                broek: "Du har skrevet α som decimaltal. Gang med 100 for at få procent.",
+                rest: "Du har beregnet den del af syren, der ikke har afgivet sin hydron. α er den del, der er blevet til base.",
                 andet: "Ikke rigtigt. α = [B] / cₛ.",
                 forkl: function (u, r) { return "α = " + D.tal1(r.alfa) + " %. Kun " + Math.round(r.alfa) + " af 100 molekyler har afgivet deres hydron, så " +
                                                  D.SYRER[u.rigtig].navn + " er ikke en stærk syre."; } }

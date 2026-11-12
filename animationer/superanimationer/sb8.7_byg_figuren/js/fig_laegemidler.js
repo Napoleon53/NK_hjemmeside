@@ -61,7 +61,7 @@
         vb: [1160, 700],
         lag: [
             { navn: "Tabletten", pladser: ["lægemiddel", "virksomt stof"],
-              ros: "Tabletten er et lægemiddel. Det virksomme stof gør arbejdet, og resten er hjælpestoffer." },
+              ros: "Tabletten er et lægemiddel. Det virksomme stof virker mod sygdommen, og resten er hjælpestoffer." },
             { navn: "Tre smertestillende stoffer", pladser: ["acetylsalicylsyre", "paracetamol", "ibuprofen"],
               ros: "Acetylsalicylsyre har en estergruppe, paracetamol en amidgruppe, og ibuprofen har en lang, upolær del." },
             { navn: "Receptoren", pladser: ["signalstof", "receptor", "bindingslomme"],
@@ -75,7 +75,7 @@
               fejl: { "virksomt stof": "<b>virksomt stof</b> er kun den del af tabletten, der virker. Overskriften gælder hele tabletten mod sygdom." } },
             { id: "virksomt stof", ord: ["virksomt stof"], x: BAR.x + BLAA / 2, y: KT.y + KT.h - 26, maal: [BAR.x + BLAA / 2, BAR.y + BAR.h + 2], dele: ["blaa"],
               omr: [{ r: [BAR.x - 3, BAR.y - 3, BLAA + 6, BAR.h + 6, 7] }],
-              fejl: { "lægemiddel": "<b>lægemiddel</b> er hele tabletten mod sygdom. Pladsen peger kun på den del af tabletten, der gør arbejdet.",
+              fejl: { "lægemiddel": "<b>lægemiddel</b> er hele tabletten mod sygdom. Pladsen peger kun på den del af tabletten, der virker mod sygdommen.",
                       paracetamol: "<b>paracetamol</b> er navnet på ét bestemt stof. Pladsen spørger, hvad den del af tabletten kaldes, der virker." } },
 
             navneplads(KM[0], {
@@ -94,15 +94,15 @@
             { id: "signalstof", ord: ["signalstof"], x: SIG.x + 6, y: 382, maal: [SIG.x, SIG.bund - LD - 52], dele: ["signal"],
               omr: [{ r: [SIG.x - 46, SIG.bund - LD - 64, 92, LD + 70, 18] }],
               fejl: { receptor: "<b>receptor</b> er proteinet i membranen. Pladsen peger på det lille molekyle over membranen.",
-                      agonist: "<b>agonist</b> er et andet stof, der ligner. Pladsen peger på det molekyle, cellen selv sender afsted.",
+                      agonist: "<b>agonist</b> er et andet stof, der ligner signalstoffet. Pladsen peger på det molekyle, cellen selv udskiller.",
                       bindingslomme: "<b>bindingslomme</b> er et hul i proteinet. Pladsen peger på det lille molekyle over membranen." } },
             { id: "bindingslomme", ord: ["bindingslomme"], x: RA, y: 442, maal: [RA, RTOP + LD - 6], dele: ["lomme"],
               omr: [{ r: [RA - LB / 2 - 6, RTOP - 6, LB + 12, LD + 12, 8] }],
-              fejl: { receptor: "<b>receptor</b> er hele proteinet. Pladsen peger kun på hullet foroven, hvor et stof kan sætte sig.",
-                      signalstof: "<b>signalstof</b> er molekylet til venstre. Pladsen peger på hullet i proteinet, hvor molekylet kan sætte sig." } },
+              fejl: { receptor: "<b>receptor</b> er hele proteinet. Pladsen peger kun på hullet foroven, hvor et stof kan bindes.",
+                      signalstof: "<b>signalstof</b> er molekylet til venstre. Pladsen peger på hullet i proteinet, hvor molekylet kan bindes." } },
             { id: "receptor", ord: ["receptor"], x: 412, y: 494, maal: [KROP[0] + KROP[2] - 2, 550], dele: ["receptorA"],
               omr: [{ r: [KROP[0] - 6, KROP[1] - 6, KROP[2] + 12, KROP[3] + 12, 24] }],
-              fejl: { signalstof: "<b>signalstof</b> er det lille molekyle, der bliver sendt. Pladsen peger på proteinet, der sidder i membranen.",
+              fejl: { signalstof: "<b>signalstof</b> er det lille molekyle, som cellen udskiller. Pladsen peger på proteinet, der sidder i membranen.",
                       bindingslomme: "<b>bindingslomme</b> er kun hullet foroven. Pladsen peger på hele proteinet i membranen." } },
 
             { id: "agonist", ord: ["agonist"], x: PB.x + PB.b / 2, y: PB.y, maal: [PB.x + PB.b / 2, PB.y], titel: true, dele: ["agonist"],
@@ -111,7 +111,7 @@
                       signalstof: "<b>signalstof</b> er kroppens eget stof. På dette kort er det et andet stof, der sidder i lommen og giver signal." } },
             { id: "antagonist", ord: ["antagonist"], x: PC.x + PC.b / 2, y: PC.y, maal: [PC.x + PC.b / 2, PC.y], titel: true, dele: ["antagonist"],
               omr: [{ r: [PC.x - 4, PC.y - 4, PC.b + 8, PC.h + 8, 18], tom: true }],
-              fejl: { agonist: "<b>agonist</b> tænder receptoren. På dette kort er der intet gult signal, og signalstoffet kan ikke komme til.",
+              fejl: { agonist: "<b>agonist</b> tænder receptoren. På dette kort er der intet gult signal, og signalstoffet kan ikke bindes.",
                       signalstof: "<b>signalstof</b> er det orange molekyle. Pladsen er titlen på kortet med det grå stof, der sidder i lommen." } }
         ],
 

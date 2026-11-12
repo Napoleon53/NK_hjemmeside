@@ -43,7 +43,7 @@
         { syre: "butansyre", alkohol: "ethanol", ester: "ethylbutanoat",
           om: "Butansyre lugter af harsk smør, men ethylbutanoat dufter af ananas." },
         { syre: "butansyre", alkohol: "propan-1-ol", ester: "propylbutanoat",
-          om: "Den renses på fanen Rens esteren." }
+          om: "Propylbutanoat renses på fanen Rens esteren." }
     ];
 
     /* ----- Fane 2: Forudsig esteren ---------------------------------------------
@@ -107,10 +107,10 @@
           fejl: {
               0: "Propylbutanoat har intet H på oxygen og kan ikke afgive hydrogenbindinger til vand.",
               2: "Butansyre har en lang carbonkæde og bliver for det meste i det øverste lag.",
-              mangler1: "Propan-1-ol har en OH-gruppe og en kort kæde. Den kan blandes med vand.",
+              mangler1: "Propan-1-ol har en OH-gruppe og en kort kæde og kan derfor blandes med vand.",
               mangler3: "Svovlsyre er en stærk syre, som danner ioner i vand."
           },
-          hint: ["Stoffer med ioner eller en OH-gruppe på en kort kæde går over i vandet.", "Svovlsyren og det meste af alkoholen går over i vandet. Esteren og syren bliver."],
+          hint: ["Stoffer med ioner eller en OH-gruppe på en kort kæde går over i vandet.", "Svovlsyren og det meste af alkoholen går over i vandet. Esteren og butansyren bliver i det øverste lag."],
           rigtigTekst: "Svovlsyren og propan-1-ol går over i vandet. Esteren bliver i det øverste lag, og det gør det meste af butansyren også.",
           knap: "Ryst skilletragten →" },
         { id: "base", navn: "Vask med natriumcarbonat",
@@ -118,7 +118,7 @@
           svar: ["Bliver til baseform i vandfasen", "Bliver til ester", "Bliver i det øverste lag"],
           rigtig: [0],
           fejl: {
-              1: "Der er ingen svovlsyre og ingen varme her. Carbonationen er en base.",
+              1: "I skilletragten er der hverken svovlsyre eller opvarmning. Carbonationen er en base.",
               2: "Carbonationen er en base. Den optager hydronen fra syrens COOH-gruppe."
           },
           hint: ["Carbonationen, CO₃²⁻, er en base. Hvad gør en base ved en syre?", "Baseformen af en carboxylsyre har en ladning. Ladede stoffer opløses i vand."],
@@ -137,16 +137,16 @@
           knap: "Tap vandfasen af →" },
         { id: "ester", navn: "Esteren",
           spm: "Nu er kun esteren tilbage i det øverste lag. Hvorfor ligger propylbutanoat øverst? Vælg alle, der passer.",
-          svar: ["Intet H på oxygen", "Lavere densitet end vand", "Den har en ladning", "Den har en OH-gruppe"],
+          svar: ["Den har intet H på oxygen", "Den har lavere densitet end vand", "Den har en ladning", "Den har en OH-gruppe"],
           rigtig: [0, 1],
           fejl: {
               2: "Esteren har ingen ladning. Den har kun en svagt polær estergruppe.",
-              3: "Esteren har ingen OH-gruppe. Den forsvandt som vand, da esteren blev dannet.",
+              3: "Esteren har ingen OH-gruppe. Syrens OH-gruppe blev fraspaltet som vand, da esteren blev dannet.",
               mangler0: "Hvorfor blander esteren sig ikke med vandet? Se på oxygenatomerne i estergruppen.",
               mangler1: "Hvorfor ligger esteren øverst og ikke nederst? Det afgøres af densiteten."
           },
-          hint: ["Der er to grunde: én til, at esteren ikke blander sig med vandet, og én til, at den ligger øverst.", "Esteren kan ikke afgive hydrogenbindinger til vand, og densiteten er lavere end vandets."],
-          rigtigTekst: "Esteren kan ikke afgive hydrogenbindinger til vand, så de to væsker blander sig ikke. Esteren flyder ovenpå, fordi densiteten er lavere." }
+          hint: ["Der er to grunde: én til, at esteren ikke blander sig med vandet, og én til, at den ligger øverst.", "Esteren kan ikke afgive hydrogenbindinger til vand, og esterens densitet er lavere end vandets."],
+          rigtigTekst: "Esteren kan ikke afgive hydrogenbindinger til vand, så de to væsker blander sig ikke. Esteren ligger øverst, fordi dens densitet er lavere end vandets." }
     ];
 
     D.FAERDIG = {

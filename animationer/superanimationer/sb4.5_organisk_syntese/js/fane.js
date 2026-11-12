@@ -40,7 +40,7 @@
                 return {
                     trin: [
                         cap(vis) + " er en keton. En keton laves ved at oxidere en alkohol.",
-                        "I " + vis + " sidder O på det midterste C. Så skal alkoholens OH også sidde der: " + r.alk.navn + ".",
+                        "I " + vis + " sidder O på det midterste C. Derfor skal alkoholens OH også sidde der: " + r.alk.navn + ".",
                         lg + r.alk.navn + " og kaliumpermanganat" + lgEfter + " Tænd for varmen, og tryk Start."
                     ],
                     svar: [r.alk.id, "permanganat"], hplus: false, varme: true
@@ -83,7 +83,7 @@
         }
         return {
             trin: [
-                "En ester laves af en carboxylsyre og en alkohol. Navnet har to dele: …yl kommer fra alkoholen, og …oat kommer fra syren.",
+                "En ester laves af en carboxylsyre og en alkohol. Navnet har to dele, hvor …yl kommer fra alkoholen, og …oat kommer fra syren.",
                 cap(alkDel) + " kommer fra " + r.alk.navn + ", og " + syreDel + " kommer fra " + syreFuld + ".",
                 lg + r.alk.navn + " og " + syreNavn + lgEfter + " Tænd for svovlsyre og varme, og tryk Start."
             ],

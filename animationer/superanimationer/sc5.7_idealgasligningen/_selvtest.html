@@ -313,8 +313,8 @@ function koerTest(W) {
             while (g.lodder > m.lodder) klik("#stempel-lod-minus");
         }
     }
-    var forventet = { varme: /Volumen steg fra 24,0 L/, lod: /Volumen faldt fra 24,0 L til 12,1 L\. Det er næsten det halve/,
-        dobbelt: /Volumen steg fra 12,0 L til 24,0 L\. Det er det dobbelte/, laast: /Trykket steg fra 1,013 bar/,
+    var forventet = { varme: /Volumenet steg fra 24,0 L/, lod: /Volumenet faldt fra 24,0 L til 12,1 L\. Det er næsten det halve/,
+        dobbelt: /Volumenet steg fra 12,0 L til 24,0 L\. Det er det dobbelte/, laast: /Trykket steg fra 1,013 bar/,
         hvorfor: /Hurtige molekyler/, ud: /Trykket faldt fra 2,026 bar til 1,772 bar/, molvolumen: /1,00 mol gas fylder 24,0 L/ };
     D.FORUDSIG.forEach(function (o, i) {
         S1.vaelg(i);
@@ -347,7 +347,7 @@ function koerTest(W) {
     indsend();
     skyder(S1.g.T + 60);
     tik(S1, 3);
-    paastand("et forkert gæt: forklaringen og det rigtige svar, ingen afvisning", S1.fase === "faerdig" && /^Du gættede: volumen bliver mindre\. Volumen steg/.test(S1.beskedTekst()) &&
+    paastand("et forkert gæt: forklaringen og det rigtige svar, ingen afvisning", S1.fase === "faerdig" && /^Du gættede: volumenet bliver mindre\. Volumenet steg/.test(S1.beskedTekst()) &&
         !!skort.querySelector(".sk-bund.bliv.nej") && skort.querySelector(".sk-knap.rigtig") && skort.querySelector(".sk-knap.forkert"), S1.beskedTekst());
     /* To ting på én gang */
     S1.vaelg(0);

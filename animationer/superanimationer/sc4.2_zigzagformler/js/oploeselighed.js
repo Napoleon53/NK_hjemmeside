@@ -199,9 +199,9 @@
     function fejlBesked(m, hvor) {
         var g = m.grupper.length, c = m.c;
         var harSyre = m.grupper.some(function (x) { return x.slags === "COOH"; });
-        if (!g) return "Ingen polære grupper. Kun C og H, så molekylet er upolært.";
+        if (!g) return "Molekylet har kun C og H og ingen polære grupper, så det er upolært.";
         if (hvor === "vand") {
-            if (harSyre) return "Syre betyder ikke vand. " + c + " C-atomer er for mange til én COOH-gruppe.";
+            if (harSyre) return "En syre opløses ikke altid i vand. " + c + " C-atomer er for mange til én COOH-gruppe.";
             return (g === 1 ? "Der er en polær gruppe" : "Der er " + g + " polære grupper") + ", men carbonkæden vejer tungest.";
         }
         if (c >= 5) return "Kæden er lang, men " + (g === 1 ? "den polære gruppe" : "de " + g + " polære grupper") + " vejer tungest.";
@@ -213,14 +213,14 @@
         var g = m.grupper.length;
         if (!g) {
             return '<div class="regn"><div class="regn-linje"><span>' + m.c + " C-atomer og 0 polære grupper</span></div>" +
-                '<div class="regn-konkl heptan">Ingen polære grupper: upolært, opløses i heptan.</div></div>';
+                '<div class="regn-konkl heptan">Molekylet har ingen polære grupper og er upolært, så stoffet opløses i heptan.</div></div>';
         }
         var gT = g === 1 ? "polær gruppe" : "polære grupper";
         var konkl, klasse = m.svar;
         var fTekst = m.forhold.replace("≈ ", "");
-        if (m.svar === "vand") konkl = fTekst + " er under 4. De polære grupper vejer tungest: polært, opløses i vand.";
-        else if (m.svar === "heptan") konkl = fTekst + " er over 4. Carbonkæden vejer tungest: upolært, opløses i heptan.";
-        else konkl = "Præcis 4. Lige på grænsen: lidt i begge. Begge svar tæller.";
+        if (m.svar === "vand") konkl = fTekst + " er under 4, så de polære grupper vejer tungest. Molekylet er polært, og stoffet opløses i vand.";
+        else if (m.svar === "heptan") konkl = fTekst + " er over 4, så carbonkæden vejer tungest. Molekylet er upolært, og stoffet opløses i heptan.";
+        else konkl = "Forholdet er præcis 4 og ligger lige på grænsen, så stoffet opløses lidt i begge lag. Begge svar tæller.";
         return '<div class="regn"><div class="regn-linje"><span>Forhold</span><span>=</span>' +
             '<span class="broek"><span>' + m.c + " <small>C-atomer</small></span><span class=\"broek-streg\"></span><span>" + g + " <small>" + gT + "</small></span></span>" +
             "<span>=</span><b>" + m.forhold + "</b></div>" +

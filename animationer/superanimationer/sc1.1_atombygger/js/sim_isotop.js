@@ -359,7 +359,7 @@
                venstre for gennemsnittet, gaar teksten mod venstre. Ellers
                ville den lande under det store gennemsnitstal. */
             var modVenstre = xt < x;
-            NK.tekst(c, "periodiske system: " + NK.tal(g.masse, 3) + " u",
+            NK.tekst(c, "Periodisk system: " + NK.tal(g.masse, 3) + " u",
                 xt + (modVenstre ? -9 : 9), yBom - 55, {
                 font: "600 13px 'Segoe UI', sans-serif",
                 justering: modVenstre ? "right" : "left", linje: "middle",

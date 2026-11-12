@@ -142,7 +142,7 @@
         if (tr === "vand")
             return { slags: "opgave", chip: chip, tekst: D.stor(o.syre) + " og " + o.alkohol + " danner en ester, og der fraspaltes vand. Klik på de tre atomer, der bliver til vand, og tryk Indsend svar." };
         if (tr === "reaktion")
-            return { slags: "opgave", chip: "Reaktionen", tekst: "Syrens OH-gruppe og alkoholens H går af som vand. Alkoholens oxygenatom binder sig til syrens carbonatom." };
+            return { slags: "opgave", chip: "Reaktionen", tekst: "Syrens OH-gruppe og alkoholens H fraspaltes som vand. Alkoholens oxygenatom binder sig til syrens carbonatom." };
         return {
             slags: "spm", chip: chip, tekst: "Esteren er dannet af " + o.syre + " og " + o.alkohol + ". Hvad hedder esteren?",
             svar: this.navne.map(function (v, j) { return { t: v.t, valgt: mig.valgt === j, forkert: !!mig.forkert[j] }; })
@@ -216,7 +216,7 @@
         this.kendt.vand = true;
         this.sejrT = 0;
         this.groen = { spm: true, maade: vist ? "svar" : "selv", knap: "Lad molekylerne reagere →",
-            tekst: "Syrens OH-gruppe og hydrogenatomet fra alkoholens OH-gruppe bliver til H₂O. Tryk på knappen, og se reaktionen.",
+            tekst: "Syrens OH-gruppe og hydrogenatomet fra alkoholens OH-gruppe bliver til H₂O. Tryk på Lad molekylerne reagere, og se reaktionen.",
             naeste: function () { this.naesteTrin(); } };
         this.besked("", "");
         this.visKort();

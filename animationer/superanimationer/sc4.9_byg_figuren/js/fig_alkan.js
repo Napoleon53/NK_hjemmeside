@@ -76,7 +76,7 @@
                       carbonhydrid: "<b>carbonhydrid</b> er en slags stof. Pladsen peger kun på formlen, der tæller atomerne i butan.",
                       flygtig: "<b>flygtig</b> siger, at et stof fordamper let. Pladsen peger på formlen, der tæller atomerne." } },
             titel("flygtig", ["flygtig"], K.x + K.b / 2, K.y + K.h, K, ["benzin"], {
-                uorganisk: "<b>uorganisk</b> passer ikke: benzin består af alkaner. Kortet viser, hvad der sker med benzin i en åben skål.",
+                uorganisk: "<b>uorganisk</b> passer ikke, for benzin består af alkaner. Kortet viser, hvad der sker med benzin i en åben skål.",
                 alkan: "<b>alkan</b> er en slags stof. Skiltet siger, hvad benzin gør i en åben skål.",
                 molekylformel: "<b>molekylformel</b> er en formel som C₄H₁₀. Skiltet siger, hvad benzin gør i en åben skål." })
         ],

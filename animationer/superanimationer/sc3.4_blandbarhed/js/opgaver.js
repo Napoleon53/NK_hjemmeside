@@ -205,7 +205,7 @@
             return;
         }
         /* Byg-opgaven: bassinet skal vise det, der skal til, og vaere faldet til ro */
-        if (this.b.m.haelder()) { this.fejl("Der bliver stadig hældt i. Vent, til det er faldet til ro."); return; }
+        if (this.b.m.haelder()) { this.fejl("Der bliver stadig hældt i. Vent, til væskerne er faldet til ro."); return; }
         var a = this.b.analyse();
         if (TJEK[o.d.byg](a, this.b.m)) { this.loestNu(); return; }
         o.foersteSvar = false;

@@ -87,24 +87,24 @@
         vb: [1160, 640],
         lag: [
             { navn: "Det uladede stof", pladser: ["fordelingskonstant", "log P"],
-              ros: "Fordelingskonstanten er stoffet i octanol divideret med stoffet i vand. Log P er logaritmen til den." },
+              ros: "Fordelingskonstanten KF er koncentrationen i octanol divideret med koncentrationen i vand. Log P er logaritmen til KF." },
             { navn: "En syre ved forskellig pH", pladser: ["fordelingsforhold", "log D"],
-              ros: "Fordelingsforholdet tæller ionen med i vandet. Derfor falder log D, når syren bliver til ioner ved høj pH." }
+              ros: "Fordelingsforholdet medregner ionen i vandlaget. Derfor falder log D, når syren bliver til ioner ved høj pH." }
         ],
         pladser: [
             titelPlads("fordelingskonstant", KK, {
-                fordelingsforhold: "<b>fordelingsforhold</b> skrives D og tæller ionen med i vandet. Kortet viser K<sub>F</sub> med samme stof i begge lag.",
-                "log P": "<b>log P</b> er logaritmen til tallet. Kortet viser selve brøken med koncentrationerne i de to lag." }),
+                fordelingsforhold: "<b>fordelingsforhold</b> har symbolet D og medregner ionen i vandlaget. Kortet viser K<sub>F</sub> med samme stof i begge lag.",
+                "log P": "<b>log P</b> er logaritmen til fordelingskonstanten. Kortet viser selve brøken med koncentrationerne i de to lag." }),
             titelPlads("log P", KP, {
                 "log D": "<b>log D</b> afhænger af pH. Skalaen viser ét tal for hvert stof, og tallet gælder den uladede form.",
-                fordelingskonstant: "<b>fordelingskonstant</b> er brøken med koncentrationerne. Skalaen viser logaritmen til den fra −4 til 6." }),
+                fordelingskonstant: "<b>fordelingskonstant</b> er brøken med koncentrationerne. Skalaen viser log P fra −4 til 6." }),
 
             titelPlads("fordelingsforhold", KD, {
                 fordelingskonstant: "<b>fordelingskonstant</b> har kun den uladede form i vandet. Brøken på dette kort lægger ionen A⁻ med i vandlaget.",
-                "log D": "<b>log D</b> er logaritmen til tallet. Kortet viser selve brøken med HA og A⁻." }),
+                "log D": "<b>log D</b> er logaritmen til fordelingsforholdet. Kortet viser selve brøken med HA og A⁻." }),
             { id: "log D", ord: ["log D"], x: 800, y: 374, maal: [G.xa, G.ya + 18], dele: ["akse"],
               omr: [{ linje: [[G.xa, G.ya - 4], [G.xa, G.yb]], b: 18 }],
-              fejl: { "log P": "<b>log P</b> er ét tal for stoffet. Grafen viser et tal, der ændrer sig med pH.",
+              fejl: { "log P": "<b>log P</b> har én værdi for hvert stof. Grafen viser en størrelse, der ændrer sig med pH.",
                       fordelingsforhold: "<b>fordelingsforhold</b> er D selv. Aksen viser logaritmen til D fra −5 til 3." } }
         ],
 

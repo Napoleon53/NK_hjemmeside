@@ -60,14 +60,14 @@
                     id: "luk", slags: "spm", navn: "Luk ringen",
                     forsoeg: { tekst: "Først lægges kæden på siden, så carbonatom 1 kommer yderst til højre. Tryk på knappen.",
                                knap: "Læg kæden på siden", forloeb: "vip" },
-                    traek: { tekst: "Det, der pegede til højre, peger nu ned. Træk det orange oxygenatom hen til carbonatom 1, så ringen lukker sig." },
+                    traek: { tekst: "Grupperne, der pegede til højre i fischerprojektionen, peger nu ned. Træk det orange oxygenatom hen til carbonatom 1, så ringen lukker sig." },
                     tekst: "Hvor er hydrogenatomet fra OH-gruppen på carbonatom 5 blevet af?",
                     om: [["H5"]],
-                    svar: ["Det sidder i OH-gruppen på carbonatom 1", "Det er gået af som en del af vand", "Det sidder stadig på oxygenatomet i ringen"], rigtig: 0,
+                    svar: ["Det sidder i OH-gruppen på carbonatom 1", "Det er fraspaltet i et vandmolekyle", "Det sidder stadig på oxygenatomet i ringen"], rigtig: 0,
                     fejl: { 1: "Der bliver ikke fraspaltet vand. Find det orange H på tavlen.",
                             2: "Oxygenatomet i ringen er bundet til to carbonatomer og har ikke noget hydrogenatom." },
                     hint: ["Find det orange H på tavlen.",
-                           "Hydrogenatomet er flyttet over til oxygenatomet fra aldehydgruppen. Der fraspaltes ikke vand."],
+                           "Hydrogenatomet er overført til oxygenatomet fra aldehydgruppen. Der fraspaltes ikke vand."],
                     forkl: "Aldehydgruppens oxygenatom har fået hydrogenatomet, og der fraspaltes ikke vand. Ringen og kæden har samme molekylformel, C₆H₁₂O₆."
                 },
                 {
@@ -79,7 +79,7 @@
                             2: "Kæden er lukket til en ring, og aldehydgruppen er blevet til en OH-gruppe." },
                     hint: ["Se, om OH-gruppen på carbonatom 1 peger op eller ned.",
                            "I α-glucose peger OH-gruppen på carbonatom 1 ned, og i β-glucose peger den op."],
-                    forkl: "OH-gruppen på carbonatom 1 peger ned, så ringen er α-glucose. Glucose kan også lukke sig, så OH-gruppen peger op. Det er β-glucose.",
+                    forkl: "OH-gruppen på carbonatom 1 peger ned, så ringen er α-glucose. Glucose kan også lukke sig til β-glucose, hvor OH-gruppen peger op.",
                     navnEfter: "α-glucose"
                 }
             ]
@@ -110,10 +110,10 @@
                     tekst: "Hvilke carbonatomer sidder uden for ringen?",
                     om: [["C1"], ["C6"]],
                     svar: ["Carbonatom 1 og carbonatom 6", "Kun carbonatom 6", "Carbonatom 2 og carbonatom 5"], rigtig: 0,
-                    fejl: { 1: "Se på carbonatom 2 yderst til højre i ringen. CH₂OH-gruppen på carbonatom 2 er carbonatom 1.",
+                    fejl: { 1: "Se på carbonatom 2 yderst til højre i ringen. Carbonatom 1 sidder i CH₂OH-gruppen på carbonatom 2.",
                             2: "Carbonatom 2 og carbonatom 5 er bundet til ringens oxygenatom og sidder i ringen." },
                     hint: ["Find de to CH₂OH-grupper på tavlen.",
-                           "Carbonatom 1 og carbonatom 6 er begge CH₂OH-grupper uden for ringen."],
+                           "Carbonatom 1 og carbonatom 6 sidder begge i CH₂OH-grupper uden for ringen."],
                     forkl: "Carbonatom 1 og carbonatom 6 sidder uden for ringen som CH₂OH-grupper. Ringen har kun fem atomer."
                 },
                 {
@@ -124,14 +124,14 @@
                     fejl: { 1: "I β-fructose peger OH-gruppen på carbonatom 2 op. På tavlen peger den ned.",
                             2: "Kæden er lukket til en ring, og carbonylgruppen er blevet til en OH-gruppe." },
                     hint: ["Se, om OH-gruppen på carbonatom 2 peger op eller ned.",
-                           "Reglen er den samme som for glucose. Peger OH-gruppen ned, er det α-formen."],
+                           "Ligesom i α-glucose peger den nye OH-gruppe ned i α-fructose."],
                     forkl: "OH-gruppen på carbonatom 2 peger ned, så ringen er α-fructose. Fructose kan også lukke sig til β-fructose.",
                     navnEfter: "α-fructose"
                 }
             ]
         }
     ];
-    D.RING_FAERDIG = "Begge sukkerstoffer er lukket til ringe.";
+    D.RING_FAERDIG = "Glucose og fructose er begge lukket til ringe.";
 
     /* =====================================================================
        Fane 2: Fra fischer til haworth
@@ -155,7 +155,7 @@
             slags: "ring", sukker: "glucose", form: "beta", navn: "β-glucose",
             tekst: "Fischerprojektionen viser glucose. Tegn β-glucose som haworthformel. Klik over eller under carbonatom 1 til 4, og tryk Indsend svar.",
             hint: [D.REGEL_HINT, "I β-glucose peger OH-gruppen på carbonatom 1 op, til samme side som CH₂OH-gruppen."],
-            forkl: "Til højre blev til ned, og til venstre blev til op. OH-gruppen på carbonatom 1 peger op, fordi ringen er β-glucose."
+            forkl: "OH-grupperne til højre i fischerprojektionen peger ned i ringen, og OH-grupperne til venstre peger op. OH-gruppen på carbonatom 1 peger op, fordi ringen er β-glucose."
         },
         {
             slags: "ring", sukker: "galactose", form: "alfa", navn: "α-galactose",
@@ -167,7 +167,7 @@
             slags: "ring", sukker: "mannose", form: "beta", navn: "β-mannose",
             tekst: "Fischerprojektionen viser mannose, som ikke står i bogen. Tegn β-mannose som haworthformel. Klik over eller under carbonatom 1 til 4, og tryk Indsend svar.",
             hint: [D.REGEL_HINT, "Mannose har OH-grupperne på carbonatom 2 og carbonatom 3 til venstre, så de peger op."],
-            forkl: "Reglen virker for alle sukkerstoffer. I mannose peger OH-grupperne på carbonatom 2 og carbonatom 3 op."
+            forkl: "Reglen fra fischerprojektion til haworthformel gælder for alle sukkerstoffer. I mannose peger OH-grupperne på carbonatom 2 og carbonatom 3 op."
         },
         {
             slags: "kaede", sukker: "allose", form: "beta", navn: "Den anden vej",
@@ -185,7 +185,7 @@
     D.LIGE = [
         {
             id: "gaet1", slags: "gaet", navn: "Gæt",
-            tekst: "Krystallerne i en pose druesukker består af α-glucose. Druesukkeret opløses i vand. Hvordan er fordelingen, når opløsningen har stået et par timer?",
+            tekst: "Krystallerne i druesukker består af α-glucose. Druesukkeret opløses i vand. Hvordan er fordelingen mellem α-glucose og β-glucose efter et par timer?",
             svar: ["Kun α-glucose", "Mest α-glucose", "Mest β-glucose"], rigtig: 2
         },
         {
@@ -195,13 +195,13 @@
         },
         {
             id: "dynamisk", slags: "spm", navn: "Dynamisk ligevægt",
-            tekst: "Fordelingen ændrer sig ikke mere. Hvad sker der stadig med molekylerne i vinduet?",
+            tekst: "Fordelingen mellem de tre former ændrer sig ikke mere. Hvad sker der stadig med molekylerne i vinduet?",
             svar: ["Ringe åbner sig og lukker sig igen", "Intet, for reaktionen er stoppet", "α-glucose bliver kun til β-glucose"], rigtig: 0,
             fejl: { 1: "Se på vinduet. Ringe åbner sig stadig og lukker sig igen.",
                     2: "β-glucose bliver også til α-glucose, og derfor ændrer fordelingen sig ikke." },
             hint: ["Hold øje med vinduet et øjeblik.",
-                   "Ringene åbner sig og lukker sig lige så ofte den ene vej som den anden vej."],
-            forkl: "Ringene åbner sig og lukker sig hele tiden, men lige mange den ene og den anden vej. Det er en dynamisk ligevægt med 36 % α-glucose og 64 % β-glucose."
+                   "Ringene åbner sig og lukker sig hele tiden, og α-glucose bliver til β-glucose lige så hurtigt som omvendt."],
+            forkl: "Ringene åbner og lukker sig hele tiden, og α-glucose bliver til β-glucose lige så hurtigt som omvendt. Opløsningen er i dynamisk ligevægt med 36 % α-glucose og 64 % β-glucose."
         },
         {
             id: "kaede", slags: "spm", navn: "Den åbne kæde",
@@ -215,7 +215,7 @@
         },
         {
             id: "gaet2", slags: "gaet", navn: "Gæt",
-            tekst: "Fehlings væske reagerer med aldehydgruppen i de åbne kæder. Hvor meget af glucosen kan reagere, når der er Fehlings væske nok?",
+            tekst: "Fehlings væske reagerer med aldehydgruppen i de åbne kæder. Hvor meget af glucosen kan reagere, når Fehlings væske er i overskud?",
             svar: ["Under 0,1 %", "Omkring 36 %", "Næsten det hele"], rigtig: 2
         },
         {
@@ -229,7 +229,7 @@
             svar: ["Ringene i vand åbner sig hele tiden kortvarigt", "Fehlings væske åbner selv ringene", "Ringene har også en aldehydgruppe"], rigtig: 0,
             fejl: { 1: "Ringene åbner sig af sig selv, også uden Fehlings væske. Fehlings væske reagerer kun med kæderne.",
                     2: "I ringen er aldehydgruppen blevet til en OH-gruppe. Kun kæden kan reagere." },
-            hint: ["Tænk på, hvad ringene gjorde i vinduet, før Fehlings væske kom i.",
+            hint: ["Tænk på, hvad ringene gjorde i vinduet, før Fehlings væske blev tilsat.",
                    "Ringene i vand åbner sig hele tiden kortvarigt. Hver gang en ring åbner sig, er der en kæde, som kan reagere."],
             forkl: "Ringene i vand åbner sig hele tiden kortvarigt. Hver gang en ring åbner sig, reagerer kæden med Fehlings væske, og til sidst har næsten al glucosen reageret."
         }

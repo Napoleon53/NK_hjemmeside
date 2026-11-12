@@ -17,27 +17,27 @@
 
     var TURE = {
         "fane-titrering": [
-            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: function () { return "1,00 g havvand, 20 mL demineraliseret vand og lidt " + NK.Data.O.navn + ", der farver den " + NK.Data.O.start + "."; } },
-            { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Sølvnitrat, AgNO₃, 0,050 M. Den tæller oppefra: 0 står øverst." },
+            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: function () { return "Kolben indeholder 1,00 g havvand, 20 mL demineraliseret vand og lidt " + NK.Data.O.navn + ", der farver væsken " + NK.Data.O.start + "."; } },
+            { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Buretten indeholder 0,050 M sølv(I)nitrat, AgNO₃. Skalaen tæller oppefra, så 0 står øverst." },
             { sel: "#tit-anker-hane", titel: "Hanen", tekst: "Træk skyderen for at åbne hanen. Dryp til sidst, eller brug knappen til én dråbe." },
-            { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Chloridet i kolben som 8 figurer. Hver Ag⁺, der kommer ned, fælder en Cl⁻ som hvidt AgCl." },
+            { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Luppen viser chloridet i kolben som 8 figurer. Hver Ag⁺, der kommer ned, fælder en Cl⁻ som hvidt AgCl." },
             { sel: "#tit-skort", titel: "Opgaven", tekst: function () { return "Luk hanen, når kolben bliver " + NK.Data.O.svag + ", og skriv så forbruget i feltet på kortet. Giv hint giver et hint og derefter svaret."; } },
-            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken." },
-            { sel: "#tit-kurvekort", titel: "Kurverne", tekst: function () { return "Hvor meget Cl⁻, AgCl og " + (NK.Kemi.indikator === "dcf" ? "fri Ag⁺" : "Ag₂CrO₄") + " der er i kolben, mens der løber sølvnitrat ned."; } },
-            { sel: ".indikatorvalg", titel: "Indikatoren", tekst: "Dichlorfluorescein bruges i dag og skifter fra gulgrøn til lyserød. Kaliumchromat brugte Mohr selv: gul til rødbrun." },
-            { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionen, indikatoren og beregningen kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. Fejlkilder: hvad ændrer forbruget og masseprocenten?" }
+            { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Panelet viser buretten ved menisken. Aflæs rumfanget ved bunden af menisken." },
+            { sel: "#tit-kurvekort", titel: "Kurverne", tekst: function () { return "Kurverne viser, hvor meget Cl⁻, AgCl og " + (NK.Kemi.indikator === "dcf" ? "fri Ag⁺" : "Ag₂CrO₄") + " der er i kolben, mens der løber sølv(I)nitrat ned."; } },
+            { sel: ".indikatorvalg", titel: "Indikatoren", tekst: "Dichlorfluorescein bruges i dag og skifter fra gulgrøn til lyserød. Mohr brugte selv kaliumchromat, som skifter fra gul til rødbrun." },
+            { sel: "#teoriknap", titel: "Teori", tekst: "Teorien forklarer kort reaktionen, indikatoren og beregningen." },
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. Fejlkilder: Hvad ændrer forbruget og masseprocenten?" }
         ],
         "fane-beregning": [
-            { sel: "#ber-data", titel: "Målingen", tekst: "Din aflæsning fra titreringen, eller en klassekammerats." },
+            { sel: "#ber-data", titel: "Målingen", tekst: "Panelet viser din aflæsning fra titreringen eller en klassekammerats aflæsning." },
             { sel: "#ber-skort", titel: "De fire trin", tekst: "Skriv først formlen og så tallet i feltet på kortet, og tryk på Indsend svar. Giv hint giver et hint og derefter svaret." },
             { sel: "#ber-anker-tavle", titel: "Tavlen", tekst: "Formlen kommer på tavlen, når du har skrevet den, og tallene, når trinnet er løst." }
         ],
         "fane-forbrug": [
-            { sel: "#for-anker-a", titel: "Kolbe A", tekst: "Som på fane 1: 1,00 g havvand fra Vesterhavet, 20 mL demineraliseret vand og 0,050 M sølvnitrat." },
-            { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret. Skiltet på bordet siger hvad." },
+            { sel: "#for-anker-a", titel: "Kolbe A", tekst: "Kolbe A er som på fane 1: 1,00 g havvand fra Vesterhavet, 20 mL demineraliseret vand og 0,050 M sølv(I)nitrat i buretten." },
+            { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret ved kolbe B, og skiltet på bordet viser hvilken." },
             { sel: "#for-skort", titel: "Dit svar", tekst: "Vælg et svar på kortet, og tryk på Indsend svar. Så titreres begge kolber til omslaget." },
-            { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Forbruget af sølvnitrat og den beregnede masseprocent for begge kolber." }
+            { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Tabellen viser forbruget af sølv(I)nitrat og den beregnede masseprocent for begge kolber." }
         ]
     };
 

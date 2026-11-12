@@ -21,13 +21,13 @@
             { sel: "#g-anker-lup", titel: "Lupperne", tekst: "Hver lup viser et lille rum i glasset, hvor der er hældt 100 syremolekyler i. Mærkerne over luppen viser, hvad partiklerne er. Klik på et mærke eller en partikel for at læse mere." },
             { sel: "#g-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
             { sel: "#g-opgaver", titel: "Opgaverne", tekst: "Fem opgaver, én ad gangen. En løst opgave bliver grøn på listen, og du kan altid vælge en opgave igen." },
-            { sel: "#phknap", titel: "pH-meter", tekst: "Slå pH-metret til, hvis du vil se pH på glassenes sedler. Opgaverne kan løses uden." },
+            { sel: "#phknap", titel: "pH-meter", tekst: "Slå pH-metret til, hvis du vil se pH på glassenes sedler. Opgaverne kan løses uden pH-metret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "På fane 2 afgør du selv, om fem syrer er stærke eller svage. På fane 3 fortynder du saltsyren." }
         ],
         "fane-s": [
             { sel: "#s-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene om glasset med gule svarknapper. Det glas, opgaven handler om, har en gul ring." },
             { sel: "#s-anker-glas", titel: "De fem glas", tekst: "Fem syrer med samme koncentration, 0,10 M, og et stykke kalk i hver. Klik på det glas, opgaven nævner, for at se det i luppen." },
-            { sel: "#s-anker-lup", titel: "Luppen", tekst: "Luppen viser det glas, opgaven handler om. Et helt molekyle er gråt med en lille orange hydron på, et molekyle, der har afgivet hydronen, er blåt, og de røde kugler er oxoniumioner." },
+            { sel: "#s-anker-lup", titel: "Luppen", tekst: "Luppen viser det glas, opgaven handler om. Et helt molekyle er gråt med en lille orange hydron på. Et molekyle, der har afgivet hydronen, er blåt, og de røde kugler er oxoniumioner." },
             { sel: "#s-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
             { sel: "#s-glaskort", titel: "De fem glas", tekst: "Her samles det, du har fundet ud af om hvert glas. Glasset får sit navn, når du har afgjort, om syren er stærk eller svag." }
         ],

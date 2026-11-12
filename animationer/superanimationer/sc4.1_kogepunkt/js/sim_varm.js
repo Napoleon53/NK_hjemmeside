@@ -256,7 +256,7 @@
     P.maalTekst = function (m) {
         if (m.slags !== "gaet") return m.tekst;
         var st = this.gaet ? D.stof(this.gaet.id) : null;
-        return st ? m.tekst.replace("{navn}", st.navn) : "Alle kæderne er målt. Kurven er færdig.";
+        return st ? m.tekst.replace("{navn}", st.navn) : "Kogepunkterne for alle kæderne er målt, og kurven er færdig.";
     };
 
     /* Hintet til gaettet naevner kaeden med to C-atomer faerre */
@@ -286,7 +286,7 @@
     /* Forklaringen, naar maalet er naaet */
     P.efterTekst = function (m) {
         if (m.slags !== "gaet") return m.efter;
-        if (!this.gaet) return "Alle kæderne er målt. Kurven er færdig.";
+        if (!this.gaet) return "Kogepunkterne for alle kæderne er målt, og kurven er færdig.";
         var st = D.stof(this.gaet.id), afv = Math.abs(this.gaet.t - st.kp);
         return "Du gættede " + D.gradTekst(this.gaet.t, 0) + ". " + st.Navn + " koger ved " + D.gradTekst(st.kp) + ". " +
             (afv <= D.GAET_GODT ? "Godt ramt." : "Kurven flader lidt ud, jo længere kæden er.");
@@ -336,7 +336,7 @@
         var st = this.stof(), T = D.gradTekst(this.proeve.T, 0);
         if (m.slags === "koge") {
             var maal = D.stof(m.id);
-            if (st.id !== m.id) this.skort.fejl("Glasset i kammeret er " + NK.html(st.navn) + ". Træk glasset med " + NK.html(maal.navn) + " ned i kammeret.");
+            if (st.id !== m.id) this.skort.fejl("Glasset i kammeret indeholder " + NK.html(st.navn) + ". Træk glasset med " + NK.html(maal.navn) + " ned i kammeret.");
             else this.skort.fejl("Ved " + T + " koger " + NK.html(maal.navn) + " ikke. Der kommer ingen bobler i glasset.");
         } else if (m.slags === "flere") {
             var mangler = m.antal - this.andreFundet();

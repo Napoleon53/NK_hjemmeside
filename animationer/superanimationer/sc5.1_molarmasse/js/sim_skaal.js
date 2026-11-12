@@ -218,7 +218,7 @@
             kl: this.svar ? "loest" + (this.rigtigt ? "" : " svar") : "spm",
             chip: "Par " + (this.nr + 1) + " af " + this.runde.length,
             tekst: NK.html("I hver skål ligger 1 mol af et stof, og skiltet på bordet viser stofferne. Vægten er låst. " +
-                "Hvilken skål synker, når låsen slippes?"),
+                "Hvilken skål synker, når låsen slippes, eller står vægten lige?"),
             svar: svar,
             laast: !!this.svar
         });

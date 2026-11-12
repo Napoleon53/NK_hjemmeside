@@ -12,7 +12,7 @@
 
     var NK = window.NK;
 
-    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find søjlen med den positive ion og rækken med den negative. L er letopløseligt, T er tungtopløseligt. På trin 2 åbner et klik tabellen i stor udgave." };
+    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find søjlen med den positive ion og rækken med den negative. L betyder letopløseligt, og T betyder tungtopløseligt. På trin 2 åbner et klik tabellen i stor udgave." };
     var TRINENE = { sel: "#opgavekort", titel: "Trinene", tekst: "De fire trin er de samme på alle sværhedsgrader. Ny opgave giver en anden blanding." };
     var KORT = { sel: "#tekstboks", titel: "Opgaven", tekst: "Her står blandingen og det, du skal gøre. Indsend svar tjekker det, du har skrevet. Enter i et felt gør det samme." };
 
@@ -20,14 +20,14 @@
         "tabel": [
             { sel: "#tekstboks", titel: "Opgaven", tekst: "Her står blandingen og det, du skal gøre. Slå op i fældningstabellen viser tabellen i stor udgave sammen med skemaet." },
             { sel: "#tavle", titel: "Skemaet", tekst: "Her står de to salte og deres ioner. De nye par, du finder, kommer frem efter pilen." },
-            { sel: "#baeger-omraade", titel: "De to opløsninger", tekst: "Ionerne svømmer rundt hver for sig. Når glassene hældes sammen, kan de finde nye partnere." },
+            { sel: "#baeger-omraade", titel: "De to opløsninger", tekst: "Ionerne svømmer rundt hver for sig. Når glassene hældes sammen, kan ionerne finde nye partnere." },
             TABEL,
             TRINENE,
-            { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Samme opgave og samme fire trin. På Let vises ionerne, formlen og ionskemaet for dig. På Middel vælger du svarene, og på Svær skriver du dem selv." }
+            { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Alle tre sværhedsgrader har samme opgave og samme fire trin. På Let vises ionerne, formlen og ionskemaet for dig. På Middel vælger du svarene, og på Svær skriver du dem selv." }
         ],
         "vaelg": [
-            { sel: "#tekstboks", titel: "Opgaven", tekst: "Vælg dit svar, og tryk Indsend svar. De forkerte svar er fejl, som elever tit laver, og du får at vide hvorfor." },
-            { sel: "#tavle", titel: "Skemaet", tekst: "Reaktionen bygges op her, ét trin ad gangen." },
+            { sel: "#tekstboks", titel: "Opgaven", tekst: "Vælg dit svar, og tryk Indsend svar. De forkerte svar er fejl, som elever ofte laver, og du får at vide hvorfor." },
+            { sel: "#tavle", titel: "Skemaet", tekst: "Reaktionsskemaet bygges op her, ét trin ad gangen." },
             TABEL,
             TRINENE
         ],

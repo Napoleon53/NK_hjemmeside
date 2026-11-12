@@ -140,7 +140,7 @@
         this.alkan = i;
         this.alkanValgt = i;
         if (maade === "svar") this.brugtSvar = true;
-        this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html("Den nærmeste er " + D.ALKANER[i].navn + ".") : null);
+        this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html("Den alkan, der passer bedst, er " + D.ALKANER[i].navn + ".") : null);
         this.visKort();
     };
 
@@ -173,7 +173,7 @@
         var s = "M(gas) = " + K.Mv(f.M) + " g/mol. Det passer bedst med " + a.navn + ", " + NK.formel(a.formel) + ", med " + K.Mtekst(f.alkan) + " g/mol.";
         if (!o.ukendt) {
             if (f.alkan === D.LIGHTERGAS) s += " Lightergas er butan.";
-            else s += " Lightergas er butan (" + K.Mtekst(D.LIGHTERGAS) + " g/mol). Så langt fra kommer man kun, hvis noget er gået galt. Se fanen Fejlkilder.";
+            else s += " Lightergas er butan (" + K.Mtekst(D.LIGHTERGAS) + " g/mol). Så langt fra butan ender molarmassen kun, hvis noget er gået galt i forsøget. Se fanen Fejlkilder.";
             var anden = this.opsum[1 - o.maaling];
             if (anden && anden.M !== undefined) s += " Den anden måling gav " + K.Mv(anden.M) + " g/mol.";
         }

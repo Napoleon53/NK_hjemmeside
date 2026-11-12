@@ -67,9 +67,9 @@
             var sumFast = 0;
             faste.forEach(function (s) { sumFast += st.ox[s] * st.el[s]; });
             regel = faste.map(function (s) { return s + " er " + X.ox(st.ox[s]); }).join(" og ") + ". " +
-                (q === 0 ? "Alle tallene skal give 0, for " + st.tekst + " er neutralt." :
-                    "Alle tallene skal give ionens ladning, " + X.lad(q) + ".");
-            if (E === "O") regel = "O sidder på O her, så O er ikke −II. " + regel;
+                (q === 0 ? "Summen af oxidationstallene skal være 0, for " + st.tekst + " er neutralt." :
+                    "Summen af oxidationstallene skal være ionens ladning, " + X.lad(q) + ".");
+            if (E === "O") regel = "O er bundet til O her, så O er ikke −II. " + regel;
             var venstre = (n > 1 ? n + " · " : "") + E;
             linjer.push(venstre + " + " + faste.map(function (s) { return st.el[s] + " · " + X.ladP(st.ox[s]); }).join(" + ") + " = " + X.lad(q));
             linjer.push(venstre + " " + (sumFast < 0 ? "− " + (-sumFast) : "+ " + sumFast) + " = " + X.lad(q));
@@ -126,11 +126,11 @@
             var linjer = [raa(tallinje(K, medSvar)), "Fra " + X.ox(K.fra) + " til " + X.ox(K.til) + "."];
             var svar;
             if (medSvar) {
-                linjer.push("Tallet " + (K.op ? "stiger" : "falder") + " " + K.delta + " trin.");
+                linjer.push("Oxidationstallet " + (K.op ? "stiger" : "falder") + " " + K.delta + " trin.");
                 if (K.antal > 1) linjer.push("Der er " + K.antal + " " + K.E + " på klammen: " + K.antal + " · " + K.delta + " = " + K.tot + ".");
                 svar = (K.op ? "↑" : "↓") + K.tot + ". Det er en " + (K.op ? "oxidation" : "reduktion") + ".";
             } else {
-                svar = "Går tallet op eller ned? Tæl trinene på tallinjen." + (K.antal > 1 ? " Husk, at der er " + K.antal + " " + K.E + " på klammen." : "");
+                svar = "Går oxidationstallet op eller ned? Tæl trinene på tallinjen." + (K.antal > 1 ? " Husk, at der er " + K.antal + " " + K.E + " på klammen." : "");
             }
             return kort(K.type, K.E + ": " + A.tekst + " ⟶ " + B.tekst, "", linjer, svar);
         }).join("");
@@ -152,7 +152,7 @@
         if (medSvar) {
             linjer.push("Det første tal, der står i begge rækker, er " + fael + ".");
             linjer.push(fael + " = " + R.ox.gange + " · " + a + " og " + fael + " = " + R.red.gange + " · " + b + ".");
-            svar = "Skriv " + R.ox.gange + " foran ↑" + a + " og " + R.red.gange + " foran ↓" + b + ". Der flytter " + fael + " elektroner.";
+            svar = "Skriv " + R.ox.gange + " foran ↑" + a + " og " + R.red.gange + " foran ↓" + b + ". Der overføres " + fael + " elektroner.";
             if (R.forafstem) svar += " Tallet foran en formel bliver gangetallet gange det tal, der stod der før.";
         } else {
             svar = "Find det første tal, der står i begge rækker.";
@@ -188,7 +188,7 @@
         var q = R.ladning, ionT = R.ionSt.tekst, pos = R.ionSt.q > 0;
         var regel = pos ? "H⁺ er positive. De skal på den side, hvor ladningen er lavest." :
             "OH⁻ er negative. De skal på den side, hvor ladningen er højest.";
-        if (R.miljoe === "neutralt") regel = "Glasset er neutralt: vand kan give OH⁻, men ikke H⁺. " + regel;
+        if (R.miljoe === "neutralt") regel = "Glasset er neutralt. Vand kan give OH⁻, men ikke H⁺. " + regel;
         var linjer = ["Før pilen: " + X.lad(q.v), "Efter pilen: " + X.lad(q.h)];
         var svar;
         if (medSvar) {
@@ -229,7 +229,7 @@
         if (medSvar) {
             var s = R.vand.side;
             linjer.push("Der mangler " + 2 * R.vand.antal + " H " + sideOrd(s) + ". Det er " + 2 * R.vand.antal + " : 2 = " + R.vand.antal + " H₂O.");
-            svar = R.vand.antal + " H₂O " + sideOrd(s) + ". Så er der " + (R.slut.v.H || 0) + " H på begge sider. Tjek O: " +
+            svar = R.vand.antal + " H₂O " + sideOrd(s) + ". Nu er der " + (R.slut.v.H || 0) + " H på begge sider. Tjek O: " +
                 (R.slut.v.O || 0) + " før pilen og " + (R.slut.h.O || 0) + " efter. Det passer.";
         } else {
             svar = "Hvilken side mangler H, og hvor mange H₂O skal der til?";

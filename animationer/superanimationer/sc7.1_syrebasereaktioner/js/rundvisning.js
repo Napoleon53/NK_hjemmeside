@@ -17,24 +17,24 @@
 
     var TURE = {
         "fane-hydron": [
-            { sel: "#hydron-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#hydron-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven og viser hint og svar. Dit svar tæller først, når du trykker Indsend svar." },
             { sel: "#hydron-anker-mol", titel: "Partiklerne", tekst: "To partikler med deres frie elektronpar (de gule prikker). Tag fat i et H, og slip det på den anden partikel." },
-            { sel: "#hydron-anker-skema", titel: "Reaktionsskemaet", tekst: "Produkterne kommer, når hydronen er flyttet. Klammerne viser de to syre-basepar." },
+            { sel: "#hydron-anker-skema", titel: "Reaktionsskemaet", tekst: "Produkterne kommer, når hydronen er overført. Klammerne viser de to syre-basepar." },
             { sel: "#hydron-kort", titel: "Reaktionerne", tekst: "Ti reaktioner. Klik på et tal for at springe til en anden reaktion." },
             { sel: "#hydron-par-kort", titel: "Syre-basepar", tekst: "Parrene fra de reaktioner, du har løst. Blå: syren og dens korresponderende base. Lilla: basen og dens korresponderende syre." },
             { sel: "#hydron-forfra", titel: "Start forfra", tekst: "Alle ti reaktioner forfra." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Syre, base, hydron og korresponderende par kort forklaret." },
-            { sel: ".faneknapper", titel: "Træning", tekst: "Fane 2 og 3 har nye reaktioner, så længe du vil: skriv produkterne, eller find parrene." }
+            { sel: ".faneknapper", titel: "Træning", tekst: "Fane 2 og 3 har nye reaktioner, så længe du vil. I fane 2 finder du produkterne, og i fane 3 finder du parrene." }
         ],
         "fane-produkter": [
-            { sel: "#prod-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#prod-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven og viser hint og svar. Dit svar tæller først, når du trykker Indsend svar." },
             { sel: "#prod-anker-lign", titel: "Reaktionen", tekst: "To reaktanter og to tomme pladser efter pilen." },
             { sel: "#prod-anker-brikker", titel: "Formlerne", tekst: "Træk de to produkter op på pladserne, eller klik på dem. Et forkert svar forklares, når du har trykket Indsend svar." },
-            { sel: "#prod-niveau", titel: "Sværhedsgrad", tekst: "Let: med vand. Middel: syre og base. Svær: amfolytter og flere hydroner. Gælder også fane 3." },
+            { sel: "#prod-niveau", titel: "Sværhedsgrad", tekst: "Let: en syre eller en base med vand. Middel: en syre og en base uden vand. Svær: amfolytter og syrer med flere hydroner. Sværhedsgraden gælder også i fane 3." },
             { sel: "#prod-kort", titel: "I træk uden fejl", tekst: "Tæller, hvor mange reaktioner du har løst i træk uden fejl og uden Vis svaret." }
         ],
         "fane-par": [
-            { sel: "#par-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#par-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven og viser hint og svar. Dit svar tæller først, når du trykker Indsend svar." },
             { sel: "#par-anker-lign", titel: "Reaktionen", tekst: "En hel reaktion. Under hver formel er der plads til et mærkat." },
             { sel: "#par-anker-brikker", titel: "Mærkaterne", tekst: "Træk hvert mærkat hen under sin formel, eller klik på mærkatet og så på formlen. Korresp. betyder korresponderende." },
             { sel: "#par-niveau", titel: "Sværhedsgrad", tekst: "Samme tre niveauer som fane 2." },

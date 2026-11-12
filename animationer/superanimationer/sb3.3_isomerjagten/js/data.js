@@ -60,17 +60,17 @@
         {
             id: "c5h12", formel: "C5H12", titel: "Alkaner", niv: "Let", quiz: true,
             tekst: "Molekylformlen passer til tre forskellige alkaner. Tegn dem én ad gangen, og tryk Indsend svar.",
-            strategi: "Begynd med den lige kæde. Gør den ét carbonatom kortere, og sæt det sidste på som en sidegren.",
+            strategi: "Begynd med den lige kæde. Gør den ét carbonatom kortere, og sæt det sidste carbonatom på som en sidegren.",
             kog: "raekke",
             kogHint: [
-                "Alle tre er alkaner med kun londonbindinger. Se på formen: lang og lige eller kugleformet?",
+                "De tre alkaner har kun londonbindinger. Er molekylerne lange og lige eller kugleformede?",
                 "Jo mere forgrenet molekylet er, jo mindre er kontaktfladen og jo lavere er kogepunktet."
             ],
-            kogTekst: "Pentan {pentan}, 2-methylbutan {2-methylbutan} og 2,2-dimethylpropan {2,2-dimethylpropan}. Jo mere forgrenet, jo mindre kontaktflade og jo svagere londonbindinger.",
+            kogTekst: "Pentan {pentan}, 2-methylbutan {2-methylbutan} og 2,2-dimethylpropan {2,2-dimethylpropan}. Et mere forgrenet molekyle har mindre kontaktflade og svagere londonbindinger.",
             isomerer: [
                 { navn: "pentan", kp: 36, mangler: "Der mangler stoffet med den lige kæde: fem carbonatomer på en række." },
-                { navn: "2-methylbutan", kp: 28, form: "forgrenet", mangler: "Der mangler et stof med fire carbonatomer i kæden og en methylgruppe på." },
-                { navn: "2,2-dimethylpropan", kp: 10, form: "forgrenet to gange", mangler: "Der mangler et stof med tre carbonatomer i kæden og to methylgrupper på det midterste." }
+                { navn: "2-methylbutan", kp: 28, form: "forgrenet", mangler: "Der mangler et stof med fire carbonatomer i kæden og én methylgruppe." },
+                { navn: "2,2-dimethylpropan", kp: 10, form: "forgrenet to gange", mangler: "Der mangler et stof med tre carbonatomer i kæden og to methylgrupper på det midterste carbonatom." }
             ]
         },
         {
@@ -80,12 +80,12 @@
             kog: "raekke",
             kogHint: [
                 "Hvilket af de to stoffer har et hydrogenatom på oxygen?",
-                "Et stof med en OH-gruppe danner hydrogenbindinger, og de er stærkere end de andre bindinger."
+                "Et stof med en OH-gruppe danner hydrogenbindinger, som er de stærkeste intermolekylære bindinger."
             ],
             kogTekst: "Ethanol koger ved {ethanol} og dimethylether ved {dimethylether}. Ethanol har en OH-gruppe og danner hydrogenbindinger. Det kan dimethylether ikke.",
             isomerer: [
-                { navn: "ethanol", kp: 78, mangler: "Der mangler en alkohol: to carbonatomer og en OH-gruppe for enden." },
-                { navn: "dimethylether", kp: -25, mangler: "Der mangler en ether: oxygenatomet sidder mellem de to carbonatomer, C−O−C." }
+                { navn: "ethanol", kp: 78, mangler: "Der mangler en alkohol med to carbonatomer og en OH-gruppe for enden." },
+                { navn: "dimethylether", kp: -25, mangler: "Der mangler en ether, hvor oxygenatomet sidder mellem de to carbonatomer, C−O−C." }
             ]
         },
         {
@@ -95,19 +95,19 @@
             kog: "raekke",
             kogHint: [
                 "Hvilke af stofferne har en OH-gruppe og danner hydrogenbindinger? De koger højest.",
-                "Har to stoffer de samme slags bindinger, koger det mest kugleformede molekyle lavest."
+                "Har to stoffer de samme slags bindinger, koger stoffet med de mest kugleformede molekyler lavest."
             ],
             kogTekst: "Propan-1-ol {propan-1-ol}, propan-2-ol {propan-2-ol} og ethylmethylether {ethylmethylether}. Kun alkoholerne danner hydrogenbindinger, og propan-2-ol er mere kugleformet.",
             isomerer: [
                 { navn: "propan-1-ol", kp: 97, mangler: "Der mangler en alkohol med OH-gruppen for enden af en kæde med tre carbonatomer." },
                 { navn: "propan-2-ol", kp: 82, form: "mere kugleformet",mangler: "Der mangler en alkohol med OH-gruppen på det midterste af tre carbonatomer." },
-                { navn: "ethylmethylether", kp: 7, mangler: "Der mangler en ether: oxygenatomet sidder mellem ét og to carbonatomer, C−O−C−C." }
+                { navn: "ethylmethylether", kp: 7, mangler: "Der mangler en ether med ét carbonatom på den ene side af oxygenatomet og to på den anden, C−O−C−C." }
             ]
         },
         {
             id: "c4h10o", formel: "C4H10O", titel: "Alkoholer og ethere", niv: "Middel",
             tekst: "Molekylformlen passer til syv stoffer: fire alkoholer og tre ethere. Tegn én ad gangen, og tryk Indsend svar.",
-            strategi: "Begynd med en lige kæde, og flyt OH-gruppen. Gør så kæden forgrenet. Til sidst etherne.",
+            strategi: "Begynd med en lige kæde, og flyt OH-gruppen. Gør så kæden forgrenet, og tegn til sidst etherne.",
             kog: "hoejest",
             kogHint: [
                 "Kun alkoholerne danner hydrogenbindinger. Det højeste kogepunkt har en af dem.",
@@ -121,16 +121,16 @@
                 { navn: "2-methylpropan-2-ol", kp: 82, mangler: "Der mangler en alkohol med OH-gruppen på det carbonatom, hvor kæden forgrener sig." },
                 { navn: "diethylether", kp: 35, mangler: "Der mangler en ether med to carbonatomer på hver side af oxygenatomet." },
                 { navn: "methylpropylether", kp: 39, mangler: "Der mangler en ether med ét carbonatom på den ene side og tre på række på den anden." },
-                { navn: "2-methoxypropan", kp: 31, mangler: "Der mangler en ether, hvor O sidder på det midterste af tre carbonatomer og har et CH₃." }
+                { navn: "2-methoxypropan", kp: 31, mangler: "Der mangler en ether, hvor O sidder mellem CH₃ og det midterste af tre carbonatomer." }
             ]
         },
         {
             id: "c5h12o", formel: "C5H12O", titel: "Kun alkoholer", niv: "Middel", kun: "alkohol",
             tekst: "Molekylformlen passer til otte alkoholer. Tegn dem én ad gangen, og tryk Indsend svar. Etherne tæller ikke.",
-            strategi: "Fem på række: flyt OH-gruppen. Så fire i kæden og en methylgruppe. Til sidst tre og to methylgrupper.",
+            strategi: "Flyt OH-gruppen langs fem C på række. Prøv så fire C plus en methylgruppe og tre C plus to methylgrupper.",
             kog: "hoejest",
             kogHint: [
-                "Alle otte er alkoholer og danner hydrogenbindinger. Se på formen af molekylerne.",
+                "Alle otte isomerer er alkoholer og danner hydrogenbindinger. Se på formen af molekylerne.",
                 "Den lige kæde med OH-gruppen for enden har den største kontaktflade."
             ],
             kogTekst: "Pentan-1-ol koger ved {pentan-1-ol}. Den lige kæde med OH-gruppen for enden har den største kontaktflade og de stærkeste londonbindinger.",
@@ -147,14 +147,14 @@
         },
         {
             id: "c6h14", formel: "C6H14", titel: "Fem alkaner", niv: "Svær",
-            tekst: "Molekylformlen passer til fem alkaner. Pas på: mange af dem kan tegnes, så de ligner et andet stof.",
-            strategi: "Seks på række. Så fem i kæden og en methylgruppe på nr. 2 eller 3. Så fire i kæden og to methylgrupper.",
+            tekst: "Molekylformlen passer til fem alkaner. Pas på, for mange af dem kan tegnes, så de ligner et andet stof.",
+            strategi: "Tegn seks C på række. Prøv så fem C plus en methylgruppe på nr. 2 eller 3 og fire C plus to methylgrupper.",
             kog: "hoejest",
             kogHint: [
-                "Alle fem er alkaner med kun londonbindinger. Se på formen af molekylerne.",
+                "Alle fem isomerer er alkaner og danner kun londonbindinger. Se på formen af molekylerne.",
                 "Den lige kæde har den største kontaktflade og de stærkeste londonbindinger."
             ],
-            kogTekst: "Hexan koger ved {hexan}. Den lige kæde har den største kontaktflade. 2,2-dimethylbutan er mest kugleformet og koger ved {2,2-dimethylbutan}.",
+            kogTekst: "Hexan koger ved {hexan}. Hexan har en lige kæde og den største kontaktflade. 2,2-dimethylbutan er mest kugleformet og koger ved {2,2-dimethylbutan}.",
             isomerer: [
                 { navn: "hexan", kp: 69, mangler: "Der mangler stoffet med den lige kæde: seks carbonatomer på en række." },
                 { navn: "2-methylpentan", kp: 60, mangler: "Der mangler et stof med fem carbonatomer i kæden og en methylgruppe på nr. 2." },
@@ -166,9 +166,9 @@
         {
             id: "c5h10", formel: "C5H10", titel: "Alkener", niv: "Svær", dobbelt: true,
             tekst: "Molekylformlen passer til fem alkener uden ring. Tegn dem én ad gangen. Cis og trans tæller som ét stof her.",
-            strategi: "Fem på række, og flyt dobbeltbindingen. Gør så kæden forgrenet, og flyt dobbeltbindingen igen.",
+            strategi: "Flyt dobbeltbindingen langs fem C på række. Gør så kæden forgrenet, og flyt dobbeltbindingen igen.",
             kog: null,
-            slutTekst: "Alle fem alkener er fundet. Dobbeltbindingen kan flytte sig, og kæden kan forgrene sig. Cis og trans kommer i B3.4.",
+            slutTekst: "Alle fem alkener er fundet. Dobbeltbindingen kan sidde forskellige steder, og kæden kan være forgrenet. Cis-trans-isomeri står i afsnit B3.4.",
             isomerer: [
                 { navn: "pent-1-en", mangler: "Der mangler en alken med fem carbonatomer på en række og dobbeltbindingen for enden." },
                 { navn: "pent-2-en", mangler: "Der mangler en alken med fem carbonatomer på en række og dobbeltbindingen fra nr. 2." },
@@ -179,8 +179,8 @@
         },
         {
             id: "c5h12o-alle", formel: "C5H12O", titel: "Mesterjagten", niv: "Mester",
-            tekst: "Mesterjagten: molekylformlen passer til fjorten stoffer, otte alkoholer og seks ethere. Find dem alle.",
-            strategi: "Først de otte alkoholer. Del så de fem carbonatomer 1 + 4 og 2 + 3 om oxygenatomet, og forgren dem.",
+            tekst: "I mesterjagten passer molekylformlen til fjorten stoffer: otte alkoholer og seks ethere. Find dem alle.",
+            strategi: "Tegn først de otte alkoholer. Del så de fem C som 1 + 4 og 2 + 3 på hver side af O, og forgren kæderne.",
             kog: "hoejest",
             kogHint: [
                 "Kun alkoholerne danner hydrogenbindinger. Det højeste kogepunkt har en af dem.",
@@ -198,10 +198,10 @@
                 { navn: "2,2-dimethylpropan-1-ol", kp: 113, mangler: "Der mangler en alkohol med tre carbonatomer i kæden, to methylgrupper og OH-gruppen for enden." },
                 { navn: "butylmethylether", kp: 70, mangler: "Der mangler en ether med ét carbonatom på den ene side af O og fire på række på den anden." },
                 { navn: "ethylpropylether", kp: 63, mangler: "Der mangler en ether med to carbonatomer på den ene side af O og tre på række på den anden." },
-                { navn: "1-methoxy-2-methylpropan", kp: 59, mangler: "Der mangler en ether: CH₃ på den ene side af O og en forgrenet gruppe, der sidder med CH₂ på O." },
-                { navn: "2-methoxybutan", kp: 59, mangler: "Der mangler en ether: O sidder på nr. 2 i en kæde med fire carbonatomer og har et CH₃." },
-                { navn: "2-methoxy-2-methylpropan", kp: 55, mangler: "Der mangler en ether: O sidder på et carbonatom med tre CH₃-grupper og har selv et CH₃." },
-                { navn: "2-ethoxypropan", kp: 54, mangler: "Der mangler en ether: O sidder på det midterste af tre carbonatomer og har to C på den anden side." }
+                { navn: "1-methoxy-2-methylpropan", kp: 59, mangler: "Der mangler en ether, hvor O sidder mellem CH₃ og CH₂ i en forgrenet carbonkæde." },
+                { navn: "2-methoxybutan", kp: 59, mangler: "Der mangler en ether, hvor O sidder mellem CH₃ og nr. 2 i en kæde med fire carbonatomer." },
+                { navn: "2-methoxy-2-methylpropan", kp: 55, mangler: "Der mangler en ether, hvor O sidder mellem CH₃ og et carbonatom med tre CH₃-grupper." },
+                { navn: "2-ethoxypropan", kp: 54, mangler: "Der mangler en ether, hvor O sidder mellem en ethylgruppe og det midterste af tre carbonatomer." }
             ]
         }
     ];

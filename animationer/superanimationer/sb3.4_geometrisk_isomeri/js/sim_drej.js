@@ -116,7 +116,7 @@
     P.indsendScene = function () {
         var mig = this;
         if (this.o.id !== "d1") return null;
-        return { klar: this.roert, mangler: "Træk først i den højre halvdel af butan. Tryk så Indsend svar.",
+        return { klar: this.roert, mangler: "Træk først i den højre halvdel af butanmolekylet. Tryk så Indsend svar.",
             fn: function () { mig.tjekD1(); } };
     };
 
@@ -156,7 +156,7 @@
         var o = this.o;
         if (o.id === "d1") return [
             "Tag fat i en af kuglerne på det højre C-atom i butan med musen.",
-            "Træk op eller ned. Hele den højre halvdel af butan drejer om bindingen i midten.",
+            "Træk op eller ned. Hele den højre halvdel af butanmolekylet drejer om bindingen i midten.",
             "Bliv ved, til CH₃ til højre står øverst ligesom CH₃ til venstre."
         ];
         if (o.id === "d2") return [
@@ -178,7 +178,7 @@
         ];
         if (t === "vend") return [
             "Tryk på knappen Vend B om på kortet.",
-            "B er det samme molekyle, når det er vendt. Det ses bare fra den anden side."
+            "B er det samme molekyle, når det er vendt. Det ses blot fra den anden side."
         ];
         var hoejre = o.h.map(D.tekst).join(" og ");
         return [

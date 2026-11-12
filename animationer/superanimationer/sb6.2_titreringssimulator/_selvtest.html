@@ -243,7 +243,7 @@ slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
             !d.getElementById("ukendt-feedback") && !d.getElementById("ukendt-opgave") && !d.getElementById("ukendt-tjek") && !d.getElementById("ukendt-facit"));
         svag();
         paastand("kortet har opgaven med spørgsmålet halvfedt og etiketten Ukendt prøve",
-            /Hvad er ækvivalensvolumenet, koncentrationen og pKs\?/.test((sk.querySelector(".sk-spm") || {}).textContent || "") &&
+            /Hvad er ækvivalensvolumenet, prøvens koncentration og pKs\?/.test((sk.querySelector(".sk-spm") || {}).textContent || "") &&
             sk.querySelector(".sk-chip").textContent === "Ukendt prøve" && /I buretten står/.test(sk.textContent));
         paastand("kortet har Giv et hint og Indsend svar", knap.textContent === "Giv et hint" && !!ind.closest("#ukendt-skort"));
         paastand("Indsend svar er grå, når felterne er tomme", ind.classList.contains("ikke-klar") && !ind.classList.contains("klar"));
@@ -257,7 +257,7 @@ slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
         skriv(fC, U.opgave.c * 3);
         ind.click();
         paastand("et forkert tal: rødt på kortet, felterne farves, og hintknappen lyser stille", status.classList.contains("skidt") &&
-            /Ækvivalensvolumenet passer\. Koncentrationen passer ikke/.test(d.getElementById("ukendt-besked").textContent) &&
+            /Ækvivalensvolumenet passer\. Prøvens koncentration passer ikke/.test(d.getElementById("ukendt-besked").textContent) &&
             fV.classList.contains("ok") && fC.classList.contains("fejl") && knap.classList.contains("peg") && U.loest === null);
         skriv(fC, U.opgave.c);
         ind.click();

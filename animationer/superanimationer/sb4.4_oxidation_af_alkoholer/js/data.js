@@ -149,8 +149,8 @@
     /* Mild oxidation er med dichromat, og aldehydet destilleres fra. Kraftig
        oxidation er med permanganat i overskud (brugerens valg 3. nov. 2026) */
     D.MAADE = {
-        mild: { navn: "Mild oxidation", middel: "dichromat", tekst: "Mild oxidation med dichromat: aldehydet destilleres fra, så snart det er dannet." },
-        kraftig: { navn: "Kraftig oxidation", middel: "permanganat", tekst: "Kraftig oxidation med permanganat i overskud." }
+        mild: { navn: "Mild oxidation", middel: "dichromat", tekst: "Ved en mild oxidation med dichromat destilleres aldehydet fra, så snart det er dannet." },
+        kraftig: { navn: "Kraftig oxidation", middel: "permanganat", tekst: "Ved en kraftig oxidation bruges permanganat i overskud." }
     };
 
     /* ----- Fane 3: de ukendte alkoholer (Basiskemi B, Xperiment 24) --------------

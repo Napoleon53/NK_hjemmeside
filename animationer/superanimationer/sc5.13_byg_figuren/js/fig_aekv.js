@@ -47,7 +47,7 @@
         vb: [1000, 600],
         lag: [
             { navn: "Opskriften", pladser: ["koefficient", "ækvivalente mængder", "begrænsende faktor"],
-              ros: "Koefficienterne viser forholdet mellem stofmængderne. Det, der slipper op først, bestemmer, hvor meget der kan laves." }
+              ros: "Koefficienterne viser forholdet mellem stofmængderne. Det, der slipper op først, bestemmer, hvor meget der kan dannes." }
         ],
         pladser: [
             { id: "koefficient", ord: ["koefficient"], x: X.k3, y: 44, maal: [X.k3, SY - 30], dele: ["koef"],

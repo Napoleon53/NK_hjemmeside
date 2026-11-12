@@ -257,13 +257,13 @@
                 { t: "312 æg", f: "Du har skrevet 3 og 12 efter hinanden. Gang i stedet: 3 · 12." }
             ],
             hint: ["Der er 3 bakker, og hver bakke har 12 æg."],
-            forkl: "3 dusin er 3 · 12 = 36 æg. Et mol bruges på samme måde, bare med 6,02 · 10²³ i stedet for 12."
+            forkl: "3 dusin er 3 · 12 = 36 æg. Et mol bruges på samme måde, blot med 6,02 · 10²³ i stedet for 12."
         },
         {
             id: "molaeg", titel: "3 mol æg", scene: "saekke", antal: 3,
             spm: "1 mol æg er 6,02 · 10²³ æg. Hvor mange æg er der i 3 mol æg?",
             svar: [
-                { t: "6,0 · 10²³ æg", f: "Det er antallet af æg i 1 mol æg. Der er 3 mol, så gang med 3." },
+                { t: "6,0 · 10²³ æg", f: "6,0 · 10²³ æg er antallet af æg i 1 mol æg. Der er 3 mol, så gang med 3." },
                 { t: "2,0 · 10²³ æg", f: "Du har divideret med 3. 3 mol æg er flere æg end 1 mol, så gang med 3." },
                 { t: "6,0 · 10⁶⁹ æg", f: "Du har ganget potensen med 3. Gang i stedet tallet foran potensen med 3." },
                 { t: "1,8 · 10²⁴ æg", ok: true }
@@ -300,12 +300,12 @@
             spm: "Et H₂O-molekyle har 2 H-atomer. Hvor mange mol H-atomer er der i 1 mol H₂O?",
             svar: [
                 { t: "2 mol", ok: true },
-                { t: "1 mol", f: "1 mol er antallet af O-atomer i 1 mol H₂O. Hvert H₂O-molekyle har 2 H-atomer." },
-                { t: "3 mol", f: "3 mol er alle atomerne i 1 mol H₂O, både H og O. Kortet spørger kun om H-atomerne." },
+                { t: "1 mol", f: "1 mol er stofmængden af O-atomer i 1 mol H₂O. Hvert H₂O-molekyle har 2 H-atomer." },
+                { t: "3 mol", f: "3 mol er stofmængden af alle atomerne i 1 mol H₂O, både H og O. Kortet spørger kun om H-atomerne." },
                 { t: "0,5 mol", f: "Hvert H₂O-molekyle har 2 H-atomer, så der er flere H-atomer end molekyler." }
             ],
-            hint: ["1 H₂O-molekyle har 2 H-atomer. Så har 1 dusin H₂O-molekyler 2 dusin H-atomer."],
-            forkl: "Hvert H₂O-molekyle har 2 H-atomer og 1 O-atom. Så har 1 mol H₂O 2 mol H-atomer og 1 mol O-atomer."
+            hint: ["1 H₂O-molekyle har 2 H-atomer. Derfor har 1 dusin H₂O-molekyler 2 dusin H-atomer."],
+            forkl: "Hvert H₂O-molekyle har 2 H-atomer og 1 O-atom. Derfor har 1 mol H₂O 2 mol H-atomer og 1 mol O-atomer."
         },
         {
             id: "mennesker", titel: "Mol mennesker", scene: "mennesker",
@@ -317,7 +317,7 @@
                 { t: "5 · 10³³ mol", f: "Du har ganget med 6,02 · 10²³. Divider i stedet, for menneskene skal deles i portioner på 1 mol." }
             ],
             hint: ["n = antal / 6,02 · 10²³. Der er langt færre end 1 mol mennesker."],
-            forkl: "n = 8 · 10⁹ / 6,02 · 10²³ = 1 · 10⁻¹⁴ mol. Mol er alt for stort til mennesker. Det er lavet til atomer og molekyler."
+            forkl: "n = 8 · 10⁹ / 6,02 · 10²³ = 1 · 10⁻¹⁴ mol. Et mol er et alt for stort antal til mennesker, for enheden er lavet til at tælle atomer og molekyler."
         }
     ];
 

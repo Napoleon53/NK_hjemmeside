@@ -461,7 +461,7 @@
         var c = this.celle(id), F = this.stof(c.j).formel;
         if (c.raekke === "M") return "Skriv molarmassen af " + F + ".";
         if (c.raekke === "n" && c.fra === "m") return "Skriv stofmængden af " + F + ".";
-        if (c.raekke === "n") return "Gå over til " + F + ": skriv stofmængden af " + F + ".";
+        if (c.raekke === "n") return "Gå over til " + F + " med koefficienterne, og skriv stofmængden af " + F + ".";
         return "Skriv massen af " + F + ".";
     };
 

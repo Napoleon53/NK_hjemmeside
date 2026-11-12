@@ -51,7 +51,7 @@
     /* Felterne i panelet: id, navnet i en saetning og om det spoerges */
     var FELTER = [
         { id: "ukendt-svar-v", noegle: "V", navn: "ækvivalensvolumenet" },
-        { id: "ukendt-svar-c", noegle: "c", navn: "koncentrationen" },
+        { id: "ukendt-svar-c", noegle: "c", navn: "prøvens koncentration" },
         { id: "ukendt-svar-pks", noegle: "pKs", navn: "pKs" }
     ];
 
@@ -154,7 +154,7 @@
         var o = this.opgave;
         return "Du har fået " + NK.tal(o.V0, 1) + " mL af en ukendt " + (o.svag ? "svag " : "stærk ") +
             (o.erSyre ? "syre" : "base") + ". I buretten står " + NK.tal(o.cT, 4) + " M " + o.titrator.formel + ". " +
-            (o.svag ? "Hvad er ækvivalensvolumenet, koncentrationen og pKs?" : "Hvad er ækvivalensvolumenet og koncentrationen?");
+            (o.svag ? "Hvad er ækvivalensvolumenet, prøvens koncentration og pKs?" : "Hvad er ækvivalensvolumenet og prøvens koncentration?");
     };
 
     /* De felter, opgaven spoerger om */
@@ -167,8 +167,8 @@
         var o = this.opgave, t = o.titrator.formel;
         var h = [
             "Ækvivalenspunktet er dér, hvor pH-kurven er stejlest. Aflæs det tilsatte volumen af " + t + " dér.",
-            "Ved ækvivalenspunktet er n(" + t + ")\u00a0=\u00a0c\u00a0·\u00a0V. Prøven har lige så mange mol " +
-                (o.erSyre ? "syre" : "base") + ". Del med prøvens volumen."
+            "Ved ækvivalenspunktet er n(" + t + ")\u00a0=\u00a0c\u00a0·\u00a0V. Prøven har samme stofmængde " +
+                (o.erSyre ? "syre" : "base") + ". Divider med prøvens volumen."
         ];
         if (o.svag) h.push("pKs er pH ved det halve ækvivalensvolumen. Aflæs pH dér på kurven.");
         return h;
@@ -330,8 +330,8 @@
         if (forkert.length) {
             var x = forkert[0];
             if (!x.tal) dele.push("Skriv " + x.f.navn + " som et tal.");
-            else if (x.f.noegle === "V") dele.push("Ækvivalensvolumenet passer ikke. Find det, hvor kurven er stejlest.");
-            else if (x.f.noegle === "c") dele.push("Koncentrationen passer ikke. Brug n\u00a0=\u00a0c\u00a0·\u00a0V for " + o.titrator.formel + " ved ækvivalenspunktet.");
+            else if (x.f.noegle === "V") dele.push("Ækvivalensvolumenet passer ikke. Aflæs volumenet, hvor kurven er stejlest.");
+            else if (x.f.noegle === "c") dele.push("Prøvens koncentration passer ikke. Brug n\u00a0=\u00a0c\u00a0·\u00a0V for " + o.titrator.formel + " ved ækvivalenspunktet.");
             else dele.push("pKs passer ikke. Aflæs pH ved det halve ækvivalensvolumen.");
         } else {
             var mn = mangler.map(function (f) { return f.navn; });

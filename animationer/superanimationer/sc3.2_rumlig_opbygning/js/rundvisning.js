@@ -17,13 +17,13 @@
         { sel: "#byg-bindinger", titel: "Bindinger", tekst: "Her kan bindingerne også skiftes. En binding kan kun blive dobbelt eller tripel, hvis begge atomer har plads til det." },
         { sel: "#byg-molekyle", titel: "Det har du bygget", tekst: "Navnet står her, når du har bygget et kendt molekyle. Formen gælder for det valgte atom." },
 
-        { sel: "#fane-molekyler.aktiv .scene", titel: "Molekylet", tekst: "Træk for at dreje molekylet. Prikformlen i hjørnet er det samme molekyle." },
+        { sel: "#fane-molekyler.aktiv .scene", titel: "Molekylet", tekst: "Træk for at dreje molekylet. Prikformlen i hjørnet viser det samme molekyle." },
         { sel: "#mol-menu", titel: "Vælg molekyle", tekst: "Elleve molekyler med de fem former." },
 
         { sel: ".fane.aktiv .vinkelknap", titel: "Vinkelmåler", tekst: "Slå vinkelmåleren til, og klik på to atomer, der sidder på samme atom." },
         { sel: ".fane.aktiv .scenekort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst i scenen. Vælg et svar, eller byg molekylet, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },
         { sel: ".fane.aktiv .opgavekort", titel: "Opgaver", tekst: "Her kan du se, hvor mange opgaver du har løst. Start forfra begynder opgaverne på fanen forfra." },
-        { sel: "#teoriknap", titel: "Teori", tekst: "Korte afsnit om elektronparfrastødning og de fem former. De er ikke nødvendige for at bruge animationen." }
+        { sel: "#teoriknap", titel: "Teori", tekst: "Korte afsnit om, hvordan elektronpar frastøder hinanden, og om de fem former. De er ikke nødvendige for at bruge animationen." }
     ];
 
     var trin = [];

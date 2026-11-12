@@ -149,12 +149,12 @@
                 if (b.laast) return;
                 if (b.tekst === p.facit) { b.laast = true; b.groen = 1; return; }
                 if (!fejl) fejl = (b.tekst === "m" && p.facit === "M") || (b.tekst === "M" && p.facit === "m") ?
-                    "Lille m og stort M er to forskellige ting. Se det blege bogstav." : "Den passer ikke der. Se det blege bogstav.";
+                    "Lille m og stort M er to forskellige ting. Se det blege bogstav." : "Brikken passer ikke på den plads. Se det blege bogstav.";
                 mig.hjem(b, true);
             });
             if (fejl) { this.rystT = 0.4; this.fejlLinje(NK.html(fejl)); return; }
             if (this.pladserI("formel").every(function (q) { return !!q.brik; })) this.delLoest("formel", "ok");
-            else this.besked("De brikker, der står der, passer. " + this.trinLinje(), "god");
+            else this.besked("De brikker, der står på pladserne, passer. " + this.trinLinje(), "god");
             return;
         }
         var fyldte = Object.keys(this.dele).filter(function (del) {
@@ -185,7 +185,7 @@
         var mangler = Object.keys(d).filter(function (k) { return !d[k]; }).map(function (k) { return DELNAVN[k]; });
         if (!mangler.length) return "";
         if (r.ramme === "linje") return "Træk brikkerne op på de tomme pladser efter lighedstegnet, og tryk på Indsend svar.";
-        return "Træk brikkerne op: " + mangler.join(" og ") + ". Tryk så på Indsend svar.";
+        return "Træk brikkerne op til " + mangler.join(" og ") + ", og tryk derefter på Indsend svar.";
     };
 
     /* ----- Knappen: hint, trekant og svar -------------------------------------------- */
@@ -309,8 +309,8 @@
         var r = this.runde, f = this.formelFraPladser(), maal = r.maal;
         if (T.LOKKER[f.venstre]) return { besked: T.LOKKER[f.venstre] };
         if (f.venstre !== maal) {
-            if (r.ramme === "linje") return { besked: "Det er ikke en formel for " + maal + ". Isolér " + maal + ": den skal stå alene på venstre side." };
-            return { besked: "Formlen skal give stofmængden n. Den står alene på venstre side." };
+            if (r.ramme === "linje") return { besked: "Det er ikke en formel for " + maal + ". Isolér " + maal + ", så bogstavet står alene på venstre side." };
+            return { besked: "Formlen skal give stofmængden n, så n skal stå alene på venstre side." };
         }
         return T.vurder(maal, f.venstre, f.hoejre);
     };
@@ -387,9 +387,9 @@
     SimFormel.enhedFejl = function (sym, tekst) {
         if (tekst === "mol/g") return "mol/g er vendt om. Molarmassen er gram pr. mol.";
         if (tekst === "g · mol") return "Molarmassen er gram pr. mol. Pr. skrives med en brøkstreg, ikke et gangetegn.";
-        if (sym === "n") return tekst === "g" ? "Gram er massen. Stofmængden tælles i mol." : "Det er molarmassens enhed. Stofmængden er ikke pr. noget.";
-        if (sym === "m") return tekst === "mol" ? "Mol er stofmængden. Massen er det, vægten viser." : "Det er molarmassens enhed. Massen er det, vægten viser.";
-        if (sym === "M") return tekst === "g" ? "Gram er massen. Molarmassen er massen af 1 mol." : "Mol er stofmængden. Molarmassen er massen af 1 mol.";
+        if (sym === "n") return tekst === "g" ? "Gram er enheden for massen. Stofmængden tælles i mol." : "Det er molarmassens enhed. Stofmængden er ikke pr. noget.";
+        if (sym === "m") return tekst === "mol" ? "Mol er enheden for stofmængden. Massen er det, vægten viser." : "Det er molarmassens enhed. Massen er det, vægten viser.";
+        if (sym === "M") return tekst === "g" ? "Gram er enheden for massen. Molarmassen er massen af 1 mol." : "Mol er enheden for stofmængden. Molarmassen er massen af 1 mol.";
         return "Den enhed passer ikke.";
     };
 
@@ -457,7 +457,7 @@
         var e = T.normEnhed(s);
         if (e === D.ENHED_TEKST[id]) return { ok: true };
         if (id === "M" && e === "gmol") return { besked: "Gram pr. mol skrives med en brøkstreg: g/mol." };
-        if (id === "m" && e === "kg") return { besked: "I kemi vejes der i gram. Molarmassen er jo i g/mol." };
+        if (id === "m" && e === "kg") return { besked: "I kemi vejes der i gram, og molarmassen er i g/mol." };
         var brik = { "mol": "mol", "g": "g", "g/mol": "g/mol", "mol/g": "mol/g" }[e];
         if (brik) return { besked: SimFormel.enhedFejl(id, brik) };
         return { besked: "Den enhed kender jeg ikke her. Tryk på Giv hint, hvis du sidder fast." };

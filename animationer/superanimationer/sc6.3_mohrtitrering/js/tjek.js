@@ -68,13 +68,13 @@
         var t0 = tjekTom(raa, "rumfanget i mL");
         if (t0) return t0;
         var t = T.tal(raa);
-        if (!t) return { besked: "Skriv et tal, fx 10,65." };
+        if (!t) return { besked: "Skriv et tal, for eksempel 10,65." };
         var x = t.v;
         tol = tol === undefined ? 0.05 : tol;
         if (Math.abs(x - v) <= tol + 1e-9) return { ok: true };
         if (Math.abs(x - v / 1000) <= (tol + 1e-9) / 1000) return { besked: "Det er rumfanget i liter. Skriv det i mL her." };
         if (Math.abs(x - (K.BURET - v)) <= 0.15) return { besked: "Buretten tæller oppefra. 0 står øverst, så tallet ved menisken er forbruget." };
-        if (Math.abs(x - v) <= 0.25) return { besked: "Tæt på. Se på bunden af menisken, og tæl de korte streger: hver er 0,1 mL." };
+        if (Math.abs(x - v) <= 0.25) return { besked: "Tæt på. Se på bunden af menisken, og tæl de korte streger. Hver kort streg er 0,1 mL." };
         if (Math.abs(Math.abs(x - v) - 1) <= 0.1) return { besked: "Tjek de hele mL. De står ved de lange streger." };
         return { besked: "Aflæs tallet ved bunden af menisken i luppen." };
     };
@@ -86,7 +86,7 @@
         var t0 = tjekTom(raa, hvad);
         if (t0) return t0;
         var t = T.tal(raa);
-        if (!t) return { besked: id === "pct" ? "Skriv et tal, fx 3,11." : "Skriv et tal, fx 5,33 · 10^-4 eller 0,000533." };
+        if (!t) return { besked: id === "pct" ? "Skriv et tal, for eksempel 3,11." : "Skriv et tal, for eksempel 5,33 · 10^-4 eller 0,000533." };
         var v = t.v, f = o.facit;
         if (id === "nb") return nSoelv(v, o, f);
         if (id === "ns") return nSalt(v, o, f);
@@ -118,7 +118,7 @@
         if (naer(v, n / 2) || naer(v, n * 2)) return { besked: "Der står 1 foran både Ag⁺ og Cl⁻ i skemaet, og hver NaCl giver én Cl⁻. Forholdet er 1 : 1." };
         if (naer(v, n * K.M_NACL) || naer(v, n * K.M_CL) || naer(v, n * K.M_AGNO3)) return { besked: "Det er en masse. Her skal du bruge stofmængden." };
         if (kommaFlyttet(v, n)) return { besked: "Tjek potensen. Stofmængden er den samme som i trinnet før." };
-        if (taetPaa(v, n)) return { besked: "Tæt på. Det er præcis den samme stofmængde som n(Ag⁺)." };
+        if (taetPaa(v, n)) return { besked: "Tæt på. n(NaCl) er præcis den samme stofmængde som n(Ag⁺)." };
         return { besked: "Én Ag⁺ reagerer med én Cl⁻. Hvor mange mol Ag⁺ fandt du?" };
     }
 
@@ -126,10 +126,10 @@
         var n = f.ns, m = f.ms;
         if (naer(v, m)) return { ok: true };
         if (naer(v, n * K.M_CL)) return { besked: "35,45 g/mol er molarmassen for chlorid. Her skal du bruge natriumchlorids, 58,44 g/mol." };
-        if (naer(v, n * K.M_AGNO3)) return { besked: "169,87 g/mol er molarmassen for sølvnitrat. Her skal du bruge natriumchlorids, 58,44 g/mol." };
-        if (naer(v, n * K.M_AGCL)) return { besked: "143,32 g/mol er molarmassen for sølvchlorid. Her skal du bruge natriumchlorids, 58,44 g/mol." };
+        if (naer(v, n * K.M_AGNO3)) return { besked: "169,87 g/mol er molarmassen for sølv(I)nitrat. Her skal du bruge natriumchlorids, 58,44 g/mol." };
+        if (naer(v, n * K.M_AGCL)) return { besked: "143,32 g/mol er molarmassen for sølv(I)chlorid. Her skal du bruge natriumchlorids, 58,44 g/mol." };
         if (naer(v, n / K.M_NACL) || naer(v, K.M_NACL / n)) return { besked: "Du har divideret. m = n · M." };
-        if (naer(v, o.m)) return { besked: "Det er hele prøvens masse. Her er det kun natriumchloridet." };
+        if (naer(v, o.m)) return { besked: "Det er hele prøvens masse. Her skal du kun finde massen af natriumchlorid." };
         if (naer(v, n)) return { besked: "Det er stofmængden. Gang den med molarmassen." };
         if (kommaFlyttet(v, m)) return { besked: "Tjek kommaet. Tallet er for " + (v > m ? "stort." : "lille.") };
         if (taetPaa(v, m)) return { besked: "Tæt på. Regn med alle cifrene: " + K.mol(n) + " mol · 58,44 g/mol." };
@@ -141,7 +141,7 @@
         if (naer(v, p)) return { ok: true };
         if (naer(v, p / 100)) return { besked: "Det er brøkdelen. Gang med 100 % for at få procent." };
         if (naer(v, mp / ms * 100) || naer(v, mp / ms)) return { besked: "Du har divideret den forkerte vej. Saltets masse skal stå øverst i brøken." };
-        if (naer(v, ms * 100)) return { besked: "Del også med prøvens masse, " + NK.tal2(mp) + " g." };
+        if (naer(v, ms * 100)) return { besked: "Divider også med prøvens masse, " + NK.tal2(mp) + " g." };
         if (kommaFlyttet(v, p)) return { besked: "Tjek kommaet. Havvand er nogle få procent salt." };
         if (taetPaa(v, p)) return { besked: "Tæt på. Regn med alle cifrene: " + K.gram(ms) + " g / " + NK.tal2(mp) + " g · 100 %." };
         return { besked: "m% = m(NaCl) / m(prøve) · 100 %." };
@@ -176,7 +176,7 @@
                      [/^m(_b)?\/M(_b)?$/, "Den formel bruges, når man kender massen. Her kender du koncentration og rumfang."]] },
         ns: { rigtig: /^(n_b|c(_b)?v(_b)?|v(_b)?c(_b)?)$/,
               omskrevet: [[/^n_b$/, /^n(_s)?$/]],
-              fejl: [[/^n$/, "Skriv hvilken stofmængde: n(Ag⁺)."],
+              fejl: [[/^n$/, "Skriv n(Ag⁺), så det er tydeligt, hvilken stofmængde du mener."],
                      [/^n_s$/, "n(Cl⁻) er det samme som n(NaCl). Hvilken stofmængde fandt du i trinnet før?"],
                      [/(^2|2$|\/2)/, "Der står 1 foran både Ag⁺ og Cl⁻ i skemaet. Forholdet er 1 : 1."],
                      [/^m/, "Her skal du finde stofmængden, ikke massen."]] },
@@ -188,7 +188,7 @@
                omskrevet: [],
                fejl: [[/^m(_s)?\/m_p$/, "Det giver brøkdelen. Gang med 100 % for at få procent."],
                       [/^(m_p\/m(_s)?(100)?|100m_p\/m(_s)?)$/, "Saltets masse skal stå øverst i brøken."],
-                      [/^m(_s)?\/m(_s)?100$/, "Skriv, hvilke masser der deles: m(NaCl) og m(prøve)."]] }
+                      [/^m(_s)?\/m(_s)?100$/, "Skriv, hvilke masser der divideres: m(NaCl) og m(prøve)."]] }
     };
 
     T.formel = function (id, raa) {

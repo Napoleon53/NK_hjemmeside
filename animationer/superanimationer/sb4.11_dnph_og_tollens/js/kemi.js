@@ -161,7 +161,7 @@
         if (kl === "alkohol") return V + " er ikke et aldehyd. Tollens' reagens er et mildt oxidationsmiddel, som kun oxiderer aldehyder.";
         if (kl === "carboxylsyre") return "Carbonatomet i carboxylgruppen har intet H. Syren er oxideret så langt, den kan.";
         if (kl === "ester") return "Carbonatomet i estergruppen har intet H, og " + vist + " er ikke et aldehyd.";
-        return "Tollens' test viser kun aldehyder.";
+        return "Tollens' test påviser kun aldehyder.";
     };
 
     /* Forklaringen, naar svaret er rigtigt */
@@ -288,7 +288,7 @@
         if (valgt.some(function (x) { return el(mol, x) === "N"; }))
             return "Nitrogenatomerne bliver i molekylet. Vand er H₂O: ét oxygenatom og to hydrogenatomer.";
         if (!o.length) return "Vand er H₂O. Oxygenatomet kommer fra carbonylgruppen, C=O.";
-        if (h.length !== 2 || o.length !== 1) return "Vand er H₂O: vælg ét oxygenatom og to hydrogenatomer.";
+        if (h.length !== 2 || o.length !== 1) return "Vand er H₂O. Vælg ét oxygenatom og to hydrogenatomer.";
         return "Vælg oxygenatomet i C=O og de to H på NH₂-gruppen.";
     };
 

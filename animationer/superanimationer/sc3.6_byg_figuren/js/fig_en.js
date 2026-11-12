@@ -76,7 +76,7 @@
         vb: [1000, 540],
         lag: [
             { navn: "Hvem trækker mest?", pladser: ["elektronegativitet", "upolær binding", "polær binding", "ionbinding"],
-              ros: "Jo større forskel i elektronegativitet, jo mere skævt deles parret. Ved en stor forskel bliver det til ioner og en ionbinding." }
+              ros: "Jo større forskel i elektronegativitet, jo mere skævt deles elektronparret. Ved en stor forskel dannes der ioner og en ionbinding." }
         ],
         pladser: [
             { id: "elektronegativitet", ord: ["elektronegativitet"], x: TB.x + TB.b / 2, y: TB.y, maal: [TB.x + TB.b / 2, TB.y], titel: true, dele: ["tabel"],

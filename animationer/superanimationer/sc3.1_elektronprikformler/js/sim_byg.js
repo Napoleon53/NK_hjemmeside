@@ -265,7 +265,7 @@
             var z = this.atomZ(), el = D.EL[z];
             return [
                 "Find " + el.s + " i det periodiske system til højre. Hovedgruppens nummer er antallet af elektroner i yderste skal.",
-                z === 1 ? "H står i hovedgruppe 1 og har 1 elektron. Den sættes ved én af siderne." :
+                z === 1 ? "H står i hovedgruppe 1 og har 1 elektron. Elektronen sættes ved én af symbolets sider." :
                     el.s + " står i hovedgruppe " + el.g + ". De første fire elektroner får hver sin side af symbolet. Først derefter danner de par."
             ];
         }

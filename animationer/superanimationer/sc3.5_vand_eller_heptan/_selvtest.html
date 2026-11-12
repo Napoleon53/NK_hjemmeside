@@ -467,7 +467,7 @@ function koerTest(W) {
         /6 C-atomer og 1 polær gruppe/.test(tbLinje("gaet")));
     svar("gaet", G, "polaert");
     paastand("svaret er valgt, og nu skal det testes", G.fase === "test" && G.svarPol === "polaert" &&
-        /træk pipetten ned i det glas, et polært stof blandes med/.test(tbLinje("gaet")) && svarKnap("gaet", "polaert").classList.contains("valgt"));
+        /Træk pipetten ned i det glas, et polært stof blandes med/.test(tbLinje("gaet")) && svarKnap("gaet", "polaert").classList.contains("valgt"));
     traek(G, 1);
     steg(G, 0.4);
     paastand("et glas, der ikke passer til svaret, giver en forklaring", G.fase === "test" && G.glas[1].tom() &&

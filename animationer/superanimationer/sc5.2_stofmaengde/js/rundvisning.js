@@ -27,7 +27,7 @@
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Flest atomer: gæt, hvor der er flest. Afvejning: regn massen ud for en ordre." }
         ],
         "fane-atomer": [
-            { sel: "#atomer-anker-vaegte", titel: "Vægtene", tekst: "En prøve på hver vægt. De viser massen, til du har svaret. Så tæller de atomerne." },
+            { sel: "#atomer-anker-vaegte", titel: "Vægtene", tekst: "En prøve på hver vægt. De viser massen, til du har svaret. Efter dit svar tæller de atomerne." },
             { sel: "#atomer-skort", titel: "Dit svar", tekst: "Kortet øverst i scenen spørger, hvor der er flest atomer. Vælg et svar, og tryk Indsend svar. Piletasterne vælger også." },
             { sel: "#atomer-anker-skilt", titel: "Skiltet", tekst: "Prøverne står her. Hintet giver molarmasserne, og efter svaret står beregningen der." },
             { sel: "#atomer-runden", titel: "Runden", tekst: "Ni par. Her står dine rigtige svar og din rekord. Ny runde giver ni nye par." }
@@ -36,7 +36,7 @@
             { sel: "#afvej-skort", titel: "Ordren", tekst: "Kortet øverst i scenen viser stofmængden, der skal afvejes. Giv hint giver et hint og derefter svaret." },
             { sel: "#afvej-regn", titel: "Regnestykket", tekst: "Skriv massen her, og tryk Indsend svar eller Enter." },
             { sel: "#afvej-anker-krukke", titel: "Krukken", tekst: "Molarmassen står på etiketten." },
-            { sel: "#afvej-anker-plakat", titel: "Plakaten", tekst: "Formlen for massen. Enhederne går op: mol · g/mol giver g." },
+            { sel: "#afvej-anker-plakat", titel: "Plakaten", tekst: "Formlen for massen. Mol går ud med mol, så mol · g/mol giver g." },
             { sel: "#afvej-anker-vaegt", titel: "Vægten", tekst: "Den afvejer, når massen er rigtig." },
             { sel: "#afvej-fremskridt", titel: "Ordrerne", tekst: "En ordre, du løser uden at se svaret, får en stjerne. Klik på et niveau for at tage dets næste ordre." }
         ]

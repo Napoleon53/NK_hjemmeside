@@ -82,8 +82,8 @@
         this.farv(res);
         if (liste.indexOf(navn) >= 0) {
             this.sidst = { navn: navn, igen: true };
-            this.besked((this.vist[this.n][navn] ? "Den blev vist" : "Den har du allerede") + ": <b>" + NK.html(navn) +
-                "</b>. Den er bare tegnet på en anden måde. Højreklik på enderne, og tegn en ny.", "skidt");
+            this.besked((this.vist[this.n][navn] ? "Den isomer blev vist" : "Den isomer har du allerede") + ": <b>" + NK.html(navn) +
+                "</b>. Molekylet er blot tegnet på en anden måde. Højreklik på enderne, og tegn en ny.", "skidt");
             this.visPanel();
             return;
         }
@@ -169,7 +169,7 @@
             this.hjaelp = 1;
             var m = mangler[0], k = m.res.kaede.length, sg = m.res.sub.length;
             this.besked("<b>Hint:</b> Der mangler " + (mangler.length === 1 ? "én isomer" : mangler.length + " isomerer") +
-                ". En af dem har en hovedkæde på " + k + " C og " + (sg ? (sg === 1 ? "én sidegruppe" : sg + " sidegrupper") : "ingen sidegrupper") + ".", "gul");
+                ". En af dem har en hovedkæde på " + k + " C-atomer og " + (sg ? (sg === 1 ? "én sidegruppe" : sg + " sidegrupper") : "ingen sidegrupper") + ".", "gul");
             this.visPanel();
             return;
         }
@@ -183,7 +183,7 @@
         this.farv(NK.Navn.analyser(this.braet.mol));
         this.braet.laast = true;
         this.venter = !this.faerdig();
-        this.besked("Her er en: <b>" + NK.html(vis.navn) + "</b>. Den er skrevet på listen.", "gul");
+        this.besked("Her er en af de manglende isomerer: <b>" + NK.html(vis.navn) + "</b>. Den er skrevet på listen.", "gul");
         if (this.faerdig()) {
             this.besked("Her er den sidste: <b>" + NK.html(vis.navn) + "</b>. Alle isomerer af " + this.formel() + " er på listen.", "gul");
             this.klaretNiveau();

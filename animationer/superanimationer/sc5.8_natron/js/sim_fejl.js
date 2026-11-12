@@ -100,7 +100,7 @@
         this.hjaelp = 0;
         if (maade === "svar") {
             this.brugtSvar = true;
-            this.svarVis(NK.html("Den rigtige: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene."));
+            this.svarVis(NK.html("Det rigtige svar: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene."));
         } else {
         }
         this.start();

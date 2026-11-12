@@ -173,27 +173,27 @@
         { o: "hotdog", slags: "disk", antal: 3, bon: "Så mange som muligt", fyld: { agurk: 6 }, tomt: ["agurk"],
           tekst: "Der er kun 6 agurkeskiver tilbage. Lav så mange hotdogs, som de rækker til.",
           hint: "Hver hotdog skal have 2 agurkeskiver. Hvor mange gange går 2 op i 6?",
-          efter: "6 agurkeskiver rækker til 3 hotdogs. Så skal der 3 pølser og 3 brød til." },
+          efter: "6 agurkeskiver rækker til 3 hotdogs, og de 3 hotdogs skal have 3 pølser og 3 brød." },
         { o: "hotdog", slags: "tal", antal: 6, bon: "6 hotdogs",
           tekst: "Bord 3 vil have 6 hotdogs. Hvor meget skal du bruge af hver?",
           efter: "6 pølser, 6 brød og 12 agurkeskiver. Det er opskriften 6 gange." },
         { o: "hotdog", slags: "begr", bon: "Så mange som muligt", fyld: { poelse: 10, broed: 10, agurk: 10 },
-          tekst: "Der ligger 10 af hver. Det, der slipper op først, er den begrænsende ingrediens. Det, der bliver tilbage, er i overskud." },
+          tekst: "Der ligger 10 af hver ingrediens. Det, der slipper op først, er den begrænsende ingrediens. Det, der bliver tilbage, er i overskud." },
         { o: "hotdog", slags: "begr", bon: "Så mange som muligt", fyld: { poelse: 8, broed: 10, agurk: 12 },
-          tekst: "Der ligger 8 pølser, 10 brød og 12 agurkeskiver." },
+          tekst: "Der ligger 8 pølser, 10 brød og 12 agurkeskiver. Hvor mange hotdogs kan du lave?" },
         { o: "hotdog", slags: "begr", bon: "Så mange som muligt", fyld: { poelse: 12, broed: 5, agurk: 12 },
-          tekst: "Der ligger 12 pølser, 5 brød og 12 agurkeskiver." },
+          tekst: "Der ligger 12 pølser, 5 brød og 12 agurkeskiver. Hvor mange hotdogs kan du lave?" },
         { o: "burger", slags: "disk", antal: 2, bon: "2 dobbeltburgere",
-          tekst: "Vognen sælger nu også dobbeltburgere. Opskriften står på skiltet. Bord 7 vil have 2.",
+          tekst: "Vognen sælger nu også dobbeltburgere. Opskriften står på skiltet. Bord 7 vil have 2 dobbeltburgere.",
           hint: "1 bolle, 2 bøffer og 3 skiver ost pr. dobbeltburger.",
           efter: "2 boller, 4 bøffer og 6 skiver ost. Forholdet er stadig 1 : 2 : 3." },
         { o: "burger", slags: "tal", antal: 4, bon: "4 dobbeltburgere",
           tekst: "Bord 8 vil have 4 dobbeltburgere. Hvor meget skal du bruge af hver?",
           efter: "4 boller, 8 bøffer og 12 skiver ost. Det er opskriften 4 gange." },
         { o: "burger", slags: "begr", bon: "Så mange som muligt", fyld: { bolle: 5, boef: 8, ost: 9 },
-          tekst: "Der ligger 5 boller, 8 bøffer og 9 skiver ost." },
+          tekst: "Der ligger 5 boller, 8 bøffer og 9 skiver ost. Hvor mange dobbeltburgere kan du lave?" },
         { o: "burger", slags: "begr", bon: "Så mange som muligt", fyld: { bolle: 6, boef: 7, ost: 12 },
-          tekst: "Der ligger 6 boller, 7 bøffer og 12 skiver ost." }
+          tekst: "Der ligger 6 boller, 7 bøffer og 12 skiver ost. Hvor mange dobbeltburgere kan du lave?" }
     ];
 
     /* Det, der regnes ud: hvor langt hver ingrediens raekker, den
@@ -225,7 +225,7 @@
                 }));
             var B = D.ingrediens(o.begr), over = ops.led.filter(function (l) { return o.over[l[0]] > 0; })
                 .map(function (l) { return D.stk(l[0], o.over[l[0]]); });
-            o.efter = D.stort(B.bestemt) + " er begrænsende: " + D.stk(o.begr, r.fyld[o.begr]) + " rækker til " +
+            o.efter = D.stort(B.bestemt) + " er den begrænsende ingrediens, for " + D.stk(o.begr, r.fyld[o.begr]) + " rækker til " +
                 D.produkt(ops, o.P) + ". " + D.liste(over) + " er i overskud.";
             if (o.over[o.begr] > 0) {
                 o.efter += " " + D.stort(D.stk(o.begr, o.over[o.begr])) + " er ikke nok til en " + ops.navn + " mere.";
@@ -252,7 +252,7 @@
           efter: "2 H₂ og 1 O₂ gav 2 H₂O. Alle atomerne blev brugt." },
         { r: "vand", enhed: "stk", krav: { H2O: 6 },
           tekst: "Lav 6 vandmolekyler uden rester.",
-          hint: "6 H₂O er opskriften 3 gange. Så skal der 3 gange så meget af hvert stof.",
+          hint: "6 H₂O er opskriften 3 gange, så der skal bruges 3 gange så meget af hvert stof.",
           efter: "6 H₂ og 3 O₂ gav 6 H₂O. Forholdet er stadig 2 : 1 : 2." },
         { r: "ammoniak", enhed: "stk", krav: { NH3: 4 }, fyld: { N2: 2 },
           tekst: "Der er 2 N₂ i kammeret. Tilsæt det H₂, der skal til.",

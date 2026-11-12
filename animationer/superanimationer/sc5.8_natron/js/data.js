@@ -92,7 +92,7 @@
     D.FORSOEG = [
         { id: "konstant", titel: "Varm natron til konstant masse",
           tekst: "Varm natronen i diglen, og vej den, til massen ikke ændrer sig mere.",
-          trin: ["Vej natronen, før du varmer.", "Varm den, lad den køle af, og vej den.", "Gentag, til to vejninger i træk er ens."],
+          trin: ["Vej natronen, før du varmer.", "Varm diglen, lad den køle af, og vej den.", "Gentag, til to vejninger i træk er ens."],
           valg: { spm: "Hvad tror du, der bliver tilbage i diglen, når natron varmes op?",
                   hint: "Natron er NaHCO₃. Gasser forsvinder op i luften. Hvilket fast stof kan blive tilbage?",
                   svar: [{ id: "A", t: "A: Na₂O" }, { id: "B", t: "B: Na₂CO₃" }, { id: "C", t: "C: NaOH" }] } }
@@ -104,7 +104,7 @@
         foer: "Aflæs vægten under diglen. Skriv massen af natron i skemaet til højre.",
         flyt: "Sæt diglen på trefoden. Træk den derhen, eller klik på den.",
         taend: "Tænd brænderen under trefoden. Start med lav flamme.",
-        varm: "Natronen varmes op. Sluk, når du vil veje, og flyt diglen over på vægten.",
+        varm: "Natronen varmes op. Sluk brænderen, når du vil veje, og flyt diglen over på vægten.",
         vaegtVent: "Diglen er varm. Vent, til vægten står stille, og aflæs den så.",
         vej: "Vægten står stille. Skriv massen i skemaet til højre.",
         igen: "Sæt diglen tilbage på trefoden, og varm igen.",
@@ -112,11 +112,11 @@
     };
 
     D.HINT = {
-        foer: "Tallet står på displayet under diglen. Skriv det med to decimaler.",
+        foer: "Massen står på displayet under diglen. Skriv den med to decimaler.",
         flyt: "Klik på diglen, eller træk den over på trefoden.",
         taend: "Klik på knappen Lav under brænderen. Høj flamme fra start får pulveret til at sprøjte.",
         varm: "Et par minutter ad gangen er fint. Klik på Sluk, og træk diglen over på vægten.",
-        vaegtVent: "En varm digel vejer for lidt. Tallet står stille, når diglen er kølet af.",
+        vaegtVent: "En varm digel vejer for lidt. Tallet på vægten står stille, når diglen er kølet af.",
         vej: "Skriv tallet fra displayet med to decimaler.",
         igen: "Konstant masse betyder, at massen ikke ændrer sig, selv om du varmer mere.",
         slukket: "Klik på Lav eller Høj under brænderen."
@@ -126,7 +126,7 @@
         foer: "Vægten viser {m} g.",
         flyt: "Diglen står på trefoden.",
         taend: "Brænderen er tændt med lav flamme.",
-        varm: "Tiden går hurtigere, til der er gået nok minutter.",
+        varm: "Tiden går hurtigere, til natronen har været varmet længe nok.",
         vaegtVent: "Tiden går hurtigere, til diglen er kølet af.",
         vej: "Vægten viser {m} g.",
         igen: "Diglen kommer tilbage på trefoden, og brænderen tændes.",
@@ -160,17 +160,17 @@
         afstem: { navn: "Afstem skemaet" },
         n_nat: { navn: "Stofmængden af natron", enhed: "mol", op: "/", led: ["m(NaHCO₃)", "M(NaHCO₃)"],
                  formelHint: "Du kender massen af natron og skal finde stofmængden. Formlen begynder sådan: n(NaHCO₃) = m / …",
-                 indsaetHint: ["Øverst står massen af natron fra skemaet: {a}.", "Nederst står molarmassen af natron: {b}. Den står på tavlen."],
+                 indsaetHint: ["Over brøkstregen står massen af natron fra opgavens tal: {a}.", "Under brøkstregen står molarmassen af natron: {b}. Den står på tavlen."],
                  talHint: "Tast {a0} : {b0}. Gram går ud med gram, så svaret er i mol." },
         n_p: { navn: "Stofmængden af {P}", enhed: "mol",
                formelHint: { "2": "Se tallene foran NaHCO₃ og {P} i skemaet. 2 NaHCO₃ giver 1 {P}. Formlen begynder sådan: n({P}) = n(NaHCO₃) …",
                              "1": "Se tallene foran NaHCO₃ og {P} i skemaet. Der står 1 foran begge." },
-               indsaetHint: ["Øverst står stofmængden af natron fra første opgave: {a}.", "Nederst står det tal, der står foran NaHCO₃ i skemaet: 2."],
+               indsaetHint: ["Over brøkstregen står stofmængden af natron fra første opgave: {a}.", "Under brøkstregen står det tal, der står foran NaHCO₃ i skemaet: 2."],
                talHint: { "2": "Tast {a0} : 2. Der bliver halvt så mange mol {P} som mol natron.",
                           "1": "Forholdet er 1 : 1. Der bliver lige så mange mol {P} som mol natron: {a0} mol." } },
         m_p: { navn: "Massen af {P}", enhed: "g", op: "*",
                formelHint: "Du kender stofmængden af {P} og skal finde massen. Formlen begynder sådan: m({P}) = n({P}) · …",
-               indsaetHint: ["Først stofmængden af {P}: {a}.", "Molarmassen af {P} står på tavlen: {b}."],
+               indsaetHint: ["Det første tal er stofmængden af {P}: {a}.", "Molarmassen af {P} står på tavlen: {b}."],
                talHint: "Tast {a0} · {b0}. Mol går ud med mol, så svaret er i g." }
     };
 
@@ -184,12 +184,12 @@
 
     D.DOM = {
         spm: "Hvilken hypotese passer med den masse, du målte?",
-        ikkeKonstant: "Massen i din digel er ikke konstant endnu. Varm videre på fanen Forsøget, til to vejninger i træk er ens. Så kan du sammenligne.",
+        ikkeKonstant: "Massen i din digel er ikke konstant endnu. Varm videre på fanen Forsøget, til to vejninger i træk er ens. Derefter kan du sammenligne massen med hypoteserne.",
         konstantHint: "Først når massen er konstant, ved du, hvad der er tilbage i diglen. Varm videre på fanen Forsøget.",
-        hint: "Sammenlign massen i skemaet med de tre streger på grafen. Hvilken streg ender kurven på?",
-        rigtig: "Natron bliver til natriumcarbonat, soda. Gassen er CO₂ og vand.",
+        hint: "Sammenlign slutmassen med de tre streger på grafen. Hvilken streg ender kurven på?",
+        rigtig: "Natron bliver til natriumcarbonat, soda. Det, der forsvinder som gas, er CO₂ og vand.",
         skema: "2 NaHCO₃ → Na₂CO₃ + CO₂ + H₂O",
-        sprojt: "Det passer med dine tal. Men pulveret sprøjtede ud af diglen, og så vejer diglen for lidt. Lav forsøget igen, og start med lav flamme."
+        sprojt: "Den hypotese passer med dine tal, men pulveret sprøjtede ud af diglen, så diglen vejer for lidt. Lav forsøget igen, og start med lav flamme."
     };
 
     /* ----- Fane 3: fejlkilderne -----------------------------------------------------
@@ -216,13 +216,13 @@
           hint: "Er al natronen nået at blive til fast stof og gas efter 2 minutter?",
           forkl: "Efter 2 minutter er der stadig natron i diglen, og der er forsvundet mindre gas. Slutmassen bliver for høj.",
           fejl: { lavere: "Der er ikke forsvundet mere gas hos gruppe 2. Der er forsvundet mindre, fordi de stoppede for tidligt.",
-                  samme: "Det samme ville kun passe, hvis al natronen var omdannet efter 2 minutter." } },
+                  samme: "Slutmassen ville kun blive den samme, hvis al natronen var omdannet efter 2 minutter." } },
         { id: "varm", titel: "Vejet varm", kort: "vejer diglen varm", rigtig: "lavere", B: { varmVejning: true },
           tekst: "Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.",
           hint: "Den varme digel varmer luften omkring sig. Varm luft stiger op.",
           forkl: "Varm luft stiger op fra diglen og løfter den en smule. Vægten viser for lidt, så slutmassen bliver for lav.",
           fejl: { hoejere: "En varm digel vejer ikke mere. Den varme luft, der stiger op, løfter den, så vægten viser mindre.",
-                  samme: "Vægten kan mærke den varme luft, der stiger op. Den viser for lidt, til diglen er kølet af." } },
+                  samme: "Vægten kan mærke den varme luft, der stiger op, og viser for lidt, til diglen er kølet af." } },
         { id: "sproejt", titel: "Høj flamme fra start", kort: "høj flamme fra start", rigtig: "lavere", B: { hoejFraStart: true },
           tekst: "Gruppe 2 skruer op for fuld flamme med det samme.",
           hint: "Hvad sker der, når der pludselig dannes meget gas i et pulver?",
@@ -240,7 +240,7 @@
           hint: "Hvad er der tilbage i diglen efter 5 minutter? Kan det også sønderdeles?",
           forkl: "Efter 5 minutter er al natronen blevet til Na₂CO₃, og så sker der ikke mere. Na₂CO₃ tåler flammen. Mere tid giver den samme slutmasse.",
           fejl: { hoejere: "Længere tid kan ikke gøre diglen tungere. Der kommer intet til.",
-                  lavere: "Det ville passe, hvis stoffet i diglen blev ved med at give gas. Men når al natronen er omdannet, sker der ikke mere." } },
+                  lavere: "Slutmassen ville kun blive mindre, hvis stoffet i diglen blev ved med at give gas. Men når al natronen er omdannet, sker der ikke mere." } },
         { id: "soda", titel: "Den forkerte krukke", kort: "tager soda", rigtig: "hoejere", B: { soda: true },
           tekst: "Gruppe 2 tager fejl af krukkerne. De varmer 5,10 g soda, Na₂CO₃, i stedet for natron.",
           hint: "Soda er det, natron bliver til. Kan det give mere gas?",
@@ -260,13 +260,13 @@
     };
     D.FAERDIG = {
         forsoeg: "Færdig.",
-        hypoteser: "Vægten har talt. Det er B.",
-        fejl: "Alle seks. Vægten ser kun det, der er i diglen."
+        hypoteser: "Massen i diglen passer med hypotese B.",
+        fejl: "Alle seks opgaver er løst. Vægten ser kun det, der er i diglen."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
 
-    D.KRUKKE = "Natron, natriumhydrogencarbonat. Det står også i bagepulver.";
+    D.KRUKKE = "Natron er natriumhydrogencarbonat og bruges i bagepulver.";
 
     NK.Data = D;
 }());

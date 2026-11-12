@@ -57,7 +57,7 @@
         if (naer(v, n * st.z)) return { besked: st.z + " er atomnummeret for " + st.s + ". Brug molarmassen på krukken." };
         var anden = null;
         D.STOFFER.forEach(function (x) { if (!anden && x !== st && naer(v, n * x.M / 100)) anden = x; });
-        if (anden) return { besked: "Det passer med molarmassen for " + anden.navn + ". Krukken her er " + st.navn + "." };
+        if (anden) return { besked: "Dit tal passer med molarmassen for " + anden.navn + ", men krukken indeholder " + st.navn + "." };
         if (naer(v, m * 10) || naer(v, m / 10) || naer(v, m * 100) || naer(v, m / 100)) {
             return { besked: "Tjek kommaet. Tallet er for " + (v > m ? "stort." : "lille.") };
         }

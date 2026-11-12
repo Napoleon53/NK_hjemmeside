@@ -161,7 +161,7 @@
         if (o.forsoeg) trin.push(["forsoeg", "Lav indgrebet"]);
         trin.push(["felter", "Sæt tallene ind, og regn Y ud"]);
         trin.push(["spm", "Sammenlign Y med K"]);
-        if (o.spm2) trin.push(["spm2", "Et fast stof"]);
+        if (o.spm2) trin.push(["spm2", "Mere fast NH₄Cl"]);
         var html = "";
         trin.forEach(function (t, i) {
             var idx = g.faser.indexOf(t[0]);
@@ -224,9 +224,9 @@
             else if (isNaN(t.v)) fejl = { f: res, t: "Skriv Y som et tal, fx 0,50." };
             else if (Math.abs(t.v - Ys) > 0.02 * Ys) {
                 var uden = M.Y({ over: r.over.map(function (d) { return { s: d.s, n: 1 }; }), under: r.under }, this.c);
-                if (r.over.some(function (d) { return d.n > 1; }) && Math.abs(t.v - uden) <= 0.02 * uden) fejl = { f: res, t: "Husk, at [NO₂] står i anden. Gang tallet med sig selv, før du deler." };
-                else if (Math.abs(t.v - 1 / Ys) <= 0.02 / Ys) fejl = { f: res, t: "Du har regnet brøken på hovedet. Det, der står over brøkstregen, skal deles med det, der står under." };
-                else fejl = { f: res, t: "Regn efter. Gang tallene over brøkstregen, gang tallene under, og del." };
+                if (r.over.some(function (d) { return d.n > 1; }) && Math.abs(t.v - uden) <= 0.02 * uden) fejl = { f: res, t: "Husk, at [NO₂] står i anden. Gang tallet med sig selv, før du dividerer." };
+                else if (Math.abs(t.v - 1 / Ys) <= 0.02 / Ys) fejl = { f: res, t: "Du har regnet brøken på hovedet. Tallene over brøkstregen skal divideres med tallene under brøkstregen." };
+                else fejl = { f: res, t: "Regn efter. Gang tallene over brøkstregen, gang tallene under brøkstregen, og divider." };
             } else {
                 var e = (t.enhed || "").replace(/\s+/g, "").toUpperCase();
                 var skal = r.enhed === "M²" ? "M2" : r.enhed;

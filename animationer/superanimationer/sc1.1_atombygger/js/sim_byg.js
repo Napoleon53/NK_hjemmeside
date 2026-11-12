@@ -236,7 +236,7 @@
             kerneTekst = g.symbol + "-" + a + " findes i naturen (" + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af alt " + g.navn.toLowerCase() + ").";
             kerneKlasse = "god";
         } else if (k.art === "radioaktiv") {
-            kerneTekst = "☢ " + g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
+            kerneTekst = "☢ " + g.symbol + "-" + a + " findes, men er radioaktiv. Isotopen " + k.isotop.note + ".";
             kerneKlasse = "gul";
         } else {
             kerneTekst = "Der findes ingen kerne med " + this.p + " protoner og " + this.n + " neutroner. Den ville falde fra hinanden.";
@@ -285,9 +285,9 @@
             var g = tilfaeldig(D.GRUNDSTOFFER);
             var i = tilfaeldig(g.isotoper);
             return {
-                tekst: "Byg et neutralt atom af " + g.navn.toLowerCase() + " (" + g.symbol + ") med massetal " + i.a + ".",
+                tekst: "Byg et neutralt atom af " + g.navn.toLowerCase() + " (" + g.symbol + ") med nukleontal " + i.a + ".",
                 p: g.z, n: i.a - g.z, e: g.z,
-                svar: "Massetal = protoner + neutroner, så " + i.a + " − " + g.z + " = "
+                svar: "Nukleontal = protoner + neutroner, så " + i.a + " − " + g.z + " = "
                     + NK.talform(i.a - g.z, "neutron", "neutroner") + ". Neutralt betyder lige mange elektroner som protoner."
             };
         },
@@ -318,7 +318,7 @@
                 tekst: "Naturens " + g.navn.toLowerCase() + " er for det meste " + g.symbol + "-" + almindelig.a
                     + ". Byg det neutrale atom af den sjældnere isotop " + g.symbol + "-" + valgt.a + ".",
                 p: g.z, n: valgt.a - g.z, e: g.z,
-                svar: "Stadig " + NK.talform(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
+                svar: "Atomet har stadig " + NK.talform(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
                     + (almindelig.a - g.z) + " til " + (valgt.a - g.z) + "."
             };
         },
@@ -332,7 +332,7 @@
                 tekst: "Byg partiklen med " + NK.talform(g.z, "proton", "protoner") + ", " + NK.talform(i.a - g.z, "neutron", "neutroner")
                     + " og " + NK.talform(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
                 p: g.z, n: i.a - g.z, e: e,
-                svar: "Det er " + g.symbol + NK.ladningHaevet(g.z - e) + " med massetal " + i.a + ". Altså "
+                svar: "Partiklen er " + g.symbol + NK.ladningHaevet(g.z - e) + " med nukleontal " + i.a + ", altså "
                     + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")
             };
         },
@@ -347,13 +347,13 @@
             var aedel = D.aedelgasStruktur(g.z - g.ion);
             var iso = D.hyppigsteIsotop(g.z);
             return {
-                tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + " og " + NK.talform(iso.a - g.z, "neutron", "neutroner")
-                    + " i kernen, som har præcis samme elektronstruktur som "
-                    + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + ").",
+                tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + " og præcis samme elektronstruktur som "
+                    + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + "). Ionen har "
+                    + NK.talform(iso.a - g.z, "neutron", "neutroner") + " i kernen.",
                 p: g.z, n: iso.a - g.z, e: g.z - g.ion,
                 svar: "Der skal " + NK.talform(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
-                    + aedel.navn.toLowerCase() + ". Ladningen " + NK.ladningstekst(g.ion) + " svarer så til "
-                    + NK.talform(g.z, "proton", "protoner") + ": " + g.navn.toLowerCase() + "."
+                    + aedel.navn.toLowerCase() + ". Med ladningen " + NK.ladningstekst(g.ion) + " har ionen "
+                    + NK.talform(g.z, "proton", "protoner") + ", så grundstoffet er " + g.navn.toLowerCase() + "."
             };
         }
     ];
@@ -461,7 +461,7 @@
             this.hjaelp = 1;
             this.pegKnap = false;
             this.saetBesked('<span class="b-maerke">Hint</span> Byg ' + nuklidHTML(this.opgave) +
-                ". Det øverste tal er massetallet, det nederste er atomnummeret.", "hint");
+                ". Øverst står nukleontallet og nederst atomnummeret.", "hint");
             this.visKort();
             return;
         }
@@ -500,8 +500,8 @@
         if (!o || this.slut) return;
         var fejl = "";
         if (o.p !== this.p) fejl = "Antallet af protoner passer ikke. Protonerne bestemmer grundstoffet.";
-        else if (o.n !== this.n) fejl = "Grundstoffet passer, men antallet af neutroner gør ikke. Massetallet er protoner plus neutroner.";
-        else if (o.e !== this.e) fejl = "Kernen passer, men antallet af elektroner gør ikke. Elektronerne bestemmer ladningen.";
+        else if (o.n !== this.n) fejl = "Grundstoffet passer, men antallet af neutroner passer ikke. Nukleontallet er protoner plus neutroner.";
+        else if (o.e !== this.e) fejl = "Kernen passer, men antallet af elektroner passer ikke. Elektronerne bestemmer ladningen.";
         if (fejl) {
             this.pegKnap = true;
             this.saetBesked('<span class="b-maerke">Ikke endnu</span> ' + fejl, "skidt");

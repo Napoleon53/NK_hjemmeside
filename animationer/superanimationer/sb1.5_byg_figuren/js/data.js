@@ -22,31 +22,31 @@ window.NK = NK;
 
     NK.FORKLARING = {
         /* B1.1 Reaktionshastighed */
-        "reaktionshastighed": "Fortæller, hvor meget koncentrationen af et stof ændrer sig i hvert sekund. Symbolet er v, og enheden er M/s.",
+        "reaktionshastighed": "Angiver, hvor meget koncentrationen af et stof ændrer sig pr. sekund. Symbolet er v, og enheden er M/s.",
         "gennemsnitshastighed": "Ændringen i koncentrationen i et tidsrum divideret med den tid, der er gået. På grafen er det hældningen på linjen mellem to punkter på kurven.",
-        "tangent": "Ret linje, der rører kurven i et punkt og har samme hældning som kurven dér. Hældningen viser, hvor hurtigt reaktionen går til netop det tidspunkt.",
-        "starthastighed": "Hvor hurtigt koncentrationen ændrer sig, lige når reaktionen begynder. Den skrives v₀.",
+        "tangent": "Ret linje, der rører kurven i et punkt og har samme hældning som kurven dér. Hældningen viser reaktionshastigheden til netop det tidspunkt.",
+        "starthastighed": "Reaktionshastigheden i det øjeblik, reaktionen begynder (t = 0 s). Symbolet er v₀.",
         /* B1.2 Koncentration og sammenstød */
         "sammenstødsmodel": "Forklaring, der siger, at partikler kun kan reagere, når de rammer hinanden. Jo oftere det sker, jo hurtigere går reaktionen.",
-        "hastighedsudtryk": "Formel, der viser, hvordan reaktionens fart afhænger af koncentrationerne. Eksponenterne i formlen kan kun findes ved forsøg.",
-        "hastighedskonstant": "Tallet k i formlen for reaktionens fart. Det hører til den enkelte reaktion ved en bestemt temperatur.",
-        "eksponent": "Tal, som en koncentration er opløftet til i formlen for reaktionens fart. Tallet findes ved forsøg og er som regel 0, 1 eller 2.",
+        "hastighedsudtryk": "Formel, der viser, hvordan reaktionshastigheden afhænger af koncentrationerne. Eksponenterne i formlen kan kun findes ved forsøg.",
+        "hastighedskonstant": "Konstanten k i formlen for reaktionshastigheden. Den har én værdi for den enkelte reaktion ved en bestemt temperatur.",
+        "eksponent": "Tal, som en koncentration er opløftet til i formlen for reaktionshastigheden. Tallet findes ved forsøg og er som regel 0, 1 eller 2.",
         /* B1.3 Aktiveringsenergi */
         "energiprofil": "Graf, der viser stoffernes energi under en reaktion. Vejen fra reaktanter til produkter går over en bakke.",
         "det aktiverede kompleks": "Tilstanden på toppen af bakken i en energiprofil. De gamle bindinger er ved at blive brudt, og de nye er ved at blive dannet.",
         "aktiveringsenergi": "Den mindste energi, molekylerne skal støde sammen med for at kunne reagere. Symbolet er Eₐ, og enheden er kJ/mol.",
-        "exoterm": "Siges om en reaktion, hvor produkterne har mindre energi end reaktanterne. Forskellen bliver afgivet til omgivelserne, som regel som varme.",
-        "endoterm": "Siges om en reaktion, hvor produkterne har mere energi end reaktanterne. Den optager energi fra omgivelserne, som i en kuldepose.",
+        "exoterm": "Siges om en reaktion, hvor produkterne har mindre energi end reaktanterne. Energiforskellen afgives til omgivelserne, som regel som varme.",
+        "endoterm": "Siges om en reaktion, hvor produkterne har mere energi end reaktanterne. Reaktionen optager energi fra omgivelserne, som i en kuldepose.",
         /* B1.4 Temperatur */
-        "temperatur": "Mål for, hvor meget bevægelsesenergi molekylerne har i gennemsnit. Jo højere den er, jo hurtigere bevæger de sig.",
+        "temperatur": "Mål for, hvor meget bevægelsesenergi molekylerne har i gennemsnit. Jo højere temperaturen er, jo hurtigere bevæger molekylerne sig.",
         /* B1.5 Katalysatorer og enzymer */
         "katalysator": "Stof, der får en reaktion til at gå hurtigere uden selv at blive brugt. Stoffet giver reaktionen en vej med lavere aktiveringsenergi.",
-        "inhibitor": "Stof, der får en reaktion til at gå langsommere. Mange af dem sætter sig på katalysatoren, så den ikke kan arbejde.",
+        "inhibitor": "Stof, der får en reaktion til at gå langsommere. Mange inhibitorer binder sig til katalysatoren, så den mister sin virkning.",
         "enzym": "Protein, der virker som katalysator i en levende organisme. Navnet ender som regel på -ase.",
         "substrat": "Stoffet, som et enzym arbejder på. For enzymet amylase i spyt er det stivelse.",
         "aktivt center": "Fordybning i et enzym, hvor substratet passer præcis ind som en nøgle i en lås.",
-        "optimum": "Den temperatur, hvor et enzym arbejder hurtigst. Bliver det varmere, begynder enzymet at miste sin form.",
-        "denaturere": "At miste sin form, som et enzym gør, når det bliver for varmt. Bagefter virker enzymet ikke."
+        "optimum": "Den temperatur, hvor et enzym arbejder hurtigst. Ved højere temperatur begynder enzymet at miste sin form.",
+        "denaturere": "At miste sin form, som et enzym gør ved for høj temperatur. Bagefter virker enzymet ikke."
     };
 
     /* Fagord fra listen, der med vilje ikke er paa en figur. Brugeren

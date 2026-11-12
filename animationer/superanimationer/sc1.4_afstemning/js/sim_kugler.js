@@ -172,9 +172,9 @@
         if (this.laast()) return;
         var koef = side === "r" ? this.opg.cr : this.opg.cp;
         var v = koef[i] + d;
-        if (v < 1) { this.kortBesked("Mindst 1. Uden stoffet er der ingen reaktion.", 4); return; }
+        if (v < 1) { this.kortBesked("Tallet foran skal være mindst 1, for uden stoffet er der ingen reaktion.", 4); return; }
         if (v > D.MAKS_KUGLER) {
-            this.kortBesked("Højst " + D.MAKS_KUGLER + " her. Flere kan ikke ses i bakken, og så mange skal der ikke til.", 5);
+            this.kortBesked("Tallet foran kan højst være " + D.MAKS_KUGLER + " her. Flere molekyler kan ikke ses i bakken, og så mange skal der ikke til.", 5);
             return;
         }
         koef[i] = v;
@@ -207,7 +207,7 @@
         var navn = D.ANDRE_STOFFER[til];
         var t = "Nu står der " + F(til) + ". " +
             (navn ? "Det er " + navn + ", ikke " + F(fra) + "." : "Det er ikke " + F(fra) + " længere.") +
-            " Det lille tal hører til stoffet. Tallet foran siger, hvor mange der er.";
+            " Det lille tal hører til stoffet. Tallet foran " + F(fra) + " siger, hvor mange " + F(fra) + " der er.";
         if (til === "O3") t += " " + D.OZON;
         this.kortBesked(t, til === "O3" ? 9 : 7);
     };
@@ -441,7 +441,7 @@
         if (this.reagerer) return;
         if (g.loest) { this.laast(); return; }
         if (g.fase === "reageret") {
-            this.kortBesked("De har allerede reageret. Ret et tal, så står molekylerne klar igen.", 4);
+            this.kortBesked("Molekylerne har allerede reageret. Ret et tal foran et stof, så står de klar igen.", 4);
             return;
         }
         if (!fraSvar) g.svarNu = false;
@@ -646,7 +646,7 @@
             var dele = Object.keys(l).map(function (x) { return l[x] + " " + x; });
             var hvad = dele.length === 1 && l[e] === 1 ? "Det er ét " + e + "-atom." :
                 "Ét " + F(a.f) + " har " + dele.join(" og ") + ".";
-            this.kortBesked(hvad + " Tallet foran " + F(a.f) + " siger, hvor mange der er.", 5);
+            this.kortBesked(hvad + " Tallet foran " + F(a.f) + " siger, hvor mange " + F(a.f) + " der er.", 5);
         } else if (u.slags === "plads") {
             this.kortBesked("Her skal der sidde et " + e + " i " + F(a.f) + ". Det skal komme fra stofferne før pilen.", 5);
         } else if (u.slags === "mangler") {
@@ -654,7 +654,7 @@
         } else if (u.slags === "tilovers") {
             this.kortBesked("Dette " + e + " fik ingen plads efter pilen. Der var for mange " + e + " før pilen.", 5);
         } else {
-            this.kortBesked("Et " + e + ", der nu sidder i " + F(this.findEfter(a)) + ".", 4);
+            this.kortBesked("Dette " + e + " sidder nu i " + F(this.findEfter(a)) + ".", 4);
         }
     };
 

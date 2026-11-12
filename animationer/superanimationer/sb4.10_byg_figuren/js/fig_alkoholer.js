@@ -57,7 +57,7 @@
         [["primær alkohol", "ét carbonatom som nabo"], ["sekundær alkohol", "to carbonatomer som naboer"], ["tertiær alkohol", "tre carbonatomer som naboer"]].forEach(function (t) {
             o[t[0]] = "<b>" + t[0] + "</b> har " + t[1] + ". Her har carbonatomet med OH " + her + ".";
         });
-        o.alkohol = "<b>alkohol</b> passer på alle tre kort og står foran rækken. Titlen her siger, hvor mange naboer carbonatomet har.";
+        o.alkohol = "<b>alkohol</b> passer på alle tre kort og står foran rækken. Titlen her siger, hvor mange naboer carbonatomet med OH har.";
         o.phenol = "<b>phenol</b> har OH direkte på en benzenring. Stoffet her har OH på en kæde.";
         o.hydroxygruppe = "<b>hydroxygruppe</b> er kun −OH. Kortets titel siger, hvor mange naboer carbonatomet med OH har.";
         return o;

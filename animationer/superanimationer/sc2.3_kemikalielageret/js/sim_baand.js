@@ -343,7 +343,7 @@
         li.innerHTML = "<b>" + NK.html(g.st.formelTekst) + "</b> " + NK.html(g.st.navn);
         NK.el("baand-kasseliste").appendChild(li);
         NK.el("baand-kasse-kort").hidden = false;
-        this.besked("Et glas røg i kassen. Det var <b>" + NK.html(g.retning === "formel" ? g.st.formelTekst : g.st.navn) + "</b>.", "skidt");
+        this.besked("Et glas røg i kassen. Den manglende halvdel af etiketten var <b>" + NK.html(g.retning === "formel" ? g.st.formelTekst : g.st.navn) + "</b>.", "skidt");
         if (this.liv <= 0) this.slut();
         this.visPanel();
     };

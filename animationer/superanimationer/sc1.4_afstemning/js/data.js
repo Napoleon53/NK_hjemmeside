@@ -144,11 +144,11 @@
 
     /* ----- Linjerne i statuslinjen ----------------------------------------------- */
     D.FAERDIG = {
-        kg: "Alle ti. Atomerne flytter sig, men de bliver de samme.",
-        sk: "Alle 24. Du kan godt undvære kuglerne nu."
+        kg: "Alle ti reaktioner er afstemt. Atomerne bytter partnere, men det er de samme atomer.",
+        sk: "Alle 24 reaktioner er afstemt. Du kan godt undvære kuglerne nu."
     };
     /* Den korte linje efter selve skemaet, naar en reaktion er afstemt */
-    D.ROS_OPGAVE = ["Opgaven er løst.", "Den går op.", "Lige mange på hver side.", "Sådan."];
+    D.ROS_OPGAVE = ["Opgaven er løst.", "Reaktionsskemaet er afstemt.", "Der er lige mange atomer af hver slags på begge sider."];
 
     /* Paaskeaegget: O2 laves om til O3 paa fane 1 */
     D.OZON = "Ozon lugter af kopimaskine og er ikke det, der reagerer her.";

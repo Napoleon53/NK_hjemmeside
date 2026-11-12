@@ -30,7 +30,7 @@
         { id: "Fe2", formel: "Fe",  q: 2,  navn: "jern(II)", grund: "jern", variabel: true, anden: 3 },
         { id: "Fe3", formel: "Fe",  q: 3,  navn: "jern(III)", grund: "jern", variabel: true, anden: 2 },
         { id: "Cu",  formel: "Cu",  q: 2,  navn: "kobber(II)", grund: "kobber", variabel: true, anden: 1 },
-        { id: "Ag",  formel: "Ag",  q: 1,  navn: "sølv" },
+        { id: "Ag",  formel: "Ag",  q: 1,  navn: "sølv(I)" },
         { id: "Pb",  formel: "Pb",  q: 2,  navn: "bly(II)", grund: "bly", variabel: true, anden: 4 },
 
         { id: "NO3", formel: "NO₃", q: -1, navn: "nitrat", sammensat: true, brud: ["O", -2] },
@@ -97,8 +97,8 @@
 
     /* Parrene, der ikke findes. Teksten staar i tabellens infolinje. */
     D.FINDES_IKKE = {
-        "NH4-OH": "Ammoniumhydroxid findes ikke. NH₄⁺ og OH⁻ giver ammoniak og vand. Det kan lugtes.",
-        "Ag-OH":  "Sølvhydroxid findes ikke. Ag⁺ og OH⁻ giver brunt sølvoxid, Ag₂O.",
+        "NH4-OH": "Ammoniumhydroxid findes ikke. NH₄⁺ og OH⁻ giver ammoniak og vand. Ammoniakken kan lugtes.",
+        "Ag-OH":  "Sølv(I)hydroxid findes ikke. Ag⁺ og OH⁻ giver brunt sølv(I)oxid, Ag₂O.",
         "Al-CO3": "Aluminiumcarbonat findes ikke. Al³⁺ og CO₃²⁻ giver Al(OH)₃ og bobler af CO₂.",
         "Fe3-CO3": "Jern(III)carbonat findes ikke. Fe³⁺ og CO₃²⁻ giver rødbrunt Fe(OH)₃ og bobler af CO₂.",
         "Fe3-I":  "Jern(III)iodid findes ikke. Fe³⁺ og I⁻ reagerer til Fe²⁺ og I₂.",

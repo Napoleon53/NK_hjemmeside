@@ -202,7 +202,7 @@ function koerTest(W) {
     paastand("2 · n(CO₂): forholdet er 1 : 1", /1 : 1/.test(f("n_kalk", "2·n(CO2)").besked || ""));
     paastand("n(CaCO₃) = n: skriv hvilken stofmængde", /hvilken stofmængde/.test(f("n_kalk", "n(CaCO3) = n").besked || ""));
     paastand("m = n · M godkendes med mol", f("mk_n", "m = n·M").ok && f("mk_n", "m(CaCO3) = n(CaCO3) * M(CaCO3)").ok);
-    paastand("m(CO₂) · 2,27 med mol: det er genvejen", /genvejen/.test(f("mk_n", "m(CO2)*2,27").besked || ""));
+    paastand("m(CO₂) · 2,27 med mol: det er regnemåden uden mol", /uden mol/.test(f("mk_n", "m(CO2)*2,27").besked || ""));
     paastand("n(CaCO₃) · M(CO₂): molarmassen for CaCO₃", /molarmassen for CaCO₃/.test(f("mk_n", "n(CaCO3)*M(CO2)").besked || ""));
     paastand("baglæns: kalkindhold / 100 · m(prøve) godkendes", f("mk_p", "m(CaCO3) = kalkindhold/100 · m(prøve)").ok && f("mk_p", "m = p·m/100").ok);
     paastand("kalkindhold · m(prøve): del med 100 %", /Del med 100/.test(f("mk_p", "kalkindhold*m(prøve)").besked || ""));
@@ -364,7 +364,7 @@ function koerTest(W) {
     paastand("vægten står på det, modellen siger", A.kolbe.visning() === K.slutVisning(A.proeve), A.kolbe.visning() + " " + K.slutVisning(A.proeve));
     paastand("det sprøjtede ikke, da pulveret kom i, mens der var ro i kolben", A.kolbe.sprojt < 1e-9, A.kolbe.sprojt);
     felt(0, "e", komma(A.proeve));
-    paastand("m(før) skrevet i m(efter)-feltet afvises", A.noteret.me === null && /Det er m\(før\)/.test(besked(A)), besked(A));
+    paastand("m(før) skrevet i m(efter)-feltet afvises", A.noteret.me === null && /Du har skrevet m\(før\)/.test(besked(A)), besked(A));
     vaegt2();
     tik(A, 0.1);
     paastand("et klik på vægten under kolben løser måling 1, og målingen er gemt", A.faerdig && NK.maalinger[0] && NK.maalinger[0].me === A.kolbe.visning());
@@ -381,7 +381,7 @@ function koerTest(W) {
     /* Måling 2 med hint og svar hele vejen */
     A.knap();
     paastand("Næste måling: måling 2 uden gæt, med en anden prøve og en linje om, at det er det samme igen", A.nr === 1 && A.fase() === "foer" &&
-        A.proeve !== NK.maalinger[0].mf && /samme en gang til/.test(besked(A)), A.fase() + " " + besked(A));
+        A.proeve !== NK.maalinger[0].mf && /en gang til/.test(besked(A)), A.fase() + " " + besked(A));
     var svar = 0, set = {}, vaekSet = false;
     while (!A.faerdig && svar++ < 60) {
         if (A.auto) {

@@ -24,11 +24,11 @@ window.NK = NK;
         "størrelse": "Noget, man kan måle, for eksempel masse eller volumen. Har et symbol og en enhed.",
         "symbol": "Bogstav, der står for en størrelse, for eksempel m for masse og V for volumen.",
         "enhed": "Fortæller, hvad en størrelse er målt i, for eksempel gram eller milliliter.",
-        "volumen": "Hvor meget noget fylder. Symbolet er V, og der måles i milliliter eller liter.",
+        "volumen": "Hvor meget noget fylder. Symbolet er V, og enheden er milliliter eller liter.",
         "densitet": "Hvor meget én milliliter af et stof vejer. Findes ved at dividere massen med volumenet.",
         "betydende cifre": "De tal i et måleresultat, der viser, hvor præcist der er målt. 10,00 g har fire, og 0,92 g/mL har to.",
         /* 5.2 Molarmasse */
-        "formelmasse": "Massen af én formelenhed, målt i enheden u. For et stof af molekyler er det massen af ét molekyle, og for et salt som NaCl er det én natriumion og én chloridion.",
+        "formelmasse": "Massen af én formelenhed, målt i enheden u. For et stof af molekyler er det massen af ét molekyle, og for et salt som NaCl er det massen af én natriumion og én chloridion.",
         "molarmasse": "Massen pr. mol formelenheder af et stof. Symbolet er M, og enheden er g/mol.",
         /* 5.3 Stofmængde */
         "mol": "Enhed for et bestemt antal, ligesom et par og et dusin. Her er antallet 6,02 · 10²³ stykker.",
@@ -37,15 +37,15 @@ window.NK = NK;
         "ækvivalente mængder": "Antal mol af to stoffer, der står i samme forhold som koefficienterne i reaktionsskemaet. De kan netop reagere, uden at der bliver noget tilovers.",
         "begrænsende faktor": "Det stof, der slipper op først i en reaktion. Det bestemmer, hvor meget produkt der kan dannes.",
         /* 5.5 Mængdeberegning */
-        "mængdeberegning": "Her regner man fra massen af ét stof i en reaktion til massen af et andet. Vejen går over stofmængden.",
+        "mængdeberegning": "Fremgangsmåde, der fører fra massen af ét stof i en reaktion til massen af et andet. Vejen går over stofmængden.",
         "mængdeberegningsskema": "Tabel under reaktionsskemaet med tre rækker: massen, molarmassen og stofmængden.",
         "vejeanalyse": "Metode, hvor man finder mængden af et stof ved at veje. En ion kan for eksempel fældes ud, og bundfaldet filtreres fra, tørres og vejes.",
         /* 5.6 Gasser */
-        "tryk": "Fortæller, hvor hårdt en gas bliver presset sammen. Symbolet er p, og der måles i bar.",
-        "kelvin": "Enhed for temperatur i beregninger med gasser. Man lægger 273 til tallet i grader celsius.",
+        "tryk": "Fortæller, hvor kraftigt en gas presser på beholderens vægge. Symbolet er p, og enheden er bar.",
+        "kelvin": "Enhed for temperatur i beregninger med gasser. Man lægger 273 til talværdien i grader celsius.",
         "det absolutte nulpunkt": "Den laveste temperatur, der findes, nemlig −273 °C. Her begynder kelvinskalaen.",
         "idealgasligningen": "Sammenhængen mellem en gas' tryk, volumen, stofmængde og temperatur. Den skrives p · V = n · R · T.",
-        "gaskonstanten": "Tallet R i idealgasligningen, som er det samme for alle gasser."
+        "gaskonstanten": "Størrelsen R i idealgasligningen, som har samme værdi for alle gasser."
     };
 
     /* Fagord fra listen, der med vilje ikke er paa en figur */
@@ -62,7 +62,7 @@ window.NK = NK;
         /* masse står ikke på nogen af bogens fagordlister. Brugeren bad om den i
            5.3 ved vægtene 1. nov. 2026; forklaringen er skrevet som bogens
            forklaring af volumen i 5.1 */
-        "masse": "Hvor meget noget vejer. Symbolet er m, og der måles i gram eller kilogram."
+        "masse": "Hvor meget noget vejer. Symbolet er m, og enheden er gram eller kilogram."
     };
     Object.keys(NK.TIDLIGERE).forEach(function (o) { NK.FORKLARING[o] = NK.TIDLIGERE[o]; });
 

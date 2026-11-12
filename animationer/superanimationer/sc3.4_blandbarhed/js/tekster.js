@@ -49,41 +49,41 @@
         {
             id: "olieIVand",
             start: { fyld: [["vand", 3]] },
-            tekst: "Der er vand i bassinet. Du hælder olie i. Hvad ser du i glasset, når det er faldet til ro?",
+            tekst: "Der er vand i bassinet. Du hælder olie i. Hvad ser du i glasset, når væskerne er faldet til ro?",
             valg: [
                 { tekst: "Ét lag", fejl: "Vand er polært, og olie er upolær. Vandmolekylerne holder fast i hinanden og skubber olien ud." },
                 { tekst: "To lag med olien øverst", rigtig: true },
-                { tekst: "To lag med olien nederst", fejl: "Olien er tyk, men den er lettere end vand: 0,92 mod 1,00 g/mL." }
+                { tekst: "To lag med olien nederst", fejl: "Olien er tyktflydende, men den har en lavere densitet end vand, nemlig 0,92 mod 1,00 g/mL." }
             ],
             handling: { haeld: "olie" },
-            hint: "Vand er polært. Olie er upolær. Tjek så tæthederne.",
-            svar: "To lag med olien øverst. Vand er polært og olie upolær, så de blandes ikke. Olien er lettere og lægger sig øverst."
+            hint: "Vand er polært, og olie er upolær. Sammenlign derefter densiteterne.",
+            svar: "To lag med olien øverst. Vand er polært og olie upolær, så de blandes ikke. Olien har den laveste densitet og lægger sig øverst."
         },
         {
             id: "ethanolIVand",
             start: { fyld: [["vand", 3]] },
-            tekst: "Der er vand i bassinet. Du hælder ethanol i. Ethanol er lettere end vand. Hvad ser du, når det er faldet til ro?",
+            tekst: "Der er vand i bassinet. Du hælder ethanol i. Ethanol har en lavere densitet end vand. Hvad ser du, når væskerne er faldet til ro?",
             valg: [
                 { tekst: "Ét lag", rigtig: true },
-                { tekst: "To lag med ethanol øverst", fejl: "Tætheden afgør kun rækkefølgen, når der er to lag. Ethanol og vand er begge polære." },
-                { tekst: "Uklart som rystet olie og vand", fejl: "Uklart bliver det kun, når to væsker ikke kan blandes. Ethanol og vand er begge polære." }
+                { tekst: "To lag med ethanol øverst", fejl: "Densiteten afgør kun rækkefølgen af lagene, når der er to lag. Ethanol og vand er begge polære." },
+                { tekst: "Uklart som rystet olie og vand", fejl: "En blanding bliver kun uklar, når to væsker ikke kan blandes. Ethanol og vand er begge polære." }
             ],
             handling: { haeld: "ethanol" },
             hint: "Ethanol har en OH-gruppe ligesom vand.",
-            svar: "Ét lag. Ethanol og vand er begge polære og danner hydrogenbindinger til hinanden. Molekylerne blander sig af sig selv, og tætheden gør ingen forskel."
+            svar: "Ét lag. Ethanol og vand er begge polære og danner hydrogenbindinger til hinanden. Molekylerne blander sig af sig selv, og densiteten gør ingen forskel."
         },
         {
             id: "olieIEthanol",
             start: { fyld: [["ethanol", 3]] },
-            tekst: "Der er ethanol i bassinet. Du hælder olie i. Hvad ser du, når det er faldet til ro?",
+            tekst: "Der er ethanol i bassinet. Du hælder olie i. Hvad ser du, når væskerne er faldet til ro?",
             valg: [
-                { tekst: "To lag med olien øverst", fejl: "Olie ligger øverst på vand, fordi vand er tungere. Ethanol er lettere end olie: 0,79 mod 0,92 g/mL." },
+                { tekst: "To lag med olien øverst", fejl: "Olie ligger øverst på vand, men ethanol har en lavere densitet end olie, 0,79 mod 0,92 g/mL." },
                 { tekst: "To lag med olien nederst", rigtig: true },
-                { tekst: "Ét lag, ethanol har en upolær del", fejl: "Den upolære del er kort. OH-gruppen gør ethanol så polær, at den ikke blandes med olie." }
+                { tekst: "Ét lag, ethanol har en upolær del", fejl: "Ethanolmolekylets upolære del er kort. OH-gruppen gør ethanol så polær, at den ikke blandes med olie." }
             ],
             handling: { haeld: "olie" },
-            hint: "Ethanol vejer 0,79 g/mL. Olie vejer 0,92 g/mL.",
-            svar: "To lag med olien nederst. Ethanol er polær og olie upolær, så de blandes ikke. Ethanol er lettere end olie og lægger sig øverst."
+            hint: "Ethanol har densiteten 0,79 g/mL og olie 0,92 g/mL.",
+            svar: "To lag med olien nederst. Ethanol er polær og olie upolær, så de blandes ikke. Ethanol har lavest densitet og lægger sig øverst."
         },
         {
             id: "ryst",
@@ -91,29 +91,29 @@
             tekst: "Olien ligger på vandet. Du ryster bassinet kraftigt. Hvad ser du lidt efter?",
             valg: [
                 { tekst: "Uklart først, så to lag igen", rigtig: true },
-                { tekst: "Ét lag: rystningen har blandet dem", fejl: "Rystningen deler olien i små dråber, men molekylerne er de samme. Se dråberne finde sammen." },
-                { tekst: "Uklart, og det bliver ved", fejl: "Dråberne finder sammen igen og stiger op. Kun med et emulgeringsmiddel, fx æggeblomme i mayonnaise, bliver det ved." }
+                { tekst: "Ét lag, fordi væskerne er blandet", fejl: "Rystningen deler olien i små dråber, men molekylerne er de samme. Se dråberne finde sammen." },
+                { tekst: "Uklart hele tiden", fejl: "Dråberne finder sammen igen og stiger op. Kun et emulgeringsmiddel som æggeblomme i mayonnaise holder blandingen uklar." }
             ],
             handling: { ryst: 1.2 },
             hint: "Ændrer en rystning på, hvilke molekyler der er polære?",
-            svar: "Rystningen deler olien i små dråber, og det ser uklart ud: en emulsion. Polariteten er den samme, så dråberne finder sammen og stiger op igen."
+            svar: "Rystningen deler olien i små dråber, så blandingen bliver uklar og kaldes en emulsion. Polariteten er den samme, så dråberne finder sammen og stiger op igen."
         },
         {
             id: "olieNed",
             start: { fyld: [["vand", 2], ["olie", 1]] },
             tekst: "Olien ligger øverst på vandet. Få den til at ligge nederst uden at tømme bassinet.",
             byg: "olieNederst",
-            hint: "Hæld noget i, der gør vandlaget lettere end olien. Ryst bagefter.",
-            svar: "Ethanol blander sig med vandet og gør blandingen lettere. Når den vejer under 0,92 g/mL, synker olien. Det kræver lidt mere ethanol end vand.",
+            hint: "Hæld et stof i, der giver vandlaget en lavere densitet end olien. Ryst bagefter.",
+            svar: "Ethanol blander sig med vandet og giver blandingen en lavere densitet. Når blandingens densitet er under 0,92 g/mL, synker olien. Blandingen skal indeholde lidt mere ethanol end vand.",
             visSvar: { haeld: ["ethanol", "ethanol", "ethanol"], ryst: 1.2 }
         },
         {
             id: "varm",
             start: { fyld: [["vand", 2], ["ethanol", 2]], blandet: true },
-            tekst: "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C. Hvad sker der?",
+            tekst: "Vand og ethanol er blandet til ét lag. Du varmer blandingen op til 90 °C. Hvad sker der?",
             valg: [
                 { tekst: "Det koger, dampen er mest ethanol", rigtig: true },
-                { tekst: "Begge koger lige meget", fejl: "De er blandet, men molekylerne er stadig to stoffer med hvert sit kogepunkt. Se, hvilke der stiger op." },
+                { tekst: "Begge stoffer koger lige meget", fejl: "De er blandet, men stadig to stoffer med hvert sit kogepunkt. Se, hvilke molekyler der stiger op." },
                 { tekst: "Intet, før blandingen når 100 °C", fejl: "Ethanol koger ved 78 °C. Blandingen koger allerede ved ca. 83 °C, for ethanol fordamper let." }
             ],
             handling: { T: 90 },
@@ -128,7 +128,7 @@
             spm: "Hvad afgør, om to væsker kan blandes?",
             svar: [
                 { tekst: "Om molekylerne er polære eller upolære", rigtig: true },
-                { tekst: "Hvor tunge væskerne er", fejl: "Tætheden afgør kun, hvilket lag der ligger øverst, når der er to lag." },
+                { tekst: "Hvor tunge væskerne er", fejl: "Densiteten afgør kun, hvilket lag der ligger øverst, når der er to lag." },
                 { tekst: "Hvor tyktflydende væskerne er", fejl: "Olie er tyktflydende, men det er ikke derfor, den ikke blandes med vand." },
                 { tekst: "Om væskerne har samme farve", fejl: "Farven siger intet om molekylerne. Vand og ethanol er begge farveløse." }
             ],
@@ -137,29 +137,29 @@
         {
             spm: "Olie hældes i vand. Hvorfor ligger olien øverst?",
             svar: [
-                { tekst: "Olien er lettere end vand", rigtig: true },
-                { tekst: "Olien er upolær", fejl: "Polariteten forklarer, at der bliver to lag. Hvilket der ligger øverst, afgør tætheden." },
-                { tekst: "Olien er mere tyktflydende", fejl: "Tyktflydende væsker kan godt ligge nederst. Det er tætheden, der tæller." }
+                { tekst: "Olien har en lavere densitet end vand", rigtig: true },
+                { tekst: "Olien er upolær", fejl: "Polariteten forklarer, at der bliver to lag. Hvilket lag der ligger øverst, afgør densiteten." },
+                { tekst: "Olien er mere tyktflydende", fejl: "Tyktflydende væsker kan godt ligge nederst. Det er densiteten, der tæller." }
             ],
-            forklaring: "Olie vejer 0,92 g/mL og vand 1,00 g/mL. Det letteste lag ligger øverst."
+            forklaring: "Olie har densiteten 0,92 g/mL og vand 1,00 g/mL. Laget med den laveste densitet ligger øverst."
         },
         {
             spm: "Hvorfor kan ethanol blandes med vand?",
             svar: [
                 { tekst: "Ethanols OH-gruppe danner hydrogenbindinger til vandet", rigtig: true },
-                { tekst: "Ethanol er lettere end vand", fejl: "Tætheden afgør ikke, om noget blandes. Olie er også lettere end vand." },
-                { tekst: "Ethanol er upolær", fejl: "Ethanol har en polær OH-gruppe. Det er den, der gør forskellen." }
+                { tekst: "Ethanol har en lavere densitet end vand", fejl: "Densiteten afgør ikke, om to væsker kan blandes. Olie har også en lavere densitet end vand." },
+                { tekst: "Ethanol er upolær", fejl: "Ethanol har en polær OH-gruppe, og den gør ethanol til et polært stof." }
             ],
-            forklaring: "Vand og ethanol er begge polære og holder lige så godt fast i hinanden som i sig selv."
+            forklaring: "Vand og ethanol er begge polære, og molekylerne holder lige så godt fast i hinanden som i molekyler af samme slags."
         },
         {
             spm: "Ethanol og olie hældes sammen. Hvilket lag ligger øverst?",
             svar: [
                 { tekst: "Ethanol", rigtig: true },
-                { tekst: "Olien, den ligger altid øverst", fejl: "Olien ligger øverst på vand. Ethanol vejer 0,79 g/mL og er lettere end olien." },
+                { tekst: "Olien, fordi den altid ligger øverst", fejl: "Olien ligger øverst på vand, men ethanol har en lavere densitet end olie, 0,79 mod 0,92 g/mL." },
                 { tekst: "Der bliver ét lag", fejl: "Ethanol er polær og olie upolær. De blandes ikke." }
             ],
-            forklaring: "Der bliver to lag, og tætheden afgør rækkefølgen: ethanol 0,79 g/mL, olie 0,92 g/mL."
+            forklaring: "Der bliver to lag, og densiteten afgør rækkefølgen: ethanol 0,79 g/mL, olie 0,92 g/mL."
         },
         {
             spm: "Olie og vand er rystet til en uklar emulsion. Hvad sker der, når bassinet står stille?",

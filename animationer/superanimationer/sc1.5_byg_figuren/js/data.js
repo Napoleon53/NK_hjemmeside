@@ -28,7 +28,7 @@ window.NK = NK;
         "atomsymbol": "Et eller to bogstaver, der står for et grundstof, for eksempel H eller Na.",
         "metal": "Blankt grundstof, der leder strøm og varme godt, for eksempel jern og kobber.",
         "ikke-metal": "Grundstof til højre for og over trappen i det periodiske system. Oxygen og carbon er eksempler.",
-        "halvmetal": "Grundstof lige ved trappen i det periodiske system, for eksempel silicium. Det har egenskaber fra begge sider.",
+        "halvmetal": "Grundstof lige ved trappen i det periodiske system, for eksempel silicium. Grundstoffet ligner metaller på nogle punkter og ikke-metaller på andre.",
         "kemisk forbindelse": "Stof, hvor atomer fra flere grundstoffer er bundet sammen, for eksempel vand.",
         /* 1.2 Atomet */
         "kerne": "Den lille, tunge del i midten af atomet. Den er bygget af protoner og neutroner.",
@@ -56,7 +56,7 @@ window.NK = NK;
         /* 1.4 Reaktionsskemaer og afstemning */
         "kemisk formel": "Viser med symboler og små tal, hvilke atomer et stof består af. De små tal fortæller, hvor mange der er af hver slags.",
         "kemisk reaktion": "Atomerne bliver sat sammen på en ny måde, så der dannes nye stoffer.",
-        "reaktionsskema": "Kemikerens opskrift: formler og en pil viser, hvad der reagerer, og hvad der dannes.",
+        "reaktionsskema": "Kemikerens opskrift: Formler og en pil viser, hvad der reagerer, og hvad der dannes.",
         "reaktant": "Stof før pilen. Det er et af de stoffer, der reagerer med hinanden.",
         "produkt": "Stof efter pilen. Det er et af de stoffer, der bliver dannet.",
         "reaktionspil": "Tegnet mellem de stoffer, der reagerer, og de stoffer, der bliver dannet. Det læses \"bliver til\".",

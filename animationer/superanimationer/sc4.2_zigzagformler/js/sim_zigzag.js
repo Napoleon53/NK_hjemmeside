@@ -172,7 +172,7 @@
         b.laast = true;
         this.farvLoest(res);
         if (this.retning === "tegn") {
-            this.besked((vist ? "Sådan ser zigzagformlen ud: " : "Rigtigt. Det er ") + "<b>" + NK.html(res.navnUdenStereo) + "</b>.", vist ? "gul" : "god");
+            this.besked((vist ? "Sådan ser zigzagformlen ud. Molekylet hedder " : "Rigtigt. Molekylet hedder ") + "<b>" + NK.html(res.navnUdenStereo) + "</b>.", vist ? "gul" : "god");
         }
         if (!vist) { if (this.afvisTilbud) this.afvisTilbud(); this.konfetti(false); }
         /* Serien er klaret: klistermaerket kraever, at hoejst tre svar er vist */
@@ -320,11 +320,11 @@
         var m = this.maal, r = m.res;
         if (this.retning === "tegn") {
             this.hintKaede = true;
-            return "Start med den længste kæde. Den er grøn på papiret: " + r.kaede.length + " C" +
-                (r.antalDobbelt ? " med dobbeltbindingen" : "") + ". Tegn den først, og sæt så sidegrupperne på.";
+            return "Start med den længste kæde, som nu er grøn på papiret. Den har " + r.kaede.length + " C-atomer" +
+                (r.antalDobbelt ? " og dobbeltbindingen" : "") + ". Tegn kæden først, og sæt derefter sidegrupperne på.";
         }
-        if (this.trin === 1) return "Hvert knæk og hver ende er et C-atom. Der er " + m.antal + ".";
-        if (this.trin === 2) return "Tæl bindingerne ved hvert C. En dobbeltbinding tæller for to. Resten op til fire er H.";
+        if (this.trin === 1) return "Hvert knæk og hver ende er et C-atom. Molekylet har " + m.antal + " C-atomer.";
+        if (this.trin === 2) return "Tæl bindingerne ved hvert C. En dobbeltbinding tæller for to. Resten op til fire bindinger går til H.";
         return "Tæl C og H på tegningen, og skriv tallene efter bogstaverne, fx C5H12.";
     };
 
@@ -379,7 +379,7 @@
         else if (this.trin === 3) klar = NK.el("zz-input").value.trim() !== "";
         return {
             chip: "Molekyle " + (s.nr + 1) + " af " + s.liste.length,
-            tekst: tegn ? "Strukturformlen hænger på tavlen. Tegn samme molekyle som zigzagformel." :
+            tekst: tegn ? "Stregformlen hænger på tavlen. Tegn samme molekyle som zigzagformel." :
                 "Sæt C og H på zigzagformlen, og skriv molekylformlen.",
             loest: this.loest, vist: this.visteSvar,
             videre: s.status.every(function (x) { return x > 0; }) ? "Ny serie →" : "Næste molekyle →",

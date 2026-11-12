@@ -15,18 +15,18 @@
 
     var TURE = {
         "fane-t": [
-            { sel: "#t-skort", titel: "Kortet øverst", tekst: "Navnet står delt i forled, stamme og endelse. Tegn molekylet på tavlen. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#t-vt", titel: "Værktøjerne", tekst: "Kæde: træk fra et carbonatom, eller klik på et, så vokser kæden. = Binding gør en binding dobbelt og tripel. De andre knapper sætter en gruppe eller et atom på det carbonatom, du klikker på." },
-            { sel: "#t-anker-tavle", titel: "Tavlen", tekst: "Tegn molekylet her. Et højreklik på et atom for enden af kæden sletter det." },
-            { sel: "#t-bund", titel: "Test", tekst: "Tryk Test, når du er færdig. Så står det, tegningen hedder, ved knappen, og kortet siger, hvad der ikke passer. Vis navnet hele tiden viser navnet, mens du tegner." },
-            { sel: "#t-slet, #t-fortryd, #t-ryd", titel: "Slet, Fortryd og Ryd", tekst: "Med Slet forsvinder det atom for enden af kæden, du klikker på. Fortryd tager det sidste skridt tilbage. Ryd fjerner hele tegningen." },
+            { sel: "#t-skort", titel: "Kortet øverst", tekst: "Kortet viser stoffets navn delt i forled, stamme og endelse. Tegn molekylet på tavlen. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#t-vt", titel: "Værktøjerne", tekst: "Med Kæde vokser kæden, når du trækker fra et carbonatom eller klikker på et. = Binding gør en binding dobbelt og derefter tripel. De andre knapper sætter en gruppe eller et atom på det carbonatom, du klikker på." },
+            { sel: "#t-anker-tavle", titel: "Tavlen", tekst: "Tegn molekylet her. Et højreklik på et atom for enden af kæden sletter atomet." },
+            { sel: "#t-bund", titel: "Test", tekst: "Tryk Test, når du er færdig. Navnet på din tegning står derefter ved knappen, og kortet viser, hvad der ikke passer. Kontakten Vis navnet hele tiden viser navnet, mens du tegner." },
+            { sel: "#t-slet, #t-fortryd, #t-ryd", titel: "Slet, Fortryd og Ryd", tekst: "Med Slet fjerner du et atom for enden af kæden ved at klikke på det. Fortryd tager det sidste skridt tilbage. Ryd fjerner hele tegningen." },
             { sel: "#fane-t .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne på begge faner." },
             { sel: "#t-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge en opgave. En løst opgave får et flueben og en stjerne, hvis du ikke fik vist svaret." }
         ],
         "fane-s": [
             { sel: "#s-feltrad", titel: "Feltet", tekst: "Skriv molekylets navn, og tryk Tjek eller Enter. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#s-anker-tavle", titel: "Formlen", tekst: "Molekylet er tegnet som zigzagformel. Hvert knæk og hver ende er et carbonatom. Et hint gør det gult, det handler om." },
-            { sel: "#s-anker-kasse", titel: "Dit navn tegnet", tekst: "Her tegner tavlen det navn, du har skrevet. Så kan du se, om det er det samme molekyle som formlen." },
+            { sel: "#s-anker-tavle", titel: "Formlen", tekst: "Molekylet er tegnet som zigzagformel. Hvert knæk og hver ende er et carbonatom. Et hint farver den del af formlen gul, som hintet handler om." },
+            { sel: "#s-anker-kasse", titel: "Dit navn tegnet", tekst: "Her tegner tavlen molekylet ud fra det navn, du har skrevet, så du kan se, om det er det samme molekyle som i formlen." },
             { sel: "#fane-s .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne." },
             { sel: "#s-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge et andet stof." }
         ]

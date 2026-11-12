@@ -75,7 +75,7 @@
           kurve: [0.0015, 0.0014, 0.0013, 0.0012, 0.0011, 0.0010] },
 
         { id: "AgCl",  kat: "Ag", an: "Cl",  p: 1, n: 1,
-          formel: "AgCl",    navn: "sølvchlorid",
+          formel: "AgCl",    navn: "sølv(I)chlorid",
           hverdag: "det hvide bundfald i fældningsforsøg",
           kurve: [0.00007, 0.00015, 0.00040, 0.00080, 0.00140, 0.00210] }
     ];
@@ -208,7 +208,7 @@
         { h: "Vandmolekylet er skævt",
           p: ["De to hydrogenatomer sidder på samme side af oxygenatomet. Oxygen trækker hårdest i elektronerne, " +
               "så <b>oxygen-enden bliver en lille smule negativ (δ−)</b>, og hydrogen-enderne bliver en lille smule positive (δ+).",
-              "Molekylet er stadig neutralt i alt. Ladningen er bare fordelt skævt."] },
+              "Molekylet er stadig neutralt i alt. Ladningen er blot fordelt skævt."] },
 
         { h: "Derfor kan vand trække i ioner",
           p: ["Plus og minus tiltrækker hinanden. Vandmolekylerne vender δ−-enden mod de positive ioner " +
@@ -217,12 +217,12 @@
               "siddende hele vejen rundt om ionen."] },
 
         { h: "Fra (s) til (aq)",
-          p: ["<b>(s)</b> betyder fast stof: ionerne sidder fast i krystallen. <b>(aq)</b> betyder opløst i vand: " +
-              "ionen svømmer frit rundt med vand omkring sig.",
+          p: ["<b>(s)</b> betyder fast stof, altså at ionerne sidder fast i krystallen. <b>(aq)</b> betyder opløst i vand, " +
+              "altså at ionen bevæger sig frit rundt med vand omkring sig.",
               "NaCl(s) → <span class=\"fk\">Na⁺(aq)</span> + <span class=\"fa\">Cl⁻(aq)</span>"] },
 
         { h: "Saltet bliver ikke til noget nyt",
-          p: ["Det er de samme ioner hele vejen igennem. De er bare kommet fra hinanden. Na⁺ er stadig Na⁺, " +
+          p: ["Det er de samme ioner hele vejen igennem. Ionerne er blot kommet fra hinanden. Na⁺ er stadig Na⁺, " +
               "og en sammensat ion som SO₄²⁻ går ikke i stykker.",
               "Damper man vandet væk, ligger saltet der igen."] },
 
@@ -232,19 +232,19 @@
               "Grænsen kaldes stoffets <b>opløselighed</b> og skrives som gram pr. 100 mL vand."] },
 
         { h: "Let- og tungtopløselige salte",
-          p: ["Grænsen er vidt forskellig fra salt til salt. Der kan opløses 36 g køkkensalt i 100 mL vand, " +
-              "men kun 0,0002 g sølvchlorid.",
-              "Kan der opløses under 1 g pr. 100 mL, kalder vi saltet <b>tungtopløseligt</b>. Så bliver næsten " +
-              "det hele liggende som bundfald."] },
+          p: ["Opløseligheden er vidt forskellig fra salt til salt. Der kan opløses 36 g køkkensalt i 100 mL vand, " +
+              "men kun 0,0002 g sølv(I)chlorid.",
+              "Kan der opløses mindre end 2 g pr. 100 mL vand, kaldes saltet <b>tungtopløseligt</b>. Næsten alt " +
+              "det tilsatte salt bliver derfor liggende som bundfald."] },
 
         { h: "Hvad temperatur og omrøring gør",
           p: ["Jo varmere vandet er, jo hurtigere farer vandmolekylerne rundt, og jo hurtigere river de ionerne løs. " +
-              "For de fleste salte kan der også <b>opløses mere</b> i varmt vand: kurven på fane 2 stiger.",
+              "For de fleste salte kan der også <b>opløses mere</b> i varmt vand, og derfor stiger kurven på fane 2.",
               "Omrøring knuser krystallen og giver mere overflade, som vandet kan tage fat i. Saltet opløses " +
               "<b>hurtigere</b>, men grænsen for, hvor meget der kan opløses, er den samme."] },
 
         { h: "Om tegningen",
-          p: ["Lupen viser et voldsomt forstørret og forenklet udsnit. Selv det mindste saltkorn består af mange " +
+          p: ["Luppen viser et voldsomt forstørret og forenklet udsnit. Selv det mindste saltkorn består af mange " +
               "milliarder ioner, og der er langt flere vandmolekyler, end der er plads til at tegne.",
               "Ved de tungtopløselige salte er der tegnet nogle få ioner ude i vandet, så man kan se, at der faktisk " +
               "går en lille smule i opløsning. I virkeligheden er det endnu færre."] }
@@ -269,7 +269,7 @@
                  "Det er tilfældigt, hvilken ende der vender ind",
                  "Begge ender vender lige meget ind mod ionen"],
           rigtig: 0,
-          hvorfor: "Na⁺ er positiv, så den trækker i den negative ende: oxygen. Ved en negativ ion som Cl⁻ er det omvendt." },
+          hvorfor: "Na⁺ er positiv, så den trækker i den negative ende, som er oxygen-enden. Ved en negativ ion som Cl⁻ er det omvendt." },
 
         { q: "Hvad betyder (aq) i Na⁺(aq)?",
           svar: ["Ionen sidder fast i krystallen",
@@ -285,7 +285,7 @@
                  "Ionerne er gået i stykker i vandet",
                  "Der kan ikke opløses mere af stoffet"],
           rigtig: 3,
-          hvorfor: "Mættet betyder, at grænsen er nået. Hælder man mere i, bliver det liggende som bundfald." },
+          hvorfor: "Mættet betyder, at vandet ikke kan opløse mere af stoffet. Hælder man mere i, bliver det liggende som bundfald." },
 
         { q: "Der kan opløses 36 g NaCl i 100 mL vand. Hvad sker der, hvis man kommer 50 g i?",
           svar: ["Alle 50 g opløses, men det tager længere tid",

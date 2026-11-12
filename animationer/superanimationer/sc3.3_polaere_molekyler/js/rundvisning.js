@@ -10,17 +10,17 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: ".faneknapper", titel: "Tre faner", tekst: "Fra én binding til hele molekyler og et forsøg, der viser forskellen." },
+        { sel: ".faneknapper", titel: "Tre faner", tekst: "Fra én binding til hele molekyler og et forsøg, der viser forskellen på polære og upolære væsker." },
 
         { sel: "#fane-en.aktiv .scene", titel: "Tovtrækningen", tekst: "Elektronparret ligger tættest på det atom, der trækker hårdest. Klik på et atom for at flytte den gule ring." },
-        { sel: "#en-tabel", titel: "Elektronegativitet", tekst: "Tallet i hvert felt er atomets elektronegativitet. Et klik sætter atomet ind i stedet for det med den gule ring." },
+        { sel: "#en-tabel", titel: "Elektronegativitet", tekst: "Tallet i hvert felt er atomets elektronegativitet. Et klik sætter atomet ind i stedet for atomet med den gule ring." },
         { sel: "#en-binding", titel: "Bindingen", tekst: "Forskellen i elektronegativitet afgør, om bindingen er upolær, polær eller en ionbinding." },
 
         { sel: "#fane-polaritet.aktiv .scene", titel: "Trækket i bindingerne", tekst: "Pilene peger mod det atom, der trækker hårdest i elektronerne. Træk for at dreje molekylet." },
-        { sel: "#pol-en", titel: "Elektronegativitet", tekst: "En binding er polær, når forskellen er mindst 0,5." },
+        { sel: "#pol-en", titel: "Elektronegativitet", tekst: "En binding er polær, når forskellen i elektronegativitet er mindst 0,5." },
 
         { sel: "#fane-vand.aktiv .scene", titel: "Laboratoriebordet", tekst: "Klik på en hane for at åbne eller lukke den. Tag fat i en stav, og gnid den på uldkluden." },
-        { sel: "#vand-forloeb", titel: "Resultater", tekst: "Et felt bliver udfyldt, når du har holdt en ladet stav ved strålen. Kortet øverst i scenen siger, hvad du skal nu." },
+        { sel: "#vand-forloeb", titel: "Resultater", tekst: "Et felt bliver udfyldt, når du har holdt en ladet stav ved strålen. Kortet øverst i scenen siger, hvad du skal gøre nu." },
         { sel: "#vand-serie", titel: "Tegneserie", tekst: "Når skemaet er udfyldt, kan du se forsøget som en tegneserie." },
 
         { sel: ".fane.aktiv .scenekort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst i scenen. Vælg et svar, eller klik på et atom, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },

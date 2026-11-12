@@ -249,7 +249,7 @@
         this.hjaelp = 0;
         if (maade === "svar") {
             this.brugtSvar = true;
-            this.svarVis(NK.html("Den rigtige: " + s.t + ". Prøv det."));
+            this.svarVis(NK.html("Det rigtige svar er " + s.t + ". Prøv det."));
         } else {
             this.besked(NK.html(o.linje), "");
         }
@@ -332,7 +332,7 @@
             if (c > m.c + 0.005) {
                 var st = D.salt(o.salte[o.salte.length - 1]);
                 var k = K.k(st, m.ion);
-                t += (k > 1 ? " Hver " + st.formel + " giver " + k + " " + D.ion(m.ion).t + "." : "") + " Der er for meget. Tryk på Start forfra i panelet.";
+                t += (k > 1 ? " Hver " + st.formel + " giver " + k + " " + D.ion(m.ion).t + "." : "") + " Der er for meget salt i glasset. Tryk på Start forfra i panelet.";
             } else if (m.begge && o.salte.some(function (s) { return g.n[s] <= 0; })) {
                 t += " Brug begge salte.";
             }
@@ -431,7 +431,7 @@
     P.slipPulver = function (s, x, y) {
         var g = this.lay.glas;
         if (this.glas.portioner(s) >= D.MAKS_PORTIONER) {
-            this.kortBesked("Nu er der nok i glasset. Tryk på Start forfra.");
+            this.kortBesked("Der kan ikke komme mere salt i glasset. Tryk på Start forfra.");
             return;
         }
         x = NK.klamp(x, g.ind.x0 + 16 * g.k, g.ind.x1 - 16 * g.k);
@@ -490,7 +490,7 @@
             this.kortBesked(this.vist("lup") ? "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." :
                 "Ionerne kommer i luppen, når du har svaret på, hvor mange ioner saltet giver.");
         }
-        if (u.slags === "soejler") this.kortBesked("Den grå søjle er saltets koncentration. De farvede er ionernes.");
+        if (u.slags === "soejler") this.kortBesked("Den grå søjle er saltets koncentration. De farvede søjler er ionernes koncentrationer.");
         return false;
     };
 

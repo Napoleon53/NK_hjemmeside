@@ -181,9 +181,9 @@
     P.hint = function () {
         var c = M.antalC(this.mol), n = this.grupper.length;
         if (this.stof === "iod") return "I₂ har ingen polære grupper og intet C. To ens atomer giver en upolær binding.";
-        if (n === 0) return "Kun C og H. Der er ingen polære grupper.";
+        if (n === 0) return "Molekylet består kun af C og H, så der er ingen polære grupper.";
         /* Tommelfingerreglen fra Kemibogen 3.4 */
-        return (n === 1 ? "1 polær gruppe og " : n + " polære grupper og ") + c + (c === 1 ? " C-atom" : " C-atomer") +
+        return (n === 1 ? "Molekylet har 1 polær gruppe og " : "Molekylet har " + n + " polære grupper og ") + c + (c === 1 ? " C-atom" : " C-atomer") +
             ". Der skal 4 C-atomer til at ophæve én polær gruppe.";
     };
 
@@ -423,7 +423,7 @@
             }
             if (this.fase === "test") {
                 var pol = this.svarPol === "polaert" ? "polært" : "upolært";
-                linje = "Test dit svar: <b>træk " + this.redskabNavn() + " ned i det glas, et " + pol + " stof blandes med.</b>";
+                linje = "Test dit svar: <b>Træk " + this.redskabNavn() + " ned i det glas, et " + pol + " stof blandes med.</b>";
                 if (this.pip.tilstand === "traek" && this.over >= 0) linje = "Slip, så testes " + D.navn(s) + " i " + glasNavn(D.OPL[this.over]) + ".";
             } else if (this.fase === "test1") {
                 linje = "Forsøget: " + D.navn(s) + " i " + glasNavn(this.testetI) + " …";

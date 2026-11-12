@@ -375,7 +375,7 @@
         var v = this.vUd();
         if (this.info && this.info.tid > 0) t = this.info.tekst;
         else if (this.fase === "faerdig") t = "";
-        else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke()) + ". Aflæs bunden af menisken i luppen i panelet, og skriv forbruget i feltet under den.";
+        else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke()) + ". Aflæs bunden af menisken i luppen i panelet, og skriv forbruget i feltet under luppen.";
         else if (this.auto) t = "Buretten titrerer selv. Hurtigt først, så dråbe for dråbe.";
         else if (this.lyserod() && this.a > 0) t = "<b>Luk hanen!</b> Kolben er lyserød.";
         else if (this.lyserod()) t = "Kolben er lyserød.";

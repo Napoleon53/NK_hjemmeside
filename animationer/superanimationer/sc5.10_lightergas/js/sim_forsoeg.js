@@ -173,7 +173,7 @@
         this.brugtSvar = false;
         this.visKort();
         this.visListe();
-        this.besked("En ny lighter og et måleglas fyldt med vand. " + this.trinLinje(), "");
+        this.besked("En ny lighter og et måleglas fyldt med vand står klar. " + this.trinLinje(), "");
         this.visSkema();
         this.fokus();
     };
@@ -228,7 +228,7 @@
         this.hjaelp = 0;
         if (maade === "svar") {
             this.brugtSvar = true;
-            this.svarVis(NK.html("Den rigtige: " + s.t.toLowerCase() + ". Vej lighteren, og se efter."));
+            this.svarVis(NK.html("Det rigtige svar: " + s.t.toLowerCase() + ". Vej lighteren, og se efter."));
             this.holdSvar = 1;
         } else {
             this.rosNaeste = NK.html("Dit gæt: " + s.t.toLowerCase() + ".");
@@ -477,7 +477,7 @@
             if (this.lt.vaad()) { ryst(e); this.besked("Lighteren er våd, og vandet vejer med. Tør den på papiret først.", "skidt"); return; }
             if (v === vist) { this.noterFoer(); return; }
             ryst(e);
-            this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
+            this.besked("Det tal står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
             return;
         }
         if (this.fase() === "gaet") { this.kortBlink(); return; }
@@ -490,14 +490,14 @@
         }
         if (v === vist) { this.noterEfter("ok"); return; }
         ryst(e);
-        if (v === Math.round(this.noteret.mf * 100)) this.besked("Det er m(før). Aflæs vægten nu.", "skidt");
-        else this.besked("Det står der ikke på vægten.", "skidt");
+        if (v === Math.round(this.noteret.mf * 100)) this.besked("Du har skrevet m(før). Aflæs vægten nu.", "skidt");
+        else this.besked("Det tal står der ikke på vægten.", "skidt");
     };
 
     P.tjekV = function (e, v) {
         var V = this.glas.V;
         if (this.gasPaa) { ryst(e); this.besked("Slip lighteren først. Så står vandet stille.", "skidt"); return; }
-        if (V < D.V_MIN) { ryst(e); this.besked("Der er for lidt gas til, at vægten kan mærke det. Slip mere ud.", "skidt"); return; }
+        if (V < D.V_MIN) { ryst(e); this.besked("Der er for lidt gas til, at vægten kan mærke det. Slip mere gas ud.", "skidt"); return; }
         if (V > D.MAALEGLAS.maks + 0.5) {
             ryst(e);
             this.besked("Vandet står under stregerne, så rumfanget kan ikke aflæses. Tryk på Start forfra, og slip lidt mindre gas ud.", "skidt");
@@ -506,8 +506,8 @@
         if (Math.abs(v - V) <= D.MAALEGLAS.streg + 0.01) { this.noterV(v); return; }
         ryst(e);
         if (Math.abs(v - V) <= 8) this.besked("Tæt på. Læs ud for bunden af den buede vandoverflade. Hver streg er 2 mL.", "skidt");
-        else if (Math.abs(v - (D.MAALEGLAS.maks - V)) <= 3) this.besked("Glasset står på hovedet, så tallene begynder ved foden. Læs tallet ud for vandet.", "skidt");
-        else this.besked("Det står der ikke ud for vandet. Se i luppen.", "skidt");
+        else if (Math.abs(v - (D.MAALEGLAS.maks - V)) <= 3) this.besked("Måleglasset står på hovedet, så tallene begynder ved foden. Læs tallet ud for vandet.", "skidt");
+        else this.besked("Det tal står der ikke ud for vandet. Se i luppen.", "skidt");
     };
 
     P.noterFoer = function () {
@@ -574,7 +574,7 @@
         if (tabt > 0.015) {
             var hvor = this.tab.flamme > this.tab.luft + this.tab.forbi ? "brændte i flammen" :
                 (this.tab.luft > this.tab.forbi ? "slap ud i luften" : "boblede forbi måleglasset");
-            ud.push("Lighteren tabte også " + K.g2(tabt) + " g gas, der " + hvor + ". Den er med i m(gas), men ikke i V, så molarmassen bliver for høj.");
+            ud.push("Lighteren tabte også " + K.g2(tabt) + " g gas, der " + hvor + ". Den gas er med i m(gas), men ikke i V, så molarmassen bliver for høj.");
         }
         return ud.length ? ud.join(" ") + " Tryk på Start forfra for en ren måling." : "";
     };
@@ -931,7 +931,7 @@
                 if (tael) this.tab.luft += K.gram(ud);
                 if (this.iGang() && !this.luftSagt) {
                     this.luftSagt = true;
-                    this.kortBesked("Gassen slipper ud i luften. Den kommer aldrig i måleglasset.", 4);
+                    this.kortBesked("Gassen slipper ud i luften. Den gas kommer aldrig i måleglasset.", 4);
                 }
             }
             if (lt.gas <= 0) this.stopGas();

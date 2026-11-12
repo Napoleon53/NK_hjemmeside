@@ -58,7 +58,7 @@
                     { t: "Fra kobberet over i jernet",
                       f: "Se på de gule elektroner i luppen. De begynder der, hvor et jernatom forlader røret." },
                     { t: "Fra jernet ud i vandet",
-                      f: "Elektronerne bliver i metallet. Det er jernionerne, Fe²⁺, der går ud i vandet." }
+                      f: "Elektronerne bliver i metallet. Det er jern(II)ionerne, Fe²⁺, der går ud i vandet." }
                 ],
                 hint: [
                     "Tryk på Nye rør og så på Lad tiden gå. Se i luppen imens.",
@@ -86,9 +86,9 @@
                 svar: [
                     { t: "Ens metaller holder lige godt på elektronerne", ok: true },
                     { t: "Vandet kan ikke komme ind i samlingen",
-                      f: "Vandet løber gennem begge rør som før. Se i luppen: går der elektroner over samlingen?" },
+                      f: "Vandet løber gennem begge rør som før. Se i luppen, om der går elektroner over samlingen." },
                     { t: "Metallet er blevet mere ædelt",
-                      f: "Et metal skifter ikke plads i spændingsrækken. Se i luppen: går der elektroner over samlingen?" }
+                      f: "Et metal skifter ikke plads i spændingsrækken. Se i luppen, om der går elektroner over samlingen." }
                 ],
                 hint: [
                     "Lad tiden gå igen, og se i luppen. Går der elektroner fra det ene rør til det andet?",
@@ -102,7 +102,7 @@
             id: "znfe", navn: "Zink og jern",
             opstil: { a: "Zn", b: "Fe", plast: false },
             gaet: {
-                tekst: "Nu er et zinkrør skruet sammen med et jernrør. I opgave 1 var det jernrøret, der blev tæret. Gæt, hvad der sker nu.",
+                tekst: "Nu er et zinkrør skruet sammen med et jernrør. I opgave 1 med kobber og jern var det jernrøret, der blev tæret. Gæt, hvad der sker nu.",
                 svar: [
                     { t: "Jernrøret tæres igen" },
                     { t: "Zinkrøret tæres", ok: true },
@@ -118,7 +118,7 @@
                     "Vælg Zink og Jern, tryk på Lad tiden gå, og vent, til de 20 år er gået."
                 ]
             },
-            loest: "Zink er mindre ædelt end jern. Nu er det zinkrøret, der afgiver elektroner, og jernrøret er beskyttet. Spændingsrækken i panelet viser, hvem der afgiver til hvem."
+            loest: "Zink er mindre ædelt end jern. Nu er det zinkrøret, der afgiver elektroner, og jernrøret er beskyttet. Spændingsrækken i panelet viser, hvilket metal der afgiver elektroner til hvilket."
         },
         {
             id: "retning", navn: "Vandets retning",
@@ -147,17 +147,17 @@
                 svar: [
                     { t: "Vandet har elektroner med fra kobberrøret",
                       f: "Elektronerne bliver i metallet. Se i luppen, hvad kuglerne med Cu²⁺ gør, når de lander på jernet." },
-                    { t: "Kobberioner i vandet tager elektroner fra jernet", ok: true },
+                    { t: "Kobber(II)ioner i vandet tager elektroner fra jernet", ok: true },
                     { t: "Vandet løber hurtigere fra kobberrøret",
                       f: "Vandet løber lige hurtigt i begge rør. Se i luppen, hvad der lander på jernet." }
                 ],
                 hint: [
                     "Vælg Kobber til venstre rør og Jern til højre rør, og tryk på Lad tiden gå.",
                     "Følg en af kuglerne med Cu²⁺ i vandet. Hvor lander den, og hvad sker der med jernatomet under den?",
-                    "Kobber er mere ædelt end jern. En kobberion tager to elektroner fra et jernatom."
+                    "Kobber er mere ædelt end jern. En kobber(II)ion tager to elektroner fra et jernatom."
                 ]
             },
-            loest: "Vandet har Cu²⁺ med fra kobberrøret. På jernrøret tager hver kobberion to elektroner fra et jernatom: Cu²⁺ + Fe → Cu + Fe²⁺. Derfor sættes jernrøret først."
+            loest: "Vandet har Cu²⁺ med fra kobberrøret. På jernrøret tager hver kobber(II)ion to elektroner fra et jernatom: Cu²⁺ + Fe → Cu + Fe²⁺. Derfor sættes jernrøret først."
         },
         {
             id: "plast", navn: "Plastmuffen",
@@ -224,7 +224,7 @@
         }
         if (krav.orden && par.a !== m0) {
             if (par.plast && par.ioner) {
-                return "Plastmuffen standser elektronerne, men vandet har stadig " + K.navn(par.ioner.fra) + "ioner med hen til " +
+                return "Plastmuffen standser elektronerne, men vandet har stadig " + K.navn(par.ioner.fra) + "(II)ioner med hen til " +
                     D.roeret(par.b) + ". Sæt " + D.roeret(m0) + " til venstre.";
             }
             return "Vandet skal komme gennem " + D.roeret(m0) + " først. Vælg " + D.Stort(K.navn(m0)) + " til venstre rør og " +
@@ -260,10 +260,10 @@
                 hint: [
                     "Sejl et år mere, og følg de gule elektroner i skroget.",
                     "Elektronerne går fra jernet i skroget hen til propellen. Hvad er propellen lavet af?",
-                    "Det er det samme som jernrøret og kobberrøret på fane 1."
+                    "Skroget og propellen svarer til jernrøret og kobberrøret på fane 1."
                 ]
             },
-            loest: "Det er det samme som i rørene: jern og kobber rører hinanden i vand. Jernet afgiver elektroner til propellen og tæres, mest tæt på propellen."
+            loest: "Jern og kobber rører hinanden i vand, ligesom i rørene på fane 1. Jernet afgiver elektroner til propellen og tæres, mest tæt på propellen."
         },
         {
             id: "klods", navn: "Beskyt skroget",
@@ -283,11 +283,11 @@
             spm: {
                 tekst: "Sæt en zinkklods på skroget, sejl et år, og se, hvad der forlader klodsen. Hvad sker der med zinken?",
                 svar: [
-                    { t: "Zn → Zn²⁺ + 2 e⁻. Zinkionerne går ud i havvandet.", ok: true },
+                    { t: "Zn → Zn²⁺ + 2 e⁻. Zn²⁺ går ud i havvandet.", ok: true },
                     { t: "Zinken slides af, når skibet sejler",
                       f: "Klodsen svinder også, når skibet ligger stille. Se på det, der forlader klodsen, mens skibet sejler." },
                     { t: "Zn²⁺ + 2 e⁻ → Zn. Zinken sætter sig på propellen.",
-                      f: "Så skulle zinken optage elektroner. Se på de gule elektroner: de går væk fra klodsen." }
+                      f: "Den reaktion kræver, at zinken optager elektroner. Se på de gule elektroner, som går væk fra klodsen." }
                 ],
                 hint: [
                     "Sæt en zinkklods på skroget, og tryk på Sejl 1 år. Se på klodsen imens.",
@@ -295,7 +295,7 @@
                     "Zink afgiver to elektroner og bliver til Zn²⁺."
                 ]
             },
-            loest: "Zink oxideres: Zn → Zn²⁺ + 2 e⁻. Elektronerne går gennem skroget til propellen, og zinkionerne går ud i havvandet. Klodsen ofres, og skroget er beskyttet."
+            loest: "Zink oxideres: Zn → Zn²⁺ + 2 e⁻. Elektronerne går gennem skroget til propellen, og Zn²⁺ går ud i havvandet. Klodsen ofres, og skroget er beskyttet."
         },
         {
             id: "mg", navn: "Magnesium",
@@ -311,7 +311,7 @@
                 tekst: "Sæt en magnesiumklods på skroget, og sejl, til klodsen er brugt op.",
                 hint: [
                     "Træk en magnesiumklods fra kajen ned på en plads på skroget.",
-                    "Tryk på Sejl 1 år, og følg tallet under klodsen.",
+                    "Tryk på Sejl 1 år, og følg, hvor mange procent der er tilbage af klodsen.",
                     "Sæt en magnesiumklods på, og sejl 2 år."
                 ]
             },
@@ -324,9 +324,9 @@
                 tekst: "Skibet er som nyt fra værftet. Hold skroget fri for rust i 10 år, og tryk så på Indsend svar. Hvor få klodser kan du nøjes med?",
                 indsend: true,
                 hint: [
-                    "Sæt en zinkklods på skroget, og hold øje med tallet under den efter hvert år.",
+                    "Sæt en zinkklods på skroget, og hold øje med, hvor mange procent der er tilbage af den efter hvert år.",
                     "En zinkklods holder tre et halvt år. Sæt en ny på, før den gamle er væk.",
-                    "En ny klods kan sidde på den anden plads, mens den gamle bliver brugt helt op. Så går intet zink til spilde."
+                    "En ny klods kan sidde på den anden plads, mens den gamle bliver brugt helt op. På den måde går intet zink til spilde."
                 ]
             },
             loest: "Ti år uden rust."
@@ -402,7 +402,7 @@
             id: "samlet", navn: "Det samlede skema",
             felter: {
                 skema: "samlet",
-                tekst: "Dioxygen optager de elektroner, jern afgiver. Der skal afgives lige så mange, som der optages. Skriv tallene i det samlede skema.",
+                tekst: "Dioxygen optager de elektroner, jern afgiver. Der skal afgives lige så mange elektroner, som der optages. Skriv tallene i det samlede skema.",
                 hint: [
                     "Ét jernatom afgiver 2 e⁻. Ét O₂ optager 4 e⁻.",
                     "Der skal så mange jernatomer til, at de tilsammen afgiver 4 e⁻.",
@@ -422,7 +422,7 @@
                     "4 FeO(OH) har 4 H. Resten af H-atomerne bliver til vand. Tæl til sidst O-atomerne."
                 ]
             },
-            loest: "Rust er jern(III)oxidhydroxid. Jern har nu afgivet tre elektroner i alt."
+            loest: "Rust er jern(III)oxidhydroxid. Hvert jernatom har nu afgivet tre elektroner i alt."
         },
         {
             id: "salt", navn: "Salt",
@@ -450,7 +450,7 @@
                     { t: "Saltet reagerer med jernet og bliver til rust",
                       f: "Se på skemaerne i panelet. Hverken Na⁺ eller Cl⁻ er med, og de bliver ikke brugt." },
                     { t: "Salt indeholder oxygen",
-                      f: "NaCl består af natrium og chlor. Dioxygenet kommer fra luften." }
+                      f: "NaCl består af Na⁺ og Cl⁻. Dioxygenet kommer fra luften." }
                 ],
                 hint: [
                     "Slå Salt til, og se, hvor Na⁺ og Cl⁻ bevæger sig hen i dråben.",

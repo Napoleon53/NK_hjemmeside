@@ -342,7 +342,7 @@
         ["Fe", "C4H10", 1, "Ét tungt atom mod fjorten lette. Fire C og ti H vejer tilsammen lidt mere end ét Fe."],
         ["Ar", "K", 1, "K har det største atomnummer, men Ar har den største atommasse. Det er atommassen, der tæller."],
         ["O3", "CO2", 1, "Begge har tre atomer. O₃ vejer mest, fordi ét O vejer mere end ét C."],
-        ["CO", "N2", 2, "Forskellen er kun 0,01 g. Så lidt kan skålvægten ikke mærke, så den står lige."],
+        ["CO", "N2", 2, "Forskellen i masse er kun 0,01 g. Så lidt kan skålvægten ikke mærke, så den står lige."],
         ["Cu", "SO2", 2, "Ét atom mod tre, men næsten samme masse. SO₂ vejer 0,51 g mere end Cu."],
         ["CO2", "C3H8", 2, "Næsten samme masse. C₃H₈ vejer 0,10 g mere, og det kan skålvægten mærke."],
         ["H2SO4", "H3PO4", 2, "Næsten samme masse. S vejer lidt mere end P og ét H tilsammen, så H₂SO₄ vejer mest."],
@@ -362,9 +362,9 @@
        foerste stof er det rigtige; de tre andre er de etiketter, der ligger
        ved siden af. */
     D.GAADE_NIVEAUER = [
-        { navn: "Tydelig forskel", farve: "#3d9ee0", hint: "Regn molarmassen for etiketterne. Groft er nok her: H er ca. 1, C 12, N 14 og O 16." },
-        { navn: "Tæt på", farve: "#3fae72", hint: "To af dem ligger tæt. Regn dem med tabellens atommasser." },
-        { navn: "To decimaler", farve: "#e6892a", hint: "Rundet af giver de næsten det samme. Regn med to decimaler." }
+        { navn: "Tydelig forskel", farve: "#3d9ee0", hint: "Regn molarmassen ud for stofferne på etiketterne. Her er det nok at regne groft: H er ca. 1, C 12, N 14 og O 16." },
+        { navn: "Tæt på", farve: "#3fae72", hint: "To af stofferne har næsten samme molarmasse. Regn dem ud med atommasserne fra det periodiske system." },
+        { navn: "To decimaler", farve: "#e6892a", hint: "Med afrundede atommasser får stofferne næsten samme molarmasse. Regn med to decimaler." }
     ];
     D.GAADER = [
         [0, ["H2O", "O2", "CO2", "NaCl"]],

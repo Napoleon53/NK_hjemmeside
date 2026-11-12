@@ -61,7 +61,7 @@
             { navn: "Hydrolyse", pladser: ["hydrolyse", "sur hydrolyse", "forsæbning"],
               ros: "Hydrolyse spalter esteren med vand. Sur hydrolyse er en ligevægt, og forsæbning forløber fuldstændig." },
             { navn: "Udbyttet", pladser: ["udbytteprocent", "teoretisk udbytte"],
-              ros: "Udbytteprocenten er udbyttet divideret med det teoretiske udbytte og ganget med 100 %." }
+              ros: "Udbytteprocenten er det faktiske udbytte divideret med det teoretiske udbytte og ganget med 100 %." }
         ],
         pladser: [
             titel("kondensation", KK, ["pilK"], {
@@ -197,7 +197,7 @@
                 lag: 2, auto: true,
                 fuld: function (g) {
                     ORG.kortB(g, KU.x, KU.y, KU.b, KU.h);
-                    ORG.t(g, KU.x + 24, KU.y + 30, "En gruppe fik 8,71 g propylpropanoat ud af en estersyntese.", { fs: 15, anker: "start", farve: F.daempet });
+                    ORG.t(g, KU.x + 24, KU.y + 30, "En gruppe fremstillede 8,71 g propylpropanoat ved en estersyntese.", { fs: 15, anker: "start", farve: F.daempet });
                     var A = { "font-size": 21, "font-weight": 700, fill: F.blaek };
                     SV.tekst(g, EQX, BY1 + 7, "=", A);
                     SV.tekst(g, BRX, BY1 - 12, "det udbytte, man fik", { "font-size": 19, "font-weight": 700, fill: F.blaek });

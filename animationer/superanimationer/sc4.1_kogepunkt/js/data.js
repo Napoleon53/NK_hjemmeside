@@ -114,11 +114,11 @@
         { slags: "flere", antal: 3, tekst: "Find kogepunktet for tre andre alkaner.",
           hint: "Træk et glas fra hylden ned i kammeret. Varm det op, eller køl det ned, til det skifter mellem væske og gas.",
           efter: "Kurven stiger. Jo længere kæden er, jo højere er kogepunktet." },
-        { slags: "gaet", tekst: "Gæt, hvor {navn} koger. Træk ? på kurven, og mål så.",
-          hint: "{Navn} har to C-atomer mere end {ned}. Følg kurven fra de korte kæder.",
+        { slags: "gaet", tekst: "Gæt kogepunktet for {navn}. Træk ? på kurven, og mål det.",
+          hint: "{Navn} har to C-atomer mere end {ned}. Forlæng kurven fra de korte kæder.",
           efter: "" },
         { slags: "koge", id: "icosan", tekst: "Kog icosan, C₂₀H₄₂. Det findes i stearinlys.",
-          hint: "Icosan står yderst til højre på hylden. Det skal helt op over 300 °C.",
+          hint: "Icosan står yderst til højre på hylden. Temperaturen skal helt op over 300 °C.",
           efter: "Icosan koger først ved 343 °C. Lange kæder holder godt fast i hinanden." }
     ];
 
@@ -127,19 +127,19 @@
 
     /* ----- Fane 2: Formen --------------------------------------------------------- */
     D.FORM_SPM = "Hvilken ballon fyldes først?";
-    D.FORM_HINT = "Alle tre har formlen C₅H₁₂. Det er kun formen, der er forskellig.";
-    D.FORM_VARM_HINT = "Træk termometeret op over 36 °C. Så koger alle tre.";
+    D.FORM_HINT = "Alle tre stoffer har formlen C₅H₁₂. Kun molekylernes form er forskellig.";
+    D.FORM_VARM_HINT = "Træk termometeret op over 36 °C, så alle tre stoffer koger.";
 
     D.HVORFOR = {
         spm: "Hvorfor koger 2,2-dimethylpropan først?",
-        hint: "Samme atomer og samme masse. Se på formen: hvor meget kan molekylerne røre hinanden?",
+        hint: "Samme atomer og samme masse. Se på formen. Hvor meget kan molekylerne røre hinanden?",
         valg: [
             { t: "Molekylerne rører hinanden mindst", rigtig: true,
               svar: "Et kugleformet molekyle har mindst berøringsflade. Derfor tiltrækker molekylerne hinanden svagest." },
-            { t: "Det har færrest atomer",
-              svar: "Alle tre er C₅H₁₂. De har præcis de samme atomer." },
-            { t: "Det er lettest",
-              svar: "Samme formel giver samme masse. Alle tre har M = 72,15 g/mol." },
+            { t: "Molekylet har færrest atomer",
+              svar: "Alle tre stoffer har formlen C₅H₁₂, så molekylerne har præcis de samme atomer." },
+            { t: "Molekylet er lettest",
+              svar: "Samme formel giver samme masse, så alle tre stoffer har M = 72,15 g/mol." },
             { t: "Bindingerne i molekylet er svagest",
               svar: "Når et stof koger, går molekylerne fra hinanden. Molekylerne selv er hele." }
         ]
@@ -150,8 +150,8 @@
        Kammeret varmer op til midt mellem de to laveste kogepunkter. */
     D.SPIL_NIVEAUER = [
         { navn: "Kædelængde", hint: "Tæl C-atomerne i hvert molekyle. Hvilke molekyler rører hinanden mindst?" },
-        { navn: "Formen", hint: "Alle har formlen C₅H₁₂. Hvilket molekyle er mest kugleformet?" },
-        { navn: "Begge dele", hint: "Tæl C-atomerne først. Formen afgør det kun, når antallet er det samme." }
+        { navn: "Formen", hint: "Alle stofferne har formlen C₅H₁₂. Hvilket molekyle er mest kugleformet?" },
+        { navn: "Begge dele", hint: "Tæl C-atomerne først. Formen tæller kun, når molekylerne har lige mange C-atomer." }
     ];
 
     D.BLANDINGER = [
@@ -188,13 +188,13 @@
        valgte (eller foer de andre, naar svaret var rigtigt). */
     D.hvorfor = function (rigtig, anden) {
         if (rigtig.nC === anden.nC) {
-            return "Samme formel. Det mest forgrenede molekyle rører sine naboer mindst.";
+            return "Stofferne har samme formel, og det mest forgrenede molekyle rører sine naboer mindst.";
         }
         if (rigtig.nC < anden.nC && anden.grene > rigtig.grene) {
             return "Flere C-atomer løfter kogepunktet mere, end grenene sænker det.";
         }
         if (rigtig.grene > anden.grene) {
-            return "Den er både kortere og mere forgrenet. Molekylerne rører hinanden mindst.";
+            return rigtig.Navn + " har en kortere og mere forgrenet kæde, så molekylerne rører hinanden mindst.";
         }
         return "Den korte kæde rører sine naboer mindst.";
     };

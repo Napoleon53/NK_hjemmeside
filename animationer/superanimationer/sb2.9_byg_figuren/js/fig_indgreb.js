@@ -56,7 +56,7 @@
         vb: [1100, 580],
         lag: [
             { navn: "Indgreb og forskydning", pladser: ["indgreb", "forskudt", "Le Chateliers princip"],
-              ros: "Indgrebet får [H₂] til at springe op. Ligevægten forskydes, så den modvirker indgrebet, og noget af dihydrogenet bruges." }
+              ros: "Indgrebet får [H₂] til at springe op. Ligevægten forskydes, så den modvirker indgrebet, og noget af dihydrogenet forbruges." }
         ],
         pladser: [
             { id: "indgreb", ord: ["indgreb"], x: X(6.1), y: Y(0.31), maal: [X(T1) + 2, Y(0.31)], dele: ["graf", "spring"],
@@ -130,7 +130,7 @@
                     REGEL.forEach(function (l, i) { KV.tekst(g, BK.x + 26, BK.y + 58 + i * 26, l, { fs: 16, anker: "start" }); });
                     KV.linje(g, BK.x + 26, BK.y + 172, BK.x + BK.b - 26, BK.y + 172, "#d5dde2", 1.2);
                     KV.tekst(g, BK.x + 26, BK.y + 202, "Her bliver noget af det tilsatte", { fs: 14.5, farve: F.daempet, anker: "start" });
-                    KV.tekst(g, BK.x + 26, BK.y + 224, "dihydrogen brugt igen.", { fs: 14.5, farve: F.daempet, anker: "start" });
+                    KV.tekst(g, BK.x + 26, BK.y + 224, "dihydrogen forbrugt.", { fs: 14.5, farve: F.daempet, anker: "start" });
                     return {};
                 },
                 byg: function (g, r, an) { an.fade(g, 0, 500); }

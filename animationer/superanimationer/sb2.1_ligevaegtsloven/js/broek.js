@@ -328,7 +328,7 @@
 
     B.hintTrin = function (opg, num, den) {
         var d = B.dom(opg, num, den);
-        if (d.ok) return { s: null, trin: ["Brøken er klar til at blive tjekket. Tryk Tjek brøken."] };
+        if (d.ok) return { s: null, trin: ["Brøken er klar til at blive tjekket. Tryk på Indsend svar."] };
         var zn = ZN[d.z], K = d.s ? B.kon(d.s) : "", f = d.s ? B.skriv(d.s) : "";
         var op = d.z === "num" ? "op i tælleren" : "ned i nævneren";
         switch (d.kode) {
@@ -349,7 +349,7 @@
                 "Fjern den gangeprik, der er i overskud."] };
         case "en":
             return { s: null, trin: ["Se på 1 i " + zn + ".",
-                "1 skriver man kun, når der ikke står noget andet.",
+                "1 skrives kun, når der ikke står noget andet i " + zn + ".",
                 "Fjern 1 fra " + zn + "."] };
         case "eks-foerst":
             return { s: null, trin: ["Se på eksponenten " + NK.haevet(d.v) + ".",
@@ -402,7 +402,7 @@
                     "Leddet skal være " + B.led(d.s, d.k) + "."] };
             }
             return { s: d.s, trin: ["Se på tallet foran " + f + " i skemaet.",
-                "Der står ikke noget tal foran " + f + ". Så er eksponenten 1, og den skrives ikke.",
+                "Der står ikke noget tal foran " + f + ". Eksponenten er derfor 1, og den skrives ikke.",
                 "Fjern eksponenten efter " + K + "."] };
         }
         return { s: null, trin: ["Sammenlign brøken med skemaet."] };

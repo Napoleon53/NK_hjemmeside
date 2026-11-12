@@ -55,7 +55,7 @@
             { navn: "Fra kæde til ring", pladser: ["ringslutning", "haworthformel"],
               ros: "Ved ringslutningen binder oxygenatomet på carbonatom 5 sig til carbonatom 1. Ringen tegnes som en haworthformel." },
             { navn: "α og β", pladser: ["α-glucose", "β-glucose"],
-              ros: "I α-glucose peger OH på carbonatom 1 ned, og i β-glucose peger den op. I vand er 64 % β-glucose." }
+              ros: "I α-glucose peger OH-gruppen på carbonatom 1 ned, og i β-glucose peger den op. I vand er 64 % af glucosen β-glucose." }
         ],
         pladser: [
             { id: "ringslutning", ord: ["ringslutning"], x: (PIL.x1 + PIL.x2) / 2 + 4, y: 26, maal: [(PIL.x1 + PIL.x2) / 2, PIL.y - 12], dele: ["pil"],

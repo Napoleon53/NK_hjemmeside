@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="112" viewBox="0 0 150 112">
+  <!-- pH-meter til bordet. Displayet tegnes af animationen: x 16-134,
+       y 16-56. Ledningen til elektroden sidder i stikket ved (128, 6). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="0.55" stop-color="#d4d9e0"/>
+      <stop offset="1" stop-color="#b3bac4"/>
+    </linearGradient>
+    <linearGradient id="skaerm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#25352c"/>
+      <stop offset="1" stop-color="#1a261f"/>
+    </linearGradient>
+    <linearGradient id="knap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5d6b7d"/>
+      <stop offset="1" stop-color="#3b4655"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="75" cy="108" rx="68" ry="4" fill="#000000" fill-opacity="0.2"/>
+  <rect x="4" y="6" width="142" height="100" rx="12" fill="url(#krop)" stroke="#8b94a1" stroke-width="1.5"/>
+  <rect x="7" y="8" width="136" height="10" rx="5" fill="#ffffff" fill-opacity="0.45"/>
+  <!-- displayet -->
+  <rect x="14" y="14" width="122" height="44" rx="6" fill="#59636f"/>
+  <rect x="16" y="16" width="118" height="40" rx="5" fill="url(#skaerm)"/>
+  <rect x="18" y="18" width="114" height="8" rx="3" fill="#ffffff" fill-opacity="0.06"/>
+  <!-- knapper og navn -->
+  <rect x="16" y="70" width="34" height="14" rx="7" fill="url(#knap)"/>
+  <rect x="58" y="70" width="34" height="14" rx="7" fill="url(#knap)"/>
+  <circle cx="122" cy="77" r="9" fill="#2f9a5f" stroke="#1e6b41" stroke-width="1.5"/>
+  <text x="16" y="99" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="700" fill="#4b5563">pH-meter</text>
+  <!-- stikket -->
+  <rect x="122" y="0" width="12" height="9" rx="2" fill="#3b4655"/>
+</svg>

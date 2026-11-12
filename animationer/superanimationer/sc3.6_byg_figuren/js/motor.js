@@ -589,7 +589,7 @@ window.NK = NK;
             if (fraPlads) {
                 if (self.valgt && self.valgt !== fraPlads.paa) self.placer(self.valgt, fraPlads);
                 else if (fraPlads.paa) self.tilBakken(fraPlads);
-                else self.peg("Træk et fagord fra bakken hen på den gule plads, eller klik først på ordet og så på pladsen.");
+                else self.peg("Træk et fagord hen på den gule plads, eller klik først på ordet og så på pladsen.");
             } else if (ord) {
                 self.vaelg(self.valgt === ord ? null : ord);
             }

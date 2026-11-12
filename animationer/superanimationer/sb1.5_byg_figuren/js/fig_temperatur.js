@@ -41,7 +41,7 @@
         vb: [1100, 540],
         lag: [
             { navn: "Varmere og hurtigere", pladser: ["temperatur", "aktiveringsenergi", "reaktionshastighed"],
-              ros: "Ved 30 °C har dobbelt så mange molekyler energi nok. Hver 10 °C giver omtrent dobbelt reaktionshastighed." }
+              ros: "Ved 30 °C har dobbelt så mange molekyler energi nok til at reagere. For hver 10 °C bliver reaktionshastigheden omtrent fordoblet." }
         ],
         pladser: [
             { id: "temperatur", ord: ["temperatur"], x: 175, y: 62, maal: [L20.x + 22, L20.y - 17], dele: ["grader"],

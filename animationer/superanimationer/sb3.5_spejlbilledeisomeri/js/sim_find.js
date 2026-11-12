@@ -81,7 +81,7 @@
     };
 
     P.promptHTML = function () {
-        return NK.html(this.o.visNavn + ". Klik på de asymmetriske C-atomer, eller vælg Intet asymmetrisk C-atom. Tryk så Indsend svar.");
+        return NK.html("Tavlen viser " + this.o.visNavn + ". Klik på de asymmetriske C-atomer, eller vælg Intet asymmetrisk C-atom. Tryk så Indsend svar.");
     };
 
     P.trinLinje = function () {
@@ -113,11 +113,11 @@
         var forkert = Object.keys(this.marker).map(Number).filter(function (id) { return asym.indexOf(id) < 0; });
         var t3;
         if (forkert.length) t3 = "Se på det C-atom, der lyser. " + K.grund(this.mol, forkert[0]);
-        else if (mangler.length) t3 = "Se på det C-atom, der lyser. Det har " + K.grupperTekst(this.mol, mangler[0]) + ": fire forskellige grupper.";
+        else if (mangler.length) t3 = "Se på det C-atom, der lyser. Det har fire forskellige grupper: " + K.grupperTekst(this.mol, mangler[0]) + ".";
         else if (!asym.length) t3 = "Se på det C-atom, der lyser. " + K.grund(this.mol, this.fristende()) + " Intet C-atom har fire forskellige grupper.";
-        else t3 = "Du har fundet " + (asym.length === 1 ? "det" : "dem alle") + ". Tryk Indsend svar.";
+        else t3 = "Du har fundet " + (asym.length === 1 ? "det asymmetriske C-atom" : "alle de asymmetriske C-atomer") + ". Tryk Indsend svar.";
         return [
-            "Et asymmetrisk C-atom har fire forskellige grupper. Et C med to H eller med en dobbeltbinding kan ikke være det.",
+            "Et asymmetrisk C-atom har fire forskellige grupper. Et C med to H eller med en dobbeltbinding kan ikke være asymmetrisk.",
             "Nu er alle H tegnet. Se på de C-atomer, der har ét H eller slet intet H, og tæl grupperne.",
             t3
         ];
@@ -148,7 +148,7 @@
             var f = this.fristende();
             return "Intet C-atom har fire forskellige grupper. " + (f !== null ? K.grund(mol, f) : "");
         }
-        if (asym.length === 1) return "Det asymmetriske C-atom har " + K.grupperTekst(mol, asym[0]) + ". Så findes " + this.o.navn + " i to enantiomerer.";
+        if (asym.length === 1) return "Det asymmetriske C-atom har " + K.grupperTekst(mol, asym[0]) + ". Derfor findes " + this.o.navn + " som to spejlbilledisomerer.";
         return "Begge de markerede C-atomer har fire forskellige grupper: " + K.grupperTekst(mol, asym[0]) + ".";
     };
 

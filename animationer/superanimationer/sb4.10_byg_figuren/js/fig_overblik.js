@@ -29,12 +29,12 @@
         vb: [1160, 536],
         lag: [
             { navn: "Reaktioner og syntese", pladser: ["oxidation", "reduktion", "syntese"],
-              ros: "Den ene vej er en oxidation og den anden vej en reduktion. En syntese er en rute i flere trin." }
+              ros: "Den øverste pil er en oxidation, og den nederste pil er en reduktion. En syntese er en rute i flere trin." }
         ],
         pladser: [
             { id: "oxidation", ord: ["oxidation"], x: (PX[0] + PX[1]) / 2, y: KO.y + 46, maal: [(PX[0] + PX[1]) / 2, OY - 22], dele: ["pilO"],
               omr: [{ r: [PX[0] - 8, OY - 24, PX[1] - PX[0] + 16, 24, 10] }],
-              fejl: { reduktion: "<b>reduktion</b> er det modsatte. Ad den øverste pil får carbonatomet en binding mere til oxygen og færre til hydrogen.",
+              fejl: { reduktion: "<b>reduktion</b> er det omvendte af en oxidation. Ad den øverste pil får carbonatomet en binding mere til oxygen og færre til hydrogen.",
                       syntese: "<b>syntese</b> er en fremstilling i flere trin. Pladsen peger på én reaktion, hvor OH bliver til C=O." } },
             { id: "reduktion", ord: ["reduktion"], x: (PX[0] + PX[1]) / 2, y: KO.y + KO.h - 34, maal: [(PX[0] + PX[1]) / 2, OY + 22], dele: ["pilR"],
               omr: [{ r: [PX[0] - 8, OY, PX[1] - PX[0] + 16, 24, 10] }],

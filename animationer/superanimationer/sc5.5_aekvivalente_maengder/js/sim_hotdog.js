@@ -574,7 +574,7 @@
         var ing = t.id ? D.ingrediens(t.id) : null, k = t.id ? o.k[t.id] : 0;
         if (t.art === "antal") {
             return "Opskriften: " + k + " " + (k === 1 ? ing.navn : ing.flertal) + " pr. " + ops.navn + ". Til " +
-                D.produkt(ops, o.P) + " skal der " + o.P + " · " + k + ".";
+                D.produkt(ops, o.P) + " skal der bruges " + o.P + " · " + k + ".";
         }
         if (t.art === "begr") {
             return "Hvor mange " + ops.flertal + " rækker hver ingrediens til? " + D.liste(ops.led.map(function (l) {
@@ -583,10 +583,10 @@
         }
         if (t.art === "produkter") {
             var B = D.ingrediens(o.begr);
-            return D.stort(B.bestemt) + " bestemmer det: " + o.fyld[o.begr] + " " + B.flertal + " / " + o.k[o.begr] +
+            return D.stort(B.bestemt) + " bestemmer, hvor mange der kan laves: " + o.fyld[o.begr] + " " + B.flertal + " / " + o.k[o.begr] +
                 " pr. " + ops.navn + ".";
         }
-        return D.produkt(ops, o.P) + " bruger " + o.P + " · " + k + " " + ing.flertal + ". Der lå " + o.fyld[t.id] + ".";
+        return D.produkt(ops, o.P) + " bruger " + o.P + " · " + k + " " + ing.flertal + ". Der lå " + o.fyld[t.id] + " på brættet.";
     };
 
     /* Svaret paa et trin, skrevet som en udregning */
@@ -599,7 +599,7 @@
         }
         if (t.art === "produkter") {
             var nB = o.fyld[o.begr], kB = o.k[o.begr], rest = nB % kB;
-            return D.stk(o.begr, nB) + " / " + kB + " = " + (rest ? String(nB / kB).replace(".", ",") + ". Der kan kun laves hele, altså " +
+            return D.stk(o.begr, nB) + " / " + kB + " = " + (rest ? String(nB / kB).replace(".", ",") + ". Der kan kun laves hele retter, altså " +
                 D.produkt(ops, o.P) : D.produkt(ops, o.P)) + ".";
         }
         return o.fyld[t.id] + " − " + o.P + " · " + o.k[t.id] + " = " + D.stk(t.id, t.svar) + " i overskud.";
@@ -935,7 +935,7 @@
         var trin = this.aktivtTrin();
         if (this.traek && this.traek.flyttet) t = "Slip over skærebrættet.";
         else if (this.serv && !this.serv.faerdig) t = "Retterne samles efter opskriften.";
-        else if (this.serv && this.serv.retur > 0) t = "Kunden tæller efter og sender dem tilbage.";
+        else if (this.serv && this.serv.retur > 0) t = "Kunden tæller efter og sender retterne tilbage.";
         else if (o && trin && trin.art === "begr") t = "Vælg den ingrediens, der slipper op først, på kortet eller på brættet.";
         else if (o && o.slags !== "disk" && !this.naaet) t = "Skriv svaret i panelet til højre. Opskriften hænger på væggen.";
         else if (tom && !this.serv) t = "Træk en ting fra en beholder hen på skærebrættet. Klik på en ting for at tage den af igen.";

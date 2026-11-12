@@ -53,7 +53,7 @@
 
     var TRIN = [
         { navn: "Oxidationstal", spm: function () { return "Skriv oxidationstallene i felterne over atomerne."; } },
-        { navn: "Hvad oxideres?", spm: function () { return "Oxidation eller reduktion? Vælg ved hver klamme."; } },
+        { navn: "Hvad oxideres?", spm: function () { return "Vælg ved hver klamme, om det er en oxidation eller en reduktion."; } },
         { navn: "Elektroner pr. atom", spm: function () { return "Hvor meget stiger og falder oxidationstallet pr. atom?"; } },
         { navn: "Koefficienter", spm: function () { return "Skriv et tal foran hvert stof, så der afgives og optages lige mange elektroner."; } },
         { navn: "Ladningen", spm: function () { return "Hvad er den samlede ladning før og efter pilen?"; } },
@@ -374,7 +374,7 @@
         if (!okO) felter.push("eox");
         if (!okR) felter.push("ered");
         if (!okO && !okR && vo !== null && vr !== null && Math.abs(vo) === R.red.delta && Math.abs(vr) === R.ox.delta) {
-            this.fejl("Du har byttet om. " + R.ox.E + " går fra " + X.ox(R.ox.fra) + " til " + X.ox(R.ox.til) + ".", felter);
+            this.fejl("Du har byttet om på stigningen og faldet. " + R.ox.E + " går fra " + X.ox(R.ox.fra) + " til " + X.ox(R.ox.til) + ".", felter);
             return;
         }
         this.fejl(okO ? X.eFejl(R, R.red, vr) : X.eFejl(R, R.ox, vo), felter);
@@ -421,10 +421,10 @@
         }
         var m = k[0] / R.koef[0];
         if (m > 1 && m % 1 === 0 && k.every(function (v, j) { return v === m * R.koef[j]; })) {
-            this.fejl("Afstemt, men alle tallene kan deles med " + m + ". Brug de mindste tal.", R.led.map(function (l, j) { return "k" + j; }));
+            this.fejl("Reaktionen er afstemt, men alle tallene kan deles med " + m + ". Brug de mindste tal.", R.led.map(function (l, j) { return "k" + j; }));
             return;
         }
-        this.fejl("Tjek tallene igen. Hvert par skal have lige mange atomer på begge sider.", R.led.map(function (l, j) { return "k" + j; }));
+        this.fejl("Tjek tallene igen. Hvert grundstof på klammerne skal have lige mange atomer før og efter pilen.", R.led.map(function (l, j) { return "k" + j; }));
     };
 
     /* Afgivet: 5 · 1 e⁻ = 5 e⁻. Optaget: 1 · 5 e⁻ = 5 e⁻. */
@@ -474,7 +474,7 @@
         var forkert = rig.side === "v" ? "h" : "v";
         if (n[forkert] > 0) {
             this.fejl(ion + " er " + (R.ionSt.q > 0 ? "positive" : "negative") + ". Før pilen er ladningen " + X.lad(q0.v) + " og efter pilen "
-                + X.lad(q0.h) + ". Så " + ion + " skal på den side, der har " + (R.ionSt.q > 0 ? "mindst" : "størst") + " ladning.", [forkert === "v" ? "iv" : "ih"]);
+                + X.lad(q0.h) + ". Derfor skal " + ion + " stå på den side, der har " + (R.ionSt.q > 0 ? "mindst" : "størst") + " ladning.", [forkert === "v" ? "iv" : "ih"]);
             return;
         }
         var q1 = this.ladningNu(), mangler = Math.abs(q1.v - q1.h) / Math.abs(R.ionSt.q);
@@ -516,9 +516,9 @@
             return "Stiger oxidationstallet, er det en oxidation. Falder det, er det en reduktion.";
         case T_E:
             return R.ox.E + " går fra " + X.ox(R.ox.fra) + " til " + X.ox(R.ox.til) + ", og " + R.red.E + " går fra "
-                + X.ox(R.red.fra) + " til " + X.ox(R.red.til) + ". Hvor mange trin er det?";
+                + X.ox(R.red.fra) + " til " + X.ox(R.red.til) + ". Hvor meget ændrer hvert oxidationstal sig?";
         case T_K:
-            var t = this.eEnhedTekst() + " Find det mindste antal elektroner, som begge går op i.";
+            var t = this.eEnhedTekst() + " Find det mindste antal elektroner, som begge tal går op i.";
             var idx = [R.ox, R.red].filter(function (Pp) { return Pp.nV !== Pp.nH; })[0];
             if (idx) t += " Husk indekstallet i " + R.led[idx.nV > idx.nH ? idx.v : idx.h].st.tekst + ".";
             return t;

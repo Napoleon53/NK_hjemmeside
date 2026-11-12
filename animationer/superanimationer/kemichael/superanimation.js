@@ -186,7 +186,7 @@
             midte: function (h) {
                 return [{ arm: -0.75, tid: 0.6 }].concat(
                     h.udtryk({ briller: 1, skeptisk: 0.6 }), h.vent(0.8),
-                    h.sig("Der mangler 20 mL. Jeg målte den i morges."),
+                    h.sig("Der mangler 20 mL. Jeg målte kaffen i morges."),
                     h.udtryk({ briller: 0, skeptisk: 0 })
                 );
             }
@@ -318,10 +318,10 @@
     R.uheld = [
         "Det var ikke meningen, men det er de færreste uheld.",
         "Jeg henter køkkenrullen igen.",
-        "Sådan lærer man det også, bare langsommere.",
+        "Sådan lærer man det også, men langsommere.",
         "Det kommer i regnskabet.",
         "Vi kalder det en observation.",
-        "Det er derfor, der er bordplade og ikke gulvtæppe.",
+        "Derfor er der bordplade og ikke gulvtæppe.",
         "Vi har alle hældt ved siden af. Nogle af os gjorde det i 1994."
     ];
 
@@ -334,7 +334,7 @@
     G.dab = "Det lærte jeg af en elev i 1.g i 2016.";
     G.stroem = "Strømmen bliver betalt af kaffebudgettet.";
     G.titrering = "Min første titrering gav et udbytte på 140 %. Det blev en lang nat.";
-    G.afslag = "Mit afslag fra et tidsskrift hænger indrammet på kontoret. Det blev afvist af samme grund.";
+    G.afslag = "Et tidsskrift afviste engang min artikel af samme grund. Afslaget hænger indrammet på kontoret.";
     G.kaktus = "Bunsen er min kaktus, så han kan tåle det.";
     G.kunst = "Skårene gemmer jeg. De skal bruges til en kunstinstallation.";
     G.rene3 = "Det er tre forsøg uden uheld. Det står også i regnskabet.";
@@ -375,14 +375,14 @@
         soevn: {
             prik: ["Jeg har sovet fire timer, så vælg dine ord med omhu.", "Ikke i dag, tak."],
             ros: ["Det er godt, så nu kan jeg sætte mig ned."],
-            uheld: ["Ikke i dag. Bare ikke i dag."],
+            uheld: ["Ikke i dag. Helst ikke i dag."],
             stilstand: ["Vi står begge to stille, men jeg har en undskyldning."]
         },
         maskine: {
             prik: ["Der er kommet en ny kaffemaskine, så jeg er et bedre menneske i dag.",
                 "Spørg gerne om noget fagligt, mens jeg er i godt humør."],
             ros: ["Det er flot, og kaffen er varm. Det er en god dag."],
-            uheld: ["Det skete altså også i dag."],
+            uheld: ["Det skete også i dag."],
             stilstand: ["Jeg har god tid, for jeg har lige hentet kaffe."]
         },
         rettebunke: {
@@ -401,13 +401,13 @@
             prik: ["Jeg har siddet i møde i fire timer.", "Jeg har brugt hele dagen på et skema, og det her er nemmere."],
             ros: ["Det var dagens første ting, der gik som planlagt."],
             uheld: ["Det skal jeg også skrive ind i et skema."],
-            stilstand: ["Jeg har siddet stille hele dagen. Nu er det din tur til at lade være."]
+            stilstand: ["Jeg har siddet stille hele dagen. Nu er det din tur til at komme i gang."]
         },
         aften: {
             prik: ["Klokken er over fem, så jeg burde være gået hjem.", "Ifølge skemaet har jeg fri, men jeg står her stadig."],
             ros: ["Det er godt, så nu kan jeg låse."],
             uheld: ["Skulle det ske nu, på dette tidspunkt?"],
-            stilstand: ["Jeg venter gerne, bare ikke hele aftenen."]
+            stilstand: ["Jeg venter gerne, men ikke hele aftenen."]
         },
         nat: function (t) {
             return {

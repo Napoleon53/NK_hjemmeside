@@ -191,7 +191,7 @@ function koerTest(W) {
     tid(r1, 3);
     paastand("fructose er lukket til en ring med fem atomer", r1.ramme === "K2" && r1.fase === "spm");
     r1.valgt = 0; r1.indsendKlik(); r1.videreKlik(); r1.valgt = 0; r1.indsendKlik();
-    paastand("fructose er løst med stjerne, og begge er løst", r1.status[1].stjerne && r1.antalLoest() === 2 && /Begge sukkerstoffer/.test(bliv(r1)));
+    paastand("fructose er løst med stjerne, og begge er løst", r1.status[1].stjerne && r1.antalLoest() === 2 && /Glucose og fructose er begge lukket/.test(bliv(r1)));
     paastand("kortets knap fører videre til fane 2", r1.groen.knap === "Videre til Fra fischer til haworth →");
     r1.forfra();
     r1.visSvar();

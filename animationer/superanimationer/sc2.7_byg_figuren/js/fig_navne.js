@@ -86,7 +86,7 @@
         vb: [1000, 792],
         lag: [
             { navn: "Positive ioner", pladser: ["natriumion", "jern(II)ion", "jern(III)ion"], ekstra: ["ammonium"],
-              ros: "Positive ioner af ét atom hedder grundstoffets navn og ion. Jern kan danne to, så ladningen står i parentes." },
+              ros: "Positive ioner af ét atom hedder grundstoffets navn og ion. Jern kan danne to slags ioner, så ladningen står i parentes." },
             { navn: "Negative ioner", pladser: ["-id", "fluorid", "chlorid", "oxid", "sulfid", "nitrid"], ekstra: ["sulfat"],
               ros: "Negative ioner af ét atom ender på -id og bygger på grundstoffets internationale navn." },
             { navn: "Sammensatte ioner", pladser: ["sammensat ion", "hydroxid", "nitrat", "carbonat"],
@@ -96,7 +96,7 @@
         ],
         pladser: [
             navn("natriumion", null, KOL5[0], R1, ["na"],
-                { ammonium: "<b>ammonium</b> er den sammensatte ion NH₄⁺. Kortet viser kun ét natriumatom." }),
+                { ammonium: "<b>ammonium</b> er den sammensatte ion NH₄⁺. Kortet viser Na⁺, en ion af kun ét atom." }),
             navn("jern(II)ion", null, KOL5[1], R1, ["fe2"], J2),
             navn("jern(III)ion", null, KOL5[2], R1, ["fe3"], J3),
 
@@ -107,7 +107,7 @@
             navn("chlorid", null, KOL5[1], R2, ["cl"]),
             navn("oxid", null, KOL5[2], R2, ["o"]),
             navn("sulfid", null, KOL5[3], R2, ["s"],
-                { sulfat: "<b>sulfat</b> er den sammensatte ion SO₄²⁻. S²⁻ er kun ét svovlatom." }),
+                { sulfat: "<b>sulfat</b> er den sammensatte ion SO₄²⁻. S²⁻ er en ion af kun ét svovlatom." }),
             navn("nitrid", null, KOL5[4], R2, ["n"]),
 
             { id: "sammensat ion", ord: ["sammensat ion"], x: RAMME.x + RAMME.b / 2, y: RAMME.y, maal: [RAMME.x + RAMME.b / 2, RAMME.y], titel: true, dele: ["ramme"],
@@ -117,13 +117,13 @@
                       carbonat: "<b>carbonat</b> er kun CO₃²⁻. Rammen rummer alle de sammensatte ioner." } },
             navn("hydroxid", null, KOL3[0], R3, ["oh"]),
             navn("nitrat", null, KOL3[1], R3, ["no3"],
-                { nitrid: "<b>nitrid</b> er N³⁻, kun ét nitrogenatom. Kortet viser NO₃⁻ med oxygen." }),
+                { nitrid: "<b>nitrid</b> er N³⁻ med kun ét nitrogenatom. Kortet viser NO₃⁻ med oxygen." }),
             navn("carbonat", null, KOL3[2], R3, ["co3"]),
             navn("sulfat", null, KOL3[0], R4, ["so4"],
-                { sulfid: "<b>sulfid</b> er S²⁻, kun ét svovlatom. Kortet viser SO₄²⁻ med oxygen." }),
+                { sulfid: "<b>sulfid</b> er S²⁻ med kun ét svovlatom. Kortet viser SO₄²⁻ med oxygen." }),
             navn("phosphat", null, KOL3[1], R4, ["po4"]),
             navn("ammonium", null, KOL3[2], R4, ["nh4"],
-                { natriumion: "<b>natriumion</b> er Na⁺, kun ét atom. Kortet viser NH₄⁺, en gruppe af atomer." })
+                { natriumion: "<b>natriumion</b> er Na⁺ med kun ét atom. Kortet viser NH₄⁺, en gruppe af atomer." })
         ],
 
         tegn: function (api) {

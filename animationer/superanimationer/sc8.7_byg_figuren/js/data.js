@@ -24,7 +24,7 @@ window.NK = NK;
         "oxidation": "Det, der sker, når et stof afgiver elektroner. Magnesium gør det, når det brænder og bliver til Mg²⁺.",
         "reduktion": "Det, der sker, når et stof optager elektroner. Dioxygen gør det og bliver til O²⁻, når magnesium brænder.",
         "redoxreaktion": "Elektroner overføres fra ét stof til et andet. Det ene stof afgiver dem, og det andet optager dem samtidig.",
-        "delreaktion": "Skema, der kun viser det ene stof, som enten afgiver eller optager elektroner. Elektronerne skrives med som e⁻.",
+        "delreaktion": "Skema, der kun viser, hvordan ét stof afgiver eller optager elektroner. Elektronerne skrives med som e⁻.",
         "oxidationsmiddel": "Stof, der optager elektroner fra et andet stof. Dioxygen, dichlor og dibrom er kraftige eksempler.",
         "reduktionsmiddel": "Stof, der afgiver elektroner til et andet stof. Metaller som magnesium, aluminium og natrium er kraftige eksempler.",
         /* 8.2 Spændingsrækken */
@@ -32,7 +32,7 @@ window.NK = NK;
         "ædelt": "Siges om et metal, der nødigt afgiver elektroner, for eksempel sølv og guld.",
         "spændingsrækken": "Liste, hvor metallerne står ordnet efter, hvor let de afgiver elektroner. De, der gør det lettest, står til venstre.",
         /* 8.3 Oxidationstal */
-        "oxidationstal": "Tal, der udtrykker, hvor mange elektroner atomet har afgivet (plus) eller optaget (minus). Det tæller også elektroner, der kun er afgivet eller optaget delvist, og skrives med romertal, for eksempel −II.",
+        "oxidationstal": "Tal, der angiver, hvor mange elektroner et atom har afgivet (plus) eller optaget (minus). Det tæller også elektroner, der kun er afgivet eller optaget delvist, og skrives med romertal, for eksempel −II.",
         /* 8.4 Afstemning af redoxreaktioner */
         "permanganat": "Violet ion med formlen MnO₄⁻. Den er et meget brugt oxidationsmiddel og bliver farveløs, når den reduceres i sur opløsning."
     };

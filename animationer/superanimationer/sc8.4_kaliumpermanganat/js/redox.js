@@ -226,7 +226,7 @@
         if (st.slags === "grundstof") return st.tekst + " står alene uden ladning. Et grundstof har oxidationstallet 0.";
         if (st.slags === "ion") return st.tekst + " er en ion af ét atom. Oxidationstallet er ionens ladning.";
         var t = "I " + st.tekst + " er " + faste(st).map(function (s) { return s + " " + ox(st.ox[s]); }).join(" og ") + ".";
-        if (E === "O") t = "O er ikke −II her, for O sidder på O. " + t;
+        if (E === "O") t = "O er ikke −II her, for O er bundet til O. " + t;
         return t + " Summen af oxidationstallene skal være " + sumTekst(st) + ".";
     }
 
@@ -261,19 +261,19 @@
         if (n === null || isNaN(n)) return "Skriv, hvor meget " + K.E + " stiger eller falder, i feltet ved pilen.";
         n = Math.abs(n);
         if (op !== K.op) {
-            return gaarTekst(K) + ". Tallet bliver " + (K.op ? "større" : "mindre") + ", så pilen skal pege " + (K.op ? "op" : "ned") + ".";
+            return gaarTekst(K) + ". Oxidationstallet bliver " + (K.op ? "større" : "mindre") + ", så pilen skal pege " + (K.op ? "op" : "ned") + ".";
         }
         if (n === K.tot) return "";
         if (K.antal > 1 && n === K.delta) {
-            return "Det er for ét " + K.E + ". Der er " + K.antal + " " + K.E + " på klammen, så gang med " + K.antal + ".";
+            return "Dit tal gælder ét " + K.E + ". Der er " + K.antal + " " + K.E + " på klammen, så gang med " + K.antal + ".";
         }
         if (n === Math.abs(K.fra) + Math.abs(K.til) && K.fra * K.til > 0) {
-            return "Du har lagt tallene sammen. Hvor mange trin er der fra " + ox(K.fra) + " til " + ox(K.til) + "?";
+            return "Du har lagt tallene sammen. Hvor meget ændrer oxidationstallet sig fra " + ox(K.fra) + " til " + ox(K.til) + "?";
         }
         if ((n === Math.abs(K.til) || n === Math.abs(K.fra)) && n !== K.delta) {
-            return "Det er et oxidationstal. Skriv forskellen fra " + ox(K.fra) + " til " + ox(K.til) + ".";
+            return "Dit tal er et oxidationstal. Skriv forskellen fra " + ox(K.fra) + " til " + ox(K.til) + ".";
         }
-        return gaarTekst(K) + ". Tæl trinene" + (K.antal > 1 ? ", og gang med de " + K.antal + " " + K.E + " på klammen." : ".");
+        return gaarTekst(K) + ". Find forskellen" + (K.antal > 1 ? ", og gang med de " + K.antal + " " + K.E + " på klammen." : ".");
     }
 
     /* ----- Hjaelp til ladningen ------------------------------------------------------- */

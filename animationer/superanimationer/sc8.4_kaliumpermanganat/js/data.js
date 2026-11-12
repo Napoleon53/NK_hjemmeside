@@ -91,7 +91,7 @@
           v: ["SO3 2-", "MnO2"], h: ["SO4 2-", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           flaske: "syre", foerMiljoe: "basisk",
           foer: "brun", foerBundfald: "brun", efter: "klar",
-          obs: "Det brune forsvandt. Glasset er næsten farveløst.", kontekst: "Syren opløser brunstenen." },
+          obs: "Det brune bundfald forsvandt. Glasset er næsten farveløst.", kontekst: "Syren opløser brunstenen." },
 
         /* ----- Fane 2: permanganat dryppes i et andet stof ------------------------
            Den første er reaktionen fra tegningen (og fra Jern i ståluld). S1 og
@@ -105,7 +105,7 @@
           tekst: "Sulfit, SO₃²⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["SO3 2-", "MnO4 -"], h: ["SO4 2-", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "SO₃²⁻ + H₂SO₄", foer: "vand", efter: "klar",
-          kontekst: "Samme stoffer som på første fane, men i syre falder mangan hele vejen." },
+          kontekst: "Samme stoffer som på første fane, men i syre falder oxidationstallet for mangan helt til +II." },
         { id: "F2", fane: "fl", gruppe: "surt", navn: "Tin i syre", kort: "Sn²⁺",
           tekst: "Sn²⁺ i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["Sn 2+", "MnO4 -"], h: ["Sn 4+", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
@@ -150,7 +150,7 @@
           tekst: "Oxalat, C₂O₄²⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["C2O4 2-", "MnO4 -"], h: ["CO2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "C₂O₄²⁻ + H₂SO₄", foer: "vand", efter: "klar", gas: true,
-          kontekst: "Permanganat titreres tit mod oxalat. CO₂ bobler op." },
+          kontekst: "Permanganat titreres ofte mod oxalat. CO₂ bobler op." },
         { id: "F10", fane: "fl", gruppe: "indeks", navn: "Brintoverilte", kort: "H₂O₂",
           tekst: "Brintoverilte, H₂O₂, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["H2O2", "MnO4 -"], h: ["O2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
@@ -160,12 +160,12 @@
           tekst: "Iodid, I⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["I -", "MnO4 -"], h: ["I2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "I⁻ + H₂SO₄", foer: "vand", efter: "iod",
-          kontekst: "Det brune er diiod, I₂. Det er opløst og ligger ikke på bunden." },
+          kontekst: "Den brune farve kommer fra diiod, I₂. Diiod er opløst og ligger ikke på bunden." },
         { id: "F12", fane: "fl", gruppe: "indeks", navn: "Bromid i syre", kort: "Br⁻",
           tekst: "Bromid, Br⁻, i svovlsyre. Dryp kaliumpermanganat i.",
           v: ["Br -", "MnO4 -"], h: ["Br2", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
           glasTekst: "Br⁻ + H₂SO₄", foer: "vand", efter: "brom",
-          kontekst: "Det orange er dibrom, Br₂." }
+          kontekst: "Den orange farve kommer fra dibrom, Br₂." }
     ];
 
     D.GRUPPER = {
@@ -197,15 +197,15 @@
        fane 1 siger den ogsaa, hvordan man fylder glasset (6. nov. 2026: den
        lange linje om at traekke flaskerne kom ikke med, da kortet kom i scenen). */
     D.INTRO = {
-        ug: "Ét urglas og fire flasker. Fyld glasset ved at trække flaskerne hen over det. Dryp så i, og afstem det, der sker.",
-        fl: "Permanganat dryppes i andre stoffer. Afstem på samme måde, med klammer under skemaet."
+        ug: "På bordet står ét urglas og fire flasker. Fyld glasset ved at trække flaskerne hen over det. Dryp så i, og afstem reaktionen.",
+        fl: "Permanganat dryppes i andre stoffer. Afstem på samme måde som på første fane, med klammer under skemaet."
     };
     D.FAERDIG = {
-        ug: "Alle tre. Mangan faldt 1, 2 og 2 trin, fra +VII til +II.",
-        fl: "Alle 14. Stigning gange tal er fald gange tal, hver gang."
+        ug: "Alle tre er afstemt. Mangan faldt 1, 2 og 2 trin, fra +VII til +II.",
+        fl: "Alle 14 reaktioner er afstemt. Stigning gange tal var lig med fald gange tal hver gang."
     };
-    D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
-    D.ROS_OPGAVE = ["Afstemt.", "Færdig.", "Den er i hus.", "Skemaet går op."];
+    D.ROS = ["Rigtigt.", "Korrekt.", "Præcis.", "Ja.", "Fint."];
+    D.ROS_OPGAVE = ["Afstemt.", "Færdig.", "Skemaet er afstemt.", "Skemaet går op."];
 
     NK.Data = D;
 }());

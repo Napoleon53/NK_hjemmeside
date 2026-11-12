@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb6.5 pH i syrer og baser</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at tallene er bogens (afsnit B6.5 og B6.6), at
+   alle tre faner kan gennemføres, at de typiske fejl får den rigtige
+   forklaring og koster stjernen, at intet løses uden Indsend svar, at
+   luppen viser modellens antal på det rigtige tidspunkt, at fane 2 ikke
+   røber vejen, før den er valgt, at teksterne er korte og uden
+   tankestreger og ASCII-dansk, at intet bevæger sig, før eleven gør
+   noget, og at kortet og tavlens indhold kan være der fra 1100 × 620 til
+   1600 × 950. Kræver en lokal server med mappen animationer/ som rod
+   (siden henter ../faelles/). Testen gemmer elevens fremskridt og lægger
+   det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb6.5-skema", "nk-sb6.5-vej", "nk-sb6.5-base"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|traek\w*|baade|laengere|oploesning|maal|maalt|saenk\w*|haev\w*|taeller|naevner|broek\w*|aendring|ligevaegt|loesning\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+function koer() {
+    var W = ramme.contentWindow;
+    koerTest(W).catch(function (e) {
+        fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl");
+    }).then(function () {
+        try {
+            NOEGLER.forEach(function (n) {
+                if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+            });
+        } catch (e) { /* ingen hukommelse */ }
+        vis();
+        window.faerdig = true;
+    });
+}
+
+async function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data;
+    var s1 = NK.sims["fane-s"], v2 = NK.sims["fane-v"], b3 = NK.sims["fane-b"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: String(t) }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function felter(sim, f) { sim.f = f.concat(["", "", ""]).slice(0, 3); sim.efterKort(); }
+    /* Et forkert svar: beskeden skal indeholde ord, og intet maa vaere loest */
+    function forkert(sim, f, moenster, liste, navn) {
+        felter(sim, f);
+        sim.indsendKlik();
+        var b = besked(sim);
+        husk("fejl " + navn, b.replace(/^Ikke endnu\s*/, ""));
+        if (sim.groen) liste.push(navn + ": løst af et forkert svar " + JSON.stringify(f));
+        else if (!moenster.test(b)) liste.push(navn + ": " + b);
+    }
+    function valgForkert(sim, j, moenster, liste, navn) {
+        sim.svarValg(j);
+        if (sim.groen) liste.push(navn + ": løst af et klik på et svar");
+        sim.indsendKlik();
+        var b = besked(sim);
+        husk("fejl " + navn, b.replace(/^Ikke endnu\s*/, ""));
+        if (sim.groen) liste.push(navn + ": løst af et forkert svar " + j);
+        else if (!moenster.test(b)) liste.push(navn + ": " + b);
+    }
+    /* Alle tekster til et trin (kortet, svarene, hintene og forklaringen) */
+    function samlTekster(sim, navn) {
+        var dd = sim.td(), e = sim.e, r = sim.r;
+        husk("kort " + navn, dd.tekst(e, r));
+        if (dd.tekstA) husk("kort " + navn, dd.tekstA(e, r));
+        if (dd.svar) dd.svar(e, r).forEach(function (t) { husk("svar " + navn, t); });
+        (dd.hint(e, r) || []).forEach(function (t) { husk("hint " + navn, t); });
+        if (dd.hintA) dd.hintA(e, r).forEach(function (t) { husk("hint " + navn, t); });
+        husk("rigtig " + navn, dd.forkl(e, r));
+    }
+    function grønt(sim) { return !!sim.groen; }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: tallene er bogens (afsnit B6.5 og B6.6)");
+    function syre(id, c) { return D.syreTal({ id: id, c: c }); }
+    var m = syre("hcooh", 0.0100);
+    paastand("bogens eksempel: 0,0100 M methansyre har Kₛ = 1,78 · 10⁻⁴ M, x = 1,25 · 10⁻³ M og pH 2,90",
+        D.potensU(m.K) === "1,78 · 10⁻⁴" && D.potensU(m.xpR) === "1,25 · 10⁻³" && D.d2(m.phLigning) === "2,90", JSON.stringify(m));
+    paastand("omdannelsesgraden i eksemplet er 12,5 %", D.tal1(m.alfa) === "12,5", m.alfa);
+    paastand("bogens eksempel: 0,025 M salpetersyre har pH 1,60", D.d2(syre("hno3", 0.025).ph) === "1,60");
+    paastand("bogens eksempel: 0,100 M ethansyre har pH 2,88 med genvejen", D.d2(syre("eddike", 0.100).phGenvej) === "2,88");
+    var tab = [["eddike", 0.100, "2,88", "2,88"], ["eddike", 0.00100, "3,91", "3,88"], ["hcooh", 0.0100, "2,90", "2,88"], ["h3po4", 0.100, "1,63", "1,58"]];
+    var tabFejl = [];
+    tab.forEach(function (x) { var r = syre(x[0], x[1]); if (D.d2(r.phLigning) !== x[2] || D.d2(r.phGenvej) !== x[3]) tabFejl.push(x[0] + " " + x[1] + ": " + D.d2(r.phLigning) + " og " + D.d2(r.phGenvej)); });
+    samlet("bogens tabel 'Hvornår må genvejen bruges?': pH med ligningen og med genvejen", tabFejl);
+    paastand("bogens figur med fire syrer i 0,10 M: methansyre 2,38 og ammonium 5,13",
+        D.d2(syre("hcooh", 0.10).phLigning) === "2,38" && D.d2(syre("nh4", 0.10).phGenvej) === "5,13");
+    var baseFejl = [], bog = { naoh: ["1,70", "12,30"], caoh2: ["2,00", "12,00"], nh3: ["3,03", "10,97"], ethanoat: ["5,27", "8,73"] };
+    D.BASER.forEach(function (b) { var r = D.baseTal(b); if (D.d2(r.poh) !== bog[b.id][0] || D.d2(r.ph) !== bog[b.id][1]) baseFejl.push(b.id + ": " + D.d2(r.poh) + " og " + D.d2(r.ph)); });
+    samlet("bogens eksempler i B6.6: natriumhydroxid 12,30, calciumhydroxid 12,00, ammoniak 10,97, natriumethanoat 8,73", baseFejl);
+    paastand("natriumethanoat: pK_b = 14,00 − 4,76 = 9,24", D.d2(D.baseTal(D.BASER[3]).pkb) === "9,24");
+    var t010 = [D.baseTal({ c: 0.10, pkb: 4.75 }), D.baseTal({ c: 0.10, pks: 4.76 })];
+    paastand("bogens tabel i B6.6: 0,10 M ammoniak 11,12 og natriumethanoat 8,88", D.d2(t010[0].ph) === "11,12" && D.d2(t010[1].ph) === "8,88", D.d2(t010[0].ph) + " " + D.d2(t010[1].ph));
+    var vejFejl = [], veje = [0, 0, 0];
+    D.VEJ_SYRER.forEach(function (e) {
+        var r = D.syreTal(e);
+        veje[r.vej]++;
+        if (r.vej === 1 && Math.abs(r.phGenvej - r.phLigning) < 0.045) vejFejl.push(e.id + ": genvejen er for tæt på (" + D.d2(r.phGenvej) + ")");
+    });
+    paastand("fane 2 har to stærke, to middelstærke og to svage syrer", veje.join(",") === "2,2,2", veje.join(","));
+    samlet("i fane 2 giver genvejen et mærkbart forkert tal for de middelstærke syrer", vejFejl);
+    var vejBog = [["hcl", 0], ["hno3", 0], ["h3po4", 1], ["hcooh", 1], ["maelk", 1], ["eddike", 2], ["nh4", 2]];
+    samlet("fremgangsmåden er bogens figur: stærk under 0, ligningen fra 0 til 4, genvejen over 4",
+        vejBog.filter(function (x) { return D.vej(D.SYRER[x[0]].pks) !== x[1]; }).map(function (x) { return x[0]; }));
+    var skemaFejl = D.SKEMA_SYRER.filter(function (e) { return D.syreTal(e).vej !== 1; }).map(function (e) { return e.id; });
+    samlet("fane 1 har kun middelstærke syrer (dem, skemaet er nødvendigt for)", skemaFejl);
+    var tolk = [["0,0100", 0.01], ["0,100 M", 0.1], ["4,17·10^-3", 4.17e-3], ["4,17e-3", 4.17e-3], ["−3,74", -3.74], ["2,510", 2.51]];
+    samlet("elevens tal læses rigtigt, også 0,0100 (ikke som 0,0 · 10⁰)",
+        tolk.filter(function (x) { return Math.abs(D.tolk(x[0]) - x[1]) > 1e-12; }).map(function (x) { return x[0] + " → " + D.tolk(x[0]); }));
+    var udt = [["0,0100 − x", 0.008], ["0.01-x", 0.008], ["0,0100 M − x", 0.008], ["x²", 4e-6], ["x·x", 4e-6], ["x^2", 4e-6], ["(x)(x)", 4e-6], ["−x", -0.002], ["+x", 0.002]];
+    samlet("udtryk med x læses: komma, M, x², x·x, (x)(x), −x og +x",
+        udt.filter(function (x) { var u = D.udtryk(x[0]); return !u.ok || Math.abs(u.f(0.002) - x[1]) > 1e-12; }).map(function (x) { return x[0]; }));
+
+    /* ================================================================= */
+    overskrift("2. Fane 1: Skemaet");
+    NK.visFane("fane-s");
+    s1.forfra();
+    await vent(50);
+    var f1 = [];
+    paastand("første syre er bogens eksempel, methansyre 0,0100 M, med 7 trin", s1.e.id === "hcooh" && s1.trinListe.length === 7);
+    paastand("Indsend svar kan ikke sendes uden tekst", !s1.kanSendes());
+    s1.indsendKlik();
+    paastand("et tryk på Indsend svar uden tekst bedømmer intet", !s1.groen && !s1.fejl);
+    paastand("luppen viser 100 hele molekyler ved start", s1.lupFase === "start" && s1.lup.antal().delte === 0);
+    for (var si = 0; si < D.SKEMA_SYRER.length; si++) {
+        s1.startEmne(si);
+        var e = s1.e, ct = e.ct, nv = e.id;
+        /* Start */
+        samlTekster(s1, "start " + nv);
+        forkert(s1, ["0", "0", "0"], /al syren/, f1, nv + " start 0");
+        forkert(s1, [ct, "0", "1e-7"], /selvionisering/, f1, nv + " start 10⁻⁷");
+        forkert(s1, [ct, ct, ct], /dannes først/, f1, nv + " start c i alle");
+        felter(s1, [ct, "0", "0 M"]);
+        if (s1.groen) f1.push(nv + " løst uden Indsend");
+        s1.indsendKlik();
+        if (!grønt(s1)) f1.push(nv + " start ikke løst: " + besked(s1));
+        s1.videreKlik();
+        if (s1.trin === "x") {
+            samlTekster(s1, "x " + nv);
+            [1, 2].forEach(function (j) { husk("fejl x", s1.td().fejlValg(s1.e, s1.r, j)); });
+            valgForkert(s1, 1, /ved start/, f1, nv + " x start");
+            valgForkert(s1, 2, /ved ligevægt/, f1, nv + " x tilbage");
+            s1.svarValg(0); s1.indsendKlik();
+            if (!grønt(s1)) f1.push(nv + " x ikke løst");
+            s1.videreKlik();
+        }
+        /* Ændring */
+        samlTekster(s1, "aendring " + nv);
+        if (s1.lup.antal().delte !== 0) f1.push(nv + " luppen har reageret før rækken Ændring");
+        forkert(s1, ["x", "x", "x"], /Skriv −x/, f1, nv + " ændring +x");
+        forkert(s1, ["−x", "−x", "+x"], /vokser/, f1, nv + " ændring −x for basen");
+        forkert(s1, [ct + " − x", "x", "x"], /koncentration ved ligevægt/, f1, nv + " ændring c − x");
+        forkert(s1, ["−1", "+1", "+1"], /med x/, f1, nv + " ændring tal");
+        felter(s1, ["-x", "x", "+x"]);
+        s1.indsendKlik();
+        if (!grønt(s1)) f1.push(nv + " ændring ikke løst: " + besked(s1));
+        tid(s1, 2.5);
+        if (s1.lup.antal().delte !== s1.r.iLup || s1.lupFase !== "ligevaegt") f1.push(nv + " luppen viser " + s1.lup.antal().delte + " og ikke " + s1.r.iLup);
+        if (!s1.lup.stille()) f1.push(nv + " luppen er ikke faldet til ro efter 2,5 s");
+        s1.videreKlik();
+        /* Ligevægt */
+        samlTekster(s1, "ligevaegt " + nv);
+        forkert(s1, ["−x", "x", "x"], /startkoncentrationen/, f1, nv + " ligevægt −x");
+        forkert(s1, [ct, "x", "x"], /ændringen/, f1, nv + " ligevægt c");
+        forkert(s1, [ct + " + x", "x", "x"], /mindre/, f1, nv + " ligevægt c + x");
+        forkert(s1, ["cs − x", "x", "x"], /som tallet/, f1, nv + " ligevægt cs");
+        forkert(s1, [ct + " − x", "0", "x"], /0 M/, f1, nv + " ligevægt 0");
+        felter(s1, [ct + "−x", "x", "x"]);
+        s1.indsendKlik();
+        if (!grønt(s1)) f1.push(nv + " ligevægt ikke løst: " + besked(s1));
+        s1.videreKlik();
+        /* Ligningen */
+        samlTekster(s1, "ligning " + nv);
+        forkert(s1, ["x", ct + " − x"], /x · x/, f1, nv + " ligning x");
+        forkert(s1, [ct + " − x", "x²"], /tælleren/, f1, nv + " ligning vendt");
+        forkert(s1, ["x²", ct], /genvejens/, f1, nv + " ligning genvej");
+        forkert(s1, ["2x", ct + " − x"], /2x/, f1, nv + " ligning 2x");
+        felter(s1, ["x*x", ct + " M - x"]);
+        s1.indsendKlik();
+        if (!grønt(s1)) f1.push(nv + " ligning ikke løst: " + besked(s1));
+        s1.videreKlik();
+        /* CAS */
+        samlTekster(s1, "cas " + nv);
+        husk("fejl cas", s1.td().fejlValg(s1.e, s1.r, 0));
+        if (s1.erValg()) f1.push(nv + " svarene står der før CAS");
+        s1.indsendKlik();
+        if (s1.casT === null) f1.push(nv + " CAS gik ikke i gang");
+        tid(s1, 1);
+        if (!s1.casVist || !s1.erValg()) f1.push(nv + " CAS gav ingen løsninger");
+        valgForkert(s1, 0, /negativ/, f1, nv + " cas negativ");
+        s1.svarValg(1); s1.indsendKlik();
+        if (!grønt(s1)) f1.push(nv + " cas ikke løst");
+        s1.videreKlik();
+        /* pH */
+        var r = s1.r;
+        samlTekster(s1, "ph " + nv);
+        forkert(s1, [D.d2(r.phStaerk)], /al syren/, f1, nv + " ph stærk");
+        if (Math.abs(r.phGenvej - r.phLigning) > 0.02) forkert(s1, [D.d2(r.phGenvej)], /genvejens/, f1, nv + " ph genvej");
+        forkert(s1, [D.d2(-r.phLigning)], /fortegnet/, f1, nv + " ph fortegn");
+        forkert(s1, [D.d2(-Math.log(r.xpR))], /ln/, f1, nv + " ph ln");
+        if (si === 0) {
+            felter(s1, [D.d2(r.phLigning)]);
+            s1.indsendKlik();
+        } else s1.knap(), s1.knap(), s1.knap();
+        if (!grønt(s1)) f1.push(nv + " ph ikke løst");
+        var bl = (el("s-ind").querySelector(".sk-bund.bliv .st-tekst") || {}).textContent || "";
+        if (bl.indexOf(D.d2(r.phLigning)) < 0) f1.push(nv + " forklaringen mangler pH");
+    }
+    samlet("alle tre syrer: hvert trin har de typiske fejl med hver sin forklaring, intet løses uden Indsend svar, og luppen reagerer først ved rækken Ændring", f1);
+    paastand("methansyre (med fejl) har ✓ og ikke ★, og de to andre (Vis svaret til sidst) har ✓",
+        s1.status.hcooh === 1 && s1.status.h3po4 === 1 && s1.status.maelk === 1, JSON.stringify(s1.status));
+    paastand("efter den sidste syre er der ingen knap på kortet", !el("s-ind").querySelector("[data-videre]"));
+    s1.startEmne(1);
+    ["start", "aendring", "ligevaegt", "ligning"].forEach(function () {
+        var dd = s1.td(); felter(s1, dd.vis(s1.e, s1.r)); s1.indsendKlik(); s1.videreKlik();
+    });
+    s1.indsendKlik(); tid(s1, 1); s1.svarValg(1); s1.indsendKlik(); s1.videreKlik();
+    felter(s1, [D.d2(s1.r.phLigning)]); s1.indsendKlik();
+    paastand("phosphorsyre uden fejl og uden hjælp giver ★", s1.status.h3po4 === 2);
+    paastand("felternes egen tekst (x²) går ikke gennem HTML", (function () { s1.startEmne(0); felter(s1, ["x²", "<b>", "&"]); s1.visKort(); return el("s-f0").value === "x²" && el("s-f1").value === "<b>"; }()));
+
+    /* ================================================================= */
+    overskrift("3. Fane 2: Vælg vejen");
+    NK.visFane("fane-v");
+    v2.forfra();
+    await vent(50);
+    var f2 = [];
+    for (var vi = 0; vi < D.VEJ_SYRER.length; vi++) {
+        v2.startEmne(vi);
+        var ev = v2.e, rv = v2.r, n2 = ev.id;
+        if (v2.trinListe.join() !== "vej,ph") f2.push(n2 + " trinnene røber vejen: " + v2.trinListe.join());
+        if (v2.lupVist) f2.push(n2 + " luppen er åben før vejen");
+        samlTekster(v2, "vej " + n2);
+        [0, 1, 2].forEach(function (j) { if (j !== rv.vej) { husk("fejl vej", v2.td().fejlValg(ev, rv, j)); valgForkert(v2, j, /./, f2, n2 + " vej " + j); } });
+        if (v2.lupVist) f2.push(n2 + " luppen åbnede ved et forkert svar");
+        v2.svarValg(rv.vej); v2.indsendKlik();
+        if (!grønt(v2)) f2.push(n2 + " vej ikke løst");
+        if (!v2.lupVist) f2.push(n2 + " luppen åbnede ikke");
+        tid(v2, 2.5);
+        if (v2.lup.antal().delte !== rv.iLup) f2.push(n2 + " luppen viser " + v2.lup.antal().delte + " og ikke " + rv.iLup);
+        if ((rv.vej === 1) !== (v2.trinListe.indexOf("cas") >= 0)) f2.push(n2 + " trinnet med CAS: " + v2.trinListe.join());
+        v2.videreKlik();
+        if (v2.trin === "cas") {
+            samlTekster(v2, "cas " + n2);
+            v2.indsendKlik(); tid(v2, 1);
+            valgForkert(v2, 0, /negativ/, f2, n2 + " cas");
+            v2.svarValg(1); v2.indsendKlik();
+            if (!grønt(v2)) f2.push(n2 + " cas ikke løst");
+            v2.videreKlik();
+        }
+        samlTekster(v2, "ph " + n2);
+        forkert(v2, [D.d2(-rv.ph)], /fortegnet/, f2, n2 + " ph fortegn");
+        if (rv.vej === 2) {
+            forkert(v2, [D.d2(rv.phStaerk)], /stærk syre/, f2, n2 + " ph stærk");
+            forkert(v2, [D.d2(D.SYRER[ev.id].pks - D.log(ev.c))], /½/, f2, n2 + " ph uden ½");
+        }
+        if (rv.vej === 1) {
+            forkert(v2, [D.d2(rv.phGenvej)], /genvejens/, f2, n2 + " ph genvej");
+            forkert(v2, [D.d2(rv.phStaerk)], /al syren/, f2, n2 + " ph stærk");
+        }
+        felter(v2, [D.d2(rv.ph)]);
+        v2.indsendKlik();
+        if (!grønt(v2)) f2.push(n2 + " ph ikke løst: " + besked(v2));
+        if (vi < D.VEJ_SYRER.length - 1) v2.videreKlik();
+    }
+    samlet("alle seks syrer: forkerte veje forklares, luppen åbner først med den rigtige vej og viser modellens antal, og CAS kommer kun for de middelstærke", f2);
+    paastand("alle seks syrer står som løst i panelet", D.VEJ_SYRER.every(function (e) { return v2.status[e.id]; }));
+
+    /* ================================================================= */
+    overskrift("4. Fane 3: Baser og salte");
+    NK.visFane("fane-b");
+    b3.forfra();
+    await vent(50);
+    var f3 = [];
+    for (var bi = 0; bi < D.BASER.length; bi++) {
+        b3.startEmne(bi);
+        var bb = b3.e, rb = b3.r, n3 = bb.id;
+        for (var g = 0; g < bb.trin.length; g++) {
+            var id3 = b3.trin;
+            samlTekster(b3, id3 + " " + n3);
+            if (id3 === "oh") {
+                if (bb.nOH === 2) forkert(b3, [String(bb.c).replace(".", ",")], /to OH/, f3, n3 + " oh c");
+                else forkert(b3, ["0,040"], /én OH/, f3, n3 + " oh 2c");
+            }
+            if (id3 === "vejb") { [0, 1].forEach(function (j) { husk("fejl vejb", b3.td().fejlValg(bb, rb, j)); valgForkert(b3, j, /./, f3, n3 + " vejb " + j); }); }
+            if (id3 === "ion") {
+                [0, 2].forEach(function (j) { husk("fejl ion", b3.td().fejlValg(bb, rb, j)); valgForkert(b3, j, /Na/, f3, n3 + " ion " + j); });
+                if (b3.loestTrin.ion) f3.push("reaktionen med vand står der før tid");
+            }
+            if (id3 === "pkb") forkert(b3, ["4,76"], /for ethansyre/, f3, n3 + " pkb");
+            if (id3 === "poh" && !bb.staerk) {
+                forkert(b3, [D.d2(rb.pohStaerk)], /stærk base/, f3, n3 + " poh stærk");
+                forkert(b3, [D.d2(rb.pkb - D.log(bb.c))], /½/, f3, n3 + " poh uden ½");
+                if (bb.salt) forkert(b3, [D.d2(rb.pohPks)], /pK_b for ethanoat|pKb for ethanoat/, f3, n3 + " poh pKs");
+            }
+            if (id3 === "ph") {
+                forkert(b3, [D.d2(rb.poh)], /sidste trin/, f3, n3 + " ph = pOH");
+                if (b3.spoegelse === null || Math.abs(b3.spoegelse - rb.poh) > 0.02) f3.push(n3 + " pH-skalaen viser ikke det forkerte svar");
+            }
+            var dd3 = b3.td();
+            if (dd3.slags === "valg") { b3.svarValg(dd3.rigtig(bb, rb)); b3.indsendKlik(); }
+            else { felter(b3, dd3.vis(bb, rb)); b3.indsendKlik(); }
+            if (!grønt(b3)) f3.push(n3 + " " + id3 + " ikke løst: " + besked(b3));
+            if (id3 === "ph" && b3.spoegelse !== null) f3.push(n3 + " det forkerte svar står stadig på skalaen");
+            if (g < bb.trin.length - 1 || bi < D.BASER.length - 1) b3.videreKlik();
+        }
+    }
+    samlet("alle fire baser: de typiske fejl forklares (pOH som pH vises på skalaen), og hvert trin løses med bogens tal", f3);
+    paastand("alle fire baser står som løst, men uden stjerne, fordi der var fejl", D.BASER.every(function (b) { return b3.status[b.id] === 1; }), JSON.stringify(b3.status));
+    b3.startEmne(3);
+    paastand("natriumethanoat har først kun opløsningen af saltet i reaktionsskemaet, og layoutet har plads til to linjer",
+        !b3.loestTrin.ion && b3.reakR.h > 2.5 * b3.rfs);
+
+    /* ================================================================= */
+    overskrift("5. Sproget");
+    var LOFT = { kort: 135, svar: 50, hint: 112, fejl: 120, rigtig: 175 };
+    var lange = [], streger = [], ascii = [], ladning = [], ord = [];
+    tekster.forEach(function (x) {
+        var slags = x.hvad.split(" ")[0], loft = LOFT[slags] || 175;
+        if (x.t.length > loft) lange.push(x.hvad + " (" + x.t.length + "): " + x.t.slice(0, 50));
+        if (/[–—]/.test(x.t)) streger.push(x.hvad + ": " + x.t.slice(0, 40));
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.slice(0, 40));
+        if (/¹⁺|¹⁻|[A-Za-z)\]]1[+−](?![\d,])/.test(x.t)) ladning.push(x.hvad + ": " + x.t.slice(0, 40));
+        if (/eddikesyre|natronlud|\bilt\b|myresyre|flussyre|mælkesyren?s? \(|bjerrum/i.test(x.t)) ord.push(x.hvad + ": " + x.t.slice(0, 40));
+    });
+    paastand("der er samlet tekster fra alle tre faner", tekster.length > 200, tekster.length);
+    samlet("teksterne holder sig under loftet (kort " + LOFT.kort + ", svar " + LOFT.svar + ", hint " + LOFT.hint + ", fejl " + LOFT.fejl + ", forklaring " + LOFT.rigtig + " tegn)", lange);
+    samlet("ingen tankestreger", streger);
+    samlet("intet ASCII-dansk", ascii);
+    samlet("ladning ±1 skrives + og −, aldrig 1+ og 1−", ladning);
+    samlet("bogens navne: ethansyre, methansyre, hydrogenfluorid, natriumhydroxid", ord);
+    var tomme = tekster.filter(function (x) { return /undefined|NaN|null/.test(x.t); }).map(function (x) { return x.hvad + ": " + x.t.slice(0, 40); });
+    samlet("ingen tekst indeholder undefined, NaN eller null", tomme);
+
+    /* ================================================================= */
+    overskrift("6. Roligt: intet bevæger sig, før eleven gør noget");
+    async function billede(sim) { sim.tilpas(); sim.tegn(); return sim.L.canvas.toDataURL(); }
+    var stilleFejl = [];
+    for (var fi = 0; fi < 3; fi++) {
+        var fid = ["fane-s", "fane-v", "fane-b"][fi], sim = NK.sims[fid];
+        NK.visFane(fid);
+        sim.startEmne(0);
+        await vent(400);
+        var a = await billede(sim);
+        await vent(1300);
+        var b = await billede(sim);
+        if (a !== b) stilleFejl.push(fid);
+    }
+    samlet("startbilledet på hver fane står stille i 1,3 s", stilleFejl);
+
+    /* ================================================================= */
+    overskrift("7. Kortet og tavlen ved fire skærmstørrelser");
+    var STR = [[1100, 620], [1280, 720], [1366, 768], [1600, 950]];
+    var hoejFejl = [], inde = [];
+    function maal(sim, hvad) {
+        var h = sim.el.skort.getBoundingClientRect().height;
+        if (h > sim.kortZone() + 1) hoejFejl.push(ramme.style.width + "×" + ramme.style.height + " " + sim.navn + " " + hvad + " (" + Math.round(h) + " > " + sim.kortZone() + ")");
+    }
+    function tavleTjek(sim, hvad) {
+        sim.tegn();
+        var t = sim.lay.tavle, nv2 = ramme.style.width + "×" + ramme.style.height + " " + sim.navn + " " + hvad;
+        if (sim.lupR && (sim.lupR.y + sim.lupR.h + 24 > t.y + t.h)) inde.push(nv2 + " luppen");
+        if (sim.skema && sim.skema.y + sim.skema.h > sim.rammeY) inde.push(nv2 + " skemaet");
+        var rx = sim.rammeRes;
+        void rx;
+    }
+    /* Hele forloebet for et emne: start, to hint, et forkert svar, groent */
+    function hele(sim, tavle) {
+        for (var g2 = 0; g2 < 9 && !sim.faerdig; g2++) {
+            var dd = sim.td(), nv3 = sim.e.id + " " + sim.trin;
+            sim.visKort(); maal(sim, nv3 + " start");
+            sim.knap(); sim.knap(); maal(sim, nv3 + " hint");
+            sim.besked("", ""); sim.nulstilHjaelp();
+            if (dd.slags === "cas") { sim.indsendKlik(); tid(sim, 1); maal(sim, nv3 + " CAS"); sim.svarValg(0); sim.indsendKlik(); maal(sim, nv3 + " fejl"); }
+            else if (dd.slags === "valg") { var fj = (dd.rigtig(sim.e, sim.r) + 1) % dd.svar(sim.e, sim.r).length; sim.svarValg(fj); sim.indsendKlik(); maal(sim, nv3 + " fejl"); }
+            else { felter(sim, ["9", "9", "9"]); sim.indsendKlik(); maal(sim, nv3 + " fejl"); }
+            if (tavle) tavleTjek(sim, nv3);
+            sim.visSvar(); maal(sim, nv3 + " grøn");
+            if (tavle) tavleTjek(sim, nv3 + " grøn");
+            if (!sim.faerdig) sim.videreKlik();
+        }
+    }
+    for (var sx = 0; sx < STR.length; sx++) {
+        ramme.style.width = STR[sx][0] + "px";
+        ramme.style.height = STR[sx][1] + "px";
+        W.dispatchEvent(new W.Event("resize"));
+        await vent(250);
+        NK.visFane("fane-s"); s1.tilpas();
+        for (var e1 = 0; e1 < D.SKEMA_SYRER.length; e1++) { s1.startEmne(e1); hele(s1, true); }
+        NK.visFane("fane-v"); v2.tilpas();
+        for (var e2 = 0; e2 < D.VEJ_SYRER.length; e2++) { v2.startEmne(e2); hele(v2, true); }
+        NK.visFane("fane-b"); b3.tilpas();
+        for (var e3 = 0; e3 < D.BASER.length; e3++) { b3.startEmne(e3); hele(b3, false); }
+        /* Fane 3: rammerne og skalaen staar ikke oven i hinanden */
+        b3.startEmne(3); b3.tilpas(); b3.layout();
+        var tb = b3.lay.tavle;
+        if (b3.etiketR.y + b3.etiketR.h > b3.skalaY) inde.push(STR[sx].join("×") + " fane 3: etiketten rører skalaen");
+        if (b3.skalaY + T_PH(b3) > tb.y + tb.h + 2) inde.push(STR[sx].join("×") + " fane 3: skalaen er under tavlen");
+        if (b3.rammeH < (3 * 2.25 + 3.7) * 12.5 + 3 * 7) inde.push(STR[sx].join("×") + " fane 3: for lidt plads til rammerne (" + Math.round(b3.rammeH) + ")");
+        /* Fane 1: skriften i skemaet og rammerne */
+        NK.visFane("fane-s"); s1.startEmne(0); s1.tilpas(); s1.layout();
+        if (s1.rammeMaks < 12.5 || s1.fsS < 13) inde.push(STR[sx].join("×") + " fane 1: for lille skrift (" + s1.fsS + ", " + s1.rammeMaks + ")");
+        var plads1 = s1.lay.tavle.y + s1.lay.tavle.h - 10 - s1.rammeY;
+        if (plads1 < (3.35 + 3.7 + 3.7) * 12.5 + 14) inde.push(STR[sx].join("×") + " fane 1: rammerne kan ikke være der (" + Math.round(plads1) + ")");
+        /* Fane 2: ligningen (7,7 enheder) kan vaere der med 12,5 px */
+        NK.visFane("fane-v"); v2.startEmne(2); v2.tilpas(); v2.layout();
+        var plads2 = v2.lay.tavle.y + v2.lay.tavle.h - 10 - v2.rammeY;
+        if (plads2 < (2.25 + 7.7 + 2.25) * 12.5 + 14) inde.push(STR[sx].join("×") + " fane 2: rammerne kan ikke være der (" + Math.round(plads2) + ")");
+        if (v2.lupR.h < 90) inde.push(STR[sx].join("×") + " fane 2: luppen er for lav (" + v2.lupR.h + ")");
+    }
+    function T_PH() { return NK.Tegning.phSkalaHoejde(); }
+    samlet("kortet kan være over tavlen i alle trin af alle emner (start, hint, fejl og grønt) fra 1100 × 620 til 1600 × 950", hoejFejl);
+    samlet("tavlens indhold er inden for tavlen, og skriften er mindst 12,5 px ved alle fire størrelser", inde);
+    ramme.style.width = "1300px";
+    ramme.style.height = "800px";
+}
+</script>
+</body>
+</html>

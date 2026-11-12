@@ -119,7 +119,7 @@
     D.E_MAAL = [
         {
             id: "kog", navn: "Ethanols kogepunkt",
-            tekst: "Find ethanols kogepunkt: stil termometeret på den temperatur, hvor ethanol begynder at koge.",
+            tekst: "Find ethanols kogepunkt. Indstil termometeret på den temperatur, hvor ethanol begynder at koge.",
             hint: [
                 "Når ethanol koger, kommer der bobler i glasset, og molekylerne i luppen river sig løs.",
                 "Træk termometeret op, til der kommer bobler i glasset. Køl så ned, til boblerne lige stopper.",
@@ -134,8 +134,8 @@
             svar: [
                 { t: "Hydrogenbindinger mellem molekylerne", ok: true,
                   mangler: "Molekylerne i dampen har ingen røde streger. Hydrogenbindingerne er også brudt." },
-                { t: "London-kræfter mellem molekylerne", ok: true,
-                  mangler: "Molekylerne i dampen har ingen grå prikker. London-kræfterne er også brudt." },
+                { t: "Londonbindinger mellem molekylerne", ok: true,
+                  mangler: "Molekylerne i dampen har ingen grå prikker. Londonbindingerne er også brudt." },
                 { t: "Bindingen mellem O og H i et molekyle",
                   f: "Et ethanolmolekyle i dampen har stadig sit H på O. Bindingerne i molekylet holder." },
                 { t: "Bindingen mellem C og C i et molekyle",
@@ -144,31 +144,31 @@
             hint: [
                 "Klik på et ethanolmolekyle i dampen. Er det helt?",
                 "Hvilke streger er der mellem molekylerne i væsken? Og i dampen?",
-                "Molekylerne er hele. Kun de røde streger og de grå prikker mellem dem forsvinder."
+                "Molekylerne i dampen er hele. Kun de røde streger og de grå prikker mellem dem forsvinder."
             ],
-            loest: "Kun bindingerne mellem molekylerne brydes: hydrogenbindingerne og London-kræfterne. Ethanolmolekylerne er hele, også i dampen."
+            loest: "Kun bindingerne mellem molekylerne brydes: hydrogenbindingerne og londonbindingerne. Ethanolmolekylerne er hele, også i dampen."
         },
         {
             id: "hvilket", navn: "Find H'et",
-            tekst: "Ethanol har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H i luppen.",
+            tekst: "Et ethanolmolekyle har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H-atom i luppen.",
             hint: [
-                "En hydrogenbinding er en rød stiplet streg. Se, hvilket atom den begynder ved.",
-                "Det H, du skal finde, sidder på et rødt O-atom.",
+                "En hydrogenbinding er tegnet som en rød stiplet streg. Se, hvilket atom stregen begynder ved.",
+                "Find et H-atom, der sidder på et rødt O-atom.",
                 "Klik på det lille hvide H, der sidder direkte på et rødt O."
             ],
             valgt: { H: "Du har valgt et H-atom.", O: "Du har valgt et O-atom.", C: "Du har valgt et C-atom." },
             klik: {
-                HC: "Det H sidder på C. C og H trækker næsten lige meget i elektronerne, så H bliver ikke δ+.",
-                O: "Det er et O-atom. O tager imod hydrogenbindingen. Find det H, der binder til O.",
+                HC: "Det H-atom sidder på et C-atom. C og H trækker næsten lige meget i elektronerne, så H bliver ikke δ+.",
+                O: "Det er et O-atom. O-atomet tager imod hydrogenbindingen. Find et H-atom, der sidder på et O-atom.",
                 C: "Det er et C-atom. Find et H-atom."
             },
-            loest: "H på O er δ+, fordi O trækker elektronerne til sig. Det tiltrækkes af O i et nabomolekyle, som er δ−. Det er en hydrogenbinding."
+            loest: "Et H-atom på et O-atom er δ+, fordi O trækker elektronerne til sig. H-atomet tiltrækkes af et O-atom med δ− i et nabomolekyle. Den tiltrækning kaldes en hydrogenbinding."
         },
         {
             id: "uden", navn: "Uden hydrogenbindinger",
             gaet: {
                 intro: "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger.",
-                tekst: "Hvor ville ethanol så koge?",
+                tekst: "Ved hvilken temperatur ville ethanol så koge?",
                 svar: [
                     { t: "Højere end 78 °C" },
                     { t: "Lidt lavere, omkring 60 °C" },
@@ -181,7 +181,7 @@
                 "Uden hydrogenbindinger er ethanol damp ved 20 °C. Køl ned, til der kommer væske i glasset.",
                 "Kogepunktet for ethanol uden hydrogenbindinger ligger mellem −60 °C og −20 °C."
             ],
-            loest: "Uden hydrogenbindinger koger ethanol ved −42 °C ligesom propan, der har samme størrelse og form. Hydrogenbindingerne løfter kogepunktet 120 °C."
+            loest: "Uden hydrogenbindinger koger ethanol ved −42 °C ligesom propan, der har samme størrelse og form. Hydrogenbindingerne hæver kogepunktet med 120 °C."
         }
     ];
 
@@ -192,8 +192,8 @@
        teksten kan sige, hvad eleven ser: vaeske, bobler eller kun damp. */
     D.tempFejl = function (navn, T, P) {
         var kp = P.kp(), t = D.grader(T) + " °C";
-        if (T < kp) return "Ved " + t + " koger " + navn + " ikke: der er ingen bobler i glasset. Kogepunktet er højere.";
-        if (P.antalGas() === P.N) return "Ved " + t + " er " + navn + " kun damp. Kogepunktet er lavere: køl ned, til der kommer væske.";
+        if (T < kp) return "Ved " + t + " koger " + navn + " ikke, for der er ingen bobler i glasset. Kogepunktet er højere.";
+        if (P.antalGas() === P.N) return "Ved " + t + " er " + navn + " kun damp. Kogepunktet er lavere. Køl ned, til der kommer væske.";
         return "Ved " + t + " koger " + navn + ", men kogepunktet er lavere. Køl ned, til boblerne lige stopper.";
     };
 
@@ -225,19 +225,19 @@
     D.PAR = [
         {
             id: "oh", navn: "Propan og ethanol", a: "propan", b: "ethanol", start: -60,
-            intro: "Propan og ethanol er næsten lige tunge: 44 og 46 g/mol.",
+            intro: "Propan og ethanol har næsten samme molarmasse, 44 og 46 g/mol.",
             spm: "Ethanol koger 120 °C højere end propan. Hvorfor?",
             svar: [
-                { t: "Ethanol er lidt tungere.",
-                  f: "2 g/mol gør næsten ingen forskel. Butan er 14 g/mol tungere end propan og koger kun 42 °C højere." },
+                { t: "Ethanol har lidt større molarmasse.",
+                  f: "2 g/mol gør næsten ingen forskel. Butan har 14 g/mol større molarmasse end propan og koger kun 42 °C højere." },
                 { t: "Ethanol har en OH-gruppe, der danner hydrogenbindinger.", ok: true },
                 { t: "O og H binder stærkere end C og H.",
-                  f: "Bindingerne inde i molekylerne brydes ikke, når et stof koger. Det er bindingerne mellem molekylerne." }
+                  f: "Bindingerne inde i molekylerne brydes ikke, når et stof koger. Kun bindingerne mellem molekylerne brydes." }
             ],
             hint: ["Se i lupperne. Hvilke streger har ethanol, som propan ikke har?",
                    "De røde streger er hydrogenbindinger. De går fra H på O til O i et andet molekyle.",
-                   "Propan har ingen OH-gruppe. Mellem propanmolekylerne er der kun London-kræfter."],
-            loest: "Hydrogenbindingerne mellem OH-grupperne holder ethanolmolekylerne sammen. Propan har kun London-kræfter."
+                   "Propan har ingen OH-gruppe. Mellem propanmolekylerne er der kun londonbindinger."],
+            loest: "Hydrogenbindingerne mellem OH-grupperne holder ethanolmolekylerne sammen. Mellem propanmolekylerne er der kun londonbindinger."
         },
         {
             id: "kaede", navn: "Ethanol og butan-1-ol", a: "ethanol", b: "butan1ol", start: 20,
@@ -246,21 +246,21 @@
             svar: [
                 { t: "Flere H-atomer giver flere hydrogenbindinger.",
                   f: "Kun H på O danner hydrogenbindinger. Ethanol og butan-1-ol har begge ét H på O." },
-                { t: "Butan-1-ol har flere OH-grupper.", f: "Tæl efter: ethanol og butan-1-ol har begge én OH-gruppe." },
-                { t: "Den lange kæde giver flere London-kræfter.", ok: true }
+                { t: "Butan-1-ol har flere OH-grupper.", f: "Tæl efter. Ethanol og butan-1-ol har begge én OH-gruppe." },
+                { t: "Butan-1-ols lange kæde giver flere londonbindinger.", ok: true }
             ],
             hint: ["Ethanol og butan-1-ol har begge én OH-gruppe. Hvad er så forskellen?",
-                   "Se på de grå prikker i lupperne. Det er London-kræfterne.",
+                   "Se på de grå prikker i lupperne. De viser londonbindingerne.",
                    "En lang kæde rører sine naboer flere steder."],
-            loest: "Ethanol og butan-1-ol danner lige mange hydrogenbindinger, men den lange kæde i butan-1-ol giver flere London-kræfter."
+            loest: "Ethanol og butan-1-ol danner lige mange hydrogenbindinger, men den lange kæde i butan-1-ol giver flere londonbindinger."
         },
         {
             id: "diol", navn: "Ethanol og ethan-1,2-diol", a: "ethanol", b: "ethandiol", start: 20,
             intro: "Ethanol har én OH-gruppe. Ethan-1,2-diol har en OH-gruppe i hver ende.",
             spm: "Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C. Hvorfor?",
             svar: [
-                { t: "Ethan-1,2-diol er tungere.",
-                  f: "Propan-1-ol vejer næsten det samme, 60 g/mol, men koger ved 97 °C. Vægten forklarer ikke 197 °C." },
+                { t: "Ethan-1,2-diol har større molarmasse.",
+                  f: "Propan-1-ol har næsten samme molarmasse, 60 g/mol, men koger ved 97 °C. Molarmassen forklarer ikke 197 °C." },
                 { t: "Kæden i ethan-1,2-diol er længere.", f: "Ethanol og ethan-1,2-diol har begge to C-atomer." },
                 { t: "To OH-grupper giver flere hydrogenbindinger.", ok: true }
             ],
@@ -284,11 +284,11 @@
        hinanden. */
     D.RANGER_GRUPPER = [
         { id: "let", titel: "1. Let: OH eller ej", kort: "Let", fokus: "Ét af stofferne har en OH-gruppe." },
-        { id: "kaede", titel: "2. Kæden", kort: "Kæden", fokus: "Stofferne er af samme slags. Se på kæderne." },
-        { id: "begge", titel: "3. Kæden og OH", kort: "Kæden og OH", fokus: "Både OH-grupper og kæder tæller." },
-        { id: "form", titel: "4. Formen", kort: "Formen", fokus: "Nogle af stofferne har de samme atomer. Se på formen." },
-        { id: "flere", titel: "5. Flere OH og ethere", kort: "Flere OH", fokus: "Nyt: flere OH-grupper, og ethere, hvor O sidder mellem to C-atomer." },
-        { id: "mester", titel: "6. Mester", kort: "Mester", fokus: "Fem stoffer og alt det, du har lært." }
+        { id: "kaede", titel: "2. Kæden", kort: "Kæden", fokus: "Stofferne hører til samme stofklasse. Se på kæderne." },
+        { id: "begge", titel: "3. Kæden og OH", kort: "Kæden og OH", fokus: "Både OH-grupper og kædernes længde har betydning for kogepunktet." },
+        { id: "form", titel: "4. Formen", kort: "Formen", fokus: "Nogle af stofferne har samme molekylformel. Se på molekylernes form." },
+        { id: "flere", titel: "5. Flere OH og ethere", kort: "Flere OH", fokus: "Nu kommer stoffer med flere OH-grupper og ethere, hvor O sidder mellem to C-atomer." },
+        { id: "mester", titel: "6. Mester", kort: "Mester", fokus: "Hver opgave har fem stoffer, og du skal bruge alt det, du har lært." }
     ];
 
     D.RANGER = [
@@ -345,21 +345,21 @@
     D.grund = function (lav, hoej) {
         var L = typeof lav === "string" ? D.STOF[lav] : lav, H = typeof hoej === "string" ? D.STOF[hoej] : hoej;
         var Ln = L.navn, Hn = H.navn, St = D.Stort;
-        var tungere = L.M > H.M + 4 ? ", selv om " + Ln + " er tungere." : ".";
+        var tungere = L.M > H.M + 4 ? ", selv om " + Ln + " har større molarmasse." : ".";
         var sammeAtomer = L.C === H.C && L.O === H.O;
         /* En ether mod en alkan: dér skulle dipol-dipol-bindinger med */
         if ((L.eter && !H.OH && !H.eter) || (H.eter && !L.OH && !L.eter)) return null;
         if (H.OH > L.OH) {
             if (L.eter) {
                 if (sammeAtomer) {
-                    return { slags: "eter", tekst: St(Ln) + " og " + Hn + " har de samme atomer, men kun " + Hn +
+                    return { slags: "eter", tekst: St(Ln) + " og " + Hn + " har samme molekylformel, men kun " + Hn +
                         " har H på O. " + St(Ln) + " danner ingen hydrogenbindinger." };
                 }
                 return { slags: "eter", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ". I " + Ln +
                     " sidder O mellem to C-atomer uden H, så " + Ln + " danner ingen hydrogenbindinger." };
             }
             if (L.OH === 0) {
-                return { slags: "oh", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har ingen. Hydrogenbindingerne holder molekylerne sammen" + tungere };
+                return { slags: "oh", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har ingen. Hydrogenbindingerne holder molekylerne i " + Hn + " sammen" + tungere };
             }
             return { slags: "oh", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har " + D.ohTekst(L.OH) +
                 ". Flere OH-grupper giver flere hydrogenbindinger." };
@@ -368,20 +368,20 @@
             /* En meget lang kaede kan slaa én OH-gruppe (Mester) */
             if (H.OH === 0 && !H.eter && L.OH === 1 && H.C >= L.C + 4) {
                 return { slags: "lang", tekst: St(Hn) + " har ingen OH-gruppe, men en meget længere kæde: " + H.C + " C-atomer mod " + L.C +
-                    " i " + Ln + ". De mange London-kræfter holder mere end én OH-gruppe." };
+                    " i " + Ln + ". De mange londonbindinger holder molekylerne stærkere sammen end hydrogenbindingerne fra én OH-gruppe." };
             }
             return null;
         }
         if (L.eter !== H.eter) return null;
         var oh = St(Ln) + " og " + Hn + (H.OH ? " har begge " + D.ohTekst(H.OH) + ". " : " har ingen OH-gruppe. ");
         if (H.C > L.C) {
-            return { slags: "kaede", tekst: oh + St(Hn) + " har den længste kæde, som rører naboerne mere, så London-kræfterne er større." };
+            return { slags: "kaede", tekst: oh + St(Hn) + " har den længste kæde, som rører nabomolekylerne mere, så londonbindingerne er stærkere." };
         }
         if (sammeAtomer && L.gren > H.gren) {
             if (!H.gren) {
-                return { slags: "form", tekst: St(Ln) + " og " + Hn + " har de samme atomer. " + St(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre." };
+                return { slags: "form", tekst: St(Ln) + " og " + Hn + " har samme molekylformel. " + St(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre." };
             }
-            return { slags: "form", tekst: St(Ln) + " og " + Hn + " har de samme atomer, men " + Ln + " er mere forgrenet og kugleformet, så molekylerne rører hinanden mindre." };
+            return { slags: "form", tekst: St(Ln) + " og " + Hn + " har samme molekylformel, men " + Ln + " er mere forgrenet og kugleformet, så molekylerne rører hinanden mindre." };
         }
         return null;
     };
@@ -393,11 +393,11 @@
 
     /* Hint 1 paa fane 3 efter, hvad det foerste forkerte par handler om */
     D.HINT1 = {
-        oh: "Tæl OH-grupperne. Hydrogenbindinger løfter kogepunktet meget.",
+        oh: "Tæl OH-grupperne. Hydrogenbindinger hæver kogepunktet meget.",
         eter: "Se efter H på O. Kun et H, der sidder på O, kan danne hydrogenbindinger.",
-        kaede: "Se på kæderne. Jo længere kæde, jo flere London-kræfter.",
+        kaede: "Se på kæderne. Jo længere kæde, jo flere londonbindinger.",
         form: "Se på formen. Et kugleformet molekyle rører sine naboer mindst.",
-        lang: "Se på kædernes længde. En meget lang kæde giver rigtig mange London-kræfter."
+        lang: "Se på kædernes længde. En meget lang kæde giver mange londonbindinger."
     };
 
     /* Medaljen, naar alle 30 er sat rigtigt: efter antal stjerner */
@@ -409,7 +409,7 @@
 
     /* ----- Faelles tekster ----------------------------------------------------- */
     D.FAERDIG = {
-        e: "Alle fire. Ethanol koger højt, fordi OH-grupperne holder fast i hinanden.",
+        e: "Alle fire opgaver er løst. Ethanol koger højt, fordi OH-grupperne danner hydrogenbindinger mellem molekylerne.",
         s: "Alle tre par er klaret. Nu skal du selv sætte stoffer i rækkefølge efter kogepunkt i Rangér.",
         r: ""
     };

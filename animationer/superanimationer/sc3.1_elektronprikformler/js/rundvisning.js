@@ -16,7 +16,7 @@
     var TURE = {
         "fane-b": [
             { sel: "#b-skort", titel: "Opgaven", tekst: "Her står det, du skal gøre. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
-            { sel: "#b-anker-flade", titel: "Bordet", tekst: "Først bygger du atomerne: et klik på en plads sætter en elektron, og et klik på en elektron fjerner den. Så trækker du en uparret elektron hen på en uparret elektron på et andet atom. Et klik på et fælles elektronpar skiller det ad igen." },
+            { sel: "#b-anker-flade", titel: "Bordet", tekst: "Først bygger du atomerne. Et klik på en plads sætter en elektron, og et klik på en elektron fjerner den. Så trækker du en uparret elektron hen på en uparret elektron på et andet atom. Et klik på et fælles elektronpar skiller det ad igen." },
             { sel: "#b-opgaver", titel: "Molekylerne", tekst: "Ti molekyler fra let til svær. Et molekyle, du klarer i første forsøg uden at se svaret, får en stjerne." },
             { sel: "#b-forfra", titel: "Forfra", tekst: "Begynder forfra på det molekyle, du er ved." }
         ],

@@ -79,7 +79,7 @@
         vb: [1000, 370],
         lag: [
             { navn: "Fire molekyler", pladser: ["tetraeder", "trekantet pyramide", "vinklet molekyle", "talforstavelse"],
-              ros: "Bindinger og frie elektronpar skubber til hinanden og giver molekylet dets form. Di i navnet betyder 2." }
+              ros: "Bindinger og frie elektronpar skubber til hinanden og giver molekylet dets form. Di i navnet carbondioxid betyder 2." }
         ],
         pladser: [
             skilt("tetraeder", 0, ["methan"], {

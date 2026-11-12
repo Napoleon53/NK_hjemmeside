@@ -290,14 +290,14 @@
     T.afstem = function (o, rawKat, rawAn) {
         var st = D.salt(o.salt), a = heltal(rawKat), b = heltal(rawAn);
         var kat = D.ion(st.kat), an = D.ion(st.an);
-        if (a === null || b === null) return { tom: true, besked: "Skriv et tal i begge felter. Også 1." };
-        if (isNaN(a) || isNaN(b) || a < 1 || b < 1) return { besked: "Skriv hele tal, fx 1, 2 eller 3." };
+        if (a === null || b === null) return { tom: true, besked: "Skriv et tal i begge felter, også når tallet er 1." };
+        if (isNaN(a) || isNaN(b) || a < 1 || b < 1) return { besked: "Skriv hele tal, for eksempel 1, 2 eller 3." };
         if (a === st.kk && b === st.ka) return { ok: true };
         var sammensat = st.an.length > 2;
         var iParentes = st.formel.indexOf("(") >= 0;
         if (a !== st.kk) {
             if (a === Math.abs(kat.q) && st.kk !== Math.abs(kat.q)) {
-                return { besked: NK.ladningstekst(kat.q) + " er ladningen. Tallet foran er, hvor mange " + kat.t + " der er: tallet efter " + st.kat + " i formlen." };
+                return { besked: NK.ladningstekst(kat.q) + " er ladningen. Tallet foran ionen er antallet af " + kat.t + ", og det er tallet efter " + st.kat + " i formlen." };
             }
             return { besked: "Tallet foran " + kat.t + " er tallet efter " + st.kat + " i formlen" + (st.kk === 1 ? ". Der står intet, så det er 1." : ".") };
         }
@@ -306,13 +306,13 @@
             return { besked: "Tallene inde i " + an.t + " hører til ionen selv. Der er " + (st.ka === 1 ? "én" : st.ka) + " " + an.t + " i hver " + st.formel + "." };
         }
         if (b === Math.abs(an.q) && st.ka !== Math.abs(an.q)) {
-            return { besked: NK.ladningstekst(an.q) + " er ladningen. Tallet foran er tallet efter " + st.an + " i formlen." };
+            return { besked: NK.ladningstekst(an.q) + " er ladningen. Tallet foran ionen er tallet efter " + st.an + " i formlen." };
         }
         return { besked: "Tallet foran " + an.t + " er tallet efter " + st.an + " i formlen" + (st.ka === 1 ? ". Der står intet, så det er 1." : ".") };
     };
 
     T.afstemHint = function () {
-        return "Tallet efter et grundstof i formlen, eller efter en parentes, siger, hvor mange af den ion der er.";
+        return "Tallet efter et grundstof eller efter en parentes i formlen siger, hvor mange af den ion der er.";
     };
 
     /* Skemaet paa tavlen: med tal, naar det er loest, ellers med ? */
@@ -440,12 +440,12 @@
         case "anden":
             var ion = id === "kat" ? st.kat : (id === "an" ? st.an : andenIon(o));
             var k = K.k(st, ion);
-            return "Tallet foran " + ionT(ion) + " i skemaet er " + k + ". " + (k === 1 ? "Så er [" + ionT(ion) + "] lig med c(" + st.formel + ")." :
+            return "Tallet foran " + ionT(ion) + " i skemaet er " + k + ". " + (k === 1 ? "Derfor er [" + ionT(ion) + "] lig med c(" + st.formel + ")." :
                 "Gang c(" + st.formel + ") med " + k + ".");
         case "cSalt":
             var g = givenIon(o), kg = K.k(st, g);
-            return kg === 1 ? "Der er én " + ionT(g) + " for hver " + st.formel + ". Så er c(" + st.formel + ") lig med [" + ionT(g) + "]." :
-                "Der er " + kg + " " + ionT(g) + " for hver " + st.formel + ". Del [" + ionT(g) + "] med " + kg + ".";
+            return kg === 1 ? "Der er én " + ionT(g) + " for hver " + st.formel + ". Derfor er c(" + st.formel + ") lig med [" + ionT(g) + "]." :
+                "Der er " + kg + " " + ionT(g) + " for hver " + st.formel + ". Divider [" + ionT(g) + "] med " + kg + ".";
         case "bidragA":
         case "bidragB":
             var kk = id === "bidragA" ? f.kA : f.kB, s2 = D.salt(id === "bidragA" ? t.A : t.B);
@@ -476,11 +476,11 @@
             return { facit: st.Mv, absTol: 0.06, fejl: glemt };
         case "n_mM":
             return { facit: f.n_mM, fejl: [[o.m * st.Mv, "Du har ganget. n = m / M."], [st.Mv / o.m, "Brøken er vendt om. n = m / M."],
-                [o.m, "Det er massen. Del den med molarmassen."]] };
+                [o.m, "Det er massen. Divider den med molarmassen."]] };
         case "c":
             return { facit: f.c, fejl: [[f.n_mM / o.V, "Rumfanget skal være i liter: " + K.mL(o.V) + " mL = " + K.L(o.V) + " L."],
                 [(o.V / 1000) / f.n_mM, "Brøken er vendt om. c = n / V."], [f.n_mM * o.V / 1000, "Du har ganget. c = n / V."],
-                [f.n_mM, "Det er stofmængden. Del den med rumfanget."]] };
+                [f.n_mM, "Det er stofmængden. Divider den med rumfanget."]] };
         case "kat":
         case "an":
         case "anden":
@@ -498,21 +498,21 @@
             var g = givenIon(o), kg = K.k(st, g);
             var fc = [];
             if (kg > 1) {
-                fc.push([o.ionC * kg, "Omvendt. Der er " + kg + " " + ionT(g) + " for hver " + st.formel + ", så c(" + st.formel + ") er mindre end [" + ionT(g) + "]."]);
-                fc.push([o.ionC, "Del med " + kg + ". Der er " + kg + " " + ionT(g) + " for hver " + st.formel + "."]);
+                fc.push([o.ionC * kg, "Du har ganget. Der er " + kg + " " + ionT(g) + " for hver " + st.formel + ", så c(" + st.formel + ") er mindre end [" + ionT(g) + "]."]);
+                fc.push([o.ionC, "Divider med " + kg + ". Der er " + kg + " " + ionT(g) + " for hver " + st.formel + "."]);
             }
             return { facit: f.cSalt, fejl: fc };
         case "nSA":
         case "nSB":
             var mS = id === "nSA" ? t.mA : t.mB, MS = D.salt(id === "nSA" ? t.A : t.B).Mv;
             return { facit: mS / MS, fejl: [[mS * MS, "Du har ganget. n = m / M."], [MS / mS, "Brøken er vendt om. n = m / M."],
-                [mS, "Det er massen. Del den med molarmassen."]] };
+                [mS, "Det er massen. Divider den med molarmassen."]] };
         case "cSA":
         case "cSB":
             var nS = id === "cSA" ? f.nSA : f.nSB, mS2 = id === "cSA" ? t.mA : t.mB, VL = t.V / 1000;
             return { facit: nS / VL, fejl: [[nS / t.V, "Rumfanget skal være i liter: " + K.mL(t.V) + " mL = " + K.L(t.V) + " L."],
                 [VL / nS, "Brøken er vendt om. c = n / V."], [nS * VL, "Du har ganget. c = n / V."],
-                [nS, "Det er stofmængden n. Koncentrationen er stofmængde pr. liter: del med rumfanget."],
+                [nS, "Det er stofmængden n. Koncentrationen er stofmængde pr. liter, så divider med rumfanget."],
                 [mS2 / VL, "Du har brugt massen. Brug stofmængden n, som du lige har regnet."]] };
         case "bidragA":
         case "bidragB":
@@ -523,8 +523,8 @@
             return { facit: kb * cb, fejl: fb };
         case "total":
             return { facit: f.total, fejl: [[f.cSA + f.cSB, "Husk tallet foran " + ionT(o.ion) + " i begge salte."],
-                [f.total / 2, "Ionerne er i det samme glas. Bidragene lægges sammen, ikke midles."],
-                [f.kA * f.nSA + f.kB * f.nSB, "Det er stofmængden af " + ionT(o.ion) + ". Læg bidragene sammen, de er koncentrationer."]] };
+                [f.total / 2, "Ionerne er i det samme glas. Bidragene lægges sammen, og der tages ikke et gennemsnit."],
+                [f.kA * f.nSA + f.kB * f.nSB, "Det er stofmængden af " + ionT(o.ion) + ". Læg bidragene til koncentrationen sammen."]] };
         case "nA":
         case "nB":
             var kn = id === "nA" ? f.kA : f.kB, cn = id === "nA" ? t.cA : t.cB, Vn = id === "nA" ? t.VA : t.VB;
@@ -534,7 +534,7 @@
             fn.push([kn * cn, "Det er koncentrationen af " + ionT(o.ion) + ". Gang med rumfanget i liter."]);
             return { facit: kn * cn * Vn / 1000, fejl: fn };
         case "Vsum":
-            return { facit: f.Vsum, fejl: [[t.VA + t.VB, "Det er i mL. Skriv det i liter."],
+            return { facit: f.Vsum, fejl: [[t.VA + t.VB, "Rumfanget er i mL. Skriv det i liter."],
                 [t.VA / 1000, "Læg begge rumfang sammen."], [t.VB / 1000, "Læg begge rumfang sammen."]] };
         case "ionBland":
             var cA = f.kA * t.cA, cB = f.kB * t.cB;
@@ -564,7 +564,7 @@
     T.trin = function (id, raa, o) {
         if (!String(raa || "").trim()) return { tom: true, besked: "Skriv tallet." };
         var t = T.tal(raa);
-        if (!t) return { besked: "Skriv et tal, fx 0,250." };
+        if (!t) return { besked: "Skriv et tal, for eksempel 0,250." };
         var k = kandidater(id, o), v = t.v;
         if (k.absTol ? Math.abs(v - k.facit) <= k.absTol : naer(v, k.facit)) return { ok: true };
         for (var i = 0; i < k.fejl.length; i++) {
@@ -573,7 +573,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (k.absTol ? Math.abs(v - k.facit) <= 1 : naer(v, k.facit, 0.04)) {
-            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, fx O = 16,00." : "Tæt på. Regn med alle cifrene." };
+            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, for eksempel O = 16,00." : "Tæt på. Regn med alle cifrene." };
         }
         return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };

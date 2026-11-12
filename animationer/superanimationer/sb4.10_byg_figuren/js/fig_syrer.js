@@ -56,7 +56,7 @@
             { navn: "Stofklassen", pladser: ["carboxylsyre", "carboxylgruppe"],
               ros: "Alle fire stoffer er carboxylsyrer. Carboxylgruppen −COOH har C=O og OH på samme carbonatom." },
             { navn: "Syre og sæbe", pladser: ["svag syre", "sæbe"],
-              ros: "Ethansyre er en svag syre, så kun en lille del afgiver en hydron. Sæbe er natriumsalte af fedtsyrer." }
+              ros: "Ethansyre er en svag syre, så kun en lille del af molekylerne afgiver en hydron. Sæbe er natriumsalte af fedtsyrer." }
         ],
         pladser: [
             { id: "carboxylsyre", ord: ["carboxylsyre"], x: HX, y: 64, maal: [BX, 64], titel: true, dele: ["baand"],
@@ -78,7 +78,7 @@
             { id: "sæbe", ord: ["sæbe"], x: KS.x + KS.b / 2, y: KS.y, maal: [KS.x + KS.b / 2, KS.y], titel: true, dele: ["saebe"],
               omr: [{ r: [KS.x - 5, KS.y - 5, KS.b + 10, KS.h + 10, 18], tom: true }],
               fejl: { carboxylsyre: "<b>carboxylsyre</b> har −COOH. Her har syren afgivet sin hydron, og baseformen sidder sammen med Na⁺.",
-                      "svag syre": "<b>svag syre</b> afgiver kun lidt hydroner. Kortet viser natriumsaltet af en fedtsyre.",
+                      "svag syre": "<b>svag syre</b> afgiver kun få hydroner. Kortet viser natriumsaltet af en fedtsyre.",
                       carboxylgruppe: "<b>carboxylgruppe</b> er −COOH. Kortet viser natriumsaltet af en fedtsyre med en lang kæde." } }
         ],
 

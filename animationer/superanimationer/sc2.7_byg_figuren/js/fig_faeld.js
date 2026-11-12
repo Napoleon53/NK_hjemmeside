@@ -68,7 +68,7 @@
             { id: "fældningsreaktion", ord: ["fældningsreaktion"], x: RAMME.x + RAMME.b / 2, y: RAMME.y, maal: [RAMME.x + RAMME.b / 2, RAMME.y], titel: true, dele: ["proces"],
               omr: [{ r: [RAMME.x - 6, RAMME.y - 6, RAMME.b + 12, RAMME.h + 12, 18], tom: true }],
               fejl: { ionskema: "<b>ionskema</b> skrives med formler og en pil. Rammen her viser glassene, der hældes sammen.",
-                      bundfald: "<b>bundfald</b> er kun det faste stof på bunden. Rammen viser det hele, der sker." } },
+                      bundfald: "<b>bundfald</b> er kun det faste stof på bunden. Rammen viser hele reaktionen." } },
             { id: "bundfald", ord: ["bundfald"], x: C.x + C.b / 2, y: 368, maal: [C.x + C.b / 2, BUND + 4], dele: ["bf"],
               omr: [{ r: [C.x - 2, BF.y - 6, C.b + 4, BUND - BF.y + 10, 8] }],
               fejl: { tungtopløselig: "<b>tungtopløselig</b> siger, hvordan saltet opfører sig. Pladsen peger på selve det faste stof på bunden.",
@@ -79,7 +79,7 @@
 
             { id: "fældningstabel", ord: ["fældningstabel"], x: TAB.x + TAB.b / 2, y: TAB.y, maal: [TAB.x + TAB.b / 2, TAB.y], titel: true, dele: ["tabel"],
               omr: [{ r: [TAB.x - 6, TAB.y - 6, TAB.b + 12, TAB.h + 12, 16], tom: true }],
-              fejl: { ionskema: "<b>ionskema</b> er en reaktion med en pil. Kortet her er en oversigt med ioner langs kanterne." } },
+              fejl: { ionskema: "<b>ionskema</b> er skrevet med formler og en pil. Kortet her er en oversigt med ioner langs kanterne." } },
             { id: "letopløselig", ord: ["letopløselig"], x: 512, y: L_CELLE.y + L_CELLE.h / 2, maal: [L_CELLE.x + L_CELLE.b, L_CELLE.y + L_CELLE.h / 2], dele: ["lc"],
               omr: [{ r: [L_CELLE.x + 2, L_CELLE.y + 2, L_CELLE.b - 4, L_CELLE.h - 4, 6] }],
               fejl: { tungtopløselig: "<b>tungtopløselig</b> er T i tabellen. Feltet ved pladsen har et L." } },

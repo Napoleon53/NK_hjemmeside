@@ -69,11 +69,11 @@
         vb: [1160, 544],
         lag: [
             { navn: "Iodtal", pladser: ["tilbagetitrering", "iodtal"],
-              ros: "Iodtallet viser, hvor meget diiod 100 g fedtstof kan addere. Ved en tilbagetitrering findes den forbrugte dibrom som en forskel." },
+              ros: "Iodtallet er det antal gram diiod, 100 g fedtstof kan addere. Ved en tilbagetitrering findes forbruget af dibrom som en forskel." },
             { navn: "Forsæbning", pladser: ["forsæbning", "sæbe"],
               ros: "Ved forsæbningen spalter KOH de tre estergrupper. Der dannes glycerol og sæbe, som er saltene af fedtsyrerne." },
             { navn: "Tal for fedtstoffer", pladser: ["forsæbningstal", "syretal"],
-              ros: "Forsæbningstallet er højt, når kæderne er korte. Syretallet stiger, når olien bliver harsk og får frie fedtsyrer." }
+              ros: "Forsæbningstallet er højt, når fedtsyrekæderne er korte. Syretallet stiger, når olien bliver harsk og får frie fedtsyrer." }
         ],
         pladser: [
             titel("tilbagetitrering", KT, ["kolber", "bjaelker"], {
@@ -91,7 +91,7 @@
                 "sæbe": "<b>sæbe</b> er saltene af fedtsyrerne. Kortets titel er navnet på hele reaktionen med KOH.",
                 tilbagetitrering: "<b>tilbagetitrering</b> er en metode til at måle. Kortets titel er reaktionen, hvor KOH spalter estergrupperne.",
                 "forsæbningstal": "<b>forsæbningstal</b> er et tal. Kortets titel er reaktionen, hvor KOH spalter estergrupperne.",
-                iodtal: "<b>iodtal</b> er et tal for dobbeltbindinger. Kortets titel er reaktionen, hvor KOH spalter estergrupperne." }),
+                iodtal: "<b>iodtal</b> er et mål for antallet af dobbeltbindinger. Kortets titel er reaktionen, hvor KOH spalter estergrupperne." }),
             { id: "sæbe", ord: ["sæbe"], x: SAEBE_X, y: KF.y + KF.h - 20, maal: [SAEBE_X, OMR_S[1] + OMR_S[3]], dele: ["ioner"],
               omr: [{ r: [OMR_S[0], OMR_S[1], OMR_S[2], OMR_S[3], 12] }],
               fejl: { "forsæbning": "<b>forsæbning</b> er reaktionen. Pladsen peger på de tre ioner med en lang kæde og K⁺, der dannes.",
@@ -99,7 +99,7 @@
 
             titel("forsæbningstal", KN1, ["kaeder"], {
                 syretal: "<b>syretal</b> handler om frie fedtsyrer i harsk olie. Her er tallet højt, når fedtsyrekæderne er korte.",
-                iodtal: "<b>iodtal</b> er gram diiod pr. 100 g. Her er tallet mg KOH, og det er højt, når kæderne er korte.",
+                iodtal: "<b>iodtal</b> er gram diiod pr. 100 g fedtstof. Her måles milligram KOH pr. gram fedtstof, og tallet er højt, når kæderne er korte.",
                 "forsæbning": "<b>forsæbning</b> er reaktionen. Kortets titel er navnet på tallet, der fortæller om kædernes længde." }),
             titel("syretal", KN2, ["frie"], {
                 "forsæbningstal": "<b>forsæbningstal</b> fortæller om kædernes længde. Her stiger tallet, fordi olien bliver harsk og får frie fedtsyrer.",

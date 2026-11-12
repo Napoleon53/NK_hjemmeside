@@ -102,7 +102,7 @@
         else if (o.hyp) s = "Hvis der dannes " + T.P(o.hyp) + ", hvad skal diglen så veje til sidst? Afstem skemaet først.";
         else {
             var mangler = this.mangler();
-            s = mangler.length ? "Regn først " + mangler.map(function (h) { return "hypotese " + h; }).join(", ").replace(/, ([^,]*)$/, " og $1") + ". Så kan du sammenligne." :
+            s = mangler.length ? "Regn først på " + mangler.map(function (h) { return "hypotese " + h; }).join(", ").replace(/, ([^,]*)$/, " og $1") + ". Derefter kan du sammenligne målingen med hypoteserne." :
                 (m.faerdig ? D.DOM.spm : D.DOM.ikkeKonstant);
         }
         return '<p class="maal-tekst">' + this.papirTekst(NK.html(s)) + "</p>" + note;
@@ -165,7 +165,7 @@
             NK.gemJournal();
             var diff = Math.abs(NK.forventet[h] - m.slut);
             this.besked(NK.html("Hypotese " + h + " giver " + K.g(NK.forventet[h]) + " g. Diglen vejer " + K.g2(m.slut) + " g. Forskellen er " +
-                K.g2(diff) + " g. Prøv en anden."), "skidt");
+                K.g2(diff) + " g. Prøv en anden hypotese."), "skidt");
             this.visKort();
             return;
         }
@@ -174,7 +174,7 @@
         var s;
         if (h === D.RIGTIG) {
             s = D.DOM.rigtig + " " + D.DOM.skema + ".";
-            if (m.sprojt) s += " Pulveret sprøjtede i din digel, så massen er lidt for lav. Den passer alligevel bedst med B.";
+            if (m.sprojt) s += " Pulveret sprøjtede i din digel, så massen er lidt for lav. Den passer alligevel bedst med hypotese B.";
             NK.dommen = true;
             NK.gem(NOEGLE_DOM, true);
         } else {
@@ -184,7 +184,7 @@
         if (g) s += g === h ? " Dit gæt fra forsøget holdt." : " Du gættede " + g + ": " + T.P(g) + ".";
         this.domTekst = s;
         this.valgt = h;
-        this.trinLoest(maade, maade === "svar" ? NK.html("Hypotese " + h + ". Stregen ligger, hvor kurven ender.") : null);
+        this.trinLoest(maade, maade === "svar" ? NK.html("Hypotese " + h + " passer, for dens streg ligger der, hvor kurven ender.") : null);
     };
 
     /* ----- Knappen og linjen: regneopgaverne bruger regningen, dommen sig selv ----- */
@@ -221,8 +221,8 @@
     P.slutLinje = function () {
         var o = this.opg, f = o.facit;
         if (o.dom) return NK.html(this.domTekst || "");
-        if (o.id === "nat") return NK.html("Natronen i din digel er " + K.mol(f.n_nat) + " mol.");
-        var m = K.g(f.m_p), s = "Hvis der dannes " + T.P(o.hyp) + ", skal diglen ende på " + m + " g. Stregen står på grafen.";
+        if (o.id === "nat") return NK.html("Stofmængden af natron i din digel er " + K.mol(f.n_nat) + " mol.");
+        var m = K.g(f.m_p), s = "Hvis der dannes " + T.P(o.hyp) + ", skal diglen ende på " + m + " g. Den masse står som en stiplet streg på grafen.";
         return NK.html(s);
     };
 
@@ -283,7 +283,7 @@
 
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
-        if (u === "graf") this.kortBesked("Grafen: dine vejninger og stregerne for de hypoteser, du har regnet. Kurven ender på den, der passer.");
+        if (u === "graf") this.kortBesked("Grafen viser dine vejninger og stregerne for de hypoteser, du har regnet. Kurven ender på stregen for den hypotese, der passer.");
         if (u === "tavle") this.kortBesked("Tavlen viser skemaet, opgavens tal og beregningen, efterhånden som du skriver den.");
         return false;
     };
@@ -314,7 +314,7 @@
         var o = this.opg;
         if (!o) return "";
         if (o.id === "nat") return "Find stofmængden af natron i diglen.";
-        if (o.hyp) return "Hypotese " + o.hyp + ": regn ud, hvad diglen skal veje, hvis der dannes " + T.P(o.hyp) + ".";
+        if (o.hyp) return "Hypotese " + o.hyp + ": Regn ud, hvad diglen skal veje, hvis der dannes " + T.P(o.hyp) + ".";
         return "Sammenlign målingen med de tre hypoteser.";
     };
 

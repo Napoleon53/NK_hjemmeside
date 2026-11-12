@@ -295,15 +295,15 @@
             return ud;
         }
         if (mangler.length === 2) {
-            ud.tekst = "Blandingen står bare. Uden svovlsyre og varme går esterdannelsen alt for langsomt.";
+            ud.tekst = "Uden svovlsyre og varme går esterdannelsen alt for langsomt. Blandingen står stadig i kolben.";
         } else if (mangler[0] === "hplus") {
-            ud.tekst = "Uden svovlsyre som katalysator går det alt for langsomt. Blandingen står stadig i kolben.";
+            ud.tekst = "Uden svovlsyre som katalysator går esterdannelsen alt for langsomt. Blandingen står stadig i kolben.";
         } else if (mangler[0] === "varme") {
-            ud.tekst = "Ved stuetemperatur går det alt for langsomt. Blandingen står stadig i kolben.";
+            ud.tekst = "Ved stuetemperatur går esterdannelsen alt for langsomt. Blandingen står stadig i kolben.";
         } else if (phenol) {
-            ud.tekst = "Syrens OH og H fra ringens OH blev til vand. Resten blev til " + fuldtNavn(produkt) + ".";
+            ud.tekst = "Syrens OH og H fra ringens OH blev til vand, og resten af de to molekyler blev til " + fuldtNavn(produkt) + ".";
         } else {
-            ud.tekst = "Syrens OH og alkoholens H blev til vand. Resten blev til " + fuldtNavn(produkt) + ".";
+            ud.tekst = "Syrens OH og alkoholens H blev til vand, og resten af de to molekyler blev til " + fuldtNavn(produkt) + ".";
         }
         return ud;
     }
@@ -315,7 +315,7 @@
 
         if (X.id === "methansyre") {
             return med({ slags: "co2", mulig: true, produkt: null,
-                tekst: mangler.length ? "Ved stuetemperatur går det langsomt. Blandingen står stadig i kolben." :
+                tekst: mangler.length ? "Ved stuetemperatur går oxidationen langsomt. Blandingen står stadig i kolben." :
                     "Methansyre blev oxideret helt til CO₂ og vand. Det er en dyr måde at lave sodavand på." });
         }
         var t1 = X.mol && X.klasse === "alkohol" ? oxTrin1(X.mol) : null;
@@ -340,7 +340,7 @@
         return med({ slags: "oxidation", mulig: true, produkt: syre, mellem: mellem.navn,
             morf: { type: "ox", alk: X, ao: alkHer, keton: false, produkt: syre, mellem: mellem.navn },
             tekst: mangler.length ? "Ved stuetemperatur går oxidationen langsomt. Blandingen står stadig i kolben." :
-                cap(X.navn) + " blev først til " + mellem.navn + " og så til " + fuldtNavn(syre) + ". Tilbagesvaleren holdt aldehydet i kolben." });
+                cap(X.navn) + " blev først til " + mellem.navn + " og derefter til " + fuldtNavn(syre) + ". Tilbagesvaleren holdt aldehydet i kolben." });
     }
 
     function ether(A, bet) {

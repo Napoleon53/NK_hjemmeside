@@ -768,7 +768,7 @@
             if (!u) { mig.fokus(); return; }
             var og = mig.opg, l = og.o.r.led[u.j], st = D.stof(l.s), f = og.felter[u.j];
             if (f.kendt) {
-                mig.besked("Det kendte: " + NK.html(og.o.nTekst) + " mol " + st.formel + ". Den fylder netop sine " + l.k +
+                mig.besked("Den kendte stofmængde er " + NK.html(og.o.nTekst) + " mol " + st.formel + ", og den fylder netop sine " + l.k +
                     (l.k === 1 ? " blok." : " blokke."), "");
             } else if (!og.afstemt) {
                 mig.besked(st.formel + ": " + NK.html(st.navn) + ". Koefficienten skrives i feltet foran formlen.", "");

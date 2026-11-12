@@ -447,7 +447,7 @@ function koer() {
     nt.nyOpgave(parAf("Ag-NO3+Na-PO4"), false);
     var r1 = tb.getBoundingClientRect(), r2 = d.getElementById("arbejdsbord").getBoundingClientRect(), r3 = d.getElementById("baeger-omraade").getBoundingClientRect();
     paastand("tekstboksen står øverst i scenen, tavlen lige under og glassene nederst", r1.top < r2.top && r2.top < r3.top && r1.top < 90);
-    paastand("tekstboksen siger, hvad der blandes, og at der skal slås op", /Sølvnitrat og natriumphosphat blandes/.test(tb.textContent)
+    paastand("tekstboksen siger, hvad der blandes, og at der skal slås op", /Sølv\(I\)nitrat og natriumphosphat blandes/.test(tb.textContent)
         && /Slå de to nye par op i fældningstabellen/.test(tb.textContent) && !!d.getElementById("slaa-op"));
     paastand("ingen tekstlinje nederst på arbejdsbordet", !d.getElementById("besked") || !!d.getElementById("besked").closest("#tekstboks"));
     d.getElementById("slaa-op").click();

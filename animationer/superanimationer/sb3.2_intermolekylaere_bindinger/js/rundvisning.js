@@ -15,24 +15,24 @@
 
     var TURE = {
         "fane-e": [
-            { sel: "#e-skort", titel: "Opgaven", tekst: "Her står opgaven. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
-            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Ethanolmolekylerne i glasset. Klik på et molekyle for at se dets bindinger til naboerne." },
-            { sel: "#e-signatur", titel: "Stregerne", tekst: "Rød stiplet streg: en hydrogenbinding. Grå prikker: en London-kraft." },
+            { sel: "#e-skort", titel: "Opgaven", tekst: "Kortet viser opgaven, hint og svar. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Luppen viser ethanolmolekylerne i glasset. Klik på et molekyle for at se dets bindinger til naboerne." },
+            { sel: "#e-signatur", titel: "Stregerne", tekst: "En rød stiplet streg er en hydrogenbinding, og grå prikker er en londonbinding." },
             { sel: "#e-anker-termometer", titel: "Termometeret", tekst: "Træk i det runde håndtag for at varme op eller køle ned. Pil op og ned virker også." },
-            { sel: "#e-anker-kammer", titel: "Glasset", tekst: "Ethanol i et reagensglas. Når ethanol koger, kommer der bobler, og ballonen fanger dampen." },
-            { sel: "#e-opgaver", titel: "Opgaverne", tekst: "Fire opgaver. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
+            { sel: "#e-anker-kammer", titel: "Glasset", tekst: "Glasset er et reagensglas med ethanol. Når ethanol koger, kommer der bobler, og ballonen fanger dampen." },
+            { sel: "#e-opgaver", titel: "Opgaverne", tekst: "Fanen har fire opgaver. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
         ],
         "fane-s": [
             { sel: "#s-skort", titel: "Opgaven", tekst: "Gæt først. Find så kogepunkterne, og send dem ind med Indsend svar." },
             { sel: "#s-anker-lupper", titel: "To stoffer", tekst: "Hvert stof har sin egen lup. Klik på et molekyle for at se dets bindinger." },
-            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Varmer begge glas på én gang. Et stof koger, når der kommer bobler i dets glas." },
-            { sel: "#s-grafkort", titel: "Grafen", tekst: "Kogepunkterne mod molarmassen. Alkaner er grå, alkoholer er røde." },
-            { sel: "#s-opgaver", titel: "Parrene", tekst: "Tre par, der hver viser én ting: OH-gruppen, kæden og to OH-grupper. Bagefter venter Rangér." }
+            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Termometeret styrer temperaturen i begge glas på én gang. Et stof koger, når der kommer bobler i dets glas." },
+            { sel: "#s-grafkort", titel: "Grafen", tekst: "Grafen viser kogepunktet afbildet som funktion af molarmassen. Alkaner er grå, og alkoholer er røde." },
+            { sel: "#s-opgaver", titel: "Parrene", tekst: "Fanen har tre par stoffer, som hvert viser én forskel: OH-gruppen, kæden og to OH-grupper. Bagefter kommer fanen Rangér." }
         ],
         "fane-r": [
-            { sel: "#r-skort", titel: "Opgaven", tekst: "Sæt stofferne i rækkefølge, og tryk Indsend svar. Står et par forkert, forklares det her." },
+            { sel: "#r-skort", titel: "Opgaven", tekst: "Sæt stofferne i rækkefølge efter kogepunkt, og tryk Indsend svar. Står to stoffer i forkert rækkefølge, forklarer kortet hvorfor." },
             { sel: "#r-tavle", titel: "Tavlen", tekst: "Træk et kort hen på et andet, så bytter de plads. Du kan også klikke på to kort." },
-            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Tolv opgaver i tre grupper. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
+            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Fanen har 30 opgaver i seks niveauer. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
         ]
     };
     var trin = [];

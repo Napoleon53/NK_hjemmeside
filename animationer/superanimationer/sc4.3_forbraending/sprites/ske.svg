@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="44" viewBox="0 0 170 44">
+  <!-- En ske af staal set fra siden, skaalen til venstre og skaftet til hoejre.
+       Skaalens midte er (28, 20), og den indvendige flade (hvor soden saetter
+       sig) er en ellipse med radius 22 og 10. Skaftets ende er (168, 23). -->
+  <defs>
+    <linearGradient id="staal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f6f8"/>
+      <stop offset="0.45" stop-color="#b9c0c8"/>
+      <stop offset="1" stop-color="#6c737c"/>
+    </linearGradient>
+    <radialGradient id="skaal" cx="0.42" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#c7cdd4"/>
+      <stop offset="1" stop-color="#7d848d"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Skaftet -->
+  <path d="M50 17 Q90 19 166 19 Q170 21 166 26 Q90 26 50 25 Z" fill="url(#staal)" stroke="#59606a" stroke-width="1"/>
+  <path d="M60 19.5 Q100 21 160 20.8" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Skaalen -->
+  <ellipse cx="28" cy="21" rx="26" ry="15" fill="url(#skaal)" stroke="#59606a" stroke-width="1.2"/>
+  <ellipse cx="28" cy="20" rx="22" ry="10" fill="#d9dee3" stroke="#8a919a" stroke-width="0.8"/>
+  <path d="M12 16 Q20 11 32 12" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="2" stroke-linecap="round"/>
+</svg>

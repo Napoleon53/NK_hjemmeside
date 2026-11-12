@@ -87,19 +87,19 @@
     /* Det ekstra spoergsmaal: svarene og det rigtige (svar) */
     D.EKSTRA = {
         kondensation: {
-            spm: "Ethanal og DNPH går sammen til ét molekyle, og der fraspaltes vand. Hvad hedder sådan en reaktion?",
+            spm: "Ethanal og DNPH bindes sammen til ét molekyle, og der fraspaltes vand. Hvad hedder sådan en reaktion?",
             svar: ["Kondensation", "Addition", "Substitution", "Oxidation"], rigtig: 0,
             forkert: [null,
-                "Ved en addition fraspaltes der intet. Ved reaktionen med DNPH bliver vand til overs.",
-                "Ved en substitution bytter to atomer plads. Ethanal og DNPH går sammen, og vand fraspaltes.",
-                "Carbonatomets oxidationstal ændrer sig ikke: C=O er blevet til C=N, to bindinger til et mere elektronegativt atom."],
-            forklaring: "Det er en kondensation, som når en ester dannes. Produktet er tungtopløseligt og falder ud som et gult bundfald.",
+                "Ved en addition fraspaltes der intet. Ved reaktionen med DNPH fraspaltes der vand.",
+                "Ved en substitution erstattes et atom af et andet. Ethanal og DNPH bindes sammen, og der fraspaltes vand.",
+                "Carbonatomets oxidationstal ændrer sig ikke, for C=O er blevet til C=N, og N er ligesom O mere elektronegativt end C."],
+            forklaring: "Reaktionen er en kondensation ligesom dannelsen af en ester. Produktet er tungtopløseligt og falder ud som et gult bundfald.",
             hint: ["To molekyler bliver til ét større, og et lille molekyle fraspaltes. Det kender du fra estere i afsnit B4.5."]
         },
         binding: {
             spm: "Carbonatomet i propanon havde en dobbeltbinding til oxygen. Hvilken binding har det nu til nitrogen?",
             svar: ["Enkeltbinding", "Dobbeltbinding", "Tripelbinding"], rigtig: 1,
-            forkert: ["Tæl stregerne mellem C og N på tavlen. Oxygenatomet tog to bindinger med sig, og nitrogen giver to nye.",
+            forkert: ["Tæl stregerne mellem C og N på tavlen. Oxygenatomet tog to bindinger med sig, og nitrogenatomet danner to nye.",
                 null,
                 "Tæl stregerne mellem C og N på tavlen. Carbonatomet har stadig kun fire bindinger i alt."],
             forklaring: "C=O er blevet til C=N. Nitrogenatomet har mistet to hydrogenatomer og kan derfor danne to bindinger til carbonatomet.",

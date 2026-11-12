@@ -202,15 +202,16 @@
             + (ikAedel ? ikAedel.navn.toLowerCase() : "en ædelgas") + ". ";
 
         if (f.antalPositive === 1 && f.antalNegative === 1) {
-            t += "De to tal passer sammen 1:1: ét " + m.navn.toLowerCase() + "atom afgiver præcis så mange "
+            t += "Ét " + m.navn.toLowerCase() + "atom afgiver præcis så mange "
                 + "elektroner, som ét " + ik.navn.toLowerCase() + "atom kan tage imod, så ladningsregnskabet "
                 + "går op med kun ét atom af hver.";
         } else {
-            t += "De to tal går ikke lige op hver for sig, så der skal " + f.antalPositive + " " + m.symbol
-                + " og " + f.antalNegative + " " + ik.symbol + " til, før det samlede regnskab lander på nul.";
+            t += "Et " + m.navn.toLowerCase() + "atom afgiver ikke lige så mange elektroner, som et " + ik.navn.toLowerCase()
+                + "atom optager, så der skal " + f.antalPositive + " " + m.symbol
+                + " og " + f.antalNegative + " " + ik.symbol + " til, før den samlede ladning er nul.";
         }
 
-        t += " Resultatet er " + D.saltnavn(m, ik) + ", " + D.saltformel(m, ik) + ". Det er ikke ét molekyle, "
+        t += " Der dannes " + D.saltnavn(m, ik) + ", " + D.saltformel(m, ik) + ". Saltet er ikke ét molekyle, "
             + "men et iongitter bygget af " + m.symbol + NK.ladningHaevet(m.ion) + "- og " + ik.symbol
             + NK.ladningHaevet(ik.ion) + "-ioner i forholdet " + f.antalPositive + ":" + f.antalNegative
             + ", hvor hver ion er omgivet af ioner med modsat ladning i alle retninger.";

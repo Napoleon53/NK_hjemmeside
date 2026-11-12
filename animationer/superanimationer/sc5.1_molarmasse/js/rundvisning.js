@@ -18,7 +18,7 @@
     var TURE = {
         "fane-vaegt": [
             { sel: "#vaegt-anker-plakat", titel: "Det periodiske system", tekst: "Klik på et grundstof for at lægge et atom på vægten. Holder du musen over et felt, står navnet der." },
-            { sel: "#vaegt-anker-felt", titel: "Tallene i et felt", tekst: "Øverst til venstre står atomnummeret. Nederst står atommassen. Det er den, molarmassen regnes med." },
+            { sel: "#vaegt-anker-felt", titel: "Tallene i et felt", tekst: "Øverst til venstre står atomnummeret, og nederst står atommassen. Molarmassen regnes ud med atommassen." },
             { sel: "#vaegt-skort", titel: "Opgaven", tekst: "Kortet siger, hvilket stof du skal veje. Giv hint giver et hint og derefter svaret." },
             { sel: "#vaegt-regn", titel: "Regnestykket", tekst: "Skriv atommassen for hvert grundstof og til sidst molarmassen. Enter eller Indsend svar på kortet sender tallet." },
             { sel: "#vaegt-anker-vaegt", titel: "Vægten", tekst: "Den vejer med to decimaler, men ét molekyle kan den ikke mærke. Når molarmassen er rigtig, kommer 1 mol af stoffet på." },
@@ -29,12 +29,12 @@
         "fane-skaal": [
             { sel: "#skaal-anker-vaegt", titel: "Skålvægten", tekst: "1 mol af et stof i hver skål. Vægten er låst, til du har svaret." },
             { sel: "#skaal-skort", titel: "Dit svar", tekst: "Vælg Venstre, Står lige eller Højre, og tryk Indsend svar. Piletasterne vælger også." },
-            { sel: "#skaal-anker-kort", titel: "Skiltet", tekst: "Det, der ligger i skålene, og beregningen af massen. Pilen peger mod skålen. Hintet sætter atommasserne ind, og efter svaret står resultatet der." },
+            { sel: "#skaal-anker-kort", titel: "Skiltet", tekst: "Skiltet viser stoffet i hver skål og beregningen af massen af 1 mol. Pilene peger mod skålene. Hintet sætter atommasserne ind, og efter dit svar står massen af 1 mol på skiltet." },
             { sel: "#skaal-runden", titel: "Runden", tekst: "Ni par pr. runde. Giv hint på kortet sætter atommasserne ind på skiltet. Rekorden huskes." }
         ],
         "fane-ukendt": [
             { sel: "#ukendt-anker-flaske", titel: "Flasken", tekst: "Etiketten er faldet af. Glasset er brunt, så man kan ikke se stoffet." },
-            { sel: "#ukendt-anker-maerke", titel: "Mærket", tekst: "Det eneste, der er tilbage: molarmassen." },
+            { sel: "#ukendt-anker-maerke", titel: "Mærket", tekst: "Mærket viser kun stoffets molarmasse." },
             { sel: "#ukendt-anker-tavle", titel: "Etiketterne", tekst: "Klik på den etiket, der passer, og tryk Indsend svar på kortet. En forkert etiket falder af igen og får sin molarmasse skrevet på." },
             { sel: "#ukendt-fremskridt", titel: "Flaskerne", tekst: "En flaske, du løser i første forsøg uden at se svaret, får en stjerne." }
         ]

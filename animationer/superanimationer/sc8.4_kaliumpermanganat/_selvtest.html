@@ -267,7 +267,7 @@ async function koerTest(W) {
     paastand("Mn +VIII i MnO₄⁻: ionens ladning er glemt", /glemt ionens ladning/.test(X.oxFejl(mno4, 8)), X.oxFejl(mno4, 8));
     paastand("Mn −VII: fortegnet", /fortegnet/.test(X.oxFejl(mno4, -7)));
     paastand("pilen den forkerte vej: tallet bliver større, så op", /pege op/.test(X.klammeFejl(R1.ox, false, 2)), X.klammeFejl(R1.ox, false, 2));
-    paastand("klammen med 2 I: 1 er for ét I", /for ét I/.test(X.klammeFejl(R11.ox, true, 1)), X.klammeFejl(R11.ox, true, 1));
+    paastand("klammen med 2 I: 1 er for ét I", /gælder ét I/.test(X.klammeFejl(R11.ox, true, 1)), X.klammeFejl(R11.ox, true, 1));
     paastand("S fra +IV til +VI skrevet som 10: lagt sammen", /lagt tallene sammen/.test(X.klammeFejl(R1.ox, true, 10)));
     paastand("oxidationstallet i stedet for forskellen", /et oxidationstal/.test(X.klammeFejl(R1.ox, true, 6)));
     paastand("ingen pil valgt", /Klik på pilen/.test(X.klammeFejl(R1.ox, null, 2)));

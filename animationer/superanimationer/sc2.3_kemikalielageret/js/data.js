@@ -190,7 +190,7 @@
         ["Li", "N", "formel", 0, "#b8485e", "pulver", "Dannes, når lithium reagerer med luftens dinitrogen."],
         ["Ca", "Cl", "formel", 0, "#f5f4f0", "krystal", "Vejsalt, der virker ved lavere temperatur end køkkensalt."],
         ["Mg", "O", "formel", 0, "#f3f3ef", "pulver", "Magnesia: tabletter mod halsbrand og forstoppelse."],
-        ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Nødblus til søs: med vand dannes en gas, der selv tager fyr."],
+        ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Nødblus til søs. Med vand dannes en gas, der selv tager fyr."],
 
         ["Fe2", "O", "navn", 1, "#2b2724", "pulver", "Sort. Findes i hammerskæl, der springer af under smedning."],
         ["Cu2", "Cl", "navn", 1, "#b98a35", "pulver", "Farver en flamme blågrøn."],
@@ -209,7 +209,7 @@
         ["K", "NO3", "navn", 2, "#f6f6f2", "krystal", "Salpeter: en af bestanddelene i sortkrudt."],
         ["Ba", "SO4", "formel", 2, "#f8f8f6", "pulver", "Drikkes før røntgen, så mave og tarm kan ses."],
         ["Cu2", "SO4", "navn", 2, "#e7e9e8", "pulver", "Hvidt uden vand. Med vand bliver det blåt."],
-        ["Al", "SO4", "formel", 2, "#f1f1ed", "krystal", "Renser drikkevand: snavset fælder ud sammen med det."],
+        ["Al", "SO4", "formel", 2, "#f1f1ed", "krystal", "Renser drikkevand, fordi snavset fælder ud sammen med det."],
         ["Ca", "PO4", "navn", 2, "#efede6", "pulver", "Knoglernes mineral er en form for calciumphosphat."],
         ["NH4", "SO4", "formel", 2, "#f2f1ec", "krystal", "Gødning med både nitrogen og svovl."],
         ["Fe3", "OH", "navn", 2, "#9a4a22", "pulver", "Okker: det rødbrune slam i jernholdige vandløb."]
@@ -368,7 +368,7 @@
                 return {
                     hint: "Find " + (st.retning === "formel" ? (i.q > 0 ? i.stamme : i.navn) : NK.formel(i.formel)) +
                         " på plakaten med sammensatte ioner.",
-                    svar: "<b>" + i.tekst + "</b>. En sammensat ion med ladningen " + NK.ladningstekst(i.q) + ".",
+                    svar: "<b>" + i.tekst + "</b> er en sammensat ion med ladningen " + NK.ladningstekst(i.q) + ".",
                     plakat: "ioner"
                 };
             }
@@ -381,7 +381,7 @@
                     hint: st.formelTekst + " er neutral. Hvor meget " + (anden.q < 0 ? "minus" : "plus") +
                         " giver " + antalTekst(antalAnden, anden) + "?",
                     svar: "<b>" + i.tekst + "</b>. " + antalTekst(antalAnden, anden) + " giver " +
-                        NK.fortegn(antalAnden * anden.q) + ". Så skal " +
+                        NK.fortegn(antalAnden * anden.q) + ". Derfor skal " +
                         (antalDenne === 1 ? i.formel : antalDenne + " " + i.formel) + " give " +
                         NK.fortegn(-antalAnden * anden.q) + (antalDenne > 1 ? ", altså " + NK.fortegn(i.q) + " hver" : "") + "."
                 };

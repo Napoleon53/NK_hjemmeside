@@ -420,7 +420,7 @@
         /* Idealgasligningen */
         if (naer(a, f) || naer(a, trin.raa)) return { ok: true };
         if (x === "T" && givet.t === undefined && Math.abs(a - (f - D.KELVIN)) <= 1.5) {
-            return { besked: "Det er i °C. Her skal temperaturen være i kelvin." };
+            return { besked: "Dit tal er temperaturen i °C. Her skal temperaturen være i kelvin." };
         }
         if (givet.t !== undefined && givet.t !== 0 && x !== "T") {
             g = gasRegn(x, kopi(k, { T: givet.t }), D.R);
@@ -430,7 +430,7 @@
             return { besked: "Med bar og liter er R = " + D.R_TEKST + ". R = 8,314 hører til Pa og m³." };
         }
         if (givet.VmL !== undefined && naer(a, gasRegn(x, kopi(k, { V: givet.VmL }), D.R))) {
-            return { besked: "Volumen skal være i liter: " + G.fmt("VmL", givet.VmL) + " = " + G.fmt("V", givet.VmL / 1000) + "." };
+            return { besked: "Volumenet skal være i liter: " + G.fmt("VmL", givet.VmL) + " = " + G.fmt("V", givet.VmL / 1000) + "." };
         }
         if (x === "V" && [22.4, 24, 24.5].some(function (c) { return naer(a, c * k.n, 0.003); })) {
             return { besked: "24 L pr. mol gælder kun ved stuetemperatur og 1 bar. Regn med idealgasligningen." };

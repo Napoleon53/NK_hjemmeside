@@ -174,7 +174,7 @@
             this.bygTabel();
             if (!this.tjekTrin()) {
                 this.besked('<span class="b-maerke">' + (foer ? "Blindprøve" : "Nulstillet") + "</span> " +
-                    NK.html(foer ? "Blindprøven giver stadig A = 0,000." : "Rent vand giver nu A = 0,000. Instrumentet måler kun det, der er opløst."), "peger");
+                    NK.html(foer ? "Blindprøven giver stadig A = 0,000." : "Rent vand giver nu A = 0,000, og instrumentet måler kun den absorbans, der skyldes de opløste stoffer."), "peger");
             }
             return;
         }
@@ -186,14 +186,14 @@
         if (this.tjekTrin()) return;
         var tekst = navn + (this.d.lambdaer.length > 1 ? " ved " + lambda + " nm" : "") + ": A = " + T.A(A) + ".";
         if (grund === "nul") {
-            this.fejlLinje(NK.html(tekst) + " Instrumentet var ikke nulstillet, så tallet er " + T.A(D.BAGGRUND) +
-                " for højt. Mål blindprøven, og mål så igen.", "Ikke nulstillet");
+            this.fejlLinje(NK.html(tekst) + " Instrumentet var ikke nulstillet, så absorbansen er " + T.A(D.BAGGRUND) +
+                " for høj. Mål blindprøven, og mål så igen.", "Ikke nulstillet");
             return;
         }
         if (grund === "farve") {
             this.fejlLinje(NK.html(tekst) + (this.reag.sulf && this.reag.kob ?
                 " Farven er ikke færdig endnu, så A er for lille. Vent på uret, og mål igen." :
-                " Nitrit er farveløs og opsuger ikke lyset. Tilsæt begge reagenser først."), "For tidligt");
+                " Nitrit er farveløs og absorberer ikke lyset. Tilsæt begge reagenser først."), "For tidligt");
             return;
         }
         this.besked('<span class="b-maerke">Målt</span> ' + NK.html(tekst), "peger");
@@ -209,7 +209,7 @@
         var A = this.visA("flaske", lambda);
         var Tp = 100 * M.transmittans(A);
         this.kortBesked("Ufortyndet sodavand: A = " + T.A(A) + ". Kun " + T.dk(Tp, 1) +
-            " % af lyset slipper igennem, og A ligger langt over standardkurven. Derfor fortyndes sodavanden før målingen.", 9);
+            " % af lyset slipper igennem, og A er langt højere end absorbansen af den højeste standard. Derfor fortyndes sodavanden før målingen.", 9);
     };
 
     P.paaReagens = function (navn) {
@@ -250,13 +250,13 @@
     P.paaKlik = function (hvad) {
         var lam = this.lambda;
         if (hvad === "instrument") {
-            this.kortBesked("Spektrofotometeret sender lys med bølgelængden " + lam + " nm gennem kuvetten og måler, hvor meget der kommer ud på den anden side.", 6);
+            this.kortBesked("Spektrofotometeret sender lys med bølgelængden " + lam + " nm gennem kuvetten og måler, hvor meget lys der kommer ud på den anden side.", 6);
         } else if (hvad === "boble") {
-            this.kortBesked("Zoom på kuvetten. En foton, der rammer et farvestofmolekyle, kan blive opsuget. Jo flere molekyler, jo færre fotoner kommer ud.", 6);
+            this.kortBesked("Boblen viser kuvetten forstørret. En foton, der rammer et farvestofmolekyle, kan blive absorberet. Jo flere farvestofmolekyler, jo færre fotoner kommer ud.", 6);
         } else if (hvad === "holder") {
             this.scene.startMaaling();
         } else if (hvad === "graf") {
-            this.kortBesked("Grafen viser A mod c. Hvert punkt er en standard, du har målt.", 5);
+            this.kortBesked("Grafen viser A som funktion af c. Hvert punkt er en standard, du har målt.", 5);
         }
     };
 
@@ -666,7 +666,7 @@
             var g = this.d.graense;
             var mgL = c1 * g.M / 1000;
             var om = c1 > g.uM ? "over" : "under";
-            return v.P1 + " indeholder " + v.c1 + " µM nitrit, det er " + T.bet(mgL, 2) + " mg/L. Grænseværdien for drikkevand ved taphanen er 0,10 mg/L, så " +
+            return v.P1 + " indeholder " + v.c1 + " µM nitrit, svarende til " + T.bet(mgL, 2) + " mg/L. Grænseværdien for drikkevand ved taphanen er 0,10 mg/L, så " +
                 p1.navn + " ligger " + om + " grænsen. " + v.P2 + " indeholder " + v.c2 + " µM nitrit.";
         }
         if (this.id === "svr") {
@@ -749,7 +749,7 @@
             spec.enheder = ["", "µM"]; spec.resEnhed = "µM⁻¹";
             spec.formelFejl = function (dom, sk) {
                 if (dom.slags === "vendt") return "Brøken er vendt. a er A pr. µM, så A står i tælleren og c i nævneren.";
-                if (sk === "gange" && dom.slags === "form") return "A · c giver ikke hældningen. a er A pr. µM: A delt med c.";
+                if (sk === "gange" && dom.slags === "form") return "A · c giver ikke hældningen. a er A pr. µM, så A skal divideres med c.";
                 return null;
             };
             spec.tjekTal = function (v) {
@@ -762,7 +762,7 @@
                 if (v[0] === 0 && v[1] === 0) return { ok: false, felt: 0, besked: "Blindprøven giver 0 / 0. Vælg en af standarderne." };
                 if (std.some(function (p) { return naer(v[1], p.c * 1e-6, 0.01); })) return { ok: false, felt: 1, besked: "Skriv c i µM, som i tabellen." };
                 if (iA >= 0 && iC >= 0 && iA === iC) return { ok: true };
-                if (iA < 0 && std.some(function (p) { return naer(v[0], p.c, 0.002); })) return { ok: false, felt: 0, besked: "Tallene står omvendt. A skal i tælleren og c i nævneren." };
+                if (iA < 0 && std.some(function (p) { return naer(v[0], p.c, 0.002); })) return { ok: false, felt: 0, besked: "Tallene står omvendt. A skal stå i tælleren og c i nævneren." };
                 if (iA < 0) return { ok: false, felt: 0, besked: "Tælleren skal være A for en af standarderne. Se tabellen." };
                 if (iC < 0) return { ok: false, felt: 1, besked: "Nævneren skal være c for den samme standard: " + T.dk(std[iA].c, 1) + " µM." };
                 return { ok: false, felt: 1, besked: "A og c skal komme fra den samme standard." };
@@ -773,7 +773,7 @@
                 if (naer(x, f, 0.012)) return { ok: true, vaerdi: f };
                 if (naer(x, v[1] / v[0], 0.02)) return { ok: false, besked: "Du har regnet c / A. Brøken er vendt." };
                 if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tæl nullerne efter kommaet på lommeregneren." };
-                return { ok: false, besked: "Det passer ikke med " + T.A(v[0]) + " / " + T.dk(v[1], 1) + ". Regn brøken ud igen." };
+                return { ok: false, besked: "Resultatet passer ikke med " + T.A(v[0]) + " / " + T.dk(v[1], 1) + ". Regn brøken ud igen." };
             };
             spec.visRes = function (x) { return T.bet(x, 3); };
             spec.svarTal = function () {
@@ -792,13 +792,13 @@
             spec.venstre = "c"; spec.sk = "broek"; spec.felter = ["A", "a"]; spec.formelTekst = "A / a";
             spec.enheder = ["", "µM⁻¹"]; spec.resEnhed = "µM";
             spec.formelFejl = function (dom, sk) {
-                if (dom.slags === "vendt") return "Brøken er vendt. Del A med a, så står c alene: c = A / a.";
-                if (sk === "gange" && dom.slags === "form") return "A = a · c. For at få c alene skal A deles med a, ikke ganges.";
+                if (dom.slags === "vendt") return "Brøken er vendt. Dividér A med a, så står c alene: c = A / a.";
+                if (sk === "gange" && dom.slags === "form") return "A = a · c. For at få c alene skal A divideres med a, ikke ganges.";
                 return null;
             };
             spec.tjekTal = function (v) {
                 var navn = mig.kuvette(pid).navn;
-                if (Math.abs(v[0] - aV()) < 1e-9 && Math.abs(v[1] - Ap()) < 0.0006) return { ok: false, felt: 0, besked: "Tallene står omvendt. A i tælleren, a i nævneren." };
+                if (Math.abs(v[0] - aV()) < 1e-9 && Math.abs(v[1] - Ap()) < 0.0006) return { ok: false, felt: 0, besked: "Tallene står omvendt. A skal stå i tælleren og a i nævneren." };
                 if (Math.abs(v[0] - Ap()) >= 0.0006) return { ok: false, felt: 0, besked: "Tælleren skal være " + navn + "s absorbans, " + T.A(Ap()) + "." };
                 if (!naer(v[1], aV(), 0.006)) return { ok: false, felt: 1, besked: "Nævneren skal være hældningen a = " + T.bet(aV(), 3) + " µM⁻¹." };
                 return { ok: true };
@@ -808,9 +808,9 @@
                 var f = v[0] / v[1];
                 if (naer(x, f, 0.012)) return { ok: true, vaerdi: f };
                 if (naer(x, v[0] * v[1], 0.02)) return { ok: false, besked: "Du har ganget. c = A / a." };
-                if (naer(x, v[1] / v[0], 0.02)) return { ok: false, besked: "Brøken er vendt. Det er a / A." };
+                if (naer(x, v[1] / v[0], 0.02)) return { ok: false, besked: "Du har regnet a / A. Brøken er vendt." };
                 if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
-                return { ok: false, besked: "Det passer ikke med " + T.A(v[0]) + " / " + T.bet(v[1], 3) + ". Regn brøken ud igen." };
+                return { ok: false, besked: "Resultatet passer ikke med " + T.A(v[0]) + " / " + T.bet(v[1], 3) + ". Regn brøken ud igen." };
             };
             spec.visRes = function (x) { return T.bet(x, 3); };
             spec.svarTal = function () { return [Ap(), aV()]; };
@@ -823,7 +823,7 @@
             spec.formelTekst = F.vis("c_efter") + " · " + F.vis("V_efter") + " / " + F.vis("V_foer");
             spec.enheder = ["µM", "mL", "mL"]; spec.resEnhed = "µM";
             spec.formelFejl = function (dom) {
-                if (dom.slags === "rumfang") return "Rumfangene er byttet om. Sodavanden i flasken er stærkere end i kuvetten, så " + F.vis("c_foer") + " skal være større end " + F.vis("c_efter") + ".";
+                if (dom.slags === "rumfang") return "Rumfangene er byttet om. Koncentrationen i flasken er større end i kuvetten, så " + F.vis("c_foer") + " skal være større end " + F.vis("c_efter") + ".";
                 if (dom.slags === "cbyttet") return F.vis("c_foer") + " står allerede på venstre side. I formlen skal " + F.vis("c_efter") + " stå.";
                 if (dom.slags === "form") return "Isolér " + F.vis("c_foer") + " i " + F.vis("c_foer") + " · " + F.vis("V_foer") + " = " + F.vis("c_efter") + " · " + F.vis("V_efter") + ". Der står to størrelser over brøkstregen og én under.";
                 return null;
@@ -834,12 +834,12 @@
                 var harC = tael.some(function (x) { return naer(x, c, 0.015); });
                 var harVe = tael.some(function (x) { return naer(x, pr.vEfter, 0.001); });
                 if (tael.concat([v[2]]).some(function (x) { return naer(x, pr.vFoer / 1000, 0.001) || naer(x, pr.vEfter / 1000, 0.001); }))
-                    return { ok: false, felt: 1, besked: "Skriv begge rumfang i mL. Så går enhederne ud." };
+                    return { ok: false, felt: 1, besked: "Skriv begge rumfang i mL, så enhederne går ud." };
                 if (naer(v[2], pr.vEfter, 0.001) && tael.some(function (x) { return naer(x, pr.vFoer, 0.001); }))
                     return { ok: false, felt: 2, besked: "Rumfangene er byttet om. Under brøkstregen står " + F.vis("V_foer") + " = " + T.dk(pr.vFoer, 1) + " mL." };
                 if (!harC) return { ok: false, felt: 0, besked: F.vis("c_efter") + " er koncentrationen i kuvetten, " + T.bet(c, 3) + " µM." };
                 if (!harVe) return { ok: false, felt: 1, besked: F.vis("V_efter") + " er målekolbens rumfang, " + T.dk(pr.vEfter, 1) + " mL." };
-                if (!naer(v[2], pr.vFoer, 0.001)) return { ok: false, felt: 2, besked: F.vis("V_foer") + " er den mængde sodavand, der blev fortyndet, " + T.dk(pr.vFoer, 1) + " mL." };
+                if (!naer(v[2], pr.vFoer, 0.001)) return { ok: false, felt: 2, besked: F.vis("V_foer") + " er rumfanget af den sodavand, der blev fortyndet, " + T.dk(pr.vFoer, 1) + " mL." };
                 return { ok: true, vaerdier: [naer(v[0], c, 0.015) ? v[0] : v[1], pr.vEfter, pr.vFoer] };
             };
             spec.visTal = function (i, x) { return i === 0 ? T.bet(x, 3) : T.dk(x, 1); };
@@ -848,7 +848,7 @@
                 if (naer(x, f, 0.012)) return { ok: true, vaerdi: f };
                 if (naer(x, v[0] * v[2] / v[1], 0.02)) return { ok: false, besked: "Rumfangene er byttet om. Svaret skal være større end " + T.bet(v[0], 3) + " µM." };
                 if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
-                return { ok: false, besked: "Det passer ikke. Gang de to tal over brøkstregen, og del med tallet under." };
+                return { ok: false, besked: "Det passer ikke. Gang de to tal over brøkstregen, og dividér med tallet under." };
             };
             spec.visRes = function (x) { return T.bet(x, 3); };
             spec.svarTal = function () { return [s.c, pr.vEfter, pr.vFoer]; };
@@ -861,7 +861,7 @@
             spec.formelTekst = F.vis("c_foer") + " · " + F.vis("V_foer") + " / " + F.vis("V_efter");
             spec.enheder = ["µM", "mL", "mL"]; spec.resEnhed = "µM";
             spec.formelFejl = function (dom) {
-                if (dom.slags === "rumfang") return "Rumfangene er byttet om. Standarden er tyndere end stamopløsningen, så " + F.vis("c_efter") + " skal være mindre end " + F.vis("c_foer") + ".";
+                if (dom.slags === "rumfang") return "Rumfangene er byttet om. Standarden har en lavere koncentration end stamopløsningen, så " + F.vis("c_efter") + " skal være mindre end " + F.vis("c_foer") + ".";
                 if (dom.slags === "cbyttet") return F.vis("c_efter") + " står allerede på venstre side. I formlen skal " + F.vis("c_foer") + " stå.";
                 if (dom.slags === "form") return "Isolér " + F.vis("c_efter") + " i " + F.vis("c_foer") + " · " + F.vis("V_foer") + " = " + F.vis("c_efter") + " · " + F.vis("V_efter") + ". Der står to størrelser over brøkstregen og én under.";
                 return null;
@@ -871,13 +871,13 @@
                 if (tael.concat([v[2]]).some(function (x) { return naer(x, stam * 1e-6, 0.01); }))
                     return { ok: false, felt: 0, besked: "Skriv " + F.vis("c_foer") + " i µM: 50,0 µM." };
                 if (tael.concat([v[2]]).some(function (x) { return naer(x, vF / 1000, 0.001) || naer(x, vE / 1000, 0.001); }))
-                    return { ok: false, felt: 1, besked: "Skriv begge rumfang i mL. Så går enhederne ud." };
+                    return { ok: false, felt: 1, besked: "Skriv begge rumfang i mL, så enhederne går ud." };
                 if (naer(v[2], vE - vF, 0.001)) return { ok: false, felt: 2, besked: F.vis("V_efter") + " er hele rumfanget efter fortyndingen, 50,0 mL, ikke kun vandet." };
                 if (naer(v[2], vF, 0.001)) return { ok: false, felt: 2, besked: "Rumfangene er byttet om. Under brøkstregen står " + F.vis("V_efter") + " = 50,0 mL." };
                 var t0 = tael.slice().sort(function (a, b) { return a - b; });
                 if (!(naer(t0[0], vF, 0.001) && naer(t0[1], stam, 0.001))) {
                     if (!tael.some(function (x) { return naer(x, stam, 0.001); })) return { ok: false, felt: 0, besked: F.vis("c_foer") + " er stamopløsningens koncentration, 50,0 µM." };
-                    return { ok: false, felt: 1, besked: F.vis("V_foer") + " er den mængde stamopløsning, der blev fortyndet, 2,00 mL." };
+                    return { ok: false, felt: 1, besked: F.vis("V_foer") + " er rumfanget af den stamopløsning, der blev fortyndet, 2,00 mL." };
                 }
                 if (!naer(v[2], vE, 0.001)) return { ok: false, felt: 2, besked: F.vis("V_efter") + " er målekolbens rumfang, 50,0 mL." };
                 return { ok: true, vaerdier: [stam, vF, vE] };
@@ -888,7 +888,7 @@
                 if (naer(x, f, 0.012)) return { ok: true, vaerdi: f };
                 if (naer(x, v[0] * v[2] / v[1], 0.02)) return { ok: false, besked: "Rumfangene er byttet om. Svaret skal være mindre end 50,0 µM." };
                 if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
-                return { ok: false, besked: "Det passer ikke. Gang de to tal over brøkstregen, og del med tallet under." };
+                return { ok: false, besked: "Det passer ikke. Gang de to tal over brøkstregen, og dividér med tallet under." };
             };
             spec.visRes = function (x) { return T.bet(x, 3); };
             spec.svarTal = function () { return [stam, vF, vE]; };
@@ -917,10 +917,10 @@
                     id: id, etiket: "Standard " + id.slice(1), venstre: F.vis("c_efter"), enhed: "µM",
                     tjek: function (x) {
                         if (naer(x, f, 0.01)) return { ok: true, vaerdi: f };
-                        if (naer(x, stam * vE / V, 0.015)) return { ok: false, besked: "Rumfangene er byttet om. Standarden er tyndere end stamopløsningen." };
-                        if (naer(x, stam * V / (vE - V), 0.015)) return { ok: false, besked: "Del med hele rumfanget efter fortyndingen, 50,0 mL, ikke kun vandet." };
-                        if (naer(x, stam * V, 0.015)) return { ok: false, besked: "Husk at dele med " + F.vis("V_efter") + " = 50,0 mL." };
-                        if (naer(x, f * 1e-6, 0.015)) return { ok: false, besked: "Skriv svaret i µM, som de andre." };
+                        if (naer(x, stam * vE / V, 0.015)) return { ok: false, besked: "Rumfangene er byttet om. Standarden har en lavere koncentration end stamopløsningen." };
+                        if (naer(x, stam * V / (vE - V), 0.015)) return { ok: false, besked: "Dividér med hele rumfanget efter fortyndingen, 50,0 mL, ikke kun vandet." };
+                        if (naer(x, stam * V, 0.015)) return { ok: false, besked: "Husk at dividere med " + F.vis("V_efter") + " = 50,0 mL." };
+                        if (naer(x, f * 1e-6, 0.015)) return { ok: false, besked: "Skriv svaret i µM ligesom de andre koncentrationer." };
                         return { ok: false, besked: "Det passer ikke. Brug formlen fra standard 2 med " + F.vis("V_foer") + " = " + T.dk(V, 2) + " mL." };
                     },
                     hint: ["Brug samme formel som for standard 2: " + F.vis("c_efter") + " = " + F.vis("c_foer") + " · " + F.vis("V_foer") + " / " + F.vis("V_efter") + ".",
@@ -941,7 +941,7 @@
                 tjek: function (x) {
                     var f = A2() / aV();
                     if (naer(x, f, 0.015)) return { ok: true, vaerdi: f };
-                    if (naer(x, A1() / aV(), 0.015)) return { ok: false, besked: "Det er " + mig.kuvette("p1").navn + "s absorbans. Brug " + navn2 + "s, " + T.A(A2()) + "." };
+                    if (naer(x, A1() / aV(), 0.015)) return { ok: false, besked: "Du har brugt " + mig.kuvette("p1").navn + "s absorbans. Brug " + navn2 + "s absorbans, " + T.A(A2()) + "." };
                     if (naer(x, A2() * aV(), 0.02)) return { ok: false, besked: "Du har ganget. c = A / a." };
                     if (naer(x, aV() / A2(), 0.02)) return { ok: false, besked: "Brøken er vendt. c = A / a." };
                     if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
@@ -966,15 +966,15 @@
                     tjek: function (x) {
                         var f = A6() / kb6();
                         if (naer(x, f, 0.015)) return { ok: true, vaerdi: f };
-                        if (naer(x, A4() / kb4(), 0.03)) return { ok: false, besked: "Ved 427 nm opsuger begge farvestoffer, så A₄₂₇ siger ikke kun noget om det blå. Brug den bølgelængde, hvor kun det blå opsuger." };
-                        if (naer(x, A6() / kg4(), 0.02)) return { ok: false, besked: "Det er det gules hældning. Brug det blås standardkurve ved 630 nm." };
-                        if (naer(x, A4() / kb6(), 0.02)) return { ok: false, besked: "Det er absorbansen ved 427 nm. Brug A ved 630 nm." };
+                        if (naer(x, A4() / kb4(), 0.03)) return { ok: false, besked: "Ved 427 nm absorberer begge farvestoffer, så A₄₂₇ skyldes ikke kun det blå. Brug den bølgelængde, hvor kun det blå absorberer." };
+                        if (naer(x, A6() / kg4(), 0.02)) return { ok: false, besked: "Du har brugt det gules hældning. Brug det blås standardkurve ved 630 nm." };
+                        if (naer(x, A4() / kb6(), 0.02)) return { ok: false, besked: "Du har brugt absorbansen ved 427 nm. Brug A ved 630 nm." };
                         if (naer(x, A6() * kb6(), 0.02)) return { ok: false, besked: "Du har ganget. c = A / a." };
                         if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
-                        return { ok: false, besked: "Det passer ikke. Se på grafen for det blå: hvilken bølgelængde giver en stejl kurve, og hvor kommer A fra?" };
+                        return { ok: false, besked: "Det passer ikke. Se på grafen for det blå. Ved hvilken bølgelængde er standardkurven stejl, og hvilket farvestof absorberer dér?" };
                     },
-                    hint: ["Find en bølgelængde, hvor kun det blå opsuger lys. Se på grafen for det gule ved 630 nm.",
-                           "Ved 630 nm opsuger det gule ikke. Så kommer hele A₆₃₀ fra det blå: c(blå) = A₆₃₀ / a(blå, 630 nm).",
+                    hint: ["Find en bølgelængde, hvor kun det blå absorberer lys. Se på grafen for det gule ved 630 nm.",
+                           "Ved 630 nm absorberer det gule ikke, så hele A₆₃₀ skyldes det blå: c(blå) = A₆₃₀ / a(blå, 630 nm).",
                            "c(blå) = " + v.A630 + " / " + v.kb630 + " µM⁻¹"],
                     svar: function () { return A6() / kb6(); },
                     vis: function (x) { return T.bet(x, 3); },
@@ -987,14 +987,14 @@
                         var Ab = kb4() * s.cb;
                         var f = (A4() - Ab) / kg4();
                         if (naer(x, f, 0.02)) return { ok: true, vaerdi: f };
-                        if (naer(x, A4() / kg4(), 0.015)) return { ok: false, besked: "For meget. Det er, hvad du får, hvis alt lyset ved 427 nm blev opsuget af det gule. Det blå opsuger også lidt ved 427 nm. Træk det blås bidrag fra først." };
+                        if (naer(x, A4() / kg4(), 0.015)) return { ok: false, besked: "Resultatet er for stort. Du har regnet, som om hele absorbansen ved 427 nm skyldes det gule. Det blå absorberer også lidt ved 427 nm. Træk det blås bidrag fra først." };
                         if (naer(x, (A4() + Ab) / kg4(), 0.015)) return { ok: false, besked: "Det blås bidrag skal trækkes fra, ikke lægges til." };
-                        if (naer(x, (A4() - A6()) / kg4(), 0.02) || (A4() - A6()) / kg4() < 0 && x < 0) return { ok: false, besked: "A₆₃₀ er ikke det blås bidrag ved 427 nm. Ved 427 nm opsuger det blå meget mindre: a(blå, 427 nm) · c(blå)." };
-                        if (naer(x, A6() / kg4(), 0.02)) return { ok: false, besked: "Ved 630 nm opsuger det gule ikke. Brug A ved 427 nm." };
+                        if (naer(x, (A4() - A6()) / kg4(), 0.02) || (A4() - A6()) / kg4() < 0 && x < 0) return { ok: false, besked: "A₆₃₀ er ikke det blås bidrag ved 427 nm. Ved 427 nm absorberer det blå meget mindre: a(blå, 427 nm) · c(blå)." };
+                        if (naer(x, A6() / kg4(), 0.02)) return { ok: false, besked: "Ved 630 nm absorberer det gule ikke. Brug A ved 427 nm." };
                         if (tiGange(x, f)) return { ok: false, besked: "Kommaet står forkert. Tjek svaret på lommeregneren." };
                         return { ok: false, besked: "Det passer ikke. Ved 427 nm er A summen af det gules og det blås absorbans." };
                     },
-                    hint: ["Ved 427 nm opsuger begge farvestoffer. Absorbanserne lægges sammen: A₄₂₇ = A(gul) + A(blå).",
+                    hint: ["Ved 427 nm absorberer begge farvestoffer. Absorbanserne lægges sammen: A₄₂₇ = A(gul) + A(blå).",
                            "Det blås bidrag ved 427 nm er a(blå, 427 nm) · c(blå) = " + v.kb427 + " µM⁻¹ · " + v.cb + " µM = " + v.Ab + ".",
                            "A(gul) = " + v.A427 + " − " + v.Ab + " = " + v.Ag + ", og c(gul) = " + v.Ag + " / " + v.kg427 + " µM⁻¹."],
                     svar: function () { return (A4() - kb4() * s.cb) / kg4(); },
@@ -1017,7 +1017,7 @@
             tjek: function (x) {
                 var f = Ap() / a();
                 if (Math.abs(x - f) <= 1.0) { mig.elevAfl = null; return { ok: true, vaerdi: x }; }
-                if (Math.abs(x - Ap()) < 0.002) return { ok: false, besked: "Det er absorbansen. Aflæs c på den vandrette akse." };
+                if (Math.abs(x - Ap()) < 0.002) return { ok: false, besked: "Du har skrevet absorbansen. Aflæs c på den vandrette akse." };
                 mig.elevAfl = { c: x, A: a() * x };
                 return { ok: false, besked: "Ved " + T.dk(x, x % 1 ? 1 : 0) + " µM ligger standardkurven ved A = " + T.A(a() * x) +
                     ", men sodavanden har A = " + T.A(Ap()) + ". Gå " + (x < f ? "længere til højre." : "længere til venstre.") };
@@ -1041,22 +1041,22 @@
             if (!alle.length) return "";
             if (!her.length && this.d.lambdaer.length > 1) {
                 var andet = this.d.lambdaer.filter(function (l) { return l !== mig.lambda; })[0];
-                return "Ved " + this.lambda + " nm er alt målt. Skift til " + andet + " nm med knappen på spektrofotometeret.";
+                return "Ved " + this.lambda + " nm er alle kuvetterne målt. Skift til " + andet + " nm med knappen på spektrofotometeret.";
             }
             var navne = her.map(function (id) { return mig.kortNavn(id); });
-            return (this.d.lambdaer.length > 1 ? "Ved " + this.lambda + " nm mangler: " : "Mangler: ") + liste(navne) + ".";
+            return (this.d.lambdaer.length > 1 ? "Ved " + this.lambda + " nm er disse kuvetter ikke målt: " : "Disse kuvetter er ikke målt: ") + liste(navne) + ".";
         }
         if (t.type === "reagens") {
             if (!this.reag.sulf) return "Klik på sulfanilamid, eller træk flasken hen til stativet.";
             if (!this.reag.kob) return "Klik på koblingsreagens.";
-            return "Farven udvikler sig. Vent, til uret har gået 10 minutter.";
+            return "Farven udvikler sig. Vent, til uret viser, at der er gået 10 minutter.";
         }
         if (t.type === "regn") {
             var w = this.widget;
             if (!w || w.fase === "formel") return w && w.sk ? "Skriv formlen med bogstaver i felterne i panelet, og tryk Indsend svar. Tallene kommer bagefter." :
                 "Vælg formens form i panelet. Bogstaverne skriver du bagefter, og tallene kommer til sidst.";
             if (w.fase === "tal") return "Skriv tallene i felterne i panelet, og tryk Indsend svar.";
-            return "Regn det ud, skriv resultatet i panelet, og tryk Indsend svar.";
+            return "Regn resultatet ud, skriv det i panelet, og tryk Indsend svar.";
         }
         if (t.type === "aflaes") return "Skriv det tal, du aflæser på c-aksen, i feltet i panelet, og tryk Indsend svar.";
         if (t.type === "tal") return "Skriv svaret i panelet, og tryk Indsend svar.";

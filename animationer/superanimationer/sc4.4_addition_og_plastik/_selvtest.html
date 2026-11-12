@@ -341,7 +341,7 @@ function koerTest(W) {
     klik(A, bx, by);
     koerF(A, 3.8);
     paastand("bruger eleven brom i stedet, sker additionen, og kortet siger, hvad der skal gøres; knappen Nyt molekyle kommer frem og banker",
-        A.produkt === "Br2" && !A.faerdig && A.iForsoeg() && /Det var dibrom, og produktet er 1,2-dibromethan/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)) && !ffA.hidden && /banker/.test(ffA.className), linje(A));
+        A.produkt === "Br2" && !A.faerdig && A.iForsoeg() && /Du brugte dibrom, og produktet er 1,2-dibromethan/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)) && !ffA.hidden && /banker/.test(ffA.className), linje(A));
     klik(A, bx, by);
     paastand("på et produkt kan intet sætte sig: kortet blinker", !A.reak && A.produkt === "Br2" && blinker(A));
     ffA.click();
@@ -438,7 +438,7 @@ function koerTest(W) {
     klik(B, gp[2].x, gp[2].y); koerF(B, 0.3);
     paastand("låsen, mens kortet venter: hverken glas A eller et andet glas kan rystes", laastA && B.glas[2].m === 0 && !B.glas[2].rystes() && blinker(B));
     frem(B);
-    paastand("glas A er rystet: farven er væk, og spørgsmålet kommer med en gul ring om glas A", B.glas[0].faerdig() && B.glas[0].farver().vand < 0.01 && B.opg.fase === "spm" && B.omNu().join() === "0" && /Glas A/.test(kortT(B)) && statuslinje(B) === "", kortT(B));
+    paastand("glas A er rystet: farven er væk, og spørgsmålet kommer med en gul ring om glas A", B.glas[0].faerdig() && B.glas[0].farver().vand < 0.01 && B.opg.fase === "spm" && B.omNu().join() === "0" && /[Gg]las A/.test(kortT(B)) && statuslinje(B) === "", kortT(B));
     paastand("panelet siger, hvad der skete, men glasset har ikke fået navn endnu", /farven forsvandt/.test(d.getElementById("b-glassene").textContent) && !B.navngivet[0] && B.lupNu() === -1);
     klik(B, gp[0].x, gp[0].y); koerF(B, 0.3);
     B.nulstil();
@@ -466,7 +466,7 @@ function koerTest(W) {
     paastand("opgave 2 begynder med et friskt glas B og lukket lup", B.opg.o.id === "b" && B.glas[1].m === 0 && !B.set[1] && B.lupNu() === -1 && B.peger() === 1);
     klik(B, gp[0].x, gp[0].y); koerF(B, 0.3);
     paastand("et klik på det færdige glas A ryster det ikke, men viser det i luppen og siger, hvad det er",
-        !B.glas[0].rystes() && B.lupNu() === 0 && /Glas A er hex-1-en\. Den orange farve i glas A er væk\. Denne opgave handler om glas B\./.test(linje(B)), linje(B));
+        !B.glas[0].rystes() && B.lupNu() === 0 && /Glas A indeholder hex-1-en\. Den orange farve i glas A er væk\. Denne opgave handler om glas B\./.test(linje(B)), linje(B));
     blinker(B);
     /* Ryst glas B med musen: tag fat og flyt op og ned */
     mus(B, "pointermove", gp[1].x, gp[1].y);
@@ -530,7 +530,7 @@ function koerTest(W) {
     paastand("panelet har alle fem navne og domme", ["hex-1-en", "hexan", "cyclohexen", "cyclohexan", "benzen"].every(function (n) { return d.getElementById("b-glassene").textContent.indexOf(n) >= 0; }) && (d.getElementById("b-glassene").textContent.match(/umættet/g) || []).length === 2 && /ikke som en alken/.test(d.getElementById("b-glassene").textContent), d.getElementById("b-glassene").textContent);
     B.vaelg(0); koerF(B, 0.2);
     klik(B, gp[4].x, gp[4].y); koerF(B, 0.3);
-    paastand("et klik på det færdige glas med benzen siger, at benzen ikke bruges i skolens laboratorium", /Glas E er benzen/.test(linje(B)) && /kræftfremkaldende/.test(linje(B)) && !B.glas[4].rystes(), linje(B));
+    paastand("et klik på det færdige glas med benzen siger, at benzen ikke bruges i skolens laboratorium", /Glas E indeholder benzen/.test(linje(B)) && /kræftfremkaldende/.test(linje(B)) && !B.glas[4].rystes(), linje(B));
     var svarB = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(B, i) && B.el.skort.classList.contains("svar") && B.glas[i].m === 1 && B.navngivet[i]; });
     paastand("alle fem opgaver kan også løses med Vis svaret", svarB);
 

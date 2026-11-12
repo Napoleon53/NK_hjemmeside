@@ -152,7 +152,7 @@
 
     P.kortData = function () {
         var mig = this, v = this.opg.vist, tekst;
-        if (this.fase === "dnph") tekst = "Hvad sker der, når " + v + " kommer i DNPH? Vælg, og tryk Indsend svar.";
+        if (this.fase === "dnph") tekst = "Hvad sker der, når " + v + " tilsættes DNPH-opløsning? Vælg, og tryk Indsend svar.";
         else tekst = "Hvad sker der i Tollens' test med " + v + "? Glasset varmes i et vandbad. Vælg, og tryk Indsend svar.";
         return {
             slags: "spm", chip: "Opgave " + (this.nr + 1),
@@ -239,14 +239,14 @@
             var h2;
             if (r.dnph) h2 = "C=O sidder " + (kl === "aldehyd" ? "for enden af kæden" : "inde i kæden") + ". Det er en carbonylgruppe, og den reagerer med DNPH.";
             else if (kl === "alkohol") h2 = "Der er intet C=O i " + v + ". DNPH har intet at reagere med.";
-            else h2 = "C=O sidder ved siden af et andet O. Så er det hverken et aldehyd eller en keton.";
+            else h2 = "C=O sidder ved siden af et andet O, og derfor er stoffet hverken et aldehyd eller en keton.";
             return ["Har " + v + " en carbonylgruppe, C=O, i et aldehyd eller en keton?", h2];
         }
         var t2;
         if (r.tollens) t2 = "Carbonylgruppens carbonatom har et H. Aldehydet kan oxideres, og sølvet sætter sig på glasset.";
-        else if (r.dnph) t2 = "Carbonylgruppens carbonatom er bundet til to carbonatomer og har intet H. Det er en keton.";
-        else t2 = v.charAt(0).toUpperCase() + v.slice(1) + " er ikke et aldehyd. Tollens' test viser kun aldehyder.";
-        return ["Tollens' test viser et aldehyd. Har carbonylgruppens carbonatom et H?", t2];
+        else if (r.dnph) t2 = "Carbonylgruppens carbonatom er bundet til to carbonatomer og har intet H. Stoffet er en keton.";
+        else t2 = v.charAt(0).toUpperCase() + v.slice(1) + " er ikke et aldehyd. Tollens' test påviser kun aldehyder.";
+        return ["Tollens' test påviser aldehyder. Har carbonylgruppens carbonatom et H?", t2];
     };
 
     /* Efter det foerste hint faar C=O en gul ring, hvis der er en */

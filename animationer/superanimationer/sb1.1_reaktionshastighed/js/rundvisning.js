@@ -11,25 +11,25 @@
 
     var TURE = {
         "fane-kurve": [
-            { sel: "#kurve-laerred", titel: "Grafen", tekst: "Kurverne for [Br₂] og [BrO₃⁻] tegnes, mens reaktionen løber. Træk i grafen for at flytte tiden." },
-            { sel: "#kurve-reaktion", titel: "Reaktionen", tekst: "Afspil reaktionen, og se glasset blive gult af Br₂." },
-            { sel: "#kurve-vaerktoej", titel: "Værktøjet", tekst: "Aflæs et tidspunkt, læg en sekant mellem to tidspunkter, eller drej linealen til en tangent." },
-            { sel: "#kurve-skort", titel: "Opgaven", tekst: "Opgaven står på kortet. Vælg et svar, og tryk Indsend svar. Giv et hint giver et hint og derefter svaret." },
+            { sel: "#kurve-laerred", titel: "Grafen", tekst: "Kurverne for [Br₂] og [BrO₃⁻] tegnes, mens reaktionen forløber. Træk i grafen for at flytte tiden." },
+            { sel: "#kurve-reaktion", titel: "Reaktionen", tekst: "Afspil reaktionen, og se opløsningen i bægerglasset blive gul af Br₂." },
+            { sel: "#kurve-vaerktoej", titel: "Værktøjet", tekst: "Aflæs koncentrationerne til et tidspunkt, læg en sekant mellem to tidspunkter, eller drej linealen, til den er en tangent." },
+            { sel: "#kurve-skort", titel: "Opgaven", tekst: "Opgaven står på kortet. Vælg et svar, og tryk Indsend svar. Knappen Giv et hint giver først et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teorien", tekst: "Definitionen af reaktionshastighed og formlerne." },
-            { sel: ".faneknapper", titel: "Næste fane", tekst: "Sammenstød viser, hvorfor kurven flader ud." }
+            { sel: ".faneknapper", titel: "Næste fane", tekst: "Fanen Sammenstød viser, hvorfor kurven flader ud." }
         ],
         "fane-sammenstoed": [
-            { sel: "#sam-laerred", titel: "Kassen", tekst: "Partiklerne reagerer kun, når de støder sammen. Et sammenstød blinker. Kurven til højre tæller produktet." },
-            { sel: "#sam-opstilling", titel: "Opstillingen", tekst: "Skru på antallet af A og B, eller skift til magnesium i syre. Den forrige kurve bliver stående til sammenligning." },
+            { sel: "#sam-laerred", titel: "Kassen", tekst: "Partiklerne reagerer kun, når de støder sammen. Hvert sammenstød blinker. Kurven til højre viser, hvor mange C der er dannet." },
+            { sel: "#sam-opstilling", titel: "Opstillingen", tekst: "Vælg antallet af A og B, eller skift til magnesium i syre. Den forrige kurve bliver stående til sammenligning." },
             { sel: "#sam-maaling", titel: "Målingen", tekst: "Sammenstød pr. sekund, talt over de sidste tre sekunder." },
-            { sel: "#sam-skort", titel: "Opgaven", tekst: "Svar på kortet, og prøv det så i kassen." }
+            { sel: "#sam-skort", titel: "Opgaven", tekst: "Svar på opgaven på kortet, og afprøv derefter svaret i kassen." }
         ],
         "fane-udtryk": [
             { sel: "#udtryk-forsoeg", titel: "Forsøget", tekst: "Vælg startkoncentrationerne, og mål starthastigheden." },
-            { sel: "#udtryk-laerred", titel: "Kurverne", tekst: "Hvert forsøg giver en kurve. Den stiplede tangent i t = 0 er starthastigheden." },
-            { sel: "#udtryk-tabel", titel: "Tabellen", tekst: "Alle forsøg samles her. Sammenlign to, hvor kun ét stof er ændret." },
-            { sel: "#udtryk-udtryk", titel: "Hastighedsudtrykket", tekst: "Klik på firkanterne for at vælge 0, 1 eller 2." },
-            { sel: "#udtryk-skort", titel: "Opgaven", tekst: "Tryk Indsend svar på kortet. Giv et hint giver et hint og derefter svaret." }
+            { sel: "#udtryk-laerred", titel: "Kurverne", tekst: "Hvert forsøg giver en kurve. Hældningen af den stiplede tangent i t = 0 er starthastigheden." },
+            { sel: "#udtryk-tabel", titel: "Tabellen", tekst: "Alle forsøg samles her. Sammenlign to forsøg, hvor kun koncentrationen af ét stof er ændret." },
+            { sel: "#udtryk-udtryk", titel: "Hastighedsudtrykket", tekst: "Klik på firkanterne for at vælge eksponenten 0, 1 eller 2." },
+            { sel: "#udtryk-skort", titel: "Opgaven", tekst: "Tryk Indsend svar på kortet. Knappen Giv et hint giver først et hint og derefter svaret." }
         ]
     };
 

@@ -60,13 +60,13 @@
         pladser: [
             { id: "tangent", ord: ["tangent"], x: 223, y: 550, maal: T0_PRIK, dele: ["t0"],
               omr: [{ linje: T0, b: 15 }],
-              fejl: { starthastighed: "<b>starthastighed</b> er et tal med enheden M/s. Pladsen peger på selve den rette linje, der rører kurven.",
-                      reaktionshastighed: "<b>reaktionshastighed</b> er et tal med enheden M/s. Pladsen peger på selve den rette linje, der rører kurven.",
+              fejl: { starthastighed: "<b>starthastighed</b> er en størrelse med enheden M/s. Pladsen peger på selve den rette linje, der rører kurven.",
+                      reaktionshastighed: "<b>reaktionshastighed</b> er en størrelse med enheden M/s. Pladsen peger på selve den rette linje, der rører kurven.",
                       gennemsnitshastighed: "<b>gennemsnitshastighed</b> er hældningen mellem to punkter på kurven. Linjen her rører kurven i ét punkt." } },
             { id: "starthastighed", ord: ["starthastighed"], x: 205, y: 70, maal: [215, V0.y - 19], dele: ["v0"],
               omr: [{ r: [V0.x - 6, V0.y - 19, 182, 46, 7] }],
               fejl: { tangent: "<b>tangent</b> er den rette linje. Pladsen peger på tallet for linjens hældning ved t = 0 s.",
-                      reaktionshastighed: "<b>reaktionshastighed</b> passer på alle tidspunkter. Hastigheden lige ved start, v₀, har sit eget navn.",
+                      reaktionshastighed: "<b>reaktionshastighed</b> passer på alle tidspunkter. Hastigheden ved t = 0 s har sit eget navn og symbolet v₀.",
                       gennemsnitshastighed: "<b>gennemsnitshastighed</b> gælder et tidsrum. v₀ er hastigheden i ét øjeblik, lige når reaktionen begynder." } },
 
             { id: "reaktionshastighed", ord: ["reaktionshastighed"], x: 530, y: 70, maal: [520, V120.y - 19], dele: ["t120", "v120"],

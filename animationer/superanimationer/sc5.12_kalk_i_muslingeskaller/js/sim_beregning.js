@@ -93,7 +93,7 @@
     P.slutLinje = function () {
         var o = this.opg, f = o.facit;
         if (o.baglaens) {
-            return NK.html("Vægten falder " + K.g(f.mc) + " g. Det er CO₂, der forlader kolben.");
+            return NK.html("Vægten falder " + K.g(f.mc) + " g, fordi CO₂ forlader kolben.");
         }
         var p = f.pct, s = "Kalkindholdet er " + K.pct(p) + " %.";
         if (p > 100) s += " Over 100 % kan ikke passe. Noget andet end CO₂ har forladt kolben. Se fanen Fejlkilder.";
@@ -101,7 +101,7 @@
         else s += " Muslingeskaller har typisk " + D.TYPISK + ".";
         var anden = this.opsum[1 - o.maaling];
         if (anden && anden.pct !== undefined) s += " Den anden måling gav " + K.pct(anden.pct) + " %.";
-        if (o.niveau === "mol" && !o.kunTal) s += " Genvejen: " + K.Mtekst("CaCO3") + " / " + K.Mtekst("CO2") + " = 2,27. Derfor kan man også gange m(CO₂) med 2,27.";
+        if (o.niveau === "mol" && !o.kunTal) s += " Uden mol ganger man m(CO₂) med " + K.Mtekst("CaCO3") + " / " + K.Mtekst("CO2") + " = 2,27.";
         return NK.html(s);
     };
 
@@ -166,9 +166,9 @@
 
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
-        if (u === "co2") this.kortBesked("CO₂ er den masse, kolben tabte. Den forsvandt op i luften.");
-        if (u === "kalk") this.kortBesked("Kalken i prøven. Al CO₂ kom fra den.");
-        if (u === "pct") this.kortBesked("Hele prøven. Den hvide del er kalk, resten er mest protein og vand.");
+        if (u === "co2") this.kortBesked("Kolben tabte massen af CO₂, som forsvandt op i luften.");
+        if (u === "kalk") this.kortBesked("Bunken er kalken i prøven, og al CO₂ kom fra kalken.");
+        if (u === "pct") this.kortBesked("Søjlen er hele prøven. Den hvide del er kalk, og resten er mest protein og vand.");
         return false;
     };
 

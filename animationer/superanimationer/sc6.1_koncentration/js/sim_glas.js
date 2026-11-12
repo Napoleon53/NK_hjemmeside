@@ -595,7 +595,7 @@
             return false;
         }
         if (u.slags === "lup") {
-            this.kortBesked("Luppen viser lige meget væske fra glas " + this.glas[u.i].navn + ". Flere ioner i luppen er en højere koncentration.", 5);
+            this.kortBesked("Luppen viser lige meget væske fra glas " + this.glas[u.i].navn + ". Flere ioner i luppen betyder en højere koncentration.", 5);
             return false;
         }
         if (u.slags === "glas") {

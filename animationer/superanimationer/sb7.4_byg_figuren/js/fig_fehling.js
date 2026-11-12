@@ -41,21 +41,21 @@
         vb: [990, 560],
         lag: [
             { navn: "De to opløsninger", pladser: ["Fehling I", "Fehling II"],
-              ros: "Fehling I er blå af kobber(II)ioner. Fehling II er natriumhydroxid og tartrat og gør blandingen basisk." },
+              ros: "Fehling I er blå af kobber(II)ioner. Fehling II er en opløsning af natriumhydroxid og tartrat og gør blandingen basisk." },
             { navn: "Testen", pladser: ["Fehlings væske", "reducerende sukker"],
-              ros: "Fehlings væske giver rødt bundfald med et reducerende sukker. Saccharose er ikke reducerende og bliver ved med at være blå." }
+              ros: "Fehlings væske giver rødt bundfald med et reducerende sukker. Saccharose er ikke reducerende, så blandingen forbliver blå." }
         ],
         pladser: [
             navn("Fehling I", K1, ["g1"], {
                 "Fehling II": "<b>Fehling II</b> er natriumhydroxid og tartrat og er farveløs. Glasset her er blåt af kobber(II)ioner.",
-                "Fehlings væske": "<b>Fehlings væske</b> er blandingen af de to opløsninger. Glasset her er kun kobber(II)sulfat." }),
+                "Fehlings væske": "<b>Fehlings væske</b> er blandingen af de to opløsninger. Glasset her indeholder kun kobber(II)sulfat." }),
             navn("Fehling II", K2, ["g2"], {
                 "Fehling I": "<b>Fehling I</b> er blå af kobber(II)sulfat. Glasset her er farveløst med natriumhydroxid og tartrat.",
-                "Fehlings væske": "<b>Fehlings væske</b> er den dybblå blanding. Glasset her er farveløst og kun den ene opløsning." }),
+                "Fehlings væske": "<b>Fehlings væske</b> er den dybblå blanding. Glasset her er farveløst og indeholder kun den ene opløsning." }),
             navn("Fehlings væske", K3, ["g3"], {
-                "Fehling I": "<b>Fehling I</b> er kun kobber(II)sulfat. Glasset her er blandingen af de to opløsninger til venstre.",
-                "Fehling II": "<b>Fehling II</b> er farveløs. Glasset her er den dybblå blanding af de to opløsninger til venstre.",
-                "reducerende sukker": "<b>reducerende sukker</b> er et kulhydrat. Glasset her er den dybblå blanding, testen laves med." }),
+                "Fehling I": "<b>Fehling I</b> er kun kobber(II)sulfat. Glasset her indeholder blandingen af de to opløsninger til venstre.",
+                "Fehling II": "<b>Fehling II</b> er farveløs. Glasset her indeholder den dybblå blanding af de to opløsninger til venstre.",
+                "reducerende sukker": "<b>reducerende sukker</b> er et kulhydrat. Glasset her indeholder den dybblå blanding, som testen laves med." }),
             { id: "reducerende sukker", ord: ["reducerende sukker"], x: RAMME.x + RAMME.b / 2, y: RAMME.y, maal: [RAMME.x + RAMME.b / 2, RAMME.y], titel: true, dele: ["ramme"],
               omr: [{ r: [RAMME.x - 4, RAMME.y - 4, RAMME.b + 8, RAMME.h + 8, 18], tom: true }],
               fejl: { "Fehlings væske": "<b>Fehlings væske</b> er den dybblå blanding. Rammen er om de to sukkerstoffer, der gav rødt bundfald.",

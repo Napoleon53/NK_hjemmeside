@@ -332,20 +332,20 @@
                            ["h/f", "Massen er stofmængde gange molarmasse, ikke divideret."],
                            ["f*g", "Brug molarmassen for " + ox + ", M(" + ox + ")."],
                            ["a", "Det er massen af jernet. Regn massen af " + ox + " ud."],
-                           ["b", "Det er det, vægten viste. Regn med stofmængden."]] }
+                           ["b", "m(efter) er det, vægten viste. Regn med stofmængden."]] }
         };
         if (del === 1) {
             var ens = ensTekst(sk);
             F.n_ox = { maal: "f", kendt: ["a", "b", "e", "g", "h"], alias: {},
                        fejl: [["2*e", ens], ["e/2", ens],
-                              ["a", "Det er en masse. Forholdet i skemaet gælder stofmængder."],
-                              ["a/h", "Gå vejen over n(Fe) fra trin 1. Forholdet i skemaet er " + sk.koef[0] + " : " + sk.koef[2] + "."]] };
+                              ["a", "m(Fe) er en masse, men forholdet i skemaet gælder stofmængder."],
+                              ["a/h", "Brug n(Fe) fra trin 1. Forholdet i skemaet er " + sk.koef[0] + " : " + sk.koef[2] + "."]] };
         } else {
             F.n_ox = { maal: "f", kendt: ["a", "b", "e", "g", "h"], alias: {},
                        fejl: [[del + "*e", "Der bliver færre mol " + ox + " end Fe. Divider stofmængden af jern med " + del + "."],
                               ["e", "Forholdet er ikke 1 : 1 her. " + forholdTekst(sk)],
-                              ["a", "Det er en masse. Forholdet i skemaet gælder stofmængder."],
-                              ["a/h", "Gå vejen over n(Fe) fra trin 1, og brug forholdet i skemaet."]] };
+                              ["a", "m(Fe) er en masse, men forholdet i skemaet gælder stofmængder."],
+                              ["a/h", "Brug n(Fe) fra trin 1 og forholdet i skemaet."]] };
             if (kO2 > 1 && kO2 !== del) F.n_ox.fejl.push(["e/" + kO2, kO2 + " er tallet foran O₂. Brug tallene foran Fe og " + ox + "."]);
             F.m_ox.fejl.splice(3, 0, ["e*h", "Det er stofmængden af jern. Brug stofmængden af " + ox + " fra trin 2."]);
         }
@@ -451,7 +451,7 @@
                 [K.M_FE / t.mf, "Brøken er vendt om. Massen står øverst."],
                 [t.mf / sk.M, "Det er molarmassen af " + ox + ". Her regnes på jern, Fe."],
                 [t.me / K.M_FE, "Det er massen efter. Brug massen af stålulden før."],
-                [t.mf, "Det er massen. Del den med molarmassen."]] };
+                [t.mf, "Det er massen af stålulden. Del den med molarmassen af jern."]] };
         case "n_ox":
             if (del === 1) {
                 return { facit: f.nOx, fejl: [
@@ -468,8 +468,8 @@
                     [sk.M / f.nOxV, "Du har divideret. Gang stofmængden med molarmassen."],
                     [f.nOxV * K.M_FE, del === 1 ? "Det er massen af jernet. Brug molarmassen af " + ox + "." :
                         "Det er molarmassen af jern. Brug molarmassen af " + ox + "."],
-                    [t.me, "Det er det, vægten viste. Regn med stofmængden fra trin 2."],
-                    [sk.M, "Det er massen af 1 mol. Gang med stofmængden."]];
+                    [t.me, "Det er m(efter), som vægten viste. Regn med stofmængden fra trin 2."],
+                    [sk.M, "Det er molarmassen, altså massen af 1 mol. Gang den med stofmængden."]];
             if (del !== 1) fejl.splice(3, 0, [f.nV * sk.M, "Det er stofmængden af jern. Brug stofmængden af " + ox + " fra trin 2."]);
             return { facit: f.m, fejl: fejl };
         }
@@ -505,7 +505,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (naer(v, k.facit, 0.04)) return { besked: "Tæt på. Regn med alle cifrene." };
-        return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
+        return { besked: "Det tal passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };
 
     /* ----- Tal som tekst og facit ---------------------------------------------------------- */

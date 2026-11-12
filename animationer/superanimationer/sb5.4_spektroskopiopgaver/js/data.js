@@ -89,7 +89,7 @@
             c: [10.0, 20.0, 30.0, 40.0, 50.0], A: [0.112, 0.219, 0.336, 0.441, 0.558],
             cTekst: ["10,0", "20,0", "30,0", "40,0", "50,0"],
             proeveA: 0.306,
-            note: "Jern(II) gjort orangerødt med phenanthrolin, målt ved 510 nm med lysvejen 1,00 cm.",
+            note: "Jern(II)ioner gjort orangerøde med phenanthrolin, målt ved 510 nm med lysvejen 1,00 cm.",
             figur: { genstand: "tablet", gNavn: "Tabletten", farve: "#ee9a6c", kolbe: { tekst: "opløst", farve: "#ee9a6c" } },
             trin: ["eps", "konc"]
         },
@@ -122,7 +122,7 @@
             cTekst: ["3,0", "6,0", "9,0", "12,0", "15,0"],
             proeveA: 0.599,
             M: 63.55, V: 0.2500, VTekst: "250,0 mL",
-            note: "Kobber(II) gjort dybblåt med ammoniak, målt ved 600 nm med lysvejen 1,00 cm.",
+            note: "Kobber(II)ioner gjort dybblå med ammoniak, målt ved 600 nm med lysvejen 1,00 cm.",
             figur: { genstand: "skrue", gNavn: "Skruen", farve: "#4f86d4", kolbe: { V: "250,0 mL", farve: "#4f86d4", tekst: "opløst" } },
             trin: ["eps", "konc", "masse"]
         },
@@ -283,10 +283,10 @@
             felt: function () { return "ε ="; },
             tekst: function (o) {
                 var ind = o.id === "mno4" ? "Kopiér tabellen i panelet til et regneark, og lav standardkurven med en lineær tendenslinje." :
-                    (o.id === "jern" ? "Jernet fra en tablet er gjort orangerødt med phenanthrolin. Lav standardkurven i regnearket." :
+                    (o.id === "jern" ? "Fe²⁺ fra en tablet er omdannet til orangerødt [Fe(phen)₃]²⁺. Lav standardkurven i regnearket." :
                     (o.id === "para" ? "En hovedpinepille er opløst i vand. Lav standardkurven for paracetamol i regnearket." :
-                    (o.id === "bouillon" ? "Et enzym danner ét NADH pr. glutamat, og NADH absorberer ved 340 nm. Lav standardkurven i regnearket." :
-                    (o.id === "messing" ? "Kobberet fra en messingskrue er gjort dybblåt med ammoniak. Lav standardkurven i regnearket." :
+                    (o.id === "bouillon" ? "Et enzym danner ét NADH-molekyle pr. glutamation, og NADH absorberer ved 340 nm. Lav standardkurven i regnearket." :
+                    (o.id === "messing" ? "Cu²⁺ fra en messingskrue er omdannet til dybblåt [Cu(NH₃)₄]²⁺. Lav standardkurven i regnearket." :
                     "Lav standardkurven kun med de fem punkter i det lineære område."))));
                 return ind + " Hvad er ε for " + o.epsStof + " ved " + o.lambda + " nm?";
             },
@@ -318,7 +318,7 @@
             },
             forkl: function (o, r) {
                 return "Prøvens absorbans sat ind i standardkurvens ligning giver c(" + D.u(o.stof) + ") = " + D.tal3(r.c) + " " + tabelE(o).t +
-                    ". Punktet ligger på standardkurven.";
+                    ". Prøvens punkt ligger på standardkurven.";
             },
             sand: function (o, r) { return r.cM; },
             ogsaa: function (o, r) { return r.c0 * r.f; },    /* c = A / a uden b godtages ogsaa */
@@ -331,7 +331,7 @@
                 return "Prøven er " + o.vFoerTekst + " bouillon fortyndet til " + o.vEfterTekst + " i en målekolbe. Hvad er koncentrationen af glutamat i bouillonen?";
             },
             hint: function (o) {
-                return ["Bouillonen er fortyndet fra " + o.vFoerTekst + " til " + o.vEfterTekst + ", så bouillonen er stærkere end prøven.",
+                return ["Bouillonen er fortyndet fra " + o.vFoerTekst + " til " + o.vEfterTekst + ", så koncentrationen i bouillonen er større end i prøven.",
                     "c_før · V_før = c_efter · V_efter, så c_før = c_efter · V_efter / V_før."];
             },
             forkl: function (o, r) {
@@ -345,7 +345,7 @@
             titel: ["Massen i 1 L"], slags: "tal", enheder: "masse",
             felt: function () { return "m i 1,00 L ="; },
             tekst: function (o) {
-                return "Paracetamol har molarmassen " + NK.komma(Math.round(o.M * 100)) + " g/mol. Hvor mange mg paracetamol er der i 1,00 L af opløsningen?";
+                return "Paracetamol har molarmassen " + NK.komma(Math.round(o.M * 100)) + " g/mol. Hvad er massen af paracetamol i 1,00 L af opløsningen?";
             },
             hint: function () {
                 return ["Find først stofmængden i 1,00 L: n = c · V. Husk at regne mM om til M.",
@@ -359,7 +359,7 @@
             titel: ["Massen"], slags: "tal", enheder: "masse",
             felt: function () { return "m(Cu) ="; },
             tekst: function (o) {
-                return "Hele skruen er opløst i de " + o.VTekst + ", og kobber har molarmassen 63,55 g/mol. Hvor mange mg kobber var der i skruen?";
+                return "Hele skruen er opløst i en målekolbe på " + o.VTekst + ", og kobber har molarmassen 63,55 g/mol. Hvad var massen af kobber i skruen?";
             },
             hint: function (o) {
                 return ["Stofmængden i målekolben er n = c · V med V = " + o.VTekst + " = 0,2500 L. Husk at regne mM om til M.",
@@ -378,13 +378,13 @@
             omr: [[0, 7], [0, 4], [2, 6], [5, 7]],          /* punkterne i hvert svar */
             rigtig: 1,
             fejl: [
-                "Fra 325 µM ligger punkterne under linjen gennem de første. A / c falder fra 0,0042 til 0,0033 µM⁻¹.",
+                "Fra 325 µM ligger punkterne under linjen gennem de første punkter. A / c falder fra 0,0042 til 0,0033 µM⁻¹.",
                 null,
                 "Punkterne fra 25,0 µM ligger også på linjen, og fra 325 µM ligger punkterne under den.",
-                "Det er netop her, punkterne ligger under linjen. A / c falder fra 0,0039 til 0,0033 µM⁻¹."
+                "Netop i dette område ligger punkterne under linjen. A / c falder fra 0,0039 til 0,0033 µM⁻¹."
             ],
             hint: function () {
-                return ["Regn A / c for hvert punkt. I det lineære område er A / c næsten det samme.",
+                return ["Regn A / c for hvert punkt. I det lineære område er A / c næsten konstant.",
                     "A / c er 0,0042 µM⁻¹ op til 250 µM og falder bagefter."];
             },
             forkl: function () {
@@ -409,7 +409,7 @@
                     "Standardkurven kan kun bruges i det lineære område. Hvordan får du prøvens absorbans ned?"];
             },
             forkl: function () {
-                return "A = 1,520 ligger over det lineære område. Prøven fortyndes, så A kommer ned under 1,056, og koncentrationen ganges op bagefter.";
+                return "A = 1,520 ligger over det lineære område. Prøven fortyndes, så A kommer under 1,056, og bagefter beregnes den oprindelige koncentration med fortyndingsformlen.";
             }
         }
     };
@@ -426,28 +426,28 @@
             if (!e.cm && anden && anden.k.replace("cm", "") === e.k) return "Tallet passer, men enheden mangler cm⁻¹. ε = a / l, og lysvejen l er i cm.";
             if (!e.cm) return "Enheden mangler cm⁻¹. ε = a / l, og lysvejen l er i cm.";
             if (anden) return "Tallet passer til enheden " + anden.t + ", ikke " + e.t + ". 1 " + te.t + "⁻¹ = " + (te.f === 1e-3 ? "1000" : "10⁶") + " M⁻¹.";
-            if (D.naer(tal, 1 / r.a, 0.03)) return "Det er c / A. Hældningen er A / c: hvor meget A stiger, når c stiger med 1 " + te.t + ".";
-            if (Math.abs(r.b) > 1e-6 && Math.abs(tal - r.b) < Math.max(0.0006, Math.abs(r.b) * 0.1)) return "Det er skæringen b. Hældningen a er tallet foran x i regnearkets ligning.";
+            if (D.naer(tal, 1 / r.a, 0.03)) return "Du har regnet c / A. Hældningen er A / c, som er stigningen i A pr. " + te.t + ".";
+            if (Math.abs(r.b) > 1e-6 && Math.abs(tal - r.b) < Math.max(0.0006, Math.abs(r.b) * 0.1)) return "Du har skrevet skæringen b. Hældningen a er tallet foran x i regnearkets ligning.";
             return null;
         }
         if (id === "konc") {
             if (anden) return "Tallet passer til " + anden.t + ", ikke " + e.t + ". Koncentrationen får tabellens enhed, " + te.t + ".";
             var gange = o.proeveA * r.a * te.f;            /* A · a i M */
-            if (D.naer(v, gange, 0.04) || D.passerI(tal, liste, gange, 0.04)) return "Du har ganget A med hældningen. c = (A − b) / a: divider med a.";
-            if (D.passerI(tal, liste, r.a / o.proeveA * te.f, 0.04)) return "Du har divideret a med A. c = (A − b) / a: A står i tælleren.";
+            if (D.naer(v, gange, 0.04) || D.passerI(tal, liste, gange, 0.04)) return "Du har ganget A med hældningen. c = (A − b) / a, så der skal divideres med a.";
+            if (D.passerI(tal, liste, r.a / o.proeveA * te.f, 0.04)) return "Du har divideret a med A. c = (A − b) / a, så A står i tælleren.";
             return null;
         }
         if (id === "fortynd") {
             if (anden) return "Tallet passer til " + anden.t + ", ikke " + e.t + ".";
-            if (D.passerI(tal, liste, r.cM, D.TOL)) return "Det er koncentrationen i den fortyndede prøve. Bouillonen blev fortyndet fra " + o.vFoerTekst + " til " + o.vEfterTekst + ".";
-            if (D.passerI(tal, liste, r.cM * o.vFoer / o.vEfter, D.TOL)) return "Bouillonen er stærkere end prøven, ikke svagere. Gang med V_efter / V_før.";
+            if (D.passerI(tal, liste, r.cM, D.TOL)) return "Du har skrevet koncentrationen i den fortyndede prøve. Bouillonen blev fortyndet fra " + o.vFoerTekst + " til " + o.vEfterTekst + ".";
+            if (D.passerI(tal, liste, r.cM * o.vFoer / o.vEfter, D.TOL)) return "Koncentrationen i bouillonen er større end i prøven, ikke mindre. Gang med V_efter / V_før.";
             return null;
         }
         if (id === "literMasse" || id === "masse") {
             if (anden) return "Tallet passer til " + anden.t + ", ikke " + e.t + ". 1 g = 1000 mg.";
             if (D.passerI(tal, liste, r.mg * 1000, D.TOL)) return "Koncentrationen er i mM. Regn den om til M, før du ganger: 1 mM = 0,001 M.";
-            if (D.naer(tal, r.n * 1000, D.TOL) || D.naer(tal, r.n, D.TOL)) return "Det er stofmængden. Massen er m = n · M.";
-            if (id === "masse" && D.passerI(tal, liste, r.mg / o.V, D.TOL)) return "Det er massen i 1,00 L. Målekolben har kun " + o.VTekst + ", så V = 0,2500 L.";
+            if (D.naer(tal, r.n * 1000, D.TOL) || D.naer(tal, r.n, D.TOL)) return "Du har skrevet stofmængden. Massen er m = n · M.";
+            if (id === "masse" && D.passerI(tal, liste, r.mg / o.V, D.TOL)) return "Du har beregnet massen i 1,00 L. Målekolben har kun " + o.VTekst + ", så V = 0,2500 L.";
             return null;
         }
         return null;
@@ -463,9 +463,9 @@
     };
 
     D.FANE_SLUT = {
-        k: "Begge standardkurver er klaret.",
+        k: "Begge opgaver med standardkurver er løst.",
         i: "Alle tre prøver er regnet helt igennem.",
-        l: "Prilocain er klaret, også prøven med for høj absorbans."
+        l: "Opgaven med prilocain er løst, også prøven med for høj absorbans."
     };
 
     NK.Data = D;

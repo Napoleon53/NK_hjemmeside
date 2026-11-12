@@ -142,7 +142,7 @@ function koerTest(W) {
     SB.q = j2.q; SB.vurder(j2);
     paastand("bromchlorfluormethan: 2 af 4 og en gul linje", SB.antalMatch() === 2 && SB.el.status.classList.contains("gul") && !SB.faerdig);
     SB.umuligt();
-    paastand("bromchlorfluormethan: Det kan ikke lade sig gøre løser opgaven", SB.faerdig && /enantiomerer/.test(SB.beskedTekst()));
+    paastand("bromchlorfluormethan: Det kan ikke lade sig gøre løser opgaven", SB.faerdig && /spejlbilledisomerer/.test(SB.beskedTekst()));
     SB.vaelg(2);
     SB.umuligt();
     paastand("opgave 3 før byttet: kan godt lade sig gøre", !SB.faerdig && /Byt først/.test(SB.beskedTekst()));

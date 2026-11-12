@@ -238,11 +238,11 @@
         var o = this.o;
         var h = "";
         if (o.gruppe === "kaede") {
-            h += '<p class="note-tekst">Kæden er H(CH=CH)<sub>n</sub>H. Alle dobbeltbindingerne er konjugerede: der er præcis én enkeltbinding mellem to dobbeltbindinger.</p>';
+            h += '<p class="note-tekst">Kæden er H(CH=CH)<sub>n</sub>H. Alle dobbeltbindingerne er konjugerede, fordi der er præcis én enkeltbinding mellem to dobbeltbindinger.</p>';
         } else if (o.type === "find") {
             h += '<p class="note-tekst">Lycopen giver tomater deres farve. Her er det opløst i hexan. Konjugerede dobbeltbindinger har præcis én enkeltbinding imellem sig. Klik igen for at fjerne en markering.</p>';
         } else if (o.type === "brom") {
-            h += '<p class="note-tekst">Br₂ adderes til en dobbeltbinding, så den bliver til en enkeltbinding med et Br på hvert C-atom. Klik på en anden dobbeltbinding for at addere dibrom dér i stedet.</p>';
+            h += '<p class="note-tekst">Dibrom (Br₂) adderes til en dobbeltbinding, som derved bliver til en enkeltbinding med et Br-atom på hvert C-atom. Klik på en anden dobbeltbinding for at addere dibrom dér i stedet.</p>';
         } else {
             h += '<p class="note-tekst">Bromvand er dibrom opløst i vand. Det lægger sig øverst og trænger langsomt ned i saften. Tomatsaft er ca. 20 gange så koncentreret som opløsningen af lycopen i hexan. Grafen viser saften fortyndet 20 gange.</p>';
         }
@@ -258,7 +258,7 @@
             case "k-gaet":
                 if (this.gaet === null) return [
                     "I et længere konjugeret system kan elektronerne bevæge sig over et større stykke af molekylet.",
-                    "Jo længere systemet er, jo mindre energi skal der til at excitere en elektron. Mindre energi er længere bølgelængde.",
+                    "Jo længere det konjugerede system er, jo mindre energi skal der til at excitere en elektron. Mindre energi svarer til længere bølgelængde.",
                     "Toppen flytter mod en længere bølgelængde."
                 ];
                 return ["Tryk på + Længere kæde under grafen.", "Knappen + Længere kæde giver kæden én dobbeltbinding mere.", "Tryk på + Længere kæde under grafen."];
@@ -268,12 +268,12 @@
                 "Der skal 8 konjugerede dobbeltbindinger til."
             ];
             case "k-orange": return [
-                "Orange kommer, når stoffet absorberer blåt lys, omkring 470 nm.",
+                "Stoffet er orange, når det absorberer blåt lys omkring 470 nm.",
                 "Gør kæden længere, til toppen står ved ca. 470 nm.",
                 "Der skal 11 konjugerede dobbeltbindinger til."
             ];
             case "k-roed": return [
-                "Rød kommer, når stoffet absorberer blågrønt lys, omkring 500 nm.",
+                "Stoffet er rødt, når det absorberer blågrønt lys omkring 500 nm.",
                 "Gør kæden længere, til toppen står ved ca. 500 nm.",
                 "Der skal 13 konjugerede dobbeltbindinger til."
             ];
@@ -283,20 +283,20 @@
                 "To af de 13 dobbeltbindinger sidder for sig selv, én i hver ende, med to enkeltbindinger før den næste. Alle de andre er konjugerede."
             ];
             case "t-gul": return [
-                "Dibrom gør dobbeltbindingen til en enkeltbinding. Chromoforen bliver delt i to stykker, og farven afhænger af det længste.",
-                "Gul kommer, når det længste stykke har 8 til 10 konjugerede dobbeltbindinger.",
-                "Addér dibrom til den anden dobbeltbinding fra en af enderne af chromoforen. Den lyser."
+                "Når dibrom adderes til en dobbeltbinding, bliver dobbeltbindingen til en enkeltbinding. Chromoforen bliver delt i to stykker, og farven afhænger af det længste stykke.",
+                "Opløsningen er gul, når det længste stykke af chromoforen har 8 til 10 konjugerede dobbeltbindinger.",
+                "Addér dibrom til den anden dobbeltbinding fra en af enderne af chromoforen. Dobbeltbindingen lyser."
             ];
             case "t-farveloes": return [
-                "Det længste stykke skal have højst 7 konjugerede dobbeltbindinger. Så ligger toppen i UV.",
-                "Chromoforen har 11. Del den nær midten.",
-                "Addér dibrom til den midterste dobbeltbinding. Den lyser."
+                "Toppen ligger i UV, når det længste stykke af chromoforen højst har 7 konjugerede dobbeltbindinger.",
+                "Chromoforen har 11 konjugerede dobbeltbindinger. Del den nær midten.",
+                "Addér dibrom til den midterste dobbeltbinding. Dobbeltbindingen lyser."
             ];
             default:
                 if (this.gaet === null) return [
                     "Bromvandet kommer ovenfra. Hvor er der mest dibrom?",
-                    "Jo mere dibrom, jo flere dobbeltbindinger bliver brudt, og jo kortere bliver chromoforerne.",
-                    "Øverst er der mest dibrom: farveløs. Nederst er lycopen hel: orange."
+                    "Jo mere dibrom, jo flere dobbeltbindinger bliver til enkeltbindinger, og jo kortere bliver chromoforerne.",
+                    "Øverst er der mest dibrom, og tomatsaften er farveløs. Nederst er lycopen uændret, og tomatsaften er orange."
                 ];
                 return ["Tryk på Hæld bromvand i under grafen.", "Tryk på Hæld bromvand i under grafen.", "Tryk på Hæld bromvand i under grafen."];
         }
@@ -352,7 +352,7 @@
     P.skiftN = function (r) {
         if (this.spaer()) return;
         if (this.trin === "gaet" && this.gaet === null) return;
-        if (r > 0 && this.n >= D.KO_MAKS) { this.kortBesked("Længere bliver kæden ikke her. Den har " + D.KO_MAKS + " konjugerede dobbeltbindinger.", 4); return; }
+        if (r > 0 && this.n >= D.KO_MAKS) { this.kortBesked("Kæden kan ikke gøres længere end " + D.KO_MAKS + " konjugerede dobbeltbindinger.", 4); return; }
         this.saetN(this.n + r);
     };
 
@@ -368,7 +368,7 @@
         var o = this.o;
         if (this.faerdig) { this.nulstilHjaelp(); return; }
         if (o.id === "k-gaet" && this.n === 3 && foer === 2) {
-            var t = "Toppen flyttede fra 217 til 258 nm: mod en længere bølgelængde. En længere chromofor absorberer lys med mindre energi.";
+            var t = "Toppen flyttede fra 217 til 258 nm og dermed mod en længere bølgelængde. En længere chromofor absorberer lys med mindre energi.";
             var forkert = this.gaet !== o.rigtig;
             if (forkert) { this.brugtSvar = true; this.vistDel = true; }
             this.slutGaet = true;
@@ -384,15 +384,15 @@
         var ok = o.maal === "farvet" ? navn !== "Farveløs" : navn === o.maal;
         if (ok) {
             var tekst = "Med " + this.n + " konjugerede dobbeltbindinger ligger toppen ved " + lm + " nm. Stoffet absorberer " + F.lysOrd(lm) +
-                " lys og er " + navn.toLowerCase() + ".";
+                " lys, og opløsningen er " + navn.toLowerCase() + ".";
             if (o.id === "k-farve") tekst += " Et organisk stof er farvet fra ca. 8 konjugerede dobbeltbindinger.";
-            if (o.id === "k-orange") tekst += " Lycopen i tomater har også 11.";
+            if (o.id === "k-orange") tekst += " Lycopen i tomater har også 11 konjugerede dobbeltbindinger.";
             this.loest(tekst);
             return;
         }
         var maalOrd = o.maal === "farvet" ? "farvet" : o.maal.toLowerCase();
-        this.fejlLinje("Med " + this.n + " dobbeltbindinger ligger toppen ved " + lm + " nm, og stoffet er " + navn.toLowerCase() +
-            ". Det skal være " + maalOrd + ".");
+        this.fejlLinje("Med " + this.n + " konjugerede dobbeltbindinger ligger toppen ved " + lm + " nm, og opløsningen er " + navn.toLowerCase() +
+            ". Opløsningen skal være " + maalOrd + ".");
     };
 
     P.svarGaet = function (i) {
@@ -472,11 +472,11 @@
             return;
         }
         if (isoleret) {
-            this.fejlLinje("Den dobbeltbinding er ikke konjugeret. Chromoforen er hel, og farven er den samme.");
+            this.fejlLinje("Den valgte dobbeltbinding er ikke konjugeret med de andre. Chromoforen er hel, og farven er den samme.");
         } else if (f.navn === "Farveløs") {
-            this.fejlLinje("Nu er opløsningen farveløs. Det længste stykke har kun " + L + " konjugerede dobbeltbindinger. Addér dibrom tættere på en ende.");
+            this.fejlLinje("Opløsningen er blevet farveløs. Det længste stykke af chromoforen har kun " + L + " konjugerede dobbeltbindinger. Addér dibrom tættere på en ende.");
         } else {
-            this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ". Det længste stykke har stadig " + L + " konjugerede dobbeltbindinger. Addér dibrom nærmere midten.");
+            this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ". Det længste stykke af chromoforen har stadig " + L + " konjugerede dobbeltbindinger. Addér dibrom nærmere midten.");
         }
     };
 
@@ -491,7 +491,7 @@
     };
 
     P.regnbueFaerdig = function () {
-        var t = "Øverst er der mest dibrom, og næsten alle dobbeltbindinger er brudt: saften er farveløs. Længere nede er chromoforerne delt i kortere stykker: gul. Nederst er lycopen hel: orange.";
+        var t = "Øverst har dibrom gjort næsten alle dobbeltbindinger til enkeltbindinger, og tomatsaften er farveløs. Længere nede er chromoforerne delt i kortere stykker, og saften er gul. Nederst er lycopen uændret, og saften er orange.";
         var forkert = this.gaet !== this.o.rigtig;
         if (forkert) { this.brugtSvar = true; this.vistDel = true; }
         this.slutGaet = true;
@@ -599,7 +599,7 @@
             navn = (D.POLYEN_NAVN[n] ? D.POLYEN_NAVN[n] + ", " : "") + formel + "  ·  " + n + " konjugerede dobbeltbinding" + (n === 1 ? "" : "er");
         } else if (o.type === "find" && !this.faerdig) navn = "Lycopen, C₄₀H₅₆  ·  markeret: " + this.antalMarker();
         else if (o.type === "regnbue" && this.haeldt) navn = "Et molekyle fra det lag, der er valgt i glasset";
-        else navn = "Lycopen, C₄₀H₅₆  ·  den længste chromofor: " + konj.stoerst + " konjugerede";
+        else navn = "Lycopen, C₄₀H₅₆  ·  dobbeltbindinger i den længste chromofor: " + konj.stoerst;
         NK.tekst(ctx, navn, inde.x + inde.b / 2, inde.y + inde.h - 10, { font: "700 14px 'Segoe UI', sans-serif", farve: "#cfe0d6", justering: "center" });
 
         /* brommet paa vej ned */
@@ -610,7 +610,7 @@
             ctx.fillStyle = "rgba(20, 20, 26, 0.85)";
             NK.rundtRekt(ctx, x - 30, y - 13, 60, 26, 8);
             ctx.fill();
-            NK.tekst(ctx, "Br-Br", x, y + 6, { font: "800 16px 'Segoe UI', sans-serif", farve: "#f0a35c", justering: "center" });
+            NK.tekst(ctx, "Br−Br", x, y + 6, { font: "800 16px 'Segoe UI', sans-serif", farve: "#f0a35c", justering: "center" });
             ctx.restore();
         }
 

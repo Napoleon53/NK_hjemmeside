@@ -61,7 +61,7 @@
             { navn: "Fedtsyrer", pladser: ["fedtsyre", "mættet", "monoumættet", "polyumættet"],
               ros: "Fedtsyrer er carboxylsyrer med lange kæder. En mættet fedtsyre er lige, og hver dobbeltbinding giver et knæk." },
             { navn: "Fedtstoffet", pladser: ["glycerol", "fedtstof", "triglycerid", "hydrolyse"],
-              ros: "Glycerol og tre fedtsyrer giver et fedtstof og vand. Hydrolysen spalter det igen." },
+              ros: "Glycerol og tre fedtsyrer giver et fedtstof og vand. Hydrolysen spalter fedtstoffet igen." },
             { navn: "Olie og fast fedt", pladser: ["olie", "hærdning"],
               ros: "Olie er flydende, fordi kæderne har knæk. Ved hærdning bliver dobbeltbindingerne til enkeltbindinger." }
         ],

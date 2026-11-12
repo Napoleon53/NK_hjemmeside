@@ -21,28 +21,28 @@
 
     var TURE = {
         "fane-byg": [
-            { sel: "#byg-panel-partikler", titel: "Tilføj elementarpartikler", tekst: "Læg protoner, neutroner og elektroner i én ad gangen, og se hvad hvert tal styrer." },
-            { sel: "#fane-byg .pertabel-boks", titel: "Det periodiske system", tekst: "Viser, hvor dit atom hører hjemme. Tryk på et felt for at springe direkte til det grundstof." },
-            { sel: "#byg-skort", titel: "Opgavekortet", tekst: "Kortet øverst giver en opgave ad gangen. Byg atomet med knapperne i panelet, og tryk Indsend svar. Giv et hint viser atomsymbolet og derefter svaret." },
+            { sel: "#byg-panel-partikler", titel: "Tilføj elementarpartikler", tekst: "Læg protoner, neutroner og elektroner i én ad gangen, og se, hvad antallet af hver slags partikel styrer." },
+            { sel: "#fane-byg .pertabel-boks", titel: "Det periodiske system", tekst: "Det periodiske system viser, hvor dit atom hører hjemme. Tryk på et grundstof for at bygge et neutralt atom af det." },
+            { sel: "#byg-skort", titel: "Opgavekortet", tekst: "Kortet øverst giver én opgave ad gangen. Byg atomet fra opgaven med knapperne i panelet, og tryk Indsend svar. Knappen Giv et hint viser først atomsymbolet og derefter svaret." },
             { sel: "#opgave-boks", titel: "Opgaverne", tekst: "Her står, hvor mange opgaver du har løst selv. Start forfra begynder runden forfra." },
-            { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Massetal, atomnummer, symbol og ladning — skrevet på samme måde som i kemibogen." },
-            { sel: "#byg-nulstil", titel: "Genstart", tekst: "Nulstil til det simpleste atom: én proton og én elektron." },
-            { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, salte og et afsluttende quizspil bygger videre på det samme." }
+            { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Mærkatet viser nukleontal, atomnummer, symbol og ladning for det atom eller den ion, du har bygget." },
+            { sel: "#byg-nulstil", titel: "Genstart", tekst: "Genstart fjerner alle partikler, så du kan bygge et nyt atom fra bunden." },
+            { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Fanerne Isotoper, Ioner og Spil bygger videre på atommodellen fra denne fane." }
         ],
         "fane-isotop": [
             { sel: "#iso-panel-grundstof", titel: "Vælg grundstof", tekst: "Vælg et grundstof, der har mere end én isotop i naturen." },
-            { sel: "#iso-panel-blanding", titel: "Blandingen", tekst: "Skru på andelene, og se den gennemsnitlige atommasse følge med — eller genskab de rigtige naturlige andele." },
-            { sel: "#iso-panel-beregning", titel: "Beregningen", tekst: "Se hele regnestykket bag den vejede gennemsnitsmasse." }
+            { sel: "#iso-panel-blanding", titel: "Blandingen", tekst: "Skru på isotopernes andele, og se den gennemsnitlige atommasse følge med. Vis naturlig forekomst sætter andelene tilbage til dem fra naturen." },
+            { sel: "#iso-panel-beregning", titel: "Beregningen", tekst: "Se hele beregningen af den gennemsnitlige atommasse." }
         ],
         "fane-salt": [
-            { sel: ".saltvalg-metal, .saltvalg-ikkemetal", titel: "Vælg to grundstoffer", tekst: "Vælg frit et metal og et ikke-metal. Modellen tæller selv ud, hvor mange atomer der skal til." },
-            { sel: "#salt-laes-mere", titel: "Læs mere", tekst: "Se begrundelsen og reaktionsskemaet for netop dette salt." },
+            { sel: ".saltvalg-metal, .saltvalg-ikkemetal", titel: "Vælg to grundstoffer", tekst: "Vælg frit et metal og et ikke-metal. Animationen finder selv ud af, hvor mange atomer af hvert grundstof der skal til for at danne saltet." },
+            { sel: "#salt-laes-mere", titel: "Læs mere", tekst: "Læs, hvorfor saltet får netop sin formel, og se reaktionsskemaet." },
             { sel: "#salt-panel-formel", titel: "Formel og navn", tekst: "Følg saltets formel og navn, mens du prøver forskellige kombinationer." },
-            { sel: "#salt-knap", titel: "Kør forsøget", tekst: "Overfør elektronerne, og saml dem bagefter til et iongitter." }
+            { sel: "#salt-knap", titel: "Kør forsøget", tekst: "Overfør elektronerne, og saml bagefter ionerne til et iongitter." }
         ],
         "fane-spil": [
-            { sel: "#spil-panel-baner", titel: "Baner", tekst: "Tre baner med fem spørgsmål hver. Du kan frit hoppe mellem dem." },
-            { sel: "#spil-skort", titel: "Spørgsmålet", tekst: "Vælg et svar på kortet, og tryk Indsend svar. Begrundelsen står under svarene, også når svaret er rigtigt." },
+            { sel: "#spil-panel-baner", titel: "Baner", tekst: "Spillet har tre baner med fem spørgsmål i hver, og du kan frit skifte mellem banerne." },
+            { sel: "#spil-skort", titel: "Spørgsmålet", tekst: "Vælg et svar på kortet, og tryk Indsend svar. Under svarene står en begrundelse for det rigtige svar, også når du har svaret rigtigt." },
             { sel: "#spil-pertabel-knap", titel: "Periodisk system", tekst: "Slå op, hvis du er i tvivl om et atomnummer." }
         ]
     };

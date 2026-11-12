@@ -123,7 +123,7 @@
             this.antalLoest++;
             var nul = R.reaktanter.filter(function (r) { return R.orden[r.id] === 0; });
             var tekst = D.udtrykTekst(R, R.orden) + ".";
-            if (nul.length) tekst += " [" + nul[0].formel + "] er ikke med, fordi [" + nul[0].formel + "] ikke påvirker hastigheden.";
+            if (nul.length) tekst += " [" + nul[0].formel + "] indgår ikke i udtrykket, fordi [" + nul[0].formel + "] ikke påvirker hastigheden.";
             this.slut = { tekst: tekst, maade: "rigtig" };
             this.visPanel();
             return { rigtig: true };
@@ -132,16 +132,16 @@
         var fraSkema = R.reaktanter.every(function (r) { return mig.eksp[r.id] === Math.min(2, r.koef); })
             && R.reaktanter.some(function (r) { return Math.min(2, r.koef) !== R.orden[r.id]; });
         if (fraSkema) {
-            this.besked("Det er tallene fra reaktionsskemaet. Hastighedsudtrykket kan kun findes ved forsøg.", "skidt");
+            this.besked("Du har brugt koefficienterne fra reaktionsskemaet som eksponenter. Eksponenterne kan kun findes ved forsøg.", "skidt");
             return { rigtig: false, grund: "skema" };
         }
         var r = forkerte[0], par = this.findPar(r.id);
         if (par) {
             var f = par[1].c0[r.id] / par[0].c0[r.id], g = par[1].v0 / par[0].v0;
-            this.besked("[" + r.formel + "] passer ikke. I forsøg " + par[0].nr + " og " + par[1].nr + " blev [" + r.formel +
+            this.besked("Eksponenten for [" + r.formel + "] passer ikke. I forsøg " + par[0].nr + " og " + par[1].nr + " blev [" + r.formel +
                 "] ganget med " + NK.faktor(f) + ", og v₀ blev ganget med " + NK.faktor(g) + ".", "skidt");
         } else {
-            this.besked("[" + r.formel + "] passer ikke. Lav to forsøg, hvor kun [" + r.formel + "] ændres.", "skidt");
+            this.besked("Eksponenten for [" + r.formel + "] passer ikke. Lav to forsøg, hvor kun [" + r.formel + "] ændres.", "skidt");
         }
         return { rigtig: false, grund: "forkert", id: r.id };
     };
@@ -197,7 +197,7 @@
         this.vist = true;
         R.reaktanter.forEach(function (r) { this.eksp[r.id] = R.orden[r.id]; }, this);
         var dele = R.reaktanter.map(function (r) {
-            return "[" + r.formel + "] × 2 giver v₀ × " + Math.pow(2, R.orden[r.id]);
+            return "Fordobles [" + r.formel + "], ganges v₀ med " + Math.pow(2, R.orden[r.id]);
         });
         this.slut = { tekst: D.udtrykTekst(R, R.orden) + ". " + dele.join(". ") + ".", maade: "svar" };
         this.bygUdtryk();
@@ -346,7 +346,7 @@
         R.reaktanter.forEach(function (r) { h += "<th>[" + NK.html(r.formel) + "] / M</th>"; });
         h += "<th>v₀ / (M/s)</th></tr></thead><tbody>";
         if (!this.forsoeg.length) {
-            h += '<tr class="tom"><td colspan="' + (R.reaktanter.length + 2) + '">Ingen forsøg endnu. Vælg koncentrationer, og tryk Mål.</td></tr>';
+            h += '<tr class="tom"><td colspan="' + (R.reaktanter.length + 2) + '">Ingen forsøg endnu. Vælg startkoncentrationerne, og tryk på Mål starthastigheden.</td></tr>';
         }
         this.forsoeg.forEach(function (f) {
             var farve = FARVER[(f.nr - 1) % FARVER.length];

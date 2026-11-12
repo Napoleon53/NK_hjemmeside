@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb7.8 Proteiner</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen passer (én peptidbinding og ét
+   vandmolekyle pr. kondensation, ionbindingen findes mellem pKₛ for
+   asparaginsyres og lysins sidekæder, disulfidbroen holder i den
+   udfoldede kæde), at alle tre faner kan gennemføres, at forkerte svar
+   får den rigtige forklaring og koster stjernen, at intet løses uden
+   Indsend svar, at varmen og pH kun bryder de svage bindinger, at
+   teksterne er korte og uden tankestreger og ASCII-dansk, og at kortet
+   aldrig dækker tavlen fra 1100 × 620 til 1600 × 950. Kræver en lokal
+   server med mappen animationer/ som rod. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb7.8-peptid", "nk-sb7.8-fold", "nk-sb7.8-denat"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|traek\w*|kaede\w*|baade|laengere|vaeske|oploesning|aeggehvide|maelk|hoej)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function tid(s, sek) { for (var t = 0; t < sek; t += 1 / 60) s.opdater(1 / 60); }
+
+async function koer() {
+    var W = ramme.contentWindow;
+    try { await koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+async function koerTest(W) {
+    var NK = W.NK, D = NK.Data, Pr = NK.Protein, Fm = NK.Formel;
+
+    /* ----------------------------------------------------------------- */
+    overskrift("1. Modellen");
+    paastand("8 aminosyrer giver 7 vandmolekyler, 3 giver 2", D.vandFor(8) === 7 && D.vandFor(3) === 2);
+    paastand("opskriften har 8 aminosyrer, og bakken har dem, der mangler", D.OPSKRIFT.length === 8 &&
+        D.OPSKRIFT.slice(3).slice().sort().join() === D.BAKKE.slice().sort().join());
+    paastand("sidekædernes pKₛ er de samme som i sb7.7 (asparaginsyre 3,65, lysin 10,53)", D.AMINOSYRER.asp.pks === 3.65 && D.AMINOSYRER.lys.pks === 10.53);
+    paastand("ionbindingen findes ved pH 8, ikke ved pH 3 og pH 11", D.ionHel(8) && !D.ionHel(3) && !D.ionHel(11));
+    paastand("æggehviden denatureres fra 60 °C", D.T_DENAT === 60);
+    var to = Fm.strenge();
+    paastand("de to kæder har 6 par H og O lige over for hinanden", to.par.length === 6 && to.par.every(function (p) {
+        return to.ind[p[0]].el === "H" && to.ind[p[1]].el === "O" && to.ind[p[0]].x === to.ind[p[1]].x && to.ind[p[0]].kaede !== to.ind[p[1]].kaede;
+    }));
+    var a0 = Pr.ANKER[0], fold0 = Pr.punkter({ d: 0 }), ud0 = Pr.punkter({ d: 1 });
+    var dF = { x: fold0[a0.nede].x - fold0[a0.oppe].x, y: fold0[a0.nede].y - fold0[a0.oppe].y };
+    var dU = { x: ud0[a0.nede].x - ud0[a0.oppe].x, y: ud0[a0.nede].y - ud0[a0.oppe].y };
+    paastand("disulfidbroen holder: de to cystein sidder ens i den foldede og den udfoldede kæde", Math.abs(dF.x - dU.x) < 0.02 && Math.abs(dF.y - dU.y) < 0.02, JSON.stringify([dF, dU]));
+    paastand("den udfoldede kæde har lige så mange punkter som den foldede", Pr.COIL.length === Pr.N);
+    paastand("de fire bindinger har de fire navne fra kortet", D.KONTAKTER.map(function (k) { return k.navn; }).sort().join() === D.FOLD[2].navne.slice().sort().join());
+    var kaede3 = Fm.kaede(["ala", "gly", "ser"]);
+    paastand("tripeptidet har 2 peptidbindinger", kaede3.bindinger.filter(function (b) { return b.peptid; }).length === 2);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Fane 1 Peptidbindingen");
+    NK.visFane("fane-p");
+    var p = NK.sims["fane-p"];
+    p.vaelg(0);
+    var t1 = D.PEPTID[0];
+    paastand("det dobbeltbundne O giver sin egen forklaring", p.vandFejl([{ m: "ala", id: "r0O" }, { m: "ala", id: "r0HO" }, { m: "gly", id: "r0Hb" }]) === t1.fejlDobbelt);
+    paastand("grupperne den anden vej giver sin egen forklaring", p.vandFejl([{ m: "gly", id: "r0OH" }, { m: "gly", id: "r0HO" }, { m: "ala", id: "r0Ha" }]) === t1.fejlVendt);
+    paastand("to atomer er for lidt", /O og H/.test(p.vandFejl([{ m: "ala", id: "r0OH" }, { m: "ala", id: "r0HO" }]) || ""));
+    paastand("begge H i glycins aminogruppe kan gå af", p.vandFejl([{ m: "ala", id: "r0OH" }, { m: "ala", id: "r0HO" }, { m: "gly", id: "r0Ha" }]) === null &&
+        p.vandFejl([{ m: "ala", id: "r0OH" }, { m: "ala", id: "r0HO" }, { m: "gly", id: "r0Hb" }]) === null);
+    p.valgtAtomer = [{ m: "ala", id: "r0OH" }, { m: "ala", id: "r0HO" }, { m: "gly", id: "r0Hb" }];
+    tid(p, 0.5);
+    paastand("de rigtige atomer løser intet uden Indsend svar", !p.groen && p.vand === 0);
+    paastand("Indsend svar viser det valgte: O og 2 H", p.indsendTekst() === "Indsend svar: O og 2 H");
+    p.indsendKlik();
+    paastand("rigtigt svar: kortet bliver grønt, og reaktionen kører", !!p.groen && !!p.reak);
+    tid(p, 3);
+    paastand("efter reaktionen er der fraspaltet 1 vandmolekyle", p.vand === 1 && !p.reak);
+    p.videreKlik();
+    paastand("trin 2 begynder med Ala-Gly", p.trinNr === 1 && p.kaede.rester.join() === "ala,gly");
+    p.serinVed = "N";
+    paastand("serin ved en ende løser intet uden Indsend svar", !p.groen);
+    p.indsendKlik();
+    paastand("serin ved N-enden: forklaringen om Ser-Ala-Gly, og stjernen er væk", /Ser-Ala-Gly/.test(p.beskedTekst()) && p.fejl === true && !p.groen);
+    p.serinVed = "C"; p.indsendKlik(); tid(p, 1.6);
+    paastand("serin ved C-enden giver Ala-Gly-Ser og 2 vandmolekyler", p.kaede.rester.join() === "ala,gly,ser" && p.vand === 2);
+    p.videreKlik();
+    p.valgt = 1; p.indsendKlik();
+    paastand("8 vandmolekyler er forkert med sin egen forklaring", p.beskedTekst().indexOf("Tæl bindingerne") >= 0);
+    p.valgt = 0; p.indsendKlik();
+    paastand("7 vandmolekyler er rigtigt", !!p.groen);
+    p.videreKlik(); tid(p, 1.5);
+    paastand("trin 4 begynder med 3 perler", p.trinNr === 3 && p.antalPerler === 3 && !p.morf);
+    var forkertPerle = p.bakke.filter(function (b) { return b.id !== p.naesteId(); })[0];
+    var maal = p.perlePos(p.antalPerler);
+    p.grebPerle = { b: forkertPerle, x: maal.x, y: maal.y, dx: 0, dy: 0 }; p.opScene(maal);
+    paastand("en forkert aminosyre bliver ikke sat på og nævner den rigtige", p.antalPerler === 3 && p.beskedTekst().indexOf("cystein") >= 0);
+    for (var k = 0; k < 5; k++) {
+        var id = p.naesteId();
+        var b = p.bakke.filter(function (x) { return !x.brugt && x.id === id; })[0];
+        maal = p.perlePos(p.antalPerler);
+        p.grebPerle = { b: b, x: maal.x, y: maal.y, dx: 0, dy: 0 }; p.opScene(maal);
+        tid(p, 0.5);
+    }
+    tid(p, 1);
+    paastand("kæden er færdig: 8 aminosyrer og 7 vandmolekyler", p.antalPerler === 8 && p.vand === 7 && !!p.groen);
+    paastand("fanen er gennemført, men uden stjerne", p.status.loest && !p.status.stjerne);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Fane 2 Foldningen");
+    NK.visFane("fane-f");
+    var f = NK.sims["fane-f"];
+    f.vaelg(0);
+    f.linjer = [{ h: "k0h0", o: "k1o0" }, { h: "k0h3", o: "k1o0" }];
+    f.indsendKlik();
+    paastand("en skrå hydrogenbinding fjernes med forklaring", f.linjer.length === 1 && f.beskedTekst().indexOf("skrå") >= 0);
+    f.indsendKlik();
+    paastand("manglende hydrogenbindinger tælles", f.beskedTekst().indexOf("5 hydrogenbindinger") >= 0);
+    var h0 = to.ind.k0h0;
+    f.forbind(f.mol.ind.k0h0, f.mol.ind.k1h2);
+    paastand("H til H giver ingen binding", f.linjer.length === 1);
+    f.linjer = f.mol.par.map(function (q) { return { h: q[0], o: q[1] }; });
+    paastand("seks streger løser intet uden Indsend svar", !f.groen);
+    f.indsendKlik();
+    paastand("seks rigtige hydrogenbindinger er rigtigt", !!f.groen);
+    f.videreKlik();
+    f.w = 0.5; f.hold = {}; f.opScene({ x: 0, y: 0 }); tid(f, 1);
+    paastand("en halvt snoet kæde retter sig ud igen", f.w === 0 && f.fase === "traek");
+    f.w = 1; f.hold = {}; f.opScene({ x: 0, y: 0 }); tid(f, 1.2);
+    paastand("en helt snoet kæde får hydrogenbindinger, og spørgsmålet kommer", f.hbT >= 1 && f.fase === "spm");
+    f.valgt = 1; f.indsendKlik();
+    paastand("peptidbindinger mellem vindingerne er forkert", !f.groen && f.beskedTekst().indexOf("Peptidbindingerne holder") >= 0);
+    f.valgt = 0; f.indsendKlik();
+    f.videreKlik();
+    paastand("trin 3: spiralen er ikke foldet ned", f.trinNr === 2 && f.dy === Pr.G.DY0);
+    f.dy = -0.8; f.hold = {}; f.opScene({ x: 0, y: 0 }); tid(f, 1.2);
+    paastand("slippes spiralen for højt, glider den tilbage", Math.abs(f.dy - Pr.G.DY0) < 1e-6 && f.fase === "fold");
+    f.dy = -0.2; f.hold = {}; f.opScene({ x: 0, y: 0 }); tid(f, 3.2);
+    paastand("slippes den over foldebladet, dannes de fire bindinger", f.fase === "navne" && f.dannesT === null && f.dannet.join() === "1,1,1,1");
+    paastand("den første binding er gul, mens kortet spørger", f.tilstand().gul === 0);
+    f.svarValg(1); f.svarValg(1); f.svarValg(2); f.svarValg(0);
+    paastand("navnene løser intet uden Indsend svar", !f.groen && f.navne.every(function (n) { return !!n; }));
+    f.indsendKlik();
+    paastand("forkerte navne: forklaringen om disulfidbroen ved binding 1", f.beskedTekst().indexOf("Binding 1") >= 0 && f.beskedTekst().indexOf("disulfidbro") >= 0);
+    paastand("de forkerte navne er fjernet, de rigtige bliver", f.navne[0] === null && f.navne[1] === "ionbinding" && f.navne[2] === "londonbindinger" && f.navne[3] === "hydrogenbinding");
+    f.gulJ = 0; f.svarValg(3); f.indsendKlik();
+    paastand("fire rigtige navne er rigtigt", !!f.groen);
+    f.videreKlik();
+    f.valgt = 2; f.indsendKlik();
+    paastand("tertiær er forkert for fire kæder", !f.groen);
+    f.valgt = 3; f.indsendKlik();
+    paastand("kvaternær er rigtigt, og fanen er gennemført", !!f.groen && f.status.loest && !f.status.stjerne);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Fane 3 Denaturering og hydrolyse");
+    NK.visFane("fane-d");
+    var d = NK.sims["fane-d"];
+    d.vaelg(0);
+    d.saetT(55); tid(d, 1);
+    paastand("ved 55 °C er proteinet foldet", !d.p.denat && d.p.d === 0);
+    d.saetT(62); tid(d, 0.5);
+    paastand("over 60 °C brydes de svage bindinger først", !!d.p.denat && d.p.svag < 1 && d.p.d < 0.2);
+    tid(d, 3.5);
+    paastand("bagefter er proteinet foldet ud, og æggehviden er hvid", d.p.d === 1 && d.p.hvid === 1 && d.fase === "spm");
+    paastand("disulfidbroen og ionernes ladninger er der endnu", d.tilstand().ss === true && d.p.aspQ === -1 && d.p.lysQ === 1);
+    paastand("skyderen løser ikke spørgsmålet", !d.groen);
+    d.saetT(20); tid(d, 1);
+    paastand("æggehviden bliver ikke klar igen, når den køler af", d.p.d === 1);
+    d.svarValg(0); d.svarValg(2); d.indsendKlik();
+    paastand("peptidbindingerne er forkert med sin egen forklaring", d.beskedTekst().indexOf("Kæden er hel") >= 0 && !d.groen);
+    d.indsendKlik();
+    paastand("kun hydrogenbindingerne er for lidt", d.beskedTekst().indexOf("flere bindinger") >= 0 && !d.groen);
+    d.svarValg(1); d.indsendKlik();
+    paastand("hydrogenbindingerne og ionbindingen er rigtigt", !!d.groen);
+    d.videreKlik();
+    paastand("trin 2: et nyt glas med pH 8 og foldet protein", d.p.ph === 8 && d.p.d === 0 && d.p.hvid === 0);
+    d.saetPh(4); tid(d, 1);
+    paastand("ved pH 4 er ionbindingen der endnu", d.p.aspQ === -1 && !d.p.denat && !d.p.vent);
+    d.saetPh(3); tid(d, 0.3);
+    paastand("ved pH 3 optager −COO⁻ en hydron", d.p.aspQ === 0 && d.hydroner.length === 1 && d.hydroner[0].ind === true);
+    tid(d, 4);
+    paastand("proteinet folder sig ud, og spørgsmålet handler om lav pH", d.p.d === 1 && d.variant === "lav");
+    d.valgt = 1; d.indsendKlik();
+    paastand("−NH₃⁺ afgav en hydron er forkert ved lav pH", !d.groen);
+    d.valgt = 0; d.indsendKlik();
+    paastand("−COO⁻ optog en hydron er rigtigt ved lav pH", !!d.groen);
+    d.startTrin(1); d.saetPh(12); tid(d, 4.5);
+    paastand("ved pH 12 afgiver −NH₃⁺ en hydron, og spørgsmålet handler om høj pH", d.p.lysQ === 0 && d.variant === "hoej" && D.DENAT[1].hoej.rigtig === 1);
+    d.valgt = 1; d.indsendKlik(); d.videreKlik();
+    var slags = {};
+    d.mol.bindinger.forEach(function (b) { if (!b.stiplet) slags[d.bindSlags(b)] = (slags[d.bindSlags(b)] || 0) + 1; });
+    paastand("stykket af kæden har én peptidbinding og de andre slags bindinger", slags.peptid === 1 && slags.co >= 1 && slags.nh >= 1 && slags.nc >= 1 && slags.cc >= 1 && slags.cr >= 1, JSON.stringify(slags));
+    var fejlS = [];
+    d.mol.bindinger.forEach(function (b) {
+        if (b.stiplet || b.peptid) return;
+        d.valgtBinding = b; d.indsendKlik();
+        if (d.groen || d.beskedTekst().indexOf(D.DENAT[2].fejl[d.bindSlags(b)].slice(0, 20)) < 0) fejlS.push(b.id);
+    });
+    samlet("hver forkert binding får sin egen forklaring", fejlS);
+    d.valgtBinding = d.mol.bindinger.filter(function (b) { return b.peptid; })[0];
+    paastand("Indsend svar viser bindingen C−N", d.indsendTekst() === "Indsend svar: bindingen C−N");
+    d.indsendKlik(); tid(d, 5.5);
+    paastand("bindingen mellem C og N er rigtig, og hele kæden spaltes", !!d.groen && d.hyd.t >= 4.9);
+    d.videreKlik();
+    d.brikker.forEach(function (b) { b.kasse = 0; });
+    paastand("sorteringen løser intet uden Indsend svar", !d.groen);
+    d.indsendKlik();
+    paastand("pepsin i Denaturering er forkert og får sin forklaring", !d.groen && d.beskedTekst().indexOf("Pepsin") >= 0);
+    paastand("de forkerte går tilbage på bakken", d.brikker.filter(function (b) { return b.kasse === null; }).length === 2);
+    d.brikker.forEach(function (b) { b.kasse = b.rigtig; }); d.indsendKlik();
+    paastand("rigtig sortering, og fanen er gennemført", !!d.groen && d.status.loest);
+    d.videreKlik();
+    paastand("til sidst er begge skydere fri, og panelet har et nyt glas", d.fri && d.tempAktiv() && d.phAktiv() && !W.document.getElementById("d-nyt").hidden);
+    d.saetT(90); tid(d, 4); W.document.getElementById("d-nyt").click();
+    paastand("et nyt glas æggehvide er foldet og klart", d.p.d === 0 && d.p.T === 20 && d.p.hvid === 0);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Sproget");
+    var tekster = [];
+    function saml(o, sti) {
+        if (typeof o === "string") { tekster.push([sti, o]); return; }
+        if (Array.isArray(o)) o.forEach(function (x, i) { saml(x, sti + "[" + i + "]"); });
+        else if (o && typeof o === "object") Object.keys(o).forEach(function (k) { if (k !== "id" && k !== "slags" && k !== "kort") saml(o[k], sti + "." + k); });
+    }
+    saml(D.PEPTID, "PEPTID"); saml(D.FOLD, "FOLD"); saml(D.DENAT, "DENAT"); saml(D.DENAT_FRI, "FRI");
+    var html = W.document.body.innerText;
+    tekster.push(["side", html]);
+    samlet("ingen tankestreger", tekster.filter(function (t) { return /[–—]/.test(t[1]); }).map(function (t) { return t[0]; }));
+    samlet("ingen 1+ eller 1−", tekster.filter(function (t) { return /1\+|1−/.test(t[1]); }).map(function (t) { return t[0]; }));
+    samlet("intet ASCII-dansk", tekster.filter(function (t) { return ASCII_ORD.test(t[1]) && t[0] !== "side"; }).map(function (t) { return t[0] + ": " + t[1].match(ASCII_ORD)[0]; }));
+    samlet("intet ASCII-dansk på siden", ASCII_ORD.test(html) ? [html.match(ASCII_ORD)[0]] : []);
+    samlet("korte tekster (højst 170 tegn)", tekster.filter(function (t) { return t[0] !== "side" && t[1].length > 170; }).map(function (t) { return t[0] + " " + t[1].length; }));
+    samlet("korte svar (højst 40 tegn)", tekster.filter(function (t) { return /\.svar\[|\.navne\[|brikker\[\d+\]\.t$/.test(t[0]) && t[1].length > 40; }).map(function (t) { return t[0]; }));
+    samlet("dioxygen, ikke ilt", tekster.filter(function (t) { return /\bilt\b/i.test(t[1]); }).map(function (t) { return t[0]; }));
+    samlet("ingen indforståede henvisninger (også her, den nye form)", tekster.filter(function (t) { return /\bogså her\b|\bsom før\b/i.test(t[1]); }).map(function (t) { return t[0]; }));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Kortet dækker aldrig tavlen");
+    var STR = [[1100, 620], [1300, 800], [1600, 950]];
+    var daekker = [];
+    for (var si = 0; si < STR.length; si++) {
+        ramme.style.width = STR[si][0] + "px"; ramme.style.height = STR[si][1] + "px";
+        await vent(250);
+        var tjek = async function (navn, fane, s) {
+            s.tilpas(); s.layout(); s.visKort();
+            await vent(30);
+            var e = W.document.getElementById(fane + "-skort").getBoundingClientRect(), c = s.L.canvas.getBoundingClientRect();
+            if (e.bottom - c.top > s.lay.tavle.y - 2) daekker.push(STR[si].join("×") + " " + navn + " (" + Math.round(e.bottom - c.top) + " > " + Math.round(s.lay.tavle.y) + ")");
+        };
+        NK.visFane("fane-p"); p.vaelg(0);
+        p.valgtAtomer = [{ m: "ala", id: "r0O" }]; p.indsendKlik(); await tjek("p1 fejl", "p", p);
+        p.visSvar(); tid(p, 3); p.videreKlik(); p.serinVed = "N"; p.indsendKlik(); await tjek("p2 fejl", "p", p);
+        p.visSvar(); tid(p, 1.5); p.videreKlik(); p.valgt = 2; p.indsendKlik(); await tjek("p3 fejl", "p", p);
+        p.visSvar(); await tjek("p3 rigtigt", "p", p);
+        NK.visFane("fane-f"); f.vaelg(0);
+        f.visSvar(); tid(f, 1.2); f.videreKlik(); f.visSvar(); tid(f, 1.5); f.valgt = 2; f.indsendKlik(); await tjek("f2 fejl", "f", f);
+        f.visSvar(); await tjek("f2 rigtigt", "f", f);
+        f.videreKlik(); f.visSvar(); tid(f, 3.5); f.svarValg(1); f.svarValg(0); f.svarValg(2); f.svarValg(3); f.indsendKlik(); await tjek("f3 fejl", "f", f);
+        f.visSvar(); f.videreKlik(); f.valgt = 1; f.indsendKlik(); await tjek("f4 fejl", "f", f);
+        f.visSvar(); await tjek("f4 rigtigt", "f", f);
+        NK.visFane("fane-d"); d.vaelg(0);
+        d.saetT(80); tid(d, 3.6); d.svarValg(2); d.indsendKlik(); await tjek("d1 fejl", "d", d);
+        d.visSvar(); await tjek("d1 rigtigt", "d", d);
+        d.videreKlik(); d.saetPh(2); tid(d, 4); d.valgt = 1; d.indsendKlik(); await tjek("d2 fejl", "d", d);
+        d.visSvar(); await tjek("d2 rigtigt", "d", d);
+    }
+    samlet("kortet holder sig over tavlen i alle størrelser", daekker);
+    ramme.style.width = "1300px"; ramme.style.height = "800px";
+    void h0;
+}
+</script>
+</body>
+</html>

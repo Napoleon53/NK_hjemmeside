@@ -16,13 +16,13 @@
 
     var TURE = {
         "fane-rg": [
-            { sel: "#rg-trin", titel: "Trinene", tekst: "De seks første stoffer løses i trin: ladningen, O, H og til sidst det ukendte." },
+            { sel: "#rg-trin", titel: "Trinene", tekst: "De seks første stoffer løses i trin: ladningen, O, H og til sidst det ukendte oxidationstal." },
             { sel: "#rg-formel", titel: "Formlen", tekst: "Oxidationstallet står over atomet med romertal. Det gule ? viser, hvilket atom du er ved." },
             { sel: "#rg-skort", titel: "Her svarer du", tekst: "Kortet øverst har opgaven, spørgsmålet og feltet. Indsend svar sender tallet. Giv hint hjælper dig videre, og næste tryk viser svaret." },
             { sel: "#rg-regn", titel: "Regnestykket", tekst: "Summen af oxidationstallene er stoffets ladning. Mellemregningerne står med almindelige tal." },
             { sel: "#rg-brikker", titel: "Atomerne", tekst: "Ét atom pr. brik. Er der to Cr, får hver sin brik, og de deler summen." },
             { sel: "#rg-opgaver", titel: "Stofferne", tekst: "De seks første gennemgås trin for trin. Et stof, du løser uden at se svaret, får en stjerne." },
-            { sel: ".faneknapper", titel: "Elektronerne", tekst: "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke gør." }
+            { sel: ".faneknapper", titel: "Elektronerne", tekst: "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke virker." }
         ],
         "fane-ek": [
             { sel: "#ek-anker-molekyle", titel: "Molekylet", tekst: "En elektronprikformel. Prikkens farve viser, hvilket atom elektronen kom fra." },

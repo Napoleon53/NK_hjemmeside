@@ -163,7 +163,7 @@ function koerTest(W) {
     paastand("pentan-3-ol er et andet stof, og det tegnes", !svar(s1, "pentan-3-ol").ok && !!svar(s1, "pentan-3-ol").mol && /Tæl igen, hvor OH-gruppen sidder/.test(svar(s1, "pentan-3-ol").tekst));
     paastand("pent-2-en: molekylet har en OH-gruppe", /OH-gruppe/.test(svar(s1, "pent-2-en").tekst));
     paastand("4-methylpentan: den anden ende", /anden ende/.test(svar(s2, "4-methylpentan").tekst));
-    paastand("2-ethylbutan: ikke den længste kæde", /ikke den længste kæde/.test(svar(s2, "2-ethylbutan").tekst), svar(s2, "2-ethylbutan").tekst);
+    paastand("2-ethylbutan: ikke den længste kæde", /ikke til den længste kæde/.test(svar(s2, "2-ethylbutan").tekst), svar(s2, "2-ethylbutan").tekst);
     paastand("2-methyl-3-ethylpentan: alfabetisk rækkefølge", /alfabetisk/.test(svar(s3, "2-methyl-3-ethylpentan").tekst));
     paastand("2-methyl-3-methylbutan: ens sidegrupper skrives samlet", /samlet/.test(svar(s4, "2-methyl-3-methylbutan").tekst));
     paastand("2,3dimethylbutan og 2 methylbutan: bindestreg mellem tal og bogstaver", /bindestreg/.test(svar(s4, "2,3dimethylbutan").tekst) && /bindestreg/.test(svar(s2, "2 methylpentan").tekst));
@@ -196,8 +196,8 @@ function koerTest(W) {
     /* Tegninger paa fane 1 */
     function tegnet(s, navn) { return K.tegneFejl(s, NK.NavnLaeser.laes(navn).mol); }
     paastand("butansyre for propansyre: carbonatomet i COOH tæller med", /tæller med i stammen/.test(tegnet(stof("propansyre"), "butansyre")));
-    paastand("pentan for 2-methylbutan: stammen er fire carbonatomer", /Stammen butan er fire carbonatomer/.test(tegnet(stof("2-methylbutan"), "pentan")));
-    paastand("pentan for pent-2-en: endelsen -2-en er en dobbeltbinding", /-2-en er en dobbeltbinding/.test(tegnet(stof("pent-2-en"), "pentan")));
+    paastand("pentan for 2-methylbutan: stammen er fire carbonatomer", /Stammen butan betyder fire carbonatomer/.test(tegnet(stof("2-methylbutan"), "pentan")));
+    paastand("pentan for pent-2-en: endelsen -2-en er en dobbeltbinding", /-2-en betyder en dobbeltbinding/.test(tegnet(stof("pent-2-en"), "pentan")));
     paastand("but-2-en for but-2-yn: klik på dobbeltbindingen igen", /igen/.test(tegnet(stof("but-2-yn"), "but-2-en")));
     paastand("1-brompropan for 2-brompropan: 2-brom betyder nummer 2", /2-brom betyder et bromatom på carbonatom nummer 2/.test(tegnet(stof("2-brompropan"), "1-brompropan")));
     paastand("hexan for cyclohexan: cyclo betyder en ring", /ring/.test(tegnet(stof("cyclohexan"), "hexan")));
@@ -450,7 +450,7 @@ function koerTest(W) {
     /* Hint og Vis svaret */
     T.vaelg(T.idx("4-methylpentan-2-ol"));
     el("t-knap").click();
-    paastand("første hint: tegn kæden først", /Stammen pentan er fem carbonatomer i træk/.test(T.beskedTekst()), T.beskedTekst());
+    paastand("første hint: tegn kæden først", /Stammen pentan betyder fem carbonatomer i en kæde/.test(T.beskedTekst()), T.beskedTekst());
     el("t-knap").click(); el("t-knap").click();
     paastand("tredje hint handler om forleddet, og så kommer Vis svaret", /Forleddet 4-methyl/.test(T.beskedTekst()) && el("t-knap").textContent === "Vis svaret");
     paastand("kortet med et hint holder sig inden for sin plads", kortH("t") <= T.kortZone(), kortH("t"));

@@ -39,13 +39,13 @@
         D.O = o;
         D.TITRER_HINT = "Træk skyderen ved hanen mod højre. Dryp til sidst, og luk hanen, så snart kolben bliver " + o.svag + ".";
         D.INTRO_TITRERING = [
-            { tekst: "I denne fane titrerer du havvand med sølvnitrat for at bestemme, hvor meget chlorid havvandet indeholder. " +
+            { tekst: "I denne fane titrerer du havvand med sølv(I)nitrat for at bestemme, hvor meget chlorid havvandet indeholder. " +
                 "Kolben indeholder 1,00 g havvand, 20 mL demineraliseret vand og lidt " + o.navn + ", som farver væsken " + o.start + ". " +
-                "Buretten indeholder sølvnitrat.",
+                "Buretten indeholder sølv(I)nitrat.",
               sel: ["#tit-anker-buret", "#tit-anker-kolbe"] },
             { tekst: "Du åbner hanen ved at trække skyderen mod højre, og knappen 1 dråbe tilsætter én dråbe ad gangen. " +
                 "Du lukker hanen, så snart kolben er " + o.svag + " og forbliver det. " +
-                "Luppen viser imens, hvordan hver Ag⁺ fælder en Cl⁻ som hvidt sølvchlorid.",
+                "Luppen viser imens, hvordan hver Ag⁺ fælder en Cl⁻ som hvidt sølv(I)chlorid.",
               sel: ["#tit-anker-hane", "#tit-anker-lup"] },
             { tekst: "Når kolben har skiftet farve, aflæser du forbruget på buretten ved menisken i panelet og skriver tallet i feltet på kortet øverst i scenen. " +
                 "Kurven viser undervejs, hvordan stofmængderne i kolben ændrer sig. " +
@@ -63,18 +63,18 @@
        etiket: foran feltet, formel: facit til formlen (hoejresiden),
        formelHint: hjaelp til formlen uden at give den, hint: hjaelp til tallet. */
     D.TRIN = [
-        { id: "nb", navn: "Stofmængden af sølvioner", etiket: "n(Ag⁺) =", enhed: "mol", formel: "c · V",
-          formelHint: "Du kender koncentrationen og rumfanget af sølvnitrat.",
-          hint: "Rumfanget skal i liter: del antallet af mL med 1000." },
+        { id: "nb", navn: "Stofmængden af sølv(I)ioner", etiket: "n(Ag⁺) =", enhed: "mol", formel: "c · V",
+          formelHint: "Du kender koncentrationen og rumfanget af sølv(I)nitrat.",
+          hint: "Rumfanget skal være i liter, så divider antallet af mL med 1000." },
         { id: "ns", navn: "Stofmængden af natriumchlorid", etiket: "n(NaCl) =", enhed: "mol", formel: "n(Ag⁺)",
           formelHint: "Se på reaktionsskemaet. Hvor mange Ag⁺ reagerer med én Cl⁻? Og hver NaCl giver én Cl⁻.",
-          hint: "Det er den samme stofmængde som n(Ag⁺)." },
+          hint: "n(NaCl) er den samme stofmængde som n(Ag⁺)." },
         { id: "ms", navn: "Massen af natriumchlorid", etiket: "m(NaCl) =", enhed: "g", formel: "n · M",
           formelHint: "Du kender stofmængden af NaCl og dens molarmasse.",
           hint: "Brug natriumchlorids molarmasse, 58,44 g/mol." },
         { id: "pct", navn: "Masseprocenten", etiket: "m% =", enhed: "%", formel: "m(NaCl) / m(prøve) · 100 %",
-          formelHint: "Masseprocent er massen af stoffet delt med massen af hele prøven.",
-          hint: "Del saltets masse med prøvens masse, og gang med 100 %." }
+          formelHint: "Masseprocent er massen af stoffet divideret med massen af hele prøven.",
+          hint: "Divider saltets masse med prøvens masse, og gang med 100 %." }
     ];
 
     /* En klassekammerats maaling, naar eleven ikke selv har titreret, og
@@ -94,7 +94,7 @@
 
     D.SITUATIONER = [
         { id: "vand", spm: "forbrug", B: { vand: 60 }, titel: "Mere vand", aendring: "60 mL vand",
-          tekst: "Kolbe B får 60 mL demineraliseret vand i stedet for 20 mL. Hvordan bliver forbruget af sølvnitrat i forhold til kolbe A?",
+          tekst: "Kolbe B får 60 mL demineraliseret vand i stedet for 20 mL. Hvordan bliver forbruget af sølv(I)nitrat i forhold til kolbe A?",
           valg: D.FORBRUG_VALG, rigtig: 1,
           forkert: [
               "Demineraliseret vand indeholder ikke chlorid, og Ag⁺ reagerer kun med Cl⁻.",
@@ -104,7 +104,7 @@
           hint: "Tilfører det demineraliserede vand chlorid til kolben?",
           efter: "Det samme. Stofmængden af chlorid er den samme i begge kolber. Mængden af vand er ikke en fejlkilde." },
         { id: "halv", spm: "forbrug", B: { m: 0.50 }, titel: "Mindre havvand", aendring: "0,50 g havvand",
-          tekst: "Kolbe B får 0,50 g havvand i stedet for 1,00 g. Hvordan bliver forbruget af sølvnitrat i forhold til kolbe A?",
+          tekst: "Kolbe B får 0,50 g havvand i stedet for 1,00 g. Hvordan bliver forbruget af sølv(I)nitrat i forhold til kolbe A?",
           valg: D.FORBRUG_VALG, rigtig: 2,
           forkert: [
               "Den halve masse havvand indeholder den halve stofmængde chlorid.",
@@ -123,8 +123,8 @@
           ],
           hint: "m% = m(NaCl) / m(prøve) · 100 %. Hvad sker der med tælleren, og hvad sker der med nævneren?",
           efter: "Den samme. Den halve masse NaCl divideres med den halve prøvemasse. En mindre prøve er ikke en fejlkilde." },
-        { id: "staerk", spm: "forbrug", B: { c: 0.100 }, titel: "Stærkere sølvnitrat", aendring: "0,100 M sølvnitrat",
-          tekst: "Buretten ved kolbe B indeholder 0,100 M sølvnitrat i stedet for 0,050 M. Hvordan bliver forbruget i forhold til kolbe A?",
+        { id: "staerk", spm: "forbrug", B: { c: 0.100 }, titel: "Stærkere sølv(I)nitrat", aendring: "0,100 M sølv(I)nitrat",
+          tekst: "Buretten ved kolbe B indeholder 0,100 M sølv(I)nitrat i stedet for 0,050 M. Hvordan bliver forbruget i forhold til kolbe A?",
           valg: D.FORBRUG_VALG, rigtig: 2,
           forkert: [
               "Koncentrationen er fordoblet, så det halve rumfang indeholder den samme stofmængde Ag⁺.",
@@ -166,7 +166,7 @@
        D.INTRO_TITRERING og D.ROS_TITRERING skrives af D.saetOrd, fordi
        farverne afhaenger af indikatoren. */
     D.INTRO_BEREGNING = [
-        { tekst: "I denne fane beregner du masseprocenten af natriumchlorid i havvandet ud fra forbruget af sølvnitrat. " +
+        { tekst: "I denne fane beregner du masseprocenten af natriumchlorid i havvandet ud fra forbruget af sølv(I)nitrat. " +
             "Tavlen viser de fire trin i beregningen, og hvert trin bliver skrevet færdigt, når du har regnet det.",
           sel: "#ber-anker-tavle" },
         { tekst: "Målingen øverst i panelet er din egen fra fane 1. " +
@@ -182,7 +182,7 @@
             "Kolbe A er som på fane 1, mens én ting er ændret ved kolbe B. " +
             "Skiltet under kolbe B viser ændringen.",
           felt: ["kolbeA", "kolbeB"] },
-        { tekst: "På kortet øverst i scenen vælger du, hvordan forbruget af sølvnitrat eller masseprocenten bliver for kolbe B i forhold til kolbe A, og trykker på Indsend svar. " +
+        { tekst: "På kortet øverst i scenen vælger du, hvordan forbruget af sølv(I)nitrat eller masseprocenten bliver for kolbe B i forhold til kolbe A, og trykker på Indsend svar. " +
             "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",
           sel: "#for-skort" },
         { tekst: "Når du har valgt et svar, bliver begge kolber titreret til omslaget. " +
@@ -193,12 +193,12 @@
     /* Ros, foerste gang en hel fane er klaret (én gang pr. browser). Det
        er sammen med paaskeaeggene de eneste gange, han kommer ind af sig
        selv (brugerens regel 4. nov. 2026). */
-    D.ROS_BEREGNING = "Du har beregnet masseprocenten ud fra forbruget i buretten. Saltet i havvandet er nu talt.";
+    D.ROS_BEREGNING = "Du har beregnet masseprocenten ud fra forbruget af sølv(I)nitrat. Saltet i havvandet er nu talt.";
     D.ROS_FORBRUG = "Du har gennemført alle seks opgaver om fejlkilder. Det blev til tolv kolber, og opvasken tager jeg ikke.";
 
     /* Paaskeaeggene: buretten er loebet tom, og et resultat, der rammer
        havvandets masseprocent paa hundrededelen */
-    D.BEM_TOM = "Du har tømt hele buretten. Sølvnitrat er ikke gratis.";
+    D.BEM_TOM = "Du har tømt hele buretten. Sølv(I)nitrat er ikke gratis.";
     D.AEG_PRAECIS = "Dit resultat rammer havvandets masseprocent på hundrededelen. Det har jeg aldrig selv gjort.";
 
     D.saetOrd(NK.Kemi ? NK.Kemi.indikator : "dcf");

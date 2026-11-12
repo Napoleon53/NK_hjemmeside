@@ -436,7 +436,7 @@
             var u = sim.ion, k = sim.kendt;
             var navn = u.sammensat ? u.navn : u.grund;
             return (u.sammensat ? "Du har ikke mødt " + navn + " endnu" : NK.stort(navn) + " kan have flere ladninger")
-                + ", men du kender ladningen på " + k.formel + ". Derfor kan du regne ladningen på " + navn + " ud.";
+                + ", men du kender ladningen på " + k.formel + ". Derfor kan du regne ladningen på " + (u.sammensat ? navn : navn + "ionen") + " ud.";
         }
         PU.laererStartReplik = function () { return startReplik(this); };
 

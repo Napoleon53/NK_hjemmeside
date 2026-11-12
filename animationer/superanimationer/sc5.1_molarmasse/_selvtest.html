@@ -216,7 +216,7 @@ function koerTest(W) {
         ["18,0", "H2O", /to decimaler/], ["180,2", "H2O", /kommaet/i], ["10", "H2O", /atomnumrene/],
         ["18,03", "H2O", /Tæt på/], ["16,00", "O2", /ganget O med 2/], ["28,01", "CO2", /ganget O med 2/],
         ["12,01", "CO2", /Bidraget fra O/], ["13,02", "CH4", /ganget H med 4/], ["100", "CaCO3", /to decimaler/],
-        ["58,1", "NaCl", /Læg rækkerne sammen|to decimaler/], ["x", "H2O", /Skriv et tal/]
+        ["58,1", "NaCl", /Læg tallene sammen|to decimaler/], ["x", "H2O", /Skriv et tal/]
     ];
     var mmFejl = FEJL_MM.filter(function (f) { var r = mm(f[0], f[1]); return r.ok || !f[2].test(r.besked || ""); });
     paastand(FEJL_MM.length + " typiske fejl i molarmassen giver den rigtige besked", mmFejl.length === 0,

@@ -26,7 +26,7 @@
             { sel: "#r-skort", titel: "Opgaven", tekst: "Skriv tallene i felterne på kortet, og tryk Indsend svar eller Enter." },
             { sel: "#r-anker-lineal", titel: "Linealen", tekst: "Hold musen over pladen. Den gule streg og luppen ved linealen hjælper dig med at aflæse. Et klik låser stregen." },
             { sel: "#r-anker-plade", titel: "TLC-pladen", tekst: "Startlinjen og væskefronten er tegnet med blyant. Afstandene måles fra startlinjen til midten af pletten." },
-            { sel: "#r-notes", titel: "Dine tal", tekst: "De tal, du finder, kommer her som pæne beregninger." },
+            { sel: "#r-notes", titel: "Dine tal", tekst: "De tal, du finder, bliver skrevet her som beregninger." },
             { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Fem opgaver. En opgave, du løser uden fejl og uden at se svaret, får en stjerne." }
         ],
         "fane-l": [

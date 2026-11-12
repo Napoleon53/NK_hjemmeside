@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="130" viewBox="0 0 80 130">
+  <!-- Reagensflaske af klart glas med skruelaag. Etiketten tegnes af
+       animationen ovenpaa: x 13-67, y 64-114. Vaesken staar fra y 48. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9d3e2" stop-opacity="0.55"/>
+      <stop offset="0.18" stop-color="#e8f3f9" stop-opacity="0.35"/>
+      <stop offset="0.5" stop-color="#f4f9fc" stop-opacity="0.18"/>
+      <stop offset="0.82" stop-color="#d5e6f0" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#9fbfd2" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="vaeske" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8d8ea" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#e2f0f8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#a9cde2" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1f2530"/>
+      <stop offset="0.35" stop-color="#4a5466"/>
+      <stop offset="0.6" stop-color="#2c3340"/>
+      <stop offset="1" stop-color="#161a22"/>
+    </linearGradient>
+  </defs>
+  <!-- skygge paa bordet -->
+  <ellipse cx="40" cy="126" rx="33" ry="3.5" fill="#000000" fill-opacity="0.18"/>
+  <!-- vaesken -->
+  <path d="M9 50 L71 50 L71 114 Q71 124 61 124 L19 124 Q9 124 9 114 Z" fill="url(#vaeske)"/>
+  <path d="M9 50 L71 50" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1.2"/>
+  <!-- glasset: krop, skuldre og hals -->
+  <path d="M30 22 L30 30 Q30 34 24 36 L14 39 Q7 41 7 49 L7 114 Q7 126 19 126 L61 126 Q73 126 73 114 L73 49 Q73 41 66 39 L56 36 Q50 34 50 30 L50 22 Z"
+        fill="url(#glas)" stroke="#7e9bb0" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- genskin -->
+  <path d="M13 50 L13 112 Q13 118 17 120" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3" stroke-linecap="round"/>
+  <path d="M66 54 L66 104" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+  <!-- laaget -->
+  <rect x="27" y="5" width="26" height="19" rx="3" fill="url(#laag)"/>
+  <g stroke="#ffffff" stroke-opacity="0.12" stroke-width="1">
+    <path d="M31 7 V22 M35 7 V22 M39 7 V22 M43 7 V22 M47 7 V22"/>
+  </g>
+  <rect x="26" y="21" width="28" height="4" rx="1.5" fill="#12161d"/>
+</svg>

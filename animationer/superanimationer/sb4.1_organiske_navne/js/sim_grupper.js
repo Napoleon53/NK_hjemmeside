@@ -109,7 +109,7 @@
         if (id === null) return;
         var gi = this.gruppeMed(id);
         if (gi < 0) {
-            this.kortBesked("Det carbonatom har kun carbon og hydrogen på sig. En funktionel gruppe har O eller N.", 4.5);
+            this.kortBesked("Det carbonatom har kun carbon og hydrogen som naboer. En funktionel gruppe har O eller N.", 4.5);
             return;
         }
         var g = this.b.grupper[gi], kl = K.klasse(g.klasse);
@@ -119,7 +119,7 @@
             this.fundet[gi] = true;
             this.bygTegning();
             if (this.erFaerdig()) { this.afslut(); return; }
-            this.godLinje("Endnu en gruppe af samme slags: " + kl.navn.toLowerCase() + ".");
+            this.godLinje("Endnu en gruppe, der gør stoffet til " + kl.ental + ".");
             this.visKort();
             return;
         }
@@ -158,7 +158,7 @@
         this.bygTegning();
         var b = { rigtig: D.KLASSER.map(function (k) { return k.id; }).indexOf(g.klasse), maade: vist ? "svar" : "selv" };
         if (this.erFaerdig()) { this.bliv = b; this.afslut(); return; }
-        b.tekst = K.stor(kl.har) + " er " + kl.ental + ".";
+        b.tekst = K.stor(kl.har) + " gør stoffet til " + kl.ental + ".";
         b.knap = "Find den næste gruppe →";
         b.videre = function () {
             this.valgt = null;
@@ -189,8 +189,8 @@
                 K.stor(b.navn) + " har " + D.TAL[n] + " funktionelle grupper. Du mangler " + (mangler === 1 ? "én" : D.TAL[mangler]) + "."];
         }
         var kl = K.klasse(b.grupper[this.valgt].klasse);
-        return ["Se på hele gruppen: hvad sidder der mere på det samme carbonatom?",
-            K.stor(kl.har) + " er " + kl.ental + "."];
+        return ["Se på hele gruppen. Hvad sidder der ellers på det samme carbonatom?",
+            K.stor(kl.har) + " gør stoffet til " + kl.ental + "."];
     };
 
     P.efterHint = function (n) {

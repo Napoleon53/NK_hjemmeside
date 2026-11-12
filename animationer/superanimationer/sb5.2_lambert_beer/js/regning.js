@@ -154,7 +154,7 @@
                 return { besked: "Bogstavet " + bogst[i].slice(1) + " bruges ikke her. Bogstaverne står under tavlen.", felt: i };
             }
             if (bogst[i] === t.maal) {
-                return { besked: R.vis(t.maal) + " er det, du skal finde. Det står alene på venstre side og skal ikke stå i formlen.", felt: i };
+                return { besked: R.vis(t.maal) + " er den størrelse, du skal finde. Den står alene på venstre side og skal ikke stå i formlen.", felt: i };
             }
         }
         if (tomme.length) return { tom: true, besked: "Der mangler et bogstav i et felt.", felt: tomme[0] };
@@ -165,7 +165,7 @@
             if (deler && !elevDeler) return { besked: "Formlen for " + navn + " er en brøk. Der skal divideres. Vælg en anden form." };
             if (!deler && elevDeler) return { besked: "Formlen for " + navn + " er et gangestykke. Der skal ikke divideres. Vælg en anden form." };
             if (t.form === "/**") return { besked: "Under brøkstregen skal der stå to bogstaver ganget sammen. Vælg formen □ / (□ · □)." };
-            if (t.form === "/") return { besked: "Formlen har ét bogstav over og ét under brøkstregen. Vælg formen □ / □." };
+            if (t.form === "/") return { besked: "Formlen for " + navn + " har ét bogstav over og ét under brøkstregen. Vælg formen □ / □." };
             if (t.form === "***") return { besked: "Formlen for " + navn + " har tre bogstaver ganget sammen. Vælg formen □ · □ · □." };
             return { besked: "Formlen for " + navn + " har to bogstaver ganget sammen. Vælg formen □ · □." };
         }
@@ -208,7 +208,7 @@
         }
         if (LB.ens(om.v, forventet, 0.006)) return { ok: true, tekst: R.talMedEnhed(b, V.tal[b].tekst) };
         if (om.faktor && om.faktor !== 1 && LB.ens(s.tal, forventet, 0.006)) {
-            return { besked: "Tallet passer, men enheden ikke: " + R.vis(b) + " = " + R.talMedEnhed(b, V.tal[b].tekst) + "." };
+            return { besked: "Tallet passer, men enheden er forkert: " + R.vis(b) + " = " + R.talMedEnhed(b, V.tal[b].tekst) + "." };
         }
         if (b === "V" && LB.ens(s.tal, forventet * 1000, 0.006)) {
             return { besked: "V skal stå i liter, fordi c er i mM = mmol/L: " + NK.dk(forventet * 1000, 0) + " mL = " + V.tal.V.tekst + " L." };
@@ -227,15 +227,15 @@
             ud.push({ v: v.eps * v.l / v.A, b: "Brøken er vendt. A skal stå over brøkstregen." });
             if (v.l !== 1) {
                 ud.push({ v: v.A / v.eps, b: "Du har kun divideret med ε. l = " + R.talMedEnhed("l", NK.dk(v.l, v.l < 1 ? 3 : 2)) + " skal også med under brøkstregen." });
-                ud.push({ v: v.A / v.eps * v.l, b: "Det ligner A / ε · l uden parentes. Så ganger lommeregneren med l. Sæt parentes om ε · l." });
+                ud.push({ v: v.A / v.eps * v.l, b: "Resultatet svarer til A / ε · l tastet uden parentes, så lommeregneren har ganget med l. Sæt parentes om ε · l." });
             }
         } else if (id === "eps") {
             ud.push({ v: v.A * v.l * v.c, b: "Du har ganget. ε står alene, når A divideres med l · c." });
             ud.push({ v: v.l * v.c / v.A, b: "Brøken er vendt. A skal stå over brøkstregen." });
-            ud.push({ v: v.A / v.l * v.c, b: "Det ligner A / l · c uden parentes. Så ganger lommeregneren med c. Sæt parentes om l · c." });
+            ud.push({ v: v.A / v.l * v.c, b: "Resultatet svarer til A / l · c tastet uden parentes, så lommeregneren har ganget med c. Sæt parentes om l · c." });
             if (v.l !== 1) ud.push({ v: v.A / v.c, b: "Du har kun divideret med c. l skal også med under brøkstregen." });
         } else if (id === "epsA") {
-            ud.push({ v: v.a * v.l, b: "Du har ganget. ε = a / l: hældningen divideres med l." });
+            ud.push({ v: v.a * v.l, b: "Du har ganget. ε = a / l, så hældningen skal divideres med l." });
             ud.push({ v: v.l / v.a, b: "Brøken er vendt. a skal stå over brøkstregen." });
         } else if (id === "A") {
             ud.push({ v: v.eps * v.c, b: "l mangler. A = ε · l · c." });
@@ -253,7 +253,7 @@
 
     var ENHED_FORKLARING = {
         A: "A har ingen enhed: mM⁻¹·cm⁻¹ · cm · mM = 1.",
-        c: "c får enheden mM: A har ingen enhed, og 1 / (mM⁻¹·cm⁻¹ · cm) = mM.",
+        c: "c får enheden mM, fordi A ikke har nogen enhed, og 1 / (mM⁻¹·cm⁻¹ · cm) = mM.",
         eps: "ε har enheden mM⁻¹·cm⁻¹. Den står efter feltet.",
         n: "n får enheden mmol: mM · L = mmol/L · L = mmol.",
         m: "m får enheden mg: mmol · g/mol = mg."
@@ -281,12 +281,12 @@
         if (LB.ens(om.v, f, 0.012)) return { ok: true };
         /* Enheden er skrevet, men 1000 gange forkert */
         if (om.faktor && om.faktor !== 1 && LB.ens(s.tal, f, 0.012)) {
-            return { besked: "Tallet passer, men enheden ikke. " + ENHED_FORKLARING[b] };
+            return { besked: "Tallet passer, men enheden er forkert. " + ENHED_FORKLARING[b] };
         }
         var fejl = fejlVaerdier(id, v);
         for (var k = 0; k < fejl.length; k++) if (LB.ens(om.v, fejl[k].v, 0.012)) return { besked: fejl[k].b };
-        if (LB.ens(om.v, f, 0.05)) return { besked: "Tæt på. Tjek afrundingen: regn med tallene, som de står, og afrund først til sidst." };
-        return { besked: "Ikke rigtigt. Tast mellemregningen på lommeregneren igen." };
+        if (LB.ens(om.v, f, 0.05)) return { besked: "Tæt på. Tjek afrundingen. Regn med tallene, som de står, og afrund først til sidst." };
+        return { besked: "Ikke rigtigt. Regn mellemregningen ud på lommeregneren igen." };
     };
 
     R.facitTekst = function (o, i) {
@@ -314,7 +314,7 @@
         A: ["Du kender ε, l og c og skal finde absorbansen A.", "Lambert-Beers lov giver A direkte: A = ε · …", "A = ε · l · c. Vælg formen □ · □ · □."],
         c: ["Du kender A, ε og l og skal finde koncentrationen c.", "Isolér c i A = ε · l · c: c = A / …", "c = A / (ε · l). Vælg formen □ / (□ · □)."],
         eps: ["Du kender A, l og c og skal finde ε.", "Isolér ε i A = ε · l · c: ε = A / …", "ε = A / (l · c). Vælg formen □ / (□ · □)."],
-        epsA: ["Du kender hældningen a og kuvettebredden l og skal finde ε.", "Standardkurven er A = a · c, og Lambert-Beers lov er A = ε · l · c. Så er a = ε · l.", "ε = a / l. Vælg formen □ / □."],
+        epsA: ["Du kender hældningen a og kuvettebredden l og skal finde ε.", "Standardkurven er A = a · c, og Lambert-Beers lov er A = ε · l · c. Derfor er a = ε · l.", "ε = a / l. Vælg formen □ / □."],
         n: ["Du kender koncentrationen c og rumfanget V og skal finde stofmængden n.", "n = c · …", "n = c · V. Vælg formen □ · □."],
         m: ["Du kender stofmængden n og molarmassen M og skal finde massen m.", "m = n · …", "m = n · M. Vælg formen □ · □."]
     };

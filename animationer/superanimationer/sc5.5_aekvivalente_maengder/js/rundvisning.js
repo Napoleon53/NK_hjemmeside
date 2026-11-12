@@ -36,7 +36,7 @@
         ],
         "fane-regn": [
             { sel: "#regn-anker-skema", titel: "Skemaet", tekst: "På Svær skriver du selv koefficienterne først." },
-            { sel: "#regn-anker-soejler", titel: "Søjlerne", tekst: "De stiplede blokke er koefficienterne. Den grønne søjle er den kendte stofmængde. Et rigtigt svar fylder netop sine blokke." },
+            { sel: "#regn-anker-soejler", titel: "Søjlerne", tekst: "De stiplede blokke viser koefficienterne. Den grønne søjle er den kendte stofmængde. Et rigtigt svar fylder netop sine blokke." },
             { sel: "#regn-felter", titel: "Felterne", tekst: "Skriv stofmængden i mol under hver formel, og tryk Enter eller Indsend svar." },
             { sel: "#regn-skort", titel: "Opgaven", tekst: "Indsend svar eller Enter sender feltet ind. Giv hint giver et hint og derefter svaret." },
             { sel: "#regn-beregninger", titel: "Beregningerne", tekst: "Når et svar er rigtigt, står beregningen her, som den skal skrives." },

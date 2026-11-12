@@ -71,8 +71,8 @@
         if (id === o.begr) return { ok: true };
         var ing = D.ingrediens(id), ops = o.ops, r = o.rakker[id];
         var faerrest = o.ops.led.every(function (l) { return l[0] === id || o.fyld[l[0]] > o.fyld[id]; });
-        if (faerrest) return { besked: "Der er færrest " + ing.flertal + ", men de rækker til " + D.produkt(ops, r) + ". Hvad rækker de andre til?" };
-        return { besked: D.stort(ing.bestemt) + " rækker til " + D.produkt(ops, r) + ". Hvad rækker de andre til?" };
+        if (faerrest) return { besked: "Der er færrest " + ing.flertal + ", men de rækker til " + D.produkt(ops, r) + ". Hvad rækker de andre ingredienser til?" };
+        return { besked: D.stort(ing.bestemt) + " rækker til " + D.produkt(ops, r) + ". Hvad rækker de andre ingredienser til?" };
     };
 
     /* Hvor mange stk. det, der ligger, rækker til */

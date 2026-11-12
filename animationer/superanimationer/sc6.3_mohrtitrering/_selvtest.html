@@ -151,8 +151,8 @@ function koerTest(W) {
         ["nb", "0,5325", /liter/], ["nb", "213", /divideret/], ["nb", "0,01065", /rumfanget/], ["nb", "0,05", /koncentrationen/],
         ["nb", "5,325e-7", /mL til L/],
         ["ns", "5,325e-4", true], ["ns", "2,6625e-4", /1 : 1/], ["ns", "0,03112", /masse/],
-        ["ms", "0,03112", true], ["ms", "0,0311", true], ["ms", "0,01888", /chlorid/], ["ms", "0,09046", /sølvnitrat/],
-        ["ms", "0,07632", /sølvchlorid/], ["ms", "9,112e-6", /divideret/], ["ms", "1", /hele prøvens/], ["ms", "0,3112", /kommaet/],
+        ["ms", "0,03112", true], ["ms", "0,0311", true], ["ms", "0,01888", /chlorid/], ["ms", "0,09046", /sølv\(I\)nitrat/],
+        ["ms", "0,07632", /sølv\(I\)chlorid/], ["ms", "9,112e-6", /divideret/], ["ms", "1", /hele prøvens/], ["ms", "0,3112", /kommaet/],
         ["pct", "3,11", true], ["pct", "3,0", /Tæt på/], ["pct", "0,0311", /100 %/], ["pct", "3213", /forkerte vej/],
         ["pct", "31,1", /kommaet/], ["pct", "x", /Skriv et tal/]
     ];
@@ -538,7 +538,7 @@ function koerTest(W) {
     paastand("teorien om dichlorfluorescein siger gulgrøn og lyserød og ikke rødbrun", /gulgrøn/.test(synligTeori) && /lyserød/.test(synligTeori) && !/rødbrun/.test(synligTeori));
     paastand("ingen tankestreger i de nye tekster", ![d.querySelector(".indikatorvalg").textContent, synligTeori, D.TITRER_HINT].concat(replikkerD).some(function (x) { return /[–—]/.test(x); }));
     NK.Rundvisning.start("fane-titrering");
-    paastand("rundvisningen nævner dichlorfluorescein ved kolben", /dichlorfluorescein, der farver den gulgrøn/.test(d.getElementById("rv-tekst").textContent), d.getElementById("rv-tekst").textContent);
+    paastand("rundvisningen nævner dichlorfluorescein ved kolben", /dichlorfluorescein, der farver væsken gulgrøn/.test(d.getElementById("rv-tekst").textContent), d.getElementById("rv-tekst").textContent);
     for (i = 0; i < 7; i++) d.getElementById("rv-naeste").click();
     paastand("rundvisningen har et trin om indikatoren", d.getElementById("rv-titel").textContent === "Indikatoren" &&
         /Dichlorfluorescein bruges i dag/.test(d.getElementById("rv-tekst").textContent), d.getElementById("rv-titel").textContent);

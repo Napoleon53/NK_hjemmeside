@@ -390,7 +390,7 @@
             if (!dele) praecis = C.gange(A, B);
             var n = Math.min(A.s.length, B.s.length);
             o = {
-                type: "regn", spm: "Regn ud, og afrund korrekt.",
+                type: "regn", spm: "Regn ud, og afrund svaret til det rigtige antal betydende cifre.",
                 a: sa, b: sb, A: A, B: B, op: dele ? "/" : "·",
                 praecis: C.lommeregner(praecis), n: n, facit: C.afrund(praecis, n),
                 mindst: A.s.length <= B.s.length ? sa : sb
@@ -423,12 +423,12 @@
         } while (retning === "potens" && C.iOmraade(t) && forsoeg < 50);
         if (retning === "almindelig") {
             return {
-                type: "almindelig", spm: "Skriv som almindeligt tal.",
+                type: "almindelig", spm: "Skriv tallet som et almindeligt tal.",
                 tal: t, n: sf, facit: t, vis: C.mantisse(t), eksp: pot
             };
         }
         return {
-            type: "potens", spm: "Skriv i videnskabelig notation med " + cifre(sf) + ".",
+            type: "potens", spm: "Skriv tallet i videnskabelig notation med " + cifre(sf) + ".",
             tal: t, n: sf, facit: t, vis: C.almindelig(t)
         };
     }
@@ -599,9 +599,9 @@
         var ikkeNul = mangler.some(function (i) { return cif.charAt(i) !== "0"; });
         var sidst = mangler.some(function (i) { return cif.charAt(i) === "0" && i > sidsteIkkeNul; });
         var midte = mangler.some(function (i) { return cif.charAt(i) === "0" && i < sidsteIkkeNul; });
-        if (ikkeNul) return { ok: false, besked: "Du mangler et ciffer, der ikke er nul. De tæller altid." };
+        if (ikkeNul) return { ok: false, besked: "Du mangler et ciffer, der ikke er nul. Cifre, der ikke er nul, tæller altid." };
         if (midte) return { ok: false, besked: "Du mangler et nul mellem to andre cifre. Det tæller med." };
-        if (sidst && komma) return { ok: false, besked: "Du mangler et nul til sidst. Et nul til sidst efter kommaet tæller med: det er målt." };
+        if (sidst && komma) return { ok: false, besked: "Du mangler et nul til sidst. Et nul til sidst efter kommaet tæller med, fordi det er målt." };
         if (sidst) return { ok: false, besked: "Du mangler nullerne til sidst. I et helt tal tæller de også med." };
         return { ok: false, besked: "Ikke helt. Tæl igen." };
     }
@@ -619,7 +619,7 @@
                 return { ok: false, besked: "Tallet er rigtigt, men " + C.skillerum(C.almindelig(u)) + " har " + cifre(k) +
                     ". Nullerne til sidst tæller med. Skriv det i videnskabelig notation, så de forsvinder." };
             }
-            if (faktorTekst) return { ok: false, besked: "Tallet er rigtigt, men svaret skal have " + cifre(n) + ", lige som " + faktorTekst + ". Dit har " + k + "." };
+            if (faktorTekst) return { ok: false, besked: "Tallet er rigtigt, men svaret skal have " + cifre(n) + ", lige som " + faktorTekst + ". Dit svar har " + k + "." };
             if (k < n) return { ok: false, besked: "Tallet er rigtigt, men det har kun " + cifre(k) + ". Det skal have " + n + ". Nuller til sidst efter kommaet tæller med." };
             return { ok: false, besked: "Tallet er rigtigt, men det har " + cifre(k) + ". Det skal have " + n + "." };
         }
@@ -636,7 +636,7 @@
         var dec = C.afrundVed(udgangspunkt, -n);
         if (udgangspunkt.p < 0 && dec.s && C.ens(u, dec)) {
             return { ok: false, besked: "Du har afrundet til " + n + " " + flertal(n, "decimal", "decimaler") +
-                ". Det er betydende cifre, der tælles, fra det første ciffer, der ikke er nul." };
+                ". Tæl betydende cifre fra det første ciffer, der ikke er nul, og ikke decimaler." };
         }
         var g = C.tiGange(u, f);
         if (g !== null) {
@@ -644,7 +644,7 @@
                 (g > 0 ? "stort" : "lille") + ". Afrunding ændrer ikke tallets størrelse." };
         }
         if (faktorTekst && C.ens(u, C.afrund(opg.praecis, Math.max(C.antal(opg.A), C.antal(opg.B))))) {
-            return { ok: false, besked: "Du har afrundet efter den mest præcise faktor. Det er den mindst præcise, der bestemmer." };
+            return { ok: false, besked: "Du har afrundet efter den mest præcise faktor. Den mindst præcise faktor bestemmer antallet af betydende cifre." };
         }
         if (k > n) return { ok: false, besked: "Dit tal har " + cifre(k) + ". Det skal have " + n + ". Tæl fra det første ciffer, der ikke er nul." };
         return { ok: false, besked: "Ikke rigtigt. Tæl " + n + " cifre fra det første, der ikke er nul, og se på det næste ciffer." };
@@ -653,7 +653,7 @@
     function tjekRegn(opg, sv) {
         var u = sv.tal;
         if (!C.ens(u, opg.facit) && C.ens(u, opg.praecis)) {
-            return { ok: false, besked: "Det er lommeregnerens tal. Afrund til " + cifre(opg.n) + ", lige som " + opg.mindst + "." };
+            return { ok: false, besked: "Du har skrevet lommeregnerens tal. Afrund til " + cifre(opg.n) + ", lige som " + opg.mindst + "." };
         }
         return tjekAfrund(opg, sv, opg.praecis, opg.n, opg.mindst);
     }
@@ -667,7 +667,7 @@
         var mt = sv.mantisse, godMantisse = mt.p === 0;
         if (C.ens(u, f)) {
             if (!godMantisse) return { ok: false, besked: "Værdien passer, men der skal stå ét ciffer (1 til 9) foran kommaet." };
-            if (C.antal(u) !== n) return { ok: false, besked: "Værdien passer, men tallet foran 10-tallet skal have " + cifre(n) + ". Dit har " + C.antal(u) + "." };
+            if (C.antal(u) !== n) return { ok: false, besked: "Værdien passer, men tallet foran 10-tallet skal have " + cifre(n) + ". Dit tal har " + C.antal(u) + "." };
             return { ok: true, besked: rigtigt(opg) };
         }
         if (godMantisse && kerne(mt) === kerne(f)) {
@@ -771,7 +771,7 @@
             return "Alle cifre tæller, undtagen nullerne foran det første ciffer, der ikke er nul. Også nuller til sidst tæller.";
         }
         if (opg.type === "afrund") {
-            return "Tæl " + opg.n + " cifre fra det første, der ikke er nul. Se så på det næste ciffer: er det 5 eller mere, rundes der op." +
+            return "Tæl " + opg.n + " cifre fra det første, der ikke er nul. Se så på det næste ciffer. Er det 5 eller mere, rundes der op." +
                 (C.kanAlmindelig(opg.facit) ? "" : " Et almindeligt tal får her for mange cifre, så skriv svaret i videnskabelig notation.");
         }
         if (opg.type === "regn") {
@@ -804,8 +804,8 @@
                 (C.kanAlmindelig(opg.facit) ? "" : " Et almindeligt tal ville få for mange cifre.");
         }
         if (opg.type === "regn") {
-            return "Lommeregneren giver " + C.html(opg.praecis) + ". Med " + cifre(opg.n) + ", lige som " + opg.mindst +
-                ": <b>" + C.html(opg.facit) + "</b>.";
+            return "Lommeregneren giver " + C.html(opg.praecis) + ". " + opg.mindst + " har " + cifre(opg.n) + ", så svaret bliver" +
+                " <b>" + C.html(opg.facit) + "</b>.";
         }
         if (opg.type === "potens") {
             var fl = opg.facit.p;
@@ -821,7 +821,7 @@
     };
 
     C.forklaring = function (opg) {
-        if (opg.type === "tael") return cifre(opg.facit) + ". " + nulSaetning(opg.vis);
+        if (opg.type === "tael") return "Tallet har " + cifre(opg.facit) + ". " + nulSaetning(opg.vis);
         if (opg.type === "afrund") {
             var d = C.naesteCiffer(opg.tal, opg.n);
             return "Det næste ciffer er " + d + ", så der rundes " + (d >= 5 ? "op" : "ned") + "." +

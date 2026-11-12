@@ -154,7 +154,7 @@
 
     function fejlLadning(st, v) {
         var q = st.q;
-        if (q === 0) return "Der står ingen ladning efter formlen. Så er stoffet neutralt, og ladningen er 0.";
+        if (q === 0) return "Der står ingen ladning efter formlen. Derfor er stoffet neutralt, og ladningen er 0.";
         if (er(v, 0)) return "Der står en ladning efter formlen: " + NK.ladningHaevet(q) + ". Den skal med.";
         if (er(v, -q)) return "Fortegnet er forkert. " + (q < 0 ? "⁻ betyder minus." : "⁺ betyder plus.");
         return "Ladningen står som det lille tal og tegn efter formlen: " + NK.ladningHaevet(q) + ".";
@@ -162,15 +162,15 @@
 
     function fejlFast(st, k, v) {
         var n = k === "O" ? st.nO : st.nH;
-        if (k === "O" && er(v, 2)) return "Fortegnet er forkert. O trækker hårdt i elektronerne, så tallet er negativt.";
-        if (k === "H" && er(v, -1)) return "Fortegnet er forkert. H afgiver sin elektron, så tallet er positivt.";
-        if (n > 1 && er(v, FAST[k] * n)) return "Tallet over " + k + " gælder ét " + k + "-atom, ikke alle " + n + ".";
+        if (k === "O" && er(v, 2)) return "Fortegnet er forkert. O trækker hårdt i elektronerne, så oxidationstallet er negativt.";
+        if (k === "H" && er(v, -1)) return "Fortegnet er forkert. H afgiver sin elektron, så oxidationstallet er positivt.";
+        if (n > 1 && er(v, FAST[k] * n)) return "Oxidationstallet over " + k + " gælder ét " + k + "-atom, ikke alle " + n + ".";
         return "Ikke rigtigt. " + k + " har det samme oxidationstal i næsten alle stoffer.";
     }
 
     function fejlX(st, v) {
         var X = st.X, n = st.nX, q = st.q, k = st.kendt, r = st.ox;
-        if (st.slags === "grundstof") return st.tekst + " er et grundstof. Der er intet andet atom at give elektronerne til, så tallet er 0.";
+        if (st.slags === "grundstof") return st.tekst + " er et grundstof. Der er intet andet grundstof at give elektronerne til, så oxidationstallet er 0.";
         if (st.slags === "ion") {
             if (er(v, -r)) return "Fortegnet er forkert. Ionen er " + st.tekst + ".";
             return "En ion af ét atom har ionens ladning som oxidationstal.";

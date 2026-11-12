@@ -202,7 +202,7 @@ function koerTest(W) {
     paastand("der er ingen linje nederst i scenen og intet opgavekort i panelet",
         !d.querySelector(".statuslinje") && !d.querySelector(".opgavekort") && !d.getElementById("r-tjek"));
     paastand("tælleren af bindinger er væk; forklaringen af stregerne står ved luppen",
-        !d.getElementById("e-ant-hb") && /Hydrogenbinding/.test(E.signatur.textContent) && /London-kraft/.test(E.signatur.textContent));
+        !d.getElementById("e-ant-hb") && /Hydrogenbinding/.test(E.signatur.textContent) && /Londonbinding/.test(E.signatur.textContent));
     paastand("Indsend svar er gråt, før termometeret er rørt", !indsendKlar(E) && /20 °C/.test(E.el.indsend.textContent.replace(/ /g, " ")));
     E.indsendKlik();
     paastand("Indsend svar før termometeret er rørt koster intet, men kortet blinker", !E.fejlet && !E.faerdig && blinker(E));
@@ -260,7 +260,7 @@ function koerTest(W) {
     paastand("et klik på et H vælger det (gul ring) uden at bedømme det og uden δ+ og δ−",
         E.opg.atom && E.opg.atom.e === "H" && !E.faerdig && !E.valgt && /valgt et H-atom/.test(E.beskedTekst()), E.beskedTekst());
     E.indsendKlik();
-    paastand("H på C sendt ind: rød linje om, at det sidder på C", !E.faerdig && /sidder på C/.test(E.beskedTekst()) && !E.opg.atom, E.beskedTekst());
+    paastand("H på C sendt ind: rød linje om, at det sidder på C", !E.faerdig && /sidder på et C-atom/.test(E.beskedTekst()) && !E.opg.atom, E.beskedTekst());
     E.P.verden(mL);
     var hO = E.P.F.donorer[0];
     E.klikScene({ x: L.x + mL.wx[hO] * s1, y: L.y + mL.wy[hO] * s1 });

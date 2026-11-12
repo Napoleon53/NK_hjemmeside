@@ -446,7 +446,7 @@
             var ea = d.a.n * d.a.e, eb = d.b.n * d.b.e;
             if (d.a.n || d.b.n) {
                 var lige = ea === eb && ea > 0;
-                var tekst = l.fase === "slut" || l.fase === "flyt" ? ea + " e⁻ er flyttet" : "afgiver " + ea + " e⁻ · plads til " + eb + " e⁻";
+                var tekst = l.fase === "slut" || l.fase === "flyt" ? ea + " e⁻ er overført" : "afgiver " + ea + " e⁻ · plads til " + eb + " e⁻";
                 ctx.font = T.font("700", 13);
                 ctx.textAlign = "center";
                 ctx.fillStyle = lige ? "#8ff0b4" : "#c8ced6";

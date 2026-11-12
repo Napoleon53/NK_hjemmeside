@@ -68,7 +68,7 @@
             baser: ["vand:1", "nh:3", "ac:0", "fo:0", "f:0"]
         },
         svaer: {
-            navn: "Svær", tekst: "amfolytter og flere hydroner",
+            navn: "Svær", tekst: "amfolytter og syrer med flere hydroner",
             flere: ["so4:2", "so4:1", "so4:0", "po4:3", "po4:2", "po4:1", "po4:0", "co3:2", "co3:1", "co3:0"],
             andre: ["vand:2", "vand:3", "vand:1", "nh:3", "nh:4", "ac:1", "ac:0"]
         }
@@ -133,35 +133,35 @@
        fast: a staar altid til venstre (den foerste opgave). */
     D.HYDRON = [
         { a: "cl:1", b: "vand:2", syre: "cl:1", fast: true,
-          tekst: "HCl er en syre. Træk dens H over på vandet.",
+          tekst: "HCl er en syre og kan afgive en hydron til vandmolekylet.",
           hint: "Tag fat i H'et på HCl, og slip det på vandmolekylet." },
         { a: "no3:1", b: "vand:2", syre: "no3:1",
-          tekst: "Salpetersyre giver også en hydron til vandet.",
+          tekst: "Salpetersyre afgiver en hydron til vandmolekylet.",
           hint: "H'et sidder på et O. Træk det over på vandmolekylet." },
         { a: "ac:1", b: "vand:2", syre: "ac:1",
-          tekst: "Eddikesyre har fire H. Kun ét af dem kan gives af.",
-          hint: "H'erne på C sidder fast. Det sure H sidder på O." },
+          tekst: "Eddikesyre har fire H, men kun ét af dem kan afgives som hydron.",
+          hint: "De tre H på C sidder fast. Det H, der kan afgives, sidder på O." },
         { a: "nh:3", b: "vand:2", syre: "vand:2",
           tekst: "Ammoniak er en base. Hvem er så syren?",
-          hint: "N har et frit elektronpar, der kan tage imod. Vandet giver et H." },
+          hint: "N har et frit elektronpar, der kan optage en hydron. Vandmolekylet afgiver et H." },
         { a: "cl:1", b: "nh:3", syre: "cl:1",
-          tekst: "Ingen vand denne gang. Hvem giver, og hvem tager imod?",
-          hint: "HCl er syren. N i NH₃ tager imod med sit frie elektronpar." },
+          tekst: "HCl og NH₃ reagerer uden vand. Hvem afgiver en hydron, og hvem optager den?",
+          hint: "HCl er syren. N i NH₃ tager imod hydronen med sit frie elektronpar." },
         { a: "vand:3", b: "vand:1", syre: "vand:3",
-          tekst: "To ioner. Hvem har en hydron at give af?",
-          hint: "OH⁻ kan kun tage imod. Træk et H fra H₃O⁺ over på OH⁻." },
+          tekst: "H₃O⁺ og OH⁻ er to ioner. Hvilken af dem kan afgive en hydron?",
+          hint: "OH⁻ kan kun tage imod en hydron. Træk et H fra H₃O⁺ over på OH⁻." },
         { a: "ac:1", b: "vand:1", syre: "ac:1",
           tekst: "Eddikesyre møder hydroxid.",
           hint: "Tag H'et på O i eddikesyren, og slip det på OH⁻." },
         { a: "co3:2", b: "vand:2", syre: "co3:2",
-          tekst: "Kulsyre har to sure H. Der flytter kun ét ad gangen.",
+          tekst: "Kulsyre kan afgive to hydroner, men der overføres kun én ad gangen.",
           hint: "Tag ét af H'erne på O, og slip det på vandmolekylet." },
         { a: "po4:3", b: "vand:2", syre: "po4:3",
-          tekst: "Phosphorsyre har tre. Stadig kun ét ad gangen.",
+          tekst: "Phosphorsyre kan afgive tre hydroner, men der overføres kun én ad gangen.",
           hint: "Tag ét af H'erne på O, og slip det på vandmolekylet." },
         { a: "co3:1", b: "vand:1", syre: "co3:1",
-          tekst: "Hydrogencarbonat kan begge dele. Hvad gør den her?",
-          hint: "OH⁻ kan kun tage imod. Så må HCO₃⁻ give sit H." }
+          tekst: "Hydrogencarbonationen kan både afgive og optage en hydron. Hvad gør HCO₃⁻ over for OH⁻?",
+          hint: "OH⁻ kan kun tage imod en hydron, så HCO₃⁻ må afgive sit H." }
     ];
 
     /* ----- Kemichael ---------------------------------------------------------------
@@ -172,9 +172,9 @@
        (CSS-selectorer; felterne paa laerredet er de usynlige .anker fra
        rundvisningen). Ingen vittigheder i praesentationen. */
     D.INTRO_HYDRON = [
-        { tekst: "I denne fane flytter du en hydron fra syren til basen i ti forskellige reaktioner. Du tager fat i et H på syren og slipper det på basen. De gule prikker på partiklerne er frie elektronpar.",
+        { tekst: "I denne fane overfører du en hydron fra syren til basen i ti forskellige reaktioner. Du tager fat i et H på syren og slipper det på basen. De gule prikker på partiklerne er frie elektronpar.",
           sel: "#hydron-anker-mol" },
-        { tekst: "Når hydronen er flyttet, viser reaktionsskemaet under partiklerne produkterne og de to syre-basepar. Kortet Syre-basepar samler parrene fra alle de reaktioner, du har løst.",
+        { tekst: "Når hydronen er overført, viser reaktionsskemaet under partiklerne produkterne og de to syre-basepar. Kortet Syre-basepar samler parrene fra alle de reaktioner, du har løst.",
           sel: ["#hydron-anker-skema", "#hydron-par-kort"] },
         { tekst: "Kortet øverst i scenen stiller opgaven, og knappen Giv hint giver først et hint og derefter svaret. Når hydronen er flyttet, trykker du Indsend svar. Tallene i panelet viser de ti reaktioner, og et klik på et tal skifter til en anden reaktion.",
           sel: ["#hydron-skort", "#hydron-kort"] }
@@ -200,7 +200,7 @@
        deres maal er ti i traek uden fejl. Det er de eneste gange, han
        kommer ind af sig selv, ud over paaskeaegget (brugerens regler
        4. nov. 2026). */
-    D.HYDRON_FAERDIG = "Du har flyttet en hydron i alle ti reaktioner. Ingen af hydronerne er blevet tabt på gulvet.";
+    D.HYDRON_FAERDIG = "Du har overført en hydron i alle ti reaktioner. Ingen af hydronerne er blevet tabt på gulvet.";
     D.ROS_PRODUKTER = "Du har fundet produkterne i ti reaktioner i træk uden fejl. Den rekord skriver jeg op.";
     D.ROS_PAR = "Du har fundet parrene i ti reaktioner i træk uden fejl. Den rekord skriver jeg op.";
 

@@ -204,7 +204,7 @@
             ctx.textAlign = "right";
             ctx.font = "10px 'Segoe UI', sans-serif";
             ctx.fillStyle = "#5f6570";
-            ctx.fillText(enhed + "  —  tid →", hoejre, h - 6);
+            ctx.fillText(enhed + "  ·  tid →", hoejre, h - 6);
         }
     };
 }());

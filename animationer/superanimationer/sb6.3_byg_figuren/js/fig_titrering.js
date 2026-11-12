@@ -42,9 +42,9 @@
         vb: [1160, 640],
         lag: [
             { navn: "Metoden og kurven", pladser: ["titrering", "titrerkurve"],
-              ros: "Ved en titrering dryppes base fra buretten ned i kolben. Titrerkurven viser pH undervejs." },
+              ros: "Ved en titrering tilsættes base fra buretten til kolben. Titrerkurven viser pH som funktion af det tilsatte rumfang." },
             { navn: "To punkter på kurven", pladser: ["ækvivalenspunkt", "halvækvivalenspunkt"],
-              ros: "Ved 25,0 mL har base og syre samme stofmængde. Ved det halve, 12,5 mL, er pH lig med pKₛ." },
+              ros: "Ved 25,0 mL har den tilsatte base og syren samme stofmængde. Ved 12,5 mL er der tilsat halvt så meget base, og pH er lig med pKₛ." },
             { navn: "Farveskiftet", pladser: ["indikator", "omslagsområde"],
               ros: "Phenolphthalein skifter farve fra pH 8,2 til 10,0. Omslagsområdet ligger i kurvens lodrette spring." }
         ],

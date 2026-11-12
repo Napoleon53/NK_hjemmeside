@@ -267,7 +267,7 @@
               fejl: [["n/v1", "V_før er pipettens rumfang. Stoffet fordeles i kolbens rumfang V_efter."],
                      ["v2/n", "Brøken er vendt om. Stofmængden står øverst."],
                      ["n*v2", "Koncentrationen er stofmængde divideret med rumfang, ikke ganget."],
-                     ["c1*v2/v1", "Forholdet er vendt om. Kolbens rumfang V_efter står under brøkstregen."]] },
+                     ["c1*v2/v1", "V_før og V_efter er byttet om. Kolbens rumfang V_efter står under brøkstregen."]] },
         n2: { fane: 4, maal: "n", kendt: ["c2", "v2"], alias: { c: "c2", v: "v2", n1: "n", n2: "n" },
               fejl: [["c2/v2", "Stofmængden er koncentration gange rumfang, ikke divideret."],
                      ["v2/c2", "Stofmængden er koncentration gange rumfang, ikke divideret."]] },
@@ -278,14 +278,14 @@
         V2: { fane: 4, maal: "v2", kendt: ["n", "c1", "v1", "c2"], alias: { c: "c2", v: "v2", n1: "n", n2: "n" },
               fejl: [["c2/n", "Brøken er vendt om. Stofmængden står øverst."],
                      ["n*c2", "Rumfanget er stofmængde divideret med koncentration, ikke ganget."],
-                     ["n/c1", "c_før er koncentrationen før. V_efter skal give den nye koncentration c_efter."]] },
+                     ["n/c1", "c_før er koncentrationen før fortyndingen. Brug c_efter, den koncentration, du skal ende med."]] },
         vand: { fane: 4, maal: "W", kendt: ["v1", "v2", "n", "c1", "c2"], alias: { n1: "n", n2: "n" },
-                fejl: [["v2", "Det er hele rumfanget efter. Der er allerede V_før i glasset."],
-                       ["v1-v2", "Omvendt. V_efter er det største rumfang, så det står først."],
-                       ["v2+v1", "Der skal trækkes fra. V_før er der allerede."]] },
+                fejl: [["v2", "V_efter er hele rumfanget efter fortyndingen. Der er allerede V_før i glasset."],
+                       ["v1-v2", "V_før og V_efter er byttet om. V_efter er det største rumfang og skal stå først."],
+                       ["v2+v1", "Der skal trækkes fra, for V_før er allerede i glasset."]] },
         c2f: { fane: 4, maal: "c2", kendt: ["c1", "v1", "v2", "n"], alias: { c: "c2", v: "v2", n1: "n", n2: "n" },
-               fejl: [["c1*v2/v1", "Forholdet er vendt om. Kolbens rumfang V_efter står under brøkstregen."],
-                      ["c1*v1", "Det er stofmængden. Del med V_efter."],
+               fejl: [["c1*v2/v1", "V_før og V_efter er byttet om. Kolbens rumfang V_efter står under brøkstregen."],
+                      ["c1*v1", "c_før · V_før er stofmængden. Divider med V_efter."],
                       ["c1", "Det er koncentrationen i flasken. Efter fortyndingen er den mindre."]] }
     };
     T.REGLER = F;
@@ -504,7 +504,7 @@
                         K.mL(L.mL) + " mL = " + K.L(L.mL) + " L.", talOk: true };
                 }
                 if (L.slags === "V" && t.rumfang === "ens" && f && f.vEnhed && f.vEnhed !== s.enhed) {
-                    return { besked: "Skriv begge rumfang i samme enhed, fx begge i mL.", talOk: true };
+                    return { besked: "Skriv begge rumfang i samme enhed, for eksempel begge i mL.", talOk: true };
                 }
                 return { ok: true, led: ledige[k], enhed: s.enhed };
             }
@@ -513,10 +513,10 @@
             L = led[ledige[k]];
             /* Et rumfang med den forkerte af de to enheder: 250 L for 250 mL */
             if (L.slags === "V" && s.enhed === "L" && naer(s.v, L.mL)) {
-                return { besked: "Tjek enheden: det er " + K.mL(L.mL) + " mL, og det er " + K.L(L.mL) + " L.", talOk: true };
+                return { besked: "Tjek enheden. Rumfanget er " + K.mL(L.mL) + " mL, som er det samme som " + K.L(L.mL) + " L.", talOk: true };
             }
             if (L.slags === "V" && s.enhed === "mL" && naer(s.v, L.v) && !naer(L.v, L.mL)) {
-                return { besked: "Tjek enheden: det er " + K.L(L.mL) + " L, og det er " + K.mL(L.mL) + " mL.", talOk: true };
+                return { besked: "Tjek enheden. Rumfanget er " + K.L(L.mL) + " L, som er det samme som " + K.mL(L.mL) + " mL.", talOk: true };
             }
             if (naer(s.v, L.v) || (L.slags === "V" && naer(s.v, L.mL))) {
                 if (!s.enhed) return { besked: "Tallet er rigtigt. Skriv også enheden efter tallet.", talOk: true };
@@ -531,7 +531,7 @@
             var A = led[j];
             if (!(naer(s.base, A.v) || naer(s.v, A.v) || (A.slags === "V" && naer(s.v, A.mL)))) continue;
             if (t.op === "/") return { besked: "Brøken er vendt om. " + stort(D.NAVN[led[0].sym]) + " står øverst, som i formlen." };
-            if (t.op === "-") return { besked: "Omvendt. " + stort(D.NAVN[led[0].sym]) + " står først, som i formlen." };
+            if (t.op === "-") return { besked: "Tallene er byttet om. " + stort(D.NAVN[led[0].sym]) + " står først, som i formlen." };
             if (t.op === "*/") {
                 return { besked: i === 2 ? "Under brøkstregen står " + D.NAVN[led[2].sym] + ", som i formlen." :
                     "Over brøkstregen står " + D.NAVN[led[0].sym] + " og " + D.NAVN[led[1].sym] + ", som i formlen." };
@@ -584,7 +584,7 @@
         switch (id) {
         case "c":
             return [[f.n / VmL, ML], [VL / f.n, "Brøken er vendt om. c = n / V."], [f.n * VL, "Du har ganget. c = n / V."],
-                    [f.n, "Det er stofmængden. Del den med rumfanget."],
+                    [f.n, "Det er stofmængden. Divider den med rumfanget."],
                     [t.m !== undefined ? t.m / VL : NaN, "Brug stofmængden n, ikke massen m."],
                     [t.m !== undefined ? t.m / VmL : NaN, "Brug stofmængden n, ikke massen m."]];
         case "n_cV":
@@ -603,7 +603,7 @@
             return glemt;
         case "n_mM":
             return [[t.m * st.Mv, "Du har ganget. n = m / M."], [st.Mv / t.m, "Brøken er vendt om. n = m / M."],
-                    [t.m, "Det er massen. Del den med molarmassen."]];
+                    [t.m, "Det er massen. Divider den med molarmassen."]];
         case "m":
             return [[f.n / st.Mv, "Du har divideret. m = n · M."], [st.Mv / f.n, "Du har divideret. m = n · M."],
                     [t.c * st.Mv, "Det er c · M. Brug stofmængden n."], [f.n * 1000 * st.Mv, "Tjek stofmængden. Rumfanget skal være i liter."]];
@@ -615,7 +615,7 @@
             return [[f.n1 / t.V2, "Rumfanget skal være i liter: " + K.mL(t.V2) + " mL = " + K.L(t.V2) + " L."],
                     [f.n1 / (t.V1 / 1000), "V_før er pipettens rumfang. Stoffet fordeles i kolbens rumfang V_efter."],
                     [f.c1, "Det er koncentrationen i flasken. Efter fortyndingen er den mindre."],
-                    [f.c1 * t.V2 / t.V1, "Forholdet er vendt om. Koncentrationen bliver mindre, når der kommer vand til."],
+                    [f.c1 * t.V2 / t.V1, "V_før og V_efter er byttet om. Koncentrationen bliver mindre, når der kommer vand til."],
                     [(t.V2 / 1000) / f.n1, "Brøken er vendt om. c_efter = n / V_efter."]];
         case "n2":
             return [[t.c2 * t.V2, "Rumfanget skal være i liter: " + K.mL(t.V2) + " mL = " + K.L(t.V2) + " L."],
@@ -627,13 +627,13 @@
         case "V2":
             return [[t.c2 / f.n1, "Brøken er vendt om. V_efter = n / c_efter."],
                     [f.n1 / f.c1, "Brug c_efter, den koncentration, du skal ende med."],
-                    [f.vand / 1000, "Det er vandet. Her skal du finde hele rumfanget efter."]];
+                    [f.vand / 1000, "Det er rumfanget af vandet. Her skal du finde hele rumfanget efter fortyndingen."]];
         case "vand":
             return [[f.V2 / 1000, "Det er hele rumfanget efter. Der er allerede " + K.mL(t.V1) + " mL i glasset."],
                     [(f.V2 + t.V1) / 1000, "Der skal trækkes fra: V_efter − V_før."]];
         case "c2f":
-            return [[f.c1 * t.V2 / t.V1, "Forholdet er vendt om. Kolbens rumfang V_efter står under brøkstregen."],
-                    [f.c1 * t.V1, "Del med V_efter."], [f.c1 * t.V1 / 1000, "Det er stofmængden. Del med V_efter i liter."],
+            return [[f.c1 * t.V2 / t.V1, "V_før og V_efter er byttet om. Kolbens rumfang V_efter står under brøkstregen."],
+                    [f.c1 * t.V1, "Divider med V_efter."], [f.c1 * t.V1 / 1000, "Det er stofmængden. Divider med V_efter i liter."],
                     [f.c1, "Det er koncentrationen i flasken. Efter fortyndingen er den mindre."]];
         }
         return [];
@@ -655,7 +655,7 @@
             if (s.enhed === "lilleM") return { besked: "Tallet er rigtigt. Skriv M med stort. Lille m er massen.", talOk: true };
             if (R.slags === "V" && s.slags === "V") {
                 var mL = R.facit * 1000;
-                return { besked: "Tjek enheden: det er " + K.L(mL) + " L, og det er " + K.mL(mL) + " mL.", talOk: true };
+                return { besked: "Tjek enheden. Rumfanget er " + K.L(mL) + " L, som er det samme som " + K.mL(mL) + " mL.", talOk: true };
             }
             return { besked: "Tallet er rigtigt, men " + RES_NAVN[R.slags] + " måles i " + ENHED_NAVN[R.slags] + ", ikke i " + s.raaEnhed +
                 ". Enhederne: " + ENHEDSREGNING[id] + ".", talOk: true };
@@ -671,7 +671,7 @@
         }
         if (kommaFlyttet(s.base, R.facit)) return { besked: "Tjek kommaet. Tallet er " + (s.base > R.facit ? "for stort." : "for lille.") };
         if (R.absTol ? Math.abs(s.base - R.facit) <= 1 : naer(s.base, R.facit, 0.04)) {
-            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, fx O = 16,00." : "Tæt på. Regn med alle cifrene." };
+            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, for eksempel O = 16,00." : "Tæt på. Regn med alle cifrene." };
         }
         return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };

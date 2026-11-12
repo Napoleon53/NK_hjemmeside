@@ -83,12 +83,12 @@
 
             { id: "standardkurve", ord: ["standardkurve"], x: KS.x + KS.b / 2, y: KS.y, maal: [KS.x + KS.b / 2, KS.y], titel: true, dele: ["ramme"],
               omr: [{ r: [KS.x - 4, KS.y - 4, KS.b + 8, KS.h + 8, 18], tom: true }],
-              fejl: { absorbans: "<b>absorbans</b> er tallet på den lodrette akse. Overskriften gælder hele grafen med punkterne og linjen.",
+              fejl: { absorbans: "<b>absorbans</b> er størrelsen på den lodrette akse. Overskriften gælder hele grafen med punkterne og linjen.",
                       kompleks: "<b>kompleks</b> er det lilla stof. Overskriften gælder hele grafen med punkterne og linjen." } },
             { id: "absorbans", ord: ["absorbans"], x: 262, y: 400, maal: [G.xa, G.ya + 8], dele: ["akse"],
               omr: [{ linje: [[G.xa, G.ya - 6], [G.xa, G.yb]], b: 18 }],
               fejl: { standardkurve: "<b>standardkurve</b> er hele grafen. Pladsen peger kun på den lodrette akse.",
-                      kompleks: "<b>kompleks</b> er det lilla stof. Pladsen peger på den lodrette akse, hvor et tal uden enhed står." } }
+                      kompleks: "<b>kompleks</b> er det lilla stof. Pladsen peger på den lodrette akse, hvor en størrelse uden enhed står." } }
         ],
 
         tegn: function (api) {

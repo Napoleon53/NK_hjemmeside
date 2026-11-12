@@ -215,10 +215,10 @@ function koerTest(W) {
     paastand("før og efter kan skrives cfør, c før, c_før, c(før) og c1", ["cfør", "c før", "c_før", "c(før)", "c1", "cfoer"].every(function (x) { var b = T.bogstav(x); return b && b.s === "c1"; }) &&
         ["Vefter", "V efter", "V_efter", "V2"].every(function (x) { var b = T.bogstav(x); return b && b.s === "v2"; }));
     paastand("c_efter = c_før · V_før / V_efter i skabelonen □ · □ / □ er rigtig", ff("c2f", "*/", ["c_før", "V_før", "V_efter"]).ok);
-    paastand("V_efter og V_før byttet om: forholdet er vendt om", /vendt/.test(ff("c2f", "*/", ["c_før", "V_efter", "V_før"]).besked || ""));
+    paastand("V_efter og V_før byttet om", /byttet om/.test(ff("c2f", "*/", ["c_før", "V_efter", "V_før"]).besked || ""));
     paastand("n = c · V uden før godkendes i fortyndingen (c og V er før)", ff("n1", "*", ["c", "V"]).ok);
     paastand("c_efter = n / V_før: V_før er pipettens rumfang", /pipettens/.test(ff("c2", "/", ["n", "V_før"]).besked || ""));
-    paastand("V_vand = V_før − V_efter: omvendt", /Omvendt/.test(ff("vand", "-", ["V_før", "V_efter"]).besked || ""));
+    paastand("V_vand = V_før − V_efter: omvendt", /byttet om/.test(ff("vand", "-", ["V_før", "V_efter"]).besked || ""));
     paastand("c_efter · V_efter i trinnet n = c_før · V_før: c_efter kender du ikke", /kender du ikke/.test(ff("n1", "*", ["c_efter", "V_efter"]).besked || ""));
 
     overskrift("4. Tallene med enheder");
@@ -340,7 +340,7 @@ function koerTest(W) {
     mus(A, "pointerup", h.knap.x, h.knap.y);
     paastand("hanen stopper selv ved 0,80 L, og opgave 2 er løst", A.kar.V === 800 && A.faerdig, A.kar.V);
     paastand("et forkert gæt bliver rødt på det grønne kort og forklaret ved knappen Næste opgave, og skiltet er væk",
-        !!skort.querySelector(".kt-gaet.forkert") && /Dit gæt holdt ikke\. Vandet gør ikke stoffet mere/.test(ren(skort.querySelector(".kt-tekst"))) &&
+        !!skort.querySelector(".kt-gaet.forkert") && /Dit gæt holdt ikke\. Der kom kun vand i/.test(ren(skort.querySelector(".kt-tekst"))) &&
         !!videreA() && skilte() === "", ren(skort));
     vaelgA(2);
     gaetKnap("Den er den samme").click();
@@ -375,7 +375,7 @@ function koerTest(W) {
     for (var v = 0; v < 9; v++) tryk(A, h.knap.x, h.knap.y);
     tik(A, 0.1);
     paastand("for meget vand kan ikke reddes: ingen skilte, Start forfra lyser op, og linjen siger det",
-        A.kar.V === 850 && skilte() === "" && A.el.forfra.classList.contains("peg") && /Der er for meget i karret\. Tryk på Start forfra\./.test(besked(A)), skilte() + " " + besked(A));
+        A.kar.V === 850 && skilte() === "" && A.el.forfra.classList.contains("peg") && /Der er for meget opløsning i karret\. Tryk på Start forfra\./.test(besked(A)), skilte() + " " + besked(A));
     A.forfra();
     tik(A, 0.1);
     paastand("Start forfra: karret som ved start, skiltene er tilbage, og knappen lyser ikke", A.kar.V === 400 && skilte() === "krukke+vand" && !A.el.forfra.classList.contains("peg"), skilte());
@@ -509,7 +509,7 @@ function koerTest(W) {
         /^Svaret Begge har 0,20 mol/.test(blivT()) && /^Næste spørgsmål/.test(videreG().textContent), ren(gkort));
     d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     paastand("Enter går videre: svaret er væk, og det næste spørgsmål kommer", G.spmNr === 1 && /spm/.test(gkort.className) && !/Svaret/.test(ren(gkort)), G.spmNr);
-    paastand("0,50 M betyder 0,50 mol pr. liter vand", D.GLAS[1].spm[1].svar.filter(function (x) { return x.ok; })[0].t === "0,50 mol pr. liter vand");
+    paastand("0,50 M betyder 0,50 mol pr. liter opløsning", D.GLAS[1].spm[1].svar.filter(function (x) { return x.ok; })[0].t === "0,50 mol pr. liter opløsning");
 
     G.vaelg(2, false);
     G.layout();

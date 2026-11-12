@@ -280,7 +280,7 @@ function koerTest(W) {
     e3.videreKlik();
     paastand("trin 4: ved hvilken pH vandrer alle tre mod minuspolen?", e3.trinNr === 3 && e3.fase === "spm");
     e3.valgt = 2; e3.indsendKlik();
-    paastand("pH 13: alle tre er negative", /negative/.test(besked(e3)), besked(e3));
+    paastand("pH 13: alle tre er negative", /negativt ladede/.test(besked(e3)), besked(e3));
     e3.knap(); e3.knap(); e3.knap();
     paastand("hintknappen giver to hint og til sidst svaret, som koster stjernen", !!e3.groen && e3.groen.maade === "svar" && e3.groen.knap === "Næste trin →" && !e3.status.loest);
     tid(e3, 3.5);

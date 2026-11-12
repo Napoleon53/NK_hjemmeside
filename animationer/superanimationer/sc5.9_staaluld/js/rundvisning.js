@@ -16,10 +16,10 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Her står opgaven, og linjen siger, hvad du skal nu. Et tal fra vægten skriver du i feltet på kortet og sender med Indsend svar. Den gule knap giver et hint og derefter svaret." },
-            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Stålulden ligger på en varmefast plade, og vægten er nulstillet med pladen. Den viser altså kun stålulden." },
+            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Her står opgaven, og linjen siger, hvad du skal gøre nu. Et tal fra vægten skriver du i feltet på kortet og sender med Indsend svar. Den gule knap giver et hint og derefter svaret." },
+            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Stålulden ligger på en varmefast plade, og vægten er nulstillet med pladen. Vægten viser derfor kun massen af stålulden." },
             { sel: "#forsoeg-anker-braender", titel: "Bunsenbrænderen", tekst: "Klik på brænderen, så tænder den stålulden. Du kan også trække den hen, så flammen rører stålulden." },
-            { sel: "#forsoeg-anker-flaske", titel: "Flasken med dioxygen", tekst: "I luft går stålulden ud, før alt jernet har reageret. Klik på flasken, mens den gløder, så mere af jernet når at reagere." },
+            { sel: "#forsoeg-anker-flaske", titel: "Flasken med dioxygen", tekst: "I luft går stålulden ud, før alt jernet har reageret. Klik på flasken, mens stålulden gløder, så mere af jernet når at reagere." },
             { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Overfladen af en ståltråd. Dioxygen fra luften sætter sig på jernatomerne. Dinitrogen reagerer ikke." },
             { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Dine tal for m(før) og m(efter) i begge målinger. De bruges på fanen Beregningen." },
             { sel: "#forsoeg-forfra", titel: "Start forfra", tekst: "Knappen i panelet lægger en ny klump ståluld på vægten." },
@@ -29,7 +29,7 @@
             { sel: "#beregning-kort", titel: "Kortet", tekst: "Her står, hvad du skal finde, og linjen siger, hvilket trin du er ved. Indsend svar tjekker det, du har skrevet." },
             { sel: "#beregning-anker-tavle", titel: "Skemaet på tavlen", tekst: "Reaktionsskemaet med masse, molarmasse og stofmængde under hvert stof. Tallene, du kender, står der. De tre spørgsmålstegn regner du ud, ét ad gangen." },
             { sel: "#beregning-raekker", titel: "Regnestykket", tekst: "Skriv først formlen, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed. Enter i et felt er det samme som Indsend svar." },
-            { sel: "#beregning-skift", titel: "Let eller Svær", tekst: "Let regner med FeO. Svær regner med Fe₃O₄, som er det oxid, der mest dannes. Så er forholdet ikke 1 : 1." },
+            { sel: "#beregning-skift", titel: "Let eller Svær", tekst: "Let regner med FeO. Svær regner med Fe₃O₄, som er det oxid, der mest dannes. Med Fe₃O₄ er forholdet ikke 1 : 1." },
             { sel: "#beregning-anker-soejler", titel: "Søjlerne", tekst: "Stålulden før, det vægten viste bagefter, og det, du regner ud. Den røde del er det dioxygen, der har bundet sig." },
             { sel: "#beregning-opgaver", titel: "Opgaverne", tekst: "De to målinger fra forsøget. Har du ikke målt selv, bruges et eksempel." }
         ]

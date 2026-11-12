@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proteiner</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>Proteiner</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-p" role="tab" aria-selected="true"><span class="nr">1</span>Peptidbindingen</button>
+        <button class="faneknap" data-fane="fane-f" role="tab" aria-selected="false"><span class="nr">2</span>Foldningen</button>
+        <button class="faneknap" data-fane="fane-d" role="tab" aria-selected="false"><span class="nr">3</span>Denaturering og hydrolyse</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: PEPTIDBINDINGEN                                            -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-p" role="tabpanel" aria-label="Peptidbindingen">
+    <div class="scene">
+        <canvas id="p-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="p-skort">
+            <div class="sk-ind" id="p-ind"></div>
+            <div class="sk-bund" id="p-status">
+                <p class="st-tekst" id="p-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="p-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="p-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="p-anker-formel"></div>
+        <div class="anker" id="p-anker-vand"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="p-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="p-maerke"></span></h2>
+            <ol class="trinliste" id="p-trin"></ol>
+            <button class="knap igenknap" id="p-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="p-om">
+            <h2>Om formlerne</h2>
+            <p class="note-tekst">Formlerne er tegnet som i bogen. Carbonatomerne sidder i hjørnerne af zigzaggen, og hydrogenatomerne på carbonatomerne er ikke tegnet. Peptidbindingen står i en grøn kasse.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FOLDNINGEN                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-f" role="tabpanel" aria-label="Foldningen">
+    <div class="scene">
+        <canvas id="f-laerred"></canvas>
+        <div class="scenekort" id="f-skort">
+            <div class="sk-ind" id="f-ind"></div>
+            <div class="sk-bund" id="f-status">
+                <p class="st-tekst" id="f-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="f-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="f-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="f-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="f-maerke"></span></h2>
+            <ol class="trinliste" id="f-trin"></ol>
+            <button class="knap igenknap" id="f-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="f-om">
+            <h2>Om figurerne</h2>
+            <p class="note-tekst">Det grønne rør er peptidkæden, og de røde prikker er hydrogenbindinger. Kuglerne er sidekæderne: grå er C, hvid H, rød O, blå N og gul S. En rød glød er en positiv ladning og en blå glød en negativ.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: DENATURERING OG HYDROLYSE                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-d" role="tabpanel" aria-label="Denaturering og hydrolyse">
+    <div class="scene">
+        <canvas id="d-laerred"></canvas>
+        <div class="scenekort" id="d-skort">
+            <div class="sk-ind" id="d-ind"></div>
+            <div class="sk-bund" id="d-status">
+                <p class="st-tekst" id="d-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="d-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="d-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="d-anker-tavle"></div>
+        <div class="anker" id="d-anker-glas"></div>
+        <div class="anker" id="d-anker-lup"></div>
+        <div class="anker" id="d-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="d-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="d-maerke"></span></h2>
+            <ol class="trinliste" id="d-trin"></ol>
+            <button class="knap blaa" id="d-nyt" type="button" hidden>Nyt glas æggehvide</button>
+            <button class="knap igenknap" id="d-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="d-om">
+            <h2>Om forsøget</h2>
+            <p class="note-tekst">Proteinet i luppen er tegnet som i fane 2. Den gule disulfidbro er en elektronparbinding mellem to svovlatomer. Den orange kugle er en hydron, H⁺.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Proteiner</h2>
+        <h3 class="teori-hoved">Peptidbindingen</h3>
+        <p>To aminosyrer kondenserer, når carboxylgruppen i den ene reagerer med aminogruppen i den anden, og der fraspaltes vand. Bindingen mellem C og N kaldes en peptidbinding. En kæde har en N-ende med den frie aminogruppe og en C-ende med den frie carboxylgruppe, og rækkefølgen skrives fra N-enden.</p>
+        <h3 class="teori-hoved">Fire niveauer af struktur</h3>
+        <p>Den primære struktur er rækkefølgen af aminosyrer. Den sekundære struktur er α-helix og β-foldeblad, som holdes sammen af hydrogenbindinger mellem C=O og N−H i kæden. Den tertiære struktur er hele kædens foldning, og den kvaternære struktur er placeringen af flere kæder i forhold til hinanden.</p>
+        <h3 class="teori-hoved">Bindingerne mellem sidekæderne</h3>
+        <p>Den tertiære struktur holdes sammen af hydrogenbindinger mellem polære sidekæder, ionbindinger mellem en sur og en basisk sidekæde, londonbindinger mellem upolære sidekæder og disulfidbroer mellem to sidekæder fra cystein. Disulfidbroen er den stærkeste.</p>
+        <h3 class="teori-hoved">Denaturering og hydrolyse</h3>
+        <p>Ved denaturering brydes de svage bindinger, og proteinet mister sin form, men kæden er hel. Det sker ved varme, ved syre og base, med ethanol og med ioner af tungmetaller. Ved hydrolyse spalter vand peptidbindingerne, og kæden bliver til aminosyrer. I fordøjelsen katalyseres hydrolysen af enzymer som pepsin og trypsin.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> skyderen &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/protein.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_peptid.js"></script>
+<script src="js/sim_fold.js"></script>
+<script src="js/sim_denat.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

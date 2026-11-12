@@ -82,11 +82,11 @@
         vb: [1160, 706],
         lag: [
             { navn: "Opbygningen", pladser: ["aminosyre", "sidekæde", "essentiel aminosyre"],
-              ros: "En aminosyre har −NH₂ og −COOH på samme carbonatom. Sidekæden R gør dem forskellige, og ni af dem er essentielle." },
+              ros: "En aminosyre har −NH₂ og −COOH på samme carbonatom. Sidekæden R gør de 20 aminosyrer forskellige, og ni af dem er essentielle." },
             { navn: "Sidekæderne", pladser: ["upolær sidekæde", "polær sidekæde", "sur sidekæde", "basisk sidekæde"],
-              ros: "Sidekæden kan være upolær, polær, sur eller basisk. Det afgør, hvordan proteinet senere folder sig." },
+              ros: "Sidekæden kan være upolær, polær, sur eller basisk. Sidekædernes egenskaber afgør, hvordan proteinet senere folder sig." },
             { navn: "Amfoionen", pladser: ["amfoion", "fordelingsdiagram", "isoelektrisk punkt"],
-              ros: "I vand er aminosyren en amfoion. Fordelingsdiagrammet viser de tre former, og ved det isoelektriske punkt er næsten alt amfoioner." }
+              ros: "I vand er aminosyrer amfoioner. Fordelingsdiagrammet viser de tre former, og ved det isoelektriske punkt er næsten alle amfoioner." }
         ],
         pladser: [
             titel("aminosyre", KG, ["skabelon"], {
@@ -104,7 +104,7 @@
                 "upolær sidekæde": "<b>upolær sidekæde</b> er en slags R. Kortet viser de ni aminosyrer, vi skal have fra maden." }),
 
             titel("upolær sidekæde", KU, ["upol"], {
-                "polær sidekæde": SIDE_FEJL.p + "CH₃ og CH har ingen OH-gruppe.",
+                "polær sidekæde": SIDE_FEJL.p + "Sidekæderne i alanin og valin har ingen OH-gruppe.",
                 "sur sidekæde": SIDE_FEJL.s + "Se på R i alanin og valin.",
                 "basisk sidekæde": SIDE_FEJL.b + "Se på R i alanin og valin." }),
             titel("polær sidekæde", KP, ["pol"], {
@@ -130,7 +130,7 @@
                 amfoion: "<b>amfoion</b> er én af formerne. Kortets titel er navnet på hele grafen med de tre kurver." }, KD.x + KD.b - 135),
             { id: "isoelektrisk punkt", ord: ["isoelektrisk punkt"], x: DX(PI), y: KD.y + 40, maal: [DX(PI), DG.ya - 6], dele: ["iso"],
               omr: [{ r: [DX(PI) - 10, DG.ya - 12, 20, DG.yb - DG.ya + 12, 8] }],
-              fejl: { amfoion: "<b>amfoion</b> er en partikel. Pladsen peger på den pH, hvor næsten alt er amfoioner med samlet ladning 0.",
+              fejl: { amfoion: "<b>amfoion</b> er en partikel. Pladsen peger på den pH, hvor næsten alle molekyler er amfoioner med samlet ladning 0.",
                       "fordelingsdiagram": "<b>fordelingsdiagram</b> er hele grafen. Pladsen peger på én pH midt mellem de to pKₛ-værdier." } }
         ],
 

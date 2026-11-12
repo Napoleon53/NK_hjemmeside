@@ -39,9 +39,9 @@
         vb: [1100, 720],
         lag: [
             { navn: "Enzymet", pladser: ["enzym", "substrat", "aktivt center", "inhibitor"],
-              ros: "Substratet passer i enzymets aktive center som en nøgle i en lås. En inhibitor sætter sig i vejen." },
+              ros: "Substratet passer i enzymets aktive center som en nøgle i en lås. En inhibitor blokerer det aktive center." },
             { navn: "Varmen", pladser: ["optimum", "denaturere"],
-              ros: "Enzymet arbejder hurtigst ved sit optimum. Bliver det varmere, denaturerer enzymet og mister sin form." }
+              ros: "Enzymet arbejder hurtigst ved sit optimum. Ved højere temperatur denaturerer enzymet og mister sin form." }
         ],
         pladser: [
             { id: "enzym", ord: ["enzym"], x: 420, y: KE1.y + 280, maal: [E1.x + R * 0.86, E1.y + R * 0.5], dele: ["enzym1"],
@@ -67,7 +67,7 @@
 
             { id: "optimum", ord: ["optimum"], x: KT.x + 145, y: KT.y + 52, maal: [TX(TOPT) - 9, TY(AMAX)], dele: ["graf"],
               omr: [{ c: [TX(TOPT), TY(AMAX), 15] }],
-              fejl: { denaturere: "<b>denaturere</b> er det, der sker, når det bliver for varmt. Pladsen peger på toppen, hvor enzymet arbejder hurtigst.",
+              fejl: { denaturere: "<b>denaturere</b> er det, der sker med et enzym ved for høj temperatur. Pladsen peger på toppen, hvor enzymet arbejder hurtigst.",
                       inhibitor: "<b>inhibitor</b> er et stof. Pladsen peger på en temperatur, toppen af kurven." } },
             { id: "denaturere", ord: ["denaturere"], x: UD.x, y: KT.y + 100, maal: [UD.x + 22, UD.y - 28], dele: ["udfoldet"],
               omr: [{ r: [UD.x - 64, UD.y - 32, 124, 62, 10] }],
@@ -84,7 +84,7 @@
                 fuld: function (g) {
                     KV.kort(g, KE1.x, KE1.y, KE1.b, KE1.h);
                     var e = KV.enzym(g, E1.x, E1.y, R);
-                    KV.tekst(g, E1.x, KE1.y + KE1.h - 20, "Det passer som en nøgle i en lås.", { fs: 14.5 });
+                    KV.tekst(g, E1.x, KE1.y + KE1.h - 20, "Substratet passer som en nøgle i en lås.", { fs: 14.5 });
                     return { e: e.g };
                 },
                 byg: function (g, r, an) { an.pop(r.e, 0, 500); }

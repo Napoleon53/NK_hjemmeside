@@ -253,9 +253,9 @@
         var st = R.led[P.v].st;
         if (v === null || isNaN(v)) return "Skriv et tal i feltet ved " + P.E + ".";
         v = Math.abs(v);
-        if (P.nV > 1 && v === P.delta * P.nV) return "Det er for alle " + P.nV + " " + P.E + " i " + st.tekst + ". Her skal du bruge ét atom.";
-        if (v === Math.abs(P.til) || v === Math.abs(P.fra)) return "Det er et oxidationstal. Brug forskellen fra " + ox(P.fra) + " til " + ox(P.til) + ".";
-        return P.E + " går fra " + ox(P.fra) + " til " + ox(P.til) + ". Tæl trinene.";
+        if (P.nV > 1 && v === P.delta * P.nV) return "Dit tal gælder alle " + P.nV + " " + P.E + " i " + st.tekst + ". Her skal du bruge ét atom.";
+        if (v === Math.abs(P.til) || v === Math.abs(P.fra)) return "Dit tal er et oxidationstal. Brug forskellen fra " + ox(P.fra) + " til " + ox(P.til) + ".";
+        return P.E + " går fra " + ox(P.fra) + " til " + ox(P.til) + ". Find forskellen mellem de to oxidationstal.";
     }
 
     /* ----- Beregninger, der vises som svar ------------------------------------------ */

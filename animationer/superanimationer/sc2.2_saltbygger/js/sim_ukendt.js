@@ -207,7 +207,7 @@
         this.besked("");
         NK.saetHTML("ukendt-opgavetekst", o.side === "kat"
             ? "Formlen er <b>" + salt.formel + "</b>. " + NK.stort(this.ion.grund)
-                + " kan have flere ladninger. Hvilken ladning har " + this.ion.grund + " her?"
+                + " kan have flere ladninger. Hvilken ladning har " + this.ion.grund + "ionen her?"
             : "Formlen er <b>" + salt.formel + "</b>. " + this.ion.formel
                 + " er en sammensat ion, du ikke kender. Hvilken ladning har den?");
         this.saetKnap("start");
@@ -320,8 +320,8 @@
             tekst = this.opvejTekst() + " Træk i kortet med ?, eller tryk på +.";
         } else {
             var mangler = kat ? plus < minus : minus < plus;
-            tekst = "<b>" + NK.fortegn(plus) + "</b> og <b>" + NK.fortegn(-minus) + "</b>: "
-                + (mangler ? "der mangler " + tegn + ". Træk kortet bredere." : "for meget " + tegn + ". Træk kortet smallere.");
+            tekst = "<b>" + NK.fortegn(plus) + "</b> og <b>" + NK.fortegn(-minus) + "</b> går ikke lige op. "
+                + (mangler ? "Der mangler " + tegn + ", så træk kortet bredere." : "Der er for meget " + tegn + ", så træk kortet smallere.");
         }
         this.besked("<b>Ikke endnu.</b> " + tekst, "skidt");
     };

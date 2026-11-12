@@ -380,7 +380,7 @@
         });
 
         NK.tekst(ctx,
-            "Gassen bliver brunere, når [NO₂] stiger — samme princip som Lambert-Beers lov.",
+            "Gassen bliver brunere, når [NO₂] stiger. Det følger af Lambert-Beers lov.",
             bx0, by1 + 22, { farve: "#8d95a1", font: "12px 'Segoe UI', sans-serif" });
 
         NK.tekst(ctx, NK.tal(t.n1) + " × N₂O₄", bx0, by1 + 42, {

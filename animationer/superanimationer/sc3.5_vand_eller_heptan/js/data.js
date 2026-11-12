@@ -265,7 +265,7 @@
             svar: D.POL_SVAR, rigtig: "polaert",
             hint: "Et molekyle med en negativ og en positiv ende kaldes polært.",
             ros: "Rigtigt. Vand er polært.",
-            fejl: "Nej. Vandmolekylet har en negativ og en positiv ende. Så er det polært."
+            fejl: "Nej. Vandmolekylet har en negativ og en positiv ende, så vand er polært."
         },
         {
             id: "heptan", kort: "heptan", spm: "Er heptan polært eller upolært?",
@@ -273,7 +273,7 @@
             svar: D.POL_SVAR, rigtig: "upolaert",
             hint: "Et molekyle uden en negativ og en positiv ende kaldes upolært.",
             ros: "Rigtigt. Heptan er upolært.",
-            fejl: "Nej. Heptan har ingen ladede ender. Så er det upolært."
+            fejl: "Nej. Heptanmolekylet har ingen ladede ender, så heptan er upolært."
         },
         {
             id: "regel", kort: "begge", spm: "Hvad blandes et polært stof med?",

@@ -167,7 +167,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
             hintPol: "Find forskellen i elektronegativitet mellem C og H i tabellen.",
-            svarPol: "Forskellen er kun 0,4, så C-H-bindingerne er upolære, og der er intet træk. Methan er upolært."
+            svarPol: "Forskellen i elektronegativitet er kun 0,4, så C-H-bindingerne er upolære, og der er intet træk. Methan er upolært."
         },
         {
             id: "CO2", navn: "carbondioxid", form: "lineaer", centrum: 1, vinkel: [0, 1, 2],
@@ -263,7 +263,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1]],
             hintPol: "Find forskellen i elektronegativitet mellem H og Cl i tabellen.",
-            svarPol: "Forskellen er 0,9, så bindingen er polær, og der er ingen andre bindinger til at ophæve trækket. HCl er polært."
+            svarPol: "Forskellen i elektronegativitet er 0,9, så bindingen er polær, og der er ingen andre bindinger til at ophæve trækket. HCl er polært."
         }
     ];
 
@@ -385,19 +385,19 @@ window.NK = NK;
     /* ----- Teoriboksen ------------------------------------------------------ */
     D.TEORI = [
         { h: "Elektronegativitet",
-          p: ["Elektronegativitet er et tal for, hvor hårdt et atom trækker i elektronparrene i sine bindinger.",
-              "Den stiger mod højre i en periode og op ad en hovedgruppe. Fluor har den største, 4,0."] },
+          p: ["Elektronegativitet er et mål for, hvor kraftigt et atom trækker i de fælles elektronpar i sine bindinger.",
+              "Elektronegativiteten stiger mod højre i en periode og opad i en hovedgruppe. Fluor har den største elektronegativitet, 4,0."] },
 
         { h: "Tre slags bindinger",
-          p: ["<b>ΔEN under 0,5:</b> upolær binding. Atomerne deler elektronparret lige.",
-              "<b>ΔEN fra 0,5 op til 2,0:</b> polær binding. Elektronparret ligger tættest på det mest elektronegative atom, der bliver δ−. Det andet atom bliver δ+.",
+          p: ["<b>ΔEN under 0,5:</b> upolær binding. Atomerne deler elektronparret ligeligt.",
+              "<b>ΔEN fra 0,5 til under 2,0:</b> polær binding. Elektronparret ligger tættest på det mest elektronegative atom, der bliver δ−. Det andet atom bliver δ+.",
               "<b>ΔEN på 2,0 eller mere:</b> ionbinding. Det ene atom tager elektronerne helt, og der dannes ioner."] },
 
         { h: "δ+ og δ−",
           p: ["δ betyder en lille smule. Atomerne i en polær binding har en lille ladning, ikke en hel. Molekylet som helhed er neutralt."] },
 
         { h: "Polære molekyler",
-          p: ["Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. Så har molekylet en positiv og en negativ ende.",
+          p: ["Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. Molekylet har da en positiv og en negativ ende.",
               "CO₂ og CCl₄ har polære bindinger, men er symmetriske og derfor upolære."] },
 
         { h: "Vandstrålen og den ladede stav",

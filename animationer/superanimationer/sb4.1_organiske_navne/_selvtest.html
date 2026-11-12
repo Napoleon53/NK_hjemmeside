@@ -588,7 +588,7 @@ function koerTest(W) {
     svar("g", "Carboxylsyre");
     videre("g").click();
     klikAtom(G, cg[1].o);
-    paastand("citronsyre: den anden carboxylgruppe skal kun klikkes på", G.valgt === null && G.antalFundet() === 2 && /samme slags/.test(G.beskedTekst()), G.beskedTekst());
+    paastand("citronsyre: den anden carboxylgruppe skal kun klikkes på", G.valgt === null && G.antalFundet() === 2 && /Endnu en gruppe/.test(G.beskedTekst()), G.beskedTekst());
 
     G.vaelg(G.idx("ethyl-3-oxobutanoat"));
     var est = G.b.grupper.filter(function (g) { return g.klasse === "ester"; })[0];

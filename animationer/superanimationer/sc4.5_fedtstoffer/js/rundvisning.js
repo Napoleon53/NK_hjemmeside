@@ -18,23 +18,23 @@
     var TURE = {
         "fane-fabrik": [
             { sel: "#fabrik-anker-fliser", titel: "Fedtsyrerne", tekst: "Fire fedtsyrer med 18 C-atomer. Træk en op på glycerol, eller klik på den." },
-            { sel: "#fabrik-anker-glycerol", titel: "Glycerol", tekst: "En alkohol med tre OH-grupper. Hver kan binde én fedtsyre. Der dannes ét vandmolekyle pr. binding." },
+            { sel: "#fabrik-anker-glycerol", titel: "Glycerol", tekst: "Glycerol er en alkohol med tre OH-grupper, og hver OH-gruppe kan binde én fedtsyre. Der dannes ét vandmolekyle pr. binding." },
             { sel: "#fabrik-skort", titel: "Ordren", tekst: "Kunden siger, hvor fedtet skal være fast eller flydende. Tryk Indsend svar, når der sidder tre fedtsyrer på glycerol." },
             { sel: "#fabrik-ordrer", titel: "Ordrerne", tekst: "De fem ordrer. Et flueben viser, at ordren er leveret." },
-            { sel: "#fabrik-fedt-kort", titel: "Dit fedtstof", tekst: "Smeltepunktet og tilstanden fire steder i køkkenet. Grøn: som kunden vil have det." },
+            { sel: "#fabrik-fedt-kort", titel: "Dit fedtstof", tekst: "Kortet viser smeltepunktet og tilstanden fire steder i køkkenet. Grøn betyder, at fedtet er, som kunden vil have det." },
             { sel: "#fabrik-anker-glas", titel: "Glasset", tekst: "Dit fedtstof ved 20 °C. Det følger med over på fane 2." },
-            { sel: "#fabrik-forfra", titel: "Start forfra", tekst: "Ordre 1 igen, og glycerol bliver tom." },
+            { sel: "#fabrik-forfra", titel: "Start forfra", tekst: "Knappen starter forfra med ordre 1 og tager fedtsyrerne af glycerol." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Esterbindingen, mættet og umættet fedt og knækkene kort forklaret." },
-            { sel: ".faneknapper", titel: "Køleskabet", tekst: "Fane 2: sæt fedtstofferne i fryseren, køleskabet, på bordet eller i solen." }
+            { sel: ".faneknapper", titel: "Køleskabet", tekst: "På fane 2 sætter du fedtstofferne i fryseren, i køleskabet, på bordet eller i solen." }
         ],
         "fane-koele": [
             { sel: "#koele-anker-bord", titel: "Glassene", tekst: "Fem fedtstoffer fra køkkenet og dit eget fra fane 1. Træk et glas et andet sted hen." },
             { sel: "#koele-anker-skab", titel: "Fryser og køleskab", tekst: "Fryseren er −18 °C og køleskabet 5 °C. Der er plads til to glas hvert sted." },
             { sel: "#koele-anker-vindue", titel: "I solen", tekst: "I vindueskarmen er det 35 °C." },
-            { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Det valgte glas set helt tæt på. Hver kæde er en fedtsyre i sin farve. Faste molekyler ligger i rækker." },
-            { sel: "#koele-skort", titel: "Opgaven", tekst: "Gæt først: fast, delvist fast eller flydende. Tryk Indsend svar, så flytter glasset derhen." },
-            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Fedtsyrerne i det valgte glas: mættede, monoumættede og polyumættede." },
-            { sel: "#koele-forfra", titel: "Start forfra", tekst: "Alle opgaver i køkkenet igen, og glassene kommer tilbage på bordet." }
+            { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Zoomvinduet viser molekylerne i det valgte glas helt tæt på. Hver kæde er en fedtsyre i sin farve, og molekylerne i fast fedt ligger i rækker." },
+            { sel: "#koele-skort", titel: "Opgaven", tekst: "Gæt først, om fedtet er fast, delvist fast eller flydende. Når du trykker Indsend svar, flytter glasset hen til det sted, opgaven nævner." },
+            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Varedeklarationen viser, hvor mange af fedtsyrerne i det valgte glas der er mættede, monoumættede og polyumættede." },
+            { sel: "#koele-forfra", titel: "Start forfra", tekst: "Knappen starter alle opgaver i køkkenet forfra, og glassene kommer tilbage på bordet." }
         ]
     };
 

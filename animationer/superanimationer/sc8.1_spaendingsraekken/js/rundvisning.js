@@ -16,13 +16,13 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#fs-anker-holder", titel: "Stængerne", tekst: "Fem metaller. Træk en stang ned i et glas. Et klik på en stang i et glas sender den hjem." },
+            { sel: "#fs-anker-holder", titel: "Stængerne", tekst: "Fem metaller. Træk en stang ned i et glas. Et klik på en stang i et glas sætter den tilbage på plads." },
             { sel: "#fs-anker-glas", titel: "Glassene", tekst: "Opløsninger med fem slags metalioner og saltsyre, H⁺. Ionen står på skiltet." },
             { sel: "#fs-anker-lup", titel: "Luppen", tekst: "Stangen og opløsningen, set helt tæt på. Klik på et glas for at se det." },
             { sel: "#fs-skort", titel: "Kortet", tekst: "Målet, du er ved. Giv hint giver et hint og derefter svaret. Indsend svar sender dit svar." },
             { sel: "#fs-skemakort", titel: "Skemaet", tekst: "Hvert forsøg bliver skrevet ind: ✓ for en reaktion, – for ingen." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Spændingsrækken kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Rækken: stil metallerne i rækkefølge. Forudsig: brug rækken, før stangen kommer ned." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Rækken: stil metallerne i rækkefølge. Forudsig: brug spændingsrækken, før stangen kommer ned." }
         ],
         "fane-raekken": [
             { sel: "#rk-anker-kort", titel: "Kortene", tekst: "De fem metaller fra forsøget og hydrogen." },

@@ -176,7 +176,7 @@
         if (V <= 0) return kar.nTot > 0 ? "Pulveret ligger tørt. Hæld vand i." : "Karret er tomt.";
         var man = this.mangler();
         if (kar.nFast() > 0) {
-            return "Der kan ikke opløses mere i så lidt vand. Resten ligger på bunden. " +
+            return "Der kan ikke opløses mere i så lidt vand. Resten af stoffet ligger på bunden. " +
                 (man.forfra ? "Tryk på Start forfra." : "Hæld vand i.");
         }
         var dele = [];
@@ -186,7 +186,7 @@
             dele.push(man.forfra ? "Koncentrationen er for høj. Tryk på Start forfra." :
                 "Koncentrationen er for høj. Hæld vand i, eller tryk på Start forfra.");
         } else if (man.forfra) {
-            dele.push(m.V !== undefined && V > m.V ? "Der er for meget i karret. Tryk på Start forfra." :
+            dele.push(m.V !== undefined && V > m.V ? "Der er for meget opløsning i karret. Tryk på Start forfra." :
                 "Der er for meget stof i karret. Tryk på Start forfra.");
         }
         return dele.join(" ");
@@ -392,7 +392,7 @@
             return true;
         }
         if (u === "kar") this.kortBesked("Træk en skefuld fra krukken hertil, eller brug hanerne.");
-        if (u === "zoom") this.kortBesked("Luppen viser altid lige meget væske. Flere prikker er en højere koncentration.");
+        if (u === "zoom") this.kortBesked("Luppen viser altid lige meget væske. Flere prikker i luppen betyder en højere koncentration.");
         return false;
     };
 

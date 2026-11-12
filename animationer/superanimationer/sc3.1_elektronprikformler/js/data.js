@@ -47,9 +47,9 @@
 
     /* Paaskeaegget: et klik paa en aedelgas i det periodiske system */
     D.AEDELGAS = {
-        He: "Helium har allerede 2 elektroner i sin skal og deler dem ikke med nogen. Det er derfor, en heliumballon ikke brænder.",
+        He: "Helium har allerede 2 elektroner i sin skal og deler dem ikke med nogen. Derfor brænder en heliumballon ikke.",
         Ne: "Neon har 8 elektroner i yderste skal og danner ingen bindinger. Neon har allerede det, de andre atomer prøver at få.",
-        Ar: "Argon har 8 elektroner i yderste skal. Næsten 1 % af luften er argon, og det reagerer ikke med noget.",
+        Ar: "Argon har 8 elektroner i yderste skal. Næsten 1 % af luften er argon, og argon reagerer ikke med noget.",
         Kr: "Krypton har 8 elektroner i yderste skal og er lige så tilfreds som de andre ædelgasser."
     };
 
@@ -59,7 +59,7 @@
     D.MOLEKYLER = [
         {
             id: "h2", f: "H₂", navn: "dihydrogen", atomer: [1, 1], om: 0,
-            bygt: "Alle elektroner er parret. De to hydrogenatomer deler 1 elektronpar: en enkeltbinding.",
+            bygt: "Alle elektroner er parret. De to hydrogenatomer deler 1 elektronpar i en enkeltbinding.",
             facit: { pos: [[0, 0], [1, 0]], b: [[0, 1, 1]] },
             hint: ["Hvert hydrogenatom har 1 uparret elektron. Træk den ene hen på den anden, så deler de to atomer et elektronpar."]
         },
@@ -90,38 +90,38 @@
         },
         {
             id: "co2", f: "CO₂", navn: "carbondioxid", atomer: [8, 6, 8], om: 1,
-            bygt: "Alle elektroner er parret. Carbon deler 2 elektronpar med hvert oxygenatom: to dobbeltbindinger.",
+            bygt: "Alle elektroner er parret. Carbon deler 2 elektronpar med hvert oxygenatom, så der er to dobbeltbindinger.",
             facit: { pos: [[-1, 0], [0, 0], [1, 0]], b: [[0, 1, 2], [1, 2, 2]] },
             hint: ["Carbon har 4 uparrede elektroner, og hvert oxygenatom har 2. Carbon skal derfor dele 2 elektronpar med hvert oxygenatom.",
                 "Når carbon og oxygen deler ét elektronpar, så træk endnu en uparret elektron fra carbon hen på samme oxygenatom. Så bliver det en dobbeltbinding."]
         },
         {
             id: "ch2o", f: "CH₂O", navn: "methanal (formaldehyd)", atomer: [1, 6, 8, 1], om: 2,
-            bygt: "Alle elektroner er parret. Carbon og oxygen deler 2 elektronpar: en dobbeltbinding.",
+            bygt: "Alle elektroner er parret. Carbon og oxygen deler 2 elektronpar i en dobbeltbinding.",
             facit: { pos: [[-1, 0], [0, 0], [0, -1], [1, 0]], b: [[0, 1, 1], [1, 2, 2], [1, 3, 1]] },
             hint: ["Hydrogen kan kun danne én binding, så et hydrogenatom kan ikke sidde mellem to andre atomer. Begynd med at binde de to hydrogenatomer til carbon.",
-                "Med to hydrogenatomer har carbon 2 uparrede elektroner tilbage, og oxygen har 2. Carbon og oxygen deler 2 elektronpar: en dobbeltbinding."]
+                "Med to hydrogenatomer har carbon 2 uparrede elektroner tilbage, og oxygen har 2. Carbon og oxygen deler 2 elektronpar i en dobbeltbinding."]
         },
         {
             id: "n2", f: "N₂", navn: "dinitrogen", atomer: [7, 7], om: 0,
-            bygt: "Alle elektroner er parret. De to nitrogenatomer deler 3 elektronpar: en tripelbinding.",
+            bygt: "Alle elektroner er parret. De to nitrogenatomer deler 3 elektronpar i en tripelbinding.",
             facit: { pos: [[0, 0], [1, 0]], b: [[0, 1, 3]] },
             hint: ["Hvert nitrogenatom har 3 uparrede elektroner. Hvor mange elektronpar skal de to nitrogenatomer så dele?",
                 "Træk alle tre uparrede elektroner fra det ene nitrogenatom over på det andet, én ad gangen. Så bliver det en tripelbinding."]
         },
         {
             id: "hcn", f: "HCN", navn: "hydrogencyanid", atomer: [1, 6, 7], om: 1,
-            bygt: "Alle elektroner er parret. Carbon og nitrogen deler 3 elektronpar: en tripelbinding.",
+            bygt: "Alle elektroner er parret. Carbon og nitrogen deler 3 elektronpar i en tripelbinding.",
             facit: { pos: [[-1, 0], [0, 0], [1, 0]], b: [[0, 1, 1], [1, 2, 3]] },
             hint: ["Hydrogen danner 1 binding, carbon 4 og nitrogen 3. Hvilket atom kan sidde i midten?",
-                "Carbon sidder i midten. Bind hydrogen til carbon, og lad carbon og nitrogen dele 3 elektronpar: en tripelbinding."]
+                "Carbon sidder i midten. Bind hydrogen til carbon, og lad carbon og nitrogen dele 3 elektronpar i en tripelbinding."]
         },
         {
             id: "c2h2", f: "C₂H₂", navn: "ethyn", atomer: [1, 6, 6, 1], om: 1,
-            bygt: "Alle elektroner er parret. De to carbonatomer deler 3 elektronpar: en tripelbinding.",
+            bygt: "Alle elektroner er parret. De to carbonatomer deler 3 elektronpar i en tripelbinding.",
             facit: { pos: [[-1, 0], [0, 0], [1, 0], [2, 0]], b: [[0, 1, 1], [1, 2, 3], [2, 3, 1]] },
             hint: ["Hvert carbonatom binder ét hydrogenatom. Hvor mange uparrede elektroner har hvert carbonatom så tilbage?",
-                "Hvert carbonatom har 3 uparrede elektroner tilbage. De to carbonatomer deler 3 elektronpar: en tripelbinding."]
+                "Hvert carbonatom har 3 uparrede elektroner tilbage. De to carbonatomer deler 3 elektronpar i en tripelbinding."]
         }
     ];
 
@@ -140,13 +140,13 @@
         },
         {
             f: "HCl", atomer: [1, 17], pos: [[0, 0], [1, 0]], b: [[0, 1, 1]], frie: { 1: 4 },
-            hint: "Chlor har 7 elektroner i yderste skal, og 1 af dem er med i bindingen. Hvor mange frie skal der så være?",
+            hint: "Chlor har 7 elektroner i yderste skal, og 1 af dem er med i bindingen. Hvor mange frie elektronpar skal der så være?",
             forklaring: "Chlor har kun 6 elektroner omkring sig. Med tre frie elektronpar har det 8."
         },
         {
             f: "H₂O", atomer: VAND.atomer, pos: VAND.pos, b: VAND.b,
             hint: "Tæl omkring oxygen: både de frie elektroner og begge elektroner i hver binding. Hvert hydrogenatom skal have 2.",
-            forklaring: "Oxygen har 4 elektroner i de fælles elektronpar og 4 i de frie elektronpar: 8. Hvert hydrogenatom har 2."
+            forklaring: "Oxygen har 4 elektroner i de fælles elektronpar og 4 i de frie elektronpar, i alt 8. Hvert hydrogenatom har 2."
         },
         {
             f: "NH₃", atomer: [1, 7, 1, 1], pos: [[-1, 0], [0, 0], [1, 0], [0, 1]], b: [[0, 1, 1], [1, 2, 1], [1, 3, 1]], frie: { 1: 4 },
@@ -167,7 +167,7 @@
         {
             f: "N₂", atomer: [7, 7], pos: [[0, 0], [1, 0]], b: [[0, 1, 3]],
             hint: "Tæl omkring hvert nitrogenatom. Alle 6 elektroner i tripelbindingen tæller med hos begge atomer.",
-            forklaring: "Hvert nitrogenatom har 6 elektroner i tripelbindingen og 2 i det frie elektronpar: 8."
+            forklaring: "Hvert nitrogenatom har 6 elektroner i tripelbindingen og 2 i det frie elektronpar, i alt 8."
         },
         {
             f: "H₂O", atomer: [1, 1, 8], pos: CO2, b: [[0, 1, 1], [1, 2, 1]], frie: { 2: 6 },
@@ -183,18 +183,18 @@
         },
         {
             f: "Br₂", atomer: [35, 35], pos: [[0, 0], [1, 0]], b: [[0, 1, 1]], frie: { 0: 8 },
-            hint: "Brom har 7 elektroner i yderste skal, og 1 af dem er med i bindingen. Hvor mange frie er der så?",
+            hint: "Brom har 7 elektroner i yderste skal, og 1 af dem er med i bindingen. Hvor mange frie elektronpar er der så?",
             forklaring: "Det ene bromatom har 10 elektroner omkring sig. Med tre frie elektronpar har det 8."
         },
         {
             f: "C₂H₂", atomer: [1, 6, 6, 1], pos: [[-1, 0], [0, 0], [1, 0], [2, 0]], b: [[0, 1, 1], [1, 2, 3], [2, 3, 1]],
             hint: "Tæl omkring hvert carbonatom: bindingen til hydrogen og alle elektroner i tripelbindingen.",
-            forklaring: "Hvert carbonatom har 2 elektroner i bindingen til hydrogen og 6 i tripelbindingen: 8."
+            forklaring: "Hvert carbonatom har 2 elektroner i bindingen til hydrogen og 6 i tripelbindingen, i alt 8."
         },
         {
             f: "CO₂", atomer: [8, 6, 8], pos: CO2, b: [[0, 1, 3], [1, 2, 2]], frie: { 0: 2, 1: 0, 2: 4 },
             ret: { b: [[0, 1, 2], [1, 2, 2]] },
-            hint: "Carbon danner 4 bindinger. Tæl bindingerne til carbon på tegningen: en tripelbinding tæller som 3.",
+            hint: "Carbon danner 4 bindinger. Tæl bindingerne til carbon på tegningen. En tripelbinding tæller som 3.",
             forklaring: "Carbon har 5 bindinger og 10 elektroner omkring sig. Med to dobbeltbindinger har alle atomer 8."
         }
     ];
@@ -205,14 +205,14 @@
        fejlen: atomnummeret, det antal atomet mangler, periodens nummer. */
     D.antalHint = function (z, tal) {
         var el = D.EL[z];
-        if (tal === z && z !== 1) return el.s + " har atomnummer " + z + ". Det er alle elektronerne, ikke kun dem i yderste skal.";
-        if (z !== 1 && tal === 8 - el.v && tal !== el.v) return "Det er det antal, " + el.navn + " mangler for at få 8. Hvor mange har " + el.navn + " i yderste skal?";
+        if (tal === z && z !== 1) return el.s + " har atomnummer " + z + " og dermed " + z + " elektroner i alt. Kun elektronerne i yderste skal tegnes.";
+        if (z !== 1 && tal === 8 - el.v && tal !== el.v) return "Du har sat det antal elektroner, som " + el.navn + " mangler for at få 8. Hvor mange elektroner har " + el.navn + " i yderste skal?";
         if (tal === el.p && el.p !== el.g) return el.s + " står i periode " + el.p + ". Perioden er rækken. Hovedgruppen er kolonnen.";
         if (tal < el.v) return "Der mangler elektroner. Se, hvilken hovedgruppe " + el.s + " står i.";
         return "Der er for mange elektroner. Se, hvilken hovedgruppe " + el.s + " står i.";
     };
 
-    D.FORDELING = "Antallet er rigtigt, men de første fire elektroner skal have hver sin side af symbolet. Først derefter danner de par.";
+    D.FORDELING = "Antallet af elektroner er rigtigt, men de første fire elektroner skal have hver sin side af symbolet. Først derefter danner de par.";
 
     /* Det, kortet siger, naar et atom er tegnet rigtigt: tallet og
        de uparrede elektroner, som er dem, der kan danne bindinger
@@ -241,7 +241,7 @@
         if (st.bs > 0 && tal === st.frie + st.bs) return "Begge elektroner i et fælles elektronpar tæller med, ikke kun den ene.";
         if (st.bs > 0 && st.frie > 0 && tal === st.frie) return "Husk elektronerne i de fælles elektronpar. De tæller med.";
         if (st.frie > 0 && tal === 2 * st.bs) return "Husk de frie elektroner. De tæller også med.";
-        if (tal === st.maal && tal !== st.nu) return "Det er det antal, der skal være. Tæl, hvor mange der er på tegningen.";
+        if (tal === st.maal && tal !== st.nu) return "Du har valgt det antal elektroner, der skal være. Tæl, hvor mange elektroner der er på tegningen.";
         return "Tæl igen. Alle prikker omkring atomet tæller, også dem i de fælles elektronpar.";
     };
 

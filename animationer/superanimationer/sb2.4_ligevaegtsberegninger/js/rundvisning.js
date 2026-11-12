@@ -15,10 +15,10 @@
         "fane-bh": [
             { sel: "#bh-skort", titel: "Papirkortet", tekst: "Øverst står målet. Under det står, hvad du skal nu, og hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret. Indsend svar sender dit svar ind." },
             { sel: "#bh-laerred", titel: "Beholderen og grafen", tekst: "Til venstre er molekylerne i en lukket beholder. Til højre er reaktionsbrøken Y som funktion af x. Den gule linje er K." },
-            { sel: ".bh-skyder", titel: "x", tekst: "Skyderen bestemmer x: hvor meget af stoffet der er omsat. Du kan også trække på grafen." },
+            { sel: ".bh-skyder", titel: "x", tekst: "Skyderen bestemmer x, som er den koncentration af stoffet, der er omsat. Du kan også trække på grafen." },
             { sel: "#bh-skema", titel: "Skemaet", tekst: "Start, ændring og ligevægt for hvert stof. Tallene følger skyderen. I nogle mål skriver du selv udtrykkene med x." },
-            { sel: "#bh-y", titel: "Y og K", tekst: "Reaktionsbrøken regnet med koncentrationerne i skemaet. Ved ligevægt er Y = K." },
-            { sel: "#bh-opgaver", titel: "Målene", tekst: "Otte mål på tre reaktioner. Et mål, du når uden at se svaret, får en stjerne." },
+            { sel: "#bh-y", titel: "Y og K", tekst: "Y er reaktionsbrøken regnet med koncentrationerne i rækken Ligevægt. Ved ligevægt er Y = K." },
+            { sel: "#bh-opgaver", titel: "Målene", tekst: "Der er otte mål på tre reaktioner. Du får en stjerne for hvert mål, du når uden at se svaret." },
             { sel: ".faneknapper", titel: "Opgaverne", tekst: "På fanerne Uden x og Med x regner du de rigtige opgaver." }
         ],
         "fane-ux": [

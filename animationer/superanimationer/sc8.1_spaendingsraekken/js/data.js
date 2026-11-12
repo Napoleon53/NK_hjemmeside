@@ -63,15 +63,15 @@
             forkert: [null,
                 "Rust kræver dioxygen og tager dage. Se i luppen, hvad der sætter sig.",
                 "Zinken går i opløsning. Se i luppen, hvad der sætter sig i stedet."],
-            spmHint: "Se i luppen, hvad Cu²⁺ bliver til, når de rammer stangen.",
-            efter: "Kobberionerne optager elektroner fra zink og bliver til kobber på stangen."
+            spmHint: "Se i luppen, hvad Cu²⁺-ionerne bliver til, når de rammer stangen.",
+            efter: "Kobber(II)ionerne optager elektroner fra zink og bliver til kobber på stangen."
         },
         {
             id: "cu-ag", stang: "Cu", glas: "Ag",
             tekst: "Sæt kobberstangen i glasset med Ag⁺.",
             hint: "Tag fat i stangen med Cu, og slip den over glasset med Ag⁺.",
-            spm: "Væsken bliver blå. Hvor kommer farven fra?",
-            valg: ["Kobberioner fra stangen", "Sølvnitrat bliver blåt, når det står", "Sølvet på stangen"],
+            spm: "Væsken i glasset med Ag⁺ bliver blå. Hvor kommer farven fra?",
+            valg: ["Kobber(II)ioner fra stangen", "Sølv(I)nitrat bliver blåt med tiden", "Sølvet på stangen"],
             rigtig: 0,
             forkert: [null,
                 "Glasset med Ag⁺ var klart, før stangen kom i. Se i luppen, hvad der forlader stangen.",
@@ -83,20 +83,20 @@
             id: "ag-cu", stang: "Ag", glas: "Cu",
             tekst: "Sæt sølvstangen i glasset med Cu²⁺.",
             hint: "Tag fat i stangen med Ag, og slip den over det blå glas.",
-            spm: "Intet sker. Hvad gør kobberionerne i luppen?",
+            spm: "Der sker intet i glasset med Cu²⁺. Hvad gør kobber(II)ionerne i luppen?",
             valg: ["De støder ind i sølvet og svømmer videre", "De sætter sig på sølvet", "De tager elektroner fra sølvet"],
             rigtig: 0,
             forkert: [null,
                 "Se efter i luppen. Der kommer intet kobber på stangen.",
-                "Så ville de blive til kobber. Se efter i luppen."],
+                "Kobber(II)ionerne ville blive til kobber, hvis de tog elektroner. Se efter i luppen."],
             spmHint: "Følg en af de blå ioner i luppen, når den rammer stangen.",
-            efter: "Sølv afgiver ikke elektroner til kobberionerne. Det gjorde zink."
+            efter: "Kobber(II)ionerne optager elektroner fra zink, men ikke fra sølv."
         },
         {
             id: "syre", stang: null, glas: "H",
             tekst: "Find en stang, der giver bobler i saltsyren (H⁺).",
             hint: "Prøv stængerne én ad gangen i glasset med H⁺. Ikke alle giver bobler.",
-            spm: "Hvad er boblerne?",
+            spm: "Hvad er boblerne i saltsyren?",
             valg: ["Dihydrogen, H₂", "Dioxygen, O₂", "Vanddamp, fordi syren koger"],
             rigtig: 0,
             forkert: [null,
@@ -107,22 +107,22 @@
         },
         {
             id: "skema",
-            tekst: "Prøv resten, så skemaet bliver fyldt ud.",
-            hint: "De tomme felter i skemaet mangler. Hver stang skal i hvert glas, undtagen sit eget metal."
+            tekst: "Prøv alle stænger i alle glas, så skemaet bliver fyldt ud.",
+            hint: "Hvert tomt felt i skemaet er et forsøg, der mangler. Hver stang skal i alle glas undtagen glasset med ioner af samme metal."
         }
     ];
 
     /* ----- Fane 2: raekken -------------------------------------------------- */
     D.RAEKKEN = ["Mg", "Zn", "Fe", "H", "Cu", "Ag"];
 
-    D.RK_PROMPT = "Stil de seks på hylden i rækkefølge, fra uædel til ædel.";
+    D.RK_PROMPT = "Stil de seks kort på hylden i rækkefølge, fra uædel til ædel.";
     D.RK_HINT = "Et metal står til venstre for de metaller, hvis ioner det reagerer med. Tæl fluebenene i hver række i skemaet.";
     D.RK_FAERDIG = "Øverst i scenen står nu spændingsrækken med flere metaller. Dine seks stoffer har deres pladser i den.";
 
     /* Beskeden, naar r staar til hoejre for l, men skulle staa til
        venstre for det. set: har eleven set forsoeget paa fane 1? */
     D.rkForkert = function (l, r, set) {
-        var prov = set ? "" : " Prøv det på fane 1.";
+        var prov = set ? "" : " Prøv forsøget på fane 1.";
         if (l === "H") {
             return K.Navn(r) + " står til højre for H. Men " + K.navn(r) + " giver bobler i saltsyren, så " +
                 K.navn(r) + " skal stå til venstre for H." + prov;
@@ -132,7 +132,7 @@
                 K.navn(l) + "." + prov;
         }
         return K.Navn(r) + " står til højre for " + K.navn(l) + ". Men " + K.navn(r) + " " + (set ? "reagerede" : "reagerer") + " med " +
-            K.ionerne(l) + ", så " + K.navn(r) + " skal stå til venstre." + prov;
+            K.ionerne(l) + ", så " + K.navn(r) + " skal stå til venstre for " + K.navn(l) + "." + prov;
     };
 
     /* ----- Fane 3: forudsig --------------------------------------------------
@@ -152,7 +152,7 @@
     D.FU_VALG = ["Ja, der sker en reaktion", "Nej, intet sker"];
 
     D.fuHint = function (m, i) {
-        return "Find " + m + " og " + (i === "H" ? "H" : i) + " i rækken foroven. Står stangens metal til venstre for ionernes?";
+        return "Find " + m + " og " + (i === "H" ? "H" : i) + " i rækken foroven. Står stangens metal til venstre for ionernes metal?";
     };
 
     /* Svaret paa forudsigelsen. rigtigt: gaettede eleven rigtigt? */
@@ -160,10 +160,10 @@
         var ja = K.reagerer(m, i);
         var hvem = i === "H" ? "H" : K.navn(i);
         if (ja) {
-            return (rigtigt ? "Rigtigt. " : "Der skete noget. ") + K.Navn(m) + " står til venstre for " + hvem + " i rækken, så " +
+            return (rigtigt ? "Rigtigt. " : "Der skete en reaktion. ") + K.Navn(m) + " står til venstre for " + hvem + " i rækken, så " +
                 K.navn(m) + " afgiver elektroner til " + K.ionerne(i) + ".";
         }
-        return (rigtigt ? "Rigtigt. " : "Intet skete. ") + K.Navn(m) + " står til højre for " + hvem + " i rækken, så " +
+        return (rigtigt ? "Rigtigt. " : "Der skete ingen reaktion. ") + K.Navn(m) + " står til højre for " + hvem + " i rækken, så " +
             K.navn(m) + " kan ikke afgive elektroner til " + K.ionerne(i) + ".";
     };
 
@@ -181,12 +181,12 @@
         return "Gassen dihydrogen, H₂, består af molekyler med to atomer.";
     };
 
-    D.KOEF_SPM = "Afstem. Skriv, hvor mange der er af hvert stof, også 1.";
+    D.KOEF_SPM = "Afstem reaktionen. Skriv, hvor mange der er af hvert stof, også 1.";
 
     D.koefHint = function (r) {
-        var t = K.Navn(r.m) + " afgiver " + r.a + " e⁻. Hver " + K.ion(r.i) + " optager " + r.b + " e⁻.";
+        var t = "Hvert " + K.navn(r.m) + "atom afgiver " + r.a + " e⁻. Hver " + K.ion(r.i) + " optager " + r.b + " e⁻.";
         if (r.gas) t += " To H bliver til ét H₂.";
-        return t + " Hvor mange af hver, før der er lige mange elektroner begge veje?";
+        return t + " Hvor mange skal der være af hver, så der afgives lige så mange elektroner, som der optages?";
     };
 
     function plus(q) { return q > 0 ? "+" + q : String(q); }
@@ -198,10 +198,10 @@
         case "atomM":
             return "Der er " + svar.v + " " + r.m + " før pilen og " + svar.h + " efter.";
         case "atomI":
-            if (r.gas) return "Der er " + svar.v + " H før pilen og " + svar.h + " efter. H₂ har to.";
+            if (r.gas) return "Der er " + svar.v + " H før pilen og " + svar.h + " efter. Hvert H₂ har to H.";
             return "Der er " + svar.v + " " + r.i + " før pilen og " + svar.h + " efter.";
         case "ladning":
-            return "Atomerne passer, men ladningen gør ikke: " + plus(svar.v) + " før pilen og " + plus(svar.h) +
+            return "Atomerne passer, men ladningen er " + plus(svar.v) + " før pilen og " + plus(svar.h) +
                 " efter. Der skal afgives lige så mange elektroner, som der optages.";
         case "forkort":
             return "Forholdet er rigtigt, men alle tal kan deles med " + svar.g + ". Brug de mindste hele tal.";

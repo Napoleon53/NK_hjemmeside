@@ -28,14 +28,14 @@
         Na: { navn: "natrium",   E: -2.71, q: 1 },
         Mg: { navn: "magnesium", E: -2.37, q: 2, salt: "magnesiumsulfat",  saltFormel: "MgSO4",     anion: "SO4", anionQ: -2 },
         Al: { navn: "aluminium", E: -1.66, q: 3, salt: "aluminiumsulfat",  saltFormel: "Al2(SO4)3", anion: "SO4", anionQ: -2 },
-        Zn: { navn: "zink",      E: -0.76, q: 2, salt: "zinksulfat",       saltFormel: "ZnSO4",     anion: "SO4", anionQ: -2 },
+        Zn: { navn: "zink",      E: -0.76, q: 2, salt: "zink(II)sulfat",       saltFormel: "ZnSO4",     anion: "SO4", anionQ: -2 },
         Fe: { navn: "jern",      E: -0.44, q: 2, salt: "jern(II)sulfat",   saltFormel: "FeSO4",     anion: "SO4", anionQ: -2 },
         Ni: { navn: "nikkel",    E: -0.26, q: 2, salt: "nikkel(II)sulfat", saltFormel: "NiSO4",     anion: "SO4", anionQ: -2 },
         Sn: { navn: "tin",       E: -0.14, q: 2, salt: "tin(II)chlorid",   saltFormel: "SnCl2",     anion: "Cl",  anionQ: -1 },
         Pb: { navn: "bly",       E: -0.13, q: 2, salt: "bly(II)nitrat",    saltFormel: "Pb(NO3)2",  anion: "NO3", anionQ: -1 },
         H:  { navn: "hydrogen",  E: 0.00,  q: 1, salt: "saltsyre",         saltFormel: "HCl",       anion: "Cl",  anionQ: -1, gas: true },
         Cu: { navn: "kobber",    E: 0.34,  q: 2, salt: "kobber(II)sulfat", saltFormel: "CuSO4",     anion: "SO4", anionQ: -2 },
-        Ag: { navn: "sølv",      E: 0.80,  q: 1, salt: "sølvnitrat",       saltFormel: "AgNO3",     anion: "NO3", anionQ: -1 },
+        Ag: { navn: "sølv",      E: 0.80,  q: 1, salt: "sølv(I)nitrat",       saltFormel: "AgNO3",     anion: "NO3", anionQ: -1 },
         Hg: { navn: "kviksølv",  E: 0.85,  q: 2 },
         Pt: { navn: "platin",    E: 1.18,  q: 2 },
         Au: { navn: "guld",      E: 1.50,  q: 3, salt: "guld(III)chlorid", saltFormel: "AuCl3",     anion: "Cl",  anionQ: -1 }
@@ -72,7 +72,7 @@
     K.frit = function (s) { return K.STOF[s].gas ? "H₂" : s; };
 
     /* "kobberionerne", men H⁺ for hydrogen */
-    K.ionerne = function (s) { return K.STOF[s].gas ? "H⁺" : K.STOF[s].navn + "ionerne"; };
+    K.ionerne = function (s) { var st = K.STOF[s]; return st.gas ? "H⁺" : st.navn + (["Li", "K", "Ca", "Na", "Mg", "Al"].indexOf(s) < 0 ? ["", "(I)", "(II)", "(III)"][st.q] : "") + "ionerne"; };
 
     K.saltFormel = function (s) { return NK.formel(K.STOF[s].saltFormel); };
 

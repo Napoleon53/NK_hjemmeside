@@ -90,7 +90,7 @@ function koer() {
     overskrift("5. Navne");
     var navne = [["Al", "SO4", "aluminiumsulfat"], ["NH4", "SO4", "ammoniumsulfat"], ["Ca", "OH", "calciumhydroxid"],
         ["Na", "HCO3", "natriumhydrogencarbonat"], ["Fe3", "SO4", "jern(III)sulfat"], ["Fe2", "OH", "jern(II)hydroxid"],
-        ["Cu", "NO3", "kobber(II)nitrat"], ["Ag", "PO4", "sølvphosphat"], ["Ca", "PO4", "calciumphosphat"]];
+        ["Cu", "NO3", "kobber(II)nitrat"], ["Ag", "PO4", "sølv(I)phosphat"], ["Ca", "PO4", "calciumphosphat"]];
     for (i = 0; i < navne.length; i++) {
         var ns = D.salt(navne[i][0], navne[i][1]);
         paastand(ns.formel + " -> " + ns.navn, ns.navn === navne[i][2], "ventede " + navne[i][2]);
@@ -541,7 +541,7 @@ function koer() {
         fu.laerer && fu.laerer.scene && fu.laerer.scene.navn);
     var snReplik = fu.laererStartReplik();
     paastand("Kemichael siger, at tin kan have flere ladninger, og at ladningen kan regnes ud, fordi O er kendt",
-        snReplik === "Tin kan have flere ladninger, men du kender ladningen på O. Derfor kan du regne ladningen på tin ud.", snReplik);
+        snReplik === "Tin kan have flere ladninger, men du kender ladningen på O. Derfor kan du regne ladningen på tinionen ud.", snReplik);
     paastand("ingen plakat er fremme, før der bedes om et hint", !NK.Opslag.aaben());
     ukn.click();
     paastand("Giv hint: det periodiske system kommer frem med O fremhævet, og plakaten lyser",
@@ -784,7 +784,7 @@ function koer() {
     /* Laerredets taleboble (Start opgave paa fane 3, prik og kaffe): i
        hjoernet og fri af bordet, ogsaa med et stort salt paa */
     var proeve = ["Du har ikke mødt thiosulfat endnu, men du kender ladningen på SO₄. Derfor kan du regne ladningen på thiosulfat ud.",
-        "Chrom kan have flere ladninger, men du kender ladningen på SO₄. Derfor kan du regne ladningen på chrom ud."];
+        "Chrom kan have flere ladninger, men du kender ladningen på SO₄. Derfor kan du regne ladningen på chromionen ud."];
     function boblerFri(sim) {
         var ud = [];
         sim.laerer.x = sim.laererHjoerneX();

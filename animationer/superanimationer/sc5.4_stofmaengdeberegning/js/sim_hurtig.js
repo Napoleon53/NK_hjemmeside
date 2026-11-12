@@ -38,20 +38,20 @@
         var m = p.m, M = p.M, n = m / M, sp;
         if (slags === "n") {
             sp = { spm: "m = " + tal(m) + " g og M = " + tal(M) + " g/mol. n = ?", svar: [
-                [tal(n) + " mol", ""], [tal(M / m) + " mol", "Vendt om. Massen står øverst: n = m / M."],
-                [tal(m * M) + " mol", "Ganget. Enheden ville blive g²/mol, ikke mol."],
+                [tal(n) + " mol", ""], [tal(M / m) + " mol", "Brøken er vendt om. Massen står øverst: n = m / M."],
+                [tal(m * M) + " mol", "Du har ganget. Enheden ville blive g²/mol, ikke mol."],
                 [tal(n) + " g", "Tallet er rigtigt, men stofmængden er i mol."]],
                 forkl: "n = " + tal(m) + " g / " + tal(M) + " g/mol = " + tal(n) + " mol." };
         } else if (slags === "m") {
             sp = { spm: "n = " + tal(n) + " mol og M = " + tal(M) + " g/mol. m = ?", svar: [
-                [tal(m) + " g", ""], [tal(M / n) + " g", "Delt. Massen er stofmængde gange molarmasse."],
-                [tal(n / M) + " g", "Delt. Massen er stofmængde gange molarmasse."],
+                [tal(m) + " g", ""], [tal(M / n) + " g", "Du har delt. Massen er stofmængden gange molarmassen."],
+                [tal(n / M) + " g", "Du har delt. Massen er stofmængden gange molarmassen."],
                 [tal(m) + " mol", "Tallet er rigtigt, men massen er i g."]],
                 forkl: "m = " + tal(n) + " mol · " + tal(M) + " g/mol = " + tal(m) + " g." };
         } else {
             sp = { spm: "m = " + tal(m) + " g og n = " + tal(n) + " mol. M = ?", svar: [
-                [tal(M) + " g/mol", ""], [tal(n / m) + " g/mol", "Vendt om. Massen står øverst: M = m / n."],
-                [tal(m * n) + " g/mol", "Ganget. Molarmassen er massen delt med stofmængden."],
+                [tal(M) + " g/mol", ""], [tal(n / m) + " g/mol", "Brøken er vendt om. Massen står øverst: M = m / n."],
+                [tal(m * n) + " g/mol", "Du har ganget. Molarmassen er massen delt med stofmængden."],
                 [tal(M) + " mol/g", "Tallet er rigtigt, men molarmassen er i g/mol."]],
                 forkl: "M = " + tal(m) + " g / " + tal(n) + " mol = " + tal(M) + " g/mol." };
         }

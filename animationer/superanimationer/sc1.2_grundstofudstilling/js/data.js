@@ -386,11 +386,11 @@
         /* Elektronstrukturen */
         var yderst = g.skaller[g.skaller.length - 1];
         var hintS = g.Navn + " har " + g.z + (g.z === 1 ? " elektron" : " elektroner") + " og står i " + g.periode +
-            ". periode, altså " + (g.periode === 1 ? "én skal" : g.periode + " skaller") + ".";
+            ". periode, så atomet har " + (g.periode === 1 ? "én skal" : g.periode + " skaller") + ".";
         return {
             hint: hintS,
-            svar: g.Navn + ": <b>" + g.struktur + "</b>. " +
-                (g.z === 2 ? "Én skal med 2." : g.periode + " skaller og " + yderst + " i den yderste, som hovedgruppe " + g.hg + "."),
+            svar: g.Navn + " har elektronstrukturen <b>" + g.struktur + "</b>. " +
+                (g.z === 2 ? "Den ene skal er fuld med 2 elektroner." : "Der er " + (g.periode === 1 ? "1 skal" : g.periode + " skaller") + " med " + yderst + (yderst === 1 ? " elektron" : " elektroner") + " i den yderste, og " + g.navn + " står i hovedgruppe " + g.hg + "."),
             skaller: true
         };
     };
@@ -419,7 +419,7 @@
     D.hjaelpFormel = function (fo, felt) {
         if (felt === "ialt") {
             return {
-                hint: "Læg tallene sammen for alle grundstofferne." + (fo.q ? " Ladningen er ikke et atom." : ""),
+                hint: "Læg antallet af atomer sammen for alle grundstofferne." + (fo.q ? " Ladningen tæller ikke som et atom." : ""),
                 svar: fo.orden.map(function (s) { return fo.antal[s]; }).join(" + ") + " = <b>" + fo.ialt + "</b> atomer."
             };
         }
@@ -428,16 +428,16 @@
         if (fk.some(function (o) { return o.gange > 1; })) {
             hint = felt + " står inde i en parentes. Tallet efter parentesen ganger alt indeni.";
         } else if (fk.length > 1) {
-            hint = felt + " står " + fk.length + " steder i formlen. Læg dem sammen.";
+            hint = felt + " står " + fk.length + " steder i formlen. Læg antallet af " + felt + "-atomer fra hvert sted sammen.";
         } else if (!fk[0].led.harTal) {
-            hint = "Står der intet tal efter " + felt + ", er der ét.";
+            hint = "Står der intet tal efter " + felt + ", er der ét " + felt + "-atom.";
         } else {
             hint = "Tallet lige efter " + felt + " gælder kun " + felt + ".";
         }
         var o0 = fk[0];
         var svar = felt + ": ";
         if (fk.length === 1 && o0.gange > 1) {
-            svar += o0.led.n + " i hver parentes og " + o0.gange + " parenteser: " + o0.gange + " × " + o0.led.n + " = <b>" + fo.antal[felt] + "</b>.";
+            svar += o0.led.n + " i hver parentes og " + o0.gange + " parenteser, så " + o0.gange + " × " + o0.led.n + " = <b>" + fo.antal[felt] + "</b>.";
         } else if (fk.length > 1) {
             svar += udregning(fo, felt).replace(/= (\d+)$/, "= <b>$1</b>") + ".";
         } else {

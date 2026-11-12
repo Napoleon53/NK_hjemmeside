@@ -194,7 +194,7 @@
             var under = document.createElement("span");
             under.className = "under";
             under.textContent = (p.pseudo ? "stærk base" : "pKs " + NK.tal(p.pKa, 2)) +
-                " · halv ved " + NK.tal(p.Vhalv, 2) + " mL";
+                " · halvækvivalens ved " + NK.tal(p.Vhalv, 2) + " mL";
             midt.appendChild(under);
 
             var hoejre = document.createElement("span");

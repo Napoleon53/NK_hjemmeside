@@ -122,20 +122,20 @@
         if (u.fejl) return { besked: u.fejl };
         var x = brugX(u);
         if (x) return x;
-        if (u.konst) return { besked: "Ændringen skrives med x. x er det, der omsættes." };
+        if (u.konst) return { besked: "Ændringen skrives med x. x er den koncentration, der omsættes." };
         var f = function (t) { return u.f(t, u.vars[0]); };
         if (M.samme(f, function (t) { return b * t; })) return { ok: true };
         if (M.samme(f, function (t) { return -b * t; })) {
-            return { besked: a.side === "r" ? navnet(s) + " står før pilen og bliver brugt. Ændringen er negativ." :
+            return { besked: a.side === "r" ? navnet(s) + " står før pilen og forbruges. Ændringen er negativ." :
                 navnet(s) + " står efter pilen og dannes. Ændringen er positiv." };
         }
         if (M.c0(o, s) && M.samme(f, function (t) { return M.c0(o, s) + b * t; })) {
-            return { besked: "Det er ligevægtskoncentrationen. I rækken Ændring står kun det, der kommer til eller forsvinder." };
+            return { besked: "Du har skrevet ligevægtskoncentrationen. I rækken Ændring står kun den koncentration, der dannes eller forbruges." };
         }
         var k = f(0.1) / 0.1;
         if (Math.abs(f(0)) < 1e-12 && isFinite(k)) {
-            if (a.k > 1) return { besked: "Der står " + a.k + " foran " + navnet(s) + ". Der " + (a.side === "r" ? "bruges " : "dannes ") + a.k + " " + navnet(s) + ", hver gang x vokser med én." };
-            return { besked: "Der står ikke noget tal foran " + navnet(s) + ". Så ændres det med x, ikke med et andet tal gange x." };
+            if (a.k > 1) return { besked: "Der står " + a.k + " foran " + navnet(s) + ", så koncentrationen af " + navnet(s) + " ændrer sig " + a.k + " gange så meget som x." };
+            return { besked: "Der står ikke noget tal foran " + navnet(s) + ", så koncentrationen af " + navnet(s) + " ændres med x og ikke med et andet tal gange x." };
         }
         return { besked: "Ændringen for " + navnet(s) + " passer ikke. Reaktanterne får −, produkterne +, og koefficienten står foran x." };
     }
@@ -176,13 +176,13 @@
         if (u.konst && pl.a && M.ens(f(0), pl.a, 0.005)) {
             return { besked: NK.tal(pl.a) + " M er startkoncentrationen. Ved ligevægt er " + M.kon(s) + " udtrykket i skemaets nederste række." };
         }
-        if (pl.a && M.samme(f, function (t) { return pl.b * t; })) return { besked: "Det er ændringen. Brug skemaets nederste række, Ligevægt." };
+        if (pl.a && M.samme(f, function (t) { return pl.b * t; })) return { besked: "Du har skrevet ændringen. Brug skemaets nederste række, Ligevægt." };
         var anden = M.alle(o).filter(function (a) {
             if (a.s === s) return false;
             var q = M.plads(o, a.s);
             return M.samme(f, function (t) { return q.a + q.b * t; });
         })[0];
-        if (anden) return { besked: "Det er udtrykket for " + M.kon(anden.s) + ". I dette felt skal " + M.kon(s) + " stå." };
+        if (anden) return { besked: "Du har skrevet udtrykket for " + M.kon(anden.s) + ". I dette felt skal " + M.kon(s) + " stå." };
         return { besked: "Feltet for " + M.kon(s) + " passer ikke med skemaets nederste række." };
     }
 
@@ -193,7 +193,7 @@
         if (!u.konst) return { besked: "Til venstre for lighedstegnet står Kc's værdi, et tal." };
         var v = u.f(0);
         if (M.ens(v, o.K, 0.005)) return { ok: true };
-        if (M.ens(v, 1 / o.K, 0.005)) return { besked: "Det er 1/Kc. Skriv Kc's værdi fra opgaven." };
+        if (M.ens(v, 1 / o.K, 0.005)) return { besked: "Du har skrevet 1/Kc. Skriv Kc's værdi fra opgaven." };
         return { besked: "Kc's værdi står under Oplyst på tavlen." };
     }
 
@@ -703,19 +703,19 @@
         var o = this.o, v = this.v;
         var str = v["dx.str"], s = v["dx.stof"], verb = v["dx.verb"], enh = v["dx.enh"];
         if (!str) return this.fejlSvar({ tom: true, besked: "Vælg, hvad x er, i den første boks." }, "dx.str");
-        if (str === "lig") return this.fejlSvar({ besked: "Ligevægtskoncentrationen er det, der er tilbage til sidst. x er det, der ændrer sig undervejs." }, "dx.str");
-        if (str === "n") return this.fejlSvar({ besked: "Skemaet regner i koncentrationer, ikke i mol. x er en koncentration." }, "dx.str");
+        if (str === "lig") return this.fejlSvar({ besked: "Ligevægtskoncentrationen er koncentrationen ved ligevægt. x er ændringen i koncentration fra start til ligevægt." }, "dx.str");
+        if (str === "n") return this.fejlSvar({ besked: "Skemaet regner med koncentrationer, ikke med stofmængder. x er en koncentration." }, "dx.str");
         if (str === "broek") return this.fejlSvar({ besked: "En brøkdel har ingen enhed og kan ikke trækkes fra en koncentration. x er en koncentration." }, "dx.str");
         if (!s) return this.fejlSvar({ tom: true, besked: "Vælg stoffet." }, "dx.stof");
         var a = M.find(o, s);
         if (a.k > 1) return this.fejlSvar({ besked: "Der står " + a.k + " foran " + M.skriv(s) + ". Vælg et stof med koefficienten 1, så bliver ændringerne x, 2x og så videre." }, "dx.stof");
         if (!verb) return this.fejlSvar({ tom: true, besked: "Vælg, om " + M.skriv(s) + " omsættes eller dannes." }, "dx.verb");
-        if (a.side === "r" && verb === "dan") return this.fejlSvar({ besked: M.skriv(s) + " står før pilen. Det bliver brugt, så det omsættes." }, "dx.verb");
-        if (a.side === "p" && verb === "oms") return this.fejlSvar({ besked: M.skriv(s) + " står efter pilen. Det dannes." }, "dx.verb");
+        if (a.side === "r" && verb === "dan") return this.fejlSvar({ besked: M.skriv(s) + " står før pilen og er en reaktant, så stoffet omsættes." }, "dx.verb");
+        if (a.side === "p" && verb === "oms") return this.fejlSvar({ besked: M.skriv(s) + " står efter pilen og er et produkt, så stoffet dannes." }, "dx.verb");
         if (!enh) return this.fejlSvar({ tom: true, besked: "Vælg enheden for x." }, "dx.enh");
-        if (enh === "mol") return this.fejlSvar({ besked: "x er en koncentration. En koncentration måles i M, altså mol/L." }, "dx.enh");
+        if (enh === "mol") return this.fejlSvar({ besked: "x er en koncentration og måles i M, som er mol/L." }, "dx.enh");
         if (enh === "ingen") return this.fejlSvar({ besked: "x er en koncentration og har enheden M." }, "dx.enh");
-        this.delOk("defx", false, "Skriv altid den sætning, før du bruger x.");
+        this.delOk("defx", false, "Skriv altid sætningen om, hvad x er, før du bruger x.");
     };
 
     F.xStofFacit = function () {
@@ -725,8 +725,8 @@
     F.hint_defx = function () {
         var a = this.xStofFacit();
         return { s: a.s, trin: [
-            "x er en ændring: den koncentration, der bliver brugt eller dannet fra start til ligevægt.",
-            "Vælg et stof med koefficienten 1, fx " + M.skriv(a.s) + ", og om det omsættes eller dannes. En koncentration måles i M.",
+            "x er en ændring, nemlig den koncentration, der omsættes eller dannes fra start til ligevægt.",
+            "Vælg et stof med koefficienten 1 som " + M.skriv(a.s) + ", og vælg, om stoffet omsættes eller dannes. En koncentration måles i M.",
             "x er den koncentration af " + M.skriv(a.s) + ", der omsættes, indtil ligevægten har indstillet sig. x måles i M."
         ] };
     };
@@ -884,8 +884,8 @@
         if (r === "aendr") {
             var xs = this.xStofFacit();
             return { s: a.s, trin: [
-                "Reaktanterne bruges, og produkterne dannes. Koefficienterne siger, hvor meget.",
-                "Når x " + M.skriv(xs.s) + " omsættes, " + (a.side === "r" ? "bruges " : "dannes ") + (a.k > 1 ? a.k + "x " : "x ") + M.skriv(a.s) + ".",
+                "Reaktanterne forbruges, og produkterne dannes. Koefficienterne angiver, hvor meget.",
+                "Når " + M.kon(xs.s) + " falder med x, " + (a.side === "r" ? "falder " : "stiger ") + M.kon(a.s) + " med " + (a.k > 1 ? a.k + "x" : "x") + ".",
                 "Ændring: " + alle.map(function (b) { return M.skriv(b.s) + " " + M.aendrTekst(b); }).join(", ") + "."
             ] };
         }
@@ -917,7 +917,7 @@
     F.trin_skema = function () {
         var r = this.fase.skema;
         if (r === "start") return "Skriv startkoncentrationerne i skemaet. Tallene står under Oplyst. Der står 0, hvis stoffet ikke er der fra start.";
-        if (r === "aendr") return "Skriv ændringen for hvert stof med x. Reaktanterne bruges, og produkterne dannes.";
+        if (r === "aendr") return "Skriv ændringen for hvert stof med x. Reaktanterne forbruges, og produkterne dannes.";
         return "Skriv ligevægtskoncentrationen for hvert stof med x: start + ændring.";
     };
 
@@ -993,7 +993,7 @@
         var l = lov.den[0] || lov.num[0];
         return { s: l.s, trin: [
             "Ved ligevægt er brøken lig med Kc. Skriv Kc's værdi til venstre for lighedstegnet.",
-            "I hvert felt skal udtrykket fra skemaets nederste række stå. Fx er " + M.kon(l.s) + " = " + M.ligTekst(o, l.s) + ". Du kan klikke på udtrykkene i skemaet.",
+            "I hvert felt skal udtrykket fra skemaets nederste række stå. For eksempel er " + M.kon(l.s) + " = " + M.ligTekst(o, l.s) + ". Du kan klikke på udtrykkene i skemaet.",
             this.ligningTekst()
         ] };
     };
@@ -1195,7 +1195,7 @@
         if (!daarlig.length) {
             return { s: null, trin: [
                 "Klik på løsningen, og se i skemaet, om alle koncentrationer bliver positive.",
-                "Med x = " + NK.tal(god) + " M er alle tre rækker positive.",
+                "Med x = " + NK.tal(god) + " M er alle koncentrationer i rækken Ligevægt positive.",
                 "Tryk Kan bruges ved x = " + NK.tal(god) + " M."
             ] };
         }
@@ -1320,9 +1320,9 @@
             if (!s.tom && !s.besked) {
                 var pl = M.plads(o, a.s);
                 if (s.v < 0) s.besked = "En koncentration kan ikke være negativ.";
-                else if (andre.some(function (r) { return M.ens(s.v, M.vaerdi(pl, r), 0.02); })) s.besked = "Det er regnet med den forkastede løsning. Brug x = " + NK.tal(x) + " M.";
+                else if (andre.some(function (r) { return M.ens(s.v, M.vaerdi(pl, r), 0.02); })) s.besked = "Tallet er regnet med den forkastede løsning. Brug x = " + NK.tal(x) + " M.";
                 else if (Math.abs(pl.b) > 1 && M.ens(s.v, x, 0.02)) s.besked = "Der står " + Math.abs(pl.b) + " foran " + M.skriv(a.s) + ", så " + M.kon(a.s) + " = " + M.ligTekst(o, a.s) + ".";
-                else if (pl.a && M.ens(s.v, x, 0.02)) s.besked = "Det er x, altså det, der er omsat. Der er " + M.ligTekst(o, a.s) + " tilbage.";
+                else if (pl.a && M.ens(s.v, x, 0.02)) s.besked = "Tallet er x, som er den koncentration, der er omsat. Ved ligevægt er der " + M.ligTekst(o, a.s) + " tilbage.";
                 else s.besked = "Sæt x = " + NK.tal(x) + " M ind i udtrykket fra skemaet: " + M.kon(a.s) + " = " + M.ligTekst(o, a.s) + ".";
             }
             if (!forste || (forste.svar.tom && !s.tom)) forste = { svar: s, key: key, s: a.s };
@@ -1337,11 +1337,11 @@
         var mig = this, o = this.o;
         if (this.fase.konc === "formel") {
             var f = String(this.v["kn.formel"] || "").replace(/\s+/g, "").replace(/[:÷]/g, "/").replace(/[·*×]/g, "*");
-            if (!f) return this.fejlSvar({ tom: true, besked: "Skriv formlen for koncentrationen med bogstaver, fx c = m / … (men med de rigtige bogstaver)." }, "kn.formel");
+            if (!f) return this.fejlSvar({ tom: true, besked: "Skriv formlen for koncentrationen med bogstaver og ikke med tal." }, "kn.formel");
             if (/^c=/i.test(f)) f = f.slice(2);
             if (/^n\/v$/i.test(f)) { this.fase.konc = "tal"; this.faseOk("Rigtig formel: c = n / V."); return; }
             if (/^v\/n$/i.test(f)) return this.fejlSvar({ besked: "Brøken er vendt. Stofmængden n står over brøkstregen." }, "kn.formel");
-            if (/^(n\*v|v\*n)$/i.test(f)) return this.fejlSvar({ besked: "Der skal divideres. Koncentrationen er stofmængde pr. liter." }, "kn.formel");
+            if (/^(n\*v|v\*n)$/i.test(f)) return this.fejlSvar({ besked: "Der skal divideres. Koncentrationen er stofmængde pr. rumfang." }, "kn.formel");
             if (/m/i.test(f)) return this.fejlSvar({ besked: "Her kender du stofmængden n og rumfanget V, ikke massen." }, "kn.formel");
             return this.fejlSvar({ besked: "Koncentrationen er stofmængden divideret med rumfanget. Skriv det med bogstaverne n og V." }, "kn.formel");
         }
@@ -1354,7 +1354,7 @@
             if (!t.tom && !t.besked) {
                 if (M.ens(t.v, o.n[s] * o.V, 0.02)) t.besked = "Der skal divideres med rumfanget, ikke ganges.";
                 else if (M.ens(t.v, o.V / o.n[s], 0.02)) t.besked = "Brøken er vendt. Stofmængden står over brøkstregen.";
-                else if (M.ens(t.v, o.n[s], 0.02)) t.besked = "Det er stofmængden i mol. Divider med rumfanget.";
+                else if (M.ens(t.v, o.n[s], 0.02)) t.besked = "Tallet er stofmængden i mol. Divider med rumfanget.";
                 else t.besked = "Regn " + NK.tal(o.n[s]) + " mol / " + NK.tal(o.V) + " L på lommeregneren.";
             }
             if (!forste || (forste.svar.tom && !t.tom)) forste = { svar: t, key: key, s: s };
@@ -1491,10 +1491,10 @@
                 var svar;
                 if (l.s === o.ukendt) {
                     var u = M.udtryk(raa);
-                    if (u.tom) svar = { tom: true, besked: "Skriv et bogstav, fx c, for den ukendte " + M.kon(l.s) + "." };
-                    else if (u.klamme) svar = { besked: "CAS kan ikke regne med firkantede parenteser. Skriv et bogstav, fx c, for " + M.kon(l.s) + "." };
+                    if (u.tom) svar = { tom: true, besked: "Skriv et bogstav som c for den ukendte " + M.kon(l.s) + "." };
+                    else if (u.klamme) svar = { besked: "CAS kan ikke regne med firkantede parenteser. Skriv et bogstav som c for " + M.kon(l.s) + "." };
                     else if (u.fejl) svar = { besked: u.fejl };
-                    else if (u.konst) svar = { besked: M.kon(l.s) + " kender du ikke. Skriv et bogstav, fx c, i stedet for et tal. CAS løser ligningen for bogstavet." };
+                    else if (u.konst) svar = { besked: M.kon(l.s) + " kender du ikke. Skriv et bogstav som c i stedet for et tal. CAS løser ligningen for bogstavet." };
                     else if (u.vars.length > 1 || !M.samme(function (t) { return u.f(t); }, function (t) { return t; })) svar = { besked: "Skriv kun ét bogstav for " + M.kon(l.s) + ", fx c." };
                     else { svar = { ok: true }; bogstav = u.vars[0]; }
                 } else {
@@ -1522,10 +1522,10 @@
                 var t = tjekTal(mig.v[key], c[l.s]);
                 if (t.ok) return;
                 if (!t.tom && !t.besked) {
-                    if (M.ens(t.v, o.n[l.s], 0.02)) t.besked = "Det er stofmængden i mol. Brug koncentrationen fra før.";
+                    if (M.ens(t.v, o.n[l.s], 0.02)) t.besked = "Tallet er stofmængden i mol. Brug den koncentration, du har regnet ud.";
                     else {
                         var anden = Object.keys(c).filter(function (s) { return s !== l.s && M.ens(t.v, c[s], 0.02); })[0];
-                        t.besked = anden ? "Det er " + M.kon(anden) + ". I dette felt skal " + M.kon(l.s) + " stå." : "Feltet for " + M.kon(l.s) + " skal have koncentrationen fra før.";
+                        t.besked = anden ? "Tallet er " + M.kon(anden) + ". I dette felt skal " + M.kon(l.s) + " stå." : "Feltet for " + M.kon(l.s) + " skal have den koncentration, du har regnet ud.";
                     }
                 }
                 if (!f2 || (f2.svar.tom && !t.tom)) f2 = { svar: t, key: key, s: l.s };
@@ -1546,7 +1546,7 @@
         if (ENH_E[enh] !== M.deltaN(o)) {
             var p = o.p.map(function (x) { return x[0]; }), rr = o.r.map(function (x) { return x[0]; });
             return this.fejlSvar({ besked: "Tallet er rigtigt, men enheden passer ikke. Enheden er M opløftet i (" + p.join(" + ") + ") − (" + rr.join(" + ") + ") = " +
-                NK.fortegn(M.deltaN(o)).replace(/^\+/, "") + (M.deltaN(o) ? ", altså " + M.kEnhed(o) + "." : ", altså ingen enhed.") }, "ik.enh");
+                NK.fortegn(M.deltaN(o)).replace(/^\+/, "") + (M.deltaN(o) ? ", så Kc har enheden " + M.kEnhed(o) + "." : ", så Kc har ingen enhed.") }, "ik.enh");
         }
         this.delOk("indsaet", this.vist.ikTal);
     };
@@ -1554,11 +1554,11 @@
     /* De fejl, man laver paa lommeregneren, naar Kc regnes ud */
     F.kcFejl = function (v, c) {
         var o = this.o, lov = M.lovFacit(o), K = M.kAf(o, c);
-        if (M.ens(v, 1 / K, 0.02)) return "Det er 1/Kc. Produkterne står i tælleren.";
+        if (M.ens(v, 1 / K, 0.02)) return "Du har regnet 1/Kc. Produkterne står i tælleren.";
         var T = 1, N = 1, uden = 1;
         lov.num.forEach(function (l) { T *= Math.pow(c[l.s], l.e); uden *= c[l.s]; });
         lov.den.forEach(function (l) { N *= Math.pow(c[l.s], l.e); uden /= c[l.s]; });
-        if (M.ens(v, uden, 0.02)) return "Det ligner en udregning uden eksponenterne. Husk ² og ³.";
+        if (M.ens(v, uden, 0.02)) return "Tallet passer med en udregning uden eksponenterne. Husk ² og ³.";
         /* Én eksponent glemt */
         var glemt = lov.num.concat(lov.den).filter(function (l) {
             if (l.e < 2) return false;
@@ -1566,7 +1566,7 @@
             return M.ens(v, lov.num.indexOf(l) >= 0 ? K / f : K * f, 0.02);
         })[0];
         if (glemt) return "Husk eksponenten på " + M.kon(glemt.s) + ": " + M.led(glemt.s, glemt.e) + ".";
-        if (M.ens(v, T, 0.02)) return "Det er kun tælleren. Divider med hele nævneren.";
+        if (M.ens(v, T, 0.02)) return "Tallet er kun tælleren. Divider med hele nævneren.";
         if (lov.den.length) {
             /* Kun det foerste led i naevneren er divideret, resten er ganget */
             var d0 = Math.pow(c[lov.den[0].s], lov.den[0].e), rest = N / d0;
@@ -1588,7 +1588,7 @@
         if (this.fase.indsaet === "tal") {
             var l = lov.num[0];
             return { s: l.s, trin: [
-                "Sæt koncentrationerne fra før ind i ligevægtsloven.",
+                "Sæt de koncentrationer, du har regnet ud, ind i ligevægtsloven.",
                 M.kon(l.s) + " = " + NK.tal(c[l.s]) + " M" + (l.e > 1 ? ", og det står i " + l.e + ". potens." : "."),
                 "Kc = " + delAf(lov.num, function (q) { return NK.tal(c[q.s]); }) + " / " +
                     (lov.den.length > 1 ? "(" + delAf(lov.den, function (q) { return NK.tal(c[q.s]); }) + ")" : delAf(lov.den, function (q) { return NK.tal(c[q.s]); })) + "."] };
@@ -1629,7 +1629,7 @@
     };
 
     F.trin_indsaet = function () {
-        if (this.type === "ukendt") return "Sæt Kc og de kendte koncentrationer ind i ligevægtsloven. Skriv et bogstav, fx c, for den ukendte.";
+        if (this.type === "ukendt") return "Sæt Kc og de kendte koncentrationer ind i ligevægtsloven. Skriv et bogstav som c for den ukendte koncentration.";
         if (this.fase.indsaet === "tal") return "Sæt koncentrationerne ind i ligevægtsloven.";
         return "Regn Kc ud på lommeregneren, og vælg enheden.";
     };

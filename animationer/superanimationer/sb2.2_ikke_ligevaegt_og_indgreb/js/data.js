@@ -105,7 +105,7 @@
                     "Y = 0 er mindre end K = 4,0."
                 ]
             },
-            loest: "Uden produkt er Y = 0, altså mindre end K. Reaktionen går mod højre og danner CO₂ og H₂, indtil Y = K."
+            loest: "Uden produkter er Y = 0, som er mindre end K. Reaktionen går mod højre og danner CO₂ og H₂, indtil Y = K."
         },
         {
             id: "forMeget", navn: "For meget produkt",
@@ -123,7 +123,7 @@
                 fyld: true,
                 om: ["fyld", "tallinje"],
                 tekst: "Klik på Fyld beholderen, og følg Y på tallinjen under beholderen.",
-                set: "Y faldt fra 9,0 til 4,0. Der blev brugt CO₂ og H₂, og der blev dannet CO og H₂O.",
+                set: "Y faldt fra 9,0 til 4,0. Der blev forbrugt CO₂ og H₂, og der blev dannet CO og H₂O.",
                 hint: [
                     "Knappen Fyld beholderen sidder på beholderen.",
                     "Klik på den gule knap Fyld beholderen.",
@@ -136,17 +136,17 @@
                 svar: [
                     { t: "[H₂] faldt", ok: true },
                     { t: "[H₂] steg",
-                      f: "Mod venstre bliver H₂ brugt sammen med CO₂. Se [H₂] i panelet: fra start og nu." },
+                      f: "Mod venstre forbruges H₂ sammen med CO₂. Sammenlign [H₂] fra start og nu i panelet." },
                     { t: "[H₂] ændrede sig ikke",
-                      f: "Se [H₂] i panelet: fra start og nu." }
+                      f: "Sammenlign [H₂] fra start og nu i panelet." }
                 ],
                 hint: [
                     "H₂ står på højre side af reaktionspilen.",
-                    "Når reaktionen går mod venstre, bliver stofferne på højre side brugt.",
+                    "Når reaktionen går mod venstre, forbruges stofferne på højre side.",
                     "[H₂] faldt fra 0,45 M til 0,42 M."
                 ]
             },
-            loest: "Y > K betyder, at der er for meget produkt. Reaktionen går mod venstre og bruger CO₂ og H₂, indtil Y er faldet til K."
+            loest: "Y > K betyder, at der er for meget produkt. Reaktionen går mod venstre og forbruger CO₂ og H₂, indtil Y er faldet til K."
         },
         {
             id: "reaktant", navn: "Mere CO",
@@ -220,15 +220,15 @@
                     { t: "Som før indgrebet",
                       f: "Se tallene ved H₂ i panelet. Ligevægten modvirker indgrebet, men ophæver det ikke helt." },
                     { t: "Højere end lige efter",
-                      f: "Mod venstre bliver H₂ brugt. Kan [H₂] så stige efter indgrebet?" }
+                      f: "Mod venstre forbruges H₂. Kan [H₂] så stige efter indgrebet?" }
                 ],
                 hint: [
                     "Panelet viser [H₂] før indgrebet, lige efter og nu.",
-                    "Ligevægten bruger noget af det H₂, der blev pumpet ind, men ikke det hele.",
+                    "Reaktionen mod venstre forbruger noget af det H₂, der blev pumpet ind, men ikke det hele.",
                     "[H₂] faldt fra 0,30 M til 0,29 M, men er stadig højere end 0,20 M."
                 ]
             },
-            loest: "Ligevægten modvirker indgrebet ved at bruge noget af det H₂, der blev pumpet ind, men ophæver det ikke. Det er Le Chateliers princip."
+            loest: "Ligevægten modvirker indgrebet ved at forbruge noget af det H₂, der blev pumpet ind, men ophæver ikke indgrebet. Det er Le Chateliers princip."
         },
         {
             id: "mere", navn: "Mere H₂ uden H₂",
@@ -324,18 +324,18 @@
                 tekst: "Hvilken vej blev ligevægten forskudt, da blodet kom til musklen?",
                 svar: [
                     { t: "Mod højre",
-                      f: "Mod højre bliver der dannet HbO₂. Blev der det i musklen?" },
+                      f: "Mod højre bliver der dannet HbO₂. Blev der dannet HbO₂ i musklen?" },
                     { t: "Mod venstre", ok: true },
                     { t: "Den blev ikke forskudt",
-                      f: "Y blev større end K. Så var blodet ikke i ligevægt, og reaktionen måtte gå en af vejene." }
+                      f: "Da Y blev større end K, var blodet ikke i ligevægt, og reaktionen måtte forløbe i en af retningerne." }
                 ],
                 hint: [
                     "Lå Y til højre eller til venstre for K på tallinjen, da blodet kom til musklen?",
                     "Når Y er større end K, går reaktionen mod venstre.",
-                    "HbO₂ blev til Hb og O₂: mod venstre."
+                    "HbO₂ blev til Hb og O₂, og det er reaktionen mod venstre."
                 ]
             },
-            loest: "Musklen bruger O₂, så [O₂] falder. Y bliver større end K, og ligevægten forskydes mod venstre: HbO₂ afgiver O₂ til musklen."
+            loest: "Musklen bruger O₂, så [O₂] falder. Y bliver større end K, og ligevægten forskydes mod venstre, så HbO₂ afgiver O₂ til musklen."
         },
         {
             id: "loeb", navn: "Musklen arbejder",
@@ -365,17 +365,17 @@
                 svar: [
                     { t: "HbO₂ afgiver O₂", ok: true },
                     { t: "Hb binder mere O₂",
-                      f: "Så ville [O₂] falde endnu mere. Ligevægten modvirker indgrebet." },
+                      f: "Hvis Hb bandt mere O₂, ville [O₂] falde endnu mere. Ligevægten modvirker indgrebet." },
                     { t: "Musklen bruger mindre O₂",
                       f: "Det er musklen, der laver indgrebet. Spørgsmålet er, hvad ligevægten i blodet gør." }
                 ],
                 hint: [
-                    "Le Chateliers princip: ligevægten forskydes, så indgrebet bliver modvirket.",
+                    "Ifølge Le Chateliers princip forskydes ligevægten, så indgrebet bliver modvirket.",
                     "Indgrebet er, at [O₂] falder. Hvad modvirker det?",
                     "Når HbO₂ afgiver O₂, bliver der dannet O₂."
                 ]
             },
-            loest: "Ligevægten modvirker, at [O₂] falder, ved at danne O₂: HbO₂ afgiver O₂. En muskel, der arbejder hårdt, får derfor mere dioxygen."
+            loest: "Ligevægten modvirker faldet i [O₂] ved at danne O₂, idet HbO₂ afgiver O₂. En muskel, der arbejder hårdt, får derfor mere dioxygen."
         },
         {
             id: "bjerg", navn: "I bjergene",
@@ -511,7 +511,7 @@
     var FELT_HINT_CO = [
         "Find [CO₂] i oplysningerne på tavlen, og skriv tallet i feltet under [CO₂].",
         "Gør det samme med de tre andre felter. Enheden M står allerede efter feltet.",
-        "Over brøkstregen 0,10 og 0,10, under 0,20 og 0,10. Det giver Y = 0,50."
+        "Over brøkstregen står 0,10 og 0,10 og under 0,20 og 0,10. Det giver Y = 0,50."
     ];
 
     D.R_MAAL = [
@@ -601,14 +601,14 @@
                 tekst: "Stofferne på tavlen er væsker, der er blandet med hinanden. Hvilken reaktionsbrøk hører til?",
                 svar: [
                     { t: "[CH₃COOC₂H₅] / ([CH₃COOH] · [C₂H₅OH])", h: B("[CH₃COOC₂H₅]", "[CH₃COOH] · [C₂H₅OH]"),
-                      f: "Vand er her ikke et opløsningsmiddel, men et af de stoffer, der er blandet. Så er H₂O med." },
+                      f: "Vand er her ikke et opløsningsmiddel, men et af de stoffer, der er blandet. Derfor er H₂O med." },
                     { t: "[CH₃COOH] · [C₂H₅OH] / ([CH₃COOC₂H₅] · [H₂O])", h: B("[CH₃COOH] · [C₂H₅OH]", "[CH₃COOC₂H₅] · [H₂O]"),
                       f: "Brøken er vendt. Produkterne står over brøkstregen." },
                     { t: "[CH₃COOC₂H₅] · [H₂O] / ([CH₃COOH] · [C₂H₅OH])", h: B("[CH₃COOC₂H₅] · [H₂O]", "[CH₃COOH] · [C₂H₅OH]"), ok: true }
                 ],
                 hint: [
                     "Esteren og vand er produkterne og står over brøkstregen.",
-                    "Væsker, der er blandet med hinanden, er alle med i brøken. Også vand.",
+                    "Når væsker er blandet med hinanden, er de alle med i brøken, også vand.",
                     "Y = [CH₃COOC₂H₅] · [H₂O] / ([CH₃COOH] · [C₂H₅OH])."
                 ],
                 godt: "De fire væsker er blandet med hinanden, så de er alle med i brøken, også vand."
@@ -617,7 +617,7 @@
                 tekst: "Skriv koncentrationerne fra tavlen ind i brøken, og regn Y ud.",
                 hint: [
                     "Skriv [CH₃COOC₂H₅] og [H₂O] i felterne over brøkstregen.",
-                    "Over brøkstregen 1,0 og 1,0, under 0,50 og 0,50.",
+                    "Over brøkstregen står 1,0 og 1,0 og under 0,50 og 0,50.",
                     "Y = 1,0 M · 1,0 M / (0,50 M · 0,50 M) = 4,0."
                 ]
             },
@@ -631,7 +631,7 @@
                 hint: [
                     "Sammenlign de to tal.",
                     "Når Y = K, er blandingen i ligevægt.",
-                    "Koncentrationerne ændrer sig ikke: ingen vej."
+                    "Koncentrationerne ændrer sig ikke, så reaktionen går ingen vej."
                 ]
             },
             loest: "Y = K, så blandingen er i ligevægt. Koncentrationerne ændrer sig ikke, selv om begge reaktioner forløber hele tiden."
@@ -670,7 +670,7 @@
                     "Y < K, så ligevægten forskydes mod højre."
                 ]
             },
-            loest: "Y blev mindre end K, så ligevægten forskydes mod højre. Noget af den tilsatte N₂O₄ bliver til NO₂: indgrebet bliver modvirket."
+            loest: "Y blev mindre end K, så ligevægten forskydes mod højre. Noget af det tilsatte N₂O₄ bliver til NO₂, og dermed modvirkes indgrebet."
         },
         {
             id: "salmiak", navn: "Salmiak",
@@ -725,18 +725,18 @@
                 godt: "Y > K, så NH₃ og HCl reagerer og danner fast NH₄Cl, indtil Y = K igen."
             },
             spm2: {
-                tekst: "Hvad ville der ske, hvis man i stedet kom mere fast NH₄Cl i beholderen?",
+                tekst: "Hvad ville der ske, hvis man i stedet tilsatte mere fast NH₄Cl i beholderen?",
                 svar: [
                     { t: "Ligevægten forskydes mod højre",
                       f: "NH₄Cl er et fast stof og er ikke med i Y. Ændrer Y sig så, når der kommer mere NH₄Cl?" },
-                    { t: "Ingenting, NH₄Cl er ikke i Y", ok: true },
+                    { t: "Intet, for NH₄Cl er ikke med i Y", ok: true },
                     { t: "Ligevægten forskydes mod venstre",
                       f: "NH₄Cl er et fast stof og er ikke med i Y. Ændrer Y sig så, når der kommer mere NH₄Cl?" }
                 ],
                 hint: [
                     "Se på reaktionsbrøken på tavlen. Er NH₄Cl med?",
                     "Et indgreb, der ikke ændrer Y, forskyder ikke ligevægten.",
-                    "Ingenting sker."
+                    "Ligevægten forskydes ikke."
                 ]
             },
             loest: "Mere NH₃ gør Y større end K, så der dannes fast NH₄Cl. Mere fast NH₄Cl ændrer ikke Y og forskyder derfor ikke ligevægten."

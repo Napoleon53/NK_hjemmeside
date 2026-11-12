@@ -89,11 +89,11 @@
         vb: [1180, 810],
         lag: [
             { navn: "Næringsstoffer og kulhydrater", pladser: ["næringsstof", "monosaccharid", "disaccharid", "polysaccharid"],
-              ros: "Kulhydrater, fedtstoffer og proteiner er næringsstoffer. Kulhydraterne deles efter, hvor mange enheder de har." },
+              ros: "Kulhydrater, fedtstoffer og proteiner er næringsstoffer. Kulhydraterne inddeles efter, hvor mange sukkerenheder de består af." },
             { navn: "To monosaccharider", pladser: ["glucose", "fructose", "fischerprojektion"],
               ros: "Glucose og fructose er tegnet som fischerprojektioner. Hvert kryds er et carbonatom." },
             { navn: "Aldose, ketose, D og L", pladser: ["aldose", "ketose", "D-form", "L-form"],
-              ros: "En aldose har en aldehydgruppe, og en ketose har en ketongruppe. OH på carbonatom 5 afgør D eller L." }
+              ros: "En aldose har en aldehydgruppe, og en ketose har en ketongruppe. OH-gruppen på carbonatom 5 adskiller D-formen fra L-formen." }
         ],
         pladser: [
             /* Lag 1 */
@@ -105,7 +105,7 @@
             titel("monosaccharid", OV[0], ["mono"], {
                 disaccharid: "<b>disaccharid</b> er to enheder, der er bundet sammen. Kortet viser kun én sekskant.",
                 polysaccharid: "<b>polysaccharid</b> er en lang kæde af enheder. Kortet viser kun én sekskant.",
-                "næringsstof": "<b>næringsstof</b> er en gruppe i maden, som kulhydrater. Kortet viser ét sukkerstof af én enhed." }),
+                "næringsstof": "<b>næringsstof</b> er en gruppe i maden, for eksempel kulhydrater. Kortet viser ét sukkerstof af én enhed." }),
             titel("disaccharid", OV[1], ["di"], {
                 monosaccharid: "<b>monosaccharid</b> er én enhed. Kortet viser to sekskanter, der er bundet sammen.",
                 polysaccharid: "<b>polysaccharid</b> er en lang kæde. Kortet viser kun to sekskanter, der er bundet sammen.",

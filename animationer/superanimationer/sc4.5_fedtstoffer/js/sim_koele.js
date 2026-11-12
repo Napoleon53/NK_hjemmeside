@@ -471,7 +471,7 @@
         if (this.trin === "gaet" || this.trin === "set") {
             var f = D.fedt(o.fedt), st = D.sted(o.sted);
             this.sk.vis({ kl: "spm", chip: chip,
-                tekst: NK.html(f.Navn + " " + st.i + " (" + D.gradTekst(st.T) + ")") + ". Er det fast, delvist fast eller flydende?",
+                tekst: NK.html(f.Navn + " står " + st.i + " ved " + D.gradTekst(st.T)) + ". Er fedtet fast, delvist fast eller flydende?",
                 laast: this.trin === "set",
                 svar: SVAR.map(function (s) {
                     var set = mig.trin === "set";
@@ -681,7 +681,7 @@
             if (!u) return;
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "zoom") {
-                mig.besked("Hver kæde er en fedtsyre i sin farve. Faste molekyler ligger stille i rækker. Flydende bevæger sig.", "");
+                mig.besked("Hver kæde er en fedtsyre i sin farve. Molekylerne i fast fedt ligger stille i rækker, og molekylerne i flydende fedt bevæger sig.", "");
                 return;
             }
             if (u.slags === "glas") {

@@ -31,10 +31,10 @@
     D.TRIN = [
         { id: "nb", navn: "Stofmængden af NaOH", etiket: "n(NaOH) =", enhed: "mol", formel: "c · V",
           formelHint: "Du kender koncentrationen og rumfanget af NaOH.",
-          hint: "Rumfanget skal i liter: del antallet af mL med 1000." },
+          hint: "Rumfanget skal regnes om til liter, så del antallet af mL med 1000." },
         { id: "ns", navn: "Stofmængden af eddikesyre", etiket: "n(CH₃COOH) =", enhed: "mol", formel: "n(NaOH)",
           formelHint: "Se på reaktionsskemaet. Hvor mange CH₃COOH reagerer med én OH⁻?",
-          hint: "Det er den samme stofmængde som n(NaOH)." },
+          hint: "n(CH₃COOH) er den samme stofmængde som n(NaOH)." },
         { id: "ms", navn: "Massen af eddikesyre", etiket: "m(CH₃COOH) =", enhed: "g", formel: "n · M",
           formelHint: "Du kender stofmængden af eddikesyre og dens molarmasse.",
           hint: "Brug eddikesyrens molarmasse, 60,05 g/mol." },
@@ -79,7 +79,7 @@
           hint: "Hvor mange mol eddikesyre er der i 1,00 g eddike i forhold til 2,00 g?",
           efter: "Halvt så mange. Halvt så meget eddike indeholder halvt så mange mol eddikesyre." },
         { id: "halvProcent", spm: "procent", samme: true, B: { m: 1.00 }, aendring: "1,00 g eddike",
-          tekst: "Du regner masseprocenten ud for kolbe B. Bliver den større, den samme eller mindre end for kolbe A?",
+          tekst: "Kolbe B har stadig kun 1,00 g eddike. Bliver masseprocenten for kolbe B større, den samme eller mindre end for kolbe A?",
           valg: ["Større", "Den samme", "Mindre"], rigtig: 1,
           forkert: [
               "Massen af eddikesyre er halvt så stor, og prøven er også halvt så stor. Brøken ændrer sig ikke.",
@@ -87,9 +87,9 @@
               "Massen af eddikesyre er halvt så stor, men du deler også med en halvt så stor prøve."
           ],
           hint: "m% = m(CH₃COOH) / m(prøve) · 100 %. Hvad sker der med tælleren, og hvad sker der med nævneren?",
-          efter: "Den samme. Det er den samme eddike: halvt så meget syre delt med en halvt så stor prøve." },
+          efter: "Den samme. Det er den samme eddike, og halvt så meget syre bliver delt med en halvt så stor prøve." },
         { id: "base", spm: "forbrug", B: { c: 0.200 }, aendring: "0,200 M NaOH",
-          tekst: "Buretten ved kolbe B har NaOH med 0,200 M i stedet for 0,100 M. Skal der flere, lige så mange eller færre mL til?",
+          tekst: "Buretten ved kolbe B indeholder 0,200 M NaOH i stedet for 0,100 M. Skal der flere, lige så mange eller færre mL NaOH til?",
           valg: D.ML_VALG, rigtig: 2,
           forkert: [
               "Hver mL indeholder dobbelt så mange OH⁻, så der skal færre mL til den samme mængde syre.",
@@ -97,7 +97,7 @@
               ""
           ],
           hint: "Hvor mange OH⁻ er der i 1 mL, når koncentrationen er dobbelt så stor?",
-          efter: "Halvt så mange. Hver mL indeholder dobbelt så mange OH⁻." },
+          efter: "Halvt så mange mL. Hver mL indeholder dobbelt så mange OH⁻." },
         { id: "spild", spm: "procent", B: { spild: 0.15 }, aendring: "noget eddike spildt",
           tekst: "Du spilder lidt af eddiken til kolbe B, efter at du har vejet den. Bliver masseprocenten for høj, rigtig eller for lav?",
           valg: D.PROCENT_VALG, rigtig: 2,
@@ -128,7 +128,7 @@
             "Du lukker hanen, så snart kolben er svagt lyserød og forbliver det. " +
             "Luppen viser imens, hvordan hver OH⁻ reagerer med et eddikesyremolekyle.",
           sel: ["#tit-anker-hane", "#tit-anker-lup"] },
-        { tekst: "Når kolben er blevet lyserød, aflæser du forbruget ved menisken i panelet og skriver tallet i feltet under den. " +
+        { tekst: "Når kolben er blevet lyserød, aflæser du forbruget ved menisken i panelet og skriver tallet i feltet nedenunder. " +
             "Kortet øverst i scenen viser opgaven, og knappen Indsend svar sender aflæsningen. " +
             "Titreringskurven viser undervejs, hvordan pH i kolben ændrer sig, og knappen Tabel viser målingerne til Excel. " +
             "Knappen Giv hint på kortet hjælper dig, hvis du sidder fast.",

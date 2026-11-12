@@ -122,7 +122,7 @@
                 /* En laast opgave (fane 1: den forrige er ikke afstemt) */
                 var laast = !!(mig.laast && mig.laast(i));
                 c.classList.toggle("laast", laast);
-                c.title = laast ? "Afstem skemaet før, så åbner denne" : mig.opgaver[i].navn;
+                c.title = laast ? "Afstem den forrige reaktion, så åbner denne" : mig.opgaver[i].navn;
                 c.querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : (laast ? "🔒" : ""));
             });
             this.grupper.forEach(function (g) {

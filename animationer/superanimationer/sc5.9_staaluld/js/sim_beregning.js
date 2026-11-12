@@ -243,12 +243,12 @@
 
     P.slutLinje = function () {
         var o = this.opg, t = o.tal, f = o.facit;
-        var s = "Vægten viste " + K.g2(t.me) + " g. Regnet ud: " + K.g2(f.m) + " g.";
+        var s = "Vægten viste " + K.g2(t.me) + " g, og beregningen giver " + K.g2(f.m) + " g.";
         if (o.spm) s += " " + D.HVORFOR.efter.replace("{p}", K.pct(f.pct));
         else {
             s += " Her reagerede ca. " + K.pct(f.pct) + " % af jernet.";
             var f1 = K.facit({ tal: NK.maaling(0), sk: o.sk });
-            s += " I måling 1 var det ca. " + K.pct(f1.pct) + " %.";
+            s += " I måling 1 reagerede ca. " + K.pct(f1.pct) + " % af jernet.";
         }
         return NK.html(s);
     };
@@ -303,8 +303,8 @@
         if (u === "s0") this.kortBesked("Stålulden før: " + K.g2(t.mf) + " g jern.");
         else if (u === "s1") this.kortBesked("Vægten efter: " + K.g2(t.mf) + " g jern og " + K.g2(K.r2(t.me - t.mf)) + " g dioxygen, der har bundet sig.");
         else if (u === "s2") {
-            this.kortBesked(this.s.teori ? "Hvis alt jernet bliver til " + o.sk.oxid + ": " + K.g2(f.m) + " g. Den røde del er det dioxygen, der binder sig." :
-                "Den kommer, når du har regnet massen af " + o.sk.oxid + " ud.");
+            this.kortBesked(this.s.teori ? "Hvis alt jernet bliver til " + o.sk.oxid + ", vejer stålulden " + K.g2(f.m) + " g. Den røde del er det dioxygen, der binder sig." :
+                "Søjlen kommer, når du har regnet massen af " + o.sk.oxid + " ud.");
         } else if (u) this.kortBesked(NK.html(this.celleTekst(u)));
         return false;
     };

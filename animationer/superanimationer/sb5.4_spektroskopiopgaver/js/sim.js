@@ -541,7 +541,7 @@
             } else {
                 var hx = cE > g.xmaks ? g.x1 - 8 : g.x0 + 8;
                 T.pil(ctx, cE > g.xmaks ? g.x1 - 60 : g.x0 + 60, pyE + 18, hx, pyE + 18, { farve: T.FORKERT });
-                T.haloTekst(ctx, cE > g.xmaks ? "din c er længere ude" : "din c er tæt på 0", cE > g.xmaks ? g.x1 - 64 : g.x0 + 64, pyE + 18, 13, T.FORKERT, cE > g.xmaks ? "right" : "left");
+                T.haloTekst(ctx, cE > g.xmaks ? "din c er uden for grafen" : "din c er tæt på 0", cE > g.xmaks ? g.x1 - 64 : g.x0 + 64, pyE + 18, 13, T.FORKERT, cE > g.xmaks ? "right" : "left");
             }
         }
         /* Den nye proeve med for hoej absorbans */

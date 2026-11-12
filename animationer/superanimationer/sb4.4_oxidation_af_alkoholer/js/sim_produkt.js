@@ -265,7 +265,7 @@
         if (o.produkt) {
             var kl = D.KLASSER[K.stof(o.produkt).klasse];
             tekst = this.alkNavn() + " er en " + t.navn + " alkohol. " +
-                (o.o.maade === "mild" ? "Ved en mild oxidation" : (o.o.maade === "kraftig" ? "Ved en kraftig oxidation" : "Den")) +
+                (o.o.maade === "mild" ? "Ved en mild oxidation" : (o.o.maade === "kraftig" ? "Ved en kraftig oxidation" : "Ved oxidationen")) +
                 " bliver den til " + o.produkt + ", " + (kl ? kl.ental : "") + ". " + D.stor(mid.navn) + "et skifter fra " + mid.fra + " til " + mid.til + ".";
         } else {
             tekst = this.alkNavn() + " er en tertiær alkohol. Carbonatomet med OH-gruppen har intet hydrogenatom, så der sker ingen oxidation. " + D.stor(mid.navn) + "et forbliver " + mid.fra + ".";
@@ -286,16 +286,16 @@
     P.produktFejl = function (klasse) {
         var type = this.alk.type, m = this.opg.o.maade, h = this.alk.h;
         if (type === "tertiaer")
-            return "Carbonatomet med OH-gruppen har intet hydrogenatom. Oxidationsmidlet kan ikke tage noget fra det, så alkoholen oxideres ikke.";
+            return "Carbonatomet med OH-gruppen har intet hydrogenatom. Oxidationsmidlet kan derfor ikke fjerne et hydrogenatom, og alkoholen oxideres ikke.";
         if (klasse === null)
             return "Carbonatomet med OH-gruppen har " + (h === 1 ? "ét hydrogenatom" : D.TAL[h] + " hydrogenatomer") + ", som oxidationsmidlet kan tage. Der sker en oxidation.";
         if (type === "primaer") {
-            if (klasse === "keton") return "En keton har C=O inde i kæden. Her sidder OH-gruppen for enden af kæden, og der kommer C=O også til at sidde.";
+            if (klasse === "keton") return "En keton har C=O inde i kæden. Her sidder OH-gruppen for enden af kæden, og derfor kommer C=O også til at sidde for enden.";
             if (klasse === "carboxylsyre") return "Ved en mild oxidation destilleres aldehydet fra, så snart det er dannet. Det når ikke at blive oxideret videre.";
-            return "Med permanganat i overskud bliver aldehydet oxideret videre, fordi carbonatomet stadig har et hydrogenatom.";
+            return "Med permanganat i overskud bliver aldehydet oxideret videre, fordi carbonatomet i C=O stadig har et hydrogenatom.";
         }
-        if (klasse === "aldehyd") return "Et aldehyd har C=O for enden af kæden. Her sidder OH-gruppen inde i kæden, og der kommer C=O også til at sidde.";
-        return "Carbonatomet med OH-gruppen har kun ét hydrogenatom. Det kan kun oxideres én gang, så der dannes ingen carboxylsyre.";
+        if (klasse === "aldehyd") return "Et aldehyd har C=O for enden af kæden. Her sidder OH-gruppen inde i kæden, og derfor kommer C=O også til at sidde inde i kæden.";
+        return "Carbonatomet med OH-gruppen har kun ét hydrogenatom. Alkoholen kan derfor kun oxideres én gang, og der dannes ingen carboxylsyre.";
     };
 
     /* Kortets knap gaar altid fremad. Start forfra staar et andet sted (knappen
@@ -322,7 +322,7 @@
                 "Carbonatomet med OH-gruppen er bundet til " + (n === 1 ? "ét andet carbonatom" : D.TAL[n] + " andre carbonatomer") + ". Ét giver primær, to sekundær og tre tertiær."];
         }
         var type = this.alk.type, m = this.opg.o.maade;
-        var h2 = { primaer: m === "mild" ? "En primær alkohol bliver først til et aldehyd. Ved en mild oxidation stopper den der."
+        var h2 = { primaer: m === "mild" ? "En primær alkohol bliver først til et aldehyd. Ved en mild oxidation stopper oxidationen ved aldehydet."
                 : "En primær alkohol bliver først til et aldehyd og derefter til en carboxylsyre.",
             sekundaer: "En sekundær alkohol bliver til en keton, som ikke kan oxideres videre.",
             tertiaer: "En tertiær alkohol har intet hydrogenatom på carbonatomet med OH-gruppen." }[type];

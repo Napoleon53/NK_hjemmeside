@@ -896,8 +896,8 @@
         if (Math.hypot(g.x - G.markP.x, g.y - G.markP.y) < 16) mark = "P";
         else if (Math.hypot(g.x - G.markR.x, g.y - G.markR.y) < 16) mark = "R";
         if (!mark) return;
-        if (mark === "P" && sp.indhold !== "kolbe") { this.kortBesked("Ved P skal der en prøve fra kolben. Referencen skal ved R.", 4); return; }
-        if (mark === "R" && sp.indhold !== "ref") { this.kortBesked("Ved R skal der en prøve fra referenceglasset. Prøven fra kolben skal ved P.", 4); return; }
+        if (mark === "P" && sp.indhold !== "kolbe") { this.kortBesked("Ved P skal der sættes en prøve fra kolben, og referencen skal sættes ved R.", 4); return; }
+        if (mark === "R" && sp.indhold !== "ref") { this.kortBesked("Ved R skal der sættes en prøve fra referenceglasset, og prøven fra kolben skal sættes ved P.", 4); return; }
         if (mark === "P") {
             pl.P = Km.tlcProeve(S.K);
             pl.faerdig = Km.faerdig(S.K);
@@ -954,7 +954,7 @@
                 this.hoppe = 3;
                 S.plade.omroer = true;
                 this.klikTider = [];
-                this.kortBesked("Fuld fart: magnetloppen hopper i kolben. Den falder til ro igen.", 3);
+                this.kortBesked("Ved fuld fart hopper magneten i kolben, men den falder til ro igen.", 3);
             }
         } else if (id === "hane") {
             S.sug = !S.sug;

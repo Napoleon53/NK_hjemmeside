@@ -72,9 +72,9 @@
             { navn: "Metoden", pladser: ["chromatografi", "tyndtlagschromatografi", "TLC"],
               ros: "Chromatografi skiller en blanding ad med en væske. Tyndtlagschromatografi, TLC, bruger en plade med kiselgel." },
             { navn: "Pladen og væsken", pladser: ["stationær fase", "mobil fase", "løbevæske"],
-              ros: "Den stationære fase er laget på pladen. Den mobile fase, løbevæsken, suges op og tager stofferne med." },
+              ros: "Den stationære fase er laget på pladen. Den mobile fase er løbevæsken, som suges op og fører stofferne med sig." },
             { navn: "Fronten og Rf-værdien", pladser: ["væskefront", "Rf-værdi"],
-              ros: "Væskefronten er væskens øverste kant. Rf-værdien er plettens afstand divideret med frontens afstand." }
+              ros: "Væskefronten er væskens øverste kant. Rf-værdien er plettens afstand divideret med væskefrontens afstand." }
         ],
         pladser: [
             { id: "chromatografi", ord: ["chromatografi"], x: FR.x + FR.b / 2, y: FR.y, maal: [FR.x + FR.b / 2, FR.y], titel: true, dele: ["ramme", "filter"],

@@ -22,10 +22,10 @@
             { sel: "#fb-reaktor .pladser", titel: "Kolben", tekst: "Der er plads til to stoffer. Et klik på en plads tager stoffet af igen." },
             { sel: "#fb-reaktor .betingelser", titel: "Svovlsyre og varme", tekst: "Svovlsyre er katalysator. Varmepladen koger blandingen, og tilbagesvaleren over kolben holder dampen inde." },
             { sel: "#fb-start", titel: "Start", tekst: "Stofferne hældes i, og du ser, hvad der sker. Det, kunderne har bestilt, bliver leveret af sig selv. En blanding, der ikke kan reagere, bliver hældt ud." },
-            { sel: "#fb-tavleboks", titel: "Tavlen", tekst: "Molekylerne med strukturformler. Orange atomer kommer fra syren, blå fra alkoholen og lilla fra permanganaten. Et klik på tavlen springer animationen over." },
+            { sel: "#fb-tavleboks", titel: "Tavlen", tekst: "Molekylerne med strukturformler. Orange atomer kommer fra syren, blå fra alkoholen og lilla fra permanganatet. Et klik på tavlen springer animationen over." },
             { sel: "#fb-kasse, #fb-titelfelt", titel: "Kassen og titlen", tekst: "Du starter med 300 kr. som lærling. Titlen følger det, fabrikken har tjent i alt, og giver adgang til udstyr i butikken." },
             { sel: "#fb-seriefelt", titel: "Serien", tekst: "Hver levering i træk giver 10 % oveni, højst 50 %. En blanding, der må hældes ud, bryder serien. Det gør Vis svaret også." },
-            { sel: "#fb-boerskort", titel: "Børsen", tekst: "Hvert halve minut er der høj efterspørgsel på en ny duft. Den ordre giver mere." },
+            { sel: "#fb-boerskort", titel: "Børsen", tekst: "Hvert halve minut er der høj efterspørgsel på en ny duft. En ordre på den duft giver en højere pris." },
             { sel: "#fb-kortknap", titel: "Esterkortet", tekst: "Alle de estere, du har lavet. Første gang du laver et nyt stof, får du 50 kr. Klik for at se kortet." },
             { sel: "#fb-forfra", titel: "Forfra", tekst: "Starter fabrikken forfra med 300 kr. Tryk to gange." }
         ]

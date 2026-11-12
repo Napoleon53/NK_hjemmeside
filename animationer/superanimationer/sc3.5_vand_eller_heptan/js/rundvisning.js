@@ -19,14 +19,14 @@
             { sel: "#forsoeg-anker-kort", titel: "Formlen", tekst: "Strukturformlen for stoffet. Her klikker du på de polære grupper." },
             { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Det, du ser i glassene, og dit svar skrives her. Klik på et stof for at teste det." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Polære grupper og carbonkæder kort forklaret." },
-            { sel: ".faneknapper", titel: "Fane 2", tekst: "Gæt polaritet: gæt først, så viser forsøget svaret." }
+            { sel: ".faneknapper", titel: "Fane 2", tekst: "På fanen Gæt polaritet gætter du først, og så viser forsøget svaret." }
         ],
         "fane-gaet": [
-            { sel: "#gaet-anker-kort", titel: "Formlen", tekst: "Klik på de polære grupper. Søjlen tæller dem og C-atomerne." },
+            { sel: "#gaet-anker-kort", titel: "Formlen", tekst: "Klik på de polære grupper. Søjlen tæller de polære grupper og C-atomerne." },
             { sel: "#gaet-tb", titel: "Papirkortet", tekst: "Vælg polært eller upolært på papirkortet, og tryk Indsend svar. Giv et hint giver et hint og derefter svaret." },
-            { sel: "#gaet-anker-glas", titel: "Glassene", tekst: "Test dit svar: træk pipetten ned i det glas, svaret passer til. Forsøget viser, om du har ret." },
-            { sel: "#gaet-runde", titel: "Runden", tekst: "Ti stoffer, fem af hver slags. Rekorden huskes." },
-            { sel: "#gaet-sorteret", titel: "Sorteret", tekst: "Stofferne, du har testet: polære og upolære." }
+            { sel: "#gaet-anker-glas", titel: "Glassene", tekst: "Test dit svar ved at trække pipetten ned i det glas, som svaret passer til. Forsøget viser, om du har ret." },
+            { sel: "#gaet-runde", titel: "Runden", tekst: "En runde har ti stoffer, fem polære og fem upolære. Rekorden huskes." },
+            { sel: "#gaet-sorteret", titel: "Sorteret", tekst: "Stofferne, du har testet, sorteret i polære og upolære." }
         ]
     };
 

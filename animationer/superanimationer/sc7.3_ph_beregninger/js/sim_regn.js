@@ -163,8 +163,8 @@
             var b3 = K.trinHAfOh(oh);
             var h = K.rund(b3.facit);
             var b4 = K.trinPhAfH(h, [
-                [-K.log10(oh), "Det er −log[OH⁻]. pH regnes ud fra [H₃O⁺]."],
-                [-K.log10(c), "Det er −log af tallet på flasken. pH regnes ud fra [H₃O⁺]."]
+                [-K.log10(oh), "Du har regnet −log[OH⁻]. pH regnes ud fra [H₃O⁺]."],
+                [-K.log10(c), "Du har regnet −log af koncentrationen på flasken. pH regnes ud fra [H₃O⁺]."]
             ]);
             opg.trin = [b1, b2, b3, b4];
             opg.etiket = [{ id: "oh", navn: "[OH⁻]", trin: 1 }, { id: "h", navn: "[H₃O⁺]", trin: 2 }, { id: "ph", navn: "pH", trin: 3 }];
@@ -445,7 +445,7 @@
             t.elevSvar = t.felt === "konc" ? K.konc(tal.v) : (t.felt === "ph" ? K.phTekst(tal.v) : String(tal.v));
             this.trinFaerdig(r.note, false);
         } else {
-            this.fejl(felt, r.besked || "Det er ikke rigtigt. Regn det igen på lommeregneren, og se på linjen under det, du tastede: står tallene, hvor de skal?");
+            this.fejl(felt, r.besked || "Det er ikke rigtigt. Regn det igen på lommeregneren, og se på linjen under det, du tastede. Står tallene, hvor de skal?");
         }
     };
 

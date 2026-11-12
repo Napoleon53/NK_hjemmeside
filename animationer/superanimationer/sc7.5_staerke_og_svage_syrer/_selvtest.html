@@ -545,7 +545,7 @@ function koerTest(W) {
     D.ORD.forEach(function (o, r) { ord(r, "s", true); ord(r, "k", o.konc); });
     F.tavle.querySelector("#f-tjek").click();
     paastand("den typiske fejl (fortyndet saltsyre er stadig stærk, men eddikesyre er ikke): rækken bliver rød med forklaring",
-        roed(F) && /^Ikke endnu\s+Eddikesyre 0,0010 M: stærk og svag handler om, hvilken syre det er/.test(statuslinje(F)) && F.tavle.querySelectorAll(".ord-raekke.forkert").length === 2 &&
+        roed(F) && /^Ikke endnu\s+Eddikesyre 0,0010 M: Stærk og svag handler om, hvilken syre det er/.test(statuslinje(F)) && F.tavle.querySelectorAll(".ord-raekke.forkert").length === 2 &&
         F.tavle.getBoundingClientRect().top >= gkF.getBoundingClientRect().bottom + 4, statuslinje(F));
     D.ORD.forEach(function (o, r) { ord(r, "s", K.erStaerk(o.syre)); ord(r, "k", !o.konc); });
     F.tavle.querySelector("#f-tjek").click();

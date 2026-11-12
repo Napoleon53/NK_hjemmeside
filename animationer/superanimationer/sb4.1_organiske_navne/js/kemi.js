@@ -225,14 +225,14 @@
             tekst: k === "alkohol" ? "Tæl carbonatomerne i den længste kæde, som OH-gruppen sidder på. Hvad er stammen?"
                 : "Tæl carbonatomerne i den længste kæde." + medC + " Hvad er stammen?",
             valg: D.STAMMER.slice(), rigtig: stof.stamme,
-            godt: K.stor(stof.stamme) + " er " + K.antalC(n) + ".",
+            godt: "Stammen " + stof.stamme + " betyder " + K.antalC(n) + ".",
             fejl: function (v) {
                 var m = D.STAMMER.indexOf(v) + 1;
                 if (m === stof.antalC && stof.antalC !== n) return "Sidegruppen tæller ikke med i stammen. Tæl kun den længste kæde.";
                 if (k !== "alkohol" && m === n - 1) return "Carbonatomet i " + (k === "carboxylsyre" ? "COOH" : "C=O") + " hører med til kæden. Tæl det med.";
                 /* Enden med OH eller O talt med som et carbonatom */
                 if (m === n + 1 && m !== stof.antalC) return "Et atom med bogstav er ikke et carbonatom. Tæl kun knæk og ender uden bogstaver.";
-                return K.stor(v) + " er " + K.antalC(m) + ". Tæl hvert knæk og hver ende i den længste kæde.";
+                return "Stammen " + v + " betyder " + K.antalC(m) + ". Tæl hvert knæk og hver ende i den længste kæde.";
             },
             hint: ["Hvert knæk og hver ende i zigzagformlen er et carbonatom.",
                 "Den længste kæde er gul i formlen. Tæl dens carbonatomer."],
@@ -252,7 +252,7 @@
                 fejl: function (id) {
                     var a = stof.mol.atom(id), i = stof.kaede.indexOf(id);
                     if (a.el !== "C") return "Det er et " + (a.el === "O" ? "oxygenatom" : "nitrogenatom") + ". Kæden nummereres kun på carbonatomerne.";
-                    if (i < 0) return "Det carbonatom er en sidegruppe. Nummer 1 er en ende af den længste kæde.";
+                    if (i < 0) return "Det carbonatom hører til en sidegruppe. Nummer 1 er en ende af den længste kæde.";
                     if (i > 0 && i < n - 1) return "Nummer 1 er en af kædens to ender.";
                     if (k === "aldehyd") return "I et aldehyd er carbonatomet i C=O nummer 1.";
                     if (k === "carboxylsyre") return "I en carboxylsyre er carbonatomet i COOH nummer 1.";
@@ -272,7 +272,7 @@
             slags: "valg", del: "endelse", vis: "gruppe", om: "gruppe",
             tekst: "Vælg endelsen. Den viser stofklassen" + hvorTekst,
             valg: K.endelseValg(stof, aktive), rigtig: stof.endelse, somEndelse: true,
-            godt: K.stor(K.klasse(k).har) + " er " + K.klasse(k).ental + "." + (stof.pos ? " " + G + " sidder på carbonatom nummer " + stof.pos + "." : ""),
+            godt: K.stor(K.klasse(k).har) + " gør stoffet til " + K.klasse(k).ental + "." + (stof.pos ? " " + G + " sidder på carbonatom nummer " + stof.pos + "." : ""),
             fejl: function (v) {
                 var kv = klasseAfEndelse(v), q = tal(v), kl = K.klasse(kv), egen = K.klasse(k);
                 if (kv !== k) return "Endelsen " + K.medStreg(v).replace(/^-\d+-/, "-") + " hører til " + kl.ental + ". Molekylet har " + egen.har + ".";
@@ -281,7 +281,7 @@
                 return G + " sidder på carbonatom nummer " + stof.pos + ". Se numrene i formlen.";
             },
             hint: ["Alkoholer ender på -ol, aldehyder på -al, ketoner på -on og carboxylsyrer på -syre.",
-                K.stor(K.klasse(k).har) + " er " + K.klasse(k).ental + "." + (stof.pos ? " " + G + " sidder på carbonatom nummer " + stof.pos + "." : "")],
+                K.stor(K.klasse(k).har) + " gør stoffet til " + K.klasse(k).ental + "." + (stof.pos ? " " + G + " sidder på carbonatom nummer " + stof.pos + "." : "")],
             hintVis: [null, null]
         });
         /* 4. Forleddet: kun naar der er en sidegruppe */
@@ -444,7 +444,7 @@
         var gpos = res.kaede.indexOf(gr[0].c) + 1;
         if (gpos !== stof.gpos && stof.pos) return du + "Tallet " + stof.pos + " betyder, at " + GRUPPEORD[k] + " sidder på carbonatom nummer " + stof.pos + ".";
         if (stof.forled) return du + "Forleddet " + stof.forled + " betyder et ekstra carbonatom på nummer " + stof.spos + ".";
-        return du + "Kæden må ikke have sidegrupper: " + stof.navn + " har intet forled.";
+        return du + "Kæden må ikke have sidegrupper, for " + stof.navn + " har intet forled.";
     };
 
     /* ----- Fane 3: et stof med flere grupper -------------------------------------------- */
@@ -482,16 +482,16 @@
     K.gruppeFejl = function (b, g, valgt) {
         var mol = b.mol, rigtig = g.klasse, v = K.klasse(valgt);
         if (rigtig === "carboxylsyre" && (valgt === "keton" || valgt === "aldehyd" || valgt === "alkohol")) {
-            return "C=O og OH sidder på det samme carbonatom. Sammen er de én gruppe, og den er ikke " + v.ental + ".";
+            return "C=O og OH sidder på det samme carbonatom. Sammen er de én gruppe, og den gør ikke stoffet til " + v.ental + ".";
         }
         if (rigtig === "ester" && (valgt === "keton" || valgt === "aldehyd" || valgt === "carboxylsyre")) {
-            return valgt === "carboxylsyre" ? "Der sidder intet H på oxygenatomet. Oxygenatomet er bundet til carbon på begge sider."
+            return valgt === "carboxylsyre" ? "Det enkeltbundne oxygenatom har intet H, for det er bundet til et carbonatom på begge sider."
                 : "Carbonatomet med C=O har også et O i kæden. Sammen er de én gruppe.";
         }
         if (rigtig === "keton" && valgt === "aldehyd") return "C=O sidder inde i kæden med et carbonatom på hver side. I et aldehyd sidder C=O for enden.";
         if (rigtig === "aldehyd" && valgt === "keton") return "C=O sidder for enden af kæden. I en keton sidder C=O inde i kæden.";
-        if (rigtig === "alkohol" && valgt === "carboxylsyre") return "OH-gruppens carbonatom har ingen dobbeltbinding til oxygen. Så er gruppen ikke en carboxylgruppe.";
-        if (rigtig === "amin") return "Gruppen har et nitrogenatom. " + v.navn + " har " + v.har + ".";
+        if (rigtig === "alkohol" && valgt === "carboxylsyre") return "OH-gruppens carbonatom har ingen dobbeltbinding til oxygen. Derfor er gruppen ikke en carboxylgruppe.";
+        if (rigtig === "amin") return "Den markerede gruppe har et nitrogenatom. " + K.stor(v.ental) + " har " + v.har + ".";
         var har = mol.atom(g.atomer[g.atomer.length - 1]).el === "N" ? "et nitrogenatom" : K.klasse(rigtig).har;
         return K.stor(v.ental) + " har " + v.har + ". Den markerede gruppe har " + har + ".";
     };

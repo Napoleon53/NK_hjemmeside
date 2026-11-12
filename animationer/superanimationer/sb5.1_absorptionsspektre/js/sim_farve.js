@@ -140,7 +140,7 @@
     P.promptHTML = function () {
         var o = this.o;
         if (o.type === "byg") {
-            return '<p class="note-tekst">Kurven viser, hvor meget lys stoffet absorberer ved hver bølgelængde. Lampen sender hvidt lys gennem kuvetten, og øjet ser det, der slipper igennem.</p>';
+            return '<p class="note-tekst">Kurven viser stoffets absorbans som funktion af bølgelængden. Lampen sender hvidt lys gennem kuvetten, og øjet ser det lys, der slipper igennem.</p>';
         }
         var trin1 = this.trin === "top" && !this.venter ? "aktiv" : "ok";
         var trin2 = this.faerdig ? "ok" : (this.trin === "farve" ? "aktiv" : "");
@@ -148,7 +148,7 @@
             '<p class="note-tekst">' + NK.html(o.beskrivelse) + "</p>" +
             '<ol class="trinliste"><li class="' + trin1 + '">Find toppen' + (this.valgtL !== null ? ": " + this.valgtL + " nm" : "") + "</li>" +
             '<li class="' + trin2 + '">Vælg farven' + (this.faerdig ? ": " + NK.html(o.farve.toLowerCase()) : "") + "</li></ol>";
-        if (this.faerdig) h += '<p class="note-tekst maal">Et spektrofotometer måler ved toppen, ' + o.lmax + " nm, hvor stoffet absorberer mest.</p>";
+        if (this.faerdig) h += '<p class="note-tekst maal">Et spektrofotometer indstilles til λ<sub>max</sub> = ' + o.lmax + " nm, hvor stoffet absorberer mest.</p>";
         return h;
     };
 
@@ -156,7 +156,7 @@
     P.hintTrin = function () {
         var o = this.o;
         if (this.trin === "byg") return [
-            "Den farve, vi ser, står over for det lys, der bliver absorberet, i farvecirklen.",
+            "Vi ser den farve, der står over for det absorberede lys i farvecirklen.",
             "Find " + o.maal.toLowerCase() + " i farvecirklen. Over for den står " + o.lys + ".",
             "Træk toppen til ca. " + o.svar + " nm."
         ];
@@ -167,7 +167,7 @@
         ];
         return [
             "Vi ser det lys, der slipper igennem kuvetten, ikke det lys, der bliver absorberet.",
-            "Stoffet absorberer " + o.absorberer + ". Linjen i farvecirklen går fra det absorberede til den farve, vi ser.",
+            "Stoffet absorberer " + o.absorberer + ". Linjen i farvecirklen går fra det absorberede lys til den farve, vi ser.",
             "Opløsningen er " + o.farve.toLowerCase() + "."
         ];
     };
@@ -234,7 +234,7 @@
         }
         var anden = (o.andreToppe || []).some(function (r) { return l >= r[0] && l <= r[1]; });
         if (anden) {
-            this.fejlLinje("Det er en top, men ikke den højeste. Find det sted, hvor kurven er allerhøjest.");
+            this.fejlLinje("Du har klikket på en top, men ikke den højeste. Find det sted, hvor kurven er højest.");
             return;
         }
         this.fejlLinje("Ved " + Math.round(l) + " nm er absorbansen kun " + Tg.tal(mig.A(l), 2) + ". Find det sted, hvor kurven er højest.");
@@ -252,8 +252,8 @@
         }
         var absorberetSvar = LYS_TIL_SVAR[F.lysNavn(o.lmax)];
         var tekst = o.nej && o.nej[navn];
-        if (!tekst && navn === absorberetSvar) tekst = "Det er farven på det lys, stoffet absorberer. Vi ser det lys, der slipper igennem.";
-        if (!tekst) tekst = "Stoffet absorberer " + o.absorberer + ". Find det i farvecirklen, og se på farven over for det.";
+        if (!tekst && navn === absorberetSvar) tekst = "Du har valgt farven på det lys, stoffet absorberer. Vi ser det lys, der slipper igennem.";
+        if (!tekst) tekst = "Stoffet absorberer " + o.absorberer + ". Find det absorberede lys i farvecirklen, og se på farven over for det.";
         this.forkertValg(j, tekst);
     };
 
@@ -261,7 +261,7 @@
         var o = this.o;
         var lt = Math.round(this.topL);
         this.auto = false;
-        this.loest("Toppen står ved " + lt + " nm. Stoffet absorberer " + F.lysOrd(lt) + " lys, og resten blander sig til " +
+        this.loest("Toppen står ved " + lt + " nm. Stoffet absorberer " + F.lysOrd(lt) + " lys, og resten af lyset blander sig til " +
             o.maal.toLowerCase() + ". " + o.maal + " står over for " + o.lys + " i farvecirklen.");
     };
 
@@ -271,7 +271,7 @@
         var f = this.farve();
         if (f.navn === this.o.maal) { this.byggetFaerdig(); return; }
         this.fejlLinje("Opløsningen er " + f.navn.toLowerCase() + ", ikke " + this.o.maal.toLowerCase() +
-            ". Den farve, vi ser, står over for det absorberede lys i farvecirklen.");
+            ". Vi ser den farve, der står over for det absorberede lys i farvecirklen.");
     };
 
     /* Eleven har flyttet toppen: Indsend bliver klar, og en gammel besked forsvinder */
@@ -513,7 +513,7 @@
     P.klikScene = function (pt) {
         if (this.paaOeje(pt)) {
             this.blink = 0.3;
-            this.kortBesked("Øjet har tre slags tappe: til rødt, grønt og blåt lys. Hver farve, du ser, er en blanding af de tre.", 6);
+            this.kortBesked("Øjet har tre slags tappe, som reagerer på rødt, grønt og blåt lys. Hver farve, du ser, er en blanding af de tre farver.", 6);
             return;
         }
         if (this.o.type === "stof" && this.trin === "top" && this.g && this.g.inde(pt)) {

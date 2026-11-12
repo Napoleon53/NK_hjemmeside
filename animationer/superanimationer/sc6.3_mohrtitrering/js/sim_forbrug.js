@@ -412,9 +412,9 @@
         var u = this.hvadErUnder(pt);
         if (!u) return;
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
-        if (u.slags === "A") this.info = { tekst: "Kolbe A: " + NK.tal2(this.A.m) + " g havvand fra " + this.sted + ", " + this.A.vand +
-            " mL demineraliseret vand og sølvnitrat " + K.c(this.A.c) + " M.", tid: 5 };
-        if (u.slags === "B") this.info = { tekst: "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A.", tid: 5 };
+        if (u.slags === "A") this.info = { tekst: "Kolbe A har " + NK.tal2(this.A.m) + " g havvand fra " + this.sted + " og " + this.A.vand +
+            " mL demineraliseret vand. Den titreres med " + K.c(this.A.c) + " M sølv(I)nitrat.", tid: 5 };
+        if (u.slags === "B") this.info = { tekst: "Ved kolbe B er én ting ændret: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A.", tid: 5 };
         this.visBund();
     };
 

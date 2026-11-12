@@ -514,7 +514,7 @@
         if (!k) {
             var sat = this.slots.filter(function (s) { return s.syre && s.t >= 1; }).length;
             NK.saetHTML("fabrik-db", sat + "/3 fedtsyrer");
-            NK.saetHTML("fabrik-fedt", '<p class="note">Sæt tre fedtsyrer på glycerol. Så ses det her, hvor fedtet er fast.</p>');
+            NK.saetHTML("fabrik-fedt", '<p class="note">Sæt tre fedtsyrer på glycerol, så viser kortet her, hvor fedtet er fast.</p>');
             return;
         }
         var fedt = { kaeder: k }, n = F.antalDb(k);
@@ -544,7 +544,7 @@
         } else if (sat === 0) {
             t = "Træk en fedtsyre fra bordet hen på en OH-gruppe på glycerol.";
         } else if (sat < 3) {
-            t = sat + " af 3 fedtsyrer sat på. Hver binding giver ét vandmolekyle.";
+            t = sat + " af 3 fedtsyrer er sat på. Hver binding giver ét vandmolekyle.";
         } else {
             var k = this.kaeder();
             t = k ? "Dit fedtstof smelter ved " + NK.html(F.smpTekst(k)) + ". Klik på en kæde for at tage den af." : "Fedtsyren bindes.";
@@ -823,7 +823,7 @@
         if (u.slags === "flise") {
             var id = D.SYRER[u.i].id, i = this.ledig();
             if (i < 0) {
-                this.besked("Glycerol har kun tre OH-grupper. Klik på en kæde for at tage den af, eller træk fedtsyren hen over den.", "");
+                this.besked("Glycerol har kun tre OH-grupper. Klik på en kæde for at tage den af, eller træk fedtsyren hen over en af kæderne for at bytte.", "");
                 return;
             }
             var r = this.lay.fliser[u.i];
@@ -841,12 +841,12 @@
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "kop") { if (mig.klikKop) mig.klikKop(); return; }
             if (u.slags === "glycerol") {
-                mig.besked("Glycerol er en alkohol med tre OH-grupper. Hver kan binde én fedtsyre.", "");
+                mig.besked("Glycerol er en alkohol med tre OH-grupper. Hver OH-gruppe kan binde én fedtsyre.", "");
                 return;
             }
             if (u.slags === "glas") {
                 var k = mig.kaeder();
-                mig.besked(k ? "Dit fedtstof på køkkenbordet, 20 °C. Det er " + D.TILSTANDE[F.tilstand({ kaeder: k }, 20)].navn + ". Du kan tage det med ud i køkkenet på fane 2." :
+                mig.besked(k ? "Dit fedtstof står på køkkenbordet ved 20 °C og er " + D.TILSTANDE[F.tilstand({ kaeder: k }, 20)].navn + ". Du kan tage det med ud i køkkenet på fane 2." :
                     "Glasset er tomt. Byg et fedtstof, så kommer det i glasset.", "");
                 return;
             }

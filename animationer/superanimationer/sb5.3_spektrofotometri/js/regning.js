@@ -199,7 +199,7 @@
             this.fejlFelt = -1;
             this.byg();
             this.fokus();
-            this.fane.delOk("Rigtig formel. Nu tallene: skriv dem i felterne.");
+            this.fane.delOk("Rigtig formel. Skriv nu tallene i felterne.");
             return;
         }
         this.fejlFelt = dom.felt === undefined ? -1 : dom.felt;
@@ -220,7 +220,7 @@
         if (dom.slags === "stortA") return "Stort A er absorbansen. Hældningen skrives med lille a.";
         if (dom.slags === "vendt") return "Brøken er vendt.";
         if (dom.slags === "fremmed") return "Den størrelse hører ikke med i formlen her.";
-        if (dom.slags === "form") return "Formlen har ikke den form. Prøv en anden skabelon.";
+        if (dom.slags === "form") return "Formlen har ikke den form. Vælg en anden form.";
         return "Den formel passer ikke her.";
     };
 
@@ -239,7 +239,7 @@
             this.fejlFelt = -1;
             this.byg();
             this.fokus();
-            this.fane.delOk("Rigtige tal. Regn det ud, og skriv resultatet.");
+            this.fane.delOk("Rigtige tal. Regn resultatet ud, og skriv det i feltet.");
             return;
         }
         this.fejlFelt = dom.felt === undefined ? -1 : dom.felt;
@@ -292,7 +292,7 @@
             this.fase = "res";
             this.byg();
             this.fokus();
-            return "Tallene er sat ind. Regn det ud, og skriv resultatet.";
+            return "Tallene er sat ind. Regn resultatet ud, og skriv det i feltet.";
         }
         if (this.fase === "res") {
             this.resultat = s.svarRes(this.talOk);
@@ -393,7 +393,7 @@
         this.byg();
         if (fejl) { this.fokus(); this.fane.fejl(fejl); return; }
         if (this.faerdig()) { this.fane.talLoest(this); return; }
-        if (nye) { this.fokus(); this.fane.delOk(nye === 1 ? "Rigtigt. Fortsæt med det næste." : "Rigtigt. Fortsæt med de næste."); return; }
+        if (nye) { this.fokus(); this.fane.delOk(nye === 1 ? "Rigtigt. Fortsæt med det næste felt." : "Rigtigt. Fortsæt med de næste felter."); return; }
         if (tomme) { this.fokus(); this.fane.fejl("Skriv et tal i feltet."); }
     };
 

@@ -37,58 +37,58 @@
             saet: { proeve: [{ id: "hcl", c: 0.1 }, { id: "vand", c: 0 }], V0: 25, titrator: { id: "naoh", c: 0.1 }, indikator: "bromthymolblaat" }
         },
         {
-            id: "eddike", navn: "Eddikesyre med natriumhydroxid",
-            note: "Klassikeren. Bufferområdet ses tydeligt, og ækvivalenspunktet ligger i det basiske.",
+            id: "eddike", navn: "Ethansyre med natriumhydroxid",
+            note: "Bufferområdet ses tydeligt, og ækvivalenspunktet ligger i det basiske område.",
             saet: { proeve: [{ id: "eddikesyre", c: 0.1 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         },
         {
             id: "ammoniak", navn: "Ammoniak med saltsyre",
-            note: "Nu den anden vej: en svag base titreres med en stærk syre, og ækvivalenspunktet ligger i det sure.",
+            note: "En svag base titreres med en stærk syre, og ækvivalenspunktet ligger i det sure område.",
             saet: { proeve: [{ id: "ammoniak", c: 0.1 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "hcl", c: 0.1 }, indikator: "methylroedt" }
         },
         {
             id: "phosphor", navn: "Phosphorsyre med natriumhydroxid",
-            note: "To spring, ikke tre: det sidste trin (pKs 12,35) er for svagt til at kunne titreres.",
+            note: "Kurven har to spring og ikke tre, fordi det sidste trin (pKs 12,35) er for svagt til at kunne titreres.",
             saet: { proeve: [{ id: "phosphorsyre", c: 0.05 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         },
         {
             id: "soda", navn: "Soda med saltsyre (dobbeltindikator)",
-            note: "Na₂CO₃ giver to spring: først til hydrogencarbonat ved pH 8,3, så til kulsyre ved pH 4.",
+            note: "Na₂CO₃ giver to spring, først til hydrogencarbonat ved pH 8,3 og derefter til kulsyre ved pH 4.",
             saet: { proeve: [{ id: "na2co3", c: 0.05 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "hcl", c: 0.1 }, indikator: "methylorange" }
         },
         {
             id: "blanding", navn: "Blanding af stærk og svag syre",
-            note: "HCl og eddikesyre i samme kolbe. Det første spring tæller kun den stærke syre.",
+            note: "HCl og ethansyre i samme bægerglas. Det første spring svarer kun til den stærke syre.",
             saet: { proeve: [{ id: "hcl", c: 0.05 }, { id: "eddikesyre", c: 0.05 }], V0: 20, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         },
         {
             id: "citron", navn: "Citronsyre i sodavand",
-            note: "Tre pKs-værdier så tæt på hinanden, at springene smelter sammen til ét.",
+            note: "Citronsyre har tre pKs-værdier så tæt på hinanden, at springene smelter sammen til ét.",
             saet: { proeve: [{ id: "citronsyre", c: 0.03 }, { id: "vand", c: 0 }], V0: 25, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         },
         {
             id: "glycin", navn: "Glycin med natriumhydroxid",
-            note: "En aminosyre. Prøv også at titrere den med saltsyre og find det isoelektriske punkt midt imellem.",
+            note: "Glycin er en aminosyre. Titrér den også med saltsyre, og find det isoelektriske punkt midt mellem de to pKs-værdier.",
             saet: { proeve: [{ id: "glycin", c: 0.1 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "naoh", c: 0.1 }, indikator: "thymolphthalein" }
         },
         {
-            id: "puffer", navn: "Puffer: eddikesyre og acetat",
-            note: "Start i en puffer. Se hvor lidt pH flytter sig, indtil pufferen er brugt op.",
+            id: "puffer", navn: "Puffer: ethansyre og ethanoat",
+            note: "Titreringen starter i en puffer. Se, hvor lidt pH ændrer sig, indtil pufferen er brugt op.",
             saet: { proeve: [{ id: "eddikesyre", c: 0.1 }, { id: "natriumacetat", c: 0.1 }], V0: 20, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         },
         {
             id: "fortyndet", navn: "Meget fortyndet syre",
-            note: "0,001 M HCl. Springet skrumper, og valg af indikator bliver pludselig kritisk.",
+            note: "0,001 M HCl. Springet bliver mindre, og valget af indikator bliver afgørende.",
             saet: { proeve: [{ id: "hcl", c: 0.001 }, { id: "vand", c: 0 }], V0: 25, titrator: { id: "naoh", c: 0.001 }, indikator: "bromthymolblaat" }
         },
         {
             id: "svagsvag", navn: "Svag syre med svag base",
-            note: "Eddikesyre med ammoniak. Næsten intet spring — derfor bruger man altid en stærk titrator.",
+            note: "Ethansyre med ammoniak giver næsten intet spring. Derfor bruges der altid en stærk titrator.",
             saet: { proeve: [{ id: "eddikesyre", c: 0.1 }, { id: "vand", c: 0 }], V0: 20, titrator: { id: "ammoniak", c: 0.1 }, indikator: "lakmus" }
         },
         {
             id: "khp", navn: "Standardisering mod KHP",
-            note: "Kaliumhydrogenphthalat er en primær standard: man vejer den af og bestemmer NaOH-opløsningens koncentration.",
+            note: "Kaliumhydrogenphthalat er en primær standard. Stoffet vejes af, og titreringen bestemmer koncentrationen af NaOH-opløsningen.",
             saet: { proeve: [{ id: "khp", c: 0.05 }, { id: "vand", c: 0 }], V0: 25, titrator: { id: "naoh", c: 0.1 }, indikator: "phenolphthalein" }
         }
     ];
@@ -183,11 +183,11 @@
             gruppe.label = "Dit eget stof";
             o = document.createElement("option");
             o.value = "egen_syre";
-            o.textContent = "Egen syre — skriv pKs selv";
+            o.textContent = "Egen syre (skriv pKs selv)";
             gruppe.appendChild(o);
             o = document.createElement("option");
             o.value = "egen_base";
-            o.textContent = "Egen base — skriv pKs selv";
+            o.textContent = "Egen base (skriv pKs selv)";
             gruppe.appendChild(o);
             vaelger.appendChild(gruppe);
         }
@@ -260,8 +260,8 @@
         var t = Kemi.titratorType(beregning.titrator.stof);
         var ae = Kemi.aekvivalenspunkter(beregning);
         var advarsel = "";
-        if (t.type === "ingen") advarsel = "Det stof i buretten kan hverken afgive eller optage protoner.";
-        else if (ae.length === 0) advarsel = "Der er ikke noget i kolben, som denne titrator kan omsætte.";
+        if (t.type === "ingen") advarsel = "Stoffet i buretten kan hverken afgive eller optage hydroner.";
+        else if (ae.length === 0) advarsel = "Der er ikke noget i bægerglasset, som titratoren kan omsætte.";
         var boks = NK.el("ops-advarsel");
         boks.textContent = advarsel;
         boks.style.display = advarsel ? "block" : "none";

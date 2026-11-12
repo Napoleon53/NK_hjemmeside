@@ -270,7 +270,7 @@
     P.slet = function (u) {
         var b = this.braet;
         if (!u || u.slags !== "atom") { b.toast("Klik på et atom for enden af kæden."); return; }
-        if (b.antal() <= 1) { b.toast("Startatomet bliver stående. Vælg C for at tegne."); return; }
+        if (b.antal() <= 1) { b.toast("Det første atom på tavlen kan ikke slettes. Vælg C for at tegne."); return; }
         if (b.sletAtom(u.atom) && b.antal() <= 1) this.vaelgVaerktoej("C");
     };
 
@@ -308,7 +308,7 @@
         var mig = this, tr = this.trin(), o = this.opg, chip = "Opgave " + (this.nr + 1) + " · " + D.NIVEAUER[o.niv - 1], tekst;
         if (tr === "tegn")
             return { slags: "opgave", chip: chip, tekst: "Hvordan ser esteren af " + o.syre + " og " + o.alkohol + " ud? Tegn den på tavlen, og tryk Indsend svar." };
-        if (tr === "syre") tekst = "Esteren på tavlen er dannet af en carboxylsyre og en alkohol. Hvilken carboxylsyre?";
+        if (tr === "syre") tekst = "Esteren på tavlen er dannet af en carboxylsyre og en alkohol. Hvad hedder carboxylsyren?";
         else if (tr === "alkohol") tekst = "Syredelen er grøn. Hvilken alkohol er esteren dannet af?";
         else tekst = "Esteren er dannet af " + o.syre + " og " + o.alkohol + ". Hvad hedder esteren?";
         return {

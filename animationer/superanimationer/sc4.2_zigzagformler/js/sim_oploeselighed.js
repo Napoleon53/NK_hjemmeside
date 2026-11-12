@@ -162,7 +162,7 @@
         if (!this.m.grupper.length) {
             this.besked("<b>Hint:</b> Kig efter polære grupper: OH, COOH og O i kæden. Er der ingen, er molekylet upolært.", "gul");
         } else {
-            this.besked("<b>Hint:</b> De blå grupper er polære. Tæl C-atomerne, og del med antallet af blå grupper. Under 4: vand. Over 4: heptan.", "gul");
+            this.besked("<b>Hint:</b> De blå grupper er polære. Tæl C-atomerne, og del med antallet af blå grupper. Er tallet under 4, opløses stoffet i vand. Er det over 4, opløses det i heptan.", "gul");
         }
         this.visPanel();
     };

@@ -228,7 +228,7 @@ function koerTest(W) {
     paastand("[SO₄²⁻] = 0,12 M i Al₂(SO₄)₃: hver giver 3", /giver 3/.test(T.trin("an", "0,12", oA).besked || ""));
     paastand("[SO₄²⁻] = 0,24 M: det er [Al³⁺]", /Det er \[Al/.test(T.trin("an", "0,24", oA).besked || ""));
     var oF = { salt: "FeCl3", bag: "an", ionC: 0.6 }; oF.facit = K.facitIoner(oF);
-    paastand("baglæns: c(FeCl₃) = 1,80 M er omvendt", /Omvendt/.test(T.trin("cSalt", "1,8", oF).besked || ""));
+    paastand("baglæns: c(FeCl₃) = 1,80 M er omvendt", /Du har ganget/.test(T.trin("cSalt", "1,8", oF).besked || ""));
     paastand("n = 2 · c · V, n(Cl⁻) = 2 · c(CaCl₂) · V(A) og 2cV er rigtige",
         T.formel("nA", "n = 2 · c · V", o1).ok && T.formel("nA", "n(Cl⁻) = 2 · c(CaCl₂) · V(A)", o1).ok && T.formel("nA", "2cV", o1).ok);
     paastand("c · V for CaCl₂: gang også med 2", /Gang også med 2/.test(T.formel("nA", "c · V", o1).besked || ""));
@@ -337,7 +337,7 @@ function koerTest(W) {
     A.knap();
     paastand("Giv hint på spørgsmålet: tallet efter Na", /^Hint\b.*tallet efter Na/.test(besked(A)), besked(A));
     svarA("4");
-    paastand("4: det hører til O i sulfat-ionen", /sulfat-ionen/.test(besked(A)), besked(A));
+    paastand("4: det hører til O i sulfationen", /sulfationen/.test(besked(A)), besked(A));
     svarA("2");
     A.knap();
     tik(A, 2);

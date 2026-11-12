@@ -50,14 +50,14 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
         stof({ id: "h2so4", navn: "Svovlsyre", formel: "H₂SO₄", gruppe: "Stærke syrer", pKa: [-3, 1.99], z: -2, k: 2, former: ["H₂SO₄", "HSO₄⁻", "SO₄²⁻"] }),
 
         /* --- Svage syrer --- */
-        stof({ id: "eddikesyre", navn: "Eddikesyre", formel: "CH₃COOH", gruppe: "Svage syrer", pKa: [4.76], z: -1, k: 1, former: ["CH₃COOH", "CH₃COO⁻"] }),
-        stof({ id: "myresyre", navn: "Myresyre", formel: "HCOOH", gruppe: "Svage syrer", pKa: [3.75], z: -1, k: 1, former: ["HCOOH", "HCOO⁻"] }),
+        stof({ id: "eddikesyre", navn: "Ethansyre", formel: "CH₃COOH", gruppe: "Svage syrer", pKa: [4.76], z: -1, k: 1, former: ["CH₃COOH", "CH₃COO⁻"] }),
+        stof({ id: "myresyre", navn: "Methansyre", formel: "HCOOH", gruppe: "Svage syrer", pKa: [3.75], z: -1, k: 1, former: ["HCOOH", "HCOO⁻"] }),
         stof({ id: "propansyre", navn: "Propansyre", formel: "C₂H₅COOH", gruppe: "Svage syrer", pKa: [4.87], z: -1, k: 1, former: ["C₂H₅COOH", "C₂H₅COO⁻"] }),
         stof({ id: "benzoesyre", navn: "Benzoesyre", formel: "C₆H₅COOH", gruppe: "Svage syrer", pKa: [4.20], z: -1, k: 1, former: ["C₆H₅COOH", "C₆H₅COO⁻"] }),
         stof({ id: "maelkesyre", navn: "Mælkesyre", formel: "CH₃CH(OH)COOH", gruppe: "Svage syrer", pKa: [3.86], z: -1, k: 1, former: ["HLac", "Lac⁻"] }),
-        stof({ id: "chloreddikesyre", navn: "Chloreddikesyre", formel: "ClCH₂COOH", gruppe: "Svage syrer", pKa: [2.87], z: -1, k: 1, former: ["ClCH₂COOH", "ClCH₂COO⁻"] }),
+        stof({ id: "chloreddikesyre", navn: "Chlorethansyre", formel: "ClCH₂COOH", gruppe: "Svage syrer", pKa: [2.87], z: -1, k: 1, former: ["ClCH₂COOH", "ClCH₂COO⁻"] }),
         stof({ id: "acetylsalicylsyre", navn: "Acetylsalicylsyre (aspirin)", formel: "C₉H₈O₄", gruppe: "Svage syrer", pKa: [3.50], z: -1, k: 1, former: ["HAsp", "Asp⁻"] }),
-        stof({ id: "hf", navn: "Hydrogenfluorid (flussyre)", formel: "HF", gruppe: "Svage syrer", pKa: [3.17], z: -1, k: 1, former: ["HF", "F⁻"] }),
+        stof({ id: "hf", navn: "Hydrogenfluorid", formel: "HF", gruppe: "Svage syrer", pKa: [3.17], z: -1, k: 1, former: ["HF", "F⁻"] }),
         stof({ id: "hno2", navn: "Salpetersyrling", formel: "HNO₂", gruppe: "Svage syrer", pKa: [3.15], z: -1, k: 1, former: ["HNO₂", "NO₂⁻"] }),
         stof({ id: "hocl", navn: "Hypochlorsyrling", formel: "HOCl", gruppe: "Svage syrer", pKa: [7.53], z: -1, k: 1, former: ["HOCl", "OCl⁻"] }),
         stof({ id: "hcn", navn: "Hydrogencyanid", formel: "HCN", gruppe: "Svage syrer", pKa: [9.21], z: -1, k: 1, former: ["HCN", "CN⁻"] }),
@@ -103,8 +103,8 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
         stof({ id: "anilin", navn: "Anilin", formel: "C₆H₅NH₂", gruppe: "Svage baser", pKa: [4.60], z: 0, k: 0, former: ["C₆H₅NH₃⁺", "C₆H₅NH₂"] }),
 
         /* --- Salte: korresponderende baser og amfolytter --- */
-        stof({ id: "natriumacetat", navn: "Natriumacetat", formel: "CH₃COONa", gruppe: "Salte", pKa: [4.76], z: -1, k: 0, former: ["CH₃COOH", "CH₃COO⁻"] }),
-        stof({ id: "natriumformiat", navn: "Natriumformiat", formel: "HCOONa", gruppe: "Salte", pKa: [3.75], z: -1, k: 0, former: ["HCOOH", "HCOO⁻"] }),
+        stof({ id: "natriumacetat", navn: "Natriumethanoat", formel: "CH₃COONa", gruppe: "Salte", pKa: [4.76], z: -1, k: 0, former: ["CH₃COOH", "CH₃COO⁻"] }),
+        stof({ id: "natriumformiat", navn: "Natriummethanoat", formel: "HCOONa", gruppe: "Salte", pKa: [3.75], z: -1, k: 0, former: ["HCOOH", "HCOO⁻"] }),
         stof({ id: "natriumbenzoat", navn: "Natriumbenzoat", formel: "C₆H₅COONa", gruppe: "Salte", pKa: [4.20], z: -1, k: 0, former: ["C₆H₅COOH", "C₆H₅COO⁻"] }),
         stof({ id: "natriumfluorid", navn: "Natriumfluorid", formel: "NaF", gruppe: "Salte", pKa: [3.17], z: -1, k: 0, former: ["HF", "F⁻"] }),
         stof({ id: "natriumcyanid", navn: "Natriumcyanid", formel: "NaCN", gruppe: "Salte", pKa: [9.21], z: -1, k: 0, former: ["HCN", "CN⁻"] }),
@@ -394,16 +394,16 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
        thymolblaat bruger, giver den rigtige farvekurve alligevel. */
     Kemi.INDIKATORER = [
         { id: "ingen", navn: "Ingen indikator", pKa: [], farver: [[0, 0, 0, 0]], omslag: "–" },
-        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [-2, 9.4, 13.0], farver: [[214, 48, 36, 0.85], [0, 0, 0, 0], [232, 45, 140, 0.85], [0, 0, 0, 0]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0 (og farveløs igen over pH ≈ 13)" },
-        { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [6.0, 7.6], omslag: "6,0 – 7,6" },
-        { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omraade: [3.1, 4.4], omslag: "3,1 – 4,4" },
-        { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omraade: [4.4, 6.2], omslag: "4,4 – 6,2" },
-        { id: "bromcresolgroent", navn: "Bromcresolgrønt", pKa: [4.7], farver: [[240, 205, 40, 0.8], [40, 100, 220, 0.85]], omraade: [3.8, 5.4], omslag: "3,8 – 5,4" },
-        { id: "lakmus", navn: "Lakmus", pKa: [6.5], farver: [[220, 60, 70, 0.8], [70, 80, 210, 0.8]], omraade: [4.5, 8.3], omslag: "4,5 – 8,3" },
-        { id: "phenolroedt", navn: "Phenolrødt", pKa: [7.9], farver: [[240, 200, 40, 0.8], [225, 50, 60, 0.85]], omraade: [6.8, 8.4], omslag: "6,8 – 8,4" },
-        { id: "thymolblaat", navn: "Thymolblåt", pKa: [1.65, 8.9], farver: [[225, 45, 40, 0.85], [240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [8.0, 9.6], omslag: "1,2 – 2,8 og 8,0 – 9,6" },
-        { id: "thymolphthalein", navn: "Thymolphthalein", pKa: [9.9], farver: [[0, 0, 0, 0], [40, 80, 210, 0.85]], omraade: [9.3, 10.5], omslag: "9,3 – 10,5" },
-        { id: "alizaringult", navn: "Alizaringult R", pKa: [11.0], farver: [[245, 210, 60, 0.8], [215, 55, 45, 0.85]], omraade: [10.1, 12.0], omslag: "10,1 – 12,0" },
+        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [-2, 9.4, 13.0], farver: [[214, 48, 36, 0.85], [0, 0, 0, 0], [232, 45, 140, 0.85], [0, 0, 0, 0]], omraade: [8.2, 10.0], omslag: "8,2 til 10,0 (og farveløs igen over pH ≈ 13)" },
+        { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [6.0, 7.6], omslag: "6,0 til 7,6" },
+        { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omraade: [3.1, 4.4], omslag: "3,1 til 4,4" },
+        { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omraade: [4.4, 6.2], omslag: "4,4 til 6,2" },
+        { id: "bromcresolgroent", navn: "Bromcresolgrønt", pKa: [4.7], farver: [[240, 205, 40, 0.8], [40, 100, 220, 0.85]], omraade: [3.8, 5.4], omslag: "3,8 til 5,4" },
+        { id: "lakmus", navn: "Lakmus", pKa: [6.5], farver: [[220, 60, 70, 0.8], [70, 80, 210, 0.8]], omraade: [4.5, 8.3], omslag: "4,5 til 8,3" },
+        { id: "phenolroedt", navn: "Phenolrødt", pKa: [7.9], farver: [[240, 200, 40, 0.8], [225, 50, 60, 0.85]], omraade: [6.8, 8.4], omslag: "6,8 til 8,4" },
+        { id: "thymolblaat", navn: "Thymolblåt", pKa: [1.65, 8.9], farver: [[225, 45, 40, 0.85], [240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [8.0, 9.6], omslag: "1,2 til 2,8 og 8,0 til 9,6" },
+        { id: "thymolphthalein", navn: "Thymolphthalein", pKa: [9.9], farver: [[0, 0, 0, 0], [40, 80, 210, 0.85]], omraade: [9.3, 10.5], omslag: "9,3 til 10,5" },
+        { id: "alizaringult", navn: "Alizaringult R", pKa: [11.0], farver: [[245, 210, 60, 0.8], [215, 55, 45, 0.85]], omraade: [10.1, 12.0], omslag: "10,1 til 12,0" },
         { id: "universal", navn: "Universalindikator", pKa: [], skala: true, farver: [], omslag: "hele skalaen" }
     ];
 

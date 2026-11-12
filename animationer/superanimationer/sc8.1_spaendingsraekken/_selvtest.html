@@ -333,7 +333,7 @@ async function koerTest(W, ramme) {
         doc.getElementById("rk-indsend").classList.contains("klar"));
     rk.indsend();
     paastand("forkert rækkefølge: Fe og Zn bliver røde", rk.fejlPar && rk.fejlPar.join() === "Fe,Zn", JSON.stringify(rk.fejlPar));
-    paastand("beskeden bruger skemaet: zink reagerede med jernionerne", /Zink står til højre for jern\. Men zink reagerede med jernionerne/.test(doc.getElementById("rk-besked").textContent),
+    paastand("beskeden bruger skemaet: zink reagerede med jernionerne", /Zink står til højre for jern\. Men zink reagerede med jern\(II\)ionerne/.test(doc.getElementById("rk-besked").textContent),
         doc.getElementById("rk-besked").textContent);
     rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "Zn"; })[0], 1);
     paastand("byt: Zn og Fe bytter plads", rk.pladser[1].sym === "Zn" && rk.pladser[2].sym === "Fe");
@@ -419,7 +419,7 @@ async function koerTest(W, ramme) {
     paastand("tomme felter: skriv et tal", /alle fire felter/.test(doc.getElementById("fu-besked").textContent));
     [1, 1, 1, 1].forEach(function (v, k) { fl[k].value = v; });
     fu.tjekKoef();
-    paastand("1, 1, 1, 1: ladningen", /ladningen gør ikke/.test(doc.getElementById("fu-besked").textContent));
+    paastand("1, 1, 1, 1: ladningen", /ladningen er \+/.test(doc.getElementById("fu-besked").textContent));
     fu.knap(); fu.knap();
     paastand("Giv hint og Vis svaret afstemmer", fu.fase === "faerdig" && /2 Al afgiver 6 e⁻/.test(doc.getElementById("fu-bliv").textContent));
     fu.nr = 0; fu.nyOpgave();

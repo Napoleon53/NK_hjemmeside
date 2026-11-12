@@ -36,30 +36,30 @@
         vb: [1160, 584],
         lag: [
             { navn: "Konstanten og eksponenten", pladser: ["basestyrkekonstant", "basestyrkeeksponent"],
-              ros: "Basestyrkekonstanten for ammoniak er 1,78 · 10⁻⁵ M, og eksponenten er minus logaritmen til den, 4,75." },
+              ros: "Basestyrkekonstanten for ammoniak er 1,78 · 10⁻⁵ M, og basestyrkeeksponenten er minus logaritmen til konstanten, 4,75." },
             { navn: "Hydroxid og et par", pladser: ["stærk base", "korresponderende syre-basepar"],
-              ros: "OH⁻ er den vigtigste stærke base. For parret NH₄⁺ og NH₃ giver de to eksponenter 14,00 tilsammen." }
+              ros: "OH⁻ er den vigtigste stærke base. For parret NH₄⁺ og NH₃ er summen af pKs og pKb 14,00." }
         ],
         pladser: [
             { id: "basestyrkekonstant", ord: ["basestyrkekonstant"], x: 224, y: Y2 - 7, maal: [FX - 6, Y2 - 9], dele: ["kb"],
               omr: [{ r: [FX - 7, Y2 - 30, 46, 38, 6] }],
               fejl: { "basestyrkeeksponent": "<b>basestyrkeeksponent</b> er minus logaritmen til konstanten. Pladsen peger på symbolet foran brøken.",
                       "stærk base": "<b>stærk base</b> er en slags base. Pladsen peger på symbolet foran brøken med koncentrationerne.",
-                      "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to stoffer. Pladsen peger på symbolet foran brøken." } },
+                      "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to partikler. Pladsen peger på symbolet foran brøken." } },
             { id: "basestyrkeeksponent", ord: ["basestyrkeeksponent"], x: 224, y: Y3 - 7, maal: [FX - 6, Y3 - 9], dele: ["pkb"],
               omr: [{ r: [FX - 7, Y3 - 30, 62, 38, 6] }],
-              fejl: { "basestyrkekonstant": "<b>basestyrkekonstant</b> er brøken med koncentrationerne. Pladsen peger på symbolet for −log til den.",
+              fejl: { "basestyrkekonstant": "<b>basestyrkekonstant</b> er brøken med koncentrationerne. Pladsen peger på symbolet for −log K<sub>b</sub>.",
                       "stærk base": "<b>stærk base</b> er en slags base. Pladsen peger på symbolet for −log K<sub>b</sub>." } },
 
             { id: "stærk base", ord: ["stærk base"], x: 290, y: 298, maal: [OOH - 6, OY - MOH.R - 8], dele: ["naoh"],
               omr: [{ r: [OOH - MOH.R - 14, OY - MOH.R - 12, 2 * MOH.R + 28, 108 + MOH.R, 12] }],
-              fejl: { "basestyrkekonstant": "<b>basestyrkekonstant</b> er et tal. Pladsen peger på hydroxidionen, som bliver fri, når NaOH opløses.",
-                      "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to stoffer. Pladsen peger på én ion fra NaOH." } },
+              fejl: { "basestyrkekonstant": "<b>basestyrkekonstant</b> er en ligevægtskonstant. Pladsen peger på hydroxidionen, som bliver fri, når NaOH opløses.",
+                      "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to partikler. Pladsen peger på én ion fra NaOH." } },
             { id: "korresponderende syre-basepar", ord: ["korresponderende syre-basepar"], x: 860, y: 298, maal: [(PX[0] + PX[1]) / 2, KL - 26], dele: ["par"],
               omr: [{ r: [PX[0] - 8, KL - 32, PX[1] - PX[0] + 16, 40, 6] }],
               fejl: { "stærk base": "<b>stærk base</b> er ét stof med pK<sub>b</sub> under 0. Pladsen peger på klammen om NH₄⁺ og NH₃.",
-                      "basestyrkeeksponent": "<b>basestyrkeeksponent</b> er ét tal. Pladsen peger på klammen om NH₄⁺ og NH₃.",
-                      "basestyrkekonstant": "<b>basestyrkekonstant</b> er ét tal. Pladsen peger på klammen om NH₄⁺ og NH₃." } }
+                      "basestyrkeeksponent": "<b>basestyrkeeksponent</b> er én størrelse. Pladsen peger på klammen om NH₄⁺ og NH₃.",
+                      "basestyrkekonstant": "<b>basestyrkekonstant</b> er én størrelse. Pladsen peger på klammen om NH₄⁺ og NH₃." } }
         ],
 
         tegn: function (api) {

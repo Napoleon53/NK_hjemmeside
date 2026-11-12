@@ -77,7 +77,7 @@
 
         { id: "co",      gruppe: "carbon", f: "CO",   q: 0,  navn: "Carbonmonoxid" },
         { id: "ch4",     gruppe: "carbon", f: "CH4",  q: 0,  navn: "Methan",
-          note: "C kan have alt fra −IV til +IV." },
+          note: "C kan have alle oxidationstal fra −IV til +IV." },
         { id: "c2o4",    gruppe: "carbon", f: "C2O4", q: -2, navn: "Oxalat-ion" },
         { id: "co3",     gruppe: "carbon", f: "CO3",  q: -2, navn: "Carbonat-ion" },
         { id: "hco3",    gruppe: "carbon", f: "HCO3", q: -1, navn: "Hydrogencarbonat-ion" },
@@ -170,10 +170,10 @@
        Spoergsmaalet, fejl, hint og ros staar paa kortet i scenen, ved
        feltet (brugerens test 3. okt. 2026). */
     D.FAERDIG = {
-        rg: "Alle 31. Summen er ladningen, hver gang.",
-        ek: "Alle 12. Reglerne er en genvej. Elektronerne er grunden."
+        rg: "Alle 31 stoffer er løst. Summen af oxidationstallene var stoffets ladning hver gang.",
+        ek: "Alle 12 molekyler og ioner er løst. Reglerne er en genvej, og elektronerne viser, hvorfor reglerne virker."
     };
-    D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
-    D.ROS_OPGAVE = ["Den er i hus.", "Rigtigt regnet.", "Summen passer."];
+    D.ROS = ["Rigtigt.", "Korrekt.", "Præcis.", "Ja.", "Fint."];
+    D.ROS_OPGAVE = ["Opgaven er løst.", "Rigtigt regnet.", "Summen passer."];
     NK.Data = D;
 }());

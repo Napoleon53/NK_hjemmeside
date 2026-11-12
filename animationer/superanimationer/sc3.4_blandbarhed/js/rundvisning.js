@@ -14,14 +14,14 @@
 
     var TURE = {
         "bassin": [
-            { sel: "#anker-bassin", titel: "Bassinet", tekst: "Et glas væske, forstørret, så du kan se molekylerne. Hver kugle er et molekyle. Hold musen over en kugle for at se, hvad den er, og træk i bassinet for at ryste det." },
-            { sel: "#anker-glas", titel: "Glasset", tekst: "Det samme glas i almindelig størrelse. Vand og ethanol er klare, olien er lysegul, og en emulsion er uklar. Det er det, du ville se i laboratoriet." },
-            { sel: "#haeld-kort", titel: "Hæld i", tekst: "Hver knap hælder en portion i gennem tragten. Bassinet rummer elleve. Farven på knappen er farven på kuglerne." },
+            { sel: "#anker-bassin", titel: "Bassinet", tekst: "Bassinet viser væsken i glasset så forstørret, at du kan se molekylerne. Hver kugle er et molekyle. Hold musen over en kugle for at se, hvad den er, og træk i bassinet for at ryste det." },
+            { sel: "#anker-glas", titel: "Glasset", tekst: "Glasset viser den samme væske i almindelig størrelse. Vand og ethanol er klare, olien er lysegul, og en emulsion er uklar. Sådan ville væskerne se ud i laboratoriet." },
+            { sel: "#haeld-kort", titel: "Hæld i", tekst: "Hver knap hælder en portion i gennem tragten. Bassinet rummer elleve portioner. Farven på knappen er farven på kuglerne." },
             { sel: "#energi-kort", titel: "Ryst og varm", tekst: "Ryst blandingen, eller skru op for varmen. De farvede tal under skyderen er kogepunkterne for ethanol og vand." },
-            { sel: "#anker-koeler", titel: "Køleren", tekst: "Tilbagesvaleren køler dampen, så den drypper tilbage i bassinet. Vælg Destillation, så løber den over i et forlag." },
+            { sel: "#anker-koeler", titel: "Køleren", tekst: "Tilbagesvaleren køler dampen, så den drypper tilbage i bassinet. Vælger du Destillation, løber dampen over i et forlag i stedet." },
             { sel: "#skort", titel: "Opgavekortet", tekst: "Seks opgaver. Vælg et svar, og tryk Indsend svar. Giv et hint hjælper, når du sidder fast." },
             { sel: "#opgavekort", titel: "Opgaver", tekst: "Her kan du se, hvor mange opgaver du har løst. Start forfra begynder opgaverne forfra." },
-            { sel: "#quizknap, #teoriknap", titel: "Quiz og teori", tekst: "Fem spørgsmål, når du har prøvet dig frem. Teorien samler det hele." }
+            { sel: "#quizknap, #teoriknap", titel: "Quiz og teori", tekst: "Quizzen har fem spørgsmål til, når du har prøvet dig frem. Teorien forklarer det, du ser i bassinet." }
         ]
     };
 

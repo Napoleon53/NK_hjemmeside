@@ -299,8 +299,8 @@
         var tekst;
         var o = D.O;
         if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev " + o.farve + " på den sidste dråbe.";
-        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.tydelig + ", så der er tilsat lidt for meget sølvnitrat.";
-        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.kraftig + ": omslaget kom tidligere, så forbruget er for stort.";
+        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.tydelig + ", så der er tilsat lidt for meget sølv(I)nitrat.";
+        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.kraftig + ". Omslaget kom tidligere, så forbruget er for stort.";
         this.slutTekst = tekst;
         this.besked("", "");
         NK.maaling = { V: v, m: this.pr.m, c: this.pr.c, p: this.pr.p, sted: this.pr.sted, egen: true, over: over, nr: this.nr, brugt: false };
@@ -382,7 +382,7 @@
     P.visKort = function () {
         var o = D.O, chip = "Prøve " + this.nr;
         var sted = NK.tal2(this.pr.m) + " g havvand fra " + NK.html(this.pr.sted) + ".";
-        var spm = "Aflæs buretten ved menisken i panelet til højre. Hvor meget sølvnitrat er løbet ned?";
+        var spm = "Aflæs buretten ved menisken i panelet til højre. Hvor meget sølv(I)nitrat er løbet ned?";
         var felt = NK.Scenekort.felt;
         if (this.fase === "titrer") {
             this.kort.vis({ slags: "opgave", chip: chip, tekst: sted + " Titrér havvandet, til kolben bliver " + o.svag + "." });
@@ -406,13 +406,13 @@
         else if (this.fase === "titrer" && this.rodbrun() && this.a > 0) { t = "<b>Luk hanen!</b> Kolben er " + o.farve + "."; kl = "gul"; }
         else if (this.fast.html) { t = this.fast.html; kl = this.fast.klasse; }
         else if (this.fase !== "titrer") t = "";
-        else if (this.auto) t = "Buretten titrerer selv. Hurtigt først, så dråbe for dråbe.";
+        else if (this.auto) t = "Buretten titrerer selv, først hurtigt og til sidst dråbe for dråbe.";
         else if (this.rodbrun()) t = "Kolben er " + o.farve + ".";
         else if (this.a > 0 && this.skyer.some(function (s) { return s.liv > 1.2; })) {
             t = this.a > 0.45 ? "De " + o.skyer + " bliver længere. Træk skyderen ned på <b>dryp</b>." :
                 "Du er tæt på. Luk hanen, så snart kolben bliver " + o.svag + " og bliver ved med at være det.";
         }
-        else if (this.a > 0) t = "Sølvnitrat løber ned. Hvidt sølvchlorid gør kolben uklar. Luk hanen, når den bliver " + o.farve + ".";
+        else if (this.a > 0) t = "Sølv(I)nitrat løber ned. Hvidt sølv(I)chlorid gør kolben uklar. Luk hanen, når kolben bliver " + o.farve + ".";
         else if (v > 0) t = "Kolben er " + o.start + " og uklar. Der er stadig chlorid tilbage. Åbn hanen igen.";
         else t = "Træk skyderen ved hanen mod højre for at åbne den.";
         this.kort.bund(t, t ? kl : "");
@@ -670,10 +670,10 @@
         if (s === "hane") { this.skiftHane(); return; }
         if (s === "draabe") { this.enDraabe(); return; }
         var tekst = {
-            buret: "Sølvnitrat, AgNO₃, " + K.c(this.pr.c) + " M. Forbruget aflæses ved menisken i luppen til højre.",
-            kolbe: NK.tal2(this.pr.m) + " g havvand, 20 mL demineraliseret vand og lidt " + D.O.navn + ", der farver kolben " + D.O.start + ". Magnetloppen rører rundt.",
-            lup: "1 figur = 1/8 af chloridet i kolben. Hver Ag⁺ fælder én Cl⁻ som hvidt AgCl. Na⁺ og NO₃⁻ er ikke tegnet: de reagerer ikke.",
-            flaske: "Havvand fra " + this.pr.sted + ". Saltindholdet er ukendt. Det skal du finde."
+            buret: "Buretten indeholder " + K.c(this.pr.c) + " M sølv(I)nitrat, AgNO₃. Forbruget aflæses ved menisken i luppen til højre.",
+            kolbe: "Kolben indeholder " + NK.tal2(this.pr.m) + " g havvand, 20 mL demineraliseret vand og lidt " + D.O.navn + ", der farver kolben " + D.O.start + ". Magnetloppen rører rundt.",
+            lup: "Én figur er 1/8 af chloridet i kolben. Hver Ag⁺ fælder én Cl⁻ som hvidt AgCl. Na⁺ og NO₃⁻ er ikke tegnet, fordi de ikke reagerer.",
+            flaske: "Flasken indeholder havvand fra " + this.pr.sted + ". Saltindholdet er ukendt, og det skal du finde."
         }[s];
         if (tekst) {
             this.info = { tekst: tekst, tid: 5 };

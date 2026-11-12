@@ -121,15 +121,15 @@
         { id: "nacl", titel: "Én til én", salte: ["NaCl"], V: 1000, maal: { ion: "Cl", c: 0.30 },
           tekst: "Lav en opløsning, hvor [Cl⁻] = 0,30 M.",
           linje: "Træk en portion natriumchlorid fra krukken ned i glasset.",
-          hint: "Hver portion er 0,10 mol, og glasset har 1,00 L. Hvor mange Cl⁻ giver hver NaCl?",
+          hint: "Hver portion er 0,10 mol, og glasset har 1,00 L. Hvor mange Cl⁻ giver én formelenhed NaCl?",
           svar: "NaCl ⟶ Na⁺ + Cl⁻. [Cl⁻] = c(NaCl) = 0,30 M. Det er tre portioner.",
           goer: [["NaCl", 3]],
           konklusion: "Den aktuelle koncentration af Cl⁻ er 0,30 M. Det er det samme som c(NaCl)." },
         { id: "na2so4", titel: "To Na⁺", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 }, regn: ["Na"],
           tekst: "Opløs en portion (0,10 mol) Na₂SO₄ i glasset med 0,50 L vand.",
           linje: "Træk en portion natriumsulfat ned i glasset.",
-          hint: "Træk fra krukken, eller klik på den.",
-          svar: "En portion Na₂SO₄ i 0,50 L.",
+          hint: "Træk en portion fra krukken ned i glasset, eller klik på krukken.",
+          svar: "Der skal én portion Na₂SO₄ i glasset med 0,50 L vand.",
           goer: [["Na2SO4", 1]],
           /* Spoergsmaalene efter opløsningen, ét ad gangen. vis: det, glasset
              og beregningen i kortet viser, naar svaret er fundet (salt: den
@@ -143,11 +143,11 @@
                        { t: "0,10 M", forkl: "0,10 mol er stofmængden n. Koncentrationen er n / V, og rumfanget er 0,50 L." },
                        { t: "0,050 M", forkl: "Du har ganget med rumfanget. Koncentrationen er n / V = 0,10 mol / 0,50 L." }],
                 efter: "c(Na₂SO₄) = 0,10 mol / 0,50 L = 0,20 M." },
-              { spm: "Hvor mange Na⁺ giver én Na₂SO₄?", vis: "lup",
+              { spm: "Hvor mange Na⁺ giver én formelenhed Na₂SO₄?", vis: "lup",
                 hint: "Se på tallet efter Na i formlen Na₂SO₄.",
                 svar: [{ t: "2", ok: true },
-                       { t: "1", forkl: "Tallet efter Na i Na₂SO₄ er 2. Der er to Na⁺ i hver." },
-                       { t: "4", forkl: "4 hører til O inde i sulfat-ionen SO₄²⁻. Se på tallet efter Na." }],
+                       { t: "1", forkl: "Tallet efter Na i Na₂SO₄ er 2. Der er to Na⁺ i hver formelenhed." },
+                       { t: "4", forkl: "4 hører til O inde i sulfationen SO₄²⁻. Se på tallet efter Na." }],
                 note: "Luppen viser to Na⁺ for hver SO₄²⁻.",
                 efter: "Na₂SO₄ ⟶ 2 Na⁺ + SO₄²⁻. Luppen viser to Na⁺ for hver SO₄²⁻." },
               { spm: "Hvad bliver [Na⁺]?", vis: "ioner",
@@ -179,16 +179,16 @@
                   svar: [{ t: "SO₄²⁻", ok: true },
                          { t: "Al³⁺", forkl: "Al³⁺ har den største ladning, men der er to Al³⁺ og tre SO₄²⁻ i hver formelenhed." },
                          { t: "Lige mange", forkl: "Tallene i formlen er forskellige: Al₂ og (SO₄)₃." }] },
-          linje: "Prøv det: træk en portion ned i glasset.",
-          hint: "Træk fra krukken, eller klik på den.",
+          linje: "Prøv det. Træk en portion ned i glasset.",
+          hint: "Træk en portion fra krukken ned i glasset, eller klik på krukken.",
           svar: "En portion Al₂(SO₄)₃ i 1,00 L.",
           goer: [["Al2(SO4)3", 1]],
-          konklusion: "Der er flest SO₄²⁻. Den aktuelle koncentration er 0,30 M mod 0,20 M for Al³⁺." },
+          konklusion: "Der er flest SO₄²⁻. Den aktuelle koncentration af SO₄²⁻ er 0,30 M mod 0,20 M for Al³⁺." },
         { id: "begge", titel: "To salte", salte: ["NaCl", "Na2SO4"], V: 1000, maal: { ion: "Na", c: 0.50, begge: true },
           tekst: "Lav en opløsning, hvor [Na⁺] = 0,50 M. Brug begge salte.",
           linje: "Der skal både natriumchlorid og natriumsulfat i.",
           hint: "Na⁺ kommer fra begge salte. NaCl giver én Na⁺, Na₂SO₄ giver to.",
-          svar: "Fx tre portioner NaCl og én Na₂SO₄: [Na⁺] = 0,30 M + 2 · 0,10 M = 0,50 M.",
+          svar: "For eksempel tre portioner NaCl og én portion Na₂SO₄: [Na⁺] = 0,30 M + 2 · 0,10 M = 0,50 M.",
           goer: [["NaCl", 3], ["Na2SO4", 1]],
           konklusion: "Den aktuelle koncentration af Na⁺ er 0,50 M. Bidragene fra de to salte lægges sammen." }
     ];
@@ -265,7 +265,7 @@
                formelHint: "Du kender stofmængden og rumfanget. Koncentrationen er stofmængde pr. liter: c = n / …" },
         bidragA: { navn: "Bidraget fra {A}", enhed: "M", formel: "" },
         bidragB: { navn: "Bidraget fra {B}", enhed: "M", formel: "" },
-        total: { navn: "Det hele", enhed: "M", formel: "" },
+        total: { navn: "Den samlede koncentration", enhed: "M", formel: "" },
         nA: { navn: "Stofmængden fra glas A", enhed: "mol", formel: "k · c · V",
               formelHint: "Du kender saltets koncentration og rumfanget i glas A. Husk, hvor mange af ionen hver formelenhed giver." },
         nB: { navn: "Stofmængden fra glas B", enhed: "mol", formel: "k · c · V",
@@ -286,7 +286,7 @@
     D.FAERDIG = {
         opl: "Alle seks. Formlen bestemmer, hvor mange ioner der kommer.",
         ioner: "Alle tre niveauer. Tallet foran ionen gør arbejdet.",
-        bland: "Alle fire. Stofmængder kan lægges sammen. Koncentrationer kan ikke."
+        bland: "Alle fire. Stofmængder kan lægges sammen, men koncentrationer kan ikke lægges sammen."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];

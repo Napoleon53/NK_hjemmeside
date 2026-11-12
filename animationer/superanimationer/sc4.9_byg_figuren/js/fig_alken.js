@@ -65,7 +65,7 @@
             omr: [{ r: [x - b / 2, k.y + 26, b, k.h - 24, 12] }], fejl: fejl };
     }
 
-    var FAMILIE = function (o, stof) { return "<b>" + o + "</b> står på rammen. Skiltet her er navnet på familien, " + stof + " hører til, ligesom alkan."; };
+    var FAMILIE = function (o, stof) { return "<b>" + o + "</b> står på rammen. Skiltet her er navnet på den familie, som " + stof + " hører til, ligesom alkan."; };
 
     NK.FIGURER.alken = {
         vb: [1000, 712],
@@ -91,14 +91,14 @@
                 umættet: FAMILIE("umættet", "ethyn") }),
 
             titel("addition", AD, AD.x + AD.b / 2, ["ad"], {
-                polymerisation: "<b>polymerisation</b> sætter mange små molekyler sammen til en kæde. Her sætter to Br sig på ét ethen.",
+                polymerisation: "<b>polymerisation</b> sætter mange små molekyler sammen til en kæde. Her sætter to Br sig på ét ethenmolekyle.",
                 bromvand: "<b>bromvand</b> er væsken i glasset. Rammen viser selve reaktionen, hvor to Br sætter sig på ethen." }),
             { id: "bromvand", ord: ["bromvand"], x: (T1 + T2) / 2, y: BV.y + BV.h - 30, maal: [T1 + 17, TB - 28], dele: ["bv"],
               omr: [{ r: [T1 - 17, TB - 58, 34, 60, 8] }],
               fejl: { addition: "<b>addition</b> er en reaktion. Pladsen peger på den gule væske i glasset.",
                       polymer: "<b>polymer</b> er et langt molekyle. Pladsen peger på den gule væske i glasset." } },
             titel("polymerisation", PO, PO.x + PO.b / 2, ["po"], {
-                addition: "<b>addition</b> sætter to atomer på én dobbeltbinding. Her sætter mange ethen sig sammen til én kæde.",
+                addition: "<b>addition</b> sætter to atomer på én dobbeltbinding. Her sætter mange ethenmolekyler sig sammen til én kæde.",
                 polymer: "<b>polymer</b> er kun den lange kæde. Rammen viser hele reaktionen." }),
             { id: "polymer", ord: ["polymer"], x: 560, y: KY, maal: [404, KY], dele: ["kaede"],
               omr: [{ r: [40, KY - 18, 362, 34, 8] }],

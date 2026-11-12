@@ -187,8 +187,8 @@
         return String(html).replace(/ · /g, " · ").replace(/([0-9⁰¹²³⁴⁵⁶⁷⁸⁹]) M(?![a-zæøå])/g, "$1 M");
     };
 
-    var RUND_PH = "pH skrives med to decimaler. Se på det tredje ciffer efter kommaet: er det 5 eller mere, runder du op.";
-    var RUND_KONC = "Behold to cifre: 6,172839506 · 10⁻⁵ bliver til 6,2 · 10⁻⁵. Tallet foran · 10 skrives i det store felt og eksponenten, her −5, i det lille.";
+    var RUND_PH = "pH skrives med to decimaler. Er det tredje ciffer efter kommaet 5 eller mere, runder du op.";
+    var RUND_KONC = "Behold to betydende cifre, så 6,172839506 · 10⁻⁵ bliver til 6,2 · 10⁻⁵. Tallet foran · 10 skrives i det store felt, og eksponenten −5 skrives i det lille felt.";
 
     /* [H₃O⁺] -> pH.  ekstra: flere typiske fejl foerst, fx pOH ved baser */
     K.trinPhAfH = function (h, ekstra) {
@@ -205,9 +205,9 @@
             formler: [
                 { f: "pH = −log[H₃O⁺]", rigtig: true },
                 { f: "pH = log[H₃O⁺]", forkl: "Uden minus bliver pH negativ. Der skal minus foran log." },
-                { f: "pH = 10^{−[H₃O⁺]}", forkl: "10 opløftet i noget er vejen den anden vej, fra pH til [H₃O⁺]." }
+                { f: "pH = 10^{−[H₃O⁺]}", forkl: "En tierpotens bruges til den modsatte beregning, fra pH til [H₃O⁺]." }
             ].concat(ekstra ? [{ f: "pH = −log[OH⁻]", forkl: "pH regnes altid ud fra [H₃O⁺], ikke ud fra [OH⁻]." }] : []),
-            formelHint: "Du kender [H₃O⁺] og skal finde pH. Den formel starter med pH = og har −log i sig.",
+            formelHint: "Du kender [H₃O⁺] og skal finde pH. Den rigtige formel begynder med pH = og indeholder −log.",
             tastTekst: "Skriv " + hT + " i stedet for [H₃O⁺] i formlen. Tast det på lommeregneren, og tryk =.",
             tastHint: "Sådan ser det ud med tallet sat ind: pH = −log(" + hT + "). Husk minus foran log.",
             skrivTekst: "Rund af til to decimaler, og skriv pH i feltet.",
@@ -219,7 +219,7 @@
                     [Math.log(h), "Det er ln-tasten, og minusset mangler. Brug −log."],
                     [-log10(p.mTal), "Du har kun taget log af " + p.m + ". Hele tallet " + hT + " skal stå inde i parentesen efter log."],
                     [-log10(p.mTal) + p.e, "Eksponenten skal være negativ: 10" + NK.haevet(p.e) + ", ikke 10" + NK.haevet(-p.e) + "."],
-                    [14 - facit, "Du har regnet 14 − pH. Her skal du bare bruge pH = −log[H₃O⁺]."]
+                    [14 - facit, "Du har regnet 14 − pH. Her skal du kun bruge pH = −log[H₃O⁺]."]
                 ]);
                 if (Math.abs(p.mTal - 1) > 0.05) k.push([-p.e, "Du har kun brugt 10" + NK.haevet(p.e) + ". Tallet " + p.m + " foran skal også med."]);
                 var b = find(svar, k);
@@ -244,10 +244,10 @@
             taster: ["10^(", "−"].concat(K.tasterTekst(pT), [")"]),
             formler: [
                 { f: "[H₃O⁺] = 10^{−pH}", rigtig: true },
-                { f: "[H₃O⁺] = 10^{pH}", forkl: "Uden minus bliver tallet kæmpestort. Der skal minus i eksponenten." },
-                { f: "[H₃O⁺] = −log(pH)", forkl: "−log er vejen den anden vej, fra [H₃O⁺] til pH." }
+                { f: "[H₃O⁺] = 10^{pH}", forkl: "Uden minus bliver koncentrationen kæmpestor. Der skal minus i eksponenten." },
+                { f: "[H₃O⁺] = −log(pH)", forkl: "−log bruges til den modsatte beregning, fra [H₃O⁺] til pH." }
             ],
-            formelHint: "Du kender pH og skal finde [H₃O⁺]. Så skal pH op i eksponenten på 10, med minus foran.",
+            formelHint: "Du kender pH og skal finde [H₃O⁺]. Derfor skal −pH stå som eksponent på 10.",
             tastTekst: "Skriv " + pT + " i stedet for pH i formlen. Brug tasten 10ˣ, og tryk =.",
             tastHint: "Sådan ser det ud med tallet sat ind: [H₃O⁺] = " + K.tiI("−" + pT) + ". Tast 10ˣ, så −" + pT + ", så ) og =.",
             skrivTekst: "Rund af til to cifre, og skriv [H₃O⁺] i felterne.",
@@ -262,7 +262,7 @@
                 var b = find(svar, k, true);
                 if (b) return b;
                 b = find(svar, [
-                    [-log10(ph), "Du har taget log af pH. Den modsatte vej går med 10ˣ.", "abs"],
+                    [-log10(ph), "Du har taget log af pH. Fra pH til [H₃O⁺] skal du bruge 10ˣ.", "abs"],
                     [ph, "Det er pH-værdien. Her skal du skrive koncentrationen.", "abs"]
                 ]);
                 if (b) return b;
@@ -290,17 +290,17 @@
             taster: ["1", ",", "0", "·", "10^(", "−", "1", "4", ")", "/", "("].concat(K.tasterPotens(v), [")"]),
             formler: [
                 { f: ukendt + " = K_{w} / " + kendt, rigtig: true },
-                { f: ukendt + " = K_{w} · " + kendt, forkl: kendt + " gange " + ukendt + " giver K_{w}. Så skal du dele med " + kendt + ", ikke gange." },
+                { f: ukendt + " = K_{w} · " + kendt, forkl: kendt + " gange " + ukendt + " giver K_{w}. Derfor skal du dele med " + kendt + ", ikke gange." },
                 { f: ukendt + " = " + kendt + " / K_{w}", forkl: "Brøken er vendt om. K_{w} skal stå øverst." }
             ],
-            formelHint: "[H₃O⁺] og [OH⁻] ganget sammen giver altid K_{w} = 1,0 · 10⁻¹⁴ M². Så finder du " + ukendt + " ved at dele K_{w} med " + kendt + ".",
+            formelHint: "[H₃O⁺] og [OH⁻] ganget sammen giver altid K_{w} = 1,0 · 10⁻¹⁴ M². Derfor finder du " + ukendt + " ved at dele K_{w} med " + kendt + ".",
             tastTekst: "Skriv tallene ind: K_{w} = 1,0 · 10⁻¹⁴ og " + kendt + " = " + vT + ". Sæt parentes om tallet under brøkstregen, og tryk =.",
             tastHint: "Sådan ser det ud med tallene sat ind: " + ukendt + " = " + KW_TEKST + " / (" + vT + "). Uden parentesen deler lommeregneren kun med " + p.m + ".",
             skrivTekst: "Rund af til to cifre, og skriv " + ukendt + " i felterne.",
             skrivHint: RUND_KONC,
             fejl: function (svar) {
                 var k = [
-                    [K.KW * v, "Du har ganget. " + ukendt + " = K<sub>w</sub> / " + kendt + ", altså dele."],
+                    [K.KW * v, "Du har ganget, men " + ukendt + " = K<sub>w</sub> / " + kendt + ", så du skal dele."],
                     [v / K.KW, "Du har vendt brøken om. K<sub>w</sub> skal stå øverst."],
                     [v, "Det er " + kendt + ". Brug K<sub>w</sub> til at finde " + ukendt + "."],
                     [K.KW / p.mTal * Math.pow(10, p.e),
@@ -346,12 +346,12 @@
                 { f: "[H₃O⁺] = 2 · c", forkl: "Hvert " + s.formel + "-molekyle giver én H₃O⁺, ikke to. Se reaktionsskemaet." },
                 { f: "[H₃O⁺] = K_{w} / c", forkl: s.formel + " er en syre. Den giver H₃O⁺ direkte, så K_{w} skal ikke bruges." }
             ],
-            formelHint: s.formel + " er en stærk syre. Alle molekyler reagerer, og hvert molekyle giver én H₃O⁺ (se skemaet). Så er der lige så mange H₃O⁺, som der var " + s.formel + ".",
-            skrivTekst: "c(" + s.formel + ") = " + cT + " M. Skriv tallet som et tal gange 10 i en potens.",
-            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser det flyttede. Fx er " + kommaEksempel(c) + ".",
+            formelHint: s.formel + " er en stærk syre. Alle " + s.formel + "-molekyler reagerer, og hvert molekyle giver én H₃O⁺ (se skemaet). Derfor er der lige så mange H₃O⁺, som der var " + s.formel + ".",
+            skrivTekst: "c(" + s.formel + ") = " + cT + " M. Skriv koncentrationen som et tal gange en tierpotens.",
+            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. For eksempel er " + kommaEksempel(c) + ".",
             fejl: function (svar) {
                 var b = find(svar, [
-                    [2 * c, "Én " + s.formel + " giver én H₃O⁺. [H₃O⁺] = c."],
+                    [2 * c, "Hvert " + s.formel + "-molekyle giver én H₃O⁺, så [H₃O⁺] = c."],
                     [K.KW / c, "Det er [OH⁻]. For en stærk syre er [H₃O⁺] = c."]
                 ], true);
                 if (b) return b;
@@ -395,7 +395,7 @@
         var tal = b.n > 1 ? b.n + " · " + cT + " M = " + K.decimal(facit) + " M" : cT + " M";
         var formler = b.n > 1 ? [
             { f: "[OH⁻] = " + b.n + " · c", rigtig: true },
-            { f: "[OH⁻] = c", forkl: "Hver " + b.formel + " giver " + b.n + " OH⁻. Så bliver der " + b.n + " gange så mange OH⁻." },
+            { f: "[OH⁻] = c", forkl: "Hver " + b.formel + " giver " + b.n + " OH⁻. Derfor bliver der " + b.n + " gange så mange OH⁻." },
             { f: "[OH⁻] = c / " + b.n, forkl: "Der bliver flere OH⁻, ikke færre. Du skal gange med " + b.n + "." }
         ] : [
             { f: "[OH⁻] = c", rigtig: true },
@@ -413,9 +413,9 @@
             formelHint: "Du fandt lige, at én " + b.formel + " giver " + (b.n > 1 ? b.n + " OH⁻" : "én OH⁻") + ". Hvad betyder det for, hvor mange OH⁻ der er?",
             tastTekst: "Skriv c = " + cT + " ind i formlen. Tast " + b.n + " · " + cT + " på lommeregneren, og tryk =.",
             tastHint: "Sådan ser det ud med tallet sat ind: [OH⁻] = " + b.n + " · " + cT + " M.",
-            skrivTekst: b.n > 1 ? "Skriv [OH⁻] som et tal gange 10 i en potens, i felterne." :
-                "c(" + b.formel + ") = " + cT + " M. Skriv tallet som et tal gange 10 i en potens.",
-            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser det flyttede. Fx er " + kommaEksempel(facit) + ".",
+            skrivTekst: b.n > 1 ? "Skriv [OH⁻] som et tal gange en tierpotens i felterne." :
+                "c(" + b.formel + ") = " + cT + " M. Skriv koncentrationen som et tal gange en tierpotens.",
+            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. For eksempel er " + kommaEksempel(facit) + ".",
             fejl: function (svar) {
                 var k = b.n > 1 ? [
                     [c, "Hver " + b.formel + " giver " + b.n + " OH⁻. Gang med " + b.n + "."],

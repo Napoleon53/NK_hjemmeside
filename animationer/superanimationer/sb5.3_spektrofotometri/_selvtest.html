@@ -193,7 +193,7 @@ function koerTest(W) {
     paastand("… og linjen siger, hvor kurven ligger", /længere til venstre/.test(besked(S1)), besked(S1));
     talfelt(S1, ["17,5"]);
     paastand("17,5 godtages (inden for 1 µM af 18,0)", S1.trin().id === "c" && S1.svar.cAfl === 17.5);
-    paastand("c = A · a: ganget", /deles med a/.test(regn(S1, "gange", ["A", "a"])));
+    paastand("c = A · a: ganget", /divideres med a/.test(regn(S1, "gange", ["A", "a"])));
     felt(S1, ".skift").click();
     var rc = regn(S1, "broek", ["A", "a"], ["0,468", "0,026"], "18");
     paastand("c = 18,0 µM", S1.svar.c === 0.468 / 0.026 && S1.trin().id === "foer", rc);

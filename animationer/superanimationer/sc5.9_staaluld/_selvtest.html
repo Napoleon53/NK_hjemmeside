@@ -391,7 +391,7 @@ function koerTest(W) {
     var maks = Math.floor(NK.Tegn.LUP_ATOMER * A.klump.udbytte / 2) * 2;
     paastand("luppen: den inderste del af jernet har ikke reageret", A.lup.reageret() === maks && maks < NK.Tegn.LUP_ATOMER, A.lup.reageret() + " af " + NK.Tegn.LUP_ATOMER);
     felt(komma(A.proeve));
-    paastand("m(før) i feltet til m(efter) afvises", A.noteret.me === null && /Det er m\(før\)/.test(besked(A)), besked(A));
+    paastand("m(før) i feltet til m(efter) afvises", A.noteret.me === null && /Du har skrevet m\(før\)/.test(besked(A)), besked(A));
     felt(komma(A.klump.visning()));
     paastand("måling 1 er løst, forklaringen siger, hvorfor gættet ikke holdt, og målingen er gemt", A.faerdig && /tog .* g på/.test(besked(A)) && /Brænde bliver lettere/.test(besked(A)) &&
         /Løst/.test(besked(A)) && NK.maalinger[0] && NK.maalinger[0].me === A.klump.visning(), besked(A));
@@ -399,7 +399,7 @@ function koerTest(W) {
     paastand("kortet bliver på opgaven: opgaven står der stadig, forklaringen står under i en grøn boks, og Næste måling står, hvor Indsend svar stod",
         kortA.classList.contains("loest") && kortA.querySelector(".sk-tekst .sk-chip").textContent === "Måling 1" && !!A.el.bliv.querySelector(".sk-bund.bliv.god") &&
         A.el.bund.hidden && !!videreA && /Næste måling/.test(videreA.textContent) && !kortA.querySelector(".statuslinje"), videreA ? videreA.textContent : "");
-    paastand("under skemaet: Den blev tungere", /Den blev tungere/.test(d.getElementById("forsoeg-gaetlinje").textContent));
+    paastand("under skemaet: Stålulden blev tungere", /Stålulden blev tungere/.test(d.getElementById("forsoeg-gaetlinje").textContent));
     paastand("skemaet viser begge tal, og hvor meget stålulden tog på", /tog .* g på/.test(d.getElementById("forsoeg-note").textContent) &&
         d.getElementById("forsoeg-e0").textContent === komma(A.klump.visning()) + " g", d.getElementById("forsoeg-note").textContent);
     paastand("listen viser måling 1 som løst med grønt", d.querySelectorAll("#forsoeg-liste .hyldelinje")[0].classList.contains("loest"));
@@ -440,7 +440,7 @@ function koerTest(W) {
     tik(A, 2);
     paastand("gået ud: brænderen kan ikke tænde den igen, og det siges", A.klump.ude && A.klump.p === pUde && /kan ikke tændes igen/.test(besked(A)), besked(A));
     klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
-    paastand("gået ud: flasken siger, at den skal bruges, mens den gløder", A.klump.ilt === 0 && /mens den gløder/.test(besked(A)), besked(A));
+    paastand("gået ud: flasken siger, at den skal bruges, mens den gløder", A.klump.ilt === 0 && /mens stålulden gløder/.test(besked(A)), besked(A));
 
     overskrift("8. Fane 2: skemaet og beregningen (Let)");
     NK.visFane("fane-beregning");
@@ -566,7 +566,7 @@ function koerTest(W) {
     svarB()[1].click(); B.el.indsend.click();
     var pctSvaer = B.opg.facit.pct;
     paastand("Svær, måling 1 kan løses: der regnes mere ud end i Let, så en mindre del af jernet har reageret",
-        B.faerdig && B.status[0].stjerne && pctSvaer < pctLet && /Regnet ud: /.test(besked(B)), pctSvaer.toFixed(0) + " mod " + pctLet.toFixed(0) + ". " + besked(B));
+        B.faerdig && B.status[0].stjerne && pctSvaer < pctLet && /beregningen giver/.test(besked(B)), pctSvaer.toFixed(0) + " mod " + pctLet.toFixed(0) + ". " + besked(B));
     var gemtB = NK.hent("nk-sc5.8-beregning", {});
     paastand("de løste opgaver gemmes for hvert skema for sig, og valget af skema huskes", !!gemtB.m1 && !!gemtB.m2 && !!gemtB.m1_svaer && !gemtB.m2_svaer && NK.hent("nk-sc5.8-skema", "") === "svaer",
         Object.keys(gemtB).join(","));
@@ -654,9 +654,9 @@ function koerTest(W) {
         A.vaelgGaet("samme");
         maal(A, "opgaven");
         var hintA = Object.keys(D.HINT).map(function (k) { return D.HINT[k]; }).concat([
-            "Det er det, vægten viser nu. m(før) er massen, før stålulden brændte. Start forfra i panelet, hvis du ikke så den.",
+            "Du har skrevet det, vægten viser nu. m(før) er massen, før stålulden brændte. Start forfra i panelet, hvis du ikke så den.",
             "Stålulden er tændt, men m(før) mangler. Skriv den, hvis du nåede at se den, eller tryk på Start forfra i panelet.",
-            "Stålulden er gået ud og kan ikke tændes igen. Start forfra i panelet, og brug flasken med dioxygen, mens den gløder."]);
+            "Stålulden er gået ud og kan ikke tændes igen. Start forfra i panelet, og brug flasken med dioxygen, mens stålulden gløder."]);
         hintA.forEach(function (t, i) { A.besked('<span class="b-maerke">Hint</span> ' + NK.html(t), i % 2 ? "skidt" : "hint"); maal(A, "fane 1, linje " + i); });
         var lettere = D.GAET.svar[0];
         A.faerdig = true;

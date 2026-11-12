@@ -58,7 +58,7 @@
             { navn: "Syren og basen", pladser: ["syre", "base", "hydron"],
               ros: "Ethansyre afgiver en hydron, og vand optager den. Den orange hydron sidder nu i oxoniumionen." },
             { navn: "Reaktionen og parrene", pladser: ["syre-basereaktion", "korresponderende syre-basepar"],
-              ros: "I en syre-basereaktion flytter en hydron fra syren til basen. Reaktionen har altid to syre-basepar." },
+              ros: "I en syre-basereaktion overføres en hydron fra syren til basen. Reaktionen har altid to syre-basepar." },
             { navn: "Flere hydroner", pladser: ["amfolyt", "monohydron", "polyhydron"],
               ros: "Hydrogencarbonat kan både afgive og optage en hydron. HCl kan afgive én hydron, og H₃PO₄ kan afgive tre." }
         ],
@@ -82,13 +82,13 @@
 
             { id: "syre-basereaktion", ord: ["syre-basereaktion"], x: RA.x + RA.b / 2, y: RA.y, maal: [RA.x + RA.b / 2, RA.y], titel: true, dele: ["ramme"],
               omr: [{ r: [RA.x - 4, RA.y - 4, RA.b + 8, RA.h + 8, 18], tom: true }],
-              fejl: { "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to stoffer. Overskriften gælder hele reaktionen, hvor en hydron flytter.",
+              fejl: { "korresponderende syre-basepar": "<b>korresponderende syre-basepar</b> er to partikler. Overskriften gælder hele reaktionen, hvor en hydron overføres.",
                       "hydron": "<b>hydron</b> er kun H⁺. Overskriften gælder hele reaktionen mellem ethansyre og vand." } },
             { id: "korresponderende syre-basepar", ord: ["korresponderende syre-basepar"], x: 580, y: 438, maal: [580, K0 + KY], dele: ["par"],
               omr: [{ r: [XS[1] - 7, K0 - 6, XS[2] - XS[1] + 14, KI + 13, 6] }, { r: [XS[0] - 7, K0 - 6, XS[3] - XS[0] + 14, KY + 13, 6] }],
-              fejl: { "syre-basereaktion": "<b>syre-basereaktion</b> er hele reaktionen. Pladsen peger på klammerne, der hver binder to stoffer sammen.",
-                      "amfolyt": "<b>amfolyt</b> er ét stof. Pladsen peger på klammerne, der hver binder to stoffer sammen.",
-                      "polyhydron": "<b>polyhydron</b> siges om én syre. Pladsen peger på klammerne, der hver binder to stoffer sammen." } },
+              fejl: { "syre-basereaktion": "<b>syre-basereaktion</b> er hele reaktionen. Pladsen peger på klammerne, der hver binder to partikler sammen.",
+                      "amfolyt": "<b>amfolyt</b> er ét stof. Pladsen peger på klammerne, der hver binder to partikler sammen.",
+                      "polyhydron": "<b>polyhydron</b> siges om én syre. Pladsen peger på klammerne, der hver binder to partikler sammen." } },
 
             { id: "amfolyt", ord: ["amfolyt"], x: AX[1], y: 530, maal: [AX[1], IK.y + 2], dele: ["amfolyt"],
               omr: [{ r: [IK.x - 4, IK.y - 4, IK.b + 8, IK.h + 8, 14] }],
@@ -98,11 +98,11 @@
             { id: "monohydron", ord: ["monohydron"], x: C1.x + C1.b / 2, y: C1.y, maal: [C1.x + C1.b / 2, C1.y], titel: true, dele: ["mono"],
               omr: [{ r: [C1.x - 4, C1.y - 4, C1.b + 8, C1.h + 8, 18], tom: true }],
               fejl: { "polyhydron": "<b>polyhydron</b> siges om en syre, der kan afgive flere hydroner. Overskriften gælder kortet med HCl og én pil.",
-                      "amfolyt": "<b>amfolyt</b> kan både afgive og optage. Overskriften gælder kortet med HCl, som kun afgiver." } },
+                      "amfolyt": "<b>amfolyt</b> kan både afgive og optage en hydron. Overskriften gælder kortet med HCl, som kun kan afgive én hydron." } },
             { id: "polyhydron", ord: ["polyhydron"], x: C2.x + C2.b / 2, y: C2.y, maal: [C2.x + C2.b / 2, C2.y], titel: true, dele: ["poly"],
               omr: [{ r: [C2.x - 4, C2.y - 4, C2.b + 8, C2.h + 8, 18], tom: true }],
               fejl: { "monohydron": "<b>monohydron</b> siges om en syre, der kun kan afgive én hydron. Overskriften gælder kortet med H₃PO₄ og tre pile.",
-                      "amfolyt": "<b>amfolyt</b> er ét stof, der både kan afgive og optage. Overskriften gælder kortet med H₃PO₄ og tre pile." } }
+                      "amfolyt": "<b>amfolyt</b> er ét stof, der både kan afgive og optage en hydron. Overskriften gælder kortet med H₃PO₄ og tre pile." } }
         ],
 
         tegn: function (api) {

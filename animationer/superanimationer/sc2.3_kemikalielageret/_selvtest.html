@@ -192,7 +192,7 @@ function koerTest(W) {
     paastand("alle ioner, ionnavne, formler og navne i ASCII, med hævet skrift og med mellemrum", ikkeGodkendt.length === 0,
         ikkeGodkendt.slice(0, 6).join(", "));
     var noteNa = T.ion("Na1+", D.ion("Na"), D.stof("Na2O"), "formel");
-    paastand("Na1+ godkendes med en bemærkning om skrivemåden", noteNa.ok && /bare som \+/.test(noteNa.note));
+    paastand("Na1+ godkendes med en bemærkning om skrivemåden", noteNa.ok && /blot som \+/.test(noteNa.note));
     var fos = T.navn("calciumfosfid", D.stof("Ca3P2"));
     paastand("fosfid godkendes, men staves phosphid", fos.ok && /phosphid/.test(fos.note));
     var soelv = T.navn("sølv(I)bromid", D.stof("AgBr")), soelv2 = T.navn("sølvbromid", D.stof("AgBr"));
@@ -287,7 +287,7 @@ function koerTest(W) {
             return D.trin(s)[0].ion === (s.katIon.beregnes ? s.anIon : s.katIon);
         }));
     var hFe = D.hjaelp(Fe2O3, D.trin(Fe2O3)[1], { slags: "ion" });
-    paastand("svaret for Fe³⁺ regner med 3 O²⁻ og 2 Fe", /3 O²⁻ giver −6\. Så skal 2 Fe give \+6, altså \+3 hver/.test(hFe.svar), hFe.svar);
+    paastand("svaret for Fe³⁺ regner med 3 O²⁻ og 2 Fe", /3 O²⁻ giver −6\. Derfor skal 2 Fe give \+6, altså \+3 hver/.test(hFe.svar), hFe.svar);
 
     overskrift("7. Sproget");
     var INTRO = D.INTRO_LAGER.concat(D.INTRO_BAAND);

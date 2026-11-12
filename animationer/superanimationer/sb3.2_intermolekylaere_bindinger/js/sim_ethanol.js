@@ -89,8 +89,8 @@
     P.sceneLinje = function () {
         var g = this.opg, id = g.o.id;
         if (id === "hvilket") return g.atom ? g.o.valgt[g.atom.e] + " Tryk Indsend svar." : "";
-        if (id === "uden" && !this.P.hb && this.roertTermo) return "Stil termometeret på kogepunktet, og tryk Indsend svar.";
-        if (id === "kog" && this.roertTermo) return "Stil termometeret på kogepunktet, og tryk Indsend svar.";
+        if (id === "uden" && !this.P.hb && this.roertTermo) return "Indstil termometeret på kogepunktet, og tryk Indsend svar.";
+        if (id === "kog" && this.roertTermo) return "Indstil termometeret på kogepunktet, og tryk Indsend svar.";
         return "";
     };
 
@@ -165,7 +165,7 @@
             var mig = this;
             this.valgte = {};
             o.svar.forEach(function (sv, j) { if (sv.ok) mig.valgte[j] = true; });
-            this.loest("svar", o.loest, "Hydrogenbindingerne og London-kræfterne.");
+            this.loest("svar", o.loest, "Hydrogenbindingerne og londonbindingerne.");
         } else if (o.id === "hvilket") {
             var m = this.findMolekyle(false) || this.P.mol[0];
             g.lysH = { m: m, h: this.P.F.donorer[0] };
@@ -216,7 +216,7 @@
         this.visKontakt();
         if (!this.P.hb) {
             this.besked('<span class="b-maerke">Tankeeksperiment</span> ' +
-                NK.html("I virkeligheden kan man ikke slå hydrogenbindingerne fra, men modellen kan. Find nu kogepunktet."), "peger");
+                NK.html("Hydrogenbindingerne kan kun slås fra i modellen, ikke i virkeligheden. Find nu kogepunktet for ethanol uden hydrogenbindinger."), "peger");
         } else {
             this.besked('<span class="b-maerke">Til igen</span> ' + NK.html("Hydrogenbindingerne er slået til igen."), "peger");
         }
@@ -367,13 +367,13 @@
         this.valgtT = 6;
         var P0 = this.P;
         if (m.gas) {
-            this.kortBesked("Et ethanolmolekyle i dampen. Det er helt: 2 C, 6 H og 1 O. Det har ingen bindinger til andre molekyler.", 6);
+            this.kortBesked("Dette ethanolmolekyle er i dampen. Det er helt: 2 C, 6 H og 1 O. Det har ingen bindinger til andre molekyler.", 6);
             return;
         }
         var nh = P0.hbListe.filter(function (b) { return b.a === m || b.b === m; }).length;
         var nl = P0.lonListe.filter(function (b) { return b.a === m || b.b === m; }).length;
-        this.kortBesked("Et ethanolmolekyle i væsken. Lige nu har det " + nh + " hydrogenbinding" + (nh === 1 ? "" : "er") +
-            " og " + nl + " London-kraft" + (nl === 1 ? "" : "er") + " til naboerne. δ+ og δ− står ved OH-gruppen.", 6);
+        this.kortBesked("Dette ethanolmolekyle er i væsken. Lige nu har det " + nh + " hydrogenbinding" + (nh === 1 ? "" : "er") +
+            " og " + nl + " londonbinding" + (nl === 1 ? "" : "er") + " til naboerne. δ+ og δ− står ved OH-gruppen.", 6);
     };
 
     NK.SimEthanol = SimEthanol;

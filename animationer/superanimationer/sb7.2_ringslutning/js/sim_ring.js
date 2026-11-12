@@ -474,7 +474,7 @@
         }
         var id = this.ramt(pt);
         if (this.fase === "ilt") {
-            if (!id) { this.kortBesked("Klik på et oxygenatom i en af grupperne.", 3); return; }
+            if (!id) { this.kortBesked("Klik på et af oxygenatomerne i kæden.", 3); return; }
             this.valgt = this.valgt === id ? null : id;
             this.besked("", "");
             this.visKort();

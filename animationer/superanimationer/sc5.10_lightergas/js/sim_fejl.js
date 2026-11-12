@@ -102,7 +102,7 @@
         this.svarVist = maade === "svar";
         if (maade === "svar") {
             this.brugtSvar = true;
-            this.svarForud = NK.html("Den rigtige: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene.");
+            this.svarForud = NK.html("Det rigtige svar: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene.");
         }
         this.start();
     };

@@ -699,7 +699,7 @@
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "glas" && this.fase === "gaet") {
             /* Stangen kommer foerst ned, naar gaettet er sendt: kortet blinker */
-            this.info = { tekst: "Svar først på kortet: sker der noget? Så kommer stangen ned.", tid: 3 };
+            this.info = { tekst: "Svar først på kortet, om der sker en reaktion. Derefter kommer stangen ned i glasset.", tid: 3 };
             this.kort.blink();
         } else if (u.slags === "raekke") {
             this.info = { tekst: "Spændingsrækken: uædel til venstre, ædel til højre.", tid: 3 };

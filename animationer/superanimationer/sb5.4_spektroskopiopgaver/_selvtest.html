@@ -243,7 +243,7 @@ async function koerTest(W) {
     paastand("c_efter i stedet for c_før giver forklaringen om den fortyndede prøve", !i2.groen && /fortyndede prøve/.test(besked(i2)), besked(i2));
     husk("fejl", besked(i2));
     svar(i2, "0,001", "mM");
-    paastand("divideret i stedet for ganget: bouillonen er stærkere", !i2.groen && /stærkere/.test(besked(i2)), besked(i2));
+    paastand("divideret i stedet for ganget: bouillonen er stærkere", !i2.groen && /større end i prøven/.test(besked(i2)), besked(i2));
     husk("fejl", besked(i2));
     svar(i2, "10,0", "mM");
     paastand("c_før = 10,0 mM er rigtigt", !!i2.groen);

@@ -232,10 +232,10 @@
     P.trinLinje = function () {
         var f = this.fase();
         if (f === "faerdig") return "";
-        if (f === "startForfra") return "Startmassen står ikke i skemaet. Sæt diglen tilbage på vægten, hvis den ikke er varmet. Ellers tryk på Start forfra.";
+        if (f === "startForfra") return "Startmassen står ikke i skemaet. Sæt diglen tilbage på vægten, hvis du ikke har varmet den endnu. Ellers tryk på Start forfra.";
         if (f === "varm" && this.d.sprojtRate > 0) return "Det sprøjter! Pulver ryger ud af diglen. Skru ned på Lav.";
         if (f === "varm" && this.sprojtSet) return "Det sprøjtede, og noget pulver røg ud af diglen. Slutmassen bliver for lav. Fortsæt, eller tryk på Start forfra.";
-        if (f === "varm" && this.d.nat > 0.01 && this.opvarmetSiden() > 12 && this.d.flamme === "lav") return D.LINJE.varm + " Lav flamme er langsom. Høj er fin nu.";
+        if (f === "varm" && this.d.nat > 0.01 && this.opvarmetSiden() > 12 && this.d.flamme === "lav") return D.LINJE.varm + " Lav flamme varmer langsomt, så nu kan du skrue op på Høj.";
         return D.LINJE[f] || "";
     };
 
@@ -359,7 +359,7 @@
         }
         var m = this.vejninger.length ? this.vejninger[this.vejninger.length - 1] : null;
         NK.saetTekst("forsoeg-note", this.faerdig && m ? "Massen er konstant: " + K.g2(m.m) + " g. Natronen tabte " +
-            K.g2(K.r2(this.vejninger[0].m - m.m)) + " g." : "Massen er konstant, når to vejninger i træk er ens: ændringen er 0,00 g.");
+            K.g2(K.r2(this.vejninger[0].m - m.m)) + " g." : "Massen er konstant, når to vejninger i træk er ens, altså når ændringen er 0,00 g.");
     };
 
     P.opvarmetTekst = function () { return K.min(this.d.opv) + " min"; };
@@ -389,7 +389,7 @@
         if (f === "foer") {
             if (v === Math.round(this.proeve * 100)) { this.noter("ok"); return; }
             ryst(e);
-            this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
+            this.besked("Det tal står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
             return;
         }
         if (f === "vaegtVent") {
@@ -402,8 +402,8 @@
         if (v === visV) { this.noter("ok"); return; }
         ryst(e);
         var forrige = this.vejninger[this.vejninger.length - 1];
-        if (v === Math.round(forrige.m * 100)) this.besked("Det er massen fra sidste vejning. Hvad viser vægten nu?", "skidt");
-        else this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
+        if (v === Math.round(forrige.m * 100)) this.besked("Du har skrevet massen fra sidste vejning. Hvad viser vægten nu?", "skidt");
+        else this.besked("Det tal står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
     };
 
     /* En vejning skrives i skemaet */
@@ -427,7 +427,7 @@
         /* Massen er ikke konstant endnu: linjen siger, hvor meget den faldt */
         var fald = K.r2(forrige.m - m);
         this.rosKlasse = "gul";
-        if (ens) this.rosNaeste = "Det samme som sidst, men diglen nåede ikke at blive rigtig varm. Varm længere.";
+        if (ens) this.rosNaeste = "Massen er den samme som sidst, men diglen nåede ikke at blive rigtig varm. Varm længere.";
         else if (this.vejninger.length >= D.MAX_VEJNINGER) this.rosNaeste = "Skemaet er fuldt. Tryk på Start forfra, og varm længere ad gangen.";
         else if (fald > 0) this.rosNaeste = "Massen faldt " + K.g2(fald) + " g. Den er ikke konstant endnu.";
         else this.rosNaeste = "Noteret: " + K.g2(m) + " g.";
@@ -449,7 +449,7 @@
         s += " Regn på fanen Hypoteserne, hvilken hypotese massen passer med.";
         this.forklaring = NK.html(s);
         this.sidsteFase = "faerdig";
-        this.trinLoest(maade, maade === "svar" ? NK.html("Vægten viser " + K.g2(slutM) + " g. Det samme som sidst.") : null);
+        this.trinLoest(maade, maade === "svar" ? NK.html("Vægten viser " + K.g2(slutM) + " g, det samme som sidst.") : null);
         this.visSkema();
         if (NK.sims && NK.sims["fane-hypoteser"]) NK.sims["fane-hypoteser"].nyMaaling();
     };
@@ -529,8 +529,8 @@
             this.saetFlamme(d.flamme ? "" : "lav");
             return false;
         }
-        if (u === "vaegt") this.kortBesked("Vægten er nulstillet med den tomme digel. Den viser massen af det, der er i diglen.");
-        if (u === "zoom") this.kortBesked(NK.dommen ? "Luppen: to HCO₃⁻ bliver til CO₃²⁻, CO₂ og H₂O. CO₂ og H₂O forsvinder op i luften, og Na⁺ bliver." :
+        if (u === "vaegt") this.kortBesked("Vægten er nulstillet med den tomme digel og viser derfor massen af det, der er i diglen.");
+        if (u === "zoom") this.kortBesked(NK.dommen ? "I luppen bliver to HCO₃⁻ til CO₃²⁻, CO₂ og H₂O. CO₂ og H₂O forsvinder op i luften, og Na⁺ bliver i diglen." :
             "Luppen viser natronen: Na⁺ og HCO₃⁻. Gas forsvinder, og det, der bliver tilbage, står som ?.");
         if (u === "graf") this.kortBesked("Grafen viser de masser, du har skrevet i skemaet. Når massen er konstant, bliver kurven vandret.");
         if (u === "glas") this.kortBesked(D.KRUKKE);

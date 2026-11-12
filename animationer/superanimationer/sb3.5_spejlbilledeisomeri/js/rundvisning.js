@@ -16,16 +16,16 @@
     var TURE = {
         "fane-sb": [
             { sel: "#sb-anker-molekyle", titel: "Molekylet", tekst: "Træk i molekylet for at dreje det. Slipper du tæt på spejlbilledets stilling, klikker det på plads. Tryk så Indsend svar." },
-            { sel: "#sb-anker-spejl", titel: "Spejlbilledet", tekst: "Molekylet set i et spejl. Det står stille. Grønne ringe viser de grupper, der passer." },
+            { sel: "#sb-anker-spejl", titel: "Spejlbilledet", tekst: "Spejlbilledet viser molekylet set i et spejl og står stille. Grønne ringe viser de grupper, der passer." },
             { sel: "#sb-valg", titel: "Det kan ikke lade sig gøre", tekst: "Vælg dette svar, hvis molekylet aldrig kan komme til at passe med sit spejlbillede. Tryk så Indsend svar." },
-            { sel: "#sb-skort", titel: "Kortet", tekst: "Opgaven, det næste skridt og hvad der skete. Knappen med gul kant giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#sb-opgaver", titel: "Opgaverne", tekst: "Seks molekyler. En opgave, du løser uden at se svaret, får en stjerne." }
+            { sel: "#sb-skort", titel: "Kortet", tekst: "Kortet viser opgaven, det næste skridt og hvad der skete. Knappen med gul kant giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#sb-opgaver", titel: "Opgaverne", tekst: "Fanen har seks molekyler. En opgave, du løser uden at se svaret, får en stjerne." }
         ],
         "fane-fi": [
             { sel: "#fi-anker-tavle", titel: "Tavlen", tekst: "Klik på de C-atomer, der har fire forskellige grupper. De får en stjerne." },
             { sel: "#fi-valg", titel: "Knapperne", tekst: "Vis alle H tegner alle atomer. Sæt dine stjerner, eller vælg Intet asymmetrisk C-atom, og tryk Indsend svar." },
-            { sel: "#fi-skort", titel: "Kortet", tekst: "Opgaven og hvad der gik galt. Knappen med gul kant giver ét hint ad gangen." },
-            { sel: "#fi-opgaver", titel: "Opgaverne", tekst: "13 molekyler fra let til svær. Nogle har intet asymmetrisk C-atom, ét har to." }
+            { sel: "#fi-skort", titel: "Kortet", tekst: "Kortet viser opgaven og hvad der gik galt. Knappen med gul kant giver ét hint ad gangen." },
+            { sel: "#fi-opgaver", titel: "Opgaverne", tekst: "Fanen har 13 molekyler fra let til svær. Nogle har intet asymmetrisk C-atom, og ét har to." }
         ],
         "fane-rs": [
             { sel: "#rs-anker-molekyle", titel: "Molekylet", tekst: "Klik på den gruppe, der skal have det næste nummer, og tryk Indsend svar. Træk så i molekylet for at dreje det." },

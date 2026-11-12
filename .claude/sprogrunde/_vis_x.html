@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}iframe{border:0;width:1366px;height:768px}</style></head><body>
+<iframe id="r" src="/animationer/superanimationer/sb6.5_ph_i_syrer_og_baser/index.html?alene"></iframe>
+<script>
+const r=document.getElementById('r'), loes=location.search.includes('loes');
+r.onload=()=>setTimeout(()=>{const W=r.contentWindow,NK=W.NK,s1=NK.sims["fane-s"];
+NK.visFane("fane-s"); s1.forfra(); s1.startEmne(0);
+const e=s1.e; s1.f=[e.ct,"0","0"]; s1.efterKort(); s1.indsendKlik(); s1.videreKlik();
+if(loes){ s1.svarValg(0); s1.indsendKlik(); } else { s1.svarValg(2); s1.indsendKlik(); }
+},1500);
+</script></body></html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb8.4 Log P og log D</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at tallene følger bogen (afsnit B8.4:
+   acetylsalicylsyre log D 1,2 i mavesækken og −2,7 i blodet, amfetamin
+   −0,7 i blodet, log D = log P for den uladede form, og log D falder 1
+   pr. pH-enhed), at luppen har 20 molekyler med plads til dem i begge
+   halvdele, at ionerne aldrig er i octanol, at paracetamol giver 15 og 5,
+   at alle tre faner kan gennemføres, at forkerte svar får den rigtige
+   forklaring og koster stjernen, at intet løses uden Indsend svar, at
+   kurven tegnes roligt fra pH 0, at teksterne er korte og uden
+   tankestreger og ASCII-dansk, og at kortet aldrig dækker tavlen fra
+   1100 × 620 til 1600 × 950. Kræver en lokal server med mappen
+   animationer/ som rod. Testen gemmer elevens fremskridt og lægger det
+   tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb8.4-logp", "nk-sb8.4-logd", "nk-sb8.4-base"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|traek\w*|baade|laengere|vaeske|proeve\w*|maengde|oploesning|oploest|saenk\w*|haev\w*|maveSaek|lag\b-|oejeblik)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, S = NK.Scene, ST = D.STOFFER;
+    var p1 = NK.sims["fane-p"], d2 = NK.sims["fane-d"], b3 = NK.sims["fane-b"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : ""; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function tegn(sim) { sim.tilpas(); sim.tegn(); }
+    function naer(a, b, tol) { return Math.abs(a - b) <= tol; }
+    function spor(sim) { for (var p = 0; p <= 14.01; p += 0.1) sim.saetPh(p); tid(sim, 0.3); }
+    function sum(f) { return f.oct + f.u + f.ion; }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: tallene er bogens (afsnit B8.4)");
+    paastand("acetylsalicylsyre: log D = 1,2 i mavesækken (pH 1,5), som log P", D.komma1(D.logD(ST.asa, 1.5)) === "1,2");
+    paastand("acetylsalicylsyre: log D = −2,7 i blodet (pH 7,4), som bogens eksempel", D.komma1(D.logD(ST.asa, 7.4)) === "−2,7");
+    paastand("acetylsalicylsyre: log D = −1,8 i tyndtarmen (pH 6,5), som trin 3 i fane 2", D.komma1(D.logD(ST.asa, 6.5)) === "−1,8" && naer(D.LOGD[2].maal, -1.8, 0.001));
+    paastand("amfetamin: log D ≈ −0,7 i blodet med både genvejen og den fulde formel", D.komma1(D.logD(ST.amf, 7.4)) === "−0,7" && naer(D.BASE[1].maal, -0.7, 1e-9));
+    paastand("ved pH = pKₛ er log D = log P − log 2 for både syre og base",
+        naer(D.logD(ST.asa, 3.5), 1.2 - Math.log(2) / Math.LN10, 1e-9) && naer(D.logD(ST.amf, 9.9), 1.8 - Math.log(2) / Math.LN10, 1e-9));
+    paastand("genvejen: over pKₛ falder syrens log D med 1 pr. pH-enhed, under pKₛ stiger basens med 1",
+        naer(D.logD(ST.asa, 7) - D.logD(ST.asa, 8), 1, 0.001) && naer(D.logD(ST.amf, 6) - D.logD(ST.amf, 5), 1, 0.001));
+    paastand("et stof, der hverken er syre eller base, har log D = log P ved alle pH", [0, 4, 7, 11, 14].every(function (p) { return D.logD(ST.para, p) === ST.para.logP; }));
+    var summer = [];
+    ["asa", "amf", "lid", "para", "glu", "ibu"].forEach(function (id) {
+        for (var p = 0; p <= 14; p += 0.1) { var f = D.fordeling(ST[id], p); if (sum(f) !== 20 || f.oct < 0 || f.u < 0 || f.ion < 0) summer.push(id + " " + p.toFixed(1)); }
+    });
+    samlet("fordelingen har altid 20 molekyler og ingen negative tal", summer);
+    var fp = D.fordeling(ST.para, 7), fi = D.fordeling(ST.ibu, 7), fg = D.fordeling(ST.glu, 7);
+    paastand("paracetamol: 15 i octanol og 5 i vand, Kꜰ = 3,0 og log P = 0,48", fp.oct === 15 && fp.u === 5 && D.komma2(ST.para.logP) === "0,48", JSON.stringify(fp));
+    paastand("ibuprofen: alle 20 i octanol, glucose: alle 20 i vand", fi.oct === 20 && fg.oct === 0 && fg.u === 20);
+    var f0 = D.fordeling(ST.asa, 0), f14 = D.fordeling(ST.asa, 14), fa = D.fordeling(ST.amf, 0);
+    paastand("acetylsalicylsyre: 19 i octanol ved pH 0 og alle 20 som A⁻ i vand ved pH 14", f0.oct === 19 && f0.ion === 0 && f14.ion === 20, JSON.stringify([f0, f14]));
+    paastand("amfetamin: alle 20 som BH⁺ i vand ved pH 0", fa.ion === 20);
+    paastand("lidocain er ukendt i fane 3 med log P = 2,4 og pKₛ = 7,9", ST.lid.logP === 2.4 && ST.lid.pks === 7.9 && D.BASE[3].maal === 2.4);
+    paastand("tallene på kortet læses med komma, punktum og begge slags minus", D.laesTal("−1,8") === -1.8 && D.laesTal("-1.8") === -1.8 && D.laesTal("log D = 0,48") === 0.48 && isNaN(D.laesTal("abc")));
+
+    /* ================================================================= */
+    overskrift("2. Luppen");
+    var L = new S.Lup(), plads = [];
+    [84, 100, 120, 150, 185].forEach(function (R) {
+        L.R = 0; L.geometri(0, 0, R);
+        if (L.plads.o.length < 20 || L.plads.v.length < 20) plads.push("R " + R + ": " + L.plads.o.length + "/" + L.plads.v.length);
+        ["o", "v"].forEach(function (h) {
+            var pl = L.plads[h];
+            for (var i = 0; i < pl.length; i++) {
+                if (Math.hypot(pl[i].dx, pl[i].dy) > R - L.r - 4) plads.push("R " + R + " uden for");
+                if (h === "o" ? pl[i].dy > -L.r : pl[i].dy < L.r) plads.push("R " + R + " over grænsen");
+                for (var j = i + 1; j < pl.length; j++) if (Math.hypot(pl[i].dx - pl[j].dx, pl[i].dy - pl[j].dy) < 2 * L.r) plads.push("R " + R + " overlap");
+            }
+        });
+    });
+    samlet("mindst 20 pladser i hver halvdel ved alle størrelser, inden for luppen og uden overlap", plads);
+    L.R = 0; L.geometri(0, 0, 140); L.nulstil();
+    paastand("før omrystningen er alle 20 molekyler i vandet", L.antal().u === 20 && L.antal().oct === 0);
+    var forkert = [];
+    for (var ph = 0; ph <= 14; ph += 0.5) {
+        L.saetFordeling(D.fordeling(ST.asa, ph), false);
+        var n = L.antal(), f = D.fordeling(ST.asa, ph);
+        if (n.oct !== f.oct || n.u !== f.u || n.ion !== f.ion) forkert.push("pH " + ph);
+        L.mol.forEach(function (m) { if (m.ion && m.halv === "o") forkert.push("ion i octanol ved pH " + ph); });
+        var brugt = {};
+        L.mol.forEach(function (m) { var k = m.halv + m.slot; if (brugt[k]) forkert.push("to på samme plads"); brugt[k] = 1; });
+    }
+    samlet("luppen følger fordelingen, ionerne er kun i vandet, og to molekyler deler aldrig plads", forkert);
+
+    /* ================================================================= */
+    overskrift("3. Fane 1: Log P");
+    NK.visFane("fane-p");
+    p1.forfra(); tegn(p1);
+    paastand("fane 1 begynder med paracetamol i vandet og uden Indsend svar", p1.stofId === "para" && p1.lup.antal().u === 20 && el("p-indsend").hidden);
+    var tk = p1.tragt;
+    p1.klikScene({ x: p1.lup.cx, y: p1.lup.cy });
+    paastand("et klik ved siden af skilletragten får kortet til at sige, hvor der skal klikkes", /skilletragten/.test(besked(p1)), besked(p1));
+    var midtT = { x: tk.x + tk.b * 0.62, y: tk.y + tk.h * 0.35 };
+    paastand("skilletragten kan klikkes", S.iTragt(tk, midtT) && p1.overScene(midtT) === "pointer");
+    p1.klikScene(midtT);
+    paastand("et klik ryster tragten", p1.rystT !== null && p1.lup.ryster);
+    tid(p1, 0.5); tegn(p1);
+    paastand("under omrystningen er lagene blandet, og tragten drejer", p1.lup.blandet > 0.9 && Math.abs(p1.vinkel()) >= 0);
+    tid(p1, 2.2); tegn(p1);
+    paastand("bagefter er der 15 molekyler i octanol og 5 i vand", p1.lup.antal().oct === 15 && p1.lup.antal().u === 5 && p1.lup.iRo(), JSON.stringify(p1.lup.antal()));
+    paastand("kortet bliver stående med forklaringen og Næste trin", !!p1.groen && /ligevægt/.test(bliv(p1)) && !!el("p-ind").querySelector("[data-videre]"));
+    p1.videreKlik();
+    paastand("trin 2 har et felt til Kꜰ", p1.fase === "tal" && !!el("p-felt"));
+    p1.talTekst = "0,33"; p1.indsendKlik();
+    paastand("0,33: forklaringen om tæller og nævner, og stjernen er tabt", /tælleren/.test(besked(p1)) && p1.fejl && !p1.groen, besked(p1));
+    p1.talTekst = "15"; p1.indsendKlik();
+    paastand("15: forklaringen om antallet i ét lag", /antallet i octanollaget/.test(besked(p1)), besked(p1));
+    p1.talTekst = "3,0"; p1.indsendKlik();
+    paastand("3,0 er rigtigt, og regnestykket står i kassen", !!p1.groen && p1.resultater.length === 1 && /15 \/ 5/.test(p1.resultater[0].t));
+    p1.videreKlik();
+    p1.talTekst = "1,1"; p1.indsendKlik();
+    paastand("1,1 (ln 3): forklaringen om ln og log", /ln/.test(besked(p1)), besked(p1));
+    p1.talTekst = "3"; p1.indsendKlik();
+    paastand("3: forklaringen om, at det er Kꜰ", /er KF\./.test(besked(p1)), besked(p1));
+    p1.talTekst = "0,48"; p1.indsendKlik();
+    paastand("0,48 er rigtigt", !!p1.groen && p1.resultater.length === 2);
+    p1.videreKlik();
+    paastand("trin 4: stof X er i vandet, og Indsend svar er skjult, til tragten er rystet", p1.stofId === "ibu" && !p1.rystet && el("p-indsend").hidden && !el("p-ind").querySelector("[data-valg]"));
+    p1.klikScene(midtT); tid(p1, 2.6);
+    paastand("efter omrystningen er alle 20 i octanol, og kortet spørger", p1.lup.antal().oct === 20 && !!el("p-ind").querySelector("[data-valg]"));
+    p1.svarValg(0);
+    paastand("et svar vælger kun", p1.valgt === 0 && !p1.groen);
+    p1.indsendKlik();
+    paastand("glucose: forklaringen om, at glucose er hydrofilt", /hydrofilt/.test(besked(p1)) && !p1.groen, besked(p1));
+    p1.svarValg(2); p1.indsendKlik();
+    paastand("ibuprofen er rigtigt, og fanen er gennemført uden stjerne", !!p1.groen && p1.faerdig && p1.status.loest && !p1.status.stjerne);
+    paastand("panelet viser de tre stoffer bagefter", !el("p-proev").hidden);
+    p1.proevStof("glu"); p1.klikScene(midtT); tid(p1, 2.6);
+    paastand("glucose kan rystes bagefter: alle 20 i vand", p1.lup.antal().u === 20 && p1.rystet);
+    p1.forfra();
+    p1.klikScene(midtT); tid(p1, 2.6); p1.videreKlik();
+    p1.talTekst = "3"; p1.indsendKlik(); p1.videreKlik();
+    p1.talTekst = "0,477"; p1.indsendKlik(); p1.videreKlik();
+    p1.klikScene(midtT); tid(p1, 2.6); p1.svarValg(2); p1.indsendKlik();
+    paastand("uden fejl gives stjernen", p1.status.stjerne);
+    p1.forfra(); p1.knap(); p1.knap(); p1.knap();
+    paastand("hjælpeknappens sidste trin ryster tragten", p1.rystT !== null);
+
+    /* ================================================================= */
+    overskrift("4. Fane 2: Log D og pH");
+    NK.visFane("fane-d");
+    d2.forfra(); tegn(d2);
+    paastand("fane 2 begynder ved pH 0 med 19 HA i octanol, og Indsend svar er skjult", d2.ph === 0 && d2.lup.antal().oct === 19 && el("d-indsend").hidden);
+    var sk = d2.skala;
+    paastand("skyderen kan gribes", d2.nedScene({ x: sk.x + sk.b, y: sk.y }) === true);
+    tid(d2, 0.25);
+    paastand("mens kurven tegnes, glider knappen roligt (højst 4 pH pr. sekund)", d2.ph > 0.3 && d2.ph < 1.3, d2.ph);
+    d2.opScene();
+    tid(d2, 4); tegn(d2);
+    paastand("kurven er tegnet, og kortet bliver stående", !!d2.groen && d2.daekning() >= D.DAEKNING && /A−/.test(bliv(d2)), bliv(d2));
+    paastand("ved pH 14 er alle 20 molekyler A⁻ i vand", d2.ph === 14 && d2.lup.antal().ion === 20);
+    d2.videreKlik();
+    d2.saetPh(10);
+    paastand("i trin 2 følger skyderen musen direkte", (function () { d2.nedScene({ x: sk.x, y: sk.y }); d2.opScene(); return d2.ph === 0; })());
+    d2.svarValg(1);
+    paastand("svaret vælger kun", d2.valgt === 1 && !d2.groen);
+    d2.indsendKlik();
+    paastand("octanol bliver polært: forklaringen om, at octan-1-ol er det samme stof", /samme stof/.test(besked(d2)), besked(d2));
+    d2.svarValg(0); d2.indsendKlik();
+    paastand("ionen er ladet: rigtigt", !!d2.groen);
+    d2.videreKlik();
+    paastand("trin 3 har formlen og feltet i samme række", !!el("d-ind").querySelector(".sk-raekke .sk-formel") && !!el("d-felt"));
+    d2.talTekst = "1,2"; d2.indsendKlik();
+    paastand("1,2: forklaringen om, at pH og pKₛ er byttet om", /byttet om/.test(besked(d2)), besked(d2));
+    d2.talTekst = "-998,8"; d2.indsendKlik();
+    paastand("−998,8: forklaringen om log foran parentesen", /log foran/.test(besked(d2)), besked(d2));
+    d2.talTekst = "−1,8"; d2.indsendKlik();
+    tid(d2, 2);
+    paastand("−1,8 er rigtigt; skyderen glider til pH 6,5, og punktet hedder tyndtarm: −1,8", !!d2.groen && d2.ph === 6.5 && d2.punkter.length === 1 && d2.punkter[0].tekst === "tyndtarm: −1,8");
+    d2.videreKlik();
+    paastand("trin 4 viser stregen ved pH = pKₛ", d2.visPks && !d2.visHaeldning);
+    d2.svarValg(3); d2.indsendKlik();
+    paastand("10: forklaringen om, at D bliver 10 gange mindre", /10 gange mindre/.test(besked(d2)), besked(d2));
+    d2.svarValg(1); d2.indsendKlik();
+    paastand("1 er rigtigt, trekanten med hældningen vises, og fanen er gennemført", !!d2.groen && d2.visHaeldning && d2.faerdig && d2.status.loest && !d2.status.stjerne);
+    paastand("kortets knap fører videre til fane 3", /Syre eller base/.test(el("d-ind").querySelector("[data-videre]").textContent));
+    d2.forfra();
+    spor(d2); d2.videreKlik(); d2.svarValg(0); d2.indsendKlik(); d2.videreKlik();
+    d2.talTekst = "-1,80"; d2.indsendKlik(); d2.videreKlik(); d2.svarValg(1); d2.indsendKlik();
+    paastand("uden fejl gives stjernen", d2.status.stjerne);
+
+    /* ================================================================= */
+    overskrift("5. Fane 3: Syre eller base");
+    NK.visFane("fane-b");
+    b3.forfra(); tegn(b3);
+    paastand("fane 3 begynder ved pH 0 med 20 BH⁺ i vand og syrens kurve svagt bagved", b3.ph === 0 && b3.lup.antal().ion === 20 && (b3.cfg.baggrund || []).indexOf("asa") >= 0);
+    spor(b3);
+    paastand("kurven er tegnet, og kortet bliver stående", !!b3.groen && /spejlvendt/.test(bliv(b3)));
+    b3.videreKlik();
+    b3.talTekst = "4,3"; b3.indsendKlik();
+    paastand("4,3: forklaringen om, at pKₛ står først for en base", /står pKs først/.test(besked(b3)), besked(b3));
+    b3.talTekst = "-0,7"; b3.indsendKlik(); tid(b3, 2);
+    paastand("−0,7 er rigtigt, og punktet hedder blod: −0,7", !!b3.groen && b3.ph === 7.4 && b3.punkter[0].tekst === "blod: −0,7");
+    b3.videreKlik();
+    paastand("trin 3 viser kroppens områder", b3.visKrop);
+    b3.svarValg(0); b3.indsendKlik();
+    paastand("mavesækken: forklaringen om BH⁺", /BH\+/.test(besked(b3)), besked(b3));
+    b3.svarValg(1); b3.indsendKlik();
+    paastand("tyndtarmen er rigtigt", !!b3.groen);
+    b3.videreKlik();
+    paastand("trin 4: det ukendte stof er lidocain, skjult, uden kurve, og kortet har svar og felt i én række",
+        b3.stofId === "lid" && b3.skjult() && b3.daekning() < 0.02 && !!el("b-ind").querySelector(".sk-raekke [data-valg]") && !!el("b-felt"));
+    paastand("panelet afslører ikke det ukendte stof", !/lidocain/i.test(el("b-om").textContent));
+    b3.svarValg(1); b3.indsendKlik();
+    paastand("uden log P: kortet beder om begge dele, og intet bedømmes", !b3.groen && /Vælg syre eller base/.test(besked(b3)), besked(b3));
+    spor(b3);
+    b3.svarValg(0); b3.talTekst = "2,4"; b3.indsendKlik();
+    paastand("syre: forklaringen om, at kurven er højest ved høj pH", /høj pH/.test(besked(b3)) && !b3.groen, besked(b3));
+    b3.svarValg(1); b3.talTekst = "1,8"; b3.indsendKlik();
+    paastand("base med log P = 1,8: forklaringen om den vandrette del", /vandrette/.test(besked(b3)) && !b3.groen, besked(b3));
+    b3.talTekst = "2,4"; b3.indsendKlik();
+    paastand("base og 2,4 er rigtigt: stoffet er afsløret som lidocain, og fanen er gennemført", !!b3.groen && !b3.skjult() && b3.faerdig && /lidocain/.test(bliv(b3)));
+    paastand("kortets sidste knap åbner teorien", (function () { b3.videreKlik(); var v = el("teori").classList.contains("vis"); el("teori").classList.remove("vis"); return v; })());
+    paastand("panelet viser stofferne bagefter", !el("b-proev").hidden);
+    b3.proevStof("asa");
+    paastand("et stof fra panelet får sin egen kurve", b3.stofId === "asa");
+
+    /* ================================================================= */
+    overskrift("6. Teksterne");
+    D.LOGP.concat(D.LOGD).concat(D.BASE).forEach(function (t) {
+        husk("tekst", t.tekst); husk("tekst", t.rystTekst); husk("forkl", t.forkl);
+        (t.hint || []).forEach(function (x) { husk("hint", x); });
+        (t.svar || []).forEach(function (x) { husk("svar", x); });
+        (t.fejl || []).forEach(function (x) { husk("fejl", x && (x.t || x)); });
+        ["fejlAndet", "fejlSlags", "fejlLogP", "fejlIntet"].forEach(function (k) { husk("fejl", t[k]); });
+    });
+    [D.LOGP_FAERDIG, D.LOGD_FAERDIG, D.BASE_FAERDIG].forEach(function (x) { husk("hint", x); });
+    var GR = { tekst: 165, forkl: 185, hint: 125, svar: 36, fejl: 125 };
+    var lange = [], streger = [], ascii = [];
+    tekster.forEach(function (x) {
+        var g = GR[x.hvad] || 220;
+        if (x.t.length > g) lange.push(x.hvad + " " + x.t.length + ": " + x.t.slice(0, 40));
+        if (/[–—]|\s-\s/.test(x.t)) streger.push(x.t.slice(0, 50));
+        if (ASCII_ORD.test(x.t)) ascii.push(x.t.slice(0, 50));
+    });
+    samlet("teksterne er korte (tekst 165, forklaring 185, svar 36, hint og fejl 125 tegn)", lange);
+    samlet("ingen tankestreger", streger);
+    samlet("ingen ASCII-dansk (ae, oe, aa)", ascii);
+    var hele = d.body.innerText;
+    paastand("ingen 1+ eller 1− på siden", !/1[+−]/.test(hele));
+    paastand("siden bruger bogens ord: octan-1-ol, fordelingskonstant, log P, log D, genvejen",
+        ["octan-1-ol", "ordelingskonstant", "Log P", "Log D", "enveje"].every(function (o) { return d.body.textContent.indexOf(o) >= 0; }));
+
+    /* ================================================================= */
+    overskrift("7. Kortet dækker aldrig tavlen");
+    var stoer = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]], daek = [];
+    var tilstande = [
+        ["fane-p", function () { p1.vaelg(0); }],
+        ["fane-p", function () { p1.vaelg(0); p1.rystTragt(); tid(p1, 2.6); }],
+        ["fane-p", function () { p1.vaelg(0); p1.startTrin(1); p1.talTekst = "0,33"; p1.indsendKlik(); }],
+        ["fane-p", function () { p1.vaelg(0); p1.startTrin(2); p1.talTekst = "1,1"; p1.indsendKlik(); }],
+        ["fane-p", function () { p1.vaelg(0); p1.startTrin(3); p1.rystTragt(); tid(p1, 2.6); p1.svarValg(1); p1.indsendKlik(); }],
+        ["fane-p", function () { p1.vaelg(0); p1.startTrin(3); p1.rystTragt(); tid(p1, 2.6); p1.svarValg(2); p1.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); spor(d2); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(1); d2.svarValg(2); d2.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(1); d2.svarValg(0); d2.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(2); d2.talTekst = "5"; d2.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(2); d2.talTekst = "-1,8"; d2.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(3); d2.svarValg(2); d2.indsendKlik(); }],
+        ["fane-d", function () { d2.vaelg(0); d2.startTrin(3); d2.svarValg(1); d2.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); spor(b3); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(1); b3.talTekst = "5"; b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(1); b3.talTekst = "-0,7"; b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(2); b3.svarValg(0); b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(2); b3.svarValg(1); b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(3); b3.svarValg(0); b3.talTekst = "2"; b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(3); b3.svarValg(1); b3.talTekst = "2"; b3.indsendKlik(); }],
+        ["fane-b", function () { b3.vaelg(0); b3.startTrin(3); b3.svarValg(1); b3.talTekst = "2,4"; b3.indsendKlik(); }]
+    ];
+    var hoejest = 0;
+    stoer.forEach(function (bh) {
+        ramme.style.width = bh[0] + "px"; ramme.style.height = bh[1] + "px";
+        tilstande.forEach(function (ts, i) {
+            NK.visFane(ts[0]);
+            var sim = NK.sims[ts[0]];
+            ts[1]();
+            sim.tilpas(); sim.layout();
+            var k = el(sim.navn + "-skort").getBoundingClientRect(), c = sim.L.canvas.getBoundingClientRect();
+            hoejest = Math.max(hoejest, k.bottom - c.top);
+            if (k.bottom - c.top > sim.lay.tavle.y - 4) daek.push(bh.join("x") + " nr. " + i + ": kort " + Math.round(k.bottom - c.top) + " > tavle " + Math.round(sim.lay.tavle.y));
+            try { sim.tegn(); } catch (e) { daek.push(bh.join("x") + " nr. " + i + " tegn: " + e.message); }
+        });
+    });
+    samlet("kortet slutter over tavlen i 21 tilstande og fire størrelser, og alt kan tegnes", daek);
+    skriv("  (kortets laveste kant: " + Math.round(hoejest) + " px)", "note");
+    var smaa = [];
+    stoer.forEach(function (bh) {
+        ramme.style.width = bh[0] + "px"; ramme.style.height = bh[1] + "px";
+        ["fane-d", "fane-b"].forEach(function (id) {
+            NK.visFane(id);
+            var s = NK.sims[id];
+            s.tilpas(); s.layout();
+            if (s.graf.x1 - s.graf.x0 < 200) smaa.push(bh.join("x") + " " + id + " graf " + Math.round(s.graf.x1 - s.graf.x0));
+            if (s.lup.R < 84) smaa.push(bh.join("x") + " " + id + " lup " + s.lup.R);
+            if (s.graf.y1 - s.graf.y0 < 150) smaa.push(bh.join("x") + " " + id + " grafhøjde " + Math.round(s.graf.y1 - s.graf.y0));
+        });
+        NK.visFane("fane-p");
+        if (p1.lup.R < 92) smaa.push(bh.join("x") + " fane-p lup " + p1.lup.R);
+    });
+    samlet("grafen er mindst 200 px bred og 150 px høj, og luppen har en radius på mindst 84 px", smaa);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>

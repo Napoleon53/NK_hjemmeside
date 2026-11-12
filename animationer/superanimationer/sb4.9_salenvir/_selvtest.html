@@ -326,7 +326,7 @@ async function koer() {
     svar(0);
     paastand("syntesen er færdig", sim.fase === "loest" && /færdig/.test(kortTekst()));
     paastand("sidste trin: kortet bliver på spørgsmålet uden en knap videre, og Start forfra står kun i panelet",
-        / bliv/.test(kort().className) && /Hvad viser det\?/.test(kort().querySelector(".sk-tekst").textContent) && !!kort().querySelector('.sk-knap.rigtig[data-valg="0"]') &&
+        / bliv/.test(kort().className) && /Hvad viser smeltepunktet/.test(kort().querySelector(".sk-tekst").textContent) && !!kort().querySelector('.sk-knap.rigtig[data-valg="0"]') &&
         !kort().querySelector("[data-videre]") && !/forfra/i.test(kort().textContent) && /Syntesen er færdig\./.test(blivTekst()) && !!W.document.querySelector(".panel #forfra"), blivTekst());
     sim.videre(); sim.knap(); sim.opdater(1 / 60);
     paastand("efter sidste trin begynder intet forfra af sig selv", sim.trinNr === 9 && sim.fase === "loest" && S.app.slut !== null);

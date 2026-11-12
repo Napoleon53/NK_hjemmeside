@@ -164,7 +164,7 @@
         }
         if (k === "O") return "O har næsten altid oxidationstallet −II.";
         if (k === "H") return "H har næsten altid oxidationstallet +I.";
-        if (st.slags === "grundstof") return st.tekst + " er et grundstof. Der er ingen andre atomer at give elektronerne til.";
+        if (st.slags === "grundstof") return st.tekst + " er et grundstof. Der er intet andet grundstof at give elektronerne til.";
         if (st.slags === "ion") return st.tekst + " er en ion af ét atom. Hele ladningen sidder på det ene atom.";
         var dele = [];
         if (st.nH) dele.push("H giver " + (st.nH > 1 ? st.nH + " · (+1) = " : "") + O.lad(st.nH));

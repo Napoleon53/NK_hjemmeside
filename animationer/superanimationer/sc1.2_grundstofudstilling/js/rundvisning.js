@@ -17,26 +17,26 @@
 
     var TURE = {
         "fane-montre": [
-            { sel: "#montre-anker-montre", titel: "Udstillingen", tekst: "Et skab formet som det periodiske system. Hvert rum har et skilt med atomnummer og symbol. Tallene foroven er hovedgrupperne, tallene til venstre perioderne." },
-            { sel: "#montre-anker-kasse", titel: "Kassen", tekst: "De 36 prøver. På mærket mangler enten navnet eller symbolet. Klik på en prøve for at tage den op." },
+            { sel: "#montre-anker-montre", titel: "Udstillingen", tekst: "Udstillingen er et skab, der er formet som det periodiske system. Hvert rum har et skilt med atomnummer og symbol. Tallene foroven er hovedgrupperne, og tallene til venstre er perioderne." },
+            { sel: "#montre-anker-kasse", titel: "Kassen", tekst: "Kassen rummer de 36 prøver. På hver prøves mærke mangler enten grundstoffets navn eller symbol. Klik på en prøve for at tage den op." },
             { sel: "#montre-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst i scenen. Skriv det, der mangler på mærket, træk prøven op på sin plads, og skriv elektronstrukturen. Indsend svar sender svaret, og Giv et hint giver et hint og derefter svaret." },
             { sel: "#montre-kort", titel: "Prøvens trin", tekst: "Panelet viser, hvilke af prøvens tre trin der er klaret." },
             { sel: "#montre-anker-tavle", titel: "Tavlen", tekst: "Atommodellen tegnes, mens du skriver elektronstrukturen. Elektroner, der ikke er plads til, bliver røde." },
-            { sel: "#montre-anker-navne", titel: "Navnetavlen", tekst: "Klik for at slå navnene op." },
+            { sel: "#montre-anker-navne", titel: "Navnetavlen", tekst: "Klik på navnetavlen for at slå grundstoffernes navne op." },
             { sel: "#montre-fremskridt", titel: "Perioderne", tekst: "En prøve, du løser uden at se svaret, får en stjerne. Klik på en periode for at tage dens næste prøve." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Formlerne: tæl atomerne i et stof. Opråbet: find grundstofferne i udstillingen på tid." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "I fanen Formlerne tæller du atomerne i et stof, og i fanen Opråbet finder du grundstofferne i udstillingen på tid." }
         ],
         "fane-formler": [
-            { sel: "#formler-anker-flaske", titel: "Flasken", tekst: "Stoffet og dets formel. Formlen fortæller, hvilke grundstoffer stoffet er lavet af, og hvor mange atomer der er af hvert." },
-            { sel: "#formler-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst i scenen. Tæl atomerne af hvert grundstof og til sidst dem alle. Indsend svar sender svaret, og Giv et hint giver et hint og derefter svaret." },
+            { sel: "#formler-anker-flaske", titel: "Flasken", tekst: "Flasken viser stoffet og dets formel. Formlen fortæller, hvilke grundstoffer stoffet er lavet af, og hvor mange atomer der er af hvert." },
+            { sel: "#formler-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst i scenen. Tæl atomerne af hvert grundstof og til sidst alle atomerne i alt. Indsend svar sender svaret, og Giv et hint giver et hint og derefter svaret." },
             { sel: "#formler-anker-tavle", titel: "Tavlen", tekst: "Når et grundstof er talt, flyver dets atomer ud af udstillingen og op på tavlen. En parentes bliver til lige så mange kopier, som tallet efter den siger." },
             { sel: "#formler-anker-raekke", titel: "Flaskerne", tekst: "Klik på en flaske for at skifte stof." }
         ],
         "fane-opraab": [
-            { sel: "#opraab-anker-tavle", titel: "Tavlen", tekst: "Her står opråbet: et navn, en elektronstruktur eller et spørgsmål om det rum, der blinker. Kridtstregen er tiden." },
+            { sel: "#opraab-anker-tavle", titel: "Tavlen", tekst: "Her står opråbet: et navn, en elektronstruktur eller et spørgsmål om det rum, der blinker. Kridtstregen viser, hvor lang tid du har." },
             { sel: "#opraab-anker-montre", titel: "Udstillingen", tekst: "Klik på det grundstof, tavlen siger." },
-            { sel: "#opraab-kort", titel: "Point", tekst: "Hurtige svar giver flere point, og en stime ganger dem op. En fejl eller en tid, der løber ud, koster et liv." },
-            { sel: "#opraab-hvem", titel: "Hvem er jeg?", tekst: "En ekstra runde med 20 gåder om grundstoffer, du kender. Der er ingen liv: et forkert svar kommer igen senere." }
+            { sel: "#opraab-kort", titel: "Point", tekst: "Hurtige svar giver flere point, og en stime af rigtige svar ganger pointene op. Et forkert svar eller en tid, der løber ud, koster et liv." },
+            { sel: "#opraab-hvem", titel: "Hvem er jeg?", tekst: "En ekstra runde med 20 gåder om grundstoffer, du kender. Der er ingen liv, og en gåde, du svarer forkert på, kommer igen senere." }
         ]
     };
 

@@ -19,13 +19,13 @@
        .anker fra rundvisningen). felt "tegning": kassen om atomerne paa
        tavlen (introFelt i laerer.js). Ingen vittigheder i praesentationen.
        Fane 1 har et andet trin 2 i retningen Zigzag -> strukturformel. */
-    var ZZ_START = { tekst: "I denne fane øver du dig i at skifte mellem strukturformler og zigzagformler. Knapperne øverst i panelet vælger, om du tegner zigzagformlen ud fra strukturformlen eller omvendt. Hver retning er en serie på ti molekyler, der bliver sværere.",
+    var ZZ_START = { tekst: "I denne fane øver du dig i at skifte mellem stregformler og zigzagformler. Knapperne øverst i panelet vælger, om du tegner zigzagformlen ud fra stregformlen eller omvendt. Hver retning er en serie på ti molekyler, der bliver sværere.",
                      sel: "#zz-retning" };
     var ZZ_SLUT = { tekst: "Kortet øverst i scenen viser opgaven. Knappen Giv et hint giver et hint og derefter svaret, og Indsend svar tjekker det, du har lavet. Serien viser, hvilke af de ti molekyler du har løst. En serie giver et klistermærke til tegnebrættet, når du højst har set tre af svarene.",
                     sel: ["#zz-skort", "#zz-serie"] };
     D.INTRO_ZIGZAG = [
         ZZ_START,
-        { tekst: "Strukturformlen hænger på papiret øverst på tavlen. Du tegner samme molekyle som zigzagformel ved at trække fra C-atomet, og kæden knækker af sig selv. Et klik på en binding gør den til en dobbeltbinding.",
+        { tekst: "Stregformlen hænger på papiret øverst på tavlen. Du tegner samme molekyle som zigzagformel ved at trække fra C-atomet, og kæden knækker af sig selv. Et klik på en binding gør den til en dobbeltbinding.",
           sel: "#zz-anker-papir", felt: "tegning" },
         ZZ_SLUT
     ];
@@ -44,7 +44,7 @@
           sel: ["#nv-skort", "#nv-serie"] }
     ];
     D.INTRO_ISOMERER = [
-        { tekst: "I denne fane finder du alle isomerer af en alkan, altså alle molekyler med samme molekylformel. Knapperne øverst i panelet vælger formlen, fra C₄H₁₀ med to isomerer til C₇H₁₆ med ni isomerer.",
+        { tekst: "I denne fane finder du alle isomerer af en alkan, altså alle stoffer med samme molekylformel. Knapperne øverst i panelet vælger formlen, fra C₄H₁₀ med to isomerer til C₇H₁₆ med ni isomerer.",
           sel: "#is-niveau" },
         { tekst: "Du tegner et molekyle med formlen ved at trække fra C-atomet på tavlen, og du trykker Indsend svar, når alle C-atomer er brugt. Et stof, du ikke har fundet før, kommer på listen Isomererne. Tegner du et stof, du allerede har fundet, ryster stoffets plads i listen.",
           sel: "#is-liste-kort", felt: "tegning" },

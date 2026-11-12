@@ -42,7 +42,7 @@
             dele: [
                 { id: "sal-sug", tekst: "Afmål 1,4 mL salicylaldehyd med pipetten.",
                   knap: "Sug 1,4 mL op", paa: "pip2",
-                  hint: ["Pipettebolden suger væsken op i pipetten. Tallet ved pipetten viser, hvor meget der er i."] },
+                  hint: ["Pipettebolden suger væsken op i pipetten. Tallet ved pipetten viser væskens rumfang."] },
                 { id: "sal-toem", tekst: "Kom de 1,4 mL salicylaldehyd i den koniske kolbe.",
                   knap: "Tøm pipetten i kolben", paa: "pip2",
                   hint: ["Pipetten føres hen over kolben, og bolden presser væsken ud."] }
@@ -78,14 +78,14 @@
                 { id: "varm", tekst: "Opløsningen bliver varmet op til omkring 75 °C.", auto: true,
                   hint: ["Se på termometret, mens opløsningen bliver varm."] }
             ],
-            slut: "Opløsningen er 75 °C. Det er varmt nok til, at reaktionen går hurtigt, og under ethanols kogepunkt på 78 °C."
+            slut: "Opløsningen har temperaturen 75 °C. Den temperatur er høj nok til en hurtig reaktion og lavere end ethanols kogepunkt på 78 °C."
         },
         /* ----- 5 ---------------------------------------------------------- */
         {
             id: "en", navn: "0,5 mL ethylendiamin",
             gaet: {
                 intro: "Ethylendiamin er en farveløs væske. Om lidt drypper du den ned i den varme opløsning af salicylaldehyd.",
-                tekst: "Hvad ser du, når ethylendiamin kommer i kolben?",
+                tekst: "Hvad forventer du at se, når ethylendiamin kommer i kolben?",
                 svar: [
                     { t: "Ingenting. Alle stofferne er farveløse.", ok: false },
                     { t: "Opløsningen bliver gul.", ok: true },
@@ -95,12 +95,12 @@
             dele: [
                 { id: "en-sug", tekst: "Afmål 0,5 mL ethylendiamin med den lille pipette.",
                   knap: "Sug 0,5 mL op", paa: "pip1",
-                  hint: ["Det er en pipette på 1 mL. Ethylendiamin er ætsende, så det afmåles med pipettebold."] },
+                  hint: ["Ethylendiamin er ætsende og afmåles derfor med pipettebold i den lille pipette på 1 mL."] },
                 { id: "en-toem", tekst: "Dryp de 0,5 mL ethylendiamin ned i kolben, én dråbe ad gangen.",
                   knap: "Dryp i kolben", paa: "pip1",
                   hint: ["Dråbe for dråbe giver en rolig reaktion. Se, hvad der sker, hvor dråberne rammer."] }
             ],
-            slut: "Opløsningen blev gul. Det gule er Salenvir, der dannes, hvor dråberne rammer."
+            slut: "Opløsningen blev gul. Den gule farve skyldes Salenvir, som dannes, hvor dråberne rammer."
         },
         /* ----- 6 ---------------------------------------------------------- */
         {
@@ -111,7 +111,7 @@
                   hint: ["P er prøven fra kolben. Pletten sættes på blyantsstregen nederst på pladen."] },
                 { id: "tlc-r", tekst: "Sæt en plet af referencen ved R med den anden pipettespids.",
                   knap: "Sæt referencen ved R", paa: "spids-r",
-                  hint: ["Referenceglasset har fortyndet salicylaldehyd. Så kan du se, hvor højt salicylaldehyd løber."] },
+                  hint: ["Referencen er fortyndet salicylaldehyd og viser, hvor højt salicylaldehyd løber på pladen."] },
                 { id: "tlc-koer", tekst: "Stil TLC-pladen i bægerglasset med løbevæske.",
                   knap: "Stil pladen i glasset", paa: "plade",
                   hint: ["Løbevæsken suges op ad pladen og tager stofferne med sig, hvert stof sit eget stykke."] },
@@ -138,14 +138,14 @@
                 svar: [
                     { t: "Kold ethanol kan opløse mindre Salenvir.", ok: true },
                     { t: "Reaktionen bliver først færdig i kulden.", ok: false,
-                      f: "TLC-pladen viste, at reaktionen allerede er færdig. Kulden ændrer, hvor meget der kan være opløst." },
+                      f: "TLC-pladen viste, at reaktionen allerede er færdig. Kulden ændrer, hvor meget Salenvir ethanolen kan opløse." },
                     { t: "Filtrerpapiret tåler ikke varm ethanol.", ok: false,
-                      f: "Papiret tåler godt varm ethanol. Se på kolben: der kom krystaller, da den blev kold." }
+                      f: "Papiret tåler godt varm ethanol. Se på kolben. Der kom krystaller, da den blev kold." }
                 ],
                 hint: ["Se i kolben. Hvad kom der til syne, da den blev kold?"],
-                godt: "Rigtigt. Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten fælder ud som gule krystaller."
+                godt: "Rigtigt. Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten af Salenvir fælder ud som gule krystaller."
             },
-            slut: "Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten fælder ud som gule krystaller."
+            slut: "Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten af Salenvir fælder ud som gule krystaller."
         },
         /* ----- 8 ---------------------------------------------------------- */
         {
@@ -160,7 +160,7 @@
                 { id: "filtr-haeld", tekst: "Hæld kolbens indhold ned i Büchnertragten.",
                   knap: "Hæld kolben i tragten", paa: "kolbe",
                   hint: ["Krystallerne bliver på papiret, og ethanolen løber ned i sugekolben."] },
-                { id: "filtr-skyl", tekst: "Skyl kolben med lidt ethanol, og hæld det i tragten.",
+                { id: "filtr-skyl", tekst: "Skyl kolben med lidt ethanol, og hæld skyllevæsken i tragten.",
                   knap: "Skyl kolben", paa: "sproejte",
                   hint: ["Der sidder stadig krystaller i kolben. Skylningen får dem med."] }
             ],
@@ -184,23 +184,23 @@
                   hint: ["Massen kommer i skemaet til højre."] }
             ],
             felt: {
-                tekst: "Hvad er dit praktiske udbytte, altså massen af Salenvir?",
+                tekst: "Hvad er dit praktiske udbytte? Skriv massen af Salenvir.",
                 enhed: "g",
                 hint: function (t) {
                     return ["Træk massen af det tomme urglas fra massen af urglasset med krystallerne.",
                             "m = " + k(t.mFuld, 2) + " g − " + k(t.mTom, 2) + " g"];
                 },
                 fejl: function (svar, t) {
-                    if (Math.abs(svar - t.mFuld) < 0.006) return "Det er massen af urglasset med krystallerne. Træk urglassets egen masse fra.";
-                    if (Math.abs(svar - t.mTom) < 0.006) return "Det er massen af det tomme urglas. Du skal finde krystallernes masse.";
+                    if (Math.abs(svar - t.mFuld) < 0.006) return "Du har skrevet massen af urglasset med krystallerne. Træk urglassets egen masse fra.";
+                    if (Math.abs(svar - t.mTom) < 0.006) return "Du har skrevet massen af det tomme urglas. Du skal finde krystallernes masse.";
                     if (Math.abs(svar - (t.mFuld + t.mTom)) < 0.02) return "Massen af urglasset skal trækkes fra, ikke lægges til.";
-                    return "Se på skemaet til højre: træk urglassets masse fra massen med krystallerne.";
+                    return "Se på skemaet til højre, og træk urglassets masse fra massen af urglasset med krystallerne.";
                 },
                 godt: function (t) {
                     return "Rigtigt. Du fik " + k(t.svar, 2) + " g Salenvir.";
                 }
             },
-            slut: function (t) { return "Rigtigt. Du fik " + k(t.svar, 2) + " g Salenvir. Om lidt ser du på, hvor rent det er."; }
+            slut: function (t) { return "Rigtigt. Du fik " + k(t.svar, 2) + " g Salenvir. Om lidt undersøger du, hvor rent stoffet er."; }
         },
         /* ----- 10 --------------------------------------------------------- */
         {
@@ -240,20 +240,20 @@
         ],
         /* Forklaringer til et forkert svar: [rigtigt svar][valgt svar] */
         fejl: {
-            ikkeFaerdigMenJa: "Se en gang til: prøven P har en plet i samme højde som referencen R. Det er salicylaldehyd.",
+            ikkeFaerdigMenJa: "Se en gang til. Prøven P har en plet i samme højde som referencen R. Det er salicylaldehyd.",
             nyPlet: "Prøven P har fået en ny plet: Salenvir. Reaktionen er først færdig, når salicylaldehyden er brugt op.",
-            faerdigMenNej: "Se en gang til: prøven P har ingen plet i højde med R. Salicylaldehyden er brugt op."
+            faerdigMenNej: "Se en gang til. Prøven P har ingen plet i højde med R. Salicylaldehyden er brugt op."
         },
         hint: ["Referencen R er salicylaldehyd. Har prøven P en plet i samme højde som R?"],
-        ikkeFaerdig: "Rigtigt. Der er stadig salicylaldehyd, så reaktionen er ikke færdig. Vent 10 minutter, og kør en ny plade.",
+        ikkeFaerdig: "Rigtigt. Der er stadig salicylaldehyd, så reaktionen er ikke færdig. Vent 10 minutter, og lav en ny TLC-plade.",
         faerdig: "Rigtigt. Salicylaldehyden er brugt op, og reaktionen er færdig.",
-        overskud: "Rigtigt, der er stadig salicylaldehyd. Kolben fik mere, end ethylendiaminen kan omsætte, så pletten bliver. Reaktionen er færdig."
+        overskud: "Rigtigt. Der er stadig salicylaldehyd, fordi kolben fik mere, end ethylendiaminen kan omsætte. Pletten forsvinder derfor ikke, men reaktionen er færdig."
     };
 
     /* Spoergsmaalet efter smeltepunktet */
     var SMP_SPM = {
         tekst: function (a, b) {
-            return "Salenvir smelter ved 127-128 °C. Dit stof smeltede ved " + k(a, 1) + " til " + k(b, 1) + " °C. Hvad viser det?";
+            return "Salenvir smelter ved 127-128 °C. Dit stof smeltede ved " + k(a, 1) + " til " + k(b, 1) + " °C. Hvad viser smeltepunktet om stoffet?";
         },
         svar: [
             { t: "Stoffet er rent og tørt." },
@@ -264,7 +264,7 @@
         hint: ["Et rent stof smelter ved det rigtige smeltepunkt og over højst et par grader."],
         godtRent: "Rigtigt. Stoffet smelter skarpt og ved det rigtige smeltepunkt, så det er rent og tørt.",
         godtUrent: function (vaad) {
-            return vaad ? "Rigtigt. Der var stadig ethanol i krystallerne. Det sænker smeltepunktet og gør intervallet bredere."
+            return vaad ? "Rigtigt. Der var stadig ethanol i krystallerne. Ethanolen sænker smeltepunktet og gør intervallet bredere."
                         : "Rigtigt. Urenheder sænker smeltepunktet og gør intervallet bredere.";
         }
     };
@@ -273,7 +273,7 @@
     var BESKED = {
         ikkeVejet: "Urglasset blev ikke vejet tomt, så krystallernes masse kan ikke findes. Vej et nyt urglas, og flyt krystallerne over.",
         tragtFuld: "Tragten er fuld. Uden sug løber ethanolen kun langsomt igennem.",
-        varmFiltr: function (T) { return "Kolben er " + Math.round(T) + " °C. Noget Salenvir er stadig opløst og løber ned i sugekolben."; },
+        varmFiltr: function (T) { return "Temperaturen i kolben er " + Math.round(T) + " °C. Noget Salenvir er stadig opløst og løber ned i sugekolben."; },
         ikkeFugtet: "Filtrerpapiret er ikke fugtet. Nogle krystaller løber under papiret.",
         intetSug: "Der er ikke åbnet for suget, så ethanolen løber kun langsomt igennem."
     };

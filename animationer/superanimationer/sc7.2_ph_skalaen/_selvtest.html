@@ -338,7 +338,7 @@ function koerTest(W) {
     paastand("Indsend svar: pH 6 giver 100 H₃O⁺ og 1 OH⁻ i samme rum, og mål 1 er nået", L.ph === 6 && L.naaet && L.lup.z === 8 &&
         L.lup.synlige("h3o") === 100 && L.lup.synlige("oh") === 1);
     paastand("kortet bliver på målet med forklaringen, og Næste mål står, hvor Indsend svar stod", /^Mål 1 af 5/.test(kortTekst(L)) &&
-        /^Rigtigt\s*pH 6/.test(blivTekst(L)) && videre(L).textContent === "Næste mål →" && !vises(L.el.indsend) && !vises(L.el.knap));
+        /^Rigtigt\s*Ved pH 6/.test(blivTekst(L)) && videre(L).textContent === "Næste mål →" && !vises(L.el.indsend) && !vises(L.el.knap));
     mus(cl, "pointerdown", x7, sy); mus(cl, "pointerup", x7, sy);
     paastand("mens kortet venter på Næste, er mærket låst, og kortet blinker", L.ph === 6 && !L.glid && L.el.skort.classList.contains("blink"));
     paastand("panelet viser 10 gange så mange H₃O⁺ og [H₃O⁺] = 1,0 · 10⁻⁶ M", /10 gange så mange H₃O⁺/.test(d.getElementById("lup-modvand").textContent) &&

@@ -95,7 +95,7 @@
         vb: [1160, 640],
         lag: [
             { navn: "Et fedtstof dannes", pladser: ["glycerol", "fedtsyre", "triglycerid"],
-              ros: "Glycerol og tre fedtsyrer kondenserer til et triglycerid. De tre estergrupper holder fedtsyrerne fast." },
+              ros: "Glycerol og tre fedtsyrer kondenserer til et triglycerid. De tre estergrupper binder fedtsyrerne til glycerol." },
             { navn: "Fedtsyrer", pladser: ["mættet fedtsyre", "umættet fedtsyre"],
               ros: "Stearinsyre er mættet og har en lige kæde. Oliesyre er umættet og har et knæk ved cis-dobbeltbindingen." },
             { navn: "Hærdning", pladser: ["hærdning", "transfedtsyre"],
@@ -121,12 +121,12 @@
 
             { id: "mættet fedtsyre", ord: ["mættet fedtsyre"], x: NX + 102, y: YS + 40, maal: [B_STEARIN[0] + 6, YS + 22], dele: ["stearin"],
               omr: [{ r: [B_STEARIN[0], B_STEARIN[1], B_STEARIN[2], B_STEARIN[3], 10] }],
-              fejl: { "umættet fedtsyre": "<b>umættet fedtsyre</b> har mindst én dobbeltbinding. Stearinsyre har kun enkeltbindinger, og kæden er lige.",
-                      transfedtsyre: "<b>transfedtsyre</b> har en dobbeltbinding. Stearinsyre har kun enkeltbindinger.",
+              fejl: { "umættet fedtsyre": "<b>umættet fedtsyre</b> har mindst én C=C-dobbeltbinding. Stearinsyre har kun enkeltbindinger mellem carbonatomerne, og kæden er lige.",
+                      transfedtsyre: "<b>transfedtsyre</b> har en C=C-dobbeltbinding. Stearinsyre har kun enkeltbindinger mellem carbonatomerne.",
                       fedtsyre: "<b>fedtsyre</b> passer på begge kæder og står i dannelsen. Pladsen spørger, hvilken slags fedtsyre stearinsyre er." } },
             { id: "umættet fedtsyre", ord: ["umættet fedtsyre"], x: NX + 102, y: YO + 40, maal: [B_OLIE[0] + 6, YO + 22], dele: ["olie"],
               omr: [{ r: [B_OLIE[0], B_OLIE[1], B_OLIE[2], B_OLIE[3], 10] }],
-              fejl: { "mættet fedtsyre": "<b>mættet fedtsyre</b> har kun enkeltbindinger. Oliesyre har en dobbeltbinding, der giver et knæk på kæden.",
+              fejl: { "mættet fedtsyre": "<b>mættet fedtsyre</b> har kun enkeltbindinger mellem carbonatomerne. Oliesyre har en C=C-dobbeltbinding, der giver et knæk i kæden.",
                       transfedtsyre: "<b>transfedtsyre</b> har en næsten lige kæde. Oliesyre har en cis-dobbeltbinding og et knæk.",
                       fedtsyre: "<b>fedtsyre</b> passer på begge kæder og står i dannelsen. Pladsen spørger, hvilken slags fedtsyre oliesyre er." } },
 
@@ -137,8 +137,8 @@
                       "umættet fedtsyre": "<b>umættet fedtsyre</b> er et stof. Pladsen peger på reaktionen, hvor olien adderer dihydrogen." } },
             { id: "transfedtsyre", ord: ["transfedtsyre"], x: KH.x + KH.b - 22 - 102, y: TY + 44, maal: [B_TRANS[0] + B_TRANS[2] - 4, TY + 14], dele: ["trans"],
               omr: [{ r: [B_TRANS[0], B_TRANS[1], B_TRANS[2], B_TRANS[3], 10] }],
-              fejl: { "mættet fedtsyre": "<b>mættet fedtsyre</b> har kun enkeltbindinger. Denne kæde har en rød dobbeltbinding, men den giver intet knæk.",
-                      "umættet fedtsyre": "<b>umættet fedtsyre</b> passer på alle kæder med dobbeltbindinger. Her er dobbeltbindingen ikke cis, og kæden er lige.",
+              fejl: { "mættet fedtsyre": "<b>mættet fedtsyre</b> har kun enkeltbindinger mellem carbonatomerne. Denne kæde har en rød dobbeltbinding, men den giver intet knæk.",
+                      "umættet fedtsyre": "<b>umættet fedtsyre</b> passer på alle kæder med C=C-dobbeltbindinger. Her er dobbeltbindingen ikke cis, og kæden er lige.",
                       hærdning: "<b>hærdning</b> er en reaktion. Pladsen peger på et stof, der kan dannes som biprodukt." } }
         ],
 

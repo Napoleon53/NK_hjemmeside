@@ -51,7 +51,7 @@
             { navn: "Tre slags syrer", pladser: ["stærk syre", "middelstærk syre", "svag syre"],
               ros: "Under 0 er syren stærk, fra 0 til 4 middelstærk og fra 4 til 10 svag. Jo lavere pKₛ, jo stærkere syre." },
             { navn: "Koncentrationerne", pladser: ["formel koncentration", "aktuel koncentration", "omdannelsesgrad"],
-              ros: "cₛ står på flasken, og [S] er det, der er tilbage ved ligevægt. Omdannelsesgraden stiger, når syren fortyndes." }
+              ros: "cₛ står på flasken, og [S] er koncentrationen af syremolekylerne ved ligevægt. Omdannelsesgraden stiger, når syren fortyndes." }
         ],
         pladser: [
             { id: "syrestyrkekonstant", ord: ["syrestyrkekonstant"], x: 200, y: Y2 - 7, maal: [FX - 6, Y2 - 9], dele: ["ks"],
@@ -61,7 +61,7 @@
                       "stærk syre": "<b>stærk syre</b> er en slags syre. Pladsen peger på symbolet foran brøken med koncentrationerne." } },
             { id: "syrestyrkeeksponent", ord: ["syrestyrkeeksponent"], x: 200, y: Y3 - 7, maal: [FX - 6, Y3 - 9], dele: ["pks"],
               omr: [{ r: [FX - 7, Y3 - 30, 62, 38, 6] }],
-              fejl: { "syrestyrkekonstant": "<b>syrestyrkekonstant</b> er brøken med koncentrationerne. Pladsen peger på symbolet for −log til den.",
+              fejl: { "syrestyrkekonstant": "<b>syrestyrkekonstant</b> er brøken med koncentrationerne. Pladsen peger på symbolet for −log Kₛ.",
                       "omdannelsesgrad": "<b>omdannelsesgrad</b> er en brøkdel af syren i procent. Pladsen peger på symbolet for −log Kₛ." } },
 
             { id: "stærk syre", ord: ["stærk syre"], x: 330, y: PY, maal: [X(-3), BY + BH], dele: ["staerk"],
@@ -79,7 +79,7 @@
 
             { id: "formel koncentration", ord: ["formel koncentration"], x: 180, y: 530, maal: [HC, HY - 20], dele: ["cs"],
               omr: [{ r: [XC - 106, HY - 24, 114, RY[2] - HY + 38, 8] }],
-              fejl: { "aktuel koncentration": "<b>aktuel koncentration</b> er det, der er tilbage ved ligevægt. Pladsen peger på kolonnen c<sub>s</sub>.",
+              fejl: { "aktuel koncentration": "<b>aktuel koncentration</b> er koncentrationen af syremolekylerne ved ligevægt. Pladsen peger på kolonnen c<sub>s</sub>.",
                       "omdannelsesgrad": "<b>omdannelsesgrad</b> er en brøkdel i procent. Pladsen peger på koncentrationerne i kolonnen c<sub>s</sub>." } },
             { id: "aktuel koncentration", ord: ["aktuel koncentration"], x: 472, y: 530, maal: [HS, HY - 20], dele: ["s"],
               omr: [{ r: [XS - 122, HY - 24, 130, RY[2] - HY + 38, 8] }],

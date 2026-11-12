@@ -205,7 +205,7 @@ function koerTest(W) {
     paastand("Indsend svar ved den forkerte koncentration: Ikke endnu", (function () {
         L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click();
         skyd("lys-c", 0.3); indsend(L);
-        return !L.faerdig && skidt(L) && /Kuvetten står ikke/.test(L.beskedTekst());
+        return !L.faerdig && skidt(L) && /passer kuvetten ikke med opgaven/.test(L.beskedTekst());
     })(), L.beskedTekst());
     paastand("under gættet er skyderen låst, og kortet blinker", (function () {
         L.vaelg(1); skyd("lys-c", 0.55);
@@ -406,7 +406,7 @@ function koerTest(W) {
     forvent("V i mL", R.tjekTal(o("r8"), "V", "250"), /liter/);
     paastand("V i mL med enheden mL godtages", R.tjekTal(o("r8"), "V", "250 mL").ok);
     forvent("l med forkert enhed", R.tjekTal(o("r2"), "l", "1,00 g"), /enheden cm/);
-    forvent("l i mm i stedet for cm", R.tjekTal(o("r2"), "l", "1,00 mm"), /enheden ikke/);
+    forvent("l i mm i stedet for cm", R.tjekTal(o("r2"), "l", "1,00 mm"), /enheden er forkert/);
     forvent("c ganget i stedet for divideret", R.tjekRes(o("r2"), 0, "2,87 mM"), /ganget/);
     forvent("c med vendt brøk", R.tjekRes(o("r2"), 0, "7,69 mM"), /vendt/);
     forvent("kort kuvette: kun divideret med ε", R.tjekRes(o("r4"), 0, "0,0600 mM"), /kun divideret med ε/);

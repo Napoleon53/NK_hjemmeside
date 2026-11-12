@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alkoholer og carboxylsyrer</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">OH</span> Alkoholer og carboxylsyrer</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-n" role="tab" aria-selected="true"><span class="nr">1</span>Navnet</button>
+        <button class="faneknap" data-fane="fane-k" role="tab" aria-selected="false"><span class="nr">2</span>Kogepunktet</button>
+        <button class="faneknap" data-fane="fane-v" role="tab" aria-selected="false"><span class="nr">3</span>I vand</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: NAVNET                                                     -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-n" role="tabpanel" aria-label="Navnet">
+    <div class="scene">
+        <canvas id="n-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="n-skort">
+            <div class="sk-ind" id="n-ind"></div>
+            <div class="sk-bund" id="n-status">
+                <p class="st-tekst" id="n-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="n-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="n-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="n-anker-plade"></div>
+        <div class="anker" id="n-anker-hylde"></div>
+        <div class="anker" id="n-anker-kontrol"></div>
+        <div class="anker" id="n-anker-stil"></div>
+        <div class="anker" id="n-anker-maskine"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="n-navnekort">
+            <h2>Navnenes første del</h2>
+            <table class="stammer">
+                <tr><td>1 C</td><td>meth</td><td>5 C</td><td>pent</td></tr>
+                <tr><td>2 C</td><td>eth</td><td>6 C</td><td>hex</td></tr>
+                <tr><td>3 C</td><td>prop</td><td>7 C</td><td>hept</td></tr>
+                <tr><td>4 C</td><td>but</td><td>8 C</td><td>oct</td></tr>
+            </table>
+            <h2 class="anden">Endelsen</h2>
+            <table class="endelser">
+                <tr><td>Alkan</td><td>ingen gruppe</td><td>-an</td></tr>
+                <tr><td>Alkohol</td><td>−OH</td><td>-ol</td></tr>
+                <tr><td>Carboxylsyre</td><td>−COOH</td><td>-syre</td></tr>
+            </table>
+        </div>
+
+        <div class="kort" id="n-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="n-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="n-liste"></div>
+            <button class="knap nulstil lille" id="n-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: KOGEPUNKTET                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-k" role="tabpanel" aria-label="Kogepunktet">
+    <div class="scene">
+        <canvas id="k-laerred"></canvas>
+        <div class="scenekort" id="k-skort">
+            <div class="sk-ind" id="k-ind"></div>
+            <div class="sk-bund" id="k-status">
+                <p class="st-tekst" id="k-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="k-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="k-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="k-anker-plade"></div>
+        <div class="anker" id="k-anker-hylde"></div>
+        <div class="anker" id="k-anker-kontrol"></div>
+        <div class="anker" id="k-anker-stil"></div>
+        <div class="anker" id="k-anker-instr"></div>
+        <div class="anker" id="k-anker-lup"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="k-skemakort">
+            <h2>Kogepunkter i °C</h2>
+            <div id="k-skema"></div>
+            <p class="note">Antal carbonatomer i alt øverst. Et tal kommer i skemaet, når du har bygget stoffet. <span class="gasprik"></span> gas ved 20 °C</p>
+        </div>
+
+        <div class="kort" id="k-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="k-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="k-liste"></div>
+            <button class="knap nulstil lille" id="k-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: I VAND                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-v" role="tabpanel" aria-label="I vand">
+    <div class="scene">
+        <canvas id="v-laerred"></canvas>
+        <div class="scenekort" id="v-skort">
+            <div class="sk-ind" id="v-ind"></div>
+            <div class="sk-bund" id="v-status">
+                <p class="st-tekst" id="v-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="v-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="v-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="v-anker-plade"></div>
+        <div class="anker" id="v-anker-hylde"></div>
+        <div class="anker" id="v-anker-kontrol"></div>
+        <div class="anker" id="v-anker-stil"></div>
+        <div class="anker" id="v-anker-instr"></div>
+        <div class="anker" id="v-anker-lup"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="v-regelkort">
+            <h2>Tommelfingerreglen</h2>
+            <p class="regel">Der skal 4 carbonatomer til at ophæve virkningen af én polær gruppe. OH og COOH er hver én polær gruppe.</p>
+            <div id="v-skema"></div>
+            <p class="note">Kan stoffet opløses i vand? Antal carbonatomer i alt øverst.</p>
+        </div>
+
+        <div class="kort" id="v-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="v-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="v-liste"></div>
+            <button class="knap nulstil lille" id="v-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Alkoholer og carboxylsyrer</h2>
+        <p>En funktionel gruppe er en lille gruppe af atomer, som giver et organisk stof særlige egenskaber. Stoffer med den samme funktionelle gruppe hører til samme stofklasse.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Tre stofklasser</span>
+            Alkan: ingen gruppe, navnet ender på -an (ethan)<br>
+            Alkohol: −OH, navnet ender på -ol (ethanol)<br>
+            Carboxylsyre: −COOH, navnet ender på -syre (ethansyre)
+        </div>
+        <h3 class="teori-hoved">Navnet</h3>
+        <p>Første del af navnet viser antallet af carbonatomer, som i alkanernes navne. I en carboxylsyre tæller carbonatomet i COOH med. I en kæde med 3 eller flere carbonatomer viser et tal foran -ol, hvilket carbonatom OH-gruppen sidder på, for eksempel propan-1-ol.</p>
+        <h3 class="teori-hoved">Kogepunktet</h3>
+        <p>OH og COOH er polære grupper, fordi oxygen har en høj elektronegativitet. H i én gruppe er positiv (δ+) og tiltrækker O i en anden gruppe, som er negativ (δ−). Tiltrækningen kaldes en hydrogenbinding. Derfor har alkoholer og carboxylsyrer meget højere kogepunkter end alkaner af samme størrelse. Jo længere kæden er, jo større er kontaktfladen mellem molekylerne, og jo højere er kogepunktet.</p>
+        <h3 class="teori-hoved">Opløselighed i vand</h3>
+        <p>Vandmolekylerne tiltrækker den polære gruppe, men ikke den upolære kæde. Der skal 4 carbonatomer til at ophæve virkningen af én polær gruppe, så kun korte alkoholer og carboxylsyrer kan blandes med vand.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> kæden &nbsp;·&nbsp; <kbd>Enter</kbd> indsend &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/kugler.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/instrument.js"></script>
+<script src="js/plade.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

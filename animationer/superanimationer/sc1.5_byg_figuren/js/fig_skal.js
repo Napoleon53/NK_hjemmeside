@@ -76,7 +76,7 @@
             { navn: "Perioder og grupper", pladser: ["periode", "hovedgruppe", "undergruppe"], ekstra: ["ædelgasser"],
               ros: "Chlor står i periode 3, fordi atomet har tre skaller." },
             { navn: "Familier og reglen", pladser: ["alkalimetaller", "halogener", "ædelgasser", "regel1", "regel2"],
-              ros: "Argon har 8 elektroner i yderste skal ligesom de andre ædelgasser, og det er en særlig stabil elektronstruktur." }
+              ros: "Argon har 8 elektroner i yderste skal ligesom de andre ædelgasser på nær helium, og det er en særlig stabil elektronstruktur." }
         ],
         pladser: [
             { id: "skalmodel", ord: ["skalmodel"], x: CL.x, y: CLK.y, maal: [CL.x, CLK.y], titel: true, dele: ["model"],
@@ -111,9 +111,9 @@
                       "ædelgasreglen": "<b>ædelgasreglen</b> er en regel. Pladsen peger på en kolonne af grundstoffer.",
                       oktetreglen: "<b>oktetreglen</b> er en regel. Pladsen peger på en kolonne af grundstoffer." } },
             { id: "regel1", ord: ["ædelgasreglen", "oktetreglen"], par: "regel2", x: 768, y: 38, maal: [MAERKE.x, MAERKE.y - MAERKE.h / 2 - 6], dele: ["otte"], omr: [maerkeOmr()],
-              fejl: { "ædelgasser": "<b>ædelgasser</b> er en familie af grundstoffer. De to pladser ved argon er navnene på en regel." } },
+              fejl: { "ædelgasser": "<b>ædelgasser</b> er en familie af grundstoffer. De to pladser ved argon skal have navnene på en regel." } },
             { id: "regel2", ord: ["ædelgasreglen", "oktetreglen"], x: 768, y: 38, maal: [MAERKE.x, MAERKE.y - MAERKE.h / 2 - 6], dele: ["regel"], omr: [maerkeOmr()],
-              fejl: { "ædelgasser": "<b>ædelgasser</b> er en familie af grundstoffer. De to pladser ved argon er navnene på en regel." } }
+              fejl: { "ædelgasser": "<b>ædelgasser</b> er en familie af grundstoffer. De to pladser ved argon skal have navnene på en regel." } }
         ],
 
         tegn: function (api) {

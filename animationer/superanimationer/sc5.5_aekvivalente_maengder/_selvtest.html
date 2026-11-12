@@ -323,7 +323,7 @@ function koerTest(W) {
     H.indsend();
     paastand("og Indsend svar bedømmer valget", H.k === 1 && H.begrFundet() === "agurk");
     H.knap();
-    paastand("hintet siger, hvad der bestemmer antallet", /bestemmer det/.test(kortTekst(H)));
+    paastand("hintet siger, hvad der bestemmer antallet", /bestemmer, hvor mange/.test(kortTekst(H)));
     H.knap();
     paastand("Vis svaret skriver udregningen: 12 agurkeskiver / 2 = 6 hotdogs", H.trin[1].status === "svar" &&
         /12 agurkeskiver \/ 2 = 6 hotdogs/.test(kortTekst(H)));

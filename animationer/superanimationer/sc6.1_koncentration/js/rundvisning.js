@@ -20,31 +20,31 @@
             { sel: "#kar-anker-krukke", titel: "Krukken", tekst: "Træk en skefuld kobber(II)sulfat ned i karret, eller klik på krukken. En skefuld er 0,10 mol." },
             { sel: "#kar-anker-haner", titel: "Hanerne", tekst: "Hold musen nede på den blå knap for at hælde vand i, og på den røde hane for at tappe ud. Hvert tryk er 0,05 L. Et gult skilt viser, hvad der mangler." },
             { sel: "#kar-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Antallet af ioner i den følger koncentrationen." },
-            { sel: "#kar-data", titel: "Tallene", tekst: "Stofmængden, rumfanget og c = n / V, mens du arbejder i karret." },
+            { sel: "#kar-data", titel: "Tallene", tekst: "Panelet viser stofmængden, rumfanget og c = n / V, mens du arbejder i karret." },
             { sel: "#kar-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap på kortet. Først får du et hint, og et tryk mere viser svaret." },
-            { sel: "#kar-forfra", titel: "Start forfra", tekst: "Karret, som det var, da opgaven begyndte." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "c eller n?: forskellen på stofmængde og koncentration. Målekolben: regn en opløsning ud, før den laves. Fortynding: der kommer vand til, men ikke stof." }
+            { sel: "#kar-forfra", titel: "Start forfra", tekst: "Knappen stiller karret tilbage til opgavens start." },
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "c eller n?: forskellen på stofmængde og koncentration. Målekolben: Regn en opløsning ud, før den laves. Fortynding: Der kommer vand til, men ikke stof." }
         ],
         "fane-glas": [
             { sel: "#glas-skort", titel: "Spørgsmålet", tekst: "Spørgsmålet står på kortet øverst. Vælg et svar, og tryk på Indsend svar. Handler spørgsmålet om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
             { sel: "#glas-anker-glassene", titel: "Glassene", tekst: "Hver prik i et glas er 0,01 mol kobber(II)sulfat. Tæl prikkerne, så har du stofmængden n." },
             { sel: "#glas-anker-lupper", titel: "Lupperne", tekst: "En lup viser altid lige meget væske. Flere ioner i luppen betyder en højere koncentration c." },
             { sel: "#glas-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap på kortet. Først får du et hint, og et tryk mere viser svaret." },
-            { sel: "#glas-data", titel: "Tabellen", tekst: "Det, du ved om glassene. Et spørgsmålstegn er noget, du skal finde." },
+            { sel: "#glas-data", titel: "Tabellen", tekst: "Tabellen viser det, du ved om glassene. Et spørgsmålstegn er noget, du skal finde." },
             { sel: "#glas-opgaver", titel: "Opgaverne", tekst: "Otte opgaver. En opgave, du løser uden forkerte svar og uden at se svaret, får en stjerne." }
         ],
         "fane-kolbe": [
-            { sel: "#kolbe-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningen, efterhånden som du skriver den." },
+            { sel: "#kolbe-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser opgavens tal og beregningen, efterhånden som du skriver den." },
             { sel: "#kolbe-raekker", titel: "Regnestykket", tekst: "Tre trin: vælg formlens form og skriv bogstaverne, sæt tallene ind med enheder, og skriv resultatet med enhed." },
-            { sel: "#kolbe-anker-bord", titel: "Bordet", tekst: "Det, du har regnet, sker her: stoffet vejes af, hældes i kolben, og kolben fyldes op til mærket." },
-            { sel: "#kolbe-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
+            { sel: "#kolbe-anker-bord", titel: "Bordet", tekst: "Her sker det, du har regnet. Stoffet vejes af og hældes i kolben, og kolben fyldes op til mærket." },
+            { sel: "#kolbe-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal gøre nu, og hvad der gik galt. Den gule knap giver et hint og derefter svaret." },
             { sel: "#kolbe-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En opgave, du løser uden at se svaret, får en stjerne. Nye tal giver samme opgave med andre tal." }
         ],
         "fane-fortynd": [
-            { sel: "#fortynd-anker-lupper", titel: "Lupperne", tekst: "Flasken og kolben. Ionerne fra pipetten fordeler sig i mere vand, så der er færre i luppen." },
-            { sel: "#fortynd-anker-bord", titel: "Bordet", tekst: "I første opgave: klik på en pipette, så på en målekolbe og til sidst på sprøjteflasken." },
-            { sel: "#fortynd-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne." },
-            { sel: "#fortynd-kort", titel: "Opgaven", tekst: "Fra opgave 2 regner du i tre trin: formlen, tallene med enheder og resultatet. Før og efter står med lille skrift: V før fortyndingen og V efter. Scenen gør det, du har regnet." },
+            { sel: "#fortynd-anker-lupper", titel: "Lupperne", tekst: "Lupperne viser flasken og kolben. Ionerne fra pipetten fordeler sig i mere vand, så der er færre i kolbens lup." },
+            { sel: "#fortynd-anker-bord", titel: "Bordet", tekst: "I første opgave klikker du på en pipette, så på en målekolbe og til sidst på sprøjteflasken." },
+            { sel: "#fortynd-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser opgavens tal og beregningerne." },
+            { sel: "#fortynd-kort", titel: "Opgaven", tekst: "Fra opgave 2 regner du i tre trin: formlen, tallene med enheder og resultatet. Før og efter står som lille skrift under V, så V før er rumfanget før fortyndingen, og V efter er rumfanget efter. Scenen gør det, du har regnet." },
             { sel: "#fortynd-opgaver", titel: "Opgaverne", tekst: "Fem opgaver. Nye tal giver samme opgave med andre tal." }
         ]
     };

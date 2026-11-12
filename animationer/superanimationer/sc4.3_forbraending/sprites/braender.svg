@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="220" viewBox="0 0 90 220">
+  <!-- Bunsenbraender set forfra (efter sc5.9's bunsen.svg, uden luftkraven).
+       Roerets munding er (45, 22); flammen tegnes af animationen derfra og
+       opad. Luftkraven tegnes af animationen om (45, 160), 26 bred og 22 hoej,
+       fordi hullet aabner og lukker. Bunden staar paa y 216. -->
+  <defs>
+    <linearGradient id="roer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6d737b"/>
+      <stop offset="0.32" stop-color="#e8ecef"/>
+      <stop offset="0.58" stop-color="#bcc2c9"/>
+      <stop offset="1" stop-color="#5a6068"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#555b64"/>
+      <stop offset="1" stop-color="#23272d"/>
+    </linearGradient>
+    <linearGradient id="fodtop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4b5159"/>
+      <stop offset="0.4" stop-color="#8b929b"/>
+      <stop offset="1" stop-color="#3d4249"/>
+    </linearGradient>
+    <linearGradient id="slange" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e2876a"/>
+      <stop offset="1" stop-color="#9c3a25"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skygge paa bordet -->
+  <ellipse cx="45" cy="215" rx="40" ry="4.5" fill="#000000" fill-opacity="0.35"/>
+
+  <!-- Slangen ud til venstre -->
+  <path d="M16 196 Q3 198 1 214" fill="none" stroke="url(#slange)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M16 194 Q5 196 2.5 208" fill="none" stroke="#f3b49f" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+  <rect x="11" y="191" width="16" height="10" rx="2" fill="url(#roer)" stroke="#50565e" stroke-width="0.8"/>
+
+  <!-- Foden -->
+  <path d="M8 215 Q8 199 25 194 L65 194 Q82 199 82 215 Z" fill="url(#fod)" stroke="#16191d" stroke-width="1"/>
+  <ellipse cx="45" cy="194" rx="20" ry="3.4" fill="url(#fodtop)"/>
+  <path d="M14 212 Q16 202 27 198" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Gashanen -->
+  <rect x="62" y="189" width="9" height="11" rx="1.5" fill="url(#roer)" stroke="#50565e" stroke-width="0.8"/>
+  <circle cx="74" cy="194.5" r="6.5" fill="#2d62b3" stroke="#1b3e73" stroke-width="1"/>
+  <path d="M69.5 194.5 L78.5 194.5 M74 190 L74 199" stroke="#8fb4ea" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- Roeret -->
+  <rect x="37" y="22" width="16" height="172" fill="url(#roer)" stroke="#50565e" stroke-width="1"/>
+  <path d="M41.5 26 L41.5 190" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1.4"/>
+  <ellipse cx="45" cy="22" rx="8" ry="2.3" fill="#2a2e34" stroke="#50565e" stroke-width="0.8"/>
+
+  <!-- Gasdysen nederst i roeret (ses gennem luftkraven, naar den er aaben) -->
+  <rect x="42" y="168" width="6" height="8" rx="1" fill="#7c828a"/>
+</svg>

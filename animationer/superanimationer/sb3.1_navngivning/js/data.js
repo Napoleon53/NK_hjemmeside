@@ -168,11 +168,11 @@
        Et vaerktoej, opgavens eget stof har brug for, er der altid (chlorethansyre
        faar −Cl, ogsaa naar halogenalkanerne er slaaet fra). */
     D.VAERKTOEJ = [
-        { id: "tegn", tekst: "Kæde", titel: "Træk fra et carbonatom, eller klik på et: kæden vokser med ét carbonatom", klasser: null },
+        { id: "tegn", tekst: "Kæde", titel: "Træk fra et carbonatom, eller klik på et, så kæden vokser med ét carbonatom", klasser: null },
         { id: "binding", tekst: "= Binding", titel: "Klik på en binding: enkelt, dobbelt, tripel og tilbage", klasser: ["alken", "alkyn"] },
         { id: "gruppe:OH", tekst: "−OH", titel: "Klik på et carbonatom for at sætte en OH-gruppe på", klasser: ["alkohol", "carboxylsyre"] },
         { id: "gruppe:O", tekst: "=O", titel: "Klik på et carbonatom for at sætte et oxygenatom på med en dobbeltbinding", klasser: ["carboxylsyre"] },
-        { id: "gruppe:COOH", tekst: "−COOH", titel: "Klik på carbonatomet for enden af kæden: det bliver til COOH-gruppen", klasser: ["carboxylsyre"] },
+        { id: "gruppe:COOH", tekst: "−COOH", titel: "Klik på carbonatomet for enden af kæden for at gøre det til en COOH-gruppe", klasser: ["carboxylsyre"] },
         { id: "halogen:Cl", tekst: "−Cl", titel: "Klik på et carbonatom for at sætte et chloratom på", klasser: ["halogen"] },
         { id: "halogen:Br", tekst: "−Br", titel: "Klik på et carbonatom for at sætte et bromatom på", klasser: ["halogen"] },
         { id: "ring6", tekst: "⬡ Ring", titel: "Klik på tavlen: en ring med seks carbonatomer", klasser: ["alkan", "alken", "alkohol"] }

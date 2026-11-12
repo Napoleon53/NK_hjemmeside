@@ -19,25 +19,25 @@
         "fane-varm": [
             { sel: "#varm-anker-hylde", titel: "Hylden", tekst: "Elleve alkaner ved stuetemperatur. Gasserne har fyldt deres ballon. Træk et glas ned i kammeret, eller klik på det." },
             { sel: "#varm-anker-kammer", titel: "Kammeret", tekst: "Glasset i kammeret har den temperatur, termometeret viser. Når stoffet koger, fylder gassen ballonen." },
-            { sel: "#varm-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme op eller køle ned. Piletasterne flytter én grad, med Skift ti." },
+            { sel: "#varm-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme op eller køle ned. Piletasterne ændrer temperaturen én grad ad gangen, og med Skift ti grader." },
             { sel: "#varm-anker-zoom", titel: "Molekylerne", tekst: "Hver kugle er et C-atom med dets H-atomer. Grå er fast stof, orange væske og blå gas. De gule prikker viser, hvor molekylerne rører hinanden." },
             { sel: "#varm-kurve-kort", titel: "Kurven", tekst: "Hvert kogepunkt, du finder, kommer på kurven. Den grønne linje er stuetemperatur." },
-            { sel: "#varm-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen giver fire små mål. Indsend svar sender, og den gule knap giver et hint og derefter svaret." },
-            { sel: "#teoriknap", titel: "Teori", tekst: "Kogepunkt, London-kræfter, kædelængde og form kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Formen: tre stoffer med samme formel. Hvem koger først: gæt i blandinger." }
+            { sel: "#varm-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen giver fire små mål. Knappen Indsend svar sender dit svar, og den gule knap giver et hint og derefter svaret." },
+            { sel: "#teoriknap", titel: "Teori", tekst: "Kogepunkt, londonbindinger, kædelængde og form kort forklaret." },
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "På fanen Formen undersøger du tre stoffer med samme formel. På fanen Hvem koger først? gætter du, hvilket stof i en blanding der koger først." }
         ],
         "fane-form": [
-            { sel: "#form-anker-bad", titel: "Vandbadet", tekst: "Tre glas med C₅H₁₂ i samme vand. Hvert har sin ballon." },
-            { sel: "#form-anker-zoom", titel: "Molekylerne", tekst: "Et vindue ind i hvert glas. Samme atomer, forskellig form." },
+            { sel: "#form-anker-bad", titel: "Vandbadet", tekst: "Tre glas står i samme vandbad. Hvert glas indeholder et stof med formlen C₅H₁₂ og har sin egen ballon." },
+            { sel: "#form-anker-zoom", titel: "Molekylerne", tekst: "Hvert vindue viser molekylerne i ét glas. Molekylerne har de samme atomer, men forskellig form." },
             { sel: "#form-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme vandbadet op." },
             { sel: "#form-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen beder dig gætte, hvilken ballon der fyldes først. Derefter varmer du op, og kortet spørger hvorfor." },
             { sel: "#form-tabel-kort", titel: "Kogepunkterne", tekst: "Her kommer stofferne i den rækkefølge, de koger. Knappen under dem viser, hvor molekylerne rører hinanden." }
         ],
         "fane-spil": [
-            { sel: "#spil-anker-zoom", titel: "Blandingen", tekst: "To eller tre alkaner i samme glas, hver i sin farve." },
+            { sel: "#spil-anker-zoom", titel: "Blandingen", tekst: "Glasset indeholder to eller tre alkaner, og hver alkan har sin egen farve." },
             { sel: "#spil-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen spørger, hvilket stof der koger først. Du kan også vælge ved at klikke på et molekyle." },
             { sel: "#spil-anker-kammer", titel: "Kammeret", tekst: "Når du har indsendt dit svar, varmer kammeret op, til det første stof er kogt væk." },
-                        { sel: "#spil-runde", titel: "Runden", tekst: "Ni blandinger på tre niveauer. Rekorden huskes." }
+                        { sel: "#spil-runde", titel: "Runden", tekst: "En runde består af ni blandinger på tre niveauer, og din rekord bliver gemt." }
         ]
     };
 

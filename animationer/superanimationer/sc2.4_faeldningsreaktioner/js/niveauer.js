@@ -75,11 +75,11 @@
             var o = niv.o, ny = D.nytPar(o, k, a);
             if (ny && ny.kode === "T") {
                 niv.loes(false, "Rigtigt. " + ionT(o.P.kat) + " og " + ionT(o.P.an) + " er T i tabellen og falder ud. "
-                    + tilskuerTekst(o) + " er tilskuerioner: de bliver i opløsning.");
+                    + tilskuerTekst(o) + " er tilskuerioner, som bliver i opløsning.");
                 return;
             }
             niv.blink(k, a);
-            if (ny) niv.saetBesked(ionT(ny.salt.kat) + " og " + ionT(ny.salt.an) + " er L i tabellen: letopløseligt. De bliver i opløsning.", "skidt");
+            if (ny) niv.saetBesked(ionT(ny.salt.kat) + " og " + ionT(ny.salt.an) + " danner et letopløseligt salt (L i tabellen), så de bliver i opløsning.", "skidt");
             else if (D.gammeltPar(o, k, a)) niv.saetBesked(gammelt(o, k, a), "skidt");
             else if (o.ioner.indexOf(D.ion(k)) < 0 || o.ioner.indexOf(D.ion(a)) < 0) niv.saetBesked(ikkeHer(o, k, a), "skidt");
         },
@@ -150,7 +150,7 @@
         }
         var b = D.bundfald(o.P.kat.id, o.P.an.id);
         return start + o.P.formel + " er tungtopløseligt og falder ud som et " + b.ord + " bundfald. "
-            + o.bliver[0].formel + " er letopløseligt, så de ioner bliver i opløsning.";
+            + o.bliver[0].formel + " er letopløseligt, så dets ioner bliver i opløsning.";
     }
 
     function rigtigtUdfald(o) {
@@ -211,14 +211,14 @@
                     if (ny) {
                         if (niv.s.fundne.indexOf(ny) >= 0) return;
                         niv.s.fundne.push(ny);
-                        var tekst = ionT(ny.salt.kat) + " og " + ionT(ny.salt.an) + " er " + (ny.kode === "T" ? "tungtopløseligt" : "letopløseligt") + ".";
+                        var tekst = "Parret " + ionT(ny.salt.kat) + " og " + ionT(ny.salt.an) + " er " + (ny.kode === "T" ? "tungtopløseligt" : "letopløseligt") + ".";
                         niv.hint = null;
                         if (niv.s.fundne.length === 2) {
                             niv.s.fase = "b";
                             niv.hjaelp = 0;
                             niv.besked = { tekst: "Begge nye par er fundet. " + tekst, klasse: "god" };
                         } else {
-                            niv.besked = { tekst: "Fundet: " + tekst + " Find det andet par.", klasse: "god" };
+                            niv.besked = { tekst: "Det ene par er fundet. " + tekst + " Find det andet par.", klasse: "god" };
                         }
                         niv.vis();
                         return;
@@ -259,7 +259,7 @@
                     }
                     var ny = o.nye.filter(function (n) { return niv.s.fundne.indexOf(n) < 0; })[0];
                     niv.hint = [{ kat: ny.salt.kat.id, an: ny.salt.an.id }];
-                    return "Byt partner: " + ionT(ny.salt.kat) + " skal have " + ionT(ny.salt.an) + " som ny partner. Find søjlen med "
+                    return "Byt partner. " + ionT(ny.salt.kat) + " skal have " + ionT(ny.salt.an) + " som ny partner. Find søjlen med "
                         + ionT(ny.salt.kat) + " og rækken med " + ionT(ny.salt.an) + ".";
                 },
                 vis: function (niv) {
@@ -270,7 +270,7 @@
                     niv.delVist = true;
                     niv.hjaelp = 0;
                     niv.hint = null;
-                    niv.besked = { tekst: "Svaret: de nye par er " + nyePar(niv.o) + ".", klasse: "gul" };
+                    niv.besked = { tekst: "Svaret: De nye par er " + nyePar(niv.o) + ".", klasse: "gul" };
                     niv.vis();
                 },
                 efter: function (niv) {
@@ -490,7 +490,7 @@
                     niv.fokusFelt = foerste.key;
                     niv.vis();
                 },
-                hint: function () { return HINT_IONER + " Tast fx Fe3+ for Fe³⁺ eller brug ladningsknapperne."; },
+                hint: function () { return HINT_IONER + " Skriv for eksempel Fe3+ for Fe³⁺, eller brug ladningsknapperne."; },
                 vis: function (niv) {
                     var o = niv.o;
                     [["A", o.A], ["B", o.B]].forEach(function (x) {

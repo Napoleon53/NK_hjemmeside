@@ -57,7 +57,7 @@
                 klik: function (s, idx) {
                     if (idx < 0) return false;
                     if (s.mol().delta[idx] === -1) return true;
-                    return "Det er " + D.GRUNDSTOFFER[s.mol().atomer[idx].el].navn + ". Prøv et andet atom.";
+                    return "Du har klikket på et " + D.GRUNDSTOFFER[s.mol().atomer[idx].el].navn + "atom, som ikke bliver δ−. Prøv et andet atom.";
                 },
                 slut: function (s) { s.slutOpgaveMol(); }
             };
@@ -65,7 +65,7 @@
         function (sim) {
             var mol = sim.nytMolekyle(["CO2", "CCl4"]);
             var svar = [
-                "Trækkene ophæver hinanden",
+                "Bindingernes træk ophæver hinanden",
                 "Atomerne trækker lige hårdt",
                 "Bindingerne er for korte",
                 "Der er ingen frie elektronpar"

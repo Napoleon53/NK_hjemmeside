@@ -106,12 +106,12 @@
           tekst: "Isolér molarmassen M i n = m / M. Byg højre side af M = … med brikkerne.",
           hint: "Gang begge sider af n = m / M med M, og del så begge sider med n.",
           trekant: true, efter: "M",
-          faerdig: "Gram pr. mol. Enheden siger selv, hvad der skal deles med hvad." },
+          faerdig: "Molarmassen har enheden gram pr. mol, og enheden viser, hvad der skal deles med hvad." },
         { id: "hukommelse", titel: "Skriv formlen selv", ramme: "skriv", maal: "n",
           aabne: ["formel", "enhed"], efter: "n",
           tekst: "Ingen brikker denne gang. Skriv formlen og enhederne i felterne til højre.",
-          om: "Rigtig udenadslære kommer først med mange timers træning. Det her er første skridt.",
-          faerdig: "Uden brikker. Resten er træning." }
+          om: "Rigtig udenadslære kommer først med mange timers træning. Denne opgave er første skridt.",
+          faerdig: "Du har skrevet formlen uden brikker. Resten er træning." }
     ];
 
     /* Brikkerne. slags: sym, navn, enhed eller op */
@@ -153,7 +153,7 @@
         { id: "m1", titel: "Find massen", stof: "NaHCO3", trin: ["m"],
           tekst: "Til et forsøg skal du bruge {n} mol {kendt}. Hvor mange gram skal du afveje?",
           tal: [{ n: 0.250 }, { n: 0.100 }, { n: 0.500 }, { n: 0.0500 }] },
-        { id: "m2", titel: "Massen af kobbersulfat", stof: "CuSO4", trin: ["m"],
+        { id: "m2", titel: "Massen af kobber(II)sulfat", stof: "CuSO4", trin: ["m"],
           tekst: "Du skal bruge {n} mol {navn}. Hvor mange gram skal du afveje?",
           tal: [{ n: 0.0500 }, { n: 0.200 }, { n: 0.125 }, { n: 0.0250 }] },
         { id: "M", titel: "Find molarmassen", stof: "?", trin: ["M"],
@@ -200,7 +200,7 @@
     D.TRINBAR = ["Formlen", "Tallene ind", "Resultatet"];
 
     /* Trekanten: linjen i kortet, naar den kommer frem */
-    D.TREKANT = "Dæk det over, du vil finde. Det, der er tilbage, er formlen: ved siden af hinanden ganges, over hinanden deles.";
+    D.TREKANT = "Dæk i trekanten det bogstav, du vil finde. Det, der er tilbage, er formlen. Bogstaver ved siden af hinanden ganges, og bogstaver over hinanden deles.";
 
     /* ----- Fane 3: Hurtigrunden ---------------------------------------------------
        Faste spoergsmaal: svarene med det rigtige foerst (de blandes) og en
@@ -215,25 +215,25 @@
 
     D.HURTIG = [
         { slags: "formel", spm: "n = ?", svar: ["m / M", "M / m", "m · M"],
-          fejl: ["", "Vendt om. Enheden bliver (g/mol) / g = 1/mol.", "Ganget. Enheden bliver g · g/mol = g²/mol."],
+          fejl: ["", "Brøken er vendt om. Enheden bliver (g/mol) / g = 1/mol.", "Du har ganget. Enheden bliver g · g/mol = g²/mol."],
           forkl: "n = m / M. Enheden: g / (g/mol) = mol." },
         { slags: "formel", spm: "m = ?", svar: ["n · M", "n / M", "M / n"],
-          fejl: ["", "Delt. Enheden bliver mol / (g/mol) = mol²/g.", "Delt. Enheden bliver (g/mol) / mol = g/mol²."],
+          fejl: ["", "Du har delt. Enheden bliver mol / (g/mol) = mol²/g.", "Du har delt. Enheden bliver (g/mol) / mol = g/mol²."],
           forkl: "m = n · M. Enheden: mol · g/mol = g." },
         { slags: "formel", spm: "M = ?", svar: ["m / n", "n / m", "m · n"],
-          fejl: ["", "Vendt om. Enheden bliver mol/g.", "Ganget. Enheden bliver g · mol."],
+          fejl: ["", "Brøken er vendt om. Enheden bliver mol/g.", "Du har ganget. Enheden bliver g · mol."],
           forkl: "M = m / n. Enheden: g / mol = g/mol." },
         { slags: "formel", spm: "Du kender m og M. Hvilken formel giver n?", svar: ["n = m / M", "n = M / m", "n = m · M"],
-          fejl: ["", "Vendt om. Massen står øverst.", "Ganget. Det giver g²/mol, ikke mol."],
+          fejl: ["", "Brøken er vendt om. Massen står øverst.", "Du har ganget. Enheden bliver g²/mol, ikke mol."],
           forkl: "n = m / M." },
-        { slags: "enhed", spm: "Enheden for molarmasse, M?", svar: ["g/mol", "mol/g", "g · mol", "g"],
-          fejl: ["", "Omvendt. Molarmassen er gram pr. mol.", "Molarmassen er gram pr. mol, ikke gange.", "Det er massen. Molarmassen er massen af 1 mol: g/mol."],
+        { slags: "enhed", spm: "Hvad er enheden for molarmassen M?", svar: ["g/mol", "mol/g", "g · mol", "g"],
+          fejl: ["", "Enheden er vendt om. Molarmassen er gram pr. mol.", "Molarmassen er gram pr. mol, ikke gram gange mol.", "Gram er enheden for massen. Molarmassen er massen af 1 mol: g/mol."],
           forkl: "Molarmassen er massen af 1 mol: g/mol." },
-        { slags: "enhed", spm: "Enheden for stofmængde, n?", svar: ["mol", "g", "g/mol"],
-          fejl: ["", "Gram er massen. Stofmængden tæller portioner af 1 mol.", "Det er molarmassen."],
+        { slags: "enhed", spm: "Hvad er enheden for stofmængden n?", svar: ["mol", "g", "g/mol"],
+          fejl: ["", "Gram er enheden for massen. Stofmængden tæller portioner af 1 mol.", "g/mol er enheden for molarmassen."],
           forkl: "Stofmængden måles i mol." },
-        { slags: "enhed", spm: "Enheden for masse, m?", svar: ["g", "mol", "g/mol"],
-          fejl: ["", "Mol er stofmængden.", "Det er molarmassen, massen af 1 mol."],
+        { slags: "enhed", spm: "Hvad er enheden for massen m?", svar: ["g", "mol", "g/mol"],
+          fejl: ["", "Mol er enheden for stofmængden.", "g/mol er enheden for molarmassen, massen af 1 mol."],
           forkl: "Massen måles i gram." },
         { slags: "navn", spm: "Hvad står stort M for?", svar: ["molarmasse", "masse", "stofmængde", "antal partikler"],
           fejl: ["", "Massen er lille m.", "Stofmængden er n.", "Antallet er N."],
@@ -251,7 +251,7 @@
           fejl: ["", "Mol går ud med mol.", "Mol går ud med mol. Tilbage er gram.", "Du har delt i stedet for at gange."],
           forkl: "mol · g/mol = g." },
         { slags: "forkort", spm: "g / mol = ?", svar: ["g/mol", "mol/g", "g · mol"],
-          fejl: ["", "Omvendt. Gram står øverst.", "Der skal deles, ikke ganges."],
+          fejl: ["", "Enheden er vendt om. Gram står øverst.", "Der skal deles, ikke ganges."],
           forkl: "g / mol = g/mol: massen af 1 mol." }
     ];
 
@@ -272,8 +272,8 @@
         hurtig: "Tolv spørgsmål på tid. Fejl kommer igen."
     };
     D.FAERDIG = {
-        formel: "Alle seks. Træn videre på Vægten og i Hurtigrunden.",
-        vaegt: "Alle seks. Formlen først, så tallet med enhed."
+        formel: "Alle seks opgaver er løst. Træn videre på fanerne Vægten og Hurtigrunden.",
+        vaegt: "Alle seks opgaver er løst. Skriv altid formlen først og derefter tallet med enhed."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];

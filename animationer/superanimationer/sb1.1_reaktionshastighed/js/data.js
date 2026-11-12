@@ -66,15 +66,15 @@
                     tekst: "Hvornår er reaktionshastigheden størst?",
                     valg: [
                         { tekst: "Lige i starten", rigtig: true,
-                          forklaring: "Kurven for Br₂ er stejlest ved t = 0. Her er der flest BrO₃⁻, og hastigheden er størst." },
-                        { tekst: "Til sidst, hvor der er mest Br₂", rigtig: false,
-                          forklaring: "Der er mest Br₂ til sidst, men kurven er næsten vandret. Hastigheden er hældningen, ikke højden." },
-                        { tekst: "Den er den samme hele tiden", rigtig: false,
-                          forklaring: "Så ville kurven være en ret linje. Den bliver fladere og fladere." },
-                        { tekst: "Der, hvor de to kurver krydser", rigtig: false,
-                          forklaring: "I krydset er de to koncentrationer lige store. Det siger intet om hældningen." }
+                          forklaring: "Kurven for Br₂ er stejlest ved t = 0. Her er koncentrationen af reaktanterne størst, og derfor er hastigheden størst." },
+                        { tekst: "Til sidst, hvor [Br₂] er størst", rigtig: false,
+                          forklaring: "[Br₂] er størst til sidst, men kurven er næsten vandret. Hastigheden er kurvens hældning, ikke dens højde." },
+                        { tekst: "Hastigheden er den samme hele tiden", rigtig: false,
+                          forklaring: "Med en konstant hastighed ville kurven være en ret linje. Kurven bliver fladere og fladere." },
+                        { tekst: "Når de to kurver krydser hinanden", rigtig: false,
+                          forklaring: "I krydset er [Br₂] og [BrO₃⁻] lige store, men det siger intet om kurvernes hældning." }
                     ],
-                    hint: "Hastigheden er, hvor hurtigt kurven stiger. Hvor er den stejlest?",
+                    hint: "Reaktionshastigheden er kurvens hældning. Hvor er kurven for Br₂ stejlest?",
                     opsaet: { vaerktoej: "aflaes", stof: "br2", t: 0, helKurve: true }
                 };
             }
@@ -93,15 +93,15 @@
                     tekst: "Beregn gennemsnitshastigheden v(Br₂) fra t₁ = " + t1 + " s til t₂ = " + t2 + " s.",
                     valg: [
                         { tekst: ms(dc / dt), rigtig: true,
-                          forklaring: "Δ[Br₂] = " + NK.sci(dc, 2) + " M og Δt = " + dt + " s. Hastigheden er Δ[Br₂]/Δt, hældningen af sekanten." },
+                          forklaring: "Δ[Br₂] = " + NK.sci(dc, 2) + " M og Δt = " + dt + " s. Gennemsnitshastigheden er Δ[Br₂]/Δt, som er sekantens hældning." },
                         { tekst: ms(c2 / t2), rigtig: false,
-                          forklaring: "Det er [Br₂] delt med t₂. Brug ændringen: [Br₂] ved t₂ minus [Br₂] ved t₁." },
+                          forklaring: "Dette svar er [Br₂] ved t₂ divideret med t₂. Brug i stedet Δ[Br₂] = [Br₂] ved t₂ − [Br₂] ved t₁." },
                         { tekst: ms(dc / t2), rigtig: false,
-                          forklaring: "Ændringen er rigtig, men den skal deles med Δt = t₂ − t₁, ikke med t₂." },
+                          forklaring: "Δ[Br₂] er rigtig, men Δ[Br₂] skal divideres med Δt = t₂ − t₁, ikke med t₂." },
                         { tekst: NK.sci(dt / dc, 2) + " s/M", rigtig: false,
-                          forklaring: "Tiden er delt med koncentrationen. Hastighed er ændring i koncentration pr. tid." }
+                          forklaring: "Her er Δt divideret med Δ[Br₂]. Hastighed er ændring i koncentration pr. tid." }
                     ],
-                    hint: "Δ[Br₂] = [Br₂] ved t₂ − [Br₂] ved t₁. Del med Δt = t₂ − t₁.",
+                    hint: "Δ[Br₂] = [Br₂] ved t₂ − [Br₂] ved t₁. Divider Δ[Br₂] med Δt = t₂ − t₁.",
                     opsaet: { vaerktoej: "sekant", stof: "br2", t1: t1, t2: t2, laas: true, skjul: true }
                 };
             }
@@ -113,11 +113,11 @@
             lav: function () {
                 var t = this.tider[this.nr++ % this.tider.length];
                 return {
-                    tekst: "Læg tangenten ved t = " + t + " s. Drej linealen i enderne, til den kun rører kurven i punktet.",
+                    tekst: "Læg en tangent til kurven for Br₂ ved t = " + t + " s. Drej linealen i enderne, til den kun rører kurven i punktet.",
                     tangent: true,
                     t: t,
                     hint: "En tangent følger kurven lige i punktet. Den må ikke skære kurven over eller under punktet.",
-                    rigtigTekst: "Linealen er en tangent. Dens hældning er hastigheden i det øjeblik: v(Br₂) = " + ms(B.v("br2", t)) + ".",
+                    rigtigTekst: "Linealen er en tangent, og dens hældning er hastigheden ved t = " + t + " s: v(Br₂) = " + ms(B.v("br2", t)) + ".",
                     opsaet: { vaerktoej: "tangent", stof: "br2", tT: t, laas: true, skjul: true, lineal: 0 }
                 };
             }
@@ -130,18 +130,18 @@
                 var t = this.tider[this.nr++ % this.tider.length];
                 var x = B.v("br2", t);
                 return {
-                    tekst: "Ved t = " + t + " s dannes Br₂ med v(Br₂) = " + ms(x) + ". Hvor hurtigt bruges BrO₃⁻?",
+                    tekst: "Ved t = " + t + " s er v(Br₂) = " + ms(x) + ". Hvor stor er v(BrO₃⁻)?",
                     valg: [
                         { tekst: "v(BrO₃⁻) = " + ms(x / 3), rigtig: true,
-                          forklaring: "Der dannes 3 Br₂, hver gang én BrO₃⁻ bruges. Så går BrO₃⁻ tre gange langsommere." },
+                          forklaring: "Der dannes 3 Br₂, hver gang 1 BrO₃⁻ forbruges. Derfor er v(BrO₃⁻) en tredjedel af v(Br₂)." },
                         { tekst: "v(BrO₃⁻) = " + ms(3 * x), rigtig: false,
-                          forklaring: "Du har ganget med 3. Br₂ har den største koefficient, så det er Br₂, der går hurtigst." },
+                          forklaring: "Du har ganget med 3. Br₂ har den største koefficient, så det er [Br₂], der ændrer sig hurtigst." },
                         { tekst: "v(BrO₃⁻) = " + ms(x), rigtig: false,
-                          forklaring: "Koefficienterne er forskellige: 3 Br₂ for hver BrO₃⁻." },
+                          forklaring: "Koefficienterne er forskellige, for der dannes 3 Br₂ for hver BrO₃⁻, der forbruges." },
                         { tekst: "v(BrO₃⁻) = " + ms(-x / 3), rigtig: false,
                           forklaring: "Hastigheden er altid positiv. Minus i definitionen vender fortegnet, fordi [BrO₃⁻] falder." }
                     ],
-                    hint: "Se på reaktionsskemaet: hvor mange Br₂ dannes der, når én BrO₃⁻ bruges?",
+                    hint: "Se på reaktionsskemaet. Hvor mange Br₂ dannes der, når 1 BrO₃⁻ forbruges?",
                     opsaet: { vaerktoej: "tangent", stof: "br2", tT: t, laas: true, lineal: "tangent" }
                 };
             }
@@ -153,14 +153,14 @@
             lav: function () {
                 var t = this.tider[this.nr++ % this.tider.length];
                 return {
-                    tekst: "Er gennemsnitshastigheden fra 0 til " + t + " s større eller mindre end hastigheden præcis ved " + t + " s?",
+                    tekst: "Er gennemsnitshastigheden fra 0 s til " + t + " s større eller mindre end hastigheden præcis ved t = " + t + " s?",
                     valg: [
                         { tekst: "Større", rigtig: true,
-                          forklaring: "Kurven flader ud. Gennemsnittet tager den stejle start med, så sekanten er stejlere end tangenten ved " + t + " s." },
+                          forklaring: "Kurven flader ud. Sekanten begynder ved den stejle start af kurven og er derfor stejlere end tangenten ved " + t + " s." },
                         { tekst: "Mindre", rigtig: false,
-                          forklaring: "Så skulle kurven blive stejlere med tiden. Den bliver fladere." },
+                          forklaring: "Det ville kræve, at kurven blev stejlere med tiden, men kurven bliver fladere." },
                         { tekst: "Lige store", rigtig: false,
-                          forklaring: "Det gælder kun for en ret linje. Sammenlign sekanten med kurvens hældning ved " + t + " s." }
+                          forklaring: "De to hastigheder er kun lige store, når kurven er en ret linje. Sammenlign sekanten med kurvens hældning ved " + t + " s." }
                     ],
                     hint: "Sekanten går fra 0 til " + t + " s. Er den stejlere eller fladere end kurven lige ved " + t + " s?",
                     opsaet: { vaerktoej: "sekant", stof: "br2", t1: 0, t2: t, laas: true }
@@ -174,13 +174,13 @@
                     tekst: "Hvilken enhed har reaktionshastighed?",
                     valg: [
                         { tekst: "M/s", rigtig: true,
-                          forklaring: "Ændring i koncentration (M) pr. tid (s). Langsomme reaktioner måles også i M/min." },
+                          forklaring: "Koncentration måles i M og tid i s, så reaktionshastigheden har enheden M/s. Langsomme reaktioner angives også i M/min." },
                         { tekst: "s/M", rigtig: false,
-                          forklaring: "Det er tid pr. koncentration, altså omvendt." },
+                          forklaring: "s/M er tid divideret med koncentration. Hastighed er koncentration divideret med tid." },
                         { tekst: "M", rigtig: false,
-                          forklaring: "M er en koncentration. Hastigheden er, hvor meget den ændrer sig pr. tid." },
+                          forklaring: "M er enheden for koncentration. Hastigheden er ændringen i koncentration pr. tid." },
                         { tekst: "M·s", rigtig: false,
-                          forklaring: "Koncentrationen skal deles med tiden, ikke ganges." }
+                          forklaring: "Ændringen i koncentration skal divideres med tiden, ikke ganges med den." }
                     ],
                     hint: "Hastighed er ændring pr. tid. Hvad ændrer sig, og hvad måles tiden i?",
                     opsaet: { vaerktoej: "aflaes", stof: "br2", helKurve: true }
@@ -197,16 +197,16 @@
             id: "fordoblA",
             lav: function () {
                 return {
-                    tekst: "Du fordobler antallet af A, og B er det samme. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+                    tekst: "Du fordobler antallet af A, og antallet af B er uændret. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
                     valg: [
                         { tekst: "De fordobles", rigtig: true,
                           forklaring: "Hver B har dobbelt så mange A at ramme. Prøv 12 A og derefter 24 A." },
                         { tekst: "De firdobles", rigtig: false,
-                          forklaring: "Det sker kun, hvis både A og B fordobles." },
+                          forklaring: "Sammenstødene firdobles kun, hvis både antallet af A og antallet af B fordobles." },
                         { tekst: "De er de samme", rigtig: false,
                           forklaring: "Med flere A møder hver B en A oftere. Prøv 12 A og derefter 24 A." },
                         { tekst: "De halveres", rigtig: false,
-                          forklaring: "Der bliver ikke mindre plads til at støde sammen. Der bliver flere at støde ind i." }
+                          forklaring: "Med flere A får hver B flere partikler at støde ind i, ikke færre." }
                     ],
                     hint: "Tænk på én B. Hvor mange A kan den ramme?",
                     opsaet: { opstilling: "opl", nA: 12, nB: 12 }
@@ -217,16 +217,16 @@
             id: "fordoblBegge",
             lav: function () {
                 return {
-                    tekst: "Du fordobler både A og B. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+                    tekst: "Du fordobler både antallet af A og antallet af B. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
                     valg: [
                         { tekst: "De firdobles", rigtig: true,
-                          forklaring: "Dobbelt så mange B, og hver af dem møder dobbelt så mange A: 2 · 2 = 4." },
+                          forklaring: "Der er dobbelt så mange B, og hver B møder dobbelt så mange A. Det giver 2 · 2 = 4 gange så mange sammenstød." },
                         { tekst: "De fordobles", rigtig: false,
-                          forklaring: "Hver B møder dobbelt så mange A, og der er også dobbelt så mange B. Prøv 12 + 12 og 24 + 24." },
+                          forklaring: "Hver B møder dobbelt så mange A, og der er også dobbelt så mange B. Prøv 12 A og 12 B og derefter 24 A og 24 B." },
                         { tekst: "De er de samme", rigtig: false,
-                          forklaring: "Der er både flere A og flere B at ramme. Prøv 12 + 12 og 24 + 24." }
+                          forklaring: "Der er både flere A og flere B at ramme. Prøv 12 A og 12 B og derefter 24 A og 24 B." }
                     ],
-                    hint: "Først fordobles A. Hvad gør det? Så fordobles B oveni.",
+                    hint: "Fordobl først antallet af A. Hvad sker der med sammenstødene? Fordobl derefter også antallet af B.",
                     opsaet: { opstilling: "opl", nA: 12, nB: 12 }
                 };
             }
@@ -235,18 +235,18 @@
             id: "fladerUd",
             lav: function () {
                 return {
-                    tekst: "Hvorfor bliver kurven fladere, jo længere tid der går?",
+                    tekst: "Hvorfor bliver kurven for C fladere, jo længere tid der går?",
                     valg: [
                         { tekst: "Der er færre A og B tilbage, så de støder sjældnere sammen", rigtig: true,
-                          forklaring: "Hver reaktion fjerner en A og en B. Tælleren for sammenstød falder, og kurven flader ud." },
+                          forklaring: "Hver reaktion fjerner en A og en B. Antallet af sammenstød pr. sekund falder, og kurven for C flader ud." },
                         { tekst: "Partiklerne bliver langsommere", rigtig: false,
-                          forklaring: "Farten er den samme hele tiden. Se på dem. Det er antallet, der falder." },
+                          forklaring: "Partiklernes fart er den samme hele tiden. Det er antallet af A og B, der falder." },
                         { tekst: "Produktet står i vejen", rigtig: false,
                           forklaring: "Produktet fylder lidt, men det er ikke grunden. Tæl A og B." },
                         { tekst: "Reaktionen løber tør for energi", rigtig: false,
-                          forklaring: "Temperaturen er den samme hele tiden. Det er A og B, der løber tør." }
+                          forklaring: "Temperaturen er den samme hele tiden. Det er A og B, der forbruges." }
                     ],
-                    hint: "Start forfra, og hold øje med tælleren for sammenstød, mens A og B bliver brugt.",
+                    hint: "Start forfra, og følg antallet af sammenstød pr. sekund i kortet Måling, mens A og B forbruges.",
                     opsaet: { opstilling: "opl", nA: 12, nB: 12 }
                 };
             }
@@ -255,7 +255,7 @@
             id: "pulver",
             lav: function () {
                 return {
-                    tekst: "Samme mængde magnesium som én klump og som pulver. Hvad giver flest H₂ pr. sekund?",
+                    tekst: "Den samme mængde magnesium reagerer med syre som en klump og som pulver. Hvilken form danner flest H₂ pr. sekund?",
                     valg: [
                         { tekst: "Pulveret", rigtig: true,
                           forklaring: "Pulveret har større overflade. H⁺ kan ramme mange flere Mg-atomer ad gangen." },

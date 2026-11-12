@@ -260,7 +260,7 @@
                 return kk.st.tekst + " " + NK.komma(kk.st.M);
             });
             var forkl = "<b>" + NK.html(g.st.tekst + " " + g.st.navn + " har M = " + NK.komma(g.st.M) + " g/mol.") + "</b> " +
-                NK.html("De andre: " + andre.join(" · ") + ".");
+                NK.html("De andre etiketter: " + andre.join(" · ") + ".");
             var naeste = this.naesteUloesteEllerIngen();
             var knap = naeste >= 0 ? "Næste flaske →" : null;
             if (!knap) forkl += " " + NK.html("Alle tolv flasker har fået etiket.");
@@ -316,7 +316,7 @@
         if (!o || o.faerdig || this.flyv) { this.kort.blink(); return; }
         if (!this.valgtKort) {
             this.kort.blink();
-            this.besked("Klik først på en etiket på tavlen. Så kan du sende den.", "peger");
+            this.besked("Klik først på en etiket på tavlen, og tryk derefter Indsend svar.", "peger");
             return;
         }
         var kk = this.valgtKort;

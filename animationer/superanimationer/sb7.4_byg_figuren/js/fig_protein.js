@@ -83,11 +83,11 @@
         vb: [1160, 654],
         lag: [
             { navn: "Peptidbindingen", pladser: ["peptidbinding", "dipeptid"],
-              ros: "Alanin og glycin kondenserer til et dipeptid. Peptidbindingen sidder mellem carbon og nitrogen." },
+              ros: "Alanin og glycin kondenserer til et dipeptid. Peptidbindingen sidder mellem et carbonatom og et nitrogenatom." },
             { navn: "Fire niveauer", pladser: ["protein", "primær struktur", "sekundær struktur", "tertiær struktur", "kvaternær struktur"],
-              ros: "Et protein beskrives på fire niveauer: rækkefølgen, mønstrene, hele foldningen og flere kæder sammen." },
+              ros: "Et protein beskrives på fire niveauer: aminosyrernes rækkefølge, mønstrene i kæden, hele kædens foldning og flere kæder samlet." },
             { navn: "Formen", pladser: ["α-helix", "β-foldeblad", "hydrofob vekselvirkning", "disulfidbro", "denaturering"],
-              ros: "Hydrogenbindinger, upolære sidekæder og disulfidbroer holder formen. Ved denaturering går formen tabt." }
+              ros: "Hydrogenbindinger, hydrofobe vekselvirkninger og disulfidbroer holder proteinet foldet. Ved denaturering folder proteinet sig ud." }
         ],
         pladser: [
             { id: "peptidbinding", ord: ["peptidbinding"], x: AMID[0] + AMID[2] / 2, y: KP.y + 32, maal: [AMID[0] + AMID[2] / 2, AMID[1] - 2], dele: ["amid"],

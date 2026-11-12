@@ -108,7 +108,7 @@
               omr: [{ r: [PO.x, PO.y, PO.b, PO.h, 10] }],
               fejl: { opløselighedsprodukt: "<b>opløselighedsprodukt</b> er konstanten Kₒ. Pladsen peger på pilene, der viser ioner, som går begge veje.",
                       opløselighed: "<b>opløselighed</b> er en mængde. Pladsen peger på pilene, der viser ioner, som går begge veje lige hurtigt.",
-                      fældningsreaktion: "<b>fældningsreaktion</b> går kun mod gitteret. Pilene viser, at ioner både forlader gitteret og sætter sig på det." } },
+                      fældningsreaktion: "<b>fældningsreaktion</b> forløber kun i én retning og danner fast stof. Pilene viser, at ioner både forlader gitteret og sætter sig på det." } },
             { id: "opløselighedsprodukt", ord: ["opløselighedsprodukt"], x: PX, y: L[0] - 7, maal: [0, 0], dele: ["ko"],
               omr: [],
               fejl: { opløselighed: "<b>opløselighed</b> er mængden af opløst salt, x. Pladsen peger på Kₒ og udtrykket med ionernes koncentrationer.",

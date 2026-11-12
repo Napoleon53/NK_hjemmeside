@@ -23,7 +23,7 @@
         "fane-h": [
             { sel: "#h-skort", titel: "Kortet øverst", tekst: "Kortet siger, hvilken ring du skal tegne. Tryk Indsend svar, når alle grupperne er sat." },
             { sel: "#h-anker-fischer", titel: "Fischerprojektionen", tekst: "Sukkeret som åben kæde. Se, om hver OH-gruppe står til højre eller til venstre." },
-            { sel: "#h-anker-ring", titel: "Ringen", tekst: "Klik på en grå cirkel over eller under et carbonatom for at sætte gruppen dér. Klik igen for at fjerne den." },
+            { sel: "#h-anker-ring", titel: "Ringen", tekst: "Klik på en grå cirkel over eller under et carbonatom for at sætte en OH-gruppe dér. Klik igen for at fjerne den." },
             { sel: "#h-opgaver", titel: "Opgaverne", tekst: "Fem opgaver. Den sidste går den anden vej, fra ringen til fischerprojektionen." }
         ],
         "fane-l": [

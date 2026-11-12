@@ -72,32 +72,32 @@
     var OPGAVER = [
         byggeopgave("C2H4", "Byg ethen, C₂H₄.",
             "Sæt to carbonatomer sammen, og gør bindingen mellem dem til en dobbeltbinding.",
-            "To carbonatomer med en dobbeltbinding. Hvert carbonatom har tre retninger, så alle atomer ligger i samme plan."),
+            "Ethen har en dobbeltbinding mellem de to carbonatomer. Hvert carbonatom har tre retninger, så alle atomer ligger i samme plan."),
         byggeopgave("CH3OH", "Byg methanol, CH₃OH.",
             "Start med carbon, og sæt et oxygenatom på. Hydrogen kommer selv på.",
-            "Carbon har fire retninger og er et tetraeder. Oxygen har to bindinger og to frie elektronpar og er vinklet."),
+            "Carbon har fire retninger, så formen omkring carbon er et tetraeder. Oxygen har to bindinger og to frie elektronpar, så formen omkring oxygen er vinklet."),
         byggeopgave("CO2", "Byg carbondioxid, CO₂.",
             "Der må ikke sidde hydrogen på carbon. Hvilken binding skal der så være til hvert oxygenatom?",
-            "To dobbeltbindinger. Carbon har to retninger, så molekylet er lineært."),
+            "Carbon har to dobbeltbindinger og dermed to retninger, så molekylet er lineært."),
         byggeopgave("HCN", "Byg blåsyre, HCN.",
             "Carbon og nitrogen skal dele tre elektronpar.",
-            "En tripelbinding mellem C og N. Carbon har to retninger, så molekylet er lineært."),
+            "C og N deler tre elektronpar i en tripelbinding. Carbon har to retninger, så molekylet er lineært."),
         byggeopgave("CH3COOH", "Byg eddikesyre, CH₃COOH.",
-            "Det ene carbonatom har to oxygenatomer: det ene med dobbeltbinding, det andet med enkeltbinding.",
-            "Carbonatomet med dobbeltbindingen er plant. Det andet carbonatom er et tetraeder."),
+            "Det ene carbonatom er bundet til to oxygenatomer, det ene med en dobbeltbinding og det andet med en enkeltbinding.",
+            "Formen omkring carbonatomet med dobbeltbindingen er plan. Formen omkring det andet carbonatom er et tetraeder."),
         byggeopgave("C2H5OH", "Byg ethanol, C₂H₅OH, og mål vinklen mellem C, O og H.",
             "Slå vinkelmåleren til, og klik på carbonatomet og hydrogenatomet, der sidder på oxygen.",
-            "Vinklen er 104,5°. Oxygen har to frie elektronpar, der trykker bindingerne sammen.", COH),
+            "Vinklen mellem C, O og H er 104,5°. Oxygen har to frie elektronpar, der trykker bindingerne sammen.", COH),
         function () {
             return {
-                tekst: "Byg et molekyle med et nitrogenatom, der er pyramideformet.",
+                tekst: "Byg et molekyle, hvor atomerne omkring et nitrogenatom danner en pyramide.",
                 hint: "Nitrogen med tre enkeltbindinger har ét frit elektronpar.",
-                svar: "Fx NH₃ eller CH₃NH₂. Tre bindinger og ét frit elektronpar giver en pyramide.",
+                svar: "Nitrogen i for eksempel NH₃ eller CH₃NH₂ har tre bindinger og ét frit elektronpar, og det giver en pyramide.",
                 start: function (sim) { sim.ryd(); },
                 kan: harAtomer,
                 fejl: function (sim) {
                     if (!B.antal(sim.s, "N")) return "Molekylet har intet nitrogenatom. Sæt et N på.";
-                    return "Intet nitrogenatom i molekylet er pyramideformet. Se formen omkring N i panelet.";
+                    return "Atomerne omkring nitrogen danner ikke en pyramide. Se formen omkring N i panelet.";
                 },
                 tjek: function (sim) {
                     var at = sim.maal ? sim.maal.atomer : [];
@@ -110,7 +110,7 @@
             return {
                 tekst: "Byg et molekyle med to carbonatomer, hvor alle atomerne ligger på en ret linje.",
                 hint: "En tripelbinding giver hvert carbonatom to retninger.",
-                svar: "Fx ethyn, H-C≡C-H. Hvert carbonatom har to retninger, 180° fra hinanden.",
+                svar: "Ethyn, H-C≡C-H, er et eksempel. Hvert carbonatom har to retninger, der ligger 180° fra hinanden.",
                 start: function (sim) { sim.ryd(); },
                 kan: harAtomer,
                 fejl: function (sim) {

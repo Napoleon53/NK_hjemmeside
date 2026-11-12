@@ -201,7 +201,7 @@
         }
         var goer = f.handling.replace(/^Prøv det: /, "");
         goer = goer.charAt(0).toUpperCase() + goer.slice(1);
-        this.fejlLinje(NK.html("Kuvetten står ikke, som opgaven siger: c = " + this.cTekst() + " og l = " + this.lTekst() + ". " + goer));
+        this.fejlLinje(NK.html("Med c = " + this.cTekst() + " og l = " + this.lTekst() + " passer kuvetten ikke med opgaven. " + goer));
     };
 
     P.vaelgSvar = function (j) {
@@ -238,7 +238,7 @@
     P.promptHTML = function () {
         var f = this.forud();
         if (this.fase === "gaet") {
-            return '<p class="note-tekst">Gæt først på kortet. Så prøver du det selv med skyderne her i panelet.</p>';
+            return '<p class="note-tekst">Gæt først på kortet, og prøv derefter selv med skyderne her i panelet.</p>';
         }
         var v = f.valg[this.valgt];
         return '<p class="note-tekst">Dit gæt: <b>' + NK.html(v.t) + "</b> (" + NK.html(v.n) + ")" +
@@ -255,7 +255,7 @@
             return { trin: ["Forudsigelsen handler om " + D.STOFFER[f.start.stof].navn + ". Vælg det i panelet til højre."], lys: "stof" };
         }
         if (m.A) {
-            trin = ["Se på A i displayet under detektoren, mens du skruer.",
+            trin = ["Se på A i displayet under detektoren, mens du ændrer c.",
                 "Skyderen c står i panelet til højre. A vokser, når c vokser.",
                 "Ved l = " + this.lTekst() + " giver c = " + this.cTekst(this.maalC()) + " en absorbans tæt på 1,00."];
             lys = "c";
@@ -420,19 +420,19 @@
                 this.briller = !this.briller;
                 this.fotoner = [];
                 if (this.briller) {
-                    this.kortBesked("Detektoren har fået solbriller på. Nu viser den 0,30 for meget ved alle målinger, også ved rent vand. " +
-                        "Derfor nulstiller man altid spektrofotometret med en blindprøve. Klik igen for at tage dem af.", 9);
+                    this.kortBesked("Detektoren har fået solbriller på. Nu viser den en absorbans, der er 0,30 for høj ved alle målinger, også ved rent vand. " +
+                        "Derfor nulstiller man altid spektrofotometret med en blindprøve. Klik igen for at tage solbrillerne af.", 9);
                 } else {
-                    this.kortBesked("Solbrillerne er taget af. Displayet viser igen kun det, kuvetten absorberer.", 4);
+                    this.kortBesked("Solbrillerne er taget af. Displayet viser igen kun den absorbans, der skyldes opløsningen i kuvetten.", 4);
                 }
             } else {
-                this.kortBesked("Detektoren måler det lys, der slipper gennem kuvetten. T og A står i displayet under den.", 5);
+                this.kortBesked("Detektoren måler det lys, der slipper gennem kuvetten. T og A står i displayet under detektoren.", 5);
             }
         } else if (h === "kuvette" || h === "vaeg") {
-            this.kortBesked("Kuvetten med " + s.navn + ", " + this.cTekst() + ". Lyset går " + this.lTekst() +
-                " gennem væsken. Træk i grebet på højre side for at gøre kuvetten bredere.", 6);
+            this.kortBesked("Kuvetten indeholder " + s.navn + " med koncentrationen " + this.cTekst() + ". Lysvejen gennem opløsningen er " + this.lTekst() +
+                ". Træk i grebet på højre side for at gøre kuvetten bredere.", 6);
         } else if (h === "lampe") {
-            this.kortBesked("Lampen sender lys med kun én bølgelængde: " + s.lambda + " nm. Det er det lys, " + s.navn + " absorberer mest.", 6);
+            this.kortBesked("Lampen sender kun lys med bølgelængden " + s.lambda + " nm, hvor " + s.navn + " absorberer mest.", 6);
         } else if (h === "kurve") {
             this.kortBesked("Kurven viser, hvor meget af lyset der er tilbage på vejen fra lampen til detektoren.", 5);
         }

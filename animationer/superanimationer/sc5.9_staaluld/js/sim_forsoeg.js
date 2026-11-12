@@ -149,7 +149,7 @@
         this.visKort();
         this.visListe();
         this.visKort();
-        this.besked("En ny klump ståluld på vægten. " + this.trinLinje(), "");
+        this.besked("En ny klump ståluld ligger på vægten. " + this.trinLinje(), "");
         this.visSkema();
         this.visGaet();
         this.fokus();
@@ -213,7 +213,7 @@
         var e = this.el.gaetLinje, s = this.gaet ? gaetSvar(this.gaet) : null;
         if (!s || this.nr !== 0 || this.gemtVist) { e.innerHTML = ""; return; }
         var efter = "";
-        if (this.faerdig) efter = s.ok ? ' <span class="holdt">Det holdt.</span>' : ' <span class="ikke">Den blev tungere.</span>';
+        if (this.faerdig) efter = s.ok ? ' <span class="holdt">Det holdt.</span>' : ' <span class="ikke">Stålulden blev tungere.</span>';
         e.innerHTML = '<img src="sprites/' + s.billede + '" alt=""><span>Dit gæt: <b>' + NK.html(s.t.toLowerCase()) + "</b>." + efter + "</span>";
     };
 
@@ -345,16 +345,16 @@
             if (v === m0) { this.noterFoer(); return; }
             this.rystFelt();
             if (this.klump.taendt && v === nu) {
-                this.besked("Det er det, vægten viser nu. m(før) er massen, før stålulden brændte. Start forfra i panelet, hvis du ikke så den.", "skidt");
+                this.besked("Du har skrevet det, vægten viser nu. m(før) er massen, før stålulden brændte. Start forfra i panelet, hvis du ikke så den.", "skidt");
             } else {
-                this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
+                this.besked("Det tal står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
             }
             return;
         }
         if (v === nu) { this.noterEfter("ok"); return; }
         this.rystFelt();
-        if (v === m0) this.besked("Det er m(før). m(efter) er det, vægten viser nu, hvor stålulden er brændt.", "skidt");
-        else this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
+        if (v === m0) this.besked("Du har skrevet m(før). m(efter) er det, vægten viser nu, hvor stålulden er brændt.", "skidt");
+        else this.besked("Det tal står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
     };
 
     P.noterFoer = function () {
@@ -374,7 +374,7 @@
         if (s && s.ok) dele.push("Dit gæt holdt.");
         dele.push("Stålulden tog " + K.g2(K.r2(this.noteret.me - this.noteret.mf)) + " g på.");
         dele.push(s && !s.ok ? s.forkl : o.efter);
-        if (this.klump.ude) dele.push(this.klump.brugtIlt ? "Den gik ud, før alt jernet havde reageret." : D.UDEN_ILT);
+        if (this.klump.ude) dele.push(this.klump.brugtIlt ? "Stålulden gik ud, før alt jernet havde reageret." : D.UDEN_ILT);
         this.forklaring = NK.html(dele.join(" "));
         this.sidsteFase = "faerdig";
         this.trinLoest(maade, maade === "svar" ? NK.html(D.SVAR.efter.replace("{m}", K.g2(this.noteret.me))) : null);
@@ -512,7 +512,7 @@
             if (this.faerdig) { this.kortBesked(""); return false; }
             if (k.taendt) {
                 this.kortBesked(k.braender() ? "Stålulden gløder allerede." : (k.ude ?
-                    "Stålulden er gået ud og kan ikke tændes igen. Start forfra i panelet, og brug flasken med dioxygen, mens den gløder." :
+                    "Stålulden er gået ud og kan ikke tændes igen. Start forfra i panelet, og brug flasken med dioxygen, mens stålulden gløder." :
                     "Stålulden er brændt færdig. Tryk på Start forfra i panelet for en ny klump."));
                 return false;
             }
@@ -526,7 +526,7 @@
                 k.givIlt();
                 this.kortBesked("Ren dioxygen fra flasken. Stålulden gløder kraftigere.", 2.5);
             } else if (k.ude) {
-                this.kortBesked("Stålulden er gået ud. Flasken med dioxygen skal bruges, mens den gløder.");
+                this.kortBesked("Stålulden er gået ud. Flasken med dioxygen skal bruges, mens stålulden gløder.");
             } else if (k.taendt) {
                 this.kortBesked("Alt det jern, dioxygenet kan nå, har reageret.");
             } else {
@@ -540,7 +540,7 @@
                     (k.ude ? "Stålulden er gået ud. De grå tråde nåede ikke at reagere." :
                         "Stålulden er blevet sort. Jernet er blevet til jernoxid.")));
         }
-        if (u === "vaegt") this.kortBesked("Vægten er nulstillet med den varmefaste plade. Den viser kun stålulden.");
+        if (u === "vaegt") this.kortBesked("Vægten er nulstillet med den varmefaste plade og viser derfor kun massen af stålulden.");
         if (u === "zoom") this.kortBesked("Luppen viser overfladen af en ståltråd. Dioxygen fra luften sætter sig på jernatomerne. Dinitrogen reagerer ikke.");
         return false;
     };
@@ -567,7 +567,7 @@
             return;
         }
         this.braenderHjem();
-        this.kortBesked("Hold flammen mod stålulden, eller klik bare på brænderen.");
+        this.kortBesked("Hold flammen mod stålulden, eller klik på brænderen.");
     };
 
     /* ----- Layout ----------------------------------------------------------------------- */

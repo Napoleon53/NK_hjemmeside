@@ -31,9 +31,9 @@
             typer: ["cis", "trans"],
             svar: [["cis", "cis", "c", "cis: de to ens grupper på samme side (tast C)"],
                    ["trans", "trans", "t", "trans: de to ens grupper på hver sin side (tast T)"],
-                   ["ingen", "Ingen cis/trans-isomeri", "i", "Tast I"]],
-            start: "15 molekyler. cis: de to ens grupper sidder på samme side af dobbeltbindingen. trans: de sidder på hver sin side.",
-            spm: "Er molekylet cis, trans eller uden cis/trans-isomeri?"
+                   ["ingen", "Ingen cis-trans-isomeri", "i", "Tast I"]],
+            start: "Spillet har 15 molekyler. I cis-formen sidder de to ens grupper på samme side af dobbeltbindingen, og i trans-formen sidder de på hver sin side.",
+            spm: "Er molekylet cis, trans eller uden cis-trans-isomeri?"
         },
         ez: {
             titel: "E eller Z?", skilt: "E, Z eller ingen?", rekord: "nk-sb4.6-rekord", model: NK.EZ,
@@ -41,7 +41,7 @@
             svar: [["E", "E", "e", "E: på hver sin side (tast E)"],
                    ["Z", "Z", "z", "Z: på samme side (tast Z)"],
                    ["ingen", "Ingen E/Z-isomeri", "i", "Tast I"]],
-            start: "15 molekyler. Z: de to grupper med højest prioritet sidder på samme side af dobbeltbindingen. E: de sidder på hver sin side.",
+            start: "Spillet har 15 molekyler. I Z-formen sidder de to grupper med højest prioritet på samme side af dobbeltbindingen, og i E-formen sidder de på hver sin side.",
             spm: "Er molekylet E, Z eller uden E/Z-isomeri?"
         }
     };

@@ -758,7 +758,7 @@
                 "Et gangetegn står mellem to koncentrationer.",
                 "Slet det gangetegn, der er i overskud."] };
         case "en":
-            return { s: null, trin: ["Se på 1 i " + zn + ".", "1 skriver man kun, når der ikke står andet.", "Slet 1."] };
+            return { s: null, trin: ["Se på 1 i " + zn + ".", "1 skrives kun, når der ikke står andet i " + zn + ".", "Slet 1."] };
         case "eks-foerst":
             return { s: null, trin: ["Se på eksponenten " + NK.haevet(d.v) + ".", "En eksponent hører til koncentrationen lige foran den.",
                 "Skriv eksponenten lige efter ]."] };
@@ -793,7 +793,7 @@
                     "Der står " + d.k + " foran " + f + ". Koefficienten bliver til eksponenten.", "Leddet skal være " + M.led(d.s, d.k) + "."] };
             }
             return { s: d.s, trin: ["Se på tallet foran " + f + " i reaktionsskemaet.",
-                "Der står ikke noget tal foran " + f + ". Så er eksponenten 1, og den skrives ikke.", "Slet eksponenten efter " + K + "."] };
+                "Der står ikke noget tal foran " + f + ". Eksponenten er derfor 1, og den skrives ikke.", "Slet eksponenten efter " + K + "."] };
         }
         return begynd("num");
     };

@@ -37,7 +37,7 @@
         vb: [1000, 360],
         lag: [
             { navn: "Hastighedsudtrykket", pladser: ["hastighedsudtryk", "hastighedskonstant", "eksponent"],
-              ros: "Hastighedsudtrykket viser, hvordan farten afhænger af koncentrationerne. Eksponenterne x og y findes ved forsøg." }
+              ros: "Hastighedsudtrykket viser, hvordan reaktionshastigheden afhænger af koncentrationerne. Eksponenterne x og y findes ved forsøg." }
         ],
         pladser: [
             { id: "hastighedsudtryk", ord: ["hastighedsudtryk"], x: K.x + K.b / 2, y: K.y, maal: [K.x + K.b / 2, K.y], titel: true, dele: ["formel"],

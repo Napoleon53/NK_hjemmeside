@@ -18,8 +18,8 @@
         "fane-k": [
             { sel: "#k-skort", titel: "Kortet øverst", tekst: "Al tekst står her. Flyt flasken, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#k-anker-skala", titel: "Skalaen", tekst: "Kₛ-skalaen står over pKₛ-skalaen. Farverne er bogens fire grupper fra stærke til meget svage syrer." },
-            { sel: "#k-anker-hylde", titel: "Flasken", tekst: "Skiltet viser syrens Kₛ. Træk flasken op på skalaen, eller klik på skalaen. Piletasterne flytter den 0,1." },
-            { sel: "#k-anker-lup", titel: "Luppen", tekst: "100 af syrens partikler i 0,10 M. Blå partikler har afgivet hydronen, og den sidder nu på vand som H₃O⁺." }
+            { sel: "#k-anker-hylde", titel: "Flasken", tekst: "Skiltet viser syrens Kₛ. Træk flasken op på skalaen, eller klik på skalaen. Piletasterne flytter flasken 0,1 i pKₛ." },
+            { sel: "#k-anker-lup", titel: "Luppen", tekst: "Luppen viser 100 af syrens partikler i en 0,10 M opløsning. De blå partikler har afgivet deres hydron til vand, så der er dannet H₃O⁺." }
         ],
         "fane-r": [
             { sel: "#r-skort", titel: "Kortet øverst", tekst: "Kortet stiller spørgsmålet til det trin, du er ved. Vælg et svar eller skriv et tal, og tryk Indsend svar." },
@@ -32,7 +32,7 @@
             { sel: "#u-anker-maaler", titel: "pH-metret", tekst: "Kolben har en ukendt syre med en kendt koncentration. pH-metret måler pH, når du trykker Mål pH." },
             { sel: "#u-anker-skema", titel: "Reaktionsskemaet", tekst: "Syren afgiver en hydron til vand. Under stofferne kommer [H₃O⁺], [B] og [S] frem, når du har regnet dem." },
             { sel: "#u-anker-rammer", titel: "Kₛ og pKₛ", tekst: "Kₛ regnes med koncentrationerne fra skemaet. Tallene har samme farve som stofferne. Den gule ramme er det trin, du er ved." },
-            { sel: "#u-flaskekort", titel: "Flaskerne", tekst: "Tre ukendte syrer. Flaske A har alle trin, og i B og C går det hurtigere." }
+            { sel: "#u-flaskekort", titel: "Flaskerne", tekst: "Tre ukendte syrer. Flaske A har alle trin, og flaske B og C har færre trin." }
         ]
     };
     var trin = [];

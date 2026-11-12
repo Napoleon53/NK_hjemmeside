@@ -70,7 +70,7 @@
             if (!u) { this.toast("Klik på et atom, eller træk fra et atom, for at tegne videre."); return; }
             if (u.slags === "binding") {
                 if (mig.jagt && mig.jagt.dobbelt && (v === "binding" || v === "tegn")) { this.skiftBinding(u.binding); return; }
-                this.toast("Isomererne her har kun enkeltbindinger. Træk fra et atom for at tegne.");
+                this.toast("Isomererne i denne jagt har kun enkeltbindinger. Træk fra et atom for at tegne.");
                 return;
             }
             if (u.slags !== "atom") return;
@@ -284,7 +284,7 @@
         var k = NK.el("j-quiz"), til = this.quizTil();
         k.classList.toggle("til", til);
         k.setAttribute("aria-checked", til ? "true" : "false");
-        NK.saetTekst("j-quiz-note", til ? "Efter hver ny isomer: hvilken slags isomerer?" : "Slået fra: du kan tegne isomerer uden afbrydelser.");
+        NK.saetTekst("j-quiz-note", til ? "Efter hver ny isomer spørger kortet, hvilken slags isomeri der er tale om." : "Slået fra. Du kan tegne isomererne uden afbrydelser.");
     };
 
     /* Et klik med O valgt: carbonatomet bliver til et oxygenatom, og et

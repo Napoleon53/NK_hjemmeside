@@ -113,10 +113,10 @@
             "Heptan består kun af C og H. Hvor stor er forskellen i elektronegativitet?",
             "C og H har næsten samme elektronegativitet, så heptan er upolært. Molekylerne drejer sig ikke mod staven."),
         valgopgave("Strålen bøjer mod både den positive og den negative stav. Hvad viser det?",
-            ["Molekylerne er polære, ikke ladede", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
+            ["Vandmolekylerne er polære, ikke ladede", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
             "Et ladet stof ville blive frastødt af den ene stav.",
             "Var vandet ladet, ville den ene stav frastøde det. Vandmolekylerne er neutrale, men polære."),
-        valgopgave("Hvorfor bøjer ethanol mindre end vand?",
+        valgopgave("Hvorfor bøjer strålen af ethanol mindre end vandstrålen?",
             ["Ethanol har en upolær carbonkæde", "Ethanol er helt upolært", "Ethanol har ingen O-H-binding", "Ethanol er tungere end vand"],
             "Se på, hvilken del af ethanolmolekylet der er polær.",
             "Ethanol har en polær OH-gruppe, men resten af molekylet er upolært. Derfor bøjer strålen mindre end vandstrålen.")

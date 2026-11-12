@@ -22,23 +22,23 @@
             { sel: "#forsoeg-anker-glas", titel: "Karret og måleglasset", tekst: "Måleglasset er fyldt med vand og står på hovedet i karret. Træk lighteren ned under det, og hold musen nede på den. Gassen skubber vandet ned." },
             { sel: "#forsoeg-anker-lup", titel: "Luppen", tekst: "Vandet i måleglasset, forstørret. Læs rumfanget ud for bunden af den buede vandoverflade." },
             { sel: "#forsoeg-anker-papir", titel: "Papiret", tekst: "Lighteren er våd, når den kommer op af vandet. Stil den på papiret, før den vejes igen." },
-            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "m(før), V og m(efter) for begge målinger. Aflæs vægten skriver vægtens tal. V læser du selv i luppen. Tallene bruges på fanen Beregningen." },
-            { sel: "#forsoeg-kort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Indsend svar sender det tal, du har skrevet i skemaet. Giv hint giver et hint og derefter svaret." },
+            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Skemaet har m(før), V og m(efter) for begge målinger. Knappen Aflæs vægten skriver vægtens tal. V læser du selv i luppen. Tallene bruges på fanen Beregningen." },
+            { sel: "#forsoeg-kort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal gøre nu. Indsend svar sender det tal, du har skrevet i skemaet. Giv hint giver et hint og derefter svaret." },
             { sel: "#forsoeg-forfra", titel: "Start forfra", tekst: "Knappen i panelet giver en ny lighter og et måleglas fyldt med vand." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra masse og rumfang til molarmassen og alkanen. Fejlkilder: hvad sker der, når noget går galt?" }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra masse og rumfang til molarmassen og alkanen. Fejlkilder: Hvad sker der, når noget går galt?" }
         ],
         "fane-beregning": [
             { sel: "#beregning-kort", titel: "Opgaven", tekst: "Kortet øverst har opgaven og det næste skridt. Indsend svar sender det, du har skrevet eller valgt. Giv hint giver et hint og derefter svaret." },
             { sel: "#beregning-anker-tavle", titel: "Tavlen", tekst: "Molvolumenet, opgavens tal og beregningerne. En beregning står der, når den er rigtig." },
-            { sel: "#beregning-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med symboler, fx m(gas) = m(før) − m(efter), og tryk på Indsend svar eller Enter. Så tallet." },
+            { sel: "#beregning-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med symboler, for eksempel m(gas) = m(før) − m(efter). Tryk på Indsend svar eller Enter, og skriv derefter tallet." },
             { sel: "#beregning-anker-graf", titel: "Alkanerne", tekst: "De fem første alkaner og deres molarmasser. Din egen molarmasse kommer som en stiplet linje." },
             { sel: "#beregning-opsum", titel: "Opsummeringen", tekst: "De to målinger side om side." },
-            { sel: "#beregning-opgaver", titel: "Opgaverne", tekst: "Tre opgaver. Den sidste er en ukendt gas. Nye tal giver en anden gas." }
+            { sel: "#beregning-opgaver", titel: "Opgaverne", tekst: "Der er tre opgaver, og den sidste handler om en ukendt gas. Knappen Nye tal giver en anden gas." }
         ],
         "fane-fejl": [
-            { sel: "#fejl-anker-a", titel: "Gruppe A", tekst: "Gør det rigtigt: tør lighter, alle bobler i måleglasset, glasset fyldt helt med vand og 20 °C." },
-            { sel: "#fejl-anker-b", titel: "Gruppe B", tekst: "Gør én ting anderledes. Den står på kortet øverst." },
-            { sel: "#fejl-kort", titel: "Gæt først", tekst: "Bliver B's molarmasse højere, lavere eller den samme? Klik på dit gæt på kortet. Så laver begge grupper forsøget." },
+            { sel: "#fejl-anker-a", titel: "Gruppe A", tekst: "Gruppe A gør det rigtigt: tør lighter, alle bobler i måleglasset, glasset fyldt helt med vand og 20 °C." },
+            { sel: "#fejl-anker-b", titel: "Gruppe B", tekst: "Gruppe B gør én ting anderledes, og kortet øverst siger hvilken." },
+            { sel: "#fejl-kort", titel: "Gæt først", tekst: "Bliver gruppe B's molarmasse højere, lavere eller den samme? Klik på dit gæt på kortet. Så laver begge grupper forsøget." },
             { sel: "#fejl-resultat", titel: "Resultaterne", tekst: "Det, de to grupper skriver, og den molarmasse, de regner ud." },
             { sel: "#fejl-opgaver", titel: "Fejlkilderne", tekst: "Seks ting, der kan gå galt. Et rigtigt gæt første gang giver en stjerne." }
         ]

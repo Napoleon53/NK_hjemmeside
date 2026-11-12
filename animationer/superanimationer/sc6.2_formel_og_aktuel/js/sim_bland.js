@@ -81,7 +81,7 @@
         var o = this.opg, f = o.facit, ion = D.ion(o.ion).t;
         if (o.id === "samme") return NK.html("Ionerne er i det samme glas, så bidragene lægges sammen: [" + ion + "] = " + K.c(f.total) + " M.");
         var t = "[" + ion + "] = " + K.c(f.ionBland) + " M i blandingen.";
-        if (o.ion2) t += " [" + D.ion(o.ion2).t + "] = " + K.c(f.ion2) + " M: ionen fra det ene glas fordeler sig i det hele.";
+        if (o.ion2) t += " [" + D.ion(o.ion2).t + "] = " + K.c(f.ion2) + " M, fordi ionen fra det ene glas fordeler sig i hele blandingen.";
         else if (o.id === "lige") t += " Stofmængderne lægges sammen, og det gør rumfangene også.";
         return NK.html(t);
     };
@@ -204,7 +204,7 @@
             if (i(lay.vaegtA) || i(lay.vaegtB)) {
                 this.kortBesked("Saltet er vejet af. Det kommer i vandet, når du har regnet dets koncentration.");
             } else if (i(lay.mix)) {
-                this.kortBesked(K.mL(this.opg.tal.V) + " mL vand. Et salt kommer i, når du har regnet dets koncentration.");
+                this.kortBesked("Glasset har " + K.mL(this.opg.tal.V) + " mL vand. Et salt kommer i, når du har regnet dets koncentration.");
             }
             return false;
         }

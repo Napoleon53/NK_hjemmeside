@@ -12,24 +12,24 @@
     var TURE = {
         "fane-kryds": [
             { sel: "#kryds-laerred", titel: "Forsøget", tekst: "Træk måleglasset med syre hen over bægerglasset. Uret starter, når syren rammer." },
-            { sel: "#kryds-maaling", titel: "Uret", tekst: "Kig på krydset oppefra, og tryk Stop, når du ikke kan se det. Målingerne samles her." },
-            { sel: "#kryds-blanding", titel: "Blandingen", tekst: "Vælg, hvor meget Na₂S₂O₃ der er i glasset. Koncentrationen fordobles fra knap til knap." },
+            { sel: "#kryds-maaling", titel: "Uret", tekst: "Kig på krydset oppefra, og tryk på Stop uret, når du ikke længere kan se krydset. Målingerne samles her." },
+            { sel: "#kryds-blanding", titel: "Blandingen", tekst: "Vælg, hvor meget Na₂S₂O₃ der er i bægerglasset. [S₂O₃²⁻] fordobles fra knap til knap." },
             { sel: "#kryds-skort", titel: "Quizzen", tekst: "Fem spørgsmål om forsøget på kortet. Vælg et svar, og tryk Indsend svar." },
             { sel: "#teoriknap", titel: "Teorien", tekst: "Reaktionen, og hvorfor 1/Δt er et mål for hastigheden." },
-            { sel: ".faneknapper", titel: "Næste fane", tekst: "Koncentration: find ud af, hvad hastigheden afhænger af." }
+            { sel: ".faneknapper", titel: "Næste fane", tekst: "I fanen Koncentration undersøger du, hvad hastigheden afhænger af." }
         ],
         "fane-konc": [
             { sel: "#konc-forsoeg", titel: "Blandingen", tekst: "Vælg rumfangene, og tryk Bland og mål. Uret stopper selv." },
-            { sel: "#konc-tabel", titel: "Tabellen", tekst: "Regn [S₂O₃²⁻] og [H₃O⁺] i glasset ud, og skriv dem ind. Efter to rigtige i en kolonne regnes resten for dig." },
-            { sel: "#konc-laerred", titel: "Grafen", tekst: "Et punkt for hvert tal, du har regnet ud. 1/Δt er et mål for hastigheden." },
+            { sel: "#konc-tabel", titel: "Tabellen", tekst: "Regn [S₂O₃²⁻] og [H₃O⁺] i glasset ud, og skriv dem ind. Efter to rigtige tal i en kolonne regnes resten af kolonnen for dig." },
+            { sel: "#konc-laerred", titel: "Grafen", tekst: "Grafen får et punkt for hver koncentration, du har regnet ud. 1/Δt er et mål for hastigheden." },
             { sel: "#konc-akse", titel: "Vandret akse", tekst: "Skift mellem [S₂O₃²⁻] og [H₃O⁺]." },
-            { sel: "#konc-skort", titel: "Opgaven", tekst: "Svar på kortet, og prøv det så med et forsøg." }
+            { sel: "#konc-skort", titel: "Opgaven", tekst: "Svar på opgaven på kortet, og afprøv derefter svaret med et forsøg." }
         ],
         "fane-temp": [
             { sel: "#temp-forsoeg", titel: "Temperaturen", tekst: "Samme blanding hver gang. Vælg temperaturen, og mål." },
-            { sel: "#temp-laerred", titel: "Grafen", tekst: "1/Δt mod temperaturen. Hvor meget større bliver den for hver 10 °C?" },
+            { sel: "#temp-laerred", titel: "Grafen", tekst: "Grafen viser 1/Δt mod temperaturen. Hvor mange gange større bliver 1/Δt for hver 10 °C?" },
             { sel: "#temp-tabel", titel: "Tabellen", tekst: "Alle forsøg samles her." },
-            { sel: "#temp-skort", titel: "Opgaven", tekst: "Tjek tommelfingerreglen om en fordobling pr. 10 °C." }
+            { sel: "#temp-skort", titel: "Opgaven", tekst: "Undersøg tommelfingerreglen om, at hastigheden fordobles for hver 10 °C." }
         ]
     };
 

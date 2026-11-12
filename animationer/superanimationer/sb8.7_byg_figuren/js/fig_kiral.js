@@ -87,14 +87,14 @@
         vb: [1160, 660],
         lag: [
             { navn: "Ibuprofen", pladser: ["kiral", "kiralt center", "asymmetrisk carbonatom"],
-              ros: "Ibuprofen er kiral, fordi ét carbonatom har fire forskellige grupper. Det er molekylets kirale center." },
+              ros: "Ibuprofen er kiral, fordi ét carbonatom er bundet til fire forskellige grupper. Det er molekylets kirale center." },
             { navn: "To former", pladser: ["spejlbilledformer", "spejlbilledisomerer", "racemisk blanding"],
               ros: "De to spejlbilledformer er hinandens spejlbilleder. En racemisk blanding har lige meget af hver form." }
         ],
         pladser: [
             { id: "kiral", ord: ["kiral"], x: 176, y: KA.y + KA.h - 30, maal: [HELT[0] + 14, HELT[1] + HELT[3]], dele: ["helt"],
               omr: [{ r: [HELT[0], HELT[1], HELT[2], HELT[3], 16] }],
-              fejl: { "kiralt center": "<b>kiralt center</b> er ét carbonatom. Pladsen siger noget om hele molekylet, som ikke kan dække sit spejlbillede.",
+              fejl: { "kiralt center": "<b>kiralt center</b> er ét carbonatom. Pladsen siger noget om hele molekylet, som ikke kan bringes til at dække sit spejlbillede.",
                       "asymmetrisk carbonatom": "<b>asymmetrisk carbonatom</b> er ét carbonatom. Pladsen siger noget om hele molekylet ibuprofen.",
                       "racemisk blanding": "<b>racemisk blanding</b> er en blanding af to former. Pladsen siger noget om ét molekyle ibuprofen.",
                       spejlbilledformer: "<b>spejlbilledformer</b> er to udgaver af molekylet. Pladsen siger noget om ét molekyle ibuprofen." } },

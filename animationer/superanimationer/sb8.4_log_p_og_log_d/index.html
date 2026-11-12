@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log P og log D</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>Log <i>P</i> og log <i>D</i></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-p" role="tab" aria-selected="true"><span class="nr">1</span>Log <i>P</i></button>
+        <button class="faneknap" data-fane="fane-d" role="tab" aria-selected="false"><span class="nr">2</span>Log <i>D</i> og pH</button>
+        <button class="faneknap" data-fane="fane-b" role="tab" aria-selected="false"><span class="nr">3</span>Syre eller base</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LOG P                                                      -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-p" role="tabpanel" aria-label="Log P">
+    <div class="scene">
+        <canvas id="p-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="p-skort">
+            <div class="sk-ind" id="p-ind"></div>
+            <div class="sk-bund" id="p-status">
+                <p class="st-tekst" id="p-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="p-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="p-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="p-anker-tragt"></div>
+        <div class="anker" id="p-anker-lup"></div>
+        <div class="anker" id="p-anker-kasse"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="p-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="p-maerke"></span></h2>
+            <ol class="trinliste" id="p-trin"></ol>
+            <button class="knap igenknap" id="p-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="p-om">
+            <h2>Om luppen</h2>
+            <p class="note-tekst">Luppen forstørrer grænsen mellem de to lag. Den viser lige store rumfang af octan-1-ol og vand, og hver orange kugle er et molekyle af stoffet.</p>
+        </div>
+
+        <div class="kort" id="p-proev" hidden>
+            <h2>Prøv et andet stof</h2>
+            <div class="stofvalg" id="p-stoffer">
+                <button class="knap stofknap" type="button" data-stof="glu">Glucose</button>
+                <button class="knap stofknap" type="button" data-stof="para">Paracetamol</button>
+                <button class="knap stofknap" type="button" data-stof="ibu">Ibuprofen</button>
+            </div>
+            <p class="note-tekst">Vælg et stof, og klik på skilletragten for at ryste den.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: LOG D OG PH                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-d" role="tabpanel" aria-label="Log D og pH">
+    <div class="scene">
+        <canvas id="d-laerred"></canvas>
+        <div class="scenekort" id="d-skort">
+            <div class="sk-ind" id="d-ind"></div>
+            <div class="sk-bund" id="d-status">
+                <p class="st-tekst" id="d-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="d-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="d-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="d-anker-tragt"></div>
+        <div class="anker" id="d-anker-lup"></div>
+        <div class="anker" id="d-anker-graf"></div>
+        <div class="anker" id="d-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="d-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="d-maerke"></span></h2>
+            <ol class="trinliste" id="d-trin"></ol>
+            <button class="knap igenknap" id="d-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="d-om">
+            <h2>Om stoffet</h2>
+            <p class="note-tekst" id="d-omstof"></p>
+            <p class="note-tekst" id="d-omlup"></p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: SYRE ELLER BASE                                            -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-b" role="tabpanel" aria-label="Syre eller base">
+    <div class="scene">
+        <canvas id="b-laerred"></canvas>
+        <div class="scenekort" id="b-skort">
+            <div class="sk-ind" id="b-ind"></div>
+            <div class="sk-bund" id="b-status">
+                <p class="st-tekst" id="b-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="b-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="b-anker-tragt"></div>
+        <div class="anker" id="b-anker-lup"></div>
+        <div class="anker" id="b-anker-graf"></div>
+        <div class="anker" id="b-anker-skyder"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="b-trinkort">
+            <h2>Trinnene <span class="taeller maerke-tekst" id="b-maerke"></span></h2>
+            <ol class="trinliste" id="b-trin"></ol>
+            <button class="knap igenknap" id="b-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="b-om">
+            <h2>Om stoffet</h2>
+            <p class="note-tekst" id="b-omstof"></p>
+            <p class="note-tekst" id="b-omlup"></p>
+        </div>
+
+        <div class="kort" id="b-proev" hidden>
+            <h2>Vælg et stof</h2>
+            <div class="stofvalg" id="b-stoffer">
+                <button class="knap stofknap" type="button" data-stof="asa">Acetylsalicylsyre</button>
+                <button class="knap stofknap" type="button" data-stof="amf">Amfetamin</button>
+                <button class="knap stofknap" type="button" data-stof="lid">Lidocain</button>
+            </div>
+            <p class="note-tekst">Træk i skyderen, og tegn stoffets kurve.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Log <i>P</i> og log <i>D</i></h2>
+        <h3 class="teori-hoved">Fordelingskonstanten og log <i>P</i></h3>
+        <p>Rystes et stof med octan-1-ol og vand, fordeler stoffet sig mellem de to lag. Fordelingen er en ligevægt, og ligevægtskonstanten kaldes fordelingskonstanten:</p>
+        <p class="teori-formel"><i>K</i><sub>F</sub> = [stof i octanol] / [stof i vand] &nbsp;&nbsp; og &nbsp;&nbsp; log <i>P</i> = log <i>K</i><sub>F</sub></p>
+        <p>En positiv log <i>P</i> betyder, at der er mest stof i octanol, og en negativ log <i>P</i>, at der er mest stof i vand.</p>
+        <h3 class="teori-hoved">Log <i>D</i></h3>
+        <p>Log <i>P</i> gælder kun den uladede form. Log <i>D</i> medregner også den ladede form i vandlaget og afhænger derfor af pH. Ionen går næsten ikke over i octan-1-ol.</p>
+        <p class="teori-formel">For en syre: log <i>D</i> = log <i>P</i> − log(1 + 10<sup>pH − p<i>K</i><sub>s</sub></sup>)</p>
+        <p class="teori-formel">For en base: log <i>D</i> = log <i>P</i> − log(1 + 10<sup>p<i>K</i><sub>s</sub> − pH</sup>)</p>
+        <h3 class="teori-hoved">Genvejen</h3>
+        <p>Når stoffet er næsten helt uladet, er log <i>D</i> ≈ log <i>P</i>. Når stoffet er næsten helt ladet, falder log <i>D</i> med 1, hver gang afstanden mellem pH og p<i>K</i><sub>s</sub> vokser med én pH-enhed. Genvejen kan bruges, når pH ligger mindst 1,5 fra p<i>K</i><sub>s</sub>.</p>
+        <h3 class="teori-hoved">Optagelse i kroppen</h3>
+        <p>Kun den uladede form kan passere en cellemembran. En syre har højest log <i>D</i> ved lav pH, og en base har højest log <i>D</i> ved høj pH.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> pH &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/scene.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_logp.js"></script>
+<script src="js/sim_kurve.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

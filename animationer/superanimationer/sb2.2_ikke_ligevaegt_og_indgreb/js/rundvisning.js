@@ -16,8 +16,8 @@
     var TURE = {
         "fane-i": [
             { sel: "#i-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har svarknapper på kortet. Vælg et svar på et spørgsmål, og tryk Indsend svar. Når svaret er rigtigt, står forklaringen på kortet. Blinker kortet, skal du først gøre det, kortet siger." },
-            { sel: "#i-anker-beholder", titel: "Beholderen", tekst: "En lukket beholder med CO, H₂O, CO₂ og H₂. Hvert molekyle står for 0,025 M. Når reaktionen forløber, bliver et par molekyler lavet om ad gangen. Klik på et molekyle for at se, hvad det er." },
-            { sel: "#i-anker-knapper", titel: "Indgrebene", tekst: "Når opgaven beder om det, kan du pumpe et stof ind (+) eller fjerne det (−). Hver gang er det 0,10 M." },
+            { sel: "#i-anker-beholder", titel: "Beholderen", tekst: "Beholderen er lukket og indeholder CO, H₂O, CO₂ og H₂. Hvert molekyle står for 0,025 M. Når reaktionen forløber, bliver et par molekyler omdannet ad gangen. Klik på et molekyle for at se, hvad det er." },
+            { sel: "#i-anker-knapper", titel: "Indgrebene", tekst: "Når opgaven beder om det, kan du pumpe et stof ind (+) eller fjerne det (−). Hvert klik ændrer koncentrationen med 0,10 M." },
             { sel: "#i-anker-tallinje", titel: "Tallinjen", tekst: "Reaktionsbrøken Y og ligevægtskonstanten K. Står Y til venstre for K, går reaktionen mod højre. Står Y til højre for K, går den mod venstre. Den tomme, stiplede ring viser Y før indgrebet." },
             { sel: "#i-konckort", titel: "Koncentrationerne", tekst: "Koncentrationerne og Y før indgrebet, lige efter det og nu." },
             { sel: "#i-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
@@ -29,7 +29,7 @@
             { sel: "#b-anker-lunge", titel: "Lungerne", tekst: "I lungerne kommer der dioxygen ind i blodet fra luften. Når opgaven beder om det, sender et klik på lungerne blodet derhen." },
             { sel: "#b-anker-muskel", titel: "Musklen", tekst: "Musklen bruger dioxygen. Når opgaven beder om det, sender et klik på musklen blodet derhen." },
             { sel: "#b-anker-lup", titel: "Luppen", tekst: "En lille portion af blodet: 12 Hb og de frie O₂. En Hb med O₂ på er lysere rød og hedder HbO₂. For at gøre det enkelt har hver Hb kun ét sted, hvor et O₂ kan sætte sig." },
-            { sel: "#b-anker-tallinje", titel: "Tallinjen", tekst: "Reaktionsbrøken Y = [HbO₂] / ([Hb] · [O₂]) og ligevægtskonstanten K. Når [O₂] springer, springer Y væk fra K, og reaktionen går tilbage mod K." },
+            { sel: "#b-anker-tallinje", titel: "Tallinjen", tekst: "Tallinjen viser reaktionsbrøken Y = [HbO₂] / ([Hb] · [O₂]) og ligevægtskonstanten K. Når [O₂] ændrer sig brat, flytter Y sig væk fra K, og reaktionen forløber, til Y igen er lig med K." },
             { sel: "#b-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
             { sel: "#b-luppenkort", titel: "Tallene i luppen", tekst: "Hvor mange Hb der har O₂ på, og hvor mange frie O₂ der er i luppen." },
             { sel: "#b-opgaver", titel: "Opgaverne", tekst: "Fem opgaver om lungerne, musklen og bjergene." }

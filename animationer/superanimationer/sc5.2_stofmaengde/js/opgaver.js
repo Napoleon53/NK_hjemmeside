@@ -98,8 +98,8 @@
             efter: D.regnMasse(cu, 3, null, NK.komma(D.masse(cu, 3))) + ". Hver klump er 1 mol."
         },
         {
-            navn: "Opvarmning", tekst: "Læg 3 mol guld ved siden af kobberet.",
-            hint: "Træk tre klumper fra krukken med guld op. Kobberet bliver liggende.",
+            navn: "Opvarmning", tekst: "Læg 3 mol guld på vægten ved siden af kobberet.",
+            hint: "Træk tre klumper fra krukken med guld op på vægten. Kobberet bliver liggende.",
             fremhaev: ["Au"], svar: { Cu: 3, Au: 3 }, start: { Cu: 3 }, tjek: praecis({ Cu: 3, Au: 3 }),
             efter: "Lige mange mol af hver, men guldet vejer " + g(D.masse(au, 3)) +
                 " og kobberet kun " + g(D.masse(cu, 3)) + "."
@@ -170,7 +170,7 @@
                 svar[a.s] = ka;
                 svar[b.s] = kb;
                 return {
-                    tekst: "Bland " + a.navn + " og " + b.navn + ": " + N + " mol i alt, og vægten skal vise " + g(X) + ".",
+                    tekst: "Bland " + a.navn + " og " + b.navn + ", så der er " + N + " mol i alt, og vægten viser " + g(X) + ".",
                     hint: "Start med " + N + " mol " + a.navn + ". Hver klump, du bytter til " + b.navn +
                         ", lægger " + g(b.M - a.M) + " til.",
                     fremhaev: [a.s, b.s], svar: svar,
@@ -179,7 +179,7 @@
                         if (ens(k.tal, svar)) return { ok: true };
                         var andre = k.dele.some(function (d) { return d.st !== a && d.st !== b; });
                         if (andre) return { besked: "Brug kun " + a.navn + " og " + b.navn + "." };
-                        if (k.n === N) return { besked: N + " mol og " + g(k.m) + ". Det er for " + (k.m > X ? "meget." : "lidt.") };
+                        if (k.n === N) return { besked: N + " mol vejer " + g(k.m) + ". Det er for " + (k.m > X ? "meget." : "lidt.") };
                         if (k.n > N) return { besked: "Der skal ligge " + N + " mol i alt." };
                         return null;
                     }
@@ -197,13 +197,13 @@
                     hint: "Brug det stof, hvor 1 mol vejer mest.",
                     fremhaev: "alle", svar: svar, nmin: nmin,
                     efter: function (k) {
-                        return k.n + " mol og " + g(k.m) + ". Med " + (nmin - 1) + " mol kan vægten højst vise " +
+                        return k.n + " mol vejer " + g(k.m) + ". Med " + (nmin - 1) + " mol kan vægten højst vise " +
                             g(D.masse(tung, nmin - 1)) + ".";
                     },
                     tjek: function (k) {
                         if (k.m > X && k.n === nmin) return { ok: true };
                         if (k.m > X && k.n > nmin) {
-                            return { besked: "Over " + p[0] + " g, men med " + k.n + " mol. Det kan gøres med færre." };
+                            return { besked: "Vægten viser over " + p[0] + " g, men der ligger " + k.n + " mol. Det kan gøres med færre mol." };
                         }
                         return null;
                     }
@@ -226,7 +226,7 @@
                 svar[t.s] = 1;
                 return {
                     tekst: "Find tre klumper af hvert sit stof, der tilsammen vejer " + g(X) + ".",
-                    hint: "Den ene er " + t.navn + ". De to andre skal tilsammen veje " + g(X - t.M) + ".",
+                    hint: "Den ene klump er " + t.navn + ". De to andre klumper skal tilsammen veje " + g(X - t.M) + ".",
                     fremhaev: [t.s], svar: svar,
                     efter: Navn(a) + ", " + b.navn + " og " + t.navn + ": m = " + g(a.M) + " + " + g(b.M) +
                         " + " + g(t.M) + " = " + g(X) + ".",

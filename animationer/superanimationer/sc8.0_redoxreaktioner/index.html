@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redoxreaktioner</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">e⁻</span> Redoxreaktioner</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-b" role="tab" aria-selected="true"><span class="nr">1</span>Magnesium brænder</button>
+        <button class="faneknap" data-fane="fane-d" role="tab" aria-selected="false"><span class="nr">2</span>Delreaktioner</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">3</span>Syre/base og redox</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: MAGNESIUM BRAENDER                                         -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-b" role="tabpanel" aria-label="Magnesium brænder">
+    <div class="scene">
+        <canvas id="b-laerred"></canvas>
+        <div class="scenekort" id="b-skort">
+            <div class="sk-ind" id="b-ind"></div>
+            <div class="sk-bund" id="b-status">
+                <p class="st-tekst" id="b-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="b-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="b-anker-makro"></div>
+        <div class="anker" id="b-anker-lup"></div>
+        <div class="anker" id="b-anker-faner"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="b-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="b-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="b-liste"></div>
+        </div>
+        <div class="kort maaling">
+            <button class="knap nulstil lille" id="b-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: DELREAKTIONER                                              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-d" role="tabpanel" aria-label="Delreaktioner">
+    <div class="scene">
+        <canvas id="d-laerred"></canvas>
+        <div class="scenekort" id="d-skort">
+            <div class="sk-ind" id="d-ind"></div>
+            <div class="sk-bund" id="d-status">
+                <p class="st-tekst" id="d-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="d-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="d-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="d-anker-ark"></div>
+        <div class="anker" id="d-anker-bakke"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="d-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="d-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="d-liste"></div>
+        </div>
+        <div class="kort maaling">
+            <button class="knap nulstil lille" id="d-forfra" type="button" title="Tag brikkerne af arket (R)">Tag brikkerne af arket ↺</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: SYRE/BASE OG REDOX                                         -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Syre/base og redox">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="s-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-sb"></div>
+        <div class="anker" id="s-anker-rx"></div>
+        <div class="anker" id="s-anker-bakke"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="s-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="s-loest">0</b>/3</span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+        <div class="kort maaling">
+            <button class="knap nulstil lille" id="s-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Redoxreaktioner</h2>
+        <p>Når magnesium brænder, afgiver hvert magnesiumatom 2 elektroner, og hvert oxygenatom optager 2. Magnesiumoxid består derfor af ionerne Mg²⁺ og O²⁻.</p>
+        <h3 class="teori-hoved">Oxidation og reduktion</h3>
+        <p>En oxidation er at afgive elektroner, og en reduktion er at optage elektroner. Elektroner kan ikke forsvinde, så de to sker altid samtidig, og den samlede reaktion kaldes en redoxreaktion.</p>
+        <h3 class="teori-hoved">Delreaktioner</h3>
+        <p>Oxidationen og reduktionen kan skrives hver for sig som to delreaktioner, hvor elektronerne skrives som e⁻. Ved oxidationen står elektronerne til højre for pilen, og ved reduktionen står de til venstre.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Magnesium og dioxygen</span>
+            Oxidation: Mg → Mg²⁺ + 2 e⁻<br>
+            Reduktion: O₂ + 4 e⁻ → 2 O²⁻<br>
+            Samlet: 2 Mg + O₂ → 2 MgO
+        </div>
+        <p>Der afgives lige så mange elektroner, som der optages. Derfor går der 2 magnesiumatomer på ét dioxygenmolekyle.</p>
+        <h3 class="teori-hoved">Reduktionsmiddel og oxidationsmiddel</h3>
+        <p>Et reduktionsmiddel er det stof, der afgiver elektronerne, og et oxidationsmiddel er det stof, der optager dem. Magnesium er reduktionsmidlet, fordi det reducerer dioxygen.</p>
+        <p>En redoxreaktion minder om en syre/base-reaktion. Elektroner overføres fra reduktionsmidlet til oxidationsmidlet, ligesom en hydron, H⁺, overføres fra syren til basen.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_brand.js"></script>
+<script src="js/sim_del.js"></script>
+<script src="js/sim_sammen.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

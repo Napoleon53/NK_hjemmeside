@@ -377,7 +377,7 @@
             });
             return;
         }
-        var t = M.skriv(a.s) + " står " + (a.side === "r" ? "før pilen og bliver brugt." : "efter pilen og dannes.");
+        var t = M.skriv(a.s) + " står " + (a.side === "r" ? "før pilen og forbruges." : "efter pilen og dannes.");
         if (a.k > 1) t += " Koefficienten er " + a.k + ".";
         this.kortBesked(t, 4);
     };
@@ -436,7 +436,7 @@
     P.domRod = function (i) {
         var r = this.roedder[i], d = M.dom(this.rx, r);
         if (d.ok) {
-            this.fejlLinje("x = " + NK.tal(r) + " M giver positive koncentrationer. Det er ligevægten, skyderen kan nå. Klik på den anden.");
+            this.fejlLinje("x = " + NK.tal(r) + " M giver positive koncentrationer og er den ligevægt, skyderen kan nå. Klik på den anden løsning.");
             return;
         }
         this.forkastet = i;
@@ -543,7 +543,7 @@
             if (r === "aendr") {
                 return { s: a.s, trin: [
                     "Se på tallene i rækken Ændring, mens du trækker i x. Hvordan hænger de sammen med x?",
-                    "Reaktanterne bruges og får −, produkterne dannes og får +." + (a.k > 1 ? " Der står " + a.k + " foran " + M.skriv(a.s) + "." : ""),
+                    "Reaktanterne forbruges og får −, produkterne dannes og får +." + (a.k > 1 ? " Der står " + a.k + " foran " + M.skriv(a.s) + "." : ""),
                     "Ændring: " + M.alle(rx).map(function (b) { return M.skriv(b.s) + " " + M.aendrTekst(b); }).join(", ") + "."
                 ] };
             }
@@ -560,7 +560,7 @@
             return { s: d.neg, trin: [
                 "En løsning kan kun bruges, hvis den ligger der, hvor skyderen kan komme: mellem 0 og " + t3(this.xMax) + " M.",
                 "Sæt hver løsning ind i rækken Ligevægt. Bliver en koncentration negativ, kan løsningen ikke bruges.",
-                "x = " + NK.tal(daarlig) + " M giver " + M.kon(d.neg) + " = " + M.indsatTekst(rx, d.neg, daarlig) + ". Klik på den."
+                "x = " + NK.tal(daarlig) + " M giver " + M.kon(d.neg) + " = " + M.indsatTekst(rx, d.neg, daarlig) + ". Klik på den løsning."
             ] };
         }
         var op = M.alle(rx).filter(function (b) { return Math.abs(M.vaerdi(M.plads(rx, b.s), mig.xMax)) < 1e-9; })[0];

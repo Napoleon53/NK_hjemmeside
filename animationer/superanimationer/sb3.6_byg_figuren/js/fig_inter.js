@@ -73,9 +73,9 @@
         vb: [1160, 740],
         lag: [
             { navn: "Londonbindinger", pladser: ["midlertidig dipol", "londonbinding"],
-              ros: "Elektronerne samles et øjeblik i den ene ende af pentan. Den midlertidige dipol giver en londonbinding til nabomolekylet." },
+              ros: "Elektronerne samles et øjeblik i den ene ende af pentanmolekylet. Den midlertidige dipol giver en londonbinding til nabomolekylet." },
             { navn: "Polære molekyler", pladser: ["permanent dipol", "dipol-dipolbinding", "hydrogenbinding"],
-              ros: "Propanon har en permanent dipol og danner dipol-dipolbindinger. Ethanol har H på O og danner hydrogenbindinger." },
+              ros: "Propanonmolekylet har en permanent dipol og danner dipol-dipolbindinger. Ethanolmolekylet har H på O og danner hydrogenbindinger." },
             { navn: "Overblik og vand", pladser: ["intermolekylær binding", "hydrofob", "hydrofil"],
               ros: "Alle tre slags er intermolekylære bindinger. En lang carbonkæde er hydrofob, og OH-gruppen er hydrofil." }
         ],
@@ -90,7 +90,7 @@
               fejl: { "midlertidig dipol": "<b>midlertidig dipol</b> er enderne på ét molekyle. Pladsen peger på prikkerne, hvor to pentanmolekyler tiltrækker hinanden.",
                       "dipol-dipolbinding": "<b>dipol-dipolbinding</b> kræver polære molekyler. Pentan er upolært og har kun en dipol et kort øjeblik.",
                       hydrogenbinding: "<b>hydrogenbinding</b> kræver H på O eller N. Pentan har kun C og H.",
-                      "intermolekylær binding": "<b>intermolekylær binding</b> er fællesnavnet foran alle tre slags. Her er navnet på netop prikkerne mellem pentan." } },
+                      "intermolekylær binding": "<b>intermolekylær binding</b> er fællesnavnet for alle tre slags. Her er navnet på netop prikkerne mellem to pentanmolekyler." } },
 
             { id: "permanent dipol", ord: ["permanent dipol"], x: SX, y: ST.D.y + 34, maal: [P2.o[0] + 16, DY - 6], dele: ["pdipol"],
               omr: [{ r: [P2.c[0] + 2, DY - 38, P2.o[0] - P2.c[0] + 18, 54, 12] }],

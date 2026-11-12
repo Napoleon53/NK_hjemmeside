@@ -107,9 +107,9 @@
         if (ind.id === "ingen") {
             tekst = "Uden indikator ser man kun pH-metret.";
         } else if (ind.skala) {
-            tekst = "Universalindikator skifter farve hele vejen — god til at følge pH, men upræcis til at finde ækvivalenspunktet.";
+            tekst = "Universalindikator skifter farve over hele pH-skalaen. Den er god til at følge pH, men upræcis til at finde ækvivalenspunktet.";
         } else {
-            tekst = ind.navn + " slår om ved pH " + ind.omslag + ". Den er brugbar, hvis springet går tværs igennem det interval.";
+            tekst = ind.navn + " slår om ved pH " + ind.omslag + ". Indikatoren viser ækvivalenspunktet korrekt, hvis omslagsområdet ligger inden for kurvens lodrette spring.";
         }
         NK.saetTekst("lab-ind-note", tekst);
     };
@@ -144,26 +144,26 @@
             return "Der er ikke noget i glasset, som titratoren kan omsætte. Prøv en anden opstilling.";
         }
         if (b.V >= b.maksV() - 1e-6) {
-            return "Buretten er tom. Nulstil, eller gør den større i venstre spalte.";
+            return "Buretten er tom. Tryk Tøm og start forfra, eller giv buretten et større rumfang i venstre spalte.";
         }
         var naeste = this.naesteAekv();
         if (naeste && Math.abs(naeste.V - b.V) < b.maksV() * 0.015) {
-            return "Nu er du lige ved ækvivalenspunktet. Luk hanen, og giv én dråbe ad gangen.";
+            return "Ækvivalenspunktet er tæt på. Luk hanen, og tilsæt én dråbe ad gangen.";
         }
         var hld = this.haeldning();
         if (hld > 3) {
-            return "pH løber! Her betyder én dråbe flere hele pH-enheder.";
+            return "pH ændrer sig brat. Her kan én dråbe ændre pH med flere enheder.";
         }
         if (naeste && hld < 0.25 && b.V > 0) {
-            return "Bufferområde: der er både syre og korresponderende base i glasset, så pH flytter sig kun langsomt.";
+            return "Du er i bufferområdet. Glasset indeholder både syre og korresponderende base, så pH ændrer sig kun langsomt.";
         }
         if (!naeste) {
-            return "Du er forbi det sidste ækvivalenspunkt. Nu fortynder du bare titratoren.";
+            return "Du er forbi det sidste ækvivalenspunkt. Titratoren reagerer ikke længere, men fortyndes kun i glasset.";
         }
         if (b.V === 0) {
             return "Åbn hanen, og hold øje med pH-metret.";
         }
-        return "Følg med på kurven nedenunder — hvor stejlt går det?";
+        return "Følg kurven nedenunder, og se, hvor stejl den bliver.";
     };
 
     NK.SimLab.prototype.tegn = function () {

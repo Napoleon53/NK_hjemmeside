@@ -167,13 +167,13 @@
         }
 
         laeg(typiske, S.formel(o.kb, S.ladning(o.syre)),
-            "Hydronen er H⁺. Den tager en plusladning med, når den forlader " + A + ". Så bliver resten " + KB + ".");
+            "Hydronen er H⁺. Den tager en plusladning med, når den forlader " + A + ". Derfor bliver " + A + " til " + KB + ".");
         if (S.ladning(o.kb) < 0) {
             laeg(typiske, S.formel(o.kb, -S.ladning(o.kb)),
                 "Ladningen falder med 1, når en positiv hydron forlader " + A + ". Det giver " + KB + ".");
         }
         laeg(typiske, S.formel(o.ks, S.ladning(o.base)),
-            "Hydronen har en plusladning med over til " + B + ". Så bliver det " + KS + ".");
+            "Hydronen har en plusladning med over til " + B + ". Derfor bliver " + B + " til " + KS + ".");
         if (ps.n + 1 <= fs.max || (fs.plus && ps.n + 1 === fs.max + 1)) {
             laeg(typiske, S.formel(S.korr(o.syre, 1)),
                 A + " er syren. Den afgiver en hydron. Den optager ikke en.");
@@ -184,14 +184,14 @@
         }
         if (ps.n - 2 >= fs.min) {
             laeg(typiske, S.formel(S.korr(o.syre, -2)),
-                "Der flytter kun én hydron i en reaktion. " + A + " bliver til " + KB + ".");
+                "Der overføres kun én hydron i en reaktion. " + A + " bliver til " + KB + ".");
         }
         if (pb.n + 2 <= fb.max) {
             laeg(typiske, S.formel(S.korr(o.base, 2)),
                 "Basen tager kun imod én hydron. " + B + " bliver til " + KS + ".");
         }
-        laeg(sjaeldne, "H₂", "Der dannes ikke H₂. Hydronen H⁺ går over til " + B + ".");
-        laeg(sjaeldne, "H⁺", "Hydronen bliver ikke alene tilbage. Den går over til " + B + ".");
+        laeg(sjaeldne, "H₂", "Der dannes ikke H₂. Hydronen H⁺ overføres til " + B + ".");
+        laeg(sjaeldne, "H⁺", "Hydronen bliver ikke alene tilbage. Den overføres til " + B + ".");
 
         var ud = NK.bland(typiske).slice(0, 6);
         return ud.concat(NK.bland(sjaeldne).slice(0, Math.max(0, 6 - ud.length)));
@@ -218,10 +218,10 @@
         if (!reak && foerPil) return X + " står før pilen. Det reagerer, så det er syren eller basen.";
         if (maerke === "syre") {
             return S.kanGive(id) ?
-                X + " kan godt give en hydron af, men her tager den imod en og bliver til " + S.formel(o.ks) + "." :
-                X + " har ingen hydron at give af her. Den tager imod en og bliver til " + S.formel(o.ks) + ".";
+                X + " kan godt afgive en hydron, men her tager den imod en og bliver til " + S.formel(o.ks) + "." :
+                X + " har ingen hydron at afgive her. Den tager imod en og bliver til " + S.formel(o.ks) + ".";
         }
-        if (maerke === "base") return X + " giver en hydron af og bliver til " + S.formel(o.kb) + ". Så er den syren.";
+        if (maerke === "base") return X + " afgiver en hydron og bliver til " + S.formel(o.kb) + ", så den er syren.";
         if (maerke === "kb") return X + " har én H mere end " + S.formel(o.base) + ". Den er den korresponderende syre.";
         return X + " har én H mindre end " + S.formel(o.syre) + ". Den er den korresponderende base.";
     };

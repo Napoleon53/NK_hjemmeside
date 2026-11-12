@@ -110,13 +110,13 @@
     D.RS.forEach(function (o) { var m = D.MOL[o.mol]; o.navn = m.triv ? m.triv.charAt(0).toUpperCase() + m.triv.slice(1) : m.navn.charAt(0).toUpperCase() + m.navn.slice(1); });
 
     D.FAERDIG = {
-        sb: "Alle seks. Et C-atom med fire forskellige grupper giver to molekyler, der er hinandens spejlbilleder.",
-        fi: "Alle 13. Du kan finde de asymmetriske C-atomer.",
-        rs: "Alle syv. Du kan bestemme R og S."
+        sb: "Alle seks opgaver er løst. Et C-atom med fire forskellige grupper giver to molekyler, der er hinandens spejlbilleder.",
+        fi: "Alle 13 opgaver er løst. Du kan finde de asymmetriske C-atomer.",
+        rs: "Alle syv opgaver er løst. Du kan bestemme R og S."
     };
 
     /* Paaskeaegget: mynte og kommen er de to former af carvon */
-    D.CARVON = "Carvon findes i to spejlbilledformer: (R)-carvon dufter af grøn mynte, (S)-carvon af kommen.";
+    D.CARVON = "Carvon findes i to spejlbilledformer. (R)-carvon dufter af grøn mynte, og (S)-carvon dufter af kommen.";
 
     NK.Data = D;
 }());

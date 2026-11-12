@@ -70,7 +70,7 @@
             { navn: "Salt i vand", pladser: ["opløst stof", "opløsningsmiddel", "opløsning"],
               ros: "Saltet kaldes det opløste stof, også før det er rørt ud i vandet. Vandet er opløsningsmidlet, og saltvandet er en opløsning." },
             { navn: "Hvor meget salt?", pladser: ["masseprocent", "stofmængdekoncentration", "molær"],
-              ros: "Masseprocenten er saltets andel af massen. Koncentrationen er mol pr. liter, og M læses molær." },
+              ros: "Masseprocenten er saltets andel af massen. Stofmængdekoncentrationen er antallet af mol pr. liter, og M læses molær." },
             { navn: "Fremstil og fortynd", pladser: ["målekolbe", "fortynde"],
               ros: "I en målekolbe fyldes der vand på til mærket. Ved en fortynding er stofmængden den samme, men koncentrationen falder." }
         ],
@@ -88,7 +88,7 @@
 
             /* ----- Lag 2: etiketten ------------------------------------------- */
             linje("masseprocent", LY[0], LX, W1, ["mp"], {
-                stofmængdekoncentration: "<b>stofmængdekoncentration</b> er mol pr. liter. Linjen viser, hvor mange procent af massen der er salt.",
+                stofmængdekoncentration: "<b>stofmængdekoncentration</b> er antallet af mol pr. liter. Linjen viser, hvor mange procent af massen der er salt.",
                 molær: "<b>molær</b> er bogstavet M. Linjen viser, hvor mange procent af massen der er salt." }),
             linje("stofmængdekoncentration", LY[1], LX, W2, ["c"], {
                 masseprocent: "<b>masseprocent</b> er saltets andel af massen. Linjen viser antallet af mol salt i én liter.",

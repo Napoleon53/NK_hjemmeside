@@ -110,7 +110,7 @@
     P.trinLinje = function () {
         if (this.trin === "gaet") {
             var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
-            return "Gæt først: " + (mangler.length > 1 ? "hvilke oxidationstal har " : "hvilket oxidationstal har ") + liste(mangler) + "?";
+            return "Gæt først: " + (mangler.length > 1 ? "Hvilke oxidationstal har " : "Hvilket oxidationstal har ") + liste(mangler) + "?";
         }
         var dobbelt = this.enheder.some(function (u) { return u.b.orden > 1; });
         var hvad = dobbelt ? (this.enheder.length > 1 ? "elektronerne i hver binding" : "elektronerne i bindingen") :
@@ -164,7 +164,7 @@
         }
         if (this.trin === "fordel") {
             return {
-                hint: "Elektronerne går til atomet med det største tal. Er tallene ens, deles de.",
+                hint: "Elektronparret går til atomet med den største elektronegativitet. Er tallene ens, deles parret.",
                 svar: function () { mig.visFordeling(); }
             };
         }
@@ -306,8 +306,8 @@
         u.forkert = false;
         if (u.b.mest === -1) {
             u.hos = "delt";
-            if (!stille) this.besked(NK.html("To " + til.s + " trækker lige hårdt. Parret deles: " +
-                (u.b.orden > 1 ? "to elektroner" : "én elektron") + " til hver."), "peger");
+            if (!stille) this.besked(NK.html("To " + til.s + " trækker lige hårdt, så hvert " + til.s + " får " +
+                (u.b.orden > 1 ? "to elektroner" : "én elektron") + " fra bindingen."), "peger");
         } else {
             u.hos = i;
             if (!stille) {
@@ -332,7 +332,7 @@
         });
         if (forste) {
             var til = m.atomer[forste.hos], mod = m.atomer[forste.hos === forste.b.a ? forste.b.b : forste.b.a];
-            this.fejlLinje(til.s + " har " + this.enNavn(til) + ", og " + mod.s + " har " + this.enNavn(mod) + ". " +
+            this.fejlLinje(til.s + " har elektronegativiteten " + this.enNavn(til) + ", og " + mod.s + " har " + this.enNavn(mod) + ". " +
                 mod.s + " trækker hårdest, så parret skal hen til " + mod.s + ".");
             this.visKnap();
             return;

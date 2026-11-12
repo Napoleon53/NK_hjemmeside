@@ -274,8 +274,8 @@
     var MIDLER = "M(gas) kender du ikke endnu. Det er den, forsøget skal finde.";
     var F = {
         dm: { maal: "c", kendt: ["a", "b"], alias: {},
-              fejl: [["b-a", "Omvendt. Den vejede mest før, så m(før) står først."],
-                     ["a+b", "Den tabte masse. Træk m(efter) fra m(før)."]] },
+              fejl: [["b-a", "Omvendt. Beholderen vejede mest før, så m(før) står først."],
+                     ["a+b", "Beholderen tabte masse, da gassen slap ud. Træk m(efter) fra m(før)."]] },
         n: { maal: "e", kendt: ["a", "b", "c", "v", "w", "p", "r", "t"], alias: { "?n": "e", "?m": "c" },
              fejl: [["v*w", "Stofmængden er rumfanget divideret med molvolumenet, ikke ganget."],
                     ["w/v", "Brøken er vendt om. Rumfanget står øverst."],
@@ -382,12 +382,12 @@
         case "dm":
             return { facit: f.dm, fejl: [
                 [-f.dm, "Omvendt. Beholderen vejede mest før, så m(før) står først."],
-                [t.mf + t.me, "Den tabte masse. Træk m(efter) fra m(før)."],
+                [t.mf + t.me, "Beholderen tabte masse, da gassen slap ud. Træk m(efter) fra m(før)."],
                 [t.mf, "Det er m(før). Træk m(efter) fra."],
                 [t.me, "Det er m(efter). Træk det fra m(før)."]] };
         case "n":
             return { facit: f.n, fejl: [
-                [t.V / D.VM, "Rumfanget skal i liter, fordi Vₘ er i L/mol: " + K.V(t.V) + " mL = " + liter + "."],
+                [t.V / D.VM, "Rumfanget skal regnes om til liter, fordi Vₘ er i L/mol: " + K.V(t.V) + " mL = " + liter + "."],
                 [t.V / 1000 * D.VM, "Du har ganget. n = V / Vₘ."],
                 [D.VM / (t.V / 1000), "Brøken er vendt om. n = V / Vₘ."],
                 [t.V / 1000 / 22.4, "22,4 L/mol gælder ved 0 °C. Ved 20 °C er det " + D.VM_TEKST + "."],
@@ -398,7 +398,7 @@
                 [f.dm * n3, "Du har ganget. M = m / n."],
                 [n3 / f.dm, "Brøken er vendt om. Massen står øverst."],
                 [t.mf / n3, "Brug massen af gassen, ikke hele beholderen."],
-                [f.dm / (t.V / D.VM), "Tjek n: rumfanget skal i liter."]] };
+                [f.dm / (t.V / D.VM), "Tjek n. Rumfanget skal regnes om til liter."]] };
         }
         return null;
     }
@@ -424,7 +424,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (naer(v, k.facit, 0.04)) return { besked: "Tæt på. Regn med alle cifrene." };
-        return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
+        return { besked: "Det tal passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };
 
     /* ----- Den paene beregning: [formlen, tallene] ------------------------------------ */

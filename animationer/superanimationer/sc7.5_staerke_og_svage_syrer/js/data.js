@@ -52,7 +52,7 @@
             id: "kalk", navn: "Kalk i syre",
             opstil: { kalk: false, lup: [false, false] },
             gaet: {
-                intro: "To glas med saltsyre og eddikesyre, begge 0,10 M. Om lidt kommer et stykke kalk i hvert glas.",
+                intro: "Der står et glas med saltsyre og et glas med eddikesyre, begge 0,10 M. Om lidt kommer et stykke kalk i hvert glas.",
                 tekst: "I hvilket glas bruser kalken mest?",
                 svar: [
                     { t: "I glasset med saltsyre", ok: true },
@@ -84,7 +84,7 @@
             },
             spm: {
                 om: [0],
-                tekst: "Luppen over saltsyren: 100 HCl-molekyler blev hældt i. Hvor mange er stadig hele?",
+                tekst: "Der blev hældt 100 HCl-molekyler i rummet i luppen over saltsyren. Hvor mange af dem er stadig hele?",
                 svar: [
                     { t: "Alle 100 er hele",
                       f: "Et helt HCl-molekyle er gråt med en orange hydron på. Er der grå molekyler i luppen over saltsyren?" },
@@ -98,7 +98,7 @@
                     "Der er ingen grå molekyler i luppen over saltsyren."
                 ]
             },
-            loest: "Alle 100 HCl-molekyler har afgivet en hydron: 100 oxoniumioner, H₃O⁺, og 100 chloridioner, Cl⁻."
+            loest: "Alle 100 HCl-molekyler har afgivet en hydron, så der er 100 oxoniumioner, H₃O⁺, og 100 chloridioner, Cl⁻."
         },
         {
             id: "lup-eddike", navn: "Eddikesyren i luppen",
@@ -114,13 +114,13 @@
             },
             spm: {
                 om: [1],
-                tekst: "Luppen over eddikesyren: Hvor mange af de 100 eddikesyremolekyler har afgivet en hydron?",
+                tekst: "Hvor mange af de 100 eddikesyremolekyler i luppen over eddikesyren har afgivet en hydron?",
                 svar: [
                     { t: "Omkring 1 molekyle", ok: true },
                     { t: "Omkring halvdelen",
-                      f: "Tæl de røde oxoniumioner i luppen over eddikesyren: én for hvert molekyle, der har afgivet en hydron." },
+                      f: "Tæl de røde oxoniumioner i luppen over eddikesyren. Der er én for hvert molekyle, der har afgivet en hydron." },
                     { t: "Alle 100 molekyler",
-                      f: "Så ville alle molekylerne være blå som i luppen over saltsyren." }
+                      f: "Hvis alle 100 havde afgivet en hydron, ville alle molekylerne være blå som i luppen over saltsyren." }
                 ],
                 hint: [
                     "Hvert molekyle, der har afgivet en hydron, har givet én rød oxoniumion, H₃O⁺.",
@@ -138,9 +138,9 @@
                 tekst: "Hold øje med luppen over eddikesyren, til en blå ion tager en hydron tilbage.",
                 set: "Et helt eddikesyremolekyle afgav en hydron, og en blå ion tog en hydron tilbage.",
                 hint: [
-                    "Der kommer et lille skilt i luppen over eddikesyren, når en hydron flytter.",
+                    "Der kommer et lille skilt i luppen over eddikesyren, når en hydron overføres.",
                     "Først afgiver et helt molekyle en hydron. Lidt efter tager en blå ion en hydron tilbage.",
-                    "Vent nogle sekunder. Hydronerne flytter hele tiden."
+                    "Vent nogle sekunder. Hydronerne overføres hele tiden."
                 ]
             },
             spm: {
@@ -148,7 +148,7 @@
                 tekst: "Hvorfor er der altid omkring 1 oxoniumion i luppen over eddikesyren?",
                 svar: [
                     { t: "Reaktionen er gået i stå",
-                      f: "Skiltene i luppen over eddikesyren viser, at hydronerne stadig flytter." },
+                      f: "Skiltene i luppen over eddikesyren viser, at hydronerne stadig overføres." },
                     { t: "Den går begge veje lige ofte", ok: true },
                     { t: "Der er ikke vand nok",
                       f: "Der er rigeligt vand: omkring 55.000 vandmolekyler, som ikke er tegnet." }
@@ -159,7 +159,7 @@
                     "Derfor bliver antallet af oxoniumioner ved med at være omkring 1."
                 ]
             },
-            loest: "I eddikesyre går reaktionen begge veje. Derfor dobbeltpil: CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺."
+            loest: "I eddikesyre går reaktionen begge veje. Derfor skrives reaktionen med dobbeltpil: CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺."
         },
         {
             id: "hvorfor", navn: "Stærk og svag",
@@ -168,7 +168,7 @@
                 tekst: "Saltsyren og eddikesyren er begge 0,10 M. Hvorfor bruser kalken mest i saltsyren?",
                 svar: [
                     { t: "Der er mest syre i saltsyren",
-                      f: "Begge syrer er 0,10 M: der blev hældt 100 molekyler i hver lup." },
+                      f: "Begge syrer er 0,10 M, og der blev hældt 100 molekyler i hver lup." },
                     { t: "Saltsyrens molekyler er hele",
                       f: "I luppen over saltsyren er der ingen hele HCl-molekyler." },
                     { t: "Flest oxoniumioner i saltsyren", ok: true }
@@ -199,13 +199,13 @@
 
     var STYRKE_HINT = [
         "Et helt syremolekyle er gråt med en orange hydron på. Har molekylet afgivet hydronen, er det blåt.",
-        "Stærk syre: alle molekyler har afgivet en hydron. Svag syre: kun få."
+        "I en stærk syre har alle molekyler afgivet en hydron, men i en svag syre kun få."
     ];
 
     function pilHint(b, staerk) {
         return [
-            "Enkeltpil: reaktionen går helt til ende.",
-            "Dobbeltpil: reaktionen går begge veje, så der er hele molekyler tilbage.",
+            "Enkeltpil betyder, at reaktionen forløber fuldstændig.",
+            "Dobbeltpil betyder, at reaktionen går begge veje, så der er hele molekyler tilbage.",
             staerk ? "I glas " + b + " har alle molekyler afgivet en hydron." : "I glas " + b + " er de fleste molekyler stadig hele."
         ];
     }
@@ -218,7 +218,7 @@
         {
             id: "a", navn: "Glas A", glas: 0,
             forsoeg: {
-                tekst: "Fem glas med 0,10 M syre, uden etiketter. Klik på glas A for at se i luppen.",
+                tekst: "På bordet står fem glas med 0,10 M syre uden etiketter. Klik på glas A for at se i luppen.",
                 hint: klikHint("A", "længst til venstre")
             },
             spm: {
@@ -233,14 +233,14 @@
             },
             spm2: {
                 om: [0],
-                tekst: "Glas A, salpetersyre: hvilken pil skal der stå i reaktionsskemaet?",
+                tekst: "Hvilken pil skal der stå i reaktionsskemaet for salpetersyren i glas A?",
                 svar: [
                     { t: "→  enkeltpil", ok: true },
                     { t: "⇌  dobbeltpil", f: "Dobbeltpil bruges, når der er hele molekyler tilbage. Er der det i luppen for glas A?" }
                 ],
                 hint: pilHint("A", true)
             },
-            loest: "HNO₃ + H₂O → NO₃⁻ + H₃O⁺. Enkeltpil, fordi reaktionen går helt til ende i en stærk syre."
+            loest: "HNO₃ + H₂O → NO₃⁻ + H₃O⁺. Enkeltpil, fordi reaktionen forløber fuldstændig i en stærk syre."
         },
         {
             id: "b", navn: "Glas B", glas: 1,
@@ -260,9 +260,9 @@
             },
             spm2: {
                 om: [1],
-                tekst: "Glas B, eddikesyre: hvilken pil skal der stå i reaktionsskemaet?",
+                tekst: "Hvilken pil skal der stå i reaktionsskemaet for eddikesyren i glas B?",
                 svar: [
-                    { t: "→  enkeltpil", f: "Enkeltpil betyder helt til ende. Så var der ingen hele molekyler i luppen for glas B." },
+                    { t: "→  enkeltpil", f: "Enkeltpil betyder, at reaktionen forløber fuldstændig. Så var der ingen hele molekyler i luppen for glas B." },
                     { t: "⇌  dobbeltpil", ok: true }
                 ],
                 hint: pilHint("B", false)
@@ -283,14 +283,14 @@
                     { t: "En svag syre", ok: true },
                     { t: "Midt imellem", f: "En syre er kun stærk, når alle molekyler har afgivet en hydron. Ellers er syren svag." }
                 ],
-                godt: "Omkring 8 ud af 100 er stadig få. Glas C er citronsyre, C₆H₈O₇.",
+                godt: "Kun omkring 8 ud af 100 molekyler har afgivet en hydron. Glas C er citronsyre, C₆H₈O₇.",
                 hint: STYRKE_HINT.concat(["I luppen for glas C er der omkring 8 oxoniumioner og 92 hele molekyler."])
             },
             spm2: {
                 om: [2],
-                tekst: "Glas C, citronsyre: hvilken pil skal der stå i reaktionsskemaet?",
+                tekst: "Hvilken pil skal der stå i reaktionsskemaet for citronsyren i glas C?",
                 svar: [
-                    { t: "→  enkeltpil", f: "Enkeltpil betyder helt til ende. Så var der ingen hele molekyler i luppen for glas C." },
+                    { t: "→  enkeltpil", f: "Enkeltpil betyder, at reaktionen forløber fuldstændig. Så var der ingen hele molekyler i luppen for glas C." },
                     { t: "⇌  dobbeltpil", ok: true }
                 ],
                 hint: pilHint("C", false)
@@ -338,7 +338,7 @@
                 svar: [
                     { t: "I glas B, eddikesyre",
                       f: "Oxoniumionerne får kalken til at bruse. Hvilket glas har flest, glas B eller glas E?" },
-                    { t: "Lige meget: begge er svage",
+                    { t: "Lige meget, for begge er svage",
                       f: "Svage syrer er ikke lige svage. Sammenlign boblerne i glas B og glas E." },
                     { t: "I glas E, myresyre", ok: true }
                 ],
@@ -348,7 +348,7 @@
                     "Flest oxoniumioner giver mest brus."
                 ]
             },
-            loest: "Myresyre og eddikesyre er begge svage syrer, men myresyre afgiver lidt flere hydroner og bruser derfor mest."
+            loest: "Myresyre og eddikesyre er begge svage syrer, men myresyre afgiver lidt flere hydroner, og derfor bruser kalken mest i myresyren."
         }
     ];
 
@@ -379,7 +379,7 @@
                     "Tryk på Fortynd 10 gange, og vent, til glasset med saltsyre er fyldt."
                 ]
             },
-            loest: "Saltsyren er nu 10 gange tyndere end eddikesyren, men har stadig flest oxoniumioner: 10 mod omkring 1."
+            loest: "Saltsyren har nu en 10 gange lavere koncentration end eddikesyren, men har stadig flest oxoniumioner: 10 mod omkring 1."
         },
         {
             id: "lige", navn: "Lige mange oxoniumioner",
@@ -391,7 +391,7 @@
                 hint: [
                     "Sammenlign de røde kugler i luppen over saltsyren og i luppen over eddikesyren.",
                     "Hver fortynding giver 10 gange færre oxoniumioner i saltsyren: 100, 10, 1.",
-                    "Saltsyren skal være 0,0010 M: to fortyndinger fra 0,10 M."
+                    "Saltsyren skal være 0,0010 M, og det kræver to fortyndinger fra 0,10 M."
                 ]
             },
             spm: {
@@ -408,7 +408,7 @@
                     "10 · 10 = 100."
                 ]
             },
-            loest: "Saltsyren skal fortyndes 100 gange for at ligne eddikesyren: kun 1 ud af 100 eddikesyremolekyler har afgivet en hydron."
+            loest: "Saltsyren skal fortyndes 100 gange for at ligne eddikesyren, hvor kun 1 ud af 100 eddikesyremolekyler har afgivet en hydron."
         },
         {
             id: "svag", navn: "Er saltsyren blevet svag?",
@@ -435,16 +435,16 @@
             id: "mest", navn: "Hvor er der mest syre?",
             opstil: { trin: 2 },
             spm: {
-                tekst: "Tæl alle syremolekyler, grå og blå, i luppen over saltsyren og over eddikesyren. Hvor er der mest syre?",
+                tekst: "Tæl alle grå og blå syremolekyler i lupperne over saltsyren og eddikesyren. Hvor er der mest syre?",
                 svar: [
                     { t: "I glasset med saltsyre",
                       f: "Tæl de grå og de blå molekyler i luppen over saltsyren og i luppen over eddikesyren." },
-                    { t: "Lige meget: kalken bruser ens",
+                    { t: "Lige meget, for kalken bruser ens",
                       f: "Lige meget brus viser kun lige mange oxoniumioner. Tæl også de hele eddikesyremolekyler." },
                     { t: "I glasset med eddikesyre", ok: true }
                 ],
                 hint: [
-                    "Hvert syremolekyle tæller: de grå er hele, de blå har afgivet en hydron.",
+                    "Hvert syremolekyle tæller med. De grå er hele, og de blå har afgivet en hydron.",
                     "Luppen over eddikesyren har 100 syremolekyler, luppen over saltsyren har 1.",
                     "Eddikesyren er 0,10 M, og saltsyren er 0,0010 M."
                 ]
@@ -462,7 +462,7 @@
                     "Saltsyre er altid stærk, eddikesyre altid svag. 10 M er koncentreret, 0,0010 M er fortyndet."
                 ]
             },
-            loest: "Stærk og svag: hvor stor en del af molekylerne der afgiver en hydron. Koncentreret og fortyndet: hvor meget syre der er i hver liter."
+            loest: "Stærk og svag fortæller, hvor stor en del af molekylerne der afgiver en hydron. Koncentreret og fortyndet fortæller, hvor meget syre der er i hver liter."
         }
     ];
 
@@ -479,10 +479,10 @@
     D.ordFejl = function (raekke, del) {
         var o = D.ORD[raekke], navn = K.Navn(o.syre);
         if (del === "s") {
-            return navn + " " + o.c + ": stærk og svag handler om, hvilken syre det er. " +
+            return navn + " " + o.c + ": Stærk og svag handler om, hvilken syre det er. " +
                 (K.erStaerk(o.syre) ? "Saltsyre er altid en stærk syre." : "Eddikesyre er altid en svag syre.");
         }
-        return navn + " " + o.c + ": koncentreret og fortyndet handler om, hvor meget syre der er i hver liter. " +
+        return navn + " " + o.c + ": Koncentreret og fortyndet handler om, hvor meget syre der er i hver liter. " +
             (o.konc ? "10 M er meget." : "0,0010 M er meget lidt.");
     };
 
@@ -490,7 +490,7 @@
        kendt: eleven har faaet at vide, hvilken syre det er */
     D.partikel = function (slags, syre, kendt) {
         var s = K.SYRE[syre];
-        if (slags === "ox") return "En oxoniumion, H₃O⁺: vand, der har fået en hydron fra syren.";
+        if (slags === "ox") return "En oxoniumion, H₃O⁺, er et vandmolekyle, der har fået en hydron fra syren.";
         if (slags === "ion") {
             if (!kendt) return "Syrens ion: et syremolekyle, der har afgivet sin hydron.";
             return D.Stort(s.ionNavn === "citronsyrens ion" ? "citronsyrens ion" : "en " + s.ionNavn) + ", " + s.ion + ": " + s.formel + ", der har afgivet sin hydron.";

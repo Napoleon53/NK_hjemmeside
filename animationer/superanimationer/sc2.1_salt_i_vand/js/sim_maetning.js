@@ -389,7 +389,7 @@
         /* Faldt der noget ud, fordi vandet blev koldere? */
         var kornPaaVej = this.korn.length > 0;
         if (bundfald > this.sidsteBundfald + 0.02 && !kornPaaVej && !this.haeld) {
-            this.varsel = "Der falder salt ud igen: koldere vand kan ikke rumme lige så meget.";
+            this.varsel = "Der falder salt ud igen, fordi koldere vand ikke kan rumme lige så meget.";
             this.varselUr = 3.2;
         } else if (bundfald < this.sidsteBundfald - 0.02 && bundfald <= 0.001 && this.tilsat > 0) {
             this.varsel = "Nu er alt saltet opløst.";
@@ -453,9 +453,9 @@
             besked = this.varsel;
             klasse = "besked gul";
         } else if (this.tilsat === 0) {
-            besked = "100 mL vand. Hæld salt i, og se, hvor meget der kan være.";
+            besked = "Glasset indeholder 100 mL vand. Hæld salt i, og se, hvor meget der kan være.";
         } else if (!maettet) {
-            besked = "Det hele er opløst. Der er plads til " + NK.gram(graense - this.tilsat) + " g mere.";
+            besked = "Alt saltet er opløst, og vandet kan opløse " + NK.gram(graense - this.tilsat) + " g mere.";
             klasse = "besked god";
         } else {
             besked = "Opløsningen er mættet. " + NK.gram(oploest) + " g er opløst, og " +
@@ -917,7 +917,7 @@
             tekst: "Du hælder " + gram + " g " + salt.formel + " i 100 mL vand ved " + t +
                    " °C. Hvor meget bliver liggende som bundfald?",
             valg: vt.valg, rigtig: vt.rigtig,
-            hint: "Aflæs, hvor meget vandet kan rumme ved " + t + " °C. Resten bliver liggende.",
+            hint: "Aflæs, hvor meget vandet kan rumme ved " + t + " °C. Resten af saltet bliver liggende.",
             svar: "Vandet kan rumme " + gramTekst(s) + ", så " + gram + " g − " + gramTekst(s) +
                   " = " + gramTekst(rest) + " bliver liggende.",
             start: function (sim) {
@@ -945,10 +945,10 @@
         var startTemp = Math.max(0, graense - 25);
         return {
             tekst: "Der er hældt " + gram + " g " + salt.formel +
-                   " i 100 mL vand. Find den laveste temperatur, hvor det hele er opløst.",
+                   " i 100 mL vand. Find den laveste temperatur, hvor alt saltet er opløst.",
             hint: "Find " + gram + " g på den lodrette akse, og gå vandret hen til kurven.",
             svar: "Ved ca. " + graense + " °C kan vandet netop rumme " + gram + " g " + salt.formel +
-                  ". Er det koldere, bliver noget liggende.",
+                  ". Er vandet koldere, bliver noget af saltet liggende.",
             start: function (sim) {
                 NK.Valg.saet(salt.id);
                 sim.nulstil();
@@ -962,7 +962,7 @@
                 var t = Math.round(sim.temp);
                 if (sim.bundfald() > 0) return "Ved " + t + " °C ligger der stadig bundfald i glasset. Prøv en højere temperatur.";
                 if (sim.temp <= graense + 2) return true;
-                return "Ved " + t + " °C er alt opløst, men det kan klares ved en lavere temperatur.";
+                return "Ved " + t + " °C er alt opløst, men alt saltet kan opløses ved en lavere temperatur.";
             },
             indsendTekst: function (sim) { return "Indsend svar: " + Math.round(sim.temp) + " °C"; },
             visSvar: function (sim) { sim.saetTemp(graense); }

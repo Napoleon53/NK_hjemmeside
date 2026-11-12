@@ -86,7 +86,7 @@
         { id: "jernsulfid", navn: "Jern og svovl", venstre: [["Fe", 1], ["S", 1]], hoejre: [["FeS", 1]] },
         { id: "magnesiumoxid", navn: "Magnesium brænder", venstre: [["Mg", 2], ["O2", 1]], hoejre: [["MgO", 2]] },
         { id: "aluminiumoxid", navn: "Aluminium brænder", venstre: [["Al", 4], ["O2", 3]], hoejre: [["Al2O3", 2]] },
-        { id: "jernoxid", navn: "Jern af jernoxid", venstre: [["Fe2O3", 2], ["C", 3]], hoejre: [["Fe", 4], ["CO2", 3]] },
+        { id: "jernoxid", navn: "Jern af jern(III)oxid", venstre: [["Fe2O3", 2], ["C", 3]], hoejre: [["Fe", 4], ["CO2", 3]] },
         { id: "kul", navn: "Kul brænder", venstre: [["C", 1], ["O2", 1]], hoejre: [["CO2", 1]] },
         { id: "ammoniak", navn: "Haber-Bosch", venstre: [["N2", 1], ["H2", 3]], hoejre: [["NH3", 2]] },
         { id: "methan", navn: "Methan brænder", venstre: [["CH4", 1], ["O2", 2]], hoejre: [["CO2", 1], ["H2O", 2]] },
@@ -170,7 +170,7 @@
         { id: "aluminiumoxid", r: "aluminiumoxid", kendt: "Al", soegt: "Al2O3", n: [2, 3, 4],
           tekst: "Aluminiumpulver brænder i luft. Hvor meget aluminiumoxid dannes der?" },
         { id: "jernoxid", r: "jernoxid", kendt: "Fe2O3", soegt: "Fe", n: [0.5, 1, 1.5, 2],
-          tekst: "Jernoxid varmes med rigeligt kul. Hvor meget jern dannes der?" }
+          tekst: "Jern(III)oxid varmes med rigeligt kul. Hvor meget jern dannes der?" }
     ];
 
     /* ======================================================================
@@ -182,7 +182,7 @@
        ====================================================================== */
     D.SKEMA = [
         { id: "kul", r: "kul", givet: "C", n: [2, 3, 4, 5, 6, 8],
-          tekst: "Kul brænder i rigeligt dioxygen. Hvor meget CO₂ dannes der? O₂ regner vi ikke på.",
+          tekst: "Kul brænder i rigeligt dioxygen. Hvor meget CO₂ dannes der? Du skal ikke regne på O₂.",
           spoerg: [["C", "M"], ["CO2", "M"], ["C", "n"], ["CO2", "n"], ["CO2", "m"]] },
         { id: "ammoniak", r: "ammoniak", givet: "N2", n: [0.5, 1, 1.5, 2], afstem: true,
           tekst: "Ammoniak laves af N₂ og rigeligt H₂. Afstem skemaet, og find massen af NH₃.",
@@ -233,13 +233,13 @@
     D.INTRO = {
         vej: "Fra gram til gram går vejen over mol.",
         skema: "Hele skemaet, som det skal stå i en rapport.",
-        begr: "To kendte masser. Den, der slipper op først, bestemmer."
+        begr: "Det stof, der slipper op først, afgør, hvor meget der dannes."
     };
 
     D.FAERDIG = {
-        vej: "Alle fire. Gram, mol, mol, gram: det er hele vejen.",
+        vej: "Alle fire opgaver er løst. Gram, mol, mol, gram er hele vejen.",
         skema: "Alle fem opgaver er løst. Skemaet sidder.",
-        begr: "Alle seks. Noget slipper altid op først."
+        begr: "Alle seks opgaver er løst. Noget slipper altid op først."
     };
 
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];

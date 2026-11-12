@@ -52,7 +52,7 @@
     var LET = {
         id: "let", navn: "Sodavand", niveau: "let",
         titel: "Rød sodavand",
-        spoergsmaal: "Hvor meget rødt farvestof, E129, er der i sodavanden?",
+        spoergsmaal: "Hvad er koncentrationen af det røde farvestof E129 i sodavanden?",
         lambdaer: [504], maaletid: 1.1,
         kuvetter: [
             { id: "blind", navn: "blindprøven", etiket: ["Blind"], indhold: {}, rolle: "blind", c: 0 },
@@ -80,8 +80,8 @@
                 linje: "Sæt blindprøven med rent vand i spektrofotometeret.",
                 kuvetter: ["blind"],
                 hint: ["Blindprøven er kuvetten med rent vand. Den står yderst til venstre i stativet.",
-                       "Træk kuvetten op i kuvetteholderen på spektrofotometeret, eller klik på den."],
-                loest: "Nulstillet. Rent vand giver nu A = 0,000, så instrumentet kun måler farvestoffet.",
+                       "Træk kuvetten op i kuvetteholderen på spektrofotometeret, eller klik på kuvetten."],
+                loest: "Spektrofotometeret er nulstillet, så rent vand giver A = 0,000. Den målte absorbans skyldes nu kun farvestoffet.",
                 resume: "Rent vand: A = 0,000"
             },
             {
@@ -89,8 +89,8 @@
                 linje: "Mål de fem standarder. Hver måling bliver et punkt på grafen.",
                 kuvetter: ["s1", "s2", "s3", "s4", "s5"],
                 hint: ["Standarderne er de fem røde kuvetter med kendt koncentration.",
-                       "Sæt dem i spektrofotometeret én ad gangen. Rækkefølgen er ligegyldig."],
-                loest: "Punkterne ligger på en ret linje gennem (0, 0). Det er standardkurven.",
+                       "Sæt standarderne i spektrofotometeret én ad gangen. Rækkefølgen er ligegyldig."],
+                loest: "Punkterne ligger på en ret linje gennem (0, 0). Den rette linje er standardkurven.",
                 resume: "5 punkter på en ret linje"
             },
             {
@@ -98,14 +98,14 @@
                 linje: "Find standardkurvens hældning a ud fra et af punkterne.",
                 info: "Standardkurven er en ret linje gennem (0, 0): A = a · c.",
                 hint: {
-                    formel: ["a fortæller, hvor meget A stiger pr. µM. Du kender A og c for hver standard.",
+                    formel: ["Hældningen a angiver, hvor meget A stiger pr. µM. Du kender A og c for hver standard.",
                              "a = A / …"],
                     tal: ["Vælg en standard i tabellen, fx den med 20,0 µM.",
-                          "Den har A = {A20}. Tælleren er A, nævneren er c."],
+                          "Standarden med 20,0 µM har A = {A20}. Tælleren er A, og nævneren er c."],
                     res: ["Regn brøken ud på lommeregneren.",
                           "Skriv svaret med tre betydende cifre, fx 0,0123."]
                 },
-                loest: "a = {a} µM⁻¹. A stiger {a} for hver µM farvestof."
+                loest: "a = {a} µM⁻¹. A stiger {a}, hver gang koncentrationen af farvestof stiger med 1 µM."
             },
             {
                 type: "maal", id: "pr", proeve: true, titel: "Mål sodavanden",
@@ -129,12 +129,12 @@
                 linje: "Beregn koncentrationen i kuvetten med A = a · c.",
                 info: "Du kender sodavandens A og hældningen a = {a} µM⁻¹.",
                 hint: {
-                    formel: ["Isolér c i A = a · c. Del begge sider med a.",
+                    formel: ["Isolér c i A = a · c. Dividér begge sider med a.",
                              "c = A / …"],
-                    tal: ["A er sodavandens absorbans i tabellen, a er hældningen fra trin 3.",
+                    tal: ["A er sodavandens absorbans i tabellen, og a er hældningen fra trin 3.",
                           "c = {A} / {a} µM⁻¹"],
                     res: ["Regn brøken ud på lommeregneren.",
-                          "Svaret skal ligge tæt på det, du aflæste: ca. {cAfl} µM."]
+                          "Svaret skal ligge tæt på den koncentration, du aflæste, ca. {cAfl} µM."]
                 },
                 loest: "c = {c} µM. Det passer med aflæsningen på grafen."
             },
@@ -148,7 +148,7 @@
                     tal: ["c<sub>efter</sub> er koncentrationen i kuvetten, {c} µM. V<sub>efter</sub> er målekolbens rumfang.",
                           "c<sub>før</sub> = {c} µM · {vEfter} mL / {vFoer} mL"],
                     res: ["mL går ud med mL, så svaret er i µM.",
-                          "Sodavanden i flasken er {faktor} gange stærkere end i kuvetten."]
+                          "Koncentrationen i flasken er {faktor} gange større end i kuvetten."]
                 },
                 loest: "Flasken indeholder {cFlaske} µM E129. Det er {mgL} mg/L."
             }
@@ -163,7 +163,7 @@
     var MIDDEL = {
         id: "mid", navn: "Nitrit", niveau: "middel",
         titel: "Nitrit i vand",
-        spoergsmaal: "Hvor meget nitrit, NO₂⁻, er der i vandprøverne?",
+        spoergsmaal: "Hvad er koncentrationen af nitrit (NO₂⁻) i vandprøverne?",
         lambdaer: [540], maaletid: 0.9,
         stam: 50.0, vEfter: 50.0,
         reagenser: true,
@@ -202,7 +202,7 @@
                 linje: "Nitrit er farveløs. Tilsæt begge reagenser til alle kuvetterne.",
                 hint: ["De to dråbeflasker står til højre på bordet.",
                        "Klik på sulfanilamid og derefter på koblingsreagens. Du kan også trække dem hen til stativet."],
-                loest: "Nitrit er blevet til et rødt azofarvestof. Jo mere nitrit, jo mere rødt.",
+                loest: "Nitrit er blevet til et rødt azofarvestof. Jo højere koncentration af nitrit, jo kraftigere er den røde farve.",
                 resume: "Nitrit → rødt azofarvestof"
             },
             {
@@ -210,9 +210,9 @@
                 linje: "Nulstil med standard 1, og mål standard 2 til 6.",
                 kuvetter: ["s1", "s2", "s3", "s4", "s5", "s6"],
                 hint: ["Standard 1 er blindprøven. Den har fået reagenser, men intet nitrit.",
-                       "Mål standard 1 først. Så er instrumentet nulstillet.",
+                       "Mål standard 1 først, så instrumentet bliver nulstillet.",
                        "Mål derefter standard 2 til 6 én ad gangen."],
-                loest: "Alle seks standarder er målt. Koncentrationerne mangler stadig, så punkterne er ikke på grafen endnu.",
+                loest: "Alle seks standarder er målt. Standardernes koncentrationer er ikke beregnet endnu, så punkterne er ikke på grafen.",
                 resume: "A er målt for standard 1 til 6"
             },
             {
@@ -240,7 +240,7 @@
                 type: "maal", id: "pr", proeve: true, titel: "Mål vandprøverne",
                 linje: "Mål {p1} og {p2}.",
                 kuvetter: ["p1", "p2"],
-                hint: ["Vandprøverne står til højre for standarderne. De har også fået reagenser."],
+                hint: ["Vandprøverne står til højre for standarderne. Vandprøverne har også fået reagenser."],
                 loest: "Prøvernes absorbans står som stiplede linjer på grafen.",
                 resume: "{P1}: A = {A1}, {P2}: A = {A2}"
             },
@@ -254,7 +254,7 @@
                     tal: ["A er {p1}s absorbans i tabellen. a er hældningen i standardkurvens ligning.",
                           "c = {A1} / {a} µM⁻¹"],
                     res: ["Regn brøken ud på lommeregneren.",
-                          "Svaret skal passe med grafen: {p1}s linje rammer kurven nær {cRund} µM."]
+                          "Svaret skal passe med grafen, hvor den stiplede linje for {p1} rammer standardkurven nær {cRund} µM."]
                 },
                 loest: "{P1} indeholder {c1} µM nitrit."
             },
@@ -275,7 +275,7 @@
     var SVAER = {
         id: "svr", navn: "To farvestoffer", niveau: "svær",
         titel: "Grøn sodavand",
-        spoergsmaal: "Den grønne farve er gult E102 og blåt E133. Hvor meget er der af hvert?",
+        spoergsmaal: "Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133. Hvad er koncentrationen af hvert farvestof?",
         lambdaer: [427, 630], maaletid: 0.6,
         kuvetter: [
             { id: "blind", navn: "blindprøven", etiket: ["Blind"], indhold: {}, rolle: "blind", c: 0 },
@@ -310,7 +310,7 @@
                 lambdaer: [427, 630],
                 hint: ["Skift bølgelængde med de to knapper på spektrofotometeret.",
                        "Mål blindprøven først. Mål så alle standarder ved 427 nm, skift til 630 nm, og mål dem igen."],
-                loest: "Se på graferne: hvilket farvestof opsuger ved hvilken bølgelængde?",
+                loest: "Se på graferne. Hvilket farvestof absorberer ved hvilken bølgelængde?",
                 resume: "4 standardkurver"
             },
             {
@@ -318,7 +318,7 @@
                 linje: "Mål {proeve} ved 427 nm og ved 630 nm.",
                 kuvetter: ["p"], lambdaer: [427, 630],
                 hint: ["Sodavanden er kuvetten længst til højre i stativet.",
-                       "Mål den, skift bølgelængde, og mål den igen."],
+                       "Mål sodavanden, skift bølgelængde, og mål den igen."],
                 loest: "Sodavandens absorbans står på begge grafer.",
                 resume: "A₄₂₇ = {A427}, A₆₃₀ = {A630}"
             },
@@ -333,7 +333,7 @@
                 type: "tal", id: "cg", proeve: true, titel: "Find c af det gule",
                 linje: "Find koncentrationen af det gule farvestof i {proeve}.",
                 felter: ["gul"],
-                loest: "c(gul) = {cg} µM. Ved 427 nm kommer {Ag} fra det gule og {Ab} fra det blå.",
+                loest: "c(gul) = {cg} µM. Ved 427 nm bidrager det gule farvestof med {Ag} og det blå med {Ab} til absorbansen.",
                 resume: "c(gul) = {cg} µM"
             }
         ],
@@ -355,18 +355,18 @@
                    "Så der kommer et ekstra punkt på grafen"],
             nej: [null,
                   "Blindprøven indeholder intet farvestof. Den giver nulpunktet.",
-                  "Lampen skal være tændt i forvejen, men det er ikke det, blindprøven gør.",
+                  "Lampen skal være tændt i forvejen, men det er ikke formålet med blindprøven.",
                   "Punktet (0, 0) kommer med, men formålet er at nulstille instrumentet."],
-            hvorfor: "Blindprøven indeholder alt det samme som prøverne undtagen det farvede stof. Når den sættes til A = 0, måler instrumentet bagefter kun det farvede stof."
+            hvorfor: "Blindprøven indeholder alt det samme som prøverne undtagen det farvede stof. Når instrumentet nulstilles med blindprøven, skyldes den målte absorbans bagefter kun det farvede stof."
         },
         {
             q: "Hvad sker der med absorbansen, når koncentrationen af farvestoffet fordobles?",
             svar: ["Den fordobles", "Den halveres", "Den er uændret", "Den stiger med 0,3"],
             nej: [null,
                   "Det er transmittansen, der falder, når der kommer mere farvestof. A stiger.",
-                  "Flere molekyler opsuger flere fotoner.",
-                  "Det gælder ikke generelt. A er proportional med c."],
-            hvorfor: "Lambert-Beers lov: A = ε · l · c. A er proportional med c, så standardkurven er en ret linje gennem (0, 0)."
+                  "Flere farvestofmolekyler absorberer flere fotoner.",
+                  "En fast stigning på 0,3 gælder ikke generelt. A er ligefrem proportional med c."],
+            hvorfor: "Ifølge Lambert-Beers lov er A = ε · l · c. A er ligefrem proportional med c, så standardkurven er en ret linje gennem (0, 0)."
         },
         {
             q: "Hvorfor laver man en standardrække i stedet for kun at måle prøven?",
@@ -387,14 +387,14 @@
                    "Reagenserne fjerner andre farvede stoffer i vandet",
                    "Reagenserne nulstiller spektrofotometeret"],
             nej: [null,
-                  "De fortynder lidt, men lige meget i alle kuvetter. Formålet er farven.",
-                  "De danner et farvet stof med nitrit. De fjerner ikke andre stoffer.",
-                  "Det gør blindprøven."],
-            hvorfor: "Nitrit og sulfanilamid danner en farveløs diazoniumion. Den reagerer med koblingsreagenset og giver et rødt azofarvestof, der opsuger lys ved 540 nm. Hver nitrition giver ét farvestofmolekyle."
+                  "Reagenserne fortynder lidt, men lige meget i alle kuvetter. Formålet er at danne et farvet stof.",
+                  "Reagenserne danner et farvet stof med nitrit. De fjerner ikke andre stoffer.",
+                  "Spektrofotometeret nulstilles med blindprøven."],
+            hvorfor: "Nitrit og sulfanilamid danner en farveløs diazoniumion. Den reagerer med koblingsreagenset og giver et rødt azofarvestof, der absorberer lys ved 540 nm. Hver nitrition giver ét farvestofmolekyle."
         },
         {
             q: "Hvorfor venter man 10 minutter, før kuvetterne med nitrit måles?",
-            svar: ["Reaktionen, der danner farvestoffet, skal nå at løbe færdig",
+            svar: ["Reaktionen, der danner farvestoffet, skal nå at forløbe fuldstændig",
                    "Opløsningen skal køle af efter reaktionen",
                    "Spektrofotometeret skal varme op",
                    "Luftbobler skal nå at stige op"],
@@ -408,31 +408,31 @@
             q: "Standardkurven er A = 0,0463 · c. En prøve har A = 0,185. Hvad er c?",
             svar: ["4,00 µM", "0,00857 µM", "0,250 µM", "0,185 µM"],
             nej: [null,
-                  "Det er A · a. Du skal dele: c = A / a.",
+                  "Det er A · a. Der skal divideres: c = A / a.",
                   "Det er a / A. Brøken er vendt.",
                   "Det er absorbansen. Den har ingen enhed."],
             hvorfor: "c = A / a = 0,185 / 0,0463 µM⁻¹ = 4,00 µM."
         },
         {
-            q: "En grøn sodavand indeholder et gult og et blåt farvestof. Ved 630 nm opsuger kun det blå. Hvad kan man så?",
-            svar: ["Finde c af det blå direkte af A ved 630 nm",
-                   "Finde c af det gule direkte af A ved 630 nm",
-                   "Finde begge koncentrationer af A ved 630 nm",
+            q: "En grøn sodavand indeholder et gult og et blåt farvestof. Ved 630 nm absorberer kun det blå. Hvad kan man så?",
+            svar: ["Finde c af det blå direkte ud fra A ved 630 nm",
+                   "Finde c af det gule direkte ud fra A ved 630 nm",
+                   "Finde begge koncentrationer ud fra A ved 630 nm",
                    "Ingenting, for absorbansen af en blanding kan ikke bruges"],
             nej: [null,
-                  "Ved 630 nm opsuger det gule ikke. A ved 630 nm siger intet om det gule.",
+                  "Ved 630 nm absorberer det gule ikke, så A ved 630 nm skyldes kun det blå.",
                   "Én absorbans kan kun give én koncentration.",
                   "Absorbanserne af de to stoffer lægges sammen, så blandingen kan godt bruges."],
-            hvorfor: "Når kun ét stof opsuger ved en bølgelængde, kommer hele A fra det stof: c = A / a."
+            hvorfor: "Når kun ét stof absorberer ved en bølgelængde, skyldes hele A det stof, og c = A / a."
         },
         {
-            q: "Ved 427 nm har den grønne sodavand A = 0,444. Det blå bidrager med 0,039. Hvor stor er det gules absorbans?",
+            q: "Ved 427 nm har den grønne sodavand A = 0,444. Det blå farvestof bidrager med 0,039. Hvor stor er det gule farvestofs absorbans?",
             svar: ["0,405", "0,483", "0,444", "0,039"],
             nej: [null,
                   "Du har lagt det blås bidrag til. Det skal trækkes fra.",
-                  "0,444 er begge farvestoffer tilsammen.",
+                  "0,444 er absorbansen af begge farvestoffer tilsammen.",
                   "Det er det blås bidrag."],
-            hvorfor: "Absorbanserne lægges sammen: A = A(gul) + A(blå). Så er A(gul) = 0,444 − 0,039 = 0,405."
+            hvorfor: "Absorbanserne lægges sammen: A = A(gul) + A(blå). Derfor er A(gul) = 0,444 − 0,039 = 0,405."
         }
     ];
 

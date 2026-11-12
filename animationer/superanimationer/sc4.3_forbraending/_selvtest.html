@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.3 Forbrænding</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at alle fem reaktionsskemaer er afstemt (også
+   efter at være ganget med 2), at trinnenes facit følger rækkefølgen C,
+   H og O, at luftreguleringen giver sod og CO i luppen, når den er
+   lukket, og kun CO₂ og H₂O, når den er åben, at alle opgaver på begge
+   faner kan løses (med musen, med forkerte svar, med Vis svaret), at
+   scenen er låst uden for et forsøg, at "vælg alle, der passer" kræver
+   alle de rigtige og ingen forkerte, at stjernen kun gives uden fejl, at
+   teksterne er korte, ikke er skrevet uden æ, ø og å og siger dioxygen
+   om O₂, og at kortet og tingene kan være der fra 1100 × 620 til
+   1600 × 950 (kortet måles i alle dele af alle opgaver, også med hvert
+   hint og hvert forkert svar).
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+var NOEGLER = ["nk-sc4.3-b", "nk-sc4.3-a"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|braend\w*|braender\w*|spoerg\w*|faa|saa|naar|aaben|fuldstaendig|ufuldstaendig|raekkefoelge\w*|groen\w*|roed|blaa|maengde)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1200); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    koerTest(W).catch(function (e) {
+        fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl");
+    }).then(function () {
+        try {
+            NOEGLER.forEach(function (n) {
+                if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+            });
+        } catch (e) { /* ingen hukommelse */ }
+        vis();
+    });
+}
+
+function koerF(X, sek) { for (var t = 0; t < sek; t += 1 / 60) X.opdater(1 / 60); }
+
+async function koerTest(W) {
+    var d = W.document, NK = W.NK, D = NK.Data, Tg = NK.Tegn;
+    var B = NK.sims["fane-b"], A = NK.sims["fane-a"];
+    var aabnetPaa = (d.querySelector(".fane.aktiv") || {}).id;
+
+    function rigtige(X) { var del = X.opg.del, ud = []; del.svar.forEach(function (s, i) { if (s.ok) ud.push(i); }); return ud; }
+    function forkerte(X) { var del = X.opg.del, ud = []; del.svar.forEach(function (s, i) { if (!s.ok) ud.push(i); }); return ud; }
+    function roed(X) { return /skidt/.test(X.el.status.className); }
+    function blinker(X) { return X.el.skort.classList.contains("blink"); }
+    function nulBlink(X) { X.el.skort.classList.remove("blink"); }
+    function visFane(id) { NK.visFane(id); }
+    function mus(X, type, x, y) {
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.PointerEvent(type, { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0, pointerId: 1 }));
+    }
+    function klik(X, x, y) {
+        mus(X, "pointermove", x, y); mus(X, "pointerdown", x, y); mus(X, "pointerup", x, y);
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.MouseEvent("click", { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0 }));
+    }
+    function midt(R) { return { x: R.x + R.b / 2, y: R.y + R.h / 2 }; }
+    function klikR(X, R) { var p = midt(R); klik(X, p.x, p.y); }
+    function traek(X, fra, til) {
+        mus(X, "pointermove", fra.x, fra.y); mus(X, "pointerdown", fra.x, fra.y);
+        for (var i = 1; i <= 6; i++) mus(X, "pointermove", fra.x + (til.x - fra.x) * i / 6, fra.y + (til.y - fra.y) * i / 6);
+        mus(X, "pointerup", til.x, til.y);
+    }
+    function klikKnap(e) { e.dispatchEvent(new W.MouseEvent("click", { bubbles: true, cancelable: true })); }
+    function valgKnap(X, j) { var k = X.el.skort.querySelector('[data-valg="' + j + '"]'); if (k) klikKnap(k); return !!k; }
+
+    /* ================================================================ */
+    overskrift("1. Kemien: skemaerne og luppen");
+    D.A_MAAL.forEach(function (o) {
+        var b = D.STOF[o.r.br], p = D.STOF[o.r.cp], k = o.k;
+        var kk = k.halv ? o.hel : { br: 1, O2: k.O2, cp: k.cp, H2O: k.H2O };
+        var C = [kk.br * b.C, kk.cp * p.C], H = [kk.br * b.H, 2 * kk.H2O], O = [2 * kk.O2, kk.cp * p.O + kk.H2O];
+        paastand(o.navn + ": " + D.skemaTekst(o.r, kk) + " er afstemt", C[0] === C[1] && H[0] === H[1] && O[0] === O[1], C + " " + H + " " + O);
+        paastand(o.navn + ": alle tal i skemaet er hele", [kk.br, kk.O2, kk.cp, kk.H2O].every(function (n) { return n === Math.round(n); }));
+        paastand(o.navn + ": " + (k.halv ? "fire trin (O₂ får et halvt tal)" : "tre trin"), o.dele.length === (k.halv ? 4 : 3), o.dele.length);
+        paastand(o.navn + ": trinnene står i rækkefølgen C, H, O", o.dele[0].trin === "C" && o.dele[1].trin === "H" && o.dele[2].trin === "O");
+    });
+    paastand("propan som i bogens eksempel", D.skemaTekst(D.A_REAKTIONER[1], { br: 1, O2: 5, cp: 3, H2O: 4 }) === "C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O");
+    paastand("ethan som i bogen: 2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O", D.skemaTekst(D.A_MAAL[3].r, D.A_MAAL[3].hel) === "2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O");
+    paastand("methan med for lidt dioxygen: 2 CH₄ + 3 O₂ → 2 CO + 4 H₂O", D.skemaTekst(D.A_MAAL[4].r, D.A_MAAL[4].hel) === "2 CH₄ + 3 O₂ → 2 CO + 4 H₂O");
+    paastand("halve tal skrives 3½ og 1½", D.halv(3.5) === "3½" && D.halv(1.5) === "1½" && D.halv(0.5) === "½" && D.halv(7) === "7");
+    D.LUFT.forEach(function (l, pos) {
+        var n = D.iLuppen(pos);
+        if (pos < D.BLAA_FRA) paastand("luften " + l.navn + ": flammen soder, og luppen har CO og sod", D.soder(pos) && n.CO > 0 && n.sod > 0, JSON.stringify(n));
+        else paastand("luften " + l.navn + ": ingen sod, og luppen har kun CO₂ og H₂O", !D.soder(pos) && n.CO === 0 && n.sod === 0 && n.CO2 > 0, JSON.stringify(n));
+    });
+    paastand("luppen: jo mindre luft, jo mere CO og sod", D.iLuppen(0).CO + D.iLuppen(0).sod >= D.iLuppen(1).CO + D.iLuppen(1).sod && D.iLuppen(1).CO + D.iLuppen(1).sod >= D.iLuppen(2).CO + D.iLuppen(2).sod);
+    paastand("luppen: vand er der altid (alt hydrogen bliver til vand)", D.LUFT.every(function (l, pos) { return D.iLuppen(pos).H2O === 8; }));
+
+    /* ================================================================ */
+    overskrift("2. Teksterne: korte, med æ, ø og å, dioxygen om O₂");
+    var tekster = [], langt = [];
+    function graense(t, max, hvad) { tekster.push(t); if (t.length > max) langt.push(hvad + " " + t.length + ">" + max + ": " + t.slice(0, 40)); }
+    D.B_MAAL.concat(D.A_MAAL).forEach(function (o) {
+        graense(o.loest, 160, o.id + " løst");
+        o.dele.forEach(function (del) {
+            graense(del.tekst, del.type === "spm" ? 105 : 95, o.id + " tekst");
+            (del.hint || []).forEach(function (h) { graense(h, 100, o.id + " hint"); });
+            if (del.set) graense(del.set, 160, o.id + " set");
+            if (del.rigtigt) graense(del.rigtigt, 160, o.id + " rigtigt");
+            if (del.mangler) graense(del.mangler, 110, o.id + " mangler");
+            (del.svar || []).forEach(function (s) { graense(s.t, 34, o.id + " svar"); if (s.f) graense(s.f, 110, o.id + " forkert"); });
+        });
+    });
+    D.A_MAAL.forEach(function (o) {
+        [1, 2, 3, 4, 5, 6, 7, 8, 10, 2.5, 3.5].forEach(function (k) { ["C", "H", "O"].forEach(function (t) { graense(D.aFejl(t, k, o), 110, o.id + " aFejl " + t + k); }); });
+    });
+    [0, 1, 2].forEach(function (p) { graense(D.forLidtLuft(p), 110, "forLidtLuft"); });
+    [D.forMegetLuft, D.taendFoerst, D.braenderTaendt, D.luftLaast, D.skeIkkeSort, D.lupSpm, D.FAERDIG.b, D.FAERDIG.a].forEach(function (t) { graense(t, 110, "besked"); });
+    Object.keys(D.LUP_NAVN).forEach(function (k) { graense(D.LUP_NAVN[k], 110, "lup " + k); });
+    paastand("alle tekster er inden for grænserne", langt.length === 0, langt.slice(0, 3).join(" | "));
+    var alt = tekster.join(" ") + " " + d.body.innerText;
+    paastand("ingen ord er skrevet uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [])[0]);
+    paastand("ordet ilt står ingen steder (O₂ er dioxygen)", !/\bilt\b/i.test(alt));
+    paastand("dioxygen står i teksterne", /dioxygen/.test(alt));
+    paastand("ingen tankestreger", !/[–—]/.test(alt));
+    paastand("ingen 1+ eller 1−", !/1[+−-](?!\d)/.test(tekster.join(" ").replace(/\d+ [+−-] \d+/g, "")));
+
+    /* ================================================================ */
+    overskrift("3. Fane 1: Brænderen (med musen)");
+    visFane("fane-b"); B.tilpas(); B.layout();
+    paastand("animationen åbner på fane 1", aabnetPaa === "fane-b", aabnetPaa);
+    B.vaelg(0);
+    paastand("opgave 1: brænderen er slukket og luften lukket", !B.b.taendt && B.b.luft === 0);
+    paastand("opgave 1: luppen er skjult", !B.lupVis);
+    klikR(B, B.b.skeRekt());
+    paastand("opgave 1: skeen kan ikke komme i en slukket flamme", B.b.skeKlar() && /Tænd/.test(B.beskedTekst()), B.beskedTekst());
+    koerF(B, 4.5);
+    klikR(B, B.b.braenderRekt());
+    paastand("opgave 1: et klik på brænderen tænder den", B.b.taendt);
+    var k0 = B.b.knapRekt();
+    traek(B, midt(k0), { x: B.b.g.skinne.x1, y: B.b.g.skinne.y });
+    paastand("opgave 1: luftreguleringen er låst (flammen skal være gul)", B.b.luft === 0);
+    paastand("opgave 1: ingen Indsend svar i forsøget", B.el.indsend.hidden);
+    klikR(B, B.b.skeRekt());
+    paastand("opgave 1: et klik på skeen sender den ind i flammen", B.b.ske.fase === "ind");
+    koerF(B, 1.0);
+    paastand("opgave 1: kortet går ikke videre, mens skeen er i flammen", !B.venter);
+    koerF(B, 2.5);
+    paastand("opgave 1: skeen kommer sort tilbage", B.b.ske.sod > 0.9, B.b.ske.sod.toFixed(2));
+    paastand("opgave 1: kortet bliver på opgaven med Godt og Næste", B.venter && /Skeen blev sort/.test(B.el.skort.innerText) && !!B.el.skort.querySelector("[data-videre]"));
+    nulBlink(B);
+    klikR(B, B.b.skeRekt());
+    paastand("låsen: skeen kan ikke bruges, mens kortet venter på Næste", B.b.skeKlar() && blinker(B));
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    paastand("opgave 1: spørgsmålet om det sorte lag kommer", B.erSpm() && /sorte lag/.test(B.el.skort.innerText));
+    paastand("spørgsmålet: Indsend svar er gråt, til et svar er valgt", B.el.indsend.classList.contains("ikke-klar"));
+    valgKnap(B, forkerte(B)[0]);
+    paastand("et svar vælger kun (bedømmes ikke endnu)", !roed(B) && !B.faerdig);
+    klikKnap(B.el.indsend);
+    paastand("et forkert svar giver en rød forklaring, og hintknappen lyser", roed(B) && B.pegKnap);
+    valgKnap(B, rigtige(B)[0]);
+    klikKnap(B.el.indsend);
+    paastand("opgave 1 er løst", B.faerdig && B.status[0].loest);
+    paastand("ingen stjerne efter et forkert svar", !B.status[0].stjerne);
+    paastand("panelet: den gule flamme har luftreguleringen lukket og sod", /lukket/.test(NK.el("b-flammer").innerText) && /ja/.test(NK.el("b-flammer").innerText));
+
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    paastand("opgave 2: brænderen brænder med luften lukket", B.nr === 1 && B.b.taendt && B.b.luft === 0);
+    paastand("opgave 2: Indsend svar viser luftreguleringens trin", /luften lukket/.test(B.el.indsend.textContent), B.el.indsend.textContent);
+    klikKnap(B.el.indsend);
+    paastand("opgave 2: lukket luft er forkert", roed(B) && !B.venter);
+    var s = B.b.g.skinne;
+    traek(B, midt(B.b.knapRekt()), { x: (s.x0 + s.x1) / 2, y: s.y });
+    paastand("opgave 2: knappen trækkes til halvt åben", B.b.luft === 2, B.b.luft);
+    paastand("opgave 2: fejlen forsvinder, når luften stilles igen", !roed(B));
+    koerF(B, 0.5);
+    klikKnap(B.el.indsend);
+    paastand("opgave 2: halvt åben soder stadig (gul spids)", roed(B) && /gul spids/.test(B.beskedTekst()));
+    traek(B, midt(B.b.knapRekt()), { x: s.x1 + 20, y: s.y });
+    paastand("opgave 2: knappen trækkes helt åben", B.b.luft === 4, B.b.luft);
+    klikR(B, B.b.skeRekt());
+    koerF(B, 3.2);
+    paastand("opgave 2: skeen bliver ikke sort i den blå flamme", B.b.ske.sod < 0.01);
+    paastand("opgave 2: skeen går ikke videre af sig selv (Indsend svar)", !B.venter);
+    klikKnap(B.el.indsend);
+    paastand("opgave 2: helt åben er rigtigt", B.venter);
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    nulBlink(B);
+    traek(B, midt(B.b.knapRekt()), { x: s.x0, y: s.y });
+    paastand("låsen: luften kan ikke stilles under spørgsmålet", B.b.luft === 4 && blinker(B));
+    valgKnap(B, rigtige(B)[0]); klikKnap(B.el.indsend);
+    paastand("opgave 2 er løst, uden stjerne efter Indsend svar med lukket luft", B.faerdig && !B.status[1].stjerne);
+
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    paastand("opgave 3: luppen er fremme, og flammen er blå", B.nr === 2 && B.lupVis && B.b.luft >= D.BLAA_FRA);
+    koerF(B, 1);
+    var typer = {};
+    B.lupM.alle(B.lay.lup).forEach(function (m) { if (m.alfa > 0.5) typer[m.type] = 1; });
+    paastand("opgave 3: luppen over den blå flamme har kun CO₂ og H₂O", typer.CO2 && typer.H2O && !typer.CO && !typer.sod, Object.keys(typer).join(","));
+    paastand("opgave 3: fire svar, to rigtige", B.opg.del.svar.length === 4 && rigtige(B).length === 2);
+    valgKnap(B, 0); klikKnap(B.el.indsend);
+    paastand("vælg alle: kun ét af de rigtige giver beskeden om, at der mangler et", roed(B) && /flere stoffer/.test(B.beskedTekst()), B.beskedTekst());
+    valgKnap(B, 1); klikKnap(B.el.indsend);
+    paastand("vælg alle: et forkert valg bliver rødt og kan ikke vælges igen", roed(B) && B.opg.forkert[1] && B.el.skort.querySelector('[data-valg="1"]').disabled);
+    paastand("vælg alle: det rigtige valg bliver valgt", !!B.opg.valgte[0]);
+    valgKnap(B, 3); klikKnap(B.el.indsend);
+    paastand("opgave 3 er løst med CO₂ og H₂O", B.faerdig);
+    paastand("opgave 3: begge rigtige svar er grønne", B.el.skort.querySelectorAll(".sk-knap.rigtig").length === 2);
+
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    paastand("opgave 4: flammen er blå, og Indsend svar spørger om luften", B.nr === 3 && B.b.luft >= D.BLAA_FRA && !B.el.indsend.hidden);
+    klikKnap(B.el.indsend);
+    paastand("opgave 4: åben luft soder ikke mest", roed(B) && /Luk/.test(B.beskedTekst()));
+    traek(B, midt(B.b.knapRekt()), { x: s.x0 - 30, y: s.y });
+    paastand("opgave 4: knappen trækkes til lukket", B.b.luft === 0);
+    koerF(B, 1.2);
+    typer = {};
+    B.lupM.alle(B.lay.lup).forEach(function (m) { if (m.alfa > 0.5) typer[m.type] = 1; });
+    paastand("opgave 4: luppen over den gule flamme har CO₂, H₂O, CO og sod", typer.CO2 && typer.H2O && typer.CO && typer.sod, Object.keys(typer).join(","));
+    klikKnap(B.el.indsend);
+    paastand("opgave 4: lukket er rigtigt", B.venter);
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    var lr = B.lay.lup, lupM = null;
+    B.lupM.alle(lr).forEach(function (m) { if (!lupM && m.alfa > 0.9 && m.type === "CO") lupM = m; });
+    if (lupM) { klik(B, lupM.x, lupM.y); paastand("et klik i luppen under spørgsmålet siger ikke svaret", /bogstaverne/.test(B.beskedTekst()), B.beskedTekst()); }
+    valgKnap(B, 1); valgKnap(B, 2); klikKnap(B.el.indsend);
+    paastand("opgave 4 er løst med CO og sod", B.faerdig);
+
+    klikKnap(B.el.skort.querySelector("[data-videre]"));
+    paastand("opgave 5: flammen er gul, og luppen er fremme", B.nr === 4 && B.b.luft === 0 && B.lupVis);
+    valgKnap(B, rigtige(B)[0]); klikKnap(B.el.indsend);
+    paastand("opgave 5 er løst, og alle fem er løst", B.faerdig && B.antalLoest() === 5);
+    paastand("efter sidste opgave fører knappen videre til fane 2", /Afstem forbrændingen/.test(B.el.skort.innerText));
+    paastand("panelet: begge flammer er udfyldt", NK.el("b-flammer").querySelectorAll("dd.mat").length === 0);
+    paastand("Start forfra står ikke på kortet", !/forfra/i.test(B.el.skort.innerText));
+
+    /* Vis svaret i alle dele */
+    D.B_MAAL.forEach(function (o, i) {
+        B.vaelg(i);
+        for (var n = 0; n < 30 && !B.faerdig; n++) { B.knap(); koerF(B, 0.1); }
+        paastand("Vis svaret løser " + o.navn, B.faerdig);
+    });
+
+    /* ================================================================ */
+    overskrift("4. Fane 2: Afstem forbrændingen (med musen)");
+    visFane("fane-a"); A.tilpas(); A.layout();
+    function pil(op) { klikR(A, A.pilRekt(A.aktiv, op)); }
+    function stil(v) {
+        for (var n = 0; n < 30 && Math.floor(A.felt[A.aktiv] || 0) < Math.floor(v); n++) pil(true);
+        for (n = 0; n < 30 && Math.floor(A.felt[A.aktiv] || 0) > Math.floor(v); n++) pil(false);
+        var harHalv = (A.felt[A.aktiv] || 0) % 1 > 0.25, skal = v % 1 > 0.25;
+        if (harHalv !== skal) klikR(A, A.halvRekt());
+    }
+    A.vaelg(0);
+    paastand("opgave 1: trin 1 er carbon med feltet foran CO₂", A.aktiv === "cp" && /carbon/.test(A.el.skort.innerText));
+    paastand("felterne er tomme fra start (intet facit før tid)", A.felt.cp === null && A.felt.H2O === null && A.felt.O2 === null);
+    paastand("Indsend svar er gråt, til et tal er valgt", A.el.indsend.classList.contains("ikke-klar"));
+    klikR(A, A.feltRekt("H2O"));
+    paastand("et klik på H₂O i trin 1 siger rækkefølgen", /Rækkefølgen er C, H og O/.test(A.beskedTekst()), A.beskedTekst());
+    pil(true); pil(true);
+    paastand("pilen op stiller feltet foran CO₂", A.felt.cp === 2);
+    paastand("Indsend svar viser tallet og formlen", /2 CO₂/.test(A.el.indsend.textContent), A.el.indsend.textContent);
+    klikKnap(A.el.indsend);
+    paastand("et forkert tal giver en rød forklaring med carbonatomerne", roed(A) && /carbonatom/.test(A.beskedTekst()), A.beskedTekst());
+    pil(false);
+    paastand("fejlen forsvinder, når tallet ændres", !roed(A));
+    klikKnap(A.el.indsend);
+    paastand("trin 1 rigtigt: kortet bliver på trinnet med forklaringen", A.venter && /CH₄ har 1 carbonatom/.test(A.el.skort.innerText));
+    nulBlink(A);
+    pil(true);
+    paastand("låsen: pilene virker ikke, mens kortet venter på Næste", A.felt.cp === 1 && blinker(A));
+    klikKnap(A.el.skort.querySelector("[data-videre]"));
+    paastand("trin 2 er hydrogen", A.aktiv === "H2O");
+    stil(4); klikKnap(A.el.indsend);
+    paastand("4 H₂O til CH₄ giver forklaringen om 2 H i hvert H₂O", roed(A) && /Hvert H₂O har 2/.test(A.beskedTekst()), A.beskedTekst());
+    stil(2); klikKnap(A.el.indsend);
+    klikKnap(A.el.skort.querySelector("[data-videre]"));
+    paastand("trin 3 er oxygen", A.aktiv === "O2");
+    stil(4); klikKnap(A.el.indsend);
+    paastand("4 O₂ giver forklaringen om 2 O i hvert O₂", roed(A) && /Hvert O₂ har 2/.test(A.beskedTekst()), A.beskedTekst());
+    stil(2); klikKnap(A.el.indsend);
+    paastand("methan er afstemt, og kortet siger det", A.faerdig && /skemaet afstemt/.test(A.el.skort.innerText));
+    var rg = A.regnskab();
+    paastand("regnskabet passer for C, H og O", rg.C[0] === rg.C[1] && rg.H[0] === rg.H[1] && rg.O[0] === rg.O[1], JSON.stringify(rg));
+    paastand("ingen stjerne efter forkerte tal", !A.status[0].stjerne);
+
+    D.A_MAAL.forEach(function (o, i) {
+        if (i === 0) return;
+        A.vaelg(i);
+        var k = o.k;
+        [["cp", k.cp], ["H2O", k.H2O], ["O2", k.O2]].forEach(function (x) {
+            stil(x[1]);
+            klikKnap(A.el.indsend);
+            if (A.venter) klikKnap(A.el.skort.querySelector("[data-videre]"));
+        });
+        if (k.halv) {
+            paastand(o.navn + ": spørgsmålet om hele tal kommer efter " + D.halv(k.O2) + " O₂", A.erSpm() && /hele tal/.test(A.el.skort.innerText));
+            valgKnap(A, 1); klikKnap(A.el.indsend);
+            paastand(o.navn + ": at runde op er forkert", roed(A));
+            valgKnap(A, 0); klikKnap(A.el.indsend);
+            paastand(o.navn + ": skemaet ganges med 2 på tavlen", A.faerdig && A.dobbelt && A.vist("O2") === o.hel.O2 && A.vist("br") === 2);
+        }
+        paastand(o.navn + " er afstemt", A.faerdig);
+        var r2 = A.regnskab();
+        paastand(o.navn + ": regnskabet passer bagefter", r2.C[0] === r2.C[1] && r2.H[0] === r2.H[1] && r2.O[0] === r2.O[1], JSON.stringify(r2));
+        if (!k.halv) paastand(o.navn + ": løst i første forsøg giver stjerne", A.status[i].stjerne);
+    });
+    paastand("alle fem forbrændinger er afstemt", A.antalLoest() === 5);
+    paastand("efter den sidste er der ingen knap videre (og intet forfra på kortet)", !A.el.skort.querySelector("[data-videre]") && !/forfra/i.test(A.el.skort.innerText));
+    D.A_MAAL.forEach(function (o, i) {
+        A.vaelg(i);
+        for (var n = 0; n < 40 && !A.faerdig; n++) A.knap();
+        paastand("Vis svaret løser " + o.navn, A.faerdig);
+    });
+    A.vaelg(2);
+    A.skift("cp", 1);
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+    paastand("pil op på tastaturet stiller feltet", A.felt.cp === 2, A.felt.cp);
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter sender svaret", roed(A));
+
+    /* ================================================================ */
+    overskrift("5. Skærmstørrelser: kortet og tingene kan være der");
+    var STR = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]];
+    for (var si = 0; si < STR.length; si++) {
+        var bb = STR[si][0], hh = STR[si][1];
+        ramme.style.width = bb + "px";
+        ramme.style.height = hh + "px";
+        await vent(250);
+        var problem = [];
+        [["fane-b", B], ["fane-a", A]].forEach(function (x) {
+            var X = x[1];
+            visFane(x[0]);
+            X.tilpas();
+            X.layout();
+            X.opgaver.forEach(function (o, i) {
+                X.vaelg(i);
+                function maal(hvad) {
+                    var r = X.el.skort.getBoundingClientRect(), c = X.L.canvas.getBoundingClientRect();
+                    var bund = r.bottom - c.top;
+                    if (bund > 10 + X.kortZone() + 4) problem.push(x[0] + " " + o.id + " " + hvad + " " + Math.round(bund) + ">" + (10 + X.kortZone()));
+                }
+                for (var di = 0; di < o.dele.length; di++) {
+                    maal("del " + di);
+                    var h2 = X.hintNu();
+                    for (var kk = 0; kk < h2.length; kk++) { X.knap(); maal("del " + di + " hint " + (kk + 1)); }
+                    if (X.erSpm()) {
+                        forkerte(X).forEach(function (j) { X.svarValg(j); X.indsendKlik(); maal("del " + di + " forkert " + j); });
+                        if (X.opg.del.flere) { X.opg.forkert = {}; X.opg.valgte = {}; X.svarValg(rigtige(X)[0]); X.indsendKlik(); maal("mangler"); }
+                    } else if (X.opg.del.indsend && X.kanIndsendes()) {
+                        X.indsendKlik(); maal("del " + di + " indsend");
+                    }
+                    X.visSvar();
+                    maal("del " + di + " svar");
+                    if (X.venter) X.knap();
+                }
+            });
+        });
+        paastand(bb + " × " + hh + ": kortet er inden for sin zone i alle dele af alle opgaver", problem.length === 0, problem.slice(0, 4).join(" | "));
+        visFane("fane-b"); B.tilpas(); B.layout();
+        var g = B.b.g, L = B.lay, kz = 10 + B.kortZone();
+        paastand(bb + " × " + hh + ": den gule flamme og soden er under kortet", g.mund.y - g.hGul - 50 * g.k >= kz, Math.round(g.mund.y - g.hGul - 50 * g.k) + " " + kz);
+        paastand(bb + " × " + hh + ": brænderen, skeen og luftreguleringen står til venstre for luppen", g.stativX + 22 * g.k <= L.lup.x - 8 && g.skinne.x1 + 30 <= L.lup.x && g.rekt.x - 8 >= 0, Math.round(g.stativX) + " " + Math.round(L.lup.x));
+        paastand(bb + " × " + hh + ": luppen begynder under kortet og er mindst 200 px høj", L.lup.y - 26 >= kz && L.lup.h >= 200, Math.round(L.lup.y) + " " + Math.round(L.lup.h));
+        paastand(bb + " × " + hh + ": signaturen under luppen er over bordet", L.lup.y + L.lup.h + 30 <= L.yBord);
+        paastand(bb + " × " + hh + ": brænderen er mindst " + (hh <= 620 ? 150 : 170) + " px høj", g.rekt.h >= (hh <= 620 ? 150 : 170), Math.round(g.rekt.h));
+        paastand(bb + " × " + hh + ": kuglerne i luppen er mindst 8 px", B.lupM.r(L.lup) >= 8, B.lupM.r(L.lup));
+        visFane("fane-a"); A.tilpas();
+        var minR = Infinity, minF = Infinity, ud = [];
+        D.A_MAAL.forEach(function (o, i) {
+            A.vaelg(i); A.layout();
+            var la = A.lay, T = la.tavle;
+            minR = Math.min(minR, la.r); minF = Math.min(minF, la.F);
+            if (T.y < 10 + A.kortZone()) ud.push(o.id + " tavle");
+            if (la.kol.H2O.x + la.kol.H2O.b > la.regn.x) ud.push(o.id + " skema ind i regnskabet");
+            var hoejest = 0;
+            ["br", "O2", "cp", "H2O"].forEach(function (sx) { var gg = A.gitter(sx, la.r); hoejest = Math.max(hoejest, Math.min(4, Math.ceil(o.hel[sx] || 1)) * (gg.mh + gg.gap)); });
+            if (la.gitterY + hoejest > T.y + T.h) ud.push(o.id + " kugler under tavlen");
+            if (la.regn.y < T.y + 36 || la.regn.y + la.regn.h > T.y + T.h) ud.push(o.id + " regnskab");
+            if (la.raekkeY - la.felth / 2 - 30 < la.trinY + 8) ud.push(o.id + " pil op i trinnene");
+        });
+        paastand(bb + " × " + hh + ": skemaet, kuglerne og regnskabet er på tavlen", ud.length === 0, ud.join(" | "));
+        paastand(bb + " × " + hh + ": formlerne er mindst 24 px og kuglerne mindst 8 px", minF >= 24 && minR >= 8, Math.round(minF) + " " + minR.toFixed(1));
+    }
+    ramme.style.width = "1300px";
+    ramme.style.height = "760px";
+}
+</script>
+</body>
+</html>

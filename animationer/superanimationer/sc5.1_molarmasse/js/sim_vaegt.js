@@ -523,7 +523,7 @@
             return (f.i === 1 ? "Vægten kan ikke mærke ét molekyle. " : "") + "Skriv atommassen for " + f.s +
                 " i regnestykket i panelet, og tryk Indsend svar.";
         }
-        return "Læg rækkerne sammen, og skriv molarmassen i regnestykket i panelet.";
+        return "Læg tallene for grundstofferne sammen, og skriv molarmassen i regnestykket i panelet.";
     };
 
     P.visKnap = function () {
@@ -595,7 +595,7 @@
 
     P.hjaelp = function (f) {
         var st = this.opg.st;
-        if (f.slags === "byg") return { hint: D.hintByg(st), svar: "Molekylet har " + D.svarByg(st) };
+        if (f.slags === "byg") return { hint: D.hintByg(st), svar: "Formlen viser " + D.svarByg(st) };
         if (f.slags === "masse") {
             var g = D.grundstof(f.s);
             return {
@@ -606,7 +606,7 @@
         }
         var led = st.orden.map(function (s) { return NK.komma(st.antal[s] * D.grundstof(s).m); });
         return {
-            hint: led.length > 1 ? "Læg rækkerne sammen: " + led.join(" + ") + "." : "Der er kun ét grundstof. M er rækken ovenover.",
+            hint: led.length > 1 ? "Læg tallene sammen: " + led.join(" + ") + "." : "Der er kun ét grundstof, så M er tallet i linjen ovenover.",
             svar: "M = " + (led.length > 1 ? led.join(" + ") + " = " : "") + "<b>" + NK.komma(st.M) + " g/mol</b>."
         };
     };

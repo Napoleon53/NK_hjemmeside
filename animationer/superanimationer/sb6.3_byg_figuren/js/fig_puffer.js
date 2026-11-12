@@ -38,13 +38,13 @@
         vb: [1160, 590],
         lag: [
             { navn: "Puffersystemet", pladser: ["puffersystem", "pufferligningen", "syrestyrkeeksponent"],
-              ros: "Puffersystemet holder pH næsten fast. Pufferligningen giver pH = 4,76 + log(30/40) = 4,64." }
+              ros: "Puffersystemet holder pH næsten konstant. Pufferligningen giver pH = 4,76 + log(30/40) = 4,64." }
         ],
         pladser: [
             { id: "puffersystem", ord: ["puffersystem"], x: SKILT_X, y: G2.y, maal: [SKILT_X, G2.y], titel: true, dele: ["puffer"],
               omr: [{ r: [G2.x - 4, G2.y - 4, G2.b + 8, G2.h + 8, 16], tom: true }],
               fejl: { "pufferligningen": "<b>pufferligningen</b> er en formel. Overskriften gælder opløsningen med både CH₃COOH og CH₃COO⁻.",
-                      "syrestyrkeeksponent": "<b>syrestyrkeeksponent</b> er et tal for en syre. Overskriften gælder opløsningen med både CH₃COOH og CH₃COO⁻." } },
+                      "syrestyrkeeksponent": "<b>syrestyrkeeksponent</b> beskriver en syres styrke. Overskriften gælder opløsningen med både CH₃COOH og CH₃COO⁻." } },
             { id: "pufferligningen", ord: ["pufferligningen"], x: RB.x + RB.b / 2, y: RB.y, maal: [RB.x + RB.b / 2, RB.y], titel: true, dele: ["ligning"],
               omr: [{ r: [RB.x - 4, RB.y - 4, RB.b + 8, RB.h + 8, 18], tom: true }],
               fejl: { "puffersystem": "<b>puffersystem</b> er en opløsning. Overskriften gælder formlen, der giver pH ud fra base og syre.",

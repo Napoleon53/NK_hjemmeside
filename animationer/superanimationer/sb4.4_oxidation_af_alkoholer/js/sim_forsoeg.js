@@ -218,41 +218,41 @@
             var R = { tertiaer: 0, sekundaer: 1, primaer: 2 }[type];
             return {
                 chip: "2 Reaktionen", felt: 2,
-                tekst: "Hvad sker der, når permanganat møder " + navn + "?",
-                svar: ["Ingen reaktion", "Den bliver til en keton", "Den bliver til en carboxylsyre"], rigtig: R,
+                tekst: "Hvad sker der, når " + navn + " opvarmes med permanganat?",
+                svar: ["Ingen reaktion", "Alkoholen bliver til en keton", "Alkoholen bliver til en carboxylsyre"], rigtig: R,
                 fejl: function (j) {
-                    if (type === "tertiaer") return "Både en keton og en carboxylsyre kræver, at carbonatomet med OH-gruppen mister et hydrogenatom. Det har ingen.";
-                    if (j === 0) return "Carbonatomet med OH-gruppen har hydrogenatomer, som permanganat kan tage. Der sker en reaktion.";
-                    if (type === "sekundaer") return "En carboxylsyre kræver to oxidationer. Carbonatomet har kun ét hydrogenatom.";
-                    return "OH-gruppen sidder for enden af kæden, så C=O kommer også til at sidde for enden. Med permanganat i overskud oxideres den to gange.";
+                    if (type === "tertiaer") return "Både en keton og en carboxylsyre kræver, at carbonatomet med OH-gruppen mister et hydrogenatom, men det carbonatom har intet hydrogenatom.";
+                    if (j === 0) return "Carbonatomet med OH-gruppen har mindst ét hydrogenatom, som permanganat kan tage. Der sker en reaktion.";
+                    if (type === "sekundaer") return "En carboxylsyre kræver to oxidationer. Carbonatomet med OH-gruppen har kun ét hydrogenatom.";
+                    return "OH-gruppen sidder for enden af kæden, så C=O kommer også til at sidde for enden. Med permanganat i overskud oxideres alkoholen to gange.";
                 },
-                hint: ["Hvor mange gange kan alkoholen oxideres? Se på tallet fra Molekylet.",
-                    { tertiaer: "Ingen hydrogenatomer på carbonatomet: ingen oxidation.", sekundaer: "Én oxidation af en sekundær alkohol giver en keton.",
+                hint: ["Hvor mange gange kan alkoholen oxideres? Se på antallet af hydrogenatomer, du fandt i feltet Molekylet.",
+                    { tertiaer: "Uden hydrogenatomer på carbonatomet med OH-gruppen sker der ingen oxidation.", sekundaer: "Én oxidation af en sekundær alkohol giver en keton.",
                         primaer: "To oxidationer af en primær alkohol giver en carboxylsyre." }[type]],
                 god: { tertiaer: "Ingen reaktion. Permanganatet bliver ikke brugt.",
                     sekundaer: "Propan-2-ol bliver til propanon, en keton. Nu afstemmes reaktionen.",
-                    primaer: "Propan-1-ol bliver til propansyre. Opløsningen ender basisk, så syren har afgivet en hydron og er propanoat. Nu afstemmes reaktionen." }[type]
+                    primaer: "Propan-1-ol bliver til propansyre. Opløsningen bliver basisk, så propansyre afgiver en hydron og bliver til propanoat. Nu afstemmes reaktionen." }[type]
             };
         }
         if (del === "forvent") {
             var V = {
                 tertiaer: { svar: ["Violet · pH 7", "Brunsten · pH stiger", "Farveløs · pH falder"],
                     tekst: "Hvad forventer du at se i glasset med 2-methylpropan-2-ol efter opvarmningen?",
-                    fejl: { 1: "Brunsten (MnO₂) dannes kun, når permanganatet oxiderer noget. Her sker der ingen reaktion.",
+                    fejl: { 1: "Brunsten (MnO₂) dannes kun, når permanganatet oxiderer alkoholen, og 2-methylpropan-2-ol reagerer ikke.",
                         2: "Permanganatet bliver ikke brugt, så det er stadig violet." },
                     hint: ["Der sker ingen reaktion. Hvad sker der så med permanganatet?", "Permanganat er violet, og uden reaktion dannes der hverken MnO₂ eller OH⁻."],
-                    god: "Violet, og pH er 7. Find glasset." },
+                    god: "Opløsningen er stadig violet, og pH er 7. Find glasset." },
                 sekundaer: { svar: ["Brunsten · pH stiger tydeligt", "Brunsten · pH stiger kun lidt", "Violet · pH 7"],
                     tekst: "3 propan-2-ol og 2 MnO₄⁻ giver 2 MnO₂ (brunsten) og 2 OH⁻. Hvad forventer du at se i glasset med propan-2-ol?",
-                    fejl: { 1: "Der dannes 2 OH⁻, og der er ingen syre til at tage dem. Så stiger pH tydeligt.",
+                    fejl: { 1: "Der dannes 2 OH⁻, og der er ingen syre til at tage dem. Derfor stiger pH tydeligt.",
                         2: "Permanganatet bliver brugt og bliver til brunsten, MnO₂, et brunsort bundfald." },
                     hint: ["Hvad bliver MnO₄⁻ til, og hvad gør OH⁻ ved pH?", "Brunsten (MnO₂) er et brunsort fast stof. OH⁻ gør opløsningen basisk."],
                     god: "Brunsten falder til bunds, og pH stiger tydeligt. Find glasset." },
                 primaer: { svar: ["Mere brunsten · pH stiger kun lidt", "Mindre brunsten · pH stiger tydeligt", "Violet · pH 7"],
                     tekst: "3 propan-1-ol og 4 MnO₄⁻ giver 4 MnO₂ og kun 1 OH⁻. Hvad forventer du at se i glasset med propan-1-ol, sammenlignet med propan-2-ol?",
-                    fejl: { 1: "3 propan-1-ol giver 4 MnO₂, men 3 propan-2-ol kun 2. Og 3 propan-1-ol giver kun 1 OH⁻, fordi propansyren har afgivet en hydron til resten.",
+                    fejl: { 1: "3 propan-1-ol giver 4 MnO₂, men 3 propan-2-ol kun 2. Samtidig giver 3 propan-1-ol kun 1 OH⁻, fordi propansyren har afgivet hydroner til de øvrige OH⁻.",
                         2: "Propan-1-ol kan oxideres, så permanganatet bliver til brunsten, MnO₂." },
-                    hint: ["Sammenlign med propan-2-ol: 3 molekyler og 2 MnO₄⁻ giver 2 MnO₂ og 2 OH⁻.",
+                    hint: ["Sammenlign med propan-2-ol, hvor 3 molekyler og 2 MnO₄⁻ giver 2 MnO₂ og 2 OH⁻.",
                         "Mere MnO₂ giver mere brunsten. Færre OH⁻ giver en lavere pH."],
                     god: "" }
             }[type];
@@ -265,17 +265,17 @@
             var ip = this.glasMed("primaer");
             return {
                 chip: "Glasset", felt: 4, kort: NR[type],
-                tekst: type === "tertiaer" ? "Hvilket glas passer? Du forventer violet, og pH er 7. Vælg glasset, og tryk Indsend svar."
-                    : "Hvilket glas passer? Du forventer brunsten i bunden, og at pH er steget tydeligt.",
+                tekst: type === "tertiaer" ? "Hvilket glas indeholder 2-methylpropan-2-ol? Du forventer en violet opløsning med pH 7. Vælg glasset, og tryk Indsend svar."
+                    : "Hvilket glas indeholder propan-2-ol? Du forventer brunsten i bunden og en tydelig stigning i pH.",
                 svar: GLASNAVNE, rigtig: ig, laast: laast,
                 fejl: function (j) {
                     if (type === "tertiaer") return "Glas " + BOGSTAVER[j] + " er brunsort. Der er sket en oxidation, så det kan ikke være 2-methylpropan-2-ol.";
-                    return "Glas " + BOGSTAVER[j] + " har pH " + mig.papir(j) + ". Sammenlign med det andet brunsorte glas: hvor er pH steget mest?";
+                    return "Glas " + BOGSTAVER[j] + " har pH " + mig.papir(j) + ". Sammenlign med det andet brunsorte glas. Hvor er pH steget mest?";
                 },
                 hint: type === "tertiaer" ? ["Kig efter det glas, der stadig er violet.", "Kun ét glas har ikke skiftet farve."]
                     : ["To glas er brunsorte. Se på pH ved dem begge.", "Glasset med den højeste pH har fået flest OH⁻."],
-                god: type === "tertiaer" ? "Glas " + BOGSTAVER[ig] + " er 2-methylpropan-2-ol. Nu den sekundære alkohol, propan-2-ol."
-                    : "Glas " + BOGSTAVER[ig] + " er propan-2-ol. Nu den primære alkohol, propan-1-ol.",
+                god: type === "tertiaer" ? "Glas " + BOGSTAVER[ig] + " indeholder 2-methylpropan-2-ol. Nu følger den sekundære alkohol, propan-2-ol."
+                    : "Glas " + BOGSTAVER[ig] + " indeholder propan-2-ol. Nu følger den primære alkohol, propan-1-ol.",
                 efter: function () { mig.kendt[ig] = NR[type]; }
             };
         }
@@ -284,7 +284,7 @@
             var VX = [-1, 0, 1, 2, 3];
             return {
                 chip: "Trin 1", felt: 2,
-                tekst: "Oxidationstal. Carbonatomet med OH-gruppen har " + D.rom(a.cFra) + " i " + a.alkohol + ". Hvad har det i " + a.produkt + "?",
+                tekst: "Oxidationstal. Carbonatomet med OH-gruppen har oxidationstallet " + D.rom(a.cFra) + " i " + a.alkohol + ". Hvilket oxidationstal har det i " + a.produkt + "?",
                 svar: VX.map(D.rom), rigtig: VX.indexOf(a.cTil),
                 fejl: function () {
                     return "Tæl bindingerne fra carbonatomet som på fane 1: til H −1, til O +1 og en dobbeltbinding til O +2." +
@@ -293,7 +293,7 @@
                 hint: ["Tegn " + a.produkt + " for dig selv med alle H. Hvilke bindinger har carbonatomet?",
                     a.qProd ? "Carbonatomet har en dobbeltbinding til O (+2), en binding til O⁻ (+1) og en binding til C (0)."
                         : "Carbonatomet har en dobbeltbinding til O (+2) og to bindinger til C (0)."],
-                god: "Carbonatomet stiger fra " + D.rom(a.cFra) + " til " + D.rom(a.cTil) + ", altså " + a.stigning + ".",
+                god: "Oxidationstallet for carbonatomet stiger fra " + D.rom(a.cFra) + " til " + D.rom(a.cTil) + ", en stigning på " + a.stigning + ".",
                 boble: D.rom(a.cFra) + " til " + D.rom(a.cTil) + ": carbonatomet stiger " + a.stigning + "."
             };
         }
@@ -301,18 +301,18 @@
             var M = [2, 3, 4, 6];
             return {
                 chip: "Trin 1", felt: 2,
-                tekst: "Oxidationstal. Mangan har +VII i MnO₄⁻. Hvad har mangan i MnO₂?",
+                tekst: "Oxidationstal. Mangan har oxidationstallet +VII i MnO₄⁻. Hvilket oxidationstal har mangan i MnO₂?",
                 svar: M.map(D.rom), rigtig: M.indexOf(a.mnTil),
                 fejl: function () { return "Oxygen har −II, og MnO₂ har ingen ladning. Mangan skal opveje de to oxygenatomer."; },
                 hint: ["Oxygen har −II, og summen af oxidationstallene er ladningen.", "To oxygenatomer giver 2 · (−II) = −IV."],
-                god: "Mangan falder fra +VII til +IV, altså 3.",
+                god: "Oxidationstallet for mangan falder fra +VII til +IV, et fald på 3.",
                 boble: "+VII til +IV: mangan falder 3."
             };
         }
         if (del === "koef") {
             return {
                 chip: "Trin 2", felt: 2, indtast: true,
-                tekst: "Stigning og fald. Carbonatomet stiger " + a.stigning + ", og mangan falder 3. Skriv koefficienterne foran " + a.alkohol +
+                tekst: "Stigning og fald. Oxidationstallet stiger " + a.stigning + " for carbon og falder 3 for mangan. Skriv koefficienterne foran " + a.alkohol +
                     " og MnO₄⁻ i skemaet, så den samlede stigning bliver lige så stor som det samlede fald.",
                 svar: [], rigtig: null,
                 fejlTal: function (x, y) {
@@ -320,7 +320,7 @@
                     return "Med " + x + " og " + y + " er den samlede stigning " + x + " · " + a.stigning + " = " + x * a.stigning +
                         ", og det samlede fald " + y + " · 3 = " + y * 3 + ". De skal være lige store.";
                 },
-                hint: ["Den samlede stigning skal være lige så stor som det samlede fald. Tallene i pilene under skemaet regner med, mens du skriver.",
+                hint: ["Den samlede stigning skal være lige så stor som det samlede fald. Tallene i pilene under skemaet bliver regnet om, mens du skriver.",
                     "Find det mindste tal, som både " + a.stigning + " og 3 går op i. Det er " + a.samlet + "."],
                 boble: a.kAlk + " · " + a.stigning + " = " + a.samlet + " og " + a.kMn + " · 3 = " + a.samlet + ": stigning og fald er lige store.",
                 god: ""
@@ -329,7 +329,7 @@
         if (del === "ladning") {
             return {
                 chip: "Trin 3", felt: 2,
-                tekst: "Ladning. Opløsningen ender basisk, så ladningen afstemmes med OH⁻. Hvor mange OH⁻ skal der stå til højre?",
+                tekst: "Ladning. Opløsningen bliver basisk, så ladningen afstemmes med OH⁻. Hvor mange OH⁻ skal der stå til højre?",
                 svar: ["1", "2", "3", "4"], rigtig: a.oh - 1,
                 fejl: function () {
                     return "Ladningen til venstre er " + D.fortegn(a.ladV) + ", og til højre er den " + D.fortegn(a.ladH) +
@@ -344,11 +344,11 @@
         }
         return {
             chip: "Trin 4", felt: 2,
-            tekst: "Hydrogen. Hvor mange H₂O skal der stå til højre, for at hydrogen passer?",
+            tekst: "Hydrogen. Hvor mange H₂O skal der stå til højre, for at der er lige mange hydrogenatomer på begge sider?",
             svar: ["1", "2", "3", "4"], rigtig: a.h2o - 1,
             fejl: function () { return "Tæl hydrogenatomerne på begge sider. Til venstre er der " + a.kAlk + " · " + a.hAlk + " = " + a.hV + "."; },
             hint: ["Til venstre: " + a.kAlk + " · " + a.hAlk + " = " + a.hV + " hydrogenatomer.",
-                "Til højre: " + a.kAlk + " · " + a.hProd + " + " + a.oh + " = " + a.hH + ". Der mangler " + (a.hV - a.hH) + ", og hvert H₂O har 2."],
+                "Til højre: " + a.kAlk + " · " + a.hProd + " + " + a.oh + " = " + a.hH + ". Der mangler " + (a.hV - a.hH) + " hydrogenatomer til højre, og hvert H₂O har 2."],
             god: "",
             boble: a.h2o + " H₂O: " + a.hV + " H og " + a.oV + " O på begge sider. Afstemt: " + a.kAlk + " " + a.alkohol + " og " + a.kMn +
                 " MnO₄⁻ giver " + a.oh + " OH⁻."
@@ -474,7 +474,7 @@
         this.status.stjerne = this.status.stjerne || (!this.fejl && !this.sv && !vist);
         this.gem();
         /* Hvilken alkohol der er i hvert glas, staar ved glassene; kortet siger kun det nye */
-        var tekst = "Det passer med glas " + BOGSTAVER[ip] + ": mest brunsten, og pH er " + this.papir(ip) + "." +
+        var tekst = "Propan-1-ol er i glas " + BOGSTAVER[ip] + ", som har mest brunsten og pH " + this.papir(ip) + "." +
             " 3 propan-1-ol og 4 MnO₄⁻ giver kun 1 OH⁻, så pH stiger kun lidt.";
         if (foerste) tekst += " " + D.FAERDIG.u;
         this.valgt = null;

@@ -72,14 +72,14 @@
             { navn: "Saltet opløses", pladser: ["stofmængde", "formelenhed"],
               ros: "Der hældes 0,20 mol CaCl₂ i. Hver formelenhed giver én calciumion og to chloridioner." },
             { navn: "To slags koncentration", pladser: ["formel koncentration", "aktuel koncentration", "molær"],
-              ros: "Den formelle koncentration gælder saltet, der hældes i. Den aktuelle gælder ionerne, der findes i opløsningen." }
+              ros: "Den formelle koncentration gælder saltet, der hældes i. Den aktuelle koncentration gælder ionerne, der findes i opløsningen." }
         ],
         pladser: [
             /* ----- Lag 1: saltet, der hældes i -------------------------------- */
             { id: "stofmængde", ord: ["stofmængde"], x: 150, y: HY - 6, maal: [HX - 9, HY - 6], dele: ["mol"],
               omr: [{ r: [HX - 5, HY - 21, WMOL + 10, 28, 6] }],
               fejl: { formelenhed: "<b>formelenhed</b> er den mindste portion af saltet. Pladsen peger på antallet af mol, der hældes i.",
-                      "formel koncentration": "<b>formel koncentration</b> er mol pr. liter. Pladsen peger kun på antallet af mol.",
+                      "formel koncentration": "<b>formel koncentration</b> er antallet af mol pr. liter. Pladsen peger kun på antallet af mol.",
                       molær: "<b>molær</b> er bogstavet M for mol/L. Pladsen peger på antallet af mol, der hældes i." } },
             { id: "formelenhed", ord: ["formelenhed"], x: KF.x + KF.b - 128, y: UY[0], maal: [UX + 47, UY[0]], dele: ["enheder"],
               omr: [{ r: [UX - 44, UY[0] - 17, 88, 34, 14] }],

@@ -306,7 +306,7 @@
             var alle = D.TABEL.every(function (id) { return this.regnet[id]; }, this);
             knap = alle ? "Videre til Den ukendte syre →" : "Næste syre →";
             this.alleRegnet = alle;
-        } else if (j === 2 && this.del === "formel") knap = "Regn tallet ud →";
+        } else if (j === 2 && this.del === "formel") knap = "Videre til beregningen →";
         this.groen = { spm: true, maade: vist ? "svar" : "selv", tekst: tekst, knap: knap };
         if (svarNr !== undefined) this.groen.svarNr = svarNr;
         this.sejrT = 0;

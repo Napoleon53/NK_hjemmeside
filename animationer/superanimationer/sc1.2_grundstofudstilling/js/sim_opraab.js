@@ -37,7 +37,7 @@
         opraab: { knap: "opraab-knap", start: "Start opråbet", igen: "Spil igen", titel: "Opråb",
             saadan: "Tavlen siger et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Blinker et rum, vælger du navnet på tavlen. En fejl koster et liv." },
         hvem: { knap: "opraab-hvem", start: "Hvem er jeg?", igen: "Hvem er jeg? igen", titel: "Hvem er jeg?",
-            saadan: "Tavlen fortæller noget om et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Svarer du forkert, kommer det igen senere. Find alle 20." }
+            saadan: "Tavlen fortæller noget om et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Svarer du forkert, kommer gåden igen senere. Find alle 20 grundstoffer." }
     };
 
     var ALMINDELIGE = D.GRUNDSTOFFER.filter(function (g) { return g.z <= 20 || g.z === 26 || g.z === 29 || g.z === 30; });
@@ -530,7 +530,7 @@
         if (!o) { ctx.restore(); return; }
         if (o.slags === "hvem") { this.tegnGaade(ctx, ind, o, lille); ctx.restore(); return; }
 
-        var spm = o.slags === "symbol" ? "Hvad hedder det, der blinker?" : (o.slags === "struktur" ? "Find grundstoffet med elektronstrukturen" : "Find");
+        var spm = o.slags === "symbol" ? "Hvad hedder grundstoffet, der blinker?" : (o.slags === "struktur" ? "Find grundstoffet med elektronstrukturen" : "Find");
         ctx.font = Tg.font("600", lille);
         ctx.fillStyle = "rgba(238, 242, 234, 0.75)";
         ctx.fillText(spm, cx, midt - stor * 0.85);

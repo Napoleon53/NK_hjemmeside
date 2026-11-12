@@ -18,19 +18,19 @@
         "fane-k": [
             { sel: "#k-skort", titel: "Kortet øverst", tekst: "Kortet stiller spørgsmålet til det trin, du er ved. Skriv tallet, vælg enheden, og tryk Indsend svar. Den gule knap giver ét hint ad gangen." },
             { sel: "#k-tabelkort", titel: "Standardrækken", tekst: "Kopiér tabellen til et regneark, og lav et punktdiagram med en lineær tendenslinje. Punktum som decimaltegn er til et regneark på engelsk." },
-            { sel: "#k-anker-graf", titel: "Standardkurven", tekst: "Punkterne er tabellens. Linjen og ligningen fra regnearket kommer frem, når du har fundet ε. Et forkert svar ses som en rød linje." },
-            { sel: "#k-anker-figur", titel: "Prøven", tekst: "Prøven og spektrofotometeret. Kuvetten kommer ned i lyset, når prøven skal måles, og displayet viser absorbansen." },
+            { sel: "#k-anker-graf", titel: "Standardkurven", tekst: "Punkterne er målingerne i tabellen. Linjen og ligningen fra regnearket kommer frem, når du har fundet ε. Et forkert svar ses som en rød linje." },
+            { sel: "#k-anker-figur", titel: "Prøven", tekst: "Figuren viser prøven og spektrofotometeret. Kuvetten kommer ned i lyset, når prøven skal måles, og displayet viser absorbansen." },
             { sel: "#k-anker-rammer", titel: "Regnestykkerne", tekst: "Én ramme pr. trin. Den gule ramme er det trin, du er ved, og et løst trin viser hele regnestykket." }
         ],
         "fane-i": [
             { sel: "#i-skort", titel: "Kortet øverst", tekst: "Kortet stiller spørgsmålet til det trin, du er ved. Skriv tallet, vælg enheden, og tryk Indsend svar." },
-            { sel: "#i-anker-figur", titel: "Prøven", tekst: "Fra pillen, bouillonen eller skruen til målekolben og kuvetten. Rumfangene står ved kolben og pilen." },
+            { sel: "#i-anker-figur", titel: "Prøven", tekst: "Figuren viser vejen fra pillen, bouillonen eller skruen til målekolben og kuvetten. Rumfangene står ved kolben og pilen." },
             { sel: "#i-anker-rammer", titel: "Regnestykkerne", tekst: "Efter ε og c regner du videre til det, opgaven spørger om: massen i 1,00 L, koncentrationen før fortyndingen eller massen af kobber." },
             { sel: "#i-opgavekort", titel: "Opgaverne", tekst: "Tre prøver. Klik på en opgave for at skifte. ★ betyder løst uden fejl og uden at se svaret." }
         ],
         "fane-l": [
             { sel: "#l-skort", titel: "Kortet øverst", tekst: "Kortet stiller spørgsmålet til det trin, du er ved. Vælg et svar eller skriv et tal, og tryk Indsend svar." },
-            { sel: "#l-anker-graf", titel: "Standardkurven", tekst: "Otte punkter. Det område, du vælger, bliver blåt. Når det er fundet, er punkterne uden for området orange." },
+            { sel: "#l-anker-graf", titel: "Standardkurven", tekst: "Grafen har otte punkter. Det område, du vælger, bliver blåt. Når det lineære område er fundet, er punkterne uden for området orange." },
             { sel: "#l-tabelkort", titel: "Standardrækken", tekst: "Kopiér alle otte punkter til regnearket. Til ε bruger du kun punkterne i det lineære område." },
             { sel: "#l-anker-figur", titel: "Prøven", tekst: "Prilocain er trukket ud af en blodprøve og måles med UV-lys. Displayet viser prøvens absorbans." }
         ]

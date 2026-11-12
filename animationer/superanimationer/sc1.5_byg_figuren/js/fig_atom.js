@@ -104,11 +104,11 @@
         vb: [1000, 680],
         lag: [
             { navn: "Atomets dele", pladser: ["kerne", "elektron", "proton", "neutron"],
-              ros: "Carbonatomet har fået en kerne af protoner og neutroner og elektroner uden om." },
+              ros: "Carbonatomet har fået en kerne af protoner og neutroner, og elektronerne sidder uden om kernen." },
             { navn: "Atomnummer og ladning", pladser: ["atomnummer", "elektrisk neutral"], ekstra: ["nukleontal"],
               ros: "Carbon har 6 protoner og 6 elektroner, så ladningerne ophæver hinanden." },
             { navn: "Isotoper og atommasse", pladser: ["isotoper", "nukleontal", "atommasse"],
-              ros: "Carbonatomer findes med 6, 7 og 8 neutroner, og atommassen er gennemsnittet." }
+              ros: "Carbonatomer findes med 6, 7 og 8 neutroner, og atommassen er gennemsnittet af isotopernes masser." }
         ],
         pladser: [
             { id: "kerne", ord: ["kerne"], x: A.x, y: 38, maal: [A.x, A.y - 27], dele: ["kerne"], omr: [{ c: [A.x, A.y, 27] }],

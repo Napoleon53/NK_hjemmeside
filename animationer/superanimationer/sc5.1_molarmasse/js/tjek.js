@@ -38,21 +38,21 @@
         if (!t) return { besked: "Skriv et tal, fx 12,01." };
         var v = t.v, m = g.m / 100;
         if (t.dec >= 3 && naer(v, g.praecis, 0.0015)) {
-            return { ok: true, note: "Rigtigt. Tabellen her har to decimaler: " + NK.komma(g.m) + "." };
+            return { ok: true, note: "Rigtigt. Det periodiske system her har to decimaler: " + NK.komma(g.m) + "." };
         }
         if (naer(v, m, 0.005)) return { ok: true };
         if (v === g.z) return { besked: g.z + " er atomnummeret for " + s + ". Atommassen er tallet nederst i feltet." };
         if (n > 1 && naer(v, n * m, 0.011)) {
-            return { besked: "Det er alle " + n + " " + s + "-atomer. Skriv atommassen for ét. Antallet står allerede foran." };
+            return { besked: "Det er massen af alle " + n + " " + s + "-atomer. Skriv atommassen for ét atom. Antallet står allerede foran feltet." };
         }
         var anden = null;
         D.GRUNDSTOFFER.forEach(function (x) {
             if (!anden && x.s !== s && naer(v, x.m / 100, 0.005)) anden = x;
         });
-        if (anden) return { besked: NK.komma(anden.m) + " er atommassen for " + anden.s + ". Rækken her er " + s + "." };
+        if (anden) return { besked: NK.komma(anden.m) + " er atommassen for " + anden.s + ". Her skal du skrive atommassen for " + s + "." };
         var andenZ = null;
         D.GRUNDSTOFFER.forEach(function (x) { if (!andenZ && x.s !== s && v === x.z && t.dec === 0) andenZ = x; });
-        if (t.dec < 2 && naer(v, m, 0.6)) return { besked: "Skriv decimalerne med, som de står i tabellen." };
+        if (t.dec < 2 && naer(v, m, 0.6)) return { besked: "Skriv decimalerne med, som de står i det periodiske system." };
         if (naer(v, m * 10, m * 0.02) || naer(v, m / 10, m * 0.002)) return { besked: "Tjek kommaet. Tallet er 10 gange for " + (v > m ? "stort." : "lille.") };
         if (andenZ) return { besked: andenZ.z + " er atomnummeret for " + andenZ.s + ". Find " + s + ", og brug tallet nederst i feltet." };
         return { besked: "Find " + s + " i det periodiske system. Atommassen er tallet nederst i feltet." };
@@ -79,22 +79,22 @@
         if (st.orden.length > 1) {
             for (i = 0; i < st.orden.length; i++) {
                 s = st.orden[i]; n = st.antal[s]; m = D.grundstof(s).m;
-                if (naer(v, M - n * m, 1.5)) return { besked: "Bidraget fra " + s + " mangler. Læg alle rækkerne sammen." };
+                if (naer(v, M - n * m, 1.5)) return { besked: "Bidraget fra " + s + " mangler. Læg tallene for alle grundstofferne sammen." };
             }
         }
         /* Hvert grundstof talt én gang */
         var enGang = st.orden.reduce(function (a, s2) { return a + D.grundstof(s2).m; }, 0);
-        if (enGang !== M && naer(v, enGang, 1.5)) return { besked: "Hvert grundstof skal ganges med sit antal." };
+        if (enGang !== M && naer(v, enGang, 1.5)) return { besked: "Atommassen for hvert grundstof skal ganges med grundstoffets antal atomer." };
         /* Atomnumrene i stedet for atommasserne */
         var zSum = st.orden.reduce(function (a, s2) { return a + st.antal[s2] * D.grundstof(s2).z * 100; }, 0);
         if (naer(v, zSum, 1.5)) return { besked: "Det er atomnumrene lagt sammen. Brug atommasserne." };
         /* For faa decimaler */
         if (t.dec < 2 && naer(v, M, 60)) return { besked: "Skriv to decimaler, som atommasserne har." };
         /* Kommaet */
-        if (naer(v, M * 10, M * 0.002) || naer(v, M / 10, M * 0.0002)) return { besked: "Tjek kommaet. Svaret er 10 gange for " + (v > M ? "stort." : "lille.") };
+        if (naer(v, M * 10, M * 0.002) || naer(v, M / 10, M * 0.0002)) return { besked: "Tjek kommaet. Dit svar er 10 gange for " + (v > M ? "stort." : "lille.") };
         /* Taet paa: en regnefejl */
-        if (naer(v, M, 3)) return { besked: "Tæt på. Læg rækkerne sammen igen: " + sumTekst + "." };
-        return { besked: "Læg rækkerne sammen: " + sumTekst + "." };
+        if (naer(v, M, 3)) return { besked: "Tæt på. Læg tallene sammen igen: " + sumTekst + "." };
+        return { besked: "Læg tallene sammen: " + sumTekst + "." };
     };
 
     NK.Tjek = T;

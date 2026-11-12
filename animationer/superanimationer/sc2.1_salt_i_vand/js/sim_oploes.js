@@ -1712,8 +1712,8 @@
                 sim.pause = true;
                 if (!fejl) return;
                 o.svar = fejl.ion.ion.q > 0
-                    ? "Molekylet vendte hydrogen ind mod en positiv ion. Det er oxygen-enden (δ−), der skal vende ind."
-                    : "Molekylet vendte oxygen ind mod en negativ ion. Det er hydrogen-enderne (δ+), der skal vende ind.";
+                    ? "Det forkerte vandmolekyle vendte hydrogen ind mod en positiv ion. Det er oxygen-enden (δ−), der skal vende ind."
+                    : "Det forkerte vandmolekyle vendte oxygen ind mod en negativ ion. Det er hydrogen-enderne (δ+), der skal vende ind.";
             },
             /* Et klik vaelger kun et vandmolekyle (blaa ring); Indsend svar sender det ind */
             peg: function (sim, x, y) {
@@ -1757,7 +1757,7 @@
             valg: alle,
             rigtig: alle.indexOf(ret),
             skjulLigning: true,
-            hint: "Tæl ionerne i lupen. Hvor mange negative ioner er der for hver positiv, og hvilken ladning har de?",
+            hint: "Tæl ionerne i luppen. Hvor mange negative ioner er der for hver positiv, og hvilken ladning har de?",
             svar: D.venstreLed(salt) + " → " + ret + ". Ionerne kommer fra hinanden, men ændrer sig ikke.",
             start: function (sim) {
                 NK.Valg.saet(salt.id);
@@ -1771,9 +1771,9 @@
             tekst: "Opløs hele NaCl-krystallen på under " + GRAENSE_SEK + " sekunder. Uret starter forfra, " +
                    "når du trykker på Ny krystal.",
             stortUr: true,
-            hint: "To af indstillingerne under Forsøget kan gøre det hurtigere.",
-            svar: "Varmt vand og omrøring. Varmen gør vandmolekylerne hurtigere, og omrøringen knuser krystallen, " +
-                  "så flere kan tage fat på én gang.",
+            hint: "To af indstillingerne under Forsøget kan gøre opløsningen hurtigere.",
+            svar: "Brug varmt vand og omrøring. Varmen gør vandmolekylerne hurtigere, og omrøringen knuser krystallen, " +
+                  "så flere vandmolekyler kan tage fat på én gang.",
             start: function (sim) {
                 NK.Valg.saet("NaCl");
                 sim.saetTemp(TEMPERATURER[1]);
@@ -1799,14 +1799,14 @@
 
     function opgTungOmroering() {
         return {
-            tekst: "Sølvchlorid er tungtopløseligt. Hvad sker der med antallet af ioner i vandet, hvis du rører rundt?",
+            tekst: "Sølv(I)chlorid er tungtopløseligt. Hvad sker der med antallet af ioner i vandet, hvis du rører rundt?",
             valg: ["Der går flere ioner i opløsning",
                    "Der går lige så mange i opløsning",
                    "Der går færre ioner i opløsning"],
             rigtig: 1,
-            hint: "Prøv det: slå omrøring til, og tæl de frie ioner i lupen.",
+            hint: "Prøv det. Slå omrøring til, og tæl de frie ioner i luppen.",
             svar: "Omrøringen knuser krystallen, så opløsningen hurtigere bliver mættet. " +
-                  "Men det ændrer ikke på, at AgCl er meget tungtopløseligt.",
+                  "Mængden af AgCl, der kan opløses, ændrer sig ikke.",
             start: function (sim) {
                 NK.Valg.saet("AgCl");
                 sim.saetOmroering(false);

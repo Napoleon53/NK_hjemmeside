@@ -1736,7 +1736,7 @@ kbd {
     padding: 8px 6px;
     font-size: 1.02rem;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;  /* lange svar brydes over to linjer i stedet for at blive skåret af (sprogrunden 12. nov. 2026) */
 }
 
 .sk-knap.brik .brikprik { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; }

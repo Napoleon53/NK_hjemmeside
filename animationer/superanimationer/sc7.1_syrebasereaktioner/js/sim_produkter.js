@@ -233,7 +233,7 @@
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             var A = NK.html(S.formel(this.opg.syre)), B = NK.html(S.formel(this.opg.base));
-            this.besked(NK.Skort.maerke("Hint", A + " er syren, og " + B + " er basen. Hydronen H⁺ går fra " + A + " til " + B + "."), "gul");
+            this.besked(NK.Skort.maerke("Hint", A + " er syren, og " + B + " er basen. En hydron, H⁺, overføres fra " + A + " til " + B + "."), "gul");
             this.visOpgave();
             return;
         }

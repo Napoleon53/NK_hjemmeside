@@ -76,7 +76,7 @@
             { navn: "Forbrænding", pladser: ["forbrænding", "fuldstændig", "ufuldstændig"],
               ros: "Med luft nok brænder methan helt til CO₂ og vand. Med for lidt dioxygen bliver flammen gul af sod." },
             { navn: "Skemaet og to stoffer", pladser: ["carbonmonoxid", "afstemt", "substitution"],
-              ros: "Skemaet har lige mange atomer på begge sider. CO er giftigt, og i substitutionen bytter H plads med Br." }
+              ros: "Det afstemte reaktionsskema har lige mange atomer på begge sider. CO er giftigt, og i substitutionen bytter H plads med Br." }
         ],
         pladser: [
             { id: "forbrænding", ord: ["forbrænding"], x: FR.x + FR.b / 2, y: FR.y, maal: [FR.x + FR.b / 2, FR.y], titel: true, dele: ["ramme"],

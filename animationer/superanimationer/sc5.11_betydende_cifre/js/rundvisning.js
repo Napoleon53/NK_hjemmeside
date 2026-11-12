@@ -18,8 +18,8 @@
     var SVAR = { sel: "#svarrad", titel: "Svaret", tekst: "Skriv tallet med komma, og tryk Indsend svar på kortet eller Enter. Over feltet vælger du almindeligt tal eller videnskabelig notation. Eksponenten skrives i det lille, hævede felt; ± skifter fortegnet." };
     var KORT = { sel: "#skort", titel: "Kortet", tekst: "Opgaven står på kortet øverst. Indsend svar sender dit svar. Sidder du fast, så tryk på den gule knap: først et hint og så svaret. Kortet siger også, hvad der gik galt, og hvorfor et svar er rigtigt." };
     var PANEL = { sel: "#rundevalg", titel: "Ti opgaver", tekst: "Ti opgaver i en runde. De ti streger viser, hvor langt du er i runden. Ny runde giver ti nye opgaver på denne fane." };
-    var VAELG_AFRUND = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Måletal, der skal afrundes, eller regnestykker, hvor svaret skal afrundes. Et skift starter en ny runde." };
-    var VAELG_KOMMA = { sel: "#vaelgere, #niveauer, #niveaunote", titel: "To slags opgaver", tekst: "Videnskabelig notation begge veje, eller enheder. Enhederne har fire niveauer; Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på de tre andre. Et skift starter en ny runde." };
+    var VAELG_AFRUND = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Vælg mellem måletal, der skal afrundes, og regnestykker, hvor svaret skal afrundes. Skifter du, begynder en ny runde." };
+    var VAELG_KOMMA = { sel: "#vaelgere, #niveauer, #niveaunote", titel: "To slags opgaver", tekst: "Vælg mellem videnskabelig notation begge veje og enheder. Enhederne har fire niveauer, og Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på de tre andre. Skifter du, begynder en ny runde." };
     var RUNDE = { sel: "#rundekort", titel: "Runden", tekst: "De løste opgaver med facit. Grøn er rigtigt i første forsøg, gul med hjælp og rød, når svaret blev vist." };
     var FANER = { sel: ".faneknapper", titel: "De andre faner", tekst: "Flyt kommaet, Afrund og Blandet, hvor alle slags opgaver er med." };
 

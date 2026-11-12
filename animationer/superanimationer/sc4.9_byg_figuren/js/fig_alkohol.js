@@ -44,7 +44,7 @@
         vb: [1000, 440],
         lag: [
             { navn: "Grupperne", pladser: ["funktionel gruppe", "hydroxygruppe", "carboxylgruppe"],
-              ros: "De funktionelle grupper −OH og −COOH giver stofferne deres egenskaber. Ethan har ingen." },
+              ros: "De funktionelle grupper −OH og −COOH giver stofferne deres egenskaber. Ethan har ingen funktionel gruppe." },
             { navn: "Stofklasserne", pladser: ["stofklasse", "alkohol", "carboxylsyre"],
               ros: "Stoffer med −OH er alkoholer og ender på -ol. Stoffer med −COOH er carboxylsyrer." }
         ],
@@ -72,10 +72,10 @@
                       carboxylsyre: "<b>carboxylsyre</b> er kun én af familierne. Pladsen står foran hele rækken." } },
             skilt("alkohol", 1, ["ol"], {
                 carboxylsyre: "<b>carboxylsyre</b> har −COOH. Ethanol har kun −OH.",
-                hydroxygruppe: "<b>hydroxygruppe</b> er kun −OH. Skiltet er navnet på familien, ethanol hører til, ligesom alkan." }),
+                hydroxygruppe: "<b>hydroxygruppe</b> er kun −OH. Skiltet er navnet på den familie, som ethanol hører til, ligesom alkan." }),
             skilt("carboxylsyre", 2, ["syre"], {
                 alkohol: "<b>alkohol</b> har kun −OH. Ethansyre har −COOH.",
-                carboxylgruppe: "<b>carboxylgruppe</b> er kun −COOH. Skiltet er navnet på familien, ethansyre hører til, ligesom alkan." })
+                carboxylgruppe: "<b>carboxylgruppe</b> er kun −COOH. Skiltet er navnet på den familie, som ethansyre hører til, ligesom alkan." })
         ],
 
         tegn: function (api) {

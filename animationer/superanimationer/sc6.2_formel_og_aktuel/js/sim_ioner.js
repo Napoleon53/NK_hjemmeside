@@ -129,7 +129,7 @@
         if (!lay) return false;
         var fl = lay.flaske;
         if (pt.x >= fl.x0 && pt.x <= fl.x0 + fl.b && pt.y >= fl.y0 && pt.y <= fl.y0 + fl.h) {
-            this.kortBesked("Etiketten siger saltets koncentration. Ionernes skal du selv finde.");
+            this.kortBesked("Etiketten viser saltets koncentration. Ionernes koncentrationer skal du selv finde.");
         } else if (Math.hypot(pt.x - lay.zoom.x, pt.y - lay.zoom.y) < lay.zoom.r) {
             this.kortBesked("Ionerne kommer i luppen, når du har fundet deres koncentrationer.");
         }

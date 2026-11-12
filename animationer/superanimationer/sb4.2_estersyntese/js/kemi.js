@@ -308,16 +308,16 @@
     K.alkoholFejl = function (opg, valg) {
         if (valg.type === "byttet") return "Alkoholdelen er kæden på det enkeltbundne oxygenatom, ikke den del med C=O.";
         if (valg.type === "med") return "Carbonatomet i C=O hører til syredelen. Alkoholdelen er kun kæden på oxygenatomet.";
-        if (valg.type === "kaede") return "Alkoholdelen er forgrenet: den længste kæde har fire carbonatomer og en methylgruppe.";
+        if (valg.type === "kaede") return "Alkoholdelen er forgrenet. Den længste kæde har fire carbonatomer og en methylgruppe.";
         return "Tæl carbonatomerne i kæden på det enkeltbundne oxygenatom.";
     };
 
     K.syreForklaring = function (opg) {
-        return "Syredelen har C=O og " + cAtomer(K.antalC(opg.syre)) + ". Med OH-gruppen tilbage er det " + opg.syre + ".";
+        return "Syredelen har C=O og " + cAtomer(K.antalC(opg.syre)) + ". Med OH-gruppen sat tilbage er syren " + opg.syre + ".";
     };
 
     K.alkoholForklaring = function (opg) {
-        return "Alkoholdelen er kæden på oxygenatomet. Med H tilbage på oxygenatomet er det " + opg.alkohol + ".";
+        return "Alkoholdelen er kæden på oxygenatomet. Med H sat tilbage på oxygenatomet er alkoholen " + opg.alkohol + ".";
     };
 
     /* ----- Fane 2: elevens tegning -------------------------------------------------------
@@ -332,9 +332,9 @@
         var d = K.esterDele(mol), navn = res && res.navn ? res.navn : null;
         if (!d) {
             if (res && res.stofklasse === "carboxylsyre")
-                return "Tavlen kalder tegningen " + navn + ", en carboxylsyre. I esteren sidder alkoholdelen på oxygenatomet i stedet for H.";
+                return "Tegningen er " + navn + ", en carboxylsyre. I esteren sidder alkoholdelen på oxygenatomet i stedet for H.";
             if (res && res.stofklasse === "alkohol")
-                return "Tavlen kalder tegningen " + navn + ", en alkohol. Esteren har både C=O og et oxygenatom i kæden.";
+                return "Tegningen er " + navn + ", en alkohol. Esteren har både C=O og et oxygenatom i kæden.";
             if (t.O < 2) return "En ester har to oxygenatomer: ét med en dobbeltbinding og ét i kæden. Tegningen har " + K.tal(t.O) + ".";
             if (t.O > 2) return "En ester har kun to oxygenatomer: ét med en dobbeltbinding og ét i kæden.";
             var dbl = mol.bindinger.some(function (bd) { return bd.orden === 2 && (el(mol, bd.a) === "O" || el(mol, bd.b) === "O"); });
@@ -346,7 +346,7 @@
         if (d.cSyre === nA && d.cAlkohol === nS)
             return "Tegningen er " + navn + ". C=O skal sidde i syredelen fra " + opg.syre + ", som har " + cAtomer(nS) + ".";
         if (d.cSyre !== nS)
-            return "Tegningen er " + navn + ". Syredelen skal have " + cAtomer(nS) + " som " + opg.syre + ", regnet med C i C=O.";
+            return "Tegningen er " + navn + ". Syredelen skal have " + cAtomer(nS) + " som " + opg.syre + ", når carbonatomet i C=O tælles med.";
         return "Tegningen er " + (navn || "en anden ester") + ". Alkoholdelen skal have kæden fra " + opg.alkohol + ".";
     };
 
@@ -359,7 +359,7 @@
     };
 
     K.tegneForklaring = function (opg) {
-        return "Syrens OH-gruppe og alkoholens H er gået af som vand. Den grønne del kommer fra " + opg.syre +
+        return "Syrens OH-gruppe og alkoholens H er fraspaltet som vand. Den grønne del kommer fra " + opg.syre +
             ", og den orange del kommer fra " + opg.alkohol + ".";
     };
 
@@ -438,9 +438,9 @@
         var h = valgt.filter(function (x) { return el(mol, x) === "H"; });
         if (valgt.indexOf(id.OD) >= 0) return "Oxygenatomet med dobbeltbindingen bliver i esteren. Vandets oxygenatom kommer fra en OH-gruppe.";
         if (o.length > 1) return "Vand er H₂O. Det har kun ét oxygenatom.";
-        if (!o.length) return "Vand er H₂O. Find også oxygenatomet, der går af sammen med de to hydrogenatomer.";
+        if (!o.length) return "Vand er H₂O. Find også oxygenatomet, der fraspaltes sammen med de to hydrogenatomer.";
         if (valgt.indexOf(id.OB) >= 0) return "Det er syren, der afgiver hele OH-gruppen. Alkoholen afgiver kun sit H, og dens O binder sig til syren.";
-        if (h.length !== 2) return "Vand er H₂O: vælg ét oxygenatom og to hydrogenatomer.";
+        if (h.length !== 2) return "Vand er H₂O. Vælg ét oxygenatom og to hydrogenatomer.";
         return "Vælg syrens OH-gruppe og hydrogenatomet på alkoholens OH-gruppe.";
     };
 

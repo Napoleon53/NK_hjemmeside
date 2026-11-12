@@ -98,9 +98,9 @@
         var andre = andreGrundstoffer(g, 3).map(function (x) { return x.navn; });
         var o = opstil(g.navn, andre);
         return {
-            tekst: "Hvilket grundstof er det?",
+            tekst: "Hvilket grundstof er det tegnede atom?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: "Elektronerne sidder (" + D.skalfordeling(g.z).join(", ") + "), altså "
+            forklaring: "Atomet har elektronstrukturen (" + D.skalfordeling(g.z).join(", ") + "), altså "
                 + NK.talform(g.z, "elektron", "elektroner") + " i alt. Atomet er neutralt, så der er lige så mange "
                 + "protoner, og " + g.z + " protoner betyder " + g.navn.toLowerCase() + ".",
             atom: { p: g.z, n: iso.a - g.z, e: g.z },
@@ -121,7 +121,7 @@
         return {
             tekst: "Hvor mange neutroner er der i kernen?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: "Massetallet " + iso.a + " tæller protoner og neutroner sammen, så "
+            forklaring: "Nukleontallet " + iso.a + " tæller protoner og neutroner sammen, så "
                 + iso.a + " − " + g.z + " = " + NK.talform(n, "neutron", "neutroner") + ".",
             nuklid: { a: iso.a, z: g.z, symbol: g.symbol },
             noegle: g.z
@@ -153,9 +153,9 @@
             function (i) { return String(iso.a + 1 + i); });
         return {
             tekst: "En kerne har " + NK.talform(g.z, "proton", "protoner") + " og "
-                + NK.talform(n, "neutron", "neutroner") + ". Hvad er massetallet?",
+                + NK.talform(n, "neutron", "neutroner") + ". Hvad er nukleontallet?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: "Massetallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
+            forklaring: "Nukleontallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
             atom: { p: g.z, n: n, e: g.z },
             /* Hverken p, n eller e er hemmelige her - de staar jo i
                spørgsmålsteksten - saa intet af partikelstat-boksen skal
@@ -196,9 +196,9 @@
         return {
             tekst: "Hvilken partikel er tegnet her?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: "Kernen har " + NK.talform(g.z, "proton", "protoner") + ", så det er "
-                + g.navn.toLowerCase() + ". Der er kun " + NK.talform(e, "elektron", "elektroner")
-                + ", og så er ladningen " + NK.ladningstekst(g.ion) + ".",
+            forklaring: "Kernen har " + NK.talform(g.z, "proton", "protoner") + ", så grundstoffet er "
+                + g.navn.toLowerCase() + ". Der er " + NK.talform(e, "elektron", "elektroner")
+                + ", så ladningen er " + NK.ladningstekst(g.ion) + ".",
             atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
             /* Svarmuligheden er en notation som "Cl⁻", ikke et rent tal -
                p, e og ladning maa derfor gerne staa i boksen. Eleven skal
@@ -220,7 +220,7 @@
         });
         var o = opstil(rigtig, andre);
         return {
-            tekst: "Hvilken af dem er en isotop af " + nuklidtekst(vist.a, g.symbol) + "?",
+            tekst: "Hvilket atom er en isotop af " + nuklidtekst(vist.a, g.symbol) + "?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Isotoper har samme protontal, men forskelligt neutrontal. " + rigtig + " har også "
                 + NK.talform(g.z, "proton", "protoner") + ", så det er stadig " + g.navn.toLowerCase() + ".",
@@ -240,7 +240,7 @@
             ["0", NK.ladningstekst(-g.ion), NK.ladningstekst(g.ion > 0 ? g.ion + 1 : g.ion - 1)],
             function (i) { return NK.ladningstekst(i + 2); });
         return {
-            tekst: "Hvilken ladning får " + g.navn.toLowerCase() + ", når det bliver til en ion?",
+            tekst: "Hvilken ladning får et " + g.navn.toLowerCase() + "atom, når det bliver til en ion?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: g.navn + " har " + NK.talform(valens, "elektron", "elektroner") + " i yderste skal og "
                 + (g.ion > 0 ? "afgiver " + NK.talform(g.ion, "elektron", "elektroner")
@@ -274,8 +274,7 @@
         return {
             tekst: "Hvor mange elektroner er der i ionen " + symTekst + "?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: g.navn + " har " + NK.talform(g.z, "proton", "protoner") + ", og det ændrer en ion sig "
-                + "ikke ved. Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
+            forklaring: "Ionen har " + NK.talform(g.z, "proton", "protoner") + " ligesom et " + g.navn.toLowerCase() + "atom. Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
                 + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner, altså " + NK.talform(e, "elektron", "elektroner") + ".",
             stortekst: symTekst,
             noegle: g.z
@@ -318,7 +317,7 @@
     function dom(rigtige) {
         if (rigtige === SPOERGSMAAL_PR_BANE) return "Alle fem rigtige.";
         if (rigtige >= 3) return "Læs begrundelserne igennem, og tag banen en gang til.";
-        return "Kig på de fire første faner igen, og tag så banen forfra.";
+        return "Kig på de tre første faner igen, og tag så banen forfra.";
     }
 
     /* Hver bane husker sig selv: hvor langt man er naaet, hvad man
