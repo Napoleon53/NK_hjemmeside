@@ -28,8 +28,8 @@
             { sel: "#d-anker-skyder", titel: "pH-skyderen", tekst: "Træk i knappen. Skyderen har samme pH-akse som diagrammet." }
         ],
         "fane-e": [
-            { sel: "#e-skort", titel: "Kortet øverst", tekst: "Gæt først. Bagefter kører forsøget, og kortet stiller spørgsmål til det, du ser." },
-            { sel: "#e-anker-formler", titel: "Formlerne", tekst: "De tre aminosyrer. Når strømmen er sluttet, viser formlerne deres former og ladninger ved papirets pH." },
+            { sel: "#e-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Klik på grupperne i formlerne eller vælg et svar, og tryk Indsend svar." },
+            { sel: "#e-anker-formler", titel: "Formlerne", tekst: "De tre aminosyrer. Et klik på en gruppe giver eller tager en hydron. Under formlen står ladningen, når formerne passer til papirets pH." },
             { sel: "#e-anker-papir", titel: "Papiret", tekst: "Aminosyrerne sættes på startlinjen. En positiv aminosyre vandrer mod minuspolen og en negativ mod pluspolen." },
             { sel: "#e-trinkort", titel: "Trinnene", tekst: "Forløbet har fire trin. Begynd forfra nederst i panelet." }
         ]

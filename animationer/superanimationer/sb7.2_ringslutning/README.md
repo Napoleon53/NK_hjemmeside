@@ -180,12 +180,13 @@ at kortet aldrig dækker tavlen fra 1100 × 620 til 1600 × 950.
 
 ## I menuen
 
-Ikke i menuen endnu. Når brugeren siger til: knap nr. 1 "Ringslutning" i
-`kemi-b-filer/samling_b7.html` (koden `b7.10`) peger på denne mappe,
-`FEEDBACK_EMNER` følger med, og kolonnen "I menuen" i `../README.md` rettes.
-Kemibogen B (B7.2, Prøv selv) linker direkte til den gamle
-`kemi-b-filer/b7.10_ringslutning_kulhydrater.html`, så den gamle flyttes
-først til arkivet, når bogens link er rettet og bogen er bygget og lagt ud.
+I menuen fra 12. nov. 2026 (brugeren: "Du må gerne sætte de nye animationer ind
+i panelet"): knap nr. 1 "Ringslutning" i `kemi-b-filer/samling_b7.html` (koden
+`b7.10`) peger på denne mappe, og `index.html` har linjen til `til_panelet.js`.
+Kilden til Kemibogen B (B7.2, Prøv selv) linker hertil fra samme dag, men den
+byggede bog på kemibogen.dk linker stadig til den gamle
+`kemi-b-filer/b7.10_ringslutning_kulhydrater.html`. Den gamle bliver derfor
+liggende og flyttes først til arkivet, når bogen er bygget og lagt ud.
 
 ## Papirkortet
 

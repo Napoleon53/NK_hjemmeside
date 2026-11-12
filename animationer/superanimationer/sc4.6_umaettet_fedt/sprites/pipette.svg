@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="132" viewBox="0 0 30 132">
+  <!-- Draabepipette med bromvand. Spidsen er i (15, 131). Gummibolden
+       foroven, glasroeret med orange bromvand forneden. -->
+  <defs>
+    <linearGradient id="bold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c1d22"/>
+      <stop offset="0.4" stop-color="#4a4c55"/>
+      <stop offset="1" stop-color="#17181c"/>
+    </linearGradient>
+    <linearGradient id="roer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.28"/>
+      <stop offset="0.35" stop-color="#cfe6f7" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.22"/>
+    </linearGradient>
+    <linearGradient id="brom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c45f1c"/>
+      <stop offset="0.45" stop-color="#ee8a3a"/>
+      <stop offset="1" stop-color="#b9561a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bromvandet i roeret -->
+  <path d="M10.6 70 L19.4 70 L19.4 104 L16.2 127 L13.8 127 L10.6 104 Z" fill="url(#brom)"/>
+
+  <!-- Glasroeret -->
+  <path d="M10 44 L20 44 L20 104 L16.4 130 Q15 131.5 13.6 130 L10 104 Z"
+        fill="url(#roer)" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="1.4" stroke-linejoin="round"/>
+  <rect x="17" y="50" width="1.6" height="50" rx="0.8" fill="#ffffff" fill-opacity="0.35"/>
+
+  <!-- Gummibolden -->
+  <path d="M8 46 L8 40 Q4 38 4 26 Q4 4 15 3 Q26 4 26 26 Q26 38 22 40 L22 46 Z"
+        fill="url(#bold)" stroke="#0d0e11" stroke-width="1.2"/>
+  <path d="M9 18 Q10 9 15 7" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
+  <rect x="7" y="43" width="16" height="4" rx="1.5" fill="#2a2b31" stroke="#0d0e11" stroke-width="1"/>
+</svg>

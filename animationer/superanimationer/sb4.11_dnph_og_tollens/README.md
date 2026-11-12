@@ -210,12 +210,14 @@ fra 1100 × 620 til 1600 × 950.
 
 ## I menuen
 
-Ikke i menuen endnu. Når brugeren siger til: knap nr. 3 "DNPH/Tollens" i
-`kemi-b-filer/samling_b4,5,6.html` (koden `b5dnph`) peger på denne mappe,
-`FEEDBACK_EMNER` følger med, og kolonnen "I menuen" i `../README.md` rettes.
-Kemibogen B (B4.3, Prøv selv) linker direkte til den gamle
-`kemi-b-filer/b5.1_eksperiment_dnph_tollens.html`, så den gamle flyttes
-først til arkivet, når bogens link er rettet og bogen er bygget og lagt ud.
+I menuen fra 12. nov. 2026 (brugeren: "Du må gerne sætte de nye animationer ind
+i panelet"): knap nr. 3 "DNPH og Tollens' test" i `kemi-b-filer/samling_b4,5,6.html`
+(koden `b5dnph`) peger på denne mappe, `FEEDBACK_EMNER` har det nye navn, og
+`index.html` har linjen til `til_panelet.js`. Kilden til Kemibogen B (B4.3,
+Prøv selv, og B4-slides) linker hertil fra samme dag, men den byggede bog på
+kemibogen.dk linker stadig til den gamle `kemi-b-filer/b5.1_eksperiment_dnph_tollens.html`.
+Den gamle bliver derfor liggende og flyttes først til arkivet, når bogen er
+bygget og lagt ud.
 
 ## Papirkortet (7. nov. 2026)
 

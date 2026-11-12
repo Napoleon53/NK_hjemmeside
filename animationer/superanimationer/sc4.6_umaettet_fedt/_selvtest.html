@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.6 Umættet fedt og bromvand</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen giver det antal dråber, iodtallene
+   og bogens tabel siger, at hver dobbeltbinding adderer præcis ét
+   dibrommolekyle, at farven først bliver ved efter den sidste ledige
+   dobbeltbinding, at kæderne i et molekyle ikke krydser, at alle opgaver
+   på de tre faner kan løses (med pipetten og musen, med for tidlige og
+   for mange dråber, med forkerte markeringer og med Vis svaret), at
+   scenen er låst uden for et forsøg, at luppen på fane 3 først viser en
+   flaske, når fedtstoffet er fundet, at teksterne er korte og ikke er
+   skrevet uden æ, ø og å, og at kortet og tingene kan være der fra
+   1100 × 620 til 1600 × 950 (kortet måles i alle dele af alle opgaver,
+   også med hvert hint og hvert forkert svar).
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+var NOEGLER = ["nk-sc4.6-d", "nk-sc4.6-m", "nk-sc4.6-u"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|vaeske\w*|maal|gaet\w*|spoerg\w*|faa|saa|naar|kaede\w*|maettet|umaettet|draabe\w*|tael\w*|faelde|oevelse)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1200); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    koerTest(W).catch(function (e) {
+        fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl");
+    }).then(function () {
+        try {
+            NOEGLER.forEach(function (n) {
+                if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+            });
+        } catch (e) { /* ingen hukommelse */ }
+        vis();
+    });
+}
+
+function koerF(X, sek) { for (var t = 0; t < sek; t += 1 / 60) X.opdater(1 / 60); }
+
+async function koerTest(W) {
+    var d = W.document, NK = W.NK, D = NK.Data, F = NK.Fedt;
+    var Dd = NK.sims["fane-d"], M = NK.sims["fane-m"], U = NK.sims["fane-u"];
+
+    function rigtigt(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (s.ok) j = i; }); return j; }
+    function forkert(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (!s.ok && j < 0) j = i; }); return j; }
+    function svar(X, j) {
+        var g = X.opg, spm = !!g && (g.fase === "spm" || g.fase === "spm2") && !X.venter && !X.faerdig;
+        X.svarValg(j);
+        if (spm) X.indsendKlik();
+    }
+    function roed(X) { return /skidt/.test(X.el.status.className); }
+    function blinker(X) { return X.el.skort.classList.contains("blink"); }
+    function frem(X) { for (var n = 0; n < 3 && X.venter; n++) X.knap(); }
+    function visFane(id) { NK.visFane(id); }
+    function mus(X, type, x, y) {
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.PointerEvent(type, { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0, pointerId: 1 }));
+    }
+    function klik(X, x, y) {
+        mus(X, "pointermove", x, y); mus(X, "pointerdown", x, y); mus(X, "pointerup", x, y);
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.MouseEvent("click", { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0 }));
+    }
+    /* Dryp, til glasset har n draaber, med pipetten (et klik paa den) */
+    function drypTil(X, n, medMus) {
+        var gl = X.glas[X.opg.o.glas];
+        for (var k = 0; k < 40 && gl.draaber() < n; k++) {
+            if (medMus) { var p = X.pipetteRekt(); klik(X, p.x + p.b / 2, p.y + p.h / 2); }
+            else X.dryp();
+            koerF(X, 1.9);
+        }
+        return gl.draaber();
+    }
+
+    /* ================================================================ */
+    overskrift("1. Modellen: dråber, dobbeltbindinger og iodtal");
+    var forventet = { kokos: 1, smoer: 3, oliven: 7, raps: 9, solsikke: 10, tran: 12, heptan: 1 };
+    Object.keys(forventet).forEach(function (f) {
+        paastand(F.FEDT[f].navn + ": farven bliver ved efter dråbe " + forventet[f], F.endepunkt(f) === forventet[f], F.endepunkt(f));
+    });
+    /* iodtallet regnet af de to molekyler (g I₂ pr. 100 g fedt), mod tabellen paa Wikipedia, som oevelse 4.6b bruger */
+    var IOD = { smoer: [25, 42], oliven: [75, 94], raps: [110, 126], solsikke: [110, 145], tran: [148, 183] };
+    function molMasse(id) { var s = F.syre(id); return 12.011 * s.nC + 1.008 * (2 * s.nC - 2 * s.db) + 31.998; }
+    Object.keys(IOD).forEach(function (f) {
+        var m = 0;
+        F.FEDT[f].mol.forEach(function (k) { m += 92.094 + molMasse(k[0]) + molMasse(k[1]) + molMasse(k[2]) - 3 * 18.015; });
+        var iv = F.antalDb(f) * 253.81 / m * 100;
+        paastand(F.FEDT[f].navn + ": iodtallet " + Math.round(iv) + " ligger i " + IOD[f].join(" til "), iv >= IOD[f][0] && iv <= IOD[f][1]);
+    });
+    paastand("kokosfedt: ingen dobbeltbindinger i luppen (iodtal 6 til 11, forenkling i README)", F.antalDb("kokos") === 0);
+    /* den slags fedtsyre, der er mest af i luppen, er ogsaa den stoerste i tabellen */
+    ["kokos", "smoer", "oliven", "raps", "solsikke"].forEach(function (f) {
+        var n = [0, 0, 0];
+        F.FEDT[f].mol.forEach(function (k) { k.forEach(function (id) { var db = F.syre(id).db; n[db === 0 ? 0 : (db === 1 ? 1 : 2)]++; }); });
+        var t = F.FEDT[f].tabel, mest = t.indexOf(Math.max.apply(null, t)), mestL = n.indexOf(Math.max.apply(null, n));
+        paastand(F.FEDT[f].navn + ": luppen har mest af den slags, tabellen har mest af", mest === mestL, n.join("/") + " mod " + t.join("/"));
+        paastand(F.FEDT[f].navn + ": andelene i luppen ligger højst 20 procentpoint fra tabellen", n.every(function (x, i) { return Math.abs(x / 6 * 100 - t[i]) <= 20; }), n.join("/"));
+    });
+    /* proeven: dibrom adderer én pr. dobbeltbinding, og farven kommer foerst bagefter */
+    Object.keys(forventet).forEach(function (f) {
+        var p = new NK.Proeve(f), ok = true, n = F.endepunkt(f);
+        for (var i = 1; i <= n + 2; i++) {
+            p.dryp(); p.opdater(5); p.opdater(5);
+            if (i < n && p.frie() !== 0) ok = false;
+            if (i === n && p.frie() !== 1) ok = false;
+            if (i === n + 2 && p.frie() !== 3) ok = false;
+        }
+        paastand(F.FEDT[f].navn + ": de første " + (n - 1) + " dråber adderer, så bliver dibrom frit", ok);
+        paastand(F.FEDT[f].navn + ": alle " + F.antalDb(f) + " dobbeltbindinger har ét dibrom, ingen to", p.adderet() === F.antalDb(f) && Object.keys(p.br).length === F.antalDb(f));
+    });
+    paastand("farven: intet frit dibrom giver et farveløst lag", NK.Roer.alfa(0) === 0);
+    paastand("farven: ét frit dibrommolekyle giver et svagt farvet lag", NK.Roer.alfa(1) > 0.15 && NK.Roer.alfa(1) < 0.4);
+    paastand("farven: flere frie dibrommolekyler giver mere farve", NK.Roer.alfa(3) > NK.Roer.alfa(1));
+    /* kaederne i et molekyle krydser ikke */
+    function krydser(kaeder) {
+        var min = Infinity;
+        for (var a = 0; a < kaeder.length; a++) for (var b = a + 1; b < kaeder.length; b++) {
+            kaeder[a].forEach(function (p) { kaeder[b].forEach(function (q) { min = Math.min(min, Math.hypot(p.x - q.x, p.y - q.y)); }); });
+        }
+        return min;
+    }
+    var alleMol = [];
+    Object.keys(F.FEDT).forEach(function (f) { F.FEDT[f].mol.forEach(function (k) { alleMol.push(k); }); });
+    D.M_MAAL.forEach(function (o) { alleMol.push(o.mol); });
+    var minLup = Infinity, minStor = Infinity;
+    alleMol.forEach(function (k) {
+        minLup = Math.min(minLup, krydser(F.formLup(k).kaeder.map(function (x) { return x.pkt; })));
+        minStor = Math.min(minStor, krydser(F.formStor(k).raekker.map(function (x) { return x.pkt; })));
+    });
+    paastand("luppen: kæderne i et molekyle er mindst 1,05 bindingslængder fra hinanden", minLup >= 1.05, minLup.toFixed(2));
+    paastand("tavlen: kæderne i et molekyle er mindst 1,5 bindingslængder fra hinanden", minStor >= 1.5, minStor.toFixed(2));
+    paastand("alle kæder bøjer nedad", Object.keys(F.SYRER).every(function () { return true; }) && F.SYRER.every(function (s) {
+        var k = F.kaede(s.id); return k.pkt[k.pkt.length - 1].y >= -0.6;
+    }));
+
+    /* ================================================================ */
+    overskrift("2. Teksterne");
+    var tekster = [];
+    function saml(navn, o) {
+        if (o.gaet) {
+            paastand(navn + ": gættet højst 60 tegn", o.gaet.tekst.length <= 60, o.gaet.tekst.length);
+            o.gaet.svar.forEach(function (s) { paastand(navn + ": gættets svar højst 34 tegn", s.t.length <= 34, s.t); tekster.push(s.t); });
+            tekster.push(o.gaet.tekst, o.gaet.intro || "");
+        }
+        if (o.forsoeg) {
+            paastand(navn + ": forsøget højst 95 tegn", o.forsoeg.tekst.length <= 95, o.forsoeg.tekst.length);
+            paastand(navn + ": det, eleven så, højst 160 tegn", o.forsoeg.set.length <= 160, o.forsoeg.set.length);
+            o.forsoeg.hint.forEach(function (h) { paastand(navn + ": forsøgets hint højst 100 tegn", h.length <= 100, h.length + " " + h); tekster.push(h); });
+            tekster.push(o.forsoeg.tekst, o.forsoeg.set);
+        }
+        ["spm", "spm2"].forEach(function (f) {
+            var del = o[f];
+            if (!del) return;
+            paastand(navn + ": spørgsmålet højst 105 tegn", del.tekst.length <= 105, del.tekst.length);
+            paastand(navn + ": spørgsmålet har ét rigtigt svar", del.svar.filter(function (s) { return s.ok; }).length === 1);
+            del.svar.forEach(function (s) {
+                paastand(navn + ": svaret højst 34 tegn", s.t.length <= 34, s.t);
+                if (!s.ok) paastand(navn + ": forklaringen til et forkert svar højst 110 tegn", s.f && s.f.length <= 110, (s.f || "").length);
+                tekster.push(s.t, s.f || "");
+            });
+            del.hint.forEach(function (h) { paastand(navn + ": spørgsmålets hint højst 100 tegn", h.length <= 100, h.length + " " + h); tekster.push(h); });
+            tekster.push(del.tekst);
+        });
+        paastand(navn + ": forklaringen højst 160 tegn", o.loest.length <= 160, o.loest.length);
+        tekster.push(o.loest);
+    }
+    D.D_MAAL.forEach(function (o) { saml("fane 1 " + o.id, o); });
+    D.M_MAAL.forEach(function (o) { saml("fane 2 " + o.id, o); });
+    D.U_MAAL.forEach(function (o) { saml("fane 3 " + o.id, o); });
+    tekster.push(D.lupBrom, D.mFejl.co, D.mFejl.enkelt, D.mFejl.mangler(2), D.TRAN_NOTE, D.forTidligt("glas 2", 6), D.forMange("glas 2", 7));
+    [D.mFejl.co, D.mFejl.enkelt, D.mFejl.mangler(2), D.forTidligt("flaske B", 11), D.forMange("flaske B", 12)].forEach(function (t) {
+        paastand("fejltekst højst 110 tegn: " + t.slice(0, 30) + " …", t.length <= 110, t.length);
+    });
+    var html = d.body.innerText;
+    var asciiFund = tekster.concat([html]).filter(function (t) { return ASCII_ORD.test(t); });
+    paastand("ingen ord skrevet uden æ, ø og å", asciiFund.length === 0, asciiFund.map(function (t) { return (t.match(ASCII_ORD) || [""])[0]; }).join(", "));
+    paastand("ingen tankestreger", tekster.every(function (t) { return !/[–—]/.test(t); }));
+    paastand("ingen 1+ eller 1−", tekster.every(function (t) { return !/1[+−-](?!\d)/.test(t.replace(/\d+ − \d+/g, "")); }));
+    /* "Den har", "Det er" og "Her" peger paa noget, der stod et andet sted. "Den sidste draabe" er en artikel og i orden. */
+    var indforstaaet = tekster.filter(function (t) { return /(^|[.!?] )(Her|Nu|Den|Det|Dette) (er|har|kan|bliver|blev|var|affarver)\b/.test(t) || /\bogså her\b/i.test(t); });
+    paastand("intet indforstået: ingen tekst siger Den har, Det er, Her er eller også her", indforstaaet.length === 0, indforstaaet.join(" | "));
+    paastand("dibrom, ikke brom, om stoffet", tekster.every(function (t) { return !/\bbrom(molekyle|met)\b/i.test(t); }));
+    paastand("D.FAERDIG findes for alle tre faner", !!(D.FAERDIG.d && D.FAERDIG.m && D.FAERDIG.u));
+
+    /* ================================================================ */
+    overskrift("3. Fane 1: Dryp og tæl");
+    visFane("fane-d");
+    Dd.vaelg(0);
+    paastand("første opgave begynder med et gæt", Dd.gaetNu());
+    paastand("under gættet er luppen skjult", Dd.lupNu() < 0);
+    paastand("under gættet er Indsend svar skjult", Dd.el.indsend.hidden);
+    paastand("låsen: pipetten drypper ikke under gættet", Dd.dryp() === false && Dd.glas[1].draaber() === 0);
+    paastand("låsen: kortet blinker", blinker(Dd));
+    var p0 = Dd.pipetteRekt();
+    klik(Dd, p0.x + p0.b / 2, p0.y + p0.h / 2);
+    paastand("låsen: et klik på pipetten under gættet drypper heller ikke", Dd.glas[1].draaber() === 0);
+    svar(Dd, 0);
+    paastand("efter gættet: forsøget", Dd.opg.fase === "forsoeg" && Dd.iForsoeg());
+    paastand("Indsend svar står fremme, men er gråt uden dråber", !Dd.el.indsend.hidden && Dd.el.indsend.classList.contains("ikke-klar"));
+    Dd.indsendKlik();
+    paastand("Indsend svar uden dråber: kortet blinker og siger, hvad der mangler", blinker(Dd) && /Dryp først/.test(Dd.beskedTekst()));
+    var p1 = Dd.pipetteRekt();
+    klik(Dd, p1.x + p1.b / 2, p1.y + p1.h / 2);
+    paastand("et klik på pipetten drypper én dråbe", Dd.glas[1].fase !== "klar");
+    paastand("mens glasset ryster, kan der ikke sendes", !Dd.kanIndsendes());
+    koerF(Dd, 0.1);
+    klik(Dd, p1.x + p1.b / 2, p1.y + p1.h / 2);
+    koerF(Dd, 1.9);
+    paastand("et klik, mens dråben falder, giver ikke en dråbe mere", Dd.glas[1].draaber() === 1);
+    paastand("efter dråbe 1 er det øverste lag farveløst", Dd.glas[1].farver().olie < 0.02, Dd.glas[1].farver().olie);
+    drypTil(Dd, 6, true);
+    paastand("efter dråbe 6 er laget stadig farveløst", Dd.glas[1].farver().olie < 0.02 && Dd.glas[1].proeve.frie() === 0);
+    paastand("knappen viser antallet af dråber", /6 dråber/.test(Dd.el.indsend.textContent), Dd.el.indsend.textContent);
+    Dd.indsendKlik();
+    paastand("for tidligt: rød forklaring, og forsøget fortsætter", roed(Dd) && Dd.opg.fase === "forsoeg" && !Dd.venter, Dd.beskedTekst());
+    paastand("for tidligt: forklaringen nævner glasset og dråben", /glas 2/.test(Dd.beskedTekst()) && /6/.test(Dd.beskedTekst()));
+    drypTil(Dd, 7, true);
+    paastand("efter dråbe 7 er laget svagt farvet", Dd.glas[1].farver().olie > 0.15 && Dd.glas[1].farver().olie < 0.4, Dd.glas[1].farver().olie);
+    paastand("luppen viser ét frit dibrommolekyle", Dd.glas[1].proeve.frie() === 1 && Dd.lupNu() === 1);
+    Dd.indsendKlik();
+    paastand("7 dråber: det grønne kort med det, eleven så", Dd.venter && /dråbe 7/.test(Dd.el.skort.textContent));
+    paastand("skemaet har 7 for glas 2", /olivenolie<\/td><td>7/.test(NK.el("d-skema").innerHTML));
+    frem(Dd);
+    paastand("så spørgsmålet", Dd.opg.fase === "spm" && !Dd.el.indsend.hidden);
+    paastand("låsen: pipetten drypper ikke under spørgsmålet", Dd.dryp() === false && Dd.glas[1].draaber() === 7);
+    svar(Dd, forkert(Dd));
+    paastand("forkert svar: rød forklaring", roed(Dd));
+    svar(Dd, rigtigt(Dd));
+    paastand("rigtigt svar: opgaven er løst med stjerne", Dd.faerdig && Dd.status[0].loest && Dd.status[0].stjerne);
+    paastand("kortet bliver på spørgsmålet med forklaringen og Næste", !!Dd.el.skort.querySelector(".sk-bund.bliv") && !!Dd.el.skort.querySelector(".sk-videre"));
+
+    /* for mange draaber: loest, men uden stjerne */
+    Dd.vaelg(1);
+    svar(Dd, rigtigt(Dd));
+    drypTil(Dd, 3);
+    Dd.indsendKlik();
+    paastand("kokosfedt med 3 dråber: farven blev ved efter dråbe 1, det står på kortet", Dd.venter && /dråbe 1/.test(Dd.el.skort.textContent));
+    paastand("skemaet har 1 for glas 1", /kokosfedt<\/td><td>1</.test(NK.el("d-skema").innerHTML));
+    frem(Dd);
+    svar(Dd, rigtigt(Dd));
+    paastand("for mange dråber: løst, men uden stjerne", Dd.faerdig && Dd.status[1].loest && !Dd.status[1].stjerne);
+
+    /* resten med pipetten */
+    [2, 3, 4].forEach(function (i) {
+        Dd.vaelg(i);
+        var o = Dd.opg.o;
+        if (Dd.gaetNu()) svar(Dd, rigtigt(Dd));
+        drypTil(Dd, F.endepunkt(D.D_GLAS[o.glas].fedt));
+        Dd.indsendKlik();
+        frem(Dd);
+        if (!Dd.faerdig) svar(Dd, rigtigt(Dd));
+        paastand(o.navn + ": løst", Dd.faerdig && Dd.status[i].loest);
+    });
+    paastand("alle fem er løst, og forklaringen siger det", Dd.antalLoest() === 5 && /Alle fem glas/.test(Dd.el.skort.textContent));
+    paastand("skemaet har kolonnen minus glas 5 med 6 for olivenolie", /Minus glas 5/.test(NK.el("d-skema").innerHTML) && /olivenolie<\/td><td>7<\/td><td>6/.test(NK.el("d-skema").innerHTML));
+    paastand("kortets knap går videre til fane 2", /Ét molekyle/.test(Dd.videreTekst()));
+
+    /* Vis svaret paa alle */
+    D.D_MAAL.forEach(function (o, i) {
+        Dd.vaelg(i);
+        for (var n = 0; n < 30 && !Dd.faerdig; n++) { Dd.knap(); koerF(Dd, 0.1); }
+        paastand("Vis svaret løser " + o.navn, Dd.faerdig);
+        paastand("Vis svaret giver det rigtige antal dråber i skemaet for " + o.navn, Dd.resultat[o.glas] === F.endepunkt(D.D_GLAS[o.glas].fedt));
+    });
+
+    /* ================================================================ */
+    overskrift("4. Fane 2: Ét molekyle");
+    visFane("fane-m");
+    M.vaelg(0);
+    paastand("første opgave er et forsøg uden gæt", M.opg.fase === "forsoeg");
+    paastand("knappen siger ingen dobbeltbindinger fra start", /ingen dobbeltbindinger/.test(M.el.indsend.textContent));
+    /* rigtig mus: et klik paa en binding markerer den */
+    var g = M.geometri(), b0 = null;
+    g.bindinger.forEach(function (b) { if (b.n === "0.3") b0 = b; });
+    klik(M, (b0.a.x + b0.b.x) / 2, (b0.a.y + b0.b.y) / 2);
+    paastand("et klik på en binding markerer den", !!M.mrk["0.3"]);
+    paastand("knappen tæller den markerede", /1 dobbeltbinding/.test(M.el.indsend.textContent), M.el.indsend.textContent);
+    M.indsendKlik();
+    paastand("en enkeltbinding markeret: rød forklaring", roed(M) && /enkeltbinding/.test(M.beskedTekst()));
+    klik(M, (b0.a.x + b0.b.x) / 2, (b0.a.y + b0.b.y) / 2);
+    paastand("et klik mere fjerner markeringen", !M.mrk["0.3"]);
+    M.mrk["2.co"] = true;
+    M.indsendKlik();
+    paastand("C=O markeret: forklaringen om C=O", roed(M) && /C=O/.test(M.beskedTekst()));
+    M.mrk = {};
+    M.mrk["0.8"] = true;
+    M.indsendKlik();
+    paastand("for få markeret: forklaringen siger det", roed(M) && /flere dobbeltbindinger end/.test(M.beskedTekst()));
+    M.mrk = {};
+    M.dobbelte().forEach(function (n) { M.mrk[n] = true; });
+    M.indsendKlik();
+    paastand("alle tre markeret: dibrom flyver hen", !!M.addering && M.dobbelte().length === 3);
+    paastand("mens dibrom flyver, er markeringer låst", (function () { var x = M.overScene({ x: 10, y: 10 }); return x === null; })());
+    koerF(M, 3);
+    paastand("dibrom har adderet til alle tre", M.dobbelte().every(function (n) { return M.brom[n] === 1; }));
+    paastand("det grønne kort siger tre dibrommolekyler", M.venter && /Tre dobbeltbindinger/.test(M.el.skort.textContent));
+    frem(M);
+    svar(M, rigtigt(M));
+    paastand("olivenolie løst", M.faerdig && M.status[0].stjerne);
+    paastand("panelet viser slagsen", /monoumættet/.test(NK.el("m-fedtsyrer").innerHTML));
+
+    D.M_MAAL.forEach(function (o, i) {
+        if (i === 0) return;
+        M.vaelg(i);
+        M.mrk = {};
+        M.dobbelte().forEach(function (n) { M.mrk[n] = true; });
+        M.indsendKlik();
+        koerF(M, 1 + M.dobbelte().length * 0.4);
+        paastand(o.navn + ": " + F.dbTekst(F.antalDbMol(o.mol)) + ", og dibrom har adderet til dem", M.venter && M.dobbelte().length === F.antalDbMol(o.mol));
+        frem(M);
+        svar(M, rigtigt(M));
+        paastand(o.navn + ": løst", M.faerdig);
+    });
+    M.vaelg(2);
+    M.mrk = {};
+    paastand("kokosfedt: knappen siger ingen dobbeltbindinger", /ingen dobbeltbindinger/.test(M.el.indsend.textContent));
+    D.M_MAAL.forEach(function (o, i) {
+        M.vaelg(i);
+        for (var n = 0; n < 30 && !M.faerdig; n++) { M.knap(); koerF(M, 0.1); }
+        paastand("Vis svaret løser " + o.navn, M.faerdig && M.dobbelte().every(function (x) { return M.brom[x] === 1; }));
+    });
+    M.vaelg(0);
+    M.mrk = {};
+    M.svarValg(0);
+    paastand("låsen: et klik på tavlen under det grønne kort markerer intet", (function () {
+        M.dobbelte().forEach(function (n) { M.mrk[n] = true; }); M.indsendKlik(); koerF(M, 3);
+        var gg = M.geometri(), b = gg.bindinger[3];
+        klik(M, (b.a.x + b.b.x) / 2, (b.a.y + b.b.y) / 2);
+        return M.venter && !M.mrk[b.n] && blinker(M);
+    })());
+
+    /* ================================================================ */
+    overskrift("5. Fane 3: Ukendte fedtstoffer");
+    visFane("fane-u");
+    U.vaelg(0);
+    paastand("flaske A er et forsøg", U.opg.fase === "forsoeg");
+    paastand("luppen viser ikke en ukendt flaske", U.lupNu() < 0);
+    paastand("flasken hedder ukendt under glasset og i panelet", /ukendt/.test(NK.el("u-skema").innerHTML));
+    paastand("varedeklarationerne står i panelet med tran", /Tran/.test(NK.el("u-dekl").innerHTML) && /25 %/.test(NK.el("u-dekl").innerHTML));
+    drypTil(U, 3, true);
+    paastand("efter 3 dråber stadig ingen lup", U.lupNu() < 0);
+    U.indsendKlik();
+    frem(U);
+    svar(U, forkert(U));
+    paastand("forkert fedtstof: rød forklaring", roed(U));
+    svar(U, rigtigt(U));
+    paastand("flaske A er smør, og luppen viser den nu", U.faerdig && U.lupNu() === 0 && /smør/.test(NK.el("u-skema").innerHTML));
+    [1, 2, 3].forEach(function (i) {
+        U.vaelg(i);
+        drypTil(U, F.endepunkt(D.U_GLAS[i].fedt));
+        U.indsendKlik();
+        frem(U);
+        svar(U, rigtigt(U));
+        paastand(D.U_MAAL[i].navn + ": " + F.FEDT[D.U_GLAS[i].fedt].navn + " er fundet", U.faerdig && U.kendt(i));
+    });
+    paastand("alle fire flasker er fundet", U.antalLoest() === 4 && /Alle fire flasker/.test(U.el.skort.textContent));
+    paastand("sidste fane: ingen knap videre, når alt er løst", !U.el.skort.querySelector(".sk-videre"));
+    D.U_MAAL.forEach(function (o, i) {
+        U.vaelg(i);
+        for (var n = 0; n < 30 && !U.faerdig; n++) { U.knap(); koerF(U, 0.1); }
+        paastand("Vis svaret løser " + o.navn, U.faerdig);
+    });
+
+    /* ================================================================ */
+    overskrift("6. Skærmstørrelser: kortet og tingene kan være der");
+    var STR = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]];
+    for (var si = 0; si < STR.length; si++) {
+        var b = STR[si][0], h = STR[si][1];
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await vent(250);
+        var maks = { d: 0, m: 0, u: 0 }, problem = [];
+        [["fane-d", Dd, "d"], ["fane-m", M, "m"], ["fane-u", U, "u"]].forEach(function (x) {
+            var X = x[1];
+            visFane(x[0]);
+            X.tilpas();
+            X.layout();
+            X.opgaver.forEach(function (o, i) {
+                X.vaelg(i);
+                function maal(hvad) {
+                    var r = X.el.skort.getBoundingClientRect(), c = X.L.canvas.getBoundingClientRect();
+                    var bund = r.bottom - c.top;
+                    maks[x[2]] = Math.max(maks[x[2]], r.height);
+                    if (bund > 10 + X.kortZone() + 4) problem.push(o.id + " " + hvad + " " + Math.round(bund) + ">" + (10 + X.kortZone()));
+                }
+                X.opg.faser.forEach(function (f) {
+                    /* Et gaet maa gerne vaere hoejere end zonen (luppen er skjult imens),
+                       men det maa ikke naa ned til pipetten og glassene */
+                    if (f === "gaet") {
+                        var r0 = X.el.skort.getBoundingClientRect(), c0 = X.L.canvas.getBoundingClientRect();
+                        if (X.lay.pipTop && r0.bottom - c0.top > X.lay.pipTop - 36) problem.push(o.id + " gaet " + Math.round(r0.bottom - c0.top) + ">" + Math.round(X.lay.pipTop - 36));
+                        X.visSvar();
+                        return;
+                    }
+                    maal(f);
+                    var h2 = f === "gaet" ? [] : X.hintNu();
+                    for (var k = 0; k < h2.length; k++) { X.knap(); maal(f + " hint " + (k + 1)); }
+                    if (f === "spm" || f === "spm2") {
+                        X.opg.o[f].svar.forEach(function (s, j) { if (!s.ok) { X.svarValg(j); X.indsendKlik(); maal(f + " forkert " + j); } });
+                    }
+                    X.visSvar();
+                    maal(f + " svar");
+                    frem(X);
+                });
+            });
+        });
+        paastand(b + " × " + h + ": kortet er inden for sin zone i alle dele af alle opgaver", problem.length === 0, problem.slice(0, 4).join(" | "));
+        /* tingene: luppen under kortet, pipetten under luppen med plads til skiltet, glassene paa bordet */
+        visFane("fane-d"); Dd.tilpas(); Dd.layout();
+        var L = Dd.lay;
+        paastand(b + " × " + h + ": luppen begynder under kortets zone", L.lup.y - 24 >= 10 + Dd.kortZone(), L.lup.y);
+        paastand(b + " × " + h + ": skiltet over pipetten rammer ikke luppen", L.pipTop - 34 >= L.lup.y + L.lup.h, (L.pipTop - 34) + " " + (L.lup.y + L.lup.h));
+        paastand(b + " × " + h + ": luppen er mindst 90 px høj", L.lup.h >= 90, L.lup.h);
+        var minLupS = Infinity, mindst = h <= 620 ? 6 : 9;
+        [["fane-d", Dd], ["fane-u", U]].forEach(function (x) {
+            var X = x[1];
+            visFane(x[0]); X.tilpas(); X.layout();
+            X.glas.forEach(function (gl) { if (!gl.proeve.fedt.heptan) minLupS = Math.min(minLupS, X.lup.geo(gl.proeve, X.lay.lup).s); });
+        });
+        paastand(b + " × " + h + ": molekylerne i luppen er store nok at se (mindst " + mindst + " px pr. binding)", minLupS >= mindst, minLupS.toFixed(1));
+        visFane("fane-m"); M.tilpas(); M.layout();
+        var minS = Infinity;
+        D.M_MAAL.forEach(function (o, i) { M.vaelg(i); minS = Math.min(minS, M.geometri().s); });
+        paastand(b + " × " + h + ": molekylet på tavlen er mindst 15 px pr. binding", minS >= 15, minS.toFixed(1));
+        paastand(b + " × " + h + ": tavlen er inden for scenen", M.lay.tavle.y + M.lay.tavle.h <= M.L.h && M.lay.tavle.x >= 0);
+    }
+    ramme.style.width = "1300px";
+    ramme.style.height = "760px";
+}
+</script>
+</body>
+</html>

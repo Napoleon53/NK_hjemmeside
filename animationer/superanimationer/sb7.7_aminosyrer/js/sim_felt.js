@@ -1,14 +1,24 @@
 /* =====================================================================
    sim_felt.js - fane 3: Det elektriske felt
 
-   Fire trin (D.FELT):
-     1 gaet     asparaginsyre, valin og lysin midt paa et papir med pH 6;
-                hvilken vandrer mod minuspolen?
-     2 stroem   strømmen sluttes: formlerne viser formerne ved pH 6, og
-                pletterne vandrer efter deres ladning
-     3 lysin    hvorfor vandrer lysin mod minuspolen?
+   Fire trin (D.FELT). Eleven finder foerst formerne, foer der skal
+   forudsiges noget (brugeren 12. nov. 2026; foer var trin 1 et gaet):
+     1 former   formlerne staar uladede som i bogen; eleven klikker paa
+                grupperne, saa de passer til pH 6 (hver −COOH afgiver og
+                hver −NH₂ optager en hydron), og saa staar ladningerne der
+     2 minuspol hvilken aminosyre vandrer mod minuspolen? (lysin)
+     3 stroem   strømmen sluttes, og pletterne vandrer efter ladningen;
+                kortet bliver staaende med en knap videre
      4 ph1      ved hvilken pH vandrer alle tre mod minuspolen? (pH 1, og
                 saa koerer forsoeget igen ved pH 1)
+     5 ukendt   to ukendte aminosyrer, X og Y, vandrer ved pH 6 (X mod
+                pluspolen, Y mod minuspolen); formlerne har ? for enden af
+                sidekaeden
+     6 struktur eleven klikker paa ?, til gruppen for enden passer med
+                forsoeget (−CH₃, −OH, −COOH eller −NH₂): X faar −COOH
+                (glutaminsyre) og Y −NH₂ (lysin). Metoden fra trin 1 bruges
+                baglaens (brugeren 12. nov. 2026: "en ukendt opgave.. hvor man
+                skal bruge metoden til at løse en struktur")
    Bagefter er pH-skyderen fri, og pletterne vandrer igen, naar eleven
    slipper den.
 
@@ -28,12 +38,13 @@
     var NOEGLE = "nk-sb7.7-felt";
 
     var KOER = 2.4;          /* sekunder, strømmen er sluttet */
-    var EFTER = 0.8;         /* pause efter forsoeget, foer spoergsmaalet */
     var IGEN = 0.35;         /* pletterne kommer tilbage til start */
+    var GRUPPER = ["carboxyl", "amino", "side"];
 
     function SimFelt() {
         var mig = this;
         this.trinListe = D.FELT;
+        this.raekke = D.FELT_RAEKKE;
         this.hentStatus();
         this.startFane();
         NK.el("e-forfra").addEventListener("click", function () { mig.forfra(); });
@@ -71,24 +82,45 @@
         this.faerdig = false;
         this.fri = false;
         this.sejrT = null;
-        this.gaet = {};
         this.ph = 6;
+        this.raekke = D.FELT_RAEKKE;
         this.vis = "bog";
+        this.pletIon = false;
         this.koer = null;
         this.igen = null;
-        this.efterT = null;
+        this.stroemPaa = false;
+        this.klikket = 0;
+        this.kortKasser = {};
+        this.elevT = {};
+        this.valgSide = { x: null, y: null };
+        this.loestUkendt = false;
         this.d = {};
         this.d0 = {};
         this.dMaal = {};
         var mig = this;
-        D.FELT_RAEKKE.forEach(function (id) { mig.d[id] = 0; mig.d0[id] = 0; mig.dMaal[id] = 0; });
+        D.FELT_RAEKKE.concat(D.UKENDT_RAEKKE).forEach(function (id) { mig.d[id] = 0; mig.d0[id] = 0; mig.dMaal[id] = 0; });
+        D.FELT_RAEKKE.forEach(function (id) { mig.elevT[id] = bogTilst(D.AMINOSYRER[id]); });
         this.startTrin(0);
     };
 
     P.startTrin = function (j) {
+        var mig = this;
         this.trinNr = j;
         this.trin = this.trinListe[j];
         this.fase = this.trin.slags;
+        /* De ukendte: X og Y afloeser de tre aminosyrer ved pH 6 */
+        if (this.trin.ukendt && this.raekke !== D.UKENDT_RAEKKE) {
+            this.raekke = D.UKENDT_RAEKKE;
+            this.ph = this.trin.ph;
+            this.vis = "bog";
+            this.pletIon = false;
+            this.stroemPaa = false;
+            this.koer = null;
+            this.igen = null;
+            this.klikket = 0;
+            this.kortKasser = {};
+            this.raekke.forEach(function (id) { mig.d[id] = 0; });
+        }
         this.valgt = null;
         this.forkert = {};
         this.groen = null;
@@ -101,12 +133,9 @@
 
     P.kortData = function () {
         var mig = this, t = this.trin, chip = "Trin " + (this.trinNr + 1) + " af " + this.trinListe.length;
-        if (this.fase === "gaet") {
-            return { slags: "spm", chip: chip + " · Gæt først", tekst: t.tekst,
-                     svar: t.svar.map(function (s, j) { return { t: s, valgt: mig.valgt === j }; }) };
-        }
+        if (this.fase === "former" || this.fase === "struktur") return { slags: "spm", chip: chip, tekst: t.tekst };
         if (this.fase === "forsoeg") {
-            if (this.koer || this.efterT !== null) return { slags: "opgave", chip: chip, tekst: t.koerer };
+            if (this.koer) return { slags: "opgave", chip: chip, tekst: t.koerer };
             return { slags: "opgave", chip: chip, tekst: t.tekst,
                      ekstra: '<div class="sk-handling"><button type="button" class="knap blaa" data-udfoer="1">' + NK.html(t.knap) + "</button></div>" };
         }
@@ -115,35 +144,65 @@
     };
 
     P.skjulIndsend = function () { return this.fase === "forsoeg"; };
-    P.skjulHint = function () { return this.fase === "forsoeg" || this.fase === "gaet"; };
+    P.skjulHint = function () { return this.fase === "forsoeg"; };
 
     P.svarValg = function (j) {
-        if (this.fase === "forsoeg") return;
+        if (this.fase !== "spm") return;
         this.valgt = this.valgt === j ? null : j;
         this.visKort();
     };
 
-    P.kanSendes = function () { return this.fase !== "forsoeg" && this.valgt !== null; };
-    P.indsendTekst = function () {
-        if (this.valgt === null) return "Indsend svar";
-        if (this.fase === "gaet") return "Indsend svar: " + this.trin.svar[this.valgt];
-        return "Indsend svar";
+    P.kanSendes = function () {
+        if (this.fase === "former" || this.fase === "struktur") return this.klikket > 0;
+        return this.fase === "spm" && this.valgt !== null;
     };
-    P.ingentingTekst = function () { return "Vælg et af svarene på kortet først."; };
+    P.indsendTekst = function () { return "Indsend svar"; };
+    P.ingentingTekst = function () { return this.trin.fejlIntet || "Vælg et af svarene på kortet først."; };
 
-    P.indsend = function () {
-        if (this.fase === "gaet") {
-            /* Et gaet er gratis: det bliver husket, og forsoeget kommer */
-            this.gaet[this.trin.id] = this.valgt;
-            this.startTrin(this.trinNr + 1);
-            return;
+    P.indsend = function () { this.bedoem(false); };
+
+    /* Den foerste gruppe, der ikke passer til pH 6, og forklaringen til den */
+    P.formFejl = function () {
+        var t = this.trin, ph = t.ph;
+        for (var i = 0; i < D.FELT_RAEKKE.length; i++) {
+            var id = D.FELT_RAEKKE[i], aa = D.AMINOSYRER[id], maal = D.tilstand(aa, ph), elev = this.elevT[id];
+            for (var k = 0; k < GRUPPER.length; k++) {
+                var g = GRUPPER[k];
+                if (maal[g] === undefined || maal[g] === elev[g]) continue;
+                if (g === "side") return aa.sideSlags === "carboxyl" ? t.fejlSideCarboxyl : t.fejlSideAmino;
+                return (g === "carboxyl" ? t.fejlCarboxyl : t.fejlAmino).replace("{navn}", aa.navn);
+            }
         }
-        this.bedoem(false);
+        return null;
+    };
+
+    /* Den foerste ukendte, hvis gruppe ikke passer med forsoeget */
+    P.strukturFejl = function () {
+        var t = this.trin;
+        for (var i = 0; i < D.UKENDT_RAEKKE.length; i++) {
+            var u = D.UKENDTE[D.UKENDT_RAEKKE[i]], v = this.valgSide[u.id], tekst;
+            if (v === u.facit) continue;
+            if (!v) tekst = t.fejlMangler;
+            else if (v === "CH3" || v === "OH") tekst = t.fejlNeutral.replace("{gruppe}", D.ENDE_TEKST[v]);
+            else tekst = v === "amino" ? t.fejlAmino : t.fejlCarboxyl;
+            return tekst.replace("{navn}", u.navn);
+        }
+        return null;
     };
 
     P.bedoem = function (vist) {
-        var t = this.trin;
-        if (this.valgt !== t.rigtig) {
+        var t = this.trin, fejlTekst;
+        if (this.fase === "former") {
+            fejlTekst = this.formFejl();
+            if (fejlTekst) { this.fejl = true; this.fejlLinje(fejlTekst); return; }
+            this.vis = "ion";
+            this.pletIon = true;
+        } else if (this.fase === "struktur") {
+            fejlTekst = this.strukturFejl();
+            if (fejlTekst) { this.fejl = true; this.fejlLinje(fejlTekst); return; }
+            this.vis = "ion";
+            this.loestUkendt = true;
+        } else if (this.valgt !== t.rigtig) {
             this.fejl = true;
             var tekst = t.fejl[this.valgt];
             this.forkert[this.valgt] = true;
@@ -187,30 +246,52 @@
     P.nulstil = function () { if (!this.groen && !this.koer) this.vaelg(0); };
 
     P.hintNu = function () {
-        if (this.groen || this.fase !== "spm") return [];
-        return this.trin.hint;
+        if (this.groen || this.fase === "forsoeg") return [];
+        return this.trin.hint || [];
     };
 
     P.visSvar = function () {
+        var mig = this;
         this.sv = true;
-        this.valgt = this.trin.rigtig;
+        if (this.fase === "former") {
+            D.FELT_RAEKKE.forEach(function (id) { mig.elevT[id] = D.tilstand(D.AMINOSYRER[id], mig.trin.ph); });
+        } else if (this.fase === "struktur") {
+            D.UKENDT_RAEKKE.forEach(function (id) { mig.valgSide[id] = D.UKENDTE[id].facit; });
+        } else this.valgt = this.trin.rigtig;
         this.bedoem(true);
     };
 
     /* ----- Forsoeget -------------------------------------------------------------------- */
     P.udfoer = function () {
-        if (this.fase !== "forsoeg" || this.koer || this.efterT !== null) return;
-        this.vis = "ion";
+        if (this.fase !== "forsoeg" || this.koer || this.groen) return;
+        /* Ved de ukendte ses kun pletterne; formlerne beholder deres ? */
+        if (!this.trin.ukendt) this.vis = "ion";
+        this.pletIon = true;
         this.startKoer();
         this.visKort();
     };
 
-    P.ladning = function (id) { return D.ladning(D.AMINOSYRER[id], this.ph); };
+    /* Den rigtige aminosyre bag et id (X er glutaminsyre, Y er lysin) */
+    P.sand = function (id) { return D.UKENDTE[id] ? D.AMINOSYRER[D.UKENDTE[id].rigtig] : D.AMINOSYRER[id]; };
+
+    /* Den aminosyre, formlen viser: for X og Y med den gruppe, eleven har valgt */
+    P.vist = function (id) {
+        var u = D.UKENDTE[id];
+        if (!u) return D.AMINOSYRER[id];
+        var sand = this.sand(id), e = this.valgSide[id];
+        var aa = { id: id, navn: u.navn, kort: u.kort, side: "ukendt", n: u.n, ende: e,
+                   grupper: { carboxyl: sand.grupper.carboxyl, amino: sand.grupper.amino } };
+        if (e === "carboxyl" || e === "amino") { aa.sideSlags = e; aa.grupper.side = D.ENDE_PKS[e]; }
+        return aa;
+    };
+
+    P.ladning = function (id) { return D.ladning(this.sand(id), this.ph); };
 
     P.startKoer = function () {
         var mig = this;
         this.koer = { t: 0 };
-        D.FELT_RAEKKE.forEach(function (id) {
+        this.stroemPaa = true;
+        this.raekke.forEach(function (id) {
             mig.d0[id] = mig.d[id];
             mig.dMaal[id] = NK.klamp(mig.ladning(id) * D.VANDRING, -0.92, 0.92);
         });
@@ -221,8 +302,9 @@
         var mig = this;
         this.ph = Math.round(ph / D.PH_SKRIDT) * D.PH_SKRIDT;
         this.vis = "ion";
+        this.pletIon = true;
         this.koer = null;
-        D.FELT_RAEKKE.forEach(function (id) { mig.d[id] = 0; });
+        this.raekke.forEach(function (id) { mig.d[id] = 0; });
         this.igen = { t: 0 };
     };
 
@@ -235,15 +317,17 @@
         if (this.koer) {
             this.koer.t += dt;
             var u = NK.blod(this.koer.t / KOER);
-            D.FELT_RAEKKE.forEach(function (id) { mig.d[id] = NK.lerp(mig.d0[id], mig.dMaal[id], u); });
+            this.raekke.forEach(function (id) { mig.d[id] = NK.lerp(mig.d0[id], mig.dMaal[id], u); });
             if (this.koer.t >= KOER) {
                 this.koer = null;
-                if (this.fase === "forsoeg" && !this.groen) { this.efterT = EFTER; this.visKort(); }
+                /* Forsoeget er slut: kortet bliver staaende med en knap videre */
+                if (this.fase === "forsoeg" && !this.groen) {
+                    this.groen = { spm: true, maade: "selv", maerke: "Forsøget", tekst: this.trin.efter, knap: "Næste trin →" };
+                    this.besked("", "");
+                    this.visKort();
+                    this.visListe();
+                }
             }
-        }
-        if (this.efterT !== null) {
-            this.efterT -= dt;
-            if (this.efterT <= 0) { this.efterT = null; if (this.fase === "forsoeg") this.startTrin(this.trinNr + 1); }
         }
     };
 
@@ -256,7 +340,8 @@
     P.overScene = function (pt) {
         if (!pt) return null;
         if (T.paaSkala(this.skala, pt)) return this.fri ? "ew-resize" : "not-allowed";
-        if (this.fase === "forsoeg" && !this.koer && this.efterT === null && this.paaPapir(pt)) return "pointer";
+        if (this.fase === "forsoeg" && !this.koer && !this.groen && this.paaPapir(pt)) return "pointer";
+        if ((this.fase === "former" || this.fase === "struktur") && !this.groen && this.gruppeVed(pt)) return "pointer";
         return null;
     };
 
@@ -270,6 +355,7 @@
     P.saetPh = function (ph) {
         this.ph = Math.round(ph / D.PH_SKRIDT) * D.PH_SKRIDT;
         this.vis = "ion";
+        this.pletIon = true;
     };
 
     P.flytScene = function (pt) { if (this.grebSkyder) this.saetPh(T.xTilPh(this.skala, pt.x)); };
@@ -281,12 +367,44 @@
 
     P.klikScene = function (pt) {
         if (T.paaSkala(this.skala, pt)) {
-            if (!this.fri) { this.kortBlink(); this.kortBesked("Skyderen er låst, til de fire trin er løst.", 3); }
+            if (!this.fri) { this.kortBlink(); this.kortBesked("Skyderen er låst, til alle trin er løst.", 3); }
             return;
         }
         if (this.spaer()) return;
-        if (this.fase === "forsoeg" && !this.koer && this.efterT === null && this.paaPapir(pt)) { this.udfoer(); return; }
+        if (this.fase === "forsoeg" && !this.koer && this.paaPapir(pt)) { this.udfoer(); return; }
+        if (this.fase === "former" || this.fase === "struktur") {
+            var h = this.gruppeVed(pt);
+            if (h && this.fase === "former") {
+                /* Gruppen faar eller afgiver sin hydron */
+                this.elevT[h.id][h.g] = 1 - this.elevT[h.id][h.g];
+            } else if (h) {
+                /* Gruppen for enden af sidekaeden skifter: −CH₃, −OH, −COOH, −NH₂ */
+                var e = this.valgSide[h.id];
+                this.valgSide[h.id] = D.ENDER[(D.ENDER.indexOf(e) + 1) % D.ENDER.length];
+            }
+            if (h) {
+                this.klikket++;
+                this.besked("", "");
+                this.visIndsend();
+                return;
+            }
+        }
         this.kortBlink();
+    };
+
+    /* Den gruppe i formlerne, musen er over: { id, g } */
+    P.gruppeVed = function (pt) {
+        if (!pt) return null;
+        var gr = this.fase === "struktur" ? ["side"] : GRUPPER;
+        for (var i = 0; i < this.raekke.length; i++) {
+            var id = this.raekke[i], kk = this.kortKasser[id];
+            if (!kk) continue;
+            for (var k = 0; k < gr.length; k++) {
+                var b = kk[gr[k]], m = 5;
+                if (b && pt.x > b.x - m && pt.x < b.x + b.w + m && pt.y > b.y - m && pt.y < b.y + b.h + m) return { id: id, g: gr[k] };
+            }
+        }
+        return null;
     };
 
     /* ----- Layout ------------------------------------------------------------------------ */
@@ -303,7 +421,8 @@
         var fs = Math.round(NK.klamp(Math.min((ledig - 10) / 13.2, kortB / 10.8), 10, 17) * 2) / 2;
         this.fs = fs;
         var kortH = Math.min(ledig, Math.round(13.2 * fs + 10));
-        this.kort = D.FELT_RAEKKE.map(function (id, i) { return { id: id, x: t.x + 14 + i * (kortB + 14), y: t.y + 12, b: kortB, h: kortH }; });
+        var n = this.raekke.length, x0 = t.x + (t.b - n * kortB - (n - 1) * 14) / 2;
+        this.kort = this.raekke.map(function (id, i) { return { id: id, x: x0 + i * (kortB + 14), y: t.y + 12, b: kortB, h: kortH }; });
         var sy = t.y + 12 + kortH + 26 + Math.max(0, (ledig - kortH) * 0.5);
         this.strimmel = { x: t.x + 74, y: sy, b: t.b - 148, h: stribeH };
         this.skala = { x: t.x + 70 + (this.kompakt ? 30 : 0), y: t.y + t.h - (this.kompakt ? 30 : 34), b: t.b - 140 - (this.kompakt ? 30 : 0) };
@@ -333,7 +452,7 @@
     }
 
     P.tegnKort = function (ctx, k) {
-        var aa = D.AMINOSYRER[k.id], fs = this.fs, F2 = D.FARVE;
+        var aa = this.vist(k.id), u = D.UKENDTE[k.id], fs = this.fs, F2 = D.FARVE;
         ctx.save();
         ctx.shadowColor = "rgba(0, 0, 0, 0.10)";
         ctx.shadowBlur = 8;
@@ -347,18 +466,24 @@
         ctx.stroke();
         ctx.restore();
         var ion = this.vis === "ion";
-        var tilst = ion ? D.tilstand(aa, this.ph) : bogTilst(aa);
-        M.tegn(ctx, aa, tilst, k.x + k.b / 2, k.y + 10 + 0.62 * fs, fs, { gloed: ion ? 1 : 0 });
-        var yN = k.y + k.h - 2.1 * fs;
-        NK.tekst(ctx, aa.navn, k.x + k.b / 2, yN, { font: "800 " + Math.round(fs * 0.95) + "px " + M.FONT, farve: F2.blaek, justering: "center", linje: "middle" });
-        var linje2 = aa.om + (ion ? " · ladning " + NK.fortegn(D.tilstandLadning(aa, tilst)) : "");
+        var tilst = ion ? D.tilstand(aa, this.ph) : (u ? bogTilst(aa) : this.elevT[k.id]);
+        var kk = M.tegn(ctx, aa, tilst, k.x + k.b / 2, k.y + 10 + 0.62 * fs, fs, { gloed: 1 });
+        this.kortKasser[k.id] = kk;
+        /* Grupperne, eleven kan klikke paa: alle i trin 1, enden af sidekaeden i trin 6 */
+        if (!this.groen && (this.fase === "former" || this.fase === "struktur")) {
+            (this.fase === "former" ? GRUPPER : ["side"]).forEach(function (g) { if (kk[g]) T.valgRamme(ctx, kk[g], "#d69e0c", true); });
+        }
+        var yN = k.y + k.h - 2.1 * fs, sand = this.sand(k.id);
+        var navn = u ? (this.loestUkendt ? u.navn + ": " + sand.navn : u.navn) : aa.navn;
+        var om = u ? (this.loestUkendt ? sand.om : "ukendt sidekæde") : aa.om;
+        NK.tekst(ctx, navn, k.x + k.b / 2, yN, { font: "800 " + Math.round(fs * 0.95) + "px " + M.FONT, farve: F2.blaek, justering: "center", linje: "middle" });
+        var linje2 = om + (ion ? " · ladning " + NK.fortegn(D.tilstandLadning(aa, tilst)) : "");
         NK.tekst(ctx, linje2, k.x + k.b / 2, yN + 1.15 * fs, { font: "600 " + Math.round(fs * 0.78) + "px " + M.FONT, farve: ion ? F2.amfo : F2.daempet, justering: "center", linje: "middle" });
-        if (this.fase === "spm" && !this.groen && this.trin.om === k.id) T.gulRamme(ctx, k.x - 4, k.y - 4, k.b + 8, k.h + 8, 14);
     };
 
     P.tegnPapir = function (ctx) {
         var s = this.strimmel, mig = this, F2 = D.FARVE, t = this.lay.tavle;
-        var stroem = !!this.koer || (this.vis === "ion" && this.trinNr >= 1);
+        var stroem = !!this.koer || this.stroemPaa;
         /* Polerne */
         [[s.x - 50, "−", "minuspol", F2.base], [s.x + s.b + 6, "+", "pluspol", F2.syre]].forEach(function (p) {
             ctx.save();
@@ -396,11 +521,11 @@
         NK.tekst(ctx, "start", s.x + s.b / 2, s.y - 10, { font: "600 12px " + T.FONT, farve: T.DAEMPET, justering: "center", linje: "middle" });
 
         /* Pletterne */
-        var halv = s.b / 2, rh = s.h / 3, alfa = this.igen ? NK.klamp(this.igen.t / IGEN, 0, 1) : 1;
-        D.FELT_RAEKKE.forEach(function (id, i) {
-            var aa = D.AMINOSYRER[id], x = s.x + halv - mig.d[id] * halv, y = s.y + rh * (i + 0.5);
-            var q = mig.vis === "ion" ? D.tilstandLadning(aa, D.tilstand(aa, mig.ph)) : 0;
-            var farve = mig.vis !== "ion" || q === 0 ? "#7d8896" : (q > 0 ? F2.syre : F2.base);
+        var halv = s.b / 2, rh = s.h / this.raekke.length, alfa = this.igen ? NK.klamp(this.igen.t / IGEN, 0, 1) : 1;
+        this.raekke.forEach(function (id, i) {
+            var aa = mig.sand(id), x = s.x + halv - mig.d[id] * halv, y = s.y + rh * (i + 0.5);
+            var q = mig.pletIon ? D.tilstandLadning(aa, D.tilstand(aa, mig.ph)) : 0;
+            var farve = !mig.pletIon || q === 0 ? "#7d8896" : (q > 0 ? F2.syre : F2.base);
             ctx.save();
             ctx.globalAlpha = alfa;
             var g = ctx.createRadialGradient(x, y, 2, x, y, 18);
@@ -410,18 +535,11 @@
             ctx.fillStyle = g;
             ctx.beginPath(); ctx.ellipse(x, y, 19, Math.min(13, rh * 0.32), 0, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
-            NK.tekst(ctx, aa.kort, x, y - Math.min(13, rh * 0.32) - 9, { font: "800 13px " + T.FONT, farve: T.BLAEK, justering: "center", linje: "middle" });
+            var etiket = D.UKENDTE[id] ? D.UKENDTE[id].kort : aa.kort;
+            NK.tekst(ctx, etiket, x, y - Math.min(13, rh * 0.32) - 9, { font: "800 13px " + T.FONT, farve: T.BLAEK, justering: "center", linje: "middle" });
         });
 
-        /* Gaettet og det, der kom ud af det */
-        var gi = this.gaet.gaet;
-        if (gi !== undefined) {
-            var tr = this.trinListe[0], vist = this.trinNr >= 2;
-            var ok = vist ? gi === tr.rigtig : null;
-            T.maerke(ctx, s.x + 8, s.y - 16, "Dit gæt: " + tr.svar[gi], { fyld: ok === null ? "#fff8e1" : (ok ? "#e5f5ea" : "#fdecea"),
-                kant: ok === null ? "#d69e0c" : (ok ? "#3fae72" : "#d9534f"), tegn: ok === null ? "" : (ok ? "✓" : "✗"), tegnFarve: ok ? "#2e8b57" : "#c0392b" });
-        }
-        if (this.fase === "forsoeg" && !this.koer && this.efterT === null) {
+        if (this.fase === "forsoeg" && !this.koer && !this.groen) {
             T.skilt(ctx, s.x + s.b / 2, s.y + 2, "Klik: slut strømmen", { min: t.x + 4, maks: t.x + t.b - 4 });
         }
     };

@@ -4,7 +4,10 @@
    Tre trin (D.FORDELING):
      1 spor   eleven traekker pH-skyderen fra 0 til 14, og diagrammet
               tegnes dér, hvor skyderen har vaeret; vinduet viser 20
-              valinmolekyler og deres former
+              valinmolekyler og deres former. Skyderen begynder ved pH 0,
+              og knappen glider hoejst D.TEGNEFART pH pr. sekund, saa
+              diagrammet tegnes roligt (brugeren 12. nov. 2026). Kortet
+              bliver staaende, naar diagrammet er tegnet
      2 find   eleven stiller skyderen dér, hvor der er lige meget
               syreform og amfoion (pH = pKₛ = 2,32), og trykker Indsend
      3 tal    eleven regner pHᵢₛₒ = ½ · (2,32 + 9,62) = 5,97 og skriver det
@@ -97,8 +100,8 @@
         this.visPks = false;
         this.visIso = false;
         this.phMaal = null;
-        this.naesteT = null;
-        this.saetPh(7, true);
+        this.traekMaal = null;
+        this.saetPh(0, true);
         this.mol.forEach(function (m) { m.form = null; m.blink = 0; });
         this.opdaterMol(true);
         this.startTrin(0);
@@ -110,7 +113,6 @@
         this.fase = this.trin.slags;
         this.groen = null;
         this.talTekst = "";
-        this.naesteT = null;
         this.besked("", "");
         this.nulstilHjaelp();
         this.visKort();
@@ -212,11 +214,20 @@
         return this.trin.hint || [];
     };
 
+    /* Diagrammet er tegnet: kortet bliver staaende med en knap videre */
+    P.sporFaerdig = function (vist) {
+        this.groen = { spm: true, maade: vist ? "svar" : "selv", maerke: vist ? "Svaret" : "Tegnet", tekst: this.trin.forkl, knap: "Næste trin →" };
+        this.sejrT = 0;
+        this.besked("", "");
+        this.visKort();
+        this.visListe();
+    };
+
     P.visSvar = function () {
         this.sv = true;
         if (this.fase === "spor") {
             for (var i = 0; i < ANTAL_BIN; i++) this.besoegt[i] = true;
-            this.naesteT = 0.3;
+            this.sporFaerdig(true);
             return;
         }
         if (this.fase === "find") { this.saetPh(this.trin.maal); this.rigtigt(true); return; }
@@ -235,7 +246,7 @@
         } else this.besoegt[b1] = true;
         this.ph = ph;
         this.opdaterMol(false);
-        if (this.fase === "spor" && !this.groen && this.naesteT === null && this.daekning() >= D.DAEKNING) this.naesteT = 0.7;
+        if (this.fase === "spor" && !this.groen && this.daekning() >= D.DAEKNING) this.sporFaerdig(false);
         if (this.fase === "find" && !this.groen) this.visIndsend();
     };
 
@@ -264,9 +275,12 @@
             var mig = this;
             this.mol.forEach(function (m) { var f = mig.formAf(m); if (m.form !== f) { m.blink = BLINK; m.form = f; } });
         }
-        if (this.naesteT !== null) {
-            this.naesteT -= dt;
-            if (this.naesteT <= 0) { this.naesteT = null; if (this.fase === "spor") this.startTrin(1); }
+        /* Mens diagrammet tegnes, glider knappen roligt hen mod musen */
+        if (this.traekMaal !== null) {
+            var skridt = D.TEGNEFART * dt, rest = this.traekMaal - this.glid;
+            if (Math.abs(rest) <= skridt) { this.glid = this.traekMaal; this.traekMaal = null; }
+            else this.glid += rest > 0 ? skridt : -skridt;
+            this.saetPh(this.glid);
         }
     };
 
@@ -277,15 +291,28 @@
         return null;
     };
 
+    P.langsom = function () { return this.fase === "spor" && !this.groen; };
+
+    /* Skyderen: i trin 1 glider knappen hen mod musen, ellers foelger den musen */
+    P.traekTil = function (ph) {
+        if (this.langsom()) {
+            if (this.traekMaal === null) this.glid = this.ph;
+            this.traekMaal = NK.klamp(ph, 0, 14);
+        } else {
+            this.traekMaal = null;
+            this.saetPh(ph);
+        }
+    };
+
     P.nedScene = function (pt) {
         if (!T.paaSkala(this.skala, pt)) return false;
         this.grebSkyder = true;
         this.phMaal = null;
-        this.saetPh(T.xTilPh(this.skala, pt.x));
+        this.traekTil(T.xTilPh(this.skala, pt.x));
         return true;
     };
 
-    P.flytScene = function (pt) { if (this.grebSkyder) this.saetPh(T.xTilPh(this.skala, pt.x)); };
+    P.flytScene = function (pt) { if (this.grebSkyder) this.traekTil(T.xTilPh(this.skala, pt.x)); };
     P.opScene = function () { this.grebSkyder = false; };
 
     P.klikScene = function () {

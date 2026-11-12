@@ -175,7 +175,20 @@
             var yN = y + rad * (i + 1);
             streg(ctx, x, forrige.y + forrige.h - fs * 0.12, x, yN - fs * 0.5, fs, mork);
             if (r.gruppe) {
-                kasser.side = M.tekst(ctx, r.t, x, yN, fs, r.har ? F.syre : F.base, "center");
+                var fg = r.neutral ? mork : (r.ukendt ? F.daempet : (r.har ? F.syre : F.base));
+                kasser.side = M.tekst(ctx, r.t, x, yN, fs, fg, "center");
+                if (r.ukendt) {
+                    /* Spoergsmaalstegnet staar i en stiplet kasse, der er let at ramme */
+                    var bq = Math.max(kasser.side.w + fs * 0.8, fs * 1.9);
+                    kasser.side = { x: x - bq / 2, y: yN - fs * 0.66, w: bq, h: fs * 1.32, cx: x, cy: yN };
+                    ctx.save();
+                    ctx.strokeStyle = F.daempet;
+                    ctx.lineWidth = 1.4;
+                    ctx.setLineDash([4, 3]);
+                    NK.rundtRekt(ctx, kasser.side.x, kasser.side.y, bq, kasser.side.h, 6);
+                    ctx.stroke();
+                    ctx.restore();
+                }
                 forrige = kasser.side;
             } else if (r.gren) {
                 /* Valin: H₃C—CH—CH₃ */
@@ -208,6 +221,21 @@
             return { raekker: [{ t: "CH_2" }, { t: M.gruppe("carboxyl", hc), gruppe: true, har: hc }],
                      gruppe: M.gruppe("carboxyl", hc), q: M.gruppeLadning("carboxyl", hc) };
         }
+        if (aa.side === "ukendt") {
+            /* En sidekaede med n CH₂ og en gruppe for enden: ? (ukendt), −CH₃,
+               −OH, −COOH eller −NH₂ (de ukendte aminosyrer paa fane 3) */
+            var rk = [];
+            for (var i = 0; i < aa.n; i++) rk.push({ t: "CH_2" });
+            var e = aa.ende;
+            if (!e) { rk.push({ t: "?", gruppe: true, ukendt: true }); return { raekker: rk }; }
+            if (e === "CH3" || e === "OH") {
+                rk.push({ t: e === "CH3" ? "CH_3" : "OH", gruppe: true, neutral: true });
+                return { raekker: rk, gruppe: rk[rk.length - 1].t, q: 0 };
+            }
+            var he = tilst.side;
+            rk.push({ t: M.gruppe(e, he), gruppe: true, har: he });
+            return { raekker: rk, gruppe: M.gruppe(e, he), q: M.gruppeLadning(e, he) };
+        }
         if (aa.side === "lys") {
             var ha = tilst.side;
             return { raekker: [{ t: "CH_2" }, { t: "CH_2" }, { t: "CH_2" }, { t: "CH_2" }, { t: M.gruppe("amino", ha), gruppe: true, har: ha }],
@@ -218,7 +246,7 @@
 
     /* Hoejden af formlen under CH (i fs), saa fanerne kan placere den */
     M.hoejde = function (aa) {
-        var n = aa.side === "val" ? 1 : (aa.side === "asp" ? 2 : (aa.side === "lys" ? 5 : 0));
+        var n = aa.side === "val" ? 1 : (aa.side === "asp" ? 2 : (aa.side === "lys" ? 5 : (aa.side === "ukendt" ? aa.n + 1 : 0)));
         return 1.24 + 1.75 * n;
     };
     /* Bredden (i fs) af den bredeste form */

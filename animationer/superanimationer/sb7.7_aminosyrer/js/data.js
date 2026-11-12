@@ -36,8 +36,21 @@
         asp: { id: "asp", navn: "asparaginsyre", kort: "Asp", side: "asp", om: "sur sidekæde",
                grupper: { carboxyl: 1.88, amino: 9.60, side: 3.65 }, sideSlags: "carboxyl" },
         lys: { id: "lys", navn: "lysin", kort: "Lys", side: "lys", om: "basisk sidekæde",
-               grupper: { carboxyl: 2.18, amino: 8.95, side: 10.53 }, sideSlags: "amino" }
+               grupper: { carboxyl: 2.18, amino: 8.95, side: 10.53 }, sideSlags: "amino" },
+        glu: { id: "glu", navn: "glutaminsyre", kort: "Glu", side: "ukendt", n: 2, ende: "carboxyl", om: "sur sidekæde",
+               grupper: { carboxyl: 2.19, amino: 9.67, side: 4.25 }, sideSlags: "carboxyl" }
     };
+
+    /* De ukendte aminosyrer sidst i fane 3: n CH₂-grupper i sidekæden og en
+       gruppe for enden, som eleven skal finde ud fra forsoeget */
+    D.UKENDTE = {
+        x: { id: "x", navn: "X", kort: "X", n: 2, facit: "carboxyl", rigtig: "glu" },
+        y: { id: "y", navn: "Y", kort: "Y", n: 4, facit: "amino", rigtig: "lys" }
+    };
+    D.UKENDT_RAEKKE = ["x", "y"];
+    D.ENDER = ["CH3", "OH", "carboxyl", "amino"];
+    D.ENDE_TEKST = { CH3: "−CH₃", OH: "−OH", carboxyl: "−COOH", amino: "−NH₂" };
+    D.ENDE_PKS = { carboxyl: 4.25, amino: 10.53 };
     D.VALIN = D.AMINOSYRER.val;
     D.PKS1 = D.VALIN.grupper.carboxyl;      /* syreformen afgiver en hydron fra −COOH */
     D.PKS2 = D.VALIN.grupper.amino;         /* amfoionen afgiver en hydron fra −NH₃⁺ */
@@ -143,12 +156,14 @@
     D.ANTAL_MOL = 20;
     D.PH_SKRIDT = 0.1;          /* skyderen gaar i trin paa 0,1 */
     D.DAEKNING = 0.95;          /* saa meget af pH 0-14 skal vaere tegnet */
+    D.TEGNEFART = 4;            /* pH pr. sekund, mens diagrammet tegnes (brugeren 12. nov. 2026: "det går for hurtigt") */
     D.FORDELING = [
         {
             id: "spor", slags: "spor", navn: "Tegn diagrammet",
-            tekst: "Vinduet viser 20 valinmolekyler. Træk pH-skyderen hele vejen fra pH 0 til pH 14, og se diagrammet blive tegnet.",
-            hint: ["Træk den mørke knap på skyderen under diagrammet.",
-                   "Diagrammet er færdigt, når du har været hele vejen fra pH 0 til pH 14."]
+            tekst: "Vinduet viser 20 valinmolekyler. Træk pH-skyderen fra pH 0 til pH 14, og se diagrammet blive tegnet.",
+            hint: ["Træk den mørke knap på skyderen under diagrammet mod højre.",
+                   "Diagrammet er færdigt, når du har været hele vejen fra pH 0 til pH 14."],
+            forkl: "Diagrammet viser, hvor stor en del af molekylerne der er på hver form ved alle pH-værdier fra 0 til 14."
         },
         {
             id: "pks", slags: "find", navn: "Find pKₛ",
@@ -181,31 +196,46 @@
     };
 
     /* =====================================================================
-       Fane 3: Det elektriske felt. Fire trin med tre aminosyrer.
+       Fane 3: Det elektriske felt. Seks trin. De fire foerste med tre
+       aminosyrer, de to sidste med to ukendte (brugeren 12. nov. 2026: "måske
+       med en ukendt opgave.. hvor man skal bruge metoden til at løse en
+       struktur. Det skal gerne være lidt forsimplet"). Eleven
+       finder foerst formerne ved pH 6 (stilladset, brugeren 12. nov. 2026:
+       "Det ville være bedre, hvis man først blev stilladseret om hvilke
+       former de er på inden man skal forudsige hvilken der ryger til
+       minuspolen").
        ===================================================================== */
     D.FELT_RAEKKE = ["asp", "val", "lys"];
     D.VANDRING = 0.4;           /* en ladning paa 1 flytter 0,4 af den halve strimmel */
     D.FELT = [
         {
-            id: "gaet", slags: "gaet", navn: "Gæt", ph: 6,
-            tekst: "Asparaginsyre, valin og lysin sættes midt på et papir, der er fugtet med en opløsning med pH 6. Hvilken vandrer mod minuspolen, når strømmen sluttes?",
-            svar: ["Asparaginsyre", "Valin", "Lysin"], rigtig: 2
+            id: "former", slags: "former", navn: "Formerne ved pH 6", ph: 6,
+            tekst: "Ved pH 6 har carboxylgrupper afgivet deres hydron, og aminogrupper har optaget en. Klik på grupperne, så formlerne passer til pH 6, og tryk Indsend svar.",
+            hint: ["Klik på hver −COOH og hver −NH₂ i de tre formler.",
+                   "Asparaginsyre har en ekstra −COOH i sidekæden, og lysin har en ekstra −NH₂."],
+            fejlCarboxyl: "Ved pH 6 har carboxylgruppen afgivet sin hydron. Se på −COOH i {navn}.",
+            fejlAmino: "Ved pH 6 har aminogruppen optaget en hydron. Se på −NH₂ i {navn}.",
+            fejlSideCarboxyl: "Asparaginsyres sidekæde har en carboxylgruppe, som også har afgivet sin hydron ved pH 6.",
+            fejlSideAmino: "Lysins sidekæde har en aminogruppe, som også har optaget en hydron ved pH 6.",
+            fejlIntet: "Klik på en af grupperne i formlerne først.",
+            forkl: "Asparaginsyre har to negative grupper og én positiv, så ladningen er −1. Valin har ladningen 0, og lysin har ladningen +1."
+        },
+        {
+            id: "minuspol", slags: "spm", navn: "Minuspolen",
+            tekst: "Formlerne viser ladningerne ved pH 6. Hvilken aminosyre vandrer mod minuspolen, når strømmen sluttes?",
+            svar: ["Asparaginsyre", "Valin", "Lysin"], rigtig: 2,
+            fejl: { 0: "Asparaginsyre har ladningen −1, og en negativ ion vandrer mod pluspolen.",
+                    1: "Valin har den samlede ladning 0 ved pH 6, så den vandrer ikke." },
+            hint: ["Positive og negative ladninger tiltrækker hinanden.",
+                   "Find den aminosyre, der har en positiv samlet ladning."],
+            forkl: "Lysin har ladningen +1 og vandrer mod minuspolen. Asparaginsyre vandrer mod pluspolen, og valin bliver liggende."
         },
         {
             id: "stroem", slags: "forsoeg", navn: "Strømmen", ph: 6,
-            tekst: "Tryk Slut strømmen, og se, hvor aminosyrerne vandrer hen.",
-            koerer: "Strømmen er sluttet. Formlerne øverst viser aminosyrerne ved pH 6.",
+            tekst: "Tryk Slut strømmen, og se, om det passer.",
+            koerer: "Strømmen er sluttet. Se, hvor aminosyrerne vandrer hen.",
+            efter: "Lysin vandrede mod minuspolen og asparaginsyre mod pluspolen, mens valin blev liggende ved startlinjen.",
             knap: "Slut strømmen"
-        },
-        {
-            id: "lysin", slags: "spm", navn: "Lysin", om: "lys",
-            tekst: "Hvorfor vandrer lysin mod minuspolen ved pH 6?",
-            svar: ["Sidekæden har en aminogruppe med en ekstra hydron", "Sidekæden har en carboxylgruppe uden hydron", "Lysin er det største af de tre molekyler"], rigtig: 0,
-            fejl: { 1: "Det er asparaginsyre, der har en carboxylgruppe i sidekæden. Se på lysins sidekæde.",
-                    2: "Retningen afhænger af ladningen, ikke af størrelsen. Se på lysins sidekæde." },
-            hint: ["Se på gruppen nederst i lysins sidekæde.",
-                   "Gruppen −NH₃⁺ i sidekæden giver lysin en ekstra positiv ladning."],
-            forkl: "Lysins sidekæde har en aminogruppe, der har optaget en hydron, så lysin har ladningen +1. Asparaginsyres ekstra carboxylgruppe har afgivet en hydron og giver ladningen −1."
         },
         {
             id: "ph1", slags: "spm", navn: "En anden pH", ph: 1,
@@ -216,9 +246,28 @@
             hint: ["Alle tre skal have en positiv samlet ladning.",
                    "I sur opløsning har alle grupperne en hydron."],
             forkl: "Ved pH 1 har alle grupperne en hydron. Valin og asparaginsyre har ladningen +1, og lysin har ladningen +2 og vandrer længst."
+        },
+        {
+            id: "ukendt", slags: "forsoeg", ukendt: true, navn: "To ukendte", ph: 6,
+            tekst: "To ukendte aminosyrer, X og Y, sættes på et papir med pH 6. Tryk Slut strømmen, og se, hvor de vandrer hen.",
+            koerer: "Strømmen er sluttet. Se, hvor X og Y vandrer hen.",
+            efter: "X vandrede mod pluspolen, og Y vandrede mod minuspolen. Brug det til at finde enden af deres sidekæder.",
+            knap: "Slut strømmen"
+        },
+        {
+            id: "struktur", slags: "struktur", ukendt: true, navn: "Sidekæderne", ph: 6,
+            tekst: "Hvilken gruppe sidder for enden af sidekæden i X og i Y? Klik på ?, til grupperne passer med forsøget, og tryk Indsend svar.",
+            hint: ["Find først ladningen ved pH 6. X er negativ, og Y er positiv.",
+                   "En ekstra −COOH giver ladningen −1 ved pH 6, og en ekstra −NH₂ giver +1."],
+            fejlIntet: "Klik på ? i sidekæderne først.",
+            fejlMangler: "Vælg en gruppe for enden af sidekæden i {navn}.",
+            fejlNeutral: "Med {gruppe} i sidekæden har {navn} ladningen 0 ved pH 6 og bliver liggende.",
+            fejlAmino: "Med −NH₂ i sidekæden får {navn} ladningen +1 ved pH 6 og vandrer mod minuspolen.",
+            fejlCarboxyl: "Med −COOH i sidekæden får {navn} ladningen −1 ved pH 6 og vandrer mod pluspolen.",
+            forkl: "X har en carboxylgruppe i sidekæden og ladningen −1 ved pH 6. Det er glutaminsyre. Y har en aminogruppe og ladningen +1. Det er lysin."
         }
     ];
-    D.FELT_FAERDIG = "Træk nu selv i pH-skyderen. Aminosyrerne vandrer igen, når du slipper den.";
+    D.FELT_FAERDIG = "Træk nu selv i pH-skyderen. X og Y vandrer igen, når du slipper den.";
 
     /* ----- Smaa hjaelpere -------------------------------------------------------- */
     D.komma1 = function (v) { return (Math.round(v * 10) / 10).toFixed(1).replace(".", ","); };

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umættet fedt og bromvand</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">Br₂</span> Umættet fedt</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-d" role="tab" aria-selected="true"><span class="nr">1</span>Dryp og tæl</button>
+        <button class="faneknap" data-fane="fane-m" role="tab" aria-selected="false"><span class="nr">2</span>Ét molekyle</button>
+        <button class="faneknap" data-fane="fane-u" role="tab" aria-selected="false"><span class="nr">3</span>Ukendte fedtstoffer</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: DRYP OG TAEL                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-d" role="tabpanel" aria-label="Dryp og tæl">
+    <div class="scene">
+        <canvas id="d-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="d-skort">
+            <div class="sk-ind" id="d-ind"></div>
+            <div class="sk-bund" id="d-status">
+                <p class="st-tekst" id="d-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="d-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="d-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="d-anker-lup"></div>
+        <div class="anker" id="d-anker-glas"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="d-skemakort">
+            <h2>Skemaet</h2>
+            <div id="d-skema"></div>
+            <button class="knap nulstil lille" id="d-forfra" type="button" title="Begynd glasset forfra (R)">Begynd glasset forfra ↺</button>
+        </div>
+
+        <div class="kort" id="d-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="d-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="d-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: ET MOLEKYLE                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-m" role="tabpanel" aria-label="Ét molekyle">
+    <div class="scene">
+        <canvas id="m-laerred"></canvas>
+        <div class="scenekort" id="m-skort">
+            <div class="sk-ind" id="m-ind"></div>
+            <div class="sk-bund" id="m-status">
+                <p class="st-tekst" id="m-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="m-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="m-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="m-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="m-fedtkort">
+            <h2>Fedtsyrerne</h2>
+            <div id="m-fedtsyrer"></div>
+            <button class="knap nulstil lille" id="m-forfra" type="button" title="Fjern markeringerne (R)">Fjern markeringerne ↺</button>
+        </div>
+
+        <div class="kort" id="m-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="m-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="m-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: UKENDTE FEDTSTOFFER                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-u" role="tabpanel" aria-label="Ukendte fedtstoffer">
+    <div class="scene">
+        <canvas id="u-laerred"></canvas>
+        <div class="scenekort" id="u-skort">
+            <div class="sk-ind" id="u-ind"></div>
+            <div class="sk-bund" id="u-status">
+                <p class="st-tekst" id="u-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="u-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="u-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="u-anker-lup"></div>
+        <div class="anker" id="u-anker-glas"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="u-deklkort">
+            <h2>Varedeklarationerne</h2>
+            <div id="u-dekl"></div>
+        </div>
+
+        <div class="kort maaling" id="u-skemakort">
+            <h2>Flaskerne</h2>
+            <div id="u-skema"></div>
+            <button class="knap nulstil lille" id="u-forfra" type="button" title="Begynd flasken forfra (R)">Begynd flasken forfra ↺</button>
+        </div>
+
+        <div class="kort" id="u-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="u-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="u-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Umættet fedt og bromvand</h2>
+        <p>Et fedtstof er bygget af glycerol og tre fedtsyrer. En mættet fedtsyre har kun enkeltbindinger mellem carbonatomerne. En monoumættet fedtsyre har én dobbeltbinding, og en polyumættet har to eller flere.</p>
+        <h3 class="teori-hoved">Bromvand</h3>
+        <p>Bromvand er vand med lidt opløst dibrom og er orange. Dibrom kan addere til en dobbeltbinding mellem to carbonatomer: dobbeltbindingen bliver til en enkeltbinding, og der sætter sig et bromatom på hvert carbonatom. Produktet er farveløst.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Oliesyre og dibrom</span>
+            C₁₇H₃₃COOH + Br₂ → C₁₇H₃₃Br₂COOH
+        </div>
+        <p>Hver dobbeltbinding kan addere ét dibrommolekyle. Når alle dobbeltbindingerne er brugt, bliver dibrom fra den næste dråbe frit, og farven bliver. Jo flere dobbeltbindinger fedtstoffet har, jo flere dråber kan det affarve.</p>
+        <h3 class="teori-hoved">Sådan tælles der</h3>
+        <p>Fedtstoffet opløses i heptan, og bromvandet dryppes i én dråbe ad gangen. Glasset rystes efter hver dråbe. Man tæller dråberne, til det øverste lag stadig er svagt farvet. Et glas med kun heptan viser, at den sidste dråbe altid bliver farvet, så antallet i det glas trækkes fra. Glassene må ikke stå i stærkt lys, for så kan dibrom også reagere med heptan.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/fedt.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/glas.js"></script>
+<script src="js/lup.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_dryp.js"></script>
+<script src="js/sim_molekyle.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

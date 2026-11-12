@@ -36,7 +36,17 @@ function faTil(NK, trin) {
     if (trin >= 2) { s.valgtGruppe = "carboxyl"; s.indsendKlik(); tid(s, 2.2); s.videreKlik(); tid(s, 2.2); }
     return s;
 }
-function spor(s) { for (var p = 0; p <= 14.01; p += 0.1) s.saetPh(p); tid(s, 1); }
+/* Fane 3 til et bestemt trin (0-5) */
+function feTil(NK, trin) {
+    var s = fe(NK);
+    if (trin >= 1) { s.visSvar(); s.videreKlik(); }
+    if (trin >= 2) { s.valgt = 2; s.indsendKlik(); s.videreKlik(); }
+    if (trin >= 3) { s.udfoer(); tid(s, 3); s.videreKlik(); }
+    if (trin >= 4) { s.valgt = 0; s.indsendKlik(); tid(s, 3); s.videreKlik(); }
+    if (trin >= 5) { s.udfoer(); tid(s, 3); s.videreKlik(); }
+    return s;
+}
+function spor(s) { for (var p = 0; p <= 14.01; p += 0.1) s.saetPh(p); tid(s, 0.3); s.videreKlik(); }
 
 var SCENARIER = {
     "f-start": function (NK) { fa(NK); },
@@ -53,20 +63,27 @@ var SCENARIER = {
     "f-slut": function (NK) { var s = faTil(NK, 2); s.valgtGruppe = "amino"; s.indsendKlik(); tid(s, 2.2); },
     "f-fri": function (NK) { var s = faTil(NK, 2); s.valgtGruppe = "amino"; s.indsendKlik(); tid(s, 2.2); s.saetPh(2.0); },
     "d-start": function (NK) { var s = di(NK); tid(s, 0.5); },
-    "d-halv": function (NK) { var s = di(NK); for (var p = 7; p >= 1.5; p -= 0.1) s.saetPh(p); tid(s, 0.3); },
+    "d-halv": function (NK) { var s = di(NK); for (var p = 0; p <= 6.5; p += 0.1) s.saetPh(p); tid(s, 0.3); },
+    "d-tegnet": function (NK) { var s = di(NK); for (var p = 0; p <= 14.01; p += 0.1) s.saetPh(p); tid(s, 0.3); },
     "d-find": function (NK) { var s = di(NK); spor(s); s.saetPh(3.5); },
     "d-find-fejl": function (NK) { var s = di(NK); spor(s); s.saetPh(3.5); s.indsendKlik(); },
     "d-find-ok": function (NK) { var s = di(NK); spor(s); s.saetPh(2.3); s.indsendKlik(); },
     "d-tal": function (NK) { var s = di(NK); spor(s); s.saetPh(2.3); s.indsendKlik(); s.videreKlik(); s.talTekst = "11,94"; s.visKort(); },
     "d-tal-fejl": function (NK) { var s = di(NK); spor(s); s.saetPh(2.3); s.indsendKlik(); s.videreKlik(); s.talTekst = "11,94"; s.visKort(); s.indsendKlik(); },
     "d-slut": function (NK) { var s = di(NK); spor(s); s.saetPh(2.3); s.indsendKlik(); s.videreKlik(); s.talTekst = "5,97"; s.indsendKlik(); tid(s, 2); },
-    "e-start": function (NK) { var s = fe(NK); s.valgt = 2; s.visKort(); },
-    "e-forsoeg": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); },
-    "e-koer": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 1.2); },
-    "e-lysin": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 4); },
-    "e-ph1": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); },
-    "e-slut": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 3.5); },
-    "e-ph13": function (NK) { var s = fe(NK); s.valgt = 2; s.indsendKlik(); s.udfoer(); tid(s, 4); s.valgt = 0; s.indsendKlik(); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 3.5); s.saetPh(13); s.nyRunde(13); tid(s, 3.5); },
+    "e-start": function (NK) { fe(NK); },
+    "e-former-halv": function (NK) { var s = fe(NK); s.elevT.asp.carboxyl = 0; s.elevT.asp.amino = 1; s.elevT.val.carboxyl = 0; s.klikket = 3; s.visKort(); },
+    "e-former-fejl": function (NK) { var s = fe(NK); s.elevT.asp.carboxyl = 0; s.elevT.asp.amino = 1; s.klikket = 2; s.indsendKlik(); },
+    "e-former-ok": function (NK) { var s = fe(NK); s.visSvar(); },
+    "e-minuspol": function (NK) { var s = fe(NK); s.visSvar(); s.videreKlik(); s.valgt = 2; s.visKort(); },
+    "e-koer": function (NK) { var s = fe(NK); s.visSvar(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.videreKlik(); s.udfoer(); tid(s, 1.2); },
+    "e-efter": function (NK) { var s = fe(NK); s.visSvar(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.videreKlik(); s.udfoer(); tid(s, 3); },
+    "e-slut": function (NK) { var s = fe(NK); s.visSvar(); s.videreKlik(); s.valgt = 2; s.indsendKlik(); s.videreKlik(); s.udfoer(); tid(s, 3); s.videreKlik(); s.valgt = 0; s.indsendKlik(); tid(s, 3.5); },
+    "e-ukendt": function (NK) { var s = feTil(NK, 4); },
+    "e-ukendt-efter": function (NK) { var s = feTil(NK, 4); s.udfoer(); tid(s, 3); },
+    "e-struktur": function (NK) { var s = feTil(NK, 5); s.valgSide.x = "OH"; s.klikket = 1; s.visKort(); },
+    "e-struktur-fejl": function (NK) { var s = feTil(NK, 5); s.valgSide.x = "amino"; s.valgSide.y = "amino"; s.klikket = 2; s.indsendKlik(); },
+    "e-struktur-ok": function (NK) { var s = feTil(NK, 5); s.valgSide.x = "carboxyl"; s.valgSide.y = "amino"; s.klikket = 2; s.indsendKlik(); },
     "teori": function (NK, W) { W.document.getElementById("teoriknap").click(); }
 };
 

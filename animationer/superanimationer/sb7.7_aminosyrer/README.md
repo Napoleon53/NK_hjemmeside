@@ -39,8 +39,10 @@ Planen og valgene er Claudes, og brugeren har ikke set animationen endnu.
    isoelektriske punkt er elevernes eget forsøg (holdt ude af bogen).
    Valins tal (p*K*ₛ 2,32 og 9,62, pH_iso 5,97) er bogens regneeksempel.
 4. **Loftet:** tre faner, alle med valin. Fane 1: tre trin og ét molekyle.
-   Fane 2: tre trin, 20 molekyler i et vindue og ét diagram. Fane 3: fire
-   trin, tre aminosyrer (asparaginsyre, valin, lysin) og ét stykke papir
+   Fane 2: tre trin, 20 molekyler i et vindue og ét diagram. Fane 3: seks
+   trin (fra 12. nov. 2026 med formerne først i stedet for et gæt og to
+   trin med to ukendte), tre aminosyrer (asparaginsyre, valin, lysin) og
+   derefter to ukendte (X og Y) på ét stykke papir
    mellem to poler.
 5. **Layoutet:** scene plus panel som sb7.3. Scenen er papirkortet øverst og
    et whiteboard under det med en pH-skyder nederst.
@@ -66,7 +68,11 @@ form efter skyderen, og en hydron kommer eller går.
 **2 Fordelingsdiagrammet** (`js/sim_fordeling.js`). Et vindue med 20
 valinmolekyler (pille med + for −NH₃⁺ og − for −COO⁻, kanten i formens farve)
 og bogens fordelingsdiagram, der kun tegnes, hvor skyderen har været. (1) Træk
-skyderen fra pH 0 til 14 (95 % af skalaen). (2) Stil skyderen, hvor der er
+skyderen fra pH 0 til 14 (95 % af skalaen). Skyderen begynder ved pH 0, og
+knappen glider højst 4 pH pr. sekund hen mod musen, så diagrammet tegnes
+roligt; når det er tegnet, bliver kortet stående med Næste trin (brugeren
+12. nov. 2026: "Når man laver diagrammet går det for hurtigt... og den starter
+ikke ved 0, men ved 7"). I trin 2 og 3 følger skyderen musen direkte. (2) Stil skyderen, hvor der er
 lige meget syreform og amfoion (2,32 ± 0,25), og tryk Indsend svar; et
 forkert sted får andelene i procent. Krydspunkterne med pKₛ 2,32 og 9,62
 kommer på diagrammet. (3) Skriv pHᵢₛₒ i feltet på kortet (5,97); summen
@@ -74,12 +80,28 @@ kommer på diagrammet. (3) Skriv pHᵢₛₒ i feltet på kortet (5,97); summen
 glider skyderen til 5,97, og linjen ved det isoelektriske punkt kommer.
 
 **3 Det elektriske felt** (`js/sim_felt.js`). Tre kort med asparaginsyre,
-valin og lysin øverst og et fugtet papir mellem minuspol og pluspol. (1) Gæt
-ved pH 6: hvilken vandrer mod minuspolen? (2) Slut strømmen: formlerne skifter
-til formerne ved pH 6 med ladning (−1, 0 og +1), og pletterne vandrer. (3)
-Hvorfor vandrer lysin mod minuspolen? (4) Ved hvilken pH vandrer alle tre mod
-minuspolen? Efter pH 1 kører forsøget igen, og lysin (+2) vandrer længst.
-Bagefter er skyderen fri, og forsøget kører igen, når eleven slipper den.
+valin og lysin øverst og et fugtet papir mellem minuspol og pluspol. Eleven
+finder formerne, før der skal forudsiges noget (brugeren 12. nov. 2026: "Fane 3
+er for svær. Det ville være bedre, hvis man først blev stilladseret om hvilke
+former de er på inden man skal forudsige hvilken der ryger til minuspolen";
+før var trin 1 et gæt). (1) Formerne ved pH 6: formlerne står uladede som i
+bogen, kortet giver reglen (carboxylgrupper har afgivet deres hydron,
+aminogrupper har optaget en), og eleven klikker på grupperne, så formlerne
+passer; et klik giver eller tager en hydron, og den første gruppe, der ikke
+passer, får sin egen forklaring. Bagefter står ladningerne −1, 0 og +1. (2)
+Hvilken vandrer mod minuspolen? (3) Slut strømmen og se, om det passer; kortet
+bliver stående. (4) Ved hvilken pH vandrer alle tre mod minuspolen? Efter
+pH 1 kører forsøget igen, og lysin (+2) vandrer længst.
+(5) To ukendte aminosyrer, X og Y, med ? for enden af sidekæden vandrer ved
+pH 6: X mod pluspolen og Y mod minuspolen; kortet bliver stående. (6) Eleven
+klikker på ?, som skifter mellem −CH₃, −OH, −COOH og −NH₂, til grupperne passer
+med forsøget, og bruger dermed metoden fra trin 1 baglæns (brugeren 12. nov.
+2026: "måske med en ukendt opgave.. hvor man skal bruge metoden til at løse en
+struktur. Det skal gerne være lidt forsimplet"). Et forkert valg får at vide,
+hvad gruppen ville give (ladning 0 og blive liggende, eller den modsatte pol).
+Rigtigt er −COOH i X (glutaminsyre) og −NH₂ i Y (lysin), og navnene og
+ladningerne kommer frem. Bagefter er skyderen fri, og X og Y vandrer igen, når
+eleven slipper den.
 
 ## Filerne
 
@@ -124,14 +146,18 @@ _skud.html          skærmbilleder af bestemte trin (udviklerværktøj, kræver 
   papiret er "fugtet med en opløsning med pH 6". I et rigtigt forsøg skal
   pletterne farves for at kunne ses.
 * pH-skyderen går fra 0 til 14 som bogens fordelingsdiagram.
+* De ukendte i fane 3: gruppen for enden af sidekæden vælges blandt fire
+  (−CH₃, −OH, −COOH og −NH₂), og antallet af CH₂-grupper er givet. −CH₃ og −OH
+  giver begge ladningen 0, så forsøget ved pH 6 kan kun skelne de ladede
+  grupper fra hinanden; derfor vandrer begge ukendte.
 
 ## Tal skrevet efter hukommelsen
 
 Valins pKₛ-værdier (2,32 og 9,62) og pHᵢₛₒ = 5,97 er bogens. Asparaginsyres
 (1,88, 9,60 og 3,65 for sidekæden) og lysins (2,18, 8,95 og 10,53 for
-sidekæden) pKₛ-værdier er skrevet efter hukommelsen fra en almindelig
-tabel (Lehninger). Kun deres fortegn og hele ladninger ved pH 1, 6 og 13
-bruges i opgaverne.
+sidekæden) og glutaminsyres (2,19, 9,67 og 4,25 for sidekæden) pKₛ-værdier er
+skrevet efter hukommelsen fra en almindelig tabel (Lehninger). Kun deres
+fortegn og hele ladninger ved pH 1, 6 og 13 bruges i opgaverne.
 
 ## Selvtest
 
@@ -143,16 +169,18 @@ med hydronen og den frie skyder), at forkerte svar får den rigtige forklaring
 og koster stjernen, at intet løses uden Indsend svar, at skyderen er låst, til
 fanen er løst, at en positiv aminosyre vandrer mod minuspolen, at teksterne er
 korte og uden tankestreger og ASCII-dansk, at glycin ikke er med, og at kortet
-aldrig dækker tavlen fra 1100 × 620 til 1600 × 950. 10. nov. 2026: ALT OK (75).
+aldrig dækker tavlen fra 1100 × 620 til 1600 × 950. 12. nov. 2026: ALT OK (100).
 Trækket, svarene og skyderen er også prøvet med rigtige musehændelser i
 headless Chrome.
 
 ## I menuen
 
-Ikke i menuen endnu. Når brugeren siger til: en ny knap nr. 3 i
-`kemi-b-filer/samling_b7.html` med koden `b7.7` (efter `b7.3` for sb7.3),
-`FEEDBACK_EMNER` i `samling_alt_b.html` følger med, kolonnen "I menuen" i
-`../README.md` rettes, og Kemibogen B (B7.7) får en Prøv selv-linje.
+I menuen fra 12. nov. 2026 (brugeren: "Når du er færdig med dette, må du gerne
+lægge den på animationspanelet"): knap nr. 3 i `kemi-b-filer/samling_b7.html`
+med koden `b7.7`, også i `FEEDBACK_EMNER`, og B7-beskrivelsen i
+`samling_alt_b.html` og `animationer.html` nævner aminosyrerne. `index.html`
+har linjen til `../../til_panelet.js` med `data-emne="b7.7"`. Kemibogen B
+(B7.7) har endnu ingen Prøv selv-linje.
 
 ## Papirkortet
 
