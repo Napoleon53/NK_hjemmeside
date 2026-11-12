@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Tingene i EscapeRoom Kemi C</title>
+<link rel="stylesheet" href="css/stil.css">
+<style>
+    /* Udviklervaerktoej: viser hver ting alene. Indgaar ikke i spillet. */
+    body { overflow: auto; display: block; padding: 16px; }
+    h1 { font-size: 1.2rem; margin: 0 0 12px; }
+    .gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    figure { margin: 0; background: #1d2029; border: 1px solid #2c2f3a; border-radius: 10px; padding: 8px; }
+    figcaption { font-size: 0.85rem; color: #a9adb4; margin-bottom: 4px; }
+    svg { width: 100%; height: 220px; display: block; }
+</style>
+</head>
+<body>
+<h1>Tingene i EscapeRoom Kemi C</h1>
+<div class="gitter" id="gitter"></div>
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script>
+(function () {
+    var S = NK.Sprites;
+    /* [navn, viewBox, tegning] */
+    var ting = [
+        ["Dør og kodelås", "1120 130 400 600", S.doer(1250, 160, 230, 560, "#3498db", 1, false) + S.kodelaas(1160, 380, false)],
+        ["Åben dør", "1120 130 400 600", S.doer(1250, 160, 230, 560, "#e74c3c", 5, true) + S.kodelaas(1160, 380, true)],
+        ["Tavle", "70 70 580 340", S.tavle(90, 90, 540, 270, S.kridt(360, 240, "__ Al + __ O₂ → __ Al₂O₃", 34, "middle"))],
+        ["Periodisk system", "700 80 400 300", S.plakat(720, 100, 360)],
+        ["Reagensglas og dråbeplade", "150 400 360 160", S.draabeplade(270, 540, 5, 4) + S.reagensglas(205, 524, 118, [120, 175, 235], 0.5)],
+        ["Dråbeflasker", "480 410 260 140", S.draabeflaske(520, 540, "NaCl") + S.draabeflaske(580, 540, "KI") + S.draabeflaske(640, 540, "Na₂SO₄") + S.draabeflaske(700, 540, "NaOH")],
+        ["Flaske", "880 140 160 210", S.flaske(960, 330, 96, 160, "HCN", [210, 225, 235], "#8a1f1f")],
+        ["Vægt", "200 400 280 150", S.vaegt(330, 540, "2,40 g", "Mg")],
+        ["Vejrstation", "680 90 240 280", S.vejrstation(700, 100, "23 °C", "1,013 bar")],
+        ["Burette og kolbe", "720 100 200 450", S.stativ(820, 110) + S.burette(820, 120, 400, [118, 34, 120]) + S.kolbe(820, 540, 120, 112, [214, 196, 226], 0.36)],
+        ["Notesbog", "270 430 300 120", S.notesbog(420, 540)],
+        ["Segl", "580 380 440 300", S.segl(690, 452, S.SEGLMAERKER.million, false) + S.segl(910, 452, S.SEGLMAERKER.syregalgen, false) +
+            S.segl(690, 600, S.SEGLMAERKER.pacman, false) + S.segl(910, 600, S.SEGLMAERKER.organisk, true)],
+        ["Nøgler", "0 0 200 90", S.noegle(10, 10, "#f1c40f", "#7a5a08", 1) + S.noegle(100, 50, "#8b9097", "#3d4148", 1)]
+    ];
+    document.getElementById("gitter").innerHTML = ting.map(function (t) {
+        return "<figure><figcaption>" + t[0] + '</figcaption><svg viewBox="' + t[1] + '">' + S.defs() + t[2] + "</svg></figure>";
+    }).join("");
+}());
+</script>
+</body>
+</html>

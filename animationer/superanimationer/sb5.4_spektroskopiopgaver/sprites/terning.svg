@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="86" viewBox="0 0 100 86">
+  <!-- Bouillonterning paa sin udfoldede guldfolie, set skraat fra oven. -->
+  <defs>
+    <linearGradient id="folie" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1b8"/>
+      <stop offset="0.35" stop-color="#e8c25a"/>
+      <stop offset="0.6" stop-color="#f7dc86"/>
+      <stop offset="1" stop-color="#b98a22"/>
+    </linearGradient>
+    <linearGradient id="topf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e2ad5c"/>
+      <stop offset="1" stop-color="#c58a37"/>
+    </linearGradient>
+    <linearGradient id="venstre" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a1682a"/>
+      <stop offset="1" stop-color="#b87a33"/>
+    </linearGradient>
+    <linearGradient id="hoejre" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8d5822"/>
+      <stop offset="1" stop-color="#6f431a"/>
+    </linearGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3c4a52" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#3c4a52" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="50" cy="74" rx="47" ry="10" fill="url(#skygge)"/>
+  <!-- folien -->
+  <path d="M6 60 L44 42 L94 56 L56 78 Z" fill="url(#folie)" stroke="#a9801f" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M18 60 L46 47 M30 66 L58 50 M60 72 L84 58" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+  <path d="M24 56 L50 63 M40 50 L70 58" stroke="#a9801f" stroke-opacity="0.35" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- terningen -->
+  <path d="M26 30 L50 20 L76 28 L52 39 Z" fill="url(#topf)" stroke="#7a4a1b" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M26 30 L52 39 L52 65 L26 55 Z" fill="url(#venstre)" stroke="#7a4a1b" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M52 39 L76 28 L76 54 L52 65 Z" fill="url(#hoejre)" stroke="#7a4a1b" stroke-width="0.9" stroke-linejoin="round"/>
+  <!-- kornene -->
+  <g fill="#f6d39a" fill-opacity="0.7">
+    <circle cx="40" cy="27" r="1.1"/><circle cx="55" cy="25" r="0.9"/><circle cx="62" cy="31" r="1.2"/>
+    <circle cx="47" cy="33" r="0.8"/><circle cx="34" cy="31" r="0.9"/><circle cx="58" cy="35" r="0.8"/>
+  </g>
+  <g fill="#5e3814" fill-opacity="0.45">
+    <circle cx="33" cy="42" r="1"/><circle cx="42" cy="52" r="1.1"/><circle cx="37" cy="47" r="0.8"/>
+    <circle cx="64" cy="44" r="1"/><circle cx="70" cy="40" r="0.8"/><circle cx="60" cy="54" r="1.1"/>
+  </g>
+  <path d="M28 31 L50 22" stroke="#ffe7bd" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

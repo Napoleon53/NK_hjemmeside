@@ -16,8 +16,8 @@
     var TURE = {
         "fane-d": [
             { sel: "#d-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Den gule knap giver ét hint ad gangen og til sidst svaret. Der er fem opgaver, én for hvert glas." },
-            { sel: "#d-anker-glas", titel: "De fem glas", tekst: "Som i øvelse 4.6b: et fedtstof opløst i heptan i glas 1 til 4 og kun heptan i glas 5. Pipetten hænger over det glas, opgaven handler om. Klik på pipetten for at dryppe én dråbe bromvand i." },
-            { sel: "#d-anker-lup", titel: "Luppen", tekst: "Luppen viser det øverste lag i glasset helt tæt på: to fedtstofmolekyler og dibrom fra dråberne. Klik på en kæde eller et dibrommolekyle for at se, hvad det er." },
+            { sel: "#d-anker-glas", titel: "De fem glas", tekst: "Som i øvelse 4.6b: et fedtstof opløst i heptan i glas 1 til 4 og kun heptan i glas 5. Den hvide plade bag glassene gør farven let at se. Pipetten hænger over det glas, opgaven handler om. Klik på pipetten for at dryppe én dråbe bromvand i." },
+            { sel: "#d-anker-lup", titel: "Luppen", tekst: "Luppen viser det øverste lag i glasset helt tæt på: ét fedtstofmolekyle, det samme som på fane 1, og dibrom fra dråberne. Klik på en kæde eller et dibrommolekyle for at se, hvad det er." },
             { sel: "#d-skemakort", titel: "Skemaet", tekst: "Her står antallet af dråber for hvert glas, når du har indsendt det." }
         ],
         "fane-m": [

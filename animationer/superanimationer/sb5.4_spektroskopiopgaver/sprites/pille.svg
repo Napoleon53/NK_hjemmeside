@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="104" height="58" viewBox="0 0 104 58">
+  <!-- Hovedpinepille: en hvid, aflang tablet (kaplet) med delekaerv,
+       set lidt fra oven. -->
+  <defs>
+    <linearGradient id="side" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7ebef"/>
+      <stop offset="1" stop-color="#b9c2ca"/>
+    </linearGradient>
+    <radialGradient id="top" cx="0.36" cy="0.3" r="0.85">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#f3f5f7"/>
+      <stop offset="1" stop-color="#d6dce2"/>
+    </radialGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3c4a52" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#3c4a52" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="53" cy="47" rx="48" ry="9" fill="url(#skygge)"/>
+  <!-- siden -->
+  <path d="M8 25 L8 31 Q8 44 26 44 L78 44 Q96 44 96 31 L96 25 Z" fill="url(#side)" stroke="#a7b1ba" stroke-width="0.8"/>
+  <!-- toppen -->
+  <path d="M26 10 L78 10 Q96 10 96 25 Q96 38 78 38 L26 38 Q8 38 8 25 Q8 10 26 10 Z" fill="url(#top)" stroke="#a7b1ba" stroke-width="0.9"/>
+  <!-- delekaerven -->
+  <path d="M52 12 L52 36" stroke="#9aa5ae" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M53.6 13 L53.6 35" stroke="#ffffff" stroke-width="1" stroke-linecap="round"/>
+  <!-- glans -->
+  <path d="M22 16 Q34 13 44 14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+</svg>

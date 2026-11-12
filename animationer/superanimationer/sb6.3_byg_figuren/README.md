@@ -3,7 +3,7 @@
 Ny 10. nov. 2026 (brugeren: "Kan du lave 'byg figuren' til de resterende kapitler i kemibogen B?").
 Bygget efter opskriften i `../sc1.5_byg_figuren/README.md` ("Opskrift: Byg figuren til et nyt
 kapitel") som kopi af `../sb5.6_byg_figuren` (B5). Nummeret 3 kommer efter de to animationer i
-B6-menuen (`b3.1_pKs_Ks_miniopgaver.html` og `sb6.2_titreringssimulator`).
+B6-menuen (`sb6.1_syrestyrke` og `sb6.2_titreringssimulator`).
 
 **I menuen:** B-panelets fane "byg" som B6 "Syrer og baser" (`?emne=b6.byg`, 10. nov. 2026), linjen
 under 'Byg figuren' i `FEEDBACK_EMNER` i `samling_alt_b.html` og `"b6"` i `BYG_FIGUREN` i
@@ -18,7 +18,7 @@ har ikke set den endnu.
    b6-selvionisering, b6-regnefirkant, b6-ph-poh-skala, b6-pks-skala, b6-omdannelsesgrad,
    b6-par-styrke, b6-puffer-sammenlign, b6-titrerkurve og b6-indikatorer (`vaerktoej/lav_figurer.py`,
    `sf_b6_...`) og C-bogens titrering-opstilling.
-3. **Naboerne.** `b3.1_pKs_Ks_miniopgaver.html` og `sb6.2_titreringssimulator` ejer at regne og
+3. **Naboerne.** `sb6.1_syrestyrke` og `sb6.2_titreringssimulator` ejer at regne og
    titrere. Her sættes kun ord på.
 4. **Loftet.** Seks faner, én pr. afsnit med fagord (B6.5 og B6.6 har ingen, så numrene står i
    `NK.AFSNIT`), og alle 31 fagord. Korresponderende syre-basepar og syrestyrkeeksponent står to

@@ -1,8 +1,8 @@
 /* =====================================================================
    data.js - glassene, opgaverne og teksterne
 
-   Et maal (opgave) har sine dele i raekkefoelge: gaet > forsoeg > spm >
-   spm2 (se js/fane.js). Hver del har tekst, hint og evt. om: det, delen
+   Et maal (opgave) har sine dele i raekkefoelge: forsoeg > spm (se
+   js/fane.js; der er ingen gaet i denne animation). Hver del har tekst, hint og evt. om: det, delen
    handler om, som faar en rolig gul ring i scenen (glassets plads i
    listen, "lup", "tavle" eller "pipette").
 
@@ -10,8 +10,7 @@
    bliver ved efter draabe nummer (antal dobbeltbindinger i luppen + 1).
    Teksterne bruger de tal, saa de altid passer med det, eleven ser.
 
-   Graenser, som selvtesten taeller: gaettets tekst hoejst 60 tegn, et
-   spoergsmaal 105, et svar 34, et forsoeg 95, et hint 100, forklaringen
+   Graenser, som selvtesten taeller: et spoergsmaal 105, et svar 34, et forsoeg 95, et hint 100, forklaringen
    til et forkert svar 110 og til det rigtige 160.
    ===================================================================== */
 (function () {
@@ -25,14 +24,18 @@
     function aff(fedt) { return F.endepunkt(fedt) - 1; }
     D.draaberTekst = function (n) { return n === 1 ? "1 dråbe" : n + " dråber"; };
 
-    /* ----- Fane 1: de fem glas fra oevelse 4.6b -------------------------------------- */
+    /* ----- Fane 2: de fem glas fra oevelse 4.6b -------------------------------------- */
     D.D_GLAS = [
-        { nr: "1", fedt: "kokos" },
-        { nr: "2", fedt: "oliven" },
-        { nr: "3", fedt: "raps" },
+        { nr: "1", fedt: "oliven" },
+        { nr: "2", fedt: "raps" },
+        { nr: "3", fedt: "kokos" },
         { nr: "4", fedt: "solsikke" },
         { nr: "5", fedt: "heptan" }
     ];
+
+    function drypTekst(nr) {
+        return "Dryp bromvand i glas " + nr + ", til det øverste lag stadig er orange. Indsend antallet af dråber.";
+    }
 
     var drypHint = function (nr) {
         return [
@@ -42,27 +45,51 @@
         ];
     };
 
+    /* Glassene tages i raekkefoelge, som i oevelse 4.6b (brugeren 12. nov.
+       2026: "underligt at glassene ikke gaar fra 1-5 i raekkefoelge"). Der er
+       intet gaet foer forsoeget, men ét fagligt spoergsmaal efter hvert glas,
+       som efterbehandlingen i oevelsen (brugeren samme dag: "ikke en gaette
+       konkurrence ... hellere noget der hjaelper med fagligheden"). Kokosfedt
+       er glas 3, saa eleven ser additionen foer et maettet fedtstof
+       (brugeren samme dag: "saa man ikke starter med et maettet fedt"). */
     D.D_MAAL = [
         {
-            id: "oliven", navn: "Glas 2: olivenolie", glas: 1,
-            gaet: {
-                intro: "Glas 2 har olivenolie opløst i heptan. Der dryppes én dråbe bromvand i, og glasset rystes.",
-                tekst: "Hvad sker der med den orange farve?",
+            id: "oliven", navn: "Glas 1: olivenolie", glas: 0,
+            forsoeg: {
+                om: [0, "pipette"],
+                tekst: drypTekst("1"),
+                set: "Farven blev ved efter dråbe " + ep("oliven") + ". Olivenolien i glas 1 affarvede " + D.draaberTekst(aff("oliven")) + ".",
+                hint: drypHint("1")
+            },
+            spm: {
+                om: ["lup"],
+                tekst: "Hvad skete der med dibrom fra de første " + aff("oliven") + " dråber i glas 1?",
                 svar: [
-                    { t: "Farven forsvinder", ok: true },
-                    { t: "Det øverste lag bliver orange" },
-                    { t: "Farven bliver i vandet nederst" }
+                    { t: "Addition til dobbeltbindingerne", ok: true },
+                    { t: "Substitution med enkeltbindinger",
+                      f: "Ved en substitution bliver et H skiftet ud med Br. I luppen sidder Br, hvor der var to streger." },
+                    { t: "Dibrom blev i vandet nederst",
+                      f: "Vandet i bunden af glas 1 er farveløst. Dibrom blev rystet op i det øverste lag med olien." }
+                ],
+                hint: [
+                    "Se i luppen, hvor bromatomerne sidder.",
+                    "Bromatomerne sidder, hvor der før var en dobbeltbinding mellem to carbonatomer.",
+                    "Dibrom adderede til dobbeltbindingerne. Hver blev til en enkeltbinding med ét Br på hvert C."
                 ]
             },
+            loest: "Ved en addition bliver dobbeltbindingen til en enkeltbinding, og der sætter sig et bromatom på hvert carbonatom. Produktet er farveløst."
+        },
+        {
+            id: "raps", navn: "Glas 2: rapsolie", glas: 1,
             forsoeg: {
                 om: [1, "pipette"],
-                tekst: "Dryp bromvand i glas 2, til farven i det øverste lag bliver. Indsend så antallet af dråber.",
-                set: "Farven blev ved efter dråbe " + ep("oliven") + ". Dibrom fra de første " + aff("oliven") + " dråber blev brugt.",
+                tekst: drypTekst("2"),
+                set: "Farven blev ved efter dråbe " + ep("raps") + ". Rapsolien i glas 2 affarvede " + D.draaberTekst(aff("raps")) + ".",
                 hint: drypHint("2")
             },
             spm: {
                 om: ["lup"],
-                tekst: "Luppen viser det øverste lag i glas 2. Hvorfor blev farven ved efter dråbe " + ep("oliven") + "?",
+                tekst: "Hvorfor blev farven i glas 2 ved efter dråbe " + ep("raps") + "?",
                 svar: [
                     { t: "Alle dobbeltbindinger var brugt", ok: true },
                     { t: "Heptanen kunne ikke tage mere",
@@ -71,37 +98,28 @@
                       f: "Så ville farven også forsvinde i et glas med kun heptan. I luppen sidder bromatomerne på fedtsyrerne." }
                 ],
                 hint: [
-                    "Se i luppen, hvor bromatomerne sidder, og om der er dobbeltbindinger tilbage.",
+                    "Se i luppen: er der en dobbeltbinding tilbage, som ikke har fået brom?",
                     "Hvert dibrommolekyle adderer til én dobbeltbinding. Hvad sker der, når der ikke er flere?",
-                    "Alle dobbeltbindingerne i olivenolien var brugt, så dibrom fra den sidste dråbe blev frit."
+                    "Alle " + aff("raps") + " dobbeltbindinger i rapsolien var brugt, så dibrom fra dråbe " + ep("raps") + " blev frit."
                 ]
             },
-            loest: "Hvert dibrommolekyle adderede til én dobbeltbinding. Da alle " + aff("oliven") + " dobbeltbindinger i luppen var brugt, blev dibrom fra dråbe " + ep("oliven") + " frit og gav farve."
+            loest: "Hvert dibrommolekyle adderer til én dobbeltbinding. Da alle " + aff("raps") + " var brugt, blev dibrom fra dråbe " + ep("raps") + " frit og gav farve."
         },
         {
-            id: "kokos", navn: "Glas 1: kokosfedt", glas: 0,
-            gaet: {
-                intro: "Glas 1 har kokosfedt opløst i heptan. Kokosfedt har næsten kun mættede fedtsyrer.",
-                tekst: "Hvor mange dråber affarver kokosfedt?",
-                svar: [
-                    { t: "Flere end olivenolie" },
-                    { t: "Færre end olivenolie", ok: true },
-                    { t: "Lige så mange som olivenolie" }
-                ]
-            },
+            id: "kokos", navn: "Glas 3: kokosfedt", glas: 2,
             forsoeg: {
-                om: [0, "pipette"],
-                tekst: "Dryp bromvand i glas 1, til farven i det øverste lag bliver. Indsend så antallet af dråber.",
-                set: "Farven blev ved allerede efter dråbe " + ep("kokos") + ". Kokosfedtet i glas 1 affarvede ingen dråber.",
-                hint: drypHint("1")
+                om: [2, "pipette"],
+                tekst: drypTekst("3"),
+                set: "Farven blev ved allerede efter dråbe " + ep("kokos") + ". Kokosfedtet i glas 3 affarvede ingen dråber.",
+                hint: drypHint("3")
             },
             spm: {
                 om: ["lup"],
-                tekst: "Hvorfor kunne kokosfedtet i glas 1 ikke affarve bromvandet?",
+                tekst: "Kokosfedtet i glas 3 affarvede ingen dråber bromvand. Hvorfor?",
                 svar: [
-                    { t: "Kokosfedt er et fast fedtstof",
-                      f: "Kokosfedtet er opløst i heptanen i glas 1. Det, der tæller, er dobbeltbindingerne i fedtsyrerne." },
                     { t: "Fedtsyrerne er mættede", ok: true },
+                    { t: "Kokosfedt er et fast fedtstof",
+                      f: "Kokosfedtet er opløst i heptanen i glas 3. Det, der tæller, er dobbeltbindingerne i fedtsyrerne." },
                     { t: "Fedtsyrerne er for korte",
                       f: "Kæderne i kokosfedt er korte, men dibrom adderer kun til dobbeltbindinger, og luppen viser ingen." }
                 ],
@@ -111,107 +129,63 @@
                     "Fedtsyrerne i kokosfedtet er mættede. Der er ingen dobbeltbindinger, dibrom kan addere til."
                 ]
             },
-            loest: "En mættet fedtsyre har kun enkeltbindinger, og dibrom kan ikke addere til en enkeltbinding. Derfor blev farven fra den første dråbe i glas 1."
+            loest: "En mættet fedtsyre har kun enkeltbindinger, og dibrom kan ikke addere til en enkeltbinding. Derfor blev farven fra den første dråbe i glas 3."
         },
         {
             id: "solsikke", navn: "Glas 4: solsikkeolie", glas: 3,
-            gaet: {
-                intro: "Glas 4 har solsikkeolie. 70 % af fedtsyrerne i solsikkeolie er polyumættede.",
-                tekst: "Hvor mange dråber affarver solsikkeolie?",
-                svar: [
-                    { t: "Flere end olivenolie", ok: true },
-                    { t: "Færre end olivenolie" },
-                    { t: "Lige så mange som olivenolie" }
-                ]
-            },
             forsoeg: {
                 om: [3, "pipette"],
-                tekst: "Dryp bromvand i glas 4, til farven i det øverste lag bliver. Indsend så antallet af dråber.",
-                set: "Farven blev ved efter dråbe " + ep("solsikke") + ". Solsikkeolien i glas 4 affarvede " + aff("solsikke") + " dråber.",
+                tekst: drypTekst("4"),
+                set: "Farven blev ved efter dråbe " + ep("solsikke") + ". Solsikkeolien i glas 4 affarvede " + D.draaberTekst(aff("solsikke")) + ".",
                 hint: drypHint("4")
             },
             spm: {
                 om: ["lup"],
-                tekst: "Solsikkeolien affarvede " + aff("solsikke") + " dråber, olivenolien " + aff("oliven") + ". Hvorfor affarver solsikkeolien flere?",
+                tekst: "Solsikkeolien i glas 4 affarvede flest dråber af de fire fedtstoffer. Hvorfor?",
                 svar: [
-                    { t: "Flere dobbeltbindinger", ok: true },
-                    { t: "Længere fedtsyrer",
-                      f: "Fedtsyrerne i begge olier har 16 eller 18 carbonatomer. Tæl i stedet dobbeltbindingerne i luppen." },
-                    { t: "Olien er mere flydende",
+                    { t: "Flest dobbeltbindinger", ok: true },
+                    { t: "Længst fedtsyrer",
+                      f: "Fedtsyrerne i de tre olier har alle 18 carbonatomer. Tæl i stedet dobbeltbindingerne i luppen." },
+                    { t: "Mest flydende",
                       f: "Dibrom adderer kun til dobbeltbindinger. At olien er flydende, giver ikke dibrom flere steder at addere." }
                 ],
                 hint: [
                     "Tæl bromatomerne i luppen. Der sidder to for hver dobbeltbinding, dibrom har adderet til.",
-                    "En polyumættet fedtsyre har to eller flere dobbeltbindinger.",
-                    "Solsikkeolien har flere dobbeltbindinger, fordi de fleste af dens fedtsyrer er polyumættede."
+                    "To af fedtsyrerne i solsikkeolien er polyumættede. De har to dobbeltbindinger hver.",
+                    "Solsikkeolien har flest dobbeltbindinger, fordi de fleste af dens fedtsyrer er polyumættede."
                 ]
             },
-            loest: "En polyumættet fedtsyre har to eller flere dobbeltbindinger. Solsikkeolie er mest polyumættet og kan derfor addere mere dibrom end olivenolie."
-        },
-        {
-            id: "raps", navn: "Glas 3: rapsolie", glas: 2,
-            gaet: {
-                intro: "Glas 3 har rapsolie: 63 % monoumættede og 30 % polyumættede fedtsyrer.",
-                tekst: "Hvor mange dråber affarver rapsolie?",
-                svar: [
-                    { t: "Færre end olivenolie" },
-                    { t: "Mellem olivenolie og solsikkeolie", ok: true },
-                    { t: "Flere end solsikkeolie" }
-                ]
-            },
-            forsoeg: {
-                om: [2, "pipette"],
-                tekst: "Dryp bromvand i glas 3, til farven i det øverste lag bliver. Indsend så antallet af dråber.",
-                set: "Farven blev ved efter dråbe " + ep("raps") + ". Rapsolien i glas 3 affarvede " + aff("raps") + " dråber.",
-                hint: drypHint("3")
-            },
-            spm: {
-                om: [0, 1, 2, 3],
-                tekst: "Hvilken rækkefølge passer? Begynd med det fedtstof, der affarvede flest dråber.",
-                svar: [
-                    { t: "Solsikke, raps, oliven, kokos", ok: true },
-                    { t: "Kokos, oliven, raps, solsikke",
-                      f: "Rækkefølgen er vendt om. Kokosfedtet i glas 1 affarvede færrest dråber, ikke flest." },
-                    { t: "Raps, solsikke, oliven, kokos",
-                      f: "Se skemaet i panelet: solsikkeolien i glas 4 affarvede flere dråber end rapsolien i glas 3." }
-                ],
-                hint: [
-                    "Se skemaet i panelet. Hvilket glas brugte flest dråber, før farven blev?",
-                    "Flest dråber betyder flest dobbeltbindinger. Kokosfedt har færrest.",
-                    "Solsikkeolie, rapsolie, olivenolie og til sidst kokosfedt."
-                ]
-            },
-            loest: "Jo flere dobbeltbindinger et fedtstof har, jo mere bromvand kan det affarve. Rækkefølgen passer med tabellen over fedtstofferne i Kemibogens afsnit 4.6."
+            loest: "En polyumættet fedtsyre har to eller flere dobbeltbindinger. Solsikkeolie er mest polyumættet og kan derfor addere mest dibrom."
         },
         {
             id: "heptan", navn: "Glas 5: kun heptan", glas: 4,
             forsoeg: {
                 om: [4, "pipette"],
-                tekst: "Glas 5 har kun heptan. Dryp bromvand i glas 5, til farven bliver, og indsend antallet.",
+                tekst: "Glas 5 har kun heptan. Dryp bromvand i, til det øverste lag stadig er orange, og indsend.",
                 set: "Farven blev ved allerede efter dråbe " + ep("heptan") + ". Heptan affarver ikke bromvand i mørke.",
                 hint: drypHint("5")
             },
             spm: {
-                om: [1, 4],
-                tekst: "Glas 5 brugte " + D.draaberTekst(ep("heptan")) + " og glas 2 med olivenolie " + ep("oliven") + ". Hvor mange dobbeltbindinger var der i luppen i glas 2?",
+                om: [0, 4],
+                tekst: "Glas 5 brugte " + D.draaberTekst(ep("heptan")) + ", glas 1 med olivenolie " + ep("oliven") + ". Hvor mange dobbeltbindinger var der i glas 1?",
                 svar: [
                     { t: aff("oliven") + " dobbeltbindinger", ok: true },
                     { t: ep("oliven") + " dobbeltbindinger",
-                      f: "Dråbe " + ep("oliven") + " i glas 2 blev ikke affarvet, ligesom dråben i glas 5. Træk dråben fra glas 5 fra." },
+                      f: "Dråbe " + ep("oliven") + " i glas 1 blev ikke affarvet, ligesom dråben i glas 5. Træk dråben fra glas 5 fra." },
                     { t: (ep("oliven") + 1) + " dobbeltbindinger",
-                      f: "Hvert dibrommolekyle adderer til én dobbeltbinding. Træk dråben i glas 5 fra antallet i glas 2." }
+                      f: "Hvert dibrommolekyle adderer til én dobbeltbinding. Træk dråben i glas 5 fra antallet i glas 1." }
                 ],
                 hint: [
                     "Den sidste dråbe blev orange i begge glas. Dråben er ikke brugt til en dobbeltbinding.",
-                    "Træk antallet af dråber i glas 5 fra antallet i glas 2.",
+                    "Træk antallet af dråber i glas 5 fra antallet i glas 1.",
                     ep("oliven") + " − " + ep("heptan") + " = " + aff("oliven") + ". Hver af de " + aff("oliven") + " dråber adderede til én dobbeltbinding."
                 ]
             },
-            loest: "Den sidste dråbe bliver orange i alle glas, også uden fedtstof. Derfor trækker man glas 5 fra: " + ep("oliven") + " − " + ep("heptan") + " = " + aff("oliven") + ", én dråbe for hver dobbeltbinding i glas 2."
+            loest: "Den sidste dråbe bliver orange i alle glas, også uden fedtstof. Derfor trækker man glas 5 fra: " + ep("oliven") + " − " + ep("heptan") + " = " + aff("oliven") + " dobbeltbindinger."
         }
     ];
 
-    /* ----- Fane 2: ét fedtstofmolekyle paa tavlen -------------------------------------- */
+    /* ----- Fane 1: ét fedtstofmolekyle paa tavlen (det samme som i luppen paa fane 2 og 3) --- */
     var findHint = function (fedt) {
         return [
             "En dobbeltbinding er to streger ved siden af hinanden. Den sidder ved et knæk på kæden.",
@@ -222,7 +196,7 @@
 
     D.M_MAAL = [
         {
-            id: "oliven", navn: "Fra olivenolie", mol: ["O", "O", "O"], kilde: "olivenolie",
+            id: "oliven", navn: "Fra olivenolie", mol: F.FEDT.oliven.mol[0], kilde: "olivenolie",
             forsoeg: {
                 om: ["tavle"],
                 tekst: "Klik på alle dobbeltbindingerne i fedtstoffet fra olivenolie, og tryk Indsend svar.",
@@ -248,7 +222,7 @@
             loest: "Oliesyre er monoumættet: mono betyder én. Olivenolie har mest oliesyre, og 75 % af fedtsyrerne i olivenolie er monoumættede."
         },
         {
-            id: "solsikke", navn: "Fra solsikkeolie", mol: ["O", "L", "L"], kilde: "solsikkeolie",
+            id: "solsikke", navn: "Fra solsikkeolie", mol: F.FEDT.solsikke.mol[0], kilde: "solsikkeolie",
             forsoeg: {
                 om: ["tavle"],
                 tekst: "Klik på alle dobbeltbindingerne i fedtstoffet fra solsikkeolie, og tryk Indsend svar.",
@@ -274,7 +248,7 @@
             loest: "Linolsyre er polyumættet: poly betyder mange. Fedtstoffet fra solsikkeolie adderede fem dibrommolekyler, flere end fedtstoffet fra olivenolie med tre."
         },
         {
-            id: "kokos", navn: "Fra kokosfedt", mol: ["La", "M", "P"], kilde: "kokosfedt",
+            id: "kokos", navn: "Fra kokosfedt", mol: F.FEDT.kokos.mol[0], kilde: "kokosfedt",
             forsoeg: {
                 om: ["tavle"],
                 tekst: "Klik på alle dobbeltbindingerne i fedtstoffet fra kokosfedt, og tryk Indsend svar.",
@@ -304,16 +278,16 @@
             loest: "Uden dobbeltbindinger kan dibrom ikke addere, så farven bliver. Fedtsyrerne i kokosfedt er også korte: laurinsyre har kun 12 carbonatomer."
         },
         {
-            id: "tran", navn: "Fra tran", mol: ["P", "O", "DHA"], kilde: "tran",
+            id: "tran", navn: "Fra tran", mol: F.FEDT.tran.mol[0], kilde: "tran",
             forsoeg: {
                 om: ["tavle"],
                 tekst: "Klik på alle dobbeltbindingerne i fedtstoffet fra tran, og tryk Indsend svar.",
-                set: "Syv dobbeltbindinger, og syv dibrommolekyler adderede: ét til hver dobbeltbinding.",
-                hint: findHint("Den øverste kæde har ingen, den midterste har én, og den krumme nederste kæde har seks.")
+                set: "Seks dobbeltbindinger, og seks dibrommolekyler adderede: ét til hver dobbeltbinding.",
+                hint: findHint("Den øverste kæde har ingen, den midterste har én, og den krumme nederste kæde har fem.")
             },
             spm: {
                 om: ["tavle"],
-                tekst: "Tranens fedtstof adderede 7 dibrommolekyler, olivenoliens 3. Hvorfor?",
+                tekst: "Tranens fedtstof adderede 6 dibrommolekyler, olivenoliens 3. Hvorfor?",
                 svar: [
                     { t: "Tran har flere fedtsyrer",
                       f: "Alle fedtstoffer har tre fedtsyrer på glycerol. Tæl dobbeltbindingerne i hver kæde." },
@@ -323,11 +297,11 @@
                 ],
                 hint: [
                     "Tæl dobbeltbindingerne i de tre kæder.",
-                    "Den nederste kæde i fedtstoffet fra tran har seks dobbeltbindinger alene.",
+                    "Den nederste kæde i fedtstoffet fra tran har fem dobbeltbindinger alene.",
                     "Fedtstoffet fra tran har flere dobbeltbindinger, så det kan addere mere dibrom."
                 ]
             },
-            loest: "DHA har seks dobbeltbindinger og er en omega-3-fedtsyre, som kroppen får fra fed fisk."
+            loest: "EPA har fem dobbeltbindinger og er en omega-3-fedtsyre, som kroppen får fra fed fisk."
         }
     ];
 
@@ -454,7 +428,7 @@
         return t;
     };
 
-    /* ----- Fane 2: fejl ved Indsend svar ------------------------------------------------------------ */
+    /* ----- Fane 1: fejl ved Indsend svar ------------------------------------------------------------ */
     D.mFejl = {
         co: "C=O ved esterbindingen er mellem C og O. Dibrom adderer kun til dobbeltbindinger mellem to carbonatomer.",
         enkelt: "Mindst én af de gule bindinger er en enkeltbinding med kun én streg. Klik på den igen for at fjerne den.",
@@ -465,8 +439,8 @@
     };
 
     D.FAERDIG = {
-        d: "Alle fem glas er talt. På fane 2 ser du ét fedtstofmolekyle helt tæt på.",
-        m: "Alle fire fedtstoffer er talt. På fane 3 finder du fedtstoffet i fire ukendte flasker.",
+        m: "Alle fire molekyler er talt. På fane 2 drypper du bromvand i glas med de samme fedtstoffer.",
+        d: "Alle fem glas er talt. På fane 3 finder du fedtstoffet i fire ukendte flasker.",
         u: "Alle fire flasker er fundet."
     };
 

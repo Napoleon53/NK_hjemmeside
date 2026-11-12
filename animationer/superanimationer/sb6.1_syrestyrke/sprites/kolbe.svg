@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="170" viewBox="0 0 150 170">
+  <!-- Erlenmeyerkolbe af klart glas med en farveloes oploesning.
+       Halsen: x 61-89 fra y 6 til y 60. Bunden: y 160, x 12-138.
+       Vaesken staar fra y 108 (indersiden er 18-132 dér). Elektroden
+       tegnes af animationen BAG denne fil. Etiketten: x 40-110, y 124-150. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9d3e2" stop-opacity="0.5"/>
+      <stop offset="0.2" stop-color="#eef6fb" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#f6fafd" stop-opacity="0.1"/>
+      <stop offset="0.8" stop-color="#dbe9f2" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#9fbfd2" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="vaeske" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a9cde2" stop-opacity="0.7"/>
+      <stop offset="0.5" stop-color="#dcedf7" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#9fc6dd" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="75" cy="165" rx="66" ry="4" fill="#000000" fill-opacity="0.18"/>
+  <!-- vaesken -->
+  <path d="M33 108 L117 108 L136 150 Q140 160 130 160 L20 160 Q10 160 14 150 Z" fill="url(#vaeske)"/>
+  <path d="M33 108 L117 108" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.4"/>
+  <!-- glasset -->
+  <path d="M58 4 L92 4 M61 6 L61 60 L14 152 Q9 162 21 162 L129 162 Q141 162 136 152 L89 60 L89 6"
+        fill="url(#glas)" stroke="#7e9bb0" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M57 3 Q57 8 61 8 M93 3 Q93 8 89 8" fill="none" stroke="#7e9bb0" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- genskin -->
+  <path d="M66 14 L66 58 L26 140" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M85 66 L124 142" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2" stroke-linecap="round"/>
+</svg>

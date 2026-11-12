@@ -1754,3 +1754,91 @@ kbd {
 .skema + .note { margin-top: 8px; }
 .slags { font-weight: 700; }
 .knap.nulstil.lille { margin-top: 10px; width: 100%; justify-content: center; padding: 7px 10px; font-size: 0.82rem; }
+
+/* ---------------------------------------------------------------------
+   sc4.6: et lavere kort (brugeren 12. nov. 2026: "Teksten er kæmpe stor,
+   og forhindrer ordentlige figurer til mikro/makro. Se om du ikke kan lave
+   tekstfeltet mindre dybt"). Kortet er én raekke, der bryder om:
+   opgaveteksten med Giv et hint og Indsend svar ved siden af, svarene paa
+   samme raekke som knapperne, naar der er plads, og et hint eller en
+   forklaring til sidst i sin egen raekke. .sk-ind og den ydre .sk-bund er
+   display: contents, saa deres boern kan staa i samme raekke; raekkefoelgen
+   styres med order. Vaelgeren .fane > .scene > .scenekort er staerkere end
+   papirkort.css, som indlaeses efter dette stilark.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .fane > .scene > .scenekort {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    width: min(1060px, calc(100% - 24px));
+    padding: 7px 12px 8px;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind,
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-bund:not([hidden]) { display: contents; }
+
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-tekst {
+    order: 0;
+    flex: 1 1 380px;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.36;
+}
+/* Et spoergsmaal staar alene paa foerste raekke; svarene og knapperne under */
+html body.papirkort.papirkort .fane > .scene > .scenekort.spm > .sk-ind > .sk-tekst,
+html body.papirkort.papirkort .fane > .scene > .scenekort.loest > .sk-ind > .sk-tekst { flex-basis: 100%; }
+
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-slut { order: 0; flex: 1 1 100%; }
+html body.papirkort.papirkort .fane > .scene > .scenekort .sk-slut .sk-tekst { font-size: 0.98rem; line-height: 1.36; }
+html body.papirkort.papirkort .fane > .scene > .scenekort .sk-videre { padding: 7px 15px; font-size: 0.94rem; }
+
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-svar {
+    order: 1;
+    flex: 1 1 480px;
+    gap: 6px;
+    margin: 0;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort .sk-knap {
+    padding: 5px 9px;
+    gap: 7px;
+    font-size: 0.92rem;
+    line-height: 1.22;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort .sk-knap .v-bogstav { width: 20px; height: 20px; font-size: 0.72rem; }
+
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-bund > .knap.hjaelp {
+    order: 2;
+    margin-left: auto;
+    padding: 6px 13px;
+    font-size: 0.92rem;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-bund > .knap.indsend {
+    order: 3;
+    min-width: 0;
+    padding: 6px 15px;
+    font-size: 0.92rem;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-bund > .st-tekst {
+    order: 4;
+    flex: 1 1 100%;
+    padding: 5px 9px;
+    font-size: 0.9rem;
+    line-height: 1.34;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-bund.bliv {
+    order: 5;
+    flex: 1 1 100%;
+    margin: 0;
+}
+html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-bund.bliv .st-tekst { font-size: 0.9rem; line-height: 1.34; }
+
+/* Smalle skaerme: svarene paa deres egen raekke, og under et spoergsmaal
+   staar et hint eller en forklaring til venstre for knapperne */
+@media (max-width: 1179px) {
+    html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-svar { flex-basis: 100%; }
+    html body.papirkort.papirkort .fane > .scene > .scenekort.spm > .sk-bund > .st-tekst { order: 2; flex: 1 1 240px; }
+    html body.papirkort.papirkort .fane > .scene > .scenekort.spm > .sk-bund > .knap.hjaelp { order: 3; }
+    html body.papirkort.papirkort .fane > .scene > .scenekort.spm > .sk-bund > .knap.indsend { order: 4; }
+}

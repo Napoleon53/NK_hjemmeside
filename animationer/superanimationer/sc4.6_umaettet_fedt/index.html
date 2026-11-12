@@ -2,6 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<script src="../../til_panelet.js" data-panel="samling_alt.html" data-emne="c4.5"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Umættet fedt og bromvand</title>
 <link rel="stylesheet" href="css/stil.css">
@@ -13,8 +14,8 @@
     <h1><span class="ikon">Br₂</span> Umættet fedt</h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-d" role="tab" aria-selected="true"><span class="nr">1</span>Dryp og tæl</button>
-        <button class="faneknap" data-fane="fane-m" role="tab" aria-selected="false"><span class="nr">2</span>Ét molekyle</button>
+        <button class="faneknap aktiv" data-fane="fane-m" role="tab" aria-selected="true"><span class="nr">1</span>Ét molekyle</button>
+        <button class="faneknap" data-fane="fane-d" role="tab" aria-selected="false"><span class="nr">2</span>Dryp og tæl</button>
         <button class="faneknap" data-fane="fane-u" role="tab" aria-selected="false"><span class="nr">3</span>Ukendte fedtstoffer</button>
     </div>
 
@@ -25,9 +26,40 @@
 <main>
 
 <!-- ================================================================= -->
-<!-- FANE 1: DRYP OG TAEL                                               -->
+<!-- FANE 1: ET MOLEKYLE                                                -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-d" role="tabpanel" aria-label="Dryp og tæl">
+<section class="fane aktiv" id="fane-m" role="tabpanel" aria-label="Ét molekyle">
+    <div class="scene">
+        <canvas id="m-laerred"></canvas>
+        <div class="scenekort" id="m-skort">
+            <div class="sk-ind" id="m-ind"></div>
+            <div class="sk-bund" id="m-status">
+                <p class="st-tekst" id="m-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="m-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="m-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="m-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="m-fedtkort">
+            <h2>Fedtsyrerne</h2>
+            <div id="m-fedtsyrer"></div>
+            <button class="knap nulstil lille" id="m-forfra" type="button" title="Fjern markeringerne (R)">Fjern markeringerne ↺</button>
+        </div>
+
+        <div class="kort" id="m-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="m-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="m-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: DRYP OG TAEL                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-d" role="tabpanel" aria-label="Dryp og tæl">
     <div class="scene">
         <canvas id="d-laerred"></canvas>
         <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
@@ -53,37 +85,6 @@
         <div class="kort" id="d-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="d-loest">0</b>/5</span></h2>
             <div class="opg-liste" id="d-liste"></div>
-        </div>
-    </aside>
-</section>
-
-<!-- ================================================================= -->
-<!-- FANE 2: ET MOLEKYLE                                                -->
-<!-- ================================================================= -->
-<section class="fane" id="fane-m" role="tabpanel" aria-label="Ét molekyle">
-    <div class="scene">
-        <canvas id="m-laerred"></canvas>
-        <div class="scenekort" id="m-skort">
-            <div class="sk-ind" id="m-ind"></div>
-            <div class="sk-bund" id="m-status">
-                <p class="st-tekst" id="m-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="m-knap" type="button">Giv et hint</button>
-                <button class="knap indsend ikke-klar" id="m-indsend" type="button" hidden>Indsend svar</button>
-            </div>
-        </div>
-        <div class="anker" id="m-anker-tavle"></div>
-    </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="m-fedtkort">
-            <h2>Fedtsyrerne</h2>
-            <div id="m-fedtsyrer"></div>
-            <button class="knap nulstil lille" id="m-forfra" type="button" title="Fjern markeringerne (R)">Fjern markeringerne ↺</button>
-        </div>
-
-        <div class="kort" id="m-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="m-loest">0</b>/4</span></h2>
-            <div class="opg-liste" id="m-liste"></div>
         </div>
     </aside>
 </section>

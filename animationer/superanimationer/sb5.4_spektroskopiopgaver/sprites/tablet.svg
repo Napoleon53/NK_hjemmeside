@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="64" viewBox="0 0 96 64">
+  <!-- Kosttilskudstablet med jern: rund, roedbrun overtrukket tablet
+       set lidt fra oven, med en delekaerv. -->
+  <defs>
+    <linearGradient id="side" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6e2a1c"/>
+      <stop offset="0.3" stop-color="#9a4330"/>
+      <stop offset="0.7" stop-color="#8a3a29"/>
+      <stop offset="1" stop-color="#561f14"/>
+    </linearGradient>
+    <radialGradient id="top" cx="0.38" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#e59a7f"/>
+      <stop offset="0.45" stop-color="#b9573d"/>
+      <stop offset="1" stop-color="#8c3826"/>
+    </radialGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3c4a52" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#3c4a52" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="49" cy="52" rx="44" ry="10" fill="url(#skygge)"/>
+  <!-- siden -->
+  <path d="M8 28 L8 38 A40 15 0 0 0 88 38 L88 28 Z" fill="url(#side)"/>
+  <!-- toppen -->
+  <ellipse cx="48" cy="28" rx="40" ry="15" fill="url(#top)" stroke="#6e2a1c" stroke-width="0.8"/>
+  <!-- delekaerven -->
+  <path d="M14 30 Q48 34 82 26" fill="none" stroke="#6e2a1c" stroke-opacity="0.55" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M14 31.6 Q48 35.6 82 27.6" fill="none" stroke="#f3b9a5" stroke-opacity="0.35" stroke-width="1" stroke-linecap="round"/>
+  <!-- glans -->
+  <ellipse cx="34" cy="21" rx="14" ry="4.5" fill="#ffffff" fill-opacity="0.32" transform="rotate(-8 34 21)"/>
+</svg>

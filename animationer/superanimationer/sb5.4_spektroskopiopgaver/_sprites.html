@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sb5.4 Spektroskopiopgaver</title>
+<style>
+    body { margin: 0; padding: 20px; background: #f4f6f5; font-family: "Segoe UI", sans-serif; color: #1d2433; }
+    h1 { font-size: 1.1rem; margin: 0 0 12px; }
+    .raekke { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; margin-bottom: 26px; }
+    figure { margin: 0; text-align: center; }
+    figure img { display: block; margin: 0 auto 6px; transform-origin: bottom center; }
+    figcaption { font-size: 0.82rem; color: #556766; }
+</style>
+</head>
+<body>
+<!-- Udviklervaerktoej: viser sprites alene (som README kraever), foer de bruges.
+     Nederst tegner animationens egen kode vaesken bag glasset i fire farver. -->
+<h1>Sprites i sb5.4 (2 × størrelse)</h1>
+<div class="raekke" id="raekke"></div>
+<h1>Med væske (tegnet af js/tegning.js)</h1>
+<canvas id="c" width="1100" height="520" style="width:1100px;height:520px;background:#f7f8f7;border-radius:10px"></canvas>
+<script src="js/kerne.js"></script>
+<script>NK.Data = { sub: function (s) { return s; } };</script>
+<script src="js/formel.js"></script>
+<script src="js/tegning.js"></script>
+<script>
+    var navne = ["kolbe", "kuvette", "flaske", "tablet", "pille", "terning", "skrue", "blodproeve"];
+    var r = document.getElementById("raekke");
+    navne.forEach(function (n) {
+        var f = document.createElement("figure");
+        var i = new Image();
+        i.onload = function () { i.style.width = (i.naturalWidth * 2) + "px"; };
+        i.src = "sprites/" + n + ".svg";
+        f.appendChild(i);
+        var c = document.createElement("figcaption"); c.textContent = n + ".svg"; f.appendChild(c);
+        r.appendChild(f);
+    });
+    var T = NK.Tegning;
+    T.hentSprites();
+    function tegn() {
+        var c = document.getElementById("c"), dpr = window.devicePixelRatio || 1;
+        c.width = 1100 * dpr; c.height = 520 * dpr;
+        var ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var farver = ["#b273c9", "#ee9a6c", "#4f86d4", null];
+        farver.forEach(function (f, i) {
+            T.kolbe(ctx, 20 + i * 120, 20, 100, f, {});
+            T.kuvette(ctx, 520 + i * 60, 60, 44, f);
+            T.flaske(ctx, 780 + i * 80, 60, 70, f);
+        });
+        /* Spektrofotometeret: uden kuvette, paa vej ned, maalt (synligt og UV) */
+        T.spektro(ctx, 20, 230, 250, { lambda: 528, A: null, ind: null });
+        T.spektro(ctx, 290, 230, 250, { lambda: 510, A: null, ind: 0.5, farve: "#ee9a6c" });
+        T.spektro(ctx, 560, 230, 250, { lambda: 528, A: "0,442", ind: 1, farve: "#b273c9", T: Math.pow(10, -0.442), fokus: "display" });
+        T.spektro(ctx, 830, 230, 250, { lambda: 243, A: "0,739", ind: 1, farve: null, T: Math.pow(10, -0.739) });
+        T.spektro(ctx, 290, 380, 330, { lambda: 600, A: "0,599", ind: 1, farve: "#4f86d4", T: Math.pow(10, -0.599) });
+    }
+    setTimeout(tegn, 400);
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* =====================================================================
-   glas.js - et reagensglas med et fedtstof oploest i heptan (fane 1 og 3)
+   glas.js - et reagensglas med et fedtstof oploest i heptan (fane 2 og 3)
 
    Makroniveauet. I glasset er der heptan med en draabe fedtstof i.
    Eleven drypper bromvand i, én draabe ad gangen. Draaben falder ned
@@ -10,6 +10,9 @@
 
    Glasset er spritet sprites/reagensglas.svg (med prop) eller
    reagensglas_aaben.svg (det glas, der dryppes i). Vaeskerne tegnes bag.
+   Glassene staar foran en hvid plade (js/sim_dryp.js), saa farven i det
+   oeverste lag er let at se (brugeren 12. nov. 2026). Derfor er stregerne
+   og de farveloese vaesker tegnet til en lys baggrund.
    ===================================================================== */
 (function () {
     "use strict";
@@ -22,7 +25,7 @@
     var SKIL_SEK = 0.55;       /* de to lag skiller igen */
     var HEPTAN = 92;           /* heptanlagets hoejde i spritets maal */
     var VAND_PR_DRAABE = 2.2;  /* saa meget hoejere bliver vandet i bunden pr. draabe */
-    var ORANGE = "232, 140, 48";
+    var ORANGE = "236, 128, 24";
 
     function Roer(valg) {
         this.fedtId = valg.fedt;
@@ -122,11 +125,12 @@
     };
 
     /* Farven i det oeverste lag fra antallet af frie dibrommolekyler.
-       Ét frit giver et svagt orange lag; flere giver mere farve. */
+       Ét frit giver et tydeligt, men lyst orange lag paa den hvide plade;
+       flere giver mere farve. */
     Roer.alfa = function (n) {
         if (n <= 0) return 0;
-        if (n < 1) return 0.26 * n;
-        return Math.min(0.86, 0.26 + 0.15 * (n - 1));
+        if (n < 1) return 0.48 * n;
+        return Math.min(0.9, 0.48 + 0.14 * (n - 1));
     };
 
     P.farver = function () {
@@ -144,20 +148,6 @@
     P.rammer = function (pt) {
         var m = this.maal(), f = this.flyt();
         return pt.x >= m.x0 + f.x - 8 && pt.x <= m.x0 + f.x + this.b + 8 && pt.y >= m.y0 + f.y - 4 && pt.y <= this.bund + 6;
-    };
-
-    /* Klodsen, glasset staar i */
-    P.tegnHolder = function (ctx) {
-        var b = this.b * 1.5, h = Math.max(14, this.b * 0.3);
-        ctx.save();
-        NK.rundtRekt(ctx, this.x - b / 2, this.bund - h, b, h, 4);
-        ctx.fillStyle = "#6d4c2f";
-        ctx.fill();
-        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.fillRect(this.x - b / 2 + 3, this.bund - h + 2, b - 6, 2);
-        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-        ctx.fillRect(this.x - this.b * 0.36, this.bund - h, this.b * 0.72, 3);
-        ctx.restore();
     };
 
     /* valg: maerke (tal eller bogstav paa sedlen), aaben (uden prop: det glas,
@@ -197,13 +187,14 @@
         ctx.clip();
         /* vandet fra bromvandet i bunden */
         if (m.bundY - m.yVand > 0.5) {
-            ctx.fillStyle = "rgba(140, 190, 235, 0.2)";
+            ctx.fillStyle = "rgba(140, 190, 235, 0.3)";
             ctx.fillRect(iv, m.yVand, ih - iv, m.bundY - m.yVand + 2);
             ctx.fillStyle = "rgba(" + ORANGE + ", " + F.vand.toFixed(3) + ")";
             ctx.fillRect(iv, m.yVand, ih - iv, m.bundY - m.yVand + 2);
         }
         /* heptanen med fedtstoffet */
-        ctx.fillStyle = "rgba(236, 236, 214, 0.12)";
+        /* den farveloese heptan: et svagt graablaat skaer, der forsvinder, naar laget bliver orange */
+        ctx.fillStyle = "rgba(205, 218, 232, " + (0.26 * (1 - Math.min(1, F.olie * 2))).toFixed(3) + ")";
         ctx.fillRect(iv, m.yTop, ih - iv, m.yVand - m.yTop);
         ctx.fillStyle = "rgba(" + ORANGE + ", " + F.olie.toFixed(3) + ")";
         ctx.fillRect(iv, m.yTop, ih - iv, m.yVand - m.yTop);
@@ -215,15 +206,15 @@
                 var y2 = m.yTop + 4 + d.fy * (m.bundY - m.yTop - 10);
                 ctx.beginPath();
                 ctx.arc(x, y2, d.r * Math.max(0.8, k), 0, Math.PI * 2);
-                ctx.fillStyle = d.lys ? "rgba(240, 244, 236, " + (0.3 * u).toFixed(3) + ")" : "rgba(" + ORANGE + ", " + (0.4 * u).toFixed(3) + ")";
+                ctx.fillStyle = d.lys ? "rgba(120, 150, 180, " + (0.35 * u).toFixed(3) + ")" : "rgba(" + ORANGE + ", " + (0.4 * u).toFixed(3) + ")";
                 ctx.fill();
             });
         }
         /* overfladen og graensen mellem de to lag */
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.fillStyle = "rgba(70, 85, 105, 0.5)";
         ctx.fillRect(iv, m.yTop, ih - iv, 1.4);
         if (m.bundY - m.yVand > 0.5) {
-            ctx.fillStyle = "rgba(255, 255, 255, " + (0.34 * (1 - this.uro)).toFixed(3) + ")";
+            ctx.fillStyle = "rgba(70, 85, 105, " + (0.4 * (1 - this.uro)).toFixed(3) + ")";
             ctx.fillRect(iv, m.yVand, ih - iv, 1.2);
         }
         ctx.restore();
@@ -249,7 +240,7 @@
         ctx.restore();
 
         if (valg.peg) Tg.ring(ctx, m.x0 + 1, m.y0 + 2, this.b - 2, m.h - 12, valg.tid || 0, 16);
-        else if (valg.om) Tg.omRing(ctx, m.x0 + 3, m.y0 + 4, this.b - 6, m.h - 14);
+        else if (valg.om) Tg.omRing(ctx, m.x0 + 3, m.y0 + 4, this.b - 6, m.h - 14, "#d29a00");
     };
 
     NK.Roer = Roer;

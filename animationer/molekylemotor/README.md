@@ -1,6 +1,6 @@
 # Molekylemotoren
 
-Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
+Fælles kode til at tegne og navngive molekyler. Den bruges af ti sider:
 
 * `../superanimationer/tegnebraet/`: tegnebrættet til rapporter
 * `../superanimationer/sc4.2_zigzagformler/`: quizzerne om zigzagformler, navne
@@ -34,6 +34,12 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
   tavlen, og navngivningen er facit. Animationen lægger sin egen `klik` på sin
   tavle (et klik på O eller N med Kæde sætter et carbonatom på); motoren er ikke
   ændret
+* `../superanimationer/sb4.2_estersyntese/`: estersyntesen til afsnit B4.5. Eleven tegner
+  esteren ud fra syren og alkoholen på tavlen (C, O og =O som gruppe, `regler.forbudt`
+  mod to oxygenatomer sammen), og navngivningen afgør, om tegningen er den rigtige ester.
+  Esterne bygges af syren og alkoholen som grafer; struktur tegner kondensationen og
+  molekylerne i skilletragtens lup. Animationen lægger sin egen `klik` på sin tavle;
+  motoren er ikke ændret
 
 Koden lå i sc4.2 indtil 25. september 2026. Da fik tegnebrættet sin egen side, og
 motoren blev flyttet hertil, så den ikke skal kopieres fra mappe til mappe. Den

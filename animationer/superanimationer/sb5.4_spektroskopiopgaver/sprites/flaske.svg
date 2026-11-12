@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="70" height="112" viewBox="0 0 70 112">
+  <!-- Proeveglas med skruelaag. Vaesken tegnes af animationen BAG denne
+       fil (T.flaskeVaeske): x 10-60 fra y 44 til y 101 med runde hjoerner. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fb4c2" stop-opacity="0.55"/>
+      <stop offset="0.12" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.22" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.32" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="0.86" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#9fb4c2" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a3340"/>
+      <stop offset="0.3" stop-color="#5b6676"/>
+      <stop offset="0.55" stop-color="#3a4452"/>
+      <stop offset="1" stop-color="#1c232c"/>
+    </linearGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#4b5a64" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#4b5a64" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="35" cy="106" rx="32" ry="5" fill="url(#skygge)"/>
+  <!-- glasset: skulder og hals -->
+  <path d="M22 24 L22 30 Q8 34 8 46 L8 96 Q8 104 16 104 L54 104 Q62 104 62 96 L62 46 Q62 34 48 30 L48 24"
+        fill="url(#glas)" stroke="#7d93a3" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- laaget med riller -->
+  <rect x="18" y="4" width="34" height="21" rx="3" fill="url(#laag)" stroke="#161b22" stroke-width="0.9"/>
+  <g stroke="#ffffff" stroke-opacity="0.13" stroke-width="1.2">
+    <line x1="22" y1="7" x2="22" y2="22"/><line x1="26" y1="7" x2="26" y2="22"/><line x1="30" y1="7" x2="30" y2="22"/>
+    <line x1="34" y1="7" x2="34" y2="22"/><line x1="38" y1="7" x2="38" y2="22"/><line x1="42" y1="7" x2="42" y2="22"/>
+    <line x1="46" y1="7" x2="46" y2="22"/><line x1="50" y1="7" x2="50" y2="22"/>
+  </g>
+  <rect x="18" y="4" width="34" height="4" rx="2" fill="#ffffff" fill-opacity="0.12"/>
+  <!-- genskin -->
+  <path d="M15 48 L15 94" stroke="#ffffff" stroke-opacity="0.8" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M55 52 L55 92" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

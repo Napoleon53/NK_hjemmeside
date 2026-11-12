@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="96" viewBox="0 0 44 96">
+  <!-- Kuvette af klart glas set forfra. Vaesken tegnes af animationen
+       BAG denne fil (T.kuvetteVaeske): x 7-37 fra y 26 til y 87. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fb4c2" stop-opacity="0.6"/>
+      <stop offset="0.1" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.2" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="0.3" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="0.86" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#9fb4c2" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="kant" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c9d4da"/>
+    </linearGradient>
+  </defs>
+  <!-- glasset -->
+  <path d="M5 3 L39 3 L39 87 Q39 91 35 91 L9 91 Q5 91 5 87 Z"
+        fill="url(#glas)" stroke="#7d93a3" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- den tykke kant foroven -->
+  <rect x="3.5" y="1.5" width="37" height="6" rx="1.6" fill="url(#kant)" stroke="#7d93a3" stroke-width="1.2"/>
+  <!-- bunden er tyk -->
+  <path d="M6 86 L38 86" stroke="#9fb4c2" stroke-opacity="0.8" stroke-width="1.2"/>
+  <!-- genskin -->
+  <path d="M12 12 L12 82" stroke="#ffffff" stroke-opacity="0.85" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M33 14 L33 80" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

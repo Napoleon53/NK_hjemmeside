@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb5.4 Spektroskopiopgaver</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at regnearkets linje giver opgavernes tal (og
+   bogens ε for permanganat og NADH), at elevens tal tolkes rigtigt, at
+   alle tre faner kan gennemføres, at de typiske fejl får den rigtige
+   forklaring og koster stjernen, at intet løses uden Indsend svar, at
+   prøven og linjen først kommer frem, når de er aktuelle, at teksterne er
+   korte og uden tankestreger og ASCII-dansk, at tabellen kopieres med
+   tabulator og det valgte decimaltegn, og at kortet, kurven og rammerne
+   kan være der fra 1100 × 620 til 1600 × 950. Kræver en lokal server med
+   mappen animationer/ som rod (siden henter ../faelles/). Testen gemmer
+   elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb5.4-k", "nk-sb5.4-i", "nk-sb5.4-l"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|vaelg\w*|groen\w*|roed\w*|blaa|traek\w*|baade|laengere|oploesning\w*|maal|maalt|maalekolbe\w*|taeller|naevner|broek\w*|haeldning\w*|omraade\w*|lineaer\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+function koer() {
+    var W = ramme.contentWindow;
+    koerTest(W).catch(function (e) {
+        fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl");
+    }).then(function () {
+        try {
+            NOEGLER.forEach(function (n) {
+                if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+            });
+        } catch (e) { /* ingen hukommelse */ }
+        vis();
+        window.faerdig = true;
+    });
+}
+
+async function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, O = D.OPG;
+    var k1 = NK.sims["fane-k"], i2 = NK.sims["fane-i"], l3 = NK.sims["fane-l"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function tx(t) { var e = d.createElement("div"); e.innerHTML = D.sub(NK.html(t)); return e.textContent; }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: String(t) }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function naer(a, b, rel) { return Math.abs(a - b) <= Math.abs(b) * rel; }
+    /* Elevens svar: tallet og enheden, og Indsend svar */
+    function svar(sim, tal, enhed) {
+        sim.f1 = tal; sim.enhed = enhed; sim.visKort(); sim.indsendKlik();
+    }
+    function vaelgSvar(sim, j) { sim.svarValg(j); sim.indsendKlik(); }
+
+    /* ================================================================= */
+    overskrift("1. Regnearkets linje giver opgavernes tal");
+    var R = {};
+    Object.keys(O).forEach(function (id) { R[id] = D.kaede(O[id]); });
+    paastand("permanganat: ε = 2,45 · 10³ M⁻¹ · cm⁻¹ som bogens tabel (525 nm), c = 0,180 mM",
+        D.epsU(R.mno4.epsM) === "2,45 · 10³" && D.tal3(R.mno4.c) === "0,180", D.epsU(R.mno4.epsM) + " " + D.tal3(R.mno4.c));
+    paastand("jern: ε = 1,11 · 10⁴ M⁻¹ · cm⁻¹ som sb5.2 for [Fe(phen)₃]²⁺, c = 27,6 µM",
+        D.epsU(R.jern.epsM) === "1,11 · 10⁴" && D.tal3(R.jern.c) === "27,6", D.epsU(R.jern.epsM) + " " + D.tal3(R.jern.c));
+    paastand("paracetamol: ε = 9,86 · 10³, c = 0,0750 mM og 11,3 mg i 1,00 L",
+        D.epsU(R.para.epsM) === "9,86 · 10³" && D.tal3(R.para.c) === "0,0750" && D.tal3(R.para.mg) === "11,3", D.epsU(R.para.epsM) + " " + D.tal3(R.para.c) + " " + R.para.mg);
+    paastand("bouillon: ε = 6,22 · 10³ som tabellens NADH ved 340 nm, c = 0,100 mM og 10,0 mM før fortyndingen",
+        D.epsU(R.bouillon.epsM) === "6,22 · 10³" && D.tal3(R.bouillon.c) === "0,100" && D.tal3(R.bouillon.cFoer) === "10,0", D.epsU(R.bouillon.epsM) + " " + R.bouillon.c + " " + R.bouillon.cFoer);
+    paastand("kobber: ε = 50,9 M⁻¹ · cm⁻¹ (tabellerne: ca. 50), c = 11,7 mM og 186 mg kobber",
+        D.epsU(R.messing.epsM) === "50,9" && D.tal3(R.messing.c) === "11,7" && D.tal3(R.messing.mg) === "186", D.epsU(R.messing.epsM) + " " + R.messing.c + " " + R.messing.mg);
+    paastand("prilocain: ε = 4,23 · 10³ af de fem første punkter, c = 150 µM",
+        D.epsU(R.pril.epsM) === "4,23 · 10³" && D.tal3(R.pril.c) === "150", D.epsU(R.pril.epsM) + " " + R.pril.c);
+    var daarlige = [];
+    Object.keys(O).forEach(function (id) {
+        if (R[id].r2 < 0.999) daarlige.push(id + " R² " + R[id].r2.toFixed(4));
+        if (Math.abs(R[id].b) > 0.006) daarlige.push(id + " b " + R[id].b);
+        if (!naer(R[id].c0, R[id].c, D.TOL * 0.5)) daarlige.push(id + " c med og uden b");
+        if (O[id].proeveA < O[id].A[0] || O[id].proeveA > O[id].A[(O[id].lineaer || O[id].A.length) - 1]) daarlige.push(id + " prøven uden for standarderne");
+    });
+    samlet("alle standardrækker er lineære (R² > 0,999), b er lille, c = A / a ligger inden for tolerancen, og prøven ligger mellem standarderne", daarlige);
+    var po = O.pril, ac = po.A.map(function (A, i) { return A / po.c[i]; });
+    var snit = ac.slice(0, 5).reduce(function (a, b) { return a + b; }, 0) / 5;
+    paastand("prilocain: A / c er inden for 2 % op til 250 µM og mindst 7 % lavere fra 325 µM",
+        ac.slice(0, 5).every(function (v) { return naer(v, snit, 0.02); }) && ac.slice(5).every(function (v) { return v < snit * 0.93; }), ac.map(function (v) { return v.toFixed(5); }).join(" "));
+    paastand("den for høje absorbans 1,520 er over den højeste standard i det lineære område (1,056)", po.hoejA > po.A[4] && po.hoejA < po.A[7]);
+
+    /* ================================================================= */
+    overskrift("2. Elevens tal");
+    var tt = [["2,45·10^3", 2450], ["2,45 · 10³", 2450], ["2450", 2450], ["11100", 11100], ["1105", 1105], ["2,45e3", 2450], ["0,180", 0.18], ["1.8", 1.8], ["1,11*10^4", 11100], ["4,23 · 10⁻³", 0.00423]];
+    var tolkFejl = [];
+    tt.forEach(function (p) { var v = D.tolk(p[0]); if (!(Math.abs(v - p[1]) < 1e-9 * Math.max(1, p[1]))) tolkFejl.push(p[0] + " -> " + v); });
+    paastand("tal med komma, punktum og potenser tolkes rigtigt, også 11100 og 1105 (ikke 11 · 10⁰)", tolkFejl.length === 0, tolkFejl.join(" | "));
+    paastand("tekst er intet tal", isNaN(D.tolk("abc")) && isNaN(D.tolk("")));
+    paastand("elevens potens skrives pænt på kortet: 2,45*10^3 bliver 2,45 · 10³", D.pynt("2,45*10^3") === "2,45 · 10³" && D.pynt("0,180") === "0,180", D.pynt("2,45*10^3"));
+
+    /* ================================================================= */
+    overskrift("3. Startbilledet og det, der først kommer frem, når det er aktuelt");
+    NK.visFane("fane-k");
+    k1.forfra();
+    paastand("fane 1 begynder på permanganat, trin 1 (ε)", k1.o.id === "mno4" && k1.trinId === "eps");
+    paastand("ingen kuvette, intet tal på displayet og intet, der bevæger sig", !k1.inde && k1.indT === null && k1.visA() === null && k1.sejrT === null);
+    tid(k1, 2);
+    paastand("startbilledet står stille (efter 2 s er der stadig ingen kuvette)", !k1.inde && k1.indT === null);
+    paastand("regnearkets linje er ikke tegnet, før ε er fundet", !k1.loest.eps);
+    var kopi = k1.tabelTekst().split("\n");
+    paastand("tabellen kopieres med tabulator: overskrift og fem rækker med komma", kopi.length === 6 && kopi[1] === "0,075\t0,187" && /\t/.test(kopi[0]), kopi.join(" / "));
+    el("k-punktum").click();
+    paastand("med Punktum som decimaltegn kopieres og vises tallene med punktum", k1.tabelTekst().split("\n")[1] === "0.075\t0.187" && /0\.363/.test(el("k-tabel").textContent));
+    el("k-punktum").click();
+
+    /* ================================================================= */
+    overskrift("4. Intet løses uden Indsend svar");
+    k1.f1 = "2,45 · 10^3"; k1.enhed = "Mcm"; k1.visKort();
+    tid(k1, 0.5);
+    paastand("det rigtige tal og den rigtige enhed er ikke rigtigt, før eleven trykker Indsend svar", !k1.groen);
+    k1.klikScene({ x: 300, y: 400 });
+    paastand("et klik på tavlen løser intet", !k1.groen);
+    k1.f1 = ""; k1.enhed = ""; k1.visKort(); k1.indsendKlik();
+    paastand("Indsend svar uden tal giver en besked og intet svar", !k1.groen && /tal/.test(besked(k1)), besked(k1));
+    k1.f1 = "2450"; k1.enhed = ""; k1.visKort(); k1.indsendKlik();
+    paastand("Indsend svar uden enhed beder om enheden", !k1.groen && /enheden/.test(besked(k1)), besked(k1));
+
+    /* ================================================================= */
+    overskrift("5. Fane 1 med de typiske fejl");
+    k1.forfra();
+    svar(k1, "2,45", "Mcm");
+    paastand("ε = 2,45 M⁻¹ · cm⁻¹: tallet passer til mM⁻¹ · cm⁻¹", !k1.groen && /Tallet passer til enheden mM/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "2,45", "mM");
+    paastand("ε = 2,45 mM⁻¹: enheden mangler cm⁻¹", !k1.groen && /mangler cm/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "0,408", "mMcm");
+    paastand("ε = 1 / a: eleven har regnet c / A", !k1.groen && /c \/ A/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "3500", "Mcm");
+    paastand("et forkert tal giver den røde linje på kurven og en forklaring", !k1.groen && k1.forsoeg && k1.forsoeg.id === "eps" && /rød/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    k1.f1 = "3600"; k1.visIndsend();
+    paastand("den røde linje forsvinder, når eleven skriver igen", true);
+    svar(k1, "2,45", "mMcm");
+    paastand("ε = 2,45 mM⁻¹ · cm⁻¹ er rigtigt (samme tal som a, med cm⁻¹)", !!k1.groen && k1.loest.eps, besked(k1));
+    husk("forklaring", k1.groen && k1.groen.tekst);
+    paastand("efter ε står regnearkets linje på kurven, og kortet bliver på spørgsmålet med Næste trin", k1.loest.eps && k1.groen.knap === "Næste trin →");
+    k1.videreKlik();
+    paastand("trin 2 spørger om koncentrationen, og kuvetten glider ned i spektrofotometeret", k1.trinId === "konc" && k1.indT !== null && !k1.inde);
+    tid(k1, 2);
+    paastand("bagefter viser displayet prøvens absorbans 0,442", k1.inde && k1.visA() === "0,442", k1.visA());
+    svar(k1, "0,180", "M");
+    paastand("c = 0,180 M: tallet passer til mM", !k1.groen && /Tallet passer til mM/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "1,08", "mM");
+    paastand("A · a: eleven har ganget", !k1.groen && /ganget/.test(besked(k1)), besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "0,25", "mM");
+    paastand("et forkert c giver det røde punkt på kurven", !k1.groen && k1.forsoeg && k1.forsoeg.id === "konc", besked(k1));
+    husk("fejl", besked(k1));
+    svar(k1, "0,180", "mM");
+    paastand("c = 0,180 mM er rigtigt", !!k1.groen && k1.loest.konc);
+    paastand("efter fejl får permanganat ✓ og ikke ★", k1.status.mno4 === 1, JSON.stringify(k1.status));
+    paastand("knappen fører til næste opgave", k1.groen.knap === "Næste opgave →");
+    k1.videreKlik();
+    paastand("opgave 2 er jern i en tablet med µM", k1.o.id === "jern" && k1.trinId === "eps");
+    svar(k1, "0,0111", "Mcm");
+    paastand("jern: 0,0111 M⁻¹ · cm⁻¹ passer til µM⁻¹ · cm⁻¹", /µM/.test(besked(k1)), besked(k1));
+    svar(k1, "1,11*10^4", "Mcm");
+    k1.videreKlik(); tid(k1, 2);
+    svar(k1, "27,6", "uM");
+    paastand("jern løst: ε = 1,11 · 10⁴ M⁻¹ · cm⁻¹ og c = 27,6 µM", !!k1.groen && k1.faerdig);
+    paastand("efter sidste opgave på fane 1 fører knappen til næste fane", k1.groen.knap === "Næste fane →");
+    k1.forfra();
+    svar(k1, "2453", "Mcm"); k1.videreKlik(); tid(k1, 2); svar(k1, "0,18", "mM");
+    paastand("uden fejl får opgaven ★", k1.status.mno4 === 2, JSON.stringify(k1.status));
+    paastand("panelet viser ★ ved opgaven", /Permanganat ★/.test(el("k-opgaver").textContent), el("k-opgaver").textContent);
+
+    /* ================================================================= */
+    overskrift("6. Fane 2: fortynding og masse");
+    NK.visFane("fane-i");
+    i2.forfra();
+    paastand("fane 2 begynder på paracetamol", i2.o.id === "para");
+    svar(i2, "9,86 · 10³", "Mcm"); i2.videreKlik(); tid(i2, 2);
+    svar(i2, "7,50 · 10^-5", "M");
+    paastand("paracetamol: c = 7,50 · 10⁻⁵ M er rigtigt (enhver enhed)", !!i2.groen);
+    i2.videreKlik();
+    svar(i2, "11300", "mg");
+    paastand("masse uden at regne mM om til M giver forklaringen", !i2.groen && /om til M/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "0,0113", "mg");
+    paastand("0,0113 mg passer til g", !i2.groen && /passer til g/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "0,0750", "mg");
+    paastand("stofmængden i mmol i stedet for massen", !i2.groen && /stofmængden/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "11,3", "mg");
+    paastand("11,3 mg er rigtigt, og regnestykket har to linjer (n og m)", !!i2.groen && i2.linjer("literMasse").length === 2);
+    i2.videreKlik();
+    paastand("opgave 2 er glutamat i bouillon", i2.o.id === "bouillon");
+    svar(i2, "6,22·10^3", "Mcm"); i2.videreKlik(); tid(i2, 2); svar(i2, "0,100", "mM"); i2.videreKlik();
+    paastand("trin 3 er fortyndingen, og figuren har den gule ring om fortyndingen", i2.trinId === "fortynd");
+    svar(i2, "0,100", "mM");
+    paastand("c_efter i stedet for c_før giver forklaringen om den fortyndede prøve", !i2.groen && /fortyndede prøve/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "0,001", "mM");
+    paastand("divideret i stedet for ganget: bouillonen er stærkere", !i2.groen && /stærkere/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "10,0", "mM");
+    paastand("c_før = 10,0 mM er rigtigt", !!i2.groen);
+    i2.videreKlik();
+    paastand("opgave 3 er kobber i en skrue", i2.o.id === "messing");
+    svar(i2, "50,9", "Mcm"); i2.videreKlik(); tid(i2, 2); svar(i2, "11,7", "mM"); i2.videreKlik();
+    svar(i2, "743", "mg");
+    paastand("massen i 1,00 L i stedet for 250,0 mL giver forklaringen", !i2.groen && /1,00 L/.test(besked(i2)), besked(i2));
+    husk("fejl", besked(i2));
+    svar(i2, "186", "mg");
+    paastand("m(Cu) = 186 mg er rigtigt, og knappen fører til fane 3", !!i2.groen && i2.groen.knap === "Næste fane →");
+
+    /* ================================================================= */
+    overskrift("7. Fane 3: det lineære område");
+    NK.visFane("fane-l");
+    l3.forfra();
+    paastand("fane 3 begynder med det lineære område, og svarene er på kortet", l3.trinId === "omraade" && el("l-ind").querySelectorAll(".sk-knap").length === 4);
+    l3.svarValg(0);
+    paastand("et valgt svar er ikke bedømt, før eleven trykker Indsend svar", !l3.groen && l3.valgt === 0);
+    l3.indsendKlik();
+    paastand("alle otte punkter er forkert, og forklaringen nævner 325 µM", !l3.groen && /325/.test(besked(l3)), besked(l3));
+    husk("fejl", besked(l3));
+    vaelgSvar(l3, 3);
+    husk("fejl", besked(l3));
+    vaelgSvar(l3, 1);
+    paastand("25,0 til 250 µM er rigtigt, og tabellens tre sidste rækker bliver orange", !!l3.groen && el("l-tabel").querySelectorAll("tr.uden").length === 3);
+    husk("forklaring", l3.groen.tekst);
+    l3.videreKlik();
+    svar(l3, "3,60 · 10^3", "Mcm");
+    paastand("ε af alle otte punkter (3,60 · 10³) er forkert", !l3.groen);
+    svar(l3, "4,23 · 10^3", "Mcm"); l3.videreKlik(); tid(l3, 2);
+    svar(l3, "150", "uM");
+    paastand("c(prilocain) = 150 µM er rigtigt", !!l3.groen);
+    l3.videreKlik(); tid(l3, 2);
+    paastand("ved den for høje absorbans viser displayet 1,520", l3.trinId === "hoej" && l3.visA() === "1,520", l3.visA());
+    vaelgSvar(l3, 2);
+    paastand("c = (A − b) / a er forkert, fordi 1,520 er over det lineære område", !l3.groen && /1,520/.test(besked(l3)), besked(l3));
+    husk("fejl", besked(l3));
+    vaelgSvar(l3, 0);
+    paastand("Fortynder og måler igen er rigtigt, og den sidste fane har ingen knap", !!l3.groen && l3.groen.knap === null && l3.faerdig);
+
+    /* ================================================================= */
+    overskrift("8. Hjælpen");
+    NK.visFane("fane-k");
+    k1.forfra();
+    var h = k1.hintNu();
+    paastand("trin 1 har to hint, og knappen viser bagefter svaret", h.length === 2);
+    k1.knap(); k1.knap(); k1.knap();
+    paastand("Vis svaret giver det rigtige tal og koster stjernen", !!k1.groen && k1.groen.maade === "svar" && k1.sv);
+    h.forEach(function (x) { husk("hint", x); });
+
+    /* ================================================================= */
+    overskrift("9. Sproget");
+    Object.keys(O).forEach(function (id) {
+        var o = O[id], r = D.kaede(o);
+        husk("note", o.note);
+        o.trin.forEach(function (tid2) {
+            var td = D.TRIN[tid2];
+            husk("tekst " + id + "." + tid2, td.tekst(o, r));
+            td.hint(o, r).forEach(function (x) { husk("hint " + id, x); });
+            husk("forklaring " + id + "." + tid2, td.forkl(o, r));
+            if (td.fejl) td.fejl.forEach(function (x) { husk("fejl " + tid2, x); });
+            if (td.svar && Array.isArray(td.svar)) td.svar.forEach(function (x) { husk("svar", x); });
+            if (td.slags === "tal") husk("andet " + tid2, D.fejlAndet(tid2, o));
+        });
+    });
+    Object.keys(D.FANE_SLUT).forEach(function (n) { husk("slut", D.FANE_SLUT[n]); });
+    var tank = [], ascii = [], lang = [], ladning = [];
+    var GR = { "tekst": 165, "hint": 135, "forklaring": 170, "fejl": 150, "andet": 120, "svar": 26, "note": 110, "slut": 80 };
+    tekster.forEach(function (x) {
+        if (/[—–]/.test(x.t)) tank.push(x.hvad + ": " + x.t);
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.match(ASCII_ORD)[0]);
+        if (/\b1[+−-]/.test(x.t.replace(/10[⁻^-]/g, ""))) ladning.push(x.hvad);
+        var g = GR[x.hvad.split(" ")[0]];
+        if (g && x.t.length > g) lang.push(x.hvad + " " + x.t.length + " > " + g);
+    });
+    samlet("ingen tankestreger i kortets tekster", tank);
+    samlet("intet ASCII-dansk (paa, foer, naar ...)", ascii);
+    samlet("ingen ladning skrevet som 1+ eller 1−", ladning);
+    samlet("teksterne er korte (spørgsmål 165, hint 135, forklaring 170, fejl 150, svar 26 tegn)", lang);
+    var html = d.body.innerHTML.replace(/<script[\s\S]*?<\/script>/g, "");
+    paastand("siden har ingen tankestreger uden for displayet", !/—/.test(html));
+
+    /* ================================================================= */
+    overskrift("10. Kortet, kurven og rammerne kan være der");
+    var STR = [[1100, 620], [1280, 720], [1400, 860], [1600, 950]];
+    var forHoej = [], forLille = [];
+    for (var si = 0; si < STR.length; si++) {
+        ramme.style.width = STR[si][0] + "px";
+        ramme.style.height = STR[si][1] + "px";
+        await vent(250);
+        var faner = [["fane-k", k1], ["fane-i", i2], ["fane-l", l3]];
+        for (var fi = 0; fi < faner.length; fi++) {
+            var sim = faner[fi][1];
+            NK.visFane(faner[fi][0]);
+            sim.forfra();
+            for (var oi = 0; oi < sim.liste.length; oi++) {
+                sim.startOpgave(oi);
+                var n = sim.o.trin.length;
+                for (var ti = 0; ti < n; ti++) {
+                    sim.tilpas(); sim.layout(); tid(sim, 1.2); sim.tegn();
+                    var maal = function (hvor) {
+                        var kort = el(sim.navn + "-skort").getBoundingClientRect(), sc = el(sim.navn + "-skort").parentNode.getBoundingClientRect();
+                        var bund = kort.bottom - sc.top, tavle = sim.lay.tavle.y;
+                        if (bund > tavle - 4) forHoej.push(STR[si].join("×") + " " + sim.o.id + "." + sim.trinId + " " + hvor + " " + Math.round(bund) + " > " + Math.round(tavle));
+                    };
+                    maal("spørgsmål");
+                    if (sim.td.slags === "tal") { sim.f1 = "999"; sim.enhed = D.ENHED[sim.td.enheder][3] ? D.ENHED[sim.td.enheder][3].k : D.ENHED[sim.td.enheder][0].k; sim.visKort(); sim.indsendKlik(); }
+                    else { sim.svarValg(sim.td.rigtig === 0 ? 1 : 0); sim.indsendKlik(); }
+                    maal("forkert");
+                    sim.visSvar(); sim.tegn();
+                    maal("svaret");
+                    var g = sim.g;
+                    if (g.y1 - g.y0 < 90) forLille.push(STR[si].join("×") + " " + sim.o.id + " kurven " + Math.round(g.y1 - g.y0));
+                    if (sim.rf < 12) forLille.push(STR[si].join("×") + " " + sim.o.id + " rammerne " + sim.rf);
+                    if (sim.spektroK.krop.w < 165) forLille.push(STR[si].join("×") + " " + sim.o.id + " spektrofotometeret " + Math.round(sim.spektroK.krop.w));
+                    if (ti < n - 1) sim.videreKlik();
+                }
+            }
+        }
+    }
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    samlet("kortet er aldrig højere end pladsen over tavlen (spørgsmål, forkert svar og svaret)", forHoej);
+    samlet("kurven er mindst 90 px høj, rammernes skrift mindst 12 px og spektrofotometeret mindst 165 px bredt", forLille);
+}
+</script>
+</body>
+</html>

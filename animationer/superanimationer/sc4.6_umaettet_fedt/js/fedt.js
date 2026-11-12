@@ -3,8 +3,9 @@
    for dibrom i det oeverste lag
 
    NK.Fedt.SYRER      fedtsyrerne (antal C, hvor dobbeltbindingerne sidder)
-   NK.Fedt.FEDT       fedtstofferne: to molekyler af hvert i luppen og
-                      bogens tabel over maettede og umaettede fedtsyrer
+   NK.Fedt.FEDT       fedtstofferne: ét molekyle af hvert i luppen (det
+                      samme som paa tavlen paa fane 1) og bogens tabel
+                      over maettede og umaettede fedtsyrer
    NK.Fedt.kaede      en fedtsyres kaede som zigzagformel med knaek
    NK.Fedt.formLup    et fedtstofmolekyle, som luppen tegner det
    NK.Fedt.formStor   et fedtstofmolekyle med esterbindingerne (fane 2)
@@ -30,7 +31,7 @@
     /* ----- Fedtsyrerne -----------------------------------------------------------
        nC: antal carbonatomer (carbonatomet i carboxylgruppen taeller med, som i
        bogen). cis: numrene paa de C-atomer, hvor en cis-dobbeltbinding begynder
-       (C9=C10 osv.). DHA er en omega-3-fedtsyre fra fisk. */
+       (C9=C10 osv.). EPA er en omega-3-fedtsyre fra fisk. */
     F.SYRER = [
         { id: "La",  navn: "laurinsyre",   nC: 12, cis: [] },
         { id: "M",   navn: "myristinsyre", nC: 14, cis: [] },
@@ -38,7 +39,7 @@
         { id: "S",   navn: "stearinsyre",  nC: 18, cis: [] },
         { id: "O",   navn: "oliesyre",     nC: 18, cis: [9] },
         { id: "L",   navn: "linolsyre",    nC: 18, cis: [9, 12] },
-        { id: "DHA", navn: "DHA",          nC: 22, cis: [4, 7, 10, 13, 16, 19] }
+        { id: "EPA", navn: "EPA",          nC: 20, cis: [5, 8, 11, 14, 17] }
     ];
     var syreEfterId = {};
     F.SYRER.forEach(function (s) {
@@ -58,19 +59,22 @@
     };
 
     /* ----- Fedtstofferne -------------------------------------------------------
-       mol: de to molekyler, luppen viser (tre fedtsyrer hver). Valgt, saa
-       andelen af maettede, monoumaettede og polyumaettede fedtsyrer kommer saa
-       taet paa tabellen, som seks fedtsyrer kan, og saa antallet af
-       dobbeltbindinger passer med fedtstoffets iodtal (se README).
+       mol: det ene molekyle, luppen viser (tre fedtsyrer), i en liste, saa
+       proeven og luppen kan klare flere. Brugeren 12. nov. 2026: "lidt mange
+       dryp til hvert molekyle", saa luppen viser ét molekyle, ikke to. Det er
+       det samme molekyle som paa tavlen paa fane 1 (Ét molekyle), saa eleven
+       kan genkende det. Valgt, saa slagsen, der er mest af, er den samme som i
+       tabellen, og saa iodtallet, regnet af molekylet, ligger i intervallet
+       fra tabellen paa Wikipedia, som oevelse 4.6b bruger (se README).
        tabel: procent af fedtsyrerne (maettet, mono, poly) fra tabellen i
        Kemibogens afsnit 4.6; tran fra USDA (FDC 173577), afrundet. */
     F.FEDT = {
-        kokos:    { navn: "kokosfedt",    Navn: "Kokosfedt",    mol: [["La", "La", "P"], ["La", "M", "S"]], tabel: [91, 7, 2] },
-        smoer:    { navn: "smør",         Navn: "Smør",         mol: [["P", "S", "O"], ["P", "P", "O"]],    tabel: [66, 30, 4] },
-        oliven:   { navn: "olivenolie",   Navn: "Olivenolie",   mol: [["O", "O", "O"], ["P", "O", "L"]],    tabel: [15, 75, 10] },
-        raps:     { navn: "rapsolie",     Navn: "Rapsolie",     mol: [["O", "O", "L"], ["O", "O", "L"]],    tabel: [7, 63, 30] },
-        solsikke: { navn: "solsikkeolie", Navn: "Solsikkeolie", mol: [["O", "L", "L"], ["P", "L", "L"]],    tabel: [10, 20, 70] },
-        tran:     { navn: "tran",         Navn: "Tran",         mol: [["P", "O", "DHA"], ["O", "O", "L"]],  tabel: [25, 50, 25] },
+        kokos:    { navn: "kokosfedt",    Navn: "Kokosfedt",    mol: [["La", "M", "P"]],  tabel: [91, 7, 2] },
+        smoer:    { navn: "smør",         Navn: "Smør",         mol: [["P", "S", "O"]],   tabel: [66, 30, 4] },
+        oliven:   { navn: "olivenolie",   Navn: "Olivenolie",   mol: [["O", "O", "O"]],   tabel: [15, 75, 10] },
+        raps:     { navn: "rapsolie",     Navn: "Rapsolie",     mol: [["O", "O", "L"]],   tabel: [7, 63, 30] },
+        solsikke: { navn: "solsikkeolie", Navn: "Solsikkeolie", mol: [["O", "L", "L"]],   tabel: [10, 20, 70] },
+        tran:     { navn: "tran",         Navn: "Tran",         mol: [["P", "O", "EPA"]], tabel: [25, 50, 25] },
         heptan:   { navn: "heptan",       Navn: "Kun heptan",   mol: [], heptan: true }
     };
 
@@ -124,7 +128,8 @@
     }
 
     /* Kaeden boejer altid nedad (y vokser), saa kaederne i et molekyle ikke
-       krydser hinanden: DHA boejer opad med fortegn 1 og vendes derfor. */
+       krydser hinanden: en kaede, der boejer opad med fortegn 1 (som EPA),
+       vendes. */
     F.kaede = function (id) {
         if (kaedeCache[id]) return kaedeCache[id];
         var syre = F.syre(id), k = kaedeRaa(syre, 1);
@@ -276,8 +281,8 @@
         this.dibrom = [];
         this.br = {};               /* "m.nr.k" -> true, naar dobbeltbindingen har adderet */
         this.ledige = [];
-        /* Dobbeltbindingerne i den raekkefoelge, dibrom finder dem: skiftevis i
-           de to molekyler, saa begge faar brom */
+        /* Dobbeltbindingerne i den raekkefoelge, dibrom finder dem (skiftevis i
+           molekylerne, hvis der er flere) */
         var lister = this.fedt.mol.map(function (kaeder, m) {
             var l = [];
             kaeder.forEach(function (id, nr) {

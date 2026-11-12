@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estersyntese</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>Estersyntese</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-k" role="tab" aria-selected="true"><span class="nr">1</span>Kondensationen</button>
+        <button class="faneknap" data-fane="fane-t" role="tab" aria-selected="false"><span class="nr">2</span>Forudsig esteren</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">3</span>Rens esteren</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: KONDENSATIONEN                                             -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-k" role="tabpanel" aria-label="Kondensationen">
+    <div class="scene">
+        <canvas id="k-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="k-skort">
+            <div class="sk-ind" id="k-ind"></div>
+            <div class="sk-bund" id="k-status">
+                <p class="st-tekst" id="k-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="k-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="k-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="k-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="k-opgaver">
+            <h2>Reaktionerne <span class="taeller">løst <b id="k-loest">0</b>/3</span></h2>
+            <div class="opg-chips lodret" id="k-liste"></div>
+            <button class="knap igenknap" id="k-forfra" type="button">↺ Begynd forfra med alle tre</button>
+        </div>
+
+        <div class="kort" id="k-farver" style="visibility: hidden;">
+            <h2>Farverne</h2>
+            <div class="farveforklaring">
+                <span class="ff-syre"><i></i>kommer fra syren</span>
+                <span class="ff-alkohol"><i></i>kommer fra alkoholen</span>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORUDSIG ESTEREN                                           -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-t" role="tabpanel" aria-label="Forudsig esteren">
+    <div class="scene">
+        <canvas id="t-laerred"></canvas>
+        <div class="scenekort" id="t-skort">
+            <div class="sk-ind" id="t-ind"></div>
+            <div class="sk-bund" id="t-status">
+                <p class="st-tekst" id="t-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="t-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Vaerktoejerne ligger oeverst paa whiteboardet (js/sim_tegn.js) -->
+        <div class="tegnevaerktoej" id="t-vaerktoej">
+            <span class="vt-gruppe" id="t-vt"></span>
+            <span class="vt-gruppe vt-hoejre">
+                <span class="vt-skifter" id="t-stil" role="group" aria-label="Visning"></span>
+                <button type="button" class="vtknap let" id="t-slet" data-vt="slet" title="Klik på et atom for enden af kæden for at slette det (højreklik gør det samme)">✕ Slet</button>
+                <button type="button" class="vtknap let" id="t-fortryd" title="Fortryd det sidste (Ctrl+Z)">↶ Fortryd</button>
+                <button type="button" class="vtknap let" id="t-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
+            </span>
+        </div>
+        <div class="anker" id="t-anker-tavle"></div>
+        <div class="anker" id="t-anker-reagens"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="t-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="t-loest">0</b>/<span id="t-ialt">0</span></span></h2>
+            <div class="opg-liste" id="t-liste"></div>
+            <button class="knap igenknap" id="t-forfra" type="button">↺ Begynd forfra med alle ni</button>
+        </div>
+
+        <div class="kort" id="t-stammer">
+            <h2>Stammerne</h2>
+            <div class="stammer">
+                <span><b>1</b>meth</span><span><b>2</b>eth</span><span><b>3</b>prop</span><span><b>4</b>but</span>
+                <span><b>5</b>pent</span><span><b>6</b>hex</span><span><b>7</b>hept</span><span><b>8</b>oct</span>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: RENS ESTEREN                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Rens esteren">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="s-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-tragt"></div>
+        <div class="anker" id="s-anker-lup"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="s-trin">
+            <h2>Skilletragten <span class="taeller">rensede estere <b id="s-runder">0</b></span></h2>
+            <div class="opg-chips lodret" id="s-trinliste"></div>
+            <button class="knap igenknap" id="s-forfra" type="button">↺ Begynd forfra med en ny blanding</button>
+        </div>
+
+        <div class="kort" id="s-om">
+            <h2>Om forsøget</h2>
+            <p class="note-tekst">Butansyre og propan-1-ol i overskud er varmet med tilbagesvaling sammen med lidt koncentreret svovlsyre som katalysator. Blandingen er derefter hældt i en skilletragt.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Estersyntese</h2>
+        <h3 class="teori-hoved">Sådan dannes en ester</h3>
+        <p>En ester dannes ved en kondensation af en carboxylsyre og en alkohol. Syren afgiver sin OH-gruppe, og alkoholen afgiver hydrogenatomet fra sin OH-gruppe. De danner vand, og de to molekyldele, der er tilbage, bindes sammen. Reaktionen er en ligevægt, og koncentreret svovlsyre er katalysator.</p>
+        <figure class="teori-fig"><img src="sprites/b4-esterdannelse.svg" alt="Ethansyre og ethanol danner ethylethanoat og vand. OH-gruppen fra syren og hydrogenatomet fra alkoholen bliver til vand."></figure>
+        <p class="teori-skema">R−COOH + R′−OH ⇌ R−COO−R′ + H₂O</p>
+        <h3 class="teori-hoved">Esterens navn</h3>
+        <p>Alkoholdelen står først med endelsen -yl, og syredelen står bagefter med endelsen -oat. Syredelen er den del, der har C=O, og alkoholdelen sidder på det enkeltbundne oxygenatom.</p>
+        <figure class="teori-fig"><img src="sprites/b4-esternavn.svg" alt="Ethylpropanoat: alkoholens navn med endelsen -yl kommer først, og syrens navn med endelsen -oat kommer bagefter."></figure>
+        <h3 class="teori-hoved">Rens esteren</h3>
+        <p>Blandingen rystes i en skilletragt. Vand tager svovlsyren og det meste af den overskydende alkohol. Natriumcarbonat gør resterne af carboxylsyren til baseformen, som opløses i vandet, og der dannes carbondioxid. Esteren har intet H på oxygen og en lavere densitet end vand, så den bliver i det øverste lag.</p>
+        <figure class="teori-fig"><img src="sprites/b4-estersyntese.svg" alt="Opvarmning med tilbagesvaling og vask i skilletragt. Esteren ligger øverst, og vandfasen tappes af."></figure>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>C</kbd> <kbd>O</kbd> grundstof på tavlen &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_kond.js"></script>
+<script src="js/sim_tegn.js"></script>
+<script src="js/sim_rens.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

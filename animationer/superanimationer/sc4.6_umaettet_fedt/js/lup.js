@@ -1,8 +1,8 @@
 /* =====================================================================
-   lup.js - luppen paa fane 1 og 3: det oeverste lag helt taet paa
+   lup.js - luppen paa fane 2 og 3: det oeverste lag helt taet paa
 
-   Mikroniveauet. To fedtstofmolekyler fra glasset ved siden af hinanden
-   og de dibrommolekyler, der er dryppet i. Et dibrommolekyle paa vej
+   Mikroniveauet. Ét fedtstofmolekyle fra glasset (det samme som paa
+   tavlen paa fane 1) og de dibrommolekyler, der er dryppet i. Et dibrommolekyle paa vej
    finder en dobbeltbinding; naar det er fremme, forsvinder den anden
    streg, og der sidder et bromatom paa hvert af de to carbonatomer. Et
    dibrommolekyle uden en ledig dobbeltbinding driver rundt i laget: det
@@ -28,7 +28,7 @@
 
     var P = Lup.prototype;
 
-    /* Pladserne: molekylerne side om side, saa store de kan vaere i vinduet */
+    /* Pladserne: molekylet (eller molekylerne side om side), saa stort det kan vaere i vinduet */
     P.geo = function (proeve, R) {
         var noegle = proeve.fedtId + "|" + Math.round(R.b) + "|" + Math.round(R.h) + "|" + Math.round(R.x) + "|" + Math.round(R.y);
         if (this.cache && this.cache.noegle === noegle) return this.cache;
@@ -39,7 +39,7 @@
             W += f.kasse.maxX - f.kasse.minX + (i ? luft : 0);
             H = Math.max(H, f.kasse.maxY - f.kasse.minY + 2 * kant);
         });
-        var s = forme.length ? Math.min((R.b - 28) / W, (R.h - 16) / H, 24) : 20;
+        var s = forme.length ? Math.min((R.b - 28) / W, (R.h - 16) / H, 30) : 20;
         var x = R.x + (R.b - W * s) / 2;
         var origo = forme.map(function (f) {
             var o = { x: x - f.kasse.minX * s, y: R.y + R.h / 2 - (f.kasse.minY + f.kasse.maxY) / 2 * s };

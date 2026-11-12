@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<script src="../../til_panelet.js" data-panel="samling_alt_b.html" data-emne="b3.1"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kₛ og pKₛ</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1>K<sub>s</sub> og pK<sub>s</sub></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-k" role="tab" aria-selected="true"><span class="nr">1</span>Syreskalaen</button>
+        <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">2</span>Regn på syren</button>
+        <button class="faneknap" data-fane="fane-u" role="tab" aria-selected="false"><span class="nr">3</span>Den ukendte syre</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: SYRESKALAEN                                                -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-k" role="tabpanel" aria-label="Syreskalaen">
+    <div class="scene">
+        <canvas id="k-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="k-skort">
+            <div class="sk-ind" id="k-ind"></div>
+            <div class="sk-bund" id="k-status">
+                <p class="st-tekst" id="k-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="k-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="k-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="k-anker-skala"></div>
+        <div class="anker" id="k-anker-hylde"></div>
+        <div class="anker" id="k-anker-lup"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="k-trinkort">
+            <h2>Flaskerne <span class="taeller maerke-tekst" id="k-maerke"></span></h2>
+            <ol class="trinliste" id="k-trin"></ol>
+            <button class="knap igenknap" id="k-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="k-om">
+            <h2>Om skalaen</h2>
+            <p class="note-tekst">K<sub>s</sub>-skalaen står lige over pK<sub>s</sub>-skalaen. Én enhed i pK<sub>s</sub> svarer til en faktor 10 i K<sub>s</sub>, og jo lavere pK<sub>s</sub> er, jo stærkere er syren.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: REGN PAA SYREN                                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-r" role="tabpanel" aria-label="Regn på syren">
+    <div class="scene">
+        <canvas id="r-laerred"></canvas>
+        <div class="scenekort" id="r-skort">
+            <div class="sk-ind" id="r-ind"></div>
+            <div class="sk-bund" id="r-status">
+                <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="r-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="r-anker-reak"></div>
+        <div class="anker" id="r-anker-ks"></div>
+        <div class="anker" id="r-anker-regn"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="r-trinkort">
+            <h2>Trinnene</h2>
+            <ol class="trinliste" id="r-trin"></ol>
+        </div>
+
+        <div class="kort" id="r-syrerkort">
+            <h2>Syrerne <span class="taeller maerke-tekst" id="r-maerke"></span></h2>
+            <ol class="trinliste syreliste" id="r-syrer"></ol>
+            <button class="knap igenknap" id="r-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: DEN UKENDTE SYRE                                           -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-u" role="tabpanel" aria-label="Den ukendte syre">
+    <div class="scene">
+        <canvas id="u-laerred"></canvas>
+        <div class="scenekort" id="u-skort">
+            <div class="sk-ind" id="u-ind"></div>
+            <div class="sk-bund" id="u-status">
+                <p class="st-tekst" id="u-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="u-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="u-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="u-anker-maaler"></div>
+        <div class="anker" id="u-anker-skema"></div>
+        <div class="anker" id="u-anker-rammer"></div>
+        <div class="anker" id="u-anker-hylde"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="u-flaskekort">
+            <h2>Flaskerne</h2>
+            <ol class="trinliste" id="u-flasker"></ol>
+            <button class="knap igenknap" id="u-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+
+        <div class="kort" id="u-trinkort">
+            <h2 id="u-titel">Flaske A</h2>
+            <ol class="trinliste" id="u-trin"></ol>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Syrestyrke</h2>
+        <h3 class="teori-hoved">Syrestyrkekonstanten</h3>
+        <p>En syre, S, reagerer med vand og danner sin korresponderende base, B, og en oxoniumion: S + H<sub>2</sub>O ⇌ B + H<sub>3</sub>O<sup>+</sup>. Ligevægtskonstanten kaldes syrestyrkekonstanten, K<sub>s</sub> = [B] · [H<sub>3</sub>O<sup>+</sup>] / [S], og enheden er M. Vand er opløsningsmidlet og er ikke med. Jo større K<sub>s</sub> er, jo stærkere er syren.</p>
+        <h3 class="teori-hoved">Fra K<sub>s</sub> til pK<sub>s</sub></h3>
+        <p>pK<sub>s</sub> = −log K<sub>s</sub> og K<sub>s</sub> = 10<sup>−pK<sub>s</sub></sup> M. Det vender omvendt: en stor K<sub>s</sub> giver en lille pK<sub>s</sub>, og jo lavere pK<sub>s</sub> er, jo stærkere er syren. Én enhed i pK<sub>s</sub> svarer til en faktor 10 i K<sub>s</sub>.</p>
+        <canvas id="teori-skala" class="teori-skala" width="680" height="236" aria-label="Bogens skala med pKs fra minus 8 til 14, delt i stærke, middelstærke, svage og meget svage syrer, med otte syrer"></canvas>
+        <p>En stærk syre har pK<sub>s</sub> under 0, en middelstærk mellem 0 og 4, en svag mellem 4 og 10 og en meget svag over 10.</p>
+        <h3 class="teori-hoved">Formel og aktuel koncentration</h3>
+        <p>Den formelle koncentration, c<sub>s</sub>, står på flasken. Den aktuelle koncentration er det, der er tilbage af syren: [S] = c<sub>s</sub> − [B]. Omdannelsesgraden, α = [B] / c<sub>s</sub>, er den del af syren, der har afgivet sin hydron.</p>
+        <h3 class="teori-hoved">Fra målt pH til K<sub>s</sub></h3>
+        <p>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M. Der dannes én B for hver H<sub>3</sub>O<sup>+</sup>, så [B] = [H<sub>3</sub>O<sup>+</sup>]. Så er [S] = c<sub>s</sub> − [B], og K<sub>s</sub> regnes af udtrykket.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> flasken &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_skala.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/sim_ukendt.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* =====================================================================
-   sim_dryp.js - fane 1 (Dryp og tæl) og fane 3 (Ukendte fedtstoffer)
+   sim_dryp.js - fane 2 (Dryp og tæl) og fane 3 (Ukendte fedtstoffer)
 
    En raekke reagensglas med et fedtstof oploest i heptan. Over det glas,
    opgaven handler om, haenger en pipette med bromvand. Et klik paa
@@ -8,7 +8,7 @@
    farven i det oeverste lag bliver ved, trykker eleven Indsend svar med
    antallet af draaber. Pipetten og knappen loeser aldrig opgaven selv.
 
-   Fane 1 har de fem glas fra oevelse 4.6b og skemaet. Fane 3 har fire
+   Fane 2 har de fem glas fra oevelse 4.6b og skemaet. Fane 3 har fire
    flasker med et ukendt fedtstof; luppen viser en flaske, foerst naar
    fedtstoffet er fundet, og panelet har varedeklarationerne.
 
@@ -157,32 +157,53 @@
             NK.saetHTML(valg.navn + "-skema", html + "</tbody></table>");
         };
 
-        /* ----- Scenen -------------------------------------------------------------------- */
+        /* ----- Scenen -------------------------------------------------------------------
+           Glassene staar til venstre foran en hvid plade, og luppen staar til
+           hoejre (brugeren 12. nov. 2026: glassene var alt for smaa, og en brun
+           holder bag glassene gjorde det svaert at se farven). Glassene er saa
+           store, som bredden og hoejden under kortet tillader. */
+        var DEL = 0.58;            /* glassenes del af scenens bredde */
+
         P.layout = function () {
             var W = this.L.b, H = this.L.h;
             var lay = { W: W, H: H };
             lay.yBord = H - 48;
             var kortBund = 10 + this.kortZone();
             var n = this.glas.length;
-            var gh = NK.klamp((lay.yBord - kortBund) * 0.3, 92, 185), gb = gh * 60 / 230;
+            var venstre = 14, delX = Math.round(W * DEL);
+            var afst = (delX - venstre) / n;
+            /* Lodret: skiltet over pipetten (36), pipetten (halvt saa hoej som
+               glasset) og glasset. Spritet er 230 hoejt og 60 bredt; pipettens
+               spids sidder ved glassets kant, 20 enheder under toppen. */
+            var top = kortBund + 10;
+            var k = Math.min((lay.yBord - top - 44) / (224 - 16 + 115), afst * 0.72 / 60, 1.6);
+            var gh = 230 * k, gb = 60 * k;
             lay.gh = gh;
             lay.gb = gb;
+            lay.afst = afst;
             var xs = [];
-            for (var i = 0; i < n; i++) xs.push(W * (0.5 + (i - (n - 1) / 2) * (n === 5 ? 0.17 : 0.2)));
+            for (var i = 0; i < n; i++) xs.push(venstre + afst * (i + 0.5));
             this.glas.forEach(function (g, j) { g.plads(xs[j], lay.yBord, gb); });
             lay.xs = xs;
             var m = this.glas[0].maal(true);
             lay.glasTop = m.y0;
             /* pipetten haenger med spidsen lige over glassets kant */
-            lay.ph = NK.klamp(gh * 0.5, 52, 100);
+            lay.ph = NK.klamp(gh * 0.5, 52, 130);
             lay.pb = lay.ph * 30 / 132;
             lay.spidsY = m.kant - 4;
             lay.pipTop = lay.spidsY - lay.ph;
-            var lb = Math.min(W - 40, 760), ly = kortBund + 30;
-            lay.lup = { x: W / 2 - lb / 2, y: ly, b: lb, h: Math.max(80, lay.pipTop - 36 - ly) };
+            /* Den hvide plade bag glassene */
+            var pTop = Math.max(top, lay.glasTop - 14);
+            lay.plade = { x: venstre - 6, y: pTop, b: delX - venstre + 6, h: lay.yBord - pTop };
+            /* Luppen til hoejre: titlen over (24 px), status under (24 px) */
+            var lx = delX + 18, lb = W - 14 - lx;
+            var lyTop = top + 26, lyBund = lay.yBord - 30;
+            var lh = Math.min(lyBund - lyTop, Math.max(lb * 1.05, 140));
+            var ly = lyTop + Math.max(0, (lyBund - lyTop - lh) / 2);
+            lay.lup = { x: lx, y: ly, b: lb, h: lh };
             this.lay = lay;
-            this.saetAnker("glas", xs[0] - gb, lay.glasTop - 4, xs[n - 1] - xs[0] + 2 * gb, gh + 50);
-            this.saetAnker("lup", lay.lup.x, ly - 24, lb, lay.lup.h + 28);
+            this.saetAnker("glas", lay.plade.x, lay.plade.y, lay.plade.b, lay.plade.h + 46);
+            this.saetAnker("lup", lx, ly - 24, lb, lh + 50);
         };
 
         /* Det glas, luppen viser: det valgte, hvis eleven maa se det */
@@ -214,6 +235,37 @@
             NK.el(valg.navn + "-anker-lup").hidden = this.lupNu() < 0;
         };
 
+        /* Den hvide plade, glassene staar foran, og hylden, de staar paa */
+        function tegnPlade(ctx, R) {
+            ctx.save();
+            NK.rundtRekt(ctx, R.x, R.y, R.b, R.h + 8, 12);
+            ctx.fillStyle = "#f4f2ec";
+            ctx.fill();
+            var g = ctx.createLinearGradient(0, R.y, 0, R.y + R.h);
+            g.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+            g.addColorStop(1, "rgba(200, 196, 186, 0.35)");
+            ctx.fillStyle = g;
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#cfc8b6";
+            ctx.stroke();
+            /* hylden */
+            ctx.fillStyle = "#b9bec6";
+            ctx.fillRect(R.x, R.y + R.h - 9, R.b, 9);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+            ctx.fillRect(R.x, R.y + R.h - 9, R.b, 1.5);
+            ctx.restore();
+        }
+
+        /* Den stoerste skrift (mellem stoerst og mindst), hvor teksten kan vaere i bredden b */
+        function passer(ctx, tekst, b, vaegt, stoerst, mindst) {
+            for (var s = stoerst; s > mindst; s -= 0.5) {
+                ctx.font = Tg.font(vaegt, s);
+                if (ctx.measureText(tekst).width <= b) return s;
+            }
+            return mindst;
+        }
+
         /* ----- Tegning ------------------------------------------------------------------- */
         P.tegn = function () {
             var ctx = this.L.ctx, lay = this.lay, mig = this;
@@ -221,29 +273,47 @@
             ctx.fillStyle = "#14141a";
             ctx.fillRect(0, 0, lay.W, lay.H);
             Tg.bord(ctx, lay.W, lay.yBord, lay.H);
-            var om = this.omNu(), lup = this.lupNu(), pip = this.pipetteNu();
+            tegnPlade(ctx, lay.plade);
+            var om = this.omNu(), lup = this.lupNu(), pip = this.pipetteNu(), R = lay.lup;
 
             if (lup >= 0) {
-                var R = lay.lup, gl = this.glas[lup];
+                var gl = this.glas[lup];
                 Tg.zoomRamme(ctx, R, gl.zoomFelt(lup === pip), om.indexOf("lup") >= 0);
                 this.lup.tegn(ctx, gl.proeve, R);
-                var navn = this.fedtNavn(lup);
-                NK.tekst(ctx, "Det øverste lag i " + this.hvad(lup) + ": " + navn + (F.FEDT[this.glasData[lup].fedt].heptan ? "" : " i heptan"),
-                    R.x + 4, R.y - 9, { font: Tg.font("700", 15), farve: "#e6eaef" });
+                var lang = "Det øverste lag i " + this.hvad(lup) + ": " + this.fedtNavn(lup), kort = "Det øverste lag i " + this.hvad(lup);
+                var fs = passer(ctx, lang, R.b - 4, "700", 15, 13);
+                var titel = fs > 13 || ctx.measureText(lang).width <= R.b - 4 ? lang : kort;
+                if (titel === kort) fs = passer(ctx, kort, R.b - 4, "700", 15, 12);
+                NK.tekst(ctx, titel, R.x + 2, R.y - 9, { font: Tg.font("700", fs), farve: "#e6eaef" });
                 var pr = gl.proeve, under = "", farve = "#b8f0cf";
                 if (pr.frie() > 0) { under = "Frit dibrom giver farve"; farve = "#f7c9a0"; }
                 else if (pr.adderet() > 0) under = "Dibrom har adderet til " + F.dbTekst(pr.adderet());
-                if (under) NK.tekst(ctx, under, R.x + R.b - 4, R.y - 9, { font: Tg.font("600", 14), justering: "right", farve: farve });
+                if (under) NK.tekst(ctx, under, R.x + R.b / 2, R.y + R.h + 21, { font: Tg.font("600", passer(ctx, under, R.b, "600", 14, 12)), justering: "center", farve: farve });
+            } else if (valg.ukendt && this.opg && !this.faerdig) {
+                /* Fane 3: luppen er tom, til fedtstoffet er fundet. Det staar i den. */
+                ctx.save();
+                NK.rundtRekt(ctx, R.x, R.y, R.b, R.h, 12);
+                ctx.fillStyle = "#17181f";
+                ctx.fill();
+                ctx.setLineDash([7, 6]);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#4a4f5e";
+                ctx.stroke();
+                ctx.restore();
+                var i0 = this.opg.o.glas, t1 = "Luppen viser " + this.hvad(i0) + ",", t2 = "når du har fundet fedtstoffet.";
+                var fs2 = Math.min(passer(ctx, t1, R.b - 30, "600", 15, 12), passer(ctx, t2, R.b - 30, "600", 15, 12));
+                NK.tekst(ctx, t1, R.x + R.b / 2, R.y + R.h / 2 - 4, { font: Tg.font("600", fs2), justering: "center", farve: "#9aa3ae" });
+                NK.tekst(ctx, t2, R.x + R.b / 2, R.y + R.h / 2 + fs2 + 4, { font: Tg.font("600", fs2), justering: "center", farve: "#9aa3ae" });
             }
 
             this.glas.forEach(function (g, i) {
-                g.tegnHolder(ctx);
                 var spids = i === pip ? { x: lay.xs[i], y: lay.spidsY } : null;
                 g.tegn(ctx, { maerke: mig.glasData[i].nr, aaben: i === pip, om: om.indexOf(i) >= 0 && i !== pip, tid: mig.tid, spids: spids });
                 /* navnet og antallet af draaber under glasset */
                 var kendt = mig.kendt(i), loest = kendt && mig.resultat[i] > 0;
                 var navn = kendt ? F.FEDT[mig.glasData[i].fedt].navn : "ukendt";
-                NK.tekst(ctx, mig.glasData[i].nr + " · " + navn, g.x, lay.yBord + 21, { font: Tg.font("700", 14), justering: "center", farve: loest ? "#9af0c0" : (kendt ? "#f2f3f5" : "#9aa3ae") });
+                var fs3 = passer(ctx, navn, lay.afst - 6, "700", 14, 12);
+                NK.tekst(ctx, navn, g.x, lay.yBord + 21, { font: Tg.font("700", fs3), justering: "center", farve: loest ? "#9af0c0" : (kendt ? "#f2f3f5" : "#9aa3ae") });
                 var n = g.draaber();
                 if (n) NK.tekst(ctx, D.draaberTekst(n), g.x, lay.yBord + 39, { font: Tg.font("600", 13), justering: "center", farve: "#a9b0ba" });
             });
@@ -260,7 +330,7 @@
                 var aktiv = this.iForsoeg() && gl2.klar();
                 if (aktiv && gl2.draaber() === 0) Tg.ring(ctx, pr2.x - 4, pr2.y - 2, pr2.b + 8, pr2.h + 6, this.tid, 12);
                 else if (om.indexOf("pipette") >= 0 && aktiv && this.over === "pipette") Tg.omRing(ctx, pr2.x, pr2.y, pr2.b, pr2.h);
-                if (aktiv) Tg.skilt(ctx, "Klik: 1 dråbe", pr2.x + pr2.b / 2, pr2.y - 6, 8, lay.W - 8);
+                if (aktiv) Tg.skilt(ctx, "Klik: 1 dråbe", pr2.x + pr2.b / 2, pr2.y - 6, 8, Math.round(lay.W * DEL));
             }
             this.tegnSejr(ctx, lay.W, lay.H);
         };
@@ -327,6 +397,6 @@
         return SimDryp;
     }
 
-    NK.SimDrypD = lav({ navn: "d", glas: D.D_GLAS, maal: D.D_MAAL, ord: "glas", naesteFane: "fane-m", naesteNavn: "Ét molekyle" });
+    NK.SimDrypD = lav({ navn: "d", glas: D.D_GLAS, maal: D.D_MAAL, ord: "glas", naesteFane: "fane-u", naesteNavn: "Ukendte fedtstoffer" });
     NK.SimDrypU = lav({ navn: "u", glas: D.U_GLAS, maal: D.U_MAAL, ord: "flaske", ukendt: true });
 }());

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.2 Estersyntese</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at motoren giver hver ester det navn, bogen
+   bruger, og at syredelen og alkoholdelen passer med syren og alkoholen,
+   at kondensationen på fane 1 giver esteren og vand, at forklaringerne
+   til en forkert tegning passer til fejlen, at værktøjerne på tavlen kan
+   tegne en ester, at alle tre faner kan gennemføres, at forkerte svar
+   får den rigtige forklaring og koster stjernen, at Vis svaret virker, at
+   intet løses uden Indsend svar, at stofferne i skilletragten ender i
+   det rigtige lag, at teksterne er korte og uden tankestreger og
+   ASCII-dansk, og at kortet aldrig dækker whiteboardet fra 1100 × 620
+   til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server med mappen animationer/ som
+   rod (motoren hentes fra ../../molekylemotor/). Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function note(t) { skriv("        " + t, "note"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb4.2-kond", "nk-sb4.2-tegn", "nk-sb4.2-rens", "nk-sb4.2-stil"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|gaar|staa|staar|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|kaede\w*|vaelg\w*|taelle?r?|traekker|aendring|raekke\w*|groen|bloe\w*|oeverste|vaesk\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var k1 = NK.sims["fane-k"], t2 = NK.sims["fane-t"], s3 = NK.sims["fane-s"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function kort(sim) { return el(sim.navn + "-ind").textContent; }
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : (sim.groen ? kort(sim) : ""); }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function kortTekst(sim) { return sim.kortData().tekst; }
+    function rigtigNr(liste) { for (var j = 0; j < liste.length; j++) if (liste[j].type === "rigtig") return j; return -1; }
+    function forkertNr(liste) { for (var j = 0; j < liste.length; j++) if (liste[j].type !== "rigtig") return j; return -1; }
+    function del(mol, ids) {
+        var m = new NK.Molekyle(), ny = {}, set = {};
+        ids.forEach(function (x) { set[x] = true; });
+        mol.atomer.forEach(function (a) { if (set[a.id]) { var n = m.tilfoej(a.el, a.x, a.y); n.q = a.q; ny[a.id] = n.id; } });
+        mol.bindinger.forEach(function (bd) { if (set[bd.a] && set[bd.b]) m.bind(ny[bd.a], ny[bd.b], bd.orden); });
+        return m;
+    }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: esterne, deres navne og deres to dele");
+    var alle = D.KONDENSATION.concat(D.OPGAVER);
+    alle.forEach(function (o) {
+        var b = K.byg(o.syre, o.alkohol), dd = b.dele;
+        paastand(o.syre + " + " + o.alkohol + " giver " + o.ester + " (motoren)", b.navn === o.ester, b.navn);
+        paastand("  navnet er alkoholdelen + syredelen: " + K.alkyl(o.alkohol) + " + " + K.oat(o.syre), K.navn(o.syre, o.alkohol) === o.ester);
+        paastand("  syredelen har " + K.antalC(o.syre) + " C og alkoholdelen " + K.antalC(o.alkohol) + " C",
+            dd && dd.cSyre === K.antalC(o.syre) && dd.cAlkohol === K.antalC(o.alkohol), dd ? dd.cSyre + "/" + dd.cAlkohol : "ingen estergruppe");
+        var c = b.mol.atom(dd.c), oB = b.mol.atom(dd.oB), oD = b.mol.atom(dd.oD);
+        paastand("  tegnet som i bogen: syredelen til venstre og C=O opad", c.x < oB.x && oD.y < c.y);
+        var t = K.optael(b.mol);
+        paastand("  molekylformlen: C som syren og alkoholen tilsammen, to O", t.C === K.antalC(o.syre) + K.antalC(o.alkohol) && t.O === 2);
+    });
+    /* Methanoat: =O lodret op og H paa den frie plads, som i bogens figur */
+    var mf = K.medH(K.byg("methansyre", "ethanol").mol), dm = K.esterDele(mf);
+    var hM = mf.naboer(dm.c).filter(function (x) { return mf.atom(x).el === "H"; });
+    paastand("ethylmethanoat: =O lodret op, og H er tegnet på carbonatomet", Math.abs(mf.atom(dm.oD).x - mf.atom(dm.c).x) < 1e-6 && hM.length === 1);
+    paastand("ethylmethanoat: H står skråt ned til venstre", hM.length === 1 && mf.atom(hM[0]).x < mf.atom(dm.c).x && mf.atom(hM[0]).y > mf.atom(dm.c).y);
+
+    /* Svarene: tre forskellige navne med præcis ét rigtigt */
+    var navneFejl = [];
+    alle.forEach(function (o) {
+        var v = K.navnValg(o), t = v.map(function (x) { return x.t; });
+        var rigtige = v.filter(function (x) { return x.type === "rigtig"; });
+        if (v.length !== 3 || rigtige.length !== 1 || rigtige[0].t !== o.ester || t.filter(function (x, i) { return t.indexOf(x) === i; }).length !== 3) navneFejl.push(o.ester + ": " + t.join(", "));
+        v.forEach(function (x) { if (x.type !== "rigtig") husk("forkert navn", K.navnFejl(o, x)); });
+        husk("rigtigt navn", K.navnForklaring(o));
+        K.navnHints(o).forEach(function (h) { husk("hint navn", h); });
+    });
+    samlet("navnene: tre forskellige svar med ét rigtigt (" + alle.length + " estere)", navneFejl);
+    var byttet = K.navnValg(D.OPGAVER[3]).filter(function (x) { return x.type === "byttet"; })[0];
+    paastand("propylethanoat: det ombyttede navn er ethylpropanoat", byttet && byttet.t === "ethylpropanoat", byttet && byttet.t);
+
+    var baglFejl = [];
+    D.OPGAVER.filter(function (o) { return o.baglaens; }).forEach(function (o) {
+        [["syre", K.syreValg(o), o.syre, K.syreFejl], ["alkohol", K.alkoholValg(o), o.alkohol, K.alkoholFejl]].forEach(function (x) {
+            var v = x[1], r = v.filter(function (y) { return y.type === "rigtig"; });
+            if (v.length !== 3 || r.length !== 1 || r[0].t !== x[2]) baglFejl.push(o.ester + " " + x[0] + ": " + v.map(function (y) { return y.t; }).join(", "));
+            v.forEach(function (y) { if (y.type !== "rigtig") husk("forkert " + x[0], x[3](o, y)); });
+        });
+        husk("rigtigt syre", K.syreForklaring(o));
+        husk("rigtigt alkohol", K.alkoholForklaring(o));
+        /* Hydrolysen: syren og alkoholen giver esteren tilbage */
+        if (K.byg(o.syre, o.alkohol).navn !== o.ester) baglFejl.push(o.ester + ": syren og alkoholen giver " + K.byg(o.syre, o.alkohol).navn);
+    });
+    samlet("baglæns: tre syrer og tre alkoholer med ét rigtigt svar, og de giver esteren", baglFejl);
+
+    /* ================================================================= */
+    overskrift("2. Modellen: kondensationen på fane 1");
+    D.KONDENSATION.forEach(function (k) {
+        var sc = K.kondScene(k.syre, k.alkohol), ef = K.kondEfter(sc);
+        var foer = sc.mol.fragmenter().map(function (f) { return f.length; }).sort(), efter = ef.fragmenter();
+        paastand(k.syre + " og " + k.alkohol + ": to molekyler før reaktionen", foer.length === 2);
+        var navne = efter.map(function (f) { var m = del(ef, f); var r = NK.Navn.analyser(m); return r && r.navn ? r.navn : NK.Molekyle.formelTekst(m.optaelling()); });
+        paastand("  efter reaktionen: " + navne.join(" og "), efter.length === 2 && navne.indexOf(k.ester) >= 0 && navne.indexOf("vand") >= 0, navne.join(", "));
+        var v = K.vandAtomer(sc).map(function (x) { return sc.mol.atom(x).el; }).sort().join("");
+        paastand("  vandets atomer er O og to H (syrens OH og alkoholens H)", v === "HHO" && K.vandAtomer(sc).indexOf(sc.id.OS) >= 0 && K.vandAtomer(sc).indexOf(sc.id.HA) >= 0);
+        /* Ingen atomer oven i hinanden foer og efter */
+        var taet = [];
+        [sc.start, sc.slut].forEach(function (pl, n) {
+            var ids = Object.keys(pl);
+            ids.forEach(function (a, i) { ids.slice(i + 1).forEach(function (b) { if (Math.hypot(pl[a].x - pl[b].x, pl[a].y - pl[b].y) < 0.7) taet.push((n ? "efter " : "før ") + a + "-" + b); }); });
+        });
+        samlet("  ingen atomer oven i hinanden før og efter", taet);
+    });
+    var sc0 = K.kondScene("ethansyre", "ethanol");
+    var fejlTekster = [
+        [[sc0.id.OB, sc0.id.HA, sc0.id.HS], /syren, der afgiver hele OH-gruppen/],
+        [[sc0.id.OD, sc0.id.HA, sc0.id.HS], /dobbeltbindingen/],
+        [[sc0.id.HA, sc0.id.HS], /Find også oxygenatomet/],
+        [[sc0.id.OS, sc0.id.HS], /ét oxygenatom og to hydrogenatomer/]
+    ];
+    fejlTekster.forEach(function (x) {
+        var t = K.vandFejl(sc0, x[0]);
+        husk("forkert vand", t);
+        paastand("forkert valg af atomer: " + t.slice(0, 60) + " …", x[1].test(t), t);
+    });
+    K.vandHints().forEach(function (h) { husk("hint vand", h); });
+
+    /* ================================================================= */
+    overskrift("3. Modellen: forklaringen til en forkert tegning");
+    var o4 = D.OPGAVER[3];      /* ethansyre og propan-1-ol: propylethanoat */
+    function laes(n) { return NK.NavnLaeser.laes(n).mol; }
+    paastand("den rigtige ester godkendes", K.tegneFejl(o4, K.byg(o4.syre, o4.alkohol).mol.kopi()) === null);
+    var tegnFejl = [
+        ["ethylpropanoat", /C=O skal sidde i syredelen/],
+        ["pentansyre", /carboxylsyre/],
+        ["pentan-1-ol", /alkohol/],
+        ["butylmethanoat", /Syredelen skal have to carbonatomer/],
+        ["methylethanoat", /tilsammen fem carbonatomer/],
+        ["1-methoxybutan-2-on", /samme carbonatom/],
+        ["propylpropanoat", /tilsammen fem carbonatomer/]
+    ];
+    tegnFejl.forEach(function (x) {
+        var t = K.tegneFejl(o4, laes(x[0]));
+        husk("forkert tegning", t);
+        paastand("tegnet " + x[0] + ": " + (t || "null").slice(0, 70) + " …", !!t && x[1].test(t), t);
+    });
+    var to = laes("methylethanoat");
+    var vand = to.tilfoej("O", 6, 0);
+    paastand("ester og vand tegnet: alt skal hænge sammen", /hænge sammen/.test(K.tegneFejl(D.OPGAVER[0], to) || ""));
+    var gEnkel = new NK.Molekyle(); gEnkel.tilfoej("C", 0, 0); gEnkel.bind(gEnkel.tilfoej("C", 1, 0).id, 1, 1);
+    paastand("kun carbon tegnet: et oxygenatom mangler", /to oxygenatomer/.test(K.tegneFejl(o4, gEnkel) || ""), K.tegneFejl(o4, gEnkel));
+    var alleGodkendt = [];
+    D.OPGAVER.forEach(function (o) {
+        if (K.tegneFejl(o, K.byg(o.syre, o.alkohol).mol.kopi()) !== null) alleGodkendt.push(o.ester);
+        K.tegneHints(o).forEach(function (h) { husk("hint tegn", h); });
+        husk("rigtigt tegn", K.tegneForklaring(o));
+    });
+    samlet("modellens egen ester godkendes i alle ni opgaver", alleGodkendt);
+    void vand;
+
+    /* ================================================================= */
+    overskrift("4. Fane 1: Kondensationen");
+    NK.visFane("fane-k");
+    k1.forfra();
+    paastand("starter ved opgave 1 med trinnet vand", k1.nr === 0 && k1.trin() === "vand");
+    paastand("startbilledet: farverne i panelet er skjult", el("k-farver").style.visibility === "hidden");
+    paastand("Indsend svar uden valgte atomer gør intet", (k1.indsendKlik(), k1.trin() === "vand" && !k1.groen));
+    husk("kort vand", kortTekst(k1));
+    /* Et klik i scenen vaelger et atom */
+    k1.tilpas(); k1.layout(); k1.tegn();
+    var pOS = k1.geo.P[k1.sc.id.OS];
+    var c = k1.L.canvas;
+    k1.klikScene({ x: pOS.x, y: pOS.y });
+    paastand("et klik på syrens O vælger det", k1.valgtAtomer.length === 1 && k1.valgtAtomer[0] === k1.sc.id.OS);
+    k1.klikScene({ x: pOS.x, y: pOS.y });
+    paastand("et klik mere fravælger det", k1.valgtAtomer.length === 0);
+    k1.valgtAtomer = [k1.sc.id.OB, k1.sc.id.HA, k1.sc.id.HS];
+    k1.indsendKlik();
+    paastand("alkoholens OH og syrens H: forklaringen om syrens OH-gruppe", /syren, der afgiver hele OH-gruppen/.test(besked(k1)), besked(k1));
+    paastand("hjælpeknappen lyser stille op efter fejlen", el("k-knap").classList.contains("peg"));
+    k1.valgtAtomer = K.vandAtomer(k1.sc);
+    k1.indsendKlik();
+    paastand("rigtige atomer: kortet bliver grønt med knappen til reaktionen", k1.groen && /reagere/.test(el("k-ind").textContent));
+    husk("rigtigt vand", k1.groen.tekst);
+    var vaelgt = k1.valgtAtomer.length;
+    k1.klikScene({ x: pOS.x, y: pOS.y });
+    paastand("klik i scenen, mens kortet er grønt: intet sker", k1.valgtAtomer.length === vaelgt);
+    k1.videreKlik();
+    paastand("reaktionen kører, og Indsend svar og hint er væk", k1.trin() === "reaktion" && el("k-indsend").hidden && el("k-knap").hidden);
+    husk("kort reaktion", kortTekst(k1));
+    tid(k1, 3);
+    paastand("efter reaktionen: spørgsmålet om navnet", k1.trin() === "navn" && k1.kendt.reaktion);
+    paastand("farverne i panelet kommer frem", el("k-farver").style.visibility === "visible");
+    husk("kort navn", kortTekst(k1));
+    k1.kortData().svar.forEach(function (s) { husk("svar navn", s.t); });
+    k1.svarValg(forkertNr(k1.navne));
+    paastand("et svar vælger kun", k1.trin() === "navn" && !k1.groen);
+    k1.indsendKlik();
+    paastand("forkert navn: forklaring og ingen stjerne", !!besked(k1) && k1.fejl, besked(k1));
+    k1.svarValg(rigtigNr(k1.navne));
+    k1.indsendKlik();
+    paastand("rigtigt navn: opgaven er løst uden stjerne", k1.status[0].loest && !k1.status[0].stjerne);
+    paastand("knappen fører til næste reaktion", /Næste reaktion/.test(el("k-ind").textContent));
+    k1.videreKlik();
+    paastand("næste reaktion er opgave 2", k1.nr === 1 && k1.trin() === "vand");
+    /* Opgave 2 med Vis svaret, opgave 3 uden fejl */
+    k1.knap(); k1.knap(); k1.knap();
+    paastand("hjælpeknappen: to hint og så svaret", k1.groen && k1.sv);
+    k1.videreKlik(); tid(k1, 3);
+    k1.svarValg(rigtigNr(k1.navne)); k1.indsendKlik();
+    paastand("opgave 2 løst med Vis svaret: ingen stjerne", k1.status[1].loest && !k1.status[1].stjerne);
+    k1.videreKlik();
+    k1.valgtAtomer = K.vandAtomer(k1.sc); k1.indsendKlik(); k1.videreKlik(); tid(k1, 3);
+    k1.svarValg(rigtigNr(k1.navne)); k1.indsendKlik();
+    paastand("opgave 3 løst uden fejl: stjerne", k1.status[2].loest && k1.status[2].stjerne);
+    paastand("alle tre løst: knappen fører til fane 2", /Forudsig esteren/.test(el("k-ind").textContent));
+    husk("rigtigt sidst", bliv(k1));
+    paastand("hukommelsen gemmer de tre", (JSON.parse(W.localStorage.getItem("nk-sb4.2-kond")) && Object.keys(JSON.parse(W.localStorage.getItem("nk-sb4.2-kond"))).length === 3));
+    void c;
+
+    /* ================================================================= */
+    overskrift("5. Fane 2: Forudsig esteren");
+    NK.visFane("fane-t");
+    t2.forfra();
+    var b = t2.braet;
+    paastand("opgave 1 (Let): tegn esteren, værktøjslinjen er fremme", t2.trin() === "tegn" && !el("t-vaerktoej").hidden);
+    paastand("kun startatomet: Indsend svar kan ikke sendes", !t2.kanSendes());
+    /* Tegn methylethanoat med vaerktoejerne: en kaede af fire C, O midt i, =O paa det andet */
+    var start = b.mol.atomer[0];
+    t2.vaelgVaerktoej("C");
+    b.klik({ slags: "atom", atom: start });
+    var a2 = b.mol.atomer[1];
+    b.klik({ slags: "atom", atom: a2 });
+    var a3 = b.mol.atomer[2];
+    b.klik({ slags: "atom", atom: a3 });
+    paastand("C: tre klik giver en kæde af fire carbonatomer", b.mol.atomer.length === 4 && K.antal(b.mol, "C") === 4);
+    t2.vaelgVaerktoej("O");
+    b.klik({ slags: "atom", atom: a3 });
+    paastand("O: et klik gør carbonatomet til O", b.mol.atom(a3.id).el === "O");
+    t2.vaelgVaerktoej("gruppe:O");
+    b.klik({ slags: "atom", atom: a2 });
+    paastand("=O: et klik sætter et dobbeltbundet O på, og værktøjet går tilbage til C", K.antal(b.mol, "O") === 2 && b.vaerktoej === "tegn" && b.grundstof === "C");
+    var res = NK.Navn.analyser(b.mol);
+    paastand("tegningen er methylethanoat", res.navn === "methylethanoat", res.navn);
+    paastand("Indsend svar viser molekylformlen", /C₃H₆O₂/.test(t2.indsendTekst()), t2.indsendTekst());
+    var a4 = b.mol.atomer.filter(function (x) { return x.el === "C" && x.id !== start.id && x.id !== a2.id; })[0];
+    t2.vaelgVaerktoej("O");
+    b.klik({ slags: "atom", atom: b.mol.atom(a4.id) });
+    paastand("to oxygenatomer må ikke sidde sammen", b.mol.atom(a4.id).el === "C");
+    t2.vaelgVaerktoej("C");
+    t2.indsendKlik();
+    paastand("rigtig tegning: kortet bliver grønt, og tavlen er låst", !!t2.groen && b.laast && el("t-vaerktoej").classList.contains("laast"));
+    paastand("tegningen har bogens farver", !!b.atomFarve && b.atomFarve(a3.id) === D.FARVE.alkohol.blaek);
+    paastand("en rigtig tegning koster ikke noget", !t2.fejl);
+    t2.videreKlik();
+    paastand("så spørges der om navnet", t2.trin() === "navn");
+    husk("kort navn2", kortTekst(t2));
+    t2.svarValg(rigtigNr(t2.navne)); t2.indsendKlik();
+    paastand("opgave 1 løst med stjerne", t2.status[0].loest && t2.status[0].stjerne);
+    t2.videreKlik();
+    /* Opgave 2: en forkert tegning, saa den rigtige */
+    paastand("næste opgave er opgave 2", t2.nr === 1);
+    t2.saetter = true; b.saet(K.byg("ethansyre", "propan-1-ol").mol.kopi(), true); t2.saetter = false;
+    t2.indsendKlik();
+    paastand("byttet om (propylethanoat i stedet for ethylpropanoat): forklaring", /C=O skal sidde i syredelen/.test(besked(t2)) && !t2.groen, besked(t2));
+    t2.saetter = true; b.saet(K.byg("propansyre", "ethanol").mol.kopi(), true); t2.saetter = false;
+    t2.indsendKlik(); t2.videreKlik();
+    t2.svarValg(forkertNr(t2.navne)); t2.indsendKlik();
+    paastand("forkert navn: forklaring og stjernen er væk", !!besked(t2) && t2.fejl);
+    t2.svarValg(rigtigNr(t2.navne)); t2.indsendKlik();
+    paastand("opgave 2 løst uden stjerne", t2.status[1].loest && !t2.status[1].stjerne);
+    /* Resten af opgaverne */
+    var ikkeLoest = [];
+    for (var n = 2; n < D.OPGAVER.length; n++) {
+        t2.vaelg(n);
+        var o = t2.opg;
+        husk("kort " + t2.trin(), kortTekst(t2));
+        if (!o.baglaens) {
+            paastand("opgave " + (n + 1) + " (" + D.NIVEAUER[o.niv - 1] + "): " + (o.niv === 1 ? "formlerne" : "navnene") + " står over tavlen", t2.reagensH() > 0 && (o.niv !== 1 || t2.reagenser.length === 2));
+            if (n === 4) {
+                t2.knap(); t2.knap(); t2.knap();
+                paastand("Vis svaret tegner esteren på tavlen", NK.Navn.analyser(b.mol).navn === o.id && !!t2.groen, NK.Navn.analyser(b.mol).navn);
+            } else {
+                t2.saetter = true; b.saet(K.byg(o.syre, o.alkohol).mol.kopi(), true); t2.saetter = false;
+                t2.indsendKlik();
+            }
+            t2.videreKlik();
+        } else {
+            paastand("opgave " + (n + 1) + " (Svær): ingen værktøjer, esteren står på tavlen", el("t-vaerktoej").hidden && b.laast);
+            t2.svarValg(forkertNr(t2.syrer)); t2.indsendKlik();
+            paastand("  forkert syre: forklaring", !!besked(t2), besked(t2));
+            t2.svarValg(rigtigNr(t2.syrer)); t2.indsendKlik();
+            husk("rigtigt syre", bliv(t2));
+            t2.videreKlik();
+            husk("kort alkohol", kortTekst(t2));
+            t2.kortData().svar.forEach(function (s) { husk("svar alkohol", s.t); });
+            t2.svarValg(rigtigNr(t2.alkoholer)); t2.indsendKlik(); t2.videreKlik();
+        }
+        t2.kortData().svar.forEach(function (s) { husk("svar navn", s.t); });
+        t2.svarValg(rigtigNr(t2.navne)); t2.indsendKlik();
+        husk("rigtigt sidst", bliv(t2));
+        if (!t2.status[n].loest) ikkeLoest.push(o.id);
+    }
+    samlet("alle ni opgaver kan løses", ikkeLoest);
+    paastand("alle løst: knappen fører til fane 3", /Rens esteren/.test(el("t-ind").textContent));
+    paastand("panelet tæller 9", el("t-loest").textContent === "9");
+
+    /* ================================================================= */
+    overskrift("6. Fane 3: Rens esteren");
+    NK.visFane("fane-s");
+    s3.forfra();
+    paastand("starter med ét lag og alle fire stoffer i blandingen", !s3.toLag && s3.ikoner.every(function (ik) { return ik.lag === "org"; }));
+    D.RENS_TRIN.forEach(function (t) {
+        husk("kort rens", t.spm);
+        t.svar.forEach(function (x) { husk("svar rens", x); });
+        Object.keys(t.fejl).forEach(function (k) { husk("forkert rens", t.fejl[k]); });
+        t.hint.forEach(function (h) { husk("hint rens", h); });
+        husk("rigtigt rens", t.rigtigTekst);
+    });
+    s3.indsendKlik();
+    paastand("Indsend svar uden valg gør intet", s3.trinNr === 0 && !s3.groen);
+    s3.svarValg(0); s3.svarValg(3); s3.indsendKlik();
+    paastand("esteren valgt: forklaringen om esteren, og der mangler et svar", /Propylbutanoat har intet H/.test(besked(s3)) && /mangler/.test(besked(s3)), besked(s3));
+    s3.svarValg(1); s3.indsendKlik();
+    paastand("propan-1-ol og svovlsyre: rigtigt", !!s3.groen && s3.fejl);
+    paastand("  begge rigtige svar er grønne", el("s-ind").querySelectorAll(".sk-knap.rigtig, .sk-knap.svar-vist").length === 2);
+    s3.videreKlik();
+    paastand("knappen sætter vasken i gang", s3.fase === "anim");
+    tid(s3, 5);
+    paastand("efter vasken: alkoholen og svovlsyren er tappet af", s3.ikoner.filter(function (ik) { return ik.stof === "alkohol" || ik.stof === "svovlsyre"; }).every(function (ik) { return ik.lag === "ud"; }));
+    paastand("  esteren og syren er i det øverste lag", s3.ikoner.filter(function (ik) { return ik.stof === "ester" || ik.stof === "syre"; }).every(function (ik) { return ik.lag === "org"; }));
+    paastand("  vandfasen er tom, og der er to lag i luppen", s3.vVand === 0 && s3.toLag);
+    paastand("spørgsmål 2 om natriumcarbonat", s3.fase === "spm" && s3.trin().id === "base");
+    s3.svarValg(2); s3.indsendKlik();
+    paastand("forkert: forklaringen om basen", /base/.test(besked(s3)), besked(s3));
+    s3.svarValg(0); s3.indsendKlik(); s3.videreKlik();
+    tid(s3, 4);
+    var syren = s3.ikoner.filter(function (ik) { return ik.stof === "syre"; })[0];
+    paastand("butansyre er blevet til butanoat i vandfasen", syren.form === "base" && syren.lag === "vand");
+    paastand("  det bruser, og spørgsmål 3 handler om gassen", s3.boblerTil && s3.trin().id === "gas");
+    s3.svarValg(1); s3.indsendKlik();
+    paastand("dihydrogen: forklaringen om metal", /metal/.test(besked(s3)));
+    s3.svarValg(0); s3.indsendKlik(); s3.videreKlik();
+    tid(s3, 2.5);
+    paastand("vandfasen med butanoat er tappet af", syren.lag === "ud" && s3.vVand === 0 && !s3.boblerTil);
+    paastand("kun esteren er tilbage", s3.ikoner.filter(function (ik) { return ik.lag !== "ud"; }).every(function (ik) { return ik.stof === "ester"; }));
+    s3.svarValg(0); s3.indsendKlik();
+    paastand("kun ét af to rigtige svar: der mangler et", /flere svar/.test(besked(s3)) && !s3.groen, besked(s3));
+    s3.svarValg(1); s3.indsendKlik();
+    paastand("begge grunde: rigtigt", !!s3.groen);
+    s3.videreKlik();
+    paastand("forsøget er slut uden stjerne, og panelet tæller én renset ester", s3.fase === "slut" && s3.runder === 1 && !s3.stjerne && el("s-runder").textContent === "1");
+    husk("kort slut", kortTekst(s3));
+    s3.indsendKlik();
+    paastand("på slutkortet gør Indsend svar intet", s3.fase === "slut" && !besked(s3));
+    s3.forfra();
+    paastand("Begynd forfra giver en ny blanding", s3.fase === "spm" && s3.trinNr === 0 && !s3.toLag);
+    /* En runde uden fejl giver stjernen */
+    D.RENS_TRIN.forEach(function (t, i) {
+        t.rigtig.forEach(function (j) { s3.svarValg(j); });
+        s3.indsendKlik(); s3.videreKlik();
+        if (i < 3) tid(s3, 5);
+    });
+    paastand("en runde uden fejl giver stjernen", s3.fase === "slut" && s3.stjerne && s3.runder === 2);
+
+    /* ================================================================= */
+    overskrift("7. Teksterne");
+    d.querySelectorAll(".rundvisning-boks, #teori p").forEach(function () { });
+    var html = d.body.innerText;
+    var streger = [], ascii = [], ladning = [], lange = [];
+    var GRAENSE = { svar: 34, hint: 110, forkert: 125, rigtigt: 175, kort: 150 };
+    var laengst = {};
+    tekster.forEach(function (x) {
+        if (/[–—]/.test(x.t)) streger.push(x.hvad);
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.match(ASCII_ORD)[0]);
+        if (/\b1[+−]/.test(x.t)) ladning.push(x.hvad);
+        var slags = x.hvad.split(" ")[0], g = GRAENSE[slags];
+        if (g && x.t.length > g) lange.push(x.hvad + " (" + x.t.length + "): " + x.t.slice(0, 50));
+        if (g && (!laengst[slags] || x.t.length > laengst[slags])) laengst[slags] = x.t.length;
+    });
+    samlet("ingen tankestreger (" + tekster.length + " tekster)", streger);
+    samlet("intet ASCII-dansk", ascii);
+    samlet("teksterne er korte (svar 34, hint 110, forkert 125, rigtigt 175, kort 150 tegn)", lange);
+    note("længst: " + Object.keys(laengst).map(function (k) { return k + " " + laengst[k]; }).join(", "));
+    samlet("ingen ladning skrevet som 1+ eller 1−", ladning);
+    paastand("siden har ingen tankestreger", !/[–—]/.test(html));
+    paastand("ingen Kemichael", !d.querySelector('script[src*="kemichael"]'));
+    paastand("ikke i menuen endnu: ingen linje til til_panelet.js", !d.querySelector('script[src*="til_panelet"]'));
+
+    /* ================================================================= */
+    overskrift("8. Kortet dækker aldrig whiteboardet");
+    var daekker = [], raekke = [];
+    [[1100, 620], [1300, 800], [1600, 950]].forEach(function (str) {
+        ramme.style.width = str[0] + "px";
+        ramme.style.height = str[1] + "px";
+        [k1, t2, s3].forEach(function (sim) {
+            NK.visFane("fane-" + sim.navn);
+            if (sim === s3) { sim.forfra(); sim.svarValg(0); }
+            else if (sim === t2) { sim.vaelg(8); sim.svarValg(0); }
+            else { sim.vaelg(2); sim.valgtAtomer = K.vandAtomer(sim.sc); sim.indsendKlik(); sim.videreKlik(); tid(sim, 3); sim.svarValg(0); }
+            sim.lay = null; sim.tilpas(); sim.layout();
+            var kortR = el(sim.navn + "-skort").getBoundingClientRect(), cr = sim.L.canvas.getBoundingClientRect();
+            var tavleTop = cr.top + sim.lay.tavle.y;
+            if (kortR.bottom > tavleTop + 1) daekker.push(str.join("×") + " " + sim.navn + " (" + Math.round(kortR.bottom - tavleTop) + " px)");
+            var k = el(sim.navn + "-knap"), ind = el(sim.navn + "-indsend");
+            if (!k.hidden && !ind.hidden && Math.abs(k.getBoundingClientRect().top - ind.getBoundingClientRect().top) > 4) raekke.push(str.join("×") + " " + sim.navn);
+            sim.tegn();
+        });
+    });
+    samlet("kortet slutter over whiteboardet", daekker);
+    samlet("hint og Indsend svar står på samme række", raekke);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>

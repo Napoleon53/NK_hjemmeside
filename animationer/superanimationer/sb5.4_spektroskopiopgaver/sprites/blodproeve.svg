@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="122" viewBox="0 0 44 122">
+  <!-- Blodproeveroer med roed prop og etiket. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fb4c2" stop-opacity="0.55"/>
+      <stop offset="0.14" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.26" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.36" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#9fb4c2" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="blod" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5e0d10"/>
+      <stop offset="0.35" stop-color="#9c1c20"/>
+      <stop offset="0.7" stop-color="#7d1418"/>
+      <stop offset="1" stop-color="#4b0a0c"/>
+    </linearGradient>
+    <linearGradient id="prop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f1d1b"/>
+      <stop offset="0.35" stop-color="#e2554a"/>
+      <stop offset="0.7" stop-color="#c0392b"/>
+      <stop offset="1" stop-color="#7a1715"/>
+    </linearGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3c4a52" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#3c4a52" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="22" cy="117" rx="18" ry="4" fill="url(#skygge)"/>
+  <!-- blodet -->
+  <path d="M9 50 L35 50 L35 102 Q35 113 22 113 Q9 113 9 102 Z" fill="url(#blod)"/>
+  <path d="M9 50 L35 50" stroke="#c2393a" stroke-opacity="0.8" stroke-width="1.2"/>
+  <!-- roeret -->
+  <path d="M8 22 L8 102 Q8 115 22 115 Q36 115 36 102 L36 22" fill="url(#glas)" stroke="#7d93a3" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- etiketten -->
+  <rect x="8.5" y="58" width="27" height="30" rx="1.5" fill="#fbfaf4" fill-opacity="0.95" stroke="#c9c2ae" stroke-width="0.8"/>
+  <path d="M12 66 L32 66 M12 72 L28 72 M12 78 L30 78" stroke="#8a8578" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- proppen -->
+  <path d="M5 4 Q5 1 8 1 L36 1 Q39 1 39 4 L39 24 Q39 27 36 27 L8 27 Q5 27 5 24 Z" fill="url(#prop)" stroke="#6d1412" stroke-width="0.9"/>
+  <path d="M5 9 L39 9 M5 19 L39 19" stroke="#6d1412" stroke-opacity="0.45" stroke-width="1"/>
+  <path d="M10 4 L10 24" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- genskin -->
+  <path d="M13 30 L13 52" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M13 92 L13 104" stroke="#ffffff" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+</svg>

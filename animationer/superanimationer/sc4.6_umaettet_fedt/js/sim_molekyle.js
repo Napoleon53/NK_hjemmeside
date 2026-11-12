@@ -1,5 +1,5 @@
 /* =====================================================================
-   sim_molekyle.js - fane 2: Ét molekyle
+   sim_molekyle.js - fane 1: Ét molekyle
 
    Ét fedtstofmolekyle staar stort paa en lys tavle, tegnet som i bogen:
    glycerol, esterbindingerne og tre fedtsyrer som zigzag. Eleven klikker
@@ -31,7 +31,7 @@
     }
 
     var P = SimMolekyle.prototype;
-    NK.Fane.paa(P, { navn: "m", naesteFane: "fane-u", naesteNavn: "Ukendte fedtstoffer" });
+    NK.Fane.paa(P, { navn: "m", naesteFane: "fane-d", naesteNavn: "Dryp og tæl" });
 
     /* ----- Maalene ------------------------------------------------------------------- */
     P.nyOpgave = function (o) {

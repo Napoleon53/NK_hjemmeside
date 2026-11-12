@@ -282,22 +282,31 @@
         ctx.fillRect(0, y, W, 1);
     };
 
-    /* Rammen om luppens vindue og de to stiplede streger ned til det lille
-       felt i glasset, som vinduet viser forstoerret */
+    /* Rammen om luppens vindue og de to stiplede streger hen til det lille
+       felt i glasset, som vinduet viser forstoerret. Staar luppen til hoejre
+       for feltet, gaar stregerne til luppens venstre side, ellers til bunden. */
     T.zoomRamme = function (ctx, R, fra, fremhaev) {
         ctx.save();
         if (fra) {
             ctx.setLineDash([6, 5]);
             ctx.lineWidth = 1.5;
-            ctx.strokeStyle = "rgba(242, 197, 61, 0.55)";
+            ctx.strokeStyle = "rgba(214, 160, 20, 0.75)";
             ctx.beginPath();
-            ctx.moveTo(fra.x, fra.y);
-            ctx.lineTo(R.x + 8, R.y + R.h);
-            ctx.moveTo(fra.x + fra.b, fra.y);
-            ctx.lineTo(R.x + R.b - 8, R.y + R.h);
+            if (fra.x + fra.b < R.x) {
+                ctx.moveTo(fra.x + fra.b, fra.y);
+                ctx.lineTo(R.x, R.y + 12);
+                ctx.moveTo(fra.x + fra.b, fra.y + fra.h);
+                ctx.lineTo(R.x, R.y + R.h - 12);
+            } else {
+                ctx.moveTo(fra.x, fra.y);
+                ctx.lineTo(R.x + 8, R.y + R.h);
+                ctx.moveTo(fra.x + fra.b, fra.y);
+                ctx.lineTo(R.x + R.b - 8, R.y + R.h);
+            }
             ctx.stroke();
             ctx.setLineDash([]);
-            ctx.strokeStyle = "rgba(242, 197, 61, 0.95)";
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#c99400";
             ctx.strokeRect(fra.x, fra.y, fra.b, fra.h);
         }
         if (fremhaev) {
@@ -332,7 +341,8 @@
 
     /* En rolig gul ring om det, opgaven eller spoergsmaalet handler om
        (intet indforstaaet). Ringen, der pulserer (T.ring), betyder "brug mig nu". */
-    T.omRing = function (ctx, x, y, b, h) {
+    /* farve: en moerkere gul til ringe paa den hvide plade bag glassene */
+    T.omRing = function (ctx, x, y, b, h, farve) {
         ctx.save();
         NK.rundtRekt(ctx, x - 9, y - 9, b + 18, h + 18, 16);
         ctx.lineWidth = 7;
@@ -340,7 +350,7 @@
         ctx.stroke();
         NK.rundtRekt(ctx, x - 6, y - 6, b + 12, h + 12, 14);
         ctx.lineWidth = 3;
-        ctx.strokeStyle = "#f2c53d";
+        ctx.strokeStyle = farve || "#f2c53d";
         ctx.stroke();
         ctx.restore();
     };

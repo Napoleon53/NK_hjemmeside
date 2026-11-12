@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spektroskopiopgaver</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">λ</span> Spektroskopiopgaver</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-k" role="tab" aria-selected="true"><span class="nr">1</span>Standardkurven</button>
+        <button class="faneknap" data-fane="fane-i" role="tab" aria-selected="false"><span class="nr">2</span>Indholdet</button>
+        <button class="faneknap" data-fane="fane-l" role="tab" aria-selected="false"><span class="nr">3</span>Det lineære område</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: STANDARDKURVEN                                             -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-k" role="tabpanel" aria-label="Standardkurven">
+    <div class="scene">
+        <canvas id="k-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="k-skort">
+            <div class="sk-ind" id="k-ind"></div>
+            <div class="sk-bund" id="k-status">
+                <p class="st-tekst" id="k-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="k-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="k-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="k-anker-figur"></div>
+        <div class="anker" id="k-anker-graf"></div>
+        <div class="anker" id="k-anker-rammer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort tabelkort" id="k-tabelkort">
+            <h2>Standardrækken <span class="taeller" id="k-tabelnavn"></span></h2>
+            <p class="note-tekst" id="k-note"></p>
+            <div class="tabelboks" id="k-tabel"></div>
+            <div class="kopi-raekke">
+                <button class="knap blaa kopiknap" id="k-kopier" type="button">Kopiér til regnearket</button>
+                <button class="decimalkontakt" id="k-punktum" type="button" aria-pressed="false" title="Til et regneark på engelsk"><span class="dk-kontakt"><i></i></span>Punktum som decimaltegn</button>
+            </div>
+            <p class="kopisvar" id="k-kopisvar" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="k-opgavekort">
+            <h2>Opgaverne <span class="taeller maerke-tekst" id="k-maerke"></span></h2>
+            <ol class="trinliste opgliste" id="k-opgaver"></ol>
+            <button class="knap igenknap" id="k-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: INDHOLDET                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-i" role="tabpanel" aria-label="Indholdet">
+    <div class="scene">
+        <canvas id="i-laerred"></canvas>
+        <div class="scenekort" id="i-skort">
+            <div class="sk-ind" id="i-ind"></div>
+            <div class="sk-bund" id="i-status">
+                <p class="st-tekst" id="i-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="i-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="i-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="i-anker-figur"></div>
+        <div class="anker" id="i-anker-graf"></div>
+        <div class="anker" id="i-anker-rammer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort tabelkort" id="i-tabelkort">
+            <h2>Standardrækken <span class="taeller" id="i-tabelnavn"></span></h2>
+            <p class="note-tekst" id="i-note"></p>
+            <div class="tabelboks" id="i-tabel"></div>
+            <div class="kopi-raekke">
+                <button class="knap blaa kopiknap" id="i-kopier" type="button">Kopiér til regnearket</button>
+                <button class="decimalkontakt" id="i-punktum" type="button" aria-pressed="false" title="Til et regneark på engelsk"><span class="dk-kontakt"><i></i></span>Punktum som decimaltegn</button>
+            </div>
+            <p class="kopisvar" id="i-kopisvar" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="i-opgavekort">
+            <h2>Opgaverne <span class="taeller maerke-tekst" id="i-maerke"></span></h2>
+            <ol class="trinliste opgliste" id="i-opgaver"></ol>
+            <button class="knap igenknap" id="i-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: DET LINEAERE OMRAADE                                       -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-l" role="tabpanel" aria-label="Det lineære område">
+    <div class="scene">
+        <canvas id="l-laerred"></canvas>
+        <div class="scenekort" id="l-skort">
+            <div class="sk-ind" id="l-ind"></div>
+            <div class="sk-bund" id="l-status">
+                <p class="st-tekst" id="l-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="l-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="l-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="l-anker-figur"></div>
+        <div class="anker" id="l-anker-graf"></div>
+        <div class="anker" id="l-anker-rammer"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort tabelkort" id="l-tabelkort">
+            <h2>Standardrækken <span class="taeller" id="l-tabelnavn"></span></h2>
+            <p class="note-tekst" id="l-note"></p>
+            <div class="tabelboks" id="l-tabel"></div>
+            <div class="kopi-raekke">
+                <button class="knap blaa kopiknap" id="l-kopier" type="button">Kopiér til regnearket</button>
+                <button class="decimalkontakt" id="l-punktum" type="button" aria-pressed="false" title="Til et regneark på engelsk"><span class="dk-kontakt"><i></i></span>Punktum som decimaltegn</button>
+            </div>
+            <p class="kopisvar" id="l-kopisvar" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="l-opgavekort">
+            <h2>Opgaven <span class="taeller maerke-tekst" id="l-maerke"></span></h2>
+            <ol class="trinliste opgliste" id="l-opgaver"></ol>
+            <button class="knap igenknap" id="l-forfra" type="button">↺ Begynd forfra</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Standardkurven</h2>
+        <h3 class="teori-hoved">Lambert-Beers lov</h3>
+        <p>Absorbansen er ekstinktionskoefficienten ganget med lysvejen og koncentrationen: <b class="nw">A = ε · l · c</b>. Lysvejen <i>l</i> er kuvettens bredde, som regel 1,00 cm. Loven gælder kun for fortyndede opløsninger.</p>
+        <h3 class="teori-hoved">Fra regnearket</h3>
+        <p>Indsæt tabellen i et regneark, lav et punktdiagram med koncentrationen på førsteaksen og absorbansen på andenaksen, og tilføj en lineær tendenslinje med ligningen. Regnearket skriver <b>y = a · x + b</b>, og på en standardkurve er det <b>A = a · c + b</b>.</p>
+        <ul class="teori-trin">
+            <li>Hældningen er <b>a = ε · l</b>, så <b>ε = a / l</b>.</li>
+            <li>Prøvens koncentration er <b>c = (A − b) / a</b>.</li>
+        </ul>
+        <h3 class="teori-hoved">Enhederne</h3>
+        <table class="teori-tabel">
+            <thead><tr><th>Enhed for c</th><th>Enhed for a</th><th>Enhed for ε</th></tr></thead>
+            <tbody>
+                <tr><td>M</td><td>M<sup>−1</sup></td><td>M<sup>−1</sup> · cm<sup>−1</sup></td></tr>
+                <tr><td>mM</td><td>mM<sup>−1</sup></td><td>mM<sup>−1</sup> · cm<sup>−1</sup></td></tr>
+                <tr><td>µM</td><td>µM<sup>−1</sup></td><td>µM<sup>−1</sup> · cm<sup>−1</sup></td></tr>
+            </tbody>
+        </table>
+        <p>1 mM<sup>−1</sup> = 1000 M<sup>−1</sup> og 1 µM<sup>−1</sup> = 10<sup>6</sup> M<sup>−1</sup>, fordi 1 mM = 0,001 M og 1 µM = 10<sup>−6</sup> M.</p>
+        <h3 class="teori-hoved">Fortynding og indhold</h3>
+        <p>Er prøven fortyndet, giver fortyndingsformlen koncentrationen før: <b>c<sub>før</sub> · V<sub>før</sub> = c<sub>efter</sub> · V<sub>efter</sub></b>. Indholdet regnes med stofmængden <b>n = c · V</b> og massen <b>m = n · M</b>.</p>
+        <h3 class="teori-hoved">Det lineære område</h3>
+        <p>Standardkurven kan kun bruges, hvor punkterne ligger på en ret linje. Ligger prøvens absorbans over den højeste standard i området, fortyndes prøven, og målingen gentages.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> opgaven forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

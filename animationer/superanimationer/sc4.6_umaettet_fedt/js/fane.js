@@ -46,8 +46,8 @@
      nyOpgave(o)        stil scenen op til maalet
      layout()           regn pladserne ud. this.baand().y er scenens bund
                         (der er intet baand nederst), og this.kortZone() er
-                        den plads, kortet har faaet sat af oeverst (198 px,
-                        172 px paa lave skaerme): det, eleven skal se paa,
+                        den plads, kortet har faaet sat af oeverst (156 px,
+                        146 px paa lave og 178 px paa smalle skaerme): det, eleven skal se paa,
                         begynder under 10 + kortZone() + 8, saa kortet
                         aldrig daekker det, heller ikke med et hint i
      tegn(), opdaterScene(dt)
@@ -67,7 +67,7 @@
    Indsend svar i et forsoeg (sc4.6): har fanen forsoegIndsend(), staar
    knappen ogsaa fremme i et forsoeg. kanIndsendes() siger, om der er noget
    at sende (ellers er knappen graa), indsendTekst() giver knappens tekst
-   (fx "Indsend svar: 7 dråber"), og ikkeKlar() teksten, naar eleven trykker
+   (fx "Indsend svar: 4 dråber"), og ikkeKlar() teksten, naar eleven trykker
    for tidligt. Fanen kalder this.visIndsend(), naar det skifter.
 
    Fanen KAN have: nyFase(fase), efterDel(), efterOpgave(), efterGaet(),
@@ -272,7 +272,11 @@
            gaet. Lupperne begynder under den, saa intet flytter sig, naar et
            spoergsmaal kommer. Lave skaerme har et mindre kort (se stilarket). */
         P.kortZone = function () {
-            return window.innerHeight <= 720 ? 172 : 198;
+            /* sc4.6: et lavere kort (brugeren 12. nov. 2026). Er panelet bredt i
+               forhold til scenen (under 1320 px, se stilarket), bryder teksten
+               oftere om, og under 1180 px staar svarene paa deres egen raekke. */
+            if (window.innerWidth < 1320) return 178;
+            return window.innerHeight <= 720 ? 146 : 156;
         };
 
         P.kortHTML = function () {

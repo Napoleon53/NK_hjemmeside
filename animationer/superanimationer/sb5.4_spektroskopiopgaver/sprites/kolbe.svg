@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="172" viewBox="0 0 100 172">
+  <!-- Maalekolbe af klart glas med prop. Vaesken tegnes af animationen
+       BAG denne fil (T.kolbeVaeske i js/tegning.js) med samme form:
+       halsen x 46-54, maerket ved y 40, kuglen om (50, 130) og bunden y 159.
+       Tom indeni, saa vaesken kan have enhver farve. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fb4c2" stop-opacity="0.55"/>
+      <stop offset="0.14" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.24" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="0.34" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="0.86" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#9fb4c2" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="prop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f6aa0"/>
+      <stop offset="0.35" stop-color="#5a9ad0"/>
+      <stop offset="1" stop-color="#21507d"/>
+    </linearGradient>
+    <radialGradient id="skygge" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#4b5a64" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#4b5a64" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="50" cy="164" rx="44" ry="6" fill="url(#skygge)"/>
+  <!-- glasset -->
+  <path d="M44 9 L44 86 C44 97 12 107 12 132 C12 150 21 162 35 162 L65 162 C79 162 88 150 88 132 C88 107 56 97 56 86 L56 9"
+        fill="url(#glas)" stroke="#7d93a3" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- maerket paa halsen -->
+  <path d="M43.5 40 Q50 43 56.5 40" fill="none" stroke="#3c4a52" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- proppen -->
+  <path d="M41 9 L59 9 L58 2 Q58 0 56 0 L44 0 Q42 0 42 2 Z" fill="url(#prop)" stroke="#1d4268" stroke-width="0.9" stroke-linejoin="round"/>
+  <rect x="44" y="9" width="12" height="4" fill="#1d4268" fill-opacity="0.35"/>
+  <!-- genskin -->
+  <path d="M47 16 L47 84" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M38 101 C24 109 18 120 18 134" fill="none" stroke="#ffffff" stroke-opacity="0.8" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M80 140 C79 150 74 156 66 158" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+</svg>

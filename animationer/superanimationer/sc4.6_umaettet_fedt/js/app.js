@@ -11,7 +11,8 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-d", "fane-m", "fane-u"];
+    /* Ét molekyle foerst, saa dryp og taeller eleven paa et molekyle, eleven kender (brugeren 12. nov. 2026) */
+    var faner = ["fane-m", "fane-d", "fane-u"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
