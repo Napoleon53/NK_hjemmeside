@@ -41,7 +41,7 @@ fanen kan komme med: `index.html#ioner&parring`.
 
 Tallene følger superanimationerne: R = 0,0831 L·bar/(mol·K) og Vₘ = ca. 24 L/mol
 ved stuetemperatur som i `sc5.7_idealgasligningen`, og oxidationstal skrives med romertal som i
-`sc8.2_oxidationstal`.
+`sc8.3_oxidationstal`.
 
 ## Skarpe bagsider
 

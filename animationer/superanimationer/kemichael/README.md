@@ -75,7 +75,7 @@ D.INTRO_FORSOEG = [
 på siden (panelet, kortet, en knap) eller et usynligt `.anker` over
 lærredet.
 
-Sådan kobles en fane på (mønster: `sc8.1_spaendingsraekken`):
+Sådan kobles en fane på (mønster: `sc8.2_spaendingsraekken`):
 
 1. `index.html`: `<link rel="stylesheet" href="../kemichael/praesentation.css">`
    efter stil.css og `<script src="../kemichael/praesentation.js"></script>`

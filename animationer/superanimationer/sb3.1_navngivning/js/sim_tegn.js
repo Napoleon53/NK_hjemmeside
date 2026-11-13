@@ -242,7 +242,7 @@
     P.kortData = function () {
         return {
             slags: "opgave", chip: "Opgave " + (this.nr + 1),
-            tekst: "Tegn molekylet på tavlen.",
+            tekst: "Tegn molekylet på tavlen, og tryk Test.",
             ekstra: F.navnHTML(this.dele(), { stor: true })
         };
     };
@@ -286,9 +286,10 @@
         this.visNavn(true);
     };
 
-    /* Nederst paa whiteboardet: navnet ved Test-knappen. Det staar der efter
+    /* Nederst paa whiteboardet: navnet paa tegningen. Det staar der efter
        Test (roedt, og det ryster), naar opgaven er loest (groent), og hele
-       tiden, naar kontakten er slaaet til. */
+       tiden, naar kontakten er slaaet til. Test selv staar paa kortet ved
+       hjaelpeknappen (brugeren 13. nov. 2026: "Den skal da med i tekstboksen"). */
     P.visNavn = function (ryst) {
         var t = this.testet, html = "", kl = "tb-navn";
         if (this.faerdig) { html = "Tegningen hedder: <b>" + NK.html(this.stof.navn) + "</b> ✓"; kl += " rigtig"; }
@@ -381,7 +382,7 @@
         this.saetAnker("tavle", t.x, t.y + 54, t.b, t.h - 54 - BUND - 12);
     };
 
-    /* Hoejden paa raekken nederst (kontakten, navnet og Test), som i stil.css */
+    /* Hoejden paa raekken nederst (kontakten og navnet), som i stil.css */
     var BUND = 40;
 
     /* Der tegnes mellem vaerktoejslinjen og raekken nederst */

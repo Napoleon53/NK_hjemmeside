@@ -37,6 +37,8 @@
             <div class="sk-bund" id="t-status">
                 <p class="st-tekst" id="t-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+                <!-- Test staar paa kortet som hovedknappen (brugeren 13. nov. 2026) -->
+                <button class="knap indsend" id="t-test" type="button" title="Test tegningen (Enter)">Test</button>
             </div>
         </div>
         <!-- Vaerktoejerne ligger oeverst paa whiteboardet (js/sim_tegn.js) -->
@@ -48,12 +50,11 @@
                 <button type="button" class="vtknap let" id="t-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
             </span>
         </div>
-        <!-- Nederst paa whiteboardet: kontakten, navnet og Test (js/sim_tegn.js) -->
+        <!-- Nederst paa whiteboardet: kontakten og navnet paa tegningen (js/sim_tegn.js) -->
         <div class="tegnebund" id="t-bund">
             <button type="button" class="navnekontakt" id="t-visnavn" role="switch" aria-checked="false" title="Vis navnet på tegningen, mens du tegner"><span class="kk-kontakt"><i></i></span>Vis navnet hele tiden</button>
             <span class="tb-hoejre">
                 <span class="tb-navn" id="t-navn" aria-live="polite"></span>
-                <button type="button" class="testknap" id="t-test" title="Test tegningen (Enter)">Test</button>
             </span>
         </div>
         <div class="anker" id="t-anker-tavle"></div>

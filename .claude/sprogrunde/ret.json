@@ -10633,7 +10633,7 @@
  },
  {
   "nr": 1349,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "så et dioxygenmolekyle optager 4, og ladningen falder fra 0 til −2.",
   "ny": "så et dioxygenmolekyle optager 4, og ladningen på hvert oxygenatom falder fra 0 til −2.",
   "hvorfor": "\"ladningen\" kunne læses som molekylets ladning; det er hvert oxygenatom, der får −2.",
@@ -10641,7 +10641,7 @@
  },
  {
   "nr": 1350,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Når ét stof afgiver elektroner, må et andet stof optage dem. Derfor sker det samtidig.\"",
   "ny": "\"Når ét stof afgiver elektroner, må et andet stof samtidig optage dem.\"",
   "hvorfor": "\"det\" i \"Derfor sker det samtidig\" sagde ikke, hvad der sker samtidig.",
@@ -10649,7 +10649,7 @@
  },
  {
   "nr": 1351,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "På fane 2 skriver du det samme som delreaktioner.",
   "ny": "På fane 2 skriver du oxidationen og reduktionen som delreaktioner.",
   "hvorfor": "\"det samme\" pegede tilbage på noget, eleven skal huske.",
@@ -10657,7 +10657,7 @@
  },
  {
   "nr": 1352,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Magnesium afgiver 2 e⁻, og dioxygen optager 4 e⁻. Hvor mange magnesiumatomer går der på ét O₂?\"",
   "ny": "\"Et magnesiumatom afgiver 2 e⁻, og ét O₂ optager 4 e⁻. Hvor mange magnesiumatomer går der på ét O₂?\"",
   "hvorfor": "Tallene gælder ét atom og ét molekyle; \"magnesium\" og \"dioxygen\" sagde ikke hvor meget.",
@@ -10665,7 +10665,7 @@
  },
  {
   "nr": 1353,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Ét magnesiumatom afgiver kun 2 elektroner, men dioxygen optager 4. Der skal afgives lige så mange.\"",
   "ny": "\"Ét magnesiumatom afgiver kun 2 elektroner, men der skal afgives lige så mange, som ét O₂ optager, altså 4.\"",
   "hvorfor": "\"lige så mange\" stod alene uden at sige som hvad.",
@@ -10673,7 +10673,7 @@
  },
  {
   "nr": 1354,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Dioxygen optager 4 elektroner. Hvor mange magnesiumatomer afgiver tilsammen 4?\"",
   "ny": "\"Et dioxygenmolekyle optager 4 elektroner. Hvor mange magnesiumatomer afgiver tilsammen 4?\"",
   "hvorfor": "De 4 elektroner gælder ét molekyle, ikke stoffet.",
@@ -10681,7 +10681,7 @@
  },
  {
   "nr": 1355,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Jern afgiver 3 e⁻, og dioxygen optager 4 e⁻. Hvor mange jernatomer går der på 3 dioxygenmolekyler?\"",
   "ny": "\"Et jernatom afgiver 3 e⁻, og ét O₂ optager 4 e⁻. Hvor mange jernatomer går der på 3 dioxygenmolekyler?\"",
   "hvorfor": "Tallene gælder ét atom og ét molekyle, som i spørgsmålet om magnesium.",
@@ -10689,7 +10689,7 @@
  },
  {
   "nr": 1356,
-  "fil": "sc8.0_redoxreaktioner/js/rundvisning.js",
+  "fil": "sc8.1_redoxreaktioner/js/rundvisning.js",
   "gammel": "Et klik på en plads med elektroner tager én af igen.",
   "ny": "Et klik på en plads med elektroner fjerner én elektron igen.",
   "hvorfor": "\"tager én af\" er talesprog og sagde ikke, at det er en elektron.",
@@ -10697,7 +10697,7 @@
  },
  {
   "nr": 1357,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "Natrium afgiver elektroner til chlor, så det er en redoxreaktion.",
   "ny": "Natrium afgiver elektroner til dichlor, så det er en redoxreaktion.",
   "hvorfor": "Stoffet Cl₂ hedder dichlor.",
@@ -10705,7 +10705,7 @@
  },
  {
   "nr": 1358,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Det er basen og oxidationsmidlet, der optager. Se, hvad HCl og magnesium gør i lupperne.\"",
   "ny": "\"Det er basen og oxidationsmidlet, der optager en partikel. Se, hvad HCl og magnesium gør i lupperne.\"",
   "hvorfor": "Sætningen sluttede med \"optager\" uden at sige hvad.",
@@ -10713,7 +10713,7 @@
  },
  {
   "nr": 1359,
-  "fil": "sc8.0_redoxreaktioner/js/data.js",
+  "fil": "sc8.1_redoxreaktioner/js/data.js",
   "gammel": "\"Syren afgiver en hydron, og reduktionsmidlet afgiver elektroner. Basen og oxidationsmidlet optager dem.\"",
   "ny": "\"Syren afgiver en hydron, og reduktionsmidlet afgiver elektroner. Basen optager hydronen, og oxidationsmidlet optager elektronerne.\"",
   "hvorfor": "\"dem\" kunne læses som elektronerne, så basen kom til at optage elektroner.",
@@ -10721,7 +10721,7 @@
  },
  {
   "nr": 1360,
-  "fil": "sc8.0_redoxreaktioner/js/sim_sammen.js",
+  "fil": "sc8.1_redoxreaktioner/js/sim_sammen.js",
   "gammel": "\"Træk: reaktionerne op i kortene\"",
   "ny": "\"Træk: reaktionerne op i boksene\"",
   "hvorfor": "Opgaven kalder dem bokse, og \"kortet\" er ellers kortet øverst med opgaven.",
@@ -10729,7 +10729,7 @@
  },
  {
   "nr": 1361,
-  "fil": "sc8.0_redoxreaktioner/js/sim_sammen.js",
+  "fil": "sc8.1_redoxreaktioner/js/sim_sammen.js",
   "gammel": "\"Klik nu på det kort, reaktionen hører til.\"",
   "ny": "\"Klik nu på den boks, reaktionen hører til.\"",
   "hvorfor": "Samme ord som i opgaven, så eleven ikke tror, det er kortet øverst.",
@@ -10737,7 +10737,7 @@
  },
  {
   "nr": 1362,
-  "fil": "sc8.0_redoxreaktioner/index.html",
+  "fil": "sc8.1_redoxreaktioner/index.html",
   "gammel": "som to delreaktioner med elektronerne som e⁻.",
   "ny": "som to delreaktioner, hvor elektronerne skrives som e⁻.",
   "hvorfor": "Bogen har rettet samme vending (\"med elektronerne som e⁻\") til denne.",
@@ -10745,7 +10745,7 @@
  },
  {
   "nr": 1363,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Se i luppen, hvad Cu²⁺ bliver til, når de rammer stangen.\"",
   "ny": "\"Se i luppen, hvad Cu²⁺-ionerne bliver til, når de rammer stangen.\"",
   "hvorfor": "\"de\" passede ikke til \"Cu²⁺\" alene.",
@@ -10753,7 +10753,7 @@
  },
  {
   "nr": 1364,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Kobberionerne optager elektroner fra zink og bliver til kobber på stangen.\"",
   "ny": "\"Kobber(II)ionerne optager elektroner fra zink og bliver til kobber på stangen.\"",
   "hvorfor": "Bogen skriver kobber(II)ion med romertal.",
@@ -10761,7 +10761,7 @@
  },
  {
   "nr": 1365,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "spm: \"Væsken bliver blå. Hvor kommer farven fra?\"",
   "ny": "spm: \"Væsken i glasset med Ag⁺ bliver blå. Hvor kommer farven fra?\"",
   "hvorfor": "\"Væsken\" sagde ikke, hvilket af de seks glas der menes.",
@@ -10769,7 +10769,7 @@
  },
  {
   "nr": 1366,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "[\"Kobberioner fra stangen\", \"Sølvnitrat bliver blåt, når det står\", \"Sølvet på stangen\"]",
   "ny": "[\"Kobber(II)ioner fra stangen\", \"Sølv(I)nitrat bliver blåt med tiden\", \"Sølvet på stangen\"]",
   "hvorfor": "Romertal som i bogen, og \"når det står\" var talesprog.",
@@ -10777,7 +10777,7 @@
  },
  {
   "nr": 1367,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "spm: \"Intet sker. Hvad gør kobberionerne i luppen?\"",
   "ny": "spm: \"Der sker intet i glasset med Cu²⁺. Hvad gør kobber(II)ionerne i luppen?\"",
   "hvorfor": "\"Intet sker\" sagde ikke hvor; romertal som i bogen.",
@@ -10785,7 +10785,7 @@
  },
  {
   "nr": 1368,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Så ville de blive til kobber. Se efter i luppen.\"",
   "ny": "\"Kobber(II)ionerne ville blive til kobber, hvis de tog elektroner. Se efter i luppen.\"",
   "hvorfor": "\"Så ville de\" pegede tilbage på svaret og var talesprog.",
@@ -10793,7 +10793,7 @@
  },
  {
   "nr": 1369,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Sølv afgiver ikke elektroner til kobberionerne. Det gjorde zink.\"",
   "ny": "\"Kobber(II)ionerne optager elektroner fra zink, men ikke fra sølv.\"",
   "hvorfor": "\"Det gjorde zink\" pegede tilbage på et tidligere forsøg.",
@@ -10801,7 +10801,7 @@
  },
  {
   "nr": 1370,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "spm: \"Hvad er boblerne?\"",
   "ny": "spm: \"Hvad er boblerne i saltsyren?\"",
   "hvorfor": "Spørgsmålet sagde ikke, hvilke bobler der menes.",
@@ -10809,7 +10809,7 @@
  },
  {
   "nr": 1371,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Prøv resten, så skemaet bliver fyldt ud.\"",
   "ny": "\"Prøv alle stænger i alle glas, så skemaet bliver fyldt ud.\"",
   "hvorfor": "\"resten\" sagde ikke, hvad der skal prøves.",
@@ -10817,7 +10817,7 @@
  },
  {
   "nr": 1372,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"De tomme felter i skemaet mangler. Hver stang skal i hvert glas, undtagen sit eget metal.\"",
   "ny": "\"Hvert tomt felt i skemaet er et forsøg, der mangler. Hver stang skal i alle glas undtagen glasset med ioner af samme metal.\"",
   "hvorfor": "\"De tomme felter mangler\" sagde ikke noget, og en stang kan ikke komme i \"sit eget metal\".",
@@ -10825,7 +10825,7 @@
  },
  {
   "nr": 1373,
-  "fil": "sc8.1_spaendingsraekken/js/sim_forsoeg.js",
+  "fil": "sc8.2_spaendingsraekken/js/sim_forsoeg.js",
   "gammel": "\":</b> intet sker. Det er det samme metal.\"",
   "ny": "\":</b> intet sker. Stangen og ionerne er af samme metal.\"",
   "hvorfor": "\"Det\" sagde ikke, hvad der er af samme metal.",
@@ -10833,7 +10833,7 @@
  },
  {
   "nr": 1374,
-  "fil": "sc8.1_spaendingsraekken/js/kemi.js",
+  "fil": "sc8.2_spaendingsraekken/js/kemi.js",
   "gammel": "salt: \"zinksulfat\"",
   "ny": "salt: \"zink(II)sulfat\"",
   "hvorfor": "Bogen giver zink romertal (Niels 18. okt.).",
@@ -10841,7 +10841,7 @@
  },
  {
   "nr": 1375,
-  "fil": "sc8.1_spaendingsraekken/js/kemi.js",
+  "fil": "sc8.2_spaendingsraekken/js/kemi.js",
   "gammel": "salt: \"sølvnitrat\"",
   "ny": "salt: \"sølv(I)nitrat\"",
   "hvorfor": "Bogen skriver sølv(I)nitrat.",
@@ -10849,7 +10849,7 @@
  },
  {
   "nr": 1376,
-  "fil": "sc8.1_spaendingsraekken/js/kemi.js",
+  "fil": "sc8.2_spaendingsraekken/js/kemi.js",
   "gammel": "K.ionerne = function (s) { return K.STOF[s].gas ? \"H⁺\" : K.STOF[s].navn + \"ionerne\"; };",
   "ny": "K.ionerne = function (s) { var st = K.STOF[s]; return st.gas ? \"H⁺\" : st.navn + ([\"Li\", \"K\", \"Ca\", \"Na\", \"Mg\", \"Al\"].indexOf(s) < 0 ? [\"\", \"(I)\", \"(II)\", \"(III)\"][st.q] : \"\") + \"ionerne\"; };",
   "hvorfor": "Ionernes navne i beskederne får romertal som i bogen (kobber(II)ionerne, sølv(I)ionerne), men ikke magnesium og aluminium.",
@@ -10857,7 +10857,7 @@
  },
  {
   "nr": 1377,
-  "fil": "sc8.1_spaendingsraekken/_selvtest.html",
+  "fil": "sc8.2_spaendingsraekken/_selvtest.html",
   "gammel": "/Zink står til højre for jern\\. Men zink reagerede med jernionerne/",
   "ny": "/Zink står til højre for jern\\. Men zink reagerede med jern\\(II\\)ionerne/",
   "hvorfor": "Selvtesten følger med romertallet i ionernes navne.",
@@ -10865,7 +10865,7 @@
  },
  {
   "nr": 1378,
-  "fil": "sc8.1_spaendingsraekken/js/rundvisning.js",
+  "fil": "sc8.2_spaendingsraekken/js/rundvisning.js",
   "gammel": "Et klik på en stang i et glas sender den hjem.",
   "ny": "Et klik på en stang i et glas sætter den tilbage på plads.",
   "hvorfor": "\"sender den hjem\" er talesprog.",
@@ -10873,7 +10873,7 @@
  },
  {
   "nr": 1379,
-  "fil": "sc8.1_spaendingsraekken/js/rundvisning.js",
+  "fil": "sc8.2_spaendingsraekken/js/rundvisning.js",
   "gammel": "Forudsig: brug rækken, før stangen kommer ned.",
   "ny": "Forudsig: brug spændingsrækken, før stangen kommer ned.",
   "hvorfor": "\"rækken\" kunne forveksles med fanen Rækken.",
@@ -10881,7 +10881,7 @@
  },
  {
   "nr": 1380,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Stil de seks på hylden i rækkefølge, fra uædel til ædel.\"",
   "ny": "\"Stil de seks kort på hylden i rækkefølge, fra uædel til ædel.\"",
   "hvorfor": "\"de seks\" sagde ikke, hvad der skal stilles op.",
@@ -10889,7 +10889,7 @@
  },
  {
   "nr": 1381,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\" Prøv det på fane 1.\"",
   "ny": "\" Prøv forsøget på fane 1.\"",
   "hvorfor": "\"det\" sagde ikke, hvad der skal prøves.",
@@ -10897,7 +10897,7 @@
  },
  {
   "nr": 1382,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\", så \" + K.navn(r) + \" skal stå til venstre.\" + prov;",
   "ny": "\", så \" + K.navn(r) + \" skal stå til venstre for \" + K.navn(l) + \".\" + prov;",
   "hvorfor": "\"til venstre\" sagde ikke for hvad.",
@@ -10905,7 +10905,7 @@
  },
  {
   "nr": 1383,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "Står stangens metal til venstre for ionernes?",
   "ny": "Står stangens metal til venstre for ionernes metal?",
   "hvorfor": "\"ionernes\" manglede sit navneord.",
@@ -10913,7 +10913,7 @@
  },
  {
   "nr": 1384,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "(rigtigt ? \"Rigtigt. \" : \"Der skete noget. \")",
   "ny": "(rigtigt ? \"Rigtigt. \" : \"Der skete en reaktion. \")",
   "hvorfor": "\"noget\" er upræcist; svarknapperne siger \"en reaktion\".",
@@ -10921,7 +10921,7 @@
  },
  {
   "nr": 1385,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "(rigtigt ? \"Rigtigt. \" : \"Intet skete. \")",
   "ny": "(rigtigt ? \"Rigtigt. \" : \"Der skete ingen reaktion. \")",
   "hvorfor": "Samme ord som svarknapperne.",
@@ -10929,7 +10929,7 @@
  },
  {
   "nr": 1386,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "D.KOEF_SPM = \"Afstem. Skriv,",
   "ny": "D.KOEF_SPM = \"Afstem reaktionen. Skriv,",
   "hvorfor": "\"Afstem.\" alene var telegramstil.",
@@ -10937,7 +10937,7 @@
  },
  {
   "nr": 1387,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "var t = K.Navn(r.m) + \" afgiver \" + r.a + \" e⁻. Hver \"",
   "ny": "var t = \"Hvert \" + K.navn(r.m) + \"atom afgiver \" + r.a + \" e⁻. Hver \"",
   "hvorfor": "Antallet af elektroner gælder ét atom, ikke metallet.",
@@ -10945,7 +10945,7 @@
  },
  {
   "nr": 1388,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\" Hvor mange af hver, før der er lige mange elektroner begge veje?\"",
   "ny": "\" Hvor mange skal der være af hver, så der afgives lige så mange elektroner, som der optages?\"",
   "hvorfor": "\"begge veje\" var uklart og telegramstil.",
@@ -10953,7 +10953,7 @@
  },
  {
   "nr": 1389,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\" efter. H₂ har to.\"",
   "ny": "\" efter. Hvert H₂ har to H.\"",
   "hvorfor": "\"H₂ har to\" sagde ikke to af hvad.",
@@ -10961,7 +10961,7 @@
  },
  {
   "nr": 1390,
-  "fil": "sc8.1_spaendingsraekken/js/data.js",
+  "fil": "sc8.2_spaendingsraekken/js/data.js",
   "gammel": "\"Atomerne passer, men ladningen gør ikke: \" + plus(svar.v)",
   "ny": "\"Atomerne passer, men ladningen er \" + plus(svar.v)",
   "hvorfor": "Talesprog og kolon midt i sætningen.",
@@ -10969,7 +10969,7 @@
  },
  {
   "nr": 1391,
-  "fil": "sc8.1_spaendingsraekken/js/sim_forudsig.js",
+  "fil": "sc8.2_spaendingsraekken/js/sim_forudsig.js",
   "gammel": "\"Svar først på kortet: sker der noget? Så kommer stangen ned.\"",
   "ny": "\"Svar først på kortet, om der sker en reaktion. Derefter kommer stangen ned i glasset.\"",
   "hvorfor": "Kolon midt i sætningen og \"Så kommer\" som talesprog.",
@@ -10977,7 +10977,7 @@
  },
  {
   "nr": 1392,
-  "fil": "sc8.1_spaendingsraekken/index.html",
+  "fil": "sc8.2_spaendingsraekken/index.html",
   "gammel": "Zink i kobber(II)sulfat: zink afgiver elektroner og går i opløsning som Zn²⁺. Kobberionerne optager",
   "ny": "Når zink kommer i kobber(II)sulfat, afgiver zink elektroner og går i opløsning som Zn²⁺. Kobber(II)ionerne optager",
   "hvorfor": "Kolon foran en hel sætning med lille begyndelsesbogstav; romertal som i bogen.",
@@ -10985,14 +10985,14 @@
  },
  {
   "nr": 1393,
-  "fil": "sc8.1_spaendingsraekken/index.html",
+  "fil": "sc8.2_spaendingsraekken/index.html",
   "gammel": "når kobber reagerer med sølvioner:",
   "ny": "når kobber reagerer med sølv(I)ioner:",
   "hvorfor": "Bogen skriver sølv(I)ioner.",
   "hvor": "Teoripanelet"
  },
  {
-  "fil": "sc8.1_spaendingsraekken/_selvtest.html",
+  "fil": "sc8.2_spaendingsraekken/_selvtest.html",
   "gammel": "/ladningen gør ikke/",
   "ny": "/ladningen er \\+/",
   "hvorfor": "Selvtesten følger med.",
@@ -11001,7 +11001,7 @@
  },
  {
   "nr": 1395,
-  "fil": "sc8.2_oxidationstal/js/ox.js",
+  "fil": "sc8.3_oxidationstal/js/ox.js",
   "gammel": "\"Der står ingen ladning efter formlen. Så er stoffet neutralt, og ladningen er 0.\"",
   "ny": "\"Der står ingen ladning efter formlen. Derfor er stoffet neutralt, og ladningen er 0.\"",
   "hvorfor": "\"Så er\" er talesprog.",
@@ -11009,7 +11009,7 @@
  },
  {
   "nr": 1396,
-  "fil": "sc8.2_oxidationstal/js/ox.js",
+  "fil": "sc8.3_oxidationstal/js/ox.js",
   "gammel": "O trækker hårdt i elektronerne, så tallet er negativt.",
   "ny": "O trækker hårdt i elektronerne, så oxidationstallet er negativt.",
   "hvorfor": "\"tallet\" sagde ikke, hvilket tal der menes.",
@@ -11017,7 +11017,7 @@
  },
  {
   "nr": 1397,
-  "fil": "sc8.2_oxidationstal/js/ox.js",
+  "fil": "sc8.3_oxidationstal/js/ox.js",
   "gammel": "H afgiver sin elektron, så tallet er positivt.",
   "ny": "H afgiver sin elektron, så oxidationstallet er positivt.",
   "hvorfor": "\"tallet\" sagde ikke, hvilket tal der menes.",
@@ -11025,7 +11025,7 @@
  },
  {
   "nr": 1398,
-  "fil": "sc8.2_oxidationstal/js/ox.js",
+  "fil": "sc8.3_oxidationstal/js/ox.js",
   "gammel": "\"Tallet over \" + k + \" gælder ét \"",
   "ny": "\"Oxidationstallet over \" + k + \" gælder ét \"",
   "hvorfor": "\"Tallet\" sagde ikke, hvilket tal der menes.",
@@ -11033,7 +11033,7 @@
  },
  {
   "nr": 1399,
-  "fil": "sc8.2_oxidationstal/js/ox.js",
+  "fil": "sc8.3_oxidationstal/js/ox.js",
   "gammel": "Der er intet andet atom at give elektronerne til, så tallet er 0.",
   "ny": "Der er intet andet grundstof at give elektronerne til, så oxidationstallet er 0.",
   "hvorfor": "I S₈ er der andre atomer; det er et andet grundstof, der mangler.",
@@ -11041,7 +11041,7 @@
  },
  {
   "nr": 1400,
-  "fil": "sc8.2_oxidationstal/js/sim_regler.js",
+  "fil": "sc8.3_oxidationstal/js/sim_regler.js",
   "gammel": "Der er ingen andre atomer at give elektronerne til.",
   "ny": "Der er intet andet grundstof at give elektronerne til.",
   "hvorfor": "I S₈ er der andre atomer; det er et andet grundstof, der mangler.",
@@ -11049,7 +11049,7 @@
  },
  {
   "nr": 1401,
-  "fil": "sc8.2_oxidationstal/js/data.js",
+  "fil": "sc8.3_oxidationstal/js/data.js",
   "gammel": "note: \"C kan have alt fra −IV til +IV.\"",
   "ny": "note: \"C kan have alle oxidationstal fra −IV til +IV.\"",
   "hvorfor": "\"alt fra\" var talesprog og sagde ikke, at det er oxidationstal.",
@@ -11057,7 +11057,7 @@
  },
  {
   "nr": 1402,
-  "fil": "sc8.2_oxidationstal/js/data.js",
+  "fil": "sc8.3_oxidationstal/js/data.js",
   "gammel": "rg: \"Alle 31. Summen er ladningen, hver gang.\"",
   "ny": "rg: \"Alle 31 stoffer er løst. Summen af oxidationstallene var stoffets ladning hver gang.\"",
   "hvorfor": "\"Alle 31\" og \"Summen\" sagde ikke, hvad der tælles og lægges sammen.",
@@ -11065,7 +11065,7 @@
  },
  {
   "nr": 1403,
-  "fil": "sc8.2_oxidationstal/js/data.js",
+  "fil": "sc8.3_oxidationstal/js/data.js",
   "gammel": "\"Rigtigt.\", \"Den sidder.\", \"Præcis.\"",
   "ny": "\"Rigtigt.\", \"Korrekt.\", \"Præcis.\"",
   "hvorfor": "\"Den sidder\" er talesprog, og \"Den\" peger ingen steder hen.",
@@ -11073,7 +11073,7 @@
  },
  {
   "nr": 1404,
-  "fil": "sc8.2_oxidationstal/js/data.js",
+  "fil": "sc8.3_oxidationstal/js/data.js",
   "gammel": "[\"Den er i hus.\", \"Rigtigt regnet.\"",
   "ny": "[\"Opgaven er løst.\", \"Rigtigt regnet.\"",
   "hvorfor": "\"Den er i hus\" er talesprog.",
@@ -11081,7 +11081,7 @@
  },
  {
   "nr": 1405,
-  "fil": "sc8.2_oxidationstal/js/rundvisning.js",
+  "fil": "sc8.3_oxidationstal/js/rundvisning.js",
   "gammel": "ladningen, O, H og til sidst det ukendte.",
   "ny": "ladningen, O, H og til sidst det ukendte oxidationstal.",
   "hvorfor": "\"det ukendte\" manglede sit navneord.",
@@ -11089,7 +11089,7 @@
  },
  {
   "nr": 1406,
-  "fil": "sc8.2_oxidationstal/js/rundvisning.js",
+  "fil": "sc8.3_oxidationstal/js/rundvisning.js",
   "gammel": "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke gør.",
   "ny": "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke virker.",
   "hvorfor": "Sætningen sluttede med \"gør\" uden sit led.",
@@ -11097,7 +11097,7 @@
  },
  {
   "nr": 1407,
-  "fil": "sc8.2_oxidationstal/js/sim_elektroner.js",
+  "fil": "sc8.3_oxidationstal/js/sim_elektroner.js",
   "gammel": "(mangler.length > 1 ? \"hvilke oxidationstal har \" : \"hvilket oxidationstal har \")",
   "ny": "(mangler.length > 1 ? \"Hvilke oxidationstal har \" : \"Hvilket oxidationstal har \")",
   "hvorfor": "Et spørgsmål efter kolon begynder med stort som i bogen.",
@@ -11105,7 +11105,7 @@
  },
  {
   "nr": 1408,
-  "fil": "sc8.2_oxidationstal/_selvtest.html",
+  "fil": "sc8.3_oxidationstal/_selvtest.html",
   "gammel": "Gæt først: hvilke oxidationstal har O og H?\", spm2());",
   "ny": "Gæt først: Hvilke oxidationstal har O og H?\", spm2());",
   "hvorfor": "Selvtesten følger med det store bogstav.",
@@ -11113,7 +11113,7 @@
  },
  {
   "nr": 1409,
-  "fil": "sc8.2_oxidationstal/_selvtest.html",
+  "fil": "sc8.3_oxidationstal/_selvtest.html",
   "gammel": "/Gæt først: hvilket oxidationstal har H\\?$/",
   "ny": "/Gæt først: Hvilket oxidationstal har H\\?$/",
   "hvorfor": "Selvtesten følger med det store bogstav.",
@@ -11121,7 +11121,7 @@
  },
  {
   "nr": 1410,
-  "fil": "sc8.2_oxidationstal/js/sim_elektroner.js",
+  "fil": "sc8.3_oxidationstal/js/sim_elektroner.js",
   "gammel": "\"Elektronerne går til atomet med det største tal. Er tallene ens, deles de.\"",
   "ny": "\"Elektronparret går til atomet med den største elektronegativitet. Er tallene ens, deles parret.\"",
   "hvorfor": "\"det største tal\" sagde ikke, at tallet er elektronegativiteten.",
@@ -11129,7 +11129,7 @@
  },
  {
   "nr": 1411,
-  "fil": "sc8.2_oxidationstal/js/sim_elektroner.js",
+  "fil": "sc8.3_oxidationstal/js/sim_elektroner.js",
   "gammel": "\"To \" + til.s + \" trækker lige hårdt. Parret deles: \" +\n                (u.b.orden > 1 ? \"to elektroner\" : \"én elektron\") + \" til hver.\"",
   "ny": "\"To \" + til.s + \" trækker lige hårdt, så hvert \" + til.s + \" får \" +\n                (u.b.orden > 1 ? \"to elektroner\" : \"én elektron\") + \" fra bindingen.\"",
   "hvorfor": "Kolon midt i sætningen, og \"Parret\" passede ikke til en dobbeltbinding.",
@@ -11137,7 +11137,7 @@
  },
  {
   "nr": 1412,
-  "fil": "sc8.2_oxidationstal/js/sim_elektroner.js",
+  "fil": "sc8.3_oxidationstal/js/sim_elektroner.js",
   "gammel": "this.fejlLinje(til.s + \" har \" + this.enNavn(til) + \", og \"",
   "ny": "this.fejlLinje(til.s + \" har elektronegativiteten \" + this.enNavn(til) + \", og \"",
   "hvorfor": "\"H har 2,1\" sagde ikke, hvad tallet er.",
@@ -11145,7 +11145,7 @@
  },
  {
   "nr": 1413,
-  "fil": "sc8.2_oxidationstal/js/data.js",
+  "fil": "sc8.3_oxidationstal/js/data.js",
   "gammel": "ek: \"Alle 12. Reglerne er en genvej. Elektronerne er grunden.\"",
   "ny": "ek: \"Alle 12 molekyler og ioner er løst. Reglerne er en genvej, og elektronerne viser, hvorfor reglerne virker.\"",
   "hvorfor": "\"Alle 12\" og \"Elektronerne er grunden\" var stikord uden ophav.",
@@ -11153,7 +11153,7 @@
  },
  {
   "nr": 1414,
-  "fil": "sc8.2_oxidationstal/index.html",
+  "fil": "sc8.3_oxidationstal/index.html",
   "gammel": "Så må man tilbage til elektronerne.",
   "ny": "I de tilfælde må oxidationstallet findes ud fra elektronerne.",
   "hvorfor": "\"Så må man tilbage til\" var talesprog og sagde ikke, hvad der skal findes.",
@@ -11161,7 +11161,7 @@
  },
  {
   "nr": 1415,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\"Oxidation eller reduktion? Vælg ved hver klamme.\"",
   "ny": "\"Vælg ved hver klamme, om det er en oxidation eller en reduktion.\"",
   "hvorfor": "Telegramstil; nu er det én hel sætning.",
@@ -11169,7 +11169,7 @@
  },
  {
   "nr": 1416,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\"Du har byttet om. \"",
   "ny": "\"Du har byttet om på stigningen og faldet. \"",
   "hvorfor": "\"byttet om\" sagde ikke på hvad.",
@@ -11177,7 +11177,7 @@
  },
  {
   "nr": 1417,
-  "fil": "sc8.3_redoxafstemning/js/redox.js",
+  "fil": "sc8.4_redoxafstemning/js/redox.js",
   "gammel": "return \"Det er for alle \" + P.nV",
   "ny": "return \"Dit tal gælder alle \" + P.nV",
   "hvorfor": "\"Det\" sagde ikke, at det er elevens tal.",
@@ -11185,7 +11185,7 @@
  },
  {
   "nr": 1418,
-  "fil": "sc8.3_redoxafstemning/js/redox.js",
+  "fil": "sc8.4_redoxafstemning/js/redox.js",
   "gammel": "return \"Det er et oxidationstal. Brug forskellen fra \"",
   "ny": "return \"Dit tal er et oxidationstal. Brug forskellen fra \"",
   "hvorfor": "\"Det\" sagde ikke, at det er elevens tal.",
@@ -11193,7 +11193,7 @@
  },
  {
   "nr": 1419,
-  "fil": "sc8.3_redoxafstemning/js/redox.js",
+  "fil": "sc8.4_redoxafstemning/js/redox.js",
   "gammel": "\". Tæl trinene.\";",
   "ny": "\". Find forskellen mellem de to oxidationstal.\";",
   "hvorfor": "\"trinene\" kunne forveksles med animationens syv trin.",
@@ -11201,7 +11201,7 @@
  },
  {
   "nr": 1420,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\". Hvor mange trin er det?\";",
   "ny": "\". Hvor meget ændrer hvert oxidationstal sig?\";",
   "hvorfor": "\"trin\" kunne forveksles med animationens syv trin.",
@@ -11209,7 +11209,7 @@
  },
  {
   "nr": 1421,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\" Find det mindste antal elektroner, som begge går op i.\"",
   "ny": "\" Find det mindste antal elektroner, som begge tal går op i.\"",
   "hvorfor": "\"begge\" manglede sit navneord.",
@@ -11217,7 +11217,7 @@
  },
  {
   "nr": 1422,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\"Afstemt, men alle tallene kan deles med \"",
   "ny": "\"Reaktionen er afstemt, men alle tallene kan deles med \"",
   "hvorfor": "\"Afstemt\" alene var telegramstil.",
@@ -11225,7 +11225,7 @@
  },
  {
   "nr": 1423,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\"Tjek tallene igen. Hvert par skal have lige mange atomer på begge sider.\"",
   "ny": "\"Tjek tallene igen. Hvert grundstof på klammerne skal have lige mange atomer før og efter pilen.\"",
   "hvorfor": "\"Hvert par\" er et ord fra koden, som eleven ikke ser.",
@@ -11233,7 +11233,7 @@
  },
  {
   "nr": 1424,
-  "fil": "sc8.3_redoxafstemning/js/opgave.js",
+  "fil": "sc8.4_redoxafstemning/js/opgave.js",
   "gammel": "\". Så \" + ion + \" skal på den side, der har \"",
   "ny": "\". Derfor skal \" + ion + \" stå på den side, der har \"",
   "hvorfor": "\"Så H⁺ skal på\" var talesprog.",
@@ -11241,7 +11241,7 @@
  },
  {
   "nr": 1425,
-  "fil": "sc8.3_redoxafstemning/js/data.js",
+  "fil": "sc8.4_redoxafstemning/js/data.js",
   "gammel": "kontekst: \"Sølvtræet: kobbertråd i sølvnitrat.\"",
   "ny": "kontekst: \"Sølvtræet: kobbertråd i sølv(I)nitrat.\"",
   "hvorfor": "Bogen skriver sølv(I)nitrat.",
@@ -11249,7 +11249,7 @@
  },
  {
   "nr": 1426,
-  "fil": "sc8.3_redoxafstemning/js/data.js",
+  "fil": "sc8.4_redoxafstemning/js/data.js",
   "gammel": "kontekst: \"Zink i en opløsning med kobberioner.\"",
   "ny": "kontekst: \"Zink i en opløsning med kobber(II)ioner.\"",
   "hvorfor": "Bogen skriver kobber(II)ioner.",
@@ -11257,7 +11257,7 @@
  },
  {
   "nr": 1427,
-  "fil": "sc8.3_redoxafstemning/js/data.js",
+  "fil": "sc8.4_redoxafstemning/js/data.js",
   "gammel": "Blyakkumulatoren aflades. Sulfaten er udeladt.",
   "ny": "Blyakkumulatoren aflades. Sulfationerne er udeladt.",
   "hvorfor": "\"Sulfaten\" sagde ikke, at det er ionerne.",
@@ -11265,7 +11265,7 @@
  },
  {
   "nr": 1428,
-  "fil": "sc8.3_redoxafstemning/js/rundvisning.js",
+  "fil": "sc8.4_redoxafstemning/js/rundvisning.js",
   "gammel": "klammer ved parrene",
   "ny": "klammer over og under skemaet",
   "hvorfor": "\"parrene\" er et ord fra koden, som eleven ikke ser.",
@@ -11273,7 +11273,7 @@
  },
  {
   "nr": 1429,
-  "fil": "sc8.3_redoxafstemning/js/rundvisning.js",
+  "fil": "sc8.4_redoxafstemning/js/rundvisning.js",
   "gammel": "Den står lige, når der afgives lige så mange, som der optages.",
   "ny": "Den står lige, når der afgives lige så mange elektroner, som der optages.",
   "hvorfor": "\"lige så mange\" manglede sit navneord.",
@@ -11281,7 +11281,7 @@
  },
  {
   "nr": 1430,
-  "fil": "sc8.3_redoxafstemning/js/rundvisning.js",
+  "fil": "sc8.4_redoxafstemning/js/rundvisning.js",
   "gammel": "Let har ingen reaktioner med oxygen.",
   "ny": "Let har ingen stoffer med oxygen.",
   "hvorfor": "\"reaktioner med oxygen\" kunne læses som reaktioner med dioxygen.",
@@ -11289,7 +11289,7 @@
  },
  {
   "nr": 1431,
-  "fil": "sc8.3_redoxafstemning/index.html",
+  "fil": "sc8.4_redoxafstemning/index.html",
   "gammel": "I en redoxreaktion flytter elektroner fra ét stof til et andet.",
   "ny": "I en redoxreaktion overføres elektroner fra ét stof til et andet.",
   "hvorfor": "Elektroner overføres; de flytter ikke (bogens ord).",
@@ -11297,7 +11297,7 @@
  },
  {
   "nr": 1432,
-  "fil": "sc8.3_redoxafstemning/index.html",
+  "fil": "sc8.4_redoxafstemning/index.html",
   "gammel": "Så står det samme stof to gange, mens der afstemmes,",
   "ny": "Det samme stof står da to gange i skemaet, mens der afstemmes,",
   "hvorfor": "\"Så står\" var talesprog.",
@@ -11305,7 +11305,7 @@
  },
  {
   "nr": 1433,
-  "fil": "sc8.3_redoxafstemning/index.html",
+  "fil": "sc8.4_redoxafstemning/index.html",
   "gammel": "Vægten står lige, når der afgives lige så mange, som der optages.",
   "ny": "Vægten står lige, når der afgives lige så mange elektroner, som der optages.",
   "hvorfor": "\"lige så mange\" manglede sit navneord.",
@@ -11313,7 +11313,7 @@
  },
  {
   "nr": 1434,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "ug: \"Ét urglas og fire flasker. Fyld glasset ved at trække flaskerne hen over det. Dryp så i, og afstem det, der sker.\"",
   "ny": "ug: \"På bordet står ét urglas og fire flasker. Fyld glasset ved at trække flaskerne hen over det. Dryp så i, og afstem reaktionen.\"",
   "hvorfor": "\"Ét urglas og fire flasker\" var telegramstil, og \"det, der sker\" sagde ikke, at det er reaktionen.",
@@ -11321,7 +11321,7 @@
  },
  {
   "nr": 1435,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "obs: \"Det brune forsvandt. Glasset er næsten farveløst.\"",
   "ny": "obs: \"Det brune bundfald forsvandt. Glasset er næsten farveløst.\"",
   "hvorfor": "\"Det brune\" manglede sit navneord.",
@@ -11329,7 +11329,7 @@
  },
  {
   "nr": 1436,
-  "fil": "sc8.4_kaliumpermanganat/js/rundvisning.js",
+  "fil": "sc8.5_kaliumpermanganat/js/rundvisning.js",
   "gammel": "klammer under skemaet med ↑ og ↓ under pilen.",
   "ny": "klammer under skemaet med ↑ og ↓ under reaktionspilen.",
   "hvorfor": "\"pilen\" kunne forveksles med pilene ↑ og ↓.",
@@ -11337,7 +11337,7 @@
  },
  {
   "nr": 1437,
-  "fil": "sc8.4_kaliumpermanganat/js/rundvisning.js",
+  "fil": "sc8.5_kaliumpermanganat/js/rundvisning.js",
   "gammel": "Går de op, flytter elektronerne over.",
   "ny": "Når gangetallene er rigtige, overføres elektronerne.",
   "hvorfor": "\"Går de op\" var uklart, og elektroner overføres; de flytter ikke.",
@@ -11345,7 +11345,7 @@
  },
  {
   "nr": 1438,
-  "fil": "sc8.4_kaliumpermanganat/js/rundvisning.js",
+  "fil": "sc8.5_kaliumpermanganat/js/rundvisning.js",
   "gammel": "{ sel: \"#ug-kort\", titel: \"Bidderne\", tekst: \"Her står reaktionen og de bidder, du har klaret.",
   "ny": "{ sel: \"#ug-kort\", titel: \"Trinene\", tekst: \"Her står reaktionen og de trin, du har klaret.",
   "hvorfor": "\"Bidderne\" er et ord fra koden; knappen på kortet hedder Næste trin.",
@@ -11353,7 +11353,7 @@
  },
  {
   "nr": 1439,
-  "fil": "sc8.4_kaliumpermanganat/js/rundvisning.js",
+  "fil": "sc8.5_kaliumpermanganat/js/rundvisning.js",
   "gammel": "{ sel: \"#fl-kort\", titel: \"Bidderne\", tekst: \"Her står reaktionen og de bidder, du har klaret.",
   "ny": "{ sel: \"#fl-kort\", titel: \"Trinene\", tekst: \"Her står reaktionen og de trin, du har klaret.",
   "hvorfor": "\"Bidderne\" er et ord fra koden; knappen på kortet hedder Næste trin.",
@@ -11361,7 +11361,7 @@
  },
  {
   "nr": 1440,
-  "fil": "sc8.4_kaliumpermanganat/js/fane.js",
+  "fil": "sc8.5_kaliumpermanganat/js/fane.js",
   "gammel": "\"Afstem skemaet før, så åbner denne\"",
   "ny": "\"Afstem den forrige reaktion, så åbner denne\"",
   "hvorfor": "\"skemaet før\" kunne læses som \"skemaet først\".",
@@ -11369,7 +11369,7 @@
  },
  {
   "nr": 1441,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "if (st.slags === \"grundstof\") hint = st.tekst + \" er et grundstof. Så er tallet 0.\";",
   "ny": "if (st.slags === \"grundstof\") hint = st.tekst + \" er et grundstof, så oxidationstallet er 0.\";",
   "hvorfor": "\"Så er tallet\" var talesprog og sagde ikke, hvilket tal.",
@@ -11377,7 +11377,7 @@
  },
  {
   "nr": 1442,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "hint = st.tekst + \" er en ion af ét atom. Tallet er ionens ladning.\";",
   "ny": "hint = st.tekst + \" er en ion af ét atom. Oxidationstallet er ionens ladning.\";",
   "hvorfor": "\"Tallet\" sagde ikke, hvilket tal der menes.",
@@ -11385,7 +11385,7 @@
  },
  {
   "nr": 1443,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\". Alle tallene skal give \" + (st.q ?",
   "ny": "\". Summen af oxidationstallene skal være \" + (st.q ?",
   "hvorfor": "\"Alle tallene skal give\" sagde ikke, at det er summen af oxidationstallene.",
@@ -11393,7 +11393,7 @@
  },
  {
   "nr": 1444,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\"Alle tallene skal give 0, for \"",
   "ny": "\"Summen af oxidationstallene skal være 0, for \"",
   "hvorfor": "\"Alle tallene skal give\" sagde ikke, at det er summen af oxidationstallene.",
@@ -11401,7 +11401,7 @@
  },
  {
   "nr": 1445,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\"Alle tallene skal give ionens ladning, \"",
   "ny": "\"Summen af oxidationstallene skal være ionens ladning, \"",
   "hvorfor": "\"Alle tallene skal give\" sagde ikke, at det er summen af oxidationstallene.",
@@ -11409,7 +11409,7 @@
  },
  {
   "nr": 1446,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\"O sidder på O her, så O er ikke −II. \"",
   "ny": "\"O er bundet til O her, så O er ikke −II. \"",
   "hvorfor": "\"sidder på\" er talesprog for en binding.",
@@ -11417,7 +11417,7 @@
  },
  {
   "nr": 1447,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "\"O er ikke −II her, for O sidder på O. \"",
   "ny": "\"O er ikke −II her, for O er bundet til O. \"",
   "hvorfor": "\"sidder på\" er talesprog for en binding.",
@@ -11425,7 +11425,7 @@
  },
  {
   "nr": 1448,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\". Går det op eller ned, og hvor mange trin?\"",
   "ny": "\". Stiger eller falder oxidationstallet, og hvor meget?\"",
   "hvorfor": "\"det\" og \"trin\" var uklare; trin er også navnet på skridtene i hæftet.",
@@ -11433,7 +11433,7 @@
  },
  {
   "nr": 1449,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "\". Tallet bliver \" + (K.op ?",
   "ny": "\". Oxidationstallet bliver \" + (K.op ?",
   "hvorfor": "\"Tallet\" sagde ikke, hvilket tal der menes.",
@@ -11441,7 +11441,7 @@
  },
  {
   "nr": 1450,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "return \"Det er for ét \" + K.E",
   "ny": "return \"Dit tal gælder ét \" + K.E",
   "hvorfor": "\"Det\" sagde ikke, at det er elevens tal.",
@@ -11449,7 +11449,7 @@
  },
  {
   "nr": 1451,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "\"Du har lagt tallene sammen. Hvor mange trin er der fra \"",
   "ny": "\"Du har lagt tallene sammen. Hvor meget ændrer oxidationstallet sig fra \"",
   "hvorfor": "\"trin\" kunne forveksles med skridtene i hæftet.",
@@ -11457,7 +11457,7 @@
  },
  {
   "nr": 1452,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "return \"Det er et oxidationstal. Skriv forskellen fra \"",
   "ny": "return \"Dit tal er et oxidationstal. Skriv forskellen fra \"",
   "hvorfor": "\"Det\" sagde ikke, at det er elevens tal.",
@@ -11465,7 +11465,7 @@
  },
  {
   "nr": 1453,
-  "fil": "sc8.4_kaliumpermanganat/js/redox.js",
+  "fil": "sc8.5_kaliumpermanganat/js/redox.js",
   "gammel": "\". Tæl trinene\" + (K.antal > 1 ?",
   "ny": "\". Find forskellen\" + (K.antal > 1 ?",
   "hvorfor": "\"trinene\" kunne forveksles med skridtene i hæftet.",
@@ -11473,7 +11473,7 @@
  },
  {
   "nr": 1454,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "linjer.push(\"Tallet \" + (K.op ?",
   "ny": "linjer.push(\"Oxidationstallet \" + (K.op ?",
   "hvorfor": "\"Tallet\" sagde ikke, hvilket tal der menes.",
@@ -11481,7 +11481,7 @@
  },
  {
   "nr": 1455,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\"Går tallet op eller ned? Tæl trinene på tallinjen.\"",
   "ny": "\"Går oxidationstallet op eller ned? Tæl trinene på tallinjen.\"",
   "hvorfor": "\"tallet\" sagde ikke, hvilket tal der menes.",
@@ -11489,7 +11489,7 @@
  },
  {
   "nr": 1456,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "this.besked(\"Rigtigt. Nu den anden klamme.\", \"god\");",
   "ny": "this.besked(\"Rigtigt. Udfyld nu den anden klamme.\", \"god\");",
   "hvorfor": "\"Nu den anden klamme\" var telegramstil uden udsagnsord.",
@@ -11497,7 +11497,7 @@
  },
  {
   "nr": 1457,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\"Det går op, men begge tal kan deles med \"",
   "ny": "\"Stigning og fald er lige store, men begge tal kan deles med \"",
   "hvorfor": "\"Det går op\" var talesprog og sagde ikke, hvad der passer.",
@@ -11505,7 +11505,7 @@
  },
  {
   "nr": 1458,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\". Der flytter \" + R.elektroner + \" elektroner.\";",
   "ny": "\". Der overføres \" + R.elektroner + \" elektroner.\";",
   "hvorfor": "Elektroner overføres; de flytter ikke (bogens ord).",
@@ -11513,7 +11513,7 @@
  },
  {
   "nr": 1459,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "kort = OX.gange + \" og \" + RED.gange + \". Så flytter der \" + R.elektroner + \" elektroner.\";",
   "ny": "kort = \"Gangetallene er \" + OX.gange + \" og \" + RED.gange + \", så der overføres \" + R.elektroner + \" elektroner.\";",
   "hvorfor": "\"5 og 2.\" sagde ikke, hvad tallene er, og elektroner overføres.",
@@ -11521,7 +11521,7 @@
  },
  {
   "nr": 1460,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\". Der flytter \" + fael + \" elektroner.\";",
   "ny": "\". Der overføres \" + fael + \" elektroner.\";",
   "hvorfor": "Elektroner overføres; de flytter ikke (bogens ord).",
@@ -11529,7 +11529,7 @@
  },
  {
   "nr": 1461,
-  "fil": "sc8.4_kaliumpermanganat/js/bord.js",
+  "fil": "sc8.5_kaliumpermanganat/js/bord.js",
   "gammel": "\" e⁻ er flyttet\"",
   "ny": "\" e⁻ er overført\"",
   "hvorfor": "Elektroner overføres; de flytter ikke (bogens ord).",
@@ -11537,7 +11537,7 @@
  },
  {
   "nr": 1462,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\"Glasset er neutralt: vand kan give OH⁻, men ikke H⁺. \"",
   "ny": "\"Glasset er neutralt. Vand kan give OH⁻, men ikke H⁺. \"",
   "hvorfor": "Kolon foran en hel sætning med lille begyndelsesbogstav.",
@@ -11545,7 +11545,7 @@
  },
  {
   "nr": 1463,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\"Hvert H₂O har 2 H. Så skal der kun halvt så mange H₂O, som der mangler H.\"",
   "ny": "\"Hvert H₂O har 2 H. Derfor skal der kun halvt så mange H₂O, som der mangler H.\"",
   "hvorfor": "\"Så skal der\" var talesprog.",
@@ -11553,7 +11553,7 @@
  },
  {
   "nr": 1464,
-  "fil": "sc8.4_kaliumpermanganat/js/forklaring.js",
+  "fil": "sc8.5_kaliumpermanganat/js/forklaring.js",
   "gammel": "\". Så er der \" + (R.slut.v.H || 0)",
   "ny": "\". Nu er der \" + (R.slut.v.H || 0)",
   "hvorfor": "\"Så er der\" var talesprog.",
@@ -11561,7 +11561,7 @@
  },
  {
   "nr": 1465,
-  "fil": "sc8.4_kaliumpermanganat/js/sim.js",
+  "fil": "sc8.5_kaliumpermanganat/js/sim.js",
   "gammel": "\" trin, og der flyttede \"",
   "ny": "\" trin, og der blev overført \"",
   "hvorfor": "\"trin\" kunne forveksles med skridtene i hæftet, og elektroner overføres. Forkortet, så kortet holder sig inden for sin plads.",
@@ -11569,7 +11569,7 @@
  },
  {
   "nr": 1466,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "ug: \"Alle tre. Mangan faldt 1, 2 og 2 trin, fra +VII til +II.\"",
   "ny": "ug: \"Alle tre er afstemt. Mangan faldt 1, 2 og 2 trin, fra +VII til +II.\"",
   "hvorfor": "\"Alle tre\" og \"Mangan faldt\" var stikord uden ophav. Forkortet, så kortet holder sig inden for sin plads.",
@@ -11577,7 +11577,7 @@
  },
  {
   "nr": 1467,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "D.ROS = [\"Rigtigt.\", \"Den sidder.\", \"Præcis.\"",
   "ny": "D.ROS = [\"Rigtigt.\", \"Korrekt.\", \"Præcis.\"",
   "hvorfor": "\"Den sidder\" er talesprog, og \"Den\" peger ingen steder hen.",
@@ -11585,7 +11585,7 @@
  },
  {
   "nr": 1468,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "\"Færdig.\", \"Den er i hus.\", \"Skemaet går op.\"",
   "ny": "\"Færdig.\", \"Skemaet er afstemt.\", \"Skemaet går op.\"",
   "hvorfor": "\"Den er i hus\" er talesprog.",
@@ -11593,7 +11593,7 @@
  },
  {
   "nr": 1469,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "\"Samme stoffer som på første fane, men i syre falder mangan hele vejen.\"",
   "ny": "\"Samme stoffer som på første fane, men i syre falder oxidationstallet for mangan helt til +II.\"",
   "hvorfor": "\"falder mangan hele vejen\" var talesprog og sagde ikke hvortil.",
@@ -11601,7 +11601,7 @@
  },
  {
   "nr": 1470,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "Permanganat titreres tit mod oxalat.",
   "ny": "Permanganat titreres ofte mod oxalat.",
   "hvorfor": "\"tit\" er talesprog.",
@@ -11609,7 +11609,7 @@
  },
  {
   "nr": 1471,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "kontekst: \"Det brune er diiod, I₂. Det er opløst og ligger ikke på bunden.\"",
   "ny": "kontekst: \"Den brune farve kommer fra diiod, I₂. Diiod er opløst og ligger ikke på bunden.\"",
   "hvorfor": "\"Det brune\" og \"Det\" manglede deres navneord.",
@@ -11617,7 +11617,7 @@
  },
  {
   "nr": 1472,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "kontekst: \"Det orange er dibrom, Br₂.\"",
   "ny": "kontekst: \"Den orange farve kommer fra dibrom, Br₂.\"",
   "hvorfor": "\"Det orange\" manglede sit navneord.",
@@ -11625,7 +11625,7 @@
  },
  {
   "nr": 1473,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "\"Permanganat dryppes i andre stoffer. Afstem på samme måde, med klammer under skemaet.\"",
   "ny": "\"Permanganat dryppes i andre stoffer. Afstem på samme måde som på første fane, med klammer under skemaet.\"",
   "hvorfor": "\"på samme måde\" sagde ikke som hvad.",
@@ -11633,7 +11633,7 @@
  },
  {
   "nr": 1474,
-  "fil": "sc8.4_kaliumpermanganat/js/data.js",
+  "fil": "sc8.5_kaliumpermanganat/js/data.js",
   "gammel": "fl: \"Alle 14. Stigning gange tal er fald gange tal, hver gang.\"",
   "ny": "fl: \"Alle 14 reaktioner er afstemt. Stigning gange tal var lig med fald gange tal hver gang.\"",
   "hvorfor": "\"Alle 14\" var stikord uden navneord.",
@@ -11641,7 +11641,7 @@
  },
  {
   "nr": 1475,
-  "fil": "sc8.4_kaliumpermanganat/index.html",
+  "fil": "sc8.5_kaliumpermanganat/index.html",
   "gammel": "1. Skriv oxidationstallet over de atomer, der skifter.<br>",
   "ny": "1. Skriv oxidationstallet over de atomer, der ændrer oxidationstal.<br>",
   "hvorfor": "\"der skifter\" sagde ikke hvad.",
@@ -11649,7 +11649,7 @@
  },
  {
   "nr": 1476,
-  "fil": "sc8.4_kaliumpermanganat/index.html",
+  "fil": "sc8.5_kaliumpermanganat/index.html",
   "gammel": "Skriv stigningen ↑ eller faldet ↓ under pilen.<br>",
   "ny": "Skriv stigningen ↑ eller faldet ↓ under reaktionspilen.<br>",
   "hvorfor": "\"pilen\" kunne forveksles med pilene ↑ og ↓.",
@@ -11657,7 +11657,7 @@
  },
  {
   "nr": 1477,
-  "fil": "sc8.4_kaliumpermanganat/index.html",
+  "fil": "sc8.5_kaliumpermanganat/index.html",
   "gammel": "Hvor langt mangan falder, afhænger af miljøet:",
   "ny": "Hvor langt oxidationstallet for mangan falder, afhænger af miljøet:",
   "hvorfor": "Det er oxidationstallet, der falder, ikke mangan.",
@@ -11665,14 +11665,14 @@
  },
  {
   "nr": 1478,
-  "fil": "sc8.4_kaliumpermanganat/index.html",
+  "fil": "sc8.5_kaliumpermanganat/index.html",
   "gammel": "og med mere at reagere med videre til brunsten.",
   "ny": "og med mere reduktionsmiddel videre til brunsten.",
   "hvorfor": "\"med mere at reagere med\" var tungt og upræcist.",
   "hvor": "Teoripanelet"
  },
  {
-  "fil": "sc8.4_kaliumpermanganat/_selvtest.html",
+  "fil": "sc8.5_kaliumpermanganat/_selvtest.html",
   "gammel": "paastand(\"klammen med 2 I: 1 er for ét I\", /for ét I/.test(X.klammeFejl(R11.ox, true, 1)), X.klammeFejl(R11.ox, true, 1));",
   "ny": "paastand(\"klammen med 2 I: 1 er for ét I\", /gælder ét I/.test(X.klammeFejl(R11.ox, true, 1)), X.klammeFejl(R11.ox, true, 1));",
   "hvorfor": "Selvtesten følger med.",
@@ -11681,7 +11681,7 @@
  },
  {
   "nr": 1480,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "Det er jernionerne, Fe²⁺, der går ud i vandet.",
   "ny": "Det er jern(II)ionerne, Fe²⁺, der går ud i vandet.",
   "hvorfor": "Bogen skriver jern(II)ion med romertal.",
@@ -11689,7 +11689,7 @@
  },
  {
   "nr": 1481,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Vandet løber gennem begge rør som før. Se i luppen: går der elektroner over samlingen?\"",
   "ny": "\"Vandet løber gennem begge rør som før. Se i luppen, om der går elektroner over samlingen.\"",
   "hvorfor": "Kolon foran et helt spørgsmål med lille begyndelsesbogstav.",
@@ -11697,7 +11697,7 @@
  },
  {
   "nr": 1482,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Et metal skifter ikke plads i spændingsrækken. Se i luppen: går der elektroner over samlingen?\"",
   "ny": "\"Et metal skifter ikke plads i spændingsrækken. Se i luppen, om der går elektroner over samlingen.\"",
   "hvorfor": "Kolon foran et helt spørgsmål med lille begyndelsesbogstav.",
@@ -11705,7 +11705,7 @@
  },
  {
   "nr": 1483,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "I opgave 1 var det jernrøret, der blev tæret.",
   "ny": "I opgave 1 med kobber og jern var det jernrøret, der blev tæret.",
   "hvorfor": "Henvisningen til opgave 1 sagde ikke, hvilke rør det var.",
@@ -11713,7 +11713,7 @@
  },
  {
   "nr": 1484,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "Spændingsrækken i panelet viser, hvem der afgiver til hvem.",
   "ny": "Spændingsrækken i panelet viser, hvilket metal der afgiver elektroner til hvilket.",
   "hvorfor": "\"hvem der afgiver til hvem\" var talesprog og sagde ikke hvad.",
@@ -11721,7 +11721,7 @@
  },
  {
   "nr": 1485,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "{ t: \"Kobberioner i vandet tager elektroner fra jernet\", ok: true }",
   "ny": "{ t: \"Kobber(II)ioner i vandet tager elektroner fra jernet\", ok: true }",
   "hvorfor": "Bogen skriver kobber(II)ioner.",
@@ -11729,7 +11729,7 @@
  },
  {
   "nr": 1486,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "En kobberion tager to elektroner fra et jernatom.",
   "ny": "En kobber(II)ion tager to elektroner fra et jernatom.",
   "hvorfor": "Bogen skriver kobber(II)ion.",
@@ -11737,7 +11737,7 @@
  },
  {
   "nr": 1487,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "På jernrøret tager hver kobberion to elektroner",
   "ny": "På jernrøret tager hver kobber(II)ion to elektroner",
   "hvorfor": "Bogen skriver kobber(II)ion.",
@@ -11745,7 +11745,7 @@
  },
  {
   "nr": 1488,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "+ K.navn(par.ioner.fra) + \"ioner med hen til \"",
   "ny": "+ K.navn(par.ioner.fra) + \"(II)ioner med hen til \"",
   "hvorfor": "Ionerne får romertal som i bogen (kobber(II)ioner); alle tre metaller danner 2+-ioner her.",
@@ -11753,7 +11753,7 @@
  },
  {
   "nr": 1489,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Det er det samme som jernrøret og kobberrøret på fane 1.\"",
   "ny": "\"Skroget og propellen svarer til jernrøret og kobberrøret på fane 1.\"",
   "hvorfor": "\"Det er det samme\" sagde ikke, hvad der er det samme.",
@@ -11761,7 +11761,7 @@
  },
  {
   "nr": 1490,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Det er det samme som i rørene: jern og kobber rører hinanden i vand.",
   "ny": "\"Jern og kobber rører hinanden i vand, ligesom i rørene på fane 1.",
   "hvorfor": "\"Det er det samme\" pegede tilbage, og kolonnet stod foran en hel sætning.",
@@ -11769,7 +11769,7 @@
  },
  {
   "nr": 1491,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Zn → Zn²⁺ + 2 e⁻. Zinkionerne går ud i havvandet.\"",
   "ny": "\"Zn → Zn²⁺ + 2 e⁻. Zn²⁺ går ud i havvandet.\"",
   "hvorfor": "Bogen skriver zink(II)ioner. Forkortet, så kortet holder sig inden for sin plads.",
@@ -11777,7 +11777,7 @@
  },
  {
   "nr": 1492,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Så skulle zinken optage elektroner. Se på de gule elektroner: de går væk fra klodsen.\"",
   "ny": "\"Den reaktion kræver, at zinken optager elektroner. Se på de gule elektroner, som går væk fra klodsen.\"",
   "hvorfor": "\"Så skulle\" var talesprog og pegede tilbage på svaret.",
@@ -11785,7 +11785,7 @@
  },
  {
   "nr": 1493,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "og zinkionerne går ud i havvandet.",
   "ny": "og Zn²⁺ går ud i havvandet.",
   "hvorfor": "Bogen skriver zink(II)ioner. Forkortet, så kortet holder sig inden for sin plads.",
@@ -11793,7 +11793,7 @@
  },
  {
   "nr": 1494,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Tryk på Sejl 1 år, og følg tallet under klodsen.\"",
   "ny": "\"Tryk på Sejl 1 år, og følg, hvor mange procent der er tilbage af klodsen.\"",
   "hvorfor": "\"tallet\" sagde ikke, hvad tallet viser.",
@@ -11801,7 +11801,7 @@
  },
  {
   "nr": 1495,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"Sæt en zinkklods på skroget, og hold øje med tallet under den efter hvert år.\"",
   "ny": "\"Sæt en zinkklods på skroget, og hold øje med, hvor mange procent der er tilbage af den efter hvert år.\"",
   "hvorfor": "\"tallet\" sagde ikke, hvad tallet viser.",
@@ -11809,7 +11809,7 @@
  },
  {
   "nr": 1496,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "Så går intet zink til spilde.",
   "ny": "På den måde går intet zink til spilde.",
   "hvorfor": "\"Så går\" var talesprog.",
@@ -11817,7 +11817,7 @@
  },
  {
   "nr": 1497,
-  "fil": "sc8.6_korrosion/js/sim_rust.js",
+  "fil": "sc8.7_korrosion/js/sim_rust.js",
   "gammel": "Der mangler \" + mangler + \".\";",
   "ny": "Der mangler \" + mangler + (mangler === 1 ? \" mulighed.\" : \" muligheder.\");",
   "hvorfor": "\"Der mangler 2\" sagde ikke to af hvad.",
@@ -11825,7 +11825,7 @@
  },
  {
   "nr": 1498,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "Der skal afgives lige så mange, som der optages. Skriv tallene i det samlede skema.",
   "ny": "Der skal afgives lige så mange elektroner, som der optages. Skriv tallene i det samlede skema.",
   "hvorfor": "\"lige så mange\" manglede sit navneord.",
@@ -11833,7 +11833,7 @@
  },
  {
   "nr": 1499,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "Jern har nu afgivet tre elektroner i alt.",
   "ny": "Hvert jernatom har nu afgivet tre elektroner i alt.",
   "hvorfor": "De tre elektroner gælder ét jernatom.",
@@ -11841,7 +11841,7 @@
  },
  {
   "nr": 1500,
-  "fil": "sc8.6_korrosion/js/sim_rust.js",
+  "fil": "sc8.7_korrosion/js/sim_rust.js",
   "gammel": "\"En jernion, Fe²⁺. Den var",
   "ny": "\"En jern(II)ion, Fe²⁺. Den var",
   "hvorfor": "Bogen skriver jern(II)ion.",
@@ -11849,7 +11849,7 @@
  },
  {
   "nr": 1501,
-  "fil": "sc8.6_korrosion/js/data.js",
+  "fil": "sc8.7_korrosion/js/data.js",
   "gammel": "\"NaCl består af natrium og chlor. Dioxygenet kommer fra luften.\"",
   "ny": "\"NaCl består af Na⁺ og Cl⁻. Dioxygenet kommer fra luften.\"",
   "hvorfor": "NaCl består af ioner, ikke af grundstofferne natrium og chlor.",
@@ -11857,7 +11857,7 @@
  },
  {
   "nr": 1502,
-  "fil": "sc8.6_korrosion/index.html",
+  "fil": "sc8.7_korrosion/index.html",
   "gammel": "Noget andet skal optage elektronerne.",
   "ny": "Et andet stof skal optage elektronerne.",
   "hvorfor": "\"Noget andet\" var upræcist.",
@@ -11865,7 +11865,7 @@
  },
  {
   "nr": 1503,
-  "fil": "sc8.6_korrosion/index.html",
+  "fil": "sc8.7_korrosion/index.html",
   "gammel": "jo hurtigere går det.</p>",
   "ny": "jo hurtigere tæres det mindst ædle metal.</p>",
   "hvorfor": "\"det\" sagde ikke, hvad der går hurtigere.",
@@ -11873,7 +11873,7 @@
  },
  {
   "nr": 1504,
-  "fil": "sc8.6_korrosion/index.html",
+  "fil": "sc8.7_korrosion/index.html",
   "gammel": "har det kobberioner med.",
   "ny": "har det kobber(II)ioner med.",
   "hvorfor": "Bogen skriver kobber(II)ioner.",
@@ -11881,14 +11881,14 @@
  },
  {
   "nr": 1505,
-  "fil": "sc8.6_korrosion/index.html",
+  "fil": "sc8.7_korrosion/index.html",
   "gammel": "<span class=\"eksempel-hoved\">Kobberioner på jern</span>",
   "ny": "<span class=\"eksempel-hoved\">Kobber(II)ioner på jern</span>",
   "hvorfor": "Bogen skriver kobber(II)ioner.",
   "hvor": "Teoripanelet, eksemplet"
  },
  {
-  "fil": "sc8.6_korrosion/_selvtest.html",
+  "fil": "sc8.7_korrosion/_selvtest.html",
   "gammel": "/kobberioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById(\"r-proevet\").textContent), linje(R));",
   "ny": "/kobber\\(II\\)ioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById(\"r-proevet\").textContent), linje(R));",
   "hvorfor": "Selvtesten følger med.",
@@ -11896,7 +11896,7 @@
   "nr": 1506
  },
  {
-  "fil": "sc8.6_korrosion/_selvtest.html",
+  "fil": "sc8.7_korrosion/_selvtest.html",
   "gammel": "/kobberioner med hen til jernrøret\\. Sæt jernrøret til venstre/.test(D.roerForkert({ par: [\"Fe\", \"Cu\"], orden: true, plast: true }, cuplast)));",
   "ny": "/kobber\\(II\\)ioner med hen til jernrøret\\. Sæt jernrøret til venstre/.test(D.roerForkert({ par: [\"Fe\", \"Cu\"], orden: true, plast: true }, cuplast)));",
   "hvorfor": "Selvtesten følger med.",
@@ -11905,7 +11905,7 @@
  },
  {
   "nr": 1508,
-  "fil": "sc8.7_byg_figuren/js/data.js",
+  "fil": "sc8.8_byg_figuren/js/data.js",
   "gammel": "\"Skema, der kun viser det ene stof, som enten afgiver eller optager elektroner. Elektronerne skrives med som e⁻.\"",
   "ny": "\"Skema, der kun viser, hvordan ét stof afgiver eller optager elektroner. Elektronerne skrives med som e⁻.\"",
   "hvorfor": "Bogens fagordliste er rettet til denne ordlyd; forklaringen skal følge bogen.",
@@ -11913,7 +11913,7 @@
  },
  {
   "nr": 1509,
-  "fil": "sc8.7_byg_figuren/js/data.js",
+  "fil": "sc8.8_byg_figuren/js/data.js",
   "gammel": "\"Tal, der udtrykker, hvor mange elektroner atomet har afgivet",
   "ny": "\"Tal, der angiver, hvor mange elektroner et atom har afgivet",
   "hvorfor": "Bogens fagordliste er rettet til denne ordlyd; forklaringen skal følge bogen.",
@@ -11921,7 +11921,7 @@
  },
  {
   "nr": 1510,
-  "fil": "sc8.7_byg_figuren/js/fig_mangan.js",
+  "fil": "sc8.8_byg_figuren/js/fig_mangan.js",
   "gammel": "\"<b>reduktion</b> er det, der sker mod højre. Pladsen",
   "ny": "\"<b>reduktion</b> er det, pilen under glassene viser. Pladsen",
   "hvorfor": "\"mod højre\" sagde ikke, hvad der peges på.",
@@ -11929,7 +11929,7 @@
  },
  {
   "nr": 1511,
-  "fil": "sc8.7_byg_figuren/js/fig_mangan.js",
+  "fil": "sc8.8_byg_figuren/js/fig_mangan.js",
   "gammel": "ion: \"<b>reduktion</b> er pilen under glassene. Over",
   "ny": "ion: \"<b>reduktion</b> er det, pilen under glassene viser. Over",
   "hvorfor": "En reduktion er ikke en pil; pilen viser den.",
@@ -24653,7 +24653,7 @@
    "sc5.13_byg_figuren/js/motor.js",
    "sc6.4_byg_figuren/js/motor.js",
    "sc7.6_byg_figuren/js/motor.js",
-   "sc8.7_byg_figuren/js/motor.js"
+   "sc8.8_byg_figuren/js/motor.js"
   ]
  },
  {

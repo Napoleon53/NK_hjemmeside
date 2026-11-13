@@ -17,8 +17,8 @@
         "fane-t": [
             { sel: "#t-skort", titel: "Kortet øverst", tekst: "Kortet viser stoffets navn delt i forled, stamme og endelse. Tegn molekylet på tavlen. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#t-vt", titel: "Værktøjerne", tekst: "Med Kæde vokser kæden, når du trækker fra et carbonatom eller klikker på et. = Binding gør en binding dobbelt og derefter tripel. De andre knapper sætter en gruppe eller et atom på det carbonatom, du klikker på." },
-            { sel: "#t-anker-tavle", titel: "Tavlen", tekst: "Tegn molekylet her. Et højreklik på et atom for enden af kæden sletter atomet." },
-            { sel: "#t-bund", titel: "Test", tekst: "Tryk Test, når du er færdig. Navnet på din tegning står derefter ved knappen, og kortet viser, hvad der ikke passer. Kontakten Vis navnet hele tiden viser navnet, mens du tegner." },
+            { sel: "#t-anker-tavle, #t-bund", titel: "Tavlen", tekst: "Tegn molekylet her. Et højreklik på et atom for enden af kæden sletter atomet. Kontakten Vis navnet hele tiden viser navnet på din tegning, mens du tegner." },
+            { sel: "#t-test", titel: "Test", tekst: "Tryk Test, når du er færdig. Kortet viser derefter, hvad der ikke passer, og navnet på din tegning står nederst på tavlen." },
             { sel: "#t-slet, #t-fortryd, #t-ryd", titel: "Slet, Fortryd og Ryd", tekst: "Med Slet fjerner du et atom for enden af kæden ved at klikke på det. Fortryd tager det sidste skridt tilbage. Ryd fjerner hele tegningen." },
             { sel: "#fane-t .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne på begge faner." },
             { sel: "#t-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge en opgave. En løst opgave får et flueben og en stjerne, hvis du ikke fik vist svaret." }

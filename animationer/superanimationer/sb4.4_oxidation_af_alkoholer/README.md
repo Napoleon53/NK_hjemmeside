@@ -84,9 +84,9 @@ er 3 alkoholmolekyler, der med 2 MnO₄⁻ giver 2 OH⁻.
    altid ophavets farve. Nyt: eleven finder selv oxidationstallet og klikker
    på det hydrogenatom, oxidationsmidlet tager; propan-2-ol og
    2-methylpropan-2-ol viser de to andre typer; fane 2 med ti alkoholer.
-3. **Naboerne:** `sc8.3_redoxafstemning` og `sc8.4_kaliumpermanganat` ejer
+3. **Naboerne:** `sc8.4_redoxafstemning` og `sc8.5_kaliumpermanganat` ejer
    afstemningen i almindelighed; fane 3 bruger bogens fem trin på to
-   bestemte reaktioner. `sc8.2_oxidationstal` ejer oxidationstal i almindelighed
+   bestemte reaktioner. `sc8.3_oxidationstal` ejer oxidationstal i almindelighed
    (reglerne og elektronparrene i uorganiske stoffer); her er det kun
    carbonatomet med OH-gruppen. `sc8.4` og `sc8.5` ejer afstemningen og
    permanganatens farver; dichromatets farveskift er her kun et tegn på, at

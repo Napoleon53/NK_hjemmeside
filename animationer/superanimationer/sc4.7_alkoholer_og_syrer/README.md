@@ -210,7 +210,7 @@ bagefter. Start forfra står i panelet, aldrig på kortet.
 
 ## I menuen
 
-I menuen fra 13. nov. 2026 som C4 knap 5 "Alkoholer og syrer" (koden `c4.alkoholer`, linjen til `til_panelet.js` i `index.html`). Mappen er ikke omdøbt, og det er Byg et fedtstof og Umættet fedt heller ikke (nu knap 6 og 7), som da sc8.0 blev C8 knap 1. Det, der står herunder, var planen.
+I menuen fra 13. nov. 2026 som C4 knap 5 "Alkoholer og syrer" (koden `c4.alkoholer`, linjen til `til_panelet.js` i `index.html`). Mappen er ikke omdøbt, og det er Byg et fedtstof og Umættet fedt heller ikke (nu knap 6 og 7), som Redoxreaktioner i første omgang, da den blev C8 knap 1 (kapitel 8 fik nye mappenumre samme dag, da brugeren bad om det). Det, der står herunder, var planen.
 
 Ikke i menuen. Når brugeren siger til: C4 i `kemi-c-filer/samling_c4.html`
 (efter Addition og plastik passer med bogens rækkefølge; så skal mappen og

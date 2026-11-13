@@ -1,4 +1,6 @@
-# sc8.6 Korrosion
+# sc8.7 Korrosion
+
+Mappen fik nyt nummer 13. nov. 2026, da Redoxreaktioner blev knap 1 i C8 (nummeret er knappens plads i panelet; se superanimationernes README).
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv og papirkortet fra `../faelles/` (`papirkort.css`,

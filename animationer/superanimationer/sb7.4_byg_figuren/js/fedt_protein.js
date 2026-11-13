@@ -418,7 +418,7 @@
     /* ----- Glas ------------------------------------------------------------ */
 
     /* En erlenmeyerkolbe med bund i (cx, bund) og hoejden h (som LAB.erlenmeyer
-       i sc8.7_byg_figuren). o.fyld er vaesken, o.niveau dens hoejde (0 til 1) */
+       i sc8.8_byg_figuren). o.fyld er vaesken, o.niveau dens hoejde (0 til 1) */
     FP.kolbe = function (g, cx, bund, h, o) {
         o = o || {};
         var gg = SV.g(g), KANT = "#7d8b96";

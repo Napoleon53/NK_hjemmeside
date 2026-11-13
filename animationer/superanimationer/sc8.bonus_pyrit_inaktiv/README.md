@@ -31,7 +31,7 @@ To sætninger i bestillingen var ikke skrevet færdige ("Du skal hellere
 udvælge" og "Måske kan en del af opgaverne handle om"). De er læst som: vælg
 det væsentlige ud, og lad nogle af opgaverne handle om at skille de to
 skemaer ad. "sc8.4" er læst som menuens c8.4, Kaliumpermanganat (mappen
-`sc8.4_kaliumpermanganat`), hvor opskrivningen er hæftet med klammer.
+`sc8.5_kaliumpermanganat`), hvor opskrivningen er hæftet med klammer.
 
 1. **Pointen:** Når pyrit møder luft og vand, oxideres først svovlet og så
    jernet, mens oxygen reduceres. Det er to redoxreaktioner efter hinanden,
@@ -141,7 +141,7 @@ buste af marmor.
 
 ## Hæftet
 
-Opskrivningen er den fra `sc8.4_kaliumpermanganat` (brugerens tegning):
+Opskrivningen er den fra `sc8.5_kaliumpermanganat` (brugerens tegning):
 skemaet på ternet papir, oxidationstallet over de atomer, der skifter, en
 klamme under skemaet fra atomet før pilen til det samme grundstof efter, og
 midt på klammen, under reaktionspilen, stigningen eller faldet for ét atom
@@ -195,7 +195,7 @@ også er rigtig, men det er bare ikke den traditionelle måde at gøre det på,
 på dansk). Dvs vi indsætter også først koefficienter foran S efter at vi har
 bestemt hvor meget hvert svovl falder med." Første udgave skrev 2 foran
 SO₄²⁻ først og det samlede tal (↑14 og ↓4) ved klammen. Samme dag: pilespids
-kun på produktsiden, her og i `sc8.4_kaliumpermanganat`.
+kun på produktsiden, her og i `sc8.5_kaliumpermanganat`.
 
 Nyt i forhold til sc8.5, fordi skemaerne her er anderledes bygget:
 
@@ -214,7 +214,7 @@ Nyt i forhold til sc8.5, fordi skemaerne her er anderledes bygget:
 
 ## Hjælpen
 
-Statuslinjen nederst i scenen, som i `sc1.4_afstemning` og `sc8.6_korrosion`:
+Statuslinjen nederst i scenen, som i `sc1.4_afstemning` og `sc8.7_korrosion`:
 det næste skridt i hele sætninger, en rød linje med forklaringen ved en fejl
 (linjen ryster, og den gule knap lyser stille), en grøn ved et rigtigt svar.
 Knappen Tjek prøver svaret (Enter gør det samme). Den gule knap er Giv et

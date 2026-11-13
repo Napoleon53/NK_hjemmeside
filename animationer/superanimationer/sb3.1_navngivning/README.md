@@ -57,24 +57,30 @@ dem: `index.html?med=alkohol,syre` (ordene `alkan`, `alken`, `alkyn`, `halogen`,
 
 ## Fane 1: Tegn molekylet (`#tegn`)
 
-Navnet står på kortet, delt i forled, stamme og endelse med bogens farver.
+Navnet står på kortet, delt i forled, stamme og endelse med bogens farver. Delene
+står uden luft imellem, så navnet læses som ét ord: 2-methylbutan, ikke "2-methyl
+butan" (brugeren 13. nov. 2026). Farven og stregen under hver del viser delingen;
+ordet under en kort endelse (en, yn, ol) stikker kun ud mod højre.
 Eleven tegner på molekylemotorens tavle, den samme som på tegnebrættet. Øverst på
 tavlen: Kæde, = Binding (et klik på en binding gør den dobbelt, tripel og enkelt
 igen), −OH, =O, −COOH, −Cl, −Br og Ring, og til højre Slet, Fortryd og Ryd. Kun de
 værktøjer, de valgte stofklasser bruger, er med, og altid dem, opgavens eget stof
 har brug for (chlorethansyre får −Cl).
 
-* **Test:** tegningen tjekkes kun, når eleven trykker Test (eller Enter) nederst
-  til højre på tavlen. Brugeren 20. okt. 2026: "svær at tegne uden at man
-  konstant får skæld ud". Mens eleven tegner, er der ingen fejl og intet ryst.
+* **Test:** tegningen tjekkes kun, når eleven trykker Test (eller Enter). Test
+  står på kortet til højre for den gule knap, som kortets blå hovedknap, ligesom
+  Tjek på fane 2 (brugeren 13. nov. 2026: "Den skal da med i tekstboksen"; før
+  stod den nederst til højre på tavlen). Kortet siger "Tegn molekylet på tavlen,
+  og tryk Test." Brugeren 20. okt. 2026: "svær at tegne uden at man konstant får
+  skæld ud". Mens eleven tegner, er der ingen fejl og intet ryst.
 * **Vis navnet hele tiden:** kontakten nederst til venstre på tavlen. Slået til
-  står det, tegningen hedder, ved Test-knappen, mens eleven tegner, som på
-  tegnebrættet ("Tegningen hedder: butan"). Den er slået fra, hver gang siden
+  står det, tegningen hedder, nederst til højre på tavlen, mens eleven tegner, som
+  på tegnebrættet ("Tegningen hedder: butan"). Den er slået fra, hver gang siden
   åbnes. Eleven skal stadig trykke Test.
 * **Facit:** hedder tegningen det samme som opgaven (cis og trans tæller ikke),
-  er opgaven løst ved Test, navnet står grønt ved knappen, og tegningen får
+  er opgaven løst ved Test, navnet står grønt nederst på tavlen, og tegningen får
   navnedelenes farver.
-* **Fejl:** efter Test med et andet navn står navnet rødt ved knappen og
+* **Fejl:** efter Test med et andet navn står navnet rødt nederst på tavlen og
   ryster, og kortet siger, hvilken del af navnet der ikke passer, i navnets
   rækkefølge: grupperne (endelsen), kæden (stammen), numrene og sidegrupperne
   (forleddet). Fx "Du har tegnet butansyre. Carbonatomet i COOH tæller med i
@@ -182,7 +188,7 @@ ikke ændret.
 
 ## Selvtest
 
-`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 185
+`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 192
 påstande: motoren giver hvert stof navnet fra data, navnet kan deles, og stoffet
 passer til stofklassen; typiske forkerte navne og tegninger får den rigtige
 forklaring (også alle navne talt fra den forkerte ende); kontakterne vælger
@@ -190,8 +196,9 @@ opgaverne og værktøjerne; alle opgaver løses på begge faner; der tegnes med 
 (træk, klik på enden, højreklik, Slet, −Br, = Binding, −COOH på enden og på
 startatomet, Ring); intet tjekkes,
 før der trykkes Test eller Enter, og kontakten Vis navnet hele tiden virker; hint
-gør det rigtige gult; låsen virker; kortet dækker aldrig whiteboardet, og Test
-står under tegnefeltet fra 1100 × 620 til 1600 × 950; teksterne er korte og uden
+gør det rigtige gult; låsen virker; kortet dækker aldrig whiteboardet, Test står
+på kortet til højre for hjælpeknappen, og kontakten og navnet står under
+tegnefeltet fra 1100 × 620 til 1600 × 950; teksterne er korte og uden
 tankestreger.
 
 ## I menuen
@@ -212,11 +219,13 @@ går gennem `NK.Papir.tekst` (`visKort` i `js/fane.js`).
 
 * Animationen har ingen svarknapper, så der er ingen Indsend svar. Tjek (fane 2) og
   Test (fane 1) er stadig det, der bedømmer, og logikken er den samme. Tjek er nu
-  kortets blå hovedknap, og feltet er hvidt med en stille kant.
+  kortets blå hovedknap, og feltet er hvidt med en stille kant. Fra 13. nov. 2026
+  er Test også kortets blå hovedknap (`knap indsend`).
 * Et rigtigt svar lægger ikke et nyt spørgsmål på kortet: kortet viser navnet i
   dele, forklaringen i en grøn boks og Næste opgave, og den næste opgave kommer
   først, når eleven trykker. Det, eleven skrev, står stadig grønt i kassen Dit navn
   tegnet. Derfor er det grønne kort beholdt (som de andre grønne kort i `sb3.3`).
 * Navnets dele har blækfarven på papiret (`--delblaek`, sat af `navnHTML`), ingen
   versaler og intet puls; reglerne står nederst i `css/stil.css`.
-* Selvtesten har fire nye påstande om papirkortet (189 påstande).
+* Selvtesten har fire nye påstande om papirkortet (189 påstande; 192 fra 13. nov.
+  2026).

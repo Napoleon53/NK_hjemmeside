@@ -1,4 +1,6 @@
-# sc8.4 Kaliumpermanganat
+# sc8.5 Kaliumpermanganat
+
+Mappen fik nyt nummer 13. nov. 2026, da Redoxreaktioner blev knap 1 i C8 (nummeret er knappens plads i panelet; se superanimationernes README).
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv. Den virker også,

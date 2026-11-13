@@ -22,7 +22,7 @@ gav brugeren lov til at omdøbe `superlab/sc6.8_substitution` og
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
 (bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.4_blandbarhed`,
-`sc3.4_blandbarhed_inaktiv`, `sc5.1_molarmasse`, `sc5.2_stofmaengde`, `sc5.5_aekvivalente_maengder`, `sc5.10_lightergas`, `sc6.3_mohrtitrering`, `sc4.1_kogepunkt`, `sc4.5_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.1_spaendingsraekken`),
+`sc3.4_blandbarhed_inaktiv`, `sc5.1_molarmasse`, `sc5.2_stofmaengde`, `sc5.5_aekvivalente_maengder`, `sc5.10_lightergas`, `sc6.3_mohrtitrering`, `sc4.1_kogepunkt`, `sc4.5_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.2_spaendingsraekken`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
 

@@ -1,4 +1,6 @@
-# sc8.1 Spændingsrækken
+# sc8.2 Spændingsrækken
+
+Mappen fik nyt nummer 13. nov. 2026, da Redoxreaktioner blev knap 1 i C8 (nummeret er knappens plads i panelet; se superanimationernes README).
 
 Superanimation om spændingsrækken: et metal afgiver elektroner til ionerne af
 et mere ædelt metal. Åbn `index.html`. Mappen henter kun filer inde fra sig
@@ -27,7 +29,7 @@ op, er pudset, og glasset har frisk opløsning.
    lovede, at eleven selv opstiller den), rullemenuerne, den låste stang og
    ventetiden, svaret om bobler af kogende vand og den ene afstemning, der
    altid var den samme.
-3. **Naboerne:** c8.2 og c8.3 ejer oxidationstallene, c8.4 (`sc8.3_redoxafstemning`)
+3. **Naboerne:** c8.2 og c8.3 ejer oxidationstallene, c8.4 (`sc8.4_redoxafstemning`)
    afstemningen med oxidationstal, H⁺, OH⁻ og vand, c8.5 permanganatens farver
    og c8.6 jern i ståluld. Her afstemmes kun metal og ion (eller H⁺) ud fra
    ladningerne, uden oxidationstal. c2.x ejer ionerne og saltenes navne.

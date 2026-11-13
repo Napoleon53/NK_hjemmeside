@@ -290,7 +290,7 @@ function koerTest(W) {
     klikEnde();
     paastand("et klik mere: propan, men ikke løst før Test", T.liveNavn === "propan" && !T.faerdig);
     test();
-    paastand("Test: propan er løst, og navnet står grønt ved knappen", T.faerdig && el("t-navn").classList.contains("rigtig") && /propan/.test(navnTekst()) && el("t-test").hidden, navnTekst());
+    paastand("Test: propan er løst, navnet står grønt nederst på tavlen, og Test er væk fra kortet", T.faerdig && el("t-navn").classList.contains("rigtig") && /propan/.test(navnTekst()) && el("t-test").hidden, navnTekst());
 
     T.vaelg(T.idx("2-methylbutan"));
     klikEnde(); klikEnde(); klikEnde();
@@ -303,7 +303,7 @@ function koerTest(W) {
         T.fast.klasse !== "skidt" && !el("t-status").classList.contains("ryster") && navnTekst() === "", T.beskedTekst());
     el("t-status").classList.remove("ryster");
     test();
-    paastand("Test: pentan står rødt ved knappen og ryster, og kortet siger, hvad stammen butan betyder", el("t-navn").classList.contains("forkert") && el("t-navn").classList.contains("ryster") &&
+    paastand("Test: pentan står rødt nederst på tavlen og ryster, og kortet siger, hvad stammen butan betyder", el("t-navn").classList.contains("forkert") && el("t-navn").classList.contains("ryster") &&
         /hedder: pentan$/.test(navnTekst()) && /Du har tegnet pentan\. Stammen butan/.test(T.beskedTekst()), navnTekst() + " / " + T.beskedTekst());
     paastand("efter Test med en fejl lyser hjælpeknappen", el("t-knap").classList.contains("peg"));
     paastand("kortet med fejlen holder sig inden for sin plads", kortH("t") <= T.kortZone(), kortH("t"));
@@ -430,11 +430,11 @@ function koerTest(W) {
     paastand("kontakten slået til: den står som til", T.visAltid && kon.getAttribute("aria-checked") === "true" && kon.classList.contains("til"));
     paastand("med kun startatomet står der intet navn", navnTekst() === "", navnTekst());
     klikEnde();
-    paastand("med kontakten: ethan står ved knappen, mens der tegnes, uden rødt", /hedder: ethan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
+    paastand("med kontakten: ethan står nederst på tavlen, mens der tegnes, uden rødt", /hedder: ethan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
     test();
     paastand("Test: ethan bliver rødt", el("t-navn").classList.contains("forkert") && T.fast.klasse === "skidt");
     klikEnde();
-    paastand("et klik mere: propan står ved knappen, ikke rødt, og den er ikke løst før Test", /hedder: propan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
+    paastand("et klik mere: propan står nederst på tavlen, ikke rødt, og den er ikke løst før Test", /hedder: propan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
     test();
     paastand("Test: propan er løst", T.faerdig);
     kon.click();
@@ -537,11 +537,16 @@ function koerTest(W) {
         test(); th = Math.max(th, kortH("t"));
         b.saet(NK.NavnLaeser.laes("2,3,4-trimethylpentan").mol);
         test(); th = Math.max(th, kortH("t"));
-        var lr = T.L.canvas.getBoundingClientRect(), tk = el("t-test").getBoundingClientRect(), kn = el("t-visnavn").getBoundingClientRect(), nv = el("t-navn").getBoundingClientRect();
-        var tavleBund = lr.top + T.lay.tavle.y + T.lay.tavle.h, feltBund = lr.top + T.felt().y + T.felt().h;
-        paastand(navn + ": fane 1, Test og kontakten står nederst på whiteboardet under tegnefeltet, og navnet står mellem dem", tk.bottom <= tavleBund && tk.top >= feltBund &&
-            tk.right <= lr.left + T.lay.tavle.x + T.lay.tavle.b && kn.left >= lr.left + T.lay.tavle.x && kn.right < nv.left && nv.right <= tk.left && /trimethylpentan/.test(navnTekst()),
-            [Math.round(feltBund), Math.round(tk.top), Math.round(tk.bottom), Math.round(tavleBund), Math.round(kn.right), Math.round(nv.left), Math.round(nv.right), Math.round(tk.left)].join(","));
+        var lr = T.L.canvas.getBoundingClientRect(), tk = el("t-test").getBoundingClientRect(), hk = el("t-knap").getBoundingClientRect(), sk = el("t-skort").getBoundingClientRect();
+        var kn = el("t-visnavn").getBoundingClientRect(), nv = el("t-navn").getBoundingClientRect();
+        var tavleBund = lr.top + T.lay.tavle.y + T.lay.tavle.h, feltBund = lr.top + T.felt().y + T.felt().h, tavleH = lr.left + T.lay.tavle.x + T.lay.tavle.b;
+        /* Test staar paa kortet til hoejre for hjaelpeknappen (brugeren 13. nov. 2026) */
+        paastand(navn + ": fane 1, Test står på kortet til højre for hjælpeknappen", tk.width > 0 && tk.top >= sk.top && tk.bottom <= sk.bottom && tk.right <= sk.right &&
+            hk.right <= tk.left && Math.abs((hk.top + hk.bottom) - (tk.top + tk.bottom)) < 4,
+            [Math.round(sk.top), Math.round(tk.top), Math.round(tk.bottom), Math.round(sk.bottom), Math.round(hk.right), Math.round(tk.left)].join(","));
+        paastand(navn + ": fane 1, kontakten og navnet står nederst på whiteboardet under tegnefeltet", kn.bottom <= tavleBund && kn.top >= feltBund && nv.top >= feltBund && nv.bottom <= tavleBund &&
+            kn.left >= lr.left + T.lay.tavle.x && kn.right < nv.left && nv.right <= tavleH && /trimethylpentan/.test(navnTekst()),
+            [Math.round(feltBund), Math.round(kn.top), Math.round(kn.bottom), Math.round(tavleBund), Math.round(kn.right), Math.round(nv.left), Math.round(nv.right), Math.round(tavleH)].join(","));
         paastand(navn + ": fane 1, kortet er højst " + T.kortZone() + " px med det længste hint og den længste fejl", th <= T.kortZone(), th);
         var kort = el("t-skort").getBoundingClientRect(), tl = T.L.canvas.getBoundingClientRect(), vt0 = el("t-vaerktoej").getBoundingClientRect();
         paastand(navn + ": fane 1, whiteboardet begynder under kortet", kort.bottom <= tl.top + T.lay.tavle.y && T.lay.tavle.h >= 250, Math.round(T.lay.tavle.h));

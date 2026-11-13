@@ -1757,7 +1757,10 @@ kbd {
    Hver del har sin farve (--delfarve, sat af js/fane.js), som ogsaa bruges
    i formlen paa whiteboardet. En tom plads er stiplet, og den plads, eleven
    er ved, er gul og pulserer stille. */
-.navnelinje { display: flex; align-items: flex-start; justify-content: center; gap: 3px; margin: 7px 0 0; }
+/* Delene staar uden luft imellem, saa navnet laeses som ét ord: 2-methylbutan,
+   ikke "2-methyl butan" (brugeren 13. nov. 2026). Etiketten under en kort del
+   (endelsen -ol) maa stikke ud til siderne uden at skubbe delene fra hinanden. */
+.navnelinje { display: flex; align-items: flex-start; justify-content: center; gap: 0; margin: 7px 0 0; }
 
 .nl-foran {
     align-self: flex-start;
@@ -1772,7 +1775,7 @@ kbd {
 .nl-del { display: inline-flex; flex-direction: column; align-items: center; }
 
 .nl-tekst {
-    padding: 1px 5px 2px;
+    padding: 1px 0 2px;
     border-bottom: 3px solid var(--delfarve);
     color: var(--delfarve);
     font-size: 1.45rem;
@@ -1782,6 +1785,9 @@ kbd {
 }
 
 .nl-etiket {
+    display: flex;
+    justify-content: center;
+    width: 0;
     margin-top: 2px;
     color: var(--delfarve);
     font-size: 0.68rem;
@@ -1791,6 +1797,11 @@ kbd {
     white-space: nowrap;
     opacity: 0.9;
 }
+
+/* Den sidste del (endelsen) kan vaere kortere end sin etiket (en, yn, ol). Dens
+   etiket stikker kun ud mod hoejre, saa den ikke roerer stammens (ethen). */
+.nl-del:last-child { align-items: flex-start; }
+.nl-del:last-child .nl-etiket { display: block; align-self: stretch; width: auto; padding-left: 6px; text-align: center; }
 
 .nl-del.tom { min-width: 84px; margin: 0 3px; }
 
@@ -1917,20 +1928,20 @@ kbd {
 /* ----- Teorien -------------------------------------------------------------- */
 .overlay-boks.bred { max-width: 660px; }
 
-.navneeksempel { display: flex; justify-content: center; gap: 2px; padding: 12px 10px 10px; }
+.navneeksempel { display: flex; justify-content: center; gap: 0; padding: 12px 10px 10px; }
 
 .ne-del {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 4px 2px;
+    padding: 0 0 2px;
     border-bottom: 3px solid var(--delfarve);
     color: var(--delfarve);
     font-size: 1.5rem;
     font-weight: 800;
 }
 
-.ne-del small { margin-top: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ne-del small { display: flex; justify-content: center; width: 0; margin-top: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 
 .teoritabel { width: 100%; margin: 4px 0 10px; border-collapse: collapse; font-size: 0.9rem; }
 .teoritabel th { padding: 4px 8px; border-bottom: 1px solid #4a4a58; color: var(--tekst-mat); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-align: left; text-transform: uppercase; }
@@ -2002,8 +2013,9 @@ kbd {
     .tegnevaerktoej .vtknap.let { padding: 5px 8px; font-size: 0.84rem; }
 }
 
-/* ----- Nederst paa tavlen (fane 1): kontakten, navnet og Test ----------------
-   Hoejden (40 px) staar ogsaa som BUND i js/sim_tegn.js. */
+/* ----- Nederst paa tavlen (fane 1): kontakten og navnet paa tegningen ---------
+   Hoejden (40 px) staar ogsaa som BUND i js/sim_tegn.js. Test staar paa
+   kortet som hovedknappen (.knap.indsend, brugeren 13. nov. 2026). */
 .tegnebund {
     position: absolute;
     z-index: 2;
@@ -2056,27 +2068,6 @@ kbd {
 .tb-navn.forkert, .tb-navn.forkert b { color: #c8382b; }
 .tb-navn.rigtig, .tb-navn.rigtig b { color: #1c8a4e; }
 .tb-navn.ryster { animation: st-ryst 0.4s ease-in-out 1; }
-
-.testknap {
-    flex: 0 0 auto;
-    min-width: 96px;
-    height: 40px;
-    padding: 0 22px;
-    border: 0;
-    border-radius: 9px;
-    background-color: var(--groen-mork);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
-}
-
-.testknap:hover { background-color: var(--groen); }
-.testknap:active { transform: scale(0.97); }
-.testknap[hidden] { display: none; }
 
 @media (max-height: 720px) {
     .sk-felt { margin-top: 6px; }

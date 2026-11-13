@@ -1,4 +1,4 @@
-# sc8.0 Redoxreaktioner
+# sc8.1 Redoxreaktioner
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv (og papirkortet i `../faelles/`) og virker også, når den
@@ -6,9 +6,9 @@ filer inde fra sig selv (og papirkortet i `../faelles/`) og virker også, når d
 papirkortet øverst midt i scenen, og den gule hintknap sidder på kortet.
 
 Den hører til Kemibogens afsnit 8.1 Redoxreaktioner, som ikke havde en
-animation. Den er knap 1 i C8 fra 13. nov. 2026 (koden `c8.redox`). Mappen hedder
-8.0, fordi `sc8.1` er Spændingsrækken; de andre mapper i kapitel 8 er ikke omdøbt,
-fordi bogen linker direkte til dem (se "I menuen").
+animation. Den er knap 1 i C8 fra 13. nov. 2026 (koden `c8.redox`). Mappen hed
+`sc8.0_redoxreaktioner`, til den kom i menuen; samme dag fik den og de andre mapper i
+kapitel 8 numre efter knappernes plads (se "I menuen").
 
 ## Bestillingen (12. november 2026)
 
@@ -28,13 +28,13 @@ syre-base-reaktioner, hvor det er hydronen, der flytter sig."
    `delreaktioner` og `hcl-vand` (figur 7.2: den orange hydron, hvis elektron
    bliver hos chlor). Knapperne Før, Brænder og Efter under luppen er bogens
    trinvise figur i 8.1.
-3. **Naboerne:** `sc8.1_spaendingsraekken` ejer, hvilke metaller der reagerer med
-   hvilke ioner; `sc8.2_oxidationstal` ejer oxidationstal, og
-   `sc8.3_redoxafstemning` afstemning med H⁺ og vand. Her er der ingen
+3. **Naboerne:** `sc8.2_spaendingsraekken` ejer, hvilke metaller der reagerer med
+   hvilke ioner; `sc8.3_oxidationstal` ejer oxidationstal, og
+   `sc8.4_redoxafstemning` afstemning med H⁺ og vand. Her er der ingen
    oxidationstal, ingen spændingsrække og ingen afstemning ud over at gange
    delreaktionerne, så der afgives lige så mange elektroner, som der optages.
    `sc7.1_syrebasereaktioner` ejer syre/base-reaktioner; her er kun én
-   (HCl + H₂O) som sammenligning. `sc8.7_byg_figuren` sætter fagordene på bogens
+   (HCl + H₂O) som sammenligning. `sc8.8_byg_figuren` sætter fagordene på bogens
    figur; her skriver eleven selv delreaktionerne, før mærkaterne sættes på.
 4. **Loftet:** tre faner, 13 opgaver (4 + 6 + 3) og tre ekstraopgaver på fane 2
    med fire reaktioner hver. Fane 1: ét bånd, én skål og én
@@ -176,13 +176,14 @@ Teksterne rettes i `js/data.js`. Formler skrives med markup: `O_2`, `Mg^{2+}`,
 Ja, fra 13. nov. 2026 (brugeren: "Når du er færdig med denne session, må du gerne
 lægge denne animation i menuen"): knap 1 "Redoxreaktioner" i
 `kemi-c-filer/samling_c8.html` med koden `c8.redox`, nr. 1 i C8 i `FEEDBACK_EMNER`
-i `samling_alt.html` og linjen til `til_panelet.js` øverst i `<head>`. De andre
-knapper i C8 er rykket et nummer ned på skærmen, men deres mapper og koder er de
-samme (`c8.1` er stadig Spændingsrækken), for Kemibogens afsnit 8.2 til 8.4 linker
-direkte til mapperne `sc8.1` til `sc8.4`. Skal mapperne følge knapperne, bliver
-de `sc8.2` til `sc8.5` og korrosion `sc8.7`, som støder sammen med
-`sc8.7_byg_figuren`; det er brugerens valg. Kemibogens afsnit 8.1 kan få en Prøv
-selv-linje, når brugeren beder om det.
+i `samling_alt.html` og linjen til `til_panelet.js` øverst i `<head>`. Samme dag
+(brugeren: "omdøb mapperne, så det passer med knapperne") fik mapperne i kapitel 8
+nye numre: `sc8.0` blev `sc8.1`, Spændingsrækken `sc8.2`, Oxidationstal `sc8.3`,
+Afstem redoxreaktioner `sc8.4`, Kaliumpermanganat `sc8.5`, Korrosion `sc8.7` og
+Byg figuren `sc8.8` (tabellen står i superanimationernes README under "Kapitel 8
+omnummereret"). Link-koderne er de samme, og nøglerne i browserens lager hedder
+stadig `nk-sc8.0-...`. Kemibogens afsnit 8.1 kan få en Prøv selv-linje, når
+brugeren beder om det.
 
 ## Selvtest
 
