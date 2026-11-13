@@ -94,6 +94,22 @@
             this.vaelg(foerste >= 0 ? foerste : 0);
         };
 
+        /* En anden liste af opgaver i samme fane (Uoevet og Oevet paa fane 2).
+           Hvad eleven har loest, huskes for hver opgave for sig. */
+        P.skiftOpgaver = function (opgaver, faerdigNoegle) {
+            var gemt = NK.hent(NOEGLE, {}) || {};
+            this.opgaver = opgaver;
+            this.faerdigNoegle = faerdigNoegle || navn;
+            this.status = opgaver.map(function (o) {
+                var s = gemt[o.id];
+                return { loest: !!(s && s.l), stjerne: !!(s && s.s) };
+            });
+            this.bygListe();
+            this.nr = this.opgaver.length - 1;
+            var foerste = this.naesteUloeste();
+            this.vaelg(foerste >= 0 ? foerste : 0);
+        };
+
         P.idx = function (id) {
             for (var i = 0; i < this.opgaver.length; i++) if (this.opgaver[i].id === id) return i;
             return -1;
@@ -103,10 +119,11 @@
 
         /* ----- Hukommelse ------------------------------------------------------ */
         P.gem = function () {
-            var ud = {}, mig = this;
+            var ud = NK.hent(NOEGLE, {}) || {}, mig = this;
             this.opgaver.forEach(function (o, i) {
                 var s = mig.status[i];
                 if (s.loest) ud[o.id] = { l: 1, s: s.stjerne ? 1 : 0 };
+                else delete ud[o.id];
             });
             NK.gem(NOEGLE, ud);
         };
@@ -218,7 +235,8 @@
                 return naeste && naeste.type === "spm" ? "Næste spørgsmål →" : "Næste trin →";
             }
             if (this.naesteUloeste() >= 0) return "Næste opgave →";
-            return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "";
+            if (valg.naesteFane) return "Videre til " + valg.naesteNavn + " →";
+            return this.visSejr ? "Se din medalje →" : "";
         };
 
         /* Den hoejde, kortet har faaet sat af oeverst i scenen (som sc4.6: et lavt
@@ -444,6 +462,16 @@
             if (this.faerdig || this.venter || !this.erForsoeg()) return;
             var tekst = set || this.opg.del.set || "";
             if (this.sidsteDel()) { this.loest("selv", tekst, maerke); return; }
+            /* direkte: spoergsmaalet kommer med det samme, uden et kort, der kun
+               siger Godt (brugeren 13. nov. 2026: "her skal lige springes et trin
+               over ... man trykker bare naeste spm efter man har indstillet
+               reguleringen") */
+            if (this.opg.del.direkte) {
+                this.naesteFase();
+                this.naesteLinje("", "");
+                if (this.efterDel) this.efterDel();
+                return;
+            }
             this.mellemsvar("selv", tekst, maerke || "Godt");
         };
 
@@ -516,6 +544,7 @@
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
                 else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
+                else if (this.visSejr) this.visSejr();
                 /* ellers intet: Start forfra staar aldrig, hvor Naeste staar */
                 return;
             }
@@ -560,7 +589,7 @@
             this.sejrT = 0;
             var alle = this.antalLoest() === this.opgaver.length;
             /* Forklaringen staar paa kortet under opgaven */
-            this.slut = { maade: maade, maerke: maerke, tekst: (linje || "") + (alle && foerste ? " " + D.FAERDIG[navn] : "") };
+            this.slut = { maade: maade, maerke: maerke, tekst: (linje || "") + (alle && foerste ? " " + D.FAERDIG[this.faerdigNoegle || navn] : "") };
             this.besked("", "");
             this.visKort();
             this.visListe();
@@ -722,6 +751,57 @@
             });
         };
     }
+
+    /* ----- Konfetti (som sb4.2 og sb3.3) ------------------------------------------
+       NK.konfetti(el, antal): et pust ud fra elementets top, naar en hel opgave
+       er klaret (brugeren 9. nov. 2026 om sb7.2: konfetti kun ved en hel
+       opgave). NK.konfettiRegn(el, antal): regn over hele elementet til sejren. */
+    var KONFETTI = ["#f2c53d", "#3d9ee0", "#e05446", "#3fae72", "#9b6bd6", "#ffffff"];
+
+    function konfettiBoks(x, y) {
+        var boks = document.createElement("div");
+        boks.className = "konfetti";
+        boks.setAttribute("aria-hidden", "true");
+        boks.style.left = x + "px";
+        boks.style.top = y + "px";
+        document.body.appendChild(boks);
+        window.setTimeout(function () { if (boks.parentNode) boks.parentNode.removeChild(boks); }, 4200);
+        return boks;
+    }
+
+    function stykke(boks, i, dx, op, ned, forsink) {
+        var b = document.createElement("i");
+        b.style.backgroundColor = KONFETTI[i % KONFETTI.length];
+        b.style.setProperty("--dx", dx.toFixed(0) + "px");
+        b.style.setProperty("--op", op.toFixed(0) + "px");
+        b.style.setProperty("--ned", ned.toFixed(0) + "px");
+        b.style.setProperty("--rot", NK.r(-720, 720).toFixed(0) + "deg");
+        b.style.animationDelay = forsink.toFixed(2) + "s";
+        if (i % 3 === 0) b.style.borderRadius = "50%";
+        boks.appendChild(b);
+    }
+
+    NK.konfetti = function (el, antal, x, y) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        var boks = konfettiBoks(x !== undefined ? r.left + x : r.left + r.width / 2, y !== undefined ? r.top + y : r.top + 18);
+        for (var i = 0; i < (antal || 46); i++) {
+            var v = NK.r(-Math.PI * 0.95, -Math.PI * 0.05), fart = NK.r(80, 240);
+            stykke(boks, i, Math.cos(v) * fart * 1.6, Math.sin(v) * fart, NK.r(180, 380), NK.r(0, 0.18));
+        }
+    };
+
+    NK.konfettiRegn = function (el, antal) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        var boks = konfettiBoks(r.left, r.top);
+        boks.classList.add("regn");
+        for (var i = 0; i < (antal || 120); i++) {
+            var x = NK.r(0, r.width);
+            stykke(boks, i, NK.r(-60, 60), NK.r(-40, 10), NK.r(r.height * 0.6, r.height + 40), NK.r(0, 1.2));
+            boks.lastChild.style.left = x + "px";
+        }
+    };
 
     NK.Fane = { paa: paa };
 }());

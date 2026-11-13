@@ -271,7 +271,7 @@
         pauseFaaet: "+1 pause. Du har {n}.",
         ingenPause: "Ingen pauser tilbage. Saml en +1 pause.",
         hjaelpNy: {
-            enzym: "Klik på katalysatoren. Den giver halve point for alle molekyler.",
+            enzym: "Klik på katalysatoren. Den giver halve point for alle molekyler på skærmen.",
             inhibitor: "Klik på inhibitoren. Den bremser alt i 7 sekunder.",
             pause: "Klik på +1 pause. Så har du en pause mere."
         },

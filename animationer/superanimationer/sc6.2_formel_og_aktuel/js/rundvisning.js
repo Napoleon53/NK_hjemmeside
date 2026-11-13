@@ -36,7 +36,7 @@
             { sel: "#bland-anker-glas", titel: "Glassene", tekst: "I første opgave kommer saltet fra vægten i vandet, når du har regnet dets koncentration. I de andre opgaver hældes glas A og B sammen, når du har regnet det samlede rumfang." },
             { sel: "#bland-anker-tavle", titel: "Tavlen", tekst: "Tavlen viser opgavens tal og beregningerne." },
             { sel: "#bland-skort", titel: "Opgaven", tekst: "Opgaven og spørgsmålet til trinnet står på kortet øverst. Giv hint giver et hint og derefter svaret." },
-            { sel: "#bland-kort", titel: "Regnetrinene", tekst: "Skriv formlen og så tallet, og tryk på Indsend svar. I stofmængden skal tallet foran ionen med, for eksempel n = 2 · c · V." },
+            { sel: "#bland-kort", titel: "Regnetrinene", tekst: "Skriv formlen og så tallet, og tryk på Indsend svar. I stofmængden skal tallet foran ionen med, fx n = 2 · c · V." },
             { sel: "#bland-anker-zoom", titel: "Luppen", tekst: "Ionerne i blandingen kommer, når koncentrationen er fundet." },
             { sel: "#bland-opgaver", titel: "Opgaverne", tekst: "Fire opgaver. Nye tal giver samme opgave med andre salte og tal." }
         ]

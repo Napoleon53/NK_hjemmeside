@@ -6,10 +6,9 @@ filer inde fra sig selv (og papirkortet i `../faelles/`) og virker også, når d
 papirkortet øverst midt i scenen, og den gule hintknap sidder på kortet.
 
 Den hører til Kemibogens afsnit 8.1 Redoxreaktioner, som ikke havde en
-animation. Mappen hedder 8.0 (som `sb2.0_ligevaegt_intro`), fordi `sc8.1` er
-Spændingsrækken, og animationen ikke er i menuen endnu. Kommer den i menuen som
-knap 1 i C8, får den og knapperne efter den nye numre efter reglen fra 11. nov.
-2026.
+animation. Den er knap 1 i C8 fra 13. nov. 2026 (koden `c8.redox`). Mappen hedder
+8.0, fordi `sc8.1` er Spændingsrækken; de andre mapper i kapitel 8 er ikke omdøbt,
+fordi bogen linker direkte til dem (se "I menuen").
 
 ## Bestillingen (12. november 2026)
 
@@ -37,7 +36,8 @@ syre-base-reaktioner, hvor det er hydronen, der flytter sig."
    `sc7.1_syrebasereaktioner` ejer syre/base-reaktioner; her er kun én
    (HCl + H₂O) som sammenligning. `sc8.7_byg_figuren` sætter fagordene på bogens
    figur; her skriver eleven selv delreaktionerne, før mærkaterne sættes på.
-4. **Loftet:** tre faner, 13 opgaver (4 + 6 + 3). Fane 1: ét bånd, én skål og én
+4. **Loftet:** tre faner, 13 opgaver (4 + 6 + 3) og tre ekstraopgaver på fane 2
+   med fire reaktioner hver. Fane 1: ét bånd, én skål og én
    lup med 2 Mg og 1 O₂. Fane 2: ét ark med to reaktioner (magnesium og
    dioxygen, jern og dioxygen fra bogens håndvarmer), elektroner og fire
    mærkater. Fane 3: to kort med en lup hver og fire reaktioner at sortere.
@@ -80,17 +80,50 @@ stof der er reduktionsmidlet). Forklaringen til en forkert delreaktion passer ti
 fejlen: forkert side, forkert antal (Mg²⁺ har ladningen +2), 2 i stedet for 4 til
 O₂ og elektroner på begge sider (`D.eFejl` i `js/data.js`).
 
+**Ekstraopgaverne på fane 2** (13. nov. 2026, brugeren: "nogle ekstraopgaver
+(uden alt for mange animationer) ... med forskellige sværhedsgrader ... i fane 2,
+så man også lige får det trænet uden mega-stilladsering"). Nederst i listen under
+overskriften Ekstraopgaver: Let, Middel og Svær med fire reaktioner hver i
+tilfældig rækkefølge. Let (magnesium og dichlor, natrium og dichlor, zink og
+kobber(II)ioner, calcium og dioxygen): elektronerne i begge delreaktioner; tallene
+foran og reaktionen øverst kommer af sig selv. Middel (lithium og dioxygen, kalium
+og dibrom, kobber og sølv(I)ioner, zink og dioxygen): også tallene foran. Svær
+(aluminium og dioxygen, aluminium og dichlor, jern og dichlor, aluminium og
+kobber(II)ioner): begge delreaktioner skal ganges, og bagefter skal eleven finde
+reduktions- eller oxidationsmidlet. Tallene foran sættes med et klik på den
+stiplede plads foran delreaktionen (minus tager ét af; tom er 1), og elektronerne
+på arket ganges med, så eleven kan se, om der afgives lige så mange, som der
+optages. Forkerte tal giver "Der afgives 6 elektroner, men der optages 4" eller
+"tallene kan være mindre" (`D.gangeFejl`). Hintene er de samme for alle
+reaktioner, så der er mindre stilladsering end i opgave 1 til 6. Ekstraopgaverne
+tæller ikke med i "løst", og Næste opgave efter opgave 6 går til fane 3, ikke til
+ekstraopgaverne (`ekstra` i `js/fane.js`). En ekstraopgave er ét mål med en liste
+af dele (`o.dele`, ny i `js/fane.js`), og `nyFase` lægger den næste reaktion på
+arket.
+
 **3 Syre/base og redox** (`#sammenlign`). To lyse kort side om side.
 Syre/base-reaktionen HCl + H₂O med en lup, hvor det orange H bliver overført som
 hydron, og dets elektron (en lille orange prik) bliver hos chlor, så chlor bliver
-blå (Cl⁻) og vandet rødt (H₃O⁺). Redoxreaktionen 2 Mg + O₂ med samme lup som på
+blå (Cl⁻) og vandet rødt (H₃O⁺). Det, der er på vej over, står med H⁺ og er
+mindre end hydrogenatomet (brugeren 13. nov. 2026: "det bør være en h+, der
+overføres på tegningen. Det er fint den er lidt mindre"). Redoxreaktionen 2 Mg + O₂ med samme lup som på
 fane 1. Tre opgaver: klik på begge lupper og svar på, hvad der blev overført fra
 HCl til H₂O (en hydron, ikke et hydrogenatom); sæt Syre, Base, Reduktionsmiddel
 og Oxidationsmiddel under de fire stoffer (bagefter står "afgiver en hydron",
-"optager elektroner" osv. under mærkaterne) og svar på, hvad syren og
-reduktionsmidlet har til fælles; og sortér fire reaktioner (NH₃ + HCl,
+"optager elektroner" osv. under mærkaterne) og svar på, hvad de to har til fælles
+("Et reduktionsmiddel er ikke en syre, men de to har én ting til fælles";
+brugeren 13. nov. 2026 ville ikke have, at et reduktionsmiddel "svarer til" en
+syre); og sortér fire reaktioner (NH₃ + HCl,
 Zn + Cu²⁺, eddikesyre + OH⁻, 2 Na + Cl₂) i de to kort. Lupperne er skjult i den
 sidste opgave, for den handler om formlerne.
+
+Kontakten **Elektronprikker** i panelet (og tasten E) viser de yderste elektroner
+som prikker i par inden i kuglerne i begge lupper (brugeren 13. nov. 2026: "en
+toggle ... diskret kunne tegne 8 elektroner rundt om O²⁻ på redoxreaktionen, og
+blot 0 elektroner rundt om Mg²⁺"). Oxygen har 6 (i dioxygen er 4 af dem fælles),
+magnesium de 2, der overføres, og bagefter har O²⁻ 8 og Mg²⁺ ingen. Chlor og
+oxygen i saltsyre-luppen har 8, og hydrogenatomets egen elektron er orange og
+bliver hos chlor. Kontakten er slået fra, hver gang siden åbnes.
 
 ## Papirkortet og hjælpen
 
@@ -140,15 +173,22 @@ Teksterne rettes i `js/data.js`. Formler skrives med markup: `O_2`, `Mg^{2+}`,
 
 ## I menuen
 
-Nej. Animationen ligger kun i sin mappe, til brugeren siger til. Så skal den i
-`kemi-c-filer/samling_c8.html` (formentlig som knap 1, så nummeret passer med
-bogens 8.1), i `FEEDBACK_EMNER` og have linjen til `til_panelet.js` øverst i
-`<head>`. Kemibogens afsnit 8.1 kan få en Prøv selv-linje, når brugeren beder om
-det.
+Ja, fra 13. nov. 2026 (brugeren: "Når du er færdig med denne session, må du gerne
+lægge denne animation i menuen"): knap 1 "Redoxreaktioner" i
+`kemi-c-filer/samling_c8.html` med koden `c8.redox`, nr. 1 i C8 i `FEEDBACK_EMNER`
+i `samling_alt.html` og linjen til `til_panelet.js` øverst i `<head>`. De andre
+knapper i C8 er rykket et nummer ned på skærmen, men deres mapper og koder er de
+samme (`c8.1` er stadig Spændingsrækken), for Kemibogens afsnit 8.2 til 8.4 linker
+direkte til mapperne `sc8.1` til `sc8.4`. Skal mapperne følge knapperne, bliver
+de `sc8.2` til `sc8.5` og korrosion `sc8.7`, som støder sammen med
+`sc8.7_byg_figuren`; det er brugerens valg. Kemibogens afsnit 8.1 kan få en Prøv
+selv-linje, når brugeren beder om det.
 
 ## Selvtest
 
 `_selvtest.html` (gennem en lokal server): teksternes længde og sprog,
 forklaringerne til forkerte delreaktioner, alle 13 opgaver løst med musen (også
 med forkerte svar først og med Vis svaret), låsen og kortets og tegningernes
-plads fra 1100 × 620 til 1600 × 950. 12. nov. 2026: ALT OK (172 påstande).
+plads fra 1100 × 620 til 1600 × 950, ekstraopgaverne (alle tre løst med musen, ladningen
+på begge sider af hver delreaktion, de mindste tal foran) og kontakten med
+elektronprikker. 13. nov. 2026: ALT OK (272 påstande).

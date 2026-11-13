@@ -133,7 +133,8 @@
         P.visKnap = function () {
             var tekst, klasse = "knap hjaelp";
             var h = this.hintNu() || [];
-            if (this.hjaelp === 0) tekst = "Giv et hint";
+            if (h.length === 0) { tekst = "Vis svaret"; klasse += " svar"; }   /* ekstraopgaverne har ingen hints */
+            else if (this.hjaelp === 0) tekst = "Giv et hint";
             else if (this.hjaelp < h.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.length + ")";
             else { tekst = "Vis svaret"; klasse += " svar"; }
             if (this.pegKnap) klasse += " peg";

@@ -148,7 +148,7 @@
         {
             id: "c6h14", formel: "C6H14", titel: "Fem alkaner", niv: "Svær",
             tekst: "Molekylformlen passer til fem alkaner. Pas på, for mange af dem kan tegnes, så de ligner et andet stof.",
-            strategi: "Tegn seks C på række. Prøv så fem C plus en methylgruppe på nr. 2 eller 3 og fire C plus to methylgrupper.",
+            strategi: "Tegn seks C på række. Prøv så fem C med en methylgruppe på nr. 2 eller 3 og fire C med to methylgrupper.",
             kog: "hoejest",
             kogHint: [
                 "Alle fem isomerer er alkaner og danner kun londonbindinger. Se på formen af molekylerne.",

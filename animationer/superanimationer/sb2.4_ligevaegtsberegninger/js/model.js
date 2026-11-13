@@ -69,7 +69,7 @@
     /* Ligevaegtsloven som HTML-broek: Kc = [NO]²·[Cl₂] / [NOCl]² */
     M.lovHTML = function (opg) {
         var f = M.lovFacit(opg);
-        return 'K<sub>c</sub> = <span class="vbroek"><span>' + NK.html(M.ledene(f.num)) + "</span><span>" +
+        return 'K = <span class="vbroek"><span>' + NK.html(M.ledene(f.num)) + "</span><span>" +
             NK.html(M.ledene(f.den)) + "</span></span>";
     };
 

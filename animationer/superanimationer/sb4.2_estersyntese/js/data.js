@@ -91,7 +91,7 @@
         stoffer: [
             { id: "ester", navn: "propylbutanoat", antal: 3 },
             { id: "alkohol", navn: "propan-1-ol", antal: 2 },
-            { id: "syre", navn: "butansyre", antal: 1 },
+            { id: "syre", navn: "butansyre", antal: 2 },
             { id: "svovlsyre", navn: "svovlsyre", formel: "H₂SO₄", antal: 1 }
         ]
     };
@@ -103,18 +103,18 @@
         { id: "vand", navn: "Vask med vand",
           spm: "Der tilsættes vand, og skilletragten rystes. Hvilke stoffer går over i vandfasen? Vælg alle, der passer.",
           svar: ["propylbutanoat", "propan-1-ol", "butansyre", "svovlsyre"], stof: ["ester", "alkohol", "syre", "svovlsyre"],
-          rigtig: [1, 3],
+          rigtig: [1, 2, 3],
           fejl: {
               0: "Propylbutanoat har intet H på oxygen og kan ikke afgive hydrogenbindinger til vand.",
-              2: "Butansyre har en lang carbonkæde og bliver for det meste i det øverste lag.",
+              mangler2: "Butansyre har en polær COOH-gruppe og en kort carbonkæde, så en del af butansyren går over i vandet.",
               mangler1: "Propan-1-ol har en OH-gruppe og en kort kæde og kan derfor blandes med vand.",
               mangler3: "Svovlsyre er en stærk syre, som danner ioner i vand."
           },
-          hint: ["Stoffer med ioner eller en OH-gruppe på en kort kæde går over i vandet.", "Svovlsyren og det meste af alkoholen går over i vandet. Esteren og butansyren bliver i det øverste lag."],
-          rigtigTekst: "Svovlsyren og propan-1-ol går over i vandet. Esteren bliver i det øverste lag, og det gør det meste af butansyren også.",
+          hint: ["Stoffer med ioner eller en OH-gruppe på en kort kæde går over i vandet.", "Svovlsyren, det meste af alkoholen og noget af butansyren går over i vandet. Esteren bliver i det øverste lag."],
+          rigtigTekst: "Svovlsyren, propan-1-ol og en del af butansyren går over i vandet. Esteren og resten af butansyren bliver i det øverste lag.",
           knap: "Ryst skilletragten →" },
         { id: "base", navn: "Vask med natriumcarbonat",
-          spm: "Butansyre er stadig i det øverste lag. Hvad sker der med butansyre, når der rystes med natriumcarbonatopløsning?",
+          spm: "Resten af butansyren er stadig i det øverste lag. Hvad sker der med butansyren, når der rystes med natriumcarbonatopløsning?",
           svar: ["Bliver til baseform i vandfasen", "Bliver til ester", "Bliver i det øverste lag"],
           rigtig: [0],
           fejl: {

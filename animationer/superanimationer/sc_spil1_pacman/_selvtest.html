@@ -496,17 +496,17 @@ function koer() {
     paastand("sætningen er den samme som i den gamle udgave",
         D.MESTER.tekst === "På sværeste niveau i Mix er du hermed kåret til Labyrintmester."
         && (!gammel || gammel.indexOf(D.MESTER.tekst) >= 0));
-    var escape = hentTekst("../../kemi-c-filer/c_spil8_escaperoom.html");
+    var escape = hentTekst("../sc_spil8_escaperoom/js/data.js");
     if (!escape) {
         note("escaperoommet blev ikke fundet");
     } else {
-        var seglLinje = (/pacman:\s*\{[^\n]*\}/.exec(escape) || [""])[0];
-        var svarE = (/answer:\s*'([^']+)'/.exec(seglLinje) || [])[1];
+        var seglLinje = (/id: "pacman"[\s\S]*?tjek:/.exec(escape) || [""])[0];
+        var svarE = (/svar:\s*"([^"]+)"/.exec(seglLinje) || [])[1];
         paastand("escaperoommets svar findes i titlen (" + svarE + ")", !!svarE && D.MESTER.titel.toLowerCase() === svarE.toLowerCase());
         paastand("escaperoommet kalder spillet Pacman Quiz, og titlen er den samme",
             /Pacman Quiz/.test(seglLinje) && d.title === "Pacman Quiz");
-        paastand("escaperoommets hint nævner SVÆR og Mix, som findes i spillet",
-            /SVÆR/.test(seglLinje) && /"Mix"/.test(seglLinje)
+        paastand("escaperoommets spørgsmål nævner Mix og sværeste niveau, som findes i spillet",
+            /sværeste niveau/.test(seglLinje) && /Mix/.test(seglLinje)
             && D.SVAERHED.svaer.navn.toUpperCase() === "SVÆR" && E.EMNER.mix.titel === "Mix");
     }
 

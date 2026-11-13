@@ -19,21 +19,27 @@
             { sel: "#p-skort", titel: "Kortet øverst", tekst: "Al tekst står her. Gør det, kortet siger, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#p-anker-tragt", titel: "Skilletragten", tekst: "Octan-1-ol ligger øverst og vand nederst. Klik på skilletragten for at ryste den." },
             { sel: "#p-anker-lup", titel: "Luppen", tekst: "Luppen viser lige store rumfang af de to lag. Hver orange kugle er et molekyle af stoffet." },
+            { sel: "#p-anker-formler", titel: "Strukturformlerne", tekst: "Strukturformlen for stoffet i skilletragten. I trin 4 står de to stoffer, stof X kan være." },
             { sel: "#p-anker-kasse", titel: "Regnestykket", tekst: "Formlen for fordelingskonstanten. Det, du regner ud, bliver skrevet her." },
-            { sel: "#p-trinkort", titel: "Trinnene", tekst: "Fanen har fire trin. Knappen Begynd forfra står nederst i panelet." }
+            { sel: "#p-trinkort", titel: "Trinnene", tekst: "Fanen har fire trin. Knappen Begynd forfra står nederst i panelet." },
+            { sel: "#p-ekstrakort", titel: "Ekstraopgaverne", tekst: "Tre opgaver uden hints. Start dem, når du er færdig med trinnene." }
         ],
         "fane-d": [
             { sel: "#d-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Træk i skyderen, vælg et svar, eller skriv et tal, og tryk Indsend svar." },
             { sel: "#d-anker-lup", titel: "Luppen", tekst: "Grå kugler er den uladede syre HA, og blå kugler er ionen A⁻. Ionen går ikke over i octan-1-ol." },
+            { sel: "#d-anker-former", titel: "Strukturformlerne", tekst: "Acetylsalicylsyre som den uladede syre HA og som ionen A⁻. Carboxylgruppen afgiver hydronen." },
             { sel: "#d-anker-graf", titel: "Kurven", tekst: "Kurven viser log D og bliver tegnet dér, hvor skyderen har været. Prikken viser log D ved skyderens pH." },
-            { sel: "#d-anker-skyder", titel: "pH-skyderen", tekst: "Skyderen bestemmer vandlagets pH. Den har samme pH-akse som kurven." }
+            { sel: "#d-anker-skyder", titel: "pH-skyderen", tekst: "Skyderen bestemmer vandlagets pH. Den har samme pH-akse som kurven." },
+            { sel: "#d-ekstrakort", titel: "Ekstraopgaverne", tekst: "Opgaver uden hints. Kontakten Svær tager en opgave med formlen for log D med." }
         ],
         "fane-b": [
             { sel: "#b-skort", titel: "Kortet øverst", tekst: "Kortet stiller opgaverne. Træk i skyderen, vælg et svar, eller skriv et tal, og tryk Indsend svar." },
             { sel: "#b-anker-lup", titel: "Luppen", tekst: "Grå kugler er den uladede base B, og røde kugler er ionen BH⁺. Ionen går ikke over i octan-1-ol." },
+            { sel: "#b-anker-former", titel: "Strukturformlerne", tekst: "Amfetamin som ionen BH⁺ og som den uladede base B. NH₃⁺-gruppen afgiver hydronen." },
             { sel: "#b-anker-graf", titel: "Kurven", tekst: "Kurven for basen bliver tegnet dér, hvor skyderen har været. Syrens kurve fra fane 2 står svagt bagved." },
             { sel: "#b-anker-skyder", titel: "pH-skyderen", tekst: "Skyderen bestemmer vandlagets pH. Den har samme pH-akse som kurven." },
-            { sel: "#b-trinkort", titel: "Trinnene", tekst: "Fanen har fire trin. Knappen Begynd forfra står nederst i panelet." }
+            { sel: "#b-trinkort", titel: "Trinnene", tekst: "Fanen har fire trin. Knappen Begynd forfra står nederst i panelet." },
+            { sel: "#b-ekstrakort", titel: "Ekstraopgaverne", tekst: "Opgaver uden hints. Kontakten Svær tager en opgave med genvejen for log D med." }
         ]
     };
     var trin = [];
@@ -44,7 +50,7 @@
         var liste = document.querySelectorAll(sel);
         var ud = [];
         for (var i = 0; i < liste.length; i++) {
-            if (liste[i].offsetWidth || liste[i].offsetHeight) ud.push(liste[i]);
+            if (liste[i].offsetWidth > 3 && liste[i].offsetHeight > 3) ud.push(liste[i]);   /* et tomt anker (1 px) springes over */
         }
         return ud;
     }

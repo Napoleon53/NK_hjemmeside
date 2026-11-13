@@ -29,7 +29,7 @@
         ],
         "fane-hypoteser": [
             { sel: "#hypoteser-anker-tavle", titel: "Tavlen", tekst: "Opgaven står på kortet over tavlen. På tavlen står skemaet med dine tal, atomtællingen og beregningen, efterhånden som du skriver den." },
-            { sel: "#hypoteser-raekker", titel: "Afstem, formel og tal", tekst: "Afstem skemaet først. Skriv så formlen med symboler, for eksempel n(Na₂O) = n(NaHCO₃) / 2. Sæt derefter tallene ind, og regn resultatet ud. Tryk på Indsend svar på kortet, eller tryk Enter." },
+            { sel: "#hypoteser-raekker", titel: "Afstem, formel og tal", tekst: "Afstem skemaet først. Skriv så formlen med symboler, fx n(Na₂O) = n(NaHCO₃) / 2. Sæt derefter tallene ind, og regn resultatet ud. Tryk på Indsend svar på kortet, eller tryk Enter." },
             { sel: "#hypoteser-anker-graf", titel: "Grafen", tekst: "Dine vejninger fra forsøget. Hver hypotese, du har regnet, får en stiplet streg ved sin forventede masse." },
             { sel: "#hypoteser-opgaver", titel: "Opgaverne", tekst: "Først regner du stofmængden af natron og de tre hypoteser. Til sidst afgør du, hvilken streg på grafen kurven ender på." }
         ],

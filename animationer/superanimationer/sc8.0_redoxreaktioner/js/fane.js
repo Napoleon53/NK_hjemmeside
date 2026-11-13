@@ -138,8 +138,8 @@
             this.bygListe();
             this.koblMus();
             /* Den foerste opgave, eleven ikke har loest */
-            this.nr = this.opgaver.length - 1;
-            var foerste = this.naesteUloeste();
+            var foerste = -1, mig2 = this;
+            this.opgaver.forEach(function (o, i) { if (foerste < 0 && !o.ekstra && !mig2.status[i].loest) foerste = i; });
             this.vaelg(foerste >= 0 ? foerste : 0);
         };
 
@@ -160,8 +160,15 @@
             NK.gem(NOEGLE, ud);
         };
 
+        /* Ekstraopgaver (o.ekstra, sc8.0) er frivillige: de taeller ikke med i
+           "loest", og Naeste opgave gaar kun til dem fra en anden ekstraopgave */
         P.antalLoest = function () {
-            return this.status.filter(function (s) { return s.loest; }).length;
+            var mig = this;
+            return this.status.filter(function (s, i) { return s.loest && !mig.opgaver[i].ekstra; }).length;
+        };
+
+        P.antalHoved = function () {
+            return this.opgaver.filter(function (o) { return !o.ekstra; }).length;
         };
 
         /* ----- Listen i panelet -------------------------------------------------- */
@@ -172,6 +179,12 @@
             var raekke = document.createElement("div");
             raekke.className = "opg-chips lodret";
             this.opgaver.forEach(function (o, i) {
+                if (o.ekstra && !(i && mig.opgaver[i - 1].ekstra)) {
+                    var hoved = document.createElement("p");
+                    hoved.className = "opg-gruppe";
+                    hoved.textContent = "Ekstraopgaver";
+                    raekke.appendChild(hoved);
+                }
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "opg-chip";
@@ -216,10 +229,18 @@
         };
 
         /* Maalets dele i den raekkefoelge, de kommer */
+        /* sc8.0: et maal kan i stedet have en liste af dele, o.dele, hver med
+           type "forsoeg" eller "spm" og sin egen tekst, hint og set (ekstra-
+           opgaverne paa fane 2: flere reaktioner i traek). Uden o.dele er
+           delene o.gaet, o.forsoeg, o.felter, o.spm og o.spm2 som hidtil. */
         P.lavOpgave = function (i) {
-            var o = this.opgaver[i], faser = [];
-            ["gaet", "forsoeg", "felter", "spm", "spm2"].forEach(function (f) { if (o[f]) faser.push(f); });
-            this.opg = { o: o, faser: faser, fi: 0, fase: faser[0], gaet: -1, forkert: {}, rigtig: undefined, valgt: null };
+            var o = this.opgaver[i], faser = [], dele = [];
+            if (o.dele) {
+                o.dele.forEach(function (d) { faser.push(d.type); dele.push(d); });
+            } else {
+                ["gaet", "forsoeg", "felter", "spm", "spm2"].forEach(function (f) { if (o[f]) { faser.push(f); dele.push(o[f]); } });
+            }
+            this.opg = { o: o, faser: faser, dele: dele, fi: 0, fase: faser[0], gaet: -1, forkert: {}, rigtig: undefined, valgt: null };
             if (this.nyOpgave) this.nyOpgave(o);
         };
 
@@ -239,6 +260,9 @@
             this.visKnap();
         };
 
+        /* Den del af maalet, eleven staar i lige nu */
+        P.delNu = function () { return this.opg ? this.opg.dele[this.opg.fi] : null; };
+
         P.gaetNu = function () {
             return !this.faerdig && !!this.opg && this.opg.fase === "gaet";
         };
@@ -247,7 +271,7 @@
            De faar en gul ring i scenen, saa teksten ikke skal gaettes. */
         P.omNu = function () {
             if (this.faerdig || this.venter || !this.opg) return [];
-            var del = this.opg.o[this.opg.fase];
+            var del = this.delNu();
             return (del && del.om) || [];
         };
 
@@ -281,7 +305,7 @@
         };
 
         P.kortHTML = function () {
-            var g = this.opg, o = g.o, del = o[g.fase], html;
+            var g = this.opg, o = g.o, del = this.delNu(), html;
             if (this.gaetNu()) {
                 html = '<span class="gk-maerke">Gæt først</span>';
                 if (del.intro) html += '<p class="gk-intro">' + NK.html(del.intro) + "</p>";
@@ -308,7 +332,7 @@
                 return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + maerke + "</span>" + svaret + NK.html(slut.tekst || "") + "</p>" +
                     (vt ? '<button type="button" class="sk-videre" data-videre="1">' + NK.html(vt) + "</button>" : "") + "</div>";
             }
-            var chip = spm ? "Spørgsmål" : "Opgave " + (this.nr + 1);
+            var chip = spm ? "Spørgsmål" : (o.chip || "Opgave " + (this.nr + 1));
             html = '<p class="sk-tekst"><span class="sk-chip">' + chip + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(del.tekst)) : NK.html(del.tekst)) + "</p>";
             if (g.gaet >= 0 && g.fase === "forsoeg") {
                 html += '<p class="sk-gaet">Dit gæt: <b>' + NK.html(o.gaet.svar[g.gaet].t) + "</b></p>";
@@ -336,7 +360,7 @@
            forklaringen staar under svarene, og knappen, der foerer videre,
            staar dér, hvor Indsend svar stod. */
         P.blivHTML = function (slut) {
-            var g = this.opg, del = g.o[g.fase], vist = slut.maade === "svar";
+            var g = this.opg, del = this.delNu(), vist = slut.maade === "svar";
             var html = '<p class="sk-tekst"><span class="sk-chip">Spørgsmål</span>' + NK.Papir.tekst(NK.html(del.tekst)) + "</p>";
             if (this.kortEkstra) html += this.kortEkstra();
             html += '<div class="sk-svar n' + del.svar.length + '">';
@@ -444,7 +468,7 @@
                 this.kortBesked("Vælg et af svarene på kortet først.", 3.5);
                 return;
             }
-            var j = g.valgt, o = g.o, del = o[g.fase];
+            var j = g.valgt, o = g.o, del = this.delNu();
             g.valgt = null;
             if (del.svar[j].ok) {
                 g.rigtig = j;
@@ -461,7 +485,7 @@
            forsoeget ikke har indsend: false (at antaende baandet og at klikke paa
            lupperne er ikke et svar, der skal indsendes) */
         P.medIndsend = function () {
-            var del = this.opg && this.opg.o.forsoeg;
+            var del = this.opg && this.opg.fase === "forsoeg" ? this.delNu() : null;
             return !!this.forsoegIndsend && !!del && del.indsend !== false;
         };
 
@@ -512,7 +536,7 @@
         /* Hinttrappen for den del af maalet, eleven staar i lige nu */
         P.hintTrin = function () {
             var g = this.opg;
-            return g.fase === "gaet" ? [] : g.o[g.fase].hint;
+            return g.fase === "gaet" ? [] : this.delNu().hint;
         };
 
         P.hintNu = function () {
@@ -528,15 +552,15 @@
                 return;
             }
             if (g.fase === "spm" || g.fase === "spm2") {
-                o[g.fase].svar.forEach(function (sv, j) { if (sv.ok) g.rigtig = j; });
-                if (g.fi < g.faser.length - 1) { this.mellemsvar("svar", o[g.fase].godt); return; }
+                this.delNu().svar.forEach(function (sv, j) { if (sv.ok) g.rigtig = j; });
+                if (g.fi < g.faser.length - 1) { this.mellemsvar("svar", this.delNu().godt); return; }
                 this.loest("svar", o.loest);
                 return;
             }
             if (g.fase === "felter") { this.felterSvar(o); return; }
             var slutTekst = this.forsoegSvar(o);
             if (g.fi >= g.faser.length - 1) { this.loest("svar", slutTekst || o.loest); return; }
-            if (o.forsoeg.set) { this.mellemsvar("svar", o.forsoeg.set); return; }
+            if (this.delNu().set) { this.mellemsvar("svar", this.delNu().set); return; }
             this.naesteFase();
             this.naesteLinje("", "");
         };
@@ -578,9 +602,10 @@
         };
 
         P.naesteUloeste = function () {
-            var n = this.status.length;
+            var n = this.status.length, ekstra = !!(this.opgaver[this.nr] && this.opgaver[this.nr].ekstra);
             for (var d = 1; d <= n; d++) {
                 var i = (this.nr + d) % n;
+                if (!!this.opgaver[i].ekstra !== ekstra) continue;
                 if (!this.status[i].loest) return i;
             }
             return -1;
@@ -635,7 +660,7 @@
             s.stjerne = s.stjerne || !this.brugtSvar;
             this.gem();
             this.sejrT = 0;
-            var alle = this.antalLoest() === this.opgaver.length;
+            var alle = this.antalLoest() === this.antalHoved() && !this.opgaver[this.nr].ekstra;
             /* Forklaringen staar paa det groenne kort */
             this.slut = { maade: maade, tekst: (linje || "") + (alle && foerste ? " " + D.FAERDIG[navn] : "") };
             this.besked("", "");

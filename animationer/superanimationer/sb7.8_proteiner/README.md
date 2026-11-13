@@ -177,6 +177,8 @@ Chrome (alle tre faner gennemført med stjerne).
 
 ## I menuen
 
+I menuen fra 13. nov. 2026 som B7 knap 4 (koden `b7.8`). Det, der står herunder, var planen.
+
 Ikke i menuen. Kommer den det, bliver den knap nr. 4 i
 `kemi-b-filer/samling_b7.html` med koden `b7.8`, og `index.html` får linjen
 `<script src="../../til_panelet.js" data-panel="samling_alt_b.html" data-emne="b7.8"></script>`

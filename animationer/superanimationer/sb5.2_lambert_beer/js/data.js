@@ -112,10 +112,10 @@
         {
             id: "toCm", navn: "Én centimeter mere",
             start: { stof: "mno4", c: 0.12, l: 1.00 },
-            spm: "Ved 0,12 mM slipper ca. halvdelen af lyset gennem en kuvette på 1,00 cm. Hvor meget slipper gennem 2,00 cm?",
+            spm: "Ved 0,12 mM slipper ca. halvdelen af lyset gennem 1,00 cm. Hvor meget slipper gennem 2,00 cm?",
             valg: [
                 { t: "0 %", n: "den anden centimeter absorberer resten" },
-                { t: "26 %", n: "den anden centimeter absorberer halvdelen af resten", ok: true },
+                { t: "26 %", n: "hver centimeter absorberer halvdelen", ok: true },
                 { t: "51 %", n: "det samme som før" }
             ],
             facit: { T: 0.26 },

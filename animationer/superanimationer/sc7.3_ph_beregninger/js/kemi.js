@@ -348,7 +348,7 @@
             ],
             formelHint: s.formel + " er en stærk syre. Alle " + s.formel + "-molekyler reagerer, og hvert molekyle giver én H₃O⁺ (se skemaet). Derfor er der lige så mange H₃O⁺, som der var " + s.formel + ".",
             skrivTekst: "c(" + s.formel + ") = " + cT + " M. Skriv koncentrationen som et tal gange en tierpotens.",
-            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. For eksempel er " + kommaEksempel(c) + ".",
+            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. Fx er " + kommaEksempel(c) + ".",
             fejl: function (svar) {
                 var b = find(svar, [
                     [2 * c, "Hvert " + s.formel + "-molekyle giver én H₃O⁺, så [H₃O⁺] = c."],
@@ -415,7 +415,7 @@
             tastHint: "Sådan ser det ud med tallet sat ind: [OH⁻] = " + b.n + " · " + cT + " M.",
             skrivTekst: b.n > 1 ? "Skriv [OH⁻] som et tal gange en tierpotens i felterne." :
                 "c(" + b.formel + ") = " + cT + " M. Skriv koncentrationen som et tal gange en tierpotens.",
-            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. For eksempel er " + kommaEksempel(facit) + ".",
+            skrivHint: "Flyt kommaet, til der står ét ciffer foran det, og tæl, hvor mange pladser kommaet er flyttet. Fx er " + kommaEksempel(facit) + ".",
             fejl: function (svar) {
                 var k = b.n > 1 ? [
                     [c, "Hver " + b.formel + " giver " + b.n + " OH⁻. Gang med " + b.n + "."],

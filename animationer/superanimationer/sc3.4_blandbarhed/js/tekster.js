@@ -110,7 +110,7 @@
         {
             id: "varm",
             start: { fyld: [["vand", 2], ["ethanol", 2]], blandet: true },
-            tekst: "Vand og ethanol er blandet til ét lag. Du varmer blandingen op til 90 °C. Hvad sker der?",
+            tekst: "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C. Hvad sker der?",
             valg: [
                 { tekst: "Det koger, dampen er mest ethanol", rigtig: true },
                 { tekst: "Begge stoffer koger lige meget", fejl: "De er blandet, men stadig to stoffer med hvert sit kogepunkt. Se, hvilke molekyler der stiger op." },

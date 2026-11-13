@@ -1,7 +1,7 @@
 # EscapeRoom Kemi C (sc_spil8_escaperoom)
 
-Spil nr. 8 i `kemi-c-filer/samling_c_spil.html`. Afløser `kemi-c-filer/c_spil8_escaperoom.html`,
-når brugeren siger til. Indtil da ligger den nye kun i sin egen mappe, og menuen peger på den gamle.
+Spil nr. 8 i `kemi-c-filer/samling_c_spil.html` fra 13. nov. 2026. Afløser `kemi-c-filer/c_spil8_escaperoom.html`,
+som nu ligger i `kemi-c-filer/arkiv/c_spil8_escaperoom_oldversion.html`.
 
 ## Bestillingen (12. nov. 2026)
 
@@ -82,8 +82,7 @@ der åbner spillet i en ny fane. Når man kommer tilbage, tjekkes rekorderne ige
 gemme noget (localStorage slået fra), godtages titlen alene.
 
 Spillene selv er ikke ændret. Pacman Quiz' og Organiske gruppers selvtest læser stadig seglene i den
-gamle `c_spil8_escaperoom.html`; de skal rettes til `sc_spil8_escaperoom/js/data.js`, når den nye
-kommer i menuen, og den gamle flyttes til `arkiv/`.
+nye `sc_spil8_escaperoom/js/data.js` (rettet 13. nov. 2026, da den nye kom i menuen).
 
 ## Beviset på gennemførsel
 
@@ -142,7 +141,7 @@ Bygget og afprøvet i headless Chrome. `_selvtest.html` er ALT OK (kemien, 2000 
 begge slutninger og seglene, beviset, sproget og skærmen ved 1366 x 768 og 1100 x 700). Brugeren har
 ikke set den endnu. Ikke i menuen.
 
-## Linjen til menuen (når brugeren siger til)
+## Linjen til menuen (udført 13. nov. 2026)
 
 I `kemi-c-filer/samling_c_spil.html`, knap 8:
 `onclick="visAnimation(this, '../superanimationer/sc_spil8_escaperoom/index.html')"`.

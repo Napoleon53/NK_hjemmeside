@@ -15,7 +15,7 @@
     var GEM = { sel: "#gem-omraade", titel: "Gem", tekst: "C gemmer brikken til senere. Godt til en ion, der ikke har en partner endnu." };
     var SALTE = { sel: "#saltkort", titel: "Målet", tekst: "Lav alle saltene her, så har du vundet. Den sidste reaktion står øverst, og hvert salt, du laver, lyser op." };
     var SPILLET = { sel: "#spilkort", titel: "Tiden", tekst: "Uret går, til alle salte er lavet. Rekorden er den hurtigste tid." };
-    var NIVEAUER = { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Let har seks simple ioner og en grøn skygge, når brikken bliver til salt. Middel har Al³⁺ og N³⁻. Svær har sammensatte ioner og ingen tal." };
+    var NIVEAUER = { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Let har seks simple ioner og en grøn skygge, når brikken bliver til salt. Middel har Al³⁺ og N³⁻. Svær har sammensatte ioner og ingen tal over rammerne." };
 
     var TURE = {
         "let": [

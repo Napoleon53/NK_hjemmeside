@@ -490,7 +490,7 @@
                     niv.fokusFelt = foerste.key;
                     niv.vis();
                 },
-                hint: function () { return HINT_IONER + " Skriv for eksempel Fe3+ for Fe³⁺, eller brug ladningsknapperne."; },
+                hint: function () { return HINT_IONER + " Skriv fx Fe3+ for Fe³⁺, eller brug ladningsknapperne."; },
                 vis: function (niv) {
                     var o = niv.o;
                     [["A", o.A], ["B", o.B]].forEach(function (x) {

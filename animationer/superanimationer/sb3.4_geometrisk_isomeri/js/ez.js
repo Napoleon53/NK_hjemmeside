@@ -187,7 +187,7 @@
             if (r.type !== "Z") return { ok: false, tekst: EZ.dom(r) + " Molekylet skal være Z." };
         } else if (o.krav === "ch3e") {
             var ens = (pos[0] === "CH3" && pos[2] === "CH3") || (pos[1] === "CH3" && pos[3] === "CH3");
-            if (!ens) return { ok: false, tekst: "De to CH₃ skal sidde på hvert sit C-atom og på samme side, for eksempel begge øverst." + nu };
+            if (!ens) return { ok: false, tekst: "De to CH₃ skal sidde på hvert sit C-atom og på samme side, fx begge øverst." + nu };
             if (r.type !== "E") return { ok: false, tekst: EZ.dom(r) + " Molekylet skal være E, selv om de to CH₃ sidder på samme side." };
         } else if (o.krav === "ingenH") {
             if (pos.indexOf("H") >= 0) return { ok: false, tekst: "Ingen af grupperne må være H." + nu };
@@ -214,7 +214,7 @@
             ],
             ingenH: [
                 "Der er ingen E/Z-isomeri, når det ene C-atom har to ens grupper.",
-                "Sæt to ens grupper på det samme C-atom, for eksempel to CH₃.",
+                "Sæt to ens grupper på det samme C-atom, fx to CH₃.",
                 "Sæt CH₃ og CH₃ til venstre og Cl og Br til højre."
             ],
             fireZ: [

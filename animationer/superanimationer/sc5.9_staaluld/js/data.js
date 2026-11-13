@@ -102,7 +102,7 @@
     D.SKILT = { taend: "Klik for at tænde", ilt: "Klik for mere dioxygen" };
 
     D.HINT = {
-        foer: "Massen står på displayet på vægten. Skriv den med to decimaler, for eksempel 4,25.",
+        foer: "Massen står på displayet på vægten. Skriv den med to decimaler, fx 4,25.",
         taend: "Bunsenbrænderen står til venstre for vægten. Klik på den. Du kan også trække den hen, så flammen rører stålulden.",
         vent: "Uden ekstra dioxygen går stålulden ud, før alt jernet har reageret. Klik på flasken med dioxygen flere gange, mens den gløder.",
         efter: "Massen står på displayet på vægten."

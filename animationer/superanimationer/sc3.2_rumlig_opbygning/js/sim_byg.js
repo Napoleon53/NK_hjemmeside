@@ -92,7 +92,7 @@
             return {
                 tekst: "Byg et molekyle, hvor atomerne omkring et nitrogenatom danner en pyramide.",
                 hint: "Nitrogen med tre enkeltbindinger har ét frit elektronpar.",
-                svar: "Nitrogen i for eksempel NH₃ eller CH₃NH₂ har tre bindinger og ét frit elektronpar, og det giver en pyramide.",
+                svar: "Nitrogen i fx NH₃ eller CH₃NH₂ har tre bindinger og ét frit elektronpar, og det giver en pyramide.",
                 start: function (sim) { sim.ryd(); },
                 kan: harAtomer,
                 fejl: function (sim) {

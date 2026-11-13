@@ -113,6 +113,7 @@
         if (this.fast.klasse === "skidt") this.naesteLinje("", "");
         if (!s.organisk && D.PAASKE[s.id] && this.cfg.navn !== "n") this.kortBesked(D.PAASKE[s.id], 6, "peger");
         this.tjekForsoeg();
+        if (!this.faerdig && !this.venter && this.kortEkstra && this.kortEkstra()) this.visKort();
         this.visIndsend();
         this.registrer();
         this.visPanel();
@@ -128,7 +129,7 @@
         var ok = false;
         if (del.maal === "ol_laengder") ok = s.g === "OH" && Object.keys(this.olLaengder).length >= 3;
         else if (del.maal === "cooh") ok = s.g === "COOH";
-        else if (del.maal === "tre_c2") ok = !!(this.sete.alkan2 && this.sete.alkohol2 && this.sete.carboxylsyre2);
+        else if (del.maal === "oh_paa") ok = s.g === "OH";
         else if (del.maal === "to_lag") ok = s.g === "OH" && s.opl === "nej" && s.tilstand === "væske";
         if (ok) this.forsoegKlaret();
     };
@@ -136,7 +137,6 @@
     /* Vis svaret: molekylet bygges for eleven */
     P.forsoegSvar = function (o, del) {
         if (del.maal === "ol_laengder") { this.olLaengder = { 1: true, 2: true, 3: true }; }
-        if (del.maal === "tre_c2") { this.sete.alkan2 = this.sete.alkohol2 = this.sete.carboxylsyre2 = true; }
         if (del.svarStof) this.saetMolekyle(del.svarStof.g, del.svarStof.n);
         else if (del.maal === "ol_laengder") this.saetMolekyle("OH", 3);
         else if (del.maal === "cooh") this.saetMolekyle("COOH", this.n);
@@ -156,18 +156,6 @@
         if (fejl) { this.fejlLinje(fejl); return; }
         this.forsoegKlaret(del.setFn ? del.setFn(s) : del.set);
         this.visPanel();
-    };
-
-    /* Kortet: listen over de tre stoffer, eleven skal bygge (fane 2, opgave 1) */
-    P.kortEkstra = function () {
-        if (!this.opg || this.opg.del.maal !== "tre_c2" || this.faerdig || this.venter) return "";
-        var mig = this;
-        var html = '<span class="sk-tjek">';
-        [["alkan2", "ethan"], ["alkohol2", "ethanol"], ["carboxylsyre2", "ethansyre"]].forEach(function (p) {
-            var ok = !!mig.sete[p[0]];
-            html += '<span class="tj' + (ok ? " ok" : "") + '">' + (ok ? "✓ " : "") + p[1] + "</span>";
-        });
-        return html + "</span>";
     };
 
     /* ----- Panelet: skemaet med det, eleven har set ------------------------------------------ */
@@ -300,13 +288,25 @@
         var hx = lay.plade.x + pb + 16, hb = W - 12 - hx;
         if (navn === "n") {
             lay.maskine = { x: hx, y: top, b: hb, h: lay.plade.h };
-        } else {
-            var ib = navn === "k" ? Math.min(150, Math.max(120, hb * 0.27)) : Math.min(180, Math.max(150, hb * 0.32));
+        } else if (navn === "k") {
+            var ib = Math.min(150, Math.max(120, hb * 0.27));
             lay.instr = { x: hx, y: top, b: ib, h: bund - top };
             var lx = hx + ib + 14, lb = W - 12 - lx;
             var lTop = top + 26, lBund = bund - 52;
             var lh = Math.min(lBund - lTop, Math.max(200, lb * 0.95));
             lay.lup = { x: lx, y: lTop + Math.max(0, (lBund - lTop - lh) / 2), b: lb, h: lh };
+        } else {
+            /* Fane 3: glasset foerst (brugeren 13. nov. 2026: "jeg så slet ikke
+               glasset før det var for sent"), oversigten over tommelfingerreglen
+               og under den en lille lup */
+            var gb = Math.min(210, Math.max(160, hb * 0.36));
+            lay.instr = { x: hx, y: top, b: gb, h: Math.min(bund - top, 520) };
+            var rx = hx + gb + 14, rb = W - 12 - rx;
+            var rh = Math.max(150, Math.min(190, (bund - top) * 0.36));
+            lay.regel = { x: rx, y: top, b: rb, h: rh };
+            var vTop = top + rh + 36, vBund = bund - 30;
+            var vh = Math.max(120, Math.min(vBund - vTop, 230, rb * 0.62));
+            lay.lup = { x: rx, y: vTop, b: rb, h: vh };
         }
         this.lay = lay;
         this.saetAnker("plade", lay.plade.x, lay.plade.y, lay.plade.b, lay.plade.h);
@@ -316,6 +316,7 @@
         this.saetAnker("stil", pr.stilAlle.x, pr.stilAlle.y, pr.stilZig.x + pr.stilZig.b - pr.stilAlle.x, pr.stilAlle.h);
         if (lay.maskine) this.saetAnker("maskine", lay.maskine.x, lay.maskine.y, lay.maskine.b, lay.maskine.h);
         if (lay.instr) this.saetAnker("instr", lay.instr.x, lay.instr.y, lay.instr.b, lay.instr.h);
+        if (lay.regel) this.saetAnker("regel", lay.regel.x, lay.regel.y, lay.regel.b, lay.regel.h);
         if (lay.lup) this.saetAnker("lup", lay.lup.x, lay.lup.y - 26, lay.lup.b, lay.lup.h + 70);
     };
 
@@ -341,6 +342,7 @@
         if (del.indsend) return null;
         if (del.maal === "ol_laengder") return s.g !== "OH" ? { tile: "OH" } : { plus: true };
         if (del.maal === "cooh") return { tile: "COOH" };
+        if (del.maal === "oh_paa") return { tile: "OH" };
         if (del.maal === "to_lag") return { plus: true };
         return null;
     };
@@ -386,6 +388,8 @@
         if (this.glas) {
             var gr = this.glas.tegn(ctx, lay.instr, { skjult: this.skjult("glas") });
             if (om.indexOf("glas") >= 0 && gr) Tg.omRing(ctx, gr.x, gr.y, gr.b, gr.h);
+            NK.tegnRegel(ctx, lay.regel, s, { skjult: this.skjult("glas") });
+            if (om.indexOf("regel") >= 0) Tg.omRing(ctx, lay.regel.x, lay.regel.y, lay.regel.b, lay.regel.h);
         }
         if (this.lup) this.tegnLup(ctx, lay.lup, om.indexOf("lup") >= 0);
         this.tegnSejr(ctx, lay.W, lay.H);

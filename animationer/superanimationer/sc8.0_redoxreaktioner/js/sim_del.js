@@ -15,6 +15,15 @@
 
    arket.foer: det, der er loest foer opgaven ("ox", "red", "gange",
    "navne"), saa en opgave aabnet fra listen staar rigtigt.
+
+   Ekstraopgaverne (o.dele i js/data.js) er fire reaktioner i traek. En del
+   med trin "e" er elektronerne i begge delreaktioner, en del med trin
+   "gange" er tallene foran delreaktionerne: en stiplet plads foran hver
+   delreaktion, hvor et klik giver ét mere og minus ét mindre (tom er 1).
+   Elektronerne paa arket ganges med, saa eleven kan se, om der afgives
+   lige saa mange, som der optages. Et spoergsmaal (svaer) spoerger om
+   reduktions- eller oxidationsmidlet. nyFase lægger den naeste reaktion
+   paa arket.
    ===================================================================== */
 (function () {
     "use strict";
@@ -39,9 +48,28 @@
 
     /* ----- Arket ------------------------------------------------------------------------ */
     P.nyOpgave = function (o) {
-        var r = D.REAK[o.reak], foer = o.foer || [];
+        if (o.dele) this.nytArk(o.dele[0].reak, []);
+        else this.nytArk(o.reak, o.foer || []);
+        this.traek = null;
+        this.valgtBrik = null;
+        this.vistSkilt = false;
+    };
+
+    /* Ekstraopgaverne: naeste del er en ny reaktion, eller samme reaktion med tallene foran */
+    P.nyFase = function () {
+        var d = this.delNu();
+        if (this.opg.o.dele && d.reak !== this.ark.reak) {
+            this.nytArk(d.reak, []);
+            this.vistSkilt = false;
+        }
+        this.valgtBrik = null;
+    };
+
+    P.nytArk = function (reak, foer) {
+        var r = D.REAK[reak];
         this.ark = {
-            reak: o.reak,
+            reak: reak,
+            gangeTal: { ox: 0, red: 0 },
             e: { ox: { v: 0, h: 0 }, red: { v: 0, h: 0 } },
             loest: { ox: foer.indexOf("ox") >= 0, red: foer.indexOf("red") >= 0 },
             gange: foer.indexOf("gange") >= 0,
@@ -55,21 +83,36 @@
         RAEKKER.forEach(function (rk) {
             if (mig.ark.loest[rk]) mig.ark.e[rk][r[rk].rigtig.side] = r[rk].rigtig.n;
         });
-        this.traek = null;
-        this.valgtBrik = null;
-        this.vistSkilt = false;
+    };
+
+    /* Det, den del af opgaven, eleven staar i, bruger: raekker med e⁻, brikker og tallene foran */
+    P.info = function () {
+        var o = this.opg.o, d = this.delNu();
+        if (o.dele) {
+            if (!d || d.type !== "forsoeg") return { aktiv: [], brikker: [], gange: false };
+            return d.trin === "gange" ? { aktiv: [], brikker: [], gange: true } : { aktiv: ["ox", "red"], brikker: ["e"], gange: false };
+        }
+        return { aktiv: o.aktiv || [], brikker: o.brikker || [], gange: false };
     };
 
     /* Pladserne, opgaven bruger lige nu */
-    P.brugerE = function () { return this.iForsoeg() && (this.opg.o.brikker || []).indexOf("e") >= 0; };
-    P.brugerNavne = function () { return (this.opg.o.brikker || []).indexOf("oxidation") >= 0; };
-    P.brugerMidler = function () { return (this.opg.o.brikker || []).indexOf("reduktionsmiddel") >= 0; };
-    P.aktivRaekke = function (rk) { return this.brugerE() && (this.opg.o.aktiv || []).indexOf(rk) >= 0; };
+    P.brugerE = function () { return this.iForsoeg() && this.info().brikker.indexOf("e") >= 0; };
+    P.brugerNavne = function () { return this.info().brikker.indexOf("oxidation") >= 0; };
+    P.brugerMidler = function () { return this.info().brikker.indexOf("reduktionsmiddel") >= 0; };
+    P.brugerGange = function () { return this.iForsoeg() && this.info().gange; };
+    P.aktivRaekke = function (rk) { return this.brugerE() && this.info().aktiv.indexOf(rk) >= 0; };
+
+    /* Tallet foran en delreaktion: det afstemte, naar det er fundet, ellers elevens (tom er 1) */
+    P.gangeVis = function (rk) {
+        var a = this.ark;
+        if (a.gange) return D.REAK[a.reak][rk].gange;
+        return a.gangeTal[rk] || 1;
+    };
 
     /* Brikkerne i bakken (de mærkater, der allerede sidder paa arket, er ikke i bakken) */
     P.bakkeBrikker = function () {
         if (!this.iForsoeg()) return [];
-        var a = this.ark, liste = (this.opg.o.brikker || []).slice();
+        var a = this.ark, liste = this.info().brikker.slice();
         return liste.filter(function (b) {
             if (b === "e") return true;
             return a.navne.ox !== b && a.navne.red !== b && a.midler.ox !== b && a.midler.red !== b;
@@ -82,6 +125,7 @@
         RAEKKER.forEach(function (rk) { if (mig.aktivRaekke(rk)) mig.ark.e[rk] = { v: 0, h: 0 }; });
         if (this.brugerNavne()) this.ark.navne = { ox: null, red: null };
         if (this.brugerMidler()) this.ark.midler = { ox: null, red: null };
+        if (this.brugerGange()) this.ark.gangeTal = { ox: 0, red: 0 };
         this.valgtBrik = null;
         this.visIndsend();
         void o;
@@ -93,11 +137,13 @@
         if (this.brugerE()) return RAEKKER.some(function (rk) { return mig.aktivRaekke(rk) && (a.e[rk].v + a.e[rk].h) > 0; });
         if (this.brugerNavne()) return !!(a.navne.ox && a.navne.red);
         if (this.brugerMidler()) return !!(a.midler.ox && a.midler.red);
+        if (this.brugerGange()) return !!(a.gangeTal.ox || a.gangeTal.red);
         return false;
     };
 
     P.ikkeKlar = function () {
         if (this.brugerE()) return "Træk først elektroner, e⁻, hen på en af de stiplede pladser.";
+        if (this.brugerGange()) return "Klik først på en stiplet plads foran en delreaktion for at sætte et tal.";
         return "Sæt begge mærkater på arket først.";
     };
 
@@ -114,6 +160,13 @@
             });
             if (fejl) { this.fejlLinje(fejl); return; }
             RAEKKER.forEach(function (rk) { if (mig.aktivRaekke(rk)) { a.loest[rk] = true; a.groen[rk] = 0; } });
+            /* den lette ekstraopgave: tallene foran kommer af sig selv */
+            if (o.dele && o.slags === "let") { a.gange = true; a.groen.gange = 0; }
+        } else if (this.brugerGange()) {
+            fejl = D.gangeFejl(a.reak, a.gangeTal);
+            if (fejl) { this.fejlLinje(fejl); return; }
+            a.gange = true;
+            a.groen.gange = 0;
         } else if (this.brugerNavne()) {
             fejl = D.navneFejl(a.navne);
             if (fejl) { this.fejlLinje(fejl); return; }
@@ -127,7 +180,9 @@
         }
         this.nulstilHjaelp();
         this.valgtBrik = null;
-        this.forsoegKlaret(o.forsoeg.set);
+        /* den sidste del af en ekstraopgave: opgavens afslutning i stedet for delens tekst */
+        var sidst = this.opg.fi >= this.opg.faser.length - 1;
+        this.forsoegKlaret(o.dele && sidst ? o.loest : this.delNu().set);
     };
 
     /* Vis svaret i et forsoeg: arket udfyldes rigtigt */
@@ -140,6 +195,10 @@
                 a.e[rk][r[rk].rigtig.side] = r[rk].rigtig.n;
                 a.loest[rk] = true;
             });
+            if (o.dele && o.slags === "let") a.gange = true;
+        } else if (this.brugerGange()) {
+            a.gangeTal = { ox: r.ox.gange, red: r.red.gange };
+            a.gange = true;
         } else if (this.brugerNavne()) {
             a.navne = { ox: "oxidation", red: "reduktion" };
             a.navneLoest = true;
@@ -155,6 +214,13 @@
     /* Efter et rigtigt svar paa et spoergsmaal: arket viser det (dér, hvor det hoerer til) */
     P.efterSpm = function () {
         var o = this.opg.o, a = this.ark;
+        /* ekstraopgaverne (svaer): midlerne kommer under stofferne */
+        if (o.dele && this.opg.fase === "spm" && !a.midlerLoest) {
+            a.midler = { ox: "reduktionsmiddel", red: "oxidationsmiddel" };
+            a.midlerLoest = true;
+            a.groen.midler = 0;
+            return;
+        }
         if ((o.id === "lige" || o.id === "fe") && this.opg.fase === "spm" && !a.gange) { a.gange = true; a.groen.gange = 0; }
         if (o.id === "fe" && this.opg.fase === "spm2" && !a.midlerLoest) {
             a.midler = { ox: "reduktionsmiddel", red: "oxidationsmiddel" };
@@ -242,6 +308,8 @@
             ud.push({ id: rk + ".v", slags: "e", rk: rk, side: "v", x: X.slotV, y: y - sh / 2, b: l.m.wSlot, h: sh });
             ud.push({ id: rk + ".h", slags: "e", rk: rk, side: "h", x: X.slotH, y: y - sh / 2, b: l.m.wSlot, h: sh });
             ud.push({ id: rk + ".navn", slags: "navn", rk: rk, x: X.label, y: y - F * 0.55, b: l.m.wLabel, h: F * 1.1 });
+            var gb = Math.max(F * 0.95, l.m.wK - F * 0.3);
+            ud.push({ id: rk + ".gange", slags: "gange", rk: rk, x: X.stof - F * 0.18 - gb, y: y - sh / 2, b: gb, h: sh });
         });
         /* Midlernes pladser under stofferne i reaktionen oeverst */
         var s = this.samletPos();
@@ -282,6 +350,15 @@
         if (p.slags === "e") return this.aktivRaekke(p.rk);
         if (p.slags === "navn") return this.brugerNavne();
         if (p.slags === "middel") return this.brugerMidler();
+        if (p.slags === "gange") return this.brugerGange();
+        return false;
+    };
+
+    /* Har pladsen noget, minus kan tage af (elektroner eller et tal foran) */
+    P.harMinus = function (p) {
+        if (!this.pladsAktiv(p)) return false;
+        if (p.slags === "e") return this.ark.e[p.rk][p.side] > 0;
+        if (p.slags === "gange") return this.ark.gangeTal[p.rk] > 0;
         return false;
     };
 
@@ -334,6 +411,19 @@
         var W = l.W, H = l.H, F = l.F, r = D.REAK[a.reak], om = this.omNu(), X = this.raekkeX();
         ctx.clearRect(0, 0, W, H);
         Tg.ark(ctx, l.ark, false);
+        /* Ekstraopgaverne: hvilken reaktion eleven er naaet til */
+        var o = this.opg.o;
+        if (o.dele) {
+            var reaks = [];
+            o.dele.forEach(function (d) { if (reaks.indexOf(d.reak) < 0) reaks.push(d.reak); });
+            ctx.save();
+            ctx.font = Tg.font("700", Math.round(NK.klamp(F * 0.36, 12, 16)));
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillStyle = "#8a826d";
+            ctx.fillText(o.navn + ": reaktion " + (reaks.indexOf(a.reak) + 1) + " af " + reaks.length, l.ark.x + 14, l.ark.y + 10);
+            ctx.restore();
+        }
 
         /* Reaktionen oeverst */
         var s = this.samletPos();
@@ -387,10 +477,18 @@
         /* Delreaktionerne */
         RAEKKER.forEach(function (rk) { mig.tegnRaekke(ctx, rk, X, r[rk]); });
 
+        /* Det gule skilt ved tallene foran, til eleven har sat et */
+        if (this.brugerGange() && !a.gangeTal.ox && !a.gangeTal.red) {
+            var pg0 = this.plads("ox.gange");
+            Tg.skilt(ctx, "Klik: sæt et tal foran", pg0.x + pg0.b / 2, pg0.y - 6, l.ark.x + 6, l.ark.x + l.ark.b - 6);
+        }
+
         /* Ringene om det, opgaven handler om */
         RAEKKER.forEach(function (rk) {
             if (om.indexOf(rk) < 0) return;
-            Tg.ring(ctx, X.stof - F * 0.35, l.y[rk] - F * 0.82, X.slut - X.stof + F * 0.6, F * 1.64, 12);
+            var x0 = X.stof - l.m.wK - F * 0.1;
+            if (mig.brugerGange()) x0 = Math.min(x0, mig.plads(rk + ".gange").x - 10);
+            Tg.ring(ctx, x0, l.y[rk] - F * 0.82, X.slut + F * 0.25 - x0, F * 1.64, 12);
         });
         if (om.indexOf("maerker") >= 0) {
             Tg.ring(ctx, X.label - 8, l.y.ox - F * 0.72, l.m.wLabel + 16, l.y.red - l.y.ox + F * 1.44, 12);
@@ -470,16 +568,50 @@
         Tg.brik(ctx, bk.tekst, p.x + p.b / 2, p.y + p.h / 2, l.m.lpx, { farve: bk.farve, b: p.b - 4, h: p.h - 2, groen: loest && groenT !== undefined, bund: loest ? "#fffdf6" : "#ffffff" });
     };
 
+    P.tegnMinus = function (ctx, p) {
+        var mr = this.minusRekt(p);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(mr.x + mr.r, mr.y + mr.r, mr.r, 0, Math.PI * 2);
+        ctx.fillStyle = this.overMinus === p.id ? "#c4473a" : "#8a3328";
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = Math.max(2, mr.r * 0.28);
+        ctx.beginPath();
+        ctx.moveTo(mr.x + mr.r * 0.5, mr.y + mr.r);
+        ctx.lineTo(mr.x + mr.r * 1.5, mr.y + mr.r);
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Pladsen til tallet foran en delreaktion (ekstraopgaverne). Tom er 1 */
+    P.tegnGangePlads = function (ctx, p, y) {
+        var t = this.ark.gangeTal[p.rk], F = this.lay.F;
+        if (!t) { Tg.plads(ctx, p, this.overPlads === p); return; }
+        NK.rundtRekt(ctx, p.x, p.y, p.b, p.h, 9);
+        ctx.save();
+        ctx.fillStyle = this.overPlads === p ? "rgba(242, 197, 61, 0.3)" : "#ffffff";
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#9aa3b0";
+        ctx.stroke();
+        ctx.restore();
+        Tg.formel(ctx, String(t), p.x + p.b / 2, y, F, {});
+        this.tegnMinus(ctx, p);
+    };
+
     P.tegnRaekke = function (ctx, rk, X, rr) {
         var l = this.lay, a = this.ark, F = l.F, y = l.y[rk], mig = this;
         var aktiv = this.aktivRaekke(rk), loest = a.loest[rk];
         var dim = !aktiv && !loest && this.brugerE();
         ctx.save();
         if (dim) ctx.globalAlpha = 0.38;
-        var gange = a.gange ? D.REAK[a.reak][rk].gange : 1;
+        var gange = this.gangeVis(rk);
         var kStof = gange > 1 ? String(gange) : "", kIon = gange * rr.ionK > 1 ? String(gange * rr.ionK) : "";
         var groenK = a.gange;
-        if (kStof) Tg.formel(ctx, kStof, X.k, y, F, { justering: "right", farve: groenK ? Tg.GROEN : Tg.BLAEK });
+        var pg = this.plads(rk + ".gange");
+        if (this.pladsAktiv(pg)) this.tegnGangePlads(ctx, pg, y);
+        else if (kStof) Tg.formel(ctx, kStof, X.k, y, F, { justering: "right", farve: groenK ? Tg.GROEN : Tg.BLAEK });
         Tg.formel(ctx, rr.stof, X.stof, y, F, { justering: "left" });
         Tg.reaktionspil(ctx, X.pil + 4, X.pil + l.m.wPil - 4, y, Tg.BLAEK, Math.max(2, F * 0.06));
         if (kIon) Tg.formel(ctx, kIon, X.kIon, y, F, { justering: "right", farve: groenK && gange > 1 ? Tg.GROEN : Tg.BLAEK });
@@ -507,21 +639,7 @@
                 ctx.stroke();
                 ctx.restore();
                 Tg.formel(ctx, n + " e^−", p.x + p.b / 2, y, F, { farve: Tg.E });
-                if (aktiv) {
-                    var mr = mig.minusRekt(p);
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(mr.x + mr.r, mr.y + mr.r, mr.r, 0, Math.PI * 2);
-                    ctx.fillStyle = mig.overMinus === p.id ? "#c4473a" : "#8a3328";
-                    ctx.fill();
-                    ctx.strokeStyle = "#ffffff";
-                    ctx.lineWidth = Math.max(2, mr.r * 0.28);
-                    ctx.beginPath();
-                    ctx.moveTo(mr.x + mr.r * 0.5, mr.y + mr.r);
-                    ctx.lineTo(mr.x + mr.r * 1.5, mr.y + mr.r);
-                    ctx.stroke();
-                    ctx.restore();
-                }
+                if (aktiv) mig.tegnMinus(ctx, p);
             } else if (aktiv || dim) {
                 Tg.plads(ctx, p, aktiv && mig.overPlads === p);
             }
@@ -577,6 +695,7 @@
     P.tagAf = function (p) {
         var a = this.ark;
         if (p.slags === "e") { if (a.e[p.rk][p.side] > 0) a.e[p.rk][p.side]--; }
+        else if (p.slags === "gange") { var t = a.gangeTal[p.rk]; a.gangeTal[p.rk] = t > 2 ? t - 1 : 0; }
         else if (p.slags === "navn") a.navne[p.rk] = null;
         else a.midler[p.rk] = null;
         this.nulstilHjaelp();
@@ -593,7 +712,7 @@
         if (f) { this.overBrik = f.brik; this.overPlads = null; return "greb"; }
         var mig = this, minus = null;
         this.pladser.forEach(function (p) {
-            if (p.slags === "e" && mig.pladsAktiv(p) && mig.ark.e[p.rk][p.side] > 0 && Tg.inde(mig.minusRekt(p), pt, 2)) minus = p;
+            if (mig.harMinus(p) && Tg.inde(mig.minusRekt(p), pt, 2)) minus = p;
         });
         if (minus) { this.overMinus = minus.id; this.overPlads = null; return "pointer"; }
         var p = this.pladsVed(pt);
@@ -604,6 +723,7 @@
 
     P.harBrik = function (p) {
         var a = this.ark;
+        if (p.slags === "gange") return false;
         if (p.slags === "e") return a.e[p.rk][p.side] > 0;
         if (p.slags === "navn") return !!a.navne[p.rk];
         return !!a.midler[p.rk];
@@ -674,12 +794,20 @@
         }
         var mig = this, minus = null;
         this.pladser.forEach(function (p) {
-            if (p.slags === "e" && mig.pladsAktiv(p) && mig.ark.e[p.rk][p.side] > 0 && Tg.inde(mig.minusRekt(p), pt, 2)) minus = p;
+            if (mig.harMinus(p) && Tg.inde(mig.minusRekt(p), pt, 2)) minus = p;
         });
         if (minus) { this.tagAf(minus); return; }
         var p = this.pladsVed(pt);
         if (!p) return;
         if (p.slags === "e") { this.saetPaa("e", p); return; }
+        if (p.slags === "gange") {
+            var t = this.ark.gangeTal[p.rk] || 1;
+            if (t >= 6) { this.kortBesked("Tallet foran er højst 6 i disse opgaver.", 3); return; }
+            this.ark.gangeTal[p.rk] = t + 1;
+            this.nulstilHjaelp();
+            this.visIndsend();
+            return;
+        }
         if (this.valgtBrik && this.passer(this.valgtBrik, p)) {
             this.saetPaa(this.valgtBrik, p);
             this.valgtBrik = null;

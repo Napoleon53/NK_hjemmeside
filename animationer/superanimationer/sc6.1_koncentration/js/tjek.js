@@ -504,7 +504,7 @@
                         K.mL(L.mL) + " mL = " + K.L(L.mL) + " L.", talOk: true };
                 }
                 if (L.slags === "V" && t.rumfang === "ens" && f && f.vEnhed && f.vEnhed !== s.enhed) {
-                    return { besked: "Skriv begge rumfang i samme enhed, for eksempel begge i mL.", talOk: true };
+                    return { besked: "Skriv begge rumfang i samme enhed, fx begge i mL.", talOk: true };
                 }
                 return { ok: true, led: ledige[k], enhed: s.enhed };
             }
@@ -671,7 +671,7 @@
         }
         if (kommaFlyttet(s.base, R.facit)) return { besked: "Tjek kommaet. Tallet er " + (s.base > R.facit ? "for stort." : "for lille.") };
         if (R.absTol ? Math.abs(s.base - R.facit) <= 1 : naer(s.base, R.facit, 0.04)) {
-            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, for eksempel O = 16,00." : "Tæt på. Regn med alle cifrene." };
+            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, fx O = 16,00." : "Tæt på. Regn med alle cifrene." };
         }
         return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };

@@ -72,7 +72,7 @@ Tre fejl i den gamle er rettet, fordi de ikke påvirker balancen:
 
 ## Escaperoommet
 
-`c_spil8_escaperoom.html` har seglet "Segl 3 · Pacman Quiz". Svaret er
+EscapeRoom Kemi C (`sc_spil8_escaperoom`, før `c_spil8_escaperoom.html`) har seglet "Segl 3 · Pacman Quiz". Svaret er
 *labyrintmester*, og hintet siger: vælg SVÆR og Mix, og gennemfør hele forløbet.
 Derfor må navnene **Pacman Quiz**, **Svær**, **Mix** og sætningen i
 `D.MESTER.tekst` ikke ændres, uden at escaperoommet rettes med. Selvtesten læser

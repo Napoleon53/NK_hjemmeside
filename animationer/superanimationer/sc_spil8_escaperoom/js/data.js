@@ -39,7 +39,7 @@
         3: { titel: "Laboratoriets vægt", tekst: "Et stykke metal ligger på vægten. Niller ville lade det reagere med saltsyre. Låsen vil have rumfanget af den gas, der dannes." },
         4: { titel: "Den hemmelige opløsning", tekst: "Niller har titreret en syre med ukendt koncentration. Buretten står der endnu. Låsen vil have syrens pH." },
         5: { titel: "Den sidste reaktion", tekst: "Den sidste dør. Buretten er fyldt med violet kaliumpermanganat. Låsen vil have prøvens koncentration." },
-        6: { titel: "Den gyldne dør", tekst: "Bag rum 5 står en dør af guld. Jeres fem gyldne nøgler passer i låsen, men fire segl holder den lukket. Seglene kommer fra jeres andre kemispil." }
+        6: { titel: "Den gyldne dør", tekst: "Bag rum 5 står en dør af guld. Jeres fem gyldne nøgler passer i låsen, men fire segl holder den lukket. Hvert segl brydes med en titel fra et andet kemispil." }
     };
 
     D.LAAS = {

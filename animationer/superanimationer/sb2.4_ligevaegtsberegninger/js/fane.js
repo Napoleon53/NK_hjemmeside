@@ -29,7 +29,7 @@
     var M = NK.Model;
 
     /* Kc med det lille c: teksterne skrives "Kc" og vises som K<sub>c</sub> */
-    NK.kc = function (html) { return String(html).replace(/\bKc\b/g, "K<sub>c</sub>"); };
+    NK.kc = function (html) { return String(html).replace(/\bKc\b/g, "K"); };
 
     function paa(P, valg) {
         var navn = valg.navn;

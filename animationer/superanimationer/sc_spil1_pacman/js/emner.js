@@ -69,12 +69,12 @@
         { navn: "Beryllium", symbol: "Be" }, { navn: "Bor", symbol: "B" }, { navn: "Carbon", symbol: "C" },
         { navn: "Nitrogen", symbol: "N" }, { navn: "Oxygen", symbol: "O" }, { navn: "Fluor", symbol: "F" },
         { navn: "Neon", symbol: "Ne" }, { navn: "Natrium", symbol: "Na" }, { navn: "Magnesium", symbol: "Mg" },
-        { navn: "Aluminium", symbol: "Al" }, { navn: "Silicium", symbol: "Si" }, { navn: "Fosfor", symbol: "P" },
+        { navn: "Aluminium", symbol: "Al" }, { navn: "Silicium", symbol: "Si" }, { navn: "Phosphor", symbol: "P" },
         { navn: "Svovl", symbol: "S" }, { navn: "Chlor", symbol: "Cl" }, { navn: "Argon", symbol: "Ar" },
         { navn: "Kalium", symbol: "K" }, { navn: "Calcium", symbol: "Ca" }, { navn: "Jern", symbol: "Fe" },
         { navn: "Kobber", symbol: "Cu" }, { navn: "Zink", symbol: "Zn" }, { navn: "Sølv", symbol: "Ag" },
         { navn: "Guld", symbol: "Au" }, { navn: "Bly", symbol: "Pb" }, { navn: "Tin", symbol: "Sn" },
-        { navn: "Nikkel", symbol: "Ni" }, { navn: "Mangan", symbol: "Mn" }, { navn: "Krom", symbol: "Cr" },
+        { navn: "Nikkel", symbol: "Ni" }, { navn: "Mangan", symbol: "Mn" }, { navn: "Chrom", symbol: "Cr" },
         { navn: "Brom", symbol: "Br" }, { navn: "Iod", symbol: "I" }
     ];
 
@@ -229,7 +229,7 @@
             function M(v) { return NK.tal(v) + " M"; }
             var r = M(c);
             return {
-                tekst: "Beregn c, når n = " + NK.tal(data.n) + " mol og V = " + NK.tal(data.v) + " L.",
+                tekst: "Beregn koncentrationen c, når n = " + NK.tal(data.n) + " mol og V = " + NK.tal(data.v) + " L.",
                 rigtig: r,
                 forkerte: tre(r, [
                     { t: M(data.n * data.v), hint: "c = n / V. Du har ganget." },
@@ -353,7 +353,7 @@
             var n = data.n, navn = NAVNE[n];
             function F(c, h) { return "C" + (c === 1 ? "" : sub(c)) + "H" + sub(h); }
             var formel = F(n, 2 * n + 2);
-            var atomer = n + " kulstofatom" + (n > 1 ? "er" : "");
+            var atomer = n + " carbonatom" + (n > 1 ? "er" : "");
             if (data.dir === "formel") {
                 var k = [
                     { t: F(n, 2 * n), hint: "CₙH₂ₙ passer ikke til alkaner. Alkaner er CₙH₂ₙ₊₂." },
@@ -384,8 +384,8 @@
     var TYPE_HINT = {
         "Oxidation": "Oxidation er at afgive elektroner. Se, hvilken side e⁻ står på.",
         "Reduktion": "Reduktion er at optage elektroner. Se, hvilken side e⁻ står på.",
-        "Fældning": "Ved en fældning dannes et tungtopløseligt salt. Her flyttes elektroner.",
-        "Syre-base": "Ved syre-base flyttes H⁺. Her flyttes elektroner."
+        "Fældning": "Ved en fældning dannes et tungtopløseligt salt. Her overføres elektroner.",
+        "Syre-base": "Ved en syre-basereaktion overføres H⁺. Her overføres elektroner."
     };
 
     var redox = {
@@ -396,7 +396,7 @@
                 [8, "Ionens ladning er −2, ikke 0."],
                 [-6, "O har −2. Så må S være positiv."],
                 [-2, "−2 er ionens ladning, ikke oxidationstallet for S."]] },
-            { type: "redox", rxn: "Fe²⁺ → Fe³⁺ + e⁻", rigtig: "Oxidation", exp: "Jern afgiver en elektron (e⁻ er produkt), og oxidationstallet stiger fra +2 til +3. Det er en oxidation." },
+            { type: "redox", rxn: "Fe²⁺ → Fe³⁺ + e⁻", rigtig: "Oxidation", exp: "Jern(II)ionen afgiver en elektron (e⁻ er produkt), og oxidationstallet stiger fra +2 til +3. Det er en oxidation." },
             { type: "tal", formel: "NO₃⁻", atom: "N", val: 5, exp: "Oxygen (O) har oxidationstal −2. 3 · (−2) + x = −1 (ionens ladning) ⇒ x = +5.", forkerte: [
                 [6, "Ionens ladning er −1, ikke 0."],
                 [-5, "O har −2. Så må N være positiv."],
@@ -411,7 +411,7 @@
                 [6, "Der er to Fe-atomer. Del med 2."],
                 [-3, "O har −2. Så må Fe være positiv."],
                 [2, "Fe₂O₃ er neutral: 2x + 3 · (−2) = 0."]] },
-            { type: "redox", rxn: "Cu²⁺ + 2e⁻ → Cu", rigtig: "Reduktion", exp: "Kobberionen optager elektroner, og oxidationstallet falder fra +2 til 0. Det er en reduktion." },
+            { type: "redox", rxn: "Cu²⁺ + 2e⁻ → Cu", rigtig: "Reduktion", exp: "Kobber(II)ionen optager elektroner, og oxidationstallet falder fra +2 til 0. Det er en reduktion." },
             { type: "tal", formel: "H₂S", atom: "S", val: -2, exp: "Hydrogen (H) har oxidationstal +1. 2 · (+1) + x = 0 (neutralt molekyle) ⇒ x = −2.", forkerte: [
                 [2, "H har +1. Så må S være negativ."],
                 [-1, "Der er to H-atomer: 2 · (+1)."],

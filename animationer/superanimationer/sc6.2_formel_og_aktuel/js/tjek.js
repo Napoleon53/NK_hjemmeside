@@ -291,7 +291,7 @@
         var st = D.salt(o.salt), a = heltal(rawKat), b = heltal(rawAn);
         var kat = D.ion(st.kat), an = D.ion(st.an);
         if (a === null || b === null) return { tom: true, besked: "Skriv et tal i begge felter, også når tallet er 1." };
-        if (isNaN(a) || isNaN(b) || a < 1 || b < 1) return { besked: "Skriv hele tal, for eksempel 1, 2 eller 3." };
+        if (isNaN(a) || isNaN(b) || a < 1 || b < 1) return { besked: "Skriv hele tal, fx 1, 2 eller 3." };
         if (a === st.kk && b === st.ka) return { ok: true };
         var sammensat = st.an.length > 2;
         var iParentes = st.formel.indexOf("(") >= 0;
@@ -564,7 +564,7 @@
     T.trin = function (id, raa, o) {
         if (!String(raa || "").trim()) return { tom: true, besked: "Skriv tallet." };
         var t = T.tal(raa);
-        if (!t) return { besked: "Skriv et tal, for eksempel 0,250." };
+        if (!t) return { besked: "Skriv et tal, fx 0,250." };
         var k = kandidater(id, o), v = t.v;
         if (k.absTol ? Math.abs(v - k.facit) <= k.absTol : naer(v, k.facit)) return { ok: true };
         for (var i = 0; i < k.fejl.length; i++) {
@@ -573,7 +573,7 @@
         }
         if (kommaFlyttet(v, k.facit)) return { besked: "Tjek kommaet. Tallet er " + (v > k.facit ? "for stort." : "for lille.") };
         if (k.absTol ? Math.abs(v - k.facit) <= 1 : naer(v, k.facit, 0.04)) {
-            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, for eksempel O = 16,00." : "Tæt på. Regn med alle cifrene." };
+            return { besked: id === "M" ? "Tæt på. Brug atommasserne med to decimaler, fx O = 16,00." : "Tæt på. Regn med alle cifrene." };
         }
         return { besked: "Det passer ikke. Tryk på Giv hint, hvis du sidder fast." };
     };

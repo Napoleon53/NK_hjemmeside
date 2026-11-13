@@ -39,6 +39,33 @@ dioxygen. Bagefter afstemmer eleven forbrændingen i rækkefølgen C, H, O."
    Fane 1: brænderen, skeen og luftreguleringen til venstre, luppen til
    højre. Fane 2: en lys tavle med skemaet og regnskabet til højre.
 
+### Brugerens første dom (13. november 2026)
+
+* "Spørgsmål 2 er lidt akavet.. man trykket OK .. og så står der bare godt..
+  og så skal man trykke næste spørgsmål... her skal lige springes et trin
+  over" (også opgave 4): et forsøg på fane 1 fører nu direkte til
+  spørgsmålet (`direkte: true` i `js/data.js`), også når skeen kommer sort
+  tilbage i opgave 1.
+* "senere kommer der er spørgsmål der nærmest svarer på sig selv" (opgave 5
+  nævnte carbonmonoxid i spørgsmålet): opgave 5 spørger nu, hvilket stof fra
+  den gule flamme der er en giftig gas, og hverken spørgsmålet eller navnet i
+  listen siger carbonmonoxid. Samme rettelse i opgave 1 (spørgsmålet siger
+  ikke sod) og opgave 2 (indledningen sagde, at luften blandes med gassen).
+  Det rigtige svar står ikke længere altid først.
+* "reaktionsskemaerne.. må gerne fejres ordentligt når man er helt færdig":
+  konfetti fra tavlen, når et skema er afstemt, og når alle er afstemt, fører
+  kortets knap Se din medalje → til en medalje (guld, sølv eller bronze efter
+  stjernerne) med alle skemaerne og konfettiregn, som i sb3.3.
+* "en mulighed for at afstemme reaktionsskemaerne almindeligt (uden tegninger
+  og uden trin)... men bare direkte indsættelse.. vælge øvet eller uøvet":
+  niveauet vælges i panelet. Øvet har seks skemaer med et felt foran hvert
+  stof.
+* "ved den nuværende uøvet.. så skal teksten her være større, og det skal
+  være tydeligt, at vi først kun er i gang med at kigge på C-atomer": kortets
+  tekst er større på fane 2, en stor linje øverst på tavlen siger "Trin 1 af
+  3: Kig kun på carbonatomerne, C", og i kuglerne og regnskabet er de andre
+  atomer tonet ned.
+
 Stop-listen er overholdt: der hældes ikke, og der er intet affaldsglas, intet
 uheld og intet forløb trin for trin. Trinnene på fane 2 er afstemningens
 fremgangsmåde, ikke et forsøg.
@@ -53,26 +80,39 @@ et klik skubber den ind i flammen et øjeblik (tørret af først), og den
 kommer selv tilbage, sort, hvis flammen soder. Luppen over flammens spids
 viser, hvad der kommer op. Fem opgaver:
 
-1. Den gule flamme: tænd, hold skeen ind i flammen; hvad er det sorte lag? (sod, rent carbon)
+1. Den gule flamme: tænd, hold skeen ind i flammen; hvad består det sorte lag
+   af? (carbon fra methan)
 2. Den blå flamme: stil luftreguleringen, så flammen ikke soder, og indsend;
-   hvorfor soder den blå flamme ikke? (dioxygen nok til alt carbon)
+   hvorfor soder flammen ikke, når luftreguleringen er åben? (dioxygen nok
+   til alt carbon)
 3. Luppen over den blå flamme: vælg alle stoffer, der passer (CO₂ og H₂O)
 4. Luppen over den gule flamme: stil luften, så flammen soder mest, og
    indsend; hvilke stoffer var der ikke over den blå flamme? (CO og C)
-5. Carbonmonoxid er giftig: hvorfor er en gul flamme farlig i et lukket rum?
+5. Den giftige gas: hvilket stof fra den gule flamme er en giftig gas? (CO)
+
+Når forsøget er gjort, kommer spørgsmålet med det samme (intet kort, der kun
+siger Godt).
 
 Luppen er skjult i opgave 1 og 2 (som sb8.6: ingen levende model, før den
 spørges om); knappen Vis luppen viser den alligevel. Panelet samler, hvad
 eleven har fundet ud af om de to flammer, som bogens figur med to flammer.
 
-**2 Afstem forbrændingen** (`#afstem`). Fem forbrændinger: methan (brænderen
+**2 Afstem forbrændingen** (`#afstem`). To niveauer, som vælges i panelet og
+huskes i browseren: **Uøvet** (trin for trin med kugler) og **Øvet** (hele
+skemaet på én gang). Hvert niveau har sin egen liste, og det løste huskes for
+hvert skema for sig.
+
+*Uøvet* har fem forbrændinger: methan (brænderen
 på fane 1), propan (bogens eksempel), pentan, ethan (3½ O₂, som i bogen) og
 methan med for lidt dioxygen (CH₄ + 1½ O₂ → CO + 2 H₂O, ganget med 2). Hvert
 skema afstemmes i tre trin, carbon, hydrogen og oxygen, og et fjerde, når O₂
 får et halvt tal (spørgsmålet "Hvad gør du, så alle tal bliver hele tal?").
 Kun feltet foran det stof, trinnet handler om, er gult og kan stilles (pilene
 over og under feltet, piletasterne og på oxygentrinnet knappen ½). Indsend
-svar sender tallet. Et klik på et andet led siger rækkefølgen.
+svar sender tallet. Et klik på et andet led siger rækkefølgen. Øverst på
+tavlen siger en stor linje trinnet og atomet ("Trin 1 af 3: Kig kun på
+carbonatomerne, C"; grøn, når trinnet er løst), og i kuglerne og regnskabet
+er de andre atomer tonet ned (`fokusAtom`, `fokus` i `T.molekyle`).
 
 Kuglemodellerne under formlerne følger tallet med det samme (et halvt O₂ er
 ét O-atom med en stiplet ring, hvor det andet skulle sidde). Regnskabet til
@@ -82,6 +122,20 @@ sig selv, men et forkert tal står bagefter med rødt og ✗, og forklaringen
 siger, hvad der ikke passer. De typiske fejl har deres egen forklaring: 8
 H₂O til 8 hydrogenatomer (hvert H₂O har 2), 10 O₂ til 10 oxygenatomer, og O₂
 afstemt uden oxygenatomerne i H₂O.
+
+*Øvet* har seks skemaer uden kugler, trin og regnskab: propan, butan, heptan,
+octan, ethan og propan med for lidt dioxygen (2 C₃H₈ + 7 O₂ → 6 CO + 8 H₂O).
+Eleven skriver tallene i felterne foran stofferne (Tab og Enter virker) og
+trykker Indsend svar. Et tomt felt tæller som 1. Fejlen siger det første
+grundstof, der ikke passer, i rækkefølgen C, H, O ("Oxygen passer ikke: 14
+oxygenatomer før pilen og 13 efter"), at tallene kan forkortes, eller at der
+skal stå hele tal. Hintene følger rækkefølgen C, H, O.
+
+**Fejringen.** Konfetti fra skemaet, når et helt skema er afstemt uden Vis
+svaret. Når alle skemaer på niveauet er afstemt, fører kortets knap til en
+medalje (guld med alle stjerner, sølv med mindst to tredjedele, ellers
+bronze), alle de afstemte skemaer og konfettiregn. Gå efter guld åbner det
+første skema uden stjerne; Luk og Esc lukker.
 
 ## Modellen
 
@@ -124,11 +178,14 @@ afstemt uden oxygenatomerne i H₂O.
   skeen med stativet. `js/lup.js`: luppen over flammen.
 * `js/tegning.js`: kuglemodellerne (også et halvt O₂) og det fælles fra sc4.6
   (bordet, luppens ramme, tavlen, ringe, skilte og knapper på lærredet).
-* `js/sim_braender.js`: fane 1. `js/sim_afstem.js`: fane 2.
+* `js/sim_braender.js`: fane 1. `js/sim_afstem.js`: fane 2 med begge
+  niveauer, den store linje, Øvet-felterne (HTML i `#a-oevet`) og medaljen.
 * `js/fane.js`: kortet, låsen og hintene fra sc4.6, rettet til delene i en
   liste (`o.dele`), "vælg alle, der passer" (`flere: true`), Indsend svar i et
   forsøg pr. del (`indsend: true`), kortet bliver på opgaven også efter et
-  forsøg, og stjerne kun uden fejl.
+  forsøg, men går direkte til spørgsmålet med `direkte: true`, stjerne kun
+  uden fejl, en anden liste i samme fane (`skiftOpgaver`), knappen til
+  medaljen (`visSejr`) og konfettien (`NK.konfetti`, `NK.konfettiRegn`).
 * `js/kerne.js`, `js/sprites.js`, `js/rundvisning.js`, `js/app.js` fra sc4.6
   (app.js giver fanen piletasterne og Enter via `tast`).
 * `sprites/`: `braender.svg` (efter sc5.9's `bunsen.svg`, uden luftkrave,
@@ -138,19 +195,26 @@ afstemt uden oxygenatomerne i H₂O.
   dioxygen, ingen tankestreger), begge faner med musen (forkerte svar, vælg
   alle, låsen, stjernen, Vis svaret, piletaster og Enter) og fire
   skærmstørrelser (kortets højde i alle dele med hvert hint og hvert forkert
-  svar; brænderen, luppen, skemaet og regnskabet). ALT OK (171) 12. nov. 2026.
+  svar; brænderen, luppen, skemaet og regnskabet), og fra 13. nov. springet
+  til spørgsmålet, spørgsmål, der ikke svarer på sig selv, den store linje og
+  de nedtonede atomer, Øvet (fejl, forkortelige tal, kommatal, tomme felter,
+  Enter, Vis svaret, skift mellem niveauerne) og medaljen. ALT OK (219) 13.
+  nov. 2026.
 
 ## Papirkortet
 
 Kortet er det lyse papirkort fra start og lavt som i sc4.6: opgaveteksten med
 Giv et hint og Indsend svar ved siden af, svarene på samme række, og et hint
 eller en forklaring på en række for sig. Efter et rigtigt svar eller et
-klaret forsøg bliver kortet på opgaven: forklaringen står under, og Næste
-står, hvor Indsend svar stod. Luftreguleringen, skeen og pilene løser aldrig
+klaret trin på fane 2 bliver kortet på opgaven: forklaringen står under, og
+Næste står, hvor Indsend svar stod. Et forsøg på fane 1 går direkte til
+spørgsmålet. På fane 2 er kortets tekst større (1,14 rem). Luftreguleringen, skeen og pilene løser aldrig
 en opgave af sig selv; Indsend svar viser, hvad der sendes ("luften helt
 åben", "3½ O₂"). Start forfra står i panelet, aldrig på kortet.
 
 ## I menuen
+
+I menuen fra 13. nov. 2026 som C4 knap 3 (koden `c4.forbraending`, linjen til `til_panelet.js` i `index.html`); Tegnebræt er flyttet sidst som knap 10. Det, der står herunder, var planen.
 
 Ikke i menuen. Når brugeren siger til: C4 i `kemi-c-filer/samling_c4.html`
 (pladsen som knap 3 svarer til afsnit 4.3, hvor Tegnebræt står nu; det afgør

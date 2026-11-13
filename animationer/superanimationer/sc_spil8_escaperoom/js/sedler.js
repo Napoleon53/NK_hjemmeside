@@ -122,7 +122,7 @@
                 '<p class="data">M(' + met.sym + ") = " + NK.komma(met.M, 2) + " g/mol&emsp;R = 0,08314 L · bar / (mol · K)</p>" +
                 '<p class="spm">Hvor mange liter dihydrogen dannes, når metallet på vægten reagerer fuldstændigt med saltsyren?</p>' +
                 "<p>Temperaturen og trykket står på vejrstationen. Svar med to decimaler.</p>",
-            note: "n(" + met.sym + ") = m / M. Skemaet giver forholdet mellem " + met.sym + " og H₂. Så er V = n · R · T / p med T i kelvin."
+            note: "n(" + met.sym + ") = m / M. Skemaet giver forholdet mellem " + met.sym + " og H₂. Så er V = n(H₂) · R · T / p med T i kelvin."
         };
         if (id === "vaegt") return {
             titel: "Vægten",
@@ -145,7 +145,7 @@
             html: '<p class="skema">' + h(sy.formel + "(aq) + " + ba.formel + "(aq) → " + ba.kation + NK.formel(sy.anion) + "(aq) + H₂O(l)") + "</p>" +
                 '<p class="spm">Hvad var pH i ' + h(sy.bestemt) + " i kolben, før titreringen begyndte?</p>" +
                 "<p>Beregn først koncentrationen af " + h(sy.bestemt) + ". Svar med to decimaler.</p>",
-            note: "Forbruget er forskellen mellem de to aflæsninger. n(" + ba.formel + ") = c · V, og " + sy.formel + " og " + ba.formel +
+            note: "Forbruget er forskellen mellem burettens to aflæsninger. n(" + ba.formel + ") = c · V, og " + sy.formel + " og " + ba.formel +
                 " reagerer 1 : 1. " + stort(sy.navn) + " er en stærk syre, så [H₃O⁺] = c(" + sy.formel + "), og pH = −log[H₃O⁺]."
         };
         if (id === "burette") return {
@@ -157,7 +157,7 @@
         };
         if (id === "kolbe") return {
             titel: "Kolben",
-            html: "<p>Kolben indeholder <b>" + NK.komma(r.Vsyre, 1) + " mL " + h(sy.navn) + "</b> med ukendt koncentration og nogle dråber phenolphthalein.</p>" +
+            html: "<p>Kolben indeholdt <b>" + NK.komma(r.Vsyre, 1) + " mL " + h(sy.navn) + "</b> med ukendt koncentration og nogle dråber phenolphthalein.</p>" +
                 "<p>Den svagt lyserøde farve viser, at titreringen er nået til omslag.</p>",
             note: null
         };
@@ -181,7 +181,7 @@
         };
         if (id === "kolbe") return {
             titel: "Kolben",
-            html: "<p>Kolben indeholdt <b>" + NK.komma(r.Vproeve, 1) + " mL " + (red.id === "fe" ? "jern(II)sulfat-opløsning" : "fortyndet brintoverilte") +
+            html: "<p>Kolben indeholdt <b>" + NK.komma(r.Vproeve, 1) + " mL " + (red.id === "fe" ? "jern(II)sulfat-opløsning" : "fortyndet hydrogenperoxid") +
                 "</b> tilsat svovlsyre.</p><p>Den svagt violette farve viser, at titreringen er nået til omslag.</p>",
             note: null
         };

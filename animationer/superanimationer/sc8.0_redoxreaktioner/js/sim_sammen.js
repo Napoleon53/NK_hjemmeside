@@ -40,7 +40,12 @@
         this.set = { sb: false, rx: false };
         this.traek = null;
         this.flyttet = false;
+        /* Elektronprikkerne i lupperne er et tilvalg, slaaet fra, hver gang siden aabnes */
+        this.prikker = false;
         this.startFane(D.S_MAAL);
+        var mig = this;
+        this.prikKnap = NK.el("s-prikker");
+        if (this.prikKnap) this.prikKnap.addEventListener("click", function () { mig.skiftPrikker(); });
     }
 
     var P = SimSammen.prototype;
@@ -78,6 +83,20 @@
     };
 
     /* ----- Lupperne ----------------------------------------------------------------- */
+    P.skiftPrikker = function () {
+        this.prikker = !this.prikker;
+        if (this.prikKnap) {
+            this.prikKnap.classList.toggle("til", this.prikker);
+            this.prikKnap.setAttribute("aria-pressed", this.prikker ? "true" : "false");
+        }
+    };
+
+    /* Tasten E slaar elektronprikkerne til og fra */
+    P.tast = function (k) {
+        if (k === "e" || k === "E") { this.skiftPrikker(); return true; }
+        return false;
+    };
+
     P.spil = function (s) {
         this.lupT[s] = 0;
         this.spiller[s] = true;
@@ -93,7 +112,7 @@
                 mig.spiller[s] = false;
                 if (!mig.set[s]) {
                     mig.set[s] = true;
-                    if (mig.iForsoeg() && mig.opg.o.id === "overfoer" && mig.set.sb && mig.set.rx) mig.forsoegKlaret(mig.opg.o.forsoeg.set);
+                    if (mig.iForsoeg() && mig.opg.o.id === "overfoer" && mig.set.sb && mig.set.rx) mig.forsoegKlaret(mig.delNu().set);
                 }
             }
         });
@@ -147,7 +166,7 @@
             this.maerkerLoest = true;
             this.groenT = 0;
             this.nulstilHjaelp();
-            this.forsoegKlaret(this.opg.o.forsoeg.set);
+            this.forsoegKlaret(this.delNu().set);
             return;
         }
         if (this.erSortering()) {
@@ -428,10 +447,10 @@
             var cx = L.x + L.b / 2, cy = L.y + L.h / 2;
             if (s === "sb") {
                 var u = Math.min(L.h / 2 * 0.95, L.b / 2 / 1.0);
-                HL.tegn(c, cx, cy - u * 0.08, u, t, {});
+                HL.tegn(c, cx, cy - u * 0.08, u, t, { prikker: mig.prikker });
             } else {
                 var R = L.h / 2 * 0.98;
-                ML.tegn(c, cx, cy, R, t, { halv: L.b / 2 / R });
+                ML.tegn(c, cx, cy, R, t, { halv: L.b / 2 / R, prikker: mig.prikker });
             }
         }, fremhaev);
         if (this.iForsoeg() && this.opg.o.id === "overfoer" && !this.set[s] && !this.spiller[s]) {

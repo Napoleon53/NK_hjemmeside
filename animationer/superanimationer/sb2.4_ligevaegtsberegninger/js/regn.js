@@ -11,7 +11,7 @@
    loest. Opgavens tal (raekken Oplyst) kommer foerst frem, naar
    ligevaegtsloven er skrevet rigtigt (brugeren 9. oktober 2026).
 
-     Uden x, Kc:      Ligevægtsloven › Koncentrationerne › Indsæt
+     Uden x, K:      Ligevægtsloven › Koncentrationerne › Indsæt
      Uden x, ukendt:  Ligevægtsloven › Indsæt › CAS › Svaret
      Med x:           Ligevægtsloven › Hvad er x? › Skemaet › Ligningen ›
                       CAS › Løsningen › Koncentrationerne
@@ -188,13 +188,13 @@
 
     function tjekKFelt(o, raa) {
         var u = M.udtryk(raa);
-        if (u.tom) return { tom: true, besked: "Skriv Kc's værdi til venstre for lighedstegnet." };
+        if (u.tom) return { tom: true, besked: "Skriv K's værdi til venstre for lighedstegnet." };
         if (u.fejl) return { besked: u.fejl };
-        if (!u.konst) return { besked: "Til venstre for lighedstegnet står Kc's værdi, et tal." };
+        if (!u.konst) return { besked: "Til venstre for lighedstegnet står K's værdi, et tal." };
         var v = u.f(0);
         if (M.ens(v, o.K, 0.005)) return { ok: true };
-        if (M.ens(v, 1 / o.K, 0.005)) return { besked: "Du har skrevet 1/Kc. Skriv Kc's værdi fra opgaven." };
-        return { besked: "Kc's værdi står under Oplyst på tavlen." };
+        if (M.ens(v, 1 / o.K, 0.005)) return { besked: "Du har skrevet 1/K. Skriv K's værdi fra opgaven." };
+        return { besked: "K's værdi står under Oplyst på tavlen." };
     }
 
     /* Et tal, der skal ramme en koncentration (fane 2 og svaret) */
@@ -264,10 +264,10 @@
             tal.push({ vis: "V = " + NK.tal(o.V) + " L", ind: NK.tal(o.V) });
             Object.keys(o.n).forEach(function (s) { tal.push({ vis: "n(" + M.skriv(s) + ") = " + NK.tal(o.n[s]) + " mol", ind: NK.tal(o.n[s]), s: s }); });
         } else if (this.type === "ukendt") {
-            tal.push({ vis: "Kc = " + M.kTekst(o), ind: NK.tal(o.K) });
+            tal.push({ vis: "K = " + M.kTekst(o), ind: NK.tal(o.K) });
             Object.keys(o.kendt).forEach(function (s) { tal.push({ vis: M.kon(s) + " = " + NK.tal(o.kendt[s]) + " M", ind: NK.tal(o.kendt[s]), s: s }); });
         } else {
-            tal.push({ vis: "Kc = " + M.kTekst(o), ind: NK.tal(o.K) });
+            tal.push({ vis: "K = " + M.kTekst(o), ind: NK.tal(o.K) });
             Object.keys(o.c0).forEach(function (s) { tal.push({ vis: M.kon(s) + "<sub>start</sub> = " + NK.tal(o.c0[s]) + " M", ind: NK.tal(o.c0[s]), s: s, html: true }); });
         }
         tal.forEach(function (t) {
@@ -297,8 +297,8 @@
     /* Det, raekken Oplyst viser, sagt i ord, naar den kommer frem */
     F.oplystTekst = function () {
         var hvad = this.type === "kc" ? "Rumfanget og stofmængderne" :
-            (this.type === "ukendt" ? "Kc og de kendte koncentrationer" :
-                "Kc og " + (Object.keys(this.o.c0).length > 1 ? "startkoncentrationerne" : "startkoncentrationen"));
+            (this.type === "ukendt" ? "K og de kendte koncentrationer" :
+                "K og " + (Object.keys(this.o.c0).length > 1 ? "startkoncentrationerne" : "startkoncentrationen"));
         return hvad + " står nu under reaktionsskemaet.";
     };
 
@@ -610,7 +610,7 @@
 
     F.slutTekst = function () {
         var o = this.o;
-        if (this.type === "kc") return "Kc = " + M.kTekst(o, M.kAf(o, M.cAfN(o))) + " ved " + o.T + ".";
+        if (this.type === "kc") return "K = " + M.kTekst(o, M.kAf(o, M.cAfN(o))) + " ved " + o.T + ".";
         if (this.type === "ukendt") return M.kon(o.ukendt) + " = " + NK.tal(this.svarRod()) + " M.";
         var x = M.xFacit(o), c = M.ceq(o, x);
         return M.alle(o).map(function (a) { return M.kon(a.s) + " = " + NK.tal(c[a.s]) + " M"; }).join(", ") + ".";
@@ -623,7 +623,7 @@
         var o = this.o, mig = this;
         var blok = el("div", "lov");
         var rad = el("div", "rs-rad");
-        rad.appendChild(el("span", "k-tegn", "K<sub>c</sub> ="));
+        rad.appendChild(el("span", "k-tegn", "K ="));
         var b = el("div", "bf-broek");
         var top = el("div", "bf-top");
         top.appendChild(this.input("lov.num", "bf-in lov", "tæller", "Tælleren"));
@@ -952,7 +952,7 @@
     F.aktiv_ligning = function () {
         var mig = this;
         var rad = el("div", "rs-rad");
-        rad.appendChild(this.input("lg.K", "bf-in tal", "Kc", "Kc's værdi"));
+        rad.appendChild(this.input("lg.K", "bf-in tal", "K", "K's værdi"));
         rad.appendChild(el("span", "rs-lig", "="));
         rad.appendChild(this.ligningsFelter("lg", function (l) {
             return mig.input("lg.s." + l.s, "bf-in udtr", M.kon(l.s), "Udtrykket for " + M.kon(l.s));
@@ -992,8 +992,8 @@
         var o = this.o, lov = M.lovFacit(o);
         var l = lov.den[0] || lov.num[0];
         return { s: l.s, trin: [
-            "Ved ligevægt er brøken lig med Kc. Skriv Kc's værdi til venstre for lighedstegnet.",
-            "I hvert felt skal udtrykket fra skemaets nederste række stå. For eksempel er " + M.kon(l.s) + " = " + M.ligTekst(o, l.s) + ". Du kan klikke på udtrykkene i skemaet.",
+            "Ved ligevægt er brøken lig med K. Skriv K's værdi til venstre for lighedstegnet.",
+            "I hvert felt skal udtrykket fra skemaets nederste række stå. Fx er " + M.kon(l.s) + " = " + M.ligTekst(o, l.s) + ". Du kan klikke på udtrykkene i skemaet.",
             this.ligningTekst()
         ] };
     };
@@ -1014,7 +1014,7 @@
     };
 
     F.trin_ligning = function () {
-        return "Opstil ligningen: Kc's værdi = ligevægtsloven med udtrykkene fra skemaets nederste række. Du kan klikke på udtrykkene i skemaet.";
+        return "Opstil ligningen: K's værdi = ligevægtsloven med udtrykkene fra skemaets nederste række. Du kan klikke på udtrykkene i skemaet.";
     };
 
     /* ===================================================================
@@ -1303,8 +1303,8 @@
         var fn = function (l) { return NK.tal(r[l.s]) + " M"; };
         var K = M.kAf(o, r);
         var passer = NK.tal(K) === NK.tal(o.K);
-        return "Kc = " + broekHTML(NK.html(delAf(lov.num, fn)), lov.den.length ? NK.html(delAf(lov.den, fn)) : "1") + " = " +
-            NK.html(M.kTekst(o, K)) + (passer ? ", som passer med Kc." : NK.html(", tæt på Kc = " + M.kTekst(o) + ". Forskellen kommer af afrundingen."));
+        return "K = " + broekHTML(NK.html(delAf(lov.num, fn)), lov.den.length ? NK.html(delAf(lov.den, fn)) : "1") + " = " +
+            NK.html(M.kTekst(o, K)) + (passer ? ", som passer med K." : NK.html(", tæt på K = " + M.kTekst(o) + ". Forskellen kommer af afrundingen."));
     };
 
     F.tjek_konc = function () {
@@ -1422,7 +1422,7 @@
         var w = el("div", "indsaet");
         if (this.fase.indsaet === "tal") {
             var rad = el("div", "rs-rad");
-            rad.appendChild(el("span", "k-tegn", "K<sub>c</sub> ="));
+            rad.appendChild(el("span", "k-tegn", "K ="));
             rad.appendChild(this.ligningsFelter("ik", function (l) {
                 return mig.input("ik." + l.s, "bf-in tal", M.kon(l.s), "Koncentrationen af " + M.skriv(l.s));
             }));
@@ -1431,13 +1431,13 @@
             return w;
         }
         var rad2 = el("div", "rs-rad");
-        rad2.appendChild(el("span", "k-tegn", "K<sub>c</sub> ="));
+        rad2.appendChild(el("span", "k-tegn", "K ="));
         rad2.appendChild(el("span", "rs-vist", this.kcIndsatHTML() + ' <span class="rs-maerke' + (this.vist.ikTal ? " svar" : "") + '">' + (this.vist.ikTal ? "↩" : "✓") + "</span>"));
         w.appendChild(rad2);
         var rad3 = el("div", "rs-rad");
         rad3.appendChild(el("span", "rs-lig", "="));
-        rad3.appendChild(this.input("ik.res", "rs-in", "tallet", "Kc's værdi"));
-        rad3.appendChild(this.select("ik.enh", ENHEDER.map(function (e) { return { v: e, tekst: e === "ingen" ? "ingen enhed" : M.enhedTekst(ENH_E[e]) }; }), "Kc's enhed"));
+        rad3.appendChild(this.input("ik.res", "rs-in", "tallet", "K's værdi"));
+        rad3.appendChild(this.select("ik.enh", ENHEDER.map(function (e) { return { v: e, tekst: e === "ingen" ? "ingen enhed" : M.enhedTekst(ENH_E[e]) }; }), "K's enhed"));
         rad3.appendChild(this.tjekKnap());
         w.appendChild(rad3);
         return w;
@@ -1455,7 +1455,7 @@
     F.aktivIndsaetUk = function () {
         var mig = this, o = this.o;
         var rad = el("div", "rs-rad");
-        rad.appendChild(this.input("iu.K", "bf-in tal", "Kc", "Kc's værdi"));
+        rad.appendChild(this.input("iu.K", "bf-in tal", "K", "K's værdi"));
         rad.appendChild(el("span", "rs-lig", "="));
         rad.appendChild(this.ligningsFelter("iu", function (l) {
             var ukendt = l.s === o.ukendt;
@@ -1476,7 +1476,7 @@
     F.linje_indsaet = function () {
         var o = this.o;
         if (this.type === "ukendt") return this.ukendtHTML(true);
-        return "K<sub>c</sub> = " + this.kcIndsatHTML() + " = <b>" + NK.html(M.kTekst(o, M.kAf(o, M.cAfN(o)))) + "</b>";
+        return "K = " + this.kcIndsatHTML() + " = <b>" + NK.html(M.kTekst(o, M.kAf(o, M.cAfN(o)))) + "</b>";
     };
 
     F.tjek_indsaet = function () {
@@ -1546,7 +1546,7 @@
         if (ENH_E[enh] !== M.deltaN(o)) {
             var p = o.p.map(function (x) { return x[0]; }), rr = o.r.map(function (x) { return x[0]; });
             return this.fejlSvar({ besked: "Tallet er rigtigt, men enheden passer ikke. Enheden er M opløftet i (" + p.join(" + ") + ") − (" + rr.join(" + ") + ") = " +
-                NK.fortegn(M.deltaN(o)).replace(/^\+/, "") + (M.deltaN(o) ? ", så Kc har enheden " + M.kEnhed(o) + "." : ", så Kc har ingen enhed.") }, "ik.enh");
+                NK.fortegn(M.deltaN(o)).replace(/^\+/, "") + (M.deltaN(o) ? ", så K har enheden " + M.kEnhed(o) + "." : ", så K har ingen enhed.") }, "ik.enh");
         }
         this.delOk("indsaet", this.vist.ikTal);
     };
@@ -1554,7 +1554,7 @@
     /* De fejl, man laver paa lommeregneren, naar Kc regnes ud */
     F.kcFejl = function (v, c) {
         var o = this.o, lov = M.lovFacit(o), K = M.kAf(o, c);
-        if (M.ens(v, 1 / K, 0.02)) return "Du har regnet 1/Kc. Produkterne står i tælleren.";
+        if (M.ens(v, 1 / K, 0.02)) return "Du har regnet 1/K. Produkterne står i tælleren.";
         var T = 1, N = 1, uden = 1;
         lov.num.forEach(function (l) { T *= Math.pow(c[l.s], l.e); uden *= c[l.s]; });
         lov.den.forEach(function (l) { N *= Math.pow(c[l.s], l.e); uden /= c[l.s]; });
@@ -1580,7 +1580,7 @@
         if (this.type === "ukendt") {
             var kendte = Object.keys(o.kendt).map(function (s) { return M.kon(s) + " = " + NK.tal(o.kendt[s]) + " M"; }).join(" og ");
             return { s: o.ukendt, trin: [
-                "Skriv Kc's værdi til venstre og de kendte koncentrationer i deres felter. Den ukendte skriver du som et bogstav, fx c.",
+                "Skriv K's værdi til venstre og de kendte koncentrationer i deres felter. Den ukendte skriver du som et bogstav, fx c.",
                 kendte + ". " + M.kon(o.ukendt) + " er den ukendte.",
                 this.ukendtTekst()] };
         }
@@ -1590,14 +1590,14 @@
             return { s: l.s, trin: [
                 "Sæt de koncentrationer, du har regnet ud, ind i ligevægtsloven.",
                 M.kon(l.s) + " = " + NK.tal(c[l.s]) + " M" + (l.e > 1 ? ", og det står i " + l.e + ". potens." : "."),
-                "Kc = " + delAf(lov.num, function (q) { return NK.tal(c[q.s]); }) + " / " +
+                "K = " + delAf(lov.num, function (q) { return NK.tal(c[q.s]); }) + " / " +
                     (lov.den.length > 1 ? "(" + delAf(lov.den, function (q) { return NK.tal(c[q.s]); }) + ")" : delAf(lov.den, function (q) { return NK.tal(c[q.s]); })) + "."] };
         }
         var e = M.deltaN(o);
         return { s: null, trin: [
             "Regn tælleren og nævneren ud hver for sig, og divider. Husk eksponenterne.",
             "Enheden er M opløftet i (produkternes koefficienter − reaktanternes) = " + e + (e ? ": " + M.kEnhed(o) + "." : ": ingen enhed."),
-            "Kc = " + M.kTekst(o, M.kAf(o, c)) + "."] };
+            "K = " + M.kTekst(o, M.kAf(o, c)) + "."] };
     };
 
     F.ukendtTekst = function () {
@@ -1629,9 +1629,9 @@
     };
 
     F.trin_indsaet = function () {
-        if (this.type === "ukendt") return "Sæt Kc og de kendte koncentrationer ind i ligevægtsloven. Skriv et bogstav som c for den ukendte koncentration.";
+        if (this.type === "ukendt") return "Sæt K og de kendte koncentrationer ind i ligevægtsloven. Skriv et bogstav som c for den ukendte koncentration.";
         if (this.fase.indsaet === "tal") return "Sæt koncentrationerne ind i ligevægtsloven.";
-        return "Regn Kc ud på lommeregneren, og vælg enheden.";
+        return "Regn K ud på lommeregneren, og vælg enheden.";
     };
 
     /* ===================================================================

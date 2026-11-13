@@ -70,6 +70,7 @@
     function tastatur(e) {
         var sim = sims[aktivFane];
         if (e.key === "Escape") {
+            if (sim && sim.lukSejr) sim.lukSejr();
             lukAlle();
             if (NK.Rundvisning) NK.Rundvisning.luk();
             return;

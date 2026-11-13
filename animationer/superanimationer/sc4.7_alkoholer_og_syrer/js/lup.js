@@ -155,13 +155,22 @@
 
     function afstand(a, x, y) { return Math.sqrt((a.x - x) * (a.x - x) + (a.y - y) * (a.y - y)); }
 
+    /* Ét molekyle i vand, fokuseret (brugeren 13. nov. 2026: den store lup
+       "tager alt fokus ... Det er okay med en mikrofigur.. men den skal være
+       mindre og mere fokuseret og mere pædagogisk"). Molekylet er vendt, saa H
+       i OH-gruppen peger opad. Kun vandet taet paa molekylet er med, og ingen
+       vandmolekyler ligger lige om kaeden. Under molekylet viser en graa
+       klamme den upolaere kaede og en groen klamme den polaere gruppe. */
     function layoutVand(stof, R, rMaks) {
         var m = K.model(stof);
+        /* Vendt, saa H i OH-gruppen peger op (glycerol har allerede den
+           midterste OH-gruppe opad) */
+        if (stof.id !== "glycerol") m = { atomer: m.atomer.map(function (a) { var b = {}; for (var q in a) if (Object.prototype.hasOwnProperty.call(a, q)) b[q] = a[q]; b.y = -a.y; return b; }), kaede: m.kaede };
         var k = K.kasse([m]);
-        var L = k.x1 - k.x0;
-        var r = Math.min(rMaks, (R.b * 0.72) / Math.max(L, 6), R.h / 9);
-        /* Molekylet midt i luppen */
+        var L = k.x1 - k.x0, Hm = k.y1 - k.y0;
+        var r = Math.min(rMaks, (R.b * 0.86) / Math.max(L + 5, 9), R.h / (Hm + 8));
         var mol = K.flyt(m, -(k.x0 + k.x1) / 2, -(k.y0 + k.y1) / 2);
+        var mk = K.kasse([mol]);
         var saer = [];
         /* Vand, der tager imod fra et H i en gruppe */
         mol.atomer.forEach(function (h) {
@@ -170,25 +179,28 @@
             var dx = h.x - o.x, dy = h.y - o.y, l = Math.sqrt(dx * dx + dy * dy) || 1;
             var ux = dx / l, uy = dy / l;
             var wx = h.x + ux * K.HB, wy = h.y + uy * K.HB;
-            /* Vandets H peger vaek fra molekylet */
+            /* Ikke ned under molekylet, hvor klammerne staar: saa vandret */
+            if (wy > mk.y1 - 0.2 && stof.id !== "vand") { ux = ux < 0 ? -1 : 1; uy = 0; wx = h.x + ux * K.HB; wy = h.y; }
             var v = Math.atan2(uy, ux);
             saer.push(vandRettet(wx, wy, Math.cos(v + 0.95), Math.sin(v + 0.95), 1));
         });
-        /* Vand, der giver et H til et O i en gruppe */
-        var RET = [[0, 1], [0, -1], [-0.55, 0.84], [0.55, 0.84], [-0.55, -0.84], [0.55, -0.84], [1, 0], [-1, 0]];
+        /* Vand, der giver et H til et O i en gruppe (helst ovenfra, saa der er
+           plads til klammerne under molekylet) */
+        var RET = [[0, -1], [0.55, -0.84], [-0.55, -0.84], [1, 0], [-1, 0], [0.55, 0.84], [-0.55, 0.84], [0, 1]];
         mol.atomer.forEach(function (o) {
             if (!o.tag) return;
-            var antal = 0, maks = o.dobbelt ? 1 : (stof.id === "vand" ? 2 : 1);
+            var antal = 0, maks = stof.id === "vand" ? 2 : 1;
             for (var i = 0; i < RET.length && antal < maks; i++) {
                 var ux = RET[i][0], uy = RET[i][1];
                 var wx = o.x + ux * (K.HB + 1), wy = o.y + uy * (K.HB + 1);
                 if (!fri(mol, saer, wx, wy)) continue;
+                if (wy > mk.y1 + 0.2 && stof.id !== "vand") continue;
                 saer.push(vandRettet(wx, wy, -ux, -uy, i % 2 ? 1 : -1));
                 antal++;
             }
         });
-        /* Resten af vandet i et fast moenster, men ikke inde i molekylet og
-           ikke taet paa kaeden, som vandet holder sig fra */
+        /* Lidt vand rundt om: kun taet paa molekylet, ikke lige om kaeden og
+           ikke under molekylet, hvor klammerne staar */
         var vand = [];
         var nx = Math.ceil(R.b / (3.3 * r)) + 2, ny = Math.ceil(R.h / (3.0 * r)) + 2;
         for (var j = -Math.ceil(ny / 2); j <= Math.ceil(ny / 2); j++) {
@@ -196,15 +208,28 @@
                 var x = i * 3.3 + (j % 2 ? 1.65 : 0) + (hash(i, j) - 0.5) * 0.5;
                 var y = j * 3.0 + (hash(j + 9, i - 4) - 0.5) * 0.5;
                 if (!fri(mol, saer, x, y, true)) continue;
+                var naer = Infinity;
+                mol.atomer.forEach(function (a) { naer = Math.min(naer, afstand(a, x, y)); });
+                if (naer > 4.4) continue;
+                if (y > mk.y1 - 0.2 && x > mk.x0 - 1.5 && x < mk.x1 + 1.5) continue;
                 vand.push(drej(VAND, (hash(i * 3 + 1, j * 5 + 2) - 0.5) * 6.2, x, y));
             }
         }
         var alle = [mol].concat(saer);
         var hb = K.hBindinger(alle).filter(function (b) {
-            /* Kun bindingerne til og fra molekylet */
             return mol.atomer.indexOf(b.h) >= 0 || mol.atomer.indexOf(b.o) >= 0;
         });
-        return { r: r, ox: R.x + R.b / 2, oy: R.y + R.h / 2, mol: [mol], vand: saer.concat(vand), kontakt: [], hb: hb };
+        /* Klammerne under molekylet */
+        var klammer = [];
+        if (stof.id === "glycerol") klammer.push({ x0: mk.x0 + 0.3, x1: mk.x1 - 0.3, polaer: true, tekst: "3 polære grupper" });
+        else if (stof.id === "dihydrogen") klammer.push({ x0: mk.x0 + 0.3, x1: mk.x1 - 0.3, polaer: false, tekst: "upolært" });
+        else if (stof.id !== "vand") {
+            var cx = mol.atomer.filter(function (a) { return a.s === "C" && !a.gruppe; }).map(function (a) { return a.x; });
+            var gx = mol.atomer.filter(function (a) { return a.tag || a.giv || a.gruppe; }).map(function (a) { return a.x; });
+            if (cx.length) klammer.push({ x0: Math.min.apply(null, cx) - 0.7, x1: Math.max.apply(null, cx) + 0.7, polaer: false, tekst: gx.length ? "upolær kæde" : "upolært" });
+            if (gx.length) klammer.push({ x0: Math.min.apply(null, gx) - 0.6, x1: Math.max.apply(null, gx) + 0.5, polaer: true, tekst: "polær gruppe" });
+        }
+        return { r: r, ox: R.x + R.b / 2, oy: R.y + R.h * 0.42, mol: [mol], vand: saer.concat(vand), kontakt: [], hb: hb, klammer: klammer, bundY: mk.y1 };
     }
 
     function naermesteO(m, h) {
@@ -267,6 +292,36 @@
         lay.kontakt.forEach(function (c) { K.tegnKontakt(ctx, c.x0, c.x1, c.y, ox, oy, r, alfa); });
         K.tegnMolekyler(ctx, lay.mol, ox, oy, r, alfa);
         lay.hb.forEach(function (b) { K.tegnHBinding(ctx, b.h, b.o, ox, oy, r, alfa); });
+        if (lay.klammer) tegnKlammer(ctx, lay, alfa);
+    }
+
+    /* Klammer under molekylet med "upolær kæde" og "polær gruppe" */
+    function tegnKlammer(ctx, lay, alfa) {
+        var r = lay.r, y = lay.oy + (lay.bundY + 0.9) * r;
+        ctx.save();
+        ctx.globalAlpha *= alfa;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.font = "700 " + Math.round(Math.max(11.5, Math.min(14, r * 0.95))) + "px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        /* En etiket, der ville staa oven i den forrige, rykkes en linje ned */
+        var forrigeSlut = -Infinity, linje = parseFloat(ctx.font.split(" ")[1]) + 3;
+        lay.klammer.forEach(function (k) {
+            var x0 = lay.ox + k.x0 * r, x1 = lay.ox + k.x1 * r;
+            var farve = k.polaer ? "#7fe0d2" : "#aab3bf";
+            ctx.strokeStyle = farve;
+            ctx.beginPath();
+            ctx.moveTo(x0, y - 6); ctx.lineTo(x0, y); ctx.lineTo(x1, y); ctx.lineTo(x1, y - 6);
+            ctx.stroke();
+            var w = ctx.measureText(k.tekst).width, mx = (x0 + x1) / 2;
+            var ty = y + 5;
+            if (mx - w / 2 < forrigeSlut + 6) ty += linje;
+            ctx.fillStyle = farve;
+            ctx.fillText(k.tekst, mx, ty);
+            forrigeSlut = mx + w / 2;
+        });
+        ctx.restore();
     }
 
     /* Luppens indhold i rektanglet R (rammen tegnes af fanen) */
@@ -326,8 +381,19 @@
 
     /* Bindinger fra molekylet til vandet (til selvtesten) */
     Lup.vandBindinger = function (stof) {
-        var lay = layoutVand(stof, { x: 0, y: 0, b: 420, h: 300 }, 17);
+        var lay = layoutVand(stof, { x: 0, y: 0, b: 340, h: 200 }, 13);
         return lay.hb.length;
+    };
+
+    /* Klammerne og om molekylet er inde i luppen (til selvtesten) */
+    Lup.vandTjek = function (stof, R) {
+        var lay = layoutVand(stof, R, 17), inde = true;
+        lay.mol[0].atomer.forEach(function (a) {
+            var x = lay.ox + a.x * lay.r, y = lay.oy + a.y * lay.r;
+            if (x < R.x + lay.r || x > R.x + R.b - lay.r || y < R.y + lay.r || y > R.y + R.h - lay.r) inde = false;
+        });
+        var bund = lay.oy + (lay.bundY + 0.9) * lay.r + 2 * 17;
+        return { klammer: lay.klammer.map(function (k) { return k.tekst; }), inde: inde && bund <= R.y + R.h, r: lay.r, vand: lay.vand.length };
     };
 
     /* Kontaktfladernes samlede laengde i det rene stof (til selvtesten) */

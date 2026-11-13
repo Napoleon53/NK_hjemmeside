@@ -12,7 +12,7 @@ opløsninger af baser i Kemibogen B. Bygget 12. nov. 2026 efter brugerens
 > fremgangsmåde ud fra pKₛ (stærk, svag eller middelstærk). En ekstra fane har
 > baser og salte med pOH.
 
-**Ikke i menuen.** Den ligger kun i sin egen mappe, til brugeren siger til.
+**I menuen fra 13. nov. 2026 som B6 knap 2 (koden `b3.5`); mappen er ikke omdøbt.** Før det: Den ligger kun i sin egen mappe, til brugeren siger til.
 Linjen til menuen: B6 i `kemi-b-filer/samling_b3.html`, mellem Kₛ og pKₛ og
 Titreringssimulatoren (bogens rækkefølge), fx
 

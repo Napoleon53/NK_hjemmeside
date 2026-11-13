@@ -30,7 +30,7 @@
         "fane-beregning": [
             { sel: "#beregning-kort", titel: "Opgaven", tekst: "Kortet øverst har opgaven og det næste skridt. Indsend svar sender det, du har skrevet eller valgt. Giv hint giver et hint og derefter svaret." },
             { sel: "#beregning-anker-tavle", titel: "Tavlen", tekst: "Molvolumenet, opgavens tal og beregningerne. En beregning står der, når den er rigtig." },
-            { sel: "#beregning-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med symboler, for eksempel m(gas) = m(før) − m(efter). Tryk på Indsend svar eller Enter, og skriv derefter tallet." },
+            { sel: "#beregning-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med symboler, fx m(gas) = m(før) − m(efter). Tryk på Indsend svar eller Enter, og skriv derefter tallet." },
             { sel: "#beregning-anker-graf", titel: "Alkanerne", tekst: "De fem første alkaner og deres molarmasser. Din egen molarmasse kommer som en stiplet linje." },
             { sel: "#beregning-opsum", titel: "Opsummeringen", tekst: "De to målinger side om side." },
             { sel: "#beregning-opgaver", titel: "Opgaverne", tekst: "Der er tre opgaver, og den sidste handler om en ukendt gas. Knappen Nye tal giver en anden gas." }

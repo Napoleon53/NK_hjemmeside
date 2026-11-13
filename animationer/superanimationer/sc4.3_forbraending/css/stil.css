@@ -1872,3 +1872,102 @@ html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-svar.n
 .huske { margin: 0; padding-left: 1.3em; font-size: 0.88rem; line-height: 1.5; color: #dfe4ea; }
 .huske b { color: var(--tekst); }
 .huske + .note { margin-top: 6px; }
+
+/* ---------------------------------------------------------------------
+   sc4.3: kortet paa fane 2 med stoerre skrift (brugeren 13. nov. 2026:
+   "teksten her skal vaere stoerre")
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort #fane-a > .scene > .scenekort > .sk-ind > .sk-tekst { font-size: 1.14rem; line-height: 1.34; }
+html body.papirkort.papirkort #fane-a > .scene > .scenekort > .sk-ind > .sk-bund.bliv .st-tekst { font-size: 1rem; }
+
+/* ---------------------------------------------------------------------
+   sc4.3: niveauet paa fane 2 (Uoevet og Oevet), to store fliser
+   --------------------------------------------------------------------- */
+.niveau { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.niveauknap {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+    padding: 8px 10px; border: 2px solid #4a4f5e; border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.04); color: var(--tekst);
+    font-family: inherit; text-align: left; cursor: pointer;
+}
+.niveauknap b { font-size: 1rem; }
+.niveauknap span { font-size: 0.78rem; color: var(--tekst-svag); line-height: 1.25; }
+.niveauknap:hover { border-color: #6b7080; background-color: rgba(255, 255, 255, 0.07); }
+.niveauknap.valgt { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.14); }
+.niveauknap.valgt b { color: #ffe08a; }
+
+/* ---------------------------------------------------------------------
+   sc4.3: Oevet. Skemaet med et felt foran hvert stof paa en lys tavle
+   --------------------------------------------------------------------- */
+.oevet {
+    position: absolute; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    padding: 20px; box-sizing: border-box;
+    border: 1.5px solid #cfc8b6; border-radius: 12px;
+    background-color: #f7f4ec; color: #1f2430;
+    box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.35);
+}
+.oevet[hidden] { display: none; }
+.oe-titel { margin: 0; font-size: 1.05rem; font-weight: 700; color: #5a6170; }
+.oe-skema { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25em 0.35em; font-size: 40px; font-weight: 700; }
+.oe-led { display: inline-flex; align-items: center; gap: 6px; }
+.oe-tegn { color: #4d5563; font-weight: 600; }
+.oe-felt {
+    width: 1.9em; height: 1.35em; padding: 0; box-sizing: border-box;
+    border: 2.5px solid #d6a400; border-radius: 8px; background-color: #fff3c4;
+    font: inherit; color: #1f2430; text-align: center;
+}
+.oe-felt:focus { outline: 3px solid rgba(61, 158, 224, 0.55); outline-offset: 1px; }
+.oe-felt.rigtig, .oe-felt:disabled { border-color: #5aa877; background-color: #d6efdf; color: #1d6b3f; opacity: 1; }
+.oevet.afstemt { border-color: #5aa877; box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(90, 168, 119, 0.35); }
+.oe-note { margin: 0; font-size: 0.9rem; color: #6b7280; }
+
+/* ---------------------------------------------------------------------
+   sc4.3: konfetti og fejringen (fra sb4.2 og sb3.3)
+   --------------------------------------------------------------------- */
+.konfetti { position: fixed; width: 0; height: 0; z-index: 60; pointer-events: none; }
+.konfetti i {
+    position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; opacity: 0;
+    animation: konfetti 2.1s linear forwards;
+}
+.konfetti.regn i { animation-duration: 2.8s; }
+@keyframes konfetti {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+    28%  { transform: translate(calc(var(--dx) * 0.75), var(--op)) rotate(calc(var(--rot) * 0.35)); opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6); }
+    80%  { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--ned)) rotate(var(--rot)); opacity: 0; }
+}
+
+.sejr {
+    position: absolute; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background-color: rgba(10, 11, 16, 0.72);
+    animation: sejr-ind 0.35s ease-out 1;
+}
+.sejr[hidden] { display: none; }
+.sejr-boks {
+    width: min(560px, 100%); max-height: 100%; overflow: auto; box-sizing: border-box;
+    padding: 18px 26px 20px; border: 3px solid var(--gul); border-radius: 18px;
+    background: radial-gradient(circle at 50% 0%, #3a3220 0%, #23201a 55%, #1b1a17 100%);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(242, 197, 61, 0.12);
+    text-align: center;
+    animation: sejr-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 1;
+}
+.sejr.soelv .sejr-boks { border-color: #c9d1da; background: radial-gradient(circle at 50% 0%, #343a42 0%, #22252b 55%, #1b1c20 100%); }
+.sejr.bronze .sejr-boks { border-color: #cd7f32; background: radial-gradient(circle at 50% 0%, #3a2a1c 0%, #241d17 55%, #1b1815 100%); }
+.sejr-medalje { width: 96px; margin: 0 auto 2px; animation: medalje-sving 2.6s ease-in-out 0.6s infinite; transform-origin: 50% 0; }
+.sejr-medalje svg { display: block; width: 100%; height: auto; }
+.sejr-titel { margin: 2px 0 8px; font-size: 1.45rem; font-weight: 800; color: #ffffff; }
+.sejr-skemaer { list-style: none; margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.06); }
+.sejr-skemaer li { padding: 2px 0; font-size: 1.02rem; font-weight: 700; color: #b8f0cf; font-variant-numeric: tabular-nums; }
+.sejr-medaljetekst { margin: 0 0 4px; font-size: 1.02rem; color: #ffe9a6; }
+.sejr.soelv .sejr-medaljetekst { color: #e3e8ee; }
+.sejr.bronze .sejr-medaljetekst { color: #f3c79c; }
+.sejr-maal { margin: 0 0 12px; font-size: 0.9rem; color: var(--tekst-svag); }
+.sejr-knapper { display: flex; justify-content: center; gap: 10px; }
+.sejr-knapper .knap { justify-content: center; min-width: 120px; padding: 10px 18px; font-size: 0.98rem; font-weight: 700; }
+.sejr-knapper .knap.blaa { animation: bank 1.7s ease-out infinite; }
+.sejr-knapper .knap[hidden] { display: none; }
+@keyframes sejr-ind { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sejr-pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes medalje-sving { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }

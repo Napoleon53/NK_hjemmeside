@@ -88,8 +88,8 @@
                 "Ca²⁺ | calciumion",
                 "Ba²⁺ | bariumion",
                 "Al³⁺ | aluminiumion",
-                "Zn²⁺ | zinkion",
-                "Ag⁺ | sølvion",
+                "Zn²⁺ | zink(II)ion",
+                "Ag⁺ | sølv(I)ion",
                 "Fe²⁺ | jern(II)ion",
                 "Fe³⁺ | jern(III)ion",
                 "Cu²⁺ | kobber(II)ion",
@@ -140,15 +140,15 @@
                 "lineær | molekylform med 180° mellem bindingerne, som i CO₂",
                 "plan trekant | molekylform med 120° mellem bindingerne, som i CH₂O",
                 "vinklet | molekylform: to bindinger og to frie elektronpar, som i H₂O",
-                "pyramide | molekylform: tre bindinger og ét frit elektronpar, som i NH₃",
+                "trekantet pyramide | molekylform: tre bindinger og ét frit elektronpar, som i NH₃",
                 "tetraeder | molekylform med 109,5° mellem bindingerne, som i CH₄",
                 "intermolekylær binding | fællesnavn for de svage bindinger mellem molekyler",
                 "hydrogenbinding | binding mellem H på N, O eller F og et frit elektronpar",
                 "dipol-dipol-binding | tiltrækning mellem δ+ og δ− i to polære molekyler",
-                "London-kræfter | tiltrækning mellem midlertidige dipoler, i alle stoffer",
+                "londonbindinger | tiltrækning mellem midlertidige dipoler, i alle stoffer",
                 "hydrofil | vandelskende: om en polær gruppe som OH",
                 "hydrofob | vandskyende: om en upolær del som en carbonkæde",
-                "lignende opløser lignende | polære stoffer blandes med polære, upolære med upolære"
+                "lige opløser lige | polære stoffer blandes med polære, upolære med upolære"
             ].join("\n")
         },
         {

@@ -82,7 +82,7 @@ async function koerTest(W) {
     var d = W.document, NK = W.NK, D = NK.Data, Tg = NK.Tegn;
     var B = NK.sims["fane-b"], Dd = NK.sims["fane-d"], S = NK.sims["fane-s"];
 
-    function del(X) { return X.opg.o[X.opg.fase]; }
+    function del(X) { return X.delNu(); }
     function rigtigt(X) { var j = -1; del(X).svar.forEach(function (s, i) { if (s.ok) j = i; }); return j; }
     function forkert(X) { var j = -1; del(X).svar.forEach(function (s, i) { if (!s.ok && j < 0) j = i; }); return j; }
     function svar(X, j) { X.svarValg(j); X.indsendKlik(); }
@@ -114,10 +114,12 @@ async function koerTest(W) {
     var alle = [];
     function saml(liste, fane) {
         liste.forEach(function (o) {
-            ["forsoeg", "spm", "spm2"].forEach(function (f) {
-                var x = o[f];
+            var dele = o.dele ? o.dele.map(function (d, i) { return [d.type + " " + d.reak + " " + i, d]; }) :
+                ["forsoeg", "spm", "spm2"].filter(function (f) { return o[f]; }).map(function (f) { return [f, o[f]]; });
+            dele.forEach(function (fx) {
+                var f = fx[0], x = fx[1];
                 if (!x) return;
-                alle.push({ t: x.tekst, g: f === "forsoeg" ? 95 : 105, hvor: fane + " " + o.id + " " + f });
+                alle.push({ t: x.tekst, g: /^forsoeg/.test(f) ? 95 : 105, hvor: fane + " " + o.id + " " + f });
                 if (x.set) alle.push({ t: x.set, g: 160, hvor: fane + " " + o.id + " set" });
                 if (x.godt) alle.push({ t: x.godt, g: 160, hvor: fane + " " + o.id + " godt" });
                 (x.hint || []).forEach(function (h, i) { alle.push({ t: h, g: 100, hvor: fane + " " + o.id + " " + f + " hint " + (i + 1) }); });
@@ -301,6 +303,86 @@ async function koerTest(W) {
     paastand("jern er reduktionsmidlet: opgave 6 er løst, og midlerne står på arket", Dd.faerdig && Dd.ark.midlerLoest);
     paastand("alle seks er løst, og kortet peger videre til fane 3", Dd.antalLoest() === 6 && /Syre\/base/.test(Dd.videreTekst()));
 
+    overskrift("4b. Fane 2: ekstraopgaverne");
+    var EKS = { let: 6, middel: 7, svaer: 8 };
+    paastand("tre ekstraopgaver efter de seks: let, middel og svær", Dd.opgaver.length === 9 && Dd.opgaver[6].ekstra && Dd.opgaver[8].id === "svaer");
+    paastand("listen har overskriften Ekstraopgaver", /Ekstraopgaver/.test(Dd.el.liste.textContent));
+    paastand("ekstraopgaverne tæller ikke med i løst", Dd.antalHoved() === 6);
+    paastand("let har 4 dele, middel 8 og svær 12", Dd.opgaver[6].dele.length === 4 && Dd.opgaver[7].dele.length === 8 && Dd.opgaver[8].dele.length === 12);
+    var alleReak = [];
+    [6, 7, 8].forEach(function (i) { Dd.opgaver[i].dele.forEach(function (d) { if (alleReak.indexOf(d.reak) < 0) alleReak.push(d.reak); }); });
+    paastand("tolv forskellige reaktioner", alleReak.length === 12, alleReak.join(" "));
+    alleReak.forEach(function (id) {
+        var r = D.REAK[id];
+        paastand(id + ": lige mange elektroner med tallene foran, og de er de mindste", r.ox.gange * r.ox.rigtig.n === r.red.gange * r.red.rigtig.n &&
+            (function () { for (var a = 1; a < r.ox.gange; a++) for (var b = 1; b <= 6; b++) if (a * r.ox.rigtig.n === b * r.red.rigtig.n) return false; return true; })());
+        paastand(id + ": de rigtige delreaktioner giver ingen fejl", D.eFejl(id, "ox", { v: 0, h: r.ox.rigtig.n }) === "" && D.eFejl(id, "red", { v: r.red.rigtig.n, h: 0 }) === "" &&
+            D.gangeFejl(id, { ox: r.ox.gange > 1 ? r.ox.gange : 0, red: r.red.gange > 1 ? r.red.gange : 0 }) === "");
+    });
+    /* Ladningerne stemmer: stoffet foer pilen og elektronerne giver samme ladning som efter */
+    function ladning(f) { var m = f.match(/\^\{?(\d*)([+−])\}?$/); if (!m) return 0; return (m[1] ? +m[1] : 1) * (m[2] === "+" ? 1 : -1); }
+    alleReak.concat(["mg", "fe"]).forEach(function (id) {
+        var r = D.REAK[id];
+        var ox = ladning(r.ox.stof) === r.ox.ionK * ladning(r.ox.ion) + -r.ox.rigtig.n * -1 - 2 * r.ox.rigtig.n + r.ox.rigtig.n;
+        var okOx = ladning(r.ox.stof) === r.ox.ionK * ladning(r.ox.ion) - r.ox.rigtig.n;
+        var okRed = ladning(r.red.stof) - r.red.rigtig.n === r.red.ionK * ladning(r.red.ion);
+        paastand(id + ": ladningen er den samme på begge sider af begge delreaktioner", okOx && okRed);
+        void ox;
+    });
+    function sl(id) { return midt(Dd.plads(id)); }
+    function eKlik(id, n) { var p = sl(id); for (var k = 0; k < n; k++) klik(Dd, p.x, p.y); }
+    async function loesEkstra(i, medFejl) {
+        Dd.vaelg(i);
+        var o = Dd.opgaver[i], n = 0;
+        while (!Dd.faerdig && n < 60) {
+            n++;
+            if (Dd.venter) { frem(Dd); continue; }
+            var d = Dd.delNu(), r = D.REAK[d.reak];
+            if (d.type === "spm") { if (medFejl) svar(Dd, forkert(Dd)); svar(Dd, rigtigt(Dd)); continue; }
+            if (d.trin === "e") {
+                if (medFejl) { eKlik("ox.v", 1); Dd.indsendKlik(); Dd.nulstil(); }
+                eKlik("ox.h", r.ox.rigtig.n); eKlik("red.v", r.red.rigtig.n);
+            } else {
+                if (medFejl) { Dd.indsendKlik(); eKlik("ox.gange", 5); Dd.indsendKlik(); Dd.nulstil(); }
+                if (r.ox.gange > 1) eKlik("ox.gange", r.ox.gange - 1);
+                if (r.red.gange > 1) eKlik("red.gange", r.red.gange - 1);
+            }
+            Dd.indsendKlik();
+        }
+        return Dd.faerdig && Dd.status[i].loest;
+    }
+    Dd.vaelg(EKS.middel);
+    var d0 = Dd.delNu(), r0 = D.REAK[d0.reak];
+    eKlik("ox.h", r0.ox.rigtig.n); eKlik("red.v", r0.red.rigtig.n); Dd.indsendKlik();
+    paastand("middel: rigtige elektroner giver en grøn tekst, før tallene foran", Dd.venter && /rigtige/.test(Dd.mellem.tekst));
+    frem(Dd);
+    paastand("middel: anden del er tallene foran, og pladserne er aktive", Dd.delNu().trin === "gange" && Dd.pladsAktiv(Dd.plads("ox.gange")) && !Dd.pladsAktiv(Dd.plads("ox.h")));
+    Dd.indsendKlik();
+    paastand("Indsend svar uden tal: forklaring, intet bedømt", !Dd.venter && /tal/.test(besked(Dd)));
+    var pg = sl("ox.gange");
+    klik(Dd, pg.x, pg.y); klik(Dd, pg.x, pg.y);
+    paastand("to klik på pladsen foran giver tallet 3", Dd.ark.gangeTal.ox === 3);
+    var mrg = Dd.minusRekt(Dd.plads("ox.gange"));
+    klik(Dd, mrg.x + mrg.b / 2, mrg.y + mrg.b / 2);
+    paastand("minus giver tallet 2", Dd.ark.gangeTal.ox === 2);
+    paastand("elektronerne på arket ganges med tallet foran", Dd.gangeVis("ox") === 2);
+    Dd.ark.gangeTal = { ox: r0.ox.gange * 2, red: r0.red.gange * 2 };
+    Dd.indsendKlik();
+    paastand("dobbelt så store tal: forklaringen siger, at tallene kan være mindre", roed(Dd) && /mindre/.test(besked(Dd)));
+    paastand("let kan løses med musen, også med fejl først", await loesEkstra(EKS.let, true));
+    paastand("let: tallene foran og reaktionen øverst kommer af sig selv", Dd.ark.gange);
+    paastand("middel kan løses med musen, også med fejl først", await loesEkstra(EKS.middel, true));
+    paastand("svær kan løses med musen, også med fejl først", await loesEkstra(EKS.svaer, true));
+    paastand("svær: reduktions- og oxidationsmidlet står under stofferne til sidst", Dd.ark.midlerLoest);
+    paastand("ekstraopgaverne tæller ikke med i løst (stadig 6)", Dd.antalLoest() === 6);
+    Dd.vaelg(EKS.svaer);
+    for (k = 0; k < 60 && !Dd.faerdig; k++) Dd.knap();
+    paastand("Vis svaret gennem hele den svære løser den", Dd.faerdig);
+    Dd.vaelg(EKS.let);
+    paastand("fra en ekstraopgave peger Næste opgave på de andre ekstraopgaver eller fane 3", Dd.naesteUloeste() < 0 || Dd.opgaver[Dd.naesteUloeste()].ekstra);
+    Dd.vaelg(5);
+    paastand("fra opgave 6 peger kortet ikke på ekstraopgaverne", Dd.naesteUloeste() < 0 || !Dd.opgaver[Dd.naesteUloeste()].ekstra);
+
     /* Vis svaret i et forsoeg med brikker */
     Dd.vaelg(0);
     for (k = 0; k < 4; k++) Dd.knap();
@@ -365,6 +447,22 @@ async function koerTest(W) {
     paastand("sidste fane: ingen knap videre, og Start forfra står ikke på kortet", S.videreTekst() === "" && !/forfra/i.test(S.el.skort.textContent));
 
     /* ================================================================ */
+    overskrift("5b. Fane 3: elektronprikkerne");
+    NK.visFane("fane-s");
+    await vent(60);
+    paastand("elektronprikkerne er slået fra, når siden åbnes", S.prikker === false && !d.getElementById("s-prikker").classList.contains("til"));
+    d.getElementById("s-prikker").click();
+    paastand("kontakten slår elektronprikkerne til", S.prikker === true && d.getElementById("s-prikker").getAttribute("aria-pressed") === "true");
+    d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "e", bubbles: true }));
+    paastand("tasten E slår dem fra igen", S.prikker === false);
+    S.prikker = true;
+    S.vaelg(1); S.tilpas();
+    var tegnFejl = null;
+    try { S.lupT.sb = 1.5; S.lupT.rx = 2.5; S.tegn(); S.lupT.sb = 3; S.lupT.rx = 5.6; S.tegn(); } catch (x) { tegnFejl = x.message; }
+    paastand("lupperne kan tegnes med elektronprikker midt i og efter reaktionen", !tegnFejl, tegnFejl);
+    S.prikker = false;
+    paastand("spørgsmålet siger, at et reduktionsmiddel ikke er en syre", /ikke en syre/.test(D.S_MAAL[1].spm.tekst) && !/svarer/.test(D.S_MAAL[1].spm.tekst));
+
     overskrift("6. Låsen og Vis svaret");
     NK.visFane("fane-b");
     await vent(80);
@@ -400,7 +498,7 @@ async function koerTest(W) {
             for (var oi = 0; oi < X.opgaver.length; oi++) {
                 X.vaelg(oi);
                 var n = 0, forkertGivet = {};
-                while (n < 30) {
+                while (n < 140) {
                     n++;
                     X.tilpas();
                     var h = X.el.skort.getBoundingClientRect().height;
@@ -431,6 +529,13 @@ async function koerTest(W) {
         paastand(navn + " fane 2: delreaktionerne er inde på arket (skrift " + Math.round(l2.F) + " px)",
             X2.label >= l2.ark.x && X2.slut <= l2.ark.x + l2.ark.b && l2.y.red + l2.F * 0.8 <= l2.ark.y + l2.ark.h && l2.F >= 20);
         paastand(navn + " fane 2: bakken er inde i scenen", l2.bakke.y + l2.bakke.h <= l2.H);
+        /* den bredeste ekstrareaktion med tallene foran */
+        Dd.vaelg(8);
+        while (Dd.delNu().reak !== "alcu") { if (Dd.venter) Dd.knap(); else { for (var kk = 0; kk < 4; kk++) Dd.knap(); } }
+        Dd.tilpas();
+        var l2b = Dd.lay, X2b = Dd.raekkeX(), pg2 = Dd.plads("ox.gange");
+        paastand(navn + " fane 2: aluminium og kobber(II)ioner med tal foran er inde på arket",
+            pg2.x >= l2b.ark.x && X2b.slut <= l2b.ark.x + l2b.ark.b && l2b.F >= 20);
         /* Fane 3: kortene */
         NK.visFane("fane-s"); await vent(40); S.vaelg(1); S.tilpas();
         var l3 = S.lay;

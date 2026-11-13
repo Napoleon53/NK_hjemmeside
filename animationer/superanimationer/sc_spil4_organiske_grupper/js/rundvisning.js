@@ -15,7 +15,7 @@
         { sel: "#spand-omraade", titel: "Spandene", tekst: "Én spand pr. stofklasse. Nye stofklasser kommer til, når pointene stiger." },
         { sel: "#spilkort", titel: "Spillet", tekst: "Tre forkerte, og spillet er slut. Du har én pause. Turbo giver fart på i 15 sekunder." },
         { sel: "#sidstekort", titel: "Det sidste molekyle", tekst: "Navnet og stofklassen. Gruppen, der afgør klassen, står i spandens farve." },
-        { sel: "#klassekort", titel: "Stofklasserne", tekst: "Dem, du har mødt, og hvordan de kendes. Tallet er, hvor mange du har sorteret." }
+        { sel: "#klassekort", titel: "Stofklasserne", tekst: "Dem, du har mødt, og hvordan de kendes. Tallet ud for hver stofklasse er, hvor mange molekyler du har sorteret." }
     ];
 
     var TURE = {

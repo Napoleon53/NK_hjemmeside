@@ -7,8 +7,8 @@ generelt er mere behagelige at kigge på, og har et mere professionelt look. Du
 må også gerne shine resten af animationen op, så den følger standarden."
 Bestillingen nedenfor er skrevet uden at spørge (som sb2.1 og sb5.2).
 
-**Ikke i menuen endnu.** Den afløser `kemi-b-filer/b9_5.spektroskopi_opgaver.html`
-(B5 knap 4, koden `b9.5`), når brugeren siger til. Se "Til menuen" nederst.
+**I menuen fra 13. nov. 2026** som B5 knap 4 (koden `b9.5`). Den afløste `kemi-b-filer/b9_5.spektroskopi_opgaver.html`
+som nu ligger i `kemi-c-filer/arkiv/b9_5.spektroskopi_opgaver_oldversion.html`.
 
 ## Bestillingen
 
@@ -114,7 +114,7 @@ rammerne kan være der fra 1100 × 620 til 1600 × 950.
 
 ## Til menuen
 
-Når brugeren siger til:
+Udført 13. nov. 2026 (brugeren: "Du må også gerne placere alle de andre nye animationer i menuen og på hjemmesiden"):
 
 1. I `kemi-b-filer/samling_b9.html` skiftes knap 4's `onclick` til
    `visAnimation(this, '../superanimationer/sb5.4_spektroskopiopgaver/index.html')`.
