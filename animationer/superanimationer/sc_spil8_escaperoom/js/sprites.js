@@ -1,15 +1,25 @@
 /* =====================================================================
    sprites.js - tingene i rummene som SVG
 
-   Hver funktion giver et stykke SVG som tekst i scenens koordinater
-   (viewBox 0 0 1600 900). Vaeggen gaar til y = 720, bordpladen ligger
-   i y = 540. _sprites.html viser dem alene.
+   Lys, skarp stil: lyse vaegge, moerke konturer og ingen filtre (et
+   SVG-filter bliver til et billede og kan se sloeret ud paa skaermen).
+   Skygger er flade ellipser. Glas staar foran lys vaeg, saa svage
+   farver kan ses.
+
+   Rummets ramme (vaeg, bord, doer, tavle) tegnes i scenens koordinater
+   (viewBox 0 0 1600 900; bordpladen i y = 580, gulvet i y = 740).
+   Tingene tegnes om deres eget nulpunkt (bund, midt) og saettes paa
+   plads med S.paa(x, y, skala, tegning). _sprites.html viser dem alene.
    ===================================================================== */
 (function () {
     "use strict";
 
     var S = NK.Sprites = {};
     var h = NK.html;
+    var K = "#27303f";           /* konturen */
+    var SKRIFT = 'font-family="Lexend, Segoe UI, sans-serif"';
+    var taeller = 0;
+    function id(p) { taeller++; return p + taeller; }
 
     /* ----- Farver ---------------------------------------------------- */
     function hexRgb(x) {
@@ -26,176 +36,186 @@
     };
     S.rgb = function (c, a) { return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + (a === undefined ? 1 : a) + ")"; };
 
+    S.paa = function (x, y, k, tegning) {
+        return '<g transform="translate(' + x + " " + y + ") scale(" + (k || 1) + ')">' + tegning + "</g>";
+    };
+    function skygge(b) { return '<ellipse cx="0" cy="2" rx="' + (b / 2 + 8) + '" ry="7" fill="#1b2230" fill-opacity="0.16"/>'; }
+
     /* ----- Faelles defs ---------------------------------------------- */
     S.defs = function () {
-        return '<defs>' +
-            '<linearGradient id="g-glas" x1="0" x2="1" y1="0" y2="0">' +
-            '<stop offset="0" stop-color="#fff" stop-opacity="0.38"/><stop offset="0.18" stop-color="#fff" stop-opacity="0.1"/>' +
-            '<stop offset="0.7" stop-color="#fff" stop-opacity="0.04"/><stop offset="0.88" stop-color="#fff" stop-opacity="0.26"/>' +
-            '<stop offset="1" stop-color="#fff" stop-opacity="0.08"/></linearGradient>' +
-            '<linearGradient id="g-vaeske" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity="0.18"/>' +
-            '<stop offset="0.35" stop-color="#fff" stop-opacity="0.12"/><stop offset="1" stop-color="#000" stop-opacity="0.25"/></linearGradient>' +
-            '<linearGradient id="g-bordplade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4b5160"/><stop offset="1" stop-color="#30343e"/></linearGradient>' +
-            '<linearGradient id="g-skab" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3a3530"/><stop offset="1" stop-color="#2a2622"/></linearGradient>' +
-            '<linearGradient id="g-trae" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7a5636"/><stop offset="1" stop-color="#553a24"/></linearGradient>' +
-            '<linearGradient id="g-metal" x1="0" x2="1"><stop offset="0" stop-color="#7d848e"/><stop offset="0.45" stop-color="#dfe3e8"/>' +
-            '<stop offset="1" stop-color="#6f767f"/></linearGradient>' +
-            '<linearGradient id="g-metal-v" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9ced5"/><stop offset="1" stop-color="#7a818b"/></linearGradient>' +
-            '<linearGradient id="g-guld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="0.35" stop-color="#f1c40f"/>' +
-            '<stop offset="0.7" stop-color="#b8860b"/><stop offset="1" stop-color="#f7dc6f"/></linearGradient>' +
-            '<linearGradient id="g-jern" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b5bac0"/><stop offset="0.5" stop-color="#6c7178"/>' +
-            '<stop offset="1" stop-color="#9aa0a7"/></linearGradient>' +
-            '<linearGradient id="g-gulv" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2e241b"/><stop offset="1" stop-color="#16110d"/></linearGradient>' +
-            '<linearGradient id="g-tavle" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2b4236"/><stop offset="1" stop-color="#1c2c24"/></linearGradient>' +
-            '<linearGradient id="g-doer" x1="0" x2="1"><stop offset="0" stop-color="#3d3b42"/><stop offset="1" stop-color="#2a292f"/></linearGradient>' +
-            '<radialGradient id="g-lys" cx="0.5" cy="0" r="0.75"><stop offset="0" stop-color="#ffefc8" stop-opacity="0.2"/>' +
-            '<stop offset="1" stop-color="#ffefc8" stop-opacity="0"/></radialGradient>' +
-            '<radialGradient id="g-doerlys" cx="0.5" cy="0.6" r="0.7"><stop offset="0" stop-color="#ffe7a8"/><stop offset="1" stop-color="#7a5a26"/></radialGradient>' +
-            '<radialGradient id="g-voks" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#e2574c"/><stop offset="0.7" stop-color="#a5241b"/>' +
-            '<stop offset="1" stop-color="#6e140e"/></radialGradient>' +
-            '<radialGradient id="g-kugle" cx="0.35" cy="0.3" r="0.7"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/>' +
-            '<stop offset="0.45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.3"/></radialGradient>' +
-            '<filter id="f-skygge" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.45"/></filter>' +
-            '<filter id="f-glod" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>' +
-            '</defs>';
+        function lin(navn, retning, stop) {
+            return '<linearGradient id="' + navn + '" ' + retning + ">" + stop.map(function (s) {
+                return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"' + (s[2] !== undefined ? ' stop-opacity="' + s[2] + '"' : "") + "/>";
+            }).join("") + "</linearGradient>";
+        }
+        var vand = 'x1="0" x2="1" y1="0" y2="0"', lod = 'x1="0" x2="0" y1="0" y2="1"';
+        return "<defs>" +
+            lin("g-glas", vand, [[0, "#ffffff", 0.9], [0.22, "#ffffff", 0.35], [0.7, "#dcebf5", 0.3], [1, "#b9cfde", 0.55]]) +
+            lin("g-glans", vand, [[0, "#ffffff", 0.55], [0.3, "#ffffff", 0], [1, "#000000", 0.12]]) +
+            lin("g-bordplade", lod, [[0, "#566277"], [1, "#3b4557"]]) +
+            lin("g-skab", lod, [[0, "#d5dce6"], [1, "#b9c3d0"]]) +
+            lin("g-trae", lod, [[0, "#b58352"], [1, "#8c5f38"]]) +
+            lin("g-metal", vand, [[0, "#9aa3ae"], [0.45, "#f1f3f6"], [1, "#8a939e"]]) +
+            lin("g-metal-v", lod, [[0, "#e6e9ee"], [1, "#a3abb6"]]) +
+            lin("g-guld", 'x1="0" y1="0" x2="1" y2="1"', [[0, "#fff3b0"], [0.35, "#f6cd2b"], [0.75, "#d19a12"], [1, "#f7dc6f"]]) +
+            lin("g-gulv", lod, [[0, "#d9c7a8"], [1, "#c3ae8b"]]) +
+            lin("g-tavle", 'x1="0" x2="1" y1="0" y2="1"', [[0, "#2f5d49"], [1, "#234838"]]) +
+            lin("g-doerlys", lod, [[0, "#fff6cf"], [1, "#f3d98a"]]) +
+            '<radialGradient id="g-voks" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ef6a5e"/><stop offset="0.7" stop-color="#b72a20"/>' +
+            '<stop offset="1" stop-color="#7c1711"/></radialGradient>' +
+            "</defs>";
     };
 
     /* ----- Rummet ------------------------------------------------------ */
-    /* Vaeg, gulv og lampe. farve er rummets farve, som toner vaeggen. */
+    /* Lys vaeg tonet af rummets farve, panel forneden og traegulv. Det
+       hele gaar langt ud over billedet, saa ingen skaerm faar kanter. */
     S.vaeg = function (farve) {
-        var vaeg = S.bland("#1d2029", farve, 0.13), under = S.bland("#16181f", farve, 0.1);
-        /* Vaeggen og gulvet gaar langt ud over billedet, saa en bred eller
-           hoej skaerm ikke faar sorte kanter. */
-        var s = '<rect x="-1200" y="-600" width="4000" height="1320" fill="' + vaeg + '"/>';
-        for (var x = -1100; x < 2800; x += 200) s += '<line x1="' + x + '" y1="-600" x2="' + x + '" y2="470" stroke="#000" stroke-opacity="0.12" stroke-width="2"/>';
-        s += '<rect x="-1200" y="470" width="4000" height="250" fill="' + under + '"/>' +
-            '<rect x="-1200" y="466" width="4000" height="6" fill="#000" fill-opacity="0.25"/>';
-        s += '<rect x="-1200" y="720" width="4000" height="700" fill="url(#g-gulv)"/>';
-        for (var g = -4; g < 13; g++) {
+        var vaeg = S.bland("#f2f4f6", farve, 0.14), panel = S.bland("#e1e6eb", farve, 0.24), liste = S.bland("#c9d0d8", farve, 0.3);
+        var s = '<rect x="-1200" y="-600" width="4000" height="1340" fill="' + vaeg + '"/>' +
+            '<rect x="-1200" y="470" width="4000" height="270" fill="' + panel + '"/>' +
+            '<rect x="-1200" y="462" width="4000" height="10" fill="' + liste + '"/>' +
+            '<rect x="-1200" y="740" width="4000" height="700" fill="url(#g-gulv)"/>';
+        for (var g = -6; g < 15; g++) {
             var gx = -200 + g * 250;
-            s += '<line x1="' + (800 + (gx - 800) * 0.55) + '" y1="720" x2="' + (800 + (gx - 800) * 1.6) + '" y2="1100" stroke="#000" stroke-opacity="0.28" stroke-width="2"/>';
+            s += '<line x1="' + (800 + (gx - 800) * 0.6) + '" y1="740" x2="' + (800 + (gx - 800) * 1.7) + '" y2="1100" stroke="#8f7a5a" stroke-opacity="0.45" stroke-width="2"/>';
         }
-        s += '<rect x="-1200" y="706" width="4000" height="14" fill="#0e0f13" fill-opacity="0.85"/>';
-        /* Lampen og lyskeglen */
-        s += '<polygon points="760,52 840,52 1180,720 420,720" fill="url(#g-lys)"/>' +
-            '<line x1="800" y1="0" x2="800" y2="34" stroke="#111" stroke-width="3"/>' +
-            '<path d="M762 56 Q800 26 838 56 Z" fill="#2c2f36" stroke="#111" stroke-width="2"/>' +
-            '<ellipse cx="800" cy="57" rx="22" ry="5" fill="#fff4cf" opacity="0.9"/>';
+        s += '<rect x="-1200" y="726" width="4000" height="14" fill="' + S.bland("#8d97a4", farve, 0.25) + '"/>' +
+            '<line x1="-1200" y1="740" x2="2800" y2="740" stroke="' + K + '" stroke-opacity="0.55" stroke-width="2"/>';
         return s;
     };
 
-    /* Bordet: plade i y 540 til 562 og skab ned til gulvet. */
+    /* Bordet: moerk plade i y 580 til 606 og lyst skab ned til gulvet. */
     S.bord = function (x1, x2) {
         var b = x2 - x1;
-        var s = '<g filter="url(#f-skygge)">' +
-            '<rect x="' + (x1 + 10) + '" y="560" width="' + (b - 20) + '" height="152" fill="url(#g-skab)"/>' +
-            '<rect x="' + x1 + '" y="540" width="' + b + '" height="22" rx="3" fill="url(#g-bordplade)"/>' +
-            '<rect x="' + x1 + '" y="540" width="' + b + '" height="3" fill="#fff" fill-opacity="0.12"/></g>';
-        var n = Math.max(1, Math.round((b - 20) / 260)), d = (b - 20) / n;
+        var s = '<rect x="' + (x1 + 14) + '" y="604" width="' + (b - 28) + '" height="136" fill="url(#g-skab)" stroke="' + K + '" stroke-width="3"/>';
+        var n = Math.max(1, Math.round((b - 28) / 280)), d = (b - 28) / n;
         for (var i = 0; i < n; i++) {
-            var lx = x1 + 10 + i * d;
-            s += '<rect x="' + (lx + 8) + '" y="574" width="' + (d - 16) + '" height="124" rx="3" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="2"/>' +
-                '<rect x="' + (lx + d / 2 - 20) + '" y="584" width="40" height="6" rx="3" fill="url(#g-metal)"/>';
+            var lx = x1 + 14 + i * d;
+            if (i > 0) s += '<line x1="' + lx + '" y1="604" x2="' + lx + '" y2="740" stroke="' + K + '" stroke-opacity="0.6" stroke-width="2"/>';
+            s += '<rect x="' + (lx + d / 2 - 24) + '" y="620" width="48" height="8" rx="4" fill="url(#g-metal)" stroke="' + K + '" stroke-width="1.5"/>';
         }
+        s += '<rect x="' + x1 + '" y="580" width="' + b + '" height="26" rx="4" fill="url(#g-bordplade)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (x1 + 6) + '" y="584" width="' + (b - 12) + '" height="4" rx="2" fill="#fff" fill-opacity="0.22"/>';
         return s;
     };
 
-    /* Doeren med karm i rummets farve. aaben: doerbladet er drejet ind. */
+    /* Doeren i rummets farve. aaben: doerbladet er drejet ind. */
     S.doer = function (x, y, b, hoejde, farve, nr, aaben) {
-        var karm = S.bland(farve, "#000000", 0.35);
-        var s = '<rect x="' + (x - 16) + '" y="' + (y - 16) + '" width="' + (b + 32) + '" height="' + (hoejde + 16) + '" rx="4" fill="' + karm + '"/>' +
-            '<rect x="' + (x - 16) + '" y="' + (y - 16) + '" width="' + (b + 32) + '" height="' + (hoejde + 16) + '" rx="4" fill="none" stroke="' + farve + '" stroke-width="4"/>' +
+        var moerk = S.bland(farve, "#10151f", 0.45), lys = S.bland(farve, "#ffffff", 0.18);
+        var s = '<rect x="' + (x - 18) + '" y="' + (y - 18) + '" width="' + (b + 36) + '" height="' + (hoejde + 18) + '" fill="' + moerk + '" stroke="' + K + '" stroke-width="3"/>' +
             '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="url(#g-doerlys)"/>';
-        var blad = '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="url(#g-doer)" stroke="#15151a" stroke-width="2"/>' +
-            '<rect x="' + (x + 24) + '" y="' + (y + 30) + '" width="' + (b - 48) + '" height="' + (hoejde * 0.36) + '" rx="3" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="3"/>' +
-            '<rect x="' + (x + 24) + '" y="' + (y + hoejde * 0.5) + '" width="' + (b - 48) + '" height="' + (hoejde * 0.42) + '" rx="3" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="3"/>' +
-            '<circle cx="' + (x + b / 2) + '" cy="' + (y + hoejde * 0.22) + '" r="26" fill="' + farve + '" stroke="#111" stroke-width="2"/>' +
-            '<text x="' + (x + b / 2) + '" y="' + (y + hoejde * 0.22 + 10) + '" text-anchor="middle" font-size="28" font-weight="700" fill="#111">' + h(nr) + '</text>' +
-            '<rect x="' + (x + 18) + '" y="' + (y + hoejde * 0.47) + '" width="12" height="44" rx="5" fill="url(#g-metal)"/>' +
-            '<rect x="' + (x + 14) + '" y="' + (y + hoejde * 0.47 + 16) + '" width="38" height="10" rx="5" fill="url(#g-metal)"/>';
-        s += '<g class="doerblad' + (aaben ? " aaben" : "") + '">' + blad + '</g>';
-        return s;
+        var p1 = hoejde * 0.34, p2 = hoejde * 0.4;
+        var blad = '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="' + farve + '" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (x + 26) + '" y="' + (y + 28) + '" width="' + (b - 52) + '" height="' + p1 + '" rx="4" fill="' + lys + '" stroke="' + moerk + '" stroke-width="3"/>' +
+            '<rect x="' + (x + 26) + '" y="' + (y + hoejde * 0.5) + '" width="' + (b - 52) + '" height="' + p2 + '" rx="4" fill="' + lys + '" stroke="' + moerk + '" stroke-width="3"/>' +
+            '<circle cx="' + (x + b / 2) + '" cy="' + (y + 28 + p1 / 2) + '" r="34" fill="#fff" stroke="' + K + '" stroke-width="3"/>' +
+            '<text x="' + (x + b / 2) + '" y="' + (y + 28 + p1 / 2 + 14) + '" text-anchor="middle" font-size="40" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(nr) + "</text>" +
+            '<rect x="' + (x + 16) + '" y="' + (y + hoejde * 0.44) + '" width="46" height="12" rx="6" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2"/>' +
+            '<circle cx="' + (x + 24) + '" cy="' + (y + hoejde * 0.44 + 6) + '" r="10" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2"/>';
+        return s + '<g class="doerblad' + (aaben ? " aaben" : "") + '">' + blad + "</g>";
     };
 
-    /* Kodelaasen ved doeren. Groen lampe, naar den er aaben. */
+    /* Kodelaasen ved doeren (70 x 118). Groen skaerm, naar den er aaben. */
     S.kodelaas = function (x, y, aaben) {
-        var s = '<rect x="' + x + '" y="' + y + '" width="62" height="104" rx="7" fill="url(#g-metal-v)" stroke="#2a2d33" stroke-width="2"/>' +
-            '<rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="46" height="18" rx="3" fill="#0f1612"/>' +
-            '<text x="' + (x + 31) + '" y="' + (y + 22) + '" text-anchor="middle" font-size="12" fill="' + (aaben ? "#66e39a" : "#e46a5c") + '" font-family="Consolas, monospace">' + (aaben ? "ÅBEN" : "• • •") + '</text>';
+        var s = '<rect x="' + x + '" y="' + y + '" width="70" height="118" rx="8" fill="url(#g-metal-v)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (x + 9) + '" y="' + (y + 9) + '" width="52" height="24" rx="3" fill="' + (aaben ? "#1f7a46" : "#1d2430") + '" stroke="' + K + '" stroke-width="1.5"/>' +
+            '<text x="' + (x + 35) + '" y="' + (y + 27) + '" text-anchor="middle" font-size="15" font-weight="700" fill="' + (aaben ? "#d9ffe6" : "#ff8f80") + '" font-family="Consolas, monospace">' + (aaben ? "ÅBEN" : "• • •") + "</text>";
         for (var r = 0; r < 4; r++) for (var c = 0; c < 3; c++) {
-            s += '<rect x="' + (x + 9 + c * 15) + '" y="' + (y + 34 + r * 15) + '" width="12" height="11" rx="2" fill="#3a3e46"/>';
+            s += '<rect x="' + (x + 10 + c * 18) + '" y="' + (y + 42 + r * 18) + '" width="14" height="13" rx="2.5" fill="#4a5568" stroke="' + K + '" stroke-width="1"/>';
         }
-        s += '<circle cx="' + (x + 31) + '" cy="' + (y + 98) + '" r="0" fill="none"/>';
         return s;
     };
 
-    /* ----- Tavlen og kridt -------------------------------------------- */
+    /* ----- Tavlen og kridt ---------------------------------------------- */
     S.tavle = function (x, y, b, hoejde, indhold) {
-        return '<g filter="url(#f-skygge)"><rect x="' + (x - 12) + '" y="' + (y - 12) + '" width="' + (b + 24) + '" height="' + (hoejde + 24) + '" rx="4" fill="url(#g-trae)"/>' +
-            '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="url(#g-tavle)"/></g>' +
-            '<rect x="' + (x + 6) + '" y="' + (y + 6) + '" width="' + (b - 12) + '" height="' + (hoejde - 12) + '" fill="none" stroke="#fff" stroke-opacity="0.04" stroke-width="6"/>' +
-            '<rect x="' + (x - 8) + '" y="' + (y + hoejde + 10) + '" width="' + (b + 16) + '" height="10" rx="2" fill="#4a321f"/>' +
-            '<rect x="' + (x + 30) + '" y="' + (y + hoejde + 5) + '" width="26" height="6" rx="3" fill="#f2f0e6"/>' +
-            '<rect x="' + (x + 66) + '" y="' + (y + hoejde + 6) + '" width="16" height="5" rx="2" fill="#f3c9c4"/>' +
+        return '<rect x="' + (x - 14) + '" y="' + (y - 14) + '" width="' + (b + 28) + '" height="' + (hoejde + 28) + '" rx="5" fill="url(#g-trae)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="url(#g-tavle)" stroke="' + K + '" stroke-width="2"/>' +
+            '<rect x="' + (x - 10) + '" y="' + (y + hoejde + 14) + '" width="' + (b + 20) + '" height="12" rx="2" fill="#7a5230" stroke="' + K + '" stroke-width="2"/>' +
+            '<rect x="' + (x + 34) + '" y="' + (y + hoejde + 7) + '" width="30" height="8" rx="3" fill="#ffffff" stroke="' + K + '" stroke-width="1"/>' +
+            '<rect x="' + (x + 74) + '" y="' + (y + hoejde + 8) + '" width="18" height="7" rx="3" fill="#f6b8b0" stroke="' + K + '" stroke-width="1"/>' +
             (indhold || "");
     };
     S.kridt = function (x, y, tekst, str, anker, vaegt) {
         return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anker || "start") + '" font-size="' + (str || 30) +
-            '" font-weight="' + (vaegt || 400) + '" fill="#eef1e6" fill-opacity="0.92" font-family="Lexend, Segoe UI, sans-serif">' + h(tekst) + '</text>';
+            '" font-weight="' + (vaegt || 500) + '" fill="#ffffff" ' + SKRIFT + ">" + h(tekst) + "</text>";
     };
 
-    /* Gult skilt ved en ting: et klik paa skiltet goer det samme som paa tingen. */
-    S.skilt = function (x, y, tekst) {
-        var b = Math.round(tekst.length * 13.4 + 34);
-        return '<g class="skilt"><rect x="' + (x - b / 2) + '" y="' + (y - 22) + '" width="' + b + '" height="44" rx="11" fill="#f6d66b" stroke="#8a6d12" stroke-width="2"/>' +
-            '<text x="' + x + '" y="' + (y + 8) + '" text-anchor="middle" font-size="23" font-weight="600" fill="#3b2f08" font-family="Lexend, Segoe UI, sans-serif">' + h(tekst) + '</text></g>';
-    };
-
-    /* ----- Glas og flasker -------------------------------------------- */
-    /* Reagensglas: bund i (x, y), hoejde hoejde, vaeske [r,g,b] eller null. */
-    S.reagensglas = function (x, y, hoejde, vaeske, fyld) {
-        var b = 26, top = y - hoejde, r = b / 2;
-        var form = 'M' + (x - r) + ' ' + top + ' L' + (x - r) + ' ' + (y - r) + ' A' + r + ' ' + r + ' 0 0 0 ' + (x + r) + ' ' + (y - r) + ' L' + (x + r) + ' ' + top + ' Z';
-        var s = '';
-        if (vaeske) {
-            var vt = y - hoejde * (fyld || 0.45);
-            s += '<clipPath id="kl-rg' + Math.round(x) + '"><path d="' + form + '"/></clipPath>' +
-                '<rect x="' + (x - r) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="' + S.rgb(vaeske, 0.85) + '" clip-path="url(#kl-rg' + Math.round(x) + ')"/>' +
-                '<rect x="' + (x - r) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="url(#g-vaeske)" clip-path="url(#kl-rg' + Math.round(x) + ')"/>' +
-                '<ellipse cx="' + x + '" cy="' + vt + '" rx="' + r + '" ry="3" fill="#fff" fill-opacity="0.25"/>';
-        }
-        s += '<path d="' + form + '" fill="url(#g-glas)" stroke="#d8e4ee" stroke-opacity="0.75" stroke-width="2"/>' +
-            '<rect x="' + (x - r - 3) + '" y="' + (top - 4) + '" width="' + (b + 6) + '" height="7" rx="3" fill="#dfe8ef" fill-opacity="0.7"/>';
+    /* Skilt ved en ting. type: "aktiv" (det trin, I er ved), "loest",
+       "bonus" eller ingenting. */
+    S.skilt = function (x, y, tekst, type) {
+        var aktiv = type === "aktiv", loest = type === "loest", bonus = type === "bonus";
+        var vist = (loest ? "✓ " : bonus ? "★ " : "") + tekst;
+        var str = aktiv ? 25 : 23, b = Math.round(vist.length * str * 0.6 + 36), hh = aktiv ? 48 : 44;
+        var fyld = bonus ? K : aktiv ? "#ffd43b" : loest ? "#d8f1e1" : "#fff4c7";
+        var kant = bonus ? "#f1c40f" : aktiv ? K : loest ? "#2b7d51" : "#9a7b14";
+        var farve = bonus ? "#ffe07a" : loest ? "#1f5a3a" : "#33290a";
+        var s = '<g class="skilt">';
+        if (aktiv) s += '<rect x="' + (x - b / 2 - 6) + '" y="' + (y - hh / 2 - 6) + '" width="' + (b + 12) + '" height="' + (hh + 12) + '" rx="16" fill="none" stroke="#ffd43b" stroke-width="5"/>';
+        s += '<rect x="' + (x - b / 2) + '" y="' + (y - hh / 2) + '" width="' + b + '" height="' + hh + '" rx="11" fill="' + fyld + '" stroke="' + kant + '" stroke-width="' + (aktiv || bonus ? 3.5 : 2.5) + '"/>' +
+            '<text x="' + x + '" y="' + (y + str * 0.35) + '" text-anchor="middle" font-size="' + str + '" font-weight="600" fill="' + farve + '" ' + SKRIFT + ">" + h(vist) + "</text></g>";
         return s;
     };
 
-    /* Draabeflaske i brunt glas med hvid pipette og etiket. */
-    S.draabeflaske = function (x, y, etiket) {
-        return '<g filter="url(#f-skygge)"><rect x="' + (x - 22) + '" y="' + (y - 70) + '" width="44" height="70" rx="9" fill="#6b3a16"/>' +
-            '<rect x="' + (x - 22) + '" y="' + (y - 70) + '" width="44" height="70" rx="9" fill="url(#g-glas)"/>' +
-            '<rect x="' + (x - 9) + '" y="' + (y - 86) + '" width="18" height="18" rx="3" fill="#2b2b2f"/>' +
-            '<path d="M' + (x - 7) + ' ' + (y - 86) + ' Q' + x + ' ' + (y - 118) + ' ' + (x + 7) + ' ' + (y - 86) + ' Z" fill="#f3f1ea"/></g>' +
-            '<rect x="' + (x - 19) + '" y="' + (y - 50) + '" width="38" height="28" rx="3" fill="#f7f4ea"/>' +
-            '<text x="' + x + '" y="' + (y - 31) + '" text-anchor="middle" font-size="' + (etiket.length > 4 ? 10.5 : 13) + '" font-weight="700" fill="#222" font-family="Lexend, Segoe UI, sans-serif">' + h(etiket) + '</text>';
+    /* ----- Glas og flasker (nulpunkt: bund, midt) ---------------------- */
+    function vaeskeI(form, x0, bredde, top, vaeske, alfa) {
+        var k = id("kl");
+        return '<clipPath id="' + k + '"><path d="' + form + '"/></clipPath>' +
+            '<rect x="' + x0 + '" y="' + top + '" width="' + bredde + '" height="' + (-top + 4) + '" fill="' + S.rgb(vaeske, alfa || 0.92) + '" clip-path="url(#' + k + ')"/>' +
+            '<line x1="' + x0 + '" y1="' + top + '" x2="' + (x0 + bredde) + '" y2="' + top + '" stroke="' + K + '" stroke-opacity="0.5" stroke-width="1.5" clip-path="url(#' + k + ')"/>';
+    }
+
+    /* Reagensglas. lag: [{ farve, andel }] fra bunden (andel af hoejden).
+       fast: [r,g,b] krystaller paa bunden. */
+    S.reagensglas = function (hoejde, lag, fast) {
+        var b = 36, r = b / 2;
+        var form = "M" + (-r) + " " + (-hoejde) + " L" + (-r) + " " + (-r) + " A" + r + " " + r + " 0 0 0 " + r + " " + (-r) + " L" + r + " " + (-hoejde) + " Z";
+        var s = skygge(b), bund = 0;
+        (lag || []).forEach(function (l) {
+            /* tegn fra toppen af laget og ned; det nederste lag ligger oeverst i z-orden sidst */
+            bund += l.andel;
+        });
+        var top = bund;
+        (lag || []).slice().reverse().forEach(function (l) {
+            s += vaeskeI(form, -r, b, -hoejde * top, l.farve);
+            top -= l.andel;
+        });
+        if (fast) {
+            [[-8, -6], [0, -4], [8, -7], [-3, -11], [5, -12]].forEach(function (p) {
+                s += '<rect x="' + (p[0] - 3) + '" y="' + (p[1] - 3) + '" width="6" height="6" transform="rotate(20 ' + p[0] + " " + p[1] + ')" fill="' + S.rgb(fast) + '" stroke="' + K + '" stroke-width="1"/>';
+            });
+        }
+        s += '<path d="' + form + '" fill="url(#g-glas)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (-r - 4) + '" y="' + (-hoejde - 5) + '" width="' + (b + 8) + '" height="9" rx="4" fill="#eef5fa" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<line x1="' + (-r + 7) + '" y1="' + (-hoejde + 14) + '" x2="' + (-r + 7) + '" y2="' + (-r - 4) + '" stroke="#fff" stroke-opacity="0.9" stroke-width="3" stroke-linecap="round"/>';
+        return s;
     };
 
-    /* Draabeplade af hvidt porcelaen, der ligger paa bordet (set skraat
-       oppefra): raekker x soejler brønde, venstre kant i x, bund i y. */
-    /* fyld[r][c]: { vaeske: [r,g,b], bundfald: [r,g,b] eller null } for
-       de brønde, der er dryppet i; resten er tomme. */
-    S.draabeplade = function (x, y, raekker, soejler, fyld) {
-        var b = soejler * 42 + 30, hh = raekker * 13 + 16;
-        var s = '<g filter="url(#f-skygge)"><polygon points="' + (x + 16) + ',' + (y - hh) + ' ' + (x + b - 16) + ',' + (y - hh) + ' ' + (x + b) + ',' + (y - 8) + ' ' + x + ',' + (y - 8) +
-            '" fill="#f2f1ec" stroke="#c9c6bc" stroke-width="2"/>' +
-            '<rect x="' + x + '" y="' + (y - 9) + '" width="' + b + '" height="9" rx="2" fill="#dcd9cf"/></g>';
+    /* Draabeflaske i brunt glas med pipette og etiket (54 x 128). */
+    S.draabeflaske = function (etiket) {
+        return skygge(54) +
+            '<rect x="-27" y="-84" width="54" height="84" rx="10" fill="#9a5a26" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="-21" y="-78" width="8" height="66" rx="4" fill="#fff" fill-opacity="0.3"/>' +
+            '<rect x="-11" y="-104" width="22" height="22" rx="3" fill="#39414f" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<path d="M-8 -104 Q0 -142 8 -104 Z" fill="#ffffff" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="-23" y="-62" width="46" height="34" rx="3" fill="#ffffff" stroke="' + K + '" stroke-width="2"/>' +
+            '<text x="0" y="-39" text-anchor="middle" font-size="' + (etiket.length > 4 ? 12.5 : 16) + '" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(etiket) + "</text>";
+    };
+
+    /* Draabeplade af hvidt porcelaen set skraat oppefra. fyld[r][c]:
+       { vaeske: [r,g,b], bundfald: [r,g,b] eller null } for de broende,
+       der er dryppet i. Nulpunkt: bund, venstre. */
+    S.draabeplade = function (raekker, soejler, fyld) {
+        var b = soejler * 54 + 36, hh = raekker * 17 + 20;
+        var s = '<polygon points="20,' + (-hh) + " " + (b - 20) + "," + (-hh) + " " + b + ",-10 0,-10" + '" fill="#ffffff" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="0" y="-11" width="' + b + '" height="11" rx="2" fill="#dfe3e8" stroke="' + K + '" stroke-width="3"/>';
         for (var r = 0; r < raekker; r++) {
-            var k = 0.82 + 0.18 * r / Math.max(1, raekker - 1), ry = y - hh + 10 + r * 13;
+            var k = 0.8 + 0.2 * r / Math.max(1, raekker - 1), ry = -hh + 13 + r * 17;
             for (var c = 0; c < soejler; c++) {
-                var cx = x + b / 2 + (c - (soejler - 1) / 2) * 42 * k, rx = 13 * k;
+                var cx = b / 2 + (c - (soejler - 1) / 2) * 54 * k, rx = 17 * k;
                 var f = fyld && fyld[r] && fyld[r][c];
-                s += '<ellipse cx="' + cx.toFixed(1) + '" cy="' + ry + '" rx="' + rx.toFixed(1) + '" ry="4" fill="' + (f ? S.rgb(f.vaeske, 0.9) : "#d6d3ca") + '" stroke="#b3b0a6" stroke-width="1.2"/>';
+                s += '<ellipse cx="' + cx.toFixed(1) + '" cy="' + ry + '" rx="' + rx.toFixed(1) + '" ry="5.5" fill="' + (f ? S.rgb(f.vaeske) : "#e9edf1") + '" stroke="' + K + '" stroke-opacity="0.7" stroke-width="1.5"/>';
                 if (f && f.bundfald) {
-                    s += '<ellipse cx="' + cx.toFixed(1) + '" cy="' + (ry + 0.5) + '" rx="' + (rx * 0.62).toFixed(1) + '" ry="2.6" fill="' + S.rgb(f.bundfald) + '" stroke="#6b6458" stroke-opacity="0.5" stroke-width="0.8"/>';
+                    s += '<ellipse cx="' + cx.toFixed(1) + '" cy="' + (ry + 0.5) + '" rx="' + (rx * 0.62).toFixed(1) + '" ry="3.4" fill="' + S.rgb(f.bundfald) + '" stroke="' + K + '" stroke-width="1"/>';
                 }
             }
         }
@@ -203,151 +223,160 @@
     };
 
     /* Reagensflaske med skruelaag. vaeske [r,g,b] eller null. */
-    S.flaske = function (x, y, b, hoejde, etiket, vaeske, laagFarve) {
-        var hals = b * 0.42, s = '';
-        var krop = 'M' + (x - b / 2) + ' ' + (y - 10) + ' Q' + (x - b / 2) + ' ' + y + ' ' + (x - b / 2 + 10) + ' ' + y + ' L' + (x + b / 2 - 10) + ' ' + y +
-            ' Q' + (x + b / 2) + ' ' + y + ' ' + (x + b / 2) + ' ' + (y - 10) + ' L' + (x + b / 2) + ' ' + (y - hoejde * 0.72) +
-            ' Q' + (x + b / 2) + ' ' + (y - hoejde * 0.82) + ' ' + (x + hals / 2) + ' ' + (y - hoejde * 0.86) + ' L' + (x + hals / 2) + ' ' + (y - hoejde) +
-            ' L' + (x - hals / 2) + ' ' + (y - hoejde) + ' L' + (x - hals / 2) + ' ' + (y - hoejde * 0.86) +
-            ' Q' + (x - b / 2) + ' ' + (y - hoejde * 0.82) + ' ' + (x - b / 2) + ' ' + (y - hoejde * 0.72) + ' Z';
-        var id = "kl-fl" + Math.round(x) + "-" + Math.round(y);
-        if (vaeske) {
-            var vt = y - hoejde * 0.62;
-            s += '<clipPath id="' + id + '"><path d="' + krop + '"/></clipPath>' +
-                '<rect x="' + (x - b / 2) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="' + S.rgb(vaeske, 0.8) + '" clip-path="url(#' + id + ')"/>' +
-                '<rect x="' + (x - b / 2) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="url(#g-vaeske)" clip-path="url(#' + id + ')"/>';
-        }
-        s += '<path d="' + krop + '" fill="url(#g-glas)" stroke="#d8e4ee" stroke-opacity="0.7" stroke-width="2"/>' +
-            '<rect x="' + (x - hals / 2 - 4) + '" y="' + (y - hoejde - 16) + '" width="' + (hals + 8) + '" height="18" rx="3" fill="' + (laagFarve || "#2f4f8a") + '"/>';
-        if (etiket) {
-            var eb = b * 0.78;
-            s += '<rect x="' + (x - eb / 2) + '" y="' + (y - hoejde * 0.55) + '" width="' + eb + '" height="' + (hoejde * 0.3) + '" rx="3" fill="#f7f4ea"/>' +
-                '<text x="' + x + '" y="' + (y - hoejde * 0.55 + hoejde * 0.19) + '" text-anchor="middle" font-size="' + Math.min(20, eb / Math.max(3, etiket.length) * 1.4).toFixed(1) +
-                '" font-weight="700" fill="#222" font-family="Lexend, Segoe UI, sans-serif">' + h(etiket) + '</text>';
+    S.flaske = function (b, hoejde, etiket, vaeske, laagFarve) {
+        var hals = b * 0.42, x = 0, y = 0;
+        var krop = "M" + (x - b / 2) + " " + (y - 12) + " Q" + (x - b / 2) + " " + y + " " + (x - b / 2 + 12) + " " + y + " L" + (x + b / 2 - 12) + " " + y +
+            " Q" + (x + b / 2) + " " + y + " " + (x + b / 2) + " " + (y - 12) + " L" + (x + b / 2) + " " + (y - hoejde * 0.7) +
+            " Q" + (x + b / 2) + " " + (y - hoejde * 0.82) + " " + (x + hals / 2) + " " + (y - hoejde * 0.86) + " L" + (x + hals / 2) + " " + (y - hoejde) +
+            " L" + (x - hals / 2) + " " + (y - hoejde) + " L" + (x - hals / 2) + " " + (y - hoejde * 0.86) +
+            " Q" + (x - b / 2) + " " + (y - hoejde * 0.82) + " " + (x - b / 2) + " " + (y - hoejde * 0.7) + " Z";
+        var s = skygge(b);
+        if (vaeske) s += vaeskeI(krop, -b / 2, b, -hoejde * 0.64, vaeske);
+        s += '<path d="' + krop + '" fill="url(#g-glas)" stroke="' + K + '" stroke-width="3"/>' +
+            '<line x1="' + (-b / 2 + 9) + '" y1="' + (-hoejde * 0.68) + '" x2="' + (-b / 2 + 9) + '" y2="-16" stroke="#fff" stroke-opacity="0.9" stroke-width="4" stroke-linecap="round"/>' +
+            '<rect x="' + (-hals / 2 - 5) + '" y="' + (-hoejde - 18) + '" width="' + (hals + 10) + '" height="22" rx="4" fill="' + (laagFarve || "#2f5fa8") + '" stroke="' + K + '" stroke-width="3"/>';
+        if (etiket !== null && etiket !== undefined) {
+            var eb = b * 0.8, eh = hoejde * 0.3;
+            s += '<rect x="' + (-eb / 2) + '" y="' + (-hoejde * 0.56) + '" width="' + eb + '" height="' + eh + '" rx="3" fill="#ffffff" stroke="' + K + '" stroke-width="2"/>';
+            if (etiket) {
+                s += '<text x="0" y="' + (-hoejde * 0.56 + eh * 0.66) + '" text-anchor="middle" font-size="' + Math.min(26, eb / Math.max(3, etiket.length) * 1.45).toFixed(1) +
+                    '" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(etiket) + "</text>";
+            } else {
+                s += '<line x1="' + (-eb / 2 + 8) + '" y1="' + (-hoejde * 0.56 + eh * 0.38) + '" x2="' + (eb / 2 - 8) + '" y2="' + (-hoejde * 0.56 + eh * 0.38) + '" stroke="' + K + '" stroke-opacity="0.45" stroke-width="2.5"/>' +
+                    '<line x1="' + (-eb / 2 + 8) + '" y1="' + (-hoejde * 0.56 + eh * 0.68) + '" x2="' + (eb / 2 - 20) + '" y2="' + (-hoejde * 0.56 + eh * 0.68) + '" stroke="' + K + '" stroke-opacity="0.45" stroke-width="2.5"/>';
+            }
         }
         return s;
     };
 
-    /* Erlenmeyerkolbe med bund i (x, y). */
-    S.kolbe = function (x, y, b, hoejde, vaeske, fyld) {
-        var hals = b * 0.3, id = "kl-ko" + Math.round(x);
-        var form = 'M' + (x - hals / 2) + ' ' + (y - hoejde) + ' L' + (x - hals / 2) + ' ' + (y - hoejde * 0.7) + ' L' + (x - b / 2) + ' ' + (y - 6) +
-            ' Q' + (x - b / 2) + ' ' + y + ' ' + (x - b / 2 + 8) + ' ' + y + ' L' + (x + b / 2 - 8) + ' ' + y + ' Q' + (x + b / 2) + ' ' + y + ' ' + (x + b / 2) + ' ' + (y - 6) +
-            ' L' + (x + hals / 2) + ' ' + (y - hoejde * 0.7) + ' L' + (x + hals / 2) + ' ' + (y - hoejde) + ' Z';
-        var s = '';
-        if (vaeske) {
-            var vt = y - hoejde * (fyld || 0.35);
-            s += '<clipPath id="' + id + '"><path d="' + form + '"/></clipPath>' +
-                '<rect x="' + (x - b / 2) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="' + S.rgb(vaeske, 0.75) + '" clip-path="url(#' + id + ')"/>' +
-                '<rect x="' + (x - b / 2) + '" y="' + vt + '" width="' + b + '" height="' + (y - vt) + '" fill="url(#g-vaeske)" clip-path="url(#' + id + ')"/>';
+    /* Erlenmeyerkolbe. bobler: der dannes gas. */
+    S.kolbe = function (b, hoejde, vaeske, fyld, bobler) {
+        var hals = b * 0.3;
+        var form = "M" + (-hals / 2) + " " + (-hoejde) + " L" + (-hals / 2) + " " + (-hoejde * 0.68) + " L" + (-b / 2) + " -8" +
+            " Q" + (-b / 2) + " 0 " + (-b / 2 + 10) + " 0 L" + (b / 2 - 10) + " 0 Q" + (b / 2) + " 0 " + (b / 2) + " -8" +
+            " L" + (hals / 2) + " " + (-hoejde * 0.68) + " L" + (hals / 2) + " " + (-hoejde) + " Z";
+        var s = skygge(b), top = -hoejde * (fyld || 0.36);
+        if (vaeske) s += vaeskeI(form, -b / 2, b, top, vaeske);
+        if (bobler) {
+            [[-18, 0.3], [4, 0.55], [20, 0.25], [-6, 0.75], [12, 0.85], [-22, 0.6]].forEach(function (p) {
+                s += '<circle cx="' + p[0] + '" cy="' + (top * p[1] - 4) + '" r="' + (3 + p[1] * 3) + '" fill="#fff" stroke="' + K + '" stroke-width="1.3"/>';
+            });
         }
-        s += '<path d="' + form + '" fill="url(#g-glas)" stroke="#d8e4ee" stroke-opacity="0.75" stroke-width="2"/>' +
-            '<rect x="' + (x - hals / 2 - 4) + '" y="' + (y - hoejde - 5) + '" width="' + (hals + 8) + '" height="7" rx="3" fill="#dfe8ef" fill-opacity="0.7"/>';
+        s += '<path d="' + form + '" fill="url(#g-glas)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (-hals / 2 - 5) + '" y="' + (-hoejde - 6) + '" width="' + (hals + 10) + '" height="9" rx="4" fill="#eef5fa" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<line x1="' + (-b / 2 + 16) + '" y1="-14" x2="' + (-hals / 2 + 5) + '" y2="' + (-hoejde * 0.66) + '" stroke="#fff" stroke-opacity="0.9" stroke-width="4" stroke-linecap="round"/>';
         return s;
     };
 
-    /* Stativ med burette; bunden af stativet staar paa bordet (y = 540). */
-    S.burette = function (x, top, bund, vaeske) {
-        var s = '', id = "kl-bu" + Math.round(x), b = 18;
-        var tut = bund + 34;
-        if (vaeske) {
-            s += '<rect x="' + (x - b / 2 + 2) + '" y="' + (top + 26) + '" width="' + (b - 4) + '" height="' + (bund - top - 26) + '" fill="' + S.rgb(vaeske, 0.8) + '"/>' +
-                '<rect x="' + (x - b / 2 + 2) + '" y="' + (top + 26) + '" width="' + (b - 4) + '" height="' + (bund - top - 26) + '" fill="url(#g-vaeske)"/>';
-        }
-        s += '<rect x="' + (x - b / 2) + '" y="' + top + '" width="' + b + '" height="' + (bund - top) + '" rx="3" fill="url(#g-glas)" stroke="#d8e4ee" stroke-opacity="0.75" stroke-width="2"/>';
+    /* Prop, slange og gassproejte til kolben (nulpunkt: kolbens munding).
+       ude: 0 til 1, hvor langt stemplet er skubbet ud. */
+    S.gassproejte = function (ude) {
+        var e = 20 + 90 * (ude || 0);
+        return '<path d="M0 -4 L0 -40 Q0 -60 20 -60 L70 -60" fill="none" stroke="' + K + '" stroke-width="9" stroke-linecap="round"/>' +
+            '<path d="M0 -4 L0 -40 Q0 -60 20 -60 L70 -60" fill="none" stroke="#f0b24a" stroke-width="4" stroke-linecap="round"/>' +
+            '<rect x="-13" y="-10" width="26" height="16" rx="3" fill="#8a5a3a" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="70" y="-80" width="170" height="40" rx="6" fill="url(#g-glas)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (70 + e) + '" y="-76" width="10" height="32" fill="#39414f"/>' +
+            '<rect x="' + (80 + e) + '" y="-65" width="' + (190 - e) + '" height="10" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2"/>' +
+            '<rect x="' + (270) + '" y="-78" width="10" height="36" rx="3" fill="#39414f" stroke="' + K + '" stroke-width="2"/>';
+    };
+
+    /* Stativ med burette. Nulpunkt: stativets fod, midt under buretten.
+       laengde: burettens roer. tomt: 0 til 1, hvor stor en del der er
+       loebet ud. */
+    S.burette = function (laengde, vaeske, tomt) {
+        var bund = -150, top = bund - laengde, b = 24;
+        var vt = top + 26 + (laengde - 60) * (tomt || 0) * 0.6;
+        var s = '<rect x="-95" y="-14" width="190" height="16" rx="5" fill="#4a5568" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="-80" y="' + (top - 20) + '" width="11" height="' + (-top + 8) + '" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="-82" y="' + (top + 90) + '" width="78" height="13" rx="4" fill="#4a5568" stroke="' + K + '" stroke-width="2.5"/>';
+        if (vaeske) s += '<rect x="' + (-b / 2 + 2) + '" y="' + vt + '" width="' + (b - 4) + '" height="' + (bund - vt) + '" fill="' + S.rgb(vaeske, 0.95) + '"/>';
+        s += '<rect x="' + (-b / 2) + '" y="' + top + '" width="' + b + '" height="' + laengde + '" rx="4" fill="url(#g-glas)" stroke="' + K + '" stroke-width="3"/>';
         for (var i = 0; i <= 10; i++) {
-            var ly = top + 30 + i * (bund - top - 50) / 10;
-            s += '<line x1="' + (x - b / 2) + '" y1="' + ly + '" x2="' + (x - b / 2 + (i % 5 === 0 ? 10 : 6)) + '" y2="' + ly + '" stroke="#e8f0f6" stroke-opacity="0.8" stroke-width="1.5"/>';
+            var ly = top + 26 + i * (laengde - 60) / 10;
+            s += '<line x1="' + (-b / 2 + 2) + '" y1="' + ly + '" x2="' + (-b / 2 + (i % 5 === 0 ? 14 : 9)) + '" y2="' + ly + '" stroke="' + K + '" stroke-width="2"/>';
         }
-        /* Hanen og tuden */
-        s += '<rect x="' + (x - 4) + '" y="' + bund + '" width="8" height="34" fill="url(#g-glas)" stroke="#d8e4ee" stroke-opacity="0.6"/>' +
-            '<rect x="' + (x - 16) + '" y="' + (bund + 10) + '" width="32" height="9" rx="4" fill="#2d6fb3"/>' +
-            '<path d="M' + (x - 3) + ' ' + tut + ' L' + x + ' ' + (tut + 12) + ' L' + (x + 3) + ' ' + tut + ' Z" fill="#d8e4ee" fill-opacity="0.7"/>';
+        s += '<rect x="-5" y="' + bund + '" width="10" height="40" fill="#eef5fa" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="-22" y="' + (bund + 12) + '" width="44" height="12" rx="5" fill="#2f6fd0" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<path d="M-4 ' + (bund + 40) + " L0 " + (bund + 56) + " L4 " + (bund + 40) + ' Z" fill="#eef5fa" stroke="' + K + '" stroke-width="2"/>';
         return s;
-    };
-    S.stativ = function (x, top) {
-        return '<rect x="' + (x - 70) + '" y="528" width="140" height="14" rx="4" fill="#2c2f36" stroke="#15161a" stroke-width="2"/>' +
-            '<rect x="' + (x - 55) + '" y="' + top + '" width="8" height="' + (530 - top) + '" fill="url(#g-metal)"/>' +
-            '<rect x="' + (x - 55) + '" y="' + (top + 70) + '" width="50" height="10" rx="3" fill="#3a3e46"/>' +
-            '<rect x="' + (x - 14) + '" y="' + (top + 64) + '" width="10" height="22" rx="3" fill="#3a3e46"/>';
     };
 
-    /* Laboratorievaegt med display og en vejebaad med metal. */
-    S.vaegt = function (x, y, display, metal) {
-        var s = '<g filter="url(#f-skygge)"><rect x="' + (x - 110) + '" y="' + (y - 62) + '" width="220" height="62" rx="10" fill="#e9ebee" stroke="#9aa0a8" stroke-width="2"/>' +
-            '<rect x="' + (x - 82) + '" y="' + (y - 84) + '" width="164" height="16" rx="4" fill="url(#g-metal)"/>' +
-            '<rect x="' + (x - 60) + '" y="' + (y - 46) + '" width="120" height="34" rx="4" fill="#163021" stroke="#0b1710" stroke-width="2"/></g>' +
-            '<text x="' + (x + 52) + '" y="' + (y - 21) + '" text-anchor="end" font-size="24" fill="#7dfa9c" font-family="Consolas, monospace">' + h(display) + '</text>' +
-            '<circle cx="' + (x - 88) + '" cy="' + (y - 28) + '" r="7" fill="#c0392b"/><circle cx="' + (x + 86) + '" cy="' + (y - 28) + '" r="7" fill="#7f8c8d"/>';
-        /* Vejebaaden */
-        s += '<path d="M' + (x - 54) + ' ' + (y - 84) + ' L' + (x - 44) + ' ' + (y - 102) + ' L' + (x + 44) + ' ' + (y - 102) + ' L' + (x + 54) + ' ' + (y - 84) + ' Z" fill="#f4f4f0" stroke="#bdbcb5" stroke-width="1.5"/>';
-        s += S.metalstykker(x, y - 98, metal);
+    /* Laboratorievaegt med display. metal: symbolet, hvis metallet ligger
+       paa vaegten. (240 bred) */
+    S.vaegt = function (display, metal) {
+        var s = skygge(240) +
+            '<rect x="-120" y="-70" width="240" height="70" rx="10" fill="#f5f6f8" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="-92" y="-92" width="184" height="18" rx="5" fill="url(#g-metal)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="-68" y="-54" width="136" height="40" rx="5" fill="#16321f" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<text x="58" y="-24" text-anchor="end" font-size="28" font-weight="700" fill="#8dffaa" font-family="Consolas, monospace">' + h(display) + "</text>" +
+            '<circle cx="-96" cy="-34" r="8" fill="#d8443a" stroke="' + K + '" stroke-width="2"/><circle cx="96" cy="-34" r="8" fill="#9aa3ae" stroke="' + K + '" stroke-width="2"/>';
+        if (metal) s += S.paa(0, -92, 1, S.vejebaad(metal));
         return s;
     };
-    S.metalstykker = function (x, y, metal) {
-        var s = '';
+    /* Vejebaad med metallet (nulpunkt: bund, midt). */
+    S.vejebaad = function (metal) {
+        var s = '<path d="M-58 0 L-46 -22 L46 -22 L58 0 Z" fill="#ffffff" stroke="' + K + '" stroke-width="2.5"/>';
+        var y = -20;
         if (metal === "Mg") {
-            s += '<path d="M' + (x - 34) + ' ' + y + ' q 12 -18 24 0 t 24 0 t 24 0" fill="none" stroke="#c9ccd2" stroke-width="4" stroke-linecap="round"/>';
+            s += '<path d="M-34 ' + y + ' q 12 -20 24 0 t 24 0 t 24 0" fill="none" stroke="' + K + '" stroke-width="7" stroke-linecap="round"/>' +
+                '<path d="M-34 ' + y + ' q 12 -20 24 0 t 24 0 t 24 0" fill="none" stroke="#d5d9df" stroke-width="3.5" stroke-linecap="round"/>';
         } else if (metal === "Al") {
-            s += '<path d="M' + (x - 30) + ' ' + y + ' l 14 -12 l 10 8 l 12 -10 l 8 12 l 12 -6 l 6 8 Z" fill="#dfe3e8" stroke="#9aa0a8"/>';
+            s += '<path d="M-32 ' + y + ' l 14 -14 l 10 9 l 12 -11 l 8 13 l 12 -7 l 8 10 Z" fill="#e8ebef" stroke="' + K + '" stroke-width="2"/>';
         } else if (metal === "Zn") {
-            [[-26, 0], [-12, -4], [2, 0], [16, -3], [28, 0], [-4, -10], [10, -11]].forEach(function (p) {
-                s += '<circle cx="' + (x + p[0]) + '" cy="' + (y + p[1]) + '" r="6" fill="#9ea6ae" stroke="#5f666e"/>';
+            [[-26, 0], [-12, -4], [2, 0], [16, -3], [28, 0], [-4, -11], [10, -12]].forEach(function (p) {
+                s += '<circle cx="' + p[0] + '" cy="' + (y + p[1] - 2) + '" r="7" fill="#aab2bb" stroke="' + K + '" stroke-width="1.8"/>';
             });
         } else {
-            s += '<ellipse cx="' + x + '" cy="' + (y - 2) + '" rx="34" ry="7" fill="#4a4d52"/><ellipse cx="' + x + '" cy="' + (y - 5) + '" rx="20" ry="5" fill="#5d6066"/>';
+            s += '<path d="M-36 ' + y + " Q-20 " + (y - 22) + " 0 " + (y - 18) + " Q22 " + (y - 22) + " 36 " + y + ' Z" fill="#565b63" stroke="' + K + '" stroke-width="2"/>';
         }
         return s;
     };
 
-    /* Vejrstation med termometer og barometer. */
-    S.vejrstation = function (x, y, tTekst, pTekst) {
-        return '<g filter="url(#f-skygge)"><rect x="' + x + '" y="' + y + '" width="200" height="240" rx="10" fill="url(#g-trae)"/></g>' +
-            '<rect x="' + (x + 12) + '" y="' + (y + 12) + '" width="176" height="216" rx="6" fill="none" stroke="#000" stroke-opacity="0.3" stroke-width="2"/>' +
-            /* termometer */
-            '<rect x="' + (x + 30) + '" y="' + (y + 28) + '" width="16" height="150" rx="8" fill="#f1f3f4" stroke="#999" stroke-width="1.5"/>' +
-            '<rect x="' + (x + 35) + '" y="' + (y + 78) + '" width="6" height="104" fill="#d33a2c"/>' +
-            '<circle cx="' + (x + 38) + '" cy="' + (y + 186) + '" r="13" fill="#d33a2c" stroke="#999" stroke-width="1.5"/>' +
-            /* barometer */
-            '<circle cx="' + (x + 128) + '" cy="' + (y + 86) + '" r="52" fill="#f6f2e6" stroke="url(#g-metal)" stroke-width="7"/>' +
-            '<line x1="' + (x + 128) + '" y1="' + (y + 86) + '" x2="' + (x + 150) + '" y2="' + (y + 50) + '" stroke="#222" stroke-width="3" stroke-linecap="round"/>' +
-            '<circle cx="' + (x + 128) + '" cy="' + (y + 86) + '" r="5" fill="#222"/>' +
-            /* aflaesningerne */
-            '<rect x="' + (x + 62) + '" y="' + (y + 152) + '" width="122" height="30" rx="4" fill="#163021"/>' +
-            '<text x="' + (x + 176) + '" y="' + (y + 174) + '" text-anchor="end" font-size="19" fill="#7dfa9c" font-family="Consolas, monospace">' + h(tTekst) + '</text>' +
-            '<rect x="' + (x + 62) + '" y="' + (y + 188) + '" width="122" height="30" rx="4" fill="#163021"/>' +
-            '<text x="' + (x + 176) + '" y="' + (y + 210) + '" text-anchor="end" font-size="19" fill="#7dfa9c" font-family="Consolas, monospace">' + h(pTekst) + '</text>';
+    /* Vejrstation med termometer og barometer (nulpunkt: oeverst, venstre; 220 x 270). */
+    S.vejrstation = function (tTekst, pTekst) {
+        return '<rect x="0" y="0" width="220" height="270" rx="12" fill="url(#g-trae)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="28" y="24" width="20" height="150" rx="10" fill="#ffffff" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="35" y="80" width="6" height="100" fill="#e0483a"/>' +
+            '<circle cx="38" cy="186" r="15" fill="#e0483a" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<circle cx="138" cy="84" r="58" fill="#ffffff" stroke="' + K + '" stroke-width="3"/>' +
+            '<circle cx="138" cy="84" r="50" fill="none" stroke="#9aa3ae" stroke-width="2" stroke-dasharray="3 9"/>' +
+            '<line x1="138" y1="84" x2="164" y2="46" stroke="' + K + '" stroke-width="4" stroke-linecap="round"/>' +
+            '<circle cx="138" cy="84" r="6" fill="' + K + '"/>' +
+            '<rect x="66" y="160" width="140" height="42" rx="5" fill="#16321f" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<text x="196" y="190" text-anchor="end" font-size="26" font-weight="700" fill="#8dffaa" font-family="Consolas, monospace">' + h(tTekst) + "</text>" +
+            '<rect x="20" y="212" width="186" height="42" rx="5" fill="#16321f" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<text x="196" y="242" text-anchor="end" font-size="26" font-weight="700" fill="#8dffaa" font-family="Consolas, monospace">' + h(pTekst) + "</text>";
     };
 
-    /* Aaben notesbog paa bordet. */
-    S.notesbog = function (x, y) {
-        var s = '<g filter="url(#f-skygge)"><path d="M' + (x - 130) + ' ' + (y - 6) + ' L' + (x - 118) + ' ' + (y - 96) + ' L' + x + ' ' + (y - 90) + ' L' + x + ' ' + y + ' Z" fill="#f4efe0"/>' +
-            '<path d="M' + x + ' ' + y + ' L' + x + ' ' + (y - 90) + ' L' + (x + 118) + ' ' + (y - 96) + ' L' + (x + 130) + ' ' + (y - 6) + ' Z" fill="#efe9d8"/></g>' +
-            '<line x1="' + x + '" y1="' + (y - 90) + '" x2="' + x + '" y2="' + y + '" stroke="#b9ae92" stroke-width="2"/>';
-        for (var i = 0; i < 6; i++) {
-            var ly = y - 80 + i * 12;
-            s += '<line x1="' + (x - 112) + '" y1="' + ly + '" x2="' + (x - 12) + '" y2="' + (ly + 1) + '" stroke="#5b6b8c" stroke-opacity="0.45" stroke-width="1.5"/>' +
-                '<line x1="' + (x + 12) + '" y1="' + (ly + 1) + '" x2="' + (x + 112) + '" y2="' + ly + '" stroke="#5b6b8c" stroke-opacity="0.45" stroke-width="1.5"/>';
-        }
-        s += '<rect x="' + (x + 70) + '" y="' + (y - 4) + '" width="70" height="6" rx="3" transform="rotate(-12 ' + (x + 105) + ' ' + y + ')" fill="#2b5ca8"/>';
-        return s;
+    /* Hylde paa vaeggen (nulpunkt: oeverst, venstre). */
+    S.hylde = function (b) {
+        return '<path d="M34 16 l0 34 l30 -34 Z" fill="#7a5230" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<path d="M' + (b - 34) + ' 16 l0 34 l-30 -34 Z" fill="#7a5230" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<rect x="0" y="0" width="' + b + '" height="18" rx="3" fill="url(#g-trae)" stroke="' + K + '" stroke-width="3"/>';
     };
 
-    /* Hylde paa vaeggen. */
-    S.hylde = function (x, y, b) {
-        return '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="14" rx="2" fill="url(#g-trae)" filter="url(#f-skygge)"/>' +
-            '<path d="M' + (x + 30) + ' ' + (y + 14) + ' l 0 30 l 26 -30 Z" fill="#3a2a1c"/>' +
-            '<path d="M' + (x + b - 30) + ' ' + (y + 14) + ' l 0 30 l -26 -30 Z" fill="#3a2a1c"/>';
+    /* Bonusskrinet: moerkt skrin med guldkant og stjerne (130 x 104). */
+    S.skrin = function (guld) {
+        return skygge(130) +
+            '<rect x="-65" y="-84" width="130" height="84" rx="8" fill="#2c3545" stroke="' + K + '" stroke-width="3"/>' +
+            '<path d="M-65 -76 Q-65 -108 -30 -108 L30 -108 Q65 -108 65 -76 Z" fill="#39445a" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="-65" y="-80" width="130" height="10" fill="url(#g-guld)" stroke="' + K + '" stroke-width="2"/>' +
+            '<rect x="-14" y="-88" width="28" height="30" rx="5" fill="url(#g-guld)" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<circle cx="0" cy="-74" r="4.5" fill="' + K + '"/>' +
+            '<polygon points="0,-48 6,-34 21,-33 9,-23 13,-8 0,-16 -13,-8 -9,-23 -21,-33 -6,-34" fill="' + (guld ? "url(#g-guld)" : "#f6cd2b") + '" stroke="' + K + '" stroke-width="2"/>';
     };
 
-    /* Plakat med et lille periodisk system (kun farvede felter). */
-    S.plakat = function (x, y, b) {
-        var c = (b - 24) / 18, hh = c * 9.6 + 56;
-        var s = '<g filter="url(#f-skygge)"><rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hh + '" fill="#f6f3ea"/></g>' +
-            '<text x="' + (x + b / 2) + '" y="' + (y + 30) + '" text-anchor="middle" font-size="18" font-weight="700" fill="#2a2f3a" font-family="Lexend, Segoe UI, sans-serif">Det periodiske system</text>';
-        NK.Sprites.pladser().forEach(function (p) {
-            var px = x + 12 + (p.kol - 1) * c, py = y + 44 + (p.raekke - 1) * c + (p.raekke > 7 ? c * 0.6 : 0);
-            s += '<rect x="' + px.toFixed(1) + '" y="' + py.toFixed(1) + '" width="' + (c - 1.2).toFixed(1) + '" height="' + (c - 1.2).toFixed(1) + '" fill="' + p.farve + '"/>';
+    /* Aaben notesbog (bruges ikke i rummene nu, men vises i _sprites). */
+
+    /* Plakat med et lille periodisk system (nulpunkt: oeverst, venstre). */
+    S.plakat = function (b) {
+        var c = (b - 28) / 18, hh = c * 9.6 + 64;
+        var s = '<rect x="0" y="0" width="' + b + '" height="' + hh + '" fill="#ffffff" stroke="' + K + '" stroke-width="3"/>' +
+            '<text x="' + (b / 2) + '" y="36" text-anchor="middle" font-size="24" font-weight="700" fill="' + K + '" ' + SKRIFT + ">Det periodiske system</text>";
+        S.pladser().forEach(function (p) {
+            var px = 14 + (p.kol - 1) * c, py = 52 + (p.raekke - 1) * c + (p.raekke > 7 ? c * 0.6 : 0);
+            s += '<rect x="' + px.toFixed(1) + '" y="' + py.toFixed(1) + '" width="' + (c - 1.5).toFixed(1) + '" height="' + (c - 1.5).toFixed(1) + '" fill="' + p.farve + '" stroke="' + K + '" stroke-opacity="0.35" stroke-width="1"/>';
         });
         return s;
     };
@@ -359,11 +388,11 @@
         PLADSER = [];
         var D = NK.D;
         function farve(Z, kol, raekke) {
-            if (raekke > 7) return "#cbb8ee";
-            if (kol === 18) return "#b9e1c5";
-            if (kol <= 2 && Z !== 1) return "#f2a7a2";
-            if (kol >= 3 && kol <= 12) return "#a6d1f0";
-            return "#f6d58b";
+            if (raekke > 7) return "#d5c4f2";
+            if (kol === 18) return "#bfe6cb";
+            if (kol <= 2 && Z !== 1) return "#f6b3ae";
+            if (kol >= 3 && kol <= 12) return "#b1d8f4";
+            return "#f8dc97";
         }
         for (var Z = 1; Z <= 118; Z++) {
             var kol, raekke;
@@ -387,70 +416,66 @@
         return PLADSER;
     };
 
-    /* ----- Noegler, segl og den gyldne doer -------------------------- */
+    /* ----- Noegler og segl ------------------------------------------------ */
     /* En noegle med hovedet til venstre, ca. 80 x 32. */
     S.noegle = function (x, y, fyld, kant, skala) {
         var k = skala || 1;
-        return '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')">' +
+        return '<g transform="translate(' + x + " " + y + ") scale(" + k + ')">' +
             '<circle cx="16" cy="16" r="14" fill="' + fyld + '" stroke="' + kant + '" stroke-width="2.5"/>' +
-            '<circle cx="16" cy="16" r="5.5" fill="#0d0e12" fill-opacity="0.75"/>' +
+            '<circle cx="16" cy="16" r="5.5" fill="' + kant + '"/>' +
             '<rect x="28" y="12" width="48" height="8" rx="2" fill="' + fyld + '" stroke="' + kant + '" stroke-width="2"/>' +
             '<rect x="56" y="18" width="7" height="12" fill="' + fyld + '" stroke="' + kant + '" stroke-width="2"/>' +
             '<rect x="67" y="18" width="7" height="9" fill="' + fyld + '" stroke="' + kant + '" stroke-width="2"/></g>';
     };
 
-    /* Voksseglet med et maerke. brudt: revnet og mat. */
-    S.segl = function (x, y, maerke, brudt) {
-        var s = '<g transform="translate(' + x + ' ' + y + ')">';
+    /* Voksseglet med et maerke (nulpunkt: midten). brudt: revnet og mat. */
+    S.segl = function (maerke, brudt) {
         if (brudt) {
-            s += '<path d="M-44 -6 Q-46 -40 -8 -44 L -2 -8 L -14 10 L -6 44 Q-44 40 -44 -6 Z" fill="#6c3a35" opacity="0.85"/>' +
-                '<path d="M8 -44 Q46 -40 44 0 Q42 40 4 44 L 10 12 L -2 -8 Z" fill="#6c3a35" opacity="0.85" transform="translate(8 4) rotate(6)"/>';
-        } else {
-            s += '<path d="M0 -46 Q20 -48 32 -36 Q48 -26 44 -4 Q50 18 34 34 Q18 50 -4 45 Q-28 48 -38 30 Q-50 12 -44 -10 Q-42 -36 -18 -44 Q-10 -48 0 -46 Z" fill="url(#g-voks)" filter="url(#f-skygge)"/>' +
-                '<circle r="30" fill="none" stroke="#5a0f0a" stroke-opacity="0.55" stroke-width="3"/>' + maerke;
+            return '<path d="M-44 -6 Q-46 -40 -8 -44 L -2 -8 L -14 10 L -6 44 Q-44 40 -44 -6 Z" fill="#c9a9a4" stroke="' + K + '" stroke-width="2.5"/>' +
+                '<path d="M8 -44 Q46 -40 44 0 Q42 40 4 44 L 10 12 L -2 -8 Z" fill="#c9a9a4" stroke="' + K + '" stroke-width="2.5" transform="translate(10 4) rotate(7)"/>';
         }
-        return s + '</g>';
+        return '<path d="M0 -46 Q20 -48 32 -36 Q48 -26 44 -4 Q50 18 34 34 Q18 50 -4 45 Q-28 48 -38 30 Q-50 12 -44 -10 Q-42 -36 -18 -44 Q-10 -48 0 -46 Z" fill="url(#g-voks)" stroke="' + K + '" stroke-width="3"/>' +
+            '<circle r="30" fill="none" stroke="#5a0f0a" stroke-opacity="0.6" stroke-width="3"/>' + maerke;
     };
     S.SEGLMAERKER = {
-        million: '<text y="12" text-anchor="middle" font-size="34" font-weight="700" fill="#5a0f0a" fill-opacity="0.75" font-family="Georgia, serif">M</text>',
-        syregalgen: '<text y="10" text-anchor="middle" font-size="26" font-weight="700" fill="#5a0f0a" fill-opacity="0.75" font-family="Lexend, Segoe UI, sans-serif">pH</text>',
-        pacman: '<path d="M0 0 L18 -12 A21 21 0 1 0 18 12 Z" fill="#5a0f0a" fill-opacity="0.7"/>',
-        organisk: '<polygon points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="#5a0f0a" stroke-opacity="0.75" stroke-width="4"/>'
+        million: '<text y="12" text-anchor="middle" font-size="34" font-weight="700" fill="#4a0b07" font-family="Georgia, serif">M</text>',
+        syregalgen: '<text y="10" text-anchor="middle" font-size="26" font-weight="700" fill="#4a0b07" ' + SKRIFT + ">pH</text>",
+        pacman: '<path d="M0 0 L18 -12 A21 21 0 1 0 18 12 Z" fill="#4a0b07"/>',
+        organisk: '<polygon points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="#4a0b07" stroke-width="4"/>'
     };
 
-    /* ----- Molekyler som kugle-og-pind i en kasse paa 200 x 150 ------- */
+    /* ----- Molekyler som kugle-og-pind i en kasse paa 200 x 150 --------- */
     S.molekyle = function (t, b, hh) {
         var D = NK.D;
-        var s = '<svg viewBox="0 0 200 150" width="' + (b || 170) + '" height="' + (hh || 128) + '" aria-hidden="true">' +
-            '<defs><radialGradient id="g-kugle-m" cx="0.35" cy="0.3" r="0.7"><stop offset="0" stop-color="#fff" stop-opacity="0.6"/>' +
-            '<stop offset="0.45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.32"/></radialGradient></defs>';
+        var s = '<svg viewBox="0 0 200 150" width="' + (b || 170) + '" height="' + (hh || 128) + '" aria-hidden="true">';
         t.b.forEach(function (bd) {
             var a = t.a[bd[0]], c = t.a[bd[1]], type = bd[2];
             var dx = c[1] - a[1], dy = c[2] - a[2], l = Math.sqrt(dx * dx + dy * dy), nx = -dy / l, ny = dx / l;
             if (type === "k") {
-                s += '<polygon points="' + a[1] + ',' + a[2] + ' ' + (c[1] + nx * 7) + ',' + (c[2] + ny * 7) + ' ' + (c[1] - nx * 7) + ',' + (c[2] - ny * 7) + '" fill="#9aa1ab"/>';
+                s += '<polygon points="' + a[1] + "," + a[2] + " " + (c[1] + nx * 7) + "," + (c[2] + ny * 7) + " " + (c[1] - nx * 7) + "," + (c[2] - ny * 7) + '" fill="' + K + '"/>';
             } else if (type === "s") {
-                s += '<line x1="' + a[1] + '" y1="' + a[2] + '" x2="' + c[1] + '" y2="' + c[2] + '" stroke="#9aa1ab" stroke-width="3" stroke-dasharray="4 4"/>';
+                s += '<line x1="' + a[1] + '" y1="' + a[2] + '" x2="' + c[1] + '" y2="' + c[2] + '" stroke="' + K + '" stroke-width="3.5" stroke-dasharray="4 4"/>';
             } else {
-                var n = type, afst = 6;
-                for (var i = 0; i < n; i++) {
-                    var o = (i - (n - 1) / 2) * afst;
-                    s += '<line x1="' + (a[1] + nx * o) + '" y1="' + (a[2] + ny * o) + '" x2="' + (c[1] + nx * o) + '" y2="' + (c[2] + ny * o) + '" stroke="#9aa1ab" stroke-width="3"/>';
+                for (var i = 0; i < type; i++) {
+                    var o = (i - (type - 1) / 2) * 7;
+                    s += '<line x1="' + (a[1] + nx * o) + '" y1="' + (a[2] + ny * o) + '" x2="' + (c[1] + nx * o) + '" y2="' + (c[2] + ny * o) + '" stroke="' + K + '" stroke-width="3.5"/>';
                 }
             }
         });
         (t.f || []).forEach(function (fp) {
             var a = t.a[fp[0]], r = D.ATOM[a[0]].r + 9, v = fp[1] * Math.PI / 180;
-            var cx = a[1] + Math.cos(v) * r, cy = a[2] + Math.sin(v) * r, px = -Math.sin(v) * 4, py = Math.cos(v) * 4;
-            s += '<circle cx="' + (cx + px) + '" cy="' + (cy + py) + '" r="2.6" fill="#e7c24a"/><circle cx="' + (cx - px) + '" cy="' + (cy - py) + '" r="2.6" fill="#e7c24a"/>';
+            var cx = a[1] + Math.cos(v) * r, cy = a[2] + Math.sin(v) * r, px = -Math.sin(v) * 4.5, py = Math.cos(v) * 4.5;
+            s += '<circle cx="' + (cx + px) + '" cy="' + (cy + py) + '" r="3" fill="' + K + '"/><circle cx="' + (cx - px) + '" cy="' + (cy - py) + '" r="3" fill="' + K + '"/>';
         });
         t.a.forEach(function (a) {
             var at = D.ATOM[a[0]];
-            s += '<circle cx="' + a[1] + '" cy="' + a[2] + '" r="' + at.r + '" fill="' + at.farve + '"/>' +
-                '<circle cx="' + a[1] + '" cy="' + a[2] + '" r="' + at.r + '" fill="url(#g-kugle-m)"/>' +
+            s += '<circle cx="' + a[1] + '" cy="' + a[2] + '" r="' + at.r + '" fill="' + at.farve + '" stroke="' + K + '" stroke-width="2.5"/>' +
+                '<circle cx="' + (a[1] - at.r * 0.32) + '" cy="' + (a[2] - at.r * 0.36) + '" r="' + (at.r * 0.28) + '" fill="#fff" fill-opacity="0.5"/>' +
                 '<text x="' + a[1] + '" y="' + (a[2] + 5) + '" text-anchor="middle" font-size="' + (a[0].length > 1 ? 13 : 15) + '" font-weight="700" fill="' +
-                (at.moerkTekst ? "#1d2433" : "#fff") + '" font-family="Lexend, Segoe UI, sans-serif">' + a[0] + '</text>';
+                (at.moerkTekst ? K : "#fff") + '" ' + SKRIFT + ">" + a[0] + "</text>";
         });
-        return s + '</svg>';
+        return s + "</svg>";
     };
+
+    S.KONTUR = K;
 }());
