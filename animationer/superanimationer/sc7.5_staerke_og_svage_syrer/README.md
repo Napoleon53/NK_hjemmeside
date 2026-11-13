@@ -5,8 +5,9 @@ filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
 Der er ingen Kemichael og ingen statuslinje nederst: al tekst står på ét kort
 øverst midt i scenen, også hint og den gule hintknap.
 
-Den er bygget fra bunden og afløser ingen gammel animation. Den er **ikke i
-menuen** endnu. Den hører til afsnit 7.2 i Kemibogen (Stærke og svage syrer),
+Den er bygget fra bunden og afløser ingen gammel animation. Den er i menuen
+fra 13. nov. 2026 som knap 2 i `samling_c7.html` (koden `c7.staerke`, linjen
+til `til_panelet.js` øverst i `index.html`). Den hører til afsnit 7.2 i Kemibogen (Stærke og svage syrer),
 som var det eneste afsnit i kapitel 7 uden sin egen animation.
 
 ## Bestillingen (9. oktober 2026)

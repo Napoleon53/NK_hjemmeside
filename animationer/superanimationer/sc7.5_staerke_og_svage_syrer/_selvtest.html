@@ -657,7 +657,7 @@ function koerTest(W) {
     paastand("æ, ø og å er skrevet rigtigt i teksterne", !m, m ? m[0] : "");
     paastand("bogens ord: hydron og oxoniumion, ingen natronlud, proton eller hydroniumion", /hydron/.test(alt2) && /oxoniumion/.test(alt2) && !/natronlud|proton|hydronium|H\+-ion/i.test(alt2));
     paastand("ingen lærer i animationen", !/kemichael/i.test(alt2) && !d.querySelector('script[src*="kemichael"]') && !NK.Laerer);
-    paastand("mappen henter kun sine egne filer og det fælles papirkort", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return /^\.\.\/faelles\//.test(u) || !/^(\.\.|\/|https?:)/.test(u); }));
+    paastand("mappen henter kun sine egne filer, det fælles papirkort og linjen til panelet", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return /^\.\.\/faelles\//.test(u) || u === "../../til_panelet.js" || !/^(\.\.|\/|https?:)/.test(u); }));
     paastand("de tre sprites er indlæst", NK.Sprites.klar("baegerglas") && NK.Sprites.klar("kalk") && NK.Sprites.klar("kalkskaal"));
     paastand("rundvisningen har trin til alle tre faner", ["fane-g", "fane-s", "fane-f"].every(function (id) { NK.visFane(id); NK.Rundvisning.start(id); var ok = NK.Rundvisning.aktiv(); NK.Rundvisning.luk(); return ok; }));
 
