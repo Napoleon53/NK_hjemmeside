@@ -475,7 +475,7 @@ function tests() {
     paastand("langt væk lyser skyggen ikke", !sp.glimt);
     sp.aktiv = { form: "O", ion: "Na", rot: 0, x: 1, y: 5 };
     sp.haardt();
-    paastand("Na⁺ sluppet op ad rammen: linjen siger, at den ikke kom med", !!sp.haendelse && sp.haendelse.skidt && sp.haendelse.tekst === "Na⁺ kom ikke med i rammen. Den mangler én Cl⁻.", sp.haendelse && sp.haendelse.tekst);
+    paastand("Na⁺ sluppet op ad rammen: linjen siger, at den ikke kom med", !!sp.haendelse && sp.haendelse.skidt && sp.haendelse.tekst === "Na⁺ kom ikke med i rammen. Rammen mangler én Cl⁻.", sp.haendelse && sp.haendelse.tekst);
     sp.braet.nulstil();
     O(sp.braet, "Al", 0, 20); O(sp.braet, "O", 2, 20);
     sp.ventende = sp.braet.ventende();

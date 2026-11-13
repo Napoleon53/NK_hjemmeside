@@ -188,7 +188,7 @@
           tekst: "Lav en opløsning, hvor [Na⁺] = 0,50 M. Brug begge salte.",
           linje: "Der skal både natriumchlorid og natriumsulfat i.",
           hint: "Na⁺ kommer fra begge salte. NaCl giver én Na⁺, Na₂SO₄ giver to.",
-          svar: "For eksempel tre portioner NaCl og én portion Na₂SO₄: [Na⁺] = 0,30 M + 2 · 0,10 M = 0,50 M.",
+          svar: "Fx tre portioner NaCl og én portion Na₂SO₄: [Na⁺] = 0,30 M + 2 · 0,10 M = 0,50 M.",
           goer: [["NaCl", 3], ["Na2SO4", 1]],
           konklusion: "Den aktuelle koncentration af Na⁺ er 0,50 M. Bidragene fra de to salte lægges sammen." }
     ];

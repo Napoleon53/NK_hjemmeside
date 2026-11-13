@@ -169,7 +169,7 @@
             id: "ol", navn: "Endelsen -ol", start: { g: "H", n: 2 },
             dele: [
                 {
-                    type: "forsoeg", maal: "ol_laengder", styr: ["gruppe", "laengde"], om: ["hylde", "kaede"],
+                    type: "forsoeg", maal: "ol_laengder", direkte: true, styr: ["gruppe", "laengde"], om: ["hylde", "kaede"],
                     tekst: "Træk OH-gruppen hen på kæden, og gør kæden længere med +. Se, hvordan navnet ændrer sig.",
                     set: "Navnet følger kædens længde, men ender hele tiden på -ol.",
                     hint: [
@@ -182,9 +182,9 @@
                     type: "spm", om: ["navn"],
                     tekst: "Hvad fortæller endelsen -ol i navnet på et stof?",
                     svar: [
-                        { t: "Stoffet har en OH-gruppe", ok: true },
                         { t: "Stoffet er en olie",
                           f: "Olie har ingen OH-gruppe. Endelsen -ol viser, at stoffet har en OH-gruppe." },
+                        { t: "Stoffet har en OH-gruppe", ok: true },
                         { t: "Kæden har ét carbonatom",
                           f: "Første del af navnet, for eksempel meth, eth og prop, viser antallet af carbonatomer." }
                     ],
@@ -201,7 +201,7 @@
             id: "syre", navn: "Endelsen -syre", start: { g: "H", n: 2 },
             dele: [
                 {
-                    type: "forsoeg", maal: "cooh", styr: ["gruppe"], om: ["hylde", "kaede"],
+                    type: "forsoeg", maal: "cooh", direkte: true, styr: ["gruppe"], om: ["hylde", "kaede"],
                     tekst: "Kæden har 2 carbonatomer. Træk COOH-gruppen hen på kæden, og se på navnet.",
                     set: "Med COOH-gruppen på kæden med 2 carbonatomer hedder stoffet propansyre.",
                     hint: [
@@ -214,11 +214,11 @@
                     type: "spm", om: ["kaede"],
                     tekst: "Kæden havde 2 carbonatomer. Hvorfor hedder syren propansyre og ikke ethansyre?",
                     svar: [
-                        { t: "Carbonatomet i COOH tæller med", ok: true },
                         { t: "-syre tæller ét carbonatom ekstra",
                           f: "Endelsen -syre viser kun gruppen. Tæl alle carbonatomer i molekylet, også det i COOH." },
                         { t: "Oxygenatomerne tæller med",
-                          f: "Første del af navnet tæller kun carbonatomer. Se efter carbonatomet i COOH-gruppen." }
+                          f: "Første del af navnet tæller kun carbonatomer. Se efter carbonatomet i COOH-gruppen." },
+                        { t: "Carbonatomet i COOH tæller med", ok: true }
                     ],
                     hint: [
                         "Prop betyder 3 carbonatomer. Tæl carbonatomerne på tegningen.",
@@ -257,9 +257,9 @@
                     type: "spm", skjul: ["navn"], om: ["kaede"],
                     tekst: "Tegningen viser en alkohol. Hvad hedder stoffet?",
                     svar: [
-                        { t: "propan-1-ol", ok: true },
                         { t: "butan-1-ol",
                           f: "Tæl carbonatomerne igen. OH-gruppen har intet carbonatom, så der er kun 3." },
+                        { t: "propan-1-ol", ok: true },
                         { t: "propansyre",
                           f: "Molekylet har en OH-gruppe og ikke COOH. Det er en alkohol, og navnet ender på -ol." },
                         { t: "propan",
@@ -275,11 +275,11 @@
                     type: "spm", om: ["kaede"],
                     tekst: "Hvad viser tallet 1 i navnet propan-1-ol?",
                     svar: [
-                        { t: "OH sidder på carbonatom 1", ok: true },
                         { t: "Molekylet har én OH-gruppe",
                           f: "Tallet viser ikke antallet af OH-grupper. Det viser, hvilket carbonatom OH-gruppen sidder på." },
                         { t: "Kæden har ét carbonatom",
-                          f: "Kæden har 3 carbonatomer, som prop viser. Tallet viser, hvor OH-gruppen sidder." }
+                          f: "Kæden har 3 carbonatomer, som prop viser. Tallet viser, hvor OH-gruppen sidder." },
+                        { t: "OH sidder på carbonatom 1", ok: true }
                     ],
                     hint: [
                         "I en kæde med 3 eller flere carbonatomer kan OH-gruppen sidde forskellige steder.",
@@ -313,61 +313,42 @@
         }
     ];
 
+    /* Fane 2 har to opgaver (brugeren 13. nov. 2026: "lidt mange spørgsmål til
+       kogepunktet ... det begynder at blive til B-niveau, når man skal
+       sammenligne alkoholers og carboxylsyrers kogepunkt") */
     D.K_MAAL = [
         {
-            id: "tre", navn: "Tre stoffer med 2 C", start: { g: "H", n: 2 },
+            id: "ethanol", navn: "Ethan og ethanol", start: { g: "H", n: 2 },
             dele: [
                 {
-                    type: "forsoeg", maal: "tre_c2", styr: ["gruppe", "laengde"], om: ["hylde", "termo"],
-                    svarStof: { g: "COOH", n: 1 },
-                    tekst: "Byg ethan, ethanol og ethansyre. Se kogepunktet på termometeret for hvert stof.",
-                    set: "Ethan koger ved −89 °C, ethanol ved 78 °C og ethansyre ved 118 °C.",
+                    type: "forsoeg", maal: "oh_paa", direkte: true, styr: ["gruppe"], om: ["hylde", "termo"],
+                    svarStof: { g: "OH", n: 2 },
+                    tekst: "Ethan koger ved −89 °C. Træk OH-gruppen hen på kæden, og se kogepunktet for ethanol.",
+                    set: "Ethanol koger ved 78 °C, og ethan koger ved −89 °C.",
                     hint: [
-                        "Ethan har −H for enden. Ethanol har en OH-gruppe, og ethansyre har en COOH-gruppe.",
-                        "Ethansyre har 2 carbonatomer i alt. Kæden før COOH skal have 1 carbonatom.",
-                        "Byg −H og OH på en kæde med 2 carbonatomer og COOH på en kæde med 1."
+                        "OH-gruppen ligger på hylden under kæden.",
+                        "Træk OH-gruppen hen til enden af kæden, eller klik på den på hylden.",
+                        "Klik på OH-gruppen på hylden, og se på termometeret."
                     ]
                 },
                 {
-                    type: "spm", om: ["termo"],
-                    tekst: "Alle tre stoffer har 2 carbonatomer. Hvorfor koger ethanol og ethansyre ved højere temperatur?",
-                    svar: [
-                        { t: "Polære grupper holder dem sammen", ok: true },
-                        { t: "De har flere carbonatomer",
-                          f: "Alle tre stoffer har 2 carbonatomer. Forskellen er gruppen for enden af kæden." },
-                        { t: "Oxygen gør molekylerne tunge",
-                          f: "Propan vejer næsten det samme som ethanol, men koger ved −42 °C. Det er gruppen, der gør forskellen." }
-                    ],
-                    hint: [
-                        "Ethan har ingen gruppe. Ethanol og ethansyre har en gruppe med oxygen.",
-                        "OH og COOH er polære grupper, fordi oxygen har en høj elektronegativitet.",
-                        "De polære grupper får molekylerne til at holde bedre fast i hinanden."
-                    ]
-                }
-            ],
-            loest: "OH og COOH er polære grupper. De får molekylerne til at holde bedre fast i hinanden, så stoffet koger ved en højere temperatur."
-        },
-        {
-            id: "lup", navn: "Luppen over ethanol", start: { g: "OH", n: 2 }, laast: true,
-            dele: [
-                {
                     type: "spm", om: ["lup"],
-                    tekst: "Luppen viser molekylerne i flydende ethanol. Hvad viser de stiplede linjer mellem OH-grupperne?",
+                    tekst: "Ethanol koger ved 78 °C og ethan ved −89 °C. Hvad holder ethanolmolekylerne sammen i luppen?",
                     svar: [
+                        { t: "Kæderne er længere end i ethan",
+                          f: "Begge molekyler har 2 carbonatomer. Se på de stiplede linjer mellem OH-grupperne i luppen." },
                         { t: "H i én OH tiltrækker O i en anden", ok: true },
                         { t: "Bindinger inde i et molekyle",
-                          f: "Bindingerne inde i et molekyle ses ikke i kuglemodellen. De stiplede linjer går mellem to molekyler." },
-                        { t: "Elektroner, der flytter",
-                          f: "Elektronerne bliver i molekylerne. Linjen viser, at H i én OH-gruppe tiltrækker O i en anden." }
+                          f: "Bindingerne inde i et molekyle ses ikke i kuglemodellen. De stiplede linjer går mellem to molekyler." }
                     ],
                     hint: [
-                        "Se, hvilke to atomer hver stiplet linje går imellem.",
+                        "Se, hvilke to atomer hver stiplet linje i luppen går imellem.",
                         "Linjen går fra H i én OH-gruppe til O i en OH-gruppe på et andet molekyle.",
                         "H i OH-gruppen er positiv, og O er negativ, så de tiltrækker hinanden."
                     ]
                 }
             ],
-            loest: "Den stiplede linje viser en hydrogenbinding. H i en OH-gruppe er positiv (δ+), og O er negativ (δ−), så to OH-grupper tiltrækker hinanden."
+            loest: "Den stiplede linje er en hydrogenbinding. H i OH-gruppen er positiv (δ+) og tiltrækker O i en anden OH-gruppe (δ−), så ethanol koger højere."
         },
         {
             id: "vaeske", navn: "Gas eller væske", start: { g: "H", n: 1 },
@@ -393,11 +374,11 @@
                     type: "spm", om: ["lup"],
                     tekst: "Hvorfor stiger kogepunktet, når kæden bliver længere?",
                     svar: [
-                        { t: "Kontaktfladen bliver større", ok: true },
                         { t: "Der kommer flere OH-grupper",
                           f: "Alkanen har ingen OH-gruppe. Se på de orange flader mellem kæderne i luppen." },
                         { t: "Molekylet bliver mere polært",
-                          f: "Kæden er upolær. Se på de orange flader, hvor kæderne rører hinanden i luppen." }
+                          f: "Kæden er upolær. Se på de orange flader, hvor kæderne rører hinanden i luppen." },
+                        { t: "Kontaktfladen bliver større", ok: true }
                     ],
                     hint: [
                         "Se på de orange flader i luppen, hvor to kæder rører hinanden.",
@@ -407,44 +388,6 @@
                 }
             ],
             loest: "Jo længere kæden er, jo større er fladen, hvor to molekyler rører hinanden, og jo bedre holder de fast i hinanden."
-        },
-        {
-            id: "samme", navn: "Samme kogepunkt", start: { g: "COOH", n: 1 },
-            dele: [
-                {
-                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], om: ["termo"],
-                    svarStof: { g: "OH", n: 4 },
-                    tekst: "Ethansyre koger ved 118 °C. Byg den alkohol, der koger ved samme temperatur, og indsend.",
-                    set: "Butan-1-ol koger ved 118 °C ligesom ethansyre, men har 4 carbonatomer.",
-                    tjek: function (s) {
-                        if (s.klasse !== "alkohol") return forkertKlasse(s, "alkohol");
-                        if (s.kp === 118) return null;
-                        return D.stort(s.navn) + " koger ved " + D.grader(s.kp) + ". Gør kæden " + (s.kp < 118 ? "længere." : "kortere.");
-                    },
-                    hint: [
-                        "Sæt OH-gruppen på kæden, og gør kæden længere, mens du ser på termometeret.",
-                        "Ethanol koger ved 78 °C. Alkoholen skal have en længere kæde.",
-                        "Butan-1-ol med 4 carbonatomer koger ved 118 °C."
-                    ]
-                },
-                {
-                    type: "spm", om: ["lup"], lupSammen: { g: "COOH", n: 1 },
-                    tekst: "Butan-1-ol har 4 carbonatomer og ethansyre kun 2. Hvorfor koger de ved samme temperatur?",
-                    svar: [
-                        { t: "COOH holder stærkere fast end OH", ok: true },
-                        { t: "Syrer koger altid ved 118 °C",
-                          f: "Propansyre koger ved 141 °C. Se i luppen, hvor mange stiplede linjer der er mellem to syremolekyler." },
-                        { t: "Ethansyre har den længste kæde",
-                          f: "Ethansyre har 2 carbonatomer og butan-1-ol 4. Se på de stiplede linjer i luppen." }
-                    ],
-                    hint: [
-                        "Luppen viser begge stoffer. Tæl de stiplede linjer mellem to molekyler i hvert stof.",
-                        "To molekyler ethansyre har to stiplede linjer imellem sig, to molekyler butan-1-ol kun én.",
-                        "COOH-gruppen holder stærkere fast end OH-gruppen, så alkoholen skal have en længere kæde."
-                    ]
-                }
-            ],
-            loest: "To molekyler ethansyre holder fast i hinanden med to hydrogenbindinger, to alkoholmolekyler med én. Alkoholen skal derfor have en længere kæde."
         }
     ];
 
@@ -489,11 +432,11 @@
                     type: "spm", om: ["lup"],
                     tekst: "Luppen viser ét molekyle ethanol i vand. Hvor går der stiplede linjer til vandmolekylerne?",
                     svar: [
-                        { t: "Kun ved OH-gruppen", ok: true },
                         { t: "Langs hele kæden",
                           f: "Kæden er upolær og tiltrækker ikke vandmolekylerne. Se, hvor de stiplede linjer sidder." },
                         { t: "Der er ingen",
-                          f: "Se igen på OH-gruppen for enden af molekylet. Derfra går der stiplede linjer til vandet." }
+                          f: "Se igen på OH-gruppen for enden af molekylet. Derfra går der stiplede linjer til vandet." },
+                        { t: "Kun ved OH-gruppen", ok: true }
                     ],
                     hint: [
                         "De stiplede linjer viser, hvor et vandmolekyle tiltrækker ethanolmolekylet.",
@@ -508,7 +451,7 @@
             id: "laengst", navn: "Den længste alkohol", start: { g: "OH", n: 1 },
             dele: [
                 {
-                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede"],
+                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede", "regel"],
                     svarStof: { g: "OH", n: 3 },
                     tekst: "Byg den længste alkohol, der kan blandes helt med vand, og indsend.",
                     set: "Propan-1-ol kan blandes helt med vand. Butan-1-ol med 4 carbonatomer ligger på grænsen.",
@@ -532,7 +475,7 @@
             id: "syrelag", navn: "En syre i to lag", start: { g: "COOH", n: 1 },
             dele: [
                 {
-                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede"],
+                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede", "regel"],
                     svarStof: { g: "COOH", n: 4 },
                     tekst: "Byg en carboxylsyre, der ikke kan opløses i vand, og indsend.",
                     tjek: function (s) {
@@ -557,12 +500,12 @@
             id: "glycerol", navn: "Glycerol", start: { g: "glycerol", n: 3 }, laast: true,
             dele: [
                 {
-                    type: "spm", skjul: ["glas"], om: ["kaede"],
+                    type: "spm", skjul: ["glas"], om: ["kaede", "regel"],
                     tekst: "Glycerol har 3 carbonatomer og 3 OH-grupper. Kan glycerol blandes med vand?",
                     svar: [
-                        { t: "Ja, i alle forhold", ok: true },
                         { t: "Nej, der bliver to lag",
                           f: "Der er 3 polære grupper til kun 3 carbonatomer. Én gruppe kan holde op til 3 carbonatomer." },
+                        { t: "Ja, i alle forhold", ok: true },
                         { t: "Kun delvist",
                           f: "Et stof ligger på grænsen ved 4 carbonatomer pr. polær gruppe, men glycerol har kun 1 pr. gruppe." }
                     ],
@@ -595,7 +538,7 @@
 
     D.FAERDIG = {
         n: "Alle fem opgaver om navnene er løst. På fane 2 undersøger du kogepunkterne.",
-        k: "Alle fire opgaver om kogepunkterne er løst. På fane 3 kommer stofferne i vand.",
+        k: "Begge opgaver om kogepunkterne er løst. På fane 3 kommer stofferne i vand.",
         v: "Alle fem opgaver om stofferne i vand er løst."
     };
 

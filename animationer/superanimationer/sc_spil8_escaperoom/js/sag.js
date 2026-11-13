@@ -88,7 +88,7 @@
         var k = r.heltal(1, 4);
         var fem = r.bland(r.bland(mP).slice(0, k).concat(r.bland(mU).slice(0, 5 - k)));
         var streg = r.vaelg(D.STREGMOLEKYLER);
-        var bm = r.vaelg(D.BONUSMOLEKYLER);
+        var bm = r.bland(D.BONUSMOLEKYLER).slice(0, 2);
         return faerdig({
             stoffer: stoffer, antalUpolaere: n, molekyler: fem, antalPolaere: k, streg: streg,
             trin: [
@@ -97,10 +97,12 @@
                 trin("streger", "flaske", "Flasken", "Klik på flasken på hylden, og tæl stregerne i stregformlen.", String(streg.streger), "#")
             ],
             bonus: {
-                molekyle: bm,
+                molekyler: bm,
                 felter: [
-                    felt("Streger i stregformlen for " + bm.navn, maskeAf(bm.streger), String(bm.streger)),
-                    felt("Frie elektronpar i " + bm.navn, "#", String(bm.par))
+                    felt("Streger i " + bm[0].navn, maskeAf(bm[0].streger), String(bm[0].streger)),
+                    felt("Frie elektronpar i " + bm[0].navn, "#", String(bm[0].par)),
+                    felt("Streger i " + bm[1].navn, maskeAf(bm[1].streger), String(bm[1].streger)),
+                    felt("Frie elektronpar i " + bm[1].navn, "#", String(bm[1].par))
                 ]
             }
         });
@@ -151,6 +153,7 @@
             if (rs[0] < 0.25 * m || rs[0] > 0.75 * m || rs[0] < 0.1 || !robust(rs, 2)) continue;
             var nMet = m / met.M, nH2 = nMet * met.forhold[1] / met.forhold[0];
             var Vt = NK.komma(V, 2), rt = NK.komma(rs[0], 2);
+            if (Vt === rt) continue;              /* guldkoden maa ikke ligne koden */
             return faerdig({
                 metal: met, m: m, t: t, p: p, nMetal: nMet, nH2: nH2, T: t + 273.15, V: V,
                 trin: [
@@ -198,6 +201,7 @@
             var px = [0, 1, 2].map(function (v) { return pHUndervejs(cb, forbrug, Vs, x, v); });
             if (px.some(isNaN) || !robust(px, 2) || px[0] >= 9.995) continue;
             var pt = NK.komma(ph, 2), xt = NK.komma(px[0], 2);
+            if (pt === xt) continue;
             return faerdig({
                 syre: syre, base: base, Vsyre: Vs, cBase: cb, foer: foer, efter: efter, forbrug: forbrug,
                 nBase: cb * forbrug / 1000, cSyre: cb * forbrug / Vs, pH: ph,

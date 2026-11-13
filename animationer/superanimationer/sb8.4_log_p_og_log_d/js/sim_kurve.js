@@ -1,22 +1,21 @@
 /* =====================================================================
    sim_kurve.js - fane 2 (Log D og pH) og fane 3 (Syre eller base)
 
-   Skilletragten, luppen og log D-kurven med pH-skyderen under kurven.
-   Skyderen bestemmer vandlagets pH. Luppen viser de 20 molekyler: de
-   uladede (HA eller B) kan vaere i begge lag, ionerne (A⁻ eller BH⁺)
-   kun i vandet. Kurven tegnes dér, hvor skyderen har vaeret, som
-   fordelingsdiagrammet i sb7.7 (skyderen begynder ved pH 0, og knappen
-   glider hoejst D.TEGNEFART pH pr. sekund, mens kurven tegnes).
+   Skilletragten, luppen med strukturformlerne under og log D-kurven med
+   pH-skyderen under kurven. Skyderen bestemmer vandlagets pH. Luppen
+   viser de 20 molekyler: de uladede (HA eller B) kan vaere i begge lag,
+   ionerne (A⁻ eller BH⁺) kun i vandet. Kurven tegnes dér, hvor skyderen
+   har vaeret, som fordelingsdiagrammet i sb7.7 (i sportrinnet begynder
+   skyderen ved pH 0, og knappen glider hoejst D.TEGNEFART pH pr. sekund).
 
-   Trinnenes slags (D.LOGD og D.BASE):
-     spor    eleven traekker skyderen fra 0 til 14; kortet bliver staaende
+   Trinnenes slags (D.LOGD, D.BASE og ekstraopgaverne):
      spm     et spoergsmaal med svar paa kortet
-     tal     eleven regner og skriver et tal; bagefter glider skyderen til
-             trinnets pH, og punktet faar et navn paa kurven
-     ukendt  et ukendt stof: syre eller base og log P (fane 3)
-   Fane 2 viser stregen ved pH = pKₛ i trin 4 og trekanten med haeldningen
-   −1 bagefter. Fane 3 viser syrens kurve svagt bagved og kroppens
-   omraader fra trin 3.
+     spor    eleven traekker skyderen fra 0 til 14; kortet bliver staaende
+     tal     eleven aflaeser eller regner og skriver et tal; bagefter
+             glider skyderen til trinnets pH, og punktet faar et navn
+     find    eleven stiller skyderen og trykker Indsend svar: pH x,x
+   Trinnene er kvalitative (brugeren 13. nov. 2026). Formlen og genvejen
+   staar kun i ekstraopgaverne bag kontakten Svær (js/ekstra.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -26,17 +25,20 @@
     var F = NK.Fane;
     var T = NK.Tegning;
     var S = NK.Scene;
+    var ST = NK.Struktur;
     var FONT = T.FONT;
 
-    /* cfg: navn (forstavelsen), fane, trin, stof, noegle, faerdig, videre,
-       videreTekst, baggrund (svage kurver bagved), stoffer (frit valg) */
+    /* cfg: navn (forstavelsen), fane, trin, ekstra, stof, noegle, faerdig,
+       videre, videreTekst, baggrund (svage kurver bagved), stoffer (frit valg) */
     function SimKurve(cfg) {
         var mig = this;
         this.cfg = cfg;
+        this.hovedListe = cfg.trin;
         this.trinListe = cfg.trin;
         this.hentStatus();
         this.startFane();
         this.lup = new S.Lup();
+        this.ekstraInit(cfg.ekstra);
         NK.el(cfg.navn + "-forfra").addEventListener("click", function () { mig.forfra(); });
         this.el.skort.addEventListener("input", function (e) {
             if (e.target && e.target.id === cfg.navn + "-felt") { mig.talTekst = e.target.value; e.target.classList.remove("ryst"); mig.visIndsend(); }
@@ -52,6 +54,7 @@
     }
 
     var P = SimKurve.prototype;
+    NK.Ekstra.paa(P);
 
     /* ----- Hukommelsen ------------------------------------------------------------ */
     P.hentStatus = function () {
@@ -62,31 +65,29 @@
 
     /* ----- Panelet ------------------------------------------------------------------ */
     P.visListe = function () {
-        var mig = this, html = "", n = this.cfg.navn;
-        this.trinListe.forEach(function (t, j) {
-            var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) || mig.faerdig ? "faerdig" : (j === mig.trinNr ? "nu" : "");
+        var mig = this, html = "", n = this.cfg.navn, liste = this.hovedListe;
+        liste.forEach(function (t, j) {
+            var nr = mig.iEkstra ? (mig.gemtTrin ? mig.gemtTrin.nr : 0) : mig.trinNr;
+            var faerdig = mig.faerdig || j < nr || (!mig.iEkstra && j === mig.trinNr && !!mig.groen);
+            var kl = faerdig ? "faerdig" : (!mig.iEkstra && j === mig.trinNr ? "nu" : "");
             html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(t.navn)) + "</span></li>";
         });
         NK.saetHTML(n + "-trin", html);
         NK.saetTekst(n + "-maerke", this.status.stjerne ? "★ gennemført uden fejl" : (this.status.loest ? "✓ gennemført" : ""));
-        var s = this.stof, skjult = this.skjult();
-        var om = skjult ? "Et ukendt lægemiddel. Hvad er log P, og er det en syre eller en base?" :
-            s.navn.charAt(0).toUpperCase() + s.navn.slice(1) + " er " + (s.slags === "syre" ? "en syre" : "en base") +
+        var s = this.stof;
+        var om = s.navn.charAt(0).toUpperCase() + s.navn.slice(1) + " er " + (s.slags === "syre" ? "en syre" : "en base") +
             " med log P = " + D.komma1(s.logP) + " og pKₛ = " + D.komma1(s.pks) + ".";
         NK.saetHTML(n + "-omstof", D.sub(NK.html(om)));
-        var forkl = skjult ? "Grå kugle: stoffets uladede form. Lilla kugle: stoffets ion." :
-            (s.slags === "syre" ? "Grå kugle: den uladede syre HA. Blå kugle: ionen A⁻." : "Grå kugle: den uladede base B. Rød kugle: ionen BH⁺.");
+        var forkl = s.slags === "syre" ? "Grå kugle: den uladede syre HA. Blå kugle: ionen A⁻." : "Grå kugle: den uladede base B. Rød kugle: ionen BH⁺.";
         NK.saetHTML(n + "-omlup", D.sub(NK.html(forkl + " Luppen viser lige store rumfang af de to lag.")));
         var pr = NK.el(n + "-proev");
         if (pr) {
-            pr.hidden = !this.faerdig;
+            pr.hidden = !this.faerdig || this.iEkstra;
             var knapper = pr.querySelectorAll("[data-stof]");
             for (var i = 0; i < knapper.length; i++) knapper[i].classList.toggle("valgt", knapper[i].getAttribute("data-stof") === this.stofId);
         }
+        this.visEkstraPanel();
     };
-
-    /* Det ukendte stof er skjult, til eleven har fundet det */
-    P.skjult = function () { return !!this.stof.skjult && !this.afsloeret; };
 
     /* ----- Forloebet ------------------------------------------------------------------ */
     P.vaelg = function () {
@@ -100,9 +101,10 @@
         this.visPks = false;
         this.visHaeldning = false;
         this.visKrop = false;
-        this.afsloeret = false;
         this.phMaal = null;
         this.traekMaal = null;
+        this.iEkstra = false;
+        this.trinListe = this.hovedListe;
         this.saetStof(this.cfg.stof, 0);
         this.startTrin(0);
     };
@@ -110,11 +112,13 @@
     P.saetStof = function (id, ph) {
         this.stofId = id;
         this.stof = D.STOFFER[id];
-        if (!this.besoegt[id]) { this.besoegt[id] = []; for (var i = 0; i < S.ANTAL_BIN; i++) this.besoegt[id].push(false); }
+        if (!this.besoegt[id]) this.besoegt[id] = this.tomtSpor();
         this.ph = undefined;
         this.lup.nulstil(D.fordeling(this.stof, ph));
         this.saetPh(ph, true);
     };
+
+    P.tomtSpor = function () { var b = []; for (var i = 0; i < S.ANTAL_BIN; i++) b.push(false); return b; };
 
     P.startTrin = function (j) {
         this.trinNr = j;
@@ -124,9 +128,15 @@
         this.talTekst = "";
         this.valgt = null;
         this.forkerte = [];
+        this.phMaal = null;
+        this.traekMaal = null;
         if (this.trin.id === "genvej") this.visPks = true;
         if (this.trin.krop) this.visKrop = true;
-        if (this.trin.stof && this.trin.stof !== this.stofId) this.saetStof(this.trin.stof, 0);
+        var stof = this.trin.stof || (this.iEkstra ? this.cfg.stof : null);
+        if (stof && stof !== this.stofId) this.saetStof(stof, 0);
+        /* Kurven tegnes forfra fra pH 0 i sportrinnet */
+        if (this.fase === "spor") { this.besoegt[this.stofId] = this.tomtSpor(); this.ph = undefined; this.saetPh(0, true); }
+        if (this.iEkstra) this.tegnHele();
         this.besked("", "");
         this.nulstilHjaelp();
         this.visKort();
@@ -134,60 +144,53 @@
         this.layout();
     };
 
+    /* Ekstraopgaverne: hele kurven og kroppens omraader er fremme */
+    P.forEkstra = function () { this.visKrop = true; };
+
     P.kortData = function () {
-        var t = this.trin, chip = "Trin " + (this.trinNr + 1) + " af " + this.trinListe.length, mig = this, n = this.cfg.navn;
+        var t = this.trin, chip = this.chip(), mig = this, n = this.cfg.navn;
         function felt() {
             return '<div class="sk-felt"><label for="' + n + '-felt">' + t.felt + '</label><input id="' + n + '-felt" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="' +
                 NK.html(mig.talTekst || "") + '" placeholder="tallet med komma"></div>';
         }
         function svar() { return t.svar.map(function (s, i) { return { t: s, valgt: mig.valgt === i, forkert: mig.forkerte.indexOf(i) >= 0 }; }); }
-        if (this.fase === "spor") return { slags: "opgave", chip: chip, tekst: t.tekst };
+        if (this.fase === "spor" || this.fase === "find") return { slags: this.fase === "find" ? "spm" : "opgave", chip: chip, tekst: t.tekst };
         if (this.fase === "spm") return { slags: "spm", chip: chip, tekst: t.tekst, svar: svar() };
         /* Formlen og feltet staar i én raekke, saa kortet bliver lavt */
-        if (this.fase === "tal") return { slags: "spm", chip: chip, tekst: t.tekst, ekstra: '<div class="sk-raekke"><p class="sk-formel">' + t.formel + "</p>" + felt() + "</div>" };
-        /* Det ukendte stof: syre eller base og feltet i én raekke */
-        if (this.fase === "ukendt") {
-            var knapper = svar().map(function (sv, j) {
-                return '<button type="button" class="sk-knap brik' + (sv.valgt ? " valgt" : "") + (sv.forkert ? " forkert" : "") + '" data-valg="' + j + '"' +
-                    (sv.forkert ? " disabled" : "") + "><span>" + NK.html(sv.t) + "</span></button>";
-            }).join("");
-            return { slags: "spm", chip: chip, tekst: t.tekst, ekstra: '<div class="sk-raekke"><div class="sk-svar brikker sk-to">' + knapper + "</div>" + felt() + "</div>" };
-        }
+        if (this.fase === "tal") return { slags: "spm", chip: chip, tekst: t.tekst, ekstra: t.formel ? '<div class="sk-raekke"><p class="sk-formel">' + t.formel + "</p>" + felt() + "</div>" : felt() };
         return { slags: "opgave", chip: chip, tekst: "" };
     };
 
     P.skjulIndsend = function () { return this.fase === "spor"; };
 
     P.svarValg = function (j) {
-        if (this.fase !== "spm" && this.fase !== "ukendt") return;
+        if (this.fase !== "spm") return;
         this.valgt = j;
         this.besked("", "");
         this.visKort();
-        if (this.fase === "ukendt") { var f = NK.el(this.cfg.navn + "-felt"); if (f && !f.value) f.focus(); }
     };
 
     P.kanSendes = function () {
         if (this.fase === "spm") return this.valgt !== null;
         if (this.fase === "tal") return !!(this.talTekst && this.talTekst.trim());
-        if (this.fase === "ukendt") return this.valgt !== null && !!(this.talTekst && this.talTekst.trim());
+        if (this.fase === "find") return true;
         return false;
     };
-    P.indsendTekst = function () { return "Indsend svar"; };
-    P.ingentingTekst = function () {
-        if (this.fase === "ukendt") return this.trin.fejlIntet;
-        return this.fase === "spm" ? "Vælg et svar først." : "Skriv et tal først.";
-    };
+    P.indsendTekst = function () { return this.fase === "find" ? "Indsend svar: pH " + D.komma1(this.ph) : "Indsend svar"; };
+    P.ingentingTekst = function () { return this.fase === "spm" ? "Vælg et svar først." : "Skriv et tal først."; };
 
     P.rystFelt = function () {
         var f = NK.el(this.cfg.navn + "-felt");
         if (f) { f.classList.remove("ryst"); void f.offsetWidth; f.classList.add("ryst"); }
     };
 
+    P.notérFejl = function () { if (!this.iEkstra) this.fejl = true; };
+
     P.indsend = function () {
         var t = this.trin, x;
         if (this.fase === "spm") {
             if (this.valgt === t.rigtig) { this.rigtigt(false); return; }
-            this.fejl = true;
+            this.notérFejl();
             this.forkerte.push(this.valgt);
             var fj = t.fejl[this.valgt];
             this.valgt = null;
@@ -201,39 +204,30 @@
             if (Math.abs(x - t.maal) <= t.tol) { this.rigtigt(false); return; }
             var tekst = t.fejlAndet;
             (t.fejl || []).forEach(function (f) { if (Math.abs(x - f.lig) <= f.tol && tekst === t.fejlAndet) tekst = f.t; });
-            this.fejl = true;
+            this.notérFejl();
             this.fejlLinje(tekst);
             this.rystFelt();
             return;
         }
-        if (this.fase === "ukendt") {
-            x = D.laesTal(this.talTekst);
-            if (isNaN(x)) { this.kortBlink(); this.kortBesked("Skriv log P som et tal, fx 1,5.", 3.5); return; }
-            var slagsOk = this.valgt === t.rigtig, talOk = Math.abs(x - t.maal) <= t.tol;
-            if (slagsOk && talOk) { this.rigtigt(false); return; }
-            this.fejl = true;
-            if (!slagsOk) {
-                this.forkerte.push(this.valgt);
-                this.valgt = null;
-                this.visKort();
-                this.fejlLinje(t.fejlSlags);
-                return;
-            }
-            this.fejlLinje(t.fejlLogP);
-            this.rystFelt();
+        if (this.fase === "find") {
+            if (Math.abs(this.ph - t.maal) <= t.tol) { this.rigtigt(false); return; }
+            this.notérFejl();
+            this.fejlLinje((this.ph < t.maal ? t.fejlLav : t.fejlHoej).replace("{ph}", D.komma1(this.ph)));
         }
     };
 
     P.rigtigt = function (vist) {
         var t = this.trin, sidste = this.trinNr === this.trinListe.length - 1, tekst = t.forkl, foerste = false;
-        if (this.fase === "tal") {
+        if (t.ph !== undefined) {
             this.phMaal = t.ph;
             var v = D.logD(this.stof, t.ph);
-            this.punkter.push({ stof: this.stofId, ph: t.ph, v: v, tekst: t.punkt + ": " + D.komma1(v) });
+            if (!this.punkter.some(function (p) { return p.ph === t.ph; })) this.punkter.push({ stof: this.stofId, ph: t.ph, v: v, tekst: t.punkt + ": " + D.komma1(v) });
         }
+        if (this.fase === "find") this.phMaal = Math.round(t.maal * 10) / 10;
         if (t.id === "genvej") this.visHaeldning = true;
-        if (this.fase === "ukendt") this.afsloeret = true;
-        if (sidste) {
+        if (this.iEkstra) {
+            this.ekstraRigtigt(t);
+        } else if (sidste) {
             foerste = !this.status.loest;
             this.status.loest = true;
             this.status.stjerne = this.status.stjerne || (!this.fejl && !this.sv && !vist);
@@ -241,8 +235,10 @@
             this.faerdig = true;
             tekst += " " + this.cfg.faerdig;
         }
-        this.groen = { spm: true, svarNr: t.rigtig, maade: vist || this.sv ? "svar" : "selv", tekst: tekst,
-                       knap: sidste ? (this.cfg.videre ? this.cfg.videreTekst : "Se teorien →") : "Næste trin →" };
+        var knap = "Næste trin →";
+        if (this.iEkstra) knap = sidste ? (this.cfg.videre ? this.cfg.videreTekst : "Se teorien →") : "Næste ekstraopgave →";
+        else if (sidste) knap = this.cfg.videre ? this.cfg.videreTekst : "Se teorien →";
+        this.groen = { spm: true, svarNr: t.rigtig, maade: vist || this.sv ? "svar" : "selv", tekst: tekst, knap: knap };
         this.sejrT = 0;
         this.besked("", "");
         this.visKort();
@@ -266,8 +262,9 @@
 
     P.nulstil = function () { if (!this.groen) this.vaelg(0); };
 
+    /* Ekstraopgaverne har ingen hints, kun Vis svaret */
     P.hintNu = function () {
-        if (this.groen) return [];
+        if (this.groen || this.iEkstra) return [];
         return this.trin.hint || [];
     };
 
@@ -281,12 +278,12 @@
     };
 
     P.visSvar = function () {
-        this.sv = true;
+        if (!this.iEkstra) this.sv = true;
         var t = this.trin;
         if (this.fase === "spor") { this.tegnHele(); this.sporFaerdig(true); return; }
         if (this.fase === "spm") { this.valgt = t.rigtig; this.rigtigt(true); return; }
         if (this.fase === "tal") { this.talTekst = D.komma1(t.maal); this.rigtigt(true); return; }
-        if (this.fase === "ukendt") { this.tegnHele(); this.valgt = t.rigtig; this.talTekst = D.komma1(t.maal); this.rigtigt(true); }
+        if (this.fase === "find") { this.rigtigt(true); }
     };
 
     P.tegnHele = function () {
@@ -314,6 +311,7 @@
         this.ph = ph;
         this.lup.saetFordeling(D.fordeling(this.stof, ph), !!foerste);
         if (this.fase === "spor" && !this.groen && this.daekning() >= D.DAEKNING) this.sporFaerdig(false);
+        if (this.fase === "find" && !this.groen) this.visIndsend();
     };
 
     P.daekning = function () {
@@ -346,8 +344,8 @@
         return null;
     };
 
-    /* Mens kurven tegnes foerste gang (og for det ukendte stof), glider knappen */
-    P.langsom = function () { return (this.fase === "spor" || this.fase === "ukendt") && !this.groen; };
+    /* Mens kurven tegnes foerste gang, glider knappen */
+    P.langsom = function () { return this.fase === "spor" && !this.groen; };
 
     P.traekTil = function (ph) {
         if (this.langsom()) {
@@ -372,13 +370,16 @@
 
     P.klikScene = function () {
         if (this.groen && !this.faerdig) { this.kortBlink(); return; }
-        if (this.fase === "spor" && !this.groen) {
+        if ((this.fase === "spor" || this.fase === "find") && !this.groen) {
             this.kortBlink();
             this.kortBesked("Træk i pH-skyderen under kurven.", 3);
         }
     };
 
-    /* ----- Layout ------------------------------------------------------------------------ */
+    /* ----- Layout ------------------------------------------------------------------------
+       Skilletragten til venstre (naar tavlen er mindst 720 px bred), luppen
+       med strukturformlerne under i midten og kurven med skyderen til hoejre.
+       Er tavlen lavere end 400 px, er der ikke plads til formlerne. */
     P.layout = function () {
         this.lay = this.tavleLayout();
         var t = this.lay.tavle;
@@ -389,14 +390,18 @@
             this.tragt = S.tragtKasse(x, t.y + 14, tb, t.h - 24);
             x = this.tragt.x + this.tragt.b + 34;
         } else this.tragt = null;
-        var R = Math.round(NK.klamp(Math.min((t.h - 96) / 2, t.b * 0.15), 84, 150));
-        this.lup.geometri(x + R, t.y + Math.max(R + 34, t.h * 0.46), R);
+        var formH = t.h >= 400 ? Math.round(NK.klamp(t.h * 0.28, 112, 150)) : 0;
+        var R = Math.round(NK.klamp(Math.min((t.h - formH - 80) / 2, t.b * 0.15), 84, 150));
+        this.lup.geometri(x + R, t.y + 32 + R, R);
+        this.former = formH ? { x: x - 10, y: this.lup.cy + R + 36, b: 2 * R + 20, h: Math.min(formH, t.y + t.h - 10 - (this.lup.cy + R + 36)) } : null;
         var gx0 = x + 2 * R + 34 + 48, gx1 = t.x + t.b - 22;
         this.graf = { x0: gx0, x1: gx1, y0: t.y + 36, y1: t.y + t.h - 122 };
         this.skala = { x: gx0, y: t.y + t.h - 30, b: gx1 - gx0 };
         if (this.tragt) this.saetAnker("tragt", this.tragt.x, this.tragt.y, this.tragt.b, this.tragt.h);
         else this.saetAnker("tragt", 0, 0, 1, 1);
         this.saetAnker("lup", this.lup.cx - R - 6, this.lup.cy - R - 30, 2 * R + 12, 2 * R + 60);
+        if (this.former) this.saetAnker("former", this.former.x, this.former.y, this.former.b, this.former.h);
+        else this.saetAnker("former", 0, 0, 1, 1);
         this.saetAnker("graf", gx0 - 50, this.graf.y0 - 20, gx1 - gx0 + 60, this.graf.y1 - this.graf.y0 + 54);
         this.saetAnker("skyder", gx0 - 36, this.skala.y - 46, gx1 - gx0 + 72, 70);
     };
@@ -412,7 +417,11 @@
             S.lupLinjer(ctx, S.lupPunkt(this.tragt), this.lup);
             S.tragt(ctx, this.tragt, { ph: this.ph });
         }
-        this.lup.tegn(ctx, { stof: this.stof, ph: this.ph, ukendt: this.skjult() });
+        this.lup.tegn(ctx, { stof: this.stof, ph: this.ph });
+        if (this.former && this.former.h > 80) {
+            var gul = this.fase === "spm" && !this.groen && (this.trin.id === "form" || this.trin.id === "hvorfor");
+            ST.ligevaegt(ctx, this.former, this.stofId, gul ? { kant: "#d69e0c", kantBredde: 2.5 } : {});
+        }
         this.tegnGraf(ctx);
         T.phSkala(ctx, this.skala, this.ph, { greb: this.grebSkyder, navn: false });
         NK.tekst(ctx, "pH", this.skala.x - 14, this.skala.y + 1, { font: "800 14px " + FONT, farve: T.BLAEK, justering: "right", linje: "middle" });
@@ -422,30 +431,27 @@
         this.tegnSejr(ctx, t);
     };
 
-    P.navnPaa = function (s) {
-        if (s.skjult && !this.afsloeret && s.id === this.stofId) return "ukendt stof";
-        return (s.slags === "syre" ? "en syre: " : "en base: ") + s.navn;
-    };
+    P.navnPaa = function (s) { return (s.slags === "syre" ? "en syre: " : "en base: ") + s.navn; };
 
     P.tegnGraf = function (ctx) {
         var g = this.graf, mig = this;
         S.akser(ctx, g);
         if (this.visKrop) S.krop(ctx, g);
-        if (this.visPks) S.pks(ctx, g, this.stof.pks);
+        if (this.visPks && this.stofId === "asa") S.pks(ctx, g, this.stof.pks);
         /* De andre stoffers kurver svagt bagved */
-        var bag = this.faerdig ? (this.cfg.stoffer || []).filter(function (id) { return id !== mig.stofId; }) : (this.cfg.baggrund || []).slice();
-        if (!this.faerdig && this.trin.slags === "ukendt" && this.cfg.ekstraBag) bag = bag.concat(this.cfg.ekstraBag);
+        var bag = this.faerdig && !this.iEkstra ? (this.cfg.stoffer || []).filter(function (id) { return id !== mig.stofId; }) : (this.cfg.baggrund || []).slice();
+        if (this.stofId !== this.cfg.stof && bag.indexOf(this.cfg.stof) < 0) bag.push(this.cfg.stof);
         bag.forEach(function (id) {
             var s = D.STOFFER[id];
             S.kurve(ctx, g, s, null, { alfa: 0.35, bredde: 2.2 });
-            S.kurveNavn(ctx, g, s, (s.skjult && !mig.afsloeret) ? "ukendt stof" : s.navn, { farve: "rgba(80, 90, 100, 0.75)", under: true });
+            S.kurveNavn(ctx, g, s, s.navn, { farve: "rgba(80, 90, 100, 0.75)", under: true });
         });
         S.kurve(ctx, g, this.stof, this.besoegt[this.stofId]);
         var b = this.besoegt[this.stofId], plateau = this.stof.slags === "syre" ? S.bin(0.5) : S.bin(13.5);
         S.akseTekst(ctx, g);
         S.markoer(ctx, g, this.stof, this.ph, this.skala.y - 12, false);
         if (b[plateau]) S.kurveNavn(ctx, g, this.stof, this.navnPaa(this.stof));
-        if (this.visHaeldning) S.haeldning(ctx, g, this.stof, 8);
+        if (this.visHaeldning && this.stofId === "asa") S.haeldning(ctx, g, this.stof, 8);
         this.punkter.forEach(function (p) { if (p.stof === mig.stofId) S.punkt(ctx, g, p.ph, p.v, p.tekst); });
         if (b[S.bin(this.ph)]) S.prik(ctx, g, this.stof, this.ph);
     };
@@ -463,11 +469,11 @@
     }
     var LogD = klasse("d"), Base = klasse("b");
     NK.lavLogD = function () {
-        return new LogD({ navn: "d", fane: "fane-d", trin: D.LOGD, stof: "asa", noegle: "nk-sb8.4-logd",
+        return new LogD({ navn: "d", fane: "fane-d", trin: D.LOGD, ekstra: D.LOGD_EKSTRA, stof: "asa", noegle: "nk-sb8.4-logd",
                           faerdig: D.LOGD_FAERDIG, videre: "fane-b", videreTekst: "Videre til Syre eller base →" });
     };
     NK.lavBase = function () {
-        return new Base({ navn: "b", fane: "fane-b", trin: D.BASE, stof: "amf", noegle: "nk-sb8.4-base",
-                          faerdig: D.BASE_FAERDIG, videre: null, baggrund: ["asa"], ekstraBag: ["amf"], stoffer: D.BASE_STOFFER });
+        return new Base({ navn: "b", fane: "fane-b", trin: D.BASE, ekstra: D.BASE_EKSTRA, stof: "amf", noegle: "nk-sb8.4-base",
+                          faerdig: D.BASE_FAERDIG, videre: null, baggrund: ["asa"], stoffer: D.BASE_STOFFER });
     };
 }());

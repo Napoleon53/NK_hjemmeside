@@ -320,6 +320,7 @@
                 a.flyttet = true;
                 this.ikoner.forEach(function (ik) {
                     if (a.navn === "vand" && (ik.stof === "alkohol" || ik.stof === "svovlsyre")) { ik.lag = "vand"; if (ik.stof === "svovlsyre") ik.form = "ioner"; }
+                    if (a.navn === "vand" && ik.stof === "syre" && !a.enSyre) { ik.lag = "vand"; a.enSyre = true; }
                     if (a.navn === "base" && ik.stof === "syre") { ik.lag = "vand"; ik.form = "base"; }
                 });
                 this.vOrg = st.vOrg * (a.navn === "vand" ? 0.82 : 0.92);

@@ -39,7 +39,7 @@ hydrogenbindingerne."
    hydrogenbindingerne i detaljer; her nævnes ordet kun med forklaringen "H i
    én gruppe tiltrækker O i en anden". `tegnebraet` navngiver alt; her kun de
    tre stofklasser med gruppen for enden.
-4. **Loftet:** tre faner, 14 opgaver (5 + 4 + 5). Én plade med én kæde (0 til
+4. **Loftet:** tre faner, 12 opgaver (5 + 2 + 5). Én plade med én kæde (0 til
    8 carbonatomer i alt) og tre grupper. Fane 1: navnemaskinen. Fane 2: ét
    termometer og én lup (højst to stoffer ved siden af hinanden). Fane 3: ét
    reagensglas og én lup.
@@ -82,23 +82,27 @@ navnenes første del for 1 til 8 C og endelserne. Fem opgaver:
 
 **2 Kogepunktet** (`#kogepunkt`). Termometeret fra −200 til 300 °C med en
 stiplet streg ved 20 °C og "Ved 20 °C: gas/væske" under. Luppen viser stoffet
-som væske: molekylerne parvis hoved mod hoved i rækker, den gyldne
+som væske: molekylerne parvis hoved mod hoved i rækker, den orange
 kontaktflade mellem kæderne i to rækker og hydrogenbindingerne som stiplede
-linjer mellem grupperne: ingen i en alkan, én pr. par i en alkohol og to pr.
-par i en carboxylsyre. Panelet har et skema med kogepunkterne for de stoffer,
-eleven har bygget (alkan, alkohol og syre mod 1 til 8 C). Fire opgaver:
+linjer mellem grupperne (ingen i en alkan, én pr. par i en alkohol, to pr. par
+i en carboxylsyre; det sidste spørges der ikke om). Panelet har et skema med
+kogepunkterne for de stoffer, eleven har bygget. To opgaver:
 
-1. Byg ethan, ethanol og ethansyre (listen på kortet krydses af); hvorfor koger to af dem højere?
-2. Luppen over ethanol: hvad viser de stiplede linjer? (forklarer ordet hydrogenbinding)
-3. Den korteste alkan, der er en væske ved 20 °C (pentan); hvorfor stiger kogepunktet med kæden? (kontaktfladen)
-4. Den alkohol, der koger ved 118 °C ligesom ethansyre (butan-1-ol); luppen viser et par af hver, så de stiplede linjer kan tælles
+1. Ethan og ethanol: OH-gruppen sættes på ethan (kæden er fast); spørgsmålet kommer med det samme: hvad holder ethanolmolekylerne sammen i luppen? (forklarer ordet hydrogenbinding)
+2. Den korteste alkan, der er en væske ved 20 °C (pentan); hvorfor stiger kogepunktet med kæden? (kontaktfladen)
 
-**3 I vand** (`#vand`). Et reagensglas med vand og stoffet foran en hvid plade.
-Når stoffet skifter, ryster glasset, og en uklar blanding skilles i ét lag, to
-lag, to lag med et tyndere øverste lag (på grænsen) eller bobler (en gas ved
-20 °C). Luppen viser ét molekyle blandt vandmolekyler: vandet holder sig væk
-fra kæden, og ved gruppen går der stiplede hydrogenbindinger til vandet.
-Panelet har tommelfingerreglen og et skema med ja, delvis og nej. Fem opgaver:
+**3 I vand** (`#vand`). Glasset står først til højre for pladen: et
+reagensglas med vand og stoffet foran en hvid plade. Når stoffet skifter,
+ryster glasset, og en uklar blanding skilles i ét lag, to lag, to lag med et
+tyndere øverste lag (på grænsen) eller bobler (en gas ved 20 °C). Til højre
+for glasset står tommelfingerreglen som oversigt med bogens ord fra figuren
+tommelfinger-trin (3.4): "1 polær gruppe kræver 4 C-atomer", felterne 1 til 8
+C-atomer grønne under grænsen, gule på den og røde over, en pil på stoffets
+antal og en konklusion i én sætning. Under oversigten står en lille lup med ét
+molekyle i vand: kun vandet tæt på molekylet, intet vand lige om kæden,
+stiplede hydrogenbindinger fra gruppen og to klammer under molekylet,
+"upolær kæde" og "polær gruppe". Panelet har skemaet med ja, delvis og nej. Fem
+opgaver:
 
 1. Gør kæden på ethanol længere, til der bliver to lag; hvorfor blandes octan-1-ol ikke?
 2. Luppen i vand: hvor går de stiplede linjer? (kun ved OH-gruppen)
@@ -152,11 +156,12 @@ Panelet har tommelfingerreglen og et skema med ja, delvis og nej. Fem opgaver:
 
 * `index.html`, `css/stil.css` (fra sc4.3; nyt nederst: panelernes tabeller
   og skemaer og listen på kortet).
-* `js/data.js`: stofferne, kogepunkterne, reglen, de 14 opgaver og alle tekster.
+* `js/data.js`: stofferne, kogepunkterne, reglen, de 12 opgaver og alle tekster.
 * `js/formel.js`: stregformlen og zigzagformlen som graf og tegning.
 * `js/kugler.js`: kuglemodellerne, parrene og hydrogenbindingerne.
 * `js/lup.js`: luppen (rent stof, to stoffer, ét molekyle i vand).
-* `js/instrument.js`: termometeret, reagensglasset og navnemaskinen.
+* `js/instrument.js`: termometeret, reagensglasset, oversigten over
+  tommelfingerreglen (`tegnRegel`) og navnemaskinen.
 * `js/plade.js`: byggepladen. `js/sim.js`: de tre faner.
 * `js/fane.js` (kortet, låsen og hintene fra sc4.3), `js/kerne.js`,
   `js/tegning.js` (kuglerne og det fælles fra sc4.3, nyt: skiltet under en
@@ -166,10 +171,31 @@ Panelet har tommelfingerreglen og et skema med ja, delvis og nej. Fem opgaver:
 * `_selvtest.html`: navnene, kogepunkterne og reglen mod bogens tal,
   strukturformlernes atomer og bindinger, hydrogenbindingerne pr. par og i
   vand, kontaktfladerne, teksterne (længder, æ, ø og å, ingen tankestreger),
-  alle 14 opgaver med musen (forkerte svar, låsen, træk og klik, piletaster
+  alle 12 opgaver med musen (forkerte svar, låsen, træk og klik, piletaster
   og Enter, Vis svaret) og fire skærmstørrelser fra 1100 × 620 til 1600 × 950
   (kortet i alle dele med hvert hint og hvert forkert svar; pladen,
-  instrumentet og luppen). ALT OK (155) 12. nov. 2026.
+  instrumentet, oversigten og luppen). ALT OK (153) 13. nov. 2026.
+
+## Brugerens rettelser 13. november 2026
+
+* "Der er lidt mange spørgsmål til kogepunktet.. Skær lige et par stykker af ..
+  det begynder at blive til B-niveau, når man skal sammenligne alkoholers og
+  carboxylsyrers kogepunkt": fane 2 har to opgaver. Opgaven om butan-1-ol og
+  ethansyre (118 °C) og spørgsmålet om tre stoffer er væk, og ethansyre står
+  ikke i fanens tekster.
+* "I fane 2 havde jeg lidt svært ved at få ethanol godkendt": listen på kortet
+  blev først opdateret, når det næste stof var bygget. Kortet opdateres nu ved
+  hvert skift, og opgave 1 har kun OH-gruppen at sætte på.
+* "Jeg bryder mig ikke så meget om mikrofiguren på fane 3.. den tager alt fokus
+  ... det ville være rart med en slags opløselighedsoversigt i stedet.. (passer
+  godt med vores 1-4-regel)... Det er okay med en mikrofigur.. men den skal være
+  mindre og mere fokuseret og mere pædagogisk": glasset står først,
+  oversigten over tommelfingerreglen er ny, og luppen er lille med klammer.
+  Reglen står ikke længere i panelet (oversigten viser den).
+* Efter Niels' dom over sc4.3 samme dag: det rigtige svar står ikke altid
+  først, intet spørgsmål nævner sit svar, og et forsøg, der kun er en handling
+  (OH eller COOH på kæden, tre længder), går direkte til spørgsmålet
+  (`direkte: true`, som i sc4.3).
 
 ## Papirkortet
 
@@ -183,6 +209,8 @@ på kæden, to lag), går videre af sig selv og har et fagligt spørgsmål
 bagefter. Start forfra står i panelet, aldrig på kortet.
 
 ## I menuen
+
+I menuen fra 13. nov. 2026 som C4 knap 5 "Alkoholer og syrer" (koden `c4.alkoholer`, linjen til `til_panelet.js` i `index.html`). Mappen er ikke omdøbt, og det er Byg et fedtstof og Umættet fedt heller ikke (nu knap 6 og 7), som da sc8.0 blev C8 knap 1. Det, der står herunder, var planen.
 
 Ikke i menuen. Når brugeren siger til: C4 i `kemi-c-filer/samling_c4.html`
 (efter Addition og plastik passer med bogens rækkefølge; så skal mappen og

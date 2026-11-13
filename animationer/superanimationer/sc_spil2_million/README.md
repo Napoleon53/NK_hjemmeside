@@ -153,7 +153,7 @@ moduler, så den virker, når `index.html` åbnes direkte fra harddisken.
   højst være 28 tegn og en beskrivelse 135. Kør `_selvtest.html` bagefter.
 * Beløb og sikre trin: `D.BELOEB` og `D.SIKRE`. Ventetider: `D.TEMPO`.
 * Titlen på sejrsskærmen er `D.TITEL` ("Superkemiker"). Escaperoommets segl 1
-  (`kemi-c-filer/c_spil8_escaperoom.html`) spørger efter den, så den må ikke
+  (`sc_spil8_escaperoom`) spørger efter den, så den må ikke
   ændres. Selvtesten kontrollerer den på begge sprog.
 * Alle tekster står i `D.TEKST` på dansk og engelsk med de samme nøgler.
 

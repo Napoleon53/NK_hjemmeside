@@ -198,7 +198,7 @@
             '<rect x="-11" y="-104" width="22" height="22" rx="3" fill="#39414f" stroke="' + K + '" stroke-width="2.5"/>' +
             '<path d="M-8 -104 Q0 -142 8 -104 Z" fill="#ffffff" stroke="' + K + '" stroke-width="2.5"/>' +
             '<rect x="-23" y="-62" width="46" height="34" rx="3" fill="#ffffff" stroke="' + K + '" stroke-width="2"/>' +
-            '<text x="0" y="-39" text-anchor="middle" font-size="' + (etiket.length > 4 ? 12.5 : 16) + '" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(etiket) + "</text>";
+            '<text x="0" y="-39" text-anchor="middle" font-size="' + (etiket.length > 4 ? 11 : etiket.length > 2 ? 14 : 16) + '" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(etiket) + "</text>";
     };
 
     /* Draabeplade af hvidt porcelaen set skraat oppefra. fyld[r][c]:
@@ -471,7 +471,7 @@
             var at = D.ATOM[a[0]];
             s += '<circle cx="' + a[1] + '" cy="' + a[2] + '" r="' + at.r + '" fill="' + at.farve + '" stroke="' + K + '" stroke-width="2.5"/>' +
                 '<circle cx="' + (a[1] - at.r * 0.32) + '" cy="' + (a[2] - at.r * 0.36) + '" r="' + (at.r * 0.28) + '" fill="#fff" fill-opacity="0.5"/>' +
-                '<text x="' + a[1] + '" y="' + (a[2] + 5) + '" text-anchor="middle" font-size="' + (a[0].length > 1 ? 13 : 15) + '" font-weight="700" fill="' +
+                '<text x="' + a[1] + '" y="' + (a[2] + 6) + '" text-anchor="middle" font-size="' + (a[0].length > 1 ? 15 : 18) + '" font-weight="700" fill="' +
                 (at.moerkTekst ? K : "#fff") + '" ' + SKRIFT + ">" + a[0] + "</text>";
         });
         return s + "</svg>";

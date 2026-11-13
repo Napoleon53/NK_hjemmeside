@@ -161,19 +161,61 @@
        foran delreaktionen, naar der afgives lige saa mange elektroner,
        som der optages.
        ================================================================ */
+    /* Felterne i en delreaktion: navn (stoffet), atom (atomets navn i
+       "magnesiumatomet"), stof og ion (foer og efter pilen), ionK (tallet
+       foran ionen), q (ladningsaendringen for ét atom), rigtig (siden og
+       antallet af elektroner for ét atom eller molekyle) og gange (tallet
+       foran delreaktionen i den afstemte reaktion). metalion: stoffet foer
+       pilen er en metalion, der bliver til et metal. */
+    function rk(ord, samlet, ox, red, stoffer) {
+        /* pladserne til reduktions- og oxidationsmidlet sidder under de to stoffer foer pilen */
+        samlet = samlet.map(function (d) { var k = {}; Object.keys(d).forEach(function (n) { k[n] = d[n]; }); return k; });
+        samlet[0].middel = "ox";
+        samlet[2].middel = "red";
+        ox.rigtig = { side: "h", n: ox.q };
+        red.rigtig = { side: "v", n: red.q * red.ionK };
+        return { ord: ord, samlet: samlet, ox: ox, red: red, stoffer: stoffer };
+    }
+    function oxR(navn, stof, q, gange) { return { navn: navn, atom: navn, stof: stof, ion: stof + "^{" + (q > 1 ? q : "") + "+}", ionK: 1, q: q, gange: gange }; }
+    function x2(navn, atom, stof, ion, q, ionNavn, gange) { return { navn: navn, atom: atom, stof: stof, ion: ion, ionK: 2, q: q, ionNavn: ionNavn, gange: gange }; }
+    function mIon(navn, atom, stof, ion, q, gange) { return { navn: navn, atom: atom, stof: stof, ion: ion, ionK: 1, q: q, metalion: true, gange: gange }; }
+    function S(k, f, middel) { return { k: k, f: f, middel: middel }; }
+    var PLUS = { t: "+" }, PIL = { pil: true };
+    var O2 = function (g) { return x2("dioxygen", "oxygen", "O_2", "O^{2−}", 2, "oxidioner", g); };
+    var CL2 = function (g) { return x2("dichlor", "chlor", "Cl_2", "Cl^−", 1, "chloridioner", g); };
+
     D.REAK = {
-        mg: {
-            ord: "Magnesium + dioxygen → magnesiumoxid",
-            samlet: [{ k: 2, f: "Mg", middel: "ox" }, { t: "+" }, { k: 1, f: "O_2", middel: "red" }, { pil: true }, { k: 2, f: "MgO" }],
-            ox:  { navn: "magnesium", stof: "Mg", ion: "Mg^{2+}", ionK: 1, rigtig: { side: "h", n: 2 }, gange: 2 },
-            red: { navn: "dioxygen", stof: "O_2", ion: "O^{2−}", ionK: 2, rigtig: { side: "v", n: 4 }, gange: 1 }
-        },
-        fe: {
-            ord: "Jern + dioxygen → jern(III)oxid",
-            samlet: [{ k: 4, f: "Fe", middel: "ox" }, { t: "+" }, { k: 3, f: "O_2", middel: "red" }, { pil: true }, { k: 2, f: "Fe_2O_3" }],
-            ox:  { navn: "jern", stof: "Fe", ion: "Fe^{3+}", ionK: 1, rigtig: { side: "h", n: 3 }, gange: 4 },
-            red: { navn: "dioxygen", stof: "O_2", ion: "O^{2−}", ionK: 2, rigtig: { side: "v", n: 4 }, gange: 3 }
-        }
+        mg: rk("Magnesium + dioxygen → magnesiumoxid", [S(2, "Mg", "ox"), PLUS, S(1, "O_2", "red"), PIL, S(2, "MgO")],
+            oxR("magnesium", "Mg", 2, 2), O2(1)),
+        fe: rk("Jern + dioxygen → jern(III)oxid", [S(4, "Fe", "ox"), PLUS, S(3, "O_2", "red"), PIL, S(2, "Fe_2O_3")],
+            oxR("jern", "Fe", 3, 4), O2(3)),
+        /* Ekstraopgaverne: let */
+        mgcl: rk("Magnesium + dichlor → magnesiumchlorid", [S(1, "Mg"), PLUS, S(1, "Cl_2"), PIL, S(1, "MgCl_2")],
+            oxR("magnesium", "Mg", 2, 1), CL2(1), { ox: "Magnesium", red: "Dichlor", prod: "Magnesiumchlorid" }),
+        nacl: rk("Natrium + dichlor → natriumchlorid", [S(2, "Na"), PLUS, S(1, "Cl_2"), PIL, S(2, "NaCl")],
+            oxR("natrium", "Na", 1, 2), CL2(1), { ox: "Natrium", red: "Dichlor", prod: "Natriumchlorid" }),
+        zncu: rk("Zink + kobber(II)ioner → zink(II)ioner + kobber", [S(1, "Zn"), PLUS, S(1, "Cu^{2+}"), PIL, S(1, "Zn^{2+}"), PLUS, S(1, "Cu")],
+            oxR("zink", "Zn", 2, 1), mIon("kobber(II)ionen", "kobber", "Cu^{2+}", "Cu", 2, 1), { ox: "Zink", red: "Kobber(II)ioner", prod: "Kobber" }),
+        cao: rk("Calcium + dioxygen → calciumoxid", [S(2, "Ca"), PLUS, S(1, "O_2"), PIL, S(2, "CaO")],
+            oxR("calcium", "Ca", 2, 2), O2(1), { ox: "Calcium", red: "Dioxygen", prod: "Calciumoxid" }),
+        /* middel */
+        lio: rk("Lithium + dioxygen → lithiumoxid", [S(4, "Li"), PLUS, S(1, "O_2"), PIL, S(2, "Li_2O")],
+            oxR("lithium", "Li", 1, 4), O2(1), { ox: "Lithium", red: "Dioxygen", prod: "Lithiumoxid" }),
+        kbr: rk("Kalium + dibrom → kaliumbromid", [S(2, "K"), PLUS, S(1, "Br_2"), PIL, S(2, "KBr")],
+            oxR("kalium", "K", 1, 2), x2("dibrom", "brom", "Br_2", "Br^−", 1, "bromidioner", 1), { ox: "Kalium", red: "Dibrom", prod: "Kaliumbromid" }),
+        cuag: rk("Kobber + sølv(I)ioner → kobber(II)ioner + sølv", [S(1, "Cu"), PLUS, S(2, "Ag^+"), PIL, S(1, "Cu^{2+}"), PLUS, S(2, "Ag")],
+            oxR("kobber", "Cu", 2, 1), mIon("sølv(I)ionen", "sølv", "Ag^+", "Ag", 1, 2), { ox: "Kobber", red: "Sølv(I)ioner", prod: "Sølv" }),
+        zno: rk("Zink + dioxygen → zink(II)oxid", [S(2, "Zn"), PLUS, S(1, "O_2"), PIL, S(2, "ZnO")],
+            oxR("zink", "Zn", 2, 2), O2(1), { ox: "Zink", red: "Dioxygen", prod: "Zink(II)oxid" }),
+        /* svaer */
+        alo: rk("Aluminium + dioxygen → aluminiumoxid", [S(4, "Al"), PLUS, S(3, "O_2"), PIL, S(2, "Al_2O_3")],
+            oxR("aluminium", "Al", 3, 4), O2(3), { ox: "Aluminium", red: "Dioxygen", prod: "Aluminiumoxid" }),
+        alcl: rk("Aluminium + dichlor → aluminiumchlorid", [S(2, "Al"), PLUS, S(3, "Cl_2"), PIL, S(2, "AlCl_3")],
+            oxR("aluminium", "Al", 3, 2), CL2(3), { ox: "Aluminium", red: "Dichlor", prod: "Aluminiumchlorid" }),
+        fecl: rk("Jern + dichlor → jern(III)chlorid", [S(2, "Fe"), PLUS, S(3, "Cl_2"), PIL, S(2, "FeCl_3")],
+            oxR("jern", "Fe", 3, 2), CL2(3), { ox: "Jern", red: "Dichlor", prod: "Jern(III)chlorid" }),
+        alcu: rk("Aluminium + kobber(II)ioner → aluminiumioner + kobber", [S(2, "Al"), PLUS, S(3, "Cu^{2+}"), PIL, S(2, "Al^{3+}"), PLUS, S(3, "Cu")],
+            oxR("aluminium", "Al", 3, 2), mIon("kobber(II)ionen", "kobber", "Cu^{2+}", "Cu", 2, 3), { ox: "Aluminium", red: "Kobber(II)ioner", prod: "Kobber" })
     };
 
     /* Formel-markup til tekst: "Mg^{2+}" -> Mg²⁺, "O_2" -> O₂, "e^−" -> e⁻.
@@ -188,6 +230,8 @@
     };
 
     function stort(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    function elek(n) { return n === 1 ? "1 elektron" : n + " elektroner"; }
+    D.elek = elek;
 
     /* Forklaringen til en forkert delreaktion. e = { v: antal til venstre, h: antal til hoejre } */
     D.eFejl = function (reak, raekke, e) {
@@ -197,16 +241,37 @@
         if (side !== ok.side) {
             return raekke === "ox" ?
                 stort(r.navn) + " afgiver elektronerne. De bliver et produkt og skal stå til højre for pilen." :
-                stort(r.navn) + " optager elektronerne. De skal stå sammen med O₂ til venstre for pilen.";
+                stort(r.navn) + " optager elektronerne. De skal stå sammen med " + D.uni(r.stof) + " til venstre for pilen.";
         }
         if (n !== ok.n) {
             if (raekke === "ox") {
-                return D.uni(r.ion) + " har ladningen +" + ok.n + ", så " + r.navn + "atomet har afgivet " + ok.n + " elektroner. Du har skrevet " + n + ".";
+                return D.uni(r.ion) + " har ladningen +" + r.q + ", så " + r.atom + "atomet har afgivet " + elek(r.q) + ". Du har skrevet " + n + ".";
             }
-            if (n === 2) return "Hvert oxygenatom optager 2 elektroner, og der er 2 oxygenatomer i O₂.";
-            return "Der dannes 2 oxidioner, O²⁻, som hver har optaget 2 elektroner. Du har skrevet " + n + ".";
+            if (r.metalion) {
+                return D.uni(r.stof) + " har ladningen +" + r.q + " og bliver til " + r.atom + " uden ladning. Ionen optager " + elek(r.q) + ".";
+            }
+            if (n === r.q) return "Hvert " + r.atom + "atom optager " + elek(r.q) + ", og der er 2 " + r.atom + "atomer i " + D.uni(r.stof) + ".";
+            return "Der dannes 2 " + r.ionNavn + ", " + D.uni(r.ion) + ", som hver har optaget " + elek(r.q) + ". Du har skrevet " + n + ".";
         }
         return "";
+    };
+
+    /* Forklaringen til forkerte tal foran delreaktionerne. g = { ox, red } (0 er intet tal, altsaa 1) */
+    D.gangeFejl = function (reak, g) {
+        var r = D.REAK[reak], a = (g.ox || 1) * r.ox.rigtig.n, b = (g.red || 1) * r.red.rigtig.n;
+        if (a !== b) return "Der afgives " + elek(a) + ", men der optages " + elek(b) + ". Sæt tal foran, så tallene bliver ens.";
+        if ((g.ox || 1) !== r.ox.gange) return "Elektronerne passer, men tallene kan være mindre. Brug de mindste tal, der passer.";
+        return "";
+    };
+
+    /* Delreaktionerne skrevet ud som tekst (til hint og forklaringer) */
+    D.delTekst = function (reak, raekke, gange) {
+        var r = D.REAK[reak][raekke], g = gange || 1, n = r.rigtig.n * g;
+        var k = function (t) { return t > 1 ? t + " " : ""; };
+        var e = n + " e⁻";
+        return raekke === "ox" ?
+            k(g) + D.uni(r.stof) + " → " + k(g * r.ionK) + D.uni(r.ion) + " + " + e :
+            k(g) + D.uni(r.stof) + " + " + e + " → " + k(g * r.ionK) + D.uni(r.ion);
     };
 
     function eHint(reak) {
@@ -337,6 +402,86 @@
         }
     ];
 
+    /* ----- Ekstraopgaverne paa fane 2 ---------------------------------------------------
+       Tre svaerhedsgrader med fire reaktioner hver (i tilfaeldig raekkefoelge).
+       Let: elektronerne i begge delreaktioner (tallene foran kommer af sig
+       selv). Middel: ogsaa tallene foran. Svaer: tal, der skal ganges paa
+       begge delreaktioner, og hvilket stof der er reduktions- eller
+       oxidationsmidlet. Mindre stilladsering end opgave 1 til 6: hintene er
+       de samme for alle reaktioner. */
+    function eDel(id, sidst) {
+        var r = D.REAK[id], ox = r.ox, red = r.red;
+        var h2 = red.metalion ?
+            D.uni(red.stof) + " bliver til " + red.atom + " uden ladning. Elektronerne står sammen med " + D.uni(red.stof) + " til venstre for pilen." :
+            "Hvert " + red.atom + "atom optager " + elek(red.q) + ", og " + D.uni(red.stof) + " har 2. Elektronerne står til venstre for pilen.";
+        return {
+            type: "forsoeg", reak: id, trin: "e", om: ["ox", "red"],
+            tekst: "Træk e⁻ ind i begge delreaktioner, så de passer med ionernes ladninger, og indsend.",
+            set: sidst ? "Begge delreaktioner er rigtige. Med tallene foran afgives og optages " + elek(ox.rigtig.n * ox.gange) + "." : "Begge delreaktioner er rigtige.",
+            hint: [
+                D.uni(ox.ion) + " har ladningen +" + ox.q + ". Hvor mange elektroner har et " + ox.atom + "atom afgivet?",
+                h2,
+                D.delTekst(id, "ox") + " og " + D.delTekst(id, "red") + "."
+            ]
+        };
+    }
+    function gDel(id) {
+        var r = D.REAK[id], ox = r.ox, red = r.red;
+        var a = ox.gange, b = red.gange;
+        var h3 = (a > 1 ? "Sæt " + a + " foran delreaktionen for " + ox.navn : "Lad delreaktionen for " + ox.navn + " være") +
+            (b > 1 ? ", og sæt " + b + " foran den for " + red.navn + "." : ", og sæt intet tal foran den for " + red.navn + ".");
+        return {
+            type: "forsoeg", reak: id, trin: "gange", om: ["ox", "red"],
+            tekst: "Sæt tal foran delreaktionerne, så der afgives lige så mange e⁻, som der optages.",
+            set: "Der afgives og optages " + elek(ox.rigtig.n * a) + ", og reaktionen står øverst på arket.",
+            hint: [
+                "Et " + ox.atom + "atom afgiver " + elek(ox.rigtig.n) + ", og " + D.uni(red.stof) + " optager " + elek(red.rigtig.n) + ". Gør tallene ens.",
+                "Find det mindste tal, som både " + ox.rigtig.n + " og " + red.rigtig.n + " går op i.",
+                h3
+            ]
+        };
+    }
+    function mDel(id, spoerg) {
+        var st = D.REAK[id].stoffer, red = spoerg === "red";
+        var svar = [
+            { t: st.ox, ok: red, f: st.ox + " afgiver elektronerne og er reduktionsmidlet. Oxidationsmidlet optager elektroner." },
+            { t: st.red, ok: !red, f: st.red + " optager elektronerne og er oxidationsmidlet. Reduktionsmidlet afgiver elektroner." },
+            { t: st.prod, f: st.prod + " er et produkt. " + (red ? "Reduktionsmidlet" : "Oxidationsmidlet") + " er et af de stoffer, der reagerer." }
+        ];
+        svar.forEach(function (x) { if (x.ok) delete x.f; });
+        var svaret = red ? st.ox + " afgiver elektronerne, så " + st.ox.toLowerCase() + " er reduktionsmidlet." :
+            st.red + " optager elektronerne, så " + st.red.toLowerCase() + " er oxidationsmidlet.";
+        return {
+            type: "spm", reak: id, om: ["ox", "red"],
+            tekst: red ? "Hvilket stof er reduktionsmidlet i reaktionen?" : "Hvilket stof er oxidationsmidlet i reaktionen?",
+            svar: svar,
+            hint: [
+                red ? "Reduktionsmidlet er det stof, der afgiver elektroner." : "Oxidationsmidlet er det stof, der optager elektroner.",
+                red ? "Se efter den delreaktion, hvor elektronerne står til højre for pilen." : "Se efter den delreaktion, hvor elektronerne står til venstre for pilen.",
+                svaret
+            ],
+            godt: svaret
+        };
+    }
+    function ekstra(id, navn, reaktioner, slags, loest) {
+        var dele = [];
+        NK.bland(reaktioner.slice()).forEach(function (r, i) {
+            if (slags === "let") { dele.push(eDel(r, true)); return; }
+            dele.push(eDel(r, false));
+            dele.push(gDel(r));
+            if (slags === "svaer") dele.push(mDel(r, i % 2 ? "ox" : "red"));
+        });
+        return { id: id, navn: navn, chip: navn, ekstra: true, slags: slags, dele: dele, loest: loest };
+    }
+    D.D_MAAL.push(
+        ekstra("let", "Let", ["mgcl", "nacl", "zncu", "cao"], "let",
+            "Alle fire reaktioner er løst. I den mellemsvære sætter du også selv tallene foran delreaktionerne."),
+        ekstra("middel", "Middel", ["lio", "kbr", "cuag", "zno"], "middel",
+            "Alle fire reaktioner er løst. I den svære skal begge delreaktioner ganges."),
+        ekstra("svaer", "Svær", ["alo", "alcl", "fecl", "alcu"], "svaer",
+            "Alle fire reaktioner er løst. Du kan skrive delreaktioner og finde reduktions- og oxidationsmidlet.")
+    );
+
     /* Mærkaterne paa fane 2 og 3. farve: oxidation orange og reduktion blaa
        som i bogen. Midlerne er sorte, saa farven ikke afsloerer pladsen. */
     D.BRIKKER = {
@@ -423,7 +568,7 @@
             },
             spm: {
                 om: ["maerker"],
-                tekst: "Et reduktionsmiddel svarer til en syre. Hvad har de to til fælles?",
+                tekst: "Et reduktionsmiddel er ikke en syre, men de to har én ting til fælles. Hvad er det?",
                 svar: [
                     { t: "Begge afgiver en partikel", ok: true },
                     { t: "Begge optager en partikel",
@@ -475,7 +620,7 @@
 
     D.FAERDIG = {
         b: "Alle fire opgaver er løst. På fane 2 skriver du oxidationen og reduktionen som delreaktioner.",
-        d: "Alle seks opgaver er løst. Fane 3 sammenligner redoxreaktioner med syre/base-reaktioner.",
+        d: "Alle seks opgaver er løst. Vil du træne mere, så vælg en ekstraopgave nederst i listen. Fane 3 sammenligner redox med syre/base.",
         s: "Alle tre opgaver er løst."
     };
 

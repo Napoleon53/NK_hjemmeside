@@ -80,6 +80,7 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
+        if (sim && sim.tast && sim.tast(e.key)) return;
         if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }

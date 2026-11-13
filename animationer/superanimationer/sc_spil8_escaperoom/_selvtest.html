@@ -17,12 +17,12 @@
 /* =====================================================================
    Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
 
-   Aabner index.html i en iframe (1366 x 768) og kontrollerer kemien
-   (afstemning, stregtal, faeldningstabellen mod sc2.4 og
-   elektronegativiteterne mod sc3.3), 2000 tilfaeldige sager (svarene
-   er robuste over for afrunding, blandingsgaaden kan loeses, koderne
-   er forskellige), forloebet med begge slutninger og seglene, beviset,
-   sproget og stoerrelsen paa skrift og kort.
+   Aabner index.html?alene i en iframe (1366 x 768) og kontrollerer
+   kemien (afstemning, stregtal, frie elektronpar, isotoper,
+   faeldningstabellen mod sc2.4 og elektronegativiteterne mod sc3.3),
+   2000 tilfaeldige sager (koden og guldkoden er robuste over for
+   afrunding), forloebet trin for trin i alle fem rum, bonusruten,
+   begge slutninger og seglene, beviset, sproget og skaermen.
    Andre spils rekorder i browseren gemmes foer testen og laegges
    tilbage bagefter. Skal koeres gennem en lokal server.
    ===================================================================== */
@@ -37,7 +37,6 @@ function vis(undervejs) {
     document.getElementById("ud").innerHTML = linjer.join("\n")
         + (undervejs ? "\n\nKører …" : "\n\n" + (fejl ? '<span class="fejl">' + fejl + " FEJL</span>" : '<span class="ok">ALT OK</span>'));
 }
-function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 function hentTekst(sti) {
     try { var x = new XMLHttpRequest(); x.open("GET", sti, false); x.send(); return x.status === 200 ? x.responseText : ""; } catch (e) { return ""; }
 }
@@ -56,7 +55,7 @@ function aabn(b, hh) {
     ramme.style.height = (hh || 768) + "px";
     return new Promise(function (ok) {
         ramme.onload = function () { ok(ramme.contentWindow); };
-        ramme.src = "index.html?t=" + Date.now();
+        ramme.src = "index.html?alene&t=" + Date.now();
     });
 }
 
@@ -82,7 +81,7 @@ function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 async function koer() {
     rydAndre();
     var w = await aabn();
-    var NK = w.NK, D = NK.D, Sag = NK.Sag;
+    var NK = w.NK, D = NK.D, Sag = NK.Sag, Se = NK.Sedler;
 
     /* ------------------------------------------------------------- */
     overskrift("1. Kemien");
@@ -95,43 +94,39 @@ async function koer() {
         ikkeAfstemt.map(function (r) { return r.v.join("+"); }).join("; "));
     D.REDOX.forEach(function (red) {
         var lad = function (l) { return l.reduce(function (s, p) { return s + p[0] * p[2]; }, 0); };
-        paastand("permanganatskemaet med " + red.stof + " passer i atomer og ladning", lig(sum(red.tael.v), sum(red.tael.h)) && lad(red.tael.v) === lad(red.tael.h));
         var tekst = tilCifre(red.skema);
-        paastand("skemaet med " + red.stof + " på tavlen er det samme som det, der tælles", red.tael.v.concat(red.tael.h).every(function (p) {
-            return tekst.indexOf((p[0] === 1 ? "" : p[0] + " ") + p[1]) >= 0;
-        }));
+        paastand("permanganatskemaet med " + red.stof + " passer i atomer og ladning og er det, der står på tavlen",
+            lig(sum(red.tael.v), sum(red.tael.h)) && lad(red.tael.v) === lad(red.tael.h) &&
+            red.tael.v.concat(red.tael.h).every(function (p) { return tekst.indexOf((p[0] === 1 ? "" : p[0] + " ") + p[1]) >= 0; }));
     });
-    var forkerteStreger = D.STREGMOLEKYLER.filter(function (m) {
-        var a = atomer(tilCifre(m.formel)), s = 0;
-        Object.keys(a).forEach(function (x) { s += D.VALENS[x] * a[x]; });
-        return s / 2 !== m.streger;
+    function streger(a) { var s = 0; Object.keys(a).forEach(function (x) { s += D.VALENS[x] * a[x]; }); return s / 2; }
+    function elektroner(a) { var s = 0; Object.keys(a).forEach(function (x) { s += D.VALENSELEKTRONER[x] * a[x]; }); return s; }
+    var fs = D.STREGMOLEKYLER.filter(function (m) { return streger(atomer(tilCifre(m.formel))) !== m.streger; });
+    paastand("stregtallet for de " + D.STREGMOLEKYLER.length + " molekyler på flasken passer med bindingerne pr. atom", fs.length === 0, fs.map(function (m) { return m.formel; }).join(", "));
+    var fb = D.BONUSMOLEKYLER.filter(function (m) {
+        var a = atomer(m.brutto), a2 = atomer(tilCifre(m.formel).replace(/\(NH2\)2/, "N2H4"));
+        return streger(a) !== m.streger || (elektroner(a) - 2 * m.streger) / 2 !== m.par || !lig(a, a2);
     });
-    paastand("stregtallet for de " + D.STREGMOLEKYLER.length + " molekyler på flasken er halvdelen af bindingerne pr. atom", forkerteStreger.length === 0,
-        forkerteStreger.map(function (m) { return m.formel; }).join(", "));
+    paastand("bonusmolekylernes streger og frie elektronpar passer med valenselektronerne (" + D.BONUSMOLEKYLER.length + " molekyler)", fb.length === 0, fb.map(function (m) { return m.navn; }).join(", "));
     var raekker = Object.keys(D.LAB).map(function (id) { return D.LAB_REAGENSER.map(function (r) { var x = D.LAB[id][r.id]; return x ? x.ord : "-"; }).join("|"); });
-    paastand("de seks ioner i laboratoriet har hver sin række", raekker.filter(function (r, i) { return raekker.indexOf(r) === i; }).length === 6);
-    var enRea = D.LAB_REAGENSER.map(function (r) {
-        var set = {}; Object.keys(D.LAB).forEach(function (id) { var x = D.LAB[id][r.id]; set[x ? x.ord : "-"] = 1; });
-        return Object.keys(set).length;
-    });
-    paastand("intet enkelt reagens skiller alle seks ioner", enRea.every(function (n) { return n < 6; }));
-
+    paastand("de seks ioner på dråbepladen har hver sin række", raekker.filter(function (r, i) { return raekker.indexOf(r) === i; }).length === 6);
+    paastand("isotoperne giver hele, positive antal neutroner og elektroner", Object.keys(D.LAB_IONER).every(function (id) {
+        var i = D.LAB_IONER[id];
+        return i.isotoper.every(function (A) { return A - i.Z > 0 && A - i.Z < 2 * i.Z; }) && i.Z - i.q > 0 && D.SYMBOLER[i.Z - 1] === i.sym;
+    }));
     var fael = hentTekst("../sc2.4_faeldningsreaktioner/js/data.js");
     if (!fael) skriv("  note  sc2.4 blev ikke fundet");
     else {
-        var KAT = { ag: "Ag", pb: "Pb", ba: "Ba", ca: "Ca", cu: "Cu", mg: "Mg" }, AN = { cl: 1, i: 3, oh: 4, so4: 5 };
-        var afvig = [];
+        var KAT = { ag: "Ag", pb: "Pb", ba: "Ba", ca: "Ca", cu: "Cu", mg: "Mg" }, AN = { cl: 1, i: 3, oh: 4, so4: 5 }, afvig = [];
         Object.keys(KAT).forEach(function (id) {
             var m = new RegExp("\\b" + KAT[id] + ':\\s*"([LTx]{8})"').exec(fael);
             if (!m) { afvig.push(id + " mangler"); return; }
             D.LAB_REAGENSER.forEach(function (r) {
-                var t = m[1].charAt(AN[r.id]), har = !!D.LAB[id][r.id];
-                /* x: Cu og I giver CuI og I2, Ag og OH giver brunt soelvoxid; begge er bundfald */
-                var skal = t === "T" || t === "x";
-                if (har !== skal) afvig.push(id + "+" + r.id);
+                var t = m[1].charAt(AN[r.id]);
+                if (!!D.LAB[id][r.id] !== (t === "T" || t === "x")) afvig.push(id + "+" + r.id);
             });
         });
-        paastand("laboratoriets bundfald følger sc2.4's fældningstabel", afvig.length === 0, afvig.join(", "));
+        paastand("dråbepladens bundfald følger sc2.4's fældningstabel", afvig.length === 0, afvig.join(", "));
     }
     var pol = hentTekst("../sc3.3_polaere_molekyler/js/data.js");
     if (!pol) skriv("  note  sc3.3 blev ikke fundet");
@@ -142,307 +137,325 @@ async function koer() {
         });
         paastand("elektronegativiteterne er de samme som i sc3.3", afvigEN.length === 0, afvigEN.join(", "));
     }
-    paastand("puljen til tavlen har 7 polære og 6 upolære molekyler",
-        D.POLMOLEKYLER.filter(function (m) { return m.polaer; }).length === 7 && D.POLMOLEKYLER.filter(function (m) { return !m.polaer; }).length === 6);
-    paastand("ethanol, methanol og eddikesyre står aldrig over for et upolært stof",
-        D.BLAND_POLAER.every(function (s) { return ["ethanol", "methanol", "eddikesyre"].indexOf(s.navn) < 0 || !s.kryds; }));
+    var alleStoffer = [D.VAND].concat(D.BLAND_POLAER, D.BLAND_UPOLAER);
+    paastand("væskerne har ingen stoffer, der blandes med både polære og upolære (ethanol, methanol, eddikesyre)",
+        alleStoffer.every(function (s) { return ["ethanol", "methanol", "eddikesyre", "propanon"].indexOf(s.navn) < 0; }));
+    var bl = Sag.bland(D.VAND, D.BLAND_UPOLAER[0]), bl2 = Sag.bland(D.BLAND_POLAER[0], D.VAND), urea = D.BLAND_POLAER.filter(function (s) { return s.fast; })[0];
+    paastand("vand og heptan giver to lag med heptan øverst, vand og glycerol ét lag", !bl.etLag && bl.oeverst.navn === "heptan" && bl2.etLag);
+    paastand("urea opløses i vand, men ikke i hexan", Sag.bland(urea, D.VAND).etLag && !Sag.bland(urea, D.BLAND_UPOLAER[1]).etLag);
+    paastand("svarfeltet læser 0,0810, 8,10·10^-2, 8.1e-2 og 8,10 · 10⁻² som det samme tal",
+        ["0,0810", "8,10·10^-2", "8.1e-2", "8,10 · 10⁻²", "8,1*10^-2"].every(function (s) { return Math.abs(Se.tal(s) - 0.081) < 1e-12; }) && isNaN(Se.tal("ca. 5")));
 
     /* ------------------------------------------------------------- */
     overskrift("2. 2000 sager");
-    var N = 2000, kast = [], masker = [], gaade = [], robust3 = [], robust4 = [], robust5 = [], koder = {}, rumKoder = [{}, {}, {}, {}, {}, {}];
-    var vidder = { 3: [], 4: [], 5: [] };
+    var N = 2000, kast = [], masker = [], r2 = [], robust3 = [], robust4 = [], robust5 = [], koder = {}, rumKoder = [{}, {}, {}, {}, {}, {}], bonKoder = [{}, {}, {}, {}, {}, {}];
     for (var nr = 1000; nr < 1000 + N; nr++) {
         var s;
         try { s = Sag.lav(nr); } catch (e) { kast.push(nr + ": " + e.message); continue; }
         var alle = "";
         for (var r = 1; r <= 5; r++) {
-            s.rum[r].felter.forEach(function (f) {
-                var n = (f.maske.match(/#/g) || []).length;
-                if (n !== f.svar.length || !/^[0-9]+$/.test(f.svar)) masker.push(nr + " rum " + r + ": " + f.maske + " / " + f.svar);
+            var q = s.rum[r];
+            if ((q.kodeMaske.match(/#/g) || []).length !== q.kode.length || !/^[0-9]+$/.test(q.kode) || q.trin.length !== 3) masker.push(nr + " rum " + r + " kode");
+            q.bonus.felter.forEach(function (f) {
+                if ((f.maske.match(/#/g) || []).length !== f.svar.length || !/^[0-9]+$/.test(f.svar)) masker.push(nr + " rum " + r + " bonus");
             });
-            var k = Sag.kode(s.rum[r]);
-            alle += k + "|";
-            rumKoder[r][k] = (rumKoder[r][k] || 0) + 1;
+            if (q.bonus.kode === q.kode) masker.push(nr + " rum " + r + ": guldkoden er den samme som koden");
+            alle += q.kode + "|";
+            rumKoder[r][q.kode] = (rumKoder[r][q.kode] || 0) + 1;
+            bonKoder[r][q.bonus.kode] = (bonKoder[r][q.bonus.kode] || 0) + 1;
         }
         koder[alle] = 1;
-        /* rum 1 */
-        var r1 = s.rum[1];
-        if (r1.kendte.indexOf(r1.x) < 0 || r1.kendte.length !== 4) masker.push(nr + ": Prøve X er ikke blandt de kendte");
-        /* rum 2: gaaden kan loeses */
-        var bl = s.rum[2].blanding, foraelder = {};
-        function find(x) { while (foraelder[x] && foraelder[x] !== x) x = foraelder[x]; return x; }
-        bl.polaere.concat(bl.upolaere).forEach(function (x) { foraelder[x] = x; });
-        var stofDef = {};
-        [D.VAND].concat(D.BLAND_POLAER, D.BLAND_UPOLAER).forEach(function (x) { stofDef[x.navn] = x; });
-        var krydsOk = false, parFejl = [];
-        bl.raekker.forEach(function (k) {
-            var a = stofDef[k.a], b = stofDef[k.b];
-            var aPol = bl.polaere.indexOf(k.a) >= 0, bPol = bl.polaere.indexOf(k.b) >= 0;
-            if (k.blandes) {
-                if (aPol !== bPol || !Sag.kanBlandes(a, b)) parFejl.push(k.a + "+" + k.b);
-                foraelder[find(k.a)] = find(k.b);
-            } else {
-                if (aPol === bPol || !(aPol ? Sag.kanKrydses(a, b) : Sag.kanKrydses(b, a))) parFejl.push(k.a + "/" + k.b);
-                krydsOk = true;
-            }
-        });
-        var rodP = find("vand");
-        var ok2 = bl.raekker.length === 6 && krydsOk && parFejl.length === 0 &&
-            bl.polaere.every(function (x) { return find(x) === rodP; }) &&
-            bl.upolaere.every(function (x) { return find(x) === find(bl.upolaere[0]) && find(x) !== rodP; }) &&
-            bl.antalUpolaere === bl.upolaere.length && bl.polaere.length + bl.upolaere.length === 6;
-        if (!ok2) gaade.push(nr + (parFejl.length ? " " + parFejl.join(",") : ""));
-        var pk = s.rum[2].svar.polaere;
-        if (pk < 1 || pk > 4 || s.rum[2].molekyler.filter(function (m) { return m.polaer; }).length !== pk) gaade.push(nr + " polære");
-        /* rum 3-5: robuste svar */
-        var r3 = s.rum[3];
-        var v3 = Sag.RUM3_VALG.map(function (v) { return NK.komma(Sag.rumfang(r3.metal, r3.m, r3.t, r3.p, v), 2); });
-        if (v3.some(function (x) { return x !== r3.svar.V; }) || r3.V < 0.5 || r3.V >= 9.995) robust3.push(nr);
-        var r4 = s.rum[4];
-        if (NK.komma(r4.efter - r4.foer, 2) !== NK.komma(r4.forbrug, 2) ||
-            [0, 3, 4].some(function (v) { return NK.komma(Sag.pH(r4.cBase, r4.forbrug, r4.Vsyre, v), 2) !== r4.svar.pH; })) robust4.push(nr);
-        var r5 = s.rum[5];
-        if ([false, true].some(function (b) { return NK.komma(Sag.koncentration(r5.redox, r5.cMn, r5.Vmn, r5.Vproeve, b), 3) !== r5.svar.c; }) ||
-            r5.Vmn < 5 || r5.Vmn > 40 || r5.c >= 9.9995) robust5.push(nr);
-        vidder[3].push(r3.V); vidder[4].push(r4.pH); vidder[5].push(r5.c);
+        var a = s.rum[1], ion = D.LAB_IONER[a.x];
+        if (a.kendte.indexOf(a.x) < 0 || a.kendte.length !== 4 || a.bonus.neutroner !== a.bonus.A - ion.Z || a.bonus.elektroner !== ion.Z - ion.q) masker.push(nr + ": rum 1");
+        var b = s.rum[2];
+        if (b.stoffer.length !== 6 || b.stoffer[0].navn !== "vand" || b.stoffer.filter(function (x) { return !x.polaer; }).length !== b.antalUpolaere ||
+            b.antalUpolaere < 2 || b.antalUpolaere > 4 || b.stoffer.filter(function (x) { return x.fast; }).length > 1 ||
+            b.molekyler.filter(function (m) { return m.polaer; }).length !== b.antalPolaere || b.antalPolaere < 1 || b.antalPolaere > 4) r2.push(nr);
+        var c = s.rum[3];
+        if (Sag.RUM3_VALG.some(function (v) { return NK.komma(Sag.rumfang(c.metal, c.m, c.t, c.p, v), 2) !== NK.komma(c.V, 2); }) || c.V < 0.5 || c.V >= 9.995 ||
+            Sag.REST_VALG.some(function (v) { return NK.komma(Sag.rest(c.metal, c.m, c.bonus.cHCl, c.bonus.vHCl, v[0], v[1]), 2) !== NK.komma(c.bonus.rest, 2); }) ||
+            c.bonus.rest < 0.1 || c.bonus.rest > c.m) robust3.push(nr);
+        var d4 = s.rum[4];
+        if (NK.komma(d4.efter - d4.foer, 2) !== NK.komma(d4.forbrug, 2) ||
+            [0, 3, 4].some(function (v) { return NK.komma(Sag.pH(d4.cBase, d4.forbrug, d4.Vsyre, v), 2) !== NK.komma(d4.pH, 2); }) ||
+            [0, 1, 2].some(function (v) { return NK.komma(Sag.pHUndervejs(d4.cBase, d4.forbrug, d4.Vsyre, d4.bonus.x, v), 2) !== NK.komma(d4.bonus.pH, 2); }) ||
+            d4.bonus.x >= d4.forbrug || d4.bonus.pH <= d4.pH) robust4.push(nr);
+        var e5 = s.rum[5];
+        if ([false, true].some(function (bb) { return NK.komma(Sag.koncentration(e5.redox, e5.cMn, e5.Vmn, e5.Vproeve, bb), 3) !== NK.komma(e5.c, 3); }) ||
+            [0, 1, 2].some(function (v) { return NK.komma(Sag.masseprocent(e5.redox, e5.c, e5.bonus.Vkolbe, e5.bonus.mProeve, v), e5.redox.pctDec) !== NK.komma(e5.bonus.pct, e5.redox.pctDec); }) ||
+            e5.Vmn < 5 || e5.Vmn > 40 || e5.bonus.pct >= 100 || e5.bonus.pct <= 1) robust5.push(nr);
     }
     paastand("alle " + N + " sager kan laves", kast.length === 0, kast.slice(0, 3).join("; "));
-    paastand("felternes masker passer med svarene", masker.length === 0, masker.slice(0, 3).join("; "));
-    paastand("blandingsgåden kan løses i alle sager, og alle par passer i virkeligheden", gaade.length === 0, gaade.slice(0, 5).join("; "));
-    paastand("rum 3: svaret er det samme med alle 16 måder at runde af", robust3.length === 0, robust3.slice(0, 5).join(", "));
-    paastand("rum 4: forbruget passer, og pH er robust", robust4.length === 0, robust4.slice(0, 5).join(", "));
-    paastand("rum 5: koncentrationen er robust, og forbruget er 5 til 40 mL", robust5.length === 0, robust5.slice(0, 5).join(", "));
-    var unikke = Object.keys(koder).length;
-    paastand("næsten alle sager har deres egen samlede kode (" + unikke + " af " + N + ")", unikke >= N * 0.99);
-    /* Chancen for, at to tilfaeldige grupper har den samme kode til et rum */
-    var faelles = [1, 2, 3, 4, 5].map(function (r) {
-        var p = 0;
-        Object.keys(rumKoder[r]).forEach(function (k) { p += Math.pow(rumKoder[r][k] / N, 2); });
-        skriv("  info  rum " + r + ": " + Object.keys(rumKoder[r]).length + " forskellige koder, to grupper har den samme i " + NK.komma(p * 100, 1) + " %");
-        return p;
-    });
-    paastand("to grupper har den samme kode til et rum i under 3 % af tilfældene", faelles.every(function (p) { return p < 0.03; }));
+    paastand("koden og guldkoden passer med felterne i låsen, og de to koder er forskellige", masker.length === 0, masker.slice(0, 3).join("; "));
+    paastand("rum 2: seks stoffer med vand først, 2 til 4 upolære, højst ét fast stof, 1 til 4 polære molekyler", r2.length === 0, r2.slice(0, 5).join(", "));
+    paastand("rum 3: rumfanget (16 måder at runde af) og resten af metallet (4 måder) er robuste", robust3.length === 0, robust3.slice(0, 5).join(", "));
+    paastand("rum 4: forbruget passer, og pH og pH undervejs er robuste", robust4.length === 0, robust4.slice(0, 5).join(", "));
+    paastand("rum 5: koncentrationen og masseprocenten er robuste, og forbruget er 5 til 40 mL", robust5.length === 0, robust5.slice(0, 5).join(", "));
+    paastand("alle sager har deres egen samlede kode (" + Object.keys(koder).length + " af " + N + ")", Object.keys(koder).length >= N * 0.99);
+    function faelles(tael) {
+        return [1, 2, 3, 4, 5].map(function (r) {
+            var p = 0; Object.keys(tael[r]).forEach(function (k) { p += Math.pow(tael[r][k] / N, 2); });
+            return p;
+        });
+    }
+    var fk = faelles(rumKoder), fg = faelles(bonKoder);
+    skriv("  info  to grupper har den samme kode i " + fk.map(function (p) { return NK.komma(p * 100, 1); }).join(" / ") + " % af tilfældene (rum 1 til 5)");
+    skriv("  info  to grupper har den samme guldkode i " + fg.map(function (p) { return NK.komma(p * 100, 1); }).join(" / ") + " % af tilfældene");
+    paastand("to grupper har den samme kode til et rum i under 3 % af tilfældene", fk.every(function (p) { return p < 0.03; }));
     paastand("den samme sag giver de samme tal", JSON.stringify(Sag.lav(4321)) === JSON.stringify(Sag.lav(4321)));
-    function spaend(l) { return NK.komma(Math.min.apply(null, l), 2) + " til " + NK.komma(Math.max.apply(null, l), 2); }
-    skriv("  info  V(H₂) " + spaend(vidder[3]) + " L, pH " + spaend(vidder[4]) + ", c " + spaend(vidder[5]) + " M");
 
     /* ------------------------------------------------------------- */
-    overskrift("3. Forløbet og den almindelige slutning");
+    overskrift("3. Trinene i de fem rum");
     w.localStorage.removeItem("nk-escaperoom");
     w = await aabn();
-    NK = w.NK; D = NK.D; Sag = NK.Sag;
-    var app = NK.app, d = w.document;
+    NK = w.NK; D = NK.D; Sag = NK.Sag; Se = NK.Sedler;
+    var app = NK.app, d = w.document, T, sag;
     paastand("en ny sag begynder på startskærmen", app.skaerm().type === "start" && !d.getElementById("midte").hidden && !!d.getElementById("startknap"));
-    paastand("sagsnummeret står i toplinjen", /^Sag #\d{4} · Fortroligt$/.test(d.getElementById("sagnr").textContent));
     app.nySag(4550, true);
     d.getElementById("startknap").click();
-    var T = app.tilstand(), sag = app.sag();
-    paastand("Start fører til rum 1, og uret går", app.skaerm().type === "rum" && app.skaerm().rum === 1 && T.start > 0);
-    paastand("teksten om rummet står øverst", !d.getElementById("fortaelling").hidden && /Rum 1 · Grundstofkoden/.test(d.getElementById("fortaelling").textContent));
-    for (var rr = 1; rr <= 5; rr++) {
-        app.nySag(4550, true); app.start();
-        for (var q = 1; q < rr; q++) losRum(app, sag, q, 0);
-        var spor = Array.prototype.slice.call(d.querySelectorAll("#tegning .spor"));
-        var ider = spor.map(function (g) { return g.getAttribute("data-spor"); });
-        paastand("rum " + rr + " har " + spor.length + " ting at klikke på (højst 4), og kodelåsen er en af dem", spor.length <= 4 && ider.indexOf("laas") >= 0);
-        var tomme = ider.filter(function (id) {
-            if (id === "laas") return false;
-            app.aabnSpor(rr, id);
-            var t = d.getElementById("seddel").textContent;
-            app.luk();
-            return t.length < 30;
-        });
-        paastand("hver ting i rum " + rr + " åbner et kort med tekst", tomme.length === 0, tomme.join(", "));
-    }
-    function losRum(a, s, r, forkerte, note) {
-        if (note) { a.aabnSpor(r, note); a.laesNote(); a.luk(); }
-        a.aabnLaas(r);
-        var kode = Sag.kode(s.rum[r]);
-        for (var i = 0; i < forkerte; i++) {
-            a.skrivKode(kode.slice(0, -1) + ((Number(kode.slice(-1)) + 1) % 10));
-            a.laasOp();
-        }
-        a.skrivKode(kode);
-        var ok = a.laasOp();
-        a.videre();
-        return ok;
-    }
-
-    app.nySag(4550, true); app.start();
     T = app.tilstand(); sag = app.sag();
-    app.aabnLaas(1);
-    paastand("Lås op er grå, til alle felter er udfyldt", d.getElementById("laasop").disabled);
-    var forkert = Sag.kode(sag.rum[1]).split("").reverse().join("");
-    if (forkert === Sag.kode(sag.rum[1])) forkert = "99" + forkert.slice(2);
-    app.skrivKode(forkert);
-    paastand("Lås op er klar, når felterne er fulde", !d.getElementById("laasop").disabled);
-    app.laasOp();
-    paastand("en forkert kode tælles, og døren bliver lukket", T.forkerte[1] === 1 && T.naaet === 1 && /giver ikke efter/.test(d.getElementById("laasbesked").textContent));
-    /* rigtige taster: et ciffer flytter videre */
-    var c = d.querySelectorAll("#seddel .ciffer");
-    c[0].value = ""; c[0].focus();
-    c[0].value = "7"; c[0].dispatchEvent(new w.Event("input", { bubbles: true }));
-    paastand("et ciffer i et felt flytter til det næste", d.activeElement === c[1]);
-    app.skrivKode(Sag.kode(sag.rum[1]));
-    app.laasOp();
-    paastand("den rigtige kode åbner døren", T.naaet === 2 && !!d.querySelector("#tegning .doerblad.aaben") && /Gå ind i rum 2/.test(d.getElementById("seddel").textContent));
-    app.videre();
-    paastand("Gå ind i rum 2 viser rum 2", app.skaerm().rum === 2);
+    paastand("Start fører til rum 1, og uret går", app.skaerm().type === "rum" && app.skaerm().rum === 1 && T.start > 0);
 
-    /* noter */
-    app.aabnSpor(2, "tavle");
-    paastand("noten er skjult, til der trykkes på knappen", d.getElementById("note").hidden);
-    app.laesNote();
-    paastand("Læs Nillers note viser noten og noteres for rum 2", !d.getElementById("note").hidden && T.noter[2] === true);
-    app.luk();
-    losRum(app, sag, 2, 0);
-    app.aabnSpor(1, "lab"); app.laesNote(); app.luk();
-    paastand("en note i et rum, der allerede er åbnet, koster intet", !T.noter[1]);
+    /* Det rigtige svar til en del */
+    function rigtigt(del) {
+        if (del.type === "sorter") { var v = {}; del.emner.forEach(function (e) { v[e.id] = e.polaer; }); return v; }
+        if (del.type === "koef") return del.svar.map(String);
+        if (del.type === "tal") return String(del.svar).replace(".", ",");
+        return del.svar;
+    }
+    function forkert(del) {
+        if (del.type === "sorter") { var v = {}; del.emner.forEach(function (e) { v[e.id] = !e.polaer; }); return v; }
+        if (del.type === "koef") return del.svar.map(function () { return "9"; });
+        if (del.type === "tal") return String(del.svar * 3 + 7).replace(".", ",");
+        if (del.type === "ps") return del.svar === 1 ? 2 : 1;
+        return del.muligheder.filter(function (m) { return m.v !== del.svar; })[0].v;
+    }
+    /* Loeser trin i i rum r som en elev: handling, saa hver del. */
+    function loesTrin(r, i, medFejl) {
+        var tr = sag.rum[r].trin[i], log = { fejl: 0, beskeder: [] };
+        app.aabnTrin(r, i);
+        var k = Se.trin(r, tr.id, sag, T);
+        if (r === 1 && tr.id === "ion") D.LAB_REAGENSER.forEach(function (re) { app.dryp("x-" + re.id); });
+        if (k.handling) {
+            log.spmFoerHandling = !!d.querySelector("#seddel .del");
+            d.querySelector("#seddel [data-handl]").click();
+        }
+        k = Se.trin(r, tr.id, sag, T);
+        k.dele.forEach(function (del) {
+            if (medFejl) {
+                var u = app.indsend(forkert(del));
+                if (u && !u.ok) { log.fejl++; log.beskeder.push(d.getElementById("besked").textContent); }
+            }
+            app.indsend(rigtigt(del));
+        });
+        log.loest = !!T.trin[r + ":" + tr.id];
+        log.kort = d.getElementById("seddel").textContent;
+        return log;
+    }
+    function aktivSkilt() { var g = d.querySelector("#tegning .spor.aktiv"); return g ? g.getAttribute("data-spor") : null; }
 
-    /* draabepladen */
-    app.aabnSpor(3, "vaegt"); app.luk();
-    T.vist = 1; app.vis();
-    paastand("en nøgle i toplinjen viser et åbnet rum igen", app.skaerm().type === "rum" && app.skaerm().rum === 1 && app.skaerm().gensyn &&
-        /Tilbage til rum 3/.test(d.getElementById("fortaelling").textContent));
-    app.aabnSpor(1, "lab");
+    for (var rum = 1; rum <= 5; rum++) {
+        var R = sag.rum[rum];
+        paastand("rum " + rum + ": kortet øverst siger trin 1 af 3, og skiltet ved " + R.trin[0].chip + " er fremhævet",
+            /Trin 1 af 3/.test(d.getElementById("goer").textContent) && aktivSkilt() === R.trin[0].ting &&
+            d.querySelector(".chip.aktiv").getAttribute("data-ting") === R.trin[0].ting);
+        var spor = d.querySelectorAll("#tegning .spor");
+        paastand("rum " + rum + ": tingene til de tre trin, bonusskrinet og kodelåsen kan klikkes (" + spor.length + " ting)",
+            R.trin.every(function (t) { return !!d.querySelector('#tegning .spor[data-spor="' + t.ting + '"]'); }) &&
+            !!d.querySelector('#tegning .spor[data-spor="bonus"]') && !!d.querySelector('#tegning .spor[data-spor="laas"]') && spor.length <= 6);
+        app.aabnTrin(rum, 2);
+        paastand("rum " + rum + ": trin 3 før trin 1 siger, hvad der skal løses først, og har knappen Gå til trin 1",
+            /Løs først trin 1/.test(d.getElementById("seddel").textContent) && !!d.querySelector("#seddel [data-gaatrin]") && !d.getElementById("indsend"));
+        app.aabnLaas(rum);
+        paastand("rum " + rum + ": låsen har ingen cifre endnu, og Lås op er grå", d.getElementById("laasop").disabled &&
+            Array.prototype.every.call(d.querySelectorAll('[data-raekke="kode"] .ciffer'), function (c) { return c.value === ""; }));
+        var logs = [0, 1, 2].map(function (i) { return loesTrin(rum, i, true); });
+        paastand("rum " + rum + ": alle tre trin kan løses, og hver del afviser et forkert svar med en besked",
+            logs.every(function (l) { return l.loest && l.fejl >= 1 && l.beskeder.every(function (b) { return b.length > 15; }); }),
+            logs.map(function (l) { return l.loest + "/" + l.fejl; }).join(" "));
+        paastand("rum " + rum + ": forsøget kommer før spørgsmålet (ingen svarfelt før knappen)", logs.every(function (l) { return !l.spmFoerHandling; }));
+        paastand("rum " + rum + ": kortet øverst siger, at koden er fundet, og kodelåsens skilt er fremhævet",
+            /Koden er fundet/.test(d.getElementById("goer").textContent) && aktivSkilt() === "laas" &&
+            d.querySelector(".chip.kode").textContent.replace(/[^0-9]/g, "") === R.kode);
+        d.querySelector("#seddel [data-tillaas]").click();
+        var cif = Array.prototype.map.call(d.querySelectorAll('[data-raekke="kode"] .ciffer'), function (c) { return c.value; }).join("");
+        paastand("rum " + rum + ": Gå til kodelåsen åbner låsen med koden " + R.kode + " klar", cif === R.kode && !d.getElementById("laasop").disabled);
+        d.getElementById("laasop").click();
+        paastand("rum " + rum + ": Lås op åbner døren med en almindelig nøgle", T.naaet === rum + 1 && !T.guld[rum] && !!d.querySelector("#tegning .doerblad.aaben") &&
+            /Døren går op/.test(d.getElementById("laasbesked").textContent));
+        d.querySelector("#seddel [data-videre]").click();
+    }
+    paastand("efter rum 5 kommer slutningen med fem jernnøgler og vejen til guld", app.skaerm().type === "slut" && d.querySelectorAll(".noegleknap.jern").length === 5 &&
+        /bonuskoder/.test(d.querySelector(".guldvej").textContent) && T.tid > 0 && /^RUMLESKAFT-\d{8}-\d{2}$/.test(d.getElementById("bevis").textContent));
+
+    /* enkelte ting undervejs */
+    app.nySag(4550, true); app.start(); T = app.tilstand(); sag = app.sag();
+    app.aabnTrin(1, 0);
+    var u1 = app.indsend(sag.rum[1].x);
+    paastand("dråbepladen: svaret afvises gratis, til alle fire reagenser er dryppet i Prøve X", u1 && !u1.ok && u1.gratis && /Dryp først/.test(u1.besked));
     app.dryp("x-oh");
-    paastand("et dryp gemmes og vises i dråbepladen", T.lab["x-oh"] === true && /bundfald/.test(d.querySelector('#labgitter tr.x').textContent));
+    paastand("et dryp gemmes og vises i dråbepladen på kortet", T.lab["x-oh"] === true && /bundfald/.test(d.querySelector("#labgitter tr.x").textContent));
+    paastand("hintet er skjult, til der trykkes på Giv et hint", d.getElementById("hint").hidden && d.getElementById("hintknap").textContent === "Giv et hint");
+    d.getElementById("hintknap").click();
+    paastand("Giv et hint viser hintet, og knappen bliver til Vis svaret", !d.getElementById("hint").hidden && d.getElementById("hintknap").textContent === "Vis svaret");
+    d.getElementById("hintknap").click();
+    paastand("Vis svaret løser delen og viser svaret", T.trin["1:ion"] === true && d.querySelector("#seddel .regnestykke").textContent.indexOf(D.LAB_IONER[sag.rum[1].x].formel) >= 0);
+    paastand("det løste trin har knappen Videre og intet svarfelt", !!d.querySelector("#seddel [data-luk].hoved") && !d.getElementById("indsend"));
+    app.aabnTrin(1, 1); app.indsend(sag.rum[1].Z);
+    app.aabnTrin(1, 2);
+    var k3 = sag.rum[1].reaktion.k;
+    var u2 = app.indsend(k3.map(function (x) { return String(x * 2); }));
+    paastand("afstemning med de dobbelte koefficienter: forholdet er rigtigt, brug de mindste hele tal", u2 && !u2.ok && /mindste hele tal/.test(u2.besked));
+    var u3 = app.indsend(k3.map(function () { return "1"; }));
+    paastand("en forkert afstemning viser en tabel med atomerne på hver side", k3.join() === k3.map(function () { return 1; }).join() || (u3 && /atomtabel/.test(u3.besked)));
     app.luk();
-    d.querySelector("[data-front]").click();
-    paastand("Tilbage til rum 3 viser rum 3", app.skaerm().rum === 3);
-    losRum(app, sag, 3, 3);
-    losRum(app, sag, 4, 0);
-    losRum(app, sag, 5, 0);
-    paastand("efter rum 5 med en note og tre forkerte koder kommer den almindelige slutning", app.skaerm().type === "slut" && T.guld === false && T.tid > 0);
-    var nk = d.querySelectorAll(".noegleknap");
-    paastand("nøgleringen har fem nøgler: rum 2 og 3 af jern, resten af guld", nk.length === 5 &&
-        nk[1].classList.contains("jern") && nk[2].classList.contains("jern") && nk[0].classList.contains("guld") && nk[3].classList.contains("guld"));
-    paastand("rum 1 med én forkert kode giver stadig en gylden nøgle", nk[0].classList.contains("guld"));
-    nk[1].click();
-    paastand("et klik på jernnøglen fra rum 2 siger: noten", /læste Nillers note/.test(d.getElementById("noegleforklaring").textContent));
-    nk[2].click();
-    paastand("et klik på jernnøglen fra rum 3 siger: tre forkerte koder", /3 forkerte koder/.test(d.getElementById("noegleforklaring").textContent));
-    paastand("slutningen har det svage hint om den gyldne dør", /Fem gyldne nøgler/.test(d.getElementById("midte").textContent));
-    paastand("beviset begynder med RUMLESKAFT", /^RUMLESKAFT-\d{8}-\d{2}$/.test(d.getElementById("bevis").textContent));
-    paastand("toplinjen har ingen gylden dør", !d.querySelector('.rumknap.guld'));
-
-    /* genindlaesning */
-    var nrFoer = T.sag;
-    w = await aabn();
-    NK = w.NK; app = NK.app; d = w.document;
-    paastand("sagen huskes efter genindlæsning", app.tilstand().sag === nrFoer && app.skaerm().type === "slut");
+    for (var q2 = 0; q2 < 3; q2++) loesTrin(1, q2);
+    app.aabnLaas(1); app.laasOp(); app.videre();
+    app.aabnTing(2, "bland");
+    app.bland(0); app.bland(1);
+    paastand("væskerne: to valgte stoffer blandes og kommer på listen", Object.keys(T.bland).length === 1 && /lag|opløses/.test(d.querySelector(".blandtekst").textContent) && d.querySelectorAll(".blandet span").length === 1);
+    var u4 = app.indsend({});
+    paastand("sorteringen afvises gratis, til alle seks stoffer er valgt", u4 && !u4.ok && u4.gratis);
+    app.luk();
+    for (q2 = 0; q2 < 3; q2++) loesTrin(2, q2);
+    app.aabnLaas(2); app.laasOp(); app.videre();
+    app.aabnTing(3, "info");
+    paastand("tavlen i rum 3 er et opslag uden svarfelt", /g\/mol/.test(d.getElementById("seddel").textContent) && !d.getElementById("indsend"));
+    loesTrin(3, 0); loesTrin(3, 1);
+    app.aabnTrin(3, 2);
+    app.indsend(String(sag.rum[3].T).replace(".", ","));
+    var r3 = sag.rum[3], ucelsius = app.indsend(NK.komma(r3.nH2 * D.R * r3.t / r3.p, 3));
+    paastand("rumfang regnet med °C får beskeden om kelvin", ucelsius && !ucelsius.ok && /kelvin/.test(ucelsius.besked));
+    paastand("de løste dele bliver stående som pæne beregninger med enheder", /T = .* K/.test(d.querySelector("#seddel .regnestykke").textContent));
+    var uV = app.indsend(NK.komma(r3.V + 0.01, 2));
+    paastand("rumfanget godtages med en hundrededel til forskel", uV && uV.ok);
 
     /* ------------------------------------------------------------- */
-    overskrift("4. Den rene sag, den gyldne dør og seglene");
-    app.nySag(6060, true); app.start();
-    T = app.tilstand(); sag = app.sag();
-    paastand("Ny sag giver en ny sag med nye tal", T.sag === 6060 && T.naaet === 1 && Sag.kode(sag.rum[3]) !== Sag.kode(Sag.lav(nrFoer).rum[3]));
-    losRum(app, sag, 1, 2);
-    for (var g = 2; g <= 5; g++) losRum(app, sag, g, 0);
-    paastand("fem rene rum (to forkerte koder er tilladt) fører til den gyldne dør", app.skaerm().type === "guld" && T.guld === true);
-    paastand("toplinjen viser nu en sjette, gylden knap", !!d.querySelector('.rumknap.guld'));
-    var segl = d.querySelectorAll('#tegning .spor[data-spor^="segl-"]');
-    paastand("døren har fire segl at klikke på", segl.length === 4);
+    overskrift("4. Bonusruten og guldnøglerne");
+    app.nySag(6060, true); app.start(); T = app.tilstand(); sag = app.sag();
+    app.aabnTing(1, "bonus");
+    paastand("bonusskrinet åbner et kort, der er mærket Bonusrute og forklarer guldkoden", /Bonusrute/.test(d.getElementById("seddel").textContent) &&
+        /guldkoden/.test(d.getElementById("seddel").textContent) && d.getElementById("seddel").classList.contains("guldkort") && !d.getElementById("hintknap"));
+    d.querySelector("#seddel [data-tillaas]").click();
+    app.skrivKode("99999999", "guld");
+    app.laasOp();
+    paastand("en forkert guldkode åbner ikke døren", T.naaet === 1 && /Guldkoden passer ikke/.test(d.getElementById("laasbesked").textContent));
+    app.skrivKode(sag.rum[1].bonus.kode, "guld");
+    app.laasOp();
+    paastand("guldkoden åbner døren uden de tre trin og giver en guldnøgle", T.naaet === 2 && T.guld[1] === true && app.trinNr(1) === 0 &&
+        /nøglen er af guld/.test(d.getElementById("laasbesked").textContent));
+    app.videre();
+    paastand("toplinjen viser guldnøglen fra rum 1", !!d.querySelector('.rumknap.guldnoegle[data-rum="1"]'));
+    for (var g = 2; g <= 5; g++) { for (q2 = 0; q2 < 3; q2++) loesTrin(g, q2); app.aabnLaas(g); app.laasOp(); app.videre(); }
+    paastand("én guldnøgle og fire jernnøgler giver slutningen uden knap til den gyldne dør", app.skaerm().type === "slut" && d.querySelectorAll(".noegleknap.guld").length === 1 && !d.querySelector("[data-tilguld]"));
+    d.querySelector('.noegleknap.jern[data-noegle="3"]').click();
+    paastand("et klik på jernnøglen fra rum 3 går tilbage til rum 3", app.skaerm().type === "rum" && app.skaerm().rum === 3 && app.skaerm().gensyn &&
+        /Guldkoden fra bonusruten kan stadig tastes/.test(d.getElementById("goer").textContent));
+    app.aabnLaas(3);
+    app.skrivKode(sag.rum[3].bonus.kode, "guld");
+    app.laasOp();
+    paastand("guldkoden kan tastes, efter døren er åbnet, og gør nøglen til guld", T.guld[3] === true && /Nøglen er nu af guld/.test(d.getElementById("laasbesked").textContent));
+    [2, 4, 5].forEach(function (r) { T.vist = r; app.vis(); app.aabnLaas(r); app.skrivKode(sag.rum[r].bonus.kode, "guld"); app.laasOp(); });
+    app.videre();
+    paastand("fem guldnøgler: slutningen har knappen Gå til den gyldne dør", app.skaerm().type === "slut" && app.alleGuld() && !!d.querySelector("[data-tilguld]"));
+    d.querySelector("[data-tilguld]").click();
+    paastand("knappen fører til den gyldne dør med fire segl", app.skaerm().type === "guld" && d.querySelectorAll('#tegning .spor[data-spor^="segl-"]').length === 4);
     app.aabnSegl("million");
-    paastand("seglet spørger efter titlen og linker til spillet", /Kemi-Millionær/.test(d.getElementById("seddel").textContent) &&
-        d.querySelector('#seddel a[href="../sc_spil2_million/index.html"]'));
     paastand("en forkert titel holder seglet", app.brydSegl("million", "millionær") === "forkert" && !T.segl.million);
-    paastand("den rigtige titel uden en sejr i browseren holder også", app.brydSegl("million", "Superkemiker") === "ikkeVundet" && !T.segl.million &&
-        /ikke vundet i denne browser/.test(d.getElementById("seglbesked").textContent));
+    paastand("den rigtige titel uden en sejr i browseren holder også", app.brydSegl("million", "Superkemiker") === "ikkeVundet" && !T.segl.million);
     w.localStorage.setItem("nk-million-rekord", "1000000");
-    w.localStorage.setItem("nk-syregalgen", JSON.stringify({ rekord: { kemi: 5 }, omraader: {} }));
-    w.localStorage.setItem("nk-pacman-klaret", JSON.stringify({ mix: { svaer: true } }));
-    w.localStorage.setItem("nk-organiske-c-rekord", "14000");
-    paastand("med sejren i browseren brydes seglet (store bogstaver og mellemrum er lige meget)", app.brydSegl("million", "  SuperKemiker ") === "brudt" && T.segl.million === true);
-    paastand("det brudte segl tegnes brudt", d.querySelector('#tegning .spor[data-spor="segl-million"]').classList.contains("set"));
-    w.localStorage.setItem("nk-syregalgen", JSON.stringify({ rekord: { kemi: 4 } }));
-    paastand("Syregalgen med fire i træk er ikke nok", app.brydSegl("syregalgen", "syreimmun") === "ikkeVundet");
     w.localStorage.setItem("nk-syregalgen", JSON.stringify({ rekord: { kemi: 4, historie: 6 } }));
-    paastand("fem i træk på en af listerne er nok", app.brydSegl("syregalgen", "syreimmun") === "brudt");
-    w.localStorage.setItem("nk-pacman-klaret", JSON.stringify({ mix: { mellem: true } }));
-    paastand("Pacman Quiz på mellem er ikke nok", app.brydSegl("pacman", "labyrintmester") === "ikkeVundet");
     w.localStorage.setItem("nk-pacman-klaret", JSON.stringify({ mix: { svaer: true } }));
-    paastand("Pacman Quiz på svær i Mix er nok", app.brydSegl("pacman", "labyrintmester") === "brudt");
-    w.localStorage.setItem("nk-organiske-c-rekord", "13990");
-    paastand("13.990 point i Organiske grupper er ikke nok", app.brydSegl("organisk", "stofgruppemester") === "ikkeVundet");
-    paastand("knappen til den gyldne dør kommer først, når alle segl er brudt", !d.getElementById("guldknap"));
     w.localStorage.setItem("orgSortering_bestAllTime", "15000");
-    paastand("14.000 i Kemi B-udgaven tæller også", app.brydSegl("organisk", "stofgruppemester") === "brudt");
-    paastand("alle fire segl brudt giver knappen Åbn den gyldne dør", app.alleSegl() && !!d.getElementById("guldknap"));
+    paastand("med sejren i browseren brydes seglet", app.brydSegl("million", "  SuperKemiker ") === "brudt" && T.segl.million === true);
+    paastand("de tre andre segl brydes med deres titler", app.brydSegl("syregalgen", "syreimmun") === "brudt" && app.brydSegl("pacman", "labyrintmester") === "brudt" &&
+        app.brydSegl("organisk", "stofgruppemester") === "brudt" && app.alleSegl() && !!d.getElementById("guldknap"));
     d.getElementById("guldknap").click();
-    paastand("den gyldne dør fører til finalen", app.skaerm().type === "finale" && /Nillers hemmelige laboratorium/.test(d.getElementById("midte").textContent));
-    paastand("guldbeviset begynder med GULDSKAFT", /^GULDSKAFT-\d{8}-\d{2}$/.test(d.getElementById("bevis").textContent));
-
-    /* note i rum 4 giver jern */
-    app.nySag(7070, true); app.start(); sag = app.sag(); T = app.tilstand();
-    for (var g2 = 1; g2 <= 5; g2++) losRum(app, sag, g2, 0, g2 === 4 ? "tavle" : null);
-    paastand("én note i rum 4 giver den almindelige slutning", app.skaerm().type === "slut" && !app.ren(4) && app.ren(3));
+    paastand("den gyldne dør fører til finalen med guldbeviset", app.skaerm().type === "finale" && /Nillers pokalskab/.test(d.getElementById("midte").textContent) &&
+        /^GULDSKAFT-\d{8}-\d{2}$/.test(d.getElementById("bevis").textContent));
+    var nrFoer = T.sag;
+    w = await aabn();
+    NK = w.NK; D = NK.D; Sag = NK.Sag; Se = NK.Sedler; app = NK.app; d = w.document;
+    paastand("sagen huskes efter genindlæsning", app.tilstand().sag === nrFoer && app.skaerm().type === "finale");
 
     /* ------------------------------------------------------------- */
     overskrift("5. Beviset");
-    var b = app.bevis("RUMLESKAFT", new w.Date(2026, 10, 12, 15, 45));
-    paastand("12. nov. kl. 15.45 giver RUMLESKAFT-12111545-04 (vægtene 4 3 2 7 6 5 4 3, mod 11)", b === "RUMLESKAFT-12111545-04", b);
-    var b2 = app.bevis("X", new w.Date(2026, 0, 3, 9, 7));
-    var p = b2.split("-")[1], vs = [4, 3, 2, 7, 6, 5, 4, 3], sm = 0;
-    for (var i = 0; i < 8; i++) sm += Number(p[i]) * vs[i];
-    paastand("kontrolcifrene er summen mod 11", b2.split("-")[2] === String(sm % 11).padStart(2, "0"));
+    var bv = app.bevis("RUMLESKAFT", new w.Date(2026, 10, 12, 15, 45));
+    paastand("12. nov. kl. 15.45 giver RUMLESKAFT-12111545-04 (vægtene 4 3 2 7 6 5 4 3, mod 11)", bv === "RUMLESKAFT-12111545-04", bv);
 
     /* ------------------------------------------------------------- */
     overskrift("6. Sproget");
-    var tekster = [D.START.tekst, D.START.under].concat(D.START.regler, D.HJAELP, [D.SLUT.tekst, D.SLUT.svagt, D.FINALE.tekst, D.LAAS.forkert, D.LAAS.rigtig]);
-    Object.keys(D.RUM).forEach(function (k) { tekster.push(D.RUM[k].tekst); });
+    var tekster = [D.START.tekst, D.START.under].concat(D.START.regler, D.HJAELP, [D.SLUT.tekst, D.SLUT.guldvej, D.FINALE.tekst, D.BONUS.om, D.RUM[6].tekst]);
+    [1, 2, 3, 4, 5].forEach(function (k) { tekster.push(D.RUM[k].niller); });
     D.SEGL.forEach(function (sg) { tekster.push(sg.spm); });
+    var hints = [], Tt = app.tilstand();
     for (var n2 = 1000; n2 < 1060; n2++) {
         var sg2 = Sag.lav(n2);
-        for (var r2 = 1; r2 <= 5; r2++) {
-            sg2.rum[r2].felter.forEach(function (f) { tekster.push(f.navn); });
-            ["lab", "tavle", "ps", "flaske", "notesbog", "vaegt", "vejr", "burette", "kolbe"].forEach(function (id) {
-                var k = NK.Sedler.spor(r2, id, sg2, app.tilstand());
-                if (k) { tekster.push(k.html.replace(/<[^>]+>/g, " ")); if (k.note) tekster.push(k.note); }
+        for (var rr = 1; rr <= 5; rr++) {
+            sg2.rum[rr].trin.forEach(function (tr) {
+                tekster.push(tr.goer);
+                var k = Se.trin(rr, tr.id, sg2, Tt);
+                tekster.push((k.intro || "").replace(/<[^>]+>/g, " "));
+                k.dele.forEach(function (del) {
+                    tekster.push(String(del.spm).replace(/<[^>]+>/g, " "), del.hint, String(del.vis).replace(/<[^>]+>/g, " "));
+                    hints.push(del.hint);
+                    (del.fejl || []).forEach(function (f) { tekster.push(f[1]); });
+                });
             });
+            tekster.push(Se.bonus(rr, sg2).html.replace(/<[^>]+>/g, " "));
+            sg2.rum[rr].bonus.felter.forEach(function (f) { tekster.push(f.navn); });
         }
     }
     var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger", streg.length === 0, streg[0]);
     var en = tekster.filter(function (t) { return /[¹][⁺⁻]|1\+|1−/.test(t); });
     paastand("ladning ±1 skrives + og −, aldrig 1+ eller 1−", en.length === 0, en[0]);
-    var ilt = tekster.filter(function (t) { return /\b(ilt|brint|kvælstof|natronlud)\b/i.test(t); });
-    paastand("ingen ilt, brint, kvælstof eller natronlud om stofferne (brintoverilte er et navn)", ilt.length === 0, ilt[0]);
-    var lange = [D.START.tekst].concat(Object.keys(D.RUM).map(function (k) { return D.RUM[k].tekst; })).filter(function (t) { return t.length > 190; });
-    paastand("teksterne øverst er højst 190 tegn", lange.length === 0, lange[0]);
+    var ilt = tekster.filter(function (t) { return /\b(ilt|brint|brintoverilte|kvælstof|natronlud)\b/i.test(t); });
+    paastand("ingen ilt, brint, brintoverilte, kvælstof eller natronlud", ilt.length === 0, ilt[0]);
+    paastand("hvert hint er en hel sætning på højst 170 tegn", hints.every(function (t) { return t && t.length <= 170 && /[.]$/.test(t); }),
+        hints.filter(function (t) { return !t || t.length > 170 || !/[.]$/.test(t); })[0]);
+    paastand("Nillers replikker er højst 130 tegn", [1, 2, 3, 4, 5].every(function (k) { return D.RUM[k].niller.length <= 130; }));
 
     /* ------------------------------------------------------------- */
     overskrift("7. Skærmen");
     async function maal(b2, h2) {
         w = await aabn(b2, h2);
-        NK = w.NK; app = NK.app; d = w.document;
-        app.nySag(4550, true); app.start(); sag = app.sag();
+        NK = w.NK; D = NK.D; Se = NK.Sedler; app = NK.app; d = w.document;
+        app.nySag(4550, true); app.start(); sag = app.sag(); T = app.tilstand();
         var svg = d.querySelector("#tegning svg").getBoundingClientRect();
-        var skala = Math.min(svg.width / 1600, svg.height / 900);
-        var tag = Math.round(23 * skala * 10) / 10;
-        paastand(b2 + " x " + h2 + ": de gule skilte er mindst 12 px (" + tag + " px)", tag >= 12);
+        var skala = Math.min(svg.width / 1600, svg.height / 780);
+        paastand(b2 + " x " + h2 + ": de gule skilte er mindst 13 px (" + NK.komma(23 * skala, 1) + " px)", 23 * skala >= 13);
         var fo = d.getElementById("fortaelling").getBoundingClientRect();
-        paastand(b2 + " x " + h2 + ": teksten om rummet står i midten", Math.abs((fo.left + fo.right) / 2 - b2 / 2) < 4);
+        paastand(b2 + " x " + h2 + ": opgavekortet står i midten og er højst 150 px højt (" + Math.round(fo.height) + " px)", Math.abs((fo.left + fo.right) / 2 - b2 / 2) < 4 && fo.height <= 150);
         var ud = [], smaa = [];
-        function smaaTekst() {
-            Array.prototype.slice.call(d.querySelectorAll(".seddel *, .fortaelling *, .mappe *")).forEach(function (e) {
+        function tjek(navn) {
+            var sd = d.getElementById("seddel"), st = d.querySelector(".studie").getBoundingClientRect(), rc = sd.getBoundingClientRect();
+            if (rc.bottom > st.bottom + 1 || rc.right > st.right + 1 || sd.scrollWidth > sd.clientWidth + 1) ud.push(navn);
+            Array.prototype.forEach.call(d.querySelectorAll(".seddel *, .fortaelling *"), function (e) {
                 var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
-                if (egen && e.offsetParent !== null && parseFloat(w.getComputedStyle(e).fontSize) < 12) smaa.push(e.tagName + "." + e.className);
+                if (egen && e.offsetParent !== null && parseFloat(w.getComputedStyle(e).fontSize) < 12) smaa.push(navn + ": " + e.tagName + "." + e.className);
             });
         }
-        function tjekKort(navn) {
-            var sd = d.getElementById("seddel"), sc = d.getElementById("scene").getBoundingClientRect(), r3 = sd.getBoundingClientRect();
-            if (r3.bottom > sc.bottom + 1 || r3.right > sc.right + 1 || sd.scrollWidth > sd.clientWidth + 1) ud.push(navn);
-            smaaTekst();
-            app.luk();
+        for (var r = 1; r <= 5; r++) {
+            for (var i = 0; i < 3; i++) {
+                app.aabnTrin(r, i);
+                var k = Se.trin(r, sag.rum[r].trin[i].id, sag, T);
+                if (r === 1 && i === 0) D.LAB_REAGENSER.forEach(function (re) { app.dryp("x-" + re.id); });
+                if (r === 2 && i === 0) { app.bland(0); app.bland(1); app.bland(2); app.bland(3); }
+                if (k.handling) app.handling();
+                k = Se.trin(r, sag.rum[r].trin[i].id, sag, T);
+                k.dele.forEach(function (del, j) {
+                    app.hint();
+                    tjek("rum " + r + " trin " + (i + 1) + " del " + (j + 1));
+                    app.indsend(rigtigt(del));
+                });
+                tjek("rum " + r + " trin " + (i + 1) + " løst");
+            }
+            app.aabnBonus(r); tjek("rum " + r + " bonus");
+            app.aabnLaas(r); tjek("rum " + r + " lås");
+            app.laasOp(); app.videre();
         }
-        smaaTekst();
-        ["lab", "tavle", "ps"].forEach(function (id) { app.aabnSpor(1, id); if (id === "lab") ["x-cl", "x-oh"].forEach(app.dryp); tjekKort("1 " + id); });
-        app.aabnLaas(1); tjekKort("1 laas");
-        losRum(app, sag, 1, 0);
-        ["tavle", "notesbog", "flaske"].forEach(function (id) { app.aabnSpor(2, id); app.laesNote(); tjekKort("2 " + id); });
-        app.aabnLaas(2); tjekKort("2 laas");
-        paastand(b2 + " x " + h2 + ": kortene er inde i scenen uden vandret rullebjælke", ud.length === 0, ud.join(", "));
+        paastand(b2 + " x " + h2 + ": alle kort er inde i billedet uden vandret rullebjælke", ud.length === 0, ud.slice(0, 4).join(", "));
         paastand(b2 + " x " + h2 + ": ingen tekst på kortene under 12 px", smaa.length === 0, smaa.slice(0, 3).join(", "));
     }
     await maal(1366, 768);

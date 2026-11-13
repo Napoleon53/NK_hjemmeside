@@ -95,8 +95,15 @@
         return { b: maxX - minX, h: maxY - minY, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
     };
 
-    /* Et molekyle med midten i (x, y), drejet vink radianer */
-    T.molekyle = function (ctx, type, x, y, r, vink, alfa) {
+    /* Et molekyle med midten i (x, y), drejet vink radianer. fokus: et
+       grundstof (C, H eller O); de andre atomer tones ned, saa det ses, at
+       trinnet kun handler om det ene slags atom */
+    function tone(s, alfa, fokus) {
+        var a = alfa === undefined ? 1 : alfa;
+        return fokus && s !== fokus ? a * 0.2 : a;
+    }
+
+    T.molekyle = function (ctx, type, x, y, r, vink, alfa, fokus) {
         var form = FORM[type], k = T.kasse(type);
         var c = Math.cos(vink || 0), s = Math.sin(vink || 0);
         var atomer = form.map(function (a) {
@@ -104,15 +111,16 @@
             return { s: a[0], x: x + dx * c - dy * s, y: y + dx * s + dy * c };
         });
         /* H bagest; i sod tegnes de bageste kugler foerst */
-        atomer.forEach(function (a) { if (a.s === "H") T.atom(ctx, "H", a.x, a.y, r, alfa); });
-        atomer.forEach(function (a) { if (a.s !== "H") T.atom(ctx, a.s, a.x, a.y, r, alfa); });
+        atomer.forEach(function (a) { if (a.s === "H") T.atom(ctx, "H", a.x, a.y, r, tone("H", alfa, fokus)); });
+        atomer.forEach(function (a) { if (a.s !== "H") T.atom(ctx, a.s, a.x, a.y, r, tone(a.s, alfa, fokus)); });
     };
 
     /* Et halvt dioxygenmolekyle: ét O-atom og en stiplet ring, hvor det andet
        skulle have siddet (der findes ikke halve molekyler) */
-    T.halvO2 = function (ctx, x, y, r, alfa) {
+    T.halvO2 = function (ctx, x, y, r, alfa, fokus) {
+        alfa = tone("O", alfa, fokus);
         ctx.save();
-        if (alfa !== undefined) ctx.globalAlpha *= alfa;
+        ctx.globalAlpha *= alfa;
         ctx.setLineDash([3, 3]);
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = "#c0561b";

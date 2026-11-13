@@ -54,7 +54,7 @@
             { id: "formelenhed", ord: ["formelenhed"], x: FE.x + FE.b / 2 - 40, y: 492, maal: [FE.x + FE.b / 2, FE.y + FE.h], dele: ["fe"],
               omr: [{ r: [FE.x, FE.y, FE.b, FE.h, 10] }],
               fejl: { ionbinding: "<b>ionbinding</b> er tiltrækningen mellem ionerne. Rammen viser den mindste portion: én Na⁺ og én Cl⁻.",
-                      "sammensat ion": "<b>sammensat ion</b> er en gruppe atomer med én fælles ladning, for eksempel NO₃⁻. I rammen sidder to ioner med hver sin ladning." } },
+                      "sammensat ion": "<b>sammensat ion</b> er en gruppe atomer med én fælles ladning, fx NO₃⁻. I rammen sidder to ioner med hver sin ladning." } },
             { id: "ionbinding", ord: ["ionbinding"], x: ZOOM.x + ZOOM.b / 2, y: 452, maal: [(PIL.x1 + PIL.x2) / 2, PIL.y + 20], dele: ["binding"],
               omr: [{ r: [PIL.x1 - 6, PIL.y - 20, PIL.x2 - PIL.x1 + 12, 40, 8] }],
               fejl: { formelenhed: "<b>formelenhed</b> er en portion af saltet. Pladsen peger på pilene mellem de to ioner.",

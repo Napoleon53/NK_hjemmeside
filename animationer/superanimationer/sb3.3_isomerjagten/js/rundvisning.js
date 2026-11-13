@@ -16,7 +16,7 @@
     var TURE = {
         "fane-j": [
             { sel: "#j-skort", titel: "Kortet øverst", tekst: "Den gule ramme viser den molekylformel, du jagter, og hvor mange atomer af hver slags den har. Teksten siger, hvor mange isomerer der er. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#j-vt", titel: "C og O", tekst: "Med C valgt tegner et træk fra et atom en kæde. Den står svagt med antallet af carbonatomer og kommer på tavlen, når du slipper musen. Med O valgt sætter et træk et oxygenatom på, og et klik gør et carbonatom til O, for eksempel midt i kæden i en ether." },
+            { sel: "#j-vt", titel: "C og O", tekst: "Med C valgt tegner et træk fra et atom en kæde. Den står svagt med antallet af carbonatomer og kommer på tavlen, når du slipper musen. Med O valgt sætter et træk et oxygenatom på, og et klik gør et carbonatom til O, fx midt i kæden i en ether." },
             { sel: "#j-stil", titel: "Visningen", tekst: "Zigzag tegner molekylerne som i bogen. Alle atomer viser også carbon- og hydrogenatomerne." },
             { sel: "#j-anker-tavle", titel: "Tavlen", tekst: "Tegn én isomer ad gangen her. Et højreklik på et atom for enden af kæden sletter det." },
             { sel: "#j-indsend", titel: "Indsend svar", tekst: "Knappen viser tegningens molekylformel. Tryk på den, når tegningen er færdig. Er stoffet nyt, kommer det på hylden, og tegningen bliver stående, så du kan ændre den til den næste isomer." },

@@ -188,7 +188,7 @@
 
     T.ion = function (raa, ion, st, retning) {
         var s = rens(raa);
-        if (!s) return { tom: true, besked: "Skriv ionen med symbol og ladning, for eksempel Na+ eller O2-." };
+        if (!s) return { tom: true, besked: "Skriv ionen med symbol og ladning, fx Na+ eller O2-." };
         var f = ion.formel, m = Math.abs(ion.q), fg = ion.q > 0 ? "+" : "-";
         var rigtig = f + (m > 1 ? m : "") + fg;
         if (s === rigtig) return { ok: true };
@@ -198,9 +198,9 @@
         if (s.toLowerCase() === rigtig.toLowerCase()) {
             return { besked: "Store og små bogstaver betyder noget. Det skrives " + NK.formel(f) + "." };
         }
-        if (/(\+\+|--)$/.test(s)) return { besked: "Skriv ladningen med tal og fortegn, for eksempel O2- for O²⁻." };
+        if (/(\+\+|--)$/.test(s)) return { besked: "Skriv ladningen med tal og fortegn, fx O2- for O²⁻." };
         if (/^[a-zæøå()]{4,}$/i.test(s)) {
-            return { besked: "Skriv ionens formel med ladning, ikke navnet, for eksempel Na+ eller O2-." };
+            return { besked: "Skriv ionens formel med ladning, ikke navnet, fx Na+ eller O2-." };
         }
 
         var sl = s.toLowerCase(), fl = f.toLowerCase();
@@ -212,7 +212,7 @@
             var tal, tegn, omvendt = false;
             if (mt) { tal = mt[1] === "" ? 1 : parseInt(mt[1], 10); tegn = mt[2]; }
             else if (mo) { tal = parseInt(mo[2], 10); tegn = mo[1]; omvendt = true; }
-            else return { besked: "Skriv ionen som symbol og ladning, for eksempel Mg2+ eller O2-." };
+            else return { besked: "Skriv ionen som symbol og ladning, fx Mg2+ eller O2-." };
             if (tal === m && tegn === fg) {
                 if (omvendt) return { besked: "Tallet står før fortegnet: " + ion.tekst + "." };
                 return { besked: "Store og små bogstaver betyder noget. Det skrives " + NK.formel(f) + "." };
@@ -255,12 +255,12 @@
                 return { besked: stort(ion.grundnavn) + " kan danne ioner med forskellig ladning. Ladningen skal stå i navnet: " + ion.stamme + "(?)ion." };
             }
             if (s.indexOf(stamme + "(") === 0) {
-                if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, for eksempel " + ion.stamme + "(II)ion, eller som 2+." };
+                if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, fx " + ion.stamme + "(II)ion, eller som 2+." };
                 return { besked: "Tjek tallet i parentesen. Det er ionens ladning, skrevet med romertal." };
             }
         } else if (s.indexOf(stamme + "(") === 0) {
             if (ion.enkelt) {
-                if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, for eksempel " + ion.navn + ", eller som " + ion.q + "+." };
+                if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, fx " + ion.navn + ", eller som " + ion.q + "+." };
                 return { besked: "Tjek tallet i parentesen. Det er ionens ladning, skrevet med romertal." };
             }
             return { besked: stort(ion.grundnavn) + " danner kun én ion, så der skal ikke tal i navnet." };
@@ -331,7 +331,7 @@
 
     T.formel = function (raa, st) {
         var s = rens(raa);
-        if (!s) return { tom: true, besked: "Skriv formlen, for eksempel Na2O." };
+        if (!s) return { tom: true, besked: "Skriv formlen, fx Na2O." };
         if (s === st.formel) return { ok: true };
         if (PAASKE_FORMEL[s]) return { besked: PAASKE_FORMEL[s] };
         if (/[+-]/.test(s)) return { besked: "Skriv formlen uden ladninger. De går ud med hinanden." };
@@ -400,7 +400,7 @@
             if (s.indexOf(stamme + "(") === 0) {
                 var slut = s.indexOf(")");
                 if (slut > 0 && s.slice(slut + 1) === anDel) {
-                    if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, for eksempel " + k.stamme + "(II), eller som 2+." };
+                    if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, fx " + k.stamme + "(II), eller som 2+." };
                     return { besked: "Tjek ladningen i parentesen. " + st.formelTekst + " er neutral." };
                 }
             }

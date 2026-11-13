@@ -506,12 +506,12 @@ function tests() {
     var er = "";
     try {
         var x = new XMLHttpRequest();
-        x.open("GET", "../../kemi-c-filer/c_spil8_escaperoom.html", false);
+        x.open("GET", "../sc_spil8_escaperoom/js/data.js", false);
         x.send();
         er = x.status === 200 ? x.responseText : "";
     } catch (e) { er = ""; }
     paastand("escaperoommet er fundet", er.length > 1000);
-    paastand("seglet kræver stofgruppemester ved 14.000 point", /answer:\s*'stofgruppemester'/.test(er) && /14\.000 point/.test(er) && D.MESTER === 14000);
+    paastand("seglet kræver stofgruppemester ved 14.000 point", /svar:\s*"stofgruppemester"/.test(er) && /14\.000 point/.test(er) && D.MESTER === 14000);
 
     /* ----------------------------------------------------------------- */
     overskrift("8. Sproget");

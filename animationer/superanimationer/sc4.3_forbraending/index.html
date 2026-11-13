@@ -2,6 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<script src="../../til_panelet.js" data-panel="samling_alt.html" data-emne="c4.forbraending"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forbrænding</title>
 <link rel="stylesheet" href="css/stil.css">
@@ -73,11 +74,41 @@
         </div>
         <div class="anker" id="a-anker-tavle"></div>
         <div class="anker" id="a-anker-regn"></div>
+
+        <!-- Oevet: hele skemaet med et felt foran hvert stof (js/sim_afstem.js) -->
+        <div class="oevet" id="a-oevet" hidden>
+            <p class="oe-titel" id="a-oe-titel"></p>
+            <div class="oe-skema" id="a-oe-skema"></div>
+            <p class="oe-note">Tallet 1 skrives ikke. Et tomt felt tæller som 1.</p>
+        </div>
+
+        <!-- Fejringen, naar alle skemaer er afstemt -->
+        <div class="sejr" id="a-sejr" hidden>
+            <div class="sejr-boks" role="dialog" aria-labelledby="a-sejr-titel">
+                <div class="sejr-medalje" id="a-medalje"></div>
+                <h2 class="sejr-titel" id="a-sejr-titel">Alle forbrændinger er afstemt!</h2>
+                <ul class="sejr-skemaer" id="a-sejr-skemaer"></ul>
+                <p class="sejr-medaljetekst" id="a-sejr-medalje"></p>
+                <p class="sejr-maal" id="a-sejr-maal"></p>
+                <div class="sejr-knapper">
+                    <button class="knap blaa" id="a-sejr-igen" type="button">Gå efter guld →</button>
+                    <button class="knap" id="a-sejr-luk" type="button">Luk</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
+        <div class="kort" id="a-niveaukort">
+            <h2>Niveau</h2>
+            <div class="niveau">
+                <button class="niveauknap" id="a-niveau-uoevet" type="button" aria-pressed="true"><b>Uøvet</b><span>Trin for trin med kugler</span></button>
+                <button class="niveauknap" id="a-niveau-oevet" type="button" aria-pressed="false"><b>Øvet</b><span>Skriv alle tal selv</span></button>
+            </div>
+        </div>
+
         <div class="kort" id="a-opgaver">
-            <h2>Forbrændingerne <span class="taeller">afstemt <b id="a-loest">0</b>/5</span></h2>
+            <h2>Skemaerne <span class="taeller">afstemt <b id="a-loest">0</b>/<span id="a-ialt">5</span></span></h2>
             <div class="opg-liste" id="a-liste"></div>
             <button class="knap nulstil lille" id="a-forfra" type="button" title="Begynd skemaet forfra (R)">Begynd skemaet forfra ↺</button>
         </div>

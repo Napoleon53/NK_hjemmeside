@@ -444,6 +444,15 @@
             if (this.faerdig || this.venter || !this.erForsoeg()) return;
             var tekst = set || this.opg.del.set || "";
             if (this.sidsteDel()) { this.loest("selv", tekst, maerke); return; }
+            /* direkte: spoergsmaalet kommer med det samme, uden et kort, der kun
+               siger Godt (brugeren 13. nov. 2026 om sc4.3: "her skal lige
+               springes et trin over") */
+            if (this.opg.del.direkte) {
+                this.naesteFase();
+                this.naesteLinje("", "");
+                if (this.efterDel) this.efterDel();
+                return;
+            }
             this.mellemsvar("selv", tekst, maerke || "Godt");
         };
 

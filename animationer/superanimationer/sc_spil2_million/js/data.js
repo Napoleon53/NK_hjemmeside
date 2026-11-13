@@ -34,7 +34,7 @@
     ];
 
     /* Titlen paa sejrsskaermen. Escaperoommets segl 1 spoerger efter den
-       (c_spil8_escaperoom.html), saa den maa ikke aendres. */
+       (sc_spil8_escaperoom), saa den maa ikke aendres. */
     D.TITEL = "Superkemiker";
 
     /* ----- Spoerg publikum ---------------------------------------------- */
@@ -115,7 +115,7 @@
         sp("c1_5", 1, "Kernepartikel med neutral ladning", "Nuclear particle with neutral charge",
             ["Neutron", "Proton", "Elektron", "Atomnummer"], ["Neutron", "Proton", "Electron", "Atomic number"]),
         sp("c1_6", 1, "Antallet af protoner i et atom (symbol Z)", "The number of protons in an atom (symbol Z)",
-            ["Atomnummer", "Massetal", "Molarmasse", "Oxidationstal"], ["Atomic number", "Mass number", "Molar mass", "Oxidation number"]),
+            ["Atomnummer", "Nukleontal", "Molarmasse", "Oxidationstal"], ["Atomic number", "Mass number", "Molar mass", "Oxidation number"]),
         sp("c1_7", 1, "De lodrette søjler i det periodiske system", "The vertical columns in the periodic table",
             ["Gruppe", "Periode", "Blok", "Serie"], ["Group", "Period", "Block", "Series"]),
         sp("c1_8", 1, "Tilstandsformen, der skrives (l)", "The state written as (l)",
@@ -153,7 +153,7 @@
         sp("c3_2", 3, "En kemisk formel, der viser, hvilke atomer og hvor mange af dem der indgår i molekylet, men ikke den rumlige opbygning", "A chemical formula showing which atoms and how many of them are in the molecule, but not the spatial structure",
             ["Molekylformel", "Strukturformel", "Elektronprikformel", "Tilstandsform"], ["Molecular formula", "Structural formula", "Lewis structure", "State of matter"]),
         sp("c3_3", 3, "Et ikke-bindende elektronpar, der sidder på et atom uden at indgå i en binding", "A non-bonding electron pair sitting on an atom without taking part in a bond",
-            ["Ledigt elektronpar", "Dobbeltbinding", "Kovalent binding", "Elektronprikformel"], ["Lone pair", "Double bond", "Covalent bond", "Lewis structure"]),
+            ["Frit elektronpar", "Dobbeltbinding", "Kovalent binding", "Elektronprikformel"], ["Lone pair", "Double bond", "Covalent bond", "Lewis structure"]),
         sp("c3_4", 3, "Et udtryk for et atoms evne til at tiltrække elektroner i en binding", "An expression of an atom's ability to attract electrons in a bond",
             ["Elektronegativitet", "Polaritet", "Oxidationstal", "Molarmasse"], ["Electronegativity", "Polarity", "Oxidation number", "Molar mass"]),
         sp("c3_5", 3, "Den rumlige struktur, man fx ser i CH₄, hvor bindingsvinklerne er 109,5°", "The spatial structure seen e.g. in CH₄, where the bond angles are 109.5°",
@@ -165,8 +165,8 @@
         sp("c3_8", 3, "En binding, hvor to atomer deler 2 elektronpar", "A bond where two atoms share 2 electron pairs",
             ["Dobbeltbinding", "Enkeltbinding", "Kovalent binding", "Ionbinding"], ["Double bond", "Single bond", "Covalent bond", "Ionic bond"]),
         sp("c3_9", 3, "En kemisk formel, der viser alle elektronerne i yderste skal, ofte tegnet med prikker", "A chemical formula showing all the electrons in the outer shell, often drawn with dots",
-            ["Elektronprikformel", "Strukturformel", "Molekylformel", "Ledigt elektronpar"], ["Lewis structure", "Structural formula", "Molecular formula", "Lone pair"]),
-        sp("c3_10", 3, "En skæv fordeling af elektroner i en binding, som skyldes forskel i elektronegativitet", "An uneven distribution of electrons in a bond, caused by a difference in electronegativity",
+            ["Elektronprikformel", "Strukturformel", "Molekylformel", "Frit elektronpar"], ["Lewis structure", "Structural formula", "Molecular formula", "Lone pair"]),
+        sp("c3_10", 3, "En binding med skæv fordeling af elektronerne, som skyldes forskel i elektronegativitet", "An uneven distribution of electrons in a bond, caused by a difference in electronegativity",
             ["Polær", "Upolær", "Hydrofob", "Neutral"], ["Polar", "Non-polar", "Hydrophobic", "Neutral"]),
 
         /* --- Kapitel 5: Mængdeberegning --- */
@@ -188,7 +188,7 @@
             ["Idealgasligningen", "Gaskonstanten", "Boyles lov", "Avogadros lov"], ["Ideal gas law", "Gas constant", "Boyle's law", "Avogadro's law"]),
         sp("c5_9", 5, "Temperaturen 0 K (−273,15 °C), den laveste temperatur, der findes", "The temperature 0 K (−273.15 °C), the lowest temperature that exists",
             ["Det absolutte nulpunkt", "Frysepunktet", "Kogepunktet", "Stuetemperatur"], ["Absolute zero", "Freezing point", "Boiling point", "Room temperature"]),
-        sp("c5_10", 5, "Symbolet R, som indgår i idealgasligningen", "The symbol R, which appears in the ideal gas law",
+        sp("c5_10", 5, "Konstanten R, som indgår i idealgasligningen", "The symbol R, which appears in the ideal gas law",
             ["Gaskonstanten", "Avogadros konstant", "Molarmassen", "Antalsforholdet"], ["Gas constant", "Avogadro's constant", "Molar mass", "Ratio of amounts"]),
 
         /* --- Kapitel 6: Koncentration og titrering --- */
@@ -218,7 +218,7 @@
             ["Base", "Syre", "Salt", "Indikator"], ["Base", "Acid", "Salt", "Indicator"]),
         sp("c7_2", 7, "Navnet på den sammensatte ion H₃O⁺, som dannes, når en syre reagerer med vand", "The name of the polyatomic ion H₃O⁺, formed when an acid reacts with water",
             ["Oxonium", "Hydroxid", "Ammonium", "Sulfat"], ["Oxonium", "Hydroxide", "Ammonium", "Sulfate"]),
-        sp("c7_3", 7, "Betegnelsen for en syre og dens basemodpart, når de hænger sammen som et par", "The term for an acid and its base counterpart, when they are linked as a pair",
+        sp("c7_3", 7, "Betegnelsen for en syre og den base, syren bliver til ved at afgive en hydron", "The term for an acid and its base counterpart, when they are linked as a pair",
             ["Korresponderende par", "Amfolyt", "Neutralisation", "Buffer"], ["Conjugate pair", "Ampholyte", "Neutralization", "Buffer"]),
         sp("c7_4", 7, "Betegnelsen for syrer, der ikke reagerer fuldstændigt med vand, fx ethansyre", "The term for acids that do not react completely with water, e.g. ethanoic acid",
             ["Svag syre", "Stærk syre", "Sur opløsning", "Basisk opløsning"], ["Weak acid", "Strong acid", "Acidic solution", "Basic solution"]),
@@ -227,11 +227,11 @@
         sp("c7_6", 7, "En opløsning, hvor [H₃O⁺] er større end [OH⁻]", "A solution where [H₃O⁺] is greater than [OH⁻]",
             ["Sur", "Basisk", "Neutral", "Amfoter"], ["Acidic", "Basic", "Neutral", "Amphoteric"]),
         sp("c7_7", 7, "Navnet for vands syre-basereaktion med sig selv", "The name for water's acid-base reaction with itself",
-            ["Vands autohydronolyse", "Vands ionprodukt", "Neutralisation", "Hydrolyse"], ["Water's autoprotolysis", "Water's ion product", "Neutralization", "Hydrolysis"]),
+            ["Vands selvionisering", "Vands ionprodukt", "Neutralisation", "Hydrolyse"], ["Water's autoprotolysis", "Water's ion product", "Neutralization", "Hydrolysis"]),
         sp("c7_8", 7, "En logaritmisk beskrivelse af [H₃O⁺], nemlig −log[H₃O⁺]", "A logarithmic description of [H₃O⁺], namely −log[H₃O⁺]",
             ["pH", "pKs", "pOH", "Ks"], ["pH", "pKa", "pOH", "Ka"]),
         sp("c7_9", 7, "Navnet på sammenhængen [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴", "The name for the relationship [H₃O⁺] · [OH⁻] = 1.0 · 10⁻¹⁴",
-            ["Vands ionprodukt", "Vands autohydronolyse", "Syrekonstanten", "pH-værdien"], ["Water's ion product", "Water's autoprotolysis", "Acid constant", "pH value"]),
+            ["Vands ionprodukt", "Vands selvionisering", "Syrekonstanten", "pH-værdien"], ["Water's ion product", "Water's autoprotolysis", "Acid constant", "pH value"]),
         sp("c7_10", 7, "Et fint ord for en titrering, hvor farveskiftet viser ækvivalenspunktet", "A fancy word for a titration where the color change shows the equivalence point",
             ["Kolorimetrisk", "Gravimetrisk", "Volumetrisk", "Potentiometrisk"], ["Colorimetric", "Gravimetric", "Volumetric", "Potentiometric"]),
 
@@ -239,7 +239,7 @@
         sp("c8_1", 8, "En delvis eller fuldstændig afgivelse af elektroner", "A partial or complete loss of electrons",
             ["Oxidation", "Reduktion", "Neutralisation", "Fældning"], ["Oxidation", "Reduction", "Neutralization", "Precipitation"]),
         sp("c8_2", 8, "En delvis eller fuldstændig optagelse af elektroner", "A partial or complete gain of electrons",
-            ["Reduktion", "Oxidation", "Ionisering", "Hydronolyse"], ["Reduction", "Oxidation", "Ionization", "Protolysis"]),
+            ["Reduktion", "Oxidation", "Ionisering", "Hydronoverførsel"], ["Reduction", "Oxidation", "Ionization", "Protolysis"]),
         sp("c8_3", 8, "En delvis eller fuldstændig overførsel af elektroner fra ét atom til et andet", "A partial or complete transfer of electrons from one atom to another",
             ["Redoxreaktion", "Syre-basereaktion", "Fældningsreaktion", "Substitutionsreaktion"], ["Redox reaction", "Acid-base reaction", "Precipitation reaction", "Substitution reaction"]),
         sp("c8_4", 8, "Et mål for, hvor mange elektroner et atom har afgivet eller optaget, helt eller delvist", "A measure of how many electrons an atom has lost or gained, fully or partially",

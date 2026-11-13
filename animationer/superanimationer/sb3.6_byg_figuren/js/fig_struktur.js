@@ -46,7 +46,7 @@
             { navn: "Tre slags", pladser: ["kædeisomerer", "stillingsisomerer", "funktionsisomerer"],
               ros: "Kædeisomerer har forskellig kæde. I stillingsisomerer har gruppen forskellig placering. Funktionsisomerer har hver sin gruppe." },
             { navn: "Overblikket", pladser: ["isomerer", "strukturisomerer", "ether"],
-              ros: "Isomerer har samme molekylformel. I strukturisomerer er atomerne bundet sammen i forskellig rækkefølge. En ether har O midt i kæden." }
+              ros: "Isomerer har samme molekylformel. I strukturisomerer er atomerne bundet i forskellig rækkefølge. En ether har O midt i kæden." }
         ],
         pladser: [
             titel("kædeisomerer", 0, ["hoved0"], {

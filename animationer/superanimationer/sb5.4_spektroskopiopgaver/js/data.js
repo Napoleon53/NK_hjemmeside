@@ -409,7 +409,7 @@
                     "Standardkurven kan kun bruges i det lineære område. Hvordan får du prøvens absorbans ned?"];
             },
             forkl: function () {
-                return "A = 1,520 ligger over det lineære område. Prøven fortyndes, så A kommer under 1,056, og bagefter beregnes den oprindelige koncentration med fortyndingsformlen.";
+                return "A = 1,520 ligger over det lineære område. Prøven fortyndes, så A kommer under 1,056. Bagefter beregnes koncentrationen før fortyndingen.";
             }
         }
     };

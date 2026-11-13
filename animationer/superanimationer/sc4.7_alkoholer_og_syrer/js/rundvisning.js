@@ -23,7 +23,7 @@
             { sel: "#n-navnekort", titel: "Navnenes første del", tekst: "Tabellen viser første del af navnet for 1 til 8 carbonatomer og endelsen for hver stofklasse." }
         ],
         "fane-k": [
-            { sel: "#k-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er fire opgaver." },
+            { sel: "#k-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er to opgaver." },
             { sel: "#k-anker-plade", titel: "Byg molekylet", tekst: "Træk en gruppe hen på kæden, og gør kæden længere eller kortere med + og −." },
             { sel: "#k-anker-instr", titel: "Termometeret", tekst: "Termometeret viser stoffets kogepunkt. Den stiplede streg er 20 °C. Koger stoffet under 20 °C, er det en gas ved stuetemperatur." },
             { sel: "#k-anker-lup", titel: "Luppen", tekst: "Luppen viser molekylerne i stoffet som væske. Stiplede linjer er hydrogenbindinger mellem grupperne, og orange flader viser, hvor kæderne rører hinanden." },
@@ -33,8 +33,9 @@
             { sel: "#v-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er fem opgaver." },
             { sel: "#v-anker-plade", titel: "Byg molekylet", tekst: "Træk en gruppe hen på kæden, og gør kæden længere eller kortere med + og −." },
             { sel: "#v-anker-instr", titel: "Glasset", tekst: "Stoffet er rystet med vand. Ét lag betyder, at stofferne blandes, og to lag betyder, at stofferne ikke blandes." },
-            { sel: "#v-anker-lup", titel: "Luppen", tekst: "Luppen viser ét molekyle i vand. De stiplede linjer er hydrogenbindinger mellem molekylet og vandmolekylerne." },
-            { sel: "#v-regelkort", titel: "Tommelfingerreglen", tekst: "Kortet viser tommelfingerreglen fra afsnit 3.4 og 4.5, og skemaet samler, hvad du har set i glasset." }
+            { sel: "#v-anker-regel", titel: "Tommelfingerreglen", tekst: "1 polær gruppe kræver 4 C-atomer. Felterne viser, om stoffets antal C-atomer er færre end grænsen, lige på den eller flere." },
+            { sel: "#v-anker-lup", titel: "Luppen", tekst: "Luppen viser ét molekyle i vand. De stiplede linjer er hydrogenbindinger fra den polære gruppe til vandmolekylerne." },
+            { sel: "#v-regelkort", titel: "Det har du set", tekst: "Skemaet samler, hvad du har set i glasset." }
         ]
     };
 

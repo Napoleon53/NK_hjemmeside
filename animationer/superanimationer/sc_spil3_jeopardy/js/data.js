@@ -49,15 +49,15 @@
                       svar: "Hvad er CaCl₂?" },
                     { ledetraad: "Navnet på ionen SO₄²⁻",
                       svar: "Hvad er sulfat?" },
-                    { ledetraad: "Bundfaldet, når sølvnitrat og natriumchlorid blandes",
-                      svar: "Hvad er sølvchlorid, AgCl?" },
+                    { ledetraad: "Bundfaldet, når sølv(I)nitrat og natriumchlorid blandes",
+                      svar: "Hvad er sølv(I)chlorid, AgCl?" },
                     { ledetraad: "Formlen for aluminiumsulfat",
                       svar: "Hvad er Al₂(SO₄)₃?" }
                 ] },
                 { navn: "Molekyler", felter: [
                     { ledetraad: "Bindingen, hvor to atomer deler et elektronpar",
                       svar: "Hvad er en kovalent binding (elektronparbinding)?" },
-                    { ledetraad: "Antallet af ledige elektronpar på oxygenatomet i H₂O",
+                    { ledetraad: "Antallet af frie elektronpar på oxygenatomet i H₂O",
                       svar: "Hvad er 2?" },
                     { ledetraad: "Formen på et NH₃-molekyle",
                       svar: "Hvad er pyramideformet (trigonal pyramide)?" },
@@ -91,14 +91,14 @@
                       svar: "Hvad er en Mohrtitrering?" }
                 ] },
                 { navn: "Organisk kemi", felter: [
-                    { ledetraad: "Carbonhydrider med kun enkeltbindinger",
+                    { ledetraad: "Carbonhydrider med kun enkeltbindinger og ingen ring",
                       svar: "Hvad er alkaner?" },
                     { ledetraad: "Den uforgrenede alkan med fire carbonatomer",
                       svar: "Hvad er butan?" },
                     { ledetraad: "Stoffer med samme molekylformel, men forskellig struktur",
                       svar: "Hvad er isomerer?" },
                     { ledetraad: "Grunden til, at pentan har højere kogepunkt end propan",
-                      svar: "Hvad er stærkere van der Waals-bindinger (større molekyler)?" },
+                      svar: "Hvad er stærkere londonbindinger (større molekyler)?" },
                     { ledetraad: "Navnet på CH₃CH(CH₃)CH₂CH₃",
                       svar: "Hvad er 2-methylbutan?" }
                 ] }
@@ -137,7 +137,7 @@
                     { ledetraad: "Antallet af isomerer med molekylformlen C₄H₁₀",
                       svar: "Hvad er 2? (butan og methylpropan)" },
                     { ledetraad: "Testen, der påviser aldehyder med Ag⁺ og NH₃",
-                      svar: "Hvad er Tollens' prøve?" },
+                      svar: "Hvad er Tollens' test?" },
                     { ledetraad: "Navnene på de to isomerer med molekylformlen C₃H₆",
                       svar: "Hvad er cyclopropan og propen?" },
                     { ledetraad: "Navnet på esteren af methanol og propansyre",
@@ -150,7 +150,7 @@
                       svar: "Hvad er Y?" },
                     { ledetraad: "En reaktion, hvor ligevægtskonstanten vokser, når temperaturen øges",
                       svar: "Hvad er endoterm?" },
-                    { ledetraad: "Navnet på ionen SCN⁻, som indgik i ligevægtsforsøget",
+                    { ledetraad: "Navnet på ionen SCN⁻, som ofte bruges i ligevægtsforsøg",
                       svar: "Hvad er thiocyanat?" },
                     { ledetraad: "Skrives χ og står for flydende stoffer i ligevægtsloven. Kan normalt udelades",
                       svar: "Hvad er en molbrøk?" }
@@ -158,11 +158,11 @@
                 { navn: "Syre-base", felter: [
                     { ledetraad: "Det, der kendetegner en svag syre",
                       svar: "Hvad er delvis reaktion med vand?" },
-                    { ledetraad: "Det, som alle baser har",
+                    { ledetraad: "Det, som en base binder en hydron med",
                       svar: "Hvad er et ledigt elektronpar?" },
                     { ledetraad: "Danskeren, der definerede en syre ud fra, at den afgiver en hydron",
                       svar: "Hvem er Brønsted?" },
-                    { ledetraad: "Ligevægtskonstanten for vands autohydronolyse",
+                    { ledetraad: "Ligevægtskonstanten for vands selvionisering",
                       svar: "Hvad er K<sub>v</sub> = [H₃O⁺]·[OH⁻]? (1,0·10⁻¹⁴ M²)" },
                     { ledetraad: "pK<sub>s</sub>-værdien for saltsyre",
                       svar: "Hvad er −7? (±3)" }
@@ -176,7 +176,7 @@
                       svar: "Hvad er chlor?" },
                     { ledetraad: "Massen af 2 mol O₂",
                       svar: "Hvad er 64 g?" },
-                    { ledetraad: "Et mol med tre betydende cifre",
+                    { ledetraad: "Antallet af stofenheder i 1 mol, skrevet med tre betydende cifre",
                       svar: "Hvad er 6,02·10²³?" }
                 ] },
                 { navn: "Reaktions&shy;typer", felter: [

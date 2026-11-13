@@ -1,16 +1,25 @@
 """Laver HTML-oversigten over sprogrettelserne i animationerne med før og nu og flueben til at vælge numre fra.
-  python3 ~/NK_hjemmeside/.claude/sprogrunde/oversigt.py <ud.html>"""
+  python3 ~/NK_hjemmeside/.claude/sprogrunde/oversigt.py <ud.html> [fra-nr] [til-nr] [titel]"""
 import difflib, html, json, os, re, sys
 
 HER = os.path.dirname(os.path.abspath(__file__))
 ROD = os.path.expanduser("~/NK_hjemmeside/animationer/superanimationer")
-L = [r for r in json.load(open(os.path.join(HER, "ret.json"), encoding="utf-8")) if r.get("hvor") != "selvtest"]
 ud = sys.argv[1]
+FRA = int(sys.argv[2]) if len(sys.argv) > 2 else 0
+TIL = int(sys.argv[3]) if len(sys.argv) > 3 else 10 ** 9
+L = [r for r in json.load(open(os.path.join(HER, "ret.json"), encoding="utf-8")) if r.get("hvor") != "selvtest" and FRA <= r["nr"] <= TIL]
+L.sort(key=lambda r: r["nr"])
 
 
 def titel(mappe):
     if mappe in ("faelles", "kemichael") or "kopier" in mappe:
         return "Fælles for flere animationer"
+    if mappe.startswith("sc_spil"):
+        try:
+            s = open(os.path.join(ROD, mappe, "index.html"), encoding="utf-8").read()
+            return "Spil: " + html.unescape(re.search(r"<title>(.*?)</title>", s, re.S).group(1)).strip()
+        except Exception:
+            return mappe
     try:
         s = open(os.path.join(ROD, mappe, "index.html"), encoding="utf-8").read()
         t = html.unescape(re.search(r"<title>(.*?)</title>", s, re.S).group(1)).strip()
@@ -35,6 +44,7 @@ def diff(a, b):
     return "".join(fa), "".join(fb)
 
 
+noegle = 'sprogrunde_animationer' + ('' if FRA == 0 else '_' + str(FRA))
 grupper = []
 for r in L:
     mappe = r["fil"].split("/")[0]
@@ -54,7 +64,7 @@ for k, (n, mappe, rs) in enumerate(grupper):
         rows.append(f'<div class="ret"><label class="nr"><input type="checkbox" value="{r["nr"]}"> <b>{r["nr"]}</b></label>'
                     f'<div><div class="lbl">Før</div>{a}</div><div><div class="lbl">Nu</div>{b}</div>'
                     f'<div class="hv"><span class="hvor">{html.escape(r["hvor"])}</span> · {html.escape(r["hvorfor"])}</div></div>')
-TITEL = "Animationer: sprogrettelser"
+TITEL = sys.argv[4] if len(sys.argv) > 4 else "Animationer: sprogrettelser"
 side = f'''<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{TITEL}</title>
 <style>
@@ -81,7 +91,7 @@ button {{ font:inherit; padding:.4rem .9rem; border-radius:8px; border:1px solid
 @media (max-width:720px) {{ .ret {{ grid-template-columns:1fr; }} .nr {{ grid-row:auto; }} .hv {{ grid-column:auto; }} }}
 </style></head><body><main>
 <h1>{TITEL}</h1>
-<p class="intro">{len(L)} rettelser i {len(grupper)} animationer er sat ind i animationerne på din computer. De kommer på kemiformler.dk, når du trykker Synkroniser. Overstreget rødt er den gamle tekst, gult er den nye, og den fede tekst under hver rettelse siger, hvor eleven ser teksten. Sæt flueben ved de rettelser, du vil have sat tilbage, og kopiér linjen nederst ind i chatten.</p>
+<p class="intro">{len(L)} rettelser i {len(grupper)} animationer og spil er sat ind i animationerne på din computer. De kommer på kemiformler.dk, når du trykker Synkroniser. Overstreget rødt er den gamle tekst, gult er den nye, og den fede tekst under hver rettelse siger, hvor eleven ser teksten. Sæt flueben ved de rettelser, du vil have sat tilbage, og kopiér linjen nederst ind i chatten.</p>
 <nav class="menu">{"".join(menu)}</nav>
 {"".join(rows)}
 </main><div class="bjaelke"><div><span id="tekst">Ingen rettelser valgt.</span><button id="kopi">Kopiér</button></div></div>
@@ -90,8 +100,8 @@ const bokse=[...document.querySelectorAll('input[type=checkbox]')];
 function opdater(){{const v=bokse.filter(b=>b.checked).map(b=>b.value);
 bokse.forEach(b=>b.closest('.ret').classList.toggle('valgt',b.checked));
 document.getElementById('tekst').textContent=v.length?('Sæt disse rettelser i animationerne tilbage: '+v.join(', ')):'Ingen rettelser valgt.';
-try{{localStorage.setItem('sprogrunde_animationer',JSON.stringify(v))}}catch(e){{}}}}
-try{{const g=JSON.parse(localStorage.getItem('sprogrunde_animationer')||'[]');bokse.forEach(b=>b.checked=g.includes(b.value))}}catch(e){{}}
+try{{localStorage.setItem('{noegle}',JSON.stringify(v))}}catch(e){{}}}}
+try{{const g=JSON.parse(localStorage.getItem('{noegle}')||'[]');bokse.forEach(b=>b.checked=g.includes(b.value))}}catch(e){{}}
 bokse.forEach(b=>b.addEventListener('change',opdater));opdater();
 document.getElementById('kopi').onclick=()=>{{const t=document.getElementById('tekst').textContent;
 navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>{{document.getElementById('kopi').textContent='Kopieret';setTimeout(()=>document.getElementById('kopi').textContent='Kopiér',1500)}})}};

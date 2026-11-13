@@ -39,48 +39,58 @@ function lpTil(NK, n) {
     if (n >= 3) { s.talTekst = "0,48"; s.indsendKlik(); s.videreKlik(); }
     return s;
 }
+/* Fane 2: form, spor, krop, logp, genvej */
 function ldTil(NK, n) {
     var s = ld(NK);
-    if (n >= 1) { spor(s); s.videreKlik(); }
-    if (n >= 2) { s.valgt = 0; s.indsendKlik(); s.videreKlik(); }
-    if (n >= 3) { s.talTekst = "-1,8"; s.indsendKlik(); tid(s, 2); s.videreKlik(); }
+    if (n >= 1) { s.svarValg(0); s.indsendKlik(); s.videreKlik(); }
+    if (n >= 2) { spor(s); s.videreKlik(); }
+    if (n >= 3) { s.svarValg(0); s.indsendKlik(); s.videreKlik(); }
+    if (n >= 4) { s.talTekst = "1,2"; s.indsendKlik(); tid(s, 2); s.videreKlik(); }
     return s;
 }
+/* Fane 3: spor, hvorfor, krop, lidocain */
 function lbTil(NK, n) {
     var s = lb(NK);
     if (n >= 1) { spor(s); s.videreKlik(); }
-    if (n >= 2) { s.talTekst = "-0,7"; s.indsendKlik(); tid(s, 2); s.videreKlik(); }
-    if (n >= 3) { s.valgt = 1; s.indsendKlik(); s.videreKlik(); }
+    if (n >= 2) { s.svarValg(0); s.indsendKlik(); s.videreKlik(); }
+    if (n >= 3) { s.svarValg(1); s.indsendKlik(); s.videreKlik(); }
     return s;
 }
+function ekstra(s, n, svaer) { if (svaer) s.svaerKlik(); s.startEkstra(); for (var i = 0; i < n; i++) { s.visSvar(); tid(s, 2); s.videreKlik(); } return s; }
 
 var SCENARIER = {
     "p-start": function (NK) { lp(NK); },
     "p-ryster": function (NK) { var s = lp(NK); s.rystTragt(); tid(s, 0.7); },
-    "p-skiller": function (NK) { var s = lp(NK); s.rystTragt(); tid(s, 1.6); },
     "p-rystet": function (NK) { var s = lp(NK); ryst(s); },
     "p-kf": function (NK) { var s = lpTil(NK, 1); s.talTekst = "0,33"; s.visKort(); s.indsendKlik(); },
-    "p-kf-ok": function (NK) { var s = lpTil(NK, 1); s.talTekst = "3,0"; s.indsendKlik(); },
     "p-logp-ok": function (NK) { var s = lpTil(NK, 2); s.talTekst = "0,48"; s.indsendKlik(); },
     "p-x": function (NK) { lpTil(NK, 3); },
-    "p-x-spm": function (NK) { var s = lpTil(NK, 3); ryst(s); s.valgt = 0; s.visKort(); },
-    "p-x-ok": function (NK) { var s = lpTil(NK, 3); ryst(s); s.valgt = 2; s.indsendKlik(); },
-    "p-frit": function (NK) { var s = lpTil(NK, 3); ryst(s); s.valgt = 2; s.indsendKlik(); s.proevStof("glu"); ryst(s); },
+    "p-x-spm": function (NK) { var s = lpTil(NK, 3); ryst(s); s.svarValg(0); },
+    "p-x-ok": function (NK) { var s = lpTil(NK, 3); ryst(s); s.svarValg(1); s.indsendKlik(); },
+    "p-frit": function (NK) { var s = lpTil(NK, 3); ryst(s); s.svarValg(1); s.indsendKlik(); s.proevStof("glu"); ryst(s); },
+    "p-ekstra1": function (NK) { var s = lpTil(NK, 3); ryst(s); s.svarValg(1); s.indsendKlik(); s.startEkstra(); ryst(s); s.talTekst = "9"; s.visKort(); s.indsendKlik(); },
+    "p-ekstra2": function (NK) { var s = lp(NK); ekstra(s, 1); },
+    "p-ekstra3-ok": function (NK) { var s = lp(NK); ekstra(s, 2); s.talTekst = "1000"; s.indsendKlik(); },
     "d-start": function (NK) { var s = ld(NK); tid(s, 0.5); },
-    "d-halv": function (NK) { var s = ld(NK); for (var p = 0; p <= 4.6; p += 0.1) s.saetPh(p); tid(s, 1.5); },
-    "d-tegnet": function (NK) { var s = ld(NK); spor(s); s.saetPh(7.4); tid(s, 1.5); },
-    "d-hvorfor": function (NK) { var s = ldTil(NK, 1); s.saetPh(10); tid(s, 1.5); s.valgt = 1; s.indsendKlik(); },
-    "d-regn": function (NK) { var s = ldTil(NK, 2); s.talTekst = "1,2"; s.visKort(); s.indsendKlik(); },
-    "d-regn-ok": function (NK) { var s = ldTil(NK, 2); s.talTekst = "-1,8"; s.indsendKlik(); tid(s, 2); },
-    "d-genvej": function (NK) { var s = ldTil(NK, 3); s.valgt = 3; s.visKort(); },
-    "d-slut": function (NK) { var s = ldTil(NK, 3); s.valgt = 1; s.indsendKlik(); tid(s, 2); },
+    "d-form-fejl": function (NK) { var s = ld(NK); s.svarValg(1); s.indsendKlik(); },
+    "d-form-ok": function (NK) { var s = ld(NK); s.svarValg(0); s.indsendKlik(); },
+    "d-spor": function (NK) { var s = ldTil(NK, 1); for (var p = 0; p <= 4.6; p += 0.1) s.saetPh(p); tid(s, 1.5); },
+    "d-tegnet": function (NK) { var s = ldTil(NK, 1); spor(s); s.saetPh(7.4); tid(s, 1.5); },
+    "d-krop": function (NK) { var s = ldTil(NK, 2); s.saetPh(7.4); tid(s, 1.5); s.svarValg(1); s.indsendKlik(); },
+    "d-logp": function (NK) { var s = ldTil(NK, 3); s.saetPh(1.5); tid(s, 1.5); s.talTekst = "1,5"; s.visKort(); s.indsendKlik(); },
+    "d-genvej": function (NK) { var s = ldTil(NK, 4); s.svarValg(3); },
+    "d-slut": function (NK) { var s = ldTil(NK, 4); s.svarValg(1); s.indsendKlik(); tid(s, 2); },
+    "d-ekstra1": function (NK) { var s = ld(NK); s.startEkstra(); s.saetPh(3.8); tid(s, 1.5); s.indsendKlik(); },
+    "d-ekstra2": function (NK) { var s = ld(NK); ekstra(s, 1); },
+    "d-ekstra3": function (NK) { var s = ld(NK); ekstra(s, 2, true); s.talTekst = "1,2"; s.visKort(); s.indsendKlik(); },
     "b-start": function (NK) { var s = lb(NK); tid(s, 0.5); },
     "b-tegnet": function (NK) { var s = lb(NK); spor(s); s.saetPh(5); tid(s, 1.5); },
-    "b-regn-ok": function (NK) { var s = lbTil(NK, 1); s.talTekst = "-0,7"; s.indsendKlik(); tid(s, 2); },
-    "b-krop": function (NK) { var s = lbTil(NK, 2); s.saetPh(2); tid(s, 1.5); s.valgt = 0; s.visKort(); },
-    "b-ukendt": function (NK) { var s = lbTil(NK, 3); for (var p = 0; p <= 9; p += 0.1) s.saetPh(p); tid(s, 1.5); },
-    "b-ukendt-fejl": function (NK) { var s = lbTil(NK, 3); spor(s); s.valgt = 0; s.talTekst = "2,4"; s.indsendKlik(); },
-    "b-slut": function (NK) { var s = lbTil(NK, 3); spor(s); s.saetPh(12); tid(s, 1.5); s.valgt = 1; s.talTekst = "2,4"; s.indsendKlik(); },
+    "b-hvorfor": function (NK) { var s = lbTil(NK, 1); s.saetPh(12); tid(s, 1.5); s.svarValg(1); s.indsendKlik(); },
+    "b-krop": function (NK) { var s = lbTil(NK, 2); s.saetPh(2); tid(s, 1.5); s.svarValg(0); },
+    "b-lid": function (NK) { var s = lbTil(NK, 3); for (var p = 0; p <= 9; p += 0.1) s.saetPh(p); s.saetPh(7.4); tid(s, 1.5); },
+    "b-slut": function (NK) { var s = lbTil(NK, 3); spor(s); s.saetPh(7.4); tid(s, 1.5); s.svarValg(1); s.indsendKlik(); },
+    "b-ekstra2": function (NK) { var s = lb(NK); ekstra(s, 1); s.saetPh(5.5); tid(s, 1.5); },
+    "b-ekstra3": function (NK) { var s = lb(NK); ekstra(s, 2, true); s.talTekst = "4,3"; s.visKort(); s.indsendKlik(); },
     "teori": function (NK, W) { W.document.getElementById("teoriknap").click(); }
 };
 

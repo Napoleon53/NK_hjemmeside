@@ -69,7 +69,7 @@
 
     /* COOH med carbonatomet i (x, 0): =O oppe til hoejre, OH nede til hoejre */
     function carboxyl(at, x) {
-        at("C", x, 0);
+        at("C", x, 0, { gruppe: true });
         at("O", x + 0.78, -1.3, { tag: true, dobbelt: true });
         at("O", x + 0.78, 1.3, { tag: true });
         at("H", x + 0.78 + 1.05, 1.36, { giv: true });

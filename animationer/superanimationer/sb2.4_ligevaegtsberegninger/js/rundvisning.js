@@ -26,7 +26,7 @@
             { sel: "#ux-delbar", titel: "Delene", tekst: "Opgaven regnes i dele. Den gule er den, du er ved." },
             { sel: "#ux-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Indsend svar eller Enter. En løst del bliver stående, som den skal stå i din besvarelse." },
             { sel: "#ux-skort", titel: "Papirkortet", tekst: "Øverst står opgaven. Under den står, hvad du skal nu, og hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#ux-opgaver", titel: "Opgaverne", tekst: "Fem opgaver: tre, hvor Kc skal findes, og to med en ukendt koncentration. Når en opgave er løst, står hele besvarelsen i panelet under listen." }
+            { sel: "#ux-opgaver", titel: "Opgaverne", tekst: "Fem opgaver: tre, hvor K skal findes, og to med en ukendt koncentration. Når en opgave er løst, står hele besvarelsen i panelet under listen." }
         ],
         "fane-mx": [
             { sel: "#mx-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet. Når ligevægtsloven er skrevet rigtigt, kommer opgavens tal frem under det. Klik på et tal for at sætte det ind i det felt, du står i." },

@@ -15,7 +15,7 @@ Taget med fra den gamle:
   grænsen for tungtopløselig er 1 g pr. 100 mL som i sc2.3, ikke 2 g, og i
   historielisten åbnede jernbanen i 1830, og Burke skrev i 1790.
 * Syrebadet, farven, der skifter med faren, og Syreimmun efter fem ord i træk.
-  Escape-rummet i `kemi-c-filer/c_spil8_escaperoom.html` spørger til det i segl 2.
+  Escape-rummet (`sc_spil8_escaperoom`) spørger til det i segl 2.
 * Ingen gentagelse, før alle ord i de valgte områder har været der.
 
 Nyt:

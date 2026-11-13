@@ -114,7 +114,7 @@
     P.hintTrin = function () {
         var o = this.o, g = this.m.g;
         if (o.byt && !this.byttet) return [
-            "Klik på to af grupperne til venstre, for eksempel Cl og F. Så bytter de plads.",
+            "Klik på to af grupperne til venstre, fx Cl og F. Så bytter de plads.",
             "Når to grupper har byttet plads, er molekylet blevet til sit spejlbillede.",
             "Klik på Cl og så på F, og drej bagefter molekylet, til alle fire passer."
         ];
@@ -204,7 +204,7 @@
             this.loest({
                 s2: "To grupper kan komme til at passe, men så har de to andre byttet plads. Molekylet og spejlbilledet hører til to forskellige stoffer, som kaldes spejlbilledisomerer.",
                 s5: "Butan-2-ol har fire forskellige grupper: OH, CH₂CH₃, CH₃ og H. Det midterste C-atom er asymmetrisk, og butan-2-ol findes som to spejlbilledisomerer.",
-                s6: "Alanin har fire forskellige grupper på det midterste C-atom. Aminosyrer findes i to spejlbilledformer, og kroppen bruger kun den ene."
+                s6: "Alanin har fire forskellige grupper på det midterste C-atom. Kroppen bruger kun den ene spejlbilledisomer."
             }[o.id]);
             return;
         }

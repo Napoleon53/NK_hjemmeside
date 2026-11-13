@@ -22,7 +22,8 @@
             { sel: "#b-flammekort", titel: "De to flammer", tekst: "Her samles det, du finder ud af om den gule og den blå flamme." }
         ],
         "fane-a": [
-            { sel: "#a-skort", titel: "Kortet øverst", tekst: "Al tekst står her: trinnet, hintene og forklaringen. Der er fem forbrændinger, og hver afstemmes i tre eller fire trin." },
+            { sel: "#a-niveaukort", titel: "Niveauet", tekst: "Uøvet afstemmer skemaet trin for trin med kuglemodeller. Øvet viser kun skemaet, og du skriver alle tallene selv." },
+            { sel: "#a-skort", titel: "Kortet øverst", tekst: "Al tekst står her: trinnet, hintene og forklaringen. På Uøvet afstemmes hver forbrænding i tre eller fire trin." },
             { sel: "#a-anker-tavle", titel: "Reaktionsskemaet", tekst: "Det gule felt står foran det stof, trinnet handler om. Stil tallet med pilene over og under feltet, og tryk Indsend svar. Kuglemodellerne under formlerne følger tallet." },
             { sel: "#a-anker-regn", titel: "Regnskabet", tekst: "Regnskabet viser antallet af hver slags atom før og efter pilen og følger de tal, du har sendt. Et spørgsmålstegn står ved det, trinnet spørger om." }
         ]

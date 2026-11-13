@@ -57,7 +57,7 @@
             start: { taendt: false, luft: 0 }, lup: false,
             dele: [
                 {
-                    type: "forsoeg", maal: "sod", om: ["braender", "ske"],
+                    type: "forsoeg", maal: "sod", direkte: true, om: ["braender", "ske"],
                     tekst: "Luftreguleringen er lukket. Tænd brænderen, og hold den kolde ske ind i flammen.",
                     set: "Skeen blev sort i den gule flamme.",
                     hint: [
@@ -68,29 +68,29 @@
                 },
                 {
                     type: "spm", om: ["ske"],
-                    tekst: "Hvad er det sorte lag på skeen?",
+                    tekst: "Hvad består det sorte lag på skeen af?",
                     svar: [
-                        { t: "Sod, som er rent carbon", ok: true },
-                        { t: "Brændt metal fra skeen",
-                          f: "Skeen er af stål og brænder ikke. Det sorte kommer fra gassen, methan, CH₄, som indeholder carbon." },
+                        { t: "Jern fra skeen",
+                          f: "Skeen er af stål og brænder ikke i flammen. Det sorte kommer fra gassen, methan, CH₄." },
+                        { t: "Carbon fra methan", ok: true },
                         { t: "Carbondioxid fra flammen",
                           f: "Carbondioxid er en farveløs gas. Det sorte lag på skeen er et fast stof." }
                     ],
                     hint: [
                         "Gassen i brænderen er methan, CH₄. Hvilke grundstoffer er der i methan?",
                         "Det sorte lag er et fast stof. Det er hverken metal fra skeen eller en gas.",
-                        "Det sorte lag er sod. Sod er rent carbon, C."
+                        "Det sorte lag er sod, og sod er rent carbon, C, fra methan."
                     ]
                 }
             ],
-            loest: "Sod er rent carbon, C. Små sodpartikler gløder i flammen, og det er dem, der gør flammen gul."
+            loest: "Det sorte lag er sod, som er rent carbon, C, fra methan. Små sodpartikler gløder i flammen, og det er dem, der gør flammen gul."
         },
         {
             id: "blaa", navn: "Den blå flamme",
             start: { taendt: true, luft: 0 }, lup: false,
             dele: [
                 {
-                    type: "forsoeg", maal: "blaa", indsend: true, om: ["luft"],
+                    type: "forsoeg", maal: "blaa", indsend: true, direkte: true, om: ["luft"],
                     tekst: "Stil luftreguleringen, så flammen ikke soder. Prøv med skeen, og tryk Indsend svar.",
                     set: "Med luftreguleringen åben er flammen blå, og skeen bliver ikke sort.",
                     hint: [
@@ -101,13 +101,13 @@
                 },
                 {
                     type: "spm", om: ["luft"],
-                    tekst: "Luften kommer ind ved luftreguleringen og blandes med gassen. Hvorfor soder den blå flamme ikke?",
+                    tekst: "Hvorfor soder flammen ikke, når luftreguleringen er åben?",
                     svar: [
-                        { t: "Der er dioxygen nok til alt carbon", ok: true },
                         { t: "Luften blæser soden væk",
                           f: "Luften blandes med gassen inde i røret. Skeen viser, at der slet ikke dannes sod." },
-                        { t: "Der kommer mindre gas ud",
-                          f: "Der kommer lige så meget methan ud. Det, der ændrer sig, er luften, der blandes med gassen." }
+                        { t: "Der kommer mindre methan ud",
+                          f: "Der kommer lige så meget methan ud. Det, der ændrer sig, er luften, der blandes med gassen." },
+                        { t: "Der er dioxygen nok til alt carbon", ok: true }
                     ],
                     hint: [
                         "Hvilket stof i luften er det, der reagerer med methan i en forbrænding?",
@@ -148,7 +148,7 @@
             start: { taendt: true, blaa: true }, lup: true,
             dele: [
                 {
-                    type: "forsoeg", maal: "gul", indsend: true, om: ["luft"],
+                    type: "forsoeg", maal: "gul", indsend: true, direkte: true, om: ["luft"],
                     tekst: "Stil luftreguleringen, så flammen soder mest, og tryk Indsend svar.",
                     set: "Med luftreguleringen lukket er flammen gul og soder mest.",
                     hint: [
@@ -179,27 +179,29 @@
             loest: "Med for lidt dioxygen er forbrændingen ufuldstændig. Nogle carbonatomer får kun ét oxygenatom (CO) eller intet (sod, C)."
         },
         {
-            id: "kulilte", navn: "Carbonmonoxid er giftig",
+            id: "kulilte", navn: "Den giftige gas",
             start: { taendt: true, luft: 0 }, lup: true,
             dele: [
                 {
                     type: "spm", om: ["lup"],
-                    tekst: "Carbonmonoxid kaldes også kulilte. Hvorfor er en gul, sodende flamme farlig i et lukket rum?",
+                    tekst: "En gul, sodende flamme er farlig i et lukket rum. Hvilket stof fra den gule flamme er en giftig gas?",
                     svar: [
-                        { t: "Den danner giftig carbonmonoxid", ok: true },
-                        { t: "Den danner mere carbondioxid",
-                          f: "Den gule flamme danner mindre carbondioxid end den blå. Carbondioxid er ikke giftig i små mængder." },
-                        { t: "Den er varmere end den blå",
-                          f: "Den blå flamme er den varmeste. Faren er en gas, der hverken kan ses eller lugtes." }
+                        { t: "CO₂, carbondioxid",
+                          f: "Carbondioxid er ikke giftig i små mængder, og den dannes også i den blå flamme." },
+                        { t: "CO, carbonmonoxid", ok: true },
+                        { t: "C, sod",
+                          f: "Sod er et fast stof, som sætter sig på skeen. Det er ikke en gas." },
+                        { t: "H₂O, vand",
+                          f: "Vand er ikke giftigt, og det dannes også i den blå flamme." }
                     ],
                     hint: [
-                        "Se i luppen over den gule flamme. Hvilken gas er der, som ikke var over den blå flamme?",
-                        "Carbonmonoxid er en gas, der hverken kan ses eller lugtes.",
-                        "Carbonmonoxid er giftig. Den binder sig til de røde blodlegemer."
+                        "Den giftige gas dannes kun, når der er for lidt dioxygen. Se i luppen over den gule flamme.",
+                        "Over den gule flamme er der to stoffer, som ikke var over den blå. Det ene er et fast stof.",
+                        "Carbonmonoxid, CO, er en giftig gas, der hverken kan ses eller lugtes."
                     ]
                 }
             ],
-            loest: "Carbonmonoxid binder sig til de røde blodlegemer, så de ikke kan transportere dioxygen. Grill derfor aldrig med kul indendørs."
+            loest: "Carbonmonoxid kaldes også kulilte. Den binder sig til de røde blodlegemer, så de ikke kan transportere dioxygen. Grill derfor aldrig indendørs."
         }
     ];
 
@@ -245,7 +247,10 @@
         CH4: { f: "CH₄", navn: "methan", C: 1, H: 4 },
         C2H6: { f: "C₂H₆", navn: "ethan", C: 2, H: 6 },
         C3H8: { f: "C₃H₈", navn: "propan", C: 3, H: 8 },
+        C4H10: { f: "C₄H₁₀", navn: "butan", C: 4, H: 10 },
         C5H12: { f: "C₅H₁₂", navn: "pentan", C: 5, H: 12 },
+        C7H16: { f: "C₇H₁₆", navn: "heptan", C: 7, H: 16 },
+        C8H18: { f: "C₈H₁₈", navn: "octan", C: 8, H: 18 },
         O2: { f: "O₂", navn: "dioxygen", O: 2 },
         CO2: { f: "CO₂", navn: "carbondioxid", C: 1, O: 2 },
         CO: { f: "CO", navn: "carbonmonoxid", C: 1, O: 1 },
@@ -256,8 +261,8 @@
         { id: "methan", navn: "Methan i brænderen", titel: "Fuldstændig forbrænding af methan", br: "CH4", cp: "CO2" },
         { id: "propan", navn: "Propan i gasgrillen", titel: "Fuldstændig forbrænding af propan", br: "C3H8", cp: "CO2" },
         { id: "pentan", navn: "Pentan i benzin", titel: "Fuldstændig forbrænding af pentan", br: "C5H12", cp: "CO2" },
-        { id: "ethan", navn: "Ethan", titel: "Fuldstændig forbrænding af ethan", br: "C2H6", cp: "CO2" },
-        { id: "co", navn: "Methan med for lidt dioxygen", titel: "Ufuldstændig forbrænding af methan", br: "CH4", cp: "CO" }
+        { id: "ethan", navn: "Ethan", titel: "Fuldstændig forbrænding af ethan", br: "C2H6", cp: "CO2", rul: 1 },
+        { id: "co", navn: "Methan med for lidt dioxygen", titel: "Ufuldstændig forbrænding af methan", br: "CH4", cp: "CO", rul: 2 }
     ];
 
     /* Et tal med halve, som eleven skriver det: 3½, ½, 7 */
@@ -285,6 +290,9 @@
     };
 
     function atomer(n, ord) { return n + " " + ord + (n === 1 ? "atom" : "atomer"); }
+
+    /* Svarene i en anden raekkefoelge, saa det rigtige ikke altid staar foerst */
+    function rul(liste, n) { return liste.slice(n).concat(liste.slice(0, n)); }
 
     function lavMaal(r) {
         var b = D.STOF[r.br], p = D.STOF[r.cp], k = D.facit(r);
@@ -327,13 +335,13 @@
             dele.push({
                 type: "spm", chip: "Trin 4 af 4", om: ["tavle"],
                 tekst: "Der står " + D.halv(k.O2) + " foran O₂. Hvad gør du, så alle tal i skemaet bliver hele tal?",
-                svar: [
+                svar: rul([
                     { t: "Ganger alle tal med 2", ok: true },
                     { t: "Runder op til " + op + " O₂",
                       f: "Med " + op + " O₂ er der " + (2 * op) + " oxygenatomer før pilen og " + k.oEfter + " efter, så skemaet passer ikke længere." },
                     { t: "Ganger kun O₂ med 2",
                       f: "Med " + k.oEfter + " O₂ er der " + (2 * k.oEfter) + " oxygenatomer før pilen, men stadig kun " + k.oEfter + " efter." }
-                ],
+                ], r.rul || 0),
                 hint: [
                     "Der findes ikke halve molekyler, så skemaet skal skrives med hele tal.",
                     "Ganger du kun ét af tallene, passer skemaet ikke længere.",
@@ -363,6 +371,67 @@
         if (Math.abs(2 * k - f.oCp) < 0.01) return "Husk også oxygenatomerne i H₂O. Efter pilen er der " + f.oCp + " i " + p.f + " og " + f.oVand + " i H₂O.";
         return "Med " + D.halv(k) + " O₂ er der " + D.halv(2 * k) + " oxygenatomer før pilen, men " + f.oEfter + " efter.";
     };
+    /* ----- Fane 2, oevet: hele skemaet paa én gang -----------------------------------------
+       Eleven skriver alle fire tal direkte, uden kugler og uden trin. Et tomt
+       felt taeller som 1, som i et reaktionsskema, hvor 1 ikke skrives. Tallene
+       skal vaere de mindste hele tal. */
+    D.O_REAKTIONER = [
+        { id: "o-propan", navn: "Propan", titel: "Fuldstændig forbrænding af propan", br: "C3H8", cp: "CO2" },
+        { id: "o-butan", navn: "Butan i en lighter", titel: "Fuldstændig forbrænding af butan", br: "C4H10", cp: "CO2" },
+        { id: "o-heptan", navn: "Heptan", titel: "Fuldstændig forbrænding af heptan", br: "C7H16", cp: "CO2" },
+        { id: "o-octan", navn: "Octan i benzin", titel: "Fuldstændig forbrænding af octan", br: "C8H18", cp: "CO2" },
+        { id: "o-ethan", navn: "Ethan", titel: "Fuldstændig forbrænding af ethan", br: "C2H6", cp: "CO2" },
+        { id: "o-co", navn: "Propan med for lidt dioxygen", titel: "Ufuldstændig forbrænding af propan", br: "C3H8", cp: "CO" }
+    ];
+
+    function lavOevet(r) {
+        var b = D.STOF[r.br], p = D.STOF[r.cp], k = D.facit(r);
+        var hel = k.halv ? { br: 2, O2: k.O2 * 2, cp: k.cp * 2, H2O: k.H2O * 2 } : { br: 1, O2: k.O2, cp: k.cp, H2O: k.H2O };
+        return {
+            id: r.id, navn: r.navn, r: r, k: k, hel: hel, oevet: true,
+            dele: [{
+                type: "forsoeg", oevet: true, indsend: true, chip: "Øvet", om: ["tavle"],
+                tekst: "Afstem reaktionsskemaet. Skriv tallene foran stofferne, og tryk Indsend svar.",
+                hint: [
+                    "Afstem i rækkefølgen C, H og O: først tallet foran " + p.f + ", så foran H₂O og til sidst foran O₂.",
+                    b.f + " har " + b.C + " C og " + b.H + " H. Det giver " + k.cp + " " + p.f + " og " + k.H2O + " H₂O.",
+                    "Efter pilen er der " + k.oEfter + " oxygenatomer, så der skal stå " + D.halv(k.O2) + " O₂." + (k.halv ? " Gang så alle tal med 2." : "")
+                ]
+            }],
+            loest: "Skemaet er afstemt: " + D.skemaTekst(r, hel) + "."
+        };
+    }
+    D.O_MAAL = D.O_REAKTIONER.map(lavOevet);
+
+    /* Fejl i det oevede skema: det foerste grundstof, der ikke passer, i
+       raekkefoelgen C, H, O, eller tal, der kan forkortes */
+    D.oFejl = function (k, m) {
+        var b = D.STOF[m.r.br], p = D.STOF[m.r.cp];
+        var C = [k.br * b.C, k.cp * p.C], H = [k.br * b.H, 2 * k.H2O], O = [2 * k.O2, k.cp * p.O + k.H2O];
+        if (C[0] !== C[1]) return "Carbon passer ikke: " + C[0] + " carbonatomer før pilen og " + C[1] + " efter.";
+        if (H[0] !== H[1]) return "Hydrogen passer ikke: " + H[0] + " hydrogenatomer før pilen og " + H[1] + " efter.";
+        if (O[0] !== O[1]) return "Oxygen passer ikke: " + O[0] + " oxygenatomer før pilen og " + O[1] + " efter.";
+        return "Skemaet passer, men alle tallene kan deles med " + [k.br, k.O2, k.cp, k.H2O].reduce(NK.gcd) + ". Brug de mindste hele tal.";
+    };
+    D.oHeleTal = "Skriv hele tal i felterne, fx 3 eller 13. Der findes ikke halve molekyler.";
+    D.oTomt = "Skriv tallene foran stofferne i felterne først.";
+
+    /* ----- Fejringen, naar alle skemaer er afstemt (som medaljen i sb3.3) ------------------- */
+    D.MEDALJE = function (stjerner, ialt) {
+        if (stjerner >= ialt) return { id: "guld", navn: "Guld", tekst: "Alle " + ialt + " skemaer uden fejl og uden at se svaret." };
+        if (stjerner >= Math.ceil(ialt * 2 / 3)) return { id: "soelv", navn: "Sølv", tekst: stjerner + " af " + ialt + " skemaer uden fejl og uden at se svaret." };
+        return { id: "bronze", navn: "Bronze", tekst: stjerner + " af " + ialt + " skemaer uden fejl og uden at se svaret." };
+    };
+
+    /* Den store tekst oeverst paa tavlen i trinnene (Uoevet) */
+    D.TRIN_TAVLE = {
+        C: "Kig kun på carbonatomerne, C",
+        H: "Kig kun på hydrogenatomerne, H",
+        O: "Kig kun på oxygenatomerne, O",
+        hel: "Gør alle tal til hele tal",
+        afstemt: "Skemaet er afstemt"
+    };
+
     D.vaelgTal = function (stofF) { return "Vælg tallet foran " + stofF + " med pilene over og under feltet."; };
     D.raekkefoelge = {
         C: "Rækkefølgen er C, H og O. Afstem carbon først med tallet foran ",
@@ -373,7 +442,8 @@
 
     D.FAERDIG = {
         b: "Alle fem opgaver om brænderen er løst. På fane 2 afstemmer du forbrændingen.",
-        a: "Alle fem forbrændinger er afstemt."
+        a: "Alle fem forbrændinger er afstemt.",
+        o: "Alle seks skemaer er afstemt."
     };
 
     NK.Data = D;

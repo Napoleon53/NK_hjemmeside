@@ -37,7 +37,7 @@
     }
 
     function ramme(farve, indhold) {
-        return '<svg class="scenetegning" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Rummet">' +
+        return '<svg class="scenetegning" viewBox="0 10 1600 780" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Rummet">' +
             S.defs() + S.vaeg(farve) + indhold + "</svg>";
     }
 
@@ -75,17 +75,17 @@
     /* ----- Rum 1 --------------------------------------------------------- */
     function rum1(r, t) {
         var R = rumRamme(1, r, t);
-        var x = D.LAB_IONER[r.x], proeve = x.opl || [214, 230, 244];
-        var tavle = S.tavle(70, 60, 600, 300,
-            S.kridt(370, 130, "Afstem skemaet", 30, "middle", 400) +
-            kridtLinje(370, 245, 600, Sc.skemaTekst(r.reaktion, true, false), 46));
+        var x = D.LAB_IONER[r.x], proeve = x.opl || [202, 224, 244];
+        var tavle = S.tavle(70, 84, 600, 290,
+            S.kridt(370, 156, "Afstem skemaet", 30, "middle", 400) +
+            kridtLinje(370, 268, 600, Sc.skemaTekst(r.reaktion, true, false), 46));
         /* Draabepladen viser de dryp, gruppen har lavet (raekke for raekke som kortet) */
         var fyld = r.kendte.concat(["x"]).map(function (id) {
             var ion = id === "x" ? r.x : id;
             return D.LAB_REAGENSER.map(function (re) {
                 if (!(t && t.lab && t.lab[id + "-" + re.id])) return null;
                 var res = D.LAB[ion][re.id];
-                return { vaeske: D.LAB_IONER[ion].opl || [214, 230, 244], bundfald: res ? res.farve : null };
+                return { vaeske: D.LAB_IONER[ion].opl || [202, 224, 244], bundfald: res ? res.farve : null };
             });
         });
         var lab = S.paa(140, 580, 1, S.reagensglas(150, [{ farve: proeve, andel: 0.5 }]) +
@@ -93,7 +93,7 @@
                 '<text x="0" y="-105" text-anchor="middle" font-size="22" font-weight="700" fill="' + S.KONTUR + '" font-family="Lexend, Segoe UI, sans-serif">X</text>') +
             S.paa(210, 580, 1, S.draabeplade(5, 4, fyld)) +
             D.LAB_REAGENSER.map(function (re, i) { return S.paa(535 + i * 68, 580, 1, S.draabeflaske(re.formel)); }).join("");
-        return spor("tavle", "Tavlen", [50, 40, 640, 350], tavle, [370, 410], R.type("afstem")) +
+        return spor("tavle", "Tavlen", [50, 20, 640, 400], tavle, [370, 44], R.type("afstem")) +
             spor("ps", "Det periodiske system", [770, 60, 380, 270], S.paa(770, 60, 1, S.plakat(380)), [960, 356], R.type("z")) +
             S.bord(40, 1170) +
             spor("lab", "Dråbepladen", [100, 410, 690, 180], lab, [430, 664], R.type("ion")) +
@@ -104,21 +104,21 @@
     function rum2(r, t) {
         var R = rumRamme(2, r, t);
         var formler = r.molekyler.map(function (m, i) {
-            return S.kridt(70 + (i + 0.5) * 120, 260, m.formel, Math.min(40, Math.round(108 / (m.formel.length * 0.58))), "middle");
+            return S.kridt(70 + (i + 0.5) * 120, 284, m.formel, Math.min(40, Math.round(108 / (m.formel.length * 0.58))), "middle");
         }).join("");
-        var tavle = S.tavle(70, 60, 600, 300, S.kridt(370, 135, "Hvilke er polære?", 30, "middle", 400) + formler);
+        var tavle = S.tavle(70, 84, 600, 290, S.kridt(370, 160, "Hvilke er polære?", 30, "middle", 400) + formler);
         var flaske = S.paa(790, 330, 1, S.hylde(330)) +
             '<rect x="820" y="236" width="26" height="94" fill="#7d5aa6" stroke="' + S.KONTUR + '" stroke-width="2.5"/>' +
             '<rect x="848" y="250" width="22" height="80" fill="#3f7fb5" stroke="' + S.KONTUR + '" stroke-width="2.5"/>' +
-            S.paa(1000, 330, 1, S.flaske(124, 210, r.streg.formel, [220, 232, 242], "#c0392b"));
+            S.paa(1000, 330, 1, S.flaske(124, 210, r.streg.formel, [202, 224, 244], "#c0392b"));
         var vaesker = r.stoffer.map(function (st, i) {
             return S.paa(125 + i * 104, 580, 1, st.fast
-                ? S.flaske(84, 120, "", st.farve, "#6b7280")
-                : S.flaske(84, 150, "", st.farve, st.navn === "vand" ? "#2f6fd0" : "#6b7280"));
+                ? S.flaske(84, 104, "", st.farve, "#6b7280")
+                : S.flaske(84, 132, "", st.farve, st.navn === "vand" ? "#2f6fd0" : "#6b7280"));
         }).join("") +
             '<rect x="735" y="552" width="70" height="28" rx="4" fill="url(#g-trae)" stroke="' + S.KONTUR + '" stroke-width="2.5"/>' +
             S.paa(770, 566, 1, S.reagensglas(150, []));
-        return spor("tavle", "Tavlen", [50, 40, 640, 350], tavle, [370, 410], R.type("polaer")) +
+        return spor("tavle", "Tavlen", [50, 20, 640, 400], tavle, [370, 44], R.type("polaer")) +
             spor("flaske", "Flasken", [930, 100, 140, 240], flaske, [1000, 396], R.type("streger")) +
             S.bord(40, 1170) +
             spor("bland", "Væskerne", [70, 400, 760, 190], vaesker, [430, 664], R.type("bland")) +
@@ -129,16 +129,16 @@
     function rum3(r, t) {
         var R = rumRamme(3, r, t);
         var met = r.metal, vejet = har(t, "3:vej"), haeldt = har(t, "3:gas");
-        var tavle = S.tavle(70, 60, 600, 300,
-            kridtLinje(370, 150, 600, met.skema, 34) +
-            S.kridt(370, 230, "M(" + met.sym + ") = " + NK.komma(met.M, 2) + " g/mol", 32, "middle") +
-            S.kridt(370, 300, "R = 0,08314 L · bar / (mol · K)", 28, "middle", 400));
+        var tavle = S.tavle(70, 84, 600, 290,
+            kridtLinje(370, 172, 600, met.skema, 34) +
+            S.kridt(370, 250, "M(" + met.sym + ") = " + NK.komma(met.M, 2) + " g/mol", 32, "middle") +
+            S.kridt(370, 318, "R = 0,08314 L · bar / (mol · K)", 28, "middle", 400));
         var vaegt = S.paa(250, 580, 1.1, S.vaegt(vejet && !haeldt ? NK.komma(r.m, 2) + " g" : "0,00 g", vejet && !haeldt ? met.sym : null)) +
             (vejet ? "" : S.paa(440, 580, 1.1, S.vejebaad(met.sym)));
-        var kolbe = S.paa(640, 580, 1, S.kolbe(150, 160, [222, 234, 244], 0.42, haeldt)) + S.paa(640, 420, 0.8, S.gassproejte(haeldt ? 0.8 : 0)) +
+        var kolbe = S.paa(640, 580, 1, S.kolbe(150, 160, [202, 224, 244], 0.42, haeldt)) + S.paa(640, 420, 0.8, S.gassproejte(haeldt ? 0.8 : 0)) +
             '<rect x="606" y="486" width="68" height="30" rx="3" fill="#fff" stroke="' + S.KONTUR + '" stroke-width="2"/>' +
             '<text x="640" y="508" text-anchor="middle" font-size="19" font-weight="700" fill="' + S.KONTUR + '" font-family="Lexend, Segoe UI, sans-serif">HCl</text>';
-        return spor("info", "Tavlen", [50, 40, 640, 350], tavle, [370, 410], "") +
+        return spor("info", "Tavlen", [50, 20, 640, 400], tavle, [370, 44], "") +
             spor("vejr", "Vejrstationen", [900, 40, 220, 280], S.paa(900, 40, 1, S.vejrstation(r.t + " °C", NK.komma(r.p, 3) + " bar")), [1010, 346], R.type("rumfang")) +
             S.bord(40, 1170) +
             spor("vaegt", "Vægten", [100, 430, 410, 160], vaegt, [290, 664], R.type("vej")) +
@@ -148,36 +148,36 @@
 
     /* ----- Rum 4 og 5: titreringen ---------------------------------------- */
     function ur() {
-        return '<circle cx="950" cy="190" r="70" fill="#fff" stroke="' + S.KONTUR + '" stroke-width="4"/>' +
-            '<line x1="950" y1="190" x2="950" y2="140" stroke="' + S.KONTUR + '" stroke-width="5" stroke-linecap="round"/>' +
-            '<line x1="950" y1="190" x2="986" y2="208" stroke="' + S.KONTUR + '" stroke-width="5" stroke-linecap="round"/>' +
-            '<circle cx="950" cy="190" r="6" fill="' + S.KONTUR + '"/>';
+        return '<circle cx="1080" cy="150" r="56" fill="#fff" stroke="' + S.KONTUR + '" stroke-width="4"/>' +
+            '<line x1="1080" y1="150" x2="1080" y2="110" stroke="' + S.KONTUR + '" stroke-width="5" stroke-linecap="round"/>' +
+            '<line x1="1080" y1="150" x2="1108" y2="164" stroke="' + S.KONTUR + '" stroke-width="5" stroke-linecap="round"/>' +
+            '<circle cx="1080" cy="150" r="6" fill="' + S.KONTUR + '"/>';
     }
     function titrering(nr, r, t, tavleIndhold, tavleTrin, buretteVaeske, kolbeFoer, kolbeEfter, flaskeEtiket, flaskeVaeske, laag, flaskeTil) {
-        var R = rumRamme(nr, r, t), titreret = har(t, nr + ":titrer"), bx = 500;
-        var flaske = '<rect x="700" y="400" width="120" height="180" fill="#fff" fill-opacity="0"/>' + S.paa(760, 580, 1, S.flaske(100, 165, flaskeEtiket, flaskeVaeske, laag));
+        var R = rumRamme(nr, r, t), titreret = har(t, nr + ":titrer"), bx = 810;
+        var flaske = '<rect x="880" y="400" width="110" height="180" fill="#fff" fill-opacity="0"/>' + S.paa(935, 580, 1, S.flaske(100, 165, flaskeEtiket, flaskeVaeske, laag));
         var burette = S.paa(bx, 580, 1, S.burette(300, buretteVaeske, titreret ? 1 : 0)) + (flaskeTil === "burette" ? flaske : "");
         var kolbe = S.paa(bx, 566, 1, S.kolbe(124, 112, titreret ? kolbeEfter : kolbeFoer, 0.4)) + (flaskeTil === "kolbe" ? flaske : "");
-        return spor("tavle", "Tavlen", [50, 40, 640, 350], S.tavle(70, 60, 600, 300, tavleIndhold), [370, 410], R.type(tavleTrin)) +
+        return spor("tavle", "Tavlen", [50, 20, 640, 400], S.tavle(70, 84, 600, 290, tavleIndhold), [370, 44], R.type(tavleTrin)) +
             ur() + S.bord(40, 1170) +
-            spor("burette", "Buretten", [400, 110, 140, 340], burette, [640, 260], R.type("titrer")) +
-            spor("kolbe", "Kolben", [430, 452, 140, 130], kolbe, [500, 664], R.type("konc")) +
+            spor("burette", "Buretten", [720, 110, 130, 340], burette, [960, 300], R.type("titrer")) +
+            spor("kolbe", "Kolben", [740, 452, 140, 130], kolbe, [810, 664], R.type("konc")) +
             R.bonus() + R.doer();
     }
     function rum4(r, t) {
         var skema = r.syre.formel + " + " + r.base.formel + " → " + r.base.kation + NK.formel(r.syre.anion) + " + H₂O";
         return titrering(4, r, t,
-            kridtLinje(370, 170, 600, skema, 40) + S.kridt(370, 280, "pH = ?", 50, "middle"), "ph",
-            [226, 236, 246], [226, 236, 246], [250, 190, 214], r.syre.formel + " ?", [226, 236, 246], "#b3261e", "kolbe");
+            kridtLinje(370, 190, 600, skema, 40) + S.kridt(370, 300, "pH = ?", 50, "middle"), "ph",
+            [202, 224, 244], [202, 224, 244], [250, 190, 214], r.syre.formel + " ?", [202, 224, 244], "#b3261e", "kolbe");
     }
     function rum5(r, t) {
         var red = r.redox;
         /* Skemaet er langt: venstre side paa én linje, hoejre side paa den naeste */
         var dele = red.skema.replace(/\((aq|l|g)\)/g, "").split("→");
         return titrering(5, r, t,
-            kridtLinje(370, 140, 600, dele[0].trim() + " →", 36) + kridtLinje(370, 200, 600, dele[1].trim(), 36) +
-            S.kridt(370, 300, "n(" + red.stof + ") = ?", 42, "middle"), "forhold",
-            [128, 40, 132], red.id === "fe" ? [214, 236, 214] : [226, 236, 246], [226, 190, 232], "KMnO₄", [128, 40, 132], "#4a2060", "burette");
+            kridtLinje(370, 162, 600, dele[0].trim() + " →", 36) + kridtLinje(370, 220, 600, dele[1].trim(), 36) +
+            S.kridt(370, 318, "n(" + red.stof + ") = ?", 42, "middle"), "forhold",
+            [128, 40, 132], red.id === "fe" ? [214, 236, 214] : [202, 224, 244], [226, 190, 232], "KMnO₄", [128, 40, 132], "#4a2060", "burette");
     }
 
     /* ----- Den gyldne doer ------------------------------------------------- */

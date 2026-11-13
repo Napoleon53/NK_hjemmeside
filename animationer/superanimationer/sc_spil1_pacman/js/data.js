@@ -107,7 +107,7 @@
     /* Mix: saa mange opgaver fra hvert af de andre emner */
     D.MIX_PR_EMNE = 3;
 
-    /* Seglet til escaperoommet (c_spil8_escaperoom.html, "Segl 3 · Pacman
+    /* Seglet til escaperoommet (sc_spil8_escaperoom, "Segl 3 · Pacman
        Quiz"). Svaret dér er "labyrintmester". Ret ikke navnene uden at
        rette escaperoommet med. */
     D.MESTER = {

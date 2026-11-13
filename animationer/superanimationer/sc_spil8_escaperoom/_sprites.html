@@ -6,11 +6,11 @@
 <link rel="stylesheet" href="css/stil.css">
 <style>
     /* Udviklervaerktoej: viser hver ting alene. Indgaar ikke i spillet. */
-    body { overflow: auto; display: block; padding: 16px; }
+    body { overflow: auto; display: block; padding: 16px; background: #e9eef2; color: #1d2433; }
     h1 { font-size: 1.2rem; margin: 0 0 12px; }
-    .gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-    figure { margin: 0; background: #1d2029; border: 1px solid #2c2f3a; border-radius: 10px; padding: 8px; }
-    figcaption { font-size: 0.85rem; color: #a9adb4; margin-bottom: 4px; }
+    .gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    figure { margin: 0; background: #f5f7f9; border: 1px solid #c9d0d8; border-radius: 10px; padding: 8px; }
+    figcaption { font-size: 0.85rem; color: #3a4150; margin-bottom: 4px; }
     svg { width: 100%; height: 220px; display: block; }
 </style>
 </head>
@@ -22,23 +22,29 @@
 <script src="js/sprites.js"></script>
 <script>
 (function () {
-    var S = NK.Sprites;
-    /* [navn, viewBox, tegning] */
+    var S = NK.Sprites, vand = [202, 224, 244];
+    /* [navn, viewBox, tegning]; de fleste ting har nulpunkt i bund, midt */
     var ting = [
-        ["Dør og kodelås", "1120 130 400 600", S.doer(1250, 160, 230, 560, "#3498db", 1, false) + S.kodelaas(1160, 380, false)],
-        ["Åben dør", "1120 130 400 600", S.doer(1250, 160, 230, 560, "#e74c3c", 5, true) + S.kodelaas(1160, 380, true)],
-        ["Tavle", "70 70 580 340", S.tavle(90, 90, 540, 270, S.kridt(360, 240, "__ Al + __ O₂ → __ Al₂O₃", 34, "middle"))],
-        ["Periodisk system", "700 80 400 300", S.plakat(720, 100, 360)],
-        ["Reagensglas og dråbeplade", "150 400 360 160", S.draabeplade(270, 540, 5, 4) + S.reagensglas(205, 524, 118, [120, 175, 235], 0.5)],
-        ["Dråbeflasker", "480 410 260 140", S.draabeflaske(520, 540, "NaCl") + S.draabeflaske(580, 540, "KI") + S.draabeflaske(640, 540, "Na₂SO₄") + S.draabeflaske(700, 540, "NaOH")],
-        ["Flaske", "880 140 160 210", S.flaske(960, 330, 96, 160, "HCN", [210, 225, 235], "#8a1f1f")],
-        ["Vægt", "200 400 280 150", S.vaegt(330, 540, "2,40 g", "Mg")],
-        ["Vejrstation", "680 90 240 280", S.vejrstation(700, 100, "23 °C", "1,013 bar")],
-        ["Burette og kolbe", "720 100 200 450", S.stativ(820, 110) + S.burette(820, 120, 400, [118, 34, 120]) + S.kolbe(820, 540, 120, 112, [214, 196, 226], 0.36)],
-        ["Notesbog", "270 430 300 120", S.notesbog(420, 540)],
-        ["Segl", "580 380 440 300", S.segl(690, 452, S.SEGLMAERKER.million, false) + S.segl(910, 452, S.SEGLMAERKER.syregalgen, false) +
-            S.segl(690, 600, S.SEGLMAERKER.pacman, false) + S.segl(910, 600, S.SEGLMAERKER.organisk, true)],
-        ["Nøgler", "0 0 200 90", S.noegle(10, 10, "#f1c40f", "#7a5a08", 1) + S.noegle(100, 50, "#8b9097", "#3d4148", 1)]
+        ["Dør og kodelås", "1160 130 400 630", S.doer(1290, 170, 230, 570, "#2f8fd8", 1, false) + S.kodelaas(1195, 400, false)],
+        ["Åben dør", "1160 130 400 630", S.doer(1290, 170, 230, 570, "#e0483a", 5, true) + S.kodelaas(1195, 400, true)],
+        ["Tavle", "40 50 660 370", S.tavle(70, 84, 600, 290, S.kridt(370, 240, "__ Al + __ O₂ → __ Al₂O₃", 44, "middle"))],
+        ["Periodisk system", "-10 -10 400 280", S.plakat(380)],
+        ["Reagensglas (ét lag, to lag, krystaller)", "-140 -190 280 200", S.paa(-90, 0, 1, S.reagensglas(165, [{ farve: vand, andel: 0.6 }])) +
+            S.paa(0, 0, 1, S.reagensglas(165, [{ farve: vand, andel: 0.3 }, { farve: [226, 208, 96], andel: 0.3 }])) +
+            S.paa(90, 0, 1, S.reagensglas(165, [{ farve: [236, 240, 222], andel: 0.5 }], [250, 250, 250]))],
+        ["Dråbeplade", "-10 -120 280 130", S.draabeplade(5, 4, [[null, { vaeske: vand, bundfald: [250, 208, 40] }], [{ vaeske: vand, bundfald: null }]])],
+        ["Dråbeflasker", "-50 -150 300 160", ["NaCl", "KI", "Na₂SO₄", "NaOH"].map(function (e, i) { return S.paa(i * 68, 0, 1, S.draabeflaske(e)); }).join("")],
+        ["Flasker", "-90 -240 300 250", S.paa(0, 0, 1, S.flaske(124, 210, "HCN", vand, "#c0392b")) + S.paa(140, 0, 1, S.flaske(84, 132, "", [226, 208, 96], "#6b7280"))],
+        ["Vægt", "-150 -150 300 160", S.vaegt("2,40 g", "Mg")],
+        ["Vejebåde (Mg, Al, Zn, Fe)", "-80 -50 560 60", ["Mg", "Al", "Zn", "Fe"].map(function (m, i) { return S.paa(i * 135, 0, 1, S.vejebaad(m)); }).join("")],
+        ["Vejrstation", "-10 -10 240 290", S.vejrstation("23 °C", "1,013 bar")],
+        ["Kolbe med gassprøjte", "-110 -260 420 270", S.kolbe(150, 160, vand, 0.42, true) + S.paa(0, -160, 0.8, S.gassproejte(0.8))],
+        ["Burette og kolbe", "-110 -480 300 490", S.burette(300, [128, 40, 132], 0.5) + S.paa(0, -14, 1, S.kolbe(124, 112, [226, 190, 232], 0.4))],
+        ["Bonusskrin", "-90 -120 180 130", S.skrin(false)],
+        ["Segl", "-70 -60 380 120", S.paa(0, 0, 1, S.segl(S.SEGLMAERKER.million, false)) + S.paa(100, 0, 1, S.segl(S.SEGLMAERKER.syregalgen, false)) +
+            S.paa(200, 0, 1, S.segl(S.SEGLMAERKER.pacman, false)) + S.paa(300, 0, 1, S.segl(S.SEGLMAERKER.organisk, true))],
+        ["Skilte", "0 0 460 220", S.skilt(120, 40, "Dråbepladen", "aktiv") + S.skilt(330, 40, "Tavlen", "") + S.skilt(120, 120, "Vægten", "loest") + S.skilt(330, 120, "Bonusrute", "bonus")],
+        ["Nøgler", "0 0 200 90", S.noegle(10, 10, "#f6cd2b", "#27303f", 1) + S.noegle(100, 50, "#aab1ba", "#27303f", 1)]
     ];
     document.getElementById("gitter").innerHTML = ting.map(function (t) {
         return "<figure><figcaption>" + t[0] + '</figcaption><svg viewBox="' + t[1] + '">' + S.defs() + t[2] + "</svg></figure>";

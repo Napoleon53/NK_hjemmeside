@@ -209,6 +209,8 @@ og Indsend svar).
 
 ## I menuen
 
+I menuen fra 13. nov. 2026 som B4 knap 2 (koden `b5ester`). Den gamle fil bliver liggende, fordi Kemibogen B4.5 og slidesene linker til den. Det, der står herunder, var planen.
+
 Ikke i menuen endnu. Når brugeren siger til: knap nr. 2 "Estersyntese" i
 `kemi-b-filer/samling_b4,5,6.html` (koden `b5ester`) skal pege på
 `../superanimationer/sb4.2_estersyntese/index.html` med en ny

@@ -16,9 +16,6 @@
     D.LAGER = "nk-escaperoom";
     D.VERSION = 2;
 
-    /* Efter saa mange forkerte svar paa en del kommer knappen Vis svaret
-       (ogsaa uden at hintet er laest), saa ingen sidder fast. */
-    D.VIS_SVAR_EFTER = 3;
 
     /* Rummenes farver (noeglerne og doerene). */
     D.FARVE = { 1: "#2f8fd8", 2: "#27ae60", 3: "#8e59b6", 4: "#e67e22", 5: "#e0483a", 6: "#f1c40f" };
@@ -98,9 +95,9 @@
        isotoper og q bruges af bonusruten. */
     D.LAB_IONER = {
         ag: { formel: "Ag⁺",  sym: "Ag", metal: "sølv",      Z: 47, q: 1, isotoper: [107, 109] },
-        pb: { formel: "Pb²⁺", sym: "Pb", metal: "bly",       Z: 82, q: 2, isotoper: [206, 207, 208] },
-        ba: { formel: "Ba²⁺", sym: "Ba", metal: "barium",    Z: 56, q: 2, isotoper: [137, 138] },
-        ca: { formel: "Ca²⁺", sym: "Ca", metal: "calcium",   Z: 20, q: 2, isotoper: [40, 44] },
+        pb: { formel: "Pb²⁺", sym: "Pb", metal: "bly",       Z: 82, q: 2, isotoper: [204, 206, 207, 208] },
+        ba: { formel: "Ba²⁺", sym: "Ba", metal: "barium",    Z: 56, q: 2, isotoper: [134, 135, 136, 137, 138] },
+        ca: { formel: "Ca²⁺", sym: "Ca", metal: "calcium",   Z: 20, q: 2, isotoper: [40, 42, 43, 44, 48] },
         cu: { formel: "Cu²⁺", sym: "Cu", metal: "kobber",    Z: 29, q: 2, isotoper: [63, 65], opl: [120, 175, 235] },
         mg: { formel: "Mg²⁺", sym: "Mg", metal: "magnesium", Z: 12, q: 2, isotoper: [24, 25, 26] }
     };
@@ -222,7 +219,7 @@
     /* Bindinger og valenselektroner pr. atom (selvtestens kontrol). */
     D.VALENS = { H: 1, C: 4, N: 3, O: 2, Cl: 1 };
     D.VALENSELEKTRONER = { H: 1, C: 4, N: 5, O: 6, Cl: 7 };
-    /* Bonus: streger og frie elektronpar i et stoerre molekyle. */
+    /* Bonus: streger og frie elektronpar i to stoerre molekyler. */
     D.BONUSMOLEKYLER = [
         { navn: "urea",           formel: "CO(NH₂)₂",    brutto: "CH4N2O", streger: 8,  par: 4 },
         { navn: "eddikesyre",     formel: "CH₃COOH",     brutto: "C2H4O2", streger: 8,  par: 4 },
@@ -273,8 +270,8 @@
           materiale: "ståluld", bonusStof: "jern", pctLav: 80, pctHoej: 99, pctDec: 0,
           skema: "MnO₄⁻(aq) + 5 Fe²⁺(aq) + 8 H⁺(aq) → Mn²⁺(aq) + 5 Fe³⁺(aq) + 4 H₂O(l)",
           tael: { v: [[1, "MnO4", -1], [5, "Fe", 2], [8, "H", 1]], h: [[1, "Mn", 2], [5, "Fe", 3], [4, "H2O", 0]] } },
-        { id: "h2o2", stof: "H₂O₂", proeve: "fortyndet brintoverilte", forhold: [2, 5], M: 34.01, Mnavn: "H₂O₂",
-          materiale: "brintoverilte fra flasken", bonusStof: "H₂O₂", pctLav: 2, pctHoej: 9.5, pctDec: 1,
+        { id: "h2o2", stof: "H₂O₂", proeve: "fortyndet hydrogenperoxid", forhold: [2, 5], M: 34.01, Mnavn: "H₂O₂",
+          materiale: "hydrogenperoxid-opløsning fra flasken", bonusStof: "H₂O₂", pctLav: 2, pctHoej: 9.5, pctDec: 1,
           skema: "2 MnO₄⁻(aq) + 5 H₂O₂(aq) + 6 H⁺(aq) → 2 Mn²⁺(aq) + 5 O₂(g) + 8 H₂O(l)",
           tael: { v: [[2, "MnO4", -1], [5, "H2O2", 0], [6, "H", 1]], h: [[2, "Mn", 2], [5, "O2", 0], [8, "H2O", 0]] } }
     ];
@@ -324,7 +321,7 @@
 
     D.HJAELP = [
         "Kortet øverst siger, hvad næste trin er. Klik på den ting i rummet, trinet nævner. Den har et gult skilt.",
-        "Hvert trin tjekkes, når I trykker Indsend svar. Et hint er gratis, og efter tre forkerte svar kan I få svaret vist.",
+        "Hvert trin tjekkes, når I trykker Indsend svar. Et hint er gratis, og bagefter kan I få svaret vist.",
         "De løste trin giver cifrene til koden. Når alle trin er løst, står koden klar i kodelåsen ved døren.",
         "Bonusruten er den mørke kasse med stjernen. Dens opgave er svær og uden hints. Guldkoden åbner døren i stedet og giver en guldnøgle. Fem guldnøgler åbner en ekstra dør til sidst.",
         "Hver sag har sit eget nummer og sine egne tal. Ny sag giver nye tal.",

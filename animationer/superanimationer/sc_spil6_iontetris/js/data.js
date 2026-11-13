@@ -163,7 +163,7 @@
         laeg: " Læg {ion} op ad den.",
         ramme: "Rammen med {gruppe} mangler {mangler}.",
         laegRamme: " Læg {ion} op ad rammen.",
-        fremmed: "{ion} kom ikke med i rammen. Den mangler {mangler}.",
+        fremmed: "{ion} kom ikke med i rammen. Rammen mangler {mangler}.",
         kaede: "Kædereaktion ×{n}.",
         kaedeStor: "Kædereaktion ×{n}. Pulveret fyger.",
         raekker: "{n} rækker på én gang.",

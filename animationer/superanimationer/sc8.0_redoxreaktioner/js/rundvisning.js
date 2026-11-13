@@ -22,13 +22,15 @@
         ],
         "fane-d": [
             { sel: "#d-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er seks opgaver." },
-            { sel: "#d-anker-ark", titel: "Arket", tekst: "Øverst står reaktionen og under den de to delreaktioner. Træk en brik hen på en stiplet plads. Et klik på en plads med elektroner fjerner én elektron igen." },
-            { sel: "#d-anker-bakke", titel: "Brikkerne", tekst: "Her ligger elektronerne og mærkaterne, du skal bruge i opgaven. Der er altid elektroner nok." }
+            { sel: "#d-anker-ark", titel: "Arket", tekst: "Øverst står reaktionen og under den de to delreaktioner. Træk en brik hen på en stiplet plads. Et klik på en plads giver én elektron mere, og minus fjerner én." },
+            { sel: "#d-anker-bakke", titel: "Brikkerne", tekst: "Her ligger elektronerne og mærkaterne, du skal bruge i opgaven. Der er altid elektroner nok." },
+            { sel: "#d-opgaver", titel: "Ekstraopgaver", tekst: "Nederst i listen er der ekstraopgaver i tre sværhedsgrader. Let: elektronerne. Middel: også tallene foran delreaktionerne. Svær: større tal og reduktions- eller oxidationsmidlet." }
         ],
         "fane-s": [
             { sel: "#s-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er tre opgaver." },
             { sel: "#s-anker-sb", titel: "Syre/base-reaktionen", tekst: "Saltsyre og vand fra kapitel 7. Klik på luppen for at se reaktionen. Det orange H er det, der bliver overført." },
-            { sel: "#s-anker-rx", titel: "Redoxreaktionen", tekst: "Magnesium og dioxygen fra fane 1. Klik på luppen for at se reaktionen." }
+            { sel: "#s-anker-rx", titel: "Redoxreaktionen", tekst: "Magnesium og dioxygen fra fane 1. Klik på luppen for at se reaktionen." },
+            { sel: "#s-luppekort", titel: "Elektronprikker", tekst: "Kontakten viser de yderste elektroner som prikker i begge lupper. Efter reaktionen har O²⁻ otte, og Mg²⁺ har ingen." }
         ]
     };
     var trin = [];

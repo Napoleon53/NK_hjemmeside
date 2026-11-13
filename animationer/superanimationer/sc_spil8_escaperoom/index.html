@@ -2,6 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<script src="../../til_panelet.js" data-panel="samling_alt.html" data-emne="spil.escaperoom"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EscapeRoom Kemi C</title>
 <link rel="stylesheet" href="css/stil.css">
@@ -29,9 +30,10 @@
     <div class="scene" id="scene">
         <div class="tegning" id="tegning"></div>
         <div class="midte" id="midte" hidden></div>
-        <div class="slor" id="slor" hidden>
-            <div class="seddel" id="seddel" role="dialog" aria-modal="true" aria-label="Kort"></div>
-        </div>
+    </div>
+    <!-- Kortet til et trin ligger over baade opgavekortet og scenen, saa det har plads -->
+    <div class="slor" id="slor" hidden>
+        <div class="seddel" id="seddel" role="dialog" aria-modal="true" aria-label="Kort"></div>
     </div>
 </main>
 

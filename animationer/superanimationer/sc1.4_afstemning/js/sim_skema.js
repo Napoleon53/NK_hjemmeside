@@ -138,7 +138,7 @@
             this.fejlLinje(v === "broek" ? "Tallene foran skal være hele tal. Giver afstemningen et halvt tal, så gang alle tallene med 2." :
                 v === 0 ? "0 foran et stof betyder, at stoffet ikke er med. Skriv mindst 1." :
                 typeof v === "number" && v > D.MAKS_TAL ? "Så store tal skal der ikke til." :
-                "Skriv hele tal i felterne, for eksempel 2 eller 3.");
+                "Skriv hele tal i felterne, fx 2 eller 3.");
             return;
         }
         var d = A.dom(o.r, o.p, k.cr, k.cp);

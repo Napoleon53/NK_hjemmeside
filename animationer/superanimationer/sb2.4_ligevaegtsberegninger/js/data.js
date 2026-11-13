@@ -124,31 +124,31 @@
           r: [[2, "NOCl", "g"]], p: [[2, "NO", "g"], [1, "Cl2", "g"]],
           V: 2.00, n: { NOCl: 0.600, NO: 0.0800, Cl2: 0.0400 },
           tekst: "Nitrosylchlorid opvarmes til 462 °C i en lukket beholder på 2,00 L, indtil ligevægten har indstillet sig. Ved ligevægt er der 0,600 mol NOCl, 0,0800 mol NO og 0,0400 mol Cl₂.",
-          spm: "Bestem ligevægtskonstanten Kc med enhed." },
+          spm: "Bestem ligevægtskonstanten K med enhed." },
         { id: "nh3", gruppe: "kc", type: "kc", navn: "Ammoniaksyntesen", T: "400 °C",
           r: [[1, "N2", "g"], [3, "H2", "g"]], p: [[2, "NH3", "g"]],
           V: 5.00, n: { N2: 0.500, H2: 1.50, NH3: 0.250 },
           tekst: "Dinitrogen og dihydrogen reagerer ved 400 °C i en lukket beholder på 5,00 L. Ved ligevægt er der 0,500 mol N₂, 1,50 mol H₂ og 0,250 mol NH₃.",
-          spm: "Bestem ligevægtskonstanten Kc med enhed." },
+          spm: "Bestem ligevægtskonstanten K med enhed." },
         { id: "vg1", gruppe: "kc", type: "kc", navn: "Vandgasligevægten", T: "700 K",
           r: [[1, "CO", "g"], [1, "H2O", "g"]], p: [[1, "CO2", "g"], [1, "H2", "g"]],
           V: 10.0, n: { CO: 0.300, H2O: 0.300, CO2: 0.700, H2: 0.700 },
           tekst: "Carbonmonoxid og vanddamp reagerer ved 700 K i en lukket beholder på 10,0 L. Ved ligevægt er der 0,300 mol CO, 0,300 mol H₂O, 0,700 mol CO₂ og 0,700 mol H₂. Vandet er på gasform.",
-          spm: "Bestem ligevægtskonstanten Kc med enhed." },
+          spm: "Bestem ligevægtskonstanten K med enhed." },
         { id: "fosgen", gruppe: "uk", type: "ukendt", navn: "Phosgen-ligevægten", T: "600 K",
           r: [[1, "CO", "g"], [1, "Cl2", "g"]], p: [[1, "COCl2", "g"]],
           K: 25.0, kendt: { CO: 0.120, COCl2: 0.450 }, ukendt: "Cl2",
-          tekst: "Phosgen dannes af carbonmonoxid og dichlor i en lukket beholder. Ved 600 K er Kc = 25,0 M⁻¹. Ved ligevægt er [CO] = 0,120 M og [COCl₂] = 0,450 M.",
+          tekst: "Phosgen dannes af carbonmonoxid og dichlor i en lukket beholder. Ved 600 K er K = 25,0 M⁻¹. Ved ligevægt er [CO] = 0,120 M og [COCl₂] = 0,450 M.",
           spm: "Bestem ligevægtskoncentrationen af Cl₂." },
         { id: "so3", gruppe: "uk", type: "ukendt", navn: "Svovltrioxid spaltes", T: "900 K",
           r: [[2, "SO3", "g"]], p: [[2, "SO2", "g"], [1, "O2", "g"]],
           K: 4.00e-3, kendt: { SO3: 0.500, O2: 0.100 }, ukendt: "SO2",
-          tekst: "Svovltrioxid spaltes i en lukket beholder. Ved 900 K er Kc = 4,00 · 10⁻³ M. Ved ligevægt er [SO₃] = 0,500 M og [O₂] = 0,100 M.",
+          tekst: "Svovltrioxid spaltes i en lukket beholder. Ved 900 K er K = 4,00 · 10⁻³ M. Ved ligevægt er [SO₃] = 0,500 M og [O₂] = 0,100 M.",
           spm: "Bestem ligevægtskoncentrationen af SO₂." }
     ];
 
     D.GRUPPER_UX = [
-        { id: "kc", titel: "Kc ud fra stofmængder" },
+        { id: "kc", titel: "K ud fra stofmængder" },
         { id: "uk", titel: "En ukendt koncentration" }
     ];
 
@@ -157,28 +157,28 @@
     D.MX = [
         { id: "butan", gruppe: "let", navn: "Isomerisering af butan", T: "25 °C", K: 2.50,
           r: [[1, "nbutan", "g"]], p: [[1, "isobutan", "g"]], c0: { nbutan: 0.600 },
-          tekst: "Butan kan omdannes til 2-methylpropan. En lukket beholder fyldes med butan, så koncentrationen er 0,600 M. Ved 25 °C er Kc = 2,50." },
+          tekst: "Butan kan omdannes til 2-methylpropan. En lukket beholder fyldes med butan, så koncentrationen er 0,600 M. Ved 25 °C er K = 2,50." },
         { id: "buten", gruppe: "let", navn: "Cis-trans-isomerisering af but-2-en", T: "400 K", K: 4.00,
           r: [[1, "cis", "g"]], p: [[1, "trans", "g"]], c0: { cis: 0.500 },
-          tekst: "cis-but-2-en kan omdannes til trans-but-2-en. En lukket beholder fyldes med cis-but-2-en, så koncentrationen er 0,500 M. Ved 400 K er Kc = 4,00." },
+          tekst: "cis-but-2-en kan omdannes til trans-but-2-en. En lukket beholder fyldes med cis-but-2-en, så koncentrationen er 0,500 M. Ved 400 K er K = 4,00." },
         { id: "so2cl2", gruppe: "mid", navn: "Sulfurylchlorid spaltes", T: "375 °C", K: 0.0500,
           r: [[1, "SO2Cl2", "g"]], p: [[1, "SO2", "g"], [1, "Cl2", "g"]], c0: { SO2Cl2: 0.200 },
-          tekst: "Sulfurylchlorid spaltes til svovldioxid og dichlor. En lukket beholder fyldes med SO₂Cl₂, så koncentrationen er 0,200 M. Ved 375 °C er Kc = 0,0500 M." },
+          tekst: "Sulfurylchlorid spaltes til svovldioxid og dichlor. En lukket beholder fyldes med SO₂Cl₂, så koncentrationen er 0,200 M. Ved 375 °C er K = 0,0500 M." },
         { id: "cocl2", gruppe: "mid", navn: "Phosgen spaltes", T: "800 K", K: 0.0200,
           r: [[1, "COCl2", "g"]], p: [[1, "CO", "g"], [1, "Cl2", "g"]], c0: { COCl2: 0.500 },
-          tekst: "Phosgen spaltes ved høj temperatur. En lukket beholder fyldes med COCl₂, så koncentrationen er 0,500 M. Ved 800 K er Kc = 0,0200 M." },
+          tekst: "Phosgen spaltes ved høj temperatur. En lukket beholder fyldes med COCl₂, så koncentrationen er 0,500 M. Ved 800 K er K = 0,0200 M." },
         { id: "iod", gruppe: "mid", navn: "Diiod spaltes til iodatomer", T: "1200 K", K: 0.0100,
           r: [[1, "I2", "g"]], p: [[2, "I", "g"]], c0: { I2: 0.400 },
-          tekst: "Diiodmolekyler spaltes til frie iodatomer. En lukket beholder fyldes med I₂, så koncentrationen er 0,400 M. Ved 1200 K er Kc = 0,0100 M." },
+          tekst: "Diiodmolekyler spaltes til frie iodatomer. En lukket beholder fyldes med I₂, så koncentrationen er 0,400 M. Ved 1200 K er K = 0,0100 M." },
         { id: "vg2", gruppe: "svaer", navn: "Vandgasligevægten", T: "700 K", K: 5.44,
           r: [[1, "CO", "g"], [1, "H2O", "g"]], p: [[1, "CO2", "g"], [1, "H2", "g"]], c0: { CO: 0.100, H2O: 0.100 },
-          tekst: "En lukket beholder fyldes med CO og vanddamp, så begge koncentrationer er 0,100 M. Der er intet CO₂ og intet H₂ fra start. Ved 700 K er Kc = 5,44." },
+          tekst: "En lukket beholder fyldes med CO og vanddamp, så begge koncentrationer er 0,100 M. Der er intet CO₂ og intet H₂ fra start. Ved 700 K er K = 5,44." },
         { id: "hbr", gruppe: "svaer", navn: "Dannelse af hydrogenbromid", T: "500 K", K: 64.0,
           r: [[1, "H2", "g"], [1, "Br2", "g"]], p: [[2, "HBr", "g"]], c0: { H2: 0.200, Br2: 0.200 },
-          tekst: "En lukket beholder fyldes med H₂ og Br₂, så begge koncentrationer er 0,200 M. Der er intet HBr fra start. Ved 500 K er Kc = 64,0." },
+          tekst: "En lukket beholder fyldes med H₂ og Br₂, så begge koncentrationer er 0,200 M. Der er intet HBr fra start. Ved 500 K er K = 64,0." },
         { id: "vg3", gruppe: "svaer", navn: "Vandgas med forskellig start", T: "700 K", K: 5.44,
           r: [[1, "CO", "g"], [1, "H2O", "g"]], p: [[1, "CO2", "g"], [1, "H2", "g"]], c0: { CO: 0.200, H2O: 0.100 },
-          tekst: "En lukket beholder fyldes med 0,200 M CO og 0,100 M vanddamp. Der er intet CO₂ og intet H₂ fra start. Ved 700 K er Kc = 5,44." }
+          tekst: "En lukket beholder fyldes med 0,200 M CO og 0,100 M vanddamp. Der er intet CO₂ og intet H₂ fra start. Ved 700 K er K = 5,44." }
     ];
 
     D.GRUPPER_MX = [

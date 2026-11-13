@@ -916,6 +916,8 @@ select:focus-visible {
 .opg-tal { letter-spacing: 0.02em; text-transform: none; }
 
 .opg-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+/* sc8.0: overskriften over ekstraopgaverne i listen */
+.opg-gruppe { width: 100%; margin: 8px 0 1px; color: var(--tekst-svag); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 
 .opg-chip {
     display: inline-flex;

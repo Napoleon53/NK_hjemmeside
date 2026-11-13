@@ -169,7 +169,7 @@
                 this.spiller = false;
                 if (!this.braendt) {
                     this.braendt = true;
-                    if (this.iForsoeg()) this.forsoegKlaret(this.opg.o.forsoeg.set);
+                    if (this.iForsoeg()) this.forsoegKlaret(this.delNu().set);
                 }
             }
         }

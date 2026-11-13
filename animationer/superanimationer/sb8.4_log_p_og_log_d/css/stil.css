@@ -2537,3 +2537,9 @@ html body.papirkort.papirkort .scenekort .sk-formel sup { font-size: 0.72em; }
 /* Formlerne i teorien */
 .teori-formel { text-align: center; font-weight: 600; }
 .teori-formel sup { font-size: 0.72em; }
+
+/* Ekstraopgaverne i panelet: listen, kontakten Svær og knappen */
+.svaer-maerke { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background-color: rgba(224, 84, 70, 0.18); color: #ffb3aa; font-size: 0.78rem; font-weight: 800; vertical-align: 1px; }
+.svaerknap { width: 100%; margin-top: 8px; }
+.svaerknap .svaer-maerke { margin-left: auto; }
+.ekstraknap { width: 100%; justify-content: center; margin-top: 8px; }

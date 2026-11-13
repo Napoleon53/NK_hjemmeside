@@ -276,7 +276,7 @@
                 dele: [sorterDel({
                     spm: "Hvilke af de fem molekyler er polære?",
                     gitter: true,
-                    emner: r.molekyler.map(function (m, i) { return { id: "m" + i, navn: m.formel, polaer: m.polaer, figur: S.molekyle(m.t, 140, 105), fordi: m.fordi }; }),
+                    emner: r.molekyler.map(function (m, i) { return { id: "m" + i, navn: m.formel, polaer: m.polaer, figur: S.molekyle(m.t, 160, 120), fordi: m.fordi }; }),
                     hint: "Et molekyle er polært, når det har polære bindinger og ikke er symmetrisk. En forskel i elektronegativitet under 0,5 giver en upolær binding.",
                     manglerTekst: "Vælg polær eller upolær for alle fem molekyler.",
                     fejlTekst: function (e) { return "Se på " + e.navn + " igen. " + e.fordi; },
@@ -297,12 +297,13 @@
         };
     }
     function bonus2(r) {
-        var m = r.bonus.molekyle;
+        var m = r.bonus.molekyler;
         return {
-            titel: "Stregformlen for " + m.navn,
-            html: "<p>Tegn stregformlen for " + h(m.navn) + ", <b>" + h(m.formel) + "</b>, så alle atomer opfylder oktetreglen (hydrogen dubletreglen).</p>" +
-                '<p class="spm">Hvor mange streger og hvor mange frie elektronpar har molekylet?</p>' +
-                "<p>Guldkoden er antallet af streger efterfulgt af antallet af frie elektronpar.</p>"
+            titel: "To stregformler",
+            html: "<p>Tegn stregformlerne for " + h(m[0].navn) + ", <b>" + h(m[0].formel) + "</b>, og " + h(m[1].navn) + ", <b>" + h(m[1].formel) +
+                "</b>, så alle atomer opfylder oktetreglen (hydrogen dubletreglen).</p>" +
+                '<p class="spm">Hvor mange streger og hvor mange frie elektronpar har hvert molekyle?</p>' +
+                "<p>Guldkoden er de fire tal: streger og frie elektronpar for " + h(m[0].navn) + ", og så for " + h(m[1].navn) + ".</p>"
         };
     }
 
@@ -341,7 +342,7 @@
             var haeldt = !!(t.handl && t.handl["3:gas"]);
             return {
                 titel: "Kolben med saltsyre",
-                intro: '<div class="forsoeg">' + mini("-110 -260 420 270", 250, 160, S.paa(0, 0, 1, S.kolbe(150, 160, [222, 234, 244], 0.42, haeldt)) + S.paa(0, -160, 0.8, S.gassproejte(haeldt ? 0.8 : 0))) +
+                intro: '<div class="forsoeg">' + mini("-110 -260 420 270", 250, 160, S.paa(0, 0, 1, S.kolbe(150, 160, [202, 224, 244], 0.42, haeldt)) + S.paa(0, -160, 0.8, S.gassproejte(haeldt ? 0.8 : 0))) +
                     "<p>" + (haeldt ? "Metallet reagerer med saltsyren. Det bobler, og dihydrogen samles i sprøjten, til alt metallet er væk." : "Kolben indeholder rigeligt saltsyre til alt metallet.") + "</p></div>" +
                     '<p class="skema">' + h(met.skema) + "</p>",
                 handling: { noegle: "3:gas", tekst: "Hæld metallet i saltsyren" },
@@ -401,7 +402,7 @@
         var cB = km(r.cBase, r.cBase < 0.1 ? 4 : 3), nB = b3(r.nBase), cS = b3(r.cSyre);
         if (id === "titrer") return {
             titel: "Titreringen",
-            intro: '<div class="forsoeg">' + titrerTegning([226, 236, 246], [226, 236, 246], [250, 190, 214], titreret) +
+            intro: '<div class="forsoeg">' + titrerTegning([202, 224, 244], [202, 224, 244], [250, 190, 214], titreret) +
                 "<div><p>Buretten indeholder <b>" + cB + " M " + h(ba.navn) + "</b>. Kolben indeholder " + km(r.Vsyre, 1) + " mL " + h(sy.navn) + " og nogle dråber phenolphthalein.</p>" +
                 '<table class="tabel"><tr><td>Aflæst før titreringen</td><td><b>' + km(r.foer, 2) + " mL</b></td></tr>" +
                 "<tr><td>Aflæst ved omslag</td><td><b>" + (titreret ? km(r.efter, 2) + " mL" : "?") + "</b></td></tr></table>" +
@@ -466,7 +467,7 @@
     function rum5(r, id, t) {
         var red = r.redox, titreret = !!(t.handl && t.handl["5:titrer"]);
         var nMn = b3(r.nMn), nP = b3(r.nProeve), f = red.forhold;
-        var foer = red.id === "fe" ? [214, 236, 214] : [226, 236, 246];
+        var foer = red.id === "fe" ? [214, 236, 214] : [202, 224, 244];
         if (id === "titrer") return {
             titel: "Titreringen",
             intro: '<div class="forsoeg">' + titrerTegning([128, 40, 132], foer, [226, 190, 232], titreret) +
@@ -516,7 +517,7 @@
             titel: "Masseprocent",
             html: "<p>Prøven blev lavet af <b>" + km(b.mProeve, 2) + " g " + h(red.materiale) + "</b>, som blev " + (red.id === "fe" ? "opløst i syre og fortyndet" : "fortyndet") +
                 " til " + km(b.Vkolbe, 1) + " mL. Heraf blev " + km(r.Vproeve, 1) + " mL titreret med " + km(r.cMn, 4) + " M kaliumpermanganat. Forbruget finder I ved at titrere.</p>" +
-                '<p class="spm">Hvor mange masseprocent ' + h(red.bonusStof) + " indeholder " + (red.id === "fe" ? "ståluldet" : "brintoverilten fra flasken") + "?</p>" +
+                '<p class="spm">Hvor mange masseprocent ' + h(red.bonusStof) + " indeholder " + (red.id === "fe" ? "ståluldet" : "opløsningen i flasken") + "?</p>" +
                 "<p>M(" + red.Mnavn + ") = " + km(red.M, 2) + " g/mol. Reaktionsskemaet står på tavlen. Svar " + (red.pctDec ? "med én decimal" : "i hele procent") + ".</p>"
         };
     }

@@ -68,7 +68,7 @@
         var t0 = tjekTom(raa, "rumfanget i mL");
         if (t0) return t0;
         var t = T.tal(raa);
-        if (!t) return { besked: "Skriv et tal, for eksempel 10,65." };
+        if (!t) return { besked: "Skriv et tal, fx 10,65." };
         var x = t.v;
         tol = tol === undefined ? 0.05 : tol;
         if (Math.abs(x - v) <= tol + 1e-9) return { ok: true };
@@ -86,7 +86,7 @@
         var t0 = tjekTom(raa, hvad);
         if (t0) return t0;
         var t = T.tal(raa);
-        if (!t) return { besked: id === "pct" ? "Skriv et tal, for eksempel 3,11." : "Skriv et tal, for eksempel 5,33 · 10^-4 eller 0,000533." };
+        if (!t) return { besked: id === "pct" ? "Skriv et tal, fx 3,11." : "Skriv et tal, fx 5,33 · 10^-4 eller 0,000533." };
         var v = t.v, f = o.facit;
         if (id === "nb") return nSoelv(v, o, f);
         if (id === "ns") return nSalt(v, o, f);
