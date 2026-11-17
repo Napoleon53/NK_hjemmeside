@@ -16,7 +16,7 @@
     var TURE = {
         "fane-e": [
             { sel: "#e-skort", titel: "Opgaven", tekst: "Kortet viser opgaven, hint og svar. Dit svar tæller først, når du trykker Indsend svar." },
-            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Luppen viser ethanolmolekylerne i glasset. Klik på et molekyle for at se dets bindinger til naboerne." },
+            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Luppen viser ethanolmolekylerne i glasset. Skiltet under luppen siger, om ethanol er væske, koger eller kun er damp. Klik på et molekyle for at se dets bindinger til naboerne." },
             { sel: "#e-signatur", titel: "Stregerne", tekst: "En rød stiplet streg er en hydrogenbinding, og grå prikker er en londonbinding." },
             { sel: "#e-anker-termometer", titel: "Termometeret", tekst: "Træk i det runde håndtag for at varme op eller køle ned. Pil op og ned virker også." },
             { sel: "#e-anker-kammer", titel: "Glasset", tekst: "Glasset er et reagensglas med ethanol. Når ethanol koger, kommer der bobler, og ballonen fanger dampen." },
@@ -25,7 +25,7 @@
         "fane-s": [
             { sel: "#s-skort", titel: "Opgaven", tekst: "Gæt først. Find så kogepunkterne, og send dem ind med Indsend svar." },
             { sel: "#s-anker-lupper", titel: "To stoffer", tekst: "Hvert stof har sin egen lup. Klik på et molekyle for at se dets bindinger." },
-            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Termometeret styrer temperaturen i begge glas på én gang. Et stof koger, når der kommer bobler i dets glas." },
+            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Termometeret styrer temperaturen i begge glas på én gang. Når et stof koger, står der Koger under dets lup." },
             { sel: "#s-grafkort", titel: "Grafen", tekst: "Grafen viser kogepunktet afbildet som funktion af molarmassen. Alkaner er grå, og alkoholer er røde." },
             { sel: "#s-opgaver", titel: "Parrene", tekst: "Fanen har tre par stoffer, som hvert viser én forskel: OH-gruppen, kæden og to OH-grupper. Bagefter kommer fanen Rangér." }
         ],

@@ -6,10 +6,14 @@
    Ballonen paa glasset holder trykket paa 1 atm.
 
    Tilstanden kommer fra tabellen, ikke fra bevaegelsen (som sc4.1):
-     * Over kogepunktet river molekylerne sig loes fra vaesken ét ad
-       gangen, hurtigere jo varmere det er, til alt er damp.
+     * Ved kogepunktet river en tredjedel af molekylerne sig hurtigt loes
+       (et skarpt skel), og jo varmere, jo mere damp, til alt er damp
+       KOG_BAAND grader over kogepunktet. Saa laenge der er vaeske
+       tilbage, koger den.
      * Under kogepunktet er en lille del damp efter damptrykket, og
-       dampen fortaetter igen, naar der koeles.
+       dampen fortaetter hurtigt igen, naar der koeles.
+     * tilstand() er skiltet under luppen: vaeske, koger eller damp, ud
+       fra temperaturen alene.
    Kogepunktet er tabelvaerdien. Er hydrogenbindingerne slaaet fra, er
    det kogepunktet for alkanen med samme form (stoffets "uden").
 
@@ -54,6 +58,12 @@
         VMAKS_V: 6, VMAKS_G: 22, WMAKS: 14,
         FMAKS: 160, FMAKS_GAS: 320,
         DAMP_MAKS: 0.12,       /* hoejst saa stor en del er damp under kogepunktet */
+        /* Et skarpt skel ved kogepunktet (Niels 17. nov. 2026: "lidt mere
+           firkantede skel"): saa snart kogepunktet er naaet, river en stor
+           del af vaesken sig loes paa én gang, og vaesken koger videre, til
+           alt er damp KOG_BAAND grader over kogepunktet */
+        KOG_START: 0.35,       /* saa stor en del er damp lige ved kogepunktet */
+        KOG_BAAND: 10,         /* saa mange grader over kogepunktet er alt damp */
         RING: 0.7              /* den hvide ring, naar et molekyle skifter */
     };
 
@@ -112,6 +122,16 @@
 
     P.koger = function () { return this.T >= this.kp(); };
 
+    /* Det, der staar paa skiltet under luppen, ud fra temperaturen alene:
+       "vaeske" under kogepunktet, "koger" fra kogepunktet og KOG_BAAND
+       grader op, og derover "damp" */
+    P.tilstand = function (T) {
+        if (T === undefined) T = this.T;
+        var kp = this.kp();
+        if (T < kp) return "vaeske";
+        return T < kp + K.KOG_BAAND ? "koger" : "damp";
+    };
+
     P.antalGas = function () {
         var n = 0;
         this.mol.forEach(function (m) { if (m.gas) n++; });
@@ -120,13 +140,18 @@
 
     /* Saa mange skal vaere damp ved temperaturen lige nu */
     P.maalGas = function () {
-        if (this.koger()) return this.N;
+        if (this.koger()) {
+            var u = NK.klamp((this.T - this.kp()) / K.KOG_BAAND, 0, 1);
+            return Math.min(this.N, Math.ceil(this.N * (K.KOG_START + (1 - K.KOG_START) * u)));
+        }
         return Math.min(this.N, Math.round(this.N * K.DAMP_MAKS * Math.min(1, this.damptryk(this.T))));
     };
 
     /* ----- Start: vaesken i bunden, eller damp overalt ------------------- */
     P.nulstil = function (T) {
         this.T = T;
+        this.skilt = this.tilstand(T);
+        this.skiltT = 9;
         this.mol = [];
         this.brudte = [];
         this.hbListe = [];
@@ -201,13 +226,18 @@
     /* Vaesken koger eller dampen fortaetter, ét molekyle ad gangen */
     P.skiftTilstand = function (dt) {
         var maal = this.maalGas(), nu = this.antalGas(), kp = this.kp();
+        /* Skiltet under luppen: hvornaar det sidst skiftede (til det lille hop) */
+        var tilst = this.tilstand();
+        if (tilst !== this.skilt) { this.skilt = tilst; this.skiltT = 0; }
+        else this.skiltT += dt;
+        /* Ved kogepunktet gaar det hurtigt, saa skellet kan ses med det samme */
         if (nu < maal) {
-            var fart = this.koger() ? Math.min(10, 0.8 + 0.45 * (this.T - kp)) : 0.8;
+            var fart = this.koger() ? Math.min(14, 6 + 0.6 * (this.T - kp)) : 0.8;
             this.tUd += dt * fart;
             while (this.tUd >= 1 && nu < maal) { this.tUd -= 1; this.fordamp(); nu++; }
             this.tInd = 0;
         } else if (nu > maal) {
-            var ind = this.koger() ? 0 : Math.min(30, 1.2 + 1.6 * (kp - this.T));
+            var ind = this.koger() ? 5 : Math.min(30, 6 + 1.6 * (kp - this.T));
             this.tInd += dt * ind;
             while (this.tInd >= 1 && nu > maal) { this.tInd -= 1; this.fortaet(); nu--; }
             this.tUd = 0;
@@ -387,7 +417,7 @@
         var kp = this.kp();
         return {
             vaeske: 1 - g,
-            koger: this.koger() && g < 1 ? NK.klamp((this.T - kp + 2) / 14, 0.1, 1) : 0,
+            koger: this.koger() && g < 1 ? NK.klamp(0.6 + (this.T - kp) / 15, 0.6, 1) : 0,
             /* Ballonen: fuld ved 20 °C, naar alt er damp; varm damp fylder mere */
             ballon: g * (this.T + 273.15) / 293.15
         };

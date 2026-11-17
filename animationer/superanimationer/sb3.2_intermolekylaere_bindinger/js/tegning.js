@@ -529,6 +529,69 @@
         ctx.restore();
     };
 
+    /* ----- Skiltet under luppen: Væske, Koger eller Kun damp -------------------------
+       Niels 17. nov. 2026: kogepunktet skal vaere lettere at finde, med "lidt
+       mere firkantede skel". Skiltet skifter ved kogepunktet og KOG_BAAND
+       grader over det (P.tilstand), hopper lidt, naar det skifter, og naar
+       stoffet begynder at koge, blinker rammen om luppen orange én gang. */
+    var SKILT_FARVE = {
+        vaeske: { bag: "#e3edf7", kant: "#7aa6cf", tekst: "#1d4f7a" },
+        koger: { bag: "#ff9a3c", kant: "#ffd2a1", tekst: "#2a1400" },
+        damp: { bag: "#cfd6de", kant: "#8f9aa6", tekst: "#38414c" }
+    };
+
+    T.skilt = function (ctx, L, P, tid) {
+        var tilst = P.skilt || P.tilstand(), t = P.skiltT === undefined ? 9 : P.skiltT;
+        var f = SKILT_FARVE[tilst], tekst = NK.Data.SKILT[tilst];
+        var kant = Math.max(6, L.r * 0.035);
+        ctx.save();
+        /* Blinket: rammen om luppen lyser orange op og falmer paa et sekund */
+        if (tilst === "koger" && t < 1) {
+            ctx.strokeStyle = "rgba(255, 154, 60, " + (0.95 * (1 - t)) + ")";
+            ctx.lineWidth = kant + 4;
+            ctx.beginPath();
+            ctx.arc(L.x, L.y, L.r + kant / 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        var px = NK.klamp(L.r * 0.085, 15, 18);
+        ctx.font = font("800", px);
+        var ikon = tilst === "koger" ? px * 1.1 : 0;
+        var b = ctx.measureText(tekst).width + 30 + ikon, h = px + 14;
+        var x = L.x, y = L.y + L.r + kant / 2;
+        var hop = 1 + 0.22 * Math.max(0, 1 - t / 0.35);
+        ctx.translate(x, y);
+        ctx.scale(hop, hop);
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = f.bag;
+        NK.rundtRekt(ctx, -b / 2, -h / 2, b, h, h / 2);
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = f.kant;
+        ctx.stroke();
+        ctx.fillStyle = f.tekst;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(tekst, ikon / 2, 1);
+        /* Tre smaa bobler foran ordet Koger, der stiger */
+        if (ikon) {
+            var x0 = -b / 2 + 14, bund = h / 2 - 5;
+            ctx.strokeStyle = f.tekst;
+            ctx.lineWidth = 1.5;
+            for (var i = 0; i < 3; i++) {
+                var u = ((tid || 0) * 0.9 + i / 3) % 1;
+                ctx.globalAlpha = 1 - u * 0.7;
+                ctx.beginPath();
+                ctx.arc(x0 + i * ikon * 0.32, bund - u * (h - 10), 1.8 + i * 0.6, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+        }
+        ctx.restore();
+    };
+
     /* Et molekyle i luppen. m: { x, y, a, gas, ring }. s: pixels pr. enhed. */
     T.molekyle = function (ctx, F, m, s, ox, oy, v) {
         v = v || {};

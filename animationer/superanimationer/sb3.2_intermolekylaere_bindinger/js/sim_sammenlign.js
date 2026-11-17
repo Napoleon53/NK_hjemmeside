@@ -155,7 +155,7 @@
         var g = this.opg;
         if (g.fase !== "maal") return;
         var k = g.maaler, st = this.st[k], T = this.Tnu();
-        if (Math.abs(T - this.Pr[k].kp()) <= D.TOL) { this.fundetKp(k, false); return; }
+        if (D.tempOK(T, this.Pr[k].kp())) { this.fundetKp(k, false); return; }
         this.fejlLinje(D.tempFejl(st.navn, T, this.Pr[k]));
     };
 
@@ -262,6 +262,7 @@
             Tg.lup(ctx, c.lup, Pk, {
                 valgt: mig.valgt && mig.valgt.k === k ? mig.valgt.m : null, donorKant: true, tid: mig.tid, lys: lys
             });
+            Tg.skilt(ctx, c.lup, Pk, mig.tid);
             var under = NK.formel(st.formel) + "  ·  " + D.Mtekst(st) + (mig.visKp(k) ? "  ·  koger ved " + D.kpTekst(st) : "");
             Tg.etiket(ctx, c.lup.x, c.lup.y - c.lup.r - 30, D.Stort(st.navn), under, { farve: FARVE[k], px: 16 });
         });

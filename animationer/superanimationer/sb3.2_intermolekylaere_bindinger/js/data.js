@@ -121,8 +121,8 @@
             id: "kog", navn: "Ethanols kogepunkt",
             tekst: "Find ethanols kogepunkt. Indstil termometeret på den temperatur, hvor ethanol begynder at koge.",
             hint: [
-                "Når ethanol koger, kommer der bobler i glasset, og molekylerne i luppen river sig løs.",
-                "Træk termometeret op, til der kommer bobler i glasset. Køl så ned, til boblerne lige stopper.",
+                "Når ethanol koger, river molekylerne i luppen sig løs, og der står Koger under luppen.",
+                "Træk termometeret langsomt op. Stop, så snart der står Koger under luppen, og tryk Indsend svar.",
                 "Ethanols kogepunkt ligger mellem 70 °C og 90 °C."
             ],
             loest: "Under 78 °C holder bindingerne mellem molekylerne ethanol sammen som en væske. Over 78 °C river molekylerne sig løs, og dampen fylder ballonen."
@@ -178,31 +178,38 @@
             tekst: "Slå hydrogenbindingerne fra med kontakten til venstre. Find så kogepunktet for ethanol uden hydrogenbindinger.",
             hint: [
                 "Kontakten til venstre for luppen slår hydrogenbindingerne fra og til.",
-                "Uden hydrogenbindinger er ethanol damp ved 20 °C. Køl ned, til der kommer væske i glasset.",
+                "Uden hydrogenbindinger er ethanol kun damp ved 20 °C. Køl langsomt ned, til der står Koger under luppen.",
                 "Kogepunktet for ethanol uden hydrogenbindinger ligger mellem −60 °C og −20 °C."
             ],
             loest: "Uden hydrogenbindinger koger ethanol ved −42 °C ligesom propan, der har samme størrelse og form. Hydrogenbindingerne hæver kogepunktet med 120 °C."
         }
     ];
 
-    /* Saa taet paa kogepunktet skal den temperatur vaere, eleven sender ind */
-    D.TOL = 4;
+    /* Saa taet paa kogepunktet skal den temperatur vaere, eleven sender ind.
+       Tilgivende (Niels 17. nov. 2026, foer ±4 °C): 4 °C under og hele
+       baandet, hvor skiltet under luppen siger Koger (NK.Proeve.K.KOG_BAAND,
+       10 °C). Saa er det nok at stoppe, naar der staar Koger. */
+    D.TOL = { under: 4, over: 10 };
+    D.tempOK = function (T, kp) { return T >= kp - D.TOL.under && T <= kp + D.TOL.over; };
+
+    /* Skiltet under luppen */
+    D.SKILT = { vaeske: "Væske", koger: "Koger", damp: "Kun damp" };
 
     /* Svaret paa en temperatur, der ikke er kogepunktet. P er proeven, saa
-       teksten kan sige, hvad eleven ser: vaeske, bobler eller kun damp. */
+       teksten kan sige, hvad eleven ser: vaeske, kogning eller kun damp. */
     D.tempFejl = function (navn, T, P) {
-        var kp = P.kp(), t = D.grader(T) + " °C";
-        if (T < kp) return "Ved " + t + " koger " + navn + " ikke, for der er ingen bobler i glasset. Kogepunktet er højere.";
-        if (P.antalGas() === P.N) return "Ved " + t + " er " + navn + " kun damp. Kogepunktet er lavere. Køl ned, til der kommer væske.";
-        return "Ved " + t + " koger " + navn + ", men kogepunktet er lavere. Køl ned, til boblerne lige stopper.";
+        var t = D.grader(T) + " °C", tilst = P.tilstand(T);
+        if (tilst === "vaeske") return "Ved " + t + " koger " + navn + " ikke. Under luppen står Væske. Kogepunktet er højere.";
+        if (tilst === "damp") return "Ved " + t + " er " + navn + " kun damp. Kogepunktet er lavere. Køl ned, til der står Koger under luppen.";
+        return "Ved " + t + " koger " + navn + ", men kogepunktet er lavere. Køl lidt ned.";
     };
 
     /* Hint til at finde et kogepunkt paa fane 2 */
     D.maalHint = function (st) {
         var lo = Math.floor((st.kp - 6) / 10) * 10, hi = lo + 20;
         return [
-            "Et stof koger, når der kommer bobler i dets glas, og molekylerne i dets lup river sig løs.",
-            "Træk termometeret op, til der kommer bobler i glasset med " + st.navn + ". Køl så ned, til boblerne lige stopper.",
+            "Når " + st.navn + " koger, river molekylerne i luppen sig løs, og der står Koger under luppen.",
+            "Træk termometeret langsomt op. Stop, så snart der står Koger under luppen med " + st.navn + ", og tryk Indsend svar.",
             "Kogepunktet for " + st.navn + " ligger mellem " + D.grader(lo) + " °C og " + D.grader(hi) + " °C."
         ];
     };

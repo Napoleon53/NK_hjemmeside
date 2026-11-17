@@ -114,7 +114,7 @@
     P.indsend = function () {
         var g = this.opg, o = g.o, T = this.Tnu();
         if (o.id === "kog" || o.id === "uden") {
-            if (Math.abs(T - this.P.kp()) <= D.TOL) {
+            if (D.tempOK(T, this.P.kp())) {
                 if (o.id === "kog") this.fundet.kp = true; else this.fundet.uden = true;
                 this.loest("selv", this.gaetDom() + o.loest, o.id === "kog" ? "Ethanol koger ved 78 °C." : "");
                 return;
@@ -264,7 +264,8 @@
 
         /* Luppen i midten */
         var x0 = kant + vB + 26, x1 = lay.termo.x - 74;
-        var top = lay.top + 24, bund = lay.bordY - 10;
+        /* Plads under luppen til skiltet (Væske, Koger, Kun damp) */
+        var top = lay.top + 24, bund = lay.bordY - 22;
         var r = Math.max(60, Math.min((x1 - x0) / 2, (bund - top) / 2));
         lay.lup = { x: (x0 + x1) / 2, y: top + (bund - top) / 2, r: r };
 
@@ -302,6 +303,7 @@
             valgtAtom: g && g.atom ? g.atom : null,
             lysH: g && g.lysH && g.o.id === "hvilket" ? g.lysH : null
         });
+        Tg.skilt(ctx, lay.lup, this.P, this.tid);
         NK.tekst(ctx, "ETHANOLMOLEKYLERNE I GLASSET", lay.lup.x, lay.lup.y - lay.lup.r - 12, {
             font: Tg.font("700", 13), justering: "center", farve: "#9aa3ae"
         });

@@ -176,6 +176,28 @@ function koerTest(W) {
     koerP(Pp, 3, 80);
     paastand("men begynder ved 80 °C, uden at alt forsvinder på én gang", Pp.antalGas() > 2 && Pp.antalGas() < Pp.N, Pp.antalGas());
 
+    /* Det skarpe skel (Niels 17. nov. 2026): skiltet, springet ved kogepunktet og tolerancen */
+    var KB = NK.Proeve.K.KOG_BAAND, skiltFejl = [], springFejl = [];
+    Object.keys(brugt).forEach(function (id) {
+        var st = s[id], P = new NK.Proeve(st, brugt[id][0], brugt[id][1], 5);
+        if (P.tilstand(st.kp - 1) !== "vaeske" || P.tilstand(st.kp) !== "koger" || P.tilstand(st.kp + KB - 1) !== "koger" || P.tilstand(st.kp + KB) !== "damp") skiltFejl.push(id);
+        P.nulstil(st.kp - 5);
+        koerP(P, 3, st.kp - 5);
+        var foer = P.antalGas();
+        koerP(P, 2, st.kp);
+        if (P.antalGas() - foer < P.N * 0.25 || P.skilt !== "koger") springFejl.push(id + " ved kp " + foer + "→" + P.antalGas() + "/" + P.N);
+        koerP(P, 10, st.kp + 5);
+        if (P.antalGas() === P.N || !(P.makro().koger > 0)) springFejl.push(id + " koger ikke videre ved kp+5");
+        koerP(P, 6, st.kp + KB + 3);
+        koerP(P, 5, st.kp - 1);
+        if (P.antalGas() > P.N * 0.12 + 0.5) springFejl.push(id + " fortætter ikke 1 °C under kp: " + P.antalGas());
+    });
+    paastand("skiltet under luppen: Væske under kogepunktet, Koger fra kogepunktet og " + KB + " °C op, så Kun damp", skiltFejl.length === 0, skiltFejl.join(", "));
+    paastand("ved kogepunktet river mindst en fjerdedel sig løs inden for 2 s, væsken koger videre 5 °C over, og 1 °C under fortætter dampen igen",
+        springFejl.length === 0, springFejl.slice(0, 3).join(", "));
+    paastand("kogepunktet godkendes fra 4 °C under til " + KB + " °C over (hele båndet, hvor der står Koger)",
+        D.tempOK(74, 78) && D.tempOK(78 + KB, 78) && !D.tempOK(73, 78) && !D.tempOK(79 + KB, 78) && D.TOL.over === KB);
+
     /* ------------------------------------------------------------------ */
     overskrift("4. Fane 1: Ethanol");
     NK.visFane("fane-e");
@@ -509,11 +531,12 @@ function koerTest(W) {
     D.RANGER.forEach(function (o) {
         o.stoffer.forEach(function (a) { o.stoffer.forEach(function (b) { if (s[a].kp < s[b].kp) tekster.push(D.forklar(a, b)); }); });
     });
-    var falskP = function (kp, gas) { return { kp: function () { return kp; }, antalGas: function () { return gas; }, N: 10 }; };
+    var falskP = function (tilst) { return { tilstand: function () { return tilst; } }; };
     var tempTekster = [];
     ["ethanol", "ethanol uden hydrogenbindinger", "ethan-1,2-diol", "2-methylpropan"].forEach(function (n) {
-        tempTekster.push(D.tempFejl(n, -100, falskP(0, 0)), D.tempFejl(n, -100, falskP(-150, 10)), D.tempFejl(n, -100, falskP(-150, 4)));
+        tempTekster.push(D.tempFejl(n, -100, falskP("vaeske")), D.tempFejl(n, -100, falskP("damp")), D.tempFejl(n, -100, falskP("koger")));
     });
+    tempTekster = tempTekster.concat([D.SKILT.vaeske, D.SKILT.koger, D.SKILT.damp]);
     tekster = tekster.concat(tempTekster);
     alleId.forEach(function (id) { tekster = tekster.concat(D.maalHint(s[id])); });
     R.opgaver.forEach(function (o, i) { R.vaelg(i); R.hintTrin().forEach(function (t) { tekster.push(t); }); tekster.push(R.kortTekst()); });

@@ -22,12 +22,12 @@ hydrogenbindinger oppe i hjørnet var "lidt underlig og indforstået".
   under det flytter sig.
 * **Indsend svar.** Termometeret løser ingen opgave af sig selv. Et
   kogepunkt findes ved at stille termometeret på den temperatur, hvor
-  stoffet begynder at koge (der kommer bobler), og trykke Indsend svar
-  (±4 °C, `D.TOL`). Knappen viser temperaturen, der sendes ind, er grå,
+  stoffet begynder at koge (der står Koger under luppen), og trykke
+  Indsend svar (`D.TOL`, se 17. november nedenfor). Knappen viser temperaturen, der sendes ind, er grå,
   til termometeret er rørt, og banker, når der er noget at sende. Et svar
   på et spørgsmål vælges først og sendes så ind. Et forkert svar giver en
-  rød forklaring på kortet (`D.tempFejl` siger, hvad eleven ser: ingen
-  bobler, bobler eller kun damp).
+  rød forklaring på kortet (`D.tempFejl` siger, hvad skiltet viser:
+  Væske, Koger eller Kun damp).
 * **Stjernen** kræver løst i første forsøg uden Vis svaret, så det ikke kan
   betale sig at gætte løs.
 * **Låsen:** under et gæt og på det grønne kort kan termometeret og
@@ -194,10 +194,12 @@ Påskeægget: et klik på termometerets kugle. Det er et sprittermometer, og ove
 
 ## Forenklinger
 
-* **Tilstanden kommer fra tabellen, ikke fra bevægelsen** (som sc4.1). Over
-  kogepunktet går molekylerne til dampen ét ad gangen, hurtigere jo varmere
-  det er. Under kogepunktet er en lille del damp efter damptrykket (Troutons
-  regel, 110 J/(mol·K) for stoffer med hydrogenbindinger), højst 12 %.
+* **Tilstanden kommer fra tabellen, ikke fra bevægelsen** (som sc4.1). Ved
+  kogepunktet river en tredjedel af molekylerne sig hurtigt løs, og jo
+  varmere, jo mere damp, til alt er damp 10 °C over kogepunktet (som om
+  varmen, der tilføres, vokser med temperaturen). Under kogepunktet er en
+  lille del damp efter damptrykket (Troutons regel, 110 J/(mol·K) for
+  stoffer med hydrogenbindinger), højst 12 %, og dampen fortætter hurtigt.
 * **Bevægelsen er en lille fysik** med stive, flade molekyler. H på O
   trækkes mod O i et andet molekyle (hvert H én binding, hvert O højst to),
   C-atomer i to molekyler trækker svagt i hinanden. Én hydrogenbinding trækker
@@ -295,3 +297,26 @@ kogepunkter var kendt før gættet, står dommen over gættet alene på kortet.
 Kortets knap siger aldrig Start forfra; det gør knappen i panelet.
 Afkrydsningsboksene i Hvad brydes? har egne regler sidst i `css/stil.css`.
 Selvtesten: ALT OK (88 påstande).
+
+## Lettere at finde kogepunktet (17. nov. 2026)
+
+Niels: "lidt nemmere at bestemme kogepunkterne.. enten ved at være mere
+tilgivende, når man gætter.. eller også ved at lave nogle lidt mere
+firkantede skel /animationer, når man overstiger kogepunktet." Begge dele:
+
+* **Skiltet under luppen** (`Tg.skilt`, `Proeve.tilstand`): Væske under
+  kogepunktet, Koger fra kogepunktet og 10 °C op (`K.KOG_BAAND`), derover
+  Kun damp. Skiltet hopper lidt, når det skifter, og når stoffet begynder
+  at koge, blinker rammen om luppen orange én gang. Glasset i kammeret er
+  for lille til, at boblerne kan ses.
+* **Et skarpt skel i luppen:** ved kogepunktet river en tredjedel af
+  molekylerne sig løs på 1 til 2 sekunder (før kun ét pr. sekund), væsken
+  koger videre i hele båndet, og 1 °C under kogepunktet fortætter dampen
+  på få sekunder. Tilstanden følger nu temperaturen begge veje.
+* **Tilgivende:** et kogepunkt godkendes fra 4 °C under til 10 °C over
+  (`D.TOL`, før ±4 °C), altså overalt, hvor der står Koger. Hint 2 siger:
+  træk langsomt op, og stop, så snart der står Koger.
+* Rundvisningen nævner skiltet. Luppen på fane 1 er gjort lidt mindre, så
+  skiltet har plads over bordet.
+
+Selvtesten: ALT OK (91 påstande).
