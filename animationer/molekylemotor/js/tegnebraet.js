@@ -34,7 +34,9 @@
                             spejlet vandret
      kopier, klip, indsaet  kopi af det markerede (kun paa siden)
      "gruppe:COOH" osv.     klik paa et atom saetter gruppen paa (GRUPPER:
-                            OH, O (=O), NH2, CHO, COOH, COO (COO⁻))
+                            OH, O (=O), NH2, CHO, COOH, COO (COO⁻)); et
+                            traek fra et atom saetter den i traekkets
+                            retning (graa, til musen slippes)
      "ladning"              klik paa et atom: ingen ladning -> - -> +
                             (hoejreklik med en gruppe eller ladning gaar
                             ogsaa tilbage til C, som i Markér)
@@ -651,14 +653,14 @@
        30 grader op mod hoejre. For enden af en kaede fortsaetter zigzaggen
        (skiftevis op og ned), saa man kan bygge en lang kaede med klik.
        Midt i kaeden kommer en sidegren i det stoerste frie hul. */
-    P.nytFra = function (fra, el) {
+    P.nytFra = function (fra, el, pt) {
         if (this.antal() >= this.maks()) { this.toast(this.maksTekst(), "advar"); return null; }
         var a = this.mol.atom(fra), mig = this;
         if (!this.mol.ledig(fra, 1)) { this.toast(this.fuld(fra)); return null; }
         var nej = this.r.forbudt ? this.r.forbudt(a, el || "C") : null;
         if (nej) { this.toast(nej, "advar"); return null; }
         var valgt = null;
-        this.retninger(fra).some(function (v) {
+        (pt ? this.retningerMod(fra, pt) : this.retninger(fra)).some(function (v) {
             var kand = { x: a.x + Math.cos(v), y: a.y + Math.sin(v) };
             if (mig.vurder(fra, kand, v, null).ok) { valgt = { kand: kand }; return true; }
             return false;
@@ -707,13 +709,34 @@
         return foretrukne.concat(resten.map(function (r) { return r.v; }));
     };
 
+    /* Retningerne fra atomet mod musen (pt i pixels), de bedste foerst, til
+       et traek med en gruppe: naer musen, men med paene vinkler til naboerne
+       som kaedens foerste binding (120 grader for enden af en kaede, midt i
+       kaeden det stoerste hul). Kun retninger hoejst 90 grader fra musen. */
+    P.retningerMod = function (fra, pt) {
+        var mol = this.mol, a = mol.atom(fra), u = this.enheder(pt);
+        var raa = Math.atan2(u.y - a.y, u.x - a.x);
+        var nb = mol.naboer(fra).map(function (n) { var b = mol.atom(n); return Math.atan2(b.y - a.y, b.x - a.x); });
+        var lineaer = mol.bindingerTil(fra).some(function (bd) { return bd.orden === 3; });
+        var ud = [];
+        for (var i = 0; i < 12; i++) {
+            var v = i * TRIN, mod = Math.abs(vinkelForskel(v, raa));
+            if (mod > 3 * TRIN + 1e-6) continue;
+            var mind = nb.reduce(function (m, w) { return Math.min(m, Math.abs(vinkelForskel(v, w))); }, Math.PI);
+            var god = lineaer ? mind : (nb.length === 1 ? 4 * TRIN - Math.abs(mind - 4 * TRIN) : Math.min(mind, 4 * TRIN));
+            ud.push({ v: v, sc: mod - 2 * god + 0.001 * Math.sin(v) });
+        }
+        return ud.sort(function (p, q) { return p.sc - q.sc; }).map(function (r) { return r.v; });
+    };
+
     /* ----- Grupper med ét klik (tegnebraettet) ------------------------------------
        Gruppen saettes paa det atom, der klikkes paa, i det bedste frie hul.
        Hvert atom i gruppen: [grundstof, bindingsorden, vinkel (grader) i
        forhold til den foerste binding, ladning]. Det foerste atom sidder paa
        det atom, der klikkes paa; de andre paa gruppens foerste atom. Vinklen
        +60 er det atom, der fortsaetter zigzaggen (OH i COOH); spejlingen
-       vaelges, saa kaeden stadig er en zigzag. */
+       vaelges, saa kaeden stadig er en zigzag. Med pt (et traek, pixels)
+       kommer gruppen i retningen mod musen (retningerMod). */
     var GRUPPER = {
         OH: [["O", 1, 0]],
         O: [["O", 2, 0]],
@@ -724,7 +747,7 @@
     };
     Tegnebraet.GRUPPER = GRUPPER;
 
-    P.saetGruppe = function (fra, navn) {
+    P.saetGruppe = function (fra, navn, pt) {
         var g = GRUPPER[navn], mol = this.mol, a = mol.atom(fra), mig = this;
         if (!g || !a) return false;
         if (this.antal() + g.length > this.maks()) { this.toast(this.maksTekst(), "advar"); return false; }
@@ -761,7 +784,7 @@
             return true;
         }
         var fund = null;
-        this.retninger(fra).some(function (v) {
+        (pt ? this.retningerMod(fra, pt) : this.retninger(fra)).some(function (v) {
             var muligheder = g.length > 1 ? [1, -1] : [1];
             if (g.length > 1) {
                 /* Zigzag: gruppens knaek gaar den anden vej end knaekket ved fra.
@@ -794,6 +817,71 @@
         });
         this.efter("atom");
         return true;
+    };
+
+    /* ----- Et traek med en gruppe ----------------------------------------------------
+       Brugeren 19. nov. 2026: med −OH valgt blev et traek fra et atom en
+       kaede. Nu kommer gruppen i traekkets retning: den staar graa, mens man
+       traekker, og kommer paa tavlen, naar musen slippes (ét skridt i
+       Fortryd). Slippes musen ved atomet igen, er det et klik.
+       traekHandling giver det, traekket goer, som en funktion (kaldt med
+       tavlen som this; sand: det lykkedes), eller null: kaeden som foer. En
+       side kan give sin egen (sb3.1: −COOH og halogenerne). */
+    P.traekHandling = function (fra, pt) {
+        if (this.vaerktoej.indexOf("gruppe:") !== 0) return null;
+        var navn = this.vaerktoej.slice(7);
+        return function () { return this.saetGruppe(fra, navn, pt); };
+    };
+
+    /* Proever en handling paa en kopi af molekylet, uden historik, uden
+       aendret og uden beskeder: { mol: det nye molekyle (null: det gik
+       ikke), toast, slags } */
+    P.proev = function (handling) {
+        var mig = this, aegte = this.mol, hist = this.hist, frem = this.frem;
+        var ud = { mol: null, toast: null, slags: null }, egne = {};
+        ["efter", "toast"].forEach(function (n) { if (Object.prototype.hasOwnProperty.call(mig, n)) egne[n] = mig[n]; });
+        this.mol = aegte.kopi();
+        this.hist = [];
+        this.frem = [];
+        this.efter = function () { };
+        this.toast = function (t, slags) { if (t) { ud.toast = t; ud.slags = slags || "fejl"; } };
+        try {
+            if (handling.call(this)) ud.mol = this.mol;
+        } finally {
+            this.mol = aegte;
+            this.hist = hist;
+            this.frem = frem;
+            delete this.efter;
+            delete this.toast;
+            Object.keys(egne).forEach(function (n) { mig[n] = egne[n]; });
+        }
+        return ud;
+    };
+
+    /* Handlingen paa tavlen i ét skridt i Fortryd */
+    P.udfoer = function (handling) {
+        var r = this.proev(handling);
+        if (r.toast) this.toast(r.toast, r.slags);
+        if (!r.mol) return false;
+        this.gem();
+        this.mol = r.mol;
+        this.efter("atom");
+        return true;
+    };
+
+    /* Forslaget ved et traek med en handling: hele det nye molekyle (mol),
+       eller en roed streg mod musen og beskeden, naar det ikke gik */
+    P.handlingsForslag = function (fra, pt, handling) {
+        var a = this.mol.atom(fra), p0 = this.px(a);
+        var ud = { fra: fra, el: "C", punkter: [], til: undefined, blok: null, toast: null, slags: null, antalC: 0 };
+        if (Math.hypot(pt.x - p0.x, pt.y - p0.y) < this.s() * 0.35) { ud.vedAtomet = true; return ud; }
+        var r = this.proev(handling);
+        if (r.mol) { ud.mol = r.mol; return ud; }
+        var u = this.enheder(pt), v = Math.round(Math.atan2(u.y - a.y, u.x - a.x) / TRIN) * TRIN;
+        ud.blok = { fra: { x: a.x, y: a.y }, kand: { x: a.x + Math.cos(v), y: a.y + Math.sin(v) } };
+        ud.toast = r.toast || "Der er ikke plads til gruppen her!";
+        ud.slags = r.slags;
+        return ud;
     };
 
     /* ----- Ladning (tegnebraettet) ---------------------------------------------
@@ -1081,6 +1169,9 @@
     var ZIGZAG_SKRIDT = Math.cos(TRIN);   /* hvor langt hvert atom naar ud langs aksen */
 
     P.lavForslag = function (fra, pt) {
+        /* Med en gruppe valgt: gruppen i traekkets retning, ikke en kaede */
+        var handling = this.traekHandling(fra, pt);
+        if (handling) return this.handlingsForslag(fra, pt, handling);
         var aegte = this.mol, s = this.s();
         var el = this.r.kunC ? "C" : this.grundstof;
         var start = aegte.atom(fra);
@@ -1190,6 +1281,12 @@
 
     /* Forslaget kommer paa tavlen (naar musen slippes) */
     P.brugForslag = function (f) {
+        if (f && f.mol) {
+            this.gem();
+            this.mol = f.mol;
+            this.efter("atom");
+            return true;
+        }
         if (!f || (!f.punkter.length && f.til === undefined)) return false;
         this.gem();
         var cur = f.fra, mig = this;
@@ -1224,6 +1321,8 @@
         if (t.bevaeget) {
             /* Kaeden kommer paa tavlen, som den stod, da musen blev sluppet */
             if (pt && t.fra !== undefined && this.mol.atom(t.fra)) g = this.lavForslag(t.fra, pt);
+            /* Et traek med en gruppe, der slippes ved atomet, er et klik */
+            if (pt && g && g.vedAtomet) { this.klik(t.u, pt); return; }
             if (t.fra !== undefined) this.brugForslag(g);
             return;
         }
@@ -1441,6 +1540,21 @@
         ctx.save();
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
+        if (f.mol) {
+            /* En gruppe: de nye atomer og bindinger graa, med symbolerne,
+               som de kommer til at staa (OH, NH₂, =O) */
+            var gl = this.mol, nye = {}, og = this.origo(), INGEN = "rgba(0, 0, 0, 0)";
+            f.mol.atomer.forEach(function (a) { if (!gl.atom(a.id)) nye[a.id] = true; });
+            var geo = NK.Struktur.geometri(f.mol, {
+                skala: s, ox: og.x, oy: og.y, stil: this.stil, farve: INGEN, visC: this.visC,
+                atomFarve: function (id) { return nye[id] ? "rgba(29, 36, 51, 0.5)" : null; },
+                bindingFarve: function (bd) { return nye[bd.a] || nye[bd.b] ? GRAA : null; }
+            });
+            geo.linjer = geo.linjer.filter(function (l) { return l.farve !== INGEN; });
+            geo.tekster = geo.tekster.filter(function (t) { return t.farve !== INGEN; });
+            geo.billeder = [];
+            NK.Struktur.tegnGeo(ctx, geo);
+        }
         if (f.punkter.length || f.til !== undefined) {
             ctx.strokeStyle = GRAA;
             ctx.lineWidth = lw;

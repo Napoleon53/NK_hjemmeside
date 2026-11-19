@@ -158,7 +158,7 @@
         var e = T.etiketRekt(x, y, h, v.bredEtiket !== undefined ? v.bredEtiket : h < 110);
         var medTekst = v.tekst !== undefined ? v.tekst : true;
         if (v.etiket === "ny") T.nyEtiket(ctx, e.x, e.y, e.b, e.h, st, { tekst: medTekst });
-        else if (v.etiket !== "ingen") T.gammelEtiket(ctx, e.x, e.y, e.b, e.h, st, { tekst: medTekst, retning: v.retning || st.retning });
+        else if (v.etiket !== "ingen") T.gammelEtiket(ctx, e.x, e.y, e.b, e.h, st, { tekst: medTekst, retning: v.retning || st.retning, opgave: v.opgave });
 
         if (st.fare && v.fare !== false) T.faremaerke(ctx, st.fare, x, y0 + 41 * k, 9 * k);
         if (v.stjerne) T.stjerne(ctx, x + b * 0.36, y0 + 3 * k, Math.max(6, 9 * k), v.stjerne);
@@ -183,11 +183,16 @@
        formlen alene, eller der staar intet. */
     var LAESBAR = 10;
 
+    /* Paa samlebaandet er den revne etiket selve opgaven, saa halvdelen,
+       der er tilbage, skal altid kunne laeses: skriften er mindst saa
+       stor, naar bredden tillader det, og den forsvinder aldrig. */
+    var OPGAVE_PX = 13;
+
     /* Navnet paa én linje, delt i positiv og negativ ion paa to eller med
        hydrogen- paa sin egen linje. Der vaelges den opdeling, der giver
        den stoerste skrift; flere linjer kun, hvis det giver tydeligt mere,
        eller hvis det er det, der goer navnet stort nok til at kunne laeses. */
-    function navnLinjer(ctx, st, b, stoerst, mindst, vaegt, maxH) {
+    function navnLinjer(ctx, st, b, stoerst, mindst, vaegt, maxH, delt) {
         var an = st.anIon.navn;
         var muligheder = [[st.navn], [st.katIon.saltdel, an]];
         if (an.indexOf("hydrogen") === 0 && an.length > 8) muligheder.push([st.katIon.saltdel, "hydrogen-", an.slice(8)]);
@@ -196,7 +201,10 @@
             var px = faelles(ctx, linjer, b, stoerst, mindst, vaegt);
             /* maxH: linjerne skal ogsaa kunne vaere i hoejden */
             if (maxH) px = Math.min(px, maxH / (linjer.length * 1.1));
-            if (!bedst || px > bedst.px + (bedst.px < LAESBAR ? 0 : 1.5)) bedst = { linjer: linjer, px: px };
+            /* delt: navnet deles i ionerne (kalium / iodid), naar skriften
+               ikke bliver mindre af det */
+            var krav = delt ? -0.5 : (bedst && bedst.px < LAESBAR ? 0 : 1.5);
+            if (!bedst || px > bedst.px + krav) bedst = { linjer: linjer, px: px };
         });
         return bedst;
     }
@@ -249,8 +257,15 @@
         var midtNavn = y + band + (h - band) * 0.3;
         var midtFormel = y + band + (h - band) * 0.74;
         if (o.navn) {
-            var nl = navnLinjer(ctx, st, bi, navnStr, 6, vaegt, (h - band) * 0.5);
-            if (nl.px >= LAESBAR) {
+            var navnH = (h - band) * 0.5;
+            /* Opgaven paa baandet: navnet fylder papiret ned til flaenget */
+            if (o.opgave && o.navnBund) {
+                midtNavn = (y + band + o.navnBund) / 2;
+                navnH = (o.navnBund - y - band) * 0.95;
+                navnStr = NK.klamp(h * 0.24, OPGAVE_PX, 18);
+            }
+            var nl = navnLinjer(ctx, st, bi, navnStr, 6, vaegt, navnH, !!o.opgave);
+            if (nl.px >= LAESBAR || o.opgave) {
                 ctx.font = font(vaegt, nl.px);
                 nl.linjer.forEach(function (l, i) {
                     ctx.fillText(l, cx, midtNavn + (i - (nl.linjer.length - 1) / 2) * nl.px * 1.1);
@@ -258,8 +273,9 @@
             }
         }
         if (o.formel) {
+            if (o.opgave) formelStr = Math.max(formelStr, OPGAVE_PX + 2);
             fpx = Math.min(faelles(ctx, [st.formelTekst], bi, formelStr, 6, "700"), (h - band) * 0.42);
-            if (fpx >= LAESBAR - 1) {
+            if (fpx >= LAESBAR - 1 || o.opgave) {
                 ctx.font = font("700", fpx);
                 ctx.fillText(st.formelTekst, cx, midtFormel);
             }
@@ -288,7 +304,8 @@
         v = v || {};
         var r = froe(st.nr + 11);
         var mangler = v.retning === "navn" ? "navn" : "formel";
-        var revY = y + h * (mangler === "formel" ? 0.58 : 0.46);
+        /* Paa samlebaandet er navnet opgaven og faar mere af papiret */
+        var revY = y + h * (mangler === "formel" ? (v.opgave ? 0.72 : 0.58) : 0.46);
         var tak = Math.max(2.5, h * 0.06);
 
         ctx.save();
@@ -345,7 +362,8 @@
         if (v.tekst !== false) {
             etiketTekst(ctx, st, x, y, b, h, {
                 navn: mangler !== "navn", formel: mangler !== "formel",
-                farve: "#3a3020", navnVaegt: "italic 600"
+                farve: "#3a3020", navnVaegt: "italic 600",
+                opgave: !!v.opgave, navnBund: revY - tak
             });
         }
         ctx.restore();

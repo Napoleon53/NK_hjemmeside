@@ -749,6 +749,46 @@ function koerTest(W) {
     d.querySelector('#tb-grupper button[data-v="gruppe:O"]').click();
     klikAtom(B.mol.atomer.filter(function (a) { return B.mol.grad(a.id) === 2; })[0]);
     paastand("=O på midten af propan giver propanon", foersteNavn() === "propanon", foersteNavn());
+    /* Traek med en gruppe (brugeren 19. nov. 2026): gruppen i traekkets retning, ikke en kaede */
+    function traekAtom(a, v, l) {
+        var p = B.px(a), s = B.s(), m = { x: p.x + Math.cos(v) * s * l, y: p.y + Math.sin(v) * s * l };
+        B.ned(p, { button: 0 });
+        for (var w = 1; w <= 6; w++) B.flyt({ x: p.x + (m.x - p.x) * w / 6, y: p.y + (m.y - p.y) * w / 6 });
+        var graa = B.forslag;
+        B.op(m);
+        return graa;
+    }
+    function retning(a, b2) { return Math.atan2(b2.y - a.y, b2.x - a.x); }
+    function forskel(v) { var g = v * 180 / Math.PI; while (g > 180) g -= 360; while (g < -180) g += 360; return Math.abs(g); }
+    B.nulstil(true, true);
+    skriv2("propan");
+    d.querySelector('#tb-grupper button[data-v="gruppe:OH"]').click();
+    var cE = endeC()[0], cN = B.mol.atom(B.mol.naboer(cE.id)[0]), lige = retning(cN, cE), foerOH = B.mol.atomer.length;
+    var grOH = traekAtom(cE, lige, 1.3);
+    var oT = B.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    paastand("et træk med –OH lige ud fra enden af propan står gråt og giver propan-1-ol med 120 grader, ikke en kæde",
+        grOH && grOH.mol && !grOH.antalC && foersteNavn() === "propan-1-ol" && B.mol.atomer.length === foerOH + 1 && oT &&
+        Math.abs(forskel(retning(cE, oT) - retning(cE, cN)) - 120) < 1 && B.vaerktoej === "gruppe:OH", foersteNavn());
+    B.fortryd();
+    paastand("ét Fortryd tager OH-gruppen tilbage", foersteNavn() === "propan" && B.mol.atomer.length === foerOH, foersteNavn());
+    [1, -1].forEach(function (side) {
+        var v = lige + side * Math.PI / 3;
+        traekAtom(cE, v + side * 0.3, 1.2);
+        var o2 = B.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+        paastand("–OH trukket til " + (side > 0 ? "den ene" : "den anden") + " side for enden af propan sidder i den retning", o2 && forskel(retning(cE, o2) - v) < 1,
+            o2 ? forskel(retning(cE, o2) - v) : "-");
+        B.fortryd();
+    });
+    d.querySelector('#tb-grupper button[data-v="gruppe:COOH"]').click();
+    traekAtom(cE, lige + Math.PI / 3, 1.4);
+    paastand("et træk med –COOH fra enden af propan giver butansyre med bogens vinkler", foersteNavn() === "butansyre" && paen(B.mol), foersteNavn());
+    B.nulstil(true, true);
+    skriv2("2,2-dimethylpropan");
+    d.querySelector('#tb-grupper button[data-v="gruppe:OH"]').click();
+    var cFuld = B.mol.atomer.filter(function (a) { return B.mol.grad(a.id) === 4; })[0], foerFuld = B.mol.atomer.length;
+    var grFuld = traekAtom(cFuld, 0.2, 1.2);
+    paastand("et træk med –OH fra et carbonatom med fire bindinger: rød streg og intet nyt", grFuld && !grFuld.mol && grFuld.blok && B.mol.atomer.length === foerFuld,
+        B.mol.atomer.length);
     B.nulstil(true, true);
     skriv2("ethan");
     d.querySelector('#tb-grupper button[data-v="gruppe:COO"]').click();

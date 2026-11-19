@@ -57,6 +57,17 @@ spillet slut. Kassen viser bagefter facit på de glas, der røg i den. Hvert
 femte rigtige svar giver et nyt niveau: formler, navne, sammensatte ioner og
 til sidst det hele blandet i begge retninger og hurtigere.
 
+19. nov. 2026 (brugeren kunne ikke se, hvad der stod på glasset): på en skærm
+på 1366 × 768 var glassene på båndet kun 100 px, og så var navnet på den revne
+etiket for småt til at blive tegnet. Etiketten stod blank. Nu er etiketten på
+båndet selve opgaven (`opgave: true` i `Tg.glas`): den er den brede, navnet
+får mere af papiret, står i mindst 13 px, når bredden tillader det, deles i
+ionerne (kalium / iodid) og forsvinder aldrig. Båndet rykker ned mod
+etiketmaskinen, når der er plads, så glassene er ca. 138 px på 1366 × 768.
+De tre første niveauer begynder med de lette stoffer: få ioner i formlen
+først (KI, MgO), så 1:2 og 2:1, og Al₂O₃, Li₃N og Ca₃P₂ til sidst. Det
+blandede niveau trækker helt tilfældigt.
+
 **Sværere ioner.** Kontakten i toplinjen er slået fra som udgangspunkt. Så
 holder glassene sig til det, kompendiet til kapitel 2 bruger: hovedgrupperne
 blandt de første 20 grundstoffer plus Br, I og Ba, metalionerne Fe, Cu, Ag og Zn
@@ -210,7 +221,9 @@ holder reglerne, at begge faner kan gennemføres, at løste glas på hylden har
 formlen på etiketten, at samlebåndets hylde har plads til otte glas, at
 præsentationen virker på begge faner (den fælles test fra
 `../kemichael/praesentation.js`), at tilbuddet står i panelet på
-samlebåndet, og at layoutet holder
+samlebåndet, at niveau 1-3 begynder med de lette stoffer, at glassene på
+båndet er mindst 130 px på en skærm på 1366 × 768, at den revne etiket på
+båndet altid har tekst, og at layoutet holder
 fra 520 × 480 til 1500 × 900, og at papirkortet virker og holder sig i kortZone
 ved 1400 × 860 og 1280 × 640. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage

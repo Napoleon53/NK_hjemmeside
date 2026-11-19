@@ -380,6 +380,83 @@ function koerTest(W) {
     klikTavle(b.px(NK.Navn.analyser(b.mol).kaede[0]));
     paastand("−COOH på et carbonatom, der allerede har =O: intet sker, og kortet siger hvorfor", b.antal() === 5 && /ikke plads til COOH/.test(T.beskedTekst()), T.beskedTekst());
 
+    /* Traek med en gruppe (brugeren 19. nov. 2026): gruppen kommer i traekkets retning, ikke en kaede */
+    function traekTil(p, maal) {
+        peger(T, "pointerdown", p);
+        for (var w = 1; w <= 8; w++) peger(T, "pointermove", { x: p.x + (maal.x - p.x) * w / 8, y: p.y + (maal.y - p.y) * w / 8 });
+    }
+    function vinkelTil(a, b2) { return Math.atan2(b2.y - a.y, b2.x - a.x); }
+    function grader(v) { var g = v * 180 / Math.PI; while (g > 180) g -= 360; while (g < -180) g += 360; return Math.abs(g); }
+    /* Musen 25 grader ved siden af retningen v fra atomet a */
+    function vedSiden(a, v) { var p = b.px(a); return { x: p.x + Math.cos(v + 0.44) * sk * 1.2, y: p.y + Math.sin(v + 0.44) * sk * 1.2 }; }
+    T.vaelg(T.idx("propan-2-ol"));
+    b.saet(NK.NavnLaeser.laes("propan").mol);
+    var kd = NK.Navn.analyser(b.mol).kaede, cm = b.mol.atom(kd[1]), cA = b.mol.atom(kd[0]), cB = b.mol.atom(kd[2]);
+    var hul = Math.atan2(2 * cm.y - cA.y - cB.y, 2 * cm.x - cA.x - cB.x);
+    vt("gruppe:OH").click();
+    traekTil(b.px(cm), vedSiden(cm, hul));
+    var graa = b.forslag;
+    paastand("et træk med −OH fra carbonatom 2: OH står gråt, mens man trækker, og intet er sat endnu", b.antal() === 3 && graa && graa.mol && graa.mol.atomer.length === 4 && !graa.antalC,
+        b.antal() + " " + (graa && graa.mol ? graa.mol.atomer.length : "-"));
+    peger(T, "pointerup", vedSiden(cm, hul));
+    var oD = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    paastand("ved slip sidder OH på carbonatom 2 i hullet mod musen, ikke en kæde: propan-2-ol, og værktøjet er Kæde igen",
+        T.liveNavn === "propan-2-ol" && b.antal() === 4 && oD && b.mol.binding(cm.id, oD.id) && grader(vinkelTil(cm, oD) - hul) < 1 && b.vaerktoej === "tegn",
+        T.liveNavn + " " + b.antal() + " " + (oD ? grader(vinkelTil(cm, oD) - hul) : "-"));
+    T.fortryd();
+    paastand("ét Fortryd tager OH-gruppen tilbage: propan", T.liveNavn === "propan" && b.antal() === 3, T.liveNavn);
+    /* For enden af kaeden: 120 grader til den side, musen er paa */
+    T.vaelg(T.idx("propan-1-ol"));
+    b.saet(NK.NavnLaeser.laes("propan").mol);
+    kd = NK.Navn.analyser(b.mol).kaede;
+    var cE = b.mol.atom(kd[0]), cN = b.mol.atom(kd[1]), lige = vinkelTil(cN, cE);
+    vt("gruppe:OH").click();
+    traekTil(b.px(cE), { x: b.px(cE).x + Math.cos(lige) * sk * 1.3, y: b.px(cE).y + Math.sin(lige) * sk * 1.3 });
+    peger(T, "pointerup", { x: b.px(cE).x + Math.cos(lige) * sk * 1.3, y: b.px(cE).y + Math.sin(lige) * sk * 1.3 });
+    oD = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    var vC = oD ? 180 - grader(vinkelTil(cE, oD) - vinkelTil(cE, cN)) : 0;
+    paastand("et træk med −OH lige ud fra enden af propan giver propan-1-ol med 120 grader ved carbonatomet", T.liveNavn === "propan-1-ol" && Math.abs(grader(vinkelTil(cE, oD) - vinkelTil(cE, cN)) - 120) < 1,
+        T.liveNavn + " " + vC);
+    /* Et traek, der slippes ved atomet, er et klik */
+    T.fortryd();
+    vt("gruppe:OH").click();
+    var pE = b.px(cE);
+    peger(T, "pointerdown", pE);
+    peger(T, "pointermove", { x: pE.x + 14, y: pE.y });
+    peger(T, "pointerup", { x: pE.x + 3, y: pE.y });
+    paastand("et træk med −OH, der slippes ved atomet, er et klik: propan-1-ol", T.liveNavn === "propan-1-ol" && b.antal() === 4, T.liveNavn);
+    /* Fra et oxygenatom: intet, og kortet siger hvorfor */
+    vt("gruppe:OH").click();
+    oD = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    traekTil(b.px(oD), { x: b.px(oD).x + sk * 1.2, y: b.px(oD).y });
+    peger(T, "pointerup", { x: b.px(oD).x + sk * 1.2, y: b.px(oD).y });
+    paastand("et træk med −OH fra et oxygenatom sætter intet, og kortet siger: træk fra et carbonatom", b.antal() === 4 && /Træk fra et carbonatom/.test(T.beskedTekst()), T.beskedTekst());
+    /* −COOH: carbonatomet for enden bliver til COOH, og −OH kommer mod musen */
+    T.vaelg(T.idx("butansyre"));
+    b.saet(NK.NavnLaeser.laes("butan").mol);
+    kd = NK.Navn.analyser(b.mol).kaede;
+    cE = b.mol.atom(kd[0]); cN = b.mol.atom(kd[1]);
+    var vOH = vinkelTil(cN, cE) + Math.PI / 3, mOH = { x: b.px(cE).x + Math.cos(vOH) * sk * 1.2, y: b.px(cE).y + Math.sin(vOH) * sk * 1.2 };
+    vt("gruppe:COOH").click();
+    traekTil(b.px(cE), mOH);
+    peger(T, "pointerup", mOH);
+    var oH = b.mol.atomer.filter(function (a) { return a.el === "O" && b.mol.bindingssum(a.id) === 1; })[0];
+    paastand("et træk med −COOH fra enden af butan: butansyre uden et nyt carbonatom, og −OH sidder mod musen",
+        T.liveNavn === "butansyre" && b.antal() === 6 && oH && grader(vinkelTil(cE, oH) - vOH) < 1 && b.vaerktoej === "tegn", T.liveNavn + " " + b.antal());
+    T.fortryd();
+    paastand("ét Fortryd tager hele COOH-gruppen tilbage", T.liveNavn === "butan" && b.antal() === 4, T.liveNavn);
+    /* −Br med et traek */
+    T.vaelg(T.idx("2-brompropan"));
+    b.saet(NK.NavnLaeser.laes("propan").mol);
+    kd = NK.Navn.analyser(b.mol).kaede;
+    cm = b.mol.atom(kd[1]); cA = b.mol.atom(kd[0]); cB = b.mol.atom(kd[2]);
+    hul = Math.atan2(2 * cm.y - cA.y - cB.y, 2 * cm.x - cA.x - cB.x);
+    vt("halogen:Br").click();
+    traekTil(b.px(cm), vedSiden(cm, hul));
+    peger(T, "pointerup", vedSiden(cm, hul));
+    paastand("et træk med −Br fra carbonatom 2 giver 2-brompropan i hullet mod musen, og værktøjet er Kæde igen",
+        T.liveNavn === "2-brompropan" && b.antal() === 4 && b.vaerktoej === "tegn", T.liveNavn + " " + b.antal());
+
     /* Slet: venstreklik sletter */
     function endeAtom() {
         var e = null;

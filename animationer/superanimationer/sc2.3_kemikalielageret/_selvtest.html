@@ -540,6 +540,38 @@ function koerTest(W) {
     var nivF = [0, 1, 2, 3, 6, 12].map(function (n) { B.nivNr = n; return B.traek(); });
     paastand("hylde 3 bruger stoffets egen retning, og fra niveau 4 blandes retningerne",
         nivF[2].retning === nivF[2].st.retning && ["formel", "navn"].indexOf(nivF[4].retning) >= 0);
+    /* 19. nov. 2026: de lette foerst, store glas og navnet altid paa etiketten */
+    [0, 1, 2].forEach(function (n) {
+        B.nivNr = n; B.pose = []; B.sidste = null;
+        var raekke = [];
+        for (var j = 0; j < 10; j++) { var st = B.traek().st; raekke.push(st.p + st.n); }
+        paastand("niveau " + (n + 1) + " begynder med de lette stoffer (få ioner i formlen)",
+            raekke[0] === 2 && raekke.every(function (v, j) { return j === 0 || v >= raekke[j - 1]; }), raekke.join(" "));
+    });
+    B.L.b = 936; B.L.h = 710;
+    B.layout();
+    paastand("936 x 710 (en skærm på 1366 x 768): glassene på båndet er mindst 130 px", B.lay.glasH >= 130, Math.round(B.lay.glasH));
+    paastand("936 x 710: båndet går fri af etiketmaskinen, og pilen går fri af hylden",
+        B.lay.baandY + 22 <= B.lay.maskine.y && B.lay.baandY - B.lay.glasH - 32 >= B.lay.hyldeY + 17);
+    B.L.b = 0;
+    B.tilpas();
+    paastand("samlebåndet: den revne etiket har altid tekst, også på det mindste glas (100 px)", (function () {
+        var c = d.createElement("canvas"); c.width = 300; c.height = 300;
+        var ctx = c.getContext("2d"), gem = ctx.fillText, n = 0, mindst = 99;
+        ctx.fillText = function () {
+            n++;
+            mindst = Math.min(mindst, parseFloat(/([0-9.]+)px/.exec(ctx.font)[1]));
+            return gem.apply(ctx, arguments);
+        };
+        var alle = D.aktive(false).every(function (st) {
+            return ["formel", "navn"].every(function (ret) {
+                n = 0;
+                NK.Tegn.glas(ctx, 150, 250, 100, st, { retning: ret, bredEtiket: true, opgave: true });
+                return n > 0;
+            });
+        });
+        return alle && mindst >= 10;
+    }()));
     B.nulstil();
     d.querySelector('.faneknap[data-fane="fane-lager"]').click();
 

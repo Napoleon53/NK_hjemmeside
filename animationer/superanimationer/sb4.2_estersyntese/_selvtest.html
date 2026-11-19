@@ -298,6 +298,24 @@ function koerTest(W) {
     t2.vaelgVaerktoej("gruppe:O");
     b.klik({ slags: "atom", atom: a2 });
     paastand("=O: et klik sætter et dobbeltbundet O på, og værktøjet går tilbage til C", K.antal(b.mol, "O") === 2 && b.vaerktoej === "tegn" && b.grundstof === "C");
+    /* Et traek med =O (19. nov. 2026): som klikket, men i traekkets retning */
+    b.fortryd();
+    t2.vaelgVaerktoej("gruppe:O");
+    /* Traek 1,2 bindingslaengder fra atomet a, vaek fra naboerne */
+    function traekO(a) {
+        var p = b.px(a), s = b.s(), dx = 0, dy = 0;
+        b.mol.naboer(a.id).forEach(function (n) { var q = b.mol.atom(n); dx += a.x - q.x; dy += a.y - q.y; });
+        var l = Math.hypot(dx, dy) || 1, m = { x: p.x + dx / l * s * 1.2, y: p.y + dy / l * s * 1.2 };
+        b.ned(p, { button: 0 });
+        for (var w = 1; w <= 6; w++) b.flyt({ x: p.x + (m.x - p.x) * w / 6, y: p.y + (m.y - p.y) * w / 6 });
+        b.op(m);
+    }
+    traekO(b.mol.atom(a3.id));
+    paastand("=O trukket fra oxygenatomet: intet sker", K.antal(b.mol, "O") === 1 && b.vaerktoej === "gruppe:O");
+    traekO(b.mol.atom(a2.id));
+    var oDbl = b.mol.atomer.filter(function (x) { return x.el === "O" && b.mol.naboer(x.id).length === 1; })[0];
+    paastand("=O trukket fra carbonatomet: dobbeltbundet O, og værktøjet går tilbage til C", K.antal(b.mol, "O") === 2 && oDbl &&
+        b.mol.binding(a2.id, oDbl.id).orden === 2 && b.vaerktoej === "tegn" && b.grundstof === "C");
     var res = NK.Navn.analyser(b.mol);
     paastand("tegningen er methylethanoat", res.navn === "methylethanoat", res.navn);
     paastand("Indsend svar viser molekylformlen", /C₃H₆O₂/.test(t2.indsendTekst()), t2.indsendTekst());

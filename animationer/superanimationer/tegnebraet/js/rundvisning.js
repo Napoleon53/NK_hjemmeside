@@ -18,7 +18,7 @@
             { sel: "#tb-anker-tavle", titel: "Tavlen", tekst: "Træk fra et atom for at tegne en kæde, eller klik på det: kæden bliver ét C længere. Klik på en binding: dobbelt og tripel. Højreklik sletter." },
             { sel: "#tb-zoom", titel: "Zoom", tekst: "Tavlen er større end skærmen. Træk i den tomme tavle for at flytte udsnittet, og zoom her eller med musehjulet. Vis alt viser hele tegningen." },
             { sel: "#tb-vaerktoej", titel: "Tegn med", tekst: "Vælg et grundstof med knappen eller tasten (C, H, O, N, L for Cl, B for Br, I), og klik på et atom for at skifte det. Med Markér (M) flytter du hele molekyler, tegner dem pænt, spejlvender og kopierer dem (Ctrl+C, Ctrl+V). Højreklik går tilbage til C." },
-            { sel: "#tb-grupper", titel: "Grupper", tekst: "Klik på en gruppe og så på et atom: –OH, =O, –CHO, –COOH og –NH₂ kommer på i ét klik. –COO⁻ giver ionen, fx ethanoat. ± giver et atom en ladning." },
+            { sel: "#tb-grupper", titel: "Grupper", tekst: "Klik på en gruppe og så på et atom: –OH, =O, –CHO, –COOH og –NH₂ kommer på i ét klik. Træk fra atomet, så kommer gruppen i den retning. –COO⁻ giver ionen, fx ethanoat. ± giver et atom en ladning." },
             { sel: "#tb-navnkort", titel: "Skriv et navn", tekst: "Skriv et navn, fx propan-2-ol eller eddikesyre, eller et helt skema: ethanol + ethansyre -> ethylethanoat + vand." },
             { sel: "#tb-molekyle", titel: "Molekyler på tavlen", tekst: "Navn, stofklasse, molekylformel og molarmasse for hvert molekyle. Klik på overskriften for at folde kortet ind." },
             { sel: "#tb-rapport", titel: "Indstillinger", tekst: "Zigzag eller alle atomer, numre og navne. Kopiér billedet ind i Word, eller gem det som SVG. En gemt SVG kan åbnes her igen." },

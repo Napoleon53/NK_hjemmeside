@@ -4,7 +4,8 @@
    Navnet staar paa kortet, delt i forled, stamme og endelse. Eleven
    tegner molekylet paa whiteboardet med molekylemotorens tavle, den
    samme som paa tegnebraettet: traek eller klik bygger kaeden, og en
-   gruppe saettes paa med ét klik.
+   gruppe saettes paa med ét klik eller et traek i den retning, den skal
+   sidde.
 
    Tegningen tjekkes kun, naar eleven trykker Test (eller Enter) nederst
    paa whiteboardet (brugerens oenske 20. okt. 2026: "svaer at tegne uden
@@ -91,6 +92,16 @@
                 return;
             }
             gammelKlik.call(this, u, pt);
+        };
+        /* Et traek med en gruppe eller et halogenatom: som klikket, men i
+           traekkets retning (brugeren 19. nov. 2026) */
+        b.traekHandling = function (fra, pt) {
+            var v = this.vaerktoej;
+            if (!/^(gruppe:|halogen:)/.test(v)) return null;
+            if (this.mol.atom(fra).el !== "C") return function () { this.toast("Træk fra et carbonatom."); return false; };
+            if (v.indexOf("halogen:") === 0) return function () { return this.nytFra(fra, v.slice(8), pt); };
+            if (v === "gruppe:COOH") return function () { return mig.lavCOOH(fra, pt); };
+            return NK.Tegnebraet.prototype.traekHandling.call(this, fra, pt);
         };
         NK.el("t-fortryd").addEventListener("click", function () { mig.fortryd(); });
         NK.el("t-ryd").addEventListener("click", function () { mig.nulstil(); });
@@ -193,24 +204,23 @@
        (startatomet blev til CH3COOH, naar man ville tegne methansyre).
        Ét Fortryd tager hele gruppen tilbage. */
     P.saetCOOH = function (id) {
+        var mig = this;
+        return this.braet.udfoer(function () { return mig.lavCOOH(id); });
+    };
+
+    /* =O og −OH paa carbonatomet (uden historik; motorens udfoer og traekket
+       proever det paa en kopi). Ved et traek (pt) kommer −OH mod musen og
+       =O i det bedste hul ved siden af. */
+    P.lavCOOH = function (id, pt) {
         var b = this.braet, mol = b.mol, nb = mol.naboer(id);
         var cNb = nb.filter(function (x) { return mol.atom(x).el === "C"; });
-        if (cNb.length > 1) { b.toast("COOH sidder for enden af kæden. Klik på et carbonatom for enden."); return false; }
+        if (cNb.length > 1) { b.toast("COOH sidder for enden af kæden. " + (pt ? "Træk fra" : "Klik på") + " et carbonatom for enden."); return false; }
         if (nb.length > cNb.length || !mol.ledig(id, 3)) {
             b.toast("Der er ikke plads til COOH på det carbonatom.");
             return false;
         }
-        var foer = b.billede(), hist = b.hist.slice();
-        this.saetter = true;
-        var ok = b.saetGruppe(id, "O") && b.saetGruppe(id, "OH");
-        this.saetter = false;
-        b.hist = hist;
-        if (!ok) { b.gendan(foer); return false; }
-        b.hist.push(foer);
-        if (b.hist.length > 80) b.hist.shift();
-        b.frem = [];
-        this.aendret("atom");
-        return true;
+        if (pt) return b.saetGruppe(id, "OH", pt) && b.saetGruppe(id, "O");
+        return b.saetGruppe(id, "O") && b.saetGruppe(id, "OH");
     };
 
     /* Slet: et venstreklik paa et atom for enden af kaeden sletter det, som

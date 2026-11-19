@@ -84,6 +84,12 @@
             }
             this.nytFra(a.id, "C");
         };
+        /* Et traek med =O: som klikket, men i traekkets retning (motoren) */
+        b.traekHandling = function (fra, pt) {
+            if (this.vaerktoej !== "gruppe:O") return null;
+            if (this.mol.atom(fra).el !== "C") return function () { this.toast("Træk fra et carbonatom for at sætte =O på."); return false; };
+            return function () { return this.saetGruppe(fra, "O", pt); };
+        };
         NK.el("t-fortryd").addEventListener("click", function () { mig.fortryd(); });
         NK.el("t-ryd").addEventListener("click", function () { mig.nulstil(); });
         this.vaerktoejEl.addEventListener("click", function (e) {
@@ -289,6 +295,8 @@
 
     P.aendret = function (hvad) {
         if (this.saetter) return;
+        /* Efter =O (klik eller traek) gaar vaerktoejet tilbage til C */
+        if (hvad === "atom" && this.braet.vaerktoej === "gruppe:O") this.vaelgVaerktoej("C", true);
         this.visVaerktoej();
         if (hvad === "vaerktoej" || hvad === "valg") return;
         if (this.fast.klasse === "skidt") this.besked("", "");

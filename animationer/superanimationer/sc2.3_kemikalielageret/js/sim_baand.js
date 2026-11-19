@@ -102,10 +102,21 @@
         lay.lilleH = NK.klamp(H * 0.13, 60, 108);
         /* Hylden begynder under papirkortet */
         lay.hyldeY = Math.round(Math.max(H * 0.18, this.top() + lay.lilleH + 6));
-        lay.baandY = Math.round(H * 0.56);
+
+        var mb = NK.klamp(W * 0.36, 250, 380);
+        var mh = mb * 150 / 240;
+        lay.maskine = { x: Math.max(12, W * 0.4 - mb / 2), y: lay.bordY - mh * 0.95, b: mb };
+
+        /* Baandet staar lidt over midten. Paa en lav skaerm (1366 x 768)
+           rykker det ned mod etiketmaskinen, saa glassene bliver store nok
+           til, at etiketten kan laeses (19. nov. 2026). Over glasset skal
+           der vaere plads til hyldebraettet og pilen (OVER). */
+        var OVER = 54, STOERST = 185;
+        var lavest = Math.min(H * 0.6, lay.maskine.y - 28);
+        lay.baandY = Math.round(Math.max(H * 0.56, Math.min(lavest, lay.hyldeY + OVER + STOERST)));
         lay.x0 = 0;
         lay.x1 = Math.round(W * 0.8);
-        lay.glasH = NK.klamp(Math.min(H * 0.26, W * 0.2, lay.baandY - lay.hyldeY - 70), 100, 185);
+        lay.glasH = NK.klamp(Math.min(H * 0.26, W * 0.2, lay.baandY - lay.hyldeY - OVER), 100, STOERST);
         lay.glasB = Tg.glasBredde(lay.glasH);
 
         var kb = NK.klamp(W * 0.17, 120, 200), kk = kb / 170;
@@ -126,9 +137,6 @@
             ioner: { x: px + pb * 0.06, y: 14 + ptH + 16, b: pb * 0.88, h: ionH }
         };
 
-        var mb = NK.klamp(W * 0.36, 250, 380);
-        var mh = mb * 150 / 240;
-        lay.maskine = { x: Math.max(12, W * 0.4 - mb / 2), y: lay.bordY - mh * 0.95, b: mb };
         this.lay = lay;
 
         /* Det usynlige indtastningsfelt ligger oven paa displayet */
@@ -267,14 +275,22 @@
         this.banner = { tekst: "Niveau " + (this.nivNr + 1) + " · " + niveau(this.nivNr).navn, t: 0 };
     };
 
+    /* Hvor svaert et stof er: antallet af ioner i formlen. KI og MgO (2)
+       er lettere end MgCl2 (3), og Al2O3 og Ca3(PO4)2 (5) er svaerest. */
+    function svaerhed(st) { return st.p + st.n; }
+
     /* Naeste stof: fra en blandet pose, saa alle kommer, foer nogen
-       kommer igen */
+       kommer igen. Paa de tre foerste niveauer kommer de lette foerst
+       (19. nov. 2026); inden for samme svaerhed er raekkefoelgen
+       tilfaeldig. Det blandede niveau traekker helt tilfaeldigt. */
     P.traek = function () {
         var n = niveau(this.nivNr);
         var svaer = NK.indstil.svaer;
         if (!this.pose.length || this.pose.niv !== this.nivNr || this.pose.svaer !== svaer) {
             var liste = D.aktive(svaer).filter(function (st) { return n.hylde === null || st.hylde === n.hylde; });
             this.pose = NK.bland(liste);
+            /* pop tager fra enden, saa de lette skal staa sidst */
+            if (n.hylde !== null) this.pose.sort(function (a, b) { return svaerhed(b) - svaerhed(a); });
             this.pose.niv = this.nivNr;
             this.pose.svaer = svaer;
             if (this.pose.length > 1 && this.pose[this.pose.length - 1] === this.sidste) this.pose.unshift(this.pose.pop());
@@ -476,7 +492,7 @@
                 ctx.beginPath();
                 ctx.rect(0, 0, lay.W, kant.kant);
                 ctx.clip();
-                Tg.glas(ctx, x, y, h, g.st, { retning: g.retning, vip: vip, udenSkygge: true });
+                Tg.glas(ctx, x, y, h, g.st, { retning: g.retning, vip: vip, udenSkygge: true, bredEtiket: true, opgave: true });
                 ctx.restore();
                 return;
             }
@@ -490,11 +506,14 @@
                 alfa = 1;
                 Tg.glas(ctx, x, y, h, g.st, g.t > 0.45
                     ? { etiket: "ny", bredEtiket: true, tekst: true }
-                    : { etiket: "gammel", retning: g.retning });
+                    : { etiket: "gammel", retning: g.retning, bredEtiket: true, opgave: true });
                 if (g.t < 0.45) mig.tegnPrint(ctx, g);
                 return;
             }
-            Tg.glas(ctx, x, y, h, g.st, { retning: g.retning, lys: g === forreste ? 0.75 + 0.25 * Math.sin(mig.tid * 5) : 0 });
+            /* Etiketten er opgaven: den brede etiket, og det, der staar paa
+               den, kan altid laeses (Tg.glas, v.opgave) */
+            Tg.glas(ctx, x, y, h, g.st, { retning: g.retning, lys: g === forreste ? 0.75 + 0.25 * Math.sin(mig.tid * 5) : 0,
+                bredEtiket: true, opgave: true });
             if (g === forreste) Tg.pil(ctx, x, y - h - 10, 9);
         });
 

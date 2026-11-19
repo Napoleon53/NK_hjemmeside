@@ -120,6 +120,17 @@ og et skævt træk kunne give en carbonspiral):
 
 Klik er uændret: et klik på et atom sætter ét C på.
 
+**Træk med en gruppe** (brugerens ønske 19. nov. 2026: med −OH valgt blev trækket en
+kæde): med en gruppe valgt kommer gruppen i trækkets retning i stedet for en kæde.
+Den står grå med sine symboler (OH, NH₂, =O), mens man trækker, og kommer på tavlen
+ved slip (ét Fortryd-skridt). Retningen (`retningerMod`) er den nærmest musen blandt
+dem med pæne vinkler: 120 grader for enden af en kæde, midt i kæden det største hul,
+højst 90 grader fra musen. Er der ikke plads, er stregen rød, og beskeden kommer.
+Slippes musen ved atomet, er det et klik. `traekHandling(fra, pt)` giver det, trækket
+gør (en side kan give sin egen: sb3.1 gør det samme for −COOH og halogenerne, sb4.2
+for =O). Handlingen prøves på en kopi af molekylet (`proev`), og `udfoer` lægger
+den på tavlen i ét skridt.
+
 ## Navngivningens regler
 
 Gymnasiebøgernes regler (IUPAC 1979/1993), dansk stavning:

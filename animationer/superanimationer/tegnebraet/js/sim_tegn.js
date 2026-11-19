@@ -530,7 +530,7 @@
         var t = D.STATUS.tegnebraet;
         if (b.vaerktoej === "marker") t = b.harValgte() ? "Træk i det markerede for at flytte det. Ctrl+C og Ctrl+V kopierer. Højreklik: tilbage til C." : "Klik på et molekyle for at markere det, eller træk en ramme om flere. Ctrl+A markerer alt. Højreklik: tilbage til C.";
         else if (b.vaerktoej === "ladning") t = "Klik på et atom: første klik giver −, næste +, og så ingen ladning. Højreklik: tilbage til C.";
-        else if (b.vaerktoej.indexOf("gruppe:") === 0) t = "Klik på et atom for at sætte " + GRUPPE_NAVN[b.vaerktoej.slice(7)] + " på. Højreklik: tilbage til C.";
+        else if (b.vaerktoej.indexOf("gruppe:") === 0) t = "Klik på et atom for at sætte " + GRUPPE_NAVN[b.vaerktoej.slice(7)] + " på, eller træk fra atomet i den retning, den skal sidde. Højreklik: tilbage til C.";
         else if (b.vaerktoej === "flyt") t = "Træk i et atom for at flytte det. Træk i tavlen for at flytte udsnittet.";
         else if (b.vaerktoej === "pil" || b.vaerktoej === "lig") t = "Klik på tavlen, hvor pilen skal stå. Træk i den bagefter for at flytte den.";
         else if (b.vaerktoej === "plus") t = "Klik på tavlen, hvor plusset skal stå.";
