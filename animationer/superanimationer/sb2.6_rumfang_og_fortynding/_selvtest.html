@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb2.6 Rumfang og fortynding</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen giver de tal, teksterne og figur
+   B2.10 i Kemibogen nævner, at alle 12 mål kan løses (selv, med
+   forkerte svar først og med Vis svaret), at eleven kun kan sætte noget
+   i gang, mens kortet viser et forsøg, at teksterne er korte og holder
+   sproget, og at kortet ikke dækker scenen fra 1100 × 620 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb2.6-s", "nk-sb2.6-f", "nk-sb2.6-r"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|maal|gaet\w*|spoerg\w*|faa|saa|naar|laengde|broek\w*|aendr\w*|maaleglas\w*|vaesk\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerF(F, sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+function taet(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+function koerTest(W) {
+    var d = W.document, NK = W.NK, D = NK.Data, M = NK.Model, G = M.GAS, O = M.OPL, Tg = NK.Tegn;
+    var S = NK.sims["fane-s"], F = NK.sims["fane-f"], R = NK.sims["fane-r"];
+    var FANER = [["s", S, "fane-s"], ["f", F, "fane-f"], ["r", R, "fane-r"]];
+
+    function erSpm(f) { return /^(brok|spm)/.test(f || ""); }
+    function svar(X, j) {
+        var g = X.opg, spm = !!g && erSpm(g.fase) && !X.venter && !X.faerdig;
+        X.svarValg(j);
+        if (spm) X.indsendKlik();
+    }
+    function besked(X) { return X.el.besked.hidden ? "" : X.beskedTekst(); }
+    function roed(X) { return /skidt/.test(X.el.status.className); }
+    function blinker(X) { return X.el.skort.classList.contains("blink"); }
+    function rigtigt(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (s.ok) j = i; }); return j; }
+    function forkert(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (!s.ok && j < 0) j = i; }); return j; }
+    function midt(f) { return { x: f.x + f.b / 2, y: f.y + f.h / 2 }; }
+
+    /* Goer forsoeget, som eleven goer det: et klik i scenen eller paa tavlen */
+    function goerForsoeg(X, navn) {
+        var o = X.opg.o, lay = X.lay;
+        if (navn === "s") { X.klikScene(midt(X.del().maal === "ned" ? lay.ned : lay.op)); koerF(X, 12); }
+        else if (navn === "f") { X.klikScene(midt(lay.vand)); koerF(X, 12); }
+        else {
+            for (var n = 0; n < 8 && X.opg.fase === "forsoeg" && !X.venter; n++) {
+                X.tegn();
+                var f = X.felter.filter(function (ff) { return !X.maerket[ff.side][ff.j]; })[0];
+                if (f) X.klikScene(midt(f));
+            }
+        }
+    }
+    function loesSelv(X, navn, i, forkertFoerst) {
+        X.vaelg(i);
+        var log = [];
+        for (var n = 0; n < 30 && !X.faerdig; n++) {
+            if (X.venter) { X.knap(); continue; }
+            var f = X.opg.fase;
+            if (/^gaet/.test(f)) { X.svarValg(rigtigt(X)); log.push("gæt"); continue; }
+            if (/^forsoeg/.test(f)) { goerForsoeg(X, navn); log.push("forsøg"); continue; }
+            if (forkertFoerst) { svar(X, forkert(X)); log.push(roed(X) && X.pegKnap ? "fejl-rød" : "fejl-IKKE-rød"); }
+            svar(X, rigtigt(X)); log.push(f);
+        }
+        return log;
+    }
+    function visSvaret(X, i) {
+        X.vaelg(i);
+        for (var n = 0; n < 60 && !X.faerdig; n++) { X.knap(); koerF(X, 0.3); }
+        koerF(X, 12);
+        return X.faerdig;
+    }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Modellen: N₂O₄(g) ⇌ 2 NO₂(g), K = 0,25 M");
+    paastand("4 N₂O₄ og 10 NO₂ i 2,0 L: K = 0,25 M", taet(G.KM, 0.25, 1e-12) && taet(M.Y(G, G.start, 2) * G.MOL, 0.25, 1e-12));
+    var g1 = M.efter(G, G.start, M.ligevaegtXi(G, G.start, 1));
+    paastand("1,0 L: ligevægt med 5 N₂O₄ og 8 NO₂ i tegningen", Math.round(g1[0]) === 5 && Math.round(g1[1]) === 8, g1.join(", "));
+    paastand("1,0 L: [NO₂] = 0,16 M ved den nye ligevægt (opgave 4)", Tg.konc(M.konc(g1[1]) / 1) === "0,16 M", g1[1]);
+    var g4 = M.efter(G, G.start, M.ligevaegtXi(G, G.start, 4));
+    paastand("4,0 L: 3 N₂O₄ og 12 NO₂, 15 molekyler mod 14 (opgave 3)", Math.round(g4[0]) === 3 && Math.round(g4[1]) === 12, g4.join(", "));
+    paastand("halvt rumfang: Y = 2 · K lige efter; dobbelt rumfang: Y = ½ · K", taet(M.Y(G, G.start, 1) / G.K, 2, 1e-12) && taet(M.Y(G, G.start, 4) / G.K, 0.5, 1e-12));
+    paastand("tegningens antal passer med K inden for 5 %", taet(64 / (5 * 1) / G.K, 1, 0.045) && taet(144 / (3 * 4) / G.K, 1, 0.045));
+
+    overskrift("2. Modellen: Co²⁺(aq) + 4 Cl⁻(aq) ⇌ CoCl₄²⁻(aq)");
+    paastand("25 mL: 2 CoCl₄²⁻, 1 Co²⁺ og 10 Cl⁻ i ligevægt (figur B2.10)", taet(M.Y(O, O.start, 1) / O.K, 1, 1e-12));
+    paastand("fortynding til det dobbelte rumfang: Y = 16 · K lige efter", taet(M.Y(O, O.start, 2) / O.K, 16, 1e-9));
+    var o2 = M.efter(O, O.start, M.ligevaegtXi(O, O.start, 2));
+    paastand("50 mL: 1 CoCl₄²⁻, 2 Co²⁺ og 14 Cl⁻ (figur B2.10)", Math.round(o2[2]) === 1 && Math.round(o2[0]) === 2 && Math.round(o2[1]) === 14, o2.join(", "));
+    paastand("tegningens 1, 2 og 14 i 50 mL passer med K inden for 5 %", taet(16 * 1 / (2 * Math.pow(14, 4)) / O.K, 1, 0.045));
+    var o4 = M.efter(O, o2, M.ligevaegtXi(O, o2, 4));
+    paastand("100 mL: næsten alle CoCl₄²⁻ er væk (under 10 % af cobalten)", o4[2] / 3 < 0.1, o4.join(", "));
+    paastand("fra 50 til 100 mL: Y = 16 · K igen (opgave 3)", taet(M.Y(O, o2, 4) / O.K, 16, 1e-9));
+    paastand("relTekst: 16 · K, ½ · K, ¼ · K, 1/16 · K og K",
+        D.relTekst(16) === "Y = 16 · K" && D.relTekst(0.5) === "Y = ½ · K" && D.relTekst(0.25) === "Y = ¼ · K" && D.relTekst(1 / 16) === "Y = 1/16 · K" && D.relTekst(1.01) === "Y = K");
+
+    overskrift("3. Fane 3: faktorerne, Y og retningen passer sammen");
+    D.R_MAAL.forEach(function (o, i) {
+        var f = { "½": 0.5, "2": 2, "¼": 0.25 }[o.f], over = 1, under = 1;
+        o.over.forEach(function (l) { over *= Math.pow(f, l[1]); });
+        o.under.forEach(function (l) { under *= Math.pow(f, l[1]); });
+        var y = over / under;
+        var ok = o.ySvar.filter(function (s) { return s.ok; });
+        var ret = y > 1.0001 ? 1 : (y < 0.9999 ? 0 : 2);
+        paastand("r" + (i + 1) + " " + o.navn + ": Y = " + D.relTekst(y).replace("Y = ", "") + ", det rigtige svar og retningen",
+            taet(y, o.Y, 1e-9) && ok.length === 1 && ok[0].t === D.relTekst(o.Y) && ret === o.ret, y + " " + (ok[0] && ok[0].t));
+    });
+
+    overskrift("4. Alle mål kan løses");
+    FANER.forEach(function (fa) {
+        var navn = fa[0], X = fa[1];
+        NK.visFane(fa[2]);
+        X.tilpas();
+        X.opgaver.forEach(function (o, i) {
+            var log = loesSelv(X, navn, i, false);
+            paastand(navn + (i + 1) + " " + o.navn + ": kan løses selv (" + log.join(" › ") + ")", X.faerdig);
+            log = loesSelv(X, navn, i, true);
+            paastand(navn + (i + 1) + ": forkerte svar giver en rød linje, og knappen lyser", X.faerdig && log.indexOf("fejl-IKKE-rød") < 0, log.join(" › "));
+            paastand(navn + (i + 1) + ": Vis svaret fører helt igennem", visSvaret(X, i));
+        });
+    });
+
+    overskrift("5. Tallene i teksterne passer med scenen");
+    NK.visFane("fane-s"); S.tilpas();
+    S.vaelg(S.idx("op")); S.svarValg(0); goerForsoeg(S, "s");
+    paastand("træk op: 15 molekyler i cylinderen bagefter (opgave 3)", S.antal("N2O4") + S.antal("NO2") === 15, S.antal("N2O4") + " + " + S.antal("NO2"));
+    S.vaelg(S.idx("modvirk")); goerForsoeg(S, "s");
+    var tab = d.getElementById("s-tal").textContent;
+    paastand("pres ned: panelet viser [NO₂] 0,10 M før, 0,20 M lige efter og 0,16 M nu", /\[NO₂\] i M0,100,200,16/.test(tab), tab);
+    paastand("pres ned: 5 N₂O₄ og 8 NO₂ i cylinderen bagefter", S.antal("N2O4") === 5 && S.antal("NO2") === 8);
+    NK.visFane("fane-f"); F.tilpas();
+    F.vaelg(F.idx("lige")); goerForsoeg(F, "f");
+    paastand("fortynding til 50 mL: 1 CoCl₄²⁻, 2 Co²⁺ og 14 Cl⁻ i måleglasset", F.antal("CoCl4") === 1 && F.antal("Co") === 2 && F.antal("Cl") === 14, F.antal("CoCl4") + " " + F.antal("Co") + " " + F.antal("Cl"));
+    F.vaelg(F.idx("mere")); F.svarValg(0); goerForsoeg(F, "f");
+    paastand("fortynding til 100 mL: 0 CoCl₄²⁻, 3 Co²⁺ og 18 Cl⁻", F.antal("CoCl4") === 0 && F.antal("Co") === 3 && F.antal("Cl") === 18);
+    var fv = F.farve();
+    paastand("farven ved 100 mL er lyserød (mere rød end blå)", fv[0] > fv[2] - 10, fv.join(","));
+
+    overskrift("5b. Stilladset og danserne");
+    NK.visFane("fane-s"); S.tilpas();
+    S.vaelg(S.idx("pres"));
+    var f0 = !S.synlig("broek") && !S.synlig("tallinje") && !S.synlig("faktor");
+    svar(S, rigtigt(S));
+    var f1 = S.synlig("broek") && !S.synlig("faktor") && !S.synlig("tallinje");
+    S.knap(); svar(S, rigtigt(S));
+    var f2 = S.synlig("faktor") && !S.synlig("tallinje");
+    S.knap(); svar(S, rigtigt(S));
+    var f3 = S.synlig("tallinje") && !S.synlig("retning");
+    paastand("stemplet: brøken, faktoren og tallinjen dukker op ét trin ad gangen", f0 && f1 && f2 && f3, [f0, f1, f2, f3].join(","));
+    paastand("stemplet: kortet viser Trin 3 af 6 og spørgsmålet på sin egen linje",
+        /Trin 3 af 6/.test(S.el.skort.textContent) && !!S.el.skort.querySelector(".sk-spm-linje"));
+    S.vaelg(S.idx("modvirk"));
+    paastand("et mål uden trin har brøken og tallinjen fremme, men ikke faktoren", S.synlig("broek") && S.synlig("tallinje") && !S.synlig("faktor"));
+    S.vaelg(S.idx("op"));
+    paastand("Træk stemplet op viser danserne", S.visning === "dansere");
+    S.svarValg(0);
+    S.klikScene(midt(S.lay.op));
+    koerF(S, 0.9 + 0.5);
+    var b1 = S.bobler.map(function (b) { return b.tekst; }).join(" | ");
+    koerF(S, 1.2);
+    var b2 = S.bobler.map(function (b) { return b.tekst; }).join(" | ");
+    paastand("danserne siger noget, når stemplet er trukket op", /Dejligt med mere plads/.test(b1) && /behøver vi ikke danse/.test(b2), b1 + " / " + b2);
+    koerF(S, 12);
+    S.visning = "molekyler";
+    NK.visFane("fane-f"); F.tilpas();
+    F.vaelg(F.idx("haeld"));
+    var ff = [];
+    for (var nn = 0; nn < 5; nn++) { ff.push([F.synlig("broek"), F.synlig("faktor"), F.synlig("taelling"), F.synlig("tallinje"), F.synlig("retning")].filter(Boolean).length); svar(F, rigtigt(F)); F.knap(); }
+    paastand("fortyndingen: brøken, faktoren, tællingen, tallinjen og retningen kommer én ad gangen", ff.join(",") === "0,1,2,3,4", ff.join(","));
+    paastand("fortyndingen: forsøget kommer først efter de fem spørgsmål", /^forsoeg/.test(F.opg.fase), F.opg.fase);
+    NK.visFane("fane-r"); R.tilpas();
+    R.vaelg(0); R.tegn();
+    paastand("regnefanen: brøken og tallinjen er ikke fremme, før faktoren er valgt", R.felter.length === 0 && R.yVis === null);
+
+    overskrift("6. Låsen: forsøget kan kun sættes i gang, når kortet beder om det");
+    NK.visFane("fane-s"); S.tilpas();
+    S.vaelg(S.idx("pres"));
+    S.el.skort.classList.remove("blink");
+    S.klikScene(midt(S.lay.ned));
+    paastand("under det første spørgsmål sker der intet ved et klik på Pres ned, og kortet blinker", S.trin === "hvile" && !S.handling && blinker(S));
+    S.vaelg(S.idx("op"));
+    S.el.skort.classList.remove("blink");
+    S.klikScene(midt(S.lay.op));
+    paastand("under gættet sker der intet ved et klik på Træk op, og kortet blinker", S.trin === "hvile" && !S.handling && blinker(S));
+    NK.visFane("fane-f"); F.tilpas();
+    F.vaelg(F.idx("haeld"));
+    F.el.skort.classList.remove("blink");
+    F.klikScene(midt(F.lay.vand));
+    paastand("under spørgsmålene før forsøget sker der intet ved et klik på Hæld vand i", F.trin === "hvile" && !F.handling);
+    NK.visFane("fane-r"); R.tilpas();
+    R.vaelg(0); R.tegn();
+    R.el.skort.classList.remove("blink");
+    R.klikScene({ x: R.lay.tavle.x + R.lay.tavle.b / 2, y: R.lay.tavle.y + 140 });
+    paastand("på tavlen kan faktoren ikke sættes på, før faktoren er valgt, og kortet blinker", !R.maerket.over[0] && R.felter.length === 0 && blinker(R));
+
+    overskrift("7. Teksterne er korte, og sproget holder");
+    var GR = { gaet: 60, spm: 105, svar: 34, forsoeg: 95, hint: 100, f: 110, loest: 160 };
+    var lang = [], ascii = [], streg = [];
+    function tjekTekst(t, hvor) {
+        if (ASCII_ORD.test(t)) ascii.push(hvor);
+        if (/[–—]/.test(t)) streg.push(hvor);
+        if (/[A-Za-z]1[+−](?![0-9])/.test(t)) streg.push(hvor + " (1+/1−)");
+    }
+    [["s", D.S_MAAL], ["f", D.F_MAAL], ["r", D.R_MAAL]].forEach(function (p) {
+        p[1].forEach(function (o, i) {
+            var hvor = p[0] + (i + 1);
+            if (o.gaet) {
+                if (o.gaet.tekst.length > GR.gaet) lang.push(hvor + " gæt");
+                tjekTekst(o.gaet.intro + " " + o.gaet.tekst, hvor);
+                o.gaet.svar.forEach(function (s) { if (s.t.length > GR.svar) lang.push(hvor + " gætsvar " + s.t); });
+            }
+            var dele = o.trin ? o.trin.map(function (t, k) { return [t.del + "_" + k, t]; }) :
+                ["brok", "forsoeg", "spm", "spm2"].map(function (f) { return [f, o[f]]; });
+            dele.forEach(function (fd) {
+                var f = fd[0], del = fd[1];
+                if (!del) return;
+                var graense = /^forsoeg/.test(f) ? GR.forsoeg : GR.spm;
+                if (del.intro) { if (del.intro.length > 110) lang.push(hvor + " " + f + " intro (" + del.intro.length + ")"); tjekTekst(del.intro, hvor + " intro"); }
+                if (/^spm|^brok/.test(f) && !/\?$/.test(del.tekst)) lang.push(hvor + " " + f + " spørgsmålet ender ikke med ?");
+                if (del.intro && /\?/.test(del.intro)) lang.push(hvor + " " + f + " indledningen har et spørgsmål");
+                if (del.tekst.length > graense) lang.push(hvor + " " + f + " (" + del.tekst.length + ")");
+                tjekTekst(del.tekst, hvor + " " + f);
+                (del.hint || []).forEach(function (h) { if (h.length > GR.hint) lang.push(hvor + " " + f + " hint (" + h.length + ")"); tjekTekst(h, hvor + " hint"); });
+                (del.svar || []).forEach(function (s) {
+                    if (s.t.length > GR.svar) lang.push(hvor + " svar " + s.t);
+                    if (s.f) { if (s.f.length > GR.f) lang.push(hvor + " f (" + s.f.length + ")"); tjekTekst(s.f, hvor + " f"); }
+                    if (!s.ok && !s.f) lang.push(hvor + " " + f + " forkert svar uden forklaring: " + s.t);
+                });
+                if (del.set && del.set.length > GR.loest) lang.push(hvor + " set (" + del.set.length + ")");
+                if (del.godt && del.godt.length > GR.loest) lang.push(hvor + " godt (" + del.godt.length + ")");
+            });
+            if (o.loest.length > GR.loest) lang.push(hvor + " løst (" + o.loest.length + ")");
+            tjekTekst(o.loest, hvor + " løst");
+        });
+    });
+    paastand("ingen tekst er for lang til kortet, og hvert forkert svar har en forklaring", !lang.length, lang.join("; "));
+    paastand("ingen ord uden æ, ø og å (foer, naeste ...) i det, eleven læser", !ascii.length, ascii.join("; "));
+    paastand("ingen tankestreger og intet 1+ eller 1−", !streg.length, streg.join("; "));
+    var teori = d.getElementById("teori").textContent;
+    paastand("teorien har ingen tankestreger og ingen ord uden æ, ø og å", !/[–—]/.test(teori) && !ASCII_ORD.test(teori));
+    var alt = JSON.stringify([D.S_MAAL, D.F_MAAL, D.R_MAAL]) + teori;
+    paastand("jern(III)thiocyanat (øvelsen) er ikke med", !/SCN|thiocyanat/i.test(alt));
+    paastand("vand står ikke i reaktionsskemaet for cobalt", !/H₂O\(l\)/.test(alt));
+
+    overskrift("8. Kortet dækker ikke scenen");
+    [[1100, 620], [1300, 760], [1600, 950]].forEach(function (s) {
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        var problemer = [];
+        FANER.forEach(function (f) {
+            var navn = f[0], X = f[1];
+            NK.visFane(f[2]);
+            X.tilpas();
+            X.opgaver.forEach(function (o, i) {
+                X.vaelg(i);
+                for (var n = 0; n < 30 && !X.faerdig; n++) {
+                    X.tilpas();
+                    var zone = 10 + X.kortZone();
+                    var bund = X.el.skort.getBoundingClientRect().bottom - X.L.canvas.getBoundingClientRect().top;
+                    if (!X.gaetNu() && bund > zone + 2) problemer.push(navn + (i + 1) + " " + X.opg.fase + " " + Math.round(bund) + ">" + zone);
+                    if (!X.gaetNu() && !X.venter && n === 1) {
+                        X.knap();
+                        bund = X.el.skort.getBoundingClientRect().bottom - X.L.canvas.getBoundingClientRect().top;
+                        if (bund > zone + 2) problemer.push(navn + (i + 1) + " hint " + Math.round(bund) + ">" + zone);
+                        X.hjaelp = 0; X.besked("", ""); X.visKnap();
+                    }
+                    if (X.venter) { X.knap(); continue; }
+                    var fa = X.opg.fase;
+                    if (/^gaet/.test(fa)) X.svarValg(rigtigt(X));
+                    else if (/^forsoeg/.test(fa)) goerForsoeg(X, navn);
+                    else svar(X, rigtigt(X));
+                }
+            });
+            var lay = X.lay, Hs = lay.Hs;
+            if (navn !== "r" && lay.tlY + 46 > Hs) problemer.push(navn + ": tallinjen uden for (" + Math.round(lay.tlY + 46) + "/" + Hs + ")");
+            if (navn !== "r" && lay.rx + lay.rw > lay.W + 1) problemer.push(navn + ": højre side er bredere end scenen");
+            if (navn === "s" && lay.C.bund - lay.C.top < 200) problemer.push("s: cylinderen er lav (" + Math.round(lay.C.bund - lay.C.top) + ")");
+            if (navn === "r" && lay.tlY + 46 > Hs) problemer.push("r: tallinjen uden for");
+        });
+        paastand(s[0] + " × " + s[1] + ": kortet holder sig i sin zone, og tingene er i scenen", !problemer.length, problemer.slice(0, 6).join("; "));
+    });
+    ramme.style.width = "1300px";
+    ramme.style.height = "760px";
+
+    overskrift("9. Rundvisningen finder sine ting");
+    FANER.forEach(function (f) {
+        NK.visFane(f[2]);
+        f[1].vaelg(0);
+        f[1].tilpas();
+        var mangler = [];
+        ["#" + f[0] + "-skort", "#" + f[0] + "-opgaver", "#" + f[0] + "-anker-tallinje"].forEach(function (sel) {
+            var el = d.querySelector(sel);
+            if (!el || !(el.offsetWidth || el.offsetHeight)) mangler.push(sel);
+        });
+        paastand("fane " + f[0] + ": kortet, opgaverne og tallinjen kan vises", !mangler.length, mangler.join(", "));
+    });
+}
+</script>
+</body>
+</html>

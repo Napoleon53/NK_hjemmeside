@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Skærmbillede: sb2.6</title>
+<style>
+    html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+    iframe { border: 0; display: block; }
+</style>
+</head>
+<body>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen.
+
+   ?b=1300&h=800&fane=s&s=vaelg:0,gaet:0,forsoeg,koer:6
+   åbner index.html i en iframe på b × h og kører kommandoerne:
+     vaelg:n    vælg mål n (fra 0)
+     gaet:j     svar j på gættet
+     svar:j     svar j på spørgsmålet (vælger og trykker Indsend svar)
+     valgt:j    vælg svar j uden at trykke Indsend svar
+     rigtig     det rigtige svar på spørgsmålet (med Indsend svar)
+     forsoeg    gør forsøget for eleven (som Vis svaret, men uden at gå videre)
+     knap       tryk på hjælpeknappen
+     videre     tryk på kortets grønne knap
+     koer:sek   kør scenen sek sekunder
+     dans       vis danserne paa fane 1
+     klar       ryd elevens fremskridt
+   ===================================================================== */
+var q = {};
+location.search.replace(/^\?/, "").split("&").forEach(function (p) { var a = p.split("="); q[a[0]] = decodeURIComponent(a.slice(1).join("=") || ""); });
+var ramme = document.getElementById("ramme");
+ramme.style.width = (q.b || 1300) + "px";
+ramme.style.height = (q.h || 800) + "px";
+var trin = 0;
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { ["nk-sb2.6-s", "nk-sb2.6-f", "nk-sb2.6-r"].forEach(function (n) { W.localStorage.removeItem(n); }); } catch (e) {}
+        W.location.reload();
+        return;
+    }
+    setTimeout(koer, 400);
+});
+function koer() {
+    var W = ramme.contentWindow, NK = W.NK;
+    var fane = { s: "fane-s", f: "fane-f", r: "fane-r" }[q.fane || "s"];
+    NK.visFane(fane);
+    var F = NK.sims[fane];
+    function k(sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+    (q.s || "").split(",").filter(Boolean).forEach(function (c) {
+        var a = c.split(":"), n = a[0], v = a[1];
+        if (n === "vaelg") F.vaelg(parseInt(v, 10));
+        else if (n === "gaet" || n === "valgt") F.svarValg(parseInt(v, 10));
+        else if (n === "svar") { F.svarValg(parseInt(v, 10)); if (F.indsendKlik) F.indsendKlik(); }
+        else if (n === "rigtig") { var del = F.opg.o[F.opg.fase]; del.svar.forEach(function (s, j) { if (s.ok) F.svarValg(j); }); if (F.indsendKlik) F.indsendKlik(); }
+        else if (n === "forsoeg") F.forsoegSvar(F.opg.o);
+        else if (n === "knap") F.knap();
+        else if (n === "videre") F.knap();
+        else if (n === "koer") k(parseFloat(v));
+        else if (n === "dans") F.visning = "dansere";
+    });
+    F.tilpas();
+    F.tegn();
+    document.title = Array.prototype.map.call(W.document.querySelectorAll(".faneknap"), function (k) { return k.className; }).join("|");
+}
+</script>
+</body>
+</html>

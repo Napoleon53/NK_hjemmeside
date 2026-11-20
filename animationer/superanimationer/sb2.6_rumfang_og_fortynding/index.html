@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<script src="../../til_panelet.js" data-panel="samling_alt_b.html" data-emne="b2.6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rumfang og fortynding</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">⇌</span> Rumfang og fortynding</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-s" role="tab" aria-selected="true"><span class="nr">1</span>Stemplet</button>
+        <button class="faneknap" data-fane="fane-f" role="tab" aria-selected="false"><span class="nr">2</span>Fortynding</button>
+        <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">3</span>Regn på Y</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: STEMPLET                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-s" role="tabpanel" aria-label="Stemplet">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="s-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-cylinder"></div>
+        <div class="anker" id="s-anker-knapper"></div>
+        <div class="anker" id="s-anker-visning"></div>
+        <div class="anker" id="s-anker-tallinje"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="s-talkort">
+            <h2>Cylinderen</h2>
+            <button class="knap fold-knap" type="button" data-fold="s-tal" aria-expanded="false">Vis tallene ▸</button>
+            <div id="s-tal" hidden></div>
+            <button class="knap" id="s-forfra" type="button" style="margin-top:10px;">↺ Stil cylinderen op igen</button>
+        </div>
+
+        <div class="kort" id="s-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="s-loest">0</b>/3</span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORTYNDING                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-f" role="tabpanel" aria-label="Fortynding">
+    <div class="scene">
+        <canvas id="f-laerred"></canvas>
+        <div class="scenekort" id="f-skort">
+            <div class="sk-ind" id="f-ind"></div>
+            <div class="sk-bund" id="f-status">
+                <p class="st-tekst" id="f-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="f-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="f-anker-glas"></div>
+        <div class="anker" id="f-anker-vand"></div>
+        <div class="anker" id="f-anker-tallinje"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="f-talkort">
+            <h2>Måleglasset</h2>
+            <button class="knap fold-knap" type="button" data-fold="f-tal" aria-expanded="false">Vis tallene ▸</button>
+            <div id="f-tal" hidden></div>
+            <button class="knap" id="f-forfra" type="button" style="margin-top:10px;">↺ Stil måleglasset op igen</button>
+        </div>
+
+        <div class="kort" id="f-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="f-loest">0</b>/3</span></h2>
+            <div class="opg-liste" id="f-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: REGN PÅ Y                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-r" role="tabpanel" aria-label="Regn på Y">
+    <div class="scene">
+        <canvas id="r-laerred"></canvas>
+        <div class="scenekort" id="r-skort">
+            <div class="sk-ind" id="r-ind"></div>
+            <div class="sk-bund" id="r-status">
+                <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="r-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="r-anker-tavle"></div>
+        <div class="anker" id="r-anker-tallinje"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="r-trinkort">
+            <h2>Trinene</h2>
+            <div id="r-trin"></div>
+        </div>
+
+        <div class="kort" id="r-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="r-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Rumfang og fortynding</h2>
+        <p>Når rumfanget ændres, bliver alle koncentrationer ganget med det samme tal. Bliver rumfanget dobbelt så stort, bliver hver koncentration halvt så stor. Bliver det halvt så stort, bliver hver koncentration dobbelt så stor. <i>K</i> ændrer sig ikke, men reaktionsbrøken <i>Y</i> kan ændre sig.</p>
+        <h3 class="teori-hoved">Tæl faktorerne</h3>
+        <p>Sæt faktoren på hver koncentration i reaktionsbrøken. En koncentration i fjerde får faktoren fire gange. Gang faktorerne sammen over og under brøkstregen hver for sig, og del dem med hinanden.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            Co²⁺(aq) + 4 Cl⁻(aq) ⇌ CoCl₄²⁻(aq) fortyndes til det dobbelte rumfang. Over brøkstregen bliver der ganget med ½ én gang og under med ½ fem gange, så <i>Y</i> = (1/2) / (1/32) · <i>K</i> = 16 · <i>K</i>. <i>Y</i> &gt; <i>K</i>, så ligevægten forskydes mod venstre.
+        </div>
+        <h3 class="teori-hoved">Reglen for fortynding</h3>
+        <p>Fortyndes en opløsning, forskydes ligevægten mod den side, der har flest opløste partikler. Tæl koefficienterne for de stoffer, der er mærket (aq).</p>
+        <h3 class="teori-hoved">Reglen for rumfang</h3>
+        <p>Gøres rumfanget mindre, forskydes en ligevægt mellem gasser mod den side, der har færrest gasmolekyler. Gøres rumfanget større, forskydes den mod den side, der har flest. Er der lige mange på begge sider, forskydes ligevægten ikke.</p>
+        <h3 class="teori-hoved">Le Chateliers princip</h3>
+        <p>Bliver en ligevægt udsat for et indgreb, forskydes den i den retning, der modvirker indgrebet. Forskydningen ophæver aldrig indgrebet helt: Efter et pres er gassen stadig mørkere end før.</p>
+        <h3 class="teori-hoved">Farverne</h3>
+        <p>NO₂ er en brun gas, og N₂O₄ er farveløs. Co²⁺ er lyserød i vand, CoCl₄²⁻ er blå, og Cl⁻ er farveløs. CoCl₄²⁻ farver langt kraftigere end Co²⁺, så opløsningen er violet, længe efter at de fleste blå ioner er omdannet.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_stempel.js"></script>
+<script src="js/sim_fortynd.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
