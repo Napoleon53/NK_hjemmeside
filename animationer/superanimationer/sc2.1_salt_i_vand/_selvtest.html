@@ -69,22 +69,40 @@ function koerTest() {
         !!(NK.Kemichael && NK.sims["fane-oploes"].laerer && NK.sims["fane-maetning"].laerer));
     paastand("hans sprites er indlæst", ["laererKrop", "laererHoved", "laererArm"].every(function (n) { return NK.Sprites.klar(n); }));
 
-    overskrift("2. Panelerne er fyldt ud ved opstart");
+    /* Fane 2 begynder forfra uden gemte fremskridt (runde T6) */
+    var s2 = NK.sims["fane-maetning"], op2 = s2.opgaver;
+    try { W.localStorage.removeItem("nk-sc2.1-maettet"); } catch (e) { /* intet lager */ }
+    op2.status = {}; op2.faerdig = false; op2.rost = false; op2.aabn(0, true);
+
+    overskrift("2. Panelet og scenen er fyldt ud ved opstart");
     var skalHaveTekst = ["oploes-navn", "oploes-hverdag", "oploes-ligning", "oploes-graense", "oploes-besked",
-        "maet-navn", "maet-graense", "maet-besked", "maet-temp-tal",
+        "maet-temp-tal", "maet-tilsat", "maet-oploest", "maet-bundfald",
         "oploes-opg-ind", "maet-opg-ind"];
     var tomme = skalHaveTekst.filter(function (id) {
         var e = d.getElementById(id);
         return !e || !e.textContent.replace(/\s/g, "");
     });
     paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
-    paastand("saltknapper i begge paneler",
-        d.querySelectorAll("#oploes-saltvalg .saltknap").length === 6 &&
-        d.querySelectorAll("#maet-saltvalg .saltknap").length === 6);
-    paastand("teoriboksen er bygget", d.querySelectorAll("#teori-liste .teorikort").length === D.TEORI.length);
-    paastand("papirkortene starter med \"Start opgave\"",
+    paastand("saltknapper i panelet på fane 1", d.querySelectorAll("#oploes-saltvalg .saltknap").length === 6);
+    var teoriArk = d.querySelector("#teori .overlay-boks.teori-ark");
+    var bogLink = d.querySelector('#teori a[href^="https://kemibogen.dk/c/kapitler/2-4-faeldningsreaktioner.html"]');
+    paastand("teorien står på teori-arket, og faelles/teori.css er indlæst",
+        !!teoriArk && !!d.querySelector('link[href="../faelles/teori.css"]'));
+    paastand("teorien slutter med en henvisning til Kemibogen 2.4 (ny fane)",
+        !!bogLink && bogLink.target === "_blank" && /noopener/.test(bogLink.rel) && !!bogLink.closest("p.teori-bog") &&
+        bogLink.textContent.indexOf("2.4") === 0);
+    paastand("teorien er kort (højst ét eksempel og under 1200 tegn)",
+        teoriArk.querySelectorAll(".eksempel").length <= 1 && teoriArk.textContent.replace(/\s+/g, " ").length < 1200,
+        teoriArk.textContent.replace(/\s+/g, " ").length);
+    paastand("ingen ikoner på knapperne Teori og Quiz",
+        d.getElementById("teoriknap").textContent.trim() === "Teori" && d.getElementById("quizknap").textContent.trim() === "Quiz");
+    paastand("fane 1's knapper har ingen ikoner",
+        [].every.call(d.querySelectorAll("#oploes-temp .tilstandsknap, #oploes-roer .tilstandsknap"), function (b) { return /^[A-ZÆØÅ][a-zæøå ]+$/.test(b.textContent); }));
+    paastand("fane 2 hedder Mættet opløsning", d.querySelector('.faneknap[data-fane="fane-maetning"]').textContent.indexOf("Mættet opløsning") >= 0);
+    paastand("papirkortet på fane 1 starter med \"Start opgave\", fane 2 med trin 1 (en handling)",
         d.querySelector("#oploes-skort .sk-videre").textContent === "Start opgave" &&
-        d.querySelector("#maet-skort .sk-videre").textContent === "Start opgave");
+        d.getElementById("maet-opg-ind").textContent.indexOf("Trin 1 af 3") >= 0 &&
+        d.getElementById("maet-opg-ind").textContent.indexOf("+5 g") >= 0);
 
     overskrift("3. Faneskift: præcis én aktiv ad gangen");
     ["fane-maetning", "fane-oploes", "fane-maetning"].forEach(function (id) {
@@ -487,9 +505,9 @@ function koerTest() {
     s1.saetOmroering(false);
     s1.nulstil();
     overskrift("13. Fane 2: opløst + bundfald går op");
-    var s2 = NK.sims["fane-maetning"];
     d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
-    NK.Valg.saet("NaCl");
+    op2.visResultat(true);          /* den fri leg: alt kan bruges */
+    s2.saetSalt("NaCl");
     s2.nulstil(); s2.saetTemp(20);
     s2.haeldI(25);
     paastand("25 g NaCl: alt opløses", naer(s2.oploest(), 25) && s2.bundfald() === 0);
@@ -499,7 +517,7 @@ function koerTest() {
     s2.saetTemp(100);
     paastand("kogende vand hjælper kun lidt på NaCl", s2.bundfald() > 10);
 
-    NK.Valg.saet("KNO3");
+    s2.saetSalt("KNO3");
     s2.nulstil(); s2.saetTemp(20); s2.haeldI(100);
     paastand("100 g KNO₃ ved 20 °C giver bundfald", s2.bundfald() > 60);
     s2.saetTemp(100);
@@ -507,7 +525,7 @@ function koerTest() {
 
     var alleOk = true;
     D.SALTE.forEach(function (salt) {
-        NK.Valg.saet(salt.id);
+        s2.saetSalt(salt.id);
         s2.nulstil();
         [0, 37, 100].forEach(function (t) {
             s2.saetTemp(t);
@@ -516,32 +534,45 @@ function koerTest() {
         });
     });
     paastand("opløst + bundfald = hældt i, for alle salte og temperaturer", alleOk);
+    s2.saetSalt("NaCl");
+    paastand("fane 2 har sit eget salt: fane 1's valg ændrer det ikke",
+        (function () { var f = NK.Valg.saltId; NK.Valg.saet("AgCl"); var ok = s2.saltId === "NaCl"; NK.Valg.saet(f); return ok; }()));
 
     overskrift("14. Grafen");
-    s2.autoSkala = false;
     s2.nulstil();
+    s2.saetSalt("NaCl");
+    paastand("aksen passer til saltet: NaCl 0-60 g", s2.ymax() === 60, s2.ymax());
+    s2.saetSalt("KNO3");
+    paastand("aksen passer til saltet: KNO₃ 0-250 g", s2.ymax() === 250, s2.ymax());
     var klemt = D.SALTE.filter(function (salt) {
-        NK.Valg.saet(salt.id);
-        return s2.ymax() < D.stoersteOploeselighed(salt);
-    }).map(function (s) { return s.id; });
-    paastand("fælles skala: ingen kurve går over grafens top", klemt.length === 0, klemt.join(", "));
-    NK.Valg.saet("NaCl");
+        s2.saetSalt(salt.id);
+        var m = D.stoersteOploeselighed(salt);
+        return s2.ymax() < m || s2.ymax() > m * 2.6;
+    }).map(function (x) { return x.id; });
+    paastand("for hvert salt fylder kurven grafen uden at gå over toppen", klemt.length === 0, klemt.join(", "));
+    s2.saetSalt("NaCl");
     s2.haeldI(25); s2.haeldI(250);
     paastand("aksen vokser med, når der hældes meget i", s2.ymax() >= s2.tilsat, s2.ymax() + " / " + s2.tilsat);
     s2.nulstil();
-    s2.autoSkala = true;
-    var zoomOk = D.SALTE.every(function (salt) {
-        NK.Valg.saet(salt.id);
-        var m = D.stoersteOploeselighed(salt);
-        return s2.ymax() >= m && s2.ymax() <= m * 2.6;
-    });
-    paastand("skaleret til stoffet: kurven fylder grafen", zoomOk);
-    s2.autoSkala = false;
+    paastand("knappen Skaler til stoffet og skyderen i panelet er væk",
+        !d.getElementById("maet-skala-knap") && !d.getElementById("maet-temp") && !d.querySelector("#fane-maetning .panel"));
 
-    var skyder = d.getElementById("maet-temp");
-    skyder.value = "80";
-    skyder.dispatchEvent(new W.Event("input"));
-    paastand("skyderen sætter temperaturen", s2.temp === 80);
+    s2.saetTemp(20);
+    var plusK = d.getElementById("maet-varmere"), minusK = d.getElementById("maet-koldere");
+    plusK.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, pointerId: 7 }));
+    plusK.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 7 }));
+    paastand("+ på varmepladen: 1 °C varmere", s2.temp === 21, s2.temp);
+    minusK.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, pointerId: 7 }));
+    minusK.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 7 }));
+    paastand("− på varmepladen: 1 °C koldere", s2.temp === 20, s2.temp);
+    plusK.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, pointerId: 7 }));
+    koerTid(s2, 60, 0.02);
+    plusK.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 7 }));
+    paastand("holdes + nede, bliver det ved", s2.temp > 30, s2.temp);
+    paastand("− og + sidder under varmepladen", (function () {
+        var r = d.getElementById("maet-plade").getBoundingClientRect(), sc = d.getElementById("maet-laerred").getBoundingClientRect();
+        return Math.abs((r.left + r.right) / 2 - sc.left - (s2.pladeX + s2.pladeB / 2)) < 2 && r.top - sc.top >= s2.bordY;
+    }()));
 
     var laerred = d.getElementById("maet-laerred");
     var rekt = laerred.getBoundingClientRect();
@@ -553,78 +584,178 @@ function koerTest() {
         laerred.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
     }
     klikVedTemperatur(60);
-    paastand("klik i grafen ved 60 °C", Math.abs(s2.temp - 60) < 1.5, String(s2.temp));
+    paastand("den fri leg: klik i grafen ved 60 °C", Math.abs(s2.temp - 60) < 1.5, String(s2.temp));
     s2.saetTemp(20);
 
     var glasKnapper = d.getElementById("maet-glasknapper");
     paastand("knapraden er placeret over spatlen", glasKnapper.style.left !== "" && glasKnapper.style.top !== "");
+    var et = d.getElementById("maet-etiket");
+    paastand("etiketten sidder på glasset (Hældt i, Opløst, Bundfald) og har ingen Grænsen lige nu",
+        !!et && et.querySelectorAll(".ge-raekke").length === 3 && et.textContent.indexOf("Grænsen") < 0 &&
+        Math.abs(parseFloat(et.style.left) + parseFloat(et.style.width) - (s2.bgX + 16 * s2.bgS)) < 2);
+    paastand("etiketten har store, mørke bogstaver på lyst papir",
+        parseFloat(W.getComputedStyle(et.querySelector(".ge-raekke")).fontSize) >= 15 &&
+        W.getComputedStyle(et).backgroundColor === "rgb(251, 250, 246)");
+    paastand("hylden med de seks salte er fremme i den fri leg", !d.getElementById("maet-hylde").hidden &&
+        d.querySelectorAll("#maet-hylde .hg-glas").length === 6);
+    d.querySelectorAll("#maet-hylde .hg-glas")[1].click();
+    paastand("et glas på hylden skifter salt og tømmer glasset", s2.saltId === "KNO3" && s2.tilsat === 0);
+    s2.saetSalt("NaCl");
 
-    overskrift("15. Opgaverne på fane 2");
-    var op2 = s2.opgaver;
+    overskrift("15. Opgaverne på fane 2 (runde T6: fast rækkefølge, trin for trin)");
+    var OPG = NK.SimMaetning.OPGAVER;
     function tal(tekst) { return parseFloat(tekst.replace(/\./g, "").replace(",", ".")); }
-    function valgOk(o) {
-        return o.valg.length >= 3 && o.rigtig >= 0 && o.rigtig < o.valg.length &&
-            o.valg.filter(function (v, j) { return o.valg.indexOf(v) === j; }).length === o.valg.length;
-    }
-    var navne2 = ["aflæs grafen", "bundfald", "find temperaturen", "afkøling"];
-    var ok2 = [true, true, true, true], note2 = ["", "", "", ""];
-    for (var runde = 0; runde < 15; runde++) {
-        var a = op2.typer[0](s2); a.start(s2);
-        if (!valgOk(a)) { ok2[0] = false; note2[0] = a.valg.join(" | "); }
-        a.visSvar(s2);
-        if (Math.abs(s2.graense() - tal(a.valg[a.rigtig])) > 0.51) { ok2[0] = false; note2[0] = a.tekst + " -> " + a.valg[a.rigtig]; }
+    paastand("fire opgaver i fast rækkefølge med sigende titler",
+        OPG.map(function (o) { return o.navn; }).join(" | ") === "Bundfald i glasset | Aflæs kurven | Varm, til alt er opløst | Afkøling giver bundfald");
+    paastand("saltet skifter kun én gang: opgave 1 NaCl, opgave 2-4 KNO₃", (function () {
+        var salte = OPG.map(function (o) { o.opsaet(s2); return s2.saltId; });
+        return salte.join(" ") === "NaCl KNO3 KNO3 KNO3";
+    }()));
+    var valgFejl = [];
+    OPG.forEach(function (o) {
+        o.trin.forEach(function (t, j) {
+            if (t.type !== "valg") return;
+            var ok = t.svar.filter(function (x) { return x.ok; }).length === 1 &&
+                t.svar.every(function (x) { return x.ok || (x.nej && x.nej.length > 20); }) && t.svar.length === 3 &&
+                t.hint && t.hint.length === 3 && !!t.slut && /\?$/.test(t.spm);
+            if (!ok) valgFejl.push(o.id + " trin " + (j + 1));
+        });
+    });
+    paastand("hvert spørgsmål: tre svar, ét rigtigt, hvert forkert med sin egen forklaring, tre hint", valgFejl.length === 0, valgFejl.join(", "));
+    function rigtig(o, j) { return o.trin[j].svar.filter(function (x) { return x.ok; })[0].t; }
+    var N = D.salt("NaCl"), K = D.salt("KNO3");
+    paastand("tallene passer med modellen (36 g, 14 g, 64 g, 68,4 g)",
+        Math.round(D.oploeselighed(N, 20)) === tal(rigtig(OPG[0], 1)) &&
+        naer(50 - D.oploeselighed(N, 20), tal(rigtig(OPG[0], 2)), 0.6) &&
+        Math.round(D.oploeselighed(K, 40)) === tal(rigtig(OPG[1], 1)) &&
+        naer(100 - D.oploeselighed(K, 20), tal(rigtig(OPG[3], 0)), 0.06));
+    paastand("de forkerte tal er elevfejl: det hældte, grænsen, temperaturen",
+        OPG[0].trin[1].svar.map(function (x) { return x.t; }).join() === "40 g,36 g,4 g" &&
+        OPG[1].trin[1].svar[0].t === "40 g" && OPG[3].trin[0].svar[0].t === "31,6 g");
 
-        var b = op2.typer[1](s2); b.start(s2);
-        if (!valgOk(b)) { ok2[1] = false; note2[1] = b.valg.join(" | "); }
-        b.visSvar(s2);
-        if (Math.abs(s2.bundfald() - tal(b.valg[b.rigtig])) > 0.06) { ok2[1] = false; note2[1] = b.tekst + " -> " + b.valg[b.rigtig]; }
-
-        var c = op2.typer[2](s2); c.start(s2);
-        if (!(s2.bundfald() > 0) || typeof c.tjek(s2) !== "string") { ok2[2] = false; note2[2] = "start: " + c.tekst; }
-        s2.saetTemp(100);
-        if (typeof c.tjek(s2) !== "string") { ok2[2] = false; note2[2] = "for varmt: " + c.tekst; }
-        c.visSvar(s2);
-        if (c.tjek(s2) !== true) { ok2[2] = false; note2[2] = "svar: " + c.tekst + " ved " + s2.temp; }
-
-        var e = op2.typer[3](s2); e.start(s2);
-        if (!valgOk(e) || s2.bundfald() > 0) { ok2[3] = false; note2[3] = "start: " + e.tekst; }
-        e.visSvar(s2);
-        if (Math.abs(s2.bundfald() - tal(e.valg[e.rigtig])) > 0.06) { ok2[3] = false; note2[3] = e.tekst + " -> " + e.valg[e.rigtig]; }
-    }
-    navne2.forEach(function (n, j) { paastand(n + ": 15 tilfældige opgaver passer med modellen", ok2[j], note2[j]); });
-    s2.nulstil();
-
-    overskrift("15b. En runde med opgaver og resultatet");
-    var brugt = [], orgTyper = op2.typer;
-    op2.typer = orgTyper.map(function (fn, nr) { return function (sim) { brugt.push(nr); return fn(sim); }; });
-    op2.nyRunde();
-    var trinListe = [];
-    for (i = 0; i < 4; i++) { op2.ny(); op2.visSvar(); trinListe.push(d.querySelector("#maet-skort .sk-videre").textContent); }
-    paastand("hver opgave kommer én gang i runden", brugt.slice().sort().join("") === "0123", brugt.join(" "));
-    paastand("efter den sidste står der Se resultatet (kortets knap går altid fremad)",
-        trinListe.join("|") === "Næste opgave|Næste opgave|Næste opgave|Se resultatet", trinListe.join(" | "));
-    paastand("tælleren viser 4/4", d.getElementById("maet-opg-nr").textContent === "4");
+    /* Hele vejen igennem, som eleven goer det */
+    d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
+    op2.status = {}; op2.faerdig = false; op2.rost = false; s2.laererRost = false; s2.laererNyt && s2.laererNyt();
+    op2.aabn(0, true);
+    var knapper = d.querySelectorAll("#maet-liste .or-knap");
+    paastand("rækken: 4 numre, kun den første har titel, de andre er låst",
+        knapper.length === 4 && knapper[0].textContent.indexOf("Bundfald i glasset") >= 0 &&
+        [1, 2, 3].every(function (i) { return knapper[i].classList.contains("laast") && knapper[i].disabled && knapper[i].querySelector(".or-navn").textContent === ""; }));
+    paastand("rækken står i scenen med Start forfra yderst til højre",
+        !!d.getElementById("maet-raekke").closest(".scene") && d.getElementById("maet-forfra").textContent.indexOf("Start forfra") >= 0);
+    paastand("trin 1: kurven er en stiplet ramme, +5 g er fremme med gul ramme, resten er skjult",
+        !op2.visGraf() && !d.getElementById("maet-lidt").hidden && d.getElementById("maet-lidt").classList.contains("opfordring") &&
+        d.getElementById("maet-meget").hidden && d.getElementById("maet-toem").hidden &&
+        d.getElementById("maet-varmere").classList.contains("skjult") && d.getElementById("maet-hylde").hidden &&
+        !d.getElementById("maet-boble").hidden && d.getElementById("maet-boble").textContent === "Klik: +5 g");
+    var lidt = d.getElementById("maet-lidt");
+    for (i = 0; i < 12; i++) lidt.click();
+    paastand("+5 g låses, så snart der ligger bundfald: glasset har 40 g", s2.tilsat === 40 && !op2.tillad("lidt"), s2.tilsat);
+    paastand("boblen forsvinder efter første klik", d.getElementById("maet-boble").hidden);
+    koerTid(s2, 30, 0.02);
+    paastand("kortet venter, til kornene er landet", op2.trinNr === 0);
+    koerTid(s2, 120, 0.02);
+    paastand("trin 1 går selv videre ca. 1 s efter, at der ligger bundfald", op2.trinNr === 1 && op2.tilstand === "trin");
+    paastand("trin 2 spørger: intet kan klikkes i scenen, og aflæsningen ved punktet er skjult",
+        op2.spoerger() && ["lidt", "meget", "toem", "plus", "minus", "graf", "hylde"].every(function (k) { return !op2.tillad(k); }) &&
+        d.getElementById("maet-lidt").hidden && !op2.visAflaesning());
+    var tempFoer = s2.temp;
+    klikVedTemperatur(80);
+    paastand("et klik i scenen under et spørgsmål ændrer intet, og kortet blinker",
+        s2.temp === tempFoer && d.getElementById("maet-skort").classList.contains("blink"));
+    paastand("spørgsmålet står halvfedt på kortet", !!d.querySelector("#maet-skort .sk-spm") &&
+        d.querySelector("#maet-skort .sk-spm").textContent.indexOf("højst opløse ved 20 °C?") > 0);
+    var ind2 = d.getElementById("maet-opg-indsend");
+    paastand("Indsend svar er gråt uden valg", ind2.classList.contains("ikke-klar"));
+    function knapMed(t) { return [].filter.call(d.querySelectorAll("#maet-skort .sk-knap"), function (b) { return b.textContent === t; })[0]; }
+    knapMed("40 g").click();
+    paastand("et svar vælger kun", op2.tilstand === "trin" && knapMed("40 g").classList.contains("valgt") && ind2.classList.contains("klar"));
+    ind2.click();
+    paastand("forkert svar: rødt, låst og med sin egen forklaring",
+        knapMed("40 g").classList.contains("forkert") && knapMed("40 g").disabled &&
+        d.getElementById("maet-opg-status").classList.contains("skidt") &&
+        d.getElementById("maet-opg-besked").textContent.indexOf("40 g er det, der er hældt i") >= 0);
+    var hk = d.getElementById("maet-opg-knap"), hintTekster = [];
+    for (i = 0; i < 3; i++) { hintTekster.push(hk.textContent); hk.click(); }
+    paastand("hinttrappen: Giv et hint › Næste hint (2 af 3) › Næste hint (3 af 3) › Vis svaret",
+        hintTekster.join(" | ") === "Giv et hint | Næste hint (2 af 3) | Næste hint (3 af 3)" && hk.textContent === "Vis svaret" &&
+        d.getElementById("maet-opg-besked").textContent.indexOf("Hint 3 af 3") === 0, hintTekster.join(" | "));
+    knapMed("36 g").click(); ind2.click();
+    paastand("rigtigt: kortet bliver på spørgsmålet med Næste spørgsmål", op2.tilstand === "bliv" &&
+        knapMed("36 g").classList.contains("rigtig") && d.querySelector("#maet-skort .sk-videre").textContent === "Næste spørgsmål →");
+    d.querySelector("#maet-skort .sk-videre").click();
+    paastand("trin 3: kurven dukker op, glasset har 50 g, og Opløst og Bundfald står som ?",
+        op2.trinNr === 2 && op2.visGraf() && s2.tilsat === 50 &&
+        d.getElementById("maet-oploest").textContent === "?" && d.getElementById("maet-bundfald").textContent === "?" &&
+        d.getElementById("maet-tilsat").textContent === "50 g");
+    knapMed("14 g").click(); ind2.click();
+    paastand("trin 3 rigtigt: tallene kommer frem, og knappen hedder Næste opgave",
+        d.getElementById("maet-bundfald").textContent === "14 g" && d.querySelector("#maet-skort .sk-videre").textContent === "Næste opgave →");
+    paastand("opgave 1 er gemt som løst uden at se svaret", op2.status.bundfald === "stjerne" &&
+        JSON.parse(W.localStorage.getItem("nk-sc2.1-maettet") || "{}").bundfald === "stjerne");
+    paastand("rækken: opgave 1 har ★, opgave 2 er åben med titel",
+        knapper[0].querySelector(".or-nr").textContent === "★" && !knapper[1].classList.contains("laast") && knapper[1].textContent.indexOf("Aflæs kurven") >= 0);
+    d.querySelector("#maet-skort .sk-videre").click();
+    paastand("opgave 2 begynder med en rolig overgang til KNO₃", op2.nr === 1 && s2.saltId === "KNO3" &&
+        d.getElementById("maet-opg-ind").textContent.indexOf("kaliumnitrat, KNO₃, i stedet for NaCl") >= 0);
+    op2.visSvar();
+    paastand("Vis svaret: svaret står gult", op2.tilstand === "bliv" && !!d.querySelector("#maet-skort .sk-knap.svar-vist"));
     op2.videre();
+    knapMed("64 g").click(); ind2.click();
+    paastand("opgave 2: punktet flyttes til 40 °C bagefter", s2.temp === 40 && op2.status.aflaes === "loest");
+    op2.videre();
+    paastand("opgave 3: 80 g KNO₃ ved 20 °C", op2.nr === 2 && s2.tilsat === 80 && s2.temp === 20 && s2.bundfald() > 40);
+    knapMed("Det bliver opløst").click(); ind2.click(); op2.videre();
+    paastand("opgave 3 trin 2: kun − og + og grafen kan bruges, + har gul ramme",
+        op2.tillad("plus") && op2.tillad("minus") && op2.tillad("graf") && !op2.tillad("lidt") &&
+        d.getElementById("maet-varmere").classList.contains("opfordring") && !d.getElementById("maet-varmere").classList.contains("skjult"));
+    s2.saetTemp(100); s2.opdater(0.02);
+    ind2.click();
+    paastand("for varmt sendt ind giver en forklaring", d.getElementById("maet-opg-status").classList.contains("skidt") &&
+        d.getElementById("maet-opg-besked").textContent.indexOf("lavere temperatur") >= 0);
+    s2.saetTemp(40);
+    var plus2 = d.getElementById("maet-varmere");
+    plus2.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, pointerId: 8 }));
+    koerTid(s2, 120, 0.02);
+    paastand("holdes + nede, stopper det af sig selv ved " + Math.ceil(D.temperaturFor(K, 80)) + " °C, hvor alt er opløst",
+        Math.round(s2.temp) === Math.ceil(D.temperaturFor(K, 80)) && s2.bundfald() === 0, s2.temp);
+    plus2.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 8 }));
+    koerTid(s2, 60, 0.02);
+    paastand("målet nået: kortet går selv videre og bliver grønt", op2.tilstand === "bliv" && op2.status.varm);
+    op2.videre();
+    knapMed("68,4 g").click(); ind2.click(); op2.videre();
+    paastand("opgave 4 trin 2: − har gul ramme og en boble til venstre", d.getElementById("maet-koldere").classList.contains("opfordring") &&
+        d.getElementById("maet-boble").textContent === "Klik: −" && d.getElementById("maet-boble").classList.contains("venstre"));
+    var minus2 = d.getElementById("maet-koldere");
+    minus2.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, pointerId: 9 }));
+    koerTid(s2, 200, 0.02);
+    minus2.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 9 }));
+    paastand("holdes − nede, stopper det ved 20 °C", Math.round(s2.temp) === 20, s2.temp);
+    koerTid(s2, 60, 0.02);
+    paastand("ved 20 °C ligger 68,4 g bundfald, og kortet viser Se resultatet",
+        op2.tilstand === "bliv" && d.getElementById("maet-bundfald").textContent === "68,4 g" &&
+        d.querySelector("#maet-skort .sk-videre").textContent === "Se resultatet →");
+    d.querySelector("#maet-skort .sk-videre").click();
     var sejrTekst = d.getElementById("maet-opg-ind").textContent;
-    paastand("resultatet vises på kortet", op2.faerdig && sejrTekst.indexOf("Du løste") >= 0, sejrTekst);
-    paastand("der henvises til den anden fane", sejrTekst.indexOf("Opløsningen") >= 0);
-    /* Kun de knapper, der ses (kortets nederste raekke er skjult paa resultatkortet) */
-    var resKnap = [].filter.call(d.querySelectorAll("#maet-skort button"), function (b) { return b.getClientRects().length > 0; });
-    paastand("resultatkortet har ingen Start forfra, kun Videre til den anden fane",
-        resKnap.length === 1 && resKnap[0].textContent.indexOf("Videre til") === 0 && d.getElementById("maet-skort").textContent.indexOf("forfra") < 0);
-    paastand("Start forfra ligger i panelet", !d.getElementById("maet-opg-forfra").hidden);
+    paastand("resultatet: fanen er gennemført, og hylden er fremme", op2.faerdig && op2.tilstand === "resultat" &&
+        sejrTekst.indexOf("Du løste 3 af 4") >= 0 && !d.getElementById("maet-hylde").hidden, sejrTekst);
     paastand("Kemichael kommer med ros", !!(s2.laerer.scene && s2.laerer.scene.navn === "ros"));
-    d.getElementById("maet-opg-forfra").click();
-    paastand("Start forfra i panelet begynder en ny runde", !op2.faerdig && op2.gennemfoert === 0 && brugt.length === 5 && op2.tilstand === "opgave");
-    /* Brugerens regel 4. nov. 2026: rosen for en hel fane kommer én gang */
-    s2.laererNyt();
-    for (i = 0; i < 4; i++) { if (i) op2.ny(); op2.visSvar(); }
-    op2.videre();
-    paastand("en runde mere giver ikke ros igen (én gang pr. fane pr. besøg)",
-        op2.faerdig && !(s2.laerer.scene && s2.laerer.scene.navn === "ros"), op2.faerdig + " " + (s2.laerer.scene && s2.laerer.scene.navn));
-    op2.forfra();
-    op2.typer = orgTyper;
-    s2.nulstil();
+    koerTid(s2, 30, 0.05);
+    paastand("mens han taler, træder etiketten og knapperne tilbage",
+        d.getElementById("maet-laerred").parentNode.classList.contains("laerer-fremme"));
+    paastand("henvisning til fane 1, hvis den har opgaver tilbage", !NK.sims["fane-oploes"].opgaver.faerdig ?
+        d.querySelector("#maet-skort .sk-videre").textContent === "Videre til Opløsningen →" : true);
+    paastand("fane 1 henviser hertil med det nye navn, når fane 2 mangler", (function () {
+        op2.faerdig = false;
+        var a = NK.sims["fane-oploes"].opgaver.andenFane();
+        op2.faerdig = true;
+        return !!a && a.fanenavn === "Mættet opløsning";
+    }()));
+    knapper[0].click();
+    paastand("en løst opgave åbnes med alt fremme (kurven ses fra trin 1)", op2.nr === 0 && op2.trinNr === 0 && op2.visGraf());
+    d.getElementById("maet-forfra").click();
+    paastand("Start forfra giver trinene igen (kurven er en stiplet ramme)", op2.nr === 0 && op2.trinNr === 0 && !op2.visGraf() && s2.tilsat === 0);
+    s2.laererNyt && s2.laererNyt();
 
     overskrift("15c. Papirkortet");
     papirkortTest(d, W, NK, s1, s2, op1, op2);
@@ -648,7 +779,8 @@ function koerTest() {
     NK.Quiz.luk();
 
     overskrift("17. Teksterne");
-    var alTekst = JSON.stringify(D.TEORI) + JSON.stringify(D.QUIZ) + JSON.stringify(D.SALTE) + d.body.innerText;
+    var alTekst = d.getElementById("teori").textContent + JSON.stringify(D.QUIZ) + JSON.stringify(D.SALTE) +
+        JSON.stringify(NK.SimMaetning.OPGAVER.map(function (o) { return o.trin.map(function (t) { return [t.tekst, t.spm, t.hint, t.slut, t.svar]; }); })) + d.body.innerText;
     var fundet = ["kinetisk", "hydratiser", "entalpi", "gitterenergi"].filter(function (o) {
         return alTekst.toLowerCase().indexOf(o) >= 0;
     });
@@ -758,23 +890,53 @@ function papirkortTest(d, W, NK, s1, s2, op1, op2) {
     op1.kaldSlut(op1.opgave);
     s1.saetOmroering(false);
 
-    /* Fane 2: temperaturen sendes ind */
+    /* Fane 2: kortet har en fast plads under raekken (REGELSAET 4), ogsaa
+       med det laengste spoergsmaal, et forkert svar og det sidste hint */
     d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
     s2.lagt = false; s2.tilpas();
-    op2.forfra(); op2.kaldSlut(op2.opgave);
-    op2.koe = [2]; op2.ny(); o = op2.opgave;
-    var ind2 = d.getElementById("maet-opg-indsend");
-    s2.saetTemp(100); s2.opdater(0.016);
-    paastand("fane 2: skyderen på 100 °C løser ikke opgaven af sig selv", op2.tilstand === "opgave" && !o.afsluttet);
-    paastand("Indsend svar viser temperaturen", ind2.textContent === "Indsend svar: 100 °C", ind2.textContent);
-    ind2.click();
-    paastand("for varmt sendt ind giver en forklaring på kortet", d.getElementById("maet-opg-status").classList.contains("skidt"));
-    op2.hjaelpKlik();
-    iZone("maet-skort", "fane 2 med hint");
-    paastand("grafen og knapperne begynder under kortet", s2.graf.y - 34 >= maal("maet-skort").bund && s2.spatelY - 36 >= maal("maet-skort").bund);
-    op2.visSvar();
-    iZone("maet-skort", "fane 2, svaret vist");
-    op2.kaldSlut(op2.opgave);
+    function iZone2(hvad) {
+        var m = maal("maet-skort"), z = NK.kortTopMaet() - 10;
+        paastand(hvad + ": kortet (" + Math.round(m.h) + " px) holder sig over forsøget (" + z + " px)", m.bund <= z + 1, "bund " + Math.round(m.bund));
+    }
+    function laengsteKort2(hvad) {
+        [[0, 2], [3, 0], [0, 1], [1, 0]].forEach(function (nt) {
+            op2.aabn(nt[0], true); op2.trinNr = nt[1]; op2.nytTrin();
+            var t = op2.trin(), forkert = t.svar.map(function (x, j) { return x.ok ? -1 : j; }).filter(function (j) { return j >= 0; })[0];
+            op2.vaelg(forkert); op2.indsendKlik();
+            iZone2(hvad + ", opgave " + (nt[0] + 1) + " trin " + (nt[1] + 1) + " med forkert svar");
+            op2.hjaelpKlik(); op2.hjaelpKlik(); op2.hjaelpKlik();
+            iZone2(hvad + ", opgave " + (nt[0] + 1) + " trin " + (nt[1] + 1) + " med hint 3");
+            op2.visSvar();
+            iZone2(hvad + ", opgave " + (nt[0] + 1) + " trin " + (nt[1] + 1) + ", svaret vist");
+        });
+        op2.aabn(2, true); op2.trinNr = 1; op2.nytTrin(); s2.saetTemp(100); op2.indsendKlik();
+        iZone2(hvad + ", opgave 3 trin 2 for varmt");
+        paastand(hvad + ": grafen, etiketten og knapperne begynder under kortet",
+            s2.papir.y >= maal("maet-skort").bund && s2.spatelY - 36 >= maal("maet-skort").bund && s2.etiketY >= maal("maet-skort").bund);
+        var sc = d.getElementById("maet-laerred").getBoundingClientRect();
+        paastand(hvad + ": scenen er samlet (højst 1260 px bred) og står i midten",
+            s2.papir.x + s2.papir.b - s2.felt.x <= 1262 &&
+            Math.abs((s2.felt.x + s2.papir.x + s2.papir.b) / 2 - sc.width / 2) < 4);
+        paastand(hvad + ": − og + og grafen kan ses i scenen", s2.bordY + 9 + 32 <= sc.height && s2.papir.y + s2.papir.h <= sc.height);
+    }
+    laengsteKort2("1200 × 800");
+    var STR = [[1100, 760], [1400, 860], [1920, 1080]];
+    var ramme0 = d.defaultView.frameElement;
+    STR.forEach(function (wh) {
+        ramme0.style.width = wh[0] + "px"; ramme0.style.height = wh[1] + "px";
+        void W.innerHeight;
+        s2.lagt = false; s2.tilpas();
+        laengsteKort2(wh[0] + " × " + wh[1]);
+    });
+    ramme0.style.width = "1200px"; ramme0.style.height = "800px";
+    void W.innerHeight;
+    s2.lagt = false; s2.tilpas();
+
+    /* Ingen versaler (REGELSAET 30) */
+    var versaler = [].filter.call(d.querySelectorAll(".kort > h2, .maerke, .overlay-boks h3, .opgaverad, .glas-etiket, .faneknap"), function (e) {
+        return W.getComputedStyle(e).textTransform === "uppercase";
+    });
+    paastand("ingen versaler i panelet, mærkerne, overlays og fane 2", versaler.length === 0, versaler.length);
 
     /* Lav skaerm */
     var ramme = d.defaultView.frameElement;
@@ -796,26 +958,32 @@ function papirkortTest(d, W, NK, s1, s2, op1, op2) {
     op1.kaldSlut(op1.opgave);
     d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
     s2.lagt = false; s2.tilpas();
-    op2.koe = [2]; op2.ny(); op2.indsendKlik(); op2.hjaelpKlik();
-    iZone("maet-skort", "lav skærm, fane 2 med hint");
-    paastand("lav skærm: grafen begynder under kortet", s2.graf.y - 34 >= maal("maet-skort").bund);
-    op2.kaldSlut(op2.opgave);
+    laengsteKort2("lav skærm (660 px)");
     ramme.style.height = "800px";
     void W.innerHeight;
     s2.lagt = false; s2.tilpas(); s1.L.tilpas(); s1.layout(true);
 
-    /* Tilbage til udgangspunktet */
-    [op1, op2].forEach(function (op) {
+    /* Tilbage til udgangspunktet (og ingen gemte fremskridt efter testen) */
+    [op1].forEach(function (op) {
         op.kaldSlut(op.opgave); op.opgave = null; op.nyRunde(); op.tilstand = "intro"; op.visStatus(); op.visKort();
     });
+    try { W.localStorage.removeItem("nk-sc2.1-maettet"); } catch (e) { /* intet lager */ }
+    op2.status = {}; op2.faerdig = false; op2.aabn(0, true);
     var tekstFejl = "";
     paastand("teksterne på kortet holder grænserne (hint ≤ 100, forklaring ≤ 160, svar ≤ 34)", (function () {
         var bad = [];
-        [op1, op2].forEach(function (op) {
+        [op1].forEach(function (op) {
             for (var k = 0; k < 6; k++) op.typer.forEach(function (fn) {
-                var x = fn(op === op1 ? s1 : s2);
+                var x = fn(s1);
                 if (x.hint && x.hint.length > 100) bad.push("hint: " + x.hint);
                 if (x.valg) x.valg.forEach(function (v) { if (v.length > 34) bad.push("svar: " + v); });
+            });
+        });
+        NK.SimMaetning.OPGAVER.forEach(function (o) {
+            o.trin.forEach(function (t) {
+                (t.hint || []).forEach(function (h) { if (h.length > 100) bad.push("hint: " + h); });
+                (t.svar || []).forEach(function (v) { if (v.t.length > 34) bad.push("svar: " + v.t); if (v.nej && v.nej.length > 160) bad.push("forklaring: " + v.nej); });
+                if (t.slut && t.slut.length > 160) bad.push("slut: " + t.slut);
             });
         });
         tekstFejl = bad.slice(0, 3).join(" | ");
@@ -845,7 +1013,8 @@ function koerTid(sim, skridt, dt) {
 }
 
 function vis() {
-    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    var antal = linjer.filter(function (l) { return l.indexOf('"ok">  ok') >= 0; }).length + fejl;
+    skriv("\n" + (fejl === 0 ? "ALT OK (" + antal + " påstande)" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
     document.getElementById("ud").innerHTML = linjer.join("\n");
     document.title = (fejl === 0 ? "ALT OK" : fejl + " FEJL") + ": selvtest sc2.1";
 }

@@ -1,0 +1,72 @@
+[
+ {
+  "nr": "T6-1",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "<span class=\"nr\">2</span>Hvor meget kan der være?</button>",
+  "ny": "<span class=\"nr\">2</span>Mættet opløsning</button>",
+  "hvor": "fanenavn 2 (REGELSAET 46)"
+ },
+ {
+  "nr": "T6-2",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "title=\"Teori (T)\">📖 <span>Teori</span></button>",
+  "ny": "title=\"Teori (T)\"><span>Teori</span></button>",
+  "hvor": "knappen Teori uden ikon"
+ },
+ {
+  "nr": "T6-3",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "title=\"Tjek dig selv (Q)\">🧠 <span>Quiz</span></button>",
+  "ny": "title=\"Tjek dig selv (Q)\"><span>Quiz</span></button>",
+  "hvor": "knappen Quiz uden ikon"
+ },
+ {
+  "nr": "T6-4",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "            <li><b>Hvor meget kan der være?</b> Spatlen hælder salt i glasset. Kurven viser opløseligheden, og den gule linje viser, hvor meget du har hældt i. \"Skaler til stoffet\" zoomer ind på det valgte salt.</li>",
+  "ny": "            <li><b>Mættet opløsning.</b> Spatlen hælder salt i glasset, og varmepladens − og + skifter temperatur. Kurven viser opløseligheden, og den gule linje viser, hvor meget der er hældt i. Når de fire opgaver er løst, kan du vælge andre salte på hylden.</li>",
+  "hvor": "hjælpen: fane 2"
+ },
+ {
+  "nr": "T6-5",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "giver knappen Giv et hint først et hint og derefter svaret.</p>",
+  "ny": "giver knappen Giv et hint et hint ad gangen og til sidst svaret.</p>",
+  "hvor": "hjælpen: opgaverne (hinttrappen)"
+ },
+ {
+  "nr": "T6-6",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "<b>tungtopløseligt</b>. Det salt, du vælger, følger med over på den anden fane.</p>",
+  "ny": "<b>tungtopløseligt</b>.</p>",
+  "hvor": "hjælpen: saltet følger ikke længere med til fane 2"
+ },
+ {
+  "nr": "T6-7",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "<kbd>R</kbd> start fanen forfra",
+  "ny": "<kbd>R</kbd> start forfra",
+  "hvor": "hjælpen: genvejen R"
+ },
+ {
+  "nr": "T6-8",
+  "fil": "sc2.1_salt_i_vand/index.html",
+  "gammel": "<div class=\"overlay\" id=\"teori\">\n    <div class=\"overlay-boks\">\n        <h2>Teori: salt i vand</h2>\n        <p>Otte korte afsnit. Du behøver ikke læse dem for at bruge animationen.</p>\n        <div class=\"teoriliste\" id=\"teori-liste\"></div>\n        <div class=\"knapper\" style=\"margin-top:18px;\">\n            <button class=\"knap blaa\" id=\"teori-luk\" type=\"button\" style=\"justify-content:center;\">Luk</button>\n        </div>\n    </div>\n</div>\n",
+  "ny": "<div class=\"overlay\" id=\"teori\">\n    <div class=\"overlay-boks teori-ark\">\n        <h2>Salt i vand</h2>\n        <p>Vandmolekylet er skævt. Oxygen-enden er en lille smule negativ (δ−), og hydrogen-enderne er en lille smule positive (δ+). Vandmolekylerne vender den modsatte ladning ind mod ionerne i krystallen og river dem løs. For natriumchlorid skrives det NaCl(s) → Na⁺(aq) + Cl⁻(aq).</p>\n        <h3 class=\"teori-hoved\">Opløseligheden er en grænse</h3>\n        <p>100 mL vand kan kun opløse en bestemt mængde af et salt. Den mængde er saltets opløselighed. Er der hældt mere i, er opløsningen mættet, og resten bliver liggende som bundfald.</p>\n        <div class=\"eksempel\">100 mL vand kan opløse 36 g NaCl ved 20 °C. Hældes der 50 g NaCl i, bliver 50 g − 36 g = 14 g liggende som bundfald.</div>\n        <p>For de fleste salte stiger opløseligheden, når vandet bliver varmere. Køles en mættet opløsning, falder der salt ud. Kan der opløses mindre end 2 g af et salt i 100 mL vand, kaldes saltet tungtopløseligt.</p>\n        <p class=\"teori-bog\">Læs mere i Kemibogen: <a href=\"https://kemibogen.dk/c/kapitler/2-4-faeldningsreaktioner.html#let--og-tungtopløselige-salte\" target=\"_blank\" rel=\"noopener\">2.4 Let- og tungtopløselige salte</a></p>\n        <div class=\"knapper\" style=\"margin-top:14px;\">\n            <button class=\"knap blaa\" id=\"teori-luk\" type=\"button\" data-luk style=\"justify-content:center;\">Luk</button>\n        </div>\n    </div>\n</div>\n",
+  "hvor": "teorien på teori-arket, kortere, henvisning til Kemibogen 2.4 (REGELSAET 31). NB: sættes den tilbage, skal bygTeori i js/app.js og D.TEORI i js/data.js også tilbage (se scratchpad-kopien eller README)"
+ },
+ {
+  "nr": "T6-9",
+  "fil": "sc2.1_salt_i_vand/js/sim_oploes.js",
+  "gammel": "b.textContent = t.tegn + \" \" + t.navn;",
+  "ny": "b.textContent = t.navn;   /* ingen ikoner (runde T6) */",
+  "hvor": "fane 1: Koldt, Lunkent, Varmt uden ikoner"
+ },
+ {
+  "nr": "T6-10",
+  "fil": "sc2.1_salt_i_vand/js/sim_oploes.js",
+  "gammel": "{ til: true, tekst: \"🌀 Omrøring\" }",
+  "ny": "{ til: true, tekst: \"Omrøring\" }",
+  "hvor": "fane 1: Omrøring uden ikon"
+ }
+]

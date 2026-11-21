@@ -2047,3 +2047,116 @@ html body.papirkort.papirkort .scenekort .sk-felt-in:disabled { background-color
 .bt-regn .bt-felt { margin-left: 2px; }
 /* Den gamle regel for #ux-arbejde (tavlen fra js/regn.js) gaelder ikke laengere */
 #ux-arbejde.ux-arbejde { justify-content: center; font-size: inherit; padding: 6px 16px 14px; }
+
+/* =====================================================================
+   RUNDE 4 (21. nov. 2026): hjaelpestregen paa skyderen og "Vis grafen"
+   ved skyderen
+   ===================================================================== */
+/* Den gule streg dér, hvor maalet er: pulserer roligt tre gange og bliver
+   staaende svagt (regel 26: intet skarpt blink) */
+.bh-maal {
+    position: absolute;
+    top: 50%;
+    width: 5px;
+    height: 24px;
+    border-radius: 3px;
+    background-color: var(--gul);
+    box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.25);
+    transform: translate(-50%, -50%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+.bh-maal.vis { animation: bh-maal-puls 1.6s ease-in-out 3; }
+@keyframes bh-maal-puls {
+    0%, 100% { opacity: 0.6; box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.25); }
+    50% { opacity: 1; box-shadow: 0 0 0 7px rgba(242, 197, 61, 0.18); }
+}
+@media (prefers-reduced-motion: reduce) { .bh-maal.vis { animation: none; } }
+
+/* "Vis grafen ▸" ud for skyderen i hoejre side, altid inden for scenen */
+#fane-bh .bh-graffane { height: 32px; padding: 0 14px; }
+
+/* =====================================================================
+   RUNDE 5 (21. nov. 2026): skemaets hoved som reaktionsskemaet, tal i
+   raekken Ligevaegt kun ved ligevaegt og i mindre skrift (ingen rullebjaelke)
+   ===================================================================== */
+.bt-skema th.bt-tegn, .bt-skema td.bt-tegn {
+    padding: 6px 2px;
+    color: #5b6270;
+    font-size: 1.05em;
+    font-weight: 400;
+}
+.bt-skema td.bt-tegn { border-bottom-color: #e4dfd2; }
+.bt-koef { margin-right: 3px; font-weight: 500; color: #1d2433; }
+/* Raekken Ligevaegt: lidt mindre skrift, tallet paa sin egen linje under udtrykket */
+.bt-skema tr.bt-lig td { font-size: 0.92em; line-height: 1.25; }
+.bt-tal { display: block; color: #2a6f9e; font-size: 0.82em; }
+.bt-tal.skjult { visibility: hidden; }
+
+/* Fane 3: skemaets hoved som reaktionsskemaet (regel 48) */
+.ice th.ice-tegn, .ice td.ice-tegn { padding: 3px 2px; color: #b5c6be; font-weight: 400; border-bottom-color: rgba(233, 238, 233, 0.16); }
+.ice .ice-koef { margin-right: 2px; }
+/* Tavlens linjer (fane 1 og 2): navnet til venstre og regnestykket til hoejre,
+   saa tavlen kan vaere der uden rullebjaelke (regel 50) */
+.bt-linje {
+    display: grid;
+    grid-template-columns: minmax(7em, 30%) minmax(0, 1fr);
+    column-gap: 14px;
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 6px;
+}
+.bt-linje .bt-navn { font-size: 0.82em; line-height: 1.25; }
+.bt-linje .bt-regn { margin-top: 0; }
+.bh-tavle { padding: 8px 14px; }
+.bt-skema th, .bt-skema td { padding: 4px 9px; }
+#fane-bh .bh-y { padding: 4px 14px; }
+.ux-tavle { padding: 12px 18px 12px; }
+.bt-data .bt-datatekst { font-size: 0.95em; line-height: 1.45; }
+/* Mindst ca. 12 px i navne og tal, ogsaa naar tavlens skrift er 14 px */
+.bt-linje .bt-navn { font-size: 0.87em; }
+.bt-skema tr.bt-lig td { font-size: 1em; }
+.bt-tal { font-size: 0.86em; }
+.bt-linje { grid-template-columns: minmax(6.5em, 27%) minmax(0, 1fr); margin-top: 4px; padding-top: 4px; }
+.bt-skema th, .bt-skema td { padding: 3px 9px; }
+.bt-skema { margin-bottom: 2px; }
+
+/* Fane 3 (runde 5): kurven i et lille vindue, og en taet tavle uden rullebjaelke */
+.kurve-ark { max-width: 640px; }
+.kurve-ark h2 { font-family: "Lexend", "Segoe UI", sans-serif; font-weight: 500; font-size: 1.05rem; color: #e9eef4; }
+#kurve-laerred { height: 240px; }
+.kurve-knap {
+    padding: 4px 12px;
+    border: 1px solid rgba(233, 238, 233, 0.35);
+    border-radius: 8px;
+    background: none;
+    color: #cfd9d4;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: max(14px, calc(var(--fs) * 0.5));
+    cursor: pointer;
+}
+.kurve-knap:hover { border-color: rgba(233, 238, 233, 0.6); color: #ffffff; }
+#mx-tavle.taet { gap: 2px; padding-top: 8px; padding-bottom: 6px; }
+#mx-tavle.taet .tv-navn { display: none; }
+#mx-tavle.taet .regn-dele { gap: 1px; }
+#mx-tavle.taet .rb { padding-top: 1px; padding-bottom: 1px; }
+#mx-tavle.taet .rb.aktiv { padding-top: 4px; padding-bottom: 4px; }
+#mx-tavle.taet .ice th, #mx-tavle.taet .ice td { padding-top: 1px; padding-bottom: 1px; }
+#mx-tavle.taet .rb.aktiv > .tekstboks { margin-bottom: 2px; }
+#mx-arbejde:has(#mx-tavle.taet) { padding-top: 4px; padding-bottom: 4px; }
+/* Taet tavle paa fane 3: reaktionen og opgavens tal paa én linje, kurveknappen
+   oeverst til hoejre ved stemplet, x-vaerdien ved siden af etiketten */
+#mx-tavle.taet .tv-hoved { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 2px 18px; }
+#mx-tavle.taet .rb-kurveknap { position: absolute; top: 6px; left: 14px; padding: 0; }
+#mx-tavle.taet .konc { display: grid; grid-template-columns: auto; }
+#mx-tavle.taet .konc-x { margin-bottom: -4px; text-align: left; font-size: max(14px, calc(var(--fs) * 0.55)); }
+#mx-tavle.taet .rb.ok .regn-gitter, #mx-tavle.taet .rb.ok .rb-linje { line-height: 1.2; }
+#mx-tavle.taet .kontrol { line-height: 1.25; }
+#mx-raekke #mx-kurve + .or-stille { margin-left: 4px; }
+/* Taet tavle: de korte faerdige linjer to og to ved siden af hinanden */
+#mx-tavle.taet .regn-dele { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 26px; }
+#mx-tavle.taet .regn-dele > .rb { flex: 1 1 100%; min-width: 0; }
+#mx-tavle.taet .regn-dele > .rb.ok.rb-lov, #mx-tavle.taet .regn-dele > .rb.ok.rb-ligning { flex: 0 0 auto; }
+#mx-tavle.taet .regn-dele > .rb.ok.rb-lov + .rb.ok.rb-defx, #mx-tavle.taet .regn-dele > .rb.ok.rb-ligning + .rb.ok.rb-cas { flex: 1 1 0; }
+/* Ordet Ligevaegt flugter med udtrykkene, ogsaa naar tallinjen under er tom */
+.bt-skema tr.bt-lig th, .bt-skema tr.bt-lig td { vertical-align: top; }

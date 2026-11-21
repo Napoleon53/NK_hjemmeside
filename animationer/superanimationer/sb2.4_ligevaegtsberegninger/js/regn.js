@@ -482,17 +482,19 @@
             this.deleEl.appendChild(blok);
         }
 
-        /* Kurven fra start til ligevaegt staar sidst paa tavlen, naar opgaven
-           med x er loest (foer i panelet, som er vaek fra 21. nov. 2026) */
-        if (this.faerdig && this.type === "x") {
-            var kb = el("div", "rb rb-kurve");
-            kb.appendChild(el("div", "regn-etiket", "Fra start til ligevægt"));
-            var kc = el("canvas", "kurve");
-            kc.id = this.N + "-kurve";
-            kb.appendChild(kc);
-            this.deleEl.appendChild(kb);
-            this.startKurve(kc);
-        } else this.kurve = null;
+        /* Kurven fra start til ligevaegt: naar opgaven med x er loest, staar
+           knappen "Vis kurven" i opgaveraekken, og kurven aabner i et lille vindue
+           (runde 5: paa tavlen gav den en rullebjaelke, REGELSAET 50) */
+        if (!(this.faerdig && this.type === "x")) this.kurve = null;
+        var kk = NK.el(this.N + "-kurve");
+        if (kk) {
+            kk.hidden = !(this.faerdig && this.type === "x");
+            if (!kk.dataset.bundet) {
+                var mig2 = this;
+                kk.dataset.bundet = "1";
+                kk.addEventListener("click", function () { mig2.visKurve(); });
+            }
+        }
 
         var stempel = NK.el(this.N + "-stempel");
         stempel.hidden = !this.faerdig;
@@ -519,12 +521,16 @@
         var arb = NK.el(this.N + "-arbejde");
         if (!arb || !arb.offsetHeight) return;
         arb.style.removeProperty("--fs");
+        this.tavle.classList.remove("taet");
         var fs = parseFloat(window.getComputedStyle(arb).fontSize) || 30;
         var gange = 0;
-        while (gange++ < 40 && fs - 1 >= 15.99 && (arb.scrollHeight > arb.clientHeight + 1 || this.tavle.scrollWidth > this.tavle.clientWidth + 1)) {
-            fs -= 1;
+        while (gange++ < 40 && fs > 16 && (arb.scrollHeight > arb.clientHeight || this.tavle.scrollWidth > this.tavle.clientWidth + 1)) {
+            fs = Math.max(16, fs - 1);
             arb.style.setProperty("--fs", fs + "px");
         }
+        /* Er der stadig ikke plads ved 16 px, bliver afstandene mindre (runde 5,
+           regel 50: ingen rullebjaelke i tavlen) */
+        if (arb.scrollHeight > arb.clientHeight) this.tavle.classList.add("taet");
         var akt = this.deleEl.querySelector(".rb.aktiv") || (this.faerdig ? this.deleEl.lastElementChild : null);
         if (akt && arb.scrollHeight > arb.clientHeight + 1) {
             var ra = arb.getBoundingClientRect(), rb = akt.getBoundingClientRect();
@@ -778,8 +784,12 @@
         var tab = el("table", "ice");
         var hoved = el("tr");
         hoved.appendChild(el("th", "ice-hj", "c / M"));
-        arter.forEach(function (a) {
-            var th = el("th", "", NK.html(M.skriv(a.s)));
+        /* Oeverste raekke laeses som reaktionsskemaet med + og ⇌ i smalle kolonner,
+           der er tomme i raekkerne under (runde 5, REGELSAET 48) */
+        function tegn(i) { return i === 0 ? null : (arter[i - 1].side !== arter[i].side ? "⇌" : "+"); }
+        arter.forEach(function (a, i) {
+            if (tegn(i)) hoved.appendChild(el("th", "ice-tegn", tegn(i)));
+            var th = el("th", "", (a.k > 1 ? '<span class="ice-koef">' + a.k + "</span>" : "") + NK.html(M.skriv(a.s)));
             th.setAttribute("data-s", a.s);
             hoved.appendChild(th);
         });
@@ -789,7 +799,8 @@
             var tr = el("tr", "ice-" + r);
             tr.appendChild(el("th", "ice-r", RAEKKE_NAVN[r]));
             var fi = RAEKKER.indexOf(fase);
-            arter.forEach(function (a) {
+            arter.forEach(function (a, ai) {
+                if (tegn(ai)) tr.appendChild(el("td", "ice-tegn", ""));
                 var td = el("td");
                 td.setAttribute("data-s", a.s);
                 var key = "sk." + r + "." + a.s;
@@ -1761,6 +1772,17 @@
 
     /* ----- Kurven: koncentrationerne fra start til ligevaegt (fra den gamle) ----- */
     var FARVER = ["#4cc9f0", "#4ade80", "#fbbf24", "#c4a7ff", "#ff7aa2"];
+
+    /* Kurven i sit eget vindue (#kurve-vindue i index.html) */
+    F.visKurve = function () {
+        var o = this.o;
+        NK.saetTekst("kurve-titel", o.navn + ": fra start til ligevægt");
+        NK.el("kurve-vindue").classList.add("vis");
+        var c = NK.el("kurve-laerred");
+        this.kurve = null;
+        this.startKurve(c);
+        this.kurve.l = null;
+    };
 
     /* Tavlen tegnes igen efter loest: kurven tegnes videre fra, hvor den var */
     F.startKurve = function (c) {

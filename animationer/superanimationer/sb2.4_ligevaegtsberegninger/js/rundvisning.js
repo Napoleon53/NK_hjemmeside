@@ -14,8 +14,8 @@
     var TURE = {
         "fane-bh": [
             { sel: "#bh-skort", titel: "Papirkortet", tekst: "Øverst står reaktionsskemaet med K. Under det står spørgsmålet eller det, du skal gøre. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#bh-laerred", titel: "Beholderen", tekst: "Molekylerne i en lukket beholder. Hvert stof har sin egen farve, og under beholderen står, hvor mange der er af hvert stof." },
-            { sel: "#bh-skyder", titel: "x", tekst: "Skyderen bestemmer x, som er den koncentration af stoffet, der er omsat. På det første mål ligger den under grafen som grafens x-akse." },
+            { sel: "#bh-laerred", titel: "Beholderen", tekst: "Molekylerne i en lukket beholder. Hvert stof har sin egen farve, og atomerne har deres symbol. Under beholderen står, hvor mange der er af hvert stof." },
+            { sel: "#bh-skyder", titel: "x", tekst: "Skyderen bestemmer x, som er den koncentration af stoffet, der er omsat. På det første mål ligger den under grafen som grafens x-akse. Piletasterne flytter x 0,001 M ad gangen. Rammer du ikke målet, viser en gul streg efter lidt tid, hvor det er." },
             { sel: "#bh-y", titel: "Y og K", tekst: "Y er reaktionsbrøken regnet med koncentrationerne lige nu. Ved ligevægt er Y = K." },
             { sel: "#bh-tavle", titel: "Tavlen", tekst: "Skemaet med Start, Ændring og Ligevægt. Feltet med ? er det, kortet spørger om. Du svarer på kortet." },
             { sel: "#bh-graffane", titel: "Grafen", tekst: "Fra mål 2 er grafen foldet ind. Her kan du folde den ud igen." },

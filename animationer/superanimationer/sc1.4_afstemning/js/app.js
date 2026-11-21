@@ -123,8 +123,11 @@
 
         /* Man kan linke direkte til en fane med  index.html#skema  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
-        var HASH = { kugler: "fane-kg", kuglerne: "fane-kg", skema: "fane-sk", skemaet: "fane-sk",
-                     formler: "fane-sk" };
+        /* De gamle adresser virker stadig (runde 2: nye fanenavne, REGELSAET 46) */
+        var HASH = { kugler: "fane-kg", kuglerne: "fane-kg", "med-kugler": "fane-kg", "afstem-med-kugler": "fane-kg",
+                     skema: "fane-sk", skemaet: "fane-sk", formler: "fane-sk", "uden-kugler": "fane-sk",
+                     "afstem-uden-kugler": "fane-sk" };
+        NK.FANE_HASH = HASH;
         visFane(HASH[oenske] || faner[0]);
 
         window.requestAnimationFrame(function (ts) {

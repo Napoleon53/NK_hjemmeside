@@ -1,4 +1,4 @@
-# sb2.4 Ligevægtsberegninger
+# sb2.4 Ligevægtsberegninger (fanerne Mod ligevægt, Ved ligevægt, Fra start til ligevægt)
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
@@ -514,3 +514,102 @@ grøn af sig selv efter 0,7 s (ikke efter 0,4 s), handlinger videre efter 0,7 s
 og x sat på målet, den rolige overgang i mål 4 og 5, beholderen 38-46 %, og
 fane 2 trin for trin (ét felt på kortet, intet på tavlen, én linje med ?,
 intet "c" alene, forkerte tal giver fejl, Vis svaret).
+
+## Runde 4 (21. nov. 2026): Vis grafen inden for scenen, hjælp til at ramme x, atomsymboler, nye fanenavne
+
+Niels: "Man kan kun folde grafen ud, hvis man zoomer ud. Jeg synes også det er
+lidt svært at ramme x med skyderen.. måske skal den blinke lidt hjælpende, hvis
+man ikke rammer efter 10 sekunder eller sådan noget. Nu hvor beholderen er så
+stor, så kunne man måske overveje om der var plads til at skrive
+atomsymbolerne på molekylerne (som måske skal være lidt større). Desuden er
+spørgsmålet om fanerne ikke skal have mere sigende navne."
+
+* **"Vis grafen ▸"** står nu i højre side ud for skyderen (før nederst under
+  tavlen) og er altid inden for scenen. Den er kun skjult, mens kortet stiller
+  et åbent spørgsmål (regel 19a); efter et rigtigt svar, under handlinger og
+  når målet er løst, kan den klikkes. Grafen foldes ud under tavlen og ind
+  igen. Selvtesten tjekker det i 1100 × 760, 1400 × 860 og 1920 × 1080 (synlig,
+  inden for scenen og øverst, så et klik rammer den).
+* **Lettere at ramme x:** Skyderen går 0,001 M ad gangen, og den får fokus,
+  når kortet beder eleven trække, så piletasterne virker. Har eleven trukket
+  i 10 s uden at nå målet, kommer en lille gul streg på skyderens spor, dér
+  hvor målet er (0,050 M, 0,040 M, helt op eller ligevægtens x). Den pulserer
+  roligt tre gange og bliver stående svagt (regel 26). Hintet "Den gule streg
+  på skyderen viser …" viser den med det samme (`visMaerke`, `efterHint`).
+* **Atomsymboler:** Molekylerne er ca. 1,3 gange større (R mindst 14 px), og
+  hvert atom har sit symbol (S, O, Cl, H, Br, C) inde i kuglen i 13,5-16 px,
+  Lexend 500, mørk skrift. Hvert stof har stadig sin farve; atomerne har en
+  lille nuance pr. grundstof (H lysest, Br og C mørkest). Molekylerne drejer
+  ikke, så symbolerne står oprejst, og de skubbes blidt fra hinanden, når de
+  mødes, og vælger pladser uden overlap fra start.
+* **Fanerne hedder** "Mod ligevægt" (fane 1: x trækkes mod ligevægten), "Ved
+  ligevægt" (fane 2: stofmængderne ved ligevægt er kendt) og "Fra start til
+  ligevægt" (fane 3: fra startkoncentrationer med x og CAS). Adresserne
+  `#mod-ligevaegt`, `#ved-ligevaegt` og `#fra-start` virker, og de gamle
+  (`#beholderen`, `#udenx`, `#medx`) virker stadig. Kemibogens link (B2.5)
+  peger på `index.html` uden adresse og virker uændret.
+
+Selvtesten: ALT OK (1110 påstande, før 1083), 21. nov. 2026. Nye påstande:
+hjælpestregen (ikke efter 5 s, efter 10 s på ligevægtens plads, pulserer tre
+gange, væk når målet er nået, vises af hintet), fokus og trin på 0,001 M,
+molekylernes størrelse og ingen drejning, få overlap, Vis grafen i tre
+skærmstørrelser, fanenavnene og de nye og gamle adresser.
+
+## Runde 5 (21. nov. 2026): skemaet som reaktionsskema, tal kun ved ligevægt, ingen rullebjælke, ét skift af reaktion
+
+Niels: "I forhold til sælskemaerne.. så må der gerne være en pil i øverste
+række.. og i nederste række.. så synes jeg ikke at den skal være udfyldt når
+der ikke er ligevægt.. Det virker lidt underligt. Og desuden så må
+skriftstørrelsen gerne være mindre i nederste række, så der ikke kommer en
+scrollbar. Derudover så er det lidt forvirrende når der skifter
+reaktionsblanding. Hjernen har lidt svært ved at omstille sig.. og jeg
+overvejer om opgave 5-6 måske bør udelades eller slåes sammen med opgave 4."
+(REGELSAET 48-51.)
+
+* **Skemaets øverste række er reaktionsskemaet** (regel 48): + og ⇌ står i
+  smalle kolonner mellem stofferne, og koefficienten står foran pillen
+  ("H₂ + Br₂ ⇌ 2 HBr"). Kolonnerne er tomme i rækkerne under, så felterne står
+  under hvert sit stof. Fane 3's skema har fået det samme (`skemaTabel` i
+  `js/regn.js`).
+* **Rækken Ligevægt får kun tal ved ligevægt** (regel 49): før står kun
+  udtrykket ("0,200 M − x", "x"). Tallene ("= 0,122 M") kommer på deres egen
+  linje i mindre skrift, når lampen er grøn, eller opgaven er løst med x på
+  ligevægten. Pladsen er der hele tiden (usynlig), så tavlen ikke hopper.
+* **Ingen rullebjælke** (regel 50), tjekket i 1100 × 760, 1400 × 860 og
+  1920 × 1080 for alle mål på fane 1 og alle opgaver på fane 2 og 3, trin for
+  trin og løst:
+  * Fane 1 og 2: tavlens linjer har navnet til venstre og regnestykket til
+    højre, tættere afstande, en lavere Y-boks, og skriften går ned til 14 px
+    (navne og tal mindst ca. 12 px). Ligevægtsloven står kun, hvor der sættes
+    ind (mål 2 og 4).
+  * Fane 3: kurven fra start til ligevægt står ikke længere på tavlen; knappen
+    "Vis kurven fra start til ligevægt ▸" i opgaverækken åbner den i et lille
+    vindue. Er der ikke plads ved 16 px, bliver tavlen "tæt": mindre
+    afstande, reaktionen og opgavens tal på én linje, og loven og definitionen
+    af x samt ligningen og CAS to og to ved siden af hinanden. Skriften er
+    stadig mindst 16 px.
+* **Ét skift af reaktion** (regel 51): CO + H₂O er taget ud af fane 1. Fane 1
+  har fem mål: SO₂Cl₂ (x ved ligevægt, skemaet med x, hvilken løsning), HBr
+  (koefficienten 2) og et nyt **"HBr: hvilken løsning?"** (`b-loesning`):
+  1. "Hvor stor kan x højst blive, når der fra start er 0,200 M H₂ og 0,200 M
+     Br₂?" (0,200 M / 0,400 M / 0,100 M). Linjen "x kan højst blive" står på
+     tavlen i det trin.
+  2. "CAS giver x = 0,160 M og x = 0,267 M. Hvilken løsning kan bruges, når x
+     højst kan blive 0,200 M?" Tavlen viser ligningen 64,0 = (2x)² / ((0,200 M
+     − x) · (0,200 M − x)) og CAS' løsninger fra dette trin.
+  3. "Træk x, til Y er lig med K." Lampen bliver grøn af sig selv, og først
+     dér får rækken Ligevægt sine tal.
+  Det nye mål hedder `b-loesning` og ikke `b-cas`, fordi gemte fremskridt med
+  `b-cas` var runde 1's "To positive løsninger"; de og `c-graense` og `c-cas`
+  springes over. Gruppen c er væk fra `D.GRUPPER_BH` og reaktionen c fra
+  `D.RX`.
+* Menuteksten i `kemi-b-filer/samling_b2.html` ("Træk x i en lukket beholder,
+  og se, hvorfor den ene løsning forkastes. Regn derefter …") passer stadig
+  (mål 3 og 5) og er ikke ændret.
+
+Selvtesten: ALT OK (1105 påstande; før 1110, fordi der er ét mål færre at gå
+igennem). Nye påstande: fem mål og ét skift af reaktion, CAS' tal for HBr mod
+modellen (0,160 og 0,267), skemaets hoved med + og ⇌ og lige mange celler i
+alle rækker, ingen tal i rækken Ligevægt før ligevægt og tallene bagefter,
+ingen rullebjælke i tavlerne på alle tre faner i tre skærmstørrelser, knappen
+Vis kurven på fane 3, og gemte c-graense og c-cas springes over.

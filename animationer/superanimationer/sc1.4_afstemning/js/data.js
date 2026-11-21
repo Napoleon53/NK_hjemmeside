@@ -106,38 +106,77 @@
           tekst: "Propan i campinggrillen brænder til carbondioxid og vand." }
     ];
 
+    /* Den foerste reaktion paa fane 1 er trinvis (21. nov. 2026, runde 2, REGELSAET
+       11-12): den begynder med en handling, og eleven ser foerst, hvad der sker med
+       atomerne, foer der skal afstemmes. Hvert trin har en hinttrappe og Vis svaret.
+         indsend: eleven trykker Indsend svar, og molekylerne reagerer med 1-tallerne.
+         valg:    et spoergsmaal med tre svar paa kortet (det rigtige har ok, de
+                  forkerte har hver sin forklaring i nej). Scenen er laast imens.
+         plus:    eleven klikker paa + foran stoffet (side og i). Kun den knap er
+                  fremme med en gul ramme og en boble. Uden indsend reagerer
+                  molekylerne af sig selv lidt efter; med indsend trykker eleven
+                  selv Indsend svar bagefter.
+       Efter indsend og plus gaar kortet selv videre ca. 1 s efter, at molekylerne
+       har reageret (REGELSAET 33). Er reaktionen loest foer (gemt i browseren),
+       er der ingen trin; Start forfra giver dem igen (REGELSAET 16). */
+    D.TRIN_KUGLER = [
+        { type: "indsend", spm: "Klik på Indsend svar, og se atomerne reagere.",
+          hint: ["Indsend svar står nederst til højre på kortet.",
+              "Når du trykker Indsend svar, reagerer molekylerne med de tal, der står foran stofferne.",
+              "Tryk Indsend svar."] },
+        { type: "valg", spm: "Hvilket atom er der for mange af før pilen?",
+          svar: [
+              { t: "Na", nej: "Der er 1 Na før pilen og plads til 1 Na efter pilen. Na passer." },
+              { t: "Cl", ok: true },
+              { t: "Ingen", nej: "Ét Cl ligger tilovers efter pilen med en rød ring. Det fik ingen plads i NaCl." }
+          ],
+          hint: ["Se på bakken efter pilen. Ét atom har en rød ring.",
+              "Der er 2 Cl før pilen, men kun plads til 1 Cl efter pilen.",
+              "Der er ét Cl for meget før pilen."],
+          slut: "Der er 2 Cl før pilen og kun plads til 1 Cl efter pilen. Det ekstra Cl ligger tilovers." },
+        { type: "plus", side: "p", i: 0, tekst: "Der skal være plads til begge Cl efter pilen.", spm: "Klik på + foran NaCl.",
+          hint: ["Hvert NaCl har plads til ét Cl.",
+              "Med 2 NaCl er der plads til 2 Cl.",
+              "Klik på + over tallet foran NaCl."] },
+        { type: "plus", side: "r", i: 0, indsend: true, tekst: "Nu mangler der et Na efter pilen.", spm: "Klik på + foran Na. Tryk så Indsend svar.",
+          hint: ["Hvert NaCl skal have ét Na.",
+              "Der er 2 NaCl, så der skal være 2 Na før pilen.",
+              "Klik på + foran Na. Tryk så Indsend svar."] }
+    ];
+
     /* Loftet paa fane 1: saa mange molekyler af ét stof kan ses i bakken */
     D.MAKS_KUGLER = 10;
 
-    /* ----- Fane 2: Skemaet --------------------------------------------------- */
+    /* ----- Fane 2: Afstem uden kugler ----------------------------------------
+       navn: titlen i listen, laast op i takt (21. nov. 2026, REGELSAET 17-18) */
     D.SKEMA = [
         /* Let: tre stoffer, smaa tal */
-        { id: "s1", gruppe: "let", r: ["Ca", "O2"], p: ["CaO"], facit: [2, 1, 2] },
-        { id: "s2", gruppe: "let", r: ["H2", "Cl2"], p: ["HCl"], facit: [1, 1, 2] },
-        { id: "s3", gruppe: "let", r: ["K", "Cl2"], p: ["KCl"], facit: [2, 1, 2] },
-        { id: "s4", gruppe: "let", r: ["N2", "O2"], p: ["NO2"], facit: [1, 2, 2] },
-        { id: "s5", gruppe: "let", r: ["SO2", "O2"], p: ["SO3"], facit: [2, 1, 2] },
-        { id: "s6", gruppe: "let", r: ["Al", "Cl2"], p: ["AlCl3"], facit: [2, 3, 2] },
-        { id: "s7", gruppe: "let", r: ["Zn", "HCl"], p: ["ZnCl2", "H2"], facit: [1, 2, 1, 1] },
-        { id: "s8", gruppe: "let", r: ["KClO3"], p: ["KCl", "O2"], facit: [2, 2, 3] },
+        { id: "s1", navn: "Calcium brænder", gruppe: "let", r: ["Ca", "O2"], p: ["CaO"], facit: [2, 1, 2] },
+        { id: "s2", navn: "Hydrogenchlorid dannes", gruppe: "let", r: ["H2", "Cl2"], p: ["HCl"], facit: [1, 1, 2] },
+        { id: "s3", navn: "Kalium og dichlor", gruppe: "let", r: ["K", "Cl2"], p: ["KCl"], facit: [2, 1, 2] },
+        { id: "s4", navn: "Nitrogendioxid dannes", gruppe: "let", r: ["N2", "O2"], p: ["NO2"], facit: [1, 2, 2] },
+        { id: "s5", navn: "Svovltrioxid dannes", gruppe: "let", r: ["SO2", "O2"], p: ["SO3"], facit: [2, 1, 2] },
+        { id: "s6", navn: "Aluminium og dichlor", gruppe: "let", r: ["Al", "Cl2"], p: ["AlCl3"], facit: [2, 3, 2] },
+        { id: "s7", navn: "Zink i saltsyre", gruppe: "let", r: ["Zn", "HCl"], p: ["ZnCl2", "H2"], facit: [1, 2, 1, 1] },
+        { id: "s8", navn: "Kaliumchlorat spaltes", gruppe: "let", r: ["KClO3"], p: ["KCl", "O2"], facit: [2, 2, 3] },
         /* Middel: fire eller fem stoffer, forbraendinger */
-        { id: "s9", gruppe: "middel", r: ["Mg", "HCl"], p: ["MgCl2", "H2"], facit: [1, 2, 1, 1] },
-        { id: "s10", gruppe: "middel", r: ["Na", "H2O"], p: ["NaOH", "H2"], facit: [2, 2, 2, 1] },
-        { id: "s11", gruppe: "middel", r: ["Fe", "O2"], p: ["Fe2O3"], facit: [4, 3, 2] },
-        { id: "s12", gruppe: "middel", r: ["P4", "O2"], p: ["P4O10"], facit: [1, 5, 1] },
-        { id: "s13", gruppe: "middel", r: ["CaCO3", "HCl"], p: ["CaCl2", "H2O", "CO2"], facit: [1, 2, 1, 1, 1] },
-        { id: "s14", gruppe: "middel", r: ["C2H5OH", "O2"], p: ["CO2", "H2O"], facit: [1, 3, 2, 3] },
-        { id: "s15", gruppe: "middel", r: ["Fe2O3", "CO"], p: ["Fe", "CO2"], facit: [1, 3, 2, 3] },
-        { id: "s16", gruppe: "middel", r: ["C2H6", "O2"], p: ["CO2", "H2O"], facit: [2, 7, 4, 6] },
+        { id: "s9", navn: "Magnesium i saltsyre", gruppe: "middel", r: ["Mg", "HCl"], p: ["MgCl2", "H2"], facit: [1, 2, 1, 1] },
+        { id: "s10", navn: "Natrium i vand", gruppe: "middel", r: ["Na", "H2O"], p: ["NaOH", "H2"], facit: [2, 2, 2, 1] },
+        { id: "s11", navn: "Jern ruster", gruppe: "middel", r: ["Fe", "O2"], p: ["Fe2O3"], facit: [4, 3, 2] },
+        { id: "s12", navn: "Phosphor brænder", gruppe: "middel", r: ["P4", "O2"], p: ["P4O10"], facit: [1, 5, 1] },
+        { id: "s13", navn: "Kalk i saltsyre", gruppe: "middel", r: ["CaCO3", "HCl"], p: ["CaCl2", "H2O", "CO2"], facit: [1, 2, 1, 1, 1] },
+        { id: "s14", navn: "Ethanol brænder", gruppe: "middel", r: ["C2H5OH", "O2"], p: ["CO2", "H2O"], facit: [1, 3, 2, 3] },
+        { id: "s15", navn: "Jernoxid og kulilte", gruppe: "middel", r: ["Fe2O3", "CO"], p: ["Fe", "CO2"], facit: [1, 3, 2, 3] },
+        { id: "s16", navn: "Ethan brænder", gruppe: "middel", r: ["C2H6", "O2"], p: ["CO2", "H2O"], facit: [2, 7, 4, 6] },
         /* Svaer: parenteser, store tal, et halvt O2 undervejs */
-        { id: "s17", gruppe: "svaer", r: ["C6H12O6", "O2"], p: ["CO2", "H2O"], facit: [1, 6, 6, 6] },
-        { id: "s18", gruppe: "svaer", r: ["Fe2O3", "C"], p: ["Fe", "CO2"], facit: [2, 3, 4, 3] },
-        { id: "s19", gruppe: "svaer", r: ["NH3", "O2"], p: ["NO", "H2O"], facit: [4, 5, 4, 6] },
-        { id: "s20", gruppe: "svaer", r: ["Al", "H2SO4"], p: ["Al2(SO4)3", "H2"], facit: [2, 3, 1, 3] },
-        { id: "s21", gruppe: "svaer", r: ["C4H10", "O2"], p: ["CO2", "H2O"], facit: [2, 13, 8, 10] },
-        { id: "s22", gruppe: "svaer", r: ["Ca(OH)2", "H3PO4"], p: ["Ca3(PO4)2", "H2O"], facit: [3, 2, 1, 6] },
-        { id: "s23", gruppe: "svaer", r: ["C8H18", "O2"], p: ["CO2", "H2O"], facit: [2, 25, 16, 18] },
-        { id: "s24", gruppe: "svaer", r: ["Cu", "HNO3"], p: ["Cu(NO3)2", "NO", "H2O"], facit: [3, 8, 3, 2, 4] }
+        { id: "s17", navn: "Glucose forbrændes", gruppe: "svaer", r: ["C6H12O6", "O2"], p: ["CO2", "H2O"], facit: [1, 6, 6, 6] },
+        { id: "s18", navn: "Jernoxid og carbon", gruppe: "svaer", r: ["Fe2O3", "C"], p: ["Fe", "CO2"], facit: [2, 3, 4, 3] },
+        { id: "s19", navn: "Ammoniak og dioxygen", gruppe: "svaer", r: ["NH3", "O2"], p: ["NO", "H2O"], facit: [4, 5, 4, 6] },
+        { id: "s20", navn: "Aluminium i svovlsyre", gruppe: "svaer", r: ["Al", "H2SO4"], p: ["Al2(SO4)3", "H2"], facit: [2, 3, 1, 3] },
+        { id: "s21", navn: "Butan brænder", gruppe: "svaer", r: ["C4H10", "O2"], p: ["CO2", "H2O"], facit: [2, 13, 8, 10] },
+        { id: "s22", navn: "Calciumphosphat dannes", gruppe: "svaer", r: ["Ca(OH)2", "H3PO4"], p: ["Ca3(PO4)2", "H2O"], facit: [3, 2, 1, 6] },
+        { id: "s23", navn: "Octan brænder", gruppe: "svaer", r: ["C8H18", "O2"], p: ["CO2", "H2O"], facit: [2, 25, 16, 18] },
+        { id: "s24", navn: "Kobber i salpetersyre", gruppe: "svaer", r: ["Cu", "HNO3"], p: ["Cu(NO3)2", "NO", "H2O"], facit: [3, 8, 3, 2, 4] }
     ];
 
     D.MAKS_TAL = 99;

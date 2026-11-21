@@ -115,8 +115,12 @@
 
         /* Man kan linke direkte til en fane med  index.html#medx  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+        /* Runde 4 (21. nov. 2026): fanerne hedder Mod ligevægt, Ved ligevægt og Fra
+           start til ligevægt. De gamle adresser (#beholderen, #udenx, #medx) virker stadig. */
         var HASH = { beholderen: "fane-bh", beholder: "fane-bh", udenx: "fane-ux", "uden-x": "fane-ux",
-            medx: "fane-mx", "med-x": "fane-mx", x: "fane-mx" };
+            medx: "fane-mx", "med-x": "fane-mx", x: "fane-mx",
+            modligevaegt: "fane-bh", "mod-ligevaegt": "fane-bh", vedligevaegt: "fane-ux", "ved-ligevaegt": "fane-ux",
+            frastart: "fane-mx", "fra-start": "fane-mx", "fra-start-til-ligevaegt": "fane-mx" };
         visFane(HASH[oenske] || faner[0]);
         if (oenske === "teori") aabnTeori();
 

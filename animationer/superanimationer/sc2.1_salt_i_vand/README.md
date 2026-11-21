@@ -16,9 +16,10 @@ To faner om det samme spørgsmål: *hvad sker der, når et salt kommer i vand?*
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
 | 1 | Opløsningen | vælger salt, temperatur og omrøring og ser gennem lupen | vandet river ionerne løs udefra og ind; omrøring og varme gør det hurtigere, men ikke mere |
-| 2 | Hvor meget kan der være? | hælder salt i 100 mL vand med spatlen og skruer på temperaturen | der er en grænse, og alt over den bliver liggende som bundfald |
+| 2 | Mættet opløsning | hælder salt i 100 mL vand med spatlen og skruer på varmepladen med − og + | der er en grænse, og alt over den bliver liggende som bundfald |
 
-Saltet følger med fra fane til fane.
+Fane 2 har sit eget salt (runde T6). Opgaven bestemmer saltet, og først når de fire
+opgaver er løst, kommer hylden med de seks salte frem.
 
 ### De seks salte
 
@@ -100,26 +101,64 @@ varme og omrøring, også hvis man skruer op på max. Målt ved 1100 × 700 til
 1920 × 1050: varmt med omrøring 7,5 til 9 s, alt andet mindst 12 s. Ændres farten, antallet af hold,
 snittene eller pladsreglerne, skal tallet måles igen.
 
-### Fane 2: hvor meget kan der være?
+### Fane 2: Mættet opløsning (runde T6, 21. nov. 2026)
 
-Til venstre et bægerglas med 100 mL vand på en varmeplade, termometer i glasset,
-pulverglas med saltets formel på etiketten og en spatel. Knapperne +5 g og +25 g
-får spatlen til at dykke ned og hælde. Regnskabet er rigtigt med det samme;
-spatel og korn er kun animation. Varmepladen gløder, og knappen på pladen drejer
-med temperaturen.
+Niels' ja til forslagene efter regelsættet (`../REGELSAET.md`): "Jatak Begynd på
+T6". Før runden lå saltvalget, temperaturskyderen og tallene for glasset i
+panelet, og tallet "Grænsen lige nu" afslørede svaret på flere af opgaverne. De
+fire opgaver kom i tilfældig rækkefølge efter "Start opgave", grafen var meget
+stor, og NaCl-kurven lå fladt i bunden, fordi aksen gik til 250 g.
 
-Til højre saltets **opløselighedskurve**:
+**Intet panel** (regel 2-3). Fanen har fire opgaver, så de står i rækken øverst i
+scenen med titler, der låses op i takt (regel 17-18), og ↺ Start forfra yderst til
+højre. Kortet står under rækken og har en fast plads (regel 4).
 
-* den blå kurve er grænsen, den gule stiplede linje er det, der er hældt i
-* ligger den gule linje over kurven, er forskellen bundfald
-* skyderen flytter temperaturen; man kan også klikke og trække i grafen
+**Scenen** (regel 32): glasset på varmepladen til venstre og kurven på et lyst papir
+til højre, samlet i midten med en største bredde på 1260 px. På store skærme bliver
+apparaterne større (bægerglasset op til 340 px), og der er højst 40 px luft mellem
+kortet og forsøget.
 
-Kurven er **glat** (monoton kubisk interpolation gennem tabelpunkterne), så den
-ikke knækker ved hvert 20 °C og aldrig vender.
+* **Etiketten på glasset** (regel 22): 100 mL vand, Hældt i, Opløst og Bundfald med
+  store sorte bogstaver på lyst papir. "Grænsen lige nu" er væk; det er kurvens job.
+  Et tal, kortet spørger om, står som "?" (regel 38).
+* **Varmepladens − og +** under pladen med temperaturen imellem (regel 2). Et klik er
+  1 °C. Holdes knappen nede, går det hurtigt, og det stopper af sig selv, når kortets
+  mål er nået. Termometeret i glasset følger med; tallet over termometeret er væk.
+* **+5 g, +25 g og ↺** over spatlen. Kun det, kortet beder om, er fremme
+  (regel 19a), og det har gul ramme og en boble ("Klik: +5 g", regel 19-20).
+* **Kurven** har aksen efter saltet (NaCl 0-60 g, KNO₃ 0-250 g, de andre efter
+  kurven) og vokser med, hvis der hældes mere i. "Skaler til stoffet" er væk.
+  Aksetitlerne er fede og sorte med stort forbogstav, "Opløselighed (g pr. 100 mL
+  vand)" vandret over aksen og "Temperatur (°C)" under den. Saltets formel står ved
+  kurvens ende. Områdeteksterne er 14 px. Aflæsningen ved punktet ("20 °C: 36 g pr.
+  100 mL") er skjult, mens kortet stiller et spørgsmål.
+* **Grafen kan trækkes i** kun, når kortet beder om en handling med temperaturen, og i
+  den fri leg. Et klik i scenen under et spørgsmål får kortet til at blinke (regel 15).
+* **Hylden** med de seks salte (små pulverglas) står i den fri leg, hvor pulverglasset
+  stod. Et nyt salt giver et tomt glas.
+* Mens Kemichael roser, træder etiketten og knapperne et øjeblik tilbage, og han står
+  foran kurven.
 
-Aksen er som udgangspunkt **fælles for alle salte, 0-250 g**, så ingen kurve bliver
-klemt flad mod kanten, og saltene kan sammenlignes direkte. Hælder man mere i end
-aksen rækker, vokser den med. "Skaler til stoffet" zoomer ind på det valgte salt.
+**De fire opgaver** (`NK.SimMaetning.OPGAVER` nederst i `js/sim_maetning.js`,
+mekanikken i `js/maet_opgaver.js`). Saltet skifter kun én gang (regel 51): opgave 1
+med NaCl, opgave 2-4 med KNO₃.
+
+| Opgave | Trin |
+|--------|------|
+| 1 Bundfald i glasset (NaCl, 20 °C) | 1) Klik på +5 g, til der ligger salt på bunden. +5 g forsvinder ved 40 g, og kortet går selv videre ca. 1 s efter, at kornene er landet. 2) Hvor mange gram NaCl kan 100 mL vand højst opløse ved 20 °C? (40 g / 36 g / 4 g, aflæses på etiketten). 3) Kurven dukker op (før en stiplet ramme med navnet, regel 13), glasset får 50 g med Opløst og Bundfald som "?": Hvor mange gram bundfald giver 50 g NaCl? (14 g / 50 g / 36 g) |
+| 2 Aflæs kurven (KNO₃) | 1) Rolig overgang (regel 42): Hvad sker der med opløseligheden af KNO₃, når vandet bliver varmere? 2) Hvor mange gram KNO₃ kan 100 mL vand højst opløse ved 40 °C? (40 g er temperaturen, 110 g er ved 60 °C). Bagefter flyttes punktet til 40 °C. |
+| 3 Varm, til alt er opløst (80 g KNO₃) | 1) Hvad sker der med bundfaldet, når vandet varmes op? 2) Klik på + på varmepladen, til alt er opløst. Ved 48 °C stopper +, og kortet går selv videre (regel 39); op til 50 °C godtages. Indsend svar er reserve og forklarer "for koldt" og "for varmt". |
+| 4 Afkøling giver bundfald (100 g KNO₃ ved 60 °C) | 1) Hvor mange gram falder ud ved 20 °C? (31,6 g / 68,4 g / 100 g). 2) Klik på − på varmepladen, til vandet er 20 °C, og se de 68,4 g bundfald. |
+
+Hvert spørgsmål har tre svar, hvor de forkerte er fejl, elever laver, og hvert har sin
+egen forklaring (regel 14). Hvert trin har hinttrappen Giv et hint › Næste hint (2 af
+3) › Næste hint (3 af 3) › Vis svaret (regel 15). Trinene i opgave 1 er mest spørgsmål
+og er derfor ikke en gennemgang efter regel 52; der er ingen spring-knap.
+
+**Gemte fremskridt.** Løste opgaver gemmes i browseren (`nk-sc2.1-maettet`): ★ er løst
+uden at se svaret, ✓ med. En løst opgave åbnes med alt fremme (kurven fra trin 1,
+regel 16); Start forfra giver trinene igen. Er alle fire løst, åbner fanen i den fri
+leg med resultatet på kortet og hylden fremme.
 
 ### Opgaverne
 
@@ -152,17 +191,9 @@ hurtigere, og grænsen i opgaven "hurtigst" blev sat ned fra 13 til 10 s.
 | Opløs NaCl-krystallen på under 10 s | det store ur; eleven skal selv finde varmt vand og omrøring |
 | AgCl: flere ioner ved omrøring? | tre svar; hintet beder eleven prøve det |
 
-**Fane 2**
-
-| Opgave | Sådan tjekkes den |
-|--------|-------------------|
-| Aflæs opløseligheden ved en temperatur | fire tal; de forkerte er naboværdier på kurven og selve temperaturen (akserne byttet om) |
-| Hvor meget bundfald ved x g og t °C | fire tal: det rigtige, grænsen, det hældte og 0 |
-| Find den laveste temperatur, hvor alt er opløst | simulationen godkender, når bundfaldet er væk og temperaturen højst 2 °C over grænsen |
-| Hvor meget falder ud ved afkøling til 20 °C | fire tal |
-
-Ved valgopgaverne vises svaret også i billedet bagefter (temperaturen sættes, eller
-saltet hældes i), så eleven kan se, at det passer.
+**Fane 2** har fra runde T6 sine egne opgaver i fast rækkefølge; se afsnittet
+"Fane 2: Mættet opløsning" ovenfor. Kortet og mekanikken i `js/opgave.js` bruges nu
+kun af fane 1.
 
 ### Kemichael
 
@@ -187,14 +218,29 @@ opgavekortet.
 
 ### Teori og quiz
 
-**Teori** åbner otte korte afsnit. **Quiz** åbner ni spørgsmål. Svarene er holdt
+**Teori** åbner et kort, roligt ark (`../faelles/teori.css`, klassen `teori-ark`,
+runde T6, regel 31): vandmolekylet og opløsningen, opløseligheden som en grænse med
+ét eksempel (50 g NaCl giver 14 g bundfald) og henvisningen "Læs mere i Kemibogen:
+2.4 Let- og tungtopløselige salte". Teksten står i `index.html`. Før stod der otte
+afsnit med fede versaloverskrifter. **Quiz** åbner ni spørgsmål. Svarene er holdt
 omtrent lige lange, så det rigtige ikke kan genkendes på længden. Ordene *kinetisk
 energi* og *hydratisering* er med vilje ikke brugt; selvtesten holder øje med det.
 
-Direkte link: `index.html#maetning` åbner fane 2.
+Direkte link: `index.html#maetning` åbner fane 2 (også `#maettet`).
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori · <kbd>Q</kbd> quiz ·
-<kbd>R</kbd> start fanen forfra · <kbd>H</kbd> hjælp · <kbd>Esc</kbd> luk.
+<kbd>R</kbd> start forfra (på fane 2: opgaven med trinene igen) · <kbd>H</kbd> hjælp · <kbd>Esc</kbd> luk.
+
+### Runde T6 på fane 1 (21. nov. 2026)
+
+Fane 1 er ellers som før (den får sin egen tur som T32). Det fælles fra T6 gælder
+også her: ingen versaler i panelets overskrifter og mærker (regel 30), ingen ikoner på
+knapperne Teori og Quiz og på knapperne Koldt, Lunkent, Varmt og Omrøring, og teorien
+på teori-arket. Fane 1's resultatkort henviser til "Mættet opløsning".
+
+Selvtestens påstand "CaCl₂ lunkent: næsten ingen overlappende vandmolekyler" er
+tilfældig og kan en sjælden gang fejle (den fejlede én gang under runden og ikke ved
+næste kørsel); den handler om fane 1's fysik og er ikke ændret.
 
 ## Filer
 
@@ -206,15 +252,18 @@ sprites/              SVG: baegerglas, varmeplade, termometer, spatel,
 js/kerne.js           NK-navnerum, dansk talformat, hævet/sænket skrift,
                       DPR-skarpt canvas, positurer, tegnehjælpere
 js/data.js            ionerne, de seks salte, opløselighedskurven,
-                      forkerte ligninger, teori og quiz
+                      forkerte ligninger og quiz
 js/sprites.js         spritelisten (FILER), deres mål (MAAL), indlæsning
 ../../v2/kemichael/      Kemichael: figuren og hans sprites
 js/valg.js            det valgte salt, delt af begge faner
 js/tegning.js         ion, vandmolekyle, vandskal, varmeplade med knapper,
                       termometer
-js/opgave.js          opgavekortet: den ene knap, runden og resultatet
+js/opgave.js          opgavekortet på fane 1: den ene knap, runden og resultatet
+js/maet_opgaver.js    fane 2: opgaverækken, trinene, hinttrappen og de gemte
+                      fremskridt (runde T6)
 js/sim_oploes.js      fane 1: lup, krystal, omrøring, kogning og opgaverne
-js/sim_maetning.js    fane 2: glas, spatel, graf og opgaverne
+js/sim_maetning.js    fane 2: glas, spatel, etiket, varmepladens − og +, graf,
+                      hylden og opgavernes trin (NK.SimMaetning.OPGAVER)
 js/laerer.js          Kemichael koblet på begge faner
 js/quiz.js            selvtesten i sit overlay
 js/app.js             faneskift, overlays, tastatur, tegneløkke; starter
@@ -242,7 +291,8 @@ Overkogningen styres af `KOGE_OVER_SEK` og `LAERER_EFTER_SEK`.
 
 **Kemichaels replikker** i denne animation står øverst i `js/laerer.js`.
 
-**Teksterne** til teoriboksen og quizzen står nederst i `js/data.js`.
+**Teksterne**: teorien står i `index.html`, quizzen nederst i `js/data.js` og fane 2's
+opgaver nederst i `js/sim_maetning.js`.
 
 **`_selvtest.html`** åbner index.html i en iframe og kontrollerer blandt andet
 formler, ladninger, kurverne, de forkerte ligninger, at krystallen går i
@@ -250,7 +300,10 @@ opløsning, at vandskallen dannes præcis dér, hvor bærerne sad, at δ-mærker
 på ret køl, omrøringens tider og knusning, hvor mange vandmolekyler der ligger
 oven i hinanden, knapperne på varmepladen, overkogningen og Kemichael, at alle
 otte opgavetyper kan løses og passer med modellen, runden og resultatet,
-regnskabet og aksen på fane 2, quizzens svarlængder og at der ikke er
+regnskabet og aksen på fane 2, fane 2's fire opgaver trin for trin (rækken,
+de låste titler, at intet kan klikkes under et spørgsmål, "?" på etiketten, at
+handlingerne går selv videre, de gemte fremskridt), kortets faste plads i 1100 × 760,
+1400 × 860 og 1920 × 1080, teori-arket med linket og at der ingen versaler er, quizzens svarlængder og at der ikke er
 tankestreger, 1+/1− eller fagord over C-niveau i teksten. Kør den efter ændringer:
 
 ```

@@ -39,23 +39,8 @@
         for (var i = 0; i < aabne.length; i++) aabne[i].classList.remove("vis");
     }
 
-    /* Teoriboksen bygges af D.TEORI, saa teksterne kun staar ét sted. */
-    function bygTeori() {
-        var vaert = NK.el("teori-liste");
-        NK.Data.TEORI.forEach(function (afsnit) {
-            var kort = document.createElement("div");
-            kort.className = "teorikort";
-            var h = document.createElement("h4");
-            h.textContent = afsnit.h;
-            kort.appendChild(h);
-            afsnit.p.forEach(function (tekst) {
-                var p = document.createElement("p");
-                p.innerHTML = tekst;
-                kort.appendChild(p);
-            });
-            vaert.appendChild(kort);
-        });
-    }
+    /* Teorien staar i index.html paa teori-arket (faelles/teori.css): kort,
+       roligt og med en henvisning til Kemibogen (REGELSAET 31, runde T6). */
 
     /* ----- Tegneloekken ------------------------------------------------- */
     function loekke(tidsstempel) {
@@ -94,14 +79,15 @@
         }
         if (e.key === "r" || e.key === "R") {
             var sim = sims[aktivFane];
-            if (sim && sim.nulstil) sim.nulstil();
+            /* Fane 2: Start forfra (opgaven med trinene igen) */
+            if (sim && sim.opgaver && sim.opgaver.tastR) sim.opgaver.tastR();
+            else if (sim && sim.nulstil) sim.nulstil();
         }
     }
 
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
         NK.Sprites.start();
-        bygTeori();
         NK.Quiz.kobl();
 
         sims["fane-oploes"] = new NK.SimOploes();
@@ -131,8 +117,11 @@
             if (Object.prototype.hasOwnProperty.call(sims, navn)) sims[navn].tilpas();
         }
 
-        /* Man kan linke direkte til en fane med fx  index.html#maetning  */
+        /* Man kan linke direkte til en fane med fx  index.html#maetning  .
+           De gamle adresser virker stadig; #maettet er fanens nye navn. */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+        var ALIAS = { maettet: "maetning", "maettet-oploesning": "maetning", oploesningen: "oploes" };
+        if (ALIAS[oenske]) oenske = ALIAS[oenske];
         visFane(sims["fane-" + oenske] ? "fane-" + oenske : faner[0]);
 
         window.requestAnimationFrame(function (ts) {

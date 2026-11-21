@@ -1,17 +1,24 @@
 /* =====================================================================
-   sim_maetning.js - fane 2: hvor meget kan der opløses?
+   sim_maetning.js - fane 2: Mættet opløsning
 
    Venstre side: et baegerglas med 100 mL vand paa en varmeplade, et
    termometer i glasset og en spatel ovenover. Man haelder salt i, ske
    for ske. Det, der kan vaere der, bliver opløst; resten bliver liggende
-   som bundfald.
+   som bundfald. En etiket paa glasset viser Haeldt i, Opløst og Bundfald
+   (REGELSAET 22). Temperaturen styres med − og + paa varmepladen
+   (REGELSAET 2).
 
-   Hoejre side: saltets oploeselighedskurve. Den blaa kurve er graensen,
-   den gule stiplede linje er det, man har haeldt i. Ligger den gule
-   linje over kurven, er forskellen bundfald.
+   Hoejre side: saltets oploeselighedskurve paa et lyst papir. Den blaa
+   kurve er graensen, den gule stiplede linje er det, man har haeldt i.
+   Ligger den gule linje over kurven, er forskellen bundfald. Aksen passer
+   til saltet (NaCl 0-60 g, KNO₃ 0-250 g).
 
-   Kurven kan bruges som betjening: klik eller traek i den for at skifte
-   temperatur.
+   Runde T6 (21. nov. 2026, Niels' ja til forslagene efter REGELSAET):
+   panelet er vaek, opgaverne staar i raekken oeverst i fast raekkefoelge
+   (js/maet_opgaver.js), og fanen har sit eget salt. Saltet er bestemt af
+   opgaven; hylden med de seks salte kommer frem, naar alle fire opgaver
+   er loest. Det, der ikke bruges i et trin, er skjult (REGELSAET 19a), og
+   det, kortet beder om, har en gul ramme og en boble (REGELSAET 19-20).
    ===================================================================== */
 (function () {
     "use strict";
@@ -25,29 +32,44 @@
     var MAX_PRIKKER = 34;        /* saa mange ionprikker svarer til 40 g opløst */
     var PRIK_GRAM = 40;
 
-    var FARVE_KURVE = "#3d9ee0";
-    var FARVE_TILSAT = "#f2c53d";
-    var FARVE_AKSE = "rgba(180, 192, 208, 0.34)";
-    var FARVE_GITTER = "rgba(150, 165, 185, 0.13)";
+    var LEX = "'Lexend', 'Segoe UI', sans-serif";
+    var PAPIR = "#fbfaf6", PAPIR_KANT = "#d9d4c6";
+    var BLAEK = "#1d2433", BLAEK_SVAG = "#4a5160";
+    var FARVE_KURVE = "#2a76ac";
+    var FARVE_TILSAT = "#b87d00";
+    var FARVE_GITTER = "#e7e3d8";
+    var FARVE_AKSE = "#8f897b";
 
-    /* Et rundt tal at slutte aksen ved: 1, 2, 2,5 eller 5 gange en
-       tierpotens, rundet op. */
+    /* Et paent tal at slutte aksen ved */
+    var STIGE = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
     function rundOp(v) {
         if (!(v > 0)) return 1;
         var tier = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
         var n = v / tier;
-        var valgt = n <= 1 ? 1 : (n <= 2 ? 2 : (n <= 2.5 ? 2.5 : (n <= 5 ? 5 : 10)));
-        return valgt * tier;
+        for (var i = 0; i < STIGE.length; i++) if (n <= STIGE[i] + 1e-9) return STIGE[i] * tier;
+        return 10 * tier;
     }
 
-    /* Den faelles akse daekker alle saltene, saa ingen kurve bliver klemt
-       flad mod kanten, og saltene kan sammenlignes direkte: 0-250 g. */
-    var FAELLES_MAKS = rundOp(Math.max.apply(null, D.SALTE.map(function (s) {
-        return D.stoersteOploeselighed(s);
-    })));
+    /* Aksen passer til saltet (forslaget til T6): NaCl 0-60 g og KNO₃ 0-250 g,
+       saa NaCl-kurven ikke ligger fladt i bunden. De andre efter kurven. */
+    var AKSE = { NaCl: 60, KNO3: 250 };
+    function saltAkse(salt) {
+        return AKSE[salt.id] || rundOp(D.stoersteOploeselighed(salt) * 1.15);
+    }
+
+    /* Gram paa etiketten og i grafen: 36 g, 4 g, 68,4 g, 0,0015 g */
+    function gramKort(v) {
+        if (!isFinite(v)) return "-";
+        if (Math.abs(v) < 1e-9) return "0 g";
+        if (Math.abs(v) < 0.1) return NK.gram(v) + " g";
+        var r = Math.round(v * 10) / 10;
+        return NK.tal(r, Math.abs(r - Math.round(r)) < 1e-9 ? 0 : 1) + " g";
+    }
+    NK.gramKort = gramKort;
 
     NK.SimMaetning = function () {
         this.L = new NK.Laerred(NK.el("maet-laerred"));
+        this.saltId = "NaCl";
         this.temp = 20;
         this.visTemp = 20;          /* termometerets soejle foelger blodt efter */
         this.tilsat = 0;
@@ -57,56 +79,92 @@
         this.prikUr = 0;
         this.svaev = null;          /* temperaturen under musen, naar den er over grafen */
         this.traekker = false;
-        this.sidsteBundfald = 0;
-        this.varsel = "";
-        this.varselUr = 0;
-        this.autoSkala = false;     /* faelles skala som udgangspunkt */
         this.haeld = null;          /* spatlens bevaegelse, mens der haeldes */
+        this.gentag = null;         /* − eller + holdes nede */
 
-        this.koblPanel();
+        this.koblKnapper();
         this.koblMus();
-        NK.Valg.paa(this.nulstil.bind(this));
         this.tilpas();
         this.tid = 0;               /* et ur, der altid gaar (bruges af laereren) */
         if (this.laererStart) this.laererStart();
-        this.opgaver = new NK.Opgaver("maet", OPGAVER, this, "Hvor meget kan der være?", "om mættede opløsninger");
-        this.opdaterPanel();
+        this.opgaver = new NK.MaetOpgaver(this, NK.SimMaetning.OPGAVER);
+        this.opdaterScene();
     };
 
     var P = NK.SimMaetning.prototype;
 
-    /* ----- Panelet -------------------------------------------------------- */
-    P.koblPanel = function () {
+    P.salt = function () { return D.salt(this.saltId); };
+
+    /* Et nyt salt giver et tomt glas */
+    P.saetSalt = function (id) {
+        if (id === this.saltId) return;
+        this.saltId = D.salt(id).id;
+        this.nulstil();
+        this.prikker = [];
+        this.bunke = 0;
+        this.opdaterHylde();
+    };
+
+    /* ----- Knapperne i scenen --------------------------------------------- */
+    P.koblKnapper = function () {
         var mig = this;
 
-        NK.Valg.byg(NK.el("maet-saltvalg"));
-
-        var skyder = NK.el("maet-temp");
-        skyder.addEventListener("input", function () {
-            mig.saetTemp(parseFloat(skyder.value));
+        NK.el("maet-lidt").addEventListener("click", function () {
+            if (!mig.opgaver.tillad("lidt")) return;
+            mig.haeldI(5);
+            mig.opgaver.klikket("lidt");
+        });
+        NK.el("maet-meget").addEventListener("click", function () {
+            if (!mig.opgaver.tillad("meget")) return;
+            mig.haeldI(25);
+            mig.opgaver.klikket("meget");
+        });
+        NK.el("maet-toem").addEventListener("click", function () {
+            if (!mig.opgaver.tillad("toem")) return;
+            mig.nulstil();
         });
 
-        NK.el("maet-lidt").addEventListener("click", function () { mig.haeldI(5); });
-        NK.el("maet-meget").addEventListener("click", function () { mig.haeldI(25); });
-        NK.el("maet-toem").addEventListener("click", function () { mig.nulstil(); });
-
-        NK.el("maet-skala-knap").addEventListener("click", function () {
-            mig.autoSkala = !mig.autoSkala;
+        /* − og + paa varmepladen: et klik er 1 °C. Holdes knappen nede,
+           gaar det hurtigt, og det stopper af sig selv, naar kortets maal
+           er naaet (eleven kan trykke igen). */
+        [["maet-koldere", -1, "minus"], ["maet-varmere", 1, "plus"]].forEach(function (k) {
+            var b = NK.el(k[0]);
+            b.addEventListener("pointerdown", function (e) {
+                if (!mig.opgaver.tillad(k[2])) return;
+                e.preventDefault();
+                mig.trinTemp(k[1]);
+                mig.opgaver.klikket(k[2]);
+                mig.gentag = { retning: k[1], knap: k[2], ur: 0.42 };
+            });
+            ["pointerup", "pointerleave", "pointercancel"].forEach(function (h) {
+                b.addEventListener(h, function () { mig.gentag = null; });
+            });
+            /* Tastaturet: Enter og mellemrum paa knappen */
+            b.addEventListener("keydown", function (e) {
+                if ((e.key === "Enter" || e.key === " ") && mig.opgaver.tillad(k[2])) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mig.trinTemp(k[1]);
+                    mig.opgaver.klikket(k[2]);
+                }
+            });
         });
+
+        this.bygHylde();
+    };
+
+    P.trinTemp = function (retning) {
+        this.saetTemp(Math.round(this.temp) + retning);
     };
 
     P.saetTemp = function (t) {
         this.temp = NK.klamp(t, 0, 100);
-        NK.el("maet-temp").value = String(Math.round(this.temp));
     };
 
     P.nulstil = function () {
         this.tilsat = 0;
         this.korn = [];
         this.haeld = null;
-        this.varsel = "";
-        this.varselUr = 0;
-        this.sidsteBundfald = 0;
     };
 
     /* Et dryp salt ned i glasset. Kornene og spatlen er kun til pynt -
@@ -126,59 +184,79 @@
         }
     };
 
+    /* Er spatlen og kornene faerdige? */
+    P.haelder = function () { return !!this.haeld || this.korn.length > 0; };
+
     /* Opgaverne stiller glasset op uden spatel og korn. */
     P.saetTilsat = function (gram) {
         this.tilsat = gram;
         this.korn = [];
         this.haeld = null;
-        this.sidsteBundfald = this.bundfald();
     };
 
     /* ----- Regnskabet ------------------------------------------------------ */
-    P.graense = function () { return D.oploeselighed(NK.Valg.salt(), this.temp); };
+    P.graense = function () { return D.oploeselighed(this.salt(), this.temp); };
     P.oploest = function () { return Math.min(this.tilsat, this.graense()); };
     P.bundfald = function () { return Math.max(0, this.tilsat - this.graense()); };
 
     /* ----- Maal ------------------------------------------------------------- */
+    /* Kortet staar under opgaveraekken og har en fast plads (REGELSAET 4) */
+    NK.kortTopMaet = function () {
+        return (window.innerHeight <= 720 ? 42 : 46) + NK.kortZone() + 10;
+    };
+
     P.tilpas = function () {
         if (!this.L.tilpas() && this.lagt) return;
         this.lagt = true;
 
         var L = this.L;
-        this.todelt = L.b >= 640;
+        var top = NK.kortTopMaet(), bundKant = L.h - 12, H = Math.max(120, bundKant - top);
+        var MB = S.MAAL.baegerglas, MP = S.MAAL.varmeplade, MG = S.MAAL.pulverglas;
 
-        /* Papirkortet har pladsen oeverst i scenen (NK.kortZone i js/opgave.js) */
-        var top = NK.kortTop() - 6, H = L.h - top;
-        var glasFelt, grafFelt;
-        if (this.todelt) {
-            glasFelt = { x: 0, y: top, b: L.b * 0.44, h: H };
-            grafFelt = { x: L.b * 0.44, y: top, b: L.b * 0.56, h: H };
-        } else {
-            glasFelt = { x: 0, y: top, b: L.b, h: H * 0.50 };
-            grafFelt = { x: 0, y: top + H * 0.50, b: L.b, h: H * 0.50 };
-        }
-        this.felt = glasFelt;
-
-        /* Stakken oppefra: knapraekke og spatel, baegerglas, varmeplade
-           og til sidst en linje tekst under bordet. */
-        var MB = S.MAAL.baegerglas, MP = S.MAAL.varmeplade, MT = S.MAAL.termometer;
-        var OVER = 108, UNDER = 30;
+        /* Stakken oppefra: knapraekke og spatel (OVER), baegerglas,
+           varmeplade og − og + under pladen (UNDER). */
+        var OVER = 84, UNDER = 50;
         var hoejdePrBredde = 231 / MB.b + 1.2 * MP.h / MP.b;
-        var bw = Math.min(glasFelt.b * 0.56, (glasFelt.h - OVER - UNDER) / hoejdePrBredde, 320);
+        var maxB = Math.min(L.b - 32, 1260);
+        this.todelt = maxB >= 700;
+
+        var etiketB = L.b >= 1500 ? 172 : 160;
+        var bw;
+        if (this.todelt) {
+            bw = Math.min(340, (H - OVER - UNDER) / hoejdePrBredde, (maxB - 380 - etiketB - 52) / 1.2);
+        } else {
+            bw = Math.min(240, (H * 0.55 - OVER - UNDER) / hoejdePrBredde, (maxB - etiketB - 12) / 1.2);
+        }
         bw = Math.max(bw, 80);
         var s = bw / MB.b;
-        var stak = OVER + bw * hoejdePrBredde + UNDER;
-        var y0 = glasFelt.y + Math.max(6, (glasFelt.h - stak) / 2);
+        var pladeB = bw * 1.2;
+        var pladeH = pladeB * MP.h / MP.b;
+        var stak = OVER + 231 * s + pladeH + UNDER;
+        var gruppeB = etiketB + 12 + pladeB;
 
+        var grafB, x0, y0;
+        if (this.todelt) {
+            grafB = Math.max(300, Math.min(720, maxB - gruppeB - 52));
+            var samlet = gruppeB + 52 + grafB;
+            x0 = (L.b - samlet) / 2;
+            /* Samlet under kortet: hoejst 40 px luft over forsoeget (REGELSAET 32) */
+            y0 = top + Math.min(40, Math.max(0, (H - stak) / 2));
+        } else {
+            x0 = (L.b - gruppeB) / 2;
+            y0 = top;
+            grafB = maxB;
+        }
+
+        this.etiketB = etiketB;
+        this.pladeB = pladeB;
+        this.pladeX = x0 + etiketB + 12;
         this.bgB = bw;
         this.bgS = s;
-        this.bgX = glasFelt.x + glasFelt.b * 0.57 - bw / 2;
+        this.bgX = this.pladeX + pladeB / 2 - bw / 2;
         this.bgY = y0 + OVER;
-
-        this.pladeB = bw * 1.2;
-        this.pladeX = this.bgX + bw / 2 - this.pladeB / 2;
         this.pladeY = this.bgY + 231 * s;
-        this.bordY = this.pladeY + this.pladeB * MP.h / MP.b;
+        this.bordY = this.pladeY + pladeH;
+        this.felt = { x: x0, y: y0, b: gruppeB, h: stak };
 
         /* Glassets inderside - her ligger vandet, bunken og ionerne */
         this.glasX = this.bgX + MB.indV * s;
@@ -189,15 +267,14 @@
         this.hjoerne = 7 * s;
 
         /* Termometeret staar i glasset ude til hoejre */
+        var MT = S.MAAL.termometer;
         this.termoH = (MB.bund - 6 + 14) * s;
         this.termoB = this.termoH * MT.b / MT.h;
         this.termoX = this.glasX + this.glasB - 24 * s - this.termoB;
         this.termoY = this.bgY - 14 * s;
 
-        /* Spatlen kommer fra venstre, fra pulverglasset, med bladet lidt
-           til venstre for glassets midte - vaek fra termometeret. Den
-           drejer om enden af skaftet (spatelPX, spatelPY), saa bladet
-           dykker ned i glasset, naar der haeldes. */
+        /* Spatlen kommer fra venstre med bladet lidt til venstre for
+           glassets midte - vaek fra termometeret. */
         var MS = S.MAAL.spatel;
         this.spatelB = bw * 0.62;
         var ss = this.spatelB / MS.b;
@@ -206,42 +283,84 @@
         this.spatelPX = this.spatelX - (MS.skaftX - MS.bladX) * ss;
         this.spatelPY = this.spatelY;
 
+        /* Etiketten sidder paa glassets venstre side, over vandet */
+        this.etiketX = this.bgX + 16 * s - etiketB;
+        this.etiketY = this.bgY + 26 * s;
+
         /* Pulverglasset staar paa bordet til venstre for varmepladen */
-        var MG = S.MAAL.pulverglas;
-        var plads = this.pladeX - glasFelt.x - 20;
-        this.krukkeB = Math.min(bw * 0.36, plads);
-        if (this.krukkeB < 40) this.krukkeB = 0;
+        this.krukkeB = Math.min(bw * 0.38, etiketB - 30);
         this.krukkeH = this.krukkeB * MG.h / MG.b;
-        this.krukkeX = this.pladeX - this.krukkeB - 10;
+        this.krukkeX = this.pladeX - this.krukkeB - 14;
         this.krukkeY = this.bordY - this.krukkeH;
 
-        this.graf = {
-            x: grafFelt.x + 58,
-            y: grafFelt.y + 50,
-            b: Math.max(60, grafFelt.b - 58 - 26),
-            h: Math.max(60, grafFelt.h - 50 - 48)
-        };
+        /* Grafens papir og selve plottet */
+        if (this.todelt) {
+            this.papir = { x: x0 + gruppeB + 52, y: y0 + 4, b: grafB, h: stak - 4 };
+        } else {
+            var gy = y0 + stak + 12;
+            this.papir = { x: (L.b - maxB) / 2, y: gy, b: maxB, h: Math.max(160, bundKant - gy) };
+        }
+        var pp = this.papir;
+        this.graf = { x: pp.x + 64, y: pp.y + 52, b: Math.max(60, pp.b - 64 - 26), h: Math.max(60, pp.h - 52 - 58) };
 
         this.positionerOverlays();
     };
 
-    /* Laereren stiller sig ved glasset. */
+    /* Laereren stiller sig foran kurven, hvor der ingen knapper er */
     P.laererPladsPx = function () {
-        return this.felt.x + this.felt.b * 0.32;
+        return this.todelt ? this.papir.x + this.papir.b * 0.3 : this.felt.x + this.felt.b * 0.32;
     };
 
-    /* Knapraekken over spatlen og skala-knappen over grafen er rigtige
-       HTML-knapper, der flyttes med, naar glasset eller grafen flytter sig. */
+    /* De rigtige HTML-knapper og etiketten flyttes med glasset */
     P.positionerOverlays = function () {
         var knapper = NK.el("maet-glasknapper");
-        if (knapper) {
-            knapper.style.left = (this.glasX + this.glasB / 2) + "px";
-            knapper.style.top = (this.spatelY - 36) + "px";
-        }
-        var skalaKnap = NK.el("maet-skala-knap");
-        if (skalaKnap) {
-            skalaKnap.style.left = (this.graf.x + this.graf.b) + "px";
-            skalaKnap.style.top = (this.graf.y - 34) + "px";
+        knapper.style.left = (this.glasX + this.glasB / 2) + "px";
+        knapper.style.top = (this.spatelY - 36) + "px";
+
+        var plade = NK.el("maet-plade");
+        plade.style.left = (this.pladeX + this.pladeB / 2) + "px";
+        plade.style.top = (this.bordY + 9) + "px";
+
+        var et = NK.el("maet-etiket");
+        et.style.left = this.etiketX + "px";
+        et.style.top = this.etiketY + "px";
+        et.style.width = this.etiketB + "px";
+
+        var hylde = NK.el("maet-hylde");
+        hylde.style.left = (this.etiketX - 4) + "px";
+        hylde.style.width = (this.etiketB - 6) + "px";
+        hylde.style.top = (this.etiketY + 132) + "px";
+        hylde.style.height = Math.max(60, this.bordY - this.etiketY - 132) + "px";
+    };
+
+    /* ----- Hylden med de seks salte (fri leg, naar opgaverne er loest) ----- */
+    P.bygHylde = function () {
+        var mig = this, vaert = NK.el("maet-hylde");
+        this.hyldeKnapper = [];
+        D.SALTE.forEach(function (salt) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "hg-glas";
+            b.title = salt.navn + ": " + salt.hverdag;
+            b.setAttribute("aria-label", salt.navn);
+            b.innerHTML = '<span class="hg-laag"></span><span class="hg-krop"><span class="hg-formel"></span></span>';
+            b.querySelector(".hg-formel").textContent = salt.formel;
+            b.addEventListener("click", function () {
+                if (!mig.opgaver.tillad("hylde")) return;
+                mig.saetSalt(salt.id);
+            });
+            vaert.appendChild(b);
+            mig.hyldeKnapper.push({ el: b, id: salt.id });
+        });
+        this.opdaterHylde();
+    };
+
+    P.opdaterHylde = function () {
+        if (!this.hyldeKnapper) return;
+        for (var i = 0; i < this.hyldeKnapper.length; i++) {
+            var valgt = this.hyldeKnapper[i].id === this.saltId;
+            this.hyldeKnapper[i].el.classList.toggle("valgt", valgt);
+            this.hyldeKnapper[i].el.setAttribute("aria-pressed", valgt ? "true" : "false");
         }
     };
 
@@ -254,7 +373,7 @@
             var r = c.getBoundingClientRect();
             var x = e.clientX - r.left;
             var g = mig.graf;
-            return NK.klamp(((x - g.x) / g.b) * 100, 0, 100);
+            return Math.round(NK.klamp(((x - g.x) / g.b) * 100, 0, 100));
         }
 
         function iGrafen(e) {
@@ -264,27 +383,36 @@
             return x >= g.x - 14 && x <= g.x + g.b + 14 && y >= g.y - 14 && y <= g.y + g.h + 14;
         }
 
+        /* Grafen kan kun traekkes i, naar kortet beder om en handling med
+           temperaturen, og i den fri leg (REGELSAET 19a) */
+        function kanTraekke() { return mig.opgaver.tillad("graf"); }
+
         c.addEventListener("pointerdown", function (e) {
             var rk = c.getBoundingClientRect();
             if (mig.laererKlik && mig.laererKlik(e.clientX - rk.left, e.clientY - rk.top)) return;
-            if (!iGrafen(e)) return;
+            if (!iGrafen(e) || !kanTraekke()) {
+                /* Scenen er laast, mens kortet spoerger: kortet blinker (REGELSAET 15) */
+                if (mig.opgaver.spoerger()) mig.opgaver.blink();
+                return;
+            }
             mig.traekker = true;
             if (c.setPointerCapture) {
                 try { c.setPointerCapture(e.pointerId); } catch (fejl) { /* syntetisk haendelse */ }
             }
             mig.saetTemp(temperaturVed(e));
             mig.svaev = mig.temp;
+            mig.opgaver.klikket("graf");
             e.preventDefault();
         });
 
         c.addEventListener("pointermove", function (e) {
-            if (mig.traekker) {
+            if (mig.traekker && kanTraekke()) {
                 mig.saetTemp(temperaturVed(e));
                 mig.svaev = mig.temp;
             } else {
-                mig.svaev = iGrafen(e) ? temperaturVed(e) : null;
+                mig.svaev = iGrafen(e) && kanTraekke() ? temperaturVed(e) : null;
             }
-            c.style.cursor = (mig.traekker || iGrafen(e)) ? "crosshair" : "default";
+            c.style.cursor = (mig.traekker || (iGrafen(e) && kanTraekke())) ? "crosshair" : "default";
         });
 
         function slip(e) {
@@ -334,6 +462,19 @@
         var bundfald = this.bundfald();
 
         this.visTemp = NK.mod(this.visTemp, this.temp, 6, dt);
+
+        /* − eller + holdes nede: én grad ad gangen, til kortets maal er naaet */
+        if (this.gentag) {
+            if (!this.opgaver.tillad(this.gentag.knap) || this.opgaver.maalNaaet()) {
+                this.gentag = null;
+            } else {
+                this.gentag.ur -= dt;
+                if (this.gentag.ur <= 0) {
+                    this.gentag.ur = 0.07;
+                    this.trinTemp(this.gentag.retning);
+                }
+            }
+        }
 
         if (this.haeld) {
             this.haeld.tid += dt;
@@ -386,23 +527,8 @@
         /* Bunken i bunden */
         this.bunke = NK.mod(this.bunke, this.bunkeHoejde(bundfald), 4, dt);
 
-        /* Faldt der noget ud, fordi vandet blev koldere? */
-        var kornPaaVej = this.korn.length > 0;
-        if (bundfald > this.sidsteBundfald + 0.02 && !kornPaaVej && !this.haeld) {
-            this.varsel = "Der falder salt ud igen, fordi koldere vand ikke kan rumme lige så meget.";
-            this.varselUr = 3.2;
-        } else if (bundfald < this.sidsteBundfald - 0.02 && bundfald <= 0.001 && this.tilsat > 0) {
-            this.varsel = "Nu er alt saltet opløst.";
-            this.varselUr = 2.6;
-        }
-        this.sidsteBundfald = bundfald;
-        if (this.varselUr > 0) {
-            this.varselUr -= dt;
-            if (this.varselUr <= 0) this.varsel = "";
-        }
-
-        this.opgaver.opdater();
-        this.opdaterPanel();
+        this.opgaver.opdater(dt);
+        this.opdaterScene();
     };
 
     P.nyPrik = function () {
@@ -423,61 +549,80 @@
         return maks * Math.sqrt(NK.klamp(gram / 80, 0, 1));
     };
 
-    /* ----- Panelteksten -------------------------------------------------------- */
-    P.opdaterPanel = function () {
-        var salt = NK.Valg.salt();
-        var tung = D.erTung(salt);
-        var graense = this.graense();
-        var oploest = this.oploest();
-        var bundfald = this.bundfald();
-        var maettet = this.tilsat > 0 && bundfald > 0.0000005;
+    /* ----- Etiketten, knapperne og boblen ------------------------------------- */
+    function vis(el, ja) {
+        if (!el) return;
+        if (el.hidden === !ja) return;
+        el.hidden = !ja;
+    }
 
+    P.opdaterScene = function () {
+        var op = this.opgaver;
+        if (!op) return;
+
+        /* Mens Kemichael er paa scenen (ros efter fanen), traeder etiketten
+           og knapperne et oejeblik tilbage, saa de ikke daekker ham */
+        var Lr = this.laerer, UDE = NK.Kemichael ? NK.Kemichael.UDE : -300;
+        var fremme = !!Lr && (!!Lr.scene || Lr.x > UDE + 40 || Lr.taleAlfa > 0.01);
+        var scene = this.L.canvas.parentNode;
+        if (scene.classList.contains("laerer-fremme") !== fremme) scene.classList.toggle("laerer-fremme", fremme);
+
+        /* Etiketten: et tal, kortet spoerger om, staar som "?" (REGELSAET 38) */
+        NK.saetTekst("maet-tilsat", op.skjulTal("tilsat") ? "?" : gramKort(this.tilsat));
+        NK.saetTekst("maet-oploest", op.skjulTal("oploest") ? "?" : gramKort(this.oploest()));
+        NK.saetTekst("maet-bundfald", op.skjulTal("bundfald") ? "?" : gramKort(this.bundfald()));
         NK.saetTekst("maet-temp-tal", Math.round(this.temp) + " °C");
-        NK.saetTekst("maet-navn", salt.navn);
-        NK.saetTekst("maet-hverdag", salt.hverdag);
-        NK.saetTekst("maet-type", tung ? "tungtopløseligt" : "letopløseligt");
-        NK.saetKlasse("maet-type", "maerke " + (tung ? "orange" : "groen"));
 
-        NK.saetTekst("maet-tilsat", NK.gram(this.tilsat) + " g");
-        NK.saetTekst("maet-oploest", NK.gram(oploest) + " g");
-        NK.saetTekst("maet-bundfald", NK.gram(bundfald) + " g");
-        NK.saetTekst("maet-graense", NK.gram(graense) + " g");
+        /* Kun det, kortet beder om, kan klikkes (REGELSAET 19a) */
+        vis(NK.el("maet-lidt"), op.tillad("lidt"));
+        vis(NK.el("maet-meget"), op.tillad("meget"));
+        vis(NK.el("maet-toem"), op.tillad("toem"));
+        var minus = NK.el("maet-koldere"), plus = NK.el("maet-varmere");
+        minus.classList.toggle("skjult", !op.tillad("minus"));
+        plus.classList.toggle("skjult", !op.tillad("plus"));
+        minus.tabIndex = op.tillad("minus") ? 0 : -1;
+        plus.tabIndex = op.tillad("plus") ? 0 : -1;
+        vis(NK.el("maet-hylde"), op.tillad("hylde"));
 
-        NK.saetTekst("maet-maerke", maettet ? "mættet" : (this.tilsat > 0 ? "umættet" : "tomt glas"));
-        NK.saetKlasse("maet-maerke", "maerke " + (maettet ? "orange" : "groen"));
-
-        NK.saetTekst("maet-skala-knap", this.autoSkala ? "Fælles skala" : "Skaler til stoffet");
-
-        var besked, klasse = "besked";
-        if (this.varsel) {
-            besked = this.varsel;
-            klasse = "besked gul";
-        } else if (this.tilsat === 0) {
-            besked = "Glasset indeholder 100 mL vand. Hæld salt i, og se, hvor meget der kan være.";
-        } else if (!maettet) {
-            besked = "Alt saltet er opløst, og vandet kan opløse " + NK.gram(graense - this.tilsat) + " g mere.";
-            klasse = "besked god";
+        /* Klik-opfordringen: gul ramme og en boble ved knappen (REGELSAET 19-20) */
+        var o = op.opfordring();
+        var KNAP = { lidt: "maet-lidt", meget: "maet-meget", plus: "maet-varmere", minus: "maet-koldere" };
+        var TEKST = { lidt: "Klik: +5 g", meget: "Klik: +25 g", plus: "Klik: +", minus: "Klik: −" };
+        ["maet-lidt", "maet-meget", "maet-varmere", "maet-koldere"].forEach(function (id) {
+            var e = NK.el(id);
+            e.classList.toggle("opfordring", !!o && KNAP[o] === id);
+        });
+        var boble = NK.el("maet-boble");
+        if (o && KNAP[o]) {
+            var knap = NK.el(KNAP[o]);
+            var sc = knap.closest(".scene").getBoundingClientRect();
+            var r = knap.getBoundingClientRect();
+            NK.saetTekst("maet-boble", TEKST[o]);
+            /* Ved varmepladen staar boblen ved siden af knappen, ellers over den */
+            var side = o === "plus" ? "hoejre" : (o === "minus" ? "venstre" : "over");
+            var bx = side === "hoejre" ? r.right - sc.left + 14 : (side === "venstre" ? r.left - sc.left - 14 : (r.left + r.right) / 2 - sc.left);
+            var by = side === "over" ? r.top - sc.top - 12 : (r.top + r.bottom) / 2 - sc.top;
+            boble.className = "maet-boble " + side;
+            boble.style.left = bx + "px";
+            boble.style.top = by + "px";
+            vis(boble, r.width > 0);
         } else {
-            besked = "Opløsningen er mættet. " + NK.gram(oploest) + " g er opløst, og " +
-                     NK.gram(bundfald) + " g ligger som bundfald.";
-            klasse = "besked gul";
+            vis(boble, false);
         }
-        NK.saetTekst("maet-besked", besked);
-        NK.saetKlasse("maet-besked", klasse);
     };
-
 
     /* ----- Tegning ---------------------------------------------------------------- */
     P.tegn = function () {
         var L = this.L, ctx = L.ctx;
         L.ryd("#10131a");
         this.tegnBord(ctx);
-        this.tegnGraf(ctx);
+        if (this.opgaver.visGraf()) this.tegnGraf(ctx);
+        else this.tegnGrafPlads(ctx);
         if (this.laererTegnOver) this.laererTegnOver(ctx);
     };
 
     P.tegnBord = function (ctx) {
-        var salt = NK.Valg.salt();
+        var salt = this.salt();
         var f = this.felt;
         var i;
 
@@ -486,8 +631,8 @@
         ctx.strokeStyle = "rgba(180, 192, 208, 0.16)";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(f.x + 14, this.bordY + 1);
-        ctx.lineTo(f.x + f.b - 14, this.bordY + 1);
+        ctx.moveTo(f.x - 6, this.bordY + 1);
+        ctx.lineTo(f.x + f.b + 6, this.bordY + 1);
         ctx.stroke();
         ctx.restore();
 
@@ -495,7 +640,7 @@
             varmeVinkel: -2.2 + 4.4 * NK.klamp((this.visTemp - 20) / 80, 0, 1)
         });
         this.tegnIndhold(ctx, salt);
-        this.tegnTermometer(ctx);
+        T.termometer(ctx, this.termoX, this.termoY, this.termoB, this.visTemp);
         S.tegn(ctx, "baegerglas", this.bgX, this.bgY, this.bgB);
 
         /* Kornene, der er paa vej ned */
@@ -513,12 +658,8 @@
         ctx.restore();
 
         this.tegnSpatel(ctx, salt);
-        this.tegnKrukke(ctx, salt);
-
-        NK.tekst(ctx, VAND_ML + " mL vand", this.glasX + this.glasB / 2, this.bordY + 20, {
-            justering: "center", farve: "rgba(200, 212, 226, 0.7)",
-            font: "600 12.5px 'Segoe UI', sans-serif"
-        });
+        /* I den fri leg staar hylden med de seks salte, hvor pulverglasset stod */
+        if (!this.opgaver.tillad("hylde")) this.tegnKrukke(ctx, salt);
     };
 
     /* Vandet, bundfaldet og ionerne - alt det, der ligger bag glasset. */
@@ -586,13 +727,6 @@
         ctx.restore();
     };
 
-    P.tegnTermometer = function (ctx) {
-        if (!T.termometer(ctx, this.termoX, this.termoY, this.termoB, this.visTemp)) return;
-        NK.tekst(ctx, Math.round(this.temp) + " °C", this.termoX + this.termoB / 2, this.termoY - 8, {
-            justering: "center", farve: "#f2c53d", font: "700 13px 'Segoe UI', sans-serif", kant: true
-        });
-    };
-
     P.tegnSpatel = function (ctx, salt) {
         var MS = S.MAAL.spatel;
         var ss = this.spatelB / MS.b;
@@ -640,13 +774,13 @@
 
         if (!S.tegn(ctx, "pulverglas", x, y, this.krukkeB)) return;
 
-        var stoerrelse = 17 * s;
+        var stoerrelse = 18 * s;
         ctx.save();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         do {
-            ctx.font = "700 " + stoerrelse.toFixed(1) + "px 'Segoe UI', sans-serif";
-            if (ctx.measureText(salt.formel).width <= 52 * s) break;
+            ctx.font = "600 " + stoerrelse.toFixed(1) + "px " + LEX;
+            if (ctx.measureText(salt.formel).width <= 54 * s) break;
             stoerrelse -= 0.5;
         } while (stoerrelse > 8);
         ctx.fillStyle = "#1f2733";
@@ -654,31 +788,64 @@
         ctx.restore();
     };
 
-    /* ----- Oploeselighedskurven ----------------------------------------------------- */
+    /* ----- Oploeselighedskurven paa et lyst papir ------------------------------------ */
     P.ymax = function () {
-        var salt = NK.Valg.salt();
-        if (this.autoSkala) return rundOp(D.stoersteOploeselighed(salt) * 1.1);
-        return Math.max(FAELLES_MAKS, rundOp(this.tilsat * 1.04));
+        var salt = this.salt();
+        return this.tilsat > 0 ? Math.max(saltAkse(salt), rundOp(this.tilsat * 1.04)) : saltAkse(salt);
+    };
+
+    P.tegnPapir = function (ctx) {
+        var pp = this.papir;
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        NK.rundtRekt(ctx, pp.x, pp.y, pp.b, pp.h, 10);
+        ctx.fillStyle = PAPIR;
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.strokeStyle = PAPIR_KANT;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Foer kurven bruges, staar den som en stiplet ramme med navnet (REGELSAET 13) */
+    P.tegnGrafPlads = function (ctx) {
+        var pp = this.papir;
+        ctx.save();
+        ctx.setLineDash([7, 6]);
+        ctx.strokeStyle = "rgba(180, 192, 208, 0.38)";
+        ctx.lineWidth = 1.5;
+        NK.rundtRekt(ctx, pp.x, pp.y, pp.b, pp.h, 10);
+        ctx.stroke();
+        ctx.restore();
+        NK.tekst(ctx, "Opløselighedskurven", pp.x + pp.b / 2, pp.y + pp.h / 2, {
+            justering: "center", linje: "middle", farve: "rgba(200, 210, 222, 0.6)",
+            font: "400 17px " + LEX
+        });
     };
 
     P.tegnGraf = function (ctx) {
-        var salt = NK.Valg.salt();
+        var salt = this.salt();
         var g = this.graf;
+        var op = this.opgaver;
         var i;
+
+        this.tegnPapir(ctx);
 
         var ymax = this.ymax();
         var tilX = function (t) { return g.x + (t / 100) * g.b; };
         var tilY = function (v) { return g.y + g.h - (v / ymax) * g.h; };
 
-        NK.tekst(ctx, "Opløselighed af " + salt.formel, g.x - 46, g.y - 32, {
-            farve: "#dde3ea", font: "600 13.5px 'Segoe UI', sans-serif"
-        });
-        NK.tekst(ctx, "gram pr. 100 mL vand", g.x - 46, g.y - 14, {
-            farve: "rgba(150, 158, 170, 0.95)", font: "500 12px 'Segoe UI', sans-serif"
+        /* Aksetitlerne: fede, sorte og med stort forbogstav. Y-titlen staar
+           vandret over aksen (Niels' regel for grafer). */
+        NK.tekst(ctx, "Opløselighed (g pr. 100 mL vand)", g.x - 44, g.y - 24, {
+            farve: BLAEK, font: "600 15px " + LEX
         });
 
         /* Gitter og y-akse */
-        var trin = paentTrin(ymax, 5);
+        var trin = paentTrin(ymax, 6);
         var dec = decimaler(trin);
         ctx.save();
         ctx.lineWidth = 1;
@@ -690,36 +857,41 @@
             ctx.moveTo(g.x, y);
             ctx.lineTo(g.x + g.b, y);
             ctx.stroke();
-            NK.tekst(ctx, NK.tal(v, dec), g.x - 8, y, {
+            NK.tekst(ctx, NK.tal(v, dec), g.x - 9, y, {
                 justering: "right", linje: "middle",
-                farve: "rgba(169, 176, 186, 0.85)", font: "500 12px 'Segoe UI', sans-serif"
+                farve: BLAEK_SVAG, font: "400 13.5px " + LEX
             });
+        }
+        for (i = 0; i <= 100; i += 20) {
+            ctx.strokeStyle = FARVE_GITTER;
+            ctx.beginPath();
+            ctx.moveTo(tilX(i), g.y);
+            ctx.lineTo(tilX(i), g.y + g.h);
+            ctx.stroke();
         }
         ctx.restore();
 
-        /* x-akse */
+        /* Akserne */
         ctx.save();
         ctx.strokeStyle = FARVE_AKSE;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.moveTo(g.x, g.y + g.h);
+        ctx.moveTo(g.x, g.y);
+        ctx.lineTo(g.x, g.y + g.h);
         ctx.lineTo(g.x + g.b, g.y + g.h);
         ctx.stroke();
         ctx.restore();
 
         for (i = 0; i <= 100; i += 20) {
-            NK.tekst(ctx, String(i), tilX(i), g.y + g.h + 16, {
-                justering: "center", farve: "rgba(169, 176, 186, 0.85)",
-                font: "500 12px 'Segoe UI', sans-serif"
+            NK.tekst(ctx, String(i), tilX(i), g.y + g.h + 19, {
+                justering: "center", farve: BLAEK_SVAG, font: "400 13.5px " + LEX
             });
         }
-        NK.tekst(ctx, "temperatur (°C)", g.x + g.b / 2, g.y + g.h + 35, {
-            justering: "center", farve: "rgba(150, 158, 170, 0.95)",
-            font: "500 12px 'Segoe UI', sans-serif"
+        NK.tekst(ctx, "Temperatur (°C)", g.x + g.b / 2, g.y + g.h + 43, {
+            justering: "center", farve: BLAEK, font: "600 15px " + LEX
         });
 
-        /* Selve kurven. Den klippes ved grafens kant i stedet for at blive
-           klemt fast langs kanten, saa en stigende kurve aldrig ser flad ud. */
+        /* Selve kurven. Den klippes ved grafens kant. */
         var punkter = [];
         for (i = 0; i <= 100; i += 1) {
             punkter.push([tilX(i), tilY(D.oploeselighed(salt, i))]);
@@ -735,11 +907,11 @@
         for (i = 0; i < punkter.length; i++) ctx.lineTo(punkter[i][0], punkter[i][1]);
         ctx.lineTo(punkter[punkter.length - 1][0], g.y + g.h);
         ctx.closePath();
-        ctx.fillStyle = "rgba(61, 158, 224, 0.14)";
+        ctx.fillStyle = "rgba(42, 118, 172, 0.09)";
         ctx.fill();
 
         ctx.strokeStyle = FARVE_KURVE;
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 2.8;
         ctx.lineJoin = "round";
         ctx.beginPath();
         for (i = 0; i < punkter.length; i++) {
@@ -749,49 +921,48 @@
         ctx.stroke();
         ctx.restore();
 
-        /* To ord, der siger, hvad de to omraader betyder */
-        NK.tekst(ctx, "her bliver der bundfald", g.x + 8, g.y + 15, {
-            farve: "rgba(240, 160, 74, 0.9)",
-            font: "600 12px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
-        });
-        NK.tekst(ctx, "her opløses det hele", g.x + g.b - 8, g.y + g.h - 9, {
-            justering: "right", farve: "rgba(126, 224, 168, 0.85)",
-            font: "600 12px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
+        /* Saltets formel ved kurvens ende, saa man kan se, hvilket salt det er */
+        var endeY = tilY(D.oploeselighed(salt, 100));
+        var formelY = endeY < g.y + 26 ? endeY + 22 : endeY - 12;
+        NK.tekst(ctx, salt.formel, g.x + g.b - 6, NK.klamp(formelY, g.y + 16, g.y + g.h - 8), {
+            justering: "right", farve: FARVE_KURVE, font: "600 16px " + LEX,
+            kant: true, kantFarve: PAPIR, kantBredde: 5
         });
 
-        /* Det, man har haeldt i. Ligger det over grafens kant (kun muligt,
-           naar der er zoomet ind paa stoffet), staar det skrevet i toppen. */
+        /* To ord, der siger, hvad de to omraader betyder (mindst 13,5 px) */
+        NK.tekst(ctx, "her bliver der bundfald", g.x + 10, g.y + 20, {
+            farve: "#a65a17", font: "500 14px " + LEX, kant: true, kantFarve: PAPIR, kantBredde: 5
+        });
+        NK.tekst(ctx, "her opløses det hele", g.x + g.b - 10, g.y + g.h - 12, {
+            justering: "right", farve: "#2e7a4c",
+            font: "500 14px " + LEX, kant: true, kantFarve: PAPIR, kantBredde: 5
+        });
+
+        /* Det, man har haeldt i */
         if (this.tilsat > 0) {
-            if (this.tilsat <= ymax) {
-                var ty = tilY(this.tilsat);
-                ctx.save();
-                ctx.strokeStyle = FARVE_TILSAT;
-                ctx.lineWidth = 2;
-                ctx.setLineDash([6, 5]);
-                ctx.beginPath();
-                ctx.moveTo(g.x, ty);
-                ctx.lineTo(g.x + g.b, ty);
-                ctx.stroke();
-                ctx.restore();
-                /* Mærket staar i den side, hvor aflaesningen ved kurven ikke er. */
-                var tilVenstre = tilX(this.temp) > g.x + g.b * 0.5;
-                NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g", tilVenstre ? g.x + 8 : g.x + g.b - 8, ty - 8, {
-                    justering: tilVenstre ? "left" : "right", farve: FARVE_TILSAT,
-                    font: "600 12px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
-                });
-            } else {
-                NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g, over grafens top ↑", g.x + g.b * 0.5, g.y - 2, {
-                    justering: "center", farve: FARVE_TILSAT,
-                    font: "600 12px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
-                });
-            }
+            var ty = tilY(this.tilsat);
+            ctx.save();
+            ctx.strokeStyle = FARVE_TILSAT;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath();
+            ctx.moveTo(g.x, ty);
+            ctx.lineTo(g.x + g.b, ty);
+            ctx.stroke();
+            ctx.restore();
+            /* Maerket staar i den side, hvor aflaesningen ved kurven ikke er. */
+            var tilVenstre = tilX(this.temp) > g.x + g.b * 0.5;
+            NK.tekst(ctx, "hældt i: " + gramKort(this.tilsat), tilVenstre ? g.x + 10 : g.x + g.b - 10, ty - 8, {
+                justering: tilVenstre ? "left" : "right", farve: FARVE_TILSAT,
+                font: "500 14px " + LEX, kant: true, kantFarve: PAPIR, kantBredde: 5
+            });
         }
 
         /* Den temperatur, der er valgt */
         var cx = tilX(this.temp);
         var cy = tilY(D.oploeselighed(salt, this.temp));
         ctx.save();
-        ctx.strokeStyle = "rgba(242, 197, 61, 0.45)";
+        ctx.strokeStyle = "rgba(184, 125, 0, 0.5)";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(cx, g.y);
@@ -799,23 +970,24 @@
         ctx.stroke();
 
         ctx.fillStyle = FARVE_KURVE;
-        ctx.strokeStyle = "#10131a";
+        ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+        ctx.arc(cx, Math.max(g.y, cy), 6, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
 
-        /* Aflaesningen: enten der, hvor musen er, ellers ved den valgte
-           temperatur. Ligger punktet helt oppe, skrives den under det. */
+        /* Aflaesningen staar ikke fremme, mens kortet spoerger (REGELSAET 38) */
+        if (!op.visAflaesning()) return;
+
         var svaever = this.svaev !== null && this.svaev !== undefined;
-        var vis = svaever ? this.svaev : this.temp;
-        var visV = D.oploeselighed(salt, vis);
-        var vx = tilX(vis), vy = tilY(visV);
+        var visT = svaever ? this.svaev : this.temp;
+        var visV = D.oploeselighed(salt, visT);
+        var vx = tilX(visT), vy = Math.max(g.y, tilY(visV));
         if (svaever) {
             ctx.save();
-            ctx.strokeStyle = "rgba(226, 234, 242, 0.4)";
+            ctx.strokeStyle = "rgba(29, 36, 51, 0.35)";
             ctx.lineWidth = 1;
             ctx.setLineDash([3, 4]);
             ctx.beginPath();
@@ -827,16 +999,14 @@
             ctx.restore();
         }
 
-        var aflaes = Math.round(vis) + " °C:  " + NK.gram(visV) + " g pr. 100 mL";
+        var aflaes = Math.round(visT) + " °C: " + gramKort(visV) + " pr. 100 mL";
         var hoejreSide = vx > g.x + g.b * 0.55;
-        /* Under punktet, hvis der ikke er plads over det, eller hvis den
-           gule linje ligger lige over punktet. */
-        var linjeY = this.tilsat > 0 && this.tilsat <= ymax ? tilY(this.tilsat) : null;
+        var linjeY = this.tilsat > 0 ? tilY(this.tilsat) : null;
         var linjeOver = linjeY !== null && linjeY <= vy + 4 && vy - linjeY < 30;
-        var labelY = vy < g.y + 40 || linjeOver ? vy + 22 : vy - 14;
-        NK.tekst(ctx, aflaes, hoejreSide ? vx - 10 : vx + 10, labelY, {
+        var labelY = vy < g.y + 40 || linjeOver ? vy + 24 : vy - 14;
+        NK.tekst(ctx, aflaes, hoejreSide ? vx - 12 : vx + 12, labelY, {
             justering: hoejreSide ? "right" : "left",
-            farve: "#ffffff", font: "600 12.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4.5
+            farve: BLAEK, font: "500 14px " + LEX, kant: true, kantFarve: PAPIR, kantBredde: 5
         });
     };
 
@@ -859,146 +1029,151 @@
         return 8;
     }
 
-    /* ----- Opgaverne ------------------------------------------------------------ */
-    function gramTekst(v) {
-        var r = Math.round(v * 10) / 10;
-        return NK.tal(r, Math.abs(r - Math.round(r)) < 1e-9 ? 0 : 1) + " g";
-    }
+    NK.SimMaetning.saltAkse = saltAkse;
 
-    /* Fire talsvar, sorteret stigende. Forkerte tal, der ligger for taet
-       paa et andet, springes over. */
-    function talValg(rigtig, forkerte) {
-        var vaerdier = [rigtig];
-        forkerte.forEach(function (v) {
-            if (!(v >= 0) || vaerdier.length >= 4) return;
-            var fri = vaerdier.every(function (w) {
-                return Math.abs(w - v) > Math.max(1.5, 0.08 * Math.max(w, v));
-            });
-            if (fri) vaerdier.push(v);
-        });
-        vaerdier.sort(function (a, b) { return a - b; });
-        return { valg: vaerdier.map(gramTekst), rigtig: vaerdier.indexOf(rigtig) };
-    }
+    /* =====================================================================
+       Opgaverne (runde T6, 21. nov. 2026). Fast raekkefoelge, ét salt-
+       skift: opgave 1 med NaCl, opgave 2-4 med KNO₃ (REGELSAET 51).
+       Hver opgave er en raekke trin (js/maet_opgaver.js):
+         valg      et spoergsmaal med tre svar i kortet. De forkerte er
+                   fejl, elever laver, og har hver sin forklaring (nej).
+         handling  kortet beder eleven om at goere noget med knapperne i
+                   scenen (knapper: det, der kan bruges; det foerste faar
+                   gul ramme og boble). Kortet gaar selv videre ca. 1 s
+                   efter, at maal(sim) er naaet (REGELSAET 33, 39);
+                   Indsend svar er reserve og bruger tjek(sim).
+       tekst er en kort indledning i almindelig skrift, spm er det
+       halvfede spoergsmaal eller den halvfede handling. skjul: tal paa
+       etiketten, der staar som "?", mens trinnet spoerger. efter(sim):
+       det, der vises i scenen, naar trinnet er loest. grafFra: kurven
+       staar som en stiplet ramme indtil dette trin (REGELSAET 13).
+       ===================================================================== */
+    var KNO3_GRAENSE = Math.ceil(D.temperaturFor(D.salt("KNO3"), 80));   /* 48 °C */
 
-    function opgAflaes() {
-        var salt = D.salt(NK.tilfaeldig(["KNO3", "CuSO4", "CaCl2", "NaCl"]));
-        var t = NK.tilfaeldig([20, 40, 60, 80]);
-        var s = Math.round(D.oploeselighed(salt, t));
-        var vt = talValg(s, [
-            Math.round(D.oploeselighed(salt, t + 20)),
-            t,
-            Math.round(D.oploeselighed(salt, t - 20)),
-            Math.round(s / 2),
-            Math.round(s * 1.5)
-        ]);
-        return {
-            tekst: "Hvor meget " + salt.formel + " kan der højst opløses i 100 mL vand ved " + t + " °C?",
-            valg: vt.valg, rigtig: vt.rigtig,
-            hint: "Find " + t + " °C på den vandrette akse, gå lodret op til kurven, og aflæs på den lodrette akse.",
-            svar: "Ved " + t + " °C kan der opløses ca. " + gramTekst(s) + " " + salt.formel + ".",
-            start: function (sim) {
-                NK.Valg.saet(salt.id);
-                sim.nulstil();
-                sim.autoSkala = false;
-                sim.saetTemp(t === 20 ? 60 : 20);
-            },
-            visSvar: function (sim) { sim.saetTemp(t); }
-        };
-    }
+    NK.SimMaetning.OPGAVER = [
+        { id: "bundfald", navn: "Bundfald i glasset", grafFra: 2,
+          opsaet: function (sim) { sim.saetSalt("NaCl"); sim.nulstil(); sim.saetTemp(20); },
+          trin: [
+              { type: "handling", knapper: ["lidt"],
+                /* +5 g forsvinder, saa snart der ligger bundfald: glasset har 40 g */
+                laas: function (sim) { return sim.bundfald() > 0; },
+                spm: "Klik på +5 g, til der ligger salt på bunden af glasset.",
+                maal: function (sim) { return sim.bundfald() > 0.0001 && !sim.haelder(); },
+                tjek: function () { return "Der ligger ikke salt på bunden endnu. Klik på +5 g igen."; },
+                hint: ["Knappen +5 g står over skeen ved glasset.",
+                    "Hvert klik hælder 5 g NaCl i vandet. Etiketten på glasset viser, hvor meget der er hældt i.",
+                    "Bliv ved med at klikke. Ved 40 g ligger der salt på bunden."],
+                visSvar: function (sim) { sim.saetTilsat(40); } },
+              { type: "valg",
+                spm: "Hvor mange gram NaCl kan 100 mL vand højst opløse ved 20 °C?",
+                svar: [
+                    { t: "40 g", nej: "40 g er det, der er hældt i. De 4 g på bunden er ikke opløst." },
+                    { t: "36 g", ok: true },
+                    { t: "4 g", nej: "4 g er bundfaldet. Det er den del af saltet, vandet ikke kan opløse." }
+                ],
+                hint: ["Se på etiketten på glasset.",
+                    "Saltet på bunden er ikke opløst. Hvor meget er opløst?",
+                    "Der er opløst 36 g NaCl, og mere kan vandet ikke opløse ved 20 °C."],
+                slut: "Ved 20 °C kan 100 mL vand højst opløse 36 g NaCl. Opløsningen er mættet, og resten bliver liggende som bundfald." },
+              { type: "valg", skjul: ["oploest", "bundfald"],
+                opsaet: function (sim) { sim.saetTilsat(50); },
+                tekst: "Kurven viser, hvor meget NaCl 100 mL vand højst kan opløse ved hver temperatur.",
+                spm: "Hvor mange gram bundfald giver 50 g NaCl i 100 mL vand ved 20 °C?",
+                svar: [
+                    { t: "14 g", ok: true },
+                    { t: "50 g", nej: "50 g er det, der er hældt i. Vandet opløser 36 g af det." },
+                    { t: "36 g", nej: "36 g er det, vandet kan opløse. Bundfaldet er resten af de 50 g." }
+                ],
+                hint: ["Aflæs kurven ved 20 °C.",
+                    "Kurven viser 36 g ved 20 °C. Resten af de 50 g bliver liggende.",
+                    "50 g − 36 g = 14 g."],
+                slut: "Vandet kan opløse 36 g NaCl, så 50 g − 36 g = 14 g bliver liggende som bundfald." }
+          ] },
 
-    function opgBundfald() {
-        var salt = D.salt(NK.tilfaeldig(["NaCl", "KNO3", "CuSO4"]));
-        var t = NK.tilfaeldig([20, 40]);
-        var s = D.oploeselighed(salt, t);
-        var gram = Math.ceil((s + 6) / 5) * 5 + 5 * Math.floor(Math.random() * 3);
-        var rest = Math.round((gram - s) * 10) / 10;
-        var vt = talValg(rest, [s, gram, 0]);
-        return {
-            tekst: "Glasset indeholder 100 mL vand. Hvor mange gram bundfald giver " + gram + " g " + salt.formel + " i 100 mL vand ved " + t +
-                   " °C?",
-            valg: vt.valg, rigtig: vt.rigtig,
-            hint: "Aflæs, hvor meget vandet kan rumme ved " + t + " °C. Resten af saltet bliver liggende.",
-            svar: "Vandet kan rumme " + gramTekst(s) + ", så " + gram + " g − " + gramTekst(s) +
-                  " = " + gramTekst(rest) + " bliver liggende.",
-            start: function (sim) {
-                NK.Valg.saet(salt.id);
-                sim.nulstil();
-                sim.saetTemp(t);
-            },
-            visSvar: function (sim) {
-                sim.nulstil();
-                sim.saetTemp(t);
-                sim.haeldI(gram);
-            }
-        };
-    }
+        { id: "aflaes", navn: "Aflæs kurven",
+          opsaet: function (sim) { sim.saetSalt("KNO3"); sim.nulstil(); sim.saetTemp(20); },
+          trin: [
+              /* Den rolige overgang til det nye salt (REGELSAET 42) */
+              { type: "valg",
+                tekst: "Glasset har nu kaliumnitrat, KNO₃, i stedet for NaCl.",
+                spm: "Hvad sker der med opløseligheden af KNO₃, når vandet bliver varmere?",
+                svar: [
+                    { t: "Den er næsten den samme", nej: "Det gælder NaCl. Kurven for KNO₃ stiger stejlt." },
+                    { t: "Den falder", nej: "Kurven for KNO₃ går opad mod højre. Jo varmere vand, jo mere KNO₃ kan opløses." },
+                    { t: "Den stiger meget", ok: true }
+                ],
+                hint: ["Se på kurven for KNO₃.",
+                    "Kurven går fra koldt vand til venstre til varmt vand til højre.",
+                    "Kurven stiger meget, så opløseligheden stiger meget."],
+                slut: "Kurven for KNO₃ stiger stejlt. I varmt vand kan der opløses meget mere KNO₃ end i koldt vand." },
+              { type: "valg",
+                spm: "Hvor mange gram KNO₃ kan 100 mL vand højst opløse ved 40 °C?",
+                svar: [
+                    { t: "40 g", nej: "40 er temperaturen. Gå lodret op fra 40 °C til kurven, og aflæs på den lodrette akse." },
+                    { t: "64 g", ok: true },
+                    { t: "110 g", nej: "110 g er opløseligheden ved 60 °C. Find 40 °C på den vandrette akse." }
+                ],
+                hint: ["Find 40 °C på den vandrette akse.",
+                    "Gå lodret op til kurven og derfra vandret over til den lodrette akse.",
+                    "Kurven går gennem ca. 64 g ved 40 °C."],
+                efter: function (sim) { sim.saetTemp(40); },
+                slut: "Ved 40 °C kan 100 mL vand opløse ca. 64 g KNO₃. Punktet på kurven viser det." }
+          ] },
 
-    function opgFindTemperatur() {
-        var m = NK.tilfaeldig([
-            { id: "KNO3",  gram: [40, 50, 60, 80, 100, 120] },
-            { id: "CuSO4", gram: [40, 50, 60, 70, 80] },
-            { id: "CaCl2", gram: [90, 100, 120, 130] }
-        ]);
-        var salt = D.salt(m.id);
-        var gram = NK.tilfaeldig(m.gram);
-        var graense = Math.ceil(D.temperaturFor(salt, gram));
-        var startTemp = Math.max(0, graense - 25);
-        return {
-            tekst: "Der er hældt " + gram + " g " + salt.formel +
-                   " i 100 mL vand. Find den laveste temperatur, hvor alt saltet er opløst.",
-            hint: "Find " + gram + " g på den lodrette akse, og gå vandret hen til kurven.",
-            svar: "Ved ca. " + graense + " °C kan vandet netop rumme " + gram + " g " + salt.formel +
-                  ". Er vandet koldere, bliver noget af saltet liggende.",
-            start: function (sim) {
-                NK.Valg.saet(salt.id);
-                sim.nulstil();
-                sim.autoSkala = false;
-                sim.saetTemp(startTemp);
-                sim.saetTilsat(gram);
-            },
-            /* Temperaturen sendes ind med Indsend svar; skyderen loeser ikke opgaven */
-            tjek: function (sim) {
-                if (NK.Valg.saltId !== salt.id || Math.abs(sim.tilsat - gram) > 0.001) return false;
-                var t = Math.round(sim.temp);
-                if (sim.bundfald() > 0) return "Ved " + t + " °C ligger der stadig bundfald i glasset. Prøv en højere temperatur.";
-                if (sim.temp <= graense + 2) return true;
-                return "Ved " + t + " °C er alt opløst, men alt saltet kan opløses ved en lavere temperatur.";
-            },
-            indsendTekst: function (sim) { return "Indsend svar: " + Math.round(sim.temp) + " °C"; },
-            visSvar: function (sim) { sim.saetTemp(graense); }
-        };
-    }
+        { id: "varm", navn: "Varm, til alt er opløst",
+          opsaet: function (sim) { sim.saetSalt("KNO3"); sim.nulstil(); sim.saetTemp(20); sim.saetTilsat(80); },
+          trin: [
+              { type: "valg",
+                spm: "Hvad sker der med bundfaldet af KNO₃, når vandet i glasset varmes op?",
+                svar: [
+                    { t: "Det bliver opløst", ok: true },
+                    { t: "Der kommer mere bundfald", nej: "Varmt vand kan opløse mere KNO₃ end koldt vand. Se på kurven." },
+                    { t: "Bundfaldet er det samme", nej: "Det gælder næsten for NaCl. Kurven for KNO₃ stiger stejlt." }
+                ],
+                hint: ["Se på kurven for KNO₃.",
+                    "Kurven stiger, når temperaturen stiger.",
+                    "Varmt vand kan opløse mere KNO₃, så bundfaldet bliver opløst."],
+                slut: "Varmt vand kan opløse mere KNO₃, så bundfaldet bliver opløst, når vandet varmes op." },
+              { type: "handling", knapper: ["plus", "minus", "graf"],
+                spm: "Klik på + på varmepladen, til alt KNO₃ i glasset er opløst.",
+                maal: function (sim) { return sim.bundfald() <= 0 && sim.temp <= KNO3_GRAENSE + 2; },
+                tjek: function (sim) {
+                    var t = Math.round(sim.temp);
+                    if (sim.bundfald() > 0) return "Ved " + t + " °C ligger der stadig bundfald i glasset. Klik på + igen.";
+                    return "Ved " + t + " °C er alt opløst, men alt KNO₃ kan opløses ved en lavere temperatur. Klik på −.";
+                },
+                hint: ["Knappen + står under varmepladen. Du kan også holde den nede.",
+                    "Se på bundfaldet i glasset og på etiketten.",
+                    "Ved " + KNO3_GRAENSE + " °C er alle 80 g KNO₃ opløst."],
+                visSvar: function (sim) { sim.saetTemp(KNO3_GRAENSE); },
+                slut: "Ved ca. " + KNO3_GRAENSE + " °C kan 100 mL vand netop opløse 80 g KNO₃. Kurven går gennem 80 g ved den temperatur." }
+          ] },
 
-    function opgAfkoeling() {
-        var m = NK.tilfaeldig([
-            { id: "KNO3",  varm: 60, gram: 100 },
-            { id: "KNO3",  varm: 80, gram: 150 },
-            { id: "CuSO4", varm: 60, gram: 60 },
-            { id: "CuSO4", varm: 80, gram: 80 },
-            { id: "CaCl2", varm: 60, gram: 130 }
-        ]);
-        var salt = D.salt(m.id);
-        var kold = 20;
-        var s = D.oploeselighed(salt, kold);
-        var ud = Math.round((m.gram - s) * 10) / 10;
-        var vt = talValg(ud, [s, m.gram, 0]);
-        return {
-            tekst: m.gram + " g " + salt.formel + " er opløst i 100 mL vand ved " + m.varm +
-                   " °C. Hvor mange gram af de " + m.gram + " g " + salt.formel + " falder ud som bundfald, når opløsningen køles til " + kold + " °C?",
-            valg: vt.valg, rigtig: vt.rigtig,
-            hint: "Aflæs, hvor meget vandet kan rumme ved " + kold + " °C.",
-            svar: "Ved " + kold + " °C kan vandet kun rumme " + gramTekst(s) + ". Resten, " + m.gram +
-                  " g − " + gramTekst(s) + " = " + gramTekst(ud) + ", falder ud.",
-            start: function (sim) {
-                NK.Valg.saet(salt.id);
-                sim.nulstil();
-                sim.autoSkala = false;
-                sim.saetTemp(m.varm);
-                sim.saetTilsat(m.gram);
-            },
-            visSvar: function (sim) { sim.saetTemp(kold); }
-        };
-    }
-
-    var OPGAVER = [opgAflaes, opgBundfald, opgFindTemperatur, opgAfkoeling];
+        { id: "afkoel", navn: "Afkøling giver bundfald",
+          opsaet: function (sim) { sim.saetSalt("KNO3"); sim.nulstil(); sim.saetTemp(60); sim.saetTilsat(100); },
+          trin: [
+              { type: "valg",
+                spm: "Hvor mange gram af de 100 g KNO₃ falder ud som bundfald, når opløsningen køles til 20 °C?",
+                svar: [
+                    { t: "31,6 g", nej: "31,6 g er det, der kan være opløst ved 20 °C. Bundfaldet er resten af de 100 g." },
+                    { t: "68,4 g", ok: true },
+                    { t: "100 g", nej: "Noget KNO₃ kan stadig være opløst ved 20 °C. Aflæs kurven ved 20 °C." }
+                ],
+                hint: ["Aflæs kurven ved 20 °C.",
+                    "Ved 20 °C kan 100 mL vand kun opløse 31,6 g KNO₃.",
+                    "100 g − 31,6 g = 68,4 g."],
+                slut: "Ved 20 °C kan vandet kun opløse 31,6 g KNO₃. Resten, 100 g − 31,6 g = 68,4 g, falder ud." },
+              { type: "handling", knapper: ["minus", "plus", "graf"],
+                spm: "Klik på − på varmepladen, til vandet er 20 °C.",
+                maal: function (sim) { return Math.abs(sim.temp - 20) < 0.5; },
+                tjek: function (sim) {
+                    return "Vandet er " + Math.round(sim.temp) + " °C. Klik på " + (sim.temp > 20 ? "−" : "+") + ", til der står 20 °C.";
+                },
+                hint: ["Knappen − står under varmepladen. Du kan også holde den nede.",
+                    "Temperaturen står mellem − og +.",
+                    "Bliv ved, til der står 20 °C."],
+                visSvar: function (sim) { sim.saetTemp(20); },
+                slut: "Ved 20 °C ligger 68,4 g KNO₃ som bundfald. Koldt vand kan opløse mindre KNO₃ end varmt vand." }
+          ] }
+    ];
 }());

@@ -4,7 +4,17 @@
    Oeverst staar reaktionsskemaet paa en tavle. Tallet foran hvert stof
    aendres med + og −. Under tavlen staar to bakker: molekylerne foer
    pilen som kugler, og efter pilen de pladser, produkterne har brug for,
-   som stiplede ringe. Regnskabet i panelet taeller atomerne paa hver side.
+   som stiplede ringe. Under bakkerne taelles atomerne paa hver side.
+
+   Runde 2 (21. nov. 2026, Niels' ja til forslagene efter REGELSAET):
+   panelet er vaek, og reaktionerne staar i opgaveraekken oeverst. Taellingen
+   staar under bakkerne, og ✓ og ✗ kommer foerst, naar molekylerne har
+   reageret (REGELSAET 38). Scenen er samlet med en stoerste bredde og
+   stoerre molekyler (REGELSAET 32). Den foerste reaktion er trinvis
+   (D.TRIN_KUGLER, REGELSAET 11-12): + og − er vaek, mens kortet spoerger,
+   og kun den knap, eleven skal bruge, er fremme med gul ramme og boble
+   (REGELSAET 19a og 20). Atomerne beholder hver sin farve: her er det
+   netop atomerne, eleven skal foelge (REGELSAET 45 gaelder ikke).
 
    Lad dem reagere: molekylerne rystes i stykker, og hvert atom flyver hen
    til en ledig plads af sin slags efter pilen. Det, der er regnet, er det,
@@ -26,27 +36,39 @@
 
     var RYST = 0.45, SPREDNING = 0.5, FLYV = 1.1;
     var VARIGHED = RYST + SPREDNING + FLYV;
-    var KMAKS = 1.6;
+    var TAEL_H = 34;           /* hoejden paa taellingen under bakkerne */
+    /* Runde 3: har eleven sprunget gennemgangen over, huskes det i browseren */
+    var NOEGLE_SET = "nk-sc1.4-kg-gennemgang";
 
     function SimKugler() {
         var mig = this;
         this.skema = NK.el("kg-skema");
-        this.regnskabEl = NK.el("kg-regnskab");
+        this.taelV = NK.el("kg-taelV");
+        this.taelH = NK.el("kg-taelH");
         this.lysE = null;
         this.startFane(D.KUGLER, D.GRUPPER);
         this.skema.addEventListener("click", function (e) { mig.klikSkema(e); });
-        this.regnskabEl.addEventListener("pointerover", function (e) {
-            var r = e.target.closest ? e.target.closest("[data-e]") : null;
-            mig.lysE = r ? r.getAttribute("data-e") : null;
-            mig.lysERegnskab = !!r;
+        /* Musen over et atom i taellingen faar atomerne af den slags til at lyse */
+        [this.taelV, this.taelH].forEach(function (t) {
+            t.addEventListener("pointerover", function (e) {
+                var r = e.target.closest ? e.target.closest("[data-e]") : null;
+                mig.lysE = r ? r.getAttribute("data-e") : null;
+                mig.lysERegnskab = !!r;
+            });
+            t.addEventListener("pointerleave", function () { mig.lysE = null; mig.lysERegnskab = false; });
         });
-        this.regnskabEl.addEventListener("pointerleave", function () { mig.lysE = null; mig.lysERegnskab = false; });
+        /* Svarene paa kortet i det trinvise spoergsmaal og Spring gennemgangen over */
+        this.el.skort.addEventListener("click", function (e) {
+            if (e.target && e.target.closest && e.target.closest("[data-spring]")) { mig.springGennemgang(); return; }
+            var k = e.target && e.target.closest ? e.target.closest("[data-valg]") : null;
+            if (k && !k.disabled) mig.vaelgSvar(parseInt(k.getAttribute("data-valg"), 10));
+        });
         this.introNu = true;
         this.vaelg(0);
     }
 
     var P = SimKugler.prototype;
-    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Skemaet", zone: [156, 124], laasTitler: true });
+    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Afstem uden kugler", zone: [156, 134], laasTitler: true, raekke: true });
 
     P.chipTekst = function (o) { return NK.html(o.navn); };
 
@@ -64,8 +86,113 @@
         };
         this.reagerer = false;
         this.auto = false;
+        this.vent = null;
+        /* Den foerste reaktion er en trinvis gennemgang, til den er loest eller
+           sprunget over (runde 3). Start forfra giver gennemgangen igen. */
+        this.trin = null;
+        if (i === 0 && D.TRIN_KUGLER && (this.medTrin || (!this.status[0].loest && !NK.hent(NOEGLE_SET, 0)))) this.trin = nytTrin(0);
         this.bygSkema();
         this.visRegnskab();
+    };
+
+    function nytTrin(nr) { return { nr: nr, valgt: null, forkert: {}, rigtig: null, vist: false, klikket: false }; }
+
+    /* ----- Trinene i den foerste reaktion (D.TRIN_KUGLER) ------------------------------- */
+    P.trinNu = function () { return this.trin ? D.TRIN_KUGLER[this.trin.nr] || null : null; };
+
+    /* Trinene gaelder, til reaktionen er afstemt */
+    P.iTrin = function () { return !!this.trinNu() && !this.opg.loest; };
+
+    var kortHTMLGrund = P.kortHTML;
+    P.kortHTML = function () {
+        var t = this.trinNu(), mig = this;
+        if (!t) return kortHTMLGrund.call(this);
+        var tekst = t.tekst ? NK.html(t.tekst) + " " : "";
+        /* Runde 3 (Niels: "så er det jo ligefør at den skal markeres som en
+           præsentation, som man kan skippe?"): etiketten siger Gennemgang, og en
+           stille knap i kortets oeverste hjoerne springer den over. Den staar
+           aldrig, hvor Indsend svar og Naeste staar. */
+        var spring = this.iTrin();
+        var html = '<p class="sk-tekst' + (spring ? " med-spring" : "") + '">' +
+            (spring ? '<button type="button" class="sk-spring" data-spring="1">Spring gennemgangen over</button>' : "") +
+            '<span class="sk-chip">Gennemgang · Trin ' + (this.trin.nr + 1) + " af " + D.TRIN_KUGLER.length + "</span>" +
+            tekst + '<span class="sk-spm' + (t.tekst ? " sk-linje" : "") + '">' + NK.html(t.spm) + "</span></p>";
+        if (t.type === "valg") {
+            var tr = this.trin, laast = !!this.trinSlut;
+            html += '<div class="sk-svar n' + t.svar.length + '">' + t.svar.map(function (sv, j) {
+                var kl = "sk-knap" + (tr.rigtig === j ? (tr.vist ? " svar-vist" : " rigtig") : "") +
+                    (tr.forkert[j] ? " forkert" : "") + (tr.valgt === j && tr.rigtig !== j ? " valgt" : "");
+                return '<button type="button" class="' + kl + '" data-valg="' + j + '"' +
+                    (laast || tr.forkert[j] ? " disabled" : "") + ">" + NK.html(sv.t) + "</button>";
+            }).join("") + "</div>";
+        }
+        var b = this.blivNu();
+        if (b) html += NK.Papir.bliv(b.html, b.maerke || (b.vist ? "Svaret" : "Afstemt"), NK.html(b.knap || mig.videreTekst()), b.vist);
+        return html;
+    };
+
+    /* Spring gennemgangen over: koekkensalt bliver en almindelig reaktion med
+       alt fremme, + og − synlige og ikke loest, saa eleven selv afstemmer den.
+       Det huskes i browseren, saa gennemgangen ikke kommer igen ved
+       genindlaesning. Start forfra giver den igen. */
+    P.springGennemgang = function () {
+        if (!this.trin || this.opg.loest) return;
+        NK.gem(NOEGLE_SET, 1);
+        this.vaelg(0);
+    };
+
+    P.vaelgSvar = function (j) {
+        var t = this.trinNu();
+        if (!t || t.type !== "valg" || this.trinSlut || this.trin.forkert[j]) return;
+        this.trin.valgt = j;
+        this.visKort();
+        this.visIndsend();
+    };
+
+    P.tjekValg = function () {
+        var t = this.trinNu(), j = this.trin.valgt, sv = t.svar[j];
+        if (!sv) return;
+        if (sv.ok) {
+            this.trin.rigtig = j;
+            this.trinLoest(NK.html(t.slut), false);
+            return;
+        }
+        this.trin.forkert[j] = true;
+        this.trin.valgt = null;
+        this.visKort();
+        this.fejlLinje(sv.nej);
+    };
+
+    /* Et trin er loest: forklaringen og Naeste trin staar paa kortet */
+    P.trinLoest = function (html, vist) {
+        this.trinSlut = { html: html, vist: !!vist, maerke: vist ? "Svaret" : "Rigtigt", knap: "Næste trin →" };
+        this.hjaelp = 0;
+        this.hintE = null;
+        this.pegKnap = false;
+        this.fast = { html: "", klasse: "" };
+        this.kortT = 0;
+        this.visBesked(this.fast);
+        this.visKort();
+    };
+
+    P.naesteTrin = function () {
+        if (!this.trin || this.opg.loest) return;
+        if (this.trin.nr + 1 >= D.TRIN_KUGLER.length) return;
+        this.trin = nytTrin(this.trin.nr + 1);
+        this.trinSlut = null;
+        this.auto = false;
+        this.vent = null;
+        this.hjaelp = 0;
+        this.hintE = null;
+        this.pegKnap = false;
+        this.fast = { html: "", klasse: "" };
+        this.kortT = 0;
+        /* Kortet foerst, saa det aldrig et oejeblik har baade det gamle og det nye */
+        this.visKort();
+        this.visBesked(this.fast);
+        this.visSkema();
+        this.visRegnskab();
+        this.fokus();
     };
 
     P.formlerR = function () { return this.opg.dr.map(A.saml); };
@@ -94,16 +221,31 @@
     /* Indsend svar: molekylerne reagerer, og saa bedoemmes resultatet.
        Graa, til eleven har rettet et tal (efter en reaktion: rettet igen). */
     P.kanSendes = function () {
-        var g = this.opg;
-        return !!g && !g.loest && !this.reagerer && g.fase === "klar" && !!g.roert;
+        var g = this.opg, t = this.trinNu();
+        if (!g || g.loest || this.reagerer) return false;
+        if (t && !this.trinSlut) {
+            if (t.type === "indsend") return g.fase === "klar";
+            if (t.type === "valg") return this.trin.valgt !== null;
+            if (t.type === "plus") return !!t.indsend && this.trin.klikket && g.fase === "klar";
+        }
+        return g.fase === "klar" && !!g.roert;
     };
 
     P.ikkeKlarTekst = function () {
+        var t = this.trinNu();
+        if (t && !this.opg.loest) {
+            if (t.type === "valg") return "Vælg først et af svarene på kortet.";
+            if (t.type === "plus") return "Klik først på + foran " + F(t.side === "r" ? this.opg.o.r[t.i] : this.opg.o.p[t.i]) + ".";
+        }
         if (this.opg.fase === "reageret") return "Molekylerne har allerede reageret. Ret et tal foran et stof, og send igen.";
         return "Ret først tallene foran stofferne med + og −.";
     };
 
-    P.indsend = function () { this.reager(); };
+    P.indsend = function () {
+        var t = this.trinNu();
+        if (t && t.type === "valg" && !this.opg.loest) { this.tjekValg(); return; }
+        this.reager();
+    };
 
     P.slutLinje = function () {
         return A.ligning(this.formlerR(), this.formlerP(), this.opg.cr, this.opg.cp) + ".";
@@ -111,6 +253,12 @@
 
     /* ----- Hinttrappen og Vis svaret ---------------------------------------------------- */
     P.hintTrin = function () {
+        var t = this.trinNu();
+        if (t && !this.opg.loest) {
+            /* Hintet i spoergsmaalet fremhaever ikke svaret i scenen */
+            var e = t.type === "plus" ? (t.side === "p" ? "Cl" : "Na") : null;
+            return { e: e, trin: t.hint };
+        }
         var a = this.aendret();
         if (a.length) {
             return { e: null, trin: [
@@ -123,7 +271,25 @@
     };
 
     P.visSvar = function () {
-        var g = this.opg, o = g.o;
+        var g = this.opg, o = g.o, t = this.trinNu();
+        if (t && !g.loest) {
+            if (t.type === "indsend") { this.reager(); return; }
+            if (t.type === "valg") {
+                var ok = 0;
+                t.svar.forEach(function (sv, j) { if (sv.ok) ok = j; });
+                this.trin.rigtig = ok;
+                this.trin.vist = true;
+                this.trin.valgt = ok;
+                this.trinLoest(NK.html(t.slut), true);
+                return;
+            }
+            if (t.type === "plus" && !t.indsend) {
+                this.trin.klikket = true;
+                this.aendr(t.side, t.i, 1);
+                this.reager();
+                return;
+            }
+        }
         g.dr = o.r.map(A.dele);
         g.dp = o.p.map(A.dele);
         g.cr = o.facit.slice(0, o.r.length);
@@ -144,6 +310,26 @@
         if (!m) return;
         var h = m.getAttribute("data-h"), side = m.getAttribute("data-s");
         var i = parseInt(m.getAttribute("data-i"), 10);
+        /* I trinene virker kun den ene + knap, kortet beder om; resten er laast */
+        var t = this.trinNu();
+        if (t && !this.opg.loest) {
+            if (t.type === "plus" && !this.trin.klikket && !this.auto && !this.reagerer &&
+                h === "op" && side === t.side && i === t.i) {
+                this.trin.klikket = true;
+                this.aendr(side, i, 1);
+                if (!t.indsend) {
+                    /* Molekylerne reagerer af sig selv lidt efter (REGELSAET 33) */
+                    this.auto = true;
+                    this.vent = { t: 0.5, fn: "reager" };
+                    this.visKnap();
+                }
+                this.visSkema();
+                this.visKort();
+                return;
+            }
+            this.kortBlink();
+            return;
+        }
         if (h === "op") this.aendr(side, i, 1);
         else if (h === "ned") this.aendr(side, i, -1);
         else if (h === "idx") this.skiftIndeks(side, i, parseInt(m.getAttribute("data-j"), 10));
@@ -165,6 +351,7 @@
         if (g.fase !== "klar") {
             g.fase = "klar";
             this.naesteLinje("", "");
+            this.visRegnskab();
         }
     };
 
@@ -220,20 +407,32 @@
 
     P.visSkema = function () {
         var g = this.opg, mig = this;
+        /* I trinene er + og − vaek (de fylder stadig, saa intet hopper), og det
+           lille tal kan ikke klikkes. Kun den + knap, kortet beder om, er fremme
+           med gul ramme og boblen "Klik: +" (REGELSAET 19a, 19 og 20). */
+        var t = this.trinNu(), iTrin = !!t && !g.loest;
         function stof(side, i) {
             var koef = side === "r" ? g.cr[i] : g.cp[i];
             var dele = side === "r" ? g.dr[i] : g.dp[i];
             var orig = A.dele(side === "r" ? g.o.r[i] : g.o.p[i]);
             var f = dele.map(function (d, j) {
+                var ind = d.s + (d.n > 1 ? "<sub>" + d.n + "</sub>" : "");
+                if (iTrin) return '<span class="fx">' + ind + "</span>";
                 var kl = "fx" + (d.n !== orig[j].n ? " aendret" : "");
                 return '<button type="button" class="' + kl + '" data-h="idx" data-s="' + side + '" data-i="' + i + '" data-j="' + j +
-                    '" title="Det lille tal">' + d.s + (d.n > 1 ? "<sub>" + d.n + "</sub>" : "") + "</button>";
+                    '" title="Det lille tal">' + ind + "</button>";
             }).join("");
+            var peg = iTrin && t.type === "plus" && t.side === side && t.i === i && !mig.trin.klikket && !mig.trinSlut;
+            var plusKl = "st-knap" + (iTrin ? (peg ? " opfordring" : " skjult") : "");
+            var minusKl = "st-knap" + (iTrin ? " skjult" : "");
+            var skjul = ' tabindex="-1" aria-hidden="true"';
             return '<span class="sk-stof">' +
                 '<span class="stepper">' +
-                '<button type="button" class="st-knap" data-h="op" data-s="' + side + '" data-i="' + i + '" aria-label="Et mere">+</button>' +
+                '<button type="button" class="' + plusKl + '" data-h="op" data-s="' + side + '" data-i="' + i + '" aria-label="Et mere"' +
+                (peg ? ' data-boble="Klik: +"' : (iTrin ? skjul : "")) + ">+</button>" +
                 '<span class="st-tal' + (koef === 1 ? " en" : "") + '">' + koef + "</span>" +
-                '<button type="button" class="st-knap" data-h="ned" data-s="' + side + '" data-i="' + i + '" aria-label="Et mindre">−</button>' +
+                '<button type="button" class="' + minusKl + '" data-h="ned" data-s="' + side + '" data-i="' + i + '" aria-label="Et mindre"' +
+                (iTrin ? skjul : "") + ">−</button>" +
                 "</span>" +
                 '<span class="sk-formel">' + f + "</span></span>";
         }
@@ -262,47 +461,71 @@
         }
     };
 
-    /* ----- Regnskabet i panelet ------------------------------------------------------------ */
+    /* ----- Taellingen under bakkerne (runde 2) -----------------------------------------------
+       "Atomer: Na 1 · Cl 2" under hver bakke i atomernes farver. Groen og roed
+       og ✓ og ✗ (efter pilen) kommer foerst, naar molekylerne har reageret,
+       og forsvinder igen, naar et tal rettes (REGELSAET 38). Hintets atom
+       har en gul ramme. */
     P.visRegnskab = function () {
         var g = this.opg;
+        if (!g) return;
         var rows = A.regnskab(this.formlerR(), this.formlerP(), g.cr, g.cp);
-        var html = '<div class="rs-hoved"><span></span><span>Før pilen</span><span>Efter pilen</span><span></span></div>';
+        var dom = g.fase === "reageret" || !!g.loest;
         var lys = this.faerdig ? null : this.hintE;
-        rows.forEach(function (x) {
-            var ok = x.v === x.h, a = D.ATOM[x.e] || D.ATOM.H;
-            html += '<div class="rs-raekke ' + (ok ? "ok" : "skidt") + (x.e === lys ? " lys" : "") + '" data-e="' + x.e + '">' +
-                '<span class="rs-e"><i style="background:' + a.farve + ";border-color:" + a.kant + '"></i>' + x.e + "</span>" +
-                '<span class="rs-tal">' + x.v + "</span>" +
-                '<span class="rs-tal">' + x.h + "</span>" +
-                '<span class="rs-m">' + (ok ? "✓" : "✗") + "</span></div>";
-        });
-        NK.saetHTML("kg-regnskab", html);
+        function side(efter) {
+            return '<span class="tl-hoved">Atomer:</span>' + rows.map(function (x) {
+                var a = D.ATOM[x.e] || D.ATOM.H, ok = x.v === x.h;
+                var kl = "tl-e" + (dom ? (ok ? " ok" : " skidt") : "") + (x.e === lys ? " lys" : "");
+                return '<span class="' + kl + '" data-e="' + x.e + '"><i style="background:' + a.farve + ";border-color:" + a.kant + '"></i>' +
+                    x.e + " <b>" + (efter ? x.h : x.v) + "</b>" +
+                    (dom && efter ? '<span class="tl-m">' + (ok ? "✓" : "✗") + "</span>" : "") + "</span>";
+            }).join('<span class="tl-prik">·</span>');
+        }
+        NK.saetHTML("kg-taelV", side(false));
+        NK.saetHTML("kg-taelH", side(true));
     };
 
     /* ----- Scenen ----------------------------------------------------------------------------- */
+    /* Scenen er samlet (runde 2, REGELSAET 32 og 37): tavlen med skemaet lige
+       under kortet, saa de to bakker tæt om pilen med en stoerste bredde,
+       centreret, og taellingen under hver bakke. Paa en stor skaerm bliver
+       bakkerne og molekylerne stoerre, ikke afstandene. */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
         var kant = NK.klamp(W * 0.022, 10, 26), top = this.top();
-        var sb = Math.min(W - 2 * kant, 1040);
+        var midt = NK.klamp(W * 0.075, 90, 130);
+        var bbMaks = NK.klamp(W * 0.28, 420, 560);
+        var bb = Math.min((W - 2 * kant - midt) / 2, bbMaks);
+        var blokB = 2 * bb + midt, x0 = (W - blokB) / 2;
         var t = this.skema;
+        var sb = Math.min(W - 2 * kant, Math.max(blokB, 640));
         t.style.left = Math.round((W - sb) / 2) + "px";
         t.style.top = top + "px";
         t.style.width = Math.round(sb) + "px";
-        this.skemaFs = Math.round(NK.klamp(Math.min(W / 30, H / 20), 20, 36));
+        this.skemaFs = Math.round(NK.klamp(Math.min(W / 36, H / 24), 20, 32));
         this.tilpasSkema();
         var sh = t.offsetHeight || 90;
-        var y0 = top + sh + NK.klamp(H * 0.025, 10, 18);
-        var y1 = baand.y - NK.klamp(H * 0.02, 8, 14);
-        var midt = NK.klamp(W * 0.12, 100, 150);
-        var bb = (W - 2 * kant - midt) / 2;
+        var y0 = top + sh + NK.klamp(H * 0.022, 10, 18);
+        var gap = 6;
+        var ledig = baand.y - y0 - gap - TAEL_H - 4;
+        var bh = Math.max(120, Math.min(ledig, bb * 0.78));
         var lay = { W: W, H: H, baand: baand, zone: this.kortZone() };
-        lay.L = { x: kant, y: y0, b: bb, h: Math.max(120, y1 - y0) };
-        lay.R = { x: kant + bb + midt, y: y0, b: bb, h: lay.L.h };
-        lay.midt = { x: kant + bb, b: midt, cy: y0 + lay.L.h / 2 };
+        lay.L = { x: x0, y: y0, b: bb, h: bh };
+        lay.R = { x: x0 + bb + midt, y: y0, b: bb, h: bh };
+        lay.midt = { x: x0 + bb, b: midt, cy: y0 + bh / 2 };
+        lay.kmaks = NK.klamp(bb / 220, 1.6, 2.3);
         this.lay = lay;
         this.saetAnker("bakker", lay.L.x, lay.L.y, lay.R.x + lay.R.b - lay.L.x, lay.L.h);
+        var ty = Math.round(y0 + bh + gap);
+        [[this.taelV, lay.L], [this.taelH, lay.R]].forEach(function (x) {
+            x[0].style.left = Math.round(x[1].x) + "px";
+            x[0].style.top = ty + "px";
+            x[0].style.width = Math.round(x[1].b) + "px";
+            x[0].style.height = TAEL_H + "px";
+        });
         this.byg();
+        if (this.status) this.visListe();
     };
 
     /* Kuglemodellen for en formel. Er det lille tal aendret, faar
@@ -336,7 +559,7 @@
 
     /* Molekylerne paa én side: hvert stof i sin egen blok med saa mange
        soejler, at kuglerne bliver stoerst muligt */
-    function placer(formler, orig, koef, rect, strimmel) {
+    function placer(formler, orig, koef, rect, strimmel, KMAKS) {
         var ix = rect.x + 12, iy = rect.y + 30, ib = rect.b - 24, ih = rect.h - 38 - strimmel;
         var etiket = 28, mellem = 18;
         var gr = formler.map(function (f, i) {
@@ -391,8 +614,8 @@
         var lay = this.lay, g = this.opg;
         if (!lay || !g) return;
         this.strimmel = NK.klamp(lay.L.h * 0.16, 30, 46);
-        this.venstre = placer(this.formlerR(), g.o.r, g.cr, lay.L, this.strimmel);
-        this.hoejre = placer(this.formlerP(), g.o.p, g.cp, lay.R, this.strimmel);
+        this.venstre = placer(this.formlerR(), g.o.r, g.cr, lay.L, this.strimmel, lay.kmaks);
+        this.hoejre = placer(this.formlerP(), g.o.p, g.cp, lay.R, this.strimmel, lay.kmaks);
         if (g.fase !== "klar") this.planlaeg();
     };
 
@@ -423,7 +646,7 @@
         var R = lay.R, s = this.strimmel;
         var sy = R.y + R.h - s / 2 - 6;
         var r0 = Math.min(s * 0.36, 16);
-        var start = R.x + 104, plads = R.x + R.b - 16 - start;
+        var start = R.x + 86, plads = R.x + R.b - 16 - start;
         var skridt = tilovers.length > 1 ? Math.min(2 * r0 + 5, plads / (tilovers.length - 1)) : 0;
         tilovers.forEach(function (a, n) {
             fly.push({ a: a, x1: start + r0 + n * skridt, y1: sy, r1: Math.min(a.r, r0), slags: "tilovers" });
@@ -466,12 +689,23 @@
             g.loest = true;
             this.sejrT = 0;              /* stemplet popper frem, og scenen glimter groent */
             this.visSkema();
+            this.visRegnskab();
             this.loest(g.svarNu ? "svar" : "selv", g.svarNu ? A.svarTekst(g.o) : "");
             return;
         }
         this.fejlT = 0;                  /* pilen bliver roed et oejeblik */
         this.visSkema();
+        this.visRegnskab();
         this.visKnap();
+        /* I trinene bedoemmes reaktionen ikke: kortet gaar selv videre ca. 1 s
+           efter, at molekylerne har reageret (REGELSAET 33) */
+        var tr = this.trinNu();
+        if (tr && (tr.type === "indsend" || (tr.type === "plus" && !tr.indsend))) {
+            this.auto = true;
+            this.vent = { t: 1.0, fn: "naesteTrin" };
+            this.visKnap();
+            return;
+        }
         var t;
         if (a.length) {
             t = "Atomerne " + (d.gaarOp ? "passer" : "passer heller ikke") + ", men der står " + F(a[0].til) +
@@ -488,6 +722,15 @@
 
     P.opdaterScene = function (dt) {
         var g = this.opg;
+        if (this.vent) {
+            this.vent.t -= dt;
+            if (this.vent.t <= 0) {
+                var fn = this.vent.fn;
+                this.vent = null;
+                this.auto = false;
+                this[fn]();
+            }
+        }
         if (g && g.fase === "reagerer") {
             g.t += dt;
             if (g.t >= VARIGHED) this.efterReaktion();
@@ -521,7 +764,7 @@
         T.bakke(ctx, lay.L, "Før pilen");
         T.bakke(ctx, lay.R, "Efter pilen", g.loest ? "rgba(63, 174, 114, 0.85)" : (skidt ? "rgba(255, 107, 92, 0.6)" : null));
         T.pil(ctx, lay.midt.x + 16, lay.midt.x + lay.midt.b - 16, lay.midt.cy - 6, pilFarve);
-        if (g.loest) T.stempel(ctx, lay.midt.x + lay.midt.b / 2, lay.midt.cy - 46, "AFSTEMT ✓", NK.pop(this.sejrT / 0.45));
+        if (g.loest) T.stempel(ctx, lay.midt.x + lay.midt.b / 2, lay.midt.cy - 46, "Afstemt ✓", NK.pop(this.sejrT / 0.45));
 
         /* Hintet og musen over regnskabet fremhaever ét atom */
         var puls = 0.5 + 0.5 * Math.sin(this.tid * 6);
@@ -571,7 +814,7 @@
             var f = F(gr.f);
             ctx.save();
             ctx.textBaseline = "middle";
-            ctx.font = T.font("700", 17);
+            ctx.font = T.font("500", 17);
             var tal = gr.n > 1 ? gr.n + " " : "";
             var b1 = ctx.measureText(tal).width, b2 = ctx.measureText(f).width;
             var x = gr.x - (b1 + b2) / 2;
@@ -593,10 +836,10 @@
         ctx.moveTo(R.x + 12, R.y + R.h - s - 10);
         ctx.lineTo(R.x + R.b - 12, R.y + R.h - s - 10);
         ctx.stroke();
-        ctx.font = T.font("700", 13);
+        ctx.font = T.font("500", 14);
         ctx.fillStyle = "#ff9d92";
         ctx.textBaseline = "middle";
-        ctx.fillText(tekst.toUpperCase(), R.x + 16, R.y + R.h - s / 2 - 6);
+        ctx.fillText(tekst, R.x + 16, R.y + R.h - s / 2 - 6);
         ctx.restore();
     };
 
@@ -625,6 +868,8 @@
     };
 
     P.overScene = function (pt) {
+        /* I trinene lægger intet i scenen op til et klik (REGELSAET 19a) */
+        if (this.iTrin()) { this.lysScene = null; if (!this.lysERegnskab) this.lysE = null; return null; }
         var u = pt ? this.find(pt) : null;
         this.lysScene = u ? u.a.e : null;
         if (!this.lysERegnskab) this.lysE = this.lysScene;
@@ -632,6 +877,8 @@
     };
 
     P.klikScene = function (pt) {
+        /* Scenen er laast i trinene: kortet blinker (REGELSAET 15) */
+        if (this.iTrin()) { this.kortBlink(); return; }
         var u = this.find(pt);
         if (!u) {
             var lay = this.lay;

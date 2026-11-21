@@ -203,52 +203,8 @@
         return 2;
     };
 
-    /* ----- Den valgfrie teoriboks ---------------------------------------- */
-    D.TEORI = [
-        { h: "Vandmolekylet er skævt",
-          p: ["De to hydrogenatomer sidder på samme side af oxygenatomet. Oxygen trækker hårdest i elektronerne, " +
-              "så <b>oxygen-enden bliver en lille smule negativ (δ−)</b>, og hydrogen-enderne bliver en lille smule positive (δ+).",
-              "Molekylet er stadig neutralt i alt. Ladningen er blot fordelt skævt."] },
-
-        { h: "Derfor kan vand trække i ioner",
-          p: ["Plus og minus tiltrækker hinanden. Vandmolekylerne vender δ−-enden mod de positive ioner " +
-              "og δ+-enderne mod de negative.",
-              "Trækker nok vandmolekyler samme vej, river de ionen løs fra krystallen. Bagefter bliver de " +
-              "siddende hele vejen rundt om ionen."] },
-
-        { h: "Fra (s) til (aq)",
-          p: ["<b>(s)</b> betyder fast stof, altså at ionerne sidder fast i krystallen. <b>(aq)</b> betyder opløst i vand, " +
-              "altså at ionen bevæger sig frit rundt med vand omkring sig.",
-              "NaCl(s) → <span class=\"fk\">Na⁺(aq)</span> + <span class=\"fa\">Cl⁻(aq)</span>"] },
-
-        { h: "Saltet bliver ikke til noget nyt",
-          p: ["Det er de samme ioner hele vejen igennem. Ionerne er blot kommet fra hinanden. Na⁺ er stadig Na⁺, " +
-              "og en sammensat ion som SO₄²⁻ går ikke i stykker.",
-              "Damper man vandet væk, ligger saltet der igen."] },
-
-        { h: "Der er en grænse: mættet",
-          p: ["Vandet kan ikke rumme uendelig meget. Når der ikke kan opløses mere, er opløsningen <b>mættet</b>, " +
-              "og resten bliver liggende i bunden som <b>bundfald</b>.",
-              "Grænsen kaldes stoffets <b>opløselighed</b> og skrives som gram pr. 100 mL vand."] },
-
-        { h: "Let- og tungtopløselige salte",
-          p: ["Opløseligheden er vidt forskellig fra salt til salt. Der kan opløses 36 g køkkensalt i 100 mL vand, " +
-              "men kun 0,0002 g sølv(I)chlorid.",
-              "Kan der opløses mindre end 2 g pr. 100 mL vand, kaldes saltet <b>tungtopløseligt</b>. Næsten alt " +
-              "det tilsatte salt bliver derfor liggende som bundfald."] },
-
-        { h: "Hvad temperatur og omrøring gør",
-          p: ["Jo varmere vandet er, jo hurtigere farer vandmolekylerne rundt, og jo hurtigere river de ionerne løs. " +
-              "For de fleste salte kan der også <b>opløses mere</b> i varmt vand, og derfor stiger kurven på fane 2.",
-              "Omrøring knuser krystallen og giver mere overflade, som vandet kan tage fat i. Saltet opløses " +
-              "<b>hurtigere</b>, men grænsen for, hvor meget der kan opløses, er den samme."] },
-
-        { h: "Om tegningen",
-          p: ["Luppen viser et voldsomt forstørret og forenklet udsnit. Selv det mindste saltkorn består af mange " +
-              "milliarder ioner, og der er langt flere vandmolekyler, end der er plads til at tegne.",
-              "Ved de tungtopløselige salte er der tegnet nogle få ioner ude i vandet, så man kan se, at der faktisk " +
-              "går en lille smule i opløsning. I virkeligheden er det endnu færre."] }
-    ];
+    /* Teorien staar i index.html paa teori-arket (runde T6, 21. nov. 2026,
+       REGELSAET 31): kort, roligt og med en henvisning til Kemibogen. */
 
     /* ----- Quizzen -------------------------------------------------------- */
     /* rigtig er nummeret paa det rigtige svar, foer svarene blandes.

@@ -18,6 +18,10 @@ Niels 21. nov. 2026: "Når du færdig med disse rettelser, kunne jeg godt tænke
 - Niels sagde ja til forslagene til T3 (sb2.4) og T4 (sb5.2) og bad om, at fanernes øvrige fejl kom med.
 - Nye regler i REGELSAET: Rækken øverst i scenen ved højst 10 opgaver og ellers et panel på 300 px (regel 3). Ingen voldsom, fed skrift (regel 30). Teorien er kort og rolig med en henvisning til Kemibogen (regel 31, `faelles/teori.css`). Niels: "de fleste animationer skal have en tur" (teorien findes i 75 animationer).
 
+- Aftenen 21. nov.: T3 sb2.4 (4 runder) og T4 sb5.2 (4 runder) bygget om; regelsættet har nu regel 1-47 sorteret efter emne (numrene er faste id'er). sb5.2 venter evt. på Niels' egne billeder af apparaterne (`sb5.2_lambert_beer/SPRITES_BESTILLING.md`). Næste: T5 sc1.4_afstemning.
+- Senere 21. nov.: sb2.4 runde 5 (⇌ og + i skemaets øverste række, rækken Ligevægt kun med tal ved Y = K, ingen rullebjælke, CO + H₂O ude: fane 1 har 5 mål, mål 5 "HBr: hvilken løsning?"); Niels: "Det ser godt ud." Regel 48-51 tilføjet. T5 sc1.4 bygges efter hans ja (opgaverække på fane 1, optælling under bakkerne med ✓ først efter Indsend svar, trinvis køkkensalt, titler på fane 2, teori-ark med link til C 1.4, fanerne "Afstem med kugler" og "Afstem uden kugler").
+- T5 sc1.4 godkendt ("flot forbedring"), køkkensalt er en gennemgang med "Spring gennemgangen over" (regel 52). T6 sc2.1 fane 2 "Mættet opløsning" bygget efter hans ja (opgaverække, − og + på varmepladen, etiket på glasset, akse efter saltet, NaCl i opgave 1 og KNO₃ i 2-4, fri leg med seks salte bagefter); venter på hans feedback. Næste: T7 sc2.3_kemikalielageret.
+
 ## Det, der venter: trinfanerne T3-T43
 
 Forslagene står i `g01.json` til `g10.json` (feltet `start`) og i oversigten i Dropbox. De blev skrevet før regelsættet, så de skal læses med regelsættets øjne (fx er svar i panelet og "Klik"-bobler under et spørgsmål nu fejl i sig selv).

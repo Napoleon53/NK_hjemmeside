@@ -15,9 +15,9 @@
     <h1><span class="ikon">⇌</span> Ligevægtsberegninger</h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-bh" role="tab" aria-selected="true"><span class="nr">1</span>Beholderen</button>
-        <button class="faneknap" data-fane="fane-ux" role="tab" aria-selected="false"><span class="nr">2</span>Uden x</button>
-        <button class="faneknap" data-fane="fane-mx" role="tab" aria-selected="false"><span class="nr">3</span>Med x</button>
+        <button class="faneknap aktiv" data-fane="fane-bh" role="tab" aria-selected="true"><span class="nr">1</span>Mod ligevægt</button>
+        <button class="faneknap" data-fane="fane-ux" role="tab" aria-selected="false"><span class="nr">2</span>Ved ligevægt</button>
+        <button class="faneknap" data-fane="fane-mx" role="tab" aria-selected="false"><span class="nr">3</span>Fra start til ligevægt</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -29,7 +29,7 @@
 <!-- ================================================================= -->
 <!-- FANE 1: BEHOLDEREN (js/sim_beholder.js)                            -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-bh" role="tabpanel" aria-label="Beholderen">
+<section class="fane aktiv" id="fane-bh" role="tabpanel" aria-label="Mod ligevægt">
     <div class="scene">
         <!-- Opgaveraekken (Niels 21. nov. 2026, REGELSAET 3): intet panel. Maalene
              med nummer og tema (kun de naaede har tema; de kommende er laaste
@@ -62,7 +62,7 @@
             <button class="bh-graffane" id="bh-graffane" type="button" aria-expanded="false" hidden>Vis grafen ▸</button>
             <div class="bh-skyder" id="bh-skyder" data-navn="Skyderen x">
                 <label for="bh-x" class="bh-xlab"><b>x = <span id="bh-xtal">0,000</span> M</b><span class="bh-xdef" id="bh-xdef"></span></label>
-                <span class="bh-spor" data-boble="Træk: x"><input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0"></span>
+                <span class="bh-spor" data-boble="Træk: x"><input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0"><span class="bh-maal" id="bh-maal" hidden></span></span>
             </div>
         </div>
     </div>
@@ -72,7 +72,7 @@
 <!-- ================================================================= -->
 <!-- FANE 2: UDEN X (js/regn.js)                                        -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-ux" role="tabpanel" aria-label="Uden x">
+<section class="fane" id="fane-ux" role="tabpanel" aria-label="Ved ligevægt">
     <div class="scene">
         <!-- Opgaveraekken (Niels 21. nov. 2026): intet panel (js/fane.js) -->
         <nav class="opgaverad" id="ux-raekke" aria-label="Opgaverne">
@@ -100,11 +100,12 @@
 <!-- ================================================================= -->
 <!-- FANE 3: MED X (js/regn.js)                                         -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-mx" role="tabpanel" aria-label="Med x">
+<section class="fane" id="fane-mx" role="tabpanel" aria-label="Fra start til ligevægt">
     <div class="scene">
         <!-- Opgaveraekken (Niels 21. nov. 2026): intet panel (js/fane.js) -->
         <nav class="opgaverad" id="mx-raekke" aria-label="Opgaverne">
             <div class="or-opgaver" id="mx-liste"></div>
+            <button class="or-knap or-stille" id="mx-kurve" type="button" hidden>Vis kurven fra start til ligevægt ▸</button>
             <button class="or-knap or-stille" id="mx-forfra" type="button" title="Samme opgave forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
         </nav>
         <!-- Papirkortet oeverst midt i scenen: opgaven, beskeden, hint og
@@ -157,6 +158,17 @@
         <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/b/kapitler/b2-5-ligevaegtsberegninger.html" target="_blank" rel="noopener">B2.5 Ligevægtsberegninger</a></p>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar eller næste &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Kurven fra start til ligevaegt (fane 3), aabnes fra knappen paa tavlen -->
+<div class="overlay" id="kurve-vindue">
+    <div class="overlay-boks kurve-ark">
+        <h2 id="kurve-titel">Fra start til ligevægt</h2>
+        <canvas class="kurve" id="kurve-laerred"></canvas>
+        <div class="knapper" style="margin-top:12px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
     </div>

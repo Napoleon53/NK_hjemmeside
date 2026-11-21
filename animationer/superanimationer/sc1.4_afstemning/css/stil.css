@@ -34,7 +34,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    --panel-bredde: 300px;     /* runde 2: kun fane 2 har panelet, og det har kun listen */
 }
 
 * { box-sizing: border-box; }
@@ -153,6 +153,8 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .fane.aktiv { display: grid; }
+/* Fane 1 har intet panel (runde 2): opgaverne staar i raekken oeverst i scenen */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
 
 .scene {
     position: relative;
@@ -197,11 +199,11 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .kort > h2 {
     margin: 0 0 8px 0;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--gul);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #e3e7ec;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -469,9 +471,6 @@ select:focus-visible {
     outline-offset: 2px;
 }
 
-@media (max-width: 1320px) {
-    :root { --panel-bredde: 370px; }
-}
 
 @media (max-width: 1100px) {
     .top { gap: 10px; padding: 8px 12px; }
@@ -894,11 +893,11 @@ select:focus-visible {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--tekst-mat);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst-svag);
 }
 
 .opg-tal { letter-spacing: 0.02em; text-transform: none; }
@@ -915,8 +914,8 @@ select:focus-visible {
     border-radius: var(--radius-lil);
     padding: 5px 9px;
     font-family: inherit;
-    font-size: 0.98rem;
-    font-weight: 700;
+    font-size: 0.86rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
@@ -996,13 +995,13 @@ kbd {
     justify-content: center;
     gap: 0 calc(var(--fs) * 0.18);
     font-size: var(--fs);
-    font-weight: 700;
+    font-weight: 500;
     white-space: nowrap;
     line-height: 1.1;
 }
 
 .sk-stof { display: inline-flex; align-items: center; gap: calc(var(--fs) * 0.14); }
-.sk-plus, .sk-pil { color: #cfd9d4; font-weight: 600; margin: 0 calc(var(--fs) * 0.12); }
+.sk-plus, .sk-pil { color: #cfd9d4; font-weight: 400; margin: 0 calc(var(--fs) * 0.12); }
 .sk-pil { margin: 0 calc(var(--fs) * 0.3); }
 .sk-formel { display: inline-flex; align-items: baseline; letter-spacing: 0.01em; }
 
@@ -1022,7 +1021,7 @@ kbd {
     color: #e9eee9;
     font-family: inherit;
     font-size: calc(var(--fs) * 0.55);
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -1135,7 +1134,7 @@ kbd {
     color: var(--gul);
     font-family: inherit;
     font-size: 0.85em;
-    font-weight: 800;
+    font-weight: 500;
     text-align: center;
     outline: none;
     transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -1152,12 +1151,15 @@ kbd {
     align-items: center;
     justify-items: center;
     gap: calc(var(--fs) * 0.08) calc(var(--fs) * 0.6);
-    margin-top: calc(var(--fs) * 0.55);
+    margin-top: calc(var(--fs) * 0.5);
+    padding: 6px 18px;
+    border: 1.5px dashed transparent;
+    border-radius: 8px;
     font-size: max(16px, calc(var(--fs) * 0.46));
-    font-weight: 700;
+    font-weight: 500;
 }
 
-.tr-h { font-size: max(12px, 0.62em); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #8fa39a; }
+.tr-h { font-size: max(13px, 0.7em); font-weight: 500; letter-spacing: 0; text-transform: none; color: #9fb1a9; }
 .tr-e { color: #e9eee9; justify-self: end; }
 .tr-t { min-width: 2.2em; text-align: center; font-variant-numeric: tabular-nums; }
 .tr-t.ok, .tr-m.ok { color: #8ff0b4; }
@@ -1178,16 +1180,16 @@ kbd {
 
 .tv-stempel {
     position: absolute;
-    top: 14px;
+    bottom: 12px;
     right: 16px;
     padding: 6px 16px;
-    border: 2.5px solid #5fcf92;
+    border: 2px solid #5fcf92;
     border-radius: 9px;
     background-color: rgba(20, 44, 32, 0.95);
     color: #8ff0b4;
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0;
     animation: stempel-ind 0.45s ease-out 1;
 }
 
@@ -1306,3 +1308,214 @@ kbd {
 
 /* Start forfra staar i panelet under listen, aldrig paa kortet (brugeren 3. nov. 2026) */
 .panel .forfraknap { display: block; margin: 10px 0 0 auto; }
+
+/* =====================================================================
+   Runde 2 (21. nov. 2026, Niels' ja til forslagene efter REGELSAET)
+   ===================================================================== */
+
+/* Tavlerne og felterne i Lexend uden tung fed skrift (REGELSAET 30) */
+.tavle, .koeffelt, .kg-taelling, .opgaverad, .optaelknap, .panel { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+.tavle { border-width: 8px; }
+
+/* ----- Opgaveraekken oeverst i scenen paa fane 1 (moenster: sc5.7, REGELSAET 3) ----- */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.or-opgaver { display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden; }
+.or-gruppe { display: flex; align-items: center; gap: 5px; padding-right: 10px; border-right: 1px solid #343440; }
+.or-gruppe:last-child { border-right: none; padding-right: 0; }
+.or-gruppenavn { margin-right: 2px; font-size: 12.5px; font-weight: 400; color: #7e8590; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+.opgaverad.trang .or-knap:not(.valgt) .or-navn { display: none; }
+.opgaverad.trang .or-knap:not(.valgt) { padding: 0 4px; }
+@media (max-width: 1199px) {
+    .or-opgaver .or-navn { display: none; }
+    .or-opgaver .or-knap { padding: 0 4px; }
+}
+
+/* Kortet staar under raekken paa fane 1 */
+#fane-kg .scenekort { top: 46px; }
+@media (max-height: 720px) {
+    .opgaverad { top: 6px; }
+    #fane-kg .scenekort { top: 42px; }
+}
+
+/* ----- Skemaet paa fane 1 i trinene (REGELSAET 19a, 19-20) ---------------------- */
+.st-knap { position: relative; }
+.st-knap.skjult { visibility: hidden; pointer-events: none; }
+.tavle span.fx { cursor: default; }
+.st-knap.opfordring {
+    border-color: var(--gul);
+    background-color: rgba(242, 197, 61, 0.2);
+    outline: 3px solid var(--gul);
+    outline-offset: 2px;
+}
+.st-knap.opfordring::after {
+    content: attr(data-boble);
+    position: absolute;
+    z-index: 4;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 3px 9px;
+    border-radius: 7px;
+    background-color: var(--gul);
+    color: #1d2433;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    pointer-events: none;
+}
+.st-knap.opfordring::before {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--gul);
+    pointer-events: none;
+}
+
+/* ----- Taellingen under bakkerne paa fane 1 --------------------------------------- */
+.kg-taelling {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #c8ced6;
+}
+.tl-hoved { margin-right: 2px; color: #8f97a3; }
+.tl-e {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: default;
+}
+.tl-e i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid; }
+.tl-e b { font-weight: 600; color: #f2f3f5; font-variant-numeric: tabular-nums; }
+.tl-e:hover { border-color: #5e5e70; }
+.tl-e.ok { background-color: rgba(63, 174, 114, 0.16); }
+.tl-e.skidt { background-color: rgba(224, 84, 70, 0.16); }
+.tl-e.lys { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.14); }
+.tl-m { margin-left: 2px; font-weight: 600; }
+.tl-e.ok .tl-m { color: #7ee0a8; }
+.tl-e.skidt .tl-m { color: #f0918a; }
+.tl-prik { color: #5e6472; }
+
+/* ----- Fane 2: tavlen uden overskrift, optaellingen med en stiplet plads ---------- */
+#sk-tavle { padding: 22px 24px 18px; gap: 0; }
+.tv-regnskab.skjult { border-color: rgba(233, 238, 233, 0.22); position: relative; }
+.tv-regnskab.skjult > * { visibility: hidden; }
+.tv-regnskab.skjult::after {
+    content: "Optællingen";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 400;
+    color: #7f938a;
+}
+.optaelknap { min-height: 46px; padding: 10px 16px; font-size: 0.95rem; font-weight: 500; }
+
+/* Kortet paa fane 2: spoergsmaalet og forklaringen paa linjen under */
+.scenekort .sk-note-linje { display: block; margin-top: 2px; }
+
+/* Listen i panelet paa fane 2 med titler */
+.oc-nr { margin-right: 5px; color: var(--tekst-mat); font-weight: 600; font-variant-numeric: tabular-nums; }
+.opg-chip { align-items: center; }
+.opg-chip.valgt .oc-nr { color: #cfe8fb; }
+
+/* Kan listen ikke vaere i panelet med alle titlerne, staar de loeste som nummer med ✓ */
+.opg-liste.trang .opg-chip:not(.valgt) .oc-navn { display: none; }
+.opg-liste.trang .opg-chip:not(.valgt) .oc-nr { margin-right: 0; }
+
+/* Lav skaerm: kortet paa fane 1 lidt taettere, saa svarene kan vaere i pladsen */
+@media (max-height: 720px) {
+    #fane-kg .scenekort { padding-top: 8px; padding-bottom: 8px; }
+    #fane-kg .scenekort .sk-svar { margin-top: 6px; }
+    #fane-kg .scenekort .sk-knap { padding: 5px 9px; }
+}
+
+/* ----- Runde 3: Spring gennemgangen over (moenster: km-spring i kemichael/praesentation.css) -----
+   En stille knap med kant oeverst til hoejre paa kortets foerste linje (float,
+   saa kun den linje bliver kortere). Den staar aldrig, hvor Indsend svar og
+   Naeste staar, og kortet faar ikke en ekstra linje. */
+.scenekort .sk-spring {
+    float: right;
+    margin: 0 0 2px 14px;
+    padding: 1px 9px;
+    border: 1px solid #c9c3b3;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #4b5363;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.3;
+    cursor: pointer;
+}
+.scenekort .sk-spring:hover { background-color: #efece2; color: #1d2433; }
+.scenekort .sk-spring:focus-visible { outline: 3px solid #e0b22e; outline-offset: 2px; }
+/* Knappen staar ved kortets hoejre kant, ikke ved tekstens 76ch */
+#fane-kg .scenekort .sk-tekst.med-spring { max-width: none; }

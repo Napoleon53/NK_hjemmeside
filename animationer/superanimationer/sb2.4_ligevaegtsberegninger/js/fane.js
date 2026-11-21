@@ -391,6 +391,7 @@
                     NK.html(h.trin[this.hjaelp - 1]), "hint");
                 this.visLys();
                 this.visKnap();
+                if (this.efterHint) this.efterHint(h.trin[this.hjaelp - 1]);
                 this.fokus();
                 return;
             }

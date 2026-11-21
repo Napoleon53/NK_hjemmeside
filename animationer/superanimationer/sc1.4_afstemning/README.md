@@ -45,6 +45,115 @@ Hjælpen nedenfor.
 5. **Layoutet:** scene plus panel. Skemaet står på en tavle øverst i scenen,
    og panelet har opgavekortet med den ene knap, regnskabet og listen.
 
+## Runde 2 (21. nov. 2026): gennemgang efter regelsættet (T5)
+
+Gennemgået efter `../REGELSAET.md` (regel 1-51). Forslagene stod i chatten, og
+Niels svarede: "Det ser godt ud. Du må gerne gå i gang med t5". Afsnittene
+længere nede beskriver den første udgave. Hvor de siger noget andet, gælder
+dette afsnit.
+
+**Begge faner**
+
+* Ingen versaler (Atomerne, Før pilen, Efter pilen, Reaktionerne, Let, Middel,
+  Svær, Afstemt ✓) og ingen tung fed skrift. Tavlerne, felterne, rækken,
+  optællingen, panelet og lærredets tekst står i Lexend med vægt 400-600
+  (regel 30).
+* Teorien står på det rolige ark (`../faelles/teori.css`, klassen
+  `teori-ark`). Den er kortere med ét eksempel (3 H₂O) og fremgangsmåden i
+  fire trin. Den slutter med "Læs mere i Kemibogen: 1.4 Reaktionsskemaer og
+  afstemning", der åbner i en ny fane (regel 31).
+* Fanerne hedder **Afstem med kugler** og **Afstem uden kugler** (regel 46).
+  De gamle adresser `#kugler`, `#kuglerne`, `#skema` og `#skemaet` virker
+  stadig, og `#med-kugler` og `#uden-kugler` er nye. Tasterne 1 og 2 er
+  uændrede.
+
+**Fane 1: Afstem med kugler (10 reaktioner)**
+
+* Panelet er væk. Reaktionerne står i **opgaverækken** øverst i scenen i
+  grupperne Let, Middel og Svær med Start forfra yderst til højre (mønster
+  `sc5.7`, regel 3). Kun de løste og den, eleven er ved, har navn. De kommende
+  er låste numre (regel 17). Under 1200 px, eller når rækken ikke kan være
+  der, står kun numrene, og den valgtes navn bliver stående. Kortet står
+  under rækken (`top: 46px`).
+* **Optællingen** står under bakkerne: "Atomer: Na 1 · Cl 2" i atomernes
+  farver. Grøn og rød og ✓ og ✗ (efter pilen) kommer først, når molekylerne
+  har reageret. De forsvinder igen, når et tal rettes (regel 38). Musen over
+  et atom i optællingen får atomerne af den slags til at lyse som før, og
+  hintets atom har en gul ramme.
+* **Scenen er samlet** (regel 32): bakkerne er højst 560 px brede hver
+  (28 % af bredden), står tæt om pilen og er centreret. Højden er 78 % af
+  bredden. Molekylerne er større (`kmaks` 1,6-2,3 i stedet for 1,6).
+  Skemaet står lige under kortet (regel 37).
+* **Den første reaktion (køkkensalt) er trinvis** (regel 11-12,
+  `D.TRIN_KUGLER` i `js/data.js`) med etiketten "Trin n af 4":
+  1. "Klik på Indsend svar, og se atomerne reagere." Ét Cl bliver tilovers.
+     Kortet går selv videre ca. 1 s efter reaktionen (regel 33).
+  2. "Hvilket atom er der for mange af før pilen?" Tre svar i kortet (Na, Cl,
+     Ingen), hvor de forkerte har hver sin forklaring. Eleven vælger og
+     trykker Indsend svar. Det rigtige svar giver en grøn forklaring og
+     Næste trin.
+  3. "Klik på + foran NaCl." Kun den knap er fremme med gul ramme og boblen
+     "Klik: +" (regel 19-21). Molekylerne reagerer af sig selv 0,5 s efter,
+     og der mangler et Na.
+  4. "Klik på + foran Na. Tryk så Indsend svar." Så er reaktionen afstemt og
+     løst.
+
+  I trinene er + og − væk (de fylder stadig, så skemaet ikke hopper). Det
+  lille tal kan ikke klikkes, scenen er låst (et klik får kortet til at
+  blinke), og musen viser ingen klikhånd (regel 19a og 15). Hvert trin har
+  en hinttrappe på tre trin og Vis svaret. Vis svaret gør handlingen for
+  eleven, og så får reaktionen ingen stjerne. Er reaktionen løst før (gemt
+  i browseren), er der ingen trin. Start forfra giver dem igen (regel 16).
+* **Atomerne beholder hver sin farve.** Regel 45 (én rolig farve pr. stof)
+  gælder ikke her, for det er netop atomerne, eleven skal følge fra stof til
+  stof.
+* Kortets plads på en lav skærm er 134 px (før 124), så det trinvise
+  spørgsmål med svar, hint og forklaring kan være der uden at scenen
+  hopper (regel 4).
+
+**Fane 2: Afstem uden kugler (24 reaktioner)**
+
+* Listen står i et panel på 300 px, som kun har listen (regel 3). Hver
+  reaktion har en titel, fx "Calcium brænder" og "Kobber i salpetersyre"
+  (`navn` i `D.SKEMA`). Titlerne låses op i takt (regel 17-18). Kan
+  listen ikke være i panelet med alle titlerne, står de løste som nummer
+  med ✓ (klassen `trang`).
+* Kortet spørger halvfedt "Hvilke tal skal stå foran Ca, O₂ og CaO?" med
+  stofferne fra reaktionen. "Et tomt felt tæller som 1." står i almindelig
+  skrift på linjen under (regel 5-7).
+* Tavlen er mindre og roligere og står lige under kortet. Den har ingen
+  overskrift "Reaktion 1". Optællingen har en stiplet plads med navnet,
+  så tavlen ikke skifter størrelse, når den slås til (regel 13). Stemplet
+  Afstemt ✓ står nederst til højre på tavlen.
+
+Tekstrettelserne står i `~/NK_hjemmeside/.claude/spoergsmaal-og-start/ret/t5.json`
+(T5-1 til T5-9) og kan sættes tilbage med `ret.py`.
+
+## Runde 3 (21. nov. 2026): gennemgangen kan springes over
+
+Niels om runde 2: "Spændende.. i den med køkkensalt.. så er det jo ligefør at
+den skal markeres som en præsentation, som man kan skippe? Jeg synes
+umiddelbart her er tale om en flot forbedring."
+
+* Etiketten i køkkensalts fire trin hedder **Gennemgang · Trin n af 4**, så
+  eleven kan se, at det er en gennemgang.
+* Kortet har en stille knap med kant, **Spring gennemgangen over**. Mønstret
+  er "Spring præsentationen over" i `kemichael/praesentation.js`. Den står
+  øverst til højre på kortets første linje (float, så kun den linje bliver
+  kortere). Den står aldrig, hvor Indsend svar, Næste eller svarene står, og
+  kortet får ingen ekstra linje.
+* Et klik giver køkkensalt som en almindelig reaktion (som reaktion 2-10).
+  Alt er fremme, + og − er synlige, det lille tal kan klikkes, tallene er 1,
+  og reaktionen er ikke løst, så eleven selv afstemmer den. Et klik midt i
+  en reaktion stopper den.
+* Klikket huskes i browseren (`nk-sc1.4-kg-gennemgang`), så gennemgangen
+  ikke kommer igen ved genindlæsning. Start forfra giver den igen. Er
+  køkkensalt løst gennem gennemgangen, er knappen væk.
+* Kortet holder sin faste plads, og skemaet står stille, når der klikkes
+  (tjekket i 1100 × 760, 1400 × 860 og 1920 × 1080).
+
+Tekstrettelsen er T5-10 i `ret/t5.json` (etiketten).
+
 ## Fane 1: Kuglerne
 
 Tavlen øverst har reaktionsskemaet. Over og under tallet foran hvert stof er
@@ -208,7 +317,8 @@ også have en kuglemodel i `D.GEO`.
 
 <kbd>1</kbd> <kbd>2</kbd> fane · <kbd>R</kbd> start forfra · <kbd>H</kbd>
 rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> reager eller tjek ·
-<kbd>Esc</kbd> luk. Direkte links: `#kugler` og `#skema`.
+<kbd>Esc</kbd> luk. Direkte links: `#kugler` og `#skema` (også `#med-kugler`
+og `#uden-kugler`).
 
 ## Selvtest
 
@@ -224,6 +334,15 @@ rigtigt svar, at knappen lyser efter en fejl og holder op igen, at
 optællingen på fane 2 er slået fra ved hver ny reaktion, sproget og layoutet
 fra 1100 × 700 til 1600 × 950.
 Sidst kørt: ALT OK (88 påstande), 30. september 2026.
+Runde 2 har afsnit 10-13: rækken og optællingen (✓ først efter Indsend svar),
+den trinvise reaktion 1 trin for trin (intet klikbart under spørgsmålet,
+kun den ene + knap i trin 3 og 4, går selv videre, Vis svaret, Start
+forfra), fane 2's titler og spørgsmål, teorien med henvisningen, ingen
+versaler eller tung skrift, og ingen rullebjælker i 1100 × 760, 1400 × 860
+og 1920 × 1080. Runde 3 har afsnit 11b (Spring gennemgangen over: knappen i trin 1-4 og
+væk bagefter, et klik giver en almindelig reaktion, intet hop, huskes,
+Start forfra giver gennemgangen igen). Sidst kørt: ALT OK (183 påstande),
+21. nov. 2026.
 
 ## I menuen
 

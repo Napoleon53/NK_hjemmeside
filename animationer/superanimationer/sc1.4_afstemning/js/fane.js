@@ -14,13 +14,18 @@
    tallene i felterne (Enter goer det samme). Et rigtigt svar laegger
    ikke kortet om. Opgaven bliver staaende, forklaringen kommer under
    den i en groen boks (gul, naar svaret blev vist), og Naeste opgave
-   staar, hvor Indsend svar stod. Start forfra ligger i panelet under
-   listen, aldrig paa kortet. Der er ingen statuslinje nederst.
+   staar, hvor Indsend svar stod. Start forfra ligger i opgaveraekken
+   (fane 1) eller i panelet under listen (fane 2), aldrig paa kortet.
+   Der er ingen statuslinje nederst.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
-     * listen i panelet: reaktionerne i grupper, med loest og stjerne
-       (huskes i browseren)
+     * listen: paa fane 1 opgaveraekken oeverst i scenen (valg.raekke, 21. nov.
+       2026, runde 2: panelet er vaek), paa fane 2 listen i panelet. Begge i
+       grupper, med loest og stjerne (huskes i browseren), og titlerne laases
+       op i takt (valg.laasTitler)
+     * trinene i en trinvis opgave (fanen saetter this.trinSlut, naar et trin
+       er loest: saa staar forklaringen og Naeste trin paa kortet)
      * kortet: opgaven, beskeden med farve efter hvad der skete, og et
        ryst ved en fejl
      * hintknappen: Giv et hint > Naeste hint > Vis svaret. Den lyser
@@ -61,7 +66,8 @@
             this.hintE = null;        /* det atom, hintet handler om */
             this.pegKnap = false;     /* knappen lyser stille efter en fejl */
             this.el = { knap: el("knap"), liste: el("liste"), skort: el("skort"), ind: el("ind"),
-                besked: el("besked"), status: el("status"), forfra: el("forfra"), indsend: el("indsend") };
+                besked: el("besked"), status: el("status"), forfra: el("forfra"), indsend: el("indsend"),
+                raekke: el("raekke") };
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
             this.slut = null;
@@ -91,13 +97,12 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Listen i panelet --------------------------------------------------
-           Laaste titler (brugeren 21. nov. 2026, "husk dette"): paa fane 1
-           (valg.laasTitler) viser listen kun navnene paa de loeste reaktioner
-           og den, eleven er ved. De kommende staar som et nummer med en graa
-           streg og kan ikke klikkes, til de er naaet: alle foer dem er loest
-           (Vis svaret taeller som loest), eleven har vaeret der, eller den er
-           loest foer (gemt i browseren). Fane 2 har kun numre og er uaendret. */
+        /* ----- Listen ------------------------------------------------------------
+           Laaste titler (brugeren 21. nov. 2026, "husk dette"): listen viser kun
+           navnene paa de loeste reaktioner og den, eleven er ved. De kommende
+           staar som et nummer og kan ikke klikkes, til de er naaet: alle foer
+           dem er loest (Vis svaret taeller som loest), eleven har vaeret der,
+           eller den er loest foer (gemt i browseren). Begge faner (runde 2). */
         P.aabenOpgave = function (i) {
             if (!valg.laasTitler) return true;
             if (this.status[i].loest || (this.naaet && this.naaet[i])) return true;
@@ -107,6 +112,7 @@
 
         P.bygListe = function () {
             var mig = this;
+            if (valg.raekke) { this.bygRaekke(); return; }
             this.el.liste.innerHTML = "";
             this.chips = [];
             this.grupper.forEach(function (g) {
@@ -136,6 +142,7 @@
 
         P.visListe = function () {
             var mig = this;
+            if (valg.raekke) { this.visRaekke(); return; }
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
@@ -154,6 +161,13 @@
                 c.classList.toggle("stjerne", s.stjerne);
                 c.querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : "");
             });
+            /* Kan listen ikke vaere i panelet med alle titlerne, staar de loeste
+               som nummer med ✓ (titlen som vaerktoejstip); den valgte beholder sin */
+            var panel = this.el.liste.closest ? this.el.liste.closest(".panel") : null;
+            if (panel && valg.laasTitler) {
+                this.el.liste.classList.remove("trang");
+                if (panel.scrollHeight > panel.clientHeight + 1) this.el.liste.classList.add("trang");
+            }
             this.grupper.forEach(function (g) {
                 var ialt = 0, loest = 0;
                 mig.opgaver.forEach(function (o, i) {
@@ -166,9 +180,65 @@
             NK.saetTekst(navn + "-loest", String(this.antalLoest()));
         };
 
+        /* ----- Opgaveraekken oeverst i scenen (fane 1, runde 2, REGELSAET 3 og 17) ----
+           Reaktionerne staar i tre grupper (Let, Middel, Svaer) med et lille navn
+           foran. Hver knap har nummeret og navnet; de kommende er et laast nummer.
+           Under 1200 px, eller naar raekken ikke kan vaere der, staar kun numrene
+           (navnet paa den valgte bliver). Start forfra staar yderst til hoejre. */
+        P.bygRaekke = function () {
+            var mig = this;
+            this.el.liste.innerHTML = "";
+            this.chips = [];
+            this.grupper.forEach(function (g) {
+                var boks = document.createElement("div");
+                boks.className = "or-gruppe";
+                var navnEl = document.createElement("span");
+                navnEl.className = "or-gruppenavn";
+                navnEl.textContent = g.titel;
+                boks.appendChild(navnEl);
+                mig.opgaver.forEach(function (o, i) {
+                    if ((o.gruppe || "alle") !== g.id) return;
+                    var b = document.createElement("button");
+                    b.type = "button";
+                    b.className = "or-knap";
+                    b.innerHTML = '<span class="or-nr"></span><span class="or-navn"></span>';
+                    b.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
+                    boks.appendChild(b);
+                    mig.chips[i] = b;
+                });
+                mig.el.liste.appendChild(boks);
+            });
+        };
+
+        P.visRaekke = function () {
+            var mig = this;
+            this.status.forEach(function (s, i) {
+                var b = mig.chips[i], o = mig.opgaver[i], aaben = mig.aabenOpgave(i);
+                if (!b) return;
+                b.classList.toggle("valgt", i === mig.nr);
+                b.classList.toggle("loest", s.loest);
+                b.classList.toggle("stjerne", s.stjerne);
+                b.classList.toggle("laast", !aaben);
+                b.disabled = !aaben;
+                NK.saetTekstEl(b.querySelector(".or-nr"), s.stjerne ? "★" : (s.loest ? "✓" : String(i + 1)));
+                NK.saetTekstEl(b.querySelector(".or-navn"), aaben ? o.navn : "");
+                b.title = aaben ? (i + 1) + ". " + o.navn : "Reaktion " + (i + 1) + " kommer, når du når dertil";
+                b.setAttribute("aria-label", aaben ? "Reaktion " + (i + 1) + ": " + o.navn : "Reaktion " + (i + 1) + ", ikke åben endnu");
+            });
+            /* Kan raekken ikke vaere der med navnene, staar kun numrene (og den valgtes navn) */
+            var r = this.el.raekke;
+            if (r) {
+                r.classList.remove("trang");
+                if (this.el.liste.scrollWidth > this.el.liste.clientWidth + 1) r.classList.add("trang");
+            }
+        };
+
         /* ----- Opgaven --------------------------------------------------------- */
-        P.vaelg = function (i) {
+        /* medTrin: Start forfra giver trinene igen i en trinvis opgave, ogsaa
+           naar den er loest foer (REGELSAET 16) */
+        P.vaelg = function (i, medTrin) {
             this.nr = i;
+            this.medTrin = !!medTrin;
             this.naaet = this.naaet || {};
             this.naaet[i] = true;
             this.hjaelp = 0;
@@ -177,6 +247,7 @@
             this.brugtSvar = false;
             this.faerdig = false;
             this.slut = null;
+            this.trinSlut = null;
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
             this.lavOpgave(i);
@@ -199,9 +270,13 @@
             return html;
         };
 
+        /* Kortet bliver paa et loest trin eller en loest opgave med forklaringen */
+        P.blivNu = function () { return this.slut || this.trinSlut || null; };
+        P.lukket = function () { return !!(this.faerdig || this.trinSlut); };
+
         P.visKort = function () {
-            var e = this.el.skort;
-            var kl = "scenekort " + (this.slut ? "loest bliv" + (this.slut.vist ? " svar" : "") : "opgave");
+            var e = this.el.skort, b = this.blivNu();
+            var kl = "scenekort " + (b ? "loest bliv" + (b.vist ? " svar" : "") : "opgave");
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
             var html = this.kortHTML();
             if (this.el.ind._html !== html) { this.el.ind.innerHTML = html; this.el.ind._html = html; }
@@ -232,7 +307,8 @@
             return Math.max(basis, this.el.skort.offsetHeight || 0);
         };
 
-        P.top = function () { return 10 + this.kortZone() + 12; };
+        /* Kortet staar under opgaveraekken, hvis fanen har den (CSS saetter top) */
+        P.top = function () { return (this.el.skort.offsetTop || 10) + this.kortZone() + 12; };
 
         P.tjekZone = function () {
             if (this.lay && this.lay.zone !== undefined && this.kortZone() > this.lay.zone) this.layout();
@@ -242,7 +318,7 @@
            Knapperne + og − og felterne vaelger kun. Bedoemmelsen sker, naar
            eleven trykker Indsend svar (eller Enter). */
         P.indsendKlik = function () {
-            if (this.auto || this.faerdig) return;
+            if (this.auto || this.lukket()) return;
             if (!this.kanSendes()) {
                 this.kortBlink();
                 var t = this.ikkeKlarTekst ? this.ikkeKlarTekst() : "";
@@ -254,14 +330,14 @@
         };
 
         P.enter = function () {
-            if (this.faerdig) this.knap();
+            if (this.lukket()) this.knap();
             else this.indsendKlik();
         };
 
         P.visIndsend = function () {
             var e = this.el.indsend;
-            e.hidden = !!this.faerdig;
-            var kan = !this.faerdig && !this.auto && this.kanSendes();
+            e.hidden = this.lukket();
+            var kan = !this.lukket() && !this.auto && this.kanSendes();
             if (e._kan === kan) return;
             e._kan = kan;
             e.classList.toggle("klar", kan);
@@ -275,8 +351,8 @@
             var b = this.kortT > 0 ? this.nuB : this.fast;
             var har = !!(b && b.html);
             this.el.besked.hidden = !har;
-            this.el.knap.hidden = !!this.faerdig;
-            this.el.status.hidden = !!this.faerdig && !har;
+            this.el.knap.hidden = this.lukket();
+            this.el.status.hidden = this.lukket() && !har;
         };
 
         /* Hinttrappen for den tilstand, eleven staar i lige nu */
@@ -310,6 +386,7 @@
         /* ----- Knappen: ét skridt hjaelp ad gangen ------------------------------- */
         P.knap = function () {
             if (this.auto) return;
+            if (this.trinSlut && !this.faerdig) { this.naesteTrin(); return; }
             if (this.faerdig) {
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
@@ -397,7 +474,7 @@
 
         /* Beskeden paa kortet, og naar opgaven er loest, forklaringen under den */
         P.beskedTekst = function () {
-            if (this.faerdig) {
+            if (this.lukket()) {
                 var f = this.el.ind.querySelector(".bliv .st-tekst");
                 return f ? f.textContent : "";
             }
@@ -430,12 +507,12 @@
         P.fokus = function () {
             if (!NK.el("fane-" + navn).classList.contains("aktiv") ||
                 document.querySelector(".overlay.vis") || (NK.Rundvisning && NK.Rundvisning.aktiv())) return;
-            if (this.faerdig) return;
+            if (this.lukket()) return;
             if (this.fokusFelt) this.fokusFelt();
         };
 
         /* R og Start forfra: samme opgave fra begyndelsen */
-        P.nulstil = function () { this.vaelg(this.nr); };
+        P.nulstil = function () { this.vaelg(this.nr, true); };
 
         P.tilpas = function () {
             if (this.L.tilpas() || !this.lay) this.layout();

@@ -16,12 +16,12 @@
 
     var TURE = {
         "fane-kg": [
-            { sel: "#kg-skema", titel: "Skemaet", tekst: "Tavlen viser reaktionsskemaet. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker." },
+            { sel: "#kg-raekke", titel: "Reaktionerne", tekst: "Rækken øverst har ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne." },
+            { sel: "#kg-skort", titel: "Opgavekortet", tekst: "Opgaven står på kortet. Indsend svar lader molekylerne reagere. Så kan du se, om reaktionen er afstemt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#kg-skema", titel: "Reaktionsskemaet", tekst: "Tavlen viser reaktionsskemaet. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker." },
             { sel: "#kg-anker-bakker", titel: "Bakkerne", tekst: "Bakken til venstre viser molekylerne før pilen. Bakken til højre viser de pladser, som produkterne skal bruge." },
-            { sel: "#kg-regnskabkort", titel: "Atomerne", tekst: "Regnskabet tæller hvert atom før og efter pilen. Hold musen over en række, så lyser atomerne af den slags op." },
-            { sel: "#kg-skort", titel: "Opgavekortet", tekst: "Opgaven står på kortet øverst. Indsend svar lader molekylerne reagere, og så kan du se, om reaktionen er afstemt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#kg-opgaver", titel: "Reaktionerne", tekst: "Listen har ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne." },
-            { sel: ".faneknapper", titel: "Skemaet", tekst: "Den anden fane har kun formlerne. Der skriver du selv tallene." }
+            { sel: ".kg-taelling", titel: "Atomerne", tekst: "Under bakkerne står, hvor mange atomer af hver slags der er før og efter pilen. Når molekylerne har reageret, viser ✓ og ✗, hvilke atomer der passer." },
+            { sel: ".faneknapper", titel: "Afstem uden kugler", tekst: "Den anden fane har kun formlerne. Der skriver du selv tallene." }
         ],
         "fane-sk": [
             { sel: "#sk-linje", titel: "Skemaet", tekst: "Skriv tallet foran hvert stof i feltet. Et tomt felt tæller som 1. Enter gør det samme som Indsend svar." },

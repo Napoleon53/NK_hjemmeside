@@ -897,3 +897,233 @@ input[type="range"] {
     .scenekort { top: 8px; }
     .sk-knap { padding: 4px 9px; font-size: 0.88rem; }
 }
+
+/* =====================================================================
+   Runde T6 (21. nov. 2026, Niels' ja til forslagene efter REGELSAET)
+   ===================================================================== */
+
+/* Ingen versaler og ingen tung skrift (REGELSAET 30), ogsaa paa fane 1 */
+.kort > h2 { font-size: 0.86rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.kort > h2 .taeller { letter-spacing: 0; }
+.maerke { font-size: 0.74rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.overlay-boks h3 { font-size: 0.92rem; letter-spacing: 0; text-transform: none; }
+.quiz-tal { letter-spacing: 0; text-transform: none; }
+
+/* ----- Fane 2 uden panel (REGELSAET 3) ---------------------------------- */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-maetning .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+[hidden] { display: none !important; }
+
+/* Opgaveraekken oeverst i scenen (moenster: sc5.7 og sc1.4) */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+
+/* Kortet staar under raekken */
+#fane-maetning .scenekort { top: 46px; }
+@media (max-height: 720px) {
+    #fane-maetning .opgaverad { top: 6px; }
+    #fane-maetning .scenekort { top: 42px; }
+}
+
+/* ----- Etiketten paa glasset (REGELSAET 22) ------------------------------ */
+.glas-etiket {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+    padding: 7px 12px 8px;
+    border: 1px solid #d9d4c6;
+    border-radius: 8px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+}
+.ge-hoved {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e4dfd2;
+    color: #4a5160;
+    font-size: 14px;
+    font-weight: 500;
+}
+.ge-raekke { display: flex; justify-content: space-between; gap: 10px; font-size: 15.5px; font-weight: 400; line-height: 1.55; }
+.ge-raekke b { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ----- Knapperne over spatlen -------------------------------------------- */
+.glas-knapper .knap.lille { font-family: inherit; font-size: 0.9rem; font-weight: 500; }
+
+/* ----- Varmepladens − og + med temperaturen (REGELSAET 2) ----------------- */
+.plade-knapper {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translateX(-50%);
+}
+.pk-knap {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #5e6878;
+    border-radius: 50%;
+    background-color: #2b313b;
+    color: #e9eef4;
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+}
+.pk-knap:hover:not(.skjult) { border-color: #8a94a3; background-color: #353c48; }
+.pk-knap.skjult { visibility: hidden; pointer-events: none; }
+.pk-tal {
+    min-width: 70px;
+    padding: 4px 10px;
+    border: 1px solid #39404b;
+    border-radius: 6px;
+    background-color: #0f1218;
+    color: #f2c53d;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ----- Klik-opfordringen: gul ramme og en boble (REGELSAET 19-20) ---------- */
+.opfordring {
+    outline: 3px solid var(--gul) !important;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 7px rgba(242, 197, 61, 0.18) !important;
+}
+.maet-boble {
+    position: absolute;
+    z-index: 7;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background-color: var(--gul);
+    color: #1d2433;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.maet-boble.hoejre { transform: translate(0, -50%); }
+.maet-boble.venstre { transform: translate(-100%, -50%); }
+.maet-boble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    margin-left: -7px;
+    border: 7px solid transparent;
+}
+.maet-boble.over::after { top: 100%; border-top-color: var(--gul); }
+.maet-boble.hoejre::after { right: 100%; left: auto; top: 50%; margin: -7px 0 0 0; border-right-color: var(--gul); }
+.maet-boble.venstre::after { left: 100%; top: 50%; margin: -7px 0 0 0; border-left-color: var(--gul); }
+
+/* ----- Hylden med de seks salte (fri leg) ---------------------------------- */
+.salthylde {
+    position: absolute;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: end;
+    gap: 10px 6px;
+}
+.hg-glas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+.hg-laag { width: 70%; height: 8px; border-radius: 3px 3px 0 0; background-color: #5b6472; }
+.hg-krop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    border: 1px solid #7d8794;
+    border-radius: 4px 4px 7px 7px;
+    background: linear-gradient(to bottom, rgba(220, 230, 240, 0.18), rgba(220, 230, 240, 0.32));
+}
+.hg-formel {
+    padding: 2px 4px;
+    border-radius: 3px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.hg-glas:hover .hg-krop { border-color: #b9c2ce; }
+.hg-glas.valgt .hg-krop { border-color: var(--blaa); box-shadow: 0 0 0 2px var(--blaa); }
+.hg-glas.valgt .hg-laag { background-color: var(--blaa); }
+
+/* Mens Kemichael er paa scenen, traeder etiketten og knapperne tilbage */
+.glas-etiket, .glas-knapper, .plade-knapper, .salthylde { transition: opacity 0.3s ease; }
+.scene.laerer-fremme .glas-etiket,
+.scene.laerer-fremme .glas-knapper,
+.scene.laerer-fremme .plade-knapper,
+.scene.laerer-fremme .salthylde,
+.scene.laerer-fremme .maet-boble { opacity: 0; pointer-events: none; }

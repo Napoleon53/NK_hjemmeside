@@ -7,6 +7,13 @@
    mens der skrives. Enter tjekker. 24 reaktioner i tre grupper: Let,
    Middel (forbraendinger og syrer) og Svaer (parenteser, store tal og et
    halvt O2 undervejs).
+
+   Runde 2 (21. nov. 2026, Niels' ja): kortet spoerger halvfedt "Hvilke tal
+   skal staa foran Ca, O₂ og CaO?" med "Et tomt felt taeller som 1." paa
+   linjen under. Reaktionerne har titler i listen, laast op i takt
+   (REGELSAET 17-18). Tavlen er mindre og staar lige under kortet uden
+   overskriften "Reaktion 1", og optaellingen har en stiplet plads med
+   navnet, saa intet hopper, naar den slaas til (REGELSAET 13).
    ===================================================================== */
 (function () {
     "use strict";
@@ -27,9 +34,11 @@
     }
 
     var P = SimSkema.prototype;
-    NK.Fane.paa(P, { navn: "sk", zone: [156, 124] });
+    NK.Fane.paa(P, { navn: "sk", zone: [156, 124], laasTitler: true });
 
-    P.chipTekst = function (o) { return String(this.opgaver.indexOf(o) + 1); };
+    P.chipTekst = function (o) {
+        return '<span class="oc-nr">' + (this.opgaver.indexOf(o) + 1) + '</span><span class="oc-navn">' + NK.html(o.navn) + "</span>";
+    };
 
     function F(f) { return A.skriv(f); }
 
@@ -64,9 +73,25 @@
 
     P.opgaveFaerdig = function () { return this.opg.loest; };
 
-    /* Opgaven paa papirkortet */
+    /* Opgaven paa papirkortet: spoergsmaalet naevner stofferne (REGELSAET 5 og 7) */
+    P.spoergsmaal = function () {
+        var o = this.opg.o, st = o.r.concat(o.p).map(F);
+        var liste = st.length === 1 ? st[0] : st.slice(0, -1).join(", ") + " og " + st[st.length - 1];
+        return "Hvilke tal skal stå foran " + liste + "?";
+    };
+
     P.kortTekst = function () {
-        return "Skriv tallene foran stofferne i felterne på tavlen, så reaktionen er afstemt. Et tomt felt tæller som 1.";
+        return this.spoergsmaal() + " Et tomt felt tæller som 1.";
+    };
+
+    /* Spoergsmaalet halvfedt paa sin egen linje og forklaringen i almindelig
+       skrift paa linjen under (REGELSAET 5-6) */
+    P.kortHTML = function () {
+        var html = '<p class="sk-tekst"><span class="sk-chip">Reaktion ' + (this.nr + 1) + " af " + this.opgaver.length + "</span>" +
+            '<span class="sk-spm">' + NK.html(this.spoergsmaal()) + "</span>" +
+            '<span class="sk-note-linje">Et tomt felt tæller som 1.</span></p>';
+        if (this.slut) html += NK.Papir.bliv(this.slut.html, this.slut.vist ? "Svaret" : "Afstemt", NK.html(this.videreTekst()), this.slut.vist);
+        return html;
     };
 
     P.trinLinje = function () {
@@ -180,10 +205,6 @@
         var mig = this, o = this.opg.o, t = this.tavle;
         t.innerHTML = "";
         t.classList.remove("faerdig", "ryst");
-        var navn = document.createElement("div");
-        navn.className = "tv-navn";
-        navn.textContent = o.navn;
-        t.appendChild(navn);
 
         var linje = document.createElement("div");
         linje.className = "sk-linje skema-stor";
@@ -246,7 +267,8 @@
        men vises kun, naar eleven har slaaet optaellingen til. */
     P.visRegnskab = function () {
         var o = this.opg.o, k = this.tal();
-        this.rsEl.hidden = !this.tael;
+        /* Slaaet fra: en stiplet plads med navnet, saa tavlen ikke skifter stoerrelse */
+        this.rsEl.classList.toggle("skjult", !this.tael);
         var rows = A.regnskab(o.r, o.p, k.cr, k.cp);
         var html = '<span class="tr-h"></span><span class="tr-h">Før pilen</span><span class="tr-h">Efter pilen</span><span class="tr-h"></span>';
         var lys = this.faerdig ? null : this.hintE;
@@ -282,32 +304,35 @@
         }
     };
 
-    /* ----- Scenen ------------------------------------------------------------------------ */
+    /* ----- Scenen ------------------------------------------------------------------------
+       Runde 2: tavlen er ikke et stort tomt felt. Den staar lige under kortet
+       (REGELSAET 37) med en stoerste bredde, og hoejden foelger skemaet og
+       pladsen til optaellingen. Knappen Vis optaellingen staar lige under. */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
         var lay = { W: W, H: H, baand: baand };
         var kant = NK.klamp(W * 0.03, 12, 34), top = this.top();
         lay.zone = this.kortZone();
-        var b = Math.min(W - 2 * kant, 1040);
-        /* Tavlen skal ikke vaere et stort tomt felt: hoejden foelger skemaets
-           egen stoerrelse, og resten af pladsen er luft omkring den */
-        var plads = baand.y - top - NK.klamp(H * 0.03, 10, 22);
-        var knap = 68;                                  /* plads til knappen under tavlen */
-        var h = NK.klamp(b * 0.5, 200, plads - knap);
-        lay.tavle = { x: Math.round((W - b) / 2), y: Math.round(top + (plads - knap - h) / 2), b: Math.round(b), h: Math.round(h) };
-        lay.fs = Math.round(NK.klamp(Math.min(h / 6, b / 15), 24, 54));
-        var t = this.tavle;
-        t.style.left = lay.tavle.x + "px";
-        t.style.top = lay.tavle.y + "px";
-        t.style.width = lay.tavle.b + "px";
-        t.style.height = lay.tavle.h + "px";
-        var k = this.taelKnap, kb = NK.klamp(lay.tavle.b * 0.32, 260, 380);
-        k.style.left = Math.round(lay.tavle.x + (lay.tavle.b - kb) / 2) + "px";
-        k.style.width = Math.round(kb) + "px";
-        k.style.top = Math.round(lay.tavle.y + lay.tavle.h + 14) + "px";
+        var b = Math.round(Math.min(W - 2 * kant, 880));
+        lay.fs = Math.round(NK.klamp(Math.min(b / 22, H / 20), 22, 40));
         this.lay = lay;
+        var t = this.tavle;
+        t.style.left = Math.round((W - b) / 2) + "px";
+        t.style.width = b + "px";
+        t.style.height = "";
         this.tilpasTavle();
+        var th = t.offsetHeight || 200;
+        var knapH = 50, gap = 14;
+        var ledig = baand.y - top - 10;
+        var y = Math.round(top + Math.max(6, Math.min(40, (ledig - th - gap - knapH) * 0.2)));
+        t.style.top = y + "px";
+        lay.tavle = { x: Math.round((W - b) / 2), y: y, b: b, h: th };
+        var k = this.taelKnap, kb = NK.klamp(b * 0.34, 260, 340);
+        k.style.left = Math.round(lay.tavle.x + (b - kb) / 2) + "px";
+        k.style.width = Math.round(kb) + "px";
+        k.style.top = Math.round(y + th + gap) + "px";
+        if (this.status) this.visListe();
     };
 
     P.tegn = function () {

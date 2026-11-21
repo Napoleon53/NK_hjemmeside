@@ -68,7 +68,9 @@
 
     /* Farven lysere (f > 0) eller moerkere (f < 0) */
     function nuance(hex, f) {
-        var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+        var r, g, b, m = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(hex);
+        if (m) { r = +m[1]; g = +m[2]; b = +m[3]; }
+        else { var n = parseInt(hex.slice(1), 16); r = n >> 16; g = (n >> 8) & 255; b = n & 255; }
         var maal = f > 0 ? 255 : 0, a = Math.abs(f);
         r = Math.round(r + (maal - r) * a); g = Math.round(g + (maal - g) * a); b = Math.round(b + (maal - b) * a);
         return "rgb(" + r + "," + g + "," + b + ")";
@@ -102,7 +104,7 @@
     }
 
     var P = SimBeholder.prototype;
-    NK.Fane.paa(P, { navn: "bh", chip: "Mål", naesteFane: "fane-ux", naesteNavn: "Uden x", videreTekst: "Næste mål →" });
+    NK.Fane.paa(P, { navn: "bh", chip: "Mål", naesteFane: "fane-ux", naesteNavn: "Ved ligevægt", videreTekst: "Næste mål →" });
 
     P.maal = function () { return this.opgaver[this.nr]; };
 
@@ -118,6 +120,7 @@
         this.roert = false;
         this.venter = 0;
         this.naaet = false;
+        this.skjulMaerke();
         this.tValgt = null;
         this.tForkert = {};
         this.efterFase = false;
@@ -200,7 +203,8 @@
         this.opdaterTal();
         var fane = NK.el("bh-graffane");
         fane.hidden = !!m.graf;
-        fane.classList.toggle("skjult", laast);
+        /* Skjult kun mens kortet stiller et aabent spoergsmaal (regel 19a) */
+        fane.classList.toggle("skjult", this.spoergerAabent());
         fane.textContent = this.grafUd ? "Skjul grafen ▾" : "Vis grafen ▸";
         fane.setAttribute("aria-expanded", this.grafUd ? "true" : "false");
         this.visOpfordring();
@@ -278,6 +282,7 @@
         this.pegKnap = false;
         this.venter = 0;
         this.roert = false;
+        this.skjulMaerke();
         this.bygTavle();
         this.visKort();
         this.naesteLinje("", "");
@@ -290,6 +295,7 @@
     P.handlingFaerdig = function (vist) {
         var t = this.maal().trin[this.trinNr];
         this.venter = 0;
+        this.skjulMaerke();
         if (t.snap || vist) { this.saetX(this.maalX(t), true); this.opdaterTal(); }
         if (t.efter) {
             this.efterFase = true;
@@ -378,11 +384,26 @@
         var mig = this, rx = this.rx;
         this.mol = [];
         /* Beholderen fyldes roligt: molekylerne toner frem ét ad gangen (regel 42) */
-        var k = 0;
+        var k = 0, L = this.lay, iw = L ? L.beh.w - 16 : 500, ih = L ? L.beh.h - 16 : 350, R = L ? this.molR(L.beh) : 14;
+        /* Pladserne vaelges, saa molekylerne helst ikke ligger oven i hinanden */
+        function plads(s) {
+            var bedst = null, bd = -Infinity;
+            for (var f = 0; f < 30; f++) {
+                var p = { x: NK.r(0.08, 0.92), y: NK.r(0.08, 0.92) }, d = Infinity;
+                mig.mol.forEach(function (q) {
+                    var dx = (q.x - p.x) * iw, dy = (q.y - p.y) * ih;
+                    d = Math.min(d, Math.sqrt(dx * dx + dy * dy) - (molRad(q.s) + molRad(s)) * R);
+                });
+                if (d > bd) { bd = d; bedst = p; }
+                if (d > 4) break;
+            }
+            return bedst;
+        }
         M.alle(rx).forEach(function (a) {
             var n = Math.round(M.c0(rx, a.s) / rx.enhed);
             for (var i = 0; i < n; i++) {
-                var m = mig.nytMolekyle(a.s, Math.random(), Math.random());
+                var pl = plads(a.s);
+                var m = mig.nytMolekyle(a.s, pl.x, pl.y);
                 m.alfa = 0;
                 m.forsink = 0.15 + k++ * 0.07;
                 mig.mol.push(m);
@@ -395,7 +416,7 @@
     P.nytMolekyle = function (s, x, y) {
         var v = NK.r(0.025, 0.06), a = NK.r(0, Math.PI * 2);
         return { s: s, x: NK.klamp(x, 0.05, 0.95), y: NK.klamp(y, 0.05, 0.95), vx: Math.cos(a) * v, vy: Math.sin(a) * v,
-            rot: NK.r(0, Math.PI * 2), vr: NK.r(-0.35, 0.35), ny: 0, alfa: 1 };
+            rot: NK.r(0, Math.PI * 2), vr: 0, ny: 0, alfa: 1 };
     };
 
     function naermeste(liste, s, x, y, undtagen) {
@@ -441,6 +462,7 @@
     };
 
     P.opdaterMolekyler = function (dt) {
+        var L = this.lay, geo = L ? { iw: L.beh.w - 16, ih: L.beh.h - 16, R: this.molR(L.beh) } : null;
         var maal = Math.round(this.x / this.rx.enhed + 1e-9);
         var gange = 0;
         while (this.nOms !== maal && gange++ < 4) {
@@ -461,11 +483,30 @@
             }
             if (m.forsink > 0) m.forsink -= dt;
             else if (m.alfa < 1) m.alfa = Math.min(1, m.alfa + dt * 1.5);
-            if (m.x < 0.05) { m.x = 0.05; m.vx = Math.abs(m.vx); }
-            if (m.x > 0.95) { m.x = 0.95; m.vx = -Math.abs(m.vx); }
-            if (m.y < 0.06) { m.y = 0.06; m.vy = Math.abs(m.vy); }
-            if (m.y > 0.94) { m.y = 0.94; m.vy = -Math.abs(m.vy); }
+            var mx = geo ? Math.min(0.3, molRad(m.s) * geo.R / geo.iw) : 0.05, my = geo ? Math.min(0.3, molRad(m.s) * geo.R / geo.ih) : 0.06;
+            if (m.x < mx) { m.x = mx; m.vx = Math.abs(m.vx); }
+            if (m.x > 1 - mx) { m.x = 1 - mx; m.vx = -Math.abs(m.vx); }
+            if (m.y < my) { m.y = my; m.vy = Math.abs(m.vy); }
+            if (m.y > 1 - my) { m.y = 1 - my; m.vy = -Math.abs(m.vy); }
         });
+        /* Faerre overlap (runde 4): molekyler, der rammer hinanden, skubbes blidt
+           fra hinanden, saa atomsymbolerne kan laeses */
+        if (geo) {
+            var ml = this.mol.filter(function (m) { return !m.ude; });
+            for (var i = 0; i < ml.length; i++) {
+                for (var j = i + 1; j < ml.length; j++) {
+                    var a = ml[i], b = ml[j];
+                    var dx = (b.x - a.x) * geo.iw, dy = (b.y - a.y) * geo.ih, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+                    var min = (molRad(a.s) + molRad(b.s)) * geo.R * 0.92;
+                    if (d >= min) continue;
+                    var skub = Math.min(1, (min - d) / min) * 40 * dt, ux = dx / d, uy = dy / d;
+                    a.x -= ux * skub / geo.iw; a.y -= uy * skub / geo.ih;
+                    b.x += ux * skub / geo.iw; b.y += uy * skub / geo.ih;
+                    var va = a.vx * ux + a.vy * uy, vb = b.vx * ux + b.vy * uy;
+                    if (va - vb > 0) { a.vx += (vb - va) * ux; a.vy += (vb - va) * uy; b.vx += (va - vb) * ux; b.vy += (va - vb) * uy; }
+                }
+            }
+        }
         if (this.laag) {
             this.laag.t += dt;
             if (this.laag.t > 2.6 && !this.laag.lukket) {
@@ -521,10 +562,16 @@
         var mig = this, m = this.maal(), rx = this.rx, w = NK.el("bh-tavle");
         if (!m.tavle) { w.innerHTML = ""; return; }
         var tab = el("table", "bt-skema");
-        var hoved = el("tr");
+        var hoved = el("tr"), arter = M.alle(rx);
         hoved.appendChild(el("th", "bt-hj", ""));
-        M.alle(rx).forEach(function (a) {
+        /* Oeverste raekke laeses som reaktionsskemaet: + mellem stofferne paa samme
+           side og ⇌ mellem reaktanter og produkter, i smalle kolonner, der er tomme
+           i raekkerne under (runde 5, REGELSAET 48) */
+        function tegn(i) { return i === 0 ? null : (arter[i - 1].side !== arter[i].side ? "⇌" : "+"); }
+        arter.forEach(function (a, i) {
+            if (tegn(i)) hoved.appendChild(el("th", "bt-tegn", tegn(i)));
             var th = el("th", "bt-stof");
+            if (a.k > 1) th.appendChild(el("span", "bt-koef", String(a.k)));
             var p = el("span", "bt-pille", NK.html(M.skriv(a.s)));
             p.style.setProperty("--stof", farve(a.s));
             p.setAttribute("data-s", a.s);
@@ -535,7 +582,8 @@
         m.tavle.raekker.forEach(function (r) {
             var tr = el("tr", "bt-" + r);
             tr.appendChild(el("th", "bt-r", RNAVN[r]));
-            M.alle(rx).forEach(function (a) {
+            arter.forEach(function (a, ai) {
+                if (tegn(ai)) tr.appendChild(el("td", "bt-tegn", ""));
                 var td = el("td");
                 td.setAttribute("data-felt", r + "." + a.s);
                 if (r === "start") {
@@ -546,7 +594,8 @@
                     else if (tilst === "senere") { td.className = "tom"; td.innerHTML = '<span class="bt-felt"></span>'; }
                     else {
                         td.innerHTML = NK.html(r === "aendr" ? M.aendrTekst(a) : ligMedEnhed(rx, a));
-                        if (r === "lig" && m.tavle.tal) td.innerHTML += ' <span class="bt-tal" data-s="' + a.s + '"></span>';
+                        /* Tallet staar paa sin egen linje i mindre skrift og kun ved ligevaegt (regel 49, 50) */
+                        if (r === "lig" && m.tavle.tal) td.innerHTML += '<span class="bt-tal skjult" data-s="' + a.s + '">= 0,000 M</span>';
                     }
                 }
                 tr.appendChild(td);
@@ -558,6 +607,8 @@
         (m.tavle.linjer || []).forEach(function (l, i) {
             var tilst = mig.feltTilstand("linje", i);
             if (tilst === "senere") return;
+            if (l.fra !== undefined && !mig.faerdig && mig.trinNr < l.fra) return;
+            if (l.til !== undefined && (mig.faerdig || mig.trinNr > l.til)) return;
             var d = el("div", "bt-linje" + (tilst === "spoerg" ? " spoerg" : "") + (l.lov ? " bt-lov" : ""));
             d.appendChild(el("div", "bt-navn", NK.html(l.navn)));
             /* Ligevaegtsloven med symboler staar synligt, mens eleven saetter ind (regel 41) */
@@ -572,12 +623,16 @@
 
     P.opdaterTal = function () {
         var rx = this.rx, x = this.x;
+        /* Raekken Ligevaegt faar kun tal, naar der er ligevaegt: lampen er groen,
+           eller opgaven er loest med x paa ligevaegten (runde 5, regel 49). Pladsen
+           er der hele tiden, saa tavlen ikke hopper. */
         var tal = NK.el("bh-tavle").querySelectorAll(".bt-tal");
+        var ligeNu = this.erLigevaegt(x) && (this.lampe || this.faerdig);
         for (var i = 0; i < tal.length; i++) {
             var s = tal[i].getAttribute("data-s"), v = M.vaerdi(M.plads(rx, s), x);
             var tekst = "= " + t3(v) + " M";
             if (tal[i].textContent !== tekst) tal[i].textContent = tekst;
-            tal[i].classList.toggle("nul", Math.abs(v) < 0.0005);
+            tal[i].classList.toggle("skjult", !ligeNu);
         }
         var Y = M.Y(rx, x), K = rx.K;
         /* Svaret staar ikke i scenen, foer eleven har svaret (regel 38): Y's
@@ -594,9 +649,48 @@
         if (e) { e.className = "y-sml" + (lige && this.lampe ? " lige" : ""); e.hidden = !visL; }
     };
 
+    /* ----- Hjaelpen paa skyderen (runde 4, Niels: "lidt svært at ramme x ... måske skal
+       den blinke lidt hjælpende, hvis man ikke rammer efter 10 sekunder") ------------
+       Har eleven trukket i 10 s uden at naa maalet (eller faaet hintet om den),
+       kommer en lille gul streg paa skyderens spor, dér hvor maalet er. Den
+       pulserer roligt tre gange og bliver staaende svagt (regel 26). */
+    var HJAELP_EFTER = 10;
+
+    P.skjulMaerke = function () {
+        this.maerke = false;
+        this.traekT = 0;
+        var e = NK.el("bh-maal");
+        if (e) { e.hidden = true; e.classList.remove("vis"); }
+    };
+
+    P.visMaerke = function () {
+        var t = this.trin();
+        if (!t || this.faerdig || (t.type !== "handling" && t.type !== "ligevaegt")) return;
+        this.maerke = true;
+        this.placerMaerke();
+        var e = NK.el("bh-maal");
+        e.hidden = false;
+        e.classList.remove("vis");
+        void e.offsetWidth;
+        e.classList.add("vis");
+    };
+
+    P.placerMaerke = function () {
+        var t = this.trin(), e = NK.el("bh-maal");
+        if (!t || !e || !this.maerke) return;
+        var w = this.skyder.getBoundingClientRect().width;
+        var xm = this.maalX(t);
+        e.style.left = Math.round(KNAP_R + xm / this.xMax * (w - 2 * KNAP_R)) + "px";
+    };
+
+    /* Fane.js kalder efterHint, naar eleven faar et hint: hintet om den gule streg viser den */
+    P.efterHint = function (tekst) { if (/gule streg/.test(tekst || "")) this.visMaerke(); };
+
     /* ----- Grafen foldes ind og ud (fra maal 2) --------------------------------------- */
+    P.spoergerAabent = function () { return !!this.trinNu() && !this.trinBliv; };
+
     P.foldGraf = function () {
-        if (this.laastScene()) { this.kortBlink(); return; }
+        if (this.spoergerAabent()) { this.kortBlink(); return; }
         this.grafUd = !this.grafUd;
         this.visDele();
         this.tilpas();
@@ -622,6 +716,7 @@
 
     P.efterOpgave = function () {
         this.venter = 0;
+        this.skjulMaerke();
         this.bygTavle();
         this.visDele();
     };
@@ -643,7 +738,7 @@
         return { s: null, trin: [
             "Y er reaktionsbrøken regnet med koncentrationerne lige nu. Ved ligevægt er Y = K.",
             isFinite(Y) && Y < rx.K ? "Y er for lille. Træk x større, så der bliver mere produkt." : "Y er for stor. Træk x mindre.",
-            "Ligevægten ligger ved x ≈ " + t3(this.xEq) + " M."
+            "Den gule streg på skyderen viser ligevægten ved x ≈ " + t3(this.xEq) + " M."
         ] };
     };
 
@@ -676,7 +771,8 @@
     };
 
     P.fokusFelt = function () {
-        if (!this.skyder.disabled && this.udenIndsend()) {
+        var t = this.trin();
+        if (!this.skyder.disabled && t && !this.faerdig && (t.type === "handling" || t.type === "ligevaegt")) {
             try { this.skyder.focus({ preventScroll: true }); } catch (e) { this.skyder.focus(); }
         }
     };
@@ -765,7 +861,7 @@
         L.tael = { x: ox, y: L.beh.y + behH + 8, w: bw };
         var bund = L.beh.y + behH + taelH;
         var hx = ox + bw + gap, top = pad;
-        if (harY) { L.y = { x: hx, y: top, w: rw, h: 74 }; top += 74 + 12; }
+        if (harY) { L.y = { x: hx, y: top, w: rw, h: 56 }; top += 56 + 8; }
         L.skyd = { x: ox, y: Hh - skydH - 2, h: skydH };
         if (grafMode) {
             L.graf = { x: hx + 54, y: top + 8, w: rw - 54 - 10, h: bund - top - 8 - 26 };
@@ -775,15 +871,16 @@
             L.skyd.w = ox + total - L.skyd.x;
             L.spor = { x: L.graf.x - KNAP_R, w: L.graf.w + 2 * KNAP_R };
         } else {
-            var faneH = 30;
-            var plads = bund - top - faneH - 6;
+            /* Runde 4 (Niels: "Man kan kun folde grafen ud, hvis man zoomer ud"):
+               "Vis grafen" staar i hoejre side ud for skyderen, altid inden for scenen */
+            var plads = bund - top;
             if (this.grafUd) {
-                L.tavle = { x: hx, y: top, w: rw, h: Math.round(plads * 0.58) };
+                L.tavle = { x: hx, y: top, w: rw, h: Math.round(plads * 0.56) };
                 var gy = L.tavle.y + L.tavle.h + 14;
-                L.graf = { x: hx + 54, y: gy + 6, w: rw - 54 - 10, h: bund - faneH - 6 - gy - 6 - 26 };
+                L.graf = { x: hx + 54, y: gy + 6, w: rw - 54 - 10, h: bund - gy - 6 - 22 };
                 if (L.graf.h < 60) L.graf = null;
             } else L.tavle = { x: hx, y: top, w: rw, h: plads };
-            L.fane = { x: hx, y: bund - faneH, w: rw, h: faneH };
+            L.fane = { x: hx, y: L.skyd.y + Math.round((skydH - 32) / 2), w: rw, h: 32 };
             L.skyd.w = bw;
             L.spor = null;
         }
@@ -807,6 +904,7 @@
         var sk = NK.el("bh-skyder");
         stil(sk, L.skyd);
         var lab = sk.querySelector(".bh-xlab"), spor = sk.querySelector(".bh-spor");
+        this.placerMaerke();
         if (L.spor) {
             /* Skalaen flugter med grafens x-akse: sporet begynder, hvor x = 0 er paa grafen */
             lab.style.width = Math.max(120, L.spor.x - L.skyd.x - 16 - 12) + "px";
@@ -833,9 +931,10 @@
         stil(w, { x: L.tavle.x, y: L.tavle.y, w: L.tavle.w });
         w.style.height = "";
         w.style.maxHeight = Math.round(L.tavle.h) + "px";
+        /* Ingen rullebjaelke (regel 50): skriften bliver mindre, ned til 14 px */
         var fs = 17;
         w.style.fontSize = fs + "px";
-        while (fs > 13 && w.scrollHeight > w.clientHeight + 1) { fs -= 0.5; w.style.fontSize = fs + "px"; }
+        while (fs > 14 && w.scrollHeight > w.clientHeight) { fs -= 0.5; w.style.fontSize = fs + "px"; }
         var sp = w.querySelector(".spoerg");
         if (sp && w.scrollHeight > w.clientHeight + 1) {
             var rw = w.getBoundingClientRect(), rs = sp.getBoundingClientRect();
@@ -858,6 +957,11 @@
                     else if (t.type === "ligevaegt") this.loest("ok", NK.html(this.maal().slut), "Ligevægt");
                 }
             }
+        }
+        var th = this.trin();
+        if (!this.faerdig && th && (th.type === "handling" || th.type === "ligevaegt") && this.roert && !this.maerke && !this.trinBliv) {
+            this.traekT += dt;
+            if (this.traekT >= HJAELP_EFTER && !this.maalNaaet(th)) this.visMaerke();
         }
         if (!NK.el("fane-bh").classList.contains("aktiv")) return;
         this.opdaterMolekyler(dt);
@@ -899,7 +1003,18 @@
     };
 
     /* Molekylets stoerrelse foelger beholderen */
-    P.molR = function (b) { return NK.klamp(Math.min(b.w, b.h) / 32, 5.5, 12.5); };
+    /* Runde 4: molekylerne ca. 1,3 gange stoerre, saa atomsymbolerne kan staa i
+       kuglerne i mindst 13,5 px (ogsaa i H) */
+    P.molR = function (b) { return NK.klamp(Math.min(b.w, b.h) / 24, 14, 17); };
+
+    /* Molekylets radius (i R): det yderste atom med dets kugle */
+    var RAD = {};
+    function molRad(s) {
+        if (RAD[s]) return RAD[s];
+        var st = D.STOF[s], r = 1;
+        if (st && st.atomer) st.atomer.forEach(function (a) { r = Math.max(r, Math.sqrt(a[1] * a[1] + a[2] * a[2]) * 1.45 + D.ATOM[a[0]].r); });
+        return (RAD[s] = r);
+    }
 
     P.tegnBeholder = function (c, b) {
         var R = this.molR(b);
@@ -921,7 +1036,7 @@
         this.rx.p.forEach(function (p) { prod[p[1]] = true; });
         this.mol.forEach(function (m) {
             if (m.alfa <= 0) return;
-            mig.tegnMolekyle(c, m.s, ix + m.x * iw, iy + m.y * ih, R, m.rot, m.alfa, fremhaev && prod[m.s]);
+            mig.tegnMolekyle(c, m.s, ix + m.x * iw, iy + m.y * ih, R, m.rot, m.alfa, fremhaev && prod[m.s], true);
         });
         c.restore();
         this.tegnLaag(c, this.lay.laag, b);
@@ -1004,10 +1119,14 @@
     /* Et molekyle: atomerne i stoffets daempede farve med en blød skygge og
        et stille lys foroven. Ingen atomfarver (Niels: "forvirrende med alle
        de farver"). fremhaev: en tynd lys ring om de nye molekyler. */
-    P.tegnMolekyle = function (c, s, x, y, R, rot, alfa, fremhaev) {
+    /* Grundstoffets nuance af stoffets farve: lidt lysere eller moerkere, saa
+       atomerne kan skelnes uden nye farver (runde 4) */
+    var NUANCE = { H: 0.28, O: 0.12, S: 0, C: -0.12, Cl: -0.05, Br: -0.12 };
+
+    P.tegnMolekyle = function (c, s, x, y, R, rot, alfa, fremhaev, symboler) {
         var st = D.STOF[s];
         if (!st || !st.atomer) return;
-        var f = farve(s), lys = nuance(f, 0.35), moerk = nuance(f, -0.25);
+        var f0 = farve(s);
         var co = Math.cos(rot), si = Math.sin(rot);
         var atomer = st.atomer.slice().sort(function (a, b) {
             return (b[1] * b[1] + b[2] * b[2]) - (a[1] * a[1] + a[2] * a[2]);
@@ -1016,7 +1135,7 @@
         c.globalAlpha = alfa;
         if (fremhaev) {
             c.beginPath();
-            c.arc(x, y, R * 2.3, 0, Math.PI * 2);
+            c.arc(x, y, R * (molRad(s) + 0.45), 0, Math.PI * 2);
             c.strokeStyle = "rgba(255, 255, 255, 0.5)";
             c.lineWidth = 1.5;
             c.stroke();
@@ -1024,10 +1143,14 @@
         c.shadowColor = "rgba(0, 0, 0, 0.35)";
         c.shadowBlur = R * 0.5;
         c.shadowOffsetY = R * 0.15;
+        var tekster = [];
         atomer.forEach(function (a) {
             var at = D.ATOM[a[0]];
+            var f = nuance(f0, NUANCE[a[0]] || 0);
+            var lys = nuance(f, 0.35), moerk = nuance(f, -0.25);
             var ax = x + (a[1] * co - a[2] * si) * R * 1.45, ay = y + (a[1] * si + a[2] * co) * R * 1.45;
             var r = at.r * R;
+            if (symboler) tekster.push({ t: a[0], x: ax, y: ay, r: r });
             var gr = c.createRadialGradient(ax - r * 0.35, ay - r * 0.4, r * 0.1, ax, ay, r);
             gr.addColorStop(0, lys);
             gr.addColorStop(0.55, f);
@@ -1044,6 +1167,18 @@
             c.globalAlpha = alfa;
             c.shadowColor = "rgba(0, 0, 0, 0.35)";
         });
+        /* Atomsymbolerne staar oprejst inde i kuglerne (mindst 13,5 px, Lexend 500) */
+        if (tekster.length) {
+            c.shadowColor = "transparent";
+            c.fillStyle = "rgba(24, 30, 42, 0.88)";
+            c.textAlign = "center";
+            c.textBaseline = "middle";
+            tekster.forEach(function (t) {
+                var fs = Math.max(13.5, Math.min(16, t.r * 1.0));
+                c.font = "500 " + fs + "px " + SKRIFT;
+                c.fillText(t.t, t.x, t.y + fs * 0.04);
+            });
+        }
         c.restore();
     };
 

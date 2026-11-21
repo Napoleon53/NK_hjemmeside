@@ -1,0 +1,72 @@
+[
+ {
+  "nr": "T5-1",
+  "fil": "sc1.4_afstemning/index.html",
+  "gammel": "<span class=\"nr\">1</span>Kuglerne</button>",
+  "ny": "<span class=\"nr\">1</span>Afstem med kugler</button>",
+  "hvor": "fanenavn 1 (REGELSAET 46)"
+ },
+ {
+  "nr": "T5-2",
+  "fil": "sc1.4_afstemning/index.html",
+  "gammel": "<span class=\"nr\">2</span>Skemaet</button>",
+  "ny": "<span class=\"nr\">2</span>Afstem uden kugler</button>",
+  "hvor": "fanenavn 2 (REGELSAET 46)"
+ },
+ {
+  "nr": "T5-3",
+  "fil": "sc1.4_afstemning/index.html",
+  "gammel": "<h2>Afstemning af reaktionsskemaer</h2>\n        <p>I en kemisk reaktion bytter atomerne partnere. Der forsvinder ingen atomer, og der kommer ingen nye til. Derfor skal der være lige mange af hvert slags atom før og efter pilen.</p>\n        <h3 class=\"teori-hoved\">Tallet foran og det lille tal</h3>\n        <div class=\"eksempel\">\n            <span class=\"eksempel-hoved\">Eksempel: <span class=\"f\">3 H₂O</span></span>\n            Det lille tal, ₂, hører til formlen. Det siger, at ét vandmolekyle har 2 H.<br>\n            Tallet foran, 3, siger, at der er 3 vandmolekyler. Det giver 3 · 2 = 6 H og 3 O.\n        </div>\n        <p>Man afstemmer kun med tallene foran. Ændrer man det lille tal, står der formlen for et andet stof. H₂O₂ er for eksempel hydrogenperoxid, ikke vand.</p>\n        <h3 class=\"teori-hoved\">Sådan afstemmer man</h3>\n        <ol class=\"teori-trin\">\n            <li>Tæl hvert slags atom før og efter pilen.</li>\n            <li>Start med et atom, der kun findes i ét stof på hver side. Lad O og H vente til sidst.</li>\n            <li>Sæt et tal foran det stof, hvor der mangler atomer. Tæl igen.</li>\n            <li>Brug de mindste hele tal. Kan alle tallene deles med 2, så del dem.</li>\n        </ol>\n        <div class=\"eksempel\">\n            <span class=\"eksempel-hoved\">Eksempel: methan brænder</span>\n            CH₄ + O₂ → CO₂ + H₂O<br>\n            C passer: 1 før og 1 efter.<br>\n            H: 4 før og 2 efter. Sæt 2 foran H₂O: CH₄ + O₂ → CO₂ + 2 H₂O<br>\n            O: 2 før og 2 + 2 = 4 efter. Sæt 2 foran O₂: CH₄ + 2 O₂ → CO₂ + 2 H₂O\n        </div>\n        <p>Skal der et ulige antal O-atomer til, og kommer de fra O₂, skal der bruges et halvt O₂-molekyle. Gang så alle tallene med 2.</p>",
+  "ny": "<h2>Afstemning af reaktionsskemaer</h2>\n        <p>I en reaktion bytter atomerne partnere. Der forsvinder ingen atomer, og der kommer ingen nye til. Derfor er der lige mange af hvert slags atom før og efter pilen.</p>\n        <h3 class=\"teori-hoved\">Tallet foran og det lille tal</h3>\n        <div class=\"eksempel\">3 H₂O er 3 vandmolekyler. Hvert vandmolekyle har 2 H og 1 O, så der er 6 H og 3 O i alt.</div>\n        <p>Man afstemmer kun med tallene foran stofferne. Ændrer man det lille tal, bliver det et andet stof. H₂O₂ er hydrogenperoxid og ikke vand.</p>\n        <h3 class=\"teori-hoved\">Sådan afstemmer man</h3>\n        <ol class=\"teori-trin\">\n            <li>Tæl hvert slags atom før og efter pilen.</li>\n            <li>Begynd med et atom, der kun står i ét stof på hver side. Lad O og H vente til sidst.</li>\n            <li>Sæt et tal foran det stof, hvor der mangler atomer. Tæl så igen.</li>\n            <li>Brug de mindste hele tal.</li>\n        </ol>\n        <p class=\"teori-bog\">Læs mere i Kemibogen: <a href=\"https://kemibogen.dk/c/kapitler/1-4-reaktionsskemaer.html\" target=\"_blank\" rel=\"noopener\">1.4 Reaktionsskemaer og afstemning</a></p>",
+  "hvor": "teorien: kortere, ét eksempel, henvisning til Kemibogen (REGELSAET 31)"
+ },
+ {
+  "nr": "T5-4",
+  "fil": "sc1.4_afstemning/js/sim_kugler.js",
+  "gammel": "naesteNavn: \"Skemaet\"",
+  "ny": "naesteNavn: \"Afstem uden kugler\"",
+  "hvor": "knappen efter sidste reaktion på fane 1"
+ },
+ {
+  "nr": "T5-5",
+  "fil": "sc1.4_afstemning/js/sim_kugler.js",
+  "gammel": "\"AFSTEMT ✓\"",
+  "ny": "\"Afstemt ✓\"",
+  "hvor": "stemplet over pilen, ingen versaler (REGELSAET 30)"
+ },
+ {
+  "nr": "T5-6",
+  "fil": "sc1.4_afstemning/js/sim_kugler.js",
+  "gammel": "ctx.fillText(tekst.toUpperCase(), R.x + 16, R.y + R.h - s / 2 - 6);",
+  "ny": "ctx.fillText(tekst, R.x + 16, R.y + R.h - s / 2 - 6);",
+  "hvor": "strimlen Tilovers, ingen versaler"
+ },
+ {
+  "nr": "T5-7",
+  "fil": "sc1.4_afstemning/js/tegning.js",
+  "gammel": "ctx.fillText(titel.toUpperCase(), r.x + 14, r.y + 10);",
+  "ny": "ctx.fillText(titel, r.x + 14, r.y + 10);",
+  "hvor": "bakkernes titler Før pilen og Efter pilen, ingen versaler"
+ },
+ {
+  "nr": "T5-8",
+  "fil": "sc1.4_afstemning/js/rundvisning.js",
+  "gammel": "{ sel: \"#kg-skema\", titel: \"Skemaet\", tekst: \"Tavlen viser reaktionsskemaet. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker.\" },\n            { sel: \"#kg-anker-bakker\", titel: \"Bakkerne\", tekst: \"Bakken til venstre viser molekylerne før pilen. Bakken til højre viser de pladser, som produkterne skal bruge.\" },\n            { sel: \"#kg-regnskabkort\", titel: \"Atomerne\", tekst: \"Regnskabet tæller hvert atom før og efter pilen. Hold musen over en række, så lyser atomerne af den slags op.\" },\n            { sel: \"#kg-skort\", titel: \"Opgavekortet\", tekst: \"Opgaven står på kortet øverst. Indsend svar lader molekylerne reagere, og så kan du se, om reaktionen er afstemt. Giv et hint giver ét hint ad gangen og til sidst svaret.\" },\n            { sel: \"#kg-opgaver\", titel: \"Reaktionerne\", tekst: \"Listen har ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne.\" },\n            { sel: \".faneknapper\", titel: \"Skemaet\", tekst: \"Den anden fane har kun formlerne. Der skriver du selv tallene.\" }",
+  "ny": "{ sel: \"#kg-raekke\", titel: \"Reaktionerne\", tekst: \"Rækken øverst har ti reaktioner fra let til svær. En reaktion, du løser uden at se svaret, får en stjerne.\" },\n            { sel: \"#kg-skort\", titel: \"Opgavekortet\", tekst: \"Opgaven står på kortet. Indsend svar lader molekylerne reagere. Så kan du se, om reaktionen er afstemt. Giv et hint giver ét hint ad gangen og til sidst svaret.\" },\n            { sel: \"#kg-skema\", titel: \"Reaktionsskemaet\", tekst: \"Tavlen viser reaktionsskemaet. Ret tallet foran et stof med + og −. Et klik på et atom i formlen ændrer det lille tal. Prøv, hvad der så sker.\" },\n            { sel: \"#kg-anker-bakker\", titel: \"Bakkerne\", tekst: \"Bakken til venstre viser molekylerne før pilen. Bakken til højre viser de pladser, som produkterne skal bruge.\" },\n            { sel: \".kg-taelling\", titel: \"Atomerne\", tekst: \"Under bakkerne står, hvor mange atomer af hver slags der er før og efter pilen. Når molekylerne har reageret, viser ✓ og ✗, hvilke atomer der passer.\" },\n            { sel: \".faneknapper\", titel: \"Afstem uden kugler\", tekst: \"Den anden fane har kun formlerne. Der skriver du selv tallene.\" }",
+  "hvor": "rundvisningen på fane 1 (rækken, optællingen, nyt fanenavn)"
+ },
+ {
+  "nr": "T5-9",
+  "fil": "sc1.4_afstemning/js/sim_skema.js",
+  "gammel": "return \"Skriv tallene foran stofferne i felterne på tavlen, så reaktionen er afstemt. Et tomt felt tæller som 1.\";",
+  "ny": "return this.spoergsmaal() + \" Et tomt felt tæller som 1.\";",
+  "hvor": "fane 2, opgaven på kortet: halvfedt spørgsmål med stofferne (REGELSAET 5-7); kortHTML viser spørgsmålet og forklaringen på hver sin linje"
+ },
+ {
+  "nr": "T5-10",
+  "fil": "sc1.4_afstemning/js/sim_kugler.js",
+  "gammel": "<span class=\"sk-chip\">Trin ' + (this.trin.nr + 1)",
+  "ny": "<span class=\"sk-chip\">Gennemgang · Trin ' + (this.trin.nr + 1)",
+  "hvor": "fane 1, reaktion 1, etiketten i gennemgangens trin (runde 3). Knappen Spring gennemgangen over er ny og står i kortHTML lige over"
+ }
+]

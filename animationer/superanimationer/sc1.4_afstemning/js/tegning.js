@@ -11,7 +11,8 @@
     var NK = window.NK;
     var D = NK.Data;
     var T = {};
-    var SKRIFT = "'Segoe UI', sans-serif";
+    /* Lexend som paa kortet (runde 2, REGELSAET 30): rolig skrift, ingen versaler */
+    var SKRIFT = "Lexend, 'Segoe UI', sans-serif";
 
     function font(vaegt, px) { return vaegt + " " + px + "px " + SKRIFT; }
     T.font = font;
@@ -42,11 +43,11 @@
         ctx.lineWidth = lys ? 2.5 : 1.5;
         ctx.strokeStyle = lys || "#454859";
         ctx.stroke();
-        ctx.font = font("700", 13);
-        ctx.fillStyle = "#8d93a3";
+        ctx.font = font("500", 14);
+        ctx.fillStyle = "#9aa0ae";
         ctx.textBaseline = "top";
         ctx.textAlign = "left";
-        ctx.fillText(titel.toUpperCase(), r.x + 14, r.y + 10);
+        ctx.fillText(titel, r.x + 14, r.y + 10);
         ctx.restore();
     };
 
@@ -77,7 +78,7 @@
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(k, k);
-        ctx.font = font("800", 17);
+        ctx.font = font("600", 17);
         var b = ctx.measureText(tekst).width + 30, h = 34;
         ctx.fillStyle = "rgba(20, 44, 32, 0.95)";
         NK.rundtRekt(ctx, -b / 2, -h / 2, b, h, 9);
@@ -125,7 +126,7 @@
         }
         if (r >= 8) {
             ctx.fillStyle = a.tekst;
-            ctx.font = font("700", Math.max(9, Math.round(r * (e.length > 1 ? 0.8 : 0.95))));
+            ctx.font = font("600", Math.max(9, Math.round(r * (e.length > 1 ? 0.78 : 0.92))));
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(e, x, y + r * 0.04);
@@ -157,7 +158,7 @@
         ctx.setLineDash([]);
         if (r >= 8) {
             ctx.fillStyle = valg.mangler ? "#ff9d92" : (valg.spoegelse ? "rgba(160, 166, 180, 0.5)" : "rgba(220, 225, 232, 0.7)");
-            ctx.font = font("700", Math.max(9, Math.round(r * (e.length > 1 ? 0.75 : 0.9))));
+            ctx.font = font("500", Math.max(9, Math.round(r * (e.length > 1 ? 0.74 : 0.88))));
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(e, x, y + r * 0.04);

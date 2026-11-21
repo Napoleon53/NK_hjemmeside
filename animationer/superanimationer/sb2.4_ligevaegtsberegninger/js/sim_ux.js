@@ -202,7 +202,7 @@
     }
 
     var P = SimUx.prototype;
-    NK.Fane.paa(P, { navn: "ux", chip: "Opgave", naesteFane: "fane-mx", naesteNavn: "Med x" });
+    NK.Fane.paa(P, { navn: "ux", chip: "Opgave", naesteFane: "fane-mx", naesteNavn: "Fra start til ligevægt" });
     P.faneStart = P.startFane;
     P.startFane = function (o, g) { this.paab = {}; this.faneStart(o, g); };
     P.paabegyndt = function (i) { return !!(this.paab && this.paab[i]); };
@@ -383,7 +383,7 @@
         if (!arb || !arb.offsetHeight) return;
         var fs = 19;
         w.style.fontSize = fs + "px";
-        while (fs > 14 && arb.scrollHeight > arb.clientHeight + 1) { fs -= 0.5; w.style.fontSize = fs + "px"; }
+        while (fs > 14 && arb.scrollHeight > arb.clientHeight) { fs -= 0.5; w.style.fontSize = fs + "px"; }
         var sp = w.querySelector(".spoerg") || w.lastElementChild;
         if (sp && arb.scrollHeight > arb.clientHeight + 1) {
             var ra = arb.getBoundingClientRect(), rs = sp.getBoundingClientRect();

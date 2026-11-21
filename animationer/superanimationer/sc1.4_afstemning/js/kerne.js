@@ -174,6 +174,11 @@ window.NK = NK;
         tekstCache[id] = tekst;
     };
 
+    /* Teksten i et element, kun naar den er ny (opgaveraekken) */
+    NK.saetTekstEl = function (e, tekst) {
+        if (e && e.textContent !== tekst) e.textContent = tekst;
+    };
+
     var htmlCache = {};
     NK.saetHTML = function (id, html) {
         if (htmlCache[id] === html) return;

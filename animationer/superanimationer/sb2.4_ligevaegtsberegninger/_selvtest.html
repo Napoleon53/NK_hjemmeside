@@ -299,7 +299,10 @@
                 o.id + ": kortet bliver på opgaven med svaret og " + (sidst ? "ingen knap (sidste opgave)" : "Næste"));
             ok(s.faerdig && s.status[i].loest && s.status[i].stjerne, o.id + ": løst med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
             ok(!W().document.getElementById(navn + "-stempel").hidden, o.id + ": stemplet Løst står på tavlen");
-            if (s.type === "x") ok(!!W().document.querySelector("#" + navn + "-dele #" + navn + "-kurve"), o.id + ": kurven fra start til ligevægt står sidst på tavlen (panelet er væk)");
+            if (s.type === "x") {
+                var kk = W().document.getElementById(navn + "-kurve");
+                ok(kk && !kk.hidden && !W().document.querySelector("#" + navn + "-dele canvas"), o.id + ": knappen Vis kurven står i opgaverækken, og kurven fylder ikke tavlen (regel 50)");
+            }
         });
     }
 
@@ -396,8 +399,11 @@
     function beholderen() {
         var NK = W().NK, M = NK.Model, D = NK.Data, s = sim("bh"), d = W().document;
         NK.visFane("fane-bh");
-        ok(D.MAAL.map(function (m) { return m.id; }).join(",") === "a-lige,a-udtryk,a-cas,b-aendr,c-graense,c-cas",
-            "fane 1 har seks mål: x ved ligevægt, skemaet med x, hvilken løsning, koefficienten 2, hvor langt kan x komme, hvilken løsning");
+        ok(D.MAAL.map(function (m) { return m.id; }).join(",") === "a-lige,a-udtryk,a-cas,b-aendr,b-loesning" && D.GRUPPER_BH.length === 2 && !D.RX.c,
+            "fane 1 har fem mål med to reaktioner: x ved ligevægt, skemaet med x, hvilken løsning (SO₂Cl₂), koefficienten 2, hvilken løsning (HBr)");
+        var skift = 0;
+        D.MAAL.forEach(function (m, i) { if (i > 0 && m.rx !== D.MAAL[i - 1].rx) skift++; });
+        ok(skift === 1, "fane 1 skifter reaktion én gang (REGELSAET 51)");
         /* Farverne: hvert stof sin daempede farve, forskellige i samme reaktion */
         Object.keys(D.RX).forEach(function (k) {
             var fa = M.alle(D.RX[k]).map(function (a) { return D.FARVE[a.s]; });
@@ -405,10 +411,10 @@
                 "reaktion " + k + ": hvert stof har sin egen farve (" + fa.join(", ") + ")");
         });
         /* Svarene: tallene i teksterne passer med modellen */
-        [["a-cas", "a"], ["c-cas", "c"]].forEach(function (p) {
+        [["a-cas", "a"], ["b-loesning", "b"]].forEach(function (p) {
             var m = D.MAAL.filter(function (q) { return q.id === p[0]; })[0], r = M.loesX(D.RX[p[1]]);
             var ok1 = r.some(function (v) { return NK.tal(v) === NK.tal(m.rodOk); }) && r.some(function (v) { return NK.tal(v) === NK.tal(m.rodNej); });
-            ok(ok1 && Math.abs(M.xFacit(D.RX[p[1]]) - m.rodOk) < 5e-4 && m.trin[0].spm.indexOf(NK.tal(m.rodOk)) >= 0 && m.trin[0].spm.indexOf(NK.tal(m.rodNej)) >= 0,
+            ok(ok1 && Math.abs(M.xFacit(D.RX[p[1]]) - m.rodOk) < 5e-4 && m.trin.some(function (t) { return t.spm.indexOf(NK.tal(m.rodOk)) >= 0 && t.spm.indexOf(NK.tal(m.rodNej)) >= 0; }),
                 p[0] + ": CAS' løsninger på kortet (" + NK.tal(m.rodOk) + " og " + NK.tal(m.rodNej) + ") passer med modellen");
         });
         D.MAAL.forEach(function (m, i) {
@@ -428,10 +434,20 @@
                     m.id + ": startkoncentrationerne i skemaet har enheden M (regel 40)");
                 ok(!!m.tavle === !d.getElementById("bh-tavle").hidden, m.id + ": tavlen står til højre");
             }
-            if (i === 3 || i === 4) {
+            if (i === 3) {
                 ok(m.trin[0].type === "valg", m.id + ": ny reaktion, så første trin er et spørgsmål om den nye reaktion og ikke en handling (regel 42)");
                 ok(d.getElementById("bh-rx").classList.contains("ny") && s.mol.some(function (q) { return q.alfa === 0 && q.forsink > 0; }),
                     m.id + ": det nye reaktionsskema toner frem, og beholderen fyldes roligt");
+            }
+            if (m.tavle) {
+                var hv = [].slice.call(d.querySelectorAll("#bh-tavle .bt-skema tr:first-child th.bt-tegn")).map(function (e) { return e.textContent; }).join(" ");
+                var forv = m.rx === "a" ? "⇌ +" : "+ ⇌";
+                var antal = d.querySelector("#bh-tavle .bt-skema tr:first-child").children.length;
+                ok(hv === forv && [].slice.call(d.querySelectorAll("#bh-tavle .bt-skema tr")).every(function (tr) { return tr.children.length === antal; }) &&
+                    (m.rx !== "b" || /2/.test(d.querySelector('#bh-tavle .bt-pille[data-s="HBr"]').parentNode.textContent)),
+                    m.id + ": skemaets øverste række læses som reaktionsskemaet (" + hv + "), og felterne står under hvert sit stof (regel 48)");
+                if (m.tavle.tal) ok([].slice.call(d.querySelectorAll("#bh-tavle .bt-tal")).every(function (e) { return e.classList.contains("skjult"); }),
+                    m.id + ": rækken Ligevægt har ingen tal, før der er ligevægt (regel 49)");
             }
             var beh0 = JSON.stringify(s.lay.beh), vagt = 0;
             while (!s.faerdig && vagt++ < 25) {
@@ -518,6 +534,11 @@
                 }
             }
             ok(s.faerdig && s.status[i].stjerne, m.id + ": nået med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
+            if (m.tavle && m.tavle.tal) {
+                var tl = [].slice.call(d.querySelectorAll("#bh-tavle .bt-tal"));
+                ok(s.erLigevaegt(s.x) && tl.length && tl.every(function (e) { return !e.classList.contains("skjult") && /^= \d,\d{3} M$/.test(e.textContent); }),
+                    m.id + ": ved ligevægt får rækken Ligevægt sine tal (" + tl.map(function (e) { return e.textContent; }).join(", ") + ")");
+            }
             ok(s.kortTekst().indexOf(m.slut) >= 0, m.id + ": forklaringen står på kortet");
         });
         /* Grafen kan foldes ud og ind igen fra maal 2 */
@@ -543,6 +564,39 @@
             while (!s.faerdig && vagt++ < 60) { s.knap(); noter(s); }
             ok(s.faerdig, m.id + ": kan nås med Vis svaret");
         });
+        /* Runde 4: hjaelpestregen paa skyderen efter 10 s (eller hintet om den) */
+        s.vaelg(0);
+        var sl = d.getElementById("bh-x"), mk = d.getElementById("bh-maal");
+        ok(s.trin().type === "ligevaegt" && mk.hidden, "hjælpestregen er skjult fra start");
+        s.saetX(0.03);
+        s.opdater(5);
+        ok(!s.maerke && mk.hidden, "efter 5 s uden at ramme er der endnu ingen hjælpestreg");
+        s.opdater(5.2);
+        var rs = sl.getBoundingClientRect(), rm = mk.getBoundingClientRect();
+        var forvent = rs.left + 10 + Math.round(s.xEq * 1000) / 1000 / s.xMax * (rs.width - 20);
+        ok(s.maerke && !mk.hidden && mk.classList.contains("vis") && Math.abs((rm.left + rm.right) / 2 - forvent) <= 3,
+            "efter 10 s uden at ramme står en gul streg på skyderen, dér hvor ligevægten er (" + Math.round((rm.left + rm.right) / 2) + " ≈ " + Math.round(forvent) + ")");
+        ok(/bh-maal-puls/.test(W().getComputedStyle(mk).animationName) && W().getComputedStyle(mk).animationIterationCount === "3",
+            "stregen pulserer roligt tre gange og bliver stående (ikke et skarpt blink)");
+        s.saetX(Math.round(s.xEq * 1000) / 1000); s.opdater(0.8);
+        ok(s.faerdig && mk.hidden, "når målet er nået, er stregen væk igen");
+        s.vaelg(0);
+        s.knap(); s.knap(); s.knap();
+        ok(/gule streg/.test(s.beskedTekst()) && s.maerke && !mk.hidden, "hintet om den gule streg viser stregen med det samme");
+        s.vaelg(0);
+        ok(W().document.activeElement === sl && sl.step === "0.001", "skyderen har fokus og går 0,001 M ad gangen, så piletasterne virker");
+        /* Runde 4: atomsymbolerne, stoerrelsen og faerre overlap */
+        ok(s.molR(s.lay.beh) >= 14 && s.mol.every(function (q) { return q.vr === 0; }),
+            "molekylerne er store nok til atomsymboler i mindst 13,5 px (R = " + s.molR(s.lay.beh).toFixed(1) + " px), og de drejer ikke");
+        s.vaelg(3); s.trinNr = 1; s.trinBliv = null; s.visDele();
+        for (var ft = 0; ft < 240; ft++) s.opdaterMolekyler(1 / 60);
+        var Lb = s.lay.beh, Rr = s.molR(Lb), tae = 0, par = 0, mm = s.mol;
+        for (var a1 = 0; a1 < mm.length; a1++) for (var b1 = a1 + 1; b1 < mm.length; b1++) {
+            par++;
+            var ddx = (mm[a1].x - mm[b1].x) * (Lb.w - 16), ddy = (mm[a1].y - mm[b1].y) * (Lb.h - 16);
+            if (Math.sqrt(ddx * ddx + ddy * ddy) < 1.4 * Rr) tae++;
+        }
+        ok(tae <= 2, "få molekyler ligger oven i hinanden efter 4 s (" + tae + " af " + par + " par)");
         /* Paaskeaegget */
         s.vaelg(0);
         s.aabnLaag();
@@ -713,6 +767,50 @@
             w + "×" + h + ": tavlen er ikke for bred, og skriften er mindst 14 px");
     }
 
+    /* ===== Runde 4: Vis grafen kan ses og klikkes uden at zoome ud ============ */
+    async function grafKnap(w, h) {
+        await aabn(w, h);
+        var NK = W().NK, d = W().document, b = sim("bh");
+        NK.visFane("fane-bh");
+        b.vaelg(1);
+        var t = b.trin(), knap = d.getElementById("bh-graffane");
+        ok(knap.classList.contains("skjult"), w + "×" + h + ": Vis grafen er skjult, mens kortet stiller et åbent spørgsmål (regel 19a)");
+        b.vaelgKortSvar(t.svar.map(function (v) { return !!v.ok; }).indexOf(true)); b.indsendKlik();
+        var r = knap.getBoundingClientRect(), ra = d.getElementById("bh-arbejde").getBoundingClientRect();
+        var paa = d.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+        ok(!knap.hidden && !knap.classList.contains("skjult") && r.top >= ra.top && r.bottom <= ra.bottom && r.bottom <= h && r.right <= w && paa === knap,
+            w + "×" + h + ": Vis grafen kan ses og klikkes inden for scenen (" + Math.round(r.top) + "-" + Math.round(r.bottom) + " af " + h + ")");
+        knap.click();
+        ok(b.grafUd && !!b.lay.graf && b.lay.graf.y + b.lay.graf.h <= b.lay.H && /Skjul grafen/.test(knap.textContent), w + "×" + h + ": grafen foldes ud inden for scenen");
+        knap.click();
+        ok(!b.grafUd && !b.lay.graf && /Vis grafen/.test(knap.textContent), w + "×" + h + ": og ind igen");
+        /* Ingen rullebjaelke i tavlen (runde 5, regel 50): alle maal paa fane 1, alle
+           opgaver paa fane 2 og 3 trin for trin og loest */
+        function rul(id) { var e = d.getElementById(id); return e.scrollHeight - e.clientHeight; }
+        var vaerst = { bh: 0, ux: 0, mx: 0 }, hvor = { bh: "", ux: "", mx: "" };
+        [["bh", "bh-tavle"], ["ux", "ux-arbejde"], ["mx", "mx-arbejde"]].forEach(function (p) {
+            var sm = sim(p[0]);
+            NK.visFane("fane-" + p[0]);
+            sm.opgaver.forEach(function (o, i) {
+                sm.vaelg(i);
+                var v = 0;
+                while (v++ < 140) {
+                    sm.tilpas();
+                    var r = rul(p[1]);
+                    if (r > vaerst[p[0]]) { vaerst[p[0]] = r; hvor[p[0]] = o.id + " " + v; }
+                    if (sm.faerdig) break;
+                    sm.knap();
+                }
+            });
+        });
+        ok(!vaerst.bh && !vaerst.ux && !vaerst.mx, w + "×" + h + ": ingen rullebjælke i tavlerne på de tre faner (" +
+            ["bh", "ux", "mx"].map(function (n) { return n + " " + vaerst[n] + (hvor[n] ? " ved " + hvor[n] : ""); }).join(", ") + ")");
+        NK.visFane("fane-bh");
+        /* Fanernes navne (runde 4) */
+        var navne = [].slice.call(d.querySelectorAll(".faneknap")).map(function (k) { return k.textContent.replace(/^\d/, "").trim(); });
+        ok(navne.join(" | ") === "Mod ligevægt | Ved ligevægt | Fra start til ligevægt", w + "×" + h + ": fanerne hedder " + navne.join(", "));
+    }
+
     /* ===== Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026) ===== */
     function laasteTitler() {
         var NK = W().NK, d = W().document;
@@ -754,10 +852,10 @@
             await aabn(1440, 860);
             laasteTitler();
             try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
-            try { W().localStorage.setItem("nk-sb2.3-bh", JSON.stringify({ "a-lige": { l: 1, s: 1 }, "b-lige": { l: 1, s: 1 }, "b-cas": { l: 1, s: 0 } })); } catch (e) { /* intet */ }
+            try { W().localStorage.setItem("nk-sb2.3-bh", JSON.stringify({ "a-lige": { l: 1, s: 1 }, "b-lige": { l: 1, s: 1 }, "b-cas": { l: 1, s: 0 }, "c-graense": { l: 1, s: 1 }, "c-cas": { l: 1, s: 1 } })); } catch (e) { /* intet */ }
             await aabn(1440, 860);
-            ok(sim("bh").opgaver.length === 6 && sim("bh").status[0].loest && sim("bh").status.filter(function (x) { return x.loest; }).length === 1,
-                "gemte fremskridt fra før runde 2 (b-lige, b-cas) giver ingen fejl og springes over");
+            ok(sim("bh").opgaver.length === 5 && sim("bh").status[0].loest && sim("bh").status.filter(function (x) { return x.loest; }).length === 1,
+                "gemte fremskridt fra før runde 2 og 5 (b-lige, b-cas, c-graense, c-cas) giver ingen fejl og springes over");
             try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
             await aabn(1440, 860);
             modellen();
@@ -774,6 +872,16 @@
             kortZoneAlle();
             ok(!zFejl.length, "papirkortet holder sig i kortZone i 1440 × 860 og 1100 × 700 (højst " + Math.round(zHoejst) + " px) " + zFejl.filter(function (x, j, a) { return a.indexOf(x) === j; }).slice(0, 40).join(", "));
             await layout(1600, 950);
+            await grafKnap(1100, 760);
+            await grafKnap(1400, 860);
+            await grafKnap(1920, 1080);
+            /* Adresserne: de nye og de gamle (fx fra Kemibogen) virker */
+            await aabn(1440, 860, "#ved-ligevaegt");
+            ok(W().document.getElementById("fane-ux").classList.contains("aktiv"), "#ved-ligevaegt åbner fanen Ved ligevægt");
+            await aabn(1440, 860, "#udenx");
+            ok(W().document.getElementById("fane-ux").classList.contains("aktiv"), "den gamle adresse #udenx virker stadig");
+            await aabn(1440, 860, "#medx");
+            ok(W().document.getElementById("fane-mx").classList.contains("aktiv"), "den gamle adresse #medx åbner Fra start til ligevægt");
             try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
         } catch (e) {
             fejl++;

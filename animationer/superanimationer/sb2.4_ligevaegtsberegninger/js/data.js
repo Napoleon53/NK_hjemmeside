@@ -76,10 +76,9 @@
              c0: { SO2Cl2: 0.200, SO2: 0, Cl2: 0 }, enhed: 0.010, xStof: "SO2Cl2", xOrd: "spaltet" },
         b: { id: "b", navn: "Hydrogenbromid dannes", T: "500 K", K: 64.0,
              r: [[1, "H2", "g"], [1, "Br2", "g"]], p: [[2, "HBr", "g"]],
-             c0: { H2: 0.200, Br2: 0.200, HBr: 0 }, enhed: 0.020, xStof: "H2", xOrd: "omsat" },
-        c: { id: "c", navn: "Vandgasligevægten", T: "700 K", K: 5.44,
-             r: [[1, "CO", "g"], [1, "H2O", "g"]], p: [[1, "CO2", "g"], [1, "H2", "g"]],
-             c0: { CO: 0.200, H2O: 0.100, CO2: 0, H2: 0 }, enhed: 0.010, xStof: "CO", xOrd: "omsat" }
+             c0: { H2: 0.200, Br2: 0.200, HBr: 0 }, enhed: 0.020, xStof: "H2", xOrd: "omsat" }
+        /* Runde 5 (Niels 21. nov. 2026): vandgasligevaegten (CO + H₂O) er taget ud af
+           fane 1, saa der kun er ét skift af reaktion paa fanen (REGELSAET 51) */
     };
 
     /* Maalene paa fane 1 (runde 2 og 3, Niels 21. nov. 2026). Hvert maal er en
@@ -111,7 +110,7 @@
        denne fane: CAS' loesninger staar paa tavlen, og eleven vaelger.
        Tallene i teksterne tjekkes mod modellen i _selvtest.html. */
     var YX_A = '<span class="vbroek"><span>x · x</span><span>0,200 M − x</span></span>';
-    var YX_C = '<span class="vbroek"><span>x · x</span><span>(0,200 M − x) · (0,100 M − x)</span></span>';
+    var YX_B = '<span class="vbroek"><span>(2x)²</span><span>(0,200 M − x) · (0,200 M − x)</span></span>';
     D.MAAL = [
         { id: "a-lige", rx: "a", gruppe: "a", navn: "SO₂Cl₂: x ved ligevægt", yBoks: true, graf: true,
           slut: "Ved ligevægt er x ≈ 0,078 M, så [SO₂Cl₂] er faldet med 0,078 M, når Y = K.",
@@ -151,7 +150,7 @@
                 vis: ["graf", "skyder"] },
               { type: "handling", tekst: "Skyderen x er den koncentration af SO₂Cl₂, der er spaltet.",
                 spm: "Træk x til 0,050 M.", x: 0.050, tol: 0.0025, snap: true,
-                hint: ["Skyderen ligger under beholderen og grafen.", "Træk skyderens knap mod højre, til der står x = 0,050 M.", "x = 0,050 M."],
+                hint: ["Skyderen ligger under beholderen og grafen. Du kan også bruge piletasterne.", "Den gule streg på skyderen viser, hvor x = 0,050 M er.", "Træk skyderens knap hen til den gule streg."],
                 efter: { type: "valg", fremhaev: true, skjulLampe: true,
                     tekst: "Ved x = 0,050 M er 5 SO₂Cl₂-molekyler spaltet til 5 SO₂ og 5 Cl₂.",
                     spm: "Er der ligevægt i beholderen, når x = 0,050 M?",
@@ -210,20 +209,19 @@
         { id: "a-cas", rx: "a", gruppe: "a", navn: "SO₂Cl₂: hvilken løsning?", yBoks: true,
           slut: "x = −0,128 M kan ikke bruges, fordi [SO₂] så ville være −0,128 M. Kun x = 0,0781 M giver positive koncentrationer, og dér er Y lig med K.",
           tavle: { raekker: ["start", "aendr", "lig"], tal: true, linjer: [
-              { navn: "Ligevægtsloven", lov: true },
               { navn: "Ved ligevægt er Y lig med K", html: "0,0500 M = " + YX_A },
               { navn: "CAS løser ligningen", html: "x = 0,0781 M eller x = −0,128 M" },
-              { navn: "Den løsning, der kan bruges", html: "x = 0,0781 M. Med x = −0,128 M bliver [SO₂] negativ.", trin: 0 }] },
+              { navn: "Den løsning, der kan bruges", html: "x = 0,0781 M, fordi x = −0,128 M giver [SO₂] < 0 M", trin: 0 }] },
           rodOk: 0.0781, rodNej: -0.128,
           trin: [
-              { type: "valg", linje: 3, spm: "CAS giver x = 0,0781 M og x = −0,128 M. Hvilken løsning kan bruges?",
+              { type: "valg", linje: 2, spm: "CAS giver x = 0,0781 M og x = −0,128 M. Hvilken løsning kan bruges?",
                 svar: [{ t: "x = 0,0781 M", ok: true },
                     { t: "x = −0,128 M", nej: "Med x = −0,128 M bliver [SO₂] = x negativ. En koncentration kan ikke være negativ." },
                     { t: "Begge", nej: "Sæt hver løsning ind i rækken Ligevægt. Med x = −0,128 M bliver [SO₂] negativ." }],
                 hint: ["Sæt hver løsning ind i rækken Ligevægt på tavlen.", "En koncentration kan ikke være negativ.", "x = 0,0781 M kan bruges."],
                 slut: "Kun x = 0,0781 M giver positive koncentrationer." },
               { type: "handling", spm: "Træk x, til Y er lig med K.", lige: true,
-                hint: ["Skyderen ligger under beholderen.", "Løsningen er x = 0,0781 M.", "Træk knappen til x = 0,078 M."] }
+                hint: ["Løsningen er x = 0,0781 M.", "Den gule streg på skyderen viser, hvor x = 0,078 M er.", "Træk knappen hen til den gule streg, og slip."] }
           ] },
         { id: "b-aendr", rx: "b", gruppe: "b", navn: "HBr: koefficienten 2",
           slut: "Hver gang ét H₂ omsættes, forbruges ét Br₂, og der dannes 2 HBr. Koefficienterne bliver til tallene foran x.",
@@ -236,7 +234,7 @@
                 slut: "Koefficienten 2 foran HBr betyder, at ét H₂ og ét Br₂ giver 2 HBr." },
               { type: "handling", tekst: "Skyderen x er den koncentration af H₂, der er omsat.",
                 spm: "Træk x til 0,040 M, og se på molekylerne.", x: 0.040, tol: 0.005, snap: true,
-                hint: ["Skyderen ligger under beholderen.", "Træk knappen til x = 0,040 M.", "x = 0,040 M."] },
+                hint: ["Skyderen ligger under beholderen. Du kan også bruge piletasterne.", "Den gule streg på skyderen viser, hvor x = 0,040 M er.", "Træk knappen hen til den gule streg."] },
               { type: "valg", felt: "aendr.H2", spm: "Hvad er ændringen i [H₂], når x er omsat?",
                 svar: [{ t: "−x", ok: true }, { t: "+x", nej: "H₂ forbruges, så [H₂] falder." },
                     { t: "−2x", nej: "Der står 1 foran H₂. x er netop den koncentration af H₂, der er omsat." }],
@@ -253,44 +251,44 @@
                 hint: ["HBr står efter pilen og dannes.", "Der står 2 foran HBr.", "Ændringen er +2x."],
                 slut: "Der dannes 2 HBr for hvert H₂, så ændringen er +2x." }
           ] },
-        { id: "c-graense", rx: "c", gruppe: "c", navn: "CO + H₂O: hvor langt kan x komme?",
-          slut: "H₂O er brugt op ved x = 0,100 M. x kan ikke blive større end den mindste startkoncentration af en reaktant.",
-          tavle: { raekker: ["start", "aendr", "lig"], tal: true },
-          trin: [
-              { type: "valg", spm: "Hvilket stof bliver brugt op først, når der fra start er 0,200 M CO og 0,100 M H₂O?",
-                svar: [{ t: "H₂O", ok: true }, { t: "CO", nej: "CO og H₂O forbruges lige hurtigt, men der er mindre H₂O fra start." },
-                    { t: "CO₂", nej: "CO₂ dannes. Det bliver ikke brugt op." }],
-                hint: ["CO og H₂O reagerer 1 til 1.", "Der er kun 0,100 M H₂O, men 0,200 M CO.", "H₂O bliver brugt op først."],
-                slut: "CO og H₂O forbruges lige hurtigt, så det stof, der er mindst af, slipper op først." },
-              { type: "handling", spm: "Træk x så langt op, som det kan komme.", xMax: true,
-                hint: ["Skyderen ligger under beholderen.", "Træk knappen helt til højre.", "x kan højst blive 0,100 M."] }
-          ] },
-        { id: "c-cas", rx: "c", gruppe: "c", navn: "CO + H₂O: hvilken løsning?", yBoks: true,
-          slut: "x = 0,280 M kan ikke bruges, fordi [H₂O] så ville være 0,100 M − 0,280 M = −0,180 M. En brugbar løsning ligger mellem 0 M og 0,100 M.",
+        /* Runde 5: "Hvilken løsning?" med HBr i stedet for en tredje reaktion. Begge
+           CAS-loesninger er positive, men den ene er stoerre end 0,200 M. linje
+           (tavle) med fra: linjen staar foerst fra det trin; med til: kun til og
+           med det trin (saa tavlen kan vaere der uden rullebjaelke, regel 50). */
+        { id: "b-loesning", rx: "b", gruppe: "b", navn: "HBr: hvilken løsning?", yBoks: true,
+          slut: "x = 0,267 M kan ikke bruges, fordi [H₂] så ville være 0,200 M − 0,267 M = −0,067 M. Kun x = 0,160 M giver positive koncentrationer, og dér er Y lig med K.",
+          /* Ligevaegtsloven staar paa tavlen, hvor der saettes ind (maal 2 og 4), men
+             ikke i maal 3 og 5, saa tavlen kan vaere der uden rullebjaelke (regel 50) */
           tavle: { raekker: ["start", "aendr", "lig"], tal: true, linjer: [
-              { navn: "Ligevægtsloven", lov: true },
-              { navn: "Ved ligevægt er Y lig med K", html: "5,44 = " + YX_C },
-              { navn: "CAS løser ligningen", html: "x = 0,0875 M eller x = 0,280 M" },
-              { navn: "Den løsning, der kan bruges", html: "x = 0,0875 M. Med x = 0,280 M bliver [H₂O] negativ.", trin: 0 }] },
-          rodOk: 0.0875, rodNej: 0.280,
+              { navn: "x kan højst blive", html: "0,200 M (der er kun 0,200 M H₂)", trin: 0, til: 0 },
+              { navn: "Ved ligevægt er Y lig med K", html: "64,0 = " + YX_B, fra: 1 },
+              { navn: "CAS løser ligningen", html: "x = 0,160 M eller x = 0,267 M", fra: 1 },
+              { navn: "Den løsning, der kan bruges", html: "x = 0,160 M, fordi x = 0,267 M giver [H₂] < 0 M", trin: 1 }] },
+          rodOk: 0.160, rodNej: 0.267,
           trin: [
-              { type: "valg", linje: 3, spm: "CAS giver x = 0,0875 M og x = 0,280 M. Hvilken løsning kan bruges?",
-                svar: [{ t: "x = 0,0875 M", ok: true },
-                    { t: "x = 0,280 M", nej: "Med x = 0,280 M bliver [H₂O] = 0,100 M − 0,280 M = −0,180 M. Der kan ikke omsættes mere H₂O, end der er." },
+              { type: "valg", linje: 0, spm: "Hvor stor kan x højst blive, når der fra start er 0,200 M H₂ og 0,200 M Br₂?",
+                svar: [{ t: "0,200 M", ok: true },
+                    { t: "0,400 M", nej: "Koncentrationerne lægges ikke sammen. x er den koncentration af H₂, der omsættes, og der er kun 0,200 M H₂." },
+                    { t: "0,100 M", nej: "Der står 1 foran H₂, så der skal ikke divideres med 2. x er den koncentration af H₂, der omsættes." }],
+                hint: ["x er den koncentration af H₂, der omsættes.", "Der kan ikke omsættes mere H₂, end der er fra start.", "x kan højst blive 0,200 M."],
+                slut: "x kan højst blive 0,200 M, for så er alt H₂ og Br₂ brugt op." },
+              { type: "valg", linje: 3, spm: "CAS giver x = 0,160 M og x = 0,267 M. Hvilken løsning kan bruges, når x højst kan blive 0,200 M?",
+                svar: [{ t: "x = 0,160 M", ok: true },
+                    { t: "x = 0,267 M", nej: "Med x = 0,267 M bliver [H₂] = 0,200 M − 0,267 M negativ. Der kan ikke omsættes mere H₂, end der er." },
                     { t: "Begge", nej: "Begge er positive, men den ene giver en negativ koncentration i rækken Ligevægt." }],
-                hint: ["x kan højst være 0,100 M, fordi der kun er 0,100 M H₂O.", "Sæt hver løsning ind i [H₂O] = 0,100 M − x.", "x = 0,0875 M kan bruges."],
-                slut: "Kun x = 0,0875 M ligger mellem 0 M og 0,100 M." },
+                hint: ["x kan højst blive 0,200 M.", "Sæt hver løsning ind i [H₂] = 0,200 M − x.", "x = 0,160 M kan bruges."],
+                slut: "Kun x = 0,160 M ligger mellem 0 M og 0,200 M." },
               { type: "handling", spm: "Træk x, til Y er lig med K.", lige: true,
-                hint: ["Skyderen ligger under beholderen.", "Løsningen er x = 0,0875 M.", "Træk knappen til x = 0,087 M eller 0,088 M."] }
+                hint: ["Løsningen er x = 0,160 M.", "Den gule streg på skyderen viser, hvor x = 0,160 M er.", "Træk knappen hen til den gule streg, og slip."] }
           ] }
     ];
 
-    /* Gemte fremskridt fra foer runde 2 (otte maal): b-lige og b-cas findes
-       ikke laengere og springes over. */
+    /* Gemte fremskridt fra foer runde 2 og 5: b-lige, b-cas (runde 1: "To positive
+       loesninger"), c-graense og c-cas findes ikke laengere og springes over. Det
+       nye maal 5 hedder derfor b-loesning og ikke b-cas. */
     D.GRUPPER_BH = [
         { id: "a", titel: "SO₂Cl₂ ⇌ SO₂ + Cl₂" },
-        { id: "b", titel: "H₂ + Br₂ ⇌ 2HBr" },
-        { id: "c", titel: "CO + H₂O ⇌ CO₂ + H₂" }
+        { id: "b", titel: "H₂ + Br₂ ⇌ 2HBr" }
     ];
 
     /* ----- Fane 2: uden x (den gamles niveau 1) ----------------------------------
@@ -401,8 +399,8 @@
 
     D.ROS_OPGAVE = ["Flot.", "Godt.", "Sådan.", "Rigtigt."];
     D.FAERDIG = {
-        bh: "Alle seks mål er nået. Opgaverne står på de to næste faner.",
-        ux: "Alle fem opgaver er løst. Prøv fanen Med x.",
+        bh: "Alle fem mål er nået. Opgaverne står på de to næste faner.",
+        ux: "Alle fem opgaver er løst. Prøv fanen Fra start til ligevægt.",
         mx: "Alle otte opgaver er løst."
     };
 

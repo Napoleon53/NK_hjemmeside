@@ -119,7 +119,7 @@
             var b = document.createElement("button");
             b.type = "button";
             b.className = "tilstandsknap" + (t.id === mig.tempValg.id ? " aktiv" : "");
-            b.textContent = t.tegn + " " + t.navn;
+            b.textContent = t.navn;   /* ingen ikoner (runde T6) */
             b.addEventListener("click", function () { mig.saetTemp(t); });
             vaert.appendChild(b);
             mig.tempKnapper.push({ el: b, id: t.id });
@@ -127,7 +127,7 @@
 
         var roer = NK.el("oploes-roer");
         this.roerKnapper = [];
-        [{ til: false, tekst: "Står stille" }, { til: true, tekst: "🌀 Omrøring" }].forEach(function (r) {
+        [{ til: false, tekst: "Står stille" }, { til: true, tekst: "Omrøring" }].forEach(function (r) {
             var b = document.createElement("button");
             b.type = "button";
             b.className = "tilstandsknap" + (r.til === mig.omroering ? " aktiv" : "");
