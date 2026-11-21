@@ -523,6 +523,57 @@ function koerTest(W) {
     samlet("kortet slutter over whiteboardet", daekker);
     samlet("hint og Indsend svar står på samme række", raekke);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("Listerne låser titlerne op i takt (21. nov. 2026)");
+    function vist(e) { return !!e && !e.hidden && e.offsetParent !== null; }
+    function laastNr(c) { return c.classList.contains("laast") && vist(c.querySelector(".hl-streg")) && /^\d$/.test(c.innerText.trim()); }
+    function tekstAf(l) { return l.map(function (c) { return c.innerText.trim().replace(/\s+/g, " "); }).join(" | "); }
+    NK.visFane("fane-t");
+    var tc = [].slice.call(el("t-liste").querySelectorAll("[data-opg]"));
+    paastand("Hvad viser testene? har kun numre under Let, Middel og Svær: alle kan vælges, og ingen har en streg",
+        tc.length === 10 && tc.every(function (c) { return !c.disabled && !c.querySelector(".hl-streg"); }), tc.length);
+    NK.visFane("fane-r");
+    r2.forfra();
+    function rk() { return [].slice.call(el("r-liste").querySelectorAll("[data-opg]")); }
+    var rl = rk();
+    paastand("Reaktionerne: ved start har kun opgave 1 en titel og en undertekst; de andre er et nummer med en grå streg uden titel og kan ikke klikkes",
+        rl.length === 3 && /DNPH og ethanal/.test(rl[0].innerText) && /kondensation/.test(rl[0].innerText) && rl.slice(1).every(function (c) { return laastNr(c) && c.disabled; }), tekstAf(rl));
+    paastand("Reaktionerne: en låst flise er lige så høj som en med undertekst",
+        Math.abs(rl[1].getBoundingClientRect().height - rl[0].getBoundingClientRect().height) <= 1,
+        rl.map(function (c) { return Math.round(c.getBoundingClientRect().height); }).join(", "));
+    rl[2].click();
+    paastand("Reaktionerne: et klik på en låst opgave gør intet", r2.nr === 0);
+    for (var rv = 0; rv < 20 && !r2.status[0].loest; rv++) {
+        if (r2.trin() === "reaktion") tid(r2, 3);
+        else if (r2.groen) r2.videreKlik();
+        else r2.visSvar();
+    }
+    rl = rk();
+    paastand("Reaktionerne: når opgave 1 er løst (Vis svaret tæller), kommer titlen på opgave 2 frem; opgave 3 er stadig låst",
+        r2.status[0].loest && /DNPH og propanon/.test(rl[1].innerText) && !rl[1].disabled && laastNr(rl[2]) && rl[2].disabled, tekstAf(rl));
+    rl[1].click();
+    paastand("Reaktionerne: opgave 2 kan nu vælges i listen", r2.nr === 1);
+    r2.forfra();
+    paastand("Begynd forfra låser opgave 2 og 3 igen", rk().slice(1).every(laastNr));
+    NK.visFane("fane-u");
+    u3.forfra();
+    u3.runder = 0;
+    u3.visTrin();
+    function uk() { return [].slice.call(el("u-trinliste").querySelectorAll("[data-trin]")); }
+    var ul = uk();
+    paastand("Ukendte stoffer: ved start har kun trin 1 en titel; trin 2 og 3 er et nummer med en grå streg",
+        ul.length === 3 && /Forsøget/.test(ul[0].innerText) && ul.slice(1).every(laastNr), tekstAf(ul));
+    u3.udfoer(); tid(u3, 8);
+    ul = uk();
+    paastand("Ukendte stoffer: når forsøget er udført, kommer titlen på trin 2 frem; trin 3 er stadig låst",
+        u3.fase === "klasse" && /Hvad viser testene/.test(ul[1].innerText) && !ul[1].classList.contains("laast") && laastNr(ul[2]), tekstAf(ul));
+    for (var ug = 0; ug < 6; ug++) { u3.visSvar(); if (ug < 5) u3.videreKlik(); }
+    ul = uk();
+    paastand("Ukendte stoffer: når den sidste flaske er klassificeret, kommer titlen på trin 3 frem",
+        /Hvilke stoffer/.test(ul[2].innerText) && !ul[2].classList.contains("laast"), tekstAf(ul));
+    u3.forfra();
+    NK.visFane("fane-t");
 }
 </script>
 </body>

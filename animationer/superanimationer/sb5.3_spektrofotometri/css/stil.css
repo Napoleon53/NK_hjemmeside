@@ -765,6 +765,11 @@ button:focus-visible {
 .trinpunkt.aktiv .tp-nr { background-color: var(--blaa); color: #ffffff; }
 .trinpunkt.aktiv .tp-titel { font-size: 1.03rem; color: #ffffff; }
 
+/* Kommende trin: et nummer med en graa streg i stedet for titlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.trinpunkt.kommer .tp-titel { flex: 1 1 auto; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
 .tp-resume {
     margin: -3px 0 4px 39px;
     font-size: 0.92rem;

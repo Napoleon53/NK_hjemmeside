@@ -146,7 +146,7 @@
             var p = parAfType(sim, "polaer");
             var minus = D.staerkest(p[0], p[1]), plus = minus === p[0] ? p[1] : p[0];
             return {
-                tekst: "Klik på det atom i " + binding(p[0], p[1]) + ", der bliver δ−.",
+                tekst: "Klik på et af de to atomer i scenen. Hvilket atom i bindingen " + binding(p[0], p[1]) + " bliver δ−?",
                 hint: "Det atom, der har den største elektronegativitet, trækker elektronparret til sig.",
                 svar: minus + " har den største elektronegativitet (" + tal(en(minus)) + ") og trækker elektronparret til sig. " +
                     minus + " bliver δ−, og " + plus + " bliver δ+.",

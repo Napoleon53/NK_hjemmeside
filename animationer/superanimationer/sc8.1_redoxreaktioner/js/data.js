@@ -310,7 +310,7 @@
             id: "lige", navn: "Lige mange elektroner", reak: "mg", foer: ["ox", "red"], aktiv: [], brikker: [],
             spm: {
                 om: ["ox", "red"],
-                tekst: "Et magnesiumatom afgiver 2 e⁻, og ét O₂ optager 4 e⁻. Hvor mange magnesiumatomer går der på ét O₂?",
+                tekst: "Et magnesiumatom afgiver 2 e⁻. Hvor mange magnesiumatomer afgiver de 4 e⁻, som ét O₂ optager?",
                 svar: [
                     { t: "2 magnesiumatomer", ok: true },
                     { t: "1 magnesiumatom",
@@ -367,7 +367,7 @@
             },
             spm: {
                 om: ["ox", "red"],
-                tekst: "Et jernatom afgiver 3 e⁻, og ét O₂ optager 4 e⁻. Hvor mange jernatomer går der på 3 dioxygenmolekyler?",
+                tekst: "Et jernatom afgiver 3 e⁻. Ét O₂ optager 4 e⁻. Hvor mange jernatomer afgiver de e⁻, som 3 O₂ optager?",
                 svar: [
                     { t: "4 jernatomer", ok: true },
                     { t: "3 jernatomer",
@@ -453,7 +453,8 @@
             st.red + " optager elektronerne, så " + st.red.toLowerCase() + " er oxidationsmidlet.";
         return {
             type: "spm", reak: id, om: ["ox", "red"],
-            tekst: red ? "Hvilket stof er reduktionsmidlet i reaktionen?" : "Hvilket stof er oxidationsmidlet i reaktionen?",
+            tekst: "Hvilket stof er " + (red ? "reduktionsmidlet" : "oxidationsmidlet") + ", når " + st.ox.charAt(0).toLowerCase() + st.ox.slice(1) +
+                " reagerer med " + st.red.charAt(0).toLowerCase() + st.red.slice(1) + "?",
             svar: svar,
             hint: [
                 red ? "Reduktionsmidlet er det stof, der afgiver elektroner." : "Oxidationsmidlet er det stof, der optager elektroner.",
@@ -568,7 +569,7 @@
             },
             spm: {
                 om: ["maerker"],
-                tekst: "Et reduktionsmiddel er ikke en syre, men de to har én ting til fælles. Hvad er det?",
+                tekst: "Se på HCl og magnesium i lupperne. Hvad har syren HCl og reduktionsmidlet magnesium til fælles?",
                 svar: [
                     { t: "Begge afgiver en partikel", ok: true },
                     { t: "Begge optager en partikel",

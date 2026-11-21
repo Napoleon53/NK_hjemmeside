@@ -271,7 +271,11 @@
             if (!d.bland) return d.tekst;
             return "Dryp " + D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]].tekst + " i urglasset";
         case "produkt":
-            return "Vælg det stof, " + R.led[R.red.v].st.tekst + " blev til";
+            /* Spoergsmaalet naevner det, eleven saa i glasset */
+            var tilMn = d.h[d.red[1]], fraMn = d.v[d.red[0]];
+            var da = tilMn === "MnO4 2-" ? "da glasset blev grønt" : (tilMn === "MnO2" ? "da der kom et brunt fast stof i glasset" :
+                (fraMn === "MnO2" ? "da det brune faste stof forsvandt" : "da den violette farve forsvandt"));
+            return "Hvilket stof blev " + R.led[R.red.v].st.tekst + " til, " + da + "?";
         case "ox":
             return "Skriv oxidationstallene for " + R.ox.E + " og " + R.red.E + " i skemaet";
         case "for":

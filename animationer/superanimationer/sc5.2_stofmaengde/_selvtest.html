@@ -488,7 +488,7 @@ function koerTest(W) {
     F.vaelg(0);
     paastand("ordren har kun ét felt, massen, og intet om atomer", F.opg.felter.length === 1 &&
         !d.querySelector("#afvej-raekker input.eks") && !/atom/i.test(d.getElementById("fane-afvej").querySelector(".panel").innerText) &&
-        /Hvad skal vægten vise\?/.test(F.kort.ind.textContent) && !!F.kort.ind.querySelector(".sk-chip"));
+        /Hvor mange gram skal vægten vise for [\d,]+\s+mol/.test(F.kort.ind.textContent) && !!F.kort.ind.querySelector(".sk-chip"));
     paastand("Indsend svar er gråt, før der står et tal i feltet", F.el.indsend.classList.contains("ikke-klar"));
     F.indsend();
     paastand("Indsend svar uden tal bedømmer intet", !F.opg.faerdig && F.aktivtFelt().forsoeg === 0);

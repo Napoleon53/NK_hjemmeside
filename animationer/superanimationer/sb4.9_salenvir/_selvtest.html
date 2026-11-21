@@ -224,7 +224,7 @@ async function koer() {
     paastand("rigtigt svar: Vent 10 minutter", sim.fase === "mellem" && /Vent 10 minutter/.test(kortTekst()));
     var kk = kort();
     paastand("papirkortet: spørgsmålet bliver stående, svaret er grønt, A er stadig rødt, C er tonet ned, og alt er låst",
-        / bliv/.test(kk.className) && /Er reaktionen færdig\?/.test(kk.querySelector(".sk-tekst").textContent) &&
+        / bliv/.test(kk.className) && /Er reaktionen færdig ifølge TLC-pladen/.test(kk.querySelector(".sk-tekst").textContent) &&
         !!kk.querySelector('.sk-knap.rigtig[data-valg="1"]') && !!kk.querySelector('.sk-knap.forkert[data-valg="0"]') && !!kk.querySelector('.sk-knap.dim[data-valg="2"]') &&
         kk.querySelectorAll("#ind .sk-knap:not(:disabled)").length === 0, kk.className);
     paastand("forklaringen står under svarene, og Vent 10 minutter står, hvor Indsend svar stod",

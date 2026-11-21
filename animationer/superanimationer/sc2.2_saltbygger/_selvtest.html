@@ -1037,11 +1037,12 @@ function papirkort(d, NK, ramme) {
             fb.startOpgave(s, k < D.NAVN_OPGAVER.length ? "navn" : "formel");
             fb.visHint();
             fb.bord.saet(s.kat, s.p * 2, s.an, s.n * 2); fb.indsendKlik();
-            maal(skaerm + " fane 1", "bord-skort", [214, 204][m[2]], s.formel + " byg");
+            /* 237/221: spørgsmålet på egen linje, 21. nov. 2026 */
+            maal(skaerm + " fane 1", "bord-skort", [237, 221][m[2]], s.formel + " byg");
             fb.bord.saet(s.kat, s.p, s.an, s.n); fb.indsendKlik();
             fb.visHint();
             fb.svar.knapper[forkertIdx(fb)].click(); fb.indsendKlik();
-            maal(skaerm + " fane 1", "bord-skort", [214, 204][m[2]], s.formel + " valg");
+            maal(skaerm + " fane 1", "bord-skort", [237, 221][m[2]], s.formel + " valg");
         });
         fb.tilpas(); fb.opdater(1 / 60);
         var kb = d.getElementById("bord-skort").getBoundingClientRect(), cb = fb.bord.canvas.getBoundingClientRect();
@@ -1056,7 +1057,8 @@ function papirkort(d, NK, ramme) {
                 f4.startOpgave(D.salt(o.kat, o.an), type);
                 f4.visHint();
                 f4.svar.knapper[forkertIdx(f4)].click(); f4.indsendKlik();
-                maal(skaerm + " fane 2", "vand-skort", [226, 212][m[2]], o.kat + o.an + " " + type);
+                /* 247/231: spørgsmålet på egen linje, 21. nov. 2026 */
+                maal(skaerm + " fane 2", "vand-skort", [247, 231][m[2]], o.kat + o.an + " " + type);
             });
         });
         f4.tilpas(); f4.opdater(1 / 60);

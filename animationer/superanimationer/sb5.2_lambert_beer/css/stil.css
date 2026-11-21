@@ -33,7 +33,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    --panel-bredde: 0px;     /* 21. nov. 2026: panelet er vaek; opgaverne staar i raekken oeverst i scenen */
 }
 
 * { box-sizing: border-box; }
@@ -822,6 +822,12 @@ kbd {
 .opg-raekke.loest.valgt { border-color: var(--blaa); }
 .opg-raekke.stjerne .or-m { color: var(--gul); }
 
+/* Kommende opgaver: et nummer med en graa streg i stedet for titlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.opg-raekke.laast { cursor: default; opacity: 0.75; }
+.opg-raekke.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
 .tjekknap {
     flex: 0 0 auto;
     padding: 0.55em 1em;
@@ -1184,9 +1190,6 @@ button:focus-visible {
     outline-offset: 2px;
 }
 
-@media (max-width: 1320px) {
-    :root { --panel-bredde: 370px; }
-}
 
 @media (max-width: 1100px) {
     .top { gap: 10px; padding: 8px 12px; }
@@ -1247,6 +1250,7 @@ button:focus-visible {
 .scenekort[hidden], .sk-bund[hidden], .scenekort [hidden] { display: none !important; }
 
 .sk-tekst { margin: 0; }
+.scenekort.gaet .sk-tekst { margin-bottom: 10px; }   /* gæt-kortet: luft over svarene (21. nov. 2026) */
 .sk-chip { white-space: nowrap; }
 .sk-gaet { margin: 4px 0 0; font-size: 0.95rem; }
 
@@ -1328,3 +1332,248 @@ button:focus-visible {
     .sk-knap { padding: 4px 8px; font-size: 0.88rem; }
 }
 #fane-lys .scenekort.gaet { width: min(900px, calc(100% - 24px)); }
+
+/* =====================================================================
+   21. NOV. 2026: REGELSAETTET (REGELSAET.md)
+   Intet panel. Opgaverne i en smal raekke oeverst i scenen (moenstret fra
+   sc5.7), betjeningen paa apparaterne i scenen, klik-opfordringer med gul
+   ramme og boble, Beregningens tavle som et lyst papir og rolig skrift.
+   ===================================================================== */
+.fane { grid-template-columns: minmax(0, 1fr); }
+.panel { display: none !important; }
+.scene { padding-top: 40px; }
+
+/* ----- Opgaveraekken ------------------------------------------------- */
+.opgaverad {
+    position: absolute;
+    z-index: 6;
+    top: 6px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.or-opgaver, .or-niveau { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.or-niveau { padding-right: 8px; margin-right: 2px; border-right: 1px solid #343440; }
+.or-niveau:empty { display: none; }
+.opgaverad .or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.opgaverad .or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.opgaverad .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+.opgaverad .or-navn { flex: none; }
+.opgaverad .or-navn:empty { display: none; }
+.opgaverad .or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.opgaverad .or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.opgaverad .or-knap.loest .or-nr { color: var(--gul); }
+.opgaverad .or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.opgaverad .or-knap.laast .or-nr { background: none; color: #6a707b; }
+.opgaverad .or-niveau .or-knap { padding: 0 9px; }
+.opgaverad .or-stille { margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.opgaverad .or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 700; }
+@media (max-width: 1199px) {
+    .or-opgaver .or-navn { display: none; }
+    .opgaverad .or-opgaver .or-knap { padding: 0 4px; }
+}
+
+/* ----- Kortzonen: fast hoejde, saa scenen ikke hopper (regel 4) -------- */
+.kortzone .scenekort { top: 2px; }
+#fane-lys .kortzone { height: 238px; }
+#fane-kurve .kortzone { height: 180px; }
+#fane-regn .kortzone { height: 232px; }
+@media (max-height: 720px) {
+    #fane-lys .kortzone { height: 226px; }
+    #fane-kurve .kortzone { height: 180px; }
+    #fane-regn .kortzone { height: 220px; }
+}
+
+/* ----- Betjeningen paa apparaterne (fane 1) -------------------------- */
+.styr-knap {
+    position: absolute;
+    z-index: 3;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #c9c3b3;
+    border-radius: 50%;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.styr-knap:hover:not(:disabled) { border-color: #8a8578; background-color: #ffffff; }
+.styr-knap:disabled { opacity: 0.4; cursor: default; }
+.scene-knap { position: absolute; z-index: 3; margin: 0; }
+#lys-langsom { font-family: "Lexend", "Segoe UI", sans-serif; font-size: 12.5px; font-weight: 500; padding: 4px 10px; }
+#lys-stoffer { display: flex; gap: 5px; margin: 0; }
+#lys-stoffer .stof-knap { flex: none; padding: 3px 8px; font-family: "Lexend", "Segoe UI", sans-serif; font-size: 13px; font-weight: 500; }
+
+/* Klik-opfordringen (regel 19-21): gul ramme om tingen og en boble med pil */
+.styr-knap.opfordring, .scene-knap.opfordring {
+    border-color: #e0b22e;
+    box-shadow: 0 0 0 3px rgba(224, 178, 46, 0.9), 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+.boble {
+    position: absolute;
+    z-index: 4;
+    padding: 5px 10px;
+    border: 1px solid #c99a14;
+    border-radius: 8px;
+    background-color: #fdf5dc;
+    color: #5a4510;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    transform: translate(-50%, -100%);
+}
+.boble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    margin-left: -7px;
+    border-width: 7px 7px 0;
+    border-style: solid;
+    border-color: #c99a14 transparent transparent;
+}
+.boble.under { transform: translate(-50%, 0); }
+.boble.under::after { top: -7px; bottom: auto; border-width: 0 7px 7px; border-color: transparent transparent #c99a14; }
+
+/* ----- Fane 3: opstillingen til venstre og papirtavlen til hoejre ------ */
+.regn-flade {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+    gap: 18px;
+    padding: 4px 18px 16px;
+}
+.regn-flade .laerred-ramme { min-height: 0; }
+.papirtavle {
+    align-self: start;
+    min-height: 120px;
+    max-height: 100%;
+    overflow: hidden;
+    padding: 14px 18px;
+    border: 1px solid #d9d4c6;
+    border-radius: 10px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+.papirtavle:empty { display: none; }
+.pt-del + .pt-del { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e4dfd2; }
+.pt-navn { margin: 0 0 4px; color: #6b6558; font-size: 14px; font-weight: 500; }
+.pt-linje {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 0.35em;
+    padding: 4px 8px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: clamp(16px, 1.55vw, 21px);
+    font-weight: 500;
+    line-height: 1.5;
+}
+.pt-linje.spoerges { border-color: #e0b22e; background-color: #fdf5dc; }
+.pt-linje .pt-svar { color: #1f6b43; font-weight: 600; }
+.pt-linje .pt-svar.vist { color: #7a5a00; }
+.pt-linje .pt-spm { color: #7a5a00; font-weight: 600; }
+.pt-linje .pt-eps { color: #6b3fb0; }
+.papirtavle .vbroek > span:first-child { border-bottom-width: 1.5px; }
+
+/* ----- Fane 3: feltet til tallet paa kortet --------------------------- */
+.sk-felt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 2px;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+.sk-felt input {
+    width: 9em;
+    padding: 5px 8px;
+    border: 1.5px solid #c9c3b3;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1d2433;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+}
+.sk-felt input:focus { outline: none; border-color: #2a76ac; box-shadow: 0 0 0 3px rgba(42, 118, 172, 0.18); }
+.sk-felt input.fejl { border-color: #c4493c; animation: ryst 0.35s ease 1; }
+.sk-felt .sk-enhed { color: #3a4150; font-weight: 500; }
+
+/* Formlerne paa kortet: samme knapper som svarene, men formlen i midten */
+.sk-svar.formler .sk-knap { justify-content: center; font-size: 1rem; font-weight: 500; }
+.sk-svar.formler .v-bogstav { display: none; }
+
+@media (max-width: 860px) {
+    .regn-flade { grid-template-columns: minmax(0, 1fr); }
+}
+/* Boblen ved siden af knappen, saa den ikke daekker etiketterne */
+.boble.venstre { transform: translate(-100%, -50%); }
+.boble.venstre::after { left: auto; right: -7px; top: 50%; bottom: auto; margin: -7px 0 0; border-width: 7px 0 7px 7px; border-color: transparent transparent transparent #c99a14; }
+.boble.hoejre { transform: translate(0, -50%); }
+.boble.hoejre::after { left: -7px; top: 50%; bottom: auto; margin: -7px 0 0; border-width: 7px 7px 7px 0; border-color: transparent #c99a14 transparent transparent; }
+#lys-stoffer { flex-direction: row; align-items: center; }
+
+/* Runde 2 (21. nov. 2026, regel 32): Beregningen samlet i midten paa en stor skaerm */
+.regn-flade { width: 100%; max-width: 1340px; margin: 0 auto; }
+
+/* Runde 3 (21. nov. 2026): opstilling og tavle side om side i balance; tavlen
+   har en stiplet plads med navnet fra start (regel 13) */
+.regn-flade { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.papirtavle.tom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed rgba(200, 208, 220, 0.30);
+    background: none;
+    box-shadow: none;
+}
+.pt-plads { color: rgba(200, 208, 220, 0.55); font-size: 15px; font-weight: 500; }

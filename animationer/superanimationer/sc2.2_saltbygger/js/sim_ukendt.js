@@ -205,11 +205,11 @@
         NK.saetHTML("ukendt-spm", "");
         this.svar.ryd();
         this.besked("");
-        NK.saetHTML("ukendt-opgavetekst", o.side === "kat"
-            ? "Formlen er <b>" + salt.formel + "</b>. " + NK.stort(this.ion.grund)
-                + " kan have flere ladninger. Hvilken ladning har " + this.ion.grund + "ionen her?"
+        NK.saetKorttekst("ukendt-opgavetekst", o.side === "kat"
+            ? NK.stort(this.ion.grund)
+                + " kan have flere ladninger. Hvilken ladning har " + this.ion.grund + "ionen i " + salt.formel + "?"
             : "Formlen er <b>" + salt.formel + "</b>. " + this.ion.formel
-                + " er en sammensat ion, du ikke kender. Hvilken ladning har den?");
+                + " er en sammensat ion, du ikke kender. Hvilken ladning har den sammensatte ion " + this.ion.formel + " i " + salt.formel + "?");
         this.saetKnap("start");
 
         this.bord.laas(false);
@@ -247,7 +247,7 @@
         var k = this.kendt, mig = this;
         this.fase = "kendt";
         this.aktivTrin(0);
-        NK.saetHTML("ukendt-opgavetekst", "Start med den ion, du kender: <b>" + k.formel + "</b>. " + (k.gruppe
+        NK.saetKorttekst("ukendt-opgavetekst", "Start med den ion, du kender: <b>" + k.formel + "</b>. " + (k.gruppe
             ? "Dens ladning kan udledes af, hvor " + k.formel + " står i det periodiske system."
             : "Det er en sammensat ion, og dens ladning skal man kende."));
         this.stilKendtSpm(k);
@@ -260,7 +260,7 @@
 
     /* Spoergsmaalet om en kendt ions ladning (trin 1, og partneren). */
     NK.SimUkendt.prototype.stilKendtSpm = function (ion) {
-        NK.saetHTML("ukendt-spm", "Hvilken ladning har <b>" + ion.formel + "</b>?");
+        NK.saetKorttekst("ukendt-spm", "Hvilken ladning har <b>" + ion.formel + "</b>?");
         NK.el("ukendt-valg").className = "valg sk-svar";
         this.svar.vis(D.kendtValg(ion));
     };
@@ -286,7 +286,7 @@
         this.aktivTrin(1);
         this.bord.markerKendt(false);
         this.bord.visKendt();          /* kortene folder sig ud */
-        NK.saetHTML("ukendt-opgavetekst", "Nu kender du ladningen på " + this.kendt.formel + ". "
+        NK.saetKorttekst("ukendt-opgavetekst", "Nu kender du ladningen på " + this.kendt.formel + ". "
             + this.opvejTekst() + " Træk i kortet med <b>?</b>, til lynlåsen lukker. Tryk så Indsend svar.");
         this.roert = false;
         this.visIndsend();
@@ -353,8 +353,8 @@
         if (o.side === "kat") {
             this.fase = "valg";
             this.aktivTrin(2);
-            NK.saetHTML("ukendt-opgavetekst", "Ladningen er fundet. Nu skal saltet have et navn.");
-            NK.saetHTML("ukendt-spm", "Hvad hedder <b>" + s.formel + "</b>?");
+            NK.saetKorttekst("ukendt-opgavetekst", "Ladningen er fundet. Nu skal saltet have et navn.");
+            NK.saetKorttekst("ukendt-spm", "Hvad hedder <b>" + s.formel + "</b>?");
             NK.el("ukendt-valg").className = "valg navne sk-svar";
             this.svar.vis(D.romertalValg(s.kat, s.an));
         } else {
@@ -363,7 +363,7 @@
                at se lynlaasen lukke. */
             this.fase = "partner";
             this.aktivTrin(2);
-            NK.saetHTML("ukendt-opgavetekst", "Nu skal " + D.ionTekst(this.ion) + " bruges i "
+            NK.saetKorttekst("ukendt-opgavetekst", "Nu skal " + D.ionTekst(this.ion) + " bruges i "
                 + D.saltnavn(this.partner, s.an) + ". Slå først ladningen op for <b>" + this.partner.formel + "</b>.");
             this.stilKendtSpm(this.partner);
             this.skift = { t: 1.4 };
@@ -390,10 +390,10 @@
         this.fase = "valg";
         this.aktivTrin(3);
         this.bord.fritByg();
-        NK.saetHTML("ukendt-opgavetekst", "Nu kender du begge ladninger: " + D.ionTekst(this.partner) + " og "
+        NK.saetKorttekst("ukendt-opgavetekst", "Nu kender du begge ladninger: " + D.ionTekst(this.partner) + " og "
             + D.ionTekst(this.ion) + ". Byg " + D.saltnavn(this.partner, s.an)
             + " på bordet med <b>+</b> og <b>−</b>, og vælg så formlen.");
-        NK.saetHTML("ukendt-spm", "Hvad er formlen for <b>" + D.saltnavn(this.partner, s.an) + "</b>?");
+        NK.saetKorttekst("ukendt-spm", "Hvad er formlen for <b>" + D.saltnavn(this.partner, s.an) + "</b>?");
         NK.el("ukendt-valg").className = "valg sk-svar";
         this.svar.vis(D.formelValg(this.partner, s.an));
     };
@@ -509,7 +509,7 @@
             NK.saetHTML("ukendt-uf", D.formelHTML(this.partner, this.salt.an));
             NK.saetTekst("ukendt-un", D.saltnavn(this.partner, this.salt.an));
         }
-        NK.saetHTML("ukendt-opgavetekst", loest ? "Opgaven er løst." : "Sådan skulle det være.");
+        NK.saetKorttekst("ukendt-opgavetekst", loest ? "Opgaven er løst." : "Sådan skulle det være.");
         if (loest && !this.vist) {
             this.loeste++;
             NK.saetTekst("ukendt-loest", String(this.loeste));

@@ -1,0 +1,585 @@
+[
+  {
+    "mappe": "sc4.3_forbraending",
+    "titel": "Forbrænding",
+    "sprog": [
+      {
+        "fane": "1 Brænderen",
+        "opgave": "3 Luppen over den blå flamme",
+        "fil": "js/data.js",
+        "linje": 127,
+        "nu_alm": "Luppen viser, hvad der kommer op fra den blå flamme. (efter spørgsmålet:) Vælg alle, der passer.",
+        "nu_fed": "Hvilke stoffer er det?",
+        "nu_svar": ["CO₂, carbondioxid", "CO, carbonmonoxid", "C, sod", "H₂O, vand"],
+        "problem": "Spørgsmålet peger tilbage med \"det\", så eleven kan ikke se, at det handler om det, der kommer op fra den blå flamme.",
+        "nyt_alm": "Luppen viser molekylerne over flammen. Vælg alle, der passer.",
+        "nyt_fed": "Hvilke stoffer kommer op fra den blå flamme?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Afstem forbrændingen",
+        "opgave": "Trin 1 af 3 (alle skemaer, Uøvet)",
+        "fil": "js/data.js",
+        "linje": 304,
+        "nu_alm": "Afstem carbon. (efter spørgsmålet:) Brug pilene, og tryk Indsend svar.",
+        "nu_fed": "Hvilket tal skal stå foran CO₂?",
+        "nu_svar": ["tal vælges med pilene ved feltet"],
+        "problem": "Spørgsmålet siger ikke, at tallet skal give lige mange carbonatomer på begge sider, og der kommer en instruktion efter det; trin 2 (linje 314) og trin 3 (linje 325) har samme mønster og kan blive \"Hvilket tal foran H₂O giver lige mange hydrogenatomer før og efter reaktionspilen?\" og \"... foran O₂ ... oxygenatomer ...\".",
+        "nyt_alm": "Afstem carbon. Vælg tallet med pilene ved feltet, og tryk Indsend svar.",
+        "nyt_fed": "Hvilket tal foran CO₂ giver lige mange carbonatomer før og efter reaktionspilen?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Brænderen",
+        "billede": "skud/b/sc4.3_forbraending__0.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, brænderen med mærket Klik: tænd, skyderen til luftreguleringen, skeen på stativet, en tom stiplet lupramme med knappen Vis luppen, panelet De to flammer med tomme linjer.",
+        "bruges": "Brænderen og skeen. Luftreguleringen nævnes kun som lukket.",
+        "forslag": [],
+        "andet": "Knappen Vis luppen kan skjules til opgave 3, så rammen kun har navnet luppen. Så klikker eleven den ikke frem i opgave 1, hvor den ikke bruges.",
+        "gevinst": "Lille: én knap mindre at klikke på i den første opgave.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Afstem forbrændingen",
+        "billede": "skud/b/sc4.3_forbraending__1.png",
+        "dom": "fint",
+        "fremme": "Kort med trin 1 af 3, tavlen med skemaet, trinoverskriften Kig kun på carbonatomerne, kuglemodeller under skemaet, tabellen før/efter med C, H og O, niveauvalg og boksen Rækkefølgen i panelet.",
+        "bruges": "Feltet foran CO₂, C-rækken i tabellen og kuglerne. H og O står dæmpet.",
+        "forslag": [],
+        "andet": "Fanen er allerede stilladseret i trin C, H og O, og det, der ikke bruges endnu, er dæmpet.",
+        "gevinst": "Ingen ændring nødvendig.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  },
+  {
+    "mappe": "sc4.4_addition_og_plastik",
+    "titel": "Addition og plastik",
+    "sprog": [
+      {
+        "fane": "1 Addition",
+        "opgave": "2 Fire bindinger",
+        "fil": "js/data.js",
+        "linje": 79,
+        "nu_alm": "Ethen og dibrom blev til 1,2-dibromethan.",
+        "nu_fed": "Hvad skete der med dobbeltbindingen?",
+        "nu_svar": ["Den er der stadig", "Den blev til en enkeltbinding", "Den forsvandt helt"],
+        "problem": "Molekylet i scenen er 1,2-dibromethan uden dobbeltbinding, så \"dobbeltbindingen\" peger tilbage på ethen, som kun nævnes i indledningen.",
+        "nyt_alm": "Ethen og dibrom blev til 1,2-dibromethan.",
+        "nyt_fed": "Hvad skete der med dobbeltbindingen i ethen, da dibrom satte sig på?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Addition",
+        "opgave": "4 Vand",
+        "fil": "js/data.js",
+        "linje": 143,
+        "nu_alm": "Vandmolekylet delte sig i to dele, som satte sig på ethen.",
+        "nu_fed": "Hvilke to dele?",
+        "nu_svar": ["H₂ og O", "H og OH", "H, H og O hver for sig"],
+        "problem": "Det halvfede er kun \"Hvilke to dele?\", så både vandmolekylet og ethen står kun i indledningen.",
+        "nyt_alm": "Vand satte sig på dobbeltbindingen i ethen.",
+        "nyt_fed": "Hvilke to dele delte vandmolekylet sig i, da det satte sig på ethen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Bromvand",
+        "opgave": "1 Glas A, spørgsmål 2",
+        "fil": "js/data.js",
+        "linje": 272,
+        "nu_alm": "Dibrom satte sig på stoffet i glas A i en addition.",
+        "nu_fed": "Er stoffet mættet eller umættet?",
+        "nu_svar": ["Stoffet er mættet", "Stoffet er umættet"],
+        "problem": "\"Stoffet\" siger ikke hvilket, og glas A står kun i indledningen.",
+        "nyt_alm": "Dibrom satte sig på stoffet i glas A i en addition.",
+        "nyt_fed": "Er stoffet i glas A mættet eller umættet?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Bromvand",
+        "opgave": "1 Glas A, spørgsmål 1",
+        "fil": "js/data.js",
+        "linje": 255,
+        "nu_alm": "I glas A er den orange farve fra dibrom, Br₂, væk.",
+        "nu_fed": "Hvor er dibrommet blevet af?",
+        "nu_svar": ["Dibrom har reageret med stoffet", "Dibrom er flyttet op i øverste lag", "Dibrom er fordampet fra glasset"],
+        "problem": "Spørgsmålet siger ikke hvilket glas, selv om fem glas står i scenen.",
+        "nyt_alm": "I glas A er den orange farve fra dibrom, Br₂, væk.",
+        "nyt_fed": "Hvor er dibrommet i glas A blevet af?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Plastik",
+        "opgave": "1 To ethenmolekyler",
+        "fil": "js/data.js",
+        "linje": 441,
+        "nu_alm": "To ethenmolekyler har sat sig sammen.",
+        "nu_fed": "Hvad skete der med deres dobbeltbindinger?",
+        "nu_svar": ["De er der stadig", "De åbnede sig og bandt dem sammen", "De blev til hydrogenatomer"],
+        "problem": "\"Deres\" peger tilbage på ethenmolekylerne i indledningen.",
+        "nyt_alm": "To ethenmolekyler har sat sig sammen.",
+        "nyt_fed": "Hvad skete der med dobbeltbindingerne i de to ethenmolekyler?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Plastik",
+        "opgave": "5 Udsnittet",
+        "fil": "js/data.js",
+        "linje": 542,
+        "nu_alm": "En kæde i polyethen er for lang til at tegne. Man tegner det udsnit, der gentager sig.",
+        "nu_fed": "Hvilket udsnit?",
+        "nu_svar": ["−CH=CH−", "−CH₂−CH₂−", "−CH₃−CH₃−"],
+        "problem": "Det halvfede er kun \"Hvilket udsnit?\", og både polyethen og \"gentager sig\" står i indledningen.",
+        "nyt_alm": "En kæde i polyethen er for lang til at tegne.",
+        "nyt_fed": "Hvilket udsnit gentager sig i en kæde af polyethen?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Addition",
+        "billede": "skud/b/sc4.4_addition_og_plastik__0.png",
+        "dom": "fint",
+        "fremme": "Gæt-kortet, ethen med mærket dobbeltbinding, dibrom på hylden.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt: ét gæt, ét molekyle, ét reagens.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Bromvand",
+        "billede": "skud/b/sc4.4_addition_og_plastik__1.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, fem ens glas med prop, mærket Klik for at ryste ved glas A, panelet De fem glas (alle ukendt).",
+        "bruges": "Glas A.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Plastik",
+        "billede": "skud/b/sc4.4_addition_og_plastik__2.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, seks ethenmolekyler, et af dem med mærket Træk hen til et andet ethenmolekyle, panelet Kæden med ét tal.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Gæt-indledningen til glas D og E (data.js linje 351 og 384) bruger kolon med lille bogstav efter: \"Glas D har fået sin etiket: cyclohexan, C₆H₁₂, en ring med kun enkeltbindinger.\" Forslag: \"Glas D har fået etiketten cyclohexan, C₆H₁₂. Cyclohexan er en ring med kun enkeltbindinger.\" og \"Glas E har fået etiketten benzen, C₆H₆. Benzen tegnes som en ring med tre dobbeltbindinger.\""
+  },
+  {
+    "mappe": "sc4.5_fedtstoffer",
+    "titel": "Byg et fedtstof",
+    "sprog": [
+      {
+        "fane": "2 Køleskabet",
+        "opgave": "Opgave 1 til 6 (alle gæt om fast eller flydende)",
+        "fil": "js/sim_koele.js",
+        "linje": 474,
+        "nu_alm": "Smør står i køleskabet ved 5 °C.",
+        "nu_fed": "Er fedtet fast, delvist fast eller flydende?",
+        "nu_svar": ["Fast", "Delvist fast", "Flydende"],
+        "problem": "Hvilket fedt, hvilket sted og hvilken temperatur står kun i indledningen, så \"fedtet\" alene kan være hvad som helst i scenen.",
+        "nyt_alm": "",
+        "nyt_fed": "Er smør fast, delvist fast eller flydende i køleskabet ved 5 °C?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Fabrikken",
+        "billede": "skud/b/sc4.5_fedtstoffer__0.png",
+        "dom": "fint",
+        "fremme": "Kort med ordren, glycerol med pil, fire fedtsyrefliser, glasset Dit fedtstof, kaffekop, panelet Ordrer og Dit fedtstof, bjælken Start præsentation.",
+        "bruges": "Glycerol og fliserne. Panelet viser resultatet, når tre fedtsyrer sidder på.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede overskueligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Køleskabet",
+        "billede": "skud/b/sc4.5_fedtstoffer__1.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med gættet og en notelinje, køleskab med fryser, vindue med sol, et stort zoomvindue med sammenfiltrede kæder i fire farver og en farveforklaring, seks glas på bordet, varedeklarationen i panelet (søjle og tre procenttal), bjælken Start præsentation.",
+        "bruges": "Smørglasset og køleskabet. Gættet er hverdagsviden. Zoomvinduet og varedeklarationen bruges først i hvorfor-spørgsmålet til sidst.",
+        "forslag": [
+          {
+            "alm": "Smør står på køkkenbordet. Om lidt flytter glasset ind i køleskabet.",
+            "fed": "Er smør fast, delvist fast eller flydende i køleskabet ved 5 °C?",
+            "svar": ["Fast", "Delvist fast", "Flydende"],
+            "derefter": "Smørglasset flytter ind i køleskabet som nu, og zoomvinduet åbner med smørrets molekyler ved 5 °C. Indtil da er zoomvinduet en stiplet ramme med navnet zoomvinduet."
+          },
+          {
+            "alm": "Zoomvinduet viser molekylerne i smørret ved 5 °C.",
+            "fed": "Hvordan ligger molekylerne i smør, der er fast?",
+            "svar": ["Tæt sammen i rækker", "Hulter til bulter", "Langt fra hinanden"],
+            "derefter": "Farveforklaringen under zoomvinduet dukker op (stearinsyre, oliesyre, linolsyre, linolensyre)."
+          },
+          {
+            "alm": "De lilla kæder er stearinsyre, som er en mættet fedtsyre.",
+            "fed": "Hvilken form har kæderne af stearinsyre i smørret?",
+            "svar": ["Rette uden knæk", "Med ét knæk", "Med mange knæk"],
+            "derefter": "Varedeklarationen i panelet folder sig ud med 66 % mættede fedtsyrer, og opgave 2 begynder."
+          }
+        ],
+        "andet": "Fold varedeklarationen i panelet ind, til den bruges. Fryseren og solvinduet kan blive stående, for de er en del af køkkenet og bruges i de næste opgaver.",
+        "gevinst": "Den svage elev ser først kun smørret og køleskabet og får derefter molekylerne og farverne ét lag ad gangen, så hvorfor-spørgsmålet til sidst bygger på noget, eleven selv har set.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Fane 2: Notelinjen under svarene siger \"Gæt på kortet, eller sæt smør i køleskabet og se selv.\" (sim_koele.js linje 539). Eleven kan altså flytte glasset og aflæse tilstanden over zoomvinduet, før gættet sendes. Zoomvinduet viser desuden tilstanden fra start (\"Delvist fast 20 °C\"). Bjælken Start præsentation dækker etiketten Køkkenbordet og bunden af glassene, til eleven har valgt."
+  },
+  {
+    "mappe": "sc4.6_umaettet_fedt",
+    "titel": "Umættet fedt",
+    "sprog": [
+      {
+        "fane": "1 Ét molekyle",
+        "opgave": "1 Fra olivenolie",
+        "fil": "js/data.js",
+        "linje": 208,
+        "nu_alm": "Hver fedtsyre i fedtstoffet fra olivenolie har én dobbeltbinding.",
+        "nu_fed": "Hvad kaldes sådan en fedtsyre?",
+        "nu_svar": ["Mættet", "Monoumættet", "Polyumættet"],
+        "problem": "\"Sådan en\" peger tilbage, så det, der skal navngives (én dobbeltbinding), står kun i indledningen.",
+        "nyt_alm": "Hver fedtsyre i fedtstoffet fra olivenolie har én dobbeltbinding.",
+        "nyt_fed": "Hvad kaldes en fedtsyre med én dobbeltbinding?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Ét molekyle",
+        "opgave": "4 Fra tran",
+        "fil": "js/data.js",
+        "linje": 290,
+        "nu_alm": "Fedtstoffet fra tran adderede 6 dibrommolekyler, og fedtstoffet fra olivenolie adderede 3.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Tran har flere fedtsyrer", "Tran har længere fedtsyrer", "Tran har flere dobbeltbindinger"],
+        "problem": "Det halvfede er kun \"Hvorfor?\", så hele spørgsmålet står i almindelig skrift.",
+        "nyt_alm": "Fedtstoffet fra tran adderede 6 dibrommolekyler. Fedtstoffet fra olivenolie adderede 3.",
+        "nyt_fed": "Hvorfor adderede fedtstoffet fra tran flere dibrommolekyler end fedtstoffet fra olivenolie?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dryp og tæl",
+        "opgave": "3 Glas 3: kokosfedt",
+        "fil": "js/data.js",
+        "linje": 118,
+        "nu_alm": "Kokosfedtet i glas 3 affarvede ingen dråber bromvand.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Fedtsyrerne er mættede", "Kokosfedt er et fast fedtstof", "Fedtsyrerne er for korte"],
+        "problem": "Det halvfede er kun \"Hvorfor?\".",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor affarvede kokosfedtet i glas 3 ingen dråber bromvand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dryp og tæl",
+        "opgave": "4 Glas 4: solsikkeolie",
+        "fil": "js/data.js",
+        "linje": 144,
+        "nu_alm": "Solsikkeolien i glas 4 affarvede flest dråber af de fire fedtstoffer.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Flest dobbeltbindinger", "De længste fedtsyrer", "Mest flydende"],
+        "problem": "Det halvfede er kun \"Hvorfor?\".",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor affarvede solsikkeolien i glas 4 flest dråber af de fire fedtstoffer?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendte fedtstoffer",
+        "opgave": "Flaske A til D (samme mønster, linje 344, 361, 378 og 395)",
+        "fil": "js/data.js",
+        "linje": 344,
+        "nu_alm": "Fedtstoffet i flaske A affarvede 1 dråbe.",
+        "nu_fed": "Hvilket fedtstof er det?",
+        "nu_svar": ["Kokosfedt", "Smør", "Rapsolie"],
+        "problem": "\"Det\" peger tilbage, så flasken står kun i indledningen.",
+        "nyt_alm": "Fedtstoffet i flaske A affarvede 1 dråbe.",
+        "nyt_fed": "Hvilket fedtstof er der i flaske A?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Ét molekyle",
+        "billede": "skud/b/sc4.6_umaettet_fedt__0.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, ét fedtstofmolekyle som zigzagformel på tavlen, panelet Fedtsyrerne med tre linjer.",
+        "bruges": "Molekylet.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Dryp og tæl",
+        "billede": "skud/b/sc4.6_umaettet_fedt__1.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, fem glas (fire med prop), pipetten over glas 1, luppen med tre kæder, panelet Skemaet.",
+        "bruges": "Pipetten, glas 1 og luppen. De andre glas har prop.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ukendte fedtstoffer",
+        "billede": "skud/b/sc4.6_umaettet_fedt__2.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, fire flasker, pipetten, en tom stiplet lupramme, panelet med varedeklarationerne (12 procenttal og en note om tran) og skemaet Flaskerne.",
+        "bruges": "Pipetten og flaske A. Varedeklarationerne bruges først i spørgsmålet efter dryppet.",
+        "forslag": [],
+        "andet": "Varedeklarationerne kan foldes ind, til spørgsmålet om flaske A kommer.",
+        "gevinst": "Lille: 12 tal mindre at kigge på, mens eleven drypper.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 1: Knappen \"Indsend svar: ingen dobbeltbindinger\" er blå og klar fra start. En elev, der klikker før læsning, sender \"ingen\" i opgave 1 og får et forkert svar med det samme."
+  },
+  {
+    "mappe": "sc4.7_alkoholer_og_syrer",
+    "titel": "Alkoholer og carboxylsyrer",
+    "sprog": [
+      {
+        "fane": "1 Navnet",
+        "opgave": "4 Hvad hedder alkoholen?",
+        "fil": "js/data.js",
+        "linje": 258,
+        "nu_alm": "Tegningen viser en alkohol.",
+        "nu_fed": "Hvad hedder stoffet?",
+        "nu_svar": ["butan-1-ol", "propan-1-ol", "propansyre", "propan"],
+        "problem": "\"Stoffet\" peger tilbage på tegningen i indledningen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad hedder alkoholen på tegningen?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Navnet",
+        "opgave": "2 Endelsen -syre",
+        "fil": "js/data.js",
+        "linje": 215,
+        "nu_alm": "Kæden havde 2 carbonatomer.",
+        "nu_fed": "Hvorfor hedder syren propansyre og ikke ethansyre?",
+        "nu_svar": ["-syre tæller ét carbonatom ekstra", "Oxygenatomerne tæller med", "Carbonatomet i COOH tæller med"],
+        "problem": "Modsætningen, at kæden kun har 2 carbonatomer, står kun i indledningen, så det halvfede alene forklarer ikke, hvorfor ethansyre var nærliggende.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor hedder syren propansyre, når kæden før COOH har 2 carbonatomer?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 I vand",
+        "opgave": "2 Luppen i vand",
+        "fil": "js/data.js",
+        "linje": 433,
+        "nu_alm": "Luppen viser ét molekyle ethanol i vand.",
+        "nu_fed": "Hvor går der stiplede linjer til vandmolekylerne?",
+        "nu_svar": ["Langs hele kæden", "Der er ingen", "Kun ved OH-gruppen"],
+        "problem": "Spørgsmålet siger ikke, at det er stederne på ethanolmolekylet, der spørges om.",
+        "nyt_alm": "Luppen viser ét molekyle ethanol i vand.",
+        "nyt_fed": "Hvor på ethanolmolekylet går der stiplede linjer til vandmolekylerne?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Navnet",
+        "billede": "skud/b/sc4.7_alkoholer_og_syrer__0.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven, byggefeltet med ethan, knapperne − og +, tre grupper på hylden, kortet Sådan dannes navnet, panelet med navnenes første del og endelserne.",
+        "bruges": "OH-gruppen, + og navnet.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede overskueligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Kogepunktet",
+        "billede": "skud/b/sc4.7_alkoholer_og_syrer__1.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med opgaven, byggefeltet, termometeret, luppen med ti ethanmolekyler og en forklaring med hydrogenbinding og kontaktflade, kogepunktsskemaet i panelet.",
+        "bruges": "OH-gruppen og termometeret i forsøget, derefter luppen i spørgsmålet.",
+        "forslag": [],
+        "andet": "Luppen kan stå som stiplet ramme med navnet luppen, til OH-gruppen sidder på kæden. Forklaringen kontaktflade under luppen hører til mål 2 og kan vente dertil.",
+        "gevinst": "Eleven ser kun kæden og termometeret, mens forsøget kører.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 I vand",
+        "billede": "skud/b/sc4.7_alkoholer_og_syrer__2.png",
+        "dom": "for meget",
+        "fremme": "Kort med opgaven, byggefeltet med ethanol, glasset, boksen Tommelfingerreglen med farvet skala 1-8 og dommen \"2 C-atomer er færre end 4, så stoffet blandes med vand\", luppen med ethanol i vand og to navne, skemaet i panelet.",
+        "bruges": "Knappen + og glasset i forsøget, derefter luppen i spørgsmålet. Tommelfingerreglen bruges først i mål 3, men den røde del af skalaen viser allerede nu, hvor der bliver to lag.",
+        "forslag": [
+          {
+            "alm": "Ethanol har 2 carbonatomer og én OH-gruppe. Glasset viser ethanol rystet med vand.",
+            "fed": "Hvor mange lag er der i glasset med ethanol og vand?",
+            "svar": ["Ét lag", "To lag"],
+            "derefter": "Knappen + under kæden bliver aktiv med mærket Klik: længere kæde."
+          },
+          {
+            "alm": "Gør kæden længere med +, og se på glasset efter hvert klik.",
+            "fed": "Hvor mange carbonatomer har den korteste alkohol, der giver to lag i vand?",
+            "svar": ["5 carbonatomer", "4 carbonatomer", "8 carbonatomer"],
+            "derefter": "Luppen åbner med ét alkoholmolekyle i vand og navnene upolær kæde og polær gruppe. Indtil da er luppen en stiplet ramme med navnet luppen."
+          },
+          {
+            "alm": "Luppen viser ét alkoholmolekyle i vand.",
+            "fed": "Hvorfor kan ethanol blandes med vand, når octan-1-ol ikke kan?",
+            "svar": ["Den lange kæde er upolær", "Octan-1-ol har ingen OH-gruppe", "Octan-1-ol er tungere end vand"],
+            "derefter": "Mål 1 er løst. Tommelfingerreglen står som stiplet ramme og dukker op i mål 3, hvor den bruges."
+          }
+        ],
+        "andet": "Skjul tommelfingerreglen til mål 3 (Den længste alkohol), som er den første del med om: regel.",
+        "gevinst": "Eleven finder selv grænsen i glasset, før reglen står skrevet, og ser kun glasset og kæden, mens forsøget kører.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Trin 2 i forslaget til fane 3 lægger forsøget og et spørgsmål sammen. Svaret 4 carbonatomer er butan-1-ol på grænsen, den fejl elever typisk laver."
+  },
+  {
+    "mappe": "sc5.1_molarmasse",
+    "titel": "Molarmasse",
+    "sprog": [
+      {
+        "fane": "2 Skålvægten",
+        "opgave": "Par 1 til 9",
+        "fil": "js/sim_skaal.js",
+        "linje": 221,
+        "nu_alm": "I hver skål ligger 1 mol af et stof, og skiltet på bordet viser stofferne. Vægten er låst.",
+        "nu_fed": "Hvilken skål synker, når låsen slippes, eller står vægten lige?",
+        "nu_svar": ["Venstre", "Står lige", "Højre"],
+        "problem": "Det er to spørgsmål i ét, og det afgørende, at der ligger 1 mol i hver skål, står kun i indledningen.",
+        "nyt_alm": "Skiltet på bordet viser stofferne. Vægten er låst, til du har svaret.",
+        "nyt_fed": "Hvilken skål synker, når der ligger 1 mol af hvert stof i skålene?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendt stof",
+        "opgave": "Flaske 1 til 12",
+        "fil": "js/sim_ukendt.js",
+        "linje": 254,
+        "nu_alm": "Etiketten er faldet af den brune flaske, og mærket viser kun molarmassen: M = 18,02 g/mol.",
+        "nu_fed": "Hvilken etiket på tavlen passer til flasken?",
+        "nu_svar": ["NaCl natriumchlorid", "CO₂ carbondioxid", "O₂ dioxygen", "H₂O vand"],
+        "problem": "\"Passer til flasken\" siger ikke, at det er molarmassen, der skal passe, og tallet står kun i indledningen.",
+        "nyt_alm": "Etiketten er faldet af den brune flaske. Mærket viser kun molarmassen.",
+        "nyt_fed": "Hvilket stof på tavlen har molarmassen M = 18,02 g/mol?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Vægten",
+        "billede": "skud/b/sc5.1_molarmasse__0.png",
+        "dom": "fint",
+        "fremme": "Kort med stoffet og en notelinje, det periodiske system, vægten, kaffekop, regnestykket i panelet, listen Stofferne, bjælken Start præsentation.",
+        "bruges": "Det periodiske system, vægten og regnestykket.",
+        "forslag": [],
+        "andet": "Regnestykket er allerede delt i trin (byg, atommasse for hvert grundstof, molarmasse).",
+        "gevinst": "Allerede stilladseret.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Skålvægten",
+        "billede": "skud/b/sc5.1_molarmasse__1.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmålet, det periodiske system, skålvægten med to molekyler, skiltet nederst, panelet Runden.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede overskueligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ukendt stof",
+        "billede": "skud/b/sc5.1_molarmasse__2.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmålet, det periodiske system, flasken med mærket, tavlen med fire etiketter, panelet Flaskerne.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede overskueligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3: På kortet deles \"M =\" og \"18,02 g/mol\" over to linjer, fordi kun tal og enhed holdes sammen (fast() i kort.js). Fane 2: Bjælken Start præsentation dækker linjen med O₂ på skiltet, til eleven har valgt."
+  },
+  {
+    "mappe": "sc5.2_stofmaengde",
+    "titel": "Stofmængde",
+    "sprog": [
+      {
+        "fane": "3 Afvejning",
+        "opgave": "Ordre 1 til 12",
+        "fil": "js/sim_afvej.js",
+        "linje": 304,
+        "nu_alm": "Afvej 2,00 mol kobber. Molarmassen står på krukken.",
+        "nu_fed": "Hvad skal vægten vise?",
+        "nu_svar": ["massen skrives i regnestykket i panelet"],
+        "problem": "Stof og stofmængde står kun i indledningen, så det halvfede alene siger ikke, hvad der vejes.",
+        "nyt_alm": "Molarmassen står på krukken.",
+        "nyt_fed": "Hvor mange gram skal vægten vise for 2,00 mol kobber?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Flest atomer",
+        "opgave": "Par 1 til 9",
+        "fil": "js/sim_atomer.js",
+        "linje": 211,
+        "nu_alm": "Skiltet på bordet viser de to prøver, og vægtene viser massen.",
+        "nu_fed": "Hvor er der flest atomer?",
+        "nu_svar": ["Venstre", "Lige mange", "Højre"],
+        "problem": "\"Hvor\" siger ikke, at der sammenlignes to prøver, så svarene Venstre og Højre hænger kun sammen med indledningen.",
+        "nyt_alm": "Skiltet på bordet viser de to prøver, og vægtene viser massen.",
+        "nyt_fed": "Hvilken af de to prøver har flest atomer?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Vægten",
+        "billede": "skud/b/sc5.2_stofmaengde__0.png",
+        "dom": "fint",
+        "fremme": "Kort med opgaven og en notelinje, seks krukker på hylden, plakaten 1 mol = 6,02 · 10²³ atomer, vægten med pil, kaffekop, panelet På vægten med fire tal, bjælken Start præsentation.",
+        "bruges": "Krukken med kobber, vægten og panelets tal.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt, og opgaverne begynder med tre opvarmninger.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Flest atomer",
+        "billede": "skud/b/sc5.2_stofmaengde__1.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmålet, plakaten, to vægte med prøver, skiltet nederst, panelet Runden.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Afvejning",
+        "billede": "skud/b/sc5.2_stofmaengde__2.png",
+        "dom": "fint",
+        "fremme": "Kort med ordren og en notelinje, plakaten m = n · M, krukken med kobber, vægten, kaffekop, regnestykket og listen Ordrerne i panelet.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  }
+]

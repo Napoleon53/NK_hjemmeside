@@ -2478,6 +2478,10 @@ sub { font-size: 0.74em; line-height: 0; vertical-align: -0.24em; }
 .trinliste li.nu .tr-nr { background: #f2c53d; color: #2b2100; }
 .trinliste li.faerdig { color: #bfe8cf; }
 .trinliste li.faerdig .tr-nr { background: #3fae72; color: #ffffff; }
+/* Kommende opgaver og trin: et nummer med en graa streg i stedet for titlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.trinliste li.laast { opacity: 0.75; }
+.hl-streg { display: block; width: 55%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
 .maerke-tekst { font-weight: 700; color: #f2c53d; }
 
 /* Svarene paa kortet kan vaere en hel saetning */

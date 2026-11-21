@@ -83,12 +83,19 @@
         P.ekstraRigtigt = function (t) { this.ekstraLoest[t.id] = true; };
 
         P.visEkstraPanel = function () {
-            var mig = this, n = this.cfg.navn, liste = this.ekstraListe(), html = "", loest = 0;
+            var mig = this, n = this.cfg.navn, liste = this.ekstraListe(), html = "", loest = 0, alleFoer = true;
+            /* Titlerne laases op i takt (brugeren 21. nov. 2026): en ekstraopgave har
+               sin titel, naar den er loest, naar eleven er eller har vaeret ved den,
+               eller naar alle foer den er loest. De andre er et nummer med en graa streg. */
+            this.ekstraNaaet = this.ekstraNaaet || {};
             liste.forEach(function (t, j) {
                 var nu = mig.iEkstra && j === mig.trinNr, faerdig = !!mig.ekstraLoest[t.id];
+                if (nu) mig.ekstraNaaet[t.id] = true;
+                var aaben = faerdig || nu || alleFoer || !!mig.ekstraNaaet[t.id];
+                if (!faerdig) alleFoer = false;
                 if (faerdig) loest++;
-                html += '<li class="' + (faerdig ? "faerdig" : (nu ? "nu" : "")) + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(t.navn)) +
-                    (t.svaer ? ' <span class="svaer-maerke">Svær</span>' : "") + "</span></li>";
+                html += '<li class="' + (faerdig ? "faerdig" : (nu ? "nu" : (aaben ? "" : "laast"))) + '"><span class="tr-nr">' + (j + 1) + "</span>" +
+                    (aaben ? "<span>" + D.sub(NK.html(t.navn)) + (t.svaer ? ' <span class="svaer-maerke">Svær</span>' : "") + "</span>" : '<span class="tr-streg"></span>') + "</li>";
             });
             NK.saetHTML(n + "-ekstra", html);
             NK.saetTekst(n + "-ekstramaerke", loest ? loest + " af " + liste.length : "");

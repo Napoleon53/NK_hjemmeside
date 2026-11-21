@@ -442,6 +442,31 @@ function koerTest(W) {
     });
     samlet("grafen er mindst 200 × 150 px, luppen har en radius på mindst 84 px, og formlerne står på tavlen (fra 1280 × 720)", smaa);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("8. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    var laastLi = function (li) { return li.classList.contains("laast") && !!li.querySelector(".tr-streg") && /^\d+$/.test(li.textContent.trim()); };
+    var tekstAf = function (l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); };
+    var lis = function (id) { return [].slice.call(el(id).querySelectorAll("li")); };
+    var loesTrin = function (s) { for (var k = 0; k < 6 && !s.groen; k++) { s.visSvar(); tid(s, 4); } };
+    ["fane-p", "fane-d", "fane-b"].forEach(function (id) {
+        var s = NK.sims[id], n = s.navn;
+        NK.visFane(id); s.tilpas();
+        if (s.svaer) s.svaerKlik();
+        s.trinMaks = {}; s.ekstraNaaet = {}; s.ekstraLoest = {}; s.forfra();
+        var lt = lis(n + "-trin"), le = lis(n + "-ekstra");
+        paastand(id + ": ved start har kun trin 1 og ekstraopgave 1 en titel; de andre er et nummer med en grå streg",
+            lt.length === s.hovedListe.length && !laastLi(lt[0]) && lt.slice(1).every(laastLi) &&
+            le.length > 1 && !laastLi(le[0]) && le.slice(1).every(laastLi), tekstAf(lt) + " / " + tekstAf(le));
+        loesTrin(s); s.videreKlik(); tid(s, 1);
+        lt = lis(n + "-trin");
+        paastand(id + ": titlen på trin 2 kommer frem, når trin 1 er løst (Vis svaret)", s.trinNr === 1 && !laastLi(lt[1]) && lt.slice(2).every(laastLi), s.trinNr + ": " + tekstAf(lt));
+        s.startEkstra(); tid(s, 1); loesTrin(s);
+        le = lis(n + "-ekstra");
+        paastand(id + ": titlen på ekstraopgave 2 kommer frem, når ekstraopgave 1 er løst", !laastLi(le[1]) && le.slice(2).every(laastLi), tekstAf(le));
+        s.startEkstra();
+        s.forfra();
+    });
 }
 </script>
 </body>

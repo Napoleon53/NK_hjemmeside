@@ -59,7 +59,7 @@
         NK.el("r-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el("r-liste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-opg]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
+            if (k && mig.aabenOpgave(parseInt(k.getAttribute("data-opg"), 10))) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
         });
     }
 
@@ -100,16 +100,36 @@
             html += '<button type="button" class="opg-chip serie" data-opg="' + i + '">' +
                 '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" +
                 '<span class="serie-navn">' + NK.html(hoved) + " og " + NK.html(o.stof) + "<small>" +
-                (o.slags === "dnph" ? "kondensation" : "oxidation og afstemning") + "</small></span></span>" +
+                (o.slags === "dnph" ? "kondensation" : "oxidation og afstemning") + '</small></span><span class="hl-streg" hidden></span></span>' +
                 '<i class="oc-m"></i></button>';
         });
         NK.el("r-liste").innerHTML = html;
     };
 
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun
+       de loeste opgaver og den, eleven er ved, viser titlen. De kommende
+       staar som et nummer med en graa streg og kan ikke klikkes, til eleven
+       er naaet dertil: alle foer den er loest (Vis svaret taeller som
+       loest), eller eleven har vaeret der (besoegt; naaet er et andet navn
+       her). */
+    P.aabenOpgave = function (i) {
+        if (this.status[i] && this.status[i].loest) return true;
+        if (this.besoegt && this.besoegt[i]) return true;
+        for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+        return true;
+    };
+
     P.visListe = function () {
         var knapper = NK.el("r-liste").querySelectorAll("[data-opg]");
         for (var i = 0; i < knapper.length; i++) {
-            var s = this.status[i];
+            var s = this.status[i], aaben = this.aabenOpgave(i), o = this.opgaver[i];
+            var navn = knapper[i].querySelector(".serie-navn");
+            navn.hidden = !aaben;
+            var streg = knapper[i].querySelector(".hl-streg");
+            if (streg) streg.hidden = aaben;
+            knapper[i].classList.toggle("laast", !aaben);
+            knapper[i].disabled = !aaben;
+            knapper[i].setAttribute("aria-label", aaben ? navn.textContent : "Opgave " + (i + 1) + ", kommer senere");
             knapper[i].classList.toggle("valgt", i === this.nr);
             knapper[i].classList.toggle("loest", s.loest);
             knapper[i].classList.toggle("stjerne", s.stjerne);
@@ -121,6 +141,8 @@
     /* ----- En opgave ------------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.besoegt = this.besoegt || {};
+        this.besoegt[i] = true;
         this.opg = this.opgaver[i];
         this.trinNr = 0;
         this.kendt = {};
@@ -191,7 +213,7 @@
             return { slags: "opgave", chip: "Reaktionen", tekst: "Oxygenatomet fra C=O og de to hydrogenatomer fra NH₂-gruppen fraspaltes som vand, og nitrogenatomet binder sig til carbonatomet." };
         var s = this.sk;
         if (tr === "oxFra") tekst = "Hvad er oxidationstallet for carbonatomet i carbonylgruppen i " + st + "? Vælg, og tryk Indsend svar.";
-        else if (tr === "oxTil") tekst = D.stor(st) + " oxideres til " + s.produkt + "-ionen. Hvad er oxidationstallet for det samme carbonatom nu?";
+        else if (tr === "oxTil") tekst = D.stor(st) + " oxideres til " + s.produkt + "-ionen. Hvad er oxidationstallet for carbonatomet i COO⁻-gruppen i " + s.produkt + "-ionen?";
         else if (tr === "ag") tekst = "Oxidationstallet for carbonatomet stiger " + s.stigning + ", og for sølv falder det " + s.fald + ". Hvor mange Ag⁺ skal der til pr. " + st + "molekyle?";
         else if (tr === "oh") tekst = "Ladningen afstemmes med OH⁻. Hvor mange OH⁻ skal der stå til venstre i skemaet?";
         else if (tr === "h2o") tekst = "Hydrogen afstemmes med H₂O. Hvor mange H₂O skal der stå til højre i skemaet?";
@@ -362,6 +384,7 @@
 
     P.forfra = function () {
         this.status = this.opgaver.map(function () { return { loest: false, stjerne: false }; });
+        this.besoegt = {};
         this.gem();
         this.vaelg(0);
     };

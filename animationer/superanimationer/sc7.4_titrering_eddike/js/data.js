@@ -59,7 +59,7 @@
 
     D.SITUATIONER = [
         { id: "vand", spm: "forbrug", B: { vand: 60 }, aendring: "60 mL vand",
-          tekst: "Kolbe B får 60 mL vand i stedet for 20 mL. Skal der flere, lige så mange eller færre mL NaOH til?",
+          tekst: "Kolbe B får 60 mL vand i stedet for 20 mL. Hvor mange mL NaOH skal kolbe B med 60 mL vand bruge i forhold til kolbe A?",
           valg: D.ML_VALG, rigtig: 1,
           forkert: [
               "Vandet indeholder ingen eddikesyre, og NaOH reagerer kun med syren.",
@@ -69,7 +69,7 @@
           hint: "Kommer der mere eddikesyre i kolben, når man hælder vand i?",
           efter: "Lige så mange. Der er lige så mange mol eddikesyre i begge kolber." },
         { id: "halv", spm: "forbrug", B: { m: 1.00 }, aendring: "1,00 g eddike",
-          tekst: "Kolbe B får kun 1,00 g eddike i stedet for 2,00 g. Skal der flere, lige så mange eller færre mL NaOH til?",
+          tekst: "Kolbe B får kun 1,00 g eddike i stedet for 2,00 g. Hvor mange mL NaOH skal kolbe B med 1,00 g eddike bruge i forhold til kolbe A?",
           valg: D.ML_VALG, rigtig: 2,
           forkert: [
               "Halvt så meget eddike indeholder halvt så mange mol eddikesyre.",
@@ -89,7 +89,7 @@
           hint: "m% = m(CH₃COOH) / m(prøve) · 100 %. Hvad sker der med tælleren, og hvad sker der med nævneren?",
           efter: "Den samme. Det er den samme eddike, og halvt så meget syre bliver delt med en halvt så stor prøve." },
         { id: "base", spm: "forbrug", B: { c: 0.200 }, aendring: "0,200 M NaOH",
-          tekst: "Buretten ved kolbe B indeholder 0,200 M NaOH i stedet for 0,100 M. Skal der flere, lige så mange eller færre mL NaOH til?",
+          tekst: "Buretten ved kolbe B indeholder 0,200 M NaOH i stedet for 0,100 M. Hvor mange mL af den 0,200 M NaOH skal kolbe B bruge i forhold til kolbe A?",
           valg: D.ML_VALG, rigtig: 2,
           forkert: [
               "Hver mL indeholder dobbelt så mange OH⁻, så der skal færre mL til den samme mængde syre.",
@@ -99,7 +99,7 @@
           hint: "Hvor mange OH⁻ er der i 1 mL, når koncentrationen er dobbelt så stor?",
           efter: "Halvt så mange mL. Hver mL indeholder dobbelt så mange OH⁻." },
         { id: "spild", spm: "procent", B: { spild: 0.15 }, aendring: "noget eddike spildt",
-          tekst: "Du spilder lidt af eddiken til kolbe B, efter at du har vejet den. Bliver masseprocenten for høj, rigtig eller for lav?",
+          tekst: "Du har vejet eddiken til kolbe B. Hvordan bliver masseprocenten for kolbe B, når du spilder eddike efter vejningen?",
           valg: D.PROCENT_VALG, rigtig: 2,
           forkert: [
               "Det spildte kommer aldrig i kolben, så der er mindre syre at titrere.",

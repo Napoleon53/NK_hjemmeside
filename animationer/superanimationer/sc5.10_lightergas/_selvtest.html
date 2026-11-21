@@ -547,6 +547,26 @@ function koerTest(W) {
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
+
+    overskrift("12. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    W.NK.visFane("fane-fejl"); C.tilpas(); C.layout();
+    C.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    C.naaet = {};
+    C.vaelg(0, false);
+    var linjerC = function () { return [].slice.call(d.querySelectorAll("#fejl-liste .hyldelinje")); };
+    var lc = linjerC();
+    paastand("ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        lc.length === D.FEJL.length && lc[0].textContent.indexOf(D.FEJL[0].titel) >= 0 && !lc[0].disabled &&
+        lc.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".hl-streg") && /^\d+$/.test(b.textContent.trim()); }),
+        lc.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    lc[3].click();
+    paastand("et klik på en låst opgave gør intet", C.nr === 0);
+    var retC = D.FEJL_SVAR.map(function (x) { return x.id; }).indexOf(D.FEJL[0].rigtig);
+    d.querySelectorAll("#fejl-valg button")[retC].click();
+    tik(C, 10);
+    lc = linjerC();
+    paastand("når opgave 1 er løst, kommer titlen på opgave 2 frem, og opgave 3 er stadig låst",
+        C.status[0].loest && lc[1].textContent.indexOf(D.FEJL[1].titel) >= 0 && !lc[1].disabled && lc[2].disabled && !!lc[2].querySelector(".hl-streg"));
     W.NK.visFane("fane-forsoeg");
 }
 </script>

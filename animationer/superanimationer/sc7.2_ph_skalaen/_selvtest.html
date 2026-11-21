@@ -397,8 +397,11 @@ function koerTest(W) {
     mus(cl, "pointerup", x12, sy);
     tik(L, 1);
     klik("#lup-indsend"); tik(L, 0.1);
+    paastand("pH 12 og Indsend svar: spørgsmålet om luppen kommer med tre svar, og mærket er låst", !L.naaet && L.spmNu && L.laast() &&
+        d.querySelectorAll("#lup-skort .sk-knap[data-valg]").length === 3 && /^Mål 5 af 5\s*Hvilken ion er der flest af i luppen ved pH 12\?$/.test(kortTekst(L)), kortTekst(L));
+    klik('#lup-skort .sk-knap[data-valg="0"]'); klik("#lup-indsend"); tik(L, 0.1);
     tik(L, 1);
-    paastand("pH 12 og Indsend svar: 100 OH⁻ og ingen H₃O⁺, og mål 5 er nået", L.naaet && L.lup.z === 4 && L.lup.synlige("oh") === 100 && L.lup.synlige("h3o") === 0);
+    paastand("OH⁻ og Indsend svar: 100 OH⁻ og ingen H₃O⁺, og mål 5 er nået", L.naaet && L.lup.z === 4 && L.lup.synlige("oh") === 100 && L.lup.synlige("h3o") === 0);
     tik(L, 1);
     paastand("efter det sidste mål roser Kemichael", !!(L.laerer.scene && L.laerer.scene.navn === "faerdig"));
     tik(L, 8);

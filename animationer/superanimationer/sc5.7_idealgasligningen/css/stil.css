@@ -33,7 +33,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    --panel-bredde: 0px;     /* 21. nov. 2026, runde 3: panelet er vaek (foer 430 og saa 300 px); opgaverne staar i raekken oeverst i scenen */
 }
 
 * { box-sizing: border-box; }
@@ -148,7 +148,7 @@ main { flex: 1; position: relative; min-height: 0; }
     position: absolute;
     inset: 0;
     display: none;
-    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .fane.aktiv { display: grid; }
@@ -466,10 +466,6 @@ button:focus-visible,
 select:focus-visible {
     outline: 2px solid var(--gul);
     outline-offset: 2px;
-}
-
-@media (max-width: 1320px) {
-    :root { --panel-bredde: 370px; }
 }
 
 @media (max-width: 1100px) {
@@ -861,7 +857,7 @@ select:focus-visible {
 .felt.svar .felt-maerke { color: var(--gul); }
 .felt.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
 
-#regn-niveau { margin-bottom: 9px; }
+/* #regn-niveau staar fra runde 3 i opgaveraekken oeverst i scenen (.or-niveau) */
 
 /* ----- Tavlen paa fane 2: teksten ligger oven paa det tegnede ------------- */
 .tavle-tekst {
@@ -921,7 +917,7 @@ select:focus-visible {
 .scenekort {
     position: absolute;
     z-index: 4;
-    top: 10px;
+    top: 46px;               /* under opgaveraekken (runde 3) */
     left: 0;
     right: 0;
     margin: 0 auto;
@@ -968,7 +964,7 @@ html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
 .kort.regnekort { border-left: 3px solid var(--lilla); }
 
 @media (max-height: 720px) {
-    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .scenekort { top: 42px; padding: 7px 12px 8px; }
     .sk-knap { padding: 5px 9px; font-size: 0.93rem; }
 }
 
@@ -980,4 +976,113 @@ html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
    saa lidt hoejere, saa cylinderen har plads under papirkortet. */
 @media (max-width: 860px) {
     .scene { height: 72vh; min-height: 580px; }
+}
+
+/* ---------------------------------------------------------------------
+   Fane 2, svarene i kortet (21. nov. 2026, som sc6.2): det, eleven skal
+   goere, staar i almindelig skrift under opgaven, og under det staar de tre
+   formler eller feltet "V = [ tallet ] L". Naar trinnet er loest, staar
+   svaret groent (gult, naar det blev vist) i stedet for feltet.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .scenekort .sk-instruks { margin-top: 5px; color: #4a5160; }
+html body.papirkort.papirkort .scenekort .kt-felt-plads { margin-top: 7px; }
+.kt-felt {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 5px 10px;
+    border: 1.5px solid #c9c3b3;
+    border-radius: 9px;
+    background-color: #ffffff;
+    font-size: 1.06rem;
+    font-weight: 600;
+    color: #1d2433;
+}
+.kt-felt:focus-within { border-color: #2a76ac; box-shadow: 0 0 0 1px #2a76ac; }
+.kt-felt input {
+    width: 7.5em;
+    padding: 5px 8px;
+    border: 1px solid #c9c3b3;
+    border-radius: 6px;
+    background-color: #fffdf6;
+    font: inherit;
+    font-weight: 600;
+    color: #1d2433;
+}
+.kt-felt input::placeholder { color: #a09a8a; font-weight: 400; }
+.kt-felt input:focus { outline: none; border-color: #2a76ac; }
+.kt-felt .kf-enhed, .kt-felt .kf-tekst { white-space: nowrap; }
+.kt-felt .kf-svar { padding: 5px 2px; font-weight: 700; }
+.kt-felt.ok { border-color: #2b7d51; background-color: #e3f3ea; color: #1f4d35; }
+.kt-felt.svar { border-color: #d4a72c; background-color: #fdf3d6; color: #6b4e00; }
+.kt-felt.ryst { animation: ryst 0.35s ease 1; border-color: #c4493c; }
+
+/* ---------------------------------------------------------------------
+   Opgaveraekken oeverst i scenen (21. nov. 2026, runde 3: panelet er vaek).
+   Smal og rolig: lille skrift, daempede farver, ingen versaler, saa den ikke
+   konkurrerer med kortet. Kun de loeste opgaver og den, eleven er ved, har
+   deres tema; de kommende er et laast nummer (CLAUDE.md). Under 1200 px
+   staar kun numrene, og temaet staar som vaerktoejstip og paa kortet.
+   --------------------------------------------------------------------- */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.or-opgaver, .or-niveau { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.or-niveau { padding-right: 8px; margin-right: 2px; border-right: 1px solid #343440; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-niveau .or-knap { padding: 0 9px; }
+.or-stille { margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 700; }
+
+@media (max-width: 1199px) {
+    .or-opgaver .or-navn { display: none; }
+    .or-opgaver .or-knap { padding: 0 4px; }
+}
+@media (max-height: 720px) {
+    .opgaverad { top: 6px; }
 }

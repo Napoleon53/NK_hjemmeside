@@ -49,7 +49,7 @@
         {
             id: "olieIVand",
             start: { fyld: [["vand", 3]] },
-            tekst: "Der er vand i bassinet. Du hælder olie i. Hvad ser du i glasset, når væskerne er faldet til ro?",
+            tekst: "Der er vand i bassinet. Du hælder olie i. Hvad ser du i glasset, når olien og vandet er faldet til ro?",
             valg: [
                 { tekst: "Ét lag", fejl: "Vand er polært, og olie er upolær. Vandmolekylerne holder fast i hinanden og skubber olien ud." },
                 { tekst: "To lag med olien øverst", rigtig: true },
@@ -62,7 +62,7 @@
         {
             id: "ethanolIVand",
             start: { fyld: [["vand", 3]] },
-            tekst: "Der er vand i bassinet. Du hælder ethanol i. Ethanol har en lavere densitet end vand. Hvad ser du, når væskerne er faldet til ro?",
+            tekst: "Du hælder ethanol i vandet. Ethanol har en lavere densitet end vand. Hvad ser du i glasset, når ethanolen og vandet er faldet til ro?",
             valg: [
                 { tekst: "Ét lag", rigtig: true },
                 { tekst: "To lag med ethanol øverst", fejl: "Densiteten afgør kun rækkefølgen af lagene, når der er to lag. Ethanol og vand er begge polære." },
@@ -75,7 +75,7 @@
         {
             id: "olieIEthanol",
             start: { fyld: [["ethanol", 3]] },
-            tekst: "Der er ethanol i bassinet. Du hælder olie i. Hvad ser du, når væskerne er faldet til ro?",
+            tekst: "Der er ethanol i bassinet. Du hælder olie i. Hvad ser du i glasset, når olien og ethanolen er faldet til ro?",
             valg: [
                 { tekst: "To lag med olien øverst", fejl: "Olie ligger øverst på vand, men ethanol har en lavere densitet end olie, 0,79 mod 0,92 g/mL." },
                 { tekst: "To lag med olien nederst", rigtig: true },
@@ -88,7 +88,7 @@
         {
             id: "ryst",
             start: { fyld: [["vand", 3], ["olie", 1]] },
-            tekst: "Olien ligger på vandet. Du ryster bassinet kraftigt. Hvad ser du lidt efter?",
+            tekst: "Olien ligger på vandet. Du ryster bassinet kraftigt. Hvad ser du i glasset, efter at olie og vand er rystet sammen?",
             valg: [
                 { tekst: "Uklart først, så to lag igen", rigtig: true },
                 { tekst: "Ét lag, fordi væskerne er blandet", fejl: "Rystningen deler olien i små dråber, men molekylerne er de samme. Se dråberne finde sammen." },
@@ -110,7 +110,7 @@
         {
             id: "varm",
             start: { fyld: [["vand", 2], ["ethanol", 2]], blandet: true },
-            tekst: "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C. Hvad sker der?",
+            tekst: "Vand og ethanol er blandet til ét lag. Hvad sker der, når blandingen af vand og ethanol varmes op til 90 °C?",
             valg: [
                 { tekst: "Det koger, dampen er mest ethanol", rigtig: true },
                 { tekst: "Begge stoffer koger lige meget", fejl: "De er blandet, men stadig to stoffer med hvert sit kogepunkt. Se, hvilke molekyler der stiger op." },

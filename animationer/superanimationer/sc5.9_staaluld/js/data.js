@@ -131,8 +131,8 @@
         { id: "m2", titel: "Måling 2", maaling: 1, kunTal: true }
     ];
 
-    /* {ox} er oxidet i det valgte reaktionsskema */
-    D.OVER_TAVLE = "Hvad vejer stålulden, hvis alt jernet bliver til {ox}?";
+    /* {ox} er oxidet i det valgte reaktionsskema, {mf} massen af stålulden */
+    D.OVER_TAVLE = "Stålulden regnes som rent jern. Hvor mange gram {ox} dannes der af {mf} g jern?";
     D.TAVLE_TITEL = "Mængdeberegning";
     D.KUN_TAL = "Formlerne er de samme som i måling 1, så her skriver du kun tallene.";
     D.EKSEMPEL_NOTE = "Tallene er et eksempel. Lav forsøget på fanen Forsøget for at regne på dine egne.";
@@ -182,7 +182,7 @@
 
     /* Spoergsmaalet efter maaling 1: de forkerte svar er det, elever tror */
     D.HVORFOR = {
-        spm: "Vægten viste mindre, end du har regnet ud. Hvorfor?",
+        spm: "Hvorfor vejer den brændte ståluld mindre, end du har regnet ud?",
         hint: "Kan dioxygenet komme helt ind til jernet midt i klumpen? Se luppen på fanen Forsøget.",
         svar: [
             { t: "Jernet fordampede i varmen.", forkl: "Jern koger først ved næsten 3000 °C. Så varm bliver stålulden ikke." },

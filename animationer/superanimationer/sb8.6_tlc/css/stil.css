@@ -1814,3 +1814,13 @@ html body.papirkort.papirkort .scenekort .sk-knap.rigtig .v-boks { border-color:
 html body.papirkort.papirkort .scenekort .sk-knap.svar-vist .v-boks { border-color: #c9a640; background-color: #c9a640; }
 /* Boksen har selv fluebenet, saa knappen faar ikke et ekstra foran */
 html body.papirkort.papirkort .scenekort .sk-knap.rigtig:has(.v-boks)::before { content: none; }
+
+/* =====================================================================
+   Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026, "husk
+   dette"): de kommende opgaver og trin staar som et nummer med en graa
+   streg i stedet for titlen og kan ikke klikkes, til eleven er naaet dertil
+   ===================================================================== */
+.tr-streg, .oc-streg { display: inline-block; width: 62%; max-width: 9em; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+.oc-f .oc-streg { width: 7em; }
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }

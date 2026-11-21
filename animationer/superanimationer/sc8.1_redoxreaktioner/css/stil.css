@@ -1031,6 +1031,12 @@ kbd {
 
 .opg-chip.valgt .oc-nr { background-color: var(--blaa); color: #ffffff; }
 
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende opgaver er
+   et nummer med en graa streg og kan ikke klikkes, til eleven er naaet dertil */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.oc-streg { display: inline-block; width: 9em; height: 9px; border-radius: 5px; background-color: #4a4a58; vertical-align: middle; }
+
 .tavle.ryst { animation: ryst 0.35s ease 1; }
 
 /* ---------------------------------------------------------------------

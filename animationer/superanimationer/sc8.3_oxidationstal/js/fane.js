@@ -84,11 +84,23 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Listen: formlerne i grupper --------------------------------------- */
+        /* ----- Listen: formlerne i grupper ---------------------------------------
+           Brugeren 21. nov. 2026 ("husk dette"): de kommende opgaver staar som et
+           nummer (i gruppen) med en graa streg uden formel og kan ikke klikkes,
+           til eleven er naaet dertil: alle foer den er loest (Vis svaret taeller
+           som loest), den er loest (ogsaa gemt i browseren), eller eleven har
+           vaeret der. Gruppernes overskrifter staar som foer. */
+        P.aabenOpgave = function (i) {
+            if (this.laast && this.laast(i)) return false;
+            if ((this.status[i] && this.status[i].loest) || (this.naaet && this.naaet[i])) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
+        };
         P.bygListe = function () {
             var mig = this;
             this.el.liste.innerHTML = "";
             this.chips = [];
+            this.chipNr = [];
             this.grupper.forEach(function (g) {
                 var boks = document.createElement("div");
                 boks.className = "opg-gruppe";
@@ -98,20 +110,22 @@
                 boks.appendChild(hoved);
                 var raekke = document.createElement("div");
                 raekke.className = "opg-chips";
+                var nrIGruppe = 0;
                 mig.opgaver.forEach(function (o, i) {
                     if ((o.gruppe || "alle") !== g.id) return;
                     var knap = document.createElement("button");
                     knap.type = "button";
                     knap.className = "opg-chip";
-                    knap.title = o.navn;
-                    knap.innerHTML = '<span class="oc-f">' + mig.chipTekst(o) + '</span><i class="oc-m"></i>';
-                    knap.addEventListener("click", function () { mig.vaelg(i); });
+                    knap.innerHTML = '<span class="oc-f"></span><i class="oc-m"></i>';
+                    mig.chipNr[i] = ++nrIGruppe;
+                    knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
                     raekke.appendChild(knap);
                     mig.chips[i] = knap;
                 });
                 boks.appendChild(raekke);
                 mig.el.liste.appendChild(boks);
             });
+            this.visListe();
         };
 
         P.visListe = function () {
@@ -119,6 +133,14 @@
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
+                var aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                var html = aaben ? mig.chipTekst(o) : '<span class="oc-lnr">' + mig.chipNr[i] + '</span><span class="oc-streg"></span>';
+                var f = c.querySelector(".oc-f");
+                if (f.innerHTML !== html) f.innerHTML = html;
+                c.disabled = !aaben;
+                c.classList.toggle("laast", !aaben);
+                c.title = aaben ? o.navn : "";
+                c.setAttribute("aria-label", aaben ? o.navn : "Opgave " + mig.chipNr[i] + ", kommer senere");
                 c.classList.toggle("valgt", i === mig.nr);
                 c.classList.toggle("loest", s.loest);
                 c.classList.toggle("stjerne", s.stjerne);
@@ -139,6 +161,8 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
             this.hjaelp = 0;
             this.brugtSvar = false;
             this.faerdig = false;

@@ -73,9 +73,18 @@
         var html = "";
         D.FORSOEG_TRIN.forEach(function (t, i) {
             html += '<div class="opg-chip trin" data-trin="' + t.id + '"><span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" +
-                NK.html(t.navn) + '</span><i class="oc-m"></i></div>';
+                '<span class="trin-navn">' + NK.html(t.navn) + '</span><span class="hl-streg" hidden></span></span><i class="oc-m"></i></div>';
         });
         NK.el("u-trinliste").innerHTML = html;
+    };
+
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende trin staar som et nummer med en graa streg uden titel. Et
+       trin er naaet, naar eleven er kommet dertil, naar trinnet foer er
+       loest (Vis svaret taeller som loest), eller naar eleven har gennemfoert
+       en runde foer (gemt i browseren). */
+    P.aabenTrin = function (j, nu) {
+        return j <= nu || this.runder > 0 || (j === 2 && this.fase === "klasse" && this.glasNr === 5 && !!this.groen);
     };
 
     P.visTrin = function () {
@@ -83,6 +92,12 @@
         var chips = NK.el("u-trinliste").querySelectorAll("[data-trin]");
         for (var i = 0; i < chips.length; i++) {
             var j = orden.indexOf(chips[i].getAttribute("data-trin"));
+            var aaben = mig.aabenTrin(j, nu);
+            chips[i].querySelector(".trin-navn").hidden = !aaben;
+            chips[i].querySelector(".hl-streg").hidden = aaben;
+            chips[i].classList.toggle("laast", !aaben);
+            if (aaben) chips[i].removeAttribute("aria-label");
+            else chips[i].setAttribute("aria-label", "Trin " + (j + 1) + ", kommer senere");
             var loest = j < nu || mig.fase === "slut";
             chips[i].classList.toggle("valgt", j === nu && mig.fase !== "slut");
             chips[i].classList.toggle("loest", loest);
@@ -159,7 +174,7 @@
         if (this.fase === "klasse") {
             var L = B[this.glasNr];
             return { slags: "spm", chip: "Flaske " + L,
-                tekst: "Hvad viser de to test om stoffet i flaske " + L + "? Vælg, og tryk Indsend svar.",
+                tekst: "Stoffet i flaske " + L + " er testet med DNPH og med Tollens' reagens. Er stoffet i flaske " + L + " et aldehyd, en keton eller ingen af delene?",
                 svar: D.RUTE_SVAR.map(function (s, j) { return { t: s.t, valgt: mig.valgt === j, forkert: !!mig.forkert[j] }; }) };
         }
         var f = this.find(), tekst, svar;

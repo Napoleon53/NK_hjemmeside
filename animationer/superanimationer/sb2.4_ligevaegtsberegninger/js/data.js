@@ -46,7 +46,18 @@
         trans:    { vis: "trans-but-2-en", alias: ["trans-2-buten", "trans-buten", "transbuten", "trans2buten", "trans", "trans-but-2-en"] }
     };
 
-    /* Atomernes farve og stoerrelse i beholderen (CPK-farverne) */
+    /* Stoffernes daempede farver i beholderen, i taelleren og paa skemaets
+       kolonneoverskrifter (runde 2, Niels 21. nov. 2026: "forvirrende med alle
+       de farver ... farvekodes på det er rart for øjnene"). Hvert molekyle er
+       tegnet i én farve; atomernes farver bruges ikke. Stofferne i samme
+       reaktion har farver, der er lette at skelne. */
+    D.FARVE = {
+        SO2Cl2: "#7fa7c9", SO2: "#d9a066", Cl2: "#8fbf8a",
+        H2: "#b7a4d6", Br2: "#c98f7a", HBr: "#d6c27a",
+        CO: "#9aa9bb", H2O: "#78b8c2", CO2: "#d9a066"
+    };
+
+    /* Atomernes stoerrelse og plads i beholderen (farven bruges ikke laengere) */
     D.ATOM = {
         H:  { farve: "#eef1f4", kant: "#9aa3ad", r: 0.62 },
         C:  { farve: "#4b4f57", kant: "#25282d", r: 0.9 },
@@ -71,45 +82,211 @@
              c0: { CO: 0.200, H2O: 0.100, CO2: 0, H2: 0 }, enhed: 0.010, xStof: "CO", xOrd: "omsat" }
     };
 
-    /* Maalene paa fane 1. type: ligevaegt (find Y = K med skyderen),
-       udtryk (skriv raekker i skemaet med x), forkast (CAS og klik paa den
-       loesning, der ikke kan bruges), graense (x saa langt op som muligt,
-       og klik paa det stof, der er brugt op). */
+    /* Maalene paa fane 1 (runde 2 og 3, Niels 21. nov. 2026). Hvert maal er en
+       raekke trin, ét ad gangen (REGELSAET 11-16, 33, 35-42):
+         valg:      et spoergsmaal med tre svar paa kortet. De forkerte er fejl,
+                    elever faktisk laver, og har hver sin forklaring (nej).
+                    broek: svaret vises som en broek (foer: det, der staar foran
+                    broeken, ellers "Y = "). felt: det felt i skemaet paa tavlen,
+                    trinnet udfylder ("aendr.SO2Cl2"). linje: den linje paa
+                    tavlen, trinnet udfylder (indeks i tavle.linjer).
+                    skjulLampe: maerket Y < K er skjult, mens kortet spoerger.
+         handling:  kortet beder eleven om at goere noget med skyderen. Kortet
+                    gaar selv videre 0,7 s efter, at eleven staar paa maalet
+                    (x med tol, xMax: helt op, lige: Y = K). snap: x saettes
+                    paa x bagefter.
+         ligevaegt: find x, hvor Y = K. Lampen bliver groen af sig selv, naar
+                    x staar stille paa ligevaegten (regel 39); Indsend svar
+                    er reserve.
+       vis (kun maal 1): det, der kommer frem i scenen, naar trinnet er loest
+       ("y": boksen med Y, "yv": Y's vaerdi, "graf", "skyder").
+       fremhaev: de dannede molekyler har en stille ring, mens kortet spoerger.
+       Svarene staar i data med det rigtige foerst; kortet viser dem i en
+       raekkefoelge, der skifter fra trin til trin.
+       tavle: skemaets raekker paa tavlen (tal: ligevaegtsraekken viser tallene,
+       der foelger skyderen) og linjerne under skemaet (lov: ligevaegtsloven med
+       symboler; trin: linjen staar med "?", mens trinnet spoerger). Skemaet og
+       udtrykkene har enheder (regel 40): "0,200 M − x".
+       yBoks: boksen med Y og K staar over tavlen. Ingen andengradsligning paa
+       denne fane: CAS' loesninger staar paa tavlen, og eleven vaelger.
+       Tallene i teksterne tjekkes mod modellen i _selvtest.html. */
+    var YX_A = '<span class="vbroek"><span>x · x</span><span>0,200 M − x</span></span>';
+    var YX_C = '<span class="vbroek"><span>x · x</span><span>(0,200 M − x) · (0,100 M − x)</span></span>';
     D.MAAL = [
-        { id: "a-lige", rx: "a", gruppe: "a", type: "ligevaegt", navn: "Find ligevægten",
-          linje: "Træk i x, til reaktionsbrøken Y er lig med K.",
-          tekst: "SO₂Cl₂ spaltes i en lukket beholder. Skyderen bestemmer x, som er den koncentration af SO₂Cl₂, der er spaltet. Find det x, hvor Y = K.",
-          slut: "Ved ligevægt er x ≈ 0,078 M, så [SO₂Cl₂] er faldet med 0,078 M, når Y = K." },
-        { id: "a-udtryk", rx: "a", gruppe: "a", type: "udtryk", raekker: ["aendr", "lig"], navn: "Skriv koncentrationerne med x",
-          linje: "Skriv ændringen og ligevægtskoncentrationen for hvert stof med x.",
-          tekst: "Tallene i skemaet følger skyderen. Skriv i felterne, hvad tallene er udtrykt ved x.",
-          slut: "[SO₂Cl₂] falder med x til 0,200 − x. [SO₂] og [Cl₂] stiger begge med x, så [SO₂] = [Cl₂] = x." },
-        { id: "a-cas", rx: "a", gruppe: "a", type: "forkast", navn: "To løsninger",
-          linje: "Løs ligningen Y = K med CAS, og klik på den løsning, der ikke kan bruges.",
-          tekst: "Ved ligevægt er Y = K. Det er en ligning med x som den eneste ubekendte. CAS giver to løsninger.",
-          slut: "x = −0,128 M kan ikke bruges, fordi [SO₂] så ville være −0,128 M. Ligningen har to løsninger, men kun den ene giver positive koncentrationer i beholderen." },
-        { id: "b-aendr", rx: "b", gruppe: "b", type: "udtryk", raekker: ["aendr"], navn: "Koefficienten 2",
-          linje: "Træk lidt i x, se på beholderen, og skriv ændringerne med x.",
-          tekst: "H₂ og Br₂ danner HBr. Træk skyderen et lille stykke, og se, hvad der sker med molekylerne.",
-          slut: "Hver gang 1 H₂ omsættes, forbruges 1 Br₂, og der dannes 2 HBr. Koefficienterne bliver til tallene foran x." },
-        { id: "b-lige", rx: "b", gruppe: "b", type: "ligevaegt", navn: "Find ligevægten",
-          linje: "Træk i x, til reaktionsbrøken Y er lig med K.",
-          tekst: "Find det x, hvor Y = K.",
-          slut: "Ved ligevægt er x = 0,160 M, og dermed er [HBr] = 2x = 0,320 M." },
-        { id: "b-cas", rx: "b", gruppe: "b", type: "forkast", navn: "To positive løsninger",
-          linje: "Løs ligningen Y = K med CAS, og klik på den løsning, der ikke kan bruges.",
-          tekst: "Denne gang er begge løsninger positive. Den ene kan alligevel ikke bruges.",
-          slut: "x = 0,267 M kan ikke bruges, fordi [H₂] så ville være 0,200 − 0,267 = −0,067 M. Der kan ikke omsættes mere H₂, end der er." },
-        { id: "c-graense", rx: "c", gruppe: "c", type: "graense", navn: "Hvor langt kan x komme?",
-          linje: "Træk x så langt op, som det kan komme, og klik på det stof, der er brugt op.",
-          tekst: "Der er 0,200 M CO og kun 0,100 M H₂O fra start. Træk x helt op. Hvad stopper reaktionen?",
-          slut: "H₂O er brugt op ved x = 0,100 M. x kan ikke blive større end den mindste startkoncentration af en reaktant." },
-        { id: "c-cas", rx: "c", gruppe: "c", type: "forkast", navn: "Grænsen for x",
-          linje: "Løs ligningen Y = K med CAS, og klik på den løsning, der ikke kan bruges.",
-          tekst: "Løs ligningen med CAS. Brug grænsen x ≤ 0,100 M til at afgøre, hvilken løsning der kan bruges.",
-          slut: "x = 0,280 M kan ikke bruges, fordi [H₂O] så ville være 0,100 − 0,280 = −0,180 M. En brugbar løsning ligger mellem 0 og 0,100 M." }
+        { id: "a-lige", rx: "a", gruppe: "a", navn: "SO₂Cl₂: x ved ligevægt", yBoks: true, graf: true,
+          slut: "Ved ligevægt er x ≈ 0,078 M, så [SO₂Cl₂] er faldet med 0,078 M, når Y = K.",
+          trin: [
+              { type: "valg", spm: "Hvilken brøk er reaktionsbrøken Y for spaltningen af SO₂Cl₂?",
+                svar: [
+                    { t: "Y = [SO₂] · [Cl₂] / [SO₂Cl₂]", broek: ["[SO₂] · [Cl₂]", "[SO₂Cl₂]"], ok: true },
+                    { t: "Y = [SO₂Cl₂] / ([SO₂] · [Cl₂])", broek: ["[SO₂Cl₂]", "[SO₂] · [Cl₂]"], nej: "Den brøk er vendt om. Produkterne står i tælleren og reaktanten i nævneren." },
+                    { t: "Y = ([SO₂] + [Cl₂]) / [SO₂Cl₂]", broek: ["[SO₂] + [Cl₂]", "[SO₂Cl₂]"], nej: "Koncentrationerne i tælleren ganges med hinanden. De lægges ikke sammen." }
+                ],
+                hint: ["Y bygges som ligevægtsloven, men med koncentrationerne lige nu.",
+                    "Produkterne står i tælleren og reaktanten i nævneren. Koncentrationerne ganges.",
+                    "Y = [SO₂] · [Cl₂] / [SO₂Cl₂]."],
+                slut: "Y bygges som ligevægtsloven med koncentrationerne lige nu. Ved ligevægt er Y lig med K.",
+                vis: ["y"] },
+              { type: "valg", spm: "Hvor stor er Y fra start, hvor der kun er 0,200 M SO₂Cl₂?",
+                svar: [
+                    { t: "Y = 0 M", ok: true },
+                    { t: "Y = 0,0500 M", nej: "0,0500 M er K, og Y er kun lig med K ved ligevægt. Fra start er [SO₂] = 0 M." },
+                    { t: "Y = 0,200 M", nej: "0,200 M er [SO₂Cl₂], som står i nævneren. Tælleren er [SO₂] · [Cl₂]." }
+                ],
+                hint: ["Sæt startkoncentrationerne ind i Y.",
+                    "Der er intet SO₂ og Cl₂ fra start, så tælleren er 0.",
+                    "Y = 0 M · 0 M / 0,200 M = 0 M."],
+                slut: "Tælleren er 0, fordi der intet SO₂ og Cl₂ er. Y = 0 M er mindre end K.",
+                vis: ["yv"] },
+              { type: "valg", spm: "Hvad sker der med Y, når mere SO₂Cl₂ bliver spaltet?",
+                svar: [
+                    { t: "Y bliver større", ok: true },
+                    { t: "Y bliver mindre", nej: "Når SO₂Cl₂ spaltes, dannes der SO₂ og Cl₂. Tælleren vokser, og nævneren bliver mindre." },
+                    { t: "Y er den samme", nej: "Koncentrationerne ændrer sig, når SO₂Cl₂ spaltes. Så ændrer Y sig også." }
+                ],
+                hint: ["Hvad sker der med [SO₂] og [Cl₂], når SO₂Cl₂ spaltes?",
+                    "[SO₂] og [Cl₂] i tælleren vokser, og [SO₂Cl₂] i nævneren bliver mindre.",
+                    "Y bliver større."],
+                slut: "Tælleren vokser, og nævneren bliver mindre, så Y bliver større. Grafen viser det, og skyderen x styrer, hvor meget SO₂Cl₂ der er spaltet.",
+                vis: ["graf", "skyder"] },
+              { type: "handling", tekst: "Skyderen x er den koncentration af SO₂Cl₂, der er spaltet.",
+                spm: "Træk x til 0,050 M.", x: 0.050, tol: 0.0025, snap: true,
+                hint: ["Skyderen ligger under beholderen og grafen.", "Træk skyderens knap mod højre, til der står x = 0,050 M.", "x = 0,050 M."],
+                efter: { type: "valg", fremhaev: true, skjulLampe: true,
+                    tekst: "Ved x = 0,050 M er 5 SO₂Cl₂-molekyler spaltet til 5 SO₂ og 5 Cl₂.",
+                    spm: "Er der ligevægt i beholderen, når x = 0,050 M?",
+                    svar: [
+                        { t: "Nej, Y er mindre end K", ok: true },
+                        { t: "Ja, Y er lig med K", nej: "Y = 0,0167 M og K = 0,0500 M. Y er ikke lig med K endnu." },
+                        { t: "Nej, Y er større end K", nej: "Y = 0,0167 M er mindre end K = 0,0500 M." }
+                    ],
+                    hint: ["Sammenlign Y og K i boksen over grafen.", "Y = 0,0167 M og K = 0,0500 M.", "Y er mindre end K, så der er ikke ligevægt endnu."],
+                    slut: "Y er mindre end K, så der er ikke ligevægt. Der skal spaltes mere SO₂Cl₂, før Y når op på K." } },
+              { type: "ligevaegt", spm: "Hvor stor er x, når reaktionsbrøken Y er lig med K?" }
+          ] },
+        { id: "a-udtryk", rx: "a", gruppe: "a", navn: "SO₂Cl₂: skemaet med x",
+          slut: "Ved ligevægt er 0,0500 M = x · x / (0,200 M − x). Den ligning har x som den eneste ubekendte.",
+          tavle: { raekker: ["start", "aendr", "lig"], linjer: [
+              { navn: "Ligevægtsloven", lov: true },
+              { navn: "Ved ligevægt er Y lig med K", html: "0,0500 M = " + YX_A, trin: 6 }] },
+          trin: [
+              { type: "valg", felt: "aendr.SO2Cl2", spm: "Hvad er ændringen i [SO₂Cl₂], når x er spaltet?",
+                svar: [{ t: "−x", ok: true }, { t: "+x", nej: "SO₂Cl₂ forbruges, så [SO₂Cl₂] falder." },
+                    { t: "−2x", nej: "Der står 1 foran SO₂Cl₂. x er netop den koncentration af SO₂Cl₂, der er spaltet." }],
+                hint: ["SO₂Cl₂ står før pilen og forbruges.", "Det, der forsvinder, har minus.", "Ændringen er −x."],
+                slut: "SO₂Cl₂ forbruges, så ændringen er −x." },
+              { type: "valg", felt: "aendr.SO2", spm: "Hvad er ændringen i [SO₂], når x er spaltet?",
+                svar: [{ t: "+x", ok: true }, { t: "−x", nej: "SO₂ dannes, så [SO₂] stiger." },
+                    { t: "+2x", nej: "Der står 1 foran SO₂. Hvert SO₂Cl₂ giver ét SO₂." }],
+                hint: ["SO₂ står efter pilen og dannes.", "Hvert spaltet SO₂Cl₂ giver ét SO₂.", "Ændringen er +x."],
+                slut: "Hvert spaltet SO₂Cl₂ giver ét SO₂, så ændringen er +x." },
+              { type: "valg", felt: "aendr.Cl2", spm: "Hvad er ændringen i [Cl₂], når x er spaltet?",
+                svar: [{ t: "+x", ok: true }, { t: "−x", nej: "Cl₂ dannes, så [Cl₂] stiger." },
+                    { t: "+2x", nej: "Der står 1 foran Cl₂. Hvert SO₂Cl₂ giver ét Cl₂." }],
+                hint: ["Cl₂ står efter pilen og dannes.", "Hvert spaltet SO₂Cl₂ giver ét Cl₂.", "Ændringen er +x."],
+                slut: "Cl₂ dannes som SO₂, så ændringen er også +x." },
+              { type: "valg", felt: "lig.SO2Cl2", spm: "Hvad er [SO₂Cl₂] ved ligevægt?",
+                svar: [{ t: "0,200 M − x", ok: true }, { t: "0,200 M + x", nej: "Ændringen er −x, så x trækkes fra." },
+                    { t: "−x", nej: "Ligevægt er start plus ændring. Start er 0,200 M." }],
+                hint: ["Ligevægt = start + ændring.", "Start er 0,200 M, og ændringen er −x.", "[SO₂Cl₂] = 0,200 M − x."],
+                slut: "Ligevægt = start + ændring = 0,200 M − x." },
+              { type: "valg", felt: "lig.SO2", spm: "Hvad er [SO₂] ved ligevægt?",
+                svar: [{ t: "x", ok: true }, { t: "0,200 M + x", nej: "Fra start er der intet SO₂, så start er 0 M og ikke 0,200 M." },
+                    { t: "0,200 M − x", nej: "0,200 M − x er [SO₂Cl₂]. For SO₂ er start 0 M, og ændringen er +x." }],
+                hint: ["Ligevægt = start + ændring.", "Start er 0 M, og ændringen er +x.", "[SO₂] = 0 M + x = x."],
+                slut: "Ligevægt = 0 M + x = x." },
+              { type: "valg", felt: "lig.Cl2", spm: "Hvad er [Cl₂] ved ligevægt?",
+                svar: [{ t: "x", ok: true }, { t: "0,200 M − x", nej: "0,200 M − x er [SO₂Cl₂]. For Cl₂ er start 0 M, og ændringen er +x." },
+                    { t: "2x", nej: "Ændringen for Cl₂ er +x, ikke +2x." }],
+                hint: ["Ligevægt = start + ændring.", "Start er 0 M, og ændringen er +x.", "[Cl₂] = 0 M + x = x."],
+                slut: "Ligevægt = 0 M + x = x. Nu står hele skemaet med x." },
+              { type: "valg", linje: 1, spm: "Ved ligevægt er Y lig med K. Hvilken ligning gælder ved ligevægt?",
+                svar: [{ t: "0,0500 M = x · x / (0,200 M − x)", foer: "0,0500 M = ", broek: ["x · x", "0,200 M − x"], ok: true },
+                    { t: "0,0500 M = x / (0,200 M − x)", foer: "0,0500 M = ", broek: ["x", "0,200 M − x"], nej: "Begge produkter står i tælleren: [SO₂] · [Cl₂] = x · x." },
+                    { t: "0,0500 M = (0,200 M − x) / (x · x)", foer: "0,0500 M = ", broek: ["0,200 M − x", "x · x"], nej: "Den brøk er vendt om. Produkterne står i tælleren som i ligevægtsloven." }],
+                hint: ["Brug ligevægtsloven på tavlen, og sæt K = 0,0500 M ind på venstre side.", "Sæt [SO₂] = x, [Cl₂] = x og [SO₂Cl₂] = 0,200 M − x ind.", "0,0500 M = x · x / (0,200 M − x)."],
+                slut: "0,0500 M = x · x / (0,200 M − x). Ligningen har x som den eneste ubekendte." }
+          ] },
+        { id: "a-cas", rx: "a", gruppe: "a", navn: "SO₂Cl₂: hvilken løsning?", yBoks: true,
+          slut: "x = −0,128 M kan ikke bruges, fordi [SO₂] så ville være −0,128 M. Kun x = 0,0781 M giver positive koncentrationer, og dér er Y lig med K.",
+          tavle: { raekker: ["start", "aendr", "lig"], tal: true, linjer: [
+              { navn: "Ligevægtsloven", lov: true },
+              { navn: "Ved ligevægt er Y lig med K", html: "0,0500 M = " + YX_A },
+              { navn: "CAS løser ligningen", html: "x = 0,0781 M eller x = −0,128 M" },
+              { navn: "Den løsning, der kan bruges", html: "x = 0,0781 M. Med x = −0,128 M bliver [SO₂] negativ.", trin: 0 }] },
+          rodOk: 0.0781, rodNej: -0.128,
+          trin: [
+              { type: "valg", linje: 3, spm: "CAS giver x = 0,0781 M og x = −0,128 M. Hvilken løsning kan bruges?",
+                svar: [{ t: "x = 0,0781 M", ok: true },
+                    { t: "x = −0,128 M", nej: "Med x = −0,128 M bliver [SO₂] = x negativ. En koncentration kan ikke være negativ." },
+                    { t: "Begge", nej: "Sæt hver løsning ind i rækken Ligevægt. Med x = −0,128 M bliver [SO₂] negativ." }],
+                hint: ["Sæt hver løsning ind i rækken Ligevægt på tavlen.", "En koncentration kan ikke være negativ.", "x = 0,0781 M kan bruges."],
+                slut: "Kun x = 0,0781 M giver positive koncentrationer." },
+              { type: "handling", spm: "Træk x, til Y er lig med K.", lige: true,
+                hint: ["Skyderen ligger under beholderen.", "Løsningen er x = 0,0781 M.", "Træk knappen til x = 0,078 M."] }
+          ] },
+        { id: "b-aendr", rx: "b", gruppe: "b", navn: "HBr: koefficienten 2",
+          slut: "Hver gang ét H₂ omsættes, forbruges ét Br₂, og der dannes 2 HBr. Koefficienterne bliver til tallene foran x.",
+          tavle: { raekker: ["start", "aendr"], linjer: [{ navn: "Ligevægtsloven", lov: true }] },
+          trin: [
+              { type: "valg", spm: "Hvor mange HBr-molekyler dannes, når ét H₂-molekyle reagerer med ét Br₂-molekyle?",
+                svar: [{ t: "2", ok: true }, { t: "1", nej: "Der står 2 foran HBr. Ét H₂ og ét Br₂ giver 2 HBr." },
+                    { t: "4", nej: "Ét H₂ og ét Br₂ giver 2 HBr. Se tallene foran stofferne i reaktionsskemaet." }],
+                hint: ["Se på reaktionsskemaet over kortet.", "Tallet foran HBr er koefficienten.", "Der dannes 2 HBr."],
+                slut: "Koefficienten 2 foran HBr betyder, at ét H₂ og ét Br₂ giver 2 HBr." },
+              { type: "handling", tekst: "Skyderen x er den koncentration af H₂, der er omsat.",
+                spm: "Træk x til 0,040 M, og se på molekylerne.", x: 0.040, tol: 0.005, snap: true,
+                hint: ["Skyderen ligger under beholderen.", "Træk knappen til x = 0,040 M.", "x = 0,040 M."] },
+              { type: "valg", felt: "aendr.H2", spm: "Hvad er ændringen i [H₂], når x er omsat?",
+                svar: [{ t: "−x", ok: true }, { t: "+x", nej: "H₂ forbruges, så [H₂] falder." },
+                    { t: "−2x", nej: "Der står 1 foran H₂. x er netop den koncentration af H₂, der er omsat." }],
+                hint: ["H₂ står før pilen og forbruges.", "x er den koncentration af H₂, der er omsat.", "Ændringen er −x."],
+                slut: "H₂ forbruges, så ændringen er −x." },
+              { type: "valg", felt: "aendr.Br2", spm: "Hvad er ændringen i [Br₂], når x er omsat?",
+                svar: [{ t: "−x", ok: true }, { t: "−2x", nej: "Der står 1 foran Br₂. Ét Br₂ reagerer med hvert H₂." },
+                    { t: "+x", nej: "Br₂ forbruges, så [Br₂] falder." }],
+                hint: ["Br₂ står før pilen og forbruges.", "Ét Br₂ reagerer med hvert H₂.", "Ændringen er −x."],
+                slut: "Ét Br₂ reagerer med hvert H₂, så ændringen er også −x." },
+              { type: "valg", felt: "aendr.HBr", spm: "Hvad er ændringen i [HBr], når x er omsat?",
+                svar: [{ t: "+2x", ok: true }, { t: "+x", nej: "Der står 2 foran HBr, så der dannes 2 HBr for hvert H₂." },
+                    { t: "−2x", nej: "HBr dannes, så [HBr] stiger." }],
+                hint: ["HBr står efter pilen og dannes.", "Der står 2 foran HBr.", "Ændringen er +2x."],
+                slut: "Der dannes 2 HBr for hvert H₂, så ændringen er +2x." }
+          ] },
+        { id: "c-graense", rx: "c", gruppe: "c", navn: "CO + H₂O: hvor langt kan x komme?",
+          slut: "H₂O er brugt op ved x = 0,100 M. x kan ikke blive større end den mindste startkoncentration af en reaktant.",
+          tavle: { raekker: ["start", "aendr", "lig"], tal: true },
+          trin: [
+              { type: "valg", spm: "Hvilket stof bliver brugt op først, når der fra start er 0,200 M CO og 0,100 M H₂O?",
+                svar: [{ t: "H₂O", ok: true }, { t: "CO", nej: "CO og H₂O forbruges lige hurtigt, men der er mindre H₂O fra start." },
+                    { t: "CO₂", nej: "CO₂ dannes. Det bliver ikke brugt op." }],
+                hint: ["CO og H₂O reagerer 1 til 1.", "Der er kun 0,100 M H₂O, men 0,200 M CO.", "H₂O bliver brugt op først."],
+                slut: "CO og H₂O forbruges lige hurtigt, så det stof, der er mindst af, slipper op først." },
+              { type: "handling", spm: "Træk x så langt op, som det kan komme.", xMax: true,
+                hint: ["Skyderen ligger under beholderen.", "Træk knappen helt til højre.", "x kan højst blive 0,100 M."] }
+          ] },
+        { id: "c-cas", rx: "c", gruppe: "c", navn: "CO + H₂O: hvilken løsning?", yBoks: true,
+          slut: "x = 0,280 M kan ikke bruges, fordi [H₂O] så ville være 0,100 M − 0,280 M = −0,180 M. En brugbar løsning ligger mellem 0 M og 0,100 M.",
+          tavle: { raekker: ["start", "aendr", "lig"], tal: true, linjer: [
+              { navn: "Ligevægtsloven", lov: true },
+              { navn: "Ved ligevægt er Y lig med K", html: "5,44 = " + YX_C },
+              { navn: "CAS løser ligningen", html: "x = 0,0875 M eller x = 0,280 M" },
+              { navn: "Den løsning, der kan bruges", html: "x = 0,0875 M. Med x = 0,280 M bliver [H₂O] negativ.", trin: 0 }] },
+          rodOk: 0.0875, rodNej: 0.280,
+          trin: [
+              { type: "valg", linje: 3, spm: "CAS giver x = 0,0875 M og x = 0,280 M. Hvilken løsning kan bruges?",
+                svar: [{ t: "x = 0,0875 M", ok: true },
+                    { t: "x = 0,280 M", nej: "Med x = 0,280 M bliver [H₂O] = 0,100 M − 0,280 M = −0,180 M. Der kan ikke omsættes mere H₂O, end der er." },
+                    { t: "Begge", nej: "Begge er positive, men den ene giver en negativ koncentration i rækken Ligevægt." }],
+                hint: ["x kan højst være 0,100 M, fordi der kun er 0,100 M H₂O.", "Sæt hver løsning ind i [H₂O] = 0,100 M − x.", "x = 0,0875 M kan bruges."],
+                slut: "Kun x = 0,0875 M ligger mellem 0 M og 0,100 M." },
+              { type: "handling", spm: "Træk x, til Y er lig med K.", lige: true,
+                hint: ["Skyderen ligger under beholderen.", "Løsningen er x = 0,0875 M.", "Træk knappen til x = 0,087 M eller 0,088 M."] }
+          ] }
     ];
 
+    /* Gemte fremskridt fra foer runde 2 (otte maal): b-lige og b-cas findes
+       ikke laengere og springes over. */
     D.GRUPPER_BH = [
         { id: "a", titel: "SO₂Cl₂ ⇌ SO₂ + Cl₂" },
         { id: "b", titel: "H₂ + Br₂ ⇌ 2HBr" },
@@ -224,7 +401,7 @@
 
     D.ROS_OPGAVE = ["Flot.", "Godt.", "Sådan.", "Rigtigt."];
     D.FAERDIG = {
-        bh: "Alle otte mål er nået. Opgaverne står på de to næste faner.",
+        bh: "Alle seks mål er nået. Opgaverne står på de to næste faner.",
         ux: "Alle fem opgaver er løst. Prøv fanen Med x.",
         mx: "Alle otte opgaver er løst."
     };

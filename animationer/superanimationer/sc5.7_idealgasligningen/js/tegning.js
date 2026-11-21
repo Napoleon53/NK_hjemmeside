@@ -166,20 +166,19 @@
         ctx.restore();
     };
 
+    /* Molekylerne: lys blaagraa med en bloed kant og uden glimt ved vaeggene
+       (brugeren 21. nov. 2026: skarpt hvidt, der farer rundt, traetter oejnene) */
     Tg.partikler = function (ctx, P, x0, bund) {
         var r = P.r;
-        P.glimt.forEach(function (gl) {
-            ctx.strokeStyle = "rgba(255, 240, 200, " + (gl.a * 0.55 * Math.min(1.2, gl.s)).toFixed(3) + ")";
-            ctx.lineWidth = 1.2;
-            ctx.beginPath();
-            ctx.arc(x0 + gl.x, bund - gl.y, r + 2 + (1 - gl.a) * 5, 0, Math.PI * 2);
-            ctx.stroke();
-        });
         P.liste.forEach(function (p) {
-            var a = NK.klamp(p.a, 0, 1);
-            ctx.fillStyle = p.ind > 0 ? "rgba(255, 255, 255, " + a + ")" : "rgba(214, 236, 255, " + (0.9 * a).toFixed(3) + ")";
+            var a = NK.klamp(p.a, 0, 1), x = x0 + p.x, y = bund - p.y;
+            ctx.fillStyle = "rgba(150, 176, 206, " + (0.3 * a).toFixed(3) + ")";
             ctx.beginPath();
-            ctx.arc(x0 + p.x, bund - p.y, r, 0, Math.PI * 2);
+            ctx.arc(x, y, r + 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = p.ind > 0 ? "rgba(214, 226, 240, " + (0.95 * a).toFixed(3) + ")" : "rgba(180, 202, 226, " + (0.9 * a).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
             ctx.fill();
         });
     };
@@ -509,6 +508,110 @@
         ctx.fillText(tekst, x0 + 8, y + 1);
         ctx.restore();
         return { x: x0, y: y - h / 2, b: b, h: h };
+    };
+
+    /* ----- Betjeningen i scenen (21. nov. 2026: intet i panelet) ------------------------
+       Laaseknappen ved stemplet: r { x, y, b, h }, laast, lys (musen er over).
+       Den viser, hvad et klik goer: "Lås stemplet" eller "Lås op". */
+    Tg.LAAS_FONT = "700 13.5px " + FONT;
+    Tg.laasKnap = function (ctx, r, laast, lys) {
+        ctx.save();
+        NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 7);
+        ctx.fillStyle = lys ? "rgba(58, 52, 30, 0.95)" : "rgba(16, 18, 24, 0.88)";
+        ctx.fill();
+        /* Stille kant; den gule ramme kommer kun, naar kortet beder om laasen (runde 4) */
+        ctx.strokeStyle = lys ? "#c9ced6" : "rgba(160, 170, 185, 0.45)";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        /* Den lille haengelaas: aaben boejle, naar stemplet glider frit */
+        var lx = r.x + 14, ly = r.y + r.h / 2 + 2;
+        ctx.strokeStyle = "#c9ced6";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (laast) ctx.arc(lx, ly - 3, 4, Math.PI, 0);
+        else { ctx.arc(lx + 4, ly - 6, 4, Math.PI, 0); }
+        ctx.stroke();
+        ctx.fillStyle = "#f2c53d";
+        NK.rundtRekt(ctx, lx - 6, ly - 3, 12, 9, 2);
+        ctx.fill();
+        ctx.font = Tg.LAAS_FONT;
+        ctx.fillStyle = "#f2f3f5";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(laast ? "Lås op" : "Lås stemplet", r.x + 28, r.y + r.h / 2 + 1);
+        ctx.restore();
+    };
+
+    /* ----- Klik-opfordringen (runde 4, 21. nov. 2026, som krukken i sc6.1) ----------------
+       En gul ramme om tingen (r: { x, y, b, h } eller { rund, x, y, r }) og en gul
+       boble med pil, der peger paa (x, y): over tingen (side "over") eller til
+       hoejre for den ("hoejre"). Rammen lyser roligt, og boblen vugger lidt. */
+    Tg.opfordring = function (ctx, r, tekst, x, y, side, W, tid) {
+        var puls = 0.65 + 0.35 * Math.sin(tid * 3), hop = Math.sin(tid * 3) * 2;
+        ctx.save();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(242, 197, 61, " + puls.toFixed(3) + ")";
+        ctx.shadowColor = "rgba(242, 197, 61, 0.45)";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        if (r.rund) ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+        else NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 9);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.font = "700 15px " + FONT;
+        var b = Math.ceil(ctx.measureText(tekst).width) + 24, h = 30, sp = 10, rx, ry;
+        if (side === "hoejre") { rx = x + sp + 3 + hop; ry = y - h / 2; }
+        else { rx = x - b / 2; ry = y - sp - 3 - h + hop; }
+        rx = NK.klamp(rx, 6, Math.max(6, W - b - 6));
+        ry = Math.max(4, ry);
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = "#ffdf6b";
+        ctx.beginPath();
+        if (side === "hoejre") {
+            ctx.moveTo(rx - sp, y);
+            ctx.lineTo(rx + 1, y - 8);
+            ctx.lineTo(rx + 1, y + 8);
+        } else {
+            var px = NK.klamp(x, rx + 14, rx + b - 14);
+            ctx.moveTo(px, ry + h + sp);
+            ctx.lineTo(px - 8, ry + h - 1);
+            ctx.lineTo(px + 8, ry + h - 1);
+        }
+        ctx.closePath();
+        ctx.fill();
+        NK.rundtRekt(ctx, rx, ry, b, h, 8);
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.fillStyle = "#33290a";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(tekst, rx + b / 2, ry + h / 2 + 1);
+        ctx.restore();
+        return { x: rx, y: ry, b: b, h: h };
+    };
+
+    /* ----- En stiplet plads --------------------------------------------------------------
+       Pladsen til det, der kommer frem senere (trinvis start 21. nov. 2026, som
+       T.plads i sb2.6). rund: en cirkel med diameteren b (manometeret). */
+    Tg.plads = function (ctx, x, y, b, h, tekst, rund) {
+        ctx.save();
+        ctx.beginPath();
+        if (rund) ctx.arc(x + b / 2, y + h / 2, b / 2, 0, Math.PI * 2);
+        else NK.rundtRekt(ctx, x, y, b, h, 10);
+        ctx.setLineDash([6, 5]);
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = "rgba(160, 170, 185, 0.45)";
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = "600 13.5px " + FONT;
+        ctx.fillStyle = "rgba(160, 170, 185, 0.75)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(tekst, x + b / 2, y + h / 2);
+        ctx.restore();
     };
 
     /* ----- Grafen paa scenen -------------------------------------------------------------

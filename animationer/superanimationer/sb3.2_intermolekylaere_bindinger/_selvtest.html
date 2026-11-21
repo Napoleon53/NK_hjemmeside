@@ -680,6 +680,45 @@ function koerTest(W) {
         });
     });
     paastand("ingen tekst under 11,5 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    function chipsAf(F) { return [].slice.call(d.querySelectorAll("#" + F.navn + "-liste .opg-chip")); }
+    function laastNr(c) { return c.disabled && c.classList.contains("laast") && !!c.querySelector(".hl-streg") && /^\d+$/.test(c.textContent.trim()); }
+    function friskListe(F) {
+        F.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        F.naaet = {};
+        F.vaelg(0);
+        return chipsAf(F);
+    }
+    NK.visFane("fane-e");
+    var ce = friskListe(E);
+    paastand("Ethanol: ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg uden titel og kan ikke klikkes",
+        ce.length === 4 && /Ethanols kogepunkt/.test(ce[0].textContent) && !ce[0].disabled && ce.slice(1).every(laastNr),
+        ce.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    ce[2].click();
+    paastand("Ethanol: et klik på en låst opgave gør intet", E.nr === 0);
+    E.visSvar();
+    ce = chipsAf(E);
+    paastand("Ethanol: når opgave 1 er løst (Vis svaret tæller), kommer titlen på opgave 2 frem; opgave 3 og 4 er stadig låst",
+        /Hvad brydes/.test(ce[1].textContent) && !ce[1].disabled && ce.slice(2).every(laastNr),
+        ce.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    ce[1].click();
+    paastand("Ethanol: opgave 2 kan nu vælges i listen", E.nr === 1);
+    NK.visFane("fane-s");
+    S.maalt = {};
+    var cs = friskListe(S);
+    paastand("Sammenlign: ved start har kun par 1 en titel; de andre er et nummer med en grå streg",
+        cs.length === D.PAR.length && /Propan og ethanol/.test(cs[0].textContent) && cs.slice(1).every(laastNr),
+        cs.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    S.loest("selv", D.PAR[0].loest, "");
+    cs = chipsAf(S);
+    paastand("Sammenlign: når par 1 er løst, kommer titlen på par 2 frem; par 3 er stadig låst",
+        /butan-1-ol/.test(cs[1].textContent) && !cs[1].disabled && laastNr(cs[2]), cs.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    NK.visFane("fane-r");
+    var cr = friskListe(R);
+    paastand("Rangér har kun numre under niveauerne: alle kan vælges, og ingen har en streg",
+        cr.length === 30 && cr.every(function (c) { return !c.disabled && !c.querySelector(".hl-streg"); }));
     NK.visFane("fane-e");
 }
 </script>

@@ -1,0 +1,149 @@
+[
+ {
+  "nr": "T4-1",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Træk koncentrationen ned til 0.\",",
+  "ny": "handling: \"Prøv det: Klik på − ved kuvetten, til koncentrationen er 0 mM.\",",
+  "hvor": "fane 1, forudsigelse 1 Vand i kuvetten, handlingen (skyderne er afløst af − og + ved kuvetten)"
+ },
+ {
+  "nr": "T4-2",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "\"Alt lyset slipper igennem: T = 100 % og A = 0.\"",
+  "ny": "\"Alt lyset slipper igennem: T = 100 %.\"",
+  "hvor": "fane 1, forudsigelse 1, hint 3 (A står ikke i displayet før forudsigelse 2)"
+ },
+ {
+  "nr": "T4-3",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "forklaring: \"Vand absorberer ikke lyset ved 525 nm, så T = 100 % og A = 0. En kuvette med vand kaldes en blindprøve. Den giver punktet (0, 0) på en standardkurve.\"",
+  "ny": "forklaring: \"Vand absorberer ikke lyset ved 525 nm, så alt lyset når frem. En kuvette med vand kaldes en blindprøve.\"",
+  "hvor": "fane 1, forudsigelse 1, forklaringen"
+ },
+ {
+  "nr": "T4-4",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Træk koncentrationen op til 0,40 mM.\",\n            maal: { c: [0.395, 0.405] },\n            hint: [\n                \"Tænk",
+  "ny": "handling: \"Prøv det: Klik på + ved kuvetten, til koncentrationen er 0,40 mM.\",\n            maal: { c: [0.395, 0.405] },\n            hint: [\n                \"Tænk",
+  "hvor": "fane 1, forudsigelse 2 Dobbelt c: A, handlingen"
+ },
+ {
+  "nr": "T4-5",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Træk koncentrationen op til 0,40 mM.\",\n            maal: { c: [0.395, 0.405] },\n            hint: [\n                \"De ekstra",
+  "ny": "handling: \"Prøv det: Klik på + ved kuvetten, til koncentrationen er 0,40 mM.\",\n            maal: { c: [0.395, 0.405] },\n            hint: [\n                \"De ekstra",
+  "hvor": "fane 1, forudsigelse 3 Dobbelt c: lyset, handlingen"
+ },
+ {
+  "nr": "T4-6",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Træk kuvetten ud til 2,00 cm med skyderen eller i kuvettens højre side.\",",
+  "ny": "handling: \"Prøv det: Gør kuvetten 2,00 cm bred med + ved kuvettebredden eller grebet på kuvettens højre side.\",",
+  "hvor": "fane 1, forudsigelse 4 Én cm mere, handlingen"
+ },
+ {
+  "nr": "T4-7",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Træk koncentrationen ned til 0,20 mM og kuvetten ud til 2,00 cm.\",",
+  "ny": "handling: \"Prøv det: Gør koncentrationen 0,20 mM og kuvetten 2,00 cm bred.\",",
+  "hvor": "fane 1, forudsigelse 5 Halv c, dobbelt l, handlingen"
+ },
+ {
+  "nr": "T4-8",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "id: \"Aen\", navn: \"Absorbansen 1\",",
+  "ny": "id: \"Aen\", navn: \"A = 1\", tema: \"A = 1\", under: \"Hvor meget lys slipper igennem?\",",
+  "hvor": "fane 1, forudsigelse 6, titlen i rækken (Niels: \"A = 1\" med undertekst)"
+ },
+ {
+  "nr": "T4-9",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "handling: \"Prøv det: Ændr koncentrationen og kuvettebredden, til A er mellem 0,98 og 1,02.\",",
+  "ny": "handling: \"Prøv det: Ændr koncentrationen eller kuvettebredden, til A er mellem 0,98 og 1,02.\",",
+  "hvor": "fane 1, forudsigelse 6, handlingen"
+ },
+ {
+  "nr": "T4-10",
+  "fil": "sb5.2_lambert_beer/js/regning.js",
+  "gammel": "if (s.tom) return { tom: true, besked: \"Regn resultatet ud, og skriv det i feltet.\" };",
+  "ny": "if (s.tom) return { tom: true, besked: \"Regn resultatet ud, og skriv tallet i feltet.\" };",
+  "hvor": "fane 3, beskeden ved et tomt felt"
+ },
+ {
+  "nr": "T4-11",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Kuvetten tømmes og fyldes med rent vand. Hvor meget af lyset når frem til detektoren, når kuvetten kun indeholder vand?\",",
+  "ny": "spm: \"Hvor meget af lyset når frem til detektoren, når kuvetten fyldes med rent vand?\",",
+  "hvor": "fane 1, forudsigelse 1 Vand i kuvetten, gættet"
+ },
+ {
+  "nr": "T4-12",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,20 mM er A = 0,490. Hvad bliver A, når koncentrationen fordobles til 0,40 mM?\",",
+  "ny": "spm: \"Hvad bliver A, når koncentrationen fordobles fra 0,20 mM til 0,40 mM?\",",
+  "hvor": "fane 1, forudsigelse 2 Dobbelt c: A, gættet (A = 0,490 står i displayet)"
+ },
+ {
+  "nr": "T4-13",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,20 mM slipper 32 % af lyset igennem. Hvor meget af lyset slipper igennem, når koncentrationen fordobles til 0,40 mM?\",",
+  "ny": "spm: \"Hvor meget af lyset slipper igennem, når koncentrationen fordobles fra 0,20 mM til 0,40 mM?\",",
+  "hvor": "fane 1, forudsigelse 3 Dobbelt c: lyset, gættet (32 % står på kurven og i displayet)"
+ },
+ {
+  "nr": "T4-14",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,12 mM slipper ca. halvdelen af lyset gennem en kuvette på 1,00 cm. Hvor meget af lyset slipper igennem, når kuvetten er 2,00 cm bred?\",",
+  "ny": "spm: \"Hvor meget af lyset slipper igennem 0,12 mM permanganat, når kuvetten bliver 2,00 cm bred i stedet for 1,00 cm?\",",
+  "hvor": "fane 1, forudsigelse 4 Én cm mere, gættet (51 % står på kurven)"
+ },
+ {
+  "nr": "T4-15",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,40 mM og 1,00 cm er A = 0,980. Hvad bliver A, når koncentrationen halveres til 0,20 mM, og kuvetten bliver 2,00 cm?\",",
+  "ny": "spm: \"Hvad sker der med A = 0,980, når koncentrationen halveres fra 0,40 mM til 0,20 mM, og kuvetten bliver 2,00 cm bred?\",",
+  "hvor": "fane 1, forudsigelse 5 Halv c, dobbelt l, gættet"
+ },
+ {
+  "nr": "T4-16",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "tekst: \"Lampen sender grønt lys gennem kuvetten med lilla permanganat. Hvad sker der med noget af det grønne lys i kuvetten med permanganat?\",",
+  "ny": "tekst: \"Hvad sker der med noget af det grønne lys i kuvetten med lilla permanganat?\",",
+  "hvor": "fane 1, forudsigelse 1, trin 1"
+ },
+ {
+  "nr": "T4-17",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "tekst: \"Kurven over strålen viser, hvor meget af lyset der er tilbage. Hvor meget af lyset når frem til detektoren gennem 0,20 mM permanganat?\",",
+  "ny": "tekst: \"Hvor meget af lyset når frem til detektoren gennem 0,20 mM permanganat?\",",
+  "hvor": "fane 1, forudsigelse 1, trin 2"
+ },
+ {
+  "nr": "T4-18",
+  "fil": "sb5.2_lambert_beer/js/sim_regn.js",
+  "gammel": "        return this.opg().tekst.replace(/\\s*Beregn[^.]*\\./g, \"\").trim();",
+  "ny": "        return this.opg().ind || \"\";",
+  "hvor": "fane 3, alle opgaver: kortet har kun spørgsmålet og handlingen; indledningen (opgavens tekst uden Beregn) er væk, undtagen Svær 2 Massen (ind i D.REGN). Tallene står på etiketterne."
+ },
+ {
+  "nr": "T4-19",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "id: \"dobbeltA\", navn: \"Dobbelt koncentration: A\", tema: \"Dobbelt c: A\",",
+  "ny": "id: \"dobbeltA\", navn: \"Dobbelt koncentration: absorbansen\", tema: \"Dobbelt c: absorbansen\",",
+  "hvor": "fane 1, forudsigelse 2, titlen i rækken (regel 34: ordet før symbolet)"
+ },
+ {
+  "nr": "T4-20",
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Hvad bliver A, når koncentrationen fordobles fra 0,20 mM til 0,40 mM?\",",
+  "ny": "spm: \"Hvad bliver absorbansen (A), når koncentrationen fordobles fra 0,20 mM til 0,40 mM?\",",
+  "hvor": "fane 1, forudsigelse 2, gættet (regel 34: \"absorbansen (A)\" første gang)"
+ },
+ {
+  "nr": "T4-21",
+  "fil": "sb5.2_lambert_beer/js/sim_lys.js",
+  "gammel": "return { tekst: \"Prøv det selv, og tryk så Indsend svar. <span class=\\\"sk-spm sk-linje\\\">\"",
+  "ny": "return { tekst: \"Prøv det selv. <span class=\\\"sk-spm sk-linje\\\">\"",
+  "hvor": "fane 1, Prøv det: kortet går selv videre (regel 33), så \"tryk så Indsend svar\" udgår"
+ }
+]

@@ -1,0 +1,655 @@
+[
+  {
+    "mappe": "sc5.10_lightergas",
+    "titel": "Lightergas",
+    "sprog": [
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "Alle seks fejlkilder (vist med 1 Våd lighter)",
+        "fil": "js/data.js",
+        "linje": 173,
+        "nu_alm": "Gruppe B tørrer ikke lighteren, før den vejes anden gang. Der sidder 0,12 g vand på den.",
+        "nu_fed": "Hvordan bliver gruppe B's molarmasse i forhold til gruppe A's?",
+        "nu_svar": ["Højere", "Lavere", "Den samme"],
+        "problem": "Det halvfede spørgsmål er det samme i alle seks fejlkilder og siger aldrig, hvad gruppe B gør anderledes.",
+        "nyt_alm": "Gruppe A gør det rigtigt. Gruppe B tørrer ikke lighteren, før den vejes anden gang. Der sidder 0,12 g vand på den.",
+        "nyt_fed": "Hvordan bliver molarmassen, når gruppe B vejer lighteren våd?",
+        "nyt_svar": ["Højere end gruppe A's", "Lavere end gruppe A's", "Den samme som gruppe A's"],
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Beregningen",
+        "opgave": "3 En ukendt gas",
+        "fil": "js/sim_beregning.js",
+        "linje": 68,
+        "nu_alm": "En lukket gasdåse med en ukendt alkan vejer 245,62 g. Der samles 180 mL af gassen over vand ved 20 °C, og dåsen vejer bagefter 245,29 g.",
+        "nu_fed": "Hvilken alkan er det?",
+        "nu_svar": ["CH₄ methan", "C₂H₆ ethan", "C₃H₈ propan", "C₄H₁₀ butan", "C₅H₁₂ pentan"],
+        "problem": "\"det\" peger tilbage på gasdåsen i indledningen.",
+        "nyt_alm": "En lukket gasdåse med en ukendt alkan vejer 245,62 g. Der samles 180 mL af gassen over vand ved 20 °C, og dåsen vejer bagefter 245,29 g.",
+        "nyt_fed": "Hvilken alkan er der i gasdåsen?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Forsøget",
+        "billede": "skud/b/sc5.10_lightergas__0.png",
+        "dom": "fint",
+        "fremme": "kort med én handling ad gangen, vægt, lighter, papir, kar med vand, måleglas i stativ, lup over måleglasset, skema med tre felter i panelet",
+        "bruges": "alt undtagen luppen bruges i måling 1, og linjen på kortet tager eleven gennem det ét skridt ad gangen",
+        "forslag": [],
+        "andet": "Luppen kan vente, til gassen er samlet og V skal aflæses. Ellers er det et guidet forsøg, hvor tingene på bordet hører til opgaven.",
+        "gevinst": "Lille: én ting mindre at se på, før lighteren er vejet.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Beregningen",
+        "billede": "skud/b/sc5.10_lightergas__1.png",
+        "dom": "lidt meget",
+        "fremme": "kort uden halvfedt spørgsmål, tavle med gassen, tallene og tre regnelinjer, søjlediagram med fem alkaner, regnestykke med tre felter i panelet, opsummering med tabel og noten om butan",
+        "bruges": "tavlens tal og første felt (formlen for m(gas)); søjlerne og opsummeringen bruges først til sidst",
+        "forslag": [],
+        "andet": "Skjul søjlediagrammet bag en stiplet ramme 'alkanernes molarmasser', til M(gas) er regnet. Fold opsummeringen ind til måling 2. Fjern noten 'Butan, C₄H₁₀, har M = 58,14 g/mol' i opsummeringen, for den giver svaret på 'hvilken alkan det er' væk fra start.",
+        "gevinst": "Den svage elev ser kun regnestykket, og svaret på alkanen ligger ikke fremme i panelet.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "billede": "skud/b/sc5.10_lightergas__2.png",
+        "dom": "fint",
+        "fremme": "kort med gæt og tre svar, to ens opstillinger A og B med skilt under, tom tabel i panelet",
+        "bruges": "kortet og skiltet under B",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fejlkilderne bruger alle D.FEJL_SPM. Forslag til et spm-felt pr. fejlkilde: Tændt lighter 'Hvordan bliver molarmassen, når gruppe B tænder lighteren, før gassen samles?'. Bobler ved siden af 'Hvordan bliver molarmassen, når hver sjette boble stiger forbi måleglasset?'. Luft i måleglasset 'Hvordan bliver molarmassen, når der er 12 mL luft i måleglasset fra start?'. Dobbelt så meget gas 'Hvordan bliver molarmassen, når gruppe B samler 300 mL gas i stedet for 150 mL?'. Varmt lokale 'Hvordan bliver molarmassen ved 30 °C, når gruppe B regner med 24,0 L/mol?'. Fane 2: Opsummeringens note 'Butan, C₄H₁₀, har M = 58,14 g/mol' står fremme fra start og løser alkanvalget i måling 1 og 2 (index.html linje 126). Kortet til måling 1 slutter med 'hvilken alkan det er' uden spørgsmålstegn, så intet er halvfedt."
+  },
+  {
+    "mappe": "sc5.11_betydende_cifre",
+    "titel": "Betydende cifre",
+    "sprog": [
+      {
+        "fane": "1 Tæl cifrene",
+        "opgave": "Tæl (alle ti opgaver, også i Blandet)",
+        "fil": "js/cifre.js",
+        "linje": 307,
+        "nu_alm": "Klik på dem.",
+        "nu_fed": "Hvilke cifre er betydende?",
+        "nu_svar": [],
+        "problem": "Spørgsmålet nævner ikke tallet på tavlen, og instruktionen 'Klik på dem.' står efter spørgsmålet.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilke cifre i tallet på tavlen er betydende?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Tæl cifrene",
+        "billede": "skud/b/sc5.11_betydende_cifre__0.png",
+        "dom": "fint",
+        "fremme": "kort, ét tal på tavlen",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Flyt kommaet",
+        "billede": "skud/b/sc5.11_betydende_cifre__1.png",
+        "dom": "fint",
+        "fremme": "kort, ét tal på tavlen, valg mellem almindeligt tal og videnskabelig notation, ét felt",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Afrund",
+        "billede": "skud/b/sc5.11_betydende_cifre__2.png",
+        "dom": "fint",
+        "fremme": "kort, ét tal på tavlen, valg af skrivemåde, ét felt med tæller",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "4 Blandet",
+        "billede": "skud/b/sc5.11_betydende_cifre__3.png",
+        "dom": "fint",
+        "fremme": "kort, ét regnestykke på tavlen, valg af skrivemåde, ét felt",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "De andre opgavetyper er bydeform uden spørgsmålstegn ('Afrund til 4 betydende cifre.') og er direkte nok."
+  },
+  {
+    "mappe": "sc6.1_koncentration",
+    "titel": "Koncentration",
+    "sprog": [
+      {
+        "fane": "1 Karret",
+        "opgave": "2 Mere vand (gættet)",
+        "fil": "js/data.js",
+        "linje": 94,
+        "nu_alm": "Du hælder vand i karret, til der er dobbelt så meget opløsning.",
+        "nu_fed": "Hvad sker der med koncentrationen?",
+        "nu_svar": ["Den bliver halvt så stor", "Den bliver dobbelt så stor", "Den er den samme"],
+        "problem": "Betingelsen, at der hældes vand i til dobbelt rumfang, står kun i indledningen.",
+        "nyt_alm": "Karret har 0,20 mol kobber(II)sulfat i 0,40 L.",
+        "nyt_fed": "Hvad sker der med koncentrationen, når der hældes vand i karret til dobbelt rumfang?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Karret",
+        "opgave": "3 Tap ud (gættet)",
+        "fil": "js/data.js",
+        "linje": 106,
+        "nu_alm": "Du tapper halvdelen af opløsningen ud.",
+        "nu_fed": "Hvad sker der med koncentrationen i karret?",
+        "nu_svar": ["Den er den samme", "Den bliver halvt så stor", "Den bliver dobbelt så stor"],
+        "problem": "Spørgsmålet siger ikke, at halvdelen af opløsningen tappes ud.",
+        "nyt_alm": "Karret har 0,30 mol kobber(II)sulfat i 0,60 L.",
+        "nyt_fed": "Hvad sker der med koncentrationen i karret, når halvdelen af opløsningen tappes ud?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 c eller n?",
+        "opgave": "2 Etiketten, spørgsmål 1",
+        "fil": "js/data.js",
+        "linje": 181,
+        "nu_alm": "Glas A har 0,30 mol kobber(II)sulfat i 0,60 L.",
+        "nu_fed": "Hvad skal der stå på etiketten?",
+        "nu_svar": ["0,50 M", "0,50 mol", "0,30 M", "0,18 M"],
+        "problem": "Spørgsmålet siger hverken, hvilket glas det gælder, eller at etiketten skal vise koncentrationen.",
+        "nyt_alm": "Glas A har 0,30 mol kobber(II)sulfat i 0,60 L.",
+        "nyt_fed": "Hvilken koncentration skal der stå på etiketten på glas A?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 c eller n?",
+        "opgave": "6 Vand i glasset, spørgsmål 2",
+        "fil": "js/data.js",
+        "linje": 277,
+        "nu_alm": "Der er hældt vand i glas A. Nu er der 0,40 L.",
+        "nu_fed": "Hvad er koncentrationen nu?",
+        "nu_svar": ["0,25 M", "0,50 M", "0,25 mol", "1,00 M"],
+        "problem": "\"nu\" peger tilbage på vandet i indledningen, og spørgsmålet nævner ikke glas A.",
+        "nyt_alm": "Der er hældt vand i glas A. Nu er der 0,40 L.",
+        "nyt_fed": "Hvad er koncentrationen i glas A, efter at der er hældt vand i?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 c eller n?",
+        "opgave": "8 To forskellige glas, spørgsmål 1",
+        "fil": "js/data.js",
+        "linje": 321,
+        "nu_alm": "Etiketterne viser koncentrationen. Glas B har den største koncentration.",
+        "nu_fed": "Har det også den største stofmængde?",
+        "nu_svar": ["Ja", "Nej, glas A har mest", "De har lige meget"],
+        "problem": "\"det\" og \"også\" peger tilbage på glas B, så spørgsmålet kan ikke stå alene.",
+        "nyt_alm": "Etiketterne viser koncentrationen. Glas B har den største koncentration.",
+        "nyt_fed": "Hvilket glas har den største stofmængde?",
+        "nyt_svar": ["Glas A", "Glas B", "De har lige meget"],
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Karret",
+        "billede": "skud/b/sc6.1_koncentration__0.png",
+        "dom": "lidt meget",
+        "fremme": "kort, kar med skala, vandhane med blå knap, krukke med skilt, rød tappehane, lup med forklaring, panel med n, V, c og regnestykket c = n / V",
+        "bruges": "krukken, karret og c i panelet; hanen og tappen bruges først i opgave 2 og 3",
+        "forslag": [
+          { "alm": "Karret har 0,50 L vand. Opløsningen skal være 0,40 M.", "fed": "Hvor mange mol kobber(II)sulfat giver 0,40 M i 0,50 L?", "svar": ["0,20 mol", "0,80 mol", "0,40 mol"], "derefter": "Panelet viser målet n = 0,20 mol ved siden af n." },
+          { "alm": "Hver skefuld fra krukken er 0,10 mol.", "fed": "Hvor mange skefulde kobber(II)sulfat er 0,20 mol?", "svar": ["2 skefulde", "4 skefulde", "8 skefulde"], "derefter": "Krukken låses op med skiltet 'Klik: en skefuld', og eleven kommer stoffet i karret." }
+        ],
+        "andet": "Hanen og tappen kan stå grå, til opgave 2 og 3 skal bruge dem. Lige nu kan opgave 1 løses ved at klikke på krukken, til c i panelet viser 0,40 M.",
+        "gevinst": "Eleven regner stofmængden ud, før der klikkes, så forsøget bliver et tjek og ikke et gæt.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 c eller n?",
+        "billede": "skud/b/sc6.1_koncentration__1.png",
+        "dom": "lidt meget",
+        "fremme": "kort med spørgsmål, to glas med prikker, to lupper med ioner og c = ?, tabel med n, V og c i panelet, n under glassene",
+        "bruges": "glassene og prikkerne; lupperne viser koncentrationen og bruges først i spørgsmål 2",
+        "forslag": [],
+        "andet": "Skjul lupperne bag en stiplet ramme 'lupperne: lige meget væske fra hvert glas', til spørgsmål 2 om koncentrationen. Luppen over glas A har flest ioner og lokker til svaret 'Glas A' i spørgsmål 1 om stofmængden.",
+        "gevinst": "Spørgsmål 1 handler kun om prikkerne i glassene, og lupperne kommer, når de forklarer koncentrationen.",
+        "prioritet": 2
+      },
+      {
+        "fane": "3 Målekolben",
+        "billede": "skud/b/sc6.1_koncentration__2.png",
+        "dom": "fint",
+        "fremme": "tavle med tallene og én regnelinje, målekolbe, krukke med NaCl, vægt, opgaven og formelvalget i panelet",
+        "bruges": "tavlen og panelet; kolben, krukken og vægten er rolig kulisse",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "4 Fortynding",
+        "billede": "skud/b/sc6.1_koncentration__3.png",
+        "dom": "lidt meget",
+        "fremme": "to lupper (flasken og kolben), tavle med målet, flaske med 1,00 M, tre pipetter, tre målekolber, sprøjteflaske, opgaven i panelet",
+        "bruges": "alt, men eleven skal selv vælge mellem ni par af pipette og kolbe uden at have tænkt over forholdet",
+        "forslag": [
+          { "alm": "Flasken har 1,00 M kobber(II)sulfat.", "fed": "Hvilken koncentration er ti gange tyndere end 1,00 M?", "svar": ["0,100 M", "10,0 M", "0,900 M"], "derefter": "Tavlen viser 'Målet: c_efter = 0,100 M', og luppen over kolben dukker op." },
+          { "alm": "Pipetten tager opløsning fra flasken. Målekolben fyldes op med vand til mærket.", "fed": "Hvor stor skal målekolben være i forhold til pipetten, når opløsningen skal være ti gange tyndere?", "svar": ["Ti gange så stor", "Ni gange så stor", "Lige så stor"], "derefter": "Pipetterne og målekolberne lyser op, og eleven vælger et par, der passer." }
+        ],
+        "andet": "Sprøjteflasken kan stå grå, til der er opløsning i en kolbe.",
+        "gevinst": "Eleven ved, at kolben skal være ti gange pipetten, før der vælges blandt ni kombinationer.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Fane 3 og 4 har intet papirkort i scenen. Opgaven står helt med fed i panelet, så det halvfede spørgsmål kan ikke testes for sig. 'Hvad bliver koncentrationen?' (fane 4, Koncentrationen efter, data.js linje 395) mangler 'efter fortyndingen', og 'Hvor meget vand skal der i?' (linje 401) mangler 'i bægerglasset'. Fane 2, Vand i glasset, spørgsmål 1 (linje 270) har samme problem som spørgsmål 2: 'Hvad er stofmængden i glasset nu?' kan blive 'Hvad er stofmængden i glas A, efter at der er hældt vand i?'."
+  },
+  {
+    "mappe": "sc6.2_formel_og_aktuel",
+    "titel": "Formel og aktuel koncentration",
+    "sprog": [
+      {
+        "fane": "1 Opløsningen",
+        "opgave": "5 Hvem er flest? (gættet)",
+        "fil": "js/data.js",
+        "linje": 177,
+        "nu_alm": "Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L.",
+        "nu_fed": "Hvilken ion bliver der flest af?",
+        "nu_svar": ["SO₄²⁻", "Al³⁺", "Lige mange"],
+        "problem": "Spørgsmålet siger ikke, at det handler om Al₂(SO₄)₃ opløst i vand.",
+        "nyt_alm": "Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L vand.",
+        "nyt_fed": "Hvilken ion bliver der flest af, når Al₂(SO₄)₃ opløses i vand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Ionerne",
+        "opgave": "Let: calciumchlorid, trin 1 (alle niveauer)",
+        "fil": "js/regning.js",
+        "linje": 227,
+        "nu_alm": "En opløsning af CaCl₂ har c(CaCl₂) = 0,240 M. Før ionernes aktuelle koncentrationer kan findes, skal opløsningsskemaet afstemmes. Opløsningsskemaet.",
+        "nu_fed": "Hvilke tal står foran ionerne?",
+        "nu_svar": [],
+        "problem": "Trinnavnet står som en løs sætning ('Opløsningsskemaet.'), og spørgsmålet siger ikke, hvilket skema og hvilke ioner.",
+        "nyt_alm": "En opløsning af CaCl₂ har c(CaCl₂) = 0,240 M. Før ionernes aktuelle koncentrationer kan findes, skal opløsningsskemaet afstemmes.",
+        "nyt_fed": "Hvilke tal står foran Ca²⁺ og Cl⁻ i opløsningsskemaet for CaCl₂?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Blandinger",
+        "opgave": "Alle fire opgaver (vist med 1 To salte i ét glas, trin 1)",
+        "fil": "js/data.js",
+        "linje": 220,
+        "nu_alm": "Du opløser 5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL vand. Hvad er [Cl⁻]? Stofmængden af CaCl₂.",
+        "nu_fed": "Hvilken formel giver n(CaCl₂)?",
+        "nu_svar": [],
+        "problem": "Kortet har to spørgsmål, og 'Hvad er [Cl⁻]?' står i almindelig skrift foran trinnavnet som løs sætning, så eleven ved ikke, hvilket spørgsmål der skal besvares.",
+        "nyt_alm": "Find [Cl⁻], når du opløser 5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL vand. Første trin er stofmængden af CaCl₂.",
+        "nyt_fed": "Hvilken formel giver n(CaCl₂)?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Opløsningen",
+        "billede": "skud/b/sc6.2_formel_og_aktuel__0.png",
+        "dom": "lidt meget",
+        "fremme": "kort, krukke med NaCl, glas med skala, tom lup med forklaring, søjlediagram med c(NaCl), [Na⁺], [Cl⁻] og en målstreg, panel med Beregningen",
+        "bruges": "krukken, glasset og søjlen for [Cl⁻]; eleven kan klikke, til søjlen rammer målstregen, uden at tænke på formlen",
+        "forslag": [
+          { "alm": "Krukken har natriumchlorid, NaCl, og glasset har 1,0 L vand.", "fed": "Hvilke ioner dannes, når NaCl opløses i vand?", "svar": ["Na⁺ og Cl⁻", "Na og Cl", "Na⁻ og Cl⁺"], "derefter": "Luppen dukker op med forklaringen Na⁺ og Cl⁻." },
+          { "alm": "Hver NaCl giver én Na⁺ og én Cl⁻.", "fed": "Hvor stor skal c(NaCl) være, når [Cl⁻] skal være 0,30 M?", "svar": ["0,30 M", "0,15 M", "0,60 M"], "derefter": "Søjlediagrammet dukker op med målstregen for [Cl⁻], og krukken låses op." }
+        ],
+        "andet": "Opgave 2 (To Na⁺) har allerede den samme slags spørgsmål efter forsøget. Første opgave er den, eleven møder først, og har ingen.",
+        "gevinst": "Eleven kobler formlen NaCl til ionerne, før søjlen kan fyldes op ved at klikke.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Ionerne",
+        "billede": "skud/b/sc6.2_formel_og_aktuel__1.png",
+        "dom": "lidt meget",
+        "fremme": "kort på tre linjer, tom lup, tavle med tal og tre regnelinjer, flaske med etiket, søjlediagram med c(CaCl₂), regnetrin med tre felter i panelet",
+        "bruges": "panelets skema og tavlen, der viser det samme; luppen, flasken og søjlerne for ionerne bruges først efter trin 1",
+        "forslag": [],
+        "andet": "Lad luppen og søjlerne for Ca²⁺ og Cl⁻ dukke op, når skemaet er afstemt. Fjern trinnavnet som løs sætning på kortet, så kortet bliver kortere.",
+        "gevinst": "Første trin handler kun om skemaet, og kortet er kortere.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Blandinger",
+        "billede": "skud/b/sc6.2_formel_og_aktuel__2.png",
+        "dom": "for meget",
+        "fremme": "kort med to spørgsmål, lup 'Glasset', tavle med fem taldata og syv regnelinjer, to vægte, bægerglas, syv regnefelter i panelet",
+        "bruges": "tavlens tal og første felt; de seks andre trin, luppen og vægtene bruges ikke i trin 1",
+        "forslag": [
+          { "alm": "Du opløser 5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL vand.", "fed": "Hvilke af saltene CaCl₂ og AlCl₃ giver Cl⁻ i glasset?", "svar": ["Begge salte", "Kun CaCl₂", "Kun AlCl₃"], "derefter": "Luppen 'Glasset' viser Ca²⁺, Al³⁺ og Cl⁻." },
+          { "alm": "CaCl₂ giver to Cl⁻, og AlCl₃ giver tre Cl⁻.", "fed": "Hvordan findes [Cl⁻] i glasset, når begge salte giver Cl⁻?", "svar": ["Bidragene lægges sammen", "Gennemsnittet af bidragene", "Kun det største bidrag tæller"], "derefter": "Regnetrinene dukker op i panelet og på tavlen med første trin åbent." }
+        ],
+        "andet": "Byt rækkefølgen, så fanen begynder med Samme rumfang (4 trin) og slutter med To salte i ét glas (7 trin fra masser). Vis kun de løste trin og det aktive i panelet og på tavlen, og saml resten i én linje som '6 trin mere'.",
+        "gevinst": "Eleven møder ikke en beregning i syv trin med to salte som det første på fanen og ved, hvorfor bidragene lægges sammen.",
+        "prioritet": 1
+      }
+    ],
+    "bemaerk": "Fane 1, To Na⁺, spørgsmål 3 'Hvad bliver [Na⁺]?' (data.js linje 153) står uden indledning og kunne hedde 'Hvad bliver [Na⁺] i glasset med Na₂SO₄?'. Fane 2 og 3: Formeltrinnet giver også en løs sætning ('Stofmængden af CaCl₂. Hvilken formel giver n(CaCl₂)?', regning.js linje 228); trinnavnet står allerede i chippen og i panelet. Indledningen på fane 2 og 3 går ikke gennem NK.Papir.tekst (fane.js linje 85), så et spørgsmål i indledningen bliver ikke halvfedt."
+  },
+  {
+    "mappe": "sc6.3_mohrtitrering",
+    "titel": "Salt i havvand",
+    "sprog": [
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "1 Mere vand",
+        "fil": "js/data.js",
+        "linje": 97,
+        "nu_alm": "Kolbe B får 60 mL demineraliseret vand i stedet for 20 mL.",
+        "nu_fed": "Hvordan bliver forbruget af sølv(I)nitrat i forhold til kolbe A?",
+        "nu_svar": ["Større", "Det samme", "Mindre"],
+        "problem": "Spørgsmålet siger ikke, hvad der er ændret ved kolbe B, og det samme spørgsmål går igen i fejlkilde 2.",
+        "nyt_alm": "Kolbe A får 20 mL demineraliseret vand som på fane 1.",
+        "nyt_fed": "Hvordan bliver forbruget af sølv(I)nitrat i kolbe B med 60 mL vand i forhold til kolbe A med 20 mL?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "3 Mindre havvand (masseprocenten)",
+        "fil": "js/data.js",
+        "linje": 117,
+        "nu_alm": "Masseprocenten for kolbe B beregnes med m(prøve) = 0,50 g.",
+        "nu_fed": "Hvordan bliver den i forhold til kolbe A?",
+        "nu_svar": ["Større", "Den samme", "Mindre"],
+        "problem": "\"den\" peger tilbage på masseprocenten, og de 0,50 g havvand står kun i indledningen.",
+        "nyt_alm": "Kolbe B har 0,50 g havvand, og der regnes med m(prøve) = 0,50 g.",
+        "nyt_fed": "Hvordan bliver masseprocenten for kolbe B med 0,50 g havvand i forhold til kolbe A med 1,00 g?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "4 Stærkere sølv(I)nitrat",
+        "fil": "js/data.js",
+        "linje": 127,
+        "nu_alm": "Buretten ved kolbe B indeholder 0,100 M sølv(I)nitrat i stedet for 0,050 M.",
+        "nu_fed": "Hvordan bliver forbruget i forhold til kolbe A?",
+        "nu_svar": ["Større", "Det samme", "Mindre"],
+        "problem": "Spørgsmålet siger hverken, hvad der forbruges, eller hvad der er ændret ved kolbe B.",
+        "nyt_alm": "Buretten ved kolbe B indeholder 0,100 M sølv(I)nitrat i stedet for 0,050 M.",
+        "nyt_fed": "Hvordan bliver forbruget i kolbe B med 0,100 M sølv(I)nitrat i forhold til kolbe A med 0,050 M?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "5 Postevand",
+        "fil": "js/data.js",
+        "linje": 137,
+        "nu_alm": "Kolbe B får 20 mL postevand i stedet for demineraliseret vand. Postevand indeholder lidt chlorid.",
+        "nu_fed": "Hvordan bliver masseprocenten?",
+        "nu_svar": ["For høj", "Korrekt", "For lav"],
+        "problem": "Spørgsmålet nævner hverken kolbe B eller postevandet.",
+        "nyt_alm": "Postevand indeholder lidt chlorid.",
+        "nyt_fed": "Hvordan bliver masseprocenten, når kolbe B får postevand i stedet for demineraliseret vand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "6 Spildt havvand",
+        "fil": "js/data.js",
+        "linje": 147,
+        "nu_alm": "Noget af havvandet til kolbe B bliver spildt efter vejningen.",
+        "nu_fed": "Hvordan bliver masseprocenten?",
+        "nu_svar": ["For høj", "Korrekt", "For lav"],
+        "problem": "Spørgsmålet nævner hverken kolbe B eller det spildte havvand.",
+        "nyt_alm": "Havvandet til kolbe B blev vejet, før noget af det blev spildt.",
+        "nyt_fed": "Hvordan bliver masseprocenten, når noget af havvandet til kolbe B spildes efter vejningen?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Titreringen",
+        "billede": "skud/b/sc6.3_mohrtitrering__0.png",
+        "dom": "lidt meget",
+        "fremme": "kort, burette i stativ med etiket, skyder med lukket, dryp og løb, knappen 1 dråbe, kolbe på omrører, stor lup med Cl⁻ og indikator og to tællere, havvandsflaske, menisken og en tom graf i panelet",
+        "bruges": "skyderen, knappen 1 dråbe og kolbens farve; luppen og grafen forklarer, men skal ikke bruges for at løse opgaven",
+        "forslag": [
+          { "alm": "Kolben har havvand med chlorid, Cl⁻. Buretten har sølv(I)nitrat med Ag⁺.", "fed": "Hvad sker der, når Ag⁺ fra buretten møder Cl⁻ i kolben?", "svar": ["Der fældes hvidt AgCl", "Kolben bliver lyserød", "Intet, begge er ioner"], "derefter": "Luppen dukker op med Cl⁻ og tælleren 'Chlorid tilbage: 8 af 8'." },
+          { "alm": "Indikatoren skifter farve, når alt chlorid er fældet.", "fed": "Hvornår skal hanen på buretten lukkes?", "svar": ["Når kolben bliver svagt lyserød", "Når kolben er kraftigt lyserød", "Når der kommer hvidt bundfald"], "derefter": "Skyderen og knappen 1 dråbe låses op. Grafen i panelet dukker op, når der løber sølv(I)nitrat ned." }
+        ],
+        "andet": "Farveordene skal følge den valgte indikator (D.O.svag og D.O.kraftig), så kaliumchromat giver rødbrun. Menisken i panelet kan vente til aflæsningen.",
+        "gevinst": "Eleven ved, hvornår hanen skal lukkes, før den kan åbnes, og ser luppen som svar på et spørgsmål i stedet for som støj.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Beregningen",
+        "billede": "skud/b/sc6.3_mohrtitrering__1.png",
+        "dom": "fint",
+        "fremme": "kort med felt, tavle med data, reaktionen og fire regnelinjer, målingen i panelet",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "billede": "skud/b/sc6.3_mohrtitrering__2.png",
+        "dom": "fint",
+        "fremme": "kort med tre svar, to ens opstillinger A og B med skilt, tabel i panelet",
+        "bruges": "kortet, skiltet og tabellens ændrede tal",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fejlkilde 2 (Mindre havvand, data.js linje 107) har samme halvfede spørgsmål som fejlkilde 1 og kunne hedde 'Hvordan bliver forbruget af sølv(I)nitrat i kolbe B med 0,50 g havvand i forhold til kolbe A?'. Skiltet under kolbe B viser ændringen, men det halvfede spørgsmål gør det ikke."
+  },
+  {
+    "mappe": "sc7.1_syrebasereaktioner",
+    "titel": "Syre-base-reaktioner",
+    "sprog": [
+      {
+        "fane": "1 Hydronen",
+        "opgave": "Reaktion 4 (NH₃ og H₂O)",
+        "fil": "js/data.js",
+        "linje": 145,
+        "nu_alm": "Ammoniak er en base. … Træk et H over på den anden partikel.",
+        "nu_fed": "Hvem er så syren?",
+        "nu_svar": [],
+        "problem": "\"så\" peger tilbage på indledningen, spørgsmålet nævner ikke vandet, og instruktionen står efter spørgsmålet.",
+        "nyt_alm": "Ammoniak er en base. Træk et H over på den anden partikel.",
+        "nyt_fed": "Hvilket molekyle er syren, når ammoniak reagerer med vand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Hydronen",
+        "opgave": "Reaktion 5 (HCl og NH₃)",
+        "fil": "js/data.js",
+        "linje": 148,
+        "nu_alm": "HCl og NH₃ reagerer uden vand. … Træk et H over på den anden partikel.",
+        "nu_fed": "Hvem afgiver en hydron, og hvem optager den?",
+        "nu_svar": [],
+        "problem": "To spørgsmål i ét, og \"den\" peger tilbage på hydronen.",
+        "nyt_alm": "HCl og NH₃ reagerer uden vand. Træk et H over på den anden partikel.",
+        "nyt_fed": "Hvilket af molekylerne HCl og NH₃ afgiver en hydron?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Hydronen",
+        "opgave": "Reaktion 6 (H₃O⁺ og OH⁻)",
+        "fil": "js/data.js",
+        "linje": 151,
+        "nu_alm": "H₃O⁺ og OH⁻ er to ioner. … Træk et H over på den anden partikel.",
+        "nu_fed": "Hvilken af dem kan afgive en hydron?",
+        "nu_svar": [],
+        "problem": "\"dem\" peger tilbage på ionerne i indledningen.",
+        "nyt_alm": "Træk et H over på den anden partikel.",
+        "nyt_fed": "Hvilken af ionerne H₃O⁺ og OH⁻ kan afgive en hydron?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Hydronen",
+        "opgave": "Reaktion 10 (HCO₃⁻ og OH⁻)",
+        "fil": "js/data.js",
+        "linje": 163,
+        "nu_alm": "Hydrogencarbonationen kan både afgive og optage en hydron. … Træk et H over på den anden partikel.",
+        "nu_fed": "Hvad gør HCO₃⁻ over for OH⁻?",
+        "nu_svar": [],
+        "problem": "Spørgsmålet er indirekte og siger ikke, at det handler om at afgive eller optage en hydron.",
+        "nyt_alm": "Hydrogencarbonationen kan både afgive og optage en hydron. Træk et H over på den anden partikel.",
+        "nyt_fed": "Afgiver eller optager HCO₃⁻ en hydron i reaktionen med OH⁻?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Produkterne",
+        "opgave": "Alle reaktioner",
+        "fil": "js/sim_produkter.js",
+        "linje": 306,
+        "nu_alm": "Træk de to produkter op på pladserne efter pilen.",
+        "nu_fed": "Hvad dannes?",
+        "nu_svar": ["Cl", "H₃O⁺", "Cl⁺", "Cl⁻", "H₃O", "H⁺", "H₂Cl⁺", "OH⁻"],
+        "problem": "Spørgsmålet siger ikke, hvilken reaktion det gælder, og instruktionen står efter spørgsmålet.",
+        "nyt_alm": "Træk to formler op på pladserne efter pilen.",
+        "nyt_fed": "Hvilke to produkter dannes, når H₂O og HCl reagerer?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Hydronen",
+        "billede": "skud/b/sc7.1_syrebasereaktioner__0.png",
+        "dom": "fint",
+        "fremme": "kort, to molekyler med frie elektronpar, stiplet pil fra H til O, reaktionsskema uden produkter",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Produkterne",
+        "billede": "skud/b/sc7.1_syrebasereaktioner__1.png",
+        "dom": "lidt meget",
+        "fremme": "kort, tavle med reaktanterne, to tomme pladser og otte formelbrikker, hvoraf seks er forkerte",
+        "bruges": "alt, men den svage elev skal vælge to af otte brikker uden at have tænkt over, hvem der afgiver hydronen",
+        "forslag": [
+          { "alm": "H₂O og HCl reagerer.", "fed": "Hvilket af stofferne H₂O og HCl afgiver en hydron?", "svar": ["HCl", "H₂O"], "derefter": "HCl får en farvet ramme som syren." },
+          { "alm": "HCl har afgivet en hydron.", "fed": "Hvad bliver HCl til, når HCl har afgivet en hydron?", "svar": ["Cl⁻", "Cl", "H₂Cl⁺"], "derefter": "Cl⁻ flyver op på den første plads efter pilen." },
+          { "alm": "H₂O har optaget hydronen fra HCl.", "fed": "Hvad bliver H₂O til, når H₂O har optaget en hydron?", "svar": ["H₃O⁺", "H₃O", "OH⁻"], "derefter": "H₃O⁺ flyver op på den anden plads. Fra næste reaktion bruges de otte brikker." }
+        ],
+        "andet": "Kun første reaktion på Let behøver trinnene. Fane 1 har allerede øvet den samme reaktion med et træk.",
+        "gevinst": "Eleven lærer at finde syren først og så produkterne ét ad gangen, i stedet for at prøve sig frem mellem otte brikker.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Parrene",
+        "billede": "skud/b/sc7.1_syrebasereaktioner__2.png",
+        "dom": "fint",
+        "fremme": "kort, tavle med reaktionen, fire tomme pladser og fire mærkater",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "På fane 1 sætter koden altid 'Træk et H over på den anden partikel.' efter teksten (sim_hydron.js linje 37 og 512), så instruktionen kommer efter spørgsmålet i reaktion 4, 5, 6 og 10. Forslagene flytter den foran spørgsmålet. På fane 2 er reaktanterne i forslaget fra skærmbilledet; koden sætter de aktuelle formler ind."
+  },
+  {
+    "mappe": "sc7.2_ph_skalaen",
+    "titel": "pH-skalaen",
+    "sprog": [
+      {
+        "fane": "3 Fortyndingen",
+        "opgave": "Mål 1",
+        "fil": "js/data.js",
+        "linje": 95,
+        "nu_alm": "Saltsyren har pH 1.",
+        "nu_fed": "Hvad bliver pH, når den fortyndes 10 gange?",
+        "nu_svar": ["pH 0,1", "pH 1,1", "pH 2", "pH 10"],
+        "problem": "\"den\" peger tilbage på saltsyren, og startværdien pH 1 står kun i indledningen.",
+        "nyt_alm": "Hvert nyt glas får 1 mL fra glasset før og 9 mL vand.",
+        "nyt_fed": "Hvad bliver pH, når saltsyre med pH 1 fortyndes 10 gange?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fortyndingen",
+        "opgave": "Mål 5",
+        "fil": "js/data.js",
+        "linje": 124,
+        "nu_alm": "Natriumhydroxiden har pH 13.",
+        "nu_fed": "Hvad bliver pH, når den fortyndes 1.000 gange?",
+        "nu_svar": ["pH 16", "pH 13", "pH 10", "pH 7"],
+        "problem": "\"den\" peger tilbage på natriumhydroxiden, og startværdien pH 13 står kun i indledningen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad bliver pH, når natriumhydroxid med pH 13 fortyndes 1.000 gange?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Luppen",
+        "opgave": "Mål 5",
+        "fil": "js/data.js",
+        "linje": 80,
+        "nu_alm": "Gå over på den basiske side til pH 12.",
+        "nu_fed": "Hvilken ion er der nu flest af i luppen?",
+        "nu_svar": [],
+        "problem": "\"nu\" peger tilbage på pH 12, og det halvfede spørgsmål bliver aldrig besvaret, fordi Indsend svar kun sender pH-mærkets plads.",
+        "nyt_alm": "Træk pH-mærket over på den basiske side til pH 12.",
+        "nyt_fed": "Hvilken ion er der flest af i luppen ved pH 12?",
+        "nyt_svar": ["OH⁻", "H₃O⁺", "Lige mange"],
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Skalaen",
+        "billede": "skud/b/sc7.2_ph_skalaen__0.png",
+        "dom": "fint",
+        "fremme": "kort, pH-skala med farver, seks hverdagsting på bordet med stiplet pil, pH-meter, tabel Gæt og målt i panelet",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Luppen",
+        "billede": "skud/b/sc7.2_ph_skalaen__1.png",
+        "dom": "lidt meget",
+        "fremme": "kort, pH-skala med mærke, bægerglas, stor lup med 20 ioner og tællere, panel med seks tal: pH, antal H₃O⁺ og OH⁻, [H₃O⁺] og [OH⁻] i potensnotation og luppens terning i nm",
+        "bruges": "pH-mærket og antallet af H₃O⁺ i luppen; koncentrationerne i potensnotation og luppens terning bruges ikke i mål 1-3",
+        "forslag": [],
+        "andet": "Fold [H₃O⁺], [OH⁻] og luppens terning ind bag 'Vis tallene', til mål 4. Mål 1-3 bruger kun antallet i luppen.",
+        "gevinst": "Den svage elev ser tællingen i luppen og ikke 1,0 · 10⁻⁷ M og 550 nm.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Fortyndingen",
+        "billede": "skud/b/sc7.2_ph_skalaen__2.png",
+        "dom": "lidt meget",
+        "fremme": "kort med fire svar, pH-skala, stor lup med 100 H₃O⁺ og teksten 'Zoomet 5 gange ind: rummet er 100.000 gange mindre', skilt om hvert nyt glas, flaske med saltsyre, flaske med natriumhydroxid, to knapper Fortynd 10 gange, panel med fire tal",
+        "bruges": "saltsyren, skalaen og skiltet; natriumhydroxiden og den højre knap bruges først i mål 5, og zoomteksten hjælper ikke med første spørgsmål",
+        "forslag": [
+          { "alm": "Hvert nyt glas får 1 mL fra glasset før og 9 mL vand.", "fed": "Hvordan ændres antallet af H₃O⁺ pr. mL, når saltsyren fortyndes 10 gange?", "svar": ["Ti gange færre", "Ti gange flere", "Det samme"], "derefter": "Luppen over saltsyren dukker op med de 100 H₃O⁺." },
+          { "alm": "Ét trin på pH-skalaen er en faktor 10.", "fed": "Hvad bliver pH, når saltsyre med pH 1 fortyndes 10 gange?", "svar": ["pH 2", "pH 1,1", "pH 0,1"], "derefter": "Knappen Fortynd 10 gange under saltsyren lyser op, så eleven kan se det." }
+        ],
+        "andet": "Flasken med natriumhydroxid og den højre knap kan stå som en stiplet ramme 'natriumhydroxid' til mål 5. Linjen 'Zoomet 5 gange ind: rummet er 100.000 gange mindre' kan vente, til luppen zoomer første gang.",
+        "gevinst": "Første spørgsmål bygger på én idé ad gangen (færre H₃O⁺, så ét trin på skalaen), og halvdelen af bordet er ikke i vejen.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Fane 2, mål 5 skal enten have svarknapper efter pH 12 (som mål 4 af slags 'valg'), eller spørgsmålet skal blive en instruktion. Fane 2, mål 3 'Gå til pH 2. Tæl, hvor mange gange luppen zoomer ind.' beder om en tælling, som ingen spørger efter bagefter. Svaret står kun i forklaringen."
+  }
+]

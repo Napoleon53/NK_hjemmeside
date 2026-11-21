@@ -1,16 +1,22 @@
 /* =====================================================================
    sim_regn.js - fane 3: Beregningen
 
-   Otte regnestykker i Let, Middel og Svaer. Regnestykket staar paa
-   tavlen i scenen, og felterne er paa tavlen, hvor oejnene er:
+   Otte regnestykker i Let, Middel og Svaer. Regelsaettet (21. nov. 2026)
+   og moenstret fra Beregningen i sc5.7:
 
-     1. Formlen: eleven vaelger formens skabelon under tavlen og
-        skriver eller klikker et bogstav i hvert felt.
-     2. Tallene ind: et felt for hvert bogstav. Tallene under tavlen
-        kan klikkes ind.
-     3. Resultatet med enhed (A har ingen, og ε's enhed staar fast).
+     * Til venstre maaleopstillingen: lampen, kuvetten og detektoren med
+       opgavens tal paa etiketterne (stoffet og c paa kuvetten, l under
+       den, A i displayet, ε, hældningen, rumfanget og molarmassen paa smaa
+       kort). Det, der spoerges om, staar som "?" med gul ramme.
+     * Kortet stiller spoergsmaalet. Hver del har to trin: formlen vaelges
+       med tre knapper (den rigtige og to typiske fejl med hver sin
+       forklaring), og tallet skrives i et felt paa kortet med enheden
+       efter feltet.
+     * Til hoejre tavlen som et lyst papir. Den er tom, til formlen er
+       fundet, og vokser saa linje for linje: et navn i ord og regnestykket
+       med tallene sat ind. Linjen, kortet spoerger om, har "?" og gul
+       ramme.
 
-   Et trin, der er loest, klappes sammen til én linje med ✓.
    Facit, tjek og hint er i js/regning.js.
    ===================================================================== */
 (function () {
@@ -19,13 +25,29 @@
     var NK = window.NK;
     var D = NK.Data;
     var R = NK.Regn;
+    var Tg = NK.Tegn;
 
     function SimRegn() {
         var mig = this;
+        this.laerred = new NK.Laerred(NK.el("regn-laerred"));
         this.tavle = NK.el("regn-tavle");
-        this.trinEl = NK.el("regn-trin");
+        this.resTekst = "";
         this.startFane(D.REGN, D.GRUPPER_REGN);
-        this.bygSkabeloner();
+        /* Feltet til tallet ligger paa kortet, som tegnes om: lyt paa kortet */
+        this.el.ind.addEventListener("input", function (e) {
+            if (e.target.id !== "regn-felt") return;
+            mig.resTekst = e.target.value;
+            e.target.classList.remove("fejl");
+            if (mig.fast.klasse === "skidt" || mig.fast.klasse === "hint") mig.besked("", "");
+            mig.nulstilHjaelp();
+            mig.visIndsend();
+        });
+        this.el.ind.addEventListener("keydown", function (e) {
+            if (e.target.id !== "regn-felt" || e.key !== "Enter") return;
+            e.preventDefault();
+            mig.enter();
+        });
+        this.laerred.canvas.addEventListener("click", function () { mig.klikScene(); });
         window.addEventListener("resize", function () { if (NK.el("fane-regn").classList.contains("aktiv")) mig.tilpas(); });
         var foerste = this.status.map(function (s) { return s.loest; }).indexOf(false);
         this.vaelg(foerste >= 0 ? foerste : 0);
@@ -42,473 +64,11 @@
         var o = this.opgaver[i];
         R.vaerdier(o);
         this.k = 0;
-        this.fokusInput = null;
+        this.resTekst = "";
         this.ts = o.trin.map(function (id, j) {
-            return { id: id, status: j === 0 ? "aktiv" : "laast", fase: "formel", sk: null,
-                bogst: ["", "", ""], bogstL: null, tal: ["", "", ""], talOk: [false, false, false], talTekst: [null, null, null],
-                res: "", vist: false };
+            return { id: id, status: j === 0 ? "aktiv" : "laast", fase: "formel", formelOk: false, vistFormel: false };
         });
-        var s = D.STOFFER[o.stof];
-        NK.saetTekst("regn-navn", s.Navn + ", " + s.formel);
-        this.bygTal();
-        this.bygBogstaver();
-        this.render();
-    };
-
-    /* Opgavens tal oeverst paa tavlen */
-    P.bygTal = function () {
-        var o = this.opg(), V = R.vaerdier(o);
-        var html = '<span class="ot-etiket">Opgavens tal</span>';
-        Object.keys(o.tal).forEach(function (b) {
-            var t = R.vis(b) + " = " + R.talMedEnhed(b, V.tal[b].tekst);
-            if (b === "V") t += " (" + NK.dk(V.tal.V.v * 1000, 0) + " mL)";
-            html += '<span class="ot-tal">' + NK.html(t) + "</span>";
-        });
-        NK.el("regn-tal").innerHTML = html;
-    };
-
-    P.bygSkabeloner = function () {
-        var mig = this, rad = NK.el("regn-skabeloner");
-        rad.innerHTML = "";
-        var VIS = {
-            "**": "□ · □",
-            "***": "□ · □ · □",
-            "/": '<span class="vbroek"><span>□</span><span>□</span></span>',
-            "/**": '<span class="vbroek"><span>□</span><span>□ · □</span></span>'
-        };
-        D.SKABELONER.forEach(function (sk) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "brik skabelon";
-            b.setAttribute("data-sk", sk);
-            b.setAttribute("aria-label", "Formen " + R.SK_NAVN[sk]);
-            b.innerHTML = VIS[sk];
-            b.addEventListener("click", function () { mig.vaelgSkabelon(sk); });
-            rad.appendChild(b);
-        });
-    };
-
-    P.bygBogstaver = function () {
-        var mig = this, rad = NK.el("regn-bogstaver");
-        rad.innerHTML = "";
-        R.knapBogstaver(this.opg()).forEach(function (b) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "brik bogstav";
-            k.textContent = R.vis(b);
-            k.title = D.BOGSTAV[b].navn;
-            k.addEventListener("mousedown", function (e) { e.preventDefault(); });
-            k.addEventListener("click", function () { mig.indsaet(R.vis(b), "formel"); });
-            rad.appendChild(k);
-        });
-    };
-
-    /* Tallene under tavlen i fasen "tallene ind" */
-    P.bygTalKnapper = function () {
-        var mig = this, o = this.opg(), V = R.vaerdier(o), rad = NK.el("regn-tallene");
-        rad.innerHTML = "";
-        var bogst = Object.keys(V.tal).filter(function (b) {
-            if (V.tal[b].givet) return true;
-            /* Et resultat fra et tidligere trin */
-            for (var j = 0; j < mig.k; j++) if (D.TRIN[o.trin[j]].maal === b) return true;
-            return false;
-        });
-        bogst.forEach(function (b) {
-            var k = document.createElement("button");
-            k.type = "button";
-            k.className = "brik talbrik";
-            var tekst = R.talMedEnhed(b, V.tal[b].tekst);
-            k.innerHTML = '<span class="tb-b">' + NK.html(R.vis(b)) + " =&nbsp;</span>" + NK.html(tekst);
-            k.addEventListener("mousedown", function (e) { e.preventDefault(); });
-            k.addEventListener("click", function () { mig.indsaet(tekst, "tal"); });
-            rad.appendChild(k);
-        });
-    };
-
-    /* ----- Tavlen ------------------------------------------------------------------------- */
-    function el(tag, klasse, html) {
-        var e = document.createElement(tag);
-        if (klasse) e.className = klasse;
-        if (html !== undefined) e.innerHTML = html;
-        return e;
-    }
-
-    function trinbar(st) {
-        var nu = st.fase === "formel" ? 0 : (st.fase === "tal" ? 1 : 2);
-        var html = '<ol class="trinbar" aria-label="Regnestykkets tre trin">';
-        D.TRINBAR.forEach(function (navn, j) {
-            var klasse = "tb-trin", nr = String(j + 1);
-            if (j < nu) { klasse += " ok"; nr = "✓"; }
-            else if (j === nu) klasse += " nu";
-            if (j > 0) html += '<li class="tb-pil" aria-hidden="true">›</li>';
-            html += '<li class="' + klasse + '"><span class="tb-nr">' + nr + '</span><span class="tb-navn">' + NK.html(navn) + "</span></li>";
-        });
-        return html + "</ol>";
-    }
-
-    /* Felterne i en skabelon. lav(j) giver felt j. */
-    function struktur(sk, lav) {
-        function tegn() { return el("span", "bf-gange", "·"); }
-        var krop = el("div", "bf-krop");
-        if (sk === "**" || sk === "***") {
-            krop.appendChild(lav(0));
-            krop.appendChild(tegn());
-            krop.appendChild(lav(1));
-            if (sk === "***") { krop.appendChild(tegn()); krop.appendChild(lav(2)); }
-            return krop;
-        }
-        var b = el("div", "bf-broek");
-        var top = el("div", "bf-top");
-        top.appendChild(lav(0));
-        b.appendChild(top);
-        b.appendChild(el("div", "bf-streg"));
-        var bund = el("div", "bf-top");
-        bund.appendChild(lav(1));
-        if (sk === "/**") { bund.appendChild(tegn()); bund.appendChild(lav(2)); }
-        b.appendChild(bund);
-        krop.appendChild(b);
-        return krop;
-    }
-
-    P.render = function () {
-        var mig = this, o = this.opg(), n = this.ts.length;
-        this.trinEl.innerHTML = "";
-        this.felter = [];
-        this.ts.forEach(function (st, i) {
-            var t = D.TRIN[st.id];
-            var blok = el("div", "rb " + st.status);
-            if (n > 1) blok.appendChild(el("div", "rb-hoved", "Del " + (i + 1) + " af " + n + ": " + NK.html(t.navn)));
-            if (st.status === "laast") {
-                blok.appendChild(el("div", "rb-linje", R.vis(t.maal) + " = ?"));
-                mig.trinEl.appendChild(blok);
-                return;
-            }
-            if (st.status === "ok" || st.status === "svar") {
-                blok.appendChild(el("div", "rb-linje", R.linjeHTML(o, i, st.bogstL, st.talTekst) +
-                    ' <span class="rs-maerke' + (st.status === "svar" ? " svar" : "") + '">' + (st.status === "svar" ? "↩" : "✓") + "</span>"));
-                mig.trinEl.appendChild(blok);
-                return;
-            }
-            blok.insertAdjacentHTML("beforeend", trinbar(st));
-            var g = el("div", "regnestykke");
-            function linje(venstre, hoejre) {
-                g.appendChild(el("span", "rs-v", venstre));
-                g.appendChild(el("span", "rs-lig", "="));
-                var h = el("div", "rs-h");
-                if (typeof hoejre === "string") h.innerHTML = hoejre; else h.appendChild(hoejre);
-                g.appendChild(h);
-                return h;
-            }
-            /* 1. Formlen */
-            if (st.fase === "formel") linje(R.vis(t.maal), mig.formelFelter(st));
-            else linje(R.vis(t.maal), '<span class="rs-vist">' + R.formelHTML(st.id, st.bogstL) + '</span><span class="rs-maerke' + (st.vistFormel ? " svar" : "") + '">' + (st.vistFormel ? "↩" : "✓") + "</span>");
-            /* 2. Tallene */
-            if (st.fase === "tal") linje("", mig.talFelter(st));
-            else if (st.fase === "res") linje("", '<span class="rs-vist">' + R.talHTML(o, i, st.bogstL, st.talTekst) + '</span><span class="rs-maerke' + (st.vistTal ? " svar" : "") + '">' + (st.vistTal ? "↩" : "✓") + "</span>");
-            /* 3. Resultatet */
-            if (st.fase === "res") linje("", mig.resFelt(st));
-            blok.appendChild(g);
-            mig.trinEl.appendChild(blok);
-        });
-
-        /* Bakken under tavlen: formens skabeloner og bogstaverne, tallene eller intet */
-        var st = this.aktivt();
-        var fase = st && !this.faerdig ? st.fase : "";
-        NK.el("regn-bk-form").hidden = fase !== "formel";
-        NK.el("regn-bk-bogst").hidden = fase !== "formel";
-        NK.el("regn-bk-tal").hidden = fase !== "tal";
-        NK.el("regn-bk-lommeregner").hidden = fase !== "res";
-        NK.el("regn-bakke").hidden = !fase;
-        if (fase === "tal") this.bygTalKnapper();
-        var sks = NK.el("regn-skabeloner").querySelectorAll(".skabelon");
-        Array.prototype.forEach.call(sks, function (b) { b.classList.toggle("valgt", !!st && b.getAttribute("data-sk") === st.sk); });
-
-        var stempel = NK.el("regn-stempel");
-        stempel.hidden = !this.faerdig;
-        stempel.textContent = this.brugtSvarNogen ? "Vist" : "Løst ✓";
-        stempel.className = "tv-stempel" + (this.brugtSvarNogen ? " gul" : "");
-        this.tavle.classList.toggle("faerdig", this.faerdig && !this.brugtSvarNogen);
-        this.tavle.classList.toggle("vist", this.faerdig && !!this.brugtSvarNogen);
-        this.visHintLys();
-        if (this.el && this.el.indsend) this.visIndsend();
-        this.tilpas();
-    };
-
-    P.nytInput = function (klasse, vaerdi, etiket, onInput, i) {
-        var mig = this;
-        var inp = document.createElement("input");
-        inp.type = "text";
-        inp.className = klasse;
-        inp.autocomplete = "off";
-        inp.spellcheck = false;
-        inp.value = vaerdi || "";
-        inp.setAttribute("aria-label", etiket);
-        inp.addEventListener("focus", function () { mig.fokusInput = inp; });
-        inp.addEventListener("input", function () { onInput(inp.value); inp.classList.remove("fejl"); mig.visIndsend(); });
-        inp.addEventListener("keydown", function (e) {
-            if (e.key !== "Enter") return;
-            e.preventDefault();
-            /* Enter i et felt: videre til det naeste tomme, ellers Indsend svar
-               (eller Naeste, naar kortet viser den) */
-            var tomt = mig.felter.filter(function (f) { return f !== inp && !f.value.trim(); })[0];
-            if (!mig.slutNu() && tomt && inp.value.trim() && klasse.indexOf("rs-in") < 0) { tomt.focus(); return; }
-            mig.enter();
-        });
-        if (i !== undefined) inp.setAttribute("data-i", i);
-        this.felter.push(inp);
-        return inp;
-    };
-
-    P.formelFelter = function (st) {
-        var mig = this, omr = el("div", "rs-felter");
-        if (!st.sk) {
-            omr.appendChild(el("span", "rs-vaelg", "Vælg formens form under tavlen"));
-            return omr;
-        }
-        omr.appendChild(struktur(st.sk, function (j) {
-            var d = el("div", "bf-del");
-            d.appendChild(mig.nytInput("bf-in bogstav", st.bogst[j], "Bogstav " + (j + 1), function (v) { st.bogst[j] = v; }, j));
-            return d;
-        }));
-        return omr;
-    };
-
-    P.talFelter = function (st) {
-        var mig = this, omr = el("div", "rs-felter");
-        omr.appendChild(struktur(st.sk, function (j) {
-            var d = el("div", "bf-del");
-            if (st.talOk[j]) {
-                d.className = "bf-del ok";
-                d.innerHTML = '<span class="bf-tekst">' + NK.html(st.talTekst[j]) + "</span>";
-                return d;
-            }
-            var b = st.bogstL[j];
-            var inp = mig.nytInput("bf-in tal", st.tal[j], "Tallet for " + R.vis(b), function (v) { st.tal[j] = v; }, j);
-            inp.placeholder = R.vis(b);
-            d.appendChild(inp);
-            return d;
-        }));
-        return omr;
-    };
-
-    P.resFelt = function (st) {
-        var omr = el("div", "rs-felter");
-        var b = D.TRIN[st.id].maal;
-        var inp = this.nytInput("rs-in", st.res, "Resultatet", function (v) { st.res = v; });
-        inp.placeholder = b === "A" ? "uden enhed" : (b === "eps" ? "tallet" : "tal og enhed");
-        omr.appendChild(inp);
-        if (b === "eps") omr.appendChild(el("span", "rs-enhed", "mM⁻¹·cm⁻¹"));
-        return omr;
-    };
-
-    /* ----- Bakken: skabelon, bogstav eller tal ind i et felt ------------------------------- */
-    P.vaelgSkabelon = function (sk) {
-        var st = this.aktivt();
-        if (!st || st.fase !== "formel" || this.faerdig) return;
-        if (this.spaer()) return;
-        st.sk = sk;
-        this.render();
-        this.naesteLinje("", "");
-        this.fokusFelt();
-    };
-
-    P.indsaet = function (tekst, fase) {
-        var st = this.aktivt();
-        if (!st || this.faerdig) return;
-        if (this.spaer()) return;
-        if (st.fase !== fase) return;
-        if (fase === "formel" && !st.sk) {
-            this.kortBesked("Vælg først formens form, og derefter kommer der felter til bogstaverne.", 4);
-            return;
-        }
-        var inp = this.fokusInput && this.felter.indexOf(this.fokusInput) >= 0 && !this.fokusInput.value.trim() ? this.fokusInput : null;
-        if (!inp) inp = this.felter.filter(function (f) { return !f.value.trim() && f.classList.contains(fase === "formel" ? "bogstav" : "tal"); })[0];
-        if (!inp) inp = this.fokusInput && this.felter.indexOf(this.fokusInput) >= 0 ? this.fokusInput : null;
-        if (!inp) return;
-        inp.value = tekst;
-        inp.dispatchEvent(new Event("input"));
-        var tomt = this.felter.filter(function (f) { return !f.value.trim() && f.classList.contains(fase === "formel" ? "bogstav" : "tal"); })[0];
-        (tomt || inp).focus();
-    };
-
-    /* ----- Tjek --------------------------------------------------------------------------- */
-    P.tjek = function () {
-        var st = this.aktivt();
-        if (!st || this.faerdig) return;
-        var o = this.opg();
-        if (st.fase === "formel") {
-            if (!st.sk) { this.besked("Vælg først formens form under tavlen, og derefter kommer der felter til bogstaverne.", "hint"); return; }
-            var bogst = st.bogst.slice(0, R.ANTAL[st.sk]).map(function (b) { return R.bogstav(b, o); });
-            var svar = R.tjekFormel(st.id, st.sk, bogst);
-            if (svar.ok) {
-                st.bogstL = bogst;
-                this.videre("Rigtig formel: " + R.vis(D.TRIN[st.id].maal) + " = " + R.formelHTML(st.id, bogst) + ".", function () { st.fase = "tal"; });
-                return;
-            }
-            this.fejlFelt(svar, svar.felt);
-            return;
-        }
-        if (st.fase === "tal") {
-            var n = R.ANTAL[st.sk], forste = null, nogen = false;
-            for (var j = 0; j < n; j++) {
-                if (st.talOk[j]) continue;
-                var s = R.tjekTal(o, st.bogstL[j], st.tal[j]);
-                if (s.ok) { st.talOk[j] = true; st.talTekst[j] = s.tekst; nogen = true; }
-                else if (!forste) forste = { svar: s, j: j };
-            }
-            if (!forste) {
-                this.videre("Rigtigt. Tallene står på deres plads.", function () { st.fase = "res"; });
-                return;
-            }
-            if (nogen) this.render();
-            this.fejlFelt(forste.svar, forste.j);
-            return;
-        }
-        var r = R.tjekRes(o, this.k, st.res);
-        if (r.ok) { this.trinLoest("ok"); return; }
-        this.fejlFelt(r, 0);
-    };
-
-    P.fejlFelt = function (svar, j) {
-        if (svar.tom) this.besked(svar.besked, "hint");
-        else this.fejlLinje(svar.besked);
-        var inp = j !== undefined ? this.felter.filter(function (f) { return f.getAttribute("data-i") === String(j); })[0] : null;
-        if (!inp) inp = this.felter[0];
-        if (inp && !svar.tom) {
-            inp.classList.remove("fejl");
-            void inp.offsetWidth;
-            inp.classList.add("fejl");
-        }
-        if (inp) inp.focus();
-    };
-
-    /* Et skridt i trinnet er rigtigt: kortet bliver paa skridtet med Naeste
-       (gult, naar svaret blev vist). fn foerer til naeste skridt. */
-    P.videre = function (html, fn) {
-        this.hjaelp = 0;
-        this.hintLys = null;
-        this.render();
-        this.mellem(html, function () { fn.call(this); this.render(); this.fokusFelt(); });
-    };
-
-    P.trinLoest = function (maade) {
-        var st = this.aktivt(), o = this.opg();
-        st.status = maade;
-        if (maade === "svar") this.brugtSvarNogen = true;
-        st.res = R.facitTekst(o, this.k);
-        this.k++;
-        if (this.k < this.ts.length) {
-            var k = this.k;
-            this.k--;
-            var mig = this;
-            this.videre(R.vis(D.TRIN[st.id].maal) + " = " + NK.html(R.facitTekst(o, k - 1)) + ".", function () {
-                mig.k = k;
-                mig.ts[k].status = "aktiv";
-            });
-            return;
-        }
-        var sidst = this.ts.length - 1;
-        var tekst = R.vis(D.TRIN[o.trin[sidst]].maal) + " = " + NK.html(R.facitTekst(o, sidst)) + ".";
-        this.render();
-        this.loest(this.brugtSvarNogen ? "svar" : "ok", tekst, this.brugtSvarNogen ? "Svaret" : "Løst ✓");
-        this.render();
-    };
-
-    /* ----- Papirkortet -------------------------------------------------------------------- */
-    P.spm = function () {
-        var o = this.opg(), m = /Beregn[^.]*\./.exec(o.tekst);
-        return m ? m[0] : o.navn + ".";
-    };
-
-    P.kortData = function () {
-        var tekst = "<b>" + NK.html(this.spm()) + "</b>";
-        if (this.faerdig) return { tekst: tekst, html: true };
-        return { tekst: tekst + " " + this.trinLinje(), html: true };
-    };
-
-    /* Indsend svar er graa, til der staar noget i det, der skal tjekkes */
-    P.kanIndsende = function () {
-        var st = this.aktivt();
-        if (!st || this.faerdig) return false;
-        if (st.fase === "formel") return !!st.sk && st.bogst.slice(0, R.ANTAL[st.sk]).some(function (b) { return String(b || "").trim(); });
-        if (st.fase === "tal") return st.tal.some(function (t, j) { return !st.talOk[j] && String(t || "").trim(); });
-        return !!String(st.res || "").trim();
-    };
-
-    P.indsend = function () { this.tjek(); };
-
-    /* ----- Panelet og linjen ------------------------------------------------------------------ */
-    P.promptHTML = function () {
-        var o = this.opg();
-        var html = '<p class="note-tekst">' + NK.html(o.tekst.replace(this.spm(), "").trim()) + "</p>";
-        if (this.faerdig) {
-            html += '<div class="forklaring">';
-            this.ts.forEach(function (st, i) { html += '<p class="fk-linje">' + R.linjeHTML(o, i, st.bogstL, st.talTekst) + "</p>"; });
-            html += "</div>";
-        }
-        return html;
-    };
-
-    P.trinLinje = function () {
-        var st = this.aktivt();
-        if (!st) return "";
-        var t = D.TRIN[st.id], n = this.ts.length, b = t.maal;
-        var foer = n > 1 ? "Del " + (this.k + 1) + " af " + n + ": " + NK.html(t.navn.toLowerCase()) + ". " : "";
-        var hvad;
-        if (st.fase === "formel") {
-            hvad = st.sk ? "Skriv bogstaverne i formlen for " + R.vis(b) + ". Klik i et felt og så på et bogstav under tavlen, eller skriv det." :
-                "Find formlen for " + R.vis(b) + ". Vælg først formens form under tavlen. Tallene kommer i næste trin.";
-        } else if (st.fase === "tal") {
-            hvad = "Sæt tallene ind i stedet for bogstaverne. Klik på et tal under tavlen, eller skriv det.";
-        } else {
-            hvad = b === "A" ? "Regn resultatet ud på lommeregneren. A har ingen enhed." :
-                (b === "eps" ? "Regn resultatet ud på lommeregneren, og skriv tallet. Enheden står efter feltet." :
-                    "Regn resultatet ud på lommeregneren, og skriv det med enhed.");
-        }
-        return foer + hvad;
-    };
-
-    /* ----- Hint og svar ------------------------------------------------------------------- */
-    P.hintTrin = function () {
-        var st = this.aktivt();
-        if (!st || this.faerdig) return null;
-        var o = this.opg();
-        if (st.fase === "formel") return { trin: R.formelHint(st.id), lys: "form" };
-        if (st.fase === "tal") return { trin: R.talHint(o, this.k, st.bogstL, st.talOk), lys: "tal" };
-        return { trin: R.resHint(o, this.k), lys: null };
-    };
-
-    P.visHintLys = function () {
-        var lys = this.faerdig ? null : this.hintLys;
-        NK.el("regn-bk-form").classList.toggle("lys", lys === "form");
-        NK.el("regn-bk-tal").classList.toggle("lys", lys === "tal");
-    };
-
-    P.visSvar = function () {
-        var st = this.aktivt();
-        if (!st) return;
-        var o = this.opg(), t = D.TRIN[st.id];
-        if (st.fase === "formel") {
-            st.sk = t.form;
-            st.bogstL = R.facitBogstaver(st.id);
-            st.bogst = st.bogstL.map(R.vis);
-            st.vistFormel = true;
-            this.brugtSvarNogen = true;
-            this.videre("Formlen er " + R.vis(t.maal) + " = " + R.formelHTML(st.id) + ".", function () { st.fase = "tal"; });
-            return;
-        }
-        if (st.fase === "tal") {
-            var V = R.vaerdier(o);
-            st.bogstL.forEach(function (b, j) {
-                st.talOk[j] = true;
-                st.talTekst[j] = R.talMedEnhed(b, V.tal[b].tekst);
-            });
-            st.vistTal = true;
-            this.brugtSvarNogen = true;
-            this.videre("Tallene: " + R.vis(t.maal) + " = " + R.talHTML(o, this.k, st.bogstL, st.talTekst) + ".", function () { st.fase = "res"; });
-            return;
-        }
-        this.trinLoest("svar");
+        this.visTavle();
     };
 
     /* Ved en ny opgave er intet svar vist endnu */
@@ -518,27 +78,326 @@
         this.faneVaelg(i);
     };
 
+    /* ----- Tekster ----------------------------------------------------------------------- */
+    P.stof = function () { return D.STOFFER[this.opg().stof]; };
+
+    /* Indledningen paa kortet (runde 3, regel 5a): kun naar spoergsmaalet
+       ellers bliver for langt (ind i D.REGN). Tallene staar paa etiketterne
+       i scenen. */
+    P.indledning = function () {
+        return this.opg().ind || "";
+    };
+
+    /* Navnet paa linjen paa tavlen og paa kortet over et ukendt tal */
+    P.navnPaa = function (b) {
+        var f = this.stof().formel;
+        if (b === "A") return "Absorbansen";
+        if (b === "c") return "Koncentrationen af " + f;
+        if (b === "eps") return "ε for " + f + " ved " + this.stof().lambda + " nm";
+        if (b === "a") return "Hældningen af standardkurven";
+        if (b === "V") return "Prøvens rumfang";
+        if (b === "M") return "Molarmassen af " + f;
+        if (b === "n") return "Stofmængden af " + f;
+        if (b === "m") return "Massen af " + f;
+        if (b === "l") return "Kuvettens bredde";
+        return b;
+    };
+
+    /* Chippen: niveauet og nummeret paa niveauet */
+    P.chipTekst = function () {
+        var o = this.opg(), g = D.GRUPPER_REGN.filter(function (x) { return x.id === o.gruppe; })[0];
+        var paa = this.opgaver.filter(function (x) { return x.gruppe === o.gruppe; });
+        var nr = paa.indexOf(o) + 1;
+        return g.titel + " " + nr + " af " + paa.length;
+    };
+
+    P.trinTekst = function () {
+        var n = this.ts.length * 2, st = this.aktivt();
+        if (!st) return "";
+        return "Trin " + (this.k * 2 + (st.fase === "tal" ? 2 : 1)) + " af " + n;
+    };
+
+    P.feltHTML = function (laast) {
+        var st = this.aktivt(), b = D.TRIN[st.id].maal, e = R.enhed(b);
+        return '<div class="sk-felt"><label for="regn-felt">' + NK.html(R.vis(b)) + ' =</label><input id="regn-felt" type="text" autocomplete="off" spellcheck="false" inputmode="decimal" placeholder="tallet"' +
+            ' value="' + NK.html(this.resTekst).replace(/"/g, "&quot;") + '"' + (laast ? " disabled" : "") + ">" +
+            (e ? '<span class="sk-enhed">' + NK.html(e) + "</span>" : "") + "</div>";
+    };
+
+    /* ----- Papirkortet -------------------------------------------------------------------- */
+    P.kortData = function () {
+        var o = this.opg(), st = this.aktivt();
+        if (!st) return { tekst: o.spm[0] };
+        var t = D.TRIN[st.id], navn = D.BOGSTAV[t.maal].navn;
+        var tekst = (this.indledning() ? this.indledning() + " " : "") + o.spm[this.k];
+        var d = { chip: this.chipTekst(), trinTekst: this.trinTekst() };
+        if (st.fase === "formel") {
+            d.tekst = tekst + " Vælg formlen for " + navn + ".";
+            d.svar = t.valg.map(function (v) { return { t: v.f }; });
+            d.formler = true;
+            return d;
+        }
+        d.tekst = tekst + " Regn " + navn + " ud på lommeregneren, og skriv tallet.";
+        d.ekstra = this.feltHTML(this.faerdig || !!this.venter);
+        return d;
+    };
+
+    /* Kortet er tegnet om: feltet faar sit tal og fokus igen */
+    P.efterKort = function () {
+        var f = NK.el("regn-felt");
+        if (f && !f.disabled) this.fokusFelt();
+    };
+
+    P.kanIndsende = function () {
+        var st = this.aktivt();
+        if (!st || this.faerdig) return false;
+        if (st.fase === "tal") return !!String(this.resTekst || "").trim();
+        return false;
+    };
+
+    function rigtigIndeks(liste) {
+        for (var k = 0; k < liste.length; k++) if (liste[k].ok) return k;
+        return 0;
+    }
+
+    /* Formlen: et svar paa kortet */
+    P.svarValgt = function (j) {
+        var st = this.aktivt();
+        if (!st || st.fase !== "formel") return;
+        var t = D.TRIN[st.id];
+        if (j === rigtigIndeks(t.valg)) { this.formelRigtig(); return; }
+        this.forkertValg(j, NK.html(t.valg[j].hvorfor));
+    };
+
+    P.formelRigtig = function () {
+        var st = this.aktivt(), t = D.TRIN[st.id], k = rigtigIndeks(t.valg), mig = this;
+        st.formelOk = true;
+        this.valgt = k;
+        this.visTavle();
+        this.mellem("Formlen er " + NK.html(t.valg[k].f) + ". Tavlen viser den med tallene sat ind.", function () {
+            st.fase = "tal";
+            mig.resTekst = "";
+            mig.visTavle();
+        }, k);
+    };
+
+    /* Tallet: Indsend svar. Enheden staar efter feltet og laegges til, hvis
+       eleven kun har skrevet tallet. */
+    P.indsend = function () {
+        var st = this.aktivt();
+        if (!st || st.fase !== "tal" || this.faerdig) return;
+        var o = this.opg(), b = D.TRIN[st.id].maal, raa = String(this.resTekst || "").trim();
+        var e = R.enhed(b);
+        if (raa && e && b !== "eps" && !/[a-zA-Zµμ]/.test(raa)) raa += " " + e;
+        var r = R.tjekRes(o, this.k, raa);
+        if (r.ok) { this.delLoest("ok"); return; }
+        if (r.tom) this.besked(r.besked, "hint");
+        else this.fejlLinje(r.besked);
+        var f = NK.el("regn-felt");
+        if (f && !r.tom) { f.classList.remove("fejl"); void f.offsetWidth; f.classList.add("fejl"); }
+        this.fokusFelt();
+    };
+
+    P.delLoest = function (maade) {
+        var st = this.aktivt(), o = this.opg(), mig = this;
+        st.status = maade;
+        if (maade === "svar") this.brugtSvarNogen = true;
+        var b = D.TRIN[st.id].maal;
+        var tekst = NK.html(R.vis(b) + " = " + R.facitTekst(o, this.k) + ".");
+        this.visTavle();
+        if (this.k < this.ts.length - 1) {
+            this.mellem(tekst, function () {
+                mig.k++;
+                mig.ts[mig.k].status = "aktiv";
+                mig.resTekst = "";
+                mig.visTavle();
+            }, null);
+            return;
+        }
+        this.loest(this.brugtSvarNogen ? "svar" : "ok", tekst, this.brugtSvarNogen ? "Svaret" : "Rigtigt");
+        this.visTavle();
+    };
+
+    /* ----- Hint og svar ------------------------------------------------------------------- */
+    P.hintTrin = function () {
+        var st = this.aktivt();
+        if (!st || this.faerdig) return null;
+        if (st.fase === "formel") return { trin: R.formelHint(st.id), lys: null };
+        return { trin: R.resHint(this.opg(), this.k), lys: null };
+    };
+
+    P.visSvar = function () {
+        var st = this.aktivt();
+        if (!st) return;
+        this.brugtSvarNogen = true;
+        if (st.fase === "formel") {
+            st.vistFormel = true;
+            this.formelRigtig();
+            return;
+        }
+        var V = R.vaerdier(this.opg());
+        this.resTekst = V.facit[this.k].tekst;
+        this.delLoest("svar");
+    };
 
     P.fokusFelt = function () {
         if (!NK.el("fane-regn").classList.contains("aktiv")) return;
-        var tomt = (this.felter || []).filter(function (f) { return !f.value.trim(); })[0] || (this.felter || [])[0];
-        if (tomt) { try { tomt.focus({ preventScroll: true }); } catch (e) { tomt.focus(); } }
+        var f = NK.el("regn-felt");
+        if (!f || f.disabled) return;
+        if (document.activeElement === f) return;
+        try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); }
+        var n = f.value.length;
+        try { f.setSelectionRange(n, n); } catch (e2) { /* ingen markoer */ }
     };
 
-    /* Tavlen skal kunne vaere der: skriften goeres mindre, til den passer */
-    P.tilpas = function () {
-        var arb = NK.el("regn-arbejde");
-        if (!arb || !arb.offsetHeight) return;
-        arb.style.removeProperty("--fs");
-        var fs = parseFloat(window.getComputedStyle(arb).fontSize) || 30;
-        var gange = 0;
-        while (gange++ < 40 && fs > 15 && (arb.scrollHeight > arb.clientHeight + 1 || this.tavle.scrollWidth > this.tavle.clientWidth + 1)) {
-            fs -= 1;
-            arb.style.setProperty("--fs", fs + "px");
+    /* Scenen har intet at klikke paa: kortet blinker, saa eleven ser, hvor
+       opgaven staar */
+    P.klikScene = function () {
+        if (this.faerdig) return;
+        this.kortBlink();
+    };
+
+    /* ----- Tavlen: vokser linje for linje ------------------------------------------------- */
+    P.visTavle = function () {
+        var o = this.opg(), mig = this, html = "";
+        this.ts.forEach(function (st, i) {
+            if (i > mig.k && st.status === "laast") return;
+            var faerdig = st.status === "ok" || st.status === "svar";
+            if (!st.formelOk && !faerdig) return;
+            var t = D.TRIN[st.id], b = t.maal;
+            var spoerges = !faerdig && i === mig.k && !mig.faerdig;
+            var slut = faerdig ? '<span class="pt-svar' + (st.status === "svar" ? " vist" : "") + '">' + NK.html(R.facitTekst(o, i)) + "</span>" :
+                '<span class="pt-spm">?</span>';
+            html += '<div class="pt-del"><p class="pt-navn">' + NK.html(mig.navnPaa(b)) + "</p>" +
+                '<div class="pt-linje' + (spoerges ? " spoerges" : "") + '">' +
+                "<span>" + NK.html(R.vis(b)) + " = " + R.formelHTML(st.id) + "</span><span>= " + R.talHTML(o, i) + "</span><span>= " + slut + "</span></div></div>";
+        });
+        /* Fra start en stiplet plads med navnet (regel 13), saa intet hopper */
+        var tom = !html;
+        if (tom) html = '<div class="pt-plads">Udregningen</div>';
+        if (this.tavle.innerHTML !== html) this.tavle.innerHTML = html;
+        this.tavle.classList.toggle("tom", tom);
+    };
+
+    /* ----- Maaleopstillingen -------------------------------------------------------------- */
+    /* Hvordan staar et tal i opgaven: givet, spoerges om nu, kommer senere
+       eller er regnet */
+    P.tilstand = function (b) {
+        var o = this.opg(), V = R.vaerdier(o);
+        if (V.tal[b] && V.tal[b].givet) return { slags: "givet", tekst: V.tal[b].tekst };
+        for (var i = 0; i < o.trin.length; i++) {
+            if (D.TRIN[o.trin[i]].maal !== b) continue;
+            var st = this.ts[i];
+            if (st && (st.status === "ok" || st.status === "svar")) return { slags: "regnet", tekst: V.facit[i].tekst };
+            return { slags: i === this.k && !this.faerdig ? "nu" : "senere", tekst: "?" };
         }
+        return null;
     };
 
-    P.opdater = function (dt) { this.opdaterBesked(dt); };
+    P.tilpas = function () {
+        this.laerred.tilpas();
+        this.tegn();
+    };
+
+    P.opdater = function (dt) {
+        this.opdaterBesked(dt);
+        this.tegn();
+    };
+
+    P.tegn = function () {
+        var L = this.laerred, ctx = L.ctx;
+        if (L.b < 60 || L.h < 60) return;
+        L.ryd();
+        /* Runde 3 (regel 32): opstillingen har en stoerste bredde og staar i
+           midten af sin spalte; den vokser med pladsen */
+        var pad = 10, BW = Math.min(L.b - 2 * pad, 620), X0 = Math.round((L.b - BW) / 2) - pad;
+        var W = BW + 2 * pad, H = L.h, mig = this;
+        ctx.save();
+        ctx.translate(X0, 0);
+        this.opX0 = X0;
+        var s = this.stof(), px = NK.klamp(Math.min(W / 34, H / 26), 13, 17);
+        var o = this.opg(), V = R.vaerdier(o);
+        var GUL = "#e0b22e", GROEN = "#1f6b43";
+
+        /* Smaa kort oeverst med de tal, der ikke sidder paa apparatet */
+        var kort = ["eps", "a", "V", "M", "n", "m"].map(function (b) { var t = mig.tilstand(b); return t ? { b: b, t: t } : null; }).filter(Boolean);
+        var kolonner = W > 420 ? 2 : 1, kb = (W - 2 * pad - (kolonner - 1) * 10) / kolonner, kh = px * 3.3;
+        kort.forEach(function (k, i) {
+            var x = pad + (i % kolonner) * (kb + 10), y = pad + Math.floor(i / kolonner) * (kh + 10);
+            var nu = k.t.slags === "nu";
+            Tg.papir(ctx, x, y, kb, kh);
+            if (nu) {
+                ctx.save(); ctx.strokeStyle = GUL; ctx.lineWidth = 3;
+                NK.rundtRekt(ctx, x - 1, y - 1, kb + 2, kh + 2, 11); ctx.stroke(); ctx.restore();
+            }
+            NK.tekst(ctx, mig.navnPaa(k.b), x + 12, y + px * 1.3, { font: Tg.font("500", px * 0.88), farve: "#6b6558" });
+            var vaerdi = R.vis(k.b) + " = " + (k.t.slags === "givet" || k.t.slags === "regnet" ? R.talMedEnhed(k.b, k.t.tekst) : "?");
+            if (k.b === "V" && k.t.slags === "givet") vaerdi = "V = " + NK.dk(V.tal.V.v * 1000, 0) + " mL = " + R.talMedEnhed("V", k.t.tekst);
+            NK.tekst(ctx, vaerdi, x + 12, y + px * 2.75, { font: Tg.font(k.t.slags === "givet" ? "500" : "600", px * 1.08),
+                farve: k.t.slags === "regnet" ? GROEN : (k.t.slags === "givet" ? "#1d2433" : "#7a5a00") });
+        });
+        var raekker = Math.ceil(kort.length / kolonner);
+        /* Det nederste og det hoejreste, der er tegnet (selvtesten maaler det) */
+        this.tegnBund = pad + raekker * (kh + 10);
+        this.tegnHoejre = kort.length ? pad + Math.min(kort.length, kolonner) * (kb + 10) - 10 : 0;
+        var top = pad + raekker * (kh + 10) + (kort.length ? 8 : 0);
+
+        /* Apparatet: lampe, straale, kuvette og detektor */
+        var harA = !!this.tilstand("A"), harC = !!this.tilstand("c");
+        var apH = H - top - pad;
+        var kh2 = NK.klamp(Math.min(apH * 0.5, W * 0.34), 60, 230);
+        var ctTop = top + NK.klamp((apH - kh2 - px * 6) / 3, 6, 60);
+        var yc = ctTop + kh2 * 0.58;
+        var lh = NK.klamp(kh2 * 0.62, 44, 130), lb = NK.klamp(lh * 0.8, 40, 100), lx = pad;
+        var detH = NK.klamp(kh2 * 0.66, 48, 140), detB = NK.klamp(detH * 0.8, 46, 110);
+        var dispB = NK.klamp(W * 0.3, 112, 150);
+        var dx = W - pad - Math.max(detB, dispB) / 2 - detB / 2;
+        var x0 = lx + lb, x1 = dx;
+        var cx = (x0 + x1) / 2;
+        var l = V.tal.l ? V.tal.l.v : 1;
+        var pxCm = NK.klamp((x1 - x0 - 70) / 2.3, 28, 110);
+        var cb = l * pxCm, cl = cx - cb / 2, ct = yc - kh2 * 0.58;
+        var rgb = s.lys;
+        var cVis = V.tal.c ? V.tal.c.v : 0.5 * s.cMax;
+        Tg.straale(ctx, x0, cl, yc, 22, rgb, 1);
+        Tg.straale(ctx, cl + cb, x1, yc, 22, rgb, 0.45);
+        Tg.kuvette(ctx, cl, ct, cb, kh2, { rgb: Tg.vaeskeFarve(s, cVis) });
+        Tg.lampe(ctx, lx, yc - lh / 2, lb, lh, rgb);
+        Tg.detektor(ctx, dx, yc - detH / 2, detB, detH, 30);
+        NK.tekst(ctx, "λ = " + s.lambda + " nm", lx, yc + lh / 2 + px * 1.2, { font: Tg.font("500", px * 0.9), farve: Tg.rgba(rgb, 1) });
+
+        /* l under kuvetten og etiketten med stoffet og c */
+        var pilY = ct + kh2 + px * 0.85;
+        Tg.maalPil(ctx, cl, cl + cb, pilY, "#cfd6de");
+        NK.tekst(ctx, "l = " + R.talMedEnhed("l", V.tal.l ? V.tal.l.tekst : "1,00"), cx, pilY + px * 1.5, { font: Tg.font("500", px), justering: "center", farve: "#e9eef4" });
+        var tagLinjer = [{ t: s.Navn, px: px * 0.95, vaegt: "500" }];
+        var cT = harC ? this.tilstand("c") : null;
+        if (cT) tagLinjer.push({ t: "c = " + (cT.slags === "givet" || cT.slags === "regnet" ? R.talMedEnhed("c", cT.tekst) : "?"), px: px * 1.08, vaegt: cT.slags === "givet" ? "500" : "600",
+            farve: cT.slags === "regnet" ? GROEN : (cT.slags === "givet" ? "#1d2433" : "#7a5a00") });
+        var tag = Tg.etiket(ctx, cx, pilY + px * 2.3, tagLinjer, { pad: 8, kant: cT && cT.slags === "nu" ? GUL : "#c9c3b3", kantB: cT && cT.slags === "nu" ? 3 : 1 });
+        this.tegnBund = Math.max(this.tegnBund, tag.y + tag.h);
+        this.tegnHoejre = Math.max(this.tegnHoejre, tag.x + tag.b);
+
+        /* Displayet med A */
+        if (harA) {
+            var aT = this.tilstand("A");
+            var dpx = NK.klamp(px * 1.05, 14, 17);
+            var dX = dx + detB / 2 - dispB / 2, dY = yc + detH / 2 + 10;
+            var tal = aT.slags === "givet" || aT.slags === "regnet" ? aT.tekst : "?";
+            var dh = Tg.display(ctx, dX, dY, dispB, [{ etiket: "A", tal: tal, farve: aT.slags === "regnet" ? "#9ff0c0" : "#ffe28a" }], dpx);
+            this.tegnBund = Math.max(this.tegnBund, dY + dh);
+            if (aT.slags === "nu") {
+                ctx.save(); ctx.strokeStyle = GUL; ctx.lineWidth = 3;
+                NK.rundtRekt(ctx, dX - 3, dY - 3, dispB + 6, dh + 6, 8); ctx.stroke(); ctx.restore();
+            }
+        }
+        NK.tekst(ctx, "Detektor", dx + detB / 2, yc - detH / 2 - 7, { font: Tg.font("500", px * 0.85), justering: "center", farve: "#b9c0ca" });
+        ctx.restore();
+        /* Tavlen er mindst lige saa hoej som opstillingen, saa de to staar i
+           balance, og intet hopper, naar linjerne kommer */
+        var mh = Math.round(Math.min(this.tegnBund + 4, H)) + "px";
+        if (this.tavle.style.minHeight !== mh) this.tavle.style.minHeight = mh;
+    };
 
     NK.SimRegn = SimRegn;
 }());

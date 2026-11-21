@@ -2429,6 +2429,16 @@ sub { font-size: 0.74em; line-height: 0; vertical-align: -0.24em; }
 .opg-chip.trin:hover { background-color: var(--panel-2); border-color: #4a4a58; }
 .opg-chip.trin.loest:hover { background-color: rgba(63, 174, 114, 0.2); border-color: rgba(63, 174, 114, 0.75); }
 .opg-chip.trin.valgt:hover { border-color: var(--blaa); background-color: rgba(61, 158, 224, 0.2); }
+
+/* ----- Kommende opgaver og trin: et nummer med en graa streg i stedet for
+   titlen (titlerne laases op i takt, brugeren 21. nov. 2026) ------------- */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.opg-chip.laast .oc-f { flex: 1 1 auto; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+.hl-streg[hidden], .opg-chip .serie-navn[hidden], .trin-navn[hidden] { display: none; }
+/* En laast flise paa fane 2 er lige saa hoej som en med undertekst */
+.opg-chip.serie.laast .oc-f { min-height: calc(1.2 * (0.92rem + 0.78rem)); }
 #u-forfra, #r-forfra, #t-forfra { margin-top: 10px; width: 100%; justify-content: center; }
 .sk-handling { display: flex; justify-content: center; margin-top: 10px; }
 .sk-handling .knap { min-width: 220px; justify-content: center; font-size: 1.02rem; padding: 9px 18px; }

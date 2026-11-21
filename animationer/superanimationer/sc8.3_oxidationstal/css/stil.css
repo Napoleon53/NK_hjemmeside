@@ -1250,6 +1250,13 @@ select:focus-visible {
 .oc-m:empty { display: none; }
 .opg-chip.stjerne .oc-m { color: var(--gul); }
 
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende opgaver er
+   et nummer med en graa streg og kan ikke klikkes, til eleven er naaet dertil */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.oc-lnr { color: var(--tekst-mat); margin-right: 6px; }
+.oc-streg { display: inline-block; width: 1.8em; height: 8px; border-radius: 4px; background-color: #4a4a58; vertical-align: middle; }
+
 /* ---------------------------------------------------------------------
    SC8.2: gaettet og regnskabet paa fane 2
    --------------------------------------------------------------------- */

@@ -62,7 +62,7 @@
         };
 
         /* ----- Scenekortet ---------------------------------------------------- */
-        P.kortZone = function () { return window.innerHeight <= 720 ? 172 : 196; };
+        P.kortZone = function () { return window.innerHeight <= 720 ? 172 : 203; };   /* før 196: spørgsmålet på egen linje, 21. nov. 2026 */
 
         P.visKort = function () {
             var e = this.el.skort, html, kl;
@@ -402,5 +402,33 @@
         ctx.restore();
     }
 
-    NK.Fane = { paa: paa, ring: ring };
+    /* ----- Opgavelisten laaser titlerne op i takt --------------------------------
+       Brugeren 21. nov. 2026 ("husk dette"): listen viser kun titlerne paa de
+       loeste opgaver og den, eleven er ved. De kommende staar som et nummer med
+       en graa streg og kan ikke klikkes. En opgave er naaet, naar den er loest
+       (ogsaa gemt i browseren), naar eleven har vaeret der (naaet), eller naar
+       alle foer den er loest (Vis svaret taeller som loest). Trinlisten goer det
+       samme: et trin har sin titel, naar eleven er naaet dertil. */
+    function opgAaben(status, naaet, i) {
+        if (status[i] && status[i].loest) return true;
+        if (naaet && naaet[i]) return true;
+        for (var j = 0; j < i; j++) if (!(status[j] && status[j].loest)) return false;
+        return true;
+    }
+
+    /* Et trin i trinlisten. kl er "faerdig", "nu" eller "", navn er HTML */
+    function trinLi(j, kl, navn, aaben) {
+        var k = (kl || "") + (aaben ? "" : " laast");
+        return '<li class="' + k.trim() + '"><span class="tr-nr">' + (j + 1) + "</span>" +
+            (aaben ? navn : '<span class="tr-streg"></span>') + "</li>";
+    }
+
+    /* Det hoejeste trin, eleven har vaeret ved i listen noegle (i denne session) */
+    function trinNaaet(sim, noegle, nr) {
+        sim.trinMaks = sim.trinMaks || {};
+        if (!(sim.trinMaks[noegle] >= nr)) sim.trinMaks[noegle] = nr;
+        return sim.trinMaks[noegle];
+    }
+
+    NK.Fane = { paa: paa, ring: ring, opgAaben: opgAaben, trinLi: trinLi, trinNaaet: trinNaaet };
 }());

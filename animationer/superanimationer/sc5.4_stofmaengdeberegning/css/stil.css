@@ -1406,3 +1406,9 @@ html body.papirkort.papirkort .scenekort.loest.svar .sk-slut-tekst > .sk-tekst {
     html body.papirkort.papirkort .scenekort.loest .sk-slut-tekst > .kt-tekst.sk-tekst { padding: 4px 9px; font-size: 0.88rem; line-height: 1.3; }
     html body.papirkort.papirkort .scenekort.loest .kt-slut-t .kt-gaet { margin-bottom: 3px; font-size: 0.86rem; }
 }
+
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende opgaver er
+   et nummer med en grå streg og kan ikke klikkes, til eleven er naaet dertil */
+.hyldelinje.laast { cursor: default; opacity: 0.75; }
+.hyldelinje.laast:hover { background-color: rgba(255, 255, 255, 0.045); border-color: transparent; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }

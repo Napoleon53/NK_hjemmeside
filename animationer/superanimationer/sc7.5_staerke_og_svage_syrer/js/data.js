@@ -84,7 +84,7 @@
             },
             spm: {
                 om: [0],
-                tekst: "Der blev hældt 100 HCl-molekyler i rummet i luppen over saltsyren. Hvor mange af dem er stadig hele?",
+                tekst: "Hvor mange af de 100 HCl-molekyler i luppen over saltsyren er stadig hele?",
                 svar: [
                     { t: "Alle 100 er hele",
                       f: "Et helt HCl-molekyle er gråt med en orange hydron på. Er der grå molekyler i luppen over saltsyren?" },
@@ -300,8 +300,8 @@
         {
             id: "d", navn: "Glas D", glas: 3, kendt: true,
             gaet: {
-                intro: "Glas D har fået sin etiket: saltsyre, HCl, en stærk syre. 100 HCl-molekyler blev hældt i.",
-                tekst: "Hvad viser luppen for glas D?",
+                intro: "Glas D har fået en etiket. Glasset indeholder saltsyre, HCl, som er en stærk syre.",
+                tekst: "Hvad viser luppen for de 100 HCl-molekyler i glas D?",
                 svar: [
                     { t: "1 oxoniumion og 99 hele molekyler" },
                     { t: "50 oxoniumioner og 50 hele" },
@@ -318,8 +318,8 @@
         {
             id: "e", navn: "Glas E", glas: 4, kendt: true,
             gaet: {
-                intro: "Glas E har fået sin etiket: myresyre, HCOOH, en svag syre. 100 myresyremolekyler blev hældt i.",
-                tekst: "Hvilken partikel er der flest af i luppen for glas E?",
+                intro: "Glas E har fået en etiket. Glasset indeholder myresyre, HCOOH, som er en svag syre.",
+                tekst: "Hvad er der flest af i luppen for myresyren i glas E?",
                 svar: [
                     { t: "Oxoniumioner, H₃O⁺" },
                     { t: "Hele myresyremolekyler", ok: true },
@@ -334,7 +334,7 @@
             },
             spm: {
                 om: [1, 4], navngiv: [1],
-                tekst: "Glas E, myresyre: 4 ud af 100 har afgivet en hydron. Glas B, eddikesyre: 1. Hvor bruser kalken mest?",
+                tekst: "Bruser kalken mest i myresyren i glas E eller i eddikesyren i glas B?",
                 svar: [
                     { t: "I glas B, eddikesyre",
                       f: "Oxoniumionerne får kalken til at bruse. Hvilket glas har flest, glas B eller glas E?" },
@@ -361,8 +361,8 @@
             id: "ti", navn: "Fortynd 10 gange",
             opstil: { trin: 0 },
             gaet: {
-                intro: "Eddikesyre til venstre og saltsyre til højre, begge 0,10 M. Om lidt fortynder du saltsyren 10 gange, til 0,010 M.",
-                tekst: "Hvor bruser kalken mest, når saltsyren er fortyndet?",
+                intro: "Eddikesyre til venstre og saltsyre til højre, begge 0,10 M.",
+                tekst: "Bruser kalken mest i 0,10 M eddikesyre eller i 0,010 M HCl?",
                 svar: [
                     { t: "I eddikesyren" },
                     { t: "I den fortyndede saltsyre", ok: true },

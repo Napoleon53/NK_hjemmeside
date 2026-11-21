@@ -89,21 +89,21 @@
         { id: "magnesium", navn: "Magnesium", gruppe: "let", r: ["Mg", "O2"], p: ["MgO"], facit: [2, 1, 2],
           tekst: "Magnesium brænder med et blændende hvidt lys. Det bruges i fyrværkeri." },
         { id: "vand", navn: "Vand", gruppe: "let", r: ["H2", "O2"], p: ["H2O"], facit: [2, 1, 2],
-          tekst: "Dihydrogen og dioxygen bliver til vand. Reaktionen driver brændselsceller og raketmotorer." },
+          tekst: "Dihydrogen og dioxygen bliver til vand i brændselsceller og raketmotorer." },
         { id: "peroxid", navn: "Hydrogenperoxid", gruppe: "middel", r: ["H2O2"], p: ["H2O", "O2"], facit: [2, 2, 1],
-          tekst: "Hydrogenperoxid renser sår og bleger hår. Det går langsomt i stykker til vand og dioxygen." },
+          tekst: "Hydrogenperoxid går langsomt i stykker til vand og dioxygen." },
         { id: "kulilte", navn: "Kulilte", gruppe: "middel", r: ["CO", "O2"], p: ["CO2"], facit: [2, 1, 2],
           tekst: "Kulilte er giftig. Den brænder videre til carbondioxid med en blå flamme." },
         { id: "ammoniak", navn: "Ammoniak", gruppe: "middel", r: ["N2", "H2"], p: ["NH3"], facit: [1, 3, 2],
           tekst: "Ammoniak laves af dinitrogen fra luften og bliver til kunstgødning." },
         { id: "methan", navn: "Methan", gruppe: "middel", r: ["CH4", "O2"], p: ["CO2", "H2O"], facit: [1, 2, 1, 2],
-          tekst: "Methan er naturgas. Når det brænder helt, bliver det til carbondioxid og vand." },
+          tekst: "Methan er naturgas. Det brænder til carbondioxid og vand." },
         { id: "aluminium", navn: "Aluminium", gruppe: "svaer", r: ["Al", "O2"], p: ["Al2O3"], facit: [4, 3, 2],
           tekst: "Aluminium får straks et tyndt lag oxid. Laget beskytter resten af metallet." },
         { id: "jern", navn: "Jern og damp", gruppe: "svaer", r: ["Fe", "H2O"], p: ["Fe3O4", "H2"], facit: [3, 4, 1, 4],
-          tekst: "Varmt jern og vanddamp giver magnetit, Fe₃O₄, og dihydrogen. Det kan ske i dampkedler af jern." },
+          tekst: "Varmt jern og vanddamp giver magnetit, Fe₃O₄, og dihydrogen." },
         { id: "propan", navn: "Propan", gruppe: "svaer", r: ["C3H8", "O2"], p: ["CO2", "H2O"], facit: [1, 5, 3, 4],
-          tekst: "Propan er gassen i flasken til campinggrillen. Den brænder til carbondioxid og vand." }
+          tekst: "Propan i campinggrillen brænder til carbondioxid og vand." }
     ];
 
     /* Loftet paa fane 1: saa mange molekyler af ét stof kan ses i bakken */

@@ -250,7 +250,7 @@ function koerTest(W) {
     paastand("efter turen: kortet viser svaret og knappen Næste gæt", G.fase === "facit" && /Næste gæt/.test(d.getElementById("g-skort").textContent));
     var gk = d.getElementById("g-skort");
     paastand("forkert gæt: spørgsmålet bliver stående, gættet er rødt, det rigtige svar er gult, og kortet siger, hvor langt gættet var fra",
-        gk.classList.contains("facit") && gk.classList.contains("bliv") && /Hvor høj bliver stakken\?/.test(gk.querySelector(".sk-tekst").textContent) &&
+        gk.classList.contains("facit") && gk.classList.contains("bliv") && /Hvor høj bliver en stak af 1 mol papirark\?/.test(gk.querySelector(".sk-tekst").textContent) &&
         !!gk.querySelector('.sk-knap.forkert[data-valg="1"]') && !!gk.querySelector('.sk-knap.svar-vist[data-valg="' + D.GAET[0].ret + '"]') &&
         /^Svaret/.test(gk.querySelector(".sk-bund.bliv .st-tekst").textContent) &&
         gk.querySelector(".sk-bund.bliv").innerHTML.indexOf("10<sup>11</sup> gange for lille") >= 0 && gk.querySelector(".sk-bund.bliv").contains(gk.querySelector(".sk-videre")),
@@ -415,6 +415,42 @@ function koerTest(W) {
     ramme.style.height = "860px";
     G.nulstil();
     T.nulstil();
+
+    /* ================================================================ */
+    overskrift("Opgavelisten: titlerne låses op i takt (21. nov. 2026)");
+    (function () {
+        function tekster(X) { return X.chips.map(function (c) { return c.textContent.trim(); }).join(" | "); }
+        function kunFoerste(X, liste) {
+            var c = X.chips;
+            return c.length === liste.length && c[0].textContent.indexOf(liste[0].titel) >= 0 && !c[0].disabled &&
+                c.slice(1).every(function (k, j) { return k.disabled && k.classList.contains("laast") && !!k.querySelector(".hl-streg") && k.textContent.trim() === String(j + 2); });
+        }
+        function andenAaben(X, liste) {
+            var c = X.chips;
+            return c[1].textContent.indexOf(liste[1].titel) >= 0 && !c[1].disabled && c.slice(2).every(function (k) { return k.disabled && !!k.querySelector(".hl-streg"); });
+        }
+        NK.visFane("fane-g");
+        G.nulstil();
+        paastand("Gættene: ved start viser listen kun titlen på gæt 1; de andre er et nummer med en grå streg og kan ikke klikkes", kunFoerste(G, D.GAET), tekster(G));
+        G.chips[3].click();
+        paastand("Gættene: et klik på et låst gæt gør intet", G.fase === "intro" && G.nr === 0, G.fase + " " + G.nr);
+        G.videre();
+        G.svarValg(D.GAET[0].ret); G.indsendKlik(); koerF(G, 9);
+        paastand("Gættene: når gæt 1 er besvaret, kommer titlen på gæt 2 frem; de senere er stadig låst", G.svar[D.GAET[0].id] !== undefined && andenAaben(G, D.GAET), tekster(G));
+        NK.visFane("fane-t");
+        T.nulstil();
+        paastand("Opgaverne: ved start viser listen kun titlen på opgave 1; de andre er et nummer med en grå streg og kan ikke klikkes", kunFoerste(T, D.OPGAVER), tekster(T));
+        T.chips[3].click();
+        paastand("Opgaverne: et klik på en låst opgave gør intet", T.nr === 0, T.nr);
+        for (var n = 0; n < 12 && T.fase !== "loest"; n++) { T.knap(); koerF(T, 0.5); }
+        paastand("Opgaverne: når opgave 1 er løst (Vis svaret tæller som løst), kommer titlen på opgave 2 frem; de senere er stadig låst", T.status[0].loest && andenAaben(T, D.OPGAVER), tekster(T));
+        T.status[5].loest = true; T.visListe();
+        paastand("Opgaverne: en opgave, der er løst før (gemt i browseren), har sin titel og kan vælges", T.chips[5].textContent.indexOf(D.OPGAVER[5].titel) >= 0 && !T.chips[5].disabled, tekster(T));
+        T.nulstil();
+        paastand("Start forfra låser titlerne igen", kunFoerste(T, D.OPGAVER), tekster(T));
+        G.nulstil();
+        NK.visFane("fane-g");
+    })();
 }
 </script>
 </body>

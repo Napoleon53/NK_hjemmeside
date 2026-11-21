@@ -326,9 +326,9 @@
         NK.saetTekst("ber-titel", o.egen ? "Din måling" : "En klassekammerats måling");
         NK.saetTekst("ber-nr", String(Math.min(o.k + 1, 4)));
         this.kort.vis({ chip: o.faerdig ? "Masseprocenten" : "Trin " + (o.k + 1) + " af 4",
-            tekst: NK.html("Regn eddikens masseprocent ud." +
-                (o.faerdig ? "" : " " + D.TRIN[o.k].navn + ": Hvad er " +
-                (o.felter[o.k].fase === "formel" ? "formlen" : "tallet") + " for " + this.venstre(o.k) + "?")) });
+            tekst: NK.html("Regn eddikens masseprocent ud i fire trin." +
+                (o.faerdig ? "" : " " + (o.felter[o.k].fase === "formel" ? "Hvilken formel giver " : "Hvad er ") +
+                D.TRIN[o.k].navn.charAt(0).toLowerCase() + D.TRIN[o.k].navn.slice(1) + ", " + this.venstre(o.k) + "?")) });
         this.visKnap();
     };
 

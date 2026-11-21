@@ -328,7 +328,7 @@ function koerTest(W) {
     klik('#prod-niveau [data-niveau="let"]');
     tik(B, 0.3);
     paastand("Let: reaktionen har vand", B.opg.reaktanter.indexOf("vand:2") >= 0);
-    paastand("kortet står i scenen med opgaven, og panelet har kun tælleren", !!B.el.skort.closest(".scene") && /^Produkterne\s*Hvad dannes\?/.test(kortTekst(B)) &&
+    paastand("kortet står i scenen med opgaven, og panelet har kun tælleren", !!B.el.skort.closest(".scene") && /^Produkterne\s*Træk to formler op på pladserne efter pilen\.\s*Hvilke to produkter dannes, når .+ og .+ reagerer\?/.test(kortTekst(B)) &&
         !d.querySelector("#fane-produkter .panel .knap.hjaelp") && /rekord/.test(d.getElementById("prod-taeller").textContent));
     var iF = B.brikker.findIndex(function (b) { return !b.rigtig; }), bF = B.brikker[iF];
     mus(B, "pointerdown", bF.r.x + bF.r.b / 2, bF.r.y + bF.r.h / 2); mus(B, "pointerup", bF.r.x + bF.r.b / 2, bF.r.y + bF.r.h / 2);

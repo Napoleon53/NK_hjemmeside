@@ -50,7 +50,7 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
   den basiske og gøre det i et glas? Så får man dog først lov til at gå
   videre, når man har lavet første reaktionsskema." Fane 1 har nu ét glas,
   der starter basisk: lidt sulfit (grønt), mere sulfit (brunt) og svovlsyre
-  (næsten farveløst). Reaktion 2 og 3 er låst (🔒 i listen), til skemaet før
+  (næsten farveløst). Reaktion 2 og 3 er låst (et nummer med en grå streg i listen), til skemaet før
   dem er afstemt. Det sure og det neutrale glas med sulfit er flyttet til
   fane 2 (Sulfit i syre og Sulfit i vand).
 * "Michaels forklaringer er lidt overvældende for en svag elev [...] Måske
@@ -257,6 +257,11 @@ gangetallene, koefficienterne, ladningen, H⁺ eller OH⁻ og vandet.
 
 En ny reaktion er én linje i `D.REAKTIONER`. Selvtesten tjekker, at den er
 afstemt med de mindste tal.
+
+## Opgavelisten (21. nov. 2026)
+
+Listerne på begge faner (et nummer i gruppen i stedet for formlen; afløser hængelåsen på fane 1) låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 12 tjekker det.
 
 ## Forenklinger
 

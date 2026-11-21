@@ -678,6 +678,30 @@ function koerTest(W) {
     paastand("alkenjagten slutter uden kogepunkter med et grønt kort", s.st.kog && s.groen && /Alle fem alkener er fundet/.test(kortTekst()), kortTekst());
     paastand("whiteboardet viser de fem alkener uden °C, og hylden har ingen kogepunkter",
         s.celler.length === 5 && d.querySelectorAll("#j-hylder .hk-kp").length === 0);
+
+    /* ================================================================= */
+    overskrift("13. Jagterne låser titlerne op i takt (21. nov. 2026)");
+    s.status.forEach(function (st) { st.fundet = []; st.kog = false; st.loest = false; st.stjerne = false; st.sv = false; st.fe = false; });
+    s.naaet = {};
+    s.vaelg(0);
+    function fliser() { return [].slice.call(d.querySelectorAll("#j-jagtliste .jagtlinje")); }
+    function laastNr(f) { return f.disabled && f.classList.contains("laast") && !!f.querySelector(".hl-streg") && /^\d+$/.test(f.textContent.replace(/\s/g, "").replace(/C2$/, "")); }
+    var fl = fliser();
+    paastand("ved start har kun jagt 1 formel, niveau og tal; de andre er et nummer med en grå streg og kan ikke klikkes",
+        fl.length === 8 && /C5H12/.test(fl[0].textContent) && /Let/.test(fl[0].textContent) && !fl[0].disabled && fl.slice(1).every(laastNr) &&
+        fl.slice(1).every(function (f) { return !/Let|Middel|Svær|Mester|\//.test(f.textContent); }),
+        fl.map(function (f) { return f.textContent.trim(); }).join(" | "));
+    paastand("en låst flise er lige så høj som en åben", Math.abs(fl[1].getBoundingClientRect().height - fl[0].getBoundingClientRect().height) < 1 &&
+        Math.abs(fl[2].getBoundingClientRect().height - fl[0].getBoundingClientRect().height) < 1);
+    fl[3].click();
+    paastand("et klik på en låst jagt gør intet", s.nr === 0);
+    loesJagt(0);
+    fl = fliser();
+    paastand("når jagt 1 er klaret, kommer formlen på jagt 2 frem; jagt 3 til 8 er stadig låst",
+        s.status[0].loest && /C2H6O/.test(fl[1].textContent) && !fl[1].disabled && fl.slice(2).every(laastNr),
+        fl.map(function (f) { return f.textContent.trim(); }).join(" | "));
+    fl[1].click();
+    paastand("jagt 2 kan nu vælges i listen", s.nr === 1);
 }
 </script>
 </body>

@@ -329,6 +329,11 @@ svaret) ved 1400 × 860, 1280 × 720, 1100 × 650 og 900 × 650.
 Sidst kørt: ALT OK (144 påstande), 6. november 2026. Før papirkortet gav den
 3 fejl om layoutet (900 × 650 og vægten ved 1280 × 720), som også er rettet.
 
+## Opgavelisten (21. nov. 2026)
+
+Reaktionerne i panelet er knapper med numre uden titler, så reglen om låste opgavetitler
+(21. nov. 2026) har intet at skjule. Knapperne kan vælges som før.
+
 ## I menuen
 
 I menuen fra 26. sept. 2026 som c8.3 i `kemi-c-filer/samling_c8.html` (nr. 3,

@@ -445,7 +445,7 @@ function koerTest(W) {
     paastand("mål 5: gættet holdt ikke; dommen og det, luppen viser, står alene på kortet, før spørgsmålet kommer",
         S.venter && S.opg.fase === "forsoeg" && /^Forsøget ✓Dit gæt holdt ikke\. I luppen for glas E/.test(kortT(S)) && S.lup.antal().delte >= 4 && S.lup.antal().delte <= 5 && videre(S).textContent === "Næste spørgsmål →", kortT(S));
     videre(S).click();
-    paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /Glas E, myresyre/.test(kortT(S)) && /Glas B, eddikesyre/.test(kortT(S)), kortT(S));
+    paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /myresyren i glas E/.test(kortT(S)) && /eddikesyren i glas B/.test(kortT(S)), kortT(S));
     svar(S, 1);
     var roedE = roed(S) && /ikke lige svage/.test(statuslinje(S));
     svar(S, rigtigt(S));
@@ -830,6 +830,25 @@ function koerTest(W) {
     });
     ramme.style.width = "";
     ramme.style.height = "";
+
+    overskrift("11. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    NK.visFane("fane-g"); G.tilpas(); G.layout();
+    G.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    G.naaet = {};
+    G.vaelg(0, false);
+    var laastL = function () { return [].slice.call(d.querySelectorAll("#g-liste .opg-chip")); };
+    var ll = laastL();
+    paastand("ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        ll.length === G.opgaver.length && ll.length > 1 && ll[0].textContent.indexOf(G.opgaver[0].navn) >= 0 && !ll[0].disabled &&
+        ll.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()); }),
+        ll.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    ll[ll.length - 1].click();
+    paastand("et klik på en låst opgave gør intet", G.nr === 0);
+    G.loest("svar", "");
+    ll = laastL();
+    paastand("når opgave 1 er løst, kommer titlen på opgave 2 frem; de senere er stadig låst",
+        G.status[0].loest && ll[1].textContent.indexOf(G.opgaver[1].navn) >= 0 && !ll[1].disabled &&
+        ll.slice(2).every(function (b) { return b.disabled && !!b.querySelector(".oc-streg"); }));
     G.vaelg(0); S.vaelg(0); F.vaelg(0);
     NK.visFane("fane-g");
 }

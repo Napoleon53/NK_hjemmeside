@@ -286,6 +286,11 @@ taleboblen med Næste, trinnets nummer og Spring over. Koden er
 filen er sc1.2's med trinnene, HTML-boblen og rammen lagt til, og den er
 mønsteret for præsentationer efter reglerne fra 3. oktober 2026.
 
+## Opgavelisten (21. nov. 2026)
+
+Ingen opgaveliste: målene på fane 1 står ét ad gangen på kortet ("Mål 1 af 5"), og panelet viser skemaet og Dine svar.
+Reglen om låste opgavetitler (21. nov. 2026) har derfor intet at låse.
+
 ## I menuen
 
 I menuen fra 26. sept. 2026 som c8.1 i `kemi-c-filer/samling_c8.html`. Den gamle

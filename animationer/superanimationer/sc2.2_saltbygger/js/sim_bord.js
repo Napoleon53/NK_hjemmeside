@@ -34,7 +34,8 @@
         var mig = this;
         this.bord = new NK.Bord(NK.el("bord-scene"), {
             visFormel: true,
-            kortZone: function () { return NK.kortZone("bord-skort", [214, 204]); },
+            /* 237/221 (før 214/204): spørgsmålet på egen linje, 21. nov. 2026 */
+            kortZone: function () { return NK.kortZone("bord-skort", [237, 221]); },
             lyt: function (hvad) {
                 if (hvad === "aendret") mig.aendret();
                 else if (hvad === "laast" && mig.opgave && mig.fase === "valg") NK.kortBlink("bord-skort");
@@ -94,7 +95,7 @@
         this.svar.ryd();
         NK.el("byg-knapper").hidden = false;
         NK.saetTekst("bord-chip", "Opgaver");
-        NK.saetHTML("bord-opgavetekst", "Byg frit med ionerne på hylderne. Når du er klar, får du en opgave ad gangen.");
+        NK.saetKorttekst("bord-opgavetekst", "Byg frit med ionerne på hylderne. Når du er klar, får du en opgave ad gangen.");
         NK.el("bord-prompt").hidden = true;
         NK.el("bord-trin").hidden = true;
         NK.el("bord-afslut").hidden = true;
@@ -186,7 +187,7 @@
         this.roert = false;
         NK.el("byg-knapper").hidden = true;
         NK.saetTekst("bord-chip", "Opgave " + this.nr);
-        NK.saetHTML("bord-opgavetekst", retning === "navn"
+        NK.saetKorttekst("bord-opgavetekst", retning === "navn"
             ? "Byg <b>" + salt.navn + "</b> på bordet med ionerne fra hylderne, så ladningen går op. Tryk så Indsend svar."
             : "Læg ionerne i <b>" + salt.formel + "</b> på bordet med hylderne. Tryk så Indsend svar.");
         NK.el("bord-prompt").hidden = true;
@@ -293,7 +294,7 @@
             this.svar.vis(D.navneValg(o.kat, o.an));
         }
         NK.el("opgave-valg").className = r.valgKlasse + " sk-svar";
-        NK.saetHTML("bord-opgavetekst", this.retning === "navn"
+        NK.saetKorttekst("bord-opgavetekst", this.retning === "navn"
             ? "Ionerne passer, og ladningen går op. Hvilken formel har <b>" + o.navn + "</b>?"
             : "Ionerne passer, og ladningen går op. Hvad hedder <b>" + o.formel + "</b>?");
         NK.saetHTML("bord-hint", "");

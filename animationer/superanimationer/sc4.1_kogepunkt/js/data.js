@@ -126,7 +126,7 @@
     D.GAET_GODT = 25;
 
     /* ----- Fane 2: Formen --------------------------------------------------------- */
-    D.FORM_SPM = "Hvilken ballon fyldes først?";
+    D.FORM_SPM = "Hvilket af de tre stoffer koger først, når vandbadet varmes op?";
     D.FORM_HINT = "Alle tre stoffer har formlen C₅H₁₂. Kun molekylernes form er forskellig.";
     D.FORM_VARM_HINT = "Træk termometeret op over 36 °C, så alle tre stoffer koger.";
 

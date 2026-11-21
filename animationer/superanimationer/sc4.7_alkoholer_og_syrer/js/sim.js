@@ -266,7 +266,8 @@
         });
         for (var k in gem) if (Object.prototype.hasOwnProperty.call(gem, k)) this[k] = gem[k];
         kopi.parentNode.removeChild(kopi);
-        this.zone = Math.max(64, Math.ceil(hoejst) + 2);
+        /* + 3 (foer + 2): spoergsmaalet paa egen linje, 21. nov. 2026 */
+        this.zone = Math.max(64, Math.ceil(hoejst) + 3);
         this.zoneNoegle = noegle;
         return this.zone;
     };

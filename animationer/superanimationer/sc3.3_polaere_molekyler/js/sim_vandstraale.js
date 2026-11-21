@@ -112,7 +112,7 @@
             ["Heptan er upolært", "Heptan er tungere end vand", "Heptan er positivt ladet", "Heptanstrålen er for tyk"],
             "Heptan består kun af C og H. Hvor stor er forskellen i elektronegativitet?",
             "C og H har næsten samme elektronegativitet, så heptan er upolært. Molekylerne drejer sig ikke mod staven."),
-        valgopgave("Strålen bøjer mod både den positive og den negative stav. Hvad viser det?",
+        valgopgave("Du har holdt begge stave tæt på vandstrålen. Hvorfor bøjer vandstrålen mod både den positive og den negative stav?",
             ["Vandmolekylerne er polære, ikke ladede", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
             "Et ladet stof ville blive frastødt af den ene stav.",
             "Var vandet ladet, ville den ene stav frastøde det. Vandmolekylerne er neutrale, men polære."),

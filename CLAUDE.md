@@ -72,12 +72,25 @@ sync; denne er færdig.
   over animationen; der er ingen tekstlinje nederst i scenen.
   Mønster: scenekortet (`kortHTML` og `gaetBlink`) i
   `animationer/superanimationer/sc7.5_staerke_og_svage_syrer/js/fane.js`.
+- Opgavelisten viser kun titlerne på de løste opgaver og den, eleven er ved
+  (brugeren 21. nov. 2026, "husk dette"). De kommende står som et nummer uden
+  titel og låses op i takt med, at eleven kommer videre. Eleven må gerne kunne
+  se, hvor mange opgaver der kommer, men ser ikke alle overskrifter på én gang.
+  Titlerne er sigende, gerne med en kort undertekst i mindre skrift.
+- Klik-opfordringer ("Klik: hæld", gul ramme og boble) står kun, når eleven
+  skal klikke dér (brugeren 21. nov. 2026, "husk det"). Mens kortet stiller et
+  spørgsmål, er de væk eller højst et svagt pejlemærke. Når de står, er de
+  tydelige: gul ramme om tingen og en boble med pil, som krukken i
+  `sc6.1_koncentration` fane 1.
 - Teksten står meget tydeligt øverst i midten, aldrig i højre hjørne, og en
   opgave må sjældent kunne løses ved tilfældigt at klikke på skydere og
   knapper (brugeren 24. okt. 2026, "husk dette"). Som minimum er der en knap
   **Indsend svar**: en skyder, et termometer eller en kontakt løser aldrig
   en opgave af sig selv, og svarknapper vælger kun. Stjerne kun for første
-  forsøg; gerne "vælg alle, der passer". Et gæt er gratis. Mønster:
+  forsøg; gerne "vælg alle, der passer". Et gæt er gratis. Undtagelse (brugeren
+  21. nov. 2026, REGELSAET 33 og 39): Når eleven har gættet og skal prøve det,
+  eller skal trække til et mål (fx Y = K), går det selv videre ½-1 sekund efter,
+  at scenen står på målet; Indsend svar bliver som reserve. Mønster:
   `animationer/superanimationer/sb3.2_intermolekylaere_bindinger/js/fane.js`.
 - "Start forfra" står aldrig samme sted som "Næste opgave" (brugeren 3. nov.
   2026, "husk det"). Det grønne korts knap går altid fremad (næste opgave,
@@ -104,6 +117,12 @@ sync; denne er færdig.
 - Skal en superanimation bygges eller rettes, så læs
   `animationer/superanimationer/README.md` først. Afsnittet "Bestillingen, før
   der skrives kode" er bindende.
+- Skal en superanimation bygges, bygges om eller gennemgås, så læs også
+  `animationer/superanimationer/REGELSAET.md` (brugerens feedback 20.-21. nov.
+  2026 samlet: to steder at kigge, intet i panelet, stilladsering, låste
+  opgavetitler, klik-opfordringer, makro og mikro, tavlen, rolig skrift og kort
+  teori med henvisning til Kemibogen i `faelles/teori.css`). Hvor det siger
+  noget andet end README'en, vinder regelsættet.
 - Kemichael præsenterer ikke fanerne i en superanimation (brugerens valg 27.
   sept. 2026: præsentationerne blev ofte indforståede), og han sidder ikke
   længere ved et kateder i bunden (brugerens valg 9. okt. 2026: Kemichael

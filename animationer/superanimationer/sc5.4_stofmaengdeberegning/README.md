@@ -274,3 +274,7 @@ gamle udgave; nu gælder dette:
 
 I menuen fra 26. sept. 2026 som c5.3 i `kemi-c-filer/samling_c5.html`. Den gamle
 ligger i `kemi-c-filer/arkiv/c5.3_opgaver_masse_til_stofmængde_oldversion.html`.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).

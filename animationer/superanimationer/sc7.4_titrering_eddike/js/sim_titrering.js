@@ -349,7 +349,7 @@
 
     P.visKort = function () {
         var tekst = this.fase === "titrer" ? "Titrér eddiken, til kolben bliver svagt lyserød." :
-            "Aflæs buretten ved menisken. Hvor meget NaOH er løbet ned?";
+            "Aflæs buretten ved menisken. Hvor mange mL NaOH er løbet ned fra buretten?";
         this.kort.vis({ chip: "Prøve " + this.nr, tekst: NK.html(tekst) });
         this.visKnap();
     };

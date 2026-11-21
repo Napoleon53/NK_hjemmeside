@@ -62,7 +62,8 @@
         };
 
         /* ----- Scenekortet ---------------------------------------------------- */
-        P.kortZone = function () { return window.innerHeight <= 720 ? 172 : 196; };
+        /* 179 og 203 (foer 172 og 196): spoergsmaalet paa egen linje, 21. nov. 2026 */
+        P.kortZone = function () { return window.innerHeight <= 720 ? 179 : 203; };
 
         P.visKort = function () {
             var e = this.el.skort, html, kl;

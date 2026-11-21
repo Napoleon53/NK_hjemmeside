@@ -352,10 +352,14 @@
         var aktivBoks = null;
         var gammel = ol.querySelector(".trin-arbejde");
         var h = "";
+        /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"):
+           de klarede trin og det aktive viser titlen; de kommende staar som
+           et nummer med en graa streg, saa eleven ser, hvor mange trin der
+           kommer, men ikke alle overskrifter paa én gang. */
         d.trin.forEach(function (t, i) {
             var kl = i < mig.trinNr || mig.faerdigt ? "gjort" : (i === mig.trinNr ? "aktiv" : "kommer");
             h += '<li class="trinpunkt ' + kl + '" data-i="' + i + '"><div class="tp-hoved"><span class="tp-nr">' + (kl === "gjort" ? "✓" : (i + 1)) +
-                '</span><span class="tp-titel">' + mig.flet(t.titel) + "</span></div>";
+                '</span><span class="tp-titel">' + (kl === "kommer" ? '<span class="hl-streg"></span>' : mig.flet(t.titel)) + "</span></div>";
             if (kl === "gjort" && mig.resume[i]) h += '<div class="tp-resume">' + mig.resume[i] + "</div>";
             if (kl === "aktiv") {
                 h += '<div class="tp-krop">' + (t.info ? '<p class="tp-info">' + mig.flet(t.info) + "</p>" : "") +

@@ -2485,3 +2485,13 @@ sub { font-size: 0.74em; line-height: 0; vertical-align: -0.24em; }
 
 /* Teorien: et stykke amylose og et stykke cellulose tegnet af samme model som fanerne */
 .teori-kaeder { display: block; width: 100%; max-width: 660px; height: auto; margin: 6px auto 4px; background: #ffffff; border-radius: 10px; }
+
+/* =====================================================================
+   Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026, "husk
+   dette"): de kommende opgaver og trin staar som et nummer med en graa
+   streg i stedet for titlen og kan ikke klikkes, til eleven er naaet dertil
+   ===================================================================== */
+.tr-streg, .oc-streg { display: inline-block; width: 62%; max-width: 9em; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+.oc-f .oc-streg { width: 7em; }
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }

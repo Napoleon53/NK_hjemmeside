@@ -411,7 +411,8 @@ function koerTest(W) {
         S.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
         S.gem();
     });
-    paastand("kortet bliver højst én linje højere end pladsen, der er sat af (164 px)", hoejest <= 170 + 24, hoejest + " px ved " + hvor);
+    /* 171 (foer 170) og 165 px: spoergsmaalet paa egen linje, 21. nov. 2026 */
+    paastand("kortet bliver højst én linje højere end pladsen, der er sat af (165 px)", hoejest <= 171 + 24, hoejest + " px ved " + hvor);
     paastand("kortet står altid inden for kortZone", !over.length, over.join(", "));
     paastand("der er ingen tekst nederst i scenen: kortet er det eneste tekstfelt", Array.prototype.every.call(d.querySelectorAll(".scene .st-tekst"), function (e) { return !!e.closest(".scenekort"); }) &&
         !d.querySelector(".statuslinje") && !d.querySelector(".scene-valg") && !d.querySelector(".panel .opgavekort"));

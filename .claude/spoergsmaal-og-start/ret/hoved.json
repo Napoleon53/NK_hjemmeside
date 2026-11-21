@@ -1,0 +1,23 @@
+[
+ {
+  "nr": "G1",
+  "fil": "sb4.9_salenvir/js/data.js",
+  "gammel": "tekst: \"Se på TLC-pladen under UV-lampen. Er reaktionen færdig?\",",
+  "ny": "tekst: \"Er reaktionen færdig ifølge TLC-pladen under UV-lampen?\",",
+  "hvor": "sb4.9 (inaktiv), spørgsmålet efter en TLC-plade: ét spørgsmål uden indledning, så kortet ikke bliver højere"
+ },
+ {
+  "nr": "G1",
+  "fil": "sb4.9_salenvir/_selvtest.html",
+  "gammel": "/Er reaktionen færdig\\?/.test(kk.querySelector(\".sk-tekst\").textContent)",
+  "ny": "/Er reaktionen færdig ifølge TLC-pladen/.test(kk.querySelector(\".sk-tekst\").textContent)",
+  "hvor": "sb4.9 selvtest"
+ },
+ {
+  "nr": "sc6.3-romertal",
+  "fil": "sc6.3_mohrtitrering/js/sim_beregning.js",
+  "gammel": "\"Regn masseprocenten af NaCl i havvandet ud. Først \" + t.navn.toLowerCase() : t.navn",
+  "ny": "\"Regn masseprocenten af NaCl i havvandet ud. Først \" + t.navn.charAt(0).toLowerCase() + t.navn.slice(1) : t.navn",
+  "hvor": "sc6.3 fane 2: kun første bogstav gøres lille, så der står sølv(I)ioner og ikke sølv(i)ioner"
+ }
+]

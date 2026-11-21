@@ -108,7 +108,8 @@
         var t = K.trinPhAfH(h);
         return {
             navn: st.navn, stof: st.id, givet: "h",
-            tekst: st.navn + " har [H₃O⁺] = " + K.konc(h) + ". Hvad er pH?",
+            tekst: "Hvad er pH i " + st.navn.toLowerCase() + " med [H₃O⁺] = " + K.konc(h) + "?",
+            udsagn: st.navn + " har [H₃O⁺] = " + K.konc(h) + ". Du skal finde pH.",
             etiket: [{ id: "h", navn: "[H₃O⁺]", vaerdi: K.konc(h), trykt: true }, { id: "ph", navn: "pH", trin: 0 }],
             trin: [t],
             slutPh: t.facit
@@ -123,7 +124,8 @@
         var t2 = K.trinOhAfH(K.rund(t1.facit), ph);
         return {
             navn: st.navn, stof: st.id, givet: "ph", maalFoer: ph,
-            tekst: "pH-metret viser, at " + st.navn.toLowerCase() + " har pH " + K.phTekst(ph) + ". Hvad er [H₃O⁺] og [OH⁻]?",
+            tekst: "pH-metret har målt pH i " + st.navn.toLowerCase() + ". Hvad er [H₃O⁺] og [OH⁻] i " + st.navn.toLowerCase() + " med pH " + K.phTekst(ph) + "?",
+            udsagn: "pH-metret viser, at " + st.navn.toLowerCase() + " har pH " + K.phTekst(ph) + ". Du skal finde [H₃O⁺] og [OH⁻].",
             etiket: [{ id: "ph", navn: "pH", vaerdi: K.phTekst(ph), trykt: true, maales: true },
                 { id: "h", navn: "[H₃O⁺]", trin: 0 }, { id: "oh", navn: "[OH⁻]", trin: 1 }],
             trin: [t1, t2]
@@ -148,7 +150,8 @@
         this.sidste = s.formel;
         var opg = {
             navn: s.navn, flaske: s, syre: valg[0] === "syre", c: c, givet: "c",
-            tekst: "Flasken indeholder " + K.decimal(c) + " M " + s.formel + " (" + s.navn.toLowerCase() + "). Hvad er pH?"
+            tekst: "Flasken indeholder " + s.navn.toLowerCase() + ". Hvad er pH i flasken med " + K.decimal(c) + " M " + s.formel + "?",
+            udsagn: "Flasken indeholder " + K.decimal(c) + " M " + s.formel + " (" + s.navn.toLowerCase() + "). Du skal finde pH."
         };
         if (opg.syre) {
             var t1 = K.trinHAfSyre(s, c);
@@ -590,7 +593,7 @@
     /* Det, kortet siger om den bid, eleven er ved */
     P.bidTekst = function () {
         var t = this.trin();
-        if (this.bid === "formel") return "Vælg formlen, der går fra " + this.stationNavn(this.fraNoegle(t)) + " til " + NAVN[t.til] + ".";
+        if (this.bid === "formel") return "Hvilken formel går fra " + this.stationNavn(this.fraNoegle(t)) + " til " + NAVN[t.til] + "?";
         if (this.bid === "tast") return K.formelHtml(t.tastTekst) + " Lommeregneren står i panelet.";
         return K.formelHtml(t.skrivTekst).replace(/ i (feltet|felterne)\.$/, " i $1 i panelet.");
     };
@@ -626,7 +629,11 @@
             this.kort.vis(o);
             return;
         }
-        o.ekstra = '<p class="sk-trin">' + nrTekst + this.bidTekst() + "</p>";
+        /* Ved formlen staar opgaven som indledning, og formlen er spoergsmaalet */
+        if (this.bid === "formel") {
+            o.tekst = opg.udsagn;
+            o.ekstra = '<p class="sk-trin">' + nrTekst + (NK.Papir ? NK.Papir.tekst(this.bidTekst()) : this.bidTekst()) + "</p>";
+        } else o.ekstra = '<p class="sk-trin">' + nrTekst + this.bidTekst() + "</p>";
         if (this.bid === "formel") {
             o.svar = this.formelOrden(t).map(function (k) {
                 var kl = "";

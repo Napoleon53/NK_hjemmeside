@@ -855,6 +855,7 @@ button:focus-visible {
 .scenekort[hidden], .sk-bund[hidden], .scenekort [hidden] { display: none !important; }
 
 .sk-tekst { margin: 0; }
+.scenekort.gaet .sk-tekst { margin-bottom: 10px; }   /* gæt-kortet: luft over svarene (21. nov. 2026) */
 .sk-chip { white-space: nowrap; }
 .sk-gaet { margin: 4px 0 0; font-size: 0.95rem; }
 

@@ -107,3 +107,7 @@ antal, at de ukendte peger på den rigtige flaske, alle tre faner med de typiske
 fejl, at intet løses uden Indsend svar, at reaktionsskemaet kun viser det
 regnede, sproget, at startbilledet står stille, at kortet kan være over tavlen
 fra 1100 × 620 til 1600 × 950, og at skemaet og rammerne kan være der.
+
+## Listerne låser titlerne op i takt (21. nov. 2026)
+
+Flaskerne på Syreskalaen og Den ukendte syre og trinlisterne på Regn på syren og Den ukendte syre viser kun titlen på det løste og det, eleven er ved; det kommende står som et nummer eller bogstav med en grå streg (`aabenOpgave`, `aabenFlaske`, `aabenTrin`). Syrerne på Regn på syren er valg af stof og står altid. Selvtesten: ALT OK (57 påstande).

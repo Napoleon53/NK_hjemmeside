@@ -301,7 +301,7 @@
         this.kort.vis({
             kl: o.faerdig ? "loest" + (o.brugtSvar && !o.gennemsyn ? " svar" : "") : "opgave",
             chip: "Ordre " + (ordre.plads + 1) + " af " + this.iNiveau(ordre.niveau) + " · " + nv.navn,
-            tekst: NK.html("Afvej " + ordre.nTekst + " mol " + ordre.st.navn + ". Molarmassen står på krukken. Hvad skal vægten vise?")
+            tekst: NK.html("Molarmassen står på krukken. Hvor mange gram skal vægten vise for " + ordre.nTekst + " mol " + ordre.st.navn + "?")
         });
         if (o.faerdig) {
             var forkl = "<b>" + NK.html(ordre.nTekst + " mol " + ordre.st.navn + " vejer " + ordre.mTekst + " g.") + "</b> " +

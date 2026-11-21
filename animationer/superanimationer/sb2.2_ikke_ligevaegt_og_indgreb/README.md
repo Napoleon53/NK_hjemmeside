@@ -202,3 +202,8 @@ og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`.
 O₂ hedder dioxygen og H₂ dihydrogen, når stoffet menes (Niels: "altid dioxygen overalt"):
 fane 2 hedder Dioxygen i blodet, og gæt, forklaringer, teori, rundvisning og klik på
 partikler siger dioxygen. Hashen `#dioxygen` virker ved siden af `#oxygen`.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Brugerens regel 21. nov. 2026: Listen viser kun titlen på de løste opgaver og den, eleven er ved. De kommende står som et nummer med en grå streg og kan ikke klikkes, før alle opgaver før dem er løst (Vis svaret tæller som løst).
+Koden er `aabenOpgave`, `bygListe` og `visListe` i `js/fane.js` og `.hl-streg` i `css/stil.css`. Selvtesten prøver det og gav ALT OK (133 påstande).

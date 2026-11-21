@@ -289,3 +289,7 @@ stående, svaret er grønt, forklaringen står under svarene, og Find den næste
 isomer står, hvor Indsend svar stod (`groen.spm` i `js/sim_jagt.js`, første
 gren i `visKort` i `js/fane.js`). De andre grønne kort (alle isomerer fundet,
 jagten klaret) er som før, men på papir.
+
+## Jagterne låser titlerne op i takt (21. nov. 2026)
+
+Listen viser kun formel, niveau og tal for de klarede jagter og den, eleven er ved (også en jagt med fundne isomerer, gemt i browseren); de kommende står som et nummer med en grå streg og kan ikke klikkes, før alle jagter før dem er klaret (`aabenJagt` i `js/sim_jagt.js`). Selvtesten: ALT OK (159 påstande).

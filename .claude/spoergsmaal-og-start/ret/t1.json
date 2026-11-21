@@ -1,0 +1,72 @@
+[
+ {
+  "nr": 68,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "spm: \"Du lægger et lod på stemplet. Trykket udefra stiger fra 1,013 bar til 2,013 bar, næsten det dobbelte. Hvad sker der med volumenet?\",",
+  "ny": "spm: \"Du lægger et lod på stemplet. Trykket udefra stiger fra 1,013 bar til 2,013 bar. Hvad sker der med volumenet, når trykket udefra bliver næsten dobbelt så stort?\",",
+  "hvor": "fane 1, opgave 2 Et lod på, spørgsmålet"
+ },
+ {
+  "nr": 69,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "spm: \"Du fordobler stofmængden fra 0,50 mol til 1,00 mol. Temperaturen og trykket er de samme. Hvad sker der med volumenet?\",",
+  "ny": "spm: \"Du lukker gas ind, fra 0,50 mol til 1,00 mol. Temperatur og tryk er de samme. Hvad sker der med volumenet, når stofmængden af gassen bliver dobbelt så stor?\",",
+  "hvor": "fane 1, opgave 3 Dobbelt så meget gas, spørgsmålet"
+ },
+ {
+  "nr": 70,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "spm: \"Stemplet er låst, så volumenet ikke kan ændre sig. Hvad sker der med trykket, når gassen bliver varmere?\",",
+  "ny": "spm: \"Stemplet er låst, så volumenet ikke kan ændre sig. Hvad sker der med trykket i den låste cylinder, når gassen bliver varmere?\",",
+  "hvor": "fane 1, opgave 4 Låst stempel, spørgsmålet"
+ },
+ {
+  "nr": 71,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "spm: \"Stemplet er låst. Du lukker 0,25 mol gas ud. Hvad sker der med trykket?\",",
+  "ny": "spm: \"Stemplet er låst. Hvad sker der med trykket i den låste cylinder, når du lukker 0,25 mol gas ud?\",",
+  "hvor": "fane 1, opgave 6 Gas ud, spørgsmålet"
+ },
+ {
+  "nr": 72,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"Der er {n} gas i en cylinder med et stempel ved {T} og {p}. Hvor stort er volumenet?\",",
+  "ny": "tekst: \"Gassen er i en cylinder med et stempel. Hvor stort er volumenet af {n} gas ved {T} og {p}?\",",
+  "hvor": "fane 2, Let 1 Gas i et stempel, opgaveteksten"
+ },
+ {
+  "nr": 73,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"En gas fylder {V} ved {t} og {p}. Hvor mange mol gas er det?\",",
+  "ny": "tekst: \"Hvor mange mol gas fylder {V} ved {t} og {p}?\",",
+  "hvor": "fane 2, Middel 2 Stofmængden, opgaveteksten"
+ },
+ {
+  "nr": 73,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"{n} gas fylder {V} ved {p}. Hvad er temperaturen i kelvin?\",",
+  "ny": "tekst: \"Hvad er temperaturen i kelvin, når {n} gas fylder {V} ved {p}?\",",
+  "hvor": "fane 2, Let 4 Temperaturen, opgaveteksten (samme mønster som Middel 2)"
+ },
+ {
+  "nr": 74,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"Hvor stort et volumen fylder {m} ammoniak, NH₃, ved {t} og {p}? M(NH₃) = {M}.\",",
+  "ny": "tekst: \"Gassen er ammoniak, NH₃. M(NH₃) = {M}. Hvor stort er volumenet af {m} NH₃ ved {t} og {p}?\",",
+  "hvor": "fane 2, Svær 1 Ammoniak, opgaveteksten"
+ },
+ {
+  "nr": 74,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"En ballon indeholder {V} carbondioxid, CO₂, ved {t} og {p}. Hvor mange gram CO₂ er der i ballonen? M(CO₂) = {M}.\",",
+  "ny": "tekst: \"En ballon indeholder {V} carbondioxid, CO₂, ved {t} og {p}. M(CO₂) = {M}. Hvor mange gram CO₂ er der i ballonen?\",",
+  "hvor": "fane 2, Svær 2 Ballon med CO₂, molarmassen før spørgsmålet (samme mønster som Svær 1)"
+ },
+ {
+  "nr": 74,
+  "fil": "sc5.7_idealgasligningen/js/data.js",
+  "gammel": "tekst: \"En heliumflaske på {V} har et tryk på {p} ved {t}. Hvor mange gram helium er der i flasken? M(He) = {M}.\",",
+  "ny": "tekst: \"En heliumflaske på {V} har et tryk på {p} ved {t}. M(He) = {M}. Hvor mange gram helium er der i flasken?\",",
+  "hvor": "fane 2, Svær 4 Heliumflasken, molarmassen før spørgsmålet (samme mønster som Svær 1)"
+ }
+]

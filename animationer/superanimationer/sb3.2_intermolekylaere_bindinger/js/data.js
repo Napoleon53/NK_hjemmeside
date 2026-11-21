@@ -150,7 +150,7 @@
         },
         {
             id: "hvilket", navn: "Find H'et",
-            tekst: "Et ethanolmolekyle har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H-atom i luppen.",
+            tekst: "Et ethanolmolekyle har seks H-atomer. Hvilket H-atom i ethanol kan danne hydrogenbindinger? Klik på det i luppen, og tryk Indsend svar.",
             hint: [
                 "En hydrogenbinding er tegnet som en rød stiplet streg. Se, hvilket atom stregen begynder ved.",
                 "Find et H-atom, der sidder på et rødt O-atom.",
@@ -168,7 +168,7 @@
             id: "uden", navn: "Uden hydrogenbindinger",
             gaet: {
                 intro: "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger.",
-                tekst: "Ved hvilken temperatur ville ethanol så koge?",
+                tekst: "Ved hvilken temperatur koger ethanol uden hydrogenbindinger?",
                 svar: [
                     { t: "Højere end 78 °C" },
                     { t: "Lidt lavere, omkring 60 °C" },
@@ -233,7 +233,7 @@
         {
             id: "oh", navn: "Propan og ethanol", a: "propan", b: "ethanol", start: -60,
             intro: "Propan og ethanol har næsten samme molarmasse, 44 og 46 g/mol.",
-            spm: "Ethanol koger 120 °C højere end propan. Hvorfor?",
+            spm: "Hvorfor koger ethanol 120 °C højere end propan?",
             svar: [
                 { t: "Ethanol har lidt større molarmasse.",
                   f: "2 g/mol gør næsten ingen forskel. Butan har 14 g/mol større molarmasse end propan og koger kun 42 °C højere." },
@@ -249,7 +249,7 @@
         {
             id: "kaede", navn: "Ethanol og butan-1-ol", a: "ethanol", b: "butan1ol", start: 20,
             intro: "Ethanol og butan-1-ol har begge én OH-gruppe. Butan-1-ol har to C-atomer mere.",
-            spm: "Butan-1-ol koger 40 °C højere end ethanol. Hvorfor?",
+            spm: "Hvorfor koger butan-1-ol 40 °C højere end ethanol?",
             svar: [
                 { t: "Flere H-atomer giver flere hydrogenbindinger.",
                   f: "Kun H på O danner hydrogenbindinger. Ethanol og butan-1-ol har begge ét H på O." },
@@ -264,7 +264,7 @@
         {
             id: "diol", navn: "Ethanol og ethan-1,2-diol", a: "ethanol", b: "ethandiol", start: 20,
             intro: "Ethanol har én OH-gruppe. Ethan-1,2-diol har en OH-gruppe i hver ende.",
-            spm: "Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C. Hvorfor?",
+            spm: "Hvorfor koger ethan-1,2-diol 119 °C højere end ethanol?",
             svar: [
                 { t: "Ethan-1,2-diol har større molarmasse.",
                   f: "Propan-1-ol har næsten samme molarmasse, 60 g/mol, men koger ved 97 °C. Molarmassen forklarer ikke 197 °C." },

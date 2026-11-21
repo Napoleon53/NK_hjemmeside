@@ -465,7 +465,7 @@ function koer() {
     paastand("begge nye par fundet: opslaget lukker af sig selv om lidt", Op.aaben() && Op.lukker() && nt.s.fase === "b");
     Op.lukNu();
     paastand("tilbage ved blandingen: tabellen er i panelet igen, og kortet spørger, hvad der falder ud",
-        !Op.aaben() && ob.hidden && !!panelTabel.querySelector("#tabel .ftabel") && /Hvad falder ud\?/.test(tb.textContent)
+        !Op.aaben() && ob.hidden && !!panelTabel.querySelector("#tabel .ftabel") && /falder ud som bundfald\?/.test(tb.textContent)
         && tb.querySelectorAll(".sk-knap").length === 4 && !/Begge nye par/.test(tb.textContent));
     nt.nyOpgave(parAf("K-NO3+Na-Cl"), false);
     d.querySelector('#tabel-hjem td[data-kat="Na"][data-an="NO3"]').click();

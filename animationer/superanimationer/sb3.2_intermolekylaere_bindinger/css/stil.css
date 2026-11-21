@@ -1025,6 +1025,13 @@ kbd {
 
 .opg-chip.valgt .oc-nr { background-color: var(--blaa); color: #ffffff; }
 
+/* Kommende opgaver: et nummer med en graa streg i stedet for titlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.opg-chip.laast .oc-f { flex: 1 1 auto; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
 .tavle.ryst { animation: ryst 0.35s ease 1; }
 
 /* ---------------------------------------------------------------------

@@ -37,7 +37,7 @@
         this.vis = {};
         this.startFane(D.OPL);
         this.el.beregning = NK.el("opl-beregning");
-        this.el.note = NK.el("opl-note");
+        this.el.tavle = NK.el("opl-kort");
         this.introNu = true;
         this.vaelg(0, false);
     }
@@ -183,11 +183,29 @@
         return this.statusLinje();
     };
 
-    /* Beregningen staar i panelet (tallene), ikke paa kortet */
+    /* Beregningen staar paa en lille tavle oeverst til venstre i scenen (21. nov.
+       2026: intet i panelet). Pladsen er altid sat af (lay.tavle), saa intet
+       flytter sig, naar den dukker op. Skriften skrumper, til alt kan vaere der. */
     P.visKortEkstra = function () {
         var h = this.beregningHTML();
-        if (this.el.beregning) this.el.beregning.innerHTML = h;
-        if (this.el.note) this.el.note.hidden = !!h;
+        if (this.el.beregning && this.el.beregning.innerHTML !== h) this.el.beregning.innerHTML = h;
+        if (this.el.tavle) this.el.tavle.hidden = !h;
+        this.tilpasTavle();
+    };
+    P.tilpasTavle = function () {
+        var e = this.el.tavle, r = this.lay && this.lay.tavle;
+        if (!e || !r) return;
+        e.style.left = Math.round(r.x) + "px";
+        e.style.top = Math.round(r.y) + "px";
+        e.style.width = Math.round(r.b) + "px";
+        e.style.height = Math.round(r.h) + "px";
+        if (e.hidden) return;
+        var s = 1;
+        e.style.fontSize = "";
+        while (s > 0.72 && (e.scrollHeight > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1)) {
+            s -= 0.04;
+            e.style.fontSize = s + "em";
+        }
     };
 
     /* ----- Beregningen i panelet ----------------------------------------------------
@@ -211,7 +229,14 @@
                 led.map(function (l) { return '<span class="sb-led">= ' + l + "</span>"; }).join(" ") + "</span>";
         }
         function c(s) { return "c(" + D.salt(s).formel + ")"; }
+        /* Hver del har et navn i ord over sig (runde 3, 21. nov. 2026: tavlen maa
+           ikke vaere indforstaaet) */
+        function navn(t) {
+            r += '<span class="sb-navn' + (r ? " sb-ny" : "") + '">' + NK.html(t) + "</span>";
+            ny = false;
+        }
         if (this.vist("salt")) {
+            navn(salte.length > 1 ? "Saltenes koncentrationer" : "Koncentrationen af " + D.salt(salte[0]).formel);
             if (salte.length > 1) raekke("c", [broek("n", "V")]);
             salte.forEach(function (s) {
                 if (salte.length === 1) raekke(c(s), [broek("n", "V")]);
@@ -219,7 +244,8 @@
             });
         }
         if (this.vist("lup") && salte.length === 1) {
-            r += '<span class="sb-skema' + (r ? " sb-ny" : "") + '">' + NK.html(K.skema(D.salt(salte[0]))) + "</span>";
+            navn("Opløsningsskemaet");
+            r += '<span class="sb-skema">' + NK.html(K.skema(D.salt(salte[0]))) + "</span>";
         }
         if (this.vist("ioner")) {
             (o.regn || [o.maal.ion]).forEach(function (id) {
@@ -231,14 +257,13 @@
                     tal.push((k > 1 ? k + " · " : "") + K.to(g.cSalt(s)) + " M");
                 });
                 var sum = "<b>" + K.to(g.ion(id)) + " M</b>";
-                ny = true;
+                navn(D.ion(id).t + " i glasset");
                 raekke(ion, [NK.html(formel.join(" + "))]);
                 raekke(ion, tal.length > 1 || /·/.test(tal[0]) ? [NK.html(tal.join(" + ")), sum] : [sum]);
             });
         }
         if (!r) return "";
-        return '<div class="superberegning"><span class="sb-etiket">Beregningen</span><div class="sb-gitter">' + r + "</div>" +
-            (loest ? '<p class="sb-konklusion">' + NK.html(o.konklusion) + "</p>" : "") + "</div>";
+        return '<div class="superberegning"><div class="sb-gitter">' + r + "</div></div>";
     };
 
     P.vaelgSvar = function (j, maade) {
@@ -448,10 +473,25 @@
     /* Et klik i scenen, foer der er gaettet: kortet blinker */
     P.blokValg = function () { this.gaetBlink(); };
 
+    /* Venter opgaven paa salt? Saa har krukken rammen og boblen. Ikke under et
+       gaet eller et spoergsmaal, og ikke naar maalet er naaet. */
+    P.venterPaaSalt = function () {
+        var o = this.opg, m = o.maal, g = this.glas;
+        if (this.fase !== "goer" || this.faerdig || this.auto) return false;
+        if (m.portioner) return o.salte.some(function (s) { return g.portioner(s) < m.portioner; });
+        if (m.begge && o.salte.some(function (s) { return !(g.n[s] > 0); })) return true;
+        return g.ion(m.ion) < m.c - 0.005;
+    };
+
     /* ----- Musen ------------------------------------------------------------------- */
     P.hvad = function (pt) {
         var lay = this.lay;
         if (!lay || !pt) return null;
+        /* Et klik paa boblen over én krukke er et klik paa krukken */
+        var bf = this.bobleFelt;
+        if (bf && lay.krukker.length === 1 && pt.x >= bf.x && pt.x <= bf.x + bf.b && pt.y >= bf.y && pt.y <= bf.y + bf.h) {
+            return { slags: "krukke", salt: lay.krukker[0].salt };
+        }
         for (var i = 0; i < lay.krukker.length; i++) {
             var kr = lay.krukker[i];
             if (pt.x >= kr.x - 6 && pt.x <= kr.x + kr.b + 6 && pt.y >= kr.y - 10 && pt.y <= kr.y + kr.h) return { slags: "krukke", salt: kr.salt };
@@ -487,7 +527,7 @@
         }
         if (u.slags === "glas") this.kortBesked("Træk en portion fra krukken hertil.");
         if (u.slags === "zoom") {
-            this.kortBesked(this.vist("lup") ? "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." :
+            this.kortBesked(this.vist("lup") ? "Luppen viser altid lige meget væske. Hver kugle er en ion med sin formel." :
                 "Ionerne kommer i luppen, når du har svaret på, hvor mange ioner saltet giver.");
         }
         if (u.slags === "soejler") this.kortBesked("Den grå søjle er saltets koncentration. De farvede søjler er ionernes koncentrationer.");
@@ -526,30 +566,50 @@
         var y0 = 10 + lay.zone, Hr = Hs - y0;
         var colB = Math.round(NK.klamp(W * 0.36, 210, 400));
         var colX = W - colB - 14;
-        var zr = Math.round(NK.klamp(Math.min(colB * 0.3, Hr * 0.17), 40, 105));
-        lay.zoom = { x: colX + colB / 2, y: y0 + 24 + zr, r: zr };
-        var sy = lay.zoom.y + zr + 66;
+        /* Luppen er stor (runde 3): kuglerne har formlen inde i, og der er ingen legende */
+        var zr = Math.round(NK.klamp(Math.min(colB * 0.4, Hr * 0.24, (Hr - 260) / 2), 56, 140));
+        lay.zoom = { x: colX + colB / 2, y: y0 + 26 + zr, r: zr };
+        var sy = lay.zoom.y + zr + 24;
         lay.soejler = { x: colX, y: sy, b: colB, h: Math.max(110, lay.bordY - 8 - sy) };
         var venstreB = colX - 24;
+        /* Tavlen med beregningen oeverst til venstre; glasset og krukken under den */
+        /* Navnene over regnestykkerne fylder; paa lave skaerme bliver glasset lidt mindre */
+        var th = Math.round(NK.klamp(Hr * 0.5, 110, 250));
+        th = Math.max(80, Math.min(th, lay.bordY - y0 - 34 - 120));
+        lay.tavle = { x: 16, y: y0, b: Math.min(venstreB - 16, 470), h: th };
         var nK = this.opg ? this.opg.salte.length : 1;
-        var gh = Math.min(lay.bordY - y0 - 24, (venstreB - 30) / (0.8 + 0.34 * nK) / 1.02);
-        gh = Math.max(140, Math.min(gh, 460));
-        var krH = gh * 0.42, krB = Tg.krukkeBredde(krH);
+        var gh = Math.min(lay.bordY - y0 - th - 34, (venstreB - 30) / (0.8 + 0.42 * nK) / 1.02);
+        gh = Math.max(120, Math.min(gh, 460));
+        /* Krukken staar lige ved siden af glasset og er stor nok til, at navnet kan
+           laeses (runde 4: "NaCl er gemt komisk langt væk"). Over den er der plads
+           til boblen "Klik: en portion". */
+        var krPlads = (venstreB - 40 - gh * 0.8 - (nK - 1) * 14) / (nK * Tg.krukkeBredde(1));
+        var krH = Math.min(Math.max(gh * 0.5, 110), 190, lay.bordY - y0 - th - 56, krPlads);
+        krH = Math.max(80, krH);
+        var krB = Tg.krukkeBredde(krH), gruppe = nK * krB + (nK - 1) * 14 + 24 + gh * 0.8;
+        var x = Math.max(18, 16 + (venstreB - 16 - gruppe) / 2);
         lay.krukker = [];
-        var x = 18;
         (this.opg ? this.opg.salte : ["NaCl"]).forEach(function (s) {
             lay.krukker.push({ salt: s, cx: x + krB / 2, x: x, y: lay.bordY - krH, b: krB, h: krH });
             x += krB + 14;
         });
-        var gx = Math.max(x + 10, (x + venstreB - gh * 0.8) / 2);
+        var gx = x - 14 + 24;
         lay.glas = Tg.glas1Geo(gx, lay.bordY, gh);
         lay.lup = { x: lay.glas.cx + 20 * lay.glas.k, y: lay.glas.ind.bund - 60 * lay.glas.k };
         this.lay = lay;
         var gg = lay.glas;
         this.saetAnker("glas", gg.x, gg.y0, gg.b, gg.h);
         this.saetAnker("krukke", lay.krukker[0].x, lay.krukker[0].y, x - 18, krH);
-        this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 30, 2 * zr, 2 * zr + 90);
+        this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 30, 2 * zr, 2 * zr + 34);
+        /* Skalaen for kuglerne i luppen: hoejst ca. 20, naar opgaven er loest */
+        if (this.opg) {
+            var gl = new K.Glas(this.opg.V, this.opg.salte);
+            this.opg.goer.forEach(function (x) { gl.tilsaet(x[0], x[1] * D.PORTION); });
+            this.skala = Tg.skala(gl.ionListe().reduce(function (sum, id) { return sum + gl.ion(id); }, 0), zr);
+        }
         this.saetAnker("soejler", lay.soejler.x, lay.soejler.y, lay.soejler.b, lay.soejler.h);
+        this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
+        this.tilpasTavle();
     };
 
     /* ----- Opdater ----------------------------------------------------------------------- */
@@ -578,7 +638,8 @@
         var vSalt = this.vist("salt"), vIoner = this.vist("ioner"), vLup = this.vist("lup");
         this.opg.salte.forEach(function (s) { vis["s" + s] = NK.mod(vis["s" + s] || 0, vSalt ? gl.cSalt(s) : 0, 6, dt); });
         this.ioner().forEach(function (id) { vis["i" + id] = NK.mod(vis["i" + id] || 0, vIoner ? gl.ion(id) : 0, 6, dt); });
-        this.part.saet(this.ioner().map(function (id) { return vLup ? Tg.prikker(gl.ion(id)) : 0; }));
+        var skala = this.skala;
+        this.part.saet(this.ioner().map(function (id) { return vLup ? Tg.kugler(gl.ion(id), skala) : 0; }));
         this.part.opdater(dt);
 
     };
@@ -602,28 +663,21 @@
         });
         Tg.glas1(ctx, g, { V: this.glas.V / 1000, farve: farve, skyer: this.skyer });
 
-        /* Krukkerne */
+        /* Krukkerne. Venter opgaven paa salt, har krukken en gul ramme og boblen
+           "Klik: en portion" (som krukken i sc6.1); med to krukker har begge rammen */
+        var venter = this.venterPaaSalt();
         lay.krukker.forEach(function (kr) {
             var st = D.salt(kr.salt);
-            var lys = mig.over && mig.over.slags === "krukke" && mig.over.salt === kr.salt ? 1 : 0;
+            var lys = mig.over && mig.over.slags === "krukke" && mig.over.salt === kr.salt ? 1 : (venter ? 0.5 + 0.5 * Math.sin(t * 4.5) : 0);
             Tg.krukke(ctx, kr.cx, lay.bordY, kr.h, st, { lys: lys, linje3: "" });
         });
+        if (venter) {
+            var kf = lay.krukker[0], kl = lay.krukker[lay.krukker.length - 1];
+            this.bobleFelt = Tg.boble(ctx, "Klik: en portion", (kf.x + kl.x + kl.b) / 2, kf.y - 10, lay.W, t);
+        } else this.bobleFelt = null;
         NK.tekst(ctx, "1 portion = 0,10 mol", lay.krukker[0].x, Math.min(lay.bordY + 26, lay.Hs - 6), {
             font: Tg.font("700", NK.klamp(g.k * 15, 13, 16)), linje: "middle", farve: "#9fcdf3" });
 
-        /* Pilen over krukken, foer der er gjort noget */
-        if (!this.handlet && !this.faerdig && this.fase !== "valg" && !this.auto) {
-            var kr0 = lay.krukker[0], hop = Math.sin(t * 5) * 5;
-            ctx.save();
-            ctx.fillStyle = "#f2c53d";
-            ctx.beginPath();
-            ctx.moveTo(kr0.cx, kr0.y - 14 + hop);
-            ctx.lineTo(kr0.cx - 9, kr0.y - 28 + hop);
-            ctx.lineTo(kr0.cx + 9, kr0.y - 28 + hop);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-        }
 
         /* Pulveret og spatlen */
         var sb = NK.klamp(g.h * 0.3, 70, 150);
@@ -637,11 +691,12 @@
 
         /* Luppen */
         var z = lay.zoom, ioner = this.ioner();
-        Tg.zoomLinje(ctx, lay.lup.x, lay.lup.y, z.x - z.r, z.y);
+        /* Keglen fra forstoerrelsesglasset i glasset op til luppen (som sc6.3) */
+        Tg.zoomKegle(ctx, lay.lup.x, lay.lup.y, z.x, z.y, z.r);
         var st = { ioner: ioner.map(function (id) { return D.ion(id); }) };
         var skjultLup = !this.vist("lup") && this.handlet;
         Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: farve, titel: "Luppen: altid lige meget væske",
-            tekst: skjultLup ? "?" : "", forklar: !skjultLup });
+            tekst: skjultLup ? "?" : "" });
         var lk = NK.klamp(g.k * 0.45, 0.25, 0.6);
         NK.Sprites.tegn(ctx, "lup", lay.lup.x - 52 * lk, lay.lup.y - 52 * lk, 140 * lk, 140 * lk);
 

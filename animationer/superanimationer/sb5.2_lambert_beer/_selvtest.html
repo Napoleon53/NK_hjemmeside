@@ -68,7 +68,7 @@ function koerTest(W) {
     var NK = W.NK, D = NK.Data, LB = NK.LB, R = NK.Regn;
     var L = NK.sims["fane-lys"], K = NK.sims["fane-kurve"], G = NK.sims["fane-regn"];
     var tekster = [];
-    function noter(t) { tekster.push(t); }
+    function noter(t) { if (t !== undefined && t !== null) tekster.push(t); }
 
     /* Tegneloekken koerer ikke af sig selv i en skjult iframe: kør den */
     function koerTil(S, betingelse, max) {
@@ -148,6 +148,7 @@ function koerTest(W) {
         if (f.facit.T !== undefined && /%/.test(t) && Math.round(T * 100) + " %" !== t) fFejl.push(f.id + ": " + t + " mod " + Math.round(T * 100) + " %");
         if (f.facit.A !== undefined && /^\d/.test(t) && NK.dk(A, 3) !== t) fFejl.push(f.id + ": " + t + " mod " + NK.dk(A, 3));
         noter(f.spm); noter(f.handling); noter(f.forklaring); f.hint.forEach(noter); f.valg.forEach(function (v) { noter(v.t); noter(v.n); });
+        (f.trin || []).forEach(function (t) { noter(t.tekst); noter(t.ros); t.hint.forEach(noter); t.svar.forEach(function (v) { noter(v.t); noter(v.hvorfor); }); });
     });
     paastand("hver forudsigelse har ét rigtigt svar, og modellen giver det", fFejl.length === 0, fFejl.join(" | "));
     var start = D.FORUD[2].start, Ast = LB.A(D.STOFFER.mno4.eps, start.l, start.c);
@@ -156,84 +157,241 @@ function koerTest(W) {
     paastand("Én centimeter mere: 51 % efter 1 cm og 26 % efter 2 cm", Math.round(LB.T(A4) * 100) === 51 && Math.round(LB.T(2 * A4) * 100) === 26);
 
     /* ------------------------------------------------------------------ */
-    overskrift("3. Fane 1 i brug");
+    overskrift("3. Fane 1 i brug: knapperne paa apparaterne (21. nov. 2026)");
     NK.visFane("fane-lys");
     var cv1 = d.getElementById("lys-laerred");
     L.tilpas();
-    var forkertOk = [], rigtigOk = [];
+    function synlig(id) { var e = d.getElementById(id); return !!e && !e.hidden && e.offsetParent !== null; }
+    function klikN(id, n) { for (var q = 0; q < n; q++) d.getElementById(id).click(); }
+    function tegnNu() { L.opdater(0.016); }
+    /* Forbi trinene i den foerste forudsigelse med de rigtige svar */
+    function forbiTrin() {
+        for (var q = 0; q < 6 && L.fase === "trin"; q++) {
+            var t = L.trinNu(), k = 0;
+            t.svar.forEach(function (v, j) { if (v.ok) k = j; });
+            d.querySelector('#lys-ind [data-valg="' + k + '"]').click();
+            indsend(L);
+            L.videreKlik();
+        }
+    }
     function vaelgSvar(nr, rigtig) {
         L.vaelg(nr);
+        forbiTrin();
         var f = D.FORUD[nr], j = -1;
         f.valg.forEach(function (v, k) { if (!!v.ok === rigtig && j < 0) j = k; });
         d.querySelector('#lys-ind [data-gaet="' + j + '"]').click();
         return f;
     }
+    /* Proev det med − og + (hoejst 12 klik), som eleven goer */
     function goerDet(nr) {
-        var f = D.FORUD[nr];
-        if (f.maal.l && f.maal.l[0] > 1.5) {
-            /* Traek i kuvettens hoejre side */
-            var g = L.geo();
-            traek(cv1, g.cr, g.ct + g.cuvH * 0.84, g.cx + 2.0 * g.pxCm / 2, g.ct + g.cuvH * 0.84);
+        var f = D.FORUD[nr], m = f.maal, e = 1e-9;
+        for (var q = 0; q < 12; q++) {
+            if (m.c && L.c > m.c[1] + e) d.getElementById("lys-c-ned").click();
+            else if (m.c && L.c < m.c[0] - e) d.getElementById("lys-c-op").click();
+            else if (m.l && L.l < m.l[0] - e) d.getElementById("lys-l-op").click();
+            else if (m.l && L.l > m.l[1] + e) d.getElementById("lys-l-ned").click();
+            else if (m.A && L.A() < m.A[0]) d.getElementById("lys-c-op").click();
+            else if (m.A && L.A() > m.A[1]) d.getElementById("lys-c-ned").click();
+            else break;
         }
-        if (f.maal.c) skyd("lys-c", (f.maal.c[0] + f.maal.c[1]) / 2);
-        if (f.maal.A) skyd("lys-c", L.maalC());
         indsend(L);
     }
+    function nulAlt() { L.status.forEach(function (st) { st.loest = false; st.stjerne = false; }); L.naaet = {}; }
+
+    /* Trinene i den foerste forudsigelse */
+    nulAlt();
+    L.vaelg(0); tegnNu();
+    paastand("forudsigelse 1 begynder med Trin 1 af 3 som et spørgsmål med tre svar",
+        L.fase === "trin" && /Trin 1 af 3/.test(kortTekst(L)) && d.querySelectorAll("#lys-ind [data-valg]").length === 3, kortTekst(L).slice(0, 80));
+    function knapperISzenen() {
+        L.opdater(0.016);
+        return ["lys-c-ned", "lys-c-op", "lys-l-ned", "lys-l-op", "lys-langsom", "lys-stoffer", "lys-boble"].filter(synlig);
+    }
+    paastand("fra start er kun lampen, strålen, kuvetten og detektoren fremme: kurven, T, A, tavlen og knapperne venter",
+        !L.fremme("kurve") && !L.fremme("T") && !L.fremme("A") && !L.fremme("tavle") &&
+        ["lys-c-ned", "lys-c-op", "lys-l-ned", "lys-l-op", "lys-langsom", "lys-stoffer", "lys-boble"].every(function (id) { return !synlig(id); }));
+    paastand("under trinnet er scenen låst: et klik på kuvetten får kortet til at blinke", (function () {
+        L.el.skort.classList.remove("blink");
+        var g = L.geo();
+        klikPaa(cv1, g.cx, g.ct + g.cuvH * 0.4);
+        return L.el.skort.classList.contains("blink") && L.fase === "trin";
+    })());
+    paastand("et forkert svar i trin 1 bliver rødt og får sin egen forklaring", (function () {
+        d.querySelector('#lys-ind [data-valg="1"]').click(); indsend(L);
+        noter(L.beskedTekst());
+        var b = d.querySelector('#lys-ind [data-valg="1"]');
+        return b.classList.contains("forkert") && skidt(L) && /skifter ikke farve/.test(L.beskedTekst()) && !L.venter;
+    })(), L.beskedTekst());
+    paastand("det rigtige svar i trin 1: kurven Lys tilbage kommer frem, og kortet bliver på spørgsmålet med Næste", (function () {
+        d.querySelector('#lys-ind [data-valg="0"]').click(); indsend(L);
+        noter(kortTekst(L));
+        return !!L.venter && bliv(L, "god") && L.fremme("kurve") && !L.fremme("T");
+    })());
+    paastand("trin 2: det rigtige svar (32 %) giver T i displayet; så kommer gættet som Trin 3 af 3", (function () {
+        L.videreKlik();
+        var ok1 = /Trin 2 af 3/.test(kortTekst(L));
+        d.querySelector('#lys-ind [data-valg="1"]').click(); indsend(L);
+        var ok2 = !!L.venter && L.fremme("T") && !L.fremme("A");
+        L.videreKlik();
+        return ok1 && ok2 && L.fase === "gaet" && /Trin 3 af 3/.test(kortTekst(L)) && d.querySelectorAll("#lys-ind [data-gaet]").length === 3;
+    })(), kortTekst(L).slice(0, 80));
+    paastand("mens kortet spørger, er der ingen klik-opfordring", (function () { tegnNu(); return !synlig("lys-boble") && !d.querySelector(".opfordring"); })());
+    paastand("efter gættet kommer − og + frem ved etiketten, og − har gul ramme og boblen Klik: fortynd", (function () {
+        d.querySelector('#lys-ind [data-gaet="0"]').click(); tegnNu();
+        return synlig("lys-c-ned") && synlig("lys-c-op") && d.getElementById("lys-c-ned").classList.contains("opfordring") &&
+            synlig("lys-boble") && d.getElementById("lys-boble").textContent === "Klik: fortynd" && !synlig("lys-l-op");
+    })(), d.getElementById("lys-boble").textContent);
+    paastand("fire klik på − giver 0 mM, og så forsvinder boblen; Indsend svar giver Rigtigt", (function () {
+        klikN("lys-c-ned", 4); tegnNu();
+        var ok = Math.abs(L.c) < 1e-9 && !synlig("lys-boble") && !d.querySelector(".opfordring") && klar(L);
+        indsend(L);
+        return ok && L.faerdig && /Rigtigt/.test(kortTekst(L));
+    })(), L.c);
+    paastand("forudsigelse 2: A i displayet, tavlen og (ved Prøv det) Langsomt lys kommer frem; bredden endnu ikke", (function () {
+        L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click(); tegnNu();
+        return L.fremme("A") && L.fremme("tavle") && synlig("lys-langsom") && !L.fremme("l") && !synlig("lys-l-op");
+    })());
+    paastand("forudsigelse 4: ved Prøv det kommer − og + ved l og grebet på kuvetten frem, men ikke − og + ved c", (function () {
+        L.vaelg(3); d.querySelector('#lys-ind [data-gaet="1"]').click(); tegnNu();
+        return L.fremme("l") && synlig("lys-l-op") && synlig("lys-l-ned") && L.styrVis("l") && !synlig("lys-c-op");
+    })());
+    paastand("er forudsigelse 1 løst, er alt fremme fra start; Start forfra giver trinene igen", (function () {
+        L.status[0].loest = true;
+        L.vaelg(0);
+        var foer = L.fase === "gaet" && L.fremme("kurve") && L.fremme("T");
+        d.getElementById("lys-forfra").click();
+        return foer && L.fase === "trin" && !L.fremme("kurve");
+    })());
+    paastand("stofferne kommer først frem, når alle seks forudsigelser er prøvet", (function () {
+        nulAlt(); L.naaet[2] = true; L.vaelg(2); d.querySelector('#lys-ind [data-gaet="0"]').click(); tegnNu();
+        var foer = !synlig("lys-stoffer");
+        L.status.forEach(function (st) { st.loest = true; });
+        L.vaelg(2); d.querySelector('#lys-ind [data-gaet="0"]').click(); tegnNu();
+        var efter = synlig("lys-stoffer");
+        nulAlt();
+        return foer && efter;
+    })());
+    paastand("regel 19a: under alle trin og gæt er der ingen knapper, intet greb og ingen boble i scenen", (function () {
+        var fejl19 = [];
+        L.status.forEach(function (st) { st.loest = false; }); L.naaet = {};
+        L.vaelg(0);
+        for (var q = 0; q < 2; q++) {
+            var k = knapperISzenen();
+            if (k.length) fejl19.push("trin " + (q + 1) + ": " + k.join(","));
+            L.svarValgt(L.trinNu().svar.map(function (v) { return !!v.ok; }).indexOf(true));
+            if (knapperISzenen().length) fejl19.push("trin " + (q + 1) + " med Næste");
+            L.videreKlik();
+        }
+        D.FORUD.forEach(function (f, nr) {
+            L.naaet[nr] = true; L.status.forEach(function (st) { st.loest = true; });
+            L.vaelg(nr);
+            var k2 = knapperISzenen();
+            if (k2.length || L.styrVis("l")) fejl19.push(f.id + " gæt: " + k2.join(","));
+            d.querySelector('#lys-ind [data-gaet="0"]').click();
+            var proev = knapperISzenen();
+            var m = f.maal;
+            if ((m.c || m.A) && proev.indexOf("lys-c-op") < 0) fejl19.push(f.id + " prøv: mangler c");
+            if (!(m.l || m.A) && proev.indexOf("lys-l-op") >= 0) fejl19.push(f.id + " prøv: l uden brug");
+            if (!(m.c || m.A) && proev.indexOf("lys-c-op") >= 0) fejl19.push(f.id + " prøv: c uden brug");
+        });
+        L.status.forEach(function (st) { st.loest = false; }); L.naaet = {};
+        return fejl19.length === 0 || (noter(fejl19.join(" | ")), false);
+    })());
+    paastand("rolige fotoner: højst 128 px/s (40 % af før), med langsomt lys højst 40 px/s", (function () {
+        var max = 0, maxL = 0, q;
+        for (q = 0; q < 300; q++) max = Math.max(max, L.fart());
+        L.langsom = true; for (q = 0; q < 300; q++) maxL = Math.max(maxL, L.fart()); L.langsom = false;
+        return max <= 128 && maxL <= 40;
+    })());
+
+    nulAlt();
+    var forkertOk = [], rigtigOk = [];
     D.FORUD.forEach(function (f, nr) {
+        L.naaet[nr] = true;
         vaelgSvar(nr, false);
         noter(L.beskedTekst());
         goerDet(nr);
         var kb = L.el.ind.querySelectorAll("button[data-valg]");
         var jf = -1; f.valg.forEach(function (v, k) { if (!v.ok && jf < 0) jf = k; });
-        if (!(L.faerdig && /Prøvet/.test(kortTekst(L)) && bliv(L, "svar") && kb[jf] && kb[jf].classList.contains("forkert"))) forkertOk.push(f.id + ": " + kortTekst(L).slice(0, 60));
-        noter(kortTekst(L)); noter(L.promptHTML());
+        if (!(L.faerdig && /Prøvet/.test(kortTekst(L)) && bliv(L, "svar") && kb[jf] && kb[jf].classList.contains("forkert"))) forkertOk.push(f.id + ": " + kortTekst(L).slice(0, 60) + " c=" + L.c + " l=" + L.l);
+        noter(kortTekst(L));
         vaelgSvar(nr, true);
         goerDet(nr);
         if (!(L.faerdig && /Rigtigt/.test(kortTekst(L)) && bliv(L, "god") && !!L.el.ind.querySelector("[data-videre]"))) rigtigOk.push(f.id + ": " + kortTekst(L).slice(0, 60));
     });
-    paastand("alle seks kan prøves med skyderne og træk, også efter et forkert gæt", forkertOk.length === 0, forkertOk.join(" | "));
+    paastand("alle seks kan prøves med − og + på apparaterne, også efter et forkert gæt", forkertOk.length === 0, forkertOk.join(" | "));
     paastand("et rigtigt gæt giver Rigtigt, kortet bliver med Næste", rigtigOk.length === 0, rigtigOk.join(" | "));
-    paastand("kuvetten kan trækkes ud til 2,00 cm", (function () { L.vaelg(3); d.querySelector('#lys-ind [data-gaet="1"]').click(); goerDet(3); return Math.abs(L.l - 2) < 1e-9 && L.faerdig; })());
-    paastand("skyderen bedømmer ikke af sig selv, heller ikke når den slippes ved målet", (function () {
-        L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click();
-        var graaFoer = graa(L);
-        skyd("lys-c", 0.4);
-        var ok = graaFoer && !L.faerdig && klar(L);
+    paastand("kuvetten kan trækkes ud til 2,00 cm i grebet", (function () {
+        L.vaelg(3); d.querySelector('#lys-ind [data-gaet="1"]').click();
+        var g = L.geo();
+        traek(cv1, g.cr, g.ct + g.cuvH * 0.84, g.cx + 2.0 * g.pxCm / 2, g.ct + g.cuvH * 0.84);
         indsend(L);
-        return ok && L.faerdig;
+        return Math.abs(L.l - 2) < 1e-9 && L.faerdig;
+    })(), L.l);
+    paastand("regel 33: står kuvetten på målet, går kortet selv videre efter 1 sekund (ikke før)", (function () {
+        L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click();
+        klikN("lys-c-op", 4);
+        L.opdater(0.5);
+        var ikkeEndnu = !L.faerdig && Math.abs(L.c - 0.4) < 1e-9;
+        L.opdater(0.3); L.opdater(0.3);
+        return ikkeEndnu && L.faerdig && /Rigtigt/.test(kortTekst(L));
+    })());
+    paastand("regel 33: går eleven væk fra målet inden for sekundet, afbrydes det", (function () {
+        L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click();
+        klikN("lys-c-op", 4); L.opdater(0.6);
+        klikN("lys-c-op", 1); L.opdater(0.6); L.opdater(0.6);
+        var afbrudt = !L.faerdig;
+        klikN("lys-c-ned", 1); L.opdater(0.5);
+        var igen = !L.faerdig;
+        L.opdater(0.6);
+        return afbrudt && igen && L.faerdig;
+    })());
+    paastand("regel 34: absorbansen (A) står som ord på kortet første gang; ingen λ, I₀ eller l alene i scenen før loven", (function () {
+        return /absorbansen \(A\)/.test(D.FORUD[1].spm) && D.FORUD[1].tema.indexOf("absorbansen") >= 0 &&
+            !/λ|I₀/.test(d.getElementById("lys-ind").textContent);
     })());
     paastand("Indsend svar ved den forkerte koncentration: Ikke endnu", (function () {
         L.vaelg(1); d.querySelector('#lys-ind [data-gaet="0"]').click();
-        skyd("lys-c", 0.3); indsend(L);
+        klikN("lys-c-op", 2); indsend(L);
         return !L.faerdig && skidt(L) && /passer kuvetten ikke med opgaven/.test(L.beskedTekst());
     })(), L.beskedTekst());
-    paastand("under gættet er skyderen låst, og kortet blinker", (function () {
-        L.vaelg(1); skyd("lys-c", 0.55);
+    paastand("under gættet er knapperne låst, og kortet blinker", (function () {
+        L.vaelg(1); L.el.skort.classList.remove("blink");
+        d.getElementById("lys-c-op").click();
         var laast = Math.abs(L.c - 0.20) < 1e-9 && L.el.skort.classList.contains("blink");
         d.querySelector('#lys-ind [data-gaet="0"]').click();
         return laast && Math.abs(L.c - 0.20) < 1e-9 && L.fase === "proev";
     })());
-    paastand("gættet står på kortet, ikke i scenen eller panelet", d.querySelectorAll("#fane-lys .scene .scenekort").length === 1 && !d.getElementById("lys-valg") && (function () { L.vaelg(0); return d.querySelectorAll("#lys-ind [data-gaet]").length === 3; })());
+    paastand("gættet står på kortet, ikke i scenen eller et panel", d.querySelectorAll("#fane-lys .scene .scenekort").length === 1 && !d.getElementById("lys-valg") && !d.querySelector("#fane-lys .panel") && (function () { L.vaelg(1); return d.querySelectorAll("#lys-ind [data-gaet]").length === 3; })());
     /* Hinttrappen og Vis svaret i gaettet */
-    L.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    nulAlt();
+    L.naaet[2] = true;
     L.vaelg(2);
     var h = [];
     for (i = 0; i < 4; i++) { h.push(L.el.knap.textContent); L.knap(); if (i < 3) noter(L.beskedTekst()); }
     paastand("hintet er tre trin, så Vis svaret", h.join(" | ") === "Giv et hint | Næste hint (2 af 3) | Næste hint (3 af 3) | Vis svaret", h.join(" | "));
     koerTil(L, function () { return L.faerdig; }, 80);
-    paastand("Vis svaret skruer selv, til detektoren viser svaret", L.faerdig && Math.abs(L.c - 0.4) < 1e-9 && /Svaret/.test(kortTekst(L)) && bliv(L, "svar"), kortTekst(L));
+    paastand("Vis svaret stiller selv kuvetten, til detektoren viser svaret", L.faerdig && Math.abs(L.c - 0.4) < 1e-9 && /Svaret/.test(kortTekst(L)) && bliv(L, "svar"), kortTekst(L));
     paastand("Vis svaret giver ingen stjerne", !L.status[2].stjerne);
+    paastand("Vis svaret ved A = 1 stiller c på et tal, knapperne kan nå", (function () {
+        L.naaet[5] = true; L.vaelg(5);
+        for (var q = 0; q < 5; q++) L.knap();
+        koerTil(L, function () { return L.faerdig; }, 80);
+        var s0 = D.STOFFER.mno4;
+        return L.faerdig && Math.abs(L.c / s0.cKnap - Math.round(L.c / s0.cKnap)) < 1e-6;
+    })(), L.c);
     /* Paaskeaegget */
+    L.vaelg(2); for (i = 0; i < 4; i++) L.knap(); koerTil(L, function () { return L.faerdig; }, 80);
     var g1 = L.geo();
     klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
     paastand("påskeægget: solbriller på detektoren giver A + 0,30", L.briller && Math.abs(L.Avis() - L.A() - 0.30) < 1e-12);
     noter(L.beskedTekst());
     klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
     paastand("solbrillerne kan tages af igen", !L.briller);
-    L.vaelg(0);
+    L.vaelg(2); d.querySelector('#lys-ind [data-gaet="0"]').click();
     klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
-    paastand("under en forudsigelse forklarer et klik på detektoren kun", !L.briller && /Detektoren måler/.test(L.beskedTekst()));
-    L.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    paastand("under en forudsigelse forklarer et klik på detektoren kun", !L.briller && /Detektoren måler/.test(L.beskedTekst()), L.beskedTekst());
+    nulAlt();
 
     /* ------------------------------------------------------------------ */
     overskrift("4. Standardkurven");
@@ -242,19 +400,19 @@ function koerTest(W) {
     K.tilpas();
     function klikKuv(k) {
         var g = K.geo(), q = K.bakkePlads(g, k);
-        klikPaa(cv2, q.x + g.bk / 2, q.y + g.bh / 2);
+        klikPaa(cv2, g.ox + q.x + g.bk / 2, q.y + g.bh / 2);
     }
     function traekLinje(a) {
         var g = K.geo(), gr = K.graf(), e = K.linjeEnde(g, gr);
         var cc = gr.xMax * 0.8;
         if (a * cc > gr.yMax * 0.9) cc = gr.yMax * 0.9 / a;
         var p = K.tilPx(g, gr, cc, a * cc);
-        traek(cv2, e.x, e.y, p.x, p.y);
+        traek(cv2, g.ox + e.x, e.y, g.ox + p.x, p.y);
     }
     function traekAflaes(c) {
         var g = K.geo(), gr = K.graf();
         var x0 = K.tilPx(g, gr, K.aflaes.c, 0), x1 = K.tilPx(g, gr, c, 0);
-        traek(cv2, x0.x, x0.y + 8, x1.x, x1.y + 8);
+        traek(cv2, g.ox + x0.x, x0.y + 8, g.ox + x1.x, x1.y + 8);
     }
     var kFejl = [];
     D.KURVE.forEach(function (o, nr) {
@@ -263,14 +421,14 @@ function koerTest(W) {
         koerTil(K, function () { return K.alleMaalt() && !K.maaling && !K.koe.length; }, 600);
         if (!K.alleMaalt()) { kFejl.push(o.id + " ikke målt"); return; }
         if (Math.abs(K.kuv[0].A) > 1e-9) kFejl.push(o.id + " vand er ikke 0");
-        noter(K.beskedTekst()); noter(K.promptHTML());
+        noter(K.beskedTekst());
         if (o.aftryk) {
             if (K.trin() !== "aftryk") kFejl.push(o.id + " fingeraftrykket ses ikke");
             traekLinje(K.bedsteA()); indsend(K);
             if (K.linje.ok) kFejl.push(o.id + " linjen godtaget med fingeraftrykket");
             noter(K.beskedTekst());
             var g = K.geo(), pp = K.bakkePlads(g, K.kuv.length);
-            klikPaa(cv2, pp.x + g.bk / 2, pp.y + g.bh * 0.3);
+            klikPaa(cv2, g.ox + pp.x + g.bk / 2, pp.y + g.bh * 0.3);
             klikKuv(K.aftrykI);
             noter(K.beskedTekst());
             if (K.kuv[K.aftrykI].aftryk) kFejl.push(o.id + " ikke tørret");
@@ -300,7 +458,7 @@ function koerTest(W) {
         if (K.faerdig) kFejl.push(o.id + " aflæsningen bedømt, da den blev sluppet");
         indsend(K);
         if (!K.faerdig || !K.status[nr].stjerne || !bliv(K, "god")) kFejl.push(o.id + " ikke løst med stjerne: " + kortTekst(K).slice(0, 60));
-        noter(kortTekst(K)); noter(K.promptHTML());
+        noter(kortTekst(K));
         /* Proevens koncentration ligger inden for standarderne */
         if (K.proeveC < o.std[0] * 0.9 || K.proeveC > o.std[o.std.length - 1]) kFejl.push(o.id + " prøven uden for standarderne");
     });
@@ -332,7 +490,7 @@ function koerTest(W) {
     K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
 
     /* ------------------------------------------------------------------ */
-    overskrift("5. Regnestykkerne");
+    overskrift("5. Regnestykkerne: formlen med knapper, tallet i et felt (21. nov. 2026)");
     NK.visFane("fane-regn");
     var facitFejl = [];
     var FACIT = { r1: ["0,735"], r2: ["0,130 mM"], r3: ["11,1 mM⁻¹·cm⁻¹"], r4: ["0,120 mM"], r5: ["2,45 mM⁻¹·cm⁻¹"],
@@ -340,73 +498,101 @@ function koerTest(W) {
     D.REGN.forEach(function (o) {
         var t = o.trin.map(function (x, i) { return R.facitTekst(o, i); });
         if (t.join("|") !== FACIT[o.id].join("|")) facitFejl.push(o.id + ": " + t.join(", "));
-        noter(o.tekst); noter(o.navn);
+        noter(o.tekst); noter(o.navn); o.spm.forEach(noter);
+        if (o.spm.length !== o.trin.length) facitFejl.push(o.id + ": " + o.spm.length + " spørgsmål til " + o.trin.length + " dele");
     });
-    paastand("facit regnet af tallene: A = 0,735 … m = 6,54 mg", facitFejl.length === 0, facitFejl.join(" | "));
+    paastand("facit regnet af tallene: A = 0,735 … m = 6,54 mg, og ét spørgsmål pr. del", facitFejl.length === 0, facitFejl.join(" | "));
+    var vFejl = [];
+    Object.keys(D.TRIN).forEach(function (id) {
+        var v = D.TRIN[id].valg, ok = v.filter(function (x) { return x.ok; });
+        if (v.length !== 3 || ok.length !== 1) vFejl.push(id + ": " + ok.length + " rigtige");
+        else if (ok[0].f !== R.formelTekst(id)) vFejl.push(id + ": " + ok[0].f + " mod " + R.formelTekst(id));
+        v.forEach(function (x) { if (!x.ok && !x.hvorfor) vFejl.push(id + ": " + x.f + " uden forklaring"); });
+    });
+    paastand("hver formel har tre knapper: den rigtige og to typiske fejl med hver sin forklaring", vFejl.length === 0, vFejl.join(" | "));
 
-    function felter(klasse) { return Array.prototype.slice.call(d.querySelectorAll("#regn-trin ." + klasse)); }
-    function skrivI(inp, v) { inp.value = v; inp.dispatchEvent(new W.Event("input", { bubbles: true })); }
-    function tjek() { indsend(G); }
+    function rigtigFormel(id) { var k = 0; D.TRIN[id].valg.forEach(function (x, j) { if (x.ok) k = j; }); return k; }
+    function felt() { return d.getElementById("regn-felt"); }
+    function skrivTal(v) { var f = felt(); f.value = v; f.dispatchEvent(new W.Event("input", { bubbles: true })); }
     var uiFejl = [];
     D.REGN.forEach(function (o, nr) {
         G.vaelg(nr);
+        var V = R.vaerdier(o);
         o.trin.forEach(function (id, i) {
-            var t = D.TRIN[id];
-            d.querySelector('#regn-skabeloner [data-sk="' + t.form + '"]').click();
-            /* Bogstaverne: faktorerne i omvendt raekkefoelge, for de maa byttes */
-            var b = R.facitBogstaver(id).slice();
-            if (t.form === "***" || t.form === "**") b.reverse();
-            else if (t.form === "/**") b = [b[0], b[2], b[1]];
-            var bf = felter("bf-in.bogstav");
-            if (bf.length !== b.length) uiFejl.push(o.id + " felter: " + bf.length);
-            bf.forEach(function (inp, j) { skrivI(inp, b[j] === "eps" ? "e" : R.vis(b[j])); });
-            tjek();
+            d.querySelector('#regn-ind [data-valg="' + rigtigFormel(id) + '"]').click();
+            indsend(G);
             if (!G.venter || !bliv(G, "god")) { uiFejl.push(o.id + " formlen: " + G.beskedTekst().slice(0, 70)); return; }
             noter(kortTekst(G));
             G.videreKlik();
-            if (G.aktivt().fase !== "tal") { uiFejl.push(o.id + " Næste efter formlen"); return; }
-            /* Tallene: klik paa talbrikkerne */
-            var V = R.vaerdier(o);
-            felter("bf-in.tal").forEach(function (inp, j) {
-                inp.focus();
-                var bb = G.aktivt().bogstL[j];
-                var knap = Array.prototype.filter.call(d.querySelectorAll("#regn-tallene .talbrik"), function (k) {
-                    return k.textContent.indexOf(R.vis(bb) + " =") === 0;
-                })[0];
-                if (knap) knap.click(); else skrivI(inp, V.tal[bb].tekst);
-            });
-            tjek();
-            if (!G.venter) { uiFejl.push(o.id + " tallene: " + G.beskedTekst().slice(0, 70)); return; }
+            if (G.aktivt().fase !== "tal" || !felt()) { uiFejl.push(o.id + " intet felt efter formlen"); return; }
+            skrivTal(V.facit[i].tekst);
+            indsend(G);
             noter(kortTekst(G));
-            G.videreKlik();
-            if (G.aktivt().fase !== "res") { uiFejl.push(o.id + " Næste efter tallene"); return; }
-            var res = felter("rs-in")[0];
-            skrivI(res, t.maal === "eps" ? V.facit[i].tekst : R.facitTekst(o, i));
-            tjek();
-            noter(kortTekst(G));
-            if (G.venter) G.videreKlik();
+            if (i < o.trin.length - 1) {
+                if (!G.venter) { uiFejl.push(o.id + " del " + (i + 1) + ": " + G.beskedTekst().slice(0, 70)); return; }
+                G.videreKlik();
+            }
         });
         if (!G.faerdig || !G.status[nr].stjerne || !bliv(G, "god")) uiFejl.push(o.id + " ikke løst med stjerne: " + kortTekst(G).slice(0, 70));
-        noter(G.promptHTML());
     });
-    paastand("Indsend svar er grå, før der står noget i felterne", (function () { G.vaelg(0); return graa(G); })());
-    paastand("alle otte kan regnes på tavlen med skabelon, bogstaver, talbrikker, Indsend svar og Næste", uiFejl.length === 0, uiFejl.join(" | "));
+    paastand("Indsend svar er grå, før der er valgt en formel", (function () { G.vaelg(0); return graa(G); })());
+    paastand("alle otte kan regnes med formelknapperne, tallet i feltet, Indsend svar og Næste", uiFejl.length === 0, uiFejl.join(" | "));
+    var fvFejl = [];
+    Object.keys(D.TRIN).forEach(function (id) {
+        var nr = -1;
+        D.REGN.forEach(function (o, k) { if (nr < 0 && o.trin[0] === id) nr = k; });
+        if (nr < 0) return;
+        D.TRIN[id].valg.forEach(function (x, j) {
+            if (x.ok) return;
+            G.vaelg(nr);
+            d.querySelector('#regn-ind [data-valg="' + j + '"]').click(); indsend(G);
+            var b = d.querySelector('#regn-ind [data-valg="' + j + '"]');
+            if (!(b.classList.contains("forkert") && skidt(G) && G.beskedTekst().indexOf(x.hvorfor) >= 0 && !G.venter)) fvFejl.push(id + " " + x.f);
+        });
+    });
+    paastand("en forkert formel bliver rød og får sin egen forklaring", fvFejl.length === 0, fvFejl.join(" | "));
+    paastand("tavlen er tom, til formlen er fundet, og vokser så linje for linje med ? og gul ramme", (function () {
+        G.vaelg(6);
+        var tom = !G.tavle.querySelector(".pt-linje");
+        d.querySelector('#regn-ind [data-valg="' + rigtigFormel("epsA") + '"]').click(); indsend(G);
+        var en = G.tavle.querySelectorAll(".pt-linje").length === 1 && !!G.tavle.querySelector(".pt-linje.spoerges .pt-spm") && /ε for FeSCN/.test(G.tavle.textContent);
+        G.videreKlik(); skrivTal("4,70"); indsend(G); G.videreKlik();
+        var stadig = G.tavle.querySelectorAll(".pt-linje").length === 1 && !!G.tavle.querySelector(".pt-svar");
+        d.querySelector('#regn-ind [data-valg="' + rigtigFormel("c") + '"]').click(); indsend(G);
+        var to = G.tavle.querySelectorAll(".pt-linje").length === 2 && G.tavle.querySelectorAll(".pt-linje")[1].classList.contains("spoerges");
+        return tom && en && stadig && to;
+    })(), G.tavle.textContent.slice(0, 120));
+    paastand("ingen overskrifter i versaler og ingen \"Opgavens tal\" på fane 3",
+        !/OPGAVENS TAL|FORMENS FORM|BOGSTAVERNE/i.test(d.getElementById("fane-regn").textContent) && !d.querySelector("#fane-regn .bakke"));
+    paastand("opgavens tal står på opstillingen; det, der spørges om, står som ?", (function () {
+        G.vaelg(0);
+        var a = G.tilstand("A"), c = G.tilstand("c"), e = G.tilstand("eps");
+        G.vaelg(7);
+        var n = G.tilstand("n"), cc = G.tilstand("c");
+        return a.slags === "nu" && c.slags === "givet" && c.tekst === "0,300" && e.slags === "givet" && n.slags === "senere" && cc.slags === "nu";
+    })());
+    paastand("tallet skrives uden enhed; enheden står efter feltet (og må også skrives)", (function () {
+        G.vaelg(1);
+        d.querySelector('#regn-ind [data-valg="' + rigtigFormel("c") + '"]').click(); indsend(G); G.videreKlik();
+        var enhed = d.querySelector("#regn-ind .sk-enhed");
+        skrivTal("0,130"); indsend(G);
+        var ok1 = G.faerdig;
+        G.vaelg(1);
+        d.querySelector('#regn-ind [data-valg="' + rigtigFormel("c") + '"]').click(); indsend(G); G.videreKlik();
+        skrivTal("0,130 mM"); indsend(G);
+        return !!enhed && enhed.textContent === "mM" && ok1 && G.faerdig;
+    })());
+    paastand("ganget i stedet for divideret i feltet giver sin egen besked", (function () {
+        G.vaelg(1);
+        d.querySelector('#regn-ind [data-valg="' + rigtigFormel("c") + '"]').click(); indsend(G); G.videreKlik();
+        skrivTal("2,87"); indsend(G);
+        return !G.faerdig && skidt(G) && /ganget/.test(G.beskedTekst());
+    })(), G.beskedTekst());
 
-    /* De typiske fejl */
+    /* De typiske fejl i resultatet */
     function o(id) { return D.REGN.filter(function (x) { return x.id === id; })[0]; }
     var bes = [];
     function forvent(navn, svar, re) { bes.push(svar.besked || ""); paastand(navn, !svar.ok && re.test(svar.besked || ""), svar.besked); }
-    forvent("formlen som gangestykke, når der skal divideres", R.tjekFormel("c", "***", ["A", "eps", "l"]), /brøk/);
-    forvent("brøken vendt", R.tjekFormel("c", "/**", ["eps", "A", "l"]), /vendt/);
-    forvent("det, der skal findes, står i formlen", R.tjekFormel("c", "/**", ["A", "eps", "c"]), /skal finde/);
-    forvent("ét bogstav under brøkstregen, når der skal være to", R.tjekFormel("c", "/", ["A", "eps"]), /to bogstaver/);
-    paastand("ε kan skrives som e, eps og ε", ["e", "eps", "ε", "epsilon"].every(function (x) { return R.bogstav(x, o("r2")) === "eps"; }));
-    paastand("a er hældningen, når opgaven har en hældning, ellers A", R.bogstav("a", o("r5")) === "a" && R.bogstav("a", o("r2")) === "A");
-    forvent("et tal på den forkerte plads", R.tjekTal(o("r2"), "eps", "0,611"), /er A/);
-    forvent("V i mL", R.tjekTal(o("r8"), "V", "250"), /liter/);
-    paastand("V i mL med enheden mL godtages", R.tjekTal(o("r8"), "V", "250 mL").ok);
-    forvent("l med forkert enhed", R.tjekTal(o("r2"), "l", "1,00 g"), /enheden cm/);
-    forvent("l i mm i stedet for cm", R.tjekTal(o("r2"), "l", "1,00 mm"), /enheden er forkert/);
     forvent("c ganget i stedet for divideret", R.tjekRes(o("r2"), 0, "2,87 mM"), /ganget/);
     forvent("c med vendt brøk", R.tjekRes(o("r2"), 0, "7,69 mM"), /vendt/);
     forvent("kort kuvette: kun divideret med ε", R.tjekRes(o("r4"), 0, "0,0600 mM"), /kun divideret med ε/);
@@ -420,25 +606,27 @@ function koerTest(W) {
     forvent("tæt på, men afrundet undervejs", R.tjekRes(o("r8"), 2, "6,70 mg"), /afrunding/);
     bes.forEach(noter);
 
-    /* Hinttrappen og Vis svaret paa tavlen */
+    /* Hinttrappen og Vis svaret */
     G.vaelg(1);
     var h3 = [];
     for (i = 0; i < 4; i++) { h3.push(G.el.knap.textContent); G.knap(); if (i < 3) noter(G.beskedTekst()); }
     paastand("hintet til formlen er tre trin, så Vis svaret", h3.join(" | ") === "Giv et hint | Næste hint (2 af 3) | Næste hint (3 af 3) | Vis svaret", h3.join(" | "));
     paastand("første hint siger, hvad man kender, ikke formlen", /Du kender A, ε og l/.test(R.formelHint("c")[0]) && !/=/.test(R.formelHint("c")[0]));
-    paastand("Vis svaret giver formlen gult på kortet med Næste", !!G.venter && bliv(G, "svar") && /A/.test(kortTekst(G)));
+    paastand("Vis svaret giver formlen gult på kortet med Næste", !!G.venter && bliv(G, "svar") && /Formlen er c = A/.test(kortTekst(G)), kortTekst(G).slice(0, 120));
     G.videreKlik();
-    paastand("Næste: tallene kommer bagefter", G.aktivt().fase === "tal");
+    paastand("Næste: tallet kommer bagefter i et felt", G.aktivt().fase === "tal" && !!felt());
     paastand("hinttrappen begynder forfra i næste skridt", G.el.knap.textContent === "Giv et hint", G.el.knap.textContent);
     var sv = 0;
+    G.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
     D.REGN.forEach(function (o2, nr) {
         G.vaelg(nr);
-        for (var q = 0; q < 60 && !G.faerdig; q++) G.knap();
-        if (G.faerdig && !G.status[nr].stjerne) sv++;
+        for (var q = 0; q < 60 && !G.faerdig; q++) { if (G.venter) G.videreKlik(); else G.knap(); }
+        if (!G.faerdig || G.status[nr].stjerne) sv++;
         noter(G.beskedTekst());
     });
-    paastand("Vis svaret fører gennem alle otte uden stjerne", sv === 0 || sv === D.REGN.length, sv);
-    G.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    paastand("Vis svaret fører gennem alle otte uden stjerne", sv === 0, sv);
+    G.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    G.naaet = {};
 
     /* ------------------------------------------------------------------ */
     overskrift("6. Sproget");
@@ -461,80 +649,107 @@ function koerTest(W) {
     paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).join(" | "));
     var natron = ren.filter(function (t) { return /natronlud/i.test(t); });
     paastand("ingen natronlud", natron.length === 0);
-    var punktum = ren.filter(function (t) { return /\d\.\d/.test(t.replace(/<[^>]*>/g, "").replace(/\d+\.\d+\.\d+/g, "")); });
+    var punktum = ren.filter(function (t) { return /\d\.\d/.test(t.replace(/<[^>]*>/g, "").replace(/\d+\.\d+\.\d+/g, "").replace(/\b[ABCT]\d+\.\d+\b/g, "")); });
     paastand("decimaltal med komma", punktum.length === 0, punktum.slice(0, 2).join(" | "));
 
     /* ------------------------------------------------------------------ */
     overskrift("7. Layoutet");
     var ramme = document.getElementById("ramme");
-    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
+    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950], [1920, 1080]];
     var lFejl = [];
     function under(a, b) { return a.getBoundingClientRect().bottom <= b.getBoundingClientRect().top + 1; }
+    function inden(e, r) { var q = e.getBoundingClientRect(); return q.left >= r.left - 1 && q.right <= r.right + 1 && q.top >= r.top - 1 && q.bottom <= r.bottom + 1; }
     maal.forEach(function (m) {
         var navn = m.join("×");
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
         NK.visFane("fane-lys");
-        L.vaelg(3); L.tilpas();
+        L.naaet = { 0: true, 1: true, 2: true, 3: true, 4: true };
+        L.status.forEach(function (st) { st.loest = true; });
+        L.vaelg(4); L.tilpas();
+        d.querySelector('#lys-ind [data-gaet="0"]').click();
         [1, 3].forEach(function (lv) {
             L.saetL(lv, false);
+            L.opdater(0.016);
             var g = L.geo();
             if (g.kBund - g.kTop < 80) lFejl.push(navn + " kurven er lav");
-            if (g.cbund + g.px * 3.4 > g.tavleY) lFejl.push(navn + " kuvetten rører tavlen");
+            if (L.tag.y + L.tag.h > g.H) lFejl.push(navn + " etiketten uden for lærredet");
+            if (g.bw > 1200) lFejl.push(navn + " optikbænken er " + g.bw + " px bred");
+            if (Math.abs(g.bx0 - (g.W - g.bx1)) > 2) lFejl.push(navn + " optikbænken står ikke i midten");
+            var fo = L.formel;
+            if (!fo || fo.x < 0 || fo.x + fo.b > g.W) lFejl.push(navn + " loven uden for lærredet");
+            else if (fo.y > 12 || fo.y + fo.h > g.kTop - 16) lFejl.push(navn + " loven står ikke øverst lige under kortet");
+            else if (Math.abs(fo.x + fo.b / 2 - g.W / 2) > 2) lFejl.push(navn + " loven står ikke i midten");
             if (g.cl < g.x0 + 30 || g.cr > g.x1 - 30) lFejl.push(navn + " kuvetten uden for strålen ved l = " + lv);
-            var dispH = Math.min(19, Math.max(14, g.detB / 6.4)) * (2 * 1.45 + 0.7);
-            if (g.dispY + dispH > g.H) lFejl.push(navn + " displayet uden for lærredet");
+            if (L.dispBund > g.H) lFejl.push(navn + " displayet uden for lærredet");
             if (g.ly < g.kBund - 40) lFejl.push(navn + " lampen rører kurven");
+            var cr = cv1.getBoundingClientRect();
+            ["lys-c-ned", "lys-c-op", "lys-l-ned", "lys-l-op", "lys-langsom", "lys-stoffer"].forEach(function (id) {
+                var e = d.getElementById(id);
+                if (!e.hidden && !inden(e, cr)) lFejl.push(navn + " " + id + " uden for lærredet ved l = " + lv);
+            });
+            var st = d.getElementById("lys-stoffer");
+            if (!st.hidden && st.getBoundingClientRect().bottom > cr.bottom + 1) lFejl.push(navn + " stofferne uden for lærredet");
         });
         var sp = d.querySelector("#fane-lys .kortzone").getBoundingClientRect(), cvr = cv1.getBoundingClientRect();
         if (cvr.height < 300) lFejl.push(navn + " lærredet på fane 1 er kun " + Math.round(cvr.height) + " px");
         if (sp.bottom > cvr.top + 1) lFejl.push(navn + " kortzonen over lærredet");
+        L.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        L.naaet = {};
         NK.visFane("fane-kurve");
         K.vaelg(3); K.tilpas();
         var g2 = K.geo();
         if (g2.bakkeY + g2.bakkeH > g2.H) lFejl.push(navn + " bakken uden for lærredet");
+        if (g2.tabY + g2.tabH > g2.H) lFejl.push(navn + " tabellen Målingerne uden for lærredet");
         if (g2.gy1 - g2.gy0 < 250 || g2.gx1 - g2.gx0 < 300) lFejl.push(navn + " grafen er lille");
+        if (g2.W > 1340 || Math.abs(g2.ox - (K.laerred.b - g2.W - g2.ox)) > 2) lFejl.push(navn + " standardkurvens opstilling er ikke samlet i midten");
         if (g2.dispY + g2.dispH > g2.sy + g2.sh) lFejl.push(navn + " displayet uden for spektrofotometret");
         if (g2.slotY + g2.kh + 6 > g2.dispY) lFejl.push(navn + " displayet rører kuvetten");
         NK.visFane("fane-regn");
         D.REGN.forEach(function (o2, nr) {
             G.vaelg(nr);
-            /* Den største tavle: alle trin løst undtagen det sidste, der står med tallene */
+            /* Den stoerste tavle: alle dele loest undtagen den sidste, der staar med tallet */
             for (var q = 0; q < 60; q++) {
                 var st = G.aktivt();
                 if (!st || (G.k === G.ts.length - 1 && st.fase === "tal")) break;
-                G.knap();
+                if (G.venter) G.videreKlik(); else G.knap();
             }
             G.tilpas();
-            var arb = d.getElementById("regn-arbejde");
-            if (arb.scrollHeight > arb.clientHeight + 1) lFejl.push(navn + " tavlen er for høj " + o2.id);
             var tv = d.getElementById("regn-tavle");
+            if (tv.scrollHeight > tv.clientHeight + 1) lFejl.push(navn + " tavlen er for høj " + o2.id);
             if (tv.scrollWidth > tv.clientWidth + 1) lFejl.push(navn + " tavlen er for bred " + o2.id);
-            if (!under(d.querySelector("#fane-regn .kortzone"), d.getElementById("regn-tavle"))) lFejl.push(navn + " tavlen bag kortet " + o2.id);
-            var fs = parseFloat(W.getComputedStyle(arb).fontSize);
-            if (fs < 18) lFejl.push(navn + " skriften på tavlen er " + fs + " px " + o2.id);
+            if (!under(d.querySelector("#fane-regn .kortzone"), tv)) lFejl.push(navn + " tavlen bag kortet " + o2.id);
+            if (G.tegnBund > G.laerred.h + 1) lFejl.push(navn + " opstillingen er for høj " + o2.id + " (" + Math.round(G.tegnBund) + " > " + G.laerred.h + ")");
+            if (G.tegnHoejre > G.laerred.b + 1) lFejl.push(navn + " opstillingen er for bred " + o2.id);
+            var lin = tv.querySelector(".pt-linje");
+            var fs = lin ? parseFloat(W.getComputedStyle(lin).fontSize) : 99;
+            if (fs < 16) lFejl.push(navn + " skriften på tavlen er " + fs + " px " + o2.id);
         });
-        ["#fane-lys .panel", "#fane-kurve .panel", "#fane-regn .panel"].forEach(function (sel) {
-            NK.visFane(sel.split(" ")[0].slice(1));
-            var p = d.querySelector(sel);
-            if (p.scrollWidth > p.clientWidth + 1) lFejl.push(navn + " panelet er for bredt " + sel);
+        G.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        G.naaet = {};
+        ["lys", "kurve", "regn"].forEach(function (f) {
+            NK.visFane("fane-" + f);
+            var r = d.getElementById(f + "-raekke");
+            if (r.scrollWidth > r.clientWidth + 1) lFejl.push(navn + " rækken på " + f + " er for bred");
+            if (!under(r, d.querySelector("#fane-" + f + " .scenekort"))) lFejl.push(navn + " rækken rører kortet på " + f);
         });
     });
-    paastand("lærred, tavle og panel kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 5).join(", "));
+    paastand("lærred, knapper, regnestykke og række kan være der fra 1100 × 700 til 1920 × 1080; bænken er højst 1200 px og står i midten", lFejl.length === 0, lFejl.slice(0, 5).join(", "));
 
     /* ------------------------------------------------------------------ */
     overskrift("8. Papirkortet");
-    paastand("body.papirkort, ingen statuslinje, opgavelinje eller Tjek-knap",
-        d.body.classList.contains("papirkort") && !d.querySelector(".statuslinje") && !d.querySelector(".opgavelinje") && !d.querySelector(".tjekknap"));
-    paastand("de tre kort står i scenen, ikke i panelet, og Start forfra står i panelet",
+    paastand("body.papirkort, ingen statuslinje, opgavelinje, Tjek-knap, bakke eller panel",
+        d.body.classList.contains("papirkort") && !d.querySelector(".statuslinje") && !d.querySelector(".opgavelinje") && !d.querySelector(".tjekknap") &&
+        !d.querySelector(".panel") && !d.querySelector(".bakke"));
+    paastand("de tre kort står i scenen, og Start forfra står i rækken øverst, aldrig på kortet",
         ["lys", "kurve", "regn"].every(function (n) {
             var e = d.getElementById(n + "-skort");
-            return e && e.closest(".scene") && !e.closest(".panel") && !e.querySelector(".forfraknap") && d.getElementById(n + "-forfra").closest(".panel");
+            return e && e.closest(".scene") && !e.querySelector("[id$=forfra]") && d.getElementById(n + "-forfra").closest(".opgaverad");
         }));
     /* Kortet med det laengste hint, en lang fejl og forklaringen skal kunne
-       vaere i zonen, ogsaa paa en lav skaerm */
+       vaere i zonen, ogsaa paa en lav skaerm, i hvert skridt */
     var zFejl = [];
-    var LANG = "Kuvetten står ikke, som opgaven siger: c = 0,050 mM og l = 1,00 cm. Træk kuvetten ud til 2,00 cm med skyderen eller i kuvettens højre side.";
+    var LANG = "Med c = 0,050 mM og l = 1,00 cm passer kuvetten ikke med opgaven. Gør kuvetten 2,00 cm bred med + ved kuvettebredden eller grebet på kuvettens højre side.";
     function maalKort(S, hvad, nv) {
         var e = S.el.skort, z = S.kortZone();
         var r1 = e.getBoundingClientRect(), r2 = e.parentNode.getBoundingClientRect();
@@ -547,9 +762,9 @@ function koerTest(W) {
         if (!S.gaetNu()) { S.besked('<span class="b-maerke">Ikke endnu</span> ' + NK.html(LANG), "skidt"); maalKort(S, "fejl", nv); }
         S.besked("", "");
     }
-    function loes(S) {
+    function loes(S, nv) {
         for (var q = 0; q < 80 && !S.faerdig; q++) {
-            if (S.venter) S.videreKlik();
+            if (S.venter) { maalKort(S, "næste " + q, nv); S.videreKlik(); proevKort(S, nv + " skridt " + q); }
             else S.knap();
             koerTil(S, function () { return !S.auto && !S.maaling && !(S.koe && S.koe.length); }, 600);
         }
@@ -563,25 +778,28 @@ function koerTest(W) {
         [["fane-lys", L], ["fane-kurve", K], ["fane-regn", G]].forEach(function (fs) {
             NK.visFane(fs[0]);
             var S = fs[1];
+            S.status.forEach(function (s2) { s2.loest = false; s2.stjerne = false; });
             for (var i2 = 0; i2 < S.opgaver.length; i2++) {
+                S.naaet = S.naaet || {}; S.naaet[i2] = true;
                 S.vaelg(i2); S.tilpas();
                 proevKort(S, nv + "#" + i2);
-                if (S === L) { d.querySelector('#lys-ind [data-gaet="0"]').click(); proevKort(S, nv + "#" + i2 + " prøv"); }
-                if (!loes(S)) uloest.push(S.navn + i2);
+                if (S === L && L.fase === "gaet") { d.querySelector('#lys-ind [data-gaet="0"]').click(); proevKort(S, nv + "#" + i2 + " prøv"); }
+                if (!loes(S, nv + "#" + i2)) uloest.push(S.navn + i2);
                 maalKort(S, "løst", nv + "#" + i2);
                 noter(kortTekst(S));
             }
             S.status.forEach(function (s2) { s2.loest = false; s2.stjerne = false; });
+            S.naaet = {};
         });
     });
-    paastand("kortet holder sig i zonen med hint, fejl og forklaring (1100 × 700, 1400 × 860, 1600 × 950)", zFejl.length === 0, zFejl.slice(0, 5).join(", "));
+    paastand("kortet holder sig i zonen i hvert skridt med hint, fejl og forklaring (1100 × 700, 1400 × 860, 1600 × 950)", zFejl.length === 0, zFejl.slice(0, 5).join(", "));
     paastand("alle opgaver kan løses med Giv et hint, Vis svaret og Næste", uloest.length === 0, uloest.join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     var smaa = [];
     ["fane-lys", "fane-kurve", "fane-regn"].forEach(function (f) {
         NK.visFane(f);
-        d.querySelectorAll("#" + f + " .panel *, #" + f + " .tavle *, #" + f + " .bakke *, #" + f + " .scenekort *").forEach(function (e) {
+        d.querySelectorAll("#" + f + " .opgaverad *, #" + f + " .papirtavle *, #" + f + " .scenekort *, #" + f + " .styr-knap, #" + f + " .scene-knap, #" + f + " .scene-knap *").forEach(function (e) {
             if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
             var egen = Array.prototype.some.call(e.childNodes, function (n2) { return n2.nodeType === 3 && n2.textContent.trim(); });
             if (!egen) return;
@@ -590,6 +808,81 @@ function koerTest(W) {
         });
     });
     paastand("ingen tekst under 11,5 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    paastand("kortets plads er fast: scenen skifter ikke størrelse, når kortet skifter (fane 1)", (function () {
+        NK.visFane("fane-lys");
+        L.status.forEach(function (s2) { s2.loest = false; }); L.naaet = {};
+        L.vaelg(0); L.tilpas();
+        var h0 = cv1.getBoundingClientRect().height, ens = true;
+        d.querySelector('#lys-ind [data-valg="1"]').click(); indsend(L);
+        if (cv1.getBoundingClientRect().height !== h0) ens = false;
+        forbiTrin(); d.querySelector('#lys-ind [data-gaet="0"]').click();
+        L.kortBesked("En kort besked, der gør kortet en linje højere end før, så scenen kunne hoppe, hvis kortets plads fulgte kortet.", 4);
+        if (cv1.getBoundingClientRect().height !== h0) ens = false;
+        return ens;
+    })());
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Opgaverækken låser titlerne op i takt (21. nov. 2026)");
+    function raekkerAf(f) { return [].slice.call(d.querySelectorAll("#" + f + "-liste .or-knap")).filter(function (c) { return !c.hidden; }); }
+    function laastNr(c) { return c.disabled && c.classList.contains("laast") && !c.querySelector(".or-navn").textContent && /^\d+$/.test(c.textContent.trim()); }
+    [[L, "lys", "Vand i kuvetten", "Dobbelt c: absorbansen"], [K, "kurve", "Permanganat", "Jern(III), rødt"],
+     [G, "regn", "Find A", "Find c"]].forEach(function (x) {
+        var F = x[0], f = x[1];
+        NK.visFane("fane-" + f);
+        F.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        F.naaet = {};
+        F.vaelg(0);
+        var r = raekkerAf(f);
+        var antal = f === "regn" ? 3 : F.opgaver.length;
+        paastand(f + ": ved start har kun opgave 1 sit tema; de andre er et låst nummer uden tema",
+            r.length === antal && r[0].textContent.indexOf(x[2]) >= 0 && !r[0].disabled && r.slice(1).every(laastNr),
+            r.map(function (c) { return c.textContent.trim(); }).join(" | "));
+        r[2].click();
+        paastand(f + ": et klik på en låst opgave gør intet", F.nr === 0);
+        F.loest("svar", "");
+        r = raekkerAf(f);
+        paastand(f + ": når opgave 1 er løst (Vis svaret tæller), kommer temaet på opgave 2 frem; resten er stadig låst",
+            r[1].textContent.indexOf(x[3]) >= 0 && !r[1].disabled && r.slice(2).every(laastNr),
+            r.map(function (c) { return c.textContent.trim(); }).join(" | "));
+        r[1].click();
+        paastand(f + ": opgave 2 kan nu vælges i rækken", F.nr === 1);
+        F.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        F.naaet = {};
+    });
+    paastand("regn: Let, Middel og Svær står først i rækken og kan altid vælges; så står kun opgaverne på niveauet", (function () {
+        NK.visFane("fane-regn");
+        G.vaelg(0);
+        var niv = [].slice.call(d.querySelectorAll("#regn-niveau .or-knap"));
+        var tekst = niv.map(function (b) { return b.textContent; }).join(",");
+        niv[2].click();
+        var svaer = G.nr === 6 && raekkerAf("regn").length === 2 && niv[2].classList.contains("valgt");
+        niv[0].click();
+        return tekst === "Let,Middel,Svær" && svaer && G.nr === 0;
+    })());
+    paastand("under 1200 px står kun numrene i rækken, og temaet står på kortet", (function () {
+        ramme.style.width = "1100px"; ramme.style.height = "760px";
+        NK.visFane("fane-lys"); L.vaelg(0);
+        var navnSkjult = W.getComputedStyle(d.querySelector("#lys-liste .or-navn")).display === "none";
+        var ok = navnSkjult && /Vand i kuvetten/.test(kortTekst(L));
+        ramme.style.width = "1300px"; ramme.style.height = "820px";
+        return ok;
+    })());
+
+    /* ------------------------------------------------------------------ */
+    overskrift("10. Teorien (regel 31)");
+    var tb = d.querySelector("#teori .overlay-boks");
+    paastand("teorien står på det lyse ark i Lexend (faelles/teori.css)", tb.classList.contains("teori-ark") && /Lexend/.test(W.getComputedStyle(tb).fontFamily) &&
+        !!d.querySelector('link[href="../faelles/teori.css"]'));
+    paastand("teorien slutter med en henvisning til B5.2 i Kemibogen", (function () {
+        var a = d.querySelector("#teori .teori-bog a");
+        return !!a && a.href === "https://kemibogen.dk/b/kapitler/b5-2-absorbans-og-lambert-beers-lov.html" && /B5\.2/.test(a.textContent);
+    })());
+    paastand("teorien er kort (under 1000 tegn) og har ingen overskrifter i versaler", (function () {
+        var t = tb.cloneNode(true);
+        [].slice.call(t.querySelectorAll(".genveje, .knapper, .teori-bog")).forEach(function (e) { e.remove(); });
+        var hs = [].slice.call(tb.querySelectorAll("h3"));
+        return t.textContent.replace(/\s+/g, " ").trim().length < 1000 && hs.every(function (h) { return W.getComputedStyle(h).textTransform === "none"; });
+    })());
     NK.visFane("fane-lys");
 }
 </script>

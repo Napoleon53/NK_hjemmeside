@@ -36,6 +36,13 @@
         <div class="anker" id="stempel-anker-flaske"></div>
         <div class="anker" id="stempel-anker-hylde"></div>
         <div class="anker" id="stempel-anker-graf"></div>
+        <div class="anker" id="stempel-anker-laas"></div>
+        <!-- Opgaveraekken (21. nov. 2026, runde 3): panelet er vaek. Opgaverne med nummer og tema
+             (kun de naaede har tema; de kommende er laaste numre) og Start forfra til sidst (js/sim_stempel.js) -->
+        <nav class="opgaverad" id="stempel-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="stempel-prikker"></div>
+            <button class="or-knap or-stille" id="stempel-forfra" type="button" title="Start opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
         <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
         <div class="scenekort spm" id="stempel-skort">
             <div id="stempel-ind" aria-live="polite"></div>
@@ -49,43 +56,6 @@
         </div>
     </div>
 
-    <aside class="panel">
-        <div class="kort" id="stempel-opgaver">
-            <h2>Opgaverne <span class="taeller">opgave <b id="stempel-nr">1</b>/7</span></h2>
-            <div class="prikrad" id="stempel-prikker" aria-label="Opgaverne"></div>
-            <button class="knap igen" id="stempel-forfra" type="button"><span>Start opgaven forfra</span><span class="tegn">↺</span></button>
-        </div>
-
-        <div class="kort styr" id="stempel-styr">
-            <h2>Gassen</h2>
-            <div class="styr-raekke">
-                <label for="stempel-T">Temperatur</label>
-                <input type="range" id="stempel-T" min="150" max="500" step="1" value="293">
-                <span class="styr-tal" id="stempel-T-tal">293 K (20 °C)</span>
-            </div>
-            <div class="styr-raekke">
-                <span class="styr-navn">Lodder</span>
-                <button class="knap lille" id="stempel-lod-minus" type="button" aria-label="Et lod af">−</button>
-                <span class="styr-tal kort-tal" id="stempel-lod-tal">0</span>
-                <button class="knap lille" id="stempel-lod-plus" type="button" aria-label="Et lod på">+</button>
-                <span class="styr-note">udefra <b id="stempel-pydre">1,013 bar</b></span>
-            </div>
-            <div class="styr-raekke">
-                <span class="styr-navn">Gas</span>
-                <button class="knap lille" id="stempel-n-minus" type="button" aria-label="0,25 mol gas ud">−</button>
-                <span class="styr-tal kort-tal" id="stempel-n-tal">1,00 mol</span>
-                <button class="knap lille" id="stempel-n-plus" type="button" aria-label="0,25 mol gas ind">+</button>
-            </div>
-            <div class="styr-raekke">
-                <span class="styr-navn">Stemplet</span>
-                <div class="vaelgerrad" role="group" aria-label="Frit eller låst stempel">
-                    <button class="vaelger" id="stempel-frit" type="button">Frit</button>
-                    <button class="vaelger" id="stempel-laast" type="button">Låst</button>
-                </div>
-            </div>
-        </div>
-
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -97,6 +67,12 @@
         <div class="anker" id="regn-anker-cylinder"></div>
         <div class="anker" id="regn-anker-tavle"></div>
         <div class="tavle-tekst" id="regn-tavle"></div>
+        <!-- Opgaveraekken (runde 3): Let, Middel og Svær, opgaverne paa niveauet og Nye tal (js/sim_regn.js) -->
+        <nav class="opgaverad" id="regn-raekke" aria-label="Opgaverne">
+            <div class="or-niveau" id="regn-niveau" role="group" aria-label="Sværhedsgrad"></div>
+            <div class="or-opgaver" id="regn-liste"></div>
+            <button class="or-knap or-stille" id="regn-nye" type="button" title="Samme opgave med nye tal (R)"><span class="or-tegn">⟳</span> Nye tal</button>
+        </nav>
         <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
         <div class="scenekort opgave" id="regn-skort">
             <div id="regn-ind" aria-live="polite"></div>
@@ -110,19 +86,6 @@
         </div>
     </div>
 
-    <aside class="panel">
-        <div class="kort regnekort" id="regn-kort">
-            <h2>Beregningen <span class="taeller" id="regn-taeller"></span></h2>
-            <div class="raekker" id="regn-raekker"></div>
-        </div>
-
-        <div class="kort" id="regn-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/12</span></h2>
-            <div class="vaelgerrad" id="regn-niveau" role="group" aria-label="Sværhedsgrad"></div>
-            <div class="hyldeliste" id="regn-liste"></div>
-            <button class="knap nye" id="regn-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
-        </div>
-    </aside>
 </section>
 
 </main>

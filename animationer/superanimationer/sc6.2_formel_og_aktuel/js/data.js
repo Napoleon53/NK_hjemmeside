@@ -118,14 +118,14 @@
        regn: de ioner, beregningen i kortet viser (ellers maalets ion).
        konklusion: beregningens sidste linje, i ord. */
     D.OPL = [
-        { id: "nacl", titel: "Én til én", salte: ["NaCl"], V: 1000, maal: { ion: "Cl", c: 0.30 },
+        { id: "nacl", titel: "Natriumchlorid", under: "Lav [Cl⁻] = 0,30 M", salte: ["NaCl"], V: 1000, maal: { ion: "Cl", c: 0.30 },
           tekst: "Lav en opløsning, hvor [Cl⁻] = 0,30 M.",
           linje: "Træk en portion natriumchlorid fra krukken ned i glasset.",
           hint: "Hver portion er 0,10 mol, og glasset har 1,00 L. Hvor mange Cl⁻ giver én formelenhed NaCl?",
           svar: "NaCl ⟶ Na⁺ + Cl⁻. [Cl⁻] = c(NaCl) = 0,30 M. Det er tre portioner.",
           goer: [["NaCl", 3]],
           konklusion: "Den aktuelle koncentration af Cl⁻ er 0,30 M. Det er det samme som c(NaCl)." },
-        { id: "na2so4", titel: "To Na⁺", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 }, regn: ["Na"],
+        { id: "na2so4", titel: "Natriumsulfat", under: "Find [Na⁺] trin for trin", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 }, regn: ["Na"],
           tekst: "Opløs en portion (0,10 mol) Na₂SO₄ i glasset med 0,50 L vand.",
           linje: "Træk en portion natriumsulfat ned i glasset.",
           hint: "Træk en portion fra krukken ned i glasset, eller klik på krukken.",
@@ -158,23 +158,23 @@
                 efter: "[Na⁺] = 2 · 0,20 M = 0,40 M." }
           ],
           konklusion: "Den aktuelle koncentration af Na⁺ er 0,40 M. Det er to gange c(Na₂SO₄)." },
-        { id: "fecl3", titel: "Tre Cl⁻", salte: ["FeCl3"], V: 1000, maal: { ion: "Cl", c: 0.60 },
+        { id: "fecl3", titel: "Jern(III)chlorid", under: "Lav [Cl⁻] = 0,60 M", salte: ["FeCl3"], V: 1000, maal: { ion: "Cl", c: 0.60 },
           tekst: "Lav en opløsning, hvor [Cl⁻] = 0,60 M.",
           linje: "Træk jern(III)chlorid ned i glasset.",
           hint: "Hver FeCl₃ giver tre Cl⁻. Hvor stor skal c(FeCl₃) så være?",
           svar: "c(FeCl₃) = 0,60 M / 3 = 0,20 M. Det er to portioner i 1,00 L.",
           goer: [["FeCl3", 2]],
           konklusion: "Den aktuelle koncentration af Cl⁻ er 0,60 M. Det er tre gange c(FeCl₃)." },
-        { id: "k3po4", titel: "Tre K⁺", salte: ["K3PO4"], V: 500, maal: { ion: "K", c: 0.60 },
+        { id: "k3po4", titel: "Kaliumphosphat", under: "Lav [K⁺] = 0,60 M", salte: ["K3PO4"], V: 500, maal: { ion: "K", c: 0.60 },
           tekst: "Lav en opløsning, hvor [K⁺] = 0,60 M.",
           linje: "Træk kaliumphosphat ned i glasset.",
           hint: "Hver K₃PO₄ giver tre K⁺, og glasset har 0,50 L.",
           svar: "c(K₃PO₄) = 0,60 M / 3 = 0,20 M, og n = 0,20 M · 0,50 L = 0,10 mol. Det er én portion.",
           goer: [["K3PO4", 1]],
           konklusion: "Den aktuelle koncentration af K⁺ er 0,60 M. Det er tre gange c(K₃PO₄)." },
-        { id: "al2so43", titel: "Hvem er flest?", salte: ["Al2(SO4)3"], V: 1000, maal: { portioner: 1 }, regn: ["Al", "SO4"],
-          tekst: "Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L.",
-          valg: { spm: "Hvilken ion bliver der flest af?",
+        { id: "al2so43", titel: "Aluminiumsulfat", under: "Hvilken ion er flest?", salte: ["Al2(SO4)3"], V: 1000, maal: { portioner: 1 }, regn: ["Al", "SO4"],
+          tekst: "Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L vand.",
+          valg: { spm: "Hvilken ion bliver der flest af, når Al₂(SO₄)₃ opløses i vand?",
                   hint: "Tallet efter Al og tallet efter parentesen siger, hvor mange af hver ion der er i én formelenhed.",
                   svar: [{ t: "SO₄²⁻", ok: true },
                          { t: "Al³⁺", forkl: "Al³⁺ har den største ladning, men der er to Al³⁺ og tre SO₄²⁻ i hver formelenhed." },
@@ -184,7 +184,7 @@
           svar: "En portion Al₂(SO₄)₃ i 1,00 L.",
           goer: [["Al2(SO4)3", 1]],
           konklusion: "Der er flest SO₄²⁻. Den aktuelle koncentration af SO₄²⁻ er 0,30 M mod 0,20 M for Al³⁺." },
-        { id: "begge", titel: "To salte", salte: ["NaCl", "Na2SO4"], V: 1000, maal: { ion: "Na", c: 0.50, begge: true },
+        { id: "begge", titel: "To salte med Na⁺", under: "Lav [Na⁺] = 0,50 M", salte: ["NaCl", "Na2SO4"], V: 1000, maal: { ion: "Na", c: 0.50, begge: true },
           tekst: "Lav en opløsning, hvor [Na⁺] = 0,50 M. Brug begge salte.",
           linje: "Der skal både natriumchlorid og natriumsulfat i.",
           hint: "Na⁺ kommer fra begge salte. NaCl giver én Na⁺, Na₂SO₄ giver to.",
@@ -198,46 +198,130 @@
        halvdelen baglæns (en ions koncentration er målt). Svær: fra massen.
        std er den foerste opgave; derefter traekkes nye. */
     D.NIV = [
-        { id: "let", titel: "Let", salte: ["NaCl", "KI", "CaCl2", "MgCl2", "BaCl2", "Na2SO4", "K2SO4", "Na2CO3"],
+        { id: "let", titel: "Let", under: "Fra c(salt) til ionerne", salte: ["NaCl", "KI", "CaCl2", "MgCl2", "BaCl2", "Na2SO4", "K2SO4", "Na2CO3"],
           c: [0.100, 0.120, 0.150, 0.200, 0.240, 0.250, 0.300, 0.400, 0.500],
           std: { salt: "CaCl2", c: 0.240 } },
-        { id: "middel", titel: "Middel", salte: ["FeCl3", "AlCl3", "K3PO4", "Na3PO4", "Al2(SO4)3"],
+        { id: "middel", titel: "Middel", under: "Fx FeCl₃ og baglæns", salte: ["FeCl3", "AlCl3", "K3PO4", "Na3PO4", "Al2(SO4)3"],
           c: [0.0500, 0.100, 0.120, 0.150, 0.200, 0.250],
           std: { salt: "Al2(SO4)3", c: 0.120 },
           baglaens: 0.5, stdBag: { salt: "Na3PO4", ion: "an", ionC: 0.150 } },
-        { id: "svaer", titel: "Svær", salte: ["Pb(NO3)2", "CaCl2", "Na2SO4", "AlCl3", "K3PO4", "MgCl2", "Al2(SO4)3"],
+        { id: "svaer", titel: "Svær", under: "Fra massen til ionerne", salte: ["Pb(NO3)2", "CaCl2", "Na2SO4", "AlCl3", "K3PO4", "MgCl2", "Al2(SO4)3"],
           n: [0.00500, 0.0100, 0.0125, 0.0200, 0.0250, 0.0500], V: [100, 250, 500],
           std: { salt: "Pb(NO3)2", m: 4.14, V: 250 } }
     ];
 
     /* ----- Fane 3: blandinger ---------------------------------------------------------------
-       samme: to salte vejes af og opløses i det samme glas vand (mA og mB i
-       g, V i mL). Masserne er valgt, saa n og c bliver paene tal. De andre:
-       to glas, A og B, haeldes sammen. ion: den ion, der spoerges om (i
-       begge glas); ion2: en ion, der kun er i det ene glas. V i mL. */
+       To glas, A og B, haeldes sammen (lige, forskellig, toioner). ion: den
+       ion, der spoerges om (i begge glas); ion2: en ion, der kun er i det
+       ene glas. V i mL. samme: to salte vejes af og opløses i det samme glas
+       vand (mA og mB i g, V i mL). Masserne er valgt, saa n og c bliver paene
+       tal.
+
+       Raekkefoelgen (21. nov. 2026): fanen begynder med Samme rumfang (4 trin)
+       og slutter med To salte i ét glas (7 trin fra masser), saa eleven ikke
+       moeder en beregning i syv trin med to salte som det foerste.
+
+       start: det foerste maal er trinvist (brugeren 21. nov. 2026, runde 2:
+       "svarene i kortet, aldrig i panelet", foerst valg, saa skrive; runde 4:
+       en let start). Otte trin, ét ad gangen: eleven haelder glas A og saa
+       glas B over i det tomme glas (haeld), svarer paa, hvilke ioner luppen
+       viser (ioner), og saa fem spoergsmaal med tre svar hver (trin). Regningen
+       staar paa tavlen og vokser linje for linje i den raekkefoelge, eleven
+       svarer: V, n(Cl⁻) fra A, n(Cl⁻) fra B og [Cl⁻]. id er linjen paa tavlen,
+       fase "formel" er formlen (svarene i D.FORMELVALG), ellers tallet. De
+       forkerte tal laves af sim_bland.js (talValg) og er typiske fejl, hver
+       med sin forklaring i fejl. hint er hinttrappen, godt rosen. To godt
+       (eller intro) er [én til én, flere] eller [ens, forskellige]; se
+       sim_bland.js. {A}, {B}, {VA}, {nAled} osv. saettes ind af sim_bland.js.
+       Har eleven loest maalet, er alt fremme fra start som i de andre maal. */
     D.BLAND = [
-        { id: "samme", titel: "To salte i ét glas", ion: "Cl",
-          tekst: "Du opløser {mA} g {A} og {mB} g {B} i {V} vand. Hvad er [{ion}]?",
-          tal: [{ A: "CaCl2", mA: 5.55, B: "AlCl3", mB: 4.00, V: 200 }, { A: "NaCl", mA: 2.92, B: "CaCl2", mB: 2.78, V: 250 },
-                { A: "MgCl2", mA: 2.86, B: "KCl", mB: 2.98, V: 200 }, { A: "BaCl2", mA: 5.21, B: "FeCl3", mB: 4.06, V: 250 }] },
-        { id: "lige", titel: "Samme rumfang", ion: "Cl",
-          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}]?",
+        { id: "lige", under: "Find [Cl⁻] i blandingen", titel: "Samme rumfang", ion: "Cl",
+          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. Find [{ion}], når de hældes sammen.",
           tal: [{ A: "NaCl", cA: 0.200, VA: 100, B: "KCl", cB: 0.200, VB: 100 },
                 { A: "NaCl", cA: 0.300, VA: 50, B: "KCl", cB: 0.100, VB: 50 },
                 { A: "CaCl2", cA: 0.100, VA: 100, B: "NaCl", cB: 0.200, VB: 100 },
-                { A: "KCl", cA: 0.400, VA: 150, B: "NaCl", cB: 0.200, VB: 150 }] },
-        { id: "forskellig", titel: "Forskelligt rumfang", ion: "Cl",
-          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}]?",
+                { A: "KCl", cA: 0.400, VA: 150, B: "NaCl", cB: 0.200, VB: 150 }],
+          start: {
+              /* Runde 4 (brugeren: "Det lyder ikke særlig nemt at tilgå"): først det
+                 konkrete, én handling ad gangen. Trin 1 og 2 haelder glas A og glas B
+                 over, trin 3 spoerger om ionerne i luppen, og foerst trin 4 siger maalet. */
+              haeld: [
+                  { glas: "A", intro: "Glas A og glas B har to forskellige saltopløsninger.",
+                    tekst: "Klik på glas A for at hælde det over i det tomme glas.",
+                    hint: ["Glas A er glasset med den gule ramme og etiketten A.",
+                           "Klik én gang på glas A.",
+                           "Du kan også trække glas A hen over det tomme glas."] },
+                  { glas: "B", intro: "",
+                    tekst: "Klik på glas B for at hælde det over i det samme glas.",
+                    hint: ["Glas B er glasset med den gule ramme og etiketten B.",
+                           "Klik én gang på glas B.",
+                           "Du kan også trække glas B hen over blandingen."] }
+              ],
+              ioner: {
+                  intro: "Luppen viser blandingen.",
+                  tekst: "Hvilke ioner er der i blandingen?",
+                  svar: [{ t: "{ioner}", ok: true },
+                         { t: "{A} og {B}", f: "Saltene er opløst. I vandet findes de som ioner, ikke som {A} og {B}." },
+                         { t: "Kun {ion}", f: "Se på kuglerne i luppen. Der er også {kationer} i blandingen." }],
+                  hint: ["Hver kugle i luppen er en ion. Læs formlerne på kuglerne.",
+                         "{A} og {B} er delt i ioner, da de blev opløst i vand.",
+                         "Blandingen har {ioner}."],
+                  godt: "{A} og {B} blev delt i ioner, da de blev opløst. Blandingen har {ioner}." },
+              trin: [
+                  { id: "Vsum", intro: "Nu skal du finde koncentrationen af Cl⁻ i blandingen, [Cl⁻].",
+                    tekst: "Hvor stort er det samlede rumfang i blandingsglasset?",
+                    fejl: { en: "Det er rumfanget i glas A før hældningen. Aflæs skalaen på blandingsglasset.",
+                            dobbelt: "400 mL er den øverste streg på glasset. Aflæs, hvor væsken står i blandingsglasset." },
+                    hint: ["Se på skalaen på blandingsglasset.",
+                           "Find stregen, hvor væsken står i blandingsglasset.",
+                           "Væsken står ved {Vsum} mL."],
+                    godt: "Væsken i blandingsglasset står ved {Vsum} mL. V = {Vsum} mL = {VsumL} L." },
+                  { id: "nA", fase: "formel", tekst: "Hvilken formel giver stofmængden af Cl⁻ fra glas A?",
+                    hint: ["Koncentrationen er stofmængde pr. liter: c = n / V.",
+                           "Find n ved at gange begge sider med V.",
+                           "Formlen er {formelA}."],
+                    godt: ["Koncentrationen er stofmængde pr. liter. Derfor er n = c · V.",
+                           "Hver {A} giver {kA} Cl⁻. Derfor er n = {kA} · c · V."] },
+                  { id: "nA", tekst: "Hvor mange mol Cl⁻ kommer der fra glas A?",
+                    fejl: { mL: "Rumfanget skal være i liter: {VA} mL = {VAL} L.",
+                            c: "{cAion} M er koncentrationen af Cl⁻ i glas A. Gang med rumfanget i liter." },
+                    hint: ["Brug formlen {formelA}.",
+                           "Rumfanget skal være i liter: {VA} mL = {VAL} L.",
+                           "n = {nAled}."],
+                    godt: "n(Cl⁻) fra A = {nAled}." },
+                  { id: "nB", tekst: "Hvor mange mol Cl⁻ kommer der fra glas B?",
+                    fejl: { mL: "Rumfanget skal være i liter: {VB} mL = {VBL} L.",
+                            c: "{cBion} M er koncentrationen af Cl⁻ i glas B. Gang med rumfanget i liter." },
+                    hint: ["Regn som for glas A: {formelB}.",
+                           "Rumfanget skal være i liter: {VB} mL = {VBL} L.",
+                           "n = {nBled}."],
+                    godt: "n(Cl⁻) fra B = {nBled}." },
+                  { id: "ionBland", tekst: "Hvad er [Cl⁻] i blandingen?",
+                    fejl: { sum: "Koncentrationer kan ikke lægges sammen. Cl⁻ fra begge glas fordeler sig i hele blandingen.",
+                            en: "Det er kun Cl⁻ fra glas A. Læg stofmængderne fra begge glas sammen." },
+                    hint: ["Koncentrationen er stofmængde pr. liter: [Cl⁻] = n / V.",
+                           "n er Cl⁻ fra begge glas: {nA} mol + {nB} mol.",
+                           "V er hele blandingen: {VsumL} L."],
+                    godt: ["[Cl⁻] = {ionLed}. Der er dobbelt så mange Cl⁻ i dobbelt så stort rumfang. Derfor er [Cl⁻] den samme som i hvert glas.",
+                           "[Cl⁻] = {ionLed}. Rumfangene er lige store, så [Cl⁻] ligger midt mellem {cAion} M og {cBion} M."] }
+              ]
+          } },
+        { id: "forskellig", under: "Find [Cl⁻] i blandingen", titel: "Forskelligt rumfang", ion: "Cl",
+          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. Find [{ion}], når de hældes sammen.",
           tal: [{ A: "CaCl2", cA: 0.300, VA: 100, B: "NaCl", cB: 0.150, VB: 200 },
                 { A: "NaCl", cA: 0.200, VA: 150, B: "CaCl2", cB: 0.100, VB: 50 },
                 { A: "AlCl3", cA: 0.100, VA: 100, B: "KCl", cB: 0.300, VB: 200 },
                 { A: "MgCl2", cA: 0.250, VA: 200, B: "NaCl", cB: 0.100, VB: 200 }] },
-        { id: "toioner", titel: "Ionen i det ene glas", ion: "Na",
-          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}] og [{ion2}]?",
+        { id: "toioner", titel: "Ionen i det ene glas", under: "Find to koncentrationer", ion: "Na",
+          tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. Find [{ion}] og [{ion2}], når de hældes sammen.",
           tal: [{ A: "Na2SO4", cA: 0.200, VA: 150, B: "NaCl", cB: 0.400, VB: 50, ion: "Na", ion2: "SO4" },
                 { A: "CaCl2", cA: 0.200, VA: 100, B: "NaCl", cB: 0.200, VB: 100, ion: "Cl", ion2: "Ca" },
                 { A: "K3PO4", cA: 0.100, VA: 100, B: "KCl", cB: 0.300, VB: 100, ion: "K", ion2: "PO4" },
-                { A: "Na2SO4", cA: 0.100, VA: 100, B: "Na3PO4", cB: 0.100, VB: 100, ion: "Na", ion2: "SO4" }] }
+                { A: "Na2SO4", cA: 0.100, VA: 100, B: "Na3PO4", cB: 0.100, VB: 100, ion: "Na", ion2: "SO4" }] },
+        { id: "samme", titel: "To salte i ét glas", under: "Fra masserne til [Cl⁻]", ion: "Cl",
+          tekst: "Find [{ion}], når du opløser {mA} g {A} og {mB} g {B} i {V} vand.",
+          tal: [{ A: "CaCl2", mA: 5.55, B: "AlCl3", mB: 4.00, V: 200 }, { A: "NaCl", mA: 2.92, B: "CaCl2", mB: 2.78, V: 250 },
+                { A: "MgCl2", mA: 2.86, B: "KCl", mB: 2.98, V: 200 }, { A: "BaCl2", mA: 5.21, B: "FeCl3", mB: 4.06, V: 250 }] }
     ];
 
     /* ----- Regnetrinene -------------------------------------------------------------------
@@ -270,11 +354,43 @@
               formelHint: "Du kender saltets koncentration og rumfanget i glas A. Husk, hvor mange af ionen hver formelenhed giver." },
         nB: { navn: "Stofmængden fra glas B", enhed: "mol", formel: "k · c · V",
               formelHint: "Du kender saltets koncentration og rumfanget i glas B. Husk, hvor mange af ionen hver formelenhed giver." },
-        Vsum: { navn: "Det samlede rumfang", enhed: "L", formel: "" },
+        Vsum: { navn: "Det samlede rumfang", enhed: "mL", formel: "" },
         ionBland: { navn: "Koncentrationen i blandingen", enhed: "M", formel: "n / V",
                     formelHint: "Stofmængden af ionen fordeler sig i hele blandingen." },
         ion2: { navn: "Den anden ion", enhed: "M", formel: "n / V",
                 formelHint: "Ionen kommer kun fra det ene glas, men den fordeler sig i hele blandingen." }
+    };
+
+    /* ----- Formlerne vaelges paa kortet (runde 2, 21. nov. 2026) ------------------------
+       Et formeltrin har tre svar: den rigtige formel og to typiske fejl, hver
+       med sin forklaring (f). godt er rosen. {k} er tallet foran ionen, {salt}
+       saltet i glasset, {ion} ionen og {glas} det glas, ionen kommer fra.
+       Hvilken slags hvert trin har, staar i tjek.js (T.formelValg). */
+    D.FORMELVALG = {
+        mM: { svar: [{ t: "n = m / M", ok: true },
+                     { t: "n = M / m", f: "Molarmassen er masse pr. mol. Stofmængden er massen delt med molarmassen." },
+                     { t: "n = m · M", f: "Massen skal deles med molarmassen, ikke ganges med den." }],
+              godt: "Molarmassen er masse pr. mol. Derfor er n = m / M." },
+        nV: { svar: [{ t: "c = n / V", ok: true },
+                     { t: "c = m / V", f: "Koncentrationen er stofmængde pr. liter, ikke masse pr. liter. Brug stofmængden n." },
+                     { t: "c = n · V", f: "Koncentrationen er stofmængde pr. liter. Stofmængden skal deles med rumfanget." }],
+              godt: "Koncentrationen er stofmængde pr. liter. Derfor er c = n / V." },
+        cV: { svar: [{ t: "n = c · V", ok: true },
+                     { t: "n = c / V", f: "Koncentrationen er stofmængde pr. liter. Stofmængden er derfor koncentrationen gange rumfanget." },
+                     { t: "n = V / c", f: "Rumfanget skal ganges med koncentrationen, ikke deles med den." }],
+              godt: "Koncentrationen er stofmængde pr. liter. Derfor er n = c · V." },
+        kcV: { svar: [{ t: "n = {k} · c · V", ok: true },
+                      { t: "n = c · V", f: "Hver {salt} giver {k} {ion}. Gang også med {k}." },
+                      { t: "n = c / V", f: "Koncentrationen er stofmængde pr. liter. Stofmængden er derfor koncentrationen gange rumfanget." }],
+               godt: "Hver {salt} giver {k} {ion}. Derfor er n = {k} · c · V." },
+        ionV: { svar: [{ t: "[{ion}] = n / V", ok: true },
+                       { t: "[{ion}] = c(A) + c(B)", f: "Koncentrationer kan ikke lægges sammen. {ion} fra begge glas fordeler sig i hele blandingen." },
+                       { t: "[{ion}] = n · V", f: "Koncentrationen er stofmængde pr. liter. Stofmængden skal deles med rumfanget." }],
+                godt: "{ion} fra begge glas fordeler sig i hele blandingen. Derfor deles stofmængden med det samlede rumfang." },
+        ion2V: { svar: [{ t: "[{ion}] = n / V", ok: true },
+                        { t: "[{ion}] = n / V({glas})", f: "{ion} kommer kun fra glas {glas}, men den fordeler sig i hele blandingen. Brug det samlede rumfang." },
+                        { t: "[{ion}] = n · V", f: "Koncentrationen er stofmængde pr. liter. Stofmængden skal deles med rumfanget." }],
+                 godt: "{ion} fra glas {glas} fordeler sig i hele blandingen. Derfor deles med det samlede rumfang." }
     };
 
     /* ----- Replikkerne ------------------------------------------------------------------ */

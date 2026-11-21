@@ -30,7 +30,7 @@
             id: "cufe", navn: "Kobber og jern",
             opstil: { a: "Cu", b: "Fe", plast: false },
             gaet: {
-                tekst: "Et kobberrør og et jernrør er skruet sammen, og der løber vand i dem. Gæt, hvad der sker med rørene i løbet af 20 år.",
+                tekst: "Et kobberrør og et jernrør er skruet sammen. Der løber vand i dem i 20 år. Hvilket rør tæres ved samlingen af kobberrøret og jernrøret?",
                 svar: [
                     { t: "Kobberrøret tæres ved samlingen" },
                     { t: "Jernrøret tæres ved samlingen", ok: true },
@@ -52,7 +52,7 @@
             id: "elektroner", navn: "Elektronerne",
             opstil: { a: "Cu", b: "Fe", plast: false },
             spm: {
-                tekst: "Lad tiden gå igen, og følg de gule elektroner (e⁻) i luppen. Hvilken vej går de?",
+                tekst: "Lad tiden gå igen, og følg de gule elektroner (e⁻) i luppen. Hvilken vej går elektronerne mellem jernrøret og kobberrøret?",
                 svar: [
                     { t: "Fra jernet over i kobberet", ok: true },
                     { t: "Fra kobberet over i jernet",
@@ -102,7 +102,7 @@
             id: "znfe", navn: "Zink og jern",
             opstil: { a: "Zn", b: "Fe", plast: false },
             gaet: {
-                tekst: "Nu er et zinkrør skruet sammen med et jernrør. I opgave 1 med kobber og jern var det jernrøret, der blev tæret. Gæt, hvad der sker nu.",
+                tekst: "I opgave 1 med kobber og jern var det jernrøret, der blev tæret. Hvilket rør tæres, når et zinkrør er skruet sammen med et jernrør?",
                 svar: [
                     { t: "Jernrøret tæres igen" },
                     { t: "Zinkrøret tæres", ok: true },
@@ -124,7 +124,7 @@
             id: "retning", navn: "Vandets retning",
             opstil: { a: "Fe", b: "Cu", plast: false },
             gaet: {
-                tekst: "Vandet løber fra venstre mod højre. Med kobberrøret først går der hul i jernrøret efter 10 år. Nu er rørene byttet om, så vandet kommer gennem jernrøret først. Gæt, hvornår der går hul.",
+                tekst: "Med kobberrøret først går der hul i jernrøret efter 10 år. Nu er rørene byttet om. Hvornår går der hul i jernrøret, når vandet kommer gennem jernrøret først?",
                 svar: [
                     { t: "Før der er gået 10 år" },
                     { t: "Efter 10 år igen" },
@@ -142,7 +142,7 @@
                 ]
             },
             spm: {
-                tekst: "Sæt kobberrøret først igen, og se i luppen. Hvorfor går der hul hurtigere, når vandet kommer fra kobberrøret?",
+                tekst: "Sæt kobberrøret først igen, og se i luppen. Hvorfor går der hurtigere hul i jernrøret, når kobberrøret er først?",
                 krav: { par: ["Cu", "Fe"], orden: true, plast: false },
                 svar: [
                     { t: "Vandet har elektroner med fra kobberrøret",
@@ -300,7 +300,7 @@
         {
             id: "mg", navn: "Magnesium",
             gaet: {
-                tekst: "Magnesium er endnu mindre ædelt end zink. Gæt, hvordan en klods af magnesium klarer sig i forhold til en klods af zink.",
+                tekst: "Magnesium er endnu mindre ædelt end zink. Hvor længe holder en klods af magnesium på skroget i forhold til en klods af zink?",
                 svar: [
                     { t: "Den holder længere end zink" },
                     { t: "Den bliver brugt hurtigere end zink", ok: true },
@@ -355,7 +355,7 @@
         {
             id: "krav", navn: "Vand og dioxygen",
             gaet: {
-                tekst: "En plade af jern set helt tæt på. Kontakterne bestemmer, om der ligger en dråbe vand på pladen, og om der er dioxygen i luften. Gæt, hvad der skal til, for at jern ruster.",
+                tekst: "En plade af jern set helt tæt på. Kontakterne bestemmer, om der ligger en dråbe vand på pladen, og om der er dioxygen i luften. Hvad skal der til, for at jern ruster?",
                 svar: [
                     { t: "Kun vand" },
                     { t: "Kun dioxygen" },
@@ -427,7 +427,7 @@
         {
             id: "salt", navn: "Salt",
             gaet: {
-                tekst: "Om vinteren saltes vejene, og skibe sejler i saltvand. Gæt, hvad der sker med jernet, når der er salt i dråben.",
+                tekst: "Om vinteren saltes vejene, og skibe sejler i saltvand. Ruster jern hurtigere eller langsommere, når der er salt i vanddråben?",
                 svar: [
                     { t: "Jernet ruster hurtigere", ok: true },
                     { t: "Jernet ruster langsommere" },

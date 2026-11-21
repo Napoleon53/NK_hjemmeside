@@ -79,12 +79,22 @@
                 (k.svaret ? '<b class="kt-svaret sk-svaret">' + NK.html(punktum(k.svaret)) + "</b> " : "") + (k.html || "") + "</p></div>" +
                 '<button type="button" class="kt-videre sk-videre" data-videre="1">' + NK.html(k.videre) + "</button></div>";
         }
-        /* Paa papirkortet staar indledningen foran spoergsmaalet i samme linje */
-        var intro = "";
-        /* Indledningen er ikke fed; kun spoergsmaalet til trinnet er det */
-        if (k.intro && NK.Papir) intro = '<span class="kt-intro">' + NK.html(k.intro) + "</span> ";
+        /* Paa papirkortet gaar indledningen og spoergsmaalet samlet gennem
+           NK.Papir.tekst (21. nov. 2026): indledningen staar i almindelig skrift,
+           og spoergsmaalet staar halvfedt paa sin egen linje. Foer blev kun
+           spoergsmaalet sendt igennem, saa det begyndte midt i en linje, og et
+           spoergsmaal i indledningen blev ikke halvfedt. */
+        var tekst = NK.html(k.tekst);
+        if (k.intro && NK.Papir) tekst = NK.html(k.intro + " " + k.tekst);
         else if (k.intro) html += '<p class="kt-intro">' + NK.html(k.intro) + "</p>";
-        html += (k.foer || "") + '<p class="kt-tekst sk-tekst"><span class="kt-chip sk-chip">' + NK.html(k.chip) + "</span>" + intro + papir(NK.html(k.tekst)) + "</p>" + gaet;
+        /* fed: en opfordring uden spoergsmaalstegn staar ogsaa halvfedt paa sin egen
+           linje ("Klik på glas A ...", runde 4) */
+        var midt = k.fed && NK.Papir ? (k.intro ? NK.html(k.intro) + " " : "") + '<span class="sk-spm' + (k.intro ? " sk-linje" : "") + '">' +
+            NK.html(k.tekst) + "</span>" : papir(tekst);
+        html += (k.foer || "") + '<p class="kt-tekst sk-tekst"><span class="kt-chip sk-chip">' + NK.html(k.chip) + "</span>" + midt + "</p>" + gaet;
+        /* Feltet, eleven skriver i, staar paa kortet under spoergsmaalet (21. nov.
+           2026: svarene staar aldrig i panelet). visSceneKort saetter det ind. */
+        if (k.felt) html += '<div class="kt-felt-plads" data-felt></div>';
         if (k.svar) {
             html += '<div class="kt-svar sk-svar n' + k.svar.length + '">';
             k.svar.forEach(function (s) {
@@ -159,7 +169,15 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Opgavelisten ---------------------------------------------------- */
+        /* ----- Opgavelisten ----------------------------------------------------
+           Runde 4 (brugeren 21. nov. 2026, "husk dette"): sigende titler med en
+           kort undertekst (o.under). De kommende opgaver staar som et nummer med
+           en graa streg uden titel og kan ikke klikkes, til eleven er naaet dertil
+           (en loest opgave, ogsaa gemt i browseren, eller én, eleven har vaeret
+           ved). Niveauerne paa fane 2 vaelges frit og er altid synlige. */
+        P.aabenOpgave = function (i) {
+            return !!valg.niveauer || !!(this.status[i] && this.status[i].loest) || !!(this.naaet && this.naaet[i]);
+        };
         P.bygListe = function () {
             var mig = this;
             this.el.liste.innerHTML = "";
@@ -167,9 +185,9 @@
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "hyldelinje";
-                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn">' + NK.html(o.titel) +
-                    '</span><span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
-                knap.addEventListener("click", function () { mig.vaelg(i, false); });
+                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn"></span>' +
+                    '<span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
+                knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i, false); });
                 mig.el.liste.appendChild(knap);
             });
         };
@@ -178,7 +196,14 @@
             var mig = this;
             var knapper = this.el.liste.querySelectorAll(".hyldelinje");
             this.status.forEach(function (s, i) {
-                knapper[i].classList.toggle("valgt", i === mig.nr);
+                var k = knapper[i], aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                var html = aaben ? NK.html(o.titel) + (o.under ? "<em>" + NK.html(o.under) + "</em>" : "") : '<span class="hl-streg"></span>';
+                var nv = k.querySelector(".hl-navn");
+                if (nv.innerHTML !== html) nv.innerHTML = html;
+                k.classList.toggle("valgt", i === mig.nr);
+                k.classList.toggle("laast", !aaben);
+                k.disabled = !aaben;
+                k.setAttribute("aria-label", aaben ? o.titel : "Opgave " + (i + 1) + ", kommer senere");
                 NK.saetTekst(navn + "-stj-" + i, valg.niveauer ? (s.antal ? s.antal + " ✓" : "") : (s.stjerne ? "★" : (s.loest ? "✓" : "")));
             });
             NK.saetTekst(navn + "-loest", String(this.antalLoest()));
@@ -187,6 +212,9 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i, nyeTal) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
+            this.zoneMaks = 0;
             this.hjaelp = 0;
             this.pegKnap = false;
             this.brugtSvar = false;
@@ -197,6 +225,9 @@
             this.lavOpgave(i, nyeTal);
             this.layout();
             this.visKort();
+            /* Kortets plads maales foerst med den nye opgaves kort */
+            this.zoneMaks = 0;
+            this.tjekZone();
             this.visListe();
             /* Paa scenekortet siger opgaven selv, hvor man er: ingen indledning i linjen */
             this.naesteLinje(this.introNu && !this.el.skort ? D.INTRO[navn] : "", "");
@@ -234,12 +265,19 @@
            rigtigt, forklaringen og knappen videre paa et groent kort. */
         P.visSceneKort = function () {
             var k = this.kortData(), e = this.el.skort;
-            var kl = "scenekort " + k.slags + (k.gul ? " svar" : "") + (k.bliv ? " bliv" : "");
+            /* kompakt: et kort uden svar, hvor Giv hint staar ved teksten (runde 4) */
+            var kl = "scenekort " + k.slags + (k.gul ? " svar" : "") + (k.bliv ? " bliv" : "") + (k.kompakt ? " kompakt" : "");
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
             var html = fast(kortHTML(k));
             if (html !== this.kortSidst) {
+                var fokusFoer = this.regning && this.regning.el.contains(document.activeElement);
                 this.el.ind.innerHTML = html;
                 this.kortSidst = html;
+                var plads = this.el.ind.querySelector("[data-felt]");
+                if (plads && this.regning) {
+                    plads.appendChild(this.regning.el);
+                    if (fokusFoer) this.regning.fokus();
+                }
             }
         };
 
@@ -311,10 +349,15 @@
            i scenen, der er vaek igen om lidt, flytter heller ikke noget. */
         P.kortZone = function () {
             if (!this.el.skort) return 0;
-            var basis = valg.zone ? valg.zone[window.innerHeight <= 720 ? 1 : 0] : 150;
+            var lav = window.innerHeight <= 720 ? 1 : 0;
+            var basis = this.zoneBasis ? this.zoneBasis()[lav] : (valg.zone ? valg.zone[lav] : 150);
             if (this.kortT > 0 && this.lay && this.lay.zone >= basis) return this.lay.zone;
             var h = this.gaetNu && this.gaetNu() ? 0 : this.el.skort.offsetHeight;
-            return Math.max(basis, h);
+            /* Pladsen bliver i hele opgaven saa stor, som kortet har vaeret (21. nov.
+               2026), saa scenen ikke hopper op og ned, naar kortet skifter mellem
+               spoergsmaal, svar og forklaring. Den nulstilles ved ny opgave. */
+            this.zoneMaks = Math.max(this.zoneMaks || 0, h);
+            return Math.max(basis, this.zoneMaks);
         };
 
         P.tjekZone = function () {
@@ -328,8 +371,10 @@
                 klasse = "knap blaa banker";
                 tekst = this.videreTekst();
             } else {
-                tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-                if (this.hjaelp > 0) klasse += " svar";
+                /* En hinttrappe (trinInfo().hints) giver Naeste hint, til trappen er brugt */
+                var trappe = this.hintTrappe || 1;
+                tekst = this.hjaelp === 0 ? "Giv hint" : (this.hjaelp < trappe ? "Næste hint" : "Vis svaret");
+                if (this.hjaelp >= trappe) klasse += " svar";
                 /* Mens der gaettes, er gaettekortet det eneste fyldte gule */
                 if (this.gaetNu && this.gaetNu()) klasse += " stille";
                 if (this.pegKnap && this.hjaelp === 0) klasse += " peg";
@@ -373,9 +418,12 @@
             }
             var info = this.trinInfo();
             if (!info) return;
-            if (this.hjaelp === 0) {
-                this.hjaelp = 1;
-                this.hjaelpVis(info.hint);
+            /* Giv hint, Naeste hint (med en hinttrappe, info.hints) og Vis svaret */
+            var trappe = info.hints || [info.hint];
+            if (this.hjaelp < trappe.length) {
+                this.hjaelp++;
+                this.hintTrappe = trappe.length;
+                this.hjaelpVis(trappe[this.hjaelp - 1]);
                 this.visKnap();
                 this.fokus();
                 return;
@@ -512,7 +560,7 @@
         };
 
         P.tilpas = function () {
-            if (this.L.tilpas() || !this.lay) this.layout();
+            if (this.L.tilpas() || !this.lay) { this.zoneMaks = 0; this.layout(); }
         };
 
         P.saetAnker = function (id, x, y, b, h) {

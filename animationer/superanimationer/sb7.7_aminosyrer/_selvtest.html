@@ -379,6 +379,26 @@ function koerTest(W) {
         });
     });
     samlet("kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes", daek);
+
+    /* ================================================================= */
+    overskrift("7. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    var laastLi = function (li) { return li.classList.contains("laast") && !!li.querySelector(".tr-streg") && /^\d+$/.test(li.textContent.trim()); };
+    var tekstAf = function (l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); };
+    ["fane-f", "fane-d", "fane-e"].forEach(function (id) {
+        var s = NK.sims[id], liste = function () { return [].slice.call(W.document.getElementById(s.navn + "-trin").querySelectorAll("li")); };
+        NK.visFane(id); s.tilpas();
+        s.trinMaks = {}; s.forfra();
+        var lt = liste(), navn1 = s.trinListe[1].navn;
+        paastand(id + ": ved start har kun trin 1 sin titel; de " + (lt.length - 1) + " andre er et nummer med en grå streg",
+            lt.length === s.trinListe.length && lt.length > 1 && !laastLi(lt[0]) && lt.slice(1).every(laastLi), tekstAf(lt));
+        /* Vis svaret, til trin 1 er løst (et trin kan have et forsøg før spørgsmålet) */
+        for (var k = 0; k < 6 && !s.groen; k++) { s.visSvar(); tid(s, 4); }
+        s.videreKlik(); tid(s, 1);
+        lt = liste();
+        paastand(id + ": titlen på trin 2 kommer frem, når trin 1 er løst (Vis svaret)",
+            s.trinNr === 1 && !laastLi(lt[1]) && lt.slice(2).every(laastLi), s.trinNr + ": " + tekstAf(lt) + " (" + navn1 + ")");
+        s.forfra();
+    });
     ramme.style.width = ""; ramme.style.height = "";
 }
 </script>

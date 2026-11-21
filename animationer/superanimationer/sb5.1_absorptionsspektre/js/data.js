@@ -132,7 +132,7 @@
     D.KO = [
         {
             id: "k-gaet", gruppe: "kaede", type: "gaet", navn: "Gæt først", n: 2,
-            tekst: "Buta-1,3-dien har λmax = 217 nm. Hvor ligger λmax for stoffet med én konjugeret dobbeltbinding mere?",
+            tekst: "Buta-1,3-dien har to konjugerede dobbeltbindinger og λmax = 217 nm. Hvor ligger λmax, når buta-1,3-dien får én konjugeret dobbeltbinding mere?",
             svar: ["Kortere bølgelængde", "Samme bølgelængde", "Længere bølgelængde"],
             rigtig: 2
         },
@@ -151,7 +151,7 @@
             tekst: "Klik på en dobbeltbinding for at addere ét dibrommolekyle til den. Gør opløsningen farveløs." },
         {
             id: "t-regnbue", gruppe: "tomat", type: "regnbue", navn: "Tomatregnbuen",
-            tekst: "Bromvand hældes i tomatsaft og trænger langsomt ned. Hvilke farver får saften fra top til bund?",
+            tekst: "Bromvand hældes i tomatsaft og trænger langsomt ned. Hvilke farver får tomatsaften fra top til bund, når bromvandet trænger ned?",
             svar: ["Farveløs, gul, orange", "Orange, gul, farveløs", "Hele glasset bliver gult"],
             rigtig: 0
         }

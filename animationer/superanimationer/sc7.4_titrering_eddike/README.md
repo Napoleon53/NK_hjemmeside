@@ -258,6 +258,11 @@ forsvinder også, når eleven har gjort noget på fanen. Koden er den fælles
 `../kemichael/praesentation.js`, koblet med `NK.Praesentation.kobl` i hver
 `sim_*.js` og `NK.Praesentation.trin` i `js/laerer.js`.
 
+## Opgavelisten (21. nov. 2026)
+
+Ingen opgaveliste: fane 1 og 2 har én måling ad gangen, og fane 3 viser situationerne én ad gangen på kortet.
+Reglen om låste opgavetitler (21. nov. 2026) har intet at låse; de fire regnetrin på fane 2 er trin i én opgave.
+
 ## I menuen
 
 Ja, fra 25. sept. 2026 (brugerens ønske): knappen med `data-emne="c7.4"` i

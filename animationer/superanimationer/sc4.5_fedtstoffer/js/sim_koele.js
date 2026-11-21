@@ -471,7 +471,7 @@
         if (this.trin === "gaet" || this.trin === "set") {
             var f = D.fedt(o.fedt), st = D.sted(o.sted);
             this.sk.vis({ kl: "spm", chip: chip,
-                tekst: NK.html(f.Navn + " står " + st.i + " ved " + D.gradTekst(st.T)) + ". Er fedtet fast, delvist fast eller flydende?",
+                tekst: NK.html("Er " + f.navn + " fast, delvist fast eller flydende " + st.i + " ved " + D.gradTekst(st.T) + "?"),
                 laast: this.trin === "set",
                 svar: SVAR.map(function (s) {
                     var set = mig.trin === "set";

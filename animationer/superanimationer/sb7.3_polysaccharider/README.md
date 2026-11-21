@@ -169,3 +169,9 @@ Kortet er det lyse papirkort fra start (se Fælles krav i `../README.md`):
 `<body class="papirkort">`. Efter et rigtigt svar bliver kortet på
 spørgsmålet med forklaringen under svarene, og Næste står, hvor Indsend svar
 stod. Kortets grønne knap går altid fremad; Begynd forfra står i panelet.
+
+## Opgavelisten (21. nov. 2026)
+
+Opgavelisten og trinlisterne låser titlerne op i takt: kun de løste og den, eleven er ved, har
+titel, og de kommende er et nummer med en grå streg, der ikke kan klikkes (`opgAaben` og `trinLi`
+i `js/fane.js`). Selvtesten afsnit 7 tjekker det (ALT OK, 78 påstande).

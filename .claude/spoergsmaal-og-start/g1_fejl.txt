@@ -1,0 +1,103 @@
+Selvtestfejl, der kom med G1 (spørgsmålet på egen linje), før sprogrettelserne. Afstanden over spørgsmålet er bagefter sat ned med 2 px.
+
+sb1.4_thiosulfat:
+   FEJL  fane 2: kortet holder sig i zonen (234 px af 230, syre hint)
+   FEJL  fane 3: kortet holder sig i zonen (234 px af 230, kold hint)
+sb2.4_ligevaegtsberegninger:
+   FEJL: papirkortet holder sig i kortZone i 1440 × 860 og 1100 × 700 (højst 186 px) 1440×860 bh c-graense 159 > 158 [sk-bund bliv svar: Svaret [CO] = 0,113 M, [H₂O] = 0,0125 M, [CO₂] = 0,0875 M, [H₂] = 0,0875 M.]
+sb3.2_intermolekylaere_bindinger:
+   FEJL  kortet er aldrig højere end pladsen over luppen, heller ikke med det længste hint eller den længste forklaring   (1100×700 spm oh 202>196 2 g/mol gør næsten ingen forsk)
+sb3.4_geometrisk_isomeri:
+   FEJL  fane 1: kortet bliver højst én linje højere end pladsen, der er sat af   (197 px ved But-2-en: Hint 3 af 3 Træk hårdt. Dobbeltbindingen kan ikke )
+sb3.5_spejlbilledeisomeri:
+   FEJL  kortet bliver højst én linje højere end pladsen, der er sat af (164 px)   (197 px ved fane-sb 0: Hint 1 af 3 Træk i molekylet til venstre. Slip, nå)
+sb5.4_spektroskopiopgaver:
+   FEJL  kortet er aldrig højere end pladsen over tavlen (spørgsmål, forkert svar og svaret)   (1100×620 jern.eps forkert 194 > 194 | 1100×620 jern.eps svaret 195 > 194 | 1100×620 messing.eps forkert 194 > 194 | 1100×620 messing.eps svaret 199 > 194)
+sb6.2_titreringssimulator:
+   FEJL  1400 x 860: kortet holder sig i kortZone, og apparatet begynder under det (det længste hint 135 px, den længste fejl 135 px, zone 132)
+   FEJL  1280 x 640: kortet holder sig i kortZone, og apparatet begynder under det (det længste hint 114 px, den længste fejl 114 px, zone 112)
+   FEJL  1100 x 700: kortet holder sig i kortZone, og apparatet begynder under det (det længste hint 114 px, den længste fejl 114 px, svaret med det længste navn 134 px, zone 112)
+   FEJL  700 x 560: kortet holder sig i kortZone, og apparatet begynder under det (det længste hint 153 px, den længste fejl 153 px, zone 142)
+sb6.5_ph_i_syrer_og_baser:
+   FEJL  kortet kan være over tavlen i alle trin af alle emner (start, hint, fejl og grønt) fra 1100 × 620 til 1600 × 950   (1100px×620px s hcooh x start (175 > 172) | 1100px×620px s hcooh x hint (191 > 172) | 1100px×620px s hcooh x fejl (191 > 172) | 1100px×620px s hcooh x grøn (179 > 172))
+sb7.2_ringslutning:
+   FEJL  kortet slutter over tavlen på alle tre faner i fire størrelser   (1400x860 fane-l: kort 228 > tavle 218 | 1600x950 fane-l: kort 228 > tavle 218)
+sb7.3_polysaccharider:
+   FEJL  kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes   (1400x860 fane-i: kort 228 > tavle 218 | 1600x950 fane-i: kort 228 > tavle 218)
+sb7.7_aminosyrer:
+   FEJL  kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes   (1100x620 fane-d: kort 200 > tavle 194)
+sb7.8_proteiner:
+   FEJL  kortet holder sig over tavlen i alle størrelser   (1300×800 d1 fejl (216 > 218) | 1600×950 d1 fejl (216 > 218))
+sb8.4_log_p_og_log_d:
+   FEJL  kortet slutter over tavlen i 32 tilstande og fire størrelser, og alt kan tegnes   (1400x860 nr. 9: kort 224 > tavle 218 | 1400x860 nr. 10: kort 224 > tavle 218 | 1400x860 nr. 24: kort 216 > tavle 218 | 1600x950 nr. 9: kort 224 > tavle 218)
+sc1.1_atombygger:
+   FEJL  kortene holder sig i kortZone på en almindelig og en lav skærm   (1280×680 fane 1 114>112 fejl Byg partiklen med 1 proton, 0 neutroner og 0 )
+sc1.2_grundstofudstilling:
+   FEJL  kortet holder sig over tegningen på 1400 × 860 og 1100 × 660 (spørgsmål, fejl, hint og svar)   (1400×860 H navn svar 171 > 168 dele montre-spm:50,montre-raekke:35,montre-status:0,montre-bliv:38 | NavnMærket på prøven siger H. / Hvad hedder grundstoffet med symbolet H? /  / hydrogen /  / SvaretH er hydrogen. /  / Næste →; 1400×860 H navn svar 171 > 168 dele montre-spm:50,montre-raekke:35,mont
+sc2.4_faeldningsreaktioner:
+   FEJL  tekstboksen er højst 215 px høj ved 1400 x 860 (236 px)
+sc3.3_polaere_molekyler:
+   FEJL  kortet holder sig i kortZone (1400x860 og 1100x700)   (1400x860 pol 2 hint 217>200; 1400x860 pol 2 fejl 217>200; 1400x860 pol 2 fejl 217>200; 1400x860 pol 2 fejl 217>200; 1400x860 pol 2 løst 212>200)
+sc3.4_blandbarhed:
+   FEJL  kortet holder sig i kortZone, og bassinet står under det (1400x860 og 1100x700)   (1400x860 2 svar 216>200; 1400x860 2 rigtigt 216>200; 1400x860 4 fejl 216>200; 1400x860 4 svar 210>200; 1400x860 4 rigtigt 210>200)
+sc3.5_vand_eller_heptan:
+   FEJL  layoutet holder ved 390 × 844   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint)
+   FEJL  layoutet holder ved 520 × 480   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint)
+   FEJL  layoutet holder ved 860 × 640   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1280 × 640   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1280 × 720   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1300 × 820   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1366 × 650   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1400 × 860   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+   FEJL  layoutet holder ved 1500 × 900   (fane-forsoeg: papirkortet går ud over kortZone ved start 0 fejl, start 0 hint, start 0 ros (+3))
+sc4.1_kogepunkt:
+   FEJL  spil: kortet holder sig i kortZone ved 1400 × 860 (højst 204 px, zonen slutter ved 180)
+   FEJL  spil: kortet holder sig i kortZone ved 1100 × 700 (højst 173 px, zonen slutter ved 164)
+sc4.3_forbraending:
+   FEJL  1100 × 620: kortet er inden for sin zone i alle dele af alle opgaver   (fane-b blaa_lup del 0 svar 193>188)
+   FEJL  1400 × 860: kortet er inden for sin zone i alle dele af alle opgaver   (fane-b blaa_lup del 0 hint 1 182>166 | fane-b blaa_lup del 0 hint 2 182>166 | fane-b blaa_lup del 0 hint 3 182>166 | fane-b blaa_lup del 0 forkert 1 182>166)
+   FEJL  1600 × 950: kortet er inden for sin zone i alle dele af alle opgaver   (fane-b blaa_lup del 0 hint 1 182>166 | fane-b blaa_lup del 0 hint 2 182>166 | fane-b blaa_lup del 0 svar 190>166)
+sc4.4_addition_og_plastik:
+   FEJL  1100 × 620: tingene kan være der på alle tre faner   (fane 3 opgave 5 (spm, forkert svar 1): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, forkert svar 3): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, hint 1): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, hint 2): k
+   FEJL  1100 × 700: tingene kan være der på alle tre faner   (fane 3 opgave 5 (spm, forkert svar 1): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, forkert svar 3): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, hint 1): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm): kortet er højere end sin plads 175 mod 172; fane 3 opgave 5 (spm, hint 2): k
+   FEJL  1300 × 760: tingene kan være der på alle tre faner   (fane 3 opgave 5 (spm, forkert svar 1): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, forkert svar 3): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, hint 1): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, hint 2): k
+   FEJL  1600 × 950: tingene kan være der på alle tre faner   (fane 3 opgave 5 (spm, forkert svar 1): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, forkert svar 3): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, hint 1): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm): kortet er højere end sin plads 206 mod 198; fane 3 opgave 5 (spm, hint 2): k
+sc4.6_umaettet_fedt:
+   FEJL  1100 × 620: kortet er inden for sin zone i alle dele af alle opgaver   (tran spm hint 2 199>188 | tran spm hint 3 199>188 | tran spm forkert 0 199>188 | tran spm forkert 1 199>188)
+sc4.7_alkoholer_og_syrer:
+   FEJL  1280 × 720: kortet er inden for sin zone i alle dele af alle opgaver   (fane-v lupvand del 0 hint 1 159>156 | fane-v lupvand del 0 hint 2 159>156)
+sc5.3_et_mol:
+   FEJL  1100 × 620: kortet holder sig inden for sin plads   (muldvarpe svar 233 > 208)
+   FEJL  1300 × 760: kortet holder sig inden for sin plads   (muldvarpe svar 218 > 208)
+sc5.4_stofmaengdeberegning:
+   FEJL  layoutet holder fra 520 × 380 til 1500 × 900   (520×380 fane-vaegt regnestykket er højere end tavlen 126 > 124)
+sc5.9_staaluld:
+   FEJL  papirkortet holder sig inden for kortZone i alle trin (1400 × 860 og 1100 × 660)   (1400×860 forkert svar 0: 204 > 198; 1400×860 forkert svar 2: 204 > 198; 1400×860 hint til spørgsmålet: 204 > 198; 1400×860 spørgsmålet med svaret vist: 200 > 198; 1400×860 spørgsmålet med svaret vist og rosen for fanen: 220 > 198; 1100×660 forkert svar 0: 181 > 172; 1100×660 forkert svar 2: 181 > 172; 1100×66
+sc5.10_lightergas:
+   FEJL  1400 × 860: kortet holder sig i kortZone på alle tre faner   (fane 2 opgave 3 forkert methan: kort 208, zone 204, scenen fra 212; fane 2 opgave 3 forkert ethan: kort 208, zone 204, scenen fra 212; fane 2 opgave 3 forkert butan: kort 208, zone 204, scenen fra 212; fane 2 opgave 3 forkert pentan: kort 208, zone 204, scenen fra 212)
+   FEJL  1100 × 660: kortet holder sig i kortZone på alle tre faner   (fane 2 opgave 3 forkert methan: kort 181, zone 180, scenen fra 188; fane 2 opgave 3 forkert ethan: kort 181, zone 180, scenen fra 188; fane 2 opgave 3 forkert butan: kort 181, zone 180, scenen fra 188; fane 2 opgave 3 forkert pentan: kort 181, zone 180, scenen fra 188)
+sc6.3_mohrtitrering:
+   FEJL  kortet holder sig over buretten og tavlen (1400 × 860, 1280 × 700 og 1100 × 640)   (1280px×700px trin 1 talhint 175>173; 1280px×700px trin 1 løst 182>173; 1100px×640px trin 1 formelhint 183>172; 1100px×640px trin 1 talhint 183>172)
+sc7.1_syrebasereaktioner:
+   FEJL  ved 1400 × 860 er kortet højst 159 px og holder sig i kortZone   (fane 1 fejl 4 159 > 142; fane 1 hint 4 159 > 142; fane 1 rigtigt 4 154 > 142)
+   FEJL  ved 1100 × 700 er kortet højst 135 px og holder sig i kortZone   (fane 1 fejl 4 135 > 124; fane 1 hint 4 135 > 124; fane 1 svaret 4 130 > 124)
+sc7.2_ph_skalaen:
+   FEJL  ved 1400 × 860 er kortet højst 180 px og holder sig i kortZone   (fortynd 1 162 > 158; fortynd hint 1 180 > 158; fortynd fejl 1 180 > 158)
+sc7.3_ph_beregninger:
+   FEJL  ved 1400 × 860 er kortet højst 228 px (fane-staerk opgave 2 trin 0 formelhint) og holder sig i kortZone   (fane-ph opgave 0 trin 0 formelhint 207 > 204; fane-ph opgave 0 trin 0 forkert formel 2 207 > 204; fane-ph opgave 1 trin 0 formelhint 207 > 204)
+   FEJL  ved 1100 × 700 er kortet højst 203 px (fane-konc opgave 0 trin 1 formelhint) og holder sig i kortZone   (fane-konc opgave 0 trin 1 formelhint 203 > 188; fane-konc opgave 1 trin 1 formelhint 203 > 188; fane-konc opgave 2 trin 1 formelhint 203 > 188)
+sc7.4_titrering_eddike:
+   FEJL  opstillingerne flytter sig ikke, når forklaringen kommer (alle fem, rigtigt og forkert)   (820 høj, 1 forkert: 212 → 213; 820 høj, 3 forkert: 212 → 213; 820 høj, 5 forkert: 212 → 213)
+sc8.1_redoxreaktioner:
+   FEJL  1400 × 860 fane-d: kortet er højst 156 px (højst 158 i lige spm)
+   FEJL  1600 × 950 fane-d: kortet er højst 156 px (højst 158 i lige spm)
+sc8.2_spaendingsraekken:
+   FEJL  ved 1400 × 860: kortet holder sig i kortZone, og tegningen begynder under det   (forsøget: luppen flytter sig, når forklaringen kommer)
+sc8.7_korrosion:
+   FEJL  1100 × 700: kortet holder sig i sin plads (200 px) i alle dele af alle opgaver   (202 px i r retning.spm hint 2)
+sb4.9_salenvir:
+   FEJL  forklaringen står under svarene, og Vent 10 minutter står, hvor Indsend svar stod   (Rigtigt Der er stadig salicylaldehyd, så reaktionen er ikke færdig. Vent 10 minutter, og lav en ny TLC-plade. 192)
+   FEJL  1400 × 820: kortet holder sig inden for 184 px   (197 px ved trin 6 spørgsmål)
+   FEJL  1100 × 700: kortet holder sig inden for 156 px   (167 px ved trin 6 spørgsmål)
+   FEJL  1280 × 720: kortet holder sig inden for 156 px   (167 px ved trin 6 spørgsmål)
+   FEJL  1600 × 950: kortet holder sig inden for 184 px   (197 px ved trin 6 spørgsmål)

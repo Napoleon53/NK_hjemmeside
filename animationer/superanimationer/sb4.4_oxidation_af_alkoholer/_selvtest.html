@@ -468,6 +468,56 @@ function koerTest(W) {
     samlet("kortet slutter over whiteboardet", daekker);
     samlet("hint og Indsend svar står på samme række", raekke);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("7. Listerne låser titlerne op i takt (21. nov. 2026)");
+    function linjer(id) { return [].slice.call(el(id).querySelectorAll(".opg-chip")); }
+    function laastNr(c) { return c.classList.contains("laast") && !!c.querySelector(".hl-streg") && /^\d+$/.test(c.textContent.trim()); }
+    function tekst(l) { return l.map(function (c) { return c.textContent.trim(); }).join(" | "); }
+    NK.visFane("fane-o");
+    o.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    o.naaet = {};
+    o.vaelg(0);
+    var ol = linjer("o-serieliste");
+    paastand("Oxidationstallet: ved start har kun ethanol en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        ol.length === 3 && /ethanol/.test(ol[0].textContent) && /primær/.test(ol[0].textContent) && ol.slice(1).every(function (c) { return laastNr(c) && c.disabled; }), tekst(ol));
+    paastand("Oxidationstallet: en låst alkohol er lige så høj som en med undertekst",
+        Math.abs(ol[1].getBoundingClientRect().height - ol[0].getBoundingClientRect().height) < 1);
+    ol[2].click();
+    paastand("Oxidationstallet: et klik på en låst alkohol gør intet", o.nr === 0);
+    var vaern = 0;
+    while (!o.status[0].loest && vaern++ < 40) {
+        if (o.groen) o.videreKlik();
+        else if (o.fase === "anim") tid(o, 2.5);
+        else if (o.fase === "h") { o.oxider(); tid(o, 2.5); }
+        else o.knap();
+    }
+    ol = linjer("o-serieliste");
+    paastand("Oxidationstallet: når ethanol er klaret (Vis svaret tæller), kommer propan-2-ol frem; den tredje er stadig låst",
+        o.status[0].loest && /propan-2-ol/.test(ol[1].textContent) && !ol[1].disabled && laastNr(ol[2]), tekst(ol));
+    ol[1].click();
+    paastand("Oxidationstallet: propan-2-ol kan nu vælges i listen", o.nr === 1);
+    NK.visFane("fane-u");
+    u.status.runder = 0;
+    u.forfra();
+    var ul = linjer("u-trinliste");
+    paastand("Ukendte alkoholer: i den første runde har kun Forsøget en titel; de tre andre er et nummer med en grå streg",
+        ul.length === 4 && /Forsøget/.test(ul[0].textContent) && ul.slice(1).every(laastNr), tekst(ul));
+    el("u-ind").querySelector('[data-handling="forsoeg"]').click();
+    tid(u, 9);
+    ul = linjer("u-trinliste");
+    paastand("Ukendte alkoholer: efter forsøget kommer titlen på trin 2 frem; trin 3 og 4 er stadig låst",
+        u.trin() === "t-H" && /tertiære/.test(ul[1].textContent) && ul.slice(2).every(laastNr), tekst(ul));
+    vaern = 0;
+    while (u.trin().charAt(0) === "t" && vaern++ < 12) {
+        var v2 = 0;
+        while (!(u.groen && u.groen.spm) && v2++ < 6) u.knap();
+        if ((u.liste[u.ti + 1] || "").charAt(0) === "s") break;
+        u.videreKlik();
+    }
+    ul = linjer("u-trinliste");
+    paastand("Ukendte alkoholer: når den tertiæres sidste spørgsmål er besvaret, kommer titlen på trin 3 frem; trin 4 er stadig låst",
+        !!(u.groen && u.groen.spm) && u.trin().charAt(0) === "t" && /sekundære/.test(ul[2].textContent) && laastNr(ul[3]), u.trin() + ": " + tekst(ul));
 }
 </script>
 </body>

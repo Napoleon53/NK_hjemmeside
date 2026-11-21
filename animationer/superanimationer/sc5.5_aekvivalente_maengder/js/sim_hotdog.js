@@ -809,7 +809,7 @@
         if (!k) return;
         var o = this.ordre(), t = this.aktivtTrin(), mig = this;
         var d = { chip: o ? "Ordre " + (this.nr + 1) + " af " + D.ORDRER.length : "Frit valg",
-            tekst: NK.html(o ? o.tekst : "Læg på brættet, og ring med klokken.") };
+            tekst: NK.html(o ? (o.tekst2 && !(t && t.art === "begr") ? o.tekst2 : o.tekst) : "Læg på brættet, og ring med klokken.") };
         if (o && !this.naaet && t && t.art === "begr") {
             d.svar = o.ops.led.map(function (l) {
                 return { j: l[0], t: NK.html(D.stort(D.ingrediens(l[0]).flertal)), valgt: mig.valgtBegr === l[0],

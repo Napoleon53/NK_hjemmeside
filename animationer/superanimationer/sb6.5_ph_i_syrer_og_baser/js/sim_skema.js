@@ -69,7 +69,7 @@
         },
         x: {
             navn: "Hvad er x?", slags: "valg",
-            tekst: function () { return "Syren afgiver hydroner til vand, til der er ligevægt. Ændringen i koncentration er ukendt og kaldes x. Hvad angiver x?"; },
+            tekst: function () { return "Ændringen i koncentration fra start til ligevægt kaldes x. Hvad angiver x i rækken Ændring?"; },
             svar: function () { return ["Koncentrationen af syre, der har afgivet en hydron", "Syrens koncentration ved start", "Syrens koncentration ved ligevægt"]; },
             rigtig: function () { return 0; },
             fejlValg: function (e, r, j) {

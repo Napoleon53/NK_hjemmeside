@@ -775,7 +775,7 @@ button:focus-visible {
 .scene.soejle.medkort { padding-top: calc(var(--kortzone) + 20px); }
 .scene.medkort .tilbud { top: 8px; z-index: 7; }
 /* Fane 3: kortet har ingen svarknapper og er lavere */
-#fane-udtryk { --kortzone: 168px; }
+#fane-udtryk { --kortzone: 171px; }   /* var 168: spørgsmålet på egen linje, 21. nov. 2026 */
 
 .sk-tekst { margin: 0; }
 .sk-ligning { margin: 4px 0 0; font-size: 1.12rem; font-weight: 600; text-align: center; }

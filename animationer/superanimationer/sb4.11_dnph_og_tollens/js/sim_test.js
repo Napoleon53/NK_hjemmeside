@@ -152,8 +152,8 @@
 
     P.kortData = function () {
         var mig = this, v = this.opg.vist, tekst;
-        if (this.fase === "dnph") tekst = "Hvad sker der, når " + v + " tilsættes DNPH-opløsning? Vælg, og tryk Indsend svar.";
-        else tekst = "Hvad sker der i Tollens' test med " + v + "? Glasset varmes i et vandbad. Vælg, og tryk Indsend svar.";
+        if (this.fase === "dnph") tekst = "Hvad sker der, når " + v + " tilsættes DNPH-opløsning?";
+        else tekst = "Glasset med Tollens' reagens varmes i et vandbad. Hvad sker der, når " + v + " varmes med Tollens' reagens?";
         return {
             slags: "spm", chip: "Opgave " + (this.nr + 1),
             tekst: tekst,

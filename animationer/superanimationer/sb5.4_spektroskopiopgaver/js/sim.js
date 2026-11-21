@@ -41,7 +41,7 @@
         NK.el(navn + "-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el(navn + "-opgaver").addEventListener("click", function (e) {
             var li = e.target.closest && e.target.closest("li[data-nr]");
-            if (li) mig.startOpgave(parseInt(li.getAttribute("data-nr"), 10));
+            if (li && mig.aabenOpgave(parseInt(li.getAttribute("data-nr"), 10))) mig.startOpgave(parseInt(li.getAttribute("data-nr"), 10));
         });
         NK.el(navn + "-kopier").addEventListener("click", function () { mig.kopier(); });
         NK.el(navn + "-punktum").addEventListener("click", function () {
@@ -77,11 +77,28 @@
     B.gem = function () { NK.gem(this.noegle, { s: this.status }); };
 
     /* ----- Panelet ---------------------------------------------------------------- */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun
+       de loeste opgaver og den, eleven er ved, viser titlen. De kommende
+       staar som et nummer med en graa streg og kan ikke klikkes, til eleven
+       er naaet dertil: alle foer den er loest (Vis svaret taeller som
+       loest), eller eleven har vaeret der. */
+    B.aabenOpgave = function (j) {
+        if (this.status[this.liste[j]]) return true;
+        if (this.naaet && this.naaet[j]) return true;
+        for (var k = 0; k < j; k++) if (!this.status[this.liste[k]]) return false;
+        return true;
+    };
+
     B.visListe = function () {
         var mig = this, html = "", loeste = 0;
         this.liste.forEach(function (id, j) {
             var s = mig.status[id];
             if (s) loeste++;
+            if (!mig.aabenOpgave(j)) {
+                html += '<li class="laast" data-nr="' + j + '" aria-disabled="true" title="Opgave ' + (j + 1) + ', kommer senere"><span class="tr-nr">' + (j + 1) +
+                    '</span><span class="hl-streg"></span></li>';
+                return;
+            }
             var kl = j === mig.nr ? "nu" : (s ? "faerdig" : "");
             html += '<li class="' + kl + '" data-nr="' + j + '" title="' + NK.html(D.OPG[id].navn) + '"><span class="tr-nr">' + (j + 1) + "</span><span>" +
                 NK.html(D.OPG[id].navn) + (s ? (s === 2 ? " ★" : " ✓") : "") + "</span></li>";
@@ -154,6 +171,8 @@
 
     B.startOpgave = function (nr) {
         this.nr = nr;
+        this.naaet = this.naaet || {};
+        this.naaet[nr] = true;
         this.o = D.OPG[this.liste[nr]];
         this.r = D.kaede(this.o);
         this.loest = {};
@@ -338,6 +357,7 @@
 
     B.forfra = function () {
         this.status = {};
+        this.naaet = {};
         this.gem();
         this.startOpgave(0);
     };

@@ -159,6 +159,11 @@ At se forløbet igen (Brænder, et klik på en lup) er altid tilladt.
 Teksterne rettes i `js/data.js`. Formler skrives med markup: `O_2`, `Mg^{2+}`,
 `e^−`; `D.uni` laver dem om til tekst, og `Tg.formel` tegner dem.
 
+## Opgavelisten (21. nov. 2026)
+
+Listerne på alle tre faner (ekstraopgaverne Let, Middel og Svær er niveauer og altid åbne) låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 8 tjekker det.
+
 ## Forenklinger
 
 * Kun de elektroner, der bliver overført, er tegnet: de 2 yderste elektroner på

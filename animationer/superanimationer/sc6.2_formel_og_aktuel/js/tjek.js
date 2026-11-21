@@ -365,6 +365,27 @@
 
     T.formelHint = function (id) { return D.TRIN[id].formelHint || ""; };
 
+    /* Formlen vaelges paa kortet (21. nov. 2026): tre svar fra D.FORMELVALG med
+       tallene og navnene sat ind. Giver { svar: [{ t, ok, f }], godt }. */
+    T.formelValg = function (id, o) {
+        var f = o.facit || {}, t = o.tal || {}, slags, v = { ion: o.ion ? D.ion(o.ion).t : "" };
+        if (id === "n_mM" || id === "nSA" || id === "nSB") slags = "mM";
+        else if (id === "c" || id === "cSA" || id === "cSB") slags = "nV";
+        else if (id === "nA" || id === "nB") {
+            v.k = id === "nA" ? f.kA : f.kB;
+            v.salt = D.salt(id === "nA" ? t.A : t.B).formel;
+            slags = v.k > 1 ? "kcV" : "cV";
+        } else if (id === "ionBland") slags = "ionV";
+        else if (id === "ion2") {
+            slags = "ion2V";
+            v.ion = D.ion(o.ion2).t;
+            v.glas = f.k2A > 0 ? "A" : "B";
+        }
+        var data = D.FORMELVALG[slags];
+        function fyld(s) { return String(s || "").replace(/\{(\w+)\}/g, function (m, n) { return v[n] !== undefined ? String(v[n]) : m; }); }
+        return { svar: data.svar.map(function (x) { return { t: fyld(x.t), ok: !!x.ok, f: fyld(x.f) }; }), godt: fyld(data.godt) };
+    };
+
     /* Trinnets navn, med saltenes formler for {A} og {B} */
     T.navn = function (id, o) {
         var n = D.TRIN[id].navn, t = o.tal;
@@ -404,13 +425,68 @@
         case "total": return [v, "= " + K.c(f.bidragA) + " M + " + K.c(f.bidragB) + " M = " + K.c(f.total) + " M"];
         case "nA": return [T.formelTekst(id, o), "= " + gange(f.kA, K.c(t.cA), "M") + " · " + K.L(t.VA) + " L = " + K.mol(f.nA) + " mol"];
         case "nB": return [T.formelTekst(id, o), "= " + gange(f.kB, K.c(t.cB), "M") + " · " + K.L(t.VB) + " L = " + K.mol(f.nB) + " mol"];
-        case "Vsum": return ["V = V(A) + V(B)", "= " + K.mL(t.VA) + " mL + " + K.mL(t.VB) + " mL = " + K.mL(t.VA + t.VB) + " mL = " + K.L(t.VA + t.VB) + " L"];
+        /* Rumfanget aflaeses paa blandingsglasset (runde 5: rumfang laegges ikke sammen) */
+        case "Vsum": return ["V = " + K.mL(t.VA + t.VB) + " mL", "= " + K.L(t.VA + t.VB) + " L"];
         case "ionBland":
             var nt = f.nA > 0 && f.nB > 0 ? "(" + K.mol(f.nA) + " mol + " + K.mol(f.nB) + " mol)" : K.mol(f.nA + f.nB) + " mol";
             return [v + " = n / V", "= " + nt + " / " + K.L(t.VA + t.VB) + " L = " + K.c(f.ionBland) + " M"];
         case "ion2": return [v + " = n / V", "= " + K.mol(f.n2) + " mol / " + K.L(t.VA + t.VB) + " L = " + K.c(f.ion2) + " M"];
         }
         return [v, ""];
+    };
+
+    /* ----- Tavlen (runde 3, 21. nov. 2026): hver linje har et navn i ord foran
+       regnestykket, saa den kan laeses alene ("Cl⁻ fra glas A", "n = c · V = ...").
+       Navnet staar paa tavlen, saa venstresiden kan vaere kort (n, c, M, V). */
+    T.tavleNavn = function (id, o) {
+        var t = o.tal || {}, st = o.salt ? D.salt(o.salt) : null;
+        var A = t.A ? D.salt(t.A).formel : "", B = t.B ? D.salt(t.B).formel : "", ion = o.ion ? ionT(o.ion) : "";
+        switch (id) {
+        case "Vsum": return "Rumfanget af blandingen";
+        case "nA": return ion + " fra glas A";
+        case "nB": return ion + " fra glas B";
+        case "ionBland": return ion + " i blandingen";
+        case "ion2": return ionT(o.ion2) + " i blandingen";
+        case "nSA": return "Stofmængden af " + A;
+        case "nSB": return "Stofmængden af " + B;
+        case "cSA": return "Koncentrationen af " + A;
+        case "cSB": return "Koncentrationen af " + B;
+        case "bidragA": return ion + " fra " + A;
+        case "bidragB": return ion + " fra " + B;
+        case "total": return ion + " i glasset";
+        case "M": return "Molarmassen af " + st.formel;
+        case "n_mM": return "Stofmængden af " + st.formel;
+        case "c":
+        case "cSalt": return "Koncentrationen af " + st.formel;
+        case "afstem": return "Opløsningsskemaet";
+        case "kat": return ionT(st.kat) + " i opløsningen";
+        case "an": return ionT(st.an) + " i opløsningen";
+        case "anden": return ionT(andenIon(o)) + " i opløsningen";
+        }
+        return T.navn(id, o);
+    };
+    /* Den korte venstreside paa tavlen */
+    var KORT = { nA: "n", nB: "n", nSA: "n", nSB: "n", n_mM: "n", cSA: "c", cSB: "c", c: "c", M: "M" };
+    T.tavleVenstre = function (id, o) { return KORT[id] || T.venstre(id, o); };
+    /* Den loeste linje: [formlen, "= tallene"] */
+    T.tavleRegning = function (id, o) {
+        var f = o.facit, t = o.tal || {};
+        if (id === "Vsum") return T.regning(id, o);
+        /* Stofmaengderne fra A og B staar lige over; her staar summen */
+        if (id === "ionBland") return ["[" + ionT(o.ion) + "] = n / V", "= " + K.mol(f.nA + f.nB) + " mol / " + K.L(t.VA + t.VB) + " L = " + K.c(f.ionBland) + " M"];
+        var r = T.regning(id, o), v = T.venstre(id, o);
+        if (KORT[id] && r[0].indexOf(v) === 0) r = [KORT[id] + r[0].slice(v.length), r[1]];
+        return r;
+    };
+    /* Linjen, kortet spoerger om: "n = ?" eller "n = c · V = ?" */
+    T.tavleSpm = function (id, o, fase) {
+        var kort = T.tavleVenstre(id, o);
+        if (fase === "tal" && D.TRIN[id].formel) {
+            var ft = T.formelTekst(id, o), v = T.venstre(id, o);
+            if (ft.indexOf(v) === 0) ft = kort + ft.slice(v.length);
+            return ft + " = ?";
+        }
+        return kort + " = ?";
     };
 
     T.facitTekst = function (id, o) {
@@ -422,7 +498,7 @@
         case "nSB": return K.mol(f.nSB) + " mol";
         case "nA": return K.mol(f.nA) + " mol";
         case "nB": return K.mol(f.nB) + " mol";
-        case "Vsum": return K.L(o.tal.VA + o.tal.VB) + " L";
+        case "Vsum": return K.mL(o.tal.VA + o.tal.VB) + " mL";
         }
         var v = f[id];
         return K.c(v) + " M";
@@ -451,7 +527,7 @@
             var kk = id === "bidragA" ? f.kA : f.kB, s2 = D.salt(id === "bidragA" ? t.A : t.B);
             return "Hver " + s2.formel + " giver " + kk + " " + ionT(o.ion) + ". Sæt ind: " + T.venstre(id, o) + " = " + ind + ".";
         case "total": return "Ionerne er i det samme glas. Læg bidragene sammen.";
-        case "Vsum": return "Læg rumfangene sammen, og regn om til liter: 1000 mL = 1 L.";
+        case "Vsum": return "Aflæs skalaen på blandingsglasset. Find stregen, hvor væsken står.";
         }
         var mL = "";
         if (id === "c") mL = "Husk: " + K.mL(o.V) + " mL = " + K.L(o.V) + " L. ";
@@ -534,8 +610,10 @@
             fn.push([kn * cn, "Det er koncentrationen af " + ionT(o.ion) + ". Gang med rumfanget i liter."]);
             return { facit: kn * cn * Vn / 1000, fejl: fn };
         case "Vsum":
-            return { facit: f.Vsum, fejl: [[t.VA + t.VB, "Rumfanget er i mL. Skriv det i liter."],
-                [t.VA / 1000, "Læg begge rumfang sammen."], [t.VB / 1000, "Læg begge rumfang sammen."]] };
+            /* Rumfanget aflaeses i mL paa blandingsglasset */
+            return { facit: t.VA + t.VB, fejl: [[(t.VA + t.VB) / 1000, "Skriv rumfanget i mL, som det står på blandingsglasset."],
+                [t.VA, "Det er rumfanget i glas A før hældningen. Aflæs skalaen på blandingsglasset."],
+                [t.VB, "Det er rumfanget i glas B før hældningen. Aflæs skalaen på blandingsglasset."]] };
         case "ionBland":
             var cA = f.kA * t.cA, cB = f.kB * t.cB;
             return { facit: f.ionBland, fejl: [[cA + cB, KONC_FEJL],

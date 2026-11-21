@@ -43,7 +43,7 @@
             trin: [
                 {
                     id: "ilt", slags: "ilt", navn: "Find oxygenatomet",
-                    tekst: "Glucose lukker sig til en ring med seks atomer. Hvilket oxygenatom binder sig til carbonatom 1? Klik på det, og tryk Indsend svar.",
+                    tekst: "Ringen i glucose har seks atomer. Svar ved at klikke på et oxygenatom. Hvilket oxygenatom binder sig til carbonatom 1, når glucose lukker sig til en ring?",
                     rigtig: "O5",
                     hint: ["Ringen har fem carbonatomer og ét oxygenatom.",
                            "Tæl fem carbonatomer fra carbonatom 1. Oxygenatomet sidder på det sidste af dem."],
@@ -89,7 +89,7 @@
             trin: [
                 {
                     id: "ilt", slags: "ilt", navn: "Find oxygenatomet",
-                    tekst: "Fructose har carbonylgruppen på carbonatom 2 og lukker sig til en ring med fem atomer. Klik på det oxygenatom, der binder sig til carbonatom 2.",
+                    tekst: "Fructose har carbonylgruppen på carbonatom 2, og ringen har fem atomer. Hvilket oxygenatom binder sig til carbonatom 2, når fructose lukker sig til en ring?",
                     rigtig: "O5",
                     hint: ["Ringen har fire carbonatomer og ét oxygenatom.",
                            "Tæl fire carbonatomer fra carbonatom 2. Oxygenatomet sidder på det sidste af dem."],
@@ -195,7 +195,7 @@
         },
         {
             id: "dynamisk", slags: "spm", navn: "Dynamisk ligevægt",
-            tekst: "Fordelingen mellem de tre former ændrer sig ikke mere. Hvad sker der stadig med molekylerne i vinduet?",
+            tekst: "Tallene ved siden af vinduet ændrer sig ikke mere. Hvad sker der med glucosemolekylerne i vinduet, når fordelingen står stille?",
             svar: ["Ringe åbner sig og lukker sig igen", "Intet, for reaktionen er stoppet", "α-glucose bliver kun til β-glucose"], rigtig: 0,
             fejl: { 1: "Se på vinduet. Ringe åbner sig stadig og lukker sig igen.",
                     2: "β-glucose bliver også til α-glucose, og derfor ændrer fordelingen sig ikke." },
@@ -225,7 +225,7 @@
         },
         {
             id: "aabner", slags: "spm", navn: "Ringene åbner sig",
-            tekst: "Næsten alle molekylerne har reageret. Hvorfor kunne ringene også nå at reagere?",
+            tekst: "Kun den åbne kæde kan reagere med Fehlings væske. Hvordan kunne glucosen i ringene nå at reagere med Fehlings væske?",
             svar: ["Ringene i vand åbner sig hele tiden kortvarigt", "Fehlings væske åbner selv ringene", "Ringene har også en aldehydgruppe"], rigtig: 0,
             fejl: { 1: "Ringene åbner sig af sig selv, også uden Fehlings væske. Fehlings væske reagerer kun med kæderne.",
                     2: "I ringen er aldehydgruppen blevet til en OH-gruppe. Kun kæden kan reagere." },

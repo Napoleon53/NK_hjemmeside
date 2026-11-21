@@ -152,9 +152,9 @@
     /* ----- Papirkortet ------------------------------------------------- */
     NK.SimUkendt.prototype.opgaveTekst = function () {
         var o = this.opgave;
-        return "Du har fået " + NK.tal(o.V0, 1) + " mL af en ukendt " + (o.svag ? "svag " : "stærk ") +
+        return "Du har fået " + NK.tal(o.V0, 1) + " mL ukendt " + (o.svag ? "svag " : "stærk ") +
             (o.erSyre ? "syre" : "base") + ". I buretten står " + NK.tal(o.cT, 4) + " M " + o.titrator.formel + ". " +
-            (o.svag ? "Hvad er ækvivalensvolumenet, prøvens koncentration og pKs?" : "Hvad er ækvivalensvolumenet og prøvens koncentration?");
+            (o.svag ? (o.erSyre ? "Hvad er ækvivalensvolumenet, prøvens koncentration og pKs?" : "Hvad er ækvivalensvolumenet, basens koncentration og pKs for den korresponderende syre?") : "Hvad er ækvivalensvolumenet og prøvens koncentration?");
     };
 
     /* De felter, opgaven spoerger om */
@@ -194,7 +194,7 @@
     /* Hoejden, kortet har sat af oeverst i scenen. Selvtesten maaler kortet
        med de laengste tekster i en almindelig og en lav skaerm. */
     NK.SimUkendt.prototype.kortZone = function () {
-        var z = window.innerHeight <= 720 ? 112 : 132;
+        var z = window.innerHeight <= 720 ? 132 : 156;   /* før 112 og 132: spørgsmålet på egen linje, 21. nov. 2026 */
         var b = this.l.b || 900;
         if (b < 560) z += 72;
         else if (b < 760) z += 30;

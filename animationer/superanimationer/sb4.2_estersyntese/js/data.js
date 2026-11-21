@@ -136,7 +136,7 @@
           rigtigTekst: "CO₃²⁻ + 2 H⁺ → CO₂ + H₂O. Gassen øger trykket, så skilletragten skal udluftes undervejs.",
           knap: "Tap vandfasen af →" },
         { id: "ester", navn: "Esteren",
-          spm: "Nu er kun esteren tilbage i det øverste lag. Hvorfor ligger propylbutanoat øverst? Vælg alle, der passer.",
+          spm: "Nu er kun esteren tilbage i det øverste lag. Hvorfor danner propylbutanoat et lag oven på vandet? Vælg alle, der passer.",
           svar: ["Den har intet H på oxygen", "Den har lavere densitet end vand", "Den har en ladning", "Den har en OH-gruppe"],
           rigtig: [0, 1],
           fejl: {

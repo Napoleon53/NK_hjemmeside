@@ -387,6 +387,37 @@ function koerTest(W) {
     paastand("Vis svaret fører gennem atom, byg og tæl (CH₂O)", B.faerdig && trin.indexOf("atom") >= 0 && trin.indexOf("byg") >= 0 && trin.indexOf("tael") >= 0, trin.join(","));
     paastand("med Vis svaret: ingen stjerne og et gult kort", !B.status[6].stjerne && /svar/.test(B.el.skort.className));
 
+    /* Laaste titler (brugeren 21. nov. 2026): kun de loeste og det, eleven er ved, har formel */
+    B.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    B.naaet = {};
+    B.tegnede = {};
+    B.vaelg(0);
+    var chipsB = function () { return [].slice.call(d.querySelectorAll("#b-liste .opg-chip")); };
+    var cb = chipsB();
+    paastand("låste titler: fra start har kun molekyle 1 en formel; de ni andre er et nummer med en grå streg og kan ikke klikkes",
+        cb.length === 10 && cb[0].textContent.trim() === D.MOLEKYLER[0].f && !cb[0].disabled &&
+        cb.slice(1).every(function (c, k) { return c.disabled && c.classList.contains("laast") && !!c.querySelector(".oc-streg") && c.textContent.trim() === String(k + 2); }),
+        cb.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    cb[3].click();
+    paastand("låste titler: et klik på et låst molekyle gør intet", B.nr === 0);
+    vagt = 0;
+    while (!B.faerdig && vagt++ < 30) {
+        if (B.venter) { B.knap(); continue; }
+        B.knap(); B.knap(); B.knap();
+    }
+    koerF(B, 2.5);
+    cb = chipsB();
+    paastand("låste titler: når molekyle 1 er løst (Vis svaret tæller), kommer formlen på molekyle 2 frem, og resten er stadig låst",
+        B.status[0].loest && cb[1].textContent.trim() === D.MOLEKYLER[1].f && !cb[1].disabled && cb.slice(2).every(function (c) { return c.disabled; }),
+        cb.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    B.knap();
+    paastand("låste titler: Næste molekyle går til molekyle 2", B.nr === 1);
+    B.status[5].loest = true; B.visListe();
+    paastand("låste titler: et molekyle, der er løst før (gemt i browseren), har sin formel", chipsB()[5].querySelector(".oc-f").textContent === D.MOLEKYLER[5].f && !chipsB()[5].disabled);
+    paastand("fane 2 har kun numre og er ikke låst", [].every.call(d.querySelectorAll("#f-liste .opg-chip"), function (c) { return !c.disabled && !c.classList.contains("laast"); }));
+    B.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    B.naaet = {};
+
     /* Laasen: naar kortet er groent, saetter et klik i scenen intet i gang */
     B.tegnede = {};
     B.vaelg(0);
@@ -463,7 +494,7 @@ function koerTest(W) {
     Fj.valgt = Fj.forkert.id; Fj.indsendKlik();
     var kF = Fj.el.skort;
     paastand("papirkortet: det rigtige atom, og spørgsmålet Find fejlen bliver stående med Ingen fejl tonet ned og Tæl efter dér, hvor Indsend svar stod",
-        Fj.venter && / bliv/.test(kF.className) && /Klik på det atom, der er tegnet forkert/.test(kF.querySelector(".sk-tekst").textContent) &&
+        Fj.venter && / bliv/.test(kF.className) && /Hvilket atom er tegnet forkert/.test(kF.querySelector(".sk-tekst").textContent) &&
         !!kF.querySelector(".sk-knap.ingen.dim:disabled") && /^Rigtigt Det er /.test(kF.querySelector(".sk-bund.bliv .st-tekst").textContent) &&
         kF.querySelector(".sk-bund.bliv .sk-videre").textContent === "Tæl efter →" && Fj.el.indsend.hidden && kF.getBoundingClientRect().height <= Fj.kortZone(),
         kF.querySelector(".sk-bund.bliv .st-tekst") ? kF.querySelector(".sk-bund.bliv .st-tekst").textContent : kF.className);
@@ -478,7 +509,7 @@ function koerTest(W) {
     paastand("Ingen fejl på kortet vælger kun: blå boks, intet bedømt", Fj.valgt === "ingen" && !!kF.querySelector(".sk-knap.ingen.valgt") && !Fj.faerdig && Fj.el.indsend.classList.contains("klar"));
     Fj.el.indsend.click();
     paastand("Indsend svar: Ingen fejl er rigtigt og bliver grønt, og forklaringen står under knappen",
-        Fj.faerdig && / bliv/.test(kF.className) && !!kF.querySelector(".sk-knap.ingen.rigtig:disabled") && /Klik på det atom/.test(kF.querySelector(".sk-tekst").textContent) &&
+        Fj.faerdig && / bliv/.test(kF.className) && !!kF.querySelector(".sk-knap.ingen.rigtig:disabled") && /Hvilket atom er tegnet forkert/.test(kF.querySelector(".sk-tekst").textContent) &&
         /^Rigtigt /.test(kF.querySelector(".sk-bund.bliv .st-tekst").textContent) && kF.getBoundingClientRect().height <= Fj.kortZone(), kF.getBoundingClientRect().height);
 
     /* ------------------------------------------------------------------ */

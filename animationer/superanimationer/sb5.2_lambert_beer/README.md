@@ -116,11 +116,13 @@ gamle måling står som et blegt kryds.
 
 ## Fane 3: Beregningen
 
-Hvert trin regnes i tre skridt på tavlen (mønstret fra sc6.1 og sc5.3):
-formlen (vælg formens form, □ · □, □ · □ · □, □ / □ eller □ / (□ · □), og skriv
-eller klik et bogstav i hvert felt), tallene ind (klik på tallene under
-tavlen eller skriv dem) og resultatet med enhed. ε kan skrives som e, eps
-eller ε. Et trin, der er løst, klappes sammen til én linje med ✓.
+Fra 21. nov. 2026 (se Regelsættet nedenfor) har hver del to trin: formlen
+vælges med tre knapper på kortet (den rigtige og to typiske fejl, hver med
+sin egen forklaring, `valg` i `D.TRIN`), og tallet skrives i et felt på
+kortet med enheden efter feltet. Tavlen sætter tallene ind i formlen, så
+snart formlen er fundet. Til venstre står måleopstillingen med opgavens tal
+på etiketterne, til højre tavlen som et lyst papir. (Før: formens form,
+bogstaverne og tallene i en bakke under en grøn tavle, tre skridt pr. del.)
 
 | Opgave | Gruppe | Trin | Facit |
 |--------|--------|------|-------|
@@ -133,17 +135,15 @@ eller ε. Et trin, der er løst, klappes sammen til én linje med ✓.
 | Fra hældning til prøve | Svær | ε = a / l, så c | 4,70 mM⁻¹·cm⁻¹ og 0,0800 mM |
 | Massen af permanganat | Svær | c, n = c · V, m = n · M | 0,220 mM, 0,0550 mmol, 6,54 mg |
 
-Beskederne til de typiske fejl (`js/regning.js`): gangestykke i stedet for
-brøk, brøken vendt, det, der skal findes, i formlen, et tal på et andet
-bogstavs plads, V i mL, l i mm, ganget i stedet for divideret, kun divideret
-med ε, A / ε · l uden parentes, c uden enhed eller i M uden omregning, A med
-enhed, m = n / M og afrunding undervejs. c i M med omregning (1,30·10⁻⁴ M)
-godtages.
+Formelknapperne har hver sin forklaring (`valg` i `D.TRIN`): ganget i stedet
+for divideret, brøken vendt, l mangler. Beskederne til tallet (`js/regning.js`):
+ganget i stedet for divideret, brøken vendt, kun divideret med ε, A / ε · l
+uden parentes, m = n / M og afrunding undervejs. Enheden står efter feltet;
+skriver eleven selv en enhed, læses den (c i M med omregning godtages).
 
 Hint til formlen: hvad man kender › formlens begyndelse (c = A / …) › hele
-formlen og formen. Hint til tallene: hvor tallene står › det første tal ›
-hele mellemregningen. Hint til resultatet: tasterne (med parentesen) ›
-enheden › resultatets første cifre.
+formlen. Hint til tallet: tasterne (med parentesen) › enheden › resultatets
+første cifre.
 
 ## Tallene og forenklingerne
 
@@ -175,12 +175,14 @@ js/lb.js           modellen: A, T, I(x), dybden for en absorberet foton,
 js/data.js         stofferne, forudsigelserne, standardkurverne og
                    regnestykkerne
 js/tegning.js      lampen, strålen, kuvetten, detektoren, displayet og tavlen
-js/fane.js         det fælles: listen, papirkortet, Indsend svar og hintknappen
+js/fane.js         det fælles: opgaverækken, papirkortet, Indsend svar og
+                   hintknappen
 js/regning.js      fane 3: facit, tjek af formel, tal og resultat, beskeder
                    og hint
 js/sim_lys.js      fane 1
 js/sim_kurve.js    fane 2
-js/sim_regn.js     fane 3: felterne på tavlen og bakken
+js/sim_regn.js     fane 3: kortet med formelknapperne og feltet, opstillingen
+                   og papirtavlen
 js/rundvisning.js  rundvisningen bag ?
 js/app.js          faneskift, tastatur og løkken
 _selvtest.html     udviklerværktøj, se nedenfor
@@ -235,7 +237,8 @@ typiske fejl, hinttrappen, sproget og layoutet fra 1100 × 700 til
 svar grå, at skydere og træk ikke bedømmer selv, låsen under gættet,
 Næste, at kortet holder sig i zonen, og at alle opgaver kan løses med
 hintknappen.
-Sidst kørt: ALT OK (73 påstande), 6. november 2026.
+Sidst kørt: ALT OK (73 påstande), 6. november 2026. Se også Regelsættet
+nedenfor: ALT OK (102 påstande), 21. november 2026.
 
 ## I menuen
 
@@ -252,3 +255,201 @@ Når brugeren siger til:
 * `FEEDBACK_EMNER` i `samling_alt_b.html` tjekkes; knappen hedder stadig
   "Lambert-Beers Lov" og har nummer 3.
 * Kolonnen "I menuen" i superanimationernes README rettes.
+
+## Opgavelisten låser titlerne op i takt (21. nov. 2026)
+
+Listerne på alle tre faner viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, før de er nået (`aabenOpgave` i `js/fane.js`). Niveauerne Let, Middel og Svær på fane 3 står som før. Selvtesten: ALT OK (86 påstande).
+
+## Regelsættet (21. nov. 2026, T4 i gennemgangen)
+
+Gennemgået efter `../REGELSAET.md` (regel 1-31). Niels 21. nov. 2026: "øverste
+række op til 8-10 opgaver, og derefter sidepanel", og om formelvælgeren på
+Beregningen og teorien: "Jeg synes faktisk det er lidt voldsomt ... ret grimme
+fede skrifttyper, som overvælder øjnene og skaber panik. Der kommer for meget på
+en gang ... I forhold til teori-afsnit må der gerne stå mindre og med en mere
+elegant skrifttype, og måske en henvisning, der fører læseren tilbage til
+kemibogen." Planen fik hans ja ("dine planer er gode").
+
+* **Intet panel** på de tre faner (6, 4 og 8 opgaver). Opgaverne står i en
+  smal række øverst i scenen med nummer og tema (`tema` i `js/data.js`) og
+  "↺ Start forfra" yderst til højre (`.opgaverad`, mønstret fra sc5.7). De
+  kommende er låste, stiplede numre. På Beregningen står Let, Middel og Svær
+  først og kan altid vælges; så står kun opgaverne på niveauet. Under 1200 px
+  står kun numrene, og temaet står på kortets etiket. Koden er `bygListe`,
+  `visListe`, `vaelgNiveau` og `aabenOpgave` i `js/fane.js`.
+* **Kortets plads er fast** (regel 4): Lyset 258/244 px, Standardkurven
+  180 px, Beregningen 256/244 px (almindelig/lav skærm). Selvtesten måler
+  kortet i hvert skridt med det længste hint og en lang fejl (+10 px).
+* **Lyset:** Betjeningen sidder på apparaterne: − og + ved kuvettens etiket
+  ("Permanganat   0,20 mM") ændrer c i trin på `cKnap` (0,05 mM for
+  permanganat), − og + ved l ændrer bredden 0,50 cm ad gangen (grebet på
+  kuvetten virker stadig), Langsomt lys sidder under lampen, og stofferne står
+  under detektoren, først når alle seks forudsigelser er prøvet. Forudsigelse 1
+  er trinvis (`trin` i `D.FORUD[0]`): Trin 1 "Hvad sker der med noget af det
+  grønne lys i kuvetten med permanganat?" giver kurven Lys tilbage, Trin 2 "Hvor
+  meget af lyset når frem til detektoren gennem 0,20 mM permanganat?" giver T i
+  displayet, og Trin 3 er gættet om vand. Bagefter kommer − og + frem med gul
+  ramme og boblen "Klik: fortynd". A i displayet, tavlen og Langsomt lys kommer
+  med forudsigelse 2, bredden med forudsigelse 4 (`fremme` i `js/sim_lys.js`).
+  Det, der ikke er fremme, har en stiplet plads med navnet. Er forudsigelse 1
+  løst før, er alt fremme fra start; Start forfra giver trinene igen.
+  Klik-opfordringen (`opfordring`) står kun, når kortet beder om en handling, og
+  kun ved den knap, der skal bruges; boblen står ved siden af knappen.
+  Fotonerne er rolige: 40 % af den gamle fart, ingen glød om prikkerne og en
+  svag ring, hvor en foton bliver absorberet. Tavlen er et lyst papir med
+  Lexend. "Absorbansen 1" hedder nu "A = 1" med værktøjstippet "Hvor meget lys
+  slipper igennem?".
+* **Standardkurven:** Opgaven og trinet står på kortet ("Trin 2 af 4"), og
+  aflæsningen spørger "Hvor stor er prøvens koncentration?". Tabellen Målingerne
+  står på et lyst papir under bakken (`tegnTabel`).
+* **Beregningen:** se Fane 3 ovenfor. Ingen "OPGAVENS TAL", "FORMENS FORM" eller
+  "BOGSTAVERNE". Det, der spørges om, står som "?" med gul ramme på
+  opstillingen og på tavlen og bliver grønt, når det er regnet. Niels' skærmbillede
+  med ε i alle tre pladser kom af tre klik på ε (ét klik udfyldte ét felt);
+  bakken er væk.
+* **Skrift (regel 30):** Lexend på lærrederne (`Tg.SKRIFT`) med vægt 500-600,
+  ingen versaler som overskrifter.
+* **Teorien (regel 31):** kortere, på det lyse ark (`../faelles/teori.css`,
+  klassen `teori-ark`) og med henvisningen "Læs mere i Kemibogen: B5.2
+  Absorbans og Lambert-Beers lov".
+* **Kortene er korte** (regel 5-6, koordinatorens gennemsyn samme dag): På
+  Standardkurven står kun en kort indledning (`kort` i `D.KURVE`, fx "En
+  opløsning af permanganat har en ukendt koncentration.") og trinets handling
+  halvfedt på sin egen linje ("Træk i den gule prik, til linjen går gennem
+  punkterne."); aflæsningen spørger "Hvor stor er prøvens koncentration?". Beskeden
+  "Se på punkterne", der gentog fingeraftrykkets linje, er væk. På Lyset står
+  gættet kun i linjen nederst ("Dit gæt"), og handlingen står halvfedt på sin
+  egen linje under "Prøv det selv, og tryk så Indsend svar."
+* Rundvisningen peger på rækken og knapperne i scenen.
+* Tekstrettelserne står i `~/NK_hjemmeside/.claude/spoergsmaal-og-start/ret/t4.json`
+  (T4-1 til T4-10) og kan sættes tilbage med `ret.py tilbage`.
+
+Selvtesten (`_selvtest.html`) er skrevet om for knapperne i scenen, trinene,
+klik-opfordringen, formelknapperne, feltet, tavlen, rækken og teorien. Ingen
+grænse er lempet (kortzonen måles stadig med 10 px luft); tjekket for
+decimaltal springer kun afsnitsnumre som B5.2 over. Sidst kørt: ALT OK (102
+påstande), 21. november 2026.
+
+## Runde 2 (21. nov. 2026): samlet scene, pænere figurer, intet klikbart under spørgsmål
+
+Niels så Lyset på en stor skærm (ca. 1950 px): "den er blevet.. grim.. Som om
+vi ikke har fået gevinst ud af den ekstra plads. På min store skærm er
+afstandene helt vildt store.. og lambert beers lov er opskrevet med semigrim
+fed skrift nede i bunden.. Den er kommet i skammekroen. Figurene er ikke
+særligt pæne... Man bliver udsat for en del spørgsmål .. det er ok... men jeg
+synes ikke vi helt lever op til reglerne: 1) Hvis man kan slå spørgsmålet
+sammen med beskrivelsen, så er det at foretrække 2) når der stilles spørgsmål
+skal der ikke være objekter på skærmen der lægger op til at blive klikket på."
+(Regel 5a, 19a og 32 i `../REGELSAET.md`.)
+
+* **Samlet optikbænk (regel 32):** Lampe, stråle, kuvette og detektor har en
+  største bredde på 1160 px og står i midten (`BAENK_MAKS` og `geo` i
+  `js/sim_lys.js`); kurven Lys tilbage følger samme bredde lige over strålen.
+  Alt står tæt under kortet, og på en stor skærm bliver kurven, kuvetten,
+  lampen og detektoren større i stedet for længere fra hinanden. Kortets plads
+  på Lyset er 238/226 px. Standardkurven (højst 1340 px, `ox` og `punkt` i
+  `js/sim_kurve.js`) og Beregningen (`.regn-flade` højst 1340 px) står også
+  samlet i midten.
+* **Formlen ud af skammekroen:** Den brede, fede tavle nederst er væk.
+  Regnestykket `A = ε · l · c` står på et lille lyst papir lige under
+  detektorens display i Lexend 400-500 (`tegnFormel`), med ε i lilla og A i
+  mørkegul, ingen fed skrift.
+* **Figurer i "super figur"-stil** (`js/tegning.js`, bruges på alle tre faner):
+  lampen er et lampehus med køleriller, linserør og en linse i lysets farve;
+  kuvetten har glasvægge med tykkelse, tyk bund, kant foroven, matte sider,
+  et svagt højlys og væske med menisk; detektoren har en frontplade med
+  indgangsspalte og en rist; displayet er et LCD i en ramme. Blød skygge under
+  apparaterne, rolige farver, ingen glimt.
+* **Spørgsmål og beskrivelse slået sammen (5a):** Alle seks forudsigelser og
+  trin 1-2 er ét spørgsmål uden indledning, fx "Hvad bliver A, når
+  koncentrationen fordobles fra 0,20 mM til 0,40 mM?" (`ret/t4.json` T4-11 til
+  T4-17). "Gæt først" står i kortets etiket på linje med spørgsmålet
+  ("Forudsigelse 3 af 6 · Gæt først"), ikke som en linje for sig.
+* **Intet klikbart under et spørgsmål (19a):** Under trin, gæt og Næste er
+  scenen uden − og +, greb, Langsomt lys og stofvalg; etiketten "Permanganat
+  0,20 mM" er ren tekst. Ved "Prøv det" kommer kun det frem, forudsigelsen skal
+  bruge (`styrVis`): c-knapperne ved forudsigelse 1-3, bredden og grebet ved
+  4, begge ved 5 og 6, Langsomt lys og (når alle seks er prøvet) stofferne i en
+  række under lampen. På Standardkurven står den gule prik kun, når linjen skal
+  lægges.
+* Selvtesten: ny påstand for regel 19a (alle trin og gæt uden knapper, og kun
+  det nødvendige ved Prøv det), layoutet testes også i 1920 × 1080 med
+  bænken højst 1200 px og i midten, regnestykket ved displayet og
+  Standardkurven samlet. Sidst kørt: ALT OK (103 påstande), 21. november 2026.
+
+## Runde 3 (21. nov. 2026): pladsen på en stor skærm
+
+Koordinatorens gennemsyn af runde 2 i 1920 × 1080 (regel 5a, 13 og 32):
+
+* **Lyset:** Kurven og kuvetten vokser, til bænken fylder den lodrette plads
+  (kurven op til 300 px, kuvetten op til 2,2 gange sin bredde ved 1 cm); kun det,
+  der er tilbage, fordeles over og under. Ingen afstand er blevet større.
+  Glasset over væsken i kuvetten er lyst (ikke en mørk kant).
+* **Standardkurven:** Venstre spalte (spektrofotometret, bakken og Målingerne)
+  fylder samme højde som grafen: den ekstra højde gør apparatet og kuvetterne
+  større.
+* **Beregningen:** Opstillingen er højst 620 px bred og står i midten af sin
+  spalte, med lampe, kuvette og detektor i samme stil og størrelse som på
+  Lyset. Tavlen har fra start en stiplet plads med navnet "Udregningen" og er
+  mindst lige så høj som opstillingen, så de to står i balance side om side, og
+  intet hopper, når linjerne kommer. Kortet er nu kun det halvfede spørgsmål og
+  handlingen ("Vælg formlen for absorbansen."); tallene står på etiketterne i
+  scenen. Kun Svær 2 (Massen) har en kort indledning ("En prøve på 250 mL
+  indeholder permanganat.", `ind` i `D.REGN`). Kortets plads er 232/220 px.
+  `ret/t4.json` T4-18.
+
+Selvtesten: ALT OK (103 påstande), 21. november 2026.
+
+## Runde 4 (21. nov. 2026): loven øverst, Prøv det går selv videre, ordet før symbolet
+
+Niels: "I forhold til lambert beers lov er den blevet bedre. markant. Men jeg
+synes nu stadig at figurene er lidt fjollet. Måske skal jeg lave sprites et
+andet sted? Jeg synes stadig at Lambert beers lov er gemt væk. Skrifttypen er
+bedre. Men kan den ikke komme op lige under kortet.. Så er det lidt nemmere, at
+se den vigtighed. Når man har sat koncentrationen til 0,40 mM, så skal den bare
+selv gå videre efter 1 sekund.. for at spare et klik. Måske skal der ikke stå
+"A" så tidligt.. måske er det bedre med Absorbansen (A) oppe i kortet."
+(Regel 33, 34 og 37 i `../REGELSAET.md`.)
+
+* **Loven lige under kortet (regel 37):** "Lambert-Beers lov" med
+  `A = ε · l · c = … = 0,490` står centreret øverst i scenen over kurven på et
+  lyst papir, lidt større end før og uden fed (`tegnFormel` og `formY` i
+  `js/sim_lys.js`). I forudsigelse 1 står en stiplet plads med navnet dér.
+  Papiret ved detektoren er væk. På Beregningen står regnestykket allerede
+  øverst på tavlen lige under kortet.
+* **Prøv det går selv videre (regel 33):** Står kuvetten på målet, går kortet
+  selv til svaret 1 sekund efter (`videreT` i `opdater`); går eleven væk fra
+  målet inden da, afbrydes det. Indsend svar er der stadig som reserve. Kortet
+  siger nu "Prøv det selv." over handlingen.
+* **Ordet før symbolet (regel 34):** Forudsigelse 2 spørger "Hvad bliver
+  absorbansen (A), når …?" og hedder "Dobbelt c: absorbansen" i rækken. I₀ og I
+  ved strålen er væk (de bruges ikke i forudsigelserne), lampen viser "525 nm"
+  uden λ, og målet under kuvetten viser "1,00 cm" uden l, til loven er kommet.
+  T kommer i displayet sammen med rosen "transmittansen T" i trin 2, A med
+  forudsigelse 2.
+* `ret/t4.json` T4-19 til T4-21. Selvtesten har nye påstande for regel 33 (går
+  videre efter 1 s, ikke før, og afbrydes) og 34, og layouttesten tjekker, at
+  loven står øverst i midten. Sidst kørt: ALT OK (105 påstande).
+
+## Billeder af apparaterne (når de kommer)
+
+Niels overvejer at lave billeder af apparaterne et andet sted. Bestillingen står
+i `SPRITES_BESTILLING.md`. Når filerne ligger i `billeder/`, skal koden bruge dem
+sådan (ikke bygget endnu):
+
+* `js/tegning.js` henter billederne én gang (`new Image()`), og `Tg.lampe`,
+  `Tg.detektor` og `Tg.kuvette` tegner billedet med `drawImage` i samme kasse
+  (x, y, b, h), som de tegner i nu. Er et billede ikke hentet (eller mangler),
+  tegnes den nuværende figur, så intet går i stykker.
+* Lampen tegnes, så linsen (50 % af billedets højde) står ved strålen; koden
+  lægger lysets farve over linsen med en blød cirkel. Detektoren tegnes, så
+  spalten (50 %) står ved strålen.
+* Kuvetten tegnes i tre dele: venstre væg, midten gentaget i den bredde, `l`
+  giver, og højre væg. Væsken (farve, menisk, molekyler) tegnes af koden
+  først, og glasset lægges ovenpå, så væsken ses gennem det gennemsigtige
+  indre. Strålen går i 58 % af højden som nu.
+* Displayrammen lægges under detektoren, og tallene skrives i feltet som nu.
+  Spektrofotometret på Standardkurven erstatter den mørke kasse i `tegnSpekt`,
+  og kuvetten sættes i brønden.
+* Hver figur får sin egen påstand i selvtesten: billedet er hentet, eller
+  reserven tegnes.

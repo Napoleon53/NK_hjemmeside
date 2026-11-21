@@ -57,7 +57,8 @@
     /* Den hoejde, kortet har faaet sat af oeverst i scenen. Det, eleven
        arbejder med, tegnes under NK.kortTop(). Selvtesten maaler kortet i
        alle tilstande med det laengste hint og den laengste forklaring. */
-    NK.kortZone = function () { return window.innerHeight <= 720 ? 186 : 200; };
+    /* 189/215 (før 186/200): spørgsmålet på egen linje, 21. nov. 2026 */
+    NK.kortZone = function () { return window.innerHeight <= 720 ? 189 : 215; };
     NK.kortTop = function () { return 10 + NK.kortZone() + 10; };
 
     /* Saetter pladsen paa scenen, saa knapperne i hjoernerne staar under kortet */

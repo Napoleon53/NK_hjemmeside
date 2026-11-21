@@ -108,6 +108,23 @@
         };
 
         /* ----- Opgavelisten ---------------------------------------------------- */
+        /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun de
+           loeste opgaver (ogsaa gemt i browseren) og den, eleven er ved, har titel.
+           De kommende er et nummer med en graa streg og kan ikke klikkes, til de er
+           naaet: alle foer dem er loest (Vis svaret taeller som loest), eller eleven
+           har vaeret der. */
+        P.aabenOpgave = function (i) {
+            var o = this.opgaver[i], s = this.status[i];
+            if (!o) return false;
+            if ((s && s.loest) || i === this.nr || (this.naaet && this.naaet[o.id || i])) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
+        };
+
+        P.listeTitel = function (o) {
+            return NK.html(o.titel);
+        };
+
         P.bygListe = function () {
             var mig = this;
             this.el.liste.innerHTML = "";
@@ -115,9 +132,9 @@
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "hyldelinje";
-                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn">' + NK.html(o.titel) +
-                    '</span><span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
-                knap.addEventListener("click", function () { mig.vaelg(i, false); });
+                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn"></span>' +
+                    '<span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
+                knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i, false); });
                 mig.el.liste.appendChild(knap);
             });
         };
@@ -127,6 +144,13 @@
             var knapper = this.el.liste.querySelectorAll(".hyldelinje");
             this.status.forEach(function (s, i) {
                 knapper[i].classList.toggle("valgt", i === mig.nr);
+                var k = knapper[i], aaben = mig.aabenOpgave(i);
+                var html = aaben ? mig.listeTitel(mig.opgaver[i]) : '<span class="hl-streg"></span>';
+                var nv = k.querySelector(".hl-navn");
+                if (nv.innerHTML !== html) nv.innerHTML = html;
+                k.classList.toggle("laast", !aaben);
+                k.disabled = !aaben;
+                if (aaben) k.removeAttribute("aria-label"); else k.setAttribute("aria-label", "Opgave " + (i + 1) + ", kommer senere");
                 knapper[i].classList.toggle("loest", s.loest);
                 NK.saetTekst(navn + "-stj-" + i, s.stjerne ? "★" : (s.loest ? "✓" : ""));
             });
@@ -136,6 +160,8 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i, nyeTal) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            if (this.opgaver[i]) this.naaet[this.opgaver[i].id || i] = true;
             this.hjaelp = 0;
             this.pegKnap = false;
             this.brugtSvar = false;

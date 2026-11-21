@@ -175,3 +175,9 @@ forfra (sidste sag på fane 3: Næste opgave); det gør knappen i panelet.
 Felterne, regnestykket og afkrydsningsboksene har egne regler sidst i
 `css/stil.css`. Med papirkortet kan kortet nu være på sin plads i alle dele ved
 1100 × 700 (før var to dele for høje). Selvtesten: ALT OK (206 påstande).
+
+## Opgavelisten (21. nov. 2026)
+
+Opgavelisten låser titlerne op i takt: kun de løste opgaver og den, eleven er ved, har titel, og de
+kommende er et nummer med en grå streg, der ikke kan klikkes (`aabenOpgave` og `visListe` i
+`js/fane.js`). Selvtesten tjekker det til sidst (ALT OK, 218 påstande).

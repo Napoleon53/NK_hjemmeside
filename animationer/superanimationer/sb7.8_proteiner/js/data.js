@@ -202,7 +202,7 @@
             forsoegTekst: "Glasset indeholder æggehvide, som består af vand og proteiner. Hæv temperaturen med skyderen, og se, hvad der sker med proteinet i luppen.",
             forsoegHint: ["Træk knappen på temperaturskyderen mod højre.",
                           "Hæv temperaturen til over 60 °C."],
-            tekst: "Proteinet er denatureret. Hvilke bindinger er brudt? Vælg alle, der passer, og tryk Indsend svar.",
+            tekst: "Æggehviden er varmet op, og proteinet er denatureret. Vælg alle, der passer. Hvilke bindinger i proteinet blev brudt ved opvarmningen?",
             svar: ["Hydrogenbindingerne", "Ionbindingen", "Peptidbindingerne", "Disulfidbroen"], rigtige: [0, 1],
             fejlMangler: "Der er brudt flere bindinger end dem, du har valgt. Se efter de røde prikker og + og − i proteinet.",
             fejl: { 2: "Kæden er hel, så peptidbindingerne er ikke brudt. De er stærke elektronparbindinger.",
@@ -217,14 +217,14 @@
             forsoegHint: ["Træk knappen på pH-skyderen langt mod venstre eller langt mod højre.",
                           "Prøv pH under 3 eller over 11."],
             lav: {
-                tekst: "Ved lav pH forsvandt ionbindingen. Hvad skete der med asparaginsyre og lysin i ionbindingen?",
+                tekst: "Ionbindingen mellem asparaginsyre og lysin forsvandt. Hvad skete der med asparaginsyre og lysin, da pH blev sænket?",
                 svar: ["−COO⁻ optog en hydron", "−NH₃⁺ afgav en hydron", "Peptidbindingen blev spaltet"], rigtig: 0,
                 fejl: { 1: "Ved lav pH er der mange oxoniumioner i opløsningen, så en gruppe optager en hydron. −NH₃⁺ har allerede optaget en hydron.",
                         2: "Kæden er hel. Se på grupperne med + og − i ionbindingen." },
                 forkl: "Ved lav pH optager −COO⁻ i asparaginsyre en hydron og bliver til −COOH uden ladning. Ionbindingen forsvinder, og proteinet folder sig ud."
             },
             hoej: {
-                tekst: "Ved høj pH forsvandt ionbindingen. Hvad skete der med asparaginsyre og lysin i ionbindingen?",
+                tekst: "Ionbindingen mellem asparaginsyre og lysin forsvandt. Hvad skete der med asparaginsyre og lysin, da pH blev hævet?",
                 svar: ["−COO⁻ optog en hydron", "−NH₃⁺ afgav en hydron", "Peptidbindingen blev spaltet"], rigtig: 1,
                 fejl: { 0: "Ved høj pH er der mange hydroxidioner i opløsningen, så en gruppe afgiver en hydron. −COO⁻ har ingen hydron at afgive.",
                         2: "Kæden er hel. Se på grupperne med + og − i ionbindingen." },

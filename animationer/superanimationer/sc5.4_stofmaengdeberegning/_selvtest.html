@@ -623,6 +623,39 @@ function koerTest(W) {
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     paastand("layoutet holder fra 520 × 380 til 1500 × 900", problemer.length === 0, problemer.join("; "));
+
+    /* ================================================================ */
+    overskrift("Opgavelisten: titlerne låses op i takt (21. nov. 2026)");
+    (function () {
+        var X = A, sel = "#formel-liste .hyldelinje";
+        function knapper() { return [].slice.call(d.querySelectorAll(sel)); }
+        function tekster() { return knapper().map(function (c) { return c.textContent.trim(); }).join(" | "); }
+        NK.visFane("fane-formel");
+        X.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+        X.naaet = {};
+        X.vaelg(0);
+        var OP = X.opgaver, ch = knapper();
+        function titel(o) { return o.titel; }
+        paastand("ved start viser listen kun titlen på opgave 1; de andre er et nummer med en grå streg og kan ikke klikkes",
+            ch.length === OP.length && ch.length > 1 && ch[0].textContent.indexOf(titel(OP[0])) >= 0 && !ch[0].disabled &&
+            ch.slice(1).every(function (c, j) { return c.disabled && c.classList.contains("laast") && !!c.querySelector(".hl-streg") && c.textContent.trim() === String(j + 2) && !c.title; }),
+            tekster());
+        ch[ch.length - 1].click();
+        paastand("et klik på en låst opgave gør intet", X.nr === 0, X.nr);
+        for (var n = 0; n < 40 && !X.faerdig; n++) { X.knap(); tik(X, 0.1); }
+        ch = knapper();
+        paastand("når opgave 1 er løst (Vis svaret tæller som løst), kommer titlen på opgave 2 frem; de senere er stadig låst",
+            X.faerdig && ch[1].textContent.indexOf(titel(OP[1])) >= 0 && !ch[1].disabled &&
+            ch.slice(2).every(function (c) { return c.disabled && !!c.querySelector(".hl-streg"); }), tekster());
+        var sidste = OP.length - 1;
+        X.status[sidste].loest = true; X.visListe();
+        ch = knapper();
+        paastand("en opgave, der er løst før (gemt i browseren), har sin titel og kan vælges",
+            ch[sidste].textContent.indexOf(titel(OP[sidste])) >= 0 && !ch[sidste].disabled, tekster());
+        X.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+        X.naaet = {};
+        X.vaelg(0);
+    })();
 }
 </script>
 </body>

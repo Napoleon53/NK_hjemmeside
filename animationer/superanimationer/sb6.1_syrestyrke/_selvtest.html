@@ -567,6 +567,55 @@ async function koerTest(W) {
     samlet("skala, lup, flaske, kolbe, reaktionsskema og hylde er inden for tavlen ved alle fire størrelser", inde);
     ramme.style.width = "1300px";
     ramme.style.height = "800px";
+
+    /* ================================================================= */
+    overskrift("Listerne låser titlerne op i takt (21. nov. 2026)");
+    function li(id) { return [].slice.call(el(id).querySelectorAll("li")); }
+    function laastNr(x) { return x.classList.contains("laast") && !!x.querySelector(".hl-streg") && /^[0-9A-Z]$/.test(x.textContent.trim()); }
+    function tekstAf(l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); }
+    NK.visFane("fane-k");
+    k1.forfra();
+    var lk = li("k-trin");
+    paastand("Syreskalaen: ved start har kun flaske 1 en titel; de fem andre er et nummer med en grå streg uden titel",
+        lk.length === 6 && /Ethansyre/.test(lk[0].textContent) && !lk[0].classList.contains("laast") && lk.slice(1).every(laastNr), tekstAf(lk));
+    k1.visSvar();
+    lk = li("k-trin");
+    paastand("Syreskalaen: når flaske 1 er løst (Vis svaret tæller), kommer titlen på flaske 2 frem; 3 til 6 er stadig låst",
+        new RegExp(tx(D.Navn(D.SKALA[1].id))).test(lk[1].textContent) && !lk[1].classList.contains("laast") && lk.slice(2).every(laastNr), tekstAf(lk));
+    k1.forfra();
+    NK.visFane("fane-r");
+    r2.forfra();
+    var lr = li("r-trin");
+    paastand("Regn på syren: ved start har kun trin 1 en titel; de tre andre er et nummer med en grå streg",
+        lr.length === 4 && /Reaktionen/.test(lr[0].textContent) && lr.slice(1).every(laastNr), tekstAf(lr));
+    r2.visSvar();
+    lr = li("r-trin");
+    paastand("Regn på syren: når trin 1 er løst, kommer titlen på trin 2 frem; trin 3 og 4 er stadig låst",
+        /udtrykket/.test(lr[1].textContent) && !lr[1].classList.contains("laast") && lr.slice(2).every(laastNr), tekstAf(lr));
+    var ls = li("r-syrer");
+    paastand("Regn på syren: syrerne er valg af stof og står alle med navn og uden streg",
+        ls.length === D.TABEL.length && ls.every(function (x) { return !x.classList.contains("laast") && !x.querySelector(".hl-streg") && x.textContent.trim().length > 2; }));
+    r2.forfra();
+    NK.visFane("fane-u");
+    u3.forfra();
+    var lf = li("u-flasker"), lt = li("u-trin");
+    paastand("Den ukendte syre: ved start har kun flaske A og trin 1 en titel; B, C og de syv andre trin står som bogstav eller nummer med en grå streg",
+        lf.length === 3 && /Ukendt syre A/.test(lf[0].textContent) && lf.slice(1).every(laastNr) && lf[1].textContent.trim() === "B" &&
+        lt.length === 8 && /Mål pH/.test(lt[0].textContent) && lt.slice(1).every(laastNr), tekstAf(lf) + " || " + tekstAf(lt));
+    u3.maal(); tid(u3, 1.7);
+    lt = li("u-trin");
+    paastand("Den ukendte syre: når trin 1 er løst, kommer titlen på trin 2 frem; trin 3 til 8 er stadig låst",
+        /Oxonium/.test(lt[1].textContent) && !lt[1].classList.contains("laast") && lt.slice(2).every(laastNr), tekstAf(lt));
+    for (var ui = 0; ui < 30 && !u3.faerdig; ui++) {
+        if (u3.groen) u3.videre();
+        else if (u3.trin === "maal") { u3.maal(); tid(u3, 1.7); }
+        else u3.visSvar();
+    }
+    lf = li("u-flasker");
+    paastand("Den ukendte syre: når flaske A er opklaret, kommer flaske B frem; C er stadig låst",
+        u3.faerdig && !lf[1].classList.contains("laast") && /B/.test(lf[1].textContent) && lf[1].textContent.trim().length > 1 && laastNr(lf[2]), tekstAf(lf));
+    u3.forfra();
+    NK.visFane("fane-k");
 }
 </script>
 </body>

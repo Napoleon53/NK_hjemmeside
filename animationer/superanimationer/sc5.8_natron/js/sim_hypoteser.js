@@ -98,8 +98,8 @@
     P.promptHTML = function () {
         var o = this.opg, m = this.maal, s;
         var note = m.egen ? "" : '<p class="note">Tallene er et eksempel. Lav forsøget på fanen Forsøget for at regne på din egen digel.</p>';
-        if (o.id === "nat") s = (m.egen ? "Din digel" : "Diglen i eksemplet") + " havde " + K.g2(m.mf) + " g natron før opvarmningen. Hvor mange mol er det?";
-        else if (o.hyp) s = "Hvis der dannes " + T.P(o.hyp) + ", hvad skal diglen så veje til sidst? Afstem skemaet først.";
+        if (o.id === "nat") s = "Massen er fra " + (m.egen ? "din digel" : "diglen i eksemplet") + " før opvarmningen. Hvor mange mol er " + K.g2(m.mf) + " g natron?";
+        else if (o.hyp) s = "Hypotese " + o.hyp + " siger, at der dannes " + T.P(o.hyp) + ". Afstem skemaet først. Hvad skal diglen veje til sidst, hvis der dannes " + T.P(o.hyp) + "?";
         else {
             var mangler = this.mangler();
             s = mangler.length ? "Regn først på " + mangler.map(function (h) { return "hypotese " + h; }).join(", ").replace(/, ([^,]*)$/, " og $1") + ". Derefter kan du sammenligne målingen med hypoteserne." :

@@ -42,12 +42,13 @@
     /* Displayet, naar feltet er tomt: uden markoer i feltet peger det over
        paa panelet; med markoer siger det, hvad der skal skrives */
     var DISPLAY_PEG = "Skriv i feltet til højre →";
-    function displayOpgave(f) {
+    /* Med stoffet (st) siger kortet, hvilket stofs formel eller navn der skal skrives */
+    function displayOpgave(f, st) {
         var i = f.raekke.ion;
         if (f.slags === "ion") return "Skriv ionen for " + (i.q > 0 ? i.stamme : (f.raekke.del || NK.formel(i.formel)));
         if (f.slags === "ionnavn") return "Skriv navnet på " + i.tekst;
-        if (f.slags === "formel") return "Skriv hele formlen";
-        return "Skriv hele navnet";
+        if (f.slags === "formel") return st ? "Skriv formlen for " + st.navn : "Skriv hele formlen";
+        return st ? "Skriv navnet på " + st.formelTekst : "Skriv hele navnet";
     }
 
     function SimLager() {
@@ -501,7 +502,7 @@
             kl = "scenekort opgave";
             html = '<p class="sk-tekst">' + chip + kendt + (st.retning === "formel" ? "Find ionerne, og skriv formlen." :
                 "Find ionerne, og skriv navnet.") + "</p>" +
-                '<p class="sk-trin"><b>' + NK.html(displayOpgave(f)) + "</b> i feltet i panelet.</p>" +
+                '<p class="sk-trin"><b>' + NK.html(displayOpgave(f, st)) + "</b> i feltet i panelet.</p>" +
                 '<div class="sk-bund' + (this.beskedK ? " " + this.beskedK : "") + (this.beskedH ? "" : " tom") + '">' +
                 '<p class="st-tekst">' + this.beskedH + "</p>" +
                 '<button type="button" class="knap hjaelp' + (o.hjaelp ? " svar" : "") + (this.pegHint ? " peg" : "") + '">' +

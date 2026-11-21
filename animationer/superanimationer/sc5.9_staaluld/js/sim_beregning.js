@@ -56,7 +56,8 @@
 
     var P = SimBeregning.prototype;
     /* Efter den sidste opgave er der ingen knap videre paa kortet */
-    NK.Fane.paa(P, { navn: "beregning", zone: [198, 172] });
+    /* zone: 172 -> 180 paa lave skaerme: spoergsmaalet paa egen linje, 21. nov. 2026 */
+    NK.Fane.paa(P, { navn: "beregning", zone: [198, 180] });
     NK.Regning.paa(P);
 
     /* ----- Omskifteren Let / Svær ---------------------------------------------------- */
@@ -133,7 +134,7 @@
             (o.tal.egen ? "" : '<p class="note">' + NK.html(D.EKSEMPEL_NOTE) + "</p>");
     };
 
-    P.overTavle = function () { return D.OVER_TAVLE.replace("{ox}", this.opg.sk.oxid); };
+    P.overTavle = function () { return D.OVER_TAVLE.replace("{ox}", this.opg.sk.oxid).replace("{mf}", K.g2(this.opg.tal.mf)); };
 
     /* ----- Spoergsmaalet til sidst i maaling 1 --------------------------------------------- */
     var trinInfoRegning = P.trinInfo, trinLinjeRegning = P.trinLinje;

@@ -316,9 +316,9 @@
         var mig = this, tr = this.trin(), o = this.opg, chip = "Opgave " + (this.nr + 1) + " · " + D.NIVEAUER[o.niv - 1], tekst;
         if (tr === "tegn")
             return { slags: "opgave", chip: chip, tekst: "Hvordan ser esteren af " + o.syre + " og " + o.alkohol + " ud? Tegn den på tavlen, og tryk Indsend svar." };
-        if (tr === "syre") tekst = "Esteren på tavlen er dannet af en carboxylsyre og en alkohol. Hvad hedder carboxylsyren?";
-        else if (tr === "alkohol") tekst = "Syredelen er grøn. Hvilken alkohol er esteren dannet af?";
-        else tekst = "Esteren er dannet af " + o.syre + " og " + o.alkohol + ". Hvad hedder esteren?";
+        if (tr === "syre") tekst = "Hvilken carboxylsyre er esteren på tavlen dannet af?";
+        else if (tr === "alkohol") tekst = "Syredelen er grøn. Hvilken alkohol er esteren på tavlen dannet af?";
+        else tekst = "Hvad hedder esteren af " + o.syre + " og " + o.alkohol + "?";
         return {
             slags: "spm", chip: chip, tekst: tekst,
             svar: this.svarListe().map(function (v, j) { return { t: v.t, valgt: mig.valgt === j, forkert: !!mig.forkert[j] }; })

@@ -69,7 +69,7 @@
     /* ----- Faelles trin: bundfaldet i tabellen (niveau 2 og 3) ------------- */
     var TRIN_BUNDFALD = {
         navn: "Bundfaldet",
-        spm: "Ionerne bytter partner. Hvilket af de nye par er tungtopløseligt? Slå op i fældningstabellen.",
+        spm: "Ionerne bytter partner. Hvilket nyt par af ioner er tungtopløseligt ifølge fældningstabellen?",
         opslagSpm: "Ionerne i de to opløsninger bytter partner. Find det nye par, der er tungtopløseligt, og klik på det.",
         tabelKlik: function (niv, k, a) {
             var o = niv.o, ny = D.nytPar(o, k, a);
@@ -199,7 +199,7 @@
                    der falder ud (svar paa kortet). */
                 navn: "Bundfaldet",
                 spm: function (niv) {
-                    return niv.s.fase === "b" ? "De to nye par står på tavlen. Hvad falder ud?"
+                    return niv.s.fase === "b" ? "Hvilket af de to nye par på tavlen falder ud som bundfald?"
                         : "Ionerne bytter partner. Slå de to nye par op i fældningstabellen.";
                 },
                 opslagSpm: "Ionerne i de to opløsninger bytter partner. Find de to nye par i tabellen, og klik på dem.",
@@ -325,7 +325,7 @@
         trin: [
             {
                 navn: "Ionerne",
-                spm: "Hvilke ioner er der i de to opløsninger? Vælg alle fire, og tryk Indsend svar.",
+                spm: "Hvilke fire ioner er der i de to opløsninger, før de blandes?",
                 flere: true,
                 start: function (niv) {
                     var o = niv.o;

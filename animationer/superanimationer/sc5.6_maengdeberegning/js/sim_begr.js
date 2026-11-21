@@ -87,8 +87,7 @@
     /* Opgaven paa kortet: de to kendte masser og spoergsmaalet */
     P.kortTekst = function () {
         var o = this.x.o, g = this.x.givet;
-        return "Givet: <b>" + D.tekstMasse(g[o.a]) + "\u00a0g " + D.stof(o.a).formel + "</b> og <b>" +
-            D.tekstMasse(g[o.b]) + "\u00a0g " + D.stof(o.b).formel + "</b>. " + NK.html(o.tekst);
+        return NK.html(o.tekst).replace("{a} g", D.tekstMasse(g[o.a]) + "\u00a0g").replace("{b} g", D.tekstMasse(g[o.b]) + "\u00a0g");
     };
 
     P.nyOpgave = function () {

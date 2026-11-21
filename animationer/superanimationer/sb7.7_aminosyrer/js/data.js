@@ -116,7 +116,7 @@
             traekTekst: "En aminosyre har en sur og en basisk gruppe, så der kan ske en hydronoverførsel inden i molekylet. Træk hydronen fra carboxylgruppen over til aminogruppen.",
             traekHint: ["Hydronen er det orange H i carboxylgruppen til højre.",
                         "Træk det orange H hen på gruppen −NH₂ til venstre, og slip det dér."],
-            tekst: "Hvilken samlet ladning har den ion, der er dannet?",
+            tekst: "Hydronen er flyttet fra carboxylgruppen til aminogruppen i valin. Hvilken samlet ladning har valin, når hydronen sidder på aminogruppen?",
             svar: ["+1", "0", "−1"], rigtig: 1,
             fejl: { 0: "Ionen har også en negativ ladning på gruppen −COO⁻. Læg de to ladninger sammen.",
                     2: "Ionen har også en positiv ladning på gruppen −NH₃⁺. Læg de to ladninger sammen." },
@@ -126,7 +126,7 @@
         },
         {
             id: "sur", slags: "klik", navn: "Sur opløsning",
-            tekst: "Der tilsættes saltsyre til opløsningen, så pH falder til 1. Hvilken gruppe optager en hydron? Klik på den, og tryk Indsend svar.",
+            tekst: "Der tilsættes saltsyre til opløsningen af valin. Svar ved at klikke på en gruppe. Hvilken gruppe i valin optager en hydron, når pH falder til 1?",
             rigtig: "carboxyl",
             fejl: { amino: "Gruppen −NH₃⁺ har allerede optaget en hydron. Find den gruppe, der kan optage en." },
             hint: ["Kun en gruppe, der har afgivet sin hydron, kan optage en ny.",
@@ -222,7 +222,7 @@
         },
         {
             id: "minuspol", slags: "spm", navn: "Minuspolen",
-            tekst: "Formlerne viser ladningerne ved pH 6. Hvilken aminosyre vandrer mod minuspolen, når strømmen sluttes?",
+            tekst: "Formlerne viser ladningerne ved pH 6. Hvilken aminosyre vandrer mod minuspolen ved pH 6, når strømmen sluttes?",
             svar: ["Asparaginsyre", "Valin", "Lysin"], rigtig: 2,
             fejl: { 0: "Asparaginsyre har ladningen −1, og en negativ ion vandrer mod pluspolen.",
                     1: "Valin har den samlede ladning 0 ved pH 6, så den vandrer ikke." },

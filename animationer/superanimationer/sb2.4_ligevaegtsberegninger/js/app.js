@@ -28,7 +28,7 @@
         }
         aktivFane = id;
         if (NK.Rundvisning) NK.Rundvisning.luk();
-        if (sims[id]) { sims[id].tilpas(); sims[id].fokus(); }
+        if (sims[id]) { sims[id].tilpas(); sims[id].tilpasRaekke(); sims[id].fokus(); }
     }
     NK.visFane = visFane;
 
@@ -106,7 +106,12 @@
         NK.el("teoriknap").addEventListener("click", aabnTeori);
 
         document.addEventListener("keydown", tastatur);
-        window.addEventListener("resize", function () { if (sims[aktivFane]) sims[aktivFane].tilpas(); });
+        window.addEventListener("resize", function () {
+            if (!sims[aktivFane]) return;
+            sims[aktivFane].tilpas();
+            sims[aktivFane].tilpasRaekke();
+            sims[aktivFane].visKort();
+        });
 
         /* Man kan linke direkte til en fane med  index.html#medx  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();

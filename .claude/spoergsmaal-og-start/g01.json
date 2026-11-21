@@ -1,0 +1,708 @@
+[
+  {
+    "mappe": "sb1.1_reaktionshastighed",
+    "titel": "Reaktionshastighed",
+    "sprog": [
+      {
+        "fane": "1 Kurven",
+        "opgave": "gennemsnit (opgave 2)",
+        "fil": "js/data.js",
+        "linje": 93,
+        "nu_alm": "Beregn gennemsnitshastigheden v(Br₂) fra t₁ = 80 s til t₂ = 120 s.",
+        "nu_fed": "",
+        "nu_svar": ["1,1·10⁻⁵ M/s", "1,9·10⁻⁵ M/s", "3,7·10⁻⁶ M/s", "9,1·10⁴ s/M"],
+        "problem": "Opgaven er en ordre uden spørgsmålstegn, så intet står med fed, og opgaven ligner baggrundstekst.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad er gennemsnitshastigheden v(Br₂) fra t₁ = 80 s til t₂ = 120 s?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Kurven",
+        "opgave": "koefficient (opgave 4)",
+        "fil": "js/data.js",
+        "linje": 133,
+        "nu_alm": "Ved t = 100 s er v(Br₂) = 1,1·10⁻⁵ M/s.",
+        "nu_fed": "Hvor stor er v(BrO₃⁻)?",
+        "nu_svar": ["v(BrO₃⁻) = 3,6·10⁻⁶ M/s", "v(BrO₃⁻) = 3,3·10⁻⁵ M/s", "v(BrO₃⁻) = 1,1·10⁻⁵ M/s", "v(BrO₃⁻) = −3,6·10⁻⁶ M/s"],
+        "problem": "Det fede spørgsmål siger ikke, hvad v(BrO₃⁻) skal regnes ud fra. Det givne tal står kun i den almindelige skrift.",
+        "nyt_alm": "Linealen er tangent til kurven for Br₂ ved t = 100 s.",
+        "nyt_fed": "Hvor stor er v(BrO₃⁻), når v(Br₂) = 1,1·10⁻⁵ M/s?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Sammenstød",
+        "opgave": "fordoblA (opgave 1)",
+        "fil": "js/data.js",
+        "linje": 200,
+        "nu_alm": "Du fordobler antallet af A, og antallet af B er uændret.",
+        "nu_fed": "Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+        "nu_svar": ["De fordobles", "De firdobles", "De er de samme", "De halveres"],
+        "problem": "Indgrebet (antallet af A fordobles) står kun i den almindelige skrift. Det fede spørgsmål kan ikke besvares alene.",
+        "nyt_alm": "Antallet af B er det samme hele tiden.",
+        "nyt_fed": "Hvad sker der med sammenstødene mellem A og B pr. sekund, når antallet af A fordobles?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Sammenstød",
+        "opgave": "fordoblBegge (opgave 2)",
+        "fil": "js/data.js",
+        "linje": 220,
+        "nu_alm": "Du fordobler både antallet af A og antallet af B.",
+        "nu_fed": "Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+        "nu_svar": ["De firdobles", "De fordobles", "De er de samme"],
+        "problem": "Det fede spørgsmål er ordret det samme som i opgave 1. Forskellen (begge fordobles) står kun i den almindelige skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad sker der med sammenstødene mellem A og B pr. sekund, når både A og B fordobles?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Sammenstød",
+        "opgave": "pulver (opgave 4)",
+        "fil": "js/data.js",
+        "linje": 258,
+        "nu_alm": "Den samme mængde magnesium reagerer med syre som en klump og som pulver.",
+        "nu_fed": "Hvilken form danner flest H₂ pr. sekund?",
+        "nu_svar": ["Pulveret", "Klumpen", "De giver lige mange"],
+        "problem": "Ordet form peger tilbage. Det fede spørgsmål siger ikke, at det handler om magnesium i syre.",
+        "nyt_alm": "Den samme mængde magnesium reagerer med syre som en klump og som pulver.",
+        "nyt_fed": "Hvilken form af magnesium danner flest H₂ pr. sekund i syre?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Hastighedsudtryk",
+        "opgave": "Reaktion 1 af 8 (alle reaktioner)",
+        "fil": "js/sim_udtryk.js",
+        "linje": 305,
+        "nu_alm": "Find hastighedsudtrykket for reaktionen. Vælg eksponenterne under tabellen.",
+        "nu_fed": "",
+        "problem": "Kortet har intet fedt spørgsmål. Eleven får ikke at vide, hvad der konkret skal findes, nemlig eksponenterne på koncentrationerne.",
+        "nyt_alm": "Mål starthastigheden ved forskellige startkoncentrationer, og vælg eksponenterne under tabellen.",
+        "nyt_fed": "Hvilke eksponenter har [NO] og [H₂] i hastighedsudtrykket?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Kurven",
+        "billede": "skud/a/sb1.1_reaktionshastighed__0.png",
+        "dom": "fint",
+        "fremme": "Kort med Afspil reaktionen og Start opgave, bægerglas, tom graf (Tryk Afspil), Kemichaels boble Start præsentation / Nej tak. Panel: reaktionsskema, Afspil/Forfra, værktøjerne Aflæs/Sekant/Tangent med tre tal.",
+        "bruges": "Opgave 1 (Hvornår er reaktionshastigheden størst?) bruger kurven og Aflæs. Sekant og Tangent bruges først i opgave 2 og 3.",
+        "forslag": [],
+        "andet": "Sekant og Tangent kan stå nedtonet til opgave 2 og 3. Scenen er ellers rolig.",
+        "gevinst": "Lille, scenen er overskuelig.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Sammenstød",
+        "billede": "skud/a/sb1.1_reaktionshastighed__1.png",
+        "dom": "lidt meget",
+        "fremme": "Kort, kasse med partikler, der allerede farer rundt, graf over dannet C, signatur, Kemichaels boble. Panel: To opløste stoffer/Metal i syre, Antal A og Antal B (3 knapper hver), Start forfra, stort tal for sammenstød pr. sekund og Dannet C.",
+        "bruges": "Opgave 1 bruger kassen, Antal A og tallet for sammenstød pr. sekund. Grafen bruges først i opgave 3, Metal i syre først i opgave 4.",
+        "forslag": [
+          { "alm": "Kassen indeholder 12 A og 12 B, der farer rundt.", "fed": "Hvad skal der ske, for at en A og en B kan danne C?", "svar": ["De skal støde sammen", "De skal bare være i samme kasse", "De skal ligge stille side om side"], "derefter": "Kortet Måling dukker op med tallet for sammenstød mellem A og B pr. sekund." },
+          { "alm": "Én B farer rundt mellem 12 A.", "fed": "Hvor mange A kan én B ramme, når der er 24 A i stedet for 12?", "svar": ["Dobbelt så mange", "Lige så mange", "Halvt så mange"], "derefter": "Knappen 24 ved Antal A lyser op." },
+          { "alm": "Antallet af B er det samme hele tiden.", "fed": "Hvad sker der med sammenstødene mellem A og B pr. sekund, når antallet af A fordobles?", "svar": ["De fordobles", "De firdobles", "De er de samme"], "derefter": "Eleven skifter til 24 A og ser tallet i Måling stige til det dobbelte." }
+        ],
+        "andet": "Grafen over dannet C står som stiplet ramme med navnet til opgave 3. Fanen Metal i syre skjules til opgave 4. Lad gerne partiklerne stå stille, til første trin er besvaret.",
+        "gevinst": "Den svage elev ved, hvilket tal der skal kigges på, i stedet for at se partikler, graf og tal skifte på én gang.",
+        "prioritet": 2
+      },
+      {
+        "fane": "3 Hastighedsudtryk",
+        "billede": "skud/a/sb1.1_reaktionshastighed__2.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med reaktionen, tom graf, tom tabel, hastighedsudtryk med to ?-felter, Kemichaels boble. Panel: [NO] og [H₂] med 3 knapper hver, Mål starthastigheden, Ryd tabellen.",
+        "bruges": "Alt bruges i første reaktion, men opgaven er åben. Eleven skal selv finde metoden: ændr én koncentration ad gangen.",
+        "forslag": [
+          { "alm": "Du skal finde ud af, hvordan [NO] påvirker starthastigheden v₀.", "fed": "Hvilken koncentration skal ændres mellem to forsøg, når virkningen af [NO] skal måles?", "svar": ["Kun [NO]", "Både [NO] og [H₂]", "Kun [H₂]"], "derefter": "Panelet Nyt forsøg lyser. Eleven måler v₀ med [NO] = 0,10 M og 0,20 M og [H₂] = 0,10 M, og tabellen og kurverne fyldes." },
+          { "alm": "I de to forsøg er [NO] fordoblet, og [H₂] er den samme.", "fed": "Hvor mange gange større blev v₀, da [NO] blev fordoblet?", "svar": ["4 gange", "2 gange", "v₀ er den samme"], "derefter": "Feltet ved [NO] i hastighedsudtrykket under tabellen lyser op." },
+          { "alm": "v₀ blev 4 gange større, da [NO] blev fordoblet.", "fed": "Hvilken eksponent får [NO] i hastighedsudtrykket, når v₀ bliver 4 gange større?", "svar": ["2", "4", "1"], "derefter": "[NO]² står i udtrykket. De samme tre trin kommer for [H₂], og så Indsend svar." }
+        ],
+        "andet": "Kun reaktion 1 stilladseres. Hintene i sim_udtryk.js (Lav to forsøg med forskellig ..., Sammenlign forsøg ...) siger allerede det samme og kan genbruges.",
+        "gevinst": "Metoden, én koncentration ad gangen og fordobling til faktor til eksponent, bliver vist trin for trin første gang.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Kemichaels boble Start præsentation / Nej tak står midt i scenen på alle tre faner, selv om reglen fra 27. sept. er, at Kemichael ikke præsenterer fanerne. Den dækker grafen på fane 1 og 3."
+  },
+  {
+    "mappe": "sb1.4_thiosulfat",
+    "titel": "Thiosulfat og syre",
+    "sprog": [
+      {
+        "fane": "1 Krydset",
+        "opgave": "samme (quizspørgsmål 2)",
+        "fil": "js/data.js",
+        "linje": 119,
+        "nu_alm": "",
+        "nu_fed": "Hvad er det samme, hver gang krydset forsvinder?",
+        "nu_svar": ["Mængden af dannet svovl", "Tiden", "Alt thiosulfat er brugt", "Hastigheden"],
+        "problem": "Det samme er uklart: Det siges ikke, at der sammenlignes målinger. Svarene er ikke samme slags ting, da tre er størrelser og ét er en tilstand.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken størrelse er den samme i alle målinger, når krydset forsvinder?",
+        "nyt_svar": ["Mængden af dannet svovl", "Tiden Δt", "[S₂O₃²⁻], der er faldet til 0", "Hastigheden"],
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Krydset",
+        "opgave": "hurtigere (quizspørgsmål 3)",
+        "fil": "js/data.js",
+        "linje": 146,
+        "nu_alm": "Med [S₂O₃²⁻] = 0,10 M i glasset var Δt = 20 s, og med [S₂O₃²⁻] = 0,20 M var Δt = 10 s.",
+        "nu_fed": "Hvor mange gange større var hastigheden med 0,20 M?",
+        "nu_svar": ["2 gange", "0,50 gange", "10 gange", "4 gange"],
+        "problem": "Det fede spørgsmål siger ikke, hvad der sammenlignes med (0,10 M), og 0,20 M står uden stofnavn.",
+        "nyt_alm": "Med [S₂O₃²⁻] = 0,10 M var Δt = 20 s. Med [S₂O₃²⁻] = 0,20 M var Δt = 10 s.",
+        "nyt_fed": "Hvor mange gange større er hastigheden ved [S₂O₃²⁻] = 0,20 M end ved 0,10 M?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Krydset",
+        "opgave": "brugtOp (quizspørgsmål 4)",
+        "fil": "js/data.js",
+        "linje": 172,
+        "nu_alm": "Med 10 mL Na₂S₂O₃ er [S₂O₃²⁻] = 0,10 M i glasset. Krydset er væk, når der er dannet 0,0015 M svovl.",
+        "nu_fed": "Hvor stor en del af thiosulfatet er forbrugt?",
+        "nu_svar": ["Ca. 1,5 %", "Det hele", "Ca. halvdelen", "Ca. 15 %"],
+        "problem": "Tidspunktet (når krydset forsvinder) står kun i den almindelige skrift, så Det hele ligner det rigtige svar.",
+        "nyt_alm": "Med 10 mL Na₂S₂O₃ er [S₂O₃²⁻] = 0,10 M i glasset. Krydset forsvinder, når der er dannet 0,0015 M svovl.",
+        "nyt_fed": "Hvor stor en del af thiosulfatet er forbrugt, når krydset forsvinder?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Koncentration",
+        "opgave": "beregn (opgave 2)",
+        "fil": "js/data.js",
+        "linje": 250,
+        "nu_alm": "Beregn [S₂O₃²⁻] i en blanding af 25 mL 0,50 M Na₂S₂O₃, 5 mL HCl og 20 mL vand.",
+        "nu_fed": "",
+        "nu_svar": ["0,25 M", "0,50 M", "0,63 M", "0,42 M"],
+        "problem": "Opgaven er en ordre uden spørgsmålstegn, så intet står med fed.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad er [S₂O₃²⁻] i en blanding af 25 mL 0,50 M Na₂S₂O₃, 5 mL HCl og 20 mL vand?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Koncentration",
+        "opgave": "halver (opgave 3)",
+        "fil": "js/data.js",
+        "linje": 263,
+        "nu_alm": "Du halverer [S₂O₃²⁻] og holder alt andet konstant.",
+        "nu_fed": "Hvad sker der med Δt?",
+        "nu_svar": ["Δt fordobles", "Δt halveres", "Δt er den samme", "Δt firdobles"],
+        "problem": "Indgrebet (halvering af [S₂O₃²⁻]) står kun i den almindelige skrift. Det fede spørgsmål kan ikke besvares alene.",
+        "nyt_alm": "Alt andet end [S₂O₃²⁻] holdes konstant.",
+        "nyt_fed": "Hvad sker der med Δt, når [S₂O₃²⁻] halveres?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Koncentration",
+        "opgave": "syre (opgave 4)",
+        "fil": "js/data.js",
+        "linje": 284,
+        "nu_alm": "Du fordobler [H₃O⁺] ved konstant [S₂O₃²⁻].",
+        "nu_fed": "Hvad sker der med hastigheden?",
+        "nu_svar": ["Den stiger kun lidt", "Den fordobles", "Den firdobles, fordi der står 2 H₃O⁺ i skemaet", "Den falder"],
+        "problem": "Indgrebet (fordobling af [H₃O⁺]) står kun i den almindelige skrift.",
+        "nyt_alm": "[S₂O₃²⁻] holdes konstant.",
+        "nyt_fed": "Hvad sker der med hastigheden, når [H₃O⁺] fordobles?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Temperatur",
+        "opgave": "faktor (opgave 1)",
+        "fil": "js/data.js",
+        "linje": 365,
+        "nu_alm": "Ved 20 °C var Δt = 20 s, og ved 30 °C var Δt = 10 s.",
+        "nu_fed": "Hvor mange gange større var hastigheden ved 30 °C?",
+        "nu_svar": ["Ca. 2,0 gange", "Ca. 0,5 gange", "Ca. 1,5 gange", "10 gange"],
+        "problem": "Det fede spørgsmål siger ikke, hvad der sammenlignes med (20 °C).",
+        "nyt_alm": "Ved 20 °C var Δt = 20 s. Ved 30 °C var Δt = 10 s.",
+        "nyt_fed": "Hvor mange gange større er hastigheden ved 30 °C end ved 20 °C?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Temperatur",
+        "opgave": "kold (opgave 5)",
+        "fil": "js/data.js",
+        "linje": 449,
+        "nu_alm": "Blandingen køles til 10 °C.",
+        "nu_fed": "Hvad sker der med Δt i forhold til Δt ved 20 °C?",
+        "nu_svar": ["Den bliver ca. dobbelt så lang", "Reaktionen stopper helt", "Den bliver kortere", "Den er den samme"],
+        "problem": "Den nye temperatur (10 °C) står kun i den almindelige skrift, så det fede spørgsmål mangler halvdelen af sammenligningen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad sker der med Δt, når blandingen køles fra 20 °C til 10 °C?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Krydset",
+        "billede": "skud/a/sb1.4_thiosulfat__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort (Lav et par målinger, og start så quizzen) med en besked, bægerglas på papir med kryds, Set oppefra-cirkel, måleglas med HCl og pil, stopur, graf med stiplet linje, Kemichaels boble. Panel: reaktionsskema, 10/20/40 mL, beskrivelse, [S₂O₃²⁻], Tilsæt syren, tom tabel med 4 kolonner, quizprikker.",
+        "bruges": "Quizzen kræver et par målinger først. Til første måling bruges glasset, krydset oppefra, måleglasset og stopuret. Grafen og tabellen bruges først bagefter.",
+        "forslag": [
+          { "alm": "Glasset med Na₂S₂O₃ står på et papir med et kryds. Om lidt hældes saltsyre i.", "fed": "Hvornår skal du stoppe uret, når syren er hældt i glasset?", "svar": ["Når krydset ikke kan ses oppefra", "Når al syren er hældt i", "Når væsken er helt hvid"], "derefter": "Måleglasset og stopuret lyser op, og eleven laver første måling med 10 mL." },
+          { "alm": "Væsken blev uklar, og krydset forsvandt.", "fed": "Hvorfor forsvinder krydset under bægerglasset?", "svar": ["Der dannes svovl, som gør væsken uklar", "Der dannes SO₂, som farver væsken", "Syren opløser krydset"], "derefter": "Kurven for dannet svovl og den stiplede linje krydset er væk dukker op, og målingen står i tabellen." },
+          { "alm": "Første måling havde 10 mL Na₂S₂O₃.", "fed": "Hvad sker der med Δt, når der er 20 mL Na₂S₂O₃ i glasset i stedet for 10 mL?", "svar": ["Δt bliver kortere", "Δt bliver længere", "Δt er den samme"], "derefter": "Knappen 20 mL lyser. Efter målingen fortsætter quizzen med Hvad er det samme ..." }
+        ],
+        "andet": "Grafen og tabellen står som stiplede rammer med navn, til første måling er lavet. Quizzens første spørgsmål bliver trin 2.",
+        "gevinst": "Eleven ved, hvornår uret skal stoppes, og hvorfor der måles, i stedet for at skulle lave et par målinger uden mål.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Koncentration",
+        "billede": "skud/a/sb1.4_thiosulfat__1.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med Start opgave, Set oppefra-cirkel med tid, graf med akseknapper [S₂O₃²⁻]/[H₃O⁺], tabel med 8 kolonner, Kemichaels boble. Panel: Na₂S₂O₃, HCl og vand med −/+, I alt, Bland og mål, Ryd tabellen.",
+        "bruges": "Opgave 1 (vandet) bruger rumfangene i panelet. Grafen får først punkter, når eleven selv har skrevet en rigtig koncentration i tabellen. Det er skjult for eleven. [H₃O⁺]-kolonnen og akseknappen bruges først i opgave 4.",
+        "forslag": [
+          { "alm": "Glasset får 20 mL 0,50 M Na₂S₂O₃, 5 mL HCl og 25 mL vand.", "fed": "Hvad er [S₂O₃²⁻] i glasset med 20 mL 0,50 M Na₂S₂O₃ og 50 mL i alt?", "svar": ["0,20 M", "0,50 M", "0,40 M"], "derefter": "Bland og mål lyser. Efter målingen står rækken i tabellen med [S₂O₃²⁻] udfyldt, og første punkt kommer på grafen." },
+          { "alm": "Næste forsøg skal have 10 mL Na₂S₂O₃ og stadig 5 mL HCl.", "fed": "Hvor meget vand skal der i glasset, så der er 50 mL i alt?", "svar": ["35 mL", "25 mL", "Intet vand"], "derefter": "Eleven måler, og andet punkt kommer på grafen. Derefter kommer den nuværende opgave 1 om vandet." }
+        ],
+        "andet": "[H₃O⁺]-kolonnen og akseknappen [H₃O⁺] skjules til opgaven om syre. Fra tredje forsøg skriver eleven selv koncentrationen i tabellen som nu.",
+        "gevinst": "Eleven ser, at en beregnet koncentration giver et punkt på grafen, og møder ikke en tom graf og en tabel med 8 kolonner uden at vide hvorfor.",
+        "prioritet": 2
+      },
+      {
+        "fane": "3 Temperatur",
+        "billede": "skud/a/sb1.4_thiosulfat__2.png",
+        "dom": "fint",
+        "fremme": "Kort med Start opgave, termometer, Set oppefra-cirkel, tom graf, tabel med 4 kolonner, Kemichaels boble. Panel: temperatur med −/+ og Mål ved 20 °C.",
+        "bruges": "Opgave 1 bruger to målinger ved 20 og 30 °C. Alt er i brug.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Kemichaels boble Start præsentation / Nej tak står midt i scenen på alle tre faner (reglen fra 27. sept. siger ingen præsentation). Svaret Så kun én koncentration ændres, og lyset går gennem lige meget væske (opgave 1, fane 2) har to grunde med påhængt , og og er 68 tegn."
+  },
+  {
+    "mappe": "sb2.1_ligevaegtsloven",
+    "titel": "Ligevægtsloven",
+    "sprog": [
+      {
+        "fane": "1 Brøken",
+        "opgave": "Alle 12 reaktioner (tekst + fast sætning)",
+        "fil": "js/sim_broek.js",
+        "linje": 71,
+        "nu_alm": "Dihydrogen og diiod danner hydrogeniodid. Alle tre stoffer er gasser. Skriv reaktionsbrøken for ligevægten.",
+        "nu_fed": "",
+        "problem": "Kortet har intet fedt spørgsmål, så selve opgaven står i samme skrift som baggrunden og kommer sidst.",
+        "nyt_alm": "Dihydrogen og diiod danner hydrogeniodid. Alle tre stoffer er gasser.",
+        "nyt_fed": "Hvad er reaktionsbrøken for ligevægten på tavlen?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Find fejlen",
+        "opgave": "Alle 12 tavler",
+        "fil": "js/sim_fejl.js",
+        "linje": 49,
+        "nu_alm": "Klik på delen, eller vælg Der er ingen fejl.",
+        "nu_fed": "Hvilken del af elevens reaktionsbrøk på tavlen er forkert?",
+        "nu_svar": ["Der er ingen fejl"],
+        "problem": "Instruktionen kommer efter spørgsmålet, og spørgsmålet går ud fra, at der er en fejl, selv om to tavler ikke har nogen.",
+        "nyt_alm": "En elev har skrevet reaktionsbrøken på tavlen. Klik på den forkerte del, eller vælg Der er ingen fejl.",
+        "nyt_fed": "Hvor står fejlen i elevens reaktionsbrøk, hvis der er en?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Brøken",
+        "billede": "skud/a/sb2.1_ligevaegtsloven__0.png",
+        "dom": "fint",
+        "fremme": "Kort, tavle med reaktionsskema og tomme felter Tæller og Nævner, bakke med 6 stoffer, 4 tegn og 3 eksponenter. Panel: 12 reaktioner i tre grupper.",
+        "bruges": "Alt bruges i første opgave. Brikkerne, der ikke passer, er bevidste fejlmuligheder.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Find fejlen",
+        "billede": "skud/a/sb2.1_ligevaegtsloven__1.png",
+        "dom": "fint",
+        "fremme": "Kort med Der er ingen fejl, tavle med skema og elevens brøk. Panel: 12 tavler.",
+        "bruges": "Alt bruges.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Quizzen bag knappen Quiz (js/data.js linje 279) er ikke på papirkortet, men har samme mønster: N₂(g) + 3H₂(g) ⇌ 2NH₃(g). Hvordan står dihydrogen i reaktionsbrøken? Spørgsmålet kunne være: Hvordan står H₂ i reaktionsbrøken for N₂(g) + 3H₂(g) ⇌ 2NH₃(g)?"
+  },
+  {
+    "mappe": "sb2.2_ikke_ligevaegt_og_indgreb",
+    "titel": "Ikke-ligevægt og indgreb",
+    "sprog": [
+      {
+        "fane": "1 Indgreb",
+        "opgave": "1 Kun reaktanter (gæt)",
+        "fil": "js/data.js",
+        "linje": 74,
+        "nu_alm": "En tom beholder fyldes med lige meget CO og H₂O. Der er ingen CO₂ og H₂ i den endnu.",
+        "nu_fed": "Hvilken vej går reaktionen?",
+        "nu_svar": ["Mod højre", "Mod venstre", "Ingen vej"],
+        "problem": "Betingelsen (kun reaktanter i beholderen) står kun i indledningen. Spørgsmålet er ordret det samme som i mål 2.",
+        "nyt_alm": "En tom beholder fyldes med lige meget CO og H₂O.",
+        "nyt_fed": "Hvilken vej går reaktionen, når der kun er CO og H₂O?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Indgreb",
+        "opgave": "2 For meget produkt (gæt)",
+        "fil": "js/data.js",
+        "linje": 115,
+        "nu_alm": "Beholderen fyldes med en blanding, hvor Y = 9,0. Ligevægtskonstanten er K = 4,0.",
+        "nu_fed": "Hvilken vej går reaktionen?",
+        "nu_svar": ["Mod højre", "Mod venstre", "Ingen vej"],
+        "problem": "Y og K, som afgør svaret, står kun i indledningen.",
+        "nyt_alm": "Beholderen fyldes med en blanding af alle fire stoffer.",
+        "nyt_fed": "Hvilken vej går reaktionen, når Y = 9,0 og K = 4,0?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Indgreb",
+        "opgave": "3 Mere CO (gæt)",
+        "fil": "js/data.js",
+        "linje": 156,
+        "nu_alm": "Beholderen er i ligevægt, så Y = K. Om lidt pumpes der mere CO ind i beholderen.",
+        "nu_fed": "Hvilken vej forskydes ligevægten?",
+        "nu_svar": ["Mod højre", "Mod venstre", "Ingen vej"],
+        "problem": "Samme tilfælde som i går i sb2.6. Indgrebet (mere CO) står kun i indledningen.",
+        "nyt_alm": "Beholderen er i ligevægt, så Y = K.",
+        "nyt_fed": "Hvilken vej forskydes ligevægten, når der pumpes CO ind?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Indgreb",
+        "opgave": "4 Mere H₂ (gæt)",
+        "fil": "js/data.js",
+        "linje": 197,
+        "nu_alm": "Beholderen er i ligevægt, så Y = K. Om lidt pumpes der mere H₂ ind i beholderen.",
+        "nu_fed": "Hvilken vej forskydes ligevægten?",
+        "nu_svar": ["Mod højre", "Mod venstre", "Ingen vej"],
+        "problem": "Indgrebet (mere H₂) står kun i indledningen, og det fede spørgsmål er ordret det samme som i mål 3.",
+        "nyt_alm": "Beholderen er i ligevægt, så Y = K.",
+        "nyt_fed": "Hvilken vej forskydes ligevægten, når der pumpes H₂ ind?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Indgreb",
+        "opgave": "4 Mere H₂ (spørgsmål efter forsøget)",
+        "fil": "js/data.js",
+        "linje": 217,
+        "nu_alm": "Panelet viser [H₂] før indgrebet, lige efter og nu.",
+        "nu_fed": "Hvordan endte [H₂]?",
+        "nu_svar": ["Mellem før og lige efter", "Som før indgrebet", "Højere end lige efter"],
+        "problem": "Endte er uklart, og spørgsmålet siger ikke, hvad [H₂] skal sammenlignes med. Det står kun i indledningen.",
+        "nyt_alm": "Panelet viser [H₂] før indgrebet, lige efter og nu.",
+        "nyt_fed": "Hvor ligger [H₂] nu i forhold til [H₂] før og lige efter indgrebet?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dioxygen i blodet",
+        "opgave": "3 Musklen arbejder (gæt)",
+        "fil": "js/data.js",
+        "linje": 345,
+        "nu_alm": "Når du løber, bruger musklen mere dioxygen, så [O₂] i musklen falder endnu mere.",
+        "nu_fed": "Hvad gør hæmoglobinet i musklen?",
+        "nu_svar": ["Det afgiver mere O₂", "Det binder mere O₂", "Ingen ændring"],
+        "problem": "Det fede spørgsmål er ordret det samme som i mål 2. At musklen arbejder, står kun i indledningen.",
+        "nyt_alm": "Når du løber, bruger musklen mere dioxygen, så [O₂] i musklen falder endnu mere.",
+        "nyt_fed": "Hvad gør hæmoglobinet i musklen, når du løber?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dioxygen i blodet",
+        "opgave": "4 I bjergene (gæt)",
+        "fil": "js/data.js",
+        "linje": 385,
+        "nu_alm": "Højt oppe i bjergene er der mindre dioxygen i luften, så [O₂] i lungerne er lavere end ved havet.",
+        "nu_fed": "Hvor meget O₂ binder blodet i lungerne?",
+        "nu_svar": ["Mindre end ved havet", "Lige så meget som ved havet", "Mere end ved havet"],
+        "problem": "Bjergene står kun i indledningen, men alle tre svar sammenligner med havet.",
+        "nyt_alm": "Højt oppe i bjergene er der mindre dioxygen i luften end ved havet.",
+        "nyt_fed": "Hvor meget O₂ binder blodet i lungerne oppe i bjergene?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dioxygen i blodet",
+        "opgave": "5 Højdetræning (gæt)",
+        "fil": "js/data.js",
+        "linje": 425,
+        "nu_alm": "Efter nogle uger i bjergene har kroppen dannet flere røde blodlegemer og dermed mere Hb.",
+        "nu_fed": "Hvilken vej forskydes ligevægten?",
+        "nu_svar": ["Mod højre", "Mod venstre", "Ingen vej"],
+        "problem": "Hverken indgrebet (mere Hb) eller ligevægten står i det fede spørgsmål.",
+        "nyt_alm": "Efter nogle uger i bjergene har kroppen dannet flere røde blodlegemer.",
+        "nyt_fed": "Hvilken vej forskydes ligevægten, når blodet får mere Hb?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Dioxygen i blodet",
+        "opgave": "5 Højdetræning (spørgsmål efter forsøget)",
+        "fil": "js/data.js",
+        "linje": 444,
+        "nu_alm": "",
+        "nu_fed": "Hvorfor bærer blodet nu mere dioxygen?",
+        "nu_svar": ["Hb er en reaktant, der blev tilsat", "K blev større", "Luften fik mere O₂"],
+        "problem": "Nu peger tilbage på forsøget uden at sige, hvad der er sket.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor bærer blodet mere dioxygen efter nogle uger i bjergene?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "1 CO og vanddamp (retning)",
+        "fil": "js/data.js",
+        "linje": 543,
+        "nu_alm": "Y = 0,50 og K = 4,0.",
+        "nu_fed": "Hvilken vej går reaktionen?",
+        "nu_svar": ["Mod højre, fordi Y < K", "Mod venstre, fordi Y > K", "Ingen vej, fordi Y = K"],
+        "problem": "Tallene, som afgør svaret, står kun i den almindelige skrift foran spørgsmålet.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken vej går reaktionen, når Y = 0,50 og K = 4,0?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "2 N₂O₄ og NO₂ (retning)",
+        "fil": "js/data.js",
+        "linje": 584,
+        "nu_alm": "Y = 0,80 M og K = 0,20 M.",
+        "nu_fed": "Hvilken vej går reaktionen?",
+        "nu_svar": ["Mod højre, fordi Y < K", "Mod venstre, fordi Y > K", "Ingen vej, fordi Y = K"],
+        "problem": "Samme mønster som mål 1: Tallene står uden for det fede spørgsmål.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken vej går reaktionen, når Y = 0,80 M og K = 0,20 M?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "3 Esteren (reaktionsbrøk)",
+        "fil": "js/data.js",
+        "linje": 601,
+        "nu_alm": "Stofferne på tavlen er væsker, der er blandet med hinanden.",
+        "nu_fed": "Hvilken reaktionsbrøk hører til?",
+        "nu_svar": ["[CH₃COOC₂H₅] / ([CH₃COOH] · [C₂H₅OH])", "[CH₃COOH] · [C₂H₅OH] / ([CH₃COOC₂H₅] · [H₂O])", "[CH₃COOC₂H₅] · [H₂O] / ([CH₃COOH] · [C₂H₅OH])"],
+        "problem": "Hører til hvad? Spørgsmålet slutter uden at nævne reaktionen.",
+        "nyt_alm": "Stofferne på tavlen er væsker, der er blandet med hinanden.",
+        "nyt_fed": "Hvilken reaktionsbrøk hører til esterdannelsen på tavlen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "3 Esteren (retning)",
+        "fil": "js/data.js",
+        "linje": 626,
+        "nu_alm": "Y = 4,0 og K = 4,0.",
+        "nu_fed": "Hvilken vej går reaktionen?",
+        "nu_svar": ["Mod højre, fordi Y < K", "Mod venstre, fordi Y > K", "Ingen vej, fordi Y = K"],
+        "problem": "Samme mønster som mål 1: Tallene står uden for det fede spørgsmål.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken vej går reaktionen, når Y = 4,0 og K = 4,0?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "4 Mere N₂O₄ (retning)",
+        "fil": "js/data.js",
+        "linje": 663,
+        "nu_alm": "Lige efter indgrebet er Y = 0,10 M og K = 0,20 M.",
+        "nu_fed": "Hvilken vej forskydes ligevægten?",
+        "nu_svar": ["Mod højre, fordi Y < K", "Mod venstre, fordi Y > K", "Ingen vej, fordi Y = K"],
+        "problem": "Både indgrebet og tallene står kun i den almindelige skrift.",
+        "nyt_alm": "Der er pumpet N₂O₄ ind i blandingen på tavlen.",
+        "nyt_fed": "Hvilken vej forskydes ligevægten, når Y = 0,10 M og K = 0,20 M?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "5 Salmiak (retning)",
+        "fil": "js/data.js",
+        "linje": 715,
+        "nu_alm": "Y = 3,0 · 10⁻⁴ M² og K = 1,0 · 10⁻⁴ M².",
+        "nu_fed": "Hvilken vej forskydes ligevægten?",
+        "nu_svar": ["Mod højre, fordi Y < K", "Mod venstre, fordi Y > K", "Ingen vej, fordi Y = K"],
+        "problem": "Tallene står kun i den almindelige skrift.",
+        "nyt_alm": "Der er pumpet NH₃ ind i blandingen på tavlen.",
+        "nyt_fed": "Hvilken vej forskydes ligevægten, når Y = 3,0 · 10⁻⁴ M² og K = 1,0 · 10⁻⁴ M²?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Regn på Y",
+        "opgave": "5 Salmiak (spm2)",
+        "fil": "js/data.js",
+        "linje": 728,
+        "nu_alm": "",
+        "nu_fed": "Hvad ville der ske, hvis man i stedet tilsatte mere fast NH₄Cl i beholderen?",
+        "nu_svar": ["Ligevægten forskydes mod højre", "Intet, for NH₄Cl er ikke med i Y", "Ligevægten forskydes mod venstre"],
+        "problem": "Hypotetisk form, og i stedet peger tilbage på indgrebet med NH₃.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad sker der med ligevægten, når der kommer mere fast NH₄Cl i beholderen?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Indgreb",
+        "billede": "skud/a/sb2.2_ikke_ligevaegt_og_indgreb__0.png",
+        "dom": "lidt meget",
+        "fremme": "Gættekort, tom beholder, signatur med fire stoffer, brøken Y, tallinje med K = 4,0 og to pile med tekst (Y < K: reaktionen går mod højre, Y > K: ... mod venstre). Panel: fire tomme koncentrationer og Y, K-tekst, 5 mål.",
+        "bruges": "Gættet bruger kun beholderen. Brøken og tallinjen bruges i forsøget og spørgsmålet bagefter. Pilenes tekst afslører svaret på spørgsmålet Hvorfor gik reaktionen mod højre?.",
+        "forslag": [
+          { "alm": "En tom beholder skal fyldes med lige meget CO og H₂O.", "fed": "Hvad er reaktionsbrøken Y for CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)?", "svar": ["[CO₂] · [H₂] / ([CO] · [H₂O])", "[CO] · [H₂O] / ([CO₂] · [H₂])", "([CO₂] + [H₂]) / ([CO] + [H₂O])"], "derefter": "Brøken Y dukker op under beholderen." },
+          { "alm": "Der er intet CO₂ og H₂ i beholderen fra start.", "fed": "Hvor stor er Y, når der intet CO₂ og H₂ er i beholderen?", "svar": ["Y = 0", "Y = K = 4,0", "Y = 1"], "derefter": "Tallinjen med K = 4,0 dukker op, og Y står ved 0." },
+          { "alm": "Y = 0 er langt fra K = 4,0.", "fed": "Hvilken vej går reaktionen, når Y = 0 og K = 4,0?", "svar": ["Mod højre", "Mod venstre", "Ingen vej"], "derefter": "Pilene på tallinjen dukker op, og knappen Fyld beholderen lyser. Forsøget fortsætter som nu." }
+        ],
+        "andet": "Brøk-delen findes allerede på fane 3 (del brok med svar som brøker) og kan genbruges. Spørgsmålet Hvorfor gik reaktionen mod højre? bliver overflødigt efter trin 3 og kan blive Hvad skete der med [CO₂] og [H₂], mens beholderen blev fyldt?. Pilenes tekst kan vente, til trin 3 er besvaret.",
+        "gevinst": "Eleven bygger selv vejen fra brøken over Y = 0 til retningen, ligesom i sb2.6, og møder ikke brøk, tallinje og pile på én gang.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Dioxygen i blodet",
+        "billede": "skud/a/sb2.2_ikke_ligevaegt_og_indgreb__1.png",
+        "dom": "fint",
+        "fremme": "Gættekort, lunger, muskel, blodbane med pile, lup med Hb, HbO₂ og O₂, signatur (delvis bag kortet), skema Hb + O₂ ⇌ HbO₂, brøken Y, tallinje med pile. Panel: fire tal i luppen, 5 mål.",
+        "bruges": "Gættet bruger lungerne og luppen, forsøget lungerne og tallinjen, spørgsmålet brøken. Kun tallene i panelet bruges ikke før mål 4.",
+        "forslag": [],
+        "andet": "Billedet er rigt, men alt indgår i mål 1, og brøk og tallinje kendes fra fane 1. Tallene i panelet kan foldes ind bag Vis tallene til mål 4.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Regn på Y",
+        "billede": "skud/a/sb2.2_ikke_ligevaegt_og_indgreb__2.png",
+        "dom": "fint",
+        "fremme": "Spørgsmålskort med tre brøker, tavle med skema, K og fire koncentrationer, Y = ?, tallinje. Panel: Trinene 1-3, 5 mål.",
+        "bruges": "Målet er allerede delt i tre trin (brøk, tal, sammenlign).",
+        "forslag": [],
+        "andet": "Tallinjen kunne stå som stiplet ramme til trin 3, men gevinsten er lille.",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Gættegrænsen er 60 tegn (selvtesten), og alle forslag til gæt holder sig under. På fane 2 dækker gættekortet signaturen over luppen. Pilene på tallinjen (Y < K: reaktionen går mod højre) står fast i scenen og giver svaret på flere af spørgsmålene om, hvorfor reaktionen gik en bestemt vej."
+  },
+  {
+    "mappe": "sb2.4_ligevaegtsberegninger",
+    "titel": "Ligevægtsberegninger",
+    "sprog": [
+      {
+        "fane": "1 Beholderen",
+        "opgave": "Mål 7 Hvor langt kan x komme? (c-graense)",
+        "fil": "js/data.js",
+        "linje": 105,
+        "nu_alm": "Der er 0,200 M CO og kun 0,100 M H₂O fra start. Træk x helt op.",
+        "nu_fed": "Hvad stopper reaktionen? Træk x så langt op, som det kan komme, og klik på det stof, der er brugt op.",
+        "problem": "To fede stykker i træk: Et spørgsmål og bagefter en ordre, der gentager Træk x helt op fra den almindelige skrift. Hvad stopper er indirekte, da svaret er et stof.",
+        "nyt_alm": "Der er 0,200 M CO og kun 0,100 M H₂O fra start. Træk x så langt op, som det kan komme, og klik på stoffet.",
+        "nyt_fed": "Hvilket stof er brugt op, når x er trukket helt op?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Beholderen",
+        "opgave": "Mål 8 Grænsen for x (c-cas)",
+        "fil": "js/data.js",
+        "linje": 109,
+        "nu_alm": "Løs ligningen med CAS. Brug grænsen x ≤ 0,100 M til at afgøre, hvilken løsning der kan bruges.",
+        "nu_fed": "Løs ligningen Y = K med CAS, og klik på den løsning, der ikke kan bruges.",
+        "problem": "Den almindelige skrift beder om den løsning, der kan bruges, og den fede om den, der ikke kan. Løs ligningen med CAS står to gange.",
+        "nyt_alm": "Løs ligningen Y = K med CAS. Fra mål 7 ved du, at x højst kan være 0,100 M.",
+        "nyt_fed": "Hvilken af de to løsninger kan ikke bruges, når x højst kan være 0,100 M?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Beholderen",
+        "opgave": "Mål 1 Find ligevægten (a-lige)",
+        "fil": "js/data.js",
+        "linje": 80,
+        "nu_alm": "SO₂Cl₂ spaltes i en lukket beholder. Skyderen bestemmer x, som er den koncentration af SO₂Cl₂, der er spaltet. Find det x, hvor Y = K.",
+        "nu_fed": "Træk i x, til reaktionsbrøken Y er lig med K.",
+        "problem": "Den samme ordre står tre gange på kortet (Find det x, den fede linje og beskeden Træk i skyderen ...). Det fede er en ordre og ikke et spørgsmål.",
+        "nyt_alm": "SO₂Cl₂ spaltes i en lukket beholder. Skyderen x er den koncentration af SO₂Cl₂, der er spaltet.",
+        "nyt_fed": "Hvor stor er x, når reaktionsbrøken Y er lig med K?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Beholderen",
+        "billede": "skud/a/sb2.4_ligevaegtsberegninger__0.png",
+        "dom": "for meget",
+        "fremme": "Kort med lang tekst, fed linje og besked (Y og K står nederst til højre), beholder med 20 molekyler og signatur med antal, graf med Y mod x og stiplet K-linje, skyder for x med forklaring, skema med Start/Ændring/Ligevægt (9 tal), boks med brøken Y = 0 M, K = 0,0500 M og Y < K. Panel: reaktion, 8 mål.",
+        "bruges": "Mål 1 bruger skyderen og Y-boksen (eller grafen). Skemaet bruges først i mål 2. Kortets besked må selv fortælle, hvor Y og K står, fordi seks ting er fremme på én gang.",
+        "forslag": [
+          { "alm": "SO₂Cl₂ spaltes til SO₂ og Cl₂ i en lukket beholder ved 375 °C.", "fed": "Hvad er reaktionsbrøken Y for SO₂Cl₂(g) ⇌ SO₂(g) + Cl₂(g)?", "svar": ["[SO₂] · [Cl₂] / [SO₂Cl₂]", "[SO₂Cl₂] / ([SO₂] · [Cl₂])", "([SO₂] + [Cl₂]) / [SO₂Cl₂]"], "derefter": "Boksen med Y og K dukker op nederst til højre." },
+          { "alm": "Fra start er der 0,200 M SO₂Cl₂ og intet SO₂ og Cl₂.", "fed": "Hvor stor er Y, før noget SO₂Cl₂ er spaltet?", "svar": ["Y = 0 M", "Y = K = 0,0500 M", "Y = 0,200 M"], "derefter": "Grafen med Y mod x og den stiplede K-linje dukker op med punktet i x = 0." },
+          { "alm": "Skyderen x er den koncentration af SO₂Cl₂, der er spaltet.", "fed": "Hvad sker der med Y, når x bliver større?", "svar": ["Y bliver større", "Y bliver mindre", "Y er den samme"], "derefter": "Skyderen låses op, og målet fortsætter som nu: Træk i x, til Y = K, og Indsend svar." }
+        ],
+        "andet": "Skemaet med Start, Ændring og Ligevægt står som stiplet ramme med navnet skemaet til mål 2. Kortet på fane 1 har i dag ingen svarknapper. Trinmønstret med svar fra sb2.6 skal flyttes over.",
+        "gevinst": "Den svage elev ser først brøken, så Y, så grafen og til sidst skyderen, i stedet for seks ting og en lang tekst på én gang.",
+        "prioritet": 1
+      },
+      {
+        "fane": "2 Uden x",
+        "billede": "skud/a/sb2.4_ligevaegtsberegninger__1.png",
+        "dom": "fint",
+        "fremme": "Kort med opgavetekst, fed opgave og besked, tavle med skema, trinlinje (Ligevægtsloven › Koncentrationerne › Indsæt) og brøkbygger. Panel: 5 opgaver.",
+        "bruges": "Opgaven er allerede delt i trin, og kun første trin er fremme.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Med x",
+        "billede": "skud/a/sb2.4_ligevaegtsberegninger__2.png",
+        "dom": "fint",
+        "fremme": "Som fane 2 med syv trin i trinlinjen.",
+        "bruges": "Allerede stilladseret i syv trin, og kun første trin er fremme.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "På fane 1 er det fede altid feltet linje (sk-spm), og teksten før den kører gennem NK.Papir.tekst. Derfor kan der blive to fede stykker, som i mål 7. js/regn.js linje 670 har lille bogstav efter kolon (Skriv ligevægtsloven: produkterne i tælleren ...). Mål 4 og 6 har også en ordre i den almindelige skrift, som den fede linje gentager."
+  },
+  {
+    "mappe": "sb3.1_navngivning",
+    "titel": "Navngivning",
+    "sprog": [],
+    "start": [
+      {
+        "fane": "1 Tegn molekylet",
+        "billede": "skud/a/sb3.1_navngivning__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med Tegn molekylet på tavlen, og tryk Test og navnet propan med farvet stamme, værktøjslinje med 8 værktøjer (Kæde, = Binding, −OH, =O, −COOH, −Cl, −Br, Ring) og Slet/Fortryd/Ryd, tavle med ét carbonatom og træk-håndtag, kontakten Vis navnet hele tiden. Panel: 6 stofklasser med kontakter, 46 opgaver.",
+        "bruges": "Opgave 1 (propan) bruger kun Kæde. De syv andre værktøjer er støj i de første opgaver.",
+        "forslag": [
+          { "alm": "Stammen i navnet fortæller, hvor mange carbonatomer kæden har.", "fed": "Hvor mange carbonatomer er der i kæden i propan?", "svar": ["3", "4", "2"], "derefter": "Værktøjet Kæde lyser op, og eleven tegner kæden." },
+          { "alm": "Endelsen -an betyder, at stoffet er en alkan.", "fed": "Hvilke bindinger er der mellem carbonatomerne i propan?", "svar": ["Kun enkeltbindinger", "En dobbeltbinding", "En tripelbinding"], "derefter": "Knappen Test lyser op." }
+        ],
+        "andet": "Værktøjer, som opgavens stofklasse ikke bruger, kan stå nedtonet i Let-opgaverne.",
+        "gevinst": "Eleven lærer at læse navnets dele, før der tegnes, og prøver ikke tilfældige værktøjer.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Skriv navnet",
+        "billede": "skud/a/sb3.1_navngivning__1.png",
+        "dom": "fint",
+        "fremme": "Kort med felt, Tjek og Giv et hint, tavle med ethan som én streg, stiplet felt Dit navn tegnet. Panel: stofklasser, 43 opgaver.",
+        "bruges": "Alt bruges.",
+        "forslag": [],
+        "andet": "Scenen er rolig, men første opgave er en enkelt streg (ethan). Det er svært at læse for en svag elev. Et første trin kunne være Hvor mange carbonatomer er der i stregen på tavlen? med svarene 2, 1 og 0.",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Ingen af kortets tekster har spørgsmålstegn. Begge faner er ordrer (Tegn ..., og tryk Test / Skriv ..., og tryk Tjek), og det passer til opgavetypen. Hovedknappen hedder Test og Tjek og ikke Indsend svar, som CLAUDE.md kræver som minimum."
+  }
+]

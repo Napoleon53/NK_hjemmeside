@@ -1690,7 +1690,7 @@
         var saltId = NK.tilfaeldig(["NaCl", "KNO3", "CaCl2", "CuSO4"]);
         var fejl = null;
         var o = {
-            tekst: "Billedet står stille. Ét vandmolekyle vender forkert ind mod sin ion. Klik på det, og tryk på Indsend svar.",
+            tekst: "Billedet i luppen står stille. Du svarer ved at klikke på et vandmolekyle. Hvilket vandmolekyle vender den forkerte ende ind mod sin ion?",
             hint: "Oxygen (rød, δ−) skal vende ind mod en positiv ion, og hydrogen (hvid, δ+) mod en negativ.",
             svar: "",
             start: function (sim) {
@@ -1799,7 +1799,7 @@
 
     function opgTungOmroering() {
         return {
-            tekst: "Sølv(I)chlorid er tungtopløseligt. Hvad sker der med antallet af ioner i vandet, hvis du rører rundt?",
+            tekst: "Sølv(I)chlorid, AgCl, er tungtopløseligt. Hvad sker der med antallet af opløste ioner fra AgCl, når du rører rundt?",
             valg: ["Der går flere ioner i opløsning",
                    "Der går lige så mange i opløsning",
                    "Der går færre ioner i opløsning"],

@@ -7,6 +7,7 @@
 <title>Ligevægtsberegninger</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 </head>
 <body class="papirkort">
 
@@ -30,6 +31,16 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-bh" role="tabpanel" aria-label="Beholderen">
     <div class="scene">
+        <!-- Opgaveraekken (Niels 21. nov. 2026, REGELSAET 3): intet panel. Maalene
+             med nummer og tema (kun de naaede har tema; de kommende er laaste
+             numre) og Start forfra yderst til hoejre (js/fane.js) -->
+        <nav class="opgaverad" id="bh-raekke" aria-label="Målene">
+            <div class="or-opgaver" id="bh-liste"></div>
+            <button class="or-knap or-stille" id="bh-forfra" type="button" title="Samme mål forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
+        <!-- Reaktionsskemaet med stort, centreret over kortet (runde 3, Niels:
+             "måske skal det ligge udenfor kortet - altså over") -->
+        <div class="rx-over" id="bh-rx" aria-live="polite"></div>
         <!-- Papirkortet oeverst midt i scenen: opgaven, beskeden, hint og
              Indsend svar (Niels 4. nov. 2026). js/fane.js fylder det. -->
         <div class="scenekort opgave" id="bh-skort">
@@ -40,31 +51,22 @@
                 <button class="knap indsend" id="bh-indsend" type="button">Indsend svar</button>
             </div>
         </div>
+        <!-- Runde 2 (Niels 21. nov. 2026): beholderen er hovedfiguren. Laerredet
+             tegner beholderen, taelleren og grafen; boksen med Y, tavlen,
+             fanen "Vis grafen" og skyderen ligger ovenpaa og placeres af
+             js/sim_beholder.js (beregnLay). -->
         <div class="bh-arbejde" id="bh-arbejde">
-            <div class="laerred-ramme"><canvas id="bh-laerred"></canvas></div>
-            <div class="bh-skyder">
+            <canvas id="bh-laerred"></canvas>
+            <div class="bh-y" id="bh-y" data-navn="Reaktionsbrøken Y"></div>
+            <div class="bh-tavle" id="bh-tavle" hidden></div>
+            <button class="bh-graffane" id="bh-graffane" type="button" aria-expanded="false" hidden>Vis grafen ▸</button>
+            <div class="bh-skyder" id="bh-skyder" data-navn="Skyderen x">
                 <label for="bh-x" class="bh-xlab"><b>x = <span id="bh-xtal">0,000</span> M</b><span class="bh-xdef" id="bh-xdef"></span></label>
-                <input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0">
-            </div>
-            <div class="bh-under">
-                <div class="bh-skema" id="bh-skema"></div>
-                <div class="bh-y" id="bh-y"></div>
+                <span class="bh-spor" data-boble="Træk: x"><input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0"></span>
             </div>
         </div>
     </div>
 
-    <aside class="panel">
-        <div class="kort" id="bh-kort">
-            <h2>Reaktionen</h2>
-            <div id="bh-prompt"></div>
-        </div>
-
-        <div class="kort" id="bh-opgaver">
-            <h2>Målene <span class="taeller">nået <b id="bh-loest">0</b>/8</span></h2>
-            <div class="opg-liste" id="bh-liste"></div>
-        </div>
-        <button class="forfraknap" id="bh-forfra" type="button" title="Samme mål forfra (R)">Samme mål forfra ↺</button>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -72,8 +74,15 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-ux" role="tabpanel" aria-label="Uden x">
     <div class="scene">
-        <!-- Papirkortet oeverst midt i scenen: opgaven, beskeden, hint og
-             Indsend svar (Niels 4. nov. 2026). js/fane.js fylder det. -->
+        <!-- Opgaveraekken (Niels 21. nov. 2026): intet panel (js/fane.js) -->
+        <nav class="opgaverad" id="ux-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="ux-liste"></div>
+            <button class="or-knap or-stille" id="ux-forfra" type="button" title="Samme opgave forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
+        <!-- Runde 3: reaktionsskemaet over kortet, kortet med ét spoergsmaal ad
+             gangen og svaret paa kortet, tavlen med opgavens tal og én linje
+             pr. trin (js/sim_ux.js) -->
+        <div class="rx-over" id="ux-rx" aria-live="polite"></div>
         <div class="scenekort opgave" id="ux-skort">
             <div class="sk-ind" id="ux-ind"></div>
             <div class="sk-bund" id="ux-status">
@@ -82,31 +91,10 @@
                 <button class="knap indsend" id="ux-indsend" type="button">Indsend svar</button>
             </div>
         </div>
-        <div class="arbejde" id="ux-arbejde">
-            <div class="tavle" id="ux-tavle">
-                <div class="tv-navn" id="ux-navn"></div>
-                <div class="tv-stempel" id="ux-stempel" hidden></div>
-                <div class="tv-hoved" id="ux-hoved">
-                    <div class="skema" id="ux-reaktion"></div>
-                    <div class="ot-raekke" id="ux-oplyst"></div>
-                </div>
-                <ol class="delbar" id="ux-delbar" aria-label="Opgavens dele"></ol>
-                <div class="regn-dele" id="ux-dele"></div>
-            </div>
+        <div class="ux-arbejde" id="ux-arbejde">
+            <div class="ux-tavle" id="ux-tavle"></div>
         </div>
     </div>
-
-    <aside class="panel">
-        <div class="kort" id="ux-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="ux-loest">0</b>/5</span></h2>
-            <div class="opg-liste" id="ux-liste"></div>
-        </div>
-        <button class="forfraknap" id="ux-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
-        <!-- Besvarelsen og kurven, naar opgaven er loest (js/regn.js panelHTML) -->
-        <div class="kort" id="ux-kort" hidden>
-            <div id="ux-prompt"></div>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -114,6 +102,11 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-mx" role="tabpanel" aria-label="Med x">
     <div class="scene">
+        <!-- Opgaveraekken (Niels 21. nov. 2026): intet panel (js/fane.js) -->
+        <nav class="opgaverad" id="mx-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="mx-liste"></div>
+            <button class="or-knap or-stille" id="mx-forfra" type="button" title="Samme opgave forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
         <!-- Papirkortet oeverst midt i scenen: opgaven, beskeden, hint og
              Indsend svar (Niels 4. nov. 2026). js/fane.js fylder det. -->
         <div class="scenekort opgave" id="mx-skort">
@@ -138,17 +131,6 @@
         </div>
     </div>
 
-    <aside class="panel">
-        <div class="kort" id="mx-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="mx-loest">0</b>/8</span></h2>
-            <div class="opg-liste" id="mx-liste"></div>
-        </div>
-        <button class="forfraknap" id="mx-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
-        <!-- Besvarelsen og kurven, naar opgaven er loest (js/regn.js panelHTML) -->
-        <div class="kort" id="mx-kort" hidden>
-            <div id="mx-prompt"></div>
-        </div>
-    </aside>
 </section>
 
 </main>
@@ -157,38 +139,22 @@
 <!-- TEORIEN (aabnes kun med knappen eller T)                           -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <div class="overlay-boks teori-ark">
         <h2>Ligevægtsberegninger</h2>
-        <h3 class="teori-hoved">Ligevægtsloven</h3>
-        <p>For ligevægten aA + bB ⇌ cC + dD gælder ved ligevægt:</p>
-        <div class="eksempel">K = <span class="vbroek"><span>[C]<sup>c</sup>·[D]<sup>d</sup></span><span>[A]<sup>a</sup>·[B]<sup>b</sup></span></span></div>
-        <p>Enheden er M opløftet i (summen af produkternes koefficienter − summen af reaktanternes koefficienter). Er eksponenten 0, har K ingen enhed. K gælder kun ved den temperatur, den er målt ved.</p>
-        <p>Kendes stofmængden n i rumfanget V, er koncentrationen c = n / V.</p>
+        <p>Ved ligevægt er reaktionsbrøken Y lig med ligevægtskonstanten K. For ligevægten aA + bB ⇌ cC + dD gælder ved ligevægt:</p>
+        <div class="eksempel">K = <span class="vbroek"><span>[C]<sup>c</sup> · [D]<sup>d</sup></span><span>[A]<sup>a</sup> · [B]<sup>b</sup></span></span></div>
+        <p>K gælder kun ved den temperatur, den er målt ved.</p>
 
         <h3 class="teori-hoved">Skemaet med x</h3>
-        <p>Kendes kun startkoncentrationerne, indfører man x og skriver et skema med tre rækker: Start, Ændring og Ligevægt. Ligevægt = start + ændring.</p>
+        <p>Kendes kun startkoncentrationerne, indføres x som den koncentration af et stof, der omsættes. Skemaet har tre rækker: Start, Ændring og Ligevægt. Reaktanterne ændres med −x og produkterne med +x, og koefficienten står foran x.</p>
+        <p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven, og ligningen løses med CAS. En løsning, der giver en negativ koncentration, forkastes.</p>
         <div class="eksempel">
-            <span class="eksempel-hoved">Sådan indfører du x</span>
-            x er den koncentration af SO₂Cl₂, der omsættes, indtil ligevægten har indstillet sig. x måles i M.
+            <span class="eksempel-hoved">Eksempel med SO₂Cl₂ ⇌ SO₂ + Cl₂ og K = 0,0500 M</span>
+            0,0500 = <span class="vbroek"><span>x · x</span><span>0,200 − x</span></span> giver x = 0,0781 M eller x = −0,128 M.<br>
+            Kun x = 0,0781 M giver positive koncentrationer.
         </div>
-        <ol class="teori-trin">
-            <li>x knyttes til ét stof med koefficienten 1.</li>
-            <li>Reaktanterne ændres med −x, produkterne med +x. Koefficienten står foran x: 2NO giver ±2x.</li>
-            <li>x er en ændring i koncentration og hverken en ligevægtskoncentration eller en stofmængde i mol.</li>
-        </ol>
 
-        <h3 class="teori-hoved">Ligningen og CAS</h3>
-        <p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven, og brøken sættes lig med K's værdi. Dermed er x den eneste ubekendte. Ligningen løses med CAS, som regner uden enheder, men x har enheden M.</p>
-        <div class="eksempel">0,0500 = <span class="vbroek"><span>x · x</span><span>0,200 − x</span></span> &nbsp;⇒&nbsp; x = −0,128 ∨ x = 0,0781</div>
-
-        <h3 class="teori-hoved">Hvilken løsning kan bruges?</h3>
-        <p>CAS giver ofte to løsninger. Kun én giver positive koncentrationer. Sæt hver løsning ind i rækken Ligevægt, og skriv begrundelsen:</p>
-        <div class="eksempel">x = −0,128 M forkastes, fordi [SO₂] = x ville blive negativ.</div>
-        <p>En brugbar løsning ligger mellem 0 og den mindste startkoncentration af en reaktant (divideret med koefficienten). Den anden løsning er ofte også positiv, men så stor, at en koncentration i rækken Ligevægt bliver negativ.</p>
-
-        <h3 class="teori-hoved">Kontrol</h3>
-        <p>Sæt ligevægtskoncentrationerne ind i ligevægtsloven. Giver brøken K igen, er regningen rigtig. Svar med tre betydende cifre og med enhed.</p>
-        <p class="note-lille">Talværdierne i opgaverne er konstrueret, så regningen bliver overskuelig. Fremgangsmåden er den samme som ved målte data.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/b/kapitler/b2-5-ligevaegtsberegninger.html" target="_blank" rel="noopener">B2.5 Ligevægtsberegninger</a></p>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar eller næste &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
@@ -222,6 +188,7 @@
 <script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regn.js"></script>
+<script src="js/sim_ux.js"></script>
 <script src="js/sim_beholder.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

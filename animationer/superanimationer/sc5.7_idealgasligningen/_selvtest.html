@@ -25,7 +25,18 @@
    rigtige besked, at de typiske regnefejl giver den rigtige besked, at
    sproget holder reglerne, at begge faner kan gennemføres, at hint og
    svar står i opgavekortet ved den gule knap, og at layoutet holder fra 520 × 380 til
-   1500 × 900.
+   1500 × 900. Trinvis start (21. nov. 2026): at opgave 1 begynder med to
+   trin, hvor kun cylinderen er fremme, at manometeret og varmepladen kommer
+   efter det rigtige trin, at trinene kan løses med forkerte svar, hint og Vis
+   svaret, at scenen er låst under et spørgsmål, at intet hopper, og at
+   grafen, lodderne, gassen og låsen kommer med opgave 2, 3 og 4. Runde 2
+   (samme dag): ingen skyder, intet felt og ingen knap til forsøget i
+   panelet, rigtige klik på apparaterne i scenen, langsommere molekyler uden
+   glimt, og på fane 2 formlen som knapper og tallet i et felt på kortet.
+   Runde 3: intet panel, opgaverækken øverst i scenen med låste kommende
+   opgaver, og at scenen ligger fast, når der kommer gas ind.
+   Runde 4: klik-opfordringer (gul ramme og boble) kun, når kortet beder om
+   en handling, og kun på det apparat, der skal bruges.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -80,7 +91,16 @@ function koerTest(W) {
     function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
     function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
-    function skyder(T) { var e = d.getElementById("stempel-T"); e.value = String(T); e.dispatchEvent(new W.Event("input", { bubbles: true })); }
+    /* Et rigtigt klik paa en ting i scenen paa fane 1 (21. nov. 2026: al betjening sker i scenen) */
+    function scene(u, gange) {
+        for (var k = 0; k < (gange || 1); k++) {
+            var s = NK.sims["fane-stempel"], p = s.punkt(u), c = s.L.canvas, r = c.getBoundingClientRect();
+            var o = { bubbles: true, clientX: r.left + p.x, clientY: r.top + p.y, pointerId: 1 };
+            c.dispatchEvent(new W.PointerEvent("pointerdown", o));
+            c.dispatchEvent(new W.PointerEvent("pointerup", o));
+            c.dispatchEvent(new W.MouseEvent("click", o));
+        }
+    }
 
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
@@ -241,8 +261,28 @@ function koerTest(W) {
         tekster.push(o.spm, o.hint, o.hvorfor);
         if (o.proev) tekster.push(o.proev, o.proevHint);
         o.valg.forEach(function (v) { tekster.push(v.t); if (v.svar) tekster.push(v.svar); });
+        (o.trin || []).forEach(function (t) {
+            tekster.push(t.spm, t.godt);
+            t.hint.forEach(function (h) { tekster.push(h); });
+            t.valg.forEach(function (v) { tekster.push(v.t); if (v.svar) tekster.push(v.svar); });
+        });
     });
+    /* Trinene (21. nov. 2026): tre hint, ét rigtigt svar, hvert forkert svar sin egen forklaring,
+       og spørgsmålet til sidst i teksten, så det står alene på sin egen linje */
+    var trinFejl = [];
+    D.FORUDSIG.forEach(function (o) {
+        (o.trin || []).forEach(function (t, k) {
+            var rigtige = t.valg.filter(function (v) { return v.ok; }).length;
+            var uden = t.valg.filter(function (v) { return !v.ok && !v.svar; }).length;
+            if (t.hint.length !== 3 || rigtige !== 1 || uden || !t.godt || !/\. [A-ZÆØÅ][^.?]*\?$/.test(t.spm) || !t.vis) trinFejl.push(o.id + " trin " + (k + 1));
+        });
+    });
+    paastand("trinene har et rigtigt svar, en forklaring til hvert forkert, tre hint og en indledning før spørgsmålet", trinFejl.length === 0 && D.FORUDSIG[0].trin.length === 2, trinFejl.join(", "));
     D.REGN.forEach(function (o) { tekster.push(o.tekst, o.slut, o.navn); });
+    Object.keys(D.FORMELVALG).forEach(function (k) {
+        tekster.push(D.FORMELVALG[k].godt);
+        D.FORMELVALG[k].svar.forEach(function (v) { tekster.push(v.t); if (v.f) tekster.push(v.f); });
+    });
     Object.keys(D.SCENE).forEach(function (k) { tekster.push(D.SCENE[k]); });
     var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
     var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -269,6 +309,98 @@ function koerTest(W) {
     });
 
     /* ------------------------------------------------------------------ */
+    overskrift("7a. Trinvis start på opgave 1 (21. nov. 2026)");
+    klik('[data-fane="fane-stempel"]');
+    var tk = d.getElementById("stempel-skort");
+    var DELE = ["mano", "plade", "graf", "hylde", "gas", "laas"];
+    function fremme() { return DELE.filter(function (x) { return S1.fremme(x); }).join(" "); }
+    /* Kan tingen klikkes i scenen (er den fremme)? */
+    function kan(u) { return S1.under(S1.punkt(u)) === u; }
+    function anker(id) { return d.getElementById("stempel-anker-" + id).style.display !== "none"; }
+    function chip() { var c = tk.querySelector(".sk-chip"); return c ? c.textContent : ""; }
+    function spmLinje() { var s = tk.querySelector(".sk-spm.sk-linje"); return s ? s.textContent : ""; }
+    function layNu() { S1.tilpas(); var l = S1.lay; return JSON.stringify([l.top, l.cyl, l.mano, l.plade, l.graf, l.flaske, l.hylde]); }
+    function trinSvar(ok) { var j = -1; S1.trinDel().valg.forEach(function (v, k) { if (!!v.ok === ok && j < 0) j = k; }); return j; }
+    function videreKnap() { return tk.querySelector(".sk-bund.bliv [data-videre]"); }
+    /* Trinene besvares rigtigt, til forudsigelsen (trin 3) står på kortet */
+    function forbiTrin() {
+        var n = 0;
+        while (S1.fase === "trin" && n++ < 6) {
+            svarKnap(trinSvar(true)).click();
+            indsend();
+            if (videreKnap()) videreKnap().click();
+        }
+    }
+    /* Første gang: intet er løst, og eleven har ikke været på andre opgaver */
+    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    S1.naaet = 0;
+    S1.vaelg(0);
+    var lay0 = layNu();
+    paastand("trin 1: etiketten er Trin 1 af 3, og spørgsmålet står på sin egen linje", S1.fase === "trin" && chip() === "Trin 1 af 3" &&
+        /^Hvad holder stemplet i cylinderen oppe\?$/.test(spmLinje()), chip() + " | " + spmLinje());
+    paastand("trin 1: kun cylinderen er fremme (manometer, varmeplade, graf, lodder, gas og lås er skjult)", fremme() === "" &&
+        anker("cylinder") && !anker("manometer") && !anker("plade") && !anker("graf") &&
+        !anker("hylde") && !anker("flaske") && !anker("laas"), fremme());
+    var L0 = S1.lay, plA = NK.Tegn.pladeStr(L0.plade), hy0 = S1.lodPaaHylde(0);
+    var punkter = { manometer: { x: L0.mano.cx, y: L0.mano.cy }, varm: { x: plA.varm.x, y: plA.varm.y },
+        flaske: { x: L0.flaske.x + L0.flaske.b / 2, y: L0.flaske.y + L0.flaske.h / 2 },
+        hylde: { x: hy0.x + L0.lodB / 2, y: hy0.y + 4 }, laasKnap: S1.punkt("laasKnap") };
+    var klikbare = Object.keys(punkter).filter(function (k) { return S1.under(punkter[k]) !== null; });
+    var findes = Object.keys(punkter).filter(function (k) { return S1.underAlle(punkter[k]) === k; });
+    paastand("trin 1: det skjulte kan hverken klikkes eller give et vink", klikbare.length === 0 && findes.length === 5, klikbare.join(", ") + " / " + findes.join(", "));
+    var Ta = S1.g.T, cr0 = S1.L.canvas.getBoundingClientRect();
+    scene("varm");
+    scene("hylde");
+    scene("flaske");
+    var laastA = S1.g.T === Ta && S1.g.lodder === 0 && S1.g.n === 1;
+    tk.classList.remove("blink");
+    scene("gas");
+    paastand("trin 1: scenen er låst under spørgsmålet: et klik i cylinderen får kortet til at blinke, og de skjulte apparater gør intet", S1.laastNu() && laastA && tk.classList.contains("blink"));
+    paastand("trin 1: Indsend svar er grå, til der er valgt et svar, og der står intet hint fra start", vises(d.getElementById("stempel-indsend")) &&
+        d.getElementById("stempel-indsend").classList.contains("ikke-klar") && !/Hint/.test(S1.beskedTekst()) && S1.el.knap.textContent === "Giv hint");
+    var jLuft = -1, jSvaev = -1;
+    D.FORUDSIG[0].trin[0].valg.forEach(function (v, k) { if (v.t === "Luften over stemplet") jLuft = k; if (/svæver/.test(v.t)) jSvaev = k; });
+    svarKnap(jLuft).click();
+    paastand("et svar vælger kun", S1.fase === "trin" && S1.valgt === jLuft && fremme() === "" && d.getElementById("stempel-indsend").classList.contains("klar"));
+    indsend();
+    var knL = svarKnap(jLuft);
+    paastand("forkert svar (Luften over stemplet): rødt og låst, og forklaringen siger, at luften trykker stemplet ned",
+        S1.fase === "trin" && S1.trin.k === 0 && knL.classList.contains("forkert") && knL.disabled &&
+        /^Luften over stemplet trykker stemplet ned/.test(S1.beskedTekst()) && fremme() === "" && S1.el.knap.classList.contains("peg"), S1.beskedTekst());
+    paastand("intet hopper ved forklaringen til det forkerte svar", layNu() === lay0);
+    svarKnap(jLuft).click();
+    paastand("det røde svar kan ikke vælges igen", S1.valgt === -1);
+    svarKnap(jSvaev).click();
+    indsend();
+    paastand("det andet forkerte svar har sin egen forklaring", /^Stemplet vejer noget/.test(S1.beskedTekst()) && S1.trin.k === 0 && fremme() === "", S1.beskedTekst());
+    svarKnap(trinSvar(true)).click();
+    indsend();
+    paastand("rigtigt svar: manometeret kommer frem, og kortet bliver på spørgsmålet med forklaringen og Næste spørgsmål",
+        fremme() === "mano" && anker("manometer") && videreKnap() && /Næste spørgsmål/.test(videreKnap().textContent) &&
+        !vises(d.getElementById("stempel-indsend")) && svarKnap(trinSvar(true)).classList.contains("rigtig") &&
+        /^Rigtigt Molekylerne støder mod stemplet nedefra/.test(S1.beskedTekst()) && /luftens tryk og stemplets vægt/.test(S1.beskedTekst()), S1.beskedTekst());
+    paastand("… scenen er stadig låst, og intet hopper, når manometeret kommer frem", S1.laastNu() && layNu() === lay0);
+    videreKnap().click();
+    paastand("Næste spørgsmål: Trin 2 af 3 uden rosen fra trin 1, og varmepladen er endnu ikke fremme", S1.fase === "trin" && S1.trin.k === 1 &&
+        chip() === "Trin 2 af 3" && !tk.querySelector(".sk-bund.bliv") && !/Rigtigt/.test(tk.textContent) && fremme() === "mano" && !kan("varm") &&
+        /^Hvad sker der med molekylernes fart, når gassen bliver varmere\?$/.test(spmLinje()), spmLinje());
+    var hTr = [];
+    for (var hk = 0; hk < 3; hk++) { klik("#stempel-knap"); hTr.push(S1.beskedTekst() + " → " + S1.el.knap.textContent); }
+    paastand("hinttrappen: tre hint, så Vis svaret", /^Hint 1 af 3: .* → Næste hint$/.test(hTr[0]) && /^Hint 2 af 3: .* → Næste hint$/.test(hTr[1]) &&
+        /^Hint 3 af 3: .* → Vis svaret$/.test(hTr[2]) && fremme() === "mano", hTr.join(" | "));
+    klik("#stempel-knap");
+    paastand("Vis svaret: svaret står gult, varmepladen med − og + kommer frem, og stjernen er væk", S1.trinSvaret() && S1.trin.vist &&
+        svarKnap(trinSvar(true)).classList.contains("svar-vist") && fremme() === "mano plade" && kan("varm") && kan("koel") && !kan("hylde") && anker("plade") &&
+        S1.brugtSvar && /^Svaret Jo varmere gassen er/.test(S1.beskedTekst()), S1.beskedTekst());
+    paastand("intet hopper, når varmepladen kommer frem", layNu() === lay0);
+    videreKnap().click();
+    paastand("Trin 3 af 3 er forudsigelsen med det frie stempel i spørgsmålet", S1.fase === "valg" && S1.trin && chip() === "Trin 3 af 3" &&
+        /^Hvad sker der med volumenet, når gassen under det frie stempel bliver varmere\?$/.test(spmLinje()) && /Vælg det, du tror/.test(S1.beskedTekst()) &&
+        fremme() === "mano plade" && !kan("hylde") && S1.laastNu(), chip() + " | " + spmLinje());
+    paastand("intet hopper ved trin 3", layNu() === lay0);
+    S1.brugtSvar = false;
+
+    /* ------------------------------------------------------------------ */
     overskrift("7. Stemplet kan gennemføres");
     klik('[data-fane="fane-stempel"]');
     paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !S1.k && !d.querySelector(".kboble, .kknap"));
@@ -284,8 +416,9 @@ function koerTest(W) {
         svarKnap(j).click();
         indsend();
     }
-    /* Papirkortet (6. nov. 2026) */
+    /* Papirkortet (6. nov. 2026). Opgave 1 er ikke løst, så trinene kommer først */
     S1.vaelg(0);
+    forbiTrin();
     var skort = d.getElementById("stempel-skort"), indsendK = d.getElementById("stempel-indsend");
     paastand("papirkortet står i scenen, ikke i panelet", !!skort.closest(".scene") && !skort.closest(".panel") && d.body.classList.contains("papirkort") &&
         !d.querySelector(".panel .opgavekort, .panel #stempel-valg, .panel #regn-prompt"));
@@ -294,23 +427,25 @@ function koerTest(W) {
     svarKnap(0).click();
     paastand("et svar vælger kun: det bedømmes ikke af sig selv", S1.fase === "valg" && S1.valgt === 0 && indsendK.classList.contains("klar") &&
         svarKnap(0).classList.contains("valgt"));
-    var T1 = S1.g.T, b1 = 0, blink0 = skort.classList.contains("blink");
+    var T1 = S1.g.T;
     skort.classList.remove("blink");
-    klik("#stempel-lod-plus");
-    paastand("før svaret er sendt, er forsøget låst, og kortet blinker", S1.g.lodder === 0 && skort.classList.contains("blink"));
-    skyder(T1 + 80);
-    paastand("… også skyderen", S1.g.T === T1 && S1.fase === "valg");
-    paastand("Start forfra står i panelet og ikke på kortet", !!d.querySelector(".panel #stempel-forfra") && !/forfra/i.test(skort.textContent));
+    scene("varm");
+    paastand("før svaret er sendt, er forsøget låst: et klik på varmepladen gør intet, og kortet blinker", S1.g.T === T1 && skort.classList.contains("blink"));
+    skort.classList.remove("blink");
+    scene("gas");
+    paastand("… også et klik i cylinderen", S1.g.T === T1 && S1.fase === "valg" && skort.classList.contains("blink"));
+    paastand("Start forfra står i opgaverækken øverst og ikke på kortet", !!d.querySelector("#stempel-raekke #stempel-forfra") && !/forfra/i.test(skort.textContent));
+    /* Forsøget gøres med klik på apparaterne i scenen, som eleven gør det */
     function goer(o) {
-        var g = S1.g;
-        if (o.handling === "varm") skyder(g.T + 60);
-        else if (o.handling === "lod") klik("#stempel-lod-plus");
-        else if (o.handling === "dobbeltN") { var maal = 2 * g.n; while (g.n < maal - 1e-9) klik("#stempel-n-plus"); }
-        else if (o.handling === "udN") klik("#stempel-n-minus");
+        var g = S1.g, n = 0;
+        if (o.handling === "varm") scene("varm", 3);
+        else if (o.handling === "lod") scene("hylde");
+        else if (o.handling === "dobbeltN") { var maal = 2 * g.n; while (g.n < maal - 1e-9 && n++ < 10) scene("flaske"); }
+        else if (o.handling === "udN") scene("hane");
         else if (o.handling === "maal") {
             var m = o.maalTilstand;
-            while (g.n < m.n - 1e-9) klik("#stempel-n-plus");
-            while (g.lodder > m.lodder) klik("#stempel-lod-minus");
+            while (g.n < m.n - 1e-9 && n++ < 10) scene("flaske");
+            while (g.lodder > m.lodder && n++ < 20) scene("stempelLod");
         }
     }
     var forventet = { varme: /Volumenet steg fra 24,0 L/, lod: /Volumenet faldt fra 24,0 L til 12,1 L\. Det er næsten det halve/,
@@ -319,12 +454,13 @@ function koerTest(W) {
     D.FORUDSIG.forEach(function (o, i) {
         S1.vaelg(i);
         tik(S1, 2);
+        forbiTrin();
         vaelgRigtig(i);
         if (/Hint:/.test(S1.beskedTekst())) hintUbedt++;
         goer(o);
         tik(S1, 3);
         paastand((i + 1) + ". " + o.navn + ": løst med en stjerne og det rigtige resultat", S1.fase === "faerdig" && S1.status[i].stjerne &&
-            /^Rigtigt\./.test(S1.beskedTekst()) && forventet[o.id].test(S1.beskedTekst()), S1.fase + " | " + S1.beskedTekst());
+            /^Rigtigt /.test(S1.beskedTekst()) && forventet[o.id].test(S1.beskedTekst()), S1.fase + " | " + S1.beskedTekst());
     });
     var videreK = skort.querySelector("[data-videre]");
     paastand("alle syv er løst, og knappen går videre til Beregningen", S1.antalLoest() === 7 && videreK && /Videre til Beregningen/.test(videreK.textContent) && S1.beskedTekst().indexOf(D.FAERDIG.stempel) >= 0);
@@ -345,26 +481,26 @@ function koerTest(W) {
     S1.vaelg(0);
     svarKnap(1).click();
     indsend();
-    skyder(S1.g.T + 60);
+    scene("varm", 3);
     tik(S1, 3);
     paastand("et forkert gæt: forklaringen og det rigtige svar, ingen afvisning", S1.fase === "faerdig" && /^Du gættede: volumenet bliver mindre\. Volumenet steg/.test(S1.beskedTekst()) &&
         !!skort.querySelector(".sk-bund.bliv.nej") && skort.querySelector(".sk-knap.rigtig") && skort.querySelector(".sk-knap.forkert"), S1.beskedTekst());
     /* To ting på én gang */
     S1.vaelg(0);
     vaelgRigtig(0);
-    klik("#stempel-lod-plus");
-    skyder(S1.g.T + 60);
+    scene("hylde");
+    scene("varm", 3);
     tik(S1, 3);
     paastand("to ting på én gang: stilles tilbage med en besked", S1.fase === "proev" && /Du ændrede også lodderne/.test(S1.beskedTekst()) && S1.g.lodder === 0, S1.beskedTekst());
     /* Låsen i en opgave med låst stempel */
     S1.vaelg(3);
     vaelgRigtig(3);
-    klik("#stempel-frit");
-    paastand("låst stempel åbnet: linjen beder om at låse igen", /Lås det igen/.test(S1.fast.html), S1.fast.html);
-    skyder(S1.g.T + 60);
+    scene("laasKnap");
+    paastand("låst stempel åbnet med låseknappen i scenen: linjen beder om at låse igen", !S1.g.laast && /Lås det igen/.test(S1.fast.html), S1.fast.html);
+    scene("varm", 3);
     tik(S1, 3);
     paastand("… og forsøget aflæses først, når stemplet er låst", S1.fase === "proev");
-    klik("#stempel-laast");
+    scene("laasKnap");
     tik(S1, 3);
     paastand("… og forsøget er stillet tilbage og kører videre efter låsen", S1.fase === "proev" || S1.fase === "faerdig");
     /* Hint og Vis svaret */
@@ -377,52 +513,240 @@ function koerTest(W) {
     paastand("Vis svaret: svaret står i kortet, og forsøget kører af sig selv", S1.valgt >= 0 && D.FORUDSIG[1].valg[S1.valgt].ok && !!S1.auto);
     tik(S1, 4);
     paastand("… og opgaven er løst uden stjerne", S1.fase === "faerdig" && !S1.status[1].stjerne, S1.fase);
-    /* Scenen (efter svaret er sendt, er forsøget åbent) */
+    /* Scenen (efter svaret er sendt, er forsøget åbent): rigtige klik på apparaterne */
     S1.vaelg(0);
     vaelgRigtig(0);
     var n0 = S1.g.n;
-    S1.klikScene("flaske");
+    scene("flaske");
     paastand("klik på gasflasken: 0,25 mol mere", Math.abs(S1.g.n - n0 - 0.25) < 1e-9 && /0,25 mol gas mere/.test(S1.beskedTekst()));
-    S1.klikScene("hane");
+    scene("hane");
     paastand("klik på hanen: 0,25 mol ud", Math.abs(S1.g.n - n0) < 1e-9);
-    S1.klikScene("hylde");
+    scene("hylde");
     paastand("klik på loddet på hylden: et lod på stemplet", S1.g.lodder === 1 && /Et lod mere/.test(S1.beskedTekst()));
-    S1.klikScene("stempelLod");
-    S1.klikScene("stempel");
-    paastand("klik på stemplet: det låses", S1.g.laast && /låst/.test(S1.beskedTekst()));
-    S1.klikScene("stempel");
+    S1.flyv = [];
+    scene("stempelLod");
+    paastand("klik på loddet på stemplet: det kommer af igen", S1.g.lodder === 0 && /Et lod af/.test(S1.beskedTekst()));
+    scene("laasKnap");
+    paastand("klik på Lås stemplet: det låses, og knappen hedder nu Lås op", S1.g.laast && /låst/.test(S1.beskedTekst()) && S1.under(S1.punkt("laasKnap")) === "laasKnap");
+    scene("laasKnap");
+    paastand("klik på Lås op: stemplet glider frit igen", !S1.g.laast);
     var T0 = S1.g.T;
-    S1.klikScene("varm");
-    paastand("varmepladens knapper: 25 K ad gangen", S1.g.T === T0 + 25);
-    S1.klikScene("koel");
+    scene("varm");
+    paastand("varmepladens + : " + D.STEMPEL.T_KNAP + " K ad gangen", S1.g.T === T0 + D.STEMPEL.T_KNAP && D.STEMPEL.T_KNAP === 20);
+    scene("koel");
+    paastand("varmepladens − : tilbage igen", S1.g.T === T0);
     tik(S1, 1);
     paastand("molekylerne passer med stofmængden (40 pr. mol)", S1.part.levende() === Math.round(S1.g.n * 40), S1.part.levende());
     S1.g.saet({ n: 2, T: 293, lodder: 0, laast: false });
     S1.efter();
-    skyder(500);
+    S1.saetT(500, "test");
     paastand("stoppet: beskeden om, at trykket stiger i stedet", S1.g.stop && /stoppet/.test(S1.beskedTekst()), S1.beskedTekst());
-    S1.g.saet({ n: 1, T: 290, lodder: 0, laast: false });
+    S1.g.saet({ n: 1, T: 293, lodder: 0, laast: false });
     S1.aeg224 = false;
-    skyder(273);
+    scene("koel");
     tik(S1, 1.5);
     paastand("påskeægget: 22,4 L ved 0 °C", /22,4 L/.test(S1.beskedTekst()), S1.beskedTekst());
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7b. Delene kommer frem opgave for opgave (21. nov. 2026)");
+    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    S1.naaet = 0;
+    S1.vaelg(0);
+    var layA = layNu();
+    forbiTrin();
+    paastand("efter trin 1 og 2: manometeret og varmepladen er fremme, grafen, lodderne, gassen og låsen ikke",
+        fremme() === "mano plade" && kan("varm") && !kan("hylde") && !kan("flaske") && !kan("laasKnap"), fremme());
+    vaelgRigtig(0);
+    goer(D.FORUDSIG[0]);
+    tik(S1, 3);
+    paastand("opgave 1 løst med en stjerne: alt, opgave 1 bruger, er fremme, og intet hoppede undervejs",
+        S1.fase === "faerdig" && S1.status[0].loest && S1.status[0].stjerne && fremme() === "mano plade" && layNu() === layA, fremme());
+    videreKnap().click();
+    paastand("opgave 2: grafen, lodhylden og Lodder er kommet frem, gassen og låsen ikke", S1.nr === 1 && fremme() === "mano plade graf hylde" &&
+        kan("hylde") && !kan("flaske") && anker("graf") && anker("hylde") && !anker("flaske"), fremme());
+    S1.vaelg(2);
+    paastand("opgave 3: gasflasken og hanen er kommet frem", fremme() === "mano plade graf hylde gas" && kan("flaske") && kan("hane") &&
+        anker("flaske"), fremme());
+    paastand("… og stemplet kan ikke låses, før låseknappen er fremme", !kan("laasKnap") && S1.underAlle(S1.punkt("laasKnap")) === "laasKnap" && !anker("laas"));
+    S1.vaelg(3);
+    paastand("opgave 4: låseknappen er kommet frem, og alt er fremme", fremme() === DELE.join(" ") && kan("laasKnap") && anker("laas"), fremme());
+    S1.vaelg(1);
+    paastand("tilbage på opgave 2: det, der er kommet frem, bliver fremme", fremme() === DELE.join(" "));
+    S1.vaelg(0);
+    paastand("opgave 1 er løst: ingen trin, Opgave 1 af 7, og alt er fremme", S1.fase === "valg" && !S1.trin && chip() === "Opgave 1 af 7" &&
+        fremme() === DELE.join(" "), chip());
+    klik("#stempel-forfra");
+    paastand("Start opgaven forfra på opgave 1 giver trinene igen med kun cylinderen fremme", S1.fase === "trin" && S1.trin.k === 0 &&
+        chip() === "Trin 1 af 3" && fremme() === "" && !anker("laas"));
+    S1.status.forEach(function (s, i) { s.loest = i <= 2; });
+    var naaetGemt = S1.naaetFraStatus();
+    S1.status.forEach(function (s) { s.loest = true; });
+    paastand("løst før (gemt i browseren): det, eleven har nået, er fremme fra start, og alt, når alle er løst",
+        naaetGemt === 2 && S1.naaetFraStatus() === 6, naaetGemt);
+    S1.naaet = 6;
+    S1.vaelg(0);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7c. Ingen panel og roligere molekyler (21. nov. 2026, runde 2 og 3)");
+    var scene1 = d.querySelector("#fane-stempel .scene").getBoundingClientRect(), fane1 = d.getElementById("fane-stempel").getBoundingClientRect();
+    paastand("intet panel på nogen fane (ingen skyder, intet felt, ingen knap til forsøget), og scenen har hele bredden",
+        !d.querySelector(".panel, aside") && Math.abs(scene1.width - fane1.width) < 1 &&
+        !d.querySelector("#stempel-raekke input, #regn-raekke input, [type=range]"), scene1.width + " / " + fane1.width);
+    var pp = new G.Partikler();
+    pp.fyld(40, 400, 300);
+    for (var tt = 0; tt < 120; tt++) pp.opdater(1 / 60, 400, 300, 1, null);
+    paastand("molekylerne er langsommere: grundfarten er højst 76 px/s (40 % af de 190 før)", pp.grundfart() <= 76 && G.FART_MAKS === 76 && S1.part.grundfart() <= 76, pp.grundfart());
+    paastand("ingen glimt ved væggene", pp.glimt.length === 0 && S1.part.glimt.length === 0);
+    S1.g.saet({ n: 1, T: 293, lodder: 0, laast: false });
+    S1.g.saetT(493);
+    tik(S1, 3);
+    paastand("varmere gas er stadig hurtigere (farten følger kvadratroden af T)", Math.abs(S1.part.fart - Math.sqrt(493 / 293)) < 0.02, S1.part.fart);
+    S1.vaelg(0);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7d. Scenen ligger fast, og opgaverækken øverst (21. nov. 2026, runde 3)");
+    /* Zoomfejlen: en kort besked fra scenen gjorde kortet højere, og så blev scenen lagt om */
+    S1.naaet = 6;
+    S1.vaelg(2);
+    vaelgRigtig(2);
+    var fast0 = layNu() + S1.lay.pxPrL;
+    scene("flaske", 4);
+    var fast1 = layNu() + S1.lay.pxPrL;
+    scene("hylde", 3);
+    scene("varm", 2);
+    scene("laasKnap");
+    var fast2 = layNu() + S1.lay.pxPrL;
+    paastand("skalaen og cylinderens placering er de samme før og efter 4 × gas ind, 3 lodder på, opvarmning og lås",
+        fast0 === fast1 && fast1 === fast2 && Math.abs(S1.g.n - 1.5) < 1e-9 && S1.g.lodder === 3 && S1.g.laast && !d.getElementById("stempel-note").hidden, fast0 + " | " + fast2);
+    var tops = [];
+    for (var oi = 0; oi < 7; oi++) { S1.vaelg(oi); tops.push(layNu()); }
+    paastand("scenen hopper ikke, når opgaven skifter", tops.every(function (x) { return x === tops[0]; }));
+    /* Rækken på fane 1 */
+    function raekke1() { return [].slice.call(d.querySelectorAll("#stempel-raekke .or-opgaver .or-knap")); }
+    function nrTekst(b) { return b.querySelector(".or-nr").textContent; }
+    function navnTekst(b) { return b.querySelector(".or-navn").textContent; }
+    S1.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    S1.naaet = 0;
+    S1.vaelg(0);
+    var rk1 = raekke1();
+    paastand("rækken på fane 1 har 7 opgaver og Start forfra til sidst", rk1.length === 7 && !!d.querySelector("#stempel-raekke > #stempel-forfra:last-child"));
+    paastand("fra start: kun opgave 1 har sit tema; 2 til 7 er låste numre uden tema", navnTekst(rk1[0]) === "Varmere gas" && rk1[0].classList.contains("valgt") &&
+        rk1.slice(1).every(function (b, k) { return b.disabled && b.classList.contains("laast") && navnTekst(b) === "" && nrTekst(b) === String(k + 2); }),
+        rk1.map(function (b) { return nrTekst(b) + ":" + navnTekst(b); }).join(" "));
+    rk1[3].click();
+    paastand("et klik på en låst opgave gør intet", S1.nr === 0);
+    forbiTrin();
+    vaelgRigtig(0);
+    goer(D.FORUDSIG[0]);
+    tik(S1, 3);
+    videreKnap().click();
+    vaelgRigtig(1);
+    goer(D.FORUDSIG[1]);
+    tik(S1, 3);
+    videreKnap().click();
+    rk1 = raekke1();
+    paastand("efter to løste opgaver: 1 og 2 har stjerne og tema, 3 er åben med tema, 4 til 7 er låste",
+        nrTekst(rk1[0]) === "★" && nrTekst(rk1[1]) === "★" && navnTekst(rk1[1]) === "Et lod på" && S1.nr === 2 && navnTekst(rk1[2]) === "Mere gas" &&
+        !rk1[2].disabled && rk1.slice(3).every(function (b) { return b.disabled && navnTekst(b) === ""; }),
+        rk1.map(function (b) { return nrTekst(b) + ":" + navnTekst(b); }).join(" "));
+    rk1[0].click();
+    paastand("et klik på en løst opgave i rækken går til den", S1.nr === 0 && raekke1()[0].classList.contains("valgt"));
+    raekke1()[2].click();
+    klik("#stempel-knap");
+    klik("#stempel-knap");
+    tik(S1, 4);
+    rk1 = raekke1();
+    paastand("Vis svaret tæller som løst: opgave 3 får ✓ uden stjerne", S1.fase === "faerdig" && nrTekst(rk1[2]) === "✓" && !S1.status[2].stjerne);
+    videreKnap().click();
+    paastand("… og opgave 4 åbner, når eleven går videre", S1.nr === 3 && !raekke1()[3].disabled && navnTekst(raekke1()[3]) === "Låst stempel");
+    vaelgRigtig(3);
+    klik("#stempel-forfra");
+    paastand("Start forfra i rækken stiller opgaven tilbage", S1.nr === 3 && S1.fase === "valg" && S1.valgt === -1);
+    /* Rækken på fane 2 */
+    klik('[data-fane="fane-regn"]');
+    R.tilpas();
+    function raekke2() { return [].slice.call(d.querySelectorAll("#regn-raekke .or-opgaver .or-knap")); }
+    R.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    R.vaelg(0, false);
+    var rk2 = raekke2(), niv = [].slice.call(d.querySelectorAll("#regn-raekke .or-niveau .or-knap"));
+    paastand("rækken på fane 2 har Let, Middel og Svær, 4 opgaver og Nye tal til sidst", niv.length === 3 && rk2.length === 4 &&
+        niv.map(function (b) { return b.textContent; }).join(" ") === "Let Middel Svær" && !!d.querySelector("#regn-raekke > #regn-nye:last-child"));
+    paastand("fra start: kun Let 1 har sit navn; 2 til 4 er låste numre", navnTekst(rk2[0]) === "Gas i et stempel" &&
+        rk2.slice(1).every(function (b) { return b.disabled && navnTekst(b) === ""; }));
+    var regnTop0 = R.lay.top;
+    loes(R);
+    rk2 = raekke2();
+    paastand("Let 1 løst: stjerne, og Let 2 åbner med sit navn", nrTekst(rk2[0]) === "★" && !rk2[1].disabled && navnTekst(rk2[1]) === "Ballonen" && rk2[2].disabled);
+    rk2[1].click();
+    paastand("et klik i rækken går til opgaven, og tavlen hopper ikke", R.nr === 1 && R.lay.top === regnTop0);
+    var tekst0 = R.opgaveTekst();
+    klik("#regn-nye");
+    paastand("Nye tal i rækken giver nye tal i opgaven", R.opgaveTekst() !== tekst0 && R.nr === 1);
+    klik('#regn-niveau [data-niveau="middel"]');
+    rk2 = raekke2();
+    paastand("Middel kan altid vælges; inden for niveauet er kun den første åben", R.o.def.niveau === "middel" && !rk2[0].disabled &&
+        rk2.slice(1).every(function (b) { return b.disabled; }) && R.lay.top === regnTop0);
+    klik('#regn-niveau [data-niveau="let"]');
+    klik('[data-fane="fane-stempel"]');
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7e. Klik-opfordringer kun, når kortet beder om en handling (21. nov. 2026, runde 4)");
+    function opfTegnet() { S1.tegn(); return (S1.klikTegnet || []).join(","); }
+    S1.naaet = 6;
+    var underSpm = [];
+    for (var q = 0; q < 7; q++) { S1.vaelg(q); if (S1.fase === "valg" && opfTegnet() !== "") underSpm.push(q + 1); }
+    S1.vaelg(0, true);
+    if (opfTegnet() !== "") underSpm.push("trin 1");
+    paastand("ingen bobler under et spørgsmål, et gæt eller et trin", underSpm.length === 0, underSpm.join(", "));
+    paastand("ingen faste klik-tekster i scenen", typeof NK.Tegn.klikTekst === "undefined" && typeof NK.Tegn.opfordring === "function");
+    S1.vaelg(2); vaelgRigtig(2);
+    var a1 = opfTegnet(); scene("flaske"); var a2 = opfTegnet(); scene("flaske"); var a3 = opfTegnet();
+    paastand("Luk gas ind: præcis gasflasken har ramme og boble, til der er gas nok, så er boblen væk", a1 === "flaske" && a2 === "flaske" && a3 === "", [a1, a2, a3].join(" | "));
+    S1.vaelg(1); vaelgRigtig(1);
+    var b1 = opfTegnet(); scene("hylde"); var b2 = opfTegnet();
+    paastand("Læg et lod på: præcis lodderne på hylden, og boblen forsvinder bagefter", b1 === "hylde" && b2 === "", b1 + " | " + b2);
+    S1.vaelg(0); vaelgRigtig(0);
+    var c1 = opfTegnet(); scene("varm"); var c2 = opfTegnet(); scene("varm"); var c3 = opfTegnet();
+    paastand("Varm op: præcis varmepladens +, til gassen er varmet nok", c1 === "varm" && c2 === "varm" && c3 === "", [c1, c2, c3].join(" | "));
+    S1.vaelg(3); vaelgRigtig(3);
+    var d0 = opfTegnet(); scene("laasKnap"); var d1 = opfTegnet(); scene("laasKnap"); var d2 = opfTegnet();
+    paastand("låst stempel åbnet: boblen flytter til låseknappen, til stemplet er låst igen", d0 === "varm" && d1 === "laasKnap" && d2 === "varm", [d0, d1, d2].join(" | "));
+    S1.vaelg(5); vaelgRigtig(5);
+    var e1 = opfTegnet(); scene("hane"); var e2 = opfTegnet();
+    paastand("Luk gas ud: præcis hanen", e1 === "hane" && e2 === "", e1 + " | " + e2);
+    S1.vaelg(6); vaelgRigtig(6);
+    var f1 = opfTegnet(); scene("flaske", 2); var f2 = opfTegnet();
+    S1.flyv = []; scene("stempelLod"); S1.flyv = []; scene("stempelLod"); S1.flyv = [];
+    var f3 = opfTegnet();
+    paastand("1 mol gas: først gasflasken, så lodderne på stemplet, til sidst ingen", f1 === "flaske" && f2 === "stempelLod" && f3 === "", [f1, f2, f3].join(" | "));
+    tik(S1, 3);
+    paastand("ingen bobler, når opgaven er løst", S1.fase === "faerdig" && opfTegnet() === "", S1.fase);
 
     /* ------------------------------------------------------------------ */
     overskrift("8. Beregningen kan gennemføres");
     klik('[data-fane="fane-regn"]');
     tik(R, 0.5);
-    var VARIANT = { V: "pV = nRT", n: "n = pV/(RT)", p: "p = nRT/V", T: "T = pV/(nR)" };
+    /* Fane 2 (21. nov. 2026): formlen vælges med en knap på kortet, og tallet skrives i feltet på kortet */
+    function regnKnap(j) { return d.querySelectorAll("#regn-skort .sk-knap")[j]; }
+    function regnFelt() { return d.querySelector("#regn-skort #regn-felt input"); }
+    function regnVidere() { var v = d.querySelector("#regn-skort .sk-bund.bliv [data-videre]"); if (v) v.click(); return !!v; }
+    function rigtigFormel(t) { var j = -1; D.FORMELVALG[t.rel + ":" + t.x].svar.forEach(function (v, k) { if (v.ok) j = k; }); return j; }
+    function skriv(inp, tekst) { inp.value = tekst; inp.dispatchEvent(new W.Event("input", { bubbles: true })); }
     function loes(r) {
-        var o = r.o, n = 0;
-        while (!r.faerdig && n++ < 20) {
+        var n = 0;
+        while (!r.faerdig && n++ < 30) {
+            if (r.venter) { if (!regnVidere()) return "ingen Næste"; continue; }
             var t = r.aktivt();
-            if (!t || !t.input) return "intet felt";
-            if (t.fase === "formel") {
-                t.input.value = t.rel === "gas" ? VARIANT[t.x] : (t.x === "n" ? "n = m/M" : t.x === "m" ? "m = n·M" : "M = m/n");
+            if (r.iFormel()) {
+                if (d.querySelectorAll("#regn-skort .sk-knap").length !== 3) return "ikke tre formler";
+                regnKnap(rigtigFormel(t)).click();
+                klik("#regn-indsend");
             } else {
-                t.input.value = G.talTekst(t.x, t.facit, t.id === "M");
+                var inp = regnFelt();
+                if (!inp) return "intet felt";
+                skriv(inp, G.talTekst(t.x, t.facit, t.id === "M"));
+                enter(inp);
             }
-            enter(t.input);
             if (/Hint:/.test(r.beskedTekst())) hintUbedt++;
         }
         return r.faerdig ? "" : "ikke færdig";
@@ -430,7 +754,8 @@ function koerTest(W) {
     var tavleOk = true, sceneOk = true, lukketOk = true, taeller = 0;
     D.REGN.forEach(function (def, i) {
         R.vaelg(i, false);
-        paastand(def.id + " " + def.navn + ": kan løses ved at skrive formlen og tallet", loes(R) === "" && R.status[i].stjerne, R.beskedTekst());
+        var l = loes(R);
+        paastand(def.id + " " + def.navn + ": kan løses ved at vælge formlen og skrive tallet på kortet", l === "" && R.status[i].stjerne, l || R.beskedTekst());
         var linjer = d.querySelectorAll("#regn-tavle .tv-linje").length;
         if (linjer < 1 + R.o.trin.length || !d.querySelector("#regn-tavle .tv-slut")) tavleOk = false;
         if (!R.kendt("V") || !R.kendt("p") || !R.kendt("n") || !R.kendt("T")) sceneOk = false;
@@ -444,14 +769,39 @@ function koerTest(W) {
     /* Papirkortet på fane 2 */
     R.vaelg(0, true);
     var rk = d.getElementById("regn-skort"), ri = d.getElementById("regn-indsend");
-    paastand("fane 2: kortet står i scenen, felterne i panelet", !!rk.closest(".scene") && !!d.querySelector(".panel #regn-raekker input"));
-    paastand("fane 2: Indsend svar er grå, til der står noget i feltet", vises(ri) && ri.classList.contains("ikke-klar"));
-    var ti = R.aktivt().input;
-    ti.value = "V = nRT/p";
-    ti.dispatchEvent(new W.Event("input", { bubbles: true }));
-    paastand("… og klar, når der står noget", ri.classList.contains("klar"));
+    var fk = [].slice.call(rk.querySelectorAll(".sk-knap")).map(function (b) { return b.textContent; });
+    paastand("fane 2: kortet står i scenen med tre formler som knapper, og panelet har intet felt", !!rk.closest(".scene") &&
+        R.iFormel() && fk.length === 3 && fk.indexOf("V = n · R · T / p") >= 0 && !d.querySelector("#fane-regn .panel input") &&
+        /Trin 1 af 2/.test(rk.querySelector(".sk-chip").textContent) && /Vælg formlen for volumenet/.test(rk.textContent), fk.join(" | "));
+    paastand("fane 2: Indsend svar er grå, til der er valgt en formel", vises(ri) && ri.classList.contains("ikke-klar"));
+    regnKnap(1).click();
+    paastand("… og en formel vælger kun: den bedømmes ikke af sig selv", ri.classList.contains("klar") && regnKnap(1).classList.contains("valgt") && R.iFormel());
     ri.click();
-    paastand("Indsend svar sender feltet ind", R.aktivt().fase === "tal" && /Rigtig formel/.test(R.beskedTekst()), R.beskedTekst());
+    paastand("forkert formel (V = p · R · T / n): rød og låst, og forklaringen siger, at p og n er byttet om", regnKnap(1).classList.contains("forkert") &&
+        regnKnap(1).disabled && /p og n er byttet om/.test(R.beskedTekst()) && R.iFormel() && R.el.knap.classList.contains("peg"), R.beskedTekst());
+    regnKnap(rigtigFormel(R.aktivt())).click();
+    ri.click();
+    paastand("rigtig formel: grøn, en kort forklaring, Næste, og formlen står på tavlen", R.venter && regnKnap(rigtigFormel(R.aktivt())).classList.contains("rigtig") &&
+        /^Rigtigt Del begge sider/.test(R.beskedTekst()) && /n · R · T/.test(d.getElementById("regn-tavle").textContent) && !vises(ri), R.beskedTekst());
+    regnVidere();
+    var felt = regnFelt(), fp = d.getElementById("regn-felt");
+    paastand("Næste: tallet skrives i et felt på kortet med enheden efter (V = [ ] L)", !!felt && /^V =/.test(fp.textContent.trim()) &&
+        fp.querySelector(".kf-enhed").textContent === "L" && /Trin 2 af 2/.test(rk.querySelector(".sk-chip").textContent) &&
+        !rk.querySelector(".sk-knap") && vises(ri) && ri.classList.contains("ikke-klar"), fp.textContent);
+    skriv(felt, NK.betydende(R.aktivt().facit / 10, 3));
+    paastand("… Indsend svar er klar, når der står noget", ri.classList.contains("klar"));
+    ri.click();
+    paastand("et forkert tal: feltet ryster, og linjen siger hvorfor (kommaet)", /kommaet/.test(R.beskedTekst()) && fp.classList.contains("ryst") && regnFelt() === felt, R.beskedTekst());
+    R.vaelg(D.REGN.map(function (o) { return o.id; }).indexOf("M1"), false);
+    skriv(regnFelt(), "373");
+    enter(regnFelt());
+    regnVidere();
+    regnKnap(rigtigFormel(R.aktivt())).click();
+    klik("#regn-indsend");
+    regnVidere();
+    skriv(regnFelt(), NK.betydende(2 * 0.0831 * 100 / 1.013, 3));
+    klik("#regn-indsend");
+    paastand("fejlbeskederne virker stadig i kortets felt: temperaturen i °C i stedet for kelvin", /kelvin/.test(R.beskedTekst()) && !R.faerdig, R.beskedTekst());
     R.status.forEach(function (st) { st.loest = false; });
     R.vaelg(0, false);
     loes(R);
@@ -463,21 +813,22 @@ function koerTest(W) {
     /* En forkert formel, så hint og svar */
     R.vaelg(0, true);
     var t0 = R.aktivt();
-    t0.input.value = "V = pnRT";
-    enter(t0.input);
-    paastand("forkert formel: feltet ryster, og linjen siger hvorfor", /p skal stå under/.test(R.beskedTekst()) && d.getElementById("regn-bund").className.indexOf("skidt") >= 0 && t0.fase === "formel");
+    regnKnap(2).click();
+    klik("#regn-indsend");
+    paastand("forkert formel (T under brøkstregen): linjen siger hvorfor", /T skal stå over brøkstregen/.test(R.beskedTekst()) && d.getElementById("regn-bund").className.indexOf("skidt") >= 0 && t0.fase === "formel");
     paastand("… der kommer intet hint af sig selv, men den gule knap lyser op", !/Hint:/.test(R.beskedTekst()) && R.el.knap.classList.contains("peg"));
     klik("#regn-knap");
     paastand("Giv hint: det, man kender, ikke formlen", /^Hint:/.test(R.beskedTekst()) && /Du kender/.test(R.beskedTekst()) && !/nRT|n · R · T/.test(R.beskedTekst()) &&
         !R.el.knap.classList.contains("peg"), R.beskedTekst());
     klik("#regn-knap");
-    paastand("Vis svaret: formlen står i kortet, og feltet er nu til tallet", t0.fase === "tal" && /Formlen/.test(R.beskedTekst()) &&
-        d.getElementById("regn-bund").className.indexOf("gul") >= 0, R.beskedTekst());
+    paastand("Vis svaret: den rigtige formel står gult på kortet med Næste, og feltet er derefter til tallet", t0.fase === "tal" && R.venter &&
+        regnKnap(rigtigFormel(t0)).classList.contains("svar-vist") && /^Svaret /.test(R.beskedTekst()), R.beskedTekst());
+    regnVidere();
     klik("#regn-knap");
     klik("#regn-knap");
     paastand("Vis svaret på tallet: beregningen, opgaven er løst uden stjerne", R.faerdig && !R.status[0].stjerne || R.faerdig && R.brugtSvar, R.beskedTekst());
     paastand("nye tal giver andre tal i teksten", (function () { var a = R.opgaveTekst(); klik("#regn-nye"); return R.opgaveTekst() !== a; }()));
-    paastand("niveauerne: Svær viser fire opgaver", (function () { klik('#regn-niveau [data-niveau="svaer"]'); return d.querySelectorAll("#regn-liste .hyldelinje").length === 4 && R.o.def.niveau === "svaer"; }()));
+    paastand("niveauerne: Svær viser fire opgaver", (function () { klik('#regn-niveau [data-niveau="svaer"]'); return d.querySelectorAll("#regn-liste .or-knap").length === 4 && R.o.def.niveau === "svaer"; }()));
 
     /* ------------------------------------------------------------------ */
     overskrift("9. Hjælpen");
@@ -504,7 +855,7 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("11. Layoutet");
     var ramme = document.getElementById("ramme");
-    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    var stoerrelser = [[1600, 950], [1500, 900], [1400, 860], [1300, 820], [1100, 700], [1100, 620], [1000, 640], [860, 700], [700, 600], [520, 380]];
     function over(a, b2) { return a.x < b2.x + b2.b - 1 && a.x + a.b > b2.x + 1 && a.y < b2.y + b2.h - 1 && a.y + a.h > b2.y + 1; }
     stoerrelser.forEach(function (st) {
         ramme.style.width = st[0] + "px";
@@ -517,13 +868,18 @@ function koerTest(W) {
             sim.layout();
             var lay = sim.lay, Wc = lay.W, Hc = lay.H;
             /* Papirkortet holder sig i sin plads oeverst (kortZone), ogsaa med det hoejeste kort:
-               opgave 5 med fire lange svar og hintet, og det forkerte svar med forklaringen */
+               opgave 5 med fire lange svar og hintet, og det forkerte svar med forklaringen.
+               Trinene (21. nov. 2026): trin 1 med det forkerte svar, det rigtige og hint 2 */
             if (id === "fane-stempel") {
+                var KORT = ["med hintet", "med forklaringen", "i trin 1 med det forkerte svar", "i trin 1 med det rigtige svar", "i trin 1 med hint 2"];
                 [function () { sim.vaelg(4); sim.vaelgKortSvar(1); sim.knap(); },
-                 function () { sim.vaelg(4); sim.vaelgKortSvar(1); sim.indsend(); }].forEach(function (f, k) {
+                 function () { sim.vaelg(4); sim.vaelgKortSvar(1); sim.indsend(); },
+                 function () { sim.vaelg(0, true); sim.vaelgKortSvar(1); sim.indsend(); },
+                 function () { sim.vaelg(0, true); sim.vaelgKortSvar(0); sim.indsend(); },
+                 function () { sim.vaelg(0, true); sim.knap(); sim.knap(); }].forEach(function (f, k) {
                     f(); sim.tilpas();
                     var kr2 = d.getElementById("stempel-skort").getBoundingClientRect(), cr2 = sim.L.canvas.getBoundingClientRect();
-                    if (kr2.bottom - cr2.top > sim.lay.top + 1) problemer.push(id + ": kortet " + (k ? "med forklaringen" : "med hintet") + " går ud over sin plads");
+                    if (kr2.bottom - cr2.top > sim.lay.top + 1) problemer.push(id + ": kortet " + KORT[k] + " går ud over sin plads");
                     if (sim.lay.cyl.y < sim.lay.top) problemer.push(id + ": cylinderen går op under det høje kort");
                     if (sim.lay.bordY > sim.lay.H - 10 || sim.lay.cyl.h < 80) problemer.push(id + ": cylinderen bliver for lav under det høje kort (" + Math.round(sim.lay.cyl.h) + " px)");
                 });
@@ -566,8 +922,16 @@ function koerTest(W) {
                 if (over(tv, mr)) problemer.push(id + ": tavlen over manometeret");
                 if (tv.b < 180) problemer.push(id + ": tavlen er for smal (" + Math.round(tv.b) + ")");
             }
-            var panel = d.querySelector("#" + id + " .panel");
-            if (panel.scrollWidth > panel.clientWidth + 1) problemer.push(id + ": panelet er for bredt");
+            /* Opgaverækken (runde 3): over kortet, inden for scenen, uden at løbe over */
+            var rae = d.getElementById(sim.navn + "-raekke").getBoundingClientRect(), kr3 = ke.getBoundingClientRect();
+            var raeEl = d.getElementById(sim.navn + "-raekke");
+            if (rae.bottom > kr3.top + 1) problemer.push(id + ": rækken går ned over kortet");
+            if (rae.left < cr.left - 1 || rae.right > cr.right + 1 || rae.top < cr.top - 1) problemer.push(id + ": rækken er uden for scenen");
+            if (st[0] >= 1100 && raeEl.scrollWidth > raeEl.clientWidth + 1) problemer.push(id + ": rækken løber over (" + raeEl.scrollWidth + " > " + raeEl.clientWidth + ")");
+            var navn0 = raeEl.querySelector(".or-opgaver .or-navn");
+            if (st[0] < 1200 && navn0 && W.getComputedStyle(navn0).display !== "none") problemer.push(id + ": rækken viser temaerne på en smal skærm");
+            if (st[0] >= 1200 && navn0 && navn0.textContent && W.getComputedStyle(navn0).display === "none") problemer.push(id + ": rækken skjuler temaerne på en bred skærm");
+            if (id === "fane-stempel" && st[0] < 1200 && !/ · /.test(ke.querySelector(".sk-chip").textContent)) problemer.push(id + ": temaet står ikke på kortet på en smal skærm");
         });
         paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 4).join("; "));
     });

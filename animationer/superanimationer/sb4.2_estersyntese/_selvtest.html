@@ -486,6 +486,37 @@ function koerTest(W) {
     samlet("kortet slutter over whiteboardet", daekker);
     samlet("hint og Indsend svar står på samme række", raekke);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("9. Listerne låser titlerne op i takt (21. nov. 2026)");
+    function linjer(id) { return [].slice.call(el(id).querySelectorAll(".opg-chip")); }
+    function laastNr(c) { return c.classList.contains("laast") && !!c.querySelector(".hl-streg") && /^\d+$/.test(c.textContent.trim()); }
+    function tekst(l) { return l.map(function (c) { return c.textContent.trim(); }).join(" | "); }
+    NK.visFane("fane-k");
+    k1.forfra();
+    var kl = linjer("k-liste");
+    paastand("Kondensationen: ved start har kun reaktion 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        kl.length === 3 && /ethansyre og ethanol/.test(kl[0].textContent) && !kl[0].disabled && kl.slice(1).every(function (c) { return laastNr(c) && c.disabled; }), tekst(kl));
+    kl[2].click();
+    paastand("Kondensationen: et klik på en låst reaktion gør intet", k1.nr === 0);
+    k1.valgtAtomer = K.vandAtomer(k1.sc); k1.indsendKlik(); k1.videreKlik(); tid(k1, 3);
+    k1.svarValg(rigtigNr(k1.navne)); k1.indsendKlik();
+    kl = linjer("k-liste");
+    paastand("Kondensationen: når reaktion 1 er løst, kommer titlen på reaktion 2 frem; reaktion 3 er stadig låst",
+        k1.status[0].loest && /butansyre og ethanol/.test(kl[1].textContent) && !kl[1].disabled && laastNr(kl[2]) && kl[2].disabled, tekst(kl));
+    kl[1].click();
+    paastand("Kondensationen: reaktion 2 kan nu vælges i listen", k1.nr === 1);
+    NK.visFane("fane-s");
+    s3.runder = 0;
+    s3.forfra();
+    var sl = linjer("s-trinliste");
+    paastand("Rens esteren: i den første runde har kun trin 1 en titel; de tre andre er et nummer med en grå streg",
+        sl.length === 4 && /Vask med vand/.test(sl[0].textContent) && sl.slice(1).every(laastNr), tekst(sl));
+    D.RENS_TRIN[0].rigtig.forEach(function (j) { s3.svarValg(j); });
+    s3.indsendKlik();
+    sl = linjer("s-trinliste");
+    paastand("Rens esteren: når trin 1 er løst, kommer titlen på trin 2 frem; trin 3 og 4 er stadig låst",
+        !!s3.groen && /natriumcarbonat/.test(sl[1].textContent) && sl.slice(2).every(laastNr), tekst(sl));
 }
 </script>
 </body>

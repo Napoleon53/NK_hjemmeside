@@ -74,8 +74,9 @@
         var N = this.N;
         if (this.trin === "find") return { tekst: "Markér chromoforen i " + this.o.navn.toLowerCase() +
             ". Klik på dobbeltbindingerne i det største konjugerede system, og tryk Indsend svar." };
+        var navn = this.o.navn.charAt(0).toLowerCase() + this.o.navn.slice(1);
         return {
-            tekst: "Chromoforen har " + N + " konjugerede dobbeltbinding" + (N === 1 ? "" : "er") + ". Hvilken farve har stoffet?",
+            tekst: "Chromoforen har " + N + " konjugerede dobbeltbinding" + (N === 1 ? "" : "er") + ". Hvilken farve har en opløsning af " + navn + "?",
             farver: true,
             svar: SVAR.map(function (navn) {
                 var f = D.FARVER.filter(function (x) { return x.navn === navn; })[0];

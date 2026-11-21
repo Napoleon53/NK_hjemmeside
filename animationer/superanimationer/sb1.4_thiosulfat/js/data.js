@@ -116,13 +116,13 @@
             id: "samme",
             lav: function () {
                 return {
-                    tekst: "Hvad er det samme, hver gang krydset forsvinder?",
+                    tekst: "Hvilken størrelse er den samme i alle målinger, når krydset forsvinder?",
                     valg: [
                         { tekst: "Mængden af dannet svovl", rigtig: true,
                           forklaring: "Der skal lige meget svovl til at skjule krydset. Alle kurverne når den stiplede streg." },
-                        { tekst: "Tiden", rigtig: false,
+                        { tekst: "Tiden Δt", rigtig: false,
                           forklaring: "Tiden Δt er forskellig fra måling til måling, og det er Δt, du måler." },
-                        { tekst: "Alt thiosulfat er brugt", rigtig: false,
+                        { tekst: "[S₂O₃²⁻], der er faldet til 0", rigtig: false,
                           forklaring: "Kun omkring 1 % af thiosulfatet er forbrugt, når krydset forsvinder. Reaktionen fortsætter længe efter." },
                         { tekst: "Hastigheden", rigtig: false,
                           forklaring: "Hastigheden er forskellig fra blanding til blanding, og derfor er tiderne forskellige." }
@@ -143,8 +143,8 @@
                 var a = krydsDt(blA.vThio), b = krydsDt(blB.vThio), f = a / b;
                 var cA = molaer(blA.c), cB = molaer(blB.c);
                 return {
-                    tekst: "Med [S₂O₃²⁻] = " + cA + " i glasset var Δt = " + a + " s, og med [S₂O₃²⁻] = " + cB + " var Δt = " + b +
-                        " s. Hvor mange gange større var hastigheden med " + cB + "?",
+                    tekst: "Med [S₂O₃²⁻] = " + cA + " var Δt = " + a + " s. Med [S₂O₃²⁻] = " + cB + " var Δt = " + b +
+                        " s. Hvor mange gange større er hastigheden ved [S₂O₃²⁻] = " + cB + " end ved " + cA + "?",
                     valg: [
                         { tekst: NK.faktor(f) + " gange", rigtig: true,
                           forklaring: "Den samme mængde svovl blev dannet på kortere tid. 1/Δt er " + NK.bet(1 / b, 2) + " s⁻¹ mod " + NK.bet(1 / a, 2) + " s⁻¹ og dermed " + NK.faktor(f) + " gange større." },
@@ -169,8 +169,8 @@
                 var pct = M.S_KRYDS / bl.c * 100;
                 var c = molaer(bl.c), sv = NK.bet(M.S_KRYDS, 2) + " M";
                 return {
-                    tekst: "Med " + bl.vThio + " mL Na₂S₂O₃ er [S₂O₃²⁻] = " + c + " i glasset. Krydset er væk, når der er dannet " +
-                        sv + " svovl. Hvor stor en del af thiosulfatet er forbrugt?",
+                    tekst: "Med " + bl.vThio + " mL Na₂S₂O₃ er [S₂O₃²⁻] = " + c + " i glasset. Krydset forsvinder, når der er dannet " +
+                        sv + " svovl. Hvor stor en del af thiosulfatet er forbrugt, når krydset forsvinder?",
                     valg: [
                         { tekst: "Ca. " + NK.bet(pct, 2) + " %", rigtig: true,
                           forklaring: "Der dannes ét S pr. S₂O₃²⁻, og " + sv + " af " + c +
@@ -247,7 +247,7 @@
                     { v: M.C_THIO * b[0] / (b[0] + b[1]), f: "Vandet tæller med: " + b[0] + " + " + b[1] + " + " + b[2] + " = " + v + " mL." }
                 ];
                 return {
-                    tekst: "Beregn [S₂O₃²⁻] i en blanding af " + b[0] + " mL " + M.THIO_TEKST + " Na₂S₂O₃, " + b[1] + " mL HCl og " + b[2] + " mL vand.",
+                    tekst: "Hvad er [S₂O₃²⁻] i en blanding af " + b[0] + " mL " + M.THIO_TEKST + " Na₂S₂O₃, " + b[1] + " mL HCl og " + b[2] + " mL vand?",
                     valg: [{ tekst: molaer(c), rigtig: true,
                         forklaring: "[S₂O₃²⁻] = " + M.THIO_TEKST + " · " + b[0] + " mL / " + v + " mL = " + molaer(c) + "." }]
                         .concat(forkert.map(function (x) { return { tekst: molaer(x.v), rigtig: false, forklaring: x.f }; })),
@@ -260,7 +260,7 @@
             id: "halver",
             lav: function () {
                 return {
-                    tekst: "Du halverer [S₂O₃²⁻] og holder alt andet konstant. Hvad sker der med Δt?",
+                    tekst: "Alt andet end [S₂O₃²⁻] holdes konstant. Hvad sker der med Δt, når [S₂O₃²⁻] halveres?",
                     valg: [
                         { tekst: "Δt fordobles", rigtig: true,
                           forklaring: "Hastigheden halveres, så det tager dobbelt så lang tid at danne den samme mængde svovl." },
@@ -281,7 +281,7 @@
             lav: function () {
                 var a = dt(20, 5, 25), b = dt(20, 10, 20);
                 return {
-                    tekst: "Du fordobler [H₃O⁺] ved konstant [S₂O₃²⁻]. Hvad sker der med hastigheden?",
+                    tekst: "[S₂O₃²⁻] holdes konstant. Hvad sker der med hastigheden, når [H₃O⁺] fordobles?",
                     valg: [
                         { tekst: "Den stiger kun lidt", rigtig: true,
                           forklaring: "Med 5 mL HCl er Δt = " + sek(a) + ", og med 10 mL HCl er Δt = " + sek(b) + ". Reaktionen kræver syre, men mere syre øger kun hastigheden lidt." },
@@ -362,8 +362,8 @@
                 var p = this.par[this.nr++ % this.par.length];
                 var a = tempDt(p[0]), b = tempDt(p[1]), f = a / b;
                 return {
-                    tekst: "Ved " + p[0] + " °C var Δt = " + s(a) + ", og ved " + p[1] + " °C var Δt = " + s(b) +
-                        ". Hvor mange gange større var hastigheden ved " + p[1] + " °C?",
+                    tekst: "Ved " + p[0] + " °C var Δt = " + s(a) + ". Ved " + p[1] + " °C var Δt = " + s(b) +
+                        ". Hvor mange gange større er hastigheden ved " + p[1] + " °C end ved " + p[0] + " °C?",
                     valg: [
                         { tekst: "Ca. " + NK.tal(f, 1) + " gange", rigtig: true,
                           forklaring: "1/Δt blev " + NK.bet(1 / b, 3) + " s⁻¹ mod " + NK.bet(1 / a, 3) + " s⁻¹. Det er ca. " + NK.tal(f, 1) + " gange større." },
@@ -446,7 +446,7 @@
             lav: function () {
                 var a = tempDt(20), b = tempDt(10);
                 return {
-                    tekst: "Blandingen køles til 10 °C. Hvad sker der med Δt i forhold til Δt ved 20 °C?",
+                    tekst: "Hvad sker der med Δt, når blandingen køles fra 20 °C til 10 °C?",
                     valg: [
                         { tekst: "Den bliver ca. dobbelt så lang", rigtig: true,
                           forklaring: "Når temperaturen falder 10 °C, halveres hastigheden omtrent. Δt er " + s(a) + " ved 20 °C og " + s(b) + " ved 10 °C." },

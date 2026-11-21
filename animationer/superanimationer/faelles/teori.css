@@ -1,0 +1,153 @@
+/* =====================================================================
+   faelles/teori.css - teorien (knappen Teori og tasten T) som et roligt,
+   lyst ark med Lexend
+
+   Brugeren 21. nov. 2026 om teorien i sc5.7 og sb5.2: "ret grimme fede
+   skrifttyper, som overvælder øjnene og skaber panik. Der kommer for meget
+   på en gang ... I forhold til teori-afsnit må der gerne stå mindre og med
+   en mere elegant skrifttype, og måske en henvisning, der fører læseren
+   tilbage til kemibogen."
+
+   Saadan slaas det til i en animation (efter stil.css og papirkort.css):
+     <link rel="stylesheet" href="../faelles/teori.css">
+   og teorien faar klassen "teori-ark" paa .overlay-boks:
+     <div class="overlay" id="teori"><div class="overlay-boks teori-ark"> ...
+   Sidst i arket staar henvisningen til Kemibogen:
+     <p class="teori-bog">Læs mere i Kemibogen:
+        <a href="https://kemibogen.dk/b/kapitler/..." target="_blank" rel="noopener">B5.2 ...</a></p>
+
+   Teksten skal ogsaa vaere kort: det vigtigste, formlen og et lille
+   eksempel. Resten staar i bogen.
+   Klasserne i teorien (h2, p, h3.teori-hoved, .eksempel, .eksempel-hoved,
+   .teori-trin, p.genveje, .vbroek) er de samme i alle animationer.
+   ===================================================================== */
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("lexend/lexend-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("lexend/lexend-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html body .overlay-boks.teori-ark {
+    max-width: 560px;
+    padding: 24px 28px 20px;
+    border: 1px solid #d9d4c6;
+    border-radius: 12px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    font-weight: 350;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+html body .overlay-boks.teori-ark h2 {
+    margin: 0 0 12px;
+    color: #1d2433;
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+html body .overlay-boks.teori-ark p,
+html body .overlay-boks.teori-ark .teori-trin li {
+    margin: 0 0 9px;
+    color: #2d3443;
+    font-size: 0.9rem;
+    font-weight: 350;
+    line-height: 1.6;
+}
+
+html body .overlay-boks.teori-ark b,
+html body .overlay-boks.teori-ark strong { font-weight: 500; color: #1d2433; }
+
+/* Mellemoverskrifter: almindelig skrift, ingen versaler */
+html body .overlay-boks.teori-ark h3.teori-hoved {
+    margin: 18px 0 6px;
+    color: #1d2433;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+html body .overlay-boks.teori-ark .teori-trin { margin: 0 0 10px; padding-left: 20px; }
+html body .overlay-boks.teori-ark .teori-trin li { margin-bottom: 4px; }
+html body .overlay-boks.teori-ark .teori-trin li::marker { color: #8a8578; font-weight: 400; }
+
+/* Formler og eksempler: en stille ramme, ikke fed */
+html body .overlay-boks.teori-ark .eksempel {
+    margin: 6px 0 12px;
+    padding: 9px 14px;
+    border: 1px solid #e4dfd2;
+    border-left: 3px solid #b9b2a0;
+    border-radius: 0 8px 8px 0;
+    background-color: #f3f1ea;
+    color: #1d2433;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+html body .overlay-boks.teori-ark .eksempel-hoved {
+    display: block;
+    margin-bottom: 3px;
+    color: #6b6558;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+html body .overlay-boks.teori-ark .vbroek span:first-child { border-bottom-color: #1d2433; }
+
+/* Henvisningen til Kemibogen */
+html body .overlay-boks.teori-ark p.teori-bog {
+    margin: 16px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid #e4dfd2;
+    color: #2d3443;
+    font-size: 0.9rem;
+}
+
+html body .overlay-boks.teori-ark p.teori-bog a {
+    color: #2a76ac;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+html body .overlay-boks.teori-ark p.genveje { margin-top: 10px; color: #8a8578; font-size: 0.78rem; }
+
+html body .overlay-boks.teori-ark kbd {
+    border-color: #c9c3b3;
+    background-color: #f3f1ea;
+    color: #3a4150;
+    font-weight: 400;
+}
+
+/* Luk: en stille knap */
+html body .overlay-boks.teori-ark .knap.blaa,
+html body .overlay-boks.teori-ark [data-luk] {
+    border: 1px solid #c9c3b3;
+    background: #ffffff;
+    color: #1d2433;
+    font-family: inherit;
+    font-weight: 500;
+    box-shadow: none;
+}
+
+html body .overlay-boks.teori-ark [data-luk]:hover { border-color: #8a8578; background: #f3f1ea; }
+
+html body .overlay-boks.teori-ark::-webkit-scrollbar { width: 8px; }
+html body .overlay-boks.teori-ark::-webkit-scrollbar-thumb { background: #d9d4c6; border-radius: 4px; }

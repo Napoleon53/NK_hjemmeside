@@ -42,7 +42,9 @@
         NK.el("k-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el("k-liste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-opg]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
+            if (!k) return;
+            var i = parseInt(k.getAttribute("data-opg"), 10);
+            if (mig.aabenOpgave(i)) mig.vaelg(i);
         });
     }
 
@@ -84,22 +86,38 @@
         var html = "";
         this.opgaver.forEach(function (o, i) {
             html += '<button type="button" class="opg-chip serie" data-opg="' + i + '">' +
-                '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" +
-                '<span class="serie-navn">' + NK.html(o.syre) + " og " + NK.html(o.alkohol) + '<small class="k-esternavn"></small></span></span>' +
-                '<i class="oc-m"></i></button>';
+                '<span class="oc-f"></span><i class="oc-m"></i></button>';
         });
         NK.el("k-liste").innerHTML = html;
+    };
+
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun
+       de loeste reaktioner og den, eleven er ved, viser titlen. De kommende
+       staar som et nummer med en graa streg og kan ikke klikkes, til eleven
+       er naaet dertil: alle foer den er loest (Vis svaret taeller som
+       loest), eller eleven har vaeret der. */
+    P.aabenOpgave = function (i) {
+        if (this.status[i].loest || (this.naaet && this.naaet[i])) return true;
+        for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+        return true;
     };
 
     P.visListe = function () {
         var knapper = NK.el("k-liste").querySelectorAll("[data-opg]");
         for (var i = 0; i < knapper.length; i++) {
-            var s = this.status[i];
+            var s = this.status[i], o = this.opgaver[i], aaben = this.aabenOpgave(i);
+            var html = '<span class="oc-nr">' + (i + 1) + "</span>" + (aaben ?
+                '<span class="serie-navn">' + NK.html(o.syre) + " og " + NK.html(o.alkohol) + '<small class="k-esternavn">' +
+                (s.loest ? "giver " + NK.html(K.byg(o.syre, o.alkohol).navn) : "") + "</small></span>" : '<span class="hl-streg"></span>');
+            var f = knapper[i].querySelector(".oc-f");
+            if (f.innerHTML !== html) f.innerHTML = html;
+            knapper[i].classList.toggle("laast", !aaben);
+            knapper[i].disabled = !aaben;
+            knapper[i].setAttribute("aria-label", aaben ? o.syre + " og " + o.alkohol : "Opgave " + (i + 1) + ", kommer senere");
             knapper[i].classList.toggle("valgt", i === this.nr);
             knapper[i].classList.toggle("loest", s.loest);
             knapper[i].classList.toggle("stjerne", s.stjerne);
             knapper[i].querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : "");
-            knapper[i].querySelector(".k-esternavn").textContent = s.loest ? "giver " + K.byg(this.opgaver[i].syre, this.opgaver[i].alkohol).navn : "";
         }
         NK.saetTekst("k-loest", String(this.antalLoest()));
         /* Farverne forklares, naar eleven har set en ester */
@@ -109,6 +127,8 @@
     /* ----- En opgave ------------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[i] = true;
         this.opg = this.opgaver[i];
         this.trinNr = 0;
         this.kendt = {};
@@ -140,11 +160,11 @@
     P.kortData = function () {
         var mig = this, tr = this.trin(), chip = "Opgave " + (this.nr + 1), o = this.opg;
         if (tr === "vand")
-            return { slags: "opgave", chip: chip, tekst: D.stor(o.syre) + " og " + o.alkohol + " danner en ester, og der fraspaltes vand. Klik på de tre atomer, der bliver til vand, og tryk Indsend svar." };
+            return { slags: "opgave", chip: chip, tekst: "Hvilke tre atomer fraspaltes som vand, når " + o.syre + " og " + o.alkohol + " danner en ester? Klik på dem i formlerne, og tryk Indsend svar." };
         if (tr === "reaktion")
             return { slags: "opgave", chip: "Reaktionen", tekst: "Syrens OH-gruppe og alkoholens H fraspaltes som vand. Alkoholens oxygenatom binder sig til syrens carbonatom." };
         return {
-            slags: "spm", chip: chip, tekst: "Esteren er dannet af " + o.syre + " og " + o.alkohol + ". Hvad hedder esteren?",
+            slags: "spm", chip: chip, tekst: "Hvad hedder esteren af " + o.syre + " og " + o.alkohol + "?",
             svar: this.navne.map(function (v, j) { return { t: v.t, valgt: mig.valgt === j, forkert: !!mig.forkert[j] }; })
         };
     };
@@ -266,6 +286,7 @@
 
     P.forfra = function () {
         this.status = this.opgaver.map(function () { return { loest: false, stjerne: false }; });
+        this.naaet = {};
         this.gem();
         this.vaelg(0);
     };

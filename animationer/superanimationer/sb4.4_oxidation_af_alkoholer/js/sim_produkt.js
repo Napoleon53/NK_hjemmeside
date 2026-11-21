@@ -184,8 +184,8 @@
             };
         }
         var m = this.opg.o.maade, tekst;
-        if (m) tekst = D.MAADE[m].tekst + " Hvad bliver " + navn + " til?";
-        else tekst = navn.charAt(0).toUpperCase() + navn.slice(1) + " oxideres med " + D.MIDLER[this.opg.o.middel].navn + ". Hvad dannes?";
+        if (m) tekst = D.MAADE[m].tekst + " Hvad bliver " + navn + " til" + (D.MAADE[m].ved ? " " + D.MAADE[m].ved : "") + "?";
+        else tekst = "Hvad dannes, når " + navn + " oxideres med " + D.MIDLER[this.opg.o.middel].navn + "?";
         return {
             slags: "opgave", chip: "Opgave " + (this.nr + 1),
             tekst: tekst + " Klik på svaret på tavlen, og tryk Indsend svar."

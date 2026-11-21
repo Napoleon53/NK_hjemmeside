@@ -528,6 +528,10 @@ kbd {
 .oc-m { font-style: normal; font-size: 0.78rem; color: #7ee0a8; }
 .oc-m:empty { display: none; }
 .opg-chip.stjerne .oc-m { color: var(--gul); }
+/* Laaste titler (21. nov. 2026): et kommende molekyle er et nummer med en graa streg */
+.opg-chip.laast { cursor: default; color: var(--tekst-mat); align-items: center; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.oc-streg { display: inline-block; width: 1.8em; height: 8px; margin-left: 6px; border-radius: 4px; background-color: #4a4a58; }
 
 .forfraknap {
     background-color: rgba(20, 20, 28, 0.85);

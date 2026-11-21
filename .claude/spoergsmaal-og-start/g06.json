@@ -1,0 +1,443 @@
+[
+  {
+    "mappe": "sc3.1_elektronprikformler",
+    "titel": "Elektronprikformler",
+    "sprog": [
+      {
+        "fane": "2 Find fejlen",
+        "opgave": "Find fejlen (alle tolv tegninger)",
+        "fil": "js/sim_fejl.js",
+        "linje": 78,
+        "nu_alm": "En elev har tegnet prikformlen for H₂O. Klik på det atom, der er tegnet forkert. Er tegningen rigtig, så vælg Ingen fejl.",
+        "nu_fed": "",
+        "nu_svar": ["(klik på et atom i tegningen)", "Ingen fejl"],
+        "problem": "Kortet har intet spørgsmål, så intet står med fed. Selve opgaven (hvilket atom er forkert) står midt i en instruktion.",
+        "nyt_alm": "En elev har tegnet prikformlen for H₂O. Klik på atomet i tegningen, eller vælg Ingen fejl.",
+        "nyt_fed": "Hvilket atom er tegnet forkert i elevens prikformel for H₂O?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Byg",
+        "billede": "skud/a/sc3.1_elektronprikformler__0.png",
+        "dom": "fint",
+        "fremme": "Kortet, ét hydrogenatom med stiplede elektronpladser og mærkatet 'Klik på de stiplede pladser', det periodiske system med hovedgrupperne",
+        "bruges": "Atomet og det periodiske system (hovedgruppen giver antallet af elektroner)",
+        "forslag": [],
+        "andet": "Fanen er allerede stilladseret: atomet bygges først, så molekylet, så tæller eleven efter.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Find fejlen",
+        "billede": "skud/a/sc3.1_elektronprikformler__1.png",
+        "dom": "fint",
+        "fremme": "Kortet med knappen Ingen fejl og elevens tegning af H₂O",
+        "bruges": "Alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Byg atomet og Byg molekylet er instruktioner uden spørgsmål. Det er i orden, fordi eleven bygger. Find fejlen er derimod et spørgsmål forklædt som instruktion."
+  },
+  {
+    "mappe": "sc3.2_rumlig_opbygning",
+    "titel": "Molekylers rumlige opbygning",
+    "sprog": [
+      {
+        "fane": "1 Byg molekylet",
+        "opgave": "Opgave 9 (formen omkring carbon i ethen)",
+        "fil": "js/sim_byg.js",
+        "linje": 131,
+        "nu_alm": "Her er ethen.",
+        "nu_fed": "Hvilken form har atomerne omkring et af carbonatomerne?",
+        "nu_svar": ["Lineær", "Vinklet", "Plan", "Pyramide", "Tetraeder"],
+        "problem": "Det fede spørgsmål siger ikke, hvilket molekyle carbonatomerne sidder i. 'Her er' peger bare på scenen.",
+        "nyt_alm": "Ethen, C₂H₄, står i scenen.",
+        "nyt_fed": "Hvilken form har atomerne omkring hvert carbonatom i ethen?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Byg molekylet",
+        "billede": "skud/b/sc3.2_rumlig_opbygning__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med Start opgave 1, et methanmolekyle i 3D og knappen Vinkelmåler. Panelet har atomknapperne og Det har du bygget.",
+        "bruges": "Første opgave (Byg ethen) bruger atomknapperne og molekylet",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Molekylerne",
+        "billede": "skud/b/sc3.2_rumlig_opbygning__1.png",
+        "dom": "fint",
+        "fremme": "Kortet, vandmolekylet i 3D med frie elektronpar, boksen Prikformel og Vinkelmåler. Panelet har 11 molekyleknapper og formen, vinklen og de frie par.",
+        "bruges": "Molekylet og prikformlen. Panelets svar bliver til ? under opgaven.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Selvtesten i sc3.4 afviser tekster, der begynder med 'Her'. Samme regel kunne gælde opgaveteksten i sim_byg.js:131."
+  },
+  {
+    "mappe": "sc3.3_polaere_molekyler",
+    "titel": "Polære molekyler",
+    "sprog": [
+      {
+        "fane": "2 Polær eller upolær?",
+        "opgave": "Opgave 3 (CO₂ eller CCl₄ er upolært)",
+        "fil": "js/sim_polaritet.js",
+        "linje": 76,
+        "nu_alm": "Bindingerne i CO₂ er polære.",
+        "nu_fed": "Hvorfor er molekylet alligevel upolært?",
+        "nu_svar": ["Bindingernes træk ophæver hinanden", "Atomerne trækker lige hårdt", "Bindingerne er for korte", "Der er ingen frie elektronpar"],
+        "problem": "'Molekylet' og 'alligevel' peger tilbage. Det fede spørgsmål siger hverken hvilket molekyle eller at bindingerne er polære.",
+        "nyt_alm": "Bindingerne i CO₂ er polære.",
+        "nyt_fed": "Hvorfor er CO₂ upolært, selvom bindingerne er polære?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Forsøg: vandstrålen",
+        "opgave": "Opgave 3 (strålen bøjer mod begge stave)",
+        "fil": "js/sim_vandstraale.js",
+        "linje": 115,
+        "nu_alm": "Strålen bøjer mod både den positive og den negative stav.",
+        "nu_fed": "Hvad viser det?",
+        "nu_svar": ["Vandmolekylerne er polære, ikke ladede", "Vandet er positivt ladet", "Vandet er negativt ladet", "Stavene har samme ladning"],
+        "problem": "Det fede spørgsmål er helt indforstået. Iagttagelsen står kun i den almindelige skrift.",
+        "nyt_alm": "Du har holdt begge stave tæt på vandstrålen.",
+        "nyt_fed": "Hvorfor bøjer vandstrålen mod både den positive og den negative stav?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Elektronegativitet (og 2 Polær eller upolær?)",
+        "opgave": "Opgave 1 (hvilket atom bliver δ−)",
+        "fil": "js/sim_en.js",
+        "linje": 149,
+        "nu_alm": "Klik på det atom i H-Cl, der bliver δ−.",
+        "nu_fed": "",
+        "nu_svar": ["(klik på et atom i scenen)"],
+        "problem": "Kortet har intet spørgsmål, så intet står med fed. Samme tekst står i sim_polaritet.js:53 med fx H₂O.",
+        "nyt_alm": "Klik på et af de to atomer i scenen.",
+        "nyt_fed": "Hvilket atom i bindingen H-Cl bliver δ−?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Elektronegativitet",
+        "billede": "skud/b/sc3.3_polaere_molekyler__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kortet med Start opgave 1, to store atomer (H og Cl) med elektronsky, δ+ og δ−, EN-tal og navne, billedteksten 'Cl trækker hårdest ...' og ΔEN-skalaen med tre farvede felter og markør. Panelet har et periodisk system med 19 felter og EN-tal, boksen Bindingen med regnestykket og mærket POLÆR, og to visningsvalg.",
+        "bruges": "Opgave 1 (hvilket atom bliver δ−) bruger kun de to atomer og deres EN-tal. ΔEN-skalaen, regnestykket og mærket bruges først i opgave 2, det periodiske system først i opgave 3.",
+        "forslag": [
+          {
+            "alm": "Tallet under hvert atom er atomets elektronegativitet.",
+            "fed": "Hvilket atom i bindingen H-Cl har den største elektronegativitet?",
+            "svar": ["Cl", "H", "De er lige store"],
+            "derefter": "Elektronparret glider hen mod Cl, og elektronskyen bliver tættest ved Cl."
+          },
+          {
+            "alm": "Atomet med den største elektronegativitet trækker elektronparret til sig.",
+            "fed": "Hvilket atom i bindingen H-Cl bliver δ−?",
+            "svar": ["Cl", "H", "Ingen af dem"],
+            "derefter": "δ+ og δ− kommer frem ved atomerne."
+          },
+          {
+            "alm": "ΔEN er forskellen mellem de to atomers elektronegativitet.",
+            "fed": "Hvor stor er ΔEN for bindingen H-Cl?",
+            "svar": ["0,9", "5,1", "2,1"],
+            "derefter": "Regnestykket 3,0 − 2,1 = 0,9 kommer frem i panelet, og markøren lander på ΔEN-skalaen."
+          },
+          {
+            "alm": "ΔEN-skalaen har grænserne 0,5 og 2,0.",
+            "fed": "Hvilken slags binding er H-Cl, når ΔEN er 0,9?",
+            "svar": ["Polær", "Upolær", "Ionbinding"],
+            "derefter": "Mærket POLÆR kommer frem i panelet, og det periodiske system låses op, så eleven kan sætte andre atomer sammen."
+          }
+        ],
+        "andet": "Fra start står ΔEN-skalaen og boksen Bindingen som stiplede rammer ('ΔEN-skalaen', 'regnestykket'), og δ+ og δ− er skjult. Billedteksten nederst kan vente, til trinnene er løst. Alle dele findes allerede (skjul.skift og skjul.type).",
+        "gevinst": "Den svage elev møder ét begreb ad gangen (EN, δ, ΔEN, bindingstype) i stedet for syv ting på én skærm.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Polær eller upolær?",
+        "billede": "skud/b/sc3.3_polaere_molekyler__1.png",
+        "dom": "fint",
+        "fremme": "Kortet, vandmolekylet i 3D med δ+ og δ− og pile for træk i bindingerne, boksen Prikformel. Panelet har molekyleknapper, visningsvalg og bindingstabellen med ΔEN.",
+        "bruges": "Molekylet med δ og pilene (Er X polært eller upolært?)",
+        "forslag": [],
+        "andet": "Prikformlen bruges ikke i opgaverne på fanen. Den kunne være slået fra fra start.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Forsøg: vandstrålen",
+        "billede": "skud/b/sc3.3_polaere_molekyler__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med ét skridt ('Klik på en hane ...'), tre haner, vasken, to stave og uldkluden. Panelet har skemaet med ? og den låste tegneserie.",
+        "bruges": "Kortet fører eleven skridt for skridt gennem forsøget. Opgaverne kommer først, når skemaet er udfyldt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Under δ−-opgaven på fane 1 skifter billedteksten nederst i scenen til spørgsmålet 'Hvem trækker hårdest i elektronparret?' (sim_en.js:430). Det giver et andet spørgsmål nederst i scenen ud over kortet, mod reglen om ingen tekstlinje nederst."
+  },
+  {
+    "mappe": "sc3.4_blandbarhed",
+    "titel": "Blandbarhed",
+    "sprog": [
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Opgave 1 (olie i vand)",
+        "fil": "js/tekster.js",
+        "linje": 52,
+        "nu_alm": "Der er vand i bassinet. Du hælder olie i.",
+        "nu_fed": "Hvad ser du i glasset, når væskerne er faldet til ro?",
+        "nu_svar": ["Ét lag", "To lag med olien øverst", "To lag med olien nederst"],
+        "problem": "'Væskerne' siger ikke hvilke. At der hældes olie i vand, står kun i den almindelige skrift.",
+        "nyt_alm": "Der er vand i bassinet. Du hælder olie i.",
+        "nyt_fed": "Hvad ser du i glasset, når olien og vandet er faldet til ro?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Opgave 2 (ethanol i vand)",
+        "fil": "js/tekster.js",
+        "linje": 65,
+        "nu_alm": "Der er vand i bassinet. Du hælder ethanol i. Ethanol har en lavere densitet end vand.",
+        "nu_fed": "Hvad ser du, når væskerne er faldet til ro?",
+        "nu_svar": ["Ét lag", "To lag med ethanol øverst", "Uklart som rystet olie og vand"],
+        "problem": "'Væskerne' siger ikke, at det er ethanol og vand.",
+        "nyt_alm": "Der er vand i bassinet. Du hælder ethanol i. Ethanol har en lavere densitet end vand.",
+        "nyt_fed": "Hvad ser du i glasset, når ethanolen og vandet er faldet til ro?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Opgave 3 (olie i ethanol)",
+        "fil": "js/tekster.js",
+        "linje": 78,
+        "nu_alm": "Der er ethanol i bassinet. Du hælder olie i.",
+        "nu_fed": "Hvad ser du, når væskerne er faldet til ro?",
+        "nu_svar": ["To lag med olien øverst", "To lag med olien nederst", "Ét lag, ethanol har en upolær del"],
+        "problem": "Det fede spørgsmål er ordret det samme som i opgave 2, men væskerne er nu olie og ethanol. Det kan eleven kun se i den almindelige skrift.",
+        "nyt_alm": "Der er ethanol i bassinet. Du hælder olie i.",
+        "nyt_fed": "Hvad ser du i glasset, når olien og ethanolen er faldet til ro?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Opgave 4 (ryst olie og vand)",
+        "fil": "js/tekster.js",
+        "linje": 91,
+        "nu_alm": "Olien ligger på vandet. Du ryster bassinet kraftigt.",
+        "nu_fed": "Hvad ser du lidt efter?",
+        "nu_svar": ["Uklart først, så to lag igen", "Ét lag, fordi væskerne er blandet", "Uklart hele tiden"],
+        "problem": "Det fede spørgsmål siger hverken, hvad der er i bassinet, eller at der er rystet.",
+        "nyt_alm": "Olien ligger på vandet. Du ryster bassinet kraftigt.",
+        "nyt_fed": "Hvad ser du i glasset, efter at olie og vand er rystet sammen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Opgave 6 (varm vand og ethanol)",
+        "fil": "js/tekster.js",
+        "linje": 113,
+        "nu_alm": "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C.",
+        "nu_fed": "Hvad sker der?",
+        "nu_svar": ["Det koger, dampen er mest ethanol", "Begge stoffer koger lige meget", "Intet, før blandingen når 100 °C"],
+        "problem": "Det fede spørgsmål har hverken stofferne eller temperaturen med.",
+        "nyt_alm": "Vand og ethanol er blandet til ét lag.",
+        "nyt_fed": "Hvad sker der, når blandingen af vand og ethanol varmes op til 90 °C?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "(ingen faner)",
+        "billede": "skud/b/sc3.4_blandbarhed__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med Start opgave 1, bassinet med vand som kugler, tragten og køleren, glasset 'Sådan ser det ud'. Panelet har Hæld i og Ryst og varm (temperaturskyder, tilbagesvaling eller destillation, Tøm bassinet).",
+        "bruges": "Opgave 1 bruger bassinet og glasset (olie i vand)",
+        "forslag": [],
+        "andet": "Scenen er rolig. Kortet Ryst og varm i panelet bruges først i opgave 4 og 6 og kunne være foldet ind indtil da.",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fire af seks opgaver gemmer hele situationen (hvilke væsker, rystet, 90 °C) i den almindelige skrift. Opgave 5 ('Få den til at ligge nederst') er en byggeopgave uden spørgsmål, og det er fint. Quizzen står i et vindue uden papirkort og er ikke gennemgået."
+  },
+  {
+    "mappe": "sc3.5_vand_eller_heptan",
+    "titel": "Vand eller heptan",
+    "sprog": [],
+    "start": [
+      {
+        "fane": "1 Forsøget",
+        "billede": "skud/b/sc3.5_vand_eller_heptan__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med Spørgsmål 1 af 3, stativet med vand og heptan, kortet med vands formel og δ+ og δ−. Panelet har det tomme skema.",
+        "bruges": "Formlen og glassene. Fanen er allerede stilladseret med tre spørgsmål (vand, heptan, reglen), før stofferne testes.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Gæt polaritet",
+        "billede": "skud/b/sc3.5_vand_eller_heptan__1.png",
+        "dom": "fint",
+        "fremme": "Kortet (Klik på de polære grupper i urinstof), de to glas med mærkerne polært og upolært, formlen for urinstof med tællesøjlen, bægerglas med spatel. Panelet har Runden og Sorteret.",
+        "bruges": "Formlen (grupperne), bagefter glassene",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Spørgsmålene står alle selvstændigt ('Er glycerol polært eller upolært?'). Den eneste kandidat er 'Hvad blandes et polært stof med?' (data.js), som kunne være 'Blandes et polært stof med vand eller med heptan?', men den kan godt stå som den er."
+  },
+  {
+    "mappe": "sc4.1_kogepunkt",
+    "titel": "Alkaners kogepunkt",
+    "sprog": [
+      {
+        "fane": "2 Formen",
+        "opgave": "Gæt (hvilket stof koger først)",
+        "fil": "js/data.js",
+        "linje": 129,
+        "nu_alm": "Tre glas med C₅H₁₂ står i vandbadet.",
+        "nu_fed": "Hvilken ballon fyldes først?",
+        "nu_svar": ["pentan", "2-methylbutan", "2,2-dimethylpropan"],
+        "problem": "Der spørges om en ballon, men svarene er stoffer. At vandbadet varmes op, står ingen steder. Teksten sættes sammen i sim_form.js:293.",
+        "nyt_alm": "Tre glas med C₅H₁₂ står i vandbadet. Ballonen på et glas fyldes, når stoffet i glasset koger.",
+        "nyt_fed": "Hvilket af de tre stoffer koger først, når vandbadet varmes op?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Varm op",
+        "billede": "skud/b/sc4.1_kogepunkt__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kortet (Mål 1 af 4: Få pentan til at koge), hylden med 11 glas og formler, kammeret med glas og ballon, vinduet med ca. 24 molekyler i bevægelse og forklaringen fast/væske/gas, pauseknappen, det store termometer med håndtag, kaffekoppen og tændstikæsken. Panelet har den tomme kurve over kogepunkter.",
+        "bruges": "Mål 1 bruger kammeret, vinduet og termometeret. Hylden med de ti andre glas og kurven bruges først i mål 2.",
+        "forslag": [
+          {
+            "alm": "Glasset i kammeret indeholder pentan ved 20 °C. Vinduet viser molekylerne i glasset.",
+            "fed": "Hvilken tilstandsform har pentan ved 20 °C?",
+            "svar": ["Væske", "Gas", "Fast stof"],
+            "derefter": "Forklaringen fast, væske og gas over vinduet bliver fremhævet, og termometeret kommer frem."
+          },
+          {
+            "alm": "Når pentan koger, bliver væsken til gas.",
+            "fed": "Skal temperaturen i kammeret op eller ned, før pentan koger?",
+            "svar": ["Op", "Ned", "Hverken op eller ned"],
+            "derefter": "Håndtaget på termometeret får sin gule ring."
+          },
+          {
+            "alm": "Træk i håndtaget på termometeret. Tryk Indsend svar, når pentan koger.",
+            "fed": "Få pentan til at koge.",
+            "svar": [],
+            "derefter": "Det nuværende mål 1 som forsøg. Ballonen fyldes, og kogepunktet 36,1 °C bliver sat på kurven i panelet, som først kommer frem nu."
+          },
+          {
+            "alm": "Ballonen på glasset er nu fyldt med pentan som gas.",
+            "fed": "Hvad sker der med pentanmolekylerne, når pentan koger?",
+            "svar": ["De river sig løs fra hinanden", "De går i stykker til C og H", "De bliver større"],
+            "derefter": "Hylden med de andre alkaner låses op til mål 2."
+          }
+        ],
+        "andet": "Hylden står som stiplet ramme ('hylden med flere alkaner') til mål 2, og kurven i panelet står som stiplet ramme ('kurven med kogepunkter'), til det første kogepunkt er fundet.",
+        "gevinst": "Den svage elev ser kun pentan, vinduet og termometeret. Eleven forstår farverne i vinduet, før der skal varmes, og ved, hvad kogning er på molekylniveau.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Formen",
+        "billede": "skud/b/sc4.1_kogepunkt__1.png",
+        "dom": "fint",
+        "fremme": "Kortet med gættet, tre vinduer med molekyler og gule berøringsprikker, vandbadet med tre glas og balloner, termometeret. Panelet har listen med ? og knappen 'Se, hvor molekylerne rører hinanden'.",
+        "bruges": "Gættet bruger vinduerne med molekylernes form. Termometeret kommer i næste trin.",
+        "forslag": [],
+        "andet": "Det vigtigste er sproget i spørgsmålet (se sprog).",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Hvem koger først?",
+        "billede": "skud/b/sc4.1_kogepunkt__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med tre stoffer at vælge imellem, forklaringen med molekylerne, kammeret, vinduet med blandingen og termometeret. Panelet har Runden.",
+        "bruges": "Stofnavnene og molekylerne i vinduet",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3: 'Glasset indeholder en blanding. Hvilket stof koger først?' kan stå, fordi svarknapperne er stofferne. Fane 1: Målene er handlinger uden spørgsmål, og Indsend svar viser temperaturen ('Indsend svar: 20 °C'). Det er fint."
+  },
+  {
+    "mappe": "sc4.2_zigzagformler",
+    "titel": "Zigzagformler",
+    "sprog": [],
+    "start": [
+      {
+        "fane": "1 Zigzag",
+        "billede": "skud/b/sc4.2_zigzagformler__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med opgaven og næste skridt, tavlen med ét C-atom og 'træk', stregformlen på papiret. Panelet har retningen, C-atomer 1 af 3 og serien.",
+        "bruges": "Alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Navne",
+        "billede": "skud/b/sc4.2_zigzagformler__1.png",
+        "dom": "fint",
+        "fremme": "Kortet (Tegn 2-methylbutan), tavlen med C-atomet og en lys skitse af kæden. Panelet har retning, alkaner eller alkener, C-atomer og serien.",
+        "bruges": "Alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Isomerer",
+        "billede": "skud/b/sc4.2_zigzagformler__2.png",
+        "dom": "fint",
+        "fremme": "Kortet (Tegn en isomer af C₄H₁₀), tavlen med C-atomet. Panelet har formlerne og listen med to tomme pladser.",
+        "bruges": "Alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "4 Opløselighed",
+        "billede": "skud/b/sc4.2_zigzagformler__3.png",
+        "dom": "fint",
+        "fremme": "Kortet (Hvor opløses ethanol?), ethanol som zigzagformel og bægerglasset med heptan over vand. Panelet har Point, Liv og bunken.",
+        "bruges": "Molekylet og de to lag",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fanerne Zigzag, Navne og Isomerer har tegneopgaver uden spørgsmål. Det er naturligt for opgavetypen. 'Hvor opløses ethanol?' kan stå alene, fordi lagene er navngivet i scenen."
+  }
+]

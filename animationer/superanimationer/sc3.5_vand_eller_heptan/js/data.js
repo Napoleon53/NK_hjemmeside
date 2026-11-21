@@ -261,7 +261,7 @@
     D.START = [
         {
             id: "vand", kort: "vand", spm: "Er vand polært eller upolært?",
-            kontekst: "Oxygen trækker elektronerne til sig. Vandmolekylet får en negativ ende (δ−) og en positiv ende (δ+).",
+            kontekst: "Oxygen giver vandmolekylet en negativ ende (δ−) og en positiv ende (δ+).",
             svar: D.POL_SVAR, rigtig: "polaert",
             hint: "Et molekyle med en negativ og en positiv ende kaldes polært.",
             ros: "Rigtigt. Vand er polært.",
@@ -269,7 +269,7 @@
         },
         {
             id: "heptan", kort: "heptan", spm: "Er heptan polært eller upolært?",
-            kontekst: "Heptan består kun af carbon og hydrogen. Molekylet har ingen ladede ender.",
+            kontekst: "Heptan består kun af carbon og hydrogen. Det har ingen ladede ender.",
             svar: D.POL_SVAR, rigtig: "upolaert",
             hint: "Et molekyle uden en negativ og en positiv ende kaldes upolært.",
             ros: "Rigtigt. Heptan er upolært.",

@@ -375,7 +375,7 @@ function koerTest(W) {
     paastand("og klar, når der står noget", bi.classList.contains("klar"));
     bi.click();
     paastand("Indsend svar sender feltet, og der står ingen ros under det næste spørgsmål", S2.aktivtFelt().fase === "tal" &&
-        !/Rigtig/.test(d.getElementById("ber-besked").textContent) && /tallet/.test(d.getElementById("ber-ind").textContent));
+        !/Rigtig/.test(d.getElementById("ber-besked").textContent) && /Hvad er stofmængden af NaOH, n\(NaOH\)\?/.test(d.getElementById("ber-ind").textContent));
     /* Fane 3: et svar vaelger kun */
     klik('[data-fane="fane-forbrug"]');
     S3.nulstil(); S3.tilpas();

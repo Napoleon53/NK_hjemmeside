@@ -141,7 +141,7 @@ viser svaret. Efter et rigtigt svar bliver kortet på trinnet med svaret i grøn
 forklaringen under, og Næste står, hvor Indsend svar stod. Tøm udstillingen,
 Stil flaskerne tilbage og Øv prøven igen står i panelet. Linjen under scenen er
 væk. Udstillingen og flaskerne begynder under kortet (`kortZone()`, 150 px eller
-132 px på lave skærme), og selvtesten måler kortet i alle trin på 1400 × 860 og
+132 px på lave skærme, 147 px på fanen Formlerne på en lav skærm fra 1000 px bred), og selvtesten måler kortet i alle trin på 1400 × 860 og
 1100 × 660. Opråbet (fane 3) er et spil på tid, hvor eleven klikker i
 udstillingen, og det har intet papirkort. På fane 1 siger skiltene til N og O nu
 dinitrogen og dioxygen, fordi det er stoffet i luften; resten af animationen

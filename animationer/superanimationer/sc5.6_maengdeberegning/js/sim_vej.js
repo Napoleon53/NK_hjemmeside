@@ -50,7 +50,7 @@
     /* Opgaven paa kortet: den kendte masse og spoergsmaalet */
     P.kortTekst = function () {
         var o = this.x.o;
-        return "Givet: <b>" + D.tekstMasse(this.x.m) + "\u00a0g " + D.stof(o.kendt).formel + "</b>. " + NK.html(o.tekst);
+        return NK.html(o.tekst).replace("{m} g", D.tekstMasse(this.x.m) + "\u00a0g");
     };
 
     /* Scenen starter forfra: pulveret ligger paa vaegten */

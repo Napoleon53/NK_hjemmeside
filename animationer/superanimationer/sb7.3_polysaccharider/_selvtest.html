@@ -324,6 +324,41 @@ function koerTest(W) {
     });
     samlet("kortet slutter over tavlen på alle tre faner i fire størrelser, og alt kan tegnes", daek);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("7. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    function chips(id) { return [].slice.call(el(id).querySelectorAll(".opg-chip")); }
+    function laastChip(b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()); }
+    function trinLi(id) { return [].slice.call(el(id).querySelectorAll("li")); }
+    function laastLi(li) { return li.classList.contains("laast") && !!li.querySelector(".tr-streg") && /^\d+$/.test(li.textContent.trim()); }
+    function tekstAf(l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); }
+    NK.visFane("fane-k"); k1.tilpas();
+    k1.naaet = {}; k1.trinMaks = {}; k1.forfra();
+    var kc = chips("k-liste"), kt = trinLi("k-trin");
+    paastand("fane 1: ved start har kun Amylose og trin 1 en titel; Cellulose og trin 2 og 3 er et nummer med en grå streg og kan ikke klikkes",
+        kc.length === 2 && /Amylose/.test(kc[0].textContent) && !kc[0].disabled && laastChip(kc[1]) &&
+        kt.length === 3 && /Vælg glucosen/.test(kt[0].textContent) && kt.slice(1).every(laastLi), tekstAf(kc) + " / " + tekstAf(kt));
+    kc[1].click();
+    paastand("fane 1: et klik på en låst opgave gør intet", k1.nr === 0);
+    k1.visSvar(); tid(k1, 2); k1.videreKlik(); tid(k1, 2);
+    kt = trinLi("k-trin");
+    paastand("fane 1: titlen på trin 2 kommer frem, når trin 1 er løst", k1.trinNr === 1 && !laastLi(kt[1]) && laastLi(kt[2]), tekstAf(kt));
+    k1.visSvar(); tid(k1, 2); k1.videreKlik(); k1.udfoer(); tid(k1, 12);
+    k1.visSvar(); tid(k1, 2);
+    kc = chips("k-liste");
+    paastand("fane 1: Vis svaret tæller som løst: når opgave 1 er løst, kommer titlen på opgave 2 frem", k1.status[0].loest && /Cellulose/.test(kc[1].textContent) && !kc[1].disabled, tekstAf(kc));
+    k1.forfra();
+    [["fane-g", g2, "g-trin"], ["fane-i", i3, "i-trin"]].forEach(function (x) {
+        NK.visFane(x[0]); x[1].tilpas();
+        x[1].trinMaks = {}; x[1].forfra();
+        var lt = trinLi(x[2]), navn1 = x[1].trinListe[1].navn;
+        paastand(x[0] + ": ved start har kun trin 1 sin titel; de andre er et nummer med en grå streg",
+            lt.length === x[1].trinListe.length && lt[0].textContent.indexOf(x[1].trinListe[0].navn) >= 0 && lt.slice(1).every(laastLi), tekstAf(lt));
+        x[1].visSvar(); x[1].videreKlik();
+        lt = trinLi(x[2]);
+        paastand(x[0] + ": titlen på trin 2 kommer frem, når trin 1 er løst", lt[1].textContent.indexOf(navn1) >= 0 && !laastLi(lt[1]) && lt.slice(2).every(laastLi), tekstAf(lt));
+        x[1].forfra();
+    });
 }
 </script>
 </body>

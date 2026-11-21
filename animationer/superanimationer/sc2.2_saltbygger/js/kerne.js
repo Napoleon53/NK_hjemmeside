@@ -165,6 +165,14 @@ window.NK = NK;
         htmlCache[id] = html;
     };
 
+    /* Kortets tekst (opgaveteksten og spoergsmaalet paa papirkortet) gaar
+       gennem NK.Papir.tekst i faelles/papirkort.js, som i de andre
+       animationer: spoergsmaalet bliver halvfedt og staar paa sin egen
+       linje (21. nov. 2026). Teksten er allerede HTML (med <b>). */
+    NK.saetKorttekst = function (id, html) {
+        NK.saetHTML(id, NK.Papir ? NK.Papir.tekst(html) : html);
+    };
+
     var klasseCache = {};
     NK.saetKlasse = function (id, klasse) {
         if (klasseCache[id] === klasse) return;

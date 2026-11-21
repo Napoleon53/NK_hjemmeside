@@ -14,6 +14,10 @@
      4. traekker den lodrette linje hen, hvor proevens absorbans rammer
         linjen, og aflaeser koncentrationen.
 
+   Fra 21. nov. 2026 (regelsaettet) er panelet vaek: opgaven og de fire
+   trin staar paa kortet ("Trin 2 af 4"), og tabellen Maalingerne staar
+   paa et lyst papir under bakken.
+
    Raekkefoelgen er ikke laast, men linjen godtages foerst, naar alle
    standarderne er maalt, og aflaesningen kraever linjen og proeven.
    Opgave 4 har et fingeraftryk paa én kuvette: punktet ligger for hoejt,
@@ -169,11 +173,7 @@
         if (this.faerdig) return;
         var t = this.trin();
         if (t !== this.sidsteTrin) { this.sidsteTrin = t; this.nulstilHjaelp(); }
-        if (t === "aftryk" && !this.sagtNy.punkt) {
-            this.sagtNy.punkt = true;
-            this.besked('<span class="b-maerke">Se på punkterne</span> Ét punkt ligger langt fra de andre. Find ud af hvorfor, før linjen lægges.', "hint");
-            return;
-        }
+        /* Fingeraftrykket: kortets halvfede linje siger det selv (21. nov. 2026) */
         if (t === "slut") return;
         this.naesteLinje("", "");
     };
@@ -233,49 +233,26 @@
         this.loest(vist ? "svar" : "ok", NK.html(tekst), vist ? "Svaret" : "Aflæst ✓");
     };
 
-    /* ----- Panelet --------------------------------------------------------------------- */
-    P.promptHTML = function () {
-        var o = this.opg(), s = this.stof, mig = this;
-        var t = this.trin();
-        var punkter = [
-            { tekst: this.aftrykMaalt() ? "Mål vandet og standarderne (én skal måles igen)" : "Mål vandet og standarderne (" + this.antalMaalt() + "/6)",
-                ok: this.alleMaalt() && !this.aftrykMaalt() },
-            { tekst: "Læg linjen gennem (0, 0)", ok: this.linje.ok },
-            { tekst: "Mål prøven", ok: this.proeve().A !== null },
-            { tekst: "Aflæs prøvens koncentration", ok: this.aflaes.ok }
-        ];
-        var html = '<p class="note-tekst">' + NK.html(o.tekst) + "</p><ol class='tjekliste'>";
-        punkter.forEach(function (p) { html += '<li class="' + (p.ok ? "ok" : "") + '">' + NK.html(p.tekst) + "</li>"; });
-        html += "</ol>";
-        if (t === "slut") {
-            var a = this.linje.a;
-            html += '<div class="forklaring"><p>Punkterne ligger på en ret linje gennem (0, 0), fordi A = ε · l · c. Hældningen er a = ε · l. ' +
-                "Med l = 1,00 cm er ε = " + NK.dk(a, mig.decA()) + " mM⁻¹·cm⁻¹ (tabelværdien er " + NK.dk(s.eps, mig.decA()) + ").</p></div>";
-        }
-        return html;
-    };
-
-    P.visTabel = function () {
-        var s = this.stof, mig = this;
-        var html = "<table class='maaletabel'><thead><tr><th></th><th>c (mM)</th><th>A</th></tr></thead><tbody>";
-        this.kuv.forEach(function (k, i) {
-            var nu = mig.maaling && mig.maaling.k === i;
-            html += "<tr class='" + (nu ? "nu" : "") + (k.proeve ? " proeve" : "") + "'><td>" + (k.proeve ? "Prøven" : (i === 0 ? "Vand" : "Standard " + i)) +
-                "</td><td>" + (k.proeve ? (mig.aflaes.ok ? NK.dk(mig.facitC(), s.cDec + 1) : "?") : NK.dk(k.c, s.cDec)) +
-                "</td><td>" + (k.A === null ? "" : NK.dk(k.A, 3)) + "</td></tr>";
-        });
-        html += "</tbody></table>";
-        NK.saetHTML("kurve-tabel", html);
-    };
+    /* Tabellen Maalingerne tegnes paa laerredet under bakken (tegnTabel) */
+    P.visTabel = function () {};
 
     /* ----- Papirkortet ------------------------------------------------------------ */
+    /* Kortet: opgaven, saa det trin, eleven er ved (regel 5-6: spoergsmaalet
+       om koncentrationen staar paa sin egen linje) */
+    var TRIN_NR = { maal: 1, aftryk: 1, linje: 2, proeve: 3, aflaes: 4, slut: 4 };
+
     P.kortData = function () {
         if (this.venterDel) return this.venterDel;
         var o = this.opg(), t = this.trin();
-        var tekst = "Find prøvens koncentration med en standardkurve ved " + this.stof.lambda + " nm. " + this.trinLinje();
-        if (t === "linje" || t === "aflaes") return { tekst: tekst + " Tryk så Indsend svar." };
-        if (t === "slut") return { tekst: "Find prøvens koncentration med en standardkurve ved " + this.stof.lambda + " nm.", chip: undefined };
-        return { tekst: tekst, indsend: false };
+        var d = { trinTekst: "Trin " + TRIN_NR[t] + " af 4", html: true };
+        if (t === "slut") { d.tekst = NK.html(o.kort); return d; }
+        /* Aflaesningen er et spoergsmaal: det bliver halvfedt paa sin egen
+           linje af sig selv (NK.Papir.tekst). De andre trin er en handling,
+           som staar halvfedt paa sin egen linje under den korte indledning. */
+        if (t === "aflaes") d.tekst = NK.html(o.kort + " " + this.trinLinje());
+        else d.tekst = NK.html(o.kort) + ' <span class="sk-spm sk-linje">' + NK.html(this.trinLinje()) + "</span>";
+        if (t !== "linje" && t !== "aflaes") d.indsend = false;
+        return d;
     };
 
     P.kanIndsende = function () {
@@ -294,13 +271,13 @@
     P.trinLinje = function () {
         var t = this.trin(), mangler = this.standarder().filter(function (k) { return k.A === null; });
         if (t === "maal") {
-            if (this.kuv[0].A === null) return "Klik på kuvetterne i bakken for at måle dem. Begynd med vandet.";
-            return "Mål de næste kuvetter. Kuvetter, der ikke er målt: " + mangler.length + ".";
+            if (this.kuv[0].A === null) return "Klik på kuvetterne i bakken for at måle dem, og begynd med vandet.";
+            return "Mål resten af kuvetterne i bakken (" + mangler.length + " mangler).";
         }
-        if (t === "aftryk") return "Ét punkt ligger langt fra de andre. Find ud af hvorfor.";
-        if (t === "linje") return "Træk i den gule prik for enden af linjen, til linjen passer med punkterne.";
-        if (t === "proeve") return "Mål prøven ved at klikke på kuvetten Prøven i bakken.";
-        if (t === "aflaes") return "Træk den lodrette linje hen, hvor prøvens absorbans rammer standardkurven.";
+        if (t === "aftryk") return "Ét punkt ligger langt fra de andre. Find ud af hvorfor, før linjen lægges.";
+        if (t === "linje") return "Træk i den gule prik, til linjen går gennem punkterne.";
+        if (t === "proeve") return "Klik på kuvetten Prøven i bakken for at måle den.";
+        if (t === "aflaes") return "Hvor stor er prøvens koncentration? Træk den lodrette linje hen, hvor prøvens absorbans rammer standardkurven.";
         return "";
     };
 
@@ -368,38 +345,64 @@
     P.tilpas = function () { this.laerred.tilpas(); };
 
     /* ----- Geometrien ------------------------------------------------------------------- */
+    /* Runde 2 (regel 32): hele opstillingen har en stoerste bredde og staar
+       i midten. Tegningen forskydes ox til hoejre (tegn), og musen regnes
+       tilbage (punkt). */
+    var MAKS_B = 1340;
+
+    P.ox = function () { return Math.max(0, Math.round((this.laerred.b - MAKS_B) / 2)); };
+    P.punkt = function (e) { var p = this.laerred.punkt(e); p.x -= this.ox(); return p; };
+
+    /* Runde 3 (21. nov. 2026, regel 32): venstre spalte (spektrofotometret,
+       bakken og Maalingerne) faar samme hoejde som grafen. Den ekstra
+       hoejde goer apparatet og bakken stoerre i stedet for at efterlade tom
+       plads under tabellen. */
     P.geo = function () {
-        var W = this.laerred.b, H = this.laerred.h, pad = 14;
-        var g = { W: W, H: H, pad: pad };
-        g.vb = NK.klamp(W * 0.38, 250, 380);                 /* venstre spalte */
-        g.px = NK.klamp(Math.min(W / 60, H / 34), 12.5, 16);
-        /* Spektrofotometret */
-        g.sx = pad; g.sy = pad + g.px * 1.4;
-        g.sb = g.vb - pad; g.sh = NK.klamp(H * 0.36, 150, 230);
-        g.yc = g.sy + g.sh * 0.42;
-        g.lb = 34; g.lh = 46;
-        g.lx = g.sx + 14; g.ly = g.yc - g.lh / 2;
-        g.detB = 40; g.detH = 54;
-        g.dx = g.sx + g.sb - 14 - g.detB; g.dy = g.yc - g.detH / 2;
-        g.slotX = (g.lx + g.lb + g.dx) / 2;
-        g.kb = 30; g.kh = 64;
-        g.slotY = g.yc - g.kh * 0.55;
-        g.beamH = 20;
-        g.dispB = NK.klamp(g.sb * 0.5, 140, 200);
-        g.dispX = g.sx + g.sb / 2 - g.dispB / 2;
-        g.dpx = NK.klamp(g.px * 1.1, 14, 18);
-        g.dispH = g.dpx * (1.45 + 0.7);
-        g.dispY = g.sy + g.sh - g.dispH - 10;
-        /* Bakken */
-        g.bakkeY = g.sy + g.sh + g.px * 2.4;
+        var W = Math.min(this.laerred.b, MAKS_B), H = this.laerred.h, pad = 14;
+        var g = { W: W, H: H, pad: pad, ox: this.ox() };
+        g.vb = NK.klamp(W * 0.36, 290, 470);                 /* venstre spalte */
+        g.px = NK.klamp(Math.min(W / 60, H / 34), 12.5, 17);
         var n = this.kuv.length + (this.aftrykI > 0 ? 1 : 0);
         g.raekker = (g.vb - pad) / n < 40 ? 2 : 1;
         var perRaekke = Math.ceil(n / g.raekker);
-        g.slot = (g.vb - pad - 10) / perRaekke;
-        g.bk = NK.klamp(g.slot * 0.55, 20, 30);
-        g.bh = NK.klamp(H * 0.11, 46, 64);
-        g.bakkeH = g.raekker * (g.bh + g.px * 2.6) + 14;
         g.perRaekke = perRaekke;
+        g.slot = (g.vb - pad - 10) / perRaekke;
+        function lag(sh, bh) {
+            g.sx = pad; g.sy = pad + g.px * 1.4;
+            g.sb = g.vb - pad; g.sh = sh;
+            var f = NK.klamp(sh / 190, 1, 1.7);           /* apparatet vokser med kassen */
+            g.yc = g.sy + g.sh * 0.42;
+            g.lb = 34 * f; g.lh = 46 * f;
+            g.lx = g.sx + 14; g.ly = g.yc - g.lh / 2;
+            g.detB = 40 * f; g.detH = 54 * f;
+            g.dx = g.sx + g.sb - 14 - g.detB; g.dy = g.yc - g.detH / 2;
+            g.slotX = (g.lx + g.lb + g.dx) / 2;
+            g.kb = 30 * f; g.kh = 64 * f;
+            g.slotY = g.yc - g.kh * 0.55;
+            g.beamH = 20 * f;
+            g.dispB = NK.klamp(g.sb * 0.5, 140, 220);
+            g.dispX = g.sx + g.sb / 2 - g.dispB / 2;
+            g.dpx = NK.klamp(g.px * 1.1, 14, 19);
+            g.dispH = g.dpx * (1.45 + 0.7);
+            g.dispY = g.sy + g.sh - g.dispH - 10;
+            g.bakkeY = g.sy + g.sh + g.px * 2.4;
+            g.bk = NK.klamp(g.slot * 0.55, 20, 30 * Math.min(f, 1.35));
+            g.bh = bh;
+            g.bakkeH = g.raekker * (g.bh + g.px * 2.6) + 14;
+            g.tabY = g.bakkeY + g.bakkeH + g.px * 1.6;
+            g.tabRH = g.px * 1.55;
+            g.tabH = g.tabRH * 2 + 10;
+            return g.tabY + g.tabH;
+        }
+        var sh = NK.klamp(H * 0.36, 150, 230), bh = NK.klamp(H * 0.11, 46, 64);
+        var bund = H - pad - 4;
+        /* Er der plads tilbage, vokser apparatet (to tredjedele) og bakken */
+        var rest = bund - lag(sh, bh);
+        if (rest > 0) {
+            sh = Math.min(sh + rest * 0.7, 380);
+            bh = Math.min(bh + rest * 0.15, 96);
+            lag(sh, bh);
+        }
         /* Grafen */
         g.gx0 = g.vb + 30 + g.px * 3.2;
         g.gx1 = W - pad - 12;
@@ -457,14 +460,14 @@
         }
         /* Grebet paa linjen og selve linjen */
         var e = this.linjeEnde(g, gr);
-        if (this.antalMaalt() >= 2 && Math.hypot(p.x - e.x, p.y - e.y) <= 16) return { slags: "linje" };
+        if (this.trin() === "linje" && !this.slutNu() && Math.hypot(p.x - e.x, p.y - e.y) <= 16) return { slags: "linje" };
         /* Den lodrette aflaesningslinje */
         if (this.linje.ok && this.proeve().A !== null && !this.aflaes.ok && this.aflaes.c !== null) {
             var ax = this.tilPx(g, gr, this.aflaes.c, 0).x;
             if (Math.abs(p.x - ax) <= 12 && p.y >= g.gy0 && p.y <= g.gy1 + 22) return { slags: "aflaes" };
         }
         if (p.x >= g.gx0 && p.x <= g.gx1 && p.y >= g.gy0 && p.y <= g.gy1) {
-            if (this.antalMaalt() >= 2) {
+            if (this.trin() === "linje" && !this.slutNu()) {
                 var d = this.fraPx(g, gr, p.x, p.y);
                 var paaLinje = this.tilPx(g, gr, d.c, this.linje.a * d.c);
                 if (Math.abs(paaLinje.y - p.y) <= 10 && d.c > gr.xMax * 0.1) return { slags: "linje" };
@@ -476,7 +479,7 @@
     };
 
     P.ned = function (e) {
-        var p = this.laerred.punkt(e);
+        var p = this.punkt(e);
         var h = this.hvad(p);
         /* Naar kortet viser Naeste, er linjerne laast */
         if (h && (h.slags === "linje" || h.slags === "aflaes") && this.slutNu()) { this.spaer(); this.traek = null; return; }
@@ -488,7 +491,7 @@
     };
 
     P.flyt = function (e) {
-        var p = this.laerred.punkt(e), t = this.traek;
+        var p = this.punkt(e), t = this.traek;
         if (t && t.h && Math.hypot(p.x - t.x, p.y - t.y) > 4) t.flyttet = true;
         if (t && t.h && t.flyttet) {
             var g = this.geo(), gr = this.graf();
@@ -523,7 +526,7 @@
     };
 
     P.op = function (e) {
-        var t = this.traek, p = this.laerred.punkt(e);
+        var t = this.traek, p = this.punkt(e);
         this.traek = null;
         this.papirTraek = null;
         if (!t || !t.h) { if (this.papir.valgt) this.papir.valgt = false; return; }
@@ -619,9 +622,13 @@
         if (L.b < 50 || L.h < 50) return;
         L.ryd();
         var g = this.geo();
+        ctx.save();
+        ctx.translate(g.ox, 0);
         this.tegnSpekt(ctx, g);
         this.tegnBakke(ctx, g);
+        this.tegnTabel(ctx, g);
         this.tegnGraf(ctx, g);
+        ctx.restore();
     };
 
     P.kuvetteFarve = function (k) {
@@ -638,7 +645,7 @@
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.restore();
-        NK.tekst(ctx, "Spektrofotometer, " + s.lambda + " nm", g.sx + 4, g.sy - 7, { font: Tg.font("700", px), farve: "#cfd6de" });
+        NK.tekst(ctx, "Spektrofotometer, " + s.lambda + " nm", g.sx + 4, g.sy - 7, { font: Tg.font("500", px), farve: "#cfd6de" });
 
         var k = this.iSpekt >= 0 ? this.kuv[this.iSpekt] : null;
         var T = 1;
@@ -694,7 +701,7 @@
         ctx.lineWidth = lys ? 2.5 : 1.5;
         ctx.stroke();
         ctx.restore();
-        NK.tekst(ctx, "Bakken", g.pad + 4, y0 - 7, { font: Tg.font("700", px), farve: "#cfd6de" });
+        NK.tekst(ctx, "Bakken", g.pad + 4, y0 - 7, { font: Tg.font("500", px), farve: "#cfd6de" });
         this.kuv.forEach(function (k, i) {
             var q = mig.bakkePlads(g, i);
             var ude = mig.maaling && mig.maaling.k === i;
@@ -711,8 +718,8 @@
                 ctx.restore();
             }
             var navn = k.proeve ? "Prøven" : k.navn;
-            NK.tekst(ctx, navn, q.x + g.bk / 2, q.y + g.bh + px * 1.15, { font: Tg.font("600", Math.max(12, px * 0.85)), justering: "center", farve: k.proeve ? "#ffe28a" : "#c8ced6" });
-            if (k.A !== null) NK.tekst(ctx, "✓", q.x + g.bk / 2, q.y + g.bh + px * 2.2, { font: Tg.font("700", px * 0.85), justering: "center", farve: "#7ee0a8" });
+            NK.tekst(ctx, navn, q.x + g.bk / 2, q.y + g.bh + px * 1.15, { font: Tg.font("500", Math.max(12.5, px * 0.85)), justering: "center", farve: k.proeve ? "#ffe28a" : "#c8ced6" });
+            if (k.A !== null) NK.tekst(ctx, "✓", q.x + g.bk / 2, q.y + g.bh + px * 2.2, { font: Tg.font("500", px * 0.85), justering: "center", farve: "#7ee0a8" });
         });
         if (this.aftrykI > 0) {
             var pp = this.bakkePlads(g, this.kuv.length);
@@ -736,8 +743,49 @@
             ctx.stroke();
             ctx.restore();
             var hp = this.bakkePlads(g, this.kuv.length);
-            NK.tekst(ctx, "Papir", hp.x + g.bk / 2, hp.y + g.bh + px * 1.15, { font: Tg.font("600", Math.max(12, px * 0.85)), justering: "center", farve: "#c8ced6" });
+            NK.tekst(ctx, "Papir", hp.x + g.bk / 2, hp.y + g.bh + px * 1.15, { font: Tg.font("500", Math.max(12.5, px * 0.85)), justering: "center", farve: "#c8ced6" });
         }
+    };
+
+    /* Tabellen Maalingerne: et lyst papir under bakken med c og A for hver
+       kuvette (regel 23: det, eleven regner med, kan ses) */
+    P.tegnTabel = function (ctx, g) {
+        var s = this.stof, mig = this, px = g.px;
+        var x = g.pad, b = g.vb - g.pad, y = g.tabY;
+        NK.tekst(ctx, "Målingerne", x + 4, y - 7, { font: Tg.font("500", px), farve: "#cfd6de" });
+        Tg.papir(ctx, x, y, b, g.tabH);
+        var lw = px * 4.2, kol = (b - lw - 8) / this.kuv.length;
+        var f = Math.max(12.5, px * 0.85);
+        ctx.save();
+        ctx.textBaseline = "middle";
+        [["c (mM)", 0], ["A", 1]].forEach(function (r) {
+            var yy = y + 5 + g.tabRH * (r[1] + 0.5);
+            ctx.font = Tg.font("500", f);
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#6b6558";
+            ctx.fillText(r[0], x + 8, yy);
+        });
+        ctx.strokeStyle = "#e4dfd2";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x + 6, y + 5 + g.tabRH);
+        ctx.lineTo(x + b - 6, y + 5 + g.tabRH);
+        ctx.stroke();
+        this.kuv.forEach(function (k, i) {
+            var cx = x + lw + kol * (i + 0.5);
+            var nu = mig.maaling && mig.maaling.k === i;
+            if (nu) {
+                ctx.fillStyle = "#e7f1fa";
+                ctx.fillRect(cx - kol / 2 + 1, y + 3, kol - 2, g.tabH - 6);
+            }
+            ctx.textAlign = "center";
+            ctx.font = Tg.font("500", f);
+            ctx.fillStyle = k.proeve ? "#7a5a00" : "#1d2433";
+            var cTekst = k.proeve ? (mig.aflaes.ok ? NK.dk(mig.facitC(), s.cDec + 1) : "?") : NK.dk(k.c, s.cDec);
+            ctx.fillText(cTekst, cx, y + 5 + g.tabRH * 0.5);
+            ctx.fillText(k.A === null ? "" : NK.dk(k.A, 3), cx, y + 5 + g.tabRH * 1.5);
+        });
+        ctx.restore();
     };
 
     P.tegnGraf = function (ctx, g) {
@@ -749,7 +797,7 @@
         NK.rundtRekt(ctx, x0 - g.px * 3.4, y0 - g.px * 1.6, x1 - x0 + g.px * 3.4 + 10, y1 - y0 + g.px * 4.4, 10);
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.font = Tg.font("600", Math.max(12, px * 0.85));
+        ctx.font = Tg.font("500", Math.max(12.5, px * 0.85));
         ctx.fillStyle = "#4a5160";
         ctx.textAlign = "center";
         for (var c = 0; c <= gr.xMax + 1e-9; c += gr.xs.trin) {
@@ -769,7 +817,7 @@
         ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0, y1); ctx.lineTo(x1, y1); ctx.stroke();
         ctx.fillStyle = "#222831";
-        ctx.font = Tg.font("700", px);
+        ctx.font = Tg.font("500", px);
         ctx.textAlign = "center";
         ctx.fillText("c (mM)", (x0 + x1) / 2, y1 + px * 2.5);
         ctx.textAlign = "left";
@@ -787,7 +835,7 @@
             ctx.lineWidth = 2;
             ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
             ctx.restore();
-            NK.tekst(ctx, "Prøven: A = " + NK.dk(pr.A, 3), p1.x + 6, p1.y - 6, { font: Tg.font("700", Math.max(12, px * 0.85)), farve: "#8a6200" });
+            NK.tekst(ctx, "Prøven: A = " + NK.dk(pr.A, 3), p1.x + 6, p1.y - 6, { font: Tg.font("500", Math.max(12.5, px * 0.85)), farve: "#8a6200" });
         }
 
         /* Linjen gennem (0, 0) */
@@ -801,7 +849,8 @@
             if (!this.linje.flyttet) ctx.setLineDash([8, 6]);
             ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(slut.x, slut.y); ctx.stroke();
             ctx.setLineDash([]);
-            if (!this.faerdig) {
+            /* Den gule prik staar kun, naar linjen skal laegges (regel 19a) */
+            if (this.trin() === "linje" && !this.slutNu()) {
                 var lys = this.hintLys === "linje";
                 ctx.fillStyle = "#f2c53d";
                 ctx.strokeStyle = lys ? "#b07800" : "#7a5a00";
@@ -810,7 +859,7 @@
             }
             ctx.restore();
             NK.tekst(ctx, "A = a · c     a = " + NK.dk(this.linje.a, this.decA()) + " mM⁻¹", x0 + 10, y0 + px * 1.1,
-                { font: Tg.font("700", px), farve: this.linje.ok ? "#1d7a48" : "#3f5f86" });
+                { font: Tg.font("500", px), farve: this.linje.ok ? "#1d7a48" : "#3f5f86" });
         }
 
         /* Fejlmaalinger, der er maalt om: et blegt kryds */
@@ -861,7 +910,7 @@
             ctx.restore();
             if (ok) {
                 NK.tekst(ctx, "c = " + NK.dk(cc, s.cDec + (cc < 0.1 ? 1 : 0)) + " mM", bund.x + 12, bund.y - 10,
-                    { font: Tg.font("800", px * 1.05), farve: "#1d7a48" });
+                    { font: Tg.font("600", px * 1.05), farve: "#1d7a48" });
             }
         }
     };

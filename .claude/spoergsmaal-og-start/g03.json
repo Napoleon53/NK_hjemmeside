@@ -1,0 +1,584 @@
+[
+  {
+    "mappe": "sb4.5_organisk_syntese",
+    "titel": "Organisk syntese",
+    "sprog": [],
+    "start": [
+      {
+        "fane": "(ingen faner) Fabrikken",
+        "billede": "skud/a/sb4.5_organisk_syntese__0.png",
+        "dom": "lidt meget",
+        "fremme": "Ordrekortet; lageret; butiksdøren med dagens tilbud; kolben med to stofpladser; kontakterne Svovlsyre og Varme; Start; tavlen. I toplinjen kassen, titlen med fremskridtslinje, serien og tre udstyrsikoner. I panelet tre kunder, børsen og esterkortet med 52 felter.",
+        "bruges": "Første ordre (ethylethanoat) bruger ordren, butikken, lageret, kolben, svovlsyre, varme, Start og tavlen. Børsen, esterkortet, serien, udstyret, titlen og de to andre kunder bruges ikke.",
+        "forslag": [
+          {
+            "alm": "Neglesalonen vil have ethylethanoat. En ester laves af en carboxylsyre og en alkohol.",
+            "fed": "Hvilke to stoffer skal du købe for at lave ethylethanoat?",
+            "svar": ["Ethanol og ethansyre", "Ethanol og kaliumpermanganat", "Methanol og propansyre"],
+            "derefter": "Kortet går over til ordren, som den er nu (Køb de to stoffer til ordren i butikken), og butiksdøren lyser op."
+          }
+        ],
+        "andet": "Skjul børsen, esterkortet, serien og udstyret til første levering (eller vis dem som stiplede rammer med navn), og vis kun én kunde i panelet ved første ordre. Spørgsmålet ovenfor kun ved allerførste ordre, ikke i spillet bagefter.",
+        "gevinst": "Den svage elev ser kun ordren, butikken og kolben og har sagt syre + alkohol højt, før spillets ekstra lag kommer på.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Ingen spørgsmål med svarknapper: kortet viser ordren og næste skridt som instruktion, så der er ingen sprogfund. Spillet er en fri fabrik, så stilladseringen er kun et forslag til første ordre."
+  },
+  {
+    "mappe": "sb4.11_dnph_og_tollens",
+    "titel": "DNPH og Tollens' test",
+    "sprog": [
+      {
+        "fane": "2 Reaktionerne",
+        "opgave": "3 Tollens' reagens og ethanal, trin 2 (oxidationstallet efter)",
+        "fil": "js/sim_reaktion.js",
+        "linje": 194,
+        "nu_alm": "Ethanal oxideres til ethanoat-ionen.",
+        "nu_fed": "Hvad er oxidationstallet for det samme carbonatom nu?",
+        "nu_svar": ["−III", "−II", "−I", "0", "+I", "+II", "+III"],
+        "problem": "'det samme carbonatom' og 'nu' peger tilbage; spørgsmålet siger ikke, at det handler om carbonatomet i ethanoat-ionen.",
+        "nyt_alm": "Ethanal oxideres til ethanoat-ionen.",
+        "nyt_fed": "Hvad er oxidationstallet for carbonatomet i COO⁻-gruppen i ethanoat-ionen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Reaktionerne",
+        "opgave": "1 DNPH og ethanal, sidste spørgsmål (kondensation)",
+        "fil": "js/data.js",
+        "linje": 90,
+        "nu_alm": "Ethanal og DNPH bindes sammen til ét molekyle, og der fraspaltes vand.",
+        "nu_fed": "Hvad hedder sådan en reaktion?",
+        "nu_svar": ["Kondensation", "Addition", "Substitution", "Oxidation"],
+        "problem": "'sådan en reaktion' peger tilbage; det, der kendetegner reaktionen, står kun i indledningen.",
+        "nyt_alm": "Ethanal og DNPH er bundet sammen på tavlen.",
+        "nyt_fed": "Hvad hedder en reaktion, hvor to molekyler bindes sammen, og der fraspaltes vand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Reaktionerne",
+        "opgave": "2 DNPH og propanon, sidste spørgsmål (bindingen)",
+        "fil": "js/data.js",
+        "linje": 100,
+        "nu_alm": "Carbonatomet i propanon havde en dobbeltbinding til oxygen.",
+        "nu_fed": "Hvilken binding har det nu til nitrogen?",
+        "nu_svar": ["Enkeltbinding", "Dobbeltbinding", "Tripelbinding"],
+        "problem": "'det' og 'nu' peger tilbage; spørgsmålet siger ikke, at det handler om carbonatomet i produktet med DNPH.",
+        "nyt_alm": "Carbonatomet i propanon havde en dobbeltbinding til oxygen.",
+        "nyt_fed": "Hvilken binding er der mellem carbon og nitrogen i produktet af propanon og DNPH?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Reaktionerne",
+        "opgave": "3 Tollens' reagens og ethanal, sidste spørgsmål (ammoniak)",
+        "fil": "js/data.js",
+        "linje": 109,
+        "nu_alm": "Tollens' reagens indeholder også ammoniak.",
+        "nu_fed": "Hvad gør ammoniakken?",
+        "nu_svar": ["Holder Ag⁺ opløst", "Gør opløsningen sur", "Oxiderer aldehydet", "Danner sølvspejlet"],
+        "problem": "'ammoniakken' siger ikke hvor; at ammoniak er en del af Tollens' reagens, står kun i indledningen, som desuden har et 'også'.",
+        "nyt_alm": "Tollens' reagens indeholder sølv(I)ioner og ammoniak.",
+        "nyt_fed": "Hvad gør ammoniakken i Tollens' reagens?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Hvad viser testene?",
+        "opgave": "Alle ti stoffer, spørgsmål 2 (Tollens' test)",
+        "fil": "js/sim_test.js",
+        "linje": 156,
+        "nu_alm": "Glasset varmes i et vandbad. Vælg, og tryk Indsend svar.",
+        "nu_fed": "Hvad sker der i Tollens' test med ethanal?",
+        "nu_svar": ["Gult eller orange bundfald", "Sølvspejl", "Ingen ændring"],
+        "problem": "Betingelsen (vandbadet) kommer efter spørgsmålet, og en instruktion står til sidst; den er overflødig ved siden af knappen Indsend svar (det samme gælder DNPH-spørgsmålet i linje 155).",
+        "nyt_alm": "Glasset med Tollens' reagens varmes i et vandbad.",
+        "nyt_fed": "Hvad sker der, når ethanal varmes med Tollens' reagens?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Ukendte stoffer",
+        "opgave": "Trin 2 Hvad viser testene? (flaske A til F)",
+        "fil": "js/sim_ukendt.js",
+        "linje": 162,
+        "nu_alm": "Vælg, og tryk Indsend svar.",
+        "nu_fed": "Hvad viser de to test om stoffet i flaske A?",
+        "nu_svar": ["Et aldehyd", "En keton", "Hverken aldehyd eller keton"],
+        "problem": "Omsvøb: 'Hvad viser ... om' skjuler, at der spørges om stofklassen, og 'de to test' siger ikke hvilke.",
+        "nyt_alm": "Stoffet i flaske A er testet med DNPH og med Tollens' reagens.",
+        "nyt_fed": "Er stoffet i flaske A et aldehyd, en keton eller ingen af delene?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Hvad viser testene?",
+        "billede": "skud/a/sb4.11_dnph_og_tollens__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med tre svar; ethanal som zigzagformel; to reagensglas (DNPH med gul ramme, Tollens' test). Panelet: opgavenumre og tabellen Det har du fundet.",
+        "bruges": "Formlen og DNPH-glasset; Tollens-glasset i spørgsmål 2.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Reaktionerne",
+        "billede": "skud/a/sb4.11_dnph_og_tollens__1.png",
+        "dom": "fint",
+        "fremme": "Kortet med en instruktion; ethanal og DNPH som strukturformler. Panelet: tre reaktioner og en kort tekst om de to reaktioner.",
+        "bruges": "Begge molekyler: eleven klikker på de tre atomer, der bliver til vand.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ukendte stoffer",
+        "billede": "skud/a/sb4.11_dnph_og_tollens__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med knappen Udfør testene; seks flasker med hver to reagensglas (12 glas); seks kort med navn og strukturformel. Panelet: tre trin og forsøgsbeskrivelsen.",
+        "bruges": "Første handling er én knap. De 12 glas bruges i trin 2, de seks strukturformler først i trin 3 (Hvilke stoffer?).",
+        "forslag": [],
+        "andet": "Kan overvejes: Vis de seks stofkort som én stiplet ramme ('stofferne i flaskerne'), til trin 3 begynder. Spørgsmålene i trin 2 handler kun om testresultaterne.",
+        "gevinst": "Trin 2 får kun glassene at se på.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "På fane 2 har tre Tollens-trin samme mønster i lille skala: 'Hvor mange Ag⁺ skal der til pr. ethanalmolekyle?' og '... OH⁻ ... til venstre i skemaet?' / '... H₂O ... til højre i skemaet?' kan stå alene, men formålet (oxidere ethanal, afstemme ladning, afstemme hydrogen) står kun i indledningen. Fx 'Hvor mange OH⁻ skal stå til venstre for at afstemme ladningen?'."
+  },
+  {
+    "mappe": "sb5.1_absorptionsspektre",
+    "titel": "Absorptionsspektre",
+    "sprog": [
+      {
+        "fane": "2 Konjugeringen",
+        "opgave": "8 Tomatregnbuen (gæt, og kortet efter forsøget)",
+        "fil": "js/data.js",
+        "linje": 154,
+        "nu_alm": "Bromvand hældes i tomatsaft og trænger langsomt ned.",
+        "nu_fed": "Hvilke farver får saften fra top til bund?",
+        "nu_svar": ["Farveløs, gul, orange", "Orange, gul, farveløs", "Hele glasset bliver gult"],
+        "problem": "'saften' og årsagen til farveskiftet (bromvandet, der trænger ned) står kun i indledningen; i gæt-kortet er hele teksten halvfed, efter forsøget kun spørgsmålet.",
+        "nyt_alm": "Bromvand hældes i tomatsaft og trænger langsomt ned.",
+        "nyt_fed": "Hvilke farver får tomatsaften fra top til bund, når bromvandet trænger ned?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Konjugeringen",
+        "opgave": "1 Gæt først",
+        "fil": "js/data.js",
+        "linje": 135,
+        "nu_alm": "",
+        "nu_fed": "Buta-1,3-dien har λmax = 217 nm. Hvor ligger λmax for stoffet med én konjugeret dobbeltbinding mere?",
+        "nu_svar": ["Kortere bølgelængde", "Samme bølgelængde", "Længere bølgelængde"],
+        "problem": "Gæt-kortet gør hele teksten halvfed, og 'stoffet med én ... mere' er indirekte. fane.js:238 kan allerede vise en indledning i almindelig skrift (d.intro), men kortData sender den ikke.",
+        "nyt_alm": "Buta-1,3-dien har to konjugerede dobbeltbindinger og λmax = 217 nm.",
+        "nyt_fed": "Hvor ligger λmax, når buta-1,3-dien får én konjugeret dobbeltbinding mere?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Chromoforen",
+        "opgave": "Alle otte molekyler, trin 2 Vælg farven",
+        "fil": "js/sim_chrom.js",
+        "linje": 78,
+        "nu_alm": "Chromoforen har 3 konjugerede dobbeltbindinger.",
+        "nu_fed": "Hvilken farve har stoffet?",
+        "nu_svar": ["Farveløs", "Gul", "Orange", "Rød", "Lilla", "Blå"],
+        "problem": "'stoffet' siger ikke hvilket; navnet står kun på tavlen og i panelet.",
+        "nyt_alm": "Chromoforen i hexa-1,3,5-trien har 3 konjugerede dobbeltbindinger.",
+        "nyt_fed": "Hvilken farve har en opløsning af hexa-1,3,5-trien?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Farven",
+        "billede": "skud/a/sb5.1_absorptionsspektre__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kortet med instruktion; lampe med lysstråle og farvede fotoner; kuvette; øje med farveetiket (Blå); farvecirklen med markør for det absorberede og det sete lys; absorptionsspektret med en top, der kan trækkes. Panelet: forklaring og 9 opgavenumre.",
+        "bruges": "Alt, men på én gang: toppen trækkes, og øjets etiket og farvecirklen viser løbende resultatet. Eleven kan trække, til der står Gul, uden at forstå komplementærfarver.",
+        "forslag": [
+          {
+            "alm": "Lampen sender hvidt lys gennem kuvetten. Kurven viser stoffets absorbans.",
+            "fed": "Hvilket lys absorberer stoffet, når toppen af kurven ligger ved 640 nm?",
+            "svar": ["Orange og rødt lys", "Blåt lys", "Alt lyset"],
+            "derefter": "Lyset tændes, og fotonerne viser, at det orange og røde lys forsvinder i kuvetten."
+          },
+          {
+            "alm": "Orange og rødt lys bliver absorberet i kuvetten. Resten af lyset når øjet.",
+            "fed": "Hvilken farve ser øjet, når kuvetten absorberer orange og rødt lys?",
+            "svar": ["Blå", "Rød", "Orange"],
+            "derefter": "Øjets etiket (Blå) og farvecirklen dukker op med stregen fra det absorberede lys til den farve, vi ser."
+          },
+          {
+            "alm": "I farvecirklen står den farve, vi ser, over for det lys, der bliver absorberet.",
+            "fed": "Hvilket lys skal kuvetten absorbere, for at opløsningen ser gul ud?",
+            "svar": ["Blåt og violet lys", "Gult lys", "Rødt og orange lys"],
+            "derefter": "Håndtaget på toppen bliver aktivt, og kortet viser opgaven, som den er nu: Træk toppen, så opløsningen bliver gul, og tryk Indsend svar."
+          }
+        ],
+        "andet": "Vis øjets etiket og farvecirklen som stiplede rammer ('det, vi ser', 'farvecirklen'), til trin 2 er løst. Kun første mål (Gør den gul) stilladseres; mål 2 til 4 kan være som nu.",
+        "gevinst": "Den svage elev lærer reglen (vi ser det lys, der ikke bliver absorberet) i små skridt, før den bruges, i stedet for at skubbe toppen, til etiketten viser Gul.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Konjugeringen",
+        "billede": "skud/a/sb5.1_absorptionsspektre__1.png",
+        "dom": "fint",
+        "fremme": "Gæt-kortet med tre svar; buta-1,3-dien på tavlen; spektret med λmax = 217 nm; reagensglas (farveløs). Panelet: forklaring og 8 opgavenumre.",
+        "bruges": "Molekylet og λmax på grafen; reagensglasset fra opgave 2.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Chromoforen",
+        "billede": "skud/a/sb5.1_absorptionsspektre__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med instruktion; molekylet på tavlen; tom graf med ?; reagensglas med ?. Panelet: forklaring af chromofor og to trin.",
+        "bruges": "Molekylet; grafen og glasset er skjult bag ?, til de skal bruges.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Byg farven (fane 1, mål 1 til 4) løser sig næsten selv: Etiketten og farvecirklen viser hele tiden den farve, toppen giver, så eleven kan trække, til der står det rigtige. På fane 3 røber navnet 'Allura rød (E129)' svaret på farvespørgsmålet. Quizzen (pop-up, uden papirkort) har samme mønster, fx 'En opløsning absorberer grønt lys ved 530 nm og intet andet. Hvilken farve har den?'."
+  },
+  {
+    "mappe": "sb5.2_lambert_beer",
+    "titel": "Lambert-Beers lov",
+    "sprog": [
+      {
+        "fane": "1 Lyset",
+        "opgave": "5 Halv koncentration, dobbelt vej",
+        "fil": "js/data.js",
+        "linje": 134,
+        "nu_alm": "Ved 0,40 mM og 1,00 cm er A = 0,980. Koncentrationen halveres til 0,20 mM, og kuvettebredden bliver 2,00 cm.",
+        "nu_fed": "Hvad bliver A?",
+        "nu_svar": ["Det samme (A = 0,980)", "Det dobbelte (A = 1,96)", "Det halve (A = 0,490)"],
+        "problem": "Begge betingelser står kun i indledningen; 'Hvad bliver A?' kan ikke stå alene. I gæt-kortet er hele teksten halvfed, så spørgsmålet drukner i tre sætninger.",
+        "nyt_alm": "Ved 0,40 mM og 1,00 cm er A = 0,980.",
+        "nyt_fed": "Hvad bliver A, når koncentrationen halveres til 0,20 mM, og kuvetten bliver 2,00 cm?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Lyset",
+        "opgave": "4 Én centimeter mere",
+        "fil": "js/data.js",
+        "linje": 115,
+        "nu_alm": "Ved 0,12 mM slipper ca. halvdelen af lyset gennem 1,00 cm.",
+        "nu_fed": "Hvor meget slipper gennem 2,00 cm?",
+        "nu_svar": ["0 % (den anden centimeter absorberer resten)", "26 % (hver centimeter absorberer halvdelen)", "51 % (det samme som før)"],
+        "problem": "Spørgsmålet siger hverken, at det er lyset, der slipper igennem, eller at 2,00 cm er kuvettebredden.",
+        "nyt_alm": "Ved 0,12 mM slipper ca. halvdelen af lyset gennem en kuvette på 1,00 cm.",
+        "nyt_fed": "Hvor meget af lyset slipper igennem, når kuvetten er 2,00 cm bred?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Lyset",
+        "opgave": "1 Vand i kuvetten",
+        "fil": "js/data.js",
+        "linje": 58,
+        "nu_alm": "Kuvetten tømmes og fyldes med rent vand.",
+        "nu_fed": "Hvor meget af lyset når så frem til detektoren?",
+        "nu_svar": ["100 % (alt lyset)", "50 % (halvdelen)", "0 % (intet)"],
+        "problem": "'så' peger tilbage; at kuvetten kun indeholder vand, står kun i indledningen, mens scenen viser 32 % for permanganat.",
+        "nyt_alm": "Kuvetten tømmes og fyldes med rent vand.",
+        "nyt_fed": "Hvor meget af lyset når frem til detektoren, når kuvetten kun indeholder vand?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Lyset",
+        "opgave": "3 Dobbelt koncentration: lyset",
+        "fil": "js/data.js",
+        "linje": 96,
+        "nu_alm": "Ved 0,20 mM slipper 32 % af lyset igennem.",
+        "nu_fed": "Hvor meget slipper igennem, når koncentrationen fordobles til 0,40 mM?",
+        "nu_svar": ["16 % (halvdelen af 32 %)", "10 % (32 % af 32 %)", "64 % (det dobbelte)"],
+        "problem": "'Hvor meget' siger ikke, at det er lyset; spørgsmål 2 og 3 lyder næsten ens, men det ene spørger om A og det andet om lyset.",
+        "nyt_alm": "Ved 0,20 mM slipper 32 % af lyset igennem.",
+        "nyt_fed": "Hvor meget af lyset slipper igennem, når koncentrationen fordobles til 0,40 mM?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Lyset",
+        "billede": "skud/a/sb5.2_lambert_beer__0.png",
+        "dom": "for meget",
+        "fremme": "Gæt-kortet; kurven Lys tilbage (100 % til 32 %); lampe med lysstråle og fotoner; kuvette med trækhåndtag; detektor med T og A; tavlen med A = ε · l · c regnet ud. Panelet: stofvalg (3 knapper), to skydere (c og l), Langsomt lys og 6 forudsigelser.",
+        "bruges": "Kun lampen, kuvetten og detektoren, og bagefter koncentrationsskyderen. Kurven, A, formeltavlen, stofvalget og kuvettebredden bruges ikke i første forudsigelse, og tre af dem viser tal for permanganat, mens spørgsmålet handler om vand.",
+        "forslag": [
+          {
+            "alm": "Lampen sender grønt lys gennem kuvetten med lilla permanganat.",
+            "fed": "Hvad sker der med noget af det grønne lys i kuvetten med permanganat?",
+            "svar": ["Det bliver absorberet", "Det bliver farvet lilla", "Det går uændret igennem"],
+            "derefter": "Kurven Lys tilbage dukker op over strålen og falder fra 100 % til 32 % gennem kuvetten."
+          },
+          {
+            "alm": "Kurven over strålen viser, hvor meget af lyset der er tilbage.",
+            "fed": "Hvor meget af lyset når frem til detektoren gennem 0,20 mM permanganat?",
+            "svar": ["32 %", "68 %", "100 %"],
+            "derefter": "Detektorens display viser T = 32,4 %. A står endnu ikke i displayet."
+          },
+          {
+            "alm": "Kuvetten tømmes og fyldes med rent vand.",
+            "fed": "Hvor meget af lyset når frem til detektoren, når kuvetten kun indeholder vand?",
+            "svar": ["100 %", "50 %", "0 %"],
+            "derefter": "Koncentrationsskyderen låses op, og kortet siger som nu: Prøv det. Træk koncentrationen ned til 0, og tryk Indsend svar."
+          }
+        ],
+        "andet": "Vis formeltavlen og A i displayet som stiplede rammer ('Lambert-Beers lov', 'A'), til forudsigelse 2 (Dobbelt koncentration: A), og kuvettebredden fra forudsigelse 4. Stofvalget bruges ikke i nogen af de seks forudsigelser og kan foldes ind, til de er prøvet.",
+        "gevinst": "Den svage elev møder ét tal ad gangen (først lyset, så T, senere A og formlen) i stedet for tre talvisninger om permanganat, mens spørgsmålet handler om vand.",
+        "prioritet": 1
+      },
+      {
+        "fane": "2 Standardkurven",
+        "billede": "skud/a/sb5.2_lambert_beer__1.png",
+        "dom": "fint",
+        "fremme": "Kortet med instruktion; spektrofotometer med A-display; bakke med 7 kuvetter; tom graf. Panelet: opgavetekst med fire trin, tabellen Målingerne og 4 opgaver.",
+        "bruges": "Bakken og spektrofotometeret (første klik er vandet); grafen fyldes, mens der måles.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Beregningen",
+        "billede": "skud/a/sb5.2_lambert_beer__2.png",
+        "dom": "fint",
+        "fremme": "Kortet; tavlen med opgavens tal og trinbjælken Formlen, Tallene ind, Resultatet; formens form og bogstaverne under tavlen.",
+        "bruges": "Alt; regnestykket er allerede delt i tre trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Gæt-kortet på fane 1 viser hele teksten halvfed, så indledning og spørgsmål flyder sammen. fane.js:233 kan allerede vise en indledning i almindelig skrift (d.intro), men sim_lys.js:183 sender kun spm; delte man spm i intro og spm, ville alle seks forudsigelser følge sb2.6. Fane 3: 'Vælg først formens form under tavlen' er indforstået, fx 'Vælg først, om formlen er et produkt eller en brøk'."
+  },
+  {
+    "mappe": "sb5.3_spektrofotometri",
+    "titel": "Spektrofotometri",
+    "sprog": [
+      {
+        "fane": "3 To farvestoffer",
+        "opgave": "Spørgsmålet (panelets overskrift og kortet, når en drik er analyseret)",
+        "fil": "js/data.js",
+        "linje": 278,
+        "nu_alm": "Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133.",
+        "nu_fed": "Hvad er koncentrationen af hvert farvestof?",
+        "nu_svar": [],
+        "problem": "'hvert farvestof' peger tilbage og siger ikke, i hvilken drik; fane 1 og 2 nævner både stoffet og prøven i spørgsmålet.",
+        "nyt_alm": "Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133.",
+        "nyt_fed": "Hvad er koncentrationen af E102 og af E133 i den grønne drik?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Sodavand",
+        "billede": "skud/a/sb5.3_spektrofotometri__0.png",
+        "dom": "fint",
+        "fremme": "Kortet (trin 1 af 7); spektrofotometer; zoomboble; tom standardkurve med teksten 'Punkterne kommer, når du måler'; stativ med 7 kuvetter og en flaske. Panelet: spørgsmålet, syv trin og tabellen Målingerne.",
+        "bruges": "Blindprøven (gul pil) og spektrofotometeret. Resten bruges i de næste trin, og grafen er tom.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Nitrit",
+        "billede": "skud/a/sb5.3_spektrofotometri__1.png",
+        "dom": "fint",
+        "fremme": "Kortet (trin 1 af 7); spektrofotometer; zoomboble med nitrit; tom standardkurve; stativ med 8 kuvetter og to dråbeflasker. Panelet: spørgsmålet, syv trin og tabellen.",
+        "bruges": "Dråbeflaskerne (gul pil) og kuvetterne; resten kommer i de næste trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 To farvestoffer",
+        "billede": "skud/a/sb5.3_spektrofotometri__2.png",
+        "dom": "lidt meget",
+        "fremme": "Kortet (trin 1 af 4); spektrofotometer med to bølgelængdeknapper; zoomboble; to tomme grafer med hver to serier; stativ med 10 kuvetter. Panelet: spørgsmålet, fire trin og en tabel med to A-kolonner.",
+        "bruges": "Alt: Første trin er 17 målinger (blindprøven og otte standarder ved både 427 og 630 nm). Pointen (kun det blå absorberer ved 630 nm) kommer bagefter som et spørgsmål uden svarknapper i forklaringen.",
+        "forslag": [
+          {
+            "alm": "Den grønne sodavand indeholder det gule farvestof E102 og det blå farvestof E133.",
+            "fed": "Hvilket lys absorberer det blå farvestof E133?",
+            "svar": ["Orange lys ved 630 nm", "Blåt lys", "Violet lys ved 427 nm"],
+            "derefter": "Knappen 630 nm lyser op, og kortet beder om blindprøven og de otte standarder ved 630 nm."
+          },
+          {
+            "alm": "Graferne viser absorbansen af de to farvestoffer ved 630 nm.",
+            "fed": "Hvilket farvestof absorberer lys ved 630 nm?",
+            "svar": ["Kun det blå E133", "Kun det gule E102", "Begge farvestoffer"],
+            "derefter": "Knappen 427 nm låses op, og kortet beder om de otte standarder ved 427 nm."
+          },
+          {
+            "alm": "Graferne viser nu også absorbansen ved 427 nm.",
+            "fed": "Hvilke farvestoffer absorberer lys ved 427 nm?",
+            "svar": ["Begge, mest det gule E102", "Kun det gule E102", "Kun det blå E133"],
+            "derefter": "Trin 2 (mål sodavanden ved begge bølgelængder) begynder som nu."
+          }
+        ],
+        "andet": "Del målingen i to (først 630 nm, så 427 nm), så eleven ikke skifter bølgelængde midt i 17 målinger. Spørgsmålene erstatter det retoriske spørgsmål i trin 1's forklaring (data.js:313).",
+        "gevinst": "Den svage elev ved, hvorfor det blå kan findes direkte ved 630 nm, før der skal regnes, i stedet for at måle 17 gange uden et mål.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Trin 1 på fane 3 ender sin forklaring med et spørgsmål uden svarknapper ('Se på graferne. Hvilket farvestof absorberer ved hvilken bølgelængde?', data.js:313). Kortet gør første sætning halvfed, også når den er en instruktion (forsoeg.js:1108), så halvfed betyder noget andet her end i de andre animationer. Fane 1 og 2 er fint stilladseret med syv trin og en gul pil."
+  },
+  {
+    "mappe": "sb5.4_spektroskopiopgaver",
+    "titel": "Spektroskopiopgaver",
+    "sprog": [
+      {
+        "fane": "3 Det lineære område",
+        "opgave": "Prilocain i en blodprøve, trin 4 For høj absorbans",
+        "fil": "js/data.js",
+        "linje": 397,
+        "nu_alm": "En anden blodprøve giver absorbansen 1,520.",
+        "nu_fed": "Hvad gør du for at finde koncentrationen af prilocain?",
+        "nu_svar": ["Fortynder og måler igen", "Aflæser c på kurven", "Regner c = (A − b) / a", "Måler i en ny kuvette"],
+        "problem": "Det, opgaven handler om (A = 1,520 ligger over det lineære område), står kun i indledningen; uden den er 'Regner c = (A − b) / a' et rimeligt svar.",
+        "nyt_alm": "En anden blodprøve med prilocain er målt ved 235 nm.",
+        "nyt_fed": "Hvordan finder du koncentrationen i en blodprøve med A = 1,520?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Standardkurven",
+        "billede": "skud/a/sb5.4_spektroskopiopgaver__0.png",
+        "dom": "fint",
+        "fremme": "Kortet med felt og enhedsvælger; flaske og spektrofotometer; grafen med standardrækken; trinrammer (trin 2 stiplet). Panelet: tabellen, Kopiér til regnearket og 2 opgaver.",
+        "bruges": "Tabellen (til regnearket) og grafen; senere trin har allerede stiplede rammer som i sb2.6.",
+        "forslag": [],
+        "andet": "Kan overvejes: Første spørgsmål samler hældningen, a = ε · l og enheden i ét felt. Går svage elever i stå, kan hældningen a spørges først (linjen dukker op på grafen), før ε.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Indholdet",
+        "billede": "skud/a/sb5.4_spektroskopiopgaver__1.png",
+        "dom": "fint",
+        "fremme": "Som fane 1 med pille og målekolbe og tre trinrammer (to stiplede).",
+        "bruges": "Tabellen og grafen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Det lineære område",
+        "billede": "skud/a/sb5.4_spektroskopiopgaver__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med fire svar; blodprøve, målekolbe, spektrofotometer; grafen med otte punkter i en gul stiplet ramme; fire trinrammer (tre stiplede). Panelet: otte målinger.",
+        "bruges": "Grafen og tabellen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "De øvrige spørgsmål kan stå alene (fx 'Hvad er ε for permanganat ved 528 nm?' og 'Hvad var massen af kobber i skruen?')."
+  },
+  {
+    "mappe": "sb6.1_syrestyrke",
+    "titel": "Kₛ og pKₛ",
+    "sprog": [
+      {
+        "fane": "1 Syreskalaen",
+        "opgave": "6 Faktoren 10",
+        "fil": "js/data.js",
+        "linje": 102,
+        "nu_alm": "Methansyre har pKₛ = 3,75, og ethansyre har pKₛ = 4,76.",
+        "nu_fed": "Hvor mange gange større er Kₛ for methansyre?",
+        "nu_svar": ["1 gang", "10 gange", "100 gange"],
+        "problem": "'større' end hvad? At der sammenlignes med ethansyre, står kun i indledningen.",
+        "nyt_alm": "Methansyre har pKₛ = 3,75, og ethansyre har pKₛ = 4,76.",
+        "nyt_fed": "Hvor mange gange større er Kₛ for methansyre end for ethansyre?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Den ukendte syre",
+        "opgave": "Flaske A, B og C, trin 1 Mål pH",
+        "fil": "js/data.js",
+        "linje": 249,
+        "nu_alm": "Flasken indeholder en ukendt syre med cₛ = 0,100 M. Begynd med at måle pH i opløsningen.",
+        "nu_fed": "Hvilken syre er det?",
+        "nu_svar": [],
+        "problem": "Det halvfede spørgsmål kan ikke besvares på dette trin (det er trin 7), og opgaven (mål pH) står i almindelig skrift efter det.",
+        "nyt_alm": "Flasken indeholder en ukendt syre med cₛ = 0,100 M. Syren findes ud fra pH og cₛ.",
+        "nyt_fed": "Hvad er pH i flasken med den ukendte syre?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Regn på syren",
+        "opgave": "Alle elleve syrer, trin 1 Reaktionen",
+        "fil": "js/data.js",
+        "linje": 163,
+        "nu_alm": "Ethansyre reagerer med vand.",
+        "nu_fed": "Hvad dannes, når CH₃COOH afgiver en hydron til vand?",
+        "nu_svar": ["OH⁻", "CH₃COO⁻", "CH₃COO", "CH₃COOH₂⁺"],
+        "problem": "'Hvad dannes' passer også på H₃O⁺, men svarene er kun baser; spørgsmålet kan stilles mere præcist.",
+        "nyt_alm": "Ethansyre reagerer med vand.",
+        "nyt_fed": "Hvilken base dannes, når CH₃COOH afgiver en hydron til vand?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Den ukendte syre",
+        "opgave": "Flaske A, trin 3 Basen",
+        "fil": "js/data.js",
+        "linje": 260,
+        "nu_alm": "Syren har afgivet hydroner til vand.",
+        "nu_fed": "Hvor stor er [B], koncentrationen af syrens korresponderende base?",
+        "nu_svar": ["[B] = [H₃O⁺] = 4,17 · 10⁻³ M", "[B] = cₛ = 0,100 M", "[B] = 0 M"],
+        "problem": "Indskudt forklaring midt i spørgsmålet, og 'syrens' siger ikke hvilken syre.",
+        "nyt_alm": "Den ukendte syre har afgivet hydroner og dannet sin korresponderende base, B.",
+        "nyt_fed": "Hvor stor er koncentrationen af basen B i flasken?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Syreskalaen",
+        "billede": "skud/a/sb6.1_syrestyrke__0.png",
+        "dom": "fint",
+        "fremme": "Kortet; Kₛ- og pKₛ-skalaen med fire zoner; én flaske med etiket og en gul boble 'Træk flasken op på skalaen'. Panelet: 6 opgaver og en tekst om skalaen.",
+        "bruges": "Alt.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Regn på syren",
+        "billede": "skud/a/sb6.1_syrestyrke__1.png",
+        "dom": "fint",
+        "fremme": "Kortet med fire svar; reaktionsskemaet med en tom plads; Kₛ fra tabellen. Panelet: fire trin og elleve syrer.",
+        "bruges": "Skemaet og den tomme plads; resten af tavlen bygges op trin for trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Den ukendte syre",
+        "billede": "skud/a/sb6.1_syrestyrke__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med knappen Mål pH; pH-meter i en kolbe; reaktionsskema og tre stiplede rammer (Konstanten, pKₛ, Omdannelsesgrad). Panelet: tre flasker og otte trin.",
+        "bruges": "pH-metret; resten har sin plads sat af.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 1 og 3 har små gule bobler i scenen ('Træk flasken op på skalaen', 'Klik: mål pH') ud over kortet. Alle tre faner er allerede stilladseret med tomme pladser og stiplede rammer."
+  }
+]

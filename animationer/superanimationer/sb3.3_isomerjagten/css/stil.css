@@ -2238,6 +2238,14 @@ kbd {
 .jl-formel { grid-column: 2; font-size: 1.02rem; font-weight: 800; white-space: nowrap; }
 .jl-bund { grid-column: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 3px; min-width: 0; }
 .jl-maerke { font-size: 0.86rem; font-weight: 800; color: var(--gul); }
+
+/* Kommende jagter: et nummer med en graa streg i stedet for formlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.jagtlinje.laast { cursor: default; opacity: 0.75; }
+.jagtlinje.laast:hover { background-color: rgba(255, 255, 255, 0.045); border-color: transparent; }
+.jagtlinje.laast .jl-formel { display: flex; align-items: center; }
+.jl-skjult { visibility: hidden; width: 0; overflow: hidden; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
 .jl-navn { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.7rem; font-weight: 700; color: var(--tekst-mat); }
 .jl-navn.niv-let { color: #7ee0a8; }
 .jl-navn.niv-middel { color: #8cc8f2; }

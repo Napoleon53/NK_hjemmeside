@@ -428,9 +428,9 @@
     /* ----- Papirkortet ------------------------------------------------------- */
     P.trinTekst = function (f) {
         var fo = this.opg.fo;
-        var start = fo.Navn + " har formlen " + fo.formelTekst + ". ";
-        if (f.slags === "ialt") return start + "Hvor mange atomer er der i alt i formlen?";
-        return start + "Hvor mange " + f.s + "-atomer er der i formlen?";
+        var start = "Flasken på bordet indeholder " + (fo.q ? fo.navn + "er" : fo.navn) + ". ";
+        if (f.slags === "ialt") return start + "Hvor mange atomer er der i alt i formlen " + fo.formelTekst + "?";
+        return start + "Hvor mange " + f.s + "-atomer er der i formlen " + fo.formelTekst + "?";
     };
 
     P.svarTekst = function (f) {

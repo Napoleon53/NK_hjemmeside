@@ -41,11 +41,12 @@ window.NK = NK;
         return a;
     };
 
-    /* Pladsen oeverst i scenen til papirkortet: mindst 164 px, saa figuren
-       ikke flytter sig, naar der kommer et hint */
+    /* Pladsen oeverst i scenen til papirkortet: mindst 165 px, saa figuren
+       ikke flytter sig, naar der kommer et hint (165, foer 164: spoergsmaalet
+       paa egen linje, 21. nov. 2026) */
     NK.kortZone = function (kort) {
         var h = kort ? kort.offsetHeight : 0;
-        return 12 + Math.max(h, 164) + 6;
+        return 12 + Math.max(h, 165) + 6;
     };
 
     NK.tilfaeldig = function (liste) {

@@ -145,22 +145,22 @@
        massen regnes af stofmaengden. I Mesteren er stof2 det andet stof. */
     D.VAEGT = [
         { id: "n1", titel: "Find stofmængden", stof: "NaCl", trin: ["n"],
-          tekst: "Du har afvejet {m} g {navn} ({kendt}). Hvor mange mol er det?",
+          tekst: "Du har afvejet {kendt} på vægten. Hvor mange mol er {m} g {navn}?",
           tal: [{ m: 116.88 }, { m: 29.22 }, { m: 175.32 }, { m: 14.61 }] },
         { id: "n2", titel: "Stofmængden af kridt", stof: "CaCO3", trin: ["n"],
-          tekst: "En elev har afvejet {m} g {navn} ({kendt}). Hvor mange mol er det?",
+          tekst: "En elev har afvejet {kendt} på vægten. Hvor mange mol er {m} g {navn}?",
           tal: [{ m: 25.00 }, { m: 12.50 }, { m: 40.00 }, { m: 7.50 }] },
         { id: "m1", titel: "Find massen", stof: "NaHCO3", trin: ["m"],
-          tekst: "Til et forsøg skal du bruge {n} mol {kendt}. Hvor mange gram skal du afveje?",
+          tekst: "Til et forsøg skal du afveje natron. Hvor mange gram er {n} mol {kendt}?",
           tal: [{ n: 0.250 }, { n: 0.100 }, { n: 0.500 }, { n: 0.0500 }] },
         { id: "m2", titel: "Massen af kobber(II)sulfat", stof: "CuSO4", trin: ["m"],
-          tekst: "Du skal bruge {n} mol {navn}. Hvor mange gram skal du afveje?",
+          tekst: "Hvor mange gram er {n} mol {navn}?",
           tal: [{ n: 0.0500 }, { n: 0.200 }, { n: 0.125 }, { n: 0.0250 }] },
         { id: "M", titel: "Find molarmassen", stof: "?", trin: ["M"],
-          tekst: "En krukke har mistet sin etiket. {m} g af pulveret er {n} mol. Find molarmassen.",
+          tekst: "En krukke har mistet sin etiket. Hvad er molarmassen af pulveret, når {m} g er {n} mol?",
           tal: [{ ukendt: "KCl", n: 0.200 }, { ukendt: "NaOH", n: 0.250 }, { ukendt: "Na2CO3", n: 0.100 }, { ukendt: "KNO3", n: 0.0500 }] },
         { id: "mester", titel: "Mesteren", stof: "NaCl", stof2: "C6H12O6", trin: ["n", "m"],
-          tekst: "Du har {m} g {navn}. Hvor mange gram glukose er den samme stofmængde?",
+          tekst: "Hvor mange gram glukose har samme stofmængde som {m} g {navn}?",
           tal: [{ m: 29.22 }, { m: 11.69 }, { m: 58.44 }, { m: 87.66 }] }
     ];
 

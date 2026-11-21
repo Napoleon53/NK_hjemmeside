@@ -245,7 +245,8 @@
 
     /* ----- Panelet og kortet ----------------------------------------------------------- */
     P.bygPanel = function () {
-        this.kort = new NK.Scenekort("ber", this, [176, 150]);
+        /* Lav skaerm 159 (foer 150): spoergsmaalet paa egen linje, 21. nov. 2026 */
+        this.kort = new NK.Scenekort("ber", this, [176, 159]);
     };
 
     P.fokus = function () {
@@ -276,7 +277,7 @@
     P.visKort = function () {
         var o = this.opg, k = Math.min(o.k, o.felter.length - 1), f = o.felter[k], t = D.TRIN[k];
         var venstre = NK.html(this.venstre(k)), felt = NK.Scenekort.felt;
-        var intro = (k === 0 ? "Regn masseprocenten af NaCl i havvandet ud. Først " + t.navn.toLowerCase() : t.navn) + ". ";
+        var intro = (k === 0 ? "Regn masseprocenten af NaCl i havvandet ud. Først " + t.navn.charAt(0).toLowerCase() + t.navn.slice(1) : t.navn) + ". ";
         var d = { chip: "Trin " + (k + 1) + " af " + o.felter.length };
         if (f.fase === "formel" && f.status === "aktiv") {
             d.slags = "spm";

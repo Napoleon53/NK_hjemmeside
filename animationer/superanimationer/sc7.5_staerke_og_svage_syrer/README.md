@@ -429,3 +429,8 @@ kortet om: spørgsmålet bliver stående med svaret grønt, forklaringen står u
 svarene, og Næste står, hvor Indsend svar stod (`blivHTML`). Selvtesten svarer
 med `svar(X, j)`, der vælger og trykker Indsend svar, og den tillader filerne i
 `../faelles/`.
+
+## Opgavelisten (21. nov. 2026)
+
+Listerne på alle tre faner låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 11 tjekker det.

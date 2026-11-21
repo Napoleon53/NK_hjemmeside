@@ -14,25 +14,21 @@
 
     var TURE = {
         "fane-lys": [
-            { sel: "#lys-skort", titel: "Kortet", tekst: "Forudsigelsen står på kortet øverst. Gæt først ved at klikke på det svar, du tror på. Derefter prøver du det selv og trykker Indsend svar." },
-            { sel: "#lys-laerred", titel: "Kuvetten i lyset", tekst: "Lampen sender lys med én bølgelængde gennem kuvetten. Prikkerne er fotoner. Kurven over strålen viser, hvor meget lys der er tilbage. Træk i grebet på kuvettens højre side for at gøre den bredere." },
-            { sel: "#lys-skruer", titel: "Skyderne", tekst: "Her ændrer du koncentrationen c og kuvettebredden l. Du kan også vælge et andet stof og få lyset til at gå langsomt." },
-            { sel: "#lys-opgaver", titel: "Forudsigelserne", tekst: "Seks forudsigelser. En forudsigelse, du gætter rigtigt uden at se svaret, får en stjerne. Start forfra begynder forudsigelsen forfra." },
+            { sel: "#lys-skort", titel: "Kortet", tekst: "Spørgsmålet står på kortet øverst. Gæt først ved at klikke på det svar, du tror på. Derefter prøver du det selv og trykker Indsend svar." },
+            { sel: "#lys-laerred", titel: "Kuvetten i lyset", tekst: "Lampen sender lys med én bølgelængde gennem kuvetten. Prikkerne er fotoner. Kurven over strålen viser, hvor meget lys der er tilbage." },
+            { sel: "#lys-c-ned, #lys-c-op, #lys-l-ned, #lys-l-op", titel: "Knapperne ved kuvetten", tekst: "− og + ved kuvettens etiket ændrer koncentrationen. − og + ved l ændrer kuvettens bredde. Knapperne kommer frem, når du skal bruge dem." },
+            { sel: "#lys-raekke", titel: "Forudsigelserne", tekst: "Seks forudsigelser. En ny åbner, når du kommer dertil. En forudsigelse, du gætter rigtigt uden at se svaret, får en stjerne. Start forfra begynder forudsigelsen forfra." },
             { sel: ".faneknapper", titel: "Standardkurven", tekst: "På fanen Standardkurven måler du standarder, lægger en linje gennem (0, 0) og bestemmer koncentrationen af en ukendt prøve." }
         ],
         "fane-kurve": [
-            { sel: "#kurve-laerred", titel: "Spektrofotometret og bakken", tekst: "Klik på en kuvette i bakken, så bliver den målt. Hver måling bliver et punkt på grafen til højre." },
-            { sel: "#kurve-maalinger", titel: "Målingerne", tekst: "Tabellen viser koncentrationen og absorbansen for hver kuvette. Prøvens koncentration står som ?, til du har aflæst den." },
             { sel: "#kurve-skort", titel: "Kortet", tekst: "Kortet øverst siger næste skridt. Når du har lagt linjen eller aflæst prøven, trykker du Indsend svar. Giv et hint giver ét hint ad gangen." },
-            { sel: "#kurve-kort", titel: "Opgaven", tekst: "Panelet viser opgaven og de fire skridt. Et skridt, der er gjort, bliver grønt." },
-            { sel: "#kurve-opgaver", titel: "Opgaverne", tekst: "Fire standardkurver. Prøvens koncentration er ny, hver gang du begynder forfra." }
+            { sel: "#kurve-laerred", titel: "Spektrofotometret og bakken", tekst: "Klik på en kuvette i bakken, så bliver den målt. Hver måling bliver et punkt på grafen og et tal i tabellen Målingerne under bakken." },
+            { sel: "#kurve-raekke", titel: "Opgaverne", tekst: "Fire standardkurver. En ny åbner, når du kommer dertil. Prøvens koncentration er ny, hver gang du begynder forfra." }
         ],
         "fane-regn": [
-            { sel: "#regn-tal", titel: "Opgavens tal", tekst: "De tal, opgaven giver. Resten af opgaveteksten står i panelet til højre." },
-            { sel: "#regn-trin", titel: "Regnestykket", tekst: "Først formlen, så tallene og til sidst resultatet. Felterne står på tavlen. Indsend svar på kortet eller Enter tjekker det, du har skrevet." },
-            { sel: "#regn-bakke", titel: "Under tavlen", tekst: "Formens form, bogstaverne og senere tallene. Klik på dem for at sætte dem ind i et felt, eller skriv selv." },
-            { sel: "#regn-skort", titel: "Kortet", tekst: "Spørgsmålet og næste skridt står på kortet øverst. Her står også, hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#regn-opgaver", titel: "Opgaverne", tekst: "Otte regnestykker i Let, Middel og Svær. Et regnestykke, du løser uden at se svaret, får en stjerne." }
+            { sel: "#regn-skort", titel: "Kortet", tekst: "Spørgsmålet står på kortet. Vælg først formlen, og skriv så tallet i feltet. Giv et hint giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#regn-laerred", titel: "Opgavens tal", tekst: "Tallene fra opgaven står på kuvetten, i displayet og på de små kort. Det, du skal finde, står som ? med gul ramme." },
+            { sel: "#regn-raekke", titel: "Opgaverne", tekst: "Let, Middel og Svær kan altid vælges. Et regnestykke, du løser uden at se svaret, får en stjerne." }
         ]
     };
     var trin = [];

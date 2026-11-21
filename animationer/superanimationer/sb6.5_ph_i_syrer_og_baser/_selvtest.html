@@ -463,6 +463,33 @@ async function koerTest(W) {
     samlet("tavlens indhold er inden for tavlen, og skriften er mindst 12,5 px ved alle fire størrelser", inde);
     ramme.style.width = "1300px";
     ramme.style.height = "800px";
+
+    /* ================================================================= */
+    overskrift("8. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    var laastLi = function (li) { return li.classList.contains("laast") && !!li.querySelector(".tr-streg") && /^\d+$/.test(li.textContent.trim()); };
+    var tekstAf = function (l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); };
+    var lis = function (id) { return [].slice.call(el(id).querySelectorAll("li")); };
+    ["fane-s", "fane-v", "fane-b"].forEach(function (id) {
+        var s = NK.sims[id];
+        NK.visFane(id); s.tilpas();
+        s.naaet = {}; s.trinMaks = {}; s.forfra();
+        var le = lis(s.opt.liste), lt = lis(s.opt.trinliste);
+        paastand(id + ": ved start har kun emne 1 og trin 1 en titel; de andre er et nummer med en grå streg",
+            le.length === s.emner.length && !laastLi(le[0]) && le.slice(1).every(laastLi) &&
+            lt.length > 1 && !laastLi(lt[0]) && lt.slice(1).every(laastLi), tekstAf(le) + " / " + tekstAf(lt));
+        le[2].click();
+        paastand(id + ": et klik på en låst syre eller base gør intet", s.nr === 0);
+        s.visSvar(); tid(s, 1); s.videreKlik();
+        lt = lis(s.opt.trinliste);
+        paastand(id + ": titlen på trin 2 kommer frem, når trin 1 er løst", s.trinNr === 1 && !laastLi(lt[1]), tekstAf(lt));
+        for (var k = 0; k < 12 && !s.faerdig; k++) { s.visSvar(); tid(s, 1); if (!s.faerdig) s.videreKlik(); }
+        le = lis(s.opt.liste);
+        paastand(id + ": Vis svaret tæller som løst: når emne 1 er løst, kommer titlen på emne 2 frem", s.faerdig && !laastLi(le[1]) && le.slice(2).every(laastLi), tekstAf(le));
+        var sid = s.emner.length - 1;
+        s.status[s.emneId(s.emner[sid])] = 1; s.visListe();
+        paastand(id + ": et emne, der er løst før (gemt i browseren), har sin titel", sid >= 2 && !laastLi(lis(s.opt.liste)[sid]));
+        s.forfra();
+    });
 }
 </script>
 </body>

@@ -890,7 +890,7 @@ button:focus-visible {
    aldrig daekker glasset, uret eller graferne. Selvtesten maaler, at kortet
    holder sig i zonen paa en almindelig og en lav skaerm.
    ===================================================================== */
-:root { --kortzone: 220px; }
+:root { --kortzone: 222px; }   /* var 220: spørgsmålet på egen linje, 21. nov. 2026 */
 
 .scenekort {
     position: absolute;

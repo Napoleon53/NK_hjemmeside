@@ -62,7 +62,8 @@
     /* Den hoejde, kortet har faaet sat af oeverst i scenen. Bassinet
        tegnes under NK.kortTop(). Selvtesten maaler kortet med det
        laengste spoergsmaal, den laengste fejl og den laengste forklaring. */
-    NK.kortZone = function () { return window.innerHeight <= 720 ? 192 : 200; };
+    /* 194/214 (før 192/200): spørgsmålet på egen linje, 21. nov. 2026 */
+    NK.kortZone = function () { return window.innerHeight <= 720 ? 194 : 214; };
     NK.kortTop = function () { return 10 + NK.kortZone() + 10; };
 
     function Opgaver(bassin, temp) {

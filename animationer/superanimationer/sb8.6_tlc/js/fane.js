@@ -151,13 +151,24 @@
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "opg-chip";
-                knap.title = o.navn;
-                knap.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" + NK.html(o.navn) + '</span><i class="oc-m"></i>';
-                knap.addEventListener("click", function () { mig.vaelg(i); });
+                knap.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + '</span><span class="oc-navn"></span></span><i class="oc-m"></i>';
+                knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
                 raekke.appendChild(knap);
                 mig.chips[i] = knap;
             });
             this.el.liste.appendChild(raekke);
+        };
+
+        /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): en
+           opgave har sin titel, naar den er loest (ogsaa gemt i browseren), naar
+           eleven er eller har vaeret ved den (naaet), eller naar alle foer den er
+           loest (Vis svaret taeller som loest). De kommende staar som et nummer
+           med en graa streg og kan ikke klikkes. */
+        P.aabenOpgave = function (i) {
+            if (this.status[i] && this.status[i].loest) return true;
+            if (this.naaet && this.naaet[i]) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
         };
 
         P.visListe = function () {
@@ -165,6 +176,13 @@
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
+                var aaben = mig.aabenOpgave(i), o = mig.opgaver[i], nv = c.querySelector(".oc-navn");
+                var navnH = aaben ? NK.html(o.navn) : '<span class="oc-streg"></span>';
+                if (nv.innerHTML !== navnH) nv.innerHTML = navnH;
+                c.disabled = !aaben;
+                c.classList.toggle("laast", !aaben);
+                if (aaben) { c.title = o.navn; c.removeAttribute("aria-label"); }
+                else { c.removeAttribute("title"); c.setAttribute("aria-label", "Opgave " + (i + 1) + ", kommer senere"); }
                 c.classList.toggle("valgt", i === mig.nr);
                 c.classList.toggle("loest", s.loest);
                 c.classList.toggle("stjerne", s.stjerne);
@@ -176,6 +194,8 @@
         /* ----- Opgaven og dens dele ------------------------------------------------ */
         P.vaelg = function (i) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
             this.hjaelp = 0;
             this.pegKnap = false;
             this.brugtSvar = false;

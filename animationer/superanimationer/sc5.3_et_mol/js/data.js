@@ -114,7 +114,7 @@
             id: "papir", et: "1 ark", titel: "Papirstakken", stige: "laengde", en: 1e-4,
             ting: "ark", fyld: "papir", top: "ark",
             intro: "Ét ark A4-papir er 0,1 mm tykt.",
-            spm: "Vi stabler 1 mol papirark. Hvor høj bliver stakken?",
+            spm: "Hvor høj bliver en stak af 1 mol papirark?",
             svar: [
                 { t: "Op til loftet", v: 2.5 },
                 { t: "Ud til Månen", v: 3.84e8 },
@@ -129,7 +129,7 @@
             id: "bamser", et: "1 vingummibamse", titel: "Vingummibamserne", stige: "rumfang", en: 2e-6,
             ting: "vingummibamser", fyld: "slik", top: "bamse",
             intro: "En vingummibamse fylder ca. 2 cm³.",
-            spm: "Vi samler 1 mol vingummibamser. Hvor meget slik bliver det?",
+            spm: "Hvor meget slik er 1 mol vingummibamser?",
             svar: [
                 { t: "En fyldt slikbutik", v: 300 },
                 { t: "Esrum Sø fuld af slik", v: 2.3e8 },
@@ -159,7 +159,7 @@
             id: "sand", et: "1 sandkorn", titel: "Sandet", stige: "rumfang", en: 1e-10,
             ting: "sandkorn", fyld: "sand", top: "sandkorn",
             intro: "Et sandkorn fylder ca. 0,1 mm³.",
-            spm: "Vi samler 1 mol sandkorn. Hvor meget sand bliver det?",
+            spm: "Hvor meget sand er 1 mol sandkorn?",
             svar: [
                 { t: "En sandkasse", v: 1 },
                 { t: "Danmark dækket 1 km højt", v: 4.3e13 },
@@ -174,7 +174,7 @@
             id: "draaber", et: "1 dråbe", titel: "Vanddråberne", stige: "rumfang", en: 5e-8,
             ting: "dråber", fyld: "vand", top: "draabe",
             intro: "En dråbe vand fylder 0,05 mL.",
-            spm: "Vi samler 1 mol vanddråber. Hvor meget vand bliver det?",
+            spm: "Hvor meget vand er 1 mol vanddråber?",
             svar: [
                 { t: "Østersøen", v: 2.17e13 },
                 { t: "Middelhavet 8 gange", v: 3.01e16 },
@@ -219,7 +219,7 @@
             id: "muldvarpe", et: "1 muldvarp", titel: "Muldvarpene", stige: "rumfang", en: 1e-4,
             ting: "muldvarpe", fyld: "muldvarp", top: "muldvarp",
             intro: "På engelsk hedder både mol og muldvarp mole. En muldvarp fylder 0,1 L.",
-            spm: "Vi samler 1 mol muldvarpe i én stor klump. Hvor stor bliver klumpen?",
+            spm: "Hvor stor bliver en klump af 1 mol muldvarpe?",
             svar: [
                 { t: "Et svømmebassin", v: 2500 },
                 { t: "Esrum Sø", v: 2.3e8 },
@@ -309,7 +309,7 @@
         },
         {
             id: "mennesker", titel: "Mol mennesker", scene: "mennesker",
-            spm: "Der er ca. 8 · 10⁹ mennesker på Jorden. Hvor mange mol mennesker er det?",
+            spm: "Hvor mange mol er de ca. 8 · 10⁹ mennesker på Jorden?",
             svar: [
                 { t: "1 mol", f: "1 mol er 6,02 · 10²³ stk. Der er langt færre mennesker end det, så svaret er under 1 mol." },
                 { t: "8 · 10⁹ mol", f: "8 · 10⁹ er antallet af mennesker, ikke antal mol. Divider med 6,02 · 10²³." },

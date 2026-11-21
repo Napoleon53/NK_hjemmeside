@@ -331,6 +331,11 @@ lokal server eller Chrome med `--allow-file-access-from-files` og lægger
 elevens gemte fremskridt tilbage bagefter. Sidst kørt 9. oktober 2026:
 ALT OK (172 påstande).
 
+## Opgavelisten (21. nov. 2026)
+
+Listerne på alle fire faner låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 13 tjekker det.
+
 ## Forenklinger
 
 * Kobber(II)sulfat regnes som CuSO₄ (159,61 g/mol), og pulveret tegnes

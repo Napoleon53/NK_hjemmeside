@@ -1,0 +1,784 @@
+[
+  {
+    "mappe": "sc7.3_ph_beregninger",
+    "titel": "pH-beregninger",
+    "sprog": [
+      {
+        "fane": "1 Find pH",
+        "opgave": "Alle opgaver på fanen (trinnene Tast og Skriv)",
+        "fil": "js/sim_regn.js",
+        "linje": 111,
+        "nu_alm": "Citronsaft har [H₃O⁺] = 5,0 · 10⁻³ M.",
+        "nu_fed": "Hvad er pH?",
+        "problem": "Det halvfede siger hverken stoffet eller [H₃O⁺], så alt, der skal regnes på, står kun i den almindelige skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad er pH i citronsaft med [H₃O⁺] = 5,0 · 10⁻³ M?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Find koncentrationen",
+        "opgave": "Alle opgaver på fanen",
+        "fil": "js/sim_regn.js",
+        "linje": 126,
+        "nu_alm": "pH-metret viser, at cola har pH 2,50.",
+        "nu_fed": "Hvad er [H₃O⁺] og [OH⁻]?",
+        "problem": "Det halvfede nævner hverken colaen eller pH 2,50, som er det eneste tal, der regnes ud fra.",
+        "nyt_alm": "pH-metret har målt pH i colaen.",
+        "nyt_fed": "Hvad er [H₃O⁺] og [OH⁻] i cola med pH 2,50?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Stærke syrer og baser",
+        "opgave": "Alle opgaver på fanen",
+        "fil": "js/sim_regn.js",
+        "linje": 151,
+        "nu_alm": "Flasken indeholder 0,10 M HCl (saltsyre).",
+        "nu_fed": "Hvad er pH?",
+        "problem": "Det halvfede siger hverken stoffet eller koncentrationen. For en base er det afgørende, om formlen har én eller to OH.",
+        "nyt_alm": "Flasken indeholder saltsyre.",
+        "nyt_fed": "Hvad er pH i flasken med 0,10 M HCl?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1-3 (alle faner)",
+        "opgave": "Trinnet, hvor formlen vælges",
+        "fil": "js/sim_regn.js",
+        "linje": 593,
+        "nu_alm": "Citronsaft har [H₃O⁺] = 5,0 · 10⁻³ M. Vælg formlen, der går fra [H₃O⁺] til pH.",
+        "nu_fed": "Hvad er pH?",
+        "nu_svar": ["pH = 10^−[H₃O⁺]", "pH = −log[H₃O⁺]", "pH = log[H₃O⁺]"],
+        "problem": "Svarknapperne er formler, men det halvfede spørger om pH. Det, knapperne svarer på, står som instruktion i almindelig skrift på linjen under (sk-trin, uden om NK.Papir.tekst).",
+        "nyt_alm": "Citronsaft har [H₃O⁺] = 5,0 · 10⁻³ M. Du skal finde pH.",
+        "nyt_fed": "Hvilken formel går fra [H₃O⁺] til pH?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Find pH",
+        "billede": "skud/b/sc7.3_ph_beregninger__0.png",
+        "dom": "fint",
+        "fremme": "kortet med tre formler, regnevejen [H₃O⁺] → pH, citronen med etiket, pH-metret; i panelet regnestykket og lommeregneren",
+        "bruges": "kortets formler og regnevejen; tallet står på etiketten. Lommeregneren og pH-metret kommer i de næste bidder",
+        "forslag": [],
+        "andet": "Opgaven er allerede delt i bidder (vælg formel, tast, skriv svar), og feltet i panelet kommer først, når formlen er valgt. Intet at ændre.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Find koncentrationen",
+        "billede": "skud/b/sc7.3_ph_beregninger__1.png",
+        "dom": "fint",
+        "fremme": "kortet med tre formler, regnevejen, colaen med etiket, pH-metret med 2,50; lommeregneren i panelet",
+        "bruges": "formlerne, regnevejen og pH-metrets tal",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Stærke syrer og baser",
+        "billede": "skud/b/sc7.3_ph_beregninger__2.png",
+        "dom": "fint",
+        "fremme": "kortet med tre formler, regnevejen c(HCl) → [H₃O⁺], flasken med etiket, pH-metret; reaktionsskemaet og lommeregneren i panelet",
+        "bruges": "formlerne, regnevejen og flaskens koncentration",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Det samme mønster i alle tre faner: Opgavens spørgsmål er halvfedt hele vejen, mens det, eleven skal gøre lige nu, står i almindelig skrift under det. Skal forslaget om formel-trinnet laves, skal linjen sk-trin gives gennem NK.Papir.tekst (eller have klassen sk-spm), og opgavens spørgsmål skal stå uden spørgsmålstegn imens."
+  },
+  {
+    "mappe": "sc7.4_titrering_eddike",
+    "titel": "Titrering af eddike",
+    "sprog": [
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Trin 1 til 4 (formel og tal)",
+        "fil": "js/sim_beregning.js",
+        "linje": 329,
+        "nu_alm": "Regn eddikens masseprocent ud.",
+        "nu_fed": "Stofmængden af NaOH: Hvad er tallet for n(NaOH)?",
+        "problem": "\"tallet for n(NaOH)\" er indforstået, og trinnets navn med kolon står inde i det halvfede. I formelfasen bør det være \"Hvilken formel giver stofmængden af NaOH, n(NaOH)?\" (samme skabelon for de fire trin med D.TRIN[k].navn og venstre(k)).",
+        "nyt_alm": "Regn eddikens masseprocent ud i fire trin.",
+        "nyt_fed": "Hvad er stofmængden af NaOH, n(NaOH)?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 To kolber",
+        "opgave": "Opgave 1 (60 mL vand)",
+        "fil": "js/data.js",
+        "linje": 62,
+        "nu_alm": "Kolbe B får 60 mL vand i stedet for 20 mL.",
+        "nu_fed": "Skal der flere, lige så mange eller færre mL NaOH til?",
+        "nu_svar": ["Flere mL", "Lige så mange", "Færre mL"],
+        "problem": "Det halvfede nævner hverken kolbe B, ændringen eller hvad der sammenlignes med (kolbe A).",
+        "nyt_alm": "Kolbe B får 60 mL vand i stedet for 20 mL.",
+        "nyt_fed": "Hvor mange mL NaOH skal kolbe B med 60 mL vand bruge i forhold til kolbe A?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 To kolber",
+        "opgave": "Opgave 2 (1,00 g eddike)",
+        "fil": "js/data.js",
+        "linje": 72,
+        "nu_alm": "Kolbe B får kun 1,00 g eddike i stedet for 2,00 g.",
+        "nu_fed": "Skal der flere, lige så mange eller færre mL NaOH til?",
+        "nu_svar": ["Flere mL", "Lige så mange", "Færre mL"],
+        "problem": "Samme spørgsmål som i opgave 1, så det halvfede kan ikke skelne opgaverne; ændringen står kun i indledningen.",
+        "nyt_alm": "Kolbe B får kun 1,00 g eddike i stedet for 2,00 g.",
+        "nyt_fed": "Hvor mange mL NaOH skal kolbe B med 1,00 g eddike bruge i forhold til kolbe A?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 To kolber",
+        "opgave": "Opgave 4 (0,200 M NaOH)",
+        "fil": "js/data.js",
+        "linje": 92,
+        "nu_alm": "Buretten ved kolbe B indeholder 0,200 M NaOH i stedet for 0,100 M.",
+        "nu_fed": "Skal der flere, lige så mange eller færre mL NaOH til?",
+        "nu_svar": ["Flere mL", "Lige så mange", "Færre mL"],
+        "problem": "Det halvfede siger ikke, at NaOH nu er dobbelt så koncentreret, og det er hele pointen.",
+        "nyt_alm": "Buretten ved kolbe B indeholder 0,200 M NaOH i stedet for 0,100 M.",
+        "nyt_fed": "Hvor mange mL af den 0,200 M NaOH skal kolbe B bruge i forhold til kolbe A?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 To kolber",
+        "opgave": "Opgave 5 (spild)",
+        "fil": "js/data.js",
+        "linje": 102,
+        "nu_alm": "Du spilder lidt af eddiken til kolbe B, efter at du har vejet den.",
+        "nu_fed": "Bliver masseprocenten for høj, rigtig eller for lav?",
+        "nu_svar": ["For høj", "Rigtig", "For lav"],
+        "problem": "Det halvfede siger hverken kolbe B eller spildet, så eleven ved ikke, hvorfor masseprocenten skulle blive forkert.",
+        "nyt_alm": "Du har vejet eddiken til kolbe B.",
+        "nyt_fed": "Bliver masseprocenten for kolbe B for høj, rigtig eller for lav, når du spilder eddike efter vejningen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Titreringen",
+        "opgave": "Aflæsningen",
+        "fil": "js/sim_titrering.js",
+        "linje": 352,
+        "nu_alm": "Aflæs buretten ved menisken.",
+        "nu_fed": "Hvor meget NaOH er løbet ned?",
+        "problem": "\"Hvor meget\" siger ikke, at svaret skal være i mL, og buretten nævnes kun i indledningen.",
+        "nyt_alm": "Aflæs buretten ved menisken.",
+        "nyt_fed": "Hvor mange mL NaOH er løbet ned fra buretten?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Titreringen",
+        "billede": "skud/b/sc7.4_titrering_eddike__0.png",
+        "dom": "fint",
+        "fremme": "kortet, stativ med burette, hane-skyder og knappen 1 dråbe, kolben, eddikeflasken, luppen med 8 CH₃COOH; i panelet menisk-luppen og titreringskurven",
+        "bruges": "buretten, skyderen og kolben. Luppen og kurven følger titreringen",
+        "forslag": [],
+        "andet": "Menisk-luppen i panelet bruges først ved aflæsningen og kunne foldes ind til da. Lille gevinst.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Beregningen",
+        "billede": "skud/b/sc7.4_titrering_eddike__1.png",
+        "dom": "fint",
+        "fremme": "tavlen med data, reaktionsskema, fire beregningslinjer (tre grå) og en bjælke; i panelet målingen og fire felter",
+        "bruges": "data, første linje og første felt; de tre næste trin står grå som pladsholdere",
+        "forslag": [],
+        "andet": "Dataene står både på tavlen og i panelet. Det kunne nøjes med ét sted.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 To kolber",
+        "billede": "skud/b/sc7.4_titrering_eddike__2.png",
+        "dom": "fint",
+        "fremme": "kortet med tre svar, to buretter og to kolber, skiltet B · 60 mL vand; tabellen i panelet",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3: Opgave 3 (masseprocent med 1,00 g) kan få samme form: \"Bliver masseprocenten for kolbe B med 1,00 g eddike større, den samme eller mindre end for kolbe A?\"."
+  },
+  {
+    "mappe": "sc7.5_staerke_og_svage_syrer",
+    "titel": "Stærke og svage syrer",
+    "sprog": [
+      {
+        "fane": "1 To glas",
+        "opgave": "Saltsyren i luppen",
+        "fil": "js/data.js",
+        "linje": 87,
+        "nu_alm": "Der blev hældt 100 HCl-molekyler i rummet i luppen over saltsyren.",
+        "nu_fed": "Hvor mange af dem er stadig hele?",
+        "nu_svar": ["Alle 100 er hele", "Omkring halvdelen er hele", "Ingen er hele"],
+        "problem": "\"af dem\" peger tilbage på HCl-molekylerne i indledningen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvor mange af de 100 HCl-molekyler i luppen over saltsyren er stadig hele?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Stærk eller svag?",
+        "opgave": "Glas D (gæt)",
+        "fil": "js/data.js",
+        "linje": 304,
+        "nu_alm": "Glas D har fået sin etiket: saltsyre, HCl, en stærk syre. 100 HCl-molekyler blev hældt i.",
+        "nu_fed": "Hvad viser luppen for glas D?",
+        "nu_svar": ["1 oxoniumion og 99 hele molekyler", "50 oxoniumioner og 50 hele", "100 oxoniumioner og ingen hele"],
+        "problem": "Det halvfede siger ikke, at glas D er saltsyre med 100 HCl-molekyler, og det er det, gættet bygger på. Indledningen har lille bogstav efter kolon.",
+        "nyt_alm": "Glas D har fået en etiket. Glasset indeholder saltsyre, HCl, som er en stærk syre.",
+        "nyt_fed": "Hvad viser luppen for de 100 HCl-molekyler i saltsyren i glas D?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Stærk eller svag?",
+        "opgave": "Glas E (gæt)",
+        "fil": "js/data.js",
+        "linje": 322,
+        "nu_alm": "Glas E har fået sin etiket: myresyre, HCOOH, en svag syre. 100 myresyremolekyler blev hældt i.",
+        "nu_fed": "Hvilken partikel er der flest af i luppen for glas E?",
+        "nu_svar": ["Oxoniumioner, H₃O⁺", "Hele myresyremolekyler", "Lige mange af hver"],
+        "problem": "Det halvfede siger ikke, at glas E er myresyre, så eleven kan ikke bruge det, hun ved om svage syrer. Lille bogstav efter kolon i indledningen.",
+        "nyt_alm": "Glas E har fået en etiket. Glasset indeholder myresyre, HCOOH, som er en svag syre.",
+        "nyt_fed": "Hvilken partikel er der flest af i luppen for myresyren i glas E?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Stærk eller svag?",
+        "opgave": "Glas E (spørgsmålet efter forsøget)",
+        "fil": "js/data.js",
+        "linje": 337,
+        "nu_alm": "Glas E, myresyre: 4 ud af 100 har afgivet en hydron. Glas B, eddikesyre: 1.",
+        "nu_fed": "Hvor bruser kalken mest?",
+        "nu_svar": ["I glas B, eddikesyre", "Lige meget, for begge er svage", "I glas E, myresyre"],
+        "problem": "Det halvfede nævner ikke de to glas, der sammenlignes. Tallene 4 og 1 ses også i lupperne, så de kan undværes på kortet (grænsen er 105 tegn).",
+        "nyt_alm": "",
+        "nyt_fed": "Bruser kalken mest i myresyren i glas E eller i eddikesyren i glas B?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Fortyndet?",
+        "opgave": "Fortynd 10 gange (gæt)",
+        "fil": "js/data.js",
+        "linje": 365,
+        "nu_alm": "Eddikesyre til venstre og saltsyre til højre, begge 0,10 M. Om lidt fortynder du saltsyren 10 gange, til 0,010 M.",
+        "nu_fed": "Hvor bruser kalken mest, når saltsyren er fortyndet?",
+        "nu_svar": ["I eddikesyren", "I den fortyndede saltsyre", "Lige meget i de to glas"],
+        "problem": "Det afgørende, at saltsyren nu er 10 gange mindre koncentreret end eddikesyren, står kun i indledningen.",
+        "nyt_alm": "Eddikesyre til venstre og saltsyre til højre, begge 0,10 M.",
+        "nyt_fed": "Hvor bruser kalken mest, når saltsyren er fortyndet til 0,010 M og eddikesyren stadig er 0,10 M?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 To glas",
+        "billede": "skud/b/sc7.5_staerke_og_svage_syrer__0.png",
+        "dom": "fint",
+        "fremme": "gæt-kortet, to glas med skilte og skålen med kalk",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Stærk eller svag?",
+        "billede": "skud/b/sc7.5_staerke_og_svage_syrer__1.png",
+        "dom": "fint",
+        "fremme": "kortet, fem glas med kalk, der bruser, og en stiplet ramme med navnet Luppen; listen over de fem glas i panelet",
+        "bruges": "glas A og luppens plads",
+        "forslag": [],
+        "andet": "Fanen bruger allerede den stiplede ramme med navn til luppen.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Fortyndet?",
+        "billede": "skud/b/sc7.5_staerke_og_svage_syrer__2.png",
+        "dom": "fint",
+        "fremme": "gæt-kortet, to glas med kalk; i panelet koncentrationer og H₃O⁺ i lupperne",
+        "bruges": "glassene og koncentrationerne",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 1, Hydroner frem og tilbage: Svaret \"Den går begge veje lige ofte\" begynder med \"Den\" om reaktionen (\"Hydronerne går begge veje lige ofte\" er 34 tegn)."
+  },
+  {
+    "mappe": "sc8.1_redoxreaktioner",
+    "titel": "Redoxreaktioner",
+    "sprog": [
+      {
+        "fane": "2 Delreaktioner",
+        "opgave": "Lige mange elektroner",
+        "fil": "js/data.js",
+        "linje": 313,
+        "nu_alm": "Et magnesiumatom afgiver 2 e⁻, og ét O₂ optager 4 e⁻.",
+        "nu_fed": "Hvor mange magnesiumatomer går der på ét O₂?",
+        "nu_svar": ["2 magnesiumatomer", "1 magnesiumatom", "4 magnesiumatomer"],
+        "problem": "\"går der på\" er talesprog og siger ikke, at magnesium skal afgive lige så mange elektroner, som O₂ optager.",
+        "nyt_alm": "Et magnesiumatom afgiver 2 e⁻.",
+        "nyt_fed": "Hvor mange magnesiumatomer afgiver de 4 e⁻, som ét O₂ optager?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Delreaktioner",
+        "opgave": "Håndvarmeren",
+        "fil": "js/data.js",
+        "linje": 370,
+        "nu_alm": "Et jernatom afgiver 3 e⁻, og ét O₂ optager 4 e⁻.",
+        "nu_fed": "Hvor mange jernatomer går der på 3 dioxygenmolekyler?",
+        "nu_svar": ["4 jernatomer", "3 jernatomer", "12 jernatomer"],
+        "problem": "Samme indirekte \"går der på\" som i opgave 3; betingelsen om lige mange elektroner står ingen steder.",
+        "nyt_alm": "Et jernatom afgiver 3 e⁻. Ét O₂ optager 4 e⁻.",
+        "nyt_fed": "Hvor mange jernatomer afgiver de e⁻, som 3 O₂ optager?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Syre/base og redox",
+        "opgave": "Den, der afgiver",
+        "fil": "js/data.js",
+        "linje": 571,
+        "nu_alm": "Et reduktionsmiddel er ikke en syre, men de to har én ting til fælles.",
+        "nu_fed": "Hvad er det?",
+        "nu_svar": ["Begge afgiver en partikel", "Begge optager en partikel", "Begge indeholder hydrogen"],
+        "problem": "Det halvfede peger kun tilbage med \"det\".",
+        "nyt_alm": "Se på HCl og magnesium i lupperne.",
+        "nyt_fed": "Hvad har syren HCl og reduktionsmidlet magnesium til fælles?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Delreaktioner",
+        "opgave": "Ekstraopgaven Svær (midlerne)",
+        "fil": "js/data.js",
+        "linje": 456,
+        "nu_alm": "",
+        "nu_fed": "Hvilket stof er reduktionsmidlet i reaktionen?",
+        "nu_svar": ["Aluminium", "Dichlor", "Aluminiumchlorid"],
+        "problem": "\"i reaktionen\" siger ikke hvilken; eleven har lige skrevet fire reaktioner og skal selv finde den på arket.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilket stof er reduktionsmidlet, når aluminium reagerer med dichlor?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Magnesium brænder",
+        "billede": "skud/b/sc8.1_redoxreaktioner__0.png",
+        "dom": "fint",
+        "fremme": "kortet, magnesiumbåndet i tangen, skålen og luppen med Mg-atomer og ét O₂",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Delreaktioner",
+        "billede": "skud/b/sc8.1_redoxreaktioner__1.png",
+        "dom": "fint",
+        "fremme": "kortet, arket med reaktionen i ord, den aktive delreaktion og den næste i gråt, én e⁻-brik",
+        "bruges": "det hele; den grå række er en pladsholder",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Syre/base og redox",
+        "billede": "skud/b/sc8.1_redoxreaktioner__2.png",
+        "dom": "fint",
+        "fremme": "kortet, to reaktionsskemaer med hver sin lup; kontakten Elektronprikker i panelet",
+        "bruges": "begge lupper",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  },
+  {
+    "mappe": "sc8.2_spaendingsraekken",
+    "titel": "Spændingsrækken",
+    "sprog": [
+      {
+        "fane": "3 Forudsig",
+        "opgave": "Alle opgaver (gættet)",
+        "fil": "js/data.js",
+        "linje": 151,
+        "nu_alm": "Jern i kobber(II)sulfat.",
+        "nu_fed": "Sker der noget?",
+        "nu_svar": ["Ja, der sker en reaktion", "Nej, intet sker"],
+        "problem": "Det halvfede nævner hverken metallet eller opløsningen, og \"noget\" er uklart. Teksten sættes sammen i sim_forudsig.js linje 369, så D.FU_SPM skal være en funktion af m og i.",
+        "nyt_alm": "",
+        "nyt_fed": "Sker der en reaktion, når jern kommer ned i kobber(II)sulfat?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Forudsig",
+        "opgave": "Alle opgaver (produkterne)",
+        "fil": "js/data.js",
+        "linje": 170,
+        "nu_alm": "Jern i kobber(II)sulfat. (efter spørgsmålet: Vælg de to stoffer.)",
+        "nu_fed": "Hvad dannes?",
+        "problem": "Det halvfede er to ord uden stoffer, og instruktionen \"Vælg de to stoffer.\" står efter spørgsmålet.",
+        "nyt_alm": "Der sker en reaktion.",
+        "nyt_fed": "Hvilke to stoffer dannes, når jern reagerer med Cu²⁺?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Forsøget",
+        "opgave": "Mål 2 (kobberstang i Ag⁺)",
+        "fil": "js/data.js",
+        "linje": 73,
+        "nu_alm": "Væsken i glasset med Ag⁺ bliver blå.",
+        "nu_fed": "Hvor kommer farven fra?",
+        "nu_svar": ["Kobber(II)ioner fra stangen", "Sølv(I)nitrat bliver blåt med tiden", "Sølvet på stangen"],
+        "problem": "\"farven\" peger tilbage; det halvfede siger hverken glasset eller den blå farve.",
+        "nyt_alm": "Kobberstangen står i glasset med Ag⁺.",
+        "nyt_fed": "Hvor kommer den blå farve i glasset med Ag⁺ fra?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Forsøget",
+        "opgave": "Mål 3 (sølvstang i Cu²⁺)",
+        "fil": "js/data.js",
+        "linje": 86,
+        "nu_alm": "Der sker intet i glasset med Cu²⁺.",
+        "nu_fed": "Hvad gør kobber(II)ionerne i luppen?",
+        "nu_svar": ["De støder ind i sølvet og svømmer videre", "De sætter sig på sølvet", "De tager elektroner fra sølvet"],
+        "problem": "Det halvfede siger ikke, at det er sølvstangen, ionerne møder.",
+        "nyt_alm": "Der sker intet i glasset med Cu²⁺.",
+        "nyt_fed": "Hvad gør kobber(II)ionerne, når de rammer sølvstangen?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Forsøget",
+        "billede": "skud/b/sc8.2_spaendingsraekken__0.png",
+        "dom": "lidt meget",
+        "fremme": "kortet, stativ med fem metalstænger, seks glas med skilte, luppen over det blå glas; skemaet med 25 tomme felter i panelet",
+        "bruges": "zinkstangen, det blå glas med Cu²⁺ og luppen",
+        "forslag": [],
+        "andet": "Dæmp de stænger og glas, mål 1 til 3 ikke bruger, så kun den stang og det glas, kortet nævner, er lyse. Alle bliver lyse i mål 4 og 5. Skemaet kan blive, for det fyldes af det, eleven selv gør.",
+        "gevinst": "Den svage elev, der klikker først, ser straks, hvilken stang og hvilket glas opgaven gælder, og prøver ikke tilfældige par.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Rækken",
+        "billede": "skud/b/sc8.2_spaendingsraekken__1.png",
+        "dom": "fint",
+        "fremme": "kortet, hylden med seks stiplede pladser og pilen uædel → ædel, seks kort; skemaet fra fane 1 i panelet",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Forudsig",
+        "billede": "skud/b/sc8.2_spaendingsraekken__2.png",
+        "dom": "fint",
+        "fremme": "kortet med to svar, spændingsrækken med 15 stoffer, stativ med jernstangen, glasset og luppen",
+        "bruges": "rækken (Fe og Cu) og glasset",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3, afstemningen: \"Afstem reaktionen. Skriv, hvor mange der er af hvert stof, også 1.\" har intet spørgsmål, så intet er halvfedt. Det er fint for en instruktion."
+  },
+  {
+    "mappe": "sc8.3_oxidationstal",
+    "titel": "Oxidationstal",
+    "sprog": [
+      {
+        "fane": "2 Elektronerne",
+        "opgave": "Gættet (alle molekyler)",
+        "fil": "js/sim_elektroner.js",
+        "linje": 113,
+        "nu_alm": "Find oxidationstallet for O og H i H₂O.",
+        "nu_fed": "Gæt først: Hvilke oxidationstal har O og H?",
+        "problem": "Molekylet mangler i det halvfede, og netop på denne fane afhænger svaret af molekylet (O er −II i H₂O, −I i H₂O₂ og +II i OF₂). \"Gæt først:\" med kolon står inde i spørgsmålet.",
+        "nyt_alm": "Find oxidationstallene for O og H i H₂O. Gæt først.",
+        "nyt_fed": "Hvilke oxidationstal har O og H i H₂O?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Reglerne",
+        "opgave": "Alle stoffer (trinnene O, H og det ukendte grundstof)",
+        "fil": "js/sim_regler.js",
+        "linje": 110,
+        "nu_alm": "Find oxidationstallet for Cl i ClO₃⁻.",
+        "nu_fed": "Hvilket oxidationstal har hvert O?",
+        "problem": "Det halvfede nævner ikke stoffet. Ved det ukendte grundstof (\"Hvilket oxidationstal har Cl?\") kan det ikke besvares uden stoffet. Formlen står dog stort på tavlen.",
+        "nyt_alm": "Find oxidationstallet for Cl i ClO₃⁻.",
+        "nyt_fed": "Hvilket oxidationstal har hvert O i ClO₃⁻?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Reglerne",
+        "billede": "skud/b/sc8.3_oxidationstal__0.png",
+        "dom": "fint",
+        "fremme": "kortet med ét felt, tavlen med trinvisningen Ladningen › O › C og formlen CO₂",
+        "bruges": "det hele; opgaven er allerede stilladset i trin",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Elektronerne",
+        "billede": "skud/b/sc8.3_oxidationstal__1.png",
+        "dom": "fint",
+        "fremme": "kortet med to gættefelter, tavlen med elektronprikformlen for H₂O og elektronegativiteterne; regnskabet venter i panelet",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  },
+  {
+    "mappe": "sc8.4_redoxafstemning",
+    "titel": "Afstem redoxreaktioner",
+    "sprog": [],
+    "start": [
+      {
+        "fane": "Let (uden oxygen)",
+        "billede": "skud/b/sc8.4_redoxafstemning__0.png",
+        "dom": "fint",
+        "fremme": "kortet, reaktionsskemaet med fire felter til oxidationstal og en række knapper med oxidationstal",
+        "bruges": "det hele; de syv trin kommer ét ad gangen",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "Middel (surt miljø)",
+        "billede": "skud/b/sc8.4_redoxafstemning__1.png",
+        "dom": "fint",
+        "fremme": "som Let",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "Svær (basisk og særlige)",
+        "billede": "skud/b/sc8.4_redoxafstemning__2.png",
+        "dom": "fint",
+        "fremme": "som Let",
+        "bruges": "det hele",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Kortet bruger ikke NK.Papir.tekst; trinnets tekst (js/opgave.js linje 54-62) står altid halvfedt, også når den er en instruktion i bydeform. Trin 3 \"Hvor meget stiger og falder oxidationstallet pr. atom?\" er to spørgsmål i ét, men felterne ved klammerne (\"stiger med __ pr. atom\", \"falder med __ pr. atom\") gør det klart. Intet tydeligt sprogfund."
+  },
+  {
+    "mappe": "sc8.5_kaliumpermanganat",
+    "titel": "Kaliumpermanganat",
+    "sprog": [
+      {
+        "fane": "1 Urglassene og 2 Flere reaktioner",
+        "opgave": "Trinnet Hvad blev mangan til?",
+        "fil": "js/sim.js",
+        "linje": 274,
+        "nu_alm": "Vælg det stof, MnO₄⁻ blev til.",
+        "nu_fed": "",
+        "problem": "Det eneste trin med valg har intet halvfedt spørgsmål, og teksten siger ikke, at svaret findes ud fra glassets farve.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilket stof blev MnO₄⁻ til, da glasset blev grønt?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Urglassene",
+        "billede": "skud/b/sc8.5_kaliumpermanganat__0.png",
+        "dom": "fint",
+        "fremme": "kortet, fire flasker, det tomme urglas, luppen, hæftet med en tom pil; i panelet trinlisten, farvekortet og de tre reaktioner",
+        "bruges": "to af flaskerne og urglasset",
+        "forslag": [],
+        "andet": "Opgaven er allerede delt i ti små trin, og hæftet fyldes efterhånden. Farvekortet i panelet bruges først i trinnet Hvad blev mangan til? og kunne foldes ind til da.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Flere reaktioner",
+        "billede": "skud/b/sc8.5_kaliumpermanganat__1.png",
+        "dom": "fint",
+        "fremme": "kortet, én flaske, urglasset med Fe²⁺, luppen og hæftet; farvekortet og listen over 14 reaktioner i panelet",
+        "bruges": "flasken og urglasset",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Kortet har ellers kun instruktioner i bydeform, så intet bliver halvfedt. Det er fint for regnetrinnene. Indledningen på fane 1 siger \"Dryp så i, og afstem reaktionen\" uden at sige, hvad der dryppes."
+  },
+  {
+    "mappe": "sc8.7_korrosion",
+    "titel": "Korrosion",
+    "sprog": [
+      {
+        "fane": "1 Rørene",
+        "opgave": "Kobber og jern (gæt)",
+        "fil": "js/data.js",
+        "linje": 33,
+        "nu_alm": "Et kobberrør og et jernrør er skruet sammen, og der løber vand i dem.",
+        "nu_fed": "Gæt, hvad der sker med rørene i løbet af 20 år.",
+        "nu_svar": ["Kobberrøret tæres ved samlingen", "Jernrøret tæres ved samlingen", "Begge rør tæres lige meget"],
+        "problem": "Det halvfede er en opfordring, ikke et spørgsmål, og nævner ikke, at rørene er af kobber og jern. Svarene handler om, hvilket rør der tæres.",
+        "nyt_alm": "Et kobberrør og et jernrør er skruet sammen. Der løber vand i dem i 20 år.",
+        "nyt_fed": "Hvilket rør tæres ved samlingen af kobberrøret og jernrøret?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Rørene",
+        "opgave": "Elektronerne",
+        "fil": "js/data.js",
+        "linje": 55,
+        "nu_alm": "Lad tiden gå igen, og følg de gule elektroner (e⁻) i luppen.",
+        "nu_fed": "Hvilken vej går de?",
+        "nu_svar": ["Fra jernet over i kobberet", "Fra kobberet over i jernet", "Fra jernet ud i vandet"],
+        "problem": "\"de\" peger tilbage på elektronerne, og rørene nævnes ikke.",
+        "nyt_alm": "Lad tiden gå igen, og følg de gule elektroner (e⁻) i luppen.",
+        "nyt_fed": "Hvilken vej går elektronerne mellem jernrøret og kobberrøret?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Rørene",
+        "opgave": "Zink og jern (gæt)",
+        "fil": "js/data.js",
+        "linje": 105,
+        "nu_alm": "Nu er et zinkrør skruet sammen med et jernrør. I opgave 1 med kobber og jern var det jernrøret, der blev tæret.",
+        "nu_fed": "Gæt, hvad der sker nu.",
+        "nu_svar": ["Jernrøret tæres igen", "Zinkrøret tæres", "Ingen af dem tæres"],
+        "problem": "\"nu\" peger tilbage, og det halvfede nævner hverken zink eller jern.",
+        "nyt_alm": "I opgave 1 med kobber og jern var det jernrøret, der blev tæret.",
+        "nyt_fed": "Hvilket rør tæres, når et zinkrør er skruet sammen med et jernrør?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Rørene",
+        "opgave": "Vandets retning (gæt)",
+        "fil": "js/data.js",
+        "linje": 127,
+        "nu_alm": "Vandet løber fra venstre mod højre. Med kobberrøret først går der hul i jernrøret efter 10 år. Nu er rørene byttet om, så vandet kommer gennem jernrøret først.",
+        "nu_fed": "Gæt, hvornår der går hul.",
+        "nu_svar": ["Før der er gået 10 år", "Efter 10 år igen", "Senere end efter 10 år"],
+        "problem": "Det halvfede siger hverken hvilket rør eller at rørene er byttet om; alt står i tre sætninger indledning.",
+        "nyt_alm": "Med kobberrøret først går der hul i jernrøret efter 10 år. Nu er rørene byttet om.",
+        "nyt_fed": "Hvornår går der hul i jernrøret, når vandet kommer gennem jernrøret først?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Skibet",
+        "opgave": "Magnesium (gæt)",
+        "fil": "js/data.js",
+        "linje": 303,
+        "nu_alm": "Magnesium er endnu mindre ædelt end zink.",
+        "nu_fed": "Gæt, hvordan en klods af magnesium klarer sig i forhold til en klods af zink.",
+        "nu_svar": ["Den holder længere end zink", "Den bliver brugt hurtigere end zink", "Den beskytter slet ikke skroget"],
+        "problem": "En opfordring i stedet for et spørgsmål, og \"klarer sig\" er uklart. Svarene handler om, hvor længe klodsen holder.",
+        "nyt_alm": "Magnesium er endnu mindre ædelt end zink.",
+        "nyt_fed": "Hvor længe holder en klods af magnesium på skroget i forhold til en klods af zink?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "1 Rørene",
+        "opgave": "Vandets retning (spørgsmålet)",
+        "fil": "js/data.js",
+        "linje": 145,
+        "nu_alm": "Sæt kobberrøret først igen, og se i luppen.",
+        "nu_fed": "Hvorfor går der hul hurtigere, når vandet kommer fra kobberrøret?",
+        "nu_svar": ["Vandet har elektroner med fra kobberrøret", "Kobber(II)ioner i vandet tager elektroner fra jernet", "Vandet løber hurtigere fra kobberrøret"],
+        "problem": "Det halvfede siger ikke, hvilket rør der får hul, og \"hurtigere\" har intet at sammenligne med.",
+        "nyt_alm": "Sæt kobberrøret først igen, og se i luppen.",
+        "nyt_fed": "Hvorfor går der hurtigere hul i jernrøret, når vandet kommer gennem kobberrøret først?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Rørene",
+        "billede": "skud/b/sc8.7_korrosion__0.png",
+        "dom": "lidt meget",
+        "fremme": "gæt-kortet, årstælleren og Lad tiden gå, luppen med 72 atomer og fem O₂, de to rør med vand, to rækker metalvælgere",
+        "bruges": "kun de to rør. Lad tiden gå bruges lige efter gættet, luppen først i opgave 2 og metalvælgerne først i opgave 3",
+        "forslag": [
+          {
+            "alm": "Et kobberrør og et jernrør er skruet sammen. Der løber vand i dem i 20 år.",
+            "fed": "Hvilket rør tæres ved samlingen af kobberrøret og jernrøret?",
+            "svar": ["Jernrøret", "Kobberrøret", "Begge rør lige meget"],
+            "derefter": "Knappen Lad tiden gå og årstælleren dukker op. Luppen står som stiplet ramme med navnet \"luppen ved samlingen\". Eleven lader tiden gå og ser hullet i jernrøret."
+          },
+          {
+            "alm": "Jernrøret fik hul ved samlingen. Kobberrøret er helt.",
+            "fed": "Hvilket metal er mindst ædelt, jern eller kobber?",
+            "svar": ["Jern", "Kobber", "De er lige ædle"],
+            "derefter": "Luppen ved samlingen åbner med atomerne, og opgave 2 (Hvilken vej går elektronerne?) følger."
+          }
+        ],
+        "andet": "Metalvælgerne under rørene kan være skjult til opgave 3 (To ens rør), hvor eleven selv skal vælge metal. Kortet dækker i dag overskriften over luppen.",
+        "gevinst": "Den svage elev ser to rør og ét spørgsmål, og atomerne i luppen kommer først, når spørgsmålet handler om atomer.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Skibet",
+        "billede": "skud/b/sc8.7_korrosion__1.png",
+        "dom": "lidt meget",
+        "fremme": "kortet, skibet med propel og to stiplede pladser til klodser, kajen med seks klodser (Zn, Mg, Cu), årstæller og Sejl 1 år; i panelet fem tal om skibet",
+        "bruges": "skibet, propellen og Sejl 1 år. Klodserne må ikke bruges (hintet siger \"Lad klodserne blive på kajen\")",
+        "forslag": [
+          {
+            "alm": "Skibets skrog er af jern, og propellen er af bronze, som mest er kobber.",
+            "fed": "Hvor ruster jernskroget mest, når propellen er af bronze?",
+            "svar": ["Omkring propellen", "Lige meget over hele skroget", "Længst væk fra propellen"],
+            "derefter": "Knappen Sejl 1 år dukker op, og eleven sejler 3 år (forsøget, som det er i dag). Spørgsmålet Hvorfor ruster skroget mest ved propellen? følger."
+          }
+        ],
+        "andet": "Skjul kajen med klodserne og de stiplede pladser på skroget til opgave 2 (Beskyt skroget), eller vis kajen som stiplet ramme med navnet \"kajen med klodser\". Plads 1, Plads 2 og Klodser brugt i panelet kan vente til samme tid.",
+        "gevinst": "Den svage elev, der klikker først, trækker ikke en klods på skroget i den opgave, hvor klodserne skal blive på kajen.",
+        "prioritet": 2
+      },
+      {
+        "fane": "3 Rusten",
+        "billede": "skud/b/sc8.7_korrosion__2.png",
+        "dom": "lidt meget",
+        "fremme": "gæt-kortet, kontakterne Vand og Dioxygen, jernpladen med ca. 170 atomer, dråben, O₂ og N₂ i luften, tælleren Jernatomer væk og Pr. minut; de fire muligheder i panelet",
+        "bruges": "kontakterne, pladen og dråben; tælleren først i opgave 6 (Salt)",
+        "forslag": [],
+        "andet": "Skjul tælleren Jernatomer væk og Pr. minut til opgave 6. Kortet dækker halvdelen af kontakten Dioxygen.",
+        "gevinst": "Lidt mindre at se på under gættet, og kontakten, eleven skal bruge, ses helt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Alle seks gæt i animationen slutter med \"Gæt, ...\" i stedet for et spørgsmål. Fanen gør den sidste sætning halvfed (delGaet i js/fane.js linje 62), så det halvfede er en opfordring. Også fane 3: \"Gæt, hvad der skal til, for at jern ruster.\" kan blive \"Hvad skal der til, for at jern ruster?\", og \"Gæt, hvad der sker med jernet, når der er salt i dråben.\" kan blive \"Hvad sker der med jernet, når der er salt i vanddråben?\"."
+  }
+]

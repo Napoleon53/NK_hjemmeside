@@ -49,7 +49,7 @@
                 [tal(m) + " mol", "Tallet er rigtigt, men massen er i g."]],
                 forkl: "m = " + tal(n) + " mol · " + tal(M) + " g/mol = " + tal(m) + " g." };
         } else {
-            sp = { spm: "m = " + tal(m) + " g og n = " + tal(n) + " mol. M = ?", svar: [
+            sp = { spm: "Hvad er M, når m = " + tal(m) + " g og n = " + tal(n) + " mol?", svar: [
                 [tal(M) + " g/mol", ""], [tal(n / m) + " g/mol", "Brøken er vendt om. Massen står øverst: M = m / n."],
                 [tal(m * n) + " g/mol", "Du har ganget. Molarmassen er massen delt med stofmængden."],
                 [tal(M) + " mol/g", "Tallet er rigtigt, men molarmassen er i g/mol."]],

@@ -142,13 +142,13 @@
           tekst: "Eddikesyre har fire H, men kun ét af dem kan afgives som hydron.",
           hint: "De tre H på C sidder fast. Det H, der kan afgives, sidder på O." },
         { a: "nh:3", b: "vand:2", syre: "vand:2",
-          tekst: "Ammoniak er en base. Hvem er så syren?",
+          tekst: "Ammoniak er en base.", spm: "Hvilket molekyle er syren, når ammoniak reagerer med vand?",
           hint: "N har et frit elektronpar, der kan optage en hydron. Vandmolekylet afgiver et H." },
         { a: "cl:1", b: "nh:3", syre: "cl:1",
-          tekst: "HCl og NH₃ reagerer uden vand. Hvem afgiver en hydron, og hvem optager den?",
+          tekst: "HCl og NH₃ reagerer uden vand.", spm: "Hvilket af molekylerne HCl og NH₃ afgiver en hydron?",
           hint: "HCl er syren. N i NH₃ tager imod hydronen med sit frie elektronpar." },
         { a: "vand:3", b: "vand:1", syre: "vand:3",
-          tekst: "H₃O⁺ og OH⁻ er to ioner. Hvilken af dem kan afgive en hydron?",
+          tekst: "", spm: "Hvilken af ionerne H₃O⁺ og OH⁻ kan afgive en hydron?",
           hint: "OH⁻ kan kun tage imod en hydron. Træk et H fra H₃O⁺ over på OH⁻." },
         { a: "ac:1", b: "vand:1", syre: "ac:1",
           tekst: "Eddikesyre møder hydroxid.",
@@ -160,7 +160,7 @@
           tekst: "Phosphorsyre kan afgive tre hydroner, men der overføres kun én ad gangen.",
           hint: "Tag ét af H'erne på O, og slip det på vandmolekylet." },
         { a: "co3:1", b: "vand:1", syre: "co3:1",
-          tekst: "Hydrogencarbonationen kan både afgive og optage en hydron. Hvad gør HCO₃⁻ over for OH⁻?",
+          tekst: "Hydrogencarbonationen kan både afgive og optage en hydron.", spm: "Afgiver eller optager HCO₃⁻ en hydron i reaktionen med OH⁻?",
           hint: "OH⁻ kan kun tage imod en hydron, så HCO₃⁻ må afgive sit H." }
     ];
 

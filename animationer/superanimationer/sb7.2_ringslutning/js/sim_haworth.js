@@ -34,7 +34,7 @@
         NK.el("h-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el("h-liste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-opg]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
+            if (k && !k.disabled) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
         });
     }
 
@@ -70,7 +70,7 @@
         var html = "";
         this.opgaver.forEach(function (o, i) {
             html += '<button type="button" class="opg-chip" data-opg="' + i + '"><span class="oc-f"><b>' + (i + 1) + "</b> " +
-                NK.html(o.navn) + '</span><i class="oc-m"></i></button>';
+                '<span class="oc-navn">' + NK.html(o.navn) + '</span></span><i class="oc-m"></i></button>';
         });
         NK.el("h-liste").innerHTML = html;
     };
@@ -79,6 +79,14 @@
         var chips = NK.el("h-liste").querySelectorAll("[data-opg]");
         for (var k = 0; k < chips.length; k++) {
             var i = parseInt(chips[k].getAttribute("data-opg"), 10), s = this.status[i];
+            /* De kommende opgaver er et nummer med en graa streg (21. nov. 2026) */
+            var aaben = F.opgAaben(this.status, this.naaet, i), nv = chips[k].querySelector(".oc-navn");
+            var navnH = aaben ? NK.html(this.opgaver[i].navn) : '<span class="oc-streg"></span>';
+            if (nv.innerHTML !== navnH) nv.innerHTML = navnH;
+            chips[k].disabled = !aaben;
+            chips[k].classList.toggle("laast", !aaben);
+            if (aaben) chips[k].removeAttribute("aria-label");
+            else chips[k].setAttribute("aria-label", "Opgave " + (i + 1) + ", kommer senere");
             chips[k].classList.toggle("valgt", i === this.nr);
             chips[k].classList.toggle("loest", s.loest);
             chips[k].classList.toggle("stjerne", s.stjerne);
@@ -109,6 +117,8 @@
     /* ----- En opgave ---------------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[i] = true;
         this.opg = this.opgaver[i];
         this.su = D.SUKKER[this.opg.sukker];
         this.M = S.model(this.opg.sukker, this.su.sider, this.su.keto);

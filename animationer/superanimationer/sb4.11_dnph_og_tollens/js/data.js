@@ -87,17 +87,17 @@
     /* Det ekstra spoergsmaal: svarene og det rigtige (svar) */
     D.EKSTRA = {
         kondensation: {
-            spm: "Ethanal og DNPH bindes sammen til ét molekyle, og der fraspaltes vand. Hvad hedder sådan en reaktion?",
+            spm: "Ethanal og DNPH er bundet sammen på tavlen. Hvad hedder en reaktion, hvor to molekyler bindes sammen, og der fraspaltes vand?",
             svar: ["Kondensation", "Addition", "Substitution", "Oxidation"], rigtig: 0,
             forkert: [null,
                 "Ved en addition fraspaltes der intet. Ved reaktionen med DNPH fraspaltes der vand.",
                 "Ved en substitution erstattes et atom af et andet. Ethanal og DNPH bindes sammen, og der fraspaltes vand.",
                 "Carbonatomets oxidationstal ændrer sig ikke, for C=O er blevet til C=N, og N er ligesom O mere elektronegativt end C."],
             forklaring: "Reaktionen er en kondensation ligesom dannelsen af en ester. Produktet er tungtopløseligt og falder ud som et gult bundfald.",
-            hint: ["To molekyler bliver til ét større, og et lille molekyle fraspaltes. Det kender du fra estere i afsnit B4.5."]
+            hint: ["Estere dannes ved den samme slags reaktion. Det kender du fra afsnit B4.5."]
         },
         binding: {
-            spm: "Carbonatomet i propanon havde en dobbeltbinding til oxygen. Hvilken binding har det nu til nitrogen?",
+            spm: "Carbonatomet i propanon havde en dobbeltbinding til oxygen. Hvilken binding er der mellem carbon og nitrogen i produktet af propanon og DNPH?",
             svar: ["Enkeltbinding", "Dobbeltbinding", "Tripelbinding"], rigtig: 1,
             forkert: ["Tæl stregerne mellem C og N på tavlen. Oxygenatomet tog to bindinger med sig, og nitrogenatomet danner to nye.",
                 null,
@@ -106,7 +106,7 @@
             hint: ["Se på stregerne mellem carbonatomet og nitrogenatomet på tavlen."]
         },
         ammoniak: {
-            spm: "Tollens' reagens indeholder også ammoniak. Hvad gør ammoniakken?",
+            spm: "Tollens' reagens indeholder sølv(I)ioner og ammoniak. Hvad gør ammoniakken i Tollens' reagens?",
             svar: ["Holder Ag⁺ opløst", "Gør opløsningen sur", "Oxiderer aldehydet", "Danner sølvspejlet"], rigtig: 0,
             forkert: [null,
                 "Ammoniak er en base, så den gør ikke opløsningen sur.",

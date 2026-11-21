@@ -914,8 +914,8 @@
         var rest = Math.round((gram - s) * 10) / 10;
         var vt = talValg(rest, [s, gram, 0]);
         return {
-            tekst: "Du hælder " + gram + " g " + salt.formel + " i 100 mL vand ved " + t +
-                   " °C. Hvor meget bliver liggende som bundfald?",
+            tekst: "Glasset indeholder 100 mL vand. Hvor mange gram bundfald giver " + gram + " g " + salt.formel + " i 100 mL vand ved " + t +
+                   " °C?",
             valg: vt.valg, rigtig: vt.rigtig,
             hint: "Aflæs, hvor meget vandet kan rumme ved " + t + " °C. Resten af saltet bliver liggende.",
             svar: "Vandet kan rumme " + gramTekst(s) + ", så " + gram + " g − " + gramTekst(s) +
@@ -984,7 +984,7 @@
         var vt = talValg(ud, [s, m.gram, 0]);
         return {
             tekst: m.gram + " g " + salt.formel + " er opløst i 100 mL vand ved " + m.varm +
-                   " °C. Hvor meget falder ud, når opløsningen køles til " + kold + " °C?",
+                   " °C. Hvor mange gram af de " + m.gram + " g " + salt.formel + " falder ud som bundfald, når opløsningen køles til " + kold + " °C?",
             valg: vt.valg, rigtig: vt.rigtig,
             hint: "Aflæs, hvor meget vandet kan rumme ved " + kold + " °C.",
             svar: "Ved " + kold + " °C kan vandet kun rumme " + gramTekst(s) + ". Resten, " + m.gram +

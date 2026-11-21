@@ -108,13 +108,19 @@
         return "trin " + { tal: 1, drej: 2, svar: 3 }[this.trinNu()] + " af 3";
     };
 
+    /* Trin 1 spoerger om prioriteten og trin 2 er en instruktion; spoergsmaalet
+       om R eller S staar foerst i trin 3, hvor det kan besvares (21. nov. 2026) */
     P.promptHTML = function () {
-        return NK.html("Er molekylet (R)- eller (S)-" + this.m.navn + "?" + (this.faerdig ? "" : " " + this.trinLinje()));
+        var t = this.faerdig ? "svar" : this.trinNu(), navn = this.m.navn;
+        if (t === "tal") return NK.html(this.naesteTal === 1 ? "Hvilken gruppe på " + navn + " har højest prioritet? " + this.trinLinje() :
+            "Hvilken gruppe på " + navn + " får prioritet nummer " + this.naesteTal + "? Klik på gruppen i modellen, og tryk Indsend svar.");
+        if (t === "drej") return NK.html(this.trinLinje());
+        return NK.html("Er molekylet (R)- eller (S)-" + navn + "?" + (this.faerdig ? "" : " " + this.trinLinje()));
     };
 
     P.trinLinje = function () {
         var t = this.trinNu();
-        if (t === "tal") return this.naesteTal === 1 ? "Klik på den gruppe, der har højest prioritet, og tryk Indsend svar. Den får nummer 1." :
+        if (t === "tal") return this.naesteTal === 1 ? "Klik på gruppen i modellen, og tryk Indsend svar. Den får nummer 1." :
             "Klik på den gruppe, der får nummer " + this.naesteTal + ", og tryk Indsend svar.";
         if (t === "drej") return "Træk i molekylet, så gruppe 4 (" + D.tekst(this.grupper[this.orden[3]]) + ") peger væk fra dig.";
         return "Følg 1 → 2 → 3. Vælg R eller S på kortet.";

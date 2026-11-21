@@ -228,3 +228,7 @@ spørgsmålet: svaret er grønt, forklaringen står under svarene, og Næste st�
 hvor Indsend svar stod. Mens reaktionen med DNPH kører, har kortet kun en
 kort tekst og ingen knapper (`skjulIndsend` og `skjulHint`). Kortets grønne
 knap går altid fremad; Begynd forfra står i panelet.
+
+## Listerne låser titlerne op i takt (21. nov. 2026)
+
+Reaktionerne og trinene på Ukendte stoffer viser kun titlen på det løste og det, eleven er ved; det kommende står som et nummer med en grå streg og kan ikke klikkes (`aabenOpgave` i `js/sim_reaktion.js`, `aabenTrin` i `js/sim_ukendt.js`). Hvad viser testene? har kun numre og er uændret. Selvtesten: ALT OK (151 påstande).

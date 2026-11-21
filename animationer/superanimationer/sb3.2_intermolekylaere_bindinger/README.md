@@ -320,3 +320,7 @@ firkantede skel /animationer, når man overstiger kogepunktet." Begge dele:
   skiltet har plads over bordet.
 
 Selvtesten: ALT OK (91 påstande).
+
+## Opgavelisten låser titlerne op i takt (21. nov. 2026)
+
+Listen på Ethanol og Sammenlign viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, før de er nået (`aabenOpgave` i `js/fane.js`). Rangér har kun numre under niveauerne og er uændret. Selvtesten: ALT OK (98 påstande).

@@ -308,7 +308,7 @@ function koerTest(W) {
         !d.querySelector(".panel .knap.hjaelp") && !d.querySelector(".panel .maal-tekst") && !d.querySelector(".panel [data-formel]"));
     paastand("fane 1: kun [H₃O⁺] og pH står på regnevejen, og der er ingen pil", S1.stationSes("h") && S1.stationSes("ph") && !S1.stationSes("oh") && !S1.pilSes("h>ph"));
     paastand("fane 1: kortet har opgaven og første bid (vælg formlen); feltet til svaret ses ikke endnu",
-        S1.bid === "formel" && /Hvad er pH\?/.test(kortT(S1)) && /Vælg formlen/.test(kortT(S1)) && feltBoks(S1).hidden && S1.el.knap.textContent === "Giv hint");
+        S1.bid === "formel" && /Du skal finde pH\./.test(kortT(S1)) && /Hvilken formel går fra \[H₃O⁺\] til pH\?/.test(kortT(S1)) && feltBoks(S1).hidden && S1.el.knap.textContent === "Giv hint");
     paastand("formlen vælges blandt 3 knapper på kortet med én rigtig", tp.formler.length === 3 && tp.formler.filter(function (f) { return f.rigtig; }).length === 1 &&
         knapper(S1).length === 3);
     paastand("Indsend svar er grå, før en formel er valgt", vises(S1.el.indsend) && S1.el.indsend.classList.contains("ikke-klar"));
@@ -343,7 +343,7 @@ function koerTest(W) {
     paastand("fane 1: pH-metret måler, og kortet har ingen knap videre imens", !!S1.maaling && !videre(S1) && !vises(S1.el.knap));
     kor(S1, 60);
     paastand("fane 1: pH-metret viser facit bagefter, og kortet bliver med Ny opgave", S1.visning === K.phTekst(S1.opg.slutPh) && !!videre(S1) &&
-        videre(S1).textContent === "Ny opgave →" && /pH-metret viser/.test(kortT(S1)) && /Hvad er pH\?/.test(kortT(S1)));
+        videre(S1).textContent === "Ny opgave →" && /pH-metret viser/.test(kortT(S1)) && /Hvad er pH i /.test(kortT(S1)));
     paastand("fane 1: pilen er brugt, og stationen pH er regnet", S1.pilStatus("h>ph") === "brugt" && S1.stationStatus("ph") === "loest");
     videre(S1).click();
     paastand("fane 1: Ny opgave giver en ny opgave, og pilen er væk igen", !S1.faerdig && S1.trinNr === 0 && !S1.pilSes("h>ph"));

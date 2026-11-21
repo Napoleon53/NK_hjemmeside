@@ -222,8 +222,7 @@
         /* 1. Stammen */
         trin.push({
             slags: "valg", del: "stamme", vis: "kaede", om: null,
-            tekst: k === "alkohol" ? "Tæl carbonatomerne i den længste kæde, som OH-gruppen sidder på. Hvad er stammen?"
-                : "Tæl carbonatomerne i den længste kæde." + medC + " Hvad er stammen?",
+            tekst: (k === "alkohol" ? "OH-gruppen skal sidde på kæden." : medC.slice(1)) + " Hvilken stamme passer til den længste kæde i formlen?",
             valg: D.STAMMER.slice(), rigtig: stof.stamme,
             godt: "Stammen " + stof.stamme + " betyder " + K.antalC(n) + ".",
             fejl: function (v) {
@@ -324,7 +323,7 @@
             },
             {
                 slags: "valg", del: "alkohol", vis: "esterdele", om: "alkohol",
-                tekst: "Den orange del sidder på det enkeltbundne oxygenatom og kommer fra alkoholen. Hvad hedder den?",
+                tekst: "Den orange del sidder på det enkeltbundne oxygenatom. Hvad hedder den orange del fra alkoholen?",
                 valg: D.ALKYL.slice(), rigtig: stof.dele[0].tekst,
                 godt: "Den orange del har " + K.antalC(a) + ".",
                 fejl: function (v) {
@@ -338,7 +337,7 @@
             },
             {
                 slags: "valg", del: "syre", vis: "esterdele", om: "syre",
-                tekst: "Den grønne del har C=O og kommer fra syren. Carbonatomet i C=O tæller med. Hvad hedder den?",
+                tekst: "Carbonatomet i C=O tæller med. Hvad hedder den grønne del fra syren?",
                 valg: D.OATER.slice(), rigtig: stof.dele[1].tekst,
                 godt: "Den grønne del har " + K.antalC(sy) + ", når carbonatomet i C=O tælles med.",
                 fejl: function (v) {
@@ -358,7 +357,7 @@
         var egen = stof.dele[0].tekst;
         return [{
             slags: "valg", del: "kaeder", vis: "gruppe", fyldOgsaa: "endelse", om: "kvaelstof",
-            tekst: "Tæl carbonatomerne i hver kæde på nitrogenatomet. Hvad hedder kæderne?",
+            tekst: "Tæl carbonatomerne i hver kæde. Hvad hedder kæderne på nitrogenatomet?",
             valg: (stof.o.valg || [egen]).slice(), rigtig: egen,
             godt: "Nitrogenatomet har " + D.KAEDER[egen] + ".",
             fejl: function (v) { return K.stor(v) + " er " + D.KAEDER[v] + ". Se på kæderne på nitrogenatomet igen."; },

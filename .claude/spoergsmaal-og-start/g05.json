@@ -1,0 +1,530 @@
+[
+  {
+    "mappe": "sc1.1_atombygger",
+    "titel": "Atomets opbygning",
+    "sprog": [
+      {
+        "fane": "1 Atommodellen",
+        "opgave": "Opgavetype 4 (partiklen er givet)",
+        "fil": "js/sim_byg.js",
+        "linje": 332,
+        "nu_alm": "Byg partiklen med 11 protoner, 12 neutroner og 10 elektroner.",
+        "nu_fed": "Hvad er det, du har bygget?",
+        "nu_svar": [],
+        "problem": "Det eneste fede er et spørgsmål, eleven ikke kan svare på (der er ingen svarknapper, eleven svarer ved at bygge), og 'det' peger tilbage på indledningen. Fjern spørgsmålet, så kortet er en ren byggeopgave som de fire andre typer. Navnet på partiklen står allerede i forklaringen bagefter.",
+        "nyt_alm": "Byg partiklen med 11 protoner, 12 neutroner og 10 elektroner.",
+        "nyt_fed": "",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "4 Spil",
+        "opgave": "Bane 2, sp_massetal",
+        "fil": "js/sim_spil.js",
+        "linje": 155,
+        "nu_alm": "En kerne har 17 protoner og 18 neutroner.",
+        "nu_fed": "Hvad er nukleontallet?",
+        "nu_svar": ["35", "17", "18", "37"],
+        "problem": "Tallene, der skal lægges sammen, står kun i indledningen. Det fede spørgsmål siger ikke, hvilken kerne det handler om.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad er nukleontallet for en kerne med 17 protoner og 18 neutroner?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "4 Spil",
+        "opgave": "Bane 2, sp_ladning",
+        "fil": "js/sim_spil.js",
+        "linje": 175,
+        "nu_alm": "Partiklen har 12 protoner og 10 elektroner.",
+        "nu_fed": "Hvad er ladningen?",
+        "nu_svar": ["2+", "0", "2−", "3+"],
+        "problem": "Antallet af protoner og elektroner står kun i indledningen, og ladningen er skjult som ? i boksen. Det fede spørgsmål kan ikke besvares alene.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken ladning har en partikel med 12 protoner og 10 elektroner?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "4 Spil",
+        "opgave": "Bane 3, sp_aedelgas",
+        "fil": "js/sim_spil.js",
+        "linje": 289,
+        "nu_alm": "",
+        "nu_fed": "Hvilken ædelgas kommer chlor til at ligne som ion?",
+        "nu_svar": ["argon", "helium", "neon", "krypton"],
+        "problem": "'Ligne' er indirekte. Det, der spørges om, er elektronstrukturen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken ædelgas har samme elektronstruktur som ionen af chlor?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Atommodellen",
+        "billede": "skud/a/sc1.1_atombygger__0.png",
+        "dom": "fint",
+        "fremme": "Startkort med Start opgave, ét H-atom med nuklidmærkat og kernetekst, Genstart. I panelet tre tællere med + og −, to knapper og det periodiske system.",
+        "bruges": "Ingen opgave fra start (fri byggeleg). Første opgave bruger tællerne og atomet.",
+        "forslag": [],
+        "andet": "Første opgave trækkes tilfældigt blandt fem typer, også den sværeste (ion med samme elektronstruktur som en ædelgas). Lad de to første opgaver altid være type 1 (neutralt atom) og type 3 (den sjældnere isotop).",
+        "gevinst": "Den svage elev møder den letteste byggeopgave først.",
+        "prioritet": 3
+      },
+      {
+        "fane": "4 Spil",
+        "billede": "skud/a/sc1.1_atombygger__3.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmål og fire svar, atommodel med skaltal, boksen med protoner, elektroner og ladning, knappen Periodisk system. Banerne i panelet.",
+        "bruges": "Det hele.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Spil, bane 1: I 'Hvor mange elektroner er der i atomets yderste skal?' står svaret allerede på skaltal-mærket ved den yderste skal (fx 6/8), så opgaven løser sig selv. Skjul skaltallene i netop den opgave. Fane 2 (Isotoper) og 3 (Ioner) er fri udforskning uden opgaver."
+  },
+  {
+    "mappe": "sc1.2_grundstofudstilling",
+    "titel": "Grundstofudstillingen",
+    "sprog": [
+      {
+        "fane": "2 Formlerne",
+        "opgave": "Alle flasker, felterne for hvert grundstof og I alt",
+        "fil": "js/sim_formler.js",
+        "linje": 432,
+        "nu_alm": "Vand har formlen H₂O.",
+        "nu_fed": "Hvor mange H-atomer er der i formlen?",
+        "nu_svar": [],
+        "problem": "Formlen står kun i indledningen. 'Formlen' i det fede siger ikke hvilken. Det samme gælder 'Hvor mange atomer er der i alt i formlen?'.",
+        "nyt_alm": "Flasken på bordet indeholder vand.",
+        "nyt_fed": "Hvor mange H-atomer er der i formlen H₂O?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Udstillingen",
+        "billede": "skud/a/sc1.2_grundstofudstilling__0.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmål og skrivefelt, udstillingen med 36 rum og navnetavlen, kassen med prøver, prøven med mærke, en tom tavle med ?, kaffekop og tilbuddet om præsentation. I panelet de tre trin og perioderne.",
+        "bruges": "Kortet, prøvens mærke og evt. navnetavlen. Udstillingen bruges i trin 2 og tavlen i trin 3.",
+        "forslag": [],
+        "andet": "Opgaven er allerede delt i trin (navn, plads, elektronstruktur). Tavlen med ? kunne være en stiplet ramme med navnet 'atommodellen', til elektronstrukturen er det aktuelle trin.",
+        "gevinst": "Lidt mindre at se på i første trin.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Formlerne",
+        "billede": "skud/a/sc1.2_grundstofudstilling__1.png",
+        "dom": "fint",
+        "fremme": "Kort med spørgsmål og felt, udstillingen, tavlen med H₂O, en stor flaske, elleve små flasker og koppen. I panelet tre felter og niveauerne.",
+        "bruges": "Kortet og formlen på tavlen og flasken.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Opråbet",
+        "billede": "skud/a/sc1.2_grundstofudstilling__2.png",
+        "dom": "fint",
+        "fremme": "Udstillingen, tavlen med 'Opråb, tryk Start i panelet', point og knapperne i panelet.",
+        "bruges": "Et spil på tid, der først begynder ved Start.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Tilbuddet Start præsentation / Nej tak ligger midt over udstillingen på alle tre faner og dækker skiltet foroven."
+  },
+  {
+    "mappe": "sc1.4_afstemning",
+    "titel": "Afstem reaktioner",
+    "sprog": [
+      {
+        "fane": "1 Kuglerne",
+        "opgave": "Alle ti reaktioner",
+        "fil": "js/sim_kugler.js",
+        "linje": 86,
+        "nu_alm": "Natrium og dichlor er farlige hver for sig. Sammen bliver de til køkkensalt. Afstem reaktionen med + og − foran stofferne, og tryk Indsend svar.",
+        "nu_fed": "",
+        "nu_svar": [],
+        "problem": "Intet er halvfedt. Opgaven står som tredje sætning efter historien, så den, der kun skimmer, finder den ikke.",
+        "nyt_alm": "Natrium og dichlor er farlige hver for sig. Sammen bliver de til køkkensalt.",
+        "nyt_fed": "Hvilke tal skal stå foran stofferne, så der er lige mange af hvert atom før og efter pilen?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Kuglerne",
+        "billede": "skud/a/sc1.4_afstemning__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort uden halvfedt spørgsmål, tavlen med skemaet og seks + og −, bakken Før pilen med molekylerne, bakken Efter pilen med stiplede pladser, regnskabet i panelet med ✓ og ✗ og listen med ti reaktioner.",
+        "bruges": "Alt bruges, men regnskabet tæller atomerne for eleven og viser ✓ og ✗ fra start. Så kan første opgave løses ved at klikke på + og −, til alt er grønt, uden at eleven selv tæller.",
+        "forslag": [
+          {
+            "alm": "Natrium og dichlor bliver til køkkensalt.",
+            "fed": "Hvilket atom passer ikke i Na + Cl₂ → NaCl?",
+            "svar": ["Cl", "Na", "Begge passer"],
+            "derefter": "Regnskabet dukker op i panelet med Na ✓ og Cl ✗. Indtil da står det som en stiplet ramme med navnet 'regnskabet'."
+          },
+          {
+            "alm": "Før pilen er der 2 Cl i Cl₂. Efter pilen er der 1 Cl i NaCl.",
+            "fed": "Hvordan får du 2 Cl efter pilen i Na + Cl₂ → NaCl?",
+            "svar": ["Sæt 2 foran NaCl", "Skriv NaCl₂", "Sæt 2 foran Cl₂"],
+            "derefter": "Tallet foran NaCl bliver 2, og bakken Efter pilen får to NaCl-pladser. Regnskabet viser nu Na ✗."
+          },
+          {
+            "alm": "Efter pilen står der 2 NaCl, så der er 2 Na efter pilen og 1 Na før.",
+            "fed": "Hvordan får du lige mange Na på begge sider af pilen?",
+            "svar": ["Sæt 2 foran Na", "Skriv Na₂", "Sæt 2 foran Cl₂"],
+            "derefter": "+ og − dukker op ved alle tre stoffer på tavlen."
+          },
+          {
+            "alm": "Skemaet skal være 2 Na + Cl₂ → 2 NaCl.",
+            "fed": "Sæt tallene med + og −, og tryk Indsend svar.",
+            "svar": [],
+            "derefter": "Molekylerne reagerer, og AFSTEMT ✓ popper frem over pilen. Reaktion 2 og frem er som nu."
+          }
+        ],
+        "andet": "Lad regnskabet og + og − ved de andre stoffer være skjult i første mål, til trinnene har brug for dem. Fra reaktion 2 er alt fremme som nu.",
+        "gevinst": "Den svage elev lærer fremgangsmåden (tæl, ret ét atom, tæl igen) og den typiske fejl med det lille tal, før seks knapper og et regnskab med ✓ og ✗ inviterer til at klikke i blinde.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Skemaet",
+        "billede": "skud/a/sc1.4_afstemning__1.png",
+        "dom": "fint",
+        "fremme": "Kort, tavlen med tre felter og knappen Vis optællingen. Listen i panelet.",
+        "bruges": "Det hele.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2 har regnskabet slået fra (Vis optællingen), men fane 1 viser det med ✓ og ✗ fra første klik."
+  },
+  {
+    "mappe": "sc2.1_salt_i_vand",
+    "titel": "Salt i vand",
+    "sprog": [
+      {
+        "fane": "1 Opløsningen",
+        "opgave": "AgCl og omrøring (opgTungOmroering)",
+        "fil": "js/sim_oploes.js",
+        "linje": 1802,
+        "nu_alm": "Sølv(I)chlorid er tungtopløseligt.",
+        "nu_fed": "Hvad sker der med antallet af ioner i vandet, hvis du rører rundt?",
+        "nu_svar": ["Der går flere ioner i opløsning", "Der går lige så mange i opløsning", "Der går færre ioner i opløsning"],
+        "problem": "Det fede nævner ikke, at det er AgCl, og 'hvis' gør spørgsmålet hypotetisk.",
+        "nyt_alm": "Sølv(I)chlorid, AgCl, er tungtopløseligt.",
+        "nyt_fed": "Hvad sker der med antallet af opløste ioner fra AgCl, når du rører rundt?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Opløsningen",
+        "opgave": "Find fejlen (opgFindFejl)",
+        "fil": "js/sim_oploes.js",
+        "linje": 1693,
+        "nu_alm": "Billedet står stille. Ét vandmolekyle vender forkert ind mod sin ion. Klik på det, og tryk på Indsend svar.",
+        "nu_fed": "",
+        "nu_svar": [],
+        "problem": "Intet er halvfedt, og opgaven står som tredje sætning.",
+        "nyt_alm": "Billedet i luppen står stille. Du svarer ved at klikke på et vandmolekyle.",
+        "nyt_fed": "Hvilket vandmolekyle vender den forkerte ende ind mod sin ion?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Hvor meget kan der være?",
+        "opgave": "Bundfald (opgBundfald)",
+        "fil": "js/sim_maetning.js",
+        "linje": 917,
+        "nu_alm": "Du hælder 45 g NaCl i 100 mL vand ved 20 °C.",
+        "nu_fed": "Hvor meget bliver liggende som bundfald?",
+        "nu_svar": ["0 g", "9 g", "36 g", "45 g"],
+        "problem": "Salt, mængde og temperatur står kun i indledningen. Det fede spørgsmål kan ikke besvares alene.",
+        "nyt_alm": "Glasset indeholder 100 mL vand.",
+        "nyt_fed": "Hvor mange gram bundfald giver 45 g NaCl i 100 mL vand ved 20 °C?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Hvor meget kan der være?",
+        "opgave": "Afkøling (opgAfkoeling)",
+        "fil": "js/sim_maetning.js",
+        "linje": 986,
+        "nu_alm": "100 g KNO₃ er opløst i 100 mL vand ved 60 °C.",
+        "nu_fed": "Hvor meget falder ud, når opløsningen køles til 20 °C?",
+        "nu_svar": ["0 g", "31,6 g", "68,4 g", "100 g"],
+        "problem": "Saltet og mængden står kun i indledningen, og 'falder ud' siger ikke, at det er bundfald.",
+        "nyt_alm": "100 g KNO₃ er opløst i 100 mL vand ved 60 °C.",
+        "nyt_fed": "Hvor mange gram af de 100 g KNO₃ falder ud som bundfald, når opløsningen køles til 20 °C?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Opløsningen",
+        "billede": "skud/a/sc2.1_salt_i_vand__0.png",
+        "dom": "lidt meget",
+        "fremme": "Startkort, bægerglas på varmeplade med lup, et stort lupbillede med vandmolekyler med δ-mærker, ioner og et ur, der kører. I panelet seks salte, tre temperaturer, omrøring, δ-afkrydsning, Ny krystal, opgavetælleren og Det sker der med ligning og opløselighed.",
+        "bruges": "Opgaverne kommer i tilfældig rækkefølge. Find fejlen bruger luppen og δ-mærkerne, ligningsopgaven luppen, hurtigst-opgaven temperatur og omrøring, og AgCl-opgaven omrøring.",
+        "forslag": [
+          {
+            "alm": "Luppen viser et saltkorn af NaCl i vand. Na⁺ er lilla, og Cl⁻ er blå.",
+            "fed": "Hvilken ende af et vandmolekyle vender ind mod en positiv Na⁺-ion?",
+            "svar": ["Oxygen-enden (δ−)", "Hydrogen-enden (δ+)", "Det er tilfældigt"],
+            "derefter": "δ-mærkerne dukker op på vandmolekylerne. Vis δ+ og δ− er slået fra indtil da."
+          },
+          {
+            "alm": "Oxygen-enden er lidt negativ og vender ind mod Na⁺.",
+            "fed": "Hvilken ende af et vandmolekyle vender ind mod en negativ Cl⁻-ion?",
+            "svar": ["Hydrogen-enden (δ+)", "Oxygen-enden (δ−)", "Det er tilfældigt"],
+            "derefter": "Uret og Det sker der dukker op, og Find fejlen kommer som næste opgave."
+          }
+        ],
+        "andet": "Fast rækkefølge i stedet for tilfældig, så første opgave altid er den samme. Fold Det sker der ind, og flyt linjen 'Der kan opløses 36,0 g pr. 100 mL' til fane 2, hvor den hører hjemme.",
+        "gevinst": "Den svage elev ved, hvad hun skal kigge efter i det travle lupbillede, før hun skal finde fejlen.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Hvor meget kan der være?",
+        "billede": "skud/a/sc2.1_salt_i_vand__1.png",
+        "dom": "lidt meget",
+        "fremme": "Startkort, bægerglas med termometer, spatel og pulverglas, knapperne +5 g og +25 g, opløselighedskurven med labels og temperaturlinje. I panelet seks salte, temperaturskyderen og fire tal (Hældt i, Opløst, Bundfald, Grænsen lige nu).",
+        "bruges": "Opgaverne kommer i tilfældig rækkefølge, og alle fire bruger grafen. Første gang møder eleven både en ny graf og et regnskab i panelet på én gang.",
+        "forslag": [
+          {
+            "alm": "Glasset indeholder 100 mL vand ved 20 °C.",
+            "fed": "Hvad sker der, når du bliver ved med at hælde NaCl i 100 mL vand?",
+            "svar": ["Noget bliver liggende på bunden", "Alt bliver altid opløst", "Intet bliver opløst"],
+            "derefter": "+5 g og +25 g lyser op, og eleven hælder NaCl i, til der ligger bundfald. Tallene Hældt i, Opløst og Bundfald dukker op i panelet."
+          },
+          {
+            "alm": "Ved 20 °C kan 100 mL vand højst opløse 36 g NaCl.",
+            "fed": "Hvor mange gram bundfald giver 50 g NaCl i 100 mL vand ved 20 °C?",
+            "svar": ["14 g", "50 g", "36 g"],
+            "derefter": "Grafen dukker op med den blå kurve og den gule linje ved 50 g. Indtil da står den som en stiplet ramme med navnet 'opløselighedskurven'."
+          },
+          {
+            "alm": "Saltet skiftes til KNO₃. Der er hældt 50 g i 100 mL vand ved 20 °C.",
+            "fed": "Hvad sker der med bundfaldet af KNO₃, når vandet varmes op til 60 °C?",
+            "svar": ["Det bliver opløst", "Der kommer mere bundfald", "Bundfaldet er det samme"],
+            "derefter": "Temperaturskyderen dukker op. Eleven varmer op og ser bundfaldet forsvinde. Så følger de fire opgaver som nu."
+          }
+        ],
+        "andet": "Fold Grænsen lige nu ind i panelet, så aflæsningsopgaven ikke kan løses ved at trække i skyderen og læse tallet.",
+        "gevinst": "Den svage elev forstår, hvad kurven betyder (grænsen og bundfaldet), før hun skal aflæse den.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Fane 2: Aflæsningsopgaven kan løses uden at læse på akserne, for skyderen giver 'Grænsen lige nu' i panelet og et talmærke på kurven. Bundfaldsopgaven kan løses ved at hælde i og læse Bundfald i panelet. Quizzen i overlayet bruger ikke papirkortet og har ingen halvfed spørgsmålslinje."
+  },
+  {
+    "mappe": "sc2.2_saltbygger",
+    "titel": "Saltbyggeren",
+    "sprog": [
+      {
+        "fane": "2 Opløs i vand",
+        "opgave": "Forudsig (Der hældes vand på saltet)",
+        "fil": "js/sim_vand.js",
+        "linje": 189,
+        "nu_alm": "Der hældes vand på saltet.",
+        "nu_fed": "Hvad kommer der ud i vandet?",
+        "nu_svar": ["2 Al³⁺(aq) + 3 SO₄²⁻(aq)", "Al₂(SO₄)₃(aq)", "2 Al³⁺(aq) + 3 S(aq) + 12 O(aq)", "3 Al³⁺(aq) + 2 SO₄²⁻(aq)"],
+        "problem": "Saltet nævnes ikke (det står kun i ligningen under), og 'kommer ud' siger ikke, at det er ionerne, der spørges om.",
+        "nyt_alm": "Der hældes vand på saltet i glasset.",
+        "nyt_fed": "Hvilke ioner kommer ud i vandet, når Al₂(SO₄)₃ opløses?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendt ion",
+        "opgave": "Opgavens start, ukendt sammensat ion",
+        "fil": "js/sim_ukendt.js",
+        "linje": 212,
+        "nu_alm": "Formlen er K₂CrO₄. CrO₄ er en sammensat ion, du ikke kender.",
+        "nu_fed": "Hvilken ladning har den?",
+        "nu_svar": [],
+        "problem": "'Den' peger tilbage på CrO₄ i indledningen.",
+        "nyt_alm": "Formlen er K₂CrO₄. CrO₄ er en sammensat ion, du ikke kender.",
+        "nyt_fed": "Hvilken ladning har den sammensatte ion CrO₄ i K₂CrO₄?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendt ion",
+        "opgave": "Opgavens start, ukendt metal",
+        "fil": "js/sim_ukendt.js",
+        "linje": 210,
+        "nu_alm": "Formlen er PbO. Bly kan have flere ladninger.",
+        "nu_fed": "Hvilken ladning har blyionen her?",
+        "nu_svar": [],
+        "problem": "'Her' peger tilbage på formlen i indledningen.",
+        "nyt_alm": "Bly kan have flere ladninger.",
+        "nyt_fed": "Hvilken ladning har blyionen i PbO?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Byg salte",
+        "billede": "skud/a/sc2.2_saltbygger__0.png",
+        "dom": "fint",
+        "fremme": "Hylderne med 11 positive og 9 negative ioner, startkortet, et tomt bord med to stiplede felter, tilbuddet om præsentation. I panelet Afstem for mig, Opløs det i vand og Vis navne.",
+        "bruges": "Fri byggeleg, til eleven trykker Start opgave. Opgaverne har allerede trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Opløs i vand",
+        "billede": "skud/a/sc2.2_saltbygger__1.png",
+        "dom": "fint",
+        "fremme": "Startkort, ét bægerglas med et salt, der opløses, og valget af salt i panelet.",
+        "bruges": "Fri udforskning, til eleven trykker Start opgave.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ukendt ion",
+        "billede": "skud/a/sc2.2_saltbygger__2.png",
+        "dom": "fint",
+        "fremme": "Kortet med formlen og de tre trin, to plakater, formlen PbO og to sammenfoldede kort med ?.",
+        "bruges": "Det hele. Opgaven er allerede stilladseret i trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Animationen bruger ikke NK.Papir.tekst. Spørgsmålet bliver aldrig halvfedt på nogen af de tre faner, kun saltets navn eller formel står med <b> (fx 'Hvilken formel har aluminiumsulfat?' med kun navnet fedt). Skal den følge de andre, skal opgaveteksterne gennem NK.Papir.tekst."
+  },
+  {
+    "mappe": "sc2.3_kemikalielageret",
+    "titel": "Kemikalielageret",
+    "sprog": [
+      {
+        "fane": "1 Lageret",
+        "opgave": "Sidste felt i hvert glas (hele formlen eller hele navnet)",
+        "fil": "js/sim_lager.js",
+        "linje": 49,
+        "nu_alm": "Etiketten siger natriumoxid. Find ionerne, og skriv formlen.",
+        "nu_fed": "Skriv hele formlen",
+        "nu_svar": [],
+        "problem": "Den fede linje siger ikke, hvilket stofs formel. Navnet står kun i indledningen. Det samme gælder 'Skriv hele navnet', som bør blive til fx 'Skriv navnet på Fe₂O₃'.",
+        "nyt_alm": "Etiketten siger natriumoxid. Find ionerne, og skriv formlen.",
+        "nyt_fed": "Skriv formlen for natriumoxid",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Lageret",
+        "billede": "skud/a/sc2.3_kemikalielageret__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med første glas, reolen med 29 glas, to plakater, det store glas, etiketmaskinen med 'Skriv i feltet til højre', kop og tilbuddet om præsentation. I panelet tre skrivefelter og hylderne.",
+        "bruges": "Kortet, feltet i panelet og evt. plakaten med det periodiske system. Opgaven er allerede delt i trin (positiv ion, negativ ion, formel).",
+        "forslag": [],
+        "andet": "Flyt skrivefeltet op på kortet ved siden af Indsend svar, som i sc1.2. Nu står opgaven på kortet, feltet i panelet og en tredje besked på etiketmaskinen, så eleven skal kigge tre steder.",
+        "gevinst": "Den svage elev kan læse, skrive og sende på samme sted.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Samlebåndet",
+        "billede": "skud/a/sc2.3_kemikalielageret__1.png",
+        "dom": "fint",
+        "fremme": "Kort, tom hylde, båndet, etiketmaskinen, kassen og to plakater. Point og Start i panelet.",
+        "bruges": "Et spil på tid, der først begynder ved Start.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Lageret: Svarfeltet står i panelet, ikke på kortet. Kortets fede linje slutter med 'i feltet i panelet', og etiketmaskinen siger 'Skriv i feltet til højre'."
+  },
+  {
+    "mappe": "sc2.4_faeldningsreaktioner",
+    "titel": "Fældningsreaktioner",
+    "sprog": [
+      {
+        "fane": "Let",
+        "opgave": "Trin 2, anden del (hvad falder ud)",
+        "fil": "js/niveauer.js",
+        "linje": 202,
+        "nu_alm": "Kaliumbromid og sølv(I)nitrat blandes. De to nye par står på tavlen.",
+        "nu_fed": "Hvad falder ud?",
+        "nu_svar": ["AgBr falder ud", "KNO₃ falder ud", "Begge falder ud", "Intet bundfald"],
+        "problem": "Det fede siger hverken, hvad der blandes, eller at 'falder ud' betyder bundfald.",
+        "nyt_alm": "Kaliumbromid og sølv(I)nitrat blandes.",
+        "nyt_fed": "Hvilket af de to nye par på tavlen falder ud som bundfald?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "Middel og Svær",
+        "opgave": "Trin 2 Bundfaldet (TRIN_BUNDFALD)",
+        "fil": "js/niveauer.js",
+        "linje": 72,
+        "nu_alm": "Kaliumbromid og sølv(I)nitrat blandes. Ionerne bytter partner. … Slå op i fældningstabellen.",
+        "nu_fed": "Hvilket af de nye par er tungtopløseligt?",
+        "nu_svar": [],
+        "problem": "'De nye par' er ikke på tavlen endnu, og der kommer en instruktion efter spørgsmålet, som knappen Slå op i fældningstabellen allerede giver.",
+        "nyt_alm": "Kaliumbromid og sølv(I)nitrat blandes. Ionerne bytter partner.",
+        "nyt_fed": "Hvilket nyt par af ioner er tungtopløseligt ifølge fældningstabellen?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "Middel",
+        "opgave": "Trin 1 Ionerne",
+        "fil": "js/niveauer.js",
+        "linje": 328,
+        "nu_alm": "Kaliumbromid og sølv(I)nitrat blandes. … Vælg alle fire, og tryk Indsend svar.",
+        "nu_fed": "Hvilke ioner er der i de to opløsninger?",
+        "nu_svar": ["K⁺", "NO₃⁻", "K²⁺", "O²⁻", "Br²⁻", "Br⁻", "Ag²⁺", "Ag⁺"],
+        "problem": "At der skal vælges fire, står i en instruktion efter spørgsmålet.",
+        "nyt_alm": "Kaliumbromid og sølv(I)nitrat blandes.",
+        "nyt_fed": "Hvilke fire ioner er der i de to opløsninger, før de blandes?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "Let",
+        "billede": "skud/a/sc2.4_faeldningsreaktioner__0.png",
+        "dom": "fint",
+        "fremme": "Kort (Trin 2 af 4) med Slå op-knap, tavlen med skemaet og ionerne, tre bægerglas og tilbuddet om præsentation. I panelet trinlisten og fældningstabellen.",
+        "bruges": "Kortet, tavlen og tabellen. Opgaven er allerede stilladseret i fire trin.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "Middel",
+        "billede": "skud/a/sc2.4_faeldningsreaktioner__1.png",
+        "dom": "fint",
+        "fremme": "Kort med otte ionknapper, tavlen med stiplede ?-felter, tre glas med ?. Trinlisten og fældningstabellen i panelet.",
+        "bruges": "Kortet og tavlen. Tabellen bruges i trin 2. Pladserne til det, der kommer senere, er allerede stiplede.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "Svær",
+        "billede": "skud/a/sc2.4_faeldningsreaktioner__2.png",
+        "dom": "fint",
+        "fremme": "Kort, tavlen med fire skrivefelter og ladningsknapper, tre glas med ?. Trinlisten og fældningstabellen i panelet.",
+        "bruges": "Kortet, felterne og ladningsknapperne.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Tilbuddet Start præsentation / Nej tak står midt i scenen mellem tavlen og glassene på alle tre faner."
+  }
+]

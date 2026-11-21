@@ -170,44 +170,51 @@
        maaleglasset, maaleglasset fyldt helt med vand og 20 °C. De slipper
        150 mL ud. Gruppe B goer én ting anderledes (B). rigtig: hvordan
        B's molarmasse bliver. fejl: forklaringen til de to forkerte gaet. */
-    D.FEJL_SPM = "Hvordan bliver gruppe B's molarmasse i forhold til gruppe A's?";
-    D.FEJL_SVAR = [{ id: "hoejere", t: "Højere" }, { id: "lavere", t: "Lavere" }, { id: "samme", t: "Den samme" }];
+    D.FEJL_INTRO = "Gruppe A gør det rigtigt.";
+    D.FEJL_SVAR = [{ id: "hoejere", t: "Højere end gruppe A's", g: "højere" }, { id: "lavere", t: "Lavere end gruppe A's", g: "lavere" },
+        { id: "samme", t: "Samme som gruppe A's", g: "den samme" }];
     D.FEJL_A = "Gruppe A gør det rigtigt: tør lighter, alle bobler i måleglasset, glasset fyldt helt med vand og 20 °C.";
     D.FEJL_START = { mf: 17.84, V: 150, t: 20 };
 
     D.FEJL = [
         { id: "vaad", titel: "Våd lighter", kort: "vejer den våd", rigtig: "lavere", B: { film: 0.12 },
           tekst: "Gruppe B tørrer ikke lighteren, før den vejes anden gang. Der sidder 0,12 g vand på den.",
+          spm: "Hvordan bliver molarmassen, når gruppe B vejer lighteren våd?",
           hint: "Vandet vejer med i m(efter). Hvad sker der med m(gas)?",
           forkl: "Vandet vejer med i m(efter), så lighteren ser ud til at have tabt mindre gas. m(gas) bliver for lille, og det gør molarmassen også.",
           fejl: { hoejere: "Vandet gør m(efter) større. Forskellen m(før) − m(efter) bliver mindre.",
                   samme: "Vægten kan ikke se forskel på vand og lighter. Vandet tæller med i m(efter)." } },
         { id: "taendt", titel: "Tændt lighter", kort: "tænder den først", rigtig: "hoejere", B: { flamme: 0.06 },
           tekst: "Gruppe B vejer lighteren og tænder den så et par sekunder for at se, om den virker. Så samler de gassen.",
+          spm: "Hvordan bliver molarmassen, når gruppe B tænder lighteren, før gassen samles?",
           hint: "Den gas, der brændte, forlod lighteren. Kom den i måleglasset?",
           forkl: "Lighteren tabte også den gas, der brændte, men gassen kom aldrig i måleglasset. m(gas) er for stor i forhold til V, så molarmassen bliver for høj.",
           fejl: { lavere: "Der forsvinder mere masse, ikke mindre. Rumfanget i måleglasset er det samme.",
                   samme: "Den gas, der brændte, vejede også noget. Den er med i m(gas), men ikke i V." } },
         { id: "forbi", titel: "Bobler ved siden af", kort: "bobler slipper forbi", rigtig: "hoejere", B: { forbi: 1 / 6 },
           tekst: "Gruppe B holder lighteren skævt. Hver sjette boble stiger op ved siden af måleglasset.",
+          spm: "Hvordan bliver molarmassen, når nogle af gruppe B's bobler slipper forbi måleglasset?",
           hint: "Lighteren taber gassen uanset hvad. Men hvad måler måleglasset?",
           forkl: "Lighteren tabte al gassen, men kun en del kom i måleglasset. V er for lille, så n bliver for lille, og molarmassen bliver for høj.",
           fejl: { lavere: "V bliver mindre, og så bliver n mindre. At dele med et mindre tal giver en større molarmasse.",
                   samme: "Vægten ser al gassen forsvinde, men måleglasset får kun en del af den." } },
         { id: "luft", titel: "Luft i måleglasset", kort: "luft fra start", rigtig: "lavere", B: { luft: 12 },
           tekst: "Gruppe B fyldte ikke måleglasset helt med vand. Der var 12 mL luft i toppen, før de begyndte.",
+          spm: "Hvordan bliver molarmassen, når gruppe B har luft i måleglasset fra start?",
           hint: "Luften fylder med i det, de aflæser. Hvad sker der med V?",
           forkl: "Luften fylder med i måleglasset, så V bliver for stor. Så bliver n for stor, og molarmassen bliver for lav.",
           fejl: { hoejere: "V bliver større, og så bliver n større. At dele med et større tal giver en mindre molarmasse.",
                   samme: "Luften var der før gassen, og den fylder med i aflæsningen." } },
         { id: "dobbelt", titel: "Dobbelt så meget gas", kort: "300 mL gas", rigtig: "samme", B: { V: 300 },
           tekst: "Gruppe B bruger et måleglas på 500 mL og slipper 300 mL gas ud i stedet for 150 mL.",
+          spm: "Hvordan bliver molarmassen, når gruppe B slipper 300 mL gas ud i stedet for 150 mL?",
           hint: "Hvad sker der med m(gas), når V bliver dobbelt så stort?",
           forkl: "Dobbelt så meget gas vejer dobbelt så meget. Massen og stofmængden vokser lige meget, så molarmassen er den samme. Molarmassen bliver blot bestemt lidt mere præcist.",
           fejl: { hoejere: "Massen bliver dobbelt så stor, men det gør stofmængden også.",
                   lavere: "Stofmængden bliver dobbelt så stor, men det gør massen også." } },
         { id: "varm", titel: "Varmt lokale", kort: "30 °C i lokalet", rigtig: "lavere", B: { t: 30 },
           tekst: "Det er 30 °C i lokalet, da gruppe B laver forsøget. De regner stadig med 24,0 L/mol.",
+          spm: "Hvordan bliver molarmassen, når gruppe B laver forsøget ved 30 °C?",
           hint: "Fylder en gas mere eller mindre, når den er varm?",
           forkl: "Varm gas fylder mere. Den samme gas fylder ca. 3 % mere ved 30 °C, men gruppen deler stadig med 24,0 L/mol. n bliver for stor, og molarmassen bliver lidt for lav.",
           fejl: { hoejere: "Gassen fylder mere, når den er varm. Et større V giver et større n og en mindre molarmasse.",

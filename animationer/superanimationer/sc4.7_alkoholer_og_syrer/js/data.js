@@ -212,7 +212,7 @@
                 },
                 {
                     type: "spm", om: ["kaede"],
-                    tekst: "Kæden havde 2 carbonatomer. Hvorfor hedder syren propansyre og ikke ethansyre?",
+                    tekst: "Hvorfor hedder syren propansyre, når kæden før COOH har 2 carbonatomer?",
                     svar: [
                         { t: "-syre tæller ét carbonatom ekstra",
                           f: "Endelsen -syre viser kun gruppen. Tæl alle carbonatomer i molekylet, også det i COOH." },
@@ -255,7 +255,7 @@
             dele: [
                 {
                     type: "spm", skjul: ["navn"], om: ["kaede"],
-                    tekst: "Tegningen viser en alkohol. Hvad hedder stoffet?",
+                    tekst: "Hvad hedder alkoholen på tegningen?",
                     svar: [
                         { t: "butan-1-ol",
                           f: "Tæl carbonatomerne igen. OH-gruppen har intet carbonatom, så der er kun 3." },
@@ -430,7 +430,7 @@
             dele: [
                 {
                     type: "spm", om: ["lup"],
-                    tekst: "Luppen viser ét molekyle ethanol i vand. Hvor går der stiplede linjer til vandmolekylerne?",
+                    tekst: "Luppen viser ethanol i vand. Hvor på ethanolmolekylet går der stiplede linjer til vandmolekylerne?",
                     svar: [
                         { t: "Langs hele kæden",
                           f: "Kæden er upolær og tiltrækker ikke vandmolekylerne. Se, hvor de stiplede linjer sidder." },

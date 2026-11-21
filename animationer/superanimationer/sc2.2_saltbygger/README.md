@@ -254,7 +254,7 @@ opgaverne.
 * Fane 1: under en opgave viser bordet ingen note nederst. Kun beskeden om,
   at der ikke er plads til flere ioner, kan stå dér.
 
-Pladsen til kortet (`kortZone`) er 214/204 px på fane 1, 226/212 px på fane 2
+Pladsen til kortet (`kortZone`) er 237/221 px på fane 1, 247/231 px på fane 2
 og 300/320 px på fane 3 (almindelig/lav skærm). Selvtesten (afsnit 20) måler
 alle opgaver og trin med hint og besked i 1400 × 860 og 1280 × 680 og tjekker,
 at bordet, glasset og formlen står under kortet.

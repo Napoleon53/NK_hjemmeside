@@ -88,7 +88,8 @@
     };
 
     /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
-    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 132, 158); };
+    /* 137 (foer 132): svarene i maal 5 (nr. 103), 21. nov. 2026 */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 137, 158); };
 
     P.saetAnker = function (id, x, y, b, h) {
         var e = NK.el(id);
@@ -139,6 +140,7 @@
         this.valgNr = -1;
         this.forkert = {};
         this.vist = false;
+        this.spmNu = false;     /* maal 5: spoergsmaalet om luppen, naar pH 12 er naaet */
         this.venterTjek = false;
         this.pegKnap = false;
         this.glid = null;
@@ -157,11 +159,24 @@
        Vis svaret), og luppen er faerdig med at zoome */
     P.tjekMaal = function () {
         var m = this.maal();
-        if (!m || this.naaet || m.slags === "valg") return;
+        if (!m || this.naaet || m.slags === "valg" || this.spmNu) return;
         if (!this.venterTjek && this.hjaelp !== 2) return;
         if (this.traek || this.glid || !this.lup.rolig()) return;
         this.venterTjek = false;
-        if (Math.abs(this.ph - m.ph) < 0.04) { this.maalNaaet(); return; }
+        if (Math.abs(this.ph - m.ph) < 0.04) {
+            /* Maal 5: paa pH 12 kommer spoergsmaalet om luppen med svarene */
+            if (m.valg && !this.spmNu) {
+                this.spmNu = true;
+                if (this.hjaelp === 2) { this.valgNr = m.rigtig; this.maalNaaet(); return; }
+                this.hjaelp = 0;
+                this.pegKnap = false;
+                this.besked("", "");
+                this.visKort();
+                return;
+            }
+            this.maalNaaet();
+            return;
+        }
         if (this.hjaelp === 2) return;
         var ret = m.ph < this.ph ? "mod venstre" : "mod højre";
         this.besked(NK.Skort.maerke("Ikke endnu", "Mærket står på pH " + K.phTekst(this.ph, 1) +
@@ -175,7 +190,7 @@
     P.kanSendes = function () {
         var m = this.maal();
         if (!m || this.naaet || this.hjaelp === 2) return false;
-        if (m.slags === "valg") return this.valgNr >= 0;
+        if (m.slags === "valg" || this.spmNu) return this.valgNr >= 0;
         return Math.abs(this.ph - m.start) >= 0.04 && !this.traek && !this.glid && !this.venterTjek;
     };
 
@@ -184,7 +199,7 @@
         var m = this.maal();
         if (!this.kanSendes()) { this.kort.blink(); return; }
         this.pegKnap = false;
-        if (m.slags === "valg") {
+        if (m.slags === "valg" || this.spmNu) {
             var i = this.valgNr;
             if (i === m.rigtig) { this.maalNaaet(); return; }
             this.forkert[i] = true;
@@ -223,7 +238,7 @@
     /* Et valg i en valg-opgave: vaelger kun (Indsend svar sender) */
     P.vaelg = function (i) {
         var m = this.maal();
-        if (!m || m.slags !== "valg" || this.naaet || this.forkert[i]) return;
+        if (!m || (m.slags !== "valg" && !this.spmNu) || this.naaet || this.forkert[i]) return;
         this.valgNr = i;
         if (this.afvisTilbud) this.afvisTilbud();
         this.besked("", "");
@@ -265,14 +280,14 @@
         this.pegKnap = false;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked(NK.Skort.maerke("Hint", NK.html(m.hint)), "gul");
+            this.besked(NK.Skort.maerke("Hint", NK.html(this.spmNu ? m.spmHint : m.hint)), "gul");
             this.visMaal();
             return;
         }
         if (this.hjaelp === 2) return;
         /* Vis svaret: valget saettes, eller maerket glider hen, og luppen zoomer */
         this.hjaelp = 2;
-        if (m.slags === "valg") {
+        if (m.slags === "valg" || this.spmNu) {
             this.valgNr = m.rigtig;
             this.maalNaaet();
             return;
@@ -336,7 +351,7 @@
             return;
         }
         var svar = null;
-        if (m.slags === "valg") {
+        if (m.slags === "valg" || this.spmNu) {
             svar = m.valg.map(function (x, j) {
                 var kl = "";
                 if (mig.naaet) kl = j === m.rigtig ? (mig.vist ? "svar-vist" : "rigtig") : (mig.forkert[j] ? "forkert" : "dim");
@@ -348,7 +363,7 @@
         var klar = this.kanSendes();
         this.kort.vis({
             chip: "Mål " + (this.nr + 1) + " af " + D.LUP_MAAL.length,
-            tekst: NK.html(m.tekst),
+            tekst: NK.html(this.spmNu ? m.spm : m.tekst + (m.spm ? " " + m.spm : "")),
             svar: svar,
             laast: this.naaet,
             bliv: this.naaet ? { tekst: NK.html(m.efter), vist: this.vist,
@@ -356,14 +371,14 @@
             besked: b,
             hint: { tekst: this.hjaelp === 0 ? "Giv hint" : (this.hjaelp === 1 ? "Vis svaret" : "Viser svaret …"),
                 svar: this.hjaelp > 0, peg: this.pegKnap, laast: this.hjaelp === 2 },
-            indsend: { tekst: klar && m.slags !== "valg" ? "Indsend svar: pH " + K.phTekst(this.ph, 1) : "Indsend svar", klar: klar }
+            indsend: { tekst: klar && m.slags !== "valg" && !this.spmNu ? "Indsend svar: pH " + K.phTekst(this.ph, 1) : "Indsend svar", klar: klar }
         });
     };
 
     /* Maerket er laast, naar kortet viser et spoergsmaal eller venter paa Naeste */
     P.laast = function () {
         var m = this.maal();
-        return !!m && (this.naaet || m.slags === "valg");
+        return !!m && (this.naaet || m.slags === "valg" || !!this.spmNu);
     };
 
     P.visMaaling = function () {
@@ -384,7 +399,7 @@
         var m = this.maal(), zm = this.lup.zoomerMod();
         if (zm < 0) return "Luppen viser over 100 ioner af én slags og zoomer ind på et 10 gange mindre rum.";
         if (zm > 0) return "Luppen viser højst 10 af den ion, der er flest af, og zoomer ud til et 10 gange større rum.";
-        if (m && (this.naaet || m.slags === "valg")) return "";
+        if (m && (this.naaet || m.slags === "valg" || this.spmNu)) return "";
         if (m && Math.abs(this.ph - m.start) < 0.04 && !this.glid) return "Træk pH-mærket på skalaen. Et klik på skalaen virker også.";
         return "pH " + K.phTekst(this.ph, 1) + ". " + K.modVand(this.ph);
     };

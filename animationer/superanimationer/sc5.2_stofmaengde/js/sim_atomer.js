@@ -208,7 +208,7 @@
         k.vis({
             kl: this.svar ? "loest" + (this.rigtigt ? "" : " svar") : "spm",
             chip: "Par " + (this.nr + 1) + " af " + this.runde.length + " · " + D.PAR_NIVEAUER[this.par.niveau].navn,
-            tekst: NK.html("Skiltet på bordet viser de to prøver, og vægtene viser massen. Hvor er der flest atomer?"),
+            tekst: NK.html("Skiltet på bordet viser de to prøver, og vægtene viser massen. Hvilken af de to prøver har flest atomer?"),
             svar: svar,
             laast: !!this.svar
         });

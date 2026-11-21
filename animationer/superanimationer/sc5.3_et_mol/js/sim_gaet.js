@@ -106,6 +106,18 @@
     P.q = function () { return D.GAET[this.nr]; };
 
     /* ----- Listen i panelet ---------------------------------------------------- */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun de
+       besvarede gaet (ogsaa gemt i browseren) og den, eleven er ved, har titel. De kommende er et nummer
+       med en graa streg og kan ikke klikkes, til de er naaet: alle foer dem er
+       besvaret, eller eleven har vaeret der. Gaet forfra laaser dem igen. */
+    P.aabenGaet = function (i) {
+        var q = D.GAET[i];
+        if (!q) return false;
+        if (this.svar[q.id] !== undefined || i === this.nr || (this.naaet && this.naaet[q.id])) return true;
+        for (var j = 0; j < i; j++) if (this.svar[D.GAET[j].id] === undefined) return false;
+        return true;
+    };
+
     P.bygListe = function () {
         var mig = this;
         var liste = NK.el("g-liste");
@@ -117,8 +129,8 @@
             var k = document.createElement("button");
             k.type = "button";
             k.className = "opg-chip";
-            k.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" + NK.htmlPotens(q.titel) + '</span><i class="oc-m"></i>';
-            k.addEventListener("click", function () { mig.vaelg(i); mig.fokus(); });
+            k.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + '</span><span class="oc-navn"></span></span><i class="oc-m"></i>';
+            k.addEventListener("click", function () { if (!mig.aabenGaet(i)) return; mig.vaelg(i); mig.fokus(); });
             raekke.appendChild(k);
             mig.chips[i] = k;
         });
@@ -128,7 +140,13 @@
     P.visListe = function () {
         var mig = this;
         D.GAET.forEach(function (q, i) {
-            var c = mig.chips[i], s = mig.svar[q.id];
+            var c = mig.chips[i], s = mig.svar[q.id], aaben = mig.aabenGaet(i);
+            var html = aaben ? NK.htmlPotens(q.titel) : '<span class="hl-streg"></span>';
+            var nv = c.querySelector(".oc-navn");
+            if (nv.innerHTML !== html) nv.innerHTML = html;
+            c.disabled = !aaben;
+            c.classList.toggle("laast", !aaben);
+            if (aaben) c.removeAttribute("aria-label"); else c.setAttribute("aria-label", "Gæt " + (i + 1) + ", kommer senere");
             c.classList.toggle("valgt", i === mig.nr && mig.fase !== "intro" && mig.fase !== "slut");
             c.classList.toggle("loest", s === q.ret);
             c.classList.toggle("forbi", s !== undefined && s !== q.ret);
@@ -152,6 +170,8 @@
 
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[D.GAET[i].id] = true;
         this.hintVist = false;
         this.valgt = null;
         this.stige.blink = {};
@@ -309,6 +329,7 @@
 
     P.nulstil = function () {
         this.svar = {};
+        this.naaet = {};
         NK.gem(NOEGLE, this.svar);
         this.nr = 0;
         this.intro();

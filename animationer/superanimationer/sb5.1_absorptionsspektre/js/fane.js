@@ -236,7 +236,9 @@
             if (d.gaet && !slut) {
                 html = '<span class="gk-maerke">Gæt først</span>';
                 if (d.intro) html += '<p class="gk-intro">' + NK.html(d.intro) + "</p>";
-                html += '<p class="gk-tekst">' + NK.html(d.tekst) + '</p><div class="gk-svar n' + d.svar.length + '">';
+                /* Teksten som paa de andre kort: indledningen i almindelig skrift og kun
+                   spoergsmaalet halvfedt (NK.Papir.tekst, 21. nov. 2026) */
+                html += '<p class="sk-tekst">' + papir(NK.html(d.tekst)) + '</p><div class="gk-svar n' + d.svar.length + '">';
                 d.svar.forEach(function (sv, j) {
                     html += '<button type="button" class="gk-knap" data-gaet="' + j + '"><span class="v-bogstav">' + "ABCD".charAt(j) +
                         "</span><span>" + NK.html(sv.t) + "</span></button>";

@@ -231,3 +231,7 @@ spørgsmålet: svaret er grønt (alle rigtige svar, når flere passer),
 forklaringen står under svarene, og knappen, der fører videre, står, hvor
 Indsend svar stod. Mens reaktionen eller skilletragten kører, har kortet kun
 en kort tekst og ingen knapper (`skjulIndsend` og `skjulHint`).
+
+## Listerne låser titlerne op i takt (21. nov. 2026)
+
+Reaktionerne (fane 1) og trinene i skilletragten (fane 3) viser kun titlen på de løste og den, eleven er ved; de kommende står som et nummer med en grå streg, og en låst reaktion kan ikke klikkes (`aabenOpgave` i `js/sim_kond.js`, `aabenTrin` i `js/sim_rens.js`; har eleven renset en ester før, står alle trin). Fane 2 har kun numre under niveauerne og er uændret. Selvtesten: 184 påstande, kun den kendte fejl om til_panelet.js.

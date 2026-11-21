@@ -30,7 +30,8 @@
     }
 
     var P = SimBeregning.prototype;
-    NK.Fane.paa(P, { navn: "beregning", naesteFane: "fane-fejl", naesteNavn: "Fejlkilder", zone: [204, 180] });
+    /* zone: 206 (før 204), spørgsmålet på egen linje, 21. nov. 2026 */
+    NK.Fane.paa(P, { navn: "beregning", naesteFane: "fane-fejl", naesteNavn: "Fejlkilder", zone: [206, 180] });
     NK.Regning.paa(P);
 
     /* ----- Opgaven -------------------------------------------------------------- */
@@ -65,7 +66,7 @@
         NK.saetTekst("beregning-note", !o.ukendt && !t.egen ? "Tallene er et eksempel. Lav forsøget på fanen Forsøget for at regne på dine egne." : "");
         if (o.ukendt) {
             return NK.html("En lukket gasdåse med en ukendt alkan vejer " + K.g2(t.mf) + " g. Der samles " +
-                K.V(t.V) + " mL af gassen over vand ved 20 °C, og dåsen vejer bagefter " + K.g2(t.me) + " g. Hvilken alkan er det?");
+                K.V(t.V) + " mL af gassen over vand ved 20 °C, og dåsen vejer bagefter " + K.g2(t.me) + " g. Hvilken alkan er der i gasdåsen?");
         }
         var s = o.kunTal ? "Find molarmassen i måling 2. Formlerne er de samme som i måling 1, så du skriver kun tallene." :
             "Find gassens molarmasse i måling " + (o.maaling + 1) + ", og find ud af, hvilken alkan det er.";

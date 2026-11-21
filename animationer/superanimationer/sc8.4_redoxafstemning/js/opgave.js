@@ -868,9 +868,13 @@
 
     P.kortHTML = function () {
         var R = this.R, nr = this.kortTrin(), t = TRIN[nr];
-        var opg = NK.html(this.opgaveTekst()) + (R.def.kontekst ? ' <span class="sk-kontekst">' + NK.html(R.def.kontekst) + "</span>" : "");
-        var html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + (nr + 1) + " af " + ANTAL_TRIN + "</span>" + opg
-            + ' <span class="sk-spm">' + NK.html(t.spm(R)) + "</span></p>";
+        /* Teksten gaar gennem NK.Papir.tekst som i de andre animationer: et
+           spoergsmaal (med ?) bliver halvfedt paa sin egen linje, og en opgave
+           i bydeform staar i almindelig skrift. Konteksten bliver kursiv. */
+        var kon = R.def.kontekst ? NK.Papir.tekst(NK.html(R.def.kontekst)) : "";
+        var opg = NK.Papir.tekst(NK.html(this.opgaveTekst() + (R.def.kontekst ? " " + R.def.kontekst : "") + " " + t.spm(R)));
+        if (kon) opg = opg.replace(kon, '<span class="sk-kontekst">' + kon + "</span>");
+        var html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + (nr + 1) + " af " + ANTAL_TRIN + "</span>" + opg + "</p>";
         if (this.bliv) {
             return html + NK.Papir.bliv(NK.html(this.bliv.tekst), this.bliv.vist ? "Svaret" : "Rigtigt", NK.html(this.knapTekst()), this.bliv.vist);
         }

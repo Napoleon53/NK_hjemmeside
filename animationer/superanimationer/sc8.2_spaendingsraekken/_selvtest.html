@@ -193,7 +193,7 @@ async function koerTest(W, ramme) {
     alle.concat([["Fe", "H"], ["H", "Cu"]]).forEach(function (p) {
         var m = p[0], i = p[1];
         if (m === "H") { tekster.push(D.rkForkert("Cu", "H", true)); return; }
-        tekster.push(D.iagttagelse(m, i), D.fuSvar(m, i, true), D.fuSvar(m, i, false), D.fuHint(m, i), D.opgaveTekst(m, i));
+        tekster.push(D.iagttagelse(m, i), D.fuSvar(m, i, true), D.fuSvar(m, i, false), D.fuHint(m, i), D.opgaveTekst(m, i), D.FU_SPM(m, i), D.PRODUKT_SPM(m, i));
         if (K.reagerer(m, i)) {
             var r = K.reaktion(m, i);
             tekster.push(D.produktHint(r), D.produktForkert(r, "m"), D.produktForkert(r, "i"), D.koefHint(r), D.elektronTekst(r));
@@ -391,10 +391,10 @@ async function koerTest(W, ramme) {
     fu.gaet(1);
     koerTid(fu, 3.2);
     paastand("forkert gæt: rød forklaring med rækken, og kortet bliver på spørgsmålet", /står til venstre for kobber/.test(doc.getElementById("fu-bliv").textContent) &&
-        /bliv nej/.test(doc.getElementById("fu-bliv").innerHTML) && /Sker der noget/.test(doc.getElementById("fu-ind").textContent));
+        /bliv nej/.test(doc.getElementById("fu-bliv").innerHTML) && /Sker der en reaktion, når aluminium kommer ned i kobber\(II\)sulfat\?/.test(doc.getElementById("fu-ind").textContent));
     paastand("pilen med e⁻ vises på rækken", fu.markeret);
     fu.videre();
-    paastand("Næste spørgsmål: hvad dannes?", fu.fase === "produkt" && /Hvad dannes/.test(doc.getElementById("fu-ind").textContent));
+    paastand("Næste spørgsmål: hvad dannes?", fu.fase === "produkt" && /Hvilke to stoffer dannes, når aluminium reagerer med Cu²⁺\?/.test(doc.getElementById("fu-ind").textContent));
     var mChip = fu.chips.findIndex(function (c) { return c.slags === "m"; });
     var rChip = fu.chips.findIndex(function (c) { return c.rigtig === 0; });
     fu.vaelgChip(mChip);

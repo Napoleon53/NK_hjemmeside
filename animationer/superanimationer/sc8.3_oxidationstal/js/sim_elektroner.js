@@ -110,7 +110,7 @@
     P.trinLinje = function () {
         if (this.trin === "gaet") {
             var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
-            return "Gæt først: " + (mangler.length > 1 ? "Hvilke oxidationstal har " : "Hvilket oxidationstal har ") + liste(mangler) + "?";
+            return "Gæt først. " + (mangler.length > 1 ? "Hvilke oxidationstal har " : "Hvilket oxidationstal har ") + liste(mangler) + " i " + this.m.tekst + "?";
         }
         var dobbelt = this.enheder.some(function (u) { return u.b.orden > 1; });
         var hvad = dobbelt ? (this.enheder.length > 1 ? "elektronerne i hver binding" : "elektronerne i bindingen") :
@@ -121,7 +121,7 @@
     /* Kortets tekst: molekylets navn, opgaven og det, eleven skal nu.
        Naar regnskabet er gjort op, staar svaret i stedet. */
     P.maalTekst = function () {
-        return "Find oxidationstallet for " + liste(this.spurgte()) + " i " + this.m.tekst + ".";
+        return "Find " + (this.spurgte().length > 1 ? "oxidationstallene" : "oxidationstallet") + " for " + liste(this.spurgte()) + " i " + this.m.tekst + ".";
     };
 
     P.visSpm = function () {

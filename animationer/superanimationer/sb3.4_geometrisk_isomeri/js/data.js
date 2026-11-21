@@ -59,7 +59,7 @@
           maal: "Træk i den højre halvdel af butanmolekylet, så de to CH₃-grupper står på samme side. Tryk så Indsend svar." },
         { id: "d2", navn: "But-2-en", slags: "drej", binding: 2,
           v: ["CH3", "H"], h: ["H", "CH3"], drej: 0,
-          maal: "Træk den højre CH₃-gruppe i but-2-en op på samme side som den venstre CH₃-gruppe. Kan CH₃-gruppen komme derop?" },
+          maal: "Træk i den højre CH₃-gruppe i but-2-en. Kan den højre CH₃-gruppe i but-2-en drejes op på samme side som den venstre?" },
         { id: "d3", navn: "1,2-dichlorethen", slags: "to", binding: 2,
           a: { v: ["Cl", "H"], h: ["Cl", "H"] }, b: { v: ["Cl", "H"], h: ["H", "Cl"] },
           kog: [60, 48], smelt: [-81, -49],

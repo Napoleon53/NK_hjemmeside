@@ -70,8 +70,8 @@
             id: "start", navn: "Kun reaktanter",
             opstil: { c: { CO: 0.20, H2O: 0.20, CO2: 0, H2: 0 }, tom: true },
             gaet: {
-                intro: "En tom beholder fyldes med lige meget CO og H₂O. Der er ingen CO₂ og H₂ i den endnu.",
-                tekst: "Hvilken vej går reaktionen?",
+                intro: "En tom beholder fyldes med lige meget CO og H₂O.",
+                tekst: "Hvilken vej går reaktionen, når der kun er CO og H₂O?",
                 svar: [
                     { t: "Mod højre", ok: true },
                     { t: "Mod venstre" },
@@ -111,8 +111,8 @@
             id: "forMeget", navn: "For meget produkt",
             opstil: { c: { CO: 0.10, H2O: 0.10, CO2: 0.20, H2: 0.45 }, tom: true },
             gaet: {
-                intro: "Beholderen fyldes med en blanding, hvor Y = 9,0. Ligevægtskonstanten er K = 4,0.",
-                tekst: "Hvilken vej går reaktionen?",
+                intro: "Beholderen fyldes med en blanding af alle fire stoffer.",
+                tekst: "Hvilken vej går reaktionen, når Y = 9,0 og K = 4,0?",
                 svar: [
                     { t: "Mod højre" },
                     { t: "Mod venstre", ok: true },
@@ -152,8 +152,8 @@
             id: "reaktant", navn: "Mere CO",
             opstil: { c: LIGEVAEGT, tom: false },
             gaet: {
-                intro: "Beholderen er i ligevægt, så Y = K. Om lidt pumpes der mere CO ind i beholderen.",
-                tekst: "Hvilken vej forskydes ligevægten?",
+                intro: "Beholderen er i ligevægt, så Y = K.",
+                tekst: "Hvilken vej forskydes ligevægten, når der pumpes CO ind?",
                 svar: [
                     { t: "Mod højre", ok: true },
                     { t: "Mod venstre" },
@@ -193,8 +193,8 @@
             id: "produkt", navn: "Mere H₂",
             opstil: { c: LIGEVAEGT, tom: false },
             gaet: {
-                intro: "Beholderen er i ligevægt, så Y = K. Om lidt pumpes der mere H₂ ind i beholderen.",
-                tekst: "Hvilken vej forskydes ligevægten?",
+                intro: "Beholderen er i ligevægt, så Y = K.",
+                tekst: "Hvilken vej forskydes ligevægten, når der pumpes H₂ ind?",
                 svar: [
                     { t: "Mod højre" },
                     { t: "Mod venstre", ok: true },
@@ -214,7 +214,7 @@
             },
             spm: {
                 om: ["panel"],
-                tekst: "Panelet viser [H₂] før indgrebet, lige efter og nu. Hvordan endte [H₂]?",
+                tekst: "Se tallene ved H₂ i panelet. Hvor ligger [H₂] nu i forhold til [H₂] før og lige efter indgrebet?",
                 svar: [
                     { t: "Mellem før og lige efter", ok: true },
                     { t: "Som før indgrebet",
@@ -342,7 +342,7 @@
             opstil: { sted: "muskel" },
             gaet: {
                 intro: "Når du løber, bruger musklen mere dioxygen, så [O₂] i musklen falder endnu mere.",
-                tekst: "Hvad gør hæmoglobinet i musklen?",
+                tekst: "Hvad gør hæmoglobinet i musklen, når du løber?",
                 svar: [
                     { t: "Det afgiver mere O₂", ok: true },
                     { t: "Det binder mere O₂" },
@@ -381,8 +381,8 @@
             id: "bjerg", navn: "I bjergene",
             opstil: { sted: "muskel", bjerg: true },
             gaet: {
-                intro: "Højt oppe i bjergene er der mindre dioxygen i luften, så [O₂] i lungerne er lavere end ved havet.",
-                tekst: "Hvor meget O₂ binder blodet i lungerne?",
+                intro: "Højt oppe i bjergene er der mindre dioxygen i luften end ved havet.",
+                tekst: "Hvor meget O₂ binder blodet i lungerne oppe i bjergene?",
                 svar: [
                     { t: "Mindre end ved havet", ok: true },
                     { t: "Lige så meget som ved havet" },
@@ -421,8 +421,8 @@
             id: "flere", navn: "Højdetræning",
             opstil: { sted: "lunge", bjerg: true },
             gaet: {
-                intro: "Efter nogle uger i bjergene har kroppen dannet flere røde blodlegemer og dermed mere Hb.",
-                tekst: "Hvilken vej forskydes ligevægten?",
+                intro: "Efter nogle uger i bjergene har kroppen dannet flere røde blodlegemer.",
+                tekst: "Hvilken vej forskydes ligevægten, når blodet får mere Hb?",
                 svar: [
                     { t: "Mod højre", ok: true },
                     { t: "Mod venstre" },
@@ -441,7 +441,7 @@
                 ]
             },
             spm: {
-                tekst: "Hvorfor bærer blodet nu mere dioxygen?",
+                tekst: "Hvorfor bærer blodet mere dioxygen efter nogle uger i bjergene?",
                 svar: [
                     { t: "Hb er en reaktant, der blev tilsat", ok: true },
                     { t: "K blev større",
@@ -540,7 +540,7 @@
             },
             spm: {
                 om: ["tallinje"],
-                tekst: "Y = 0,50 og K = 4,0. Hvilken vej går reaktionen?",
+                tekst: "Hvilken vej går reaktionen, når Y = 0,50 og K = 4,0?",
                 svar: retning(0, "", [null,
                     "0,50 er mindre end 4,0. Se, hvor Y står på tallinjen i forhold til K.",
                     "0,50 er ikke lig med 4,0, så blandingen er ikke i ligevægt."]),
@@ -581,7 +581,7 @@
             },
             spm: {
                 om: ["tallinje"],
-                tekst: "Y = 0,80 M og K = 0,20 M. Hvilken vej går reaktionen?",
+                tekst: "Hvilken vej går reaktionen, når Y = 0,80 M og K = 0,20 M?",
                 svar: retning(1, "", [
                     "0,80 M er større end 0,20 M. Se, hvor Y står på tallinjen i forhold til K.",
                     null,
@@ -598,7 +598,7 @@
             id: "ester", navn: "Esteren",
             r: "ester", c: { syre: 0.50, alk: 0.50, est: 1.0, vand: 1.0 }, Y: 4.0,
             brok: {
-                tekst: "Stofferne på tavlen er væsker, der er blandet med hinanden. Hvilken reaktionsbrøk hører til?",
+                tekst: "Stofferne er væsker, der er blandet sammen. Hvilken reaktionsbrøk hører til esterdannelsen på tavlen?",
                 svar: [
                     { t: "[CH₃COOC₂H₅] / ([CH₃COOH] · [C₂H₅OH])", h: B("[CH₃COOC₂H₅]", "[CH₃COOH] · [C₂H₅OH]"),
                       f: "Vand er her ikke et opløsningsmiddel, men et af de stoffer, der er blandet. Derfor er H₂O med." },
@@ -623,7 +623,7 @@
             },
             spm: {
                 om: ["tallinje"],
-                tekst: "Y = 4,0 og K = 4,0. Hvilken vej går reaktionen?",
+                tekst: "Hvilken vej går reaktionen, når Y = 4,0 og K = 4,0?",
                 svar: retning(2, "", [
                     "Y er ikke mindre end K. Se, hvor Y står på tallinjen.",
                     "Y er ikke større end K. Se, hvor Y står på tallinjen.",
@@ -660,7 +660,7 @@
             },
             spm: {
                 om: ["tallinje"],
-                tekst: "Lige efter indgrebet er Y = 0,10 M og K = 0,20 M. Hvilken vej forskydes ligevægten?",
+                tekst: "Der er pumpet N₂O₄ ind i blandingen. Hvilken vej forskydes ligevægten, når Y = 0,10 M og K = 0,20 M?",
                 svar: retning(0, "", [null,
                     "0,10 M er mindre end 0,20 M. Se, hvor Y står på tallinjen i forhold til K.",
                     "Lige efter indgrebet er Y ikke lig med K."]),
@@ -712,7 +712,7 @@
             },
             spm: {
                 om: ["tallinje"],
-                tekst: "Y = 3,0 · 10⁻⁴ M² og K = 1,0 · 10⁻⁴ M². Hvilken vej forskydes ligevægten?",
+                tekst: "Der er pumpet NH₃ ind. Hvilken vej forskydes ligevægten, når Y = 3,0 · 10⁻⁴ M² og K = 1,0 · 10⁻⁴ M²?",
                 svar: retning(1, "", [
                     "3,0 · 10⁻⁴ er større end 1,0 · 10⁻⁴. Se tallinjen.",
                     null,
@@ -725,7 +725,7 @@
                 godt: "Y > K, så NH₃ og HCl reagerer og danner fast NH₄Cl, indtil Y = K igen."
             },
             spm2: {
-                tekst: "Hvad ville der ske, hvis man i stedet tilsatte mere fast NH₄Cl i beholderen?",
+                tekst: "Hvad sker der med ligevægten, når der kommer mere fast NH₄Cl i beholderen?",
                 svar: [
                     { t: "Ligevægten forskydes mod højre",
                       f: "NH₄Cl er et fast stof og er ikke med i Y. Ændrer Y sig så, når der kommer mere NH₄Cl?" },

@@ -61,7 +61,10 @@
            begynder under kortTop(). Selvtesten maaler kortet i alle trin
            med det laengste hint og den laengste besked. */
         P.kortZone = function () {
-            return window.innerHeight <= 720 ? 132 : 150;
+            /* Formlerne 147 paa en lav og bred skaerm (fra 1000 px), saa rummene
+               i en smal montre ikke bliver mindre: spørgsmålet på egen linje, 21. nov. 2026 */
+            if (window.innerHeight <= 720) return navn === "formler" && window.innerWidth >= 1000 ? 147 : 132;
+            return 150;
         };
 
         P.kortTop = function () { return 10 + this.kortZone() + 8; };

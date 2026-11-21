@@ -275,7 +275,7 @@
     var SVAER = {
         id: "svr", navn: "To farvestoffer", niveau: "svær",
         titel: "Grøn sodavand",
-        spoergsmaal: "Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133. Hvad er koncentrationen af hvert farvestof?",
+        spoergsmaal: "Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133. Hvad er koncentrationen af E102 og af E133 i den grønne drik?",
         lambdaer: [427, 630], maaletid: 0.6,
         kuvetter: [
             { id: "blind", navn: "blindprøven", etiket: ["Blind"], indhold: {}, rolle: "blind", c: 0 },

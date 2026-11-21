@@ -46,7 +46,7 @@
         else if (this.valgt === "ingen") kl = "valgt";
         else if (this.opg.ingen) kl = "forkert";
         return {
-            tekst: "Hvilken del af elevens reaktionsbrøk på tavlen er forkert? Klik på delen, eller vælg Der er ingen fejl.",
+            tekst: "Klik på den forkerte del, eller vælg Der er ingen fejl. Hvor står fejlen i elevens reaktionsbrøk på tavlen, hvis der er en?",
             svar: [{ t: "Der er ingen fejl", klasse: kl, laast: this.faerdig || this.opg.ingen }]
         };
     };

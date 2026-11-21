@@ -40,7 +40,7 @@
             trin: [
                 {
                     id: "vaelg", slags: "vaelg", navn: "Vælg glucosen",
-                    tekst: "Amylose i stivelse er en kæde med α-1,4-glykosidbindinger. Hvilken glucose skal sættes på kæden? Klik på den, og tryk Indsend svar.",
+                    tekst: "Amylose i stivelse er en kæde med α-1,4-glykosidbindinger. Svar ved at klikke på en glucose. Hvilken glucose skal sættes på amylosekæden?",
                     rigtig: "alfa",
                     fejl: { beta: "I β-glucose peger OH-gruppen på carbonatom 1 op. Oxygenatomerne i kædens glykosidbindinger peger ned." },
                     hint: ["Se på kædens grønne oxygenatomer. Peger de ned eller op fra carbonatom 1?",
@@ -76,7 +76,7 @@
             trin: [
                 {
                     id: "vaelg", slags: "vaelg", navn: "Vælg glucosen",
-                    tekst: "Træ og bomuld består hovedsageligt af cellulose. Cellulose er en kæde med β-1,4-glykosidbindinger. Hvilken glucose skal sættes på kæden?",
+                    tekst: "Træ og bomuld består hovedsageligt af cellulose. Cellulose er en kæde med β-1,4-glykosidbindinger. Hvilken glucose skal sættes på cellulosekæden?",
                     rigtig: "beta",
                     fejl: { alfa: "I α-glucose peger OH-gruppen på carbonatom 1 ned. En β-binding kommer fra en OH-gruppe, der peger op." },
                     hint: ["β-1,4 fortæller, at bindingen kommer fra carbonatom 1 i β-glucose.",
@@ -207,7 +207,7 @@
         },
         {
             id: "gaet2", slags: "gaet", navn: "Gæt",
-            tekst: "Spyt indeholder enzymet amylase. Spyt dryppes på kogt stivelse og på vat, og prøverne står i 10 minutter ved 37 °C. Hvad spalter amylase?",
+            tekst: "Spyt med enzymet amylase dryppes på kogt stivelse og på vat. Prøverne står i 10 minutter ved 37 °C. Spalter amylase den kogte stivelse, vattet eller begge?",
             svar: ["Kun stivelsen", "Kun vattet", "Begge prøver"], rigtig: 0
         },
         {
@@ -218,7 +218,7 @@
         },
         {
             id: "enzym", slags: "spm", navn: "Enzymet",
-            tekst: "Amylase spaltede stivelsen til maltose, men ikke cellulosen. Hvorfor?",
+            tekst: "Amylase spaltede stivelsen til maltose. Hvorfor kunne amylase ikke spalte cellulosen i vattet?",
             om: "lup",
             svar: ["Amylase passer kun til α-bindinger", "Cellulose har ingen glykosidbindinger", "Cellulose er ikke bygget af glucose"], rigtig: 0,
             fejl: { 1: "Cellulose har β-1,4-glykosidbindinger mellem glucoseenhederne.",

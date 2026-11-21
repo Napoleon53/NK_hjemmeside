@@ -126,3 +126,9 @@ trinnene), har ingen hints, kun Vis svaret, og koster ikke fanens stjerne.
 `kemi-b-filer/samling_b8.html` før TLC (`b8.6`) med koden `b8.4`, linjen til
 `til_panelet.js` øverst i `<head>` og eventuelt en Prøv selv-linje i
 Kemibogens B8.4.
+
+## Opgavelisten (21. nov. 2026)
+
+Trinlisterne og ekstraopgaverne låser titlerne op i takt: kun de løste og den, eleven er ved, har
+titel, og de kommende er et nummer med en grå streg (`trinLi` i `js/fane.js`, `visEkstraPanel` i
+`js/ekstra.js`). Selvtesten afsnit 8 tjekker det (ALT OK, 116 påstande).

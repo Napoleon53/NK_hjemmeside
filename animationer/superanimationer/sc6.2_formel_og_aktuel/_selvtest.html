@@ -93,17 +93,40 @@ function koerTest(W) {
         return true;
     }
     function besked(sim) { return sim.beskedTekst(); }
-    var FORMLER = { n_mM: "n = m / M", c: "c = n / V", ionBland: "[ion] = n / V", ion2: "n / V",
-                    nSA: "n = m / M", nSB: "n(B) = m / M", cSA: "c = n / V", cSB: "c(B) = n / V" };
-    /* Løs resten af opgaven ved at skrive det rigtige */
+    /* Runde 2 (21. nov. 2026): svarene staar paa kortet. Et formeltrin har tre
+       svar; et tal skrives i feltet paa kortet; efter et rigtigt svar venter
+       kortet paa Naeste. */
+    function rigtigJ(sim) {
+        var r = sim.regning, f = r.aktivt();
+        return r.valg(f, f.fase).liste.map(function (x) { return !!x.ok; }).indexOf(true);
+    }
+    function vaelgRigtigt(sim) { sim.kortValg(rigtigJ(sim)); sim.indsendKlik(); }
+    function naeste(sim) { if (sim.venter) sim.knap(); }
+    /* Haeldningen i den trinvise opgave paa fane 3: klik paa glas A og B */
+    /* Runde 4: glas A og glas B haeldes over hver for sig (kun det aktive glas kan klikkes) */
+    function haeldBegge(sim) {
+        ["A", "B"].forEach(function (h) { var g = sim.lay["glas" + h]; tryk(sim, g.cx, g.y0 + g.h / 2); tik(sim, 4); });
+    }
+    function forbiStart(sim) {
+        if (!sim.trinNu || !sim.trinNu()) return;
+        if (sim.trinvis.trin < 2) haeldBegge(sim);
+        if (sim.trinNu() && sim.trinvis.trin === 2 && !sim.venter) {
+            var j = sim.ionData().svar.map(function (x) { return !!x.ok; }).indexOf(true);
+            sim.kortValg(j); sim.indsendKlik();
+        }
+        naeste(sim);
+    }
+    /* Loes resten af opgaven med de rigtige svar */
     function loesAlt(sim) {
-        var n = 0, f, o = sim.opg;
-        while ((f = sim.regning.aktivt()) && n++ < 20) {
-            if (f.fase === "koef") { var st = D.salt(o.salt); skrivI(sim, String(st.kk), String(st.ka)); }
-            else if (f.fase === "formel") {
-                var k = f.id === "nA" ? o.facit.kA : (f.id === "nB" ? o.facit.kB : 1);
-                skrivI(sim, f.id === "nA" || f.id === "nB" ? "n = " + k + " · c · V" : FORMLER[f.id]);
-            } else skrivI(sim, T.facitTekst(f.id, o).replace(/ (M|mol|L|g\/mol)$/, ""));
+        forbiStart(sim);
+        var n = 0, f, o = sim.opg, r = sim.regning;
+        while (!sim.faerdig && n++ < 40) {
+            if (sim.venter) { sim.knap(); continue; }
+            f = r.aktivt();
+            if (!f) break;
+            if (r.erValg(f)) vaelgRigtigt(sim);
+            else if (f.fase === "koef") { var st = D.salt(o.salt); skrivI(sim, String(st.kk), String(st.ka)); }
+            else skrivI(sim, T.facitTekst(f.id, o).replace(/ (M|mol|mL|L|g\/mol)$/, ""));
             tik(sim, 0.1);
         }
         tik(sim, 6);
@@ -183,7 +206,7 @@ function koerTest(W) {
             var tr = s.id === "samme" ? ["nSA", "nSB", "cSA", "cSB", "bidragA", "bidragB", "total"] :
                 ["nA", "nB", "Vsum", "ionBland"].concat(ob.ion2 ? ["ion2"] : []);
             tr.forEach(function (id) {
-                var ft = T.facitTekst(id, ob).replace(/ (M|mol|L)$/, "");
+                var ft = T.facitTekst(id, ob).replace(/ (M|mol|mL|L)$/, "");
                 if (!T.trin(id, ft, ob).ok) bland.push(s.id + "/" + id + " " + ft);
                 var r = T.regning(id, ob).join(" ");
                 if (/NaN|undefined|Infinity/.test(r)) bland.push(s.id + "/" + id + " beregning " + r);
@@ -204,13 +227,15 @@ function koerTest(W) {
     });
     paastand("alle tal på fane 3 godkendes, ionen er i begge glas, og blandingen kan være i glasset", bland.length === 0, bland.join("; "));
     paastand("første opgave på fane 3: masserne giver pæne tal, og n / V passer med c", paene.length === 0, paene.join("; "));
-    var o0 = { fane: 3, id: "samme", tal: D.BLAND[0].tal[0], ion: "Cl" };
+    /* Fane 3's opgaver findes ved navn (raekkefoelgen er byttet 21. nov. 2026) */
+    function iB(id) { return D.BLAND.map(function (s) { return s.id; }).indexOf(id); }
+    var o0 = { fane: 3, id: "samme", tal: D.BLAND[iB("samme")].tal[0], ion: "Cl" };
     o0.facit = K.facitBland(o0);
     paastand("5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL: [Cl⁻] = 0,950 M", T.facitTekst("total", o0) === "0,950 M", T.facitTekst("total", o0));
     paastand("beregningen: c(CaCl₂) = n / V = 0,0500 mol / 0,200 L = 0,250 M",
         T.regning("cSA", o0).join(" ") === "c(CaCl₂) = n / V = 0,0500 mol / 0,200 L = 0,250 M", T.regning("cSA", o0).join(" "));
     paastand("trinnet hedder Stofmængden af CaCl₂", T.navn("nSA", o0) === "Stofmængden af CaCl₂", T.navn("nSA", o0));
-    var o1 = { fane: 3, id: "forskellig", tal: D.BLAND[2].tal[0], ion: "Cl" };
+    var o1 = { fane: 3, id: "forskellig", tal: D.BLAND[iB("forskellig")].tal[0], ion: "Cl" };
     o1.facit = K.facitBland(o1);
     paastand("100 mL 0,300 M CaCl₂ + 200 mL 0,150 M NaCl: [Cl⁻] = 0,300 M", T.facitTekst("ionBland", o1) === "0,300 M", T.facitTekst("ionBland", o1));
     paastand("beregningen: [Cl⁻] = n / V = (0,0600 mol + 0,0300 mol) / 0,300 L = 0,300 M",
@@ -235,7 +260,9 @@ function koerTest(W) {
     paastand("[Cl⁻] = n / V og n / V(samlet) er rigtige", T.formel("ionBland", "[Cl⁻] = n / V", o1).ok && T.formel("ionBland", "n / Vsamlet", o1).ok);
     paastand("cA + cB: koncentrationer lægges ikke sammen", /ikke lægges sammen/.test(T.formel("ionBland", "cA + cB", o1).besked || ""));
     paastand("0,75 M (koncentrationerne lagt sammen): samme besked", /ikke lægges sammen/.test(T.trin("ionBland", "0,75", o1).besked || ""));
-    paastand("V = 300: det er i mL", /mL/.test(T.trin("Vsum", "300", o1).besked || ""));
+    /* Rumfanget aflaeses i mL paa blandingsglasset (runde 5) */
+    paastand("V = 300 (aflæst i mL) er rigtigt; 0,300 giver beskeden om mL; 100 er rumfanget i glas A",
+        T.trin("Vsum", "300", o1).ok && /i mL/.test(T.trin("Vsum", "0,300", o1).besked || "") && /glas A før hældningen/.test(T.trin("Vsum", "100", o1).besked || ""));
     var oS = { salt: "Pb(NO3)2", m: 4.14, V: 250 }; oS.facit = K.facitIoner(oS);
     paastand("n(Pb(NO₃)₂) = m / M er rigtig", T.formel("n_mM", "n(Pb(NO3)2) = m/M", oS).ok);
     paastand("M(Pb(NO₃)₂) uden parentesens 2: tæl atomerne", /Tæl atomerne/.test(T.trin("M", "269,21", oS).besked || ""));
@@ -258,7 +285,43 @@ function koerTest(W) {
             q.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); });
         });
     });
-    D.BLAND.concat(D.NIV).forEach(function (o) { tekster.push(o.titel, o.tekst || ""); });
+    D.BLAND.concat(D.NIV, D.OPL).forEach(function (o) { tekster.push(o.titel, o.tekst || "", o.under || ""); });
+    /* Teksterne i den trinvise opgave paa fane 3 og formlerne paa kortet, med
+       alle opgavernes tal sat ind (runde 2, 21. nov. 2026) */
+    var startT = { spm: [], svar: [], hint: [], f: [], godt: [], intro: [] };
+    var gemtOpg = C.opg, gemtNr = C.nr;
+    D.BLAND.forEach(function (sp, i) {
+        sp.tal.forEach(function (t) {
+            var ob = { fane: 3, id: sp.id, tal: t, ion: t.ion || sp.ion, ion2: t.ion2 };
+            ob.facit = K.facitBland(ob);
+            C.opg = ob; C.nr = i;
+            ["nSA", "nSB", "cSA", "cSB", "nA", "nB", "ionBland"].concat(ob.ion2 ? ["ion2"] : []).forEach(function (id) {
+                if ((sp.id === "samme") !== /S/.test(id)) return;
+                var fv = T.formelValg(id, ob);
+                startT.godt.push(fv.godt);
+                fv.svar.forEach(function (x) { startT.svar.push(x.t); if (x.f) startT.f.push(x.f); });
+            });
+            if (!sp.start) return;
+            /* Haeldningen (trin 1 og 2) og spoergsmaalet om ionerne (trin 3) */
+            sp.start.haeld.forEach(function (h) {
+                startT.intro.push(C.fyld(h.intro)); startT.spm.push(C.fyld(h.tekst));
+                h.hint.forEach(function (x) { startT.hint.push(C.fyld(x)); });
+            });
+            var qi = sp.start.ioner;
+            startT.intro.push(C.fyld(qi.intro)); startT.spm.push(C.fyld(qi.tekst)); startT.godt.push(C.fyld(qi.godt));
+            qi.hint.forEach(function (x) { startT.hint.push(C.fyld(x)); });
+            qi.svar.forEach(function (x) { startT.svar.push(C.fyld(x.t)); if (x.f) startT.f.push(C.fyld(x.f)); });
+            sp.start.trin.forEach(function (q) {
+                startT.intro.push(C.fyld(q.intro || ""));
+                startT.spm.push(C.fyld(q.tekst));
+                [].concat(q.godt).forEach(function (x) { startT.godt.push(C.fyld(x)); });
+                q.hint.forEach(function (x) { startT.hint.push(C.fyld(x)); });
+                if (!q.fase) C.talValg(q.id).forEach(function (x) { startT.svar.push(x.t); if (x.f) startT.f.push(x.f); });
+            });
+        });
+    });
+    C.opg = gemtOpg; C.nr = gemtNr;
+    Object.keys(startT).forEach(function (k) { tekster = tekster.concat(startT[k]); });
     Object.keys(D.TRIN).forEach(function (id) { tekster.push(D.TRIN[id].navn, D.TRIN[id].formelHint || ""); });
     Object.keys(D.SALTE).forEach(function (id) { tekster.push(D.salt(id).navn); });
     ["INTRO", "FAERDIG"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
@@ -270,6 +333,11 @@ function koerTest(W) {
     paastand("ingen ord uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
     paastand("opgaverne på fane 1 siger Lav en opløsning, ikke Gør", D.OPL.every(function (o) { return !/Gør /.test(o.tekst); }) &&
         /^Lav en opløsning, hvor \[Cl⁻\] = 0,30 M\.$/.test(D.OPL[0].tekst), D.OPL[0].tekst);
+    /* Graenserne fra sc7.5 (spoergsmaal 105, svar 34, hint 100, forklaringen til et forkert svar 110, til det rigtige 160) */
+    function lang(liste, max) { return liste.filter(function (t) { return t.length > max; }); }
+    var forLange = lang(startT.spm, 105).concat(lang(startT.svar, 34), lang(startT.hint, 100), lang(startT.f, 110), lang(startT.godt, 160));
+    paastand("fane 3, den trinvise opgave og formlerne på kortet: spørgsmål, svar, hint og forklaringer holder tegngrænserne", forLange.length === 0, forLange.join(" | "));
+    paastand("fane 3, den trinvise opgave og formlerne på kortet: ingen tekst har et {navn}, der ikke er sat ind", !/[{}]/.test(Object.keys(startT).map(function (k) { return startT[k].join(" "); }).join(" ")));
     paastand("hver opgave på fane 1 har en konklusion i ord", D.OPL.every(function (o) { return /aktuelle koncentration/.test(o.konklusion || ""); }));
 
     overskrift("5. Fane 1: opløsningen med musen");
@@ -286,8 +354,9 @@ function koerTest(W) {
         return [].map.call(e.querySelectorAll(".sb-v, .sb-led, .sb-skema, .sb-konklusion"), function (x) { return x.textContent; }).join(" ");
     }
     vaelgA(0);
-    paastand("kortet Glasset er væk: panelet har kun opgaven og opgavelisten",
-        !d.getElementById("opl-data") && d.querySelectorAll("#fane-opl .panel > .kort").length === 2 && !!d.querySelector("#fane-opl .scene #opl-skort"));
+    paastand("panelet har kun opgavelisten og Start forfra; beregningen står på en tavle i scenen (21. nov. 2026)",
+        !d.getElementById("opl-data") && d.querySelectorAll("#fane-opl .panel > .kort").length === 1 && !!d.querySelector("#fane-opl .panel #opl-forfra") &&
+        !!d.querySelector("#fane-opl .scene #opl-skort") && !!d.querySelector("#fane-opl .scene #opl-beregning") && d.getElementById("opl-kort").hidden);
     portion(0);
     paastand("et klik på krukken giver en portion: [Cl⁻] = 0,10 M", Math.abs(A.glas.ion("Cl") - 0.1) < 1e-9 && /målet er 0,30 M/.test(besked(A)), besked(A));
     paastand("før opgaven er løst, står der ingen beregning i kortet", beregning() === "", beregning());
@@ -301,8 +370,9 @@ function koerTest(W) {
     paastand("beregningen står i kortet: formlen først, så tallene med enheder",
         /c\(NaCl\) = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M/.test(beregning()) && d.querySelectorAll("#opl-beregning .superberegning .broek").length === 2,
         beregning());
-    paastand("så skemaet, [Cl⁻] = c(NaCl) og en konklusion i ord",
-        /NaCl\(s\) ⟶ Na⁺\(aq\) \+ Cl⁻\(aq\) \[Cl⁻\] = c\(NaCl\) \[Cl⁻\] = 0,30 M Den aktuelle koncentration af Cl⁻ er 0,30 M\./.test(beregning()), beregning());
+    /* Konklusionen i ord staar paa kortet, ikke paa tavlen i scenen (21. nov. 2026) */
+    paastand("så skemaet og [Cl⁻] = c(NaCl); konklusionen i ord står på kortet",
+        /NaCl\(s\) ⟶ Na⁺\(aq\) \+ Cl⁻\(aq\) \[Cl⁻\] = c\(NaCl\) \[Cl⁻\] = 0,30 M$/.test(beregning()) && /Den aktuelle koncentration af Cl⁻ er 0,30 M\./.test(prompt()), beregning());
     paastand("kortet viser konklusionen under opgaven, og linjen nederst er væk", /Den aktuelle koncentration af Cl⁻ er 0,30 M/.test(prompt()) && besked(A) === "", besked(A));
     function valgKnap(t) {
         return [].filter.call(d.querySelectorAll("#opl-ind [data-valg]"), function (b) { return b.textContent.replace(/\u00a0/g, " ") === t; })[0];
@@ -347,8 +417,8 @@ function koerTest(W) {
     svarA("0,40 M");
     tik(A, 2);
     paastand("0,40 M: opgave 2 er løst uden stjerne (to forkerte svar først), og ionernes søjler står", A.faerdig && A.status[1].loest && !A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01, besked(A));
-    paastand("beregningen slutter med [Na⁺] = 2 · c(Na₂SO₄), tallene og konklusionen",
-        /\[Na⁺\] = 2 · c\(Na₂SO₄\) \[Na⁺\] = 2 · 0,20 M = 0,40 M Den aktuelle koncentration af Na⁺ er 0,40 M\./.test(beregning()), beregning());
+    paastand("beregningen slutter med [Na⁺] = 2 · c(Na₂SO₄) og tallene; konklusionen står på kortet",
+        /\[Na⁺\] = 2 · c\(Na₂SO₄\) \[Na⁺\] = 2 · 0,20 M = 0,40 M$/.test(beregning()) && /Den aktuelle koncentration af Na⁺ er 0,40 M\./.test(prompt()), beregning());
     vaelgA(1);
     A.knap(); A.knap();
     tik(A, 4);
@@ -377,7 +447,7 @@ function koerTest(W) {
     portion(0);
     paastand("Al₂(SO₄)₃: gættet holdt, [SO₄²⁻] = 0,30 M", A.faerdig && /Dit gæt holdt/.test(prompt()) && Math.abs(A.glas.ion("SO4") - 0.3) < 1e-9, besked(A));
     paastand("beregningen har begge ioner, og svarknapperne er væk",
-        /\[Al³⁺\] = 2 · 0,10 M = 0,20 M \[SO₄²⁻\] = 3 · c\(Al₂\(SO₄\)₃\) \[SO₄²⁻\] = 3 · 0,10 M = 0,30 M Der er flest SO₄²⁻\./.test(beregning()) &&
+        /\[Al³⁺\] = 2 · 0,10 M = 0,20 M \[SO₄²⁻\] = 3 · c\(Al₂\(SO₄\)₃\) \[SO₄²⁻\] = 3 · 0,10 M = 0,30 M$/.test(beregning()) && /Der er flest SO₄²⁻\./.test(prompt()) &&
         !d.querySelector("#opl-ind [data-valg]"), beregning());
     vaelgA(5);
     for (i = 0; i < 5; i++) portion(0);
@@ -393,8 +463,8 @@ function koerTest(W) {
     A.indsendKlik();
     paastand("tre NaCl og én Na₂SO₄: [Na⁺] = 0,50 M, opgave 6 er løst", A.faerdig, besked(A));
     paastand("to salte: c = n / V én gang, begge salte med tal, og bidragene lagt sammen",
-        /^c = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M c\(Na₂SO₄\) = 0,10 mol\s*1,00 L = 0,10 M \[Na⁺\] = c\(NaCl\) \+ 2 · c\(Na₂SO₄\) \[Na⁺\] = 0,30 M \+ 2 · 0,10 M = 0,50 M Den aktuelle/.test(beregning()) &&
-        /lægges sammen\.$/.test(beregning()), beregning());
+        /^c = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M c\(Na₂SO₄\) = 0,10 mol\s*1,00 L = 0,10 M \[Na⁺\] = c\(NaCl\) \+ 2 · c\(Na₂SO₄\) \[Na⁺\] = 0,30 M \+ 2 · 0,10 M = 0,50 M$/.test(beregning()) &&
+        /lægges sammen\./.test(prompt()), beregning());
     paastand("alle seks er løst, og knappen går videre til Ionerne", A.antalLoest() === 6 && /Ionerne/.test(d.querySelector("#opl-skort [data-videre]").textContent), prompt());
     vaelgA(0);
     A.knap();
@@ -438,7 +508,7 @@ function koerTest(W) {
     skrivI(B, String(st0.kk + 1), String(st0.ka));
     paastand("forkert tal i skemaet: linjen siger hvorfor, og feltet ryster", /formlen|ladningen/.test(besked(B)), besked(B));
     B.knap();
-    paastand("Giv hint i skemaet", /Tallet efter et grundstof/.test(besked(B)) && /Hvilke tal står foran ionerne\?/.test(promptB()), besked(B));
+    paastand("Giv hint i skemaet", /Tallet efter et grundstof/.test(besked(B)) && /Hvilke tal står foran \S+ og \S+ i opløsningsskemaet for \S+\?/.test(promptB()), besked(B));
     B.knap();
     paastand("Vis svaret skriver skemaet", B.regning.loest("afstem"));
     paastand("luppen er tom, til ionerne er fundet", B.part.p.filter(function (q) { return !q.doer; }).length === 0);
@@ -450,39 +520,223 @@ function koerTest(W) {
     C.tilpas(); C.layout();
     var bl = D.BLAND.map(function (s, i) { C.vaelg(i, false); return loesAlt(C); });
     paastand("alle fire opgaver kan løses ved at skrive formlen og tallet", bl.every(Boolean), bl.join(","));
-    C.vaelg(0, false);
-    paastand("første opgave: syv trin, stofmængderne først, så koncentrationerne",
-        C.opg.trin.join(",") === "nSA,nSB,cSA,cSB,bidragA,bidragB,total" && /Stofmængden af CaCl₂/.test(d.getElementById("bland-ind").textContent), d.getElementById("bland-ind").textContent);
-    skrivI(C, "n = m/M"); skrivI(C, "0,0500"); skrivI(C, "n = m/M"); skrivI(C, "0,0300");
+    C.vaelg(iB("samme"), false);
+    paastand("opgaven To salte i ét glas: syv trin, stofmængderne først, så koncentrationerne",
+        C.opg.trin.join(",") === "nSA,nSB,cSA,cSB,bidragA,bidragB,total" && /Find \[Cl⁻\], når du opløser 5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL vand\. Første trin er stofmængden af CaCl₂\./.test(d.getElementById("bland-ind").textContent.replace(/\u00a0/g, " ")), d.getElementById("bland-ind").textContent);
+    /* Formlen vaelges paa kortet, tallet skrives i feltet paa kortet, og Naeste */
+    function formelC() { vaelgRigtigt(C); naeste(C); }
+    function talC(x) { skrivI(C, x); naeste(C); }
+    paastand("formlen vælges blandt tre svar på kortet, og der er intet felt", C.regning.erValg() && d.querySelectorAll("#bland-ind [data-valg]").length === 3 &&
+        !d.querySelector("#bland-skort input"));
+    formelC();
+    paastand("tallet skrives i et felt på kortet: n(CaCl₂) = [ tallet ] mol", !!d.querySelector("#bland-skort .kt-felt input") &&
+        /n\(CaCl₂\) =\s*mol/.test(d.querySelector("#bland-skort .kt-felt").textContent));
+    talC("0,0500"); formelC(); talC("0,0300");
     tik(C, 2);
     paastand("saltene ligger på vægtene, til koncentrationen er regnet", C.s.bunke.A === 1 && C.s.bunke.B === 1 && !C.s.iGlas.CaCl2);
-    skrivI(C, "c = n/V"); skrivI(C, "0,0500");
+    formelC(); skrivI(C, "0,0500");
     paastand("c(CaCl₂) = 0,0500: det er stofmængden", /Det er stofmængden n/.test(besked(C)) && !C.s.iGlas.CaCl2, besked(C));
     skrivI(C, "0,250");
+    paastand("rigtigt tal: kortet bliver på spørgsmålet med svaret grønt i feltet, forklaringen og Næste",
+        C.venter && !!d.querySelector("#bland-skort .kt-felt.ok") && /0,250 M/.test(d.querySelector("#bland-skort .kt-felt").textContent) &&
+        !!d.querySelector("#bland-skort [data-videre]") && C.el.indsend.hidden);
+    naeste(C);
     tik(C, 2);
     paastand("c(CaCl₂) fundet: CaCl₂ er i vandet, AlCl₃ ligger stadig på vægten",
         C.s.iGlas.CaCl2 && C.s.bunke.A === 0 && C.s.bunke.B === 1 && !C.s.iGlas.AlCl3);
-    skrivI(C, "c = n/V"); skrivI(C, "0,150");
+    formelC(); talC("0,150");
     tik(C, 2);
     paastand("c(AlCl₃) fundet: begge salte er i vandet, luppen venter", C.s.iGlas.AlCl3 && !C.s.vist);
-    skrivI(C, "0,500"); skrivI(C, "0,450"); skrivI(C, "0,950");
+    talC("0,500"); talC("0,450"); skrivI(C, "0,950");
     tik(C, 2);
     paastand("[Cl⁻] = 0,950 M: opgaven er løst, og luppen viser ionerne", C.faerdig && C.s.vist && C.part.antal(2) > 0, besked(C));
-    C.vaelg(2, false);
-    skrivI(C, "n = 2cV"); skrivI(C, "0,06"); skrivI(C, "cV"); skrivI(C, "0,03");
-    paastand("glassene står, til rumfanget er fundet", C.s.Vmix === 0);
-    skrivI(C, "0,3");
+    C.vaelg(iB("forskellig"), false);
+    var fv = C.regning.valg(C.regning.aktivt(), "formel").liste;
+    C.kortValg(fv.map(function (x) { return x.t; }).indexOf("n = c · V")); C.indsendKlik();
+    paastand("n = c · V for CaCl₂ (tallet foran ionen glemt): gang også med 2", /Gang også med 2/.test(besked(C)) && !C.venter, besked(C));
+    formelC(); talC("0,06");
+    paastand("glassene står, til begge stofmængder er fundet", C.s.Vmix === 0);
+    formelC(); skrivI(C, "0,03");
     tik(C, 8);
-    paastand("rumfanget fundet: A og B er hældt i blandingen (300 mL)", Math.abs(C.s.Vmix - 300) < 0.5 && C.s.VA < 0.5 && C.s.VB < 0.5, C.s.Vmix);
+    paastand("stofmængderne fundet: A og B er hældt i blandingen (300 mL), så rumfanget kan aflæses", Math.abs(C.s.Vmix - 300) < 0.5 && C.s.VA < 0.5 && C.s.VB < 0.5, C.s.Vmix);
+    naeste(C);
+    paastand("rumfanget: kortet spørger om det samlede rumfang i blandingsglasset, og feltet er i mL",
+        spmLinje() === "Hvor stort er det samlede rumfang i blandingsglasset?" && /V =\s*mL/.test(d.querySelector("#bland-skort .kt-felt").textContent), promptC());
+    skrivI(C, "0,3");
+    paastand("0,3: skriv rumfanget i mL, som det står på glasset", /i mL/.test(besked(C)) && !C.venter, besked(C));
+    talC("300");
     paastand("luppen venter på koncentrationen", !C.s.vist);
-    skrivI(C, "cA + cB");
-    paastand("cA + cB giver beskeden om koncentrationer", /ikke lægges sammen/.test(besked(C)), besked(C));
-    skrivI(C, "[Cl-] = n/V"); skrivI(C, "0,3");
+    fv = C.regning.valg(C.regning.aktivt(), "formel").liste;
+    C.kortValg(fv.map(function (x) { return x.t; }).indexOf("[Cl⁻] = c(A) + c(B)")); C.indsendKlik();
+    paastand("[Cl⁻] = c(A) + c(B) giver beskeden om koncentrationer", /ikke lægges sammen/.test(besked(C)), besked(C));
+    formelC(); skrivI(C, "0,75");
+    paastand("0,75 M (koncentrationerne lagt sammen) i feltet på kortet: samme besked", /ikke lægges sammen/.test(besked(C)) && !C.faerdig, besked(C));
+    skrivI(C, "0,3");
     tik(C, 2);
     paastand("koncentrationen fundet: luppen viser blandingen", C.s.vist && C.faerdig);
     var tFoer = C.opg.tal;
     d.getElementById("bland-nye").click();
     paastand("Nye tal giver andre salte eller tal", C.opg.tal !== tFoer);
+
+    overskrift("7b. Fane 3: den trinvise første opgave (21. nov. 2026, runde 2 og 4)");
+    function promptC() { return d.getElementById("bland-ind").textContent.replace(/ /g, " "); }
+    function spmLinje() { var e = d.querySelector("#bland-ind .sk-spm.sk-linje, #bland-ind .sk-spm"); return e ? e.textContent.replace(/ /g, " ") : ""; }
+    function valgC(t) {
+        return [].filter.call(d.querySelectorAll("#bland-ind [data-valg]"), function (b) { return b.textContent.replace(/ /g, " ").replace(/^✓\s*/, "") === t; })[0];
+    }
+    function svarC(t) { var b = valgC(t); if (!b) return false; b.click(); C.indsendKlik(); return true; }
+    function knapper() { return d.querySelectorAll("#bland-ind [data-valg]").length; }
+    function videre() { var b = d.querySelector("#bland-skort [data-videre]"); if (b) b.click(); return !!b; }
+    var iL = iB("lige");
+    paastand("rækkefølgen: Samme rumfang først og To salte i ét glas sidst, og kun den første opgave er trinvis",
+        iL === 0 && iB("samme") === D.BLAND.length - 1 && D.BLAND.filter(function (s) { return s.start; }).length === 1 && !!D.BLAND[0].start);
+    C.status[iL] = { loest: false, stjerne: false, antal: 0 };
+    C.vaelg(iL, false); C.tilpas(); C.layout(); tik(C, 0.5);
+    var tavleY = C.lay.tavle.y, zoneFejl = [];
+    function zoneTjek(navn) {
+        C.tilpas();
+        var e = C.el.skort;
+        if (C.lay.tavle.y !== tavleY) zoneFejl.push(navn + ": tavlen " + C.lay.tavle.y + " ≠ " + tavleY);
+        if (e.offsetTop + e.offsetHeight > C.lay.tavle.y + 1) zoneFejl.push(navn + ": kortet " + (e.offsetTop + e.offsetHeight) + " > " + C.lay.tavle.y);
+    }
+    /* Rammen og boblen ved glassene optages, mens fanen tegner */
+    function rammer(sim) {
+        var Tg = NK.Tegn, r0 = Tg.ramme, b0 = Tg.boble, ud = { ramme: [], boble: [] };
+        Tg.ramme = function (ctx, x, y, b, h) { ud.ramme.push({ x: x, y: y, b: b, h: h }); return r0.apply(Tg, arguments); };
+        Tg.boble = function (ctx, tekst, x, y) { ud.boble.push({ t: tekst, x: x, y: y }); return b0.apply(Tg, arguments); };
+        try { sim.tegn(); } finally { Tg.ramme = r0; Tg.boble = b0; }
+        return ud;
+    }
+    function omGlas(r, g) { return r.x <= g.x0 && r.x + r.b >= g.x0 + g.b - 2 && r.y <= g.y0 + 2; }
+    var gA = C.lay.glasA, gB = C.lay.glasB, mx = C.lay.mix;
+    var rm = rammer(C);
+    paastand("trin 1 af 8: kortet begynder med det konkrete og beder kun om glas A, uden målet og uden svarknapper",
+        C.trinNu() && /^Trin 1 af 8 ?Glas A og glas B har to forskellige saltopløsninger\./.test(promptC()) &&
+        spmLinje() === "Klik på glas A for at hælde det over i det tomme glas." && !/Find/.test(promptC()) &&
+        knapper() === 0 && !d.querySelector("#bland-skort input") && C.el.indsend.hidden && !C.el.knap.hidden, promptC());
+    paastand("trin 1: kun glas A har den gule ramme og boblen Klik: hæld",
+        rm.ramme.length === 1 && omGlas(rm.ramme[0], gA) && rm.boble.length === 1 && rm.boble[0].t === "Klik: hæld" && Math.abs(rm.boble[0].x - gA.cx) < 2,
+        JSON.stringify(rm));
+    paastand("trin 1: kortet er kort, og Giv hint står ved teksten", C.el.skort.classList.contains("kompakt") && C.el.skort.offsetHeight < 120, C.el.skort.offsetHeight);
+    paastand("fra start: luppen har en stiplet plads, og tavlen er ikke tegnet endnu",
+        !C.lupVist() && C.regning.laast && C.regning.vistTil === -1 && !C.regning.tavleR);
+    zoneTjek("trin 1");
+    tik(C, 5);
+    var tv0 = C.lay.tavle;
+    tryk(C, tv0.x + tv0.b / 2, tv0.y + tv0.h / 2);
+    tryk(C, mx.cx, mx.y0 + mx.h / 2);
+    tik(C, 3);
+    paastand("hældningen sker kun ved elevens klik: tiden, et klik på tavlen og på det tomme glas hælder intet",
+        C.s.Vmix === 0 && !C.trinvis.haeldt.A && !C.trinvis.haeldt.B && C.s.VA === 100, besked(C));
+    tryk(C, gB.cx, gB.y0 + gB.h / 2);
+    tik(C, 3);
+    paastand("trin 1: et klik på glas B hælder intet, og kortet siger, at det er glas A", C.s.Vmix === 0 && !C.trinvis.haeldt.B &&
+        /Klik på glas A/.test(besked(C)) && C.trinvis.trin === 0, besked(C));
+    tik(C, 4);
+    tryk(C, gA.cx, gA.y0 + gA.h / 2);
+    tik(C, 3.5);
+    zoneTjek("trin 2");
+    rm = rammer(C);
+    paastand("et klik på glas A hælder det over, og kortet går selv videre til trin 2 af 8 om glas B",
+        Math.abs(C.s.Vmix - 100) < 0.5 && C.s.VA < 0.5 && C.trinvis.trin === 1 && /^Trin 2 af 8/.test(promptC()) &&
+        spmLinje() === "Klik på glas B for at hælde det over i det samme glas." && !C.lupVist() && !C.venter, promptC());
+    paastand("trin 2: nu har kun glas B rammen og boblen", rm.ramme.length === 1 && omGlas(rm.ramme[0], gB) && rm.boble.length === 1 &&
+        Math.abs(rm.boble[0].x - gB.cx) < 2, JSON.stringify(rm));
+    tryk(C, gA.cx, gA.y0 + gA.h / 2);
+    tik(C, 2);
+    paastand("trin 2: et klik på det tomme glas A gør intet", Math.abs(C.s.Vmix - 100) < 0.5 && C.trinvis.trin === 1);
+    tik(C, 4);
+    traek(C, gB.cx, gB.y0 + gB.h / 2, mx.cx, mx.y0 + 10);
+    tik(C, 4);
+    zoneTjek("trin 3");
+    paastand("glas B trukket over: blandingen har 200 mL, luppen kommer frem med ionerne, og trin 3 af 8 spørger om ionerne",
+        Math.abs(C.s.Vmix - 200) < 0.5 && C.lupVist() && C.part.antal(0) + C.part.antal(1) + C.part.antal(2) > 0 &&
+        /^Trin 3 af 8 ?Luppen viser blandingen\./.test(promptC()) && spmLinje() === "Hvilke ioner er der i blandingen?" && knapper() === 3 &&
+        rammer(C).ramme.length === 0, promptC());
+    svarC("NaCl og KCl");
+    paastand("NaCl og KCl: saltene findes som ioner i vandet", /findes de som ioner/.test(besked(C)) && valgC("NaCl og KCl").disabled, besked(C));
+    svarC("Kun Cl⁻");
+    paastand("Kun Cl⁻: der er også Na⁺ og K⁺", /også Na⁺ og K⁺/.test(besked(C)), besked(C));
+    svarC("Na⁺, K⁺ og Cl⁻");
+    paastand("Na⁺, K⁺ og Cl⁻: rigtigt, og kortet venter på Næste", C.venter && /Blandingen har Na⁺, K⁺ og Cl⁻/.test(promptC()), promptC());
+    videre();
+    zoneTjek("trin 4");
+    paastand("trin 4 af 8: først nu kommer målet, [Cl⁻], og spørgsmålet om rumfanget",
+        /^Trin 4 af 8 ?Nu skal du finde koncentrationen af Cl⁻ i blandingen, \[Cl⁻\]\./.test(promptC()) &&
+        spmLinje() === "Hvor stort er det samlede rumfang i blandingsglasset?", promptC());
+    C.tegn();
+    paastand("trin 4 af 8: spørgsmålet om rumfanget med tre svar, og tavlen dukker op med kun linjen V = ? med gul ramme",
+        /^Trin 4 af 8/.test(promptC()) && spmLinje() === "Hvor stort er det samlede rumfang i blandingsglasset?" && knapper() === 3 &&
+        C.regning.vistTil === 0 && !C.regning.laast && C.regning.aktivt().id === "Vsum" && !!C.regning.tavleR &&
+        !C.el.indsend.hidden && C.el.indsend.classList.contains("ikke-klar"), promptC());
+    tryk(C, mx.cx, mx.y0 + mx.h / 2);
+    paastand("scenen er låst under spørgsmålet: et klik i scenen får kortet til at blinke", d.getElementById("bland-skort").classList.contains("blink") && !C.venter);
+    tik(C, 4);
+    svarC("100 mL");
+    zoneTjek("trin 2 forkert");
+    paastand("100 mL: forklaringen siger, at det er rumfanget i glas A før hældningen, og svaret slås fra", /glas A før hældningen/.test(besked(C)) && valgC("100 mL").disabled && C.brugtSvar, besked(C));
+    var hintOk = [];
+    C.knap(); hintOk.push(/^Hint\b.*skalaen/.test(besked(C)) && C.el.knap.textContent === "Næste hint");
+    C.knap(); hintOk.push(/^Hint\b.*hvor væsken står/.test(besked(C)) && C.el.knap.textContent === "Næste hint");
+    C.knap(); hintOk.push(/^Hint\b.*Væsken står ved 200 mL/.test(besked(C)) && C.el.knap.textContent === "Vis svaret");
+    zoneTjek("trin 2 hint");
+    paastand("hinttrappen: Giv hint, Næste hint, Næste hint og så Vis svaret", hintOk.every(Boolean), hintOk.join(","));
+    svarC("200 mL");
+    paastand("200 mL: kortet bliver på spørgsmålet med svaret grønt, forklaringen og Næste, og tavlen har linjen for V",
+        C.venter && !!d.querySelector("#bland-ind .sk-knap.rigtig") && /V = 200 mL = 0,200 L/.test(promptC()) && !/mL \+/.test(promptC()) &&
+        C.regning.loest("Vsum") && C.el.indsend.hidden, promptC());
+    videre();
+    zoneTjek("trin 3");
+    paastand("trin 5 af 8: formlen for stofmængden fra glas A vælges blandt n = c · V, n = c / V og n = V / c",
+        /^Trin 5 af 8/.test(promptC()) && spmLinje() === "Hvilken formel giver stofmængden af Cl⁻ fra glas A?" &&
+        !!valgC("n = c · V") && !!valgC("n = c / V") && !!valgC("n = V / c"), promptC());
+    svarC("n = c / V");
+    paastand("n = c / V: forklaringen", /gange rumfanget/.test(besked(C)), besked(C));
+    C.knap(); C.knap(); C.knap(); C.knap();
+    zoneTjek("trin 3 vist");
+    paastand("Vis svaret på formlen: svaret er gult, og tavlen viser n(Cl⁻) fra A = c · V",
+        C.venter && d.getElementById("bland-skort").classList.contains("svar") && C.regning.felter[1].fase === "tal" && !!d.querySelector("#bland-ind .sk-knap.svar-vist"));
+    videre();
+    paastand("trin 6 af 8: hvor mange mol Cl⁻ fra glas A", /^Trin 6 af 8/.test(promptC()) && spmLinje() === "Hvor mange mol Cl⁻ kommer der fra glas A?", promptC());
+    svarC("20,0 mol");
+    paastand("20,0 mol: rumfanget skal være i liter", /liter: 100 mL = 0,100 L/.test(besked(C)), besked(C));
+    svarC("0,200 mol");
+    paastand("0,200 mol: det er koncentrationen", /koncentrationen af Cl⁻ i glas A/.test(besked(C)), besked(C));
+    svarC("0,0200 mol");
+    paastand("0,0200 mol: rigtigt, og regningen står i forklaringen", C.venter && /0,200 M · 0,100 L = 0,0200 mol/.test(promptC()), promptC());
+    videre();
+    paastand("trin 7 af 8: hvor mange mol Cl⁻ fra glas B", /^Trin 7 af 8/.test(promptC()) && spmLinje() === "Hvor mange mol Cl⁻ kommer der fra glas B?", promptC());
+    svarC("0,0200 mol"); videre();
+    zoneTjek("trin 6");
+    paastand("trin 8 af 8: [Cl⁻] i blandingen, og tavlen har nu tre løste linjer og den aktive",
+        /^Trin 8 af 8/.test(promptC()) && spmLinje() === "Hvad er [Cl⁻] i blandingen?" && C.regning.vistTil === 3, promptC());
+    svarC("0,400 M");
+    paastand("0,400 M: koncentrationer kan ikke lægges sammen", /kan ikke lægges sammen/.test(besked(C)), besked(C));
+    svarC("0,100 M");
+    paastand("0,100 M: det er kun Cl⁻ fra glas A", /kun Cl⁻ fra glas A/.test(besked(C)), besked(C));
+    svarC("0,200 M");
+    tik(C, 2);
+    zoneTjek("løst");
+    paastand("0,200 M: opgaven er løst, rosen siger hvorfor, og den grønne knap går videre",
+        C.faerdig && C.status[iL].loest && !C.status[iL].stjerne && /den samme som i hvert glas/.test(promptC()) &&
+        /Næste opgave|Forfra med nye tal/.test(d.querySelector("#bland-skort [data-videre]").textContent) && C.regning.faerdig() && C.s.vist, promptC());
+    paastand("kortet har den samme plads under hele opgaven, så scenen ikke hopper", zoneFejl.length === 0, zoneFejl.join("; "));
+    paastand("intet svarfelt, ingen regnetrin og ingen stiplet plads i panelet",
+        !d.querySelector(".panel input, .panel .raekke, .panel .plads, .panel .kt-felt, .panel [data-valg]"));
+    C.vaelg(iL, false);
+    paastand("løst før: alt er fremme fra start, og opgaven regnes som de andre (formlen vælges, tallet skrives)",
+        !C.trinvis && !C.regning.laast && C.lupVist() && /^Trin 1 af 7/.test(promptC()) && knapper() === 3, promptC());
+    C.status[iL] = { loest: false, stjerne: false, antal: 0 };
+    d.getElementById("bland-nye").click();
+    paastand("Nye tal på den uløste første opgave giver trinene igen fra trin 1",
+        C.trinNu() && /^Trin 1 af 8/.test(promptC()) && C.s.Vmix === 0 && !C.lupVist(), promptC());
+    loesAlt(C);
+    paastand("trinene kan også klares med de rigtige svar i ét stræk", C.faerdig && C.status[iL].loest);
+    C.status[iB("forskellig")].loest = false;
+    C.vaelg(iB("forskellig"), false);
+    paastand("en senere opgave er som før: luppen og tavlen er fremme fra start, formlen vælges", !C.trinvis && C.lupVist() && C.regning.erValg(), promptC());
+    C.vaelg(iB("samme"), false);
+    paastand("To salte i ét glas: trin 1 af 11, og tavlen har kun den første linje", /^Trin 1 af 11/.test(promptC()) && C.regning.vistTil === 0, promptC());
 
     overskrift("8. Hjælpen");
     B.vaelg(1, false);
@@ -492,8 +746,12 @@ function koerTest(W) {
     B.knap();
     paastand("hintet står i kortet, og knappen lyser ikke mere", /^Hint\b/.test(besked(B)) && !B.el.knap.classList.contains("peg"), besked(B));
     B.knap();
-    paastand("Vis svaret: skemaet står i panelet, og kortet spørger om næste trin uden svaret under det",
-        B.regning.loest("afstem") && !/^Hint\b|^Svaret\b/.test(besked(B)) && B.el.knap.textContent === "Giv hint" && /Trin 2 af/.test(promptB()), besked(B));
+    paastand("Vis svaret: skemaet står gult i feltet på kortet, og kortet venter på Næste",
+        B.regning.loest("afstem") && B.venter && !!d.querySelector("#ioner-skort .kt-felt.svar") && d.getElementById("ioner-skort").classList.contains("svar") &&
+        !!d.querySelector("#ioner-skort [data-videre]"), promptB());
+    B.knap();
+    paastand("Næste: kortet spørger om næste trin uden svaret under det", !B.venter && !/^Hint\b|^Svaret\b/.test(besked(B)) &&
+        B.el.knap.textContent === "Giv hint" && /Trin 2 af/.test(promptB()), besked(B));
     paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText));
     window.document.getElementById("ramme").contentDocument.dispatchEvent(new W.KeyboardEvent("keydown", { key: "k", bubbles: true }));
     paastand("tasten K gør ikke noget mere", !/^Hint\b/.test(besked(B)));
@@ -512,12 +770,26 @@ function koerTest(W) {
     B.indsendKlik();
     paastand("Indsend svar uden svar bedømmer intet, og kortet blinker", !B.regning.loest("afstem") && d.getElementById("ioner-skort").classList.contains("blink"));
     var fB = B.regning.aktivt(), stB = D.salt(B.opg.salt);
+    paastand("Ionerne: skemaets to felter står i kortet under spørgsmålet, ikke i panelet",
+        !!fB.input && !!fB.input2 && !!fB.input.closest("#ioner-skort") && !!fB.input2.closest("#ioner-skort") && !d.querySelector("#fane-ioner .panel input"));
     fB.input.value = String(stB.kk); fB.input2.value = String(stB.ka);
     fB.input.dispatchEvent(new W.Event("input", { bubbles: true }));
     paastand("tal i felterne gør Indsend svar klar uden at bedømme", insB.classList.contains("klar") && !B.regning.loest("afstem"));
     B.indsendKlik();
-    paastand("Indsend svar bedømmer: skemaet er løst, og kortet spørger om næste trin uden ros under det",
-        B.regning.loest("afstem") && /Trin 2 af/.test(d.getElementById("ioner-ind").textContent) && !/Rigtigt|Den sidder|Præcis/.test(besked(B)), besked(B));
+    paastand("Indsend svar bedømmer: skemaet er løst, og kortet bliver på spørgsmålet med skemaet grønt og Næste",
+        B.regning.loest("afstem") && B.venter && !!d.querySelector("#ioner-skort .kt-felt.ok") && /Trin 1 af/.test(d.getElementById("ioner-ind").textContent), promptB());
+    B.knap();
+    var fB2 = B.regning.aktivt();
+    paastand("Næste: næste trin har feltet [ion] = [ tallet ] M på kortet, og rosen står ikke under det",
+        /Trin 2 af/.test(d.getElementById("ioner-ind").textContent) && !!fB2.input && !!fB2.input.closest("#ioner-skort") &&
+        /M$/.test(d.querySelector("#ioner-skort .kt-felt").textContent.trim()) && besked(B) === "", besked(B));
+    B.vaelg(2, false);
+    paastand("Ionerne, Svær: formlen n = m / M vælges med tre svarknapper på kortet", (function () {
+        var r = B.regning;
+        skrivI(B, T.facitTekst("M", B.opg).replace(/ g\/mol$/, "")); naeste(B);
+        return r.aktivt().id === "n_mM" && r.erValg() && d.querySelectorAll("#ioner-ind [data-valg]").length === 3 && !d.querySelector("#ioner-skort input");
+    })(), promptB());
+    B.vaelg(0, false);
     loesAlt(B);
     paastand("sidste trin: kortet bliver med resultatet og Ny opgave, hvor Indsend svar stod",
         B.faerdig && d.getElementById("ioner-skort").classList.contains("bliv") && insB.hidden && /Ny opgave/.test(d.querySelector("#ioner-skort [data-videre]").textContent));
@@ -532,7 +804,7 @@ function koerTest(W) {
         NK.visFane("fane-opl"); A.tilpas();
         D.OPL.forEach(function (o, k) {
             A.vaelg(k, false); A.tilpas();
-            var topA = function () { return Math.min(A.lay.zoom.y - A.lay.zoom.r - 24, A.lay.glas.y0); };
+            var topA = function () { return Math.min(A.lay.zoom.y - A.lay.zoom.r - 24, A.lay.glas.y0, A.lay.tavle.y); };
             if (A.fase === "valg") { A.knap(); A.kortValg(0); }
             A.knap(); maalK(A, "opl " + (k + 1) + " hint", topA());
             A.knap(); tik(A, 8);
@@ -547,9 +819,12 @@ function koerTest(W) {
             var sim = x[0];
             NK.visFane(x[1]); sim.tilpas();
             x[2].forEach(function (k) {
+                /* Fane 3's foerste maal maales ogsaa med den trinvise start */
+                if (sim === C && D.BLAND[k].start) sim.status[k].loest = false;
                 sim.vaelg(k, false); sim.tilpas();
-                for (var t = 0; t < 30 && !sim.faerdig; t++) {
+                for (var t = 0; t < 60 && !sim.faerdig; t++) {
                     sim.knap(); maalK(sim, x[1] + " " + (k + 1) + " trin " + t, sim.lay.tavle.y);
+                    if (sim.trinNu && sim.trinNu()) tik(sim, 7);
                 }
                 maalK(sim, x[1] + " " + (k + 1) + " løst", sim.lay.tavle.y);
             });
@@ -585,6 +860,248 @@ function koerTest(W) {
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     paastand("layoutet holder fra 520 × 380 til 1500 × 900", problemer.length === 0, problemer.join("; "));
+
+    /* Runde 2 (21. nov. 2026): det smalle panel og scenen, der faar pladsen.
+       Intet overlapper, intet gaar uden for scenen, og kortet staar over det hele. */
+    var lag = [];
+    function R(x, y, b, h, navn) { return { x: x, y: y, b: b, h: h, navn: navn }; }
+    function over(a, b) { return a.x < b.x + b.b - 1 && b.x < a.x + a.b - 1 && a.y < b.y + b.h - 1 && b.y < a.y + a.h - 1; }
+    function tjekDele(navn, sim, dele) {
+        var W = sim.L.b, H = sim.L.h, e = sim.el.skort, bund = e.offsetTop + e.offsetHeight;
+        dele.forEach(function (x, i) {
+            if (x.x < -1 || x.y < -1 || x.x + x.b > W + 1 || x.y + x.h > H + 1) lag.push(navn + ": " + x.navn + " går uden for scenen");
+            if (x.y < bund - 1) lag.push(navn + ": kortet dækker " + x.navn + " (" + Math.round(bund) + " > " + Math.round(x.y) + ")");
+            dele.slice(i + 1).forEach(function (z) { if (over(x, z)) lag.push(navn + ": " + x.navn + " og " + z.navn + " overlapper"); });
+        });
+    }
+    /* Luppen med titlen over sig; der er ingen legende under den (runde 3) */
+    function lupR(L, ekstra) { var z = L.zoom; return R(z.x - z.r - 3, z.y - z.r - 24, 2 * z.r + 6, 2 * z.r + 27 + ekstra, "luppen"); }
+    [[1100, 620], [1280, 720], [1400, 860], [1600, 950]].forEach(function (st) {
+        ramme.style.width = st[0] + "px"; ramme.style.height = st[1] + "px";
+        var str2 = st[0] + "×" + st[1];
+        var panel = d.querySelector("#fane-bland .panel");
+        NK.visFane("fane-opl"); A.tilpas();
+        [0, 5].forEach(function (k) {
+            A.vaelg(k, false); A.tilpas(); A.layout();
+            var L = A.lay, g = L.glas, dele = [R(L.tavle.x, L.tavle.y, L.tavle.b, L.tavle.h, "tavlen"), lupR(L, 0),
+                R(L.soejler.x, L.soejler.y, L.soejler.b, L.soejler.h, "søjlerne"), R(g.x, g.y0, g.b, g.h, "glasset")];
+            L.krukker.forEach(function (kr, i) { dele.push(R(kr.x, kr.y, kr.b, kr.h, "krukke " + (i + 1))); });
+            tjekDele(str2 + " Opløsningen " + (k + 1), A, dele);
+        });
+        NK.visFane("fane-ioner"); B.tilpas();
+        [0, 2].forEach(function (k) {
+            B.vaelg(k, false); B.tilpas(); B.layout();
+            var L = B.lay, fl = L.flaske;
+            tjekDele(str2 + " Ionerne " + (k + 1), B, [R(L.tavle.x, L.tavle.y, L.tavle.b, L.tavle.h, "tavlen"), lupR(L, 0),
+                R(L.soejler.x, L.soejler.y, L.soejler.b, L.soejler.h, "søjlerne"), R(fl.x0, fl.y0, fl.b, fl.h, "flasken")]);
+        });
+        NK.visFane("fane-bland"); C.tilpas();
+        D.BLAND.forEach(function (sp, k) {
+            C.vaelg(k, false); C.tilpas(); C.layout();
+            var L = C.lay, dele = [R(L.tavle.x, L.tavle.y, L.tavle.b, L.tavle.h, "tavlen"), lupR(L, 0)];
+            ["mix", "glasA", "glasB", "vaegtA", "vaegtB"].forEach(function (n) { var g = L[n]; if (g) dele.push(R(g.x0, g.y0, g.b, g.h, n)); });
+            tjekDele(str2 + " Blandinger " + (k + 1), C, dele);
+        });
+        if (panel.offsetWidth > 310) lag.push(str2 + ": panelet er " + panel.offsetWidth + " px bredt");
+        /* Knapperne staar paa én linje; i listen staar titlen og underteksten hver paa én linje */
+        [].forEach.call(d.querySelectorAll(".panel .knap"), function (b) {
+            if (!b.offsetHeight) return;
+            if (b.scrollWidth > b.clientWidth + 1 || b.offsetHeight > 46) lag.push(str2 + ": " + b.textContent.trim().replace(/\s+/g, " ") + " står ikke på én linje");
+        });
+        [].forEach.call(d.querySelectorAll(".panel .hyldelinje"), function (b) {
+            if (!b.offsetHeight) return;
+            var nv = b.querySelector(".hl-navn"), em = nv.querySelector("em");
+            function lh(e) { var cs = getComputedStyle(e); return parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.3; }
+            var hoej = nv.offsetHeight - (em ? em.offsetHeight : 0);
+            if (b.scrollWidth > b.clientWidth + 1 || hoej > lh(nv) * 1.5 || (em && em.offsetHeight > lh(em) * 1.5))
+                lag.push(str2 + ": " + b.textContent.trim().replace(/\s+/g, " ") + " står ikke på én linje");
+        });
+    });
+    ramme.style.width = "1300px"; ramme.style.height = "820px";
+    paastand("panelet er højst 310 px, og hver linje i det står på én linje (1100 × 620 til 1600 × 950)",
+        lag.filter(function (x) { return /panelet|én linje/.test(x); }).length === 0, lag.filter(function (x) { return /panelet|én linje/.test(x); }).slice(0, 4).join("; "));
+    paastand("intet overlapper i scenen, intet går uden for den, og kortet dækker intet (1100 × 620 til 1600 × 950)",
+        lag.filter(function (x) { return !/panelet|én linje/.test(x); }).length === 0, lag.filter(function (x) { return !/panelet|én linje/.test(x); }).slice(0, 5).join("; "));
+    /* Tavlen med beregningen paa fane 1 kan vaere der med mindst 0,72 af skriften (to salte er den laengste) */
+    var tavleFejl = [];
+    [[1100, 620], [1280, 720], [1400, 860], [1600, 950]].forEach(function (st) {
+        ramme.style.width = st[0] + "px"; ramme.style.height = st[1] + "px";
+        NK.visFane("fane-opl"); A.tilpas(); A.vaelg(5, false); A.tilpas(); A.knap(); A.knap(); tik(A, 8); A.visKort();
+        var e = d.getElementById("opl-kort");
+        if (e.hidden || e.scrollHeight > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1) tavleFejl.push(st.join("×") + " " + e.scrollHeight + ">" + e.clientHeight);
+    });
+    ramme.style.width = "1300px"; ramme.style.height = "820px";
+    paastand("fane 1: hele beregningen kan stå på tavlen i scenen (1100 × 620 til 1600 × 950)", tavleFejl.length === 0, tavleFejl.join("; "));
+    paastand("intet svarfelt og ingen svarknapper i panelet på nogen fane", !d.querySelector(".panel input, .panel [data-valg], .panel .kt-felt, .panel .raekke"));
+
+    overskrift("10. Scenen (runde 3, 21. nov. 2026): luppen, glassene og tavlen");
+    /* Tegningen optages: al tekst og alle cirkler, som fanen tegner i én omgang */
+    function optag(sim) {
+        var ctx = sim.L.ctx, tekster = [], buer = [], ft = ctx.fillText, ar = ctx.arc;
+        ctx.fillText = function (t, x, y) {
+            var m = ctx.getTransform(), px = parseFloat((/(\d+(\.\d+)?)px/.exec(ctx.font) || [0, 0])[1]);
+            tekster.push({ t: String(t), x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f, px: px, b: ctx.measureText(t).width });
+            return ft.apply(ctx, arguments);
+        };
+        ctx.arc = function (x, y, r) {
+            var m = ctx.getTransform();
+            buer.push({ x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f, r: r });
+            return ar.apply(ctx, arguments);
+        };
+        try { sim.tegn(); } finally { delete ctx.fillText; delete ctx.arc; }
+        return { tekster: tekster, buer: buer };
+    }
+    var IONTEKST = Object.keys(D.IONER).map(function (k) { return D.IONER[k].t; });
+    /* Hver ion i luppen: formlen midt i en kugle, der er stor nok, mindst 13,5 px,
+       og ingen formel uden for luppen (ingen legende) */
+    function tjekLup(navn, sim, fejlListe) {
+        var o = optag(sim), z = sim.lay.zoom, kugler = 0;
+        o.tekster.forEach(function (t) {
+            if (IONTEKST.indexOf(t.t) < 0) return;
+            if (Math.hypot(t.x - z.x, t.y - z.y) > z.r + 1) { fejlListe.push(navn + ": " + t.t + " står uden for luppen (en legende?)"); return; }
+            kugler++;
+            var bue = o.buer.filter(function (b) { return Math.hypot(b.x - t.x, b.y - t.y + 1) < 2 && b.r >= t.b / 2 + 2; })[0];
+            if (!bue) fejlListe.push(navn + ": " + t.t + " står ikke inde i en kugle");
+            if (t.px < 13.5) fejlListe.push(navn + ": " + t.t + " er skrevet med " + t.px + " px");
+        });
+        if (!kugler) fejlListe.push(navn + ": ingen kugler i luppen");
+        return o;
+    }
+    var lupFejl = [];
+    NK.visFane("fane-opl"); A.tilpas(); A.vaelg(5, false); A.tilpas(); A.knap(); A.knap(); tik(A, 8);
+    tjekLup("Opløsningen, to salte", A, lupFejl);
+    NK.visFane("fane-ioner"); B.tilpas(); B.vaelg(1, false); loesAlt(B); tik(B, 2);
+    tjekLup("Ionerne, Middel", B, lupFejl);
+    NK.visFane("fane-bland"); C.tilpas();
+    C.status[iL] = { loest: false, stjerne: false, antal: 0 };
+    C.vaelg(iL, false); C.tilpas(); haeldBegge(C); tik(C, 2);
+    var oB = tjekLup("Blandinger, efter hældningen", C, lupFejl);
+    paastand("luppen: hver ion er en kugle med formlen inde i (mindst 13,5 px), og der er ingen legende under luppen", lupFejl.length === 0, lupFejl.slice(0, 4).join("; "));
+    var zC = C.lay.zoom, mxC = C.lay.mix;
+    paastand("luppen er stor (radius mindst 90 px ved 1300 × 820) og står over blandingsglasset", zC.r >= 90 && zC.y + zC.r < mxC.y0 && zC.x - zC.r < mxC.cx && mxC.cx < zC.x + zC.r, zC.r);
+    paastand("højst ca. 20 kugler i luppen", C.part.p.filter(function (q) { return !q.doer; }).length <= 20 && A.part.p.filter(function (q) { return !q.doer; }).length <= 20);
+    /* Glassene har etiketter: A, B og Blandingen paa glasset, og ingen tekst under glassene */
+    function inde(t, g) { return t.x >= g.x0 && t.x <= g.x0 + g.b && t.y >= g.y0 && t.y <= g.y0 + g.h; }
+    var et = { A: false, B: false, Bl: false, under: [] };
+    oB.tekster.forEach(function (t) {
+        if (t.t === "A" && inde(t, C.lay.glasA)) et.A = true;
+        if (t.t === "B" && inde(t, C.lay.glasB)) et.B = true;
+        if (t.t === "Blandingen" && inde(t, C.lay.mix)) et.Bl = true;
+        if (t.y > C.lay.bordY + 4) et.under.push(t.t);
+    });
+    var tA = C.opg.tal;
+    paastand("glassene har etiketter: A og B med saltet og koncentrationen, og blandingsglasset hedder Blandingen",
+        et.A && et.B && et.Bl && oB.tekster.some(function (t) { return t.t === D.salt(tA.A).formel && inde(t, C.lay.glasA); }) &&
+        oB.tekster.some(function (t) { return t.t === K.c(tA.cA) + " M" && inde(t, C.lay.glasA); }), JSON.stringify(et));
+    paastand("ingen små tekster under glassene", et.under.length === 0, et.under.join(", "));
+    /* Tavlen: i hoejre side, ingen "OPGAVENS TAL", ingen overskrift i versaler og ingen "trin mere" */
+    loesAlt(C);
+    var tavleTekst = [], tavleFejl2 = [];
+    [[C, "Blandinger"], [B, "Ionerne"]].forEach(function (x) {
+        var sim = x[0];
+        NK.visFane(sim === C ? "fane-bland" : "fane-ioner"); sim.tilpas();
+        var o = optag(sim), L = sim.lay;
+        if (L.tavle.x < sim.L.b / 2) tavleFejl2.push(x[1] + ": tavlen står ikke i højre side");
+        o.tekster.forEach(function (t) {
+            if (/OPGAVENS TAL|BEREGNINGEN|trin mere/i.test(t.t)) tavleFejl2.push(x[1] + ": " + t.t);
+            if (t.x >= L.tavle.x - 1) tavleTekst.push(t.t);
+        });
+    });
+    paastand("tavlen står i højre side og har ingen \"OPGAVENS TAL\", ingen overskrift og ingen \"trin mere\" (Blandinger og Ionerne)", tavleFejl2.length === 0, tavleFejl2.join("; "));
+    paastand("hver linje på tavlen har et navn i ord: Rumfanget af blandingen, Cl⁻ fra glas A og B og Cl⁻ i blandingen",
+        ["Rumfanget af blandingen", "Cl⁻ fra glas A", "Cl⁻ fra glas B", "Cl⁻ i blandingen"].every(function (n) { return tavleTekst.indexOf(n) >= 0; }) &&
+        tavleTekst.some(function (t) { return /^V = [0-9,]+ mL$/.test(t); }) && tavleTekst.some(function (t) { return /^n = c · V/.test(t); }), tavleTekst.slice(0, 8).join(" | "));
+    paastand("fane 1: tavlen har ingen overskrift, og hver del har et navn i ord",
+        !d.querySelector("#opl-kort .sb-etiket") && d.querySelectorAll("#opl-kort .sb-navn").length >= 2 && /Na⁺ i glasset/.test(d.getElementById("opl-kort").textContent));
+
+    overskrift("11. Opgavelisten og krukken (runde 4, 21. nov. 2026)");
+    /* Opgavelisten paa fane 1: kun de loeste og den, eleven er ved, har titel */
+    NK.visFane("fane-opl"); A.tilpas();
+    A.status.forEach(function (s) { s.loest = false; s.stjerne = false; s.antal = 0; });
+    A.naaet = {};
+    A.vaelg(0, false);
+    var linjerA = function () { return [].slice.call(d.querySelectorAll("#opl-liste .hyldelinje")); };
+    var la = linjerA();
+    paastand("fra start har kun opgave 1 en titel og en undertekst; de fem andre er et nummer med en grå streg",
+        la.length === 6 && /Natriumchlorid/.test(la[0].textContent) && !!la[0].querySelector("em") &&
+        la.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".hl-streg") && /^\d$/.test(b.textContent.trim()); }),
+        la.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    la[3].click();
+    paastand("en låst opgave kan ikke klikkes", A.nr === 0);
+    A.knap(); A.knap(); tik(A, 8);
+    d.querySelector("#opl-skort [data-videre]").click();
+    la = linjerA();
+    paastand("Vis svaret tæller som løst: opgave 2 er nået og har sin titel, opgave 3 til 6 er stadig låst",
+        A.nr === 1 && /Natriumsulfat/.test(la[1].textContent) && !la[1].disabled && la.slice(2).every(function (b) { return b.disabled; }));
+    A.status[3].loest = true; A.visListe();
+    paastand("en opgave, der er løst før (gemt i browseren), har sin titel", /Kaliumphosphat/.test(linjerA()[3].textContent) && !linjerA()[3].disabled);
+    NK.visFane("fane-ioner");
+    paastand("Ionerne: Let, Middel og Svær vælges frit og er alle synlige med en undertekst",
+        [].every.call(d.querySelectorAll("#ioner-liste .hyldelinje"), function (b) { return !b.disabled && !!b.querySelector("em"); }));
+    /* Krukken staar lige ved glasset med den gule ramme og boblen */
+    NK.visFane("fane-opl"); A.tilpas();
+    var krFejl = [];
+    [0, 5].forEach(function (k) {
+        A.vaelg(k, false); A.tilpas(); A.layout();
+        var L = A.lay, kl = L.krukker[L.krukker.length - 1], afst = L.glas.x - (kl.x + kl.b);
+        if (afst > 40 || afst < 0) krFejl.push("opgave " + (k + 1) + ": krukken står " + Math.round(afst) + " px fra glasset");
+        if (L.krukker[0].h < 100) krFejl.push("opgave " + (k + 1) + ": krukken er kun " + Math.round(L.krukker[0].h) + " px høj");
+        var Tg2 = NK.Tegn, k0 = Tg2.krukke, b0 = Tg2.boble, lys = [], bobler = [];
+        Tg2.krukke = function (ctx, x, y, h, st, v) { lys.push(v && v.lys); return k0.apply(Tg2, arguments); };
+        Tg2.boble = function (ctx, t) { bobler.push(t); return b0.apply(Tg2, arguments); };
+        try { A.tegn(); } finally { Tg2.krukke = k0; Tg2.boble = b0; }
+        if (!A.venterPaaSalt() || lys.length !== L.krukker.length || !lys.every(function (x) { return x > 0; }) || bobler[0] !== "Klik: en portion")
+            krFejl.push("opgave " + (k + 1) + ": ramme " + JSON.stringify(lys) + ", boble " + bobler.join(","));
+    });
+    A.vaelg(0, false); A.tilpas();
+    var kr0 = A.lay.krukker[0];
+    for (var pk = 0; pk < 3; pk++) { tryk(A, kr0.cx, kr0.y + kr0.h / 2); tik(A, 2); }
+    if (A.venterPaaSalt()) krFejl.push("efter tre portioner venter opgaven stadig på salt");
+    paastand("krukken står lige ved glasset og er stor nok; den har den gule ramme og boblen Klik: en portion, så længe der skal salt i (begge krukker i opgave 6)",
+        krFejl.length === 0, krFejl.join("; "));
+
+
+    overskrift("12. Rumfanget og det gamle niveau (runde 5, 21. nov. 2026)");
+    /* Det gamle niveau: en stiplet linje i de tomme glas efter haeldningen */
+    NK.visFane("fane-bland"); C.tilpas();
+    function glasKald() {
+        var Tg3 = NK.Tegn, g0 = Tg3.glasTydelig, kald = [];
+        Tg3.glasTydelig = function (ctx, g, V, farve, et, gammel) { kald.push({ g: g, gammel: gammel || 0 }); return g0.apply(Tg3, arguments); };
+        try { C.tegn(); } finally { Tg3.glasTydelig = g0; }
+        return function (g) { return (kald.filter(function (k) { return k.g === g; })[0] || {}).gammel; };
+    }
+    C.status[iL] = { loest: false, stjerne: false, antal: 0 };
+    C.vaelg(iL, false); C.tilpas();
+    var gk = glasKald();
+    var foer = !gk(C.lay.glasA) && !gk(C.lay.glasB);
+    haeldBegge(C); tik(C, 2);
+    gk = glasKald();
+    var tal5 = C.opg.tal, oL = optag(C);
+    paastand("efter hældningen har glas A og glas B en stiplet linje ved det gamle niveau med rumfanget skrevet ved (før hældningen ingen)",
+        foer && gk(C.lay.glasA) === tal5.VA && gk(C.lay.glasB) === tal5.VB && !gk(C.lay.mix) &&
+        oL.tekster.some(function (t) { return t.t === K.mL(tal5.VA) + " mL" && t.x > C.lay.glasA.x0 && t.x < C.lay.glasA.x0 + C.lay.glasA.b; }));
+    C.vaelg(iB("forskellig"), false); C.tilpas();
+    loesAlt(C);
+    gk = glasKald();
+    paastand("også i de andre opgaver har de tomme glas linjen ved det gamle niveau", gk(C.lay.glasA) === C.opg.tal.VA && gk(C.lay.glasB) === C.opg.tal.VB);
+    /* Ingen sum af rumfang: ingen "V(A) + V(B)" eller "mL + " paa tavlen, paa kortet,
+       i hint og forklaringer, paa alle fire opgaver */
+    var sumFejl = [], SUM = /V\(A\) \+ V\(B\)|mL \+ /;
+    D.BLAND.forEach(function (sp, k) {
+        if (sp.start) C.status[k] = { loest: false, stjerne: false, antal: 0 };
+        C.vaelg(k, false); C.tilpas();
+        for (var n = 0; n < 70 && !C.faerdig; n++) {
+            var tekst = promptC() + " | " + besked(C) + " | " + optag(C).tekster.map(function (t) { return t.t; }).join(" ");
+            if (SUM.test(tekst)) sumFejl.push(sp.titel + ": " + (tekst.match(/.{0,40}(V\(A\) \+ V\(B\)|mL \+ ).{0,20}/) || [""])[0]);
+            C.knap();
+            if (C.trinNu && C.trinNu()) tik(C, 7); else tik(C, 0.2);
+        }
+        var slut = promptC() + " " + optag(C).tekster.map(function (t) { return t.t; }).join(" ");
+        if (SUM.test(slut)) sumFejl.push(sp.titel + " (løst): " + (slut.match(/.{0,40}(V\(A\) \+ V\(B\)|mL \+ ).{0,20}/) || [""])[0]);
+    });
+    if (SUM.test(d.getElementById("teori").textContent)) sumFejl.push("Teori");
+    paastand("ingen \"V(A) + V(B)\" eller \"mL + \" på tavlen, på kortet, i hint og forklaringer og i Teori (alle fire opgaver)", sumFejl.length === 0, sumFejl.slice(0, 4).join("; "));
+
 }
 </script>
 </body>

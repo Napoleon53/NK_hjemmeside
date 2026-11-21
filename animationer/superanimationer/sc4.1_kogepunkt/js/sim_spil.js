@@ -198,7 +198,7 @@
         var mig = this, b = this.b;
         var d = {
             chip: "Blanding " + (this.nr + 1) + " af " + this.runde.length + ": " + D.SPIL_NIVEAUER[b.niveau].navn,
-            tekst: "Glasset indeholder en blanding. Hvilket stof koger først?"
+            tekst: "Hvilket stof i blandingen koger først?"
         };
         d.svar = b.st.map(function (st, k) {
             var kl = "";

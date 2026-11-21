@@ -90,7 +90,7 @@
                 var t1 = iv[0], t2 = iv[1];
                 var c1 = B.br2(t1), c2 = B.br2(t2), dc = c2 - c1, dt = t2 - t1;
                 return {
-                    tekst: "Beregn gennemsnitshastigheden v(Br₂) fra t₁ = " + t1 + " s til t₂ = " + t2 + " s.",
+                    tekst: "Hvad er gennemsnitshastigheden v(Br₂) fra t₁ = " + t1 + " s til t₂ = " + t2 + " s?",
                     valg: [
                         { tekst: ms(dc / dt), rigtig: true,
                           forklaring: "Δ[Br₂] = " + NK.sci(dc, 2) + " M og Δt = " + dt + " s. Gennemsnitshastigheden er Δ[Br₂]/Δt, som er sekantens hældning." },
@@ -130,7 +130,7 @@
                 var t = this.tider[this.nr++ % this.tider.length];
                 var x = B.v("br2", t);
                 return {
-                    tekst: "Ved t = " + t + " s er v(Br₂) = " + ms(x) + ". Hvor stor er v(BrO₃⁻)?",
+                    tekst: "Linealen er tangent til kurven for Br₂ ved t = " + t + " s. Hvor stor er v(BrO₃⁻), når v(Br₂) = " + ms(x) + "?",
                     valg: [
                         { tekst: "v(BrO₃⁻) = " + ms(x / 3), rigtig: true,
                           forklaring: "Der dannes 3 Br₂, hver gang 1 BrO₃⁻ forbruges. Derfor er v(BrO₃⁻) en tredjedel af v(Br₂)." },
@@ -197,7 +197,7 @@
             id: "fordoblA",
             lav: function () {
                 return {
-                    tekst: "Du fordobler antallet af A, og antallet af B er uændret. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+                    tekst: "Antallet af B er det samme hele tiden. Hvad sker der med sammenstødene mellem A og B pr. sekund, når antallet af A fordobles?",
                     valg: [
                         { tekst: "De fordobles", rigtig: true,
                           forklaring: "Hver B har dobbelt så mange A at ramme. Prøv 12 A og derefter 24 A." },
@@ -217,7 +217,7 @@
             id: "fordoblBegge",
             lav: function () {
                 return {
-                    tekst: "Du fordobler både antallet af A og antallet af B. Hvad sker der med sammenstødene mellem A og B pr. sekund?",
+                    tekst: "Hvad sker der med sammenstødene mellem A og B pr. sekund, når både A og B fordobles?",
                     valg: [
                         { tekst: "De firdobles", rigtig: true,
                           forklaring: "Der er dobbelt så mange B, og hver B møder dobbelt så mange A. Det giver 2 · 2 = 4 gange så mange sammenstød." },
@@ -255,7 +255,7 @@
             id: "pulver",
             lav: function () {
                 return {
-                    tekst: "Den samme mængde magnesium reagerer med syre som en klump og som pulver. Hvilken form danner flest H₂ pr. sekund?",
+                    tekst: "Den samme mængde magnesium reagerer med syre som en klump og som pulver. Hvilken form af magnesium danner flest H₂ pr. sekund i syre?",
                     valg: [
                         { tekst: "Pulveret", rigtig: true,
                           forklaring: "Pulveret har større overflade. H⁺ kan ramme mange flere Mg-atomer ad gangen." },

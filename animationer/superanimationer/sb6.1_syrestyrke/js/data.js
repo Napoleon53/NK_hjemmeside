@@ -99,7 +99,7 @@
         { id: "hco3", forkl: "Hydrogencarbonat har pKₛ = 10,33 og er en meget svag syre. Jo længere mod højre på skalaen, jo svagere er syren." }
     ];
     D.SKALA_SPM = {
-        tekst: "Methansyre har pKₛ = 3,75, og ethansyre har pKₛ = 4,76. Hvor mange gange større er Kₛ for methansyre?",
+        tekst: "Methansyre har pKₛ = 3,75, og ethansyre har pKₛ = 4,76. Hvor mange gange større er Kₛ for methansyre end for ethansyre?",
         svar: ["1 gang", "10 gange", "100 gange"], rigtig: 1,
         gule: ["hcooh", "eddike"],
         fejl: { 0: "To syrer med forskellig pKₛ har også forskellig Kₛ. Se på Kₛ-skalaen over de to flasker.",
@@ -160,7 +160,7 @@
 
     D.REGN = {
         base: {
-            tekst: function (s) { return D.Navn(s.id) + " reagerer med vand. Hvad dannes, når " + D.u(s.syre) + " afgiver en hydron til vand?"; },
+            tekst: function (s) { return D.Navn(s.id) + " reagerer med vand. Hvilken base dannes, når " + D.u(s.syre) + " afgiver en hydron til vand?"; },
             hint: function (s) { return ["En hydron, H⁺, består af ét H-atom og én positiv ladning.", "Fjern ét H fra " + D.u(s.syre) + ", og træk 1 fra ladningen."]; },
             forkl: function (s) { return D.u(s.syre) + " og " + D.u(s.base) + " er et korresponderende syre-basepar. Vand optager hydronen og bliver til H₃O⁺."; }
         },
@@ -246,7 +246,7 @@
 
     D.UKENDT_TRIN = {
         maal: { navn: "Mål pH", titel: "pH",
-                tekst: function (u) { return "Flasken indeholder en ukendt syre med cₛ = " + D.konc(u.c) + ". Hvilken syre er det? Begynd med at måle pH i opløsningen."; },
+                tekst: function (u) { return "Flasken indeholder en ukendt syre med cₛ = " + D.konc(u.c) + ". Syren findes ud fra pH og cₛ. Hvad er pH i flasken med den ukendte syre?"; },
                 hint: ["Tryk Mål pH, eller klik på pH-metret.", "pH-metrets elektrode sænkes ned i opløsningen."] },
         oxonium: { navn: "Oxonium", titel: "Oxonium: findes ud fra den målte pH",
                    tekst: function (u) { return "pH-metret viser " + D.tal2(u.ph) + ". Beregn [H₃O⁺] i opløsningen, og tryk Indsend svar."; },
@@ -257,7 +257,7 @@
                    forkl: function (u, r) { return "[H₃O⁺] = " + D.potensU(r.h) + " M. Det er koncentrationen af oxoniumioner i flasken." +
                        (u.fuld ? "" : " B og H₃O⁺ dannes i forholdet 1 : 1, så [B] er lige så stor."); } },
         basen: { navn: "Basen", titel: "Basen: forholdet er 1 : 1",
-                 tekst: function () { return "Syren har afgivet hydroner til vand. Hvor stor er [B], koncentrationen af syrens korresponderende base?"; },
+                 tekst: function () { return "Den ukendte syre har dannet sin korresponderende base, B. Hvor stor er koncentrationen af basen B i flasken?"; },
                  svar: function (u, r) { return ["[B] = [H₃O⁺] = " + D.potensU(r.h) + " M", "[B] = cₛ = " + D.konc(u.c), "[B] = 0 M"]; }, rigtig: 0,
                  fejl: { 1: "cₛ er den formelle koncentration af syren. Kun en lille del af syren er blevet til base.",
                          2: "Hver gang der dannes en oxoniumion, dannes der også en korresponderende base." },

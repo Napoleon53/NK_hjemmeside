@@ -290,7 +290,7 @@
         var mig = this, t = this.trin;
         var d = { chip: { gaet: "Gæt", varm: "Varm op", hvorfor: "Spørgsmål", faerdig: "Spørgsmål" }[t] };
         if (t === "gaet") {
-            d.tekst = "Tre glas med C₅H₁₂ står i vandbadet. " + D.FORM_SPM;
+            d.tekst = "Tre glas med C₅H₁₂ står i vandbadet. Ballonen på et glas fyldes, når stoffet i glasset koger. " + D.FORM_SPM;
             d.svar = D.ISOMERER.map(function (st, i) {
                 return { t: st.navn, prik: FARVER[i], kl: mig.valgt === i ? "valgt" : "" };
             });

@@ -201,7 +201,7 @@
        minutter er nok til, at al natronen er omdannet (brugerens oenske 29.
        sept. 2026: 5 minutter mod 2). rigtig: hvad gruppe 2's digel vejer
        til sidst. fejl: forklaringen til de to forkerte gaet. */
-    D.FEJL_SPM = "Gæt: Hvad vejer diglen hos gruppe 2 til sidst, sammenlignet med gruppe 1?";
+    /* Spoergsmaalet staar i hver fejlkilde (spm), saa det selv siger, hvad gruppe 2 goer (21. nov. 2026) */
     D.FEJL_SVAR = [{ id: "hoejere", t: "Mere end hos gruppe 1" }, { id: "lavere", t: "Mindre end hos gruppe 1" },
         { id: "samme", t: "Det samme som hos gruppe 1" }];
     D.FEJL_1 = "Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af.";
@@ -212,37 +212,43 @@
 
     D.FEJL = [
         { id: "tidligt", titel: "Kun 2 minutter", kort: "varmer kun 2 min", rigtig: "hoejere", B: { tid: 2 },
-          tekst: "Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt og varmer kun i 2 minutter.",
+          tekst: "Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når de kun varmer i 2 minutter?",
           hint: "Er al natronen nået at blive til fast stof og gas efter 2 minutter?",
           forkl: "Efter 2 minutter er der stadig natron i diglen, og der er forsvundet mindre gas. Slutmassen bliver for høj.",
           fejl: { lavere: "Der er ikke forsvundet mere gas hos gruppe 2. Der er forsvundet mindre, fordi de stoppede for tidligt.",
                   samme: "Slutmassen ville kun blive den samme, hvis al natronen var omdannet efter 2 minutter." } },
         { id: "varm", titel: "Vejet varm", kort: "vejer diglen varm", rigtig: "lavere", B: { varmVejning: true },
           tekst: "Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når de vejer den varm?",
           hint: "Den varme digel varmer luften omkring sig. Varm luft stiger op.",
           forkl: "Varm luft stiger op fra diglen og løfter den en smule. Vægten viser for lidt, så slutmassen bliver for lav.",
           fejl: { hoejere: "En varm digel vejer ikke mere. Den varme luft, der stiger op, løfter den, så vægten viser mindre.",
                   samme: "Vægten kan mærke den varme luft, der stiger op, og viser for lidt, til diglen er kølet af." } },
         { id: "sproejt", titel: "Høj flamme fra start", kort: "høj flamme fra start", rigtig: "lavere", B: { hoejFraStart: true },
           tekst: "Gruppe 2 skruer op for fuld flamme med det samme.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når de bruger høj flamme fra start?",
           hint: "Hvad sker der, når der pludselig dannes meget gas i et pulver?",
           forkl: "Gassen dannes så hurtigt, at pulveret sprøjter ud af diglen. Det, der ryger ud, mangler på vægten, så slutmassen bliver for lav.",
           fejl: { hoejere: "Der ryger noget ud af diglen, ikke noget ind. Diglen vejer mindre bagefter.",
                   samme: "Når det sprøjter, ryger en del af pulveret ud af diglen. Det kommer ikke med på vægten." } },
         { id: "fugt", titel: "Fugtig natron", kort: "fugtig natron", rigtig: "lavere", B: { vand: 0.30 },
           tekst: "Gruppe 2's natron har stået åben i en fugtig kælder. Af deres 5,10 g er 0,30 g vand.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når 0,30 g af deres natron er vand?",
           hint: "Vandet vejer med i startmassen. Hvor bliver det af, når diglen varmes?",
           forkl: "Vandet damper væk, og der er kun 4,80 g natron til at blive til fast stof. Slutmassen bliver for lav.",
           fejl: { hoejere: "Vandet bliver ikke i diglen. Det damper væk, og der er mindre natron i de 5,10 g.",
                   samme: "Vandet tager pladsen fra natronen i de 5,10 g. Der bliver mindre fast stof tilbage." } },
         { id: "laenge", titel: "Dobbelt så længe", kort: "varmer i 10 min", rigtig: "samme", B: { tid: 10 },
           tekst: "Gruppe 2 vil være sikre. De varmer i 10 minutter i stedet for 5.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når de varmer i 10 minutter?",
           hint: "Hvad er der tilbage i diglen efter 5 minutter? Kan det også sønderdeles?",
           forkl: "Efter 5 minutter er al natronen blevet til Na₂CO₃, og så sker der ikke mere. Na₂CO₃ tåler flammen. Mere tid giver den samme slutmasse.",
           fejl: { hoejere: "Længere tid kan ikke gøre diglen tungere. Der kommer intet til.",
                   lavere: "Slutmassen ville kun blive mindre, hvis stoffet i diglen blev ved med at give gas. Men når al natronen er omdannet, sker der ikke mere." } },
         { id: "soda", titel: "Den forkerte krukke", kort: "tager soda", rigtig: "hoejere", B: { soda: true },
           tekst: "Gruppe 2 tager fejl af krukkerne. De varmer 5,10 g soda, Na₂CO₃, i stedet for natron.",
+          spm: "Hvad vejer diglen hos gruppe 2 til sidst, når de varmer soda i stedet for natron?",
           hint: "Soda er det, natron bliver til. Kan det give mere gas?",
           forkl: "Soda sønderdeles ikke i flammen. Der forsvinder ingen gas, og slutmassen er 5,10 g. Den passer ikke med nogen af hypoteserne.",
           fejl: { lavere: "Soda giver ikke gas i flammen. Der forsvinder intet, så diglen vejer det samme som før.",

@@ -42,14 +42,25 @@
     P.gem = function () { NK.gem(NOEGLE, { l: this.status.loest ? 1 : 0, s: this.status.stjerne ? 1 : 0 }); };
 
     /* ----- Panelet ------------------------------------------------------------------ */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende flasker staar som et nummer med en graa streg uden titel.
+       En flaske er naaet, naar eleven er kommet dertil, naar alle foer den
+       er loest (Vis svaret taeller som loest), eller naar hele fanen er
+       gennemfoert foer (gemt i browseren). */
+    P.aabenOpgave = function (j) { return j <= this.nr + (this.groen ? 1 : 0) || this.status.loest; };
     P.visListe = function () {
         var mig = this, html = "";
+        function linje(kl, j, titel) {
+            var aaben = mig.aabenOpgave(j);
+            return '<li class="' + kl + (aaben ? "" : " laast") + '"' + (aaben ? "" : ' aria-label="Opgave ' + (j + 1) + ', kommer senere"') +
+                '><span class="tr-nr">' + (j + 1) + "</span>" + (aaben ? "<span>" + titel + "</span>" : '<span class="hl-streg"></span>') + "</li>";
+        }
         D.SKALA.forEach(function (f, j) {
             var kl = j < mig.nr || (j === mig.nr && mig.groen) ? "faerdig" : (j === mig.nr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + NK.html(D.Navn(f.id)) + "</span></li>";
+            html += linje(kl, j, NK.html(D.Navn(f.id)));
         });
         var j6 = D.SKALA.length, kl6 = this.faerdig ? "faerdig" : (this.nr === j6 ? "nu" : "");
-        html += '<li class="' + kl6 + '"><span class="tr-nr">' + (j6 + 1) + "</span><span>Faktoren 10</span></li>";
+        html += linje(kl6, j6, "Faktoren 10");
         NK.saetHTML("k-trin", html);
         NK.saetTekst("k-maerke", this.status.stjerne ? "★ uden fejl" : (this.status.loest ? "✓ gennemført" : ""));
     };

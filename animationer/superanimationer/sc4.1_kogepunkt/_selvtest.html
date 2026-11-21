@@ -337,7 +337,7 @@ function koerTest(W) {
     paastand("vandbadet starter ved 0 °C, og alle tre er væsker", F.termo.T === 0 && F.proever.every(function (p) {
         var t = tael(p); return t[0] === 0 && t[2] <= p.dampMaks(p.grupper[0]);
     }));
-    paastand("gættet står på kortet med tre svar, og Indsend svar er grå", /Hvilken ballon fyldes først/.test(kt("form")) &&
+    paastand("gættet står på kortet med tre svar, og Indsend svar er grå", /Hvilket af de tre stoffer koger først/.test(kt("form")) &&
         d.querySelectorAll("#form-skort [data-valg]").length === 3 && graa("form"));
     var cf = d.getElementById("form-laerred"), rcf = cf.getBoundingClientRect(), fl = F.lay;
     function fmus(type, x, y) {

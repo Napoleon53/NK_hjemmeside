@@ -437,7 +437,7 @@ function koerAlt() {
         && skR0.top - scR.top <= 16 && skR0.bottom <= rammeTop, Math.round(skR0.left) + "-" + Math.round(skR0.right) + " i " + Math.round(scR.left) + "-" + Math.round(scR.right));
     paastand("på kortet står trinnet som indlejret overskrift, opgaven og trinnets spørgsmål",
         /^Trin 1 af 7$/.test(skort.querySelector(".sk-chip").textContent) && /surt miljø/.test(skort.textContent) && /permanganat/.test(skort.textContent)
-        && /Skriv oxidationstallene i felterne over atomerne\./.test(skort.querySelector(".sk-spm").textContent), skort.textContent);
+        && /Skriv oxidationstallene i felterne over atomerne\.$/.test(skort.querySelector(".sk-tekst").textContent) && !skort.querySelector(".sk-spm"), skort.textContent);
     paastand("ingen statuslinje eller besked under arket: beskeden og knapperne står på kortet",
         !d.querySelector(".ab-bund, .statuslinje, .opgavelinje, .ab-hoved") && !!skort.querySelector("#besked") && !!skort.querySelector("#tjek") && !!skort.querySelector("#opgaveknap"));
     paastand("Start forfra står i panelet, ikke på kortet", !!d.querySelector(".panel #forfra") && !skort.querySelector("#forfra") && !/forfra/i.test(skort.textContent));

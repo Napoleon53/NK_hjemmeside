@@ -66,10 +66,11 @@
 
     /* ----- Panelet ------------------------------------------------------------------ */
     P.visListe = function () {
-        var mig = this, html = "";
+        /* Et kommende trin er et nummer med en graa streg (21. nov. 2026) */
+        var mig = this, html = "", maks = F.trinNaaet(this, "forloeb", this.trinNr), hel = this.status.loest;
         this.trinListe.forEach(function (t, j) {
             var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) || mig.faerdig ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + NK.html(t.navn) + "</span></li>";
+            html += F.trinLi(j, kl, "<span>" + NK.html(t.navn) + "</span>", hel || kl !== "" || j <= maks);
         });
         NK.saetHTML("e-trin", html);
         NK.saetTekst("e-maerke", this.status.stjerne ? "★ gennemført uden fejl" : (this.status.loest ? "✓ gennemført" : ""));

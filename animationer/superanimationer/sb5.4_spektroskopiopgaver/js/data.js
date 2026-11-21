@@ -394,7 +394,7 @@
         hoej: {
             titel: ["For høj", "absorbans"], slags: "valg",
             tekst: function (o) {
-                return "En anden blodprøve giver absorbansen " + D.abs(o.hoejA) + ". Hvad gør du for at finde koncentrationen af prilocain?";
+                return "En anden blodprøve med prilocain er målt ved " + o.lambda + " nm. Hvordan finder du koncentrationen i en blodprøve med A = " + D.abs(o.hoejA) + "?";
             },
             svar: ["Fortynder og måler igen", "Aflæser c på kurven", "Regner c = (A − b) / a", "Måler i en ny kuvette"],
             rigtig: 0,

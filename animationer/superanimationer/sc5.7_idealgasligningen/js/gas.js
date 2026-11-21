@@ -248,8 +248,14 @@
        vaeg, y op fra bunden, i pixels) og en fart. Farten er
        proportional med kvadratroden af T (samme fordeling hele tiden,
        hvert molekyle har sin egen faktor). Molekylerne stoeder ikke ind i
-       hinanden (en idealgas), kun i vaeggene og stemplet, og hvert stoed
-       giver et lille glimt.
+       hinanden (en idealgas), kun i vaeggene og stemplet.
+
+       Roligere molekyler (brugeren 21. nov. 2026: "molekylerne bevaeger sig
+       overordnet for hurtigt. Det er ikke rart for oejnene"): grundfarten er
+       40 % af foer (B * 0,34 px/s, 28 til 76, foer B * 0,85, 70 til 190), og
+       glimtene ved vaeggene er taget ud. Forholdet til temperaturen er det
+       samme. Intet i modellen (tryk, stempel, manometer) afhaenger af den
+       viste fart; den er kun tegning.
        ====================================================================== */
     function Partikler() {
         this.liste = [];
@@ -265,7 +271,8 @@
 
     var PP = Partikler.prototype;
 
-    PP.grundfart = function () { return NK.klamp(this.B * 0.85, 70, 190); };
+    G.FART_MAKS = 76;             /* px/s, hoejeste grundfart (foer 190) */
+    PP.grundfart = function () { return NK.klamp(this.B * 0.34, 28, G.FART_MAKS); };
 
     PP.nyt = function (x, y, retning) {
         var v = retning === undefined ? Math.random() * Math.PI * 2 : retning + NK.r(-0.5, 0.5);
@@ -324,7 +331,7 @@
         this.H = H;
         this.fart = NK.mod(this.fart, fartMaal, 3, dt);
         var r = this.r, v0 = this.grundfart() * this.fart;
-        var mig = this, stoed = 0;
+        var stoed = 0;
         var ux = ud ? ud.x : B - 8, uy = ud ? ud.y : r;
         var trin = Math.max(1, Math.ceil(dt / 0.02));
         var h = dt / trin;
@@ -342,23 +349,17 @@
                 var fart = v0 * p.f;
                 p.x += p.vx * fart * h;
                 p.y += p.vy * fart * h;
-                var ramt = false;
-                if (p.x < r) { p.x = r; p.vx = Math.abs(p.vx); ramt = true; }
-                else if (p.x > B - r) { p.x = B - r; p.vx = -Math.abs(p.vx); ramt = true; }
+                if (p.x < r) { p.x = r; p.vx = Math.abs(p.vx); }
+                else if (p.x > B - r) { p.x = B - r; p.vx = -Math.abs(p.vx); }
                 if (H < 2 * r + 1) {
                     p.y = H / 2;
                 } else {
-                    if (p.y < r) { p.y = r; p.vy = Math.abs(p.vy); ramt = true; }
-                    else if (p.y > H - r) { p.y = H - r; p.vy = -Math.abs(p.vy); ramt = true; stoed++; }
-                }
-                if (ramt && mig.glimt.length < 70 && Math.random() < 0.8) {
-                    mig.glimt.push({ x: p.x, y: p.y, a: 1, s: fart / Math.max(1, v0) });
+                    if (p.y < r) { p.y = r; p.vy = Math.abs(p.vy); }
+                    else if (p.y > H - r) { p.y = H - r; p.vy = -Math.abs(p.vy); stoed++; }
                 }
             });
         }
         this.liste = this.liste.filter(function (p) { return p.a > 0; });
-        this.glimt.forEach(function (g) { g.a -= dt * 3.2; });
-        this.glimt = this.glimt.filter(function (g) { return g.a > 0; });
         /* Stoed paa stemplet pr. sekund, glattet */
         this._stoedTael += stoed;
         this._stoedTid += dt;

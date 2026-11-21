@@ -76,7 +76,7 @@
             opstil: { stof: "ethen", produkt: "Br2" },
             spm: {
                 om: ["mol"],
-                tekst: "Ethen og dibrom blev til 1,2-dibromethan. Hvad skete der med dobbeltbindingen?",
+                tekst: "Ethen og dibrom gav 1,2-dibromethan. Hvad skete der med dobbeltbindingen i ethen, da dibrom satte sig på?",
                 svar: [
                     { t: "Den er der stadig",
                       f: "Tæl stregerne mellem de to carbonatomer i 1,2-dibromethan." },
@@ -140,7 +140,7 @@
             },
             spm: {
                 om: ["mol"],
-                tekst: "Vandmolekylet delte sig i to dele, som satte sig på ethen. Hvilke to dele?",
+                tekst: "Vand satte sig på dobbeltbindingen. Hvilke to dele delte vandmolekylet sig i, da det satte sig på ethen?",
                 svar: [
                     { t: "H₂ og O", f: "Se på produktet af ethen og vand. På det ene carbonatom sidder et O med et H på." },
                     { t: "H og OH", ok: true },
@@ -252,7 +252,7 @@
             },
             spm: {
                 om: [0],
-                tekst: "I glas A er den orange farve fra dibrom, Br₂, væk. Hvor er dibrommet blevet af?",
+                tekst: "I glas A er den orange farve fra dibrom, Br₂, væk. Hvor er dibrommet i glas A blevet af?",
                 svar: [
                     { t: "Dibrom har reageret med stoffet", ok: true },
                     { t: "Dibrom er flyttet op i øverste lag",
@@ -269,7 +269,7 @@
             },
             spm2: {
                 om: [0],
-                tekst: "Dibrom satte sig på stoffet i glas A i en addition. Er stoffet mættet eller umættet?",
+                tekst: "Dibrom satte sig på stoffet i glas A i en addition. Er stoffet i glas A mættet eller umættet?",
                 svar: [
                     { t: "Stoffet er mættet", f: "Et mættet stof har ingen dobbeltbinding, som dibrom kan sætte sig på. I glas A har dibrom reageret." },
                     { t: "Stoffet er umættet", ok: true }
@@ -438,7 +438,7 @@
             },
             spm: {
                 om: ["kaede"],
-                tekst: "To ethenmolekyler har sat sig sammen. Hvad skete der med deres dobbeltbindinger?",
+                tekst: "To ethenmolekyler har sat sig sammen. Hvad skete der med dobbeltbindingerne i de to ethenmolekyler?",
                 svar: [
                     { t: "De er der stadig",
                       f: "Se på kæden af de to ethenmolekyler. Der er kun én streg mellem hvert par af carbonatomer." },
@@ -539,7 +539,7 @@
             opstil: { led: 6 },
             spm: {
                 om: ["kaede"],
-                tekst: "En kæde i polyethen er for lang til at tegne. Man tegner det udsnit, der gentager sig. Hvilket udsnit?",
+                tekst: "En kæde i polyethen er for lang til at tegne. Hvilket udsnit gentager sig i en kæde af polyethen?",
                 svar: [
                     { t: "−CH=CH−", f: "Dobbeltbindingerne åbnede sig, da ethenmolekylerne satte sig sammen. Kæden har kun enkeltbindinger." },
                     { t: "−CH₂−CH₂−", ok: true },

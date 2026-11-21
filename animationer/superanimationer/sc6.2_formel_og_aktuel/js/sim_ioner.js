@@ -26,14 +26,15 @@
         this.part = new NK.Partikler(17);
         this.vis = {};
         this.startFane(D.NIV);
-        this.regning = new NK.Regning({ vaert: NK.el("ioner-raekker"), fane: this });
+        this.regning = new NK.Regning({ fane: this });
         this.introNu = true;
         this.vaelg(0, false);
     }
 
     var P = SimIoner.prototype;
     /* Pladsen oeverst i scenen til papirkortet: almindelig og lav skaerm */
-    var ZONE = [150, 132];
+    /* Kortet har feltet eller svarene under spoergsmaalet (21. nov. 2026) */
+    var ZONE = [206, 182];
     NK.Fane.paa(P, { navn: "ioner", niveauer: true, zone: ZONE });
     NK.Regning.paa(P);
 
@@ -147,29 +148,33 @@
         void id;
     };
 
-    /* ----- Layout -------------------------------------------------------------------- */
+    /* ----- Layout (runde 3, 21. nov. 2026) ---------------------------------------------
+       Tavlen til hoejre. Til venstre: luppen oeverst med en kegle ned i flasken,
+       og flasken og soejlerne langs bordet. */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var Hs = H;
-        var lay = { W: W, H: H, Hs: Hs };
-        lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.06, 14, 40));
+        var lay = { W: W, H: H, Hs: H };
+        lay.bordY = Math.round(H - NK.klamp(H * 0.06, 14, 40));
         /* Pladsen oeverst er sat af til papirkortet (kortZone) */
         lay.zone = this.kortZone();
-        var y0 = 10 + lay.zone, Hr = Hs - y0;
-        var zr = Math.round(NK.klamp(Math.min(Hr * 0.15, W * 0.09), 40, 92));
-        lay.zoom = { x: 16 + zr + 8, y: y0 + 24 + zr, r: zr };
-        var tx = lay.zoom.x + zr + NK.klamp(W * 0.04, 24, 50);
-        lay.tavle = { x: tx, y: y0, b: W - tx - 18, h: Math.round(NK.klamp(Hr * 0.5, 150, 320)) };
-        var top = Math.max(lay.zoom.y + zr + 70, lay.tavle.y + lay.tavle.h + 22);
-        var zone = lay.bordY - top;
-        var fh = NK.klamp(zone * 0.92, 90, 210);
+        var y0 = 10 + lay.zone, Hr = lay.bordY - y0;
+        var tb = Math.round(NK.klamp(W * 0.34, 250, 420));
+        lay.tavle = { x: W - tb - 14, y: y0, b: tb, h: lay.bordY - y0 - 8 };
+        var venstre = lay.tavle.x - 22;
+        var fh = NK.klamp(Hr * 0.42, 110, 230);
+        var R = NK.klamp(Math.min((Hr - fh - 70) / 2, (venstre - 14) * 0.3), 50, 140);
         lay.flaske = Tg.flaskeGeo(18 + fh * 0.34, lay.bordY, fh);
-        var sx = lay.flaske.x0 + lay.flaske.b + 36;
-        lay.soejler = { x: sx, y: top, b: Math.min(W - 18 - sx, 520), h: Math.max(120, lay.bordY - 8 - top) };
+        var sx = lay.flaske.x0 + lay.flaske.b + 30;
+        var top = lay.flaske.y0;
+        lay.soejler = { x: sx, y: Math.min(top, lay.bordY - 130), b: Math.min(venstre - sx, 520), h: lay.bordY - 8 - Math.min(top, lay.bordY - 130) };
+        /* Luppen over flasken og lidt til hoejre, saa keglen gaar skraat ned i flasken */
+        lay.zoom = { x: NK.klamp(lay.flaske.cx + R * 0.8, 14 + R, venstre - R), y: y0 + 26 + R, r: Math.round(R) };
         this.lay = lay;
+        var f = this.opg ? this.opg.facit : null;
+        this.skala = Tg.skala(f ? f.kat + f.an : 0.5, lay.zoom.r);
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("soejler", lay.soejler.x, lay.soejler.y, lay.soejler.b, lay.soejler.h);
-        this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 26, 2 * zr, 2 * zr + 60);
+        this.saetAnker("zoom", lay.zoom.x - R, lay.zoom.y - R - 26, 2 * R, 2 * R + 30);
     };
 
     /* ----- Opdater og tegn -------------------------------------------------------------- */
@@ -180,7 +185,7 @@
             vis[p[0]] = NK.mod(vis[p[0]] || 0, mig.kendt(p[0]) ? p[1] : 0, 6, dt);
         });
         var alle = this.kendt("kat") && this.kendt("an") && this.regning.faerdig();
-        this.part.saet(alle ? [Tg.prikker(f.kat), Tg.prikker(f.an)] : [0, 0]);
+        this.part.saet(alle ? [Tg.kugler(f.kat, this.skala), Tg.kugler(f.an, this.skala)] : [0, 0]);
         this.part.opdater(dt);
         void st;
     };
@@ -195,7 +200,8 @@
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);
         var ck = this.kendt("c");
         var linje2 = ck ? K.c(f.c) + " M" : (o.bag ? "[" + D.ion(o.bag === "kat" ? st.kat : st.an).t + "] " + K.c(o.ionC) + " M" : "? M");
-        Tg.flaske(ctx, lay.flaske, Tg.vaeske(st, f.c), [st.formel, linje2]);
+        /* Svær: massen og rumfanget staar paa etiketten (ingen "opgavens tal" paa tavlen) */
+        Tg.flaske(ctx, lay.flaske, Tg.vaeske(st, f.c), o.m !== undefined ? [st.formel, K.g(o.m) + " g i " + K.mL(o.V) + " mL", linje2] : [st.formel, linje2]);
         var s = [
             { navn: "c(" + st.formel + ")", v: vis.c || 0, farve: "#8b93a0" },
             { navn: "[" + D.ion(st.kat).t + "]", v: vis.kat || 0, farve: D.ion(st.kat).farve },
@@ -204,9 +210,11 @@
         var maks = Math.max(0.2, f.c, f.kat, f.an) * 1.15;
         maks = Math.ceil(maks / 0.1) * 0.1;
         Tg.soejler(ctx, lay.soejler, s, maks);
-        var z = lay.zoom, alle = this.regning.faerdig();
-        Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: Tg.vaeske(st, f.c), titel: "Luppen",
-            tekst: alle ? "" : "?", forklar: alle });
+        /* Luppen kigger i flasken: keglen gaar fra vaesken op til luppen */
+        var z = lay.zoom, alle = this.regning.faerdig(), fl = lay.flaske;
+        Tg.zoomKegle(ctx, fl.cx, fl.y0 + fl.h * 0.62, z.x, z.y, z.r);
+        Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: Tg.vaeske(st, f.c), titel: "Luppen: opløsningen i flasken",
+            tekst: alle ? "" : "?" });
     };
 
     NK.SimIoner = SimIoner;

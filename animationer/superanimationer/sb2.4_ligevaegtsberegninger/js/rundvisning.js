@@ -13,27 +13,26 @@
 
     var TURE = {
         "fane-bh": [
-            { sel: "#bh-skort", titel: "Papirkortet", tekst: "Øverst står målet. Under det står, hvad du skal nu, og hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret. Indsend svar sender dit svar ind." },
-            { sel: "#bh-laerred", titel: "Beholderen og grafen", tekst: "Til venstre er molekylerne i en lukket beholder. Til højre er reaktionsbrøken Y som funktion af x. Den gule linje er K." },
-            { sel: ".bh-skyder", titel: "x", tekst: "Skyderen bestemmer x, som er den koncentration af stoffet, der er omsat. Du kan også trække på grafen." },
-            { sel: "#bh-skema", titel: "Skemaet", tekst: "Start, ændring og ligevægt for hvert stof. Tallene følger skyderen. I nogle mål skriver du selv udtrykkene med x." },
-            { sel: "#bh-y", titel: "Y og K", tekst: "Y er reaktionsbrøken regnet med koncentrationerne i rækken Ligevægt. Ved ligevægt er Y = K." },
-            { sel: "#bh-opgaver", titel: "Målene", tekst: "Der er otte mål på tre reaktioner. Du får en stjerne for hvert mål, du når uden at se svaret." },
-            { sel: ".faneknapper", titel: "Opgaverne", tekst: "På fanerne Uden x og Med x regner du de rigtige opgaver." }
+            { sel: "#bh-skort", titel: "Papirkortet", tekst: "Øverst står reaktionsskemaet med K. Under det står spørgsmålet eller det, du skal gøre. Giv et hint giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#bh-laerred", titel: "Beholderen", tekst: "Molekylerne i en lukket beholder. Hvert stof har sin egen farve, og under beholderen står, hvor mange der er af hvert stof." },
+            { sel: "#bh-skyder", titel: "x", tekst: "Skyderen bestemmer x, som er den koncentration af stoffet, der er omsat. På det første mål ligger den under grafen som grafens x-akse." },
+            { sel: "#bh-y", titel: "Y og K", tekst: "Y er reaktionsbrøken regnet med koncentrationerne lige nu. Ved ligevægt er Y = K." },
+            { sel: "#bh-tavle", titel: "Tavlen", tekst: "Skemaet med Start, Ændring og Ligevægt. Feltet med ? er det, kortet spørger om. Du svarer på kortet." },
+            { sel: "#bh-graffane", titel: "Grafen", tekst: "Fra mål 2 er grafen foldet ind. Her kan du folde den ud igen." },
+            { sel: "#bh-raekke", titel: "Målene", tekst: "Der er seks mål på tre reaktioner. Et nyt mål åbner, når du kommer dertil. Start forfra står til højre." }
         ],
         "fane-ux": [
-            { sel: "#ux-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet. Når ligevægtsloven er skrevet rigtigt, kommer opgavens tal frem under det. Klik på et tal for at sætte det ind i det felt, du står i." },
-            { sel: "#ux-delbar", titel: "Delene", tekst: "Opgaven regnes i dele. Den gule er den, du er ved." },
-            { sel: "#ux-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Indsend svar eller Enter. En løst del bliver stående, som den skal stå i din besvarelse." },
-            { sel: "#ux-skort", titel: "Papirkortet", tekst: "Øverst står opgaven. Under den står, hvad du skal nu, og hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#ux-opgaver", titel: "Opgaverne", tekst: "Fem opgaver: tre, hvor K skal findes, og to med en ukendt koncentration. Når en opgave er løst, står hele besvarelsen i panelet under listen." }
+            { sel: "#ux-rx", titel: "Reaktionen", tekst: "Reaktionsskemaet for opgaven står med stort øverst." },
+            { sel: "#ux-skort", titel: "Papirkortet", tekst: "Kortet stiller ét spørgsmål ad gangen. Du svarer på kortet: vælg et svar eller skriv et tal, og tryk Indsend svar." },
+            { sel: "#ux-tavle", titel: "Tavlen", tekst: "Øverst står opgavens tal. Under dem kommer besvarelsen linje for linje. Linjen med ? er den, kortet spørger om." },
+            { sel: "#ux-raekke", titel: "Opgaverne", tekst: "Fem opgaver: tre, hvor K skal findes, og to med en ukendt koncentration. En ny opgave åbner, når du kommer dertil. Start forfra står til højre." }
         ],
         "fane-mx": [
             { sel: "#mx-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet. Når ligevægtsloven er skrevet rigtigt, kommer opgavens tal frem under det. Klik på et tal for at sætte det ind i det felt, du står i." },
             { sel: "#mx-delbar", titel: "Delene", tekst: "Ligevægtsloven, hvad x er, skemaet, ligningen, CAS, løsningen og koncentrationerne. Den gule er den, du er ved." },
             { sel: "#mx-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Indsend svar eller Enter. Skemaet bliver stående, så du kan bruge det i ligningen og til at prøve løsningerne." },
             { sel: "#mx-skort", titel: "Papirkortet", tekst: "Øverst står opgaven. Under den står, hvad du skal nu, og hvad der gik galt. Giv et hint giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#mx-opgaver", titel: "Opgaverne", tekst: "Otte opgaver i Let, Middel og Svær. Når en opgave er løst, står hele besvarelsen og kurven fra start til ligevægt i panelet under listen." }
+            { sel: "#mx-raekke", titel: "Opgaverne", tekst: "Otte opgaver i Let, Middel og Svær. Hvert niveau kan altid vælges. Når en opgave er løst, står kurven fra start til ligevægt sidst på tavlen." }
         ]
     };
     var trin = [];

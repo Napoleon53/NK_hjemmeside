@@ -1,0 +1,595 @@
+[
+  {
+    "mappe": "sb3.2_intermolekylaere_bindinger",
+    "titel": "Intermolekylære bindinger",
+    "sprog": [
+      {
+        "fane": "1 Ethanol",
+        "opgave": "4 Uden hydrogenbindinger (gæt)",
+        "fil": "js/data.js",
+        "linje": 171,
+        "nu_alm": "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger.",
+        "nu_fed": "Ved hvilken temperatur ville ethanol så koge?",
+        "nu_svar": ["Højere end 78 °C", "Lidt lavere, omkring 60 °C", "Meget lavere, under 0 °C"],
+        "problem": "Betingelsen (uden hydrogenbindinger) står kun i indledningen; \"så\" peger tilbage på den, så det halvfede alene spørger bare om ethanols kogepunkt.",
+        "nyt_alm": "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger.",
+        "nyt_fed": "Ved hvilken temperatur koger ethanol uden hydrogenbindinger?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Sammenlign",
+        "opgave": "1 Propan og ethanol (spørgsmålet efter målingen)",
+        "fil": "js/data.js",
+        "linje": 236,
+        "nu_alm": "Ethanol koger 120 °C højere end propan.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Ethanol har lidt større molarmasse.", "Ethanol har en OH-gruppe, der danner hydrogenbindinger.", "O og H binder stærkere end C og H."],
+        "problem": "Papirkortet gør kun \"Hvorfor?\" halvfedt, så det halvfede siger intet om, hvad der skal forklares.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor koger ethanol 120 °C højere end propan?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Sammenlign",
+        "opgave": "2 Ethanol og butan-1-ol (spørgsmålet efter målingen)",
+        "fil": "js/data.js",
+        "linje": 252,
+        "nu_alm": "Butan-1-ol koger 40 °C højere end ethanol.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Flere H-atomer giver flere hydrogenbindinger.", "Butan-1-ol har flere OH-grupper.", "Butan-1-ols lange kæde giver flere londonbindinger."],
+        "problem": "Kun \"Hvorfor?\" er halvfedt; hvad der skal forklares, står i almindelig skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor koger butan-1-ol 40 °C højere end ethanol?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Sammenlign",
+        "opgave": "3 Ethanol og ethan-1,2-diol (spørgsmålet efter målingen)",
+        "fil": "js/data.js",
+        "linje": 267,
+        "nu_alm": "Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Ethan-1,2-diol har større molarmasse.", "Kæden i ethan-1,2-diol er længere.", "To OH-grupper giver flere hydrogenbindinger."],
+        "problem": "Kun \"Hvorfor?\" er halvfedt; begge stoffer og forskellen står i almindelig skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor koger ethan-1,2-diol 119 °C højere end ethanol?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Ethanol",
+        "opgave": "3 Find H'et",
+        "fil": "js/data.js",
+        "linje": 153,
+        "nu_alm": "Et ethanolmolekyle har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H-atom i luppen.",
+        "nu_fed": "",
+        "problem": "Ingen halvfed sætning, og instruktionen \"sådan et H-atom\" peger tilbage på en lang sætning med \", men\".",
+        "nyt_alm": "Et ethanolmolekyle har seks H-atomer. (efter spørgsmålet:) Klik på det i luppen, og tryk Indsend svar.",
+        "nyt_fed": "Hvilket H-atom i ethanol kan danne hydrogenbindinger?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Ethanol",
+        "billede": "skud/a/sb3.2_intermolekylaere_bindinger__0.png",
+        "dom": "fint",
+        "fremme": "kortet med opgave 1, varmeblok med reagensglas, stor lup med ethanolmolekyler (hydrogen- og londonbindinger tegnet) og skiltet Væske, kassen Sådan læses luppen, termometer med greb",
+        "bruges": "termometeret og skiltet under luppen (Væske/Koger)",
+        "forslag": [],
+        "andet": "Kassen Sådan læses luppen bruges først i opgave 2 og 3 og kunne dukke op dér, men den er lille og rolig.",
+        "gevinst": "Lille; opgaven er én tydelig handling med termometeret.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Sammenlign",
+        "billede": "skud/a/sb3.2_intermolekylaere_bindinger__1.png",
+        "dom": "fint",
+        "fremme": "gætkort med to svar, to lupper med navne og molarmasser, to små varmeblokke, termometer; i panelet forklaring, tom graf og parlisten",
+        "bruges": "navnene og molarmasserne over lupperne (gættet)",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Et gæt med to stoffer side om side er roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Rangér",
+        "billede": "skud/a/sb3.2_intermolekylaere_bindinger__2.png",
+        "dom": "fint",
+        "fremme": "kortet, tavlen med tre stofkort og pilen lavest/højest kogepunkt",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Opgave 1 (Find ethanols kogepunkt) har ingen halvfed sætning; den er en ren instruktion og fungerer. \"Vælg alle, der passer\" står efter spørgsmålet i opgave 2 (det accepterede mønster)."
+  },
+  {
+    "mappe": "sb3.3_isomerjagten",
+    "titel": "Isomerjagten",
+    "sprog": [
+      {
+        "fane": "(ingen faner)",
+        "opgave": "Kogepunkterne i jagter med \"hoejest\" (fx C4H10O)",
+        "fil": "js/sim_jagt.js",
+        "linje": 346,
+        "nu_alm": "Alle syv isomerer er fundet. (efter spørgsmålet:) Klik på den på tavlen, og tryk Indsend svar.",
+        "nu_fed": "Hvilken har det højeste kogepunkt?",
+        "problem": "\"Hvilken\" har intet navneord, så det halvfede alene siger ikke, at der vælges mellem isomererne på tavlen.",
+        "nyt_alm": "Alle syv isomerer er fundet. (efter spørgsmålet:) Klik på den, og tryk Indsend svar.",
+        "nyt_fed": "Hvilken af de syv isomerer på tavlen har det højeste kogepunkt?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "(ingen faner)",
+        "billede": "skud/a/sb3.3_isomerjagten__0.png",
+        "dom": "fint",
+        "fremme": "kortet med formlen C5H12 og opgaven, tavlen med ét C-atom og \"træk\", værktøjslinjen; i panelet jagterne, isomeri-quizzen og en tom hylde",
+        "bruges": "tavlen og formlen",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Jagtteksterne er instruktioner uden halvfed sætning; det passer til en tegneopgave. Quizspørgsmålet \"Pentan er ny. Hvilken slags isomerer er pentan og 2-methylbutan?\" kan stå alene."
+  },
+  {
+    "mappe": "sb3.4_geometrisk_isomeri",
+    "titel": "Geometrisk isomeri",
+    "sprog": [
+      {
+        "fane": "1 Dobbeltbindingen",
+        "opgave": "2 But-2-en",
+        "fil": "js/data.js",
+        "linje": 62,
+        "nu_alm": "Træk den højre CH₃-gruppe i but-2-en op på samme side som den venstre CH₃-gruppe.",
+        "nu_fed": "Kan CH₃-gruppen komme derop?",
+        "nu_svar": ["Ja, CH₃ kan drejes op", "Nej, CH₃ fjedrer tilbage"],
+        "problem": "\"CH₃-gruppen\" og \"derop\" peger tilbage; det halvfede siger hverken hvilken CH₃, hvilket molekyle eller hvorhen.",
+        "nyt_alm": "Træk i den højre CH₃-gruppe i but-2-en.",
+        "nyt_fed": "Kan den højre CH₃-gruppe i but-2-en drejes op på samme side som den venstre?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Dobbeltbindingen",
+        "billede": "skud/a/sb3.4_geometrisk_isomeri__0.png",
+        "dom": "fint",
+        "fremme": "kortet og ét butanmolekyle som kuglemodel med en stiplet pil",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Cis eller trans?",
+        "billede": "skud/a/sb3.4_geometrisk_isomeri__1.png",
+        "dom": "fint",
+        "fremme": "kortet med Start spillet, tom tavle med skiltet; i panelet emnevalg, point og rang",
+        "bruges": "Start spillet",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 E og Z (ekstra)",
+        "billede": "skud/a/sb3.4_geometrisk_isomeri__2.png",
+        "dom": "fint",
+        "fremme": "kortet (trin 1 af 3), tavlen med ét molekyle; i panelet atomnumrene og opgavelisten",
+        "bruges": "molekylet og atomnumrene",
+        "forslag": [],
+        "andet": "Fanen er allerede stilladseret i tre trin.",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  },
+  {
+    "mappe": "sb3.5_spejlbilledeisomeri",
+    "titel": "Spejlbilledeisomeri",
+    "sprog": [
+      {
+        "fane": "1 Spejlbilledet",
+        "opgave": "3 Bromchlorfluormethan (byt to grupper)",
+        "fil": "js/sim_spejl.js",
+        "linje": 80,
+        "nu_alm": "Til venstre står bromchlorfluormethan. Klik på to af grupperne til venstre, så de bytter plads.",
+        "nu_fed": "Kan molekylet så drejes, så det passer med spejlbilledet?",
+        "nu_svar": ["Det kan ikke lade sig gøre"],
+        "problem": "\"så\" peger tilbage på byttet, og spørgsmålet står fremme, før eleven har byttet, så det inviterer til at svare uden at bytte.",
+        "nyt_alm": "Til venstre står bromchlorfluormethan. Klik på to af grupperne til venstre, så de bytter plads.",
+        "nyt_fed": "Kan molekylet med de to byttede grupper drejes, så det passer med spejlbilledet?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 R eller S",
+        "opgave": "Alle opgaver, trin 1 og 2",
+        "fil": "js/sim_rs.js",
+        "linje": 112,
+        "nu_alm": "(efter spørgsmålet:) Klik på den gruppe, der har højest prioritet, og tryk Indsend svar. Den får nummer 1.",
+        "nu_fed": "Er molekylet (R)- eller (S)-bromchlorfluormethan?",
+        "problem": "Det halvfede er slutspørgsmålet, men i trin 1 og 2 skal eleven klikke grupper og dreje; R- og S-knapperne kommer først i trin 3, så den svage elev læser et spørgsmål, der ikke kan besvares endnu.",
+        "nyt_alm": "(efter spørgsmålet:) Klik på gruppen i modellen, og tryk Indsend svar. Den får nummer 1.",
+        "nyt_fed": "Hvilken gruppe på bromchlorfluormethan har højest prioritet?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Spejlbilledet",
+        "billede": "skud/a/sb3.5_spejlbilledeisomeri__0.png",
+        "dom": "fint",
+        "fremme": "kortet med én svarknap, molekylet og spejlbilledet som kuglemodeller, spejlet",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Find C-atomet",
+        "billede": "skud/a/sb3.5_spejlbilledeisomeri__1.png",
+        "dom": "fint",
+        "fremme": "kortet med Vis alle H og Intet asymmetrisk C-atom, tavlen med én zigzagformel",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 R eller S",
+        "billede": "skud/a/sb3.5_spejlbilledeisomeri__2.png",
+        "dom": "fint",
+        "fremme": "kortet (trin 1 af 3), ét molekyle som kuglemodel; i panelet atomnumrene",
+        "bruges": "molekylet og atomnumrene",
+        "forslag": [],
+        "andet": "Fanen har allerede trin; kun kortets halvfede spørgsmål skal følge trinnet (se sprog).",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "R eller S, de næste trin med samme greb: nummer 2-4 \"Hvilken gruppe på bromchlorfluormethan får prioritet nummer 2?\", drejningen som ren instruktion, og først i trin 3 \"Følg 1 → 2 → 3. Er molekylet (R)- eller (S)-bromchlorfluormethan?\". I startbilledet af bromchlorfluormethan står Br-kuglen næsten helt skjult bag F, så netop den gruppe, der skal klikkes først, kan næsten ikke ses uden at dreje."
+  },
+  {
+    "mappe": "sb4.1_organiske_navne",
+    "titel": "Navne på organiske stoffer",
+    "sprog": [
+      {
+        "fane": "1 Giv navnet",
+        "opgave": "Trin 1 Stammen (alle kædestoffer)",
+        "fil": "js/kemi.js",
+        "linje": 225,
+        "nu_alm": "Tæl carbonatomerne i den længste kæde, som OH-gruppen sidder på.",
+        "nu_fed": "Hvad er stammen?",
+        "nu_svar": ["methan", "ethan", "propan", "butan", "pentan", "hexan"],
+        "problem": "Det halvfede siger ikke, at stammen findes af den længste kæde i formlen; alt det står i almindelig skrift.",
+        "nyt_alm": "OH-gruppen skal sidde på kæden.",
+        "nyt_fed": "Hvilken stamme passer til den længste kæde i formlen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Giv navnet",
+        "opgave": "Ester, trin 2 Alkoholens del",
+        "fil": "js/kemi.js",
+        "linje": 327,
+        "nu_alm": "Den orange del sidder på det enkeltbundne oxygenatom og kommer fra alkoholen.",
+        "nu_fed": "Hvad hedder den?",
+        "nu_svar": ["methyl", "ethyl", "propyl", "butyl"],
+        "problem": "\"den\" peger tilbage; det halvfede alene siger ikke, at det er den orange alkoholdel.",
+        "nyt_alm": "Den orange del sidder på det enkeltbundne oxygenatom.",
+        "nyt_fed": "Hvad hedder den orange del fra alkoholen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Giv navnet",
+        "opgave": "Ester, trin 3 Syrens del",
+        "fil": "js/kemi.js",
+        "linje": 341,
+        "nu_alm": "Den grønne del har C=O og kommer fra syren. Carbonatomet i C=O tæller med.",
+        "nu_fed": "Hvad hedder den?",
+        "nu_svar": ["methanoat", "ethanoat", "propanoat", "butanoat"],
+        "problem": "\"den\" peger tilbage; det halvfede alene siger ikke, at det er den grønne syredel.",
+        "nyt_alm": "Carbonatomet i C=O tæller med.",
+        "nyt_fed": "Hvad hedder den grønne del fra syren?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Flere grupper",
+        "opgave": "Spørgsmålet efter et klik på en gruppe",
+        "fil": "js/sim_grupper.js",
+        "linje": 86,
+        "nu_alm": "Atomet med den gule ring sidder i en funktionel gruppe.",
+        "nu_fed": "Hvilken stofklasse giver gruppen?",
+        "nu_svar": ["Alkohol", "Aldehyd", "Keton", "Carboxylsyre", "Ester", "Amin"],
+        "problem": "\"gruppen\" peger tilbage, og stofferne har flere grupper; \"giver gruppen\" er en uklar vending.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken stofklasse hører den funktionelle gruppe med den gule ring til?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Giv navnet",
+        "opgave": "Amin, kæderne",
+        "fil": "js/kemi.js",
+        "linje": 361,
+        "nu_alm": "Tæl carbonatomerne i hver kæde på nitrogenatomet.",
+        "nu_fed": "Hvad hedder kæderne?",
+        "nu_svar": ["methyl", "ethyl", "propyl", "dimethyl"],
+        "problem": "\"kæderne\" siger ikke hvilke; at det er kæderne på nitrogenatomet, står kun i indledningen.",
+        "nyt_alm": "Tæl carbonatomerne i hver kæde.",
+        "nyt_fed": "Hvad hedder kæderne på nitrogenatomet?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Giv navnet",
+        "billede": "skud/a/sb4.1_organiske_navne__0.png",
+        "dom": "fint",
+        "fremme": "kortet (trin 1 af 2) med navnefelterne og seks stammeknapper, tavlen med én zigzagformel; i panelet stofklasserne og opgaverne",
+        "bruges": "formlen og navnefelterne",
+        "forslag": [],
+        "andet": "Fanen er allerede stilladseret: stamme, numre, endelse og forled hver for sig.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Tegn molekylet",
+        "billede": "skud/a/sb4.1_organiske_navne__1.png",
+        "dom": "fint",
+        "fremme": "kortet med navnet i farvede dele, tavlen med ét C-atom og værktøjerne",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Flere grupper",
+        "billede": "skud/a/sb4.1_organiske_navne__2.png",
+        "dom": "fint",
+        "fremme": "kortet og én zigzagformel",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Grænsen for hele trinteksten er 105 tegn (_selvtest.html); forslagene holder sig under. Ved aldehyd, keton og carboxylsyre bliver stammetrinnet \"Carbonatomet i C=O tæller med. Hvilken stamme passer til den længste kæde i formlen?\" (COOH ved syrerne)."
+  },
+  {
+    "mappe": "sb4.2_estersyntese",
+    "titel": "Estersyntese",
+    "sprog": [
+      {
+        "fane": "1 Kondensationen og 2 Forudsig esteren",
+        "opgave": "Navnet på esteren (alle reaktioner og opgaver)",
+        "fil": "js/sim_kond.js (samme tekst i js/sim_tegn.js linje 321)",
+        "linje": 147,
+        "nu_alm": "Esteren er dannet af ethansyre og ethanol.",
+        "nu_fed": "Hvad hedder esteren?",
+        "problem": "Det halvfede siger ikke, hvilken ester; syren og alkoholen står kun i indledningen.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad hedder esteren af ethansyre og ethanol?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Forudsig esteren",
+        "opgave": "Svær, baglæns: syren",
+        "fil": "js/sim_tegn.js",
+        "linje": 319,
+        "nu_alm": "Esteren på tavlen er dannet af en carboxylsyre og en alkohol.",
+        "nu_fed": "Hvad hedder carboxylsyren?",
+        "problem": "\"carboxylsyren\" peger tilbage; det halvfede siger ikke, at det er syren, esteren på tavlen er dannet af.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvilken carboxylsyre er esteren på tavlen dannet af?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Rens esteren",
+        "opgave": "4 Esteren",
+        "fil": "js/data.js",
+        "linje": 139,
+        "nu_alm": "Nu er kun esteren tilbage i det øverste lag. (efter spørgsmålet:) Vælg alle, der passer.",
+        "nu_fed": "Hvorfor ligger propylbutanoat øverst?",
+        "nu_svar": ["Den har intet H på oxygen", "Den har lavere densitet end vand", "Den har en ladning", "Den har en OH-gruppe"],
+        "problem": "Det ene rigtige svar (intet H på oxygen) forklarer, at esteren ikke blander sig med vandet, ikke at den ligger øverst, så spørgsmålet passer kun til halvdelen af facit.",
+        "nyt_alm": "Nu er kun esteren tilbage i det øverste lag. (efter spørgsmålet:) Vælg alle, der passer.",
+        "nyt_fed": "Hvorfor danner propylbutanoat et lag oven på vandet?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Kondensationen",
+        "opgave": "Alle tre reaktioner, første trin (vandet)",
+        "fil": "js/sim_kond.js",
+        "linje": 143,
+        "nu_alm": "Ethansyre og ethanol danner en ester, og der fraspaltes vand. Klik på de tre atomer, der bliver til vand, og tryk Indsend svar.",
+        "nu_fed": "",
+        "problem": "Animationens allerførste kort har ingen halvfed sætning, og sætning 1 har en påhængt \", og der fraspaltes vand\".",
+        "nyt_alm": "(efter spørgsmålet:) Klik på dem i formlerne, og tryk Indsend svar.",
+        "nyt_fed": "Hvilke tre atomer fraspaltes som vand, når ethansyre og ethanol danner en ester?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Forudsig esteren",
+        "opgave": "Svær, baglæns: alkoholen",
+        "fil": "js/sim_tegn.js",
+        "linje": 320,
+        "nu_alm": "Syredelen er grøn.",
+        "nu_fed": "Hvilken alkohol er esteren dannet af?",
+        "problem": "\"esteren\" siger ikke hvilken; tilføj \"på tavlen\" som i syretrinnet.",
+        "nyt_alm": "Syredelen er grøn.",
+        "nyt_fed": "Hvilken alkohol er esteren på tavlen dannet af?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Kondensationen",
+        "billede": "skud/a/sb4.2_estersyntese__0.png",
+        "dom": "fint",
+        "fremme": "kortet og to formler (ethansyre + ethanol) med navne",
+        "bruges": "alt",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Forudsig esteren",
+        "billede": "skud/a/sb4.2_estersyntese__1.png",
+        "dom": "fint",
+        "fremme": "kortet, tavlen med syre + alkohol → ?, et C-atom med \"træk\", værktøjer (C, O, =O, Zigzag/Alle atomer, Slet, Fortryd, Ryd); i panelet opgaverne og stammerne",
+        "bruges": "formlerne, tavlen og værktøjerne",
+        "forslag": [],
+        "andet": "Tegneopgaven er ét stort skridt, men fane 1 har netop vist kondensationen tre gange. Kan overvejes senere: første opgave begynder med syredelen tegnet på tavlen.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Rens esteren",
+        "billede": "skud/a/sb4.2_estersyntese__2.png",
+        "dom": "fint",
+        "fremme": "kortet med fire svar, skilletragten, luppen Blandingen fra kolben med otte formler; i panelet trinene og Om forsøget",
+        "bruges": "luppen med de fire stoffer",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Grænsen for kortteksten er 150 tegn (_selvtest.html). Rens trin 1: \"vandfasen\" findes ikke i billedet endnu (der er kun ét lag), men spørgsmålet kan stå alene. \"Vælg alle, der passer\" står efter spørgsmålet i trin 1 og 4."
+  },
+  {
+    "mappe": "sb4.4_oxidation_af_alkoholer",
+    "titel": "Oxidation af alkoholer",
+    "sprog": [
+      {
+        "fane": "2 Hvad dannes?",
+        "opgave": "Opgaver uden mild/kraftig (fx 2 propan-2-ol)",
+        "fil": "js/sim_produkt.js",
+        "linje": 188,
+        "nu_alm": "Propan-2-ol oxideres med dichromat. (efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nu_fed": "Hvad dannes?",
+        "problem": "Det halvfede nævner hverken alkoholen eller oxidationsmidlet.",
+        "nyt_alm": "(efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nyt_fed": "Hvad dannes, når propan-2-ol oxideres med dichromat?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Hvad dannes?",
+        "opgave": "Mild oxidation (1 propan-1-ol, 8 2-methylpropan-1-ol)",
+        "fil": "js/data.js (bygges i js/sim_produkt.js linje 187)",
+        "linje": 152,
+        "nu_alm": "Ved en mild oxidation med dichromat destilleres aldehydet fra, så snart det er dannet. (efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nu_fed": "Hvad bliver propan-1-ol til?",
+        "problem": "Betingelsen (mild oxidation) står kun i indledningen, og indledningen afslører samtidig svaret (\"aldehydet destilleres fra\").",
+        "nyt_alm": "Ved en mild oxidation destilleres produktet fra, så snart det er dannet. (efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nyt_fed": "Hvad bliver propan-1-ol til ved en mild oxidation med dichromat?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Hvad dannes?",
+        "opgave": "Kraftig oxidation (4 butan-1-ol, 10 3-methylbutan-1-ol)",
+        "fil": "js/data.js (bygges i js/sim_produkt.js linje 187)",
+        "linje": 153,
+        "nu_alm": "Ved en kraftig oxidation bruges permanganat i overskud. (efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nu_fed": "Hvad bliver butan-1-ol til?",
+        "problem": "Betingelsen (kraftig oxidation med permanganat) står kun i indledningen.",
+        "nyt_alm": "Ved en kraftig oxidation bruges permanganat i overskud. (efter spørgsmålet:) Klik på svaret på tavlen, og tryk Indsend svar.",
+        "nyt_fed": "Hvad bliver butan-1-ol til ved en kraftig oxidation med permanganat?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendte alkoholer",
+        "opgave": "1 Molekylet (hver alkohol)",
+        "fil": "js/sim_forsoeg.js",
+        "linje": 207,
+        "nu_alm": "Se på carbonatomet med OH-gruppen i 2-methylpropan-2-ol.",
+        "nu_fed": "Hvor mange hydrogenatomer sidder der på det?",
+        "nu_svar": ["0", "1", "2", "3"],
+        "problem": "\"det\" peger tilbage på carbonatomet; det halvfede alene siger ikke, hvilket atom eller hvilken alkohol.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvor mange hydrogenatomer sidder på carbonatomet med OH-gruppen i 2-methylpropan-2-ol?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Ukendte alkoholer",
+        "opgave": "Afstemning trin 1, carbonatomets oxidationstal",
+        "fil": "js/sim_forsoeg.js",
+        "linje": 287,
+        "nu_alm": "Oxidationstal. Carbonatomet med OH-gruppen har oxidationstallet 0 i propan-2-ol.",
+        "nu_fed": "Hvilket oxidationstal har det i propanon?",
+        "nu_svar": ["−I", "0", "+I", "+II", "+III"],
+        "problem": "\"det\" peger tilbage på carbonatomet i indledningen.",
+        "nyt_alm": "Oxidationstal. Carbonatomet med OH-gruppen har oxidationstallet 0 i propan-2-ol.",
+        "nyt_fed": "Hvilket oxidationstal har carbonatomet med C=O i propanon?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Oxidationstallet",
+        "billede": "skud/a/sb4.4_oxidation_af_alkoholer__0.png",
+        "dom": "lidt meget",
+        "fremme": "kortet med syv romertal som svar, ethanol med alle atomer og det markerede carbonatom, navn og \"oxidationstal: ?\"; i panelet alkoholerne, en tom trappe med oxidationstal og to kontakter (elektronpar, elektronegativitet)",
+        "bruges": "formlen og de syv svarknapper; metoden (H tæller −1, O tæller +1) findes kun i hintene og bag kontakterne",
+        "forslag": [
+          {
+            "alm": "Det markerede carbonatom i ethanol er bundet til to H-atomer.",
+            "fed": "Hvilket atom trækker elektronparret i en binding mellem C og H til sig?",
+            "svar": ["C", "H"],
+            "derefter": "Elektronparrene slås til (kontakten findes), parrene på de to C−H-bindinger glider over til C, og \"2 bindinger til H: −2\" dukker op ved formlen."
+          },
+          {
+            "alm": "Det markerede carbonatom er også bundet til oxygenatomet i OH-gruppen.",
+            "fed": "Hvilket atom trækker elektronparret i bindingen mellem C og O til sig?",
+            "svar": ["O", "C"],
+            "derefter": "Parret glider over til O, og \"1 binding til O: +1\" kommer på regnestykket ved formlen."
+          },
+          {
+            "alm": "Bindingen til det andet carbonatom tæller 0.",
+            "fed": "Hvad er oxidationstallet for det markerede carbonatom i ethanol?",
+            "svar": ["−I", "+I", "−II"],
+            "derefter": "Tallet står ved atomet, og ethanol får sin plads på trappen i panelet som nu. Derefter fortsætter serien med de syv romertal."
+          }
+        ],
+        "andet": "Kun første trin for ethanol stilladseres. Trappen i panelet kan stå tonet ned, til første tal er fundet.",
+        "gevinst": "Den svage elev får reglen for oxidationstallet bygget op i to små valg, før de syv romertal kommer, i stedet for at skulle hente den i hintene.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Hvad dannes?",
+        "billede": "skud/a/sb4.4_oxidation_af_alkoholer__1.png",
+        "dom": "fint",
+        "fremme": "kortet med tre typer, tavlen med alkoholen, reagensglasset, pilen og en stiplet ramme med ?; i panelet opgaverne og Det har du fundet",
+        "bruges": "alkoholen med det markerede carbonatom",
+        "forslag": [],
+        "andet": "Allerede stilladseret: først typen, så produktet; svarfeltet har sin plads sat af.",
+        "gevinst": "",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ukendte alkoholer",
+        "billede": "skud/a/sb4.4_oxidation_af_alkoholer__2.png",
+        "dom": "fint",
+        "fremme": "kortet med Udfør forsøget, tre tomme glas, tre formelkort; i panelet trinene og Om forsøget",
+        "bruges": "knappen og glassene",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3 Ladning: \"Hvor mange OH⁻ skal der stå til højre?\" kan stå alene, fordi skemaet står på tavlen. Svaret i fane 1 trin 3 bør have de forkerte svar, elever laver: byttet fortegn (+I) og glemt binding til O (−II)."
+  }
+]

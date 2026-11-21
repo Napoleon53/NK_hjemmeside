@@ -232,7 +232,7 @@
     /* Spoergsmaalet efter en TLC-plade. Hvilket svar der er rigtigt, afgoer
        js/sim.js ud fra pladen. */
     var TLC_SPM = {
-        tekst: "Se på TLC-pladen under UV-lampen. Er reaktionen færdig?",
+        tekst: "Er reaktionen færdig ifølge TLC-pladen under UV-lampen?",
         svar: [
             { t: "Ja: P har ingen plet ud for R." },
             { t: "Nej: P har stadig en plet ud for R." },

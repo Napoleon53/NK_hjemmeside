@@ -75,6 +75,18 @@
     P.o = function () { return D.OPGAVER[this.nr]; };
 
     /* ----- Listen i panelet ----------------------------------------------------- */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun de
+       loeste opgaver (ogsaa gemt i browseren) og den, eleven er ved, har titel. De kommende er et nummer
+       med en graa streg og kan ikke klikkes, til de er naaet: alle foer dem er
+       loest (Vis svaret taeller som loest), eller eleven har vaeret der. Start forfra laaser dem igen. */
+    P.aabenOpgave = function (i) {
+        var o = D.OPGAVER[i], s = this.status[i];
+        if (!o) return false;
+        if ((s && s.loest) || i === this.nr || (this.naaet && this.naaet[o.id])) return true;
+        for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+        return true;
+    };
+
     P.bygListe = function () {
         var mig = this;
         var liste = NK.el("t-liste");
@@ -86,8 +98,8 @@
             var k = document.createElement("button");
             k.type = "button";
             k.className = "opg-chip";
-            k.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" + NK.htmlPotens(o.titel) + '</span><i class="oc-m"></i>';
-            k.addEventListener("click", function () { mig.vaelg(i); });
+            k.innerHTML = '<span class="oc-f"><span class="oc-nr">' + (i + 1) + '</span><span class="oc-navn"></span></span><i class="oc-m"></i>';
+            k.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
             raekke.appendChild(k);
             mig.chips[i] = k;
         });
@@ -97,7 +109,13 @@
     P.visListe = function () {
         var mig = this;
         this.status.forEach(function (s, i) {
-            var c = mig.chips[i];
+            var c = mig.chips[i], aaben = mig.aabenOpgave(i);
+            var html = aaben ? NK.htmlPotens(D.OPGAVER[i].titel) : '<span class="hl-streg"></span>';
+            var nv = c.querySelector(".oc-navn");
+            if (nv.innerHTML !== html) nv.innerHTML = html;
+            c.disabled = !aaben;
+            c.classList.toggle("laast", !aaben);
+            if (aaben) c.removeAttribute("aria-label"); else c.setAttribute("aria-label", "Opgave " + (i + 1) + ", kommer senere");
             c.classList.toggle("valgt", i === mig.nr && mig.fase !== "slut");
             c.classList.toggle("loest", s.loest);
             c.classList.toggle("stjerne", s.stjerne);
@@ -109,6 +127,8 @@
     /* ----- Opgaven ----------------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[D.OPGAVER[i].id] = true;
         this.hjaelp = 0;
         this.forkerte = [];
         this.valgt = null;
@@ -251,6 +271,7 @@
 
     P.nulstil = function () {
         this.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+        this.naaet = {};
         this.gem();
         this.vaelg(0);
     };

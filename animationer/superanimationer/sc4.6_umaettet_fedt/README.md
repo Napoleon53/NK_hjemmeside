@@ -196,3 +196,7 @@ I menuen fra 12. nov. 2026: knap nr. 6 "Umættet fedt" i
 `til_panelet.js` (`data-panel="samling_alt.html" data-emne="c4.5"`). Den gamle
 fil ligger i `kemi-c-filer/arkiv/c4.7_fedtstoffer_additionsreaktioner_oldversion.html`.
 Kemibogens afsnit 4.6 kan få en Prøv selv-linje hertil.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).

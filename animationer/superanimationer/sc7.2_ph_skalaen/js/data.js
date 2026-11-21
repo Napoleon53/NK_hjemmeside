@@ -77,8 +77,14 @@
           ], rigtig: 3,
           hint: "Der er fem trin fra pH 7 til pH 2, og hvert trin ganger med 10: 10 · 10 · 10 · 10 · 10.",
           efter: "Fem trin: 10 · 10 · 10 · 10 · 10 = 100.000 gange så mange H₃O⁺ som i rent vand." },
-        { tekst: "Gå over på den basiske side til pH 12. Hvilken ion er der nu flest af i luppen?",
+        { tekst: "Træk pH-mærket over på den basiske side til pH 12.", spm: "Hvilken ion er der flest af i luppen ved pH 12?",
           start: 2, ph: 12,
+          valg: [
+              ["OH⁻", ""],
+              ["H₃O⁺", "Der er flest H₃O⁺ på den sure side under pH 7. Se, om der er flest røde eller blå prikker i luppen."],
+              ["Lige mange", "Der er kun lige mange H₃O⁺ og OH⁻ ved pH 7. Se på prikkerne i luppen ved pH 12."]
+          ], rigtig: 0,
+          spmHint: "De røde prikker i luppen er H₃O⁺, og de blå prikker er OH⁻.",
           hint: "Træk mærket helt over til 12. Luppen zoomer ud hen mod 7 og ind igen på den anden side.",
           efter: "OH⁻. Over pH 7 er der flest OH⁻, og luppen zoomer efter dem. Ved pH 12 er der 100.000 gange så mange OH⁻ som i rent vand." }
     ];
@@ -92,7 +98,7 @@
 
     D.FORTYND_MAAL = [
         { slags: "valg", serie: "syre", k: 1,
-          tekst: "Saltsyren har pH 1. Hvad bliver pH, når den fortyndes 10 gange?",
+          tekst: "Hvert nyt glas får 1 mL fra glasset før og 9 mL vand. Hvad bliver pH, når saltsyre med pH 1 fortyndes 10 gange?",
           valg: [
               ["pH 0,1", "pH 0,1 ville betyde, at saltsyren var blevet surere. Vand gør ikke en syre surere."],
               ["pH 1,1", "Ti gange mere vand giver ti gange færre H₃O⁺. Det er et helt trin."],
@@ -121,7 +127,7 @@
           hint: "Se på pH og luppen, når pH i glassene nærmer sig 7. Hvilken ion er der flest af?",
           efter: "Saltsyren bliver aldrig basisk. Vand har selv lige mange H₃O⁺ og OH⁻, så pH nærmer sig 7 uden at komme over." },
         { slags: "valg", serie: "base", k: 3,
-          tekst: "Natriumhydroxiden har pH 13. Hvad bliver pH, når den fortyndes 1.000 gange?",
+          tekst: "Hvad bliver pH, når natriumhydroxid med pH 13 fortyndes 1.000 gange?",
           valg: [
               ["pH 16", "Mere vand bringer pH tættere på 7. For en base går pH ned."],
               ["pH 13", "Der er 1.000 gange færre OH⁻ efter fortyndingen, og det ændrer pH."],

@@ -68,7 +68,7 @@
 
     /* Kortet: reaktionen i ord og opgaven */
     P.kortData = function () {
-        return { tekst: this.opg.o.tekst + " Skriv reaktionsbrøken for ligevægten." };
+        return { tekst: this.opg.o.tekst + " Hvad er reaktionsbrøken for ligevægten på tavlen?" };
     };
 
     P.trinLinje = function () {

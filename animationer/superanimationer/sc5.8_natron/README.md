@@ -268,3 +268,7 @@ med superanimationen"):
   som `c5.7_eksperiment_natron_oldversion.html`.
 * Navnet i `FEEDBACK_EMNER` i `animationer/samling_alt.html` er det samme
   som før ("Forsøg: Natron").
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).

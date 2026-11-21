@@ -75,6 +75,9 @@ På begge faner: en stjerne kun, når hele opgaven er klaret i første forsøg u
 svaret. Den gule hintknap giver to hint og så Vis svaret. Når kortet er grønt, er
 scenen låst (et klik får knappen videre til at blinke).
 
+**Låste titler (21. nov. 2026):** Listen på fane 1 låser formlerne op i takt: kun de løste molekyler og det, eleven er ved, har formel, og de kommende står som et nummer med en grå streg og kan ikke klikkes (`aabenOpgave` i `js/fane.js`).
+Fane 2 har kun numre og er uændret.
+
 ## Filer
 
 ```

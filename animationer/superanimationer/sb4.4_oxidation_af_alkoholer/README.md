@@ -307,3 +307,7 @@ grønt (`naesteSpm` i `js/sim_forsoeg.js`; boblen og den grønne linje i
 reaktionsfeltet har `stille`, så de ikke gentager forklaringen). Koefficient-
 felterne er låst, mens kortet venter.
 
+
+## Listerne låser titlerne op i takt (21. nov. 2026)
+
+Alkoholerne (fane 1) og trinene i forsøget (fane 3) viser kun titlen på de klarede og den, eleven er ved; de kommende står som et nummer med en grå streg, og en låst alkohol kan ikke klikkes (`aabenSerie` i `js/sim_oxtal.js`, `aabenTrin` i `js/sim_forsoeg.js`; har eleven gennemført en runde før, står alle trin). Fane 2 har kun numre under niveauerne og er uændret. Selvtesten: ALT OK (129 påstande).

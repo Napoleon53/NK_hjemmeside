@@ -107,6 +107,9 @@ historie og opgaven, beskeden (Ikke endnu, Hint 1 af 3, Afstemt), knappen
 opgavekortet i panelet er væk. Panelet har regnskabet, listen med
 reaktionerne og Start forfra.
 
+**Låste titler (21. nov. 2026):** Listen på fane 1 låser navnene op i takt: kun de løste reaktioner og den, eleven er ved, har navn, og de kommende står som et nummer med en grå streg og kan ikke klikkes (`aabenOpgave` i `js/fane.js`).
+Fane 2 har kun numre og er uændret.
+
 * På fane 1 ændrer + og − kun tallene. Indsend svar lader molekylerne
   reagere, og først da bedømmes reaktionen.
 * På fane 2 står felterne på tavlen. Enter i et felt gør det samme som

@@ -1,0 +1,692 @@
+[
+  {
+    "mappe": "sb6.2_titreringssimulator",
+    "titel": "Titreringssimulator",
+    "sprog": [
+      {
+        "fane": "4 Ukendt prøve",
+        "opgave": "Ukendt prøve (svag base; teksten bygges af kode med tal sat ind)",
+        "fil": "js/sim_ukendt.js",
+        "linje": 155,
+        "nu_alm": "Du har fået 20,0 mL af en ukendt svag base. I buretten står 0,1000 M HCl.",
+        "nu_fed": "Hvad er ækvivalensvolumenet, prøvens koncentration og pKs?",
+        "nu_svar": ["felterne i panelet: Ækvivalensvolumen (mL), Koncentration (M), pKs"],
+        "problem": "Ved en svag base står der ikke, at pKs er for den korresponderende syre BH⁺, så eleven kan regne pKb; tre størrelser spørges i én sætning.",
+        "nyt_alm": "Du har fået 20,0 mL af en ukendt svag base. I buretten står 0,1000 M HCl.",
+        "nyt_fed": "Hvad er ækvivalensvolumenet, basens koncentration og pKs for den korresponderende syre?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "4 Ukendt prøve",
+        "billede": "skud/a/sb6.2_titreringssimulator__3.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med tre spørgsmål i ét; stativ med buret, bægerglas, magnetomrører og pH-meter; tom graf (Din måling); i panelet pH-display, fem knapper til hanen og tre svarfelter.",
+        "bruges": "Alt bruges, men på én gang: eleven skal titrere, finde springet, regne koncentrationen og aflæse pKs, før der kommer nogen tilbagemelding.",
+        "forslag": [
+          { "alm": "Du har fået 20,0 mL af en ukendt svag syre. I buretten står 0,1000 M NaOH.", "fed": "Hvor på titrerkurven aflæser du ækvivalensvolumenet?", "svar": ["Midt i det lodrette spring", "Der, hvor pH er 7,00", "Der, hvor kurven begynder at stige"], "derefter": "Kortet beder eleven titrere forbi springet. Kun feltet Ækvivalensvolumen i panelet er åbent; de to andre står grå med navn." },
+          { "alm": "Ved ækvivalenspunktet har al syren reageret med NaOH i forholdet 1 : 1.", "fed": "Hvilket regnestykke giver stofmængden af syre i prøven?", "svar": ["0,1000 M · ækvivalensvolumenet", "0,1000 M · 20,0 mL", "ækvivalensvolumenet / 20,0 mL"], "derefter": "Feltet Koncentration åbnes, og eleven skriver prøvens koncentration." },
+          { "alm": "Prøven er en svag syre, så kurven har et fladt stykke før springet.", "fed": "Hvor på titrerkurven aflæser du syrens pKs?", "svar": ["pH ved det halve ækvivalensvolumen", "pH ved ækvivalenspunktet", "pH før den første dråbe"], "derefter": "Feltet pKs åbnes. Ved en stærk syre eller base springes trinnet over." }
+        ],
+        "andet": "Åbn felterne i panelet ét ad gangen, og lad spørgsmålet på kortet skifte med trinnet. Hintene findes allerede og passer til de tre trin.",
+        "gevinst": "Den svage elev får én størrelse ad gangen og lærer, hvor på kurven hvert tal står, i stedet for tre tal på én gang uden tilbagemelding.",
+        "prioritet": 2
+      }
+    ],
+    "bemaerk": "Fane 1-3 er værktøjer uden opgavekort og er ikke vurderet. Ved en svag syre bør spørgsmålet også præciseres: 'Hvad er ækvivalensvolumenet, syrens koncentration og syrens pKs?'. Under spørgsmålet står den grå linje 'Titrér prøven. Skriv svarene i felterne i panelet, og tryk Indsend svar.'"
+  },
+  {
+    "mappe": "sb6.5_ph_i_syrer_og_baser",
+    "titel": "pH i syrer og baser",
+    "sprog": [
+      {
+        "fane": "1 Skemaet",
+        "opgave": "Methansyre, trin 2 Hvad er x?",
+        "fil": "js/sim_skema.js",
+        "linje": 72,
+        "nu_alm": "Syren afgiver hydroner til vand, til der er ligevægt. Ændringen i koncentration er ukendt og kaldes x.",
+        "nu_fed": "Hvad angiver x?",
+        "nu_svar": ["Koncentrationen af syre, der har afgivet en hydron", "Syrens koncentration ved start", "Syrens koncentration ved ligevægt"],
+        "problem": "Alene er det et spørgsmål om et bogstav: Det siger ikke, at x står i skemaets række Ændring.",
+        "nyt_alm": "Ændringen i koncentration fra start til ligevægt er ukendt og kaldes x.",
+        "nyt_fed": "Hvad angiver x i rækken Ændring?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Baser og salte",
+        "opgave": "Ammoniak, trin Vejen",
+        "fil": "js/sim_base.js",
+        "linje": 57,
+        "nu_alm": "Ammoniak har pKb = 4,75.",
+        "nu_fed": "Hvilken fremgangsmåde giver pOH i opløsningen?",
+        "nu_svar": ["Stærk base: pOH = −log cb", "Middelstærk base: løs ligningen", "Svag base: genvejen"],
+        "problem": "'i opløsningen' siger ikke hvilken; fane 2 skriver stof og koncentration i spørgsmålet ('pH i 0,025 M salpetersyre').",
+        "nyt_alm": "Ammoniak har pKb = 4,75.",
+        "nyt_fed": "Hvilken fremgangsmåde giver pOH i 0,0500 M ammoniak?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Baser og salte",
+        "opgave": "Natriumethanoat, trin Basen",
+        "fil": "js/sim_base.js",
+        "linje": 69,
+        "nu_alm": "Natriumethanoat består af Na⁺ og CH₃COO⁻.",
+        "nu_fed": "Hvilken ion bestemmer pH i opløsningen?",
+        "nu_svar": ["Na⁺", "CH₃COO⁻", "Både Na⁺ og CH₃COO⁻"],
+        "problem": "'opløsningen' peger tilbage; spørgsmålet nævner ikke saltet.",
+        "nyt_alm": "Natriumethanoat består af Na⁺ og CH₃COO⁻.",
+        "nyt_fed": "Hvilken ion bestemmer pH i en opløsning af natriumethanoat?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Skemaet",
+        "billede": "skud/a/sb6.5_ph_i_syrer_og_baser__0.png",
+        "dom": "fint",
+        "fremme": "Kort med tre felter; reaktionsskema med skemaet Start, Ændring og Ligevægt; kolbe med etiket; lup med 100 molekyler; tre stiplede rammer (Ligningen, Løsningen, pH).",
+        "bruges": "Etiketten og rækken Start; luppen viser starten. Resten venter i stiplede rammer.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Fanen følger allerede mønstret fra sb2.6 med trin og stiplede rammer.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Vælg vejen",
+        "billede": "skud/a/sb6.5_ph_i_syrer_og_baser__1.png",
+        "dom": "fint",
+        "fremme": "Kort med tre svar; pKₛ-skala med HNO₃ markeret; kolbe med etiket; to rammer (Vejen, pH).",
+        "bruges": "Skalaen og etiketten.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt: én skala og ét valg.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Baser og salte",
+        "billede": "skud/a/sb6.5_ph_i_syrer_og_baser__2.png",
+        "dom": "fint",
+        "fremme": "Kort med ét felt; reaktionsskema; kolbe med etiket; tre rammer (Hydroxid, pOH, pH); pH-skala nederst.",
+        "bruges": "Reaktionsskemaet og etiketten.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede trin for trin.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Mange trin er instruktioner uden spørgsmål ('Skriv rækken Ændring med x.', 'Beregn pH i 0,025 M salpetersyre, og tryk Indsend svar.'), så kortet har intet halvfedt. De kunne stilles som spørgsmål ('Hvad er pH i 0,025 M salpetersyre?'), så øjet har noget at fange."
+  },
+  {
+    "mappe": "sb7.2_ringslutning",
+    "titel": "Ringslutning",
+    "sprog": [
+      {
+        "fane": "1 Ringen lukker sig",
+        "opgave": "Glucose, trin 1 Find oxygenatomet",
+        "fil": "js/data.js",
+        "linje": 46,
+        "nu_alm": "Glucose lukker sig til en ring med seks atomer. (efter spørgsmålet:) Klik på det, og tryk Indsend svar.",
+        "nu_fed": "Hvilket oxygenatom binder sig til carbonatom 1?",
+        "nu_svar": ["(klik på et atom i fischerprojektionen)"],
+        "problem": "Spørgsmålet siger ikke, at det handler om ringslutningen, og instruktionen står efter spørgsmålet på samme linje.",
+        "nyt_alm": "Ringen i glucose har seks atomer. Svar ved at klikke på et oxygenatom.",
+        "nyt_fed": "Hvilket oxygenatom binder sig til carbonatom 1, når glucose lukker sig til en ring?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Ringen lukker sig",
+        "opgave": "Fructose, trin 1 Find oxygenatomet",
+        "fil": "js/data.js",
+        "linje": 92,
+        "nu_alm": "Fructose har carbonylgruppen på carbonatom 2 og lukker sig til en ring med fem atomer. Klik på det oxygenatom, der binder sig til carbonatom 2.",
+        "nu_fed": "",
+        "nu_svar": ["(klik på et atom i fischerprojektionen)"],
+        "problem": "Kortet har intet spørgsmål og derfor intet halvfedt, mens samme trin for glucose har et.",
+        "nyt_alm": "Fructose har carbonylgruppen på carbonatom 2, og ringen har fem atomer.",
+        "nyt_fed": "Hvilket oxygenatom binder sig til carbonatom 2, når fructose lukker sig til en ring?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Ligevægten",
+        "opgave": "Trin 3 Dynamisk ligevægt",
+        "fil": "js/data.js",
+        "linje": 198,
+        "nu_alm": "Fordelingen mellem de tre former ændrer sig ikke mere.",
+        "nu_fed": "Hvad sker der stadig med molekylerne i vinduet?",
+        "nu_svar": ["Ringe åbner sig og lukker sig igen", "Intet, for reaktionen er stoppet", "α-glucose bliver kun til β-glucose"],
+        "problem": "'stadig' peger tilbage på indledningen; alene siger spørgsmålet ikke, at fordelingen står stille.",
+        "nyt_alm": "Tallene ved siden af vinduet ændrer sig ikke mere.",
+        "nyt_fed": "Hvad sker der med glucosemolekylerne i vinduet, når fordelingen står stille?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Ligevægten",
+        "opgave": "Trin 7 Ringene åbner sig",
+        "fil": "js/data.js",
+        "linje": 228,
+        "nu_alm": "Næsten alle molekylerne har reageret.",
+        "nu_fed": "Hvorfor kunne ringene også nå at reagere?",
+        "nu_svar": ["Ringene i vand åbner sig hele tiden kortvarigt", "Fehlings væske åbner selv ringene", "Ringene har også en aldehydgruppe"],
+        "problem": "'også' og 'nå at reagere' peger tilbage; spørgsmålet nævner hverken Fehlings væske eller at kun kæden kan reagere.",
+        "nyt_alm": "Næsten al glucosen har reageret, men kun den åbne kæde kan reagere med Fehlings væske.",
+        "nyt_fed": "Hvordan kunne glucosen i ringene nå at reagere med Fehlings væske?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Ringen lukker sig",
+        "billede": "skud/a/sb7.2_ringslutning__0.png",
+        "dom": "fint",
+        "fremme": "Kort; én fischerprojektion af glucose.",
+        "bruges": "Fischerprojektionen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt: én formel og ét klik.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Fra fischer til haworth",
+        "billede": "skud/a/sb7.2_ringslutning__1.png",
+        "dom": "fint",
+        "fremme": "Kort; én haworthformel med klikbare carbonatomer.",
+        "bruges": "Haworthformlen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Ligevægten",
+        "billede": "skud/a/sb7.2_ringslutning__2.png",
+        "dom": "fint",
+        "fremme": "Gæt med tre svar; vindue med 100 molekyler; tre søjler med antal.",
+        "bruges": "Gættet; vinduet og søjlerne viser starten (100 α-glucose).",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Et gæt med ét vindue er roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2's fem opgaver er instruktioner uden spørgsmål ('Tegn β-glucose som haworthformel. Klik over eller under ...') og har intet halvfedt."
+  },
+  {
+    "mappe": "sb7.3_polysaccharider",
+    "titel": "Polysaccharider",
+    "sprog": [
+      {
+        "fane": "1 Byg kæden",
+        "opgave": "Amylose, trin 1 Vælg glucosen",
+        "fil": "js/data.js",
+        "linje": 43,
+        "nu_alm": "Amylose i stivelse er en kæde med α-1,4-glykosidbindinger. (efter spørgsmålet:) Klik på den, og tryk Indsend svar.",
+        "nu_fed": "Hvilken glucose skal sættes på kæden?",
+        "nu_svar": ["(klik på α-glucose eller β-glucose på tavlen)"],
+        "problem": "'kæden' siger ikke, at det er amylose, og netop amylose (α-bindinger) afgør svaret; instruktionen står efter spørgsmålet.",
+        "nyt_alm": "Amylose i stivelse er en kæde med α-1,4-glykosidbindinger. Svar ved at klikke på en glucose.",
+        "nyt_fed": "Hvilken glucose skal sættes på amylosekæden?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Byg kæden",
+        "opgave": "Cellulose, trin 1 Vælg glucosen",
+        "fil": "js/data.js",
+        "linje": 79,
+        "nu_alm": "Træ og bomuld består hovedsageligt af cellulose. Cellulose er en kæde med β-1,4-glykosidbindinger.",
+        "nu_fed": "Hvilken glucose skal sættes på kæden?",
+        "nu_svar": ["(klik på α-glucose eller β-glucose på tavlen)"],
+        "problem": "Ordret det samme spørgsmål som ved amylose, men med det modsatte svar; det, der afgør svaret (cellulose, β), står kun i indledningen.",
+        "nyt_alm": "Træ og bomuld består hovedsageligt af cellulose. Cellulose er en kæde med β-1,4-glykosidbindinger.",
+        "nyt_fed": "Hvilken glucose skal sættes på cellulosekæden?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Spyt og iod",
+        "opgave": "Trin 6 Enzymet",
+        "fil": "js/data.js",
+        "linje": 221,
+        "nu_alm": "Amylase spaltede stivelsen til maltose, men ikke cellulosen.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Amylase passer kun til α-bindinger", "Cellulose har ingen glykosidbindinger", "Cellulose er ikke bygget af glucose"],
+        "problem": "Det halvfede er kun 'Hvorfor?'; alt, spørgsmålet handler om, står i indledningen.",
+        "nyt_alm": "Amylase spaltede stivelsen til maltose.",
+        "nyt_fed": "Hvorfor kunne amylase ikke spalte cellulosen i vattet?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Spyt og iod",
+        "opgave": "Trin 4 Gæt",
+        "fil": "js/data.js",
+        "linje": 210,
+        "nu_alm": "Spyt indeholder enzymet amylase. Spyt dryppes på kogt stivelse og på vat, og prøverne står i 10 minutter ved 37 °C.",
+        "nu_fed": "Hvad spalter amylase?",
+        "nu_svar": ["Kun stivelsen", "Kun vattet", "Begge prøver"],
+        "problem": "Alene lyder det som et paratvidensspørgsmål om amylase, men svarene handler om de to prøver.",
+        "nyt_alm": "Spyt med enzymet amylase dryppes på kogt stivelse og på vat. Prøverne står i 10 minutter ved 37 °C.",
+        "nyt_fed": "Spalter amylase den kogte stivelse, vattet eller begge?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Byg kæden",
+        "billede": "skud/a/sb7.3_polysaccharider__0.png",
+        "dom": "fint",
+        "fremme": "Kort; kæde med tre glucoseenheder; to valgkort (α-glucose og β-glucose); tæller for enheder og vand.",
+        "bruges": "Kæden og de to valgkort.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt: én kæde og to valg.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Forgreninger",
+        "billede": "skud/a/sb7.3_polysaccharider__1.png",
+        "dom": "fint",
+        "fremme": "Kort med tre svar; ét stykke amylopectin med forgreningen markeret.",
+        "bruges": "Figuren og den gule ramme.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Spyt og iod",
+        "billede": "skud/a/sb7.3_polysaccharider__2.png",
+        "dom": "fint",
+        "fremme": "Gæt med tre svar; kartoffel og vat; to lupper; lille forklaring til lupperne.",
+        "bruges": "Kartoflen, vattet og lupperne.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Et gæt med to prøver er roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "To trin på fane 1 har instruktionen 'Klik på den/dem, og tryk Indsend svar.' efter spørgsmålet (også trinnet med de to OH-grupper). Små: 'Hvilken prøve bliver blåsort?' (fane 3, trin 1) siger ikke 'af iodopløsningen'."
+  },
+  {
+    "mappe": "sb7.7_aminosyrer",
+    "titel": "Aminosyrer",
+    "sprog": [
+      {
+        "fane": "1 Tre former",
+        "opgave": "Trin 1 Amfoionen (spørgsmålet efter træk-opgaven)",
+        "fil": "js/data.js",
+        "linje": 119,
+        "nu_alm": "",
+        "nu_fed": "Hvilken samlet ladning har den ion, der er dannet?",
+        "nu_svar": ["+1", "0", "−1"],
+        "problem": "'den ion, der er dannet' peger tilbage på træk-opgaven, som er væk fra kortet; spørgsmålet nævner hverken valin eller hydronens nye plads.",
+        "nyt_alm": "Hydronen er flyttet fra carboxylgruppen til aminogruppen i valin.",
+        "nyt_fed": "Hvilken samlet ladning har valin, når hydronen sidder på aminogruppen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Tre former",
+        "opgave": "Trin 2 Sur opløsning",
+        "fil": "js/data.js",
+        "linje": 129,
+        "nu_alm": "Der tilsættes saltsyre til opløsningen, så pH falder til 1. (efter spørgsmålet:) Klik på den, og tryk Indsend svar.",
+        "nu_fed": "Hvilken gruppe optager en hydron?",
+        "nu_svar": ["(klik på en gruppe i valin)"],
+        "problem": "Betingelsen pH 1 står kun i indledningen, og instruktionen kommer efter spørgsmålet; trin 3 har betingelsen i det halvfede.",
+        "nyt_alm": "Der tilsættes saltsyre til opløsningen af valin. Svar ved at klikke på en gruppe.",
+        "nyt_fed": "Hvilken gruppe i valin optager en hydron, når pH falder til 1?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Det elektriske felt",
+        "opgave": "Trin 2 Minuspolen",
+        "fil": "js/data.js",
+        "linje": 225,
+        "nu_alm": "Formlerne viser ladningerne ved pH 6.",
+        "nu_fed": "Hvilken aminosyre vandrer mod minuspolen, når strømmen sluttes?",
+        "nu_svar": ["Asparaginsyre", "Valin", "Lysin"],
+        "problem": "pH 6 står kun i indledningen, og ved pH 1 er svaret et andet.",
+        "nyt_alm": "Formlerne viser ladningerne ved pH 6.",
+        "nyt_fed": "Hvilken aminosyre vandrer mod minuspolen ved pH 6, når strømmen sluttes?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Tre former",
+        "billede": "skud/a/sb7.7_aminosyrer__0.png",
+        "dom": "fint",
+        "fremme": "Kort; valins formel med det orange H; låst pH-skyder på pH 7.",
+        "bruges": "Formlen; skyderen viser pH.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt: én formel og ét træk.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Fordelingsdiagrammet",
+        "billede": "skud/a/sb7.7_aminosyrer__1.png",
+        "dom": "fint",
+        "fremme": "Kort; vindue med 20 valinmolekyler og tre tal; tomt diagram; pH-skyder.",
+        "bruges": "Alt: eleven trækker skyderen og ser diagrammet blive tegnet.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Alt på skærmen bruges i første trin.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Det elektriske felt",
+        "billede": "skud/a/sb7.7_aminosyrer__2.png",
+        "dom": "lidt meget",
+        "fremme": "Kort; tre formelkort med syv stiplede grupper at klikke på; papirstrimmel med minuspol, pluspol og tre pletter; låst pH-skyder.",
+        "bruges": "Kun de tre formler; strimlen bruges først i trin 2-3. Eleven skal rette syv grupper i tre formler, før der kommer en tilbagemelding.",
+        "forslag": [
+          { "alm": "Papiret er fugtet med en opløsning med pH 6. Valin har en upolær sidekæde.", "fed": "Hvilken form har valin ved pH 6?", "svar": ["Amfoion med −NH₃⁺ og −COO⁻", "Syreform med −NH₃⁺ og −COOH", "Uladet med −NH₂ og −COOH"], "derefter": "Valins formel skifter til amfoionen med samlet ladning 0." },
+          { "alm": "Asparaginsyre har en ekstra carboxylgruppe i sidekæden.", "fed": "Hvilken samlet ladning har asparaginsyre ved pH 6?", "svar": ["−1", "0", "−2"], "derefter": "Asparaginsyres formel skifter, og −1 står under den." },
+          { "alm": "Lysin har en ekstra aminogruppe i sidekæden.", "fed": "Hvilken samlet ladning har lysin ved pH 6?", "svar": ["+1", "0", "+2"], "derefter": "Lysins formel skifter, og strimlen med minuspol og pluspol dukker op." }
+        ],
+        "andet": "Mindste udgave: Behold klik-opgaven, men én aminosyre ad gangen (valin først, som eleven kender fra fane 1), og vis strimlen som en stiplet ramme 'papiret mellem minuspol og pluspol' til trin 2.",
+        "gevinst": "Valin, som eleven kender, kommer først, og sidekæderne kommer én ad gangen i stedet for syv klik i tre formler.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2, trin Find pKₛ, har instruktionen 'Træk skyderen dertil, og tryk Indsend svar.' efter spørgsmålet. Fane 3, trin Sidekæderne: 'Klik på ?, til grupperne passer ...' har et spørgsmålstegn midt i instruktionen; 'Klik på spørgsmålstegnene' er lettere at læse."
+  },
+  {
+    "mappe": "sb7.8_proteiner",
+    "titel": "Proteiner",
+    "sprog": [
+      {
+        "fane": "3 Denaturering og hydrolyse",
+        "opgave": "Trin 1 Varme (spørgsmålet efter forsøget)",
+        "fil": "js/data.js",
+        "linje": 205,
+        "nu_alm": "Proteinet er denatureret. (efter spørgsmålet:) Vælg alle, der passer, og tryk Indsend svar.",
+        "nu_fed": "Hvilke bindinger er brudt?",
+        "nu_svar": ["Hydrogenbindingerne", "Ionbindingen", "Peptidbindingerne", "Disulfidbroen"],
+        "problem": "Spørgsmålet siger ikke i hvad eller af hvad (proteinet i æggehviden, ved opvarmning), og instruktionen står efter spørgsmålet.",
+        "nyt_alm": "Æggehviden er varmet op, og proteinet er denatureret. Vælg alle, der passer.",
+        "nyt_fed": "Hvilke bindinger i proteinet blev brudt ved opvarmningen?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Denaturering og hydrolyse",
+        "opgave": "Trin 2 pH, udgaven ved lav pH",
+        "fil": "js/data.js",
+        "linje": 220,
+        "nu_alm": "Ved lav pH forsvandt ionbindingen.",
+        "nu_fed": "Hvad skete der med asparaginsyre og lysin i ionbindingen?",
+        "nu_svar": ["−COO⁻ optog en hydron", "−NH₃⁺ afgav en hydron", "Peptidbindingen blev spaltet"],
+        "problem": "Det halvfede er ordret det samme ved lav og høj pH, men det rigtige svar er forskelligt; pH står kun i indledningen.",
+        "nyt_alm": "Ionbindingen mellem asparaginsyre og lysin forsvandt.",
+        "nyt_fed": "Hvad skete der med asparaginsyre og lysin, da pH blev sænket?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Denaturering og hydrolyse",
+        "opgave": "Trin 2 pH, udgaven ved høj pH",
+        "fil": "js/data.js",
+        "linje": 227,
+        "nu_alm": "Ved høj pH forsvandt ionbindingen.",
+        "nu_fed": "Hvad skete der med asparaginsyre og lysin i ionbindingen?",
+        "nu_svar": ["−COO⁻ optog en hydron", "−NH₃⁺ afgav en hydron", "Peptidbindingen blev spaltet"],
+        "problem": "Samme halvfede spørgsmål som ved lav pH med et andet rigtigt svar; betingelsen står kun i indledningen.",
+        "nyt_alm": "Ionbindingen mellem asparaginsyre og lysin forsvandt.",
+        "nyt_fed": "Hvad skete der med asparaginsyre og lysin, da pH blev hævet?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Peptidbindingen",
+        "billede": "skud/a/sb7.8_proteiner__0.png",
+        "dom": "fint",
+        "fremme": "Kort; alanin og glycin med de to reagerende grupper markeret.",
+        "bruges": "Begge formler.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Foldningen",
+        "billede": "skud/a/sb7.8_proteiner__1.png",
+        "dom": "fint",
+        "fremme": "Kort; to stykker peptidkæde over for hinanden.",
+        "bruges": "Begge kæder.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Denaturering og hydrolyse",
+        "billede": "skud/a/sb7.8_proteiner__2.png",
+        "dom": "fint",
+        "fremme": "Kort; reagensglas med æggehvide; stor lup med α-helix, β-foldeblad og fire bindinger mellem sidekæderne; temperaturskyder.",
+        "bruges": "Skyderen og luppen; luppen er travl, men det hele er det, der ændrer sig ved opvarmningen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Første opgave er ét træk i skyderen, og luppen er bygget op på fane 2.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2, Kvaternær struktur: 'de fire kæder' i det halvfede peger tilbage på hæmoglobin, men svarene gør det klart. Mange trin på fane 1-3 er instruktioner uden spørgsmål og har intet halvfedt."
+  },
+  {
+    "mappe": "sb8.4_log_p_og_log_d",
+    "titel": "Log P og log D",
+    "sprog": [
+      {
+        "fane": "1 Log P",
+        "opgave": "Trin 4 Glucose eller ibuprofen",
+        "fil": "js/data.js",
+        "linje": 137,
+        "nu_alm": "Glucose har fem OH-grupper. Ibuprofen har en benzenring og to carbonkæder.",
+        "nu_fed": "Hvilket af de to stoffer er X?",
+        "nu_svar": ["glucose", "ibuprofen"],
+        "problem": "'de to stoffer' peger tilbage; spørgsmålet kan stilles direkte med navnene.",
+        "nyt_alm": "Glucose har fem OH-grupper. Ibuprofen har en benzenring og to carbonkæder.",
+        "nyt_fed": "Er stof X glucose eller ibuprofen?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Log D og pH",
+        "opgave": "Trin 1 Den uladede form",
+        "fil": "js/data.js",
+        "linje": 188,
+        "nu_alm": "Acetylsalicylsyre, HA, kan afgive en hydron og blive til ionen A⁻. Se på strukturformlerne under luppen.",
+        "nu_fed": "Hvilken form går over i octan-1-ol?",
+        "nu_svar": ["HA, den uladede syre", "A⁻, den negative ion", "begge former"],
+        "problem": "'Hvilken form' siger ikke, af hvilket stof.",
+        "nyt_alm": "Acetylsalicylsyre, HA, kan afgive en hydron og blive til ionen A⁻. Se på strukturformlerne under luppen.",
+        "nyt_fed": "Hvilken form af acetylsalicylsyre går over i octan-1-ol?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Log D og pH",
+        "opgave": "Trin 5 Kurven falder",
+        "fil": "js/data.js",
+        "linje": 220,
+        "nu_alm": "Ved pH over pKₛ = 3,5 er kurven en ret linje.",
+        "nu_fed": "Hvor meget falder log D, når pH stiger med 1?",
+        "nu_svar": ["0,1", "1", "3,5", "10"],
+        "problem": "Svaret gælder kun over pKₛ, men det står kun i indledningen; ved lav pH falder log D næsten ikke.",
+        "nyt_alm": "Over pKₛ = 3,5 er kurven for acetylsalicylsyre en ret linje.",
+        "nyt_fed": "Hvor meget falder log D, når pH stiger med 1 på den rette del af kurven?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Log P",
+        "billede": "skud/a/sb8.4_log_p_og_log_d__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort; skilletragt i stativ; lup med 20 molekyler; kort med paracetamols strukturformel; kassen Fordelingskonstanten med brøken for Kꜰ og log P = log Kꜰ.",
+        "bruges": "Skilletragten og luppen. Kassen med formlerne bruges først i trin 2-3 og giver svaret på definitionen, før eleven er spurgt; strukturformlen bruges først i forklaringen til trin 3.",
+        "forslag": [
+          { "alm": "Paracetamol har fordelt sig mellem octan-1-ol og vand.", "fed": "Hvilken brøk er fordelingskonstanten Kꜰ for paracetamol?", "svar": ["[stof i octanol] / [stof i vand]", "[stof i vand] / [stof i octanol]", "[stof i octanol] / [stof i alt]"], "derefter": "Brøken dukker op i kassen Fordelingskonstanten, der indtil da er en stiplet ramme med navnet." },
+          { "alm": "Luppen viser lige store rumfang af de to lag, så antallet af molekyler kan bruges.", "fed": "Hvad er Kꜰ for paracetamol ifølge luppen?", "svar": ["3,0", "0,33", "15"], "derefter": "Feltet er som nu (fejlteksterne til 0,33 og 15 findes). 15 / 5 = 3,0 står i kassen, og linjen log P = log Kꜰ dukker op." },
+          { "alm": "Kꜰ for paracetamol er 3,0.", "fed": "Hvad er log P for paracetamol?", "svar": ["0,48", "3,0", "1,10"], "derefter": "Strukturformlen af paracetamol dukker op til højre, og forklaringen peger på OH-gruppen og benzenringen." }
+        ],
+        "andet": "Fold kassen Fordelingskonstanten og strukturformlen ind, til de bruges (stiplede rammer med navn), som reaktionsbrøken i sb2.6.",
+        "gevinst": "Eleven tager selv stilling til brøken, før den står på tavlen, og ser kun skilletragten og luppen ved starten.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Log D og pH",
+        "billede": "skud/a/sb8.4_log_p_og_log_d__1.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med tre svar; skilletragt; lup med HA-molekyler; ramme med strukturformlerne HA og A⁻; tomt diagram for log D med én prik; pH-skyder.",
+        "bruges": "Luppen og strukturformlerne. Diagrammet og skyderen bruges først i trin 2.",
+        "forslag": [],
+        "andet": "Vis diagrammet og pH-skyderen som en stiplet ramme 'kurven for log D' til trin 2 (Tegn kurven).",
+        "gevinst": "Første spørgsmål handler kun om luppen og formlerne, og det store tomme diagram trækker ikke blikket.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Syre eller base",
+        "billede": "skud/a/sb8.4_log_p_og_log_d__2.png",
+        "dom": "fint",
+        "fremme": "Kort; skilletragt; lup med BH⁺; strukturformler for BH⁺ og B; diagram med kurven for acetylsalicylsyre; pH-skyder.",
+        "bruges": "Alt: eleven trækker skyderen og ser kurven for basen ved siden af syrens.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Opbygningen er kendt fra fane 2.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 3, trin Lidocain, har både en instruktion ('Træk pH-skyderen fra 0 til 14.') og et spørgsmål på samme kort."
+  },
+  {
+    "mappe": "sb8.6_tlc",
+    "titel": "TLC",
+    "sprog": [
+      {
+        "fane": "1 Tovtrækningen",
+        "opgave": "Ren heptan, gæt",
+        "fil": "js/data.js",
+        "linje": 145,
+        "nu_alm": "Karret fyldes med ren heptan i stedet for 7 : 3. Heptan er upolær.",
+        "nu_fed": "Hvor ender pletterne fra spinat?",
+        "nu_svar": ["Alle løber længere end før", "Caroten løber, resten bliver nede", "Alle bliver på startlinjen"],
+        "problem": "Det halvfede er ordret det samme ved heptan og propanon; løbevæsken, som afgør svaret, står kun i indledningen.",
+        "nyt_alm": "Karret fyldes med ren heptan i stedet for 7 : 3. Heptan er upolær.",
+        "nyt_fed": "Hvor ender pletterne fra spinat i ren heptan?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Tovtrækningen",
+        "opgave": "Ren propanon, gæt",
+        "fil": "js/data.js",
+        "linje": 164,
+        "nu_alm": "Karret fyldes med ren propanon. Propanon er mere polær end heptan.",
+        "nu_fed": "Hvor ender pletterne fra spinat?",
+        "nu_svar": ["Alle løber næsten op til fronten", "De løber som med 7 : 3", "Alle bliver på startlinjen"],
+        "problem": "Samme halvfede spørgsmål som ved heptan, men med det modsatte svar.",
+        "nyt_alm": "Karret fyldes med ren propanon. Propanon er mere polær end heptan.",
+        "nyt_fed": "Hvor ender pletterne fra spinat i ren propanon?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Tovtrækningen",
+        "opgave": "Spinat på pladen, gæt",
+        "fil": "js/data.js",
+        "linje": 96,
+        "nu_alm": "På TLC-pladen er der en plet af gulerod og en plet af grønt spinatudtræk. Løbevæsken er heptan og propanon (7 : 3).",
+        "nu_fed": "Hvad sker der med den grønne plet fra spinat?",
+        "nu_svar": ["Den løber op som én grøn plet", "Den deles i flere farvede pletter", "Den bliver på startlinjen"],
+        "problem": "Spørgsmålet siger ikke hvornår (når pladen står i løbevæsken).",
+        "nyt_alm": "På TLC-pladen er der en plet af gulerod og en plet af grønt spinatudtræk. Løbevæsken er heptan og propanon (7 : 3).",
+        "nyt_fed": "Hvad sker der med spinatpletten, når pladen står i karret?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Rf-værdien",
+        "opgave": "Kan det være en Rf-værdi?, spørgsmål 2",
+        "fil": "js/data.js",
+        "linje": 330,
+        "nu_alm": "En elev regner Rf-værdien for en plet ud til 2,6.",
+        "nu_fed": "Hvad har eleven gjort forkert?",
+        "nu_svar": ["Byttet om på de to afstande", "Målt fra pladens kant", "Glemt enheden"],
+        "problem": "'eleven' og tallet 2,6, som afgør svaret, står kun i indledningen.",
+        "nyt_alm": "En elev regner Rf-værdien for en plet ud til 2,6.",
+        "nyt_fed": "Hvilken fejl giver en Rf-værdi på 2,6?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Læs pladen",
+        "opgave": "Hovedpinetabletten, spørgsmål 1",
+        "fil": "js/data.js",
+        "linje": 387,
+        "nu_alm": "TLC-pladen er tør, men der ses ingen pletter.",
+        "nu_fed": "Hvad skal du gøre?",
+        "nu_svar": ["Se på pladen i UV-lys", "Køre pladen en gang til", "Sætte større pletter"],
+        "problem": "Det halvfede siger intet om, hvad problemet er; alt står i indledningen.",
+        "nyt_alm": "TLC-pladen er tør, men der ses ingen pletter.",
+        "nyt_fed": "Hvordan kan du se pletterne på den tørre TLC-plade?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Læs pladen",
+        "opgave": "Er produktet rent?, spørgsmål 2",
+        "fil": "js/data.js",
+        "linje": 447,
+        "nu_alm": "Bane 4 er produktet, efter det er renset ved omkrystallisation.",
+        "nu_fed": "Hvad viser bane 4?",
+        "nu_svar": ["Produktet er rent nu", "Produktet er stadig urent", "Paracetamol er forsvundet"],
+        "problem": "'Hvad viser bane 4?' siger ikke, at spørgsmålet handler om det rensede produkt.",
+        "nyt_alm": "Bane 4 er produktet efter omkrystallisation.",
+        "nyt_fed": "Hvad viser bane 4 om det rensede produkt?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Læs pladen",
+        "opgave": "Er reaktionen færdig?, spørgsmål 2",
+        "fil": "js/data.js",
+        "linje": 423,
+        "nu_alm": "",
+        "nu_fed": "Hvornår er reaktionen færdig?",
+        "nu_svar": ["Efter 5 minutter", "Efter 15 minutter", "Efter 30 minutter"],
+        "problem": "'reaktionen' siger ikke hvilken, og forsøgsteksten med banernes tider er væk fra kortet.",
+        "nyt_alm": "Bane 2, 3 og 4 er taget efter 5, 15 og 30 minutter.",
+        "nyt_fed": "Hvornår har al salicylsyre reageret?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Tovtrækningen",
+        "billede": "skud/a/sb8.6_tlc__0.png",
+        "dom": "fint",
+        "fremme": "Gæt med tre svar; TLC-plade over karret med to pletter; fire flasker med polaritetsskala nederst til venstre.",
+        "bruges": "Pladen og karret; flaskerne bruges først i opgave 4 (Ren heptan).",
+        "forslag": [],
+        "andet": "Flaskerne kan vente til opgave 4; de er små og står i hjørnet, så det er ikke nødvendigt.",
+        "gevinst": "Et gæt med én plade er roligt.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Rf-værdien",
+        "billede": "skud/a/sb8.6_tlc__1.png",
+        "dom": "fint",
+        "fremme": "Kort med ét felt; plade med lineal og én plet; kassen Dine tal.",
+        "bruges": "Linealen og væskefronten.",
+        "forslag": [],
+        "andet": "Fold Formlen i panelet ind, til spørgsmålet 'Hvordan regnes Rf-værdien for pletten?' (opgave 1, trin 3) er besvaret; ellers står svaret i panelet.",
+        "gevinst": "Første mål er allerede stilladset i fire trin.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Læs pladen",
+        "billede": "skud/a/sb8.6_tlc__2.png",
+        "dom": "fint",
+        "fremme": "Kort; plade over karret med fem pletter; tom visning med fem banenavne.",
+        "bruges": "Pladen; visningen fyldes, når pladen er løbet.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2: Formlen for Rf står fremme i panelet fra start, mens opgave 1, trin 3 spørger 'Hvordan regnes Rf-værdien for pletten?', så eleven kan aflæse svaret. Små: 'Hvad viser den nye TLC-plade med heptan og ethylethanoat (1 : 1)?' nævner ikke pillen, som alle svarene handler om ('Hvad viser den nye TLC-plade om pillen fra nettet?')."
+  }
+]

@@ -164,13 +164,13 @@
        ====================================================================== */
     D.VEJ = [
         { id: "jernsulfid", r: "jernsulfid", kendt: "Fe", soegt: "FeS", n: [1, 2, 3],
-          tekst: "Jern varmes med rigeligt svovl. Hvor meget jernsulfid dannes der?" },
+          tekst: "Jern varmes med rigeligt svovl. Hvor mange gram jernsulfid dannes der af {m} g jern?" },
         { id: "magnesiumoxid", r: "magnesiumoxid", kendt: "Mg", soegt: "MgO", n: [1, 2, 3],
-          tekst: "Magnesium brænder i luft. Hvor meget magnesiumoxid dannes der?" },
+          tekst: "Magnesium brænder i luft. Hvor mange gram magnesiumoxid dannes der af {m} g magnesium?" },
         { id: "aluminiumoxid", r: "aluminiumoxid", kendt: "Al", soegt: "Al2O3", n: [2, 3, 4],
-          tekst: "Aluminiumpulver brænder i luft. Hvor meget aluminiumoxid dannes der?" },
+          tekst: "Aluminiumpulver brænder i luft. Hvor mange gram aluminiumoxid dannes der af {m} g aluminium?" },
         { id: "jernoxid", r: "jernoxid", kendt: "Fe2O3", soegt: "Fe", n: [0.5, 1, 1.5, 2],
-          tekst: "Jern(III)oxid varmes med rigeligt kul. Hvor meget jern dannes der?" }
+          tekst: "Jern(III)oxid varmes med rigeligt kul. Hvor mange gram jern dannes der af {m} g jern(III)oxid?" }
     ];
 
     /* ======================================================================
@@ -182,7 +182,7 @@
        ====================================================================== */
     D.SKEMA = [
         { id: "kul", r: "kul", givet: "C", n: [2, 3, 4, 5, 6, 8],
-          tekst: "Kul brænder i rigeligt dioxygen. Hvor meget CO₂ dannes der? Du skal ikke regne på O₂.",
+          tekst: "Kul brænder i rigeligt dioxygen. Du skal ikke regne på O₂. Hvor mange gram CO₂ dannes der af {m} g C?",
           spoerg: [["C", "M"], ["CO2", "M"], ["C", "n"], ["CO2", "n"], ["CO2", "m"]] },
         { id: "ammoniak", r: "ammoniak", givet: "N2", n: [0.5, 1, 1.5, 2], afstem: true,
           tekst: "Ammoniak laves af N₂ og rigeligt H₂. Afstem skemaet, og find massen af NH₃.",
@@ -196,7 +196,7 @@
           spoerg: ["afstem", ["C3H8", "M"], ["O2", "M"], ["CO2", "M"], ["H2O", "M"],
                    ["C3H8", "n"], ["O2", "n"], ["CO2", "n"], ["H2O", "n"], ["O2", "m"], ["CO2", "m"], ["H2O", "m"]] },
         { id: "fotosyntese", r: "fotosyntese", givet: "C6H12O6", n: [0.5, 1, 1.5, 2], afstem: true,
-          tekst: "En plante danner glucose. Hvor meget CO₂ skal den optage? Afstem skemaet først.",
+          tekst: "En plante danner glucose. Afstem skemaet først. Hvor mange gram CO₂ skal planten optage for at danne {m} g glucose?",
           spoerg: ["afstem", ["C6H12O6", "M"], ["CO2", "M"], ["C6H12O6", "n"], ["CO2", "n"], ["CO2", "m"]] }
     ];
 
@@ -209,17 +209,17 @@
        ====================================================================== */
     D.BEGR = [
         { id: "jernsulfid", r: "jernsulfid", a: "Fe", b: "S", p: "FeS", std: { L: "S", saet: 2, rest: 1 },
-          tekst: "Jern og svovl varmes sammen. Hvor meget jernsulfid dannes der?" },
+          tekst: "Jern og svovl varmes sammen. Hvor mange gram jernsulfid dannes der af {a} g Fe og {b} g S?" },
         { id: "saltsyre", r: "saltsyre", a: "Mg", b: "HCl", p: "H2", std: { L: "HCl", saet: 1, rest: 0.5 },
-          tekst: "Magnesium kommes i saltsyre. Hvor meget H₂ dannes der?" },
+          tekst: "Magnesium kommes i saltsyre. Hvor mange gram H₂ dannes der af {a} g Mg og {b} g HCl?" },
         { id: "knaldgas", r: "knaldgas", a: "H2", b: "O2", p: "H2O", std: { L: "H2", saet: 1, rest: 0.5 },
-          tekst: "Knaldgas eksploderer. Hvor meget vand dannes der?" },
+          tekst: "Knaldgas eksploderer. Hvor mange gram vand dannes der af {a} g H₂ og {b} g O₂?" },
         { id: "ammoniak", r: "ammoniak", a: "N2", b: "H2", p: "NH3", std: { L: "H2", saet: 1, rest: 0.5 },
-          tekst: "Ammoniak laves af N₂ og H₂. Hvor meget NH₃ kan der laves?" },
+          tekst: "Ammoniak laves af N₂ og H₂. Hvor mange gram NH₃ dannes der af {a} g N₂ og {b} g H₂?" },
         { id: "methan", r: "methan", a: "CH4", b: "O2", p: "CO2", std: { L: "O2", saet: 1, rest: 1 },
-          tekst: "Methan brænder i en lukket beholder. Hvor meget CO₂ dannes der?" },
+          tekst: "Methan brænder i en lukket beholder. Hvor mange gram CO₂ dannes der af {a} g CH₄ og {b} g O₂?" },
         { id: "aluminiumchlorid", r: "aluminiumchlorid", a: "Al", b: "Cl2", p: "AlCl3", std: { L: "Cl2", saet: 1, rest: 1 },
-          tekst: "Aluminium reagerer med dichlor. Hvor meget aluminiumchlorid dannes der?" }
+          tekst: "Aluminium reagerer med dichlor. Hvor mange gram aluminiumchlorid dannes der af {a} g Al og {b} g Cl₂?" }
     ];
     /* Hoejst saa mange poser af hvert stof paa bakken */
     D.BEGR_MAKS = 6;

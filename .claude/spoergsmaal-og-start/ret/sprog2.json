@@ -1,0 +1,576 @@
+[
+ {
+  "nr": 29,
+  "fil": "sc4.3_forbraending/js/data.js",
+  "gammel": "tekst: \"Luppen viser, hvad der kommer op fra den blå flamme. Hvilke stoffer er det? Vælg alle, der passer.\",",
+  "ny": "tekst: \"Luppen viser molekyler over flammen. Vælg alle, der passer. Hvilke stoffer kommer op fra den blå flamme?\",",
+  "hvor": "fane 1, opgave 3 Luppen over den blå flamme, spørgsmålet"
+ },
+ {
+  "nr": 30,
+  "fil": "sc4.3_forbraending/js/data.js",
+  "gammel": "tekst: \"Afstem carbon. Hvilket tal skal stå foran \" + p.f + \"? Brug pilene, og tryk Indsend svar.\",",
+  "ny": "tekst: \"Afstem carbon. Hvilket tal foran \" + p.f + \" giver lige mange carbonatomer før og efter reaktionspilen?\",",
+  "hvor": "fane 2, trin 1 (carbon), spørgsmålet"
+ },
+ {
+  "nr": 30,
+  "fil": "sc4.3_forbraending/js/data.js",
+  "gammel": "tekst: \"Afstem hydrogen. Hvilket tal skal stå foran H₂O?\",",
+  "ny": "tekst: \"Hvilket tal foran H₂O giver lige mange hydrogenatomer før og efter reaktionspilen?\",",
+  "hvor": "fane 2, trin 2 (hydrogen), spørgsmålet"
+ },
+ {
+  "nr": 30,
+  "fil": "sc4.3_forbraending/js/data.js",
+  "gammel": "tekst: \"Afstem oxygen til sidst. Hvilket tal skal stå foran O₂?\",",
+  "ny": "tekst: \"Hvilket tal foran O₂ giver lige mange oxygenatomer før og efter reaktionspilen?\",",
+  "hvor": "fane 2, trin 3 (oxygen), spørgsmålet"
+ },
+ {
+  "nr": 31,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"Ethen og dibrom blev til 1,2-dibromethan. Hvad skete der med dobbeltbindingen?\",",
+  "ny": "tekst: \"Ethen og dibrom gav 1,2-dibromethan. Hvad skete der med dobbeltbindingen i ethen, da dibrom satte sig på?\",",
+  "hvor": "fane 1, opgave 2 Fire bindinger, spørgsmål 1"
+ },
+ {
+  "nr": 32,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"Vandmolekylet delte sig i to dele, som satte sig på ethen. Hvilke to dele?\",",
+  "ny": "tekst: \"Vand satte sig på dobbeltbindingen. Hvilke to dele delte vandmolekylet sig i, da det satte sig på ethen?\",",
+  "hvor": "fane 1, opgave 4 Vand, spørgsmålet"
+ },
+ {
+  "nr": 33,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"Dibrom satte sig på stoffet i glas A i en addition. Er stoffet mættet eller umættet?\",",
+  "ny": "tekst: \"Dibrom satte sig på stoffet i glas A i en addition. Er stoffet i glas A mættet eller umættet?\",",
+  "hvor": "fane 2, glas A, spørgsmål 2"
+ },
+ {
+  "nr": 34,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"I glas A er den orange farve fra dibrom, Br₂, væk. Hvor er dibrommet blevet af?\",",
+  "ny": "tekst: \"I glas A er den orange farve fra dibrom, Br₂, væk. Hvor er dibrommet i glas A blevet af?\",",
+  "hvor": "fane 2, glas A, spørgsmål 1"
+ },
+ {
+  "nr": 35,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"To ethenmolekyler har sat sig sammen. Hvad skete der med deres dobbeltbindinger?\",",
+  "ny": "tekst: \"To ethenmolekyler har sat sig sammen. Hvad skete der med dobbeltbindingerne i de to ethenmolekyler?\",",
+  "hvor": "fane 3, opgave 1 To ethenmolekyler, spørgsmålet"
+ },
+ {
+  "nr": 36,
+  "fil": "sc4.4_addition_og_plastik/js/data.js",
+  "gammel": "tekst: \"En kæde i polyethen er for lang til at tegne. Man tegner det udsnit, der gentager sig. Hvilket udsnit?\",",
+  "ny": "tekst: \"En kæde i polyethen er for lang til at tegne. Hvilket udsnit gentager sig i en kæde af polyethen?\",",
+  "hvor": "fane 3, opgave 5 Udsnittet, spørgsmålet"
+ },
+ {
+  "nr": 37,
+  "fil": "sc4.5_fedtstoffer/js/sim_koele.js",
+  "gammel": "tekst: NK.html(f.Navn + \" står \" + st.i + \" ved \" + D.gradTekst(st.T)) + \". Er fedtet fast, delvist fast eller flydende?\",",
+  "ny": "tekst: NK.html(\"Er \" + f.navn + \" fast, delvist fast eller flydende \" + st.i + \" ved \" + D.gradTekst(st.T) + \"?\"),",
+  "hvor": "fane 2 Køleskabet, opgave 1-6, gættet"
+ },
+ {
+  "nr": 38,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "tekst: \"Hver fedtsyre i fedtstoffet fra olivenolie har én dobbeltbinding. Hvad kaldes sådan en fedtsyre?\",",
+  "ny": "tekst: \"Hver fedtsyre i olivenolie har én dobbeltbinding. Hvad kaldes en fedtsyre med én dobbeltbinding?\",",
+  "hvor": "fane 1, opgave 1 Fra olivenolie, spørgsmålet"
+ },
+ {
+  "nr": 39,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "tekst: \"Fedtstoffet fra tran adderede 6 dibrommolekyler, og fedtstoffet fra olivenolie adderede 3. Hvorfor?\",",
+  "ny": "tekst: \"Hvorfor adderede fedtstoffet fra tran flere dibrommolekyler end fedtstoffet fra olivenolie?\",",
+  "hvor": "fane 1, opgave 4 Fra tran, spørgsmålet"
+ },
+ {
+  "nr": 40,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "tekst: \"Kokosfedtet i glas 3 affarvede ingen dråber bromvand. Hvorfor?\",",
+  "ny": "tekst: \"Hvorfor affarvede kokosfedtet i glas 3 ingen dråber bromvand?\",",
+  "hvor": "fane 2, glas 3 kokosfedt, spørgsmålet"
+ },
+ {
+  "nr": 41,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "tekst: \"Solsikkeolien i glas 4 affarvede flest dråber af de fire fedtstoffer. Hvorfor?\",",
+  "ny": "tekst: \"Hvorfor affarvede solsikkeolien i glas 4 flest dråber af de fire fedtstoffer?\",",
+  "hvor": "fane 2, glas 4 solsikkeolie, spørgsmålet"
+ },
+ {
+  "nr": 42,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "D.draaberTekst(aff(\"smoer\")) + \". Hvilket fedtstof er det?\",",
+  "ny": "D.draaberTekst(aff(\"smoer\")) + \". Hvilket fedtstof er der i flaske A?\",",
+  "hvor": "fane 3, flaske A, spørgsmålet"
+ },
+ {
+  "nr": 42,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "D.draaberTekst(aff(\"tran\")) + \". Hvilket fedtstof er det?\",",
+  "ny": "D.draaberTekst(aff(\"tran\")) + \". Hvilket fedtstof er der i flaske B?\",",
+  "hvor": "fane 3, flaske B, spørgsmålet"
+ },
+ {
+  "nr": 42,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "tekst: \"Fedtstoffet i flaske C affarvede ingen dråber. Hvilket fedtstof er det?\",",
+  "ny": "tekst: \"Fedtstoffet i flaske C affarvede ingen dråber. Hvilket fedtstof er der i flaske C?\",",
+  "hvor": "fane 3, flaske C, spørgsmålet"
+ },
+ {
+  "nr": 42,
+  "fil": "sc4.6_umaettet_fedt/js/data.js",
+  "gammel": "D.draaberTekst(aff(\"raps\")) + \". Hvilket fedtstof er det?\",",
+  "ny": "D.draaberTekst(aff(\"raps\")) + \". Hvilket fedtstof er der i flaske D?\",",
+  "hvor": "fane 3, flaske D, spørgsmålet"
+ },
+ {
+  "nr": 43,
+  "fil": "sc4.7_alkoholer_og_syrer/js/data.js",
+  "gammel": "tekst: \"Tegningen viser en alkohol. Hvad hedder stoffet?\",",
+  "ny": "tekst: \"Hvad hedder alkoholen på tegningen?\",",
+  "hvor": "fane 1, opgave 4 Hvad hedder alkoholen?, spørgsmålet"
+ },
+ {
+  "nr": 44,
+  "fil": "sc4.7_alkoholer_og_syrer/js/data.js",
+  "gammel": "tekst: \"Kæden havde 2 carbonatomer. Hvorfor hedder syren propansyre og ikke ethansyre?\",",
+  "ny": "tekst: \"Hvorfor hedder syren propansyre, når kæden før COOH har 2 carbonatomer?\",",
+  "hvor": "fane 1, opgave 2 Endelsen -syre, spørgsmålet"
+ },
+ {
+  "nr": 45,
+  "fil": "sc4.7_alkoholer_og_syrer/js/data.js",
+  "gammel": "tekst: \"Luppen viser ét molekyle ethanol i vand. Hvor går der stiplede linjer til vandmolekylerne?\",",
+  "ny": "tekst: \"Luppen viser ethanol i vand. Hvor på ethanolmolekylet går der stiplede linjer til vandmolekylerne?\",",
+  "hvor": "fane 3, opgave 2 Luppen i vand, spørgsmålet"
+ },
+ {
+  "nr": 46,
+  "fil": "sc5.1_molarmasse/js/sim_skaal.js",
+  "gammel": "tekst: NK.html(\"I hver skål ligger 1 mol af et stof, og skiltet på bordet viser stofferne. Vægten er låst. \" +\n                \"Hvilken skål synker, når låsen slippes, eller står vægten lige?\"),",
+  "ny": "tekst: NK.html(\"Skiltet på bordet viser stofferne. Vægten er låst, til du har svaret. \" +\n                \"Hvilken skål synker, når der ligger 1 mol af hvert stof i skålene?\"),",
+  "hvor": "fane 2 Skålvægten, par 1-9, spørgsmålet"
+ },
+ {
+  "nr": 47,
+  "fil": "sc5.1_molarmasse/js/sim_ukendt.js",
+  "gammel": "var tekst = \"Etiketten er faldet af den brune flaske, og mærket viser kun molarmassen: <b>M = \" + NK.komma(g.st.M) +\n            \" g/mol</b>. Hvilken etiket på tavlen passer til flasken?\";",
+  "ny": "var tekst = \"Etiketten er faldet af den brune flaske. Mærket viser kun molarmassen. Hvilket stof på tavlen har molarmassen M = \" + NK.komma(g.st.M) +\n            \" g/mol?\";",
+  "hvor": "fane 3 Ukendt stof, flaske 1-12, spørgsmålet"
+ },
+ {
+  "nr": 48,
+  "fil": "sc5.2_stofmaengde/js/sim_afvej.js",
+  "gammel": "tekst: NK.html(\"Afvej \" + ordre.nTekst + \" mol \" + ordre.st.navn + \". Molarmassen står på krukken. Hvad skal vægten vise?\")",
+  "ny": "tekst: NK.html(\"Molarmassen står på krukken. Hvor mange gram skal vægten vise for \" + ordre.nTekst + \" mol \" + ordre.st.navn + \"?\")",
+  "hvor": "fane 3 Afvejning, ordre 1-12, spørgsmålet"
+ },
+ {
+  "nr": 48,
+  "fil": "sc5.2_stofmaengde/_selvtest.html",
+  "gammel": "/Hvad skal vægten vise\\?/.test(F.kort.ind.textContent)",
+  "ny": "/Hvor mange gram skal vægten vise for [\\d,]+\\s+mol/.test(F.kort.ind.textContent)",
+  "hvor": "selvtesten: spørgsmålet på kortet"
+ },
+ {
+  "nr": 49,
+  "fil": "sc5.2_stofmaengde/js/sim_atomer.js",
+  "gammel": "tekst: NK.html(\"Skiltet på bordet viser de to prøver, og vægtene viser massen. Hvor er der flest atomer?\"),",
+  "ny": "tekst: NK.html(\"Skiltet på bordet viser de to prøver, og vægtene viser massen. Hvilken af de to prøver har flest atomer?\"),",
+  "hvor": "fane 2 Flest atomer, par 1-9, spørgsmålet"
+ },
+ {
+  "nr": 50,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Vi stabler 1 mol papirark. Hvor høj bliver stakken?\",",
+  "ny": "spm: \"Hvor høj bliver en stak af 1 mol papirark?\",",
+  "hvor": "fane 1, gæt 1 Papirstakken"
+ },
+ {
+  "nr": 51,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Vi samler 1 mol vingummibamser. Hvor meget slik bliver det?\",",
+  "ny": "spm: \"Hvor meget slik er 1 mol vingummibamser?\",",
+  "hvor": "fane 1, gæt 2 Vingummibamserne"
+ },
+ {
+  "nr": 52,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Vi samler 1 mol sandkorn. Hvor meget sand bliver det?\",",
+  "ny": "spm: \"Hvor meget sand er 1 mol sandkorn?\",",
+  "hvor": "fane 1, gæt 4 Sandet"
+ },
+ {
+  "nr": 53,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Vi samler 1 mol vanddråber. Hvor meget vand bliver det?\",",
+  "ny": "spm: \"Hvor meget vand er 1 mol vanddråber?\",",
+  "hvor": "fane 1, gæt 5 Vanddråberne"
+ },
+ {
+  "nr": 54,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Vi samler 1 mol muldvarpe i én stor klump. Hvor stor bliver klumpen?\",",
+  "ny": "spm: \"Hvor stor bliver en klump af 1 mol muldvarpe?\",",
+  "hvor": "fane 1, gæt 8 Muldvarpene"
+ },
+ {
+  "nr": 55,
+  "fil": "sc5.3_et_mol/js/data.js",
+  "gammel": "spm: \"Der er ca. 8 · 10⁹ mennesker på Jorden. Hvor mange mol mennesker er det?\",",
+  "ny": "spm: \"Hvor mange mol er de ca. 8 · 10⁹ mennesker på Jorden?\",",
+  "hvor": "fane 2, opgave 6 Mol mennesker"
+ },
+ {
+  "nr": 56,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"Du har afvejet {m} g {navn} ({kendt}). Hvor mange mol er det?\",",
+  "ny": "tekst: \"Du har afvejet {kendt} på vægten. Hvor mange mol er {m} g {navn}?\",",
+  "hvor": "fane 2, opgave 1 Find stofmængden"
+ },
+ {
+  "nr": 56,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"En elev har afvejet {m} g {navn} ({kendt}). Hvor mange mol er det?\",",
+  "ny": "tekst: \"En elev har afvejet {kendt} på vægten. Hvor mange mol er {m} g {navn}?\",",
+  "hvor": "fane 2, opgave 2 Stofmængden af kridt"
+ },
+ {
+  "nr": 57,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"Til et forsøg skal du bruge {n} mol {kendt}. Hvor mange gram skal du afveje?\",",
+  "ny": "tekst: \"Til et forsøg skal du afveje natron. Hvor mange gram er {n} mol {kendt}?\",",
+  "hvor": "fane 2, opgave 3 Find massen"
+ },
+ {
+  "nr": 57,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"Du skal bruge {n} mol {navn}. Hvor mange gram skal du afveje?\",",
+  "ny": "tekst: \"Hvor mange gram er {n} mol {navn}?\",",
+  "hvor": "fane 2, opgave 4 Massen af kobber(II)sulfat"
+ },
+ {
+  "nr": 58,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"En krukke har mistet sin etiket. {m} g af pulveret er {n} mol. Find molarmassen.\",",
+  "ny": "tekst: \"En krukke har mistet sin etiket. Hvad er molarmassen af pulveret, når {m} g er {n} mol?\",",
+  "hvor": "fane 2, opgave 5 Find molarmassen"
+ },
+ {
+  "nr": 59,
+  "fil": "sc5.4_stofmaengdeberegning/js/data.js",
+  "gammel": "tekst: \"Du har {m} g {navn}. Hvor mange gram glukose er den samme stofmængde?\",",
+  "ny": "tekst: \"Hvor mange gram glukose har samme stofmængde som {m} g {navn}?\",",
+  "hvor": "fane 2, opgave 6 Mesteren"
+ },
+ {
+  "nr": 60,
+  "fil": "sc5.4_stofmaengdeberegning/js/sim_hurtig.js",
+  "gammel": "sp = { spm: \"m = \" + tal(m) + \" g og n = \" + tal(n) + \" mol. M = ?\", svar: [",
+  "ny": "sp = { spm: \"Hvad er M, når m = \" + tal(m) + \" g og n = \" + tal(n) + \" mol?\", svar: [",
+  "hvor": "fane 3 Hurtigrunden, regnespørgsmålet, hvor M skal findes"
+ },
+ {
+  "nr": 61,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Bord 3 vil have 6 hotdogs. Hvor meget skal du bruge af hver?\",",
+  "ny": "tekst: \"Bord 3 vil have 6 hotdogs. Hvor mange pølser, brød og agurkeskiver skal du bruge til 6 hotdogs?\",",
+  "hvor": "fane 1, ordre 3"
+ },
+ {
+  "nr": 61,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Bord 8 vil have 4 dobbeltburgere. Hvor meget skal du bruge af hver?\",",
+  "ny": "tekst: \"Bord 8 vil have 4 dobbeltburgere. Hvor mange boller, bøffer og skiver ost skal du bruge til 4 dobbeltburgere?\",",
+  "hvor": "fane 1, ordre 8"
+ },
+ {
+  "nr": 62,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Der ligger 10 af hver ingrediens. Det, der slipper op først, er den begrænsende ingrediens. Det, der bliver tilbage, er i overskud.\" },",
+  "ny": "tekst: \"Det, der slipper op først, er den begrænsende ingrediens. Hvad slipper op først, når du laver hotdogs af 10 pølser, 10 brød og 10 agurkeskiver?\",\n          tekst2: \"Det, der bliver tilbage, er i overskud. Hvor mange hotdogs kan du lave af 10 pølser, 10 brød og 10 agurkeskiver?\" },",
+  "hvor": "fane 1, ordre 4: spørgsmålet til valget og (tekst2) til antallet og overskuddet"
+ },
+ {
+  "nr": 63,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Der ligger 8 pølser, 10 brød og 12 agurkeskiver. Hvor mange hotdogs kan du lave?\" }",
+  "ny": "tekst: \"Det, der slipper op først, er den begrænsende ingrediens. Hvad slipper op først, når du laver hotdogs af 8 pølser, 10 brød og 12 agurkeskiver?\",\n          tekst2: \"Hvor mange hotdogs kan du lave af 8 pølser, 10 brød og 12 agurkeskiver?\" }",
+  "hvor": "fane 1, ordre 5: spørgsmålet til valget og (tekst2) til antallet"
+ },
+ {
+  "nr": 63,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Der ligger 12 pølser, 5 brød og 12 agurkeskiver. Hvor mange hotdogs kan du lave?\" }",
+  "ny": "tekst: \"Det, der slipper op først, er den begrænsende ingrediens. Hvad slipper op først, når du laver hotdogs af 12 pølser, 5 brød og 12 agurkeskiver?\",\n          tekst2: \"Hvor mange hotdogs kan du lave af 12 pølser, 5 brød og 12 agurkeskiver?\" }",
+  "hvor": "fane 1, ordre 6: spørgsmålet til valget og (tekst2) til antallet"
+ },
+ {
+  "nr": 63,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Der ligger 5 boller, 8 bøffer og 9 skiver ost. Hvor mange dobbeltburgere kan du lave?\" }",
+  "ny": "tekst: \"Det, der slipper op først, er den begrænsende ingrediens. Hvad slipper op først, når du laver dobbeltburgere af 5 boller, 8 bøffer og 9 skiver ost?\",\n          tekst2: \"Hvor mange dobbeltburgere kan du lave af 5 boller, 8 bøffer og 9 skiver ost?\" }",
+  "hvor": "fane 1, ordre 9: spørgsmålet til valget og (tekst2) til antallet"
+ },
+ {
+  "nr": 63,
+  "fil": "sc5.5_aekvivalente_maengder/js/data.js",
+  "gammel": "tekst: \"Der ligger 6 boller, 7 bøffer og 12 skiver ost. Hvor mange dobbeltburgere kan du lave?\" }",
+  "ny": "tekst: \"Det, der slipper op først, er den begrænsende ingrediens. Hvad slipper op først, når du laver dobbeltburgere af 6 boller, 7 bøffer og 12 skiver ost?\",\n          tekst2: \"Hvor mange dobbeltburgere kan du lave af 6 boller, 7 bøffer og 12 skiver ost?\" }",
+  "hvor": "fane 1, ordre 10: spørgsmålet til valget og (tekst2) til antallet"
+ },
+ {
+  "nr": 63,
+  "fil": "sc5.5_aekvivalente_maengder/js/sim_hotdog.js",
+  "gammel": "tekst: NK.html(o ? o.tekst : \"Læg på brættet, og ring med klokken.\") };",
+  "ny": "tekst: NK.html(o ? (o.tekst2 && !(t && t.art === \"begr\") ? o.tekst2 : o.tekst) : \"Læg på brættet, og ring med klokken.\") };",
+  "hvor": "fane 1, kortet skifter spørgsmål, når den begrænsende er fundet (tekst2)"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Jern varmes med rigeligt svovl. Hvor meget jernsulfid dannes der?\" }",
+  "ny": "tekst: \"Jern varmes med rigeligt svovl. Hvor mange gram jernsulfid dannes der af {m} g jern?\" }",
+  "hvor": "fane 1 Vejen, opgave 1-4"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Magnesium brænder i luft. Hvor meget magnesiumoxid dannes der?\" }",
+  "ny": "tekst: \"Magnesium brænder i luft. Hvor mange gram magnesiumoxid dannes der af {m} g magnesium?\" }",
+  "hvor": "fane 1 Vejen, opgave 1-4"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Aluminiumpulver brænder i luft. Hvor meget aluminiumoxid dannes der?\" }",
+  "ny": "tekst: \"Aluminiumpulver brænder i luft. Hvor mange gram aluminiumoxid dannes der af {m} g aluminium?\" }",
+  "hvor": "fane 1 Vejen, opgave 1-4"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Jern(III)oxid varmes med rigeligt kul. Hvor meget jern dannes der?\" }",
+  "ny": "tekst: \"Jern(III)oxid varmes med rigeligt kul. Hvor mange gram jern dannes der af {m} g jern(III)oxid?\" }",
+  "hvor": "fane 1 Vejen, opgave 1-4"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/js/sim_vej.js",
+  "gammel": "return \"Givet: <b>\" + D.tekstMasse(this.x.m) + \"\\u00a0g \" + D.stof(o.kendt).formel + \"</b>. \" + NK.html(o.tekst);",
+  "ny": "return NK.html(o.tekst).replace(\"{m} g\", D.tekstMasse(this.x.m) + \"\\u00a0g\");",
+  "hvor": "fane 1 Vejen: massen sættes ind i spørgsmålet, ingen fed Givet"
+ },
+ {
+  "nr": 64,
+  "fil": "sc5.6_maengdeberegning/_selvtest.html",
+  "gammel": "/Givet: [\\d,]+ g Mg/.test(kortTxt(V)) && /Hvor meget magnesiumoxid/.test(kortTxt(V))",
+  "ny": "/Hvor mange gram magnesiumoxid dannes der af [\\d,]+ g magnesium\\?/.test(kortTxt(V))",
+  "hvor": "selvtesten: opgaven på kortet med den kendte masse"
+ },
+ {
+  "nr": 65,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Kul brænder i rigeligt dioxygen. Hvor meget CO₂ dannes der? Du skal ikke regne på O₂.\",",
+  "ny": "tekst: \"Kul brænder i rigeligt dioxygen. Du skal ikke regne på O₂. Hvor mange gram CO₂ dannes der af {m} g C?\",",
+  "hvor": "fane 2 Skemaet, opgave 1 Kul"
+ },
+ {
+  "nr": 65,
+  "fil": "sc5.6_maengdeberegning/js/sim_skema.js",
+  "gammel": "        var o = this.x.o;\n        return \"Givet: <b>\" + D.tekstMasse(this.x.m) + \"\\u00a0g \" + D.stof(o.givet).formel + \"</b>. \" + NK.html(o.tekst);",
+  "ny": "        var o = this.x.o;\n        if (o.tekst.indexOf(\"{m} g\") >= 0) return NK.html(o.tekst).replace(\"{m} g\", D.tekstMasse(this.x.m) + \"\\u00a0g\");\n        return \"Givet: <b>\" + D.tekstMasse(this.x.m) + \"\\u00a0g \" + D.stof(o.givet).formel + \"</b>. \" + NK.html(o.tekst);",
+  "hvor": "fane 2 Skemaet: massen sættes ind i spørgsmålet, når teksten har {m} (opgave 1 og 5)"
+ },
+ {
+  "nr": 66,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"En plante danner glucose. Hvor meget CO₂ skal den optage? Afstem skemaet først.\",",
+  "ny": "tekst: \"En plante danner glucose. Afstem skemaet først. Hvor mange gram CO₂ skal planten optage for at danne {m} g glucose?\",",
+  "hvor": "fane 2 Skemaet, opgave 5 Fotosyntese"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Jern og svovl varmes sammen. Hvor meget jernsulfid dannes der?\" }",
+  "ny": "tekst: \"Jern og svovl varmes sammen. Hvor mange gram jernsulfid dannes der af {a} g Fe og {b} g S?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Magnesium kommes i saltsyre. Hvor meget H₂ dannes der?\" }",
+  "ny": "tekst: \"Magnesium kommes i saltsyre. Hvor mange gram H₂ dannes der af {a} g Mg og {b} g HCl?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Knaldgas eksploderer. Hvor meget vand dannes der?\" }",
+  "ny": "tekst: \"Knaldgas eksploderer. Hvor mange gram vand dannes der af {a} g H₂ og {b} g O₂?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Ammoniak laves af N₂ og H₂. Hvor meget NH₃ kan der laves?\" }",
+  "ny": "tekst: \"Ammoniak laves af N₂ og H₂. Hvor mange gram NH₃ dannes der af {a} g N₂ og {b} g H₂?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Methan brænder i en lukket beholder. Hvor meget CO₂ dannes der?\" }",
+  "ny": "tekst: \"Methan brænder i en lukket beholder. Hvor mange gram CO₂ dannes der af {a} g CH₄ og {b} g O₂?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "tekst: \"Aluminium reagerer med dichlor. Hvor meget aluminiumchlorid dannes der?\" }",
+  "ny": "tekst: \"Aluminium reagerer med dichlor. Hvor mange gram aluminiumchlorid dannes der af {a} g Al og {b} g Cl₂?\" }",
+  "hvor": "fane 3 Begrænsende mængde, opgave 1-6"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/sim_begr.js",
+  "gammel": "return \"Givet: <b>\" + D.tekstMasse(g[o.a]) + \"\\u00a0g \" + D.stof(o.a).formel + \"</b> og <b>\" +\n            D.tekstMasse(g[o.b]) + \"\\u00a0g \" + D.stof(o.b).formel + \"</b>. \" + NK.html(o.tekst);",
+  "ny": "return NK.html(o.tekst).replace(\"{a} g\", D.tekstMasse(g[o.a]) + \"\\u00a0g\").replace(\"{b} g\", D.tekstMasse(g[o.b]) + \"\\u00a0g\");",
+  "hvor": "fane 3: masserne sættes ind i spørgsmålet, ingen fed Givet"
+ },
+ {
+  "nr": 67,
+  "fil": "sc5.6_maengdeberegning/js/fane.js",
+  "gammel": "papir(k.tekst) + \"</p>\";\n        var v = k.valg;",
+  "ny": "(k.valg ? k.tekst : papir(k.tekst)) + \"</p>\";\n        var v = k.valg;",
+  "hvor": "fane 3: opgavens spørgsmål står i almindelig skrift, mens valget (Hvilket stof slipper op først?) står på kortet"
+ },
+ {
+  "nr": 75,
+  "fil": "sc5.8_natron/js/sim_hypoteser.js",
+  "gammel": "if (o.id === \"nat\") s = (m.egen ? \"Din digel\" : \"Diglen i eksemplet\") + \" havde \" + K.g2(m.mf) + \" g natron før opvarmningen. Hvor mange mol er det?\";",
+  "ny": "if (o.id === \"nat\") s = \"Massen er fra \" + (m.egen ? \"din digel\" : \"diglen i eksemplet\") + \" før opvarmningen. Hvor mange mol er \" + K.g2(m.mf) + \" g natron?\";",
+  "hvor": "fane 2 Hypoteserne, opgave 1 Stofmængden af natron"
+ },
+ {
+  "nr": 76,
+  "fil": "sc5.8_natron/js/sim_hypoteser.js",
+  "gammel": "else if (o.hyp) s = \"Hvis der dannes \" + T.P(o.hyp) + \", hvad skal diglen så veje til sidst? Afstem skemaet først.\";",
+  "ny": "else if (o.hyp) s = \"Hypotese \" + o.hyp + \" siger, at der dannes \" + T.P(o.hyp) + \". Afstem skemaet først. Hvad skal diglen veje til sidst, hvis der dannes \" + T.P(o.hyp) + \"?\";",
+  "hvor": "fane 2 Hypoteserne, opgave 2-4 Hypotese A, B og C"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "D.FEJL_SPM = \"Gæt: Hvad vejer diglen hos gruppe 2 til sidst, sammenlignet med gruppe 1?\";",
+  "ny": "/* Spoergsmaalet staar i hver fejlkilde (spm), saa det selv siger, hvad gruppe 2 goer (21. nov. 2026) */",
+  "hvor": "fane 3 Fejlkilder: det fælles spørgsmål afløses af ét pr. fejlkilde"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt og varmer kun i 2 minutter.\",",
+  "ny": "tekst: \"Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når de kun varmer i 2 minutter?\",",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.\",\n          hint:",
+  "ny": "tekst: \"Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når de vejer den varm?\",\n          hint:",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 2 skruer op for fuld flamme med det samme.\",\n          hint:",
+  "ny": "tekst: \"Gruppe 2 skruer op for fuld flamme med det samme.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når de bruger høj flamme fra start?\",\n          hint:",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 2's natron har stået åben i en fugtig kælder. Af deres 5,10 g er 0,30 g vand.\",\n          hint:",
+  "ny": "tekst: \"Gruppe 2's natron har stået åben i en fugtig kælder. Af deres 5,10 g er 0,30 g vand.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når 0,30 g af deres natron er vand?\",\n          hint:",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 2 vil være sikre. De varmer i 10 minutter i stedet for 5.\",\n          hint:",
+  "ny": "tekst: \"Gruppe 2 vil være sikre. De varmer i 10 minutter i stedet for 5.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når de varmer i 10 minutter?\",\n          hint:",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/data.js",
+  "gammel": "tekst: \"Gruppe 2 tager fejl af krukkerne. De varmer 5,10 g soda, Na₂CO₃, i stedet for natron.\",\n          hint:",
+  "ny": "tekst: \"Gruppe 2 tager fejl af krukkerne. De varmer 5,10 g soda, Na₂CO₃, i stedet for natron.\",\n          spm: \"Hvad vejer diglen hos gruppe 2 til sidst, når de varmer soda i stedet for natron?\",\n          hint:",
+  "hvor": "fane 3 Fejlkilder, spørgsmålet til fejlkilden"
+ },
+ {
+  "nr": 77,
+  "fil": "sc5.8_natron/js/sim_fejl.js",
+  "gammel": "this.papirTekst(NK.html(o.tekst) + \" \" + NK.html(D.FEJL_SPM))",
+  "ny": "this.papirTekst(NK.html(o.tekst) + \" \" + NK.html(o.spm))",
+  "hvor": "fane 3 Fejlkilder: kortet bruger fejlkildens eget spørgsmål"
+ },
+ {
+  "nr": 78,
+  "fil": "sc5.9_staaluld/js/data.js",
+  "gammel": "spm: \"Vægten viste mindre, end du har regnet ud. Hvorfor?\",",
+  "ny": "spm: \"Hvorfor vejer den brændte ståluld mindre, end du har regnet ud?\",",
+  "hvor": "fane 2, måling 1, spørgsmålet efter beregningen"
+ },
+ {
+  "nr": 79,
+  "fil": "sc5.9_staaluld/js/data.js",
+  "gammel": "/* {ox} er oxidet i det valgte reaktionsskema */\n    D.OVER_TAVLE = \"Hvad vejer stålulden, hvis alt jernet bliver til {ox}?\";",
+  "ny": "/* {ox} er oxidet i det valgte reaktionsskema, {mf} massen af stålulden */\n    D.OVER_TAVLE = \"Stålulden regnes som rent jern. Hvor mange gram {ox} dannes der af {mf} g jern?\";",
+  "hvor": "fane 2, måling 1 og 2, kortets spørgsmål over tavlen"
+ },
+ {
+  "nr": 79,
+  "fil": "sc5.9_staaluld/js/sim_beregning.js",
+  "gammel": "P.overTavle = function () { return D.OVER_TAVLE.replace(\"{ox}\", this.opg.sk.oxid); };",
+  "ny": "P.overTavle = function () { return D.OVER_TAVLE.replace(\"{ox}\", this.opg.sk.oxid).replace(\"{mf}\", K.g2(this.opg.tal.mf)); };",
+  "hvor": "fane 2: massen af stålulden sættes ind i spørgsmålet"
+ },
+ {
+  "nr": 79,
+  "fil": "sc5.9_staaluld/_selvtest.html",
+  "gammel": "D.OVER_TAVLE.replace(\"{ox}\", \"FeO\")) >= 0",
+  "ny": "D.OVER_TAVLE.replace(\"{ox}\", \"FeO\").replace(\"{mf}\", komma(B.opg.tal.mf))) >= 0",
+  "hvor": "selvtesten: spørgsmålet over tavlen"
+ },
+ {
+  "nr": 50,
+  "fil": "sc5.3_et_mol/_selvtest.html",
+  "gammel": "/Hvor høj bliver stakken\\?/.test(",
+  "ny": "/Hvor høj bliver en stak af 1 mol papirark\\?/.test(",
+  "hvor": "selvtesten: gæt 1 bliver på spørgsmålet"
+ },
+ {
+  "nr": 78,
+  "fil": "sc5.9_staaluld/_selvtest.html",
+  "gammel": "/Hvorfor\\?/.test(kortB.querySelector",
+  "ny": "/Hvorfor vejer den brændte ståluld mindre/.test(kortB.querySelector",
+  "hvor": "selvtesten: spørgsmålet efter de tre trin"
+ },
+ {
+  "nr": 79,
+  "fil": "sc5.9_staaluld/_selvtest.html",
+  "gammel": "/FeO\\?/.test(kortB.querySelector",
+  "ny": "/gram FeO dannes der af [\\d,]+ g jern\\?/.test(kortB.querySelector",
+  "hvor": "selvtesten: tilbage på Let"
+ }
+]

@@ -67,11 +67,14 @@
     /* ----- Panelet ------------------------------------------------------------------ */
     P.visListe = function () {
         var mig = this, html = "";
+        /* Et kommende trin er et nummer med en graa streg (21. nov. 2026) */
+        var nu = this.iEkstra ? (this.gemtTrin ? this.gemtTrin.nr : 0) : this.trinNr;
+        var maks = F.trinNaaet(this, "hoved", nu), hel = this.status.loest;
         this.hovedListe.forEach(function (t, j) {
             var nr = mig.iEkstra ? (mig.gemtTrin ? mig.gemtTrin.nr : 0) : mig.trinNr;
             var faerdig = mig.faerdig || j < nr || (!mig.iEkstra && j === mig.trinNr && !!mig.groen);
             var kl = faerdig ? "faerdig" : (!mig.iEkstra && j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(t.navn)) + "</span></li>";
+            html += F.trinLi(j, kl, "<span>" + D.sub(NK.html(t.navn)) + "</span>", hel || kl !== "" || j <= maks);
         });
         NK.saetHTML("p-trin", html);
         NK.saetTekst("p-maerke", this.status.stjerne ? "★ gennemført uden fejl" : (this.status.loest ? "✓ gennemført" : ""));

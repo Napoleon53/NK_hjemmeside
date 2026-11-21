@@ -134,3 +134,9 @@ reagerer ved rækken Ændring (fane 1) og først åbner med den rigtige vej (fan
 2), stjernerne, sproget (loftet over tekstlængder, ingen tankestreger,
 ASCII-dansk eller 1+/1−), at startbilledet står stille, og at kortet og
 tavlens indhold kan være der i alle trin fra 1100 × 620 til 1600 × 950.
+
+## Opgavelisten (21. nov. 2026)
+
+Listen med syrer og baser og trinlisten låser titlerne op i takt: kun de løste og den, eleven
+er ved, har titel, og de kommende er et nummer med en grå streg, der ikke kan klikkes (`visListe` i
+`js/trin.js`). Selvtesten afsnit 8 tjekker det (ALT OK, 54 påstande).

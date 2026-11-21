@@ -128,7 +128,7 @@
         },
         function () {
             return {
-                tekst: "Her er ethen. Hvilken form har atomerne omkring et af carbonatomerne?",
+                tekst: "Ethen, C₂H₄, står i scenen. Hvilken form har atomerne omkring hvert carbonatom i ethen?",
                 valg: D.FORM_ORDEN.map(function (f) { return D.FORMER[f].knap; }),
                 rigtig: D.FORM_ORDEN.indexOf("plan"),
                 laas: true,

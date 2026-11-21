@@ -112,9 +112,26 @@
         NK.el("s-trinliste").innerHTML = html;
     };
 
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende trin staar som et nummer med en graa streg uden titel. Et
+       trin er naaet, naar eleven er kommet dertil, naar trinnet foer er
+       loest (Vis svaret taeller som loest), eller naar eleven har renset en
+       ester foer (gemt i browseren). */
+    P.aabenTrin = function (i) {
+        return i <= this.trinNr || this.fase === "slut" || this.runder > 0 ||
+            (i === this.trinNr + 1 && !!this.groen && !!this.groen.spm);
+    };
+
     P.visListe = function () {
         var chips = NK.el("s-trinliste").querySelectorAll("[data-trin]"), mig = this;
         for (var i = 0; i < chips.length; i++) {
+            var aaben = this.aabenTrin(i);
+            var html = '<span class="oc-nr">' + (i + 1) + "</span>" +
+                (aaben ? '<span class="serie-navn">' + NK.html(this.trinListe[i].navn) + "</span>" : '<span class="hl-streg"></span>');
+            var f = chips[i].querySelector(".oc-f");
+            if (f.innerHTML !== html) f.innerHTML = html;
+            chips[i].classList.toggle("laast", !aaben);
+            chips[i].setAttribute("aria-label", aaben ? this.trinListe[i].navn : "Trin " + (i + 1) + ", kommer senere");
             var loest = i < this.trinNr || this.fase === "slut" || (i === this.trinNr && this.groen && this.groen.spm);
             chips[i].classList.toggle("loest", !!loest);
             chips[i].classList.toggle("valgt", i === this.trinNr && mig.fase !== "slut");

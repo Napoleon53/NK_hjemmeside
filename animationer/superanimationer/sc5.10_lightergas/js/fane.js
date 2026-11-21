@@ -89,7 +89,16 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Opgavelisten ---------------------------------------------------- */
+        /* ----- Opgavelisten ----------------------------------------------------
+           Brugeren 21. nov. 2026 ("husk dette"): de kommende opgaver staar som et
+           nummer med en graa streg uden titel og kan ikke klikkes, til eleven er
+           naaet dertil: alle foer den er loest (Vis svaret taeller som loest),
+           den er loest (ogsaa gemt i browseren), eller eleven har vaeret der. */
+        P.aabenOpgave = function (i) {
+            if ((this.status[i] && this.status[i].loest) || (this.naaet && this.naaet[i])) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
+        };
         P.bygListe = function () {
             var mig = this;
             this.el.liste.innerHTML = "";
@@ -97,18 +106,26 @@
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "hyldelinje";
-                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn">' + NK.html(o.titel) +
-                    '</span><span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
-                knap.addEventListener("click", function () { mig.vaelg(i, false); });
+                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn"></span>' +
+                    '<span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
+                knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i, false); });
                 mig.el.liste.appendChild(knap);
             });
+            this.visListe();
         };
 
         P.visListe = function () {
             var mig = this;
             var knapper = this.el.liste.querySelectorAll(".hyldelinje");
             this.status.forEach(function (s, i) {
-                knapper[i].classList.toggle("valgt", i === mig.nr);
+                var k = knapper[i], aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                var html = aaben ? NK.html(o.titel) + (o.under ? "<em>" + NK.html(o.under) + "</em>" : "") : '<span class="hl-streg"></span>';
+                var nv = k.querySelector(".hl-navn");
+                if (nv.innerHTML !== html) nv.innerHTML = html;
+                k.classList.toggle("laast", !aaben);
+                k.disabled = !aaben;
+                k.setAttribute("aria-label", aaben ? o.titel : "Opgave " + (i + 1) + ", kommer senere");
+                k.classList.toggle("valgt", i === mig.nr);
                 NK.saetTekst(navn + "-stj-" + i, s.stjerne ? "★" : (s.loest ? "✓" : ""));
             });
             NK.saetTekst(navn + "-loest", String(this.antalLoest()));
@@ -117,6 +134,8 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i, nyeTal) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
             this.hjaelp = 0;
             this.brugtSvar = false;
             this.faerdig = false;

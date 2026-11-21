@@ -2632,6 +2632,12 @@ html body.papirkort.papirkort .scenekort .sk-felt.svaret.vist .sk-svarvaerdi { b
 .opgliste li { cursor: pointer; }
 .opgliste li:hover { border-color: rgba(242, 197, 61, 0.55); }
 
+/* Kommende opgaver: et nummer med en graa streg i stedet for titlen
+   (titlerne laases op i takt, brugeren 21. nov. 2026) */
+.opgliste li.laast { cursor: default; opacity: 0.75; }
+.opgliste li.laast:hover { border-color: rgba(255, 255, 255, 0.08); }
+.opgliste li .hl-streg { display: block; flex: 0 0 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
 /* Teorien: enhederne for ε */
 .teori-tabel { border-collapse: collapse; margin: 2px 0 10px; font-size: 0.92rem; color: #dde3ea; }
 .teori-tabel th, .teori-tabel td { padding: 4px 16px 4px 0; text-align: left; }

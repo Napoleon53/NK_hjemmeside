@@ -87,6 +87,7 @@
     /* Opgaven paa kortet: den kendte masse og spoergsmaalet */
     P.kortTekst = function () {
         var o = this.x.o;
+        if (o.tekst.indexOf("{m} g") >= 0) return NK.html(o.tekst).replace("{m} g", D.tekstMasse(this.x.m) + "\u00a0g");
         return "Givet: <b>" + D.tekstMasse(this.x.m) + "\u00a0g " + D.stof(o.givet).formel + "</b>. " + NK.html(o.tekst);
     };
 

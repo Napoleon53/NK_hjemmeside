@@ -314,7 +314,7 @@ function koerTest(W) {
     vaelgA(1);
     paastand("opgave 2 begynder med gættet på et gult kort i scenen: mærket Gæt først, spørgsmålet og tre svar",
         /gaet/.test(skort.className) && skort.querySelector(".gk-maerke").textContent === "Gæt først" &&
-        skort.querySelector(".gk-tekst").textContent === "Hvad sker der med koncentrationen?" && skort.querySelectorAll(".gk-knap").length === 3, skort.textContent);
+        skort.querySelector(".gk-tekst").textContent === "Hvad sker der med koncentrationen, når der hældes vand i karret til dobbelt rumfang?" && skort.querySelectorAll(".gk-knap").length === 3, skort.textContent);
     paastand("spørgsmålet står kun på kortet i scenen, ikke i panelet", !/Hvad sker der/.test(d.querySelector("#fane-kar .panel").textContent) && !d.getElementById("kar-valg"));
     paastand("mens der gættes, er hintknappen kun et omrids, og der er ingen skilte", A.el.knap.classList.contains("stille") && skilte() === "", A.el.knap.className);
     paastand("mens der gættes, står der intet andet på kortet end gættet", besked(A) === "", besked(A));
@@ -802,6 +802,25 @@ function koerTest(W) {
     ramme.style.height = "820px";
     paastand("alle tilstande kunne nås", ikkeLoest.length === 0, ikkeLoest.join("; "));
     paastand("kortet er aldrig højere end sin plads på 1100 × 620, 1280 × 720, 1366 × 768 og 1500 × 900", forHoej.length === 0, forHoej.slice(0, 6).join("; "));
+
+    overskrift("13. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    NK.visFane("fane-fortynd"); C.tilpas(); C.layout();
+    C.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    C.naaet = {};
+    C.vaelg(0, false);
+    var laastL = function () { return [].slice.call(d.querySelectorAll("#fortynd-liste .hyldelinje")); };
+    var ll = laastL();
+    paastand("ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        ll.length === C.opgaver.length && ll.length > 1 && ll[0].textContent.indexOf(C.opgaver[0].titel) >= 0 && !ll[0].disabled &&
+        ll.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".hl-streg") && /^\d+$/.test(b.textContent.trim()); }),
+        ll.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    ll[ll.length - 1].click();
+    paastand("et klik på en låst opgave gør intet", C.nr === 0);
+    C.opgaveLoest("svar", "");
+    ll = laastL();
+    paastand("når opgave 1 er løst, kommer titlen på opgave 2 frem; de senere er stadig låst",
+        C.status[0].loest && ll[1].textContent.indexOf(C.opgaver[1].titel) >= 0 && !ll[1].disabled &&
+        ll.slice(2).every(function (b) { return b.disabled && !!b.querySelector(".hl-streg"); }));
 }
 </script>
 </body>

@@ -70,7 +70,7 @@
             id: "cu-ag", stang: "Cu", glas: "Ag",
             tekst: "Sæt kobberstangen i glasset med Ag⁺.",
             hint: "Tag fat i stangen med Cu, og slip den over glasset med Ag⁺.",
-            spm: "Væsken i glasset med Ag⁺ bliver blå. Hvor kommer farven fra?",
+            spm: "Kobberstangen står i glasset med Ag⁺. Hvor kommer den blå farve i glasset med Ag⁺ fra?",
             valg: ["Kobber(II)ioner fra stangen", "Sølv(I)nitrat bliver blåt med tiden", "Sølvet på stangen"],
             rigtig: 0,
             forkert: [null,
@@ -83,7 +83,7 @@
             id: "ag-cu", stang: "Ag", glas: "Cu",
             tekst: "Sæt sølvstangen i glasset med Cu²⁺.",
             hint: "Tag fat i stangen med Ag, og slip den over det blå glas.",
-            spm: "Der sker intet i glasset med Cu²⁺. Hvad gør kobber(II)ionerne i luppen?",
+            spm: "Der sker intet i glasset med Cu²⁺. Hvad gør kobber(II)ionerne, når de rammer sølvstangen?",
             valg: ["De støder ind i sølvet og svømmer videre", "De sætter sig på sølvet", "De tager elektroner fra sølvet"],
             rigtig: 0,
             forkert: [null,
@@ -148,7 +148,7 @@
         return K.Navn(m) + " i " + K.STOF[i].salt + ".";
     };
 
-    D.FU_SPM = "Sker der noget?";
+    D.FU_SPM = function (m, i) { return "Sker der en reaktion, når " + K.navn(m) + " kommer ned i " + K.STOF[i].salt + "?"; };
     D.FU_VALG = ["Ja, der sker en reaktion", "Nej, intet sker"];
 
     D.fuHint = function (m, i) {
@@ -167,7 +167,7 @@
             K.navn(m) + " kan ikke afgive elektroner til " + K.ionerne(i) + ".";
     };
 
-    D.PRODUKT_SPM = "Hvad dannes? Vælg de to stoffer.";
+    D.PRODUKT_SPM = function (m, i) { return "Der sker en reaktion. Hvilke to stoffer dannes, når " + K.navn(m) + " reagerer med " + K.ion(i) + "?"; };
 
     D.produktHint = function (r) {
         return "Metallet afgiver elektroner og bliver til en ion. " +

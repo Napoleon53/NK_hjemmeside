@@ -2515,3 +2515,13 @@ html body.papirkort.papirkort .scenekort .sk-felt input.ryst { border-color: var
     html body.papirkort.papirkort .scenekort .sk-felt input { font-size: 1rem; }
     html body.papirkort.papirkort .scenekort .sk-felt input { padding: 4px 9px; }
 }
+
+/* =====================================================================
+   Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026, "husk
+   dette"): de kommende opgaver og trin staar som et nummer med en graa
+   streg i stedet for titlen og kan ikke klikkes, til eleven er naaet dertil
+   ===================================================================== */
+.tr-streg, .oc-streg { display: inline-block; width: 62%; max-width: 9em; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+.oc-f .oc-streg { width: 7em; }
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }

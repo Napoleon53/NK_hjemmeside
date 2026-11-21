@@ -220,3 +220,8 @@ I menuen fra 20. november 2026 (brugeren: "du må gerne sætte den i menuen"):
 * Kemibogen: Prøv selv-linjerne i B2.4 og A1.4 (A1.4 med `#stempel`) og i slidesene
   til B2 peger hertil. Den byggede bog på kemibogen.dk peger på den gamle adresse,
   til bøgerne lægges ud igen.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Brugerens regel 21. nov. 2026: Listen viser kun titlen på de løste opgaver og den, eleven er ved. De kommende står som et nummer med en grå streg og kan ikke klikkes, før alle opgaver før dem er løst (Vis svaret tæller som løst).
+Koden er `aabenOpgave`, `bygListe` og `visListe` i `js/fane.js` og `.hl-streg` i `css/stil.css`. Selvtesten prøver det og gav ALT OK (97 påstande).

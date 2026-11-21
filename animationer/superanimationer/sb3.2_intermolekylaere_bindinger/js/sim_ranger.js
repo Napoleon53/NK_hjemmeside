@@ -50,6 +50,8 @@
     NK.Fane.paa(P, { navn: "r" });
 
     P.chipTekst = function (o) { return String(o.nr); };
+    /* Kun numre under niveauerne: ingen titler at laase (fane.js, aabenOpgave) */
+    P.kunNumre = true;
 
     function kp(id) { return D.STOF[id].kp; }
 

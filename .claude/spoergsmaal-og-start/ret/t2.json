@@ -1,0 +1,86 @@
+[
+ {
+  "nr": 88,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "tekst: \"Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L.\",",
+  "ny": "tekst: \"Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L vand.\",",
+  "hvor": "fane 1, opgave 5 Hvem er flest?, indledningen til gættet"
+ },
+ {
+  "nr": 88,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "valg: { spm: \"Hvilken ion bliver der flest af?\",",
+  "ny": "valg: { spm: \"Hvilken ion bliver der flest af, når Al₂(SO₄)₃ opløses i vand?\",",
+  "hvor": "fane 1, opgave 5 Hvem er flest?, gættet"
+ },
+ {
+  "nr": 89,
+  "fil": "sc6.2_formel_og_aktuel/js/regning.js",
+  "gammel": "        if (f.fase === \"koef\") return navn + \". Hvilke tal står foran ionerne?\";",
+  "ny": "        if (f.fase === \"koef\") {\n            var st = D.salt(this.opg.salt);\n            return \"Hvilke tal står foran \" + D.ion(st.kat).t + \" og \" + D.ion(st.an).t + \" i opløsningsskemaet for \" + st.formel + \"?\";\n        }",
+  "hvor": "fane 2, alle niveauer, spørgsmålet til skemaet (uden trinnavnet som løs sætning)"
+ },
+ {
+  "nr": 89,
+  "fil": "sc6.2_formel_og_aktuel/_selvtest.html",
+  "gammel": "/Hvilke tal står foran ionerne\\?/.test(promptB())",
+  "ny": "/Hvilke tal står foran \\S+ og \\S+ i opløsningsskemaet for \\S+\\?/.test(promptB())",
+  "hvor": "selvtesten, afsnit 6, Giv hint i skemaet"
+ },
+ {
+  "nr": "sc6.2-kort",
+  "fil": "sc6.2_formel_og_aktuel/js/regning.js",
+  "gammel": "        var navn = T.navn(f.id, this.opg), v = T.venstre(f.id, this.opg);",
+  "ny": "        /* Trinnavnet (navn) staar paa tavlen, ikke som loes saetning paa\n           kortet. Spoergsmaalet skal kunne laeses alene. */\n        var navn = T.navn(f.id, this.opg), v = T.venstre(f.id, this.opg), hvad = v;\n        if (f.id === \"Vsum\") hvad = \"det samlede rumfang V\";\n        if (f.id === \"ionBland\" || f.id === \"ion2\") hvad = v + \" i blandingen\";\n        if (f.id === \"total\") hvad = v + \" i glasset\";",
+  "hvor": "fane 2 og 3, spørgsmålet til trinnet: hvad der spørges om"
+ },
+ {
+  "nr": "sc6.2-kort",
+  "fil": "sc6.2_formel_og_aktuel/js/regning.js",
+  "gammel": "        if (f.fase === \"formel\") return navn + \". Hvilken formel giver \" + v + \"?\";\n        return navn + \". Hvad er \" + v + \"?\";",
+  "ny": "        if (f.fase === \"formel\") return \"Hvilken formel giver \" + hvad + \"?\";\n        return \"Hvad er \" + hvad + \"?\";",
+  "hvor": "fane 2 og 3, formel- og taltrinnet uden trinnavnet som løs sætning"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "tekst: \"Du opløser {mA} g {A} og {mB} g {B} i {V} vand. Hvad er [{ion}]?\",",
+  "ny": "tekst: \"Find [{ion}], når du opløser {mA} g {A} og {mB} g {B} i {V} vand.\",",
+  "hvor": "fane 3, To salte i ét glas, opgaveteksten"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "titel: \"Samme rumfang\", ion: \"Cl\",\n          tekst: \"Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}]?\",",
+  "ny": "titel: \"Samme rumfang\", ion: \"Cl\",\n          tekst: \"Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. Find [{ion}], når de hældes sammen.\",",
+  "hvor": "fane 3, Samme rumfang, opgaveteksten"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "titel: \"Forskelligt rumfang\", ion: \"Cl\",\n          tekst: \"Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}]?\",",
+  "ny": "titel: \"Forskelligt rumfang\", ion: \"Cl\",\n          tekst: \"Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. Find [{ion}], når de hældes sammen.\",",
+  "hvor": "fane 3, Forskelligt rumfang, opgaveteksten"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/js/data.js",
+  "gammel": "De hældes sammen. Hvad er [{ion}] og [{ion2}]?\",",
+  "ny": "Find [{ion}] og [{ion2}], når de hældes sammen.\",",
+  "hvor": "fane 3, Ionen i det ene glas, opgaveteksten"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/js/sim_bland.js",
+  "gammel": "            .replace(\"{ion}\", D.ion(o.ion).t).replace(\"{ion}\", D.ion(o.ion).t).replace(\"{ion2}\", o.ion2 ? D.ion(o.ion2).t : \"\");\n        return s;",
+  "ny": "            .replace(\"{ion}\", D.ion(o.ion).t).replace(\"{ion}\", D.ion(o.ion).t).replace(\"{ion2}\", o.ion2 ? D.ion(o.ion2).t : \"\");\n        /* Ved første regnetrin siger kortet, hvad trinnet er (i stedet for trinnavnet som løs sætning) */\n        var r = this.regning;\n        if (r && r.k === 0 && !r.faerdig() && r.nuNr() === r.foer + 1) {\n            var navn = NK.Tjek.navn(o.trin[0], o);\n            s += \" Første trin er \" + navn.charAt(0).toLowerCase() + navn.slice(1) + \".\";\n        }\n        return s;",
+  "hvor": "fane 3, alle fire opgaver, indledningen ved trin 1"
+ },
+ {
+  "nr": 90,
+  "fil": "sc6.2_formel_og_aktuel/_selvtest.html",
+  "gammel": "/Stofmængden af CaCl₂/.test(d.getElementById(\"bland-ind\").textContent)",
+  "ny": "/Find \\[Cl⁻\\], når du opløser 5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL vand\\. Første trin er stofmængden af CaCl₂\\./.test(d.getElementById(\"bland-ind\").textContent.replace(/\\u00a0/g, \" \"))",
+  "hvor": "selvtesten, afsnit 7, første opgave med to salte"
+ }
+]

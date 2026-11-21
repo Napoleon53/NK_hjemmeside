@@ -2555,3 +2555,15 @@ html body.papirkort.papirkort .scenekort .sk-felt.skbroek .efter { white-space: 
     html body.papirkort.papirkort .scenekort .sk-felt.skbroek .broekfelt input { padding: 1px 8px; font-size: 0.95rem; }
     html body.papirkort.papirkort .scenekort .sk-felter { margin-top: 6px; }
 }
+
+/* =====================================================================
+   Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026, "husk
+   dette"): de kommende opgaver og trin staar som et nummer med en graa
+   streg i stedet for titlen og kan ikke klikkes, til eleven er naaet dertil
+   ===================================================================== */
+.tr-streg, .oc-streg { display: inline-block; width: 62%; max-width: 9em; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+.oc-f .oc-streg { width: 7em; }
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.valgliste li.laast { cursor: default; }
+.valgliste li.laast:hover { border-color: rgba(255, 255, 255, 0.08); }

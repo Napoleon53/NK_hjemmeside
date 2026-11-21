@@ -58,8 +58,8 @@ skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
 
 **Opløsningen.** Et literglas med vand (0,50 eller 1,00 L) og én eller to
 krukker. En portion er 0,10 mol; den kan trækkes ned i glasset, eller man
-kan klikke på krukken. Luppen viser altid lige meget væske: én prik er
-0,05 M af en ion. Søjlerne viser saltets koncentration (grå) og hver ions,
+kan klikke på krukken. Luppen viser altid lige meget væske: én kugle er
+0,05 M af en ion (se "Scenen" nedenfor). Søjlerne viser saltets koncentration (grå) og hver ions,
 og en stiplet linje viser målet. Panelet har kun opgavekortet og
 opgavelisten. De seks opgaver: NaCl (én til én), Na₂SO₄ (tre
 spørgsmål i små trin), FeCl₃ (tre Cl⁻), K₃PO₄ (tre K⁺ i 0,50 L),
@@ -107,8 +107,11 @@ opløsningsskemaet afstemmes." (brugerens ønske 4. okt. 2026: før stod
 På Svær skal c(salt) beregnes først, og baglæns nævner linjen c(salt) og
 den anden ion.
 
-**Blandinger.** To salte i ét glas (bidragene lægges sammen), samme
-rumfang, forskelligt rumfang og en ion, der kun er i det ene glas.
+**Blandinger.** Samme rumfang, forskelligt rumfang, en ion, der kun er i
+det ene glas, og til sidst to salte i ét glas (bidragene lægges sammen).
+Rækkefølgen er byttet 21. nov. 2026, så fanen ikke begynder med en
+beregning i mange trin med to salte. Første opgave er trinvis (se "Svarene
+i kortet" nedenfor).
 
 **To salte i ét glas** (brugerens ønske 29. sept. 2026: eleverne blander c
 og n sammen) starter fra saltene: fx 5,55 g CaCl₂ og 4,00 g AlCl₃ ligger
@@ -120,7 +123,8 @@ valgt, så n og c bliver pæne tal (selvtesten tjekker det). Fejlene, der
 blander c og n, har egne beskeder: c = stofmængden, c = m / V og et bidrag
 regnet med n i stedet for c. I
 stofmængden skal tallet foran ionen med: n(Cl⁻) = 2 · c · V for CaCl₂.
-Når det samlede rumfang er fundet, hældes A og B i blandingsglasset, og når
+Når stofmængderne er fundet, hældes A og B i blandingsglasset, og det
+samlede rumfang aflæses på glasset (runde 5); når
 koncentrationen er fundet, viser luppen ionerne. De typiske fejl har egne
 beskeder: koncentrationerne lagt sammen, kun det ene rumfang, rumfanget i
 mL, tallet foran ionen glemt og ionen fra det ene glas, der ikke er
@@ -191,7 +195,28 @@ saltene først kommer i vandet og glassene først hældes sammen, når det er
 regnet, at hint og svar kun kommer fra den gule knap og står i
 opgavekortet, at knappen lyser op efter en fejl, og at
 layoutet holder fra 520 × 380 til 1500 × 900. Afsnit 8b tjekker papirkortet.
-Sidst kørt 6. november 2026: ALT OK (128 påstande).
+Afsnit 7b tjekker den trinvise første opgave på fane 3: at glassene kun
+hældes ved elevens klik eller træk, at luppen og linjerne på tavlen kommer
+efter det rigtige trin, at trinene kan klares med forkerte svar,
+hinttrappen og Vis svaret, at scenen er låst under et spørgsmål, at kortets
+plads er den samme i hele opgaven, og at alt er fremme, når opgaven er
+løst. Afsnit 7, 8 og 8b tjekker felterne og svarknapperne på kortet på
+fane 2 og 3, og afsnit 9, at panelet er smalt, at intet overlapper fra
+1100 × 620 til 1600 × 950, at hele beregningen kan stå på tavlen på fane 1,
+og at der intet svarfelt er i panelet. Afsnit 4 holder teksterne i den
+trinvise opgave og formlerne på kortet på sc7.5's tegngrænser.
+Afsnit 10 tjekker scenen fra runde 3: at hver ion i luppen er en kugle med
+formlen inde i (mindst 13,5 px), at ingen formel står uden for luppen (ingen
+legende), at luppen er stor og står over blandingsglasset, at glassene har
+etiketterne A, B og Blandingen og ingen tekst under sig, at tavlen står i
+højre side uden "OPGAVENS TAL", overskrift og "trin mere", og at hver linje
+har et navn i ord.
+Afsnit 7b dækker også starten fra runde 4 (trin 1 og 2 kan kun klares ved
+klik på det rigtige glas, kun det glas har rammen, og spørgsmålet om
+ionerne), og afsnit 11 opgavelisten (kommende opgaver uden titel kan ikke
+klikkes, titlen kommer, når opgaven nås) og krukken (lige ved glasset, med
+rammen og boblen).
+Sidst kørt 21. november 2026: ALT OK (201 påstande).
 
 ## Papirkortet (6. nov. 2026)
 
@@ -214,25 +239,192 @@ kortet" beskriver den gamle udgave; nu gælder dette:
   Efter et rigtigt svar bliver kortet på spørgsmålet med svaret grønt,
   forklaringen under og Næste spørgsmål, hvor Indsend svar stod. Et forkert svar
   koster stjernen (CLAUDE.md: stjerne kun for første forsøg). Beregningen står
-  i panelet i kortet Beregningen sammen med Start forfra.
-* Fane 2 og 3: felterne bliver i panelet (kortet Regnetrinene), men opgaven og
-  spørgsmålet til det aktive trin står på kortet, fx "Trin 1 af 3 ...
-  Hvilken formel giver n?". Indsend svar er gråt, til der står noget i feltet,
-  og Enter i feltet er det samme. Felternes egen ↵-knap er væk. Efter et trin
-  står der ingen ros; kortet spørger om næste trin. Efter sidste trin bliver
-  kortet med resultatet og Ny opgave eller Næste opgave.
+  på en lille tavle i scenen (se "Svarene i kortet" nedenfor).
+* Fane 2 og 3: se "Svarene i kortet" nedenfor (21. nov. 2026). Panelet har
+  kun opgavelisten.
 * Lærredet sætter pladsen øverst af til kortet (`kortZone`, ZONE i
   `js/sim_*.js`), og kortet får mere plads, hvis teksten kræver det.
 * Ingen molekylenavne at rette (stoffer som O₂ og Cl₂ nævnes ikke).
+
+## Svarene i kortet (21. nov. 2026, runde 2)
+
+Brugeren 21. nov. 2026, efter at have prøvet den første trinvise udgave af
+Blandinger: "man bliver stadig forvirret, når der efterfølgende bliver
+spurgt ind til formler og så sker der noget 5-6 steder.. hvor skal man
+egentlig kigge hen. Måske skal sidefanen være mindre? og måske skal svarene
+aldrig angives heroppe i panelet?" Han valgte: svarene på kortet på alle tre
+faner, først valg og så skrive på Blandinger, og et smallere panel.
+
+Eleven kigger nu to steder: **kortet** (spørgsmålet og svarene) og **tavlen**
+(regnestykket vokser linje for linje, og den linje, kortet spørger om, har
+den gule ramme). Panelet har kun opgavelisten, Nye tal og Start forfra og er
+300 px bredt (`--panel-bredde` i `css/stil.css`; 290 px er det mindste, hvor
+linjerne står på én linje i Chrome på Linux, og 300 px giver luft til
+andre systemers skrift).
+
+* **Fane 2 og 3** (`js/regning.js`): En formel vælges blandt tre svar på
+  kortet (den rigtige og to typiske fejl, `D.FORMELVALG` i `js/data.js` og
+  `T.formelValg` i `js/tjek.js`). Et tal skrives i et felt på kortet under
+  spørgsmålet, fx "n(Cl⁻) fra A = [ tallet ] mol", og skemaet har to små
+  felter ("CaCl₂(s) ⟶ [ ] Ca²⁺(aq) + [ ] Cl⁻(aq)"). Beskederne ved fejl er
+  de samme som før (`T.trin` og `T.afstem`). Efter et rigtigt svar bliver
+  kortet på spørgsmålet med svaret grønt, forklaringen under og Næste.
+  Etiketten tæller formlen og tallet som to trin, fx "Trin 3 af 7". Kortets
+  plads bliver i hele opgaven så stor, som kortet har været (`kortZone` i
+  `js/fane.js`), så scenen ikke hopper.
+* **Fane 3, tavlen**: Kun de løste linjer og den, kortet spørger om, står på
+  tavlen (se "Scenen" nedenfor om runde 3).
+* **Fane 3, første opgave (Samme rumfang)** er trinvis i seks trin, når den
+  ikke er løst før (`start` i `D.BLAND`, koden i `js/sim_bland.js`):
+  1. Eleven hælder glas A og glas B over i det tomme glas (klik eller træk;
+     "Klik: hæld" står over glassene). Blandingsglasset viser 200 mL, og
+     luppen Blandingen kommer frem med Na⁺, K⁺ og Cl⁻ (før har den en stiplet
+     plads).
+  2. "Hvor stort er det samlede rumfang i blandingsglasset?" (200 mL, 100 mL,
+     400 mL; fra runde 5 aflæses det, se nedenfor).
+     Tavlen får V = 200 mL = 0,200 L.
+  3. "Hvilken formel giver stofmængden af Cl⁻ fra glas A?" (n = c · V,
+     n = c / V, n = V / c).
+  4. "Hvor mange mol Cl⁻ kommer der fra glas A?" (0,0200 mol, 20,0 mol med
+     rumfanget i mL, 0,200 mol, som er koncentrationen).
+  5. Det samme for glas B.
+  6. "Hvad er [Cl⁻] i blandingen?" (0,200 M, 0,400 M med koncentrationerne
+     lagt sammen, 0,100 M med Cl⁻ fra kun det ene glas). Rosen siger, at der
+     er dobbelt så mange Cl⁻ i dobbelt så stort rumfang.
+
+  Tavlen læses oppefra i den rækkefølge, eleven svarer (V, n fra A, n fra B,
+  [Cl⁻]). Hvert trin har tre hint (Giv hint, Næste hint, Næste hint, Vis
+  svaret), og hvert forkert svar har sin egen forklaring. De forkerte tal
+  regnes af opgavens tal (`talValg`), så Nye tal også virker. Et klik i
+  scenen under et spørgsmål får kortet til at blinke. Er opgaven løst før,
+  eller er eleven på en senere opgave, regnes den som de andre. Nye tal på
+  den uløste første opgave giver trinene igen. Runde 2 afløser de to
+  spørgsmål fra runde 1 (hvilke salte giver Cl⁻, og hvordan lægges de
+  sammen).
+* **Fane 1**: Beregningen står på en lille tavle øverst til venstre i
+  scenen, over glasset og krukken (`lay.tavle` og `tilpasTavle` i
+  `js/sim_opl.js`, `.scenetavle` i `css/stil.css`). Pladsen er altid sat af,
+  så intet flytter sig, når den dukker op, og skriften skrumper, til det hele
+  kan være der. Konklusionen i ord står kun i kortets grønne forklaring.
+  Kortet selv ville blive for højt med beregningen, og så ville scenen hoppe.
+  Start forfra står i panelet under opgavelisten.
+* Indledningen på kortet på fane 2 og 3 går gennem `NK.Papir.tekst` sammen med
+  spørgsmålet (`kortHTML` i `js/fane.js`), så spørgsmålet står halvfedt på sin
+  egen linje. Trinnavnet står ikke længere som løs sætning foran spørgsmålet
+  ("Stofmængden af CaCl₂. Hvilken formel ..."). Ved første trin siger kortet
+  "Første trin er stofmængden af CaCl₂."
+
+## Scenen (21. nov. 2026, runde 3)
+
+Brugeren efter runde 2: "Jeg synes at den hvide tavle er forvirrende og
+indforstået. Jeg kunne godt tænke mig at glassene og bogstaverne er mere
+tydelige. Jeg synes mikrofiguren er et skridt tilbage i forhold til
+tidligere animationer. [...] Tavlen gerne rykkes lidt over i højre side.
+Mikrofiguren skal ikke indeholde legender, men være så stor at legenderne
+ligger inde i ionerne." Det gælder alle tre faner:
+
+* **Luppen** (`T.zoom`, `T.kugle` og `Partikler` i `js/tegning.js`) er som i
+  sc2.1 og sc6.3: hver ion er en blank kugle med formlen inde i (14 til 17 px),
+  en sammensat ion er én kugle, og Cl⁻ er større end Na⁺. Der er ingen legende.
+  Kuglerne skubber til hinanden, så formlerne kan læses. Luppen er større, og
+  en gul kegle går fra et felt i glasset, flasken eller blandingsglasset op
+  til luppen (`T.zoomKegle`, som sc6.3), så man ser, hvor luppen kigger.
+* **Glassene på Blandinger** er tegnet tydeligere (`T.glasTydelig`): tykt glas,
+  svagt blå væske og store skalastreger. Hvert glas har en etiket af lyst papir
+  med store, sorte bogstaver (`T.etiket`): "A", saltet og koncentrationen, og
+  "Blandingen" på det tomme glas. De små grå tekster under glassene er væk; i
+  To salte i ét glas står saltets navn på en seddel foran vægten. På Ionerne
+  står massen og rumfanget på flaskens etiket på Svær.
+* **Tavlen** (`tegnTavle` i `js/regning.js`, `T.papir` i `js/tegning.js`) er et
+  roligt stykke lyst papir i højre side af scenen på Ionerne og Blandinger,
+  uden genskin, uden "OPGAVENS TAL" (tallene står på glassene og flasken), uden
+  overskrift og uden "trin mere". Den tegnes først, når kortet spørger om den
+  første linje, og vokser linje for linje. Hver linje har et navn i ord over
+  regnestykket (`T.tavleNavn` i `js/tjek.js`), fx "Cl⁻ fra glas A" og
+  "n = c · V = 0,200 M · 0,100 L = 0,0200 mol". Linjen, kortet spørger om, har
+  "?" og den gule ramme. Skriften og papirets højde måles med alle linjer
+  løst, så intet skifter, når en linje dukker op.
+* **Fane 1** beholder tavlen med beregningen øverst til venstre, fordi luppen
+  og søjlerne står i højre side. Den er nu lyst papir uden overskrift, og hver
+  del har et navn i ord ("Koncentrationen af NaCl", "Opløsningsskemaet",
+  "Cl⁻ i glasset").
+* **Layoutet på Blandinger**: kortet øverst, glassene langs bordet til venstre
+  og i midten (Blandingen forrest, så A og B), luppen over blandingsglasset og
+  tavlen til højre. Selvtesten tjekker, at intet overlapper fra 1100 × 620 til
+  1600 × 950.
+
+## En let start, krukken og opgavelisten (21. nov. 2026, runde 4)
+
+Brugeren efter runde 3: Starten på Blandinger "lyder ikke særlig nemt at
+tilgå", krukken på fane 1 var "gemt komisk langt væk" med en svag pil, og
+opgavenavnene skal være mere sigende og låses op i takt med, at eleven kommer
+videre ("husk dette", nu i CLAUDE.md).
+
+* **Blandinger, første opgave** har otte trin og begynder med det konkrete,
+  én handling ad gangen (`start.haeld` og `start.ioner` i `D.BLAND`):
+  1. "Glas A og glas B har to forskellige saltopløsninger." **Klik på glas A
+     for at hælde det over i det tomme glas.** Kun glas A har den gule ramme
+     og boblen "Klik: hæld" (`T.ramme` og `T.boble` i `js/tegning.js`, som
+     krukken i sc6.1). Et klik på glas B hælder intet.
+  2. **Klik på glas B for at hælde det over i det samme glas.** Nu har glas B
+     rammen. Kortet går selv videre, når et glas er hældt over (det er en
+     handling, ikke et svar).
+  3. Luppen kommer frem. "Luppen viser blandingen." **Hvilke ioner er der i
+     blandingen?** (Na⁺, K⁺ og Cl⁻; NaCl og KCl; Kun Cl⁻.)
+  4. Først her kommer målet: "Nu skal du finde koncentrationen af Cl⁻ i
+     blandingen, [Cl⁻]." **Hvor stort er det samlede rumfang i blandingsglasset?**
+  5. til 8. Formlen, Cl⁻ fra glas A og B og [Cl⁻] som i runde 2 og 3.
+
+  Kortet til trin 1 og 2 er kort: Giv hint står ved teksten (`kompakt` i
+  `js/fane.js` og `css/stil.css`), og opfordringen står halvfedt (`fed`).
+* **Krukken på fane 1** står lige ved siden af glasset og er større
+  (`layout` i `js/sim_opl.js`). Så længe opgaven venter på salt
+  (`venterPaaSalt`), har krukken en gul ramme og boblen "Klik: en portion";
+  med to krukker har begge rammen. Den svage pil er væk.
+* **Opgavelisten** (`bygListe` og `visListe` i `js/fane.js`) har sigende
+  titler med en kort undertekst (`under` i `D.OPL`, `D.NIV` og `D.BLAND`), fx
+  "Natriumchlorid" / "Lav [Cl⁻] = 0,30 M". De kommende opgaver står som et
+  nummer med en grå streg, uden titel, og kan ikke klikkes, før eleven er nået
+  dertil (en løst opgave, også gemt i browseren, eller én, eleven har været
+  ved; Vis svaret tæller som løst). Niveauerne på Ionerne vælges frit og er
+  altid synlige.
+
+## Det gamle niveau og rumfanget (21. nov. 2026, runde 5)
+
+Brugeren: "det er ikke så tydeligt længere hvor meget man tilsatte, fordi man
+ikke kan se det på figuren.. måske bør der være en lille stiplet linje ved
+100 mL", og om rumfanget: "man kan jo normalvis ikke bare lægge 2 voluminer
+sammen.. [...] Måske skal der bare stå noget ala. Hvad er totalvoluminet? og
+så skal man svare 200 mL .. men der skal ikke komme en beregning, der viser
+det."
+
+* Når glas A og glas B er hældt over, har hvert glas en stiplet gul linje ved
+  det gamle niveau med rumfanget skrevet ved ("100 mL"); etiketten bliver
+  (`gammelV` i `T.glasTydelig`). Det gælder alle opgaver på Blandinger.
+* Kortet spørger "Hvor stort er det samlede rumfang i blandingsglasset?", og
+  eleven aflæser det: i første opgave med tre svar, i de andre i et felt i mL.
+  Tavlen viser kun "V = 200 mL = 0,200 L". "V = V(A) + V(B)" og
+  "100 mL + 100 mL" er væk overalt (tavle, hint, forklaringer, ros, Teori).
+  Hints peger på skalaen på blandingsglasset, og de forkerte svar forklares
+  med det, man ser (rumfanget i glas A før hældningen, den øverste streg).
+* I opgave 2-4 hældes glassene over, når begge stofmængder er fundet, så
+  rumfanget kan aflæses, før kortet spørger om det.
+* Selvtesten (afsnit 12) tjekker linjerne ved det gamle niveau og, at ingen
+  tekst lægger rumfang sammen på nogen opgave.
 
 ## Forenklinger
 
 * Alle salte regnes som helt opløst og helt delt i ioner. Der er ingen
   hydrolyse (FeCl₃, AlCl₃, Na₂CO₃, Na₃PO₄) og ingen ionpar.
-* Rumfanget af en blanding er summen af de to rumfang, og rumfanget af en
-  opløsning er rumfanget af vandet.
+* I modellen er rumfanget af en blanding summen af de to rumfang, og rumfanget
+  af en opløsning er rumfanget af vandet. Det passer kun godt, fordi
+  opløsningerne er fortyndede. Animationen viser det ikke som en regel: eleven
+  aflæser det samlede rumfang på blandingsglasset, og ingen tekst lægger
+  rumfang sammen (runde 5).
 * Jern(III)chlorid farver opløsningen gul; de andre salte er farveløse.
-* Luppen viser én prik for hver 0,05 M af en ion (højst 30, mindst én).
+* Luppen viser én kugle for hver 0,05 M af en ion (mindst én, højst 14 af hver).
+  Bliver der mere end ca. 20 kugler i opgaven, eller er luppen lille, er én
+  kugle 0,10 eller 0,20 M (`T.skala` i `js/tegning.js`).
 * Atommasserne har to decimaler (som sc5.1). Koncentrationer skrives med
   tre betydende cifre, masser og molarmasser med to decimaler.
 

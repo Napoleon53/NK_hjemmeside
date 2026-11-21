@@ -1,0 +1,366 @@
+[
+ {
+  "nr": 171,
+  "fil": "sb3.2_intermolekylaere_bindinger/js/data.js",
+  "gammel": "tekst: \"Ved hvilken temperatur ville ethanol så koge?\",",
+  "ny": "tekst: \"Ved hvilken temperatur koger ethanol uden hydrogenbindinger?\",",
+  "hvor": "fane 1, opgave 4 Uden hydrogenbindinger, gættet"
+ },
+ {
+  "nr": 172,
+  "fil": "sb3.2_intermolekylaere_bindinger/js/data.js",
+  "gammel": "spm: \"Ethanol koger 120 °C højere end propan. Hvorfor?\",",
+  "ny": "spm: \"Hvorfor koger ethanol 120 °C højere end propan?\",",
+  "hvor": "fane 2, par 1 propan og ethanol, spørgsmålet"
+ },
+ {
+  "nr": 173,
+  "fil": "sb3.2_intermolekylaere_bindinger/js/data.js",
+  "gammel": "spm: \"Butan-1-ol koger 40 °C højere end ethanol. Hvorfor?\",",
+  "ny": "spm: \"Hvorfor koger butan-1-ol 40 °C højere end ethanol?\",",
+  "hvor": "fane 2, par 2 ethanol og butan-1-ol, spørgsmålet"
+ },
+ {
+  "nr": 174,
+  "fil": "sb3.2_intermolekylaere_bindinger/js/data.js",
+  "gammel": "spm: \"Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C. Hvorfor?\",",
+  "ny": "spm: \"Hvorfor koger ethan-1,2-diol 119 °C højere end ethanol?\",",
+  "hvor": "fane 2, par 3 ethanol og ethan-1,2-diol, spørgsmålet"
+ },
+ {
+  "nr": 175,
+  "fil": "sb3.2_intermolekylaere_bindinger/js/data.js",
+  "gammel": "tekst: \"Et ethanolmolekyle har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H-atom i luppen.\",",
+  "ny": "tekst: \"Et ethanolmolekyle har seks H-atomer. Hvilket H-atom i ethanol kan danne hydrogenbindinger? Klik på det i luppen, og tryk Indsend svar.\",",
+  "hvor": "fane 1, opgave 3 Find H'et, kortet"
+ },
+ {
+  "nr": 176,
+  "fil": "sb3.3_isomerjagten/js/sim_jagt.js",
+  "gammel": "\"Alle \" + K.tal(n) + \" isomerer er fundet. Hvilken har det højeste kogepunkt? Klik på den på tavlen, og tryk Indsend svar.\"",
+  "ny": "\"Alle \" + K.tal(n) + \" isomerer er fundet. Hvilken af de \" + K.tal(n) + \" isomerer på tavlen har det højeste kogepunkt? Klik på den, og tryk Indsend svar.\"",
+  "hvor": "kogepunkterne i jagter med det højeste kogepunkt"
+ },
+ {
+  "nr": 177,
+  "fil": "sb3.4_geometrisk_isomeri/js/data.js",
+  "gammel": "maal: \"Træk den højre CH₃-gruppe i but-2-en op på samme side som den venstre CH₃-gruppe. Kan CH₃-gruppen komme derop?\" },",
+  "ny": "maal: \"Træk i den højre CH₃-gruppe i but-2-en. Kan den højre CH₃-gruppe i but-2-en drejes op på samme side som den venstre?\" },",
+  "hvor": "fane 1, opgave 2 But-2-en, kortet"
+ },
+ {
+  "nr": 178,
+  "fil": "sb3.5_spejlbilledeisomeri/js/sim_spejl.js",
+  "gammel": "\" Kan molekylet så drejes, så det passer med spejlbilledet?\");",
+  "ny": "\" Kan molekylet med de to byttede grupper drejes, så det passer med spejlbilledet?\");",
+  "hvor": "fane 1, opgave 3 bromchlorfluormethan (byt to grupper), spørgsmålet"
+ },
+ {
+  "nr": 179,
+  "fil": "sb3.5_spejlbilledeisomeri/js/sim_rs.js",
+  "gammel": "    P.promptHTML = function () {\n        return NK.html(\"Er molekylet (R)- eller (S)-\" + this.m.navn + \"?\" + (this.faerdig ? \"\" : \" \" + this.trinLinje()));\n    };",
+  "ny": "    /* Trin 1 spoerger om prioriteten og trin 2 er en instruktion; spoergsmaalet\n       om R eller S staar foerst i trin 3, hvor det kan besvares (21. nov. 2026) */\n    P.promptHTML = function () {\n        var t = this.faerdig ? \"svar\" : this.trinNu(), navn = this.m.navn;\n        if (t === \"tal\") return NK.html(this.naesteTal === 1 ? \"Hvilken gruppe på \" + navn + \" har højest prioritet? \" + this.trinLinje() :\n            \"Hvilken gruppe på \" + navn + \" får prioritet nummer \" + this.naesteTal + \"? Klik på gruppen i modellen, og tryk Indsend svar.\");\n        if (t === \"drej\") return NK.html(this.trinLinje());\n        return NK.html(\"Er molekylet (R)- eller (S)-\" + navn + \"?\" + (this.faerdig ? \"\" : \" \" + this.trinLinje()));\n    };",
+  "hvor": "fane 3 R eller S, kortet i trin 1 og 2"
+ },
+ {
+  "nr": 179,
+  "fil": "sb3.5_spejlbilledeisomeri/js/sim_rs.js",
+  "gammel": "\"Klik på den gruppe, der har højest prioritet, og tryk Indsend svar. Den får nummer 1.\"",
+  "ny": "\"Klik på gruppen i modellen, og tryk Indsend svar. Den får nummer 1.\"",
+  "hvor": "fane 3 R eller S, trin 1, linjen efter spørgsmålet"
+ },
+ {
+  "nr": 180,
+  "fil": "sb4.1_organiske_navne/js/kemi.js",
+  "gammel": "            tekst: k === \"alkohol\" ? \"Tæl carbonatomerne i den længste kæde, som OH-gruppen sidder på. Hvad er stammen?\"\n                : \"Tæl carbonatomerne i den længste kæde.\" + medC + \" Hvad er stammen?\",",
+  "ny": "            tekst: (k === \"alkohol\" ? \"OH-gruppen skal sidde på kæden.\" : medC.slice(1)) + \" Hvilken stamme passer til den længste kæde i formlen?\",",
+  "hvor": "fane 1, trin 1 Stammen (alle kædestoffer)"
+ },
+ {
+  "nr": 181,
+  "fil": "sb4.1_organiske_navne/js/kemi.js",
+  "gammel": "tekst: \"Den orange del sidder på det enkeltbundne oxygenatom og kommer fra alkoholen. Hvad hedder den?\",",
+  "ny": "tekst: \"Den orange del sidder på det enkeltbundne oxygenatom. Hvad hedder den orange del fra alkoholen?\",",
+  "hvor": "fane 1, ester trin 2 alkoholens del"
+ },
+ {
+  "nr": 182,
+  "fil": "sb4.1_organiske_navne/js/kemi.js",
+  "gammel": "tekst: \"Den grønne del har C=O og kommer fra syren. Carbonatomet i C=O tæller med. Hvad hedder den?\",",
+  "ny": "tekst: \"Carbonatomet i C=O tæller med. Hvad hedder den grønne del fra syren?\",",
+  "hvor": "fane 1, ester trin 3 syrens del"
+ },
+ {
+  "nr": 184,
+  "fil": "sb4.1_organiske_navne/js/kemi.js",
+  "gammel": "tekst: \"Tæl carbonatomerne i hver kæde på nitrogenatomet. Hvad hedder kæderne?\",",
+  "ny": "tekst: \"Tæl carbonatomerne i hver kæde. Hvad hedder kæderne på nitrogenatomet?\",",
+  "hvor": "fane 1, amin, kæderne"
+ },
+ {
+  "nr": 183,
+  "fil": "sb4.1_organiske_navne/js/sim_grupper.js",
+  "gammel": "tekst: \"Atomet med den gule ring sidder i en funktionel gruppe. Hvilken stofklasse giver gruppen?\",",
+  "ny": "tekst: \"Hvilken stofklasse hører den funktionelle gruppe med den gule ring til?\",",
+  "hvor": "fane 3, spørgsmålet efter et klik på en gruppe"
+ },
+ {
+  "nr": 185,
+  "fil": "sb4.2_estersyntese/js/sim_kond.js",
+  "gammel": "tekst: \"Esteren er dannet af \" + o.syre + \" og \" + o.alkohol + \". Hvad hedder esteren?\",",
+  "ny": "tekst: \"Hvad hedder esteren af \" + o.syre + \" og \" + o.alkohol + \"?\",",
+  "hvor": "fane 1, navnet på esteren"
+ },
+ {
+  "nr": 185,
+  "fil": "sb4.2_estersyntese/js/sim_tegn.js",
+  "gammel": "else tekst = \"Esteren er dannet af \" + o.syre + \" og \" + o.alkohol + \". Hvad hedder esteren?\";",
+  "ny": "else tekst = \"Hvad hedder esteren af \" + o.syre + \" og \" + o.alkohol + \"?\";",
+  "hvor": "fane 2, navnet på esteren"
+ },
+ {
+  "nr": 186,
+  "fil": "sb4.2_estersyntese/js/sim_tegn.js",
+  "gammel": "tekst = \"Esteren på tavlen er dannet af en carboxylsyre og en alkohol. Hvad hedder carboxylsyren?\";",
+  "ny": "tekst = \"Hvilken carboxylsyre er esteren på tavlen dannet af?\";",
+  "hvor": "fane 2, svær baglæns, syren"
+ },
+ {
+  "nr": 189,
+  "fil": "sb4.2_estersyntese/js/sim_tegn.js",
+  "gammel": "tekst = \"Syredelen er grøn. Hvilken alkohol er esteren dannet af?\";",
+  "ny": "tekst = \"Syredelen er grøn. Hvilken alkohol er esteren på tavlen dannet af?\";",
+  "hvor": "fane 2, svær baglæns, alkoholen"
+ },
+ {
+  "nr": 187,
+  "fil": "sb4.2_estersyntese/js/data.js",
+  "gammel": "spm: \"Nu er kun esteren tilbage i det øverste lag. Hvorfor ligger propylbutanoat øverst? Vælg alle, der passer.\",",
+  "ny": "spm: \"Nu er kun esteren tilbage i det øverste lag. Hvorfor danner propylbutanoat et lag oven på vandet? Vælg alle, der passer.\",",
+  "hvor": "fane 3, trin 4 Esteren"
+ },
+ {
+  "nr": 188,
+  "fil": "sb4.2_estersyntese/js/sim_kond.js",
+  "gammel": "tekst: D.stor(o.syre) + \" og \" + o.alkohol + \" danner en ester, og der fraspaltes vand. Klik på de tre atomer, der bliver til vand, og tryk Indsend svar.\" };",
+  "ny": "tekst: \"Hvilke tre atomer fraspaltes som vand, når \" + o.syre + \" og \" + o.alkohol + \" danner en ester? Klik på dem i formlerne, og tryk Indsend svar.\" };",
+  "hvor": "fane 1, første trin (vandet)"
+ },
+ {
+  "nr": 191,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/sim_produkt.js",
+  "gammel": "if (m) tekst = D.MAADE[m].tekst + \" Hvad bliver \" + navn + \" til?\";",
+  "ny": "if (m) tekst = D.MAADE[m].tekst + \" Hvad bliver \" + navn + \" til\" + (D.MAADE[m].ved ? \" \" + D.MAADE[m].ved : \"\") + \"?\";",
+  "hvor": "fane 2, spørgsmålet ved mild og kraftig oxidation (betingelsen står i D.MAADE[m].ved)"
+ },
+ {
+  "nr": 190,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/sim_produkt.js",
+  "gammel": "else tekst = navn.charAt(0).toUpperCase() + navn.slice(1) + \" oxideres med \" + D.MIDLER[this.opg.o.middel].navn + \". Hvad dannes?\";",
+  "ny": "else tekst = \"Hvad dannes, når \" + navn + \" oxideres med \" + D.MIDLER[this.opg.o.middel].navn + \"?\";",
+  "hvor": "fane 2, opgaver uden mild/kraftig"
+ },
+ {
+  "nr": 191,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/data.js",
+  "gammel": "tekst: \"Ved en mild oxidation med dichromat destilleres aldehydet fra, så snart det er dannet.\" },",
+  "ny": "tekst: \"Ved en mild oxidation destilleres produktet fra, så snart det er dannet.\", ved: \"ved en mild oxidation med dichromat\" },",
+  "hvor": "fane 2, indledningen og betingelsen i spørgsmålet ved mild oxidation"
+ },
+ {
+  "nr": 192,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/data.js",
+  "gammel": "tekst: \"Ved en kraftig oxidation bruges permanganat i overskud.\" }",
+  "ny": "tekst: \"Ved en kraftig oxidation bruges permanganat i overskud.\", ved: \"ved en kraftig oxidation med permanganat\" }",
+  "hvor": "fane 2, betingelsen i spørgsmålet ved kraftig oxidation"
+ },
+ {
+  "nr": 193,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/sim_forsoeg.js",
+  "gammel": "tekst: \"Se på carbonatomet med OH-gruppen i \" + navn + \". Hvor mange hydrogenatomer sidder der på det?\",",
+  "ny": "tekst: \"Hvor mange hydrogenatomer sidder på carbonatomet med OH-gruppen i \" + navn + \"?\",",
+  "hvor": "fane 3, trin 1 Molekylet"
+ },
+ {
+  "nr": 194,
+  "fil": "sb4.4_oxidation_af_alkoholer/js/sim_forsoeg.js",
+  "gammel": "\". Hvilket oxidationstal har det i \" + a.produkt + \"?\",",
+  "ny": "\". Hvilket oxidationstal har carbonatomet med C=O i \" + a.produkt + \"?\",",
+  "hvor": "fane 3, afstemning trin 1"
+ },
+ {
+  "nr": 195,
+  "fil": "sb4.11_dnph_og_tollens/js/sim_reaktion.js",
+  "gammel": "\"-ionen. Hvad er oxidationstallet for det samme carbonatom nu?\";",
+  "ny": "\"-ionen. Hvad er oxidationstallet for carbonatomet i COO⁻-gruppen i \" + s.produkt + \"-ionen?\";",
+  "hvor": "fane 2, Tollens trin 2"
+ },
+ {
+  "nr": 196,
+  "fil": "sb4.11_dnph_og_tollens/js/data.js",
+  "gammel": "spm: \"Ethanal og DNPH bindes sammen til ét molekyle, og der fraspaltes vand. Hvad hedder sådan en reaktion?\",",
+  "ny": "spm: \"Ethanal og DNPH er bundet sammen på tavlen. Hvad hedder en reaktion, hvor to molekyler bindes sammen, og der fraspaltes vand?\",",
+  "hvor": "fane 2, DNPH og ethanal, sidste spørgsmål"
+ },
+ {
+  "nr": 196,
+  "fil": "sb4.11_dnph_og_tollens/js/data.js",
+  "gammel": "hint: [\"To molekyler bliver til ét større, og et lille molekyle fraspaltes. Det kender du fra estere i afsnit B4.5.\"]",
+  "ny": "hint: [\"Estere dannes ved den samme slags reaktion. Det kender du fra afsnit B4.5.\"]",
+  "hvor": "fane 2, DNPH og ethanal, hintet (gentog spørgsmålet)"
+ },
+ {
+  "nr": 197,
+  "fil": "sb4.11_dnph_og_tollens/js/data.js",
+  "gammel": "spm: \"Carbonatomet i propanon havde en dobbeltbinding til oxygen. Hvilken binding har det nu til nitrogen?\",",
+  "ny": "spm: \"Carbonatomet i propanon havde en dobbeltbinding til oxygen. Hvilken binding er der mellem carbon og nitrogen i produktet af propanon og DNPH?\",",
+  "hvor": "fane 2, DNPH og propanon, sidste spørgsmål"
+ },
+ {
+  "nr": 198,
+  "fil": "sb4.11_dnph_og_tollens/js/data.js",
+  "gammel": "spm: \"Tollens' reagens indeholder også ammoniak. Hvad gør ammoniakken?\",",
+  "ny": "spm: \"Tollens' reagens indeholder sølv(I)ioner og ammoniak. Hvad gør ammoniakken i Tollens' reagens?\",",
+  "hvor": "fane 2, Tollens og ethanal, sidste spørgsmål"
+ },
+ {
+  "nr": 199,
+  "fil": "sb4.11_dnph_og_tollens/js/sim_test.js",
+  "gammel": "else tekst = \"Hvad sker der i Tollens' test med \" + v + \"? Glasset varmes i et vandbad. Vælg, og tryk Indsend svar.\";",
+  "ny": "else tekst = \"Glasset med Tollens' reagens varmes i et vandbad. Hvad sker der, når \" + v + \" varmes med Tollens' reagens?\";",
+  "hvor": "fane 1, spørgsmål 2 (Tollens' test)"
+ },
+ {
+  "nr": 199,
+  "fil": "sb4.11_dnph_og_tollens/js/sim_test.js",
+  "gammel": "tekst = \"Hvad sker der, når \" + v + \" tilsættes DNPH-opløsning? Vælg, og tryk Indsend svar.\";",
+  "ny": "tekst = \"Hvad sker der, når \" + v + \" tilsættes DNPH-opløsning?\";",
+  "hvor": "fane 1, spørgsmål 1 (DNPH), instruktionen efter spørgsmålet fjernet som i problemet"
+ },
+ {
+  "nr": 200,
+  "fil": "sb4.11_dnph_og_tollens/js/sim_ukendt.js",
+  "gammel": "tekst: \"Hvad viser de to test om stoffet i flaske \" + L + \"? Vælg, og tryk Indsend svar.\",",
+  "ny": "tekst: \"Stoffet i flaske \" + L + \" er testet med DNPH og med Tollens' reagens. Er stoffet i flaske \" + L + \" et aldehyd, en keton eller ingen af delene?\",",
+  "hvor": "fane 3, trin 2 Hvad viser testene?"
+ },
+ {
+  "nr": 201,
+  "fil": "sb5.1_absorptionsspektre/js/data.js",
+  "gammel": "tekst: \"Bromvand hældes i tomatsaft og trænger langsomt ned. Hvilke farver får saften fra top til bund?\",",
+  "ny": "tekst: \"Bromvand hældes i tomatsaft og trænger langsomt ned. Hvilke farver får tomatsaften fra top til bund, når bromvandet trænger ned?\",",
+  "hvor": "fane 2, opgave 8 Tomatregnbuen"
+ },
+ {
+  "nr": 202,
+  "fil": "sb5.1_absorptionsspektre/js/data.js",
+  "gammel": "tekst: \"Buta-1,3-dien har λmax = 217 nm. Hvor ligger λmax for stoffet med én konjugeret dobbeltbinding mere?\",",
+  "ny": "tekst: \"Buta-1,3-dien har to konjugerede dobbeltbindinger og λmax = 217 nm. Hvor ligger λmax, når buta-1,3-dien får én konjugeret dobbeltbinding mere?\",",
+  "hvor": "fane 2, opgave 1 Gæt først"
+ },
+ {
+  "nr": 203,
+  "fil": "sb5.1_absorptionsspektre/js/sim_chrom.js",
+  "gammel": "        return {\n            tekst: \"Chromoforen har \" + N + \" konjugerede dobbeltbinding\" + (N === 1 ? \"\" : \"er\") + \". Hvilken farve har stoffet?\",",
+  "ny": "        var navn = this.o.navn.charAt(0).toLowerCase() + this.o.navn.slice(1);\n        return {\n            tekst: \"Chromoforen har \" + N + \" konjugerede dobbeltbinding\" + (N === 1 ? \"\" : \"er\") + \". Hvilken farve har en opløsning af \" + navn + \"?\",",
+  "hvor": "fane 3, trin 2 Vælg farven (navnet kun i spørgsmålet: med navnet også i indledningen blev kortet for højt ved allura rød)"
+ },
+ {
+  "nr": "sb5-gaet",
+  "fil": "sb5.1_absorptionsspektre/js/fane.js",
+  "gammel": "                html += '<p class=\"gk-tekst\">' + NK.html(d.tekst) + '</p><div class=\"gk-svar n' + d.svar.length + '\">';",
+  "ny": "                /* Teksten som paa de andre kort: indledningen i almindelig skrift og kun\n                   spoergsmaalet halvfedt (NK.Papir.tekst, 21. nov. 2026) */\n                html += '<p class=\"sk-tekst\">' + papir(NK.html(d.tekst)) + '</p><div class=\"gk-svar n' + d.svar.length + '\">';",
+  "hvor": "gæt-kortet: teksten gennem NK.Papir.tekst som på de andre kort"
+ },
+ {
+  "nr": "sb5-gaet",
+  "fil": "sb5.1_absorptionsspektre/css/stil.css",
+  "gammel": ".sk-tekst { margin: 0; }\n",
+  "ny": ".sk-tekst { margin: 0; }\n.scenekort.gaet .sk-tekst { margin-bottom: 10px; }   /* gæt-kortet: luft over svarene (21. nov. 2026) */\n",
+  "hvor": "gæt-kortet: luft mellem teksten og svarknapperne"
+ },
+ {
+  "nr": 206,
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Kuvetten tømmes og fyldes med rent vand. Hvor meget af lyset når så frem til detektoren?\",",
+  "ny": "spm: \"Kuvetten tømmes og fyldes med rent vand. Hvor meget af lyset når frem til detektoren, når kuvetten kun indeholder vand?\",",
+  "hvor": "fane 1, forudsigelse 1 Vand i kuvetten"
+ },
+ {
+  "nr": 207,
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,20 mM slipper 32 % af lyset igennem. Hvor meget slipper igennem, når koncentrationen fordobles til 0,40 mM?\",",
+  "ny": "spm: \"Ved 0,20 mM slipper 32 % af lyset igennem. Hvor meget af lyset slipper igennem, når koncentrationen fordobles til 0,40 mM?\",",
+  "hvor": "fane 1, forudsigelse 3 Dobbelt koncentration: lyset"
+ },
+ {
+  "nr": 205,
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,12 mM slipper ca. halvdelen af lyset gennem 1,00 cm. Hvor meget slipper gennem 2,00 cm?\",",
+  "ny": "spm: \"Ved 0,12 mM slipper ca. halvdelen af lyset gennem en kuvette på 1,00 cm. Hvor meget af lyset slipper igennem, når kuvetten er 2,00 cm bred?\",",
+  "hvor": "fane 1, forudsigelse 4 Én centimeter mere"
+ },
+ {
+  "nr": 204,
+  "fil": "sb5.2_lambert_beer/js/data.js",
+  "gammel": "spm: \"Ved 0,40 mM og 1,00 cm er A = 0,980. Koncentrationen halveres til 0,20 mM, og kuvettebredden bliver 2,00 cm. Hvad bliver A?\",",
+  "ny": "spm: \"Ved 0,40 mM og 1,00 cm er A = 0,980. Hvad bliver A, når koncentrationen halveres til 0,20 mM, og kuvetten bliver 2,00 cm?\",",
+  "hvor": "fane 1, forudsigelse 5 Halv koncentration, dobbelt vej"
+ },
+ {
+  "nr": "sb5-gaet",
+  "fil": "sb5.2_lambert_beer/js/fane.js",
+  "gammel": "                html = \"\";\n                if (d.intro) html += '<p class=\"gk-intro\">' + NK.html(d.intro) + \"</p>\";\n                html += '<p class=\"gk-tekst\"><span class=\"gk-maerke\">Gæt først</span>' + NK.html(d.tekst) + '</p><div class=\"gk-svar n' + d.svar.length + '\">';",
+  "ny": "                html = '<span class=\"gk-maerke\">Gæt først</span>';\n                if (d.intro) html += '<p class=\"gk-intro\">' + NK.html(d.intro) + \"</p>\";\n                /* Teksten som paa de andre kort: indledningen i almindelig skrift og kun\n                   spoergsmaalet halvfedt (NK.Papir.tekst, 21. nov. 2026) */\n                html += '<p class=\"sk-tekst\">' + papir(NK.html(d.tekst)) + '</p><div class=\"gk-svar n' + d.svar.length + '\">';",
+  "hvor": "gæt-kortet: teksten gennem NK.Papir.tekst som på de andre kort"
+ },
+ {
+  "nr": "sb5-gaet",
+  "fil": "sb5.2_lambert_beer/css/stil.css",
+  "gammel": ".sk-tekst { margin: 0; }\n",
+  "ny": ".sk-tekst { margin: 0; }\n.scenekort.gaet .sk-tekst { margin-bottom: 10px; }   /* gæt-kortet: luft over svarene (21. nov. 2026) */\n",
+  "hvor": "gæt-kortet: luft mellem teksten og svarknapperne"
+ },
+ {
+  "nr": 208,
+  "fil": "sb5.3_spektrofotometri/js/data.js",
+  "gammel": "spoergsmaal: \"Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133. Hvad er koncentrationen af hvert farvestof?\",",
+  "ny": "spoergsmaal: \"Den grønne farve skyldes det gule farvestof E102 og det blå farvestof E133. Hvad er koncentrationen af E102 og af E133 i den grønne drik?\",",
+  "hvor": "fane 3, spørgsmålet"
+ },
+ {
+  "nr": 209,
+  "fil": "sb5.4_spektroskopiopgaver/js/data.js",
+  "gammel": "return \"En anden blodprøve giver absorbansen \" + D.abs(o.hoejA) + \". Hvad gør du for at finde koncentrationen af prilocain?\";",
+  "ny": "return \"En anden blodprøve med prilocain er målt ved \" + o.lambda + \" nm. Hvordan finder du koncentrationen i en blodprøve med A = \" + D.abs(o.hoejA) + \"?\";",
+  "hvor": "fane 3, prilocain trin 4 For høj absorbans"
+ },
+ {
+  "nr": 210,
+  "fil": "sb6.1_syrestyrke/js/data.js",
+  "gammel": "Hvor mange gange større er Kₛ for methansyre?\",",
+  "ny": "Hvor mange gange større er Kₛ for methansyre end for ethansyre?\",",
+  "hvor": "fane 1, opgave 6 Faktoren 10"
+ },
+ {
+  "nr": 212,
+  "fil": "sb6.1_syrestyrke/js/data.js",
+  "gammel": "\" reagerer med vand. Hvad dannes, når \" + D.u(s.syre) + \" afgiver en hydron til vand?\"; },",
+  "ny": "\" reagerer med vand. Hvilken base dannes, når \" + D.u(s.syre) + \" afgiver en hydron til vand?\"; },",
+  "hvor": "fane 2, trin 1 Reaktionen"
+ },
+ {
+  "nr": 211,
+  "fil": "sb6.1_syrestyrke/js/data.js",
+  "gammel": "\". Hvilken syre er det? Begynd med at måle pH i opløsningen.\"; },",
+  "ny": "\". Syren findes ud fra pH og cₛ. Hvad er pH i flasken med den ukendte syre?\"; },",
+  "hvor": "fane 3, trin 1 Mål pH"
+ },
+ {
+  "nr": 213,
+  "fil": "sb6.1_syrestyrke/js/data.js",
+  "gammel": "return \"Syren har afgivet hydroner til vand. Hvor stor er [B], koncentrationen af syrens korresponderende base?\"; },",
+  "ny": "return \"Den ukendte syre har dannet sin korresponderende base, B. Hvor stor er koncentrationen af basen B i flasken?\"; },",
+  "hvor": "fane 3, trin 3 Basen (indledningen forkortet: forslagets var to linjer, og det grønne kort blev for højt)"
+ }
+]

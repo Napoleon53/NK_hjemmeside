@@ -77,7 +77,7 @@
         if (o.byt && !this.byttet) {
             return NK.html(navn + (this.bytValgt === null ? "Klik på to af grupperne til venstre, så de bytter plads." :
                 "Klik på den gruppe, " + D.tekst(this.grupper[this.bytValgt]) + " skal bytte plads med.") +
-                " Kan molekylet så drejes, så det passer med spejlbilledet?");
+                " Kan molekylet med de to byttede grupper drejes, så det passer med spejlbilledet?");
         }
         var n = this.match ? this.antalMatch() : 0;
         var slut = this.faerdig ? "" : (n === 4 ? " Alle fire grupper passer. Tryk Indsend svar." : " Træk i molekylet til venstre, og tryk Indsend svar.");

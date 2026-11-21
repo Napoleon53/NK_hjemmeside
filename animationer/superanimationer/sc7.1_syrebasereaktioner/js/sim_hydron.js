@@ -118,7 +118,8 @@
     };
 
     /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
-    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 142); };
+    /* 133 og 157 (foer 124 og 142): spoergsmaalet paa egen linje, 21. nov. 2026 */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 133, 157); };
 
     /* Hvor de to partikler staar. Pladsen regnes ud fra reaktanterne med
        plads til et H paa hvert frit par, saa intet flytter sig, naar
@@ -509,7 +510,7 @@
         if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
         this.kort.vis({
             chip: "Reaktion " + (n + 1) + " af " + D.HYDRON.length,
-            tekst: NK.html(D.HYDRON[n].tekst + " " + INSTRUKS),
+            tekst: NK.html([D.HYDRON[n].tekst, INSTRUKS, D.HYDRON[n].spm].filter(Boolean).join(" ")),
             bliv: bliv,
             besked: b,
             hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap, laast: this.hjaelp === 2 },

@@ -46,7 +46,7 @@
     }
 
     var P = SimKugler.prototype;
-    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Skemaet", zone: [156, 124] });
+    NK.Fane.paa(P, { navn: "kg", naesteFane: "fane-sk", naesteNavn: "Skemaet", zone: [156, 124], laasTitler: true });
 
     P.chipTekst = function (o) { return NK.html(o.navn); };
 
@@ -83,7 +83,7 @@
 
     /* Opgaven paa papirkortet: det, reaktionen handler om, og hvad der skal goeres */
     P.kortTekst = function () {
-        return this.opg.o.tekst + " Afstem reaktionen med + og − foran stofferne, og tryk Indsend svar.";
+        return this.opg.o.tekst + " Hvilke tal skal stå foran stofferne, så der er lige mange af hvert atom før og efter pilen?";
     };
 
     P.trinLinje = function () {

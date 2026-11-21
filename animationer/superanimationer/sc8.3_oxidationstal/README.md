@@ -226,6 +226,11 @@ i linjen under feltet, og knappen bliver til Vis svaret (kun et omrids).
 Efter et forkert svar lyser knappen stille op. Under tavlen er der en smal
 stribe til knappen Start forfra.
 
+## Opgavelisten (21. nov. 2026)
+
+Listerne på begge faner (et nummer i gruppen i stedet for formlen; grupperne står som før) låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 12 tjekker det.
+
 ## Forenklinger
 
 * Elektronegativiteterne er Paulings værdier med én decimal fra Databogen

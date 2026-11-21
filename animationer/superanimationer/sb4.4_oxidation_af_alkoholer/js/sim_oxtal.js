@@ -66,7 +66,9 @@
         });
         NK.el("o-serieliste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-serie]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-serie"), 10));
+            if (!k) return;
+            var i = parseInt(k.getAttribute("data-serie"), 10);
+            if (mig.aabenSerie(i)) mig.vaelg(i);
         });
         NK.el("o-kontakter").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-vis]") : null;
@@ -111,17 +113,34 @@
         var html = "";
         D.SERIER.forEach(function (s, i) {
             html += '<button type="button" class="opg-chip serie" data-serie="' + i + '">' +
-                '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" +
-                '<span class="serie-navn">' + NK.html(s.navn) + '<small>' + NK.html(D.TYPER[s.type].navn) + " alkohol</small></span></span>" +
-                '<i class="oc-m"></i></button>';
+                '<span class="oc-f"></span><i class="oc-m"></i></button>';
         });
         NK.el("o-serieliste").innerHTML = html;
+    };
+
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun
+       de klarede alkoholer og den, eleven er ved, viser navnet. De kommende
+       staar som et nummer med en graa streg og kan ikke klikkes, til eleven
+       er naaet dertil: alle foer den er klaret (Vis svaret taeller som
+       klaret), eller eleven har vaeret der. */
+    P.aabenSerie = function (i) {
+        if (this.status[i].loest || (this.naaet && this.naaet[i])) return true;
+        for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+        return true;
     };
 
     P.visListe = function () {
         var mig = this, knapper = NK.el("o-serieliste").querySelectorAll("[data-serie]");
         for (var i = 0; i < knapper.length; i++) {
-            var s = this.status[i];
+            var s = this.status[i], se = D.SERIER[i], aaben = this.aabenSerie(i);
+            var html = '<span class="oc-nr">' + (i + 1) + "</span>" + (aaben ?
+                '<span class="serie-navn">' + NK.html(se.navn) + "<small>" + NK.html(D.TYPER[se.type].navn) + " alkohol</small></span>" :
+                '<span class="hl-streg"></span>');
+            var f = knapper[i].querySelector(".oc-f");
+            if (f.innerHTML !== html) f.innerHTML = html;
+            knapper[i].classList.toggle("laast", !aaben);
+            knapper[i].disabled = !aaben;
+            knapper[i].setAttribute("aria-label", aaben ? se.navn : "Alkohol " + (i + 1) + ", kommer senere");
             knapper[i].classList.toggle("valgt", i === mig.nr);
             knapper[i].classList.toggle("loest", s.loest);
             knapper[i].classList.toggle("stjerne", s.stjerne);
@@ -168,6 +187,8 @@
     /* ----- En alkohol ---------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[i] = true;
         this.serie = D.SERIER[i];
         this.b = K.byg(this.serie);
         this.mol = this.b.mol;

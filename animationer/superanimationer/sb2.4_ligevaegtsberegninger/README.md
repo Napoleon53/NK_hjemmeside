@@ -267,3 +267,250 @@ Når brugeren siger til:
 * `FEEDBACK_EMNER` i `samling_alt_b.html` er uændret: knappen hedder stadig
   "Ligevægtsberegninger" og har nummer 3.
 * Kolonnen "I menuen" i superanimationernes README rettes.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Brugerens regel 21. nov. 2026: Listen viser kun titlen på de løste opgaver og den, eleven er ved. De kommende står som et nummer med en grå streg og kan ikke klikkes, før alle opgaver før dem er løst (Vis svaret tæller som løst). På Med x vælges niveauerne (Let, Middel, Svær) frit. Hvert niveaus første opgave er åben, og inden for niveauet låses titlerne op i rækkefølge.
+Koden er `aabenOpgave`, `bygListe` og `visListe` i `js/fane.js`. Selvtesten prøver det og gav ALT OK (653 påstande). Fra 21. nov. 2026 (T3) står listen i rækken øverst i scenen, og de kommende er stiplede numre (se nedenfor).
+
+## Regelsættet (21. nov. 2026, T3): trinvis start, intet panel, rolig skrift og kort teori
+
+Niels 21. nov. 2026 sagde ja til forslaget til T3 (`REGELSAET.md` i
+superanimationerne). Problemet var, at fane 1 viste seks ting på én gang
+(beholderen, grafen, skyderen, skemaet, boksen med Y og K og et langt kort),
+så kortet selv måtte sige "Y og K står nederst til højre".
+
+* **Trinvis start på mål 1** (regel 11-16, mønster `sc5.7`): Fra start er
+  kun beholderen fremme. Grafen, skyderen, skemaet og Y-boksen har en stiplet
+  plads med navnet (`data-navn`, klassen `.stiplet`; grafen tegnes som en
+  stiplet ramme på lærredet), så intet hopper, når de kommer frem. Kortet
+  siger "Trin 1 af 4" og stiller tre spørgsmål med tre svar hver
+  (`D.MAAL[0].trin` i `js/data.js`). Hvert forkert svar er en fejl, elever
+  faktisk laver (brøken vendt om, plus i tælleren, Y = K fra start, Y lig med
+  [SO₂Cl₂]), og har sin egen forklaring.
+  1. **Hvilken brøk er reaktionsbrøken Y for SO₂Cl₂ ⇌ SO₂ + Cl₂?** (svarene
+     er brøker på knapperne) Svaret: Y-boksen kommer frem.
+  2. **Hvor stor er Y, før noget SO₂Cl₂ er spaltet?** Svaret: Grafen kommer frem.
+  3. **Hvad sker der med Y, når mere SO₂Cl₂ bliver spaltet?** Svaret:
+     Skyderen kommer frem med en gul ramme og boblen "Træk: x".
+  4. Målet som før: **Hvor stor er x, når reaktionsbrøken Y er lig med K?**
+
+  Hvert trin har en hinttrappe på tre trin og så Vis svaret. Et klik på et
+  svar vælger kun, Indsend svar bedømmer. Efter et rigtigt svar bliver kortet
+  på spørgsmålet med svaret grønt, forklaringen og Næste spørgsmål. Scenen er
+  låst, mens kortet stiller et spørgsmål (et greb i scenen får kortet til at
+  blinke). Skemaet bliver stiplet til mål 2. Er mål 1 nået før (gemt i
+  browseren), er der ingen trin, og alt er fremme. Start forfra på mål 1
+  giver trinene igen. Koden: `trinNu`, `fremme`, `visDele`, `dommTrin`,
+  `trinOk` og `naesteTrin` i `js/sim_beholder.js`; kortets svarknapper og
+  `trinBliv` i `js/fane.js`.
+* **Intet panel** (regel 3, højst 10 opgaver): Alle tre faner har en smal
+  række øverst i scenen med nummer og tema og "↺ Start forfra" til højre
+  (`.opgaverad`, som `sc5.7`). Kommende opgaver er stiplede numre uden tema.
+  På Med x står Let, Middel og Svær foran deres opgaver. Er rækken for bred,
+  har kun den valgte opgave sit tema (`.kompakt`); under 1200 px står kun
+  numrene, og temaet står på kortets etiket. Målene har fået sigende temaer
+  ("SO₂Cl₂: x ved ligevægt", "HBr: koefficienten 2", "Vandgas: grænsen for
+  x" og ikke to gange "Find ligevægten"). Panelets kort Reaktionen er afløst
+  af en **etiket på beholderen** med reaktionen, temperaturen og K med store
+  sorte bogstaver på et lyst mærkat (regel 22). Besvarelsen i panelet på fane
+  2 og 3 er væk (tavlen viser den), og kurven fra start til ligevægt står
+  sidst på tavlen, med y-titlen vandret over aksen.
+* **Klik-opfordringer** (regel 19-21): kun når kortet beder om en handling.
+  Skyderen har "Træk: x" på mål med skyderen, til eleven har trukket.
+  Knappen Løs ligningen med CAS har "Klik: løs med CAS", til den er brugt.
+* **Spørgsmålet på egen linje** (regel 6): kortet sætter nu teksten med
+  `NK.Papir.tekst`, også på fane 1. Beskeden "Y og K står nederst til højre"
+  er væk.
+* **Skriften** (regel 30, Niels: "Jeg synes faktisk det er lidt voldsomt"):
+  Tavlerne, skemaet, rækken og lærredet bruger Lexend med vægt 400-600 i
+  stedet for fed Segoe UI. Ingen versaler: "OPLYST", "KLIK FOR AT SKRIVE",
+  "KONCENTRATIONERNE VED LIGEVÆGT" og "VED LIGEVÆGT ER Y = K" står i
+  almindelig skrift ("Klik for at skrive:"). Selvtesten tjekker, at intet
+  synligt i scenerne har versaler.
+* **Teorien** (regel 31, Niels: "der må gerne stå mindre og med en mere
+  elegant skrifttype, og måske en henvisning, der fører læseren tilbage til
+  kemibogen"): et lyst ark (`../faelles/teori.css`, klassen `teori-ark`) med
+  ligevægtsloven, skemaet med x og ét eksempel. Afsnittene om enheden,
+  kontrollen og grænsen for x er taget ud; de står i bogen. Sidst står "Læs
+  mere i Kemibogen: B2.5 Ligevægtsberegninger" med link til kemibogen.dk.
+* Kortets plads (`--kz`): 214 px på fane 1 (246 px på en skærm over 720 px,
+  fordi trinenes brøker og et hint på to linjer når 240 px) og 236 px på fane
+  2 og 3. Selvtesten måler nu kortets nederste kant fra scenens top, ikke kun
+  kortets højde, fordi kortet står under rækken.
+* Rundvisningen peger på rækken og nævner etiketten.
+
+Selvtesten: ALT OK (723 påstande, før 653), 21. nov. 2026. Nye påstande:
+trinene (etiket, spørgsmål på egen linje, tre svar, Indsend svar gråt, låst
+scene, forkert svar rødt med egen forklaring, hinttrappen, rigtigt svar
+bliver, det rigtige kommer frem, intet hopper), trin 4 med boblen, at boblen
+forsvinder, skemaet til mål 2, Start forfra giver trinene igen, gemt mål 1
+viser alt, rækken over kortet og ikke for bred, intet panel, kurven på
+tavlen, teorien med link og ingen versaler.
+
+## Runde 2 (21. nov. 2026): fane 1 bygget om
+
+Niels efter runde 1: "Selve animationen er lidt grim.. Det er forvirrende med
+alle de farver.. Der er så lidt plads i beholderen, at man bare bliver
+forvirret. Måske skal beholderen være større, og de forskellige molekyler skal
+måske farvekodes på det er rart for øjnene. Selve reaktionsskemaet er gemt ...
+ved siden af en bevægende figur ... Kan du i stedet for første linje så ikke
+bare skrive reaktionsskemaet med stort ... den vil nok bare lidt for meget med
+en 2. gradsligning.. fordi man skal pludselig sætte en masse rækker ind på en
+gang ... Grafen har fået lov til at få den centrale plads..selvom vi ikke
+rigtig bruger den i bogen. og skyderen sidder lidt akavet adskilt fra
+grafen." Og: "Måske skal grafen kunne foldes ind, når vi skal videre til
+beregningen. og ved beregningen skal der kun komme en række eller endda felt
+ad gangen... Måske skal x lige defineres lidt tydeligere inden man bliver
+kastet ud i det." (REGELSAET 5a, 19a, 32-37.)
+
+* **Kortets første linje er reaktionsskemaet med stort** (1,5 gange kortets
+  skrift) med "K = 0,0500 M ved 375 °C" i almindelig skrift efter det, på
+  alle mål. Etiketten på beholderen er væk. Koden: `d.rx` i `kortHTML` i
+  `js/fane.js`, `.sk-rx` i `css/stil.css`.
+* **Beholderen er hovedfiguren**: halvdelen af scenen (mindst 45 %), høj, og
+  scenen er samlet i midten og højst 1500 px bred. Hvert stof har sin egen
+  dæmpede farve (`D.FARVE` i `js/data.js`: SO₂Cl₂ blå, SO₂ orange, Cl₂ grøn,
+  H₂ lilla, Br₂ terrakotta, HBr gul, CO grå, H₂O turkis, CO₂ orange).
+  Molekylerne er tegnet i én farve med en blød skygge; atomfarverne bruges
+  ikke. Under beholderen står antallet af hvert stof i stoffets farve og
+  "1 molekyle = 0,01 M". Skemaets kolonneoverskrifter har de samme farver.
+  Molekylerne bevæger sig langsommere (regel 26).
+* **Grafen**: På mål 1 står den ved siden af beholderen og er mindre end
+  før. Skyderen ligger under beholder og graf som én række, og dens skala
+  flugter med grafens x-akse (x = 0 og x = 0,20 står lige under grafens 0
+  og 0,20). Fra mål 2 er grafen foldet ind ("Vis grafen ▸" kan folde den ud
+  under tavlen), skyderen sidder direkte under beholderen, og tavlen står
+  til højre.
+* **x defineres konkret** (regel 35): mål 1 har fem trin. Efter brøken, Y fra
+  start og "hvad sker der med Y" kommer "Træk x til 0,050 M." (gul ramme og
+  boble på skyderen) og så "Hvor mange SO₂Cl₂-molekyler er spaltet, når
+  x = 0,050 M?" (5 / 10 / 50; de dannede molekyler har en stille ring). Til
+  sidst målet: find x ved ligevægt.
+* **Skemaet felt for felt** (regel 36): mål 2 har syv trin, ét felt ad gangen
+  (ændringen for SO₂Cl₂, SO₂ og Cl₂ og derefter ligevægtsrækken) og til sidst
+  Y udtrykt med x. Feltet, der spørges om, har "?" og gul ramme på tavlen;
+  de kommende felter er tomme og stiplede. Svarene står på kortet (tre
+  knapper), aldrig på tavlen. HBr-målet gør det samme for rækken Ændring
+  (−x, −x, +2x) efter "Træk x til 0,040 M" og "Hvor mange HBr-molekyler
+  dannes?".
+* **Ingen andengradsligning på fanen**: "To løsninger"-målene er blevet til
+  "CAS giver x = 0,0781 M og x = −0,128 M. Hvilken løsning kan bruges?"
+  (og 0,0875 M / 0,280 M for CO + H₂O). Tavlen viser ligningen og CAS'
+  løsninger. Bagefter trækker eleven x til ligevægten og ser, at Y = K.
+* **Seks mål**: SO₂Cl₂: x ved ligevægt, SO₂Cl₂: skemaet med x, SO₂Cl₂:
+  hvilken løsning?, HBr: koefficienten 2, CO + H₂O: hvor langt kan x komme?,
+  CO + H₂O: hvilken løsning? HBr "Find ligevægten" og "To positive
+  løsninger" er udgået. Gemte fremskridt med de gamle id'er springes over.
+  "Hvor langt kan x komme?" spørger nu om stoffet på kortet i stedet for et
+  klik i skemaet.
+* **"Prøv det" går selv videre** (regel 33): når kortet beder eleven trække x
+  til en værdi, går kortet videre 1 s efter, at x er nået. Handlinger har
+  ingen Indsend svar.
+* **Intet klikbart under spørgsmål** (regel 19a): mens kortet spørger, har
+  skyderen ingen knap, og "Vis grafen" er usynlig (pladsen er der). Et greb
+  i scenen får kortet til at blinke. Svarene står i skiftende rækkefølge.
+* **Tavlen** er et lyst papir (regel 28-29), så høj som indholdet. Er der
+  ikke plads, bliver skriften mindre (ned til 13 px), og det, kortet spørger
+  om, rulles frem.
+* Kortets plads (`--kz`) på fane 1: 230 px (262 px på en skærm over 720 px).
+
+Koden: `js/sim_beholder.js` er skrevet om (trinene `trin`, `trinNu`,
+`handlingFaerdig`, tavlen `bygTavle` og `feltTilstand`, layoutet `beregnLay`
+og `tilpas`). Fane 2 og 3 er uændrede. Rundvisningen er rettet.
+
+Selvtesten: ALT OK (920 påstande, før 723), 21. nov. 2026. Nye påstande:
+seks mål, farverne, CAS' tal mod modellen, hvert trin (reaktionslinjen,
+etiketten, tre svar, intet klikbart under spørgsmål, låst scene, felt med ?
+og de næste stiplede, forkert svar med egen forklaring, handlinger går selv
+videre efter 1 s), at beholderen ligger fast, grafen foldet ind og ud, gamle
+gemte id'er, beholderen stor og scenen samlet i tre skærmstørrelser, og at
+skyderen flugter med grafens x-akse.
+
+## Runde 3 (21. nov. 2026): Y = ?, grøn lampe, enheder, K i ligningen, rolige overgange, fane 2 trinvis
+
+Niels: "Ligevægtsberegneren er blevet meget pænere!" og: "Måske er beholderen
+nu faktisk lidt for stor. Toppen af låget ser lidt skør ud (lidt for simpelt).
+Men Y=0 skal først komme frem, når man har indtastet værdien. Det er hyggeligt
+nok med at man skal trække den halvejs.. Men måske skal spørgsmålet være.. om
+hvorvidt der er ligevægt.. og man skal svare nej.. fordi Y < K. Når man sætter
+x så Y = K skal lampen bare blive grøn automatisk efter ca. ½-1 sekund. Ved
+ÆNDRING skal der ikke stå 0,200 - x. Både fordi jeg savner enheden.. her skal
+være en enhed herinde. og fordi andre bøger anser 0,200 M - x som det der skal
+stå i ændringsspalten.. giv en anden svarmulighed.. såsom -2x (det vil mange
+skrive!). ved ligevægt er Y = K .. og derfor skal sættes K ind i udtrykket og
+ikke Y. Når man skal sætte ind, så kunne det være rart at man stadig har
+adgang til ligevægtsloven. Desuden så synes jeg at reaktionsskemaet skal være
+centreret og måske endnu større.. måske skal det ligge udenfor kortet - altså
+over ... overgangen til opgave 4 er lidt kluntet.. både for Træk x sidder fast
+på skyderen, men også fordi der ikke sker noget når jeg slipper den, der hvor
+jeg tror den skal være. Opgaven kommer lidt ud af det blå ... i fane 2 bliver
+man bombarderet med informationer.. og det er svært at læse hvad det er man
+skal når man pludselig bliver bedt om at bestemme alle koncentrationer ved
+ligevægt.. Der står bare 'c'.. så hvad er det for en koncentration?"
+(REGELSAET 38-43.)
+
+**Fane 1**
+
+* **Beholderen** er lidt mindre (38-46 % af scenens bredde, før 42-52 %) og
+  har et rigtigt **låg**: en metalplade med lidt dybde, en mørk pakning mod
+  glasset, to klemmer med skruer ned over glaskanten og et greb i midten
+  (`tegnLaag` i `js/sim_beholder.js`). Låget sidder på beholderen.
+* **Reaktionsskemaet** står uden for kortet, centreret over det (31 px, Lexend
+  500) med "K = 0,0500 M ved 375 °C" i mindre skrift efter (`#bh-rx`,
+  `.rx-over`). Kortet begynder med etiketten og spørgsmålet.
+* **Svaret står ikke i scenen før svaret** (regel 38): Y-boksen viser
+  "Y = [SO₂]·[Cl₂]/[SO₂Cl₂] = ?" uden mærket Y < K, til trin 2 (Y fra start)
+  er besvaret. Grafen kommer først frem efter trin 3 ("Hvad sker der med Y"),
+  fordi kurven ellers viser svaret. Mens kortet spørger, om der er ligevægt,
+  er mærket Y < K skjult (Y og K står der, så eleven kan sammenligne).
+* **Trin 4 i mål 1** er nu "Træk x til 0,050 M." og så "Er der ligevægt i
+  beholderen, når x = 0,050 M?" (Nej, Y er mindre end K / Ja, Y er lig med K /
+  Nej, Y er større end K). Antal-molekyler-spørgsmålet er væk; tælleren og en
+  stille ring om de dannede molekyler viser stadig, hvad x er.
+* **Lampen bliver grøn af sig selv** (regel 39): Når x står stille på
+  ligevægten i 0,7 s, bliver mærket grønt "Y = K", og målet er løst (Indsend
+  svar er reserve). Det samme ved alle "Træk x til …"-handlinger: står x på
+  målet i 0,7 s, går kortet videre, og x sættes på den hele værdi. Uret
+  begynder forfra ved hver bevægelse. Boblen "Træk: x" forsvinder ved første
+  træk. "Træk x til 0,050 M" godtager 0,048-0,052 M og HBr's 0,040 M
+  0,035-0,045 M (et halvt molekyle), og ligevægten godtages, når Y er inden
+  for 4 % af K, eller x er så tæt på, som skyderen kan komme.
+* **Enheder** (regel 40): skemaet skriver "0,200 M", "0 M", "0,200 M − x",
+  "x", og tallene, der følger skyderen, har M. Ændring-trinene har ingen
+  svarmulighed med startkoncentrationen; fejlsvaret er fx −2x.
+* **K i ligningen** (regel 41): mål 2's sidste trin er "Ved ligevægt er Y lig
+  med K. Hvilken ligning gælder ved ligevægt?" med "0,0500 M = x · x /
+  (0,200 M − x)" og to fejl. Ligevægtsloven med symboler står på tavlen i mål
+  2, 3, 4 og 6.
+* **Rolige overgange** (regel 42): Skifter reaktionen (mål 4 og 5), toner det
+  nye reaktionsskema frem, og beholderen fyldes roligt ét molekyle ad gangen.
+  Første trin er et spørgsmål om den nye reaktion: "Hvor mange HBr-molekyler
+  dannes, når ét H₂-molekyle reagerer med ét Br₂-molekyle?" (2 / 1 / 4) og
+  "Hvilket stof bliver brugt op først, når der fra start er 0,200 M CO og
+  0,100 M H₂O?" (H₂O / CO / CO₂). Derefter handlingen. I mål 3 og 6 trækker
+  eleven bagefter x, til Y = K.
+
+**Fane 2 (Uden x)** er bygget om som trin med svar på kortet (`js/sim_ux.js`,
+regel 5a, 36, 43). Reaktionsskemaet står over kortet, kortet stiller ét
+spørgsmål ad gangen, og tavlen (lyst papir) har opgavens tal øverst ("Lukket
+beholder på 2,00 L ved 462 °C. Ved ligevægt er der …. Opgaven er at finde K
+med enhed.") og én linje pr. trin; linjen, der spørges om, har "?" og gul
+ramme. Opgaverne med K: ligevægtsloven (tre brøker), koncentrationen af hvert
+stof for sig ("Hvad er koncentrationen af NOCl ved ligevægt, [NOCl]?" med
+feltet "[NOCl] = __ M" på kortet; tavlen viser "[NOCl] = n(NOCl) / V =
+0,600 mol / 2,00 L = ?"), regnestykket med tallene sat ind (tre), K's tal
+(felt) og K's enhed (tre). Opgaverne med en ukendt koncentration:
+ligevægtsloven, ligningen med K og de kendte tal sat ind (tre) og den ukendte
+koncentration (felt, CAS). Der står ingen steder "c" alene. Trinene laves af
+opgavens data, så tallene passer med modellen. Fane 3 bruger stadig
+`js/regn.js` og er ikke ændret (den havde ingen "c" alene).
+
+Selvtesten: ALT OK (1083 påstande, før 920), 21. nov. 2026. Nye påstande:
+reaktionsskemaet over kortet og centreret, Y = ? og skjult mærke før svaret,
+grafen skjult under trin 3, mærket skjult under ligevægtsspørgsmålet,
+enheder i skemaet og svarene, K-ligningen med ligevægtsloven på tavlen, lampen
+grøn af sig selv efter 0,7 s (ikke efter 0,4 s), handlinger videre efter 0,7 s
+og x sat på målet, den rolige overgang i mål 4 og 5, beholderen 38-46 %, og
+fane 2 trin for trin (ét felt på kortet, intet på tavlen, én linje med ?,
+intet "c" alene, forkerte tal giver fejl, Vis svaret).

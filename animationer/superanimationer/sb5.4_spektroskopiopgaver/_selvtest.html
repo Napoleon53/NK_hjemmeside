@@ -368,6 +368,32 @@ async function koerTest(W) {
     ramme.style.width = "1400px"; ramme.style.height = "860px";
     samlet("kortet er aldrig højere end pladsen over tavlen (spørgsmål, forkert svar og svaret)", forHoej);
     samlet("kurven er mindst 90 px høj, rammernes skrift mindst 12 px og spektrofotometeret mindst 165 px bredt", forLille);
+
+    /* ================================================================= */
+    overskrift("11. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    function punkterAf(sim) { return [].slice.call(el(sim.navn + "-opgaver").querySelectorAll("li")); }
+    function laastNr(li) { return li.classList.contains("laast") && !!li.querySelector(".hl-streg") && /^\d+$/.test(li.textContent.trim()); }
+    [["fane-k", k1], ["fane-i", i2], ["fane-l", l3]].forEach(function (x) {
+        var sim = x[1];
+        NK.visFane(x[0]);
+        sim.forfra();
+        var p = punkterAf(sim), navn0 = D.OPG[sim.liste[0]].navn;
+        paastand(x[0] + ": ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg uden titel og kan ikke klikkes",
+            p.length === sim.liste.length && p[0].textContent.indexOf(navn0) >= 0 && !p[0].classList.contains("laast") && p.slice(1).every(laastNr),
+            p.map(function (li) { return li.textContent.trim(); }).join(" | "));
+        if (sim.liste.length < 2) return;
+        p[1].click();
+        paastand(x[0] + ": et klik på en låst opgave gør intet", sim.nr === 0);
+        for (var ti = 0; ti < sim.o.trin.length; ti++) { sim.visSvar(); if (ti < sim.o.trin.length - 1) sim.videreKlik(); }
+        p = punkterAf(sim);
+        paastand(x[0] + ": når opgave 1 er løst (Vis svaret tæller), kommer titlen på opgave 2 frem; resten er stadig låst",
+            sim.faerdig && p[1].textContent.indexOf(D.OPG[sim.liste[1]].navn) >= 0 && !p[1].classList.contains("laast") && p.slice(2).every(laastNr),
+            p.map(function (li) { return li.textContent.trim(); }).join(" | "));
+        p[1].click();
+        paastand(x[0] + ": opgave 2 kan nu vælges i listen", sim.nr === 1);
+        sim.forfra();
+    });
+    NK.visFane("fane-k");
 }
 </script>
 </body>

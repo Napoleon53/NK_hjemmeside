@@ -316,3 +316,7 @@ Br₂ hedder dibrom og H₂ dihydrogen, når stoffet menes: hylden ("dibrom, Br�
 Brom og hydrogen bliver, hvor atomerne menes (en binding til brom, bromatomer). Bromvand
 bliver stående som reagensets navn. `D.REAGENS_FRA` og opgavernes id'er ("brom",
 "hydrogen") er kode og er ikke ændret.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).

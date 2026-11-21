@@ -207,6 +207,30 @@ function koerTest(W) {
             Y + " / " + ok + " / " + j);
     });
 
+    overskrift("3b. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    FANER.forEach(function (f) {
+        var navn = f[0], X = f[1];
+        NK.visFane(f[2]);
+        X.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+        X.naaetOpg = {};
+        X.vaelg(0);
+        var ch = function () { return [].slice.call(d.querySelectorAll("#" + navn + "-liste .opg-chip")); };
+        var la = ch();
+        paastand("fane " + navn + ": fra start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+            la.length === X.opgaver.length && la[0].textContent.indexOf(X.opgaver[0].navn) >= 0 && !la[0].disabled &&
+            la.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".hl-streg") && /^\d$/.test(b.textContent.trim()) && !b.title; }),
+            la.map(function (b) { return b.textContent.trim(); }).join(" | "));
+        la[3].click();
+        paastand("fane " + navn + ": et klik på en låst opgave gør intet", X.nr === 0);
+        loesSelv(X, navn, 0, false);
+        la = ch();
+        paastand("fane " + navn + ": når opgave 1 er løst, kommer titlen på opgave 2 frem, og opgave 3 til 5 er stadig låst",
+            X.faerdig && la[1].textContent.indexOf(X.opgaver[1].navn) >= 0 && !la[1].disabled && la.slice(2).every(function (b) { return b.disabled; }));
+        X.status[3].loest = true; X.visListe();
+        paastand("fane " + navn + ": en opgave, der er løst før (gemt i browseren), har sin titel", ch()[3].textContent.indexOf(X.opgaver[3].navn) >= 0 && !ch()[3].disabled);
+        X.status[3].loest = false; X.visListe();
+    });
+
     overskrift("4. Alle mål kan løses");
     FANER.forEach(function (f) {
         var navn = f[0], X = f[1];

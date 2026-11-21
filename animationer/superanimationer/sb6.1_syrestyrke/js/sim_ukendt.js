@@ -65,18 +65,34 @@
     P.gem = function () { NK.gem(NOEGLE, { o: this.opklaret }); };
 
     /* ----- Panelet ------------------------------------------------------------------ */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende flasker og trin staar som et bogstav eller nummer med en graa
+       streg uden titel. En flaske er naaet, naar eleven er der, naar den er
+       opklaret foer (gemt i browseren), eller naar alle foer den er opklaret.
+       Et trin er naaet, naar eleven er kommet dertil, naar trinnet foer er
+       loest (Vis svaret taeller som loest), eller naar flasken er opklaret
+       foer. */
+    P.aabenFlaske = function (j) {
+        if (j <= this.nr || this.opklaret[D.UKENDTE[j].id]) return true;
+        for (var i = 0; i < j; i++) if (!this.opklaret[D.UKENDTE[i].id]) return false;
+        return true;
+    };
+    P.aabenTrin = function (j) { return j <= this.trinNr + (this.groen ? 1 : 0) || !!this.opklaret[this.u.id]; };
     P.visListe = function () {
-        var mig = this, html = "";
+        var mig = this, html = "", streg = '<span class="hl-streg"></span>';
         this.trinListe.forEach(function (id, j) {
             var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(D.UKENDT_TRIN[id].navn)) + "</span></li>";
+            var aaben = mig.aabenTrin(j);
+            html += '<li class="' + kl + (aaben ? "" : " laast") + '"' + (aaben ? "" : ' aria-label="Trin ' + (j + 1) + ', kommer senere"') +
+                '><span class="tr-nr">' + (j + 1) + "</span>" + (aaben ? "<span>" + D.sub(NK.html(D.UKENDT_TRIN[id].navn)) + "</span>" : streg) + "</li>";
         });
         NK.saetHTML("u-trin", html);
         var fh = "";
         D.UKENDTE.forEach(function (u, j) {
-            var o = mig.opklaret[u.id];
-            fh += '<li class="' + (j === mig.nr ? "nu" : (o ? "faerdig" : "")) + '"><span class="tr-nr">' + u.id + "</span><span>" +
-                (o ? NK.html(D.Navn(u.rigtig)) + (o === 2 ? " ★" : " ✓") : "Ukendt syre " + u.id) + "</span></li>";
+            var o = mig.opklaret[u.id], aaben = mig.aabenFlaske(j);
+            fh += '<li class="' + (j === mig.nr ? "nu" : (o ? "faerdig" : "")) + (aaben ? "" : " laast") + '"' +
+                (aaben ? "" : ' aria-label="Flaske ' + u.id + ', kommer senere"') + '><span class="tr-nr">' + u.id + "</span>" +
+                (aaben ? "<span>" + (o ? NK.html(D.Navn(u.rigtig)) + (o === 2 ? " ★" : " ✓") : "Ukendt syre " + u.id) + "</span>" : streg) + "</li>";
         });
         NK.saetHTML("u-flasker", fh);
         NK.saetTekst("u-titel", "Flaske " + this.u.id);

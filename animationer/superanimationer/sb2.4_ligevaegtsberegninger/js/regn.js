@@ -482,6 +482,18 @@
             this.deleEl.appendChild(blok);
         }
 
+        /* Kurven fra start til ligevaegt staar sidst paa tavlen, naar opgaven
+           med x er loest (foer i panelet, som er vaek fra 21. nov. 2026) */
+        if (this.faerdig && this.type === "x") {
+            var kb = el("div", "rb rb-kurve");
+            kb.appendChild(el("div", "regn-etiket", "Fra start til ligevægt"));
+            var kc = el("canvas", "kurve");
+            kc.id = this.N + "-kurve";
+            kb.appendChild(kc);
+            this.deleEl.appendChild(kb);
+            this.startKurve(kc);
+        } else this.kurve = null;
+
         var stempel = NK.el(this.N + "-stempel");
         stempel.hidden = !this.faerdig;
         stempel.textContent = this.brugtSvarNogen ? "Vist" : "Løst ✓";
@@ -636,7 +648,7 @@
         rad.appendChild(this.tjekKnap());
         blok.appendChild(rad);
         var chips = el("div", "indsaet-raekke");
-        chips.appendChild(el("span", "ir-etiket", "Klik for at skrive"));
+        chips.appendChild(el("span", "ir-etiket", "Klik for at skrive:"));
         var maks = 2;
         M.alle(o).forEach(function (a) {
             chips.appendChild(mig.chip(M.kon(a.s), M.kon(a.s), a.s));
@@ -1747,41 +1759,14 @@
         return "Skriv svaret med tre betydende cifre.";
     };
 
-    /* ===================================================================
-       Panelet: naar opgaven er loest, hele besvarelsen og kurven
-       =================================================================== */
-    F.panelHTML = function () {
-        var mig = this, o = this.o;
-        var html = "";
-        if (this.faerdig) {
-            html += '<div class="forklaring"><span class="fk-hoved">Besvarelsen</span>';
-            html += '<p class="fk-linje">' + NK.html(M.skemaTekst(o)) + " ved " + NK.html(o.T) + "</p>";
-            this.dele.forEach(function (d) {
-                if (d === "skema") {
-                    html += '<div class="fk-skema">' + mig.skemaTabel("faerdig").outerHTML + "</div>";
-                    return;
-                }
-                var l = mig["linje_" + d]();
-                if (typeof l === "string") html += '<p class="fk-linje">' + l + "</p>";
-                else html += '<div class="fk-blok">' + l.outerHTML + "</div>";
-            });
-            if (this.type === "x") {
-                html += '<span class="fk-hoved">Fra start til ligevægt</span><canvas class="kurve" id="' + this.N + '-kurve"></canvas>';
-            }
-            html += "</div>";
-        }
-        return html;
-    };
-
     /* ----- Kurven: koncentrationerne fra start til ligevaegt (fra den gamle) ----- */
     var FARVER = ["#4cc9f0", "#4ade80", "#fbbf24", "#c4a7ff", "#ff7aa2"];
 
-    F.efterOpgave = function () {
-        if (this.type !== "x") { this.kurve = null; return; }
-        var c = NK.el(this.N + "-kurve");
-        if (!c) return;
+    /* Tavlen tegnes igen efter loest: kurven tegnes videre fra, hvor den var */
+    F.startKurve = function (c) {
         var o = this.o, x = M.xFacit(o), ceq = M.ceq(o, x);
-        this.kurve = { canvas: c, t: 0, arter: M.alle(o).map(function (a, i) {
+        var gl = this.kurve && this.kurve.id === o.id ? this.kurve.t : 0;
+        this.kurve = { id: o.id, canvas: c, t: gl, arter: M.alle(o).map(function (a, i) {
             return { navn: M.skriv(a.s), farve: FARVER[i % FARVER.length], c0: M.c0(o, a.s), ceq: ceq[a.s] };
         }) };
     };
@@ -1796,7 +1781,10 @@
         k.l.tilpas();
         var g = k.l.ctx, b = k.l.b, h = k.l.h;
         k.l.ryd();
-        var mV = 44, mH = 66, mT = 10, mB = 24;
+        /* Pladsen til hoejre passer til det laengste navn (2-methylpropan) */
+        g.font = "500 12.5px 'Lexend', 'Segoe UI', sans-serif";
+        var mV = 44, mT = 24, mB = 24, mH = 66;
+        k.arter.forEach(function (a) { mH = Math.max(mH, g.measureText(a.navn).width + 16); });
         var bx = b - mV - mH, by = h - mT - mB;
         if (bx < 20 || by < 20) return;
         var cmax = 0;
@@ -1804,7 +1792,7 @@
         cmax = cmax * 1.12 || 1;
         g.strokeStyle = "rgba(255,255,255,0.12)";
         g.fillStyle = "#a9b0ba";
-        g.font = "12px 'Segoe UI', sans-serif";
+        g.font = "400 12px 'Lexend', 'Segoe UI', sans-serif";
         g.lineWidth = 1;
         for (var i = 0; i <= 4; i++) {
             var y = mT + by - by * i / 4;
@@ -1815,9 +1803,12 @@
         g.strokeStyle = "rgba(255,255,255,0.35)";
         g.beginPath(); g.moveTo(mV, mT); g.lineTo(mV, mT + by); g.lineTo(mV + bx, mT + by); g.stroke();
         g.textAlign = "center"; g.textBaseline = "top";
-        g.fillText("tid", mV + bx / 2, mT + by + 6);
-        g.save(); g.translate(11, mT + by / 2); g.rotate(-Math.PI / 2);
-        g.textBaseline = "middle"; g.fillText("c / M", 0, 0); g.restore();
+        /* Aksetitlerne: x under aksen, y vandret over aksen */
+        g.font = "500 12.5px 'Lexend', 'Segoe UI', sans-serif";
+        g.fillStyle = "#dfe6ee";
+        g.fillText("Tid", mV + bx / 2, mT + by + 6);
+        g.textAlign = "left"; g.textBaseline = "alphabetic";
+        g.fillText("c / M", 4, mT - 9);
         var TT = 100, tau = 18;
         var etiketter = [];
         k.arter.forEach(function (a) {
@@ -1840,7 +1831,7 @@
             etiketter.sort(function (p, q) { return p.y - q.y; });
             for (var e = 1; e < etiketter.length; e++) if (etiketter[e].y - etiketter[e - 1].y < 14) etiketter[e].y = etiketter[e - 1].y + 14;
             g.globalAlpha = Math.min(1, (k.t - 0.5) / 0.3);
-            g.font = "600 12px 'Segoe UI', sans-serif";
+            g.font = "500 12.5px 'Lexend', 'Segoe UI', sans-serif";
             etiketter.forEach(function (p) {
                 g.fillStyle = p.a.farve;
                 g.textAlign = "left"; g.textBaseline = "middle";
@@ -1864,6 +1855,7 @@
     /* Det, fane 1 ogsaa bruger */
     NK.RegnHjaelp = { delAf: delAf, broek: broekHTML, start: tjekStart, aendr: tjekAendr, lig: tjekLig };
 
-    NK.SimUx = lav("ux", D.UX, D.GRUPPER_UX, { navn: "ux", chip: "Opgave", naesteFane: "fane-mx", naesteNavn: "Med x" });
-    NK.SimMx = lav("mx", D.MX, D.GRUPPER_MX, { navn: "mx", chip: "Opgave" });
+    /* Fane 2 har fra runde 3 (21. nov. 2026) sin egen trinvise fane i
+       js/sim_ux.js; den gamle kc- og ukendt-kode her bruges ikke laengere af den. */
+    NK.SimMx = lav("mx", D.MX, D.GRUPPER_MX, { navn: "mx", chip: "Opgave", niveauer: true });
 }());

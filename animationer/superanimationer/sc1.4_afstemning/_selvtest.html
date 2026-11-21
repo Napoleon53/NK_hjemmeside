@@ -242,6 +242,34 @@ function koerTest(W) {
     paastand("knappen går videre og står på kortet", /Næste opgave/.test(kortVidere("kg")));
     K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
 
+    /* Laaste titler (brugeren 21. nov. 2026): kun de loeste og den, eleven er ved, har navn */
+    K.naaet = {};
+    K.vaelg(0);
+    var chipsK = function () { return [].slice.call(d.querySelectorAll("#kg-liste .opg-chip")); };
+    var ck = chipsK();
+    paastand("låste titler: fra start har kun reaktion 1 et navn; de ni andre er et nummer med en grå streg og kan ikke klikkes",
+        ck.length === 10 && /Køkkensalt/.test(ck[0].textContent) && !ck[0].disabled &&
+        ck.slice(1).every(function (c, k) { return c.disabled && c.classList.contains("laast") && !!c.querySelector(".oc-streg") && c.textContent.trim() === String(k + 2); }),
+        ck.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    ck[4].click();
+    paastand("låste titler: et klik på en låst reaktion gør intet", K.nr === 0);
+    D.KUGLER[0].facit.forEach(function (v, j) {
+        var o0 = D.KUGLER[0], side = j < o0.r.length ? "r" : "p", ii = j < o0.r.length ? j : j - o0.r.length;
+        for (var n = 1; n < v; n++) K.aendr(side, ii, 1);
+    });
+    reagerHelt(K);
+    ck = chipsK();
+    paastand("låste titler: når reaktion 1 er løst, kommer navnet på reaktion 2 frem, og resten er stadig låst",
+        K.status[0].loest && /Magnesium/.test(ck[1].textContent) && !ck[1].disabled && ck.slice(2).every(function (c) { return c.disabled; }),
+        ck.map(function (c) { return c.textContent.trim(); }).join(" | "));
+    K.knap();
+    paastand("låste titler: Næste opgave går til reaktion 2", K.nr === 1);
+    K.status[6].loest = true; K.visListe();
+    paastand("låste titler: en reaktion, der er løst før (gemt i browseren), har sit navn", /Methan/.test(chipsK()[6].textContent) && !chipsK()[6].disabled);
+    paastand("fane 2 har kun numre og er ikke låst", [].every.call(d.querySelectorAll("#sk-liste .opg-chip"), function (c) { return !c.disabled && !c.classList.contains("laast"); }));
+    K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    K.naaet = {};
+
     /* ------------------------------------------------------------------ */
     overskrift("6. Fane 2: skemaet");
     NK.visFane("fane-sk");

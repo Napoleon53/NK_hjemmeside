@@ -3,13 +3,18 @@
 
    Der er ingen laerer i denne animation. Opgaven, beskeden, hintet og
    Indsend svar staar paa det lyse papirkort oeverst i midten af scenen
-   (Niels 4. nov. 2026, ../faelles/papirkort.css og .js). Panelet har
-   listen og forfra.
+   (Niels 4. nov. 2026, ../faelles/papirkort.css og .js). Der er intet
+   panel (Niels 21. nov. 2026, REGELSAET 3): opgaverne og Start forfra
+   staar i en smal raekke oeverst i scenen.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
-     * listen i panelet: opgaverne i grupper, med loest og stjerne
-       (huskes i browseren)
+     * raekken oeverst i scenen: opgaverne med nummer og tema, loest og
+       stjerne (huskes i browseren); de kommende er laaste numre
+     * trin (fanen giver trinNu, kortData().svar, vaelgKortSvar og
+       naesteTrin): et spoergsmaal med svarknapper paa kortet. Efter et
+       rigtigt svar bliver kortet paa spoergsmaalet med forklaringen og
+       Naeste spoergsmaal (this.trinBliv).
      * papirkortet: opgaven, beskeden (naeste skridt, fejl, hint) og
        Indsend svar; efter et rigtigt svar forklaringen og Naeste
      * hintknappen: Giv et hint > Naeste hint > Vis svaret. Den lyser
@@ -52,7 +57,7 @@
             this.hjaelp = 0;          /* hvor mange hint eleven har bedt om */
             this.hintS = null;        /* det stof, hintet handler om */
             this.pegKnap = false;     /* knappen lyser stille efter en fejl */
-            this.el = { knap: el("knap"), indsend: el("indsend"), liste: el("liste"), kort: el("kort"), skort: el("skort"),
+            this.el = { knap: el("knap"), indsend: el("indsend"), liste: el("liste"), skort: el("skort"),
                 ind: el("ind"), besked: el("besked"), status: el("status"), forfra: el("forfra") };
             this.fast = { html: "", klasse: "" };
             this.nuB = null;
@@ -60,7 +65,23 @@
             this.el.knap.addEventListener("click", function () { mig.knap(); });
             this.el.indsend.addEventListener("click", function () { mig.indsendKlik(); });
             this.el.skort.addEventListener("click", function (e) {
-                if (e.target.closest && e.target.closest("[data-videre]")) mig.knap();
+                if (!e.target.closest) return;
+                if (e.target.closest("[data-videre]")) { mig.knap(); return; }
+                var v = e.target.closest("[data-valg]");
+                if (v && !v.disabled && mig.vaelgKortSvar) mig.vaelgKortSvar(parseInt(v.getAttribute("data-valg"), 10));
+            });
+            /* Et talfelt paa kortet (fane 2, runde 3): svaret skrives paa kortet */
+            this.el.skort.addEventListener("input", function (e) {
+                if (!e.target.hasAttribute || !e.target.hasAttribute("data-kfelt")) return;
+                mig.feltV = e.target.value;
+                e.target.classList.remove("fejl");
+                mig.paab[mig.nr] = true;
+                mig.visIndsend();
+            });
+            this.el.skort.addEventListener("keydown", function (e) {
+                if (e.key !== "Enter" || !e.target.hasAttribute || !e.target.hasAttribute("data-kfelt")) return;
+                e.preventDefault();
+                if (mig.blivNu()) mig.knap(); else mig.indsendKlik();
             });
             if (this.el.forfra) this.el.forfra.addEventListener("click", function () { mig.nulstil(); mig.fokus(); });
             this.bygListe();
@@ -80,35 +101,56 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Listen i panelet -------------------------------------------------- */
+        /* ----- Raekken af opgaver -------------------------------------------------
+           Brugeren 21. nov. 2026 ("husk dette"): listen viser kun titlerne paa de
+           loeste opgaver og den, eleven er ved. De kommende staar som et nummer
+           med en graa streg og kan ikke klikkes, til de er naaet: alle foer dem
+           er loest (Vis svaret taeller som loest), eller eleven har vaeret der.
+           En opgave, der er loest foer (gemt i browseren), har sin titel.
+           Med valg.niveauer (Let, Middel, Svaer paa Med x) kan hvert niveau
+           vaelges frit: dets foerste opgave er aaben, og inden for niveauet
+           laases titlerne op i raekkefoelge. */
+        P.aabenOpgave = function (i) {
+            var s = this.status[i], o = this.opgaver[i];
+            if (!s) return false;
+            if (s.loest || (this.naaetOpg && this.naaetOpg[i])) return true;
+            for (var j = 0; j < i; j++) {
+                if (valg.niveauer && (this.opgaver[j].gruppe || "alle") !== (o.gruppe || "alle")) continue;
+                if (!this.status[j].loest) return false;
+            }
+            return true;
+        };
+
+        /* Raekken oeverst i scenen (Niels 21. nov. 2026, REGELSAET 3 og 17):
+           én knap pr. opgave med nummer og tema. Paa Med x staar niveauet
+           (Let, Middel, Svaer) foran sine opgaver. */
         P.bygListe = function () {
-            var mig = this;
+            var mig = this, forrige = null;
             this.el.liste.innerHTML = "";
             this.chips = [];
-            this.grupper.forEach(function (g) {
-                var boks = document.createElement("div");
-                boks.className = "opg-gruppe";
-                if (g.titel) {
-                    var hoved = document.createElement("div");
-                    hoved.className = "opg-hoved";
-                    hoved.innerHTML = "<span>" + NK.html(g.titel) + '</span><span class="opg-tal" id="' + navn + "-gt-" + g.id + '"></span>';
-                    boks.appendChild(hoved);
+            this.opgaver.forEach(function (o, i) {
+                var g = o.gruppe || "alle";
+                if (g !== forrige && forrige !== null) {
+                    var skel = document.createElement("span");
+                    skel.className = "or-skel";
+                    skel.setAttribute("aria-hidden", "true");
+                    mig.el.liste.appendChild(skel);
                 }
-                var raekke = document.createElement("div");
-                raekke.className = "opg-chips";
-                mig.opgaver.forEach(function (o, i) {
-                    if ((o.gruppe || "alle") !== g.id) return;
-                    var knap = document.createElement("button");
-                    knap.type = "button";
-                    knap.className = "opg-chip";
-                    knap.title = o.navn;
-                    knap.innerHTML = '<span class="oc-f">' + (i + 1) + '</span><span class="oc-n">' + NK.html(o.navn) + '</span><i class="oc-m"></i>';
-                    knap.addEventListener("click", function () { mig.vaelg(i); });
-                    raekke.appendChild(knap);
-                    mig.chips[i] = knap;
-                });
-                boks.appendChild(raekke);
-                mig.el.liste.appendChild(boks);
+                if (g !== forrige && valg.niveauer) {
+                    var gr = mig.grupper.filter(function (x) { return x.id === g; })[0];
+                    var lab = document.createElement("span");
+                    lab.className = "or-gruppe";
+                    lab.textContent = gr ? gr.titel : "";
+                    mig.el.liste.appendChild(lab);
+                }
+                forrige = g;
+                var knap = document.createElement("button");
+                knap.type = "button";
+                knap.className = "or-knap";
+                knap.innerHTML = '<span class="or-nr"></span><span class="or-navn"></span>';
+                knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
+                mig.el.liste.appendChild(knap);
+                mig.chips[i] = knap;
             });
         };
 
@@ -117,33 +159,44 @@
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
+                var aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                var nv = c.querySelector(".or-navn"), nr = c.querySelector(".or-nr");
+                var navnHTML = aaben ? NK.html(o.navn) : "";
+                if (nv.innerHTML !== navnHTML) nv.innerHTML = navnHTML;
+                nr.textContent = s.stjerne ? "★" : (s.loest ? "✓" : String(i + 1));
+                c.classList.toggle("laast", !aaben);
+                c.disabled = !aaben;
+                c.title = aaben ? (i + 1) + ". " + o.navn : "";
+                c.setAttribute("aria-label", aaben ? "Opgave " + (i + 1) + ": " + o.navn : "Opgave " + (i + 1) + ", kommer senere");
                 c.classList.toggle("valgt", i === mig.nr);
                 c.classList.toggle("loest", s.loest);
                 c.classList.toggle("stjerne", s.stjerne);
                 c.classList.toggle("paabegyndt", !s.loest && !!(mig.paabegyndt && mig.paabegyndt(i)));
-                c.querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : "");
             });
-            this.grupper.forEach(function (g) {
-                var ialt = 0, loest = 0;
-                mig.opgaver.forEach(function (o, i) {
-                    if ((o.gruppe || "alle") !== g.id) return;
-                    ialt++;
-                    if (mig.status[i].loest) loest++;
-                });
-                NK.saetTekst(navn + "-gt-" + g.id, loest + "/" + ialt);
-            });
-            NK.saetTekst(navn + "-loest", String(this.antalLoest()));
+            this.tilpasRaekke();
+        };
+
+        /* Er raekken for bred, staar kun temaet paa den valgte opgave; de
+           andre er numre (temaet staar som vaerktoejstip) */
+        P.tilpasRaekke = function () {
+            var r = this.el.liste && this.el.liste.parentNode;
+            if (!r || !r.offsetWidth) return;
+            r.classList.remove("kompakt");
+            if (r.scrollWidth > r.clientWidth + 1) r.classList.add("kompakt");
         };
 
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i) {
             this.nr = i;
+            this.naaetOpg = this.naaetOpg || {};
+            this.naaetOpg[i] = true;
             this.hjaelp = 0;
             this.hintS = null;
             this.pegKnap = false;
             this.brugtSvar = false;
             this.faerdig = false;
             this.slut = null;
+            this.trinBliv = null;
             this.lavOpgave(i);
             this.visKort();
             this.visListe();
@@ -167,31 +220,64 @@
            stod. Fanen giver kortData(): { tekst, spm } som HTML. */
         P.visKort = function () {
             var e = this.el.skort;
-            var kl = "scenekort " + (this.faerdig ? "loest bliv" + (this.slut && this.slut.maade === "svar" ? " svar" : "") : "opgave");
+            var tb = this.trinBliv;
+            var kl = "scenekort " + (this.faerdig ? "loest bliv" + (this.slut && this.slut.maade === "svar" ? " svar" : "") :
+                (tb ? "loest bliv" + (tb.maade === "svar" ? " svar" : "") : "opgave"));
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
             NK.saetHTML(navn + "-ind", NK.kc(this.kortHTML()));
-            if (this.el.kort && this.panelHTML) {
-                var ph = this.panelHTML();
-                this.el.kort.hidden = !ph;
-                NK.saetHTML(navn + "-prompt", NK.kc(ph));
-            }
             this.visKnap();
         };
 
+        /* Spoergsmaalet saettes med NK.Papir.tekst, saa det staar halvfedt paa
+           sin egen linje under indledningen (REGELSAET 6). En ordre uden
+           spoergsmaalstegn ("Bestem K med enhed.") staar ogsaa paa sin egen linje. */
         P.kortHTML = function () {
             var d = this.kortData();
-            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(valg.chip + " " + (this.nr + 1) + " af " + this.opgaver.length) + "</span>" +
-                (d.tekst ? NK.Papir.tekst(d.tekst) + " " : "") + (d.spm ? '<span class="sk-spm">' + d.spm + "</span>" : "") + "</p>";
+            var chip = d.chip || (valg.chip + " " + (this.nr + 1) + " af " + this.opgaver.length);
+            if (!d.chip && smal() && this.opgaver[this.nr]) chip += " · " + this.opgaver[this.nr].navn;
+            var tekst;
+            if (d.spm && /\?\s*$/.test(d.spm)) tekst = NK.Papir.tekst((d.tekst ? d.tekst + " " : "") + d.spm);
+            else tekst = (d.tekst ? NK.Papir.tekst(d.tekst) + " " : "") + (d.spm ? '<span class="sk-spm' + (d.tekst ? " sk-linje" : "") + '">' + d.spm + "</span>" : "");
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + tekst + "</p>";
+            /* Reaktionsskemaet med stort paa kortets foerste linje (runde 2 paa
+               fane 1, Niels: "Kan du i stedet for første linje så ikke bare skrive
+               reaktionsskemaet med stort") */
+            if (d.rx) {
+                html = '<p class="sk-rx"><span class="sk-rx-skema">' + NK.html(d.rx.skema).replace(/\((g|l|s|aq)\)/g, '<span class="sk-rx-ti">($1)</span>') +
+                    '</span><span class="sk-rx-k">' + NK.html(d.rx.k) + "</span></p>" + html;
+            }
+            if (d.svar) {
+                html += '<div class="sk-svar n' + d.svar.length + '">';
+                d.svar.forEach(function (v) {
+                    var c = (v.valgt ? " valgt" : "") + (v.rigtig ? " rigtig" : "") + (v.forkert ? " forkert" : "") +
+                        (v.svarVist ? " svar-vist" : "") + (v.dim ? " dim" : "");
+                    html += '<button type="button" class="sk-knap' + c + '" data-valg="' + v.j + '"' + (v.laast ? " disabled" : "") + ">" + v.t + "</button>";
+                });
+                html += "</div>";
+            }
+            if (d.felt) {
+                var fv = d.felt;
+                html += '<div class="sk-felt"><span class="sk-felt-pre">' + fv.pre + '</span><input type="text" class="sk-felt-in' + (fv.fejl ? " fejl" : "") +
+                    '" data-kfelt="1" autocomplete="off" spellcheck="false" inputmode="decimal" aria-label="' + NK.html(fv.navn || "Svaret") + '" value="' +
+                    NK.html(fv.v || "").replace(/"/g, "&quot;") + '"' + (fv.laast ? " disabled" : "") + '>' + (fv.enhed ? '<span class="sk-felt-enh">' + fv.enhed + "</span>" : "") + "</div>";
+            }
             if (this.faerdig) html += this.blivHTML();
+            else if (this.trinBliv) {
+                var tb = this.trinBliv;
+                html += NK.Papir.bliv(tb.tekst || "", NK.html(tb.maade === "svar" ? "Svaret" : "Rigtigt"), NK.html(tb.knap || "Næste spørgsmål →"), tb.maade === "svar");
+            }
             return html;
         };
+
+        /* Kortet staar i bliv: opgaven eller et trin er loest */
+        P.blivNu = function () { return !!(this.faerdig || this.trinBliv); };
 
         P.blivHTML = function () {
             var slut = this.slut || { maade: "ok", tekst: "" }, vist = slut.maade === "svar";
             var knap = this.videreTekst();
             var maerke = vist ? "Svaret" : (slut.maerke || "Rigtigt");
             var h = NK.Papir.bliv(slut.tekst || "", NK.html(maerke), NK.html(knap), vist);
-            /* Ingen knap efter den sidste opgave paa den sidste fane (forfra ligger i panelet) */
+            /* Ingen knap efter den sidste opgave paa den sidste fane (forfra ligger i raekken) */
             return knap ? h : h.replace(/<button[^>]*data-videre[^>]*><\/button>/, "");
         };
 
@@ -216,7 +302,7 @@
 
         /* Laasen: naar opgaven er loest, saetter et klik i scenen intet i gang */
         P.spaer = function () {
-            if (!this.faerdig) return false;
+            if (!this.blivNu() && !(this.laastScene && this.laastScene())) return false;
             this.kortBlink();
             return true;
         };
@@ -228,7 +314,7 @@
         };
 
         P.visKnap = function () {
-            if (!this.faerdig) {
+            if (!this.blivNu()) {
                 var h = this.hintNu(), tekst, klasse = "knap hjaelp";
                 if (this.hjaelp === 0) tekst = "Giv et hint";
                 else if (this.hjaelp < h.trin.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.trin.length + ")";
@@ -242,14 +328,14 @@
         };
 
         P.kanSendes = function () {
-            return !this.faerdig && !!(this.kanIndsende && this.kanIndsende());
+            return !this.blivNu() && !!(this.kanIndsende && this.kanIndsende());
         };
 
         /* Indsend svar: graa, til der er noget at sende ind */
         P.visIndsend = function () {
             var e = this.el.indsend;
-            e.hidden = !!this.faerdig;
-            if (this.faerdig) return;
+            e.hidden = this.blivNu() || !!(this.udenIndsend && this.udenIndsend());
+            if (e.hidden) return;
             var kan = this.kanSendes();
             var t = (kan && this.indsendTekst && this.indsendTekst()) || "Indsend svar";
             if (e.textContent !== t) e.textContent = t;
@@ -259,7 +345,7 @@
         };
 
         P.indsendKlik = function () {
-            if (this.faerdig) return;
+            if (this.blivNu()) return;
             if (!this.kanSendes()) { this.kortBlink(); return; }
             this.tjek();
             this.visKnap();
@@ -271,9 +357,9 @@
             var b = this.nuB || this.fast || { html: "", klasse: "" };
             var harTekst = !!b.html;
             this.el.besked.hidden = !harTekst;
-            this.el.knap.hidden = !!this.faerdig;
+            this.el.knap.hidden = this.blivNu();
             var ryster = this.el.status.classList.contains("ryster");
-            this.el.status.hidden = !!this.faerdig;
+            this.el.status.hidden = this.blivNu();
             this.el.status.className = "sk-bund" + (b.klasse ? " " + b.klasse : "") + (harTekst ? "" : " tom") + (ryster ? " ryster" : "");
         };
 
@@ -288,6 +374,7 @@
 
         /* ----- Hintknappen og kortets groenne knap --------------------------------- */
         P.knap = function () {
+            if (!this.faerdig && this.trinBliv) { this.naesteTrin(); return; }
             if (this.faerdig) {
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
@@ -419,6 +506,9 @@
 
         P.opdater = function (dt) { this.opdaterBesked(dt); };
     }
+
+    /* Under 1200 px staar kun numrene i raekken; saa staar temaet paa kortet */
+    function smal() { return !!(window.matchMedia && window.matchMedia("(max-width: 1199px)").matches); }
 
     NK.Fane = { paa: paa };
 

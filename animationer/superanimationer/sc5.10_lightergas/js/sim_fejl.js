@@ -66,7 +66,7 @@
 
     /* Spoergsmaalet bliver staaende, ogsaa naar forsoegene har vist svaret */
     P.promptHTML = function () {
-        return NK.html(this.opg.tekst) + " " + NK.html(D.FEJL_SPM);
+        return NK.html(D.FEJL_INTRO + " " + this.opg.tekst + " " + this.opg.spm);
     };
 
     /* Gaettet: forsoegene er laast, til eleven har valgt */
@@ -102,7 +102,7 @@
         this.svarVist = maade === "svar";
         if (maade === "svar") {
             this.brugtSvar = true;
-            this.svarForud = NK.html("Det rigtige svar: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene.");
+            this.svarForud = NK.html("Det rigtige svar: " + D.FEJL_SVAR[j].g + ". Se forsøgene.");
         }
         this.start();
     };
@@ -114,7 +114,7 @@
         this.visTabel();
         /* Koer igen paa en loest opgave: forklaringen bliver staaende */
         if (this.faerdig) { this.visKort(); return; }
-        var pre = this.svarForud || (this.brugtSvar ? "" : "Dit gæt: " + NK.html(D.FEJL_SVAR[this.valgt].t.toLowerCase()) + ".");
+        var pre = this.svarForud || (this.brugtSvar ? "" : "Dit gæt: " + NK.html(D.FEJL_SVAR[this.valgt].g) + ".");
         this.svarForud = "";
         this.besked((pre ? pre + " " : "") + this.trinLinje(), this.brugtSvar ? "gul" : "");
         this.visKort();
@@ -144,7 +144,7 @@
         this.auto = null;
         this.res = { A: this.st[0].f.resultat(), B: this.st[1].f.resultat() };
         var s = D.FEJL_SVAR[this.valgt];
-        var pre = s.id === o.rigtig ? "Dit gæt holdt." : "Du gættede: " + s.t.toLowerCase() + ". " + o.fejl[s.id];
+        var pre = s.id === o.rigtig ? "Dit gæt holdt." : "Du gættede: " + s.g + ". " + o.fejl[s.id];
         this.forklaring = NK.html(pre + " " + o.forkl);
         this.visTabel();
         if (this.faerdig) {

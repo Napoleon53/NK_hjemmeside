@@ -1234,3 +1234,9 @@ html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { font-size: 0.9
 @media (max-width: 760px) {
     .scenekort .sk-valg { grid-template-columns: minmax(0, 1fr); gap: 5px; }
 }
+
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende opgaver er
+   et nummer med en grå streg og kan ikke klikkes, til eleven er naaet dertil */
+.hyldelinje.laast { cursor: default; opacity: 0.75; }
+.hyldelinje.laast:hover { background-color: rgba(255, 255, 255, 0.045); border-color: transparent; }
+.hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }

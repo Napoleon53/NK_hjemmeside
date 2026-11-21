@@ -229,3 +229,7 @@ Når brugeren siger til:
   `b9.2_forsøg_breezer_oldversion.html` og `b9.4_nitritforsøg_oldversion.html`.
 * `FEEDBACK_EMNER` i `samling_alt_b.html` rettes, så b9.2 ikke står der mere.
 * Kolonnen "I menuen" i superanimationernes README rettes.
+
+## Trinlisten låser titlerne op i takt (21. nov. 2026)
+
+Trinlisten under Spørgsmålet viser kun titlen på de klarede trin og det aktive; de kommende står som et nummer med en grå streg (`bygTrinliste` i `js/forsoeg.js`). Fanerne (Let, Middel, Svær) er uændrede. Selvtesten: ALT OK (127 påstande).

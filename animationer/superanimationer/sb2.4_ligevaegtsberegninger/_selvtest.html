@@ -51,9 +51,12 @@
     function status(navn) { return W().document.getElementById(navn + "-status").className; }
     /* Hver besked maales ogsaa: papirkortet maa ikke blive hoejere end kortZone */
     var zFejl = [], zHoejst = 0;
+    /* Kortets nederste kant maales fra scenens top: kortet staar under
+       opgaveraekken (21. nov. 2026), saa dets top er ikke laengere 10 px */
     function maalKort(s, hvad) {
-        var h = s.el.skort.getBoundingClientRect().height;
-        if (!h) return;
+        var rk = s.el.skort.getBoundingClientRect();
+        if (!rk.height) return;
+        var h = rk.bottom - s.el.skort.parentNode.getBoundingClientRect().top;
         zHoejst = Math.max(zHoejst, h);
         if (h > s.kortZone() + 0.5) zFejl.push(f.width + "×" + f.height + " " + s.navn + " " + (hvad || (s.o || s.maal()).id) + " " + Math.round(h) + " > " + s.kortZone());
     }
@@ -296,7 +299,7 @@
                 o.id + ": kortet bliver på opgaven med svaret og " + (sidst ? "ingen knap (sidste opgave)" : "Næste"));
             ok(s.faerdig && s.status[i].loest && s.status[i].stjerne, o.id + ": løst med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
             ok(!W().document.getElementById(navn + "-stempel").hidden, o.id + ": stemplet Løst står på tavlen");
-            if (s.type === "x") ok(!!W().document.getElementById(navn + "-kurve"), o.id + ": kurven fra start til ligevægt står i panelet");
+            if (s.type === "x") ok(!!W().document.querySelector("#" + navn + "-dele #" + navn + "-kurve"), o.id + ": kurven fra start til ligevægt står sidst på tavlen (panelet er væk)");
         });
     }
 
@@ -323,78 +326,221 @@
         });
     }
 
-    /* ===== 3. Fane 1: de otte maal ============================================= */
+    /* ===== 2b. Fane 2 trinvis (runde 3, REGELSAET 5a, 36, 43) ====================== */
+    function uxAlle() {
+        var NK = W().NK, M = NK.Model, D = NK.Data, u = sim("ux"), d = W().document;
+        NK.visFane("fane-ux");
+        var cAlene = /(^|[\s(=])c(\s*=|[\s)]|$)/;
+        D.UX.forEach(function (o, i) {
+            u.vaelg(i);
+            var n = u.trinListe.length;
+            ok(d.getElementById("ux-rx").querySelector(".rx-skema").textContent.replace(/\s/g, "") === M.skemaTekst(o).replace(/\s/g, ""),
+                o.id + ": reaktionsskemaet står med stort over kortet");
+            var tavle = d.getElementById("ux-tavle");
+            ok(/Opgaven er at finde/.test(tavle.textContent) && (o.type !== "kc" || tavle.textContent.indexOf(NK.tal(o.V) + " L") >= 0),
+                o.id + ": opgavens tal og målet står på tavlen, ikke i en lang tekst på kortet (regel 5a)");
+            var vagt = 0;
+            while (!u.faerdig && vagt++ < 20) {
+                var t = u.trinNu(), k = u.trinNr, kort = d.getElementById("ux-skort"), navn = o.id + " trin " + (k + 1);
+                maalKort(u, navn);
+                ok(kort.querySelector(".sk-chip").textContent.indexOf("Trin " + (k + 1) + " af " + n) === 0, navn + ": etiketten siger Trin " + (k + 1) + " af " + n);
+                ok(d.querySelectorAll("#ux-tavle .spoerg").length === 1 && d.querySelector("#ux-tavle .spoerg .bt-felt").textContent === "?",
+                    navn + ": én linje på tavlen har ? og gul ramme; de kommende linjer er der ikke endnu");
+                ok(!cAlene.test(kort.textContent + " " + tavle.textContent), navn + ": intet c alene på kortet eller tavlen (regel 43)");
+                if (t.type === "valg") {
+                    ok(kort.querySelectorAll(".sk-svar .sk-knap").length === 3 && !kort.querySelector("[data-kfelt]") && !tavle.querySelector("input"),
+                        navn + ": tre svar på kortet og ingen felter på tavlen");
+                    var forkert = t.svar.map(function (v) { return !!v.ok; }).indexOf(false), rigtig = t.svar.map(function (v) { return !!v.ok; }).indexOf(true);
+                    d.querySelector('#ux-skort .sk-knap[data-valg="' + forkert + '"]').click();
+                    u.indsendKlik(); noter(u);
+                    ok(fejlNu("ux") && u.beskedTekst().indexOf(t.svar[forkert].nej) >= 0, navn + ": et forkert svar får sin egen forklaring");
+                    d.querySelector('#ux-skort .sk-knap[data-valg="' + rigtig + '"]').click();
+                    u.indsendKlik();
+                } else {
+                    var felt = kort.querySelectorAll("[data-kfelt]");
+                    ok(felt.length === 1 && !tavle.querySelector("input") && kort.querySelector(".sk-felt-pre").textContent.trim() === t.pre,
+                        navn + ": ét felt på kortet (" + t.pre + " __ " + t.enhed + "), ingen på tavlen");
+                    if (/^\[/.test(t.pre)) ok(/^Hvad er koncentrationen af .+ ved ligevægt, \[.+\]\?$/.test(t.spm), navn + ": spørgsmålet siger, hvilken koncentration (" + t.spm + ")");
+                    var f = felt[0];
+                    f.value = o.type === "kc" && /^\[/.test(t.pre) ? NK.tal(t.facit * o.V * o.V).replace(".", ",") : "0,999";
+                    f.dispatchEvent(new (W().Event)("input", { bubbles: true }));
+                    ok(d.getElementById("ux-indsend").classList.contains("klar"), navn + ": Indsend svar er klar, når der står et tal");
+                    u.indsendKlik(); noter(u);
+                    ok(fejlNu("ux") && !u.trinBliv && !u.faerdig, navn + ": et forkert tal giver en fejl (" + u.beskedTekst().slice(0, 50) + ")");
+                    f = kort.querySelector("[data-kfelt]");
+                    f.value = NK.tal(t.facit);
+                    f.dispatchEvent(new (W().Event)("input", { bubbles: true }));
+                    u.indsendKlik();
+                }
+                maalKort(u, navn + " rigtigt");
+                if (u.faerdig) break;
+                ok(!!u.trinBliv && !d.querySelector("#ux-tavle .spoerg") && /Næste spørgsmål/.test((kort.querySelector("[data-videre]") || {}).textContent || ""),
+                    navn + ": rigtigt svar bliver på spørgsmålet, og linjen på tavlen er udfyldt");
+                u.knap();
+            }
+            ok(u.faerdig && u.status[i].stjerne && u.kortTekst().indexOf(u.slutTekst()) >= 0, o.id + ": løst med stjerne (" + u.slutTekst() + ")");
+            if (o.type === "kc") ok(n === 4 + Object.keys(o.n).length, o.id + ": én koncentration ad gangen (" + Object.keys(o.n).length + " trin), aldrig alle på én gang");
+        });
+        D.UX.forEach(function (o, i) {
+            u.vaelg(i);
+            var vagt = 0;
+            while (!u.faerdig && vagt++ < 60) { u.knap(); noter(u); }
+            ok(u.faerdig && u.slut.maade === "svar", o.id + ": kan løses med Vis svaret alene");
+        });
+    }
+
+    /* ===== 3. Fane 1: de seks maal, trin for trin (runde 2, 21. nov. 2026) ===== */
+    function klikSvar(j) { W().document.querySelector('#bh-skort .sk-knap[data-valg="' + j + '"]').click(); }
+    function stiplet(id) { return W().document.getElementById(id).classList.contains("stiplet"); }
+
     function beholderen() {
-        var NK = W().NK, M = NK.Model, D = NK.Data, s = sim("bh");
+        var NK = W().NK, M = NK.Model, D = NK.Data, s = sim("bh"), d = W().document;
         NK.visFane("fane-bh");
+        ok(D.MAAL.map(function (m) { return m.id; }).join(",") === "a-lige,a-udtryk,a-cas,b-aendr,c-graense,c-cas",
+            "fane 1 har seks mål: x ved ligevægt, skemaet med x, hvilken løsning, koefficienten 2, hvor langt kan x komme, hvilken løsning");
+        /* Farverne: hvert stof sin daempede farve, forskellige i samme reaktion */
+        Object.keys(D.RX).forEach(function (k) {
+            var fa = M.alle(D.RX[k]).map(function (a) { return D.FARVE[a.s]; });
+            ok(fa.every(function (f) { return /^#[0-9a-f]{6}$/.test(f || ""); }) && fa.filter(function (f, i) { return fa.indexOf(f) === i; }).length === fa.length,
+                "reaktion " + k + ": hvert stof har sin egen farve (" + fa.join(", ") + ")");
+        });
+        /* Svarene: tallene i teksterne passer med modellen */
+        [["a-cas", "a"], ["c-cas", "c"]].forEach(function (p) {
+            var m = D.MAAL.filter(function (q) { return q.id === p[0]; })[0], r = M.loesX(D.RX[p[1]]);
+            var ok1 = r.some(function (v) { return NK.tal(v) === NK.tal(m.rodOk); }) && r.some(function (v) { return NK.tal(v) === NK.tal(m.rodNej); });
+            ok(ok1 && Math.abs(M.xFacit(D.RX[p[1]]) - m.rodOk) < 5e-4 && m.trin[0].spm.indexOf(NK.tal(m.rodOk)) >= 0 && m.trin[0].spm.indexOf(NK.tal(m.rodNej)) >= 0,
+                p[0] + ": CAS' løsninger på kortet (" + NK.tal(m.rodOk) + " og " + NK.tal(m.rodNej) + ") passer med modellen");
+        });
         D.MAAL.forEach(function (m, i) {
             s.vaelg(i);
-            var rx = s.rx;
-            if (m.type === "ligevaegt") {
-                ok(!s.kanIndsende() && W().document.getElementById("bh-indsend").classList.contains("ikke-klar"), m.id + ": Indsend svar er gråt, før skyderen er flyttet");
-                s.saetX(0.01); s.slutTraek(); s.tjek(); noter(s);
-                ok(!s.faerdig && fejlNu("bh"), m.id + ": x = 0,010 er ikke ligevægt");
-                ok(/for lille/.test(s.hintTrin().trin[1]), m.id + ": hintet siger, at Y er for lille");
-                s.saetX(Math.round(s.xEq * 1000) / 1000); s.slutTraek();
-                ok(!s.faerdig && s.kanIndsende(), m.id + ": skyderen ved ligevægten bedømmer ikke af sig selv");
-                s.tjek();
-            } else if (m.type === "udtryk") {
-                var f0 = M.alle(rx)[0];
-                m.raekker.forEach(function (r) {
-                    M.alle(rx).forEach(function (a) { skriv("bh", r + "." + a.s, r === "aendr" ? (a.s === f0.s ? "+x" : M.aendrTekst(a)) : M.ligTekst(rx, a.s, false)); });
-                });
-                s.tjek(); noter(s);
-                ok(fejlNu("bh"), m.id + ": +x for en reaktant giver en fejl");
-                skriv("bh", "aendr." + f0.s, M.aendrTekst(f0));
-                s.tjek(); noter(s);
-            } else if (m.type === "forkast") {
-                s.koerCas(); noter(s);
-                var god = M.xFacit(rx);
-                var gi = s.roedder.map(function (v) { return Math.abs(v - god) < 1e-12; }).indexOf(true);
-                s.vaelgRod(gi);
-                ok(!fejlNu("bh") && !s.faerdig && s.kanIndsende(), m.id + ": et klik på en løsning vælger kun");
-                s.tjek(); noter(s);
-                ok(fejlNu("bh"), m.id + ": den brugbare løsning kan ikke forkastes");
-                s.vaelgRod(1 - gi); s.tjek(); noter(s);
+            var n = m.trin.length;
+            if (i === 0) {
+                ok(s.frisk && s.trinNr === 0, "mål 1 begynder med trin 1, når det ikke er nået før");
+                var f0 = s.fremme();
+                ok(!f0.y && !f0.graf && !f0.skyder && stiplet("bh-y") && stiplet("bh-skyder") && d.getElementById("bh-x").disabled,
+                    "mål 1: fra start er kun beholderen fremme; Y-boksen, grafen og skyderen har en stiplet plads med navnet");
+                var S0 = Math.min(s.lay.W - 24, 1500);
+                ok(!!s.lay.graf && s.lay.beh.w >= 0.38 * S0 - 1 && s.lay.beh.w <= 0.46 * S0 + 1,
+                    "mål 1: grafen står ved siden af beholderen, og beholderen er 38-46 % af scenens bredde (runde 3: lidt mindre)");
             } else {
-                s.klikStof(M.alle(rx)[1]);
-                ok(!s.faerdig, m.id + ": et klik før x er helt oppe tæller ikke");
-                s.saetX(s.xMax);
-                ok(s.naaet, m.id + ": skyderen stopper ved " + s.xMax);
-                s.klikStof(M.alle(rx)[0]);
-                ok(!fejlNu("bh") && !s.faerdig, m.id + ": et klik på et stof vælger kun");
-                s.tjek(); noter(s);
-                ok(fejlNu("bh"), m.id + ": CO er ikke brugt op");
-                s.klikStof(M.alle(rx)[1]); s.tjek(); noter(s);
+                ok(!s.fremme().graf && !s.lay.graf && !d.getElementById("bh-graffane").hidden, m.id + ": grafen er foldet ind, og fanen Vis grafen står der");
+                if (m.tavle) ok([].slice.call(d.querySelectorAll('#bh-tavle td[data-felt^="start."]')).every(function (td) { return / M$/.test(td.textContent.trim()); }),
+                    m.id + ": startkoncentrationerne i skemaet har enheden M (regel 40)");
+                ok(!!m.tavle === !d.getElementById("bh-tavle").hidden, m.id + ": tavlen står til højre");
+            }
+            if (i === 3 || i === 4) {
+                ok(m.trin[0].type === "valg", m.id + ": ny reaktion, så første trin er et spørgsmål om den nye reaktion og ikke en handling (regel 42)");
+                ok(d.getElementById("bh-rx").classList.contains("ny") && s.mol.some(function (q) { return q.alfa === 0 && q.forsink > 0; }),
+                    m.id + ": det nye reaktionsskema toner frem, og beholderen fyldes roligt");
+            }
+            var beh0 = JSON.stringify(s.lay.beh), vagt = 0;
+            while (!s.faerdig && vagt++ < 25) {
+                var t = s.trin(), k = s.trinNr, kort = d.getElementById("bh-skort"), navn = m.id + " trin " + (k + 1);
+                maalKort(s, navn);
+                ok(JSON.stringify(s.lay.beh) === beh0, navn + ": beholderen ligger fast (intet hopper)");
+                var rxe = d.getElementById("bh-rx"), rxr = rxe.getBoundingClientRect(), kr0 = kort.getBoundingClientRect();
+                ok(!kort.querySelector(".sk-rx") && rxe.querySelector(".rx-skema").textContent.replace(/\s/g, "") === M.skemaTekst(s.rx).replace(/\s/g, "") &&
+                    rxr.bottom <= kr0.top + 1 && parseFloat(W().getComputedStyle(rxe.querySelector(".rx-skema")).fontSize) >= 26,
+                    navn + ": reaktionsskemaet står med stort over kortet, ikke på kortet");
+                ok(Math.abs((rxe.querySelector(".rx-skema").getBoundingClientRect().left + rxe.getBoundingClientRect().right) / 2 - (kr0.left + kr0.right) / 2) < kr0.width / 2,
+                    navn + ": reaktionsskemaet står centreret over kortet");
+                if (n > 1) ok(kort.querySelector(".sk-chip").textContent.indexOf("Trin " + (k + 1) + " af " + n) === 0, navn + ": etiketten siger Trin " + (k + 1) + " af " + n);
+                if (t.type === "valg") {
+                    ok(kort.querySelectorAll(".sk-svar .sk-knap").length === 3 && !s.kanIndsende() && d.getElementById("bh-indsend").classList.contains("ikke-klar"),
+                        navn + ": tre svar på kortet, og Indsend svar er gråt");
+                    ok((d.getElementById("bh-skyder").classList.contains("hvile") || stiplet("bh-skyder")) && d.getElementById("bh-x").disabled &&
+                        (d.getElementById("bh-graffane").hidden || d.getElementById("bh-graffane").classList.contains("skjult")) && !d.querySelector("#fane-bh .opfordring"),
+                        navn + ": intet i scenen lægger op til et klik, mens kortet spørger");
+                    /* Regel 38: svaret staar ikke i scenen, mens kortet spoerger om det */
+                    if (i === 0 && k === 1) ok(d.getElementById("bh-yv").textContent === "?" && d.getElementById("bh-ysml").hidden,
+                        navn + ": Y-boksen viser Y = ?, og mærket Y < K er skjult, mens kortet spørger om Y");
+                    if (i === 0 && k === 2) ok(!s.fremme().graf, navn + ": grafen er ikke fremme, mens kortet spørger, hvad der sker med Y");
+                    if (t.skjulLampe) ok(d.getElementById("bh-ysml").hidden && d.getElementById("bh-yv").textContent !== "?",
+                        navn + ": mærket Y < K er skjult, mens kortet spørger, om der er ligevægt (Y og K står der)");
+                    if (t.felt && /^aendr/.test(t.felt)) ok(!t.svar.some(function (v) { return /0,\d/.test(v.t); }),
+                        navn + ": ingen svarmulighed med startkoncentrationen i rækken Ændring (regel 40)");
+                    if (t.felt && /^lig/.test(t.felt)) ok(t.svar.every(function (v) { return !/0,200(?! M)/.test(v.t); }), navn + ": svarene har enheden M (regel 40)");
+                    if (t.linje !== undefined && m.tavle.linjer[t.linje].html && /0,0500 M =/.test(m.tavle.linjer[t.linje].html)) {
+                        ok(t.svar.every(function (v) { return /^0,0500 M =/.test(v.t); }) && !!d.querySelector("#bh-tavle .bt-lov") && /K =/.test(d.querySelector("#bh-tavle .bt-lov").textContent),
+                            navn + ": udtrykket sættes lig med K, og ligevægtsloven står på tavlen imens (regel 41)");
+                    }
+                    var x0 = s.x;
+                    kort.classList.remove("blink");
+                    s.saetX(x0 + 0.02);
+                    ok(s.x === x0 && kort.classList.contains("blink"), navn + ": scenen er låst, og kortet blinker");
+                    if (t.felt) {
+                        var cel = d.querySelector('#bh-tavle td[data-felt="' + t.felt + '"]');
+                        ok(cel && cel.classList.contains("spoerg") && cel.textContent.trim() === "?" && d.querySelectorAll("#bh-tavle .spoerg").length === 1,
+                            navn + ": feltet " + t.felt + " har ? og gul ramme på tavlen; kun dét felt spørges der om");
+                        var naeste = m.trin[k + 1] && m.trin[k + 1].felt;
+                        if (naeste) ok(d.querySelector('#bh-tavle td[data-felt="' + naeste + '"]').classList.contains("tom"), navn + ": det næste felt er tomt og stiplet");
+                    }
+                    if (t.linje !== undefined) ok(!!d.querySelector("#bh-tavle .bt-linje.spoerg"), navn + ": linjen på tavlen har ? og gul ramme");
+                    var forkert = t.svar.map(function (v) { return !!v.ok; }).indexOf(false), rigtig = t.svar.map(function (v) { return !!v.ok; }).indexOf(true);
+                    klikSvar(forkert);
+                    ok(kort.querySelector('.sk-knap[data-valg="' + forkert + '"]').classList.contains("valgt") && !s.trinBliv, navn + ": et klik på et svar vælger kun");
+                    s.indsendKlik(); noter(s);
+                    ok(fejlNu("bh") && s.beskedTekst().indexOf(t.svar[forkert].nej) >= 0 && kort.querySelector('.sk-knap[data-valg="' + forkert + '"]').classList.contains("forkert"),
+                        navn + ": et forkert svar bliver rødt og får sin egen forklaring");
+                    klikSvar(rigtig);
+                    s.indsendKlik();
+                    maalKort(s, navn + " rigtigt");
+                    if (s.faerdig) break;
+                    ok(!!s.trinBliv && kort.querySelector(".sk-knap.rigtig") && /Næste spørgsmål/.test((kort.querySelector("[data-videre]") || {}).textContent || ""),
+                        navn + ": rigtigt svar bliver på spørgsmålet med svaret grønt og Næste spørgsmål");
+                    if (t.vis) ok(t.vis.every(function (v) { return s.fremme()[v]; }), navn + ": " + t.vis.join(" og ") + " kommer frem, når trinnet er løst");
+                    if (i === 0 && k === 1) ok(d.getElementById("bh-yv").textContent === "0 M" && !d.getElementById("bh-ysml").hidden, navn + ": Y = 0 M kommer frem, når eleven har svaret");
+                    if (t.felt) ok(d.querySelector('#bh-tavle td[data-felt="' + t.felt + '"]').textContent.trim() !== "?", navn + ": feltet er udfyldt på tavlen");
+                    s.knap();
+                } else if (t.type === "handling") {
+                    ok(d.getElementById("bh-indsend").hidden && d.getElementById("bh-skyder").classList.contains("opfordring") && !d.getElementById("bh-x").disabled,
+                        navn + ": kortet beder om en handling, skyderen har den gule ramme og boblen, og der er ingen Indsend svar");
+                    var mx = s.maalX(t);
+                    if (t.tol) mx = Math.round((mx + t.tol * 0.6) * 1000) / 1000;
+                    s.saetX(mx);
+                    ok(s.trinNr === k && !s.efterFase && !d.getElementById("bh-skyder").classList.contains("opfordring"), navn + ": boblen forsvinder, og kortet venter et øjeblik");
+                    s.opdater(0.6);
+                    ok(s.trinNr === k && !s.efterFase && !s.faerdig, navn + ": efter 0,6 s er kortet ikke gået videre endnu");
+                    s.opdater(0.6);
+                    ok(s.faerdig || s.trinNr === k + 1 || s.efterFase, navn + ": kortet går selv videre 0,7 s efter, at x står på målet (regel 39)");
+                    if (t.snap) ok(Math.abs(s.x - t.x) < 1e-9, navn + ": x sættes på " + t.x + " M bagefter");
+                } else {
+                    ok(!s.kanIndsende() && d.getElementById("bh-indsend").classList.contains("ikke-klar"), navn + ": Indsend svar er gråt, før skyderen er flyttet");
+                    s.saetX(0.01); s.slutTraek(); s.tjek(); noter(s);
+                    ok(!s.faerdig && fejlNu("bh") && /for lille/.test(s.hintTrin().trin[1]), navn + ": x = 0,010 er ikke ligevægt, og hintet siger, at Y er for lille");
+                    s.saetX(Math.round(s.xEq * 1000) / 1000); s.slutTraek();
+                    ok(!s.faerdig && s.kanIndsende() && !d.getElementById("bh-ysml").classList.contains("lige"), navn + ": lige efter trækket er lampen ikke grøn endnu");
+                    s.opdater(0.4);
+                    ok(!s.faerdig, navn + ": efter 0,4 s er målet ikke løst endnu");
+                    s.opdater(0.4);
+                    ok(s.faerdig && d.getElementById("bh-ysml").classList.contains("lige") && d.getElementById("bh-ysml").textContent === "Y = K",
+                        navn + ": lampen bliver grøn Y = K af sig selv, og målet er løst (regel 39)");
+                }
             }
             ok(s.faerdig && s.status[i].stjerne, m.id + ": nået med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
-            ok(s.kortTekst().indexOf(m.slut) >= 0 && s.kortTekst().indexOf(m.linje) >= 0 && !W().document.querySelector("#bh-prompt .forklaring"),
-                m.id + ": forklaringen står på kortet under målet, ikke i panelet");
+            ok(s.kortTekst().indexOf(m.slut) >= 0, m.id + ": forklaringen står på kortet");
         });
-        var kasse = W().document.getElementById("bh-skort");
-        ok(kasse.parentNode.classList.contains("scene") && kasse.contains(W().document.getElementById("bh-status")) && kasse.contains(W().document.getElementById("bh-knap")),
-            "fane 1: målet, beskeden og hintknappen står på papirkortet i scenen");
-        ok(kasse.getBoundingClientRect().bottom <= W().document.getElementById("bh-laerred").getBoundingClientRect().top + 1,
-            "fane 1: papirkortet står over beholderen");
-        ok(!W().document.querySelector(".statuslinje") && !W().document.querySelector(".opgavelinje") && !W().document.querySelector(".tekstboks"),
-            "der er ingen statuslinje, opgavelinje eller tekstboks i scenen");
+        /* Grafen kan foldes ud og ind igen fra maal 2 */
+        s.vaelg(2);
+        s.trinBliv = null; s.trinNr = 1; s.visDele();
+        d.getElementById("bh-graffane").click();
+        ok(s.grafUd && !!s.lay.graf && !!s.lay.tavle && /Skjul grafen/.test(d.getElementById("bh-graffane").textContent), "fanen Vis grafen folder grafen ud under tavlen");
+        d.getElementById("bh-graffane").click();
+        ok(!s.grafUd && !s.lay.graf, "og ind igen");
         /* Molekylerne passer med x */
-        s.vaelg(4);
+        s.vaelg(3);
+        s.trinNr = 1; s.efterFase = false; s.trinBliv = null; s.visDele();
         s.saetX(0.16);
-        for (var t = 0; t < 30; t++) s.opdater(1 / 60);
+        for (var tt = 0; tt < 30; tt++) s.opdaterMolekyler(1 / 60);
         var tael = {};
         s.mol.forEach(function (q) { tael[q.s] = (tael[q.s] || 0) + 1; });
         ok(tael.H2 === 2 && tael.Br2 === 2 && tael.HBr === 16, "ved x = 0,160 M er der 2 H₂, 2 Br₂ og 16 HBr (" + JSON.stringify(tael) + ")");
-        s.saetX(0);
-        for (t = 0; t < 30; t++) s.opdater(1 / 60);
-        tael = {};
-        s.mol.forEach(function (q) { tael[q.s] = (tael[q.s] || 0) + 1; });
-        ok(tael.H2 === 10 && tael.Br2 === 10 && !tael.HBr, "tilbage ved x = 0 er der 10 H₂ og 10 Br₂");
-        /* Vis svaret paa hvert maal */
+        /* Vis svaret paa hvert maal, maal 1 med trinene igen efter Start forfra */
         D.MAAL.forEach(function (m, i) {
             s.vaelg(i);
+            if (i === 0) { s.nulstil(); ok(s.frisk && s.trinNr === 0, "Start forfra på mål 1 giver trinene igen"); }
             var vagt = 0;
-            while (!s.faerdig && vagt++ < 20) { s.knap(); noter(s); }
+            while (!s.faerdig && vagt++ < 60) { s.knap(); noter(s); }
             ok(s.faerdig, m.id + ": kan nås med Vis svaret");
         });
         /* Paaskeaegget */
@@ -409,10 +555,12 @@
         ok(d.body.classList.contains("papirkort") && !!d.querySelector('link[href="../faelles/papirkort.css"]'), "papirkortet er slået til (body.papirkort og faelles/papirkort.css)");
         ["bh", "ux", "mx"].forEach(function (n) {
             var kort = d.getElementById(n + "-skort");
-            ok(kort && kort.parentNode.classList.contains("scene") && !d.querySelector("#fane-" + n + " .panel .scenekort") &&
-                kort.contains(d.getElementById(n + "-indsend")) && kort.contains(d.getElementById(n + "-knap")), n + ": kortet står i scenen, ikke i panelet");
-            ok(d.querySelector("#fane-" + n + " .panel #" + n + "-forfra") && !kort.querySelector(".forfraknap") && !/forfra/i.test(kort.textContent),
-                n + ": Start forfra står i panelet, ikke på kortet");
+            ok(kort && kort.parentNode.classList.contains("scene") && !d.querySelector("#fane-" + n + " .panel") &&
+                kort.contains(d.getElementById(n + "-indsend")) && kort.contains(d.getElementById(n + "-knap")), n + ": kortet står i scenen, og der er intet panel");
+            ok(d.querySelector("#" + n + "-raekke #" + n + "-forfra") && d.querySelector("#fane-" + n + " .scene #" + n + "-raekke") && !/forfra/i.test(kort.textContent),
+                n + ": opgaverne og Start forfra står i rækken øverst i scenen, ikke på kortet");
+            var rr = d.getElementById(n + "-raekke").getBoundingClientRect(), kr = kort.getBoundingClientRect();
+            ok(rr.bottom <= kr.top + 1, n + ": rækken står over kortet");
         });
         ok(!d.querySelector(".tjekknap"), "der er ingen Tjek-knapper på tavlen; Indsend svar på kortet afløser dem");
         /* Fane 2: Indsend svar er gråt uden svar, og et forkert svar bliver paa kortet */
@@ -422,9 +570,9 @@
         var ind = d.getElementById("ux-indsend");
         ok(ind.classList.contains("ikke-klar") && !u.kanIndsende(), "ux: Indsend svar er gråt, før der er skrevet noget");
         u.indsendKlik();
-        ok(!fejlNu("ux") && u.k === 0, "ux: Indsend svar uden svar dømmer intet");
-        skriv("ux", "lov.num", "[NO]");
-        ok(ind.classList.contains("klar"), "ux: Indsend svar er klar, når der er skrevet noget");
+        ok(!fejlNu("ux") && u.trinNr === 0, "ux: Indsend svar uden svar dømmer intet");
+        d.querySelector('#ux-skort .sk-knap[data-valg="1"]').click();
+        ok(ind.classList.contains("klar") && !u.trinBliv, "ux: et klik på et svar vælger kun, og Indsend svar bliver klar");
         /* Fane 3: Kan bruges og Forkast vaelger kun */
         NK.visFane("fane-mx");
         var m = sim("mx");
@@ -439,13 +587,16 @@
         NK.visFane("fane-bh");
         var b = sim("bh");
         b.vaelg(0);
+        var fr = b.fremme();
+        ok(b.status[0].loest && !b.frisk && b.trin().type === "ligevaegt" && fr.y && fr.graf && fr.skyder && !d.querySelector("#fane-bh .stiplet"),
+            "mål 1 er nået før (gemt i browseren): kortet står på målet, og alt er fremme fra start");
         var rI = d.getElementById("bh-indsend").getBoundingClientRect();
         b.saetX(Math.round(b.xEq * 1000) / 1000); b.slutTraek(); b.indsendKlik();
         var v = d.querySelector("#bh-skort [data-videre]"), rV = v && v.getBoundingClientRect();
-        ok(b.faerdig && rV && Math.abs(rV.right - rI.right) < 4 && b.kortTekst().indexOf(b.maal().linje) >= 0,
+        ok(b.faerdig && rV && Math.abs(rV.right - rI.right) < 4 && b.kortTekst().indexOf(b.trin().spm) >= 0,
             "bh: rigtigt svar bliver på målet, og Næste står, hvor Indsend svar stod");
-        b.klikStof(NK.Model.alle(b.rx)[0]);
-        ok(d.getElementById("bh-skort").classList.contains("blink") && d.getElementById("bh-status").hidden, "bh: et klik i skemaet efter rigtigt svar får kortet til at blinke");
+        b.klikBeholder();
+        ok(d.getElementById("bh-skort").classList.contains("blink") && d.getElementById("bh-status").hidden, "bh: et klik i beholderen efter rigtigt svar får kortet til at blinke");
         b.knap();
         ok(d.getElementById("fane-ux").classList.contains("aktiv") || (!b.faerdig && !d.querySelector("#bh-skort .bliv")), "bh: Næste fører videre, og rosen står ikke under det næste mål");
     }
@@ -467,7 +618,16 @@
     /* ===== 4. Sproget ============================================================== */
     function sproget() {
         var D = W().NK.Data, tekster = beskeder.slice();
-        D.MAAL.forEach(function (m) { tekster.push(m.linje, m.tekst, m.slut); });
+        var alleTrin = [];
+        D.MAAL.forEach(function (m) {
+            tekster.push(m.slut);
+            m.trin.forEach(function (t) { alleTrin.push(t); if (t.efter) alleTrin.push(t.efter); });
+        });
+        alleTrin.forEach(function (t) {
+            tekster.push(t.spm, t.tekst || "", t.slut || "");
+            (t.hint || []).forEach(function (h) { tekster.push(h); });
+            (t.svar || []).forEach(function (v) { tekster.push(v.nej || ""); });
+        });
         D.UX.concat(D.MX).forEach(function (o) { tekster.push(o.tekst, o.spm || ""); });
         tekster.push(W().document.getElementById("teori").textContent);
         var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -476,6 +636,22 @@
         ok(!en.length, "ingen 1+ eller 1− (" + (en[0] || "") + ")");
         ok(!tekster.some(function (t) { return /natronlud/i.test(t); }), "natriumhydroxid, ikke natronlud");
         ok(!tekster.some(function (t) { return /undefined|NaN/.test(t); }), "ingen undefined eller NaN i teksterne");
+        alleTrin.forEach(function (t, k) {
+            if (t.type === "valg") ok(/\?$/.test(t.spm) && t.hint.length === 3 && t.svar.length === 3 && t.svar.filter(function (v) { return v.ok; }).length === 1 &&
+                t.svar.every(function (v) { return v.ok || v.nej; }), "spørgsmålet " + t.spm + " har tre hint, ét rigtigt svar og en forklaring til hvert forkert");
+            else if (t.type === "handling") ok(/\.$/.test(t.spm) && t.hint.length === 3 && (t.xMax || t.lige || typeof t.x === "number"), "handlingen " + t.spm + " har et mål og tre hint");
+        });
+        /* Teorien (REGELSAET 31) og skriften (regel 30) */
+        var d = W().document;
+        ok(!!d.querySelector('link[href="../faelles/teori.css"]') && d.querySelector("#teori .overlay-boks").classList.contains("teori-ark"),
+            "teorien er et roligt ark (faelles/teori.css, teori-ark)");
+        var bog = d.querySelector("#teori .teori-bog a");
+        ok(bog && /kemibogen\.dk\/b\/kapitler\/b2-5-ligevaegtsberegninger\.html$/.test(bog.href), "teorien henviser til B2.5 i Kemibogen");
+        ok(d.querySelectorAll("#teori h3").length <= 2 && d.querySelectorAll("#teori .eksempel").length <= 2, "teorien er kort (højst to mellemoverskrifter og to rammer)");
+        var store = [].slice.call(d.querySelectorAll("#fane-ux *, #fane-mx *, #fane-bh *")).filter(function (e) {
+            return e.offsetParent !== null && W().getComputedStyle(e).textTransform === "uppercase" && e.textContent.trim();
+        });
+        ok(!store.length, "ingen versaler i scenerne (" + store.slice(0, 3).map(function (e) { return e.className + ": " + e.textContent.trim().slice(0, 30); }).join(", ") + ")");
     }
 
     /* ===== 5. Layoutet ============================================================== */
@@ -503,51 +679,72 @@
         ok(synlig(d.querySelector("#mx-dele .rb.aktiv")), w + "×" + h + ": løsningerne kan ses, når den første er sat ind i skemaet");
         ok(synlig(d.querySelector("#mx-dele .ice-lig")), w + "×" + h + ": rækken Ligevægt kan ses samtidig");
         W().NK.visFane("fane-bh");
-        var b = sim("bh");
-        b.vaelg(3);
-        await sov(300);
-        var sk = d.getElementById("bh-skema"), c = d.getElementById("bh-laerred");
-        ok(sk.scrollWidth <= sk.clientWidth + 2, w + "×" + h + ": skemaet med felter på fane 1 er ikke for bredt");
-        b.vaelg(6);
-        await sov(200);
-        ok(sk.scrollWidth <= sk.clientWidth + 2, w + "×" + h + ": skemaet med fire stoffer på fane 1 er ikke for bredt");
-        b.vaelg(3);
-        await sov(200);
-        ok(c.clientHeight >= 200, w + "×" + h + ": beholderen og grafen er mindst 200 px høje (" + c.clientHeight + ")");
-        /* Fane 1 ruller, hvis den ikke kan vaere der: maal derfor arbejdsomraadet */
-        var sc = d.getElementById("bh-arbejde");
-        ok(sc.scrollHeight <= sc.clientHeight + 2, w + "×" + h + ": fane 1 kan være i scenen");
-        /* Et hint paa flere linjer og forklaringen maa ikke skubbe skemaet ud */
-        b.knap(); b.knap();
-        await sov(200);
-        ok(/Hint 2/.test(b.beskedTekst()) && sc.scrollHeight <= sc.clientHeight + 2 && c.clientHeight >= 200, w + "×" + h + ": fane 1 kan være i scenen med et hint i tekstboksen (" + c.clientHeight + ")");
-        b.knap(); b.knap();
-        await sov(200);
-        ok(b.faerdig && sc.scrollHeight <= sc.clientHeight + 2 && c.clientHeight >= 200, w + "×" + h + ": fane 1 kan være i scenen med forklaringen i tekstboksen (" + c.clientHeight + ")");
-        ok(/Næste mål|Videre til/.test((d.querySelector("#bh-skort [data-videre]") || {}).textContent || ""), w + "×" + h + ": knappen, der fører videre, står på papirkortet");
-        /* Med CAS' loesninger fylder det nederste mest. Paa den mindste skaerm
-           kan det ikke vaere der; saa skal der kunne rulles, saa intet er skaaret af */
-        b.vaelg(2);
-        b.koerCas();
-        await sov(200);
-        var rul = sc.scrollHeight > sc.clientHeight + 2;
-        ok(!rul || W().getComputedStyle(sc).overflowY === "auto", w + "×" + h + ": fane 1 med CAS' løsninger " + (rul ? "kan rulles (mangler " + (sc.scrollHeight - sc.clientHeight) + " px)" : "kan være i scenen"));
+        var b = sim("bh"), arb = d.getElementById("bh-arbejde"), ra = arb.getBoundingClientRect();
+        function inden(e) { var r = e.getBoundingClientRect(); return !r.width || (r.top >= ra.top - 1 && r.bottom <= ra.bottom + 1 && r.left >= ra.left - 1 && r.right <= ra.right + 1); }
+        [0, 1, 2, 4].forEach(function (i) {
+            b.vaelg(i);
+            b.tilpas();
+            var L = b.lay;
+            ok(L.beh.w >= 0.38 * Math.min(L.W - 24, 1500) - 1 && L.beh.h >= (h >= 800 ? 280 : 150), w + "×" + h + " mål " + (i + 1) + ": beholderen er stor nok (" + Math.round(L.beh.w) + " × " + Math.round(L.beh.h) + ")");
+            ok(L.total <= 1500 && Math.abs((L.ox) - (L.W - L.total - L.ox)) <= 2, w + "×" + h + " mål " + (i + 1) + ": scenen er samlet i midten og højst 1500 px bred");
+            ok(["bh-skyder", "bh-y", "bh-tavle", "bh-graffane"].every(function (id) { return d.getElementById(id).hidden || inden(d.getElementById(id)); }) &&
+                L.beh.y + L.beh.h <= L.H, w + "×" + h + " mål " + (i + 1) + ": alt på fane 1 kan være i scenen uden at rulle");
+        });
+        /* Maal 1: skyderens skala flugter med grafens x-akse */
+        b.vaelg(0);
+        b.tilpas();
+        var ri = d.getElementById("bh-x").getBoundingClientRect(), rc = d.getElementById("bh-laerred").getBoundingClientRect(), G = b.lay.graf;
+        ok(Math.abs(ri.left + 10 - (rc.left + G.x)) <= 3 && Math.abs(ri.right - 10 - (rc.left + G.x + G.w)) <= 3,
+            w + "×" + h + ": skyderens 0 og " + b.xMax + " står lige under grafens 0 og " + b.xMax);
         W().NK.visFane("fane-ux");
         var u = sim("ux");
-        u.vaelg(1);
-        ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2, w + "×" + h + ": ligevægtsloven med felter er ikke for bred");
+        u.vaelg(2);
         var uk = d.getElementById("ux-knap").getBoundingClientRect(), ub = d.getElementById("ux-status").getBoundingClientRect();
         ok(uk.right <= ub.right + 1 && uk.left > ub.left + 150, w + "×" + h + ": hintknappen står til højre på kortet, og der er plads til teksten");
-        /* Vandgas med fire stoffer: alle fire beregninger og Tjek kan ses */
-        u.vaelg(2);
-        facitDel("ux", u, "lov");
-        skriv("ux", "kn.formel", "n/V"); u.tjek();
-        await sov(200);
+        /* Vandgas med fire stoffer: frem til den sidste koncentration */
+        var vg = 0;
+        while (u.trinNr < 4 && vg++ < 40) u.knap();
         u.tilpas();
-        var ua = d.getElementById("ux-arbejde"), akt = d.querySelector("#ux-dele .rb.aktiv");
-        var ra = ua.getBoundingClientRect(), rk = akt.getBoundingClientRect();
-        ok(rk.top >= ra.top - 2 && rk.bottom <= ra.bottom + 2, w + "×" + h + ": de fire beregninger af koncentrationen kan ses");
-        ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2, w + "×" + h + ": beregningerne er ikke for brede");
+        await sov(150);
+        var ua = d.getElementById("ux-arbejde"), sp = d.querySelector("#ux-tavle .spoerg");
+        var ra2 = ua.getBoundingClientRect(), rk = sp.getBoundingClientRect();
+        ok(rk.top >= ra2.top - 2 && rk.bottom <= ra2.bottom + 2, w + "×" + h + ": linjen med ? på tavlen kan ses, når fire koncentrationer er fundet");
+        ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2 && parseFloat(d.getElementById("ux-tavle").style.fontSize) >= 14,
+            w + "×" + h + ": tavlen er ikke for bred, og skriften er mindst 14 px");
+    }
+
+    /* ===== Opgavelisten laaser titlerne op i takt (brugeren 21. nov. 2026) ===== */
+    function laasteTitler() {
+        var NK = W().NK, d = W().document;
+        ["bh", "ux", "mx"].forEach(function (n) {
+            var s = sim(n), mx = n === "mx";
+            NK.visFane("fane-" + n);
+            s.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+            s.naaetOpg = {};
+            s.vaelg(0);
+            var ch = function () { return [].slice.call(d.querySelectorAll("#" + n + "-liste .or-knap")); };
+            var harTitel = function (b, i) { return b.textContent.indexOf(s.opgaver[i].navn) >= 0; };
+            var la = ch(), aabne = mx ? [0, 2, 5] : [0], forkerte = [];
+            la.forEach(function (b, i) {
+                if (aabne.indexOf(i) >= 0) { if (!harTitel(b, i) || b.disabled) forkerte.push((i + 1) + " mangler titlen"); }
+                else if (harTitel(b, i) || !b.disabled || !b.classList.contains("laast") || !/^\d$/.test(b.textContent.trim()) || b.title) forkerte.push((i + 1) + " er ikke låst");
+            });
+            ok(la.length === s.opgaver.length && !forkerte.length, n + ": fra start har kun " +
+                (mx ? "den første opgave på hvert niveau (Let, Middel, Svær)" : "opgave 1") +
+                " en titel; de andre er et stiplet nummer og kan ikke klikkes " + forkerte.join(", "));
+            la[1].click();
+            ok(s.nr === 0, n + ": et klik på en låst opgave gør intet");
+            var vagt = 0;
+            while (!s.faerdig && vagt++ < 80) s.knap();
+            la = ch();
+            var stadig = mx ? [3, 4, 6, 7] : la.map(function (b, i) { return i; }).slice(2);
+            ok(s.faerdig && harTitel(la[1], 1) && !la[1].disabled && stadig.every(function (i) { return la[i].disabled && !harTitel(la[i], i); }),
+                n + ": når opgave 1 er løst (Vis svaret tæller som løst), kommer titlen på opgave 2 frem, og de senere er stadig låst");
+            var sidst = s.opgaver.length - 1;
+            s.status[sidst].loest = true; s.visListe();
+            ok(harTitel(ch()[sidst], sidst) && !ch()[sidst].disabled, n + ": en opgave, der er løst før (gemt i browseren), har sin titel");
+            s.status[sidst].loest = false; s.visListe();
+        });
     }
 
     async function koer() {
@@ -555,12 +752,19 @@
             await aabn(1440, 860);
             try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
             await aabn(1440, 860);
+            laasteTitler();
+            try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
+            try { W().localStorage.setItem("nk-sb2.3-bh", JSON.stringify({ "a-lige": { l: 1, s: 1 }, "b-lige": { l: 1, s: 1 }, "b-cas": { l: 1, s: 0 } })); } catch (e) { /* intet */ }
+            await aabn(1440, 860);
+            ok(sim("bh").opgaver.length === 6 && sim("bh").status[0].loest && sim("bh").status.filter(function (x) { return x.loest; }).length === 1,
+                "gemte fremskridt fra før runde 2 (b-lige, b-cas) giver ingen fejl og springes over");
+            try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
+            await aabn(1440, 860);
             modellen();
-            regnAlle("ux");
+            uxAlle();
             regnAlle("mx");
             beholderen();
             await aabn(1440, 860);
-            svarAlle("ux");
             svarAlle("mx");
             sproget();
             papirkortet();

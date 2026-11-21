@@ -251,8 +251,8 @@
     P.visKort = function () {
         var o = this.opg, g = o.g, k = this.kort;
         NK.el("ukendt-igen").hidden = !o.gennemsyn;
-        var tekst = "Etiketten er faldet af den brune flaske, og mærket viser kun molarmassen: <b>M = " + NK.komma(g.st.M) +
-            " g/mol</b>. Hvilken etiket på tavlen passer til flasken?";
+        var tekst = "Etiketten er faldet af den brune flaske. Mærket viser kun molarmassen. Hvilket stof på tavlen har molarmassen M = " + NK.komma(g.st.M) +
+            " g/mol?";
         k.vis({ kl: o.faerdig ? "loest" + (o.brugtSvar ? " svar" : "") : "opgave",
             chip: "Flaske " + (g.plads + 1) + " af " + this.iNiveau(g.niveau), tekst: tekst });
         if (o.faerdig) {

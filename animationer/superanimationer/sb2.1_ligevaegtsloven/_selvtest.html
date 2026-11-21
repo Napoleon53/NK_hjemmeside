@@ -509,7 +509,7 @@ function koerTest(W) {
     NK.visFane("fane-br");
     S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
     S.vaelg(1); S.nulstil();
-    paastand("kortet viser etiketten og opgaven", /^Reaktion 2 af 12/.test(S.kortTekst().trim()) && /Skriv reaktionsbrøken/.test(S.kortTekst()) && S.el.skort.querySelector(".sk-chip"));
+    paastand("kortet viser etiketten og opgaven", /^Reaktion 2 af 12/.test(S.kortTekst().trim()) && /Hvad er reaktionsbrøken for ligevægten på tavlen\?/.test(S.kortTekst()) && S.el.skort.querySelector(".sk-chip"));
     paastand("Indsend svar er gråt, før der er noget i brøken", S.el.indsend.classList.contains("ikke-klar") && !S.el.indsend.hidden);
     S.indsendKlik();
     paastand("Indsend svar uden brøk dømmer intet", !S.faerdig && !S.el.status.classList.contains("skidt"));
@@ -542,7 +542,7 @@ function koerTest(W) {
     F.valgKlik(0);
     paastand("fane 2: Der er ingen fejl vælger kun og afløser delen", !F.faerdig && !fd.classList.contains("valgt") && F.el.skort.querySelector(".sk-knap.valgt"));
     F.valgKlik(0); fd.click(); F.indsendKlik();
-    paastand("fane 2: rigtigt svar bliver på spørgsmålet med Næste", F.faerdig && F.el.skort.querySelector(".sk-bund.bliv [data-videre]") && /Hvilken del/.test(F.kortTekst()));
+    paastand("fane 2: rigtigt svar bliver på spørgsmålet med Næste", F.faerdig && F.el.skort.querySelector(".sk-bund.bliv [data-videre]") && /Hvor står fejlen/.test(F.kortTekst()));
     /* Den sidste tavle paa den sidste fane: ingen knap paa kortet */
     F.status.forEach(function (x) { x.loest = true; });
     F.vaelg(11); F.knap(); F.knap(); F.knap(); F.knap();

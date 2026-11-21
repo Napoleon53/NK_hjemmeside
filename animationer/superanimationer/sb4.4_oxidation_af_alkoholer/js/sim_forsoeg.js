@@ -184,12 +184,28 @@
     };
 
     /* ----- Panelet: trinene ------------------------------------------------------ */
+    /* Det trin i panelet, et spoergsmaal hoerer til: 0 Forsoeget, 1 den
+       tertiaere, 2 den sekundaere og 3 den primaere alkohol */
+    function trinAf(id) { return id === "forsoeg" ? 0 : { t: 1, s: 2, p: 3 }[id.charAt(0)]; }
+
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende trin staar som et nummer med en graa streg uden titel. Et
+       trin er naaet, naar eleven er kommet dertil, naar trinnets sidste
+       spoergsmaal foer det er besvaret rigtigt (Vis svaret taeller), eller
+       naar eleven har gennemfoert en runde foer (gemt i browseren). */
+    P.aabenTrin = function (i, nu) {
+        if (i <= nu || this.status.runder > 0) return true;
+        return i === nu + 1 && !!this.groen && !!this.groen.spm && trinAf(this.liste[this.ti + 1] || "") === i;
+    };
+
     P.visListe = function () {
-        var mig = this, id = this.trin(), nu = this.groen ? 4 : (id === "forsoeg" ? 0 : { t: 1, s: 2, p: 3 }[id.charAt(0)]), html = "";
+        var mig = this, id = this.trin(), nu = this.groen && !this.groen.spm ? 4 : trinAf(id), html = "";
         D.FORSOEG_TRIN.forEach(function (t, i) {
-            var klaret = i < nu;
-            html += '<div class="opg-chip trin' + (i === nu ? " valgt" : "") + (klaret ? " loest" : "") + '">' +
-                '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" + NK.html(t.navn) + '</span><i class="oc-m">' + (klaret ? "✓" : "") + "</i></div>";
+            var klaret = i < nu, aaben = mig.aabenTrin(i, nu);
+            html += '<div class="opg-chip trin' + (i === nu ? " valgt" : "") + (klaret ? " loest" : "") + (aaben ? "" : " laast") + '"' +
+                (aaben ? "" : ' aria-label="Trin ' + (i + 1) + ', kommer senere"') + ">" +
+                '<span class="oc-f"><span class="oc-nr">' + (i + 1) + "</span>" + (aaben ? NK.html(t.navn) : '<span class="hl-streg"></span>') +
+                '</span><i class="oc-m">' + (klaret ? "✓" : "") + "</i></div>";
         });
         NK.saetHTML("u-trinliste", html);
         NK.saetTekst("u-runder", String(this.status.runder));
@@ -204,7 +220,7 @@
             nb.forEach(function (n) { if (f.mol.atom(n).el === "C") nC++; });
             return {
                 chip: "1 Molekylet", felt: 1,
-                tekst: "Se på carbonatomet med OH-gruppen i " + navn + ". Hvor mange hydrogenatomer sidder der på det?",
+                tekst: "Hvor mange hydrogenatomer sidder på carbonatomet med OH-gruppen i " + navn + "?",
                 svar: ["0", "1", "2", "3"], rigtig: nH,
                 fejl: function () { return "Tæl kun de hydrogenatomer, der sidder direkte på det markerede carbonatom, ikke dem på oxygenatomet eller på de andre carbonatomer."; },
                 hint: ["Det markerede carbonatom har fire bindinger. Hvad går de til?",
@@ -284,7 +300,7 @@
             var VX = [-1, 0, 1, 2, 3];
             return {
                 chip: "Trin 1", felt: 2,
-                tekst: "Oxidationstal. Carbonatomet med OH-gruppen har oxidationstallet " + D.rom(a.cFra) + " i " + a.alkohol + ". Hvilket oxidationstal har det i " + a.produkt + "?",
+                tekst: "Oxidationstal. Carbonatomet med OH-gruppen har oxidationstallet " + D.rom(a.cFra) + " i " + a.alkohol + ". Hvilket oxidationstal har carbonatomet med C=O i " + a.produkt + "?",
                 svar: VX.map(D.rom), rigtig: VX.indexOf(a.cTil),
                 fejl: function () {
                     return "Tæl bindingerne fra carbonatomet som på fane 1: til H −1, til O +1 og en dobbeltbinding til O +2." +
@@ -443,6 +459,7 @@
         };
         this.besked("", "");
         this.visKort();
+        this.visListe();
     };
 
     /* Naeste spoergsmaal efter et rigtigt svar: svaret saettes ind paa tavlen og

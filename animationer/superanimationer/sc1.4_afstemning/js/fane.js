@@ -91,7 +91,20 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Listen i panelet -------------------------------------------------- */
+        /* ----- Listen i panelet --------------------------------------------------
+           Laaste titler (brugeren 21. nov. 2026, "husk dette"): paa fane 1
+           (valg.laasTitler) viser listen kun navnene paa de loeste reaktioner
+           og den, eleven er ved. De kommende staar som et nummer med en graa
+           streg og kan ikke klikkes, til de er naaet: alle foer dem er loest
+           (Vis svaret taeller som loest), eleven har vaeret der, eller den er
+           loest foer (gemt i browseren). Fane 2 har kun numre og er uaendret. */
+        P.aabenOpgave = function (i) {
+            if (!valg.laasTitler) return true;
+            if (this.status[i].loest || (this.naaet && this.naaet[i])) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
+        };
+
         P.bygListe = function () {
             var mig = this;
             this.el.liste.innerHTML = "";
@@ -112,7 +125,7 @@
                     knap.className = "opg-chip";
                     knap.title = o.navn;
                     knap.innerHTML = '<span class="oc-f">' + mig.chipTekst(o) + '</span><i class="oc-m"></i>';
-                    knap.addEventListener("click", function () { mig.vaelg(i); });
+                    knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
                     raekke.appendChild(knap);
                     mig.chips[i] = knap;
                 });
@@ -126,6 +139,16 @@
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
+                if (valg.laasTitler) {
+                    var aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                    var html = aaben ? mig.chipTekst(o) : (i + 1) + '<span class="oc-streg"></span>';
+                    var f = c.querySelector(".oc-f");
+                    if (f.innerHTML !== html) f.innerHTML = html;
+                    c.classList.toggle("laast", !aaben);
+                    c.disabled = !aaben;
+                    c.title = aaben ? o.navn : "";
+                    c.setAttribute("aria-label", aaben ? o.navn : "Reaktion " + (i + 1) + ", kommer senere");
+                }
                 c.classList.toggle("valgt", i === mig.nr);
                 c.classList.toggle("loest", s.loest);
                 c.classList.toggle("stjerne", s.stjerne);
@@ -146,6 +169,8 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
             this.hjaelp = 0;
             this.hintE = null;
             this.pegKnap = false;

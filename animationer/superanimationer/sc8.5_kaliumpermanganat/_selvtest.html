@@ -569,7 +569,7 @@ async function koerTest(W) {
     paastand("et klik på den rigtige formel løser heller ikke opgaven af sig selv", A.aktivt() === "produkt" && !A.venter && !A.opg.produkt);
     indsend.click();
     var vk = A.el.ind.querySelector("[data-videre]");
-    paastand("rigtigt: kortet bliver på spørgsmålet, forklaringen står i den grønne boks", !!A.venter && skort.classList.contains("bliv") && /Vælg det stof/.test(kortTekst(A)) &&
+    paastand("rigtigt: kortet bliver på spørgsmålet, forklaringen står i den grønne boks", !!A.venter && skort.classList.contains("bliv") && /Hvilket stof blev MnO₄⁻ til, da glasset blev grønt\?/.test(kortTekst(A)) &&
         !!A.el.ind.querySelector(".sk-bund.bliv.god") && /MnO₄²⁻ er grøn/.test(besked(A)), kortTekst(A) + " / " + besked(A));
     paastand("Næste trin står, hvor Indsend svar stod, og Indsend svar og hint er væk", !!vk && /Næste trin/.test(vk.textContent) && indsend.hidden && knap.hidden &&
         Math.abs(r_(vk).right - irect.right) <= 4 && r_(vk).bottom <= r_(skort).bottom, vk && Math.round(r_(vk).right) + " / " + Math.round(irect.right));
@@ -699,6 +699,26 @@ async function koerTest(W) {
     }
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
+
+    overskrift("12. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    NK.visFane("fane-fl"); B.tilpas(); B.layout();
+    B.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    B.naaetOpg = {};
+    B.vaelg(0, false);
+    var titelAf = function (k) { return (function () { var t = d.createElement("span"); t.innerHTML = B.chipTekst(B.opgaver[k]); return t.textContent; })(); };
+    var laastL = function () { return [].slice.call(d.querySelectorAll("#fl-liste .opg-chip")); };
+    var ll = laastL();
+    paastand("ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        ll.length === B.opgaver.length && ll.length > 1 && ll[0].textContent.indexOf(titelAf(0)) >= 0 && !ll[0].disabled &&
+        ll.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()); }),
+        ll.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    ll[ll.length - 1].click();
+    paastand("et klik på en låst opgave gør intet", B.nr === 0);
+    B.opgaveLoest("svar", "");
+    ll = laastL();
+    paastand("når opgave 1 er løst, kommer titlen på opgave 2 frem; de senere er stadig låst",
+        B.status[0].loest && ll[1].textContent.indexOf(titelAf(1)) >= 0 && !ll[1].disabled &&
+        ll.slice(2).every(function (b) { return b.disabled && !!b.querySelector(".oc-streg"); }));
 }
 </script>
 </body>

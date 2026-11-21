@@ -219,3 +219,7 @@ brugeren), `FEEDBACK_EMNER`, linjen til `til_panelet.js` øverst i `<head>` i
 `index.html` og kolonnen "I menuen" i superanimationernes README. Kemibogens
 afsnit 4.5 kan få en Prøv selv-linje hertil, men kun hvis brugeren beder om
 det.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).

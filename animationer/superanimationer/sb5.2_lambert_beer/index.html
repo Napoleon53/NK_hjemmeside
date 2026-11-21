@@ -7,6 +7,7 @@
 <title>Lambert-Beers lov</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 </head>
 <body class="papirkort">
 
@@ -30,8 +31,14 @@
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-lys" role="tabpanel" aria-label="Lyset">
     <div class="scene">
-        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
-             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <!-- Opgaveraekken (21. nov. 2026): panelet er vaek. Forudsigelserne med nummer og tema
+             (kun de naaede har tema) og Start forfra yderst til hoejre (js/fane.js) -->
+        <nav class="opgaverad" id="lys-raekke" aria-label="Forudsigelserne">
+            <div class="or-opgaver" id="lys-liste"></div>
+            <button class="or-knap or-stille" id="lys-forfra" type="button" title="Samme forudsigelse forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
+        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, beskeden ved et
+             forkert svar, forklaringen og knapperne -->
         <div class="kortzone">
             <div class="scenekort opgave" id="lys-skort">
                 <div class="sk-ind" id="lys-ind" aria-live="polite"></div>
@@ -42,43 +49,24 @@
                 </div>
             </div>
         </div>
-        <div class="laerred-ramme"><canvas id="lys-laerred"></canvas></div>
-    </div>
-
-    <aside class="panel">
-        <div class="kort opgavekort" id="lys-kort">
-            <h2><span id="lys-titel">Forudsigelse</span><span class="taeller">forudsigelse <b id="lys-nr">1</b>/<span id="lys-antal">6</span></span></h2>
-            <div id="lys-prompt"></div>
-        </div>
-
-        <div class="kort" id="lys-skruer">
-            <h2>Kuvetten</h2>
-            <div class="stoffer" id="lys-stoffer" role="group" aria-label="Stoffet i kuvetten">
+        <div class="laerred-ramme">
+            <canvas id="lys-laerred"></canvas>
+            <!-- Betjeningen sidder paa apparaterne (21. nov. 2026): − og + ved kuvettens
+                 etiket og ved kuvettebredden, Langsomt lys paa lampen og stofferne ved
+                 kuvetten, naar alle seks forudsigelser er proevet (js/sim_lys.js) -->
+            <button class="styr-knap" id="lys-c-ned" type="button" aria-label="Lavere koncentration" title="Lavere koncentration">−</button>
+            <button class="styr-knap" id="lys-c-op" type="button" aria-label="Højere koncentration" title="Højere koncentration">+</button>
+            <button class="styr-knap" id="lys-l-ned" type="button" aria-label="Smallere kuvette" title="Smallere kuvette">−</button>
+            <button class="styr-knap" id="lys-l-op" type="button" aria-label="Bredere kuvette" title="Bredere kuvette">+</button>
+            <button class="lilleknap scene-knap" id="lys-langsom" type="button">Langsomt lys</button>
+            <div class="stoffer scene-knap" id="lys-stoffer" role="group" aria-label="Stoffet i kuvetten">
                 <button type="button" class="stof-knap valgt" data-stof="mno4">MnO₄⁻</button>
                 <button type="button" class="stof-knap" data-stof="fescn">FeSCN²⁺</button>
                 <button type="button" class="stof-knap" data-stof="fephen">[Fe(phen)₃]²⁺</button>
             </div>
-            <div class="skyder-boks" id="lys-c-boks">
-                <label for="lys-c"><span>Koncentration, c</span><b id="lys-c-tal">0,20 mM</b></label>
-                <input type="range" id="lys-c" min="0" max="0.6" step="0.01" value="0.2">
-            </div>
-            <div class="skyder-boks" id="lys-l-boks">
-                <label for="lys-l"><span>Kuvettebredde, l</span><b id="lys-l-tal">1,00 cm</b></label>
-                <input type="range" id="lys-l" min="0.5" max="3" step="0.1" value="1">
-            </div>
-            <div class="skyder-fod">
-                <span class="lambda" id="lys-lambda">λ = 525 nm</span>
-                <button type="button" class="lilleknap" id="lys-langsom">Langsomt lys</button>
-            </div>
+            <div class="boble" id="lys-boble" hidden></div>
         </div>
-
-        <div class="kort" id="lys-opgaver">
-            <h2>Forudsigelserne <span class="taeller">prøvet <b id="lys-loest">0</b>/6</span></h2>
-            <div class="opg-liste" id="lys-liste"></div>
-            <p class="faerdig-tekst" id="lys-faerdig"></p>
-            <div class="forfra-raekke"><button class="forfraknap" id="lys-forfra" type="button" title="Samme forudsigelse forfra (R)">Start forfra ↺</button></div>
-        </div>
-    </aside>
+    </div>
 </section>
 
 <!-- ================================================================= -->
@@ -86,8 +74,10 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-kurve" role="tabpanel" aria-label="Standardkurven">
     <div class="scene">
-        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
-             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <nav class="opgaverad" id="kurve-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="kurve-liste"></div>
+            <button class="or-knap or-stille" id="kurve-forfra" type="button" title="Samme opgave forfra med en ny prøve (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
         <div class="kortzone">
             <div class="scenekort opgave" id="kurve-skort">
                 <div class="sk-ind" id="kurve-ind" aria-live="polite"></div>
@@ -100,25 +90,6 @@
         </div>
         <div class="laerred-ramme"><canvas id="kurve-laerred"></canvas></div>
     </div>
-
-    <aside class="panel">
-        <div class="kort opgavekort" id="kurve-kort">
-            <h2><span id="kurve-titel">Opgave</span><span class="taeller">opgave <b id="kurve-nr">1</b>/<span id="kurve-antal">4</span></span></h2>
-            <div id="kurve-prompt"></div>
-        </div>
-
-        <div class="kort" id="kurve-maalinger">
-            <h2>Målingerne</h2>
-            <div id="kurve-tabel"></div>
-        </div>
-
-        <div class="kort" id="kurve-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="kurve-loest">0</b>/4</span></h2>
-            <div class="opg-liste" id="kurve-liste"></div>
-            <p class="faerdig-tekst" id="kurve-faerdig"></p>
-            <div class="forfra-raekke"><button class="forfraknap" id="kurve-forfra" type="button" title="Samme opgave forfra med en ny prøve (R)">Start forfra ↺</button></div>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -126,8 +97,12 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-regn" role="tabpanel" aria-label="Beregningen">
     <div class="scene">
-        <!-- Papirkortet oeverst midt i scenen (6. nov. 2026): opgaven, svarene, hint,
-             beskeden ved et forkert svar, forklaringen og knapperne. Ingen statuslinje nederst. -->
+        <!-- Let, Middel og Svaer kan altid vaelges; saa opgaverne paa niveauet -->
+        <nav class="opgaverad" id="regn-raekke" aria-label="Opgaverne">
+            <div class="or-niveau" id="regn-niveau" role="group" aria-label="Sværhedsgrad"></div>
+            <div class="or-opgaver" id="regn-liste"></div>
+            <button class="or-knap or-stille" id="regn-forfra" type="button" title="Samme opgave forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+        </nav>
         <div class="kortzone">
             <div class="scenekort opgave" id="regn-skort">
                 <div class="sk-ind" id="regn-ind" aria-live="polite"></div>
@@ -138,83 +113,42 @@
                 </div>
             </div>
         </div>
-        <div class="arbejde" id="regn-arbejde">
-
-            <div class="tavle" id="regn-tavle">
-                <div class="tv-navn" id="regn-navn"></div>
-                <div class="tv-stempel" id="regn-stempel" hidden></div>
-                <div class="ot-raekke" id="regn-tal"></div>
-                <div class="regn-trin" id="regn-trin"></div>
-            </div>
-
-            <div class="bakke" id="regn-bakke">
-                <div class="bk-gruppe" id="regn-bk-form">
-                    <span class="bk-hoved">Formens form</span>
-                    <div class="bk-brikker" id="regn-skabeloner"></div>
-                </div>
-                <div class="bk-gruppe" id="regn-bk-bogst">
-                    <span class="bk-hoved">Bogstaverne</span>
-                    <div class="bk-brikker" id="regn-bogstaver"></div>
-                </div>
-                <div class="bk-gruppe" id="regn-bk-tal" hidden>
-                    <span class="bk-hoved">Opgavens tal</span>
-                    <div class="bk-brikker" id="regn-tallene"></div>
-                </div>
-                <div class="bk-gruppe" id="regn-bk-lommeregner" hidden>
-                    <span class="bk-hoved">Resultatet</span>
-                    <p class="bk-note">Regn på lommeregneren, og skriv resultatet på tavlen.</p>
-                </div>
-            </div>
+        <!-- Til venstre maaleopstillingen med opgavens tal paa etiketterne, til hoejre
+             tavlen som et lyst papir, der vokser linje for linje (js/sim_regn.js) -->
+        <div class="regn-flade" id="regn-flade">
+            <div class="laerred-ramme regn-opstilling"><canvas id="regn-laerred"></canvas></div>
+            <div class="papirtavle" id="regn-tavle" aria-live="polite"></div>
         </div>
-
     </div>
-
-    <aside class="panel">
-        <div class="kort opgavekort" id="regn-kort">
-            <h2><span id="regn-titel">Opgave</span><span class="taeller">opgave <b id="regn-nr">1</b>/<span id="regn-antal">8</span></span></h2>
-            <div id="regn-prompt"></div>
-        </div>
-
-        <div class="kort" id="regn-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/8</span></h2>
-            <div class="opg-liste" id="regn-liste"></div>
-            <p class="faerdig-tekst" id="regn-faerdig"></p>
-            <div class="forfra-raekke"><button class="forfraknap" id="regn-forfra" type="button" title="Samme opgave forfra (R)">Start forfra ↺</button></div>
-        </div>
-    </aside>
 </section>
 
 </main>
 
 <!-- ================================================================= -->
-<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- TEORIEN (aabnes kun med knappen eller T). Kort og rolig, og resten  -->
+<!-- staar i Kemibogen (regelsaettet, regel 31, 21. nov. 2026)          -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <div class="overlay-boks teori-ark">
         <h2>Lambert-Beers lov</h2>
-        <p>Lambert-Beers lov siger, at absorbansen ved en bestemt bølgelængde er ligefrem proportional med koncentrationen af det stof, der absorberer lyset, og med lysvejen gennem opløsningen.</p>
+        <p>Absorbansen er ligefrem proportional med koncentrationen og med lysvejen gennem opløsningen.</p>
         <div class="eksempel">A = ε · l · c</div>
         <ul class="teori-trin">
             <li><b>A</b> er absorbansen. Den har ingen enhed.</li>
-            <li><b>ε</b> er ekstinktionskoefficienten. Den er en konstant for stoffet ved den valgte bølgelængde. I animationen har ε enheden mM⁻¹·cm⁻¹, og 1 mM⁻¹·cm⁻¹ = 1000 M⁻¹·cm⁻¹.</li>
-            <li><b>l</b> er lysvejen i cm. Lysvejen er lig med kuvettens bredde.</li>
+            <li><b>ε</b> er ekstinktionskoefficienten, en konstant for stoffet ved den valgte bølgelængde (her i mM⁻¹·cm⁻¹).</li>
+            <li><b>l</b> er lysvejen, dvs. kuvettens bredde i cm.</li>
             <li><b>c</b> er koncentrationen i mM.</li>
         </ul>
-        <p>Enhederne går ud: mM⁻¹·cm⁻¹ · cm · mM = 1. Derfor har A ingen enhed.</p>
 
         <h3 class="teori-hoved">Transmittans og absorbans</h3>
-        <p>Det lys, der sendes ind i kuvetten, har intensiteten I₀, og det lys, der kommer ud, har intensiteten I. Transmittansen T er den brøkdel af lyset, der slipper igennem.</p>
+        <p>Transmittansen T er den brøkdel af lyset, der slipper igennem kuvetten.</p>
         <div class="eksempel">T = I / I₀ &nbsp;&nbsp;og&nbsp;&nbsp; A = −log(T)</div>
-        <p>T = 100 % giver A = 0. T = 10 % giver A = 1, og T = 1 % giver A = 2.</p>
-
-        <h3 class="teori-hoved">Hvorfor logaritmen</h3>
-        <p>Hvert lag af opløsningen absorberer den samme brøkdel af det lys, der kommer ind i laget. Lyset bliver derfor svagere med den samme faktor for hver centimeter, mens A vokser med det samme tal for hver centimeter. Derfor er det A og ikke T, der er ligefrem proportional med c og l.</p>
+        <p>Hvert lag af opløsningen absorberer den samme brøkdel af lyset. Derfor er det A og ikke T, der er proportional med c og l.</p>
 
         <h3 class="teori-hoved">Standardkurven</h3>
-        <p>Man måler absorbansen af en blindprøve (vand) og en række standarder med kendt koncentration. Når absorbansen afbildes som funktion af koncentrationen, ligger punkterne på en ret linje gennem (0, 0):</p>
-        <div class="eksempel">A = a · c &nbsp;&nbsp;hvor&nbsp;&nbsp; a = ε · l</div>
-        <p>Prøvens koncentration aflæses på linjen eller beregnes som c = A / a. Prøven skal måles i samme kuvette og ved samme bølgelængde som standarderne.</p>
+        <p>Absorbansen af en række standarder afbildes mod koncentrationen. Punkterne ligger på en ret linje gennem (0, 0) med hældningen a = ε · l. Prøvens koncentration aflæses på linjen.</p>
 
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/b/kapitler/b5-2-absorbans-og-lambert-beers-lov.html" target="_blank" rel="noopener">B5.2 Absorbans og Lambert-Beers lov</a></p>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>

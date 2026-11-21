@@ -951,3 +951,10 @@ html body.papirkort.papirkort .scenekort .sk-bund .knap.forfra {
     box-shadow: none;
 }
 html body.papirkort.papirkort .scenekort .sk-bund .knap.forfra:hover { border-color: #8f8873; background-color: #fffdf6; }
+
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende gaet og
+   opgaver er et nummer med en grå streg og kan ikke klikkes, til eleven er
+   naaet dertil */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.hl-streg { display: inline-block; width: 8em; height: 9px; border-radius: 5px; background-color: #4a4a58; vertical-align: middle; }

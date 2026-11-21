@@ -134,6 +134,9 @@ html body.papirkort.papirkort .scenekort.loest.svar .sk-tekst {
 }
 
 html body.papirkort.papirkort .scenekort .sk-spm { font-weight: 600; color: #0f1522; }
+/* Spoergsmaalet paa sin egen linje, naar der staar en indledning foer det
+   (papirkort.js saetter .sk-linje; brugeren 21. nov. 2026) */
+html body.papirkort.papirkort .scenekort .sk-spm.sk-linje { display: block; text-wrap: balance; }
 html body.papirkort.papirkort .scenekort .nw { white-space: nowrap; }
 
 /* ----- Svarknapperne: hvide og neutrale. Kun det valgte har farve. ------- */

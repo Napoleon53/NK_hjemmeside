@@ -300,9 +300,14 @@
         var R = this.R, e = NK.el("udtryk-skort"), bliv = !!this.slut;
         var kl = "scenekort " + (bliv ? "loest bliv" + (this.slut.maade === "svar" ? " svar" : "") : "opgave");
         if (e.className.replace(" blink", "") !== kl) e.className = kl;
+        /* Spoergsmaalet naevner reaktionens egne koncentrationer: [NO] og [H₂], [Br⁻], [BrO₃⁻] og [H⁺] */
+        var led = R.reaktanter.map(function (r) { return "[" + r.formel + "]"; }), en = led.length === 1;
+        var ledTekst = en ? led[0] : led.slice(0, -1).join(", ") + " og " + led[led.length - 1];
+        var opgave = "Mål starthastigheden, og vælg " + (en ? "eksponenten" : "eksponenterne") + " under tabellen. " +
+            (en ? "Hvilken eksponent har " : "Hvilke eksponenter har ") + ledTekst + " i hastighedsudtrykket?";
         /* Tallet foran et stof maa ikke staa alene for enden af en linje */
         var html = '<p class="sk-tekst"><span class="sk-chip">Reaktion ' + (this.nr + 1) + " af " + D.REAKTIONER.length + "</span>" +
-            NK.Papir.tekst(NK.html("Find hastighedsudtrykket for reaktionen. Vælg eksponenterne under tabellen.")) + "</p>" +
+            NK.Papir.tekst(NK.html(opgave)) + "</p>" +
             '<p class="sk-ligning">' + NK.html(R.ligning.replace(/(\d) /g, "$1\u00a0")) + "</p>";
         if (bliv) {
             var svar = this.slut.maade === "svar";

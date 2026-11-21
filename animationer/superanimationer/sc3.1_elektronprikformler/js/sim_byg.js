@@ -65,7 +65,7 @@
     };
 
     var P_ = NK.SimByg.prototype;
-    NK.Fane.paa(P_, { navn: "b", naesteFane: "fane-f", naesteNavn: "Find fejlen", naesteTekst: "Næste molekyle →" });
+    NK.Fane.paa(P_, { navn: "b", naesteFane: "fane-f", naesteNavn: "Find fejlen", naesteTekst: "Næste molekyle →", laasTitler: true });
 
     /* ----- Opgaven ------------------------------------------------------------ */
     P_.lavOpgave = function (i) {

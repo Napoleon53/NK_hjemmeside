@@ -1971,3 +1971,9 @@ html body.papirkort.papirkort #fane-a > .scene > .scenekort > .sk-ind > .sk-bund
 @keyframes sejr-ind { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sejr-pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes medalje-sving { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+
+/* Opgavelisten (brugeren 21. nov. 2026, "husk dette"): de kommende opgaver er
+   et nummer med en grå streg og kan ikke klikkes, til eleven er naaet dertil */
+.opg-chip.laast { cursor: default; opacity: 0.75; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.hl-streg { display: inline-block; width: 8em; height: 9px; border-radius: 5px; background-color: #4a4a58; vertical-align: middle; }

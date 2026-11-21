@@ -44,7 +44,7 @@
         NK.el("k-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el("k-liste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-opg]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
+            if (k && !k.disabled) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
         });
         this.el.skort.addEventListener("click", function (e) {
             if (e.target.closest && e.target.closest("[data-udfoer]")) mig.udfoer();
@@ -85,7 +85,7 @@
         var html = "";
         this.opgaver.forEach(function (o, i) {
             html += '<button type="button" class="opg-chip" data-opg="' + i + '"><span class="oc-f"><b>' + (i + 1) + "</b> " +
-                NK.html(o.navn) + '</span><i class="oc-m"></i></button>';
+                '<span class="oc-navn">' + NK.html(o.navn) + '</span></span><i class="oc-m"></i></button>';
         });
         NK.el("k-liste").innerHTML = html;
     };
@@ -94,16 +94,24 @@
         var chips = NK.el("k-liste").querySelectorAll("[data-opg]");
         for (var k = 0; k < chips.length; k++) {
             var i = parseInt(chips[k].getAttribute("data-opg"), 10), s = this.status[i];
+            /* De kommende opgaver er et nummer med en graa streg (21. nov. 2026) */
+            var aaben = F.opgAaben(this.status, this.naaet, i), nv = chips[k].querySelector(".oc-navn");
+            var navnH = aaben ? NK.html(this.opgaver[i].navn) : '<span class="oc-streg"></span>';
+            if (nv.innerHTML !== navnH) nv.innerHTML = navnH;
+            chips[k].disabled = !aaben;
+            chips[k].classList.toggle("laast", !aaben);
+            if (aaben) chips[k].removeAttribute("aria-label");
+            else chips[k].setAttribute("aria-label", "Opgave " + (i + 1) + ", kommer senere");
             chips[k].classList.toggle("valgt", i === this.nr);
             chips[k].classList.toggle("loest", s.loest);
             chips[k].classList.toggle("stjerne", s.stjerne);
             chips[k].querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : "");
         }
         NK.saetTekst("k-loest", String(this.antalLoest()));
-        var mig = this, html = "";
+        var mig = this, html = "", maks = F.trinNaaet(this, this.nr, this.trinNr), hel = this.status[this.nr].loest;
         this.opg.trin.forEach(function (t, j) {
             var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span>" + NK.html(t.navn) + "</li>";
+            html += F.trinLi(j, kl, NK.html(t.navn), hel || j <= maks);
         });
         NK.saetHTML("k-trin", html);
         NK.saetTekst("k-trin-navn", this.opg.navn);
@@ -112,6 +120,8 @@
     /* ----- En opgave ---------------------------------------------------------------- */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[i] = true;
         this.opg = this.opgaver[i];
         this.form = this.opg.form;
         this.enh = [];

@@ -83,7 +83,7 @@
         }
         return {
             slags: "spm", chip: "Spørgsmål",
-            tekst: "Atomet med den gule ring sidder i en funktionel gruppe. Hvilken stofklasse giver gruppen?",
+            tekst: "Hvilken stofklasse hører den funktionelle gruppe med den gule ring til?",
             kolonner: 6,
             /* Prikkerne har blaekfarven: kortet er lyst papir (3. nov. 2026) */
             svar: D.KLASSER.map(function (k) {

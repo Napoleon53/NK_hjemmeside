@@ -75,7 +75,7 @@
             }
             return {
                 chip: "Find fejlen",
-                tekst: "En elev har tegnet prikformlen for " + this.o.f + ". Klik på det atom, der er tegnet forkert. Er tegningen rigtig, så vælg Ingen fejl.",
+                tekst: "En elev har tegnet prikformlen for " + this.o.f + ". Klik på atomet i tegningen, eller vælg Ingen fejl. Hvilket atom er tegnet forkert i elevens prikformel for " + this.o.f + "?",
                 ekstra: '<div class="sk-ingen"><button type="button" class="' + kl + '" data-ingen="1"' + (laast ? " disabled" : "") +
                     '><span class="v-boks" aria-hidden="true">' + boks + "</span><span>Ingen fejl</span></button></div>",
                 spm: "find"

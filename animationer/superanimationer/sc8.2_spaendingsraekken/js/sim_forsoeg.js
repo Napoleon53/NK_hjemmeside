@@ -547,7 +547,8 @@
     };
 
     /* Pladsen oeverst i scenen til papirkortet: [almindelig skaerm, lav skaerm] */
-    var ZONE = [160, 148];
+    /* 180 (foer 160): spoergsmaalet paa egen linje, 21. nov. 2026 */
+    var ZONE = [180, 148];
     P.kortZone = function () { return this.kort ? this.kort.zone(ZONE) : 10 + ZONE[0] + 8; };
 
     /* ----- Opdater ------------------------------------------------------------------------- */

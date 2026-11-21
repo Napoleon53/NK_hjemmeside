@@ -127,3 +127,7 @@ Udført 13. nov. 2026 (brugeren: "Du må også gerne placere alle de andre nye a
    til `kemi-c-filer/arkiv/b9_5.spektroskopi_opgaver_oldversion.html`, når intet
    andet linker til den.
 4. Kolonnen "I menuen" i superanimationernes README rettes.
+
+## Opgavelisten låser titlerne op i takt (21. nov. 2026)
+
+Opgavelisten i panelet viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, før de er nået (`aabenOpgave` i `js/sim.js`, Begynd forfra låser dem igen). Trinboksene på tavlen er uændrede. Selvtesten: ALT OK (84 påstande).

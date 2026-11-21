@@ -618,6 +618,30 @@ function koerTest(W) {
     Sl.faerdig = false;
     paastand("kortets knap går altid fremad og siger aldrig Start forfra, heller ikke når alle sager er løst", !/forfra/i.test(vtL), vtL);
 
+    /* ================================================================ */
+    overskrift("Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    var chips = function (S) { return [].slice.call(d.getElementById(S.navn + "-liste").querySelectorAll(".opg-chip")); };
+    var laastChip = function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()) && !b.title; };
+    var tekstAf = function (l) { return l.map(function (x) { return x.textContent.trim(); }).join(" | "); };
+    [["fane-p", Sp], ["fane-r", Sr], ["fane-l", Sl]].forEach(function (x) {
+        var S = x[1], id = x[0];
+        NK.visFane(id); S.tilpas(); S.layout();
+        S.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+        S.naaet = {}; S.vaelg(0);
+        var c = chips(S);
+        paastand(id + ": ved start har kun opgave 1 sin titel; de " + (c.length - 1) + " andre er et nummer med en grå streg og kan ikke klikkes",
+            c.length === S.opgaver.length && c[0].textContent.indexOf(S.opgaver[0].navn) >= 0 && !c[0].disabled && c.slice(1).every(laastChip), tekstAf(c));
+        c[3].click();
+        paastand(id + ": et klik på en låst opgave gør intet", S.nr === 0);
+        for (var n = 0; n < 40 && !S.faerdig; n++) { if (S.venter) S.knap(); else { S.brugtSvar = true; S.visSvar(); koerF(S, 9); } }
+        c = chips(S);
+        paastand(id + ": Vis svaret tæller som løst: titlen på opgave 2 kommer frem, de andre er stadig låst",
+            S.faerdig && S.status[0].loest && c[1].textContent.indexOf(S.opgaver[1].navn) >= 0 && !c[1].disabled && c.slice(2).every(laastChip), tekstAf(c));
+        S.status[4].loest = true; S.visListe();
+        paastand(id + ": en opgave, der er løst før (gemt i browseren), har sin titel", !chips(S)[4].disabled && chips(S)[4].textContent.indexOf(S.opgaver[4].navn) >= 0);
+        S.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    });
+
     Sp.vaelg(0);
     Sr.vaelg(0);
     Sl.vaelg(0);

@@ -107,7 +107,7 @@
         var st = this.opg.st;
         if (k === "ladning") return "Hvilken ladning har " + st.tekst + "?";
         var s = k === "X" ? st.X : k, n = k === "X" ? st.nX : (k === "O" ? st.nO : st.nH);
-        return "Hvilket oxidationstal har " + (n > 1 ? "hvert " : "") + s + "?";
+        return "Hvilket oxidationstal har " + (n > 1 ? "hvert " : "") + s + " i " + st.tekst + "?";
     };
 
     P.trinLinje = function () {

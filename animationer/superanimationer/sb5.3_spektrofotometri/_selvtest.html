@@ -480,6 +480,29 @@ function koerTest(W) {
     });
     ramme.style.width = "";
     ramme.style.height = "";
+
+    overskrift("12. Trinlisten låser titlerne op i takt (21. nov. 2026)");
+    function punkter(S) { return [].slice.call(S.el.trin.querySelectorAll(".trinpunkt:not(.slut)")); }
+    function laastTrin(li) { return li.classList.contains("kommer") && !!li.querySelector(".hl-streg") && /^\d+$/.test(li.textContent.trim()); }
+    [["fane-let", S1, 504], ["fane-mid", S2, 540], ["fane-svr", S3, 427]].forEach(function (x) {
+        NK.visFane(x[0]);
+        var S = x[1];
+        S.nulstil();
+        var p = punkter(S);
+        paastand(x[0] + ": ved start har kun trin 1 en titel; de " + (p.length - 1) + " andre er et nummer med en grå streg uden titel og kan ikke klikkes",
+            p.length === S.d.trin.length && p[0].classList.contains("aktiv") && p[0].textContent.indexOf(S.d.trin[0].titel) >= 0 &&
+            p.slice(1).every(laastTrin) && !S.el.trin.querySelector("button.trinpunkt, .trinpunkt[onclick]"),
+            p.map(function (li) { return li.textContent.trim().slice(0, 30); }).join(" | "));
+    });
+    NK.visFane("fane-let");
+    S1.nulstil();
+    maal(S1, "blind", 504);
+    var p1 = punkter(S1);
+    paastand("fane-let: når trin 1 er klaret, kommer titlen på trin 2 frem; trin 3 til 7 er stadig låst",
+        S1.trinNr === 1 && p1[1].textContent.indexOf(S1.d.trin[1].titel) >= 0 && !p1[1].querySelector(".hl-streg") && p1.slice(2).every(laastTrin),
+        p1.map(function (li) { return li.textContent.trim().slice(0, 30); }).join(" | "));
+    paastand("fane-let: når fanen er færdig, står alle titler", visSvarHele(S1) && punkter(S1).every(function (li) { return !li.querySelector(".hl-streg"); }));
+    S1.nulstil();
     NK.visFane("fane-let");
 }
 </script>

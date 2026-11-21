@@ -58,7 +58,7 @@
             });
             NK.el(opt.liste).addEventListener("click", function (e) {
                 var li = e.target.closest && e.target.closest("li[data-nr]");
-                if (li) mig.startEmne(parseInt(li.getAttribute("data-nr"), 10));
+                if (li && !li.classList.contains("laast")) mig.startEmne(parseInt(li.getAttribute("data-nr"), 10));
             });
         };
 
@@ -71,6 +71,8 @@
 
         P.startEmne = function (nr) {
             this.nr = nr;
+            this.naaet = this.naaet || {};
+            this.naaet[nr] = true;
             this.e = this.emner[nr];
             this.r = this.tal(this.e);
             this.trinListe = this.trinFor(this.e);
@@ -306,17 +308,25 @@
 
         /* ----- Panelet ---------------------------------------------------------------------- */
         P.visListe = function () {
-            var mig = this, html = "";
+            /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): en syre
+               eller base har sin titel, naar den er loest (ogsaa gemt i browseren), naar
+               eleven er eller har vaeret ved den, eller naar alle foer den er loest. De
+               kommende er et nummer med en graa streg og kan ikke klikkes. Trinlisten
+               goer det samme for trinnene i emnet. */
+            var mig = this, html = "", alleFoer = true;
             this.emner.forEach(function (e, j) {
                 var o = mig.status[mig.emneId(e)];
-                html += '<li data-nr="' + j + '" class="' + (j === mig.nr ? "nu" : (o ? "faerdig" : "")) + '"><span class="tr-nr">' + (j + 1) + "</span><span>" +
-                    D.sub(NK.html(mig.listeNavn(e))) + (o === 2 ? " ★" : (o ? " ✓" : "")) + "</span></li>";
+                var aaben = !!o || j === mig.nr || alleFoer || !!(mig.naaet && mig.naaet[j]);
+                if (!o) alleFoer = false;
+                html += '<li data-nr="' + j + '" class="' + (j === mig.nr ? "nu" : (o ? "faerdig" : (aaben ? "" : "laast"))) + '"' +
+                    (aaben ? "" : ' aria-label="' + (j + 1) + ', kommer senere"') + '><span class="tr-nr">' + (j + 1) + "</span>" +
+                    (aaben ? "<span>" + D.sub(NK.html(mig.listeNavn(e))) + (o === 2 ? " ★" : (o ? " ✓" : "")) + "</span>" : '<span class="tr-streg"></span>') + "</li>";
             });
             NK.saetHTML(this.opt.liste, html);
-            var th = "";
+            var th = "", hel = !!this.status[this.emneId(this.e)], maks = NK.Fane.trinNaaet(this, this.nr, this.trinNr);
             this.trinListe.forEach(function (id, j) {
                 var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-                th += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(mig.TRIN[id].navn)) + "</span></li>";
+                th += NK.Fane.trinLi(j, kl, "<span>" + D.sub(NK.html(mig.TRIN[id].navn)) + "</span>", hel || kl !== "" || j <= maks);
             });
             NK.saetHTML(this.opt.trinliste, th);
             NK.saetTekst(this.opt.titel, this.emneNavn(this.e));

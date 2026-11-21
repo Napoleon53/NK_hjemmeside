@@ -35,6 +35,12 @@
         <div class="anker" id="opl-anker-krukke"></div>
         <div class="anker" id="opl-anker-zoom"></div>
         <div class="anker" id="opl-anker-soejler"></div>
+        <div class="anker" id="opl-anker-tavle"></div>
+        <!-- Beregningen staar paa en lille tavle i scenen, naar der er noget at vise
+             (21. nov. 2026: intet i panelet, mens eleven regner) -->
+        <div class="scenetavle" id="opl-kort" hidden>
+            <div id="opl-beregning"></div>
+        </div>
         <!-- Opgaven staar paa ét papirkort oeverst midt i scenen (6. nov. 2026):
              teksten, svarene, beskeden, hint og Indsend svar -->
         <div class="scenekort opgave" id="opl-skort">
@@ -48,16 +54,10 @@
     </div>
 
     <aside class="panel">
-        <div class="kort maaling" id="opl-kort">
-            <h2>Beregningen</h2>
-            <div id="opl-beregning"></div>
-            <p class="note" id="opl-note">Beregningen kommer her, når opgaven er løst.</p>
-            <button class="knap nulstil" id="opl-forfra" type="button" title="Tøm glasset (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
-        </div>
-
         <div class="kort" id="opl-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="opl-loest">0</b>/6</span></h2>
             <div class="hyldeliste" id="opl-liste"></div>
+            <button class="knap nulstil" id="opl-forfra" type="button" title="Tøm glasset (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -84,11 +84,6 @@
     </div>
 
     <aside class="panel">
-        <div class="kort maaling" id="ioner-kort">
-            <h2>Regnetrinene</h2>
-            <div class="raekker" id="ioner-raekker"></div>
-        </div>
-
         <div class="kort" id="ioner-opgaver">
             <h2>Niveauerne <span class="taeller">løst <b id="ioner-loest">0</b>/3</span></h2>
             <div class="hyldeliste" id="ioner-liste"></div>
@@ -118,11 +113,6 @@
     </div>
 
     <aside class="panel">
-        <div class="kort maaling" id="bland-kort">
-            <h2>Regnetrinene</h2>
-            <div class="raekker" id="bland-raekker"></div>
-        </div>
-
         <div class="kort" id="bland-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="bland-loest">0</b>/4</span></h2>
             <div class="hyldeliste" id="bland-liste"></div>
@@ -150,8 +140,8 @@
         <div class="eksempel">
             <span class="eksempel-hoved">Blandinger</span>
             To salte i det samme glas: bidragene til [ion] lægges sammen.<br>
-            To glas, der hældes sammen: stofmængderne lægges sammen, og rumfanget bliver det samlede.<br>
-            [Cl⁻] = <span class="broek"><span>n(Cl⁻) fra A + n(Cl⁻) fra B</span><span>V(A) + V(B)</span></span>
+            To glas, der hældes sammen: stofmængderne lægges sammen, og rumfanget aflæses på blandingen.<br>
+            [Cl⁻] = <span class="broek"><span>n(Cl⁻) fra A + n(Cl⁻) fra B</span><span>V(blandingen)</span></span>
         </div>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>

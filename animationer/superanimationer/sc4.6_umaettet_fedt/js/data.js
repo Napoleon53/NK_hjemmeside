@@ -115,7 +115,7 @@
             },
             spm: {
                 om: ["lup"],
-                tekst: "Kokosfedtet i glas 3 affarvede ingen dråber bromvand. Hvorfor?",
+                tekst: "Hvorfor affarvede kokosfedtet i glas 3 ingen dråber bromvand?",
                 svar: [
                     { t: "Fedtsyrerne er mættede", ok: true },
                     { t: "Kokosfedt er et fast fedtstof",
@@ -141,7 +141,7 @@
             },
             spm: {
                 om: ["lup"],
-                tekst: "Solsikkeolien i glas 4 affarvede flest dråber af de fire fedtstoffer. Hvorfor?",
+                tekst: "Hvorfor affarvede solsikkeolien i glas 4 flest dråber af de fire fedtstoffer?",
                 svar: [
                     { t: "Flest dobbeltbindinger", ok: true },
                     { t: "De længste fedtsyrer",
@@ -205,7 +205,7 @@
             },
             spm: {
                 om: ["tavle"],
-                tekst: "Hver fedtsyre i fedtstoffet fra olivenolie har én dobbeltbinding. Hvad kaldes sådan en fedtsyre?",
+                tekst: "Hver fedtsyre i olivenolie har én dobbeltbinding. Hvad kaldes en fedtsyre med én dobbeltbinding?",
                 svar: [
                     { t: "Mættet",
                       f: "En mættet fedtsyre har ingen dobbeltbindinger. Hver kæde i fedtstoffet fra olivenolie har én." },
@@ -287,7 +287,7 @@
             },
             spm: {
                 om: ["tavle"],
-                tekst: "Fedtstoffet fra tran adderede 6 dibrommolekyler, og fedtstoffet fra olivenolie adderede 3. Hvorfor?",
+                tekst: "Hvorfor adderede fedtstoffet fra tran flere dibrommolekyler end fedtstoffet fra olivenolie?",
                 svar: [
                     { t: "Tran har flere fedtsyrer",
                       f: "Alle fedtstoffer har tre fedtsyrer på glycerol. Tæl dobbeltbindingerne i hver kæde." },
@@ -341,7 +341,7 @@
             forsoeg: ukendtForsoeg(0),
             spm: {
                 om: [0],
-                tekst: "Fedtstoffet i flaske A affarvede " + D.draaberTekst(aff("smoer")) + ". Hvilket fedtstof er det?",
+                tekst: "Fedtstoffet i flaske A affarvede " + D.draaberTekst(aff("smoer")) + ". Hvilket fedtstof er der i flaske A?",
                 svar: [
                     { t: "Kokosfedt",
                       f: "Kokosfedt er 91 % mættet og affarver næsten intet. Fedtstoffet i flaske A affarvede lidt." },
@@ -358,7 +358,7 @@
             forsoeg: ukendtForsoeg(1),
             spm: {
                 om: [1],
-                tekst: "Fedtstoffet i flaske B affarvede " + D.draaberTekst(aff("tran")) + ". Hvilket fedtstof er det?",
+                tekst: "Fedtstoffet i flaske B affarvede " + D.draaberTekst(aff("tran")) + ". Hvilket fedtstof er der i flaske B?",
                 svar: [
                     { t: "Smør",
                       f: "Smør er mest mættet og affarver kun få dråber. Fedtstoffet i flaske B affarvede mange." },
@@ -375,7 +375,7 @@
             forsoeg: ukendtForsoeg(2),
             spm: {
                 om: [2],
-                tekst: "Fedtstoffet i flaske C affarvede ingen dråber. Hvilket fedtstof er det?",
+                tekst: "Fedtstoffet i flaske C affarvede ingen dråber. Hvilket fedtstof er der i flaske C?",
                 svar: [
                     { t: "Kokosfedt", ok: true },
                     { t: "Smør",
@@ -392,7 +392,7 @@
             forsoeg: ukendtForsoeg(3),
             spm: {
                 om: [3],
-                tekst: "Fedtstoffet i flaske D affarvede " + D.draaberTekst(aff("raps")) + ". Hvilket fedtstof er det?",
+                tekst: "Fedtstoffet i flaske D affarvede " + D.draaberTekst(aff("raps")) + ". Hvilket fedtstof er der i flaske D?",
                 svar: [
                     { t: "Rapsolie", ok: true },
                     { t: "Tran",

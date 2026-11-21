@@ -134,7 +134,7 @@
         {
             id: "x", slags: "x", navn: "Glucose eller ibuprofen", stof: "ibu",
             rystTekst: "Stof X er enten glucose eller ibuprofen. Se på de to strukturformler til højre, og klik på skilletragten for at ryste den.",
-            tekst: "Glucose har fem OH-grupper. Ibuprofen har en benzenring og to carbonkæder. Hvilket af de to stoffer er X?",
+            tekst: "Glucose har fem OH-grupper. Ibuprofen har en benzenring og to carbonkæder. Er stof X glucose eller ibuprofen?",
             svar: ["glucose", "ibuprofen"], rigtig: 1,
             hint: ["Se, i hvilket lag molekylerne af stof X er i luppen.",
                    "OH-grupper danner hydrogenbindinger til vand. Benzenringe og carbonkæder er upolære og går over i octan-1-ol."],
@@ -185,7 +185,7 @@
     D.LOGD = [
         {
             id: "form", slags: "spm", navn: "Den uladede form",
-            tekst: "Acetylsalicylsyre, HA, kan afgive en hydron og blive til ionen A⁻. Se på strukturformlerne under luppen. Hvilken form går over i octan-1-ol?",
+            tekst: "Acetylsalicylsyre, HA, kan afgive en hydron og blive til ionen A⁻. Hvilken form af acetylsalicylsyre går over i octan-1-ol?",
             svar: ["HA, den uladede syre", "A⁻, den negative ion", "begge former"], rigtig: 0,
             hint: ["Octan-1-ol er næsten upolært og ligner fedt. Lige opløser lige.",
                    "Ionen A⁻ er ladet. Ladede partikler bliver i det polære vand."],
@@ -217,7 +217,7 @@
         },
         {
             id: "genvej", slags: "spm", navn: "Kurven falder",
-            tekst: "Ved pH over pKₛ = 3,5 er kurven en ret linje. Hvor meget falder log D, når pH stiger med 1?",
+            tekst: "Over pKₛ = 3,5 er kurven for acetylsalicylsyre en ret linje. Hvor meget falder log D, når pH stiger med 1 på den rette del af kurven?",
             svar: ["0,1", "1", "3,5", "10"], rigtig: 1,
             hint: ["Stil skyderen på pH 6, og aflæs log D. Gør det samme ved pH 7.", "Ved pH 6 er log D ca. −1,3, og ved pH 7 er log D ca. −2,3."],
             fejl: ["Stil skyderen på pH 6 og pH 7, og aflæs log D begge steder.", null,

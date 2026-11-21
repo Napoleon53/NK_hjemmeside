@@ -318,6 +318,47 @@ function koerTest(W) {
     });
     samlet("kortet slutter over tavlen på alle tre faner i fire størrelser", daek);
     ramme.style.width = ""; ramme.style.height = "";
+
+    /* ================================================================= */
+    overskrift("7. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    function chips(id) { return [].slice.call(el(id).querySelectorAll(".opg-chip")); }
+    function laastChip(b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()); }
+    function trinLi(id) { return [].slice.call(el(id).querySelectorAll("li")); }
+    function laastLi(li) { return li.classList.contains("laast") && !!li.querySelector(".tr-streg") && /^\d+$/.test(li.textContent.trim()); }
+    NK.visFane("fane-h"); h2.tilpas();
+    h2.naaet = {}; h2.forfra();
+    var hc = chips("h-liste");
+    paastand("fane 2: ved start har kun opgave 1 sin titel; de fire andre er et nummer med en grå streg og kan ikke klikkes",
+        hc.length === 5 && /Nummerér ringen/.test(hc[0].textContent) && !hc[0].disabled && hc.slice(1).every(laastChip),
+        hc.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    hc[3].click();
+    paastand("fane 2: et klik på en låst opgave gør intet", h2.nr === 0);
+    h2.visSvar();
+    hc = chips("h-liste");
+    paastand("fane 2: Vis svaret tæller som løst: titlen på opgave 2 kommer frem, opgave 3 til 5 er stadig låst",
+        /β-glucose/.test(hc[1].textContent) && !hc[1].disabled && hc.slice(2).every(laastChip), hc.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    h2.status[3].loest = true; h2.visListe();
+    paastand("fane 2: en opgave, der er løst før (gemt i browseren), har sin titel", /β-mannose/.test(chips("h-liste")[3].textContent) && !chips("h-liste")[3].disabled);
+    h2.forfra();
+    NK.visFane("fane-r"); r1.tilpas();
+    r1.naaet = {}; r1.trinMaks = {}; r1.forfra();
+    var rc = chips("r-liste"), rt = trinLi("r-trin");
+    paastand("fane 1: ved start har kun Glucose og trin 1 en titel; Fructose og trin 2 og 3 er et nummer med en grå streg",
+        rc.length === 2 && /Glucose/.test(rc[0].textContent) && laastChip(rc[1]) &&
+        rt.length === 3 && /Find oxygenatomet/.test(rt[0].textContent) && rt.slice(1).every(laastLi), rt.map(function (li) { return li.textContent.trim(); }).join(" | "));
+    r1.visSvar(); r1.videreKlik();
+    rt = trinLi("r-trin");
+    paastand("fane 1: titlen på trin 2 kommer frem, når trin 1 er løst", r1.trinNr === 1 && !laastLi(rt[1]) && laastLi(rt[2]), rt.map(function (li) { return li.textContent.trim(); }).join(" | "));
+    r1.forfra();
+    NK.visFane("fane-l"); l3.tilpas();
+    l3.trinMaks = {}; l3.forfra();
+    var lt = trinLi("l-trin");
+    paastand("fane 3: ved start har kun trin 1 sin titel; de seks andre er et nummer med en grå streg",
+        lt.length === 7 && /Gæt/.test(lt[0].textContent) && lt.slice(1).every(laastLi), lt.map(function (li) { return li.textContent.trim(); }).join(" | "));
+    l3.valgt = 0; l3.indsendKlik();
+    lt = trinLi("l-trin");
+    paastand("fane 3: titlen på trin 2 kommer frem, når trin 1 er løst", /Opløs druesukkeret/.test(lt[1].textContent) && lt.slice(2).every(laastLi));
+    l3.forfra();
 }
 </script>
 </body>

@@ -104,7 +104,7 @@
         this.svar.ryd();
         NK.el("vand-saltkort").hidden = false;
         NK.saetTekst("vand-chip", "Opgaver");
-        NK.saetTekst("vand-opgavetekst", "Læg et salt i vandet med valgene i panelet. Når du er klar, får du en opgave ad gangen.");
+        NK.saetKorttekst("vand-opgavetekst", "Læg et salt i vandet med valgene i panelet. Når du er klar, får du en opgave ad gangen.");
         NK.el("vand-afslut").hidden = true;
         NK.saetHTML("vand-spm", "");
         this.besked("vand-besked", "");
@@ -186,14 +186,14 @@
         this.saetKnap("hint");
 
         if (type === "forudsig") {
-            NK.saetTekst("vand-opgavetekst", "Der hældes vand på saltet. Hvad kommer der ud i vandet?");
+            NK.saetKorttekst("vand-opgavetekst", "Der hældes vand på saltet i glasset. Hvilke ioner kommer ud i vandet, når " + salt.formel + " opløses?");
             NK.saetHTML("vand-spm", '<span class="lign-v">' + D.oploesVenstre(salt) + "  →</span>");
             NK.el("vand-valg").className = "valg sk-svar en-spalte";
             this.svar.vis(D.oploesValg(salt));
             this.niveau = this.niveauMaal = 0;
             this.lavKrystal("vent");
         } else {
-            NK.saetTekst("vand-opgavetekst", "Tæl ionerne i glasset. Hvilket salt er opløst?");
+            NK.saetKorttekst("vand-opgavetekst", "Tæl ionerne i glasset. Hvilket salt er opløst?");
             NK.saetHTML("vand-spm", "");
             NK.el("vand-valg").className = "valg sk-svar";
             this.svar.vis(D.saltValg(salt, this.k));
@@ -349,7 +349,8 @@
                  wy: vb - (vb - vt) * this.niveau, klar: this.l.b > 50 };
     };
 
-    NK.SimVand.prototype.kortZone = function () { return NK.kortZone("vand-skort", [226, 212]); };
+    /* 247/231 (før 226/212): spørgsmålet på egen linje, 21. nov. 2026 */
+    NK.SimVand.prototype.kortZone = function () { return NK.kortZone("vand-skort", [247, 231]); };
 
     NK.SimVand.prototype.radius = function (ion) {
         return NK.ionRadiusVand(ion.ion) * this.G.s;

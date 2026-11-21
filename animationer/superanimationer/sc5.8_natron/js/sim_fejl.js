@@ -71,7 +71,7 @@
 
     P.promptHTML = function () {
         var o = this.opg;
-        return '<p class="maal-tekst">' + this.papirTekst(NK.html(o.tekst) + " " + NK.html(D.FEJL_SPM)) + "</p>";
+        return '<p class="maal-tekst">' + this.papirTekst(NK.html(o.tekst) + " " + NK.html(o.spm)) + "</p>";
     };
 
     /* Svarene paa kortet vaelger kun; Indsend svar saetter de to forsoeg i

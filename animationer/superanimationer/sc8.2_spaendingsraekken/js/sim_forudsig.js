@@ -363,10 +363,10 @@
         var mig = this, fase = this.fase, m = this.par[0], i = this.par[1];
         if (!this.kort) return;
         var chip = this.nr < D.OPGAVER.length ? "Opgave " + (this.nr + 1) + " af " + D.OPGAVER.length : "Ekstra opgave";
-        var spm = D.FU_SPM;
-        if (fase === "produkt") spm = D.PRODUKT_SPM;
-        else if (fase === "koef" || (fase === "faerdig" && this.reag)) spm = D.KOEF_SPM;
-        var d = { kl: "spm", chip: chip, tekst: NK.html(D.opgaveTekst(m, i) + " " + spm) };
+        var tekst = D.FU_SPM(m, i);
+        if (fase === "produkt") tekst = D.PRODUKT_SPM(m, i);
+        else if (fase === "koef" || (fase === "faerdig" && this.reag)) tekst = D.opgaveTekst(m, i) + " " + D.KOEF_SPM;
+        var d = { kl: "spm", chip: chip, tekst: NK.html(tekst) };
         if (fase === "gaet" || fase === "koerer" || fase === "vurderet" || (fase === "faerdig" && !this.reag)) {
             /* Ja og nej: vaelger kun. Bagefter er svaret groent, et forkert gaet roedt. */
             var rigtigSvar = this.reag ? 0 : 1, vist = fase === "vurderet" || fase === "faerdig";

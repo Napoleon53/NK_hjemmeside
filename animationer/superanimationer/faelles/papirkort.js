@@ -4,7 +4,10 @@
    NK.Papir.tekst(html): spoergsmaalet (en saetning, der ender med ?)
    bliver halvfedt, resten af teksten staar i almindelig skrift i samme
    stoerrelse, saa indledningen ikke bliver sprunget over (brugerens valg
-   3. nov. 2026). Ord med bindestreg (propan-2-ol, OH-gruppen) deles ikke
+   3. nov. 2026). Staar der en indledning foer spoergsmaalet, staar
+   spoergsmaalet paa sin egen linje (.sk-linje), saa det kan laeses alene
+   og ikke begynder midt i en linje (brugeren 21. nov. 2026, som i sb2.6).
+   Det, der staar efter spoergsmaalet, begynder paa en ny linje. Ord med bindestreg (propan-2-ol, OH-gruppen) deles ikke
    over to linjer (det gaelder ogsaa forklaringen i bliv). Giv teksten,
    efter den er lavet til HTML med NK.html.
 
@@ -39,9 +42,19 @@
             if (slutterSaetning(s, i)) { dele.push(s.slice(start, i + 1)); start = i + 2; }
         }
         dele.push(s.slice(start));
-        return dele.map(function (d) {
-            d = samlOrd(d);
-            return /\?\s*$/.test(d) ? '<span class="sk-spm">' + d + "</span>" : d;
+        /* Spoergsmaal, der staar lige efter hinanden, samles i én halvfed del */
+        var grupper = [];
+        dele.forEach(function (d) {
+            var spm = /\?\s*$/.test(d), sidst = grupper[grupper.length - 1];
+            if (sidst && sidst.spm === spm) sidst.d.push(d);
+            else grupper.push({ spm: spm, d: [d] });
+        });
+        var foer = false;
+        return grupper.map(function (g) {
+            var d = samlOrd(g.d.join(" "));
+            var ud = g.spm ? '<span class="sk-spm' + (foer ? " sk-linje" : "") + '">' + d + "</span>" : d;
+            if (d.replace(/<[^>]*>/g, "").trim()) foer = true;
+            return ud;
         }).join(" ");
     }
 

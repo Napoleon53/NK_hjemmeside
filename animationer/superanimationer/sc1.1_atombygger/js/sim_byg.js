@@ -330,7 +330,7 @@
             var e = NK.klamp(g.z - q, 0, MAKS_E);
             return {
                 tekst: "Byg partiklen med " + NK.talform(g.z, "proton", "protoner") + ", " + NK.talform(i.a - g.z, "neutron", "neutroner")
-                    + " og " + NK.talform(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
+                    + " og " + NK.talform(e, "elektron", "elektroner") + ".",
                 p: g.z, n: i.a - g.z, e: e,
                 svar: "Partiklen er " + g.symbol + NK.ladningHaevet(g.z - e) + " med nukleontal " + i.a + ", altså "
                     + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")

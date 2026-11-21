@@ -55,10 +55,11 @@
     P.gem = function () { NK.gem(NOEGLE, { l: this.status.loest ? 1 : 0, s: this.status.stjerne ? 1 : 0 }); };
 
     P.visListe = function () {
-        var mig = this, html = "";
+        /* Et kommende trin er et nummer med en graa streg (21. nov. 2026) */
+        var mig = this, html = "", maks = F.trinNaaet(this, "forloeb", this.trinNr), hel = this.status.loest;
         this.trinListe.forEach(function (t, j) {
             var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen) || mig.faerdig ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + NK.html(t.navn) + "</span></li>";
+            html += F.trinLi(j, kl, "<span>" + NK.html(t.navn) + "</span>", hel || kl !== "" || j <= maks);
         });
         NK.saetHTML("d-trin", html);
         NK.saetTekst("d-maerke", this.status.stjerne ? "★ gennemført uden fejl" : (this.status.loest ? "✓ gennemført" : ""));

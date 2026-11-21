@@ -382,7 +382,7 @@
     T.tal = function (trin, raa, k, givet) {
         var l = T.laesTal(raa);
         if (l.tom) return { tom: true, besked: "Skriv tallet i feltet." };
-        if (l.formel) return { besked: "Skriv tallet her. Formlen står allerede over feltet." };
+        if (l.formel) return { besked: "Skriv tallet i feltet. Formlen står allerede på tavlen." };
         if (l.fejl || !isFinite(l.v)) return { besked: "Tallet kan ikke læses. Skriv det med komma, fx 24,0." };
         var a = l.v, f = trin.facit, x = trin.x, g;
 
@@ -415,7 +415,7 @@
                 if (naer(a, k.n / k.m)) return { besked: "Brøken er vendt om. Massen skal stå øverst." };
                 if (naer(a, k.m)) return { besked: "Det er massen. Del den med stofmængden." };
             }
-            return generelt(a, f) || { besked: "Det passer ikke. Sæt tallene ind i formlen over feltet." };
+            return generelt(a, f) || { besked: "Det passer ikke. Sæt tallene ind i formlen på tavlen." };
         }
         /* Idealgasligningen */
         if (naer(a, f) || naer(a, trin.raa)) return { ok: true };

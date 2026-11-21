@@ -304,7 +304,7 @@
             forsoeg++;
         } while ((!t || !t.s) && forsoeg < 50);
         return {
-            type: "tael", spm: "Hvilke cifre er betydende? Klik på dem.",
+            type: "tael", spm: "Hvilke cifre i tallet på tavlen er betydende?",
             vis: s, tal: t, facit: t.s.length, betydende: C.betydendeI(s)
         };
     }

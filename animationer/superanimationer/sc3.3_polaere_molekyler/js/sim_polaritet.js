@@ -50,7 +50,7 @@
             var el = mol.atomer[minus].el;
             return {
                 mol: mol.id,
-                tekst: "Klik på det atom i " + mol.formel + ", der bliver δ−.",
+                tekst: "Klik på et atom i molekylet i scenen. Hvilket atom i " + mol.formel + " bliver δ−?",
                 hint: "Det mest elektronegative atom trækker elektronerne i bindingen til sig. Find det i tabellen.",
                 svar: NK.formel(el) + " har den største elektronegativitet (" + NK.tal(D.GRUNDSTOFFER[el].en, 1) + ") og bliver δ−.",
                 start: function (s) { s.startOpgaveMol(mol.id, {}, { "pol-delta": false, "pol-traek": false, "pol-samlet": false }); },
@@ -73,7 +73,7 @@
             var orden = NK.bland([0, 1, 2, 3]);
             return {
                 mol: mol.id,
-                tekst: "Bindingerne i " + mol.formel + " er polære. Hvorfor er molekylet alligevel upolært?",
+                tekst: "Bindingerne i " + mol.formel + " er polære. Hvorfor er " + mol.formel + " upolært, selvom bindingerne er polære?",
                 valg: orden.map(function (i) { return svar[i]; }),
                 rigtig: orden.indexOf(0),
                 fejlValg: function () {

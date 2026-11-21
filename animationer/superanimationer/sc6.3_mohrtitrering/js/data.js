@@ -94,7 +94,7 @@
 
     D.SITUATIONER = [
         { id: "vand", spm: "forbrug", B: { vand: 60 }, titel: "Mere vand", aendring: "60 mL vand",
-          tekst: "Kolbe B får 60 mL demineraliseret vand i stedet for 20 mL. Hvordan bliver forbruget af sølv(I)nitrat i forhold til kolbe A?",
+          tekst: "Kolbe A får 20 mL demineraliseret vand som på fane 1. Hvordan bliver forbruget af sølv(I)nitrat i kolbe B med 60 mL vand i forhold til kolbe A med 20 mL?",
           valg: D.FORBRUG_VALG, rigtig: 1,
           forkert: [
               "Demineraliseret vand indeholder ikke chlorid, og Ag⁺ reagerer kun med Cl⁻.",
@@ -114,7 +114,7 @@
           hint: "Hvordan er stofmængden af chlorid i 0,50 g havvand i forhold til 1,00 g?",
           efter: "Mindre, det halve. Den halve masse havvand indeholder den halve stofmængde chlorid." },
         { id: "halvProcent", spm: "procent", samme: true, B: { m: 0.50 }, titel: "Mindre havvand", aendring: "0,50 g havvand",
-          tekst: "Masseprocenten for kolbe B beregnes med m(prøve) = 0,50 g. Hvordan bliver den i forhold til kolbe A?",
+          tekst: "Kolbe B har 0,50 g havvand, og der regnes med m(prøve) = 0,50 g. Hvordan bliver masseprocenten for kolbe B med 0,50 g havvand i forhold til kolbe A med 1,00 g?",
           valg: ["Større", "Den samme", "Mindre"], rigtig: 1,
           forkert: [
               "m(NaCl) er halveret, og m(prøve) er også halveret. Brøken er uændret.",
@@ -124,7 +124,7 @@
           hint: "m% = m(NaCl) / m(prøve) · 100 %. Hvad sker der med tælleren, og hvad sker der med nævneren?",
           efter: "Den samme. Den halve masse NaCl divideres med den halve prøvemasse. En mindre prøve er ikke en fejlkilde." },
         { id: "staerk", spm: "forbrug", B: { c: 0.100 }, titel: "Stærkere sølv(I)nitrat", aendring: "0,100 M sølv(I)nitrat",
-          tekst: "Buretten ved kolbe B indeholder 0,100 M sølv(I)nitrat i stedet for 0,050 M. Hvordan bliver forbruget i forhold til kolbe A?",
+          tekst: "Buretten ved kolbe B indeholder 0,100 M sølv(I)nitrat i stedet for 0,050 M. Hvordan bliver forbruget af 0,100 M sølv(I)nitrat i forhold til 0,050 M?",
           valg: D.FORBRUG_VALG, rigtig: 2,
           forkert: [
               "Koncentrationen er fordoblet, så det halve rumfang indeholder den samme stofmængde Ag⁺.",
@@ -134,7 +134,7 @@
           hint: "n = c · V. Hvilket rumfang giver den samme stofmængde Ag⁺, når c er fordoblet?",
           efter: "Mindre, det halve. Med den dobbelte koncentration giver det halve rumfang den samme stofmængde Ag⁺. Beregnes der med 0,100 M, bliver masseprocenten den samme." },
         { id: "postevand", spm: "procent", B: { post: true }, titel: "Postevand", aendring: "postevand",
-          tekst: "Kolbe B får 20 mL postevand i stedet for demineraliseret vand. Postevand indeholder lidt chlorid. Hvordan bliver masseprocenten?",
+          tekst: "Postevand indeholder lidt chlorid. Hvordan bliver masseprocenten, når kolbe B får postevand i stedet for demineraliseret vand?",
           valg: D.PROCENT_VALG, rigtig: 0,
           forkert: [
               "",
@@ -144,7 +144,7 @@
           hint: "Hvordan bliver forbruget, når kolben indeholder mere chlorid? Og hvilken masse divideres der med?",
           efter: "For høj. Chloridet fra postevandet tæller med i forbruget, men der divideres kun med havvandets masse." },
         { id: "spild", spm: "procent", B: { spild: 0.15 }, titel: "Spildt havvand", aendring: "havvand spildt",
-          tekst: "Noget af havvandet til kolbe B bliver spildt efter vejningen. Hvordan bliver masseprocenten?",
+          tekst: "Havvandet til kolbe B blev vejet, før noget af det blev spildt. Hvordan bliver masseprocenten, når noget af havvandet til kolbe B spildes efter vejningen?",
           valg: D.PROCENT_VALG, rigtig: 2,
           forkert: [
               "Det spildte havvand kommer ikke i kolben, så der er mindre chlorid at titrere.",

@@ -136,3 +136,7 @@ er lidt tættere, når kortet bliver på spørgsmålet, så det kan være i
 begge faner og tjekker, at et klik på et gæt kun vælger, at Indsend svar låser
 det, at kortet bliver på spørgsmålet, at det holder sig i `kortZone()` fra
 1100 × 620, og at forfra-knapperne ikke står, hvor knappen videre stod.
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenGaet` og `aabenOpgave` i `js/sim_gaet.js` og `js/sim_tael.js`; Start forfra låser dem igen).

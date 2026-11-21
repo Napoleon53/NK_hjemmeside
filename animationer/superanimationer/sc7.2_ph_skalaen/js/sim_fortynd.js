@@ -122,7 +122,8 @@
     };
 
     /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
-    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 152, 158); };
+    /* 178 (foer 158): spoergsmaalet paa egen linje, 21. nov. 2026 */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 152, 178); };
 
     P.tilpas = function () {
         if (this.L.tilpas() || !this.lay) this.layout();

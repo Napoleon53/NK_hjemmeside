@@ -1,0 +1,664 @@
+[
+  {
+    "mappe": "sc5.3_et_mol",
+    "titel": "Hvor meget er et mol?",
+    "sprog": [
+      {
+        "fane": "1 Gæt et mol",
+        "opgave": "Gæt 1 Papirstakken",
+        "fil": "js/data.js",
+        "linje": 117,
+        "nu_alm": "Ét ark A4-papir er 0,1 mm tykt. Vi stabler 1 mol papirark.",
+        "nu_fed": "Hvor høj bliver stakken?",
+        "nu_svar": ["Op til loftet", "Ud til Månen", "Ud til Solen", "Langt ud i Mælkevejen"],
+        "problem": "Det halvfede siger ikke, hvilken stak eller hvor mange ark. 1 mol står kun i den almindelige skrift.",
+        "nyt_alm": "Ét ark A4-papir er 0,1 mm tykt.",
+        "nyt_fed": "Hvor høj bliver en stak af 1 mol papirark?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Gæt et mol",
+        "opgave": "Gæt 2 Vingummibamserne",
+        "fil": "js/data.js",
+        "linje": 132,
+        "nu_alm": "En vingummibamse fylder ca. 2 cm³. Vi samler 1 mol vingummibamser.",
+        "nu_fed": "Hvor meget slik bliver det?",
+        "nu_svar": ["En fyldt slikbutik", "Esrum Sø fuld af slik", "Alle verdenshave", "Hele Jorden"],
+        "problem": "\"det\" peger tilbage. Det halvfede nævner hverken 1 mol eller vingummibamserne.",
+        "nyt_alm": "En vingummibamse fylder ca. 2 cm³.",
+        "nyt_fed": "Hvor meget slik er 1 mol vingummibamser?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Gæt et mol",
+        "opgave": "Gæt 4 Sandet",
+        "fil": "js/data.js",
+        "linje": 162,
+        "nu_alm": "Et sandkorn fylder ca. 0,1 mm³. Vi samler 1 mol sandkorn.",
+        "nu_fed": "Hvor meget sand bliver det?",
+        "nu_svar": ["En sandkasse", "Danmark dækket 1 km højt", "Alle verdenshave", "Hele Jorden"],
+        "problem": "\"det\" peger tilbage. 1 mol sandkorn står kun i den almindelige skrift.",
+        "nyt_alm": "Et sandkorn fylder ca. 0,1 mm³.",
+        "nyt_fed": "Hvor meget sand er 1 mol sandkorn?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Gæt et mol",
+        "opgave": "Gæt 5 Vanddråberne",
+        "fil": "js/data.js",
+        "linje": 177,
+        "nu_alm": "En dråbe vand fylder 0,05 mL. Vi samler 1 mol vanddråber.",
+        "nu_fed": "Hvor meget vand bliver det?",
+        "nu_svar": ["Østersøen", "Middelhavet 8 gange", "Alle verdenshave", "Alle verdenshave 100 gange"],
+        "problem": "\"det\" peger tilbage. 1 mol vanddråber står kun i den almindelige skrift.",
+        "nyt_alm": "En dråbe vand fylder 0,05 mL.",
+        "nyt_fed": "Hvor meget vand er 1 mol vanddråber?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Gæt et mol",
+        "opgave": "Gæt 8 Muldvarpene",
+        "fil": "js/data.js",
+        "linje": 222,
+        "nu_alm": "På engelsk hedder både mol og muldvarp mole. En muldvarp fylder 0,1 L. Vi samler 1 mol muldvarpe i én stor klump.",
+        "nu_fed": "Hvor stor bliver klumpen?",
+        "nu_svar": ["Et svømmebassin", "Esrum Sø", "Større end Månen", "Større end Jorden"],
+        "problem": "\"klumpen\" peger tilbage. Det halvfede siger ikke, at det er 1 mol muldvarpe.",
+        "nyt_alm": "På engelsk hedder både mol og muldvarp mole. En muldvarp fylder 0,1 L.",
+        "nyt_fed": "Hvor stor bliver en klump af 1 mol muldvarpe?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Tæl i mol",
+        "opgave": "Opgave 6 Mol mennesker",
+        "fil": "js/data.js",
+        "linje": 312,
+        "nu_alm": "Der er ca. 8 · 10⁹ mennesker på Jorden.",
+        "nu_fed": "Hvor mange mol mennesker er det?",
+        "nu_svar": ["1 mol", "8 · 10⁹ mol", "1 · 10⁻¹⁴ mol", "5 · 10³³ mol"],
+        "problem": "\"det\" peger tilbage. Tallet 8 · 10⁹, som skal regnes med, står kun i den almindelige skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvor mange mol er de ca. 8 · 10⁹ mennesker på Jorden?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Gæt et mol",
+        "billede": "skud/b/sc5.3_et_mol__0.png",
+        "dom": "fint",
+        "fremme": "Introkort med Start, en æggebakke (1 dusin = 12 stk.) og en sæk (1 mol = 6,02 · 10²³ stk.)",
+        "bruges": "Det hele. Introen sammenligner dusin og mol.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt. To ting og én knap.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Tæl i mol",
+        "billede": "skud/b/sc5.3_et_mol__1.png",
+        "dom": "fint",
+        "fremme": "Kort med fire svar, tre æggebakker. Panelet har formlen n = antal / 6,02 · 10²³.",
+        "bruges": "Æggebakkerne. Formlen i panelet bruges først fra opgave 3.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt. Opgave 1 handler kun om de tre bakker.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fem af de otte gæt har samme mønster: 'Vi samler 1 mol X. Hvor meget ... bliver det?'. Hvis 1 mol X flyttes ind i spørgsmålet, kan det halvfede stå alene. Spørgsmålene holder sig under 105 tegn."
+  },
+  {
+    "mappe": "sc5.4_stofmaengdeberegning",
+    "titel": "Stofmængdeberegning",
+    "sprog": [
+      {
+        "fane": "2 Vægten",
+        "opgave": "Opgave 1 Find stofmængden (og opgave 2 Stofmængden af kridt, linje 151)",
+        "fil": "js/data.js",
+        "linje": 148,
+        "nu_alm": "Du har afvejet 116,88 g natriumchlorid (køkkensalt).",
+        "nu_fed": "Hvor mange mol er det?",
+        "nu_svar": [],
+        "problem": "\"det\" peger tilbage. Massen og stoffet står kun i den almindelige skrift. Opgave 2 ('En elev har afvejet 25,00 g calciumcarbonat (kridt). Hvor mange mol er det?') har samme problem. Skabelon: alm 'Du har afvejet {kendt} på vægten.', fed 'Hvor mange mol er {m} g {navn}?'.",
+        "nyt_alm": "Du har afvejet køkkensalt på vægten.",
+        "nyt_fed": "Hvor mange mol er 116,88 g natriumchlorid?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Vægten",
+        "opgave": "Opgave 3 Find massen (og opgave 4 Massen af kobber(II)sulfat, linje 157)",
+        "fil": "js/data.js",
+        "linje": 154,
+        "nu_alm": "Til et forsøg skal du bruge 0,250 mol natron.",
+        "nu_fed": "Hvor mange gram skal du afveje?",
+        "nu_svar": [],
+        "problem": "Det halvfede siger ikke, af hvilket stof eller hvor mange mol. Opgave 4 ('Du skal bruge 0,0500 mol kobber(II)sulfat. Hvor mange gram skal du afveje?') har samme problem.",
+        "nyt_alm": "Til et forsøg skal du afveje natron.",
+        "nyt_fed": "Hvor mange gram er 0,250 mol natron?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Vægten",
+        "opgave": "Opgave 5 Find molarmassen",
+        "fil": "js/data.js",
+        "linje": 160,
+        "nu_alm": "En krukke har mistet sin etiket. 14,91 g af pulveret er 0,200 mol. Find molarmassen.",
+        "nu_fed": "",
+        "nu_svar": [],
+        "problem": "Der er intet spørgsmål, så intet står med fed. Opgaven er gemt i en ordre til sidst.",
+        "nyt_alm": "En krukke har mistet sin etiket.",
+        "nyt_fed": "Hvad er molarmassen af pulveret, når 14,91 g er 0,200 mol?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Vægten",
+        "opgave": "Opgave 6 Mesteren",
+        "fil": "js/data.js",
+        "linje": 163,
+        "nu_alm": "Du har 29,22 g natriumchlorid.",
+        "nu_fed": "Hvor mange gram glukose er den samme stofmængde?",
+        "nu_svar": [],
+        "problem": "\"den samme stofmængde\" peger tilbage. Det halvfede siger ikke, hvad glukosen skal sammenlignes med.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvor mange gram glukose har samme stofmængde som 29,22 g natriumchlorid?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Hurtigrunden",
+        "opgave": "Regnespørgsmålet, hvor M skal findes",
+        "fil": "js/sim_hurtig.js",
+        "linje": 52,
+        "nu_alm": "m = 20 g og n = 0,5 mol.",
+        "nu_fed": "M = ?",
+        "nu_svar": ["40 g/mol", "0,025 g/mol", "10 g/mol", "40 mol/g"],
+        "problem": "Efter 'mol.' kommer et stort M, så kortet deler sætningen, og kun 'M = ?' bliver fed. Når n eller m skal findes, er hele sætningen fed, fordi der står lille n eller m.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvad er M, når m = 20 g og n = 0,5 mol?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Formlen",
+        "billede": "skud/b/sc5.4_stofmaengdeberegning__0.png",
+        "dom": "fint",
+        "fremme": "Kort, brøken n = □/□ med blege bogstaver, skema med navn og enhed for n, m og M, tre brikker i bunden",
+        "bruges": "Brøken og brikkerne. Skemaet er udfyldt og bruges først aktivt i opgave 2 og 3, men det støtter.",
+        "forslag": [],
+        "andet": "Kortets anden linje ('Træk n, m og M fra bunden op på de blege bogstaver, og tryk på Indsend svar.') gentager næsten første linje. Den ene kan gå.",
+        "gevinst": "Allerede trinvis. Opgave 1 viser hvor brikkerne skal hen.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Vægten",
+        "billede": "skud/b/sc5.4_stofmaengdeberegning__1.png",
+        "dom": "fint",
+        "fremme": "Kort med trinlinje, tavle med opgavens tal og n(NaCl) = ?, krukke med M, vægt med 116,88 g, stiplet sæk ? mol. Panelet har trinene Formlen, Tallene ind og Resultatet og et felt.",
+        "bruges": "Det hele. Trinene i panelet stilladserer allerede.",
+        "forslag": [],
+        "andet": "Det halvfede spørgsmål ('Hvor mange mol er det?') spørger efter slutresultatet, men trin 1 beder om formlen. Se sprogfundene.",
+        "gevinst": "Allerede trinvis med tre trin.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Hurtigrunden",
+        "billede": "skud/b/sc5.4_stofmaengdeberegning__2.png",
+        "dom": "fint",
+        "fremme": "Introkort med Start runden og en tavle med samme tekst",
+        "bruges": "Kun Start-knappen",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 1 har kun instruktioner (Byg formlen ...) og ingen spørgsmål, så intet står med fed. Det passer til en byggeopgave. Hurtigrundens introtekst står både på kortet og på tavlen."
+  },
+  {
+    "mappe": "sc5.5_aekvivalente_maengder",
+    "titel": "Ækvivalente mængder",
+    "sprog": [
+      {
+        "fane": "1 Pølsevognen",
+        "opgave": "Ordre 3 (6 hotdogs) og ordre 8 (4 dobbeltburgere, linje 191)",
+        "fil": "js/data.js",
+        "linje": 178,
+        "nu_alm": "Bord 3 vil have 6 hotdogs.",
+        "nu_fed": "Hvor meget skal du bruge af hver?",
+        "nu_svar": [],
+        "problem": "Det halvfede siger ikke 'af hver ingrediens', og 6 hotdogs står kun i den almindelige skrift. Ordre 8 ('Bord 8 vil have 4 dobbeltburgere. Hvor meget skal du bruge af hver?') bør blive til 'Hvor mange boller, bøffer og skiver ost skal du bruge til 4 dobbeltburgere?'.",
+        "nyt_alm": "Bord 3 vil have 6 hotdogs.",
+        "nyt_fed": "Hvor mange pølser, brød og agurkeskiver skal du bruge til 6 hotdogs?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Pølsevognen",
+        "opgave": "Ordre 4 (10 af hver)",
+        "fil": "js/data.js",
+        "linje": 181,
+        "nu_alm": "Der ligger 10 af hver ingrediens. Det, der slipper op først, er den begrænsende ingrediens. Det, der bliver tilbage, er i overskud.",
+        "nu_fed": "",
+        "nu_svar": ["Pølser", "Brød", "Agurkeskiver"],
+        "problem": "Der er intet spørgsmål på kortet, men tre svarknapper. Det, der spørges om, står kun i den lille linje ('Vælg den ingrediens, der slipper op først ...').",
+        "nyt_alm": "Det, der slipper op først, er den begrænsende ingrediens.",
+        "nyt_fed": "Hvad slipper op først, når du laver hotdogs af 10 pølser, 10 brød og 10 agurkeskiver?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Pølsevognen",
+        "opgave": "Ordre 5 (8 pølser, 10 brød, 12 agurkeskiver), samme i ordre 6, 9 og 10 (linje 185, 194, 196)",
+        "fil": "js/data.js",
+        "linje": 183,
+        "nu_alm": "Der ligger 8 pølser, 10 brød og 12 agurkeskiver.",
+        "nu_fed": "Hvor mange hotdogs kan du lave?",
+        "nu_svar": ["Pølser", "Brød", "Agurkeskiver"],
+        "problem": "Svarknapperne er ingredienser, men det halvfede spørger om et antal hotdogs. I første trin skal eleven vælge, hvad der slipper op først, og det står kun i den lille linje. Kortet bør skifte spørgsmål med trinnet (js/sim_hotdog.js, visKort): først det nye, så 'Hvor mange hotdogs kan du lave af 8 pølser, 10 brød og 12 agurkeskiver?'.",
+        "nyt_alm": "Det, der slipper op først, er den begrænsende ingrediens.",
+        "nyt_fed": "Hvad slipper op først, når du laver hotdogs af 8 pølser, 10 brød og 12 agurkeskiver?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Pølsevognen",
+        "billede": "skud/b/sc5.5_aekvivalente_maengder__0.png",
+        "dom": "fint",
+        "fremme": "Kort, opskriftskilt, bon, gryde, brødkurv, agurkeglas, skærebræt, tallerken, klokke. Panelet viser På brættet med tre tal.",
+        "bruges": "Næsten det hele i ordre 1: opskriften, beholderne, brættet og klokken. Tallerkenen bruges, når retterne samles.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "En kendt hverdagsscene, hvor alle ting bruges med det samme. Pilen viser, hvad der skal trækkes.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Molekylerne",
+        "billede": "skud/b/sc5.5_aekvivalente_maengder__1.png",
+        "dom": "fint",
+        "fremme": "Kort, reaktionsskema med kuglemodeller, plakat (1 figur = 1 molekyle), to kasser, kammer med Start. Panelet har en tabel med før og efter.",
+        "bruges": "Det hele.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Overskueligt. Pilen viser vejen fra kassen til kammeret.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Tavlen",
+        "billede": "skud/b/sc5.5_aekvivalente_maengder__2.png",
+        "dom": "fint",
+        "fremme": "Kort, skemaet 2 H₂ + O₂ ⟶ 2 H₂O, stiplede blokke og felter under formlerne",
+        "bruges": "Det hele.",
+        "forslag": [],
+        "andet": "Bjælken 'Start præsentation / Nej tak' dækker feltet med den kendte stofmængde under O₂ fra start.",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Fane 2 og 3 har kun instruktioner ('Lav 2 vandmolekyler ...', 'Find de andre stofmængder ...') og ingen spørgsmål. Det passer til opgaverne. Ordre 7 ('... Bord 7 vil have 2 dobbeltburgere.') siger ikke, hvad eleven skal gøre. Den lille linje siger det."
+  },
+  {
+    "mappe": "sc5.6_maengdeberegning",
+    "titel": "Mængdeberegning",
+    "sprog": [
+      {
+        "fane": "1 Vejen",
+        "opgave": "Opgave 1 Jern og svovl (samme mønster i opgave 2-4, linje 169-173)",
+        "fil": "js/data.js",
+        "linje": 167,
+        "nu_alm": "Givet: 55,85 g Fe. Jern varmes med rigeligt svovl.",
+        "nu_fed": "Hvor meget jernsulfid dannes der?",
+        "nu_svar": [],
+        "problem": "Massen af jern står kun i indledningen, og 'Hvor meget' siger ikke gram. 'Givet: 55,85 g Fe' er også fed (b-mærke i js/sim_vej.js linje 53), så kortet har to fede steder. Kortteksten kan bygges som 'Hvor mange gram {søgt} dannes der af {m} g {kendt}?'.",
+        "nyt_alm": "Jern varmes med rigeligt svovl.",
+        "nyt_fed": "Hvor mange gram jernsulfid dannes der af 55,85 g jern?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Skemaet",
+        "opgave": "Opgave 1 Kul brænder",
+        "fil": "js/data.js",
+        "linje": 185,
+        "nu_alm": "Givet: 36,03 g C. Kul brænder i rigeligt dioxygen. [efter spørgsmålet:] Du skal ikke regne på O₂.",
+        "nu_fed": "Hvor meget CO₂ dannes der?",
+        "nu_svar": [],
+        "problem": "Massen af C står kun i indledningen, og der kommer en instruktion efter spørgsmålet.",
+        "nyt_alm": "Kul brænder i rigeligt dioxygen. Du skal ikke regne på O₂.",
+        "nyt_fed": "Hvor mange gram CO₂ dannes der af 36,03 g C?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Skemaet",
+        "opgave": "Opgave 5 Fotosyntese",
+        "fil": "js/data.js",
+        "linje": 199,
+        "nu_alm": "Givet: 90,09 g C₆H₁₂O₆. En plante danner glucose. [efter spørgsmålet:] Afstem skemaet først.",
+        "nu_fed": "Hvor meget CO₂ skal den optage?",
+        "nu_svar": [],
+        "problem": "\"den\" peger tilbage på planten. Massen af glucose står kun i indledningen, og der kommer en instruktion efter spørgsmålet.",
+        "nyt_alm": "En plante danner glucose. Afstem skemaet først.",
+        "nyt_fed": "Hvor mange gram CO₂ skal planten optage for at danne 90,09 g glucose?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "3 Begrænsende mængde",
+        "opgave": "Opgave 1 Jern og svovl (samme mønster i opgave 2-6, linje 214-222)",
+        "fil": "js/data.js",
+        "linje": 212,
+        "nu_alm": "Givet: 167,55 g Fe og 64,12 g S. Jern og svovl varmes sammen.",
+        "nu_fed": "Hvor meget jernsulfid dannes der?",
+        "nu_svar": [],
+        "problem": "Masserne står kun i indledningen. Når eleven skal vælge den begrænsende, kommer et andet fedt spørgsmål på kortet ('Hvilket stof slipper op først?', js/sim_begr.js linje 131), så der står to spørgsmål med fed på én gang. Det første bør stå i almindelig skrift imens.",
+        "nyt_alm": "Jern og svovl varmes sammen.",
+        "nyt_fed": "Hvor mange gram jernsulfid dannes der af 167,55 g Fe og 64,12 g S?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Vejen",
+        "billede": "skud/b/sc5.6_maengdeberegning__0.png",
+        "dom": "lidt meget",
+        "fremme": "Kort med trinlinje, tavle med skema (m, M, n under Fe, S og FeS), to krukker med M, to vægte, pilen Fe ⟶ FeS",
+        "bruges": "Det hele bruges til sidst. Felterne låses op ét ad gangen, men det halvfede spørgsmål spørger efter slutresultatet. Trin 1 ('Skriv stofmængden af Fe') står kun i den lille linje.",
+        "forslag": [
+          { "alm": "Vægten viser massen af jern. Molarmassen står på krukken.", "fed": "Hvor mange mol er 55,85 g jern?", "svar": ["1,000 mol", "55,85 mol", "3119 mol"], "derefter": "n(Fe) står i skemaet, og pilen over mod FeS tegnes" },
+          { "alm": "Skemaet er Fe + S ⟶ FeS. Der står 1 foran både Fe og FeS.", "fed": "Hvor mange mol FeS dannes der af 1,000 mol Fe?", "svar": ["1,000 mol", "2,000 mol", "55,85 mol"], "derefter": "n(FeS) står i skemaet" },
+          { "alm": "Molarmassen af FeS er 87,91 g/mol.", "fed": "Hvor mange gram er 1,000 mol FeS?", "svar": ["87,91 g", "55,85 g", "1,000 g"], "derefter": "Vægten til højre viser 87,91 g FeS, og hele vejen gram, mol, mol, gram står i skemaet" }
+        ],
+        "andet": "Felterne i skemaet kan blive. Eleven skriver svaret dér. Det eneste nye er, at det halvfede spørgsmål følger det felt, der er åbent. Vægten og krukken til højre kan være en stiplet ramme ('det, der dannes'), til trin 3.",
+        "gevinst": "Den svage elev ved hele tiden, hvilket tal der skal i feltet nu, i stedet for at gætte slutmassen i mol-feltet.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Skemaet",
+        "billede": "skud/b/sc5.6_maengdeberegning__1.png",
+        "dom": "fint",
+        "fremme": "Kort med trinlinje og en tavle med skemaet (m, M, n under C, O₂ og CO₂)",
+        "bruges": "Det hele. Felterne låses op ét ad gangen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt. Kun skemaet.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Begrænsende mængde",
+        "billede": "skud/b/sc5.6_maengdeberegning__2.png",
+        "dom": "fint",
+        "fremme": "Kort med trinlinje, tavle med skemaet for Fe, S og FeS, mærkater med masserne og en pil",
+        "bruges": "Det hele.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Roligt.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Alle tre faner skriver 'Givet: <b>…</b>.' foran opgaven, så kortet får to fede steder og et kolon. Flyttes masserne ind i spørgsmålet, kan 'Givet:' gå. Fane 2's opgave 2-4 har kun instruktioner ('Afstem skemaet, og find massen af NH₃.'). Det er fint."
+  },
+  {
+    "mappe": "sc5.7_idealgasligningen",
+    "titel": "Idealgasligningen",
+    "sprog": [
+      {
+        "fane": "1 Stemplet",
+        "opgave": "Opgave 2 Et lod på",
+        "fil": "js/data.js",
+        "linje": 67,
+        "nu_alm": "Du lægger et lod på stemplet. Trykket udefra stiger fra 1,013 bar til 2,013 bar, næsten det dobbelte.",
+        "nu_fed": "Hvad sker der med volumenet?",
+        "nu_svar": ["Det bliver næsten halvt så stort", "Det bliver næsten dobbelt så stort", "Det falder, men kun lidt", "Det er det samme"],
+        "problem": "Det halvfede nævner ikke, at trykket fordobles. Det står kun i indledningen.",
+        "nyt_alm": "Du lægger et lod på stemplet. Trykket udefra stiger fra 1,013 bar til 2,013 bar.",
+        "nyt_fed": "Hvad sker der med volumenet, når trykket udefra bliver næsten dobbelt så stort?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Stemplet",
+        "opgave": "Opgave 3 Dobbelt så meget gas",
+        "fil": "js/data.js",
+        "linje": 82,
+        "nu_alm": "Du fordobler stofmængden fra 0,50 mol til 1,00 mol. Temperaturen og trykket er de samme.",
+        "nu_fed": "Hvad sker der med volumenet?",
+        "nu_svar": ["Det bliver dobbelt så stort", "Det bliver halvt så stort", "Det er det samme"],
+        "problem": "Det halvfede er ordret det samme som i opgave 2. Ændringen (dobbelt stofmængde) står kun i indledningen.",
+        "nyt_alm": "Du lukker gas ind, fra 0,50 mol til 1,00 mol. Temperaturen og trykket er de samme.",
+        "nyt_fed": "Hvad sker der med volumenet, når stofmængden af gassen bliver dobbelt så stor?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Stemplet",
+        "opgave": "Opgave 4 Låst stempel",
+        "fil": "js/data.js",
+        "linje": 96,
+        "nu_alm": "Stemplet er låst, så volumenet ikke kan ændre sig.",
+        "nu_fed": "Hvad sker der med trykket, når gassen bliver varmere?",
+        "nu_svar": ["Trykket stiger", "Trykket falder", "Trykket er det samme"],
+        "problem": "Svaret afhænger af, at stemplet er låst (med frit stempel er trykket det samme), men det står kun i indledningen.",
+        "nyt_alm": "Stemplet er låst, så volumenet ikke kan ændre sig.",
+        "nyt_fed": "Hvad sker der med trykket i den låste cylinder, når gassen bliver varmere?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "1 Stemplet",
+        "opgave": "Opgave 6 Gas ud",
+        "fil": "js/data.js",
+        "linje": 126,
+        "nu_alm": "Stemplet er låst. Du lukker 0,25 mol gas ud.",
+        "nu_fed": "Hvad sker der med trykket?",
+        "nu_svar": ["Trykket falder", "Trykket stiger", "Trykket er det samme"],
+        "problem": "Både ændringen (gas ud) og betingelsen (låst stempel) står kun i indledningen.",
+        "nyt_alm": "Stemplet er låst.",
+        "nyt_fed": "Hvad sker der med trykket i den låste cylinder, når du lukker 0,25 mol gas ud?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Let 1 Gas i et stempel",
+        "fil": "js/data.js",
+        "linje": 178,
+        "nu_alm": "Gas i et stempel. Der er 1,50 mol gas i en cylinder med et stempel ved 293 K og 1,013 bar.",
+        "nu_fed": "Hvor stort er volumenet?",
+        "nu_svar": [],
+        "problem": "Det halvfede siger ikke, hvilken gas eller hvilke tal. Det er den første regneopgave på fanen.",
+        "nyt_alm": "Gassen er i en cylinder med et stempel.",
+        "nyt_fed": "Hvor stort er volumenet af 1,50 mol gas ved 293 K og 1,013 bar?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Middel 2 Stofmængden (samme i Let 4, linje 193: 'Hvad er temperaturen i kelvin?')",
+        "fil": "js/data.js",
+        "linje": 205,
+        "nu_alm": "En gas fylder 65,8 L ved 20 °C og 1,013 bar.",
+        "nu_fed": "Hvor mange mol gas er det?",
+        "nu_svar": [],
+        "problem": "\"det\" peger tilbage. Middel 1 viser, at alt kan stå i spørgsmålet ('Hvor meget fylder 2,00 mol vanddamp ved 100 °C og 1,013 bar?').",
+        "nyt_alm": "",
+        "nyt_fed": "Hvor mange mol gas fylder 65,8 L ved 20 °C og 1,013 bar?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Svær 1 Ammoniak (samme i Svær 2 og 4, linje 227 og 238)",
+        "fil": "js/data.js",
+        "linje": 222,
+        "nu_alm": "[efter spørgsmålet:] M(NH₃) = 17,03 g/mol.",
+        "nu_fed": "Hvor stort et volumen fylder 10,0 g ammoniak, NH₃, ved 135 °C og 0,550 bar?",
+        "nu_svar": [],
+        "problem": "Molarmassen kommer efter spørgsmålet, og ', NH₃,' er skudt ind midt i det. Svær 2 og 4 har det samme mønster med M efter spørgsmålet.",
+        "nyt_alm": "Gassen er ammoniak, NH₃. M(NH₃) = 17,03 g/mol.",
+        "nyt_fed": "Hvor stort er volumenet af 10,0 g NH₃ ved 135 °C og 0,550 bar?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Stemplet",
+        "billede": "skud/b/sc5.7_idealgasligningen__0.png",
+        "dom": "for meget",
+        "fremme": "Graf (tryk og volumen med kurve), manometer, cylinder med molekyler og V-mærke, lodhylde med tre lodder, gasflaske med hane, varmeplade med − og +. Panelet har skyderen Temperatur, Lodder − +, Gas − + og Frit/Låst.",
+        "bruges": "Første mål (varmere gas) bruger kun cylinderen med stemplet og V-mærket og varmen (varmeplade eller skyder). Grafen og lodderne hører til mål 2, gasflasken til mål 3 og 6, manometeret og Låst til mål 4.",
+        "forslag": [
+          { "alm": "Cylinderen er fyldt med gas. Stemplet kan glide frit op og ned.", "fed": "Hvad holder stemplet i cylinderen oppe?", "svar": ["Gasmolekylernes stød mod stemplet", "Luften over stemplet", "Stemplet svæver af sig selv"], "derefter": "Manometeret med p = 1,013 bar og 'udefra 1,013 bar' i panelet kommer frem" },
+          { "alm": "Varmepladen under cylinderen kan gøre gassen varmere.", "fed": "Hvad sker der med molekylernes fart, når gassen bliver varmere?", "svar": ["Farten bliver større", "Farten bliver mindre", "Farten er den samme"], "derefter": "Varmepladen med − og + og skyderen Temperatur i panelet kommer frem" },
+          { "alm": "Stemplet glider frit.", "fed": "Hvad sker der med volumenet, når gassen under det frie stempel bliver varmere?", "svar": ["Volumenet bliver større", "Volumenet bliver mindre", "Volumenet er det samme"], "derefter": "Prøv det. Eleven skruer op for varmen, og V-mærket og skalaen viser, at volumenet stiger" }
+        ],
+        "andet": "Skjul grafen og lodhylden til mål 2 (Et lod på), gasflasken og Gas − + til mål 3, knappen Frit/Låst til mål 4. Grafen kan have sin plads sat af som stiplet ramme med navnet 'Tryk og volumen'.",
+        "gevinst": "Den svage elev møder én cylinder og én varmekilde i stedet for seks apparater og fire kontroller. Hun ved, hvorfor stemplet flytter sig, før hun gætter.",
+        "prioritet": 1
+      },
+      {
+        "fane": "2 Beregningen",
+        "billede": "skud/b/sc5.7_idealgasligningen__1.png",
+        "dom": "fint",
+        "fremme": "Kort med trinlinje, cylinder med n, p og T og V = ?, manometer, varmeplade (293 K), grøn tavle. Panelet har feltet V = skriv formlen.",
+        "bruges": "Det hele. Cylinderen viser de kendte tal, og tavlen viser beregningen.",
+        "forslag": [],
+        "andet": "Kortet har to fede steder, titlen 'Gas i et stempel.' (b-mærke, js/sim_regn.js linje 300) og spørgsmålet. Titlen står også i opgavelisten og på tavlen og kan stå i almindelig skrift.",
+        "gevinst": "Roligt nok. Cylinderen gentager opgavens tal.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Opgave 1 på fane 1 ('Stemplet glider frit. Hvad sker der med volumenet, når gassen bliver varmere?') kan stå alene, men 'frit' bør ind i spørgsmålet, fordi mål 4 stiller det samme spørgsmål med låst stempel. Det er med i trin 3 ovenfor."
+  },
+  {
+    "mappe": "sc5.8_natron",
+    "titel": "Natron i diglen",
+    "sprog": [
+      {
+        "fane": "2 Hypoteserne",
+        "opgave": "Opgave 1 Stofmængden af natron",
+        "fil": "js/sim_hypoteser.js",
+        "linje": 101,
+        "nu_alm": "Diglen i eksemplet havde 5,21 g natron før opvarmningen.",
+        "nu_fed": "Hvor mange mol er det?",
+        "nu_svar": [],
+        "problem": "\"det\" peger tilbage. Massen står kun i indledningen.",
+        "nyt_alm": "Massen er fra diglen i eksemplet før opvarmningen.",
+        "nyt_fed": "Hvor mange mol er 5,21 g natron?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Hypoteserne",
+        "opgave": "Opgave 2-4 Hypotese A, B og C",
+        "fil": "js/sim_hypoteser.js",
+        "linje": 102,
+        "nu_alm": "[efter spørgsmålet:] Afstem skemaet først.",
+        "nu_fed": "Hvis der dannes Na₂O, hvad skal diglen så veje til sidst?",
+        "nu_svar": [],
+        "problem": "Spørgsmålet begynder med en hvis-sætning, og der kommer en instruktion efter det. Det første trin er at afstemme, og det står sidst.",
+        "nyt_alm": "Hypotese A siger, at der dannes Na₂O. Afstem skemaet først.",
+        "nyt_fed": "Hvad skal diglen veje til sidst, hvis der dannes Na₂O?",
+        "styrke": "lille"
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "opgave": "Alle seks fejlkilder (opgave 1 Kun 2 minutter vist)",
+        "fil": "js/data.js",
+        "linje": 204,
+        "nu_alm": "Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt og varmer kun i 2 minutter.",
+        "nu_fed": "Gæt: Hvad vejer diglen hos gruppe 2 til sidst, sammenlignet med gruppe 1?",
+        "nu_svar": ["Mere end hos gruppe 1", "Mindre end hos gruppe 1", "Det samme som hos gruppe 1"],
+        "problem": "Spørgsmålet er det samme i alle seks opgaver, så det, gruppe 2 gør forkert, står kun i indledningen. 'Gæt:' med kolon står fed foran. Hver fejlkilde bør få sit eget spm. De andre fem: '... når de vejer den varm?', '... når de bruger høj flamme fra start?', '... når 0,30 g af deres natron er vand?', '... når de varmer i 10 minutter?', '... når de varmer soda i stedet for natron?'.",
+        "nyt_alm": "Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt.",
+        "nyt_fed": "Hvad vejer diglen hos gruppe 2 til sidst, når de kun varmer i 2 minutter?",
+        "styrke": "tydelig"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Forsøget",
+        "billede": "skud/b/sc5.8_natron__0.png",
+        "dom": "lidt meget",
+        "fremme": "Gættekort med tre formler, trefod med brænder og knapperne Sluk/Lav/Høj, vægt med digel (5,37 g), natronkrukke, lup med 16 ioner og forklaring, tom graf (Massen i diglen). Panelet har skemaet Vejningerne. En statusboks øverst til venstre ligger halvt bag kortet.",
+        "bruges": "Gættet bruger kun diglen og måske luppen. Brænderen, knapperne og grafen bruges først efter gættet.",
+        "forslag": [
+          { "alm": "Natron er NaHCO₃. Når natron varmes op, dannes der CO₂ og vanddamp.", "fed": "Hvad sker der med massen i diglen, når natron varmes op?", "svar": ["Massen bliver mindre", "Massen er den samme", "Massen bliver større"], "derefter": "Grafen 'Massen i diglen' kommer frem (tom). Indtil da er den en stiplet ramme med navnet." },
+          { "alm": "Gasserne forsvinder op i luften. Et fast stof bliver tilbage i diglen.", "fed": "Hvilket fast stof bliver tilbage i diglen, når natron varmes op?", "svar": ["Na₂CO₃", "Na₂O", "NaOH"], "derefter": "Det frie gæt er som nu. Bagefter kommer brænderens knapper Sluk, Lav og Høj og trinlisten på kortet frem." }
+        ],
+        "andet": "Grafen og brænderknapperne kan vente til efter gættet. Statusboksen øverst til venstre (Opvarmet / Diglen) ligger halvt skjult bag kortet fra start.",
+        "gevinst": "Den svage elev får grafens størrelse (massen) forklaret, før hun skal gætte en formel, og ser kun digel, vægt og lup, mens hun gætter.",
+        "prioritet": 2
+      },
+      {
+        "fane": "2 Hypoteserne",
+        "billede": "skud/b/sc5.8_natron__1.png",
+        "dom": "fint",
+        "fremme": "Kort med note og trinlinje, tavle med opgavens tal og beregningen, graf med eksemplets måling. Panelet har regnestykket med felt.",
+        "bruges": "Tavlen og feltet. Grafen bruges først ved hypoteserne og dommen.",
+        "forslag": [],
+        "andet": "Grafen kan stå som stiplet ramme til opgave 2 (hypotese A), hvor den første stiplede streg kommer på.",
+        "gevinst": "Lille gevinst. Fanen er allerede trinvis.",
+        "prioritet": 3
+      },
+      {
+        "fane": "3 Fejlkilder",
+        "billede": "skud/b/sc5.8_natron__2.png",
+        "dom": "fint",
+        "fremme": "Gættekort, to grupper med statusboks, trefod og vægt. Panelet har resultattabellen.",
+        "bruges": "Det hele. Sammenligningen er pointen.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Overskueligt. To ens opstillinger side om side.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": "Gættet på fane 1 ('Hvad tror du, der bliver tilbage i diglen, når natron varmes op?') kan stå alene. 'Hvilket fast stof bliver tilbage ...' er mere direkte og passer til formlerne i svarene (trin 2 ovenfor)."
+  },
+  {
+    "mappe": "sc5.9_staaluld",
+    "titel": "Afbrænding af ståluld",
+    "sprog": [
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Måling 1, spørgsmålet efter beregningen",
+        "fil": "js/data.js",
+        "linje": 185,
+        "nu_alm": "Vægten viste mindre, end du har regnet ud.",
+        "nu_fed": "Hvorfor?",
+        "nu_svar": ["Jernet fordampede i varmen.", "Ikke alt jernet nåede at reagere.", "Vægten kan ikke veje dioxygenet."],
+        "problem": "Kun 'Hvorfor?' står med fed. Det, der skal forklares, står i den almindelige skrift.",
+        "nyt_alm": "",
+        "nyt_fed": "Hvorfor vejer den brændte ståluld mindre, end du har regnet ud?",
+        "styrke": "tydelig"
+      },
+      {
+        "fane": "2 Beregningen",
+        "opgave": "Måling 1 og 2, kortets spørgsmål over tavlen",
+        "fil": "js/data.js",
+        "linje": 135,
+        "nu_alm": "",
+        "nu_fed": "Hvad vejer stålulden, hvis alt jernet bliver til FeO?",
+        "nu_svar": [],
+        "problem": "'stålulden' siger ikke, hvilken masse der regnes med (4,00 g). Spørgsmålet er hypotetisk, men regnestykket finder m(FeO).",
+        "nyt_alm": "Stålulden regnes som rent jern.",
+        "nyt_fed": "Hvor mange gram FeO dannes der af 4,00 g jern?",
+        "styrke": "lille"
+      }
+    ],
+    "start": [
+      {
+        "fane": "1 Forsøget",
+        "billede": "skud/b/sc5.9_staaluld__0.png",
+        "dom": "fint",
+        "fremme": "Gættekort med tre billedknapper, bunsenbrænder, vægt med ståluld (4,50 g), flaske med dioxygen, lup med Fe, O₂ og N₂ og forklaring. Panelet har et tomt skema.",
+        "bruges": "Gættet bruger stålulden på vægten. Scenen står stille, mens eleven gætter.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Ét klart ja/nej-agtigt gæt med billeder. Scenen er rolig og navngivet.",
+        "prioritet": 3
+      },
+      {
+        "fane": "2 Beregningen",
+        "billede": "skud/b/sc5.9_staaluld__1.png",
+        "dom": "fint",
+        "fremme": "Kort med 'Trin 1 af 3', tavle med skema (2 Fe + O₂ → 2 FeO), tre søjler (Før, Vægten efter, Regnet ud). Panelet har tre trin og Let/Svær.",
+        "bruges": "Det hele. Felterne og trinene låses op ét ad gangen, og søjlen Regnet ud står stiplet til sidst.",
+        "forslag": [],
+        "andet": "",
+        "gevinst": "Allerede stilladseret med stiplede pladser.",
+        "prioritet": 3
+      }
+    ],
+    "bemaerk": ""
+  }
+]

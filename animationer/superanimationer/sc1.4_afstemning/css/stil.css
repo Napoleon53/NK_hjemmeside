@@ -975,6 +975,10 @@ kbd {
 .opg-chip.loest { background-color: rgba(63, 174, 114, 0.2); border-color: rgba(63, 174, 114, 0.75); }
 .opg-chip.loest.valgt { border-color: var(--blaa); }
 .opg-chip { min-width: 2.2em; justify-content: center; }
+/* Laaste titler (21. nov. 2026): en kommende reaktion er et nummer med en graa streg */
+.opg-chip.laast { cursor: default; color: var(--tekst-mat); align-items: center; }
+.opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
+.oc-streg { display: inline-block; width: 2.4em; height: 8px; margin-left: 6px; border-radius: 4px; background-color: #4a4a58; }
 
 /* ---------------------------------------------------------------------
    SC1.4: skemaet paa tavlen (begge faner)

@@ -203,6 +203,11 @@ i deres felt. Lithium er kun med i rækken; metallerne i forsøgene er de samme.
 Påskeæg: et klik på vandpytten under det utætte rør og et klik på fisken
 under skibet.
 
+## Opgavelisten (21. nov. 2026)
+
+Listerne på alle tre faner låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 11 tjekker det.
+
 ## Forenklinger
 
 * **Farten er valgt, retningen er regnet.** Hvem der afgiver elektroner til

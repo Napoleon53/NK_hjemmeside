@@ -91,7 +91,8 @@
     };
 
     /* Den plads, papirkortet har oeverst i scenen (selvtesten maaler den) */
-    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 124, 142); };
+    /* 131 og 154 (foer 124 og 142): spoergsmaalet paa egen linje, 21. nov. 2026 */
+    P.kortZone = function () { return NK.Skort.zone(this.L.canvas, 131, 154); };
 
     /* Ligningen og brikkerne. Er ligningen for bred, bliver alt mindre. */
     P.stil = function () {
@@ -303,7 +304,8 @@
         if (!b.html) { var l = this.linje(); if (l) b = { html: l, klasse: "peger" }; }
         this.kort.vis({
             chip: "Produkterne",
-            tekst: "Hvad dannes? Træk de to produkter op på pladserne efter pilen.",
+            tekst: NK.html("Træk to formler op på pladserne efter pilen. Hvilke to produkter dannes, når " + S.formel(this.opg.reaktanter[0]) +
+                " og " + S.formel(this.opg.reaktanter[1]) + " reagerer?"),
             bliv: bliv,
             besked: b,
             hint: { tekst: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", svar: this.hjaelp > 0, peg: this.pegKnap },

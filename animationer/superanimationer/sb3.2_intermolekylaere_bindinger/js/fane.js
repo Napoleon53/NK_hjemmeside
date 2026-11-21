@@ -135,7 +135,7 @@
                     knap.className = "opg-chip";
                     knap.title = o.navn;
                     knap.innerHTML = '<span class="oc-f">' + mig.chipTekst(o, i) + '</span><i class="oc-m"></i>';
-                    knap.addEventListener("click", function () { mig.vaelg(i); });
+                    knap.addEventListener("click", function () { if (mig.aabenOpgave(i)) mig.vaelg(i); });
                     raekke.appendChild(knap);
                     mig.chips[i] = knap;
                 });
@@ -144,11 +144,32 @@
             });
         };
 
+        /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"):
+           kun de loeste opgaver og den, eleven er ved, viser titlen. De
+           kommende staar som et nummer med en graa streg og kan ikke klikkes,
+           til eleven er naaet dertil: alle foer den er loest (Vis svaret
+           taeller som loest), eller eleven har vaeret der. En liste med kun
+           numre (Rangér, kunNumre) har ingen titler at skjule. */
+        P.aabenOpgave = function (i) {
+            if (this.kunNumre) return true;
+            if (this.status[i] && this.status[i].loest) return true;
+            if (this.naaet && this.naaet[i]) return true;
+            for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+            return true;
+        };
+
         P.visListe = function () {
             var mig = this;
             this.status.forEach(function (s, i) {
                 var c = mig.chips[i];
                 if (!c) return;
+                var aaben = mig.aabenOpgave(i), o = mig.opgaver[i];
+                var html = aaben ? mig.chipTekst(o, i) : '<span class="oc-nr">' + (i + 1) + '</span><span class="hl-streg"></span>';
+                var f = c.querySelector(".oc-f");
+                if (f.innerHTML !== html) f.innerHTML = html;
+                c.classList.toggle("laast", !aaben);
+                c.disabled = !aaben;
+                c.title = aaben ? o.navn : "Opgave " + (i + 1) + ", kommer senere";
                 c.classList.toggle("valgt", i === mig.nr);
                 c.classList.toggle("loest", s.loest);
                 c.classList.toggle("stjerne", s.stjerne);
@@ -170,6 +191,8 @@
         /* ----- Opgaven --------------------------------------------------------- */
         P.vaelg = function (i) {
             this.nr = i;
+            this.naaet = this.naaet || {};
+            this.naaet[i] = true;
             this.hjaelp = 0;
             this.pegKnap = false;
             this.brugtSvar = false;

@@ -93,7 +93,9 @@
         this.braet.stil = this.stil;
         NK.el("j-jagtliste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-jagt]") : null;
-            if (k) mig.vaelg(parseInt(k.getAttribute("data-jagt"), 10));
+            if (!k) return;
+            var i = parseInt(k.getAttribute("data-jagt"), 10);
+            if (mig.aabenJagt(i)) mig.vaelg(i);
         });
         NK.el("j-igen").addEventListener("click", function () { mig.jagIgen(mig.nr); });
         NK.el("j-quiz").addEventListener("click", function () { mig.saetQuiz(!mig.quizTil()); });
@@ -162,6 +164,8 @@
     /* ----- En jagt vaelges ------------------------------------------------------ */
     P.vaelg = function (i) {
         this.nr = i;
+        this.naaet = this.naaet || {};
+        this.naaet[i] = true;
         this.jagt = D.JAGTER[i];
         this.st = this.status[i];
         this.hjaelp = 0;
@@ -343,7 +347,7 @@
                 slags: "spm", chip: "Kogepunkter",
                 tekst: j.kog === "raekke" ?
                     "Alle " + K.tal(n) + " isomerer er fundet. Klik på dem på tavlen fra højeste til laveste kogepunkt, og tryk Indsend svar." :
-                    "Alle " + K.tal(n) + " isomerer er fundet. Hvilken har det højeste kogepunkt? Klik på den på tavlen, og tryk Indsend svar."
+                    "Alle " + K.tal(n) + " isomerer er fundet. Hvilken af de " + K.tal(n) + " isomerer på tavlen har det højeste kogepunkt? Klik på den, og tryk Indsend svar."
             };
         }
         return { slags: "opgave", chip: "Jagt " + (this.nr + 1) + " af " + D.JAGTER.length + " · " + j.niv, tekst: j.tekst, maal: this.maalHTML() };
@@ -685,10 +689,29 @@
     }
 
     /* ----- Panelet: jagterne og hylden ----------------------------------------------- */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): kun
+       de klarede jagter og den, eleven er ved, viser formlen, niveauet og
+       tallet. De kommende staar som et nummer med en graa streg og kan ikke
+       klikkes, til eleven er naaet dertil: alle jagter foer den er klaret,
+       eller eleven har vaeret der (ogsaa en jagt med fundne isomerer, gemt
+       i browseren). */
+    P.aabenJagt = function (i) {
+        var s = this.status[i];
+        if (s.loest || s.fundet.length || (this.naaet && this.naaet[i])) return true;
+        for (var j = 0; j < i; j++) if (!this.status[j].loest) return false;
+        return true;
+    };
+
     P.visListe = function () {
         var mig = this, html = "";
         D.JAGTER.forEach(function (j, i) {
             var s = mig.status[i], n = j.isomerer.length;
+            if (!mig.aabenJagt(i)) {
+                html += '<button type="button" class="jagtlinje laast" disabled data-jagt="' + i + '" aria-label="Jagt ' + (i + 1) + ', kommer senere">' +
+                    '<span class="jl-nr">' + (i + 1) + '</span><span class="jl-formel"><span class="hl-streg"></span><span class="jl-skjult">C<sub>2</sub></span></span>' +
+                    '<span class="jl-bund"><span class="jl-navn">&nbsp;</span></span></button>';
+                return;
+            }
             var maerke = s.stjerne ? "★" : (s.loest ? "✓" : "");
             html += '<button type="button" class="jagtlinje' + (i === mig.nr ? " valgt" : "") + (s.loest ? " loest" : "") + '" data-jagt="' + i + '" title="' + NK.html(j.titel + " (" + j.niv + ")") + '">' +
                 '<span class="jl-nr">' + (i + 1) + "</span>" +

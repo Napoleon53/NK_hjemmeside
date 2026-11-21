@@ -54,7 +54,7 @@
         },
         vejb: {
             navn: "Vejen", slags: "valg",
-            tekst: function (b, r) { return "Ammoniak har pK_b = " + D.d2(r.pkb) + ". Hvilken fremgangsmåde giver pOH i opløsningen?"; },
+            tekst: function (b, r) { return "Ammoniak har pK_b = " + D.d2(r.pkb) + ". Hvilken fremgangsmåde giver pOH i " + b.ct + " M " + b.navn + "?"; },
             svar: function () { return ["Stærk base: pOH = −log c_b", "Middelstærk base: løs ligningen", "Svag base: genvejen"]; },
             rigtig: function () { return 2; },
             fejlValg: function (b, r, j) {
@@ -66,7 +66,7 @@
         },
         ion: {
             navn: "Basen", slags: "valg",
-            tekst: function () { return "Natriumethanoat består af Na⁺ og CH₃COO⁻. Hvilken ion bestemmer pH i opløsningen?"; },
+            tekst: function () { return "Natriumethanoat består af Na⁺ og CH₃COO⁻. Hvilken ion bestemmer pH i en opløsning af natriumethanoat?"; },
             svar: function () { return ["Na⁺", "CH₃COO⁻", "Både Na⁺ og CH₃COO⁻"]; },
             rigtig: function () { return 1; },
             fejlValg: function (b, r, j) {

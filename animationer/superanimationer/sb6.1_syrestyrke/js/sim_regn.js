@@ -61,11 +61,22 @@
     P.gem = function () { NK.gem(NOEGLE, { r: this.regnet, k: this.kendt, n: this.antalStartet }); };
 
     /* ----- Panelet ------------------------------------------------------------------ */
+    /* Titlerne laases op i takt (brugeren 21. nov. 2026, "husk dette"): de
+       kommende trin staar som et nummer med en graa streg uden titel. Et
+       trin er naaet, naar eleven er kommet dertil, naar trinnet foer er
+       loest (Vis svaret taeller som loest), eller naar eleven har regnet en
+       syre helt igennem foer (gemt i browseren). Syrerne er valg af stof og
+       staar altid. */
+    P.aabenOpgave = function (j) {
+        return j <= this.trinNr + (this.groen && this.trinFaerdig ? 1 : 0) || Object.keys(this.regnet).length > 0;
+    };
     P.visListe = function () {
         var mig = this, html = "";
         D.REGN_TRIN.forEach(function (t, j) {
             var kl = j < mig.trinNr || (j === mig.trinNr && mig.groen && mig.trinFaerdig) ? "faerdig" : (j === mig.trinNr ? "nu" : "");
-            html += '<li class="' + kl + '"><span class="tr-nr">' + (j + 1) + "</span><span>" + D.sub(NK.html(t.navn)) + "</span></li>";
+            var aaben = mig.aabenOpgave(j);
+            html += '<li class="' + kl + (aaben ? "" : " laast") + '"' + (aaben ? "" : ' aria-label="Trin ' + (j + 1) + ', kommer senere"') +
+                '><span class="tr-nr">' + (j + 1) + "</span>" + (aaben ? "<span>" + D.sub(NK.html(t.navn)) + "</span>" : '<span class="hl-streg"></span>') + "</li>";
         });
         NK.saetHTML("r-trin", html);
         var sh = "", n = 0;

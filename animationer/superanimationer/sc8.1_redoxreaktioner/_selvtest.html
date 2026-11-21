@@ -461,7 +461,7 @@ async function koerTest(W) {
     try { S.lupT.sb = 1.5; S.lupT.rx = 2.5; S.tegn(); S.lupT.sb = 3; S.lupT.rx = 5.6; S.tegn(); } catch (x) { tegnFejl = x.message; }
     paastand("lupperne kan tegnes med elektronprikker midt i og efter reaktionen", !tegnFejl, tegnFejl);
     S.prikker = false;
-    paastand("spørgsmålet siger, at et reduktionsmiddel ikke er en syre", /ikke en syre/.test(D.S_MAAL[1].spm.tekst) && !/svarer/.test(D.S_MAAL[1].spm.tekst));
+    paastand("spørgsmålet nævner syren HCl og reduktionsmidlet magnesium", /syren HCl/.test(D.S_MAAL[1].spm.tekst) && /reduktionsmidlet magnesium/.test(D.S_MAAL[1].spm.tekst) && !/svarer/.test(D.S_MAAL[1].spm.tekst));
 
     overskrift("6. Låsen og Vis svaret");
     NK.visFane("fane-b");
@@ -551,6 +551,27 @@ async function koerTest(W) {
     }
     ramme.style.width = "1400px";
     ramme.style.height = "860px";
+
+    overskrift("8. Opgavelisten låser titlerne op i takt (21. nov. 2026)");
+    NK.visFane("fane-b"); B.tilpas(); B.layout();
+    B.status.forEach(function (st) { st.loest = false; st.stjerne = false; });
+    B.naaet = {};
+    B.vaelg(0, false);
+    var laastL = function () { return [].slice.call(d.querySelectorAll("#b-liste .opg-chip")); };
+    var ll = laastL();
+    paastand("ved start har kun opgave 1 en titel; de andre er et nummer med en grå streg og kan ikke klikkes",
+        ll.length === B.opgaver.length && ll.length > 1 && ll[0].textContent.indexOf(B.opgaver[0].navn) >= 0 && !ll[0].disabled &&
+        ll.slice(1).every(function (b) { return b.disabled && b.classList.contains("laast") && !!b.querySelector(".oc-streg") && /^\d+$/.test(b.textContent.trim()); }),
+        ll.map(function (b) { return b.textContent.trim(); }).join(" | "));
+    ll[ll.length - 1].click();
+    paastand("et klik på en låst opgave gør intet", B.nr === 0);
+    B.loest("svar", "");
+    ll = laastL();
+    paastand("når opgave 1 er løst, kommer titlen på opgave 2 frem; de senere er stadig låst",
+        B.status[0].loest && ll[1].textContent.indexOf(B.opgaver[1].navn) >= 0 && !ll[1].disabled &&
+        ll.slice(2).every(function (b) { return b.disabled && !!b.querySelector(".oc-streg"); }));
+    paastand("fane 2: ekstraopgaverne Let, Middel og Svær er niveauer og kan altid vælges med deres navn",
+        [6, 7, 8].every(function (k) { var c = Dd.chips[k]; return Dd.aabenOpgave(k) && !c.disabled && c.textContent.indexOf(Dd.opgaver[k].navn) >= 0; }));
 }
 </script>
 </body>

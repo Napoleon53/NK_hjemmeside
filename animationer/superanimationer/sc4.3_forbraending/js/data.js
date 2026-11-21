@@ -124,7 +124,7 @@
             dele: [
                 {
                     type: "spm", flere: true, om: ["lup"],
-                    tekst: "Luppen viser, hvad der kommer op fra den blå flamme. Hvilke stoffer er det? Vælg alle, der passer.",
+                    tekst: "Luppen viser molekyler over flammen. Vælg alle, der passer. Hvilke stoffer kommer op fra den blå flamme?",
                     svar: [
                         { t: "CO₂, carbondioxid", ok: true },
                         { t: "CO, carbonmonoxid",
@@ -301,7 +301,7 @@
         var slutSkema = D.skemaTekst(r, k.halv ? hel : { br: 1, O2: k.O2, cp: k.cp, H2O: k.H2O });
         dele.push({
             type: "forsoeg", trin: "C", stof: "cp", indsend: true, chip: "Trin 1 af " + n, om: ["tavle"],
-            tekst: "Afstem carbon. Hvilket tal skal stå foran " + p.f + "? Brug pilene, og tryk Indsend svar.",
+            tekst: "Afstem carbon. Hvilket tal foran " + p.f + " giver lige mange carbonatomer før og efter reaktionspilen?",
             rigtigt: b.f + " har " + atomer(b.C, "carbon") + ", og hvert " + p.f + " har 1. Derfor skal der stå " + k.cp + " foran " + p.f + ".",
             hint: [
                 "Tæl carbonatomerne i " + b.f + ". Hvert " + p.f + " har ét carbonatom.",
@@ -311,7 +311,7 @@
         });
         dele.push({
             type: "forsoeg", trin: "H", stof: "H2O", indsend: true, chip: "Trin 2 af " + n, om: ["tavle"],
-            tekst: "Afstem hydrogen. Hvilket tal skal stå foran H₂O?",
+            tekst: "Hvilket tal foran H₂O giver lige mange hydrogenatomer før og efter reaktionspilen?",
             rigtigt: b.f + " har " + atomer(b.H, "hydrogen") + ", og hvert H₂O har 2. Derfor skal der stå " + b.H + " : 2 = " + k.H2O + " foran H₂O.",
             hint: [
                 "Tæl hydrogenatomerne i " + b.f + ". Hvert H₂O har 2 hydrogenatomer.",
@@ -322,7 +322,7 @@
         var oTekst = "Efter pilen er der " + k.oCp + " oxygenatomer i " + p.f + " og " + k.oVand + " i H₂O, i alt " + k.oEfter + ".";
         dele.push({
             type: "forsoeg", trin: "O", stof: "O2", indsend: true, chip: "Trin 3 af " + n, om: ["tavle"],
-            tekst: "Afstem oxygen til sidst. Hvilket tal skal stå foran O₂?",
+            tekst: "Hvilket tal foran O₂ giver lige mange oxygenatomer før og efter reaktionspilen?",
             rigtigt: oTekst + " Hvert O₂ har 2, så der skal stå " + D.halv(k.O2) + " foran O₂." + (k.halv ? "" : " Nu er skemaet afstemt."),
             hint: [
                 "Tæl oxygenatomerne efter pilen i både " + p.f + " og H₂O.",

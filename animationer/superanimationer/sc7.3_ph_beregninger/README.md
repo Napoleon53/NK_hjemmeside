@@ -285,6 +285,11 @@ scenen gælder den gamle udgave; nu gælder dette:
   skærme er scenen mindst 600 px høj.
 * Molekylenavne: ingen at rette.
 
+## Opgavelisten (21. nov. 2026)
+
+Ingen opgaveliste: opgaverne trækkes én ad gangen, og panelet viser kun regnestykket.
+Reglen om låste opgavetitler (21. nov. 2026) har derfor intet at låse.
+
 ## I menuen
 
 I menuen fra 26. sept. 2026 som c7.3 i `kemi-c-filer/samling_c7.html`. Den gamle

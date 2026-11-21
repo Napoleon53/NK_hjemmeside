@@ -152,8 +152,8 @@
         var o = opstil(String(iso.a), [String(g.z), String(n), String(iso.a + 2)],
             function (i) { return String(iso.a + 1 + i); });
         return {
-            tekst: "En kerne har " + NK.talform(g.z, "proton", "protoner") + " og "
-                + NK.talform(n, "neutron", "neutroner") + ". Hvad er nukleontallet?",
+            tekst: "Hvad er nukleontallet for en kerne med " + NK.talform(g.z, "proton", "protoner") + " og "
+                + NK.talform(n, "neutron", "neutroner") + "?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Nukleontallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
             atom: { p: g.z, n: n, e: g.z },
@@ -172,8 +172,8 @@
             ["0", NK.ladningstekst(-g.ion), NK.ladningstekst(g.ion > 0 ? g.ion + 1 : g.ion - 1)],
             function (i) { return NK.ladningstekst(i + 2); });
         return {
-            tekst: "Partiklen har " + NK.talform(g.z, "proton", "protoner") + " og "
-                + NK.talform(e, "elektron", "elektroner") + ". Hvad er ladningen?",
+            tekst: "Hvilken ladning har en partikel med " + NK.talform(g.z, "proton", "protoner") + " og "
+                + NK.talform(e, "elektron", "elektroner") + "?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Ladningen er protoner minus elektroner: " + g.z + " − " + e + " = "
                 + NK.ladningstekst(g.ion) + ".",
@@ -286,7 +286,7 @@
         var aedel = D.aedelgasStruktur(g.z - g.ion);
         var o = opstil(aedel.navn.toLowerCase(), bland(["helium", "neon", "argon", "krypton"]));
         return {
-            tekst: "Hvilken ædelgas kommer " + g.navn.toLowerCase() + " til at ligne som ion?",
+            tekst: "Hvilken ædelgas har samme elektronstruktur som ionen af " + g.navn.toLowerCase() + "?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: g.symbol + NK.ladningHaevet(g.ion) + " har " + (g.z - g.ion)
                 + " elektroner fordelt (" + D.skalfordeling(g.z - g.ion).join(", ")

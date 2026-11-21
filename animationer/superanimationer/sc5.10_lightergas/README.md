@@ -223,6 +223,11 @@ svarene, linjen med næste skridt, hint, fejl og ros, den gule knap Giv hint
 * Molekylenavne (dioxygen osv.): ingen at rette. Animationen nævner kun
   alkanerne, luft og vand.
 
+## Opgavelisten (21. nov. 2026)
+
+Listerne på alle tre faner låser titlerne op i takt (`aabenOpgave` i `js/fane.js`): de kommende opgaver er et nummer med en grå streg og kan ikke klikkes.
+En opgave åbner, når alle før den er løst (Vis svaret tæller), når den er løst før, eller når eleven har været der; selvtesten afsnit 12 tjekker det.
+
 ## Forenklinger
 
 * Lightergas er butan, M = 58,14 g/mol (i virkeligheden butan og isobutan,

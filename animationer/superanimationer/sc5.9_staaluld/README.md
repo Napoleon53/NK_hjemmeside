@@ -323,3 +323,7 @@ flaskens mærkat (`sprites/iltflaske.svg`), svarene, teorien og
 rundvisningen. Hverdagsordet ilt står ingen steder; selvtesten tjekker det.
 Variabelnavne og filnavne (`ilt`, `iltflaske`, `D.UDEN_ILT`) er uændrede.
 
+
+## Opgavelisten låser titlerne op (21. nov. 2026)
+
+Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).
