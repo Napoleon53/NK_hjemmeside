@@ -234,7 +234,8 @@ bagefter.
 Opgaven står på ét lyst papirkort øverst i scenen (`../faelles/papirkort.css`
 og `papirkort.js`). Statuslinjen nederst og beskeden i panelet er væk.
 
-* **Lageret:** kortet står over reolen (ikke over plakaterne) og siger, hvad
+* **Lageret** (ændret 22. nov. 2026, se Gennemgangen nederst: feltet står
+  nu på kortet, og panelet er væk): kortet står over reolen og siger, hvad
   etiketten siger, og hvad der skal skrives nu ("Skriv ionen for natrium i
   feltet i panelet"). Felterne bliver i panelet. **Indsend svar** på kortet er
   grå, til der står noget i feltet, og Enter i feltet er det samme. **Giv et
@@ -297,3 +298,84 @@ Siden 23. september 2026 er den c2.3 i `animationer/kemi-c-filer/samling_c2.html
 `samling_alt.html?emne=c2.3` går hertil. Den gamle ligger i
 `kemi-c-filer/arkiv/c2.3_Ionforbindelser_navngivning_oldversion.html`, og i
 `FEEDBACK_EMNER` i `animationer/samling_alt.html` hedder den `'Kemikalielageret'`.
+
+## Gennemgangen efter regelsættet (T7, 22. nov. 2026)
+
+Lageret er bygget om efter `../REGELSAET.md`. Niels sagde ja til forslaget og
+valgte, at glassene stadig kan tages ned frit: "Afvig helt sikkert fra reglen
+i forhold til reolen!" (undtagelsen står ved regel 17).
+
+* **Intet panel på lageret** (regel 1-3). Reolen er opgavelisten: tre hylder
+  med skilt og 0/10, og stjernerne sidder på glassene. Scenen er bredere, og
+  reolen og plakaterne står samlet i midten, også på 1920 × 1080 (regel 32).
+  Glassene bliver ikke bredere, end højden tillader.
+* **Feltet står på kortet** mellem spørgsmålet og knapperne, og hint og fejl
+  står i samme række. Feltet er ét element (`this.felt`), som flyttes ind i
+  kortet, hver gang kortet tegnes om, så tekst og markør bliver. Kortet står
+  over reolen og plakaterne og er mindst 1100 px bredt, når scenen har plads.
+* **Spørgsmålene kan stå alene** (regel 5-7), ét felt ad gangen: "Hvad er
+  formlen for natriumionen?", "Hvad er formlen for natriumoxid?", "Hvilken ion
+  er Cl i CuCl₂?", "Hvad hedder ionen Cl⁻?", "Hvad hedder CuCl₂?" (`spoergsmaal`
+  i `js/sim_lager.js`). Over spørgsmålet står "Find ionerne i natriumoxid, og
+  skriv formlen."
+* **Det første glas på hver hylde har tre svar** (regel 14). De forkerte er
+  typiske fejl (Na og Na⁻, NaO og NaO₂, jern(II)ion uden romertal), og
+  forklaringen til hvert er den, tjekket giver, når fejlen bliver skrevet. Et
+  klik vælger kun, Indsend svar tjekker, og et forkert svar bliver rødt og kan
+  ikke vælges igen (`valgFor` og `kandidater`). Fra glas 2 skriver eleven selv.
+  Selvtesten tjekker, at alle felter i alle 41 stoffer kan få tre forskellige
+  svar med præcis ét rigtigt.
+* **Etiketmaskinen peger ingen steder hen.** Displayet viser kun det, der er
+  skrevet eller valgt ("Skriv i feltet til højre →" er væk).
+* **Navnet på en fundet ion står ved kuglen** i scenen (det stod før i
+  panelet), så det kan bruges, når stoffets navn skal skrives.
+* **Øv glasset igen** står ved glasset på bordet, når et løst glas er taget
+  ned, og **↺ Sæt alle glas tilbage** står stille under plakaterne (regel 16).
+* **Tilbuddet om Kemichaels præsentation er fjernet** på lageret. K viser den
+  stadig. Samlebåndet er uændret.
+* **Linjen om stoffet har et grundled:** "Natriumoxid indgår i almindeligt
+  vinduesglas." i stedet for "Indgår i almindeligt vinduesglas." 39 linjer,
+  T7-1 til T7-39 i `~/NK_hjemmeside/.claude/spoergsmaal-og-start/ret/t7.json`
+  (`python3 ret.py tilbage T7-5` sætter en enkelt tilbage).
+
+## Mere spil på samlebåndet (22. nov. 2026)
+
+Niels: "Tag samlebåndet i sc2.3 med mere spil ... Der skal laves et
+appscript til at holde styr på highscore. Det skal være sådan at et spil
+naturligt begynder at være færdigt efter 6-7 minutter, selvom man er
+ekstremt god. (her skal der komme et umenneskeligt hurtigt niveau.. og hvis
+man gennemfører det.. så skal der komme en besked om at man ikke kommer på
+highscore, fordi man ikke er et menneske ;)"
+
+* **Fast takt.** Glassene kommer højst hvert `hvert` sekund (`NIVEAUER` i
+  `js/sim_baand.js`), så et hurtigt svar ikke fremskynder spillet. `max`
+  holder antallet på båndet nede for en langsom spiller. Niveau 1-3 har 6
+  glas, niveau 4-12 (det hele blandet) 7 glas, og takten går fra et glas
+  hvert 6,5 s til hvert 2,7 s. En spiller, der svarer rigtigt med det samme,
+  når niveau 13 efter 6-7 minutter (selvtesten tjekker det). Hvert glas
+  beholder den fart, det kom ind med.
+* **Niveau 13, Umenneskeligt hurtigt:** ti glas, ét pr. sekund, og et glas
+  kører båndet igennem på 3,2 s. Før niveauet er der et pusterum på 2 s.
+  Klares det, er spillet slut: Arket siger, at highscorelisten kun er for
+  mennesker, resultatet sendes ikke og bliver ikke rekord, og Kemichael
+  kommer ind (`D.SLUT_REPLIK.robot`). Dør man på niveau 13, siger arket, at
+  man altså er et menneske.
+* **Point:** (10 + 5 × niveau-1) × stimen (op til ×5 ved 12 i træk) plus op
+  til 5 for et hurtigt svar. "Stime ×3" stiger op ved glasset, og "Ny
+  rekord" kommer, når rekorden er slået. En robot kan højst nå ca. 19 100.
+* **Tallene på kortet:** Under spillet står point, stime, liv og rekord på
+  kortets første linje i stedet for opgaven (displayet og pilen siger den).
+* **Arket over båndet** før start og ved slut: resultatet (niveau, tid og
+  rigtige), navnefeltet med **Sæt på listen**, Top 10 denne uge og Top 10
+  alle tider, og Start samlebåndet eller Spil igen. Et Enter lige efter slut
+  starter ikke et nyt spil. Navnet huskes (`nk-spil-navn`, ellers navnet fra
+  spillet om organiske grupper). Ved slut står Kemichael foran kassen, så han
+  ikke dækker arket.
+* **Highscorelisten** er et Google-regneark med et Apps Script, som Niels
+  lægger op: `~/NK_hjemmeside/.claude/highscore/VEJLEDNING.html` og
+  `highscore.gs`. Scriptet kan holde lister til flere spil (ét faneblad pr.
+  spil), viser hvert navn én gang med det bedste resultat og afviser
+  resultater over 20 000 point eller over 120 point pr. sekund. Adressen
+  står i `ADRESSE` i `js/topliste.js` (Niels' webapp "Highscores til spil",
+  udrullet 22. nov. 2026, version 2; "Hvem har adgang" skal være Alle).
+  Kan listen ikke hentes, viser arket det og ellers kun elevens egen rekord.

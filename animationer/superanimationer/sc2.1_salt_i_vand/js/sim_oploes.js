@@ -1768,10 +1768,11 @@
 
     function opgHurtigst() {
         return {
-            tekst: "Opløs hele NaCl-krystallen på under " + GRAENSE_SEK + " sekunder. Uret starter forfra, " +
-                   "når du trykker på Ny krystal.",
+            tekst: "Vandets temperatur og omrøring bestemmer, hvor hurtigt et salt opløses. Under Forsøget kan du vælge " +
+                   "Koldt, Lunkent eller Varmt og slå Omrøring til. Uret starter forfra, når du trykker på Ny krystal. " +
+                   "Hvilke indstillinger opløser hele NaCl-krystallen på under " + GRAENSE_SEK + " sekunder?",
             stortUr: true,
-            hint: "To af indstillingerne under Forsøget kan gøre opløsningen hurtigere.",
+            hint: "Prøv én indstilling ad gangen. Vælg Varmt, og tryk på Ny krystal. Slå så også Omrøring til.",
             svar: "Brug varmt vand og omrøring. Varmen gør vandmolekylerne hurtigere, og omrøringen knuser krystallen, " +
                   "så flere vandmolekyler kan tage fat på én gang.",
             start: function (sim) {

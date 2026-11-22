@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 </head>
 <body class="papirkort">
 
@@ -16,7 +17,7 @@
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-varm" role="tab" aria-selected="true"><span class="nr">1</span>Varm op</button>
-        <button class="faneknap" data-fane="fane-form" role="tab" aria-selected="false"><span class="nr">2</span>Formen</button>
+        <button class="faneknap" data-fane="fane-form" role="tab" aria-selected="false"><span class="nr">2</span>Forgrenede kæder</button>
         <button class="faneknap" data-fane="fane-spil" role="tab" aria-selected="false"><span class="nr">3</span>Hvem koger først?</button>
     </div>
 
@@ -29,42 +30,51 @@
 <!-- ================================================================= -->
 <!-- FANE 1: VARM OP                                                    -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-varm" role="tabpanel" aria-label="Varm op">
+<section class="fane aktiv uden-panel" id="fane-varm" role="tabpanel" aria-label="Varm op">
+    <!-- Intet panel (runde T9, 22. nov. 2026, REGELSAET 2-3): opgaverne staar i
+         raekken oeverst, kurven staar paa et lyst papir i scenen til hoejre. -->
     <div class="scene">
-        <canvas id="varm-laerred"></canvas>
-        <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): målet,
-             hint, beskeden og knapperne (js/skort.js) -->
+        <canvas id="varm-laerred" aria-label="Alkaner på en hylde, et temperaturkammer med et glas og et vindue med molekylerne i glasset"></canvas>
+
+        <!-- De fem opgaver i fast raekkefoelge, laast op i takt (js/varm_opgaver.js) -->
+        <nav class="opgaverad" id="varm-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="varm-liste"></div>
+            <button class="or-knap or-stille" id="varm-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="varm-frileg" type="button" title="Brug alle glassene uden opgaver">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: spoergsmaalet, svarene, hint og Indsend svar.
+             Pladsen (venstre og bredde) saettes af sim_varm.js. -->
         <div class="scenekort" id="varm-skort">
             <div class="sk-ind" id="varm-ind"></div>
-            <div class="sk-bund" id="varm-bund">
+            <div class="sk-bund" id="varm-bund" hidden>
                 <p class="st-tekst" id="varm-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="varm-hint" type="button">Giv et hint</button>
+                <button class="knap hjaelp" id="varm-hjknap" type="button">Giv et hint</button>
                 <button class="knap indsend" id="varm-indsend" type="button">Indsend svar</button>
             </div>
         </div>
+
+        <!-- Kurven paa et lyst papir til hoejre (REGELSAET 29). En stiplet
+             plads, til det foerste kogepunkt er fundet (REGELSAET 13). -->
+        <div class="kurve-ark" id="varm-kurve-ark">
+            <canvas class="kurve" id="varm-kurve" aria-label="Kurven over kogepunkt og antal C-atomer"></canvas>
+            <div class="kurve-plads">Kurven med kogepunkterne</div>
+        </div>
+
+        <!-- Klik-opfordringen (REGELSAET 19-20) -->
+        <div class="varm-boble" id="varm-boble" hidden></div>
+
         <div class="anker" id="varm-anker-hylde"></div>
         <div class="anker" id="varm-anker-kammer"></div>
         <div class="anker" id="varm-anker-termometer"></div>
         <div class="anker" id="varm-anker-zoom"></div>
-        <div class="tilbud" id="varm-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
-        </div>
     </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="varm-kurve-kort">
-            <h2>Kogepunkter <span class="taeller" id="varm-antal"></span></h2>
-            <canvas class="kurve" id="varm-kurve"></canvas>
-            <button class="knap nulstil" id="varm-forfra" type="button" hidden><span>Start målene forfra</span><span class="tegn">↺</span></button>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
 <!-- FANE 2: FORMEN                                                     -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-form" role="tabpanel" aria-label="Formen">
+<section class="fane" id="fane-form" role="tabpanel" aria-label="Forgrenede kæder">
     <div class="scene">
         <canvas id="form-laerred"></canvas>
         <!-- Papirkortet oeverst midt i scenen (4. nov. 2026): gættet, opgaven og spørgsmålet,
@@ -136,24 +146,23 @@
 <!-- TEORIEN (aabnes kun med knappen eller T)                           -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <div class="overlay-boks teori-ark">
         <h2>Alkaners kogepunkt</h2>
-        <p>Et stof koger, når molekylerne river sig løs fra væsken og bliver til gas. Kogepunktet er den temperatur, hvor det sker ved normalt tryk (1 atm). Under kogepunktet fordamper der kun lidt fra overfladen.</p>
-        <p>Når et stof koger, går molekylerne fra hinanden. Bindingerne inde i molekylet brydes ikke.</p>
-        <p>Alkaner er upolære. Molekylerne holdes sammen af londonbindinger. Londonbindingerne virker der, hvor molekylerne rører hinanden.</p>
-        <div class="eksempel">
-            <span class="eksempel-hoved">Kædens længde</span>
-            Jo længere kæden er, jo mere rører molekylerne hinanden, og jo højere er kogepunktet.
-        </div>
-        <div class="eksempel">
-            <span class="eksempel-hoved">Formen: tre stoffer med formlen C₅H₁₂</span>
-            pentan 36,1 °C · 2-methylbutan 27,9 °C · 2,2-dimethylpropan 9,5 °C
-        </div>
-        <p>Et forgrenet molekyle er mere kugleformet. Det rører sine naboer mindre, og derfor koger stoffet lavere end alkanen med den lige kæde og samme formel. Kædelængden betyder mest, for et C-atom ekstra løfter kogepunktet mere, end en gren sænker det.</p>
-        <p>Ved stuetemperatur er alkanerne fra CH₄ til C₄H₁₀ gasser, fra C₅H₁₂ til C₁₆H₃₄ væsker og fra C₁₇H₃₆ faste stoffer.</p>
-        <p class="note">I modellen er hvert C-atom med sine H-atomer tegnet som én kugle. Gule prikker viser, hvor to molekyler rører hinanden. Tallene er fra CRC Handbook of Chemistry and Physics.</p>
-        <div class="knapper" style="margin-top:14px;">
-            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        <p>Når en væske koger, slipper molekylerne hinanden og bliver til en gas. Molekylerne selv er hele. Kogepunktet er den temperatur, hvor det sker ved normalt tryk.</p>
+        <h3 class="teori-hoved">Kæden og kogepunktet</h3>
+        <p>Jo længere kæden er, jo større er den flade, hvor to molekyler rører hinanden. Molekylerne holder bedre fast i hinanden, og kogepunktet er højere.</p>
+        <table class="teori-tabel">
+            <tr><th>C-atomer</th><th>Ved stuetemperatur</th><th>Eksempel</th></tr>
+            <tr><td>1 til 4</td><td>gas</td><td>lightergas</td></tr>
+            <tr><td>5 til ca. 17</td><td>væske</td><td>benzin</td></tr>
+            <tr><td>18 og flere</td><td>fast stof</td><td>paraffin i stearinlys</td></tr>
+        </table>
+        <h3 class="teori-hoved">Formen og kogepunktet</h3>
+        <p>Et forgrenet molekyle er mere kugleformet og rører sine naboer mindre. Pentan koger ved 36 °C, mens 2,2-dimethylpropan med de samme fem C-atomer koger ved 10 °C.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/c/kapitler/4-1-alkaner.html" target="_blank" rel="noopener">4.1 Carbonhydrider og alkaner</a></p>
+        <p class="genveje"><kbd>1</kbd>-<kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperaturen &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" type="button" data-luk>Luk</button>
         </div>
     </div>
 </div>
@@ -204,6 +213,7 @@
 <script src="js/tegning.js"></script>
 <script src="../kemichael/praesentation.js"></script>
 <script src="js/termostat.js"></script>
+<script src="js/varm_opgaver.js"></script>
 <script src="js/sim_varm.js"></script>
 <script src="js/sim_form.js"></script>
 <script src="js/sim_spil.js"></script>

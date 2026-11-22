@@ -1,0 +1,275 @@
+[
+ {
+  "nr": "T7-1",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Indgår i almindeligt vinduesglas.\"",
+  "ny": "\"Natriumoxid indgår i almindeligt vinduesglas.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-2",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Får sojamælk til at stivne til tofu.\"",
+  "ny": "\"Magnesiumchlorid får sojamælk til at stivne til tofu.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-3",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Tabletter mod radioaktivt iod ved atomulykker.\"",
+  "ny": "\"Kaliumiodid tages som tabletter mod radioaktivt iod ved atomulykker.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-4",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Giver sølv en mørk, antik overflade.\"",
+  "ny": "\"Kaliumsulfid giver sølv en mørk, antik overflade.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-5",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Linser, der lukker infrarødt lys igennem.\"",
+  "ny": "\"Bariumfluorid bruges i linser, der lukker infrarødt lys igennem.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-6",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Dannes, når lithium reagerer med luftens dinitrogen.\"",
+  "ny": "\"Lithiumnitrid dannes, når lithium reagerer med luftens dinitrogen.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-7",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Vejsalt, der virker ved lavere temperatur end køkkensalt.\"",
+  "ny": "\"Calciumchlorid tør is op ved lavere temperatur end køkkensalt.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-8",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Magnesia: tabletter mod halsbrand og forstoppelse.\"",
+  "ny": "\"Magnesia (magnesiumoxid) bruges mod halsbrand og forstoppelse.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-9",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Nødblus til søs. Med vand dannes en gas, der selv tager fyr.\"",
+  "ny": "\"Calciumphosphid i nødblus giver med vand en gas, der selv tager fyr.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-10",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Sort. Findes i hammerskæl, der springer af under smedning.\"",
+  "ny": "\"Sort jern(II)oxid findes i hammerskæl, der springer af ved smedning.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-11",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Farver en flamme blågrøn.\"",
+  "ny": "\"Kobber(II)chlorid farver en flamme blågrøn.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-12",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Hovedbestanddelen i rust.\"",
+  "ny": "\"Jern(III)oxid er hovedbestanddelen i rust.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-13",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Den hvide solcreme på næsen.\"",
+  "ny": "\"Zink(II)oxid er den hvide solcreme på næsen.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-14",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Rødt pigment i bundmaling til skibe.\"",
+  "ny": "\"Kobber(I)oxid er et rødt pigment i bundmaling til skibe.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-15",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Bruges til at ætse printplader.\"",
+  "ny": "\"Jern(III)chlorid bruges til at ætse printplader.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-16",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Det lysfølsomme stof i gammeldags fotofilm.\"",
+  "ny": "\"Sølv(I)bromid var det lysfølsomme stof i gammeldags fotofilm.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-17",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Det sorte lag på kobber, der har været varmet op.\"",
+  "ny": "\"Kobber(II)oxid er det sorte lag på kobber, der har været varmet op.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-18",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Den sorte anløbning på sølvtøj.\"",
+  "ny": "\"Sølv(I)sulfid er den sorte anløbning på sølvtøj.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-19",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Dannes, når jern opløses i saltsyre.\"",
+  "ny": "\"Jern(II)chlorid dannes, når jern opløses i saltsyre.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-20",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Kaustisk soda. Opløser fedt i afløbsrens.\"",
+  "ny": "\"Natriumhydroxid (kaustisk soda) opløser fedt i afløbsrens.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-21",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Salmiak: smagen i salt lakrids.\"",
+  "ny": "\"Ammoniumchlorid (salmiak) giver smagen i salt lakrids.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-22",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Potaske: hævemiddel i brunkager.\"",
+  "ny": "\"Kaliumcarbonat (potaske) er hævemiddel i brunkager.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-23",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Salpeter: en af bestanddelene i sortkrudt.\"",
+  "ny": "\"Kaliumnitrat (salpeter) er en af bestanddelene i sortkrudt.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-24",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Drikkes før røntgen, så mave og tarm kan ses.\"",
+  "ny": "\"Bariumsulfat drikkes før røntgen, så mave og tarm kan ses.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-25",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Hvidt uden vand. Med vand bliver det blåt.\"",
+  "ny": "\"Kobber(II)sulfat er hvidt uden vand og bliver blåt med vand.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-26",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Renser drikkevand, fordi snavset fælder ud sammen med det.\"",
+  "ny": "\"Aluminiumsulfat renser drikkevand, fordi snavset fælder ud med det.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-27",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Gødning med både nitrogen og svovl.\"",
+  "ny": "\"Ammoniumsulfat er gødning med både nitrogen og svovl.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-28",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Okker: det rødbrune slam i jernholdige vandløb.\"",
+  "ny": "\"Jern(III)hydroxid er okker, det rødbrune slam i vandløb.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-29",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Farver en flamme rød.\"",
+  "ny": "\"Strontiumchlorid farver en flamme rød.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-30",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Keramik, der leder varme næsten som et metal.\"",
+  "ny": "\"Berylliumoxid er keramik, der leder varme næsten som et metal.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-31",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Sidder på pluspolen i et bilbatteri.\"",
+  "ny": "\"Bly(IV)oxid sidder på pluspolen i et bilbatteri.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-32",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Fluoren i nogle tandpastaer.\"",
+  "ny": "\"Tin(II)fluorid er fluoren i nogle tandpastaer.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-33",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Priestley fik dioxygen ud af det i 1774.\"",
+  "ny": "\"Priestley fik dioxygen ud af kviksølv(II)oxid i 1774.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-34",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Violette krystaller. Bruges i fodbad mod svamp.\"",
+  "ny": "\"Kaliumpermanganat er violette krystaller til fodbad mod svamp.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-35",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Fjerner sølv(I)bromid fra fotopapir, så billedet tåler lys.\"",
+  "ny": "\"Natriumthiosulfat fjerner sølv(I)bromid, så et foto tåler lys.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-36",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Natron: hævemiddel i bagepulver.\"",
+  "ny": "\"Natron (natriumhydrogencarbonat) er hævemiddel i bagepulver.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-37",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Den gule indikator, når chlorid titreres med sølv(I)nitrat.\"",
+  "ny": "\"Kaliumchromat er den gule indikator i Mohr-titrering af chlorid.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-38",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Giver gult bundfald med kaliumiodid.\"",
+  "ny": "\"Bly(II)nitrat giver gult bundfald med kaliumiodid.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ },
+ {
+  "nr": "T7-39",
+  "fil": "sc2.3_kemikalielageret/js/data.js",
+  "gammel": "\"Orange. Blev grøn i gamle alkoholtestere.\"",
+  "ny": "\"Orange kaliumdichromat blev grøn i gamle alkoholtestere.\"",
+  "hvor": "lageret, linjen om stoffet efter et løst glas"
+ }
+]

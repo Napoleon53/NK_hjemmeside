@@ -18,11 +18,10 @@
     var TURE = {
         "fane-lager": [
             { sel: "#lager-anker-reol", titel: "Reolen", tekst: "Tredive glas har mistet halvdelen af etiketten. Klik på et glas for at tage det ned på bordet." },
-            { sel: "#lager-skort", titel: "Opgaven", tekst: "Kortet siger, hvad du skal skrive: først ionerne og så formlen eller navnet. Giv et hint giver et hint og derefter svaret." },
-            { sel: "#lager-kort", titel: "Felterne", tekst: "Skriv i feltet, og tryk Indsend svar på kortet eller Enter." },
+            { sel: "#lager-skort", titel: "Opgaven", tekst: "Kortet stiller ét spørgsmål ad gangen, først om ionerne og så om formlen eller navnet. Skriv svaret i feltet på kortet, og tryk Indsend svar eller Enter." },
             { sel: "#lager-anker-bord", titel: "Arbejdsbordet", tekst: "De ioner, du finder, lægger sig ved glasset. Er svaret rigtigt, printer etiketmaskinen en ny etiket." },
             { sel: "#lager-anker-plakater", titel: "Plakaterne", tekst: "Plakaterne viser det periodiske system og de sammensatte ioner. Klik på en plakat for at se den i stort format." },
-            { sel: "#lager-fremskridt", titel: "Hylderne", tekst: "Et glas, du løser uden at se svaret, får en stjerne." },
+            { sel: "#lager-nulstil", titel: "Forfra", tekst: "Et glas, du løser uden at se svaret, får en stjerne. Knappen sætter alle glas tilbage på reolen med den gamle etiket." },
             { sel: "#svaer-kontakt", titel: "Sværere ioner", tekst: "Slå kontakten til, så elleve glas får sværere ioner, bl.a. Be²⁺, Hg²⁺, MnO₄⁻ og S₂O₃²⁻. De sværere ioner kommer også på samlebåndet." },
             { sel: ".faneknapper", titel: "Samlebåndet", tekst: "Fanen Samlebåndet har de samme stoffer, men på tid." }
         ],

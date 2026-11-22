@@ -24,7 +24,7 @@
         VASK: { venstre: 196, hoejre: 604, top: 466 },
         KLUD: { x: 825, y: 572, b: 150, h: 56 },
         STAV_L: 200,
-        LUP: { x: 850, y: 185, r: 118 }
+        LUP: { x: 828, y: 200, r: 162 }
     };
 
     var T = { MAAL: MAAL };
@@ -95,31 +95,7 @@
             ctx.arc(h.x, MAAL.GREB_Y, 4.5, 0, Math.PI * 2);
             ctx.fill();
         });
-
-        /* Maerkatet ved heptanhanen */
-        var hep = T.hane("heptan");
-        ctx.strokeStyle = "#8b8470";
-        ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.moveTo(hep.x + 46, 157);
-        ctx.lineTo(hep.x + 48, 178);
-        ctx.stroke();
-        ctx.save();
-        ctx.translate(hep.x + 90, 198);
-        ctx.rotate(-0.07);
-        NK.rundtRekt(ctx, -50, -21, 100, 42, 5);
-        ctx.fillStyle = "#efe2b4";
-        ctx.fill();
-        ctx.strokeStyle = "#b09c5e";
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-        ctx.fillStyle = "#3b3526";
-        ctx.beginPath();
-        ctx.arc(-42, -14, 2.6, 0, Math.PI * 2);
-        ctx.fill();
-        NK.tekst(ctx, "Kun i", 4, -7, { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#5a4a1c" });
-        NK.tekst(ctx, "animationer", 4, 10, { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#5a4a1c" });
-        ctx.restore();
+        /* Maerkatet "Kun i animationer" ved heptanhanen er vaek (Niels 22. nov. 2026) */
     };
 
     T.vask = function (ctx) {
@@ -227,34 +203,77 @@
         return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
     }
 
-    /* theta er retningen mod molekylets negative ende (O). */
-    T.vandMolekyle = function (ctx, x, y, theta, k) {
-        var d = { x: Math.cos(theta), y: Math.sin(theta) };
-        var o = { x: x + d.x * 3 * k, y: y + d.y * 3 * k };
-        [52, -52].forEach(function (grad) {
-            var h = rot({ x: -d.x, y: -d.y }, grad * Math.PI / 180);
-            kugle(ctx, o.x + h.x * 10 * k, o.y + h.y * 10 * k, 5.5 * k, "#ffffff", "#9aa3ae");
+    /* Molekylerne i luppen (Niels 22. nov. 2026: "tydeligere hvor δ+ og δ−
+       er på mikroplanen", og ethanol var svaer at forstaa). Hvert atom har
+       sit symbol, og de polaere molekyler har δ+ og δ− ved enderne
+       (REGELSAET 24, 45). Ethanol tegnes som skeletformlen: C, C, O og
+       H'et i OH-gruppen. theta er retningen mod molekylets negative ende
+       (O), og H'et i OH-gruppen peger den modsatte vej. */
+    var LEX = "Lexend, 'Segoe UI', sans-serif";
+    var ATOMFARVE = {
+        O: ["#ffa396", "#a8281b", "#ffffff"],
+        H: ["#ffffff", "#9aa3ae", "#2b2f36"],
+        C: ["#8d95a1", "#1d2127", "#ffffff"]
+    };
+    /* CH₃ og CH₂ som én kugle med formlen inde, som paa skiltet (C₂H₅OH) */
+    var TEKST = { CH3: "CH₃", CH2: "CH₂" };
+
+    function atom(ctx, p, el, r) {
+        var f = ATOMFARVE[el] || ATOMFARVE.C;
+        kugle(ctx, p.x, p.y, r, f[0], f[1]);
+        var gruppe = !!TEKST[el];
+        NK.tekst(ctx, TEKST[el] || el, p.x, p.y + 0.5, { font: "500 " + Math.max(13.5, r * (gruppe ? 0.78 : 1.05)).toFixed(1) + "px " + LEX, justering: "center", linje: "middle", farve: f[2] });
+    }
+
+    function delta(ctx, p, tegn) {
+        NK.tekst(ctx, tegn > 0 ? "δ+" : "δ−", p.x, p.y, {
+            font: "500 15px " + LEX, justering: "center", linje: "middle",
+            farve: tegn > 0 ? PLUS : MINUS, kant: true, kantFarve: "rgba(8, 10, 16, 0.95)", kantBredde: 4
         });
-        kugle(ctx, o.x, o.y, 9 * k, "#ffa396", "#a8281b");
+    }
+
+    function plus(a, v, l) { return { x: a.x + v.x * l, y: a.y + v.y * l }; }
+
+    /* Tegner atomerne, saa molekylets midte ligger i (x, y) */
+    function tegnMolekyle(ctx, x, y, atomer, deltaer) {
+        var mx = 0, my = 0;
+        atomer.forEach(function (a) { mx += a.p.x; my += a.p.y; });
+        mx = x - mx / atomer.length; my = y - my / atomer.length;
+        function flyt(p) { return { x: p.x + mx, y: p.y + my }; }
+        atomer.forEach(function (a) { atom(ctx, flyt(a.p), a.el, a.r); });
+        (deltaer || []).forEach(function (d) { delta(ctx, flyt(d.p), d.t); });
+    }
+
+    T.vandMolekyle = function (ctx, x, y, theta, k) {
+        var d = { x: Math.cos(theta), y: Math.sin(theta) }, o = { x: 0, y: 0 };
+        var h1 = plus(o, rot({ x: -d.x, y: -d.y }, 52 * Math.PI / 180), 19 * k);
+        var h2 = plus(o, rot({ x: -d.x, y: -d.y }, -52 * Math.PI / 180), 19 * k);
+        tegnMolekyle(ctx, x, y,
+            [{ p: h1, el: "H", r: 8.5 * k }, { p: h2, el: "H", r: 8.5 * k }, { p: o, el: "O", r: 12 * k }],
+            [{ p: plus(o, d, 23 * k), t: -1 }, { p: plus(o, d, -33 * k), t: 1 }]);
     };
 
     T.ethanolMolekyle = function (ctx, x, y, theta, k) {
-        var d = { x: Math.cos(theta), y: Math.sin(theta) };
-        var o = { x: x + d.x * 8 * k, y: y + d.y * 8 * k };
-        kugle(ctx, o.x - d.x * 28 * k, o.y - d.y * 28 * k, 8.5 * k, "#8d95a1", "#1d2127");
-        kugle(ctx, o.x - d.x * 15 * k, o.y - d.y * 15 * k, 8.5 * k, "#8d95a1", "#1d2127");
-        var h = rot(d, 75 * Math.PI / 180);
-        kugle(ctx, o.x + h.x * 9 * k, o.y + h.y * 9 * k, 4.8 * k, "#ffffff", "#9aa3ae");
-        kugle(ctx, o.x, o.y, 7.5 * k, "#ffa396", "#a8281b");
+        var d = { x: Math.cos(theta), y: Math.sin(theta) }, o = { x: 0, y: 0 };
+        var mod = { x: -d.x, y: -d.y };
+        var h = plus(o, mod, 19 * k);
+        var u1 = rot(mod, 96 * Math.PI / 180);
+        var c1 = plus(o, u1, 29 * k);
+        var c2 = plus(c1, rot(u1, -62 * Math.PI / 180), 31 * k);
+        tegnMolekyle(ctx, x, y,
+            [{ p: c2, el: "CH3", r: 15 * k }, { p: c1, el: "CH2", r: 15 * k }, { p: h, el: "H", r: 8.5 * k }, { p: o, el: "O", r: 12 * k }],
+            [{ p: plus(o, rot(d, -0.55), 25 * k), t: -1 }, { p: plus(h, mod, 19 * k), t: 1 }]);
     };
 
     T.heptanMolekyle = function (ctx, x, y, theta, k) {
         var d = { x: Math.cos(theta), y: Math.sin(theta) };
         var n = { x: -d.y, y: d.x };
+        var atomer = [];
         for (var j = 0; j < 7; j++) {
-            var t = (j - 3) * 7.5 * k, z = (j % 2 ? 3 : -3) * k;
-            kugle(ctx, x + d.x * t + n.x * z, y + d.y * t + n.y * z, 5 * k, "#8d95a1", "#1d2127");
+            var t = (j - 3) * 25 * k, z = (j % 2 ? 7 : -7) * k;
+            atomer.push({ p: { x: d.x * t + n.x * z, y: d.y * t + n.y * z }, el: j === 0 || j === 6 ? "CH3" : "CH2", r: 14 * k });
         }
+        tegnMolekyle(ctx, x, y, atomer, []);
     };
 
     /* Luppen: et udsnit af straalen ved stavens spids. styrke 0-1 er,
@@ -295,17 +314,20 @@
         /* Polaere molekyler vender den modsat ladede ende mod staven:
            en negativ stav faar H-enden, en positiv faar O-enden. */
         var maal = tegn < 0 ? 0 : Math.PI;
-        var ret = NK.klamp(styrke * v.pol * 1.5, 0, 1);
-        for (var i = 0; i < 10; i++) {
-            var raekke = Math.floor(i / 2), kolonne = i % 2;
-            var x = cx + r * 0.05 + kolonne * 46 - ret * 10 + (raekke % 2) * 12;
-            var y = cy - 74 + raekke * 37;
-            var uro = Math.sin(i * 2.39 + tid * (0.7 + (i % 3) * 0.3)) * Math.PI;
+        /* Faa, store molekyler, der staar roligt (REGELSAET 25-26) */
+        var ret = NK.klamp(styrke * v.pol * 2.2, 0, 1);
+        var k = r / 162 * 1.15;
+        var PLADS = vaeske === "heptan"
+            ? [[0.22, -0.5], [0.24, 0], [0.22, 0.5]]
+            : [[0.08, -0.4], [0.58, -0.32], [0.1, 0.36], [0.6, 0.42]];
+        PLADS.forEach(function (pl, i) {
+            var x = cx + pl[0] * r - ret * 8 * k, y = cy + pl[1] * r;
+            var uro = Math.sin(i * 2.39 + tid * (0.3 + (i % 3) * 0.12)) * Math.PI;
             var theta = maal + (1 - ret) * uro;
-            if (vaeske === "vand") T.vandMolekyle(ctx, x, y, theta, 1);
-            else if (vaeske === "ethanol") T.ethanolMolekyle(ctx, x, y, theta, 0.85);
-            else T.heptanMolekyle(ctx, x, y, i * 1.3 + tid * 0.4, 0.85);
-        }
+            if (vaeske === "vand") T.vandMolekyle(ctx, x, y, theta, k);
+            else if (vaeske === "ethanol") T.ethanolMolekyle(ctx, x, y, theta, k);
+            else T.heptanMolekyle(ctx, x, y, 0.25 * Math.sin(i * 1.7 + tid * 0.25), k * 0.82);
+        });
         ctx.restore();
 
         ctx.strokeStyle = "#d6eaf8";

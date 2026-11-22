@@ -18,7 +18,6 @@
    traek og polaritet regnes ud af klargoer() nedenfor, saa de ikke kan
    komme i modstrid med atomerne.
 
-   Teksterne til teoriboksen staar nederst.
    ===================================================================== */
 var NK = window.NK || {};
 window.NK = NK;
@@ -381,31 +380,5 @@ window.NK = NK;
         return null;
     };
 
-
-    /* ----- Teoriboksen ------------------------------------------------------ */
-    D.TEORI = [
-        { h: "Elektronegativitet",
-          p: ["Elektronegativitet er et mål for, hvor kraftigt et atom trækker i de fælles elektronpar i sine bindinger.",
-              "Elektronegativiteten stiger mod højre i en periode og opad i en hovedgruppe. Fluor har den største elektronegativitet, 4,0."] },
-
-        { h: "Tre slags bindinger",
-          p: ["<b>ΔEN under 0,5:</b> upolær binding. Atomerne deler elektronparret ligeligt.",
-              "<b>ΔEN fra 0,5 til under 2,0:</b> polær binding. Elektronparret ligger tættest på det mest elektronegative atom, der bliver δ−. Det andet atom bliver δ+.",
-              "<b>ΔEN på 2,0 eller mere:</b> ionbinding. Det ene atom tager elektronerne helt, og der dannes ioner."] },
-
-        { h: "δ+ og δ−",
-          p: ["δ betyder en lille smule. Atomerne i en polær binding har en lille ladning, ikke en hel. Molekylet som helhed er neutralt."] },
-
-        { h: "Polære molekyler",
-          p: ["Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. Molekylet har da en positiv og en negativ ende.",
-              "CO₂ og CCl₄ har polære bindinger, men er symmetriske og derfor upolære."] },
-
-        { h: "Vandstrålen og den ladede stav",
-          p: ["En plastikstav, der gnides med uld, bliver negativ. En glasstav bliver positiv.",
-              "Molekylerne i en polær væske drejer, så den modsat ladede ende vender mod staven, og trækkes hen mod den. Derfor bøjer strålen mod staven, uanset om den er positiv eller negativ.",
-              "Heptan består kun af C og H og er upolært. Molekylerne drejer sig ikke, og strålen løber lige ned."] },
-
-        { h: "Modellerne",
-          p: ["Elektronskyen på fane 1 viser, hvor elektronerne oftest er. Kugle-stang-modellen på fane 2 er ikke målfast. Elektronegativiteterne er Paulings værdier med én decimal."] }
-    ];
+    /* Teorien staar direkte i index.html som et lyst ark (runde T8, 22. nov. 2026). */
 }());

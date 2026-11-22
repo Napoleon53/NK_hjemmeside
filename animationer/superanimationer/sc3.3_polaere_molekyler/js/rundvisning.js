@@ -12,9 +12,10 @@
     var TUR = [
         { sel: ".faneknapper", titel: "Tre faner", tekst: "Fra én binding til hele molekyler og et forsøg, der viser forskellen på polære og upolære væsker." },
 
-        { sel: "#fane-en.aktiv .scene", titel: "Tovtrækningen", tekst: "Elektronparret ligger tættest på det atom, der trækker hårdest. Klik på et atom for at flytte den gule ring." },
-        { sel: "#en-tabel", titel: "Elektronegativitet", tekst: "Tallet i hvert felt er atomets elektronegativitet. Et klik sætter atomet ind i stedet for atomet med den gule ring." },
-        { sel: "#en-binding", titel: "Bindingen", tekst: "Forskellen i elektronegativitet afgør, om bindingen er upolær, polær eller en ionbinding." },
+        { sel: "#en-raekke", titel: "Opgaverne", tekst: "Seks opgaver i rækkefølge. Den næste opgave låses op, når du har løst den, du er ved." },
+        { sel: "#fane-en.aktiv .scene", titel: "Tovtrækningen", tekst: "To atomer deler et elektronpar. Parret ligger tættest på det atom, der trækker hårdest." },
+        { sel: "#en-pt", titel: "Det periodiske system", tekst: "Tallet i hvert felt er atomets elektronegativitet. Når kortet beder om det, sætter et klik atomet ind i stedet for atomet med den gule ring." },
+        { sel: "#en-tavle", titel: "Regnestykket", tekst: "Her står forskellen i elektronegativitet og bindingens slags, når du har fundet dem." },
 
         { sel: "#fane-polaritet.aktiv .scene", titel: "Trækket i bindingerne", tekst: "Pilene peger mod det atom, der trækker hårdest i elektronerne. Træk for at dreje molekylet." },
         { sel: "#pol-en", titel: "Elektronegativitet", tekst: "En binding er polær, når forskellen i elektronegativitet er mindst 0,5." },

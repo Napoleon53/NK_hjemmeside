@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Highscorelisten</title>
+<style>
+body{margin:0;background:#f4f2ec;color:#1d2433;font:16px/1.55 "Lexend","Segoe UI",sans-serif}
+main{max-width:780px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:1.6rem;margin:0 0 6px}h2{font-size:1.2rem;margin:28px 0 8px}
+.lille{color:#4a5160;font-size:.95rem}
+ol li{margin:4px 0}
+.kode{position:relative;background:#1f2430;color:#e7e9ee;border-radius:10px;padding:14px;max-height:260px;overflow:auto;font:13px/1.45 ui-monospace,Consolas,monospace;white-space:pre}
+button{font:inherit;font-weight:600;background:#2a78b0;color:#fff;border:0;border-radius:8px;padding:8px 16px;cursor:pointer;margin:8px 0}
+button.ok{background:#2b7d51}
+.boks{background:#fff;border:1px solid #d9d4c6;border-radius:10px;padding:12px 16px;margin:12px 0}
+b.knap{background:#e8eef5;border-radius:5px;padding:1px 6px;font-weight:600}
+</style></head><body><main>
+<h1>Highscorelisten til samlebåndet</h1>
+<p class="lille">Det tager ca. 10 minutter. Listen virker i spillet, så snart adressen fra trin 3 er sat ind. Indtil da viser spillet kun elevens egen rekord.</p>
+
+<h2>Trin 1. Lav et regneark</h2>
+<ol>
+<li>Gå til <b>sheets.google.com</b> og lav et nyt, tomt regneark.</li>
+<li>Kald det fx <b>Highscore kemiformler.dk</b>. Arket skal være tomt. Scriptet laver selv et faneblad til samlebåndet.</li>
+</ol>
+
+<h2>Trin 2. Sæt scriptet ind</h2>
+<ol>
+<li>I regnearket: <b class="knap">Udvidelser</b> &gt; <b class="knap">Apps Script</b>.</li>
+<li>Slet det, der står i forvejen.</li>
+<li>Klik på <b>Kopiér koden</b> herunder, og sæt den ind (Ctrl+V).</li>
+<li>Gem med Ctrl+S.</li>
+</ol>
+<button id="kopier" type="button">Kopiér koden</button>
+<div class="kode" id="kode">/* =====================================================================
+   Highscorelister til spillene på kemiformler.dk (22. nov. 2026)
+
+   Ét regneark med ét faneblad pr. spil. Første spil er samlebåndet i
+   sc2.3 Kemikalielageret. Skal et nyt spil have en liste, skrives det i
+   SPIL nedenfor med den højeste score, et menneske kan nå, og scriptet
+   udrulles igen (Udrul &gt; Administrer udrulninger &gt; blyant &gt; Ny version).
+
+   Spillet henter listen med  ...exec?spil=sc2.3
+   og sender et resultat som JSON:  { spil, navn, point, niveau, sekunder }
+   ===================================================================== */
+
+const SPIL = {
+  /* Samlebåndet kan højst give ca. 19 100 point, før det umenneskelige
+     niveau er klaret, og et klaret umenneskeligt niveau sendes aldrig. */
+  &#x27;sc2.3&#x27;: { navn: &#x27;Samlebåndet (sc2.3)&#x27;, maks: 20000, pointPrSekund: 120 }
+};
+
+const TIDSZONE = &#x27;Europe/Copenhagen&#x27;;
+const TOP = 10;
+
+function doGet(e) {
+  const spil = String((e &amp;&amp; e.parameter &amp;&amp; e.parameter.spil) || &#x27;&#x27;);
+  if (!SPIL[spil]) return svar_({ fejl: &#x27;ukendt spil&#x27; });
+  return svar_(lister_(spil));
+}
+
+function doPost(e) {
+  let data;
+  try {
+    data = JSON.parse(e.postData.contents);
+  } catch (fejl) {
+    return svar_({ fejl: &#x27;ugyldig&#x27; });
+  }
+  const spil = String(data.spil || &#x27;&#x27;);
+  const regler = SPIL[spil];
+  if (!regler) return svar_({ fejl: &#x27;ukendt spil&#x27; });
+
+  const navn = rensNavn_(data.navn);
+  const point = Math.floor(Number(data.point)) || 0;
+  const niveau = Math.floor(Number(data.niveau)) || 0;
+  const sekunder = Math.floor(Number(data.sekunder)) || 0;
+
+  /* Et resultat, et menneske ikke kan nå, kommer ikke på listen */
+  const muligt = point &gt; 0 &amp;&amp; point &lt;= regler.maks &amp;&amp; point &lt;= regler.pointPrSekund * sekunder + 100;
+  if (!navn || !muligt) return svar_(Object.assign({ ok: false }, lister_(spil)));
+
+  const laas = LockService.getScriptLock();
+  laas.waitLock(10000);
+  try {
+    ark_(spil).appendRow([new Date(), navn, point, niveau, sekunder]);
+  } finally {
+    laas.releaseLock();
+  }
+  return svar_(Object.assign({ ok: true }, lister_(spil)));
+}
+
+/* Top 10 denne uge (fra mandag kl. 0) og alle tider. Hvert navn står
+   kun én gang, med sit bedste resultat. */
+function lister_(spil) {
+  const ark = ark_(spil);
+  const sidste = ark.getLastRow();
+  const raekker = sidste &gt; 1 ? ark.getRange(2, 1, sidste - 1, 3).getValues() : [];
+  const alle = raekker.map(function (r) { return { tid: new Date(r[0]), navn: String(r[1]), point: Number(r[2]) || 0 }; });
+  const mandag = ugensStart_();
+  return {
+    uge: bedste_(alle.filter(function (r) { return r.tid &gt;= mandag; })),
+    alle: bedste_(alle)
+  };
+}
+
+function bedste_(raekker) {
+  const pr = {};
+  raekker.forEach(function (r) {
+    const n = r.navn.toLowerCase();
+    if (!pr[n] || r.point &gt; pr[n].point) pr[n] = r;
+  });
+  return Object.keys(pr).map(function (n) { return pr[n]; })
+    .sort(function (a, b) { return b.point - a.point || a.tid - b.tid; })
+    .slice(0, TOP)
+    .map(function (r) { return { navn: r.navn, point: r.point }; });
+}
+
+function ugensStart_() {
+  const nu = new Date();
+  const dag = Number(Utilities.formatDate(nu, TIDSZONE, &#x27;u&#x27;));          /* 1 = mandag */
+  const dato = Utilities.formatDate(nu, TIDSZONE, &#x27;yyyy-MM-dd&#x27;);
+  const midnat = Utilities.parseDate(dato + &#x27; 00:00:00&#x27;, TIDSZONE, &#x27;yyyy-MM-dd HH:mm:ss&#x27;);
+  return new Date(midnat.getTime() - (dag - 1) * 24 * 60 * 60 * 1000);
+}
+
+/* Navnet: højst 20 tegn, ingen styretegn, og et navn, der begynder med
+   =, +, - eller @, bliver ikke til en formel i regnearket */
+function rensNavn_(navn) {
+  let n = String(navn || &#x27;&#x27;).replace(/[\u0000-\u001f&lt;&gt;]/g, &#x27;&#x27;).replace(/\s+/g, &#x27; &#x27;).trim().substring(0, 20);
+  if (/^[=+\-@]/.test(n)) n = &quot;&#x27;&quot; + n;
+  return n;
+}
+
+function ark_(spil) {
+  const regneark = SpreadsheetApp.getActiveSpreadsheet();
+  const navn = SPIL[spil].navn;
+  let ark = regneark.getSheetByName(navn);
+  if (!ark) ark = regneark.insertSheet(navn);
+  if (ark.getLastRow() === 0) ark.appendRow([&#x27;Tidspunkt&#x27;, &#x27;Navn&#x27;, &#x27;Point&#x27;, &#x27;Niveau&#x27;, &#x27;Sekunder&#x27;]);
+  return ark;
+}
+
+function svar_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+</div>
+
+<h2>Trin 3. Udrul det som webapp</h2>
+<ol>
+<li>Klik <b class="knap">Udrul</b> (Deploy) øverst til højre &gt; <b class="knap">Ny udrulning</b>.</li>
+<li>Klik på tandhjulet ved "Vælg type", og vælg <b>Webapp</b>.</li>
+<li>"Udfør som": <b>Mig</b>. "Hvem har adgang": <b>Alle</b>. Eleverne skal ikke logge ind.</li>
+<li>Klik <b class="knap">Udrul</b>. Første gang spørger Google om lov. Vælg din konto, så <b>Avanceret</b> og <b>Gå til ... (usikker)</b>. Advarslen kommer, fordi scriptet er dit eget og ikke er godkendt af Google.</li>
+<li>Kopiér adressen under "Webapp". Den begynder med <b>https://script.google.com/macros/s/</b> og slutter med <b>/exec</b>.</li>
+</ol>
+
+<h2>Trin 4. Giv Claude adressen</h2>
+<p>Sæt adressen ind i chatten. Så sætter Claude den ind i spillet og tjekker, at listen virker.</p>
+
+<div class="boks">
+<b>Om sikkerheden.</b> Scriptet kan kun læse og skrive i det ene regneark. Det har ikke adgang til resten af dit Google Drev eller din mail. En snedig elev kan sende et falsk resultat uden om spillet, men scriptet afviser resultater, et menneske ikke kan nå. Et dumt navn fjernes ved at slette rækken i regnearket.
+</div>
+<div class="boks">
+<b>Flere spil senere.</b> Scriptet kan holde lister til flere spil i samme regneark. Et nyt spil kræver en linje i scriptet og en ny version: <b class="knap">Udrul</b> &gt; <b class="knap">Administrer udrulninger</b> &gt; blyanten &gt; Version: <b>Ny version</b> &gt; <b class="knap">Udrul</b>. Adressen bliver den samme.
+</div>
+</main>
+<script>
+document.getElementById("kopier").addEventListener("click", function () {
+  var b = this, t = document.getElementById("kode").textContent;
+  function ok() { b.textContent = "Kopieret"; b.className = "ok"; setTimeout(function () { b.textContent = "Kopiér koden"; b.className = ""; }, 2500); }
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(ok, function () { vaelg(); });
+  else vaelg();
+  function vaelg() { var r = document.createRange(); r.selectNodeContents(document.getElementById("kode")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand("copy"); ok(); }
+});
+</script>
+</body></html>

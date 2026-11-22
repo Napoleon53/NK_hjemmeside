@@ -1,27 +1,32 @@
 /* =====================================================================
-   sim_koele.js - fane 2: Koeleskabet
+   sim_koele.js - fane 2: Fast eller flydende? (foer: Koeleskabet)
 
    Et koekken med fire steder: fryseren (-18 °C), koeleskabet (5 °C),
-   koekkenbordet (20 °C) og vindueskarmen i solen (35 °C). Paa bordet
-   staar glas med smoer, kakaosmoer, olivenolie, solsikkeolie og
-   hoerfroeolie, og det fedt, eleven byggede paa fane 1. Et glas kan
-   traekkes hen til et andet sted; fedtet i glasset bliver fast, delvist
-   fast eller flydende (NK.Fedt.fastAndel), og zoomvinduet viser
-   molekylerne i det valgte glas (NK.Proeve): de faste ligger i raekker,
-   de flydende bevaeger sig.
+   koekkenbordet (20 °C) og vindueskarmen i solen (35 °C). Glassene med
+   smoer, olivenolie, solsikkeolie, hoerfroeolie og kakaosmoer kommer paa
+   bordet ét ad gangen, naar en opgave bruger dem. Fedtet i et glas bliver
+   fast, delvist fast eller flydende (NK.Fedt.fastAndel), og vinduet over
+   bordet viser molekylerne i det valgte glas (NK.Proeve): de faste ligger
+   i raekker, de flydende bevaeger sig. Ved siden af vinduet staar
+   varedeklarationen paa et lyst ark; dens farver er kaedernes farver, saa
+   der ikke er en saerskilt forklaring af farverne (REGELSAET 45, 55).
 
-   Opgaverne staar paa papirkortet oeverst i scenen (js/kort.js): gaet
-   foerst (fast, delvist fast eller flydende). Et svar vaelger kun, og
-   Indsend svar sender gaettet; saa flytter glasset derhen og viser
-   svaret, og kortet bliver staaende med forklaringen og Naeste opgave.
-   Til sidst: hvorfor? Giv hint -> Vis svaret (stille knap med gul kant).
-   Til sidst gaar kortets knap videre til fabrikken (fane 1); Start
-   forfra i panelet og R starter forfra. Kemichael roser
-   kun foerste gang.
+   Runde T10 (22. nov. 2026, Niels: "Det lyder godt. Du cooker bare :)"):
+     * Intet panel. Opgaverne (fire fra T10b) i raekken oeverst (js/koele_opgaver.js,
+       D.OPG_KOELE i js/data.js): gaet foerst, traek saa selv glasset derhen.
+     * Under et spoergsmaal kan intet traekkes (et greb faar kortet til at
+       blinke). Under en handling kan kun opgavens glas traekkes, og kun
+       hen til opgavens sted. Glasset har gul ramme og en boble, og stedet
+       lyser gult (REGELSAET 19-21).
+     * Vinduet og varedeklarationen er stiplede pladser, til de bruges
+       (REGELSAET 13). Tilbuddet om praesentationen er vaek (K viser den).
+     * Fri leg (og efter alle opgaverne): alle glas kan flyttes, et klik
+       paa et glas viser dets molekyler, og Dit fedtstof fra fane 1 staar
+       paa bordet.
 
    Paaskeaegget: staar smoerret i solen i 12 sekunder, gaar der tre uger.
    Smoerret bliver harskt (hydrolyse: der dannes smoersyre), og
-   Kemichael kommer med nyt smoer.
+   Kemichael kommer med nyt smoer. Det kan kun ske i den fri leg.
    ===================================================================== */
 (function () {
     "use strict";
@@ -33,7 +38,7 @@
     var Proeve = NK.Proeve;
 
     var NOEGLE = "nk-sc4.6-koele";
-    var SVAR = ["fast", "delvist", "flydende"];
+    var N_MOL = 6;                  /* molekyler i vinduet (runde T10d: kuglemodeller paa faste pladser) */
 
     function SimKoele() {
         this.L = new NK.Laerred(NK.el("koele-laerred"));
@@ -41,22 +46,20 @@
         this.lay = null;
         this.over = null;
         this.traek = null;
+        this.overZone = null;
         /* Ingen kop paa denne fane: der er ikke plads paa bordet */
         this.g = { kaffekop: { skjult: true, iHaand: false } };
+        this.synlig = {};
         this.lagAlleGlas();
         this.valgt = this.glas[0];
-        this.opgNr = 0;
-        this.trin = "gaet";
-        this.hjaelp = 0;
-        this.forkert = [];
-        this.gaettet = null;
         this.harskVent = 0;
         this.harskTekst = 0;
-        this.bygPanel();
+        this.e = { skort: NK.el("koele-skort"), boble: NK.el("koele-boble"), dekl: NK.el("koele-dekl") };
         this.bygTilbud();
         this.koblMus();
         if (this.laererStart) this.laererStart();
-        this.visOpgave();
+        this.opgaver = new NK.KoeleOpgaver(this, D.OPG_KOELE);
+        this.opgaver.start();
     }
 
     var P = SimKoele.prototype;
@@ -64,17 +67,28 @@
     /* ----- Glassene -------------------------------------------------------------------- */
     P.lagAlleGlas = function () {
         var mig = this;
-        this.glas = D.FEDT.map(function (f, i) { return mig.nytGlas(f, i); });
-        this.glas.push(this.nytGlas(this.ditFedt(), D.FEDT.length));
+        this.glas = D.FEDT.map(function (f) { return mig.nytGlas(f); });
+        this.glas.push(this.nytGlas(this.ditFedt()));
     };
 
-    P.nytGlas = function (fedt, plads) {
-        return {
-            id: fedt.id, fedt: fedt, sted: "bord", plads: plads,
-            x: 0, y: 0, placeret: false, vinkel: 0, fastVis: -1,
-            proeve: fedt.tom ? null : new Proeve(fedt, 20, 10),
+    /* Proeven i vinduet (NK.Proeve i js/fedt.js) */
+    function nyProeve(fedt, T) { return new Proeve(fedt, T, N_MOL); }
+
+    P.nytGlas = function (fedt) {
+        var gl = {
+            id: fedt.id, fedt: fedt, sted: "bord", plads: 0,
+            x: 0, y: 0, placeret: false, vinkel: 0, fastVis: -1, alfa: 0,
+            proeve: fedt.tom ? null : nyProeve(fedt, 20),
             solTid: 0, harsk: false
         };
+        gl.plads = this.hjem(gl);
+        return gl;
+    };
+
+    /* Glassets faste plads paa bordet: i den raekkefoelge, de kommer frem */
+    P.hjem = function (gl) {
+        var i = D.BORD_ORDEN.indexOf(gl.id);
+        return i < 0 ? 0 : i;
     };
 
     /* Fedtet fra fane 1 som et fedt paa linje med de rigtige */
@@ -98,9 +112,9 @@
         if (nu === foer) return;
         var f = this.ditFedt();
         gl.fedt = f;
-        gl.proeve = f.tom ? null : new Proeve(f, D.sted(gl.sted).T, 10);
+        gl.proeve = f.tom ? null : nyProeve(f, D.sted(gl.sted).T);
         gl.fastVis = -1;
-        if (!f.tom) this.vaelg(gl);
+        if (!f.tom && this.fri()) this.vaelg(gl);
     };
 
     P.glasMedId = function (id) {
@@ -115,26 +129,114 @@
         this.visDeklaration();
     };
 
+    /* ----- Det, opgaverne bruger (D.OPG_KOELE) ------------------------------------ */
+    /* Glassene staar, hvor opgaven siger. Glas, der ikke er naevnt, er
+       ikke paa bordet endnu. Et nyt glas kommer frem paa sin plads. */
+    P.scene = function (steder, valgtId) {
+        var mig = this, taelle = {};
+        this.traek = null;
+        this.overZone = null;
+        this.glas.forEach(function (gl) {
+            var sted = steder[gl.id], foer = !!mig.synlig[gl.id];
+            if (gl.harsk) mig.nytSmoer(gl);
+            gl.solTid = 0;
+            if (!sted) {
+                mig.synlig[gl.id] = false;
+                gl.sted = "bord";
+                gl.plads = mig.hjem(gl);
+                if (gl.proeve) gl.proeve.T = 20;
+                return;
+            }
+            mig.synlig[gl.id] = true;
+            gl.sted = sted;
+            if (sted === "bord") gl.plads = mig.hjem(gl);
+            else { gl.plads = taelle[sted] || 0; taelle[sted] = gl.plads + 1; }
+            if (gl.proeve) gl.proeve.T = D.sted(sted).T;
+            if (!foer) {
+                gl.alfa = 0;
+                gl.fastVis = -1;
+                gl.vinkel = 0;
+                if (mig.lay) { var p = mig.pladsPos(gl); gl.x = p.x; gl.y = p.y; gl.placeret = true; }
+            }
+        });
+        this.vaelg(this.glasMedId(valgtId));
+    };
+
+    /* Staar glasset paa stedet (og er det sluppet og naaet frem)? */
+    P.staar = function (id, sted) {
+        var gl = this.glasMedId(id);
+        if (!gl || gl.sted !== sted || !this.synlig[id]) return false;
+        if (this.traek && this.traek.gl === gl) return false;
+        if (!this.lay) return true;
+        var p = this.pladsPos(gl);
+        return Math.abs(gl.x - p.x) < 6 && Math.abs(gl.y - p.y) < 6;
+    };
+
+    P.flytTil = function (id, sted) {
+        var gl = this.glasMedId(id);
+        if (gl && gl.sted !== sted) this.flyt(gl, sted);
+        this.vaelg(gl);
+    };
+
+    P.fri = function () { return !!this.opgaver && this.opgaver.erFri(); };
+    P.maa = function (hvad) { return !this.opgaver || this.opgaver.tillad(hvad); };
+    P.skjult = function (del) { return !!this.opgaver && this.opgaver.skjult(del); };
+
+    /* Fri leg (eller alle opgaverne er loest): alle glas er fremme */
+    P.friStart = function () {
+        var mig = this;
+        this.glas.forEach(function (gl) {
+            if (!mig.synlig[gl.id]) {
+                mig.synlig[gl.id] = true;
+                gl.alfa = 0;
+                gl.fastVis = -1;
+                gl.sted = "bord";
+                var i = mig.ledigPlads("bord", gl, mig.hjem(gl));
+                gl.plads = i < 0 ? mig.hjem(gl) : i;
+                if (gl.proeve) gl.proeve.T = 20;
+                if (mig.lay) { var p = mig.pladsPos(gl); gl.x = p.x; gl.y = p.y; }
+            }
+        });
+    };
+
+    /* Alle opgaverne er loest: Kemichael roser (kun foerste gang) */
+    P.alleLoest = function () {
+        if (NK.hent(NOEGLE, {}).rost) return;
+        NK.gem(NOEGLE, { loest: true, rost: true });
+        this.ventRos = 0.8;
+    };
+
     /* ----- Layout ------------------------------------------------------------------------ */
+    /* Kortets faste plads under raekken (REGELSAET 4): mindst D.ZONE.koele */
+    P.kortZone = function () {
+        var e = this.e.skort, b = D.ZONE.koele[window.innerHeight <= 720 ? 1 : 0];
+        var h = e && e.offsetParent ? e.offsetHeight : 0;
+        var top = e && e.offsetParent ? e.offsetTop : 46;
+        return top + Math.max(b, h) + 8;
+    };
+
     P.layout = function () {
         var W = this.L.b, H = this.L.h, lay = { W: W, H: H };
-        var kant = NK.klamp(W * 0.014, 8, 16);
+        /* Paa en stor skaerm staar koekkenet samlet i midten (REGELSAET 32) */
+        var ox = Math.max(0, Math.round((W - 1560) / 2)), Wc = W - 2 * ox;
+        lay.ox = ox;
+        var kant = NK.klamp(Wc * 0.014, 8, 16);
         lay.kant = kant;
-        lay.bordY = Math.round(H * 0.85);
+        lay.bordY = Math.round(H * 0.87);
         var gh = NK.klamp(H * 0.13, 56, 86);
         lay.gh = gh;
         /* Koeleskabet staar paa gulvet til venstre */
-        var zone = this.sk ? this.kortZone() : 10;
+        var zone = this.kortZone();
         lay.zone = zone;
-        var fh = Math.min(H - zone - 4, W * 0.24 * 520 / 220);
-        lay.K = Tg.koeleskabMaal(kant, H - 1 - 4 * fh / 520, fh);
+        var fh = Math.min(H - zone - 4, Wc * 0.24 * 520 / 220);
+        lay.K = Tg.koeleskabMaal(ox + kant, H - 1 - 4 * fh / 520, fh);
         var K = lay.K;
         /* Vinduet til hoejre, med karmen et stykke over bordet */
-        var vb = NK.klamp(W * 0.21, 140, 250);
+        var vb = NK.klamp(Wc * 0.19, 140, 250);
         var karmY = lay.bordY - Math.max(gh + 48, H * 0.2);
         var vs = vb / 240;
         if (karmY - 306 * vs < zone) { vs = (karmY - zone) / 306; vb = 240 * vs; }
-        lay.V = Tg.vindueMaal(W - kant - vb, karmY, vb);
+        lay.V = Tg.vindueMaal(ox + Wc - kant - vb, karmY, vb);
         var V = lay.V;
         /* Pladserne */
         var mig = this;
@@ -144,9 +246,13 @@
             return ud;
         }
         lay.pladser = {
-            fryser: raekke(K.rumV + 6, K.rumH - 6, K.fryserGulv, 2),
-            koele: raekke(K.rumV + 6, K.rumH - 6, K.koeleGulv, 2),
-            bord: raekke(K.x + K.b + 16, W - kant - 8, lay.bordY, 6),
+            /* Antallet af pladser staar i D.STEDER (koeleskabet har tre fra
+               runde T10b; foer stod der 2 her, saa det tredje glas landede
+               oven i det andet: Niels' fejl "solsikken vil gerne staa oven i
+               olivenolien", T10e) */
+            fryser: raekke(K.rumV + 6, K.rumH - 6, K.fryserGulv, D.sted("fryser").plads),
+            koele: raekke(K.rumV + 6, K.rumH - 6, K.koeleGulv, D.sted("koele").plads),
+            bord: raekke(K.x + K.b + 16, ox + Wc - kant - 8, lay.bordY, 6),
             sol: raekke(V.karmV + 16, V.karmH - 16, V.karmY, 2)
         };
         /* Glassene maa ikke vaere hoejere end rummene i skabet */
@@ -157,22 +263,41 @@
             fryser: { x: K.rumV, y: K.fryserTop, b: K.rumH - K.rumV, h: K.fryserGulv - K.fryserTop + 8 },
             koele: { x: K.rumV, y: K.koeleTop, b: K.rumH - K.rumV, h: K.koeleGulv - K.koeleTop + 8 },
             sol: { x: V.x, y: V.top, b: V.b, h: V.karmY - V.top + 10 },
-            bord: { x: K.x + K.b + 4, y: lay.bordY - lay.gh - 20, b: W - K.x - K.b - kant, h: lay.gh + 34 }
+            bord: { x: K.x + K.b + 4, y: lay.bordY - lay.gh - 20, b: ox + Wc - K.x - K.b - kant, h: lay.gh + 34 }
         };
-        /* Zoomvinduet over bordet, mellem skabet og vinduet */
+        /* Vinduet med molekylerne og varedeklarationen samlet over bordet,
+           mellem skabet og vinduet. Er der ikke plads ved siden af, staar
+           varedeklarationen under vinduet. */
         var zx0 = K.x + K.b + 24, zx1 = V.x - 24;
-        var zy0 = zone + 24, zy1 = lay.bordY - lay.gh - 44;
-        var zb = Math.min(zx1 - zx0, (zy1 - zy0) * 36 / 34);
-        var zh = zb * 34 / 36;
-        lay.zoom = { x: Math.round(zx0 + (zx1 - zx0 - zb) / 2), y: Math.round(zy0 + (zy1 - zy0 - zh) / 2), b: Math.round(zb), h: Math.round(zh) };
+        var zy0 = zone + 24, zy1 = lay.bordY - lay.gh - 34;
+        var bred = zx1 - zx0, hoej = zy1 - zy0;
+        var db = Math.round(NK.klamp(Wc * 0.16, 232, 252)), mel = 18;
+        var zb, zh, z = {};
+        /* Vinduet har proevens form (NK.Proeve.W x H, bredere end hoejt fra T10b) */
+        var PW = Proeve.W, PH = Proeve.H;
+        if (bred >= 220 + db + mel) {
+            zb = Math.min(hoej * PW / PH, bred - db - mel, 660);
+            zh = zb * PH / PW;
+            var gx = zx0 + (bred - zb - mel - db) / 2;
+            z = { x: Math.round(gx), y: Math.round(zy0 + (hoej - zh) / 2), b: Math.round(zb), h: Math.round(zh) };
+            lay.dekl = { x: z.x + z.b + mel, y: z.y, b: db, under: false };
+        } else {
+            var dh = 58;
+            zb = Math.min((hoej - dh - 10) * PW / PH, bred);
+            zh = zb * PH / PW;
+            z = { x: Math.round(zx0 + (bred - zb) / 2), y: Math.round(zy0 + (hoej - dh - 10 - zh) / 2), b: Math.round(zb), h: Math.round(zh) };
+            lay.dekl = { x: z.x, y: z.y + z.h + 10, b: z.b, under: true };
+        }
+        lay.zoom = z;
         lay.kop = { x: -200, y: lay.bordY };
         this.lay = lay;
         this.glas.forEach(function (gl) { if (!gl.placeret) { var p = mig.pladsPos(gl); gl.x = p.x; gl.y = p.y; gl.placeret = true; } });
         this.saetAnker("koele-anker-skab", K.x, K.top, K.b, K.h);
         this.saetAnker("koele-anker-vindue", V.x, V.top, V.b, V.karmY - V.top + 12);
-        var z = lay.zoom;
-        this.saetAnker("koele-anker-zoom", z.x, z.y - 24, z.b, z.h + 44);
-        this.saetAnker("koele-anker-bord", K.x + K.b + 8, lay.bordY - lay.gh - 10, W - K.x - K.b - kant - 8, lay.gh + 44);
+        this.saetAnker("koele-anker-zoom", z.x, z.y - 24, z.b, z.h + 30);
+        this.saetAnker("koele-anker-bord", K.x + K.b + 8, lay.bordY - lay.gh - 10, ox + Wc - K.x - K.b - kant - 8, lay.gh + 44);
+        this.placerDekl();
+        if (this.opgaver) this.opgaver.visRaekke();
     };
 
     P.saetAnker = function (id, x, y, b, h) {
@@ -182,6 +307,16 @@
         e.style.top = Math.round(y) + "px";
         e.style.width = Math.round(b) + "px";
         e.style.height = Math.round(h) + "px";
+    };
+
+    P.placerDekl = function () {
+        var d = this.lay.dekl, e = this.e.dekl;
+        e.style.left = Math.round(d.x) + "px";
+        e.style.top = Math.round(d.y) + "px";
+        e.style.width = Math.round(d.b) + "px";
+        /* Arket er saa hoejt som teksten; den stiplede plads har samme hoejde */
+        e.style.minHeight = d.under ? "" : "168px";
+        e.classList.toggle("vandret", !!d.under);
     };
 
     P.tilpas = function () {
@@ -202,9 +337,11 @@
     };
 
     /* ----- At flytte glas ------------------------------------------------------------------ */
-    P.ledigPlads = function (sted, undtagen) {
-        var n = D.sted(sted).plads, optaget = [];
-        this.glas.forEach(function (g) { if (g !== undtagen && g.sted === sted) optaget.push(g.plads); });
+    /* Den foerste ledige plads (helst oenske) blandt de synlige glas */
+    P.ledigPlads = function (sted, undtagen, oenske) {
+        var mig = this, n = D.sted(sted).plads, optaget = [];
+        this.glas.forEach(function (g) { if (g !== undtagen && mig.synlig[g.id] && g.sted === sted) optaget.push(g.plads); });
+        if (oenske !== undefined && oenske < n && optaget.indexOf(oenske) < 0) return oenske;
         for (var i = 0; i < n; i++) if (optaget.indexOf(i) < 0) return i;
         return -1;
     };
@@ -212,12 +349,12 @@
     /* Saet glasset et sted. Er der fuldt, bytter det plads med det
        glas, der staar naermest. */
     P.flyt = function (gl, sted, x) {
-        var fraSted = gl.sted, fraPlads = gl.plads;
-        var i = this.ledigPlads(sted, gl);
+        var mig = this, fraSted = gl.sted, fraPlads = gl.plads;
+        var i = this.ledigPlads(sted, gl, sted === "bord" ? this.hjem(gl) : undefined);
         if (i < 0) {
-            var mig = this, bedst = null;
+            var bedst = null;
             this.glas.forEach(function (g) {
-                if (g === gl || g.sted !== sted) return;
+                if (g === gl || !mig.synlig[g.id] || g.sted !== sted) return;
                 var d = Math.abs(mig.pladsPos(g).x - (x === undefined ? 0 : x));
                 if (!bedst || d < bedst.d) bedst = { g: g, d: d };
             });
@@ -233,168 +370,11 @@
         if (sted !== "sol") gl.solTid = 0;
         if (gl.proeve) gl.proeve.T = D.sted(sted).T;
         this.vaelg(gl);
-        if (fraSted !== sted) this.efterFlyt(gl);
     };
 
-    /* Har eleven selv sat opgavens glas paa opgavens sted? */
-    P.efterFlyt = function (gl) {
-        var o = this.opgave();
-        if (!o || this.trin !== "gaet") return;
-        if (gl.id === o.fedt && gl.sted === o.sted) this.afslor(null, true);
-    };
-
-    /* ----- Opgaverne ------------------------------------------------------------------------ */
-    P.opgave = function () {
-        return this.opgNr < D.KOELE_OPGAVER.length ? D.KOELE_OPGAVER[this.opgNr] : null;
-    };
-
-    P.nyOpgave = function () {
-        var o = this.opgave();
-        this.trin = o ? "gaet" : "hvorfor";
-        this.hjaelp = 0;
-        this.gaettet = null;
-        this.valgtSvar = null;
-        this.forkert = [];
-        this.selv = false;
-        this.besked("", "");
-        if (o) {
-            var gl = this.glasMedId(o.fedt);
-            /* Staar glasset allerede der, kommer det hjem paa bordet */
-            if (gl.sted === o.sted) {
-                var i = this.ledigPlads("bord", gl);
-                if (i < 0) i = 0;
-                gl.sted = "bord";
-                gl.plads = i;
-                gl.proeve.T = 20;
-            }
-            this.vaelg(gl);
-        } else {
-            this.vaelg(this.glasMedId("smoer"));
-        }
-        this.visOpgave();
-    };
-
-    /* Et svar paa kortet vaelger kun; Indsend svar sender det */
-    P.vaelgSvar = function (v) {
-        if (this.trin === "gaet") this.valgtSvar = v;
-        else if (this.trin === "hvorfor") {
-            var k = parseInt(v, 10);
-            if (this.forkert.indexOf(k) >= 0) return;
-            this.valgtSvar = k;
-            if (this.beskedKlasse === "skidt") this.besked("", "");
-        } else return;
-        this.visOpgave();
-    };
-
-    P.indsend = function () {
-        if (this.valgtSvar === null || this.valgtSvar === undefined) { this.sk.blink(); return; }
-        if (this.trin === "gaet") this.gaet(this.valgtSvar);
-        else if (this.trin === "hvorfor") this.svarHvorfor(this.valgtSvar);
-    };
-
-    P.gaet = function (svar) {
-        if (this.trin !== "gaet") return;
-        this.gaettet = svar;
-        if (this.afvisTilbud) this.afvisTilbud();
-        this.afslor(svar);
-    };
-
-    /* Glasset flytter derhen, og svaret vises */
-    P.afslor = function (svar, selv) {
-        var o = this.opgave(), gl = this.glasMedId(o.fedt);
-        if (gl.sted !== o.sted) this.flyt(gl, o.sted);
-        this.vaelg(gl);
-        this.trin = "set";
-        this.selv = !!selv;
-        this.besked("", "");
-        this.visOpgave();
-    };
-
-    /* Forklaringen, mens kortet bliver paa gaettet */
-    P.efterTekst = function () {
-        var o = this.opgave(), svar = this.gaettet;
-        var hvor = NK.html(D.fedt(o.fedt).Navn + " " + D.sted(o.sted).i + ": " + D.TILSTANDE[o.svar].navn + ".");
-        if (svar === null) return { t: "<b>" + hvor + "</b> " + NK.html(o.efter), slags: this.selv ? "god" : "svar" };
-        if (svar === o.svar) return { t: "<b>Rigtigt.</b> " + hvor + " " + NK.html(o.efter), slags: "god" };
-        return { t: "Du gættede " + NK.html(D.TILSTANDE[svar].navn) + ". " + hvor + " " + NK.html(o.efter), slags: "nej" };
-    };
-
-    P.svarHvorfor = function (k) {
-        if (this.trin !== "hvorfor") return;
-        var v = D.KOELE_HVORFOR.valg[k];
-        if (v.rigtig) {
-            this.trin = "faerdig";
-            this.hvorforVist = this.hjaelp === 2;
-            this.hjaelp = 0;
-            this.valgtSvar = k;
-            this.besked("", "");
-            /* Rosen kommer kun foerste gang */
-            if (!NK.hent(NOEGLE, {}).rost) this.ventRos = 0.8;
-            NK.gem(NOEGLE, { loest: true, rost: true });
-        } else {
-            if (this.forkert.indexOf(k) < 0) this.forkert.push(k);
-            this.valgtSvar = null;
-            this.besked("<b>Ikke rigtigt.</b> " + NK.html(v.svar), "skidt");
-        }
-        this.visOpgave();
-    };
-
-    /* Naeste (staar paa kortet, hvor Indsend svar stod) */
-    P.videre = function () {
-        if (this.trin === "set") {
-            this.opgNr++;
-            this.nyOpgave();
-            return;
-        }
-        if (this.trin === "faerdig") {
-            /* Videre til fabrikken: byg et fedt og proev det her */
-            var fane = document.querySelector('[data-fane="fane-fabrik"]');
-            if (fane) fane.click();
-        }
-    };
-
-    /* Giv hint -> Vis svaret (stille knap med gul kant) */
-    P.hint = function () {
-        if (this.trin !== "gaet" && this.trin !== "hvorfor") return;
-        var o = this.opgave();
-        if (this.hjaelp === 0) {
-            this.hjaelp = 1;
-            this.besked("<b>Hint:</b> " + NK.html(o ? o.hint : D.KOELE_HVORFOR.hint), "gul");
-            this.visOpgave();
-            return;
-        }
-        this.hjaelp = 2;
-        if (this.trin === "gaet") { this.gaettet = null; this.afslor(null); }
-        else {
-            for (var k = 0; k < D.KOELE_HVORFOR.valg.length; k++) {
-                if (D.KOELE_HVORFOR.valg[k].rigtig) { this.svarHvorfor(k); break; }
-            }
-        }
-    };
-
-    /* Den gamle ene knap (selvtesten): Naeste, ellers hint */
-    P.knap = function () {
-        if (this.trin === "set" || this.trin === "faerdig") this.videre();
-        else this.hint();
-    };
-
-    P.nulstil = function () {
-        var mig = this;
-        this.glas.forEach(function (gl, i) {
-            gl.sted = "bord";
-            gl.plads = i;
-            gl.solTid = 0;
-            if (gl.harsk) mig.nytSmoer(gl);
-            if (gl.proeve) gl.proeve.T = 20;
-        });
-        this.opgNr = 0;
-        this.nyOpgave();
-    };
-
-    P.enter = function () {
-        if (this.trin === "set" || this.trin === "faerdig") this.videre();
-        else this.indsend();
-    };
+    /* ----- Knapper og taster -------------------------------------------------------------- */
+    P.nulstil = function () { this.opgaver.forfra(); };
+    P.enter = function () { this.opgaver.enter(); };
 
     P.tast = function (tast) {
         if (tast === "p" || tast === "P") {
@@ -410,7 +390,7 @@
         gl.proeve.bliverHarsk();
         this.harskTekst = 3.2;
         this.vaelg(gl);
-        this.besked("<b>Tre uger senere.</b> Vand har spaltet noget af fedtet, og der er dannet smørsyre. Smørret er harskt.", "");
+        this.opgaver.friBesked("Tre uger senere. Vand har spaltet noget af fedtet, og der er dannet smørsyre. Smørret er harskt.");
         if (this.laererHarsk) this.laererHarsk(gl);
         else this.harskVent = 4;
     };
@@ -420,132 +400,67 @@
         gl = gl || this.glasMedId("smoer");
         gl.harsk = false;
         gl.solTid = 0;
-        gl.proeve = new Proeve(gl.fedt, 20, 10);
+        gl.proeve = nyProeve(gl.fedt, 20);
         gl.fastVis = -1;
-        var i = this.ledigPlads("bord", gl);
+        var i = this.ledigPlads("bord", gl, this.hjem(gl));
         gl.sted = "bord";
-        gl.plads = i < 0 ? 0 : i;
+        gl.plads = i < 0 ? this.hjem(gl) : i;
         this.vaelg(gl);
     };
 
-    /* ----- Panelet ---------------------------------------------------------------------------- */
-    P.bygPanel = function () {
-        var mig = this;
-        this.sk = new NK.SceneKort("koele", {
-            valg: function (v) { mig.vaelgSvar(v); },
-            hint: function () { mig.hint(); },
-            indsend: function () { mig.indsend(); },
-            videre: function () { mig.videre(); }
-        });
-        this.noteTxt = "";
-        this.noteTid = 0;
-        this.valgtSvar = null;
-        NK.el("koele-forfra").addEventListener("click", function () { mig.nulstil(); });
-        this.visDeklaration();
-    };
-
-    /* klasse "": en kort besked fra scenen (notelinjen i nogle sekunder);
-       "gul" (hint), "skidt" (forkert) og tom tekst: kortets nederste raekke */
-    P.besked = function (html, klasse) {
-        if (!klasse && html) {
-            this.noteTxt = html;
-            this.noteTid = 7;
-            this.visStatus();
-            return;
+    /* ----- Varedeklarationen paa det lyse ark ---------------------------------------------- */
+    /* En lille zigzag-kaede med 0, 1 eller 2 dobbeltbindinger (svg), tegnet
+       som kaederne i vinduet: lys kaede og turkise dobbeltbindinger (T10c) */
+    function kaedeSvg(antalDb) {
+        var dbVed = antalDb === 0 ? [] : (antalDb === 1 ? [3] : [2, 5]);
+        var x = 2, y = 13, ret = 0, op = true, L = 5, pkt = [{ x: x, y: y }];
+        for (var i = 0; i < 8; i++) {
+            var v = ret + (op ? -0.52 : 0.52);
+            x += L * Math.cos(v);
+            y += L * Math.sin(v);
+            pkt.push({ x: x, y: y });
+            op = !op;
+            if (dbVed.indexOf(i) >= 0) ret += 0.45;
         }
-        this.beskedKlasse = klasse;
-        if (this.sk) this.sk.besked(html, klasse);
-    };
-
-    P.beskedTekst = function () {
-        var t = this.sk.blivAaben() ? this.sk.blivTekst() : this.sk.beskedTekst();
-        return t + " " + (this.sk.noteEl.textContent || "");
-    };
-
-    P.kortZone = function () { return this.sk.zone(D.ZONE.koele); };
-
-    P.visOpgave = function () {
-        var o = this.opgave(), mig = this;
-        var antal = D.KOELE_OPGAVER.length + 1;
-        var chip = "Opgave " + Math.min(antal, this.opgNr + 1) + " af " + antal;
-        if (this.trin === "gaet" || this.trin === "set") {
-            var f = D.fedt(o.fedt), st = D.sted(o.sted);
-            this.sk.vis({ kl: "spm", chip: chip,
-                tekst: NK.html("Er " + f.navn + " fast, delvist fast eller flydende " + st.i + " ved " + D.gradTekst(st.T) + "?"),
-                laast: this.trin === "set",
-                svar: SVAR.map(function (s) {
-                    var set = mig.trin === "set";
-                    return { j: s, t: Tg.tilstandSvg(s) + NK.html(D.TILSTANDE[s].Navn),
-                        valgt: !set && mig.valgtSvar === s,
-                        rigtig: set && s === o.svar && mig.gaettet !== null,
-                        svarVist: set && s === o.svar && mig.gaettet === null,
-                        forkert: set && s === mig.gaettet && s !== o.svar };
-                }) });
-        } else if (this.trin === "hvorfor" || this.trin === "faerdig") {
-            var faerdig = this.trin === "faerdig";
-            this.sk.vis({ kl: "spm", chip: chip, tekst: NK.html(D.KOELE_HVORFOR.spm), laast: faerdig,
-                svar: D.KOELE_HVORFOR.valg.map(function (v, k) {
-                    return { j: k, t: NK.html(v.t), valgt: !faerdig && mig.valgtSvar === k,
-                        rigtig: faerdig && v.rigtig && !mig.hvorforVist, svarVist: faerdig && v.rigtig && mig.hvorforVist,
-                        forkert: mig.forkert.indexOf(k) >= 0 };
-                }) });
+        function linje(a, b, farve, b2) {
+            return '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1) + '" y2="' + b.y.toFixed(1) +
+                '" stroke="' + farve + '" stroke-width="' + b2 + '" stroke-linecap="round"/>';
         }
-        if (this.trin === "set") {
-            var e = this.efterTekst();
-            this.sk.bliv(e.t, null, this.opgNr + 1 >= D.KOELE_OPGAVER.length ? "Til hvorfor" : "Næste opgave", e.slags);
-        } else if (this.trin === "faerdig") {
-            var rigtig = D.KOELE_HVORFOR.valg.filter(function (v) { return v.rigtig; })[0];
-            this.sk.bliv("<b>Rigtigt.</b> " + NK.html(rigtig.svar), null, "Byg dit eget fedt", this.hvorforVist ? "svar" : "god");
-        } else {
-            this.sk.bliv(null);
-            var klar = this.valgtSvar !== null && this.valgtSvar !== undefined;
-            this.sk.knapper({ hint: this.hjaelp === 0 ? "Giv hint" : "Vis svaret", indsend: true, klar: klar });
+        var h = '<svg class="dekl-kaede" viewBox="0 0 44 26" aria-hidden="true">';
+        for (var k = 0; k < pkt.length - 1; k++) {
+            var erDb = dbVed.indexOf(k) >= 0;
+            h += linje(pkt[k], pkt[k + 1], erDb ? Tg.DB_FARVE : "#5d6474", erDb ? 2.4 : 1.8);
+            if (erDb) {
+                var a = pkt[k], c = pkt[k + 1], dx = c.x - a.x, dy = c.y - a.y, l = Math.sqrt(dx * dx + dy * dy);
+                var nx = -dy / l * 2.6, ny = dx / l * 2.6;
+                h += linje({ x: a.x + dx * 0.15 + nx, y: a.y + dy * 0.15 + ny }, { x: c.x - dx * 0.15 + nx, y: c.y - dy * 0.15 + ny }, Tg.DB_FARVE, 2.4);
+            }
         }
-    };
+        return h + "</svg>";
+    }
 
-    /* Varedeklarationen for det valgte glas */
     P.visDeklaration = function () {
-        var gl = this.valgt;
-        if (!gl) return;
-        var f = gl.fedt;
-        NK.saetTekst("koele-dekl-navn", f.Navn);
-        if (f.tom) { NK.saetHTML("koele-dekl", '<p class="note">Byg et fedtstof på fane 1.</p>'); return; }
-        var t = D.typer(f.andel);
-        var rk = [
-            { navn: "Mættede", v: t.maettede, farve: D.syre("S").farve },
-            { navn: "Monoumættede", v: t.enkelt, farve: D.syre("O").farve },
-            { navn: "Polyumættede", v: t.fler, farve: D.syre("L").farve }
-        ];
-        var bar = '<div class="deklbar">' + rk.map(function (r) {
-            return r.v > 0 ? '<span style="width:' + r.v.toFixed(1) + "%;background:" + r.farve + '"></span>' : "";
-        }).join("") + "</div>";
-        var linjer = rk.map(function (r) {
-            return '<div class="talraekke"><span><span class="kaedeprik" style="background:' + r.farve + '"></span>' + r.navn +
-                ' fedtsyrer</span><span class="tal">' + Math.round(r.v) + " %</span></div>";
-        }).join("");
-        var smp = f.kaeder ? '<div class="talraekke"><span>Smeltepunkt</span><span class="tal gul">' + NK.html(F.smpTekst(f.kaeder)) + "</span></div>" : "";
-        NK.saetHTML("koele-dekl", bar + linjer + smp);
-    };
-
-    P.visStatus = function () {
-        var t, tr = this.traek;
-        if (this.harskTekst > 0) t = "<b>Tre uger senere …</b> Smørret har stået i solen.";
-        else if (tr && tr.flyttet) {
-            var z = this.overZone;
-            t = z ? "Slip: " + NK.html(D.sted(z).i) + ", " + D.gradTekst(D.sted(z).T) + "." :
-                "Sæt glasset i fryseren, i køleskabet, på bordet eller i solen.";
-        } else if (this.trin === "gaet") {
-            var o = this.opgave();
-            t = "Gæt på kortet, eller sæt " + NK.html(D.fedt(o.fedt).navn) + " " + NK.html(D.sted(o.sted).i) + " og se selv.";
-        } else if (this.valgt && !this.valgt.fedt.tom) {
-            var gl = this.valgt, st = D.sted(gl.sted);
-            t = NK.html(gl.fedt.Navn) + " " + NK.html(st.i) + ": <b>" + NK.html(D.TILSTANDE[D.tilstand(this.fastMaal(gl))].navn) + "</b>. Træk glasset et andet sted hen.";
-        } else t = "Træk et glas hen et andet sted.";
-        if (this.noteTid > 0 && !(tr && tr.flyttet) && !(this.harskTekst > 0)) t = this.noteTxt;
-        /* Kortet holdes lavt: ingen linje med naeste skridt, mens et hint
-           eller et forkert svar staar paa kortet, eller under hvorfor */
-        else if (!tr && !(this.harskTekst > 0) && (this.trin === "hvorfor" || this.beskedKlasse === "gul" || this.beskedKlasse === "skidt")) t = "";
-        this.sk.note(t);
+        var gl = this.valgt, e = this.e.dekl;
+        if (!gl || !e) return;
+        var f = gl.fedt, h;
+        if (f.tom) h = '<p class="dekl-tom">Byg et fedtstof på fane 1.</p>';
+        else {
+            var t = D.typer(f.andel);
+            var rk = [
+                { navn: "Mættede", v: t.maettede, svg: kaedeSvg(0) },
+                { navn: "Monoumættede", v: t.enkelt, svg: kaedeSvg(1) },
+                { navn: "Polyumættede", v: t.fler, svg: kaedeSvg(2) }
+            ];
+            h = '<p class="dekl-titel">Varedeklaration</p><p class="dekl-navn">Fedtsyrer i ' + NK.html(f.navn) + "</p>" +
+                rk.map(function (r) {
+                    return '<div class="dekl-raekke">' + r.svg + '<span class="dekl-type">' + r.navn + '</span><span class="dekl-tal">' +
+                        Math.round(r.v) + " %</span></div>";
+                }).join("");
+            if (f.kaeder) h += '<div class="dekl-raekke dekl-smp"><span class="dekl-type">Smeltepunkt</span><span class="dekl-tal">' +
+                NK.html(F.smpTekst(f.kaeder)) + "</span></div>";
+        }
+        h += '<p class="dekl-plads-tekst">Varedeklarationen</p>';
+        if (this._deklSidst !== h) { e.innerHTML = h; this._deklSidst = h; }
     };
 
     P.fastMaal = function (gl) {
@@ -558,6 +473,7 @@
         this.tid += dt;
         var mig = this;
         this.glas.forEach(function (gl) {
+            gl.alfa = NK.mod(gl.alfa, mig.synlig[gl.id] ? 1 : 0, 5, dt);
             if (mig.traek && mig.traek.gl === gl && mig.traek.flyttet) {
                 gl.vinkel = NK.mod(gl.vinkel, NK.klamp(mig.traek.vx * 0.0012, -0.35, 0.35), 8, dt);
             } else {
@@ -569,8 +485,8 @@
             /* Fedtet smelter eller stivner i loebet af et sekund eller to */
             var maal = mig.fastMaal(gl);
             gl.fastVis = gl.fastVis < 0 ? maal : NK.mod(gl.fastVis, maal, 1.6, dt);
-            /* Smoerret i solen (paaskeaegget) */
-            if (gl.id === "smoer" && gl.sted === "sol" && !gl.harsk && !(mig.traek && mig.traek.gl === gl)) {
+            /* Smoerret i solen (paaskeaegget, kun i den fri leg) */
+            if (gl.id === "smoer" && gl.sted === "sol" && !gl.harsk && mig.fri() && !(mig.traek && mig.traek.gl === gl)) {
                 gl.solTid += dt;
                 if (gl.solTid >= D.HARSK_TID) mig.bliverHarsk(gl);
             }
@@ -578,7 +494,6 @@
         if (this.traek) this.traek.vx *= Math.exp(-dt * 6);
         if (this.valgt && this.valgt.proeve) this.valgt.proeve.opdater(dt);
         if (this.harskTekst > 0) this.harskTekst -= dt;
-        if (this.noteTid > 0) this.noteTid -= dt;
         if (this.harskVent > 0) {
             this.harskVent -= dt;
             if (this.harskVent <= 0) this.nytSmoer();
@@ -587,9 +502,16 @@
             this.ventRos -= dt;
             if (this.ventRos <= 0 && this.laererFaerdig) this.laererFaerdig();
         }
+        this.opgaver.opdater(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         this.opdaterIntro(dt);
-        this.visStatus();
+    };
+
+    /* Handlingen, kortet beder om lige nu (glas og sted), eller null */
+    P.handling = function () {
+        var t = this.opgaver.trin();
+        if (!t || t.type !== "handling" || this.opgaver.tilstand !== "trin") return null;
+        return t;
     };
 
     P.tegn = function () {
@@ -601,20 +523,26 @@
         Tg.vindue(ctx, V, this.tid);
         Tg.koeleskab(ctx, K);
 
-        /* Zonerne lyser, mens et glas holdes over dem */
-        if (tr && tr.flyttet && this.overZone) Tg.zone(ctx, lay.zoner[this.overZone], 1, this.tid);
+        /* Stedet, handlingen gaar ud paa, lyser hele tiden; ellers lyser
+           det sted, et glas holdes over */
+        var h = this.handling(), maalSted = h && !h.maal(this) ? h.sted : null;
+        var lysZ = tr && tr.flyttet ? this.overZone : null;
+        if (maalSted) Tg.zone(ctx, lay.zoner[maalSted], 1, this.tid);
+        else if (lysZ) Tg.zone(ctx, lay.zoner[lysZ], 1, this.tid);
 
         /* Skiltene ved stederne */
         var px = NK.klamp(lay.H * 0.021, 12, 14);
-        var lysZ = tr && tr.flyttet ? this.overZone : null;
-        Tg.stedSkilt(ctx, (K.rumV + K.rumH) / 2, K.fryserTop + px * 1.5, D.sted("fryser"), { px: px, lys: lysZ === "fryser" });
-        Tg.stedSkilt(ctx, (K.rumV + K.rumH) / 2, K.koeleTop + px * 2.4, D.sted("koele"), { px: px, lys: lysZ === "koele" });
-        Tg.stedSkilt(ctx, (V.x + V.b / 2), V.top + px * 2.2, D.sted("sol"), { px: px, lys: lysZ === "sol" });
-        Tg.stedSkilt(ctx, K.x + K.b + 16, lay.bordY + px * 2.9 + 16, D.sted("bord"), { px: px, lys: lysZ === "bord", justering: "left" });
+        function lys(id) { return lysZ === id || maalSted === id; }
+        Tg.stedSkilt(ctx, (K.rumV + K.rumH) / 2, K.fryserTop + px * 1.5, D.sted("fryser"), { px: px, lys: lys("fryser") });
+        Tg.stedSkilt(ctx, (K.rumV + K.rumH) / 2, K.koeleTop + px * 2.4, D.sted("koele"), { px: px, lys: lys("koele") });
+        Tg.stedSkilt(ctx, (V.x + V.b / 2), V.top + px * 2.2, D.sted("sol"), { px: px, lys: lys("sol") });
+        Tg.stedSkilt(ctx, K.x + K.b + 16, lay.bordY + px * 2.9 + 16, D.sted("bord"), { px: px, lys: lys("bord"), justering: "left" });
 
-        /* Zoomvinduet med linjerne ned til det valgte glas */
+        /* Vinduet med molekylerne (en stiplet plads, til det bruges) */
         var gl = this.valgt, z = lay.zoom;
-        if (gl && gl.proeve) {
+        if (this.skjult("zoom")) {
+            Tg.stipletPlads(ctx, z, "Molekylerne i glasset");
+        } else if (gl && gl.proeve && this.synlig[gl.id]) {
             var G = this.glasMaal(gl);
             Tg.zoomLinjer(ctx, { x: G.venstre, y: G.top, b: G.b, h: G.h }, z);
             var tilst = D.tilstand(gl.fastVis);
@@ -622,16 +550,23 @@
                 titel: gl.fedt.Navn + (gl.harsk ? " (harskt)" : ""),
                 tilstand: tilst, T: D.sted(gl.sted).T
             });
-            Tg.farveForklaring(ctx, z.x, z.y + z.h + NK.klamp(lay.H * 0.022, 12, 16), z.b, { px: 12, smoersyre: gl.harsk });
         }
+        var dk = this.skjult("dekl");
+        if (this.e.dekl.classList.contains("plads") !== dk) this.e.dekl.classList.toggle("plads", dk);
 
         /* Glassene: det, der holdes, til sidst */
-        var o = this.opgave(), puls = 0.5 + 0.5 * Math.sin(this.tid * 5);
+        var opf = this.opgaver.opfordring(), opfGlas = opf ? opf.el.replace(/^glas:/, "") : null;
+        var puls = 0.5 + 0.5 * Math.sin(this.tid * 5), boble = null;
         this.glas.forEach(function (g) {
-            if (tr && tr.gl === g && tr.flyttet) return;
-            mig.tegnGlas(ctx, g, o && mig.trin === "gaet" && g.id === o.fedt ? puls : 0);
+            if (g.alfa < 0.01 || (tr && tr.gl === g && tr.flyttet)) return;
+            mig.tegnGlas(ctx, g, g.id === opfGlas ? 0.35 + 0.65 * puls : 0);
+            if (g.id === opfGlas) {
+                var M = mig.glasMaal(g);
+                boble = { x: M.x, y: M.top - 12, tekst: opf.tekst };
+            }
         });
         if (tr && tr.flyttet) this.tegnGlas(ctx, tr.gl, 0);
+        this.visBoble(boble);
 
         /* Kaffekoppen er der ikke plads til her */
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -639,14 +574,30 @@
 
     P.tegnGlas = function (ctx, gl, puls) {
         var G = this.glasMaal(gl), f = gl.fedt;
-        var over = this.over && this.over.slags === "glas" && this.over.gl === gl;
+        var over = this.fri() && this.over && this.over.slags === "glas" && this.over.gl === gl;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(gl.alfa, 0, 1);
         Tg.glas(ctx, G, {
             tom: !!f.tom, fast: gl.fastVis, farve: f.farve, laag: f.laag, vinkel: gl.vinkel,
-            lys: over ? 1 : (puls || (this.valgt === gl ? 0.25 : 0)), harsk: gl.harsk, tid: this.tid,
+            lys: over ? 1 : (puls || (this.valgt === gl && this.fri() ? 0.25 : 0)), harsk: gl.harsk, tid: this.tid,
             alfa: f.tom ? 0.55 : 1
         });
-        var rk = this.lay.pladser.bord, bredde = rk.length > 1 ? rk[1].x - rk[0].x - 6 : 200;
-        Tg.glasNavn(ctx, G, f.Navn, { farve: this.valgt === gl ? "#f2c53d" : undefined, bredde: bredde, delt: f.delt });
+        /* Navnet deles paa to linjer, hvis det er bredere end pladsen */
+        var rk = this.lay.pladser[gl.sted] || this.lay.pladser.bord, bredde = rk.length > 1 ? rk[1].x - rk[0].x - 6 : 200;
+        Tg.glasNavn(ctx, G, f.Navn, { farve: this.valgt === gl && !this.skjult("zoom") ? "#f2c53d" : undefined, bredde: bredde, delt: f.delt });
+        ctx.restore();
+    };
+
+    /* Boblen med pil over det glas, eleven skal traekke (REGELSAET 20) */
+    P.visBoble = function (b) {
+        var e = this.e.boble;
+        if (!b || !b.tekst) { if (!e.hidden) e.hidden = true; return; }
+        if (e.textContent !== b.tekst) e.textContent = b.tekst;
+        e.hidden = false;
+        var halv = e.offsetWidth / 2 + 6, x = NK.klamp(b.x, halv, Math.max(halv, this.lay.W - halv));
+        e.style.left = Math.round(x) + "px";
+        e.style.top = Math.round(b.y) + "px";
+        e.style.setProperty("--pil", Math.round(NK.klamp(b.x - x, -halv + 14, halv - 14)) + "px");
     };
 
     /* ----- Musen -------------------------------------------------------------------------------- */
@@ -656,6 +607,7 @@
         if (this.laererUnder && this.laererUnder(pt.x, pt.y)) return { slags: "laerer" };
         for (var i = this.glas.length - 1; i >= 0; i--) {
             var gl = this.glas[i], G = this.glasMaal(gl);
+            if (!this.synlig[gl.id]) continue;
             if (pt.x >= G.venstre - 4 && pt.x <= G.venstre + G.b + 4 && pt.y >= G.top - 4 && pt.y <= G.bund + 22) return { slags: "glas", gl: gl };
         }
         var z = lay.zoom;
@@ -672,6 +624,12 @@
         return null;
     };
 
+    /* En kort besked i den fri leg om glasset */
+    P.omGlasset = function (gl) {
+        var st = D.sted(gl.sted);
+        return gl.fedt.Navn + " " + st.i + " ved " + D.gradTekst(st.T) + " er " + D.TILSTANDE[D.tilstand(this.fastMaal(gl))].navn + ".";
+    };
+
     P.koblMus = function () {
         var mig = this, c = this.L.canvas;
         c.addEventListener("pointerdown", function (e) {
@@ -681,10 +639,13 @@
             if (!u) return;
             if (u.slags === "laerer") { if (mig.laererKlik) mig.laererKlik(pt.x, pt.y); return; }
             if (u.slags === "zoom") {
-                mig.besked("Hver kæde er en fedtsyre i sin farve. Molekylerne i fast fedt ligger stille i rækker, og molekylerne i flydende fedt bevæger sig.", "");
+                if (mig.fri()) mig.opgaver.friBesked("Hver kæde er en fedtsyre i sin farve. Molekylerne i fast fedt ligger stille i rækker, og molekylerne i flydende fedt bevæger sig.");
                 return;
             }
             if (u.slags === "glas") {
+                var hvad = "glas:" + u.gl.id;
+                /* Under et spoergsmaal er scenen laast: kortet blinker */
+                if (!mig.maa(hvad)) { mig.opgaver.spaer(); return; }
                 mig.traek = { gl: u.gl, x0: pt.x, y0: pt.y, dx: u.gl.x - pt.x, dy: u.gl.y - pt.y, flyttet: false, vx: 0, px: pt.x };
                 try { c.setPointerCapture(e.pointerId); } catch (x) { /* ikke vigtigt */ }
             }
@@ -692,7 +653,11 @@
         c.addEventListener("pointermove", function (e) {
             var pt = mig.L.punkt(e), tr = mig.traek;
             if (tr) {
-                if (Math.abs(pt.x - tr.x0) + Math.abs(pt.y - tr.y0) > 6) tr.flyttet = true;
+                if (!tr.flyttet && Math.abs(pt.x - tr.x0) + Math.abs(pt.y - tr.y0) > 6) {
+                    tr.flyttet = true;
+                    /* Boblen forsvinder ved foerste traek (REGELSAET 19) */
+                    if (!mig.fri()) mig.opgaver.brug("glas:" + tr.gl.id);
+                }
                 if (tr.flyttet) {
                     tr.vx = tr.vx * 0.6 + (pt.x - tr.px) * 30 * 0.4;
                     tr.px = pt.x;
@@ -704,8 +669,9 @@
                 return;
             }
             mig.over = mig.hvadErUnder(pt);
-            var s = mig.over && mig.over.slags;
-            c.style.cursor = s === "glas" ? "grab" : (s ? "pointer" : "default");
+            var s = mig.over && mig.over.slags, kan = false;
+            if (s === "glas") kan = mig.maa("glas:" + mig.over.gl.id);
+            c.style.cursor = s === "glas" && kan ? "grab" : (s === "laerer" || (s === "zoom" && mig.fri()) ? "pointer" : "default");
         });
         c.addEventListener("pointerleave", function () { if (!mig.traek) { mig.over = null; c.style.cursor = "default"; } });
         function slip() {
@@ -715,13 +681,24 @@
             var gl = tr.gl, zone = mig.overZone;
             mig.overZone = null;
             if (!tr.flyttet) {
-                if (gl.fedt.tom) { mig.besked("Glasset er tomt. Byg et fedtstof på fane 1, så står det her.", ""); return; }
+                if (!mig.fri()) return;
+                if (gl.fedt.tom) { mig.opgaver.friBesked("Glasset er tomt. Byg et fedtstof på fane 1, så står det her."); return; }
                 mig.vaelg(gl);
-                var st = D.sted(gl.sted);
-                mig.besked(NK.html(gl.fedt.Navn) + " " + NK.html(st.i) + ", " + D.gradTekst(st.T) + ". Zoomvinduet viser molekylerne.", "");
+                mig.opgaver.friBesked(mig.omGlasset(gl) + " Vinduet viser molekylerne.");
                 return;
             }
-            if (zone) mig.flyt(gl, zone, gl.x);
+            if (mig.fri()) {
+                if (zone) {
+                    mig.flyt(gl, zone, gl.x);
+                    if (!gl.fedt.tom) mig.opgaver.friBesked(mig.omGlasset(gl));
+                }
+                return;
+            }
+            /* I en opgave kan glasset kun saettes paa opgavens sted. Ellers
+               glider det tilbage, og boblen kommer igen. */
+            var h = mig.handling();
+            if (h && zone === h.sted && gl.id === h.glas) mig.flyt(gl, zone, gl.x);
+            else if (h) delete mig.opgaver.brugt[h.el];
         }
         c.addEventListener("pointerup", slip);
         c.addEventListener("pointercancel", slip);
@@ -729,6 +706,12 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
     NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-koele", tilbud: "koele-tilbud" });
+    /* Intet tilbud paa fane 2 (22. nov. 2026, T10): kun K viser praesentationen */
+    P.startIntro = function (tving) {
+        if (!this.laererIntro || !tving) return;
+        NK.gem("nk-sc4.6-intro-koele", true);
+        if (!(this.laererIIntro && this.laererIIntro())) this.introVent = 0.1;
+    };
 
     NK.SimKoele = SimKoele;
 }());

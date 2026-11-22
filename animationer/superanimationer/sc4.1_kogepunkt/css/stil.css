@@ -793,3 +793,153 @@ canvas.par-laerred {
 /* Tilbuddet om Kemichaels praesentation staar nederst i scenen, saa det
    ikke daekker kortet */
 .tilbud { top: auto; bottom: 16px; }
+
+/* =====================================================================
+   Fane 1 uden panel (runde T9, 22. nov. 2026, REGELSAET 2-3)
+   Moenster: ../sc3.3_polaere_molekyler (T8). Decimaltal med PUNKTUM.
+   ===================================================================== */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-varm .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap[hidden] { display: none; }
+
+/* Kortet staar under raekken, mellem hylden og kurven (pladsen saettes af
+   sim_varm.js, saa scenen aldrig hopper: REGELSAET 4) */
+#fane-varm .scenekort { top: 46px; }
+
+/* Kurven paa et lyst papir (REGELSAET 29) */
+.kurve-ark {
+    position: absolute;
+    z-index: 2;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #f7f5ef;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.kurve-ark .kurve { display: block; width: 100%; height: 100%; }
+.kurve-plads { display: none; }
+.kurve-ark.plads {
+    background: none;
+    box-shadow: none;
+    border: 2px dashed #3b3f4c;
+}
+.kurve-ark.plads .kurve { visibility: hidden; }
+.kurve-ark.plads .kurve-plads {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    text-align: center;
+    color: #6a707b;
+    font-size: 14px;
+}
+
+/* Klik-opfordringen: gul boble med pil (REGELSAET 20) */
+.varm-boble {
+    position: absolute;
+    z-index: 7;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background-color: var(--gul);
+    color: #1d2433;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.varm-boble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: calc(50% + var(--pil, 0px));
+    margin-left: -7px;
+    border: 7px solid transparent;
+    border-top-color: var(--gul);
+}
+.varm-boble.venstre { transform: translate(-100%, -50%); }
+.varm-boble.venstre::after { top: 50%; left: 100%; margin-left: 0; margin-top: -7px; border-top-color: transparent; border-left-color: var(--gul); }
+.varm-boble.under { transform: translate(-50%, 0); }
+.varm-boble.under::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--gul); }
+.varm-boble[hidden] { display: none; }
+
+/* Det roede kryds paa kortet i fri leg (som sc3.3, Niels 22. nov. 2026) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-start { padding-right: 28px; }

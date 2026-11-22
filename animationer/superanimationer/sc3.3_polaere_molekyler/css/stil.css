@@ -285,7 +285,7 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .bindingsraekke {
     display: grid;
-    grid-template-columns: 62px minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 8px;
     background-color: rgba(255, 255, 255, 0.045);
@@ -648,3 +648,238 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gul); outli
 .sk-videre { cursor: pointer; font-family: inherit; white-space: nowrap; }
 
 .opgave-nr { margin: 0; font-size: 0.88rem; color: var(--tekst-svag); }
+
+/* =====================================================================
+   FANE 1 UDEN PANEL (runde T8, 22. nov. 2026, REGELSAET 2-3, 13, 19-20,
+   27-30): opgaveraekken oeverst, kortet under den, det periodiske system
+   til venstre og tavlen paa et lyst papir til hoejre. Pladserne saettes
+   af js/sim_en.js.
+   ===================================================================== */
+[hidden] { display: none !important; }
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-en .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen (moenster: sc2.1 og sc5.7) */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+
+/* Kortet staar under raekken */
+#fane-en .scenekort { top: 46px; }
+@media (max-height: 720px) {
+    #fane-en .opgaverad { top: 6px; }
+    #fane-en .scenekort { top: 42px; }
+}
+
+/* Feltet i kortet, hvor eleven skriver ΔEN */
+html body.papirkort.papirkort .scenekort .sk-felt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 9px;
+    font-size: 1.05rem;
+}
+html body.papirkort.papirkort .scenekort .sk-felt-pre { font-weight: 500; color: #1d2433; }
+html body.papirkort.papirkort .scenekort .sk-felt-in {
+    width: 6em;
+    padding: 5px 9px;
+    border: 1.5px solid #c9c3b3;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1d2433;
+    font-family: inherit;
+    font-size: 1rem;
+}
+html body.papirkort.papirkort .scenekort .sk-felt-in:focus { outline: none; border-color: #2a76ac; box-shadow: 0 0 0 2px rgba(42, 118, 172, 0.2); }
+html body.papirkort.papirkort .scenekort .sk-felt-in.fejl { border-color: #c4493c; }
+html body.papirkort.papirkort .scenekort .sk-felt-in:disabled { background-color: #f3f1ea; color: #1f5a3a; }
+
+/* Det periodiske system i scenen */
+.en-pt {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+    padding: 10px 10px 8px;
+    border: 1px solid #343440;
+    border-radius: 12px;
+    background-color: rgba(30, 30, 38, 0.92);
+}
+.en-pt-titel { margin: 0 0 8px; color: #c8ced6; font-size: 14px; font-weight: 500; text-align: center; }
+.en-pt-note { margin: 8px 0 0; color: #9aa1ab; font-size: 13.5px; font-weight: 400; line-height: 1.35; text-align: center; }
+.en-pt .pt { gap: 5px; }
+.en-pt .pt-symbol { font-size: 17px; font-weight: 600; }
+.en-pt .pt-en { font-size: 13.5px; font-weight: 400; }
+.en-pt .pt-felt.tom { font-size: 13.5px; }
+.en-plads { display: none; }
+/* Skjult: en stiplet plads med navnet, saa intet hopper (REGELSAET 13) */
+.en-pt.plads { border: 1.5px dashed rgba(255, 255, 255, 0.22); background: none; }
+.en-pt.plads > :not(.en-plads) { visibility: hidden; }
+.en-pt.plads .en-plads {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c838d;
+    font-size: 15px;
+}
+/* Tabellen som figur at aflaese: ingen knapform, intet hover (REGELSAET 19a) */
+.en-pt.laast .pt-felt { cursor: default; }
+.en-pt.laast .pt-felt:hover, .en-pt.laast .pt-felt:active { transform: none; box-shadow: none; }
+.en-pt.laast .pt-felt.valgt { box-shadow: 0 0 0 3px var(--gul); }
+.en-pt .pt-felt.spaerret { opacity: 0.35; cursor: default; }
+
+/* Klik-opfordringen: gul ramme og en boble (REGELSAET 19-20) */
+.en-pt .opfordring {
+    outline: 3px solid var(--gul);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 7px rgba(242, 197, 61, 0.18);
+    opacity: 1;
+}
+.en-pt .pt.opfordring { border-radius: 6px; }
+.en-boble {
+    position: absolute;
+    z-index: 7;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background-color: var(--gul);
+    color: #1d2433;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.en-boble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -7px;
+    border: 7px solid transparent;
+    border-top-color: var(--gul);
+}
+
+/* Tavlen: regnestykket paa et lyst papir, linje for linje (REGELSAET 27-29) */
+.en-tavle {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+    padding: 12px 14px 12px;
+    border: 1px solid #d9d4c6;
+    border-radius: 12px;
+    background-color: #fbfaf6;
+    color: #1d2433;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    font-weight: 400;
+}
+.en-tavle.plads { min-height: 120px; border: 1.5px dashed rgba(255, 255, 255, 0.22); background: none; box-shadow: none; }
+.tv-plads { display: flex; align-items: center; justify-content: center; min-height: 94px; color: #7c838d; font-size: 15px; }
+.tv-hoved { padding-bottom: 7px; border-bottom: 1px solid #e4dfd2; color: #1d2433; font-size: 16px; font-weight: 500; }
+.tv-linje { margin-top: 9px; padding: 6px 8px; border: 2px solid transparent; border-radius: 8px; }
+.tv-linje.spm { border-color: #e0b22e; background-color: #fff8e3; }
+.tv-navn { color: #4a5160; font-size: 13.5px; }
+.tv-regn { margin-top: 2px; color: #1d2433; font-size: 15.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tv-type { font-weight: 500; }
+.tv-type.upolaer { color: #23784a; }
+.tv-type.polaer { color: #b0620f; }
+.tv-type.ion { color: #b33a2e; }
+
+/* Teorien: tabellen over de tre slags bindinger */
+html body .overlay-boks.teori-ark { max-height: calc(100vh - 40px); overflow-y: auto; }
+.teori-tabel { width: 100%; margin: 4px 0 12px; border-collapse: collapse; font-size: 0.86rem; line-height: 1.45; }
+.teori-tabel th { padding: 4px 8px; border-bottom: 1px solid #d9d4c6; color: #1d2433; font-weight: 500; text-align: left; }
+.teori-tabel td { padding: 5px 8px; border-bottom: 1px solid #ece8dd; color: #2d3443; font-weight: 350; vertical-align: top; }
+
+/* Fane 2: elektronegativiteterne som figur, beregningerne foldet sammen
+   (Niels 22. nov. 2026) */
+.pol-pt { margin-bottom: 10px; }
+.pol-pt .pt-felt { cursor: default; }
+.pol-pt .pt-felt:hover, .pol-pt .pt-felt:active { transform: none; box-shadow: none; }
+.pol-pt .pt-felt.valgt { box-shadow: 0 0 0 3px var(--gul); }
+.pol-regn { margin-bottom: 6px; }
+.pol-regn summary { cursor: pointer; color: var(--tekst-svag); font-size: 0.88rem; padding: 3px 0 6px; }
+.pol-regn summary:hover { color: var(--tekst); }
+.pol-regn[open] summary { margin-bottom: 4px; }
+
+/* Mission og fri leg (Niels 22. nov. 2026, REGELSAET 57): under opgaverne
+   er det, eleven ikke kan vaelge, skjult i stedet for laast. */
+.fane.mission .kun-fri { display: none; }
+.knap.frileg { width: 100%; justify-content: center; margin-top: 6px; background: none; border: 1px solid var(--linje); color: var(--tekst-svag); }
+.knap.frileg:hover { border-color: #6a6a7a; color: var(--tekst); }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+
+/* Det roede kryds paa kortet i fri leg (Niels 22. nov. 2026) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-start { padding-right: 28px; }

@@ -810,8 +810,7 @@ html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
 
 .sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
 
-/* Start forfra paa fane 2 staar i panelet, aldrig paa kortet */
-#koele-forfra { margin-top: 10px; }
+/* (Start forfra paa fane 2 staar fra runde T10 i raekken oeverst) */
 
 /* Tilbuddet om praesentationen staar nederst, saa det ikke daekker kortet */
 .tilbud { top: auto; bottom: 16px; }
@@ -826,3 +825,199 @@ html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
 @media (max-width: 860px) {
     .scene { height: 78vh; min-height: 600px; }
 }
+
+
+/* =====================================================================
+   Fane 2 uden panel (runde T10, 22. nov. 2026, REGELSAET 2-3)
+   Moenster: ../sc4.1_kogepunkt (T9). Decimaltal med PUNKTUM.
+   ===================================================================== */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-koele .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap[hidden] { display: none; }
+
+/* Kortet staar under raekken (pladsen er D.ZONE.koele, REGELSAET 4) */
+#fane-koele .scenekort { top: 46px; }
+.scenekort[hidden] { display: none; }
+.sk-chip { white-space: nowrap; }
+.sk-videre { font-family: inherit; white-space: nowrap; cursor: pointer; }
+.sk-bund[hidden] { display: none; }
+.sk-bund .st-tekst[hidden] { display: none; }
+.sk-bund .knap[hidden] { display: none; }
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-bund .st-tekst:not([hidden]) + .knap { margin-left: 0; }
+
+/* Klik-opfordringen: gul boble med pil (REGELSAET 20) */
+.koele-boble {
+    position: absolute;
+    z-index: 7;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background-color: var(--gul);
+    color: #1d2433;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.koele-boble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: calc(50% + var(--pil, 0px));
+    margin-left: -7px;
+    border: 7px solid transparent;
+    border-top-color: var(--gul);
+}
+.koele-boble.venstre { transform: translate(-100%, -50%); }
+.koele-boble.venstre::after { top: 50%; left: 100%; margin-left: 0; margin-top: -7px; border-top-color: transparent; border-left-color: var(--gul); }
+.koele-boble.under { transform: translate(-50%, 0); }
+.koele-boble.under::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--gul); }
+.koele-boble[hidden] { display: none; }
+
+/* Det roede kryds paa kortet i fri leg (som sc3.3 og sc4.1, Niels 22. nov. 2026) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-start { padding-right: 28px; }
+
+/* Varedeklarationen paa et lyst ark ved siden af vinduet med molekylerne
+   (REGELSAET 29, 45, 55). Farverne er kaedernes farver. */
+.dekl-ark {
+    position: absolute;
+    z-index: 2;
+    box-sizing: border-box;
+    padding: 12px 14px 12px;
+    border-radius: 10px;
+    background-color: #f7f5ef;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    font-size: 14px;
+    line-height: 1.3;
+}
+.dekl-ark p { margin: 0; }
+.dekl-titel { font-weight: 500; font-size: 15px; }
+.dekl-navn { margin-top: 2px !important; margin-bottom: 10px !important; color: #5d6474; font-size: 13px; }
+.dekl-raekke {
+    display: grid;
+    grid-template-columns: 42px max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    border-top: 1px solid #e2ddd0;
+}
+.dekl-kaede { width: 42px; height: 25px; display: block; }
+.dekl-type { white-space: nowrap; }
+.dekl-tal { justify-self: end; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dekl-smp { grid-template-columns: max-content minmax(0, 1fr); }
+.dekl-tom { color: #5d6474; }
+.dekl-plads-tekst { display: none; }
+.dekl-ark.plads {
+    background: none;
+    box-shadow: none;
+    border: 2px dashed #3b3f4c;
+}
+.dekl-ark.plads > * { visibility: hidden; }
+.dekl-ark.plads .dekl-plads-tekst {
+    display: flex;
+    visibility: visible;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    color: #6a707b;
+    font-size: 15px;
+}
+/* Lav scene: arket under vinduet, raekkerne ved siden af hinanden */
+.dekl-ark.vandret { padding: 6px 10px; font-size: 12.5px; }
+.dekl-ark.vandret .dekl-titel { display: none; }
+.dekl-ark.vandret .dekl-navn { display: none; }
+.dekl-ark.vandret { display: flex; flex-wrap: wrap; gap: 0 12px; }
+.dekl-ark.vandret .dekl-raekke { border-top: none; padding: 2px 0; grid-template-columns: 32px auto auto; }
+.dekl-ark.vandret .dekl-kaede { width: 32px; height: 19px; }
+
+/* Tabellen i teorien paa det lyse ark */
+html body .overlay-boks.teori-ark .teori-tabel { width: 100%; margin: 4px 0 12px; border-collapse: collapse; font-size: 0.9rem; }
+html body .overlay-boks.teori-ark .teori-tabel th,
+html body .overlay-boks.teori-ark .teori-tabel td { padding: 5px 8px; border-bottom: 1px solid #e2ddd0; text-align: left; color: #1d2433; font-weight: 400; }
+html body .overlay-boks.teori-ark .teori-tabel th { color: #5d6474; font-weight: 500; }
+html body .overlay-boks.teori-ark svg.formel { margin: 2px 0 12px; }
+
+/* Raekken med syv titler: er der ikke plads, kun nummeret ved de andre */
+.or-opgaver.kompakt .or-knap:not(.valgt) .or-navn { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) { padding: 0 6px 0 4px; }

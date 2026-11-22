@@ -417,80 +417,74 @@
 
     /* ----- Zoomvinduet med fedtmolekylerne -------------------------------------------
        r: { x, y, b, h } i pixels. Proeven har W x H enheder. */
-    function tegnMolekyle(ctx, m, s, ox, oy, lw) {
-        var ryst = m.fast ? Math.sin(m.fase * 2.3) * 0.05 : 0;
-        ctx.save();
-        ctx.translate(ox + (m.x + ryst) * s, oy + (m.y + ryst * 0.6) * s);
-        ctx.rotate(m.a);
-        ctx.scale(m.retning, 1);
-        var f = m.form;
-        if (f.glycerol) {
-            /* Glycerol: en lodret streg med de tre (eller to) C-atomer */
-            var ys = f.kaeder.map(function (k) { return k.y0 * s; });
-            var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
-            if (f.n < 3) y1 = y0 + 2 * F.G * s;
-            ctx.strokeStyle = "#dfe6ee";
-            ctx.lineWidth = lw * 1.5;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(0, y0);
-            ctx.lineTo(0, y1);
-            ctx.stroke();
-            f.kaeder.forEach(function (k) {
-                ctx.strokeStyle = "#aeb8c4";
-                ctx.lineWidth = lw;
-                ctx.beginPath();
-                ctx.moveTo(0, k.y0 * s);
-                ctx.lineTo(1.7 * s, k.y0 * s);
-                ctx.stroke();
-                ctx.fillStyle = T.O_FARVE;
-                ctx.beginPath();
-                ctx.arc(0.85 * s, k.y0 * s, Math.max(1.6, s * 0.2), 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-        f.kaeder.forEach(function (k) {
-            var syre = D.syre(k.id);
-            var farve = syre ? syre.farve : "#b5c24a";
-            var pkt = k.pkt.map(function (p) { return { x: p.x * s, y: p.y * s }; });
-            T.kaede(ctx, pkt, k.dobbelt, farve, lw, Math.max(1.6, s * 0.2));
-            if (!f.glycerol) {
-                /* Fri syre: COOH-enden som en roed prik */
-                ctx.fillStyle = T.O_FARVE;
-                ctx.beginPath();
-                ctx.arc(pkt[0].x, pkt[0].y, Math.max(2, s * 0.28), 0, Math.PI * 2);
-                ctx.fill();
-            }
-        });
-        ctx.restore();
+    /* Turkis for dobbeltbindinger som i Kemibogen (varedeklarationens kaeder) */
+    T.DB_FARVE = "#1f9a8a";
+
+    /* ----- Vinduet med kuglemodellerne (runde T10d) --------------------------------
+       Kuglerne har bogens farveforloeb med lys oppe fra venstre
+       (KUGLE_GRAD i Kemibogen/vaerktoej/lav_figurer.py: cx 0,36, cy 0,3,
+       r 0,78) og en tynd moerk kant. Hver kugle tegnes én gang pr. stoerrelse
+       paa et lille laerred og kopieres derfra. */
+    var KUGLE = {
+        C: ["#a3adb8", "#5b6573", "#2c3540", "#1c232b"],
+        Cdb: ["#9fe0d2", "#1f9a8a", "#0b5c54", "#0a4a44"],
+        H: ["#ffffff", "#e4e9eb", "#aab5b9", "#7d8a8e"],
+        O: ["#ffc9bd", "#ef6f58", "#bf3923", "#8f2a1b"]
+    };
+    var kugleCache = {};
+    function kugleBillede(g, r) {
+        var dpr = Math.min(3, window.devicePixelRatio || 1);
+        var noegle = g + "|" + Math.round(r * 4) + "|" + dpr;
+        if (kugleCache[noegle]) return kugleCache[noegle];
+        var side = Math.ceil(2 * r + 3), c = document.createElement("canvas");
+        c.width = Math.ceil(side * dpr);
+        c.height = Math.ceil(side * dpr);
+        var k = c.getContext("2d");
+        k.scale(dpr, dpr);
+        var cx = side / 2, cy = side / 2, f = KUGLE[g] || KUGLE.C;
+        var gr = k.createRadialGradient(cx - r + 0.72 * r, cy - r + 0.6 * r, 0, cx - r + 0.72 * r, cy - r + 0.6 * r, 1.56 * r);
+        gr.addColorStop(0, f[0]);
+        gr.addColorStop(0.5, f[1]);
+        gr.addColorStop(1, f[2]);
+        k.beginPath();
+        k.arc(cx, cy, r, 0, Math.PI * 2);
+        k.fillStyle = gr;
+        k.fill();
+        k.lineWidth = Math.max(0.6, r * 0.12);
+        k.strokeStyle = f[3];
+        k.stroke();
+        var ud = { c: c, side: side };
+        kugleCache[noegle] = ud;
+        return ud;
     }
 
     T.zoomKasse = function (ctx, r, P, v) {
         v = v || {};
         var s = r.b / P.W, ox = r.x, oy = r.y;
         ctx.save();
-        ctx.fillStyle = "#0e0f14";
+        /* Et lyst kort som bogens figur */
+        var bg = ctx.createLinearGradient(0, r.y, 0, r.y + r.h);
+        bg.addColorStop(0, "#fbfdfe");
+        bg.addColorStop(1, "#eaf1f6");
         NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 10);
+        ctx.fillStyle = bg;
         ctx.fill();
         ctx.save();
         NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 10);
         ctx.clip();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
-        ctx.lineWidth = 1;
-        for (var gx = r.x + s * 3; gx < r.x + r.b; gx += s * 3) {
-            ctx.beginPath();
-            ctx.moveTo(Math.round(gx) + 0.5, r.y);
-            ctx.lineTo(Math.round(gx) + 0.5, r.y + r.h);
-            ctx.stroke();
+        /* De faste foerst, saa de loese ligger oven paa */
+        function tegnM(m) {
+            P.kuglerI(m).forEach(function (q) {
+                var R = q.r * s, b = kugleBillede(q.g, R);
+                ctx.drawImage(b.c, ox + q.x * s - b.side / 2, oy + q.y * s - b.side / 2, b.side, b.side);
+            });
         }
-        var lw = NK.klamp(s * 0.19, 1.4, 2.6);
-        /* De faste foerst, saa de flydende svoemmer henover */
-        P.mol.forEach(function (m) { if (m.fast) tegnMolekyle(ctx, m, s, ox, oy, lw); });
-        P.mol.forEach(function (m) { if (!m.fast) tegnMolekyle(ctx, m, s, ox, oy, lw); });
+        P.mol.forEach(function (m) { if (m.fast) tegnM(m); });
+        P.mol.forEach(function (m) { if (!m.fast) tegnM(m); });
         ctx.restore();
 
-        ctx.strokeStyle = v.lys ? "rgba(242, 197, 61, " + (0.4 + 0.6 * v.lys) + ")" : "#3d4252";
-        ctx.lineWidth = v.lys ? 2.5 : 2;
+        ctx.strokeStyle = v.lys ? "rgba(242, 197, 61, " + (0.4 + 0.6 * v.lys) + ")" : "#c9d6e0";
+        ctx.lineWidth = v.lys ? 2.5 : 1.5;
         NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 10);
         ctx.stroke();
 
@@ -540,6 +534,19 @@
         });
         ctx.restore();
         return linjer.length;
+    };
+
+    /* En stiplet plads med navnet, til tingen bruges (REGELSAET 13) */
+    T.stipletPlads = function (ctx, r, tekst) {
+        ctx.save();
+        ctx.strokeStyle = "#3b3f4c";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        NK.tekst(ctx, tekst, r.x + r.b / 2, r.y + r.h / 2, { font: "400 15px 'Lexend', 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#6a707b" });
+        ctx.restore();
     };
 
     /* Stiplede linjer fra glasset ud til zoomvinduets hjoerner */

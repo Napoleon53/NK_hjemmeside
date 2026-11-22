@@ -1,0 +1,9 @@
+[
+ {
+  "nr": "T9-1",
+  "fil": "sc4.1_kogepunkt/js/data.js",
+  "gammel": "[\"metan\",          \"metan\",              \"CH4\"",
+  "ny": "[\"metan\",          \"methan\",             \"CH4\"",
+  "hvor": "alle tre faner: navnet på CH₄ som i Kemibogen C 4.1 (id'et metan er uændret, så gemte fremskridt virker)"
+ }
+]

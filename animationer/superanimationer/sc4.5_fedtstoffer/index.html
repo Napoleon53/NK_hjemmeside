@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
 <link rel="stylesheet" href="../kemichael/praesentation.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 </head>
 <body class="papirkort">
 
@@ -16,7 +17,7 @@
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-fabrik" role="tab" aria-selected="true"><span class="nr">1</span>Fabrikken</button>
-        <button class="faneknap" data-fane="fane-koele" role="tab" aria-selected="false"><span class="nr">2</span>Køleskabet</button>
+        <button class="faneknap" data-fane="fane-koele" role="tab" aria-selected="false"><span class="nr">2</span>Fast eller flydende?</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -71,9 +72,11 @@
 <!-- ================================================================= -->
 <!-- FANE 2: KOELESKABET                                                -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-koele" role="tabpanel" aria-label="Køleskabet">
+<section class="fane uden-panel" id="fane-koele" role="tabpanel" aria-label="Fast eller flydende?">
+    <!-- Intet panel (runde T10, 22. nov. 2026, REGELSAET 2-3): opgaverne staar i
+         raekken oeverst, varedeklarationen paa et lyst ark ved vinduet. -->
     <div class="scene">
-        <canvas id="koele-laerred"></canvas>
+        <canvas id="koele-laerred" aria-label="Et køkken med fryser, køleskab, køkkenbord og vindue i solen og et vindue med molekylerne i fedtet"></canvas>
         <div class="anker" id="koele-anker-skab"></div>
         <div class="anker" id="koele-anker-vindue"></div>
         <div class="anker" id="koele-anker-zoom"></div>
@@ -82,28 +85,32 @@
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
-        <!-- Papirkortet (6. nov. 2026): hele opgaven staar her, oeverst midt i scenen (js/kort.js) -->
-        <div class="scenekort opgave" id="koele-skort">
-            <div id="koele-ind" aria-live="polite"></div>
-            <p class="sk-note" id="koele-note" hidden></p>
-            <div class="sk-bund tom" id="koele-bund">
-                <p class="st-tekst" id="koele-besked" aria-live="polite" hidden></p>
-                <button class="knap hjaelp" id="koele-knap" type="button">Giv hint</button>
-                <button class="knap indsend ikke-klar" id="koele-indsend" type="button" hidden>Indsend svar</button>
+
+        <!-- De syv opgaver i fast raekkefoelge, laast op i takt (js/koele_opgaver.js) -->
+        <nav class="opgaverad" id="koele-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="koele-liste"></div>
+            <button class="or-knap or-stille" id="koele-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="koele-frileg" type="button" title="Flyt alle glassene uden opgaver">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: spoergsmaalet, svarene, hint og Indsend svar -->
+        <div class="scenekort" id="koele-skort">
+            <div class="sk-ind" id="koele-ind"></div>
+            <div class="sk-bund" id="koele-bund" hidden>
+                <p class="st-tekst" id="koele-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="koele-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="koele-indsend" type="button">Indsend svar</button>
             </div>
-            <div id="koele-bliv" hidden></div>
         </div>
+
+        <!-- Varedeklarationen paa et lyst ark ved siden af vinduet med
+             molekylerne. Farverne er kaedernes farver (REGELSAET 45, 55).
+             En stiplet plads, til den bruges (REGELSAET 13). -->
+        <div class="dekl-ark plads" id="koele-dekl"></div>
+
+        <!-- Klik-opfordringen (REGELSAET 19-20) -->
+        <div class="koele-boble" id="koele-boble" hidden></div>
     </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="koele-dekl-kort">
-            <h2>Varedeklaration <span class="taeller" id="koele-dekl-navn"></span></h2>
-            <div id="koele-dekl"></div>
-        </div>
-
-        <!-- Alle opgaver i koekkenet forfra (samme som R), aldrig paa kortet -->
-        <button class="knap nulstil" id="koele-forfra" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
-    </aside>
 </section>
 
 </main>
@@ -112,31 +119,31 @@
 <!-- TEORIEN (aabnes kun med knappen eller T)                           -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <div class="overlay-boks teori-ark">
         <h2>Fedtstoffer</h2>
-        <p>Et fedtstof (et triglycerid) er glycerol bundet til tre fedtsyrer. Glycerol er en alkohol med tre OH-grupper. En fedtsyre er en lang kæde med en syregruppe (COOH) for enden.</p>
+        <p>Et fedtstof er bygget af ét molekyle glycerol og tre fedtsyrer og kaldes også et triglycerid. En fedtsyre er en carboxylsyre med en lang carbonkæde.</p>
         <div class="eksempel">
             <span class="eksempel-hoved">Esterbindingen</span>
             syre + alkohol → ester + vand
         </div>
         <svg class="formel" viewBox="0 0 528 96" role="img" aria-label="Ethansyre og methanol giver methylethanoat og vand">
-            <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="18" fill="#e6ebf1">
+            <g font-family="Lexend, Segoe UI, Arial, sans-serif" font-weight="500" font-size="18" fill="#1d2433">
                 <text x="6" y="66">H₃C</text>
                 <text x="69" y="66" text-anchor="middle">C</text>
-                <text x="69" y="25" text-anchor="middle" fill="#ff7b72">O</text>
-                <text x="95" y="66" fill="#ff7b72">O</text><text x="109" y="66">H</text>
+                <text x="69" y="25" text-anchor="middle" fill="#c4493c">O</text>
+                <text x="95" y="66" fill="#c4493c">O</text><text x="109" y="66">H</text>
                 <text x="136" y="67" text-anchor="middle" font-weight="400" font-size="20">+</text>
                 <text x="150" y="66">H₃C</text>
-                <text x="208" y="66" fill="#ff7b72">O</text><text x="222" y="66">H</text>
+                <text x="208" y="66" fill="#c4493c">O</text><text x="222" y="66">H</text>
                 <text x="296" y="66">H₃C</text>
                 <text x="359" y="66" text-anchor="middle">C</text>
-                <text x="359" y="25" text-anchor="middle" fill="#ff7b72">O</text>
-                <text x="391" y="66" text-anchor="middle" fill="#ff7b72">O</text>
+                <text x="359" y="25" text-anchor="middle" fill="#c4493c">O</text>
+                <text x="391" y="66" text-anchor="middle" fill="#c4493c">O</text>
                 <text x="417" y="66">CH₃</text>
                 <text x="466" y="67" text-anchor="middle" font-weight="400" font-size="20">+</text>
                 <text x="478" y="66">H₂O</text>
             </g>
-            <g stroke="#e6ebf1" stroke-width="2.5">
+            <g stroke="#1d2433" stroke-width="2">
                 <line x1="46" y1="60" x2="60" y2="60"/>
                 <line x1="66" y1="50" x2="66" y2="29"/><line x1="72" y1="50" x2="72" y2="29"/>
                 <line x1="78" y1="60" x2="92" y2="60"/>
@@ -147,24 +154,28 @@
                 <line x1="368" y1="60" x2="382" y2="60"/>
                 <line x1="400" y1="60" x2="414" y2="60"/>
             </g>
-            <polygon points="274,54 286,60 274,66" fill="#e6ebf1"/>
-            <g font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#a9b0ba">
+            <polygon points="274,54 286,60 274,66" fill="#1d2433"/>
+            <g font-family="Lexend, Segoe UI, Arial, sans-serif" font-size="12" fill="#5d6474">
                 <text x="6" y="90">ethansyre</text>
                 <text x="150" y="90">methanol</text>
                 <text x="296" y="90">methylethanoat (en ester)</text>
                 <text x="478" y="90">vand</text>
             </g>
         </svg>
-        <p>Syrens OH og alkoholens H bliver til vand. I et fedtstof sker det tre gange, og derfor hedder det et <b>tri</b>glycerid. Vand kan spalte esterbindingerne igen (hydrolyse).</p>
-        <div class="eksempel">
-            <span class="eksempel-hoved">Mættet og umættet</span>
-            mættet: ingen dobbeltbindinger · monoumættet: én · polyumættet: flere
-        </div>
-        <p>En dobbeltbinding i en fedtsyre giver et knæk i kæden. Rette kæder kan ligge tæt og holder godt fast i hinanden. Kæder med knæk kan ikke pakke tæt, så molekylerne holder dårligere sammen.</p>
-        <p>Derfor er mættet fedt fast ved stuetemperatur (smør, kakaosmør), og umættet fedt er flydende (olier). Jo flere knæk, jo lavere smeltepunkt.</p>
-        <p class="note">Alle fire fedtsyrer har 18 C-atomer: stearinsyre (ingen dobbeltbindinger), oliesyre (1), linolsyre (2) og linolensyre (3, en omega-3-fedtsyre). Smeltepunkterne for de rene fedtstoffer er målte værdier; de blandede er regnet med en model og står med "ca.".</p>
-        <div class="knapper" style="margin-top:14px;">
-            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        <h3 class="teori-hoved">Mættet og umættet</h3>
+        <table class="teori-tabel">
+            <tr><th>Fedtsyre</th><th>Dobbeltbindinger</th><th>Slags</th></tr>
+            <tr><td>stearinsyre</td><td>0</td><td>mættet</td></tr>
+            <tr><td>oliesyre</td><td>1</td><td>monoumættet</td></tr>
+            <tr><td>linolsyre</td><td>2</td><td>polyumættet</td></tr>
+            <tr><td>linolensyre</td><td>3</td><td>polyumættet</td></tr>
+        </table>
+        <h3 class="teori-hoved">Lige kæder pakker tæt</h3>
+        <p>Hver dobbeltbinding giver et knæk på kæden. Lige kæder kan ligge tæt og holder godt fast i hinanden, så fedt med mange mættede fedtsyrer er fast ved stuetemperatur. Kæder med knæk kan ikke pakke tæt, så fedt med mange umættede fedtsyrer er flydende. Jo flere knæk, jo lavere smeltepunkt.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/c/kapitler/4-6-fedtstoffer.html" target="_blank" rel="noopener">4.6 Fedtstoffer</a></p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>P</kbd> pause i vinduet &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" type="button" data-luk>Luk</button>
         </div>
     </div>
 </div>
@@ -200,6 +211,7 @@
 <script src="js/tegning.js"></script>
 <script src="../kemichael/praesentation.js"></script>
 <script src="js/sim_fabrik.js"></script>
+<script src="js/koele_opgaver.js"></script>
 <script src="js/sim_koele.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>

@@ -1,20 +1,26 @@
 /* =====================================================================
    sim_en.js - fane 1: elektronegativitet
 
-   To atomer deler ét elektronpar. Eleven vaelger atomerne i det lille
-   periodiske system i panelet, og scenen viser tovtraekningen:
+   To atomer deler ét elektronpar. Scenen viser tovtraekningen:
 
      elektronparret  ligger midt imellem, naar atomerne traekker lige
                      haardt, og glider mod det, der traekker haardest.
                      Ved ΔEN = 2,0 eller mere tager det atom det helt.
      elektronskyen   er tykkest ved det atom, der traekker haardest.
      δ+ og δ−        ved en polaer binding; + og − ved ioner.
-     skalaen         nederst viser ΔEN og de tre slags bindinger.
 
-   Et klik i tabellen saetter atomet paa pladsen med den gule ring, og
-   ringen hopper saa til det andet atom. Et klik paa et atom i scenen
-   flytter ringen. Et metal kan kun saettes sammen med N, O, F eller Cl
-   (D.tilladt i data.js); ellers siger scenen hvorfor.
+   Runde T8 (22. nov. 2026, Niels' ja til forslagene efter REGELSAET):
+   panelet er vaek (REGELSAET 2, 3). Opgaverne staar i raekken oeverst
+   (js/en_opgaver.js), ΔEN-skalaen staar centreret lige under kortet
+   (REGELSAET 37), det periodiske system staar i scenen til venstre, og
+   tavlen med regnestykket staar paa et lyst papir til hoejre (REGELSAET
+   27-29). Det, et trin spoerger om, er skjult, til det er besvaret.
+   Bindinger skrives som i Kemibogen med en lang streg: H−Cl.
+
+   Et klik i tabellen saetter atomet paa pladsen med den gule ring. I byg-
+   opgaverne og i den fri leg hopper ringen saa til det andet atom, og et
+   klik paa et atom i scenen flytter ringen. Et metal kan kun saettes
+   sammen med N, O, F eller Cl (D.tilladt i data.js).
 
    Hvor langt parret glider, er ΔEN / 2 (hoejst 0,92 for en polaer
    binding). Det er en tegning af tovtraekningen, ikke en beregning af
@@ -29,9 +35,10 @@
     var PLUS = "#f39a8f";
     var MINUS = "#8fcaf0";
     var GUL = "#f2c53d";
+    var LEX = "Lexend, 'Segoe UI', sans-serif";
     var SKALA_MAKS = 3.5;
     var SPRITE_KUGLE = 128 / 120;     /* atomspritet er 128 bredt, kuglen 120 */
-    var START = ["H", "Cl"];
+    var STREG = "−";                  /* bindingen som i Kemibogen: H−Cl */
 
     /* De grundstoffer, der ikke er med, staar som tomme felter, saa
        tabellen ligner det periodiske system. De svarer ogsaa paa klik. */
@@ -44,14 +51,27 @@
 
     function en(el) { return D.GRUNDSTOFFER[el].en; }
     function navn(el) { return D.GRUNDSTOFFER[el].navn; }
-    function binding(a, b) { return a + "-" + b; }
+    function binding(a, b) { return a + STREG + b; }
     function har(a, b, el) { return a === el || b === el; }
     function tal(v) { return NK.tal(v, 1); }
+    function html(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+    /* Det atom, der traekker haardest, og det andet (lige: i raekkefoelge) */
+    function hoejLav(a, b) {
+        var hoej = en(a) >= en(b) ? a : b;
+        return [hoej, hoej === a ? b : a];
+    }
 
     /* "3,0 − 2,1 = 0,9": den stoerste minus den mindste */
     function regning(a, b) {
-        var hoej = en(a) >= en(b) ? a : b, lav = hoej === a ? b : a;
-        return tal(en(hoej)) + " − " + tal(en(lav)) + " = " + tal(D.dEN(a, b));
+        var hl = hoejLav(a, b);
+        return tal(en(hl[0])) + " − " + tal(en(hl[1])) + " = " + tal(D.dEN(a, b));
+    }
+
+    /* "ΔEN = EN(Cl) − EN(H) = 3,0 − 2,1 = 0,9" */
+    function fuldRegning(a, b) {
+        var hl = hoejLav(a, b);
+        return "ΔEN = EN(" + hl[0] + ") − EN(" + hl[1] + ") = " + regning(a, b) + ".";
     }
 
     /* Farven i tabellen: blaa ved lav elektronegativitet, gennem lilla til
@@ -62,200 +82,267 @@
         return "hsl(" + hue + ", " + (lys ? "72%, 64%" : (40 + 18 * t) + "%, " + (26 + 8 * t) + "%") + ")";
     }
 
-    function begrund(a, b) {
-        var t = D.bindingstype(a, b);
-        var grund = t === "upolaer" ? "ΔEN er under 0,5, så bindingen er upolær."
-            : t === "polaer" ? "ΔEN er mellem 0,5 og 2,0, så bindingen er polær."
-            : "ΔEN er 2,0 eller mere, så bindingen er en ionbinding.";
-        return "ΔEN = " + regning(a, b) + ". " + grund;
+    /* Forklaringen til et forkert ΔEN i feltet */
+    function fejlDEN(a, b) {
+        return function (v) {
+            var d = D.dEN(a, b), sum = en(a) + en(b);
+            if (Math.abs(v + d) < 1e-6) return "ΔEN er aldrig negativ. Træk den mindste elektronegativitet fra den største.";
+            if (Math.abs(v - sum) < 1e-6) return "Du har lagt elektronegativiteterne sammen. ΔEN er forskellen mellem dem.";
+            return "Aflæs elektronegativiteten under hvert atom, og træk den mindste fra den største.";
+        };
     }
 
-    /* ----- Opgaverne ---------------------------------------------------------- */
-    function parAfType(sim, type) {
-        var nu = sim.par.slice().sort().join();
-        var liste = D.par().filter(function (p) {
-            return D.bindingstype(p[0], p[1]) === type && p.slice().sort().join() !== nu;
+    /* Svarene til "Hvilken slags binding er ...?" i fast raekkefoelge */
+    function typeSvar(rigtig) {
+        var nej = {
+            upolaer: "En upolær binding har en ΔEN under 0,5.",
+            polaer: "En polær binding har en ΔEN fra 0,5 til under 2,0.",
+            ion: "En ionbinding kræver, at ΔEN er 2,0 eller mere."
+        };
+        return D.TYPE_ORDEN.map(function (t) {
+            return { t: D.TYPER[t].knap, ok: t === rigtig, nej: nej[t] };
         });
-        return NK.bland(NK.tilfaeldig(liste));
     }
 
-    /* Byg-opgaverne: eleven saetter selv atomerne sammen. fejl() giver et
-       svar paa det, eleven har bygget, naar det ikke passer. */
-    var BYG = [
-        {
-            tekst: "Byg en binding, hvor carbon bliver δ+.",
-            ok: function (a, b) { return har(a, b, "C") && D.bindingstype(a, b) === "polaer" && D.staerkest(a, b) !== "C"; },
-            fejl: function (a, b) {
-                if (!har(a, b, "C")) return "Carbon skal være med.";
-                if (a === b) return "C-C er upolær. Sæt et andet atom på carbon.";
-                return binding(a, b) + " er upolær. Vælg et atom, der trækker hårdere end carbon.";
-            },
-            hint: "Carbon har elektronegativiteten 2,5. Hvilke atomer har mindst 0,5 mere?",
-            eksempel: ["C", "O"],
-            svar: "C-O er et eksempel. Oxygen trækker hårdere end carbon (3,5 mod 2,5), så carbon bliver δ+. Carbon bliver også δ+ sammen med N, F og Cl."
-        },
-        {
-            tekst: "Byg en upolær binding mellem to forskellige atomer.",
-            ok: function (a, b) { return a !== b && D.bindingstype(a, b) === "upolaer"; },
-            fejl: function (a, b) {
-                if (a === b) return "Atomerne skal være forskellige.";
-                return binding(a, b) + " er " + D.TYPER[D.bindingstype(a, b)].navn + ". Find to atomer, der trækker næsten lige hårdt.";
-            },
-            hint: "Find to forskellige atomer, hvis elektronegativitet højst er 0,4 fra hinanden.",
-            eksempel: ["C", "H"],
-            svar: "C-H er et eksempel, for ΔEN = 2,5 − 2,1 = 0,4 er under 0,5. N-Cl er også upolær med ΔEN = 3,0 − 3,0 = 0."
-        },
-        {
-            tekst: "Byg den mest polære binding, der har hydrogen med.",
-            ok: function (a, b) { return har(a, b, "H") && har(a, b, "F"); },
-            fejl: function (a, b) {
-                if (!har(a, b, "H")) return "Hydrogen skal være med.";
-                if (a === b) return "H-H er upolær.";
-                return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Der findes en binding med hydrogen, der er mere polær.";
-            },
-            hint: "Jo større forskel i elektronegativitet, jo mere polær er bindingen. Hvilket atom har den største elektronegativitet?",
-            eksempel: ["H", "F"],
-            svar: "Fluor har den største elektronegativitet, så H-F er den mest polære binding med ΔEN = 4,0 − 2,1 = 1,9."
-        },
-        {
-            tekst: "Byg en ionbinding.",
-            ok: function (a, b) { return D.bindingstype(a, b) === "ion"; },
-            fejl: function (a, b) {
-                return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Forskellen skal være 2,0 eller mere.";
-            },
-            hint: "Sæt et atom med lav elektronegativitet sammen med et atom med høj elektronegativitet.",
-            eksempel: ["Na", "Cl"],
-            svar: "Na-Cl er et eksempel med ΔEN = 3,0 − 0,9 = 2,1. Chlor tager elektronerne helt, og der dannes ioner."
-        },
-        {
-            tekst: "Byg en binding, hvor oxygen bliver δ+.",
-            ok: function (a, b) { return har(a, b, "O") && har(a, b, "F"); },
-            fejl: function (a, b) {
-                if (!har(a, b, "O")) return "Oxygen skal være med.";
-                return "I " + binding(a, b) + " trækker oxygen hårdest. Find et atom, der trækker endnu hårdere.";
-            },
-            hint: "Oxygen har elektronegativiteten 3,5. Kun ét atom i tabellen trækker hårdere.",
-            eksempel: ["O", "F"],
-            svar: "I O-F trækker fluor hårdere end oxygen (4,0 mod 3,5), så oxygen bliver δ+. Det sker sjældent."
-        }
-    ];
+    var HINT_SKALA = ["Se på ΔEN-skalaen under kortet.", "Grænserne er 0,5 og 2,0."];
 
+    function parEr(s, a, b) { return s.par[0] === a && s.par[1] === b; }
+
+    /* ----- Opgaverne ------------------------------------------------------------
+       Seks opgaver i fast raekkefoelge som Kemibogens eksempler i 3.3
+       (REGELSAET 11-18). skjul: det, der er skjult, mens trinet staar
+       uloest (se NK.EnOpgaver.skjult). spoerger: den linje paa tavlen,
+       der har "?" og gul ramme. */
     var OPGAVER = [
-        /* Hvilket atom bliver δ−? Parret staar i midten, til opgaven er loest. */
-        function (sim) {
-            var p = parAfType(sim, "polaer");
-            var minus = D.staerkest(p[0], p[1]), plus = minus === p[0] ? p[1] : p[0];
-            return {
-                tekst: "Klik på et af de to atomer i scenen. Hvilket atom i bindingen " + binding(p[0], p[1]) + " bliver δ−?",
-                hint: "Det atom, der har den største elektronegativitet, trækker elektronparret til sig.",
-                svar: minus + " har den største elektronegativitet (" + tal(en(minus)) + ") og trækker elektronparret til sig. " +
-                    minus + " bliver δ−, og " + plus + " bliver δ+.",
-                start: function (s) { s.startOpgavePar(p, { skift: true }); },
-                klik: function (s, i) {
-                    if (i < 0) return false;
-                    if (s.par[i] === minus) return true;
-                    return s.par[i] + " har den mindste elektronegativitet. Prøv det andet atom.";
+        {
+            id: "hcl", navn: "Hydrogenchlorid", par: ["H", "Cl"],
+            trin: [
+                {
+                    type: "valg", skjul: ["skift", "skala", "tavle", "tabel"],
+                    tekst: "Tallet under hvert atom er atomets elektronegativitet (EN).",
+                    spm: "Hvilket atom i bindingen H−Cl trækker hårdest i elektronparret?",
+                    svar: [
+                        { t: "H", nej: "H har den mindste elektronegativitet, 2,1. Det atom, der har den største elektronegativitet, trækker hårdest." },
+                        { t: "Cl", ok: true },
+                        { t: "De trækker lige hårdt", nej: "Det gør de kun, når de har samme elektronegativitet. Her har Cl 3,0 og H 2,1." }
+                    ],
+                    hint: ["Elektronegativitet er et mål for, hvor kraftigt et atom trækker i de fælles elektroner.",
+                        "Se på tallene under atomerne. Hvilket tal er størst?",
+                        "Cl har 3,0, og H har 2,1."],
+                    slut: "Cl har den største elektronegativitet, 3,0. Derfor ligger elektronparret tættest på Cl."
                 },
-                slut: function (s) { s.slutOpgavePar(); }
-            };
+                {
+                    type: "valg", skjul: ["skala", "tavle", "tabel"],
+                    tekst: "Cl er blevet δ−, og H er blevet δ+.",
+                    spm: "Hvad betyder δ− ved Cl i bindingen H−Cl?",
+                    svar: [
+                        { t: "Cl har fået en hel elektron", nej: "Så ville Cl være ionen Cl⁻. I H−Cl deles elektronparret stadig. Det ligger bare tættest på Cl." },
+                        { t: "Cl har mistet elektroner", nej: "Det er omvendt. Elektronparret ligger tættest på Cl, så Cl har lidt flere elektroner omkring sig." },
+                        { t: "Cl er delvist negativ", ok: true }
+                    ],
+                    hint: ["δ er det græske bogstav delta.",
+                        "δ betyder delvist, og − betyder negativ.",
+                        "Elektronparret ligger tættest på Cl, men H og Cl deler det stadig."],
+                    slut: "δ betyder delvist. Cl er delvist negativ, fordi elektronparret ligger tættest på Cl. H er delvist positiv."
+                },
+                {
+                    type: "valg", skjul: ["dEN", "type", "tabel"], spoerger: "dEN",
+                    spm: "Hvor stor er forskellen i elektronegativitet (ΔEN) i bindingen H−Cl?",
+                    svar: [
+                        { t: "0,9", ok: true },
+                        { t: "5,1", nej: "Du har lagt elektronegativiteterne sammen. ΔEN er forskellen mellem dem." },
+                        { t: "−0,9", nej: "ΔEN er aldrig negativ. Træk den mindste elektronegativitet fra den største." }
+                    ],
+                    hint: ["ΔEN er forskellen mellem de to atomers elektronegativitet.",
+                        "Træk den mindste elektronegativitet fra den største.",
+                        "Cl har 3,0, og H har 2,1."],
+                    slut: "ΔEN = EN(Cl) − EN(H) = 3,0 − 2,1 = 0,9. Pilen på ΔEN-skalaen viser 0,9."
+                },
+                {
+                    type: "valg", skjul: ["type", "tabel"], spoerger: "type",
+                    spm: "Hvilken slags binding er H−Cl, når ΔEN er 0,9?",
+                    svar: typeSvar("polaer"),
+                    hint: HINT_SKALA.concat(["0,9 ligger mellem 0,5 og 2,0."]),
+                    slut: "0,9 ligger mellem 0,5 og 2,0, så H−Cl er en polær binding."
+                }
+            ]
         },
-        /* Upolaer, polaer eller ionbinding? */
-        function (sim) {
-            var type = NK.tilfaeldig(D.TYPE_ORDEN);
-            var p = parAfType(sim, type);
-            return {
-                tekst: "Hvilken slags binding er " + binding(p[0], p[1]) + "?",
-                valg: D.TYPE_ORDEN.map(function (t) { return D.TYPER[t].knap; }),
-                rigtig: D.TYPE_ORDEN.indexOf(type),
-                fejlValg: function (i) {
-                    return binding(p[0], p[1]) + " er ikke " + (D.TYPE_ORDEN[i] === "ion" ? "en ionbinding" : D.TYPER[D.TYPE_ORDEN[i]].navn) + ". Beregn ΔEN, og sammenlign med 0,5 og 2,0.";
+        {
+            id: "hc", navn: "Carbon og hydrogen", par: ["H", "Cl"],
+            trin: [
+                {
+                    type: "handling", el: "C", slot: 1, skjul: ["skift", "dEN", "type"],
+                    tekst: "Det periodiske system til venstre viser elektronegativiteten for hvert atom.",
+                    spm: "Klik på C i det periodiske system for at skifte Cl ud med C.",
+                    maal: function (s) { return parEr(s, "H", "C"); },
+                    hint: ["C står i anden række i det periodiske system.", "Feltet med C har en gul ramme."],
+                    visSvar: function (s) { s.saetPar("H", "C"); }
                 },
-                hint: "Træk den mindste elektronegativitet fra den største. Grænserne er 0,5 og 2,0.",
-                svar: begrund(p[0], p[1]),
-                start: function (s) { s.startOpgavePar(p, { skift: true, type: true }); },
-                slut: function (s) { s.slutOpgavePar(); }
-            };
+                {
+                    type: "felt", skjul: ["skift", "dEN", "type"], spoerger: "dEN", pre: "ΔEN =", facit: 0.4, navn: "ΔEN",
+                    spm: "Hvor stor er forskellen i elektronegativitet (ΔEN) i bindingen H−C?",
+                    fejl: fejlDEN("H", "C"),
+                    hint: ["ΔEN er forskellen mellem de to atomers elektronegativitet.",
+                        "Elektronegativiteten står under hvert atom og i det periodiske system.",
+                        "C har 2,5, og H har 2,1. Træk den mindste fra den største."],
+                    slut: "ΔEN = EN(C) − EN(H) = 2,5 − 2,1 = 0,4."
+                },
+                {
+                    type: "valg", skjul: ["skift", "type"], spoerger: "type",
+                    spm: "Hvilken slags binding er H−C, når ΔEN er 0,4?",
+                    svar: [
+                        { t: "Upolær", ok: true },
+                        { t: "Polær", nej: "H og C er forskellige atomer, men ΔEN er under 0,5. Så er bindingen upolær." },
+                        { t: "Ionbinding", nej: "En ionbinding kræver, at ΔEN er 2,0 eller mere." }
+                    ],
+                    hint: HINT_SKALA.concat(["0,4 er under 0,5."]),
+                    slut: "0,4 er under 0,5, så H−C er en upolær binding. Elektronparret ligger næsten i midten."
+                }
+            ]
         },
-        /* Byg selv en binding, der passer. Aldrig én, der allerede staar. */
-        function (sim) {
-            var b = NK.tilfaeldig(BYG.filter(function (x) { return x !== sim.sidsteByg && !x.ok(sim.par[0], sim.par[1]); }));
-            sim.sidsteByg = b;
-            var start = 0;
-            return {
-                tekst: b.tekst,
-                hint: b.hint,
-                svar: b.svar,
-                start: function (s) { start = s.aendringer; },
-                /* Indsend svar bliver klar, naar eleven har skiftet et atom */
-                kan: function (s) { return s.aendringer !== start; },
-                tjek: function (s) {
-                    if (b.ok(s.par[0], s.par[1])) return true;
-                    return b.fejl(s.par[0], s.par[1]);
+        {
+            id: "nacl", navn: "Køkkensalt", par: ["H", "C"],
+            trin: [
+                {
+                    type: "handling", el: "Cl", slot: 1, skjul: ["skift", "dEN", "type"],
+                    tekst: "Køkkensalt er natriumchlorid. Byg bindingen mellem natrium og chlor.",
+                    spm: "Klik på Cl i det periodiske system for at skifte C ud med Cl.",
+                    maal: function (s) { return s.par[1] === "Cl"; },
+                    hint: ["Cl står i tredje række, yderst til højre.", "Feltet med Cl har en gul ramme."],
+                    visSvar: function (s) { s.saetPar(s.par[0], "Cl"); }
                 },
-                visSvar: function (s) { s.saetPar(b.eksempel[0], b.eksempel[1]); }
-            };
+                {
+                    type: "handling", el: "Na", slot: 0, skjul: ["skift", "dEN", "type"],
+                    spm: "Klik på Na i det periodiske system for at skifte H ud med Na.",
+                    maal: function (s) { return parEr(s, "Na", "Cl"); },
+                    hint: ["Na står i tredje række, yderst til venstre.", "Feltet med Na har en gul ramme."],
+                    visSvar: function (s) { s.saetPar("Na", "Cl"); }
+                },
+                {
+                    type: "felt", skjul: ["skift", "dEN", "type"], spoerger: "dEN", pre: "ΔEN =", facit: 2.1, navn: "ΔEN",
+                    spm: "Hvor stor er forskellen i elektronegativitet (ΔEN) i bindingen Na−Cl?",
+                    fejl: fejlDEN("Na", "Cl"),
+                    hint: ["ΔEN er forskellen mellem de to atomers elektronegativitet.",
+                        "Elektronegativiteten står under hvert atom og i det periodiske system.",
+                        "Cl har 3,0, og Na har 0,9. Træk den mindste fra den største."],
+                    slut: "ΔEN = EN(Cl) − EN(Na) = 3,0 − 0,9 = 2,1."
+                },
+                {
+                    type: "valg", skjul: ["skift", "type"],
+                    spm: "Hvad sker der med elektronparret i Na−Cl, når ΔEN er 2,1?",
+                    svar: [
+                        { t: "Det deles ligeligt", nej: "Sådan er det kun, når ΔEN er under 0,5." },
+                        { t: "Cl tager det helt", ok: true },
+                        { t: "Det ligger tættest på Cl", nej: "Sådan er det i en polær binding, hvor ΔEN er under 2,0." }
+                    ],
+                    hint: ["Se på ΔEN-skalaen under kortet.",
+                        "Ved en ΔEN på 2,0 eller mere er bindingen en ionbinding.",
+                        "I en ionbinding tager det ene atom elektronerne helt."],
+                    slut: "ΔEN er 2,0 eller mere, så Cl tager elektronparret helt. Der dannes ionerne Na⁺ og Cl⁻. Bindingen er en ionbinding."
+                }
+            ]
         },
-        /* Hvilken binding er mest polaer? Fire bindinger med forskellig ΔEN */
-        function () {
-            var valgte = [], set = {};
-            NK.bland(D.par().filter(function (p) { return D.bindingstype(p[0], p[1]) !== "ion"; })).forEach(function (p) {
-                var d = D.dEN(p[0], p[1]);
-                if (valgte.length < 4 && !set[d]) { set[d] = true; valgte.push(p); }
-            });
-            var bedst = valgte.reduce(function (x, p) { return D.dEN(p[0], p[1]) > D.dEN(x[0], x[1]) ? p : x; }, valgte[0]);
-            var navne = valgte.map(function (p) {
-                var hoej = en(p[0]) >= en(p[1]) ? p[0] : p[1];
-                return binding(hoej, hoej === p[0] ? p[1] : p[0]);
-            });
-            return {
-                tekst: "Hvilken binding er mest polær?",
-                valg: navne,
-                rigtig: valgte.indexOf(bedst),
-                fejlValg: function (i) {
-                    return navne[i] + " har ΔEN = " + tal(D.dEN(valgte[i][0], valgte[i][1])) + ". En af de andre bindinger har en større forskel.";
-                },
-                hint: "Beregn ΔEN for hver binding. Jo større ΔEN, jo mere polær er bindingen.",
-                svar: navne[valgte.indexOf(bedst)] + " har den største forskel i elektronegativitet: ΔEN = " + regning(bedst[0], bedst[1]) + ".",
-                visSvar: function (s) { s.saetPar(bedst[0], bedst[1]); }
-            };
+        {
+            id: "cplus", navn: "Byg: carbon bliver δ+", par: ["C", "H"],
+            trin: [
+                {
+                    type: "byg", slot: 1,
+                    tekst: "Klik på et atom i det periodiske system for at skifte H ud.",
+                    spm: "Byg en binding, hvor carbon bliver δ+.",
+                    ok: function (a, b) { return har(a, b, "C") && D.bindingstype(a, b) === "polaer" && D.staerkest(a, b) !== "C"; },
+                    fejl: function (a, b) {
+                        if (!har(a, b, "C")) return "Carbon skal være med.";
+                        if (a === b) return "C−C er upolær. Sæt et andet atom på carbon.";
+                        return binding(a, b) + " er upolær. Vælg et atom, der trækker hårdere end carbon.";
+                    },
+                    hint: ["Det atom, der trækker hårdest i elektronparret, bliver δ−. Det andet bliver δ+.",
+                        "Carbon har elektronegativiteten 2,5. Find et atom, der har mindst 0,5 mere.",
+                        "N, O, F og Cl trækker alle hårdere end carbon."],
+                    visSvar: function (s) { s.saetPar("C", "O"); },
+                    slut: function (s) {
+                        var a = s.par[0], b = s.par[1], andet = a === "C" ? b : a;
+                        return "I " + binding(a, b) + " trækker " + andet + " hårdere end carbon (" + tal(en(andet)) + " mod 2,5). Derfor bliver carbon δ+.";
+                    }
+                }
+            ]
+        },
+        {
+            id: "hf", navn: "Byg: mest polær med H", par: ["H", "Cl"],
+            trin: [
+                {
+                    type: "byg", slot: 1,
+                    tekst: "Klik på et atom i det periodiske system for at skifte Cl ud.",
+                    spm: "Byg den mest polære binding, der har hydrogen med.",
+                    ok: function (a, b) { return har(a, b, "H") && har(a, b, "F"); },
+                    fejl: function (a, b) {
+                        if (!har(a, b, "H")) return "Hydrogen skal være med.";
+                        if (a === b) return "H−H er upolær.";
+                        return binding(a, b) + " har ΔEN = " + tal(D.dEN(a, b)) + ". Der findes en binding med hydrogen, der er mere polær.";
+                    },
+                    hint: ["Jo større ΔEN er, jo mere polær er bindingen.",
+                        "Find det atom, der har den største elektronegativitet.",
+                        "Det atom står øverst til højre i det periodiske system."],
+                    visSvar: function (s) { s.saetPar("H", "F"); },
+                    slut: "Fluor har den største elektronegativitet, 4,0. Derfor er H−F den mest polære binding med hydrogen. ΔEN = 4,0 − 2,1 = 1,9."
+                }
+            ]
+        },
+        {
+            id: "fire", navn: "Den mest polære", par: ["H", "H"],
+            trin: [
+                {
+                    type: "valg", skjul: ["skala", "tavle"],
+                    tekst: "Elektronegativiteten står i det periodiske system.",
+                    spm: "Hvilken af bindingerne C−H, N−H, O−H og H−Cl er mest polær?",
+                    svar: [
+                        { t: "C−H", nej: "C−H har ΔEN = 2,5 − 2,1 = 0,4. Den er upolær." },
+                        { t: "N−H", nej: "N−H har ΔEN = 3,0 − 2,1 = 0,9. En af de andre har en større forskel." },
+                        { t: "O−H", ok: true },
+                        { t: "H−Cl", nej: "H−Cl har ΔEN = 3,0 − 2,1 = 0,9. En af de andre har en større forskel." }
+                    ],
+                    hint: ["Jo større ΔEN er, jo mere polær er bindingen.",
+                        "Hydrogen er med i alle fire. Find det andet atom, der har den største elektronegativitet.",
+                        "C har 2,5, N har 3,0, O har 3,5, og Cl har 3,0."],
+                    efter: function (s) { s.saetPar("O", "H"); },
+                    slut: "O−H har den største forskel i elektronegativitet. ΔEN = 3,5 − 2,1 = 1,4."
+                }
+            ]
         }
     ];
 
     /* ----- Simulationen --------------------------------------------------------- */
     NK.SimEN = function () {
         this.laerred = new NK.Laerred(NK.el("en-laerred"));
-        this.par = START.slice();
-        this.slot = 0;
-        this.skjul = {};
-        this.fastPar = false;
+        this.scene = this.laerred.canvas.parentNode;
+        this.par = OPGAVER[0].par.slice();
+        this.slot = 1;
         this.aendringer = 0;
         this.tid = 0;
         this.pop = [0, 0];
         this.hover = -1;
         this.geo = null;
-        this.sidsteByg = null;
-        this.vist = { skift: this.maalSkift(), adskil: this.maalAdskil(), dEN: D.dEN(START[0], START[1]) };
+        this.lay = null;
+        this.vist = { skift: 0, adskil: 0, dEN: D.dEN(this.par[0], this.par[1]) };
         this.OPGAVER = OPGAVER;
-        this.BYG = BYG;
-        this.opgaver = new NK.Opgaver("en", OPGAVER, this, {
-            antal: 6,
-            intro: "Sæt to atomer sammen, og se, hvor elektronparret i bindingen ligger. Opgaverne handler om polære bindinger.",
-            naesteFane: "fane-polaritet",
-            naesteNavn: "Polær eller upolær?"
-        });
+        this.e = { pt: NK.el("en-pt"), tabel: NK.el("en-tabel"), tavle: NK.el("en-tavle"), boble: NK.el("en-boble") };
         this._bygTabel();
         this._bindMus();
+        this.opgaver = new NK.EnOpgaver(this, OPGAVER);
+        this.vist.skift = this.maalSkift();
+        this.vist.adskil = this.maalAdskil();
     };
 
     var P = NK.SimEN.prototype;
+
+    P.skjult = function (del) { return !!this.opgaver && this.opgaver.skjult(del); };
 
     /* ----- Parret ---------------------------------------------------------- */
     P.type = function () { return D.bindingstype(this.par[0], this.par[1]); };
 
     /* Hvor langt elektronparret er glidet: −1 helt til venstre, +1 helt
-       til hoejre. Under en opgave, der skjuler det, staar det i midten. */
+       til hoejre. Mens kortet spoerger om det, staar det i midten. */
     P.maalSkift = function () {
-        if (this.skjul.skift) return 0;
+        if (this.skjult("skift")) return 0;
         var a = this.par[0], b = this.par[1];
         var staerk = D.staerkest(a, b);
         if (!staerk) return 0;
@@ -264,12 +351,17 @@
     };
 
     P.maalAdskil = function () {
-        return !this.skjul.skift && this.type() === "ion" ? 1 : 0;
+        return !this.skjult("skift") && this.type() === "ion" ? 1 : 0;
     };
 
-    /* Korte beskeder staar i kortets nederste raekke, ikke nederst i scenen */
+    /* En kort besked i kortets nederste raekke */
     P.besked = function (tekst) {
-        this.opgaver.besked(tekst, 3);
+        var o = this.opgaver;
+        o.saetBesked(html(tekst), "peger");
+        window.clearTimeout(this._ur);
+        this._ur = window.setTimeout(function () {
+            if (o.besked && o.besked.klasse === "peger") o.saetBesked("", "");
+        }, 3500);
     };
 
     /* Saetter begge atomer paa én gang (opgaverne og selvtesten). */
@@ -278,15 +370,18 @@
         if (this.par[1] !== b) this.pop[1] = 1;
         this.par = [a, b];
         this.aendringer++;
-        this.opdaterTabel();
+        if (this.celler) this.opdaterTabel();
     };
 
     /* Et klik i tabellen: atomet kommer ind paa pladsen med ringen. */
     P.vaelg = function (el) {
-        /* Under et spoergsmaal om de to atomer, der staar, og mens kortet
-           venter paa Naeste, blinker kortet i stedet */
-        if (this.fastPar) { this.opgaver.blink(); return false; }
-        if (this.opgaver.spaer()) return false;
+        var o = this.opgaver;
+        if (!o.tillad(el)) {
+            var t = o.trin();
+            if (o.tabelAktiv() && t && t.type === "handling") this.besked("Klik på " + t.el + " i det periodiske system.");
+            else o.spaer();
+            return false;
+        }
         var andet = this.par[1 - this.slot];
         var ok = D.tilladt(el, andet);
         if (ok !== true) { this.besked(ok); return false; }
@@ -295,43 +390,34 @@
             this.pop[this.slot] = 1;
             this.aendringer++;
         }
-        this.slot = 1 - this.slot;
+        /* I den fri leg hopper ringen til det andet atom. I byg-opgaverne
+           bliver den paa det atom, kortet siger, der skal skiftes ud. */
+        if (o.tilstand === "resultat") this.slot = 1 - this.slot;
+        o.klikket();
         this.opdaterTabel();
         return true;
     };
 
-    P.startOpgavePar = function (p, skjul) {
-        this.saetPar(p[0], p[1]);
-        this.skjul = skjul || {};
-        this.fastPar = true;
-        this.opdaterTabel();
-    };
-
-    P.slutOpgavePar = function () {
-        this.skjul = {};
-        this.fastPar = false;
-        this.opdaterTabel();
-    };
-
-    /* ----- Tabellen i panelet ------------------------------------------------ */
-    P._bygTabel = function () {
-        var mig = this;
-        var vaert = NK.el("en-tabel");
-        var efterPlads = {};
+    /* ----- Tabellen i scenen ------------------------------------------------ */
+    /* Bygger det lille periodiske system i vaert. Uden klik bliver felterne
+       ikke knapper, men en figur at aflaese (fane 2). */
+    function bygTabel(vaert, klik, tomKlik) {
+        var efterPlads = {}, celler = {};
         D.EN_ORDEN.forEach(function (el) {
             var g = D.GRUNDSTOFFER[el];
             efterPlads[g.periode + "-" + g.gruppe] = el;
         });
-        this.celler = {};
         for (var periode = 1; periode <= 4; periode++) {
             KOLONNER.forEach(function (gruppe) {
                 var noegle = periode + "-" + gruppe;
                 var el = efterPlads[noegle];
                 var tom = TOMME[noegle];
                 var b;
+                if (el || tom) {
+                    b = document.createElement(klik ? "button" : "div");
+                    if (klik) b.type = "button";
+                }
                 if (el) {
-                    b = document.createElement("button");
-                    b.type = "button";
                     b.className = "pt-felt";
                     b.setAttribute("data-el", el);
                     b.title = D.stort(navn(el));
@@ -340,17 +426,13 @@
                     b.innerHTML = '<span class="pt-symbol"></span><span class="pt-en"></span>';
                     b.querySelector(".pt-symbol").textContent = el;
                     b.querySelector(".pt-en").textContent = tal(en(el));
-                    b.addEventListener("click", function () { mig.vaelg(el); });
-                    mig.celler[el] = b;
+                    if (klik) b.addEventListener("click", function () { klik(el); });
+                    celler[el] = b;
                 } else if (tom) {
-                    b = document.createElement("button");
-                    b.type = "button";
                     b.className = "pt-felt tom";
                     b.title = D.stort(tom[1]);
                     b.textContent = tom[0];
-                    b.addEventListener("click", function () {
-                        mig.besked(D.stort(tom[1]) + " er ikke med her. Brug de farvede felter.");
-                    });
+                    if (tomKlik) b.addEventListener("click", function () { tomKlik(tom); });
                 } else {
                     b = document.createElement("span");
                     b.className = "pt-hul";
@@ -358,18 +440,81 @@
                 vaert.appendChild(b);
             });
         }
-        this.opdaterTabel();
+        return celler;
+    }
+
+    P._bygTabel = function () {
+        var mig = this;
+        this.celler = bygTabel(this.e.tabel, function (el) { mig.vaelg(el); }, function (tom) {
+            if (mig.opgaver.tabelAktiv()) mig.besked(D.stort(tom[1]) + " er ikke med her. Brug de farvede felter.");
+            else mig.opgaver.spaer();
+        });
     };
 
+    /* Tabellen foelger opgaven: skjult (stiplet plads), en figur at
+       aflaese, kun ét felt i brug, eller hele tabellen i brug. */
     P.opdaterTabel = function () {
-        var mig = this;
+        var mig = this, o = this.opgaver;
+        if (!o) return;
         var andet = this.par[1 - this.slot];
+        var aktiv = o.tabelAktiv();
+        var peg = o.opfordring();
+        this.e.pt.classList.toggle("plads", o.skjult("tabel"));
+        this.e.pt.classList.toggle("laast", !aktiv);
+        this.e.tabel.classList.toggle("opfordring", peg === "tabel");
         Object.keys(this.celler).forEach(function (el) {
             var c = mig.celler[el];
             c.classList.toggle("valgt", mig.par.indexOf(el) >= 0);
-            c.classList.toggle("spaerret", mig.fastPar || D.tilladt(el, andet) !== true);
+            c.classList.toggle("spaerret", aktiv && (!o.tillad(el) || D.tilladt(el, andet) !== true));
+            c.classList.toggle("opfordring", peg === el);
             c.setAttribute("aria-pressed", mig.par.indexOf(el) >= 0 ? "true" : "false");
         });
+        this.visBoble(peg);
+    };
+
+    /* Boblen ved det, kortet beder eleven klikke paa (REGELSAET 20) */
+    P.visBoble = function (peg) {
+        var b = this.e.boble;
+        var maal = peg === "tabel" ? this.e.pt : (peg ? this.celler[peg] : null);
+        if (!maal || !this.e.pt.offsetWidth) { b.hidden = true; return; }
+        var tekst = peg === "tabel" ? "Klik: et atom" : "Klik: " + peg;
+        if (b.textContent !== tekst) b.textContent = tekst;
+        var rs = this.scene.getBoundingClientRect(), r = maal.getBoundingClientRect();
+        b.style.left = Math.round(Math.max(60, r.left - rs.left + r.width / 2)) + "px";
+        b.style.top = Math.round(r.top - rs.top - 12) + "px";
+        b.hidden = false;
+    };
+
+    /* ----- Tavlen: regnestykket paa et lyst papir (REGELSAET 27-29) ---------- */
+    P.opdaterTavle = function () {
+        var o = this.opgaver, a = this.par[0], b = this.par[1];
+        var plads = o.skjult("tavle");
+        var spm = o.spoergerOm();
+        var h;
+        if (plads) {
+            h = '<div class="tv-plads">Regnestykket</div>';
+        } else {
+            h = '<div class="tv-hoved">Bindingen ' + binding(a, b) + "</div>";
+            if (!o.skjult("dEN")) {
+                var hl = hoejLav(a, b);
+                h += '<div class="tv-linje"><div class="tv-navn">Forskellen i elektronegativitet</div>' +
+                    '<div class="tv-regn">ΔEN = EN(' + hl[0] + ") − EN(" + hl[1] + ")</div>" +
+                    '<div class="tv-regn">ΔEN = ' + regning(a, b) + "</div></div>";
+            } else if (spm === "dEN") {
+                h += '<div class="tv-linje spm"><div class="tv-navn">Forskellen i elektronegativitet</div><div class="tv-regn">ΔEN = ?</div></div>';
+            }
+            if (!o.skjult("type")) {
+                var t = this.type();
+                h += '<div class="tv-linje"><div class="tv-navn">Bindingen er</div><div class="tv-regn tv-type ' + t + '">' + D.TYPER[t].navn + "</div></div>";
+            } else if (spm === "type") {
+                h += '<div class="tv-linje spm"><div class="tv-navn">Bindingen er</div><div class="tv-regn">?</div></div>';
+            }
+        }
+        if (h !== this._tavle) {
+            this._tavle = h;
+            this.e.tavle.innerHTML = h;
+            this.e.tavle.classList.toggle("plads", plads);
+        }
     };
 
     /* ----- Musen: klik paa et atom i scenen ------------------------------------ */
@@ -393,75 +538,82 @@
         cvs.addEventListener("pointerdown", function (e) {
             var p = mig._punkt(e);
             var i = mig.atomVed(p.x, p.y);
-            if (mig.opgaver.klik(i)) return;
-            if (i >= 0 && mig.fastPar) { mig.opgaver.blink(); return; }
-            if (i >= 0 && !mig.opgaver.spaer()) {
+            if (i < 0) return;
+            if (mig.opgaver.ringFri()) {
                 mig.slot = i;
                 mig.opdaterTabel();
+            } else {
+                mig.opgaver.spaer();
             }
         });
         cvs.addEventListener("pointermove", function (e) {
             var p = mig._punkt(e);
             mig.hover = mig.atomVed(p.x, p.y);
-            cvs.style.cursor = mig.hover >= 0 && (!mig.fastPar || mig.opgaver.igang()) ? "pointer" : "default";
+            cvs.style.cursor = mig.hover >= 0 && mig.opgaver.ringFri() ? "pointer" : "default";
         });
         cvs.addEventListener("pointerleave", function () { mig.hover = -1; });
     };
 
-    /* ----- Panelet --------------------------------------------------------------- */
-    P.opdaterPanel = function () {
-        var a = this.par[0], b = this.par[1];
-        var t = this.type();
-        NK.saetTekst("en-formel", binding(a, b));
-        NK.saetTekst("en-navn", navn(a) + " og " + navn(b));
-        NK.saetTekst("en-regning", this.skjul.type ? regning(a, b).replace(/= .*$/, "= ?") : regning(a, b));
-        if (this.skjul.type) {
-            NK.saetTekst("en-type", "?");
-            NK.saetKlasse("en-type", "maerke graa");
-        } else {
-            NK.saetTekst("en-type", D.TYPER[t].navn);
-            NK.saetKlasse("en-type", "maerke " + (t === "upolaer" ? "groen" : t === "polaer" ? "orange" : "roed"));
-        }
+    /* ----- Maal ------------------------------------------------------------------ */
+    /* Kortet staar under opgaveraekken og har en fast plads (REGELSAET 4) */
+    NK.kortTopEn = function () {
+        return (window.innerHeight <= 720 ? 42 : 46) + NK.kortZone() + 10;
     };
 
-    /* Billedteksten over skalaen: hvad scenen viser lige nu */
-    P.billedtekst = function () {
-        var a = this.par[0], b = this.par[1];
-        if (this.skjul.skift) return "Hvem trækker hårdest i elektronparret?";
-        var staerk = D.staerkest(a, b);
-        var t = this.type();
-        if (!staerk) return "Lige stærkt træk. Elektronparret ligger i midten.";
-        var svag = staerk === a ? b : a;
-        if (t === "upolaer") return staerk + " trækker kun lidt hårdere end " + svag + ". Bindingen er upolær.";
-        if (t === "polaer") return staerk + " trækker hårdest. Elektronparret ligger tættest på " + staerk + ".";
-        return staerk + " tager elektronerne helt. Der dannes ioner.";
+    /* Scenens opbygning: skalaen under kortet, tabellen til venstre,
+       atomerne i midten og tavlen til hoejre. Samlet i midten paa en stor
+       skaerm (REGELSAET 32). */
+    P.layout = function () {
+        var b = this.laerred.b, h = this.laerred.h;
+        var T = NK.kortTopEn();
+        var cw = Math.min(b - 32, 1260), x0 = (b - cw) / 2;
+        var sw = Math.min(cw - 80, 820);
+        var barY = T + 30;
+        var A0 = barY + 26 + 44, A1 = h - 14;
+        var ptB = NK.klamp(cw * 0.23, 286, 340), tvB = NK.klamp(cw * 0.19, 232, 290);
+        var mx0 = x0 + ptB + 24, mx1 = x0 + cw - tvB - 24;
+        var U = NK.klamp(Math.min((mx1 - mx0) / 5.2, (A1 - A0 - 80) / 2.4), 34, 112);
+        var cy = A0 + Math.max(U * 1.1, (A1 - A0 - 60) / 2);
+        this.lay = { T: T, x0: x0, cw: cw, sx0: b / 2 - sw / 2, sx1: b / 2 + sw / 2, barY: barY,
+            A0: A0, A1: A1, ptB: ptB, tvB: tvB, mx0: mx0, mx1: mx1, U: U, cy: cy };
+
+        var pt = this.e.pt, tv = this.e.tavle;
+        pt.style.width = ptB + "px";
+        pt.style.left = Math.round(x0) + "px";
+        /* Tabellen og tavlen har samme overkant, og tavlen vokser nedad */
+        var top = Math.round(Math.max(A0, cy - pt.offsetHeight / 2));
+        pt.style.top = top + "px";
+        tv.style.width = tvB + "px";
+        tv.style.left = Math.round(x0 + cw - tvB) + "px";
+        tv.style.top = top + "px";
     };
 
     /* ----- Faelles graenseflade -------------------------------------------------- */
     P.tilpas = function () {
-        this.laerred.tilpas();
+        var ny = this.laerred.tilpas();
         this.top = NK.saetKortZone(this.laerred.canvas);
+        if (ny || !this.lay || this._hoejde !== window.innerHeight) {
+            this._hoejde = window.innerHeight;
+            this.layout();
+        }
     };
 
     P.opdater = function (dt) {
         this.tid += dt;
+        this.opgaver.opdater(dt);
         this.vist.skift = NK.mod(this.vist.skift, this.maalSkift(), 5, dt);
         this.vist.adskil = NK.mod(this.vist.adskil, this.maalAdskil(), 5, dt);
         this.vist.dEN = NK.mod(this.vist.dEN, D.dEN(this.par[0], this.par[1]), 7, dt);
         this.pop[0] = Math.max(0, this.pop[0] - dt * 3);
         this.pop[1] = Math.max(0, this.pop[1] - dt * 3);
-        this.opgaver.opdater();
-        this.opdaterPanel();
+        this.opdaterTabel();
+        this.opdaterTavle();
     };
 
     /* Atomernes plads og stoerrelse paa laerredet */
     P.geometri = function () {
-        var b = this.laerred.b, h = this.laerred.h;
-        var bund = 150;
-        /* top: pladsen oeverst, som papirkortet har (NK.kortTop i opgave.js) */
-        var top = Math.min(this.top || 0, h * 0.4);
-        var U = NK.klamp(Math.min(b / 7.4, (h - bund - top) / 3.4), 34, 100);
-        var cy = top + (h - bund - top) * 0.5 + 18;
+        if (!this.lay) this.layout();
+        var L = this.lay, U = L.U;
         var s = this.vist.skift, ad = this.vist.adskil;
         var R = [0, 1].map(function (i) {
             var g = D.GRUNDSTOFFER[this.par[i]];
@@ -473,8 +625,8 @@
         }, this);
         var gab = U * (0.95 + 0.85 * ad);
         var afst = R[0] + R[1] + gab;
-        var midt = b / 2 + (R[0] - R[1]) / 2;
-        this.geo = { U: U, y: cy, x: [midt - afst / 2, midt + afst / 2], R: R, bund: bund };
+        var midt = (L.mx0 + L.mx1) / 2 + (R[0] - R[1]) / 2;
+        this.geo = { U: U, y: L.cy, x: [midt - afst / 2, midt + afst / 2], R: R };
         return this.geo;
     };
 
@@ -506,38 +658,27 @@
         var R = g.R[i], x = g.x[i], y = g.y;
         var s = R * SPRITE_KUGLE;
         NK.Sprites.tegn(ctx, "atom_" + el, x - s, y - s, 2 * s, 2 * s);
-        var fs = NK.klamp(R * 0.62, 16, 44);
+        var fs = NK.klamp(R * 0.6, 16, 42);
         var moerk = D.GRUNDSTOFFER[el].moerkTekst;
         NK.tekst(ctx, el, x, y + 1, {
-            font: "700 " + Math.round(fs) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
-            farve: moerk ? "#2b2f36" : "#ffffff", kant: !moerk, kantFarve: "rgba(0, 0, 0, 0.45)", kantBredde: Math.max(2, fs * 0.14)
+            font: "600 " + Math.round(fs) + "px " + LEX, justering: "center", linje: "middle",
+            farve: moerk ? "#2b2f36" : "#ffffff", kant: !moerk, kantFarve: "rgba(0, 0, 0, 0.4)", kantBredde: Math.max(2, fs * 0.12)
         });
         /* Elektronegativiteten og navnet under atomet */
-        NK.etiket(ctx, "EN " + tal(en(el)), x, y + R + 24, { font: "700 16px 'Segoe UI', sans-serif", hoejde: 26, kant: "rgba(255, 255, 255, 0.18)" });
-        NK.tekst(ctx, navn(el), x, y + R + 52, { font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9aa1ab" });
+        NK.etiket(ctx, "EN " + tal(en(el)), x, y + R + 24, { font: "500 16px " + LEX, hoejde: 28, kant: "rgba(255, 255, 255, 0.2)" });
+        NK.tekst(ctx, navn(el), x, y + R + 54, { font: "400 14px " + LEX, justering: "center", linje: "middle", farve: "#aab1bb" });
 
-        /* Det atom, eleven har valgt under en klik-opgave */
-        var o = this.opgaver.opgave;
-        if (o && !o.afsluttet && o.klik && this.opgaver.klikValgt === i) {
-            ctx.save();
-            ctx.strokeStyle = GUL;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y, R + 9, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
         /* Ringen om det atom, et klik i tabellen skifter ud */
-        } else if (i === this.slot && !this.fastPar) {
+        if (i === this.slot && this.opgaver.tabelAktiv()) {
             ctx.save();
             ctx.setLineDash([7, 6]);
-            ctx.lineDashOffset = -this.tid * 18;
             ctx.strokeStyle = GUL;
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.arc(x, y, R + 10, 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
-        } else if (i === this.hover && (!this.fastPar || this.opgaver.igang())) {
+        } else if (i === this.hover && this.opgaver.ringFri()) {
             ctx.save();
             ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
             ctx.lineWidth = 2;
@@ -550,8 +691,7 @@
 
     P.tegnLadning = function (ctx, g) {
         var s = this.vist.skift, ad = this.vist.adskil;
-        if (Math.abs(s) < 0.05 || this.skjul.skift) return;
-        var delta = NK.el("en-delta").checked;
+        if (Math.abs(s) < 0.05 || this.skjult("skift")) return;
         for (var i = 0; i < 2; i++) {
             var negativ = i === 0 ? s < 0 : s > 0;
             var x = g.x[i] + g.R[i] * 0.72 + 6, y = g.y - g.R[i] * 0.72 - 6;
@@ -566,11 +706,11 @@
                 ctx.arc(x + 6, y + 2, 17, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
-                NK.tekst(ctx, negativ ? "−" : "+", x + 6, y + 3, { font: "700 26px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: negativ ? MINUS : PLUS });
+                NK.tekst(ctx, negativ ? "−" : "+", x + 6, y + 3, { font: "500 26px " + LEX, justering: "center", linje: "middle", farve: negativ ? MINUS : PLUS });
                 ctx.restore();
-            } else if (delta && this.type() === "polaer") {
+            } else if (this.type() === "polaer") {
                 NK.tekst(ctx, negativ ? "δ−" : "δ+", x, y, {
-                    font: "700 22px 'Segoe UI', sans-serif", justering: "left", linje: "middle",
+                    font: "500 22px " + LEX, justering: "left", linje: "middle",
                     farve: negativ ? MINUS : PLUS, kant: true, kantBredde: 4
                 });
             }
@@ -593,36 +733,49 @@
         ctx.restore();
     };
 
-    P.tegnSkala = function (ctx, g) {
-        var b = this.laerred.b, h = this.laerred.h;
-        var x0 = Math.max(56, b * 0.09), x1 = b - Math.max(28, b * 0.06);
-        var y = h - 64, hh = 26;
+    /* Skalaen for ΔEN lige under kortet (REGELSAET 37). Er den skjult, staar
+       en stiplet plads med navnet (REGELSAET 13). */
+    P.tegnSkala = function (ctx) {
+        var L = this.lay;
+        var x0 = L.sx0 + 46, x1 = L.sx1 - 10;
+        var y = L.barY, hh = 26;
+        if (this.skjult("skala")) {
+            ctx.save();
+            ctx.setLineDash([6, 5]);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+            ctx.lineWidth = 1.5;
+            NK.rundtRekt(ctx, L.sx0, y - 18, L.sx1 - L.sx0, hh + 40, 8);
+            ctx.stroke();
+            ctx.restore();
+            NK.tekst(ctx, "ΔEN-skalaen", (L.sx0 + L.sx1) / 2, y + hh / 2 + 1, { font: "400 15px " + LEX, justering: "center", linje: "middle", farve: "#7c838d" });
+            return;
+        }
         function xAf(v) { return x0 + (x1 - x0) * v / SKALA_MAKS; }
         var zoner = [[0, D.POLAER_GRAENSE, "upolaer"], [D.POLAER_GRAENSE, D.ION_GRAENSE, "polaer"], [D.ION_GRAENSE, SKALA_MAKS, "ion"]];
         var FARVE = { upolaer: "63, 174, 114", polaer: "230, 137, 42", ion: "224, 84, 70" };
         var t = this.type();
-        var skjult = !!this.skjul.type;
+        var typeSkjult = this.skjult("type"), denSkjult = this.skjult("dEN");
         zoner.forEach(function (z) {
             var a = xAf(z[0]), c = xAf(z[1]);
-            var aktiv = !skjult && z[2] === t;
-            ctx.fillStyle = "rgba(" + FARVE[z[2]] + ", " + (aktiv ? 0.42 : 0.18) + ")";
+            var aktiv = !typeSkjult && !denSkjult && z[2] === t;
+            ctx.fillStyle = "rgba(" + FARVE[z[2]] + ", " + (aktiv ? 0.42 : 0.16) + ")";
             ctx.fillRect(a, y, c - a, hh);
             ctx.strokeStyle = "rgba(" + FARVE[z[2]] + ", 0.7)";
             ctx.lineWidth = 1;
             ctx.strokeRect(a + 0.5, y + 0.5, c - a - 1, hh - 1);
             NK.tekst(ctx, D.TYPER[z[2]].navn, (a + c) / 2, y + hh / 2 + 1, {
-                font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: D.TYPER[z[2]].farve
+                font: "500 14px " + LEX, justering: "center", linje: "middle", farve: D.TYPER[z[2]].farve
             });
         });
-        NK.tekst(ctx, "ΔEN", x0 - 10, y + hh / 2 + 1, { font: "700 14px 'Segoe UI', sans-serif", justering: "right", linje: "middle", farve: "#c8ced6" });
+        NK.tekst(ctx, "ΔEN", x0 - 10, y + hh / 2 + 1, { font: "500 15px " + LEX, justering: "right", linje: "middle", farve: "#c8ced6" });
         for (var v = 0; v <= SKALA_MAKS + 1e-9; v += 0.5) {
             var x = xAf(v);
             ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
             ctx.fillRect(x - 0.5, y + hh, 1, 5);
-            NK.tekst(ctx, tal(v), x, y + hh + 17, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9aa1ab" });
+            NK.tekst(ctx, tal(v), x, y + hh + 16, { font: "400 13.5px " + LEX, justering: "center", linje: "middle", farve: "#9aa1ab" });
         }
-        if (skjult) {
-            NK.etiket(ctx, "ΔEN = ?", xAf(SKALA_MAKS / 2), y - 22, { font: "700 15px 'Segoe UI', sans-serif", farve: GUL, hoejde: 26 });
+        if (denSkjult) {
+            NK.etiket(ctx, "ΔEN = ?", (x0 + x1) / 2, y - 16, { font: "500 15px " + LEX, farve: GUL, hoejde: 26 });
             return;
         }
         var xm = xAf(NK.klamp(this.vist.dEN, 0, SKALA_MAKS));
@@ -639,7 +792,7 @@
         ctx.fill();
         ctx.restore();
         var lx = NK.klamp(xm, x0 + 50, x1 - 50);
-        NK.etiket(ctx, "ΔEN = " + tal(D.dEN(this.par[0], this.par[1])), lx, y - 26, { font: "700 15px 'Segoe UI', sans-serif", farve: GUL, hoejde: 26 });
+        NK.etiket(ctx, "ΔEN = " + tal(D.dEN(this.par[0], this.par[1])), lx, y - 24, { font: "500 15px " + LEX, farve: GUL, hoejde: 26 });
     };
 
     P.tegn = function () {
@@ -647,44 +800,33 @@
         var b = this.laerred.b, h = this.laerred.h;
         ctx.fillStyle = "#14141a";
         ctx.fillRect(0, 0, b, h);
-        var glod = ctx.createRadialGradient(b / 2, h * 0.4, 0, b / 2, h * 0.4, Math.min(b, h) * 0.6);
-        glod.addColorStop(0, "rgba(61, 158, 224, 0.07)");
+        var g = this.geometri();
+        var glod = ctx.createRadialGradient(b / 2, g.y, 0, b / 2, g.y, Math.min(b, h) * 0.55);
+        glod.addColorStop(0, "rgba(61, 158, 224, 0.06)");
         glod.addColorStop(1, "rgba(61, 158, 224, 0)");
         ctx.fillStyle = glod;
         ctx.fillRect(0, 0, b, h);
 
-        var g = this.geometri();
-        var s = this.vist.skift;
-
         /* Elektronskyen: tykkest ved det atom, der traekker haardest */
-        if (NK.el("en-sky").checked) {
-            var w = [0.5 - 0.5 * s, 0.5 + 0.5 * s];
-            sky(ctx, g.x[0], g.y, g.R[0] * 1.75, 0.62 * w[0]);
-            sky(ctx, g.x[1], g.y, g.R[1] * 1.75, 0.62 * w[1]);
-            sky(ctx, this.parPlads(g), g.y, g.U * 1.15, 0.38 * (1 - 0.6 * this.vist.adskil));
-        }
+        var s = this.vist.skift;
+        var w = [0.5 - 0.5 * s, 0.5 + 0.5 * s];
+        sky(ctx, g.x[0], g.y, g.R[0] * 1.75, 0.62 * w[0]);
+        sky(ctx, g.x[1], g.y, g.R[1] * 1.75, 0.62 * w[1]);
+        sky(ctx, this.parPlads(g), g.y, g.U * 1.15, 0.38 * (1 - 0.6 * this.vist.adskil));
 
         this.tegnAtom(ctx, 0, g);
         this.tegnAtom(ctx, 1, g);
         this.tegnPar(ctx, g);
         this.tegnLadning(ctx, g);
-
-        NK.tekst(ctx, this.billedtekst(), b / 2, h - 120, {
-            font: "600 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#e9eef4"
-        });
-        this.tegnSkala(ctx, g);
+        this.tegnSkala(ctx);
     };
 
-    P.nulstil = function () {
-        this.opgaver.nulstil();
-        this.slutOpgavePar();
-        this.par = START.slice();
-        this.slot = 0;
-        this.aendringer++;
-        this.opdaterTabel();
-    };
+    /* Tasten R og Start forfra: den aabne opgave forfra */
+    P.nulstil = function () { this.opgaver.forfra(); };
 
     P.skiftVinkelmaaler = function () { /* ingen vinkelmaaler her */ };
 
     NK.SimEN.regning = regning;
+    NK.SimEN.bygTabel = bygTabel;
+    NK.SimEN.fuldRegning = fuldRegning;
 }());

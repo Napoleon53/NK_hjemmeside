@@ -25,16 +25,16 @@
             { sel: "#fabrik-anker-glas", titel: "Glasset", tekst: "Dit fedtstof ved 20 °C. Det følger med over på fane 2." },
             { sel: "#fabrik-forfra", titel: "Start forfra", tekst: "Knappen starter forfra med ordre 1 og tager fedtsyrerne af glycerol." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Esterbindingen, mættet og umættet fedt og knækkene kort forklaret." },
-            { sel: ".faneknapper", titel: "Køleskabet", tekst: "På fane 2 sætter du fedtstofferne i fryseren, i køleskabet, på bordet eller i solen." }
+            { sel: ".faneknapper", titel: "Fast eller flydende?", tekst: "På fane 2 sætter du fedtstofferne i fryseren, i køleskabet, på bordet eller i solen." }
         ],
         "fane-koele": [
-            { sel: "#koele-anker-bord", titel: "Glassene", tekst: "Fem fedtstoffer fra køkkenet og dit eget fra fane 1. Træk et glas et andet sted hen." },
-            { sel: "#koele-anker-skab", titel: "Fryser og køleskab", tekst: "Fryseren er −18 °C og køleskabet 5 °C. Der er plads til to glas hvert sted." },
+            { sel: "#koele-liste", titel: "Opgaverne", tekst: "Opgaverne står i rækken. En ny opgave låses op, når den forrige er løst." },
+            { sel: "#koele-skort", titel: "Opgaven", tekst: "Kortet stiller ét spørgsmål ad gangen. Gæt først, om fedtet er fast, delvist fast eller flydende. Bagefter trækker du glasset derhen og ser selv." },
+            { sel: "#koele-anker-skab", titel: "Fryser og køleskab", tekst: "Fryseren er −18 °C og køleskabet 5 °C. Der er plads til to glas i fryseren og tre i køleskabet." },
             { sel: "#koele-anker-vindue", titel: "I solen", tekst: "I vindueskarmen er det 35 °C." },
-            { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Zoomvinduet viser molekylerne i det valgte glas helt tæt på. Hver kæde er en fedtsyre i sin farve, og molekylerne i fast fedt ligger i rækker." },
-            { sel: "#koele-skort", titel: "Opgaven", tekst: "Gæt først, om fedtet er fast, delvist fast eller flydende. Når du trykker Indsend svar, flytter glasset hen til det sted, opgaven nævner." },
-            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Varedeklarationen viser, hvor mange af fedtsyrerne i det valgte glas der er mættede, monoumættede og polyumættede." },
-            { sel: "#koele-forfra", titel: "Start forfra", tekst: "Knappen starter alle opgaver i køkkenet forfra, og glassene kommer tilbage på bordet." }
+            { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Vinduet viser molekylerne i glasset helt tæt på. Hver kæde er en fedtsyre i sin farve, og molekylerne i fast fedt ligger i rækker." },
+            { sel: "#koele-dekl", titel: "Varedeklarationen", tekst: "Varedeklarationen viser, hvor mange af fedtsyrerne i glasset der er mættede, monoumættede og polyumættede. Farverne er kædernes farver i vinduet." },
+            { sel: "#koele-frileg", titel: "Fri leg", tekst: "Med Fri leg kan du flytte alle glassene. Knappen bringer dig tilbage til opgaven." }
         ]
     };
 

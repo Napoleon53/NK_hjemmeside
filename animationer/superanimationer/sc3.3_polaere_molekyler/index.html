@@ -7,6 +7,7 @@
 <title>Polære molekyler</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 </head>
 <body class="papirkort">
 
@@ -28,52 +29,43 @@
 <!-- ================================================================= -->
 <!-- FANE 1: ELEKTRONEGATIVITET                                         -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-en" role="tabpanel" aria-label="Elektronegativitet">
+<section class="fane aktiv uden-panel" id="fane-en" role="tabpanel" aria-label="Elektronegativitet">
+    <!-- Intet panel (runde T8, 22. nov. 2026, REGELSAET 2-3): opgaverne staar i
+         raekken oeverst, det periodiske system og tavlen staar i scenen. -->
     <div class="scene">
         <canvas id="en-laerred" aria-label="To atomer, der deler et elektronpar, og en skala for forskellen i elektronegativitet"></canvas>
-        <!-- Papirkortet oeverst midt i scenen: opgaven, svarene, hint, forklaringen
-             og knapperne (js/opgave.js, papirkortet 6. nov. 2026) -->
-        <div class="scenekort opgave" id="en-skort">
+
+        <!-- De seks opgaver i fast raekkefoelge, laast op i takt (js/en_opgaver.js) -->
+        <nav class="opgaverad" id="en-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="en-liste"></div>
+            <button class="or-knap or-stille" id="en-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="en-frileg" type="button" title="Brug alle knapper uden opgaver">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: opgaven, svarene, hint og Indsend svar -->
+        <div class="scenekort" id="en-skort">
             <div class="sk-ind" id="en-ind"></div>
-            <div class="sk-bund tom" id="en-status">
+            <div class="sk-bund" id="en-status" hidden>
                 <p class="st-tekst" id="en-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="en-hjknap" type="button">Giv et hint</button>
                 <button class="knap indsend" id="en-indsend" type="button">Indsend svar</button>
             </div>
         </div>
-    </div>
 
-    <aside class="panel">
-        <div class="kort" id="en-tabel-kort">
-            <h2>Vælg atomer <span class="taeller">elektronegativitet</span></h2>
+        <!-- Det periodiske system til venstre. Pladsen saettes af sim_en.js. -->
+        <div class="en-pt" id="en-pt">
+            <div class="en-pt-titel">Det periodiske system</div>
             <div class="pt" id="en-tabel"></div>
-            <p class="note">Et klik sætter atomet ind i stedet for atomet med den gule ring.</p>
+            <p class="en-pt-note">Tallet er atomets elektronegativitet.</p>
+            <div class="en-plads">Det periodiske system</div>
         </div>
 
-        <div class="kort maaling" id="en-binding">
-            <h2>Bindingen</h2>
-            <div class="formelvis">
-                <span class="fformel" id="en-formel"></span>
-                <span class="fnavn" id="en-navn"></span>
-            </div>
-            <div class="talraekke"><span>ΔEN</span><span class="tal" id="en-regning"></span></div>
-            <div class="talraekke sum"><span>Bindingen er</span><span class="maerke" id="en-type"></span></div>
-        </div>
+        <!-- Tavlen med regnestykket til hoejre (REGELSAET 27-29) -->
+        <div class="en-tavle" id="en-tavle"></div>
 
-        <div class="kort">
-            <h2>Visning</h2>
-            <div class="tjekraekke">
-                <label class="tjek"><input type="checkbox" id="en-sky" checked> Elektronsky</label>
-                <label class="tjek"><input type="checkbox" id="en-delta" checked> δ+ og δ−</label>
-            </div>
-        </div>
-
-        <div class="kort opgavekort">
-            <h2>Opgaver <span class="taeller">løst: <b id="en-opg-loest">0</b></span></h2>
-            <p class="opgave-nr">Opgaven på kortet: <b id="en-opg-nr">ikke startet</b></p>
-            <div class="knaprad"><button class="knap nulstil" id="en-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
-        </div>
-    </aside>
+        <!-- Klik-opfordringen (REGELSAET 19-20) -->
+        <div class="en-boble" id="en-boble" hidden></div>
+    </div>
 </section>
 
 <!-- ================================================================= -->
@@ -99,24 +91,33 @@
     </div>
 
     <aside class="panel">
-        <div class="kort">
+        <!-- Menuen og visningen er skjult under opgaverne og kommer frem i
+             fri leg (klassen kun-fri, Niels 22. nov. 2026, REGELSAET 57) -->
+        <div class="kort kun-fri">
             <h2>Vælg molekyle</h2>
             <div class="molvalg" id="pol-menu"></div>
         </div>
 
-        <div class="kort">
+        <div class="kort kun-fri">
             <h2>Visning</h2>
             <div class="tjekraekke">
                 <label class="tjek"><input type="checkbox" id="pol-delta" checked> δ+ og δ−</label>
                 <label class="tjek"><input type="checkbox" id="pol-traek" checked> Træk i bindingerne</label>
                 <label class="tjek"><input type="checkbox" id="pol-samlet"> Samlet træk</label>
-                <label class="tjek"><input type="checkbox" id="pol-drej" checked> Drej langsomt</label>
+                <label class="tjek"><input type="checkbox" id="pol-drej"> Drej langsomt</label>
             </div>
         </div>
 
+        <!-- Elektronegativiteterne som en figur at aflaese, og beregningerne
+             foldet sammen (Niels 22. nov. 2026: "savner adgang til
+             elektronegativitetsværdier", beregningerne var "lidt overvældende") -->
         <div class="kort maaling" id="pol-en">
-            <h2>Bindingerne <span class="taeller">elektronegativitet</span></h2>
-            <div id="pol-en-tabel"></div>
+            <h2>Elektronegativitet</h2>
+            <div class="pt pol-pt" id="pol-tabel"></div>
+            <details class="pol-regn" id="pol-regn">
+                <summary>Vis beregningerne</summary>
+                <div id="pol-en-tabel"></div>
+            </details>
             <div class="talraekke sum"><span id="pol-formel">Molekylet</span><span class="maerke" id="pol-polaer"></span></div>
         </div>
 
@@ -124,6 +125,7 @@
             <h2>Opgaver <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
             <p class="opgave-nr">Opgaven på kortet: <b id="pol-opg-nr">ikke startet</b></p>
             <div class="knaprad"><button class="knap nulstil" id="pol-forfra" type="button">Start forfra <span class="tegn">↺</span></button></div>
+            <div class="knaprad"><button class="knap frileg" id="pol-frileg" type="button">Fri leg</button></div>
         </div>
     </aside>
 </section>
@@ -174,9 +176,23 @@
 <!-- TEORIBOKSEN: valgfri, aabnes med knappen eller T                    -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
-        <h2>Teori: polære molekyler</h2>
-        <div class="teoriliste" id="teori-liste"></div>
+    <div class="overlay-boks teori-ark">
+        <h2>Elektronegativitet og polære bindinger</h2>
+        <p>Elektronegativitet er et mål for, hvor kraftigt et atom trækker i de fælles elektroner i en binding. Den er størst øverst til højre i det periodiske system. Fluor har den største, 4,0.</p>
+        <h3 class="teori-hoved">Tre slags bindinger</h3>
+        <p>Forskellen i elektronegativitet, ΔEN, findes ved at trække den mindste elektronegativitet fra den største.</p>
+        <table class="teori-tabel">
+            <tr><th>ΔEN</th><th>Binding</th><th>Elektronparret</th></tr>
+            <tr><td>under 0,5</td><td>upolær</td><td>deles ligeligt</td></tr>
+            <tr><td>0,5 til under 2,0</td><td>polær</td><td>ligger tættest på det mest elektronegative atom</td></tr>
+            <tr><td>2,0 eller mere</td><td>ionbinding</td><td>tages helt af det mest elektronegative atom</td></tr>
+        </table>
+        <div class="eksempel">H−Cl: ΔEN = EN(Cl) − EN(H) = 3,0 − 2,1 = 0,9. Bindingen er polær. Cl bliver δ−, og H bliver δ+.</div>
+        <p>δ betyder delvist. Atomerne i en polær binding har en lille ladning, ikke en hel.</p>
+        <h3 class="teori-hoved">Polære molekyler</h3>
+        <p>Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. CO₂ og CCl₄ har polære bindinger, men er symmetriske og derfor upolære. En stråle af en polær væske bøjer mod en ladet stav, uanset om staven er positiv eller negativ.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/c/kapitler/3-3-elektronegativitet-og-polaere-bindinger.html" target="_blank" rel="noopener">3.3 Elektronegativitet og polære bindinger</a> og <a href="https://kemibogen.dk/c/kapitler/3-4-polaere-molekyler-og-blandbarhed.html" target="_blank" rel="noopener">3.4 Polære molekyler og blandbarhed</a></p>
+        <p class="genveje"><kbd>1</kbd>-<kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>S</kbd> tegneserie &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
         </div>
@@ -223,6 +239,7 @@
 <script src="js/prikformel.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/valg.js"></script>
+<script src="js/en_opgaver.js"></script>
 <script src="js/sim_en.js"></script>
 <script src="js/molsim.js"></script>
 <script src="js/sim_polaritet.js"></script>

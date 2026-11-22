@@ -44,23 +44,6 @@
         return !!document.querySelector(".overlay.vis");
     }
 
-    function bygTeori() {
-        var vaert = NK.el("teori-liste");
-        NK.Data.TEORI.forEach(function (afsnit) {
-            var kort = document.createElement("div");
-            kort.className = "teorikort";
-            var h = document.createElement("h4");
-            h.textContent = afsnit.h;
-            kort.appendChild(h);
-            afsnit.p.forEach(function (tekst) {
-                var p = document.createElement("p");
-                p.innerHTML = tekst;
-                kort.appendChild(p);
-            });
-            vaert.appendChild(kort);
-        });
-    }
-
     function aabnSerie() {
         var sim = sims["fane-vand"];
         if (!sim.slut()) return;
@@ -131,7 +114,6 @@
     function start() {
         NK.Data.klargoer();
         NK.Sprites.start();
-        bygTeori();
 
         sims["fane-en"] = new NK.SimEN();
         sims["fane-polaritet"] = new NK.SimPolaritet();

@@ -181,54 +181,54 @@
        og Ba, metalionerne Fe, Cu, Ag og Zn og de seks vigtige sammensatte
        ioner. Pladsen paa hylden er raekkefoelgen inden for hylden. */
     var S = [
-        ["Na", "O", "formel", 0, "#f2f0ea", "pulver", "Indgår i almindeligt vinduesglas."],
-        ["Mg", "Cl", "formel", 0, "#f4f3ef", "krystal", "Får sojamælk til at stivne til tofu."],
-        ["K", "I", "formel", 0, "#f6f5f0", "krystal", "Tabletter mod radioaktivt iod ved atomulykker."],
+        ["Na", "O", "formel", 0, "#f2f0ea", "pulver", "Natriumoxid indgår i almindeligt vinduesglas."],
+        ["Mg", "Cl", "formel", 0, "#f4f3ef", "krystal", "Magnesiumchlorid får sojamælk til at stivne til tofu."],
+        ["K", "I", "formel", 0, "#f6f5f0", "krystal", "Kaliumiodid tages som tabletter mod radioaktivt iod ved atomulykker."],
         ["Al", "O", "formel", 0, "#eeeeea", "pulver", "Rubin og safir er aluminiumoxid med lidt urenheder."],
-        ["K", "S", "formel", 0, "#e6d59a", "pulver", "Giver sølv en mørk, antik overflade."],
-        ["Ba", "F", "formel", 0, "#f3f3f3", "pulver", "Linser, der lukker infrarødt lys igennem."],
-        ["Li", "N", "formel", 0, "#b8485e", "pulver", "Dannes, når lithium reagerer med luftens dinitrogen."],
-        ["Ca", "Cl", "formel", 0, "#f5f4f0", "krystal", "Vejsalt, der virker ved lavere temperatur end køkkensalt."],
-        ["Mg", "O", "formel", 0, "#f3f3ef", "pulver", "Magnesia: tabletter mod halsbrand og forstoppelse."],
-        ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Nødblus til søs. Med vand dannes en gas, der selv tager fyr."],
+        ["K", "S", "formel", 0, "#e6d59a", "pulver", "Kaliumsulfid giver sølv en mørk, antik overflade."],
+        ["Ba", "F", "formel", 0, "#f3f3f3", "pulver", "Bariumfluorid bruges i linser, der lukker infrarødt lys igennem."],
+        ["Li", "N", "formel", 0, "#b8485e", "pulver", "Lithiumnitrid dannes, når lithium reagerer med luftens dinitrogen."],
+        ["Ca", "Cl", "formel", 0, "#f5f4f0", "krystal", "Calciumchlorid tør is op ved lavere temperatur end køkkensalt."],
+        ["Mg", "O", "formel", 0, "#f3f3ef", "pulver", "Magnesia (magnesiumoxid) bruges mod halsbrand og forstoppelse."],
+        ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Calciumphosphid i nødblus giver med vand en gas, der selv tager fyr."],
 
-        ["Fe2", "O", "navn", 1, "#2b2724", "pulver", "Sort. Findes i hammerskæl, der springer af under smedning."],
-        ["Cu2", "Cl", "navn", 1, "#b98a35", "pulver", "Farver en flamme blågrøn."],
-        ["Fe3", "O", "navn", 1, "#8b3a1e", "pulver", "Hovedbestanddelen i rust."],
-        ["Zn", "O", "navn", 1, "#f7f7f5", "pulver", "Den hvide solcreme på næsen."],
-        ["Cu1", "O", "navn", 1, "#a8322a", "pulver", "Rødt pigment i bundmaling til skibe."],
-        ["Fe3", "Cl", "navn", 1, "#35331f", "krystal", "Bruges til at ætse printplader."],
-        ["Ag", "Br", "navn", 1, "#e6dfa4", "pulver", "Det lysfølsomme stof i gammeldags fotofilm."],
-        ["Cu2", "O", "navn", 1, "#221e1c", "pulver", "Det sorte lag på kobber, der har været varmet op."],
-        ["Ag", "S", "navn", 1, "#2e2d30", "pulver", "Den sorte anløbning på sølvtøj."],
-        ["Fe2", "Cl", "navn", 1, "#ddd6b8", "krystal", "Dannes, når jern opløses i saltsyre."],
+        ["Fe2", "O", "navn", 1, "#2b2724", "pulver", "Sort jern(II)oxid findes i hammerskæl, der springer af ved smedning."],
+        ["Cu2", "Cl", "navn", 1, "#b98a35", "pulver", "Kobber(II)chlorid farver en flamme blågrøn."],
+        ["Fe3", "O", "navn", 1, "#8b3a1e", "pulver", "Jern(III)oxid er hovedbestanddelen i rust."],
+        ["Zn", "O", "navn", 1, "#f7f7f5", "pulver", "Zink(II)oxid er den hvide solcreme på næsen."],
+        ["Cu1", "O", "navn", 1, "#a8322a", "pulver", "Kobber(I)oxid er et rødt pigment i bundmaling til skibe."],
+        ["Fe3", "Cl", "navn", 1, "#35331f", "krystal", "Jern(III)chlorid bruges til at ætse printplader."],
+        ["Ag", "Br", "navn", 1, "#e6dfa4", "pulver", "Sølv(I)bromid var det lysfølsomme stof i gammeldags fotofilm."],
+        ["Cu2", "O", "navn", 1, "#221e1c", "pulver", "Kobber(II)oxid er det sorte lag på kobber, der har været varmet op."],
+        ["Ag", "S", "navn", 1, "#2e2d30", "pulver", "Sølv(I)sulfid er den sorte anløbning på sølvtøj."],
+        ["Fe2", "Cl", "navn", 1, "#ddd6b8", "krystal", "Jern(II)chlorid dannes, når jern opløses i saltsyre."],
 
-        ["Na", "OH", "formel", 2, "#f6f6f3", "piller", "Kaustisk soda. Opløser fedt i afløbsrens."],
-        ["NH4", "Cl", "navn", 2, "#f5f5f2", "krystal", "Salmiak: smagen i salt lakrids."],
-        ["K", "CO3", "formel", 2, "#f3f2ee", "pulver", "Potaske: hævemiddel i brunkager."],
-        ["K", "NO3", "navn", 2, "#f6f6f2", "krystal", "Salpeter: en af bestanddelene i sortkrudt."],
-        ["Ba", "SO4", "formel", 2, "#f8f8f6", "pulver", "Drikkes før røntgen, så mave og tarm kan ses."],
-        ["Cu2", "SO4", "navn", 2, "#e7e9e8", "pulver", "Hvidt uden vand. Med vand bliver det blåt."],
-        ["Al", "SO4", "formel", 2, "#f1f1ed", "krystal", "Renser drikkevand, fordi snavset fælder ud sammen med det."],
+        ["Na", "OH", "formel", 2, "#f6f6f3", "piller", "Natriumhydroxid (kaustisk soda) opløser fedt i afløbsrens."],
+        ["NH4", "Cl", "navn", 2, "#f5f5f2", "krystal", "Ammoniumchlorid (salmiak) giver smagen i salt lakrids."],
+        ["K", "CO3", "formel", 2, "#f3f2ee", "pulver", "Kaliumcarbonat (potaske) er hævemiddel i brunkager."],
+        ["K", "NO3", "navn", 2, "#f6f6f2", "krystal", "Kaliumnitrat (salpeter) er en af bestanddelene i sortkrudt."],
+        ["Ba", "SO4", "formel", 2, "#f8f8f6", "pulver", "Bariumsulfat drikkes før røntgen, så mave og tarm kan ses."],
+        ["Cu2", "SO4", "navn", 2, "#e7e9e8", "pulver", "Kobber(II)sulfat er hvidt uden vand og bliver blåt med vand."],
+        ["Al", "SO4", "formel", 2, "#f1f1ed", "krystal", "Aluminiumsulfat renser drikkevand, fordi snavset fælder ud med det."],
         ["Ca", "PO4", "navn", 2, "#efede6", "pulver", "Knoglernes mineral er en form for calciumphosphat."],
-        ["NH4", "SO4", "formel", 2, "#f2f1ec", "krystal", "Gødning med både nitrogen og svovl."],
-        ["Fe3", "OH", "navn", 2, "#9a4a22", "pulver", "Okker: det rødbrune slam i jernholdige vandløb."]
+        ["NH4", "SO4", "formel", 2, "#f2f1ec", "krystal", "Ammoniumsulfat er gødning med både nitrogen og svovl."],
+        ["Fe3", "OH", "navn", 2, "#9a4a22", "pulver", "Jern(III)hydroxid er okker, det rødbrune slam i vandløb."]
     ];
 
     /* De sværere: tilvalg med kontakten Sværere ioner. Hvert stof tager
        pladsen [hylde, plads] fra et stof i grundsaettet. */
     var SVAER = [
-        ["Sr", "Cl", "formel", 0, "#f4f4f0", "krystal", "Farver en flamme rød.", 7],
-        ["Be", "O", "formel", 0, "#f0f0ec", "pulver", "Keramik, der leder varme næsten som et metal.", 8],
-        ["Pb4", "O", "navn", 1, "#3b2718", "pulver", "Sidder på pluspolen i et bilbatteri.", 7],
-        ["Sn2", "F", "navn", 1, "#f5f5f2", "pulver", "Fluoren i nogle tandpastaer.", 8],
-        ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik dioxygen ud af det i 1774.", 9],
-        ["K", "MnO4", "navn", 2, "#5a2168", "krystal", "Violette krystaller. Bruges i fodbad mod svamp.", 1],
-        ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Fjerner sølv(I)bromid fra fotopapir, så billedet tåler lys.", 2],
-        ["Na", "HCO3", "navn", 2, "#f7f7f4", "pulver", "Natron: hævemiddel i bagepulver.", 3],
-        ["K", "CrO4", "formel", 2, "#efcd1c", "krystal", "Den gule indikator, når chlorid titreres med sølv(I)nitrat.", 4],
-        ["Pb2", "NO3", "navn", 2, "#f4f4f1", "krystal", "Giver gult bundfald med kaliumiodid.", 5],
-        ["K", "Cr2O7", "formel", 2, "#e2621e", "krystal", "Orange. Blev grøn i gamle alkoholtestere.", 6]
+        ["Sr", "Cl", "formel", 0, "#f4f4f0", "krystal", "Strontiumchlorid farver en flamme rød.", 7],
+        ["Be", "O", "formel", 0, "#f0f0ec", "pulver", "Berylliumoxid er keramik, der leder varme næsten som et metal.", 8],
+        ["Pb4", "O", "navn", 1, "#3b2718", "pulver", "Bly(IV)oxid sidder på pluspolen i et bilbatteri.", 7],
+        ["Sn2", "F", "navn", 1, "#f5f5f2", "pulver", "Tin(II)fluorid er fluoren i nogle tandpastaer.", 8],
+        ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik dioxygen ud af kviksølv(II)oxid i 1774.", 9],
+        ["K", "MnO4", "navn", 2, "#5a2168", "krystal", "Kaliumpermanganat er violette krystaller til fodbad mod svamp.", 1],
+        ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Natriumthiosulfat fjerner sølv(I)bromid, så et foto tåler lys.", 2],
+        ["Na", "HCO3", "navn", 2, "#f7f7f4", "pulver", "Natron (natriumhydrogencarbonat) er hævemiddel i bagepulver.", 3],
+        ["K", "CrO4", "formel", 2, "#efcd1c", "krystal", "Kaliumchromat er den gule indikator i Mohr-titrering af chlorid.", 4],
+        ["Pb2", "NO3", "navn", 2, "#f4f4f1", "krystal", "Bly(II)nitrat giver gult bundfald med kaliumiodid.", 5],
+        ["K", "Cr2O7", "formel", 2, "#e2621e", "krystal", "Orange kaliumdichromat blev grøn i gamle alkoholtestere.", 6]
     ];
 
     /* Det, kontakten Sværere ioner tilføjer, med ord til knappens forklaring */
@@ -469,8 +469,8 @@
           sel: "#lager-anker-reol" },
         { tekst: "Hver ion, du finder, lægger sig som en kugle ved glasset på arbejdsbordet. Når formlen eller navnet er rigtigt, viser kuglerne, hvor mange af hver ion der skal til, for at ladningerne tilsammen giver nul. Et klik på en af plakaterne på væggen viser det periodiske system eller de sammensatte ioner i stort format.",
           sel: ["#lager-anker-bord", "#lager-anker-plakater"] },
-        { tekst: "Kortet øverst i scenen siger, hvad du skal skrive. Panelet til højre har ét felt til hver ion og ét til formlen eller navnet, og du trykker Indsend svar eller Enter efter hvert felt. Knappen Giv et hint på kortet giver først et hint og derefter svaret, og et glas, du løser uden at se svaret, får en stjerne.",
-          sel: ["#lager-skort", "#lager-kort"] }
+        { tekst: "Kortet øverst i scenen stiller ét spørgsmål ad gangen, først om ionerne og så om formlen eller navnet. Du skriver svaret i feltet på kortet og trykker Indsend svar eller Enter. Knappen Giv et hint giver først et hint og derefter svaret, og et glas, du løser uden at se svaret, får en stjerne.",
+          sel: "#lager-skort" }
     ];
     D.INTRO_BAAND = [
         { tekst: "I denne fane skriver du de samme slags etiketter som på lageret, men nu på tid. Glassene kører på samlebåndet hen mod kassen, og hvert glas mangler halvdelen af etiketten. Et glas, der når kassen, koster et liv, og spillet slutter, når alle tre liv er brugt.",
@@ -489,7 +489,8 @@
 
     D.SLUT_REPLIK = {
         ingen: "Alle glassene endte i kassen. Kassen har heldigvis plads nok, og det har den haft siden 2009.",
-        rekord: "Du har sat ny rekord på samlebåndet. Jeg skriver rekorden ned på en seddel et sted."
+        rekord: "Du har sat ny rekord på samlebåndet. Jeg skriver rekorden ned på en seddel et sted.",
+        robot: "Ti etiketter på ti sekunder kan intet menneske skrive. Highscorelisten er kun for mennesker, men robotter er velkomne på lageret."
     };
 
     NK.Data = D;

@@ -1,0 +1,30 @@
+[
+ {
+  "nr": "T10-1",
+  "fil": "sc4.5_fedtstoffer/js/data.js",
+  "gammel": "hint: \"Rette kæder pakker tæt. Hvilken fedtsyre har ingen knæk?\"",
+  "ny": "hint: \"Lige kæder pakker tæt. Hvilken fedtsyre har ingen knæk?\"",
+  "hvor": "fane 1, Fuglehuset, hintet (bogens ord i C 4.6: lige kæder)"
+ },
+ {
+  "nr": "T10-2",
+  "fil": "sc4.5_fedtstoffer/js/data.js",
+  "gammel": "Prøv to rette kæder og én med mange knæk.",
+  "ny": "Prøv to lige kæder og én med mange knæk.",
+  "hvor": "fane 1, Chokoladefabrikken, hintet"
+ },
+ {
+  "nr": "T10-3",
+  "fil": "sc4.5_fedtstoffer/js/sim_fabrik.js",
+  "gammel": "\"Brug flere rette kæder.\"",
+  "ny": "\"Brug flere lige kæder.\"",
+  "hvor": "fane 1, rådet ved et forkert fedt"
+ },
+ {
+  "nr": "T10-4",
+  "fil": "sc4.5_fedtstoffer/index.html",
+  "gammel": "<span class=\"nr\">2</span>Køleskabet</button>",
+  "ny": "<span class=\"nr\">2</span>Fast eller flydende?</button>",
+  "hvor": "fanens navn (REGELSAET 46, bogens overskrift i C 4.6); #koele virker stadig"
+ }
+]

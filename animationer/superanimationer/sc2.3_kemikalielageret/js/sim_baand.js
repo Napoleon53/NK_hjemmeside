@@ -16,6 +16,16 @@
    sammensatte ioner, og derefter det hele blandet i begge retninger og
    hurtigere og hurtigere. Rekorden huskes i browseren.
 
+   Mere spil (22. nov. 2026, Niels: "lidt mere gamification til del 2
+   med rullebaandet", highscore og hurtigere og hurtigere): glassene
+   kommer i fast takt (hvert), saa et hurtigt svar ikke fremskynder
+   spillet. Selv en meget god spiller naar niveau 13 efter ca. seks
+   minutter. Niveau 13 er umenneskeligt hurtigt: ti etiketter paa ti
+   sekunder. Klares det, kommer resultatet ikke paa highscorelisten,
+   for det kan intet menneske. Point, stime, liv og rekorden staar paa
+   kortet under spillet. Foer start og ved slut staar et ark over
+   baandet med resultatet og den faelles top 10 (js/topliste.js).
+
    Papirkortet (6. nov. 2026) staar oeverst over hylden: opgaven, svaret
    paa det sidste glas og Indsend svar (det samme som Enter). Kortet
    bliver ikke staaende paa et loest glas, og der er ingen hintknap: det
@@ -31,22 +41,28 @@
     var Tj = NK.Tjek;
 
     var NOEGLE = "nk-sc2.3-baand";
-    var PR_NIVEAU = 5;          /* rigtige svar, foer niveauet stiger */
     var LIV = 3;
 
-    var NIVEAUER = [
-        { navn: "Skriv formlen", hylde: 0, retning: "formel", tid: 34, max: 2 },
-        { navn: "Skriv navnet", hylde: 1, retning: "navn", tid: 34, max: 2 },
-        { navn: "Sammensatte ioner", hylde: 2, retning: null, tid: 32, max: 2 },
-        { navn: "Det hele blandet", hylde: null, retning: "begge", tid: 28, max: 3 }
-    ];
-
-    /* Tiden er den tid, et glas er om at koere hele baandet igennem */
-    function niveau(n) {
-        if (n < NIVEAUER.length) return NIVEAUER[n];
-        var b = NIVEAUER[NIVEAUER.length - 1];
-        return { navn: b.navn, hylde: null, retning: "begge", tid: Math.max(12, b.tid * Math.pow(0.88, n - NIVEAUER.length + 1)), max: 3 };
+    /* tid:   sekunder, et glas er om at koere hele baandet igennem
+       hvert: sekunder mellem to glas (hoejst saa ofte kommer der et)
+       max:   glas paa baandet ad gangen (en langsom spiller faar tid)
+       antal: rigtige svar, foer niveauet stiger
+       En spiller, der svarer rigtigt paa hvert glas, bruger summen af
+       hvert x antal: ca. 6 min 30 s paa niveau 1-12. */
+    function blandet(hvert, tid) {
+        return { navn: "Det hele blandet", hylde: null, retning: "begge", hvert: hvert, tid: tid, max: 4, antal: 7 };
     }
+    var NIVEAUER = [
+        { navn: "Skriv formlen", hylde: 0, retning: "formel", hvert: 6.5, tid: 20, max: 2, antal: 6 },
+        { navn: "Skriv navnet", hylde: 1, retning: "navn", hvert: 6.5, tid: 21, max: 2, antal: 6 },
+        { navn: "Sammensatte ioner", hylde: 2, retning: null, hvert: 6.5, tid: 21, max: 2, antal: 6 },
+        blandet(6.5, 19), blandet(5.8, 17), blandet(5.2, 15.5), blandet(4.6, 14), blandet(4.1, 12.5),
+        blandet(3.7, 11), blandet(3.3, 10), blandet(3.0, 9), blandet(2.7, 8),
+        { navn: "Umenneskeligt hurtigt", hylde: null, retning: "begge", hvert: 1.0, tid: 3.2, max: 5, antal: 10, umenneskeligt: true }
+    ];
+    var SIDSTE = NIVEAUER.length - 1;
+
+    function niveau(n) { return NIVEAUER[Math.min(n, SIDSTE)]; }
 
     function SimBaand() {
         this.L = new NK.Laerred(NK.el("baand-laerred"));
@@ -59,9 +75,14 @@
         this.rekord = NK.hent(NOEGLE, { rekord: 0 }).rekord || 0;
         this.lay = null;
         this.fokuseret = false;
+        this.ark = NK.el("baand-topliste");
+        this.liste = null;
+        this.listeStatus = NK.Topliste.findes() ? "henter" : "ingen";
         this.nulstilSpil();
         this.koblInput();
         this.koblMus();
+        this.koblArk();
+        this.hentListe();
         if (this.laererStart) this.laererStart();
         this.visPanel();
     }
@@ -84,6 +105,14 @@
         this.floats = [];
         this.banner = null;
         this.nyRekord = false;
+        this.rekordSlaaet = false;
+        this.robot = false;
+        this.sendt = false;
+        this.egen = null;
+        this.sidenSidst = 99;       /* det foerste glas kommer med det samme */
+        this.venter = 0;
+        this.spilTid = 0;
+        this.slutTid = 0;
         this.besked("", "");
         if (this.input) this.input.value = "";
         var liste = NK.el("baand-kasseliste");
@@ -154,6 +183,20 @@
             sk.style.width = Math.round(Math.max(200, lay.hyldeX1 - 20)) + "px";
         }
 
+        /* Arket med resultatet og toplisten staar over baandet, til
+           venstre, saa Kemichael kan staa ved siden af det */
+        var plads = Math.min(lay.hyldeX1, lay.kasse.x) - 170 - 16;
+        var ab = NK.klamp(plads, 340, 620);
+        lay.ark = { x: Math.round(16 + Math.max(0, (plads - ab) / 2)), y: Math.round(lay.hyldeY + 24), b: Math.round(ab) };
+        lay.ark.h = Math.round(lay.bordY - 8 - lay.ark.y);
+        if (this.ark) {
+            this.ark.style.left = lay.ark.x + "px";
+            this.ark.style.top = lay.ark.y + "px";
+            this.ark.style.width = lay.ark.b + "px";
+            this.ark.style.maxHeight = lay.ark.h + "px";
+            this.ark.classList.toggle("lavt", lay.ark.h < 400);
+        }
+
         this.saetAnker("baand-anker-baand", 0, lay.baandY - lay.glasH - 30, lay.x1, lay.glasH + 60);
         this.saetAnker("baand-anker-kasse", lay.kasse.x - 6, lay.kasse.y - 6, kb + 12, lay.kasseBund - lay.kasse.y + 12);
         this.saetAnker("baand-anker-hylde", 8, lay.hyldeY - lay.lilleH - 8, lay.hyldeX1 - 8, lay.lilleH + 24);
@@ -189,6 +232,7 @@
         knap.classList.toggle("banker", this.tilstand === "klar" || this.tilstand === "slut");
         knap.classList.toggle("blaa", this.tilstand !== "koerer");
         this.visSkort();
+        this.visArk();
     };
 
     P.kortZone = function () {
@@ -216,24 +260,40 @@
         var opg = "Skriv den manglende halvdel af etiketten på det forreste glas.";
         if (this.tilstand === "klar") {
             chip = "Samlebåndet";
-            tekst = opg + " Tryk Start samlebåndet i panelet for at begynde.";
+            tekst = opg + " Tryk Start samlebåndet for at begynde.";
         } else if (this.tilstand === "pause") {
             chip = "Pause";
             tekst = "Samlebåndet holder pause. Tryk Fortsæt i panelet for at køre videre.";
         } else if (this.tilstand === "slut") {
             chip = "Spillet er slut";
-            tekst = "Samlebåndet er stoppet med " + this.point + " point. Tryk Spil igen i panelet for at spille igen.";
+            tekst = this.robot ? "Det umenneskelige niveau er klaret med " + this.point + " point. Tryk Spil igen for at spille igen."
+                : "Samlebåndet er stoppet med " + this.point + " point. Tryk Spil igen for at spille igen.";
         } else {
+            /* Under spillet staar tallene i stedet for opgaven, som
+               etiketmaskinens display og pilen ved glasset siger */
             chip = "Niveau " + (this.nivNr + 1) + " · " + n.navn;
-            tekst = opg;
+            tekst = null;
         }
-        var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + NK.html(tekst) + "</p>" +
+        var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" +
+            (tekst === null ? this.talHTML() : NK.html(tekst)) + "</p>" +
             '<div class="sk-bund' + (this.beskedK ? " " + this.beskedK : "") + (this.beskedH ? "" : " tom") + '">' +
             '<p class="st-tekst">' + (this.beskedH || "") + "</p>" +
             (this.tilstand === "koerer" ? '<button type="button" class="knap indsend ' + (this.kanSendes() ? "klar" : "ikke-klar") +
                 '">Indsend svar</button>' : "") + "</div>";
         if (e.className !== "scenekort opgave") e.className = "scenekort opgave";
         if (e.innerHTML !== html) e.innerHTML = html;
+    };
+
+    /* Point, stime, liv og rekorden paa kortet, saa de kan ses under
+       spillet uden at kigge i panelet */
+    P.talHTML = function () {
+        var hjerter = "";
+        for (var i = 0; i < LIV; i++) hjerter += i < this.liv ? "♥" : "♡";
+        var g = this.gange();
+        return '<span class="bd-tal"><span class="bd-point">' + this.point + " point</span>" +
+            '<span class="bd-stime' + (g > 1 ? " varm" : "") + '">stime ' + this.stime + (g > 1 ? " · ×" + g : "") + "</span>" +
+            '<span class="bd-liv" aria-label="' + this.liv + ' liv">' + hjerter + "</span>" +
+            '<span class="bd-rekord' + (this.rekordSlaaet ? " slaaet" : "") + '">rekord ' + Math.max(this.rekord, this.rekordSlaaet ? this.point : 0) + "</span></span>";
     };
 
     P.visIndsend = function () {
@@ -330,20 +390,38 @@
     P.rigtigt = function (g, note) {
         var lay = this.lay;
         this.stime++;
+        /* Et glas er mere vaerd paa et hoejere niveau, stimen ganger op
+           til fem, og et hurtigt svar giver op til 5 point ekstra */
         var bonus = Math.round(5 * NK.klamp(1 - (g.x - lay.x0) / (lay.x1 - lay.x0), 0, 1));
-        var faaet = 10 * this.gange() + bonus;
+        var gange = this.gange();
+        var faaet = (10 + 5 * Math.min(this.nivNr, SIDSTE)) * gange + bonus;
         this.point += faaet;
         this.floats.push({ tekst: "+" + faaet, x: g.x, y: lay.baandY - lay.glasH - 14, t: 0 });
+        if (gange > 1 && this.stime % 3 === 0 && this.stime <= 12) {
+            this.floats.push({ tekst: "Stime ×" + gange, x: g.x, y: lay.baandY - lay.glasH - 40, t: -0.2, lille: true });
+        }
+        if (!this.rekordSlaaet && this.rekord > 0 && this.point > this.rekord) {
+            this.rekordSlaaet = true;
+            this.banner = { tekst: "Ny rekord", t: 0 };
+        }
         g.status = "loest";
         g.t = 0;
         g.fraX = g.x;
         this.besked(note || "", note ? "gul" : "");
         this.rigtigeIalt++;
         this.rigtigeINiveau++;
-        if (this.rigtigeINiveau >= PR_NIVEAU) {
+        if (this.rigtigeINiveau >= niveau(this.nivNr).antal) {
+            if (this.nivNr >= SIDSTE) {
+                /* Ti etiketter paa ti sekunder: det kan intet menneske */
+                this.robot = true;
+                this.slut();
+                return;
+            }
             this.rigtigeINiveau = 0;
             this.nivNr++;
             this.visBanner();
+            /* Foer det umenneskelige niveau: et kort pusterum til banneret */
+            if (niveau(this.nivNr).umenneskeligt) this.venter = 2.2;
         }
         this.visPanel();
     };
@@ -360,22 +438,156 @@
         NK.el("baand-kasseliste").appendChild(li);
         NK.el("baand-kasse-kort").hidden = false;
         this.besked("Et glas røg i kassen. Den manglende halvdel af etiketten var <b>" + NK.html(g.retning === "formel" ? g.st.formelTekst : g.st.navn) + "</b>.", "skidt");
-        if (this.liv <= 0) this.slut();
+        if (this.liv <= 0) { this.slut(); return; }
         this.visPanel();
     };
 
+    /* Spillet er slut. En robot (det umenneskelige niveau klaret) faar
+       hverken rekord eller plads paa listen. */
     P.slut = function () {
         this.tilstand = "slut";
-        var ny = this.point > this.rekord;
+        this.slutTid = 0;
+        var ny = !this.robot && this.point > this.rekord;
         if (ny) {
             this.rekord = this.point;
             NK.gem(NOEGLE, { rekord: this.rekord });
         }
         this.nyRekord = ny && this.point > 0;
         this.besked("", "");
-        var art = this.nyRekord ? "rekord" : (this.rigtigeIalt === 0 ? "ingen" : (this.rigtigeIalt < 6 ? "faa" : "mange"));
+        var art = this.robot ? "robot" : this.nyRekord ? "rekord" : (this.rigtigeIalt === 0 ? "ingen" : (this.rigtigeIalt < 6 ? "faa" : "mange"));
         this.ventSlut = { t: 1.4, art: art };
+        if (this.input) { this.input.value = ""; this.input.blur(); }
         this.visPanel();
+        if (!this.robot) this.hentListe();
+        var felt = this.ark && this.ark.querySelector(".bd-navn");
+        if (felt && !felt.value) { try { felt.focus({ preventScroll: true }); } catch (e) { felt.focus(); } }
+    };
+
+    /* ----- Arket med resultatet og toplisten -------------------------------- */
+    P.hentListe = function () {
+        var mig = this;
+        if (!NK.Topliste.findes()) { this.listeStatus = "ingen"; return; }
+        if (!this.liste) this.listeStatus = "henter";
+        NK.Topliste.hent().then(function (l) {
+            if (l) { mig.liste = l; mig.listeStatus = "ok"; } else if (!mig.liste) mig.listeStatus = "fejl";
+            mig.visArk();
+        });
+    };
+
+    P.sendListe = function () {
+        var mig = this, felt = this.ark.querySelector(".bd-navn");
+        var navn = NK.Topliste.rens(felt ? felt.value : "");
+        if (!navn || this.sendt || this.robot || this.point <= 0 || this.tilstand !== "slut") return;
+        NK.Topliste.navn(navn);
+        this.sendt = "sender";
+        this.egen = { navn: navn, point: this.point };
+        this.visArk();
+        NK.Topliste.send({ navn: navn, point: this.point, niveau: this.nivNr + 1, sekunder: Math.round(this.spilTid) })
+            .then(function (l) {
+                mig.sendt = l ? "sendt" : "fejl";
+                if (l) { mig.liste = l; mig.listeStatus = "ok"; }
+                mig.visArk();
+            });
+    };
+
+    function tid(s) {
+        s = Math.round(s);
+        var m = Math.floor(s / 60);
+        return (m ? m + " min " : "") + (s % 60) + " s";
+    }
+
+    P.listeHTML = function () {
+        if (this.listeStatus === "ingen") return "";
+        if (this.listeStatus === "henter") return '<p class="bd-note">Henter highscorelisten ...</p>';
+        if (this.listeStatus === "fejl" || !this.liste) return '<p class="bd-note">Highscorelisten kan ikke hentes lige nu.</p>';
+        var egen = this.egen;
+        function ol(titel, rk) {
+            var li = rk.slice(0, 10).map(function (r, i) {
+                var erEgen = egen && r.navn === egen.navn && Number(r.point) === egen.point;
+                return '<li' + (erEgen ? ' class="egen"' : "") + '><span class="nr">' + (i + 1) + '</span><span class="nv">' +
+                    NK.html(String(r.navn)) + '</span><span class="pt">' + Number(r.point) + "</span></li>";
+            }).join("");
+            return '<div class="bd-liste"><h4>' + titel + "</h4>" +
+                (li ? "<ol>" + li + "</ol>" : '<p class="bd-note">Ingen endnu.</p>') + "</div>";
+        }
+        return '<div class="bd-lister">' + ol("Top 10 denne uge", this.liste.uge) + ol("Top 10 alle tider", this.liste.alle) + "</div>";
+    };
+
+    P.visArk = function () {
+        var e = this.ark;
+        if (!e) return;
+        var vis = this.tilstand === "klar" || this.tilstand === "slut";
+        var html = "";
+        if (this.tilstand === "klar") {
+            html = "<h3>Samlebåndet</h3>" +
+                '<p class="bd-tekst">Glassene kommer hurtigere og hurtigere. Hvert glas på et højere niveau giver flere point, og en stime af rigtige svar ganger op til fem.' +
+                (this.rekord > 0 ? " Din rekord er " + this.rekord + " point." : "") + "</p>" +
+                this.listeHTML() +
+                '<div class="bd-knapper"><button type="button" class="knap bd-start">Start samlebåndet ▶</button></div>';
+        } else if (this.tilstand === "slut" && this.robot) {
+            html = "<h3>Det umenneskelige niveau er klaret</h3>" +
+                '<p class="bd-tekst">Du har skrevet ti etiketter på ti sekunder. Det kan intet menneske, og highscorelisten er kun for mennesker. ' +
+                "Resultatet på " + this.point + " point kommer derfor ikke på listen.</p>" +
+                this.listeHTML() +
+                '<div class="bd-knapper"><button type="button" class="knap bd-start">Spil igen ▶</button></div>';
+        } else if (this.tilstand === "slut") {
+            var under = "Niveau " + (this.nivNr + 1) + " · " + tid(this.spilTid) + " · " + this.rigtigeIalt + " rigtige";
+            var menneske = this.nivNr >= SIDSTE
+                ? '<p class="bd-tekst">Niveau 13 er umenneskeligt hurtigt. Du er altså et menneske, og resultatet kan komme på listen.</p>' : "";
+            var send = "";
+            if (NK.Topliste.findes() && this.point > 0) {
+                if (this.sendt === "sendt") {
+                    send = '<p class="bd-note groen">Du står på listen som ' + NK.html(this.egen.navn) + ".</p>";
+                } else if (this.sendt === "sender") {
+                    send = '<p class="bd-note">Sender ...</p>';
+                } else {
+                    var gl = this.ark.querySelector(".bd-navn");
+                    var vaerdi = gl ? gl.value : NK.Topliste.navn();
+                    send = '<div class="bd-send"><label for="bd-navn">Dit navn på listen</label>' +
+                        '<input type="text" id="bd-navn" class="bd-navn" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Fornavn eller kaldenavn" value="' +
+                        NK.html(vaerdi) + '">' +
+                        '<button type="button" class="knap bd-saet' + (NK.Topliste.rens(vaerdi) ? "" : " ikke-klar") + '">Sæt på listen</button></div>' +
+                        (this.sendt === "fejl" ? '<p class="bd-note">Resultatet kunne ikke sendes. Prøv igen.</p>' : "");
+                }
+            }
+            html = "<h3>" + (this.nyRekord ? "Ny rekord: " : "Slut: ") + this.point + " point</h3>" +
+                '<p class="bd-under">' + under + "</p>" + menneske + send + this.listeHTML() +
+                '<div class="bd-knapper"><button type="button" class="knap bd-start">Spil igen ▶</button></div>';
+        }
+        if (e.dataset.html !== html) {
+            /* Feltet beholder markoeren, naar arket tegnes om */
+            var aktiv = document.activeElement && document.activeElement.classList.contains("bd-navn");
+            e.innerHTML = html;
+            e.dataset.html = html;
+            var nyt = e.querySelector(".bd-navn");
+            if (aktiv && nyt) { nyt.focus(); nyt.setSelectionRange(nyt.value.length, nyt.value.length); }
+        }
+        this.arkSkjul(!vis);
+    };
+
+    P.arkSkjul = function (skjul) {
+        if (!this.ark) return;
+        skjul = skjul || !!(this.laererIIntro && this.laererIIntro());
+        if (this.ark.hidden !== skjul) this.ark.hidden = skjul;
+    };
+
+    P.koblArk = function () {
+        var mig = this, e = this.ark;
+        if (!e) return;
+        e.addEventListener("click", function (ev) {
+            var t = ev.target.closest ? ev.target.closest("button") : null;
+            if (!t) return;
+            if (t.classList.contains("bd-start")) { mig.knap(); return; }
+            if (t.classList.contains("bd-saet")) mig.sendListe();
+        });
+        e.addEventListener("input", function (ev) {
+            if (!ev.target.classList.contains("bd-navn")) return;
+            var b = e.querySelector(".bd-saet");
+            if (b) b.classList.toggle("ikke-klar", !NK.Topliste.rens(ev.target.value));
+        });
+        e.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" && ev.target.classList.contains("bd-navn")) { ev.preventDefault(); mig.sendListe(); }
+        });
     };
 
     /* ----- Tegneloekken -------------------------------------------------------- */
@@ -391,22 +603,32 @@
         if (!lay) return;
 
         var n = niveau(this.nivNr);
-        var fart = (lay.x1 - lay.x0 + lay.glasB) / n.tid;
+        var vej = lay.x1 - lay.x0 + lay.glasB;
+        if (this.tilstand === "slut") this.slutTid += dt;
         if (this.tilstand === "koerer") {
-            this.fase += fart * dt;
+            this.spilTid += dt;
+            this.sidenSidst += dt;
+            if (this.venter > 0) this.venter -= dt;
+            /* Baandet koerer med det niveau, der er nu. Hvert glas beholder
+               den fart, det kom ind med, saa et nyt niveau ikke skubber de
+               glas i kassen, der allerede er paa vej. */
+            this.fase += vej / n.tid * dt;
             var paa = this.glas.filter(function (g) { return g.status === "paa"; });
             var bagerst = null;
             paa.forEach(function (g) { if (!bagerst || g.x < bagerst.x) bagerst = g; });
-            if (paa.length < n.max && (!bagerst || bagerst.x > lay.x0 + lay.glasB * 1.9)) {
+            if (this.venter <= 0 && this.sidenSidst >= n.hvert && paa.length < n.max &&
+                (!bagerst || bagerst.x > lay.x0 + lay.glasB * 1.15)) {
                 var ny = this.traek();
-                this.glas.push({ st: ny.st, retning: ny.retning, x: lay.x0 - lay.glasB / 2, status: "paa", t: 0, ryst: 0 });
+                this.glas.push({ st: ny.st, retning: ny.retning, x: lay.x0 - lay.glasB / 2, status: "paa", t: 0, ryst: 0, tid: n.tid });
+                this.sidenSidst = 0;
             }
             this.glas.forEach(function (g) {
                 if (g.status !== "paa") return;
-                g.x += fart * dt;
-                if (g.x > lay.x1 - lay.glasB * 0.1) mig.iKassen_(g);
+                g.x += vej / (g.tid || n.tid) * dt;
+                if (g.x > lay.x1 - lay.glasB * 0.1 && mig.tilstand === "koerer") mig.iKassen_(g);
             });
         }
+        this.arkSkjul(!(this.tilstand === "klar" || this.tilstand === "slut"));
         this.glas.forEach(function (g) {
             if (g.ryst > 0) g.ryst -= dt;
             if (g.status !== "paa") g.t += dt;
@@ -530,8 +752,9 @@
         /* Point, der stiger op */
         this.floats.forEach(function (f) {
             var a = 1 - NK.klamp((f.t - 0.6) / 0.6, 0, 1);
+            if (f.t < 0) return;
             NK.tekst(ctx, f.tekst, f.x, f.y - f.t * 40, {
-                justering: "center", font: "800 20px 'Segoe UI', sans-serif",
+                justering: "center", font: f.lille ? "700 16px 'Segoe UI', sans-serif" : "800 20px 'Segoe UI', sans-serif",
                 farve: "rgba(242, 197, 61, " + a + ")", kant: true, kantFarve: "rgba(10, 10, 16, " + (0.8 * a) + ")"
             });
         });
@@ -546,13 +769,8 @@
             });
         }
 
-        if (this.tilstand === "slut") {
-            NK.tekst(ctx, this.nyRekord ? "Ny rekord: " + this.point + " point" : "Slut: " + this.point + " point",
-                lay.W / 2, lay.hyldeY + 44, {
-                    justering: "center", linje: "middle", font: "800 26px 'Segoe UI', sans-serif",
-                    farve: this.nyRekord ? "#f2c53d" : "#f2f3f5", kant: true
-                });
-        } else if (this.tilstand === "pause") {
+        /* Ved slut staar resultatet paa arket over baandet */
+        if (this.tilstand === "pause") {
             NK.tekst(ctx, "Pause", lay.W / 2, lay.hyldeY + 44, {
                 justering: "center", linje: "middle", font: "800 26px 'Segoe UI', sans-serif", kant: true
             });
@@ -616,6 +834,7 @@
     P.fokus = function () {
         if (!document.getElementById("fane-baand").classList.contains("aktiv")) return;
         if (document.querySelector(".overlay.vis") || (NK.Rundvisning && NK.Rundvisning.aktiv())) return;
+        if (document.activeElement && document.activeElement.classList.contains("bd-navn")) return;
         try { this.input.focus({ preventScroll: true }); } catch (e) { this.input.focus(); }
     };
 
@@ -626,6 +845,9 @@
             e.preventDefault();
             /* Under praesentationen er Enter Naeste, saa spillet ikke starter */
             if (mig.laererIIntro && mig.laererIIntro()) { mig.introNaeste(); return; }
+            /* Et Enter lige efter slut (svaret paa det sidste glas) starter
+               ikke et nyt spil, foer arket med resultatet er set */
+            if (mig.tilstand === "slut" && mig.slutTid < 1.5) return;
             mig.tjek();
         });
         this.input.addEventListener("input", function () {

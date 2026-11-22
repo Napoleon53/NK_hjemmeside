@@ -32,6 +32,7 @@ moduler og virker derfor også, når den åbnes direkte fra harddisken.
 | 3 | Forsøg: vandstrålen | lader en stav og holder den ved en stråle af vand, ethanol og heptan | polære væsker bøjer mod staven, uanset om den er positiv eller negativ |
 
 Alle faner har opgaverne på papirkortet øverst i scenen (se "Papirkortet" nedenfor).
+Fane 1 har intet panel fra runde T8 (22. nov. 2026, se nederst).
 På fane 3 er opgaverne låst, til skemaet er udfyldt. Teorien ligger bag
 knappen **Teori**, og **?** starter en rundvisning for den aktive fane.
 
@@ -175,3 +176,85 @@ ca. 34 tegn. Selvtesten (afsnit 7) måler kortet i 1400x860 og 1100x700.
 
 Molekylenavnene (6. nov. 2026): ingen ændringer; oxygen, hydrogen, chlor osv.
 står kun om atomer og elektronegativitet.
+
+## Runde T8: fane 1 efter regelsættet (22. nov. 2026)
+
+Niels sagde ja til forslaget ("Tror du rammer ret godt essensen. Begynd gerne").
+Reglerne står i `../REGELSAET.md`; numrene nedenfor henviser dertil.
+
+* **Intet panel** (regel 2-3). Opgaverne står i en række øverst med "↺ Start
+  forfra" yderst til højre. Det periodiske system står i scenen til venstre,
+  tavlen med regnestykket på et lyst papir til højre (regel 27-29), og
+  ΔEN-skalaen står centreret lige under kortet (regel 37). Afkrydsningsfelterne
+  Elektronsky og δ+ og δ− er væk (begge er altid slået til), og det samme er
+  teksten nederst i scenen og knappen Start opgave 1.
+* **Seks opgaver i fast rækkefølge** som Kemibogens eksempler i C 3.3 (regel
+  11-18), i `OPGAVER` i `js/sim_en.js`. Motoren er `js/en_opgaver.js` (mønster:
+  `sc2.1_salt_i_vand/js/maet_opgaver.js`) med fire slags trin: valg, felt
+  (eleven skriver ΔEN), handling ("Klik på C ...", går selv videre efter 0,9 s,
+  regel 33) og byg (Indsend svar). Titlerne låses op i takt (regel 17).
+  1. Hydrogenchlorid H−Cl: hvem trækker hårdest, hvad betyder δ−, ΔEN (0,9;
+     5,1; −0,9) og bindingstypen. Tabel, skala og tavle er stiplede pladser,
+     til de bruges (regel 13).
+  2. Carbon og hydrogen: klik på C, skriv ΔEN = 0,4, upolær.
+  3. Køkkensalt: klik på Cl og Na, skriv ΔEN = 2,1, Cl tager parret helt.
+  4. Byg: carbon bliver δ+ (fra C−H, ringen på H).
+  5. Byg: den mest polære binding med hydrogen (H−F).
+  6. Den mest polære af C−H, N−H, O−H og H−Cl.
+  Bagefter fri leg med hele tabellen og "Videre til Polær eller upolær?".
+* **Det, et trin spørger om, er skjult** (regel 38): parret står i midten, til
+  eleven har svaret, hvem der trækker hårdest; tavlen viser "ΔEN = ?" med gul
+  ramme; bindingstypen og den farvede zone på skalaen kommer først efter svaret.
+  Efter et rigtigt svar er det skjult, som det næste trin spørger om.
+* **Klik kun, når kortet beder om det** (regel 19a-20): under et spørgsmål er
+  tabellen en låst figur. I et handlings-trin kan kun det felt, der skal bruges,
+  klikkes, og det har gul ramme og boblen "Klik: C". I byg-opgaverne har hele
+  tabellen rammen, til eleven har klikket, og ringen bliver på det atom, kortet
+  nævner.
+* Bindinger skrives som i Kemibogen med en lang streg (H−Cl). Etiketter og skala
+  i Lexend (regel 30).
+* **Teorien** er et kort, lyst ark (`../faelles/teori.css`, regel 31) med
+  bogens tabel over de tre slags bindinger og henvisning til C 3.3 og 3.4.
+  `D.TEORI` er væk.
+* Selvtesten (`_selvtest.html`) går alle seks opgaver igennem trin for trin med
+  forkerte svar, tjekker det skjulte og måler kortet i hvert trin.
+
+Fane 2 og 3 er ikke ændret og har stadig panel.
+
+### Runde T8b: fane 2 og 3 (22. nov. 2026)
+
+Niels om fane 1: "Første fane er den bedste. Den er helt fejlfri. Godt arbejde."
+Rettet efter hans kommentarer til de andre faner (REGELSAET 53-56):
+
+* Fane 2: "Drej langsomt" er slået fra fra start ("svært at koncentrere sig").
+  Panelet har et lille periodisk system med elektronegativiteterne som figur
+  (samme tabel som fane 1, `NK.SimEN.bygTabel`, uden knapper), og atomerne i
+  molekylet har gul ring. Beregningerne står bag "Vis beregningerne" og skrives
+  "ΔEN(Cl−C) = 3,0 − 2,5 = 0,5".
+* Fane 2, opgave 3 (CO₂ og CCl₄): "Atomerne trækker lige hårdt" er skiftet ud
+  med "C og O har samme elektronegativitet" (og Cl), som tabellen viser er
+  forkert. Niels: "det er jo nok det som en svag elev ville prøve at formidle".
+* Fane 3: mærkatet "Kun i animationer" ved heptan er væk. Luppen er større og
+  har færre, større molekyler med symbolerne i kuglerne og δ+ og δ− ved
+  enderne. Ethanol er CH₃, CH₂, O og H med OH-enden mod staven; heptan er
+  CH₃−(CH₂)₅−CH₃ som syv kugler. Molekylerne står roligere.
+
+### Mission og fri leg (22. nov. 2026, REGELSAET 57)
+
+Niels: "Hvis man skal afskaffe freeroame, så skal man også fjerne illusionen af
+vælg selv ... som udgangspunkt skal starte i mission-mode.. men nede under
+start-forfra kan man også have et fri-leg-felt".
+
+* Fane 2 begynder direkte i opgave 1 (`mission: true` i `NK.Opgaver`,
+  `js/opgave.js`). Menuen og visningen (klassen `kun-fri`) er skjult under
+  opgaverne. Knappen **Fri leg** under Start forfra viser dem, og "Tilbage til
+  opgaverne" giver den opgave, der var i gang, med samme molekyle. Efter
+  sjette opgave: "Du har klaret alle 6 opgaver", fri leg og "Videre til
+  Vandstrålen".
+* Fane 1 har samme knap, **Fri leg**, i rækken ved Start forfra
+  (`friLeg` og `tilbage` i `js/en_opgaver.js`). Tilbage til opgaverne begynder
+  opgaven forfra fra trin 1.
+* Fane 3 er uændret: forsøget er frit, og opgaverne kommer, når skemaet er udfyldt.
+* Kortet i fri leg (og efter sidste opgave) har et rødt kryds, der lukker det
+  (Niels: "det er bare rart at kunne lukke en besked når man leger"). En kort
+  besked, fx om metallerne på fane 1, åbner det igen. Niels: "great succes".

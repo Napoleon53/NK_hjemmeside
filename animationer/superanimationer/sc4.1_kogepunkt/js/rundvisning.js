@@ -17,14 +17,15 @@
 
     var TURE = {
         "fane-varm": [
-            { sel: "#varm-anker-hylde", titel: "Hylden", tekst: "Elleve alkaner ved stuetemperatur. Gasserne har fyldt deres ballon. Træk et glas ned i kammeret, eller klik på det." },
+            { sel: "#varm-raekke", titel: "Opgaverne", tekst: "Fanen har fem opgaver. En ny opgave låses op, når den forrige er løst. Fri leg giver adgang til alle glassene." },
+            { sel: "#varm-anker-hylde", titel: "Hylden", tekst: "Elleve alkaner i glas med prop ved stuetemperatur. En gas fylder hele glasset. Hylden kommer frem i opgave 2." },
             { sel: "#varm-anker-kammer", titel: "Kammeret", tekst: "Glasset i kammeret har den temperatur, termometeret viser. Når stoffet koger, fylder gassen ballonen." },
-            { sel: "#varm-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme op eller køle ned. Piletasterne ændrer temperaturen én grad ad gangen, og med Skift ti grader." },
+            { sel: "#varm-anker-termometer", titel: "Termometeret", tekst: "Træk i håndtaget for at varme op eller køle ned, når kortet beder om det. Piletasterne ændrer temperaturen én grad ad gangen, og med Skift ti grader." },
             { sel: "#varm-anker-zoom", titel: "Molekylerne", tekst: "Hver kugle er et C-atom med dets H-atomer. Grå er fast stof, orange væske og blå gas. De gule prikker viser, hvor molekylerne rører hinanden." },
-            { sel: "#varm-kurve-kort", titel: "Kurven", tekst: "Hvert kogepunkt, du finder, kommer på kurven. Den grønne linje er stuetemperatur." },
-            { sel: "#varm-skort", titel: "Papirkortet", tekst: "Kortet øverst i scenen giver fire små mål. Knappen Indsend svar sender dit svar, og den gule knap giver et hint og derefter svaret." },
+            { sel: "#varm-kurve-ark", titel: "Kurven", tekst: "Hvert kogepunkt, du finder, kommer på kurven. Den grønne linje er stuetemperatur." },
+            { sel: "#varm-skort", titel: "Kortet", tekst: "Kortet stiller ét spørgsmål ad gangen. Knappen Indsend svar sender dit svar, og den gule knap giver et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Kogepunkt, londonbindinger, kædelængde og form kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "På fanen Formen undersøger du tre stoffer med samme formel. På fanen Hvem koger først? gætter du, hvilket stof i en blanding der koger først." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "På fanen Forgrenede kæder undersøger du tre stoffer med samme formel. På fanen Hvem koger først? gætter du, hvilket stof i en blanding der koger først." }
         ],
         "fane-form": [
             { sel: "#form-anker-bad", titel: "Vandbadet", tekst: "Tre glas står i samme vandbad. Hvert glas indeholder et stof med formlen C₅H₁₂ og har sin egen ballon." },

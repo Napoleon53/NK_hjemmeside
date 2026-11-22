@@ -81,29 +81,31 @@ function koerTest() {
     function typers(t, k) { return t[k] || 0; }
     paastand("der er par af alle tre slags", typer.upolaer >= 2 && typer.polaer >= 5 && typer.ion >= 5);
 
-    var en = NK.sims["fane-en"];
+    var en = NK.sims["fane-en"], EO = en.opgaver;
     NK.visFane("fane-en");
     function koer1(n) { for (var i = 0; i < (n || 120); i++) en.opdater(1 / 60); en.tegn(); }
     function parTil(a, b) { en.saetPar(a, b); koer1(); }
+    function tavle() { return d.getElementById("en-tavle").textContent; }
+    function besked1() { return d.getElementById("en-besked").textContent; }
+    EO.visResultat();
 
     parTil("H", "Cl");
     var g = en.geo, px = en.parPlads(g);
-    paastand("H-Cl: parret ligger tættest på Cl og er glidet mod det", en.vist.skift > 0.4 && Math.abs(px - g.x[1]) < Math.abs(px - g.x[0]));
-    paastand("panelet regner ΔEN = 3,0 − 2,1 = 0,9 og siger polær", d.getElementById("en-regning").textContent === "3,0 − 2,1 = 0,9" && d.getElementById("en-type").textContent === "polær");
+    paastand("H−Cl: parret ligger tættest på Cl og er glidet mod det", en.vist.skift > 0.4 && Math.abs(px - g.x[1]) < Math.abs(px - g.x[0]));
+    paastand("tavlen regner ΔEN = EN(Cl) − EN(H) = 3,0 − 2,1 = 0,9 og siger polær", /ΔEN = EN\(Cl\) − EN\(H\)/.test(tavle()) && /3,0 − 2,1 = 0,9/.test(tavle()) && /Bindingen erpolær/.test(tavle()), tavle());
     parTil("Cl", "Cl");
-    paastand("Cl-Cl: parret ligger i midten, og bindingen er upolær", Math.abs(en.vist.skift) < 0.01 && d.getElementById("en-type").textContent === "upolær");
+    paastand("Cl−Cl: parret ligger i midten, og bindingen er upolær", Math.abs(en.vist.skift) < 0.01 && /upolær/.test(tavle()));
     parTil("F", "Na");
-    paastand("F-Na: F tager parret helt, og atomerne skilles som ioner", en.vist.skift < -0.98 && en.vist.adskil > 0.98 && d.getElementById("en-type").textContent === "ionbinding");
+    paastand("F−Na: F tager parret helt, og atomerne skilles som ioner", en.vist.skift < -0.98 && en.vist.adskil > 0.98 && /ionbinding/.test(tavle()));
     parTil("H", "F");
     var hf = en.vist.skift;
     parTil("H", "N");
-    paastand("parret glider længere i H-F end i H-N", hf > en.vist.skift && en.vist.skift > 0);
-    paastand("billedteksten siger, hvem der trækker hårdest", /^N trækker hårdest/.test(en.billedtekst()), en.billedtekst());
+    paastand("parret glider længere i H−F end i H−N", hf > en.vist.skift && en.vist.skift > 0);
 
     en.slot = 0;
     parTil("H", "Cl");
     en.vaelg("O");
-    paastand("et klik i tabellen skifter atomet med ringen ud, og ringen hopper", en.par[0] === "O" && en.par[1] === "Cl" && en.slot === 1);
+    paastand("i den fri leg skifter et klik i tabellen atomet med ringen ud, og ringen hopper", en.par[0] === "O" && en.par[1] === "Cl" && en.slot === 1);
     en.saetPar("H", "Cl");
     en.slot = 0;
     en.opdaterTabel();
@@ -114,12 +116,13 @@ function koerTest() {
     paastand("metallerne er dæmpet, når ringen står over for H, men kan stadig klikkes",
         !foer && naFelt.classList.contains("spaerret") && !naFelt.disabled && !d.querySelector('.pt-felt[data-el="O"]').classList.contains("spaerret"));
     naFelt.click();
-    paastand("natrium kan ikke sættes på hydrogen, og scenen siger hvorfor", en.par[0] === "H" && en.par[1] === "Cl" && en.slot === 1 && /Natrium og hydrogen/.test(d.getElementById("en-besked").textContent));
+    paastand("natrium kan ikke sættes på hydrogen, og kortet siger hvorfor", en.par[0] === "H" && en.par[1] === "Cl" && en.slot === 1 && /Natrium og hydrogen/.test(besked1()), besked1());
     en.slot = 0;
     en.opdaterTabel();
     d.querySelector(".pt-felt.tom").click();
-    paastand("et tomt felt svarer på klik", /er ikke med her/.test(d.getElementById("en-besked").textContent));
+    paastand("et tomt felt svarer på klik", /er ikke med her/.test(besked1()));
     paastand("tabellen har 9 atomer, 13 tomme felter og hul i første periode", d.querySelectorAll(".pt-felt[data-el]").length === 9 && d.querySelectorAll(".pt-felt.tom").length === 13 && d.querySelectorAll(".pt-hul").length === 6);
+    paastand("fane 1 har intet panel: tabellen og tavlen står i scenen", !d.querySelector("#fane-en .panel") && !!d.getElementById("en-pt").closest(".scene") && !!d.getElementById("en-tavle").closest(".scene"));
 
     overskrift("3. Molekylerne på fane 2");
     var POLAER = { H2O: true, NH3: true, CH4: false, CO2: false, HCN: true, CH2O: true, C2H4: false, C2H2: false, CCl4: false, CH3Cl: true, HCl: true };
@@ -144,50 +147,100 @@ function koerTest() {
     }
 
     NK.visFane("fane-en");
-    var ENTYPER = ["δ− ved klik", "upolær, polær eller ion", "byg selv", "mest polær"];
-    en.OPGAVER.forEach(function (lav, i) {
-        var alleOk = true, note = "";
-        for (var gang = 0; gang < 10; gang++) {
-            var o = lav(en);
-            var ok = loestOpgave(en, o, function (o) {
-                if (i === 0) {
-                    var forkert = en.par[0] === D.staerkest(en.par[0], en.par[1]) ? 1 : 0;
-                    var svar = en.opgaver.klik(forkert);
-                    var foer = o.afsluttet;
-                    en.opgaver.indsendKlik();
-                    var besked = d.getElementById("en-besked").textContent;
-                    if (!svar || foer || !/mindste/.test(besked) || o.afsluttet) { alleOk = false; note = "forkert klik: " + besked; }
-                    en.opgaver.klik(1 - forkert);
-                } else if (i === 1) {
-                    var t = D.bindingstype(en.par[0], en.par[1]);
-                    en.opdater(1 / 60);
-                    if (o.valg[o.rigtig] !== D.TYPER[t].knap || d.getElementById("en-type").textContent !== "?" || !/= \?$/.test(d.getElementById("en-regning").textContent)) { alleOk = false; note = o.tekst; }
-                    en.opgaver.vaelg(o.rigtig);
-                } else if (i === 2) {
-                    var b = en.sidsteByg;
-                    en.opgaver.opdater();
-                    if (d.getElementById("en-besked").textContent || en.opgaver.kanSendes()) { alleOk = false; note = "besked eller Indsend før første ændring: " + o.tekst; }
-                    var forkertPar = D.par().filter(function (p) { return !b.ok(p[0], p[1]); })[0];
-                    en.saetPar(forkertPar[0], forkertPar[1]);
-                    en.opgaver.opdater();
-                    if (o.afsluttet || d.getElementById("en-besked").textContent) { alleOk = false; note = "bedømt uden Indsend svar: " + o.tekst; }
-                    en.opgaver.indsendKlik();
-                    if (!d.getElementById("en-besked").textContent) { alleOk = false; note = "ingen besked ved " + forkertPar.join("-") + ": " + o.tekst; }
-                    if (!b.ok(b.eksempel[0], b.eksempel[1])) { alleOk = false; note = "eksemplet passer ikke: " + o.tekst; }
-                    en.saetPar(b.eksempel[0], b.eksempel[1]);
-                } else {
-                    var bedst = o.valg[o.rigtig].split("-");
-                    var maks = Math.max.apply(null, o.valg.map(function (v) { var p = v.split("-"); return D.dEN(p[0], p[1]); }));
-                    if (D.dEN(bedst[0], bedst[1]) !== maks || o.valg.length !== 4) { alleOk = false; note = o.valg.join(", "); }
-                    en.opgaver.vaelg(o.rigtig);
-                }
-            });
-            ok = ok && !en.fastPar && !en.skjul.skift;
-            if (!ok) { alleOk = false; note = note || o.tekst; break; }
-        }
-        paastand("elektronegativitet, opgavetype " + (i + 1) + " (" + ENTYPER[i] + ", 10 tilfældige)", alleOk, note);
+    var pt = d.getElementById("en-pt"), tv = d.getElementById("en-tavle");
+    EO.status = {};
+    EO.aabn(0, true);
+    en.opdater(1 / 60);
+    var rk = d.querySelectorAll("#en-liste .or-knap");
+    paastand("rækken har 6 opgaver, og kun den første har en titel", rk.length === 6 && /Hydrogenchlorid/.test(rk[0].textContent) && rk[1].classList.contains("laast") && !rk[2].querySelector(".or-navn").textContent);
+    paastand("opgave 1, trin 1: parret står i midten, og tabel, skala og tavle er stiplede pladser",
+        en.maalSkift() === 0 && pt.classList.contains("plads") && tv.classList.contains("plads") && en.skjult("skala") && !en.skjult("delta"));
+    paastand("under spørgsmålet er tabellen en låst figur, og ingen boble står fremme", pt.classList.contains("laast") && d.getElementById("en-boble").hidden);
+    EO.vaelg(1); EO.indsendKlik(); en.opdater(1 / 60);
+    paastand("efter svaret glider parret mod Cl, men skala, tavle og tabel venter", en.maalSkift() > 0 && en.skjult("tavle") && en.skjult("skala") && en.skjult("tabel"));
+    EO.videre(); EO.vaelg(2); EO.indsendKlik(); EO.videre(); en.opdater(1 / 60);
+    paastand("trin 3: tavlen spørger 'ΔEN = ?' med gul ramme og viser ikke 0,9", /ΔEN = \?/.test(tavle()) && !/0,9/.test(tavle()) && !!d.querySelector("#en-tavle .tv-linje.spm"), tavle());
+    EO.vaelg(0); EO.indsendKlik(); en.opdater(1 / 60);
+    paastand("efter trin 3 står regnestykket, men ikke bindingstypen", /3,0 − 2,1 = 0,9/.test(tavle()) && !/polær/.test(tavle()), tavle());
+
+    EO.status = {};
+    EO.aabn(0, true);
+    var gennem = true, note1 = "";
+    function nej1(t) { if (gennem) { gennem = false; note1 = t; } }
+    en.OPGAVER.forEach(function (op, i) {
+        if (EO.nr !== i) nej1("opgave " + (i + 1) + " åbnede ikke");
+        op.trin.forEach(function (t, j) {
+            var navn = (i + 1) + "." + (j + 1) + " ";
+            if (EO.nr !== i || EO.trinNr !== j || EO.tilstand !== "trin") { nej1(navn + "ikke nået"); return; }
+            en.opdater(1 / 60);
+            if (t.type === "valg") {
+                if (!pt.classList.contains("laast")) nej1(navn + "tabellen kan bruges under spørgsmålet");
+                var f = -1;
+                t.svar.forEach(function (sv, k) { if (!sv.ok && f < 0) f = k; });
+                var parF = en.par.join();
+                d.querySelector('#en-tabel [data-el="F"]').click();
+                if (en.par.join() !== parF) nej1(navn + "et klik i tabellen ændrede atomerne under spørgsmålet");
+                EO.vaelg(f);
+                if (EO.tilstand !== "trin") nej1(navn + "et valg blev bedømt af sig selv");
+                EO.indsendKlik();
+                if (EO.tilstand !== "trin" || !/Ikke rigtigt/.test(besked1())) nej1(navn + "forkert svar uden forklaring");
+                EO.vaelg(EO.rigtigNr(t)); EO.indsendKlik();
+            } else if (t.type === "felt") {
+                if (EO.kanSendes()) nej1(navn + "Indsend svar klar uden tal");
+                EO.felt = NK.tal(-t.facit, 1); EO.indsendKlik();
+                if (EO.tilstand !== "trin" || !/aldrig negativ/.test(besked1())) nej1(navn + "negativt ΔEN uden forklaring");
+                EO.felt = "4,6"; EO.indsendKlik();
+                if (EO.tilstand !== "trin") nej1(navn + "forkert tal godtaget");
+                EO.felt = NK.tal(t.facit, 1).replace(",", "."); EO.indsendKlik();
+            } else if (t.type === "handling") {
+                var celle = d.querySelector('#en-tabel [data-el="' + t.el + '"]');
+                if (EO.kanSendes()) nej1(navn + "Indsend svar klar før klikket");
+                if (!celle.classList.contains("opfordring") || d.getElementById("en-boble").hidden || !/Klik: /.test(d.getElementById("en-boble").textContent)) nej1(navn + "ingen gul ramme og boble ved " + t.el);
+                var anden = d.querySelector('#en-tabel [data-el="F"]'), parH = en.par.join();
+                if (t.el !== "F") { anden.click(); if (en.par.join() !== parH) nej1(navn + "et andet felt kunne bruges"); }
+                celle.click();
+                if (EO.trinNr !== j) nej1(navn + "gik videre med det samme");
+                for (var k = 0; k < 70; k++) en.opdater(1 / 60);
+                if (EO.trinNr !== j + 1) nej1(navn + "gik ikke selv videre efter ca. 1 s");
+                return;
+            } else if (t.type === "byg") {
+                if (EO.kanSendes()) nej1(navn + "Indsend svar klar før en ændring");
+                var slot = en.slot, andet = en.par[1 - slot];
+                var kand = D.EN_ORDEN.filter(function (e) { return D.tilladt(e, andet) === true && e !== en.par[slot]; });
+                function med(e) { var q = en.par.slice(); q[slot] = e; return q; }
+                var fe = kand.filter(function (e) { var q = med(e); return !t.ok(q[0], q[1]); })[0];
+                en.vaelg(fe);
+                if (EO.tilstand !== "trin") nej1(navn + "bedømt uden Indsend svar");
+                EO.indsendKlik();
+                if (EO.tilstand !== "trin" || !/Ikke rigtigt/.test(besked1())) nej1(navn + "forkert binding uden forklaring");
+                if (en.slot !== slot) nej1(navn + "ringen flyttede sig fra det atom, kortet nævner");
+                var re = kand.filter(function (e) { var q = med(e); return t.ok(q[0], q[1]); })[0];
+                en.vaelg(re); EO.indsendKlik();
+            }
+            if (EO.tilstand !== "bliv") { nej1(navn + "blev ikke løst"); return; }
+            if (!d.querySelector("#en-skort .sk-bund.bliv .sk-videre")) nej1(navn + "ingen knap videre på kortet");
+            EO.videre();
+        });
     });
-    paastand("alle fem byg-opgaver har et eksempel, der passer", en.BYG.every(function (b) { return b.ok(b.eksempel[0], b.eksempel[1]) && D.tilladt(b.eksempel[0], b.eksempel[1]) === true; }));
+    paastand("fane 1: alle seks opgaver kan løses trin for trin, og forkerte svar giver en forklaring", gennem, note1);
+    paastand("fane 1: alle seks er gemt med stjerne, og den fri leg står fremme", EO.tilstand === "resultat" && en.OPGAVER.every(function (o) { return EO.status[o.id] === "stjerne"; }) && !pt.classList.contains("laast"));
+    paastand("fane 1: kortet fører videre til Polær eller upolær?", /Videre til Polær eller upolær\?/.test(d.getElementById("en-skort").textContent));
+    EO.aabn(0);
+    en.opdater(1 / 60);
+    paastand("en løst opgave har alt fremme fra start", !pt.classList.contains("plads") && !tv.classList.contains("plads") && en.maalSkift() > 0);
+    EO.forfra();
+    en.opdater(1 / 60);
+    paastand("Start forfra giver trinene igen", EO.trinNr === 0 && tv.classList.contains("plads"));
+    paastand("Start forfra står i rækken, ikke på kortet", !!d.getElementById("en-forfra").closest(".opgaverad") && !d.querySelector("#en-skort .nulstil"));
+    EO.aabn(2, true);
+    d.getElementById("en-frileg").click();
+    paastand("fane 1, Fri leg: hele tabellen kan bruges, og kortet tilbyder Tilbage til opgaverne", EO.fri && EO.tabelAktiv() && /Tilbage til opgaverne/.test(d.getElementById("en-skort").textContent));
+    d.querySelector("#en-skort [data-luk]").click();
+    var enLukket = d.getElementById("en-skort").hidden;
+    d.querySelector('.pt-felt.tom').click();
+    paastand("fane 1, fri leg: krydset lukker kortet, og en besked åbner det igen", enLukket && !d.getElementById("en-skort").hidden);
+    d.querySelector("#en-skort [data-tilbage]").click();
+    paastand("fane 1, Tilbage til opgaverne: samme opgave igen", !EO.fri && EO.nr === 2 && EO.tilstand === "trin");
 
     var pol = NK.sims["fane-polaritet"];
     NK.visFane("fane-polaritet");
@@ -206,9 +259,24 @@ function koerTest() {
         }
         paastand("polær eller upolær, opgavetype " + (i + 1) + " (10 tilfældige)", alleOk, note);
     });
-    pol.opgaver.nulstil();
-    paastand("Start forfra låser menuen op igen", !pol.menuLaast());
-    en.opgaver.nulstil();
+    var PO = pol.opgaver, polFane = d.getElementById("fane-polaritet");
+    PO.nulstil();
+    pol.opdater(1 / 60);
+    paastand("fane 2 begynder i opgave 1, og menuen og visningen er skjult (ikke låst)", PO.nr === 0 && !!PO.opgave && polFane.classList.contains("mission") && !d.getElementById("pol-menu").offsetWidth);
+    var polMol = pol.molId(), polNr = PO.nr;
+    d.getElementById("pol-frileg").click();
+    paastand("Fri leg: menuen og visningen kommer frem og kan bruges", PO.fri && !polFane.classList.contains("mission") && !!d.getElementById("pol-menu").offsetWidth && !pol.menuLaast() && !d.querySelector("#pol-menu button:disabled, #pol-menu button.laast") && /Tilbage til opgaverne/.test(d.getElementById("pol-skort").textContent));
+    d.querySelector("#pol-skort [data-luk]").click();
+    paastand("fri leg: det røde kryds lukker kortet", d.getElementById("pol-skort").hidden);
+    d.getElementById("pol-frileg").click();
+    paastand("Tilbage til opgaverne: samme opgave og samme molekyle", !PO.fri && PO.nr === polNr && pol.molId() === polMol && polFane.classList.contains("mission"));
+    for (var pn = 0; pn < 6; pn++) {
+        var po = PO.opgave;
+        if (!po.afsluttet) PO.visSvar();
+        PO.videre();
+    }
+    paastand("efter sidste opgave: tillykke, fri leg og videre til Vandstrålen", PO.fri && PO.faerdig && /klaret alle 6 opgaver/.test(d.getElementById("pol-skort").textContent) && /Videre til Vandstrålen/.test(d.getElementById("pol-skort").textContent) && d.getElementById("pol-frileg").hidden);
+    PO.nulstil();
 
     overskrift("5. Fane 3: vandstrålen");
     var vand = NK.sims["fane-vand"];
@@ -306,21 +374,25 @@ function koerTest() {
     });
 
     overskrift("6. Tekster og skrift");
-    var tekster = [d.body.innerText, serieTekst];
-    D.TEORI.forEach(function (a) { tekster.push(a.h); a.p.forEach(function (p) { tekster.push(p); }); });
+    var tekster = [d.body.innerText, serieTekst, d.getElementById("teori").textContent];
     D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintPol, m.svarPol); });
-    [en, pol, vand].forEach(function (sim) {
+    [pol, vand].forEach(function (sim) {
         sim.OPGAVER.forEach(function (lav) {
             var o = lav(sim);
             tekster.push(o.tekst, o.hint || "", o.svar || "");
             (o.valg || []).forEach(function (v) { tekster.push(v); });
         });
     });
-    en.BYG.forEach(function (b) {
-        tekster.push(b.tekst, b.hint, b.svar);
-        D.par().forEach(function (p) { if (!b.ok(p[0], p[1])) tekster.push(b.fejl(p[0], p[1])); });
+    en.OPGAVER.forEach(function (op) {
+        tekster.push(op.navn);
+        op.trin.forEach(function (t) {
+            [t.tekst, t.spm, t.slut].forEach(function (x) { if (typeof x === "string") tekster.push(x); });
+            (t.hint || []).forEach(function (x) { tekster.push(x); });
+            (t.svar || []).forEach(function (sv) { tekster.push(sv.t, sv.nej || ""); });
+            if (t.type === "felt") [-t.facit, 4.6, 99].forEach(function (v) { tekster.push(t.fejl(v)); });
+            if (t.type === "byg") D.par().forEach(function (p) { if (!t.ok(p[0], p[1])) tekster.push(t.fejl(p[0], p[1])); else if (typeof t.slut === "function") tekster.push(t.slut({ par: p })); });
+        });
     });
-    D.par().forEach(function (p) { en.saetPar(p[0], p[1]); tekster.push(en.billedtekst()); });
     D.EN_ORDEN.forEach(function (a) { D.EN_ORDEN.forEach(function (b) { var t = D.tilladt(a, b); if (t !== true) tekster.push(t); }); });
     naesteTekster.forEach(function (t) { tekster.push(t); });
     NK.Rundvisning.TUR.forEach(function (t) { tekster.push(t.titel, t.tekst); });
@@ -357,38 +429,32 @@ function papirkortTest(d, W, NK, D) {
         var k = d.getElementById(f[1] + "-skort");
         paastand(f[1] + ": kortet står i scenen, ikke i panelet", !!k && !!k.closest(".scene") && !k.closest(".panel"));
         var ff = d.getElementById(f[1] + "-forfra");
-        paastand(f[1] + ": Start forfra står i panelet, ikke på kortet", !!ff && !!ff.closest(".panel") && !k.querySelector(".nulstil"));
+        paastand(f[1] + ": Start forfra står i " + (f[1] === "en" ? "rækken" : "panelet") + ", ikke på kortet", !!ff && !!ff.closest(f[1] === "en" ? ".opgaverad" : ".panel") && !k.querySelector(".nulstil"));
         paastand(f[1] + ": ingen opgavetekst i panelet", !d.getElementById(f[1] + "-opg-tekst") && !d.querySelector("#" + f[0] + " .panel .opgave-spm"));
     });
     paastand("ingen statuslinje nederst i scenen", !d.querySelector(".scenebesked"));
 
     /* Et valgspoergsmaal paa fane 1 */
     NK.visFane("fane-en");
-    var en = NK.sims["fane-en"], O = en.opgaver, o = en.OPGAVER[1](en);
-    O.startOpgave(o);
+    var en = NK.sims["fane-en"], O = en.opgaver;
+    O.aabn(0, true);
+    var t1 = O.trin();
     var ind = d.getElementById("en-indsend");
     paastand("Indsend svar er grå uden valg", ind.classList.contains("ikke-klar") && !ind.hidden && ind.textContent === "Indsend svar");
     paastand("hintknappen står på kortet", !d.getElementById("en-hjknap").hidden && !!d.getElementById("en-hjknap").closest(".scenekort"));
-    var forkert = o.rigtig === 0 ? 1 : 0;
-    O.vaelg(forkert);
-    paastand("et valgt svar bedømmes ikke af sig selv", !o.afsluttet && ind.classList.contains("klar"));
+    O.vaelg(0);
+    paastand("et valgt svar bedømmes ikke af sig selv", O.tilstand === "trin" && ind.classList.contains("klar"));
     O.indsendKlik();
-    paastand("forkert svar: forklaringen står på kortet", !o.afsluttet && /Ikke rigtigt/.test(d.getElementById("en-besked").textContent));
-    var tabelKnap = d.querySelector("#en-tabel button");
-    var parFoer = en.par.join("-");
-    if (tabelKnap) tabelKnap.click();
-    paastand("under spørgsmålet er atomerne låst", en.par.join("-") === parFoer);
-    O.vaelg(o.rigtig);
-    paastand("det rigtige svar er heller ikke sendt ind af sig selv", !o.afsluttet);
+    paastand("forkert svar: forklaringen står på kortet", O.tilstand === "trin" && /Ikke rigtigt/.test(d.getElementById("en-besked").textContent));
+    O.vaelg(1);
     O.indsendKlik();
     var kort = d.getElementById("en-skort");
-    var groen = kort.querySelector('.sk-knap.rigtig[data-nr="' + o.rigtig + '"]');
+    var groen = kort.querySelector('.sk-knap.rigtig[data-nr="1"]');
     var bliv = kort.querySelector(".sk-bund.bliv .sk-videre");
-    paastand("rigtigt svar: kortet bliver på spørgsmålet med grønt svar og Næste", o.afsluttet && !!groen && !!bliv && ind.hidden && kort.textContent.indexOf(o.tekst.slice(0, 15)) >= 0);
+    paastand("rigtigt svar: kortet bliver på spørgsmålet med grønt svar og Næste", O.tilstand === "bliv" && !!groen && !!bliv && d.getElementById("en-status").hidden && kort.textContent.indexOf(t1.spm.slice(0, 15)) >= 0);
     paastand("etiketten er en indlejret overskrift", !!kort.querySelector(".sk-tekst .sk-chip"));
     bliv.click();
-    paastand("Næste går videre til opgave 2 uden rosen", O.nr === 1 && !kort.querySelector(".sk-bund.bliv"));
-    O.nulstil();
+    paastand("Næste går videre til trin 2 uden rosen", O.trinNr === 1 && !kort.querySelector(".sk-bund.bliv"));
 
     /* Klik-opgaven paa fane 2: et klik vaelger kun atomet */
     NK.visFane("fane-polaritet");
@@ -407,6 +473,24 @@ function papirkortTest(d, W, NK, D) {
             NK.visFane(f[0]); sim.tilpas();
             var Q = sim.opgaver, k = d.getElementById(f[1] + "-skort"), zone = NK.kortZone();
             function maal(navn) { if (k.offsetHeight > zone) fejlH.push(m.join("x") + " " + f[1] + " " + navn + " " + k.offsetHeight + ">" + zone); }
+            if (f[1] === "en") {
+                /* Fane 1: hvert trin med alle hint, alle forkerte svar og forklaringen */
+                en.OPGAVER.forEach(function (op, i) {
+                    Q.aabn(i, true);
+                    op.trin.forEach(function (t, j) {
+                        Q.trinNr = j; Q.tilstand = "trin"; Q.nytTrin();
+                        maal(i + "." + j + " trin");
+                        (t.hint || []).forEach(function () { Q.hjaelpKlik(); maal(i + "." + j + " hint"); });
+                        Q.hjaelp = 0;
+                        (t.svar || []).forEach(function (sv) { if (sv.nej) { Q.fejl(sv.nej); maal(i + "." + j + " fejl"); } });
+                        if (t.type === "felt") [-t.facit, 4.6, 99].forEach(function (v) { Q.fejl(t.fejl(v)); maal(i + "." + j + " fejl"); });
+                        if (t.type === "byg") D.par().forEach(function (p) { if (!t.ok(p[0], p[1])) { Q.fejl(t.fejl(p[0], p[1])); maal("byg fejl"); } });
+                        if (t.type !== "handling") { Q.tilstand = "bliv"; Q.visKort(); maal(i + "." + j + " løst"); }
+                    });
+                });
+                Q.aabn(0, true);
+                return;
+            }
             Q.nulstil(); maal("start");
             sim.OPGAVER.forEach(function (lav, i) {
                 for (var g = 0; g < 6; g++) {
@@ -418,9 +502,6 @@ function papirkortTest(d, W, NK, D) {
                     ft.forEach(function (t) { Q.fejl(t); maal(i + " fejl"); });
                     Q.loest(); maal(i + " løst");
                 }
-            });
-            if (f[1] === "en") en.BYG.forEach(function (b) {
-                D.par().forEach(function (p) { if (!b.ok(p[0], p[1])) { Q.fejl(b.fejl(p[0], p[1])); maal("byg fejl"); } });
             });
             Q.nulstil();
         });

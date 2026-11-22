@@ -64,9 +64,14 @@
         },
         function (sim) {
             var mol = sim.nytMolekyle(["CO2", "CCl4"]);
+            /* Ikke "Atomerne trækker lige hårdt": det er nok sådan, en svag
+               elev ville sige det rigtige svar (Niels 22. nov. 2026). Det
+               forkerte svar skal kunne tjekkes i tabellen. */
+            var andet = mol.atomer.filter(function (a) { return a.el !== "C"; })[0].el;
+            var gA = D.GRUNDSTOFFER[andet], gC = D.GRUNDSTOFFER.C;
             var svar = [
                 "Bindingernes træk ophæver hinanden",
-                "Atomerne trækker lige hårdt",
+                "C og " + andet + " har samme elektronegativitet",
                 "Bindingerne er for korte",
                 "Der er ingen frie elektronpar"
             ];
@@ -76,10 +81,11 @@
                 tekst: "Bindingerne i " + mol.formel + " er polære. Hvorfor er " + mol.formel + " upolært, selvom bindingerne er polære?",
                 valg: orden.map(function (i) { return svar[i]; }),
                 rigtig: orden.indexOf(0),
-                fejlValg: function () {
+                fejlValg: function (i) {
+                    if (orden[i] === 1) return D.stort(gA.navn) + " har elektronegativiteten " + NK.tal(gA.en, 1) + " og carbon " + NK.tal(gC.en, 1) + ". Derfor er bindingerne polære.";
                     return "Det forklarer ikke, at " + mol.formel + " er upolært. Se, hvilken vej trækkene i bindingerne peger.";
                 },
-                hint: "Se på trækkene i bindingerne, mens molekylet drejer. Hvilken vej peger de?",
+                hint: "Se på trækkene i bindingerne. Drej molekylet, og se, hvilken vej de peger.",
                 svar: mol.svarPol,
                 start: function (s) { s.startOpgaveMol(mol.id, { polaer: true }, { "pol-samlet": false }); },
                 slut: function (s) { s.slutOpgaveMol(); }
@@ -90,6 +96,7 @@
     NK.SimPolaritet = function () {
         this.init("pol", OPGAVER, ["pol-delta", "pol-traek", "pol-samlet", "pol-drej"], {
             antal: 6,
+            mission: true,
             intro: "Drej molekylerne, og se, hvordan bindingerne trækker i elektronerne. Opgaverne spørger, om et molekyle er polært.",
             naesteFane: "fane-vand",
             naesteNavn: "Vandstrålen"
@@ -98,6 +105,14 @@
 
     NK.SimPolaritet.prototype = Object.create(NK.MolSim.prototype);
     var P = NK.SimPolaritet.prototype;
+
+    /* Elektronegativiteterne som figur; atomerne i molekylet har gul ring */
+    P.tabel = function () {
+        if (!this.celler) this.celler = NK.SimEN.bygTabel(NK.el("pol-tabel"));
+        var mol = this.mol(), med = {}, mig = this;
+        mol.atomer.forEach(function (a) { med[a.el] = true; });
+        Object.keys(this.celler).forEach(function (el) { mig.celler[el].classList.toggle("valgt", !!med[el]); });
+    };
 
     P.flag = function (id) {
         if (id === "pol-prikvis") return true;
@@ -112,15 +127,15 @@
             var A = mol.atomer[b[0]].el, B = mol.atomer[b[1]].el;
             var gA = D.GRUNDSTOFFER[A], gB = D.GRUNDSTOFFER[B];
             var hoej = gA.en >= gB.en ? A : B, lav = hoej === A ? B : A;
-            var tegn = b[2] === 1 ? "-" : b[2] === 2 ? "=" : "≡";
+            var tegn = b[2] === 1 ? "−" : b[2] === 2 ? "=" : "≡";
             var noegle = hoej + tegn + lav;
             if (set[noegle]) return;
             set[noegle] = true;
             var dEN = Math.abs(gA.en - gB.en);
             var polaer = dEN >= D.POLAER_GRAENSE - 1e-9;
+            /* "ΔEN(Cl−C) = 3,0 − 2,5 = 0,5" (Niels 22. nov. 2026) */
             html += '<div class="bindingsraekke">' +
-                '<span class="bnavn">' + NK.formel(hoej) + tegn + NK.formel(lav) + "</span>" +
-                '<span class="bregning">' + NK.tal(D.GRUNDSTOFFER[hoej].en, 1) + " − " + NK.tal(D.GRUNDSTOFFER[lav].en, 1) + " = <b>" + NK.tal(dEN, 1) + "</b></span>" +
+                '<span class="bregning">ΔEN(' + NK.formel(hoej) + tegn + NK.formel(lav) + ") = " + NK.tal(D.GRUNDSTOFFER[hoej].en, 1) + " − " + NK.tal(D.GRUNDSTOFFER[lav].en, 1) + " = " + NK.tal(dEN, 1) + "</span>" +
                 '<span class="maerke ' + (polaer ? "orange" : "graa") + '">' + (polaer ? "polær" : "upolær") + "</span>" +
                 "</div>";
         });
@@ -130,6 +145,7 @@
     P.opdater = function (dt) {
         this.opdaterFaelles(dt);
         var mol = this.mol();
+        this.tabel();
         NK.saetHTML("pol-en-tabel", bindingstabel(mol));
         NK.saetTekst("pol-formel", mol.navn.charAt(0).toUpperCase() + mol.navn.slice(1) + ", " + mol.formel + ", er");
         if (this.skjul.polaer) {

@@ -96,6 +96,7 @@
         sims["fane-fabrik"] = new NK.SimFabrik();
         sims["fane-koele"] = new NK.SimKoele();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */
+        NK.visFane = visFane;        /* kortets knap paa fane 2 foerer til fabrikken */
 
         var knapper = document.querySelectorAll(".faneknap");
         function bindFane(knap) {

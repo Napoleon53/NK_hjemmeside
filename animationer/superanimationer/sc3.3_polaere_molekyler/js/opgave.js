@@ -41,6 +41,14 @@
    valg til NK.Opgaver: antal (opgaver paa fanen), intro (en tekst eller
    en funktion af sim), kanStarte(sim) (false: Start opgave 1 er skjult,
    fx til forsoeget er slut), naesteFane og naesteNavn.
+
+   mission: true (fane 2, Niels 22. nov. 2026, REGELSAET 57): fanen
+   begynder i opgaverne uden en indledning, og det, eleven ikke kan vaelge
+   under en opgave (menuen og visningen, klassen kun-fri), er skjult i
+   stedet for laast. Knappen Fri leg under Start forfra giver adgang til
+   alle knapper og bringer eleven tilbage til den opgave, der var i gang.
+   Efter sidste opgave: "Du har klaret alle opgaverne", fri leg og videre
+   til naeste fane.
    ===================================================================== */
 (function () {
     "use strict";
@@ -84,6 +92,10 @@
         this.loeste = 0;
         this.fastB = { tekst: "", klasse: "", maerke: "" };
         this.midl = null;
+        this.mission = !!valg.mission;
+        this.fri = false;
+        this.faerdig = false;
+        this.pause = null;
 
         this.e = {
             kort: NK.el(prefix + "-skort"), ind: NK.el(prefix + "-ind"), status: NK.el(prefix + "-status"),
@@ -95,8 +107,12 @@
             var b = e.target.closest ? e.target.closest("button") : null;
             if (!b || b.disabled) return;
             if (b.hasAttribute("data-videre")) { mig.videre(); return; }
+            if (b.hasAttribute("data-tilbage")) { mig.tilbage(); return; }
+            if (b.hasAttribute("data-luk")) { mig.lukket = true; mig.vis(); return; }
             if (b.hasAttribute("data-nr")) mig.vaelg(parseInt(b.getAttribute("data-nr"), 10));
         });
+        this.e.fri = NK.el(prefix + "-frileg");
+        if (this.e.fri) this.e.fri.addEventListener("click", function () { if (mig.fri) mig.tilbage(); else mig.friLeg(); });
         var forfra = NK.el(prefix + "-forfra");
         if (forfra) forfra.addEventListener("click", function () { if (mig.sim.nulstil) mig.sim.nulstil(); else mig.nulstil(); });
         this.raekke = this.lavRaekke();
@@ -117,6 +133,7 @@
 
     /* ----- Tilstanden ---------------------------------------------------- */
     P.tilstand = function () {
+        if (this.fri) return "fri";
         if (!this.opgave) return "start";
         return this.opgave.afsluttet ? "loest" : "opgave";
     };
@@ -174,10 +191,17 @@
     };
 
     P.videre = function () {
+        if (this.fri) {
+            if (this.faerdig && this.naesteFane && NK.visFane) NK.visFane(this.naesteFane);
+            return;
+        }
         if (!this.opgave || !this.opgave.afsluttet) return;
         if (!this.sidste()) {
             this.nr++;
             this.startOpgave(this.typer[this.raekke[this.nr]](this.sim));
+        } else if (this.mission) {
+            this.faerdig = true;
+            this.friLeg();
         } else if (this.naesteFane && NK.visFane) {
             NK.visFane(this.naesteFane);
         }
@@ -189,14 +213,51 @@
         if (o.slut) o.slut(this.sim);
     };
 
-    /* Start forfra (panelets knap og R): tilbage til indledningen */
+    /* Start forfra (panelets knap og R): tilbage til indledningen, eller
+       i mission direkte til opgave 1 */
     P.nulstil = function () {
         this.kaldSlut(this.opgave);
         this.opgave = null;
         this.nr = -1;
         this.loeste = 0;
+        this.fri = false;
+        this.faerdig = false;
+        this.pause = null;
         this.saetFast("", "");
         this.midl = null;
+        if (this.mission) this.start();
+        else this.vis();
+    };
+
+    /* Fri leg: alle knapper kan bruges. Opgaven, der var i gang, gemmes. */
+    P.friLeg = function () {
+        if (this.fri) return;
+        var o = this.opgave;
+        this.pause = o ? { opgave: o, nr: this.nr } : null;
+        if (o && !o.afsluttet) this.kaldSlut(o);
+        this.opgave = null;
+        this.fri = true;
+        this.lukket = false;
+        this.saetFast("", "");
+        this.midl = null;
+        this.vis();
+    };
+
+    /* Tilbage til opgaverne: den opgave, der var i gang, eller forfra */
+    P.tilbage = function () {
+        if (!this.fri) return;
+        if (this.faerdig || !this.pause) { this.nulstil(); return; }
+        var o = this.pause.opgave;
+        this.fri = false;
+        this.nr = this.pause.nr;
+        this.pause = null;
+        this.opgave = o;
+        if (!o.afsluttet) {
+            o.sluttet = false;
+            this.valgt = null;
+            this.klikValgt = -1;
+            if (o.start) o.start(this.sim);
+        }
         this.vis();
     };
 
@@ -329,11 +390,13 @@
 
     /* ----- Kortet ---------------------------------------------------------- */
     P.chip = function () {
+        if (this.fri) return this.faerdig ? "Opgaverne er klaret" : "Fri leg";
         return this.opgave ? "Opgave " + (this.nr + 1) + " af " + this.antal : "Opgaver";
     };
 
     P.videreTekst = function () {
         if (!this.sidste()) return "Næste opgave →";
+        if (this.mission) return "Se resultatet →";
         return this.naesteFane ? "Videre til " + this.naesteNavn + " →" : "";
     };
 
@@ -358,7 +421,56 @@
         return h + "</div>";
     };
 
+    /* Kortet i fri leg og efter sidste opgave */
+    P.visFri = function () {
+        var kl = "scenekort loest";
+        if (this.e.kort.className.replace(" blink", "") !== kl) this.e.kort.className = kl;
+        var tekst, knap;
+        if (this.faerdig) {
+            tekst = "Du har klaret alle " + this.antal + " opgaver. Vælg andre molekyler i panelet, og prøv dig frem.";
+            knap = this.naesteFane ? '<button type="button" class="sk-videre" data-videre="1">Videre til ' + html(this.naesteNavn) + " →</button>" : "";
+        } else {
+            tekst = "Alle knapper i panelet kan bruges. Opgaven venter, til du går tilbage.";
+            knap = '<button type="button" class="sk-videre" data-tilbage="1">Tilbage til opgaverne →</button>';
+        }
+        /* Det roede kryds lukker kortet i fri leg (Niels 22. nov. 2026). Knappen
+           i panelet bringer eleven tilbage. En besked aabner kortet igen. */
+        var h = '<button type="button" class="sk-luk" data-luk="1" title="Luk kortet" aria-label="Luk kortet">✕</button>' + '<div class="sk-start"><p class="sk-tekst"><span class="sk-chip">' + html(this.chip()) + "</span>" + html(tekst) + "</p>" + knap + "</div>";
+        if (h !== this._sidstInd) { this.e.ind.innerHTML = h; this._sidstInd = h; }
+        var b = this.midl;
+        this.e.besked.innerHTML = b ? html(b.tekst) : "";
+        this.e.besked.hidden = !b;
+        this.e.status.className = "sk-bund" + (b ? " " + b.klasse : " tom");
+        this.e.status.hidden = !b;
+        this.e.hjaelp.hidden = true;
+        this.e.indsend.hidden = true;
+        this.e.kort.hidden = !!this.lukket && !b;
+    };
+
+    P.visPanel = function () {
+        /* Molekylemenuen paa fane 2 foelger med, naar fri leg slaas til og fra */
+        if (this.mission && NK.Valg && NK.Valg.opdaterKnapper && this._friVist !== this.fri) {
+            this._friVist = this.fri;
+            NK.Valg.opdaterKnapper();
+        }
+        var fane = this.e.kort.closest ? this.e.kort.closest(".fane") : null;
+        if (fane && this.mission) fane.classList.toggle("mission", !this.fri);
+        if (this.e.fri) {
+            this.e.fri.hidden = this.faerdig;
+            var t = this.fri ? "Tilbage til opgaverne" : "Fri leg";
+            if (this.e.fri.textContent !== t) this.e.fri.textContent = t;
+        }
+        var nr = NK.el(this.p + "-opg-nr");
+        if (nr) nr.textContent = this.fri ? (this.faerdig ? "alle klaret" : "fri leg") : (this.opgave ? (this.nr + 1) + " af " + this.antal : "ikke startet");
+        var loest = NK.el(this.p + "-opg-loest");
+        if (loest) loest.textContent = String(this.loeste);
+    };
+
     P.vis = function () {
+        this.visPanel();
+        if (!this.fri) this.lukket = false;
+        this.e.kort.hidden = false;
+        if (this.fri) { this.visFri(); return; }
         var o = this.opgave, t = this.tilstand();
         var kl = "scenekort " + (t === "start" ? "opgave" : t === "loest" ? "loest" + (o.maade === "svar" ? " svar" : "") : (o.valg ? "spm" : "opgave"));
         if (this.e.kort.className.replace(" blink", "") !== kl) this.e.kort.className = kl;
@@ -408,15 +520,14 @@
             ind.setAttribute("aria-disabled", kan ? "false" : "true");
         }
 
-        var loest = NK.el(this.p + "-opg-loest");
-        if (loest) loest.textContent = String(this.loeste);
-        var nr = NK.el(this.p + "-opg-nr");
-        if (nr) nr.textContent = this.opgave ? (this.nr + 1) + " af " + this.antal : "ikke startet";
     };
 
     /* Kaldes af fanen hvert billede: Indsend svar skal blive klar, naar
        eleven har bygget noget. */
     P.opdater = function () {
+        /* I mission begynder fanen i opgave 1 (foerste billede, naar
+           molekylemenuen er bygget) */
+        if (this.mission && !this.fri && !this.opgave && this.nr < 0) { this.start(); return; }
         if (this.tilstand() === "start") {
             var n = this.introTekst() + "|" + this.startKlar();
             if (n !== this._introN) { this._introN = n; this.vis(); }
@@ -430,6 +541,7 @@
     /* Enter: Indsend svar, Start opgave eller Naeste */
     P.enter = function () {
         var t = this.tilstand();
+        if (t === "fri") { if (this.faerdig) this.videre(); return; }
         if (t === "start" && !this.startKlar()) return;
         if (t === "loest") { if (this.harVidere()) this.videre(); return; }
         this.indsendKlik();

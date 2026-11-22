@@ -21,7 +21,7 @@
             esc: "springIntro"
         });
     }
-    tilbud(NK.SimLager.prototype, "nk-sc2.3-intro", "lager-tilbud");
+    /* Lageret har intet tilbud (22. nov. 2026, T7): kun K viser praesentationen */
     tilbud(NK.SimBaand.prototype, "nk-sc2.3-intro2", "baand-tilbud");
 
     var sims = {};

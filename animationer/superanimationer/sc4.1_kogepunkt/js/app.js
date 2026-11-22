@@ -35,6 +35,9 @@
         }
     }
 
+    /* Kortets knap "Videre til ..." skifter fane (js/varm_opgaver.js) */
+    NK.visFane = visFane;
+
     /* ----- Overlays ---------------------------------------------------- */
     function lukAlle() {
         var aabne = document.querySelectorAll(".overlay.vis");

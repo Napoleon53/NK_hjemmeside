@@ -161,8 +161,10 @@
     var K_VAEG = 2000;
     var TYNGDE = 30;         /* vaeske og fast stof falder til bunden */
     var K_PLADS = 220, C_PLADS = 16, K_DREJ = 60, C_DREJ = 8, F_PLADS = 90;
-    var KT_GAS = 80;         /* gassens temperatur i modellen ved 20 °C */
-    var FART_MAKS = 40;
+    /* Rolige molekyler (REGELSAET 26, runde T9 22. nov. 2026): gassen farer
+       halvt saa hurtigt som foer (kT 80 -> 20, hoejst 40 -> 22) */
+    var KT_GAS = 20;         /* gassens temperatur i modellen ved 20 °C */
+    var FART_MAKS = 22;
     var DELSTEG = 1 / 480;
 
     var FAST = 0, VAESKE = 1, GAS = 2;

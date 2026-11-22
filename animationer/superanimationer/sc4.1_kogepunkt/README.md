@@ -162,6 +162,84 @@ højeste kort i hver fane mod zonen ved 1400 × 860 og 1100 × 700.
 * **Smeltepunkt for 2,2-dimethylpropan.** Den gamle brugte −17 °C og et
   kogepunkt på 10 °C; tabellen siger −16,5 og 9,5 °C.
 
+## Runde T9: fane 1 efter regelsættet (22. nov. 2026)
+
+Niels sagde ja til forslaget ("Ja det er cool. Det gør du bare"). Reglerne står
+i `../REGELSAET.md`; numrene nedenfor henviser dertil.
+
+* **Intet panel** (regel 2-3). Fem opgaver står i en række øverst med
+  "↺ Start forfra" og "Fri leg" yderst til højre. Titlerne låses op i takt
+  (regel 17). Kortet står under rækken mellem hylden og kurven med en fast
+  plads (regel 4): `D.ZONE.varm`, 26 px mere, når kortet er smallere end
+  640 px. Kurven står på et lyst papir til højre (regel 29) med fede, sorte
+  aksetitler og y-titlen vandret over aksen. Zoomvinduet og termometeret står
+  samlet i midten under kortet.
+* **Opgaverne** står i `D.OPG_VARM` i `js/data.js`, motoren i
+  `js/varm_opgaver.js` (mønster: `sc3.3`'s `en_opgaver.js`) med trintyperne
+  valg, handling (går selv videre ca. 1 s efter, at scenen står på målet,
+  regel 33) og indsend (gættet på kurven). Rækkefølgen følger Kemibogen C 4.1:
+  1. Pentan koger: tilstandsformen ved 20 °C, varm op, til pentan koger, og
+     hvad der sker med molekylerne.
+  2. Gasserne på hylden: hvilke alkaner er gasser ved 20 °C (ballonerne), koger
+     butan lavere eller højere end pentan, træk butan ned, og køl, til den
+     fortætter.
+  3. Længere kæder: find kogepunktet for hexan og octan, og hvad sker der med
+     kogepunktet, når kæden bliver længere.
+  4. Gæt decan: træk ? på kurven, og mål decan.
+  5. Stearinlyset: icosans tilstandsform, varm op, til det koger, og hvorfor
+     icosan koger så højt.
+  Bagefter fri leg med alle glas og "Videre til Formen".
+* **Delene dukker op, når de bruges** (regel 13, 38): hylden og kurven er
+  stiplede pladser i opgave 1, forklaringen af farverne (fast stof, væske,
+  gas) er skjult, mens kortet spørger om tilstandsformen, og kurven kommer
+  først frem efter spørgsmålet om molekylerne.
+* **Kun det, kortet beder om, kan bruges** (regel 19a-21): under et spørgsmål
+  har termometeret intet håndtag, og glassene kan ikke trækkes (et greb får
+  kortet til at blinke). En handling har gul ramme eller ring og en boble med
+  pil ("Træk: varm op", "Træk: til kammeret", "Træk: dit gæt"), og glassene får
+  en stiplet bue til kammeret.
+* Tændstikæsken og pauseknappen står kun i den fri leg. Kemichaels tilbud om
+  præsentationen er væk på fane 1 (K viser den stadig). Han roser første gang
+  alle fem opgaver er løst.
+* **Rolige molekyler** (regel 26): gassen farer halvt så hurtigt som før
+  (`KT_GAS` 80 til 20, `FART_MAKS` 40 til 22 i `js/model.js`), også på fane 2
+  og 3.
+* **methan** som i Kemibogen (før "metan") på alle tre faner. Id'et er stadig
+  `metan`, så gemte fremskridt virker. Rettelsen står i
+  `../../../.claude/spoergsmaal-og-start/ret/t9.json`.
+* **Teorien** er et kort, lyst ark (`../faelles/teori.css`, regel 31) med en
+  tabel over gas, væske og fast stof og en henvisning til C 4.1.
+* **Selvtesten** går de fem opgaver igennem med musen (termometeret, glassene
+  og gættet på kurven), forkerte svar, hinttrappen og Vis svaret. Den måler
+  kortet i hvert trin i 1400 × 860, 1100 × 700 og 860 × 700. Zoomvinduet på
+  fane 1 måles nu mod midten under kortet (mindst 40 %) og skal være større
+  end kurven; de gamle 30 % af hele scenen kan ikke nås med rækken, kortet og
+  kurven i scenen. Fane 1 testes fra 1000 × 640; ved 860 px bryder overskriften
+  i to linjer, og vinduet bliver for lille. Sidst kørt 22. nov. 2026: ALT OK.
+
+Fane 2 og 3 er ikke ændret ud over methan og de roligere molekyler.
+
+### Runde T9b (22. nov. 2026)
+
+Niels: "Godt arbejde." Rettet efter hans tre kommentarer (REGELSAET 58-59):
+
+* **Kemichael siger noget klart** (regel 58). Rosen: "Du har løst alle fem
+  opgaver. Kogepunktet stiger, når kæden bliver længere." Tændstikken: "Gassen
+  i ballonen brændte. Alkanen reagerede med dioxygen i luften og blev til
+  carbondioxid og vand." Stearinlyset og fødselsdagsballonen er væk.
+  Niels: "han siger at gas brænder.. men det er for uklart fra en kemilærer."
+* **Slutkortet** siger "Kogepunktet stiger, når kæden bliver længere. Nu kan du
+  selv varme alle glassene op." Knappen "Videre til Forgrenede kæder" virker nu
+  (`NK.visFane` i `js/app.js` manglede). Fane 2 hedder **Forgrenede kæder** i
+  stedet for Formen (regel 46); `#form` virker stadig.
+* **Hylden** (regel 59): glassene er tegnet om som vektorer (`T.proppetGlas` og
+  `T.hyldeGlasMaal` i `js/tegning.js`), bredere og skarpere, lukket med en
+  prop af kork og stillet i et træstativ. Navn og formel står under hvert glas
+  (Lexend). Glassene er så store, som der er plads til over kammeret. Ballonen
+  kommer først på i kammeret, og glasset i kammeret har samme skarpe tegning
+  (`udenProp`). En gas er usynlig og fylder hele glasset, så opgave 2 spørger
+  nu ud fra, hvilke glas der ikke har noget i bunden. Væsken er lidt tydeligere.
+
 ## Filer
 
 ```
@@ -176,7 +254,8 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, reolen, glasset med ballon, kammeret, termometeret,
                     vandbadet, zoomvinduet, parret, tændstikken og kurven
 js/termostat.js     temperaturen, som eleven trækker i termometeret
-js/sim_varm.js      fane 1
+js/sim_varm.js      fane 1 (scenen)
+js/varm_opgaver.js  fane 1: de fem opgaver, rækken og kortet (runde T9)
 js/sim_form.js      fane 2
 js/sim_spil.js      fane 3
 js/laerer.js        Kemichael på alle tre faner (præsentationen er fælles:

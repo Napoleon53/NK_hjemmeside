@@ -61,7 +61,7 @@ for (const d of MAPPER) {
     if (/ALT OK|\d+ FEJL/.test(hale(tekst)) && ens >= 3) break;
   }
   const slut = hale(tekst).split('\n').slice(-2).join(' ').replace(/\s+/g, ' ');
-  const fejl = tekst.split('\n').filter(l => /^\s*FEJL\b/.test(l));
+  const fejl = tekst.split('\n').filter(l => /^\s*(FEJL\b|UNDTAGELSE)/.test(l) || /^\s+at /.test(l) && process.env.STAK);
   const ok = /ALT OK/.test(hale(tekst)) && !/\d+ FEJL/.test(hale(tekst));
   if (ok) console.log(`${d}: ALT OK (${slut})`);
   else {

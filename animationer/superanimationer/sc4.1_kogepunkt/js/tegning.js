@@ -184,9 +184,9 @@
         var yFast = ind.bund - hFast, yVaeske = yFast - hVaeske;
         if (hVaeske > 0.5) {
             var g = ctx.createLinearGradient(ind.x0, 0, ind.x1, 0);
-            g.addColorStop(0, "rgba(170, 205, 235, 0.32)");
-            g.addColorStop(0.5, "rgba(200, 225, 245, 0.18)");
-            g.addColorStop(1, "rgba(170, 205, 235, 0.3)");
+            g.addColorStop(0, "rgba(170, 205, 235, 0.46)");
+            g.addColorStop(0.5, "rgba(200, 225, 245, 0.3)");
+            g.addColorStop(1, "rgba(170, 205, 235, 0.44)");
             ctx.fillStyle = g;
             ctx.fillRect(ind.x0, yVaeske, ind.x1 - ind.x0, hVaeske + 1);
             /* Menisken */
@@ -254,6 +254,113 @@
             ctx.restore();
         }
         if (!v.udenBallon) T.ballon(ctx, G.mund.x, G.mund.y, G.s, mk.ballon, tid, v.ballonFarve, v);
+    };
+
+    /* ----- Reagensglas med prop paa hylden (runde T9b, 22. nov. 2026) -----------
+       Niels: hylden var "grim og uskarp", og ballonerne saa skoere ud paa
+       hylden. Paa hylden staar glassene nu lukket med en prop af kork i et
+       stativ. Ballonen kommer foerst paa i kammeret. Glasset tegnes her
+       som vektorer (skarpt i alle stoerrelser) og er lidt bredere end
+       glasset i kammeret. (x, y): midten af bunden. h: glassets hoejde. */
+    T.hyldeGlasMaal = function (x, y, h) {
+        var s = h / 200, k = 1.4, r = 18 * s * k, top = y - 190 * s;
+        return {
+            s: s, x: x, bund: y, top: top, h: 190 * s, b: (r + 4 * s) * 2, venstre: x - r - 4 * s,
+            mund: { x: x, y: top + 7 * s },
+            ind: { x0: x - r, x1: x + r, top: top + 14 * s, midte: y - 2 * s - r, r: r, bund: y - 2 * s },
+            fuld: 84 * s
+        };
+    };
+
+    T.proppetGlas = function (ctx, G, mk, tid, v) {
+        v = v || {};
+        var ind = G.ind, s = G.s, vaeg = Math.max(1.6, 3.2 * s);
+        var x0 = ind.x0 - vaeg / 2, x1 = ind.x1 + vaeg / 2, r = (x1 - x0) / 2, top = G.top + 6 * s;
+        function sti() {
+            ctx.beginPath();
+            ctx.moveTo(x0, top);
+            ctx.lineTo(x0, ind.midte);
+            ctx.arc(G.x, ind.midte, r, Math.PI, 0, true);
+            ctx.lineTo(x1, top);
+        }
+        ctx.save();
+        /* En gas er usynlig og fylder hele glasset: kun et meget svagt skaer */
+        if (mk.ballon > 0) {
+            ctx.save();
+            sti(); ctx.closePath(); ctx.clip();
+            var gg = ctx.createLinearGradient(0, top, 0, ind.bund);
+            gg.addColorStop(0, "rgba(150, 200, 245, 0.04)");
+            gg.addColorStop(1, "rgba(150, 200, 245, 0.08)");
+            ctx.fillStyle = gg;
+            ctx.fillRect(x0, top, x1 - x0, ind.bund - top + 2);
+            ctx.restore();
+        }
+        T.glasIndhold(ctx, G, v.udenProp ? mk : { fast: mk.fast || 0, vaeske: mk.vaeske || 0, koger: 0 }, tid, v.frost || 0);
+        /* Glasset: let skaer, kraftig kant og to genskin */
+        sti(); ctx.closePath();
+        var g = ctx.createLinearGradient(x0, 0, x1, 0);
+        g.addColorStop(0, "rgba(220, 238, 252, 0.22)");
+        g.addColorStop(0.25, "rgba(220, 238, 252, 0.05)");
+        g.addColorStop(0.75, "rgba(220, 238, 252, 0.04)");
+        g.addColorStop(1, "rgba(220, 238, 252, 0.2)");
+        ctx.fillStyle = g;
+        ctx.fill();
+        sti();
+        ctx.strokeStyle = "rgba(226, 241, 253, 0.95)";
+        ctx.lineWidth = vaeg;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.fillRect(x1 - vaeg - 4 * s * 1.3, top + 12 * s, Math.max(1.5, 3.5 * s), (ind.midte - top) * 0.82);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.16)";
+        ctx.fillRect(x0 + vaeg + 1.5 * s, top + 16 * s, Math.max(1, 2 * s), (ind.midte - top) * 0.7);
+        /* Kraven ved mundingen */
+        var kr = Math.max(2, 5 * s);
+        ctx.fillStyle = "rgba(226, 241, 253, 0.25)";
+        ctx.strokeStyle = "rgba(226, 241, 253, 0.95)";
+        ctx.lineWidth = Math.max(1.2, 2 * s);
+        NK.rundtRekt(ctx, x0 - kr * 0.6, top - kr * 0.5, x1 - x0 + kr * 1.2, kr * 1.6, kr * 0.7);
+        ctx.fill();
+        ctx.stroke();
+        /* Proppen af kork: smallere forneden, saa den sidder i glasset.
+           I kammeret sidder ballonen i stedet (udenProp). */
+        var pT = v.udenProp ? top - kr : top - 15 * s, pB = top + 13 * s, bT = (x1 - x0) * 0.62, bB = (ind.x1 - ind.x0) * 0.46;
+        var pg = ctx.createLinearGradient(G.x - bT, 0, G.x + bT, 0);
+        pg.addColorStop(0, "#9c6d3c");
+        pg.addColorStop(0.35, "#d8ac75");
+        pg.addColorStop(1, "#8c6034");
+        ctx.fillStyle = pg;
+        ctx.strokeStyle = "#5e3e1e";
+        ctx.lineWidth = Math.max(1, 1.4 * s);
+        ctx.beginPath();
+        ctx.moveTo(G.x - bT, pT + 2 * s);
+        ctx.quadraticCurveTo(G.x - bT, pT, G.x - bT + 3 * s, pT);
+        ctx.lineTo(G.x + bT - 3 * s, pT);
+        ctx.quadraticCurveTo(G.x + bT, pT, G.x + bT, pT + 2 * s);
+        ctx.lineTo(G.x + bB, pB);
+        ctx.lineTo(G.x - bB, pB);
+        ctx.closePath();
+        if (!v.udenProp) { ctx.fill(); ctx.stroke(); }
+        /* Korkens pletter */
+        ctx.fillStyle = v.udenProp ? "rgba(0, 0, 0, 0)" : "rgba(94, 62, 30, 0.45)";
+        [[-0.4, 0.3], [0.25, 0.22], [-0.05, 0.62], [0.42, 0.55], [-0.5, 0.75]].forEach(function (pp) {
+            var py = pT + (pB - pT) * pp[1], bred = bT + (bB - bT) * pp[1];
+            ctx.beginPath();
+            ctx.arc(G.x + pp[0] * bred, py, Math.max(0.6, 1.1 * s), 0, Math.PI * 2);
+            ctx.fill();
+        });
+        if (!v.udenProp) {
+            ctx.fillStyle = "rgba(255, 240, 215, 0.45)";
+            ctx.fillRect(G.x - bT + 3 * s, pT + 1.5 * s, 2 * bT - 6 * s, Math.max(1, 1.6 * s));
+        }
+        if (v.lys) {
+            ctx.strokeStyle = "rgba(242, 197, 61, " + NK.klamp(v.lys, 0, 1) + ")";
+            ctx.lineWidth = 2;
+            NK.rundtRekt(ctx, x0 - 6, pT - 4, x1 - x0 + 12, ind.bund - pT + 8, 8);
+            ctx.stroke();
+        }
+        ctx.restore();
+        return { top: pT, bund: ind.bund, venstre: x0 - kr, hoejre: x1 + kr };
     };
 
     /* ----- Ballonen -------------------------------------------------------------
@@ -527,8 +634,10 @@
             ctx.textAlign = "right";
             ctx.fillText(m.tekst, x - 20 * s, ym + (m.dy || 0));
         });
-        /* Haandtaget i toppen af soejlen */
+        /* Haandtaget i toppen af soejlen. Uden haandtag (udenHaandtag), mens
+           termometeret ikke maa bruges (REGELSAET 19a). */
         var hr = Math.max(9, 9 * s * 1.3);
+        if (v.udenHaandtag) { ctx.restore(); return { x: x, y: yT, r: hr }; }
         var puls = v.puls ? 0.5 + 0.5 * Math.sin(v.tid * 6) : 0;
         if (puls) {
             ctx.strokeStyle = "rgba(242, 197, 61, " + (0.25 + 0.5 * puls) + ")";
@@ -998,29 +1107,33 @@
         v = v || {};
         ctx.save();
         var px = v.px || 13, b = 0;
+        var sk = v.lexend ? function (vg, p) { return vg + " " + p + "px Lexend, 'Segoe UI', sans-serif"; } : font;
+        var px2 = v.px2 || px * 0.85;
         linjer.forEach(function (l, i) {
-            ctx.font = font(i ? "500" : "700", i ? px * 0.85 : px);
+            ctx.font = sk(i ? "500" : (v.lexend ? "600" : "700"), i ? px2 : px);
             b = Math.max(b, ctx.measureText(l).width);
         });
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         linjer.forEach(function (l, i) {
-            ctx.font = font(i ? "500" : "700", i ? px * 0.85 : px);
-            ctx.fillStyle = i ? "#9aa3ae" : (v.farve || "#e6ebf1");
-            ctx.fillText(l, x, y + (i ? px * 1.15 : 0));
+            ctx.font = sk(i ? "500" : (v.lexend ? "600" : "700"), i ? px2 : px);
+            ctx.fillStyle = i ? (v.farve2 || "#9aa3ae") : (v.farve || "#e6ebf1");
+            ctx.fillText(l, x, y + (i ? px * 1.2 : 0));
         });
         ctx.restore();
         return b;
     };
 
-    /* ----- Kurven i panelet -------------------------------------------------------------
+    /* ----- Kurven paa det lyse papir (fane 1, runde T9) ------------------------------
        x: antal C (1-10 og 20 efter et knaek). y: kogepunktet i °C.
-       v: { punkter: [{ st, kp, ny }], gaet: { nC, t, fundet }, aktiv: nC,
+       Fede, sorte aksetitler; y-titlen staar vandret over aksen.
+       v: { punkter: [{ st, ny, sidst }], gaet: { nC, t, sat, aktiv }, aktiv: nC,
             gaetLys, tid } */
     var KURVE_OMR = { min: -200, max: 360 };
+    var LEX = "Lexend, 'Segoe UI', sans-serif";
     T.kurveMaal = function (W, H) {
-        var fs = NK.klamp(W * 0.03, 11, 13);
-        var v = 40, hj = 10, top = 12, bund = H - fs * 2.6 - 6;
+        var fs = NK.klamp(W * 0.05, 12.5, 15);
+        var v = fs * 3.4, hj = 12, top = fs * 3.0, bund = H - fs * 3.6;
         return {
             W: W, H: H, fs: fs, v: v, hj: hj, top: top, bund: bund,
             xFor: function (nC) {
@@ -1041,61 +1154,80 @@
         var K = T.kurveMaal(W, H), fs = K.fs;
         ctx.clearRect(0, 0, W, H);
         ctx.save();
-        ctx.font = font("600", fs);
         ctx.textBaseline = "middle";
-        /* Gitterlinjerne */
+        /* y-aksens titel vandret over aksen */
+        ctx.font = "600 " + fs + "px " + LEX;
+        ctx.fillStyle = "#1d2433";
+        ctx.textAlign = "left";
+        ctx.fillText("Kogepunkt (°C)", 10, fs * 1.25);
+        /* Gitterlinjerne og tallene */
+        ctx.font = "400 " + (fs * 0.92) + "px " + LEX;
         for (var t = -200; t <= 300; t += 100) {
             var y = Math.round(K.yFor(t)) + 0.5;
-            ctx.strokeStyle = t === 0 ? "rgba(255, 255, 255, 0.22)" : "rgba(255, 255, 255, 0.08)";
+            ctx.strokeStyle = t === 0 ? "rgba(29, 36, 51, 0.35)" : "rgba(29, 36, 51, 0.1)";
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(K.v, y);
             ctx.lineTo(W - K.hj, y);
             ctx.stroke();
-            ctx.fillStyle = "#8b93a0";
+            ctx.fillStyle = "#4a5160";
             ctx.textAlign = "right";
-            ctx.fillText(D.grader(t, 0), K.v - 5, y);
+            ctx.fillText(D.grader(t, 0), K.v - 6, y);
         }
+        /* Akserne */
+        ctx.strokeStyle = "#1d2433";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(K.v + 0.5, K.top - 6);
+        ctx.lineTo(K.v + 0.5, K.bund + 0.5);
+        ctx.lineTo(W - K.hj, K.bund + 0.5);
+        ctx.stroke();
+
         /* Stuetemperaturen */
         var yS = K.yFor(D.STUE);
-        ctx.strokeStyle = "rgba(126, 224, 168, 0.55)";
-        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = "rgba(38, 140, 86, 0.8)";
+        ctx.lineWidth = 1.3;
+        ctx.setLineDash([5, 4]);
         ctx.beginPath();
         ctx.moveTo(K.v, yS);
         ctx.lineTo(W - K.hj, yS);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = "rgba(126, 224, 168, 0.85)";
-        ctx.textAlign = "left";
-        ctx.fillText("20 °C", K.v + 4, yS - fs * 0.75);
+        ctx.fillStyle = "#23804f";
+        ctx.textAlign = "right";
+        ctx.font = "400 " + (fs * 0.9) + "px " + LEX;
+        ctx.fillText("20 °C", W - K.hj - 2, yS - fs * 0.75);
 
         /* x-aksen: antal C, med et knaek foer 20 */
-        ctx.fillStyle = "#8b93a0";
+        ctx.fillStyle = "#4a5160";
         ctx.textAlign = "center";
-        var yX = K.bund + fs * 0.9;
+        ctx.font = "400 " + (fs * 0.92) + "px " + LEX;
+        var yX = K.bund + fs * 0.95;
         for (var n = 1; n <= 10; n++) ctx.fillText(String(n), K.xFor(n), yX);
         ctx.fillText("20", K.xFor(20), yX);
         var xk = (K.xFor(10) + K.xFor(20)) / 2;
-        ctx.strokeStyle = "#8b93a0";
+        ctx.strokeStyle = "#4a5160";
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(xk - 5, yX + 4); ctx.lineTo(xk - 1, yX - 4);
         ctx.moveTo(xk + 1, yX + 4); ctx.lineTo(xk + 5, yX - 4);
         ctx.stroke();
-        ctx.fillText("antal C-atomer i kæden", (K.v + W - K.hj) / 2, yX + fs * 1.35);
+        ctx.font = "600 " + fs + "px " + LEX;
+        ctx.fillStyle = "#1d2433";
+        ctx.fillText("Antal C-atomer", (K.v + W - K.hj) / 2, yX + fs * 1.45);
 
         /* Den aktive soejle (stoffet i kammeret) */
         if (v.aktiv) {
             var xa = K.xFor(v.aktiv), bredde = (W - K.v - K.hj) / 12;
-            ctx.fillStyle = "rgba(61, 158, 224, 0.12)";
+            ctx.fillStyle = "rgba(61, 158, 224, 0.1)";
             ctx.fillRect(xa - bredde / 2, K.top, bredde, K.bund - K.top);
         }
 
         /* Punkterne, forbundet i raekkefoelge efter kaedelaengde */
         var pk = (v.punkter || []).slice().sort(function (a, b) { return a.st.nC - b.st.nC; });
         if (pk.length > 1) {
-            ctx.strokeStyle = "rgba(240, 104, 90, 0.55)";
-            ctx.lineWidth = 1.6;
+            ctx.strokeStyle = "rgba(201, 64, 50, 0.6)";
+            ctx.lineWidth = 1.8;
             ctx.beginPath();
             pk.forEach(function (p, i) {
                 var px = K.xFor(p.st.nC), py = K.yFor(p.st.kp);
@@ -1106,16 +1238,16 @@
         pk.forEach(function (p) {
             var px = K.xFor(p.st.nC), py = K.yFor(p.st.kp);
             if (p.ny) {
-                ctx.fillStyle = "rgba(242, 197, 61, " + (0.35 * p.ny) + ")";
+                ctx.fillStyle = "rgba(242, 197, 61, " + (0.45 * p.ny) + ")";
                 ctx.beginPath();
                 ctx.arc(px, py, 7 + 8 * p.ny, 0, Math.PI * 2);
                 ctx.fill();
             }
-            ctx.fillStyle = "#f0685a";
-            ctx.strokeStyle = "#1c1f26";
-            ctx.lineWidth = 1.5;
+            ctx.fillStyle = "#d1473a";
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.6;
             ctx.beginPath();
-            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.arc(px, py, 5.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         });
@@ -1125,38 +1257,41 @@
         if (nyest) {
             var nx = K.xFor(nyest.st.nC), ny = K.yFor(nyest.st.kp);
             var tekst = D.gradTekst(nyest.st.kp);
-            ctx.font = font("700", fs);
+            ctx.font = "600 " + (fs * 0.92) + "px " + LEX;
             var tb = ctx.measureText(tekst).width;
-            var lx = NK.klamp(nx - tb / 2, K.v + 2, W - K.hj - tb - 2);
-            var ly = ny - fs * 1.3 < K.top + 4 ? ny + fs * 1.4 : ny - fs * 1.3;
-            ctx.fillStyle = "rgba(20, 20, 28, 0.85)";
-            ctx.fillRect(lx - 4, ly - fs * 0.7, tb + 8, fs * 1.4);
-            ctx.fillStyle = "#ffd2cb";
+            /* Til venstre for punktet, hvor kurven ligger lavere; ellers til hoejre */
+            var lx = nx - 11 - tb, ly = ny;
+            if (lx < K.v + 4) lx = nx + 11;
+            ctx.fillStyle = "rgba(247, 245, 239, 0.92)";
+            ctx.fillRect(lx - 4, ly - fs * 0.72, tb + 8, fs * 1.44);
+            ctx.fillStyle = "#a8352a";
             ctx.textAlign = "left";
             ctx.fillText(tekst, lx, ly);
         }
 
-        /* Gaettet: en hul gul ring med et ?, som kan traekkes op og ned */
+        /* Gaettet: en gul ring med et ?, som kan traekkes op og ned */
         if (v.gaet) {
             var gx = K.xFor(v.gaet.nC), gy = K.yFor(v.gaet.t);
-            var puls = v.gaet.sat ? 0 : 0.5 + 0.5 * Math.sin((v.tid || 0) * 5);
-            ctx.strokeStyle = "rgba(242, 197, 61, " + (0.6 + 0.4 * puls) + ")";
-            ctx.fillStyle = "rgba(242, 197, 61, " + (v.gaetLys ? 0.35 : 0.15) + ")";
-            ctx.lineWidth = 2.2;
+            var puls = v.gaet.aktiv && !v.gaet.sat ? 0.5 + 0.5 * Math.sin((v.tid || 0) * 4) : 0;
+            ctx.strokeStyle = "rgba(196, 140, 10, " + (0.75 + 0.25 * puls) + ")";
+            ctx.fillStyle = "rgba(242, 197, 61, " + (v.gaetLys ? 0.55 : 0.35) + ")";
+            ctx.lineWidth = 2.4;
             ctx.beginPath();
-            ctx.arc(gx, gy, 9 + puls * 2, 0, Math.PI * 2);
+            ctx.arc(gx, gy, 10 + puls * 2, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-            ctx.fillStyle = "#f2c53d";
-            ctx.font = font("800", fs);
+            ctx.fillStyle = "#6b4c00";
+            ctx.font = "700 " + fs + "px " + LEX;
             ctx.textAlign = "center";
             ctx.fillText("?", gx, gy + 0.5);
             if (v.gaet.sat) {
-                var gt = "dit gæt: " + D.gradTekst(v.gaet.t, 0);
-                ctx.font = font("600", fs);
+                var gt = "Dit gæt: " + D.gradTekst(v.gaet.t, 0);
+                ctx.font = "500 " + (fs * 0.92) + "px " + LEX;
                 var gb = ctx.measureText(gt).width;
-                var gxx = NK.klamp(gx - gb - 14, K.v + 2, W - K.hj - gb - 2);
-                ctx.fillStyle = "#f2c53d";
+                var gxx = NK.klamp(gx - gb - 16, K.v + 4, W - K.hj - gb - 2);
+                ctx.fillStyle = "rgba(247, 245, 239, 0.92)";
+                ctx.fillRect(gxx - 4, gy - fs * 0.72, gb + 8, fs * 1.44);
+                ctx.fillStyle = "#6b4c00";
                 ctx.textAlign = "left";
                 ctx.fillText(gt, gxx, gy);
             }

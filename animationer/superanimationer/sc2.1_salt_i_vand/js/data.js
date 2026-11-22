@@ -60,7 +60,7 @@
 
         { id: "CaCl2", kat: "Ca", an: "Cl",  p: 1, n: 2,
           formel: "CaCl₂",   navn: "calciumchlorid",
-          hverdag: "tøsalt på vejene om vinteren",
+          hverdag: "trækker vand til sig, bruges i affugtere",
           kurve: [59.5, 74.5, 115, 137, 147, 159] },
 
         { id: "CuSO4", kat: "Cu", an: "SO4", p: 1, n: 1,

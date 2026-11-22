@@ -216,63 +216,106 @@ function koerTest(W) {
         /Flere C-atomer/.test(D.hvorfor(D.stof("butan"), D.stof("dimethylpropan"))) &&
         /korte kæde/.test(D.hvorfor(D.stof("hexan"), D.stof("decan"))));
 
-    overskrift("6. Varm op kan gennemføres");
+    overskrift("6. Varm op: de fem opgaver (runde T9, REGELSAET)");
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
     function kt(navn) { return d.getElementById(navn + "-skort").textContent; }
     function graa(navn) { var e = d.getElementById(navn + "-indsend"); return !e.hidden && e.classList.contains("ikke-klar"); }
     function klar(navn) { var e = d.getElementById(navn + "-indsend"); return !e.hidden && e.classList.contains("klar"); }
     klik('[data-fane="fane-varm"]');
     V.tilpas();
-    V.afvisTilbud();
-    V.maalNr = 0; V.fundet = []; V.gaet = null; V.naaet = false; V.hjaelp = 0; V.rost = false;
-    V.termo.saet(20); V.termo.roert = false;
-    V.proeve = V.lavProeve(V.valgt);
-    V.skort.besked("", "");
-    V.visMaal();
-    paastand("pentan står i kammeret ved 20 °C, og mål 1 på kortet er at få det til at koge",
-        V.stof().id === "pentan" && /pentan til at koge/.test(kt("varm")), kt("varm"));
-    paastand("Indsend svar er grå, før termometeret er rørt", graa("varm"));
+    var O = V.opgaver;
+    /* Boblen og kurvens plads saettes, naar fanen tegnes */
+    function tikV(sek) { tik(V, sek); V.tegn(); }
+    /* Frisk start: ingen loeste opgaver og ingen kogepunkter */
+    O.status = {}; O.gem(); V.fundet = []; V.gaet = null; V.rost = false; V.gem();
+    O.aabn(0, true); tikV(1.2);
     var c = d.getElementById("varm-laerred"), rc = c.getBoundingClientRect(), lay = V.lay;
     function mus(type, x, y) {
         c.dispatchEvent(new W.PointerEvent(type, { clientX: rc.left + x, clientY: rc.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
     }
-    var TM = lay.termo;
-    mus("pointerdown", TM.x, TM.yFor(20));
-    mus("pointermove", TM.x, TM.yFor(30));
-    mus("pointermove", TM.x, TM.yFor(48));
-    mus("pointerup", TM.x, TM.yFor(48));
-    paastand("termometeret kan trækkes op med musen", Math.abs(V.termo.T - 48) <= 2, V.termo.T);
-    tik(V, 4);
-    paastand("termometeret løser ikke målet af sig selv, men Indsend svar er klar", !V.naaet && V.fundet.indexOf("pentan") >= 0 && klar("varm"));
-    klik("#varm-indsend");
-    paastand("Indsend svar: pentan koger, mål 1 er nået, og kortet bliver stående med forklaringen",
-        V.naaet && V.proeve.makro().ballon > 0.5 && /36,1/.test(kt("varm")) && !!d.querySelector("#varm-skort [data-videre]") && d.getElementById("varm-indsend").hidden, kt("varm"));
+    function traekTermo(T) {
+        var TM = V.lay.termo;
+        mus("pointerdown", TM.x, TM.yFor(V.termo.T));
+        mus("pointermove", TM.x, TM.yFor((V.termo.T + T) / 2));
+        mus("pointermove", TM.x, TM.yFor(T));
+        mus("pointerup", TM.x, TM.yFor(T));
+    }
+    function traekGlas(id) {
+        var i = D.HYLDE.indexOf(D.stof(id)), hg = V.lay.hyldeGlas[i];
+        mus("pointerdown", hg.x, hg.y - V.lay.hyldeGlasH * 0.4);
+        mus("pointermove", V.lay.glas.x - 30, V.lay.glas.top + 60);
+        mus("pointermove", V.lay.glas.x, V.lay.glas.top + 80);
+        mus("pointerup", V.lay.glas.x, V.lay.glas.top + 80);
+        tikV(2);
+    }
+    function svar(ok) {
+        var t = O.trin(), i = -1;
+        t.svar.forEach(function (sv, k) { if (!!sv.ok === ok && i < 0) i = k; });
+        klik('#varm-ind [data-nr="' + i + '"]');
+        klik("#varm-indsend");
+    }
+    var knapper = d.querySelectorAll("#varm-liste .or-knap");
+    paastand("intet panel: fanen har ingen aside, og kurven står i scenen", !d.querySelector("#fane-varm .panel") && !!d.getElementById("varm-kurve-ark").closest(".scene"));
+    paastand("rækken har fem opgaver; kun den første har en titel, de andre er låst",
+        knapper.length === 5 && /Pentan koger/.test(knapper[0].textContent) && [1, 2, 3, 4].every(function (k) { return knapper[k].disabled && !knapper[k].querySelector(".or-navn").textContent; }));
+    paastand("intet præsentationstilbud på fane 1", !d.getElementById("varm-tilbud"));
+    paastand("opgave 1, trin 1: spørgsmålet om tilstandsformen står på kortet",
+        /Trin 1 af 3/.test(kt("varm")) && /Hvilken tilstandsform har pentan/.test(kt("varm")), kt("varm"));
+    paastand("hylden og kurven er stiplede pladser, og forklaringen af farverne er skjult",
+        O.skjult("hylde") && d.getElementById("varm-kurve-ark").classList.contains("plads") && O.skjult("forklaring"));
+    paastand("termometeret kan ikke bruges under spørgsmålet, og der er ingen boble", !V.maa("termo") && d.getElementById("varm-boble").hidden);
+    var T0 = V.termo.T, TM = lay.termo;
+    mus("pointerdown", TM.x, TM.yFor(T0)); mus("pointermove", TM.x, TM.yFor(80)); mus("pointerup", TM.x, TM.yFor(80));
+    paastand("et greb i termometeret under spørgsmålet ændrer intet, og kortet blinker", V.termo.T === T0 && d.getElementById("varm-skort").classList.contains("blink"));
+    paastand("Indsend svar er grå, før et svar er valgt", graa("varm"));
+    svar(false);
+    paastand("et forkert svar får sin egen forklaring", /Ikke rigtigt/.test(kt("varm")) && /bunden af glasset|faste rækker/.test(kt("varm")), kt("varm"));
+    svar(true);
+    paastand("rigtigt: kortet bliver på spørgsmålet med forklaringen og Næste spørgsmål", O.tilstand === "bliv" && /Næste spørgsmål/.test(kt("varm")) && /væske/.test(kt("varm")));
     paastand("kortet har ingen Start forfra", !/forfra/i.test(kt("varm")));
-    klik("#varm-skort [data-videre]");
-    paastand("Næste mål: mål 2", V.maalNr === 1 && !V.naaet && !/Rigtigt/.test(kt("varm")));
-    /* Traek metan fra hylden ned i kammeret */
-    mus("pointerdown", lay.hyldeGlas[0].x, lay.hyldeGlas[0].y - lay.hyldeGlasH * 0.4);
-    mus("pointermove", lay.glas.x - 30, lay.glas.top + 60);
-    mus("pointermove", lay.glas.x, lay.glas.top + 80);
-    mus("pointerup", lay.glas.x, lay.glas.top + 80);
-    tik(V, 1);
-    paastand("et glas kan trækkes fra hylden ned i kammeret", V.stof().id === "metan");
-    V.termo.saet(-175); tik(V, 6);
-    paastand("metan fortætter under −161,5 °C, og det tæller som kogepunktet", V.fundet.indexOf("metan") >= 0 &&
-        /fortætter/.test(d.getElementById("varm-note").textContent));
-    mus("pointerdown", lay.hyldeGlas[5].x, lay.hyldeGlas[5].y - lay.hyldeGlasH * 0.4);
-    mus("pointerup", lay.hyldeGlas[5].x, lay.hyldeGlas[5].y - lay.hyldeGlasH * 0.4);
-    tik(V, 1);
-    paastand("et klik på et glas på hylden sætter det i", V.stof().id === "hexan");
-    V.termo.saet(80); tik(V, 4);
-    V.skift(7); tik(V, 1); V.termo.saet(140); tik(V, 4);
-    klik("#varm-indsend");
-    paastand("tre andre kogepunkter og Indsend svar: mål 2 er nået", V.naaet && V.fundet.length === 4, V.fundet.join(","));
-    V.knap();
-    paastand("mål 3 gætter på decan", V.maalNr === 2 && V.gaet && V.gaet.id === "decan" && /decan/.test(kt("varm")));
-    V.knap();
-    paastand("hintet på kortet nævner octan", /octan/.test(kt("varm")), kt("varm"));
-    /* Gaettet traekkes paa kurven */
+    klik("#varm-skort [data-videre]"); tikV(0.2);
+    paastand("trin 2 er en handling med gul boble ved termometeret", O.trin().type === "handling" && !d.getElementById("varm-boble").hidden &&
+        /Træk/.test(d.getElementById("varm-boble").textContent));
+    paastand("forklaringen af farverne er kommet frem", !O.skjult("forklaring"));
+    traekTermo(48);
+    V.tegn();
+    paastand("termometeret kan trækkes op med musen, og boblen forsvinder", Math.abs(V.termo.T - 48) <= 2 && d.getElementById("varm-boble").hidden, V.termo.T);
+    tikV(4);
+    paastand("pentan koger, og kortet går selv videre til trin 3 (REGELSAET 33)", V.fundet.indexOf("pentan") >= 0 && O.trinNr === 2 && O.tilstand === "trin");
+    paastand("kurven er stadig en stiplet plads under spørgsmålet", d.getElementById("varm-kurve-ark").classList.contains("plads"));
+    svar(true); tikV(0.1);
+    paastand("efter svaret kommer kurven frem med pentans kogepunkt", !d.getElementById("varm-kurve-ark").classList.contains("plads") && /36,1/.test(kt("varm")));
+    paastand("opgave 1 er løst med stjerne, og opgave 2 er låst op", O.status.pentan === "stjerne" && !knapper[1].disabled && /Gasserne/.test(knapper[1].textContent));
+    klik("#varm-skort [data-videre]"); tikV(0.8);
+
+    paastand("opgave 2: hylden er kommet frem, og kammeret er tilbage på 20 °C", O.nr === 1 && !O.skjult("hylde") && Math.abs(V.termo.T - 20) < 0.01);
+    var foer = V.stof().id;
+    traekGlas("metan");
+    paastand("glassene kan ikke trækkes under spørgsmålet", V.stof().id === foer);
+    svar(true); klik("#varm-skort [data-videre]");
+    svar(false);
+    paastand("butan højere: forklaringen nævner, at butan er en gas ved 20 °C", /gas ved 20 °C/.test(kt("varm")), kt("varm"));
+    svar(true); klik("#varm-skort [data-videre]"); tikV(0.2);
+    paastand("trin 3: glasset med butan har boble, og kun det kan trækkes", O.opfordring() && O.opfordring().el === "glas:butan" && V.maa("glas:butan") && !V.maa("glas:hexan") && !V.maa("termo"));
+    traekGlas("hexan");
+    paastand("et andet glas kan ikke trækkes", V.stof().id === "pentan");
+    traekGlas("butan");
+    paastand("butan kan trækkes ned i kammeret, og kortet går selv videre", V.stof().id === "butan" && O.trinNr === 3);
+    traekTermo(-15); tikV(6);
+    paastand("butan fortætter: kogepunktet er fundet, og kortet forklarer fortætningen", V.fundet.indexOf("butan") >= 0 && O.tilstand === "bliv" &&
+        /fortætter/.test(kt("varm")) && /Næste opgave/.test(kt("varm")), kt("varm"));
+    klik("#varm-skort [data-videre]"); tikV(0.8);
+
+    paastand("opgave 3: boblen står ved glasset med hexan", O.nr === 2 && O.opfordring() && O.opfordring().el === "glas:hexan");
+    traekGlas("hexan");
+    paastand("når hexan står i kammeret, flytter boblen til termometeret", O.opfordring() && O.opfordring().el === "termo");
+    traekTermo(80); tikV(5);
+    paastand("hexan koger, og kortet går videre til octan", V.fundet.indexOf("hexan") >= 0 && O.trinNr === 1);
+    traekGlas("octan"); traekTermo(140); tikV(5);
+    paastand("octan koger, og kortet spørger om kurven", V.fundet.indexOf("octan") >= 0 && O.trinNr === 2 && /kæden bliver længere/.test(kt("varm")));
+    svar(true); klik("#varm-skort [data-videre]"); tikV(0.5);
+
+    paastand("opgave 4: gættet på decan; decan er ikke målt", O.nr === 3 && V.gaet && V.gaet.id === "decan" && V.fundet.indexOf("decan") < 0 && graa("varm"));
     var kc = d.getElementById("varm-kurve"), krc = kc.getBoundingClientRect();
     var K = NK.Tegn.kurveMaal(V.KL.b, V.KL.h);
     function kmus(type, x, y) {
@@ -281,50 +324,69 @@ function koerTest(W) {
     kmus("pointerdown", K.xFor(10), K.yFor(V.gaet.t));
     kmus("pointermove", K.xFor(10), K.yFor(150));
     kmus("pointerup", K.xFor(10), K.yFor(160));
-    paastand("gættet kan trækkes på kurven", V.gaet.sat && Math.abs(V.gaet.t - 160) <= 5, V.gaet.t);
-    V.skift(9); tik(V, 1); V.termo.saet(190); tik(V, 4);
+    paastand("gættet kan trækkes på kurven, og Indsend svar bliver klar", V.gaet.sat && Math.abs(V.gaet.t - 160) <= 5 && klar("varm"), V.gaet.t);
     klik("#varm-indsend");
-    paastand("decan måles: mål 3 er nået, og kortet sammenligner med gættet", V.naaet && /Du gættede 160 °C/.test(kt("varm")) &&
-        /174,1/.test(kt("varm")), kt("varm"));
-    V.knap();
-    V.hjaelp = 1; V.knap();
-    tik(V, 6);
-    paastand("Vis svaret på mål 4 sætter icosan i og koger det", V.stof().id === "icosan" && V.fundet.indexOf("icosan") >= 0 && V.naaet);
-    V.knap(); tik(V, 3);
-    paastand("efter de fire mål er der frit valg, forfra ligger i panelet, og Kemichael roser", !V.maal() && !d.getElementById("varm-forfra").hidden &&
-        !/forfra/i.test(kt("varm")) && !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "faerdig"));
-    tik(V, 8);
+    paastand("efter gættet beder kortet om at måle decan", O.trinNr === 1 && /Dit gæt er 160 °C/.test(kt("varm")), kt("varm"));
+    traekGlas("decan"); traekTermo(190); tikV(6);
+    paastand("decan måles, og kortet sammenligner med gættet", O.tilstand === "bliv" && /Du gættede 160 °C/.test(kt("varm")) && /174,1/.test(kt("varm")), kt("varm"));
+    klik("#varm-skort [data-videre]"); tikV(1);
+
+    paastand("opgave 5: icosan står i kammeret, og forklaringen af farverne er skjult under spørgsmålet",
+        O.nr === 4 && V.stof().id === "icosan" && O.skjult("forklaring") && /icosan/.test(kt("varm")));
+    svar(true); klik("#varm-skort [data-videre]");
+    klik("#varm-hjknap"); klik("#varm-hjknap"); klik("#varm-hjknap");
+    paastand("hinttrappen har tre hint og så Vis svaret", /Hint 3 af 3/.test(kt("varm")) && d.getElementById("varm-hjknap").textContent === "Vis svaret");
+    klik("#varm-hjknap"); tikV(8);
+    paastand("Vis svaret varmer icosan op, til det koger, og kortet går videre", V.fundet.indexOf("icosan") >= 0 && O.trinNr === 2);
+    svar(true);
+    paastand("opgave 5 har ingen stjerne (Vis svaret blev brugt)", O.status.icosan === "loest");
+    klik("#varm-skort [data-videre]"); tikV(3);
+    paastand("alle fem er løst: fanen er gennemført, kortet fører til Formen, og Kemichael roser",
+        O.tilstand === "resultat" && /Videre til Forgrenede kæder/.test(kt("varm")) && !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    tikV(8);
+    klik("#varm-skort [data-videre]");
+    paastand("knappen Videre til Forgrenede kæder skifter til fane 2", d.getElementById("fane-form").classList.contains("aktiv"));
+    klik('[data-fane="fane-varm"]'); V.tilpas();
+    paastand("i den fri leg er tændstikæsken og pauseknappen fremme, og alle glas kan bruges", V.fri() && !!V.pauseFelt && V.maa("glas:nonan") && V.maa("termo"));
     /* Taendstikken: en fuld ballon braender, og Kemichael saetter en ny i */
-    V.skift(0); tik(V, 1); V.termo.saet(20); tik(V, 2);
+    V.skift(0); tikV(1); V.termo.saet(20); tikV(2);
     var bf = V.ballonFelt();
-    paastand("metan ved 20 °C har gas i ballonen", !!bf && bf.fuld && V.proeve.gasIBallonen());
-    var ae = lay.aeske;
+    paastand("methan ved 20 °C har gas i ballonen", !!bf && bf.fuld && V.proeve.gasIBallonen());
+    var ae = V.lay.aeske;
     mus("pointerdown", ae.x + ae.b * 0.7, ae.y + 4);
     mus("pointermove", ae.x + ae.b * 0.7, ae.y - 40);
     paastand("en tændstik trukket op af æsken brænder", !!(V.stik && V.stik.braender));
     mus("pointermove", bf.x, bf.y + 8);
-    tik(V, 0.1);
+    tikV(0.1);
     paastand("tændstikken ved den fulde ballon brænder gassen", !!V.brand && V.proeve.braendt && V.proeve.produkter.length > 0);
     mus("pointerup", bf.x, bf.y + 8);
     var co2 = V.proeve.produkter.filter(function (p) { return p.slags === "co2"; }).length;
     var h2o = V.proeve.produkter.filter(function (p) { return p.slags === "h2o"; }).length;
     paastand("CH₄ + 2 O₂ → CO₂ + 2 H₂O: dobbelt så meget vand som CO₂", co2 > 0 && h2o === 2 * co2, co2 + "/" + h2o);
-    tik(V, 2.5);
+    tikV(2.5);
     paastand("Kemichael kommer", !!(V.laerer.scene && V.laerer.scene.navn === "brand"));
-    tik(V, 14);
+    tikV(14);
     paastand("han sætter et nyt glas med ny ballon i", !V.brand && !V.ballonVaek && !V.proeve.braendt && V.proeve.gasIBallonen());
-    V.skift(4); tik(V, 1); V.termo.saet(20); tik(V, 1);
+    /* Hans replik om forbraendingen er laengere nu (T9b): vent, til han er gaaet */
+    tikV(8);
+    paastand("Kemichael er gået igen", !(V.laerer.scene && V.laerer.scene.navn === "brand"));
+    V.skift(4); tikV(1); V.termo.saet(20); tikV(1);
     mus("pointerdown", ae.x + ae.b * 0.7, ae.y + 4);
     mus("pointermove", ae.x + ae.b * 0.7, ae.y - 40);
     bf = V.ballonFelt();
     mus("pointermove", bf.x, bf.y + 4);
-    tik(V, 0.1);
+    tikV(0.1);
     paastand("en tom ballon brænder ikke, men får et svar på kortet", !V.brand && /Ballonen er tom/.test(kt("varm")));
     mus("pointerup", bf.x, bf.y + 4);
-    tik(V, 0.2);
+    tikV(0.2);
     paastand("tændstikken slukkes, når den slippes", !V.stik);
     klik("#varm-forfra");
-    paastand("Start målene forfra i panelet", V.maalNr === 0 && V.fundet.length === 0);
+    paastand("Start forfra giver opgave 1 med trinene igen", O.nr === 0 && O.tilstand === "trin" && O.trinNr === 0 && O.skjult("hylde"));
+    klik("#varm-frileg");
+    paastand("Fri leg midt i en opgave: alt kan bruges, og knappen fører tilbage", V.fri() && /Tilbage til opgaverne/.test(d.getElementById("varm-frileg").textContent));
+    klik("#varm-frileg");
+    paastand("tilbage til opgave 1", O.nr === 0 && O.tilstand === "trin");
+    O.status = {}; O.gem(); V.fundet = []; V.gaet = null; V.rost = false; V.gem(); O.aabn(0, true);
 
     overskrift("7. Formen kan gennemføres");
     klik('[data-fane="fane-form"]');
@@ -445,13 +507,34 @@ function koerTest(W) {
     tik(V, 12);
 
     overskrift("9. Sproget");
+    /* Alle tekster i opgaverne paa fane 1 (funktioner kaldes med fanen) */
+    var opgTekster = [];
+    D.OPG_VARM.forEach(function (o) {
+        opgTekster.push(o.navn);
+        o.trin.forEach(function (t) {
+            ["tekst", "spm", "slut", "ikkeEndnu", "svarTekst", "boble"].forEach(function (f) {
+                var v = typeof t[f] === "function" ? t[f](V) : t[f];
+                if (v) opgTekster.push(v);
+            });
+            (typeof t.hint === "function" ? t.hint(V) : (t.hint || [])).forEach(function (h) { opgTekster.push(h); });
+            (t.svar || []).forEach(function (sv) { opgTekster.push(sv.t); if (sv.nej) opgTekster.push(sv.nej); });
+        });
+    });
+    var spm = D.OPG_VARM.reduce(function (a, o) { return a.concat(o.trin.filter(function (t) { return t.type === "valg"; })); }, []);
+    paastand("hvert spørgsmål på fane 1 slutter med ? og har tre svar med ét rigtigt, og hvert forkert svar har sin forklaring",
+        spm.every(function (t) { return /\?$/.test(t.spm) && t.svar.length === 3 && t.svar.filter(function (x) { return x.ok; }).length === 1 &&
+            t.svar.every(function (x) { return x.ok || !!x.nej; }); }));
+    var methan = opgTekster.concat(D.STOFFER.map(function (x) { return x.navn; })).filter(function (t) { return /\bmetan/i.test(t); });
+    paastand("bogens navn methan, ikke metan", methan.length === 0, methan[0]);
+    var paahaeng = opgTekster.filter(function (t) { return /, og (det|svaret)/.test(t); });
+    paastand("ingen påhængt ', og det ...'", paahaeng.length === 0, paahaeng[0]);
     var krop = d.body.innerText;
     var intro = [].concat(D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL).map(function (l) { return l.tekst; });
     var ros = [].concat([D.MAAL_FAERDIG, D.FORM_FAERDIG, D.REKORD_REPLIK, D.BRAND, D.NY_BALLON],
         D.BRAND_IGEN, D.RUNDE_REPLIK.map(function (r) { return r[1]; }));
     var replikker = intro.concat(ros);
     var tekster = replikker.concat(
-        D.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
+        opgTekster,
         D.HVORFOR.valg.map(function (v) { return v.t + " " + v.svar; }), [D.HVORFOR.spm, D.HVORFOR.hint, D.FORM_HINT, D.FORM_VARM_HINT, D.TOM_BALLON],
         D.SPIL_NIVEAUER.map(function (n) { return n.hint; }), forklaringer);
     var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -465,7 +548,7 @@ function koerTest(W) {
     paastand("præsentationens trin er hele sætninger, og intet begynder med 'Her'", halve.length === 0, halve[0]);
     var korte = ros.filter(function (t) { return t.length > 130 || !/^[A-ZÆØÅ].*\.$/.test(t) || t.split(" ").length < 5; });
     paastand("ros og påskeæg er hele sætninger på højst 130 tegn", korte.length === 0, korte[0]);
-    var tur = ["#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-kort", "#varm-skort",
+    var tur = ["#varm-raekke", "#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-ark", "#varm-skort",
         "#form-anker-bad", "#form-anker-zoom", "#form-anker-termometer", "#form-skort", "#form-tabel-kort",
         "#spil-anker-zoom", "#spil-skort", "#spil-anker-kammer", "#spil-runde"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
@@ -481,11 +564,27 @@ function koerTest(W) {
     function tilstande(n) {
         var t = [];
         if (n === "varm") {
-            D.MAAL.forEach(function (m, k) {
-                t.push(function () { V.forfra(); V.maalNr = k; V.naaet = false; V.klargoerGaet(); V.hjaelp = 1; V.skort.hintTekst(NK.html(V.hintTekst(m)), 1, 1); V.visKort(); });
-                t.push(function () { V.forfra(); V.maalNr = k; V.klargoerGaet(); if (V.gaet) { V.gaet.t = 160; V.gaet.sat = true; } V.efter = V.efterTekst(m); V.naaet = true; V.maalNr = k + 1; V.maalVist = k; V.visKort(); });
+            /* Hvert trin i hver opgave: spoergsmaalet med det laengste hint
+               og et forkert svar, og kortet efter et rigtigt svar */
+            D.OPG_VARM.forEach(function (o, k) {
+                o.trin.forEach(function (tr, j) {
+                    t.push(function () {
+                        V.opgaver.aabn(k, true); V.opgaver.trinNr = j; V.opgaver.nytTrin();
+                        var h = typeof tr.hint === "function" ? tr.hint(V) : (tr.hint || []);
+                        var laengst = h.reduce(function (a, x) { return x.length > a.length ? x : a; }, "");
+                        V.opgaver.saetBesked('<span class="b-maerke">Hint 3 af 3</span>' + NK.html(laengst), "hint");
+                    });
+                    if (tr.svar) tr.svar.forEach(function (sv, i) {
+                        if (sv.ok) return;
+                        t.push(function () { V.opgaver.aabn(k, true); V.opgaver.trinNr = j; V.opgaver.nytTrin(); V.opgaver.vaelg(i); V.opgaver.indsendKlik(); });
+                    });
+                    t.push(function () {
+                        V.opgaver.aabn(k, true); V.opgaver.trinNr = j; V.opgaver.nytTrin();
+                        if (V.gaet) { V.gaet.t = 160; V.gaet.sat = true; }
+                        V.opgaver.tilstand = "bliv"; V.opgaver.visKort();
+                    });
+                });
             });
-            t.push(function () { V.forfra(); V.skort.fejl("Glasset i kammeret er 2,2-dimethylpropan. Træk glasset med icosan ned i kammeret."); V.visKort(); });
         } else if (n === "form") {
             t.push(function () { F.nulstil(); F.knap(); });
             t.push(function () { F.nulstil(); F.gaet(0); F.kogt([2]); F.visTrin(); });
@@ -521,11 +620,12 @@ function koerTest(W) {
             sim.tilpas();
             var e = d.getElementById(n + "-skort"), maks = 0;
             tilstande(n).forEach(function (f) { f(); maks = Math.max(maks, e.offsetTop + e.offsetHeight); });
-            paastand(n + ": kortet holder sig i kortZone ved " + st[0] + " × " + st[1] + " (højst " + maks + " px, zonen slutter ved " + (sim.skort.top() - 10) + ")",
-                maks <= sim.skort.top() - 10 + 2);
+            var top = n === "varm" ? V.kortTop() : sim.skort.top();
+            paastand(n + ": kortet holder sig i kortZone ved " + st[0] + " × " + st[1] + " (højst " + maks + " px, zonen slutter ved " + (top - 10) + ")",
+                maks <= top - 10 + 2);
         });
     });
-    V.forfra(); F.nulstil(); S.nyRunde();
+    V.opgaver.status = {}; V.opgaver.gem(); V.opgaver.aabn(0, true); F.nulstil(); S.nyRunde();
     ramme0.style.width = "";
     ramme0.style.height = "";
 
@@ -536,7 +636,10 @@ function koerTest(W) {
         ramme.style.width = st[0] + "px";
         ramme.style.height = st[1] + "px";
         var problemer = [];
+        /* Fane 1 uden panel (T9) er bygget til mindst 1000 x 640. Ved 860 px
+           bryder overskriften i to linjer, og vinduet bliver for lille. */
         ["fane-varm", "fane-form", "fane-spil"].forEach(function (id) {
+            if (id === "fane-varm" && (st[0] < 1000 || st[1] < 640)) return;
             klik('[data-fane="' + id + '"]');
             var sim = NK.sims[id];
             sim.tilpas();
@@ -559,15 +662,30 @@ function koerTest(W) {
                 /* Ballonen fuld ved 360 °C skal kunne vaere over kammeret */
                 var B = NK.Tegn.ballonMaal(lay.glas.mund.x, lay.glas.mund.y, lay.glas.s, 1.6);
                 if (B.y - B.r * 1.1 < (id === "fane-varm" ? lay.hylde.bund : 0)) problemer.push(id + ": den fulde ballon rammer " + (id === "fane-varm" ? "reolen" : "toppen"));
-                /* Mikroniveauet i centrum: zoomvinduet fylder mindst 30 % af scenen */
-                if (Wc >= 900 && lay.zoom.b * lay.zoom.h < 0.3 * Wc * Hc) problemer.push(id + ": zoomvinduet fylder kun " + Math.round(100 * lay.zoom.b * lay.zoom.h / (Wc * Hc)) + " %");
+                /* Mikroniveauet i centrum: zoomvinduet fylder mindst 30 % af scenen.
+                   Fane 1 (T9) har kortet og raekken oeverst og kurven i scenen:
+                   der er zoomvinduet det stoerste i scenen og fylder mindst
+                   40 % af midten under kortet. */
+                if (id === "fane-varm") {
+                    var zA = lay.zoom.b * lay.zoom.h, midt = (lay.ark.x - lay.x1) * (lay.bordY - lay.kortTop);
+                    if (zA < 0.4 * midt) problemer.push(id + ": zoomvinduet fylder kun " + Math.round(100 * zA / midt) + " % af midten");
+                    if (zA < lay.ark.b * lay.ark.h) problemer.push(id + ": kurven er større end zoomvinduet");
+                } else if (Wc >= 900 && lay.zoom.b * lay.zoom.h < 0.3 * Wc * Hc) problemer.push(id + ": zoomvinduet fylder kun " + Math.round(100 * lay.zoom.b * lay.zoom.h / (Wc * Hc)) + " %");
             }
             if (id === "fane-varm") {
                 var reol = { x: lay.hylde.x0, y: lay.hylde.top, b: lay.hylde.x1 - lay.hylde.x0, h: lay.hylde.bund - lay.hylde.top };
                 indeR(reol, "reolen");
                 over(reol, lay.zoom, "reolen under zoomvinduet");
                 over(reol, kr, "reolen over kammeret");
-                if (Hc >= 700 && reol.y < 72 && reol.x + reol.b > Wc / 2 - 170) problemer.push(id + ": tilbuddet dækker glassene");
+                /* Kortet, kurven, vinduet og termometeret staar ikke oven i hinanden */
+                var kE = d.getElementById("varm-skort"), kortR = { x: kE.offsetLeft, y: lay.kortTop - 10 - (lay.kortTop - 10 - kE.offsetTop), b: kE.offsetWidth, h: lay.kortTop - 10 - kE.offsetTop };
+                var arkR = { x: lay.ark.x, y: lay.ark.y, b: lay.ark.b, h: lay.ark.h };
+                indeR(arkR, "kurven");
+                over(kortR, reol, "kortet over reolen");
+                over(kortR, arkR, "kortet over kurven");
+                over(arkR, lay.zoom, "kurven over zoomvinduet");
+                over(arkR, termoR(lay.termo), "kurven over termometeret");
+                over(kortR, lay.zoom, "kortet over zoomvinduet");
                 if (lay.plads < 40) problemer.push(id + ": der er kun " + Math.round(lay.plads) + " px til hvert glas");
                 if (lay.aeske) {
                     indeR(lay.aeske, "tændstikæsken");

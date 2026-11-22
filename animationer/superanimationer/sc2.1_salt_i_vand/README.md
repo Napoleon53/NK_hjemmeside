@@ -318,3 +318,10 @@ iframe; brug så en lokal server eller Firefox.
 
 I menuen fra 26. sept. 2026 som c2.1 i `kemi-c-filer/samling_c2.html`. Den gamle
 ligger i `kemi-c-filer/arkiv/c2.1_salte_vand_oploest_oldversion.html`.
+
+## 22. nov. 2026: to små rettelser på fane 1
+
+Niels: "10 sekunder er lidt stress i del 1.. fordi man får ikke introduktioner til hvordan det skal lade sig gøre" og "pas på med at kalde CaCl₂ for tøsalt.. det er jo primært NaCl der bruges hertil".
+
+* Opgaven "hurtigst" siger nu, at temperaturen og omrøringen bestemmer farten, og nævner Koldt, Lunkent, Varmt og Omrøring under Forsøget. Spørgsmålet er "Hvilke indstillinger opløser hele NaCl-krystallen på under 10 sekunder?". Hintet beder om én indstilling ad gangen. Grænsen er stadig 10 s.
+* CaCl₂'s hverdagstekst er "trækker vand til sig, bruges i affugtere" i stedet for "tøsalt på vejene om vinteren".

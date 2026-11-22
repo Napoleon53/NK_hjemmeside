@@ -342,7 +342,7 @@
             if (D.opfylder(krav, t)) return false;
             var haard = !(krav === "fast" || krav === "ikkeFlydende");
             tekst = "Dit fedt er " + D.TILSTANDE[t].navn + " " + sted.i + ". Kunden vil have det " +
-                D.KRAV_TEKST[krav] + ". " + (haard ? "Brug fedtsyrer med flere knæk." : "Brug flere rette kæder.");
+                D.KRAV_TEKST[krav] + ". " + (haard ? "Brug fedtsyrer med flere knæk." : "Brug flere lige kæder.");
             return true;
         });
         return tekst;

@@ -35,40 +35,22 @@
 
 <!-- ================================================================= -->
 <!-- FANE 1: LAGERET                                                    -->
-<!-- Raekkerne i opgavekortet bygges af sim_lager.js                    -->
+<!-- Reolen er opgavelisten; kortet bygges af sim_lager.js             -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-lager" role="tabpanel" aria-label="Lageret">
+<section class="fane aktiv uden-panel" id="fane-lager" role="tabpanel" aria-label="Lageret">
     <div class="scene">
         <canvas id="lager-laerred"></canvas>
-        <!-- Papirkortet (6. nov. 2026): opgaven, hint, bedoemmelsen og
-             knapperne oeverst i scenen; felterne bliver i panelet -->
+        <!-- Papirkortet: opgaven, feltet (eller tre svar), hint og
+             bedoemmelsen oeverst i scenen. Intet panel (22. nov. 2026). -->
         <div class="scenekort opgave" id="lager-skort" aria-live="polite"></div>
         <div class="anker" id="lager-anker-reol"></div>
         <div class="anker" id="lager-anker-bord"></div>
         <div class="anker" id="lager-anker-plakater"></div>
-        <div class="tilbud" id="lager-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
-        </div>
+        <!-- Knapperne til at begynde forfra staar i scenen, aldrig paa kortet
+             (22. nov. 2026, T7: der er intet panel paa lageret) -->
+        <button class="scene-knap" id="lager-nulstil" type="button">↺ Sæt alle glas tilbage</button>
+        <button class="scene-knap" id="lager-oev" type="button" hidden>↺ Øv glasset igen</button>
     </div>
-
-    <aside class="panel">
-        <!-- Felterne, eleven skriver i. Opgaveteksten, hint og bedoemmelsen
-             staar paa papirkortet i scenen. Knappen her er kun Oev glasset
-             igen paa et loest glas (forfra staar aldrig paa kortet). -->
-        <div class="kort opgavekort" id="lager-kort">
-            <h2><span id="lager-hylde"></span><span class="taeller">glas <b id="lager-nr">1</b>/10</span></h2>
-            <div class="opgave-prompt" id="lager-prompt"></div>
-            <div class="raekker" id="lager-raekker"></div>
-            <div class="knaprad"><button class="knap" id="lager-knap" type="button" hidden>Øv glasset igen</button></div>
-        </div>
-
-        <div class="kort" id="lager-fremskridt">
-            <h2>Hylderne <span class="taeller">løst <b id="lager-loest">0</b>/30</span></h2>
-            <div class="hyldeliste" id="lager-hylder"></div>
-            <button class="knap nulstil" id="lager-nulstil" type="button"><span>Sæt alle glas tilbage</span><span class="tegn">↺</span></button>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -85,6 +67,9 @@
         </div>
         <!-- Papirkortet: opgaven og svaret paa det sidste glas (6. nov. 2026) -->
         <div class="scenekort opgave" id="baand-skort" aria-live="polite"></div>
+        <!-- Arket over baandet foer start og ved slut: resultatet og den
+             faelles top 10 (22. nov. 2026) -->
+        <div class="bd-ark" id="baand-topliste" hidden></div>
         <div class="anker" id="baand-anker-baand"></div>
         <div class="anker" id="baand-anker-plakater"></div>
         <div class="anker" id="baand-anker-kasse"></div>
@@ -103,7 +88,7 @@
 
         <div class="kort">
             <h2>Sådan</h2>
-            <p class="note" style="margin-top:0;">Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter. Et glas, der når kassen, koster et liv. Plakaterne på væggen kan slås op, men båndet kører imens.</p>
+            <p class="note" style="margin-top:0;">Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter. Et glas, der når kassen, koster et liv. Glassene kommer hurtigere og hurtigere. Plakaterne på væggen kan slås op, men båndet kører imens.</p>
         </div>
 
         <div class="kort" id="baand-kasse-kort" hidden>
@@ -187,6 +172,7 @@
 <script src="js/tegning.js"></script>
 <script src="js/opslag.js"></script>
 <script src="js/sim_lager.js"></script>
+<script src="js/topliste.js"></script>
 <script src="js/sim_baand.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>

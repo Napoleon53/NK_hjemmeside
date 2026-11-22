@@ -153,6 +153,9 @@
     PB.laererPladsPx = function () {
         var lay = this.lay;
         if (!lay) return 600;
+        /* Ved slut staar han foran kassen, saa han ikke daekker arket med
+           resultatet */
+        if (this.tilstand === "slut" && lay.ark) return Math.max(lay.ark.x + lay.ark.b + lay.H * 0.17, lay.kasse.x + lay.kasse.b * 0.45);
         if (!this.kmIntro) return lay.W * 0.62;
         return Math.max(lay.W * 0.62, (lay.maskine.x + lay.maskine.b + lay.kasse.x) / 2);
     };
@@ -169,7 +172,7 @@
         if (!L) return;
         var replik = D.SLUT_REPLIK[art];
         if (!replik) return;
-        var god = art === "rekord";
+        var god = art === "rekord" || art === "robot";
         this.laererKoer("slut", [
             { udtryk: god ? { vrede: 0, humoer: 0.8, roed: 0 } : { vrede: 0.2, humoer: -0.2, skeptisk: 1, briller: 1 } },
             { gaa: PB.laererPlads },

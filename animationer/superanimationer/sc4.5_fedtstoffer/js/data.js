@@ -55,7 +55,7 @@
     /* ----- Stederne i koekkenet -------------------------------------------------- */
     D.STEDER = [
         { id: "fryser", navn: "fryseren",   Navn: "Fryseren",   i: "i fryseren",   T: -18, plads: 2 },
-        { id: "koele",  navn: "køleskabet", Navn: "Køleskabet", i: "i køleskabet", T: 5,   plads: 2 },
+        { id: "koele",  navn: "køleskabet", Navn: "Køleskabet", i: "i køleskabet", T: 5,   plads: 3 },
         { id: "bord",   navn: "køkkenbordet", Navn: "Køkkenbordet", i: "på køkkenbordet", T: 20, plads: 6 },
         { id: "sol",    navn: "solen",      Navn: "I solen",    i: "i solen",      T: 35,  plads: 2 }
     ];
@@ -136,7 +136,7 @@
     D.ORDRER = [
         { kunde: "Fuglehuset", tekst: "Kunden skal bruge fedt til fuglekugler, og fedtet må ikke smelte i solen.",
           krav: { sol: "fast" },
-          hint: "Rette kæder pakker tæt. Hvilken fedtsyre har ingen knæk?",
+          hint: "Lige kæder pakker tæt. Hvilken fedtsyre har ingen knæk?",
           svar: ["S", "S", "S"] },
         { kunde: "Salatbaren", tekst: "Kunden skal bruge olie til dressing, og olien skal være flydende i køleskabet.",
           krav: { koele: "flydende" },
@@ -148,7 +148,7 @@
           svar: ["O", "O", "O"] },
         { kunde: "Chokoladefabrikken", tekst: "Kunden skal bruge et fedt, der er fast på køkkenbordet, men smelter i solen.",
           krav: { bord: "fast", sol: "ikkeFast" },
-          hint: "Ét knæk sænker smeltepunktet meget. Prøv to rette kæder og én med mange knæk.",
+          hint: "Ét knæk sænker smeltepunktet meget. Prøv to lige kæder og én med mange knæk.",
           svar: ["S", "S", "Ln"] },
         { kunde: "Apoteket", tekst: "Kunden skal bruge omega-3-olie til kapsler, og olien skal være flydende i fryseren.",
           krav: { fryser: "flydende" },
@@ -170,43 +170,113 @@
         return true;
     };
 
-    /* ----- Fane 2: Koeleskabet ------------------------------------------------------
-       Et gaet foerst, saa ser man det. efter: forklaringen bagefter. */
-    D.KOELE_OPGAVER = [
-        { fedt: "smoer", sted: "koele", svar: "fast",
-          hint: "Tænk på smør, der lige er taget ud af køleskabet.",
-          efter: "Smør er mest mættet fedt. De rette kæder ligger tæt i rækker." },
-        { fedt: "smoer", sted: "bord", svar: "delvist",
-          hint: "Kan man smøre smør, der har stået fremme?",
-          efter: "Smør er blødt på køkkenbordet. De mest mættede molekyler ligger stadig i rækker, og resten flyder imellem." },
-        { fedt: "oliven", sted: "koele", svar: "delvist",
-          hint: "Oliesyre har kun ét knæk. Er ét knæk nok til at holde olien flydende ved 5 °C?",
-          efter: "Olivenolie bliver tyk og uklar i køleskabet. Ét knæk i hver kæde er ikke nok til at holde olien flydende ved 5 °C." },
-        { fedt: "solsikke", sted: "koele", svar: "flydende",
-          hint: "Solsikkeolie består mest af linolsyre, som har to knæk.",
-          efter: "Med to knæk i hver kæde kan molekylerne ikke pakke sig tæt ved 5 °C." },
-        { fedt: "hoerfroe", sted: "fryser", svar: "flydende",
-          hint: "Hørfrøolie består mest af linolensyre, som har tre knæk.",
-          efter: "Hørfrøolie er flydende ved −18 °C, fordi tre knæk i hver kæde holder molekylerne fra hinanden." },
-        { fedt: "kakao", sted: "sol", svar: "flydende",
-          hint: "Hvad sker der med chokolade i lommen på en varm dag?",
-          efter: "Kakaosmør smelter ved ca. 35 °C. Derfor smelter chokolade i munden." }
-    ];
+    /* ----- Fane 2: Fast eller flydende? (runde T10, 22. nov. 2026) ------------------
+       Syv opgaver i fast raekkefoelge (js/koele_opgaver.js, REGELSAET 3, 11-17).
+       Hver opgave har en raekke trin:
+         valg      spm (halvfed, kan staa alene), tekst (indledning), svar
+                   (ok: det rigtige, nej: forklaringen til et forkert svar),
+                   hint (tre trin), slut (det groenne kort bagefter)
+         handling  eleven traekker glasset (glas) hen til stedet (sted).
+                   Kortet gaar selv videre ca. 1 s efter (REGELSAET 33).
+       skjul: dele, der staar som en stiplet plads, til de bruges
+       (zoom: vinduet med molekylerne, dekl: varedeklarationen).
+       opsaet: hvor glassene staar, naar opgaven begynder. Glas, der ikke
+       er naevnt, er ikke paa bordet endnu (REGELSAET 13). */
+    D.BORD_ORDEN = ["smoer", "solsikke", "oliven", "kakao", "hoerfroe", "dit"];
 
-    D.KOELE_HVORFOR = {
-        spm: "Hvorfor er smør fast i køleskabet, når solsikkeolie er flydende?",
-        hint: "Se på zoomvinduet. Hvilke molekyler ligger stille i rækker?",
-        valg: [
-            { t: "Smørrets kæder er rette og pakker tæt", rigtig: true,
-              svar: "Rette kæder ligger tæt og holder godt fast i hinanden. Knæk holder molekylerne på afstand." },
-            { t: "Smør kommer fra dyr",
-              svar: "Kakaosmør kommer fra en plante og er også fast. Det er kædernes form, der afgør, om fedtet er fast." },
-            { t: "Smørrets molekyler er tungere",
-              svar: "Nej. Smørrets molekyler er faktisk lidt lettere. Det er kædernes form, der gør forskellen." },
-            { t: "Bindingerne i oliens molekyler er svagere",
-              svar: "Når fedt smelter, går molekylerne fra hinanden. Bindingerne inde i molekylerne brydes ikke." }
-        ]
-    };
+    /* Traek glasset hen til stedet */
+    var BOBLE = { fryser: "Træk: til fryseren", koele: "Træk: til køleskabet", bord: "Træk: til bordet", sol: "Træk: til solen" };
+    function traek(glas, sted, spm, slut, ekstra) {
+        var f = D.fedt(glas), st = D.sted(sted);
+        var t = {
+            type: "handling", glas: glas, sted: sted, tillad: ["glas:" + glas], el: "glas:" + glas, boble: BOBLE[sted],
+            spm: spm,
+            maal: function (s) { return s.staar(glas, sted); },
+            ikkeEndnu: f.Navn + " står ikke " + st.i + " endnu.",
+            hint: ["Tag fat i glasset med " + f.navn + ", og træk det hen til " + st.navn + ".",
+                "Slip glasset, når " + st.navn + " lyser gult."],
+            svarTekst: f.Navn + " flytter " + (sted === "bord" ? "ud på køkkenbordet" : (sted === "sol" ? "hen i solen" : "ind i " + st.navn)) + ".",
+            visSvar: function (s) { s.flytTil(glas, sted); },
+            slut: slut
+        };
+        if (ekstra) for (var k in ekstra) if (Object.prototype.hasOwnProperty.call(ekstra, k)) t[k] = ekstra[k];
+        return t;
+    }
+
+    /* Runde T10e (22. nov. 2026). Niels om gaettene: "lidt svaert.. og
+       maaske ogsaa forvirrende fordi man ser den paa stuebordet og kigger
+       paa mikrotegningen.. og saa er det ikke sikkert at man skal gaette paa
+       noget som til gengaeld ikke er sket endnu ... den er endnu ikke
+       intuitiv og rar." Derfor intet gaet: eleven goer foerst noget (traek
+       glasset ind i koeleskabet) og ser molekylerne skifte i vinduet, og saa
+       forklarer kortet det, eleven har set. Tre fedtstoffer i samme
+       koeleskab (T10b): smoer er fast, solsikkeolie flydende og olivenolie
+       midt imellem. Kakaosmoer og hoerfroeolie staar kun i den fri leg. */
+    D.OPG_KOELE = [
+        {
+            id: "smoer_koele", navn: "Smør i køleskabet",
+            opsaet: function (s) { s.scene({ smoer: "bord" }, "smoer"); },
+            trin: [
+                traek("smoer", "koele", "Træk smørret ind i køleskabet.", "",
+                    { skjul: ["dekl"], tekst: "Vinduet viser molekylerne i smørret på bordet." }),
+                {
+                    type: "valg", skjul: ["dekl"],
+                    spm: "Hvordan ligger molekylerne i smørret ved 5 °C?",
+                    svar: [
+                        { t: "Tæt sammen i rækker", ok: true },
+                        { t: "Hulter til bulter", nej: "Molekylerne i smørret flytter sig ikke. De ryster kun lidt på deres plads." },
+                        { t: "Langt fra hinanden", nej: "Molekylerne i smørret ligger tæt op ad hinanden. Langt fra hinanden er molekylerne kun i en gas." }
+                    ],
+                    hint: ["Se på vinduet. Flytter molekylerne sig?",
+                        "Ligger molekylerne tæt eller langt fra hinanden?",
+                        "Molekylerne ligger stille og tæt op ad hinanden."],
+                    slut: "Smør er fast i køleskabet. Molekylerne ligger tæt i rækker, fordi de fleste kæder er lige."
+                }
+            ]
+        },
+        {
+            id: "solsikke", navn: "Solsikkeolie",
+            opsaet: function (s) { s.scene({ smoer: "koele", solsikke: "bord" }, "solsikke"); },
+            trin: [
+                traek("solsikke", "koele", "Træk solsikkeolien ind i køleskabet ved siden af smørret.", "",
+                    { tekst: "De turkise kugler er carbonatomerne i dobbeltbindingerne." }),
+                {
+                    type: "valg",
+                    spm: "Hvorfor ligger molekylerne i solsikkeolie ikke i rækker som i smørret?",
+                    svar: [
+                        { t: "Kæderne har knæk", ok: true },
+                        { t: "Det er for varmt", nej: "Smørret står i samme køleskab ved 5 °C og er fast." },
+                        { t: "Molekylerne er større", nej: "Molekylerne i solsikkeolie er næsten lige så store som i smør. Det er formen på kæderne, der er anderledes." }
+                    ],
+                    hint: ["Sammenlign kæderne i solsikkeolie med kæderne i smør.",
+                        "Se på de turkise kugler. Hvad sker der med kæden dér?",
+                        "Hver dobbeltbinding giver et knæk på kæden."],
+                    slut: "Hver dobbeltbinding giver et knæk. Kæder med knæk kan ikke pakke sig tæt, så solsikkeolie er flydende ved 5 °C."
+                }
+            ]
+        },
+        {
+            id: "oliven", navn: "Olivenolie",
+            opsaet: function (s) { s.scene({ smoer: "koele", solsikke: "koele", oliven: "bord" }, "oliven"); },
+            trin: [
+                traek("oliven", "koele", "Træk olivenolien ind i køleskabet.", "",
+                    { tekst: "De fleste kæder i olivenolie har én dobbeltbinding." }),
+                {
+                    type: "valg",
+                    spm: "Hvorfor bliver olivenolie delvist fast i køleskabet, når solsikkeolie er flydende?",
+                    svar: [
+                        { t: "Den har færre knæk", ok: true },
+                        { t: "Den har flere knæk", nej: "Det er omvendt. De fleste kæder i olivenolie har ét knæk, og de fleste i solsikkeolie har to." },
+                        { t: "Den står koldere", nej: "Begge olier står i køleskabet ved 5 °C." }
+                    ],
+                    hint: ["Sammenlign de turkise kugler i olivenolie og i solsikkeolie.",
+                        "Hvor mange knæk har de fleste kæder i olivenolie og i solsikkeolie?",
+                        "Med færre knæk kan nogle af molekylerne lægge sig i rækker."],
+                    slut: "Med kun ét knæk kan nogle af molekylerne lægge sig i rækker ved 5 °C. Jo flere knæk, jo lavere smeltepunkt."
+                }
+            ]
+        }
+    ];
 
     /* ----- Kemichael -------------------------------------------------------------
        Praesentationen (../kemichael/praesentation.js): ét trin ad gangen,
@@ -217,7 +287,7 @@
        rundvisningen). Ingen vittigheder i praesentationen. */
     /* Papirkortets plads oeverst i scenen i pixels: [almindelig skaerm, lav
        skaerm (hoejst 720 px)]. Tegningen begynder under den (js/kort.js zone). */
-    D.ZONE = { fabrik: [104, 92], koele: [150, 132] };
+    D.ZONE = { fabrik: [104, 92], koele: [156, 130] };
 
     D.INTRO_FABRIK = [
         { tekst: "I denne fane bygger du fedtstoffer af glycerol og fedtsyrer. Du trækker en fedtsyre fra bordet hen på en af de tre OH-grupper på glycerol, og ved hver binding dannes der et vandmolekyle. Et klik på en fedtsyre på glycerol tager fedtsyren af igen.",
@@ -228,12 +298,12 @@
           sel: ["#fabrik-knap", "#fabrik-anker-glas"] }
     ];
     D.INTRO_KOELE = [
-        { tekst: "I denne fane undersøger du, hvor fedtstofferne fra køkkenet er faste, og hvor de er flydende. Glassene står på køkkenbordet ved 20 °C. Du kan trække et glas over i fryseren, i køleskabet eller i vindueskarmen i solen.",
+        { tekst: "I denne fane undersøger du, hvor fedtstofferne fra køkkenet er faste, og hvor de er flydende. Fryseren er −18 °C, køleskabet 5 °C, køkkenbordet 20 °C og vindueskarmen i solen 35 °C.",
           sel: ["#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue"] },
-        { tekst: "Zoomvinduet viser molekylerne i det valgte glas helt tæt på. Hver kæde har sin fedtsyres farve, og molekylerne i fast fedt ligger i rækker. Varedeklarationen viser, hvor mange procent af fedtsyrerne der er mættede, monoumættede og polyumættede.",
-          sel: ["#koele-anker-zoom", "#koele-dekl-kort"] },
-        { tekst: "Kortet øverst i scenen beder dig gætte, om fedtet er fast, delvist fast eller flydende. Når du har valgt og trykket Indsend svar, flytter glasset selv hen til det sted, opgaven nævner. Knappen med gul kant giver et hint og derefter svaret. Til sidst spørger kortet, hvorfor smør er fast i køleskabet, når solsikkeolie er flydende.",
-          sel: "#koele-skort" }
+        { tekst: "Vinduet viser molekylerne i glasset helt tæt på. Hver kæde har sin fedtsyres farve, og molekylerne i fast fedt ligger i rækker. Varedeklarationen viser, hvor mange procent af fedtsyrerne der er mættede, monoumættede og polyumættede.",
+          sel: ["#koele-anker-zoom", "#koele-dekl"] },
+        { tekst: "Kortet øverst i scenen stiller spørgsmålene. Først gætter du, om fedtet er fast, delvist fast eller flydende, og bagefter trækker du glasset derhen og ser selv. Opgaverne står i rækken øverst.",
+          sel: ["#koele-skort", "#koele-liste"] }
     ];
 
     /* Ros, naar en hel fane er klaret (kun foerste gang i browseren).
