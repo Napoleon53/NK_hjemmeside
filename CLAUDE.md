@@ -39,6 +39,17 @@ Skal en fejl i en af de otte gamle animationer rettes, rettes den her, ét
 sted, og bakkes ikke til NK_Undervisning. De to kopier skal ikke holdes i
 sync; denne er færdig.
 
+## Besøgstæller (GoatCounter)
+
+Siden 22. nov. 2026 har alle HTML-sider (undtagen den frosne `animationer/v2/` og viderestillinger) disse to linjer lige
+før `</head>`. Nye sider skal også have dem. Kontoen napoleon53.goatcounter.com tæller både kemiformler.dk og
+kemibogen.dk, derfor står domænet foran siden. Ingen cookies, så intet cookiebanner.
+
+```html
+<script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
+<script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+```
+
 ## Om brugeren
 
 - Brugeren vibecoder og programmerer aldrig selv. Tal direkte og uden kodejargon,
