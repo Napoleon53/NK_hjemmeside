@@ -100,7 +100,7 @@
     };
 
     /* Doeren i rummets farve. aaben: doerbladet er drejet ind. */
-    S.doer = function (x, y, b, hoejde, farve, nr, aaben) {
+    S.doer = function (x, y, b, hoejde, farve, nr, aaben, ekstra) {
         var moerk = S.bland(farve, "#10151f", 0.45), lys = S.bland(farve, "#ffffff", 0.18);
         var s = '<rect x="' + (x - 18) + '" y="' + (y - 18) + '" width="' + (b + 36) + '" height="' + (hoejde + 18) + '" fill="' + moerk + '" stroke="' + K + '" stroke-width="3"/>' +
             '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + hoejde + '" fill="url(#g-doerlys)"/>';
@@ -112,7 +112,7 @@
             '<text x="' + (x + b / 2) + '" y="' + (y + 28 + p1 / 2 + 14) + '" text-anchor="middle" font-size="40" font-weight="700" fill="' + K + '" ' + SKRIFT + ">" + h(nr) + "</text>" +
             '<rect x="' + (x + 16) + '" y="' + (y + hoejde * 0.44) + '" width="46" height="12" rx="6" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2"/>' +
             '<circle cx="' + (x + 24) + '" cy="' + (y + hoejde * 0.44 + 6) + '" r="10" fill="url(#g-metal)" stroke="' + K + '" stroke-width="2"/>';
-        return s + '<g class="doerblad' + (aaben ? " aaben" : "") + '">' + blad + "</g>";
+        return s + '<g class="doerblad' + (aaben ? " aaben" : "") + (ekstra ? " " + ekstra : "") + '">' + blad + "</g>";
     };
 
     /* Kodelaasen ved doeren (70 x 118). Groen skaerm, naar den er aaben. */
@@ -123,6 +123,30 @@
         for (var r = 0; r < 4; r++) for (var c = 0; c < 3; c++) {
             s += '<rect x="' + (x + 10 + c * 18) + '" y="' + (y + 42 + r * 18) + '" width="14" height="13" rx="2.5" fill="#4a5568" stroke="' + K + '" stroke-width="1"/>';
         }
+        return s;
+    };
+
+    /* Haengelaas paa en laast doer (nulpunkt: midt paa boejlen, foroven). */
+    S.haengelaas = function (x, y) {
+        return '<path d="M' + (x - 13) + " " + (y + 18) + " V" + (y + 6) + " a13 13 0 0 1 26 0 V" + (y + 18) + '" fill="none" stroke="#8a939e" stroke-width="6"/>' +
+            '<path d="M' + (x - 13) + " " + (y + 18) + " V" + (y + 6) + " a13 13 0 0 1 26 0 V" + (y + 18) + '" fill="none" stroke="' + K + '" stroke-width="1.5"/>' +
+            '<rect x="' + (x - 20) + '" y="' + (y + 16) + '" width="40" height="34" rx="5" fill="url(#g-metal-v)" stroke="' + K + '" stroke-width="2.5"/>' +
+            '<circle cx="' + x + '" cy="' + (y + 30) + '" r="4.5" fill="' + K + '"/><rect x="' + (x - 2) + '" y="' + (y + 32) + '" width="4" height="10" fill="' + K + '"/>';
+    };
+
+    /* Skuffen i bordets skab, der staar paa klem: en moerk sprække med et
+       glimt af guld. guld: skrinet er tomt (guldnoeglen er taget). */
+    S.skuffe = function (x, y, b, guld) {
+        var gx = x + b * 0.55;
+        var s = '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="18" fill="#1d2430"/>' +
+            /* glimtet af skrinet inde i skuffen: guldkanten og en stjernespids */
+            (guld ? "" : '<rect x="' + gx + '" y="' + (y + 7) + '" width="74" height="11" rx="2" fill="#39445a"/>' +
+                '<rect x="' + gx + '" y="' + (y + 7) + '" width="74" height="5" fill="url(#g-guld)"/>' +
+                '<rect x="' + (gx + 28) + '" y="' + (y + 5) + '" width="18" height="13" rx="3" fill="url(#g-guld)" stroke="' + K + '" stroke-width="1.5"/>') +
+            '<g class="skuffefront">' +
+            '<rect x="' + (x - 5) + '" y="' + (y + 16) + '" width="' + (b + 10) + '" height="56" rx="3" fill="url(#g-skab)" stroke="' + K + '" stroke-width="3"/>' +
+            '<rect x="' + (x - 5) + '" y="' + (y + 72) + '" width="' + (b + 10) + '" height="6" fill="#1b2230" fill-opacity="0.2"/>' +
+            '<rect x="' + (x + b / 2 - 24) + '" y="' + (y + 38) + '" width="48" height="8" rx="4" fill="url(#g-metal)" stroke="' + K + '" stroke-width="1.5"/></g>';
         return s;
     };
 

@@ -225,6 +225,32 @@ button { font-family: inherit; }
     transition: transform 0.9s cubic-bezier(0.3, 0.7, 0.3, 1);
 }
 .doerblad.aaben { transform: scaleX(0.16); }
+.doerblad.klem { transform: scaleX(0.86); }
+.spor:hover .doerblad.klem, .spor:focus-visible .doerblad.klem { transform: scaleX(0.74); }
+
+/* Laaste doere i gangen ryster, naar man klikker */
+.laastdoer { cursor: not-allowed; }
+.laastdoer.ryst { animation: rystdoer 0.45s ease-in-out; }
+@keyframes rystdoer {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(3px); }
+}
+
+/* Skuffen paa klem glider lidt ud, naar musen er over den */
+.skuffefront { transition: transform 0.35s ease; }
+.skuffe:hover .skuffefront, .skuffe:focus-visible .skuffefront { transform: translateY(7px); }
+
+/* At gaa gennem en doer: det gamle billede zoomer ind og toner ud over det nye */
+.gaar-kopi { pointer-events: none; z-index: 5; }
+.gaar-kopi.gaar { animation: gaaind 1.1s ease-in forwards; }
+@keyframes gaaind {
+    0% { transform: scale(1); opacity: 1; }
+    55% { opacity: 1; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
 
 /* ----- Papirkortene ------------------------------------------------------ */
 .midte {
@@ -330,7 +356,7 @@ button { font-family: inherit; }
 .skema { font-size: 1.18rem; text-align: center; margin: 10px 0 !important; }
 .data { color: var(--tekst-svag); }
 .ok { color: var(--groen); font-weight: 600; }
-.bonusom { background: var(--kontur); color: #ffe9a0; border-radius: 8px; padding: 8px 12px; font-size: 0.93rem; }
+.bonusom { background: #fffbea; border-left: 4px solid #e2c25a; color: #5a4a1a; border-radius: 6px; padding: 8px 12px; font-size: 0.93rem; }
 
 .tabel { border-collapse: collapse; width: 100%; margin: 8px 0; }
 .tabel th, .tabel td { border-bottom: 1px solid #e3ded0; padding: 6px 8px; text-align: left; }
@@ -457,9 +483,25 @@ button.ps-felt:hover { border-color: var(--kontur); }
 /* Kodelaasen */
 .laasdel { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid #e3ded0; border-radius: 10px; background: #fff; }
 .laasdel + .laasdel { margin-top: 10px; }
-.laasdel.guld { background: var(--kontur); color: #ffe9a0; border-color: var(--kontur); display: block; }
-.laasdel.guld .felt-navn { display: block; margin-bottom: 4px; }
-.guldfelt { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 4px 0; }
+/* Guldkoden er diskret: foldet ind bag en lille knap og lys som papiret */
+.laasdel.guld { background: #fffdf4; color: #6b5a2a; border: 1px dashed #d9c27a; display: block; font-size: 0.92rem; padding: 8px 12px; }
+.laasdel.guld[hidden] { display: none; }
+.laasdel.guld .felt-navn { display: block; margin-bottom: 2px; font-weight: 600; }
+.guldfelt { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 2px 0; }
+.laasdel.guld .ciffer { width: 32px; height: 38px; font-size: 1.15rem; }
+.guldfold {
+    display: block;
+    margin: 8px 0 0 auto;
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    font: inherit;
+    font-size: 0.85rem;
+    color: #8a7a4a;
+    cursor: pointer;
+}
+.guldfold:hover, .guldfold:focus-visible { color: #5a4510; text-decoration: underline; }
+.guldfold[hidden] { display: none; }
 .felt-navn { flex: 1; }
 .felt-navn small { display: block; color: #8a8578; font-size: 0.84rem; }
 .cifre { display: flex; align-items: center; gap: 5px; }
@@ -476,9 +518,9 @@ button.ps-felt:hover { border-color: var(--kontur); }
     padding: 0;
 }
 .ciffer:focus { outline: none; border-color: var(--blaa); box-shadow: 0 0 0 3px #dcebf9; }
-.ciffer.g { border-color: #f1c40f; }
+.ciffer.g { border-color: #e2cf8f; }
 .laasdel.aaben .ciffer { background: var(--groen-lys); border-color: var(--groen); color: var(--groen); opacity: 1; }
-.laasdel.guld.aaben .ciffer { background: #fff3b0; border-color: #f1c40f; color: #5a4510; }
+.laasdel.guld.aaben .ciffer { background: #fff6d6; border-color: #e2c25a; color: #5a4510; }
 .fast { font-size: 1.6rem; font-weight: 700; padding: 0 1px; }
 .mellem { width: 8px; }
 

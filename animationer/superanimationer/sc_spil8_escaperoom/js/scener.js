@@ -30,6 +30,8 @@
         for (var i = 0; i < r.trin.length; i++) if (!(t && t.trin && t.trin[rum + ":" + r.trin[i].id])) return i;
         return r.trin.length;
     };
+    /* Er trinet loest? */
+    Sc.loest = function (t, rum, trinId) { return !!(t && t.trin && t.trin[rum + ":" + trinId]); };
 
     function kridtLinje(x, y, b, tekst, maks) {
         var str = Math.min(maks || 40, (b - 50) / (tekst.length * 0.56));
@@ -56,17 +58,26 @@
             aaben: aaben,
             type: function (trinId) {
                 for (var i = 0; i < r.trin.length; i++) {
-                    if (r.trin[i].id === trinId) return i < nu ? "loest" : (i === nu && !aaben ? "aktiv" : "");
+                    if (r.trin[i].id === trinId) return Sc.loest(t, nr, trinId) ? "loest" : (i === nu && !aaben ? "aktiv" : "");
                 }
                 return "";
             },
             doer: function () {
                 var type = aaben ? "loest" : nu >= r.trin.length ? "aktiv" : "";
-                return spor("laas", "Kodelås", [1170, 150, 390, 600],
-                    S.doer(1290, 170, 230, 570, D.FARVE[nr], nr, aaben) + S.kodelaas(1195, 400, aaben), [1230, 364], type);
+                if (!aaben) {
+                    return spor("laas", "Kodelås", [1170, 150, 390, 600],
+                        S.doer(1290, 170, 230, 570, D.FARVE[nr], nr, false) + S.kodelaas(1195, 400, false), [1230, 364], type);
+                }
+                /* Aaben doer: man gaar selv igennem. Laasen kan stadig tage guldkoden. */
+                return spor("gennem", nr < 5 ? "Gå ind i rum " + (nr + 1) : "Gå ind til Niller", [1272, 152, 266, 588],
+                        S.doer(1290, 170, 230, 570, D.FARVE[nr], nr, true), [1405, 128], "aktiv") +
+                    spor("laas", "Kodelås", [1180, 390, 100, 140], S.kodelaas(1195, 400, true), [1230, 364], "loest");
             },
+            /* Den hemmelige vej: en skuffe i bordet, der staar paa klem.
+               Ingen skilt; den skal findes. */
             bonus: function () {
-                return spor("bonus", guld ? "Bonus løst" : "Bonusrute", [1000, 460, 150, 130], S.paa(1075, 580, 1, S.skrin(guld)), [1075, 664], "bonus");
+                return '<g class="spor skuffe" data-spor="bonus" tabindex="0" role="button" aria-label="Skuffen, der står på klem">' +
+                    '<rect class="spor-felt" x="876" y="600" width="284" height="90" fill="#fff" fill-opacity="0"/>' + S.skuffe(882, 606, 270, guld) + "</g>";
             }
         };
     }
@@ -205,15 +216,25 @@
         return s;
     }
 
-    /* ----- Startskaermen: gangen med fem doere ---------------------------- */
-    function start() {
+    /* ----- Gangen med fem doere ---------------------------------------------- */
+    /* Kun doer 1 staar paa klem; de andre har en haengelaas. */
+    Sc.GANGDOER = function (i) { return { x: 110 + (i - 1) * 300, y: 270, b: 180, h: 470 }; };
+    function gang(aktiv) {
         var s = "";
-        for (var i = 1; i <= 5; i++) s += S.doer(110 + (i - 1) * 300, 270, 180, 470, D.FARVE[i], i, false);
+        for (var i = 1; i <= 5; i++) {
+            var g = Sc.GANGDOER(i);
+            var tegning = S.doer(g.x, g.y, g.b, g.h, D.FARVE[i], i, false, i === 1 ? "klem" : "") +
+                (i === 1 ? "" : S.haengelaas(g.x + 40, g.y + g.h * 0.44 + 18));
+            if (i === 1) s += spor("doer-1", "Dør 1", [g.x - 18, g.y - 18, g.b + 36, g.h + 18], tegning, [g.x + g.b / 2, g.y - 52], aktiv ? "aktiv" : "");
+            else s += '<g class="spor laastdoer" data-spor="doer-' + i + '" tabindex="0" role="button" aria-label="Dør ' + i + ', låst">' +
+                '<rect class="spor-felt" x="' + (g.x - 18) + '" y="' + (g.y - 18) + '" width="' + (g.b + 36) + '" height="' + (g.h + 18) + '" fill="#fff" fill-opacity="0"/>' + tegning + "</g>";
+        }
         return s;
     }
 
     Sc.tegn = function (hvad, sag, t) {
-        if (hvad === "start") return ramme("#7d8ea3", start());
+        if (hvad === "start") return ramme("#7d8ea3", gang(false));
+        if (hvad === "gang") return ramme("#7d8ea3", gang(true));
         if (hvad === "guld") return ramme(D.FARVE[6], guld(t, false));
         if (hvad === "guld-aaben") return ramme(D.FARVE[6], guld(t, true));
         var f = [null, rum1, rum2, rum3, rum4, rum5][hvad];

@@ -34,18 +34,22 @@ føre til en alternativ kode, som man kan bruge i stedet."
 * **Opgavekortet øverst** har rummets navn, én replik fra Niller og linjen "Trin 1 af 3: Klik på …".
   Under den står de tre trin, koden (med streger for de cifre, der mangler) og Bonusrute. Skiltet ved
   den ting, næste trin handler om, er fremhævet i scenen; løste trin får grønt skilt med flueben.
-* **Tre trin i fast rækkefølge.** Et trin er hakket i dele, der tjekkes hver for sig med Indsend svar.
+* **Tre trin, som kan tages i den rækkefølge, eleven vil** (fra 23. nov. 2026). Kortet foreslår en rækkefølge.
+  Bygger et trin på svaret fra et andet (`kraever` i `js/sag.js`: metallet i det periodiske system bygger på
+  dråbepladen, regnetrinene i rum 3-5 på hinanden), siger kortet det og har en knap derhen. Det periodiske
+  system kan altid åbnes og klikkes i. Et trin er hakket i dele, der tjekkes hver for sig med Indsend svar.
   Et forkert svar får en besked, der passer til fejlen (kelvin, mL og liter, omvendt forhold, atomerne
   på hver side). Knappen Giv et hint bliver til Vis svaret, så ingen sidder fast. De løste dele bliver
-  stående som pæne beregninger. Klikker man på et senere trin, siger kortet, hvilket trin der kommer
-  først.
+  stående som pæne beregninger.
 * **Laboratoriedelen** er første trin i hvert rum, og alle skal igennem den: dråbepladen (rum 1),
   bland stofferne to og to (rum 2), læg metallet på vægten og hæld det i syren (rum 3), titrer til
   omslag (rum 4 og 5). Forsøget er en knap; spørgsmålet kommer først bagefter.
 * **Koden** er cifrene fra de løste trin. Når alle tre trin er løst, står koden klar i kodelåsen, og
   eleven trykker Lås op.
-* **Bonusruten** er det mørke skrin med stjernen. Én svær opgave i rummets tema, uden hints og uden
-  tjek undervejs. Svaret er guldkoden, som tastes i låsens guldfelter. Den åbner døren i stedet for
+* **Bonusruten** ligger i en skuffe i bordet, der står på klem, med et glimt af skrinets guldkant. Den har
+  intet skilt og står ikke i opgavekortet; den skal findes. Én svær opgave i rummets tema, uden hints og uden
+  tjek undervejs. Svaret er guldkoden, som tastes i låsens guldfelter. Guldfelterne er foldet ind bag en
+  lille knap "Har I en guldkode?" og er lyse som papiret; kommer eleven fra bonusruten, er de foldet ud. Den åbner døren i stedet for
   koden og giver en guldnøgle. Guldkoden kan også tastes, efter døren er åbnet.
 
 | Rum | Trin 1 (forsøget) | Trin 2 | Trin 3 | Bonusruten |
@@ -55,6 +59,14 @@ føre til en alternativ kode, som man kan bruge i stedet."
 | 3 Vejerummet | vej metallet: n = m / M | hæld i syren: n(H₂) | vejrstationen: T og V = nRT/p | for lidt syre: hvor meget metal er tilbage |
 | 4 Titrerlaboratoriet | titrer: forbruget | n(base) og c(syre) | pH | pH midt i titreringen |
 | 5 Redoxlaboratoriet | titrer: n(MnO₄⁻) | forholdet i skemaet: n(prøve) | c(prøve) | masseprocent i ståluld eller hydrogenperoxid |
+
+## Gangen og dørene (23. nov. 2026)
+
+Efter Start står eleven i gangen med de fem døre. Dør 1 står på klem med et gult skilt; dør 2-5 har en
+hængelås, og et klik på dem siger, at de åbnes indefra. Eleven går selv ind ad dør 1. Når en kodelås er
+låst op, står eleven stadig i rummet ved den åbne dør, som får skiltet "Gå ind i rum n"; et klik på døren
+(eller knappen i låsens kort) går igennem. Overgangen er en kopi af det gamle billede, der roligt zoomer ind
+mod døren og toner ud over det nye (`gaaGennem` i `js/app.js`); tilstanden skifter med det samme.
 
 ## Slutningerne
 
@@ -114,7 +126,20 @@ sløret ud). Glas står foran lys væg, så svage farver ses. `_sprites.html` vi
 
 Nikkel (Ni) i det periodiske system i rum 1 har overskæg.
 
-## Status (13. nov. 2026)
+## Runde 3 (23. nov. 2026)
 
-Bygget om efter Niels' tilbagemelding og afprøvet i headless Chrome. `_selvtest.html` er ALT OK.
-Niels har ikke set den nye udgave endnu.
+Niels: "I starten ser man kort nogle forskellige døre.. men man flyver bare ind i dør 1 med det samme..
+synes det vil være lidt mere mystik og sjov, hvis man selv skulle gå ind i døren og de andre var låst
+[...] Der må også være lidt mere freeroam. Man må gerne få lov til at klikke på det periodiske system med
+det samme. Guldkoden er aaalt for highlightet.. man kan faktisk slet ikke se den almindelige kode.. det er
+meningen at den gerne må være lidt mere diskret.. måske skal kisten også gemmes ned i en skuffe, som står
+lidt på klem.. bare så man får illusionen af at det er en hemmelig vej. Der skal ikke være et link til
+bonusruten i opgavekortet."
+
+Lavet: gangen med låste døre, man går selv igennem døre, fri rækkefølge for trin uden afhængighed,
+guldfelterne foldet ind og lyse, skrinet i en skuffe på klem uden skilt, Bonusrute-knappen fjernet fra
+opgavekortet. Startkortet siger nu kun, at Niller har gemt en sværere, hemmelig vej i hvert rum.
+
+## Status (23. nov. 2026)
+
+Runde 3 bygget og afprøvet i headless Chrome. `_selvtest.html` er ALT OK. Niels har ikke set den endnu.

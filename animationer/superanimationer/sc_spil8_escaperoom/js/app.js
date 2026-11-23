@@ -3,9 +3,12 @@
 
    Tilstanden gemmes i browseren (D.LAGER), saa en gruppe kan lukke
    fanen og fortsaette. Skaermen afgoeres af tilstanden alene:
-   start -> rum 1..5 -> slut -> (fem guldnoegler) guld -> finale.
+   start -> gangen -> rum 1..5 -> slut -> (fem guldnoegler) guld -> finale.
+   I gangen og ved en aaben doer gaar eleven selv igennem doeren.
 
-   Hvert rum har tre trin i fast raekkefoelge. Et trin er hakket i dele,
+   Hvert rum har tre trin. Kortet foreslaar en raekkefoelge, men et trin
+   kan tages naar som helst, medmindre det bygger paa svaret fra et
+   andet trin (trin.kraever). Et trin er hakket i dele,
    der tjekkes hver for sig (Indsend svar). De loeste trin giver koden.
    Bonusrutens guldkode aabner ogsaa doeren og giver en guldnoegle; den
    kan ogsaa tastes, efter doeren er aabnet.
@@ -26,7 +29,7 @@
     /* ----- Tilstanden ------------------------------------------------- */
     function nyTilstand(nr) {
         return { v: D.VERSION, sag: nr, start: null, tid: null, naaet: 1, vist: null,
-                 trin: {}, dele: {}, lab: {}, bland: {}, blandValg: [], blandSidst: null, handl: {},
+                 inde: false, trin: {}, dele: {}, lab: {}, bland: {}, blandValg: [], blandSidst: null, handl: {},
                  guld: {}, segl: {}, vedGuld: false, finale: false };
     }
     function nytNr() { return 1000 + Math.floor(Math.random() * 9000); }
@@ -34,6 +37,7 @@
     function indlaes() {
         var t = NK.hent(D.LAGER, null);
         if (!t || t.v !== D.VERSION || !(t.sag >= 1000 && t.sag <= 9999)) t = nyTilstand(nytNr());
+        if (t.inde === undefined) t.inde = !!t.start;     /* gemt foer gangen kom til */
         T = t;
         sag = NK.Sag.lav(T.sag);
     }
@@ -45,6 +49,7 @@
 
     function skaerm() {
         if (!T.start) return { type: "start" };
+        if (!T.inde) return { type: "gang" };
         if (T.vist && T.vist < T.naaet && T.vist <= 5) return { type: "rum", rum: T.vist, gensyn: true };
         if (T.naaet <= 5) return { type: "rum", rum: T.naaet };
         if (T.finale) return { type: "finale" };
@@ -79,7 +84,8 @@
                 indhold = noegleIkon(T.guld[i] ? "#f6cd2b" : "#ffffff", "#27303f");
                 titel = "Rum " + i + ": åbnet med " + (T.guld[i] ? "guldnøgle" : "almindelig nøgle") + ". Klik for at se rummet igen.";
                 klik = true;
-            } else { kl += " nu"; indhold = String(i); titel = "Rum " + i + ": her er I nu"; klik = true; }
+            } else if (!T.inde) { kl += " nu"; indhold = String(i); titel = "Rum " + i + ": gå ind ad dør 1"; }
+            else { kl += " nu"; indhold = String(i); titel = "Rum " + i + ": her er I nu"; klik = true; }
             if (sk.type === "rum" && sk.rum === i) kl += " vist";
             s += '<button type="button" class="' + kl + '" style="--farve:' + farve + '" data-rum="' + i + '"' + (klik ? "" : " disabled") +
                 ' title="' + h(titel) + '" aria-label="' + h(titel) + '">' + indhold + "</button>";
@@ -118,18 +124,21 @@
                 '<span class="niller">Niller: »' + h(info.niller) + "«</span></p>";
             var goer;
             if (aaben) {
-                goer = D.TOP.aaben + (T.guld[rum] ? "" : " Guldkoden fra bonusruten kan stadig tastes i kodelåsen.") +
-                    (sk.gensyn ? ' <button type="button" class="knap lille" data-front>Tilbage til ' + h(frontNavn()) + "</button>" : "");
+                goer = rum === T.naaet - 1 ? D.TOP.aabenGaa(rum)
+                    : D.TOP.aaben + (sk.gensyn ? ' <button type="button" class="knap lille" data-front>Tilbage til ' + h(frontNavn()) + "</button>" : "");
             } else if (nu >= r.trin.length) goer = D.TOP.fundet;
             else goer = "<b>Trin " + (nu + 1) + " af " + r.trin.length + ":</b> " + h(r.trin[nu].goer);
             s += '<p class="goer" id="goer">' + goer + "</p>";
             s += '<div class="chips">' + r.trin.map(function (tr, i) {
-                var kl = i < nu ? "loest" : (i === nu && !aaben ? "aktiv" : "venter");
-                return '<button type="button" class="chip ' + kl + '" data-ting="' + tr.ting + '"><i>' + (i < nu ? "✓" : i + 1) + "</i>" + h(tr.chip) + "</button>";
+                var ok = Sc.loest(T, rum, tr.id), kl = ok ? "loest" : (i === nu && !aaben ? "aktiv" : "venter");
+                return '<button type="button" class="chip ' + kl + '" data-ting="' + tr.ting + '"><i>' + (ok ? "✓" : i + 1) + "</i>" + h(tr.chip) + "</button>";
             }).join('<span class="pil">›</span>') +
                 '<span class="pil">›</span><button type="button" class="chip kode' + (aaben ? " loest" : nu >= r.trin.length ? " aktiv" : " venter") + '" data-ting="laas">' +
-                D.TOP.kode + ' <span class="kodecifre">' + kodeVist(rum) + "</span></button>" +
-                '<button type="button" class="chip bonus' + (T.guld[rum] ? " loest" : "") + '" data-ting="bonus">★ ' + (T.guld[rum] ? "Guldnøgle" : D.TOP.bonusChip) + "</button></div>";
+                D.TOP.kode + ' <span class="kodecifre">' + kodeVist(rum) + "</span></button></div>";
+        } else if (sk.type === "gang") {
+            s = '<p class="rumlinje"><b class="rumtitel" style="--farve:' + D.FARVE[1] + '">' + h(D.GANG.titel) + "</b> " +
+                '<span class="niller">Niller: »' + h(D.GANG.niller) + "«</span></p>" +
+                '<p class="goer" id="goer">' + (gangBesked || D.GANG.goer) + "</p>";
         } else if (sk.type === "guld") {
             s = '<p class="rumlinje"><b class="rumtitel" style="--farve:' + D.FARVE[6] + '">' + h(D.RUM[6].titel) + "</b> " + h(D.RUM[6].tekst) + "</p>";
             s += '<p class="goer">' + (alleSegl() ? D.SEGL_TEKST.alle + ' <button type="button" class="knap hoved" id="guldknap">' + D.SEGL_TEKST.doer + "</button>"
@@ -142,7 +151,7 @@
     /* ----- Scenen ------------------------------------------------------- */
     function tegnScene(sk) {
         sk = sk || skaerm();
-        var hvad = sk.type === "start" ? "start" : sk.type === "rum" ? sk.rum : sk.type === "slut" ? 5 : sk.type === "guld" ? "guld" : "guld-aaben";
+        var hvad = sk.type === "start" || sk.type === "gang" ? sk.type : sk.type === "rum" ? sk.rum : sk.type === "slut" ? 5 : sk.type === "guld" ? "guld" : "guld-aaben";
         el("tegning").innerHTML = Sc.tegn(hvad, sag, T);
         el("scene").classList.toggle("daempet", sk.type === "start" || sk.type === "slut" || sk.type === "finale");
     }
@@ -258,11 +267,17 @@
     }
     function tegnTrin() {
         var rum = seddel.rum, idx = seddel.idx, x = trinKort(), r = x.r, tr = x.tr, k = x.k;
-        var nu = trinNr(rum), etiket = "Trin " + (idx + 1) + " af " + r.trin.length;
-        if (idx > nu) {
-            /* Trinene tages i raekkefoelge: sig hvilket, der kommer foerst. */
-            saetSeddel(hoved(etiket, k.titel) + '<div class="seddel-krop"><p>Dette er trin ' + (idx + 1) + ". Løs først trin " + (nu + 1) + ": " + h(r.trin[nu].goer.charAt(0).toLowerCase() + r.trin[nu].goer.slice(1)) + "</p></div>" +
-                '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" data-gaatrin="' + nu + '">Gå til trin ' + (nu + 1) + "</button></div>");
+        var etiket = "Trin " + (idx + 1) + " af " + r.trin.length;
+        var kIdx = tr.kraever ? r.trin.map(function (q) { return q.id; }).indexOf(tr.kraever) : -1;
+        if (kIdx >= 0 && !Sc.loest(T, rum, tr.kraever)) {
+            /* Trinet bygger paa svaret fra et andet trin. Tingen kan ses,
+               men spoergsmaalet kommer foerst, naar det andet trin er loest. */
+            var kr = r.trin[kIdx], hvor = kr.chip.charAt(0).toLowerCase() + kr.chip.slice(1);
+            var krop = tr.id === "z"
+                ? "<p>I kan kigge i det periodiske system nu. Hvilket metal I skal finde, viser dråbepladen.</p>" + Se.periodisk(true, seddel.valg)
+                : "<p>Dette trin bruger svaret fra " + h(hvor) + ".</p>";
+            saetSeddel(hoved(etiket, k.titel) + '<div class="seddel-krop">' + krop + "</div>" +
+                '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" data-gaatrin="' + kIdx + '">Gå til ' + h(hvor) + "</button></div>", tr.id === "z" && k.bred);
             fokus();
             return;
         }
@@ -276,8 +291,8 @@
             if (loeste) s += '<ol class="regnestykke">' + k.dele.slice(0, loeste).map(function (d) { return '<li class="loest"><i>✓</i><span>' + d.vis + "</span></li>"; }).join("") + "</ol>";
             if (faerdig) {
                 s += '<p class="ok faerdig">Trinet er løst.' + (tr.cifre ? " Det giver " + (tr.cifre.length > 1 ? "cifrene" : "cifret") + " <b>" + tr.cifre.split("").join(" ") + "</b> til koden." : "") + "</p>";
-                var sidste = idx === r.trin.length - 1;
-                fod = '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" ' + (sidste && T.naaet <= rum ? "data-tillaas>Gå til kodelåsen" : "data-luk>Videre") + "</button></div>";
+                var alle = trinNr(rum) >= r.trin.length;
+                fod = '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" ' + (alle && T.naaet <= rum ? "data-tillaas>Gå til kodelåsen" : "data-luk>Videre") + "</button></div>";
             } else {
                 var del = k.dele[loeste];
                 s += '<div class="del">' +
@@ -381,13 +396,13 @@
         seddel = { type: "bonus", rum: rum };
         saetSeddel(hoved("★ Bonusrute", k.titel) + '<div class="seddel-krop"><p class="bonusom">' + h(D.BONUS.om) + "</p>" + k.html +
             (guld ? '<p class="ok">' + D.BONUS.loest + "</p>" : "<p>" + D.BONUS.tast + "</p>") + "</div>" +
-            (guld ? "" : '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" data-tillaas>' + D.BONUS.knap + "</button></div>"), false, true);
+            (guld ? "" : '<div class="seddel-fod"><span></span><button type="button" class="knap hoved" data-tillaas="guld">' + D.BONUS.knap + "</button></div>"), false, true);
         fokus();
     }
 
     /* ----- Kodelaasen ------------------------------------------------------ */
-    function aabnLaas(rum, besked, ok) {
-        var k = Se.laas(rum, sag, T), aaben = T.naaet > rum;
+    function aabnLaas(rum, besked, ok, visGuld) {
+        var k = Se.laas(rum, sag, T, visGuld), aaben = T.naaet > rum;
         seddel = { type: "laas", rum: rum };
         var knap;
         if (aaben && k.guld) knap = '<button type="button" class="knap hoved" data-videre>' + h(videreTekst(rum)) + "</button>";
@@ -400,6 +415,13 @@
         fokus();
     }
     function videreTekst(rum) { return rum === T.naaet - 1 ? D.LAAS.videre(rum + 1) : "Tilbage til " + frontNavn(); }
+    function visGuldfelter() {
+        var g = el("seddel").querySelector(".laasdel.guld"), b = el("seddel").querySelector("[data-visguld]");
+        if (g) g.hidden = false;
+        if (b) b.hidden = true;
+        var f = g && g.querySelector(".ciffer:not([disabled])");
+        if (f) f.focus();
+    }
     function raekke(navn) {
         return Array.prototype.slice.call(el("seddel").querySelectorAll('[data-raekke="' + navn + '"] .ciffer'));
     }
@@ -433,12 +455,12 @@
         if (guldOk) T.guld[rum] = true;
         if (!aaben) {
             T.naaet = rum + 1;
-            T.vist = null;
+            T.vist = rum;          /* I staar stadig i rummet; doeren er aaben */
             if (rum === 5) T.tid = Date.now() - T.start;
         }
         gem();
         var tekst = aaben ? D.LAAS.guldSenere : guldOk ? D.LAAS.rigtigGuld : D.LAAS.rigtig;
-        var sk = aaben ? skaerm() : { type: "rum", rum: rum };
+        var sk = skaerm();
         tegnTop(sk);
         tegnKort(sk);
         tegnScene(sk);
@@ -447,13 +469,66 @@
             var blad = el("tegning").querySelector(".doerblad");
             if (blad) { blad.classList.remove("aaben"); void blad.getBoundingClientRect(); blad.classList.add("aaben"); }
         }
-        aabnLaas(rum, tekst, true);
+        aabnLaas(rum, tekst, true, guldOk);
         return true;
     }
-    function videre() { T.vist = null; gem(); vis(); }
+
+    /* ----- At gaa gennem en doer ---------------------------------------- */
+    /* Tilstanden skifter med det samme. Det gamle billede laegges som en
+       kopi over det nye og zoomer roligt ind mod doeren, mens det toner ud. */
+    function gaaGennem(felt, skift) {
+        var scene = el("scene"), tg = el("tegning"), kopi = null;
+        var rolig = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (felt && !rolig) {
+            var a = felt.getBoundingClientRect(), b = tg.getBoundingClientRect();
+            kopi = tg.cloneNode(true);
+            kopi.removeAttribute("id");
+            kopi.className = "tegning gaar-kopi";
+            kopi.setAttribute("aria-hidden", "true");
+            kopi.style.transformOrigin = (a.left + a.width / 2 - b.left) + "px " + (a.top + a.height / 2 - b.top) + "px";
+        }
+        skift();
+        if (kopi) {
+            scene.appendChild(kopi);
+            void kopi.offsetWidth;
+            kopi.classList.add("gaar");
+            setTimeout(function () { if (kopi.parentNode) kopi.parentNode.removeChild(kopi); }, 1300);
+        }
+    }
+    function sporFelt(id) { return el("tegning").querySelector('[data-spor="' + id + '"] .spor-felt'); }
+    /* Ind ad doer 1 fra gangen */
+    function gaaInd() {
+        if (!T.start || T.inde) return;
+        gaaGennem(sporFelt("doer-1"), function () { T.inde = true; gangBesked = ""; gem(); vis(); });
+    }
+    /* Gennem den aabne doer i et rum: til naeste rum (eller slutningen). */
+    function gaaVidere(rum) {
+        if (!(T.naaet > rum)) return;
+        lukSeddel(true);
+        gaaGennem(sporFelt("gennem"), function () {
+            T.vist = rum + 1 < T.naaet && rum + 1 <= 5 ? rum + 1 : null;
+            gem();
+            vis();
+        });
+    }
+    function videre() {
+        var rum = seddel && seddel.rum;
+        if (rum && rum === T.naaet - 1) return gaaVidere(rum);
+        T.vist = null; gem(); vis();
+    }
+    /* En laast doer i gangen */
+    var gangBesked = "";
+    function laastDoer(n) {
+        gangBesked = D.GANG.laast(n);
+        el("goer").innerHTML = gangBesked;
+        var g = el("tegning").querySelector('[data-spor="doer-' + n + '"]');
+        if (g) { g.classList.remove("ryst"); void g.getBoundingClientRect(); g.classList.add("ryst"); }
+    }
 
     /* Cifrene: et ciffer flytter videre, tilbage-tasten flytter tilbage. */
-    function cifferFelter() { return Array.prototype.slice.call(el("seddel").querySelectorAll(".ciffer:not([disabled])")); }
+    function cifferFelter() {
+        return Array.prototype.slice.call(el("seddel").querySelectorAll(".ciffer:not([disabled])")).filter(function (c) { return c.offsetParent !== null; });
+    }
     function cifferInput(e) {
         var c = e.target;
         if (!c.classList || !c.classList.contains("ciffer")) return;
@@ -523,11 +598,12 @@
     }
 
     /* ----- Start og ny sag ----------------------------------------------- */
-    function startSpil() { T.start = Date.now(); gem(); vis(); }
+    function startSpil() { T.start = Date.now(); T.inde = false; gangBesked = ""; gem(); vis(); }
     function nySag(nr, udenSpoerg) {
         if (!udenSpoerg && T.start && !window.confirm("Start en ny sag med nye tal? Jeres fremskridt i denne sag forsvinder.")) return;
         T = nyTilstand(nr || nytNr());
         sag = NK.Sag.lav(T.sag);
+        gangBesked = "";
         gem();
         vis();
     }
@@ -535,7 +611,9 @@
     /* ----- Haendelser ----------------------------------------------------- */
     function sporKlik(id) {
         var sk = skaerm();
-        if (sk.type === "rum") aabnTing(sk.rum, id);
+        if (sk.type === "gang") { if (id === "doer-1") gaaInd(); else if (id.indexOf("doer-") === 0) laastDoer(Number(id.slice(5))); }
+        else if (sk.type === "rum" && id === "gennem") gaaVidere(sk.rum);
+        else if (sk.type === "rum") aabnTing(sk.rum, id);
         else if (sk.type === "guld" && id.indexOf("segl-") === 0) aabnSegl(id.slice(5));
     }
     function bind() {
@@ -585,7 +663,8 @@
             if (t.closest("#hintknap")) return hintKlik();
             if (t.closest("#indsend")) return indsend();
             if ((x = t.closest("[data-gaatrin]"))) return aabnTrin(seddel.rum, Number(x.getAttribute("data-gaatrin")));
-            if (t.closest("[data-tillaas]")) return aabnLaas(seddel.rum);
+            if ((x = t.closest("[data-tillaas]"))) return aabnLaas(seddel.rum, null, false, x.getAttribute("data-tillaas") === "guld");
+            if (t.closest("[data-visguld]")) return visGuldfelter();
             if (t.closest("#laasop")) return laasOp();
             if (t.closest("[data-videre]")) return videre();
             if (t.closest("#seglknap")) return brydSegl(seddel.id, el("seglsvar").value);
@@ -652,7 +731,7 @@
         sag: function () { return sag; },
         seddel: function () { return seddel; },
         skaerm: skaerm, vis: vis, alleGuld: alleGuld, alleSegl: alleSegl, trinNr: trinNr,
-        start: startSpil, nySag: nySag, aabnTing: aabnTing, aabnTrin: aabnTrin, aabnLaas: aabnLaas, aabnBonus: aabnBonus, aabnSegl: aabnSegl,
+        start: startSpil, gaaInd: gaaInd, gaaVidere: gaaVidere, laastDoer: laastDoer, nySag: nySag, aabnTing: aabnTing, aabnTrin: aabnTrin, aabnLaas: aabnLaas, aabnBonus: aabnBonus, aabnSegl: aabnSegl,
         handling: udfoerHandling, indsend: indsend, hint: hintKlik, dryp: dryp, bland: bland,
         skrivKode: skrivKode, laasOp: laasOp, videre: videre,
         brydSegl: brydSegl, aabnGuldDoer: aabnGuldDoer, luk: lukSeddel, bevis: bevis

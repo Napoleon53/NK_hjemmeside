@@ -22,8 +22,10 @@
 
     function felt(navn, maske, svar) { return { navn: navn, maske: maske, svar: svar }; }
     function cifre(s) { return String(s).replace(/[^0-9]/g, ""); }
-    function trin(id, ting, chip, goer, svar, maske) {
-        return { id: id, ting: ting, chip: chip, goer: goer, cifre: svar ? cifre(svar) : "", maske: maske || "" };
+    /* kraever: id paa det trin, hvis svar dette trin bygger paa. De
+       andre trin kan tages i den raekkefoelge, eleven vil. */
+    function trin(id, ting, chip, goer, svar, maske, kraever) {
+        return { id: id, ting: ting, chip: chip, goer: goer, cifre: svar ? cifre(svar) : "", maske: maske || "", kraever: kraever || null };
     }
     /* "2,45" -> "#,##" */
     function maskeAf(tekst) { return String(tekst).replace(/[0-9]/g, "#"); }
@@ -55,7 +57,7 @@
             x: x, kendte: kendte, reaktion: reak, Z: ion.Z,
             trin: [
                 trin("ion", "lab", "Dråbepladen", "Klik på dråbepladen, og find metalionen i Prøve X."),
-                trin("z", "ps", "Det periodiske system", "Klik på det periodiske system, og find metallet fra Prøve X.", String(ion.Z), "##"),
+                trin("z", "ps", "Det periodiske system", "Klik på det periodiske system, og find metallet fra Prøve X.", String(ion.Z), "##", "ion"),
                 trin("afstem", "tavle", "Tavlen", "Klik på tavlen, og afstem reaktionsskemaet.", reak.k.join(""), reak.k.map(function () { return "#"; }).join(""))
             ],
             bonus: {
@@ -158,8 +160,8 @@
                 metal: met, m: m, t: t, p: p, nMetal: nMet, nH2: nH2, T: t + 273.15, V: V,
                 trin: [
                     trin("vej", "vaegt", "Vægten", "Klik på vægten, og find stofmængden af metallet."),
-                    trin("gas", "kolbe", "Kolben", "Klik på kolben, og find stofmængden af dihydrogen."),
-                    trin("rumfang", "vejr", "Vejrstationen", "Klik på vejrstationen, og beregn rumfanget af dihydrogen.", Vt, maskeAf(Vt))
+                    trin("gas", "kolbe", "Kolben", "Klik på kolben, og find stofmængden af dihydrogen.", "", "", "vej"),
+                    trin("rumfang", "vejr", "Vejrstationen", "Klik på vejrstationen, og beregn rumfanget af dihydrogen.", Vt, maskeAf(Vt), "gas")
                 ],
                 bonus: {
                     cHCl: cH, vHCl: vH, rest: rs[0],
@@ -207,8 +209,8 @@
                 nBase: cb * forbrug / 1000, cSyre: cb * forbrug / Vs, pH: ph,
                 trin: [
                     trin("titrer", "burette", "Buretten", "Klik på buretten, og titrer syren."),
-                    trin("konc", "kolbe", "Kolben", "Klik på kolben, og beregn koncentrationen af syren."),
-                    trin("ph", "tavle", "Tavlen", "Klik på tavlen, og beregn syrens pH.", pt, maskeAf(pt))
+                    trin("konc", "kolbe", "Kolben", "Klik på kolben, og beregn koncentrationen af syren.", "", "", "titrer"),
+                    trin("ph", "tavle", "Tavlen", "Klik på tavlen, og beregn syrens pH.", pt, maskeAf(pt), "konc")
                 ],
                 bonus: {
                     x: x, pH: px[0],
@@ -256,8 +258,8 @@
                 nMn: cMn * Vmn / 1000, nProeve: cMn * Vmn / 1000 * red.forhold[1] / red.forhold[0], c: c,
                 trin: [
                     trin("titrer", "burette", "Buretten", "Klik på buretten, og titrer prøven."),
-                    trin("forhold", "tavle", "Tavlen", "Klik på tavlen, og find stofmængden af " + red.stof + "."),
-                    trin("konc", "kolbe", "Kolben", "Klik på kolben, og beregn koncentrationen af " + red.stof + ".", ct, maskeAf(ct))
+                    trin("forhold", "tavle", "Tavlen", "Klik på tavlen, og find stofmængden af " + red.stof + ".", "", "", "titrer"),
+                    trin("konc", "kolbe", "Kolben", "Klik på kolben, og beregn koncentrationen af " + red.stof + ".", ct, maskeAf(ct), "forhold")
                 ],
                 bonus: {
                     Vkolbe: Vk, mProeve: mPr, pct: pct[0],

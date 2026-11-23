@@ -26,8 +26,8 @@
         tekst: "Strømmen gik i kemifløjen, og sikkerhedsdørene smækkede i. Kemilæreren Niller sidder i det inderste laboratorium med kagen til klassens sidste time. Fem døre skal åbnes, før I når ind til ham.",
         regler: [
             "Niller har selv kodet låsene. Koden til en dør er svarene på opgaverne i rummet.",
-            "Kortet øverst siger altid, hvad næste trin er. De løste trin giver cifrene til koden.",
-            "Hvert rum har også en bonusrute med en svær opgave. Dens guldkode åbner døren og giver en guldnøgle.",
+            "Kortet øverst foreslår næste trin. De løste trin giver cifrene til koden.",
+            "Niller har gemt en sværere, hemmelig vej i hvert rum. Den giver en guldnøgle.",
             "Hver sag har sine egne tal. En anden gruppes kode passer ikke i jeres lås."
         ],
         knap: "Start"
@@ -46,20 +46,29 @@
     D.TOP = {
         fundet: "Koden er fundet. Klik på kodelåsen ved døren.",
         aaben: "Døren er åben.",
-        bonusChip: "Bonusrute",
+        aabenGaa: function (rum) { return "Døren er åben. Klik på døren for at gå " + (rum < 5 ? "ind i rum " + (rum + 1) : "ind til Niller") + "."; },
         kode: "Kode"
+    };
+
+    /* Gangen foran dør 1 */
+    D.GANG = {
+        titel: "Gangen i kemifløjen",
+        niller: "Dør 1 er den eneste, der ikke er låst. De andre døre åbner I indefra med koderne.",
+        goer: "Klik på dør 1 for at gå ind i forberedelsesrummet.",
+        laast: function (n) { return "Dør " + n + " er låst. Den åbnes indefra med koden fra rum " + (n - 1) + ". Klik på dør 1."; }
     };
 
     D.LAAS = {
         kode: "Koden fra de tre trin",
         guld: "Guldkoden fra bonusruten",
+        guldFold: "Har I en guldkode?",
         mangler: "Cifrene kommer, når trinene er løst.",
         forkert: "Låsen giver ikke efter.",
         guldForkert: "Guldkoden passer ikke.",
         rigtig: "Klik. Døren går op.",
         rigtigGuld: "Klik. Døren går op, og nøglen er af guld.",
         guldSenere: "Guldkoden passer. Nøglen er nu af guld.",
-        videre: function (n) { return n <= 5 ? "Gå ind i rum " + n : "Gå gennem døren"; },
+        videre: function (n) { return n <= 5 ? "Gå ind i rum " + n : "Gå ind til Niller"; },
         aaben: "Døren er åben."
     };
 
@@ -320,10 +329,11 @@
     };
 
     D.HJAELP = [
-        "Kortet øverst siger, hvad næste trin er. Klik på den ting i rummet, trinet nævner. Den har et gult skilt.",
+        "Kortet øverst foreslår næste trin. Klik på den ting i rummet, trinet nævner. Den har et gult skilt.",
+        "Trinene kan tages i den rækkefølge, I vil. Bygger et trin på svaret fra et andet, siger kortet det.",
         "Hvert trin tjekkes, når I trykker Indsend svar. Et hint er gratis, og bagefter kan I få svaret vist.",
         "De løste trin giver cifrene til koden. Når alle trin er løst, står koden klar i kodelåsen ved døren.",
-        "Bonusruten er den mørke kasse med stjernen. Dens opgave er svær og uden hints. Guldkoden åbner døren i stedet og giver en guldnøgle. Fem guldnøgler åbner en ekstra dør til sidst.",
+        "Niller har gemt en bonusrute i hvert rum. Dens opgave er svær og uden hints. Guldkoden åbner døren i stedet og giver en guldnøgle. Fem guldnøgler åbner en ekstra dør til sidst.",
         "Hver sag har sit eget nummer og sine egne tal. Ny sag giver nye tal.",
         "Nøglerne i toplinjen viser de døre, I har åbnet. Klik på en nøgle for at se rummet igen. Guldkoden kan også tastes senere."
     ];

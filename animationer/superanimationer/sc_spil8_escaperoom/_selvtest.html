@@ -216,7 +216,13 @@ async function koer() {
     app.nySag(4550, true);
     d.getElementById("startknap").click();
     T = app.tilstand(); sag = app.sag();
-    paastand("Start fører til rum 1, og uret går", app.skaerm().type === "rum" && app.skaerm().rum === 1 && T.start > 0);
+    paastand("Start fører til gangen, hvor kun dør 1 kan åbnes, og uret går", app.skaerm().type === "gang" && T.start > 0 &&
+        d.querySelector("#tegning .spor.aktiv").getAttribute("data-spor") === "doer-1" && d.querySelectorAll("#tegning .spor.laastdoer").length === 4 &&
+        !!d.querySelector("#tegning .doerblad.klem"));
+    d.querySelector('#tegning [data-spor="doer-3"]').dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    paastand("et klik på dør 3 siger, at den er låst, og I bliver i gangen", app.skaerm().type === "gang" && /Dør 3 er låst/.test(d.getElementById("goer").textContent));
+    d.querySelector('#tegning [data-spor="doer-1"]').dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    paastand("et klik på dør 1 går ind i rum 1", app.skaerm().type === "rum" && app.skaerm().rum === 1 && T.inde === true);
 
     /* Det rigtige svar til en del */
     function rigtigt(del) {
@@ -262,12 +268,23 @@ async function koer() {
             /Trin 1 af 3/.test(d.getElementById("goer").textContent) && aktivSkilt() === R.trin[0].ting &&
             d.querySelector(".chip.aktiv").getAttribute("data-ting") === R.trin[0].ting);
         var spor = d.querySelectorAll("#tegning .spor");
-        paastand("rum " + rum + ": tingene til de tre trin, bonusskrinet og kodelåsen kan klikkes (" + spor.length + " ting)",
+        paastand("rum " + rum + ": tingene til de tre trin, skuffen og kodelåsen kan klikkes (" + spor.length + " ting)",
             R.trin.every(function (t) { return !!d.querySelector('#tegning .spor[data-spor="' + t.ting + '"]'); }) &&
-            !!d.querySelector('#tegning .spor[data-spor="bonus"]') && !!d.querySelector('#tegning .spor[data-spor="laas"]') && spor.length <= 6);
-        app.aabnTrin(rum, 2);
-        paastand("rum " + rum + ": trin 3 før trin 1 siger, hvad der skal løses først, og har knappen Gå til trin 1",
-            /Løs først trin 1/.test(d.getElementById("seddel").textContent) && !!d.querySelector("#seddel [data-gaatrin]") && !d.getElementById("indsend"));
+            !!d.querySelector('#tegning .spor.skuffe[data-spor="bonus"]') && !!d.querySelector('#tegning .spor[data-spor="laas"]') && spor.length <= 6);
+        paastand("rum " + rum + ": skuffen har intet skilt, og opgavekortet har intet link til bonusruten",
+            !d.querySelector('#tegning [data-spor="bonus"] .skilt') && !d.querySelector('#fortaelling [data-ting="bonus"]'));
+        [1, 2].forEach(function (i) {
+            var tr = R.trin[i];
+            app.aabnTrin(rum, i);
+            var tekst = d.getElementById("seddel").textContent;
+            if (tr.kraever) paastand("rum " + rum + ": trin " + (i + 1) + " bygger på et andet trin, siger det og har en knap derhen",
+                /bruger svaret fra|Hvilket metal I skal finde/.test(tekst) && !!d.querySelector("#seddel [data-gaatrin]") && !d.getElementById("indsend"));
+            else paastand("rum " + rum + ": trin " + (i + 1) + " kan tages før trin 1", !!d.getElementById("indsend") || !!d.querySelector("#seddel [data-handl]"));
+        });
+        if (rum === 1) {
+            app.aabnTing(1, "ps");
+            paastand("rum 1: det periodiske system kan klikkes i fra start", d.querySelectorAll("#seddel .ps.klikbar [data-z]").length === 118);
+        }
         app.aabnLaas(rum);
         paastand("rum " + rum + ": låsen har ingen cifre endnu, og Lås op er grå", d.getElementById("laasop").disabled &&
             Array.prototype.every.call(d.querySelectorAll('[data-raekke="kode"] .ciffer'), function (c) { return c.value === ""; }));
@@ -285,13 +302,17 @@ async function koer() {
         d.getElementById("laasop").click();
         paastand("rum " + rum + ": Lås op åbner døren med en almindelig nøgle", T.naaet === rum + 1 && !T.guld[rum] && !!d.querySelector("#tegning .doerblad.aaben") &&
             /Døren går op/.test(d.getElementById("laasbesked").textContent));
+        paastand("rum " + rum + ": efter Lås op står I i rummet ved den åbne dør, som har et skilt",
+            app.skaerm().type === "rum" && app.skaerm().rum === rum && !!d.querySelector('#tegning .spor.aktiv[data-spor="gennem"]') &&
+            /Klik på døren/.test(d.getElementById("goer").textContent));
         d.querySelector("#seddel [data-videre]").click();
+        paastand("rum " + rum + ": knappen går gennem døren", rum < 5 ? app.skaerm().type === "rum" && app.skaerm().rum === rum + 1 && !app.skaerm().gensyn : app.skaerm().type === "slut");
     }
     paastand("efter rum 5 kommer slutningen med fem jernnøgler og vejen til guld", app.skaerm().type === "slut" && d.querySelectorAll(".noegleknap.jern").length === 5 &&
         /bonuskoder/.test(d.querySelector(".guldvej").textContent) && T.tid > 0 && /^RUMLESKAFT-\d{8}-\d{2}$/.test(d.getElementById("bevis").textContent));
 
     /* enkelte ting undervejs */
-    app.nySag(4550, true); app.start(); T = app.tilstand(); sag = app.sag();
+    app.nySag(4550, true); app.start(); app.gaaInd(); T = app.tilstand(); sag = app.sag();
     app.aabnTrin(1, 0);
     var u1 = app.indsend(sag.rum[1].x);
     paastand("dråbepladen: svaret afvises gratis, til alle fire reagenser er dryppet i Prøve X", u1 && !u1.ok && u1.gratis && /Dryp først/.test(u1.besked));
@@ -312,7 +333,11 @@ async function koer() {
     paastand("en forkert afstemning viser en tabel med atomerne på hver side", k3.join() === k3.map(function () { return 1; }).join() || (u3 && /atomtabel/.test(u3.besked)));
     app.luk();
     for (var q2 = 0; q2 < 3; q2++) loesTrin(1, q2);
-    app.aabnLaas(1); app.laasOp(); app.videre();
+    app.aabnLaas(1);
+    paastand("guldfelterne i låsen er foldet ind bag en lille knap", d.querySelector("#seddel .laasdel.guld").hidden && !!d.querySelector("#seddel [data-visguld]"));
+    d.querySelector("#seddel [data-visguld]").click();
+    paastand("knappen folder guldfelterne ud", !d.querySelector("#seddel .laasdel.guld").hidden && d.querySelector("#seddel [data-visguld]").hidden);
+    app.laasOp(); app.videre();
     app.aabnTing(2, "bland");
     app.bland(0); app.bland(1);
     paastand("væskerne: to valgte stoffer blandes og kommer på listen", Object.keys(T.bland).length === 1 && /lag|opløses/.test(d.querySelector(".blandtekst").textContent) && d.querySelectorAll(".blandet span").length === 1);
@@ -334,11 +359,12 @@ async function koer() {
 
     /* ------------------------------------------------------------- */
     overskrift("4. Bonusruten og guldnøglerne");
-    app.nySag(6060, true); app.start(); T = app.tilstand(); sag = app.sag();
+    app.nySag(6060, true); app.start(); app.gaaInd(); T = app.tilstand(); sag = app.sag();
     app.aabnTing(1, "bonus");
-    paastand("bonusskrinet åbner et kort, der er mærket Bonusrute og forklarer guldkoden", /Bonusrute/.test(d.getElementById("seddel").textContent) &&
+    paastand("skuffen åbner et kort, der er mærket Bonusrute og forklarer guldkoden", /Bonusrute/.test(d.getElementById("seddel").textContent) &&
         /guldkoden/.test(d.getElementById("seddel").textContent) && d.getElementById("seddel").classList.contains("guldkort") && !d.getElementById("hintknap"));
     d.querySelector("#seddel [data-tillaas]").click();
+    paastand("fra bonusruten står guldfelterne fremme i låsen", !d.querySelector("#seddel .laasdel.guld").hidden);
     app.skrivKode("99999999", "guld");
     app.laasOp();
     paastand("en forkert guldkode åbner ikke døren", T.naaet === 1 && /Guldkoden passer ikke/.test(d.getElementById("laasbesked").textContent));
@@ -352,7 +378,7 @@ async function koer() {
     paastand("én guldnøgle og fire jernnøgler giver slutningen uden knap til den gyldne dør", app.skaerm().type === "slut" && d.querySelectorAll(".noegleknap.guld").length === 1 && !d.querySelector("[data-tilguld]"));
     d.querySelector('.noegleknap.jern[data-noegle="3"]').click();
     paastand("et klik på jernnøglen fra rum 3 går tilbage til rum 3", app.skaerm().type === "rum" && app.skaerm().rum === 3 && app.skaerm().gensyn &&
-        /Guldkoden fra bonusruten kan stadig tastes/.test(d.getElementById("goer").textContent));
+        /Døren er åben/.test(d.getElementById("goer").textContent));
     app.aabnLaas(3);
     app.skrivKode(sag.rum[3].bonus.kode, "guld");
     app.laasOp();
@@ -423,7 +449,7 @@ async function koer() {
     async function maal(b2, h2) {
         w = await aabn(b2, h2);
         NK = w.NK; D = NK.D; Se = NK.Sedler; app = NK.app; d = w.document;
-        app.nySag(4550, true); app.start(); sag = app.sag(); T = app.tilstand();
+        app.nySag(4550, true); app.start(); app.gaaInd(); sag = app.sag(); T = app.tilstand();
         var svg = d.querySelector("#tegning svg").getBoundingClientRect();
         var skala = Math.min(svg.width / 1600, svg.height / 780);
         paastand(b2 + " x " + h2 + ": de gule skilte er mindst 13 px (" + NK.komma(23 * skala, 1) + " px)", 23 * skala >= 13);

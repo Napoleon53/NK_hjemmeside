@@ -587,7 +587,9 @@
             return t.trin && t.trin[rum + ":" + tr.id] ? tr.cifre : tr.cifre.replace(/./g, " ");
         }).join("");
     };
-    Se.laas = function (rum, sag, t) {
+    /* visGuld: guldfelterne er foldet ud (eleven kommer fra bonusruten,
+       eller guldkoden er brugt). Ellers staar der kun en lille knap. */
+    Se.laas = function (rum, sag, t, visGuld) {
         var r = sag.rum[rum], aaben = t.naaet > rum, guld = !!(t.guld && t.guld[rum]);
         var fundet = aaben ? r.kode : Se.fundet(r, t, rum);
         var mangler = !aaben && /\s/.test(fundet);
@@ -595,7 +597,8 @@
             '<div class="laasdel' + (aaben ? " aaben" : "") + '" data-raekke="kode"><span class="felt-navn">' + D.LAAS.kode +
             (mangler ? '<small>' + D.LAAS.mangler + "</small>" : "") + '</span><span class="cifre">' +
             bokse(r.kodeMaske, fundet, aaben, D.LAAS.kode) + "</span></div>" +
-            '<div class="laasdel guld' + (guld ? " aaben" : "") + '" data-raekke="guld"><span class="felt-navn"><b>★ ' + D.LAAS.guld + "</b></span>" +
+            (guld || visGuld ? "" : '<button type="button" class="guldfold" data-visguld>★ ' + D.LAAS.guldFold + "</button>") +
+            '<div class="laasdel guld' + (guld ? " aaben" : "") + '" data-raekke="guld"' + (guld || visGuld ? "" : " hidden") + '><span class="felt-navn">★ ' + D.LAAS.guld + "</span>" +
             r.bonus.felter.map(function (f) {
                 return '<div class="guldfelt"><span>' + h(f.navn) + '</span><span class="cifre">' + bokse(f.maske, guld ? f.svar : "", guld, f.navn, "g") + "</span></div>";
             }).join("") + "</div></div>";
