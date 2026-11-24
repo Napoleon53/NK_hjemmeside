@@ -17,6 +17,8 @@ window.NK = NK;
 
     /* Kapitlet og antallet af fagord i bogens liste (selvtesten tjekker det) */
     NK.KAPITEL = "B8";
+    /* Fanernes afsnit: B8.1 har to faner (lægemidler og kiralitet), efter sammenlægningen 24. nov. 2026 */
+    NK.AFSNIT = ["B8.1", "B8.1", "B8.2", "B8.3", "B8.4", "B8.5", "B8.6"];
     NK.ANTAL_FAGORD = 38;
 
     NK.FORKLARING = {
@@ -95,12 +97,12 @@ window.NK = NK;
        adresser, der aabner fanen direkte: index.html#b8.3 */
     NK.FANER = [
         { id: "laegemidler", nr: "B8.1", titel: "Lægemidler",      hash: ["laegemidler", "receptorer", "b8.1"] },
-        { id: "kiral",       nr: "B8.2", titel: "Kiralitet",       hash: ["kiral", "kiralitet", "b8.2"] },
-        { id: "syrebase",    nr: "B8.3", titel: "Syre/base",       hash: ["syrebase", "syrer-og-baser", "b8.3"] },
-        { id: "logd",        nr: "B8.4", titel: "Log P og D",      hash: ["logd", "logp", "log-p-og-log-d", "b8.4"] },
-        { id: "syntese",     nr: "B8.5", titel: "Syntese",         hash: ["syntese", "acetylsalicylsyre", "b8.5"] },
-        { id: "tlc",         nr: "B8.6", titel: "TLC",             hash: ["tlc", "b8.6"] },
-        { id: "maaling",     nr: "B8.7", titel: "Måling",          hash: ["maaling", "virksomt-stof", "b8.7"] }
+        { id: "kiral",       nr: "B8.1", titel: "Kiralitet",       hash: ["kiral", "kiralitet"] },
+        { id: "syrebase",    nr: "B8.2", titel: "Syre/base",       hash: ["syrebase", "syrer-og-baser", "b8.2"] },
+        { id: "logd",        nr: "B8.3", titel: "Log P og D",      hash: ["logd", "logp", "log-p-og-log-d", "b8.3"] },
+        { id: "syntese",     nr: "B8.4", titel: "Syntese",         hash: ["syntese", "acetylsalicylsyre", "b8.4"] },
+        { id: "tlc",         nr: "B8.5", titel: "TLC",             hash: ["tlc", "b8.5"] },
+        { id: "maaling",     nr: "B8.6", titel: "Måling",          hash: ["maaling", "virksomt-stof", "b8.6"] }
     ];
 
     /* Foerste saetning af en forklaring (som brikken i Kort og godt) */

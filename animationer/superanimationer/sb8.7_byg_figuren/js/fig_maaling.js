@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_maaling.js - figuren til B8.7 Hvor meget virksomt stof?
+   fig_maaling.js - figuren til B8.6 Hvor meget virksomt stof?
 
    Afsnittet har kun to fagord, saa figuren har ogsaa tre ord fra
    tidligere kapitler, som er vaerd at traene igen (brugeren 1. nov. 2026):

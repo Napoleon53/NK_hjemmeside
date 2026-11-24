@@ -50,7 +50,7 @@ window.NK = NK;
 
     /* Afsnittene med fagord. Fanerne har ikke numrene 1 til 4, saa
        selvtesten tjekker numrene herfra. */
-    NK.AFSNIT = ["B2.1", "B2.2", "B2.4", "B2.7"];
+    NK.AFSNIT = ["B2.1", "B2.1", "B2.3", "B2.6"];
 
     /* Alle fagord fra listen sidder paa en figur */
     NK.UDELADT = [];
@@ -65,9 +65,9 @@ window.NK = NK;
        adresser, der aabner fanen direkte: index.html#b2.4 */
     NK.FANER = [
         { id: "ligevaegt",     nr: "B2.1", titel: "Kemisk ligevægt",      hash: ["ligevaegt", "ligevægt", "kemisk-ligevaegt", "b2.1"] },
-        { id: "loven",         nr: "B2.2", titel: "Ligevægtsloven",       hash: ["loven", "ligevaegtsloven", "ligevægtsloven", "b2.2"] },
-        { id: "indgreb",       nr: "B2.4", titel: "Indgreb",              hash: ["indgreb", "ikke-ligevaegt", "b2.4"] },
-        { id: "oploeselighed", nr: "B2.7", titel: "Opløselighedsprodukt", hash: ["oploeselighed", "opløselighed", "oploeselighedsprodukt", "b2.7"] }
+        { id: "loven",         nr: "B2.1", titel: "Ligevægtsloven",       hash: ["loven", "ligevaegtsloven", "ligevægtsloven"] },
+        { id: "indgreb",       nr: "B2.3", titel: "Indgreb",              hash: ["indgreb", "ikke-ligevaegt", "b2.3"] },
+        { id: "oploeselighed", nr: "B2.6", titel: "Opløselighedsprodukt", hash: ["oploeselighed", "opløselighed", "oploeselighedsprodukt", "b2.6"] }
     ];
 
     /* Foerste saetning af en forklaring (som brikken i Kort og godt) */

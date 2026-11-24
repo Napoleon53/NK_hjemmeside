@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb1.2 Energiprofilen</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html?alene"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen.
+
+   Åbner index.html i en iframe og kontrollerer: at modellen rammer
+   tallene (Eₐ og ΔH for NO₂ + CO og den modsatte vej, andelen over Eₐ
+   ved 10, 20 og 30 °C), at teksterne holder reglerne (ét rigtigt svar,
+   forklaring til hvert forkert svar, hints, længder, ingen tankestreger,
+   svaret står ikke i spørgsmålet, det rigtige svar er ikke altid først),
+   at begge faner kan gennemføres med forkerte svar, hints og Vis svaret,
+   at scenen er låst under et spørgsmål, at − og + kun er fremme, når
+   kortet beder om dem, at handlingen går selv videre, at de kommende
+   opgaver er låste, at Fri leg virker, og at kortet holder sig inden for
+   sin plads i 1100 × 760, 1400 × 860 og 1920 × 1080.
+   Kræver en lokal server. Elevens fremskridt lægges tilbage bagefter.
+   ===================================================================== */
+var linjer = [], fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function ventPaa(f, ms) {
+    var slut = Date.now() + (ms || 5000);
+    return new Promise(function (r) {
+        (function tjek() { var v = false; try { v = f(); } catch (e) {} if (v || Date.now() > slut) r(v); else setTimeout(tjek, 40); })();
+    });
+}
+
+var ramme = document.getElementById("ramme"), W, NK, D;
+var gemt = {};
+var undtagelser = [];
+
+/* Headless Chrome koerer ikke tegneloekken i en skjult iframe: testen
+   koerer selv fanens billeder frem (sek sekunder i trin paa 1/60 s) */
+function kor(sim, sek) {
+    for (var i = 0; i < Math.round(sek * 60); i++) { sim.tilpas(); sim.opdater(1 / 60); sim.tegn(); }
+}
+
+function svarRigtigt(m) {
+    var tr = m.trin();
+    if (tr.handling) { m.sim.goerHandling(tr); m.naesteTrin(); return; }
+    var j = tr.svar.findIndex(function (s) { return s.rigtig; });
+    m.valg(j); m.indsend();
+}
+
+/* Kortets bund skal ligge over skemaet (kortet har fast plads, regel 4) */
+function kortOk(navn) {
+    var k = W.document.getElementById(navn + "-skort"), sk = W.document.getElementById(navn + "-skema");
+    if (k.hidden) return true;
+    return k.offsetTop + k.offsetHeight <= sk.offsetTop + 2;
+}
+
+async function genindlaes(b, h) {
+    ramme.style.width = b + "px";
+    ramme.style.height = h + "px";
+    var token = "t" + Math.random().toString(36).slice(2);
+    ramme.src = "index.html?alene&" + token;
+    /* Vent paa den nye side, ikke den gamle, der endnu ikke er skiftet ud */
+    await ventPaa(function () {
+        var w = ramme.contentWindow;
+        return w.location.search.indexOf(token) >= 0 && w.document.readyState === "complete" && w.NK && w.NK.sims && w.NK.sims["fane-temp"];
+    }, 8000);
+    W = ramme.contentWindow; NK = W.NK; D = NK.D;
+    W.addEventListener("error", function (e) { undtagelser.push(e.message); });
+    await vent(300);
+}
+
+function rydLager() {
+    ["profil", "temp"].forEach(function (n) { try { W.localStorage.removeItem(D.NOEGLE + "-" + n); } catch (e) {} });
+}
+
+async function koer() {
+    await genindlaes(1400, 860);
+    ["profil", "temp"].forEach(function (n) { gemt[n] = W.localStorage.getItem(D.NOEGLE + "-" + n); });
+    rydLager();
+    await genindlaes(1400, 860);
+
+    /* ----- 1. Modellen ------------------------------------------------- */
+    overskrift("1. Modellen");
+    var f = D.PROFIL.frem, t = D.PROFIL.tilbage;
+    paastand("Eₐ for NO₂ + CO → NO + CO₂ er 134 kJ/mol", f.Et - f.Er === 134);
+    paastand("ΔH for NO₂ + CO → NO + CO₂ er −226 kJ/mol", f.Ep - f.Er === -226);
+    var dH = (90.3 - 393.5) - (33.2 - 110.5);
+    paastand("ΔH passer med dannelsesentalpierne (−225,9 kJ/mol)", Math.abs(dH - (f.Ep - f.Er)) < 0.5, dH);
+    paastand("Den modsatte vej: Eₐ = 360 kJ/mol", t.Et - t.Er === 360);
+    paastand("Den modsatte vej: ΔH = +226 kJ/mol", t.Ep - t.Er === 226);
+    paastand("Samme bakke: toppen ligger samme sted", t.Et === f.Et);
+    paastand("Eₐ = 50 kJ/mol som i sb1.4", D.EA === 50);
+    paastand("20 °C: 1 ud af 155 millioner", D.udAf(20) === "1 ud af 155 millioner", D.udAf(20));
+    paastand("30 °C: 1 ud af 80 millioner", D.udAf(30) === "1 ud af 80 millioner", D.udAf(30));
+    paastand("10 °C: 1 ud af 315 millioner", D.udAf(10) === "1 ud af 315 millioner", D.udAf(10));
+    paastand("10 °C varmere giver omtrent dobbelt så mange (1,8 til 2,1)", D.forhold(30) > 1.8 && D.forhold(30) < 2.1, D.forhold(30));
+    paastand("10 °C koldere giver omtrent halvt så mange (0,45 til 0,55)", D.forhold(10) > 0.45 && D.forhold(10) < 0.55, D.forhold(10));
+    /* Fordelingen er normeret: integralet er 1 */
+    var sum = 0, dE = 0.01;
+    for (var E = dE / 2; E < 60; E += dE) sum += D.f(E, 20) * dE;
+    paastand("Fordelingen er normeret (integral 1)", Math.abs(sum - 1) < 0.002, sum);
+    var hale = 0;
+    for (E = 50 + dE / 2; E < 120; E += dE) hale += D.f(E, 20) * dE;
+    paastand("Andelen over Eₐ passer med integralet af kurven", Math.abs(hale / D.andel(20) - 1) < 0.01, hale / D.andel(20));
+    paastand("Molekylernes fart stiger kun ca. 2 % fra 20 °C til 30 °C (kortets forklaring)",
+        Math.abs(Math.sqrt(303.15 / 293.15) - 1.02) < 0.005);
+
+    /* ----- 2. Teksterne -------------------------------------------------- */
+    overskrift("2. Teksterne");
+    var alle = D.OPGAVER_PROFIL.concat(D.OPGAVER_TEMP), forst = 0, spm = 0;
+    alle.forEach(function (o, oi) {
+        o.trin.forEach(function (tr, ti) {
+            var navn = o.navn + " trin " + (ti + 1);
+            var tekster = [tr.tekst].concat(tr.hints || [], tr.godt ? [tr.godt] : []);
+            if (tr.svar) tr.svar.forEach(function (s) { tekster.push(s.t); if (s.fejl) tekster.push(s.fejl); });
+            paastand(navn + ": ingen tankestreger og ingen 1+/1−",
+                tekster.every(function (x) { return !/[–—]/.test(x) && !/[^0-9,]1[+−]/.test(x); }));
+            paastand(navn + ": hinttrappe med mindst to hints på højst 100 tegn",
+                tr.hints && tr.hints.length >= 2 && tr.hints.every(function (h) { return h.length <= 100; }));
+            if (tr.handling) {
+                paastand(navn + ": handlingen har et mål", typeof tr.maalT === "number");
+                return;
+            }
+            spm++;
+            var rigtige = tr.svar.filter(function (s) { return s.rigtig; });
+            paastand(navn + ": ét rigtigt svar", rigtige.length === 1);
+            if (tr.svar[0].rigtig) forst++;
+            paastand(navn + ": hvert forkert svar har sin egen forklaring (højst 120 tegn)",
+                tr.svar.every(function (s) { return s.rigtig || (s.fejl && s.fejl.length <= 120); }));
+            paastand(navn + ": svarene er højst 34 tegn", tr.svar.every(function (s) { return s.t.length <= 34; }));
+            paastand(navn + ": forklaringen til det rigtige svar er højst 160 tegn", tr.godt && tr.godt.length <= 160, tr.godt && tr.godt.length);
+            paastand(navn + ": spørgsmålet slutter med ?", /\?$/.test(tr.tekst));
+            paastand(navn + ": det rigtige svar står ikke i spørgsmålet", tr.tekst.indexOf(rigtige[0].t) < 0);
+        });
+    });
+    paastand("Det rigtige svar er ikke altid det første", forst < spm, forst + " af " + spm);
+
+    /* ----- 3. Fane 1 ----------------------------------------------------------- */
+    overskrift("3. Fane 1: Læs energiprofilen");
+    var sp = NK.sims["fane-profil"], m = sp.m;
+    var raekke = W.document.getElementById("profil-prikker");
+    paastand("Opgave 1 er åben med navn, opgave 2 er låst uden navn",
+        raekke.querySelectorAll(".or-knap.laast").length === 1 && /Byg profilen/.test(raekke.textContent) && !/Den modsatte vej/.test(raekke.textContent));
+    paastand("Første kort er trin 1 af 6", /Trin 1 af 6/.test(W.document.getElementById("profil-ind").textContent));
+    paastand("Fra start: bogstaverne A, B og C, ingen tal på aksen og ingen pile", sp.vis().bogstaver && !sp.vis().tal && !sp.vis().eaPil);
+    paastand("Indsend svar er gråt, før et svar er valgt", m.kort.indsendEl.classList.contains("ikke-klar"));
+    /* Scenen er laast: et klik faar kortet til at blinke */
+    m.kort.e.classList.remove("blink");
+    sp.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, clientX: 500, clientY: 600 }));
+    paastand("Et klik i scenen under spørgsmålet får kortet til at blinke", m.kort.e.classList.contains("blink"));
+    /* Forkert svar */
+    m.valg(1); m.indsend();
+    paastand("Et forkert svar giver forklaringen og bliver på spørgsmålet", m.fase() === "spm" && /Ved B er reaktionen halvvejs/.test(m.kort.beskedTekst()));
+    paastand("Hintknappen lyser stille op efter et forkert svar", m.kort.hintEl.classList.contains("peg"));
+    paastand("Det forkerte svar kan ikke vælges igen", m.kort.ind.querySelector('[data-valg="1"]').disabled);
+    m.valg(0); m.indsend();
+    paastand("Rigtigt svar: kortet bliver på spørgsmålet med Rigtigt og Næste", m.fase() === "bliv" && /Rigtigt/.test(m.kort.blivTekst() + m.kort.blivEl.textContent) && /Næste/.test(m.kort.blivEl.textContent));
+    paastand("Efter trin 1: reaktanterne har fået navn i scenen", sp.vis().reakt && !sp.vis().prod);
+    m.videre();
+    /* Hinttrappen og Vis svaret paa trin 2 */
+    m.hint();
+    paastand("Giv hint viser første hint og bliver til Næste hint", /Produkterne er de stoffer/.test(m.kort.beskedTekst()) && m.kort.hintEl.textContent === "Næste hint");
+    m.hint();
+    paastand("Efter alle hints hedder knappen Vis svaret", m.kort.hintEl.textContent === "Vis svaret");
+    m.hint();
+    paastand("Vis svaret viser svaret i gult og fører videre med Næste", m.fase() === "bliv" && m.vist && m.kort.blivEl.querySelector(".bliv.svar"));
+    m.videre();
+    svarRigtigt(m); m.videre();
+    paastand("Trin 4: tre pile med numre er fremme, og Eₐ-pilen er ikke farvet endnu", sp.vis().pile && !sp.vis().eaPil);
+    svarRigtigt(m);
+    paastand("Efter trin 4: kun pilen for Eₐ står tilbage, og aksen får tal", !sp.vis().pile && sp.vis().eaPil && sp.vis().tal);
+    m.videre(); svarRigtigt(m); m.videre();
+    paastand("Trin 6: ΔH og termometeret er ikke fremme før svaret", !sp.vis().dH);
+    svarRigtigt(m);
+    paastand("Efter trin 6: ΔH og termometeret (varmere) er fremme", sp.vis().dH);
+    paastand("Knappen efter sidste trin hedder Næste opgave", /Næste opgave/.test(m.kort.blivEl.textContent));
+    m.videre();
+    paastand("Opgave 2 begynder, og opgave 1 er markeret løst", m.o === 1 && m.loest[0] && m.t === 0);
+    paastand("Profilen spejles (spejlingen er i gang)", sp.flip > 0);
+    kor(sp, 1.0);
+    paastand("Spejlingen er færdig", sp.flip === 0);
+    paastand("Skemaet viser den modsatte vej", W.document.getElementById("profil-skema").textContent === "NO + CO₂ → NO₂ + CO");
+    for (var i = 0; i < 4; i++) { svarRigtigt(m); if (i < 3) m.videre(); }
+    paastand("Sidste trin: begge pile for Eₐ er fremme", sp.vis().begge);
+    m.videre();
+    paastand("Alle opgaver løst: kortet siger Færdig, og Fri leg er slået til", m.fase() === "faerdig" && sp.fri && /begge opgaver/.test(W.document.getElementById("profil-ind").textContent));
+    paastand("Knappen fører videre til Temperaturen", /Videre til Temperaturen/.test(m.kort.blivEl.textContent));
+    /* Fri leg: traek i produkterne */
+    var h = sp.handtag()[1], r = sp.canvas.getBoundingClientRect();
+    var foer = sp.p.Ep;
+    sp.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true, clientX: r.left + h.x, clientY: r.top + h.y, pointerId: 1 }));
+    sp.canvas.dispatchEvent(new W.PointerEvent("pointermove", { bubbles: true, clientX: r.left + h.x, clientY: r.top + h.y - 120, pointerId: 1 }));
+    W.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    paastand("Fri leg: produkterne kan trækkes op", sp.p.Ep > foer + 50, foer + " → " + sp.p.Ep);
+    paastand("Fri leg: toppen holder sig over produkterne", sp.p.Et >= Math.max(sp.p.Er, sp.p.Ep) + 10);
+    /* Gaa tilbage til opgave 1 fra raekken */
+    m.gaaTil(0);
+    paastand("En løst opgave åbner med alt fremme", m.fase() === "loest" && sp.vis().dH && !sp.fri);
+    m.forfra();
+    paastand("Start forfra giver trinene igen", m.fase() === "spm" && m.t === 0 && !sp.vis().reakt);
+
+    /* ----- 4. Fane 2 ---------------------------------------------------------------- */
+    overskrift("4. Fane 2: Temperaturen");
+    NK.visFane("fane-temp");
+    var st = NK.sims["fane-temp"], m2 = st.m;
+    kor(st, 0.1);
+    var minus = W.document.getElementById("temp-minus"), plus = W.document.getElementById("temp-plus");
+    paastand("To låste opgaver i rækken", W.document.querySelectorAll("#temp-prikker .or-knap.laast").length === 2);
+    paastand("Under spørgsmålet er − og + skjult", minus.hidden && plus.hidden);
+    paastand("Fra start: ingen Eₐ-streg og ingen lup", !st.vis().ea && !st.vis().lup);
+    st.skru(1);
+    paastand("+ virker ikke under et spørgsmål", st.T === 20);
+    svarRigtigt(m2);
+    paastand("Efter trin 1: Eₐ-stregen er fremme, luppen endnu ikke", st.vis().ea && !st.vis().lup);
+    m2.videre(); svarRigtigt(m2);
+    paastand("Efter trin 2: luppen og tallene er fremme", st.vis().lup);
+    m2.videre();
+    kor(st, 0.1);
+    paastand("Opgave 2: kun + er fremme, med gul ramme og boble", !plus.hidden && minus.hidden && plus.classList.contains("opfordring") && !W.document.getElementById("temp-boble").hidden);
+    m2.indsend();
+    paastand("Indsend svar for tidligt siger, hvad der mangler", /Glasset er 20 °C\. Klik på \+/.test(m2.kort.beskedTekst()));
+    st.skru(1);
+    kor(st, 0.1);
+    paastand("Boblen forsvinder efter første klik", W.document.getElementById("temp-boble").hidden);
+    kor(st, 0.5); st.skru(1); kor(st, 0.1); st.skru(1); kor(st, 0.1);
+    paastand("+ kan ikke skyde forbi 30 °C", st.T === 30 && plus.disabled);
+    kor(st, 1.5);
+    paastand("Handlingen går selv videre ved 30 °C", m2.fase() === "spm" && m2.t === 1);
+    paastand("Ved 30 °C vises 20 °C stiplet til sammenligning", st.vis().ghost);
+    svarRigtigt(m2); m2.videre(); svarRigtigt(m2); m2.videre();
+    kor(st, 0.1);
+    paastand("Opgave 3: kun − er fremme", !minus.hidden && plus.hidden && st.T === 20);
+    m2.hint(); m2.hint(); m2.hint();
+    paastand("Vis svaret på handlingen køler glasset og går videre", st.T === 10 && m2.fase() === "spm");
+    svarRigtigt(m2); m2.videre();
+    kor(st, 0.1);
+    paastand("Alle opgaver løst: Færdig, og − og + er fremme i Fri leg", m2.fase() === "faerdig" && !minus.hidden && !plus.hidden);
+    var lagret = JSON.parse(W.localStorage.getItem(D.NOEGLE + "-temp") || "{}");
+    paastand("Fremskridtet er gemt i browseren", lagret.loest && lagret.loest.every(Boolean));
+
+    /* ----- 5. Layoutet og kortets plads ------------------------------------------------ */
+    overskrift("5. Layoutet i tre størrelser");
+    var str = [[1100, 760], [1400, 860], [1920, 1080]];
+    for (var si = 0; si < str.length; si++) {
+        rydLager();
+        await genindlaes(str[si][0], str[si][1]);
+        var navn = str[si][0] + " × " + str[si][1];
+        var faner = [["fane-profil", "profil"], ["fane-temp", "temp"]];
+        for (var fi = 0; fi < faner.length; fi++) {
+            NK.visFane(faner[fi][0]);
+            await vent(150);
+            var mm = NK.sims[faner[fi][0]].m, okAlle = true, hvor = "";
+            for (var n = 0; n < 16 && mm.fase() !== "faerdig"; n++) {
+                var tr = mm.trin();
+                if (tr.svar) {
+                    var forkert = tr.svar.findIndex(function (s) { return !s.rigtig; });
+                    mm.valg(forkert); mm.indsend(); mm.hint();
+                    await vent(30);
+                    if (!kortOk(faner[fi][1])) { okAlle = false; hvor = "forkert svar " + mm.o + "." + mm.t; }
+                }
+                svarRigtigt(mm);
+                await vent(30);
+                if (!kortOk(faner[fi][1])) { okAlle = false; hvor = "rigtigt svar " + mm.o + "." + mm.t; }
+                if (mm.fase() === "bliv") mm.videre();
+            }
+            paastand(navn + ", " + faner[fi][1] + ": kortet er altid inden for sin plads", okAlle, hvor);
+            var sc = W.document.querySelector("#" + faner[fi][0] + " .scene");
+            paastand(navn + ", " + faner[fi][1] + ": ingen rullebjælke i scenen", sc.scrollHeight <= sc.clientHeight + 1 && sc.scrollWidth <= sc.clientWidth + 1);
+            var g = NK.sims[faner[fi][0]].g;
+            paastand(navn + ", " + faner[fi][1] + ": figuren er inden for scenen", g.y + g.h <= sc.clientHeight + 1 && g.x >= 0 && g.x + g.b <= sc.clientWidth + 1);
+        }
+        var st2 = NK.sims["fane-temp"];
+        if (st2.bad) {
+            var pk = W.document.getElementById("temp-plus");
+            paastand(navn + ": + står på vandbadet", parseFloat(pk.style.left) > st2.bad.x && parseFloat(pk.style.left) + 44 < st2.bad.x + st2.bad.b + 1);
+        }
+    }
+
+    overskrift("6. Fejl i konsollen");
+    paastand("Ingen undtagelser undervejs", undtagelser.length === 0, undtagelser.join(" | "));
+
+    /* Elevens fremskridt tilbage */
+    ["profil", "temp"].forEach(function (n) {
+        try {
+            if (gemt[n] === null) W.localStorage.removeItem(D.NOEGLE + "-" + n);
+            else W.localStorage.setItem(D.NOEGLE + "-" + n, gemt[n]);
+        } catch (e) {}
+    });
+    vis();
+}
+
+window.addEventListener("load", function () {
+    koer().catch(function (e) { fejl++; skriv("UNDTAGELSE " + e.message + "\n" + e.stack, "fejl"); vis(); });
+});
+</script>
+</body>
+</html>

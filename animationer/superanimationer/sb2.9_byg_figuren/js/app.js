@@ -60,7 +60,7 @@
 
     NK.naesteFaneNavn = function (id) {
         var f = naesteFaneEfter(id);
-        return f ? "Næste figur: " + f.nr + " →" : null;
+        return f ? "Næste figur: " + f.nr + " " + f.titel + " →" : null;
     };
 
     NK.naesteFane = function (id) {

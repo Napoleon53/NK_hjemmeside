@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_katalyse.js - figuren til B1.5 Katalysatorer og enzymer
+   fig_katalyse.js - figuren til B1.4 Katalysatorer og enzymer
 
    Øverst bogens enzym (substratet paa vej ned i lommen) og ved siden af
    et enzym, hvor en inhibitor sidder i lommen, saa substratet preller af.

@@ -18,6 +18,8 @@ window.NK = NK;
     /* Kapitlet og antallet af fagord i bogens liste (selvtesten tjekker det).
        Afsnittene hedder B1.1 til B1.5. */
     NK.KAPITEL = "B1";
+    /* Fanernes afsnit: B1.3 har to faner (aktiveringsenergi og temperatur), 24. nov. 2026 */
+    NK.AFSNIT = ["B1.1", "B1.2", "B1.3", "B1.3", "B1.4"];
     NK.ANTAL_FAGORD = 21;
 
     NK.FORKLARING = {
@@ -74,8 +76,8 @@ window.NK = NK;
         { id: "hastighed",   nr: "B1.1", titel: "Reaktionshastighed", hash: ["hastighed", "reaktionshastighed", "b1.1"] },
         { id: "sammenstoed", nr: "B1.2", titel: "Koncentration",      hash: ["sammenstoed", "koncentration", "hastighedsudtryk", "b1.2"] },
         { id: "aktivering",  nr: "B1.3", titel: "Aktiveringsenergi",  hash: ["aktivering", "aktiveringsenergi", "energiprofil", "b1.3"] },
-        { id: "temperatur",  nr: "B1.4", titel: "Temperatur",         hash: ["temperatur", "b1.4"] },
-        { id: "katalyse",    nr: "B1.5", titel: "Enzymer",            hash: ["katalyse", "katalysatorer", "enzymer", "b1.5"] }
+        { id: "temperatur",  nr: "B1.3", titel: "Temperatur",         hash: ["temperatur"] },
+        { id: "katalyse",    nr: "B1.4", titel: "Enzymer",            hash: ["katalyse", "katalysatorer", "enzymer", "b1.4"] }
     ];
 
     /* Foerste saetning af en forklaring (som brikken i Kort og godt) */

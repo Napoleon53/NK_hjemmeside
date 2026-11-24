@@ -78,7 +78,7 @@
         gentaget.forEach(function (o) { ok(bog.indexOf(o) >= 0 || tidligere.indexOf(o) >= 0, "det gentagne \"" + o + "\" er et fagord"); });
         Object.keys(set).forEach(function (o) { ok(bog.indexOf(o) >= 0 || tidligere.indexOf(o) >= 0, "\"" + o + "\" har en forklaring fra bogen"); });
         NK.FANER.forEach(function (f, i) {
-            var afsnitNr = NK.KAPITEL + "." + (i + 1);
+            var afsnitNr = NK.AFSNIT ? NK.AFSNIT[i] : NK.KAPITEL + "." + (i + 1);
             ok(B[f.id].def.nr === afsnitNr, f.id + " er afsnit " + afsnitNr);
         });
 

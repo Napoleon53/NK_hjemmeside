@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="300" viewBox="0 0 320 300">
+<!-- sb1.2 vandbad, forreste lag: vandet foran baegerglasset, glassets kanter og lys,
+     varmelegemets hoved og soklen med betjeningspanelet.
+     Panelet: displayet x 114-206, y 246-282. Knapbroendene: (54, 264) og (266, 264), r 24.
+     Lamperne: varme (100, 256), koel (220, 256), r 4 (taendes i js/sim_temp.js). -->
+<defs>
+  <linearGradient id="vf-vand" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#bfe2f5" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="#6fa9d2" stop-opacity="0.34"/>
+  </linearGradient>
+  <linearGradient id="vf-glans" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.38"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="vf-kant" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f4fafd"/>
+    <stop offset="1" stop-color="#b9cfdd"/>
+  </linearGradient>
+  <linearGradient id="vf-sokkel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f6f8fa"/>
+    <stop offset="0.18" stop-color="#e3e8ed"/>
+    <stop offset="0.75" stop-color="#c3cbd3"/>
+    <stop offset="1" stop-color="#a3adb7"/>
+  </linearGradient>
+  <linearGradient id="vf-panel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1d232a"/>
+    <stop offset="1" stop-color="#2e353e"/>
+  </linearGradient>
+  <linearGradient id="vf-display" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0b1412"/>
+    <stop offset="1" stop-color="#14221f"/>
+  </linearGradient>
+  <radialGradient id="vf-broend" cx="0.5" cy="0.4" r="0.6">
+    <stop offset="0" stop-color="#3a424c"/>
+    <stop offset="1" stop-color="#171b20"/>
+  </radialGradient>
+  <linearGradient id="vf-hoved" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4a5562"/>
+    <stop offset="1" stop-color="#232a32"/>
+  </linearGradient>
+</defs>
+
+<!-- Vandet foran baegerglasset: det, der staar under vandet, faar et blaat skaer -->
+<path d="M26 118 C 60 120.5, 260 120.5, 294 118 L294 220 Q294 225 289 225 L31 225 Q26 225 26 220 Z" fill="url(#vf-vand)"/>
+<!-- Vandoverfladen foran med menisk ved glasset -->
+<path d="M26 114.5 Q28 118.5 33 119.2 C 80 121.2, 240 121.2, 287 119.2 Q292 118.5 294 114.5"
+      fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.6"/>
+<path d="M33 122 C 80 124, 240 124, 287 122" fill="none" stroke="#2f6f9c" stroke-opacity="0.25" stroke-width="1.2"/>
+
+<!-- Glaskarret: tykke kanter og lys -->
+<rect x="22" y="36" width="276" height="192" rx="7" fill="none" stroke="url(#vf-kant)" stroke-width="4.5" stroke-opacity="0.9"/>
+<rect x="25.5" y="39.5" width="269" height="185" rx="5" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1"/>
+<rect x="34" y="46" width="9" height="170" rx="4.5" fill="url(#vf-glans)"/>
+<rect x="47" y="46" width="3" height="150" rx="1.5" fill="#ffffff" fill-opacity="0.16"/>
+<rect x="282" y="52" width="4" height="150" rx="2" fill="#ffffff" fill-opacity="0.18"/>
+<!-- Karrets overkant set lidt oppefra -->
+<path d="M22 37 Q22 33 27 33 H293 Q298 33 298 37" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="2"/>
+
+<!-- Varmelegemets hoved paa kanten -->
+<rect x="256" y="14" width="34" height="26" rx="6" fill="url(#vf-hoved)"/>
+<rect x="259" y="17" width="28" height="4" rx="2" fill="#ffffff" fill-opacity="0.22"/>
+<path d="M286 22 Q306 18 312 2" fill="none" stroke="#1d232a" stroke-width="4" stroke-linecap="round"/>
+
+<!-- Soklen -->
+<rect x="2" y="226" width="316" height="68" rx="12" fill="url(#vf-sokkel)"/>
+<path d="M14 227.5 H306" stroke="#ffffff" stroke-width="1.6" stroke-opacity="0.9"/>
+<rect x="2" y="226" width="316" height="68" rx="12" fill="none" stroke="#8b96a1" stroke-width="1"/>
+<!-- Foedder -->
+<rect x="18" y="292" width="34" height="6" rx="3" fill="#2a3037"/>
+<rect x="268" y="292" width="34" height="6" rx="3" fill="#2a3037"/>
+
+<!-- Betjeningspanelet -->
+<rect x="14" y="236" width="292" height="52" rx="10" fill="url(#vf-panel)"/>
+<rect x="14.5" y="236.5" width="291" height="51" rx="9.5" fill="none" stroke="#000" stroke-opacity="0.45"/>
+<path d="M24 287 H296" stroke="#ffffff" stroke-opacity="0.12"/>
+<!-- Displayet -->
+<rect x="112" y="244" width="96" height="38" rx="6" fill="#0a0f0e"/>
+<rect x="114" y="246" width="92" height="34" rx="5" fill="url(#vf-display)"/>
+<path d="M118 249 H202" stroke="#ffffff" stroke-opacity="0.10" stroke-width="2" stroke-linecap="round"/>
+<!-- Knapbroendene (knapperne er HTML-knapper oven paa) -->
+<circle cx="54" cy="262" r="24" fill="url(#vf-broend)"/>
+<circle cx="54" cy="262" r="24" fill="none" stroke="#5a636e" stroke-width="1.5"/>
+<circle cx="266" cy="262" r="24" fill="url(#vf-broend)"/>
+<circle cx="266" cy="262" r="24" fill="none" stroke="#5a636e" stroke-width="1.5"/>
+<!-- Lampernes fatninger -->
+<circle cx="96" cy="262" r="5.5" fill="#11151a" stroke="#4c5560"/>
+<circle cx="224" cy="262" r="5.5" fill="#11151a" stroke="#4c5560"/>
+</svg>

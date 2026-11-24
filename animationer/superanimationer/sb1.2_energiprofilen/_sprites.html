@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sb1.2 Energiprofilen</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    .ark { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+    figure { margin: 0; padding: 12px; background: #262833; border: 1px solid #3a3a47; border-radius: 8px; text-align: center; }
+    figure img { display: block; margin: 0 auto 8px; }
+    figcaption { font-size: 0.8rem; color: #a9b0ba; }
+    .samlet { position: relative; width: 640px; height: 680px; }
+    .samlet img { position: absolute; margin: 0; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser sprites alene og samlet, som i fane 2. Indgår ikke i animationen. -->
+<h1>sb1.2: sprites i dobbelt størrelse</h1>
+<div class="ark">
+    <figure>
+        <div class="samlet">
+            <img src="sprites/vandbad_bag.svg" style="left:0;top:72px;width:640px">
+            <img src="sprites/termometer.svg" style="left:90px;top:0;width:52px;transform-origin:26px 468px;transform:rotate(-10deg)">
+            <img src="sprites/baegerglas.svg" style="left:164px;top:80px;width:325px">
+            <img src="sprites/vandbad_for.svg" style="left:0;top:72px;width:640px">
+        </div>
+        <figcaption>samlet som i fane 2 (displayet, lamperne, søjlen og etiketten tegnes i js/sim_temp.js)</figcaption>
+    </figure>
+    <figure><img src="sprites/vandbad_bag.svg" width="320"><figcaption>vandbad_bag.svg</figcaption></figure>
+    <figure><img src="sprites/vandbad_for.svg" width="320"><figcaption>vandbad_for.svg</figcaption></figure>
+    <figure><img src="sprites/baegerglas.svg" width="260"><figcaption>baegerglas.svg</figcaption></figure>
+    <figure><img src="sprites/termometer.svg" width="52"><figcaption>termometer.svg</figcaption></figure>
+</div>
+</body>
+</html>

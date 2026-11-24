@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_oploeselighed.js - figuren til B2.7 Opløselighedsprodukt
+   fig_oploeselighed.js - figuren til B2.6 Opløselighedsprodukt
 
    Øverst bogens blyiodid-faeldning: bly(II)nitrat og kaliumiodid
    blandes og giver et gult bundfald (uden bogens lupper), og ved siden af
@@ -151,7 +151,7 @@
             pt.maal = [PBI.x + PBI.b / 2, SK.y + 10];
 
             /* Beregningen: venstresiderne staar under hinanden til hoejre ved lighedstegnet */
-            /* Som bogens eksempler i B2.7: massen i 1 L med molarmassen, og saa en
+            /* Som bogens eksempler i B2.6: massen i 1 L med molarmassen, og saa en
                tiendedel, fordi 100 mL er en tiendedel af en liter. Brugeren 2. nov.
                2026: "opløselighed skal pege ned til værdien, som har enheden g/100 mL".
                Venstresiden "opløselighed" er en streg i den graa udgave. */

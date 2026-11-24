@@ -1,0 +1,569 @@
+/* =====================================================================
+   sb1.2 - Energiprofilen. Stilark
+   Grundstellet (toplinjen, scenen, knapperne, teorien, rundvisningen,
+   papirkortets plads og opgaveraekken) er hentet fra sc5.7 24. nov. 2026.
+   Det, der er saerligt for sb1.2, staar sidst.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem).
+   ===================================================================== */
+
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #14141a;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #a9b0ba;
+    --tekst-mat:   #7e8590;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --orange:      #e6892a;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --roed:        #e05446;
+    --roed-mork:   #a33529;
+    --gul:         #f2c53d;
+    --lilla:       #9b6bd6;
+
+    --plus-lys:    #f7a79d;
+    --minus-lys:   #97cff5;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 0px;     /* 21. nov. 2026, runde 3: panelet er vaek (foer 430 og saa 300 px); opgaverne staar i raekken oeverst i scenen */
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.top h1 .ikon { font-size: 1.1rem; margin-right: 3px; color: var(--gul); }
+
+.faneknapper {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.faneknapper::-webkit-scrollbar { display: none; }
+
+.faneknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: var(--radius-lil);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.faneknap .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.faneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.faneknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+.faneknap.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
+.ikonknap {
+    background: transparent;
+    border: 1px solid #4a4a58;
+    color: var(--tekst-svag);
+    border-radius: 4px;
+    width: 30px;
+    height: 28px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: none;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.fane.aktiv { display: grid; }
+
+.scene {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--scene-bund);
+    overflow: hidden;
+}
+
+.scene > canvas { display: block; width: 100%; height: 100%; }
+
+/* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
+.anker { position: absolute; pointer-events: none; }
+
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knapper { display: flex; flex-direction: column; gap: 7px; }
+
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.knap .tegn { font-size: 1rem; flex-shrink: 0; }
+.knap.stor { padding: 11px 13px; font-size: 0.92rem; width: 100%; }
+
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+.knap.nulstil {
+    background-color: transparent;
+    border-color: #5b3b39;
+    color: #e08b81;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
+
+.knaprad { display: flex; gap: 6px; margin-top: 9px; }
+.knaprad.taet { margin-top: 0; }
+.knaprad .knap { flex: 1; justify-content: center; padding: 8px 6px; }
+
+/* Den knap, der er det naturlige naeste skridt, banker stille. */
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(61, 158, 224, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0); }
+}
+
+.knap.banker { animation: bank 1.7s ease-out infinite; }
+
+
+/* ---------------------------------------------------------------------
+   OVERLAYS: teorien
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 620px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 24px;
+}
+
+.overlay-boks.bred { max-width: 900px; }
+.overlay-boks.smal { max-width: 420px; }
+
+.overlay-boks h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--blaa); }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som i sc1.1)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.rundvisning-tal {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--tekst-mat);
+}
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.87rem; line-height: 1.5; color: #c8ced6; }
+
+.rundvisning-knapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   PAPIRKORTET OEVERST I SCENEN (brugerens valg 4. nov. 2026: alle aktive
+   animationer har papirkortet; lavet her 6. nov. 2026). Hele opgaven
+   staar paa ét kort oeverst midt i scenen: spoergsmaalet, svarene,
+   linjen med naeste skridt, Giv hint og Indsend svar, og efter svaret
+   forklaringen og Naeste (js/kort.js). Udseendet er
+   ../faelles/papirkort.css; her staar kun pladsen og opbygningen.
+   Tegningen begynder under kortets plads (D.ZONE i js/data.js).
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 4;
+    top: 46px;               /* under opgaveraekken (runde 3) */
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border-radius: 12px;
+}
+
+.scenekort .sk-tekst { margin: 0; }
+.scenekort .sk-note { margin: 4px 0 0; font-size: 0.92em; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sk-svar.lange { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.sk-knap {
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sk-knap:disabled { cursor: default; }
+
+.sk-bund { display: flex; align-items: center; justify-content: flex-end; }
+.sk-bund .st-tekst { flex: 1; min-width: 0; margin: 0; }
+.sk-bund .knap { flex: 0 0 auto; justify-content: center; font-size: 0.95rem; }
+
+/* Et forkert gaet: forklaringen i en roed boks */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.nej .st-tekst {
+    background-color: var(--pk-roed-lys);
+    border-left-color: var(--pk-roed);
+    color: var(--pk-roed-tekst);
+}
+
+/* Den sidste opgave paa fane 2: facit uden knap (Nye tal staar i panelet) */
+.sk-bund.bliv.uden-knap .st-tekst { flex: 1; }
+
+/* Start opgaven forfra staar i panelet, aldrig paa kortet */
+.knap.igen { margin-top: 10px; width: 100%; justify-content: space-between; }
+.kort.regnekort { border-left: 3px solid var(--lilla); }
+
+@media (max-height: 720px) {
+    .scenekort { top: 42px; padding: 7px 12px 8px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.93rem; }
+}
+
+@media (max-width: 700px) {
+    .sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+
+/* ---------------------------------------------------------------------
+   Opgaveraekken oeverst i scenen (21. nov. 2026, runde 3: panelet er vaek).
+   Smal og rolig: lille skrift, daempede farver, ingen versaler, saa den ikke
+   konkurrerer med kortet. Kun de loeste opgaver og den, eleven er ved, har
+   deres tema; de kommende er et laast nummer (CLAUDE.md). Under 1200 px
+   staar kun numrene, og temaet staar som vaerktoejstip og paa kortet.
+   --------------------------------------------------------------------- */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.or-opgaver, .or-niveau { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.or-niveau { padding-right: 8px; margin-right: 2px; border-right: 1px solid #343440; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-niveau .or-knap { padding: 0 9px; }
+.or-stille { margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 700; }
+
+@media (max-width: 1199px) {
+    .or-opgaver .or-navn { display: none; }
+    .or-opgaver .or-knap { padding: 0 4px; }
+}
+@media (max-height: 720px) {
+    .opgaverad { top: 6px; }
+}
+
+/* =====================================================================
+   SB1.2 ENERGIPROFILEN
+   ===================================================================== */
+
+/* Fokus med tastaturet */
+button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
+
+/* Reaktionsskemaet staar hoejt og centreret lige under kortet (regel 37) */
+.skema {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    max-width: calc(100% - 24px);
+    padding: 3px 14px;
+    color: #e9eef4;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: 1.28rem;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+}
+.skema .skema-navn { margin-left: 10px; color: #9aa3ae; font-size: 0.82em; }
+
+/* Knapperne paa apparaterne (fane 2: − og + paa vandbadet). Kun fremme,
+   naar kortet beder om dem, eller i Fri leg (regel 19a) */
+.appknap {
+    position: absolute;
+    z-index: 3;
+    width: 44px;
+    height: 44px;
+    border: 2px solid #8b95a3;
+    border-radius: 50%;
+    background-color: #f4f6f8;
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+.appknap:hover:not(:disabled) { background-color: #ffffff; border-color: #5f6a78; }
+.appknap:active:not(:disabled) { transform: scale(0.95); }
+.appknap:disabled { opacity: 0.35; cursor: default; }
+.appknap.opfordring { border-color: var(--gul); box-shadow: 0 0 0 4px rgba(242, 197, 61, 0.55), 0 2px 6px rgba(0, 0, 0, 0.45); }
+
+/* Klik-opfordringen: boble med pil (regel 19-20) */
+.boble {
+    position: absolute;
+    z-index: 3;
+    padding: 5px 10px;
+    border: 1px solid #c79a12;
+    border-radius: 8px;
+    background-color: #ffdf6b;
+    color: #33290a;
+    font-family: "Lexend", "Segoe UI", sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+}
+.boble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    margin-left: -7px;
+    border: 7px solid transparent;
+    border-bottom: 0;
+    border-top-color: #ffdf6b;
+}
+
+/* Fri leg: knappen i raekken og krydset paa kortet */
+.or-stille.aktiv { border-color: rgba(61, 158, 224, 0.75); color: #ffffff; }
+.or-stille + .or-stille { margin-left: 4px; }
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #e0b4ae;
+    border-radius: 50%;
+    background-color: #fbeceb;
+    color: #c4493c;
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: #f6d6d2; }
+
+/* Svarene paa kortet er korte: tre i en raekke, lange saetninger i to */
+.sk-svar { gap: 8px; margin-top: 8px; }
+
+.scene > canvas { touch-action: none; }

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="300" viewBox="0 0 320 300">
+<!-- sb1.2 vandbad, bageste lag: skyggen, glaskarrets bagvaeg, vandet og varmelegemet.
+     Karret: indre x 26-294, bund y 224, vandoverfladen y 118. Soklen begynder ved y 226.
+     Foran ligger baegerglasset, termometeret og vandbad_for.svg. -->
+<defs>
+  <linearGradient id="vb-vand" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#cfe9f7" stop-opacity="0.50"/>
+    <stop offset="0.55" stop-color="#9fcde9" stop-opacity="0.62"/>
+    <stop offset="1" stop-color="#78b2d8" stop-opacity="0.78"/>
+  </linearGradient>
+  <linearGradient id="vb-bagglas" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#e8f2f8" stop-opacity="0.16"/>
+    <stop offset="0.5" stop-color="#e8f2f8" stop-opacity="0.05"/>
+    <stop offset="1" stop-color="#e8f2f8" stop-opacity="0.14"/>
+  </linearGradient>
+  <linearGradient id="vb-staal" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#8d969f"/>
+    <stop offset="0.45" stop-color="#eef1f4"/>
+    <stop offset="1" stop-color="#7b848d"/>
+  </linearGradient>
+  <linearGradient id="vb-staal-v" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8d969f"/>
+    <stop offset="0.45" stop-color="#eef1f4"/>
+    <stop offset="1" stop-color="#7b848d"/>
+  </linearGradient>
+  <radialGradient id="vb-skygge" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#000" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- Skyggen under soklen -->
+<ellipse cx="160" cy="294" rx="168" ry="9" fill="url(#vb-skygge)"/>
+
+<!-- Glaskarrets bagvaeg -->
+<rect x="22" y="36" width="276" height="192" rx="7" fill="url(#vb-bagglas)"/>
+<path d="M26 40 V222" stroke="#ffffff" stroke-opacity="0.10" stroke-width="2"/>
+<path d="M294 40 V222" stroke="#ffffff" stroke-opacity="0.10" stroke-width="2"/>
+
+<!-- Vandet -->
+<path d="M26 118 C 60 120.5, 260 120.5, 294 118 L294 220 Q294 225 289 225 L31 225 Q26 225 26 220 Z" fill="url(#vb-vand)"/>
+<!-- Den bageste kant af vandoverfladen -->
+<path d="M26 118 C 60 115.5, 260 115.5, 294 118" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.4"/>
+<!-- Lyset i vandet -->
+<path d="M40 128 C 110 124, 210 124, 282 128" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="7" stroke-linecap="round"/>
+
+<!-- Varmelegemet: en U-formet staalspiral langs bunden og op i hjoernet -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M266 30 V198 Q266 204 260 204 H54 Q44 204 44 212 Q44 219 54 219 H270 Q279 219 279 210 V30"
+        stroke="#4d565f" stroke-width="7.5"/>
+  <path d="M266 30 V198 Q266 204 260 204 H54 Q44 204 44 212 Q44 219 54 219 H270 Q279 219 279 210 V30"
+        stroke="url(#vb-staal-v)" stroke-width="5.5"/>
+  <path d="M266 40 V196" stroke="url(#vb-staal)" stroke-width="5.5"/>
+  <path d="M279 40 V208" stroke="url(#vb-staal)" stroke-width="5.5"/>
+  <path d="M60 206 H258 M60 217 H266" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.2"/>
+</g>
+</svg>

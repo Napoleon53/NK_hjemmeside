@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energiprofilen</title>
+<link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
+<script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
+<script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body class="papirkort">
+
+<header class="top">
+    <h1><span class="ikon">∩</span> Energiprofilen</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-profil" role="tab" aria-selected="true"><span class="nr">1</span>Læs energiprofilen</button>
+        <button class="faneknap" data-fane="fane-temp" role="tab" aria-selected="false"><span class="nr">2</span>Temperaturen</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)" style="width:auto;padding:0 10px;">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LÆS ENERGIPROFILEN                                         -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-profil" role="tabpanel" aria-label="Læs energiprofilen">
+    <div class="scene">
+        <canvas id="profil-laerred"></canvas>
+        <div class="anker" id="profil-anker-profil"></div>
+        <div class="anker" id="profil-anker-termo"></div>
+        <div class="skema" id="profil-skema"></div>
+        <!-- Opgaveraekken: loeste og den aktuelle med navn, de kommende laaste (js/motor.js) -->
+        <nav class="opgaverad" id="profil-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="profil-prikker"></div>
+            <button class="or-knap or-stille" id="profil-forfra" type="button" title="Start opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-stille" id="profil-fri" type="button" title="Træk selv i energiprofilen">Fri leg</button>
+        </nav>
+        <!-- Papirkortet oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort spm" id="profil-skort">
+            <div id="profil-ind" aria-live="polite"></div>
+            <p class="sk-note" id="profil-note" hidden></p>
+            <div class="sk-bund tom" id="profil-bund">
+                <p class="st-tekst" id="profil-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="profil-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="profil-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="profil-bliv" hidden></div>
+        </div>
+    </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: TEMPERATUREN                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-temp" role="tabpanel" aria-label="Temperaturen">
+    <div class="scene">
+        <canvas id="temp-laerred"></canvas>
+        <div class="anker" id="temp-anker-bad"></div>
+        <div class="anker" id="temp-anker-graf"></div>
+        <div class="anker" id="temp-anker-lup"></div>
+        <div class="skema" id="temp-skema"></div>
+        <button class="appknap" id="temp-minus" type="button" title="Køl vandbadet 5 °C" aria-label="Køl 5 °C" hidden>−</button>
+        <button class="appknap" id="temp-plus" type="button" title="Varm vandbadet 5 °C" aria-label="Varm 5 °C" hidden>+</button>
+        <div class="boble" id="temp-boble" hidden></div>
+        <nav class="opgaverad" id="temp-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="temp-prikker"></div>
+            <button class="or-knap or-stille" id="temp-forfra" type="button" title="Start opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-stille" id="temp-fri" type="button" title="Skru selv på vandbadet">Fri leg</button>
+        </nav>
+        <div class="scenekort spm" id="temp-skort">
+            <div id="temp-ind" aria-live="polite"></div>
+            <p class="sk-note" id="temp-note" hidden></p>
+            <div class="sk-bund tom" id="temp-bund">
+                <p class="st-tekst" id="temp-besked" aria-live="polite" hidden></p>
+                <button class="knap hjaelp" id="temp-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="temp-indsend" type="button" hidden>Indsend svar</button>
+            </div>
+            <div id="temp-bliv" hidden></div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks teori-ark">
+        <h2>Energiprofilen</h2>
+        <p>Energiprofilen viser stoffernes energi undervejs i reaktionen. På toppen af bakken er de gamle bindinger ved at blive brudt, og de nye ved at blive dannet. Den tilstand kaldes det <b>aktiverede kompleks</b>.</p>
+        <p><b>Aktiveringsenergien</b>, Eₐ, er bakkens højde fra reaktanterne op til toppen. Jo lavere Eₐ er, jo flere sammenstød har energi nok, og jo hurtigere går reaktionen.</p>
+        <div class="eksempel">ΔH = H(produkter) − H(reaktanter)<br>ΔH &lt; 0: exoterm, energien afgives.<br>ΔH &gt; 0: endoterm, energien optages.</div>
+        <h3 class="teori-hoved">Temperaturen</h3>
+        <p>Molekylerne har forskellig energi. Når temperaturen stiger 10 °C, flytter kurven sig kun lidt, men omtrent dobbelt så mange molekyler har mere energi end Eₐ. Derfor bliver reaktionen omtrent dobbelt så hurtig.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/b/kapitler/b1-3-aktiveringsenergi.html" target="_blank" rel="noopener">B1.3 Aktiveringsenergi og temperatur</a></p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="../faelles/papirkort.js"></script>
+<script src="js/kort.js"></script>
+<script src="js/motor.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/sim_profil.js"></script>
+<script src="js/sim_temp.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
