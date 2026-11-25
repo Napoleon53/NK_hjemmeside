@@ -46,6 +46,40 @@
         c.stroke();
     };
 
+    /* Grafens flade: et svagt farveforloeb som bogens figurer */
+    T.flade = function (c, x, y, b, h) {
+        var g = c.createLinearGradient(0, y, 0, y + h);
+        g.addColorStop(0, "#f6f9f8");
+        g.addColorStop(1, "#e9f1ef");
+        c.save();
+        NK.rundtRekt(c, x, y, b, h, 8);
+        c.fillStyle = g;
+        c.fill();
+        c.restore();
+    };
+
+    /* Fyldet under en kurve: lys groenblaa, der bliver lysere nedad */
+    T.fyld = function (c, top, bund) {
+        var g = c.createLinearGradient(0, top, 0, bund);
+        g.addColorStop(0, "rgba(15, 118, 110, 0.24)");
+        g.addColorStop(1, "rgba(15, 118, 110, 0.06)");
+        return g;
+    };
+
+    /* Kurvens streg: moerk med en bloed skygge */
+    T.kurveStreg = function (c, bredde) {
+        c.save();
+        c.shadowColor = "rgba(20, 32, 31, 0.25)";
+        c.shadowBlur = 4;
+        c.shadowOffsetY = 2;
+        c.strokeStyle = T.F.blaek;
+        c.lineWidth = bredde || 3.4;
+        c.lineJoin = "round";
+        c.lineCap = "round";
+        c.stroke();
+        c.restore();
+    };
+
     T.tekst = function (c, s, x, y, opt) {
         opt = opt || {};
         c.save();
@@ -137,18 +171,38 @@
         g.addColorStop(0.45, k[1]);
         g.addColorStop(1, k[2]);
         c.save();
+        /* Bloed skygge under kuglen, som bogens kuglemodeller */
+        c.shadowColor = "rgba(20, 32, 31, 0.28)";
+        c.shadowBlur = r * 0.35;
+        c.shadowOffsetY = r * 0.14;
         c.beginPath();
         c.arc(x, y, r, 0, Math.PI * 2);
         c.fillStyle = g;
         c.fill();
+        c.restore();
+        c.save();
+        c.beginPath();
+        c.arc(x, y, r, 0, Math.PI * 2);
         c.strokeStyle = k[3];
-        c.lineWidth = 1.2;
+        c.lineWidth = 1.1;
         c.stroke();
-        c.font = T.font(Math.max(13.5, r * 0.95), 700);
+        /* Glansen oppe til venstre */
+        var gl = c.createRadialGradient(x - r * 0.42, y - r * 0.48, 0, x - r * 0.42, y - r * 0.48, r * 0.55);
+        gl.addColorStop(0, "rgba(255, 255, 255, 0.75)");
+        gl.addColorStop(1, "rgba(255, 255, 255, 0)");
+        c.fillStyle = gl;
+        c.beginPath();
+        c.arc(x, y, r, 0, Math.PI * 2);
+        c.fill();
+        c.font = T.font(Math.max(13.5, r * 1.0), 700);
         c.textAlign = "center";
         c.textBaseline = "middle";
+        c.lineWidth = 2.2;
+        c.strokeStyle = "rgba(0, 0, 0, 0.25)";
+        c.lineJoin = "round";
+        c.strokeText(sym, x, y + 1);
         c.fillStyle = "#ffffff";
-        c.fillText(sym, x, y + 0.5);
+        c.fillText(sym, x, y + 1);
         c.restore();
     };
 
@@ -156,17 +210,23 @@
     function binding(c, a, b, orden, s) {
         var dx = b.x - a.x, dy = b.y - a.y, l = Math.sqrt(dx * dx + dy * dy) || 1;
         var nx = -dy / l, ny = dx / l, af = s * 0.13;
+        var forsk = orden === 2 ? [-af, af] : (orden === 3 ? [-af * 1.5, 0, af * 1.5] : [0]);
+        var w = Math.max(3, s * (orden === 1 || orden === "del" ? 0.13 : 0.085));
         c.save();
-        c.strokeStyle = "#7d8a8e";
-        c.lineWidth = Math.max(2.4, s * 0.075);
         c.lineCap = "round";
-        var forsk = orden === 2 ? [-af, af] : (orden === 3 ? [-af * 1.4, 0, af * 1.4] : [0]);
-        if (orden === "del") c.setLineDash([s * 0.1, s * 0.09]);
+        if (orden === "del") c.setLineDash([s * 0.09, s * 0.1]);
         forsk.forEach(function (f) {
-            c.beginPath();
-            c.moveTo(a.x + nx * f, a.y + ny * f);
-            c.lineTo(b.x + nx * f, b.y + ny * f);
-            c.stroke();
+            var x1 = a.x + nx * f, y1 = a.y + ny * f, x2 = b.x + nx * f, y2 = b.y + ny * f;
+            /* En pind: moerk kant, lys kerne og en tynd glans */
+            c.strokeStyle = "#5f6b70";
+            c.lineWidth = w + 1.6;
+            c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+            c.strokeStyle = "#cdd5d9";
+            c.lineWidth = w;
+            c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+            c.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            c.lineWidth = Math.max(1, w * 0.3);
+            c.beginPath(); c.moveTo(x1 - nx * w * 0.2, y1 - ny * w * 0.2); c.lineTo(x2 - nx * w * 0.2, y2 - ny * w * 0.2); c.stroke();
         });
         c.restore();
     }
@@ -186,7 +246,7 @@
     T.molBredde = function (navn, s) {
         var m = MOL[navn], min = 0, maks = 0;
         m.a.forEach(function (a) { min = Math.min(min, a[1]); maks = Math.max(maks, a[1]); });
-        return (maks - min) * s + s * 0.9;
+        return (maks - min) * s + s * 0.78;
     };
 
     T.molekyle = function (c, navn, cx, cy, s) {
@@ -195,7 +255,29 @@
         var mid = (min + maks) / 2;
         var p = m.a.map(function (a) { return { x: cx + (a[1] - mid) * s, y: cy + a[2] * s * 0.9 }; });
         m.b.forEach(function (b) { binding(c, p[b[0]], p[b[1]], b[2], s); });
-        m.a.forEach(function (a, i) { T.atom(c, a[0], p[i].x, p[i].y, s * 0.42); });
+        m.a.forEach(function (a, i) { T.atom(c, a[0], p[i].x, p[i].y, s * 0.36); });
+    };
+
+    /* Det aktiverede kompleks i skarpe klammer med dobbeltkryds: [O=N···O···C≡O]‡ */
+    T.kompleks = function (c, cx, cy, s) {
+        T.molekyle(c, "kompleks", cx, cy, s);
+        var b = T.molBredde("kompleks", s) / 2 + s * 0.22, h = s * 0.62;
+        c.save();
+        c.strokeStyle = T.F.blaek;
+        c.lineWidth = 2;
+        c.lineJoin = "miter";
+        [-1, 1].forEach(function (side) {
+            var x = cx + side * b;
+            c.beginPath();
+            c.moveTo(x - side * s * 0.16, cy - h);
+            c.lineTo(x, cy - h);
+            c.lineTo(x, cy + h);
+            c.lineTo(x - side * s * 0.16, cy + h);
+            c.stroke();
+        });
+        c.restore();
+        T.tekst(c, "‡", cx + b + 4, cy - h + 6, { px: Math.round(s * 0.5), vaegt: 700 });
+        return b + s * 0.4;
     };
 
     /* To molekyler med + imellem, centreret om cx. Giver bredden */

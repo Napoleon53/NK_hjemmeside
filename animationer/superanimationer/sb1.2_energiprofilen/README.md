@@ -63,6 +63,13 @@ etiketten står over vandet. Glastermometeret står i vandet, og den røde søjl
 temperaturen. Samme termometer står i omgivelserne på fane 1. Luppens kant er blankt metal med
 lys i glasset. Vandets farve skifter ikke længere med temperaturen (det gør vand ikke).
 
+Tredje runde (25. nov. 2026, brugerens ja til samme tur for fane 1): Molekylerne har pinde med
+lys og skygge i stedet for streger, kuglerne har glans og skygge, og det aktiverede kompleks står i
+skarpe klammer med ‡ som i bogen. Energiprofilen og energifordelingen har en flade med et svagt
+farveforløb, et grønblåt fyld under kurven og en kurve med blød skygge (`T.flade`, `T.fyld` og
+`T.kurveStreg` i `js/tegning.js`). Teksterne for Eₐ og ΔH står ved pilens ender, så de ikke
+rammer molekylerne.
+
 ## Filerne
 
 * `js/data.js`: kemien, tallene og alle tekster (opgaver, svar, hints, forklaringer).

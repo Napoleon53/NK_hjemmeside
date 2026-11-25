@@ -120,7 +120,7 @@
             y0: top + 14, y1: top + ph - 44
         };
         var g = this.g;
-        g.s = NK.klamp(Math.min(pb / 31, ph / 12), 20, 32);   /* bindingslaengden i molekylerne */
+        g.s = NK.klamp(Math.min(pb / 26, ph / 11), 24, 42);   /* bindingslaengden i molekylerne */
         g.top = g.y0 + g.s * 2.6;                             /* toppen af bakken */
         g.bund = g.y1 - g.s * 1.7;                            /* den laveste plateau */
         var a = NK.el("profil-anker-profil");
@@ -206,6 +206,7 @@
             ret.venstre + " → " + ret.hoejre);
 
         T.papir(c, g.x, g.y, g.b, g.h);
+        T.flade(c, g.x0, g.y0 + 18, g.x1 + 30 - g.x0, g.y1 - g.y0 - 18);
         this.akser(c, v);
 
         /* Spejlingen mellem opgave 1 og 2: profilen klappes om */
@@ -240,7 +241,7 @@
         for (i = 0; i <= n; i++) { u = i / n; c.lineTo(mig.xU(u, skala), mig.yE(energi(p, u))); }
         c.lineTo(this.xU(1, skala), g.y1);
         c.closePath();
-        c.fillStyle = F.flade;
+        c.fillStyle = T.fyld(c, this.yE(p.Et), g.y1);
         c.fill();
         c.beginPath();
         for (i = 0; i <= n; i++) {
@@ -248,10 +249,7 @@
             if (i === 0) c.moveTo(mig.xU(u, skala), mig.yE(energi(p, u)));
             else c.lineTo(mig.xU(u, skala), mig.yE(energi(p, u)));
         }
-        c.strokeStyle = F.blaek;
-        c.lineWidth = 3.2;
-        c.lineJoin = "round";
-        c.stroke();
+        T.kurveStreg(c);
         c.restore();
     };
 
@@ -303,7 +301,7 @@
             T.pil(c, xa, yr, xa, yt, F.ea, 2.8);
             var tekst = this.fri ? "Eₐ = " + (p.Et - p.Er) + " kJ/mol" :
                 (v.eaTal ? "Eₐ = " + (p.Et - p.Er) + " kJ/mol" : "aktiveringsenergi, Eₐ");
-            T.tekst(c, tekst, xa - 12, yt + 22, { px: 16, just: "right", farve: F.ea, vaegt: 700, bund: "rgba(251,250,246,0.9)" });
+            T.tekst(c, tekst, xa - 12, yt - 10, { px: 16, just: "right", farve: F.ea, vaegt: 700, bund: "rgba(251,250,246,0.9)" });
             if (v.om === "Ea") T.gulRamme(c, xa - 12, yt - 6, 24, yr - yt + 12);
         }
         if (v.begge) {
@@ -318,7 +316,8 @@
         if (v.dH && p.Ep !== p.Er) {
             var farve = p.Ep < p.Er ? F.afgiv : F.optag;
             T.pil(c, xc, yr, xc, yp, farve, 2.6);
-            T.tekst(c, "ΔH = " + NK.fortegn(p.Ep - p.Er) + " kJ/mol", xc - 8, (yr + yp) / 2 + 5,
+            /* Teksten staar ved pilens begyndelse, saa den ikke rammer produkternes molekyler */
+            T.tekst(c, "ΔH = " + NK.fortegn(p.Ep - p.Er) + " kJ/mol", xc - 8, p.Ep < p.Er ? yr + 24 : yr - 10,
                 { px: 15, just: "right", farve: farve, vaegt: 700, bund: "rgba(251,250,246,0.9)" });
         }
     };
@@ -347,8 +346,9 @@
         side(v.reakt, venstre, "reaktanter", xr + 30, yr, -60);
         side(v.prod, hoejre, "produkter", this.xU(0.8), yp, 120);
         if (v.kompl) {
-            if (!this.fri) T.molekyle(c, "kompleks", xt, yt - sB * 1.15, sB * 0.92);
-            T.tekst(c, "aktiveret kompleks ‡", xt + (this.fri ? 0 : T.molBredde("kompleks", sB * 0.92) / 2 + 10), yt - (this.fri ? 14 : sB * 1.15 - 5),
+            var ks = sB * 0.86, kh = 0;
+            if (!this.fri) kh = T.kompleks(c, xt, yt - ks * 1.3, ks);
+            T.tekst(c, "aktiveret kompleks", xt + (this.fri ? 0 : kh + 8), yt - (this.fri ? 14 : ks * 1.3 - 5),
                 { px: 15, just: this.fri ? "center" : "left", farve: F.blaek, vaegt: 600 });
         }
         if (v.om === "niveauer") {

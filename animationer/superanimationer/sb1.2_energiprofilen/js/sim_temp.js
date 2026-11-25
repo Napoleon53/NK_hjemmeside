@@ -205,6 +205,7 @@
             (v.ea ? '<span class="skema-navn">Eₐ = ' + D.EA + " kJ/mol</span>" : ""));
         this.vandbad(c);
         T.papir(c, g.x, g.y, g.b, g.h);
+        T.flade(c, g.x0, g.y0, g.x1 + 14 - g.x0, g.y1 - g.y0);
         this.akser(c, v);
         if (v.ghost && Math.abs(this.Tv - D.T_START) > 0.5) this.kurve(c, D.T_START, true);
         this.kurve(c, this.Tv, false);
@@ -330,7 +331,7 @@
             c.lineTo(this.xE(VENSTRE[1]), g.y1);
             c.lineTo(g.x0, g.y1);
             c.closePath();
-            c.fillStyle = F.flade;
+            c.fillStyle = T.fyld(c, this.yF(D.f(D.RT(tc) / 2, tc)), g.y1);
             c.fill();
             c.beginPath();
             for (i = 0; i <= n; i++) {
@@ -338,10 +339,14 @@
                 if (i === 0) c.moveTo(mig.xE(E), mig.yF(D.f(E, tc))); else c.lineTo(mig.xE(E), mig.yF(D.f(E, tc)));
             }
         }
-        c.strokeStyle = ghost ? "#8a9799" : F.blaek;
-        c.lineWidth = ghost ? 2 : 3;
-        if (ghost) c.setLineDash([6, 5]);
-        c.stroke();
+        if (ghost) {
+            c.strokeStyle = "#8a9799";
+            c.lineWidth = 2;
+            c.setLineDash([6, 5]);
+            c.stroke();
+        } else {
+            T.kurveStreg(c, 3.2);
+        }
         /* Det hoejre stykke: kurven ligger paa aksen */
         if (!ghost) {
             c.setLineDash([]);
