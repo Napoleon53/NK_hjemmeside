@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_puffer.js - figuren til B6.7 Puffersystemer
+   fig_puffer.js - figuren til B6.5 Puffersystemer
 
    Oeverst bogens b6-puffer-sammenlign: 2,0 mmol HCl tilsat 100 mL rent
    vand og 100 mL af puffersystemet fra bogens eksempel (40 mmol
@@ -10,7 +10,7 @@
    af spoerger om. "100 mL puffer" er taget af.
    Nederst pufferligningen som titel paa et kort med formlen og bogens
    eksempel (4,76 + log(30/40) = 4,64). Syrestyrkeeksponent er gentaget
-   fra B6.3 (NK.GENTAGET) og peger paa pKₛ i formlen.
+   fra syrestyrken i B6.2 (NK.GENTAGET) og peger paa pKₛ i formlen.
    To fagord og ét gentaget i ét lag.
    ===================================================================== */
 (function () {

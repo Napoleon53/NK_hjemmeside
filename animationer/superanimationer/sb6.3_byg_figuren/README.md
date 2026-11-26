@@ -79,6 +79,18 @@ har ikke set den endnu.
   rosen er K_b undgået.
 - Lagenes rækkefølge og figurernes indhold er Claudes valg.
 
+## Fanerne følger bogens nye afsnit (26. nov. 2026)
+
+Bogens kapitel B6 fik færre afsnit: 25. nov. blev B6.3 Syrestyrke og B6.4 Basestyrke til B6.2 Syre- og
+basestyrke, og 26. nov. blev B6.1 Syre-basereaktioner og B6.2 Vands selvionisering og pH til B6.1 Syrer,
+baser og pH (Niels: "tilpasse kapitlets Byg figuren-animation"). Fanerne hedder nu B6.1 Syre-base, B6.1 pH,
+B6.2 Syrestyrke, B6.2 Basestyrke, B6.5 Puffere og B6.6 Titrering (`NK.AFSNIT` og `NK.FANER` i `js/data.js`). Det er
+samme løsning som i B2 og B8: to figurer pr. sammenlagt afsnit, så lagene ikke bliver for store. Adresserne
+`#b6.1`, `#b6.2`, `#b6.5` og `#b6.6` åbner afsnittets første fane, som knapperne på bogens fagordliste bruger.
+Figurerne og pladserne er uændrede. To forklaringer er rettet efter bogens fagordliste (stærk syre og
+middelstærk syre: "Et eksempel er ..."). Tabellen herover og "Bestillingen" bruger stadig de gamle numre.
+`_selvtest.html`: ALT OK (994) 26. nov. 2026.
+
 ## Filerne
 
 `svg.js`, `motor.js`, `app.js` og stilarket er de fælles filer (fra sb5.6, uændrede) og skal

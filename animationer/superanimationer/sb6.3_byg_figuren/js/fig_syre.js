@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_syre.js - figuren til B6.3 Syrestyrke
+   fig_syre.js - figuren til B6.2 Syre- og basestyrke (syrestyrken)
 
    Oeverst bogens formler for ethansyre: reaktionen med vand, udtrykket
    for Kₛ = 1,74 · 10⁻⁵ M og pKₛ = −log Kₛ = 4,76. Pladserne staar til

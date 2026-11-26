@@ -1,9 +1,9 @@
 /* =====================================================================
-   fig_base.js - figuren til B6.4 Basestyrke
+   fig_base.js - figuren til B6.2 Syre- og basestyrke (basestyrken)
 
    Oeverst bogens formler for ammoniak: reaktionen med vand, udtrykket for
    K_b = 1,78 · 10⁻⁵ M og pK_b = −log K_b = 4,75. Pladserne staar til
-   venstre for de to linjer og peger paa symbolerne (som i B6.3).
+   venstre for de to linjer og peger paa symbolerne (som i syrestyrken).
    Nederst til venstre natriumhydroxid, der opløses i vand, med Na⁺ og
    OH⁻ som kugler (bogens tekst: "Når de opløses i vand, bliver alle
    hydroxidionerne frie med det samme"). Staerk base peger paa OH⁻.

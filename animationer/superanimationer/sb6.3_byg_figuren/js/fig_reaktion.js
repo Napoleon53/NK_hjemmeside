@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_reaktion.js - figuren til B6.1 Syre-basereaktioner
+   fig_reaktion.js - figuren til B6.1 Syrer, baser og pH (syre-basereaktionerne)
 
    Oeverst bogens b6-hydronoverfoersel: ethansyre og vand som
    kuglemodeller. Den orange hydron flytter med den vinklede pil fra

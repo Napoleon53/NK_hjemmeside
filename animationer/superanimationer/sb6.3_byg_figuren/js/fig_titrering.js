@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_titrering.js - figuren til B6.8 Titrering af en svag syre
+   fig_titrering.js - figuren til B6.6 Titrering af en svag syre
 
    Til venstre opstillingen fra C-bogens titrering-opstilling (stativ,
    burette med 0,100 M NaOH, konisk kolbe med 25,0 mL 0,100 M ethansyre

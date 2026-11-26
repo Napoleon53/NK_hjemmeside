@@ -1,5 +1,5 @@
 /* =====================================================================
-   fig_ph.js - figuren til B6.2 Vands selvionisering og pH
+   fig_ph.js - figuren til B6.1 Syrer, baser og pH (vands selvionisering og pH)
 
    Oeverst til venstre bogens b6-selvionisering: to vandmolekyler som
    kuglemodeller, hvor det ene afgiver den orange hydron til det andet,
