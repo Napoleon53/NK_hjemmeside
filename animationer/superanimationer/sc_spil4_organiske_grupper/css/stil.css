@@ -717,27 +717,20 @@ main { flex: 1; position: relative; min-height: 0; }
 .klasseliste li.laast .tegn { font-size: 0.78rem; }
 .klasseliste .antal { text-align: right; font-variant-numeric: tabular-nums; color: var(--tekst-mat); font-size: 0.85rem; }
 
-.kort.toplistekort { border-left: 3px solid var(--lilla); }
-.topfaner { display: flex; gap: 4px; margin-bottom: 7px; }
-.topfane {
-    flex: 1;
-    background-color: var(--panel-2);
-    color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-radius: var(--radius-lil);
-    padding: 5px 8px;
-    font-family: inherit;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-.topfane.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
-.topliste { margin: 0; padding-left: 26px; font-size: 0.9rem; color: var(--tekst-svag); }
-.topliste li { padding: 2px 0; }
-.topliste li span { display: inline-block; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+/* Top 10 paa midterkortet: denne uge og alle tider side om side. Kortet
+   bliver bredere og staar lidt lavere, naar listen er med, og listen
+   gemmes vaek, mens Kemichael taler (saa rykker kortet ned). */
+.midterkort.med-liste { width: min(520px, 94%); top: 50%; }
+.midterkort.med-liste.laerer-taler { top: 70%; }
+.midterkort.laerer-taler .mk-liste { display: none; }
+.mk-liste { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 0 0 14px; text-align: left; }
+.mk-liste[hidden] { display: none; }
+.mk-kol h3 { margin: 0 0 5px; font-size: 0.82rem; font-weight: 700; color: var(--gul); }
+.topliste { margin: 0; padding-left: 24px; font-size: 0.85rem; color: var(--tekst-svag); }
+.topliste li { padding: 1px 0; }
+.topliste li span { display: inline-block; max-width: 68%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 .topliste li b { float: right; color: var(--tekst); font-variant-numeric: tabular-nums; }
-.topliste li.tom { list-style: none; margin-left: -26px; color: var(--tekst-mat); }
-.topliste-egen { margin: 8px 0 0; font-size: 0.8rem; color: var(--tekst-mat); }
+.topliste li.tom { list-style: none; margin-left: -24px; color: var(--tekst-mat); }
 
 /* ----- Stofklasserne (pop op) ----- */
 .overlay-boks.bred { max-width: 900px; }

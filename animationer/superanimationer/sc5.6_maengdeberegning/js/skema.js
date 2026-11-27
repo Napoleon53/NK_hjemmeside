@@ -29,6 +29,8 @@
 
     var RAEKKER = ["m", "M", "n"];
     var ETIKET = { m: "m (g)", M: "M (g/mol)", n: "n (mol)" };
+    /* Ordet over symbolet (REGELSAET 34, runde T12): "Masse" over "m (g)" */
+    var ORD = { m: "Masse", M: "Molarmasse", n: "Stofmængde" };
     var ENHED = { m: "g", M: "g/mol", n: "mol" };
     var FARVE = { kendt: "#3fae72", pil: "#2f6fc4", tekst: "#1c1f26", koef: "#d9731a" };
 
@@ -172,6 +174,14 @@
                 e.className = "skemafelt " + c.status;
                 e.innerHTML = '<span class="sf-tal">' + mig.vaerdiTekst(id) + '</span><span class="sf-enhed">' + enhed +
                     '</span><span class="sf-maerke">' + (c.status === "ok" ? "✓" : "↩") + "</span>";
+            } else if (mig.iKort) {
+                /* Svaret gives i kortet (runde T12): skemaet viser "?" med gul
+                   ramme i den celle, kortet spoerger om, og en tom stiplet
+                   plads i de andre (REGELSAET 2, 28, 38) */
+                e.className = "skemafelt " + (id === mig.spm ? "spm" : "tom");
+                e.innerHTML = id === mig.spm ? '<span class="sf-spm">?</span>' : "";
+                e.addEventListener("click", function () { if (mig.kald.klik) mig.kald.klik(id); });
+                c.input = null;
             } else if (mig.erAaben(id)) {
                 e.className = "skemafelt aktiv" + (c.forkert ? " forkert" : "");
                 e.innerHTML = '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="' + navn + ' i ' + enhed + '">' +
@@ -281,7 +291,7 @@
     /* ----- Fokus ------------------------------------------------------------------- */
     P.fokus = function () {
         var o = this.opg;
-        if (!o) return;
+        if (!o || this.iKort) return;
         var inp = null, mig = this;
         if (!o.afstemt) {
             this.koefEl.forEach(function (k) { if (!inp && !k.input.value) inp = k.input; });
@@ -444,7 +454,7 @@
             return "Læg atommasserne sammen: M(" + F + ") = (" + dele.join(" + ") + ") g/mol.";
         }
         if (c.raekke === "n" && c.fra === "m") {
-            return "n = m / M. Massen og molarmassen af " + F + " står i skemaet.";
+            return "n = " + broek("m", "M") + ". Massen og molarmassen af " + F + " står i skemaet.";
         }
         var k = this.kildeFor(c.j), K = this.stof(k).formel, kl = o.r.led[k];
         if (c.raekke === "n") {
@@ -512,14 +522,23 @@
         for (var i = 1; i < 3; i++) ctx.fillRect(xa, lay.y0 + lay.hovedH + i * lay.rh - 0.5, xb - xa, 1);
         ctx.fillRect(lay.x0 + lay.labelB - 6, lay.y0 + lay.hovedH, 1.5, 3 * lay.rh);
         /* Raekkernes navne. De slutter foer etiketten paa pilen ned i foerste
-           kolonne (/ M), saa den ikke daekker enheden. */
-        var etiketPlads = lay.midter[0] - lay.feltB / 2 - 5 - lay.rh * 0.34 - 22 - (lay.x0 + 2);
+           kolonne (· 1/M), saa den ikke daekker enheden. Ordet staar over
+           symbolet, naar der er plads (REGELSAET 34, runde T12). */
+        var etiketPlads = lay.midter[0] - lay.feltB / 2 - 5 - lay.rh * 0.34 - 24 - (lay.x0 + 2);
         var navnB = Math.max(40, Math.min(lay.labelB - 12, etiketPlads));
+        var toLinjer = lay.rh >= 34;
         RAEKKER.forEach(function (rk) {
+            var y = lay.raekkeY[rk];
             ctx.textAlign = "left";
-            NK.passendeSkrift(ctx, ETIKET[rk], navnB, NK.klamp(lay.rh * 0.34, 12, 19), 10, "700");
+            if (toLinjer) {
+                NK.passendeSkrift(ctx, ORD[rk], navnB, NK.klamp(lay.rh * 0.27, 11, 16), 9, "500");
+                ctx.fillStyle = "#4f5868";
+                ctx.fillText(ORD[rk], lay.x0 + 2, y - lay.rh * 0.17);
+                y += lay.rh * 0.17;
+            }
+            NK.passendeSkrift(ctx, ETIKET[rk], navnB, NK.klamp(lay.rh * (toLinjer ? 0.29 : 0.34), 12, 18), 10, "700");
             ctx.fillStyle = "#2a5d9c";
-            ctx.fillText(ETIKET[rk], lay.x0 + 2, lay.raekkeY[rk]);
+            ctx.fillText(ETIKET[rk], lay.x0 + 2, y);
         });
         /* Cellerne, der tegnes: de kendte tal og stregerne */
         Object.keys(o.celler).forEach(function (id) {
@@ -572,7 +591,8 @@
             if (p.slags === "ned") {
                 var xs = x - hb - 5;
                 Tg.rutePil(ctx, xs, yM + 4, xs, yN - 4, xs - lay.rh * 0.55, (yM + yN) / 2, v);
-                Tg.pilEtiket(ctx, xs - lay.rh * 0.34, (yM + yN) / 2, { tekst: "/ M" }, et);
+                /* Aldrig "/" som division (brugeren 24. nov. 2026): · 1/M med broekstreg */
+                Tg.pilEtiket(ctx, xs - lay.rh * 0.34, (yM + yN) / 2, { pre: "·", op: "1", ned: "M" }, et);
             } else if (p.slags === "op") {
                 var xo = x + hb + 5;
                 Tg.rutePil(ctx, xo, yN - 4, xo, yM + 4, xo + lay.rh * 0.55, (yM + yN) / 2, v);

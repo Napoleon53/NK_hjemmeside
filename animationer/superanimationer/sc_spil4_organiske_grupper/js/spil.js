@@ -204,7 +204,8 @@
         this.slipGreb();
         this.nyRekord = this.point > this.rekord;
         if (this.nyRekord) this.rekord = this.point;
-        this.naar("slut", { point: this.point, nyRekord: this.nyRekord, mester: this.mesterVist });
+        this.naar("slut", { point: this.point, nyRekord: this.nyRekord, mester: this.mesterVist,
+            niveau: this.niveau + 1, sekunder: this.tid });
         this.version++;
     };
 

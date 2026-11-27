@@ -428,7 +428,7 @@
                     tekst: "Hvorfor går reaktionen hurtigere ved højere temperatur?",
                     valg: [
                         { tekst: "Partiklerne bevæger sig hurtigere, så flere sammenstød har energi nok", rigtig: true,
-                          forklaring: "Der sker flere sammenstød pr. sekund, og en større del af sammenstødene har en energi over aktiveringsenergien. Se animationen 1.2 Energidiagram." },
+                          forklaring: "Der sker flere sammenstød pr. sekund, og en større del af sammenstødene har en energi over aktiveringsenergien. Se animationen 1.2 Energiprofilen." },
                         { tekst: "Der dannes mere svovl", rigtig: false,
                           forklaring: "Krydset forsvinder ved den samme mængde svovl, men svovlet dannes hurtigere." },
                         { tekst: "Koncentrationen af thiosulfat stiger", rigtig: false,

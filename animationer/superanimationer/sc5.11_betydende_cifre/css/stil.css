@@ -902,3 +902,85 @@ button:focus-visible {
 @media (max-height: 720px) {
     .scene { --kortzone: 152px; }
 }
+
+/* =====================================================================
+   URET OG DE HURTIGSTE RUNDER I BLANDET (27. nov. 2026)
+   Uret staar stille og smaat under stregerne i panelet, med hele
+   sekunder under runden og tiendedele bagefter. Listen staar i panelet
+   foer rundens foerste svar og i scenen paa resultatet; den er skjult,
+   til den faelles liste svarer.
+   ===================================================================== */
+.urrad {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: -4px 0 12px;
+    font-size: 0.9rem;
+    color: var(--tekst-mat);
+    font-variant-numeric: tabular-nums;
+}
+.urrad b { color: var(--tekst); font-weight: 700; }
+#ur-bedste b { color: var(--gul-lys); }
+
+.toplister { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; text-align: left; }
+.toplister h3 { margin: 0 0 6px; font-size: 0.86rem; font-weight: 700; color: var(--gul); white-space: nowrap; }
+.tl-liste { margin: 0; padding-left: 26px; font-size: 0.86rem; color: var(--tekst-svag); font-variant-numeric: tabular-nums; }
+.tl-liste li { padding: 1px 0; }
+.tl-liste li::marker { color: var(--tekst-mat); }
+.tl-liste li span {
+    display: inline-block;
+    max-width: calc(100% - 3.7em);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+.tl-liste li b { float: right; color: var(--tekst); font-weight: 600; }
+.tl-liste li.mig span, .tl-liste li.mig b { color: var(--gul-lys); }
+.tl-liste li.tom { list-style: none; margin-left: -26px; color: var(--tekst-mat); }
+
+/* Paa resultatet: listen og navnefeltet i scenen, hvor tavlen stod */
+.toplag {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--kortzone) + 20px);
+    bottom: 0;
+    z-index: 2;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(8px, 4vh, 36px) 22px 18px;
+}
+.toplag-boks {
+    width: min(600px, 100%);
+    background: linear-gradient(180deg, #1c1d27 0%, #13131a 100%);
+    border: 1px solid #353544;
+    border-radius: 16px;
+    padding: 16px 22px 14px;
+    box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+.toplag .toplister { gap: 26px; }
+.toplag .toplister h3 { font-size: 0.95rem; }
+.toplag .tl-liste { font-size: 0.95rem; }
+.toplag .tl-liste li { padding: 2px 0; }
+
+.tl-navn { display: flex; gap: 8px; justify-content: center; margin: 0 0 14px; }
+.tl-navn input {
+    width: 210px;
+    padding: 8px 12px;
+    border-radius: var(--radius-lil);
+    border: 2px solid #3f3f50;
+    background-color: #101016;
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 1rem;
+    text-align: center;
+    outline: none;
+}
+.tl-navn input::placeholder { color: #6a6a80; }
+.tl-navn input:focus { border-color: var(--gul); box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.18); }
+.tl-navn input:disabled { opacity: 0.6; }
+.tl-navn .knap { font-size: 0.95rem; }
+.tl-navn .knap:disabled { opacity: 0.6; cursor: default; }

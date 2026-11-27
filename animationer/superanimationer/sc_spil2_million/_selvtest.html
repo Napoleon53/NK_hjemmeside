@@ -42,7 +42,7 @@ function vis() {
 }
 
 /* Elevens eget gemmes og laegges tilbage til sidst */
-var NOEGLER = ["nk-million-rekord", "nk-million-set", "nk-million-sprog", "nk-million-lyd"];
+var NOEGLER = ["nk-million-rekord", "nk-million-set", "nk-million-sprog", "nk-million-lyd", "nk-million-tid", "nk-spil-navn"];
 var GEMT = {};
 NOEGLER.forEach(function (k) {
     try { GEMT[k] = localStorage.getItem(k); localStorage.removeItem(k); } catch (e) {}
@@ -385,7 +385,9 @@ async function tests() {
     S = A.spil();
     var liner = {};
     Array.prototype.forEach.call(d.querySelectorAll(".livline"), function (k) { liner[k.getAttribute("data-livline")] = k; });
+    var tidFoer = A.tid();
     liner.halv.click();
+    paastand("en livline koster 10 sekunder på uret", Math.abs(A.tid() - tidFoer - D.UR.straf) < 0.5 && /10 sekunder/.test(id("status").textContent));
     paastand("To væk fjerner to svar på brættet", d.querySelectorAll(".svar.fjernet").length === 2 && liner.halv.classList.contains("brugt") && liner.halv.disabled);
     liner.publikum.click();
     var viste = Array.prototype.filter.call(d.querySelectorAll(".svar .stemmer"), function (e) { return !e.hidden; });
@@ -422,7 +424,7 @@ async function tests() {
     tast("Escape");
     paastand("Esc lukker rundvisningen", !NK.Rundvisning.aktiv());
     id("regelknap").click();
-    paastand("Regler åbner reglerne med fem afsnit og genvejene", id("regler").classList.contains("vis") && id("regler-indhold").querySelectorAll("h3").length === 6);
+    paastand("Regler åbner reglerne med seks afsnit (også Tiden) og genvejene", id("regler").classList.contains("vis") && id("regler-indhold").querySelectorAll("h3").length === 7);
     tast("Escape");
     paastand("Esc lukker reglerne", !id("regler").classList.contains("vis"));
 
@@ -522,6 +524,74 @@ async function tests() {
     paastand("svarene kan være i ruderne", bredde);
     var midte = id("spoergsmaal").getBoundingClientRect(), flade = id("spilflade").getBoundingClientRect();
     paastand("brættet kan være i scenen", midte.top >= flade.top && id("hovedknap").getBoundingClientRect().bottom <= flade.bottom + 1);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("10. Uret og de hurtigste millionærer");
+    if (A.sprog() !== "da") A.saetSprog("da");
+    paastand("tiden skrives 1:23 under spillet og 1:23,4 bagefter", A.tidTekst(83.44) === "1:23" && A.tidTekst(83.44, true) === "1:23,4" &&
+        A.tidTekst(59.96, true) === "1:00,0" && A.tidTekst(7.25, true) === "0:07,3", A.tidTekst(83.44, true));
+    paastand("uret står i panelet", !!id("tid") && /^\d+:\d\d$/.test(id("tid").textContent), id("tid").textContent);
+    paastand("uret går, når svarene er fremme", A.urKoerer());
+    S = A.spil();
+    A.vaelg(Spil.aktuelt(S).rigtig);
+    A.laas();
+    paastand("uret står stille, når svaret er låst", !A.urKoerer());
+    await til(function () { return A.vist(); }, "udfaldet er vist");
+    A.videre();
+    paastand("uret står stille, mens svarene kommer frem", A.optaget() && !A.urKoerer());
+    await fremme();
+
+    /* Den faelles liste: scriptet svarer (fetch er falsk, intet sendes ud) */
+    var sendtKrop = null;
+    var falskListe = { uge: [{ navn: "Ida", sekunder: 41.3 }], alle: [{ navn: "Ida", sekunder: 41.3 }, { navn: "Mads", sekunder: 58 }] };
+    w.fetch = function (url, o) {
+        if (o && o.method === "POST") sendtKrop = JSON.parse(o.body);
+        return Promise.resolve({ json: function () { return Promise.resolve(falskListe); } });
+    };
+    NK.ingenNet = false;
+    A.genhent();
+    await til(function () { return NK.Topliste.harListe(); }, "listen svarer");
+    paastand("listen står ikke på brættet", id("titel-lister").hidden);
+    try { w.localStorage.removeItem(D.UR.noegle); } catch (e) {}
+    A.ur(70);
+    for (var n = A.spil().nr; n < 15; n++) {
+        await svar(true);
+        if (n < 14) id("hovedknap").click();
+    }
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    var minTid = Math.round(A.tid() * 10) / 10;
+    paastand("sejrskortet viser tiden", !id("slut-tid").hidden && id("slut-tid").textContent.indexOf(A.tidTekst(minTid, true)) >= 0, id("slut-tid").textContent);
+    paastand("første million er en ny bedste tid, og den står i panelet", /Ny bedste tid/.test(id("slut-maerke").textContent) &&
+        id("bedste").textContent === A.tidTekst(minTid, true));
+    await til(function () { return !id("slut-liste").hidden && /Ida/.test(id("slut-liste").textContent); }, "listen på sejrskortet");
+    paastand("sejrskortet har navnefelt, knap og de to lister", !id("navnefelt").hidden && /Sæt på listen/.test(id("listeknap").textContent) &&
+        d.querySelectorAll("#slut-liste .tl-liste").length === 2 && /0:41,3/.test(id("slut-liste").textContent) && /0:58,0/.test(id("slut-liste").textContent));
+    id("navnefelt").value = "Selvtest";
+    var lydFoer2 = L.til();
+    id("navnefelt").dispatchEvent(new w.KeyboardEvent("keydown", { key: "m", bubbles: true, cancelable: true }));
+    paastand("bogstaver i navnefeltet er ikke genveje", L.til() === lydFoer2 && A.skaerm() === "slut");
+    falskListe = { uge: [{ navn: "Selvtest", sekunder: minTid }], alle: [{ navn: "Ida", sekunder: 41.3 }, { navn: "Selvtest", sekunder: minTid }] };
+    id("navnefelt").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    await til(function () { return /Du er på listen/.test(id("listeknap").textContent); }, "tiden er sendt");
+    paastand("Enter i navnefeltet sender spil2, navnet, millionen og tiden", !!sendtKrop && sendtKrop.spil === "spil2" && sendtKrop.navn === "Selvtest" &&
+        sendtKrop.point === 1000000 && sendtKrop.niveau === 15 && sendtKrop.sekunder === minTid, JSON.stringify(sendtKrop));
+    paastand("knappen og feltet er slået fra bagefter, og navnet huskes", id("listeknap").disabled && id("navnefelt").disabled &&
+        w.localStorage.getItem("nk-spil-navn") === "Selvtest");
+    paastand("A.skaerm er stadig slutkortet (Enter i feltet startede ikke et nyt spil)", A.skaerm() === "slut");
+    var s3 = smaa();
+    paastand("ingen tekst på sejrskortet med listen er under 13 px", !s3.length, s3.join(", "));
+    var sk = id("slutkort").getBoundingClientRect();
+    paastand("sejrskortet med listen kan være i scenen uden at rulle", id("slutkort").scrollHeight <= id("slutkort").clientHeight + 1 &&
+        sk.top >= flade.top - 1 && sk.bottom <= flade.bottom + 1, Math.round(id("slutkort").scrollHeight) + " / " + Math.round(id("slutkort").clientHeight));
+
+    id("nytknap").click();
+    await svar(false);
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("et tabt spil har hverken tid eller liste", id("slut-tid").hidden && id("slut-liste").hidden);
+    NK.ingenNet = true;
+    w.fetch = function () { return Promise.reject(new Error("selvtest")); };
 }
 </script>
 </body>

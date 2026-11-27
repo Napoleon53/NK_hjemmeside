@@ -1,0 +1,37 @@
+[
+ {
+  "nr": "T12-1",
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "FeS:     { f: \"FeS\", navn: \"jernsulfid\"",
+  "ny": "FeS:     { f: \"FeS\", navn: \"jern(II)sulfid\"",
+  "hvor": "stoffets navn i alle tre faner (krukken, kortet, arket); bogens ord i C 5.5"
+ },
+ {
+  "nr": "T12-2",
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "Hvor mange gram jernsulfid dannes der af {m} g jern?",
+  "ny": "Hvor mange gram jern(II)sulfid dannes der af {m} g jern?",
+  "hvor": "den gamle opgavetekst til fane 1 (bruges ikke længere i kortet, men står i D.VEJ)"
+ },
+ {
+  "nr": "T12-3",
+  "fil": "sc5.6_maengdeberegning/js/data.js",
+  "gammel": "Hvor mange gram jernsulfid dannes der af {a} g Fe og {b} g S?",
+  "ny": "Hvor mange gram jern(II)sulfid dannes der af {a} g Fe og {b} g S?",
+  "hvor": "fane 3, Jern og svovl, opgaven"
+ },
+ {
+  "nr": "T12-4",
+  "fil": "sc5.6_maengdeberegning/index.html",
+  "gammel": "<span class=\"nr\">1</span>Vejen</button>",
+  "ny": "<span class=\"nr\">1</span>Fra gram til gram</button>",
+  "hvor": "fanens navn (REGELSAET 46; #vej virker stadig)"
+ },
+ {
+  "nr": "T12-5",
+  "fil": "sc5.6_maengdeberegning/js/skema.js",
+  "gammel": "return \"n = m / M. Massen og molarmassen af \" + F + \" står i skemaet.\";",
+  "ny": "return \"n = \" + broek(\"m\", \"M\") + \". Massen og molarmassen af \" + F + \" står i skemaet.\";",
+  "hvor": "fane 2 og 3, hintet til stofmængden: vandret brøkstreg (Niels 24. nov. 2026: aldrig / som division)"
+ }
+]

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Bundfald: selvtest</title>
+<style>
+    body { font-family: Consolas, monospace; font-size: 13px; margin: 16px; }
+    .ok { color: #1f7a4a; } .fejl { color: #b3261e; font-weight: bold; }
+    iframe { width: 1200px; height: 760px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<h1>Bundfald: selvtest</h1>
+<p>Kør over en server (iframen skal være same-origin). Slutlinjen er ALT OK eller N FEJL.</p>
+<pre id="ud"></pre>
+<iframe id="ramme" title="Spillet"></iframe>
+<script src="js/fagord.js"></script>
+<script src="js/ord.js"></script>
+<script src="js/spil.js"></script>
+<script>
+(function () {
+    "use strict";
+    var ud = document.getElementById("ud"), antalFejl = 0, antalOk = 0;
+    function skriv(t, k) { var s = document.createElement("span"); s.className = k || ""; s.textContent = t + "\n"; ud.appendChild(s); }
+    function tjek(betingelse, tekst) {
+        if (betingelse) { antalOk++; skriv("ok    " + tekst, "ok"); }
+        else { antalFejl++; skriv("FEJL  " + tekst, "fejl"); }
+    }
+    var O = NK.Ord, D = NK.Spil.D;
+    function froe(n) { return function () { n = (n * 1664525 + 1013904223) >>> 0; return n / 4294967296; }; }
+
+    /* ----- Bogens fagord ----------------------------------------------- */
+    skriv("Bogens fagord");
+    var boeger = NK.FAGORD.boeger;
+    tjek(boeger.length === 2 && boeger[0].id === "c" && boeger[1].id === "b", "C- og B-bogen er med, A-bogen ikke");
+    var alle = 0, forLange = [], ensNavne = [], skelet = [];
+    boeger.forEach(function (b) {
+        b.kapitler.forEach(function (k) {
+            var set = {};
+            k.afsnit.forEach(function (a) {
+                a.ord.forEach(function (o) {
+                    alle++;
+                    if (o[1].length > 90) forLange.push(o[0]);
+                    var n = O.norm(o[0]);
+                    if (set[n]) ensNavne.push(k.id + ": " + o[0]);
+                    set[n] = true;
+                    var sk = O.skelet(o[0]);
+                    var synlige = sk.replace(/[_\s\-\/()'’]/g, "");
+                    var ordAntal = o[0].split(" ").filter(function (d) { return (d.match(/[\p{L}\p{N}]/gu) || []).length > 2; }).length;
+                    if (synlige.length > ordAntal) skelet.push(o[0] + " -> " + sk);
+                });
+            });
+        });
+    });
+    tjek(alle > 500, alle + " fagord i alt");
+    tjek(!forLange.length, "alle brikker er højst 90 tegn" + (forLange.length ? ": " + forLange.join(", ") : ""));
+    tjek(!ensNavne.length, "intet fagord står to gange i samme liste" + (ensNavne.length ? ": " + ensNavne.join(", ") : ""));
+    tjek(!skelet.length, "hjælpen viser kun første bogstav i hvert ord" + (skelet.length ? ": " + skelet.slice(0, 5).join(" ; ") : ""));
+    var k4 = boeger[0].kapitler.filter(function (k) { return k.id === "c-kapitel-4"; })[0];
+    tjek(k4 && k4.nr === "4" && /Organisk/.test(k4.navn), "kapitel 4 hedder " + (k4 && k4.navn));
+    tjek(boeger[0].kapitler.some(function (k) { return k.id === "c-tema-klima" && k.navn === "Tema: Klima"; }), "temaerne er med");
+    var h2o = JSON.stringify(NK.FAGORD).indexOf("H₂O") >= 0, raa = /[~^*]|\]\(/.test(JSON.stringify(NK.FAGORD));
+    tjek(h2o && !raa, "forklaringerne er uden markdown (H₂O, ikke H~2~O)");
+
+    /* ----- Stavning ----------------------------------------------------- */
+    skriv("\nStavning");
+    tjek(O.norm("ikke-metal") === O.norm("Ikke Metal") && O.norm("ikkemetal") === O.norm("ikke-metal"), "store bogstaver, mellemrum og bindestreg er ligegyldige");
+    tjek(O.norm("ædelgasreglen") === O.norm("aedelgasreglen") && O.norm("øl") === O.norm("oel") && O.norm("å") === O.norm("aa"), "æ, ø og å kan skrives ae, oe og aa");
+    tjek(O.norm("H₂O") === O.norm("h2o") && O.norm("sp³-hybridiseret") === O.norm("sp3 hybridiseret"), "sænkede og hævede tal er almindelige tal");
+    var helix = O.former("α-helix");
+    tjek(helix.indexOf(O.norm("alfa-helix")) >= 0 && helix.indexOf(O.norm("a-helix")) >= 0, "α-helix kan skrives alfa-helix og a-helix");
+    tjek(O.afstand("elektron", "elektorn") === 1, "to ombyttede bogstaver er én fejl");
+
+    var saet = ["alkan", "alken", "alkyn", "elektron", "elektronegativitet", "ion", "proton", "det periodiske system", "R", "pH"];
+    var former = saet.map(O.former);
+    function find(t, mulige) { return O.find(t, mulige.map(function (m) { return saet.indexOf(m); }), former); }
+    var r = find("elektron", ["elektron", "proton"]);
+    tjek(r && saet[r.i] === "elektron" && !r.naesten, "det rigtige fagord rammer");
+    r = find("Elektorn", ["elektron"]);
+    tjek(r && saet[r.i] === "elektron" && r.naesten, "en lille stavefejl godtages og meldes som næsten");
+    r = find("elektronegativtet", ["elektronegativitet", "alkan"]);
+    tjek(r && r.naesten, "lange ord tåler en manglende bogstav");
+    tjek(find("alken", ["alkan"]) === null, "alken er ikke en stavefejl for alkan, når alken er i sættet");
+    tjek(find("alkon", ["alkan", "alken"]) === null, "lige tæt på to fagord godtages ikke");
+    tjek(find("ian", ["ion"]) === null, "korte ord skal staves rigtigt");
+    tjek(find("proton", ["elektron"]) === null, "et andet fagord i sættet er forkert");
+    r = find("det periodiske system", ["det periodiske system"]);
+    tjek(r && !r.naesten, "fagord i flere ord");
+    tjek(find("", ["alkan"]) === null && find("  - ", ["alkan"]) === null, "et tomt svar rammer intet");
+    tjek(O.skelet("det periodiske system") === "d__   p_________   s_____", "hjælpen: " + O.skelet("det periodiske system"));
+    tjek(O.skelet("R") === "_" && O.skelet("pH") === "__" && O.skelet("ikke-metal") === "i___-_____", "hjælpen afslører ikke korte ord: R, pH, ikke-metal");
+
+    /* ----- Sæt som tekst og link ---------------------------------------- */
+    skriv("\nSæt og link");
+    var s = O.fraTekst("Sæt: Prøve\nSider: Fagord\tForklaring\n\nkerne\tMidten af atomet.\nproton | Positiv partikel.\nneutron; Partikel uden ladning.\n// kommentar\nion\tLadet atom.");
+    tjek(s.navn === "Prøve" && s.ord.length === 4 && !s.fejl.length, "tabulator, lodret streg og semikolon deler; navnet læses");
+    s = O.fraTekst("kerne\tA\nKerne\tB\nuden deler");
+    tjek(s.ord.length === 1 && s.fejl.length === 2, "dobbelt fagord og manglende deler giver fejl");
+    var tekst = "Sæt: Kemibogen C: Fagord til 7.1 Syrer\nSider: Fagord\tForklaring\n\nhydron\tH⁺, en proton uden elektron.\nsyre\tStof, der kan afgive en hydron.\nbase\tStof, der kan optage en hydron.\nstærk syre\tSyre, der næsten fuldstændigt afgiver sine hydroner.";
+    var kode = O.tilLink(tekst);
+    tjek(O.fraLink(kode) === tekst, "linket giver den samme tekst igen (æ, ø, å og ⁺)");
+    tjek(/^[A-Za-z0-9_-]+$/.test(kode), "linket har kun tegn, der kan stå i en adresse");
+    tjek(O.fraLink("!!!") === null, "et ødelagt link giver null");
+
+    /* ----- Spillets regler ------------------------------------------------ */
+    skriv("\nSpillets regler");
+    function ordliste(n) {
+        var ud = [];
+        var navne = ["kerne", "elektron", "proton", "neutron", "isotoper", "atomnummer", "nukleontal", "atommasse", "skal", "periode", "hovedgruppe", "undergruppe"];
+        for (var i = 0; i < n; i++) ud.push({ ord: navne[i], tekst: "Forklaring " + i });
+        return ud;
+    }
+    function koer(sp, sek, svar) {
+        for (var t = 0; t < sek * 60; t++) {
+            sp.opdater(1 / 60);
+            if (svar) svar(sp);
+            if (sp.status !== "koerer") return t / 60;
+        }
+        return sek;
+    }
+
+    var sp = new NK.Spil(ordliste(8), { tempo: "normalt" }, froe(7));
+    var hv = [];
+    sp.haendelse = function (type, d) { hv.push(type); };
+    sp.start();
+    koer(sp, 1.2);
+    tjek(sp.aktive.length === 1 && hv.indexOf("nyt") >= 0, "den første krystal kommer efter under et sekund");
+    var k = sp.aktive[0], f0 = k.f;
+    koer(sp, 2);
+    tjek(Math.abs((k.f - f0) - 2 * (1 - k.f0) / D.FALDTID.normalt[0]) < 0.01, "farten følger faldtiden på niveau 1");
+    var fForkert = k.f;
+    var res = sp.svar("noget helt andet");
+    tjek(!res.ok && Math.abs(k.f - fForkert - D.STRAF) < 1e-9, "et forkert fagord får krystallen til at synke " + D.STRAF);
+    tjek(!k.hjaelp, "ingen hjælp før halvvejs");
+    var tidTilHjaelp = koer(sp, 30, function (x) { if (k.hjaelp) x.status = "stop"; });
+    sp.status = "koerer";
+    tjek(k.hjaelp && Math.abs(k.f - (k.f0 + D.HJAELP_VED * (sp.bund() - k.f0))) < 0.01, "hjælpen kommer halvvejs nede");
+    res = sp.svar(sp.ord[k.i].ord);
+    tjek(res.ok && res.point === D.POINT_EFTER, "efter hjælpen giver et fagord " + D.POINT_EFTER + " point");
+
+    /* Et helt spil, hvor hver krystal faar svar med det samme */
+    sp = new NK.Spil(ordliste(12), { tempo: "hurtigt" }, froe(11));
+    var niveauer = [];
+    sp.haendelse = function (type, d) { if (type === "niveau") niveauer.push(d.niveau); };
+    sp.start();
+    koer(sp, 300, function (x) { if (x.aktive.length && x.aktive[0].alder > 0.5) x.svar(x.ord[x.aktive[0].i].ord); });
+    var st = sp.statistik();
+    tjek(sp.status === "slut" && st.loest === 12 && st.stjerner === 3, "alle fagord opløst giver et klart glas og tre stjerner");
+    var forventet = 0;
+    for (var i = 1; i <= 12; i++) forventet += D.POINT_FOER + Math.min(i - 1, D.STIME_MAKS) * D.POINT_STIME;
+    tjek(st.point === forventet, "pointene: " + st.point + " (ventet " + forventet + ")");
+    tjek(niveauer.join(",") === "2,3", "nyt niveau for hver " + D.ORD_PR_NIVEAU + " fagord: " + niveauer.join(","));
+
+    /* Krystaller, der naar bunden */
+    sp = new NK.Spil(ordliste(10), { tempo: "hurtigt" }, froe(3));
+    var lagH = [];
+    sp.haendelse = function (type, d) { if (type === "lag") lagH.push(d.retning); };
+    sp.start();
+    var t1 = koer(sp, 60);
+    tjek(sp.status === "bund" && Math.abs(t1 - D.FOERSTE_EFTER - D.FALDTID.hurtigt[0]) < 0.1, "en krystal lander efter faldtiden (" + t1.toFixed(1) + " s)");
+    var landet = sp.bundKort.i;
+    tjek(!sp.afskriv("forkert ord") && sp.status === "bund", "forkert afskrift holder spillet stille");
+    tjek(sp.afskriv(sp.ord[landet].ord) && sp.lag === 1 && sp.status === "koerer", "afskriften giver et lag bundfald");
+    tjek(sp.koe.indexOf(landet) === Math.min(D.IGEN_EFTER, sp.koe.length - 1), "fagordet kommer igen efter " + D.IGEN_EFTER + " andre");
+    tjek(Math.abs(sp.bund() - (1 - D.LAG_ANDEL)) < 1e-9, "bunden er hævet et lag");
+    for (var n = 0; n < 5; n++) {
+        koer(sp, 30, function (x) { if (x.aktive.length && x.aktive[0].alder > 0.3) x.svar(x.ord[x.aktive[0].i].ord); });
+        if (sp.status === "slut") break;
+    }
+    tjek(lagH.indexOf(-1) >= 0 && sp.lag === 0, "fem rigtige i træk rører et lag op");
+
+    sp = new NK.Spil(ordliste(10), { tempo: "hurtigt" }, froe(5));
+    sp.haendelse = function () {};
+    sp.start();
+    for (n = 0; n < 5; n++) {
+        koer(sp, 60);
+        if (sp.status === "bund") sp.afskriv("", true);
+    }
+    tjek(sp.status === "fyldt" && sp.lag === D.LAG_MAKS, "fem lag fylder glasset, og spillet slutter");
+    tjek(sp.statistik().drillere.length >= 1 && sp.statistik().stjerner === 0, "et fyldt glas har drillere og ingen stjerner");
+
+    sp = new NK.Spil(ordliste(12), { tempo: "roligt" }, froe(9));
+    sp.haendelse = function () {};
+    sp.baner = 3;
+    sp.start();
+    sp.niveau = 6;
+    koer(sp, 40, function (x) { if (x.aktive.length >= 3) x.status = "stop"; });
+    var baner = sp.aktive.map(function (x) { return x.bane; }).sort().join(",");
+    tjek(sp.aktive.length === 3 && baner === "0,1,2", "på niveau 6 er der tre krystaller i hver sin bane");
+    sp.status = "koerer";
+    sp.baner = 2;
+    tjek(sp.samtidig() === 2, "en smal scene tager højst to ad gangen");
+
+    /* ----- Siden ------------------------------------------------------------ */
+    skriv("\nSiden");
+    var ramme = document.getElementById("ramme");
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function ventPaa(f, ms) {
+        var slut = Date.now() + (ms || 5000);
+        return new Promise(function (r) {
+            (function igen() { var v = f(); if (v || Date.now() > slut) r(v); else setTimeout(igen, 50); })();
+        });
+    }
+    function slutt() { skriv("\n" + (antalFejl ? antalFejl + " FEJL" : "ALT OK") + " (" + antalOk + " tjek)", antalFejl ? "fejl" : "ok"); }
+
+    try { localStorage.removeItem("nk-bundfald"); } catch (e) {}
+    ramme.src = "index.html#c4";
+    ramme.onload = async function () {
+        try {
+            var w = ramme.contentWindow, d = ramme.contentDocument;
+            await ventPaa(function () { return d.getElementById("mk-start"); });
+            tjek(w.NK.app.V.fane === "c" && /43 fagord/.test(d.querySelector(".mk-antal").textContent), "#c4 vælger kapitel 4 i Kemi C (" + d.querySelector(".mk-antal").textContent + ")");
+            tjek(d.querySelector(".kapitel.valgt .kap-nr").textContent === "4", "kapitel 4 er markeret");
+            d.querySelector('[data-handling=kapitel][data-v="c-kapitel-4"]').click();
+            tjek(d.getElementById("mk-start").classList.contains("mat"), "uden fagord er Start spil mat");
+            d.getElementById("mk-start").click();
+            tjek(d.getElementById("mk-trin1").classList.contains("blink"), "Start uden fagord får trin 1 til at blinke");
+            d.querySelector('[data-handling=kapitel][data-v="c-kapitel-1"]').click();
+            d.getElementById("mk-start").click();
+            var sp2 = w.NK.app.spil();
+            tjek(sp2 && sp2.status === "koerer" && d.getElementById("midterkort").hidden, "Start spil starter med de valgte fagord (" + (sp2 && sp2.n) + ")");
+            await ventPaa(function () { return sp2.aktive.length; }, 4000);
+            tjek(d.querySelectorAll(".krystal").length === 1, "den første krystal står i glasset");
+            var kr = d.querySelector(".krystal");
+            var r1 = kr.getBoundingClientRect(), sc = d.getElementById("scene").getBoundingClientRect();
+            tjek(r1.top > sc.top && r1.bottom < sc.bottom && r1.left > sc.left && r1.right < sc.right, "krystallen er inde i scenen");
+            var ordet = sp2.ord[sp2.aktive[0].i].ord;
+            w.NK.app.svar(ordet);
+            tjek(sp2.antalLoest === 1 && /Rigtigt/.test(d.getElementById("svarbesked").textContent), "et rigtigt svar opløser krystallen");
+            tjek(d.querySelectorAll("#loest-liste .chip").length === 1, "fagordet står under Opløst i panelet");
+            await ventPaa(function () { return sp2.aktive.length; }, 4000);
+            w.NK.app.pause();
+            tjek(sp2.status === "pause" && !d.getElementById("midterkort").hidden, "pause viser pausekortet");
+            var fPause = sp2.aktive[0].f;
+            await vent(400);
+            tjek(sp2.aktive[0].f === fPause, "intet synker under pausen");
+            w.NK.app.fortsaet();
+            tjek(sp2.status === "koerer", "Fortsæt");
+            sp2.aktive[0].f = sp2.bund() - 0.001;
+            await ventPaa(function () { return sp2.status === "bund"; }, 2000);
+            tjek(!d.getElementById("bundkort").hidden && d.getElementById("bk-ord").textContent === sp2.ord[sp2.bundKort.i].ord, "en krystal på bunden viser fagordet");
+            d.getElementById("bk-felt").value = sp2.ord[sp2.bundKort.i].ord;
+            d.getElementById("bk-knap").click();
+            tjek(sp2.lag === 1 && d.getElementById("bundkort").hidden && d.querySelectorAll("#drillede-liste .chip").length === 1, "afskriften giver et lag, og fagordet står under Drillede");
+            /* Linket fra bogen */
+            ramme.onload = async function () {
+                try {
+                    var w2 = ramme.contentWindow, d2 = ramme.contentDocument;
+                    await ventPaa(function () { return d2.getElementById("mk-start"); });
+                    tjek(w2.NK.app.V.fane === "link" && w2.NK.app.V.link.ord.length === 4, "#kort=...&parring fra bogen åbner med sættet");
+                    tjek(d2.querySelector(".mk-linknavn").textContent === "Kemibogen C: Fagord til 7.1 Syrer", "sættets navn står på kortet");
+                    var lang = w2.NK.app.V.link.ord.filter(function (o) { return o.lang; }).length;
+                    skriv("      (" + lang + " af 4 fagord fik den lange forklaring fra bogens lister)");
+                } catch (e) { tjek(false, "undtagelse: " + e); }
+                slutt();
+            };
+            ramme.src = "index.html?ny#kort=" + kode + "&parring";
+        } catch (e) { tjek(false, "undtagelse: " + e); slutt(); }
+    };
+}());
+</script>
+</body>
+</html>

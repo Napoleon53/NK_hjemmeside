@@ -128,6 +128,28 @@ fortsætter, hvor den slap, ved næste spørgsmål. Styrken er `D.MUSIK.styrke`
 (0,4, sat efter tal, ikke efter øret). Knappen med højttaleren og `M` slår al
 lyd til og fra, og valget huskes.
 
+## Uret og de hurtigste millionærer (27. nov. 2026)
+
+Niels: "Måske millionær med en timer .. hvor man speedrunner det?"
+
+* **Uret** (`D.UR`, `urTrin` i `js/app.js`) går kun, mens alle fire svar står
+  fremme, og svaret ikke er låst. Beskrivelsen alene, svarene, der kommer frem,
+  ventetiden efter låsen og udfaldet tæller ikke. Spørgsmålet, om man vil
+  stoppe, tæller med, så S ikke kan bruges som pause. Hver livline koster 10 s
+  (`D.UR.straf`), og statuslinjen siger det. Ingen tikkelyd.
+* **Panelet** har fire tal: Sikret, Tid (hele sekunder under spillet, så det
+  ikke flimrer), Rekord (største gevinst) og Bedste tid (hurtigste million i
+  browseren, `nk-million-tid`).
+* **Listen** er det fælles script (`.claude/highscore/highscore.gs`, spillet
+  `spil2`, laveste tid vinder, kun en vundet million, mindst 8 s). Den står på
+  titelskærmen under Start og på sejrskortet med navnefeltet og **Sæt på
+  listen** (Enter i feltet sender; bogstaver i feltet er ikke genveje). Navnet
+  huskes i `nk-spil-navn` som på samlebåndet. Svarer scriptet "ukendt spil",
+  før den nye version er lagt op, ser spillet ud som før. Under 820 px højde
+  gemmes rosen på sejrskortet, så kortet med listen kan ses uden at rulle.
+* Selvtesten (afsnit 10) prøver uret, tidsformatet og listen med en falsk
+  `fetch`; den sender aldrig noget ud.
+
 ## Filer
 
 | Fil | Indhold |
@@ -140,7 +162,8 @@ lyd til og fra, og valget huskes.
 | `js/lyd.js` | lydene, spillets egen baggrund og musik fra filer |
 | `js/visning.js` | stigen, ruderne, livlinerne, slutkortet, lyset og konfettien |
 | `js/rundvisning.js` | rundvisningen bag ? |
-| `js/app.js` | forløbet, knapperne og tastaturet |
+| `js/app.js` | forløbet, knapperne, tastaturet og uret |
+| `js/topliste.js` | den fælles liste over de hurtigste millionærer |
 | `sprites/emblem.svg` | spillets eget emblem: en kolbe med guld i en benzenring |
 | `_selvtest.html` | udviklerværktøj, se nedenfor |
 

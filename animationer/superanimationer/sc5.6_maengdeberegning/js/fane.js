@@ -427,19 +427,19 @@
             if (this.venter) { this.venter = false; this.visKort(); }
             s.aktiv = id;
             var res = s.tjek(id, s.skrevet(id));
-            if (res.tom) { this.kortBesked(NK.html(res.besked), 3.5); this.blinkKort(); this.fokus(); return; }
+            if (res.tom) { this.kortBesked(NK.Tjek.htmlBesked(res.besked), 3.5); this.blinkKort(); this.fokus(); return; }
             if (res.ok) { this.celleLoest(id, "ok"); return; }
             s.markerForkert(id);
-            this.fejlLinje(NK.html(res.besked));
+            this.fejlLinje(NK.Tjek.htmlBesked(res.besked));
             this.fokus();
         };
 
         P.tjekAfstem = function () {
             var res = this.skema.tjekKoef();
-            if (res.tom) { this.kortBesked(NK.html(res.besked), 3.5); this.blinkKort(); return; }
+            if (res.tom) { this.kortBesked(NK.Tjek.htmlBesked(res.besked), 3.5); this.blinkKort(); return; }
             if (res.ok) { this.afstemt("ok"); return; }
             this.skema.rystKoef();
-            this.fejlLinje(NK.html(res.besked));
+            this.fejlLinje(NK.Tjek.htmlBesked(res.besked));
         };
 
         P.afstemt = function (maade) {

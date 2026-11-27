@@ -25,6 +25,16 @@
    hedder knappen Se resultatet, og kortet viser runden med Videre til
    den naeste fane. Ny runde staar kun i panelet (og tasten R), aldrig
    paa kortet. Efter et forkert svar lyser den gule knap stille op.
+
+   Uret i Blandet (27. nov. 2026): det gaar, mens en opgave venter paa
+   et svar, fra opgaven er set (efter den korte glidning ind), til den er
+   loest. Forklaringen efter et svar og resultatet taeller ikke. Uret
+   gaar ogsaa, hvis eleven kigger paa en anden fane eller teorien midt i
+   en opgave, saa det ikke kan bruges som pause. Et forkert foerste svar,
+   et hint og Vis svaret koster D.UR.straf sekunder hver. Den faelles
+   liste (js/topliste.js) staar i panelet, foer rundens foerste svar, og
+   i scenen paa resultatet med navnefeltet; den er skjult, til scriptet
+   svarer med en liste.
    ===================================================================== */
 (function () {
     "use strict";
@@ -50,9 +60,27 @@
     function nuller(n) { return n > 0 ? new Array(n + 1).join("0") : ""; }
     function el(id) { return NK.el(id); }
 
+    /* ----- Uret ----------------------------------------------------------------------- */
+    function nu() { return window.performance && performance.now ? performance.now() : Date.now(); }
+
+    /* 83,4 s -> "1:23" under runden eller med tiendedele "1:23,4" bagefter */
+    function tidTekst(s, tiendedele) {
+        var t = tiendedele ? Math.round(s * 10) / 10 : Math.floor(s);
+        var m = Math.floor(t / 60), sek = t - m * 60;
+        var st = tiendedele ? sek.toFixed(1) : String(Math.floor(sek));
+        if (sek < 10) st = "0" + st;
+        return m + ":" + st.replace(".", ",");
+    }
+    NK.tidTekst = tidTekst;
+
+    function bedsteTid() { return Number(NK.hent(D.UR.noegle, 0)) || 0; }
+
     function Fane(id) {
         this.id = id;
         this.def = D.FANER[id];
+        this.paaTid = id === "blandet";          /* kun Blandet har uret og listen */
+        this.topLister = null;                    /* { uge, alle } fra den faelles liste */
+        this.listeSpurgt = false;
         var gemt = NK.hent(NOEGLE_VALG, {}) || {};
         this.valg = this.def.valg ? (gemt[id] || this.def.valg[0].id) : null;
         this.niveau = this.def.niveauer ? (gemt[id + "-niveau"] || "let") : null;
@@ -71,8 +99,59 @@
     P.nyRunde = function () {
         this.runde = { nr: 0, status: [], log: [], enCiffer: false, slut: false };
         this.resultat = false;
+        /* Uret: tid er de sekunder, uret har gaaet, straf er fejl og hjaelp,
+           fra er tidspunktet, hvor den nye opgave er gledet ind, og set er
+           sand, naar opgaven har vaeret vist paa fanen */
+        this.ur = { tid: 0, straf: 0, sidst: nu(), fra: 0, set: false, slut: 0 };
+        this.liste = { sender: false, sendt: false, fejl: false, navnSat: false, navn: "" };
         this.lavOpgave();
     };
+
+    /* ----- Uret (kun Blandet) -------------------------------------------------------------- */
+    /* Uret gaar, mens en opgave venter paa et svar */
+    P.urKoerer = function () {
+        return this.paaTid && this.ur.set && !this.loest && !this.resultat && !this.runde.slut;
+    };
+
+    /* Kaldes foer hver aendring af tilstanden, saa tiden indtil nu regnes
+       med den tilstand, der gjaldt (som i Kemi-Millionaer) */
+    P.urTrin = function () {
+        var t = nu(), u = this.ur;
+        if (this.urKoerer()) u.tid += Math.max(0, t - Math.max(u.sidst, u.fra)) / 1000;
+        u.sidst = t;
+    };
+
+    /* Den samlede tid med straf. Efter runden er det den gemte sluttid. */
+    P.tid = function () {
+        if (!this.paaTid) return 0;
+        if (this.runde.slut) return this.ur.slut;
+        this.urTrin();
+        return this.ur.tid + this.ur.straf;
+    };
+
+    P.straf = function () {
+        if (!this.paaTid) return false;
+        this.urTrin();
+        this.ur.straf += D.UR.straf;
+        return true;
+    };
+
+    /* Opgaven er paa skaermen: uret begynder, og listen hentes foerste gang */
+    P.urSe = function () {
+        if (!this.paaTid) return;
+        if (!this.ur.set) {
+            this.urTrin();
+            this.ur.set = true;
+            this.ur.fra = nu();
+        }
+        if (!this.listeSpurgt) {
+            this.listeSpurgt = true;
+            this.hentLister();
+        }
+    };
+
+    /* Til selvtesten: laegger s sekunder til uret */
+    P.urLaeg = function (s) { this.urTrin(); this.ur.tid += s; };
 
     /* Ny runde fra panelet eller tasten R (aldrig fra kortet) */
     P.forfra = function () {
@@ -84,6 +163,13 @@
     };
 
     P.lavOpgave = function () {
+        if (this.paaTid) {
+            /* Uret venter, mens den nye opgave glider ind (animerNy) */
+            this.urTrin();
+            var vist = this.aktiv();
+            this.ur.set = vist;
+            this.ur.fra = nu() + (vist ? D.UR.glid * 1000 : 0);
+        }
         var type = this.def.typer(this.valg);
         this.opg = C.lav(type, this.runde, { foran: this.id === "tael" && this.runde.nr === 0, niveau: this.niveau });
         /* Svaret starter altid som almindeligt tal, saa 10-feltet ikke
@@ -106,6 +192,7 @@
        resultatet og derfra den naeste fane. Den begynder aldrig forfra. */
     P.naeste = function () {
         if (this.resultat) { this.videre(); return; }
+        if (this.paaTid) this.urTrin();
         if (this.runde.slut) {
             this.resultat = true;
             this.saetBesked("", "");
@@ -215,17 +302,21 @@
         if (r.tom) { this.saetBesked(r.besked, ""); this.fokus(); return; }
         if (r.ok) { this.loes("ok", r); return; }
         this.fejl++;
-        this.saetBesked(r.besked, "skidt");
+        /* I Blandet koster et forkert foerste svar tid */
+        var straf = this.fejl === 1 && this.straf();
+        this.saetBesked(r.besked + (straf ? " " + NK.html(D.UR.strafTekst) : ""), "skidt");
         this.ryst();
         this.fokus();
     };
 
-    /* Den gule knap paa kortet: Giv hint, saa Vis svaret */
+    /* Den gule knap paa kortet: Giv hint, saa Vis svaret. I Blandet koster
+       begge tid. */
     P.knap = function () {
         if (this.loest || this.resultat) { this.naeste(); return; }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.saetBesked('<span class="b-maerke">Hint</span>' + C.hint(this.opg), "gul");
+            var straf = this.straf();
+            this.saetBesked('<span class="b-maerke">Hint</span>' + C.hint(this.opg) + (straf ? " " + NK.html(D.UR.strafTekst) : ""), "gul");
             this.visKnapper();
             this.fokus();
             return;
@@ -235,6 +326,8 @@
 
     P.loes = function (maade, r) {
         var o = this.opg;
+        if (this.paaTid) this.urTrin();
+        var straf = maade === "svar" && this.straf();
         this.loest = true;
         this.vist = maade === "svar";
         var status = this.vist ? "vist" : (this.fejl || this.hjaelp ? "hjulpet" : "rigtig");
@@ -255,7 +348,7 @@
                 this.mant = C.skillerum(C.almindelig(o.facit));
                 this.eksp = "";
             }
-            this.blivTekst = C.svar(o);
+            this.blivTekst = C.svar(o) + (straf ? " " + NK.html(D.UR.strafTekst) : "");
         } else {
             /* Rosen er maerket foran forklaringen; den staar kun paa dette kort */
             this.rosOrd = NK.tilfaeldig(D.ROS).replace(/\.$/, "");
@@ -278,6 +371,15 @@
         if (this.id === "blandet") {
             var rek = NK.hent(NOEGLE_REKORD, 0) || 0;
             if (r > rek) NK.gem(NOEGLE_REKORD, r);
+        }
+        /* Uret staar: tiden med straf, elevens egen bedste tid og en frisk liste */
+        if (this.paaTid) {
+            this.urTrin();
+            this.ur.slut = Math.round((this.ur.tid + this.ur.straf) * 10) / 10;
+            var bedste = bedsteTid();
+            this.runde.nyTid = !bedste || this.ur.slut < bedste;
+            if (this.runde.nyTid) NK.gem(D.UR.noegle, this.ur.slut);
+            this.hentLister();
         }
         /* Et enhedsniveau er klaret med mindst D.OPLAAS rigtige i foerste
            forsoeg. Er Let, Middel og Svær klaret, er Meget svær aaben. */
@@ -317,6 +419,8 @@
     P.hopTrin = function () { return this.hop ? Math.abs(this.hop.c - this.hop.c0) : 0; };
 
     P.opdater = function (dt) {
+        /* Uret i panelet: hele sekunder, saa teksten kun skifter én gang i sekundet */
+        if (this.paaTid && this.aktiv()) NK.saetTekst("ur-tid", tidTekst(this.tid(), this.runde.slut));
         if (this.kortT > 0) {
             this.kortT -= dt;
             if (this.kortT <= 0) { this.kortT = 0; this.visBesked(); }
@@ -350,12 +454,14 @@
 
     P.vis = function () {
         if (!this.aktiv()) return;
+        this.urSe();
         this.visKort();
         this.visTavle();
         this.visSvarrad();
         this.visMaaler();
         this.visBesked();
         this.visPanel();
+        this.visListe();
     };
 
     /* ----- Papirkortet -------------------------------------------------------------------
@@ -379,6 +485,10 @@
             var t = "<b>" + rig + " af " + D.RUNDE + "</b> rigtige i første forsøg. " + D.SLUT(rig, D.RUNDE);
             if (this.id === "blandet" && rig === D.RUNDE) t += " " + D.TI_AF_TI;
             if (this.runde.laastOp) t += " <b>" + D.LAAST_OP + "</b>";
+            if (this.paaTid) {
+                t += " " + D.DIN_TID(tidTekst(this.ur.slut, true), this.ur.straf);
+                if (this.runde.nyTid) t += " <b>" + NK.html(D.NY_BEDSTE) + "</b>";
+            }
             return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">Runden er slut</span>' + t + "</p>" +
                 (n ? '<button type="button" class="sk-videre" data-videre="1">Videre til ' + NK.html(D.FANER[n].navn) + " →</button>" : "") + "</div>";
         }
@@ -682,6 +792,80 @@
         var rekord = NK.hent(NOEGLE_REKORD, 0) || 0;
         rek.hidden = !(this.id === "blandet" && rekord > 0);
         if (!rek.hidden) rek.innerHTML = "Rekord: <b>" + rekord + " af " + D.RUNDE + "</b>";
+
+        /* Uret under stregerne, med elevens egen bedste tid */
+        el("urrad").hidden = !this.paaTid;
+        if (this.paaTid) {
+            NK.saetTekst("ur-tid", tidTekst(this.tid(), this.runde.slut));
+            var bt = bedsteTid();
+            el("ur-bedste").hidden = !bt;
+            if (bt) NK.saetTekst("ur-bedste-tal", tidTekst(bt, true));
+        }
+    };
+
+    /* ----- De hurtigste runder i Blandet ------------------------------------------------
+       Listen staar i panelet, foer rundens foerste svar, og i scenen paa
+       resultatet (i stedet for tavlen) med navnefeltet og Saet paa listen.
+       Den er skjult, til scriptet svarer med en liste. */
+    P.hentLister = function () {
+        if (!this.paaTid || !NK.Topliste || !NK.Topliste.kanSpoerge()) return;
+        var mig = this;
+        NK.Topliste.hent().then(function (d) {
+            if (d) mig.topLister = d;
+            else if (!NK.Topliste.harListe()) mig.topLister = null;
+            mig.visListe();
+        });
+    };
+
+    P.harListe = function () {
+        return this.paaTid && !!this.topLister && !!NK.Topliste && NK.Topliste.harListe();
+    };
+
+    function listeHTML(liste, mit) {
+        if (!liste || !liste.length) return '<li class="tom">' + NK.html(D.LISTE.ingen) + "</li>";
+        return liste.map(function (r) {
+            var mig = mit && String(r.navn).toLowerCase() === mit.toLowerCase();
+            return "<li" + (mig ? ' class="mig"' : "") + "><span>" + NK.html(r.navn) + "</span><b>" +
+                tidTekst(Number(r.sekunder) || 0, true) + "</b></li>";
+        }).join("");
+    }
+
+    P.visListe = function () {
+        if (!this.aktiv()) return;
+        var har = this.harListe();
+        var start = har && !this.resultat && !this.runde.status.length;
+        var slut = har && this.resultat;
+        el("toppanel").hidden = !start;
+        el("toplag").hidden = !slut;
+        el("arbejde").hidden = slut;
+        if (!start && !slut) return;
+        var l = this.liste, lister = this.topLister, mit = l.sendt ? l.navn : "";
+        Array.prototype.forEach.call(document.querySelectorAll(".tl-liste[data-liste]"), function (ol) {
+            var html = listeHTML(lister[ol.getAttribute("data-liste")], mit);
+            if (ol.innerHTML !== html) ol.innerHTML = html;
+        });
+        if (!slut) return;
+        var felt = el("navnefelt"), knap = el("listeknap");
+        if (!l.navnSat) { felt.value = NK.Topliste.navn(); l.navnSat = true; }
+        knap.textContent = l.sender ? D.LISTE.sender : (l.sendt ? D.LISTE.sendt : (l.fejl ? D.LISTE.igen : D.LISTE.send));
+        knap.disabled = felt.disabled = l.sender || l.sendt;
+    };
+
+    /* Saet paa listen (knappen eller Enter i navnefeltet): kun en hel runde,
+       og kun én gang pr. runde */
+    P.saetPaaListen = function () {
+        var l = this.liste, runde = this.runde, mig = this;
+        if (!this.resultat || !runde.slut || runde.status.length < D.RUNDE || l.sender || l.sendt || !this.harListe()) return;
+        var navn = el("navnefelt").value;
+        NK.Topliste.navn(navn);
+        l.sender = true;
+        l.fejl = false;
+        this.visListe();
+        NK.Topliste.send({ navn: navn, sekunder: this.ur.slut, rigtige: this.rigtige(), opgaver: D.RUNDE }).then(function (d) {
+            l.sender = false;
+            if (d) { mig.topLister = d; l.sendt = true; l.navn = NK.Topliste.rens(navn) || "Anonym"; } else l.fejl = true;
+            if (mig.runde === runde) mig.visListe();
+        });
     };
 
     /* Opgaven kort, til listen over runden */

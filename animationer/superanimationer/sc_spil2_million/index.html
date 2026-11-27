@@ -43,6 +43,11 @@
                 <p class="undertitel" id="undertitel"></p>
                 <ul class="chips" id="chips"></ul>
                 <button class="guldknap stor" id="startknap" type="button"><span id="start-tekst">Start spillet</span> <kbd>Enter</kbd></button>
+                <!-- De hurtigste millionaerer: vises, naar den faelles liste svarer (js/topliste.js) -->
+                <div class="toplister titel-lister" id="titel-lister" hidden>
+                    <div><h3 class="tl-uge-titel"></h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                    <div><h3 class="tl-alle-titel"></h3><ol class="tl-liste" data-liste="alle"></ol></div>
+                </div>
             </div>
 
             <!-- ================= SPILLET ============================ -->
@@ -105,6 +110,17 @@
                     <p class="slut-beloeb" id="slut-beloeb"></p>
                     <p class="slut-ekstra" id="slut-ekstra"></p>
                     <blockquote class="slut-ros" id="slut-ros" hidden></blockquote>
+                    <p class="slut-tid" id="slut-tid" hidden></p>
+                    <div class="slut-liste" id="slut-liste" hidden>
+                        <div class="sl-navn">
+                            <input type="text" id="navnefelt" maxlength="20" autocomplete="off" spellcheck="false">
+                            <button class="knap blaa" id="listeknap" type="button"></button>
+                        </div>
+                        <div class="toplister">
+                            <div><h3 class="tl-uge-titel"></h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                            <div><h3 class="tl-alle-titel"></h3><ol class="tl-liste" data-liste="alle"></ol></div>
+                        </div>
+                    </div>
                     <button class="guldknap stor" id="nytknap" type="button"><span id="nyt-tekst">Nyt spil</span> <kbd>Enter</kbd></button>
                 </div>
             </div>
@@ -121,7 +137,9 @@
         <div class="kort talkort" id="talkort">
             <div class="tal2">
                 <div id="sikret-boks"><small id="sikret-etiket">Sikret</small><b id="sikret">0 kr.</b></div>
+                <div id="tid-boks"><small id="tid-etiket">Tid</small><b id="tid">0:00</b></div>
                 <div><small id="rekord-etiket">Rekord</small><b id="rekord">ingen</b></div>
+                <div id="bedste-boks"><small id="bedste-etiket">Bedste tid</small><b id="bedste">ingen</b></div>
             </div>
         </div>
     </aside>
@@ -161,6 +179,7 @@
 <script src="js/data.js"></script>
 <script src="js/spil.js"></script>
 <script src="js/lyd.js"></script>
+<script src="js/topliste.js"></script>
 <script src="js/visning.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

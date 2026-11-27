@@ -35,7 +35,7 @@ eleven altid kan finde hjælpen selv.
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
-| 1 | Vejen | udfylder tre felter: n af det kendte, n af det søgte og m af det søgte | pulver bliver til poser med 1 mol, poserne går gennem pilen i forholdet, og det nye stof vejes |
+| 1 | Fra gram til gram (før Vejen; `#vej` virker stadig) | svarer i kortet på tre opgaver, ét felt i skemaet ad gangen (se "Runde T12" nederst) | pulver bliver til poser med 1 mol, poserne går gennem pilen i forholdet, og det nye stof vejes |
 | 2 | Skemaet | afstemmer, regner molarmasserne og udfylder hele skemaet, trinvis eller frit | skemaet som i en rapport; massen er bevaret |
 | 3 | Begrænsende mængde | regner to stofmængder, vælger hvem der slipper op først, og regner produktet | poserne reagerer i hele sæt, og resten ligger tilbage |
 
@@ -131,7 +131,8 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, tavlen, krukken, vægten, pulveret, posen med 1 mol, pilene og skålvægten
 js/skema.js         skemaet på tavlen: modellen for hver celle, felterne, pilene, hint og beregninger
 js/fane.js          det, fanerne deler: opgavelisten, knappen, tjekket, linjen i kortet og hintene
-js/sim_vej.js       fane 1
+js/vej_opgaver.js   fane 1: opgaverne, trinene, kortet, hint, fri leg (runde T12)
+js/sim_vej.js       fane 1: scenen, skemaet, arket og vægtene
 js/sim_skema.js     fane 2
 js/sim_begr.js      fane 3
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
@@ -198,3 +199,60 @@ ligger i `kemi-c-filer/arkiv/c5.5_opgave_mængdeberegningsskema_oldversion.html`
 ## Opgavelisten låser titlerne op (21. nov. 2026)
 
 Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).
+
+## Runde T12: fane 1 uden panel (27. nov. 2026)
+
+Niels: "Kan du begynde på T12 (også selvom vi ikke er helt færdige med T11?)".
+Som ved T11 er det et første udkast efter REGELSAET uden forslag først.
+Gennemgangen 21. nov. dømte fanen "lidt meget": kort, tavle, to krukker, to
+vægte og pilen var fremme på én gang, og det halvfede spørgsmål spurgte efter
+slutresultatet, mens trinet ("Skriv stofmængden af Fe") kun stod i den lille
+linje. Svarene blev skrevet i felter på tavlen, og beregningerne og
+opgavelisten stod i panelet.
+
+* **Intet panel** (regel 2-3). Tre opgaver i rækken øverst med Start forfra
+  og Fri leg (regel 57), kortet centreret under rækken med en fast plads, der
+  måles i en usynlig kopi (regel 4). Motoren er `js/vej_opgaver.js`, en
+  kopi af sc4.7's `vand_opgaver.js` (T11) med to slags trin: "valg" (tre
+  svar) og "regn" (formlen blandt tre knapper og tallet i et felt i kortet).
+  Fanen bruger ikke længere `js/fane.js`; fane 2 og 3 gør.
+* **Tre opgaver** i stedet for fire (regel 51, 61): Jern og svovl (tre svar
+  på hvert trin, de forkerte er typiske fejl med hver sin forklaring), Mere
+  jern (samme reaktion, nu formlen og tallet selv) og Aluminium brænder, som
+  begynder med et kort trin om den nye reaktion: "Hvor mange mol
+  aluminiumoxid dannes der af 4 mol aluminium?" (regel 42). Magnesium og
+  jern af jern(III)oxid er med i den fri leg.
+* **Spørgsmålet følger feltet** (regel 5, 43): "Hvor mange mol jern er
+  111,70 g jern?", "Hvor mange mol jern(II)sulfid dannes der af 2,00 mol
+  jern?", "Hvor mange gram er 2,00 mol jern(II)sulfid?". Efter et rigtigt
+  svar bliver kortet på spørgsmålet med forklaringen, og eleven trykker selv
+  videre. Hinttrappe med tre hint og så Vis svaret.
+* **Skemaet viser "?"** med gul ramme i den celle, kortet spørger om, og
+  tomme stiplede pladser i de andre (regel 28, 38). Rækkerne har ordet over
+  symbolet: Masse / m (g), Molarmasse / M (g/mol), Stofmængde / n (mol)
+  (regel 34). Pilene for vejen er · 1/M, · forholdet og · M med vandret
+  brøkstreg (Niels 24. nov.: "aldrig '/' som division"; gælder alle tre
+  faner, også hintet og fejlbeskederne via `NK.Tjek.htmlBesked`).
+* **Beregningen på et lyst ark** til højre for skemaet, der vokser linje for
+  linje med et navn i ord over hver linje (regel 28-29). Før første linje er
+  arket en stiplet plads. Bliver en linje for lang, brydes den før et
+  lighedstegn (regel 50). På en skærm smallere end 900 px er der ikke plads
+  til arket.
+* **Delene på bordet dukker op, når de bruges** (regel 13): reaktionspilen,
+  når stofmængden af det kendte stof er fundet (i opgave 3 fra start), og
+  vægten til højre er en stiplet plads, til stofmængden af det søgte stof er
+  fundet. Ingen gul bue-pil fra pulveret mere. Scenen står samlet i midten
+  (regel 32), og et klik i scenen under et spørgsmål får kortet til at blinke.
+* **Fri leg:** rækken viser de fire reaktioner og Nye tal i stedet for
+  opgaverne, kortet har et rødt kryds, og det grønne kort fører til nye tal.
+  Efter sidste opgave er fri leg slået til uden grøn knap (som T10 og T11).
+* **Teorien** er det lyse ark med henvisning til Kemibogen C 5.5 (regel 31).
+* **Sprog:** jern(II)sulfid som i C 5.5 (også fane 3), fanen hedder Fra gram
+  til gram (regel 46). Rettelserne står i `.claude/spoergsmaal-og-start/ret/t12.json`.
+* Selvtesten tester den nye fane med klik i kortet (spørgsmålene, svarene,
+  formlerne, feltet, fejlbeskederne, hinttrappen, Vis svaret, stjernen,
+  låste titler, fri leg, Start forfra og kortets plads i alle trin i 1400 ×
+  860, 1100 × 760 og 1000 × 640). Fane 1's layout testes fra 1000 × 640
+  (regel 47). ALT OK (146 påstande) 27. nov. 2026.
+
+Venter på Niels' feedback.

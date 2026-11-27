@@ -70,6 +70,20 @@
             </div>
         </div>
 
+        <!-- Resultatet i Blandet: de hurtigste runder i stedet for tavlen. Skjult,
+             til den faelles liste svarer (js/topliste.js). -->
+        <div class="toplag" id="toplag" hidden>
+            <div class="toplag-boks">
+                <div class="tl-navn">
+                    <input type="text" id="navnefelt" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Dit navn" aria-label="Dit navn">
+                    <button class="knap blaa" id="listeknap" type="button">Sæt på listen</button>
+                </div>
+                <div class="toplister">
+                    <div><h3>Top 10 denne uge</h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                    <div><h3>Top 10 alle tider</h3><ol class="tl-liste" data-liste="alle"></ol></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -80,6 +94,11 @@
             <div class="vaelgerrad niveaurad" id="niveauer" hidden></div>
             <p class="niveaunote" id="niveaunote" hidden></p>
             <div class="prikker" id="prikker" aria-hidden="true"></div>
+            <!-- Uret i Blandet (27. nov. 2026) -->
+            <p class="urrad" id="urrad" hidden title="Uret går, mens en opgave venter på dit svar. Fejl og hjælp koster 10 sekunder.">
+                <span>Tid <b id="ur-tid">0:00</b></span>
+                <span id="ur-bedste" hidden>Bedste tid <b id="ur-bedste-tal"></b></span>
+            </p>
             <button class="knap forfra" id="nyrunde" type="button" title="Ti nye opgaver på denne fane (R)">Ny runde ↺</button>
         </div>
 
@@ -89,6 +108,15 @@
             <p class="note" id="rundenote">Opgaverne kommer her, når de er løst.</p>
             <p class="note forklar"><i class="prik rigtig"></i>første forsøg <i class="prik hjulpet"></i>med hjælp <i class="prik vist"></i>svaret vist</p>
             <p class="rekord" id="rekord" hidden></p>
+        </div>
+
+        <!-- Blandet, før rundens første svar: de hurtigste runder. Skjult, til
+             den faelles liste svarer (js/topliste.js). -->
+        <div class="kort toppanel" id="toppanel" hidden>
+            <div class="toplister">
+                <div><h3>Top 10 denne uge</h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                <div><h3>Top 10 alle tider</h3><ol class="tl-liste" data-liste="alle"></ol></div>
+            </div>
         </div>
     </aside>
 </section>
@@ -154,6 +182,7 @@
 
 <script src="../faelles/papirkort.js"></script>
 <script src="js/kerne.js"></script>
+<script src="js/topliste.js"></script>
 <script src="js/data.js"></script>
 <script src="js/cifre.js"></script>
 <script src="js/fane.js"></script>

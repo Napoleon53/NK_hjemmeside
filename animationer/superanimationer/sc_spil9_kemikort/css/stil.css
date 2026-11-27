@@ -713,6 +713,42 @@ kbd {
 .p-brik.gal { border-color: var(--roed); }
 
 /* ---------------------------------------------------------------------
+   PARRING: STARTKORT OG TOP 10 (27. nov. 2026)
+   Startkortet staar kun fremme, naar den faelles liste svarer. Braettet
+   er usynligt saa laenge, saa ingen kan laese runden, foer uret gaar.
+   --------------------------------------------------------------------- */
+.parring.skjult { visibility: hidden; }
+
+.midterkort.med-liste { width: min(540px, 94%); background-color: #1a1a22; }
+#pa-start kbd { font-size: 0.82rem; }
+.midterkort .mk-note { margin: 0 0 14px 0; font-size: 0.85rem; color: var(--tekst-mat); }
+
+.sl-navn { display: flex; gap: 8px; justify-content: center; margin: 0 0 14px; }
+.sl-navn input {
+    width: 200px;
+    padding: 8px 11px;
+    border-radius: var(--radius-lil);
+    border: 1px solid #55556a;
+    background-color: #1f1f28;
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.92rem;
+    text-align: center;
+}
+.sl-navn input::placeholder { color: var(--tekst-mat); }
+.sl-navn input:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
+.sl-navn input:disabled { opacity: 0.6; }
+
+.toplister { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; margin: 0 0 16px; }
+#pa-start .toplister { margin: 18px 0 0; }
+.toplister h3 { margin: 0 0 5px; font-size: 0.82rem; font-weight: 700; color: var(--gul); }
+.tl-liste { margin: 0; padding-left: 24px; font-size: 0.86rem; color: var(--tekst-svag); }
+.tl-liste li { padding: 1px 0; }
+.tl-liste li span { display: inline-block; max-width: 64%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.tl-liste li b { float: right; color: var(--tekst); font-variant-numeric: tabular-nums; }
+.tl-liste li.tom { list-style: none; margin-left: -24px; color: var(--tekst-mat); }
+
+/* ---------------------------------------------------------------------
    POP OP
    --------------------------------------------------------------------- */
 .overlay {

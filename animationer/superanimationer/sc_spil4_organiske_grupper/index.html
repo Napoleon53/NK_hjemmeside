@@ -38,7 +38,17 @@
                     <label for="navnefelt">Navn til top 10</label>
                     <input type="text" id="navnefelt" maxlength="20" placeholder="Anonym" autocomplete="off" spellcheck="false">
                 </div>
-                <div class="mk-liste" id="mk-liste" hidden></div>
+                <!-- Top 10 staar paa kortet fra start, saa man ser den uden at lede (27. nov. 2026) -->
+                <div class="mk-liste" id="mk-liste" hidden>
+                    <div class="mk-kol">
+                        <h3>Top 10 denne uge</h3>
+                        <ol class="topliste" id="topliste-uge"></ol>
+                    </div>
+                    <div class="mk-kol">
+                        <h3>Top 10 alle tider</h3>
+                        <ol class="topliste" id="topliste-alle"></ol>
+                    </div>
+                </div>
                 <button class="knap stor blaa" id="mk-knap" type="button">Start spil</button>
                 <button class="tekstknap" id="mk-forfra" type="button" hidden>Start forfra</button>
             </div>
@@ -92,16 +102,6 @@
         <div class="kort klassekort" id="klassekort">
             <h2>Stofklasser <span class="taeller"><b id="klasser-moedt">0</b> af <span id="klasser-i-alt">0</span></span></h2>
             <ul class="klasseliste" id="klasseliste"></ul>
-        </div>
-
-        <div class="kort toplistekort" id="toplistekort" hidden>
-            <h2>Top 10 <span class="taeller" id="topliste-uge"></span></h2>
-            <div class="topfaner" role="tablist">
-                <button type="button" class="topfane aktiv" data-liste="uge" role="tab">Denne uge</button>
-                <button type="button" class="topfane" data-liste="alle" role="tab">Alle tider</button>
-            </div>
-            <ol class="topliste" id="topliste"></ol>
-            <p class="topliste-egen" id="topliste-egen"></p>
         </div>
     </aside>
 </section>

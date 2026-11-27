@@ -144,16 +144,38 @@
 <section class="fane" id="fane-parring" role="tabpanel" aria-label="Parring" hidden>
     <div class="scene">
         <div class="spilomraade">
-            <div class="parring">
+            <div class="parring" id="pa-braet">
                 <div class="p-spalte" id="pa-venstre"></div>
                 <div class="p-spalte p-svar-spalte" id="pa-hoejre"></div>
             </div>
 
             <button class="knap stor blaa naesteknap" id="pa-naeste" type="button" hidden>Næste runde <kbd>Enter</kbd></button>
 
+            <!-- Startkortet med Top 10: kun naar den faelles liste svarer (js/topliste.js) -->
+            <div class="midterkort med-liste" id="pa-start" hidden>
+                <h2>Parring på tid</h2>
+                <p class="mk-tekst" id="pa-start-tekst"></p>
+                <button class="knap stor blaa" id="pa-startknap" type="button">Start <kbd>Enter</kbd></button>
+                <div class="toplister">
+                    <div><h3>Top 10 denne uge</h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                    <div><h3>Top 10 alle tider</h3><ol class="tl-liste" data-liste="alle"></ol></div>
+                </div>
+            </div>
+
             <div class="midterkort" id="pa-slut" hidden>
                 <h2 id="pa-slut-titel">Hele sættet er parret</h2>
                 <p class="mk-tekst" id="pa-slut-tekst"></p>
+                <div class="pa-slut-liste" id="pa-slut-liste" hidden>
+                    <div class="sl-navn">
+                        <input type="text" id="pa-navn" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Dit navn" aria-label="Dit navn">
+                        <button class="knap blaa" id="pa-listeknap" type="button">Sæt på listen</button>
+                    </div>
+                    <div class="toplister">
+                        <div><h3>Top 10 denne uge</h3><ol class="tl-liste" data-liste="uge"></ol></div>
+                        <div><h3>Top 10 alle tider</h3><ol class="tl-liste" data-liste="alle"></ol></div>
+                    </div>
+                </div>
+                <p class="mk-note" id="pa-slut-note" hidden>Top 10 gælder 6 par pr. runde.</p>
                 <button class="knap stor blaa" id="pa-igen" type="button">Nyt spil</button>
             </div>
         </div>
@@ -183,7 +205,7 @@
 
         <div class="kort">
             <h2>Sådan</h2>
-            <p class="hjaelpetekst">Træk et svar fra højre over på den forside, det hører til. Du kan også klikke på svaret og derefter på forsiden. Uret løber gennem hele sættet.</p>
+            <p class="hjaelpetekst">Træk et svar fra højre over på den forside, det hører til. Du kan også klikke på svaret og derefter på forsiden. Uret går, mens en runde er i gang, og hver fejl koster 5 sekunder.</p>
         </div>
     </aside>
 </section>
@@ -202,7 +224,7 @@
         <ol>
             <li><b>Træn.</b> Du ser den ene side af kortet. Sig svaret til dig selv, vend kortet og svar ærligt, om du kunne det. Kunne du det ikke, kommer kortet igen i den samme runde. Runden er slut, når alle kort er ude af bunken.</li>
             <li><b>Vendespil.</b> Hvert kort ligger som to brikker med bagsiden op. Find de to brikker, der kommer fra det samme kort. Passer to brikker ikke, bliver de liggende, til du klikker på en ny. Tiden og fejlene tæller.</li>
-            <li><b>Parring.</b> Træk hvert svar over på den forside, det hører til. Sættet deles i runder, og uret løber gennem dem alle.</li>
+            <li><b>Parring.</b> Træk hvert svar over på den forside, det hører til. Sættet deles i runder. Uret går, mens en runde er i gang, og hver fejl lægger 5 sekunder til tiden.</li>
         </ol>
 
         <h3>Dine egne kort</h3>
@@ -283,6 +305,7 @@ SO₄²⁻	sulfation</pre>
 <script src="js/bibliotek.js"></script>
 <script src="js/traen.js"></script>
 <script src="js/vendespil.js"></script>
+<script src="js/topliste.js"></script>
 <script src="js/parring.js"></script>
 <script src="js/editor.js"></script>
 <script src="js/rundvisning.js"></script>

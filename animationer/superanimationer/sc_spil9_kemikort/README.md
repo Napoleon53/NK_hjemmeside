@@ -16,7 +16,7 @@ browseren hedder stadig `kemikort`, så delte links og gemte sæt holder.
 |------|-----------------|
 | **Træn** | Ser den ene side, gætter selv, vender kortet og svarer, om han kunne det. Et misset kort lægges tre pladser længere nede i bunken og kommer igen i den samme runde. Runden er slut, når alle kort er ude af bunken. |
 | **Vendespil** | Hvert kort ligger som to brikker med bagsiden op. To brikker fra det samme kort er et par. 6, 8 eller 10 par. Tid og fejl tælles, og den hurtigste tid er rekorden. To brikker, der ikke passer, bliver liggende, til de kan være læst (se nedenfor). |
-| **Parring** | Forsiderne står i venstre spalte med en tom plads ved siden af. Svarene ligger blandet til højre og trækkes over på den forside, de hører til. Sættet deles i runder på 4, 6 eller 8 par, og uret løber gennem dem alle. |
+| **Parring** | Forsiderne står i venstre spalte med en tom plads ved siden af. Svarene ligger blandet til højre og trækkes over på den forside, de hører til. Sættet deles i runder på 4, 6 eller 8 par. Uret går, mens en runde er i gang, og hver fejl koster 5 sekunder (se Uret og Top 10 nedenfor). |
 
 Retningen kan vendes i Træn (Symbol → Navn, Navn → Symbol eller blandet), så
 eleven også øver den svære vej. Kort, eleven misser, står i panelet under
@@ -71,6 +71,54 @@ To brikker, der ikke passer, bliver liggende åbne, til eleven klikker på en ny
 brik. Der er ingen nedtælling (brugerens ønske 20. oktober 2026: "helt undlade
 den stressende følelse"). Før lå de 0,9 s og fra 3. oktober en læsetid efter
 antallet af tegn med en rød streg, der løb ud.
+
+## Uret og Top 10 i Parring (27. nov. 2026)
+
+Niels ville have et retfærdigt ur i de spil, der ikke havde et, så flere spil
+kan få en fælles liste i én opdatering af scriptet.
+
+* **Uret** (`urKoerer`, `urTrin` i `js/parring.js`) går kun, mens en runde er
+  i gang: fra det første træk (eller fra Start, se nedenfor), til runden er
+  klaret. Mens Næste runde venter, står det stille, så eleven kan læse parrene;
+  den næste runde bygges først, når eleven trykker. Uret går videre, hvis
+  eleven skifter fane midt i en runde, ellers kunne svarene slås op i Træn.
+* **Straf:** hver forkert parring lægger 5 s til tiden (`STRAF`), og
+  statuslinjen siger "Det koster 5 sekunder." En runde med 6 par tager en
+  øvet elev 10-15 s, så at gætte sig igennem (i snit 7-8 fejl pr. runde) koster
+  mere end at tænke, mens et enkelt fejlgreb med musen ikke ødelægger tiden.
+  Ingen tikkelyd.
+* **Tiden** står i hele sekunder under spillet (1:23), så den ikke flimrer, og
+  med tiendedele bagefter (1:23,4). Resultatet siger, hvor meget der var straf.
+* **Rekorden** gemmes stadig i `nk-kemikort-rekord` pr. sæt og antal par, men
+  under nye navne, `par4straf`, `par6straf` og `par8straf`. De gamle `par4`,
+  `par6` og `par8` er sat uden straf (og med uret kørende mellem runderne) og
+  kan ikke sammenlignes; en rekord, der er gættet igennem, ville ellers aldrig
+  kunne slås. De gamle bliver liggende i browseren, men bruges ikke.
+* **Top 10** er det fælles script (`.claude/highscore/highscore.gs`) med én
+  liste pr. indbygget sæt, `spil9-grundstoffer`, `spil9-ioner`,
+  `spil9-molekyler`, `spil9-organisk`, `spil9-beregninger` og
+  `spil9-syrebase-redox`. Laveste tid vinder. Kun 6 par pr. runde (det er
+  standarden, som næsten alle spiller) kommer på listen, så hvert sæt har én
+  liste; én liste for alle sæt ville være uretfærdig, for sættene har 25-33
+  kort og meget forskellig tekstlængde. Egne sæt kommer aldrig på en liste. Med
+  4 eller 8 par i et indbygget sæt står der kun "Top 10 gælder 6 par pr. runde."
+  på resultatet.
+* **Startkortet:** når scriptet svarer med en liste, begynder et spil med 6 par
+  i et indbygget sæt med et kort med Top 10 denne uge og Top 10 alle tider side
+  om side og knappen **Start** (Enter). Brættet er usynligt, til eleven trykker,
+  så den første runde ikke kan læses, før uret går. Resultatet har navnefeltet,
+  **Sæt på listen** (Enter i feltet sender; bogstaver i feltet er ikke genveje)
+  og de to lister. Navnet huskes i `nk-spil-navn` som i de andre spil.
+* Spillet sender `{ spil, navn, point, niveau, sekunder }` med antallet af kort
+  som `point` (så en senere rettelse af et sæt kan ses i regnearket) og 6 par
+  som `niveau`.
+* Svarer scriptet "ukendt spil", fordi den nye version ikke er lagt op, eller er
+  der intet net, ser fanen ud som før (uden startkort og liste), og uret starter
+  ved det første træk. Kommer svaret først, efter eleven er gået i gang, bliver
+  brættet, og det spil kan ikke komme på listen.
+* Listen hentes én gang, når siden åbnes med et indbygget sæt, ellers når et
+  indbygget sæt eller 6 par vælges (højst én gang i minuttet), og ved
+  resultatet.
 
 ## Egne sæt
 
@@ -139,14 +187,16 @@ SO₄²⁻<TAB>sulfation
 | `js/bibliotek.js` | sættene, det valgte sæt, egne sæt og rekorderne |
 | `js/traen.js` | fane 1 |
 | `js/vendespil.js` | fane 2 |
-| `js/parring.js` | fane 3, træk med mus og finger |
+| `js/parring.js` | fane 3, træk med mus og finger, uret og straffen |
+| `js/topliste.js` | Top 10 i Parring: henter og sender til det fælles script |
 | `js/editor.js` | vinduet Kort som tekst |
 | `js/rundvisning.js` | rundvisningen bag `?`, én tur pr. fane |
 | `js/app.js` | fanerne, sætvælgeren, tastaturet og linket |
 | `_selvtest.html` | udviklerværktøj, se nedenfor |
 
-Mappen henter ingen filer uden for sig selv og bruger hverken `fetch` eller
-moduler, så den virker, når `index.html` åbnes direkte fra harddisken.
+Mappen henter ingen filer uden for sig selv og bruger ingen moduler, så den
+virker, når `index.html` åbnes direkte fra harddisken. Kun Top 10 i Parring
+bruger `fetch` (`js/topliste.js`); uden net er listen bare væk.
 
 ## Forenklinger, valgt med vilje
 
@@ -176,8 +226,10 @@ moduler, så den virker, når `index.html` åbnes direkte fra harddisken.
 
 `_selvtest.html` åbner `index.html` i en iframe og kontrollerer de seks sæt
 (længder, dubletter, sprog, faglige stikprøver), tekstformatet, biblioteket,
-en hel runde i hver af de tre faner, rekorderne og skriftstørrelserne. Den
-lægger elevens egne sæt og rekorder tilbage bagefter. Slutlinjen er
+en hel runde i hver af de tre faner, rekorderne og skriftstørrelserne. Afsnit
+10 prøver uret, straffen, startkortet og Top 10 med en falsk `fetch`; testen
+sætter `NK.ingenNet` og sender aldrig noget ud. Den lægger elevens egne sæt,
+rekorder og navn tilbage bagefter. Slutlinjen er
 "ALT OK" eller "N FEJL".
 
 ## I menuen

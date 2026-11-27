@@ -54,7 +54,33 @@
         tael: "Tryk Indsend svar, når du har valgt cifrene på tavlen.",
         afrund: "Skriv svaret i feltet under tavlen, og tryk Indsend svar.",
         komma: "Skriv svaret i feltet under tavlen, og tryk Indsend svar.",
-        blandet: "Ti blandede opgaver. Kun første forsøg tæller."
+        blandet: "Ti blandede opgaver på tid. Fejl og hjælp koster 10 sekunder."
+    };
+
+    /* Uret i Blandet (27. nov. 2026): det gaar, mens en opgave venter paa
+       et svar. Et forkert foerste svar, et hint og Vis svaret koster
+       D.UR.straf sekunder hver. Elevens bedste tid huskes i browseren. */
+    D.UR = {
+        straf: 10,
+        noegle: "nk-sc5.11-tid",
+        glid: 0.35,                       /* den nye opgave glider ind; uret venter imens */
+        strafTekst: "Det koster 10 sekunder."
+    };
+
+    /* Resultatet i Blandet: tiden, og hvor meget af den der er straf */
+    D.DIN_TID = function (tid, straf) {
+        return "Din tid: <b>" + tid + "</b>" + (straf ? " (heraf " + straf + " sekunder for fejl og hjælp)." : ".");
+    };
+    D.NY_BEDSTE = "Ny bedste tid.";
+
+    /* Den faelles liste over de hurtigste runder i Blandet (overskrifterne
+       Top 10 denne uge og Top 10 alle tider staar i index.html) */
+    D.LISTE = {
+        ingen: "Ingen endnu.",
+        send: "Sæt på listen",
+        sender: "Sender …",
+        sendt: "Tiden er sendt",
+        igen: "Prøv igen"
     };
 
     /* Meget svær under Enheder: laases op af en runde med mindst

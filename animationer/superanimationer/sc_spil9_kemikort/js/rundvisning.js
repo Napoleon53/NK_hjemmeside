@@ -30,7 +30,7 @@
             { sel: "#pa-venstre", titel: "Forsiderne", tekst: "Til venstre står det, svaret skal findes til. Pladsen ved siden af er tom, til du har ramt rigtigt." },
             { sel: "#pa-hoejre", titel: "Svarene", tekst: "Træk et svar over på den forside, det hører til. Du kan også klikke på svaret og derefter på forsiden." },
             { sel: "#pa-stoerrelse", titel: "Runderne", tekst: "Sættet deles i runder. Her vælger du, hvor mange par der er i hver runde." },
-            { sel: "#pa-tal", titel: "Tiden", tekst: "Uret løber gennem hele sættet, og fejlene tæller med. Rekorden er den hurtigste tid." },
+            { sel: "#pa-tal", titel: "Tiden", tekst: "Uret går, mens en runde er i gang, og hver fejl koster 5 sekunder. Rekorden er din hurtigste tid." },
             SAET
         ]
     };

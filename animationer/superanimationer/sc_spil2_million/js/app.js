@@ -33,7 +33,71 @@
     var timere = [];
     var spaendingslyd = null;
 
+    /* Uret (D.UR): tid er de sekunder, uret har gaaet, straf er livlinernes */
+    var ur = { tid: 0, straf: 0, sidst: 0 };
+    var topLister = null;      /* { uge, alle } fra den faelles liste */
+    var topStatus = "";        /* "", "henter", "sender" eller "ikkeHentet" */
+    var sender = false, sendt = false;
+
     function T() { return D.TEKST[sprog]; }
+
+    /* ----- Uret ---------------------------------------------------------- */
+    function nu() { return window.performance && performance.now ? performance.now() : Date.now(); }
+
+    /* Uret gaar kun, mens alle fire svar staar fremme og svaret ikke er laast */
+    function urKoerer() { return skaerm === "spil" && !!S && !S.slut && !optaget && !S.laast; }
+
+    /* Kaldes foer hver aendring af tilstanden, saa tiden indtil nu regnes
+       med den tilstand, der gjaldt. */
+    function urTrin() {
+        var t = nu();
+        if (urKoerer()) ur.tid += Math.max(0, t - ur.sidst) / 1000;
+        ur.sidst = t;
+    }
+
+    function samletTid() { return ur.tid + ur.straf; }
+
+    /* 83,4 s -> "1:23" eller med tiendedele "1:23,4" (engelsk "1:23.4") */
+    function tidTekst(s, tiendedele) {
+        var t = tiendedele ? Math.round(s * 10) / 10 : Math.floor(s);
+        var m = Math.floor(t / 60), sek = t - m * 60;
+        var st = tiendedele ? sek.toFixed(1) : String(Math.floor(sek));
+        if (sek < 10) st = "0" + st;
+        if (sprog === "da") st = st.replace(".", ",");
+        return m + ":" + st;
+    }
+
+    function bedsteTid() { return Number(NK.hent(D.UR.noegle, 0)) || 0; }
+
+    function urLoekke() {
+        urTrin();
+        V.ur(tidTekst(S ? samletTid() : 0, skaerm === "slut"));
+        window.requestAnimationFrame(urLoekke);
+    }
+
+    /* ----- De hurtigste millionaerer ------------------------------------ */
+    function hentLister() {
+        if (!NK.Topliste.kanSpoerge()) return;
+        topStatus = "henter";
+        NK.Topliste.hent().then(function (d) {
+            topLister = d;
+            topStatus = d ? "" : "ikkeHentet";
+            tegn();
+        });
+    }
+
+    function saetPaaListen() {
+        if (skaerm !== "slut" || !S || S.slut !== "vundet" || sendt || sender || !NK.Topliste.harListe()) return;
+        NK.Topliste.navn(el("navnefelt").value);
+        sender = true;
+        topStatus = "sender";
+        tegn();
+        NK.Topliste.send({ navn: el("navnefelt").value, sekunder: slutData.tid }).then(function (d) {
+            sender = false;
+            if (d) { topLister = d; sendt = true; topStatus = ""; } else topStatus = "ikkeHentet";
+            tegn();
+        });
+    }
 
     function vent(ms, f) {
         timere.push(setTimeout(f, ms * NK.Tempo));
@@ -73,6 +137,12 @@
             data.tekst = t.vundetTekst;
             data.ekstra = NK.html(t.kaaret) + " <b>" + NK.html(D.TITEL) + "</b>.";
             data.ros = D.ROS[sprog][slutData.rosNr];
+            data.tid = t.dinTid(tidTekst(slutData.tid, true), ur.straf);
+            data.nyRekord = slutData.nyTid ? t.nyBedsteTid : data.nyRekord;
+            data.liste = NK.Topliste.harListe();
+            NK.saetTekst("listeknap", sendt ? t.saatPaaListen : t.saetPaaListen);
+            el("listeknap").disabled = sendt || sender;
+            el("navnefelt").disabled = sendt || sender;
         } else {
             data.titel = S.slut === "tabt" ? t.tabtTitel : t.stoppetTitel;
             data.tekst = t.gaarHjem;
@@ -89,10 +159,17 @@
 
         var r = rekord();
         var rekordTekst = r ? NK.kr(r) : t.ingenRekord;
+        var bt = bedsteTid();
+        var bedsteTekst = bt ? tidTekst(bt, true) : t.ingenRekord;
+
+        var medListe = skaerm === "titel" && NK.Topliste.harListe();
+        el("titel-lister").hidden = !medListe;
+        el("titelskaerm").classList.toggle("med-liste", medListe);
+        V.toplister(topLister, topStatus ? t[topStatus] : "", t, tidTekst);
 
         if (!S) {
             V.stige(-1, 0, -1);
-            V.tal(NK.kr(0), rekordTekst);
+            V.tal(NK.kr(0), rekordTekst, bedsteTekst);
             V.status(t.sTitel, "");
             return;
         }
@@ -104,7 +181,7 @@
         tegnStige();
 
         var sikret = S.slut ? S.gevinst : Spil.sikret(vist && S.udfald === "rigtig" ? S.nr + 1 : S.nr);
-        V.tal(NK.kr(sikret), rekordTekst);
+        V.tal(NK.kr(sikret), rekordTekst, bedsteTekst);
 
         /* Den ene knap: Laas svaret, saa Naeste spoergsmaal */
         var hoved = t.laasSvaret;
@@ -145,12 +222,17 @@
         S = Spil.nyt();
         skaerm = "spil";
         slutData = null;
+        ur = { tid: 0, straf: 0, sidst: nu() };
+        sender = false;
+        sendt = false;
+        if (topStatus === "sender") topStatus = "";
         Lyd.spil("start");
         nytSpoergsmaal(true, "sLaes");
     }
 
     /* Beskrivelsen staar alene et oejeblik, saa kommer svarene ét ad gangen */
     function nytSpoergsmaal(medBaggrund, foerst) {
+        urTrin();
         vist = false;
         spoerger = false;
         optaget = true;
@@ -172,6 +254,7 @@
     }
 
     function faerdigAfsloeret() {
+        urTrin();
         afsloeret = 4;
         optaget = false;
         besked = function (t) { return { html: t.sVaelg }; };
@@ -196,6 +279,7 @@
 
     function laas() {
         if (!S || skaerm !== "spil" || optaget || spoerger || S.laast || S.valgt === null) return;
+        urTrin();
         Spil.laas(S);
         optaget = true;
         besked = function (t) { return { html: t.sLaast }; };
@@ -265,6 +349,7 @@
 
     function stop() {
         if (!spoerger) return;
+        urTrin();
         spoerger = false;
         if (!Spil.stop(S)) { tegn(); return; }
         vist = true;
@@ -275,6 +360,7 @@
     }
 
     function slut() {
+        urTrin();
         rydTimere();
         optaget = false;
         skaerm = "slut";
@@ -286,6 +372,15 @@
             nyRekord: S.gevinst > foer
         };
         if (slutData.nyRekord) NK.gem(NOEGLE_REKORD, S.gevinst);
+        if (S.slut === "vundet") {
+            /* Tiden for millionen: elevens egen bedste tid og navnefeltet til listen */
+            slutData.tid = Math.round(samletTid() * 10) / 10;
+            var bedste = bedsteTid();
+            slutData.nyTid = !bedste || slutData.tid < bedste;
+            if (slutData.nyTid) NK.gem(D.UR.noegle, slutData.tid);
+            el("navnefelt").value = NK.Topliste.navn();
+            hentLister();
+        }
         V.lys(S.slut === "vundet" ? "jubel" : (S.slut === "tabt" ? "fald" : ""));
         if (S.slut === "vundet") Lyd.spil("vundet");
         tegn(true);
@@ -295,7 +390,9 @@
     function livline(navn) {
         if (!S || skaerm !== "spil" || optaget || spoerger) return;
         if (!Spil.kan(S, navn)) return;
+        urTrin();
         Spil[navn](S);
+        ur.straf += D.UR.straf;
         Lyd.spil("livline");
         if (navn === "byt") { nytSpoergsmaal(false, "sByt"); return; }
         var noegle = navn === "halv" ? "sHalv" : "sPublikum";
@@ -339,6 +436,13 @@
     function tast(e) {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         var k = e.key;
+
+        /* Navnefeltet paa slutkortet: bogstaverne er navnet, ikke genveje */
+        if (e.target && e.target.tagName === "INPUT") {
+            if (k === "Enter") { saetPaaListen(); e.preventDefault(); }
+            else if (k === "Escape") e.target.blur();
+            return;
+        }
 
         if (k === "Escape") {
             if (reglerAabne()) { lukRegler(); e.preventDefault(); return; }
@@ -393,6 +497,7 @@
         el("stopknap").addEventListener("click", spoergStop);
         el("jaknap").addEventListener("click", stop);
         el("nejknap").addEventListener("click", fortryd);
+        el("listeknap").addEventListener("click", saetPaaListen);
 
         var svar = document.querySelectorAll("#svarnet .svar");
         Array.prototype.forEach.call(svar, function (k) {
@@ -424,6 +529,8 @@
         V.lydknap(Lyd.til(), T());
         tegn();
         Lyd.hentMusik();
+        hentLister();
+        window.requestAnimationFrame(urLoekke);
     }
 
     /* Til selvtesten */
@@ -434,7 +541,19 @@
         optaget: function () { return optaget; },
         vist: function () { return vist; },
         saetSprog: saetSprog,
-        start: start
+        start: start,
+        vaelg: vaelg,
+        laas: laas,
+        videre: videre,
+        livline: livline,
+        tegn: tegn,
+        /* uret: tid() er sekunderne med straf; ur(s) laegger s sekunder til */
+        tid: samletTid,
+        ur: function (s) { ur.tid += s; },
+        urKoerer: urKoerer,
+        tidTekst: tidTekst,
+        saetPaaListen: saetPaaListen,
+        genhent: hentLister
     };
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

@@ -23,7 +23,7 @@
             { sel: "#teoriknap", titel: "Stofklasserne", tekst: "Alle syv med et eksempel. Midt i et spil koster den en pause." }
         ]),
         b: FAELLES.concat([
-            { sel: "#toplistekort", titel: "Top 10", tekst: "Den fælles liste for hele skolen. Skriv dit navn, før du starter." },
+            { sel: "#mk-liste", titel: "Top 10", tekst: "Den fælles liste for hele skolen. Skriv dit navn, før du starter." },
             { sel: "#teoriknap", titel: "Stofklasserne", tekst: "Alle otte med et eksempel. Midt i et spil koster den en pause." }
         ])
     };

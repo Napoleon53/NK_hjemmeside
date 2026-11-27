@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syntesemester</title>
+<link rel="stylesheet" href="css/stil.css">
+<script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
+<script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body data-lag="1">
+
+<header class="top">
+    <h1><span class="ikon" aria-hidden="true">⚗</span> Syntesemester <span class="udgave">Kemi B</span></h1>
+    <nav class="faner" aria-label="Lagene">
+        <button class="faneknap" type="button" data-lag="1" id="fane1"><span class="fane-nr">1</span> Grupperne</button>
+        <button class="faneknap" type="button" data-lag="2" id="fane2"><span class="fane-nr">2</span> Reaktionerne</button>
+        <button class="faneknap" type="button" data-lag="3" id="fane3"><span class="fane-nr">3</span> Syntesen</button>
+    </nav>
+    <span class="fyld"></span>
+    <button class="teoriknap" id="kortknap" type="button" title="Syntesekortet fra bogen (S)">Syntesekortet</button>
+    <button class="teoriknap" id="regelknap" type="button" title="Reglerne (R)">Regler</button>
+    <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd">🔊</button>
+</header>
+
+<main>
+<section class="spilflade" aria-label="Spillet">
+    <div class="scene" id="scene">
+
+        <!-- Opgaven: gruppen, spoergsmaalet eller syntesen. Al tekst staar her, oeverst i midten. -->
+        <div class="opgavekort" id="opgavekort" hidden aria-live="polite"></div>
+
+        <!-- ===== Lag 1: Grupperne ===== -->
+        <div class="lag lag1" id="lag1" hidden>
+            <div class="bord" id="l1-bord" aria-label="Ni huller, hvor molekylerne dukker op"></div>
+            <!-- Den nye gruppe midt i scenen, naar gruppen skifter -->
+            <div class="maalskift" id="l1-skift" hidden aria-live="assertive"></div>
+        </div>
+
+        <!-- ===== Lag 2: Reaktionerne ===== -->
+        <div class="lag lag2" id="lag2" hidden>
+            <div class="skema" id="l2-skema"></div>
+            <div class="svarflade" id="l2-svar"></div>
+        </div>
+
+        <!-- ===== Lag 3: Syntesen ===== -->
+        <div class="lag lag3" id="lag3" hidden>
+            <!-- Opgaven i én linje (intet kort, Niels 27. nov. 2026) -->
+            <div class="l3-hoved" id="l3-hoved" aria-live="polite"></div>
+            <div class="l3-midte">
+                <div class="l3-boks l3-maalboks">
+                    <h3>Målet</h3>
+                    <div class="maal" id="l3-maal"></div>
+                    <div class="l3-lager" id="l3-lager" hidden></div>
+                </div>
+                <div class="l3-boks l3-ruteboks">
+                    <h3>Din rute <button class="tekstknap fortryd" type="button" id="l3-fortryd" hidden>↶ Fortryd sidste trin</button></h3>
+                    <div class="kaede" id="l3-kaede"></div>
+                    <div class="l3-besked" id="l3-besked" aria-live="polite"></div>
+                </div>
+            </div>
+            <p class="l3-instruks" id="l3-instruks">Vælg et reagens til <b id="l3-instruks-stof"></b>, det sidste stof i ruten:</p>
+            <div class="reagenser" id="l3-kort" aria-label="Reagenskortene"></div>
+        </div>
+
+        <!-- Valg midt i scenen: produktet, partneren eller en ny stofklasse -->
+        <div class="valgkort" id="valgkort" hidden role="dialog"></div>
+
+        <!-- Start og slut. Indholdet bygges i js/app.js. -->
+        <div class="midterkort" id="midterkort"></div>
+
+        <div class="toast" id="toast" hidden></div>
+        <div class="popper" id="popper" aria-hidden="true"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort spilkort">
+            <h2 id="spil-titel">Grupperne <span class="taeller">rekord <b id="rekord">0</b></span></h2>
+            <div class="tal3">
+                <div><small>Point</small><b id="point">0</b></div>
+                <div><small id="tal2-navn">Liv</small><b id="tal2">♥♥♥</b></div>
+                <div><small id="tal3-navn">Niveau</small><b id="tal3">1</b></div>
+            </div>
+            <div class="fremgang" id="fremgang">
+                <div class="fremgang-bar"><i id="fremgang-bar"></i></div>
+                <span id="fremgang-tekst"></span>
+            </div>
+            <button class="knap stor blaa" id="spilknap" type="button">Start spil</button>
+        </div>
+
+        <!-- Lag 2: 1 minut paa tid, highscoren (bygges i js/lag2.js) -->
+        <div class="kort tidskort" id="tidskort" hidden></div>
+
+        <div class="kort lagkort" id="lagkort">
+            <h2 id="lagkort-titel">Det sidste molekyle</h2>
+            <div id="lagkort-indhold"><p class="mat">Intet endnu.</p></div>
+        </div>
+
+        <div class="kort rekordkort">
+            <h2>Dine rekorder</h2>
+            <ul class="rekordliste" id="rekordliste"></ul>
+        </div>
+
+        <button class="tekstknap forfra" id="forfraknap" type="button" hidden>Start forfra</button>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="kortoverlay" hidden>
+    <div class="overlay-boks bred">
+        <h2>Syntesekortet</h2>
+        <p class="lille">Sådan kan stofklasserne omdannes til hinanden. Farven på pilen viser reaktionstypen. Kortet er figuren fra Kemibogen B4.7.</p>
+        <img class="syntesekort" src="sprites/syntesekort.svg" alt="Syntesekortet: alkan, halogenalkan, alken, alkohol, aldehyd, keton, carboxylsyre, ester og polymer med pile for substitution, addition, elimination, oxidation, kondensation og hydrolyse">
+        <p class="lille">Spillet har også kondensationen af en carboxylsyre og en amin til et amid fra afsnit B4.6. Den står ikke på kortet.</p>
+        <div class="typer-forklaring" id="typer-forklaring"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="kort-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="regler" hidden>
+    <div class="overlay-boks">
+        <h2>Syntesemester</h2>
+        <p>Tre lag med hver sin top 10. Begynd i lag 1, eller gå direkte til det lag, du vil øve.</p>
+
+        <h3>Lag 1: Grupperne</h3>
+        <ul>
+            <li><b>Slå de molekyler, der hører til gruppen på skiltet</b>, før de forsvinder ned i hullet igen. Tasterne 1 til 9 virker også.</li>
+            <li><b>Et forkert slag koster et liv.</b> Efter tre forkerte er spillet slut. Det er det også, når tiden er gået.</li>
+            <li>Rigtige slag i træk giver ×2, ×3 og op til ×5. Et nyt niveau giver 10 sekunder mere.</li>
+            <li><b>Niveau 1 til 9 er øvelse.</b> Rekorden og top 10 er kun på niveau 10, hvor alle grupperne og testene er med.</li>
+        </ul>
+
+        <h3>Lag 2: Reaktionerne</h3>
+        <ul>
+            <li><b>Svar på spørgsmålet</b>: produktet, det der står over pilen, reaktionstypen eller udgangsstoffet.</li>
+            <li><b>1 minut</b> er rekorden: så mange rigtige som muligt på 60 sekunder. Et forkert svar trækker ét fra.</li>
+            <li><b>Øv uden tid</b> har tre liv og nye reaktioner for hvert femte spørgsmål, men ingen rekord.</li>
+        </ul>
+
+        <h3>Lag 3: Syntesen</h3>
+        <ul>
+            <li><b>Skriv ruten fra udgangsstoffet til målet.</b> Hvert reagenskort reagerer med det sidste stof i ruten.</li>
+            <li><b>Pointene kommer af den korteste vej</b>: hvert trin ud over den, hvert kort uden reaktion, hvert fortrudt trin og hvert hint koster. Den korteste vej uden fejl giver 50 % ekstra.</li>
+            <li>Seks synteser pr. runde. Tiden giver kun en lille bonus, så det er planen, der vinder.</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p><kbd>Enter</kbd> start og næste &nbsp;·&nbsp; <kbd>1</kbd>-<kbd>9</kbd> slå i lag 1 og svar i lag 2 &nbsp;·&nbsp; <kbd>Backspace</kbd> fortryd i lag 3 &nbsp;·&nbsp; <kbd>P</kbd> pause &nbsp;·&nbsp; <kbd>S</kbd> syntesekortet &nbsp;·&nbsp; <kbd>R</kbd> reglerne &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="regler-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/reaktioner.js"></script>
+<script src="js/rute.js"></script>
+<script src="js/topliste.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/lag1.js"></script>
+<script src="js/lag2.js"></script>
+<script src="js/lag3.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

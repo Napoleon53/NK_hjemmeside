@@ -20,14 +20,20 @@
     var PANEL = { sel: "#rundevalg", titel: "Ti opgaver", tekst: "Ti opgaver i en runde. De ti streger viser, hvor langt du er i runden. Ny runde giver ti nye opgaver på denne fane." };
     var VAELG_AFRUND = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Vælg mellem måletal, der skal afrundes, og regnestykker, hvor svaret skal afrundes. Skifter du, begynder en ny runde." };
     var VAELG_KOMMA = { sel: "#vaelgere, #niveauer, #niveaunote", titel: "To slags opgaver", tekst: "Vælg mellem videnskabelig notation begge veje og enheder. Enhederne har fire niveauer, og Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på de tre andre. Skifter du, begynder en ny runde." };
+    var PANEL_BLANDET = { sel: "#rundevalg", titel: "Ti opgaver på tid", tekst: "Ti opgaver i en runde. Uret går, mens en opgave venter på dit svar. Et forkert første svar, et hint og Vis svaret koster 10 sekunder hver. Ny runde giver ti nye opgaver." };
     var RUNDE = { sel: "#rundekort", titel: "Runden", tekst: "De løste opgaver med facit. Grøn er rigtigt i første forsøg, gul med hjælp og rød, når svaret blev vist." };
+    /* Kun med, naar den faelles liste staar fremme (valgfri) */
+    var LISTE = { sel: "#toppanel, #toplag", titel: "De hurtigste", tekst: "De hurtigste runder i Blandet denne uge og nogensinde. Når runden er slut, kan du sætte din tid på listen.", valgfri: true };
+    /* Paa resultatet med listen staar listen, hvor tavlen og svaret stod */
+    var TAVLE_B = { sel: TAVLE.sel, titel: TAVLE.titel, tekst: TAVLE.tekst, valgfri: true };
+    var SVAR_B = { sel: SVAR.sel, titel: SVAR.titel, tekst: SVAR.tekst, valgfri: true };
     var FANER = { sel: ".faneknapper", titel: "De andre faner", tekst: "Flyt kommaet, Afrund og Blandet, hvor alle slags opgaver er med." };
 
     var TURE = {
         "tael": [KORT, TAVLE_TAEL, TJEK_TAEL, PANEL, RUNDE, FANER],
         "afrund": [KORT, TAVLE, SVAR, PANEL, VAELG_AFRUND, RUNDE],
         "komma": [KORT, TAVLE, SVAR, PANEL, VAELG_KOMMA, RUNDE],
-        "blandet": [KORT, TAVLE, SVAR, PANEL, RUNDE]
+        "blandet": [KORT, TAVLE_B, SVAR_B, PANEL_BLANDET, RUNDE, LISTE]
     };
 
     var trin = [];
@@ -120,7 +126,8 @@
     function start(niveauId) {
         var liste = TURE[niveauId];
         if (!liste || !liste.length) return;
-        trin = liste;
+        /* Et valgfrit trin er kun med, naar det kan ses */
+        trin = liste.filter(function (t) { return !t.valgfri || !!samletRect(t.sel); });
         trinNr = 0;
         erAktiv = true;
         NK.el("rundvisning").hidden = false;

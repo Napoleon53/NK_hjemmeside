@@ -34,7 +34,7 @@
     var S = {
         Fe:      { f: "Fe", navn: "jern", farve: "#6f737b", slags: "fast" },
         S:       { f: "S", navn: "svovl", farve: "#e3c93a", slags: "fast" },
-        FeS:     { f: "FeS", navn: "jernsulfid", farve: "#3e3d3b", slags: "fast" },
+        FeS:     { f: "FeS", navn: "jern(II)sulfid", farve: "#3e3d3b", slags: "fast" },
         Mg:      { f: "Mg", navn: "magnesium", farve: "#b4b9c1", slags: "fast" },
         MgO:     { f: "MgO", navn: "magnesiumoxid", farve: "#f1f1ec", slags: "fast" },
         Al:      { f: "Al", navn: "aluminium", farve: "#c9cdd4", slags: "fast" },
@@ -164,7 +164,7 @@
        ====================================================================== */
     D.VEJ = [
         { id: "jernsulfid", r: "jernsulfid", kendt: "Fe", soegt: "FeS", n: [1, 2, 3],
-          tekst: "Jern varmes med rigeligt svovl. Hvor mange gram jernsulfid dannes der af {m} g jern?" },
+          tekst: "Jern varmes med rigeligt svovl. Hvor mange gram jern(II)sulfid dannes der af {m} g jern?" },
         { id: "magnesiumoxid", r: "magnesiumoxid", kendt: "Mg", soegt: "MgO", n: [1, 2, 3],
           tekst: "Magnesium brænder i luft. Hvor mange gram magnesiumoxid dannes der af {m} g magnesium?" },
         { id: "aluminiumoxid", r: "aluminiumoxid", kendt: "Al", soegt: "Al2O3", n: [2, 3, 4],
@@ -172,6 +172,112 @@
         { id: "jernoxid", r: "jernoxid", kendt: "Fe2O3", soegt: "Fe", n: [0.5, 1, 1.5, 2],
           tekst: "Jern(III)oxid varmes med rigeligt kul. Hvor mange gram jern dannes der af {m} g jern(III)oxid?" }
     ];
+
+    /* ======================================================================
+       FANE 1 EFTER REGELSAETTET (runde T12, 27. nov. 2026)
+       Tre opgaver i raekken oeverst i scenen. Hver opgave er en raekke trin,
+       ét felt i skemaet ad gangen, og svaret gives i kortet:
+         felt "nK"  stofmaengden af det kendte stof (massen og molarmassen)
+         felt "nS"  stofmaengden af det soegte stof (koefficienterne)
+         felt "mS"  massen af det soegte stof (stofmaengden og molarmassen)
+         felt "reaktion"  et kort trin om den nye reaktion (REGELSAET 42)
+       type "valg": tre svar, de forkerte er typiske fejl (REGELSAET 14).
+       type "regn": tallet skrives i et felt i kortet; formler: formlen
+       vaelges foerst blandt tre knapper (D.FORMLER).
+       Teksterne til et felt staar i D.VEJ_TEKST; {K} og {S} er navnene, {Kf}
+       og {Sf} formlerne, {m} og {mS} masserne, {MK} og {MS} molarmasserne,
+       {nK} og {nS} stofmaengderne og {kK} og {kS} koefficienterne.
+       ====================================================================== */
+    function broek(op, ned) {
+        return '<span class="broek"><span>' + op + "</span><span>" + ned + "</span></span>";
+    }
+    D.broek = broek;
+
+    D.OPG_VEJ = [
+        { id: "jern", navn: "Jern og svovl", vej: "jernsulfid", n: 2,
+          trin: [
+              { felt: "nK", type: "valg", tekst: "Jern varmes med rigeligt svovl.",
+                svar: [{ t: "111,70 mol", nej: "Det er massen af jern i gram. Gram og mol er ikke det samme. Del massen med molarmassen." },
+                       { t: "2,00 mol", ok: true },
+                       { t: "6238 mol", nej: "Du har ganget massen med molarmassen. Stofmængden er massen delt med molarmassen." }],
+                slut: "111,70 g jern er 2,00 mol. På vægten ligger nu to poser med 1 mol jern." },
+              { felt: "nS", type: "valg",
+                svar: [{ t: "3,15 mol", nej: "Molarmasserne skal ikke bruges her. Det er koefficienterne foran Fe og FeS i reaktionsskemaet, der siger, hvor mange mol der dannes." },
+                       { t: "1,27 mol", nej: "Du har delt massen af jern med molarmassen af jern(II)sulfid. Gå i stedet fra mol jern til mol jern(II)sulfid med koefficienterne." },
+                       { t: "2,00 mol", ok: true }] },
+              { felt: "mS", type: "valg",
+                svar: [{ t: "175,82 g", ok: true },
+                       { t: "111,70 g", nej: "Det er massen af jern. Jern(II)sulfid vejer mere, for svovlen er også med i stoffet. Gang stofmængden med molarmassen af jern(II)sulfid." },
+                       { t: "43,96 g", nej: "Du har delt molarmassen med stofmængden. Massen er stofmængden gange molarmassen." }] }
+          ] },
+        { id: "jern2", navn: "Mere jern", vej: "jernsulfid", n: 3,
+          trin: [
+              { felt: "nK", type: "regn", formler: "n" },
+              { felt: "nS", type: "regn" },
+              { felt: "mS", type: "regn", formler: "m" }
+          ] },
+        { id: "aluminium", navn: "Aluminium brænder", vej: "aluminiumoxid", n: 2,
+          trin: [
+              { felt: "reaktion", type: "valg", tekst: "Aluminium brænder i luft og bliver til aluminiumoxid.",
+                svar: [{ t: "4 mol", nej: "Der står ikke det samme tal foran Al og Al₂O₃ i reaktionsskemaet. Se på koefficienterne." },
+                       { t: "8 mol", nej: "Du har vendt forholdet om. Der står 4 foran Al og 2 foran Al₂O₃, så der dannes færre mol Al₂O₃, end der er Al." },
+                       { t: "2 mol", ok: true }],
+                slut: "Der står 4 foran Al og 2 foran Al₂O₃. 4 mol aluminium giver 2 mol aluminiumoxid, altså halvt så mange mol." },
+              { felt: "nK", type: "regn" },
+              { felt: "nS", type: "regn" },
+              { felt: "mS", type: "regn" }
+          ] }
+    ];
+
+    /* Teksterne til hvert felt. Et hint eller en afslutning med lige/ulige
+       afhaenger af, om koefficienterne er ens. */
+    D.VEJ_TEKST = {
+        nK: { spm: "Hvor mange mol {K} er {m} g {K}?",
+              hint: ["Stofmængden findes af massen og molarmassen. Begge står i skemaet under {Kf}.",
+                     "Molarmassen {MK} g/mol er massen af 1 mol {K}.",
+                     "Del massen {m} g med molarmassen {MK} g/mol."],
+              slut: "{m} g {K} er {nK} mol." },
+        nS: { spm: "Hvor mange mol {S} dannes der af {nK} mol {K}?",
+              hint: ["Koefficienterne i reaktionsskemaet gælder stofmængder. Se på tallene foran {Kf} og {Sf}.",
+                     { een: "Der står ingen tal foran {Kf} og {Sf}. Så er koefficienten 1, og 1 mol {K} giver 1 mol {S}.",
+                       ellers: "{kK} mol {K} giver {kS} mol {S}." },
+                     { lige: "Stofmængden af {S} er den samme som stofmængden af {K}.",
+                       ulige: "Gang {nK} mol med {kS}, og del med {kK}." }],
+              slut: { een: "Der står 1 foran både {Kf} og {Sf}, så {nK} mol {K} giver {nS} mol {S}.",
+                      lige: "Koefficienten foran både {Kf} og {Sf} er {kK}, så {nK} mol {K} giver {nS} mol {S}.",
+                      ulige: "Forholdet er {kS} : {kK}, så {nK} mol {K} giver {nS} mol {S}." } },
+        mS: { spm: "Hvor mange gram er {nS} mol {S}?",
+              hint: ["Massen findes af stofmængden og molarmassen af {Sf}. Begge står i skemaet.",
+                     "Molarmassen {MS} g/mol er massen af 1 mol {S}.",
+                     "Gang stofmængden {nS} mol med molarmassen {MS} g/mol."],
+              slut: "{nS} mol {S} vejer {mS} g. Altså giver {m} g {K} {mS} g {S}." },
+        reaktion: { spm: "Hvor mange mol {S} dannes der af {kK} mol {K}?",
+              hint: ["Tallene foran formlerne i reaktionsskemaet gælder stofmængder.",
+                     "Find tallene foran {Kf} og {Sf} i reaktionsskemaet."] }
+    };
+
+    /* Formlen foerst (brugeren 25. sept. 2026), valgt blandt tre knapper
+       (REGELSAET 14). Broeker med vandret broekstreg (brugeren 24. nov. 2026:
+       "aldrig '/' som division"). */
+    D.FORMLER = {
+        n: { tekst: "Vælg først formlen. Tallet skriver du bagefter.",
+             svar: [{ h: "n = m · M", nej: "Massen skal deles med molarmassen, ikke ganges med den." },
+                    { h: "n = " + broek("m", "M"), ok: true },
+                    { h: "n = " + broek("M", "m"), nej: "Molarmassen er massen af 1 mol. Stofmængden er massen delt med molarmassen, ikke omvendt." }],
+             godt: "Formlen er rigtig. Skriv tallet." },
+        m: { tekst: "Vælg først formlen. Tallet skriver du bagefter.",
+             svar: [{ h: "m = " + broek("n", "M"), nej: "Molarmassen er massen af 1 mol. Massen er stofmængden gange molarmassen." },
+                    { h: "m = " + broek("M", "n"), nej: "Jo flere mol, jo større masse. Gang stofmængden med molarmassen." },
+                    { h: "m = n · M", ok: true }],
+             godt: "Formlen er rigtig. Skriv tallet." }
+    };
+
+    /* Den fri leg: alle fire reaktioner fra D.VEJ med nye tal */
+    D.VEJ_FRI = {
+        pause: "Vælg en reaktion i rækken foroven, og regn selv. Nye tal giver en ny masse.",
+        alle: "Du har klaret alle tre opgaver. Vælg en reaktion i rækken foroven, og regn selv, eller gå videre til fanen Skemaet.",
+        nye: "Nye tal →"
+    };
 
     /* ======================================================================
        FANE 2: SKEMAET
@@ -209,7 +315,7 @@
        ====================================================================== */
     D.BEGR = [
         { id: "jernsulfid", r: "jernsulfid", a: "Fe", b: "S", p: "FeS", std: { L: "S", saet: 2, rest: 1 },
-          tekst: "Jern og svovl varmes sammen. Hvor mange gram jernsulfid dannes der af {a} g Fe og {b} g S?" },
+          tekst: "Jern og svovl varmes sammen. Hvor mange gram jern(II)sulfid dannes der af {a} g Fe og {b} g S?" },
         { id: "saltsyre", r: "saltsyre", a: "Mg", b: "HCl", p: "H2", std: { L: "HCl", saet: 1, rest: 0.5 },
           tekst: "Magnesium kommes i saltsyre. Hvor mange gram H₂ dannes der af {a} g Mg og {b} g HCl?" },
         { id: "knaldgas", r: "knaldgas", a: "H2", b: "O2", p: "H2O", std: { L: "H2", saet: 1, rest: 0.5 },

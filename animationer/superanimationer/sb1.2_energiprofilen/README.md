@@ -5,7 +5,7 @@ Superanimation til Kemibogen B1.3 Aktiveringsenergi og temperatur. Åbn `index.h
 `index.html#temperatur`.
 
 Ny 24. nov. 2026. Afløser den gamle `kemi-b-filer/b1.2_energidiagram.html` (B1 knap 2).
-Ikke i menuen endnu, og brugeren har ikke set den.
+I menuen som B1 knap 2 fra 27. nov. 2026 (brugeren: "Du må gerne linke til animationen i bogen og i menuen"), med linjen til `til_panelet.js`. Kemibogen B1.3 linker til begge faner, og A2.1 til fane 1.
 
 ## Bestillingen (brugerens ja 24. nov. 2026)
 
@@ -85,8 +85,7 @@ rammer molekylerne.
 
 ## Til menuen
 
-Når brugeren siger til: knap 2 i `kemi-b-filer/samling_b1.html` peger på
-`../superanimationer/sb1.2_energiprofilen/index.html` (behold `data-emne="b1.2"`),
-linjen til `til_panelet.js` sættes øverst i `<head>`, og den gamle flyttes til
-`kemi-c-filer/arkiv/b1.2_energidiagram_oldversion.html`. Kemibogen A2.1 linker til den
-gamle fil og skal så pege på den nye.
+Gjort 27. nov. 2026: knap 2 i `kemi-b-filer/samling_b1.html` peger hertil (`data-emne="b1.2"`
+uændret), `FEEDBACK_EMNER` siger Energiprofilen, og sb1.1, sb1.4 og sb1.5 henviser til den nye.
+Tilbage: Når bogen lægges ud igen (A2.1 på kemibogen.dk linker stadig til den gamle fil), flyttes
+`kemi-b-filer/b1.2_energidiagram.html` med `git mv` til `kemi-c-filer/arkiv/b1.2_energidiagram_oldversion.html`.

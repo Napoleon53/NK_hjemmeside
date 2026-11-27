@@ -111,7 +111,7 @@ function tests() {
     var tilbud = d.getElementById("tilbud");
     paastand("tilbuddet om præsentationen vises første gang", w.getComputedStyle(tilbud).display !== "none");
     paastand("index.html er Kemi C", NK.app.udgave() === "c" && d.getElementById("udgave-maerke").textContent === "Kemi C");
-    paastand("Kemi C har ingen top 10", d.getElementById("toplistekort").hidden);
+    paastand("Kemi C har ingen top 10, før scriptet kender spillet", d.getElementById("mk-liste").hidden && d.getElementById("mk-navn").hidden);
 
     /* ----------------------------------------------------------------- */
     overskrift("2. Molekylerne (molekylemotoren er facit)");
@@ -416,7 +416,12 @@ function tests() {
     NK.app.trin(1 / 60);
     var B = NK.app.spil();
     paastand("B er sit eget spil", B !== S && B.udgave === "b" && d.getElementById("udgave-maerke").textContent === "Kemi B");
-    paastand("B har top 10 og navnefeltet", !d.getElementById("toplistekort").hidden && !d.getElementById("mk-navn").hidden);
+    paastand("B har top 10 og navnefeltet på midterkortet", !d.getElementById("mk-liste").hidden && !d.getElementById("mk-navn").hidden &&
+        d.getElementById("midterkort").classList.contains("med-liste"));
+    (function () {
+        var r = d.getElementById("midterkort").getBoundingClientRect(), o = d.getElementById("spilomraade").getBoundingClientRect();
+        paastand("midterkortet med top 10 er helt inde i spilleområdet", r.top >= o.top && r.bottom <= o.bottom && r.left >= o.left && r.right <= o.right);
+    }());
     paastand("B starter med Alkan, Alkohol og Carboxylsyre", B.spande.map(function (s) { return s.klasse; }).join() === "alkan,alkohol,syre");
     d.getElementById("navnefelt").value = "Selvtest";
     NK.app.primaer();

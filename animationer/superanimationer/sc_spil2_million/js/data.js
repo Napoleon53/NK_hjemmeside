@@ -64,6 +64,17 @@
         taelOp: 900                     /* beloebet taeller op paa slutkortet */
     };
 
+    /* ----- Uret (27. nov. 2026: Niels, "millionaer med en timer .. hvor man
+       speedrunner det") -------------------------------------------------
+       Uret gaar kun, mens alle fire svar staar fremme og svaret ikke er
+       laast: beskrivelsen alene, svarene, der kommer frem, og ventetiden
+       efter laasen taeller ikke. Hver livline koster straf sekunder. Kun en
+       vundet million kan komme paa listen over de hurtigste. */
+    D.UR = {
+        straf: 10,
+        noegle: "nk-million-tid"        /* elevens bedste tid for en million */
+    };
+
     /* ----- Musik ------------------------------------------------------- */
     /* Ligger filerne i spillets mappe, spilles de under spoergsmaalene i
        stedet for spillets egen baggrundslyd: musik1 til spoergsmaal 1-5,
@@ -293,6 +304,21 @@
             sikretTip: "Det beløb, du beholder ved et forkert svar",
             rekord: "Rekord",
             ingenRekord: "ingen",
+            tid: "Tid",
+            tidTip: "Uret går, mens svarene står fremme. Hver livline koster 10 sekunder.",
+            bedste: "Bedste tid",
+            bedsteTip: "Din hurtigste million i denne browser",
+            ugeListe: "Hurtigste denne uge",
+            alleListe: "Hurtigste nogensinde",
+            ingenEndnu: "Ingen endnu.",
+            henter: "Henter listen …",
+            sender: "Sender …",
+            ikkeHentet: "Listen kunne ikke hentes.",
+            ditNavn: "Dit navn",
+            saetPaaListen: "Sæt på listen",
+            saatPaaListen: "Du er på listen",
+            dinTid: function (tid, straf) { return "Din tid: <b>" + tid + "</b>" + (straf ? " (heraf " + straf + " s for livliner)" : ""); },
+            nyBedsteTid: "Ny bedste tid",
             ledetekst: "Hvilket fagord passer?",
             spoergsmaalAf: function (n) { return "Spørgsmål " + n + " af 15"; },
             kapitel: function (k, navn) { return "Kapitel " + k + " · " + navn; },
@@ -332,9 +358,9 @@
             sSikret: function (kr) { return "Rigtigt. <b>" + kr + "</b> er sikret."; },
             sForkert: function (svar) { return "Forkert. Det rigtige svar er <b>" + svar + "</b>."; },
             sPasserTil: function (ord, b) { return "<b>" + ord + "</b> passer til: “" + b + "”."; },
-            sHalv: "To forkerte svar er fjernet.",
-            sPublikum: "Publikum har stemt. De har ikke altid ret.",
-            sByt: "Spørgsmålet er byttet ud.",
+            sHalv: "To forkerte svar er fjernet. Det koster 10 sekunder.",
+            sPublikum: "Publikum har stemt. De har ikke altid ret. Det koster 10 sekunder.",
+            sByt: "Spørgsmålet er byttet ud. Det koster 10 sekunder.",
             sStop: function (kr) { return "Svarer du forkert, går du hjem med <b>" + kr + "</b>"; },
 
             /* Slutkortet */
@@ -351,7 +377,8 @@
                 ["Svaret", "Vælg et svar, og tryk <b>Lås svaret</b>. Først da gælder det, så du kan nå at vælge om."],
                 ["Sikre beløb", "Ved spørgsmål 5 og 10 er beløbet sikret. Svarer du senere forkert, går du hjem med det sikrede beløb. Svarer du forkert før spørgsmål 6, går du hjem med 0 kr."],
                 ["Stop", "Fra spørgsmål 2 kan du stoppe og tage det, du har vundet. Det skal ske, før du låser et svar."],
-                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Spørg publikum</b> viser, hvor mange procent der ville vælge hvert svar. Publikum har oftest ret ved de første spørgsmål og bliver mere usikre, jo sværere spørgsmålene bliver. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."]
+                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Spørg publikum</b> viser, hvor mange procent der ville vælge hvert svar. Publikum har oftest ret ved de første spørgsmål og bliver mere usikre, jo sværere spørgsmålene bliver. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."],
+                ["Tiden", "Uret går, mens de fire svar står fremme, og står stille, når svaret er låst. Hver livline koster 10 sekunder. Vinder du millionen, kan du sætte din tid på listen over de hurtigste millionærer."]
             ],
             genvejeTitel: "Genveje",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> vælg svar &nbsp;·&nbsp; <kbd>Enter</kbd> lås og gå videre &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> livliner &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>Esc</kbd> luk",
@@ -367,7 +394,7 @@
                 { sel: "#livliner", titel: "Livlinerne", tekst: "Tre slags hjælp, der hver kan bruges én gang. Gem dem til de svære spørgsmål." },
                 { sel: "#stopknap", titel: "Stop", tekst: "Er du i tvivl, kan du stoppe og beholde det, du har vundet." },
                 { sel: "#stige", titel: "Stigen", tekst: "Hvert rigtigt svar er et trin op. De hvide beløb er sikre: dem beholder du, selv om du senere svarer forkert." },
-                { sel: "#talkort", titel: "Sikret og rekord", tekst: "Sikret er det, du går hjem med ved et forkert svar. Rekorden er din største gevinst i denne browser." }
+                { sel: "#talkort", titel: "Sikret, tid og rekord", tekst: "Sikret er det, du går hjem med ved et forkert svar. Uret går, mens svarene står fremme. Rekorden er din største gevinst, og bedste tid er din hurtigste million i denne browser." }
             ]
         },
 
@@ -385,6 +412,21 @@
             sikretTip: "The amount you keep after a wrong answer",
             rekord: "Record",
             ingenRekord: "none",
+            tid: "Time",
+            tidTip: "The clock runs while the answers are shown. Each lifeline costs 10 seconds.",
+            bedste: "Best time",
+            bedsteTip: "Your fastest million in this browser",
+            ugeListe: "Fastest this week",
+            alleListe: "Fastest ever",
+            ingenEndnu: "None yet.",
+            henter: "Fetching the list …",
+            sender: "Sending …",
+            ikkeHentet: "The list could not be fetched.",
+            ditNavn: "Your name",
+            saetPaaListen: "Put me on the list",
+            saatPaaListen: "You are on the list",
+            dinTid: function (tid, straf) { return "Your time: <b>" + tid + "</b>" + (straf ? " (including " + straf + " s for lifelines)" : ""); },
+            nyBedsteTid: "New best time",
             ledetekst: "Which term fits?",
             spoergsmaalAf: function (n) { return "Question " + n + " of 15"; },
             kapitel: function (k, navn) { return "Chapter " + k + " · " + navn; },
@@ -423,9 +465,9 @@
             sSikret: function (kr) { return "Correct. <b>" + kr + "</b> is safe."; },
             sForkert: function (svar) { return "Wrong. The correct answer is <b>" + svar + "</b>."; },
             sPasserTil: function (ord, b) { return "<b>" + ord + "</b> fits: “" + b + "”."; },
-            sHalv: "Two wrong answers have been removed.",
-            sPublikum: "The audience has voted. They are not always right.",
-            sByt: "The question has been swapped.",
+            sHalv: "Two wrong answers have been removed. It costs 10 seconds.",
+            sPublikum: "The audience has voted. They are not always right. It costs 10 seconds.",
+            sByt: "The question has been swapped. It costs 10 seconds.",
             sStop: function (kr) { return "If you answer wrong, you go home with <b>" + kr + "</b>"; },
 
             tabtTitel: "Game over",
@@ -441,7 +483,8 @@
                 ["The answer", "Choose an answer and press <b>Lock the answer</b>. Only then does it count, so you can still change your mind."],
                 ["Safe amounts", "At questions 5 and 10 the amount is safe. If you answer wrong later, you go home with the safe amount. If you answer wrong before question 6, you go home with 0 kr."],
                 ["Stop", "From question 2 you can stop and take what you have won. It must happen before you lock an answer."],
-                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>Ask the audience</b> shows how many percent would choose each answer. The audience is usually right on the first questions and gets less certain as the questions get harder. <b>New question</b> swaps the question for another that is just as hard."]
+                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>Ask the audience</b> shows how many percent would choose each answer. The audience is usually right on the first questions and gets less certain as the questions get harder. <b>New question</b> swaps the question for another that is just as hard."],
+                ["The time", "The clock runs while the four answers are shown and stops when the answer is locked. Each lifeline costs 10 seconds. If you win the million, you can put your time on the list of the fastest millionaires."]
             ],
             genvejeTitel: "Shortcuts",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> choose &nbsp;·&nbsp; <kbd>Enter</kbd> lock and continue &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> lifelines &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> sound &nbsp;·&nbsp; <kbd>H</kbd> tour &nbsp;·&nbsp; <kbd>Esc</kbd> close",
@@ -457,7 +500,7 @@
                 { sel: "#livliner", titel: "The lifelines", tekst: "Three kinds of help, each usable once. Save them for the hard questions." },
                 { sel: "#stopknap", titel: "Stop", tekst: "If you are in doubt, you can stop and keep what you have won." },
                 { sel: "#stige", titel: "The ladder", tekst: "Each correct answer is a step up. The white amounts are safe: you keep them even if you answer wrong later." },
-                { sel: "#talkort", titel: "Safe and record", tekst: "Safe is what you go home with after a wrong answer. The record is your largest prize in this browser." }
+                { sel: "#talkort", titel: "Safe, time and record", tekst: "Safe is what you go home with after a wrong answer. The clock runs while the answers are shown. The record is your largest prize, and best time is your fastest million in this browser." }
             ]
         }
     };

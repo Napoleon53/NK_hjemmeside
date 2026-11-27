@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bundfald</title>
+<link rel="stylesheet" href="css/stil.css">
+<script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
+<script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon" aria-hidden="true">⚗</span> Bundfald</h1>
+    <span class="saetnavn" id="saetnavn"></span>
+    <span class="fyld"></span>
+    <button class="teoriknap" id="vaelgknap" type="button" title="Vælg andre fagord">Vælg fagord</button>
+    <button class="teoriknap" id="regelknap" type="button" title="Reglerne">Regler</button>
+    <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra" aria-label="Lyd">🔊</button>
+</header>
+
+<main>
+<section class="spilflade" aria-label="Spillet">
+    <div class="scenekolonne">
+        <div class="scene" id="scene">
+            <img class="glas" id="glas" src="sprites/baegerglas.svg" alt="" draggable="false">
+            <canvas id="bag" aria-hidden="true"></canvas>
+            <div class="kortlag" id="kortlag" aria-live="polite"></div>
+            <canvas id="for" aria-hidden="true"></canvas>
+
+            <div class="toast" id="toast" hidden></div>
+
+            <!-- En krystal har naaet bunden: fagordet og feltet, hvor det skrives af -->
+            <div class="bundkort" id="bundkort" hidden role="dialog" aria-labelledby="bk-titel">
+                <p class="bk-titel" id="bk-titel">Forklaringen nåede bunden</p>
+                <p class="bk-tekst" id="bk-tekst"></p>
+                <p class="bk-label">Fagordet er</p>
+                <p class="bk-ord" id="bk-ord"></p>
+                <form class="bk-form" id="bk-form" autocomplete="off">
+                    <input type="text" id="bk-felt" spellcheck="false" autocapitalize="off" autocorrect="off"
+                           placeholder="Skriv fagordet af" aria-label="Skriv fagordet af">
+                    <button class="knap blaa" id="bk-knap" type="submit">Fortsæt ↵</button>
+                </form>
+                <p class="bk-note" id="bk-note">Krystallen bliver til bundfald, og fagordet kommer igen senere.</p>
+            </div>
+
+            <!-- Start, pause og slut. Indholdet bygges i js/app.js. -->
+            <div class="midterkort" id="midterkort"></div>
+        </div>
+
+        <div class="svarlinje" id="svarlinje">
+            <form class="svarform" id="svarform" autocomplete="off">
+                <input type="text" id="svarfelt" spellcheck="false" autocapitalize="off" autocorrect="off"
+                       placeholder="Skriv fagordet" aria-label="Skriv fagordet til en forklaring i glasset">
+                <button class="knap blaa" type="submit">Opløs ↵</button>
+            </form>
+            <p class="svarbesked" id="svarbesked" aria-live="polite"></p>
+            <div class="ordbank" id="ordbank" hidden></div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort spilkort">
+            <h2>Spillet <span class="taeller">rekord <b id="rekord">0</b></span></h2>
+            <div class="tal3">
+                <div><small>Point</small><b id="point">0</b></div>
+                <div><small>Bundfald</small><b id="lag" class="lagvisning" aria-label="0 af 5 lag"></b></div>
+                <div><small>Niveau</small><b id="niveau">1</b></div>
+            </div>
+            <div class="fremgang">
+                <div class="fremgang-bar"><i id="fremgang-bar"></i></div>
+                <span id="fremgang-tekst">Ingen fagord endnu</span>
+            </div>
+            <button class="knap stor blaa" id="spilknap" type="button">Start spil</button>
+        </div>
+
+        <div class="kort sidstekort">
+            <h2>Det sidste fagord <span class="taeller" id="sidste-maerke"></span></h2>
+            <p class="sidste-ord" id="sidste-ord">Intet endnu.</p>
+            <p class="sidste-tekst" id="sidste-tekst"></p>
+        </div>
+
+        <div class="kort listekort">
+            <h2>Opløst <span class="taeller"><b id="antal-loest">0</b></span></h2>
+            <div class="chips" id="loest-liste"></div>
+            <h2 class="drillede-hoved" id="drillede-hoved" hidden>Drillede <span class="taeller"><b id="antal-drillede">0</b></span></h2>
+            <div class="chips" id="drillede-liste"></div>
+        </div>
+
+        <button class="tekstknap forfra" id="forfraknap" type="button" hidden>Start forfra</button>
+    </aside>
+</section>
+</main>
+
+<div class="overlay" id="regler" hidden>
+    <div class="overlay-boks">
+        <h2>Bundfald</h2>
+        <h3>Sådan spiller du</h3>
+        <ol>
+            <li><b>Forklaringerne synker ned gennem glasset.</b> Skriv fagordet, der passer, og tryk Enter. Så opløses forklaringen.</li>
+            <li><b>Halvvejs nede</b> kommer fagordets første bogstav og en streg for hvert af de andre. Før det giver et fagord 100 point, bagefter 50. Rigtige svar i træk giver bonus.</li>
+            <li><b>Når en forklaring når bunden,</b> bliver den til et lag bundfald. Skriv fagordet af, så kommer det igen senere.</li>
+            <li><b>Fem rigtige i træk</b> rører et lag bundfald op. Ved fem lag er glasset fyldt, og spillet slutter.</li>
+            <li><b>Et forkert fagord</b> får forklaringerne til at synke et stykke.</li>
+            <li>Alle fagord skal opløses, så glasset bliver klart. Der kommer flere forklaringer på én gang, og de synker hurtigere, jo længere du kommer.</li>
+        </ol>
+        <h3>Stavning</h3>
+        <p>Store og små bogstaver, mellemrum og bindestreger er ligegyldige, og ae, oe og aa er det samme som æ, ø og å. En lille stavefejl godtages, men så viser spillet, hvordan ordet staves.</p>
+        <h3>Genveje</h3>
+        <p><kbd>Enter</kbd> svar og start &nbsp;·&nbsp; <kbd>Esc</kbd> pause</p>
+        <div class="knapper">
+            <button class="knap blaa" id="regler-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/fagord.js"></script>
+<script src="js/ord.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

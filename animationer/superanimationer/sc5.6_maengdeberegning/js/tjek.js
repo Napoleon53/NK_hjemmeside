@@ -198,5 +198,15 @@
         return { besked: "m(" + f(st) + ") = n · M. Begge tal står i skemaet." };
     };
 
+    /* Beskeden som HTML med vandret broekstreg: "m / M" og "2/4" bliver til
+       broeker (brugeren 24. nov. 2026: "aldrig '/' som division"). Enheder
+       som g/mol bliver staaende. */
+    T.htmlBesked = function (s) {
+        var h = NK.html(String(s || ""));
+        h = h.replace(/(\d+)\/(\d+)/g, function (m, a, b) { return D.broek(a, b); });
+        h = h.replace(/(^|[^A-Za-zÆØÅæøå])([mnMV]) \/ ([mnMV])(?![A-Za-zÆØÅæøå])/g, function (m, f, a, b) { return f + D.broek(a, b); });
+        return h;
+    };
+
     NK.Tjek = T;
 }());

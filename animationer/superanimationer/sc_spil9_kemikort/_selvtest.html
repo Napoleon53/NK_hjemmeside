@@ -41,7 +41,7 @@ function vis() {
 }
 
 /* Elevens eget indhold gemmes og laegges tilbage til sidst */
-var NOEGLER = ["nk-kemikort-egne", "nk-kemikort-valgt", "nk-kemikort-rekord"];
+var NOEGLER = ["nk-kemikort-egne", "nk-kemikort-valgt", "nk-kemikort-rekord", "nk-spil-navn"];
 var GEMT = {};
 NOEGLER.forEach(function (k) {
     try { GEMT[k] = localStorage.getItem(k); localStorage.removeItem(k); } catch (e) {}
@@ -61,7 +61,9 @@ function koer() {
     try { tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
     /* Filen laeses med FileReader, som svarer senere */
     try {
-        filTest(function () { laegTilbage(); vis(); });
+        filTest(function () {
+            listeTest(function () { laegTilbage(); vis(); });
+        });
     } catch (e) {
         fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl");
         laegTilbage(); vis();
@@ -98,9 +100,268 @@ function filTest(faerdig) {
     }());
 }
 
+/* Parring: uret, straffen for fejl og den faelles Top 10 med en falsk
+   fetch. Intet sendes ud: fetch er falsk, og NK.ingenNet saettes igen
+   til sidst. */
+function listeTest(faerdig) {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    var P = NK.Parring, B = NK.Bibliotek, D = NK.Data;
+    function el(id) { return d.getElementById(id); }
+    function vent(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+    function til(f, navn) {
+        return new Promise(function (ok) {
+            var n = 0;
+            (function se() {
+                if (f()) { ok(true); return; }
+                if (n++ > 150) { paastand("venter på " + navn, false, "tiden løb ud"); ok(false); return; }
+                setTimeout(se, 20);
+            }());
+        });
+    }
+    function vaelg(noegle) {
+        el("saetvaelger").value = noegle;
+        el("saetvaelger").dispatchEvent(new w.Event("change"));
+    }
+    function braek(nr) { return d.querySelector('#pa-hoejre .p-brik[data-nr="' + nr + '"]'); }
+    function plads(nr) { return d.querySelector('#pa-venstre .p-plads[data-nr="' + nr + '"]'); }
+    /* Parrer resten af runden og resten af saettet uden fejl */
+    function parRunden() {
+        var b, vaern = 0;
+        while ((b = d.querySelector("#pa-hoejre .p-brik")) && vaern++ < 20) {
+            var nr = b.getAttribute("data-nr");
+            /* Efter en fejl er brikken stadig valgt; et klik mere ville fravaelge den */
+            if (!b.classList.contains("valgt")) b.click();
+            plads(nr).click();
+        }
+    }
+    function parResten() {
+        var vaern = 0;
+        while (el("pa-slut").hidden && vaern++ < 30) {
+            parRunden();
+            if (!el("pa-naeste").hidden) P.naeste();
+        }
+    }
+    function tast(maal, k) {
+        maal.dispatchEvent(new w.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true }));
+    }
+    /* Synlig tekst under 13 px i et element */
+    function smaa(rod) {
+        var ud = [], alle = rod.querySelectorAll("*");
+        for (var i = 0; i < alle.length; i++) {
+            var e = alle[i];
+            if (!e.offsetWidth && !e.offsetHeight) continue;
+            var tekst = [].some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
+            if (!tekst && e.tagName !== "INPUT") continue;
+            var px = parseFloat(w.getComputedStyle(e).fontSize);
+            if (px < 13) ud.push(e.tagName.toLowerCase() + "." + (e.className || "?") + " " + px.toFixed(1) + "px");
+        }
+        return ud;
+    }
+    /* Kortet staar helt inde i scenen og kan ses uden at rulle */
+    function passer(kort) {
+        var k = kort.getBoundingClientRect();
+        var s = d.querySelector("#fane-parring .spilomraade").getBoundingClientRect();
+        return k.top >= s.top - 1 && k.bottom <= s.bottom + 1 && k.left >= s.left - 1 && k.right <= s.right + 1
+            && kort.scrollHeight <= kort.clientHeight + 1 && d.documentElement.scrollHeight <= w.innerHeight + 1;
+    }
+    async function iStoerrelse(b, h, f) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await vent(120);
+        var r = f();
+        ramme.style.width = "";
+        ramme.style.height = "";
+        await vent(60);
+        return r;
+    }
+
+    async function koer() {
+        overskrift("10. Parring: uret, straffen og Top 10");
+        d.querySelector('.faneknap[data-fane="parring"]').click();
+        vaelg("i:grundstoffer");
+        P.saetStoerrelse(6);
+        var antal = B.saet("i:grundstoffer").kort.length;
+
+        paastand("tiden skrives 1:23 under spillet og 1:23,4 bagefter", P.tidTekst(83.44) === "1:23" && P.tidTekst(83.44, true) === "1:23,4" &&
+            P.tidTekst(59.96, true) === "1:00,0" && P.tidTekst(7.25, true) === "0:07,3", P.tidTekst(83.44, true));
+        paastand("hver fejl koster 5 sekunder", P.STRAF === 5);
+        paastand("uden liste: intet startkort, og brættet kan ses som før", el("pa-start").hidden &&
+            w.getComputedStyle(el("pa-braet")).visibility === "visible");
+        paastand("uret står stille før det første træk", !P.urKoerer() && el("pa-tid").textContent === "0:00", el("pa-tid").textContent);
+
+        var foer = P.tid();
+        braek(0).click();
+        plads(1).click();
+        paastand("et forkert par lægger 5 sekunder til tiden", Math.abs(P.tid() - foer - 5) < 0.5, P.tid().toFixed(2));
+        paastand("fejlen tælles i panelet", el("pa-fejl").textContent === "1");
+        paastand("statuslinjen siger, hvad fejlen koster", /Det koster 5 sekunder\./.test(el("pa-status").textContent), el("pa-status").textContent);
+        paastand("uret går, når runden er i gang", P.urKoerer());
+        paastand("panelet viser hele sekunder under spillet", /^\d+:\d\d$/.test(el("pa-tid").textContent) && el("pa-tid").textContent === "0:05",
+            el("pa-tid").textContent);
+        parRunden();
+        paastand("uret står stille, mens Næste runde venter", !el("pa-naeste").hidden && !P.urKoerer());
+        paastand("statuslinjen siger, at uret står stille", /står stille/.test(el("pa-status").textContent), el("pa-status").textContent);
+        var t1 = P.tid();
+        await vent(250);
+        paastand("tiden går ikke mellem runderne", P.tid() === t1);
+        P.naeste();
+        paastand("uret går igen, når næste runde kommer frem", P.urKoerer());
+        parResten();
+        paastand("hele sættet kan parres", !el("pa-slut").hidden);
+        paastand("resultatet viser tiden med tiendedele og straffen", /på \d+:\d\d,\d med 1 fejl \(heraf 5 s for fejl\)\./.test(el("pa-slut-tekst").textContent),
+            el("pa-slut-tekst").textContent);
+        paastand("panelet viser tiendedele bagefter", /^\d+:\d\d,\d$/.test(el("pa-tid").textContent), el("pa-tid").textContent);
+        paastand("rekorden er gemt under en ny nøgle med straf (par6straf), ikke par6", B.rekord("i:grundstoffer", "par6straf") !== null &&
+            B.rekord("i:grundstoffer", "par6") === null);
+        paastand("rekorden står med tiendedele i panelet", /^\d+:\d\d,\d$/.test(el("pa-rekord").textContent), el("pa-rekord").textContent);
+        paastand("uden liste: hverken navnefelt, liste eller note på resultatet", el("pa-slut-liste").hidden && el("pa-slut-note").hidden &&
+            !el("pa-slut").classList.contains("med-liste"));
+
+        /* Scriptet kender ikke spil9 endnu (foer Niels lægger den nye version op) */
+        var hentet = [], sendt = [];
+        var svar = { fejl: "ukendt spil" };
+        w.fetch = function (url, o) {
+            if (o && o.method === "POST") sendt.push(JSON.parse(o.body)); else hentet.push(String(url));
+            var s = svar;
+            return Promise.resolve({ json: function () { return Promise.resolve(s); } });
+        };
+        NK.ingenNet = false;
+        NK.Topliste.nulstil();
+        P.nyt();
+        await til(function () { return hentet.length > 0; }, "spørgsmålet til listen");
+        await vent(40);
+        paastand("spørgsmålet går til spil9-grundstoffer", /\?spil=spil9-grundstoffer$/.test(hentet[0] || ""), hentet[0]);
+        paastand("svaret \"ukendt spil\": fanen ser ud som før", el("pa-start").hidden && !P.venter() &&
+            w.getComputedStyle(el("pa-braet")).visibility === "visible" && !NK.Topliste.harListe("spil9-grundstoffer"));
+
+        /* Listen svarer */
+        var navne = ["Ida", "Mads", "Sofie Kristensen", "Ahmed", "Laura", "Emil", "Freja", "Noah", "Clara", "Oliver"];
+        var alle = navne.map(function (n, i) { return { navn: n, sekunder: 71.3 + i * 8.7 }; });
+        svar = { uge: alle.slice(0, 3), alle: alle };
+        NK.Topliste.nulstil();
+        P.nyt();
+        await til(function () { return P.venter(); }, "startkortet");
+        paastand("med en liste begynder spillet med et startkort", !el("pa-start").hidden);
+        paastand("brættet er usynligt, så den første runde ikke kan læses før Start", w.getComputedStyle(el("pa-braet")).visibility === "hidden");
+        var st = el("pa-start").textContent;
+        paastand("startkortet har Top 10 denne uge og alle tider side om side", d.querySelectorAll("#pa-start .tl-liste").length === 2 &&
+            /Top 10 denne uge/.test(st) && /Top 10 alle tider/.test(st) && /Ida/.test(st) && /1:11,3/.test(st) && /Oliver/.test(st));
+        var lis = d.querySelectorAll("#pa-start .toplister > div");
+        paastand("de to lister står ved siden af hinanden", lis.length === 2 &&
+            Math.abs(lis[0].getBoundingClientRect().top - lis[1].getBoundingClientRect().top) < 2 &&
+            lis[0].getBoundingClientRect().right <= lis[1].getBoundingClientRect().left);
+        paastand("startkortet nævner straffen og sættets størrelse", /^\d+ kort i runder på 6 par\. Hver fejl koster 5 sekunder\.$/.test(el("pa-start-tekst").textContent),
+            el("pa-start-tekst").textContent);
+        paastand("uret står stille ved startkortet", !P.urKoerer() && el("pa-tid").textContent === "0:00");
+        var s1 = smaa(el("pa-start"));
+        paastand("ingen tekst på startkortet er under 13 px", !s1.length, s1.join(", "));
+        paastand("startkortet kan ses uden at rulle ved 1400 × 860", passer(el("pa-start")));
+        paastand("og ved 1100 × 760", await iStoerrelse(1100, 760, function () { return passer(el("pa-start")); }));
+
+        tast(d.body, "Enter");
+        paastand("Enter starter: kortene kommer frem, og uret går", !P.venter() && el("pa-start").hidden && P.urKoerer() &&
+            w.getComputedStyle(el("pa-braet")).visibility === "visible");
+        braek(0).click();
+        plads(1).click();
+        P.ur(40);
+        parResten();
+        await til(function () { return !el("pa-slut").hidden && !el("pa-slut-liste").hidden; }, "resultatet med listen");
+        var minTid = Math.round(P.tid() * 10) / 10;
+        paastand("resultatet har navnefelt, knap og de to lister", !el("pa-navn").hidden && /Sæt på listen/.test(el("pa-listeknap").textContent) &&
+            d.querySelectorAll("#pa-slut-liste .tl-liste").length === 2 && /Sofie Kristensen/.test(el("pa-slut-liste").textContent));
+        paastand("resultatet viser tiden med tiendedele", el("pa-slut-tekst").textContent.indexOf(P.tidTekst(minTid, true)) >= 0, el("pa-slut-tekst").textContent);
+        paastand("navnefeltet har det gemte navn fra spillene (nk-spil-navn)", el("pa-navn").value === NK.Topliste.navn());
+        var s2 = smaa(el("pa-slut"));
+        paastand("ingen tekst på resultatet med listen er under 13 px", !s2.length, s2.join(", "));
+        paastand("resultatet med listen kan ses uden at rulle ved 1400 × 860", passer(el("pa-slut")));
+        paastand("og ved 1100 × 760", await iStoerrelse(1100, 760, function () { return passer(el("pa-slut")); }));
+
+        el("pa-navn").value = "Selvtest";
+        el("pa-navn").focus();
+        ["t", "v", "s", "h", "p", "1", " "].forEach(function (k) { tast(el("pa-navn"), k); });
+        paastand("bogstaver i navnefeltet er ikke genveje", !el("fane-parring").hidden && !NK.Editor.aaben() &&
+            !NK.Rundvisning.aktiv() && !el("pa-slut").hidden && sendt.length === 0);
+        svar = { ok: true, uge: [{ navn: "Selvtest", sekunder: minTid }], alle: [{ navn: "Ida", sekunder: 71.3 }, { navn: "Selvtest", sekunder: minTid }] };
+        tast(el("pa-navn"), "Enter");
+        await til(function () { return /Tiden er sendt/.test(el("pa-listeknap").textContent); }, "tiden er sendt");
+        var k = sendt[0] || {};
+        paastand("Enter i navnefeltet sender spil9-grundstoffer, navnet, tiden, 6 par og antal kort", k.spil === "spil9-grundstoffer" &&
+            k.navn === "Selvtest" && k.sekunder === minTid && k.niveau === 6 && k.point === antal, JSON.stringify(k));
+        paastand("kun én tid er sendt", sendt.length === 1, sendt.length);
+        paastand("knappen og feltet er slået fra bagefter, og navnet huskes", el("pa-listeknap").disabled && el("pa-navn").disabled &&
+            w.localStorage.getItem("nk-spil-navn") === "Selvtest");
+        paastand("listen fra svaret står på resultatet", /Selvtest/.test(el("pa-slut-liste").textContent));
+        paastand("resultatet står der stadig (Enter i feltet startede ikke et nyt spil)", !el("pa-slut").hidden);
+        P.saetPaaListen();
+        await vent(30);
+        paastand("samme tid kan ikke sendes to gange", sendt.length === 1);
+
+        tast(d.body, "Enter");
+        paastand("Enter uden for feltet giver et nyt spil med startkortet", P.venter() && !el("pa-start").hidden && el("pa-slut").hidden);
+        tast(d.body, "Enter");
+        parResten();
+        await til(function () { return !el("pa-slut").hidden; }, "resultatet");
+        paastand("navnet står i feltet næste gang", el("pa-navn").value === "Selvtest");
+
+        /* Listen svarer, foerst efter det foerste traek: brættet bliver, og
+           spillet kan ikke komme paa listen */
+        NK.Topliste.nulstil();
+        P.nyt();
+        paastand("før svaret: ingen startkort", !P.venter() && el("pa-start").hidden);
+        braek(0).click();
+        plads(0).click();
+        await til(function () { return NK.Topliste.harListe("spil9-grundstoffer"); }, "listen svarer");
+        await vent(30);
+        paastand("brættet forsvinder ikke midt i et spil, når listen svarer", !P.venter() && el("pa-start").hidden &&
+            w.getComputedStyle(el("pa-braet")).visibility === "visible" && P.urKoerer());
+        parResten();
+        await vent(30);
+        paastand("et spil, der ikke startede fra startkortet, får intet navnefelt", !el("pa-slut").hidden && el("pa-slut-liste").hidden);
+
+        /* Andre stoerrelser og egne saet */
+        var hentetFoer = hentet.length;
+        P.saetStoerrelse(4);
+        paastand("4 par pr. runde: intet startkort", !P.venter() && el("pa-start").hidden && P.listeId() === null);
+        parResten();
+        paastand("4 par: ingen navnefelt, men en kort linje om Top 10", el("pa-slut-liste").hidden && !el("pa-slut-note").hidden &&
+            /6 par pr\. runde/.test(el("pa-slut-note").textContent));
+        P.saetStoerrelse(6);
+        await til(function () { return P.venter(); }, "startkortet igen ved 6 par");
+        var eget = B.gem("Sæt: Prøve\nSider: A | B\n\nen | to\ntre | fire\nfem | seks\nsyv | otte\n");
+        P.saetSaet(B.saet(eget), eget);
+        paastand("et eget sæt har ingen liste og intet startkort", !P.venter() && el("pa-start").hidden && P.listeId() === null);
+        parResten();
+        paastand("et eget sæt: hverken navnefelt eller note på resultatet", !el("pa-slut").hidden && el("pa-slut-liste").hidden &&
+            el("pa-slut-note").hidden);
+        paastand("et eget sæt spørger ikke listen", hentet.every(function (u, i) { return i < hentetFoer || /spil9-grundstoffer$/.test(u); }));
+        paastand("kun den ene tid blev sendt i hele afsnittet", sendt.length === 1, sendt.length);
+        B.slet(eget);
+
+        /* Tilbage til det normale: intet net, standardsaettet */
+        NK.ingenNet = true;
+        w.fetch = function () { return Promise.reject(new Error("selvtest")); };
+        NK.Topliste.nulstil();
+        vaelg("i:" + D.STANDARD);
+        d.querySelector('.faneknap[data-fane="traen"]').click();
+    }
+
+    koer().then(faerdig, function (e) {
+        fejl++;
+        skriv("UNDTAGELSE " + e + "\n" + (e && e.stack), "fejl");
+        NK.ingenNet = true;
+        faerdig();
+    });
+}
+
 function tests() {
     var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
     var F = NK.Tekstformat, B = NK.Bibliotek, D = NK.Data;
+
+    /* Testen sender aldrig noget til den faelles liste, og et svar, der
+       kom, mens siden blev indlaest, glemmes (afsnit 10 bruger en falsk fetch) */
+    NK.ingenNet = true;
+    NK.Topliste.nulstil();
+    NK.Parring.nyt();
 
     /* ----------------------------------------------------------------- */
     overskrift("1. Indlæsning");
@@ -370,7 +631,7 @@ function tests() {
         } else break;
     }
     paastand("hele sættet kan parres", el("pa-slut").hidden === false, vaern2);
-    paastand("tiden er gemt som rekord", B.rekord(B.valgt(), "par4") !== null);
+    paastand("tiden er gemt som rekord (med straf, par4straf)", B.rekord(B.valgt(), "par4straf") !== null);
     NK.Parring.nyt();
     paastand("et nyt spil starter forfra i runde 1", el("pa-runde").textContent === "1 af " + runder);
     paastand("fejlene er nulstillet", el("pa-fejl").textContent === "0");

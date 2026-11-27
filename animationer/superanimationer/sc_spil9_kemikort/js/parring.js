@@ -7,8 +7,17 @@
    derefter paa en plads goer det samme, saa spillet ogsaa kan bruges paa
    en tavle eller en telefon.
 
-   Saettet deles i runder. Tiden loeber fra det foerste traek til den
-   sidste runde er faerdig, og fejlene taelles med.
+   Saettet deles i runder. Uret (27. nov. 2026) gaar kun, mens en runde
+   er i gang: fra det foerste traek (eller fra Start) til runden er
+   klaret. Mens Naeste runde venter, staar det stille, saa eleven kan
+   laese parrene. Hver fejl laegger STRAF sekunder til tiden, saa det ikke
+   kan betale sig at proeve sig frem.
+
+   Top 10 (js/topliste.js): et indbygget saet med LISTE_PAR par pr.
+   runde har sin egen liste. Svarer scriptet med en liste, begynder
+   spillet med et startkort med listen, og kortene kommer foerst frem,
+   naar eleven trykker Start. Saa kan ingen laese den foerste runde,
+   foer uret gaar. Uden liste ser fanen ud som foer.
    ===================================================================== */
 (function () {
     "use strict";
@@ -18,6 +27,9 @@
 
     var P = NK.Parring = {};
 
+    var STRAF = 5;          /* sekunder pr. fejl */
+    var LISTE_PAR = 6;      /* kun denne rundestoerrelse har en Top 10 */
+
     var saet = null;
     var noegle = null;
     var prRunde = 6;
@@ -25,13 +37,115 @@
     var rundeNr = 0;
     var tilbage = 0;
     var fejl = 0;
-    var start = 0;
-    var ur = 0;
-    var koerer = false;
+    var startet = false;    /* uret er sat i gang i dette spil */
+    var venter = false;     /* startkortet med listen staar fremme */
+    var rundeKlar = false;  /* runden er klaret, og Naeste runde venter */
     var slut = false;
-    var valgt = null;      /* nummeret paa den bagside, der er klikket */
-    var traek = null;      /* { nr, flyver, x0, y0, aktiv } */
+    var listespil = false;  /* spillet startede fra startkortet og kan komme paa listen */
+    var spilNr = 0;         /* et svar fra listen til et gammelt spil bruges ikke */
+    var ur = { tid: 0, sidst: 0 };
+    var slutData = null;    /* { tid: sekunder med straf, ny: ny rekord } */
+    var sender = false, sendt = false, listeStatus = "";
+    var valgt = null;       /* nummeret paa den bagside, der er klikket */
+    var traek = null;       /* { nr, flyver, x0, y0, aktiv } */
 
+    /* ----- Uret ---------------------------------------------------------- */
+    function nu() { return window.performance && performance.now ? performance.now() : Date.now(); }
+
+    function urKoerer() { return startet && !venter && !rundeKlar && !slut; }
+
+    /* Kaldes foer hver aendring af tilstanden, saa tiden indtil nu regnes
+       med den tilstand, der gjaldt. */
+    function urTrin() {
+        var t = nu();
+        if (urKoerer()) ur.tid += Math.max(0, t - ur.sidst) / 1000;
+        ur.sidst = t;
+    }
+
+    function samletTid() { return ur.tid + fejl * STRAF; }
+
+    /* 83,4 s -> "1:23" under spillet og "1:23,4" bagefter */
+    function tidTekst(s, tiendedele) {
+        var t = tiendedele ? Math.round(s * 10) / 10 : Math.floor(s);
+        var m = Math.floor(t / 60), sek = t - m * 60;
+        var st = tiendedele ? sek.toFixed(1).replace(".", ",") : String(Math.floor(sek));
+        if (sek < 10) st = "0" + st;
+        return m + ":" + st;
+    }
+
+    /* Rekorden fra 27. nov. 2026 er med straf, saa den har sin egen noegle.
+       De gamle (par4, par6, par8) er sat uden straf og bruges ikke. */
+    function rekordNavn() { return "par" + prRunde + "straf"; }
+
+    function startUr() {
+        if (startet || slut || venter) return;
+        urTrin();
+        startet = true;
+    }
+
+    /* ----- Listen -------------------------------------------------------- */
+    function listeId() {
+        if (!noegle || !NK.Bibliotek.indbygget(noegle) || prRunde !== LISTE_PAR) return null;
+        return "spil9-" + noegle.replace(/^i:/, "");
+    }
+
+    function medListe() { return NK.Topliste.harListe(listeId()); }
+
+    /* Henter listen til det valgte saet. Uden tving bruges en liste, der
+       er under et minut gammel. */
+    function hentListe(tving) {
+        var id = listeId();
+        if (!id || !NK.Topliste.kanSpoerge()) return;
+        var l = NK.Topliste.liste(id);
+        if (!tving && l && Date.now() - l.tid < 60000) return;
+        NK.Topliste.hent(id).then(function (d) {
+            if (id !== listeId()) return;
+            listeStatus = d || NK.Topliste.liste(id) ? "" : "ikkeHentet";
+            /* Svaret kan aendre, om startkortet skal staa fremme, men kun
+               i et spil, der ikke er gaaet i gang. */
+            if (!startet && !slut && medListe() !== venter) {
+                venter = medListe();
+                visBraet();
+            }
+            tegn();
+        });
+    }
+
+    function saetPaaListen() {
+        var id = listeId();
+        if (!slut || !listespil || sendt || sender || !slutData || !NK.Topliste.harListe(id)) return;
+        var navn = el("pa-navn").value;
+        NK.Topliste.navn(navn);
+        sender = true;
+        tegn();
+        var nr = spilNr;
+        NK.Topliste.send({ spil: id, navn: navn, kort: saet.kort.length, par: prRunde, sekunder: slutData.tid })
+            .then(function (d) {
+                if (nr !== spilNr) return;
+                sender = false;
+                if (d) sendt = true;
+                else status("Tiden kunne ikke sendes. Prøv igen om lidt.");
+                tegn();
+            });
+    }
+
+    function tegnLister() {
+        var id = listeId();
+        var l = id ? NK.Topliste.liste(id) : null;
+        var tekst = l ? "" : (listeStatus === "ikkeHentet" ? "Listen kunne ikke hentes." : "Henter listen …");
+        var ol = el("fane-parring").querySelectorAll(".tl-liste");
+        for (var i = 0; i < ol.length; i++) {
+            var raekker = l ? l[ol[i].getAttribute("data-liste")] || [] : [];
+            var html = (tekst || !raekker.length)
+                ? '<li class="tom">' + NK.html(tekst || "Ingen endnu.") + "</li>"
+                : raekker.map(function (r) {
+                    return "<li><span>" + NK.html(r.navn) + "</span><b>" + tidTekst(Number(r.sekunder) || 0, true) + "</b></li>";
+                }).join("");
+            if (ol[i].innerHTML !== html) ol[i].innerHTML = html;
+        }
+    }
+
+    /* ----- Spillet ------------------------------------------------------- */
     P.saetSaet = function (nyt, nyNoegle) {
         saet = nyt;
         noegle = nyNoegle;
@@ -46,13 +160,19 @@
     P.stoerrelse = function () { return prRunde; };
 
     P.nyt = function () {
-        stopUr();
+        spilNr++;
         runder = [];
         rundeNr = 0;
         fejl = 0;
-        koerer = false;
+        startet = false;
+        rundeKlar = false;
         slut = false;
-        start = 0;
+        listespil = false;
+        slutData = null;
+        sender = false;
+        sendt = false;
+        listeStatus = "";
+        ur = { tid: 0, sidst: nu() };
         valgt = null;
         if (!saet) return;
         var blandet = NK.bland(saet.kort);
@@ -63,7 +183,20 @@
             if (del.length < 2 && runder.length) runder[runder.length - 1] = runder[runder.length - 1].concat(del);
             else runder.push(del);
         }
+        venter = medListe();
         byg();
+        hentListe(false);
+    };
+
+    /* Startkortet: kortene kommer frem, og uret gaar */
+    P.start = function () {
+        if (!venter || slut) return;
+        urTrin();
+        venter = false;
+        startet = true;
+        listespil = true;
+        visBraet();
+        tegn();
     };
 
     function runde() { return runder[rundeNr] || []; }
@@ -83,44 +216,55 @@
                 + NK.html(x.k.bagside) + "</button>";
         }).join("");
         el("pa-slut").hidden = true;
-        el("pa-naeste").hidden = true;
+        visBraet();
         tegn();
-        status("Træk svaret hen på det, det hører sammen med.");
+    }
+
+    /* Braettet er skjult, mens startkortet staar fremme */
+    function visBraet() {
+        el("pa-braet").classList.toggle("skjult", venter);
+        el("pa-start").hidden = !venter;
+        status(venter ? "Tryk Start, når du er klar. Uret går, når kortene kommer frem."
+            : "Træk svaret hen på det, det hører sammen med.");
     }
 
     function tegn() {
-        NK.saetTekst("pa-tid", NK.tid(koerer ? Date.now() - start : sluttid));
+        NK.saetTekst("pa-tid", tidTekst(samletTid(), slut));
         NK.saetTekst("pa-fejl", String(fejl));
         NK.saetTekst("pa-runde", (rundeNr + 1) + " af " + runder.length);
-        var rek = noegle ? NK.Bibliotek.rekord(noegle, "par" + prRunde) : null;
-        NK.saetTekst("pa-rekord", rek === null ? "ingen" : NK.tid(rek));
+        var rek = noegle ? NK.Bibliotek.rekord(noegle, rekordNavn()) : null;
+        NK.saetTekst("pa-rekord", rek === null ? "ingen" : tidTekst(rek / 1000, true));
         var knapper = el("pa-stoerrelse").querySelectorAll("button");
         for (var i = 0; i < knapper.length; i++) {
             var n = +knapper[i].getAttribute("data-antal");
             knapper[i].classList.toggle("valgt", n === prRunde);
         }
-    }
+        el("pa-naeste").hidden = !rundeKlar || slut;
 
-    var sluttid = 0;
+        if (saet) NK.saetTekst("pa-start-tekst", saet.kort.length + " kort i runder på " + prRunde
+            + " par. Hver fejl koster " + STRAF + " sekunder.");
 
-    function startUr() {
-        if (koerer || slut) return;
-        koerer = true;
-        if (!start) start = Date.now();
-        ur = setInterval(function () { NK.saetTekst("pa-tid", NK.tid(Date.now() - start)); }, 200);
-    }
+        /* Resultatet: navnefeltet og listen kun efter et spil fra startkortet */
+        var medNavn = slut && listespil && medListe();
+        el("pa-slut").classList.toggle("med-liste", medNavn);
+        el("pa-slut-liste").hidden = !medNavn;
+        el("pa-slut-note").hidden = !(slut && noegle && NK.Bibliotek.indbygget(noegle)
+            && prRunde !== LISTE_PAR && NK.Topliste.kendt());
+        NK.saetTekst("pa-listeknap", sendt ? "Tiden er sendt" : (sender ? "Sender …" : "Sæt på listen"));
+        el("pa-listeknap").disabled = sendt || sender;
+        el("pa-navn").disabled = sendt || sender;
+        if (venter || medNavn) tegnLister();
 
-    function stopUr() {
-        clearInterval(ur);
-        ur = 0;
-        if (koerer) sluttid = Date.now() - start;
-        koerer = false;
+        /* En knap, der lige er slaaet fra, maa ikke holde paa tastaturet */
+        var a = document.activeElement;
+        if (a && a.disabled && a.blur) a.blur();
     }
 
     function status(tekst) { NK.saetTekst("pa-status", tekst); }
 
     /* ----- Forsoeget ----------------------------------------------------- */
     function forsoeg(brikNr, pladsNr) {
+        if (venter || slut || rundeKlar) return;
         var r = runde();
         var plads = el("pa-venstre").querySelector('.p-plads[data-nr="' + pladsNr + '"]');
         var brik = el("pa-hoejre").querySelector('.p-brik[data-nr="' + brikNr + '"]');
@@ -136,10 +280,11 @@
             status(r[pladsNr].forside + ": " + r[pladsNr].bagside);
             if (!tilbage) rundeFaerdig();
         } else {
+            urTrin();
             fejl++;
             ryst(plads);
             ryst(brik);
-            status("Det passer ikke sammen. Prøv en anden.");
+            status("Det passer ikke sammen. Det koster " + STRAF + " sekunder.");
             tegn();
         }
     }
@@ -152,24 +297,33 @@
     }
 
     function rundeFaerdig() {
+        urTrin();
         if (rundeNr < runder.length - 1) {
-            el("pa-naeste").hidden = false;
-            status("Runden er klaret. Tiden løber videre.");
-        } else {
-            stopUr();
-            slut = true;
-            var ny = noegle ? NK.Bibliotek.nyRekord(noegle, "par" + prRunde, sluttid) : false;
-            NK.saetTekst("pa-slut-titel", ny ? "Ny rekord" : "Hele sættet er parret");
-            NK.saetTekst("pa-slut-tekst", saet.kort.length + " kort på " + NK.tid(sluttid)
-                + " med " + (fejl === 0 ? "ingen fejl" : fejl === 1 ? "1 fejl" : fejl + " fejl") + ".");
-            el("pa-slut").hidden = false;
-            status(ny ? "Ny rekord på " + NK.tid(sluttid) + "." : "Hele sættet er parret på " + NK.tid(sluttid) + ".");
+            rundeKlar = true;
+            status("Runden er klaret. Uret står stille, til du trykker Næste runde.");
+            tegn();
+            return;
         }
+        slut = true;
+        var tid = Math.round(samletTid() * 10) / 10;
+        var ny = noegle ? NK.Bibliotek.nyRekord(noegle, rekordNavn(), Math.round(tid * 1000)) : false;
+        slutData = { tid: tid, ny: ny };
+        var t = tidTekst(tid, true);
+        NK.saetTekst("pa-slut-titel", ny ? "Ny rekord" : "Hele sættet er parret");
+        NK.saetTekst("pa-slut-tekst", saet.kort.length + " kort på " + t + " med "
+            + (fejl === 0 ? "ingen fejl" : (fejl === 1 ? "1 fejl" : fejl + " fejl"))
+            + (fejl ? " (heraf " + fejl * STRAF + " s for fejl)" : "") + ".");
+        el("pa-navn").value = NK.Topliste.navn();
+        el("pa-slut").hidden = false;
+        status(ny ? "Ny rekord på " + t + "." : "Hele sættet er parret på " + t + ".");
         tegn();
+        if (listespil) hentListe(true);
     }
 
     P.naeste = function () {
-        if (rundeNr >= runder.length - 1) return;
+        if (!rundeKlar || slut || rundeNr >= runder.length - 1) return;
+        urTrin();
+        rundeKlar = false;
         rundeNr++;
         byg();
     };
@@ -251,13 +405,25 @@
 
     P.tast = function (e) {
         if (e.key === "Enter") {
+            if (venter) { P.start(); return true; }
             if (slut) { P.nyt(); return true; }
-            if (!el("pa-naeste").hidden) { P.naeste(); return true; }
+            if (rundeKlar) { P.naeste(); return true; }
         }
         return false;
     };
 
     P.aktiver = function () { tegn(); };
+
+    /* Til selvtesten og skaermbillederne */
+    P.STRAF = STRAF;
+    P.tid = samletTid;
+    P.ur = function (s) { ur.tid += s; tegn(); };
+    P.urKoerer = urKoerer;
+    P.venter = function () { return venter; };
+    P.tidTekst = tidTekst;
+    P.listeId = listeId;
+    P.genhent = function () { hentListe(true); };
+    P.saetPaaListen = saetPaaListen;
 
     function init() {
         var h = el("pa-hoejre");
@@ -291,6 +457,19 @@
         el("pa-naeste").addEventListener("click", P.naeste);
         el("pa-nyt").addEventListener("click", P.nyt);
         el("pa-igen").addEventListener("click", P.nyt);
+        el("pa-startknap").addEventListener("click", P.start);
+        el("pa-listeknap").addEventListener("click", saetPaaListen);
+        /* Navnefeltet: bogstaverne er navnet, ikke genveje (js/app.js
+           springer felter over). Enter saetter tiden paa listen. */
+        el("pa-navn").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { saetPaaListen(); e.preventDefault(); }
+            else if (e.key === "Escape") el("pa-navn").blur();
+        });
+        /* Uret i panelet: hele sekunder, saa det ikke flimrer */
+        setInterval(function () {
+            urTrin();
+            NK.saetTekst("pa-tid", tidTekst(samletTid(), slut));
+        }, 200);
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

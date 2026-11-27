@@ -45,7 +45,7 @@
     var vist = {};
     var nyUr = 0, nyVent = [];
     var laererVent = 0, laererArt = null;
-    var topValg = "uge", topData = null, topStatus = "";
+    var topData = null, topStatus = "";
 
     var VIS_SIDSTE = { bredde: 280, binding: 30, skrift: 17, linje: 2.4 };
     var VIS_STOR = { bredde: 380, binding: 44, skrift: 24, linje: 3.4 };
@@ -76,8 +76,6 @@
         udgave = id;
         document.body.setAttribute("data-udgave", id);
         NK.saetTekst("udgave-maerke", U().navn);
-        NK.el("toplistekort").hidden = !NK.Topliste.harDelt(id);
-        NK.el("mk-navn").hidden = !NK.Topliste.harDelt(id);
         NK.el("navnefelt").value = NK.Topliste.navn();
         NK.Rundvisning.luk();
         lukOverlay();
@@ -159,13 +157,15 @@
         S().nyUge = ny.uge;
         if (data.nyRekord && data.point > 0) { laererArt = "rekord"; laererVent = 1.1; }
         if (NK.Topliste.harDelt(udgave)) {
+            var u = udgave;
             topStatus = "Sender …";
             visTopliste();
-            NK.Topliste.send(udgave, data.point).then(function (d) {
+            NK.Topliste.send(u, data).then(function (d) {
+                if (u !== udgave) return;
                 topData = d;
                 topStatus = d ? "" : "Listen kunne ikke hentes.";
                 visTopliste();
-            }, function () { topStatus = "Listen kunne ikke hentes."; visTopliste(); });
+            });
         }
         vist = {};
     }
@@ -270,7 +270,10 @@
         if (mt.innerHTML !== tekst) mt.innerHTML = tekst;
         NK.saetTekst("mk-knap", KNAP[sp.tilstand] || "Start spil");
         NK.el("mk-forfra").hidden = sp.tilstand !== "pause" && sp.tilstand !== "mester";
-        NK.el("mk-navn").hidden = !NK.Topliste.harDelt(udgave) || (sp.tilstand !== "klar" && sp.tilstand !== "slut");
+        var medListe = NK.Topliste.harDelt(udgave) && (sp.tilstand === "klar" || sp.tilstand === "slut");
+        NK.el("mk-navn").hidden = !medListe;
+        NK.el("mk-liste").hidden = !medListe;
+        kort.classList.toggle("med-liste", medListe);
     }
 
     /* ----- Panelet ----------------------------------------------------------------------------- */
@@ -356,9 +359,11 @@
         linje.className = "statuslinje " + (b.art || "");
     }
 
-    /* ----- Top 10 (kun B) ------------------------------------------------------------------------- */
+    /* ----- Top 10 på midterkortet ------------------------------------------------------------------
+       B har altid listen. C får den, når det fælles script kender spillet
+       (se js/topliste.js); indtil da er C uden liste og navnefelt. */
     function hentTopliste() {
-        if (!NK.Topliste.harDelt(udgave)) return;
+        if (!NK.Topliste.kanSpoerge(udgave)) return;
         topStatus = "Henter listen …";
         visTopliste();
         var u = udgave;
@@ -366,26 +371,23 @@
             if (u !== udgave) return;
             topData = d;
             topStatus = d ? "" : "Listen kunne ikke hentes.";
+            vist.version = null;        /* svaret kan slå listen til (C): kortet tegnes om */
             visTopliste();
-        }, function () { topStatus = "Listen kunne ikke hentes."; visTopliste(); });
+        });
     }
 
     function visTopliste() {
         if (!NK.Topliste.harDelt(udgave)) return;
-        var faner = document.querySelectorAll(".topfane");
-        for (var i = 0; i < faner.length; i++) faner[i].classList.toggle("aktiv", faner[i].getAttribute("data-liste") === topValg);
-        var liste = topData ? topData[topValg] : [];
-        var ol = NK.el("topliste");
-        if (topStatus || !liste.length) {
-            ol.innerHTML = '<li class="tom">' + NK.html(topStatus || "Ingen endnu.") + "</li>";
-        } else {
-            ol.innerHTML = liste.map(function (r) {
-                return "<li><span>" + NK.html(r.name) + "</span><b>" + Math.floor(r.score) + "</b></li>";
-            }).join("");
-        }
-        var p = NK.Topliste.personlig(udgave);
-        NK.saetTekst("topliste-egen", "Din bedste: " + p.uge + " denne uge · " + p.alle + " nogensinde");
-        NK.saetTekst("topliste-uge", "uge " + NK.Topliste.ugeNr(new Date()).split("-W")[1]);
+        ["uge", "alle"].forEach(function (navn) {
+            var liste = topData ? topData[navn] : [];
+            var html = (topStatus || !liste.length)
+                ? '<li class="tom">' + NK.html(topStatus || "Ingen endnu.") + "</li>"
+                : liste.map(function (r) {
+                    return "<li><span>" + NK.html(r.navn) + "</span><b>" + Math.floor(r.point).toLocaleString("da-DK") + "</b></li>";
+                }).join("");
+            var ol = NK.el("topliste-" + navn);
+            if (ol.innerHTML !== html) ol.innerHTML = html;
+        });
     }
 
     /* ----- Stofklasserne (knappen i toplinjen) ------------------------------------------------------- */
@@ -525,10 +527,6 @@
             NK.el(id).addEventListener("click", function (e) { if (e.target === NK.el(id)) lukOverlay(); });
         });
         NK.el("navnefelt").addEventListener("input", gemNavn);
-        var faner = document.querySelectorAll(".topfane");
-        for (var f = 0; f < faner.length; f++) {
-            faner[f].addEventListener("click", function () { topValg = this.getAttribute("data-liste"); visTopliste(); });
-        }
 
         var lydknap = NK.el("lydknap");
         function visLyd(til) { lydknap.textContent = til ? "🔊" : "🔇"; lydknap.title = til ? "Lyd fra (M)" : "Lyd til (M)"; }

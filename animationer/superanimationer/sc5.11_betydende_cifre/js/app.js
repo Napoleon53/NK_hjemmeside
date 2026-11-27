@@ -180,6 +180,15 @@
         el("svar-e").addEventListener("input", feltInput);
         el("fortegn").addEventListener("click", skiftFortegn);
 
+        /* De hurtigste runder i Blandet: Saet paa listen og navnefeltet.
+           Bogstaver i feltet er navnet, ikke genveje (tastatur() springer
+           alle felter over); Enter sender, Esc slipper feltet. */
+        el("listeknap").addEventListener("click", function () { faner.blandet.saetPaaListen(); });
+        el("navnefelt").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); faner.blandet.saetPaaListen(); }
+            else if (e.key === "Escape") e.target.blur();
+        });
+
         var lukKnapper = document.querySelectorAll("[data-luk]");
         for (i = 0; i < lukKnapper.length; i++) lukKnapper[i].addEventListener("click", lukAlle);
         el("teori").addEventListener("click", function (e) { if (e.target === el("teori")) lukAlle(); });

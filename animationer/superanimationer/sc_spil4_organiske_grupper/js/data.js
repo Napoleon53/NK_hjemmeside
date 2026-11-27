@@ -194,7 +194,7 @@
                 { tekst: "Den forkerte spand koster et liv, og efter tre forkerte er spillet slut. Fra niveau 2 falder der også hjælpere, og knappen Regler forklarer, hvad de gør. Knappen Stofklasserne viser et eksempel på hver stofklasse.",
                   sel: ["#regelknap", "#teoriknap"] },
                 { tekst: "I Kemi B kommer dit resultat på en fælles top 10 for hele skolen. Du skriver dit navn i feltet på kortet midt på skærmen, før du starter spillet.",
-                  sel: ["#mk-navn", "#toplistekort"] }
+                  sel: "#mk-navn" }
             ]
         }
     };

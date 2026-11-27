@@ -809,3 +809,196 @@ select:focus-visible {
 .hyldelinje.laast { cursor: default; opacity: 0.75; }
 .hyldelinje.laast:hover { background-color: rgba(255, 255, 255, 0.045); border-color: transparent; }
 .hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
+/* =====================================================================
+   Fane 1 uden panel (runde T12, 27. nov. 2026, REGELSAET 2-3)
+   Raekken er en kopi af ../sc4.7_alkoholer_og_syrer (T11), ../sc4.5 og
+   ../sc4.1. Feltet i kortet som ../sc6.2_formel_og_aktuel (.kt-felt).
+   Decimaltal med PUNKTUM i CSS.
+   ===================================================================== */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-vej .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen */
+.opgaverad {
+    position: absolute;
+    z-index: 7;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-opgaver[hidden] { display: none; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-knap.or-reak, .or-knap.or-nye { padding: 0 10px; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap[hidden] { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) .or-navn { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) { padding: 0 6px 0 4px; }
+
+/* Kortet staar under raekken; pladsen maales i js/sim_vej.js (REGELSAET 4) */
+#fane-vej .scenekort { top: 46px; width: min(860px, calc(100% - 24px)); }
+.scenekort[hidden] { display: none; }
+.sk-chip { white-space: nowrap; }
+#fane-vej .sk-svar.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 640px; }
+#fane-vej .sk-knap .broek, #fane-vej .kf-formel .broek { font-size: 0.86em; }
+
+/* Det roede kryds paa kortet i fri leg (som sc3.3, sc4.1, sc4.5 og sc4.7) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-tekst.sk-start { padding-right: 28px; }
+
+/* Feltet i kortet: "n(Fe) = [ tallet ] mol", med den valgte formel foran */
+.kt-felt-plads { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 9px; }
+.kf-formel {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border: 1.5px solid #2b7d51;
+    border-radius: 9px;
+    background-color: #e3f3ea;
+    color: #1f4d35;
+    font-size: 1.02rem;
+    font-weight: 500;
+}
+.kt-felt {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 5px 10px;
+    border: 1.5px solid #c9c3b3;
+    border-radius: 9px;
+    background-color: #ffffff;
+    font-size: 1.06rem;
+    font-weight: 500;
+    color: #1d2433;
+}
+.kt-felt:focus-within { border-color: #2a76ac; box-shadow: 0 0 0 1px #2a76ac; }
+.kt-felt input {
+    width: 7.5em;
+    padding: 5px 8px;
+    border: 1px solid #c9c3b3;
+    border-radius: 6px;
+    background-color: #fffdf6;
+    font: inherit;
+    font-weight: 600;
+    color: #1d2433;
+    text-align: right;
+}
+.kt-felt input::placeholder { color: #a09a8a; font-weight: 400; text-align: left; }
+.kt-felt input:focus { outline: none; border-color: #2a76ac; }
+.kt-felt input.forkert { border-color: #c4493c; background-color: #fdf0ee; }
+.kt-felt .kf-enhed, .kt-felt .kf-pre, .kt-felt .kf-svar { white-space: nowrap; }
+.kt-felt.ok { border-color: #2b7d51; background-color: #e3f3ea; color: #1f4d35; }
+.kt-felt.svar { border-color: #d4a72c; background-color: #fdf3d6; color: #6b4e00; }
+.kt-felt .kf-maerke { font-weight: 700; }
+.kt-felt.ryst { animation: ryst 0.35s ease 1; border-color: #c4493c; }
+
+/* Skemaet, naar svaret gives i kortet: "?" med gul ramme i den celle, kortet
+   spoerger om, og en tom stiplet plads i de andre (REGELSAET 28, 38) */
+.skemafelt.spm {
+    justify-content: center;
+    border: 2.5px solid #e0a91a;
+    background-color: #fff8e1;
+    box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.3);
+}
+.skemafelt.spm .sf-spm { align-self: center; margin: 0 auto; font-weight: 800; font-size: 1.15em; color: #8a6510; }
+.skemafelt.tom { background-color: rgba(255, 255, 255, 0.35); border: 2px dashed #b3bac5; box-shadow: none; }
+
+/* Arket med beregningen: et roligt, lyst papir til hoejre for skemaet. Det
+   vokser linje for linje med et navn i ord over hver linje (REGELSAET 28-29) */
+.vej-ark {
+    position: absolute;
+    z-index: 4;
+    overflow: hidden;
+    padding: 12px 16px;
+    border: 1.5px solid #d9d4c6;
+    border-radius: 10px;
+    background-color: #fbfaf6;
+    box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.3);
+    color: #1f2530;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    font-weight: 400;
+    line-height: 1.35;
+}
+.vej-ark[hidden] { display: none; }
+.vej-ark.tom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed #4a4f5e;
+    background: none;
+    box-shadow: none;
+}
+.vej-ark .va-tom { margin: 0; color: #8f97a3; font-size: 15px; }
+.va-linje { margin: 0 0 11px; }
+.va-linje:last-child { margin-bottom: 0; }
+.va-navn { margin-bottom: 2px; font-size: 0.84em; font-weight: 500; color: #5b6270; }
+.va-regn { font-size: 1em; }
+.va-led { white-space: nowrap; }
+.va-regn b { font-weight: 600; color: #1d7a48; }
+.va-linje.svar .va-regn b { color: #8a6510; }
+.vej-ark .broek { font-size: 0.84em; }

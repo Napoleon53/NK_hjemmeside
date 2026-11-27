@@ -44,7 +44,7 @@ function vis() {
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-sc5.10-valg", "nk-sc5.10-rekord", "nk-sc5.10-enheder"];
+var NOEGLER = ["nk-sc5.10-valg", "nk-sc5.10-rekord", "nk-sc5.10-enheder", "nk-sc5.11-tid", "nk-spil-navn"];
 var gemt = {};
 try { NOEGLER.forEach(function (k) { gemt[k] = localStorage.getItem(k); localStorage.removeItem(k); }); } catch (e) {}
 function laegTilbage() {
@@ -53,8 +53,10 @@ function laegTilbage() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-function koer() {
+async function koer() {
     try { koerAlt(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    try { await koerUr(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    try { var w = document.getElementById("ramme").contentWindow; w.NK.ingenNet = true; } catch (e) {}
     laegTilbage();
     vis();
 }
@@ -65,6 +67,8 @@ function koerAlt() {
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
     if (!NK) return;
+    /* Selvtesten sender aldrig noget til den faelles liste */
+    NK.ingenNet = true;
     var C = NK.Cifre, D = NK.Data;
     paastand("fire faner er bygget (tael, afrund, komma, blandet)", !!(NK.faner && NK.faner.tael && NK.faner.afrund && NK.faner.komma && NK.faner.blandet));
     var raekke = Array.prototype.map.call(d.querySelectorAll(".faneknap"), function (b) { return b.getAttribute("data-fane"); }).join(",");
@@ -602,6 +606,215 @@ function koerAlt() {
     paastand("kortet holder sig i kortZone og over tavlen (1400 × 860 og 1100 × 660, alle trin)", ud.length === 0,
         ud.slice(0, 5).join(" | ") + " højest: " + JSON.stringify(hoejst));
     skriv("        (kortets største højde: " + JSON.stringify(hoejst) + ")");
+}
+
+/* ----- 10. Uret og de hurtigste runder i Blandet (27. nov. 2026) ------------------
+   Den faelles liste proeves med en falsk fetch; intet sendes ud. Uret
+   maales i rigtig tid med korte pauser. */
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+async function til(f, navn) {
+    for (var i = 0; i < 300; i++) { if (f()) return true; await vent(10); }
+    paastand("ventede forgæves på: " + navn, false);
+    return false;
+}
+
+async function koerUr() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK, D = NK.Data, C = NK.Cifre;
+    function el(id) { return d.getElementById(id); }
+    var T = NK.tidTekst;
+    overskrift("10. Uret og de hurtigste runder i Blandet");
+    NK.ingenNet = true;
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    void ramme.offsetWidth;
+
+    function facitSvar(o) {
+        if (o.type === "tael") return { valgt: o.betydende.slice() };
+        if (o.type === "potens" || ((o.type === "afrund" || o.type === "regn") && !C.kanAlmindelig(o.facit))) return { mantisse: C.mantisse(o.facit), eksp: String(o.facit.p) };
+        return { mantisse: C.skillerum(C.almindelig(o.facit)), eksp: "" };
+    }
+    function skrivFelt(m, e) {
+        var a = el("svar-m"), b = el("svar-e");
+        a.value = m; a.dispatchEvent(new w.Event("input"));
+        b.value = e || ""; b.dispatchEvent(new w.Event("input"));
+    }
+    function loesRigtigt(f) {
+        var s = facitSvar(f.opg);
+        if (s.valgt) s.valgt.forEach(function (i) { f.klikBrik(i); });
+        else {
+            if (s.eksp !== "" && f.maade !== "pot") f.skiftMaade("pot");
+            skrivFelt(s.mantisse, s.eksp);
+        }
+        f.tjek();
+        return f.loest;
+    }
+    /* Resten af runden: rigtige svar, og til sidst Se resultatet */
+    function resten(f) {
+        while (!f.runde.slut) {
+            if (f.loest) f.naeste();
+            if (!loesRigtigt(f)) { f.knap(); if (!f.loest) f.knap(); }
+        }
+        f.naeste();
+    }
+    function kortTekst() { return el("skort").textContent.replace(/\s+/g, " "); }
+    function smaa(rod) {
+        var ud = [];
+        Array.prototype.forEach.call(rod.querySelectorAll("*"), function (e) {
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (harTekst && e.offsetWidth && parseFloat(w.getComputedStyle(e).fontSize) < 13) ud.push(e.tagName.toLowerCase() + "." + e.className + " " + w.getComputedStyle(e).fontSize);
+        });
+        return ud;
+    }
+    function passer(navn) {
+        var p = d.querySelector(".panel"), tl = el("toplag"), sk = el("skort").getBoundingClientRect();
+        var ud = [];
+        if (p.scrollHeight > p.clientHeight + 1) ud.push("panelet " + p.scrollHeight + "/" + p.clientHeight);
+        if (!tl.hidden) {
+            var bx = tl.querySelector(".toplag-boks").getBoundingClientRect(), sc = el("scene").getBoundingClientRect();
+            if (tl.scrollHeight > tl.clientHeight + 1) ud.push("listen i scenen " + tl.scrollHeight + "/" + tl.clientHeight);
+            if (bx.top < sk.bottom || bx.bottom > sc.bottom + 1) ud.push("listen dækker kortet eller går ud af scenen");
+        }
+        return ud.length ? navn + ": " + ud.join(", ") : "";
+    }
+
+    paastand("tiden skrives 1:23 under runden og 1:23,4 bagefter", T(83.44) === "1:23" && T(83.44, true) === "1:23,4" &&
+        T(59.96, true) === "1:00,0" && T(7.25, true) === "0:07,3" && T(605, true) === "10:05,0", T(83.44, true));
+
+    NK.visFane("tael");
+    paastand("de andre faner har intet ur og ingen liste", el("urrad").hidden && el("toppanel").hidden && el("toplag").hidden &&
+        !NK.faner.tael.urKoerer() && !NK.faner.komma.paaTid && !NK.faner.afrund.paaTid);
+
+    NK.visFane("blandet");
+    var f = NK.faner.blandet;
+    f.forfra();
+    paastand("Blandet: uret står i panelet under stregerne med hele sekunder", !el("urrad").hidden && !!el("urrad").closest("#rundevalg") &&
+        /^\d+:\d\d$/.test(el("ur-tid").textContent), el("ur-tid").textContent);
+    var t0 = f.tid();
+    await vent(150);
+    paastand("uret venter, mens den nye opgave glider ind", f.tid() === t0, t0 + " / " + f.tid());
+    await vent(450);
+    paastand("uret går, mens opgaven venter på et svar", f.urKoerer() && f.tid() > t0 + 0.1, f.tid());
+
+    /* En opgave, der skrives i feltet, saa et forkert svar er let at lave */
+    for (var i = 0; i < 50 && f.opg.type === "tael"; i++) f.lavOpgave();
+    f.vis();
+    var s0 = f.ur.straf;
+    skrivFelt("999999", ""); f.tjek();
+    paastand("et forkert første svar koster 10 sekunder, og kortet siger det", f.ur.straf === s0 + 10 && /Det koster 10 sekunder\./.test(el("besked").textContent) &&
+        f.urKoerer(), el("besked").textContent);
+    skrivFelt("888888", ""); f.tjek();
+    paastand("et forkert svar mere koster ikke ekstra", f.ur.straf === s0 + 10 && f.fejl === 2 && !/Det koster/.test(el("besked").textContent));
+    f.knap();
+    paastand("et hint koster 10 sekunder, og hintet siger det", f.ur.straf === s0 + 20 && /^Hint/.test(el("besked").textContent) &&
+        /Det koster 10 sekunder\./.test(el("besked").textContent), el("besked").textContent);
+    f.knap();
+    var bliv = d.querySelector("#sk-ind .sk-bund.bliv.svar");
+    paastand("Vis svaret koster 10 sekunder, og forklaringen siger det", f.loest && f.vist && f.ur.straf === s0 + 30 &&
+        !!bliv && /Det koster 10 sekunder\./.test(bliv.textContent));
+    var t1 = f.tid();
+    await vent(300);
+    paastand("uret står stille, mens forklaringen står på kortet", !f.urKoerer() && f.tid() === t1);
+    f.opdater(0);
+    paastand("tiden i panelet er med straffen", el("ur-tid").textContent === T(f.tid()) && f.tid() >= 30, el("ur-tid").textContent);
+
+    f.naeste();
+    await vent(450);
+    NK.visFane("tael");
+    var t2 = f.tid();
+    paastand("på en anden fane er uret skjult", el("urrad").hidden);
+    await vent(300);
+    NK.visFane("blandet");
+    paastand("uret går videre, når man kigger på en anden fane midt i en opgave (ingen pause at snyde med)", f.tid() > t2 + 0.2, t2 + " / " + f.tid());
+
+    /* Scriptet kender ikke spillet endnu: fanen ser ud som foer */
+    var sendtKrop = null, hentet = 0, svar = { fejl: "ukendt spil" };
+    w.fetch = function (url, o) {
+        if (o && o.method === "POST") sendtKrop = JSON.parse(o.body); else hentet++;
+        var kopi = JSON.parse(JSON.stringify(svar));
+        return Promise.resolve({ json: function () { return Promise.resolve(kopi); } });
+    };
+    NK.ingenNet = false;
+    try { w.localStorage.removeItem(D.UR.noegle); } catch (e) {}
+    f.forfra();
+    f.hentLister();
+    await til(function () { return hentet > 0; }, "listen er spurgt");
+    await vent(30);
+    paastand("svarer scriptet \"ukendt spil\", er listen skjult ved starten", !NK.Topliste.harListe() && el("toppanel").hidden && el("toplag").hidden);
+    f.urLaeg(25);
+    resten(f);
+    await vent(30);
+    var tSlut = f.ur.slut;
+    paastand("på resultatet: tavlen som før, ingen liste og intet navnefelt", f.resultat && el("toplag").hidden && !el("arbejde").hidden && !el("tavle").hidden);
+    paastand("resultatet siger tiden med tiendedele og Ny bedste tid", kortTekst().indexOf("Din tid: " + T(tSlut, true)) >= 0 && /Ny bedste tid/.test(kortTekst()), kortTekst());
+    paastand("den bedste tid huskes og står i panelet ved uret, nu med tiendedele", Number(w.localStorage.getItem(D.UR.noegle)) === tSlut &&
+        !el("ur-bedste").hidden && el("ur-bedste-tal").textContent === T(tSlut, true) && el("ur-tid").textContent === T(tSlut, true), el("ur-tid").textContent);
+    var tA = f.tid();
+    await vent(200);
+    paastand("uret står stille på resultatet", !f.urKoerer() && f.tid() === tA);
+
+    /* Scriptet svarer med en liste */
+    svar = { uge: [{ navn: "Ida", sekunder: 41.3 }], alle: [{ navn: "Ida", sekunder: 41.3 }, { navn: "Mads", sekunder: 58 }] };
+    f.forfra();
+    f.hentLister();
+    await til(function () { return NK.Topliste.harListe() && !el("toppanel").hidden; }, "listen i panelet");
+    var tp = el("toppanel");
+    paastand("ved starten står Top 10 denne uge og Top 10 alle tider side om side i panelet", /Top 10 denne uge/.test(tp.textContent) &&
+        /Top 10 alle tider/.test(tp.textContent) && /Ida/.test(tp.textContent) && /0:41,3/.test(tp.textContent) && /0:58,0/.test(tp.textContent) &&
+        Math.abs(tp.querySelectorAll(".toplister > div")[0].getBoundingClientRect().top - tp.querySelectorAll(".toplister > div")[1].getBoundingClientRect().top) < 2 &&
+        el("toplag").hidden && !tp.querySelector("input"));
+    var sm = smaa(tp);
+    paastand("ingen tekst i listen i panelet er under 13 px", !sm.length, sm.join(", "));
+    var ikke = [];
+    [["1400px", "860px"], ["1100px", "760px"]].forEach(function (st) {
+        ramme.style.width = st[0]; ramme.style.height = st[1]; void ramme.offsetWidth;
+        var p = passer(st[0] + " start");
+        if (p) ikke.push(p);
+    });
+    loesRigtigt(f);
+    paastand("efter rundens første svar er listen væk fra panelet", el("toppanel").hidden && el("toplag").hidden);
+    f.urLaeg(60);
+    resten(f);
+    await til(function () { return !el("toplag").hidden; }, "listen på resultatet");
+    var tl = el("toplag");
+    paastand("på resultatet står listen og navnefeltet, hvor tavlen stod", el("arbejde").hidden && !tl.hidden && !!el("navnefelt") &&
+        el("listeknap").textContent === "Sæt på listen" && tl.querySelectorAll(".tl-liste").length === 2 && /Mads/.test(tl.textContent));
+    paastand("en langsommere tid er ikke en ny bedste tid", !f.runde.nyTid && !/Ny bedste tid/.test(kortTekst()) && Number(w.localStorage.getItem(D.UR.noegle)) === tSlut);
+    sm = smaa(tl);
+    paastand("ingen tekst i listen på resultatet er under 13 px", !sm.length, sm.join(", "));
+    [["1400px", "860px"], ["1100px", "760px"]].forEach(function (st) {
+        ramme.style.width = st[0]; ramme.style.height = st[1]; void ramme.offsetWidth;
+        var p = passer(st[0] + " resultat");
+        if (p) ikke.push(p);
+    });
+    ramme.style.width = "1400px"; ramme.style.height = "860px"; void ramme.offsetWidth;
+    paastand("listen, kortet og panelet kan ses uden at rulle ved 1400 × 860 og 1100 × 760", !ikke.length, ikke.join(" | "));
+
+    var felt = el("navnefelt");
+    felt.focus();
+    felt.value = "Selvtest";
+    ["r", "1", "t", "h"].forEach(function (k) { felt.dispatchEvent(new w.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true })); });
+    paastand("bogstaver og tal i navnefeltet er ikke genveje", NK.aktivFane === f && f.resultat && f.runde.slut && !NK.Rundvisning.aktiv() &&
+        !d.querySelector(".overlay.vis") && sendtKrop === null);
+    var mitSlut = f.ur.slut, mineRigtige = f.rigtige();
+    svar = { uge: [{ navn: "Selvtest", sekunder: mitSlut }], alle: [{ navn: "Ida", sekunder: 41.3 }, { navn: "Selvtest", sekunder: mitSlut }] };
+    felt.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    await til(function () { return /Tiden er sendt/.test(el("listeknap").textContent); }, "tiden er sendt");
+    paastand("Enter i navnefeltet sender sc5.11, navnet, tiden, de rigtige og 10 opgaver", !!sendtKrop && sendtKrop.spil === "sc5.11" &&
+        sendtKrop.navn === "Selvtest" && sendtKrop.sekunder === mitSlut && sendtKrop.point === mineRigtige && sendtKrop.niveau === 10, JSON.stringify(sendtKrop));
+    paastand("knappen og feltet er slået fra bagefter, navnet huskes, og ens egen linje er fremhævet", el("listeknap").disabled && felt.disabled &&
+        w.localStorage.getItem("nk-spil-navn") === "Selvtest" && tl.querySelectorAll("li.mig").length === 2);
+    sendtKrop = null;
+    f.saetPaaListen();
+    paastand("en runde sendes kun én gang", sendtKrop === null);
+    f.forfra();
+    f.saetPaaListen();
+    paastand("en runde, der ikke er færdig, kan ikke sendes", sendtKrop === null && !f.resultat && el("toplag").hidden && !el("arbejde").hidden);
+    NK.visFane("tael");
+    paastand("de andre faner viser hverken uret eller listen", el("urrad").hidden && el("toppanel").hidden && el("toplag").hidden && !el("arbejde").hidden);
+
+    NK.ingenNet = true;
+    w.fetch = function () { return Promise.reject(new Error("selvtest")); };
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
 }
 </script>
 </body>

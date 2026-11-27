@@ -7,6 +7,7 @@
 <title>Mængdeberegning</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 <script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
 <script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -16,7 +17,7 @@
     <h1><span class="ikon">⇄</span> Mængdeberegning</h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-vej" role="tab" aria-selected="true"><span class="nr">1</span>Vejen</button>
+        <button class="faneknap aktiv" data-fane="fane-vej" role="tab" aria-selected="true"><span class="nr">1</span>Fra gram til gram</button>
         <button class="faneknap" data-fane="fane-skema" role="tab" aria-selected="false"><span class="nr">2</span>Skemaet</button>
         <button class="faneknap" data-fane="fane-begr" role="tab" aria-selected="false"><span class="nr">3</span>Begrænsende mængde</button>
     </div>
@@ -28,38 +29,36 @@
 <main>
 
 <!-- ================================================================= -->
-<!-- FANE 1: VEJEN                                                      -->
+<!-- FANE 1: FRA GRAM TIL GRAM (runde T12, 27. nov. 2026, REGELSAET)   -->
+<!-- Intet panel: opgaverne i raekken oeverst, kortet under raekken,    -->
+<!-- skemaet paa tavlen og beregningen paa det lyse ark til hoejre.     -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-vej" role="tabpanel" aria-label="Vejen">
+<section class="fane aktiv uden-panel" id="fane-vej" role="tabpanel" aria-label="Fra gram til gram">
     <div class="scene">
-        <canvas id="vej-laerred"></canvas>
-        <!-- Kortet oeverst midt i scenen: opgaven, valget, hint, fejl,
-             forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
-        <div class="scenekort" id="vej-skort">
-            <div class="sk-ind" id="vej-ind"></div>
-            <div class="sk-bund" id="vej-status">
-                <p class="st-tekst" id="vej-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="vej-knap" type="button">Giv hint</button>
-                <button class="knap indsend" id="vej-indsend" type="button">Indsend svar</button>
-            </div>
-        </div>
+        <canvas id="vej-laerred" aria-label="Mængdeberegningsskemaet på en tavle, beregningen på et ark og to vægte med reaktionspilen imellem"></canvas>
         <div class="anker" id="vej-anker-skema"></div>
         <div class="anker" id="vej-anker-vaegte"></div>
         <div class="skema-felter" id="vej-felter"></div>
+        <div class="vej-ark" id="vej-ark" aria-live="polite"></div>
+
+        <!-- Opgaverne i en raekke oeverst i scenen (REGELSAET 3, 17, 57) -->
+        <nav class="opgaverad" id="vej-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="vej-liste"></div>
+            <div class="or-opgaver" id="vej-reak" hidden></div>
+            <button class="or-knap or-stille" id="vej-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="vej-frileg" type="button" title="Regn med alle fire reaktioner og nye tal">Fri leg</button>
+        </nav>
+
+        <!-- Kortet under raekken: spoergsmaalet, svarene eller feltet, hint og Indsend svar -->
+        <div class="scenekort" id="vej-skort">
+            <div class="sk-ind" id="vej-ind"></div>
+            <div class="sk-bund" id="vej-bund" hidden>
+                <p class="st-tekst" id="vej-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="vej-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="vej-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
     </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="vej-beregninger">
-            <h2>Beregningerne</h2>
-            <div class="regn-linjer" id="vej-linjer"></div>
-        </div>
-
-        <div class="kort" id="vej-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="vej-loest">0</b>/4</span></h2>
-            <div class="hyldeliste" id="vej-liste"></div>
-            <button class="knap nye" id="vej-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -142,24 +141,22 @@
 <!-- TEORIEN (aabnes kun med knappen eller T)                           -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <div class="overlay-boks teori-ark">
         <h2>Mængdeberegning</h2>
-        <p>Koefficienterne i et afstemt reaktionsskema gælder stofmængder, ikke masser. Vejen fra gram til gram går derfor altid over mol.</p>
+        <p>Koefficienterne i reaktionsskemaet gælder stofmængder, ikke masser. Vejen fra gram til gram går derfor over mol. Den går fra masse til stofmængde, på tværs med koefficienterne og tilbage til masse.</p>
         <div class="eksempel">
-            <span class="eksempel-hoved">Eksempel</span>
-            111,70 g Fe reagerer: Fe + S ⟶ FeS<br>
-            n(Fe) = <span class="broek"><span>111,70 g</span><span>55,85 g/mol</span></span> = 2,00 mol<br>
-            n(FeS) = <span class="broek"><span>1</span><span>1</span></span> · n(Fe) = 2,00 mol<br>
-            m(FeS) = 2,00 mol · 87,91 g/mol = 175,82 g
+            <span class="eksempel-hoved">Eksempel: 111,70 g jern reagerer med rigeligt svovl</span>
+            Fe + S ⟶ FeS<br>
+            n(Fe) = <span class="broek"><span>m</span><span>M</span></span> = <span class="broek"><span>111,70 g</span><span>55,85 g/mol</span></span> = 2,00 mol<br>
+            n(FeS) = <span class="broek"><span>1</span><span>1</span></span> · n(Fe) = <span class="broek"><span>1</span><span>1</span></span> · 2,00 mol = 2,00 mol<br>
+            m(FeS) = n · M = 2,00 mol · 87,91 g/mol = 175,82 g
         </div>
-        <p>I skemaet står massen m, molarmassen M og stofmængden n under hver formel. Skemaet afstemmes først, og molarmassen regnes af atommasserne.</p>
-        <p>Massen er bevaret, så summen af masserne før reaktionen er lig med summen efter.</p>
-        <div class="eksempel">
-            <span class="eksempel-hoved">Begrænsende mængde</span>
-            Del hver reaktants stofmængde med sin koefficient. Den reaktant, der giver det mindste tal, slipper op først og bestemmer, hvor meget der dannes. De andre reaktanter er i overskud.
-        </div>
-        <div class="knapper" style="margin-top:14px;">
-            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        <h3 class="teori-hoved">Begrænsende mængde</h3>
+        <p>Kendes massen af begge reaktanter, findes stofmængden af dem begge. Den reaktant, der slipper op først, bestemmer, hvor meget der dannes.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/c/kapitler/5-5-maengdeberegning.html" target="_blank" rel="noopener">5.5 Mængdeberegning</a></p>
+        <p class="genveje"><kbd>1</kbd>-<kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" type="button" data-luk>Luk</button>
         </div>
     </div>
 </div>
@@ -192,6 +189,7 @@
 <script src="js/skema.js"></script>
 <script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
+<script src="js/vej_opgaver.js"></script>
 <script src="js/sim_vej.js"></script>
 <script src="js/sim_skema.js"></script>
 <script src="js/sim_begr.js"></script>

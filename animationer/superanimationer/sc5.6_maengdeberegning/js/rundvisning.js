@@ -16,13 +16,11 @@
 
     var TURE = {
         "fane-vej": [
-            { sel: "#vej-anker-skema", titel: "Skemaet", tekst: "Under hver formel: massen m, molarmassen M og stofmængden n. Den grønne boks er den kendte masse." },
-            { sel: "#vej-felter", titel: "Felterne", tekst: "Skriv tallet, og tryk Indsend svar eller Enter. Kun det næste felt er åbent. Pilene viser vejen, når et tal er rigtigt." },
-            { sel: "#vej-anker-vaegte", titel: "Vægtene", tekst: "Hvert rigtigt tal vises også her: pulveret bliver til poser med 1 mol, poserne går gennem pilen, og det nye stof vejes." },
-            { sel: "#vej-skort", titel: "Opgaven", tekst: "Kortet øverst i scenen viser opgaven. Det siger også, hvad du skal nu, og hvad der gik galt." },
-            { sel: "#vej-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
-            { sel: "#vej-beregninger", titel: "Beregningerne", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." },
-            { sel: "#vej-opgaver", titel: "Opgaverne", tekst: "Fire reaktioner. En opgave, du løser uden at se svaret, får en stjerne. Nye tal giver samme opgave med andre tal." },
+            { sel: "#vej-raekke", titel: "Opgaverne", tekst: "Tre opgaver. Den næste låses op, når du har løst den, du er ved. Fri leg giver alle fire reaktioner med nye tal." },
+            { sel: "#vej-skort", titel: "Kortet", tekst: "Kortet stiller ét spørgsmål ad gangen. Du svarer i kortet og trykker Indsend svar eller Enter. Den gule knap giver et hint og til sidst svaret." },
+            { sel: "#vej-anker-skema", titel: "Skemaet", tekst: "Under hver formel står massen m, molarmassen M og stofmængden n. Den grønne boks er den kendte masse, og spørgsmålstegnet er det tal, kortet spørger om." },
+            { sel: "#vej-ark", titel: "Beregningen", tekst: "Når et tal er rigtigt, står beregningen her, som den skal skrives." },
+            { sel: "#vej-anker-vaegte", titel: "Vægtene", tekst: "Hvert rigtigt tal vises også her. Pulveret bliver til poser med 1 mol, poserne går gennem pilen, og det nye stof vejes." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Skemaet: hele skemaet med afstemning og molarmasser. Begrænsende mængde: to kendte masser." }
         ],
         "fane-skema": [

@@ -112,7 +112,8 @@ Præsenterer spillet med tilbuddet Start præsentation / Nej tak, én gang pr. u
 (`../kemichael/praesentation.js` og `praesentation.css`): trinnene står i
 `D.UDGAVER[..].intro` (C tre trin, B fire med top 10), to til fire hele sætninger
 hver, og han peger på det, der blinker med en gul ramme: spandene, kortet
-Stofklasser, knapperne Regler og Stofklasserne og i B navnefeltet og top 10.
+Stofklasser, knapperne Regler og Stofklasserne og i B navnefeltet (listen er skjult,
+mens han taler).
 Taleboblen har Næste (på sidste trin Afslut) og Spring præsentationen over; Enter
 og pil til højre er Næste, Esc springer over, og han går aldrig videre af sig selv.
 
@@ -126,14 +127,27 @@ giver kun en replik første gang og derefter hver fjerde gang i samme besøg
 Fra niveau 3 falder der én gang pr. spil, sjældent, en kop kaffe. Klikkes den, er det
 Kemichaels. Lander den i en spand, er kaffe ikke en stofklasse. Den koster intet.
 
-## Top 10 (kun B)
+## Top 10
 
-Den gamle udgaves Google-regneark med Apps Script (opsætningen står i
+B bruger den gamle udgaves Google-regneark med Apps Script (opsætningen står i
 `.claude/b_spil_organiske_grupper_HIGHSCORE_SETUP.txt`). Hver score over 0 sendes
 med navnet fra feltet på startkortet. Den personlige rekord bruger de gamle nøgler
-(`orgSortering_*`), så elevernes rekorder følger med. C har kun den personlige rekord,
-fordi arket ikke kan skille C og B ad. Selvtesten sætter `NK.ingenNet`, så den aldrig
-sender en score.
+(`orgSortering_*`), så elevernes rekorder følger med. Selvtesten sætter `NK.ingenNet`,
+så den aldrig sender en score.
+
+27. nov. 2026 (Niels: "når man er på siden, så tror man ikke at det er væk"): listen
+lå nederst i panelet under skærmkanten og blev ikke set. Nu står Top 10 denne uge og
+Top 10 alle tider side om side på midterkortet ved start og slut (`#mk-liste`,
+klassen `med-liste` gør kortet bredere), som arket på samlebåndet i sc2.3. Mens
+Kemichael taler, skjules listen, og kortet rykker ned som før. Panelkortet og
+fanerne Denne uge / Alle tider er fjernet.
+
+C bruger det fælles script til spillene (`.claude/highscore/highscore.gs`, samme
+adresse som samlebåndet) under navnet `spil4c`. Listen og navnefeltet kommer først,
+når scriptet svarer med en liste. Før den nye version er lagt op, svarer det "ukendt
+spil", og C ser ud som før med kun den personlige rekord. Spillet sender point,
+niveau og sekunder (spillets egen tid uden pauser). Vejledningen til at lægge den nye
+version op: `.claude/highscore/OPDATERING.html`.
 
 ## Filer
 
@@ -144,7 +158,7 @@ sender en score.
 | `js/kerne.js` | fælles hjælpefunktioner (kopi fra Ion-Tetris) |
 | `js/data.js` | stofklasserne, molekylerne, niveauerne, balancen og alle tekster |
 | `js/kemi.js` | molekylerne fra molekylemotoren, gruppen og tegningerne |
-| `js/topliste.js` | rekorderne og B's fælles top 10 |
+| `js/topliste.js` | rekorderne og de fælles top 10 (B's gamle ark, C's fælles script) |
 | `js/spil.js` | ét spil: faldet, spandene, point, liv, niveauer, hjælperne (tegner ikke) |
 | `js/tegning.js` | tegner scenen |
 | `js/lyd.js` | små lyde lavet i koden (`NK.Spillyd`) |

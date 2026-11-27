@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Syntesemester: selvtest</title>
+<style>
+    body { font-family: Consolas, monospace; font-size: 13px; margin: 16px; }
+    .ok { color: #1f7a4a; } .fejl { color: #b3261e; font-weight: bold; }
+    iframe { width: 1280px; height: 650px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<h1>Syntesemester: selvtest</h1>
+<p>Kør over en server (iframen skal være same-origin). Slutlinjen er ALT OK eller N FEJL. Testen sender aldrig noget til toplisten.</p>
+<pre id="ud"></pre>
+<iframe id="ramme" title="Spillet"></iframe>
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/reaktioner.js"></script>
+<script src="js/rute.js"></script>
+<script>
+(function () {
+    "use strict";
+    var ud = document.getElementById("ud"), antalFejl = 0, antalOk = 0;
+    function skriv(t, k) { var s = document.createElement("span"); s.className = k || ""; s.textContent = t + "\n"; ud.appendChild(s); }
+    function tjek(betingelse, tekst) {
+        if (betingelse) { antalOk++; skriv("ok    " + tekst, "ok"); }
+        else { antalFejl++; skriv("FEJL  " + tekst, "fejl"); }
+    }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    async function ventPaa(f, ms) {
+        var t0 = Date.now();
+        while (Date.now() - t0 < (ms || 5000)) { try { if (f()) return true; } catch (e) { /* endnu ikke */ } await vent(40); }
+        return false;
+    }
+    function slutt() {
+        skriv("\n" + antalOk + " påstande");
+        skriv(antalFejl ? antalFejl + " FEJL" : "ALT OK", antalFejl ? "fejl" : "ok");
+    }
+
+    var D = NK.Data, K = NK.Kemi, R = NK.Reaktion;
+
+    /* ----- 1. Stofferne ---------------------------------------------------- */
+    skriv("1. Stofferne");
+    var forskel = [], antal = {};
+    D.MOLEKYLER.concat(D.EKSTRA).forEach(function (d) {
+        var s = K.stof(d[1]);
+        if (!s || s.navn !== d[1] || s.klasse !== d[0]) forskel.push(d[1] + " -> " + (s ? s.navn + " (" + s.klasse + ")" : "intet"));
+        antal[d[0]] = (antal[d[0]] || 0) + 1;
+    });
+    tjek(!forskel.length, "motorens navn og stofklasse passer for alle " + (D.MOLEKYLER.length + D.EKSTRA.length) + " stoffer" +
+        (forskel.length ? ": " + forskel.join(", ") : ""));
+    var faa = Object.keys(D.KLASSER).filter(function (k) { return (antal[k] || 0) < 5; });
+    tjek(!faa.length, "hver stofklasse har mindst 5 molekyler i lag 1" + (faa.length ? ": " + faa.join(", ") : ""));
+    var lange = D.MOLEKYLER.filter(function (d) { return K.stof(d[1]).antalC > 6; });
+    tjek(!lange.length, "ingen molekyler over 6 C i lag 1 og 2");
+    var svgOk = Object.keys(D.KLASSER).every(function (k) {
+        var s = K.alle(k)[0], t = K.svg(s, { fremhaev: k });
+        return /^<svg[^>]+viewBox/.test(t) && t.indexOf("<circle") + t.indexOf("<line") > 0;
+    });
+    tjek(svgOk, "alle klasser kan tegnes med gruppen fremhævet");
+
+    /* ----- 2. Reaktionerne ------------------------------------------------- */
+    skriv("\n2. Reaktionerne");
+    function navne(fra, kort, partner) {
+        var r = R.anvend(K.stof(fra), kort, partner ? K.stof(partner) : null);
+        if (r.ingen) return "ingen";
+        return r.valg.map(function (v) { return v.produkter.map(function (p) { return p.navn; }).sort().join("+"); }).sort().join(" / ");
+    }
+    var FORVENT = [
+        ["propen", "hbr", null, "1-brompropan / 2-brompropan", "HBr til propen giver begge produkter (bogen B4.1)"],
+        ["but-2-en", "vand", null, "butan-2-ol", "vand til but-2-en giver kun butan-2-ol"],
+        ["ethen", "h2", null, "ethan", "H₂ til ethen giver ethan"],
+        ["propyn", "h2", null, "propen", "H₂ til en alkyn giver én addition"],
+        ["propan", "br2", null, "1-brompropan / 2-brompropan", "dibrom og lys på propan giver en blanding"],
+        ["propen", "br2", null, "ingen", "dibrom på en alken fører ikke videre"],
+        ["propan-1-ol", "mild", null, "propanal", "mild oxidation af en primær alkohol giver aldehydet"],
+        ["propan-1-ol", "kraftig", null, "propansyre", "kraftig oxidation af en primær alkohol giver carboxylsyren"],
+        ["propan-2-ol", "mild", null, "propanon", "en sekundær alkohol giver en keton"],
+        ["propan-2-ol", "kraftig", null, "propanon", "også ved kraftig oxidation"],
+        ["2-methylpropan-2-ol", "kraftig", null, "ingen", "en tertiær alkohol kan ikke oxideres"],
+        ["propanon", "kraftig", null, "ingen", "en keton kan ikke oxideres"],
+        ["ethanal", "mild", null, "ethansyre", "et aldehyd oxideres til carboxylsyren"],
+        ["butan-2-ol", "h2so4", null, "but-1-en / but-2-en", "elimination giver begge alkener, uden cis og trans i navnet"],
+        ["methanol", "h2so4", null, "ingen", "methanol kan ikke eliminere"],
+        ["2-brompropan", "base", null, "propen", "elimination af HBr"],
+        ["ethylethanoat", "vand", null, "ethanol+ethansyre", "hydrolyse giver syren og alkoholen"],
+        ["ethansyre", "kond", "ethanol", "ethylethanoat", "kondensation giver esteren"],
+        ["propan-1-ol", "kond", "ethansyre", "propylethanoat", "kondensation virker også fra alkoholen"],
+        ["ethansyre", "kond", "methylamin", "N-methylethanamid", "en amin giver et amid"],
+        ["ethansyre", "kond", "propansyre", "ingen", "to syrer kondenserer ikke"],
+        ["ethylamin", "vand", null, "ingen", "en amin reagerer ikke med vand og syre i spillet"]
+    ];
+    FORVENT.forEach(function (f) {
+        var n = navne(f[0], f[1], f[2]);
+        tjek(n === f[3], f[4] + " (" + f[0] + " + " + f[1] + (f[2] ? " + " + f[2] : "") + " -> " + n + ")");
+    });
+    /* Alle kort paa alle stoffer: ingen undtagelser, og hvert ingen har en grund */
+    var undtagelser = [], udenGrund = [], tankestreg = [], forLang = [];
+    D.MOLEKYLER.forEach(function (d) {
+        var s = K.stof(d[1]);
+        R.ENKELT.forEach(function (k) {
+            var r = R.anvend(s, k);
+            if (r.fejl) undtagelser.push(d[1] + "+" + k + ": " + r.fejl);
+            var t = r.ingen ? r.grund : r.om;
+            if (!t) udenGrund.push(d[1] + "+" + k);
+            if (/[–—]/.test(t)) tankestreg.push(t);
+            if (t && t.length > 200) forLang.push(d[1] + "+" + k + " (" + t.length + ")");
+        });
+    });
+    tjek(!undtagelser.length, "ingen undtagelser for " + D.MOLEKYLER.length * 8 + " kombinationer" + (undtagelser.length ? ": " + undtagelser.slice(0, 3).join(" ; ") : ""));
+    tjek(!udenGrund.length, "hver reaktion og hvert 'ingen reaktion' har en forklaring" + (udenGrund.length ? ": " + udenGrund.slice(0, 5).join(", ") : ""));
+    tjek(!tankestreg.length, "ingen tankestreger i forklaringerne");
+    tjek(!forLang.length, "forklaringerne er højst 200 tegn" + (forLang.length ? ": " + forLang.join(", ") : ""));
+
+    /* ----- 3. Synteserne i lag 3 --------------------------------------------- */
+    skriv("\n3. Synteserne");
+    D.LAG3.RUNDE.forEach(function (raekke, i) {
+        raekke.forEach(function (o) {
+            var t0 = performance.now();
+            var k = NK.Rute.kaede(o.start, o.maal);
+            var ms = performance.now() - t0;
+            tjek(k && k.par === o.par && ms < 1500, "række " + (i + 1) + ": " + o.start.join(" + ") + " → " + o.maal + " på " + (k ? k.par : "-") +
+                " trin som en rute (data " + o.par + ", " + Math.round(ms) + " ms)");
+        });
+    });
+    var maalFindes = D.LAG3.RUNDE.every(function (r) { return r.every(function (o) { return K.stof(o.maal) && o.start.every(function (n) { return K.stof(n); }); }); });
+    tjek(maalFindes, "alle udgangsstoffer og mål findes");
+    var stiger = D.LAG3.RUNDE.map(function (r) { return Math.min.apply(null, r.map(function (o) { return o.par; })); });
+    tjek(stiger.every(function (p, i) { return !i || p >= stiger[i - 1]; }), "synteserne bliver længere gennem runden: " + stiger.join(", "));
+
+    /* ----- 4. Lag 1's niveauer ------------------------------------------------ */
+    skriv("\n4. Lag 1");
+    var nivOk = D.LAG1.NIVEAUER.every(function (n) {
+        return (n.maal || D.LAG1.ALLE_MAAL).every(function (m) {
+            var kl = m.indexOf("t:") === 0 ? D.TEST[m.slice(2)].klasser : [m];
+            return kl.every(function (k) { return K.alle(k).length >= 4; });
+        }) && n.oppe > n.nyt;
+    });
+    tjek(nivOk, "alle grupper i alle niveauer har molekyler, og et molekyle er fremme længere end tiden mellem dem");
+    tjek(D.LAG1.NIVEAUER.length === 10 && D.LAG1.NIVEAUER[9].alle && D.LAG1.REKORD_NIVEAU === 10, "ti niveauer, og niveau 10 er det hele med rekord");
+    var nye = [];
+    D.LAG1.NIVEAUER.forEach(function (n) { (n.ny || []).forEach(function (k) { nye.push(k); }); });
+    tjek(nye.length === Object.keys(D.KLASSER).length, "alle " + nye.length + " stofklasser bliver præsenteret som nye én gang");
+    var foerBrug = D.LAG1.NIVEAUER.every(function (n, i) {
+        var kendt = {};
+        D.LAG1.NIVEAUER.slice(0, i + 1).forEach(function (m) { (m.ny || []).forEach(function (k) { kendt[k] = true; }); });
+        return n.typer.every(function (k) { return kendt[k]; });
+    });
+    tjek(foerBrug, "en stofklasse kommer først på bordet, når den er præsenteret");
+    var svg = K.svg(K.stof("propan-1-ol"), {});
+    tjek(svg.indexOf("#c0262d") < 0 && !/fill="(?!#1d2433)#[0-9a-f]{6}"/i.test(svg), "molekylerne er sorte (ingen farve på O og N)");
+    var groen = K.svg(K.stof("propan-1-ol"), { fremhaev: "alkohol" });
+    tjek(groen.indexOf(K.GROEN) > 0 && groen.indexOf("<circle") < 0, "gruppen bliver grøn som i bogen, uden overstregning");
+    tjek(K.svg(K.stof("butan"), { fremhaev: "alkan" }).indexOf(K.GROEN) < 0, "en alkan får intet grønt");
+
+    /* ----- 5. Spillet i iframen ------------------------------------------------- */
+    var ramme = document.getElementById("ramme");
+    ramme.onload = async function () {
+        var w = ramme.contentWindow, d = ramme.contentDocument;
+        try {
+            await ventPaa(function () { return w.NK && w.NK.App && d.getElementById("mk-start"); });
+            tjek(w.NK.ingenNet === true, "?ingenNet slår toplisten fra");
+            var sendt = 0;
+            var gammelFetch = w.fetch;
+            w.fetch = function () { sendt++; return gammelFetch.apply(w, arguments); };
+            try { w.localStorage.removeItem("nk-syntese-1-rekord"); w.localStorage.removeItem("nk-syntese-2-rekord"); } catch (e) { /* intet */ }
+            var T = w.NK.Topliste;
+
+            /* Fontstoerrelser */
+            function mindsteSkrift() {
+                var min = 99, hvor = "";
+                Array.prototype.forEach.call(d.querySelectorAll(".scene *, .panel *"), function (el) {
+                    if (!el.offsetParent || !el.childNodes.length) return;
+                    var tekst = Array.prototype.some.call(el.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+                    if (!tekst) return;
+                    var f = parseFloat(w.getComputedStyle(el).fontSize);
+                    if (f < min) { min = f; hvor = el.className || el.tagName; }
+                });
+                return { min: min, hvor: hvor };
+            }
+            function spilFrem(L1, s1, maxTrin, stop) {
+                var slag = 0;
+                for (var n = 0; n < maxTrin && !stop(); n++) {
+                    L1._trin(50);
+                    if (s1.venter && s1.videre) s1.videre();
+                    if (s1.skiftVent) L1._lukSkift();
+                    var h = L1._huller();
+                    for (var i = 0; i < 9; i++) if (h[i].aktiv && h[i].aktiv.maal && !h[i].aktiv.slaaet) { L1._slag(i, null); slag++; }
+                }
+                return slag;
+            }
+
+            /* --- Lag 1 --- */
+            skriv("\n5. Lag 1 i spillet");
+            var L1 = w.NK.Lag[1];
+            tjek(d.querySelectorAll(".niveauknap").length === 10 && d.querySelector(".niveauknap.rekord"), "startkortet har ti niveauer, og niveau 10 er mærket rekord");
+            d.querySelector('.niveauknap[data-niv="2"]').click();
+            tjek(d.querySelector(".niveauknap.valgt").getAttribute("data-niv") === "2", "et klik vælger niveauet");
+            d.querySelector('.niveauknap[data-niv="0"]').click();
+            w.NK.App.startSpil();
+            var s1 = L1._s();
+            tjek(!s1.rekord && /Niveau 1/.test(d.getElementById("valgkort").textContent), "niveau 1 er øvelse og begynder med kortet over de tre stofklasser");
+            var tid0 = s1.tid;
+            L1._trin(1000);
+            tjek(s1.tid === tid0, "tiden står stille, mens kortet står fremme");
+            d.getElementById("vk-videre").click();
+            tjek(!d.getElementById("l1-skift").hidden && /Første gruppe/.test(d.getElementById("l1-skift").textContent) &&
+                /alkoholer/.test(d.getElementById("l1-skift").textContent), "boksen med den første gruppe står midt i scenen");
+            var fs = parseFloat(w.getComputedStyle(d.querySelector(".ms-maal")).fontSize);
+            tjek(fs >= 30, "gruppen står med " + fs + " px på båndet over bordet");
+            var baand = d.getElementById("opgavekort").getBoundingClientRect(), bordR = d.getElementById("l1-bord").getBoundingClientRect();
+            tjek(Math.abs(baand.bottom - bordR.top) <= 1 && /47, 143, 85|34, 112, 74/.test(w.getComputedStyle(d.getElementById("opgavekort")).backgroundImage),
+                "båndet med gruppen er grønt og sidder lige oven over bordet");
+            L1._trin(3000);
+            tjek(s1.tid === tid0 && s1.skiftVent && !d.getElementById("l1-skift").hidden, "på niveau 1-9 venter boksen, og tiden står stille");
+            d.getElementById("sk-videre").click();
+            tjek(d.getElementById("l1-skift").hidden && !s1.skiftVent, "Start lukker boksen");
+            var slag = spilFrem(L1, s1, 4000, function () { return s1.nivNr >= 2; });
+            tjek(s1.nivNr >= 2 && s1.point > 0 && s1.liv === 3, "rigtige slag giver point og nye niveauer (niveau " + (s1.nivNr + 1) + ", " + s1.point + " point, " + slag + " slag)");
+            tjek(s1.faktor > 1, "en serie giver en gangefaktor (×" + s1.faktor + ")");
+            if (s1.videre) s1.videre();
+            var forkert = -1;
+            for (var m = 0; m < 600 && forkert < 0; m++) {
+                L1._trin(50);
+                if (s1.venter && s1.videre) s1.videre();
+                if (s1.skiftVent) L1._lukSkift();
+                L1._huller().forEach(function (hh, j) { if (forkert < 0 && hh.aktiv && !hh.aktiv.maal && !hh.aktiv.slaaet && !s1.skift) forkert = j; });
+            }
+            var liv0 = s1.liv;
+            var forkertKlasse = L1._huller()[forkert].aktiv.stof.klasse;
+            L1._slag(forkert, null);
+            tjek(s1.liv === liv0 - 1 && s1.faktor === 1 && d.getElementById("valgkort").classList.contains("fejl"),
+                "et forkert slag koster et liv, nulstiller serien og viser forklaringen");
+            tjek(/er (en|et) /.test(d.querySelector(".vk-titel").textContent) &&
+                (forkertKlasse === "alkan" || d.querySelector("#valgkort svg").innerHTML.indexOf(K.GROEN) > 0),
+                "forklaringen siger, hvad molekylet er, og gruppen er grøn: " + d.querySelector(".vk-titel").textContent);
+            var ms1 = mindsteSkrift();
+            tjek(ms1.min >= 12, "mindste skrift i lag 1 er " + ms1.min + " px (" + ms1.hvor + ")");
+            s1.videre();
+            s1.tid = 0.05;
+            L1._trin(100);
+            await ventPaa(function () { return !L1.koerer() && d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(/Øvelse/.test(d.querySelector(".mk-point").textContent) && T.personlig(1).alle === 0, "en øvelse giver ingen rekord");
+            /* Niveau 10: rekord */
+            L1._start(9);
+            d.getElementById("midterkort").hidden = true;
+            var s10 = L1._s();
+            tjek(s10.rekord && d.getElementById("valgkort").hidden && !d.getElementById("l1-skift").hidden && !s10.skiftVent,
+                "niveau 10 begynder direkte med gruppen i midten, og boksen lukker af sig selv");
+            spilFrem(L1, s10, 6000, function () { return s10.tempo >= 1; });
+            tjek(s10.tempo >= 1 && s10.niv.oppe < D.LAG1.NIVEAUER[9].oppe, "på niveau 10 bliver det hurtigere for hver " + D.LAG1.TEMPO_PR + " rigtige");
+            var p10 = s10.point;
+            s10.tid = 0.05;
+            L1._trin(100);
+            await ventPaa(function () { return !L1.koerer() && d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(T.personlig(1).alle === p10 && /rekord/i.test(d.querySelector(".mk-point").textContent), "niveau 10 giver rekord (" + p10 + " point)");
+
+            /* --- Lag 2 --- */
+            skriv("\n6. Lag 2");
+            var L2 = w.NK.Lag[2], WR = w.NK.Reaktion, WD = w.NK.Data;
+            var problemer = [], antalSpm = 0, arter = {};
+            var nivListe = WD.LAG2.NIVEAUER.concat([WD.LAG2.MINUT]);
+            for (var nv = 0; nv < nivListe.length; nv++) {
+                var niv = nivListe[nv];
+                for (var g = 0; g < 25; g++) {
+                    niv.spm.forEach(function (art) {
+                        var q = L2._byg[art](niv);
+                        if (!q) return;
+                        antalSpm++;
+                        arter[art] = (arter[art] || 0) + 1;
+                        var noegler = q.svar.map(L2._noegle);
+                        var rk = L2._noegle(q.rigtig);
+                        var unikke = noegler.filter(function (x, i) { return noegler.indexOf(x) === i; });
+                        if (unikke.length !== noegler.length) problemer.push(art + ": to ens svar (" + noegler.join(", ") + ")");
+                        if (noegler.filter(function (x) { return x === rk; }).length !== 1) problemer.push(art + ": ikke præcis ét rigtigt svar");
+                        if (q.svar.length !== (art === "type" ? 6 : 4)) problemer.push(art + ": " + q.svar.length + " svar");
+                        q.svar.forEach(function (x) {
+                            if (L2._noegle(x) === rk) return;
+                            if (!x.grund) problemer.push(art + ": et forkert svar uden forklaring");
+                            if (art === "produkt" && x.stof && !q.rigtig.par && WR.produktNavne(q.r).indexOf(x.stof.navn) >= 0)
+                                problemer.push("produkt: " + x.stof.navn + " er også rigtigt for " + q.stof.navn + "+" + q.kort);
+                            if (art === "reagens") {
+                                var r2 = WR.anvend(q.stof, x.kort);
+                                var maal = q.v.produkter.map(function (p) { return p.navn; }).sort().join("+");
+                                if (!r2.ingen && r2.valg.some(function (v) { return v.produkter.map(function (p) { return p.navn; }).sort().join("+") === maal; }))
+                                    problemer.push("reagens: " + x.kort + " giver også " + maal);
+                            }
+                            if (art === "udgangsstof" && WR.produktNavne(WR.anvend(x.stof, q.kort)).indexOf(q.P.navn) >= 0)
+                                problemer.push("udgangsstof: " + x.stof.navn + " giver også " + q.P.navn);
+                        });
+                    });
+                }
+            }
+            tjek(!problemer.length, antalSpm + " spørgsmål bygget (" + Object.keys(arter).map(function (a) { return a + " " + arter[a]; }).join(", ") +
+                "): ét rigtigt svar, ingen dubletter, og hvert forkert svar har en forklaring" + (problemer.length ? ": " + problemer.slice(0, 4).join(" ; ") : ""));
+            tjek(Object.keys(arter).length === 4, "alle fire slags spørgsmål kan bygges");
+
+            w.NK.App.skiftLag(2);
+            await ventPaa(function () { return d.getElementById("mk-start"); });
+            tjek(!d.getElementById("tidskort").hidden && d.getElementById("tk-start") && /1 minut/.test(d.getElementById("tidskort").textContent),
+                "1 minut på tid står i panelet med rekorden og en startknap");
+            /* Oev uden tid er standard */
+            w.NK.App.startSpil();
+            var s2 = L2._s();
+            tjek(!s2.minut && d.querySelectorAll("#l2-svar .svar").length >= 4, "øv uden tid viser et spørgsmål med svar");
+            var hoejde0 = d.getElementById("opgavekort").offsetHeight;
+            var top0 = d.getElementById("l2-svar").getBoundingClientRect().top;
+            var ri = s2.q.svar.findIndex(function (x) { return L2._noegle(x) === L2._noegle(s2.q.rigtig); });
+            L2._svar(ri);
+            tjek(s2.point === 100 && d.querySelector("#l2-svar .svar.rigtig"), "et rigtigt svar giver 100 point på niveau 1");
+            tjek(Math.abs(d.getElementById("l2-svar").getBoundingClientRect().top - top0) <= 2,
+                "svarene flytter sig ikke, når forklaringen kommer (kortet " + hoejde0 + " → " + d.getElementById("opgavekort").offsetHeight + " px)");
+            tjek(hoejde0 <= 110, "kortet øverst er lavt: " + hoejde0 + " px");
+            var sceneBund = d.getElementById("scene").getBoundingClientRect().bottom;
+            var bund = d.querySelector("#l2-svar .svar:last-child").getBoundingClientRect().bottom;
+            tjek(bund <= sceneBund, "svarene kan ses på en skærm på 1280 × 650 (" + Math.round(sceneBund - bund) + " px fri)");
+            var klip = Array.prototype.some.call(d.querySelectorAll("#l2-svar svg, #l2-skema svg"), function (sv) {
+                var r = sv.getBoundingClientRect(), f = sv.closest(".svar, .sk-mol").getBoundingClientRect();
+                return r.right > f.right + 1 || r.left < f.left - 1 || r.bottom > f.bottom + 1;
+            });
+            tjek(!klip, "ingen tegning stikker ud af sit kort");
+            L2._naeste();
+            var top1 = d.getElementById("l2-svar").getBoundingClientRect().top;
+            s2.q.om = new Array(6).join("En lang forklaring på tyve tegn. ");
+            ri = s2.q.svar.findIndex(function (x) { return L2._noegle(x) === L2._noegle(s2.q.rigtig); });
+            L2._svar(ri);
+            tjek(Math.abs(d.getElementById("l2-svar").getBoundingClientRect().top - top1) <= 2, "også en forklaring på 160 tegn holder svarene på plads");
+            var ms2 = mindsteSkrift();
+            tjek(ms2.min >= 12, "mindste skrift i lag 2 er " + ms2.min + " px (" + ms2.hvor + ")");
+            for (var f = 0; f < 3; f++) {
+                L2._naeste();
+                var fi = s2.q.svar.findIndex(function (x) { return L2._noegle(x) !== L2._noegle(s2.q.rigtig); });
+                L2._svar(fi);
+            }
+            L2._naeste();
+            await ventPaa(function () { return d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(/Tre forkerte svar/.test(d.querySelector(".midterkort.slut").textContent) && /Øvelse/.test(d.querySelector(".mk-point").textContent) &&
+                T.personlig(2).alle === 0, "øv uden tid slutter efter tre forkerte og giver ingen rekord");
+            /* 1 minut fra panelet */
+            d.getElementById("tk-start").click();
+            var sm = L2._s();
+            tjek(d.getElementById("midterkort").hidden && d.getElementById("tk-start").disabled, "knappen i panelet starter 1 minut");
+            tjek(sm.minut && sm.tid === 60 && d.getElementById("l2-tid"), "1 minut har et ur på 60 sekunder");
+            ri = sm.q.svar.findIndex(function (x) { return L2._noegle(x) === L2._noegle(sm.q.rigtig); });
+            var q1 = sm.q;
+            L2._svar(ri);
+            tjek(sm.point === 1, "et rigtigt svar giver 1 point");
+            L2._trin(D.LAG2.MINUT.ventRigtig + 50);
+            tjek(sm.q !== q1 && !sm.besvaret, "det går videre af sig selv efter et rigtigt svar");
+            var fi2 = sm.q.svar.findIndex(function (x) { return L2._noegle(x) !== L2._noegle(sm.q.rigtig); });
+            L2._svar(fi2);
+            tjek(sm.point === 0 && sm.forkerte === 1, "et forkert svar trækker ét fra");
+            tjek(d.querySelectorAll("#lagkort .fejlliste li").length === 1 && /panelet/.test(d.getElementById("opgavekort").textContent) &&
+                !d.getElementById("l2-naeste"), "fejlen og forklaringen kommer i panelet, og spillet går videre af sig selv");
+            L2._trin(D.LAG2.MINUT.ventForkert + 50);
+            ri = sm.q.svar.findIndex(function (x) { return L2._noegle(x) === L2._noegle(sm.q.rigtig); });
+            L2._svar(ri);
+            L2._trin(500);
+            var forventet = 60 - (D.LAG2.MINUT.ventRigtig + D.LAG2.MINUT.ventForkert + 600) / 1000;
+            tjek(Math.abs(sm.tid - forventet) < 0.2, "uret går, også mens svaret står (" + sm.tid.toFixed(1) + " s tilbage)");
+            L2._trin(61000);
+            await ventPaa(function () { return d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(/Tiden er gået/.test(d.querySelector(".midterkort.slut").textContent) && T.personlig(2).alle === 1, "efter 1 minut er rekorden rigtige minus forkerte: 1");
+            var igenKnap = d.querySelector('.midterkort.slut [data-knap="0"]');
+            tjek(igenKnap && /Tag de 1, du glippede/.test(igenKnap.textContent), "slutkortet tilbyder at tage det, eleven glippede");
+            var glippet = L2._glippede()[0];
+            igenKnap.click();
+            var si = L2._s();
+            tjek(si.igen && si.q === glippet, "opfølgningen stiller det spørgsmål, eleven glippede");
+            var fi3 = si.q.svar.findIndex(function (x) { return L2._noegle(x) !== L2._noegle(si.q.rigtig); });
+            L2._svar(fi3);
+            tjek(/kommer igen til sidst/.test(d.getElementById("opgavekort").textContent) && d.getElementById("l2-naeste"), "et forkert svar i opfølgningen får forklaringen og kommer igen");
+            L2._naeste();
+            tjek(si.q === glippet, "spørgsmålet kommer igen");
+            ri = si.q.svar.findIndex(function (x) { return L2._noegle(x) === L2._noegle(si.q.rigtig); });
+            L2._svar(ri);
+            L2._naeste();
+            await ventPaa(function () { return d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(/Alle 1 er taget igen/.test(d.querySelector(".midterkort.slut").textContent) && !d.querySelector(".midterkort.slut .mk-point") &&
+                T.personlig(2).alle === 1, "opfølgningen slutter uden point og rører ikke rekorden");
+
+            /* --- Lag 3 --- */
+            skriv("\n7. Lag 3");
+            var L3 = w.NK.Lag[3];
+            var b1 = L3._beregn({ par: 3 }, 3, 0, 0, 0);
+            tjek(b1.point === 900 + 450 + 90 && b1.perfekt, "den korteste vej uden fejl på 0 s giver 900 + 450 + 90 point");
+            var b2 = L3._beregn({ par: 3 }, 4, 1, 1, 200);
+            tjek(b2.point === 900 - 100 - 50 - 180 && !b2.perfekt, "et trin ekstra, en fejl og ét hint giver 570 point");
+            tjek(L3._beregn({ par: 2 }, 9, 9, 2, 0).point === 0, "pointene bliver aldrig negative");
+
+            w.NK.App.skiftLag(3);
+            await ventPaa(function () { return d.getElementById("mk-start"); });
+            var valgte = WD.LAG3.RUNDE.map(function (r, i) { return r[i % r.length]; });
+            L3._start(valgte);
+            d.getElementById("midterkort").hidden = true;
+            d.getElementById("scene").classList.remove("hvile");
+            var s3 = L3._s();
+            tjek(d.getElementById("opgavekort").hidden && /Lav/.test(d.getElementById("l3-hoved").textContent), "lag 3 har intet opgavekort, kun linjen øverst");
+            L3._brug("br2", d.querySelector('[data-kort="br2"]'));
+            tjek(s3.spildt === 1 && s3.kaede.length === 1 && /Ingen reaktion/.test(d.getElementById("l3-besked").textContent), "et kort uden reaktion koster, men er intet trin");
+            /* Et trin og Fortryd */
+            var forste = w.NK.Rute.kaedeFra(s3.kaede[0].navn, s3.lager, s3.opg.maal).rute[0];
+            L3._brug(forste.kort, null);
+            if (!d.getElementById("valgkort").hidden) d.querySelector("#valgkort .vk-mulighed").click();
+            tjek(s3.kaede.length === 2 && d.querySelectorAll("#l3-kaede .kd-pil:not(.tom)").length === 1, "trinnet står som en pil med reagenset og et nyt stof");
+            L3._fortryd();
+            tjek(s3.kaede.length === 1 && s3.fortrudt === 1, "Fortryd tager trinnet væk og tæller som en fejl");
+            var ruterOk = true, valgOk = true, alleUdenGroen = true;
+            for (var o = 0; o < valgte.length; o++) {
+                for (var t = 0; t < 8 && !s3.loest; t++) {
+                    var har = s3.kaede.slice(0, -1).map(function (x) { return x.navn; }).concat(s3.lager);
+                    var k = w.NK.Rute.kaedeFra(s3.kaede[s3.kaede.length - 1].navn, har, s3.opg.maal);
+                    var tr = k.rute[0];
+                    L3._brug(tr.kort, null);
+                    if (!d.getElementById("valgkort").hidden) {
+                        var oenske = tr.kort === "kond" ? tr.partner : tr.til;
+                        var knapper = Array.prototype.slice.call(d.querySelectorAll("#valgkort .vk-mulighed"));
+                        var kn = knapper.filter(function (b) { return b.querySelector(".vk-navn").textContent === oenske; })[0];
+                        if (!kn) { valgOk = false; kn = knapper[0]; }
+                        kn.click();
+                    }
+                    if (d.getElementById("l3-kaede").innerHTML.indexOf(K.GROEN) >= 0) alleUdenGroen = false;
+                }
+                if (!s3.loest || s3.kaede.length - 1 !== s3.opg.par) ruterOk = false;
+                if (o === 0) {
+                    tjek(d.querySelector("#l3-kaede .kd-mol.maal") && /Rigtigt/.test(d.getElementById("l3-besked").textContent), "målet i ruten bliver grønt, og resultatet står under ruten");
+                    var bund3 = d.getElementById("l3-kort").getBoundingClientRect().bottom;
+                    tjek(bund3 <= d.getElementById("scene").getBoundingClientRect().bottom, "reagenskortene kan ses på en skærm på 1280 × 650");
+                    var ms3 = mindsteSkrift();
+                    tjek(ms3.min >= 12, "mindste skrift i lag 3 er " + ms3.min + " px (" + ms3.hvor + ")");
+                }
+                L3._naeste();
+            }
+            tjek(ruterOk && valgOk, "alle seks synteser kan laves i det korteste antal trin gennem spillets knapper");
+            tjek(alleUdenGroen, "grupperne er ikke markeret i ruten");
+            await ventPaa(function () { return d.querySelector(".midterkort.slut"); }, 2000);
+            tjek(s3.perfekte === 5, "fem perfekte ruter (den første havde en fejl): " + s3.perfekte);
+            tjek(d.querySelectorAll(".mk-synteser li").length === 6, "slutkortet viser de seks synteser");
+            tjek(sendt === 0, "spillet har ikke sendt noget til toplisten");
+        } catch (e) {
+            tjek(false, "undtagelse: " + (e && e.stack || e));
+        }
+        slutt();
+    };
+    ramme.src = "index.html?ingenNet#lag1";
+}());
+</script>
+</body>
+</html>

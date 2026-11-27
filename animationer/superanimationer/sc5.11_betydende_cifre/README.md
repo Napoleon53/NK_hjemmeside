@@ -5,8 +5,10 @@ Kemibogens afsnit 5.1 og modulplanen (titlen, overskriften, teoriboksen og menuk
 
 Superanimation om betydende cifre: hvor præcist et tal er kendt, hvordan det
 afrundes, og hvordan kommaet flyttes med tierpotenser og enheder. Åbn
-`index.html`. Mappen henter kun filer inde fra sig selv. Ingen
-`fetch` og ingen moduler, så den virker fra harddisken.
+`index.html`. Mappen henter kun filer inde fra sig selv og bruger ingen
+moduler, så den virker fra harddisken. Kun den fælles liste over de
+hurtigste runder i Blandet bruger `fetch` (se nedenfor); uden net er den
+skjult.
 
 Den afløser `animationer/kemi-c-filer/c5.10_quiz_betydendecifre_notation.html`
 ("Afrunding/opskrivning"). I menuen fra 26. sept. 2026.
@@ -63,7 +65,7 @@ trænet.
 | 1 | Tæl cifrene | klikker på de cifre i tallet, der er betydende | kun nullerne foran tæller ikke |
 | 2 | Flyt kommaet | skriver et tal i videnskabelig notation eller som almindeligt tal, eller omregner enheder med g, L og mol i fire niveauer | eksponenten og forstavelsen er antallet af pladser; cifrene ændres ikke |
 | 3 | Afrund | afrunder et måletal til et antal cifre, eller regner et regnestykke ud og afrunder | 5 og derover rundes op; det mindst præcise tal bestemmer |
-| 4 | Blandet | ti opgaver af alle fem typer | kun første forsøg tæller; rekorden huskes |
+| 4 | Blandet | ti opgaver af alle fem typer på tid | kun første forsøg tæller; rekorden og den bedste tid huskes |
 
 **Tavlen.** Tallet står som brikker, ét ciffer pr. brik, og kommaet står for
 sig i gult. På Tæl cifrene er brikkerne svaret: et klik vælger og fravælger,
@@ -107,6 +109,45 @@ rigtige i første forsøg (`D.OPLAAS`). Meget svær har en lås, til Let, Middel
 og Svær har flueben; et klik på låsen siger hvorfor. Fluebenene huskes i
 browseren (`nk-sc5.11-enheder`), og slutteksten siger, når Meget svær er
 låst op.
+
+## Uret og de hurtigste runder i Blandet (27. nov. 2026)
+
+Niels ville have ure i de spil, der ikke havde et, så flere kan dele én
+opdatering af den fælles liste (Google Apps Script, som Kemi-Millionær).
+Kun Blandet har uret; de andre faner er som før.
+
+* **Uret** (`urKoerer`, `urTrin` og `tid` i `js/fane.js`, tallene i `D.UR`)
+  går, mens en opgave venter på et svar: fra opgaven er set, og den korte
+  glidning ind er forbi (0,35 s), til den er løst. Forklaringen efter et svar
+  og resultatet tæller ikke. Uret går videre, hvis eleven midt i en opgave
+  kigger på en anden fane, teorien eller rundvisningen, så de ikke kan bruges
+  som pause til at tænke (Ny runde nulstiller). Ingen tikkelyd.
+* **Straf:** et forkert første svar, Giv hint og Vis svaret koster 10 sekunder
+  hver, og kortet siger det ("Det koster 10 sekunder."). Et forkert svar mere
+  på samme opgave koster kun den tid, det tager. Vis svaret koster også, så
+  det aldrig er hurtigere at se svaret end at regne det. Kortets første linje
+  i Blandet siger det på forhånd.
+* **Panelet:** under de ti streger står Tid (hele sekunder under runden,
+  tiendedele bagefter, med straffen) og Bedste tid (elevens hurtigste hele
+  runde i browseren, `nk-sc5.11-tid`). Rekorden for rigtige i første forsøg
+  er som før.
+* **Resultatet** siger rigtige i første forsøg som før og "Din tid: 1:34,0
+  (heraf 20 sekunder for fejl og hjælp)." og evt. "Ny bedste tid."
+* **Listen** (`js/topliste.js`, spillet `sc5.11` i
+  `.claude/highscore/highscore.gs`, laveste tid vinder, kun hele runder på
+  ti) står som Top 10 denne uge og Top 10 alle tider side om side: i panelet,
+  før rundens første svar, og på resultatet i scenen, hvor tavlen stod, med
+  navnefeltet og Sæt på listen (Enter i feltet sender; bogstaver i feltet er
+  ikke genveje). En runde sendes én gang; bagefter står der "Tiden er sendt",
+  og ens egen linje er gul. Navnet huskes i `nk-spil-navn` (ellers
+  `orgSortering_playerName`) som i de andre spil. Svarer scriptet "ukendt
+  spil", eller er der intet net, er listen og navnefeltet skjult, og fanen ser
+  ud som før med kun uret.
+* **Niveauer:** Blandet har ingen valg. Enhedsopgaverne i Blandet trækkes
+  altid fra Let, Middel og Svær (2 : 2 : 1, aldrig Meget svær), uanset hvad
+  eleven har valgt under Flyt kommaet, så alle runder på listen er lige svære.
+* Selvtesten (afsnit 10) prøver uret, straffen, tidsformatet og listen med en
+  falsk `fetch` og sætter `NK.ingenNet`, så den aldrig sender noget ud.
 
 ## Reglen og tallene
 
@@ -224,7 +265,8 @@ og sprites.
 index.html          toplinje, scene, panel, teori og rundvisning
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet skrift, lærred (som sc5.5)
-js/data.js          fanerne, runden og linjerne under svarfeltet
+js/topliste.js      den fælles liste over de hurtigste runder i Blandet
+js/data.js          fanerne, runden, uret og linjerne under svarfeltet
 js/cifre.js         modellen: tal som cifre, afrunding, skrivemåder,
                     opgaverne, tjekket med beskederne, hint og svar
 js/fane.js          én fane: runden, tavlen, svarfeltet, kommaet, der
@@ -254,8 +296,9 @@ hævet, `e` skifter), hint, Vis svaret og tomme svar, at hint og svar kun
 kommer fra den gule knap, og at den lyser op efter en fejl, sproget, og at tallene står på én linje
 fra 900 til 1400 px, også løste enhedsopgaver på Svær og Meget svær.
 Elevens gemte valg, rekord og klarede niveauer lægges tilbage bagefter.
-Fra 6. nov. 2026 tjekker den også papirkortet (afsnit 9). Sidst kørt: ALT OK
-(145 påstande), 6. november 2026.
+Fra 6. nov. 2026 tjekker den også papirkortet (afsnit 9) og fra 27. nov. 2026
+uret og listen i Blandet (afsnit 10). Sidst kørt: ALT OK (176 påstande),
+27. november 2026.
 
 ## Papirkortet (6. nov. 2026)
 

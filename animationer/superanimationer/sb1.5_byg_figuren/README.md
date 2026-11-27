@@ -22,7 +22,7 @@ Brugeren har ikke set figurerne endnu.
    hastighed-sekant, sammenstoed-koncentration, energiprofil, energiprofil-exo-endo,
    energifordeling, tommelfinger, energiprofil-katalysator, enzym og enzym-temperatur.
 3. **Naboerne.** `sb1.1_reaktionshastighed` (kurver, tangent, sammenstød),
-   `b1.2_energidiagram`, `b1.3_katalyse_h2o2` og `sb1.4_thiosulfat` ejer at måle og regne.
+   `sb1.2_energiprofilen`, `b1.3_katalyse_h2o2` og `sb1.4_thiosulfat` ejer at måle og regne.
    Her sættes kun ord på.
 4. **Loftet.** Fem faner, én pr. afsnit, og 19 af de 21 fagord.
    - B1.1 Reaktionshastighed: 4 fagord i to lag.

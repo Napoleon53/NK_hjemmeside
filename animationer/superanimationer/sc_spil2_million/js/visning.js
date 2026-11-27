@@ -62,7 +62,14 @@
         NK.saetTekst("stige-titel", t.stige);
         NK.saetTekst("sikret-etiket", t.sikret);
         NK.saetTekst("rekord-etiket", t.rekord);
+        NK.saetTekst("tid-etiket", t.tid);
+        NK.saetTekst("bedste-etiket", t.bedste);
         el("sikret-boks").title = t.sikretTip;
+        el("tid-boks").title = t.tidTip;
+        el("bedste-boks").title = t.bedsteTip;
+        Array.prototype.forEach.call(document.querySelectorAll(".tl-uge-titel"), function (h) { h.textContent = t.ugeListe; });
+        Array.prototype.forEach.call(document.querySelectorAll(".tl-alle-titel"), function (h) { h.textContent = t.alleListe; });
+        el("navnefelt").placeholder = t.ditNavn;
         NK.saetTekst("ledetekst", t.ledetekst);
         NK.saetTekst("jaknap", t.ja);
         NK.saetTekst("nejknap", t.nej);
@@ -110,9 +117,30 @@
         }
     };
 
-    V.tal = function (sikret, rekord) {
+    V.tal = function (sikret, rekord, bedste) {
         NK.saetTekst("sikret", sikret);
         NK.saetTekst("rekord", rekord);
+        NK.saetTekst("bedste", bedste);
+    };
+
+    V.ur = function (tekst) { NK.saetTekst("tid", tekst); };
+
+    /* ----- De hurtigste millionaerer ------------------------------------ */
+    /* lister: { uge, alle } med { navn, sekunder } eller null. status: en
+       tekst i stedet for listen (henter, sender, fejl). tidTekst giver
+       tiden paa det valgte sprog. */
+    V.toplister = function (lister, status, t, tidTekst) {
+        var ol = document.querySelectorAll(".tl-liste");
+        for (var i = 0; i < ol.length; i++) {
+            var hvilken = ol[i].getAttribute("data-liste");
+            var liste = lister ? lister[hvilken] || [] : [];
+            var html = (status || !liste.length)
+                ? '<li class="tom">' + NK.html(status || t.ingenEndnu) + "</li>"
+                : liste.map(function (r) {
+                    return "<li><span>" + NK.html(r.navn) + "</span><b>" + tidTekst(Number(r.sekunder) || 0, true) + "</b></li>";
+                }).join("");
+            if (ol[i].innerHTML !== html) ol[i].innerHTML = html;
+        }
     };
 
     /* ----- Spoergsmaalet og svarene ------------------------------------- */
@@ -215,11 +243,16 @@
         taeller = requestAnimationFrame(trin);
     }
 
-    /* data: { slags, titel, tekst, beloeb, ekstra (HTML), ros, nyRekord }
+    /* data: { slags, titel, tekst, beloeb, ekstra (HTML), ros, nyRekord,
+               tid (HTML), liste (vis navnefelt og lister) }
        animer: beloebet taeller op (kun foerste gang kortet vises) */
     V.slutkort = function (data, animer) {
         var kort = el("slutkort");
-        kort.className = "slutkort " + data.slags;
+        kort.className = "slutkort " + data.slags + (data.liste ? " med-liste" : "");
+        var tid = el("slut-tid");
+        tid.hidden = !data.tid;
+        if (tid.innerHTML !== (data.tid || "")) tid.innerHTML = data.tid || "";
+        el("slut-liste").hidden = !data.liste;
         NK.saetTekst("slut-titel", data.titel);
         NK.saetTekst("slut-tekst", data.tekst);
         el("slut-ekstra").innerHTML = data.ekstra || "";
