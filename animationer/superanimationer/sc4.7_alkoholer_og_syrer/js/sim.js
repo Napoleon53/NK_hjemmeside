@@ -1,11 +1,12 @@
 /* =====================================================================
    sim.js - de tre faner
 
-   Alle tre faner har byggepladen til venstre (js/plade.js) og noget,
+   Fane 1 og 2 har byggepladen til venstre (js/plade.js) og noget,
    der viser stoffets egenskaber, til hoejre:
      n  Navnet         navnemaskinen
      k  Kogepunktet    termometeret og luppen over det rene stof
-     v  I vand         reagensglasset med vand og luppen med ét molekyle i vand
+   Fane 3 (I vand) har sin egen fil, js/sim_vand.js, uden panel og med
+   opgaverne i en raekke oeverst (runde T11, 27. nov. 2026).
 
    Laasen (js/fane.js): eleven kan kun bygge, mens kortet viser et
    forsoeg, og kun det, forsoeget tillader (styr: "gruppe" og "laengde").
@@ -25,7 +26,6 @@
         this.n = 2;
         this.plade = new NK.Plade();
         if (cfg.navn === "k") { this.termo = new NK.Termometer(); this.lup = new NK.Lup("rent"); }
-        if (cfg.navn === "v") { this.glas = new NK.Glas(); this.lup = new NK.Lup("vand"); }
         this.over = null;
         this.traek = null;
         this.sete = {};
@@ -130,7 +130,6 @@
         if (del.maal === "ol_laengder") ok = s.g === "OH" && Object.keys(this.olLaengder).length >= 3;
         else if (del.maal === "cooh") ok = s.g === "COOH";
         else if (del.maal === "oh_paa") ok = s.g === "OH";
-        else if (del.maal === "to_lag") ok = s.g === "OH" && s.opl === "nej" && s.tilstand === "væske";
         if (ok) this.forsoegKlaret();
     };
 
@@ -164,7 +163,6 @@
         if (!s.organisk || s.id === "glycerol") return;
         var vist = false;
         if (this.cfg.navn === "k") vist = true;
-        if (this.cfg.navn === "v") vist = !this.skjult("glas");
         if (!vist || this.skema[s.id]) return;
         this.skema[s.id] = 1;
         NK.gem("nk-sc4.7-skema-" + this.cfg.navn, this.skema);
@@ -296,18 +294,6 @@
             var lTop = top + 26, lBund = bund - 52;
             var lh = Math.min(lBund - lTop, Math.max(200, lb * 0.95));
             lay.lup = { x: lx, y: lTop + Math.max(0, (lBund - lTop - lh) / 2), b: lb, h: lh };
-        } else {
-            /* Fane 3: glasset foerst (brugeren 13. nov. 2026: "jeg så slet ikke
-               glasset før det var for sent"), oversigten over tommelfingerreglen
-               og under den en lille lup */
-            var gb = Math.min(210, Math.max(160, hb * 0.36));
-            lay.instr = { x: hx, y: top, b: gb, h: Math.min(bund - top, 520) };
-            var rx = hx + gb + 14, rb = W - 12 - rx;
-            var rh = Math.max(150, Math.min(190, (bund - top) * 0.36));
-            lay.regel = { x: rx, y: top, b: rb, h: rh };
-            var vTop = top + rh + 36, vBund = bund - 30;
-            var vh = Math.max(120, Math.min(vBund - vTop, 230, rb * 0.62));
-            lay.lup = { x: rx, y: vTop, b: rb, h: vh };
         }
         this.lay = lay;
         this.saetAnker("plade", lay.plade.x, lay.plade.y, lay.plade.b, lay.plade.h);
@@ -344,7 +330,6 @@
         if (del.maal === "ol_laengder") return s.g !== "OH" ? { tile: "OH" } : { plus: true };
         if (del.maal === "cooh") return { tile: "COOH" };
         if (del.maal === "oh_paa") return { tile: "OH" };
-        if (del.maal === "to_lag") return { plus: true };
         return null;
     };
 
@@ -385,12 +370,6 @@
         if (this.termo) {
             var tr = this.termo.tegn(ctx, lay.instr, { skjult: this.skjult("termo") });
             if (om.indexOf("termo") >= 0 && tr) Tg.omRing(ctx, tr.x, tr.y, tr.b, tr.h);
-        }
-        if (this.glas) {
-            var gr = this.glas.tegn(ctx, lay.instr, { skjult: this.skjult("glas") });
-            if (om.indexOf("glas") >= 0 && gr) Tg.omRing(ctx, gr.x, gr.y, gr.b, gr.h);
-            NK.tegnRegel(ctx, lay.regel, s, { skjult: this.skjult("glas") });
-            if (om.indexOf("regel") >= 0) Tg.omRing(ctx, lay.regel.x, lay.regel.y, lay.regel.b, lay.regel.h);
         }
         if (this.lup) this.tegnLup(ctx, lay.lup, om.indexOf("lup") >= 0);
         this.tegnSejr(ctx, lay.W, lay.H);
@@ -533,5 +512,4 @@
 
     NK.SimNavn = lav({ navn: "n", maal: D.N_MAAL, naesteFane: "fane-k", naesteNavn: "Kogepunktet" });
     NK.SimKoge = lav({ navn: "k", maal: D.K_MAAL, naesteFane: "fane-v", naesteNavn: "I vand" });
-    NK.SimVand = lav({ navn: "v", maal: D.V_MAAL });
 }());

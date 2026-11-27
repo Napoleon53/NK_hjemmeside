@@ -5,22 +5,19 @@
        staar ved y 42. Stregerne sidder ved hver 0,1 L; tallene ved dem
        tegnes af animationen (saa glasset kan spejles, naar det haelder).
        Tuden sidder oeverst til venstre ved (14, 12). Bunden staar paa y 227. -->
-  <defs>
-    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
-      <stop offset="0.15" stop-color="#d4ebfa" stop-opacity="0.07"/>
-      <stop offset="0.85" stop-color="#d4ebfa" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.24"/>
-    </linearGradient>
-  </defs>
-  <path d="M22 18 L22 212 Q22 222 32 222 L148 222 Q158 222 158 212 L158 18 Z" fill="url(#glas)"/>
-  <path d="M10 11 Q22 10 22 20 L22 214 Q22 225 33 225 L147 225 Q158 225 158 214 L158 18 Q158 13 164 12"
-        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="142" y="30" width="5" height="176" rx="2.5" fill="#ffffff" fill-opacity="0.14"/>
-  <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="1.5" stroke-linecap="round">
-    <path d="M23 186 h22 M23 150 h22 M23 114 h22 M23 78 h22 M23 42 h22"/>
-  </g>
-  <g stroke="#eef6fc" stroke-opacity="0.45" stroke-width="1.1" stroke-linecap="round">
-    <path d="M23 204 h12 M23 168 h12 M23 132 h12 M23 96 h12 M23 60 h12"/>
-  </g>
+<defs><linearGradient id="ind" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4ebfa" stop-opacity="0.14"/><stop offset="0.1" stop-color="#d4ebfa" stop-opacity="0.05"/><stop offset="0.9" stop-color="#d4ebfa" stop-opacity="0.04"/><stop offset="1" stop-color="#d4ebfa" stop-opacity="0.12"/></linearGradient><linearGradient id="vaeg" x1="17.5" y1="0" x2="162.5" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4f9fd" stop-opacity="0.85"/><stop offset="0.04" stop-color="#cfe3f3" stop-opacity="0.5"/><stop offset="0.5" stop-color="#bcd3e6" stop-opacity="0.38"/><stop offset="0.96" stop-color="#bcd3e6" stop-opacity="0.42"/><stop offset="1" stop-color="#e6f1fa" stop-opacity="0.7"/></linearGradient><linearGradient id="glans" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.75" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><radialGradient id="skyg"><stop offset="0" stop-color="#000000" stop-opacity="0.5"/><stop offset="0.6" stop-color="#000000" stop-opacity="0.22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><clipPath id="ude"><path clip-rule="evenodd" d="M-60 -60 H240 V300 H-60 Z M22 18 V212 Q22 222 32 222 H148 Q158 222 158 212 V18 Z"/></clipPath></defs>
+<ellipse cx="90" cy="228" rx="80" ry="6" fill="url(#skyg)"/>
+<path d="M22 18 V212 Q22 222 32 222 H148 Q158 222 158 212 V18 Z" fill="url(#ind)"/>
+<path d="M17.5 18 V212 Q17.5 227 32 227 H148 Q162.5 227 162.5 212 V18 Z M22 18 V212 Q22 222 32 222 H148 Q158 222 158 212 V18 Z" fill-rule="evenodd" fill="url(#vaeg)"/>
+<path d="M17.5 18 Q17.5 10.6 10.5 10.6 A1.91 1.91 0 0 0 10.5 14.42 Q22 14.42 22 18 Z" fill="url(#vaeg)"/>
+<path d="M158 18 Q158 12 165.5 12 A1.91 1.91 0 0 1 165.5 15.82 Q162.5 15.82 162.5 18 Z" fill="url(#vaeg)"/>
+<path d="M17.5 18 V212 Q17.5 227 32 227 H148 Q162.5 227 162.5 212 V18" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M17.5 18 Q17.5 10.6 10.5 10.6 A1.91 1.91 0 0 0 10.5 14.42 Q22 14.42 22 18" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M158 18 Q158 12 165.5 12 A1.91 1.91 0 0 1 165.5 15.82 Q162.5 15.82 162.5 18" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M22 18 V212 Q22 222 32 222 H148 Q158 222 158 212 V18" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.6" clip-path="url(#ude)"/>
+<rect x="27" y="30" width="3" height="180" rx="1.5" fill="url(#glans)"/>
+<path d="M34 224 H146" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+<path d="M161.15 34 V200" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1" stroke-linecap="round"/>
+<path d="M19.75 34 V180" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round"/>
+<g stroke="#eef6fc" stroke-linecap="round"><path d="M23 186 h22 M23 150 h22 M23 114 h22 M23 78 h22 M23 42 h22" stroke-opacity="0.78" stroke-width="1.5"/><path d="M23 204 h12 M23 168 h12 M23 132 h12 M23 96 h12 M23 60 h12" stroke-opacity="0.45" stroke-width="1.1"/></g>
 </svg>

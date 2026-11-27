@@ -2,28 +2,14 @@
   <!-- Pulverglas med skruelaag. Animationen tegner:
        stoffet BAG filen, klippet til det indre (x 10-90, y 34-126, hjoernerne r 9),
        etiketten OVENPAA filen i omraadet x 14-86, y 54-108. -->
-  <defs>
-    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
-      <stop offset="0.18" stop-color="#d4ebfa" stop-opacity="0.08"/>
-      <stop offset="0.82" stop-color="#d4ebfa" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
-    </linearGradient>
-    <linearGradient id="laag" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4a5163"/>
-      <stop offset="0.55" stop-color="#2c313d"/>
-      <stop offset="1" stop-color="#20242d"/>
-    </linearGradient>
-  </defs>
-  <path d="M22 29 L78 29 Q92 31 92 45 L92 118 Q92 128 82 128 L18 128 Q8 128 8 118 L8 45 Q8 31 22 29 Z"
-        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.8" stroke-width="1.5"/>
-  <path d="M11 121 Q12 125.5 18 125.5 L82 125.5 Q88 125.5 89 121" fill="none" stroke="#dcecf8" stroke-opacity="0.35" stroke-width="1.2"/>
-  <rect x="22" y="20" width="56" height="10" rx="2" fill="#d4ebfa" fill-opacity="0.14" stroke="#dcecf8" stroke-opacity="0.65" stroke-width="1.1"/>
-  <rect x="15" y="2" width="70" height="20" rx="3.5" fill="url(#laag)" stroke="#6b7488" stroke-width="1.2"/>
-  <g stroke="#5b6376" stroke-width="1.1">
-    <path d="M23 5 v14 M31 5 v14 M39 5 v14 M47 5 v14 M55 5 v14 M63 5 v14 M71 5 v14 M78 5 v14"/>
-  </g>
-  <rect x="16" y="3" width="68" height="4" rx="2" fill="#ffffff" fill-opacity="0.12"/>
-  <rect x="12" y="44" width="4.5" height="72" rx="2.2" fill="#ffffff" fill-opacity="0.20"/>
-  <rect x="84.5" y="48" width="2.5" height="60" rx="1.2" fill="#ffffff" fill-opacity="0.10"/>
+<defs><linearGradient id="ind" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4ebfa" stop-opacity="0.14"/><stop offset="0.1" stop-color="#d4ebfa" stop-opacity="0.05"/><stop offset="0.9" stop-color="#d4ebfa" stop-opacity="0.04"/><stop offset="1" stop-color="#d4ebfa" stop-opacity="0.12"/></linearGradient><linearGradient id="vaeg" x1="5.5" y1="0" x2="94.5" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4f9fd" stop-opacity="0.85"/><stop offset="0.04" stop-color="#cfe3f3" stop-opacity="0.5"/><stop offset="0.5" stop-color="#bcd3e6" stop-opacity="0.38"/><stop offset="0.96" stop-color="#bcd3e6" stop-opacity="0.42"/><stop offset="1" stop-color="#e6f1fa" stop-opacity="0.7"/></linearGradient><linearGradient id="glans" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.75" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><radialGradient id="skyg"><stop offset="0" stop-color="#000000" stop-opacity="0.5"/><stop offset="0.6" stop-color="#000000" stop-opacity="0.22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><clipPath id="ude"><path clip-rule="evenodd" d="M-60 -60 H160 V190 H-60 Z M22 30.5 Q10 31.5 10 43 V117 Q10 126 19 126 H81 Q90 126 90 117 V43 Q90 31.5 78 30.5 Z"/></clipPath><linearGradient id="laag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a2f3a"/><stop offset="0.25" stop-color="#5a6276"/><stop offset="0.55" stop-color="#363c4a"/><stop offset="1" stop-color="#1c2027"/></linearGradient></defs>
+<path d="M22 30.5 Q10 31.5 10 43 V117 Q10 126 19 126 H81 Q90 126 90 117 V43 Q90 31.5 78 30.5 Z" fill="url(#ind)"/>
+<path d="M22 28.58 Q6.8 29.58 6.8 43 V117 Q6.8 128.6 19 128.6 H81 Q93.2 128.6 93.2 117 V43 Q93.2 29.58 78 28.58 Z M22 30.5 Q10 31.5 10 43 V117 Q10 126 19 126 H81 Q90 126 90 117 V43 Q90 31.5 78 30.5 Z" fill-rule="evenodd" fill="url(#vaeg)"/>
+<path d="M22 28.58 Q6.8 29.58 6.8 43 V117 Q6.8 128.6 19 128.6 H81 Q93.2 128.6 93.2 117 V43 Q93.2 29.58 78 28.58" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M22 30.5 Q10 31.5 10 43 V117 Q10 126 19 126 H81 Q90 126 90 117 V43 Q90 31.5 78 30.5" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.6" clip-path="url(#ude)"/>
+<path d="M8.4 50 V112" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="22" y="20" width="56" height="10" rx="2" fill="#d4ebfa" fill-opacity="0.16" stroke="#f2f8fd" stroke-opacity="0.66" stroke-width="1.1"/>
+<rect x="15" y="2" width="70" height="20" rx="3.5" fill="url(#laag)" stroke="#5f6880" stroke-width="1.2"/>
+<g stroke="#5b6376" stroke-width="1.1"><path d="M23 5 v14 M31 5 v14 M39 5 v14 M47 5 v14 M55 5 v14 M63 5 v14 M71 5 v14 M78 5 v14"/></g>
+<rect x="16" y="3" width="68" height="3.5" rx="1.75" fill="#ffffff" fill-opacity="0.14"/>
 </svg>

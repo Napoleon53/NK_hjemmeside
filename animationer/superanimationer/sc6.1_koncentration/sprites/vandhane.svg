@@ -3,31 +3,16 @@
        i en tud, der peger ned. Vandet kommer ud ved (22, 214).
        Haandtaget (den blaa knap) har midten omkring (104, 128).
        Roeret er skaaret af foroven ved y 0, saa det kan forlaenges op. -->
-  <defs>
-    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#76828f"/>
-      <stop offset="0.4" stop-color="#eef2f6"/>
-      <stop offset="1" stop-color="#8d97a3"/>
-    </linearGradient>
-    <linearGradient id="metal2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#eef2f6"/>
-      <stop offset="0.55" stop-color="#aeb8c3"/>
-      <stop offset="1" stop-color="#76828f"/>
-    </linearGradient>
-  </defs>
-  <!-- Roeret ned fra loftet -->
-  <rect x="70" y="0" width="16" height="140" fill="url(#metal)" stroke="#5d6874" stroke-width="1"/>
-  <!-- Hanehuset med knappen -->
-  <rect x="64" y="112" width="28" height="34" rx="5" fill="url(#metal2)" stroke="#5d6874" stroke-width="1.2"/>
-  <rect x="92" y="124" width="10" height="8" fill="#8d97a3" stroke="#5d6874" stroke-width="0.8"/>
-  <path d="M100 112 L116 112 Q120 112 120 116 L120 140 Q120 144 116 144 L100 144 Q96 144 96 140 L96 116 Q96 112 100 112 Z"
-        fill="#2a76ac" stroke="#174a6e" stroke-width="1.2"/>
-  <path d="M100 126 L116 126 M108 116 L108 140" stroke="#bfe0f7" stroke-width="2.5" stroke-linecap="round"/>
-  <!-- Svanehalsen og tuden -->
-  <path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204"
-        fill="none" stroke="#5d6874" stroke-width="15" stroke-linecap="butt" stroke-linejoin="round"/>
-  <path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204"
-        fill="none" stroke="url(#metal2)" stroke-width="12.5" stroke-linecap="butt" stroke-linejoin="round"/>
-  <rect x="13" y="202" width="18" height="12" rx="2" fill="url(#metal2)" stroke="#5d6874" stroke-width="1"/>
-  <rect x="16" y="211" width="12" height="3" fill="#3a434d"/>
+<defs><linearGradient id="roer" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#76828f"/><stop offset="0.4" stop-color="#eef2f6"/><stop offset="1" stop-color="#8d97a3"/></linearGradient><linearGradient id="mv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.3" stop-color="#d9dfe4"/><stop offset="0.62" stop-color="#9ea8b1"/><stop offset="1" stop-color="#66717b"/></linearGradient><linearGradient id="mh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6c767c"/><stop offset="0.3" stop-color="#eef1f3"/><stop offset="0.62" stop-color="#aeb6bc"/><stop offset="1" stop-color="#6c767c"/></linearGradient><linearGradient id="blaa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a9fd0"/><stop offset="0.45" stop-color="#2a76ac"/><stop offset="1" stop-color="#1b5580"/></linearGradient></defs>
+<rect x="70" y="0" width="16" height="140" fill="url(#roer)"/>
+<path d="M70 0 V140 M86 0 V140" stroke="#4e5862" stroke-width="1"/>
+<rect x="64" y="112" width="28" height="34" rx="5" fill="url(#mv)" stroke="#4e5862" stroke-width="1.2"/>
+<rect x="92" y="124" width="8" height="8" fill="url(#mv)" stroke="#4e5862" stroke-width="0.8"/>
+<path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204" fill="none" stroke="#4e5862" stroke-width="15" stroke-linejoin="round"/>
+<path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204" fill="none" stroke="url(#mv)" stroke-width="12.5" stroke-linejoin="round"/>
+<path d="M73.5 147 V158 Q73.5 171.5 60 171.5 H34 Q18.5 171.5 17.5 186" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1.6" stroke-linejoin="round"/>
+<rect x="13" y="202" width="18" height="12" rx="2" fill="url(#mv)" stroke="#4e5862" stroke-width="1"/>
+<rect x="16" y="211" width="12" height="3" fill="#333b45"/>
+<path d="M100 112 H116 Q120 112 120 116 V140 Q120 144 116 144 H100 Q96 144 96 140 V116 Q96 112 100 112 Z" fill="url(#blaa)" stroke="#174a6e" stroke-width="1.2"/>
+<path d="M100 126 H116 M108 116 V140" stroke="#cfe6f7" stroke-width="2.5" stroke-linecap="round"/>
 </svg>

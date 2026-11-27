@@ -192,9 +192,11 @@
     }
 
     var HB_FARVE = "#7fe0d2";
+    /* Paa den lyse lup paa fane 3 (runde T11): en moerkere turkis */
+    var HB_LYS = "#0b7f74";
 
     /* En stiplet hydrogenbinding fra kanten af H til kanten af O */
-    function tegnHBinding(ctx, h, o, ox, oy, r, alfa) {
+    function tegnHBinding(ctx, h, o, ox, oy, r, alfa, farve) {
         var hx = ox + h.x * r, hy = oy + h.y * r, qx = ox + o.x * r, qy = oy + o.y * r;
         var dx = qx - hx, dy = qy - hy, l = Math.sqrt(dx * dx + dy * dy) || 1;
         var ux = dx / l, uy = dy / l;
@@ -205,7 +207,7 @@
         ctx.lineCap = "round";
         ctx.setLineDash([Math.max(3, r * 0.3), Math.max(3, r * 0.24)]);
         ctx.lineWidth = Math.max(2.5, r * 0.26);
-        ctx.strokeStyle = HB_FARVE;
+        ctx.strokeStyle = farve || HB_FARVE;
         ctx.beginPath();
         ctx.moveTo(hx + ux * a1, hy + uy * a1);
         ctx.lineTo(qx - ux * a2, qy - uy * a2);
@@ -238,6 +240,6 @@
     NK.Kugler = {
         model: model, par: par, vend: vend, spejl: spejl, flyt: flyt, hBindinger: hBindinger, kasse: kasse,
         tegnMolekyler: tegnMolekyler, tegnHBinding: tegnHBinding, tegnKontakt: tegnKontakt,
-        HB_FARVE: HB_FARVE, CC: CC, HB: HB, HB_MAKS: HB_MAKS
+        HB_FARVE: HB_FARVE, HB_LYS: HB_LYS, CC: CC, HB: HB, HB_MAKS: HB_MAKS
     };
 }());

@@ -391,134 +391,157 @@
         }
     ];
 
-    D.V_MAAL = [
+    /* ----- Fane 3: I vand (runde T11, 27. nov. 2026) ------------------------------------
+       Tre opgaver i fast raekkefoelge med trin, ét ad gangen (js/vand_opgaver.js,
+       kopi af T10's motor i sc4.5). Stofferne er bogens tabel i 4.5: ethanol,
+       butan-1-ol, octan-1-ol og glycerol, og en carboxylsyre.
+       Et trin har:
+         type      "handling" (eleven goer noget i scenen, og kortet gaar selv
+                   videre, naar maal(sim) har vaeret sandt i ca. 1 s),
+                   "valg" (tre svar i kortet og Indsend svar) eller
+                   "indsend" (eleven bygger og trykker Indsend svar; tjek(s)
+                   giver null, naar det er rigtigt, ellers forklaringen)
+         tekst     indledningen i almindelig skrift (kan vaere en funktion af sim)
+         spm       spoergsmaalet eller handlingen, halvfed paa egen linje
+         tillad    det, eleven maa roere: "laengde" (+ og −), "tile:COOH", "glas"
+         el, boble det, der har gul ring og skilt, til eleven har brugt det
+         skjul     det, der er en stiplet plads eller skjult: "lup", "regel", "glas".
+                   "lup" og "regel" er stiplede pladser, til et trin bruger dem.
+                   Glasset ("glas") kommer frem, naar trinet er klaret.
+         beskedVed en besked paa kortet, naar eleven bygger et bestemt stof
+         om        det, trinet handler om, som faar en rolig gul ring: "lup", "regel"
+         slut      forklaringen i det groenne kort (kan vaere en funktion af sim)
+       Graenser, som selvtesten taeller: spm 105, tekst 95, svar 34, hint 100,
+       nej 110, slut 160. */
+    function navnNu(sim) { return sim.stofNu().navn; }
+
+    D.OPG_VAND = [
         {
-            id: "lag", navn: "To lag", start: { g: "OH", n: 2 },
-            dele: [
+            id: "alkohol", navn: "Alkoholer i vand", start: { g: "OH", n: 2 },
+            trin: [
                 {
-                    type: "forsoeg", maal: "to_lag", styr: ["laengde"], om: ["kaede", "glas"],
-                    svarStof: { g: "OH", n: 5 },
-                    tekst: "Gør kæden på ethanol længere og længere. Se på glasset med vand, til der bliver to lag.",
-                    set: "Med 5 carbonatomer i pentan-1-ol bliver der to lag. Butan-1-ol med 4 ligger på grænsen.",
+                    type: "handling", skjul: ["lup", "regel"], tillad: ["laengde"],
+                    el: "plus", boble: "Klik: længere kæde",
+                    tekst: "Ethanol og vand blandes til ét lag i glasset.",
+                    spm: "Gør kæden længere med +, til der bliver to lag.",
+                    /* To tydelige lag: 5 carbonatomer eller flere. Butan-1-ol ligger
+                       paa graensen og faar en besked paa kortet (bogens tabel i 4.5) */
+                    maal: function (sim) { var s = sim.stofNu(); return s.g === "OH" && s.opl === "nej" && sim.glasFaerdigt(); },
+                    beskedVed: function (s) {
+                        return s.g === "OH" && s.opl === "delvist" ? "Butan-1-ol ligger på grænsen, så kun lidt af den opløses i vandet. Gør kæden længere." : "";
+                    },
                     hint: [
-                        "Klik på + under kæden. Glasset viser, om alkoholen blandes med vand.",
-                        "Ét lag betyder, at stofferne blandes. To lag betyder, at stofferne ikke blandes.",
+                        "Klik på + under kæden. Glasset viser alkoholen rystet med vand.",
+                        "Ét lag betyder, at stofferne blandes. To lag betyder, at de ikke blandes.",
                         "Gør kæden 5 carbonatomer lang."
-                    ]
+                    ],
+                    visSvar: function (sim) { sim.saetMolekyle("OH", 5); },
+                    svarTekst: "Pentan-1-ol med 5 carbonatomer giver to lag."
                 },
                 {
-                    type: "spm", om: ["lup"],
-                    tekst: "Hvorfor kan ethanol blandes med vand, når octan-1-ol ikke kan?",
+                    type: "handling", tillad: ["glas"], el: "glas", boble: "Klik: se molekylerne", vent: 0.8,
+                    skjul: function (sim) { return sim.lupKlikket ? ["regel"] : ["lup", "regel"]; },
+                    tekst: function (sim) { return D.stort(navnNu(sim)) + " giver to lag med vand."; },
+                    spm: "Klik på glasset for at se molekylerne med luppen.",
+                    maal: function (sim) { return !!sim.lupKlikket; },
+                    hint: [
+                        "Klik på reagensglasset i midten af scenen.",
+                        "Luppen viser molekylerne i glasset.",
+                        "Klik midt på glasset."
+                    ],
+                    visSvar: function (sim) { sim.klikGlas(); },
+                    svarTekst: "Luppen viser ét molekyle af alkoholen i vand."
+                },
+                {
+                    type: "valg", skjul: ["regel"], om: ["lup"],
+                    spm: function (sim) { return "Hvorfor giver " + navnNu(sim) + " to lag med vand, når ethanol blandes med vand?"; },
                     svar: [
+                        { t: "Alkoholen har ingen OH-gruppe",
+                          nej: "Se på formlen. Alkoholen har en OH-gruppe ligesom ethanol." },
                         { t: "Den lange kæde er upolær", ok: true },
-                        { t: "Octan-1-ol har ingen OH-gruppe",
-                          f: "Begge alkoholer har én OH-gruppe. Forskellen er kæden, som er upolær." },
-                        { t: "Octan-1-ol er tungere end vand",
-                          f: "Octan-1-ol lægger sig øverst, så densiteten er lavere end vands. Det er kæden, der gør forskellen." }
+                        { t: "Alkoholen er tungere end vand",
+                          nej: "Alkoholen ligger øverst i glasset, så den er lettere end vand. Det er kæden, der gør forskellen." }
                     ],
                     hint: [
                         "Begge alkoholer har én OH-gruppe. Se på kæden i luppen.",
-                        "Vandmolekylerne holder sig væk fra kæden, fordi den er upolær.",
+                        "Vandmolekylerne holder sig væk fra kæden, for kæden er upolær.",
                         "Én OH-gruppe kan ikke holde en lang, upolær kæde i vandet."
-                    ]
-                }
-            ],
-            loest: "Vandmolekylerne tiltrækker OH-gruppen, men ikke den upolære kæde. Én OH-gruppe kan ikke holde en lang kæde i vandet."
-        },
-        {
-            id: "lupvand", navn: "Luppen i vand", start: { g: "OH", n: 2 }, laast: true,
-            dele: [
-                {
-                    type: "spm", om: ["lup"],
-                    tekst: "Luppen viser ethanol i vand. Hvor på ethanolmolekylet går der stiplede linjer til vandmolekylerne?",
-                    svar: [
-                        { t: "Langs hele kæden",
-                          f: "Kæden er upolær og tiltrækker ikke vandmolekylerne. Se, hvor de stiplede linjer sidder." },
-                        { t: "Der er ingen",
-                          f: "Se igen på OH-gruppen for enden af molekylet. Derfra går der stiplede linjer til vandet." },
-                        { t: "Kun ved OH-gruppen", ok: true }
                     ],
-                    hint: [
-                        "De stiplede linjer viser, hvor et vandmolekyle tiltrækker ethanolmolekylet.",
-                        "Kæden er upolær, men OH-gruppen er polær.",
-                        "De stiplede linjer sidder kun ved OH-gruppen."
-                    ]
+                    slut: "De stiplede linjer er hydrogenbindinger, hvor H tiltrækker O. Kun OH-gruppen danner dem. Den lange kæde er upolær, så der bliver to lag."
                 }
-            ],
-            loest: "OH-gruppen danner hydrogenbindinger til vandmolekylerne. Rundt om den upolære kæde holder vandmolekylerne sig væk."
+            ]
         },
         {
-            id: "laengst", navn: "Den længste alkohol", start: { g: "OH", n: 1 },
-            dele: [
+            id: "syre", navn: "En syre i to lag", start: { g: "OH", n: 2 },
+            trin: [
                 {
-                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede", "regel"],
-                    svarStof: { g: "OH", n: 3 },
-                    tekst: "Byg den længste alkohol, der kan blandes helt med vand, og indsend.",
-                    set: "Propan-1-ol kan blandes helt med vand. Butan-1-ol med 4 carbonatomer ligger på grænsen.",
-                    tjek: function (s) {
-                        if (s.klasse !== "alkohol") return forkertKlasse(s, "alkohol");
-                        if (s.C < 3) return D.stort(s.navn) + " kan blandes med vand, men kæden kan godt være længere.";
-                        if (s.C === 4) return "Butan-1-ol har 4 carbonatomer og ligger på grænsen. Den opløses kun delvist.";
-                        if (s.C > 4) return D.stort(s.navn) + " giver to lag. Kæden er for lang til én OH-gruppe.";
-                        return null;
-                    },
+                    type: "handling", skjul: ["glas", "regel"], tillad: ["tile:COOH"],
+                    el: "tile:COOH", boble: "Træk hen på kæden",
+                    tekst: "En carboxylsyre har en COOH-gruppe i stedet for OH.",
+                    spm: "Træk COOH-gruppen hen på kæden.",
+                    maal: function (sim) { return sim.stofNu().g === "COOH"; },
                     hint: [
-                        "Der skal 4 carbonatomer til at ophæve virkningen af én polær gruppe.",
-                        "Med 4 carbonatomer ligger alkoholen på grænsen, så den skal have færre.",
-                        "Propan-1-ol med 3 carbonatomer er den længste."
-                    ]
-                }
-            ],
-            loest: "Én OH-gruppe kan holde 3 carbonatomer i vandet. Ved 4 carbonatomer ligger alkoholen på grænsen."
-        },
-        {
-            id: "syrelag", navn: "En syre i to lag", start: { g: "COOH", n: 1 },
-            dele: [
+                        "COOH-gruppen står under kæden.",
+                        "Træk COOH-gruppen hen på enden af kæden, eller klik på den.",
+                        "Klik på COOH-gruppen."
+                    ],
+                    visSvar: function (sim) { sim.saetMolekyle("COOH", sim.n); },
+                    svarTekst: "COOH-gruppen sidder nu for enden af kæden."
+                },
                 {
-                    type: "forsoeg", indsend: true, styr: ["gruppe", "laengde"], skjul: ["glas"], om: ["kaede", "regel"],
-                    svarStof: { g: "COOH", n: 4 },
-                    tekst: "Byg en carboxylsyre, der ikke kan opløses i vand, og indsend.",
+                    type: "indsend", skjul: ["glas"], tillad: ["laengde"], om: ["regel"],
+                    tekst: "Glasset er skjult. Brug tommelfingerreglen.",
+                    spm: "Byg en carboxylsyre, der ikke kan opløses i vand, og indsend.",
+                    klar: function () { return true; },
                     tjek: function (s) {
-                        if (s.klasse !== "carboxylsyre") return forkertKlasse(s, "carboxylsyre");
-                        if (s.C < 4) return D.stort(s.navn) + " kan blandes med vand. Gør kæden længere.";
+                        if (s.klasse !== "carboxylsyre") return "Molekylet er ikke en carboxylsyre. Den har gruppen COOH.";
+                        if (s.C < 4) return D.stort(s.navn) + " har " + s.C + " carbonatom" + (s.C === 1 ? "" : "er") + " og kan blandes med vand. Gør kæden længere.";
                         if (s.C === 4) return "Butansyre har 4 carbonatomer og ligger på grænsen. Gør kæden længere.";
                         return null;
-                    },
-                    setFn: function (s) {
-                        return D.stort(s.navn) + " har " + s.C + " carbonatomer og kun én polær gruppe, så der bliver to lag.";
                     },
                     hint: [
                         "COOH er én polær gruppe. Tæl alle carbonatomer, også det i COOH.",
                         "Med 4 carbonatomer ligger syren på grænsen. Syren skal have flere carbonatomer.",
                         "Pentansyre med 5 carbonatomer kan ikke opløses i vand."
-                    ]
+                    ],
+                    visSvar: function (sim) { sim.saetMolekyle("COOH", 4); },
+                    slut: function (sim) {
+                        var s = sim.stofNu();
+                        return D.stort(s.navn) + " har " + s.C + " carbonatomer og kun én polær gruppe, så der bliver to lag.";
+                    }
                 }
-            ],
-            loest: "COOH-gruppen er én polær gruppe ligesom OH. Fra 5 carbonatomer kan syren ikke opløses i vand."
+            ]
         },
         {
-            id: "glycerol", navn: "Glycerol", start: { g: "glycerol", n: 3 }, laast: true,
-            dele: [
+            id: "glycerol", navn: "Glycerol i vand", start: { g: "glycerol", n: 3 },
+            trin: [
                 {
-                    type: "spm", skjul: ["glas"], om: ["kaede", "regel"],
-                    tekst: "Glycerol har 3 carbonatomer og 3 OH-grupper. Kan glycerol blandes med vand?",
+                    type: "valg", skjul: ["glas"], om: ["regel"],
+                    spm: "Kan glycerol med 3 carbonatomer og 3 OH-grupper blandes med vand?",
                     svar: [
-                        { t: "Nej, der bliver to lag",
-                          f: "Der er 3 polære grupper til kun 3 carbonatomer. Én gruppe kan holde op til 3 carbonatomer." },
                         { t: "Ja, i alle forhold", ok: true },
+                        { t: "Nej, der bliver to lag",
+                          nej: "Der er 3 polære grupper til kun 3 carbonatomer. Én gruppe kan holde op til 3 carbonatomer." },
                         { t: "Kun delvist",
-                          f: "Et stof ligger på grænsen ved 4 carbonatomer pr. polær gruppe, men glycerol har kun 1 pr. gruppe." }
+                          nej: "Et stof ligger på grænsen ved 4 carbonatomer pr. polær gruppe, men glycerol har kun 1 pr. gruppe." }
                     ],
                     hint: [
                         "Tæl carbonatomerne pr. OH-gruppe.",
                         "Glycerol har 1 carbonatom pr. OH-gruppe. Grænsen går ved 4.",
                         "Glycerol kan blandes med vand i alle forhold."
-                    ]
+                    ],
+                    slut: "Glycerol har 1 carbonatom pr. OH-gruppe. Alle tre OH-grupper danner hydrogenbindinger til vandet, så glycerol blandes med vand."
                 }
-            ],
-            loest: "Glycerol har 1 carbonatom pr. OH-gruppe. Alle tre OH-grupper danner hydrogenbindinger til vandmolekylerne."
+            ]
         }
     ];
+
+    /* Kortet i den fri leg */
+    D.VAND_FRI = {
+        pause: "Byg selv, og se stoffet i glasset og i luppen. Opgaven venter, til du går tilbage.",
+        alle: "Du har løst alle opgaverne.",
+        alleSpm: "Byg selv alkaner, alkoholer og carboxylsyrer, og se, om de kan blandes med vand."
+    };
 
     /* ----- Svar paa klik ------------------------------------------------------------------ */
     /* Naar gruppen er laast, og naar kaedens laengde er laast */

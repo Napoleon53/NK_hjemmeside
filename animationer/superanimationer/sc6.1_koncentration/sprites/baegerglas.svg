@@ -3,28 +3,20 @@
        klippet til det indre: x 18-142, y 16-186 (bundens hjoerner r 8).
        Rumfang: y = 186 - 0,35 * V (V i mL), saa 400 mL staar ved y 46.
        Tuden sidder oeverst til venstre. Bunden staar paa y 190. -->
-  <defs>
-    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
-      <stop offset="0.15" stop-color="#d4ebfa" stop-opacity="0.07"/>
-      <stop offset="0.85" stop-color="#d4ebfa" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.24"/>
-    </linearGradient>
-  </defs>
-  <path d="M18 16 L18 178 Q18 186 26 186 L134 186 Q142 186 142 178 L142 16 Z" fill="url(#glas)"/>
-  <path d="M10 10 Q18 10 18 18 L18 180 Q18 188 26 188 L134 188 Q142 188 142 180 L142 16 Q142 12 146 11"
-        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="128" y="26" width="4" height="150" rx="2" fill="#ffffff" fill-opacity="0.14"/>
-  <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="1.4" stroke-linecap="round">
-    <path d="M19 151 h20 M19 116 h20 M19 81 h20 M19 46 h20"/>
-  </g>
-  <g stroke="#eef6fc" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round">
-    <path d="M19 168.5 h10 M19 133.5 h10 M19 98.5 h10 M19 63.5 h10"/>
-  </g>
-  <g font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#eef6fc" fill-opacity="0.85">
-    <text x="43" y="155">100</text>
-    <text x="43" y="120">200</text>
-    <text x="43" y="85">300</text>
-    <text x="43" y="50">400 mL</text>
-  </g>
+<defs><linearGradient id="ind" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4ebfa" stop-opacity="0.14"/><stop offset="0.1" stop-color="#d4ebfa" stop-opacity="0.05"/><stop offset="0.9" stop-color="#d4ebfa" stop-opacity="0.04"/><stop offset="1" stop-color="#d4ebfa" stop-opacity="0.12"/></linearGradient><linearGradient id="vaeg" x1="13.5" y1="0" x2="146.5" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4f9fd" stop-opacity="0.85"/><stop offset="0.04" stop-color="#cfe3f3" stop-opacity="0.5"/><stop offset="0.5" stop-color="#bcd3e6" stop-opacity="0.38"/><stop offset="0.96" stop-color="#bcd3e6" stop-opacity="0.42"/><stop offset="1" stop-color="#e6f1fa" stop-opacity="0.7"/></linearGradient><linearGradient id="glans" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.75" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><radialGradient id="skyg"><stop offset="0" stop-color="#000000" stop-opacity="0.5"/><stop offset="0.6" stop-color="#000000" stop-opacity="0.22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><clipPath id="ude"><path clip-rule="evenodd" d="M-60 -60 H220 V260 H-60 Z M18 16 V178 Q18 186 26 186 H134 Q142 186 142 178 V16 Z"/></clipPath></defs>
+<ellipse cx="80" cy="191" rx="72" ry="5" fill="url(#skyg)"/>
+<path d="M18 16 V178 Q18 186 26 186 H134 Q142 186 142 178 V16 Z" fill="url(#ind)"/>
+<path d="M13.5 16 V178 Q13.5 190 26 190 H134 Q146.5 190 146.5 178 V16 Z M18 16 V178 Q18 186 26 186 H134 Q142 186 142 178 V16 Z" fill-rule="evenodd" fill="url(#vaeg)"/>
+<path d="M13.5 16 Q13.5 9 9.5 9 A1.91 1.91 0 0 0 9.5 12.82 Q18 12.82 18 16 Z" fill="url(#vaeg)"/>
+<path d="M142 16 Q142 10.5 149.5 10.5 A1.91 1.91 0 0 1 149.5 14.32 Q146.5 14.32 146.5 16 Z" fill="url(#vaeg)"/>
+<path d="M13.5 16 V178 Q13.5 190 26 190 H134 Q146.5 190 146.5 178 V16" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M13.5 16 Q13.5 9 9.5 9 A1.91 1.91 0 0 0 9.5 12.82 Q18 12.82 18 16" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M142 16 Q142 10.5 149.5 10.5 A1.91 1.91 0 0 1 149.5 14.32 Q146.5 14.32 146.5 16" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M18 16 V178 Q18 186 26 186 H134 Q142 186 142 178 V16" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.6" clip-path="url(#ude)"/>
+<rect x="23" y="26" width="3" height="150" rx="1.5" fill="url(#glans)"/>
+<path d="M28 187.6 H132" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+<path d="M145.15 30 V170" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1" stroke-linecap="round"/>
+<path d="M15.75 30 V150" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round"/>
+<g stroke="#eef6fc" stroke-linecap="round"><path d="M19 151 h20 M19 116 h20 M19 81 h20 M19 46 h20" stroke-opacity="0.78" stroke-width="1.4"/><path d="M19 168.5 h10 M19 133.5 h10 M19 98.5 h10 M19 63.5 h10" stroke-opacity="0.45" stroke-width="1"/></g>
+<g font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#eef6fc" fill-opacity="0.85"><text x="43" y="155">100</text><text x="43" y="120">200</text><text x="43" y="85">300</text><text x="43" y="50">400 mL</text></g>
 </svg>

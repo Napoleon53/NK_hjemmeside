@@ -30,12 +30,12 @@
             { sel: "#k-skemakort", titel: "Skemaet", tekst: "Kogepunktet for hvert stof, du bygger, kommer i skemaet, så du kan sammenligne." }
         ],
         "fane-v": [
-            { sel: "#v-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Der er fem opgaver." },
-            { sel: "#v-anker-plade", titel: "Byg molekylet", tekst: "Træk en gruppe hen på kæden, og gør kæden længere eller kortere med + og −." },
-            { sel: "#v-anker-instr", titel: "Glasset", tekst: "Stoffet er rystet med vand. Ét lag betyder, at stofferne blandes, og to lag betyder, at stofferne ikke blandes." },
-            { sel: "#v-anker-regel", titel: "Tommelfingerreglen", tekst: "1 polær gruppe kræver 4 C-atomer. Felterne viser, om stoffets antal C-atomer er færre end grænsen, lige på den eller flere." },
-            { sel: "#v-anker-lup", titel: "Luppen", tekst: "Luppen viser ét molekyle i vand. De stiplede linjer er hydrogenbindinger fra den polære gruppe til vandmolekylerne." },
-            { sel: "#v-regelkort", titel: "Det har du set", tekst: "Skemaet samler, hvad du har set i glasset." }
+            { sel: "#vand-raekke", titel: "Opgaverne", tekst: "Der er tre opgaver. Titlen på en opgave kommer frem, når du når den. Fri leg giver adgang til alle grupperne." },
+            { sel: "#vand-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#vand-anker-plade", titel: "Byg molekylet", tekst: "Gør kæden længere eller kortere med + og −, når kortet beder om det." },
+            { sel: "#vand-anker-instr", titel: "Glasset", tekst: "Stoffet er rystet med vand. Ét lag betyder, at stofferne blandes, og to lag betyder, at de ikke blandes." },
+            { sel: "#vand-anker-regel", titel: "Tommelfingerreglen", tekst: "1 polær gruppe kræver 4 C-atomer. Den kommer frem, når du skal bruge den." },
+            { sel: "#vand-anker-lup", titel: "Luppen", tekst: "Luppen viser ét molekyle i vand. Den kommer frem, når du klikker på glasset." }
         ]
     };
 

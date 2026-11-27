@@ -2,7 +2,8 @@
   <!-- Vejebaad af hvid plast. Pulveret tegnes af animationen BAG filen,
        med bunden paa y 14 mellem x 16 og 104; forkanten daekker det
        nederste. Baaden staar paa y 34. -->
-  <path d="M4 7 Q60 -1 116 7 L112 12 Q60 5 8 12 Z" fill="#f4f6f8" fill-opacity="0.55" stroke="#c9d0d8" stroke-width="1"/>
-  <path d="M4 8 L18 33 Q60 36 102 33 L116 8 Q60 17 4 8 Z" fill="#eef1f4" fill-opacity="0.93" stroke="#aeb7c1" stroke-width="1"/>
-  <path d="M12 14 Q60 22 108 14" stroke="#ffffff" stroke-opacity="0.8" stroke-width="1.2" fill="none"/>
+<defs><linearGradient id="plast" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.97"/><stop offset="0.5" stop-color="#eceff2" stop-opacity="0.96"/><stop offset="1" stop-color="#c9d0d7" stop-opacity="0.96"/></linearGradient></defs>
+<path d="M4 7 Q60 -1 116 7 L112 12 Q60 5 8 12 Z" fill="#f4f6f8" fill-opacity="0.55" stroke="#b9c2cb" stroke-width="1"/>
+<path d="M4 8 L18 33 Q60 36 102 33 L116 8 Q60 17 4 8 Z" fill="url(#plast)" stroke="#9aa5b0" stroke-width="1"/>
+<path d="M12 14 Q60 22 108 14" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.2" fill="none"/>
 </svg>

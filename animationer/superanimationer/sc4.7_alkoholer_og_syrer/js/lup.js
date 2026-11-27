@@ -23,8 +23,12 @@
     var NK = window.NK;
     var K = NK.Kugler;
 
-    function Lup(slags) {
+    /* lys: luppen er et lyst kort som bogens figurer (fane 3, runde T11,
+       REGELSAET 60), saa vandet, gloerien, hydrogenbindingerne og klammerne
+       faar farver, der kan ses paa lys bund */
+    function Lup(slags, lys) {
         this.slags = slags;
+        this.lys = !!lys;
         this.stof = null;
         this.stof2 = null;
         this.gammel = null;
@@ -274,42 +278,43 @@
         return lay;
     };
 
-    function tegnLay(ctx, lay, alfa) {
+    function tegnLay(ctx, lay, alfa, lys) {
         var r = lay.r, ox = lay.ox, oy = lay.oy;
         if (lay.vand) {
-            K.tegnMolekyler(ctx, lay.vand, ox, oy, r, 0.5 * alfa);
+            K.tegnMolekyler(ctx, lay.vand, ox, oy, r, (lys ? 0.62 : 0.5) * alfa);
             /* En glorie om molekylet, saa det skiller sig ud fra vandet */
             ctx.save();
             ctx.globalAlpha *= alfa;
             lay.mol[0].atomer.forEach(function (a) {
                 ctx.beginPath();
                 ctx.arc(ox + a.x * r, oy + a.y * r, r * (a.s === "H" ? 1.25 : 1.6), 0, Math.PI * 2);
-                ctx.fillStyle = "rgba(255, 228, 150, 0.09)";
+                ctx.fillStyle = lys ? "rgba(242, 197, 61, 0.2)" : "rgba(255, 228, 150, 0.09)";
                 ctx.fill();
             });
             ctx.restore();
         }
         lay.kontakt.forEach(function (c) { K.tegnKontakt(ctx, c.x0, c.x1, c.y, ox, oy, r, alfa); });
         K.tegnMolekyler(ctx, lay.mol, ox, oy, r, alfa);
-        lay.hb.forEach(function (b) { K.tegnHBinding(ctx, b.h, b.o, ox, oy, r, alfa); });
-        if (lay.klammer) tegnKlammer(ctx, lay, alfa);
+        lay.hb.forEach(function (b) { K.tegnHBinding(ctx, b.h, b.o, ox, oy, r, alfa, lys ? K.HB_LYS : undefined); });
+        if (lay.klammer) tegnKlammer(ctx, lay, alfa, lys);
     }
 
     /* Klammer under molekylet med "upolær kæde" og "polær gruppe" */
-    function tegnKlammer(ctx, lay, alfa) {
+    function tegnKlammer(ctx, lay, alfa, lys) {
         var r = lay.r, y = lay.oy + (lay.bundY + 0.9) * r;
         ctx.save();
         ctx.globalAlpha *= alfa;
         ctx.lineWidth = 2;
         ctx.lineCap = "round";
-        ctx.font = "700 " + Math.round(Math.max(11.5, Math.min(14, r * 0.95))) + "px 'Segoe UI', sans-serif";
+        ctx.font = lys ? "600 " + Math.round(Math.max(13.5, Math.min(15, r * 0.95))) + "px Lexend, 'Segoe UI', sans-serif"
+            : "700 " + Math.round(Math.max(11.5, Math.min(14, r * 0.95))) + "px 'Segoe UI', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         /* En etiket, der ville staa oven i den forrige, rykkes en linje ned */
         var forrigeSlut = -Infinity, linje = parseFloat(ctx.font.split(" ")[1]) + 3;
         lay.klammer.forEach(function (k) {
             var x0 = lay.ox + k.x0 * r, x1 = lay.ox + k.x1 * r;
-            var farve = k.polaer ? "#7fe0d2" : "#aab3bf";
+            var farve = lys ? (k.polaer ? "#0b7f74" : "#5b6270") : (k.polaer ? "#7fe0d2" : "#aab3bf");
             ctx.strokeStyle = farve;
             ctx.beginPath();
             ctx.moveTo(x0, y - 6); ctx.lineTo(x0, y); ctx.lineTo(x1, y); ctx.lineTo(x1, y - 6);
@@ -336,9 +341,10 @@
     };
 
     P.tegnIndhold = function (ctx, R, stof, stof2, alfa) {
-        var rMaks = this.slags === "vand" ? 17 : 15;
+        /* Den lyse lup paa fane 3 har faa, store molekyler (REGELSAET 60) */
+        var rMaks = this.slags === "vand" ? (this.lys ? NK.klamp(R.h / 10.5, 20, 28) : 17) : 15;
         if (!stof2) {
-            tegnLay(ctx, this.layoutFor(stof, R, rMaks, 3), alfa);
+            tegnLay(ctx, this.layoutFor(stof, R, rMaks, 3), alfa, this.lys);
             return;
         }
         /* To stoffer: hver sin halvdel med ét par og navnet i hjoernet, saa

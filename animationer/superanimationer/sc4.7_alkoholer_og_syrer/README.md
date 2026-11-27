@@ -91,24 +91,18 @@ kogepunkterne for de stoffer, eleven har bygget. To opgaver:
 1. Ethan og ethanol: OH-gruppen sættes på ethan (kæden er fast); spørgsmålet kommer med det samme: hvad holder ethanolmolekylerne sammen i luppen? (forklarer ordet hydrogenbinding)
 2. Den korteste alkan, der er en væske ved 20 °C (pentan); hvorfor stiger kogepunktet med kæden? (kontaktfladen)
 
-**3 I vand** (`#vand`). Glasset står først til højre for pladen: et
-reagensglas med vand og stoffet foran en hvid plade. Når stoffet skifter,
-ryster glasset, og en uklar blanding skilles i ét lag, to lag, to lag med et
-tyndere øverste lag (på grænsen) eller bobler (en gas ved 20 °C). Til højre
-for glasset står tommelfingerreglen som oversigt med bogens ord fra figuren
-tommelfinger-trin (3.4): "1 polær gruppe kræver 4 C-atomer", felterne 1 til 8
-C-atomer grønne under grænsen, gule på den og røde over, en pil på stoffets
-antal og en konklusion i én sætning. Under oversigten står en lille lup med ét
-molekyle i vand: kun vandet tæt på molekylet, intet vand lige om kæden,
-stiplede hydrogenbindinger fra gruppen og to klammer under molekylet,
-"upolær kæde" og "polær gruppe". Panelet har skemaet med ja, delvis og nej. Fem
-opgaver:
+**3 I vand** (`#vand`). Bygget om i runde T11 (27. nov. 2026), se afsnittet
+nedenfor. Intet panel: tre opgaver i en række øverst i scenen, kortet
+centreret under den, og fra venstre pladen, reagensglasset med vand og
+stoffet, tommelfingerreglen og en lys lup med ét molekyle i vand.
 
-1. Gør kæden på ethanol længere, til der bliver to lag; hvorfor blandes octan-1-ol ikke?
-2. Luppen i vand: hvor går de stiplede linjer? (kun ved OH-gruppen)
-3. Den længste alkohol, der kan blandes helt med vand (propan-1-ol), med glasset skjult
-4. En carboxylsyre, der ikke kan opløses (pentansyre eller længere), med glasset skjult
-5. Glycerol med 3 OH-grupper: kan den blandes med vand? (glasset skjult til svaret)
+1. Alkoholer i vand: gør kæden på ethanol længere, til der bliver to lag
+   (butan-1-ol får en besked om grænsen, pentan-1-ol går videre); klik på
+   glasset, så luppen kommer frem; hvorfor giver pentan-1-ol to lag?
+2. En syre i to lag: træk COOH-gruppen hen på kæden; byg en carboxylsyre,
+   der ikke kan opløses i vand, med glasset skjult og tommelfingerreglen fremme
+3. Glycerol i vand: kan glycerol med 3 OH-grupper blandes med vand?
+   (glasset skjult til svaret)
 
 ## Modellen
 
@@ -162,7 +156,8 @@ opgaver:
 * `js/lup.js`: luppen (rent stof, to stoffer, ét molekyle i vand).
 * `js/instrument.js`: termometeret, reagensglasset, oversigten over
   tommelfingerreglen (`tegnRegel`) og navnemaskinen.
-* `js/plade.js`: byggepladen. `js/sim.js`: de tre faner.
+* `js/plade.js`: byggepladen. `js/sim.js`: fane 1 og 2.
+* `js/sim_vand.js` og `js/vand_opgaver.js`: fane 3 (runde T11), se nedenfor.
 * `js/fane.js` (kortet, låsen og hintene fra sc4.3), `js/kerne.js`,
   `js/tegning.js` (kuglerne og det fælles fra sc4.3, nyt: skiltet under en
   ting), `js/sprites.js`, `js/rundvisning.js`, `js/app.js`.
@@ -223,3 +218,52 @@ det.
 ## Opgavelisten låser titlerne op (21. nov. 2026)
 
 Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).
+
+## Runde T11: fane 3 uden panel (27. nov. 2026)
+
+Niels: "Du må nu gerne gå direkte i gang med T11 og lave første udkast, når
+du har overvejet hvad der skal gøres." Fane 3 var i gennemgangen dømt "for
+meget": glasset, tommelfingerreglen med konklusion, en mørk lup med signatur,
+panelet med skemaet og opgavelisten og grupperne på hylden var fremme på én
+gang, og oversigten viste svaret, før der blev spurgt. Bygget efter
+REGELSAET:
+
+* **Intet panel** (regel 2-3). De tre opgaver står i rækken øverst med Start
+  forfra og Fri leg yderst til højre (regel 57), og kortet står centreret
+  under rækken. Fanen har sin egen fil, `js/sim_vand.js`, og motoren
+  `js/vand_opgaver.js` er en kopi af T10's (`sc4.5/js/koele_opgaver.js`) med
+  trinet "indsend" (et bygget molekyle med Indsend svar og en forklaring til
+  hvert forkert), tekster og pladser som funktioner af molekylet, stjerne kun
+  uden forkerte svar og uden Vis svaret, og kortets plads målt i en usynlig
+  kopi (regel 4).
+* **Tre opgaver** i stedet for fem (regel 61), stofferne fra bogens tabel i
+  4.5: ethanol, butan-1-ol på grænsen, pentan-1-ol eller længere, en
+  carboxylsyre og glycerol. Opgaven "Luppen i vand" er lagt ind i opgave 1,
+  og "Den længste alkohol" er væk (eleven ser grænsen i glasset i opgave 1).
+* **Gør først, forklar bagefter** (regel 64, 12). Opgave 1 begynder med en
+  handling (+ til to lag), så et klik på glasset (luppen kommer frem), og
+  først derefter spørgsmålet om det, eleven har set. Svarene kan tjekkes i
+  scenen (regel 54): formlen viser OH-gruppen, og glasset viser alkoholen
+  øverst.
+* **Delene dukker op, når de bruges** (regel 13, 38). Luppen og
+  tommelfingerreglen er stiplede pladser med navnet, til et trin bruger dem,
+  og de forsvinder ikke igen. Mens glasset er skjult, har oversigten hverken
+  farver, pil eller konklusion, kun reglen.
+* **Pladen viser kun det, der kan bruges** (regel 19a, 57): skifteren Alle
+  atomer / Zigzag kun i fri leg, − og + kun når kortet beder om kæden, og på
+  hylden kun COOH i opgave 2. Under et spørgsmål blinker kortet ved et klik
+  på glasset.
+* **Luppen er et lyst kort** (regel 60) med bogens kugler, en mørkere turkis
+  for hydrogenbindingerne og ingen signatur under (regel 24). Ordet
+  hydrogenbinding forklares i det grønne kort efter opgave 1. En kegle fra et
+  forstørrelsesglas på det øverste lag i glasset viser, hvor luppen kigger
+  (regel 25). Molekylerne er større end før (radius op til 28 px).
+* **Tommelfingerreglen og teorien i Lexend** uden kraftig fed skrift (regel
+  30), og teorien er det lyse ark med henvisning til Kemibogen 4.5 (regel 31).
+* Selvtesten tester den nye fane med musen (stiplede pladser, låsen, besked
+  ved grænsen, forkerte svar, glasset, der kommer frem, fri leg, Start forfra
+  og Vis svaret) og kortet i hvert trin i fire skærmstørrelser. ALT OK (184)
+  27. nov. 2026.
+
+Venter på Niels' feedback.
+

@@ -2,16 +2,10 @@
   <!-- Spatel. Bladets midte er (22, 20), spidsen (3, 20) og enden af
        skaftet (157, 20). Animationen tegner saltbunken ovenpaa bladet og
        drejer hele spatlen om enden af skaftet, naar der haeldes. -->
-  <defs>
-    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#eef2f6"/>
-      <stop offset="0.55" stop-color="#aeb8c3"/>
-      <stop offset="1" stop-color="#76828f"/>
-    </linearGradient>
-  </defs>
-  <rect x="42" y="17.5" width="115" height="5" rx="2.5" fill="url(#metal)" stroke="#5d6874" stroke-width="0.6"/>
-  <rect x="120" y="16" width="36" height="8" rx="4" fill="#2f5f8a" stroke="#1d3d5a" stroke-width="0.8"/>
-  <path d="M3 20 C3 10.5 19 8.5 34 12.5 L46 17.5 L46 22.5 L34 27.5 C19 31.5 3 29.5 3 20 Z"
-        fill="url(#metal)" stroke="#5d6874" stroke-width="0.8"/>
-  <path d="M9 16 C14 12.5 24 12 31 14" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round"/>
+<defs><linearGradient id="mv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.3" stop-color="#d9dfe4"/><stop offset="0.62" stop-color="#9ea8b1"/><stop offset="1" stop-color="#66717b"/></linearGradient><linearGradient id="mh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6c767c"/><stop offset="0.3" stop-color="#eef1f3"/><stop offset="0.62" stop-color="#aeb6bc"/><stop offset="1" stop-color="#6c767c"/></linearGradient><linearGradient id="greb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f8fb8"/><stop offset="0.4" stop-color="#2f5f8a"/><stop offset="1" stop-color="#1c3d5a"/></linearGradient></defs>
+<rect x="42" y="17.5" width="115" height="5" rx="2.5" fill="url(#mv)" stroke="#4e5862" stroke-width="0.7"/>
+<rect x="120" y="16" width="36" height="8" rx="4" fill="url(#greb)" stroke="#1a3650" stroke-width="0.8"/>
+<path d="M3 20 C3 10.5 19 8.5 34 12.5 L46 17.5 L46 22.5 L34 27.5 C19 31.5 3 29.5 3 20 Z" fill="url(#mv)" stroke="#4e5862" stroke-width="0.8"/>
+<path d="M9 16 C14 12.5 24 12 31 14" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M124 17.6 H152" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.2" stroke-linecap="round"/>
 </svg>

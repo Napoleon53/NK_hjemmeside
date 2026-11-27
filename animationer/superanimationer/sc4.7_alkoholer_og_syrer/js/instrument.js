@@ -176,7 +176,7 @@
         if (valg.skjult) {
             NK.Sprites.tegn(ctx, "reagensglas", x, y, b, h);
             NK.tekst(ctx, "?", plade.x + plade.b / 2, plade.y + plade.h / 2 + 12, { font: font("700", 40), justering: "center", farve: "#b8860b" });
-            var t2 = "Glasset vises, når du har indsendt";
+            var t2 = valg.skjultTekst || "Glasset vises, når du har indsendt";
             NK.tekst(ctx, t2, R.x + R.b / 2, plade.y + plade.h + 22, { font: font("600", NK.Tegn.passer(ctx, t2, R.b - 6, "600", 13, 10.5)), justering: "center", farve: "#aab3bf" });
             return { x: plade.x, y: plade.y, b: plade.b, h: plade.h };
         }
@@ -275,14 +275,20 @@
        felter fra 1 til 8 C-atomer er groenne under graensen, gule paa den og
        roede over, og en pil peger paa stoffets antal. Med glasset skjult er
        felterne graa, og konklusionen er vaek, saa eleven selv sammenligner. */
+    /* Runde T11 (27. nov. 2026): Lexend uden kraftig fed skrift (REGELSAET 30),
+       og mens glasset er skjult, er der hverken farver, pil eller konklusion,
+       saa oversigten ikke viser svaret (REGELSAET 38) */
+    function lex(v, px) { return v + " " + Math.round(px) + "px Lexend, 'Segoe UI', sans-serif"; }
+
     function tegnRegel(ctx, R, stof, valg) {
         valg = valg || {};
+        var font = lex;
         NK.Tegn.tavle(ctx, R);
         var x = R.x + 16, b = R.b - 32, y = R.y + 14;
         var skjult = valg.skjult;
-        var stor = Math.max(13, Math.min(16, R.h * 0.1));
-        var lille = Math.max(11.5, Math.min(13.5, R.h * 0.085));
-        NK.tekst(ctx, "Tommelfingerreglen", x, y + 14, { font: font("700", stor), farve: BLAEK });
+        var stor = Math.max(14, Math.min(17, R.h * 0.1));
+        var lille = Math.max(13, Math.min(14.5, R.h * 0.085));
+        NK.tekst(ctx, "Tommelfingerreglen", x, y + 14, { font: font("600", stor), farve: BLAEK });
 
         var vand = stof.id === "vand";
         var p = stof.polaere || 0;
@@ -290,7 +296,9 @@
         var regel = vand ? "Vand er selv et polært stof." :
             (p === 0 ? "Ingen polær gruppe. Stoffet er upolært." :
                 (p === 1 ? "1 polær gruppe kræver 4 C-atomer." : p + " polære grupper kræver " + kraev + " C-atomer."));
-        NK.tekst(ctx, regel, x, y + 20 + stor + 2, { font: font("600", NK.Tegn.passer(ctx, regel, b, "600", lille + 0.5, 10.5)), farve: p ? GROEN : "#a33529" });
+        ctx.font = font("500", lille + 1);
+        var regelPx = Math.max(12, Math.min(lille + 1, (lille + 1) * b / Math.max(1, ctx.measureText(regel).width)));
+        NK.tekst(ctx, regel, x, y + 20 + stor + 2, { font: font("500", regelPx), farve: p ? GROEN : "#a33529" });
 
         /* Felterne 1 til 8 (antallet af C-atomer) */
         var top = y + 20 + stor + 2 + 12;
@@ -307,9 +315,9 @@
             NK.rundtRekt(ctx, fx, top, fb, fh, 5);
             ctx.fillStyle = farve;
             ctx.fill();
-            var nu = stof.C === i && !vand;
+            var nu = stof.C === i && !vand && !skjult;
             if (nu) { ctx.lineWidth = 2.5; ctx.strokeStyle = BLAEK; ctx.stroke(); }
-            NK.tekst(ctx, String(i), fx + fb / 2, top + fh / 2 + 5, { font: font("700", Math.min(15, fh * 0.5)), justering: "center", farve: nu ? BLAEK : tekstF });
+            NK.tekst(ctx, String(i), fx + fb / 2, top + fh / 2 + 5, { font: font(nu ? "600" : "500", Math.min(15, fh * 0.5)), justering: "center", farve: nu ? BLAEK : tekstF });
             if (nu) {
                 /* Pilen ned paa stoffets antal C-atomer */
                 ctx.beginPath();
@@ -322,7 +330,7 @@
         /* Konklusionen */
         var ky = top + fh + lille + 8;
         var konkl;
-        if (skjult) konkl = "Sammenlign selv antallet af C-atomer med reglen.";
+        if (skjult) konkl = "Tæl stoffets C-atomer, og sammenlign med reglen.";
         else if (vand) konkl = "Vand blandes med vand.";
         else if (!p && stof.tilstand === "gas") konkl = "Stoffet opløses ikke og er en gas ved 20 °C.";
         else if (!p) konkl = "Uden en polær gruppe giver stoffet to lag.";
@@ -330,7 +338,7 @@
         else if (stof.C === kraev) konkl = stof.C + " C-atomer er lige på grænsen, så stoffet opløses kun delvist.";
         else konkl = stof.C + " C-atomer er flere end " + kraev + ", så der bliver to lag.";
         var kf = skjult ? "#8a6d12" : (!p || stof.C > kraev ? "#a33529" : (stof.C === kraev ? "#8a6d12" : "#1f6b43"));
-        ordbryd(ctx, konkl, x, ky, b, font("700", lille), kf, lille * 1.35);
+        ordbryd(ctx, konkl, x, ky, b, font("500", lille), kf, lille * 1.35);
     }
 
     /* ----- Navnemaskinen ------------------------------------------------------------------ */

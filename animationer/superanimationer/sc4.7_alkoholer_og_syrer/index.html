@@ -7,6 +7,7 @@
 <title>Alkoholer og carboxylsyrer</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
+<link rel="stylesheet" href="../faelles/teori.css">
 <script>window.goatcounter = {path: function (p) { return location.host + p; }};</script>
 <script data-goatcounter="https://napoleon53.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -112,50 +113,45 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 3: I VAND                                                     -->
+<!-- FANE 3: I VAND (runde T11, 27. nov. 2026: intet panel)             -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-v" role="tabpanel" aria-label="I vand">
+<section class="fane uden-panel" id="fane-v" role="tabpanel" aria-label="I vand">
+    <!-- Intet panel (REGELSAET 2-3): opgaverne staar i raekken oeverst,
+         kortet under raekken, og scenen har pladen, glasset,
+         tommelfingerreglen og luppen (js/sim_vand.js). -->
     <div class="scene">
-        <canvas id="v-laerred"></canvas>
-        <div class="scenekort" id="v-skort">
-            <div class="sk-ind" id="v-ind"></div>
-            <div class="sk-bund" id="v-status">
-                <p class="st-tekst" id="v-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="v-knap" type="button">Giv et hint</button>
-                <button class="knap indsend ikke-klar" id="v-indsend" type="button" hidden>Indsend svar</button>
+        <canvas id="vand-laerred" aria-label="Byggepladen med et molekyle, et reagensglas med vand og stoffet, tommelfingerreglen og en lup med ét molekyle i vand"></canvas>
+        <div class="anker" id="vand-anker-plade"></div>
+        <div class="anker" id="vand-anker-instr"></div>
+        <div class="anker" id="vand-anker-regel"></div>
+        <div class="anker" id="vand-anker-lup"></div>
+
+        <!-- Opgaverne i fast raekkefoelge, laast op i takt (js/vand_opgaver.js) -->
+        <nav class="opgaverad" id="vand-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="vand-liste"></div>
+            <button class="or-knap or-stille" id="vand-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="vand-frileg" type="button" title="Byg alle stoffer uden opgaver">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: spoergsmaalet, svarene, hint og Indsend svar -->
+        <div class="scenekort" id="vand-skort">
+            <div class="sk-ind" id="vand-ind"></div>
+            <div class="sk-bund" id="vand-bund" hidden>
+                <p class="st-tekst" id="vand-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="vand-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="vand-indsend" type="button">Indsend svar</button>
             </div>
         </div>
-        <div class="anker" id="v-anker-plade"></div>
-        <div class="anker" id="v-anker-hylde"></div>
-        <div class="anker" id="v-anker-kontrol"></div>
-        <div class="anker" id="v-anker-stil"></div>
-        <div class="anker" id="v-anker-instr"></div>
-        <div class="anker" id="v-anker-regel"></div>
-        <div class="anker" id="v-anker-lup"></div>
     </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="v-regelkort">
-            <h2>Det har du set i glasset</h2>
-            <div id="v-skema"></div>
-            <p class="note">Kan stoffet opløses i vand? Antal carbonatomer i alt øverst.</p>
-        </div>
-
-        <div class="kort" id="v-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="v-loest">0</b>/5</span></h2>
-            <div class="opg-liste" id="v-liste"></div>
-            <button class="knap nulstil lille" id="v-forfra" type="button" title="Begynd opgaven forfra (R)">Begynd opgaven forfra ↺</button>
-        </div>
-    </aside>
 </section>
-
 </main>
 
 <!-- ================================================================= -->
 <!-- TEORIEN (aabnes kun med knappen eller T)                           -->
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
-    <div class="overlay-boks">
+    <!-- Lyst ark med Lexend og en henvisning til Kemibogen (REGELSAET 31, runde T11) -->
+    <div class="overlay-boks teori-ark">
         <h2>Alkoholer og carboxylsyrer</h2>
         <p>En funktionel gruppe er en lille gruppe af atomer, som giver et organisk stof særlige egenskaber. Stoffer med den samme funktionelle gruppe hører til samme stofklasse.</p>
         <div class="eksempel">
@@ -170,6 +166,7 @@
         <p>OH og COOH er polære grupper, fordi oxygen har en høj elektronegativitet. H i én gruppe er positiv (δ+) og tiltrækker O i en anden gruppe, som er negativ (δ−). Tiltrækningen kaldes en hydrogenbinding. Derfor har alkoholer og carboxylsyrer meget højere kogepunkter end alkaner af samme størrelse. Jo længere kæden er, jo større er kontaktfladen mellem molekylerne, og jo højere er kogepunktet.</p>
         <h3 class="teori-hoved">Opløselighed i vand</h3>
         <p>Vandmolekylerne tiltrækker den polære gruppe, men ikke den upolære kæde. Der skal 4 carbonatomer til at ophæve virkningen af én polær gruppe, så kun korte alkoholer og carboxylsyrer kan blandes med vand.</p>
+        <p class="teori-bog">Læs mere i Kemibogen: <a href="https://kemibogen.dk/c/kapitler/4-5-alkoholer-og-syrer.html" target="_blank" rel="noopener">4.5 Alkoholer og carboxylsyrer</a></p>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> kæden &nbsp;·&nbsp; <kbd>Enter</kbd> indsend &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
@@ -209,6 +206,8 @@
 <script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim.js"></script>
+<script src="js/vand_opgaver.js"></script>
+<script src="js/sim_vand.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>
 </body>

@@ -5,21 +5,20 @@
        ved bunden y 248. Maerket paa halsen er y 60: der staar netop
        kolbens rumfang. Rumfanget skrives paa boblen omkring (60, 214).
        Bunden staar paa y 256. -->
-  <defs>
-    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.32"/>
-      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.07"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
-    </linearGradient>
-  </defs>
-  <path d="M52 8 L52 152 Q10 164 10 206 Q10 234 24 250 L96 250 Q110 234 110 206 Q110 164 68 152 L68 8 Z" fill="url(#glas)"/>
-  <path d="M49 6 L52 8 L52 152 Q10 164 10 206 Q10 234 24 252 Q26 254 30 254 L90 254 Q94 254 96 252 Q110 234 110 206 Q110 164 68 152 L68 8 L71 6"
-        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Maerket rundt om halsen -->
-  <path d="M52 60 L68 60" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.8"/>
-  <path d="M52 62 Q60 65 68 62" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1"/>
-  <!-- Genskin -->
-  <rect x="62" y="16" width="2" height="128" rx="1" fill="#ffffff" fill-opacity="0.2"/>
-  <path d="M22 196 Q24 176 40 166" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="4" stroke-linecap="round"/>
+<defs><linearGradient id="ind" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4ebfa" stop-opacity="0.14"/><stop offset="0.1" stop-color="#d4ebfa" stop-opacity="0.05"/><stop offset="0.9" stop-color="#d4ebfa" stop-opacity="0.04"/><stop offset="1" stop-color="#d4ebfa" stop-opacity="0.12"/></linearGradient><linearGradient id="vaeg" x1="7.5" y1="0" x2="112.5" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4f9fd" stop-opacity="0.8"/><stop offset="0.06" stop-color="#cfe3f3" stop-opacity="0.48"/><stop offset="0.5" stop-color="#bcd3e6" stop-opacity="0.38"/><stop offset="0.94" stop-color="#bcd3e6" stop-opacity="0.42"/><stop offset="1" stop-color="#e6f1fa" stop-opacity="0.65"/></linearGradient><linearGradient id="glans" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.75" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><radialGradient id="skyg"><stop offset="0" stop-color="#000000" stop-opacity="0.5"/><stop offset="0.6" stop-color="#000000" stop-opacity="0.22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><clipPath id="ude"><path clip-rule="evenodd" d="M-60 -60 H180 V320 H-60 Z M54 10 V154.38 A48 48 0 0 0 46.29 248 H73.71 A48 48 0 0 0 66 154.38 V10 Z"/></clipPath></defs>
+<ellipse cx="60" cy="256" rx="44" ry="4" fill="url(#skyg)"/>
+<path d="M54 10 V154.38 A48 48 0 0 0 46.29 248 H73.71 A48 48 0 0 0 66 154.38 V10 Z" fill="url(#ind)"/>
+<path d="M49.5 10 V150.56 A52.5 52.5 0 0 0 12.69 224.76 L24.83 249.99 Q27 254.5 32 254.5 H88 Q93 254.5 95.17 249.99 L107.31 224.76 A52.5 52.5 0 0 0 70.5 150.56 V10 Z M54 10 V154.38 A48 48 0 0 0 46.29 248 H73.71 A48 48 0 0 0 66 154.38 V10 Z" fill-rule="evenodd" fill="url(#vaeg)"/>
+<path d="M49.5 10 L49.5 8 Q49.5 6 47.75 5.6 L47.75 7.6 Q54 8 54 9 V10 Z" fill="url(#vaeg)"/>
+<path d="M66 10 V9 Q66 8 72.25 7.6 L72.25 5.6 Q70.5 6 70.5 8 L70.5 10 Z" fill="url(#vaeg)"/>
+<path d="M49.5 10 V150.56 A52.5 52.5 0 0 0 12.69 224.76 L24.83 249.99 Q27 254.5 32 254.5 H88 Q93 254.5 95.17 249.99 L107.31 224.76 A52.5 52.5 0 0 0 70.5 150.56 V10" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M49.5 10 L49.5 8 Q49.5 6 47.75 5.6 L47.75 7.6 Q54 8 54 9 V10" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M66 10 V9 Q66 8 72.25 7.6 L72.25 5.6 Q70.5 6 70.5 8 L70.5 10" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M54 10 V154.38 A48 48 0 0 0 46.29 248 H73.71 A48 48 0 0 0 66 154.38 V10" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.6" clip-path="url(#ude)"/>
+<path d="M48.29 249.6 H71.71" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+<path d="M9.75 200 A50.25 50.25 0 0 1 28.84 162.55" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="56" y="16" width="1.6" height="126" rx="0.8" fill="#ffffff" fill-opacity="0.2"/>
+<path d="M21 196 Q23 176 38 166" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M49.5 60 H70.5" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.8"/>
+<path d="M54 62.2 Q60 65 66 62.2" fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1"/>
 </svg>

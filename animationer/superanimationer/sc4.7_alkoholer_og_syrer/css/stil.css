@@ -1921,3 +1921,100 @@ html body.papirkort.papirkort .fane > .scene > .scenekort > .sk-ind > .sk-tjek {
 .opg-chip.laast { cursor: default; opacity: 0.75; }
 .opg-chip.laast:hover { background-color: var(--panel-2); border-color: #4a4a58; }
 .hl-streg { display: inline-block; width: 8em; height: 9px; border-radius: 5px; background-color: #4a4a58; vertical-align: middle; }
+
+
+/* =====================================================================
+   Fane 3 uden panel (runde T11, 27. nov. 2026, REGELSAET 2-3)
+   Kopi af raekken i ../sc4.5_fedtstoffer (T10) og ../sc4.1_kogepunkt (T9).
+   ===================================================================== */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-v .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen */
+.opgaverad {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+.or-tegn { font-weight: 600; }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap[hidden] { display: none; }
+
+/* Kortet staar under raekken; pladsen maales i js/sim_vand.js (REGELSAET 4) */
+#fane-v .scenekort { top: 46px; width: min(820px, calc(100% - 24px)); }
+.scenekort[hidden] { display: none; }
+.sk-chip { white-space: nowrap; }
+
+/* Raekken: er der ikke plads til alle titlerne, kun nummeret ved de andre */
+.or-opgaver.kompakt .or-knap:not(.valgt) .or-navn { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) { padding: 0 6px 0 4px; }
+
+/* Det roede kryds paa kortet i fri leg (som sc3.3, sc4.1 og sc4.5) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-start { padding-right: 28px; }

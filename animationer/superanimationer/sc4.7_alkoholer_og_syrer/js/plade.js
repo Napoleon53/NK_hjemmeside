@@ -14,6 +14,12 @@
 
    Pladen tegner og siger, hvad musen er over (hit). Det er fanen
    (js/sim.js), der bestemmer, hvad et klik eller et traek goer.
+
+   Fane 3 (runde T11, REGELSAET 19a og 57) kan skjule det, eleven ikke kan
+   bruge lige nu: st.vis = { stil, kontrol, tiles } i tegn(). stil: false
+   skjuler skifteren, kontrol: false skjuler knapperne − og + (teksten om
+   kaeden bliver staaende), og tiles er listen af grupper paa hylden (en
+   tom liste skjuler hylden). Det skjulte kan heller ikke rammes af musen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -112,11 +118,13 @@
         var r = this.r, R = r.R, stof = this.stof;
         if (!R || !stof) return;
         st = st || {};
+        var vis = st.vis || {};
+        this.vis = { stil: vis.stil !== false, kontrol: vis.kontrol !== false, tiles: vis.tiles || GRUPPER };
         var stil = NK.formelStil;
         NK.Tegn.tavle(ctx, R);
 
         NK.tekst(ctx, "Byg molekylet", R.x + 16, R.y + 28, { font: font("700", 15), farve: BLAEK });
-        this.tegnStil(ctx, st.over);
+        if (this.vis.stil) this.tegnStil(ctx, st.over);
 
         /* Molekylet: det nye toner ind over det gamle */
         var valg = { stil: stil, maksSkala: this.skala[stil] };
@@ -210,7 +218,9 @@
         var r = this.r, stof = this.stof, laas = st.laas || {};
         var n = stof.n;
         var maks = D.maksN(stof.g);
-        [["minus", r.minus, "−", n <= 0], ["plus", r.plus, "+", n >= maks || stof.g === "glycerol"]].forEach(function (k) {
+        if (this.vis && !this.vis.kontrol) {
+            /* Kun teksten om kaeden; knapperne er vaek (REGELSAET 19a) */
+        } else [["minus", r.minus, "−", n <= 0], ["plus", r.plus, "+", n >= maks || stof.g === "glycerol"]].forEach(function (k) {
             var slukket = laas.laengde || k[3] || stof.g === "glycerol";
             NK.Tegn.knap(ctx, k[1], k[2], {
                 px: 24, radius: 9,
@@ -227,12 +237,15 @@
 
     P.tegnHylde = function (ctx, st) {
         var r = this.r, mig = this, laas = st.laas || {};
+        var vis = (this.vis && this.vis.tiles) || GRUPPER;
+        if (!vis.length) return;
         ctx.save();
         NK.rundtRekt(ctx, r.hylde.x, r.hylde.y, r.hylde.b, r.hylde.h, 9);
         ctx.fillStyle = "#e9e3d5";
         ctx.fill();
         ctx.restore();
         GRUPPER.forEach(function (g) {
+            if (vis.indexOf(g) < 0) return;
             var tilstand = mig.stof.g === g ? "paa" : (st.traek && st.traek.g === g ? "tom" : "");
             if (laas.gruppe && tilstand !== "paa") tilstand = "laast";
             if (st.over === "tile:" + g && !tilstand) tilstand = "over";
@@ -283,11 +296,12 @@
     P.hit = function (pt) {
         var r = this.r, T = NK.Tegn;
         if (!r.R || !pt) return null;
-        if (T.inde(r.stilAlle, pt)) return "stil:alle";
-        if (T.inde(r.stilZig, pt)) return "stil:zigzag";
-        if (T.inde(r.minus, pt, 3)) return "minus";
-        if (T.inde(r.plus, pt, 3)) return "plus";
-        for (var i = 0; i < GRUPPER.length; i++) if (T.inde(r.tiles[GRUPPER[i]], pt)) return "tile:" + GRUPPER[i];
+        var vis = this.vis || { stil: true, kontrol: true, tiles: GRUPPER };
+        if (vis.stil && T.inde(r.stilAlle, pt)) return "stil:alle";
+        if (vis.stil && T.inde(r.stilZig, pt)) return "stil:zigzag";
+        if (vis.kontrol && T.inde(r.minus, pt, 3)) return "minus";
+        if (vis.kontrol && T.inde(r.plus, pt, 3)) return "plus";
+        for (var i = 0; i < GRUPPER.length; i++) if (vis.tiles.indexOf(GRUPPER[i]) >= 0 && T.inde(r.tiles[GRUPPER[i]], pt)) return "tile:" + GRUPPER[i];
         if (T.inde(r.formel, pt)) return "formel";
         return null;
     };

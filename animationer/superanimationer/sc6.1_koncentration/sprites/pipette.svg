@@ -3,15 +3,12 @@
        x 18-22 fra maerket y 44 ned til boblen, boblen som en ellipse med
        midte (20, 124) og radierne 11 og 34, og den nederste stilk fra
        y 158 til spidsen (20, 254). Maerket er y 44. Toppen er y 0. -->
-  <defs>
-    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.34"/>
-      <stop offset="0.3" stop-color="#d4ebfa" stop-opacity="0.08"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
-    </linearGradient>
-  </defs>
-  <path d="M17 2 L23 2 L23 92 Q32 98 32 124 Q32 150 23 156 L22 238 L21 254 L19 254 L18 238 L17 156 Q8 150 8 124 Q8 98 17 92 Z"
-        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.6" stroke-linejoin="round"/>
-  <path d="M17 44 L23 44" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.6"/>
-  <path d="M12 112 Q12 102 16 98" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+<defs><linearGradient id="ind" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4ebfa" stop-opacity="0.14"/><stop offset="0.1" stop-color="#d4ebfa" stop-opacity="0.05"/><stop offset="0.9" stop-color="#d4ebfa" stop-opacity="0.04"/><stop offset="1" stop-color="#d4ebfa" stop-opacity="0.12"/></linearGradient><linearGradient id="vaeg" x1="7.3" y1="0" x2="32.7" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4f9fd" stop-opacity="0.85"/><stop offset="0.12" stop-color="#cfe3f3" stop-opacity="0.5"/><stop offset="0.5" stop-color="#bcd3e6" stop-opacity="0.4"/><stop offset="0.88" stop-color="#bcd3e6" stop-opacity="0.45"/><stop offset="1" stop-color="#e6f1fa" stop-opacity="0.7"/></linearGradient><linearGradient id="glans" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.75" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><radialGradient id="skyg"><stop offset="0" stop-color="#000000" stop-opacity="0.5"/><stop offset="0.6" stop-color="#000000" stop-opacity="0.22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><clipPath id="ude"><path clip-rule="evenodd" d="M-60 -60 H100 V320 H-60 Z M18 2 V90.57 A11 34 0 0 0 17.8 157.31 L19 253.4 H21 L22.2 157.31 A11 34 0 0 0 22 90.57 V2 Z"/></clipPath></defs>
+<path d="M18 2 V90.57 A11 34 0 0 0 17.8 157.31 L19 253.4 H21 L22.2 157.31 A11 34 0 0 0 22 90.57 V2 Z" fill="url(#ind)"/>
+<path d="M16.3 1 V89.85 A12.7 35.7 0 0 0 16.1 157.98 L17.81 254.6 H22.19 L23.9 157.98 A12.7 35.7 0 0 0 23.7 89.85 V1 Z M18 2 V90.57 A11 34 0 0 0 17.8 157.31 L19 253.4 H21 L22.2 157.31 A11 34 0 0 0 22 90.57 V2 Z" fill-rule="evenodd" fill="url(#vaeg)"/>
+<path d="M16.3 1 V89.85 A12.7 35.7 0 0 0 16.1 157.98 L17.81 254.6 H22.19 L23.9 157.98 A12.7 35.7 0 0 0 23.7 89.85 V1" fill="none" stroke="#f2f8fd" stroke-opacity="0.95" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M18 2 V90.57 A11 34 0 0 0 17.8 157.31 L19 253.4 H21 L22.2 157.31 A11 34 0 0 0 22 90.57 V2" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.6" clip-path="url(#ude)"/>
+<path d="M8.15 112 Q8.15 102 12 97" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M13 116 Q13 104 16 99" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M16.3 44 H23.7" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.6"/>
 </svg>
