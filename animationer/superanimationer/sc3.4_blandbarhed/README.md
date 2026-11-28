@@ -206,12 +206,11 @@ dele (rumfang) vejer 0,926 g/mL; 2 dele vand og 3 dele ethanol 0,904 g/mL.
 ```
 index.html            toplinje, scene, panel, teori, quiz og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
-sprites/bassin.svg    bassinet med låg, tragt, hals og en streg pr. portion;
+sprites/bassin.webp   bassinet med låg, tragt, hals og en streg pr. portion;
                       det samme sprite bruges til det lille glas
-sprites/tilbagesvaler.svg, destillation.svg, forlag.svg
-                      køleren i de to udgaver og forlaget; viewBox'en er i
-                      bassinets enheder, og tegningen er regnet ud fra målene
-                      i js/apparat.js
+sprites/tilbagesvaler.webp, destillation.webp, forlag.webp
+                      køleren i de to udgaver og forlaget; kassen er i
+                      bassinets enheder (A.SPRITE i js/apparat.js)
 js/kerne.js           NK-navnerum, lærred, tekst (samme som sc2.4)
 js/data.js            stofferne, BINDING, tætheden af vand-ethanol, damptryk
 js/tekster.js         opgaverne, quizzen og Kemichaels replikker
@@ -233,10 +232,36 @@ Bassinets inderside i spritet (x 20-670, y 30-604,4 i en tegning på 690 × 686,
 der går fra y -60) svarer til gitteret: 40,5 × 35,79 kuglediametre. Ændres
 gitteret i `js/model.js`, skal spritet og målene øverst i `js/scene.js` følge med.
 
-Køleren og forlaget er regnet ud fra målene i `js/apparat.js` (`A.vaegge`,
+Køleren og forlaget er lagt efter målene i `js/apparat.js` (`A.vaegge`,
 `A.SPRITE`), så kuglerne altid er inde i røret. Rettes et mål der, skal de tre
-sprites laves om med et lille script, der læser `js/apparat.js` og skriver
-dem; det blev brugt 27. sept. 2026 og ligger ikke i mappen.
+sprites laves om (se "Glasset").
+
+## Glasset
+
+Fra 28. nov. 2026 er glasset tegnet af ChatGPT (realistisk laboratorieglas set
+lige forfra) i stedet for de gamle SVG'er, som brugeren syntes var en klar
+forbedring. Kun glasset er skiftet; kuglerne, dampen, kølevandets prikker,
+hanens håndtag og teksterne tegnes stadig af animationen.
+
+* ChatGPT tegnede glasset på helt sort bund med den gamle tegning som forlæg.
+  Sort er gjort gennemsigtigt (alfa = den stærkeste farvekanal), så kuglerne ses
+  gennem glasset, og det ser ud som på billedet på scenens mørke bund.
+* Hvert billede er foldet ind i den gamle kasse med målte punkter: bassinets
+  inderside x 20-670 og y 30-604,4 (16,05 enheder pr. kuglediameter), tragtens
+  stilk i x 250 med hanen i y -2 og åbningen i y -50, halsen i x 440 til y -20,
+  tilbagesvalerens tre kugler i y -50, -88 og -126 og kappen fra -24 til -150,
+  destillationens vej `DS.vej` og kappen 0,2-0,88 af vejen, forlagets inderside
+  x 713,6-946,4 og y 115-604,4. Billederne er i dobbelt opløsning (2 pixels pr.
+  enhed).
+* Stregerne (én pr. portion i bassinet, én pr. 10 mL i forlaget) er tegnet på
+  igen de gamle steder.
+* Bassinets væg er tykkere end før og går ud til ca. x 688 (før 676).
+
+Værktøj, prompter, forlæg og før/efter-billeder ligger i
+`~/NK_Undervisning/animationsforslag/c3.4-glas/` (README og `vaerktoej/proces.py`,
+der har punkterne). ChatGPT's billeder i fuld opløsning ligger kun lokalt i
+`~/NK_Undervisning_tungt/animationsforslag/c3.4-glas/`. De gamle SVG'er findes i
+git-historikken.
 
 ## At rette i den
 

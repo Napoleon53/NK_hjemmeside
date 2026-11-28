@@ -58,6 +58,8 @@ body {
     z-index: 20;
     flex-shrink: 0;
 }
+/* Plads til panelets knap i hjørnet (samling_alt.html) */
+.samling-fuld .top { padding-left: 56px; }
 
 .top h1 {
     margin: 0;

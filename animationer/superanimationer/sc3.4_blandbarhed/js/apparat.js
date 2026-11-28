@@ -1,7 +1,7 @@
 /* =====================================================================
    apparat.js - koeleren paa bassinet og forlaget
 
-   Bassinet har laag med to halse (sprites/bassin.svg): en tragt med
+   Bassinet har laag med to halse (sprites/bassin.webp): en tragt med
    hane, som der haeldes i, og en hals, som koeleren sidder paa. Koeleren
    kan vaere
      tilbagesvaler   en kuglekoeler lodret paa halsen. Dampen fortaetter
@@ -14,10 +14,10 @@
    Alle maal staar her i bassinspritets enheder (y nedad, 16,05 enheder
    pr. kuglediameter, indersiden x 20-670 og y 30-604,4). Modellen faar
    roerets vej omregnet til kuglediametre (A.koeler). Glasset er
-   sprites/tilbagesvaler.svg, destillation.svg og forlag.svg, hvis
-   viewBox er i de samme enheder; de er regnet ud fra A.vaegge, saa
-   kuglerne altid er inde i roeret. Rettes et maal her, skal de tre
-   sprites laves om (se README).
+   sprites/tilbagesvaler.webp, destillation.webp og forlag.webp, tegnet
+   af ChatGPT og lagt i A.SPRITE's kasser, saa roerene ligger dér, hvor
+   kuglerne loeber. Rettes et maal her, skal de tre sprites laves om
+   (se README, "Glasset").
    ===================================================================== */
 (function () {
     "use strict";
@@ -39,7 +39,7 @@
 
     /* ----- Laaget ---------------------------------------------------------
        Halsen, koeleren sidder paa, og tragten, der haeldes i. Tallene gaar
-       igen i sprites/bassin.svg. */
+       igen i sprites/bassin.webp. */
     A.LAAG = 30;                                    /* indersiden af laaget */
     A.HALS = { x: 440, halv: 26, top: -20 };
     A.TRAGT = { x: 250, top: -50, hane: -2 };

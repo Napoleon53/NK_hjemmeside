@@ -103,7 +103,9 @@ inde i en simulation, opdages det sjuskede først til sidst.
 
 ## Oversigt
 
-"I menuen" betyder, at en samlingsfil (`samling_*.html`) linker til mappen. En ny
+"I menuen" betyder, at animationspanelet linker til mappen. Fra 28. nov. 2026 står
+hele menuen i `animationer/panel/menu.js`; samlingsfilerne nedenfor (`samling_c7.html`
+osv.) er kun kapitlernes gamle adresser, der sender videre til panelet. En ny
 animation kommer først i menuen, når brugeren siger til.
 
 Spillene hedder `sc_spil<nr>_<navn>`, hvor nummeret er pladsen i
@@ -120,19 +122,29 @@ gamle samling "Organisk B" blev delt i to: den nye fil
 `kemi-b-filer/samling_b_bindinger_isomeri.html` (B3: Intermolekylært, Geometrisk isomeri,
 Spejlbilledeisomeri; fra 26. okt. 2026 superanimationerne sb4.4, sb4.6 og sb4.7; Navngivning sb3.1 fra 30. okt. og Isomerjagten sb3.3 fra 3. nov.) og `kemi-b-filer/samling_b4,5,6.html` (B4: Estersyntese, DNPH/Tollens,
 Oxidation af alkohol, Organisk syntese, Tegnebræt, Organiske grupper; Organiske navne sb4.8 som nr. 1 fra 3. nov. 2026). Ingen filer eller
-mapper er omdøbt, og ingen `data-emne` er ændret. Filnavne og koder følger derfor ikke
-længere numrene:
+mapper er omdøbt.
 
-| Menuen viser | Samlingsfil | Link-koder (`data-emne`) | Mapper |
-|:--|:--|:--|:--|
-| B3 Bindinger og isomeri | `samling_b_bindinger_isomeri.html` | `navngivning`, `b4`, `isomerjagten`, `b6geo`, `b6spejl` | `sb3.1` (nr. 1, fra 30. okt. 2026), `sb4.4` (nr. 2), `sb3.3` (nr. 3, fra 3. nov. 2026), `sb4.6` (nr. 4), `sb4.7` (nr. 5); sb4.4, sb4.6 og sb4.7 fra 26. okt. 2026 |
-| B4 Funktionelle grupper | `samling_b4,5,6.html` | `b5navne`, `b5ester`, `b5dnph`, `b5oxid`, `eb5`, `tegnebraet`, `b.spil.organiske` | `sb4.8` (nr. 1, fra 3. nov. 2026), `sb4.11` (nr. 3, fra 12. nov. 2026), `sb4.3` (nr. 4, fra 3. nov. 2026), `sb4.5` (nu nr. 5) |
-| B5 Spektroskopi | `samling_b9.html` | `b9.1`, `b9.3`, `b9.4`, `b9.5` (`b9.2` sendes til `b9.4` via `gamleNumre`) | `sb9.1` (nr. 1), `sb9.3` (nr. 2), `sb9.4` (nr. 3), alle fra 3. nov. 2026 |
-| B6 Syre/Base | `samling_b3.html` | `b3.1`, `b3.2` | `sb6.1` (nr. 1, fra 12. nov. 2026), `sb6.2` (nr. 2) |
-| B7 Fødevarer | `samling_b7.html` | `b7.10`, `b7.3`, `b7.7` | `sb7.2` (nr. 1, fra 12. nov. 2026), `sb7.3` (nr. 2, fra 10. nov. 2026), `sb7.7` (nr. 3, fra 12. nov. 2026) |
+**B-koderne fik kapitel og plads 28. nov. 2026** (brugeren: "ret gerne de andre links"
+mens der er få brugere). Koden er `b<kapitel>.<plads i menuen>`, fx `b5.1` for
+Absorptionsspektre (B5 nr. 1), og `data-emne` i hver animation følger med. Kommer en
+animation ind midt i et kapitel, får den næste ledige nummer, så koderne ikke skal
+flyttes igen. Gamle koder sendes videre af `GAMMEL` i `panel/panel.js`; undtaget er
+`b2.2`-`b2.7`, `b3.1`, `b3.2`, `b3.5` og `b7.3`, der nu er andre animationers koder.
 
-`findSideFraEmne` i `samling_alt_b.html` sender koderne til den rigtige samling, og
-`FEEDBACK_EMNER` samme sted og listen på `animationer.html` følger de nye numre. En ny
+| Kapitel | Nye koder (gamle i parentes) |
+|:--|:--|
+| B1 Kinetik | `b1.1`-`b1.4` (uændret) |
+| B2 Ligevægt | `b2.1`, `b2.2` (b2.indgreb), `b2.3` (b2.2), `b2.4` (b2.3), `b2.5` (b2.4), `b2.6` (b2.5), `b2.7` (b2.6), `b2.8` (b2.7, c2.7) |
+| B3 Bindinger og isomeri | `b3.1` (navngivning), `b3.2` (b4), `b3.3` (isomerjagten), `b3.4` (b6geo), `b3.5` (b6spejl) |
+| B4 Funktionelle grupper | `b4.1` (b5navne), `b4.2` (b5ester), `b4.3` (b5dnph), `b4.4` (b5oxid), `b4.5` (eb5), `b4.6` (tegnebraet), `b4.7` (b.spil.organiske) |
+| B5 Spektroskopi | `b5.1` (b9.1), `b5.2` (b9.3), `b5.3` (b9.4, b9.2), `b5.4` (b9.5) |
+| B6 Syre/Base | `b6.1` (b3.1), `b6.2` (b3.5), `b6.3` (b3.2) |
+| B7 Fødevarer | `b7.1` (b7.10), `b7.2` (b7.3), `b7.3` (b7.7), `b7.4` (b7.8) |
+| B8 Medicin | `b8.1` (b8.4), `b8.2` (b8.6) |
+| Byg figuren | `b1.byg`-`b8.byg` (uændret) |
+
+Panelet (`panel/panel.js`) finder koderne i `panel/menu.js`, og feedbacklisten bygges
+derfra; listen på `animationer.html` følger de nye numre. En ny
 superanimation til kemi B får nummer efter den nye menu (fx `sb5.x` til spektroskopi).
 `sc_spil_lykkehjul/` og `sc_spil_kemikort/` har kun en `index.html`, der sender gamle
 links til delte quizzer og kortsæt videre til de nye mapper.
@@ -176,7 +188,7 @@ links til delte quizzer og kortsæt videre til de nye mapper.
 | `sb7.8_proteiner` | ja | `kemi-b-filer/samling_b7.html` som nr. 4 (koden `b7.8`) fra 13. nov. 2026; ny, 12. nov. 2026 (brugeren: "Lav følgende superanimation ... Strukturens fire niveauer, bindingerne, denaturering og hydrolyse er svære at forstå ud fra stillbilleder. Kapitel B7 har animationer til 7.2, 7.3 og 7.7, men ikke til proteinerne"; overskriften i bestillingen sagde B6.7 Puffersystemer, men beskrivelsen handler om proteiner), bygget fra bunden. Afsnit B7.8 Proteiner i Kemibogen B. Tre faner: Peptidbindingen (klik på de tre atomer, der bliver til vand, når alanin og glycin kondenserer; træk serin hen til C-enden, så tripeptidet hedder Ala-Gly-Ser; hvor mange vandmolekyler ved 8 aminosyrer; byg kæden som perler efter en opskrift), Foldningen (tegn de seks hydrogenbindinger mellem to stykker kæde, så de bliver et β-foldeblad; skub en lige kæde sammen til en α-helix; træk spiralen ned over foldebladet, så de fire bindinger mellem sidekæderne dannes, og giv dem navne; hæmoglobin og den kvaternære struktur) og Denaturering og hydrolyse (æggehvide i et glas og et protein i luppen: varme over 60 °C bryder de svage bindinger, lav eller høj pH fjerner ionbindingen, disulfidbroen og peptidbindingerne holder; klik på den binding, vand spalter; sortér fem eksempler i denaturering og hydrolyse; til sidst er begge skydere fri). Strukturformler i bogens stil (`js/formel.js`), proteinet som grønt rør med kuglemodeller af sidekæderne (`js/protein.js`). Papirkortet fra start, ingen Kemichael. Selvtest ALT OK (81). Brugeren har ikke set den endnu. |
 | `sb8.4_log_p_og_log_d` | ja | `kemi-b-filer/samling_b8.html` som nr. 1 før TLC (koden `b8.4`) fra 13. nov. 2026; ny, 12. nov. 2026 (brugeren: "Lav gerne følgende superanimation: B8.4 log P og log D, hvor skilletragten med octanol og vand får en pH-skyder"), bygget fra bunden til afsnit B8.4 i Kemibogen B på grundstellet fra `sb7.7`. Rettet 13. nov. 2026 efter brugerens første dom ("god animation", men formlerne skal inddrages, stof X skal være tydeligt fra start, fane 2 og 3 for tekniske, formlen bag en kontakt markeret svær, kuglerne skal hedde BH⁺, gerne ekstraopgaver uden stillads): strukturformler i bogens stil (`js/struktur.js`: paracetamol, glucose, ibuprofen, HA ⇌ A⁻, BH⁺ ⇌ B, lidocain), kvalitative trin, og ekstraopgaver uden hints fra panelet med kontakten Svær (`js/ekstra.js`). Fane 1 Log P (ryst, 15 og 5, Kꜰ = 3,0, log P = 0,48, glucose eller ibuprofen), fane 2 Log D og pH (acetylsalicylsyre: den uladede form, kurven, mavesæk eller blod, log D = log P, falder 1 pr. pH) og fane 3 Syre eller base (amfetamin: kurven, BH⁺ afgiver H⁺, mavesæk eller tyndtarm, lidocain i blodet). Selvtest ALT OK (107), også prøvet med rigtig mus. Brugeren har ikke set rettelserne. |
 | `sb8.6_tlc` | ja, B8 nr. 1 | ny, 27. okt. 2026, bygget fra bunden til afsnit B8.6 TLC i Kemibogen B (brugerens ønske: en generel superanimation om teorien og anvendelsen af TLC, der kan bruges i animationspanelet; Salenvir har kun TLC som ét trin). Tre faner: Tovtrækningen (spinat og gulerod på en plade i et kar, fire flasker fra heptan til propanon og en lup over pladens overflade, hvor lutein hænger fast med hydrogenbindinger, og caroten følger med væsken; gæt, kør, stationær og mobil fase, ren heptan, ren propanon og find den bedste løbevæske), Rf-værdien (en tør plade med lineal, gul aflæsningsstreg og lup ved linealen; felter på kortet, formlen som tre brøker, tre pletter, linealen ved kanten, den lange plade og hvilke tal der kan være en Rf-værdi; notesblok med pæne beregninger) og Læs pladen (seks sager med UV-kasse som bogens figur: chokoladelinser, hovedpinetabletten, er reaktionen færdig, er produktet rent, pillen fra nettet med to løbevæsker og koffein i drikke). Rf regnes af en model (Rf = 1 / (1 + k), Snyders eluentstyrke) og rammer bogens figurer; luppen viser den samme andel. Scenekortet, Indsend svar og låsen fra `sb4.4`; uden Kemichael; startlinjen med kuglepen er et påskeæg. Samme dag, efter brugerens "for meget flimmer": luppen er skjult, til en opgave spørger til den (knappen Vis luppen), den bevæger sig roligere, og ringe og skilte står stille. Selvtest ALT OK (196). I menuen som B8 Medicin nr. 1 (ny `kemi-b-filer/samling_b8.html`, kode `b8.6`) |
-| `sb5.1_absorptionsspektre` | ja | `samling_b9.html` som nr. 1 med koden `b9.1` (3. nov. 2026; den gamle i `kemi-c-filer/arkiv/`); ny, 2. okt. 2026, afløser `kemi-b-filer/b9_1.Absorbtionsspektrum.html` (B9 knap 1) i tre faner: Farven (lampen sender hvidt lys gennem en kuvette til et øje, farvecirklen og spektret, hvor arealet under kurven har lysets farver; eleven trækker selv en top til gul, blå, lilla og rød, og for de fem stoffer fra den gamle findes toppen og farven, mens kuvetten er dækket), Konjugeringen (polyenet H(CH=CH)ₙH bliver længere, til det er farvet ved 8, orange ved 11 og rødt ved 13; lycopens 11 konjugerede blandt 13 dobbeltbindinger, brom, der bryder chromoforen, og tomatregnbuen) og Chromoforen (otte molekyler fra hexatrien til indigo og Allura rød; eleven markerer det største konjugerede system med C=O og N=N og vælger farven); alle farver regnes af spektret med CIE-farvefunktionerne, og navnet af farvetonen i CIELAB; Lambert-Beer er udeladt (sb9.3 ejer den); uden Kemichael, hjælpen i statuslinjen som `sc1.4_afstemning`; øjet blinker som påskeæg |
+| `sb5.1_absorptionsspektre` | ja | `samling_b9.html` som nr. 1 med koden `b9.1` (3. nov. 2026, koden `b5.1` fra 28. nov. 2026; den gamle i `kemi-c-filer/arkiv/`); ny, 2. okt. 2026, afløser `kemi-b-filer/b9_1.Absorbtionsspektrum.html` (B9 knap 1) i tre faner: Farven (lampen sender hvidt lys gennem en kuvette til et øje, farvecirklen og spektret, hvor arealet under kurven har lysets farver; eleven trækker selv en top til gul, blå, lilla og rød, og for de fem stoffer fra den gamle findes toppen og farven, mens kuvetten er dækket), Konjugeringen (polyenet H(CH=CH)ₙH bliver længere, til det er farvet ved 8, orange ved 11 og rødt ved 13; lycopens 11 konjugerede blandt 13 dobbeltbindinger, brom, der bryder chromoforen, og tomatregnbuen) og Chromoforen (otte molekyler fra hexatrien til indigo og Allura rød; eleven markerer det største konjugerede system med C=O og N=N og vælger farven); alle farver regnes af spektret med CIE-farvefunktionerne, og navnet af farvetonen i CIELAB; Lambert-Beer er udeladt (sb9.3 ejer den); uden Kemichael, hjælpen i statuslinjen som `sc1.4_afstemning`; øjet blinker som påskeæg |
 | `sb5.2_lambert_beer` | ja | `samling_b9.html` som nr. 2 med koden `b9.3` (3. nov. 2026; den gamle i `kemi-c-filer/arkiv/`); ny, 2. okt. 2026, afløser `kemi-b-filer/b9.3_lambert_beer_simulation.html` (B9 knap 3) i tre faner: Lyset (den gamles lampe, kuvette og detektor med fotoner, der nu absorberes efter I(x), en kurve "Lys tilbage" over strålen og seks forudsigelser, hvor eleven gætter først og prøver med skyderne eller ved at trække kuvetten bredere; 32 % bliver til 10 % og ikke 16 %, når c fordobles), Standardkurven (eleven måler vand, fem standarder og prøven i et spektrofotometer, lægger linjen gennem (0, 0) og aflæser prøven; fire opgaver, den sidste med et fingeraftryk, der skal tørres af) og Beregningen (otte regnestykker i Let, Middel og Svær med formlen først som sc6.1, tallene ind og resultatet med enhed på tavlen); tre rigtige stoffer (permanganat, FeSCN²⁺ og [Fe(phen)₃]²⁺) med ε fra tabellerne i mM⁻¹·cm⁻¹ i stedet for den gamles opdigtede ε i mg/L; uden Kemichael, hjælpen i statuslinjen som `sc1.4_afstemning`; solbriller på detektoren er et påskeæg |
 | `sb5.3_spektrofotometri` | ja | `samling_b9.html` som nr. 3 med koden `b9.4` (3. nov. 2026); Breezer-knappen (`b9.2`) er fjernet, og koden sendes hertil; begge gamle i `kemi-c-filer/arkiv/`; ny, 2. okt. 2026, samler `kemi-b-filer/b9.2_forsøg_breezer.html` (B9 knap 2) og `b9.4_nitritforsøg.html` (B9 knap 4) i tre faner med stilladset efter sværhedsgrad: Sodavand (let: rød sodavand med E129, blindprøve, fem standarder, eleven regner hældningen, aflæser på grafen, regner c og fortyndingen), Nitrit (middel: sulfanilamid og koblingsreagens med ventetid og mikroniveauet fra den gamle, eleven regner standardernes c med fortyndingsformlen, bruger standardkurvens ligning, grænseværdien for drikkevand) og To farvestoffer (svær: grøn sodavand med E102 og E133 målt ved 427 og 630 nm, absorbanserne lægges sammen, kun resultatfelter); spektrofotometer med zoomboble og fotoner, træk kuvetter op i holderen, regnestykket som sc6.1 (skabelon, bogstaver, tal, resultat), Ny prøve; uden Kemichael, hjælpen i statuslinjen som `sc1.4_afstemning`; ufortyndet sodavand er et påskeæg |
 | `sb5.4_spektroskopiopgaver` | ja | `kemi-b-filer/samling_b9.html` som nr. 4 (koden `b9.5`) fra 13. nov. 2026; den gamle ligger i `kemi-c-filer/arkiv/b9_5.spektroskopi_opgaver_oldversion.html`; ny, 12. nov. 2026, skal afløse `kemi-b-filer/b9_5.spektroskopi_opgaver.html` (B5 knap 4, koden `b9.5`), når brugeren siger til (brugeren: figurerne var "under niveau", og resten skulle følge standarden); de seks eksamensagtige opgaver i tre faner (Standardkurven, Indholdet, Det lineære område) med tabellen og Kopiér til regnearket i panelet, ε med enhed, c, fortynding, masse og det lineære område; tavlen som sb6.1 fane 3 med prøven fra genstand til kuvette i spektrofotometeret, standardkurven i bogens stil (B5.3) og superberegningerne i rammer; kobberkompleksets ε rettet til ca. 50 M⁻¹ · cm⁻¹ og bouillonen målt som NADH; papirkortet, ingen Kemichael. Selvtest ALT OK (75) |
@@ -571,8 +583,8 @@ superanimationer med Kemichael:
   reglerne. Filer, der begynder med `_`, er udviklerværktøj og indgår ikke i
   animationen.
 * **Menuen:** en ny animation ligger kun i sin mappe, til brugeren siger til. Først
-  da kommer den i samlingsfilerne og `FEEDBACK_EMNER`, og kolonnen "I menuen" i
-  oversigten rettes.
+  da kommer den i menuen med én linje i `animationer/panel/menu.js` (feedbacklisten
+  følger med af sig selv), og kolonnen "I menuen" i oversigten rettes.
 
 ## Tjekliste før menuen
 

@@ -338,17 +338,19 @@
         }
         if (this.blink > 0) this.blink = Math.max(0, this.blink - dt);
 
-        /* fotonerne */
+        /* fotonerne. Roligere fra 28. nov. 2026 (Niels: "går for hurtigt til,
+           at det nogensinde er rart"): færre og langsommere, samme tæthed i
+           strålen, og ringen ved en absorption er blødere og varer længere. */
         var kuvX0 = lay.kuv.x, kuvX1 = lay.kuv.x + lay.kuv.b;
         if (this.lampe) {
-            this.spawn = (this.spawn || 0) + dt * 70;
+            this.spawn = (this.spawn || 0) + dt * 28;
             while (this.spawn >= 1) {
                 this.spawn -= 1;
                 this.fotoner.push({
                     l: 400 + Math.random() * 300,
                     x: lay.lampe.x + lay.lampe.s * 0.5,
                     y: NK.r(lay.straale.y0, lay.straale.y1),
-                    v: NK.r(220, 290), ude: false, flash: 0, besluttet: false, stop: null
+                    v: NK.r(95, 125), ude: false, flash: 0, besluttet: false, stop: null
                 });
             }
         }
@@ -365,7 +367,7 @@
                 var T = Math.pow(10, -this.A(p.l));
                 if (Math.random() > T) p.stop = NK.r(kuvX0 + 4, kuvX1 - 4);
             }
-            if (p.stop !== null && p.x >= p.stop) { p.flash = 0.35; p.x = p.stop; continue; }
+            if (p.stop !== null && p.x >= p.stop) { p.flash = 0.7; p.x = p.stop; continue; }
             if (p.x > lay.oeje.x - lay.oeje.s) this.fotoner.splice(i, 1);
         }
         if (this.fotoner.length > 400) this.fotoner.splice(0, this.fotoner.length - 400);
@@ -398,11 +400,11 @@
         this.fotoner.forEach(function (p) {
             var c = F.css(F.lys(p.l));
             if (p.flash > 0) {
-                var t = 1 - p.flash / 0.35;
-                ctx.strokeStyle = F.css(F.lys(p.l), 1 - t);
-                ctx.lineWidth = 2;
+                var t = 1 - p.flash / 0.7;
+                ctx.strokeStyle = F.css(F.lys(p.l), 0.6 * (1 - t));
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, 3 + t * 9, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, 3 + t * 5, 0, Math.PI * 2);
                 ctx.stroke();
             } else {
                 ctx.fillStyle = c;

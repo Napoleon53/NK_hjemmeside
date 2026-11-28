@@ -6,7 +6,7 @@
    ryste ved at traekke i bassinet og viser navnet paa den kugle, musen
    staar over.
 
-   Alt placeres i bassinspritets enheder (sprites/bassin.svg, indersiden
+   Alt placeres i bassinspritets enheder (sprites/bassin.webp, indersiden
    x 20-670 og y 30-604,4 = modellens 40,5 x 35,79 kuglediametre).
    Koeleren og forlaget har deres maal i js/apparat.js. Det lille glas er
    bassinspritet i godt en femtedel af stoerrelsen; det staar nede ved

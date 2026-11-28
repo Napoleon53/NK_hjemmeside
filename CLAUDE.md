@@ -17,7 +17,7 @@ holdes urørte. Eneste undtagelse indtil nu: ved kapitelbyttet 16. okt. 2026
 gav brugeren lov til at omdøbe `superlab/sc6.8_substitution` og
 `sc6.9_fedt_i_chips` til `sc4.8_substitution` og `sc4.9_fedt_i_chips`.
 11. nov. 2026 fik de otte forsøg i `superlab/` én linje øverst i `<head>`
-(`til_panelet.js`, se fuld skærm nedenfor), også med brugerens lov.
+(`til_panelet.js`, se animationspanelet nedenfor), også med brugerens lov.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
@@ -159,8 +159,8 @@ kemibogen.dk, derfor står domænet foran siden. Ingen cookies, så intet cookie
   Kemichael er fast), og den har kravene til begge. Punkterne nedenfor om
   forsøg, laboratoriet og uheld gælder superlab-animationerne.
 - En ny superanimation eller superlab-animation ligger kun i sin egen mappe, til
-  brugeren siger til. Først da kommer den i samlingsfilerne (`samling_*.html`) og
-  `FEEDBACK_EMNER` og får linjen til `til_panelet.js` (se fuld skærm nedenfor), og først da flyttes en gammel animation, den afløser, til
+  brugeren siger til. Først da kommer den i menuen (én linje i `animationer/panel/menu.js`,
+  se animationspanelet nedenfor) og får linjen til `til_panelet.js`, og først da flyttes en gammel animation, den afløser, til
   `arkiv/`. Ret samtidig kolonnen "I menuen" i superanimationernes README.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
@@ -193,14 +193,23 @@ kemibogen.dk, derfor står domænet foran siden. Ingen cookies, så intet cookie
   og Kemichaels advarsel om et stof er også data der (`fare`).
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
   Prøvebordet har 473 px, fordi zoomboblen står i panelet.
-- Samlingssiderne (`samling_*.html`) kan give fuld skærm: sidepanelerne
-  skjules i begge lag, og knappen ☰ øverst til venstre gendanner dem. **Klik i
-  panelet giver aldrig fuld skærm** (rettet 20. september efter
-  kollegers tilbagemelding: det var forvirrende, at menuen forsvandt). Fuld
-  skærm vælges med ⛶ i panelets hoved (`fuldSkaerm` i de indre sider,
-  beskederne `fuldSkaerm` og `gendanPanel` til de ydre).
-- Undtagelsen er links (brugeren 11. nov. 2026): et link til en bestemt
-  animation (`samling_alt.html?emne=c7.1`, som 🔗 laver) åbner i fuld skærm, og
+- **Animationspanelet** (`animationer/samling_alt.html`, nyt 28. nov. 2026, brugerens
+  valg af udkast 3): startsiden er et lyst bibliotek med alle animationer, en søgning
+  og skiftet mellem kemi C og B (et almindeligt klik; skiftet findes kun i biblioteket, 28. nov. 2026). En åben animation
+  fylder hele skærmen; knappen ☰ i hjørnet åbner en skuffe med kapitlets
+  animationer, Kopiér link og Feedback. Indholdet står ét sted, `animationer/panel/menu.js`
+  (kapitler, animationer, beskrivelser; feedbacklisten bygges derfra), koden i
+  `panel/panel.js` og `panel/panel.css`. Animationen får altid klassen `samling-fuld`
+  på `<html>` og skal give plads til knappen (`.samling-fuld .top { padding-left: 56px; }`).
+  `samling_alt_b.html` og de gamle kapitelsider (`kemi-c-filer/samling_c*.html`,
+  `kemi-b-filer/samling_b*.html`, som Kemibogen linker til) sender kun videre til
+  panelet; de har intet indhold længere. Adresser: `?emne=c7.1#c7`, `?side=kemi-c-filer/samling_c7.html`,
+  `?kapitel=c7`, `?niveau=b`. B-koderne er `b<kapitel>.<plads>` (fx `b5.1`, fra 28. nov. 2026; gamle koder
+  sendes videre af `GAMMEL` i `panel/panel.js`, oversigt i superanimationernes README). Linjen om Novo Nordisk Fonden og fondens logo (fra
+  fondens presseside) står i biblioteket og skuffen. `samling_NV.html` og
+  `Historie/` er egne paneler i den gamle stil.
+- Links (brugeren 11. nov. 2026): et link til en bestemt
+  animation (`samling_alt.html?emne=c7.1`, som Kopiér link laver) åbner animationen, og
   fanen (`#c7`) følger med. Et direkte link til animationen selv (fx fra
   Kemibogen) sendes videre dertil af `animationer/til_panelet.js`, som hver
   animation i menuen indlæser øverst i `<head>`:
@@ -209,6 +218,13 @@ kemibogen.dk, derfor står domænet foran siden. Ingen cookies, så intet cookie
   kun på kemiformler.dk og ikke inde i panelet; `index.html?alene` viser
   animationen alene, og `?tilpanel` afprøver videresendelsen lokalt. De otte
   forsøg i den frosne `v2/superlab/` har også linjen (brugerens lov 11. nov. 2026).
+- Knappen **Rolig fart** (brugeren 28. nov. 2026: "begrænset grafik", så øjnene kan
+  slappe af) hører til i den enkelte animation, hvor noget bevæger sig af sig selv,
+  ikke i panelet. Én linje i `<head>` før animationens egne scripts:
+  `<script src="../faelles/rolig.js"></script>`. Knappen sættes selv ind foran Teori i
+  topbjælken; slået til kører alt med en fjerdedel af farten og uden glød, og valget
+  huskes på tværs af animationerne. Det virker, fordi animationerne regner fart ud fra
+  rAF-tidsstemplet (dt); tæller en animation billeder, skal den rettes til dt.
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i

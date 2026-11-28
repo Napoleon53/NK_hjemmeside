@@ -1,0 +1,201 @@
+/* =====================================================================
+   panel/panel.css - animationspanelet (samling_alt.html), 28. nov. 2026
+   ---------------------------------------------------------------------
+   To dele: biblioteket (lyst som kemiformler.dk) og skuffen over
+   animationen (mørk som animationernes egen topbjælke). Hjørneknappen
+   står i den plads, animationerne giver, når <html> har klassen
+   samling-fuld (padding-left 56px på .top).
+   ===================================================================== */
+
+@font-face {
+    font-family: "Lexend"; font-style: normal; font-weight: 300 700; font-display: swap;
+    src: url("../superanimationer/faelles/lexend/lexend-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: "Lexend"; font-style: normal; font-weight: 300 700; font-display: swap;
+    src: url("../superanimationer/faelles/lexend/lexend-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+    /* Mørkt: skuffen, feedback og hjørneknappen */
+    --p-bund: #14171b;
+    --p-flade: #1c2026;
+    --p-flade-2: #242a31;
+    --p-hover: #2b323a;
+    --p-kant: #2f363f;
+    --p-tekst: #e9edf1;
+    --p-daempet: #9aa6b2;
+    --p-svag: #6b7783;
+    --p-gul: #f1c40f;          /* trådens farve til animationerne på kemiformler.dk */
+    --p-gul-svag: rgba(241, 196, 15, .14);
+    --p-groen: #8fd694;
+    /* Lyst: biblioteket, samme farver som assets/style.css */
+    --l-bund: #f4f8f7;
+    --l-kort: #ffffff;
+    --l-kant: #dfe9e8;
+    --l-kant-2: #c3d6d4;
+    --l-tekst: #14201f;
+    --l-daempet: #556766;
+    --l-teal: #0f766e;
+    --l-teal-lys: #e3f2f0;
+    --p-font: "Lexend", "Segoe UI", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--p-font); background: var(--l-bund); color: var(--l-tekst); -webkit-font-smoothing: antialiased; }
+body.viser-animation { overflow: hidden; background: var(--p-bund); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--p-gul); outline-offset: 2px; }
+
+/* ---------------- Biblioteket ---------------- */
+.bibliotek { min-height: 100vh; }
+.viser-animation .bibliotek { display: none; }
+.top { background: var(--l-kort); border-bottom: 1px solid var(--l-kant); }
+.top-inder { max-width: 1240px; margin: 0 auto; padding: 26px 24px 20px; display: grid; grid-template-columns: 1fr auto; gap: 14px 24px; align-items: end; }
+.top h1 { margin: 0; font-size: 1.8rem; font-weight: 600; letter-spacing: -.01em; }
+.top .manchet { margin: 4px 0 0; color: var(--l-daempet); }
+.top .manchet a { color: var(--l-teal); }
+
+.niveau { display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--l-bund); border: 1px solid var(--l-kant); border-radius: 10px; padding: 3px; gap: 3px; }
+.niveau button { border: 0; border-radius: 7px; padding: 8px 16px; font-size: 14px; cursor: pointer; background: transparent; color: var(--l-daempet); }
+.niveau button.valgt { background: var(--l-kort); color: var(--l-tekst); font-weight: 600; box-shadow: 0 1px 3px rgba(20, 32, 31, .12); cursor: default; }
+.niveau button:not(.valgt):hover { color: var(--l-tekst); }
+.niveau small { color: #8a9a99; font-weight: 400; }
+
+.soeg { grid-column: 1 / -1; position: relative; max-width: 560px; }
+.soeg input { width: 100%; font: 15px var(--p-font); padding: 11px 14px 11px 40px; border-radius: 10px; border: 1px solid var(--l-kant-2);
+              background: var(--l-kort); color: var(--l-tekst); }
+.soeg input:focus { outline: none; border-color: var(--l-teal); box-shadow: 0 0 0 3px var(--l-teal-lys); }
+.soeg svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--l-daempet); }
+
+.krop { max-width: 1240px; margin: 0 auto; padding: 22px 24px 40px; display: grid; grid-template-columns: 200px 1fr; gap: 32px; }
+.kapnav { position: sticky; top: 16px; align-self: start; list-style: none; margin: 0; padding: 0; }
+.kapnav a { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px; color: var(--l-daempet); text-decoration: none; font-size: 14px; }
+.kapnav a:hover { background: var(--l-kort); color: var(--l-tekst); }
+.kapnav a.her { background: var(--l-teal-lys); color: var(--l-teal); font-weight: 500; }
+.kode { flex-shrink: 0; min-width: 36px; height: 22px; padding: 0 6px; border-radius: 11px; display: inline-grid; place-items: center;
+        font-size: 11.5px; font-weight: 600; background: var(--l-kort); border: 1px solid var(--l-kant); color: var(--l-daempet); }
+.kapnav a.her .kode { background: var(--l-teal); color: #fff; border-color: var(--l-teal); }
+.kapnav .novo { margin-top: 26px; padding: 0 10px; }
+
+.sektion { scroll-margin-top: 16px; }
+.sektion + .sektion { margin-top: 34px; }
+.sektion h2 { margin: 0; font-size: 1.2rem; font-weight: 600; display: flex; gap: 10px; align-items: center; }
+.sektion h2 .kode { background: var(--p-gul); border-color: var(--p-gul); color: #111; }
+.sektion .om { margin: 4px 0 14px; color: var(--l-daempet); font-size: 14px; line-height: 1.5; max-width: 80ch; }
+.krop > * { min-width: 0; }
+.fliser { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 12px; }
+.flise { text-align: left; border: 1px solid var(--l-kant); background: var(--l-kort); border-radius: 12px; padding: 14px 15px 15px;
+         cursor: pointer; display: flex; flex-direction: column; gap: 6px; color: inherit;
+         box-shadow: 0 1px 2px rgba(20, 32, 31, .05); transition: border-color .15s, box-shadow .15s, transform .15s; }
+.flise:hover { border-color: var(--l-teal); box-shadow: 0 8px 22px rgba(20, 32, 31, .10); transform: translateY(-2px); }
+.flise.sidst { border-color: var(--l-teal); box-shadow: inset 0 0 0 1px var(--l-teal); }
+.flise-hoved { display: flex; gap: 9px; align-items: center; font-weight: 600; font-size: 14.5px; }
+.nr { flex-shrink: 0; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; display: grid; place-items: center; font-size: 11.5px;
+      background: var(--l-teal-lys); color: var(--l-teal); font-weight: 600; }
+.flise p { margin: 0; color: var(--l-daempet); font-size: 13px; line-height: 1.5;
+           display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.intet { color: var(--l-daempet); padding: 20px 0; display: none; }
+.fod { max-width: 1240px; margin: 0 auto; padding: 18px 24px 30px; border-top: 1px solid var(--l-kant); display: flex;
+       justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.fb-link { background: none; border: 1px solid var(--l-kant-2); border-radius: 9px; padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--l-teal); }
+.fb-link:hover { background: var(--l-teal-lys); }
+.fod-tekst { font-size: 13px; color: var(--l-daempet); }
+.fod-tekst a { color: var(--l-teal); }
+
+/* ---------------- Novo Nordisk Fonden ---------------- */
+.novo { display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--p-svag); line-height: 1.3; }
+.novo-logo { display: block; width: 150px; max-width: 100%; height: auto; }
+.novo-navn { font-weight: 600; font-size: 13px; color: var(--p-daempet); }
+.novo.paa-lyst { color: #66727e; }
+.novo.paa-lyst .novo-navn { color: #1f2a35; }
+
+/* ---------------- Animationen og hjørneknappen ---------------- */
+#vindue { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: none; background: #fff; }
+.viser-animation #vindue { display: block; }
+.hjoerne { position: fixed; top: 6px; left: 8px; z-index: 50; width: 40px; height: 34px; display: none; place-items: center;
+           border-radius: 8px; border: 1px solid var(--p-kant); background: rgba(28, 32, 38, .94); color: var(--p-tekst); cursor: pointer; }
+.hjoerne svg { width: 18px; height: 18px; }
+.hjoerne:hover { border-color: var(--p-gul); color: var(--p-gul); }
+.viser-animation .hjoerne { display: grid; }
+
+.slor { position: fixed; inset: 0; background: rgba(5, 8, 12, .5); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.skuffe-aaben .slor { opacity: 1; pointer-events: auto; }
+.skuffe { position: fixed; top: 0; bottom: 0; left: 0; width: 340px; max-width: 92vw; z-index: 70; color: var(--p-tekst);
+          background: var(--p-flade); border-right: 1px solid var(--p-kant);
+          transform: translateX(-105%); visibility: hidden; transition: transform .22s ease, visibility 0s .22s; display: flex; flex-direction: column; }
+.skuffe-aaben .skuffe { transform: none; visibility: visible; transition: transform .22s ease; box-shadow: 20px 0 50px rgba(0, 0, 0, .45); }
+.sk-top { padding: 12px 12px 12px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--p-kant); }
+.sk-tilbage { background: none; border: 0; color: var(--p-daempet); cursor: pointer; font-size: 13.5px; padding: 6px 8px; margin-left: -8px; border-radius: 7px; }
+.sk-tilbage:hover { background: var(--p-hover); color: var(--p-tekst); }
+.sk-luk { background: none; border: 0; color: var(--p-daempet); font-size: 22px; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; }
+.sk-luk:hover { background: var(--p-hover); color: var(--p-tekst); }
+.sk-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 14px 6px; }
+.sk-chips button { border: 1px solid var(--p-kant); background: var(--p-bund); color: var(--p-daempet); border-radius: 13px; height: 26px; min-width: 40px;
+                   padding: 0 9px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.sk-chips button:hover { color: var(--p-tekst); border-color: var(--p-svag); }
+.sk-chips button.valgt { background: var(--p-flade-2); color: var(--p-tekst); border-color: var(--p-daempet); }
+.sk-chips button.her { background: var(--p-gul); color: #111; border-color: var(--p-gul); }
+.sk-kap { padding: 10px 16px 4px; }
+.sk-kap h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.sk-liste { list-style: none; margin: 0; padding: 6px 10px 12px; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: var(--p-kant) transparent; }
+.sk-liste button { width: 100%; text-align: left; border: 0; background: none; border-radius: 8px; padding: 8px 10px; cursor: pointer;
+                   display: flex; flex-direction: column; gap: 2px; color: var(--p-tekst); }
+.sk-liste button:hover { background: var(--p-hover); }
+.sk-liste .linje { display: flex; gap: 9px; align-items: center; font-size: 14px; }
+.sk-liste .nr { background: var(--p-flade-2); color: var(--p-daempet); }
+.sk-liste .besk { font-size: 12px; color: var(--p-svag); line-height: 1.4; padding-left: 31px;
+                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sk-liste button.aktiv { background: var(--p-gul-svag); box-shadow: inset 3px 0 0 var(--p-gul); }
+.sk-liste button.aktiv .linje { color: var(--p-gul); font-weight: 500; }
+.sk-liste button.aktiv .nr { background: var(--p-gul); color: #111; }
+.sk-bund { border-top: 1px solid var(--p-kant); padding: 12px 14px 16px; }
+.sk-knapper { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.sk-knapper button { border: 0; background: var(--p-flade-2); border-radius: 8px; padding: 9px 8px; cursor: pointer; font-size: 13px;
+                     color: var(--p-daempet); display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.sk-knapper button:hover { background: var(--p-hover); color: var(--p-tekst); }
+.sk-knapper svg { width: 16px; height: 16px; }
+.sk-knapper .fb { color: var(--p-groen); }
+.sk-knapper .kopieret { color: var(--p-groen); }
+
+/* ---------------- Feedback ---------------- */
+.fb-overlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; background: rgba(5, 8, 12, .62); padding: 16px; }
+.fb-overlay.vis { display: flex; }
+.fb-modal { width: 440px; max-width: 100%; max-height: 92vh; overflow-y: auto; color: var(--p-tekst);
+            background: var(--p-flade); border: 1px solid var(--p-kant); border-radius: 14px; padding: 20px 22px; box-shadow: 0 20px 50px rgba(0, 0, 0, .5); }
+.fb-hoved { display: flex; align-items: center; justify-content: space-between; }
+.fb-hoved h2 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+.fb-luk { background: none; border: 0; font-size: 24px; line-height: 1; color: var(--p-daempet); cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.fb-luk:hover { color: var(--p-tekst); background: var(--p-hover); }
+.fb-intro { margin: 6px 0 12px; font-size: 13.5px; line-height: 1.5; color: var(--p-daempet); }
+.fb-modal label { display: block; font-size: 12.5px; color: var(--p-daempet); margin: 12px 0 5px; }
+.fb-modal select, .fb-modal input, .fb-modal textarea { width: 100%; background: var(--p-bund); color: var(--p-tekst); border: 1px solid var(--p-kant);
+                                                        border-radius: 8px; padding: 9px 10px; font: 14px var(--p-font); }
+.fb-modal textarea { min-height: 110px; resize: vertical; }
+.fb-modal select:focus, .fb-modal input:focus, .fb-modal textarea:focus { outline: none; border-color: var(--p-gul); }
+#fbTal { color: var(--p-svag); }
+#fbTal.for-kort { color: #ef8a8a; }
+.fb-status { min-height: 18px; margin-top: 10px; font-size: 13px; line-height: 1.4; }
+.fb-status.fejl { color: #ef8a8a; }
+.fb-status.ok { color: var(--p-groen); }
+.fb-knapper { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+.fb-knapper button { border: 0; border-radius: 8px; padding: 9px 16px; font-size: 14px; cursor: pointer; }
+.fb-annuller { background: var(--p-flade-2); color: var(--p-daempet); }
+.fb-annuller:hover { background: var(--p-hover); color: var(--p-tekst); }
+.fb-send { background: var(--p-gul); color: #111; font-weight: 600; }
+.fb-send:hover { background: #ffd633; }
+.fb-send:disabled { background: #5d646b; color: #999; cursor: default; }
+
+/* ---------------- Smal skærm ---------------- */
+@media (min-width: 861px) { #novoFod { display: none; } }
+@media (max-width: 860px) {
+    .krop { grid-template-columns: 1fr; gap: 18px; }
+    .kapnav { position: static; display: flex; flex-wrap: wrap; gap: 6px; }
+    .kapnav a { padding: 0; }
+    .kapnav .navn, .kapnav .novo { display: none; }
+    .top-inder { grid-template-columns: 1fr; padding: 20px 16px 16px; }
+    .krop, .fod { padding-left: 16px; padding-right: 16px; }
+}

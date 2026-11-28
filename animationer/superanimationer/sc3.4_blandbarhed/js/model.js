@@ -79,7 +79,7 @@
         this.R = valg.raekker || 33;
         this.bredde = this.C + 0.5;
         this.fyldHoejde = (this.R - 1) * H + 1;
-        /* Luften foroven passer til sprites/bassin.svg */
+        /* Luften foroven passer til sprites/bassin.webp */
         this.hoejde = this.fyldHoejde + (valg.hoved || 7.077);
         this.tilf = valg.tilfaeldig || Math.random;
         /* Roeret over halsen (js/apparat.js). null: laaget er helt lukket,
