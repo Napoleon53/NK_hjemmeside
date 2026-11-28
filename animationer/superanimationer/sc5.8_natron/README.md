@@ -50,59 +50,28 @@ konsekvens af flammen, ikke et uheld, og eleven kan fortsætte.
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
-| 1 | Forsøget | gætter, aflæser startmassen, varmer, lader diglen køle af, vejer og gentager, til massen er konstant | noget forsvinder som gas, og massen ender et bestemt sted |
-| 2 | Hypoteserne | regner stofmængden af natron og for hver hypotese: afstemning, n(produkt) og m(produkt); så dommen | den hypotese, hvis streg kurven ender på, er den rigtige |
+| 1 | Varm og vej (før Forsøget; `#forsoeg` virker stadig) | fire opgaver: vejer natronen, gætter og varmer, varmer og vejer til konstant masse, gætter stoffet (se "Runde T13" nederst) | noget forsvinder som gas, og massen ender et bestemt sted |
+| 2 | Hypoteserne | fem opgaver i kortet: stofmængden af natron, for hver hypotese afstemning, n(produkt) og m(produkt), så dommen (se "Runde T13d" nederst) | den hypotese, hvis streg kurven ender på, er den rigtige |
 | 3 | Fejlkilder | gætter, om gruppe 2's digel til sidst vejer mere, mindre eller det samme som gruppe 1's, og ser begge forsøg | vægten kan kun afgøre det, hvis massen er målt rigtigt |
 
-**Forsøget.** Diglen med natron (4,56-5,45 g) står på en vægt, der er
-nulstillet med den tomme digel. Opgaven starter med et gæt: A Na₂O, B
-Na₂CO₃ eller C NaOH. Eleven skriver startmassen i skemaet, trækker diglen
-over på trefoden (eller klikker på den) og tænder brænderen med Lav eller
-Høj under trefoden. 1 sekund er 1 minut; skiltet øverst viser, hvor
-længe diglen har været opvarmet, og dens temperatur. Høj flamme, før
-natronen er kommet i gang, får pulveret til at sprøjte (korn flyver ud,
-linjen siger det, og slutmassen bliver for lav). Sluk og flyt diglen over
-på vægten: en varm digel vejer for lidt, og tallet flakker og står rødt,
-til den er kølet af. Hver vejning skrives i skemaet og bliver et punkt på
-grafen. Massen er konstant, når to vejninger i træk giver det samme, og
-diglen har været rigtig varm imellem (over 200 °C). Luppen viser Na⁺ og
-HCO₃⁻; det, der bliver tilbage, står som ?, og gassen som grå pust, til
-dommen er faldet på fane 2. Derefter viser luppen, at to HCO₃⁻ bliver til
-CO₃²⁻, CO₂ og H₂O. Målingen og gættet huskes i browseren og bruges på
-fane 2 og i journalen. En målt og gemt måling vises færdig; Start forfra
-giver en ny digel med en ny masse.
+**Forsøget** (før runde T13 hed fanen Forsøget og havde et gæt mellem tre
+formler, trin i kortet og skemaet i panelet). Fanen, som den er nu, står
+under "Runde T13" og "Runde T13b" nederst. Diglen med natron (4,56-5,45 g)
+står på en vægt, der er nulstillet med den tomme digel, og en varm digel vejer
+for lidt. Fra T13b varmes der i portioner på 3 minutter med knappen Varm 3 min
+(se T13b); fane 3 bruger stadig den gamle model med lav og høj flamme og sprøjt. Massen er konstant, når to vejninger i træk
+højst er 0,01 g fra hinanden, og diglen har været rigtig varm imellem (over 200 °C, se T13c).
+Målingen og gættet huskes i browseren og bruges på fane 2 og i journalen.
 
-Efter gættet står gættet på én linje, og kortet viser tre trin: vej
-natronen før, varm og vej, gentag til to vejninger i træk er ens. Det
-trin, eleven er nået til, er fremhævet. Skemaet har en kolonne med
-ændringen fra vejningen før og en grå række for den næste vejning ("varm
-igen først"), og linjen siger, hvor meget massen faldt. Der er ingen
-opgaveliste på fanen (brugerens ønske 29. sept. 2026: knappen med den ene
-opgave startede bare forfra, og det var uklart, hvad man skulle efter to
-vejninger).
-
-**Hypoteserne.** Opgaven står over tavlen. 1: n(NaHCO₃) = m / M med
-formlen, mellemregningen i brøkfelter og resultatet med enhed (som
-sc5.3). 2-4: én opgave pr. hypotese. Først afstemmes skemaet med et felt
-foran hvert stof; tomme felter tæller ikke som 1, og tavlen tæller
-atomerne på begge sider. Så n(produkt) = n(NaHCO₃) / 2 (eller
-n(NaHCO₃), når forholdet er 1 : 1) og m(produkt) = n · M. I A skrives
-formlen og hele mellemregningen; i B og C er stilladset mindre: formlen
-for stofmængden skal skrives, resten er kun resultater. Når massen er
-regnet, kommer hypotesens streg på grafen ved siden af elevens vejninger.
-5: dommen. Tre knapper; et forkert valg forklares med forskellen i gram.
-Den rigtige viser skemaet, gættet fra fane 1 og reaktionen som kugler på
-tavlen. Fanen regner på diglen fra fane 1, så snart startmassen er
+**Hypoteserne** (før runde T13d stod regnestykket i panelet, og eleven
+skrev formlerne selv). Fanen, som den er nu, står under "Runde T13d"
+nederst. Fanen regner på diglen fra fane 1, så snart startmassen er
 skrevet, også før massen er konstant; så venter dommen, og kortet sender
-eleven tilbage til Forsøget. Uden en startmasse fra fane 1 bruges den
-sidste færdige måling og ellers eksemplet (5,21 g → 3,29 g), og kortet
+eleven tilbage til Varm og vej. Uden en startmasse fra fane 1 bruges den
+sidste færdige måling og ellers eksemplet (5,21 g → 3,29 g), og skemaet
 siger det. Skifter diglen på fane 1, begynder en påbegyndt opgave forfra
 med de nye tal (brugerens ønske 29. sept. 2026: fane 2 kom med helt nye
-tal). Panelet er bredere end på de andre faner (540 px, 460 px under
-1320 px) med større skrift i regnestykket, og et rigtigt svar får
-rækken og linjen til at blinke grønt med et flueben. Snyd-knappen under
-opgavelisten udfylder alle regneopgaver (dommen skal eleven selv tage),
-og journalen får et snydebevis.
+tal).
 
 **Fejlkilder.** Begge grupper starter med 5,10 g natron og vejer diglen
 én gang, når den er kølet af. Gruppe 1 gør det rigtigt: lav flamme i 2
@@ -161,8 +130,8 @@ Link til en fane: `index.html#hypoteser`, `index.html#fejl`.
 
 ```
 index.html          markup for de tre faner, teorien, journalen og rundvisningen
-css/stil.css        alt udseende (kopi af sc5.11; nyt nederst: skemaerne, regnestykket som sc5.3,
-                    afstemningen, snydeknappen og journalen med udskrift). NB: decimaltal med PUNKTUM i CSS
+css/stil.css        alt udseende (kopi af sc5.11; nederst rækken og kortet på fane 1 og 2 (T13) og
+                    skemaet og arket på fane 2 (T13d)). NB: decimaltal med PUNKTUM i CSS
 sprites/            bunsen, trefod_bag og trefod_for (trefoden i to lag, så diglen står i trekanten),
                     digel, tang og natron (nye); vægten (som sc5.5), luppen (som sc2.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc5.11)
@@ -170,16 +139,17 @@ js/data.js          atommasserne, stofferne, hypoteserne, prøverne, flammen og 
                     fejlkilderne og replikkerne
 js/kemi.js          diglen (opvarmning, reaktion, sprøjt, afkøling, hvad vægten viser), facit og de to
                     gruppers forløb på fane 3 (vejet før, varmet, kølet af og vejet én gang)
-js/tjek.js          afstemningen, formlen, mellemregningen og tallet i hvert trin, de typiske fejl og de
-                    pæne beregninger
+js/tjek.js          afstemningen og tallet i hvert trin med de typiske fejl og den pæne beregning
+                    (fortolkningen af en skrevet formel er tilbage fra før T13d og bruges kun af selvtesten)
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
-js/tegning.js       rummet, bordet og tavlen, vægten, brænderen med flammen og knapperne, trefoden,
-                    diglen med pulveret, tangen, damp og korn, luppen med ionerne, grafen, skemaet og
-                    atomtællingen, regnestykket med brøkstreger og kuglerne i dommen
-js/fane.js          det, fanerne deler: opgavelisten, den gule knap, linjen i kortet (også hint og svar) og musen
-js/regning.js       regnetrinene i kortet og tavlen på fane 2
-js/sim_forsoeg.js   fane 1 og målingen, som fane 2 bruger
-js/sim_hypoteser.js fane 2
+js/tegning.js       rummet og bordet, vægten, brænderen med flammen, trefoden, diglen med pulveret,
+                    tangen, damp og korn, luppen med ionerne, kuglerne i dommen, grafen på et lyst
+                    ark (fane 1 og 2), ring og skilt
+js/fane.js          fane 3's opgaveliste, den gule knap, linjen i kortet (også hint og svar) og musen
+js/forsoeg_opgaver.js  fane 1's opgaver: rækken, kortet, trinene, hint og Vis svaret, fri leg (runde T13)
+js/sim_forsoeg.js   fane 1's scene og målingen, som fane 2 bruger
+js/hypotese_opgaver.js fane 2's opgaver: rækken, kortet, formlerne, felterne, hint og Vis svaret, fri leg (T13d)
+js/sim_hypoteser.js fane 2's scene: skemaet, arket med beregningen og grafen (runde T13d)
 js/sim_fejl.js      fane 3: to opstillinger med et skilt over hver (uret og slutmassen)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, journalen, genveje, tegneløkke
@@ -272,3 +242,164 @@ med superanimationen"):
 ## Opgavelisten låser titlerne op (21. nov. 2026)
 
 Listen viser kun titlen på de løste opgaver og den, eleven er ved; de kommende står som et nummer med en grå streg og kan ikke klikkes, til de er nået (`aabenOpgave` i `js/fane.js`).
+
+## Runde T13: fane 1 "Varm og vej" uden panel (28. nov. 2026)
+
+Niels sagde ja til forslaget med valg a ("Ja byg det gerne med A, så giver jeg
+feedback"). Gennemgangen 21. nov. dømte fanen "lidt meget": et gæt mellem tre
+formler før forsøget, brænderens knapper, grafen og luppen med farveforklaring
+fremme under gættet, skemaet med svarfeltet i panelet og et skilt med tid og
+temperatur halvt bag kortet.
+
+* **Intet panel** (regel 2-3). Fire opgaver i rækken øverst med Start forfra og
+  Fri leg (regel 57). Kortet står under rækken med en fast plads, der måles i
+  en usynlig kopi (regel 4). Motoren er `js/forsoeg_opgaver.js`, bygget på
+  sc4.7's `vand_opgaver.js` (T11) og sc5.6's `vej_opgaver.js` (T12) med fire
+  slags trin: gaet, handling, felt og vej. Fanen bruger ikke `js/fane.js`
+  længere; fane 2 og 3 gør. Opgaverne og teksterne står i `D.OPG_FORSOEG`,
+  `D.VEJ_FASE` og `D.FORSOEG_FRI` i `js/data.js` (de gamle `D.FORSOEG`,
+  `D.LINJE`, `D.HINT` og `D.SVAR` er væk).
+* **Opgave 1 Massen før:** "Hvor mange gram natron er der i diglen?" med et
+  felt i kortet. Et rigtigt tal giver det grønne kort, og arket Vejningerne
+  kommer frem.
+* **Opgave 2 Varm natronen:** først et gratis gæt om massen (mindre, den samme,
+  større), så én handling ad gangen med gul ring og skilt: sæt diglen på
+  trefoden, tænd lav flamme (knapperne kommer først frem nu), varm i 4
+  minutter og se luppen, sluk og flyt diglen over på vægten, og skriv tallet,
+  når det står stille. Det grønne kort siger, hvor meget massen faldt, og om
+  gættet holdt. Grafen kommer frem.
+* **Opgave 3 Konstant masse:** varm og vej igen, til to vejninger i træk viser
+  det samme. Kortet siger det næste skridt (sæt tilbage, tænd høj flamme, varm
+  i 8 minutter, flyt, aflæs), og efter hver vejning bliver kortet grønt.
+  Med 8 minutter på høj flamme er massen konstant efter tre vejninger for alle
+  prøverne (med 3 minutter skulle eleven veje seks-syv gange). Uret viser
+  "Denne gang", og Sluk får ringen efter 8 minutter.
+* **Opgave 4 Hvad er tilbage?:** først her kommer de tre formler, som et
+  gratis gæt (valg a). Kortet sender eleven videre til Hypoteserne, og fane 1
+  står i fri leg bagefter.
+* **Scenen:** apparaterne, luppen og et lyst ark med Vejningerne og grafen
+  (aksetitler med stort forbogstav, y-titlen vandret over aksen) står samlet
+  i midten og bliver større på en stor skærm (regel 32). Arket og luppen er
+  stiplede pladser, til de bruges (regel 13). Luppen har ingen
+  farveforklaring, kun linjen "? er det, der bliver tilbage i diglen", og en
+  kegle fra et forstørrelsesglas på diglen (regel 24-25); ionerne er større og
+  spredt, så formlen i kuglen er mindst 13,5 px. Uret står over trefoden og
+  temperaturen ved diglen. Er der ikke plads til alle vejningerne på en lav
+  skærm, samles de midterste i én række "⋮".
+* **Fejlene er der stadig:** høj flamme fra start sprøjter (rød besked på
+  kortet, så en stille efter), og en varm digel giver "Ikke rigtigt" med
+  forklaringen. Knappen Rolig fart er med (regel 69).
+* **Start forfra** giver opgaven igen med diglen, som den var, da opgaven
+  begyndte (opgave 1: en ny digel). **Fri leg** midt i en opgave gemmer diglen,
+  og Tilbage til opgaverne giver den igen. I fri leg står Ny digel i rækken, og
+  kortet har knappen "Skriv ... g i skemaet", når diglen står stille på vægten.
+  En elev, der kommer tilbage, begynder i den første uløste opgave med en
+  digel, der er regnet frem med modellen.
+* **Selvtesten** har nyt afsnit 8 med hele forløbet med musen, den varme
+  digel, tre vejninger i opgave 3, gættet til fane 2, fri leg, Start forfra,
+  Tilbage til opgaverne og Vis svaret hele vejen med sprøjt. Fane 1 testes fra
+  1000 px (som T9, T10 og T12; regel 47). ALT OK (122 påstande) 28. nov. 2026.
+
+## Runde T13b: Varm 3 min (28. nov. 2026)
+
+Niels om T13: "Det er lidt forvirrende ved opvarmning.. Måske skal man bare
+kunne give den 3 minutter af gangen (og den er nærmest færdig efter 6
+minutter og helt færdig efter 9 minutter). Der skal ikke være en counter der
+skifter hele tiden, men 3 minutter skal ca svare til 6 sekunder."
+
+* **Knappen Varm 3 min** under trefoden afløser Sluk, Lav og Høj. Den tænder
+  brænderen, som slukker selv efter 3 minutter (`D.F1.portion`). 3 minutter
+  tager ca. 6 sekunder (`D.F1.minPrS` = 0,5 minut pr. sekund); uden flamme går
+  tiden 1 minut pr. sekund, så diglen køler af på et par sekunder. Mens
+  brænderen er tændt, står der "Brænderen er tændt" på knappen, og en rolig
+  bjælke fyldes. Diglen kan ikke flyttes imens.
+* **Intet ur og ingen temperatur**, der skifter hele tiden. Skemaet viser,
+  hvor længe natronen er varmet i alt (3, 6, 9 og 12 min).
+* **Modellen på fane 1:** natronen reagerer kun, mens flammen brænder
+  (`kunFlamme`), 2,8 gange hurtigere end på fane 3 (`D.F1.kF`), og pulveret
+  sprøjter ikke (`udenSprojt`), så hver portion giver det samme. Efter 3
+  minutter er det meste væk, efter 6 minutter er der 0,02-0,04 g tilbage, og
+  efter 9 og 12 minutter viser vægten det samme for alle prøverne (selvtesten
+  holder øje). Opgave 3 har derfor tre vejninger (6, 9 og 12 min). Fane 3
+  bruger standardværdierne og er uændret; høj flamme fra start er stadig en
+  fejlkilde dér.
+* **Opgave 2** har fem trin: gæt, sæt diglen på trefoden, Varm 3 min (og se
+  luppen), flyt diglen over på vægten og aflæs. Opgave 3's kort siger "Varm
+  natronen i 3 minutter.", "Vent, til brænderen slukker efter 3 minutter." og
+  "Flyt diglen over på vægten.".
+* Giv et hint gør intet, når scenen allerede står på målet (ellers startede et
+  ekstra tryk på Vis svaret en ny opvarmning).
+* Selvtest ALT OK (124 påstande) 28. nov. 2026.
+
+## Runde T13c: 0,01 g regnes for konstant (28. nov. 2026)
+
+Niels: "Jeg har fortrudt.. jeg synes den kun skal have tabt 0,01 mere ved 9
+minutter, og at det accepteres som konstant."
+
+* **Konstant masse** er nu to vejninger i træk, der højst er 0,01 g fra
+  hinanden (`D.KONSTANT.tol` 0,015, før 0,005). Kortet, rundvisningen og
+  dommen på fane 2 siger det samme.
+* **Hurtigere på fane 1** (`D.F1.kF` 3,5, før 2,8): efter 3 minutter er det
+  meste væk, efter 6 minutter viser vægten 0,01 g over slutmassen, og efter 9
+  minutter (og 12) viser den slutmassen, fx 4,83 g → 3,20 → 3,06 → 3,05 g.
+  Opgave 3 har derfor to vejninger (6 og 9 min), og kortet siger "Massen
+  faldt kun 0,01 g og regnes nu for konstant. Slutmassen er 3,05 g.".
+  Selvtesten holder øje med alle prøverne, også når eleven venter længe på
+  trefoden eller vægten mellem portionerne.
+* Eksemplet på fane 2 er regnet med samme model: 5,21 → 3,45 → 3,30 → 3,29 g.
+* Fane 1's graf tegnes nu af `Tg.massegraf` i `js/tegning.js`, som fane 2
+  også bruger. Den ser ud som før.
+
+## Runde T13d: fane 2 "Hypoteserne" uden panel (28. nov. 2026)
+
+Niels om den gamle fane 2: "når der står skriv formlen tænker jeg NaHCO₃..
+og desuden kommer vi igen ud i, at man skal skrive ud i siden af feltet..
+Det føles lidt unaturligt. Jeg vil foretrække at feltet ligger inde i midten
+af animationen." og om forslaget: "Jeg synes du bare lige skal prøve dit
+forslag som i t12".
+
+* **Intet panel** (REGELSAET 2-3). Fem opgaver i rækken øverst (Natron i
+  mol, Hypotese A: Na₂O, Hypotese B: Na₂CO₃, Hypotese C: NaOH, Hvilken
+  passer?) med Start forfra og Fri leg. Titlerne låses op i takt. Kortet
+  står under rækken med en fast plads, der måles i en usynlig kopi
+  (REGELSAET 4). Motoren er `js/hypotese_opgaver.js`, bygget på fane 1's
+  (T13) og sc5.6's `vej_opgaver.js` (T12).
+* **Formlerne vælges blandt tre knapper** i kortet ("Hvilken formel giver
+  stofmængden (n) af natron?": n = m · M, n = m/M, n = M/m med vandret
+  brøkstreg), så ingen tror, at der skal skrives NaHCO₃. Når formlen er
+  rigtig, kommer feltet frem i samme kort: "n(NaHCO₃) = [ ] mol". Enheden
+  står ved feltet, så eleven kun skriver tallet.
+* **Trinene:** Opgave 1 er formlen og tallet. Hypotese A har det fulde
+  stillads: afstemningen (fire små felter foran stofferne i kortet), så
+  stofmængden af Na₂O som tre svar, hvor de forkerte er typiske fejl (samme
+  stofmængde som natron, forholdet vendt om), og massen med formlen og
+  tallet. I B og C skriver eleven selv tallene uden formelknapper. Dommen
+  er tre knapper (A: Na₂O, B: Na₂CO₃, C: NaOH); et forkert valg forklares
+  med massen ("Hypotese C giver 2,48 g. Diglen vejede 3,29 g til sidst.").
+  Hinttrappe med tre hint og så Vis svaret. Fejlbeskederne kender de
+  typiske fejl (ganget, vendt om, molarmassen for natron, kommaet).
+* **Scenen:** til venstre skemaet som i en rapport med reaktionsskemaet i
+  øverste række og masse, molarmasse og stofmængde under natron og
+  produktet (ordet over symbolet, REGELSAET 34 og 48). Den celle, kortet
+  spørger om, har "?" med gul ramme; de kommende er stiplede. Under
+  afstemningen står der "?" foran stofferne. Under skemaet et lyst ark med
+  beregningen, der vokser linje for linje med et navn over hver linje. Til
+  højre grafen med vejningerne og en stiplet streg pr. hypotese. Arket og
+  grafen er stiplede pladser, til de bruges (REGELSAET 13). I dommen viser
+  skemaets plads de tre hypoteser med deres masser og målingen, og efter
+  dommen viser arket reaktionen som kugler ("Det sker i diglen").
+* **Grønt kort** med "✓ Rigtigt" og Næste efter hvert trin (REGELSAET 66);
+  det sidste fører videre til Fejlkilder, og fane 2 står så i fri leg.
+* **Fri leg:** hypoteserne og Nye tal i rækken. Eleven regner stofmængden
+  af natron, af produktet og massen med en ny masse natron. Tilbage til
+  opgaverne bringer eleven tilbage til samme trin.
+* Snyd-knappen er væk sammen med panelet. Den gamle `js/regning.js` er
+  slettet, og de tegnefunktioner, der kun blev brugt af den gamle fane 1 og
+  2, er fjernet fra `js/tegning.js`.
+* Selvtesten tester den nye fane med klik i kortet (formlerne, felterne,
+  afstemningen, svarene, fejlbeskederne, hinttrappen, Vis svaret, dommen,
+  stjernerne, låste titler, fri leg, Tilbage til opgaverne, Start forfra og
+  kortets plads i hvert trin på 1400 × 860 og 1100 × 660). ALT OK (145
+  påstande) 28. nov. 2026.
+
+Niels 28. nov. 2026: "Super indtil videre, så er animation T13 færdig." T13 godkendt.

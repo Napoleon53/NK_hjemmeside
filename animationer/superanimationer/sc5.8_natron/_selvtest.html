@@ -50,7 +50,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc5.7-forsoeg", "nk-sc5.7-hypoteser", "nk-sc5.7-fejl", "nk-sc5.7-maaling",
+var NOEGLER = ["nk-sc5.8-forsoeg-opg", "nk-sc5.8-hyp-opg", "nk-sc5.7-hypoteser", "nk-sc5.7-fejl", "nk-sc5.7-maaling",
     "nk-sc5.7-gaet", "nk-sc5.7-dommen", "nk-sc5.7-journal"];
 
 function koer() {
@@ -94,13 +94,14 @@ function koerTest(W) {
     function nulstilAlt() {
         NK.minMaaling = null; NK.gaet = null; NK.dommen = false;
         NK.journal = { fejl: 0, svar: 0, snyd: false, valgt: null };
-        [A, B, C].forEach(function (s) { s.status.forEach(function (x) { x.loest = false; x.stjerne = false; }); s.rostAlt = false; s.visListe(); });
-        if (B.el.snyd) { B.el.snyd.disabled = false; B.el.snyd.textContent = "Snyd (udfyld alt)"; }
+        C.status.forEach(function (x) { x.loest = false; x.stjerne = false; }); C.rostAlt = false; C.visListe();
+        A.opgaver.status = {}; A.opgaver.gem(); A.massegaet = null; A.opgaver.aabn(0, true);
+        B.opgaver.status = {}; B.opgaver.gem(); B.maal = NK.maaling(); B.opdaterForventet(); B.opgaver.aabn(0, true);
     }
     nulstilAlt();
     paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !d.querySelector(".kboble, .kknap"));
-    paastand("hver fane har den gule hintknap", ["forsoeg", "hypoteser", "fejl"].every(function (n) {
-        var k = d.getElementById(n + "-knap");
+    paastand("hver fane har den gule hintknap", ["forsoeg-hjknap", "hyp-hjknap", "fejl-knap"].every(function (id) {
+        var k = d.getElementById(id);
         return k && k.classList.contains("hjaelp");
     }));
 
@@ -135,6 +136,26 @@ function koerTest(W) {
     });
     paastand("lav flamme først, vej til konstant masse: alle prøver ender på 63,08 % (B)", forkert.length === 0, forkert.join("; "));
     paastand("lav flamme de første 4 minutter: det sprøjter ikke", sproejt.length === 0, sproejt.join("; "));
+    /* Fane 1 (runde T13b/T13c): portioner paa 3 minutter med knappen Varm 3 min.
+       Efter 6 min viser vaegten 0,01 g over slutmassen, efter 9 og 12 min
+       slutmassen, ogsaa naar diglen staar laenge paa trefoden eller vaegten. */
+    function portioner(m, efter, ekstra) {
+        var dg = new K.Digel({ m: m, kF: D.F1.kF, kunFlamme: true, udenSprojt: true }), v = [m];
+        for (var p = 0; p < 4; p++) {
+            dg.sted = "trefod"; dg.flamme = "hoej"; var s0 = dg.opv + D.F1.portion - 1e-6; while (dg.opv < s0) dg.opdater(0.01);
+            dg.flamme = ""; dg.opdater(efter); v.push(vej(dg)); dg.opdater(ekstra);
+        }
+        return { dg: dg, v: v };
+    }
+    var f1 = [];
+    [[3, 0], [0, 0], [6, 10]].forEach(function (vent) {
+        D.PROEVER.forEach(function (m) {
+            var r = portioner(m, vent[0], vent[1]), v = r.v;
+            var sl = K.slutVisning(m), d6 = Math.round((v[2] - sl) * 100);
+            if (!(v[1] - sl > 0.1 && d6 === 1 && v[3] === sl && v[4] === sl && r.dg.tabt === 0)) f1.push(vent + " " + m + ": " + v.join(" "));
+        });
+    });
+    paastand("fane 1: efter 3 min er det meste væk, efter 6 min viser vægten 0,01 g over slutmassen, efter 9 og 12 min slutmassen", f1.length === 0, f1.join("; "));
     var hoej = forsoeg(5.21, "hoej");
     paastand("høj flamme fra start: det sprøjter, og slutmassen bliver for lav", hoej.dg.tabt > 0.1 && hoej.slut < K.slutVisning(5.21) - 0.1,
         "tabt " + hoej.dg.tabt.toFixed(3) + ", slut " + hoej.slut);
@@ -144,9 +165,9 @@ function koerTest(W) {
     paastand("30 minutter mere ved høj flamme ændrer ikke slutmassen (Na₂CO₃ tåler flammen)", (function () {
         var r = forsoeg(5.21, "lav"); varm(r.dg, "hoej", 30); return vej(r.dg) === r.slut;
     }()));
-    var eks = forsoeg(D.EKSEMPEL.mf, "lav");
-    paastand("eksemplet på fane 2 er regnet af modellen", JSON.stringify(eks.v) === JSON.stringify(D.EKSEMPEL.vejninger.map(function (x) { return x.m; })) &&
-        eks.slut === D.EKSEMPEL.slut, JSON.stringify(eks.v));
+    var eks = portioner(D.EKSEMPEL.mf, 3, 0).v.slice(0, 4);
+    paastand("eksemplet på fane 2 er regnet af modellen fra fane 1", JSON.stringify(eks) === JSON.stringify(D.EKSEMPEL.vejninger.map(function (x) { return x.m; })) &&
+        eks[3] === D.EKSEMPEL.slut, JSON.stringify(eks));
 
     /* ================================================================ */
     overskrift("3. Fejlkilderne i modellen");
@@ -238,15 +259,37 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("7. Sproget");
     var tekster = [];
-    D.FORSOEG.forEach(function (o) { tekster.push(o.titel, o.tekst, o.valg.spm, o.valg.hint); tekster = tekster.concat(o.trin); o.valg.svar.forEach(function (s) { tekster.push(s.t); }); });
-    ["LINJE", "HINT", "SVAR", "INTRO", "FAERDIG", "AFSTEM", "DOM"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
-    D.HYPOTESER.forEach(function (o) { tekster.push(o.titel); });
-    Object.keys(D.TRIN).forEach(function (id) {
-        var t = D.TRIN[id];
-        [t.navn, t.formelHint, t.talHint].concat(t.indsaetHint || []).forEach(function (x) {
-            if (x && typeof x === "object") Object.keys(x).forEach(function (k) { tekster.push(x[k]); }); else if (x) tekster.push(x);
+    var mS = A.maaleSim(null);
+    function tekstAf(v) { return typeof v === "function" ? v(mS) : v; }
+    D.OPG_FORSOEG.forEach(function (o) {
+        tekster.push(o.navn);
+        o.trin.forEach(function (t) {
+            ["tekst", "spm", "slut", "pre", "boble", "svarTekst"].forEach(function (k) { var x = tekstAf(t[k]); if (x) tekster.push(x); });
+            (t.hint || []).forEach(function (h) { tekster.push(tekstAf(h)); });
+            (t.svar || []).forEach(function (sv) { tekster.push(sv.t); });
         });
     });
+    Object.keys(D.VEJ_FASE).forEach(function (k) { var f = D.VEJ_FASE[k]; tekster.push(f.spm, f.boble || ""); tekster = tekster.concat(f.hint); });
+    Object.keys(D.FORSOEG_FRI).forEach(function (k) { tekster.push(D.FORSOEG_FRI[k]); });
+    tekster = tekster.concat(A.fejlTekster(), A.vejSlutTekster(), ["igen", "taend", "varm", "tilVaegt"].map(function (f) { return A.faseSvarTekst(f); }));
+    ["INTRO", "FAERDIG", "AFSTEM", "DOM"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
+    /* Fane 2: alle trinenes tekster med tal, ogsaa hint, svar og fejl (runde T13d) */
+    function hypTekster(o) {
+        tekster.push(o.navn);
+        B.medOpgave(o, function () {
+            o.trin.forEach(function (t) {
+                [B.tekster(t, "formel"), B.tekster(t)].forEach(function (tk) { tekster.push(tk.tekst, tk.spm, tk.slut); tekster = tekster.concat(tk.hint); });
+                if (t.type === "valg") B.valgSvar(t).forEach(function (sv) { tekster.push(sv.t, sv.nej || ""); });
+                if (t.type === "dom") B.domSvar().forEach(function (sv) { tekster.push(sv.t, sv.nej || ""); });
+                tekster = tekster.concat(B.fejlProever(t, true), B.slutProever(t));
+            });
+        });
+    }
+    D.OPG_HYP.forEach(hypTekster);
+    D.HYP_IDS.forEach(function (h) { hypTekster({ id: "fri", navn: "Hypotese " + h, hyp: h, mf: 5.45, trin: D.HYP_FRI_TRIN }); });
+    tekster = tekster.concat(D.HYP_TEKST.dom.ikke.hint, [D.HYP_TEKST.dom.ikke.tekst, D.HYP_TEKST.dom.ikke.spm]);
+    Object.keys(D.HYP_FRI).forEach(function (k) { tekster.push(D.HYP_FRI[k]); });
+    Object.keys(D.FORMLER).forEach(function (k) { tekster.push(D.FORMLER[k].godt); D.FORMLER[k].svar.forEach(function (sv) { tekster.push(sv.nej || ""); }); });
     ["A", "B", "C"].forEach(function (h) { ["n_p", "m_p"].forEach(function (id) { T.regler(id, h).fejl.forEach(function (x) { tekster.push(x[1]); }); }); });
     T.regler("n_nat", null).fejl.forEach(function (x) { tekster.push(x[1]); });
     D.FEJL.forEach(function (o) { tekster.push(o.titel, o.kort, o.tekst, o.hint, o.forkl); Object.keys(o.fejl).forEach(function (k) { tekster.push(o.fejl[k]); }); });
@@ -259,184 +302,290 @@ function koerTest(W) {
     paastand("natriumhydroxid, ikke natronlud", !/natronlud/i.test(alt));
 
     /* ================================================================ */
-    overskrift("8. Forsøget med musen");
+    overskrift("8. Varm og vej (runde T13, 28. nov. 2026)");
     NK.visFane("fane-forsoeg");
+    var O = A.opgaver, i, kn, dg;
     A.tilpas(); A.layout();
-    A.vaelg(0, false);
-    A.forfra();
-    paastand("første gang: gæt først på kortet i scenen, uden hintknap og Indsend svar", A.fase() === "valg" && A.el.kort.classList.contains("gaet") &&
-        /Gæt først/.test(A.kortTekst()) && d.querySelectorAll("#forsoeg-valg .gk-knap").length === 3 && A.el.knap.hidden && A.el.indsend.hidden, A.kortTekst());
-    var dg = A.digelNu();
-    A.el.kort.classList.remove("blink");
+    function kortT() { return d.getElementById("forsoeg-skort").innerText.replace(/\s+/g, " ").trim(); }
+    function felt() { return d.querySelector("#forsoeg-ind input"); }
+    function skriv(v) { var e = felt(); if (!e) return false; e.value = v; e.dispatchEvent(new W.Event("input", { bubbles: true })); O.el.indsend.click(); return true; }
+    function videre() { var k = d.querySelector("#forsoeg-ind [data-videre]"); if (k) k.click(); return !!k; }
+    function trykVarm() { A.tegn(); var r = A.lay.knapRamme; klik(A, r.x + r.b / 2, r.y + r.h / 2); return A.varmRest > 0; }
+    O.status = {}; O.gem(); A.massegaet = null; NK.gaet = null; NK.minMaaling = null;
+    O.aabn(0, true);
+    paastand("intet panel: rækken med fire opgaver, Start forfra og Fri leg; kun opgave 1 har titel", !d.querySelector("#fane-forsoeg .panel") &&
+        O.knapper.length === 4 && O.knapper[0].textContent.indexOf("Massen før") >= 0 &&
+        O.knapper.slice(1).every(function (k) { return k.disabled && k.classList.contains("laast"); }) &&
+        !d.getElementById("forsoeg-forfra").hidden && !d.getElementById("forsoeg-frileg").hidden, O.knapper.map(function (k) { return k.textContent; }).join("|"));
+    paastand("fanen hedder Varm og vej, og #forsoeg virker stadig", /Varm og vej/.test(d.querySelector('[data-fane="fane-forsoeg"]').textContent));
+    paastand("opgave 1: stort spørgsmål og et felt i kortet; Indsend svar er grå", /Hvor mange gram natron er der i diglen\?/.test(kortT()) && !!felt() &&
+        !O.el.indsend.hidden && O.el.indsend.classList.contains("ikke-klar"), kortT());
+    A.tegn();
+    paastand("under spørgsmålet: ingen brænderknapper, og arket og luppen er stiplede pladser", !A.synlig("knapper") && !A.synlig("ark") &&
+        !A.synlig("lup") && !A.kanBruges("varm"));
+    dg = A.digelNu(); O.el.kort.classList.remove("blink");
     klik(A, dg.x, dg.bund - 20);
-    paastand("et klik på diglen før gættet flytter den ikke, og kortet blinker", A.d.sted === "vaegt" && !A.flyt && A.el.kort.classList.contains("blink"));
-    d.querySelectorAll("#forsoeg-valg .gk-knap")[1].click();
-    tik(A, 0.2);
-    paastand("gættet er valgt: aflæs startmassen", A.fase() === "foer" && NK.gaet === "B" && /Aflæs vægten/.test(besked(A)), besked(A));
-    paastand("fane 1 har ingen opgaveliste, der kan starte forfra", !d.getElementById("forsoeg-liste") && !d.getElementById("forsoeg-opgaver"));
-    function trinNu() { var li = d.querySelectorAll("#forsoeg-prompt .trinliste li"); for (var k = 0; k < li.length; k++) if (li[k].classList.contains("nu")) return k + 1; return 0; }
-    paastand("gættet står på én linje, knapperne er væk, og trin 1 er fremhævet", d.getElementById("forsoeg-valg").hidden &&
-        /Dit gæt: B: Na₂CO₃/.test(d.getElementById("forsoeg-prompt").textContent) && trinNu() === 1, trinNu());
-    var inp = d.getElementById("forsoeg-inp");
-    A.opdater(0);
-    paastand("Indsend svar står på kortet og er grå, til der står et tal i skemaet", !A.el.indsend.hidden && A.el.indsend.classList.contains("ikke-klar") &&
-        A.el.kort.contains(A.el.indsend), "hidden=" + A.el.indsend.hidden + " cls=" + A.el.indsend.className + " i kort=" + A.el.kort.contains(A.el.indsend));
-    A.el.indsend.click();
-    paastand("Indsend svar uden et tal: intet bliver bedømt, kortet blinker", A.vejninger.length === 0 && A.el.kort.classList.contains("blink"));
-    inp.value = komma(A.proeve + 0.1); A.opdater(0);
-    paastand("med et tal i feltet er Indsend svar klar og viser tallet", A.el.indsend.classList.contains("klar") &&
-        A.el.indsend.textContent === "Indsend svar: " + komma(A.proeve + 0.1) + " g", A.el.indsend.textContent);
-    A.el.indsend.click();
-    paastand("forkert startmasse: det står der ikke på vægten", /står der ikke/.test(besked(A)) && A.vejninger.length === 0, besked(A));
-    inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.proeve); enter(inp);
-    tik(A, 0.2);
-    paastand("startmassen står i skemaet, og diglen skal på trefoden", A.vejninger.length === 1 && A.fase() === "flyt", A.fase());
-    paastand("trin 2 er fremhævet, og skemaet har en grå række: varm diglen først", trinNu() === 2 &&
-        /varm diglen først/.test(d.getElementById("forsoeg-tbody").textContent), trinNu());
+    paastand("et klik på diglen under spørgsmålet flytter den ikke, og kortet blinker", A.d.sted === "vaegt" && !A.flyt && O.el.kort.classList.contains("blink"));
+    skriv(komma(A.proeve + 0.1));
+    paastand("forkert tal: Ikke rigtigt, og intet står i skemaet", /Ikke rigtigt/.test(kortT()) && /står der ikke på vægten/.test(kortT()) &&
+        A.vejninger.length === 0, kortT());
+    skriv(komma(A.proeve));
+    paastand("rigtigt: kortet bliver grønt med ✓ Rigtigt, og arket kommer frem med startmassen", O.tilstand === "bliv" && /✓ Rigtigt/.test(kortT()) &&
+        A.vejninger.length === 1 && A.synlig("ark") && O.status.foer === "loest", kortT() + " " + O.status.foer);
+    videre();
+    paastand("opgave 2 begynder med et gratis gæt om massen, uden hintknap og Indsend svar", O.nr === 1 && /Hvad sker der med massen i diglen/.test(kortT()) &&
+        O.el.bund.hidden && d.querySelectorAll("#forsoeg-ind .sk-knap").length === 3, kortT());
+    d.querySelectorAll("#forsoeg-ind .sk-knap")[0].click();
+    paastand("gættet går videre: sæt diglen på trefoden, med gul ring og skilt om diglen", O.trinNr === 1 && /Dit gæt: Massen bliver mindre/.test(kortT()) &&
+        O.opfordring() && O.opfordring().el === "digel", kortT());
     dg = A.digelNu();
     traek(A, dg.x, dg.bund - 20, A.lay.op.x, A.lay.op.digel.bund - 20);
-    tik(A, 1);
-    paastand("diglen kan trækkes hen på trefoden", A.d.sted === "trefod", A.d.sted);
-    A.tegn();
-    var kn = A.lay.knapper.filter(function (r) { return r.id === "lav"; })[0];
-    klik(A, kn.x + kn.b / 2, kn.y + kn.h / 2);
-    paastand("knappen Lav tænder brænderen", A.d.flamme === "lav" && A.fase() === "varm");
-    tik(A, 4);
-    kn = A.lay.knapper.filter(function (r) { return r.id === "hoej"; })[0];
-    klik(A, kn.x + kn.b / 2, kn.y + kn.h / 2);
     tik(A, 2);
-    paastand("lav og så høj flamme: det sprøjter ikke", A.d.tabt < 0.001 && A.d.flamme === "hoej", A.d.tabt);
-    kn = A.lay.knapper.filter(function (r) { return r.id === ""; })[0];
-    klik(A, kn.x + kn.b / 2, kn.y + kn.h / 2);
-    paastand("Sluk: flyt diglen over på vægten", A.d.flamme === "" && A.fase() === "tilVaegt", A.fase());
-    dg = A.digelNu();
-    klik(A, dg.x, dg.bund - 20);
-    tik(A, 1);
-    paastand("et klik flytter diglen over på vægten, og den er varm", A.d.sted === "vaegt" && A.fase() === "vaegtVent", A.fase() + " " + Math.round(A.d.T));
-    inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.d.visning()); enter(inp);
-    paastand("skrevet, mens diglen er varm: vent, til den står stille", /varm/.test(besked(A)) && A.vejninger.length === 1, besked(A));
-    for (var i = 0; i < 20 && A.fase() !== "vej"; i++) tik(A, 1);
-    inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.d.visning()); enter(inp);
-    tik(A, 0.2);
-    paastand("den kolde digel vejes: en ny række i skemaet og et punkt på grafen", A.vejninger.length === 2 && A.fase() === "igen", A.fase());
-    var fald = NK.tal2(A.vejninger[0].m - A.vejninger[1].m);
-    paastand("efter to vejninger: trin 3 er fremhævet, linjen siger, hvor meget massen faldt, og skemaet viser ændringen",
-        trinNu() === 3 && besked(A).indexOf("Massen faldt " + fald + " g. Den er ikke konstant endnu.") === 0 &&
-        d.querySelector("#forsoeg-tbody td.aendr").textContent === "−" + fald + " g" && /varm igen først/.test(d.getElementById("forsoeg-tbody").textContent),
-        besked(A));
-    /* Videre til konstant masse: 3 minutter ad gangen */
-    for (var runde = 0; runde < 12 && !A.faerdig; runde++) {
+    paastand("diglen kan trækkes hen på trefoden, og kortet går selv videre: varm i 3 minutter, med ring om knappen Varm 3 min",
+        A.d.sted === "trefod" && O.trinNr === 2 && A.synlig("knapper") && O.opfordring() && O.opfordring().el === "varm", A.d.sted + " " + O.trinNr);
+    paastand("knappen tænder brænderen", trykVarm() && A.d.flamme === "hoej");
+    tik(A, 1.5);
+    paastand("mens brænderen er tændt: luppen kommer frem, og diglen kan ikke flyttes", A.synlig("lup") && O.trinNr === 2 && !A.kanBruges("digel"));
+    paastand("intet ur og ingen temperatur, der skifter hele tiden", !A.tegnUr && !A.tegnTemp && !A.lay.ur);
+    tik(A, 5.5);
+    paastand("3 minutter tager ca. 6 sekunder, og brænderen slukker selv", A.varmRest === 0 && A.d.flamme === "" && Math.abs(A.d.opv - 3) < 0.05, A.d.opv);
+    tik(A, 1.2);
+    paastand("kortet går selv videre: flyt diglen over på vægten", O.trinNr === 3 && O.opfordring() && O.opfordring().el === "digel", O.trinNr);
+    dg = A.digelNu(); klik(A, dg.x, dg.bund - 20); tik(A, 2);
+    paastand("diglen står på vægten: feltet til vægtens tal", A.d.sted === "vaegt" && O.trinNr === 4 && !!felt(), O.trinNr);
+    skriv(komma(A.d.visning()));
+    paastand("skrevet, mens diglen er varm: Ikke rigtigt, vent, til tallet står stille", /varm digel vejer for lidt/.test(kortT()) &&
+        A.vejninger.length === 1, kortT());
+    for (i = 0; i < 20 && !A.kanAflaese(); i++) tik(A, 1);
+    skriv(komma(A.d.visning()));
+    paastand("den kolde digel: ✓ Rigtigt, massen faldt, gættet holdt, og grafen kommer frem", O.tilstand === "bliv" && /Massen faldt fra/.test(kortT()) &&
+        /Dit gæt holdt/.test(kortT()) && A.vejninger.length === 2 && A.vejninger[0].m - A.vejninger[1].m > 0.3 && A.synlig("graf"), kortT());
+    videre();
+    paastand("opgave 3: sæt diglen tilbage på trefoden; ingen Indsend svar, når der ikke er noget at skrive", O.nr === 2 &&
+        /Sæt diglen tilbage på trefoden/.test(kortT()) && O.el.indsend.hidden, kortT());
+    var runder = 0, varmSet = false;
+    for (var r = 0; r < 8 && O.nr === 2 && !A.konstant; r++) {
         dg = A.digelNu(); klik(A, dg.x, dg.bund - 20); tik(A, 1);
-        A.saetFlamme("hoej"); tik(A, 3);
-        A.saetFlamme(""); dg = A.digelNu(); klik(A, dg.x, dg.bund - 20);
-        for (i = 0; i < 20 && A.fase() !== "vej"; i++) tik(A, 1);
-        inp = d.getElementById("forsoeg-inp"); if (!inp) break;
-        inp.value = komma(A.d.visning()); enter(inp);
-        tik(A, 0.2);
+        if (r === 0) paastand("opgave 3: varm natronen i 3 minutter (ring om knappen)", /Varm natronen i 3 minutter/.test(kortT()) && O.opfordring() && O.opfordring().el === "varm", kortT());
+        trykVarm();
+        tik(A, 2);
+        if (r === 0) paastand("mens brænderen er tændt, venter kortet, og luppen er fremhævet", /Vent, til brænderen slukker/.test(kortT()) && O.om().indexOf("lup") >= 0, kortT());
+        tik(A, 5);
+        if (r === 0) paastand("brænderen er slukket: flyt diglen over på vægten", /Flyt diglen over på vægten/.test(kortT()) && O.opfordring() && O.opfordring().el === "digel", kortT());
+        dg = A.digelNu(); klik(A, dg.x, dg.bund - 20);
+        for (i = 0; i < 20 && !A.kanAflaese(); i++) tik(A, 1);
+        skriv(komma(A.d.visning())); runder++;
+        if (!A.konstant) {
+            if (!varmSet) { varmSet = true; paastand("efter en vejning, der ikke er konstant: ✓ Rigtigt og Næste, som giver trinet igen", O.tilstand === "bliv" && O.gentag && /ikke konstant endnu/.test(kortT()), kortT()); }
+            videre();
+        }
     }
-    paastand("massen bliver konstant på 63,08 % af startmassen", A.faerdig && NK.minMaaling && NK.minMaaling.slut === K.slutVisning(A.proeve),
-        NK.minMaaling ? NK.minMaaling.slut + " / " + K.slutVisning(A.proeve) : "ingen måling");
-    paastand("forklaringen sender eleven videre til Hypoteserne", /Hypoteserne/.test(besked(A)) && /Hypoteserne/.test(A.el.knap.textContent), besked(A));
+    paastand("to vejninger i opgave 3 (6 og 9 min): 0,01 g regnes for konstant, og massen er 63,08 % af startmassen", A.konstant && runder === 2 &&
+        A.vejninger.map(function (x) { return Math.round(x.t); }).join(",") === "0,3,6,9" &&
+        K.r2(A.vejninger[2].m - A.vejninger[3].m) === 0.01 &&
+        NK.minMaaling && NK.minMaaling.slut === K.slutVisning(A.proeve), runder + " " + JSON.stringify(A.vejninger));
+    paastand("konstant: ✓ Rigtigt og Næste opgave", /Massen faldt kun 0,01 g og regnes nu for konstant/.test(kortT()) && /Næste opgave/.test(kortT()), kortT());
     paastand("luppen viser ? for det, der bliver tilbage, før dommen", Object.keys(A.lup.tilstand).length > 0 &&
         Object.keys(A.lup.tilstand).every(function (k) { return A.lup.tilstand[k] === "ukendt"; }));
+    videre();
+    paastand("opgave 4: gæt hvilket fast stof, med tre formler", O.nr === 3 && /Hvilket fast stof/.test(kortT()) &&
+        d.querySelectorAll("#forsoeg-ind .sk-knap").length === 3, kortT());
+    d.querySelectorAll("#forsoeg-ind .sk-knap")[1].click();
+    paastand("gættet gemmes til fane 2 og journalen, og kortet fører videre til Hypoteserne", NK.gaet === "B" && /Dit gæt: Na₂CO₃/.test(kortT()) &&
+        /Videre til Hypoteserne/.test(kortT()), kortT());
+    videre();
+    paastand("videre til Hypoteserne, og fane 1 står i fri leg", d.getElementById("fane-hypoteser").classList.contains("aktiv") && O.erFri() && O.alleLoest());
+    NK.visFane("fane-forsoeg");
+    paastand("fri leg: kortet har et rødt kryds, Ny digel står i rækken, og knappen Fri leg er væk", /Fri leg/.test(kortT()) &&
+        !!d.querySelector("#forsoeg-ind .sk-luk") && !O.el.ny.hidden && O.el.fri.hidden, kortT());
+    O.nyDigel();
+    paastand("Ny digel: et tomt skema og knappen Skriv ... g i skemaet", A.vejninger.length === 0 && /Skriv .* g i skemaet/.test(kortT()), kortT());
+    d.querySelector("#forsoeg-ind [data-noter]").click();
+    paastand("knappen skriver startmassen i skemaet", A.vejninger.length === 1 && A.vejninger[0].m === A.proeve);
 
-    /* Hint og svar hele vejen med høj flamme fra start: sproejt */
-    A.forfra();
-    for (i = 0; i < 40 && !A.faerdig; i++) {
-        var f0 = A.fase();
-        if (f0 === "taend" && i < 30) { A.saetFlamme("hoej"); tik(A, 0.3); continue; }
-        A.knap(); if (A.hjaelp === 1) A.knap();
-        for (var q = 0; q < 30 && (A.autoKnap || A.hurtig || A.auto || A.flyt); q++) tik(A, 0.5);
-        tik(A, 0.3);
+    /* Start forfra og fri leg midt i en opgave */
+    O.aabn(2);
+    paastand("en løst opgave har alt fremme: kortet er grønt", O.tilstand === "bliv" && O.fremme, O.tilstand);
+    O.forfra();
+    paastand("Start forfra i opgave 3 giver diglen, som den var, da opgaven begyndte", O.nr === 2 && O.tilstand === "trin" &&
+        A.vejninger.length === 2 && !A.konstant, A.vejninger.length + " " + A.konstant);
+    var foerFri = A.vejninger.length;
+    O.friLeg();
+    paastand("Fri leg midt i en opgave: alt kan bruges, og knappen hedder Tilbage til opgaverne", O.erFri() && O.tillad("digel") &&
+        O.el.fri.textContent === "Tilbage til opgaverne");
+    A.startFlyt("trefod"); tik(A, 1); A.startVarm(); tik(A, 2);
+    O.tilbage();
+    paastand("Tilbage til opgaverne: samme opgave og samme digel som før fri leg", O.nr === 2 && !O.erFri() && A.vejninger.length === foerFri &&
+        A.d.sted === "vaegt" && A.d.flamme === "" && A.varmRest === 0, A.d.sted + " " + A.d.flamme + " " + A.varmRest);
+
+    /* Hint og Vis svaret hele vejen */
+    O.status = {}; O.gem(); NK.minMaaling = null; A.massegaet = null;
+    O.aabn(0, true);
+    for (i = 0; i < 600; i++) {
+        if (O.erFri() || (O.nr === 3)) break;
+        var t = O.trin();
+        if (O.tilstand === "bliv") { videre(); continue; }
+        if (t.type === "gaet") { d.querySelectorAll("#forsoeg-ind .sk-knap")[2].click(); continue; }
+        O.hjaelpKlik(); tik(A, 0.5);
     }
-    paastand("Vis svaret kan føre forsøget hele vejen", A.faerdig, A.fase());
-    paastand("høj flamme fra start: sprøjt, og forklaringen siger det", NK.minMaaling && NK.minMaaling.sprojt && /sprøjtede/.test(besked(A)), besked(A));
+    paastand("Vis svaret kan føre forsøget hele vejen til opgave 4, uden stjerner", O.nr === 3 && A.konstant && O.status.foer === "loest" &&
+        O.status.konstant === "loest", O.nr + " " + JSON.stringify(O.status));
+    paastand("fane 1 sprøjter ikke (høj flamme fra start er en fejlkilde på fane 3)", A.d.tabt === 0 && A.d.udenSprojt &&
+        D.FEJL.some(function (f) { return f.id === "sproejt"; }));
 
     /* ================================================================ */
-    overskrift("9. Hypoteserne");
+    overskrift("9. Hypoteserne (runde T13d, 28. nov. 2026)");
+    var H = B.opgaver;
+    function kortH() { return d.getElementById("hyp-skort").textContent.replace(/\s+/g, " "); }
+    function knapH(k) { return d.querySelectorAll("#hyp-ind .sk-knap")[k]; }
+    function vaelgH(k) { knapH(k).click(); H.el.indsend.click(); }
+    function skrivH(v) { var e = d.querySelector("#hyp-ind input"); e.value = v; e.dispatchEvent(new W.Event("input", { bubbles: true })); enter(e); }
+    function afstemH(tal) {
+        var e = d.querySelectorAll("#hyp-ind input");
+        tal.forEach(function (v, k) { e[k].value = v; e[k].dispatchEvent(new W.Event("input", { bubbles: true })); });
+        H.el.indsend.click();
+    }
+    function videreH() { d.querySelector("#hyp-ind [data-videre]").click(); }
+    function skemaH() { return d.getElementById("hyp-skema").innerText.replace(/\s+/g, " "); }
+    function arkH() { return d.getElementById("hyp-ark").textContent.replace(/\s+/g, " "); }
     /* En digel, der kun er vejet foer opvarmningen: fane 2 bruger dens startmasse */
     NK.visFane("fane-forsoeg");
-    A.forfra();
-    inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.proeve); enter(inp); tik(A, 0.2);
+    O.aabn(0, true);
+    skriv(komma(A.proeve)); tik(A, 0.2);
     NK.visFane("fane-hypoteser");
-    B.vaelg(0, false);
+    paastand("intet panel: fem opgaver i rækken øverst, kortet, skemaet og arket i scenen", !d.querySelector("#fane-hypoteser .panel") &&
+        d.getElementById("fane-hypoteser").classList.contains("uden-panel") && d.querySelectorAll("#hyp-liste .or-knap").length === 5 &&
+        !!d.querySelector("#fane-hypoteser .scene #hyp-skort") && !!d.querySelector("#fane-hypoteser .scene #hyp-skema"));
     paastand("fane 2 regner på startmassen fra fane 1, før massen er konstant", B.maal.egen && B.maal.mf === A.proeve && !B.maal.faerdig &&
-        d.getElementById("hypoteser-prompt").textContent.indexOf(komma(A.proeve) + " g natron") >= 0, B.maal.mf + " / " + A.proeve);
-    [1, 2, 3].forEach(function (k) { B.status[k].loest = true; });
+        kortH().indexOf(komma(A.proeve) + " g") >= 0, B.maal.mf + " / " + A.proeve + " " + kortH());
+    H.status = { nat: "loest", A: "loest", B: "loest", C: "loest" };
     B.opdaterForventet();
-    B.vaelg(4, false);
-    paastand("dommen venter, til massen er konstant: ingen knapper, og kortet siger hvorfor", B.opg.dom && d.getElementById("hypoteser-valg").hidden &&
-        /ikke konstant endnu/.test(d.getElementById("hypoteser-prompt").textContent), d.getElementById("hypoteser-prompt").textContent);
-    B.knap(); B.knap();
-    paastand("Vis svaret i dommen sender eleven til Forsøget", d.getElementById("fane-forsoeg").classList.contains("aktiv"));
-    [1, 2, 3].forEach(function (k) { B.status[k].loest = false; });
-    B.hjaelp = 0;
-    A.forfra();
-    /* En faerdig maaling uden sproejt til resten */
+    H.aabn(4, true);
+    paastand("dommen venter, til massen er konstant: ingen svar, ingen Indsend svar, og kortet siger hvorfor", /ikke konstant endnu/.test(kortH()) &&
+        !knapH(0) && H.el.indsend.hidden, kortH());
+    H.hjaelpKlik(); H.hjaelpKlik();
+    paastand("Vis svaret i dommen sender eleven til Varm og vej", d.getElementById("fane-forsoeg").classList.contains("aktiv"));
+    H.status = {}; H.gem();
+    O.aabn(0, true);
+    /* En faerdig maaling til resten */
     NK.minMaaling = { mf: 5.21, slut: 3.29, vejninger: D.EKSEMPEL.vejninger.slice(), sprojt: false };
     NK.visFane("fane-hypoteser");
-    B.vaelg(0, false);
-    paastand("opgave 1 regner på elevens egen måling", B.maal.egen && B.maal.mf === 5.21 && !/eksempel/.test(d.getElementById("hypoteser-prompt").textContent));
-    paastand("der står intet hint, når opgaven vælges", !/Hint:/.test(besked(B)) && !B.el.knap.classList.contains("peg"));
-    function skrivAktivt(t) { var e = B.regning.aktivtInput(); e.value = t; enter(e); return besked(B); }
-    skrivAktivt("M/m");
-    paastand("forkert formel: beskeden står i kortet, og den gule knap lyser op", /vendt/.test(besked(B)) && !/Hint:/.test(besked(B)) && B.el.knap.classList.contains("peg"), besked(B));
-    skrivAktivt("n = m/M");
-    var fe = B.regning.aktivt();
-    fe.inputs[0].value = "5,21 g"; enter(fe.inputs[0]);
-    fe = B.regning.aktivt(); fe.inputs[1].value = "84,01 g/mol"; enter(fe.inputs[1]);
-    skrivAktivt("0,0620 mol");
-    paastand("stofmængden af natron: formel, brøk og resultat", B.faerdig && B.status[0].stjerne, besked(B));
-    B.knap();
-    paastand("videre til hypotese A", B.opg.id === "A" && B.regning.aktivt().fase === "afstem");
-    fe = B.regning.aktivt(); ["2", "1", "2", "1"].forEach(function (v, j) { fe.inputs[j].value = v; }); enter(fe.inputs[0]);
-    skrivAktivt("n(Na2O) = n(NaHCO3)/2");
-    fe = B.regning.aktivt(); fe.inputs[0].value = "0,0620 mol"; enter(fe.inputs[0]);
-    fe = B.regning.aktivt(); fe.inputs[1].value = "2"; enter(fe.inputs[1]);
-    skrivAktivt("0,0310 mol");
-    skrivAktivt("m(Na2O) = n(Na2O)·M(Na2O)");
-    fe = B.regning.aktivt(); fe.inputs[0].value = "61,98 g/mol"; enter(fe.inputs[0]);
-    fe = B.regning.aktivt(); fe.inputs[1].value = "0,0310 mol"; enter(fe.inputs[1]);
-    skrivAktivt("1,92 g");
-    paastand("hypotese A: afstem, n og m, og faktorerne må byttes", B.faerdig && B.status[1].stjerne && Math.abs(NK.forventet.A - 1.92) < 0.01, besked(B));
-    B.knap();
-    paastand("hypotese B: kort udgave, massens formel står der", B.opg.id === "B" && B.opg.kort);
-    B.knap();
-    paastand("Giv hint i afstemningen: hintet står i kortet", /^Hint:.*Na/.test(besked(B)) && B.el.knap.textContent === "Vis svaret" && B.el.knap.classList.contains("svar"), besked(B));
-    B.knap();
-    paastand("Vis svaret afstemmer skemaet", B.regning.loest("afstem"));
-    B.regning.loesAlt();
-    paastand("B regnet: stregen kommer på grafen ved 3,29 g", Math.abs(NK.forventet.B - 3.29) < 0.01);
-    B.knap();
-    fe = B.regning.aktivt(); ["1", "1", "1"].forEach(function (v, j) { fe.inputs[j].value = v; }); enter(fe.inputs[0]);
-    skrivAktivt("n(NaOH) = n(NaHCO3)");
-    paastand("C: forholdet 1 : 1 har ingen mellemregning", B.regning.aktivt().fase === "tal");
-    skrivAktivt("0,0620 mol");
-    skrivAktivt("2,48 g");
-    paastand("C regnet: 2,48 g", B.faerdig && Math.abs(NK.forventet.C - 2.48) < 0.01, besked(B));
-    B.knap();
-    paastand("dommen: tre svar på kortet, Indsend svar er grå", B.opg.dom && d.querySelectorAll("#hypoteser-valg .sk-knap").length === 3 &&
-        !B.el.indsend.hidden && B.el.indsend.classList.contains("ikke-klar"), "dom=" + B.opg.dom + " n=" + d.querySelectorAll("#hypoteser-valg .sk-knap").length + " hidden=" + B.el.indsend.hidden + " cls=" + B.el.indsend.className);
-    d.querySelectorAll("#hypoteser-valg .sk-knap")[2].click();
-    paastand("et svar vælges kun: intet bedømt, Indsend svar er klar", !B.faerdig && !/Forskellen/.test(besked(B)) &&
-        d.querySelectorAll("#hypoteser-valg .sk-knap")[2].classList.contains("valgt") && B.el.indsend.classList.contains("klar"), besked(B));
-    B.el.indsend.click();
-    paastand("forkert dom: forskellen forklares, svaret bliver rødt, og der kan prøves igen", /Forskellen/.test(besked(B)) && !B.faerdig &&
-        d.querySelectorAll("#hypoteser-valg .sk-knap")[2].classList.contains("forkert"), besked(B));
-    d.querySelectorAll("#hypoteser-valg .sk-knap")[1].click();
-    B.el.indsend.click();
-    paastand("B er dommen: reaktionen og gættet står der", B.faerdig && NK.dommen && /Na₂CO₃ \+ CO₂ \+ H₂O/.test(besked(B)) && /gæt/.test(besked(B)), besked(B));
-    paastand("kortet bliver på spørgsmålet: B er grønt, forklaringen står under, og knappen videre står, hvor Indsend svar stod",
-        d.querySelectorAll("#hypoteser-valg .sk-knap")[1].classList.contains("rigtig") && B.el.indsend.hidden && !B.el.knap.hidden &&
-        /Fejlkilder/.test(B.el.knap.textContent) && B.el.knap.parentNode === B.el.indsend.parentNode && /Hvilken|passer/.test(d.getElementById("hypoteser-prompt").textContent), d.querySelectorAll("#hypoteser-valg .sk-knap")[1].className + " ih=" + B.el.indsend.hidden + " kh=" + B.el.knap.hidden + " kt=" + B.el.knap.textContent + " par=" + (B.el.knap.parentNode === B.el.indsend.parentNode) + " p=" + d.getElementById("hypoteser-prompt").textContent.slice(0,80));
+    H.aabn(0, true);
+    paastand("opgave 1 regner på elevens egen måling: Din digel og intet eksempel", B.maal.egen && B.maal.mf === 5.21 && /Din digel/.test(skemaH()) &&
+        !/eksempel/.test(skemaH()), skemaH());
+    paastand("opgave 1: formlen vælges blandt tre knapper, Indsend svar er grå, og skemaet har ? ved stofmængden", /Hvilken formel giver stofmængden \(n\) af natron/.test(kortH()) &&
+        d.querySelectorAll("#hyp-ind .sk-knap").length === 3 && H.el.indsend.classList.contains("ikke-klar") &&
+        d.querySelectorAll("#hyp-skema .hs-celle.spm").length === 1 && B.status("n_nat") === "spm", kortH());
+    paastand("delene dukker op, når de bruges: arket og grafen er stiplede pladser", d.getElementById("hyp-ark").classList.contains("tom") && !B.grafSynlig());
+    knapH(2).click();
+    paastand("et svar vælges kun: intet bedømt, Indsend svar er klar", knapH(2).classList.contains("valgt") && H.el.indsend.classList.contains("klar") &&
+        !/Ikke rigtigt/.test(kortH()));
+    H.el.indsend.click();
+    paastand("forkert formel: forklaringen står i kortet, svaret er rødt og låst, og hintknappen lyser op", /ikke omvendt/.test(kortH()) &&
+        knapH(2).classList.contains("forkert") && knapH(2).disabled && H.el.knap.classList.contains("peg"), kortH());
+    vaelgH(1);
+    paastand("rigtig formel: feltet kommer frem i samme kort med formlen foran", !!d.querySelector("#hyp-ind input") && !!d.querySelector("#hyp-ind .kf-formel") &&
+        /Formlen er rigtig/.test(kortH()) && /Hvor mange mol er 5,21 g natron/.test(kortH()), kortH());
+    skrivH("437,7");
+    paastand("ganget i stedet for divideret: beskeden kender fejlen", /ganget/.test(kortH()), kortH());
+    skrivH("0,0620");
+    paastand("rigtigt tal (enheden står ved feltet): ✓ Rigtigt, tallet i skemaet og linjen på arket", H.tilstand === "bliv" && /✓ Rigtigt/.test(kortH()) &&
+        /5,21 g natron er 0,0620 mol/.test(kortH()) && !!d.querySelector("#hyp-skema .hs-celle.ok") && /Stofmængden af natron/.test(arkH()) &&
+        !d.getElementById("hyp-ark").classList.contains("tom"), kortH());
+    paastand("fejl undervejs: løst, men ingen stjerne", H.status.nat === "loest");
+    videreH();
+    paastand("hypotese A: afstemningen i kortet med et felt foran hvert stof, og ? foran stofferne i skemaet", H.nr === 1 &&
+        /Afstem reaktionsskemaet for hypotese A/.test(kortH()) && d.querySelectorAll("#hyp-ind input").length === 4 &&
+        d.querySelectorAll("#hyp-skema .hs-koef.spm").length === 4 && /natriumoxid, carbondioxid og vand/.test(kortH()), kortH());
+    afstemH(["1", "1", "1", "1"]);
+    paastand("1, 1, 1, 1: beskeden nævner Na", /1 Na til venstre og 2 til højre/.test(kortH()), kortH());
+    afstemH(["2", "1", "2", "1"]);
+    paastand("afstemt: atomerne på hver side, og tallene står i skemaet", H.tilstand === "bliv" && /2 Na, 2 H, 2 C og 6 O/.test(kortH()) &&
+        /2 NaHCO₃ → Na₂O \+ 2 CO₂ \+ H₂O/.test(skemaH()), skemaH());
+    videreH();
+    paastand("stofmængden af Na₂O: tre svar, hvor de forkerte er typiske fejl", /Hvor mange mol Na₂O dannes der af 0,0620 mol natron/.test(kortH()) &&
+        knapH(2).textContent === "0,0310 mol" && knapH(0).textContent === "0,0620 mol" && knapH(1).textContent === "0,124 mol", kortH());
+    vaelgH(1);
+    paastand("forholdet vendt om: forklaringen siger det", /vendt om/.test(kortH()), kortH());
+    vaelgH(2);
+    paastand("rigtigt: linjen med brøken kommer på arket", H.tilstand === "bliv" && /Stofmængden af Na₂O/.test(arkH()) && !!d.querySelector("#hyp-ark .broek"), arkH());
+    videreH();
+    vaelgH(2);
+    skrivH("1,92");
+    paastand("massen af Na₂O: formlen og tallet, og stregen kommer på grafen", H.tilstand === "bliv" && /stiplet streg på grafen/.test(kortH()) &&
+        Math.abs(NK.forventet.A - 1.92) < 0.01 && B.grafSynlig() && H.status.A === "loest", kortH() + " " + JSON.stringify(H.status));
+    videreH();
+    H.hjaelpKlik();
+    paastand("Giv et hint i afstemningen: Hint 1 af 3 står i kortet", /Hint 1 af 3/.test(kortH()) && /Der er 2 Na i Na₂CO₃/.test(kortH()), kortH());
+    H.hjaelpKlik(); H.hjaelpKlik();
+    paastand("efter tre hint hedder knappen Vis svaret", H.el.knap.textContent === "Vis svaret");
+    H.hjaelpKlik();
+    paastand("Vis svaret afstemmer skemaet, og kortet er gult", H.tilstand === "bliv" && H.trinVist && /Svaret/.test(kortH()) &&
+        /2 NaHCO₃ → Na₂CO₃ \+ CO₂ \+ H₂O/.test(kortH()), kortH());
+    videreH();
+    paastand("B: stofmængden skrives selv (ingen svarknapper) med enheden ved feltet", !knapH(0) && !!d.querySelector("#hyp-ind input") &&
+        /mol/.test(d.querySelector("#hyp-ind .kf-enhed").textContent), kortH());
+    skrivH("0,0620");
+    paastand("forholdet glemt: beskeden siger 2 : 1", /2 : 1/.test(kortH()), kortH());
+    skrivH("0,0310");
+    videreH();
+    paastand("B: massens formel er valgt i forvejen (ingen formelknapper)", !knapH(0) && !!d.querySelector("#hyp-ind input"));
+    skrivH("3,29");
+    paastand("B regnet: stregen ved 3,29 g, og opgaven er løst uden stjerne (svaret blev vist)", Math.abs(NK.forventet.B - 3.29) < 0.01 && H.status.B === "loest");
+    videreH();
+    afstemH(["1", "1", "1"]);
+    videreH();
+    skrivH("0,0620");
+    paastand("C: forholdet 1 : 1 forklares", /Der står ingen tal foran NaHCO₃ og NaOH/.test(kortH()), kortH());
+    videreH();
+    skrivH("2,48");
+    paastand("C regnet: 2,48 g", Math.abs(NK.forventet.C - 2.48) < 0.01 && H.status.C === "stjerne");
+    videreH();
+    paastand("dommen: tre hypoteser på kortet, Indsend svar er grå, og skemaet viser de tre masser", H.nr === 4 &&
+        /Hvilken hypotese passer med slutmassen på 3,29 g/.test(kortH()) && d.querySelectorAll("#hyp-ind .sk-knap").length === 3 &&
+        H.el.indsend.classList.contains("ikke-klar") && /1,92 g/.test(skemaH()) && /3,29 g/.test(skemaH()) && /2,48 g/.test(skemaH()), kortH());
+    knapH(2).click();
+    paastand("dommen: et svar vælges kun", knapH(2).classList.contains("valgt") && H.el.indsend.classList.contains("klar") && H.tilstand === "trin");
+    H.el.indsend.click();
+    paastand("forkert dom: massen forklares, og svaret er rødt", /Hypotese C giver 2,48 g\. Diglen vejede 3,29 g til sidst/.test(kortH()) &&
+        knapH(2).classList.contains("forkert"), kortH());
+    vaelgH(1);
+    paastand("B er dommen: natriumcarbonat, gættet og Videre til Fejlkilder, og B er grøn i skemaet", H.tilstand === "bliv" && NK.dommen &&
+        /natriumcarbonat/.test(kortH()) && /gæt/.test(kortH()) && /Videre til Fejlkilder/.test(kortH()) && knapH(1).classList.contains("rigtig") &&
+        !!d.querySelector("#hyp-skema tr.rigtig"), kortH());
     var j = NK.journalHTML();
     paastand("journalen har gættet, vejningerne, de tre masser og konklusionen", /Hypotese B/.test(j) && /3,29 g/.test(j) && /1,92 g/.test(j) &&
         /2,48 g/.test(j) && /passer med hypotese B/.test(j));
     paastand("fejl undervejs: intet guldmærke", !/uden en eneste fejl/.test(j));
-    B.snyd();
-    paastand("Snyd: snydebeviset står i journalen", /SNYDEBEVIS/.test(NK.journalHTML()) && B.el.snyd.disabled);
+    videreH();
+    paastand("Videre til Fejlkilder: fane 3 åbner, og fane 2 står i fri leg", d.getElementById("fane-fejl").classList.contains("aktiv") &&
+        H.erFri() && H.alle && H.alleLoest());
+    NK.visFane("fane-hypoteser");
+    paastand("fri leg efter alle opgaverne: hypoteserne og Nye tal i rækken, et rødt kryds og nye tal", !d.getElementById("hyp-reak").hidden &&
+        d.getElementById("hyp-liste").hidden && /Du har klaret alle 5 opgaver/.test(kortH()) && !!d.querySelector("#hyp-ind .sk-luk") &&
+        /Nye tal/.test(skemaH()), kortH());
+    H.nyFri("C");
+    paastand("fri leg: en hypotese med en ny masse natron, uden formler og afstemning", /Hvor mange mol er .* g natron/.test(kortH()) && !knapH(0) &&
+        /NaHCO₃ → NaOH \+ CO₂/.test(skemaH()), kortH());
+    H.visSvar(); videreH(); H.visSvar(); videreH(); H.visSvar();
+    paastand("fri leg: ingen streg på grafen, og Nye tal fører videre", /bliver .* g natron til .* g NaOH/.test(kortH()) && /Nye tal/.test(kortH()) &&
+        Math.abs(NK.forventet.C - 2.48) < 0.01, kortH());
+    H.tilbage();
+    paastand("Tilbage til opgaverne efter alle opgaverne: dommen med alt fremme", H.nr === 4 && !H.erFri() && H.tilstand === "bliv" && H.fremme);
+    H.aabn(1, true);
+    afstemH(["2", "1", "2", "1"]);
+    H.friLeg();
+    paastand("Fri leg midt i en opgave: knappen hedder Tilbage til opgaverne", H.erFri() && !H.alle && H.el.fri.textContent === "Tilbage til opgaverne");
+    H.tilbage();
+    paastand("Tilbage til opgaverne: samme trin og samme skema som før fri leg", H.nr === 1 && H.trinNr === 0 && H.tilstand === "bliv" &&
+        /2 NaHCO₃ → Na₂O/.test(skemaH()), H.nr + " " + H.trinNr + " " + H.tilstand);
+    H.forfra();
+    paastand("Start forfra giver trinene igen", H.nr === 1 && H.trinNr === 0 && H.tilstand === "trin" && d.querySelectorAll("#hyp-skema .hs-koef.spm").length === 4);
+    H.aabn(2);
+    paastand("en løst opgave har alt fremme: kortet er grønt, og skemaet er udfyldt", H.tilstand === "bliv" && H.fremme &&
+        d.querySelectorAll("#hyp-skema .hs-celle.ok").length === 2 && /Massen af Na₂CO₃/.test(arkH()), skemaH());
     paastand("efter dommen viser luppen de rigtige ioner", (function () {
-        NK.visFane("fane-forsoeg"); A.forfra(); A.d.sted = "trefod"; A.d.flamme = "hoej"; tik(A, 6);
+        NK.visFane("fane-forsoeg"); O.aabn(0, true); A.d.sted = "trefod"; A.d.flamme = "hoej"; tik(A, 6);
         var t = Object.keys(A.lup.tilstand).map(function (k) { return A.lup.tilstand[k]; });
         return t.indexOf("CO3") >= 0 && t.indexOf("ukendt") < 0;
     }()));
@@ -482,12 +631,13 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("11. Hjælpen");
     NK.visFane("fane-hypoteser");
-    B.vaelg(0, false);
-    B.knap();
-    paastand("Giv hint: hintet står i kortet, lige over knappen", /^Hint:/.test(besked(B)) && B.el.besked.className.indexOf("gul") >= 0, besked(B));
-    B.knap();
-    paastand("Vis svaret: svaret og næste skridt står i kortet, og knappen er Giv hint igen", B.el.besked.className.indexOf("gul") >= 0 && !/Hint:/.test(besked(B)) &&
-        B.el.knap.textContent === "Giv et hint" && !B.el.knap.classList.contains("svar"), besked(B));
+    H.aabn(0, true);
+    H.hjaelpKlik();
+    paastand("Giv et hint: hintet står i kortet, lige over knappen", /Hint 1 af 3/.test(kortH()) && H.el.besked.parentNode === H.el.knap.parentNode &&
+        /hint/.test(H.el.bund.className), kortH());
+    H.hjaelpKlik(); H.hjaelpKlik(); H.hjaelpKlik();
+    paastand("Vis svaret: formlen og tallet står i kortet, og kortet er gult", H.tilstand === "bliv" && H.trinVist && /Svaret/.test(kortH()) &&
+        /0,0620 mol/.test(kortH()) && !!d.querySelector("#hyp-skema .hs-celle.svar"), kortH());
     paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText));
 
     /* ================================================================ */
@@ -504,15 +654,30 @@ function koerTest(W) {
             sim.tilpas(); sim.layout();
             var L = sim.lay, Wc = sim.L.b, Hc = sim.L.h;
             var navn = s[0] + "×" + s[1] + " " + id;
+            /* Fane 1 har intet panel fra runde T13 og testes fra 1000 px (som
+               T9, T10 og T12; REGELSAET 47: 1100 × 760 er det mindste) */
+            if (id === "fane-forsoeg" && s[0] < 1000) return;
             if (id === "fane-forsoeg") {
-                if (L.zoom.x + L.zoom.r > Wc + 1) problemer.push(navn + " luppen");
-                if (L.vaegt.x + L.vaegt.b / 2 > L.graf.x + 2) problemer.push(navn + " vægten rammer grafen");
+                if (L.zoom.x + L.zoom.r > L.ark.x - 4) problemer.push(navn + " luppen rammer arket");
+                if (L.ark.x + L.ark.b > Wc + 1) problemer.push(navn + " arket uden for");
+                if (L.vaegt.x + L.vaegt.b / 2 > L.zoom.x - L.zoom.r) problemer.push(navn + " vægten rammer luppen");
                 if (L.op.top - L.op.th * 0.5 < 0) problemer.push(navn + " trefoden");
                 if (L.zoom.y - L.zoom.r - 22 < sim.kortZone() + 4) problemer.push(navn + " luppen under kortet");
-                if (L.knapRamme.y + L.knapRamme.h > L.Hs + 2) problemer.push(navn + " knapperne");
-                if (L.graf.h < 80) problemer.push(navn + " grafen " + Math.round(L.graf.h));
+                if (L.zoom.y + L.zoom.r + 30 > L.bordY) problemer.push(navn + " luppen rammer bordet");
+                if (L.knapRamme.y + L.knapRamme.h > L.H + 2) problemer.push(navn + " knapperne");
+                if (L.ark.h < 200 || L.ark.y + L.ark.h > Hc) problemer.push(navn + " arket " + Math.round(L.ark.h));
+                if (!(L.grafH >= 100)) problemer.push(navn + " grafen " + Math.round(L.grafH));
             } else if (id === "fane-hypoteser") {
-                if (L.tavle.x + L.tavle.b > Wc || L.tavle.h < 120) problemer.push(navn + " tavlen " + Math.round(L.tavle.h));
+                /* Fane 2 har intet panel fra runde T13d og testes ogsaa fra 1000 px */
+                if (s[0] >= 1000) {
+                    var zone = sim.kortZone();
+                    if (L.skema.y < zone + 4) problemer.push(navn + " skemaet under kortet");
+                    if (L.ark.y < L.skema.y + L.skema.h) problemer.push(navn + " arket rammer skemaet");
+                    if (L.ark.h < 100 || L.ark.y + L.ark.h > Hc) problemer.push(navn + " arket " + Math.round(L.ark.h));
+                    if (!L.graf || L.graf.x < L.skema.x + L.skema.b || L.graf.x + L.graf.b > Wc + 1 || L.graf.h < 250) problemer.push(navn + " grafen");
+                    var se = d.getElementById("hyp-skema");
+                    if (se.scrollHeight > se.clientHeight + 1 || se.scrollWidth > se.clientWidth + 1) problemer.push(navn + " skemaet har ikke plads");
+                }
             } else {
                 if (L.st[1].x1 > Wc + 1 || L.st[0].x0 < 0) problemer.push(navn + " grupperne");
                 if (L.st[0].x1 > L.st[1].x0) problemer.push(navn + " grupperne overlapper");
@@ -527,22 +692,23 @@ function koerTest(W) {
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
-    paastand("layoutet holder fra 800 × 600 til 1500 × 900", problemer.length === 0, problemer.join("; "));
+    paastand("layoutet holder fra 800 × 600 til 1500 × 900 (fane 1 fra 1100 × 660)", problemer.length === 0, problemer.join("; "));
 
     /* ================================================================ */
     overskrift("13. Papirkortet (4. nov. 2026)");
     paastand("papirkortet er slået til: body.papirkort og de fælles filer", d.body.classList.contains("papirkort") &&
         !!d.querySelector('link[href="../faelles/papirkort.css"]') && !!NK.Papir);
-    paastand("hver fane har ét kort i scenen og intet opgavekort i panelet", ["forsoeg", "hypoteser", "fejl"].every(function (n) {
-        var k = d.getElementById(n + "-kort");
-        var sek = d.getElementById("fane-" + n);
+    paastand("hver fane har ét kort i scenen og intet opgavekort i panelet", [["forsoeg", "forsoeg", "-skort", "-hjknap"], ["hypoteser", "hyp", "-skort", "-hjknap"],
+        ["fejl", "fejl", "-kort", "-knap"]].every(function (x) {
+        var k = d.getElementById(x[1] + x[2]);
+        var sek = d.getElementById("fane-" + x[0]);
         return k && k.classList.contains("scenekort") && k.parentNode.classList.contains("scene") && !sek.querySelector(".panel .opgavekort") &&
-            !sek.querySelector(".panel .besked") && k.contains(d.getElementById(n + "-besked")) && k.contains(d.getElementById(n + "-knap")) &&
-            k.contains(d.getElementById(n + "-indsend"));
+            !sek.querySelector(".panel .besked") && k.contains(d.getElementById(x[1] + "-besked")) && k.contains(d.getElementById(x[1] + x[3])) &&
+            k.contains(d.getElementById(x[1] + "-indsend"));
     }));
     paastand("ingen statuslinje nederst i scenen", !d.querySelector(".scene .statuslinje, .scene > .besked, .scene > p"));
-    paastand("Start forfra og Kør igen står ikke på kortet", !d.getElementById("forsoeg-kort").contains(d.getElementById("forsoeg-forfra")) &&
-        !d.getElementById("fejl-kort").contains(d.getElementById("fejl-forfra")));
+    paastand("Start forfra og Kør igen står ikke på kortet", !d.getElementById("forsoeg-skort").contains(d.getElementById("forsoeg-forfra")) &&
+        !d.getElementById("hyp-skort").contains(d.getElementById("hyp-forfra")) && !d.getElementById("fejl-kort").contains(d.getElementById("fejl-forfra")));
     /* Efter den sidste fejlkilde er der ingen knap paa kortet */
     NK.visFane("fane-fejl");
     C.status.forEach(function (x) { x.loest = true; });
@@ -565,21 +731,33 @@ function koerTest(W) {
         ramme.style.height = s[1] + "px";
         var nv = s[0] + "×" + s[1];
         NK.visFane("fane-forsoeg"); A.tilpas(); A.layout();
-        NK.gaet = null; A.vaelg(0, false); A.forfra(); A.valgt = null; A.visKort(); maal(A, nv + " gæt");
-        A.vaelgSvar(1, "gaet"); maal(A, nv + " trin");
-        A.knap(); maal(A, nv + " hint");
-        A.besked(NK.html("Diglen er stadig varm, og vægten viser for lidt. Vent, til tallet står stille."), "skidt"); maal(A, nv + " fejl");
-        A.besked(NK.html(D.SVAR.tilVaegt + " " + D.LINJE.tilVaegt), "gul"); maal(A, nv + " svar");
+        /* Fane 1: hvert trin med hint, fejl og det groenne kort */
+        O.status = {}; O.aabn(0, true);
+        var maalA = function (hvad) { var k = O.el.kort, bund = k.offsetTop + k.offsetHeight; if (bund > A.kortZone() + 2) ud.push(nv + " " + hvad + " " + bund + " > " + A.kortZone()); };
+        maalA("opgave 1"); O.hjaelpKlik(); maalA("opgave 1 hint"); O.hjaelpKlik(); O.hjaelpKlik(); maalA("opgave 1 hint 3");
+        O.fejl(A.fejlTekster()[3]); maalA("opgave 1 fejl");
+        skriv(komma(A.proeve)); maalA("opgave 1 løst");
+        videre(); maalA("opgave 2 gæt");
+        d.querySelectorAll("#forsoeg-ind .sk-knap")[1].click(); maalA("opgave 2 trin 2"); O.hjaelpKlik(); O.hjaelpKlik(); maalA("opgave 2 hint");
+        O.aabn(3, true); maalA("opgave 4"); d.querySelectorAll("#forsoeg-ind .sk-knap")[0].click(); maalA("opgave 4 gættet");
+        /* Fane 2: hvert trin med hvert hint, en fejl, Vis svaret og dommen */
         NK.visFane("fane-hypoteser"); B.tilpas(); B.layout();
-        B.status.forEach(function (x) { x.loest = false; });
-        B.vaelg(1, false); maal(B, nv + " hypotese A");
-        B.knap(); maal(B, nv + " hypotese A hint");
-        B.knap(); maal(B, nv + " hypotese A svar");
-        [1, 2, 3].forEach(function (k) { B.status[k].loest = true; }); B.opdaterForventet();
-        NK.forventet = { A: 1.92, B: 3.29, C: 2.48 };
-        B.vaelg(4, false); maal(B, nv + " dommen");
-        B.domValg = "C"; B.indsend(); maal(B, nv + " dommen forkert");
-        B.domValg = "B"; B.indsend(); maal(B, nv + " dommen løst");
+        var maalB = function (hvad) { var k = H.el.kort, bund = k.offsetTop + k.offsetHeight; if (bund > B.kortZone() + 2) ud.push(nv + " " + hvad + " " + bund + " > " + B.kortZone()); };
+        H.status = {};
+        [0, 1, 2, 3].forEach(function (nr) {
+            H.aabn(nr, true);
+            for (var q = 0; q < 30 && H.nr === nr; q++) {
+                var t = H.trin(), hvad = "opgave " + (nr + 1) + " trin " + (H.trinNr + 1);
+                if (H.tilstand === "bliv") { maalB(hvad + " løst"); H.videre(); continue; }
+                maalB(hvad);
+                if (H.hjaelp === 0) { H.fejl(t.type === "afstem" ? "Der er 12 Na til venstre og 10 til højre." : "Brug molarmassen for Na₂CO₃, ikke for natron."); maalB(hvad + " fejl"); }
+                H.hjaelpKlik(); maalB(hvad + " hint " + H.hjaelp);
+            }
+        });
+        H.aabn(4, true); maalB("dommen");
+        vaelgH(0); maalB("dommen forkert");
+        vaelgH(1); maalB("dommen løst");
+        H.visResultat(); maalB("fri leg efter alle opgaverne");
         NK.visFane("fane-fejl"); C.tilpas(); C.layout();
         D.FEJL.forEach(function (o, n) {
             C.vaelg(n, false); maal(C, nv + " fejlkilde " + o.id);
@@ -590,7 +768,7 @@ function koerTest(W) {
         NK.visFane("fane-fejl"); C.layout();
         if (C.lay.skiltY < C.kortZone() + 4) ud.push(nv + " skiltene på fane 3 under kortet");
         NK.visFane("fane-hypoteser"); B.layout();
-        if (B.lay.tavle.y < B.kortZone() + 4) ud.push(nv + " tavlen under kortet");
+        if (B.lay.skema.y < B.kortZone() + 4) ud.push(nv + " skemaet under kortet");
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
@@ -599,34 +777,28 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("Opgavelisten: titlerne låses op i takt (21. nov. 2026)");
     (function () {
-        var X = B, sel = "#hypoteser-liste .hyldelinje";
-        function knapper() { return [].slice.call(d.querySelectorAll(sel)); }
+        function knapper() { return [].slice.call(d.querySelectorAll("#hyp-liste .or-knap")); }
         function tekster() { return knapper().map(function (c) { return c.textContent.trim(); }).join(" | "); }
         NK.visFane("fane-hypoteser");
-        X.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-        X.naaet = {};
-        X.vaelg(0);
-        var OP = X.opgaver, ch = knapper();
-        function titel(o) { return o.titel; }
-        paastand("ved start viser listen kun titlen på opgave 1; de andre er et nummer med en grå streg og kan ikke klikkes",
-            ch.length === OP.length && ch.length > 1 && ch[0].textContent.indexOf(titel(OP[0])) >= 0 && !ch[0].disabled &&
-            ch.slice(1).every(function (c, j) { return c.disabled && c.classList.contains("laast") && !!c.querySelector(".hl-streg") && c.textContent.trim() === String(j + 2) && !c.title; }),
-            tekster());
-        ch[ch.length - 1].click();
-        paastand("et klik på en låst opgave gør intet", X.nr === 0, X.nr);
-        for (var n = 0; n < 40 && !X.faerdig; n++) { X.knap(); tik(X, 0.1); }
+        H.status = {}; H.gem();
+        H.aabn(0, true);
+        var ch = knapper();
+        paastand("ved start viser rækken kun titlen på opgave 1; de andre er et nummer og kan ikke klikkes",
+            ch.length === 5 && ch[0].textContent.indexOf("Natron i mol") >= 0 && !ch[0].disabled &&
+            ch.slice(1).every(function (c, j) { return c.disabled && c.classList.contains("laast") && c.textContent.trim() === String(j + 2); }), tekster());
+        ch[4].click();
+        paastand("et klik på en låst opgave gør intet", H.nr === 0, H.nr);
+        for (var n = 0; n < 10 && H.tilstand !== "bliv"; n++) H.hjaelpKlik();
         ch = knapper();
         paastand("når opgave 1 er løst (Vis svaret tæller som løst), kommer titlen på opgave 2 frem; de senere er stadig låst",
-            X.faerdig && ch[1].textContent.indexOf(titel(OP[1])) >= 0 && !ch[1].disabled &&
-            ch.slice(2).every(function (c) { return c.disabled && !!c.querySelector(".hl-streg"); }), tekster());
-        var sidste = OP.length - 1;
-        X.status[sidste].loest = true; X.visListe();
+            H.status.nat === "loest" && ch[1].textContent.indexOf("Hypotese A") >= 0 && !ch[1].disabled &&
+            ch.slice(2).every(function (c) { return c.disabled; }), tekster());
+        H.status = { nat: "stjerne", A: "loest", B: "loest", C: "loest", dom: "loest" }; H.visRaekke();
         ch = knapper();
-        paastand("en opgave, der er løst før (gemt i browseren), har sin titel og kan vælges",
-            ch[sidste].textContent.indexOf(titel(OP[sidste])) >= 0 && !ch[sidste].disabled, tekster());
-        X.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-        X.naaet = {};
-        X.vaelg(0);
+        paastand("løste opgaver har titlen, ✓ eller ★ og kan vælges", ch.every(function (c) { return !c.disabled; }) && /★/.test(ch[0].textContent) &&
+            /✓/.test(ch[1].textContent), tekster());
+        H.status = {}; H.gem();
+        H.aabn(0, true);
     })();
 }
 </script>

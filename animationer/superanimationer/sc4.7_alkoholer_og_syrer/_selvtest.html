@@ -196,21 +196,53 @@ async function koerTest(W) {
     }
     if (NK.Lup.parBindinger(D.stof("COOH", 0)) !== 2) parFejl.push("methansyre");
     paastand("luppen: 0 hydrogenbindinger pr. par alkaner, 1 pr. par alkoholer, 2 pr. par syrer", parFejl.length === 0, parFejl.join(", "));
-    var vandOk = [1, 2, 4, 8].every(function (n) { return NK.Lup.vandBindinger(D.stof("OH", n)) >= 2 && NK.Lup.vandBindinger(D.stof("H", n)) === 0; });
-    paastand("luppen i vand: en alkohol har hydrogenbindinger til vandet, en alkan ingen", vandOk);
-    paastand("luppen i vand: glycerol har flere hydrogenbindinger end ethanol", NK.Lup.vandBindinger(D.stof("glycerol", 3)) > NK.Lup.vandBindinger(D.stof("OH", 2)));
-    var vt = NK.Lup.vandTjek(D.stof("OH", 4), { x: 0, y: 0, b: 330, h: 200 });
-    paastand("luppen i vand: klammerne viser upolær kæde og polær gruppe", vt.klammer.join("|") === "upolær kæde|polær gruppe", vt.klammer.join("|"));
-    paastand("luppen i vand: en alkan har kun en upolær klamme", NK.Lup.vandTjek(D.stof("H", 5), { x: 0, y: 0, b: 330, h: 200 }).klammer.join("|") === "upolært");
-    var udenfor = [];
+    /* Luppen paa fane 3 (runde T11b): eleven bygger selv hydrogenbindingerne */
+    function lupV(s, R) { var l = new NK.LupVand(); l.saet(s, true); if (R) l.layout(R); return l; }
+    function afs(a, b) { return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)); }
+    var pl = [["OH", 2, 1], ["OH", 5, 1], ["COOH", 3, 1], ["COOH", 0, 1], ["glycerol", 3, 3], ["H", 5, 0], ["H", 0, 0], ["OH", 0, 2]];
+    var plFejl = pl.filter(function (p) { return lupV(D.stof(p[0], p[1])).antalSteder() !== p[2]; }).map(function (p) { return p[0] + p[1]; });
+    paastand("luppen i vand: én plads til vand pr. H i en polær gruppe (alkohol 1, syre 1, glycerol 3, alkan 0)", plFejl.length === 0, plFejl.join(", "));
+    var geoFejl = [];
     D.alle().concat([D.stof("glycerol", 3)]).forEach(function (s) {
-        [[240, 130], [330, 200]].forEach(function (st) {
-            var t = NK.Lup.vandTjek(s, { x: 0, y: 0, b: st[0], h: st[1] });
-            if (!t.inde) udenfor.push(s.id + " " + st.join("×"));
+        var md = lupV(s).md;
+        md.steder.forEach(function (st) {
+            var o = st.vand[0], dd = afs(st.h, o);
+            if (o.s !== "O" || Math.abs(dd - 3) > 0.01) geoFejl.push(s.id + " H...O " + dd.toFixed(2));
+            st.vand.slice(1).forEach(function (w) { if (afs(w, st.h) <= dd) geoFejl.push(s.id + ": vandets H peger mod gruppen"); });
+            st.vand.forEach(function (w) {
+                md.atomer.forEach(function (a) { if (afs(w, a) < (w.s === "H" && a.s === "H" ? 1.24 : 1.5)) geoFejl.push(s.id + ": vandet rører molekylet"); });
+                md.steder.forEach(function (st2) { if (st2 !== st) st2.vand.forEach(function (w2) { if (afs(w, w2) < 1.2) geoFejl.push(s.id + ": to vandmolekyler rører"); }); });
+            });
         });
     });
-    paastand("luppen i vand: molekylet og klammerne er inde i luppen, også i en lille lup", udenfor.length === 0, udenfor.slice(0, 4).join(", "));
-    paastand("luppen i vand: få vandmolekyler (fokuseret)", vt.vand <= 30, vt.vand);
+    paastand("luppen i vand: den stiplede linje går fra H i gruppen til O i vandet, vandets H peger væk, og intet rører", geoFejl.length === 0, geoFejl.slice(0, 3).join(" | "));
+    function saetn(g, n) { return lupV(D.stof(g, n)).md.saetn.map(function (x) { return x.foer + " " + x.ord; }).join("|"); }
+    paastand("luppen i vand: sætningerne er Kæden er upolær og OH-gruppen er polær", saetn("OH", 4) === "Kæden er upolær|OH-gruppen er polær", saetn("OH", 4));
+    paastand("luppen i vand: en syre har COOH-gruppen er polær, en alkan Molekylet er upolært", /COOH-gruppen er polær/.test(saetn("COOH", 4)) && saetn("H", 5) === "Molekylet er upolært", saetn("H", 5));
+    paastand("luppen i vand: glycerol har Alle tre OH-grupper er polære", saetn("glycerol", 3) === "Alle tre OH-grupper er polære");
+    /* Molekylet, vandet paa alle pladser og saetningerne er inde i luppen,
+       ved siden af bakken, og intet atom staar ned i en saetning */
+    var lupUd = [];
+    D.alle().concat([D.stof("glycerol", 3)]).forEach(function (s) {
+        [[440, 140], [470, 235], [600, 320]].forEach(function (st) {
+            var R = { x: 10, y: 10, b: st[0], h: st[1] }, l = lupV(s, R), L = l.cache, md = l.md;
+            var bakkeX = L.bakke.x + L.bakke.b;
+            var atomer = md.atomer.concat([].concat.apply([], md.steder.map(function (x) { return x.vand; })));
+            atomer.forEach(function (a) {
+                var x = L.ox + a.x * L.r, y = L.oy + a.y * L.r, rr = L.r * (a.s === "H" ? 0.62 : 1);
+                if (x - rr < bakkeX || x + rr > R.x + R.b || y - rr < R.y || y + rr > R.y + R.h) lupUd.push(s.id + " " + st.join("×") + " atom");
+            });
+            L.saetn.forEach(function (sl) {
+                if (sl.tx < bakkeX || sl.felt.x + sl.felt.b > R.x + R.b + 1 || sl.felt.y + 26 > R.y + R.h) lupUd.push(s.id + " " + st.join("×") + " sætning");
+                var x0 = Math.min(sl.x0, sl.tx), x1 = Math.max(sl.x1, sl.felt.x + sl.felt.b);
+                atomer.forEach(function (a) {
+                    var x = L.ox + a.x * L.r, y = L.oy + a.y * L.r, rr = L.r * (a.s === "H" ? 0.62 : 1);
+                    if (x + rr > x0 && x - rr < x1 && y + rr > sl.y - 4) lupUd.push(s.id + " " + st.join("×") + " atom i sætningen");
+                });
+            });
+        });
+    });
+    paastand("luppen i vand: molekylet, vandet og sætningerne er inde i luppen, også i en lille lup", lupUd.length === 0, lupUd.slice(0, 4).join(", "));
     var kl = [2, 4, 6, 8].map(function (n) { return NK.Lup.kontaktLaengde(D.stof("H", n)); });
     paastand("luppen: kontaktfladerne bliver længere med kæden", kl[0] < kl[1] && kl[1] < kl[2] && kl[2] < kl[3], kl.map(function (x) { return x.toFixed(1); }).join(" "));
 
@@ -236,6 +268,7 @@ async function koerTest(W) {
     var vandProever = [["OH", 4], ["OH", 5], ["OH", 8], ["COOH", 0], ["COOH", 3], ["COOH", 4], ["COOH", 7], ["glycerol", 3]];
     function medStof(p) { var sim = Object.create(V); sim.stofNu = function () { return D.stof(p[0], p[1]); }; sim.n = p[1]; return sim; }
     function tAf(v, sim) { return typeof v === "function" ? v(sim) : v; }
+    var indforstaaet = [];
     D.OPG_VAND.forEach(function (o) {
         graense(o.navn, 22, o.id + " navn");
         o.trin.forEach(function (t) {
@@ -248,10 +281,18 @@ async function koerTest(W) {
                 if (t.tjek) { var f = t.tjek(D.stof(p[0], p[1])); if (f) graense(f, 110, o.id + " tjek"); }
                 if (t.beskedVed) { var b = t.beskedVed(D.stof(p[0], p[1])); if (b) graense(b, 110, o.id + " besked"); }
             });
-            (t.hint || []).forEach(function (h) { graense(h, 100, o.id + " hint"); });
+            vandProever.forEach(function (p) {
+                var sim = medStof(p);
+                (t.hint || []).forEach(function (h) { graense(tAf(h, sim), 100, o.id + " hint"); });
+                if (t.ikkeEndnu) graense(tAf(t.ikkeEndnu, sim), 110, o.id + " ikke endnu");
+                /* REGELSAET 65: ingen indforstaaede beskeder om skaermen paa kortet */
+                [tAf(t.tekst, sim) || "", tAf(t.spm, sim)].forEach(function (k) { if (/skjult|Brug tommelfingerreglen/i.test(k)) indforstaaet.push(o.id + ": " + k.slice(0, 40)); });
+            });
             (t.svar || []).forEach(function (sv) { graense(sv.t, 34, o.id + " svar"); if (sv.nej) graense(sv.nej, 110, o.id + " nej"); });
         });
     });
+    Object.keys(D.VAND_BESKED).forEach(function (k) { graense(D.VAND_BESKED[k], 110, "vand " + k); });
+    paastand("fane 3: kortet siger ikke \"Glasset er skjult\" eller \"Brug tommelfingerreglen\" (REGELSAET 65)", indforstaaet.length === 0, indforstaaet.slice(0, 2).join(" | "));
     [D.VAND_FRI.pause, D.VAND_FRI.alle, D.VAND_FRI.alleSpm].forEach(function (t) { graense(t, 110, "fri leg"); });
     paastand("alle tekster er inden for grænserne", langt.length === 0, langt.slice(0, 3).join(" | "));
     var alt = tekster.join(" ") + " " + d.body.innerText;
@@ -262,7 +303,9 @@ async function koerTest(W) {
     var pladser = {};
     D.N_MAAL.concat(D.K_MAAL).forEach(function (o) { o.dele.forEach(function (del) { if (del.svar) del.svar.forEach(function (sv, i) { if (sv.ok) pladser[i] = (pladser[i] || 0) + 1; }); }); });
     D.OPG_VAND.forEach(function (o) { o.trin.forEach(function (t) { if (t.svar) t.svar.forEach(function (sv, i) { if (sv.ok) pladser[i] = (pladser[i] || 0) + 1; }); }); });
-    paastand("det rigtige svar står på forskellige pladser (ikke altid først)", Object.keys(pladser).length >= 3 && (pladser[0] || 0) <= 3, JSON.stringify(pladser));
+    /* T11b: fane 3 har ingen svarknapper laengere (svarene traekkes), saa
+       kun fane 1 og 2 taeller her: mindst to forskellige pladser */
+    paastand("det rigtige svar står på forskellige pladser (ikke altid først)", Object.keys(pladser).length >= 2 && (pladser[0] || 0) <= 3, JSON.stringify(pladser));
     paastand("spørgsmålene nævner ikke det rigtige svar", D.N_MAAL.concat(D.K_MAAL).every(function (o) {
         return o.dele.every(function (del) { return !del.svar || del.svar.every(function (sv) { return !sv.ok || del.tekst.indexOf(sv.t) < 0; }); });
     }));
@@ -403,7 +446,7 @@ async function koerTest(W) {
     paastand("opgave 2 er løst, og begge er løst", K.faerdig && K.antalLoest() === 2);
     paastand("efter sidste opgave fører knappen videre til fane 3", /I vand/.test(K.el.skort.innerText));
 
-    overskrift("5. Fane 3: I vand (runde T11, med musen)");
+    overskrift("5. Fane 3: I vand (runde T11b, med musen)");
     var O = V.opgaver;
     visFane("fane-v"); V.tilpas(); V.layout();
     O.status = {}; O.gem(); O.aabn(0, true);
@@ -412,79 +455,112 @@ async function koerTest(W) {
     function vBlink() { return V.e.skort.classList.contains("blink"); }
     function vNulBlink() { V.e.skort.classList.remove("blink"); }
     function vVent(sek) { for (var t = 0; t < sek; t += 1 / 60) V.opdater(1 / 60); }
-    function vSvar(t) { var j = -1; O.trin().svar.forEach(function (sv, i) { if (sv.t === t) j = i; }); var k = V.e.skort.querySelector('[data-nr="' + j + '"]'); if (k) klikKnap(k); return !!k; }
-    function vVidere() { var k = V.e.skort.querySelector("[data-videre]"); if (k) klikKnap(k); return !!k; }
+    function vVidere() { var k = V.e.skort.querySelector("[data-videre]"); if (k) klikKnap(k); vVent(0.05); V.tegn(); return !!k; }
     function vBesked() { return O.el.besked.innerText; }
     function raekke() { return [].slice.call(d.querySelectorAll("#vand-liste .or-knap")); }
+    function px(sel) { var e = V.e.skort.querySelector(sel); return e ? parseFloat(W.getComputedStyle(e).fontSize) : 0; }
+    function groent() { return O.tilstand === "bliv" && /✓ Rigtigt/.test(vKort()) && px(".vbliv .b-maerke") >= 20; }
+    function lupP() { vVent(0.05); V.tegn(); return V.lup.punkter(V.lay.lup); }
+    function vandTil(til) { var B = lupP().bakke, nr = -1; B.pladser.forEach(function (p, i) { if (nr < 0 && !V.lup.brugt[i]) nr = i; }); traek(V, B.pladser[nr], til); vVent(0.05); }
+    function ordTil(id, til) { var c = null; lupP().bakke.chips.forEach(function (x) { if (x.id === id) c = x; }); traek(V, midt(c), til); vVent(0.05); }
+    function felt(id) { var f = null; lupP().felter.forEach(function (x) { if (x.id === id) f = x; }); return f; }
+    function vSvar(t) { var j = -1; O.trin().svar.forEach(function (sv, i) { if (sv.t === t) j = i; }); var k = V.e.skort.querySelector('[data-nr="' + j + '"]'); if (k) klikKnap(k); return !!k; }
+    vVent(0.05); V.tegn();
     var rk = raekke();
     paastand("fane 3 har intet panel og tre opgaver i rækken øverst", !d.querySelector("#fane-v .panel") && rk.length === 3);
     paastand("ved start har kun opgave 1 en titel; 2 og 3 er låst", rk[0].textContent.indexOf("Alkoholer i vand") >= 0 && rk[1].disabled && rk[2].disabled && !rk[1].querySelector(".or-navn").textContent);
     paastand("opgave 1: ethanol, og glasset viser ét lag", V.stofNu().navn === "ethanol" && D.oplNoegle(V.glas.stof) === "ja" && !V.skjult("glas"));
     paastand("opgave 1: luppen og tommelfingerreglen er stiplede pladser", V.skjult("lup") && V.skjult("regel"));
+    paastand("spørgsmålet står i stor skrift (mindst 20 px, REGELSAET 65)", px(".sk-spm") >= 20, px(".sk-spm"));
     var vp = V.visPaaPladen();
     paastand("opgave 1: pladen har kun − og +, ingen grupper og ingen skifter", vp.kontrol && !vp.stil && vp.tiles.length === 0);
+    paastand("pladen tæller alle carbonatomer (også C i COOH)", V.plade.carbonIAlt === true);
     klikR(V, V.plade.r.tiles.COOH);
     paastand("grupperne er væk: et klik dér ændrer ikke molekylet", V.g === "OH");
     paastand("skiltet peger på +", !!O.opfordring() && O.opfordring().el === "plus");
     plus(V); vVent(2.5);
-    paastand("propan-1-ol: ét lag, og kortet venter", V.stofNu().navn === "propan-1-ol" && D.oplNoegle(V.glas.stof) === "ja" && O.trinNr === 0);
+    paastand("propan-1-ol: ét lag, og kortet venter", V.stofNu().navn === "propan-1-ol" && D.oplNoegle(V.glas.stof) === "ja" && O.trinNr === 0 && O.tilstand === "trin");
     paastand("skiltet ved + er væk efter første klik", !O.opfordring());
     plus(V); vVent(3);
-    paastand("butan-1-ol: kun delvist, kortet siger grænsen og venter", D.oplNoegle(V.glas.stof) === "delvist" && /grænsen/.test(vBesked()) && O.trinNr === 0, vBesked());
+    paastand("butan-1-ol: kun delvist, kortet siger grænsen som en stille besked og venter", D.oplNoegle(V.glas.stof) === "delvist" && /grænsen/.test(vBesked()) && !vRoed() && O.tilstand === "trin", vBesked());
     plus(V); vVent(1);
-    paastand("pentan-1-ol: kortet venter, til lagene har skilt sig", O.trinNr === 0 && !/grænsen/.test(vBesked()));
-    vVent(3);
-    paastand("pentan-1-ol: to lag, og kortet går selv videre til trin 2", D.oplNoegle(V.glas.stof) === "nej" && O.trinNr === 1);
-    paastand("trin 2: luppen er stadig en stiplet plads, og glasset har skilt", V.skjult("lup") && !!O.opfordring() && O.opfordring().el === "glas");
+    paastand("pentan-1-ol: kortet venter, til lagene har skilt sig", O.tilstand === "trin" && O.trinNr === 0);
+    vVent(2);
+    paastand("pentan-1-ol: to lag, og kortet bliver grønt med et stort ✓ Rigtigt (REGELSAET 66)", D.oplNoegle(V.glas.stof) === "nej" && groent() && O.trinNr === 0 && /to lag/.test(vKort()));
+    paastand("mens kortet er grønt: ingen gul opfordring og intet vand i luppen endnu", !O.opfordring() && V.lup.antalFast() === 0 && V.lup.modus.auto === false);
+    vVidere();
+    paastand("trin 2: luppen er fremme, bakken har vand, og skiltet peger på bakken", O.trinNr === 1 && !V.skjult("lup") && V.lup.modus.vand && !!O.opfordring() && O.opfordring().el === "lup:vand");
     plus(V);
     paastand("trin 2: + er væk, og kæden er uændret", V.stofNu().n === 5 && !V.visPaaPladen().kontrol);
-    V.tegn(); klikR(V, V.glasR);
-    paastand("klik på glasset: luppen kommer frem", !V.skjult("lup"));
-    vVent(1.5);
-    paastand("trin 3: spørgsmålet nævner pentan-1-ol og ethanol", O.trinNr === 2 && /pentan-1-ol/.test(vKort()) && /ethanol/.test(vKort()));
-    paastand("under spørgsmålet: ingen knapper på pladen", !V.visPaaPladen().kontrol && !V.visPaaPladen().tiles.length);
-    vNulBlink(); V.tegn(); klikR(V, V.glasR);
-    paastand("et klik på glasset under spørgsmålet får kortet til at blinke", vBlink());
-    paastand("Indsend svar er gråt, til et svar er valgt", O.el.indsend.classList.contains("ikke-klar"));
-    vSvar("Alkoholen er tungere end vand");
-    paastand("et svar vælger kun", !vRoed() && O.tilstand === "trin");
-    klikKnap(O.el.indsend);
-    paastand("tungere end vand er forkert med forklaring", vRoed() && /øverst/.test(vBesked()), vBesked());
-    vSvar("Den lange kæde er upolær"); klikKnap(O.el.indsend);
-    paastand("den lange kæde er rigtig; kortet bliver på spørgsmålet med forklaringen", O.tilstand === "bliv" && /hydrogenbindinger/.test(vKort()) && /H tiltrækker O/.test(vKort()));
-    paastand("tommelfingerreglen er stadig en stiplet plads", V.skjult("regel"));
-    paastand("opgave 1 er løst uden stjerne (ét forkert svar)", O.status.alkohol === "loest", O.status.alkohol);
+    var P = lupP();
+    vandTil(P.kaede[1]); vVent(0.8);
+    paastand("vand sluppet på kæden glider tilbage med en stille besked, ikke Ikke rigtigt (REGELSAET 67)", V.lup.antalFast() === 0 && /kæden/.test(vBesked()) && !vRoed() && !O.fejlet, vBesked());
+    paastand("skiltet ved bakken er væk efter første træk", !O.opfordring());
+    vandTil(P.steder[0]);
+    paastand("vand sluppet ved OH-gruppen hænger fast", V.lup.antalFast() === 1 && !/kæden/.test(vBesked()));
+    vVent(1.2);
+    paastand("trin 2 klaret: grønt kort, der forklarer hydrogenbindingen", groent() && /hydrogenbinding/.test(vKort()) && /H i OH-gruppen tiltrækker O/.test(vKort()));
+    vVidere();
+    var P2 = lupP();
+    paastand("trin 3: ordene i bakken og to tomme sætninger under pentan-1-ol", O.trinNr === 2 && V.lup.modus.ord && P2.felter.length === 2 && O.opfordring().el === "lup:ord");
+    ordTil("polaer", felt("kaede"));
+    paastand("polær i sætningen om kæden er forkert med forklaring", vRoed() && /kun C og H/.test(vBesked()) && !V.lup.ord.kaede, vBesked());
+    vVent(0.8);
+    ordTil("upolaer", felt("kaede"));
+    paastand("upolær passer til kæden", V.lup.ord.kaede === "upolaer" && !vRoed());
+    ordTil("polaer", felt("gruppe")); vVent(1);
+    paastand("begge ord på plads: grønt kort om den lange upolære kæde", groent() && /upolære kæde/.test(vKort()));
+    paastand("opgave 1 er løst uden stjerne (ét forkert ord)", O.status.alkohol === "loest", O.status.alkohol);
+    paastand("efter sidste trin: knappen siger Næste opgave", /Næste opgave/.test(vKort()));
     vVidere();
     vp = V.visPaaPladen();
     paastand("opgave 2: ethanol, glasset er skjult, og kun COOH står på hylden", O.nr === 1 && V.stofNu().navn === "ethanol" && V.skjult("glas") && vp.tiles.join() === "COOH" && !vp.kontrol);
-    paastand("opgave 2: luppen er fremme fra opgave 1", !V.skjult("lup"));
-    traekGruppe(V, "COOH");
-    paastand("COOH trækkes hen på kæden: propansyre", V.stofNu().navn === "propansyre");
-    vVent(1.5);
+    paastand("opgave 2: luppen er fremme fra opgave 1 og viser vandet af sig selv", !V.skjult("lup") && V.lup.modus.auto && !V.lup.modus.vand);
+    traekGruppe(V, "COOH"); vVent(1);
+    paastand("COOH på kæden: propansyre og et grønt kort, hvor C i COOH tæller med", V.stofNu().navn === "propansyre" && groent() && /C i COOH-gruppen tæller med/.test(vKort()) && /Propansyre har 3 carbonatomer/.test(vKort()));
+    vVidere();
     paastand("trin 2: tommelfingerreglen kommer frem, glasset er stadig skjult", O.trinNr === 1 && !V.skjult("regel") && V.skjult("glas"));
+    paastand("trin 2: kortet beder konkret om den korteste carboxylsyre med to lag", /korteste carboxylsyre, der giver to lag/.test(vKort()) && !/skjult/i.test(vKort()));
     klikKnap(O.el.indsend);
-    paastand("propansyre er forkert (kan blandes med vand)", vRoed() && /blandes/.test(vBesked()), vBesked());
+    paastand("propansyre er forkert (blandes med vand)", vRoed() && /blandes/.test(vBesked()), vBesked());
     plus(V); klikKnap(O.el.indsend);
     paastand("butansyre ligger på grænsen (forkert)", vRoed() && /grænsen/.test(vBesked()), vBesked());
-    plus(V); klikKnap(O.el.indsend);
-    paastand("pentansyre er rigtig, og glasset kommer frem med to lag", O.tilstand === "bliv" && !V.skjult("glas") && D.oplNoegle(V.glas.stof) === "nej" && /5 carbonatomer/.test(vKort()));
+    plus(V); plus(V); klikKnap(O.el.indsend);
+    paastand("hexansyre er for lang: der findes en kortere", vRoed() && /kortere/.test(vBesked()), vBesked());
+    minus(V); klikKnap(O.el.indsend);
+    paastand("pentansyre er rigtig, og glasset kommer frem med to lag", groent() && !V.skjult("glas") && D.oplNoegle(V.glas.stof) === "nej" && /5 carbonatomer/.test(vKort()));
     vVidere();
-    paastand("opgave 3: glycerol, glasset er skjult under spørgsmålet", O.nr === 2 && V.stofNu().id === "glycerol" && V.skjult("glas"));
-    vSvar("Kun delvist"); klikKnap(O.el.indsend);
-    paastand("kun delvist er forkert", vRoed());
-    vSvar("Ja, i alle forhold"); klikKnap(O.el.indsend);
-    paastand("glycerol kan blandes, og glasset kommer frem", O.tilstand === "bliv" && !V.skjult("glas"));
+    paastand("opgave 3: glycerol, glasset er skjult, og bakken har vand", O.nr === 2 && V.stofNu().id === "glycerol" && V.skjult("glas") && V.lup.modus.vand && V.lup.antalSteder() === 3);
+    var P3 = lupP();
+    vandTil(P3.kaede[1]); vVent(1);
+    paastand("glycerol: vand på kæden glider tilbage", V.lup.antalFast() === 0 && /kæden/.test(vBesked()));
+    vandTil(P3.steder[0]); vandTil(P3.steder[1]); vVent(1.2);
+    paastand("to af tre OH-grupper: kortet venter", O.tilstand === "trin" && V.lup.antalFast() === 2);
+    vandTil(P3.steder[2]); vVent(1.2);
+    paastand("vand ved alle tre OH-grupper: grønt kort", groent() && /Alle tre OH-grupper/.test(vKort()));
+    vVidere();
+    paastand("trin 2: to korte svar i kortet (Ét lag og To lag), og glasset er skjult", O.trinNr === 1 && V.skjult("glas") && O.trin().svar.length === 2 && !!V.e.skort.querySelector('[data-nr="1"]') && /Ét lag/.test(vKort()) && /To lag/.test(vKort()));
+    vSvar("To lag");
+    paastand("et svar vælger kun", !vRoed() && O.tilstand === "trin");
+    klikKnap(O.el.indsend);
+    paastand("To lag er forkert med forklaring, og glasset er stadig skjult", vRoed() && /1 carbonatom pr. OH-gruppe/.test(vBesked()) && V.skjult("glas"), vBesked());
+    vSvar("Ét lag"); klikKnap(O.el.indsend); vVent(1);
+    paastand("Ét lag er rigtigt: grønt kort, og glasset kommer frem med ét lag", groent() && !V.skjult("glas") && D.oplNoegle(V.glas.stof) === "ja");
     paastand("efter sidste opgave fører knappen til fri leg", /fri leg/i.test(vKort()));
     vVidere();
     vp = V.visPaaPladen();
     paastand("fri leg: alle grupperne, skifteren og knapperne er fremme, og der er ingen grøn knap", O.erFri() && vp.stil && vp.kontrol && vp.tiles.length === 3 && !V.e.skort.querySelector("[data-videre]"));
+    paastand("fri leg: vandet i luppen kan trækkes", V.lup.modus.vand);
     paastand("alle tre er løst", O.alleLoest());
-    traekGruppe(V, "H");
+    traekGruppe(V, "H"); vVent(0.5);
     paastand("fri leg: −H giver en alkan, og glasset viser to lag", V.stofNu().klasse === "alkan" && D.oplNoegle(V.glas.stof) !== "ja");
+    var P4 = lupP();
+    vandTil(P4.kaede[0]); vVent(0.5);
+    paastand("fri leg: vand på en alkan glider tilbage med en besked om den polære gruppe", V.lup.antalFast() === 0 && /polær gruppe/.test(vKort()), vKort());
     klikKnap(V.e.skort.querySelector(".sk-luk"));
     paastand("fri leg: det røde kryds lukker kortet", V.e.skort.hidden);
     klikKnap(O.el.forfra);
-    paastand("Start forfra giver opgave 1 med trinene igen", O.nr === 0 && O.trinNr === 0 && V.skjult("lup") && V.stofNu().navn === "ethanol" && !V.e.skort.hidden);
+    paastand("Start forfra giver opgave 1 med trinene igen", O.nr === 0 && O.trinNr === 0 && V.skjult("lup") && V.stofNu().navn === "ethanol" && !V.e.skort.hidden && V.lup.antalFast() === 0);
     klikKnap(O.el.fri);
     paastand("Fri leg: alt kan bruges, og kortet har et rødt kryds", O.erFri() && !!V.e.skort.querySelector(".sk-luk"));
     klikKnap(O.el.fri);
@@ -611,8 +687,14 @@ async function koerTest(W) {
         if (pr3.formel.h < 70) ud3.push("formlen " + Math.round(pr3.formel.h));
         if (V.plade.skala.alle < 26) ud3.push("formlen er lille: " + V.plade.skala.alle.toFixed(1));
         ["H", "OH", "COOH"].forEach(function (g) { var t = pr3.tiles[g]; if (t.x < L3.plade.x || t.x + t.b > L3.plade.x + L3.plade.b) ud3.push("gruppen " + g); });
-        var lt = NK.Lup.vandTjek(D.stof("OH", 8), L3.lup);
-        if (!lt.inde) ud3.push("octan-1-ol og klammerne er ikke inde i luppen");
+        /* Molekylerne i luppen er store nok til at laese atomsymbolerne (REGELSAET 45) */
+        ["OH", 5, "COOH", 4, "glycerol", 3].forEach(function (x, q, arr) {
+            if (q % 2) return;
+            var l = lupV(D.stof(arr[q], arr[q + 1]), L3.lup);
+            /* Kun i de tre stoerrelser fra REGELSAET (hoejde 700 og derover);
+               i 1100 × 620 er det nok, at alt er inde i luppen (afsnit 1) */
+            if (hh >= 700 && l.cache.r < 18) ud3.push(arr[q] + " i luppen er lille: r = " + l.cache.r.toFixed(1));
+        });
         paastand(bb + " × " + hh + " fane-v: pladen, glasset, reglen og luppen er på plads", ud3.length === 0, ud3.join(" | "));
     }
     ramme.style.width = "1300px";

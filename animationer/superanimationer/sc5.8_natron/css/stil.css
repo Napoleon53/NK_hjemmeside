@@ -1240,3 +1240,317 @@ html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { font-size: 0.9
 .hyldelinje.laast { cursor: default; opacity: 0.75; }
 .hyldelinje.laast:hover { background-color: rgba(255, 255, 255, 0.045); border-color: transparent; }
 .hl-streg { display: block; width: 62%; height: 9px; border-radius: 5px; background-color: #4a4a58; }
+
+/* =====================================================================
+   Fane 1 "Varm og vej" og fane 2 "Hypoteserne" uden panel (runde T13 og
+   T13d, 28. nov. 2026, REGELSAET 2-3)
+   Raekken er en kopi af ../sc5.6_maengdeberegning (T12) og
+   ../sc4.7_alkoholer_og_syrer (T11), det groenne kort af T11 og feltet i
+   kortet af T12 (.kt-felt). Decimaltal med PUNKTUM i CSS.
+   ===================================================================== */
+.fane.uden-panel { grid-template-columns: minmax(0, 1fr); }
+#fane-forsoeg .scene, #fane-hypoteser .scene { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; }
+
+/* Opgaveraekken oeverst i scenen */
+.opgaverad {
+    position: absolute;
+    z-index: 7;
+    top: 8px;
+    left: 12px;
+    right: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+}
+.or-opgaver { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+.or-knap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px 0 4px;
+    border: 1px solid #343440;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #aeb5bf;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.or-knap:hover:not(:disabled) { border-color: #4d4d5c; color: #e9eef4; }
+.or-knap .or-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #2a2a34;
+    color: #c8ced6;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+.or-knap .or-navn:empty { display: none; }
+.or-knap.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap.valgt .or-nr { background-color: var(--blaa); color: #ffffff; }
+.or-knap.loest .or-nr { color: #7ee0a8; }
+.or-knap.stjerne .or-nr { color: var(--gul); }
+.or-knap.laast { padding: 0 4px; border-style: dashed; background: none; color: #6a707b; cursor: default; }
+.or-knap.laast .or-nr { background: none; color: #6a707b; }
+.or-knap.laast::after { content: ""; display: inline-block; width: 26px; height: 4px; margin-right: 4px; border-radius: 2px; background-color: #343440; }
+.or-stille { flex: 0 0 auto; margin-left: auto; padding: 0 9px; border-color: transparent; background: none; color: #8f97a3; }
+.or-stille:hover:not(:disabled) { border-color: #343440; }
+#forsoeg-ny:not([hidden]) + .or-stille { margin-left: 0; }
+.or-tegn { font-weight: 600; }
+.or-fri { flex: 0 0 auto; padding: 0 10px; color: #8f97a3; background: none; }
+.or-fri.valgt { border-color: rgba(61, 158, 224, 0.75); background-color: rgba(61, 158, 224, 0.14); color: #ffffff; }
+.or-knap[hidden] { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) .or-navn { display: none; }
+.or-opgaver.kompakt .or-knap:not(.valgt) { padding: 0 6px 0 4px; }
+
+/* Kortet staar under raekken; pladsen maales i js/sim_forsoeg.js (REGELSAET 4) */
+#fane-forsoeg .scenekort, #fane-hypoteser .scenekort { top: 46px; width: min(820px, calc(100% - 24px)); }
+.scenekort[hidden] { display: none; }
+.sk-chip { white-space: nowrap; }
+#fane-forsoeg .sk-svar, #fane-hypoteser .sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 9px; max-width: 700px; }
+#fane-forsoeg .sk-svar .sk-knap, #fane-hypoteser .sk-svar .sk-knap { justify-content: center; text-align: center; }
+#fane-forsoeg .sk-bund .st-tekst, #fane-hypoteser .sk-bund .st-tekst { flex: 1; margin: 0; }
+#fane-forsoeg .sk-bund .st-tekst[hidden], #fane-hypoteser .sk-bund .st-tekst[hidden] { display: block; visibility: hidden; padding: 0; }
+#fane-forsoeg .sk-fri-knapper, #fane-hypoteser .sk-fri-knapper { display: flex; justify-content: flex-start; margin-top: 8px; }
+
+/* Det roede kryds paa kortet i fri leg (som sc4.7 og sc5.6) */
+html body.papirkort.papirkort .scenekort .sk-luk {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #c4493c;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+    cursor: pointer;
+}
+html body.papirkort.papirkort .scenekort .sk-luk:hover { background-color: rgba(196, 73, 60, 0.12); }
+html body.papirkort.papirkort .scenekort .sk-start { padding-right: 28px; }
+
+/* Spoergsmaalet stort, og et tydeligt groent "✓ Rigtigt" (REGELSAET 65-66) */
+html body.papirkort.papirkort #fane-forsoeg .scenekort .sk-spm, html body.papirkort.papirkort #fane-hypoteser .scenekort .sk-spm { font-size: 1.25rem; line-height: 1.3; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .sk-spm.sk-linje, html body.papirkort.papirkort #fane-hypoteser .scenekort .sk-spm.sk-linje { margin-top: 2px; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .sk-bund.vbliv, html body.papirkort.papirkort #fane-hypoteser .scenekort .sk-bund.vbliv {
+    display: block;
+    margin-top: 8px;
+    padding: 6px 12px 8px;
+    border-left: 5px solid var(--pk-groen);
+    border-radius: 8px;
+    background-color: var(--pk-groen-lys);
+}
+html body.papirkort.papirkort #fane-forsoeg .scenekort .sk-bund.vbliv.svar, html body.papirkort.papirkort #fane-hypoteser .scenekort .sk-bund.vbliv.svar { border-left-color: #d4a72c; background-color: var(--pk-gul-lys); }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .sk-bund.vbliv.gaet, html body.papirkort.papirkort #fane-hypoteser .scenekort .sk-bund.vbliv.gaet { border-left-color: var(--pk-blaa); background-color: var(--pk-blaa-lys); }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv .vb-top, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv .vb-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv .b-maerke, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv .b-maerke { font-size: 1.4rem; line-height: 1.2; color: var(--pk-groen); }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv.svar .b-maerke, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv.svar .b-maerke { color: #8a6d12; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv.gaet .b-maerke, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv.gaet .b-maerke { color: #1f5f8f; font-size: 1.25rem; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv .b-maerke::after, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv .b-maerke::after { content: ""; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv .sk-videre, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv .sk-videre { flex: 0 0 auto; min-width: 190px; }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv .st-tekst, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv .st-tekst {
+    margin: 3px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--pk-groen-tekst);
+    font-size: 1.04rem;
+    line-height: 1.36;
+}
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv.svar .st-tekst, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv.svar .st-tekst { color: var(--pk-gul-tekst); }
+html body.papirkort.papirkort #fane-forsoeg .scenekort .vbliv.gaet .st-tekst, html body.papirkort.papirkort #fane-hypoteser .scenekort .vbliv.gaet .st-tekst { color: #1d3a52; }
+/* Hele kortet faar en groen kant, saa ingen er i tvivl */
+html body.papirkort.papirkort #fane-forsoeg .scenekort.loest.bliv:not(.svar):not(.gaet), html body.papirkort.papirkort #fane-hypoteser .scenekort.loest.bliv:not(.svar):not(.gaet) {
+    border-color: var(--pk-groen);
+    box-shadow: 0 0 0 2px var(--pk-groen), 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* Feltet i kortet: "Vægten viser [ tallet ] g" */
+.kt-felt-plads { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 9px; }
+.kt-felt {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 5px 10px;
+    border: 1.5px solid #c9c3b3;
+    border-radius: 9px;
+    background-color: #ffffff;
+    font-size: 1.06rem;
+    font-weight: 500;
+    color: #1d2433;
+}
+.kt-felt:focus-within { border-color: #2a76ac; box-shadow: 0 0 0 1px #2a76ac; }
+.kt-felt input {
+    width: 6.5em;
+    padding: 5px 8px;
+    border: 1px solid #c9c3b3;
+    border-radius: 6px;
+    background-color: #fffdf6;
+    font: inherit;
+    font-weight: 600;
+    color: #1d2433;
+    text-align: right;
+}
+.kt-felt input::placeholder { color: #a09a8a; font-weight: 400; text-align: left; }
+.kt-felt input:focus { outline: none; border-color: #2a76ac; }
+.kt-felt input.forkert { border-color: #c4493c; background-color: #fdf0ee; }
+.kt-felt .kf-enhed, .kt-felt .kf-pre, .kt-felt .kf-svar { white-space: nowrap; }
+.kt-felt.ok { border-color: #2b7d51; background-color: #e3f3ea; color: #1f4d35; }
+.kt-felt.svar { border-color: #d4a72c; background-color: #fdf3d6; color: #6b4e00; }
+.kt-felt .kf-maerke { font-weight: 700; }
+.kt-felt.ryst { animation: ryst 0.35s ease 1; border-color: #c4493c; }
+
+/* =====================================================================
+   Fane 2 "Hypoteserne" (runde T13d, 28. nov. 2026): formlerne paa
+   knapperne i kortet, afstemningen i kortet, skemaet og arket med
+   beregningen i scenen (som T12 i ../sc5.6_maengdeberegning)
+   ===================================================================== */
+#fane-hypoteser .sk-knap .broek, #fane-hypoteser .kf-formel .broek { font-size: 0.86em; }
+#fane-hypoteser .sk-svar .sk-knap > span { display: inline-flex; align-items: center; gap: 5px; }
+.kf-formel {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border: 1.5px solid #2b7d51;
+    border-radius: 9px;
+    background-color: #e3f3ea;
+    color: #1f4d35;
+    font-size: 1.02rem;
+    font-weight: 500;
+}
+.kt-afstem { gap: 6px; }
+.kt-afstem input { width: 2.3em; padding: 5px 4px; text-align: center; }
+.kt-afstem input::placeholder { text-align: center; }
+.kt-afstem .ka-stof { margin-right: 2px; font-weight: 500; }
+.kt-afstem .ka-tegn { color: #5b6270; }
+
+/* Skemaet: reaktionsskemaet oeverst og en raekke pr. stoerrelse (REGELSAET 28, 34, 38, 48) */
+.hyp-skema, .hyp-ark {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 1.5px solid #d9d4c6;
+    border-radius: 12px;
+    background-color: #fbfaf6;
+    box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.3);
+    color: #1d2433;
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    font-weight: 400;
+    line-height: 1.3;
+}
+.hyp-skema { padding: 0.55em 0.9em 0.6em; }
+.hs-hoved { display: flex; align-items: baseline; gap: 12px; min-height: 1.4em; margin-bottom: 0.25em; }
+.hs-titel { flex: 0 0 auto; font-size: 0.95em; font-weight: 600; color: #1d2433; }
+.hs-note { font-size: 13.5px; color: #8a6510; line-height: 1.25; }
+.hs-tabel { border-collapse: collapse; margin: 0 auto; }
+.hs-tabel th { padding: 0 1.1em 0 0; text-align: left; font-weight: 400; white-space: nowrap; }
+.hs-tabel td { padding: 0; text-align: center; white-space: nowrap; }
+.hs-tabel tr { height: 2.55em; }
+.hs-tabel tr.hs-reak { height: 2.6em; border-bottom: 2px solid #3a4150; }
+.hs-tabel tr + tr:not(:last-child) { border-bottom: 1px solid #e6e1d4; }
+.hs-ord { display: block; font-size: 0.8em; color: #5b6270; line-height: 1.15; }
+.hs-sym { display: block; font-size: 0.86em; font-weight: 600; color: #2a5d8a; line-height: 1.15; }
+.hs-stof { min-width: 6.4em; padding: 0 0.3em; font-size: 1.22em; font-weight: 600; }
+.hs-stof.gas { min-width: 3.6em; color: #5b6270; font-weight: 500; }
+.hs-stof.ukendt { color: #8a8578; }
+.hs-op { width: 1.7em; font-size: 1.15em; color: #5b6270; }
+.hs-koef { margin-right: 0.05em; }
+.hs-koef.spm {
+    display: inline-block;
+    min-width: 1.25em;
+    padding: 0 0.2em;
+    border: 2px solid #e0a91a;
+    border-radius: 5px;
+    background-color: #fff8e1;
+    color: #8a6510;
+    font-size: 0.86em;
+    line-height: 1.35;
+}
+.hs-celle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 5.2em;
+    height: 1.75em;
+    padding: 0 0.4em;
+    border-radius: 6px;
+    font-weight: 500;
+}
+.hs-celle.kendt { color: #1d2433; }
+.hs-celle.ok { border: 1.5px solid #2b7d51; background-color: #e3f3ea; color: #1f4d35; font-weight: 600; }
+.hs-celle.svar { border: 1.5px solid #d4a72c; background-color: #fdf3d6; color: #6b4e00; font-weight: 600; }
+.hs-celle.spm {
+    border: 2.5px solid #e0a91a;
+    background-color: #fff8e1;
+    box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.3);
+    color: #8a6510;
+    font-weight: 700;
+}
+.hs-celle.tom { border: 2px dashed #c9c3b3; }
+.hs-v.gas, .hs-streg { color: #b3ad9e; }
+
+/* Dommen: de tre hypoteser og massen, diglen skal ende paa */
+.hs-dom { border-collapse: collapse; width: 100%; }
+.hs-dom th { padding: 0 0.6em 0.3em 0; text-align: left; font-size: 0.8em; font-weight: 500; color: #5b6270; }
+.hs-dom td { padding: 0.32em 0.6em 0.32em 0; border-top: 1px solid #e6e1d4; font-size: 1.05em; font-weight: 500; white-space: nowrap; }
+.hs-dom .hs-hoejre { text-align: right; padding-right: 0.4em; }
+.hs-dom td.hs-hoejre { font-weight: 600; }
+.hs-dom tr.rigtig td { background-color: #e3f3ea; color: #1f4d35; }
+.hs-dom tr.rigtig td:first-child { box-shadow: inset 4px 0 0 #2b7d51; }
+.hs-dom tr.dim td { color: #9a958a; }
+.hs-maerke {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5em;
+    height: 1.5em;
+    margin-left: 0.3em;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 0.86em;
+    font-weight: 600;
+}
+.hs-maerke.hA { background-color: #c4493c; }
+.hs-maerke.hB { background-color: #2b7d51; }
+.hs-maerke.hC { background-color: #2a76ac; }
+.hs-maalt { margin: 0.55em 0 0; font-size: 1em; }
+.hs-maalt b { font-weight: 600; }
+
+/* Arket med beregningen: vokser linje for linje med et navn i ord over hver linje */
+.hyp-ark { padding: 0.6em 1em; }
+.hyp-ark[hidden] { display: none; }
+.hyp-ark.tom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed #4a4f5e;
+    background: none;
+    box-shadow: none;
+}
+.hyp-ark .va-tom { margin: 0; color: #8f97a3; font-size: 15px; }
+.hyp-ark .va-linje { margin: 0 0 0.55em; }
+.hyp-ark .va-linje:last-child { margin-bottom: 0; }
+.hyp-ark .va-navn { margin-bottom: 2px; font-size: 0.84em; font-weight: 500; color: #5b6270; }
+.hyp-ark .va-regn { font-size: 1.05em; line-height: 1.4; }
+.hyp-ark .va-regn i { font-style: italic; }
+.hyp-ark .va-regn b { font-weight: 600; color: #1d7a48; white-space: nowrap; }
+.hyp-ark .va-linje.svar .va-regn b { color: #8a6510; }
+.hyp-ark .broek { font-size: 0.9em; line-height: 1.05; vertical-align: middle; }

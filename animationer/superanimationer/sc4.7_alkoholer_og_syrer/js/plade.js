@@ -101,6 +101,9 @@
         GRUPPER.forEach(function (g, i) { r.tiles[g] = { x: tx0 + i * (tb + gap), y: hy + 6, b: tb, h: th }; });
         this.r = r;
         this.visNavn = !!valg.visNavn;
+        /* Fane 3 (runde T11b): alle carbonatomer, ogsaa C i COOH, for det er dem,
+           tommelfingerreglen taeller */
+        this.carbonIAlt = !!valg.carbonIAlt;
         ["alle", "zigzag"].forEach(function (st) {
             if (!MAKS[st]) MAKS[st] = maksKasse(st);
         });
@@ -231,6 +234,7 @@
         });
         var tekst = stof.g === "glycerol" ? "Kæden: 3 carbonatomer" :
             (n === 0 ? "Kæden: intet carbonatom" : "Kæden: " + n + " carbonatom" + (n === 1 ? "" : "er"));
+        if (this.carbonIAlt) tekst = stof.C === 0 ? "Intet carbonatom" : (stof.C === 1 ? "1 carbonatom i alt" : stof.C + " carbonatomer i alt");
         var b = r.plus.x - (r.minus.x + r.minus.b) - 12;
         NK.tekst(ctx, tekst, r.kaedeTekst.x, r.kaedeTekst.y + 5, { font: font("700", NK.Tegn.passer(ctx, tekst, b, "700", 15, 11)), justering: "center", farve: BLAEK });
     };

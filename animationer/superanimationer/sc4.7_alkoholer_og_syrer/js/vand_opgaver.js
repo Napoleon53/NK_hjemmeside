@@ -51,6 +51,20 @@
 
     function tekstAf(v, sim) { return typeof v === "function" ? v(sim) : v; }
 
+    /* Det groenne kort (REGELSAET 66): "✓ Rigtigt" stort med Næste ved siden
+       af og forklaringen i hele kortets bredde under, saa kortet er lavt */
+    function blivHTML(tekstHtml, maerke, knap, svar) {
+        return '<div class="sk-bund vbliv ' + (svar ? "svar" : "god") + '"><div class="vb-top">' +
+            '<span class="b-maerke">' + maerke + "</span>" +
+            '<button type="button" class="sk-videre" data-videre="1">' + knap + "</button></div>" +
+            (tekstHtml ? '<p class="st-tekst">' + tekstHtml + "</p>" : "") + "</div>";
+    }
+
+    /* Hintene som tekster (et hint kan vaere en funktion af scenen) */
+    function hintAf(t, sim) {
+        return (tekstAf(t.hint, sim) || []).map(function (h) { return tekstAf(h, sim); });
+    }
+
     NK.VandOpgaver = function (sim, opgaver) {
         this.sim = sim;
         this.opg = opgaver;
@@ -76,7 +90,7 @@
             if (!b || b.disabled) return;
             if (b.hasAttribute("data-videre")) { mig.videre(); return; }
             if (b.hasAttribute("data-tilbage")) { mig.tilbage(); return; }
-            if (b.hasAttribute("data-luk")) { mig.lukket = true; mig.visKort(); return; }
+            if (b.hasAttribute("data-luk")) { mig.lukket = true; mig.besked = { html: "", klasse: "" }; mig.visKort(); return; }
             if (b.hasAttribute("data-nr")) mig.vaelg(parseInt(b.getAttribute("data-nr"), 10));
         });
 
@@ -261,8 +275,11 @@
         if (!t) return;
         if (t.efter) t.efter(this.sim);
         var sidste = this.trinNr >= o.trin.length - 1;
-        /* Et handlings-trin, der ikke er det sidste, gaar direkte videre */
-        if (!sidste && (t.type === "handling" || t.type === "indsend")) {
+        /* Et handlings-trin uden forklaring, der ikke er det sidste, gaar
+           direkte videre. Har trinet en forklaring, bliver kortet groent med
+           "✓ Rigtigt", til eleven trykker Næste (REGELSAET 66: "måske må det
+           gerne være mere tydeligt når man gør noget rigtigt") */
+        if (!sidste && !t.slut && (t.type === "handling" || t.type === "indsend")) {
             this.trinNr++;
             this.nytTrin();
             return;
@@ -371,7 +388,7 @@
         var t = this.trin();
         if (this.tilstand !== "trin" || !t) return;
         this.peger = false;
-        var hint = tekstAf(t.hint, this.sim) || [];
+        var hint = hintAf(t, this.sim);
         if (this.hjaelp < hint.length) {
             this.hjaelp++;
             this.saetBesked('<span class="b-maerke">Hint ' + this.hjaelp + " af " + hint.length + "</span>" +
@@ -471,8 +488,8 @@
             if (t.type === "valg") h += this.svarHTML(t);
             if (bliv) {
                 var o = this.opgave(), sidste = this.trinNr >= o.trin.length - 1;
-                var knap = !sidste ? "Næste spørgsmål →" : (this.nr < this.opg.length - 1 ? "Næste opgave →" : "Videre til fri leg →");
-                h += NK.Papir.bliv(html(tekstAf(t.slut, s) || ""), this.trinVist ? "Svaret" : "Rigtigt", knap, !!this.trinVist);
+                var knap = !sidste ? "Næste →" : (this.nr < this.opg.length - 1 ? "Næste opgave →" : "Videre til fri leg →");
+                h += blivHTML(html(tekstAf(t.slut, s) || ""), this.trinVist ? "Svaret" : "✓ Rigtigt", knap, !!this.trinVist);
             }
         }
         if (kl && this.el.kort.className.replace(" blink", "") !== kl) this.el.kort.className = kl;
@@ -519,7 +536,7 @@
         var ryster = this.el.bund.classList.contains("ryster");
         this.el.bund.className = "sk-bund" + (b.klasse ? " " + b.klasse : "") + (b.html ? "" : " tom") + (ryster ? " ryster" : "");
         if (fri) return;
-        var t = this.trin(), hint = t ? (tekstAf(t.hint, this.sim) || []) : [], n = hint.length;
+        var t = this.trin(), hint = t ? hintAf(t, this.sim) : [], n = hint.length;
         var k = this.el.knap;
         /* Mens scenen viser svaret, er hintknappen vaek */
         k.hidden = !!this.trinVist;
@@ -592,13 +609,14 @@
                         mig.nr = i; mig.trinNr = j; mig.valgt = -1; mig.forkert = {}; mig.hjaelp = 0; mig.peger = false; mig.brugt = {};
                         mig.tilstand = "trin"; mig.trinVist = false;
                         var beskeder = [""];
-                        (tekstAf(t.hint, mig.sim) || []).forEach(function (h, k) { beskeder.push('<span class="b-maerke">Hint ' + (k + 1) + " af 3</span>" + html(h)); });
+                        hintAf(t, mig.sim).forEach(function (h, k) { beskeder.push('<span class="b-maerke">Hint ' + (k + 1) + " af 3</span>" + html(h)); });
                         (t.svar || []).forEach(function (sv) { if (sv.nej) beskeder.push('<span class="b-maerke">Ikke rigtigt</span>' + html(sv.nej)); });
                         if (t.tjek) proever.forEach(function (p2) { var f = t.tjek(D.stof(p2[0], p2[1])); if (f) beskeder.push('<span class="b-maerke">Ikke rigtigt</span>' + html(f)); });
                         if (t.svarTekst) beskeder.push('<span class="b-maerke">Svaret</span>' + html(tekstAf(t.svarTekst, mig.sim)));
                         if (t.ikkeEndnu) beskeder.push('<span class="b-maerke">Ikke rigtigt</span>' + html(tekstAf(t.ikkeEndnu, mig.sim)));
                         if (t.beskedVed) beskeder.push(html(t.beskedVed(D.stof("OH", 4))));
                         [D.kortest, D.laengst, D.trakForbi, D.PAASKE.vand, D.PAASKE.dihydrogen].forEach(function (k) { beskeder.push(html(k)); });
+                        Object.keys(D.VAND_BESKED).forEach(function (k) { beskeder.push('<span class="b-maerke">Ikke rigtigt</span>' + html(D.VAND_BESKED[k])); });
                         beskeder.forEach(function (b) { mig.besked = { html: b, klasse: b ? "hint" : "" }; maal(); });
                         if (t.type === "valg" || t.slut) {
                             mig.besked = { html: "", klasse: "" };

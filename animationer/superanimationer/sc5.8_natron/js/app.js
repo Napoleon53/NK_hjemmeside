@@ -84,7 +84,7 @@
             ud += '<table class="journal-tabel"><tr><th></th><th>Skemaet</th><th>Forventet masse</th></tr>';
             D.HYP_IDS.forEach(function (id) {
                 var mm = NK.forventet[id];
-                ud += "<tr><td>" + id + "</td><td>" + h(NK.Regning.skemaTekst(id)) + "</td><td>" + (mm !== undefined ? h(K.g(mm)) + " g" : "ikke regnet") + "</td></tr>";
+                ud += "<tr><td>" + id + "</td><td>" + h(NK.skemaTekst(id)) + "</td><td>" + (mm !== undefined ? h(K.g(mm)) + " g" : "ikke regnet") + "</td></tr>";
             });
             ud += "</table>";
         } else ud += "<p>Ikke regnet endnu" + (m ? "" : ". Lav forsøget først") + ".</p>";

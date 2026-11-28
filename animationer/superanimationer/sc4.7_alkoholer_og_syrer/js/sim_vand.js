@@ -22,6 +22,17 @@
        (REGELSAET 19a, 57).
      * Mens tommelfingerreglen bruges, og glasset er skjult, viser
        oversigten hverken farver, pil eller konklusion (REGELSAET 38).
+
+   Runde T11b (28. nov. 2026, Niels: "mere leg (besvarelser med drag n
+   drop) og færre krøllede spørgsmål"; REGELSAET 65-67):
+     * Luppen er js/lup_vand.js: eleven traekker selv vandmolekylerne fra
+       bakken hen paa molekylet og ordene polær og upolær ind i
+       saetningerne under det. Vand, der slippes paa kaeden, glider roligt
+       tilbage med en stille besked (ingen "Ikke rigtigt").
+     * Svar, der bare er tekst (Ét lag eller To lag om glycerol), er korte
+       knapper i kortet (Niels: "det er jo bare tekst").
+     * Luppen kommer frem af sig selv, naar den bruges (intet klik paa
+       glasset), og pladen viser alle carbonatomer, ogsaa C i COOH.
    ===================================================================== */
 (function () {
     "use strict";
@@ -37,13 +48,12 @@
         this.e = { skort: NK.el("vand-skort") };
         this.plade = new NK.Plade();
         this.glas = new NK.Glas();
-        this.lup = new NK.Lup("vand", true);
+        this.lup = new NK.LupVand();
         this.g = "OH";
         this.n = 2;
         this.tid = 0;
         this.over = null;
         this.traek = null;
-        this.lupKlikket = false;
         this.glasVar = false;
         this.saetMolekyle("OH", 2, true);
         this.koblMus();
@@ -62,7 +72,7 @@
         var s = this.stofNu();
         this.plade.saet(s, straks);
         this.glas.saet(s, straks);
-        this.lup.saet(s, null, straks);
+        this.lup.saet(s, straks);
     };
 
     /* Eleven har bygget noget nyt */
@@ -83,17 +93,27 @@
     /* Glasset er rystet, og lagene har skilt sig */
     P.glasFaerdigt = function () { return this.glas.t > 1.5; };
 
-    /* Klik paa glasset: luppen kommer frem (fane 3, opgave 1, trin 2) */
-    P.klikGlas = function () {
-        this.lupKlikket = true;
-        this.opgaver.brug("glas");
-    };
-
     /* ----- Opgaverne --------------------------------------------------------------------- */
     P.nyOpgave = function (o) {
         this.traek = null;
-        this.lupKlikket = false;
         this.saetMolekyle(o.start.g, o.start.n, true);
+        this.lup.nulstil();
+    };
+
+    /* Det, luppen lader eleven traekke, og saetningerne under molekylet */
+    P.lupModus = function () {
+        var O = this.opgaver;
+        if (O.erFri()) return { vand: true, ord: false, klammer: "vis", auto: false };
+        var t = O.trin();
+        if (O.fremme || !t) return { vand: false, ord: false, klammer: "vis", auto: true };
+        var trin = O.tilstand === "trin";
+        /* Vandet staar af sig selv paa pladserne, undtagen naar eleven skal
+           traekke det, ogsaa i det groenne kort lige foer (saa det naeste trin
+           ikke er loest paa forhaand) */
+        var naeste = O.tilstand === "bliv" ? O.opgave().trin[O.trinNr + 1] : null;
+        var styr = naeste || t;
+        var auto = (styr.tillad || []).indexOf("vand") < 0;
+        return { vand: trin && this.maa("vand"), ord: trin && this.maa("ord"), klammer: t.klammer || "vis", auto: auto };
     };
 
     P.fri = function () { return this.opgaver.erFri(); };
@@ -162,7 +182,7 @@
         var rb = maxB - pb - gb - 2 * gap;
         if (rb < 250) { pb = Math.max(300, pb - (250 - rb)); rb = maxB - pb - gb - 2 * gap; }
         lay.plade = { x: x0, y: top, b: pb, h: Math.min(bund - top, 560) };
-        this.plade.layout(lay.plade, { visNavn: true });
+        this.plade.layout(lay.plade, { visNavn: true, carbonIAlt: true });
         lay.instr = { x: x0 + pb + gap, y: top, b: gb, h: Math.min(bund - top, 520) };
         var rx = lay.instr.x + gb + gap;
         var rh = NK.klamp((bund - top) * 0.32, 140, 175);
@@ -197,7 +217,8 @@
         this.glasVar = gs;
         this.plade.opdater(dt);
         this.glas.opdater(dt);
-        this.lup.saet(this.stofNu(), null);
+        this.lup.saet(this.stofNu());
+        this.lup.modus = this.lupModus();
         this.lup.opdater(dt);
         this.opgaver.opdater(dt);
     };
@@ -221,18 +242,16 @@
         var s = this.stofNu(), om = this.omNu(), O = this.opgaver;
 
         this.plade.tegn(ctx, {
-            over: this.over, traek: this.traek, laas: {}, tid: this.tid,
+            over: this.over, traek: this.traek && this.traek.slags === "tile" ? this.traek : null, laas: {}, tid: this.tid,
             vis: this.visPaaPladen(), om: om
         });
 
         /* Glasset */
         var t = O.trin();
         var glasSkjult = this.skjult("glas");
-        var gr = this.glas.tegn(ctx, lay.instr, {
-            skjult: glasSkjult,
-            skjultTekst: t && t.type === "valg" ? "Glasset vises, når du har svaret" : "Glasset vises, når du har indsendt"
-        });
+        var gr = this.glas.tegn(ctx, lay.instr, { skjult: glasSkjult, skjultTekst: " " });
         this.glasR = gr;
+        if (glasSkjult && gr) this.tegnSkjultTekst(ctx, gr, t);
         if (om.indexOf("glas") >= 0 && gr) Tg.omRing(ctx, gr.x, gr.y, gr.b, gr.h);
 
         /* Tommelfingerreglen */
@@ -247,6 +266,25 @@
         else this.tegnLup(ctx, lay.lup, gr, om.indexOf("lup") >= 0, glasSkjult);
 
         this.tegnOpfordring(ctx);
+    };
+
+    /* Teksten under det skjulte glas: hvornaar det kommer frem (REGELSAET 65) */
+    P.tegnSkjultTekst = function (ctx, gr, t) {
+        var tekst = !t ? "" : (t.type === "indsend" ? "Glasset viser svaret, når du har indsendt." :
+            (t.type === "valg" ? "Glasset viser svaret, når du har svaret." : "Glasset vises senere."));
+        if (!tekst) return;
+        var R = this.lay.instr, px = 13.5, linjer = [], linje = "";
+        ctx.save();
+        ctx.font = lex("500", px);
+        tekst.split(" ").forEach(function (o) {
+            var proeve = linje ? linje + " " + o : o;
+            if (linje && ctx.measureText(proeve).width > R.b - 8) { linjer.push(linje); linje = o; } else linje = proeve;
+        });
+        if (linje) linjer.push(linje);
+        ctx.restore();
+        linjer.forEach(function (l, i) {
+            NK.tekst(ctx, l, R.x + R.b / 2, gr.y + gr.h + 21 + i * 18, { font: lex("500", px), justering: "center", farve: "#c3c9d2" });
+        });
     };
 
     /* En stiplet plads med navnet, til tingen bruges (REGELSAET 13) */
@@ -265,8 +303,11 @@
     P.tegnLup = function (ctx, R, gr, fremhaev, glasSkjult) {
         var s = this.stofNu();
         if (gr && !glasSkjult) this.tegnKegle(ctx, gr, R);
-        var titel = s.id === "vand" ? "Luppen: vandmolekyler" : "Luppen: ét molekyle " + s.navn + " i vand";
-        NK.tekst(ctx, titel, R.x + 2, R.y - 10, { font: lex("500", Tg.passer(ctx, titel, R.b - 4, "600", 15, 12)), farve: "#e6eaef" });
+        var titel = s.id === "vand" ? "Luppen: vandmolekyler" : "Luppen: " + s.navn + " og vand";
+        /* Titlen staar over molekylet og ikke over bakken, saa boblen ved
+           bakken ikke daekker den */
+        var tx = R.x + NK.klamp(R.b * 0.2, 96, 128) + 14;
+        NK.tekst(ctx, titel, tx, R.y - 10, { font: lex("500", Tg.passer(ctx, titel, R.x + R.b - tx, "600", 15, 12)), farve: "#e6eaef" });
         ctx.save();
         NK.rundtRekt(ctx, R.x + 2, R.y + 4, R.b, R.h, 12);
         ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
@@ -278,7 +319,7 @@
         ctx.strokeStyle = "#d9d4c6";
         ctx.stroke();
         ctx.restore();
-        this.lup.tegn(ctx, R);
+        this.lup.tegn(ctx, R, this.traek && this.traek.slags === "lup" ? this.traek : null);
         if (fremhaev) Tg.omRing(ctx, R.x, R.y, R.b, R.h);
     };
 
@@ -327,10 +368,10 @@
             var tl = pr.tiles[op.el.slice(5)];
             Tg.ring(ctx, tl.x, tl.y, tl.b, tl.h, this.tid, 10);
             Tg.skilt(ctx, op.tekst, tl.x + tl.b / 2, tl.y - 4, lay.plade.x + 4, lay.plade.x + lay.plade.b - 4);
-        } else if (op.el === "glas" && this.glasR) {
-            var g = this.glasR;
-            Tg.ring(ctx, g.x, g.y, g.b, g.h, this.tid, 12);
-            Tg.skilt(ctx, op.tekst, g.x + g.b / 2, g.y - 6, minX, maxX);
+        } else if (op.el.indexOf("lup:") === 0 && this.lup.cache && !this.skjult("lup")) {
+            var B = this.lup.cache.bakke;
+            Tg.ring(ctx, B.x, B.y, B.b, B.h, this.tid, 12);
+            Tg.skilt(ctx, op.tekst, B.x + B.b / 2, B.y - 6, minX, maxX);
         }
     };
 
@@ -341,6 +382,10 @@
         this.plade.vis = { stil: v.stil, kontrol: v.kontrol, tiles: v.tiles };
         var h = this.plade.hit(pt);
         if (h) return h;
+        if (this.lay && !this.skjult("lup")) {
+            var g = this.lup.hvad(this.lay.lup, pt);
+            if (g) return "lup:" + g.slags + ":" + (g.slags === "vand" ? g.nr : g.id);
+        }
         if (this.glasR && Tg.inde(this.glasR, pt)) return "glas";
         if (this.lay && !this.skjult("lup") && Tg.inde(this.lay.lup, pt)) return "lup";
         return null;
@@ -349,10 +394,11 @@
     /* Kan det, musen er over, bruges nu? */
     P.kanBruges = function (h) {
         if (!h) return false;
-        if (this.fri()) return h !== "glas" && h !== "lup" && h !== "formel";
+        if (this.fri() && h.indexOf("lup:") !== 0) return h !== "glas" && h !== "lup" && h !== "formel";
         if (h === "plus" || h === "minus") return this.maa("laengde");
         if (h.indexOf("tile:") === 0) return this.maa(h);
-        if (h === "glas") return this.maa("glas");
+        if (h.indexOf("lup:vand") === 0) return this.fri() || this.maa("vand");
+        if (h.indexOf("lup:ord") === 0) return this.maa("ord");
         return false;
     };
 
@@ -368,16 +414,29 @@
             }
             var h = mig.hvad(pt);
             mig.over = h;
-            c.style.cursor = mig.kanBruges(h) ? (h.indexOf("tile:") === 0 ? "grab" : "pointer") : "default";
+            var greb = h && (h.indexOf("tile:") === 0 || h.indexOf("lup:") === 0);
+            c.style.cursor = mig.kanBruges(h) ? (greb ? "grab" : "pointer") : "default";
         });
         c.addEventListener("pointerleave", function () { if (!mig.traek) { mig.over = null; c.style.cursor = "default"; } });
         c.addEventListener("pointerdown", function (e) {
             if (e.button !== undefined && e.button !== 0) return;
             var pt = mig.L.punkt(e), h = mig.hvad(pt);
             mig.slapNetop = false;
+            if (h && h.indexOf("lup:") === 0) {
+                if (!mig.kanBruges(h)) { mig.opgaver.spaer(); return; }
+                var del = h.split(":");
+                var gl = del[1] === "vand" ? { slags: "vand", nr: parseInt(del[2], 10) } : { slags: "ord", id: del[2] };
+                mig.traek = { slags: "lup", g: gl, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y, flyttet: false };
+                mig.lup.traekker(gl);
+                mig.opgaver.brug("lup:" + gl.slags);
+                c.style.cursor = "grabbing";
+                try { c.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
+                e.preventDefault();
+                return;
+            }
             if (!h || h.indexOf("tile:") !== 0) return;
             if (!mig.kanBruges(h)) { mig.opgaver.spaer(); return; }
-            mig.traek = { g: h.slice(5), x: pt.x, y: pt.y, x0: pt.x, y0: pt.y, flyttet: false };
+            mig.traek = { slags: "tile", g: h.slice(5), x: pt.x, y: pt.y, x0: pt.x, y0: pt.y, flyttet: false };
             c.style.cursor = "grabbing";
             try { c.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
             e.preventDefault();
@@ -389,6 +448,7 @@
             mig.slapNetop = true;
             c.style.cursor = "default";
             var pt = mig.L.punkt(e);
+            if (t.slags === "lup") { mig.lup.traekker(null); mig.slipLup(t, pt); return; }
             /* Et klik paa gruppen eller et slip ved kaeden saetter gruppen paa */
             if (!t.flyttet || mig.plade.slipOmraade(pt)) {
                 mig.opgaver.brug("tile:" + t.g);
@@ -401,6 +461,25 @@
             if (mig.slapNetop) { mig.slapNetop = false; return; }
             mig.klik(mig.L.punkt(e));
         });
+    };
+
+    /* Vandet eller et ord er sluppet i luppen (REGELSAET 67): en opdagelse
+       (vandet glider af kaeden) giver en stille besked, et forkert ord i en
+       saetning er et forkert svar */
+    P.slipLup = function (t, pt) {
+        if (!t.flyttet) { this.lup.flyv.push({ slags: t.g.slags, nr: t.g.slags === "vand" ? t.g.nr : t.g.id, fra: { x: pt.x, y: pt.y }, t: 0, varighed: 0.3 }); return; }
+        var res = this.lup.slip(this.lay.lup, t.g, pt), s = this.stofNu(), B = D.VAND_BESKED, O = this.opgaver;
+        if (res.slags === "fast") {
+            if (O.besked && (O.besked.klasse === "peger" || O.besked.klasse === "skidt")) O.saetBesked("", "");
+        } else if (res.slags === "molekyle") {
+            this.besked(s.id === "vand" ? B.andet : (!s.polaere ? B.upolaer : B.kaede));
+        } else if (res.slags === "optaget") {
+            this.besked(B.optaget);
+        } else if (res.slags === "ord") {
+            if (res.ok) {
+                if (O.besked && O.besked.klasse === "skidt") O.saetBesked("", "");
+            } else if (!this.fri()) O.fejl(res.ord === "polaer" ? B.polaerPaaKaede : B.upolaerPaaGruppe);
+        }
     };
 
     /* En kort besked paa kortet (i fri leg med det roede kryds) */
@@ -419,8 +498,7 @@
         }
         if (h === "plus" || h === "minus") { this.laengde(h === "plus" ? 1 : -1); return; }
         if (h === "glas") {
-            if (this.maa("glas")) this.klikGlas();
-            else if (!this.fri()) this.opgaver.spaer();
+            if (!this.fri()) this.opgaver.spaer();
             return;
         }
         /* Et klik paa noget, kortet ikke har bedt om: kortet blinker (REGELSAET 15) */

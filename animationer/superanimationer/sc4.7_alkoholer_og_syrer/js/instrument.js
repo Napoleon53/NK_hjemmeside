@@ -262,7 +262,8 @@
         /* Teksten under pladen */
         if (this.t > 1.1 || noegle === "ja" || noegle === "vand" || noegle === "gas") {
             var linje = D.OPL_TEKST[noegle];
-            var farve = noegle === "ja" || noegle === "vand" ? "#9be0b8" : (noegle === "delvist" ? "#ffd27a" : "#f4a39a");
+            /* REGELSAET 66: rødt kun om noget forkert, så tilstanden staar neutralt */
+            var farve = "#e6eaef";
             NK.tekst(ctx, linje[0], R.x + R.b / 2, plade.y + plade.h + 22, { font: font("700", NK.Tegn.passer(ctx, linje[0], R.b - 6, "700", 16, 12)), justering: "center", farve: farve });
             NK.tekst(ctx, linje[1], R.x + R.b / 2, plade.y + plade.h + 41, { font: font("600", NK.Tegn.passer(ctx, linje[1], R.b - 6, "600", 12.5, 10)), justering: "center", farve: "#c3c9d2" });
         }
@@ -280,46 +281,46 @@
        saa oversigten ikke viser svaret (REGELSAET 38) */
     function lex(v, px) { return v + " " + Math.round(px) + "px Lexend, 'Segoe UI', sans-serif"; }
 
+    /* Runde T11b (28. nov. 2026, REGELSAET 65-66): reglen staar i ord ("4
+       carbonatomer ophæver én polær gruppe"), og felterne 1 til 8 er
+       carbonatomer pr. polaer gruppe med omraaderne ét lag, grænsen og to lag
+       skrevet under. Det er reglen selv, saa den staar ogsaa, mens glasset er
+       skjult. Pilen paa stoffets tal kommer foerst, naar glasset kan ses
+       (REGELSAET 38). Ingen roede felter: to lag er ikke forkert. */
     function tegnRegel(ctx, R, stof, valg) {
         valg = valg || {};
         var font = lex;
         NK.Tegn.tavle(ctx, R);
-        var x = R.x + 16, b = R.b - 32, y = R.y + 14;
+        var x = R.x + 16, b = R.b - 32, y = R.y + 12;
         var skjult = valg.skjult;
-        var stor = Math.max(14, Math.min(17, R.h * 0.1));
-        var lille = Math.max(13, Math.min(14.5, R.h * 0.085));
-        NK.tekst(ctx, "Tommelfingerreglen", x, y + 14, { font: font("600", stor), farve: BLAEK });
+        var stor = Math.max(15, Math.min(17, R.h * 0.11));
+        var lille = 14;
+        NK.tekst(ctx, "Tommelfingerreglen", x, y + 15, { font: font("600", stor), farve: BLAEK });
+        var regel = "4 carbonatomer ophæver én polær gruppe.";
+        NK.tekst(ctx, regel, x, y + 15 + stor + 6, { font: font("500", NK.Tegn.passer(ctx, regel, b, "500", 15, 13.5)), farve: GROEN });
 
-        var vand = stof.id === "vand";
-        var p = stof.polaere || 0;
-        var kraev = 4 * p;
-        var regel = vand ? "Vand er selv et polært stof." :
-            (p === 0 ? "Ingen polær gruppe. Stoffet er upolært." :
-                (p === 1 ? "1 polær gruppe kræver 4 C-atomer." : p + " polære grupper kræver " + kraev + " C-atomer."));
-        ctx.font = font("500", lille + 1);
-        var regelPx = Math.max(12, Math.min(lille + 1, (lille + 1) * b / Math.max(1, ctx.measureText(regel).width)));
-        NK.tekst(ctx, regel, x, y + 20 + stor + 2, { font: font("500", regelPx), farve: p ? GROEN : "#a33529" });
-
-        /* Felterne 1 til 8 (antallet af C-atomer) */
-        var top = y + 20 + stor + 2 + 12;
+        var p = stof.polaere || 0, vand = stof.id === "vand";
+        var vaerdi = p ? stof.C / p : null;
         var n = 8, gap = 4;
-        var fb = (b - gap * (n - 1)) / n, fh = Math.max(20, Math.min(32, R.h * 0.18));
+        var top = y + 15 + stor + 6 + 14;
+        var fb = (b - gap * (n - 1)) / n, fh = Math.max(22, Math.min(28, R.h * 0.17));
+        var ZONE = [
+            { fra: 1, til: 3, tekst: "ét lag", bund: "#cdebd9", farve: "#1f6b43" },
+            { fra: 4, til: 4, tekst: "grænsen", bund: "#f6e3b0", farve: "#7a5a0e" },
+            { fra: 5, til: 8, tekst: "to lag", bund: "#dfe5ee", farve: "#3f4a5c" }
+        ];
+        function zone(i) { for (var z = 0; z < ZONE.length; z++) if (i >= ZONE[z].fra && i <= ZONE[z].til) return ZONE[z]; return ZONE[2]; }
+        var vis = !skjult && !vand && p > 0;
         for (var i = 1; i <= n; i++) {
-            var fx = x + (i - 1) * (fb + gap);
-            var farve = "#e7e2d6", tekstF = "#6b6555";
-            if (!skjult && !vand) {
-                if (p && i < kraev) { farve = "#cdebd9"; tekstF = "#1f6b43"; }
-                else if (p && i === kraev) { farve = "#f6e3b0"; tekstF = "#7a5a0e"; }
-                else { farve = "#f4d3cd"; tekstF = "#8a2e22"; }
-            }
+            var fx = x + (i - 1) * (fb + gap), zn = zone(i);
             NK.rundtRekt(ctx, fx, top, fb, fh, 5);
-            ctx.fillStyle = farve;
+            ctx.fillStyle = zn.bund;
             ctx.fill();
-            var nu = stof.C === i && !vand && !skjult;
+            var nu = vis && Math.round(vaerdi) === i && Math.abs(vaerdi - i) < 0.01;
             if (nu) { ctx.lineWidth = 2.5; ctx.strokeStyle = BLAEK; ctx.stroke(); }
-            NK.tekst(ctx, String(i), fx + fb / 2, top + fh / 2 + 5, { font: font(nu ? "600" : "500", Math.min(15, fh * 0.5)), justering: "center", farve: nu ? BLAEK : tekstF });
+            NK.tekst(ctx, String(i), fx + fb / 2, top + fh / 2 + 5, { font: font(nu ? "600" : "500", Math.min(15, fh * 0.55)), justering: "center", farve: nu ? BLAEK : zn.farve });
             if (nu) {
-                /* Pilen ned paa stoffets antal C-atomer */
+                /* Pilen ned paa stoffets carbonatomer pr. polaer gruppe */
                 ctx.beginPath();
                 ctx.moveTo(fx + fb / 2 - 6, top - 10); ctx.lineTo(fx + fb / 2 + 6, top - 10); ctx.lineTo(fx + fb / 2, top - 3);
                 ctx.closePath();
@@ -327,18 +328,18 @@
                 ctx.fill();
             }
         }
-        /* Konklusionen */
-        var ky = top + fh + lille + 8;
-        var konkl;
-        if (skjult) konkl = "Tæl stoffets C-atomer, og sammenlign med reglen.";
-        else if (vand) konkl = "Vand blandes med vand.";
-        else if (!p && stof.tilstand === "gas") konkl = "Stoffet opløses ikke og er en gas ved 20 °C.";
-        else if (!p) konkl = "Uden en polær gruppe giver stoffet to lag.";
-        else if (stof.C < kraev) konkl = stof.C + " C-atom" + (stof.C === 1 ? "" : "er") + " er færre end " + kraev + ", så stoffet blandes med vand.";
-        else if (stof.C === kraev) konkl = stof.C + " C-atomer er lige på grænsen, så stoffet opløses kun delvist.";
-        else konkl = stof.C + " C-atomer er flere end " + kraev + ", så der bliver to lag.";
-        var kf = skjult ? "#8a6d12" : (!p || stof.C > kraev ? "#a33529" : (stof.C === kraev ? "#8a6d12" : "#1f6b43"));
-        ordbryd(ctx, konkl, x, ky, b, font("500", lille), kf, lille * 1.35);
+        /* Omraaderne skrevet under felterne */
+        ZONE.forEach(function (z) {
+            var x0 = x + (z.fra - 1) * (fb + gap), x1 = x + (z.til - 1) * (fb + gap) + fb;
+            NK.tekst(ctx, z.tekst, (x0 + x1) / 2, top + fh + lille + 4, { font: font("500", lille), justering: "center", farve: z.farve });
+        });
+        /* Hvad tallene er, eller hvorfor der ingen pil er */
+        var note = "Tallene er carbonatomer pr. polær gruppe.";
+        if (!skjult && vand) note = "Vand er selv polært og blandes med vand.";
+        else if (!skjult && !p) note = "Uden en polær gruppe giver stoffet to lag.";
+        else if (!skjult && stof.id === "glycerol") note = "Glycerol: 3 carbonatomer og 3 OH-grupper giver 1 pr. gruppe.";
+        var ny = top + fh + lille + 4 + lille + 8;
+        if (ny < R.y + R.h - 4) NK.tekst(ctx, note, x, ny, { font: font("400", NK.Tegn.passer(ctx, note, b, "400", 13.5, 12)), farve: "#5b6270" });
     }
 
     /* ----- Navnemaskinen ------------------------------------------------------------------ */

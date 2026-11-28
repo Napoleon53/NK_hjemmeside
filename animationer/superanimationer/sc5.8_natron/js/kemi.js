@@ -64,6 +64,13 @@
         this.gas = 0;            /* g gas pr. minut lige nu */
         this.sprojtRate = 0;     /* g pulver pr. minut, der sproejter ud */
         this.rest = 0;
+        /* Fane 1 (runde T13b): natronen reagerer kun, mens flammen braender
+           (kunFlamme), hurtigere (kF), og pulveret sproejter ikke (udenSprojt).
+           Saa giver hver portion paa 3 minutter det samme, uanset hvor laenge
+           diglen staar paa trefoden bagefter. Fane 3 bruger standardvaerdierne. */
+        this.kF = o.kF || 1;
+        this.kunFlamme = !!o.kunFlamme;
+        this.udenSprojt = !!o.udenSprojt;
     }
     var SKRIDT = 1 / 120;        /* minutter */
 
@@ -76,7 +83,8 @@
         this.T += (Tm - this.T) * (1 - Math.exp(-h / tau));
         /* Natronen: foerste orden, k vokser med temperaturen */
         var x = NK.klamp((this.T - D.T_START) / (D.T_FULD - D.T_START), 0, 1);
-        var k = D.K_MAX * Math.pow(x, 1.5);
+        var k = D.K_MAX * this.kF * Math.pow(x, 1.5);
+        if (this.kunFlamme && !this.varmes()) k = 0;
         var dn = this.nat * (1 - Math.exp(-k * h));
         this.nat -= dn;
         this.na2co3 += dn * K.FRAK;
@@ -92,7 +100,7 @@
         /* Sproejt: kommer gassen for hurtigt, ryger pulver ud af diglen */
         var over = this.gas - D.SPROEJT.graense;
         this.sprojtRate = 0;
-        if (over > 0) {
+        if (over > 0 && !this.udenSprojt) {
             var fast = this.nat + this.na2co3;
             var ud = Math.min(fast * 0.5, over * D.SPROEJT.andel * h);
             if (fast > 0 && ud > 0) {

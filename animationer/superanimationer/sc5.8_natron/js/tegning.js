@@ -1,10 +1,10 @@
 /* =====================================================================
    tegning.js - det, fanerne tegner
 
-   Rummet, bordet og tavlen (som sc5.3), vaegten (som sc5.5), braenderen
-   med flammen, trefoden, diglen med pulveret, tangen, damp og korn, der
-   sproejter, natronglasset, luppen med ionerne, grafen over
-   massen, skemaet med elevens tal og atomtaellingen paa tavlen.
+   Rummet og bordet (som sc5.3), vaegten (som sc5.5), braenderen med
+   flammen, trefoden, diglen med pulveret, tangen, damp og korn, der
+   sproejter, natronglasset, luppen med ionerne, grafen over massen paa
+   et lyst ark (fane 1 og 2) og opfordringerne (ring og skilt).
    Funktionerne tegner én ting et bestemt sted og husker intet selv,
    bortset fra de smaa partikelsystemer (damp, korn og luppen), der hver
    hoerer til én digel. Fanerne bestemmer, hvor tingene staar.
@@ -50,7 +50,7 @@
     }
     T.froe = froe;
 
-    /* ----- Rummet, bordet og tavlen (som sc5.3) --------------------------------------- */
+    /* ----- Rummet og bordet (som sc5.3) --------------------------------------- */
     T.rum = function (ctx, W, H, gulvY) {
         var g = ctx.createLinearGradient(0, 0, 0, gulvY);
         g.addColorStop(0, "#262833");
@@ -75,91 +75,6 @@
         ctx.fillRect(x0, y, x1 - x0, 2);
         ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
         ctx.fillRect(x0, y + plade, x1 - x0, 4);
-    };
-
-    T.tavle = function (ctx, r) {
-        ctx.save();
-        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-        NK.rundtRekt(ctx, r.x + 5, r.y + 7, r.b, r.h, 8);
-        ctx.fill();
-        ctx.fillStyle = "#b9bfc8";
-        NK.rundtRekt(ctx, r.x - 6, r.y - 6, r.b + 12, r.h + 12, 9);
-        ctx.fill();
-        var g = ctx.createLinearGradient(r.x, r.y, r.x + r.b, r.y + r.h);
-        g.addColorStop(0, "#f7f8fa");
-        g.addColorStop(1, "#e7eaee");
-        ctx.fillStyle = g;
-        ctx.fillRect(r.x, r.y, r.b, r.h);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        ctx.beginPath();
-        ctx.moveTo(r.x + r.b * 0.62, r.y);
-        ctx.lineTo(r.x + r.b * 0.74, r.y);
-        ctx.lineTo(r.x + r.b * 0.56, r.y + r.h);
-        ctx.lineTo(r.x + r.b * 0.44, r.y + r.h);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "#9aa1ab";
-        ctx.fillRect(r.x - 6, r.y + r.h + 6, r.b + 12, 6);
-        ctx.fillStyle = "#2f7ad1";
-        NK.rundtRekt(ctx, r.x + r.b * 0.8, r.y + r.h + 2, 30, 5, 2.5);
-        ctx.fill();
-        ctx.fillStyle = "#c63b2f";
-        NK.rundtRekt(ctx, r.x + r.b * 0.8 + 36, r.y + r.h + 2, 30, 5, 2.5);
-        ctx.fill();
-        ctx.restore();
-    };
-
-    /* Opgavens tekst over tavlen: én linje, ellers to (som sc5.3) */
-    T.overTavle = function (ctx, tekst, b, stoerst, mindst) {
-        var px = NK.passendeSkrift(ctx, tekst, b, stoerst, mindst, "600");
-        var lh = function (p) { return Math.round(p * 1.38); };
-        if (ctx.measureText(tekst).width <= b) return { px: px, linjer: [tekst], h: lh(px) };
-        var ord = tekst.split(" "), bedst = null;
-        ctx.font = font("600", stoerst);
-        for (var i = 1; i < ord.length; i++) {
-            var a = ord.slice(0, i).join(" "), c = ord.slice(i).join(" ");
-            var s = Math.max(ctx.measureText(a).width, ctx.measureText(c).width) * (/\.$/.test(a) ? 0.8 : 1);
-            if (!bedst || s < bedst.s) bedst = { s: s, a: a, c: c };
-        }
-        if (!bedst) return { px: px, linjer: [tekst], h: lh(px) };
-        px = Math.min(NK.passendeSkrift(ctx, bedst.a, b, stoerst, 12, "600"), NK.passendeSkrift(ctx, bedst.c, b, stoerst, 12, "600"));
-        return { px: px, linjer: [bedst.a, bedst.c], h: lh(px) * 2 };
-    };
-
-    T.tegnOverTavle = function (ctx, o, x, y) {
-        ctx.save();
-        ctx.fillStyle = "#f2c53d";
-        NK.rundtRekt(ctx, x, y + 2, 4, o.h - 4, 2);
-        ctx.fill();
-        ctx.restore();
-        var lh = o.h / o.linjer.length;
-        o.linjer.forEach(function (l, i) {
-            NK.tekst(ctx, l, x + 14, y + lh * (i + 0.5) + 1, { font: font("600", o.px), linje: "middle", farve: "#f2f3f5" });
-        });
-    };
-
-    /* En lille overskrift i smaa versaler (paa tavlen og ved grafen) */
-    T.etiket = function (ctx, tekst, x, y, px, farve, just) {
-        NK.tekst(ctx, tekst.toUpperCase(), x, y, { font: font("700", px), linje: "middle", farve: farve || "#6a7280", justering: just || "left" });
-    };
-
-    /* En etiket paa bordet under en ting */
-    T.bordEtiket = function (ctx, tekst, x, y, px, farve) {
-        NK.tekst(ctx, tekst, x, y, { font: font("700", px), justering: "center", linje: "middle", farve: farve || "#c8ced6" });
-    };
-
-    /* En lille pil, der hopper over det, der skal bruges nu */
-    T.pegepil = function (ctx, x, y, tid) {
-        var hop = Math.sin((tid || 0) * 5) * 5;
-        ctx.save();
-        ctx.fillStyle = "#f2c53d";
-        ctx.beginPath();
-        ctx.moveTo(x, y + hop);
-        ctx.lineTo(x - 9, y - 14 + hop);
-        ctx.lineTo(x + 9, y - 14 + hop);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
     };
 
     /* Et gult skaer bag noget, musen er over */
@@ -284,27 +199,6 @@
     };
 
     /* Knapperne til flammen: Sluk, Lav og Hoej. Giver rektanglerne. */
-    T.FLAMMEKNAPPER = [{ id: "", t: "Sluk" }, { id: "lav", t: "Lav" }, { id: "hoej", t: "Høj" }];
-    T.flammeknapper = function (ctx, x, y, b, h, valgt, over, peg) {
-        var n = T.FLAMMEKNAPPER.length, gap = 4, kb = (b - gap * (n - 1)) / n, ud = [];
-        var px = NK.klamp(h * 0.52, 12, 15);
-        T.FLAMMEKNAPPER.forEach(function (k, i) {
-            var r = { x: x + i * (kb + gap), y: y, b: kb, h: h, id: k.id };
-            var aktiv = valgt === k.id;
-            ctx.save();
-            ctx.fillStyle = aktiv ? (k.id === "hoej" ? "#2f6fd6" : k.id === "lav" ? "#3d8fd9" : "#5a5f6b") : (over === k.id ? "#4a4f5c" : "#343844");
-            NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 5);
-            ctx.fill();
-            ctx.strokeStyle = aktiv ? "rgba(255, 255, 255, 0.55)" : (peg === k.id ? "#f2c53d" : "rgba(255, 255, 255, 0.14)");
-            ctx.lineWidth = peg === k.id ? 2 : 1;
-            ctx.stroke();
-            NK.tekst(ctx, k.t, r.x + r.b / 2, r.y + r.h / 2 + 1, { font: font("700", px), justering: "center", linje: "middle",
-                farve: aktiv ? "#ffffff" : "#c8ced6" });
-            ctx.restore();
-            ud.push(r);
-        });
-        return ud;
-    };
 
     /* ----- Diglen med pulveret -----------------------------------------------------------
        (x, bund): midten af bunden. b: bredden. v: { fyld (0-1 af den
@@ -477,9 +371,9 @@
        graa pust uden navn. */
     var ION = {
         Na: { t: "Na⁺", farve: "#b79be8", r: 9 },
-        HCO3: { t: "HCO₃⁻", farve: "#ece5cf", r: 14 },
-        CO3: { t: "CO₃²⁻", farve: "#f2d27a", r: 14 },
-        ukendt: { t: "?", farve: "#9aa3ad", r: 14 },
+        HCO3: { t: "HCO₃⁻", farve: "#ece5cf", r: 15 },
+        CO3: { t: "CO₃²⁻", farve: "#f2d27a", r: 15 },
+        ukendt: { t: "?", farve: "#9aa3ad", r: 15 },
         CO2: { t: "CO₂", farve: "#aeb6c1", r: 11 },
         H2O: { t: "H₂O", farve: "#7fc7f0", r: 10 },
         gas: { t: "", farve: "#c9d0d8", r: 7 }
@@ -490,7 +384,7 @@
         var ud = [];
         for (var r = 0; r < RAEKKER; r++) {
             for (var c = 0; c < KOL; c++) {
-                ud.push({ x: (c - (KOL - 1) / 2) * 0.34, y: 0.6 - r * 0.25, type: (c + r) % 2 === 0 ? "HCO3" : "Na" });
+                ud.push({ x: (c - (KOL - 1) / 2) * 0.4, y: 0.6 - r * 0.31, type: (c + r) % 2 === 0 ? "HCO3" : "Na" });
             }
         }
         return ud;
@@ -559,7 +453,7 @@
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
-        if (tekst) NK.tekst(ctx, tekst, x, y + 0.5, { font: font("800", px), justering: "center", linje: "middle", farve: "#1f2530" });
+        if (tekst) NK.tekst(ctx, tekst, x, y + 0.5, { font: font("700", px), justering: "center", linje: "middle", farve: "#1f2530" });
     }
 
     T.kugle = kugle;
@@ -567,11 +461,11 @@
     /* Reaktionen som kugler: 2 NaHCO₃ → Na₂CO₃ + CO₂ + H₂O (dommen paa
        fane 2). (x, y): venstre ende af linjens midte, b: bredden. */
     T.reaktionKugler = function (ctx, x, y, b) {
-        var R = NK.klamp(b / 21, 12, 26), rn = R * 0.64;
-        var px = NK.klamp(R * 0.5, 11, 14);
+        var R = NK.klamp(b / 21, 16, 28), rn = R * 0.64;
+        var px = NK.klamp(R * 0.52, 13.5, 16);
         var xx = x;
         function ion(id, r) {
-            kugle(ctx, xx + r, y, r, ION[id].farve, ION[id].t, id === "Na" ? Math.max(11, px * 0.95) : px);
+            kugle(ctx, xx + r, y, r, ION[id].farve, ION[id].t, id === "Na" ? Math.max(13.5, px * 0.95) : px);
             xx += 2 * r;
         }
         function tegn(t, bred) {
@@ -606,19 +500,21 @@
         ctx.fillRect(cx - r, cy + r * 0.92, 2 * r, r);
         ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
         ctx.fillRect(cx - r, cy + r * 0.88, 2 * r, r * 0.04);
-        var px = NK.klamp(12.5 * s, 11, 14);
+        /* Formlen i kuglen er mindst 13,5 px (REGELSAET 24); kuglerne er store
+           og spredt ud over luppen (runde T13) */
+        var px = NK.klamp(13.5 * s, 13.5, 16);
         PLADSER.forEach(function (p, i) {
             var t = lup.tilstand[i];
             if (t === "vaek") return;
             var type = p.type === "Na" ? "Na" : (t === "CO3" ? "CO3" : t === "ukendt" ? "ukendt" : "HCO3");
             var ion = ION[type];
             var ryst = v.varm ? Math.sin(v.t * 30 + i * 1.7) * 1.2 * s : 0;
-            kugle(ctx, cx + p.x * r + ryst, cy + p.y * r, ion.r * s * 1.25, ion.farve, ion.t, type === "Na" ? px : Math.max(11, px * 0.92));
+            kugle(ctx, cx + p.x * r + ryst, cy + p.y * r, ion.r * s * 1.5, ion.farve, ion.t, px);
         });
         lup.fri.forEach(function (f) {
             var ion = ION[f.type];
             ctx.globalAlpha = NK.klamp(1 - (f.y < -0.9 ? (-0.9 - f.y) / 0.35 : 0), 0, 1);
-            kugle(ctx, cx + f.x * r, cy + f.y * r, ion.r * s * 1.25, ion.farve, ion.t, Math.max(11, px * 0.92));
+            kugle(ctx, cx + f.x * r, cy + f.y * r, ion.r * s * 1.5, ion.farve, ion.t, px);
             ctx.globalAlpha = 1;
         });
         ctx.restore();
@@ -638,269 +534,108 @@
         ctx.restore();
     };
 
-    /* Forklaringen under luppen: prikkernes farver */
-    T.lupForklaring = function (ctx, cx, y, px, kendt) {
-        var ids = kendt ? ["Na", "HCO3", "CO3", "CO2", "H2O"] : ["Na", "HCO3", "ukendt"];
-        var linjer = kendt ? [ids.slice(0, 3), ids.slice(3)] : [ids.slice(0, 2), ids.slice(2)];
-        linjer.forEach(function (linje) {
-            ctx.font = font("600", px);
-            var bredder = linje.map(function (id) {
-                var t = id === "ukendt" ? "? = det, der bliver tilbage" : ION[id].t;
-                return ctx.measureText(t).width + px + 6;
-            });
-            var samlet = bredder.reduce(function (a, b) { return a + b; }, 0) + 12 * (linje.length - 1);
-            var x = cx - samlet / 2;
-            linje.forEach(function (id, i) {
-                ctx.fillStyle = ION[id].farve;
-                ctx.beginPath();
-                ctx.arc(x + px * 0.45, y - px * 0.35, px * 0.42, 0, Math.PI * 2);
-                ctx.fill();
-                NK.tekst(ctx, id === "ukendt" ? "? = det, der bliver tilbage" : ION[id].t, x + px + 4, y, { font: font("600", px), farve: "#c8ced6" });
-                x += bredder[i] + 12;
-            });
-            y += px + 7;
-        });
-        return y;
-    };
+    /* ----- Grafen over massen paa et lyst ark (fane 1 og 2) -----------------------------
+       Aksetitler med stort forbogstav, y-titlen vandret over aksen. r: grafens
+       plads (titlen staar oeverst i den). o: { vejninger: [{ t, m }], yMax,
+       xMax, linjer: { A: m } (de hypoteser, der er regnet) eller null,
+       dommen: hypotese B er fundet (de andre streger svagere), ny: { A: 0-1 }
+       (en ny streg tegnes ud fra venstre), titel } */
+    function lex(v, px) { return v + " " + (Math.round(px * 10) / 10) + "px Lexend, 'Segoe UI', sans-serif"; }
+    T.lex = lex;
+    var HYP_STREG = { A: "#c4493c", B: "#2b7d51", C: "#2a76ac" };
+    T.HYP_STREG = HYP_STREG;
 
-    /* En stiplet linje fra et punkt til luppen */
-    T.lupLinje = function (ctx, x0, y0, x1, y1) {
-        ctx.save();
-        ctx.strokeStyle = "rgba(223, 230, 238, 0.35)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = "rgba(223, 230, 238, 0.5)";
-        ctx.beginPath();
-        ctx.arc(x0, y0, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    };
-
-    /* ----- Grafen over massen -----------------------------------------------------------------
-       r: rektanglet. v: { serier: [{ punkter: [{t, m}], farve, navn }],
-       linjer: { A: m, B: m, C: m } (de forventede masser, der er regnet),
-       fremhaev: hypotesen, der passer, yMax, xMax, titel, t (til
-       animationen af en ny linje), ny: { A: 0-1 } } */
-    T.graf = function (ctx, r, v) {
-        ctx.save();
-        ctx.fillStyle = "rgba(12, 13, 18, 0.72)";
-        NK.rundtRekt(ctx, r.x, r.y, r.b, r.h, 8);
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        var px = NK.klamp(r.b / 26, 12, 14);
-        var venstre = r.x + px * 3.1, hoejre = r.x + r.b - px * (v.linjer ? 4.8 : 1.2);
-        var top = r.y + px * 2.2, bund = r.y + r.h - px * 2.4;
-        var yMax = v.yMax || 6, xMax = v.xMax || 20;
+    T.massegraf = function (ctx, r, o) {
+        var v = o.vejninger || [], linjer = o.linjer && Object.keys(o.linjer).length ? o.linjer : null;
+        var px = 13.5;
+        var venstre = r.x + 30, hoejre = r.x + r.b - (linjer ? 66 : 8);
+        var top = r.y + 46, bund = r.y + r.h - 38;
+        if (bund - top < 50) top = bund - 50;
+        var yMax = o.yMax || 6, xMax = o.xMax || 20;
         function X(t) { return venstre + (hoejre - venstre) * NK.klamp(t / xMax, 0, 1); }
         function Y(m) { return bund - (bund - top) * NK.klamp(m / yMax, 0, 1.02); }
-        T.etiket(ctx, v.titel || "Massen i diglen", r.x + px * 0.8, r.y + px * 1.05, px, "#aab3bf");
-        /* Akser og gitter */
-        ctx.font = font("600", px);
-        var trinY = (bund - top) / yMax < px * 1.4 ? 2 : 1;
+        NK.tekst(ctx, o.titel || "Massen i diglen", r.x, r.y + 10, { font: lex("600", 15), linje: "middle", farve: "#1d2433" });
+        NK.tekst(ctx, "Masse (g)", r.x, top - 14, { font: lex("600", px), linje: "middle", farve: "#1d2433" });
+        ctx.save();
+        var trinY = (bund - top) / yMax < px * 1.5 ? 2 : 1;
         for (var m = 0; m <= yMax + 1e-9; m += trinY) {
             var y = Y(m);
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
+            ctx.strokeStyle = "#ebe6da";
+            ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(venstre, y); ctx.lineTo(hoejre, y); ctx.stroke();
-            NK.tekst(ctx, m + " g", venstre - 5, y, { font: font("600", px), justering: "right", linje: "middle", farve: "#8f98a4" });
+            NK.tekst(ctx, String(m), venstre - 7, y, { font: lex("400", px), justering: "right", linje: "middle", farve: "#3a4150" });
         }
         var trinX = xMax <= 20 ? 5 : xMax <= 40 ? 10 : 20;
         for (var t = 0; t <= xMax + 1e-9; t += trinX) {
-            NK.tekst(ctx, String(t), X(t), bund + px * 0.9, { font: font("600", px), justering: "center", linje: "middle", farve: "#8f98a4" });
+            NK.tekst(ctx, String(t), X(t), bund + 13, { font: lex("400", px), justering: "center", linje: "middle", farve: "#3a4150" });
         }
-        NK.tekst(ctx, "opvarmet (min)", (venstre + hoejre) / 2, bund + px * 1.95, { font: font("600", px), justering: "center", linje: "middle", farve: "#aab3bf" });
-        ctx.strokeStyle = "rgba(223, 230, 238, 0.45)";
+        NK.tekst(ctx, "Opvarmet (min)", (venstre + hoejre) / 2, bund + 31, { font: lex("600", px), justering: "center", linje: "middle", farve: "#1d2433" });
+        ctx.strokeStyle = "#5b6270";
+        ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(venstre, top - 4); ctx.lineTo(venstre, bund); ctx.lineTo(hoejre + 4, bund); ctx.stroke();
-
         /* Hypotesernes streger. Etiketterne skubbes fra hinanden, saa de ikke overlapper. */
-        if (v.linjer) {
-            var etY = {}, raekke = D.HYP_IDS.filter(function (id) { return v.linjer[id] !== undefined && v.linjer[id] !== null; })
-                .map(function (id) { return { id: id, y: Y(v.linjer[id]) }; }).sort(function (a, b) { return a.y - b.y; });
-            raekke.forEach(function (e, i) { if (i > 0 && e.y - raekke[i - 1].y < px * 1.15) e.y = raekke[i - 1].y + px * 1.15; etY[e.id] = e.y; });
-            D.HYP_IDS.forEach(function (id) {
-                var mm = v.linjer[id];
-                if (mm === undefined || mm === null) return;
-                var ny = v.ny && v.ny[id] !== undefined ? NK.klamp(v.ny[id], 0, 1) : 1;
-                var yy = Y(mm), farve = D.HYP_FARVE[id];
-                var fremh = v.fremhaev === id;
+        if (linjer) {
+            var etY = {}, raekke = D.HYP_IDS.filter(function (id) { return linjer[id] !== undefined && linjer[id] !== null; })
+                .map(function (id) { return { id: id, y: Y(linjer[id]) }; }).sort(function (a, b) { return a.y - b.y; });
+            raekke.forEach(function (e, i) { if (i > 0 && e.y - raekke[i - 1].y < px * 1.2) e.y = raekke[i - 1].y + px * 1.2; etY[e.id] = e.y; });
+            raekke.forEach(function (e) {
+                var mm = linjer[e.id], yy = Y(mm), fremh = o.dommen && e.id === D.RIGTIG;
+                var ny = o.ny && o.ny[e.id] !== undefined ? NK.klamp(o.ny[e.id], 0, 1) : 1;
                 ctx.save();
-                ctx.strokeStyle = farve;
-                ctx.globalAlpha = v.fremhaev && !fremh ? 0.45 : 1;
-                ctx.lineWidth = fremh ? 3 : 2;
+                ctx.globalAlpha = o.dommen && !fremh ? 0.5 : 1;
+                ctx.strokeStyle = HYP_STREG[e.id];
+                ctx.lineWidth = fremh ? 2.6 : 1.8;
                 ctx.setLineDash([7, 5]);
-                ctx.beginPath();
-                ctx.moveTo(venstre, yy);
-                ctx.lineTo(venstre + (hoejre - venstre) * ny, yy);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(venstre, yy); ctx.lineTo(venstre + (hoejre - venstre) * ny, yy); ctx.stroke();
                 ctx.setLineDash([]);
-                if (ny > 0.95) {
-                    NK.tekst(ctx, id + " " + NK.betydende(mm, 3) + " g", hoejre + 5, etY[id], { font: font("800", px), linje: "middle", farve: farve });
-                }
+                if (ny > 0.95) NK.tekst(ctx, e.id + " " + NK.betydende(mm, 3) + " g", hoejre + 5, etY[e.id], { font: lex("600", px), linje: "middle", farve: HYP_STREG[e.id] });
                 ctx.restore();
             });
         }
-
-        /* Maalingerne */
-        (v.serier || []).forEach(function (s) {
-            if (!s.punkter.length) return;
-            ctx.save();
-            ctx.strokeStyle = s.farve;
-            ctx.lineWidth = 2;
+        /* Vejningerne */
+        if (v.length) {
+            ctx.strokeStyle = "#c2671f";
+            ctx.lineWidth = 2.2;
             ctx.beginPath();
-            s.punkter.forEach(function (p, i) {
-                if (i === 0) ctx.moveTo(X(p.t), Y(p.m)); else ctx.lineTo(X(p.t), Y(p.m));
-            });
+            v.forEach(function (p, i) { if (i === 0) ctx.moveTo(X(p.t), Y(p.m)); else ctx.lineTo(X(p.t), Y(p.m)); });
             ctx.stroke();
-            s.punkter.forEach(function (p) {
-                ctx.fillStyle = s.farve;
-                ctx.beginPath();
-                ctx.arc(X(p.t), Y(p.m), 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = "#101117";
-                ctx.lineWidth = 1.2;
+            v.forEach(function (p) {
+                ctx.fillStyle = "#c2671f";
+                ctx.beginPath(); ctx.arc(X(p.t), Y(p.m), 4.2, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = "#fbfaf6";
+                ctx.lineWidth = 1.4;
                 ctx.stroke();
             });
-            ctx.restore();
-        });
+        }
         ctx.restore();
         return { X: X, Y: Y, venstre: venstre, hoejre: hoejre, top: top, bund: bund };
     };
 
-    /* ----- Tavlen paa fane 2: skemaet med elevens tal og atomtaellingen --------------------- */
-    T.skema = function (ctx, hyp, koef, x, y, b, px, loest, puls) {
-        var h = D.HYP[hyp];
-        var dele = [];
-        h.stoffer.forEach(function (id, i) {
-            if (i === 1) dele.push({ t: " → " });
-            else if (i > 1) dele.push({ t: " + " });
-            var k = koef ? String(koef[i] || "").trim() : "";
-            dele.push({ boks: true, t: loest ? (k === "1" ? "" : k) : k });
-            dele.push({ t: D.STOF[id].formel });
-        });
-        var f = px;
-        function bredde(p) {
-            var s = 0;
-            dele.forEach(function (d) {
-                ctx.font = font(d.boks ? "800" : "700", p);
-                if (d.boks) s += loest ? (d.t ? ctx.measureText(d.t + " ").width : 0) : p * 1.25 + p * 0.25;
-                else s += ctx.measureText(d.t).width;
-            });
-            return s;
-        }
-        while (f > 12 && bredde(f) > b) f -= 0.5;
-        var xx = x;
-        dele.forEach(function (d) {
-            if (d.boks) {
-                if (loest) {
-                    if (d.t) {
-                        NK.tekst(ctx, d.t + " ", xx, y, { font: font("800", f), linje: "middle", farve: "#1d7a48" });
-                        ctx.font = font("800", f);
-                        xx += ctx.measureText(d.t + " ").width;
-                    }
-                    return;
-                }
-                var bb = f * 1.25;
-                ctx.save();
-                ctx.fillStyle = d.t ? "rgba(29, 93, 156, 0.12)" : "rgba(31, 37, 48, 0.06)";
-                ctx.strokeStyle = puls ? "rgba(214, 160, 20, " + (0.4 + 0.5 * puls) + ")" : "rgba(31, 37, 48, 0.35)";
-                ctx.lineWidth = 1.5;
-                NK.rundtRekt(ctx, xx, y - f * 0.7, bb, f * 1.4, 4);
-                ctx.fill();
-                ctx.stroke();
-                ctx.restore();
-                if (d.t) NK.tekst(ctx, d.t, xx + bb / 2, y + 1, { font: font("800", f), justering: "center", linje: "middle", farve: "#1d5d9c" });
-                xx += bb + f * 0.25;
-                return;
-            }
-            NK.tekst(ctx, d.t, xx, y, { font: font("700", f), linje: "middle", farve: "#1f2530" });
-            ctx.font = font("700", f);
-            xx += ctx.measureText(d.t).width;
-        });
+    /* Et lyst ark med skygge (REGELSAET 29) */
+    T.lystArk = function (ctx, R) {
+        ctx.save();
+        NK.rundtRekt(ctx, R.x + 3, R.y + 5, R.b, R.h, 12);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fill();
+        NK.rundtRekt(ctx, R.x, R.y, R.b, R.h, 12);
+        ctx.fillStyle = "#fbfaf6";
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#d9d4c6";
+        ctx.stroke();
+        ctx.restore();
     };
 
-    /* tael: { Na: { v, h } eller null, ... } */
-    T.taelling = function (ctx, tael, x, y, b, px) {
-        var xx = x;
-        ctx.font = font("700", px);
-        D.GRUNDSTOFFER.forEach(function (g) {
-            var t = tael[g];
-            var tekst = g + ": " + (t ? t.v + " | " + t.h : "? | ?");
-            var ok = t && t.v === t.h;
-            var farve = !t ? "rgba(31, 37, 48, 0.4)" : (ok ? "#1d7a48" : "#b3362b");
-            NK.tekst(ctx, tekst + (t ? (ok ? " ✓" : " ✗") : ""), xx, y, { font: font("700", px), linje: "middle", farve: farve });
-            xx += Math.max(b / 4, ctx.measureText(tekst + " ✓").width + px);
-        });
-    };
-
-    /* ----- Et regnestykke med rigtige broekstreger (som sc5.3) -------------------------------
-       dele: { t, matte, farve, fed } eller { top, bund, matte } (en broek).
-       matte: det foerste bogstav i n(…), m(…) og M(…) staar i kursiv. */
-    function stykker(tekst, matte) {
-        if (matte && /^[nmM]\(/.test(tekst)) return [{ s: tekst.charAt(0), m: true }, { s: tekst.slice(1), m: false }];
-        return [{ s: tekst, m: false }];
-    }
-    function stykFont(st, px, fed) {
-        return st.m ? T.matte(Math.round(px * 1.12), "600") : font(fed ? "800" : "600", px);
-    }
-    function tekstBredde(ctx, tekst, px, matte, fed) {
-        var b = 0;
-        stykker(tekst, matte).forEach(function (st) { ctx.font = stykFont(st, px, fed); b += ctx.measureText(st.s).width; });
-        return b;
-    }
-    function tegnTekst(ctx, tekst, x, y, px, matte, fed, farve, centrer) {
-        var b = tekstBredde(ctx, tekst, px, matte, fed);
-        var xx = centrer ? x - b / 2 : x;
-        stykker(tekst, matte).forEach(function (st) {
-            NK.tekst(ctx, st.s, xx, y, { font: stykFont(st, px, fed), linje: "middle", farve: farve });
-            ctx.font = stykFont(st, px, fed);
-            xx += ctx.measureText(st.s).width;
-        });
-        return b;
-    }
-
-    function delBredde(ctx, d, px) {
-        if (d.top !== undefined) {
-            var bp = px * 0.9;
-            return Math.max(tekstBredde(ctx, d.top, bp, d.matte), tekstBredde(ctx, d.bund, bp, d.matte)) + px * 0.35;
-        }
-        return tekstBredde(ctx, d.t, px, d.matte, d.fed);
-    }
-
-    T.regnestykkeBredde = function (ctx, dele, px) {
-        var b = 0;
-        dele.forEach(function (d) { b += delBredde(ctx, d, px); });
-        return b;
-    };
-
-    T.regnestykke = function (ctx, dele, x, y, px, farve) {
-        var xx = x;
-        dele.forEach(function (d) {
-            var b = delBredde(ctx, d, px);
-            if (d.top !== undefined) {
-                var bp = px * 0.9, cx = xx + b / 2;
-                tegnTekst(ctx, d.top, cx, y - px * 0.66, bp, d.matte, false, d.farve || farve, true);
-                tegnTekst(ctx, d.bund, cx, y + px * 0.72, bp, d.matte, false, d.farve || farve, true);
-                ctx.save();
-                ctx.strokeStyle = d.farve || farve;
-                ctx.lineWidth = Math.max(1.5, px * 0.08);
-                ctx.lineCap = "round";
-                ctx.beginPath();
-                ctx.moveTo(xx + px * 0.1, y);
-                ctx.lineTo(xx + b - px * 0.1, y);
-                ctx.stroke();
-                ctx.restore();
-            } else {
-                tegnTekst(ctx, d.t, xx, y + 1, px, d.matte, d.fed, d.farve || farve, false);
-            }
-            xx += b;
-        });
-        return xx - x;
+    /* En stiplet plads med navnet, til tingen bruges (REGELSAET 13) */
+    T.plads = function (ctx, R, navn, lys) {
+        ctx.save();
+        NK.rundtRekt(ctx, R.x, R.y, R.b, R.h, 12);
+        ctx.setLineDash([7, 6]);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = lys ? "#b3bac5" : "#4a4f5e";
+        ctx.stroke();
+        ctx.restore();
+        NK.tekst(ctx, navn, R.x + R.b / 2, R.y + R.h / 2 + 5, { font: lex("400", 15), justering: "center", farve: lys ? "#7d8594" : "#8f97a3" });
     };
 
     /* Et tal i en cirkel (gruppe 1 og 2 paa fane 3) */
@@ -917,25 +652,66 @@
         ctx.restore();
     };
 
-    /* En lille tavle med tal: "Opvarmet i alt: 7 min" og temperaturen */
-    T.infoskilt = function (ctx, x, y, linjer, px) {
+    /* ----- Opfordringerne paa fane 1 (runde T13, som sc4.7's tegning.js) ------------------
+       omRing: en rolig gul ring om det, kortet handler om. ring: en ring, der
+       pulserer roligt, om det, eleven skal bruge nu. skilt: et lille gult skilt
+       med en spids, der peger ned paa tingen (REGELSAET 19-21). */
+    var LEX = "Lexend, 'Segoe UI', sans-serif";
+
+    T.omRing = function (ctx, x, y, b, h, farve) {
         ctx.save();
-        ctx.font = font("700", px);
-        var b = 0;
-        linjer.forEach(function (l) { b = Math.max(b, ctx.measureText(l.t).width); });
-        b += px * 1.6;
-        var h = linjer.length * px * 1.45 + px * 0.7;
-        ctx.fillStyle = "rgba(12, 13, 18, 0.7)";
-        NK.rundtRekt(ctx, x, y, b, h, 7);
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.lineWidth = 1;
+        NK.rundtRekt(ctx, x - 9, y - 9, b + 18, h + 18, 16);
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.22)";
         ctx.stroke();
-        linjer.forEach(function (l, i) {
-            NK.tekst(ctx, l.t, x + px * 0.8, y + px * 0.35 + px * 1.45 * (i + 0.5), { font: font("700", px), linje: "middle", farve: l.farve || "#dfe6ee" });
-        });
+        NK.rundtRekt(ctx, x - 6, y - 6, b + 12, h + 12, 14);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = farve || "#f2c53d";
+        ctx.stroke();
         ctx.restore();
-        return { x: x, y: y, b: b, h: h };
+    };
+
+    T.omCirkel = function (ctx, x, y, r) {
+        ctx.save();
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.22)";
+        ctx.beginPath(); ctx.arc(x, y, r + 11, 0, Math.PI * 2); ctx.stroke();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#f2c53d";
+        ctx.beginPath(); ctx.arc(x, y, r + 8, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+    };
+
+    T.ring = function (ctx, x, y, b, h, tid, radius) {
+        var puls = 0.5 + 0.5 * Math.sin(tid * 4.2);
+        ctx.save();
+        NK.rundtRekt(ctx, x - 4 - puls * 3, y - 4 - puls * 3, b + 8 + puls * 6, h + 8 + puls * 6, radius || 14);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(242, 197, 61, " + (0.55 + 0.4 * puls) + ")";
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    T.skilt = function (ctx, tekst, x, y, minX, maxX) {
+        ctx.save();
+        ctx.font = "600 14px " + LEX;
+        var b = ctx.measureText(tekst).width + 22, h = 28;
+        var vx = x - b / 2;
+        if (minX !== undefined) vx = NK.klamp(vx, minX, Math.max(minX, maxX - b));
+        var top = y - h;
+        NK.rundtRekt(ctx, vx, top, b, h, 8);
+        ctx.fillStyle = "#ffdf6b";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x - 7, y - 1); ctx.lineTo(x + 7, y - 1); ctx.lineTo(x, y + 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#33290a";
+        ctx.fillText(tekst, vx + b / 2, top + h / 2 + 0.5);
+        ctx.restore();
+        return { x: vx, y: top, b: b, h: h + 8 };
     };
 
     NK.Tegn = T;

@@ -46,8 +46,6 @@
     };
     D.HYP_IDS = ["A", "B", "C"];
     D.RIGTIG = "B";
-    /* Farverne paa grafen og i kortene */
-    D.HYP_FARVE = { A: "#e8676b", B: "#5fc48a", C: "#62a8e6" };
 
     /* ----- Fane 1: forsoeget ------------------------------------------------------
        Natronen i diglen (g). Vaegten er nulstillet med den tomme digel.
@@ -82,96 +80,130 @@
     D.OPDRIFT = 0.0007;
     D.FLAKKER = 45;
 
-    /* Konstant masse: to vejninger i traek, der viser det samme,
-       med mindst 1 minuts opvarmning imellem */
-    D.KONSTANT = { tol: 0.005, minTid: 1 };
+    /* Konstant masse: to vejninger i traek, der hoejst er 0,01 g fra
+       hinanden, med mindst 1 minuts opvarmning imellem (runde T13c, Niels
+       28. nov. 2026: "den kun skal have tabt 0,01 mere ved 9 minutter, og at
+       det accepteres som konstant"). Vaegten viser to decimaler, saa
+       graensen ligger midt mellem 0,01 og 0,02 g. */
+    D.KONSTANT = { tol: 0.015, minTid: 1 };
     D.MAX_VEJNINGER = 10;
 
-    /* trin: de tre skridt, kortet viser efter gaettet. Det skridt, eleven
-       er naaet til, er fremhaevet; de gjorte har et flueben. */
-    D.FORSOEG = [
-        { id: "konstant", titel: "Varm natron til konstant masse",
-          tekst: "Varm natronen i diglen, og vej den, til massen ikke ændrer sig mere.",
-          trin: ["Vej natronen, før du varmer.", "Varm diglen, lad den køle af, og vej den.", "Gentag, til to vejninger i træk er ens."],
-          valg: { spm: "Hvad tror du, der bliver tilbage i diglen, når natron varmes op?",
-                  hint: "Natron er NaHCO₃. Gasser forsvinder op i luften. Hvilket fast stof kan blive tilbage?",
-                  svar: [{ id: "A", t: "A: Na₂O" }, { id: "B", t: "B: Na₂CO₃" }, { id: "C", t: "C: NaOH" }] } }
+    /* Fane 1's opgaver og tekster staar nederst i filen (D.OPG_FORSOEG, runde T13). */
+
+    /* Eksemplet, hvis eleven ikke har maalt selv (samme model som fane 1:
+       5,21 g, varmet 3 minutter ad gangen og vejet efter hver gang) */
+    D.EKSEMPEL = { mf: 5.21, vejninger: [{ t: 0, m: 5.21 }, { t: 3, m: 3.45 }, { t: 6, m: 3.30 }, { t: 9, m: 3.29 }],
+        slut: 3.29, sprojt: false };
+
+    /* ----- Fane 2: hypoteserne (runde T13d, 28. nov. 2026) ---------------------------
+       Niels: "Jeg synes du bare lige skal prøve dit forslag som i t12". Intet
+       panel: fem opgaver i raekken oeverst, kortet under raekken, skemaet og
+       beregningen til venstre og grafen til hoejre (js/sim_hypoteser.js,
+       motoren i js/hypotese_opgaver.js). Trinene:
+         regn    tallet skrives i et felt i kortet ("n(NaHCO₃) = [ ] mol").
+                 formler: formlen vaelges foerst blandt tre knapper (D.FORMLER).
+         valg    tre svar; de forkerte er typiske fejl med hver sin forklaring
+                 (REGELSAET 14). Bruges foerste gang, forholdet er med.
+         afstem  de smaa felter foran stofferne staar i kortet.
+         dom     hypotese A, B eller C.
+       felt: n_nat (stofmaengden af natron), n_p og m_p (produktet). Hypotese
+       A har det fulde stillads; i B og C er formlerne og svarene vaek. */
+    D.OPG_HYP = [
+        { id: "nat", navn: "Natron i mol",
+          trin: [{ type: "regn", felt: "n_nat", formler: "n" }] },
+        { id: "A", navn: "Hypotese A: Na₂O", hyp: "A",
+          trin: [{ type: "afstem" }, { type: "valg", felt: "n_p" }, { type: "regn", felt: "m_p", formler: "m" }] },
+        { id: "B", navn: "Hypotese B: Na₂CO₃", hyp: "B",
+          trin: [{ type: "afstem" }, { type: "regn", felt: "n_p" }, { type: "regn", felt: "m_p" }] },
+        { id: "C", navn: "Hypotese C: NaOH", hyp: "C",
+          trin: [{ type: "afstem" }, { type: "regn", felt: "n_p" }, { type: "regn", felt: "m_p" }] },
+        { id: "dom", navn: "Hvilken passer?", dom: true,
+          trin: [{ type: "dom" }] }
     ];
 
-    /* Linjen paa papirkortet i hver fase */
-    D.LINJE = {
-        valg: "",
-        foer: "Aflæs vægten under diglen. Skriv massen af natron i skemaet til højre.",
-        flyt: "Sæt diglen på trefoden. Træk den derhen, eller klik på den.",
-        taend: "Tænd brænderen under trefoden. Start med lav flamme.",
-        varm: "Natronen varmes op. Sluk brænderen, når du vil veje, og flyt diglen over på vægten.",
-        vaegtVent: "Diglen er varm. Vent, til vægten står stille, og aflæs den så.",
-        vej: "Vægten står stille. Skriv massen i skemaet til højre.",
-        igen: "Sæt diglen tilbage på trefoden, og varm igen.",
-        slukket: "Brænderen er slukket. Tænd den igen for at varme videre."
+    /* Den fri leg: en hypotese med en ny masse natron, uden formler og afstemning */
+    D.HYP_FRI_TRIN = [{ type: "regn", felt: "n_nat" }, { type: "regn", felt: "n_p" }, { type: "regn", felt: "m_p" }];
+    D.HYP_FRI = {
+        pause: "Vælg en hypotese i rækken foroven, og regn selv. Nye tal giver en ny masse natron.",
+        alle: "Du har klaret alle 5 opgaver. Vælg en hypotese i rækken foroven, og regn med nye tal, eller gå videre til fanen Fejlkilder.",
+        nye: "Nye tal →"
     };
 
-    D.HINT = {
-        foer: "Massen står på displayet under diglen. Skriv den med to decimaler.",
-        flyt: "Klik på diglen, eller træk den over på trefoden.",
-        taend: "Klik på knappen Lav under brænderen. Høj flamme fra start får pulveret til at sprøjte.",
-        varm: "Et par minutter ad gangen er fint. Klik på Sluk, og træk diglen over på vægten.",
-        vaegtVent: "En varm digel vejer for lidt. Tallet på vægten står stille, når diglen er kølet af.",
-        vej: "Skriv tallet fra displayet med to decimaler.",
-        igen: "Konstant masse betyder, at massen ikke ændrer sig, selv om du varmer mere.",
-        slukket: "Klik på Lav eller Høj under brænderen."
+    /* Teksterne til hvert trin. {mf} massen af natron, {Mn} molarmassen af
+       natron, {n} stofmaengden af natron, {H} hypotesen, {P} produktets
+       formel, {produkter} produkterne i ord, {naP} antal Na i produktet,
+       {gasser} gasserne, {taelling} atomerne paa hver side, {kN} og {kP}
+       tallene foran NaHCO₃ og produktet, {np} og {mp} stofmaengden og
+       massen af produktet, {Mp} dens molarmasse og {slut} slutmassen.
+       Et hint med een/ellers eller lige/ulige afhaenger af forholdet. */
+    D.HYP_TEKST = {
+        n_nat: {
+            formel: { tekst: "Natronen i diglen har massen (m) {mf} g. Molarmassen (M) af natron er {Mn} g/mol.",
+                      spm: "Hvilken formel giver stofmængden (n) af natron?" },
+            spm: "Hvor mange mol er {mf} g natron?",
+            hint: ["Stofmængden findes af massen og molarmassen. Begge står i skemaet under NaHCO₃.",
+                   "Molarmassen {Mn} g/mol er massen af 1 mol natron.",
+                   "Del massen {mf} g med molarmassen {Mn} g/mol."],
+            slut: "{mf} g natron er {n} mol. Tallet står nu i skemaet." },
+        afstem: {
+            tekst: "Hypotese {H} siger, at natron bliver til {produkter}.",
+            spm: "Afstem reaktionsskemaet for hypotese {H}.",
+            hint: ["Start med Na. Der er {naP} Na i {P}. Hvor mange NaHCO₃ skal der så til?",
+                   "Tæl C og H på begge sider. Hvor mange {gasser} skal der så til?",
+                   "Tæl O til sidst. Der skal være lige mange O på begge sider."],
+            slut: "Der er {taelling} på hver side." },
+        n_p: {
+            spm: "Hvor mange mol {P} dannes der af {n} mol natron?",
+            hint: ["Tallene foran stofferne i reaktionsskemaet gælder stofmængder. Se på tallene foran NaHCO₃ og {P}.",
+                   { een: "Der står ingen tal foran NaHCO₃ og {P}. Så er tallet 1, og 1 mol natron giver 1 mol {P}.",
+                     ellers: "{kN} mol natron giver {kP} mol {P}." },
+                   { lige: "Stofmængden af {P} er den samme som stofmængden af natron.",
+                     ulige: "Del {n} mol med {kN}." }],
+            slut: { een: "Der står ingen tal foran NaHCO₃ og {P}. {n} mol natron giver {np} mol {P}.",
+                    ellers: "Der står {kN} foran NaHCO₃ og {kP} foran {P}. {n} mol natron giver {np} mol {P}." },
+            /* Svarene, naar trinet er et valg (hypotese A): de forkerte er
+               typiske fejl (REGELSAET 14) */
+            valg: { samme: "Der står 2 foran NaHCO₃ og 1 foran {P}. 2 mol natron giver kun 1 mol {P}.",
+                    vendt: "Forholdet er vendt om. 2 NaHCO₃ giver 1 {P}, så der dannes halvt så mange mol {P} som mol natron." } },
+        m_p: {
+            formel: { tekst: "Molarmassen (M) af {P} er {Mp} g/mol.",
+                      spm: "Hvilken formel giver massen (m) af {P}?" },
+            spm: "Hvor mange gram er {np} mol {P}?",
+            hint: ["Massen findes af stofmængden og molarmassen af {P}. Begge står i skemaet.",
+                   "Molarmassen {Mp} g/mol er massen af 1 mol {P}.",
+                   "Gang stofmængden {np} mol med molarmassen {Mp} g/mol."],
+            slut: "Hvis der dannes {P}, skal diglen ende på {mp} g. Den masse står nu som en stiplet streg på grafen.",
+            /* I den fri leg kommer der ingen streg paa grafen */
+            friSlut: "Hvis der dannes {P}, bliver {mf} g natron til {mp} g {P}." },
+        dom: {
+            spm: "Hvilken hypotese passer med slutmassen på {slut} g?",
+            hint: ["Grafen viser dine vejninger og en stiplet streg for hver hypotese.",
+                   "Find den streg, som kurven ender på.",
+                   "Slutmassen er {slut} g. Vælg den hypotese, hvis masse ligger tættest på."],
+            nej: "Hypotese {H} giver {mp} g. Diglen vejede {slut} g til sidst.",
+            /* Massen er ikke konstant endnu: eleven skal tilbage til fane 1 */
+            ikke: { tekst: "Massen i din digel er ikke konstant endnu.",
+                    spm: "Varm diglen videre på fanen Varm og vej, til massen er konstant.",
+                    hint: ["Først når massen er konstant, ved du, hvad der er tilbage i diglen."],
+                    svar: "Fanen Varm og vej åbner." } }
     };
 
-    D.SVAR = {
-        foer: "Vægten viser {m} g.",
-        flyt: "Diglen står på trefoden.",
-        taend: "Brænderen er tændt med lav flamme.",
-        varm: "Tiden går hurtigere, til natronen har været varmet længe nok.",
-        vaegtVent: "Tiden går hurtigere, til diglen er kølet af.",
-        vej: "Vægten viser {m} g.",
-        igen: "Diglen kommer tilbage på trefoden, og brænderen tændes.",
-        slukket: "Brænderen er tændt med lav flamme."
-    };
-
-    /* Eksemplet, hvis eleven ikke har maalt selv (samme model: 5,21 g, lav
-       flamme i 4 minutter, saa hoej, og en vejning hvert 3. minut) */
-    D.EKSEMPEL = { mf: 5.21, vejninger: [{ t: 0, m: 5.21 }, { t: 6, m: 3.77 }, { t: 9, m: 3.47 }, { t: 12, m: 3.36 },
-        { t: 15, m: 3.31 }, { t: 18, m: 3.30 }, { t: 21, m: 3.29 }, { t: 24, m: 3.29 }], slut: 3.29, sprojt: false };
-
-    /* ----- Fane 2: hypoteserne ------------------------------------------------------
-       Foerst stofmaengden af natron, saa én opgave pr. hypotese, og til
-       sidst dommen. I hypotese A skriver eleven formlen og hele
-       mellemregningen; i B og C er stilladset mindre (kort): formlen for
-       stofmaengden, og saa kun resultaterne. */
-    D.HYPOTESER = [
-        { id: "nat", titel: "Stofmængden af natron", trin: ["n_nat"] },
-        { id: "A", titel: "Hypotese A: der dannes Na₂O", hyp: "A", trin: ["afstem", "n_p", "m_p"] },
-        { id: "B", titel: "Hypotese B: der dannes Na₂CO₃", hyp: "B", trin: ["afstem", "n_p", "m_p"], kort: true },
-        { id: "C", titel: "Hypotese C: der dannes NaOH", hyp: "C", trin: ["afstem", "n_p", "m_p"], kort: true },
-        { id: "dom", titel: "Dommen: hvilken passer?", dom: true }
-    ];
-
-    /* Regnetrinene. op: "/" (broek), "*" (to tal, der ganges) eller null
-       (ingen mellemregning). led: formlens to symboler, som de staar paa
-       tavlen. Hintene er rettet mod feltet og giver gerne halvdelen af
-       svaret; {a} og {b} er mellemregningens tal med enhed, {a0} og {b0}
-       uden, {P} produktets formel. */
-    D.TRIN = {
-        afstem: { navn: "Afstem skemaet" },
-        n_nat: { navn: "Stofmængden af natron", enhed: "mol", op: "/", led: ["m(NaHCO₃)", "M(NaHCO₃)"],
-                 formelHint: "Du kender massen af natron og skal finde stofmængden. Formlen begynder sådan: n(NaHCO₃) = m / …",
-                 indsaetHint: ["Over brøkstregen står massen af natron fra opgavens tal: {a}.", "Under brøkstregen står molarmassen af natron: {b}. Den står på tavlen."],
-                 talHint: "Tast {a0} : {b0}. Gram går ud med gram, så svaret er i mol." },
-        n_p: { navn: "Stofmængden af {P}", enhed: "mol",
-               formelHint: { "2": "Se tallene foran NaHCO₃ og {P} i skemaet. 2 NaHCO₃ giver 1 {P}. Formlen begynder sådan: n({P}) = n(NaHCO₃) …",
-                             "1": "Se tallene foran NaHCO₃ og {P} i skemaet. Der står 1 foran begge." },
-               indsaetHint: ["Over brøkstregen står stofmængden af natron fra første opgave: {a}.", "Under brøkstregen står det tal, der står foran NaHCO₃ i skemaet: 2."],
-               talHint: { "2": "Tast {a0} : 2. Der bliver halvt så mange mol {P} som mol natron.",
-                          "1": "Forholdet er 1 : 1. Der bliver lige så mange mol {P} som mol natron: {a0} mol." } },
-        m_p: { navn: "Massen af {P}", enhed: "g", op: "*",
-               formelHint: "Du kender stofmængden af {P} og skal finde massen. Formlen begynder sådan: m({P}) = n({P}) · …",
-               indsaetHint: ["Det første tal er stofmængden af {P}: {a}.", "Molarmassen af {P} står på tavlen: {b}."],
-               talHint: "Tast {a0} · {b0}. Mol går ud med mol, så svaret er i g." }
+    /* Formlen vaelges blandt tre knapper (REGELSAET 14, som T12 i sc5.6).
+       Broeker med vandret broekstreg (Niels 24. nov. 2026: "aldrig '/' som
+       division"). */
+    function broek(op, ned) {
+        return '<span class="broek"><span>' + op + "</span><span>" + ned + "</span></span>";
+    }
+    D.broek = broek;
+    D.FORMLER = {
+        n: { svar: [{ h: "n = m · M", nej: "Massen skal deles med molarmassen, ikke ganges med den." },
+                    { h: "n = " + broek("m", "M"), ok: true },
+                    { h: "n = " + broek("M", "m"), nej: "Molarmassen er massen af 1 mol. Stofmængden er massen delt med molarmassen, ikke omvendt." }],
+             godt: "Formlen er rigtig. Skriv tallet." },
+        m: { svar: [{ h: "m = " + broek("n", "M"), nej: "Molarmassen er massen af 1 mol. Massen er stofmængden gange molarmassen." },
+                    { h: "m = " + broek("M", "n"), nej: "Jo flere mol, jo større masse. Gang stofmængden med molarmassen." },
+                    { h: "m = n · M", ok: true }],
+             godt: "Formlen er rigtig. Skriv tallet." }
     };
 
     D.AFSTEM = {
@@ -183,13 +215,9 @@
     };
 
     D.DOM = {
-        spm: "Hvilken hypotese passer med den masse, du målte?",
-        ikkeKonstant: "Massen i din digel er ikke konstant endnu. Varm videre på fanen Forsøget, til to vejninger i træk er ens. Derefter kan du sammenligne massen med hypoteserne.",
-        konstantHint: "Først når massen er konstant, ved du, hvad der er tilbage i diglen. Varm videre på fanen Forsøget.",
-        hint: "Sammenlign slutmassen med de tre streger på grafen. Hvilken streg ender kurven på?",
         rigtig: "Natron bliver til natriumcarbonat, soda. Det, der forsvinder som gas, er CO₂ og vand.",
         skema: "2 NaHCO₃ → Na₂CO₃ + CO₂ + H₂O",
-        sprojt: "Den hypotese passer med dine tal, men pulveret sprøjtede ud af diglen, så diglen vejer for lidt. Lav forsøget igen, og start med lav flamme."
+        sprojt: "Den hypotese passer med dine tal, men pulveret sprøjtede ud af diglen, så diglen vejer for lidt. Lav forsøget igen med en ny digel."
     };
 
     /* ----- Fane 3: fejlkilderne -----------------------------------------------------
@@ -273,6 +301,118 @@
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
 
     D.KRUKKE = "Natron er natriumhydrogencarbonat og bruges i bagepulver.";
+
+    /* ----- Fane 1 "Varm og vej" (runde T13, 28. nov. 2026) ---------------------------
+       Fire opgaver i raekken oeverst i scenen, motoren er js/forsoeg_opgaver.js.
+       Trinene: gaet (et gratis gaet, et klik gaar videre), handling (kortet gaar
+       selv videre, naar scenen staar paa maalet), felt (tallet fra vaegten i et
+       felt i kortet) og vej (opgave 3: varm og vej igen, til massen er konstant).
+       Teksterne kan vaere funktioner af scenen s (js/sim_forsoeg.js). */
+    var FELT_HINT = [
+        "En varm digel vejer for lidt, fordi den varme luft løfter den en smule.",
+        "Tallet på vægten er rødt og skifter, så længe diglen er varm. Vent, til det står stille.",
+        "Skriv tallet fra vægten med to decimaler."
+    ];
+    D.FELT_HINT = FELT_HINT;
+
+    /* Opvarmningen paa fane 1 (runde T13b, Niels 28. nov. 2026: "Måske skal man
+       bare kunne give den 3 minutter af gangen (og den er nærmest færdig efter 6
+       minutter og helt færdig efter 9 minutter). Der skal ikke være en counter der
+       skifter hele tiden, men 3 minutter skal ca svare til 6 sekunder."). Knappen
+       Varm 3 min taender braenderen, som slukker selv. Natronen reagerer kun,
+       mens flammen braender, kF gange hurtigere end paa fane 3: efter 3 minutter
+       er det meste vaek, efter 6 viser vaegten 0,01 g over slutmassen, og efter
+       9 og 12 minutter viser den slutmassen (runde T13c; selvtesten holder oeje,
+       ogsaa naar eleven venter laenge mellem portionerne). */
+    D.F1 = { portion: 3, minPrS: 0.5, kF: 3.5 };
+
+    /* Opgave 3: det, kortet siger i hver fase af "varm og vej igen" */
+    D.VEJ_FASE = {
+        igen: { spm: "Sæt diglen tilbage på trefoden.", el: "digel", boble: "Træk: diglen",
+                hint: ["Massen ændrer sig kun, mens natronen bliver varmet.", "Træk diglen hen på trefoden, eller klik på den."] },
+        taend: { spm: "Varm natronen i 3 minutter.", el: "varm", boble: "Klik: Varm 3 min",
+                 hint: ["Knappen Varm 3 min står under trefoden.", "Klik på Varm 3 min. Brænderen slukker selv efter 3 minutter."] },
+        varm: { spm: "Vent, til brænderen slukker efter 3 minutter.",
+                hint: ["Brænderen slukker selv, når natronen har været varm i 3 minutter."] },
+        tilVaegt: { spm: "Flyt diglen over på vægten.", el: "digel", boble: "Træk: diglen",
+                    hint: ["Diglen skal vejes, når den har været varmet.", "Træk diglen over på vægten, eller klik på den."] },
+        vaegtVent: { spm: "Hvad viser vægten, når tallet står stille?", hint: FELT_HINT },
+        vej: { spm: "Hvad viser vægten, når tallet står stille?", hint: FELT_HINT }
+    };
+
+    function g2(v) { return NK.tal2(v); }
+
+    D.OPG_FORSOEG = [
+        { id: "foer", navn: "Massen før",
+          trin: [
+              { type: "felt", pre: "Natron:", om: ["display"],
+                spm: "Hvor mange gram natron er der i diglen?",
+                hint: ["Tallet står på vægtens display.",
+                       "Vægten er nulstillet med den tomme digel. Den viser kun massen af natronen.",
+                       "Skriv tallet med to decimaler, fx 5,21."],
+                slut: function (s) { return "Natronen vejer " + g2(s.vejninger[0].m) + " g. Tallet står nu i skemaet Vejningerne."; } }
+          ] },
+        { id: "varm", navn: "Varm natronen",
+          trin: [
+              { type: "gaet", tekst: "Natronen skal varmes over brænderen.",
+                spm: "Hvad sker der med massen i diglen, når natron varmes op?",
+                svar: [{ id: "mindre", t: "Massen bliver mindre" }, { id: "samme", t: "Massen er den samme" },
+                       { id: "stoerre", t: "Massen bliver større" }],
+                gaet: function (s, sv) { s.massegaet = sv.id; } },
+              { type: "handling", tillad: ["digel"], el: "digel", boble: "Træk: diglen",
+                tekst: function (s) { return s.massegaetTekst(); },
+                spm: "Sæt diglen på trefoden.",
+                maal: function (s) { return s.d.sted === "trefod" && !s.flyt && !s.traek; },
+                hint: ["Trefoden står over brænderen.", "Træk diglen hen på trefoden, eller klik på den."],
+                visSvar: function (s) { s.startFlyt("trefod"); }, svarTekst: "Diglen kommer over på trefoden." },
+              { type: "handling", tillad: ["knapper"], el: "varm", boble: "Klik: Varm 3 min", om: ["lup"],
+                spm: "Varm natronen i 3 minutter, og se i luppen, hvad der sker.",
+                maal: function (s) { return s.d.opv >= D.F1.portion - 0.05 && !s.varmRest; },
+                hint: ["Knappen Varm 3 min står under trefoden.", "Klik på Varm 3 min. Brænderen slukker selv efter 3 minutter."],
+                visSvar: function (s) { s.startVarm(); s.varmHurtig = 4; },
+                svarTekst: "Brænderen er tændt, og tiden går hurtigere, til der er gået 3 minutter." },
+              { type: "handling", tillad: ["digel"], el: "digel", boble: "Træk: diglen",
+                tekst: "Luppen viser, at der forsvinder gas fra natronen.",
+                spm: "Flyt diglen over på vægten.",
+                maal: function (s) { return s.d.sted === "vaegt" && !s.flyt && !s.traek; },
+                hint: ["Diglen skal vejes, når den har været varmet.", "Træk diglen over på vægten, eller klik på den."],
+                visSvar: function (s) { s.startFlyt("vaegt"); },
+                svarTekst: "Diglen kommer over på vægten." },
+              { type: "felt", pre: "Vægten viser", om: ["display"],
+                tekst: "En varm digel vejer for lidt.",
+                spm: "Hvad viser vægten, når tallet står stille?",
+                hint: FELT_HINT,
+                slut: function (s) {
+                    var v = s.vejninger, g = s.massegaet;
+                    var t = "Massen faldt fra " + g2(v[0].m) + " g til " + g2(v[1].m) + " g. Der forsvandt gas fra diglen.";
+                    if (g === "mindre") t += " Dit gæt holdt.";
+                    else if (g) t += " Gættet holdt ikke.";
+                    return t;
+                } }
+          ] },
+        { id: "konstant", navn: "Konstant masse",
+          trin: [
+              { type: "vej", tillad: ["knapper", "digel"], pre: "Vægten viser",
+                tekst: "Massen er konstant, når to vejninger i træk højst er 0,01 g fra hinanden." }
+          ] },
+        { id: "tilbage", navn: "Hvad er tilbage?",
+          trin: [
+              { type: "gaet",
+                tekst: function (s) { return "Natronen tabte " + s.tabTekst() + " g, og et fast stof er tilbage i diglen."; },
+                spm: "Hvilket fast stof tror du, der er tilbage i diglen?",
+                svar: [{ id: "A", t: "Na₂O" }, { id: "B", t: "Na₂CO₃" }, { id: "C", t: "NaOH" }],
+                gaet: function (s, sv) { s.gemGaet(sv.id); },
+                slut: "Regn efter på fanen Hypoteserne, om dit gæt holder." }
+          ] }
+    ];
+
+    /* Kortet i fri leg (REGELSAET 57) */
+    D.FORSOEG_FRI = {
+        pause: "Brug brænderen, diglen og vægten, som du vil. Opgaven venter, til du trykker på Tilbage til opgaverne.",
+        alle: "Du har klaret alle 4 opgaver. Brug brænderen, diglen og vægten, som du vil. Ny digel giver en ny prøve.",
+        ingenStart: "Startmassen blev ikke vejet, før diglen blev varmet. Tryk på Ny digel for at begynde forfra.",
+        ikkeTrefod: "Sæt diglen på trefoden først."
+    };
 
     NK.Data = D;
 }());

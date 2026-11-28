@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <script src="../../til_panelet.js" data-panel="samling_alt.html" data-emne="c5.7"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="../faelles/rolig.js"></script>
 <title>Natron i diglen</title>
 <link rel="stylesheet" href="css/stil.css">
 <link rel="stylesheet" href="../faelles/papirkort.css">
@@ -16,7 +17,7 @@
     <h1><span class="ikon">⚗</span> Natron i diglen</h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Varm og vej</button>
         <button class="faneknap" data-fane="fane-hypoteser" role="tab" aria-selected="false"><span class="nr">2</span>Hypoteserne</button>
         <button class="faneknap" data-fane="fane-fejl" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
     </div>
@@ -29,78 +30,73 @@
 <main>
 
 <!-- ================================================================= -->
-<!-- FANE 1: FORSOEGET                                                  -->
+<!-- FANE 1: VARM OG VEJ (runde T13, 28. nov. 2026: intet panel)        -->
 <!-- ================================================================= -->
-<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+<section class="fane aktiv uden-panel" id="fane-forsoeg" role="tabpanel" aria-label="Varm og vej">
+    <!-- Intet panel (REGELSAET 2-3): opgaverne staar i raekken oeverst,
+         kortet under raekken, og scenen har natronglasset, trefoden med
+         braenderen, vaegten, luppen og arket med vejningerne og grafen
+         (js/sim_forsoeg.js, opgaverne i js/forsoeg_opgaver.js). -->
     <div class="scene">
-        <canvas id="forsoeg-laerred"></canvas>
+        <canvas id="forsoeg-laerred" aria-label="Natronglasset, trefoden med bunsenbrænderen, vægten med diglen, luppen og et ark med vejningerne og grafen"></canvas>
         <div class="anker" id="forsoeg-anker-opstilling"></div>
         <div class="anker" id="forsoeg-anker-knapper"></div>
         <div class="anker" id="forsoeg-anker-vaegt"></div>
         <div class="anker" id="forsoeg-anker-zoom"></div>
-        <div class="anker" id="forsoeg-anker-graf"></div>
-        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny digel med natron (R)">Start forfra ↺</button>
-        <!-- Kortet oeverst midt i scenen: opgaven, gaettet eller spoergsmaalet,
-             svarene, hint, forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
-        <div class="scenekort" id="forsoeg-kort">
-            <div class="sk-hoved"><span class="sk-chip" id="forsoeg-titel">Opgave</span></div>
-            <div class="sk-prompt" id="forsoeg-prompt"></div>
-            <div class="sk-valg" id="forsoeg-valg" hidden></div>
-            <div class="sk-bund">
-                <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv et hint</button>
-                <button class="knap indsend" id="forsoeg-indsend" type="button" hidden>Indsend svar</button>
+        <div class="anker" id="forsoeg-anker-ark"></div>
+
+        <!-- Opgaverne i fast raekkefoelge, laast op i takt -->
+        <nav class="opgaverad" id="forsoeg-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="forsoeg-liste"></div>
+            <button class="or-knap or-stille" id="forsoeg-ny" type="button" title="En ny digel med natron" hidden>Ny digel <span class="or-tegn">⟳</span></button>
+            <button class="or-knap or-stille" id="forsoeg-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="forsoeg-frileg" type="button" title="Brug brænderen, diglen og vægten uden opgaver">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: spoergsmaalet, svarene, feltet, hint og Indsend svar -->
+        <div class="scenekort" id="forsoeg-skort">
+            <div class="sk-ind" id="forsoeg-ind"></div>
+            <div class="sk-bund" id="forsoeg-bund" hidden>
+                <p class="st-tekst" id="forsoeg-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="forsoeg-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="forsoeg-indsend" type="button">Indsend svar</button>
             </div>
         </div>
     </div>
-
-    <aside class="panel">
-        <div class="kort maaling" id="forsoeg-skema">
-            <h2>Vejningerne</h2>
-            <table class="skema vejeskema">
-                <thead><tr><th></th><th>Opvarmet</th><th>Masse</th><th>Ændring</th></tr></thead>
-                <tbody id="forsoeg-tbody"></tbody>
-            </table>
-            <p class="note" id="forsoeg-note"></p>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
 <!-- FANE 2: HYPOTESERNE                                                -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-hypoteser" role="tabpanel" aria-label="Hypoteserne">
+<section class="fane uden-panel" id="fane-hypoteser" role="tabpanel" aria-label="Hypoteserne">
+    <!-- Runde T13d (28. nov. 2026): intet panel (REGELSAET 2-3). Opgaverne
+         staar i raekken oeverst, kortet under raekken, skemaet og
+         beregningen til venstre og grafen til hoejre (js/sim_hypoteser.js,
+         opgaverne i js/hypotese_opgaver.js). -->
     <div class="scene">
-        <canvas id="hypoteser-laerred"></canvas>
-        <div class="anker" id="hypoteser-anker-tavle"></div>
-        <div class="anker" id="hypoteser-anker-graf"></div>
-        <!-- Kortet oeverst midt i scenen: opgaven, gaettet eller spoergsmaalet,
-             svarene, hint, forklaringen og knapperne (papirkortet, 4. nov. 2026) -->
-        <div class="scenekort" id="hypoteser-kort">
-            <div class="sk-hoved"><span class="sk-chip" id="hypoteser-titel">Opgave</span><span class="sk-nr">opgave <b id="hypoteser-nr">1</b> af <span id="hypoteser-antal">5</span></span></div>
-            <div class="sk-prompt" id="hypoteser-prompt"></div>
-            <div class="sk-valg" id="hypoteser-valg" hidden></div>
-            <div class="sk-bund">
-                <p class="besked" id="hypoteser-besked" aria-live="polite"></p>
-                <button class="knap hjaelp" id="hypoteser-knap" type="button">Giv et hint</button>
-                <button class="knap indsend" id="hypoteser-indsend" type="button" hidden>Indsend svar</button>
+        <canvas id="hyp-laerred" aria-label="Skemaet med natron og produktet, beregningen og grafen over massen i diglen"></canvas>
+        <div class="anker" id="hyp-anker-graf"></div>
+        <div class="hyp-skema" id="hyp-skema"></div>
+        <div class="hyp-ark" id="hyp-ark"></div>
+
+        <!-- Opgaverne i fast raekkefoelge, laast op i takt. I fri leg: hypoteserne og Nye tal -->
+        <nav class="opgaverad" id="hyp-raekke" aria-label="Opgaverne">
+            <div class="or-opgaver" id="hyp-liste"></div>
+            <div class="or-opgaver" id="hyp-reak" hidden></div>
+            <button class="or-knap or-stille" id="hyp-forfra" type="button" title="Opgaven forfra (R)"><span class="or-tegn">↺</span> Start forfra</button>
+            <button class="or-knap or-fri" id="hyp-frileg" type="button" title="Regn på hypoteserne med nye tal">Fri leg</button>
+        </nav>
+
+        <!-- Papirkortet under raekken: spoergsmaalet, svarene, felterne, hint og Indsend svar -->
+        <div class="scenekort" id="hyp-skort">
+            <div class="sk-ind" id="hyp-ind"></div>
+            <div class="sk-bund" id="hyp-bund" hidden>
+                <p class="st-tekst" id="hyp-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="hyp-hjknap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="hyp-indsend" type="button">Indsend svar</button>
             </div>
         </div>
     </div>
-
-    <aside class="panel">
-        <!-- Regnestykket: felterne, eleven skriver i. Opgaven, linjen og knapperne staar paa kortet i scenen -->
-        <div class="kort regnekort" id="hypoteser-regn">
-            <h2>Regnestykket</h2>
-            <div class="raekker" id="hypoteser-raekker"></div>
-        </div>
-
-        <div class="kort" id="hypoteser-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="hypoteser-loest">0</b>/5</span></h2>
-            <div class="hyldeliste" id="hypoteser-liste"></div>
-            <button class="snydknap" id="hypoteser-snyd" type="button" title="Udfylder alle beregninger. Det står i journalen.">Snyd (udfyld alt)</button>
-        </div>
-    </aside>
 </section>
 
 <!-- ================================================================= -->
@@ -220,8 +216,9 @@
 <script src="js/tegning.js"></script>
 <script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
-<script src="js/regning.js"></script>
+<script src="js/forsoeg_opgaver.js"></script>
 <script src="js/sim_forsoeg.js"></script>
+<script src="js/hypotese_opgaver.js"></script>
 <script src="js/sim_hypoteser.js"></script>
 <script src="js/sim_fejl.js"></script>
 <script src="js/rundvisning.js"></script>

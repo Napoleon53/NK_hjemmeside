@@ -265,5 +265,67 @@ REGELSAET:
   og Vis svaret) og kortet i hvert trin i fire skærmstørrelser. ALT OK (184)
   27. nov. 2026.
 
-Venter på Niels' feedback.
+## Runde T11b: mere leg, stort spørgsmål og tydeligt rigtigt (28. nov. 2026)
+
+Niels' feedback på T11: "Hvad bliver det egentlig spurgt om? Generelt er
+spørgsmålet med lille skrift og lidt for mange ting i teksten ala: 'Glasset er
+skjult. Brug Tommelfingerreglen'. Sådan noget indforstået snak som en svag elev
+ville knække på. (husk det)", "De intermolekylære bindinger med vand er lidt
+underlige.. skal man ikke også bare selv bygge dem? Det ser endnu mere
+uoverskueligt ud ved glycerol", "Kortet er nu lidt lille her.. men nogle lange
+svar muligheder", "Pludselig blev der peget og skrevet noget med rødt.. og så
+blev jeg faktisk helt i tvivl om hvad jeg havde gjort rigtigt.. indtil jeg fandt
+den lille Rigtig besked.. (husk det)" og "Samlet set.. mere leg (besvarelser med
+drag n drop) og færre krøllede spørgsmål." Nye regler 65-67 i REGELSAET.
+
+* **Eleven bygger selv hydrogenbindingerne** (`js/lup_vand.js`, ny). Luppen har
+  en bakke med vandmolekyler til venstre. Vand, der slippes ved H i en polær
+  gruppe, glider på plads, og den stiplede linje går fra H til O i vandet
+  (før gik en af linjerne fra H til H). Vand, der slippes på kæden, glider
+  roligt tilbage med en stille besked: "Vandet hænger ikke fast på kæden."
+  Glycerol har tre pladser, og H i den højre OH-gruppe peger op, så alt vandet
+  ligger over molekylet. Der er intet "baggrundsvand" længere.
+* **Svar ved at trække i stedet for hvorfor-spørgsmål.** Opgave 1 slutter med,
+  at eleven trækker polær og upolær ind i "Kæden er ____" og "OH-gruppen er ____"
+  under molekylet (et forkert ord er et forkert svar). Opgave 3 sluttede med et
+  skilt, der skulle trækkes hen på glasset; det blev samme dag til to korte
+  svarknapper (se nedenfor).
+* **Opgave 1:** + til to lag, træk vand hen på pentan-1-ol, træk ordene.
+  Klikket på glasset er væk; luppen kommer selv frem. **Opgave 2:** træk COOH på
+  kæden, byg "den korteste carboxylsyre, der giver to lag med vand" (for lang er
+  også forkert). **Opgave 3:** træk vand til hver af glycerols tre OH-grupper,
+  træk skiltet på glasset.
+* **Stort spørgsmål og intet indforstået** (regel 65). Spørgsmålet står i 20 px.
+  Kortet siger aldrig "Glasset er skjult" eller "Brug tommelfingerreglen"; under
+  det skjulte glas står "Glasset viser svaret, når du har indsendt." eller
+  "Glasset vises senere.".
+* **Tydeligt rigtigt** (regel 66). Hvert løst trin giver et grønt kort med et
+  stort "✓ Rigtigt", Næste ved siden af og forklaringen i hele bredden under, og
+  kortet får en grøn kant. Kortet springer ikke længere selv til næste trin.
+  "To lag" under glasset står i lys neutral skrift og ikke i rødt.
+* **Tommelfingerreglen** siger reglen i ord ("4 carbonatomer ophæver én polær
+  gruppe.") med felterne 1-8 og ét lag, grænsen og to lag skrevet under. Ingen
+  røde felter. Pilen på stoffets tal kommer først, når glasset kan ses.
+* **Pladen** viser "5 carbonatomer i alt", også C i COOH (før "Kæden: 4
+  carbonatomer" ved pentansyre, som modsagde reglen).
+* Selvtesten trækker med musen (vand på kæden, vand ved gruppen, forkert og
+  rigtigt ord, forkert og rigtigt skilt) og tjekker geometrien i luppen (H til O,
+  vandets H peger væk, intet rører, sætningerne er fri af atomerne). Testen af
+  svarknappernes pladser tæller nu kun fane 1 og 2 (mindst to forskellige
+  pladser i stedet for tre), fordi fane 3 ikke har svarknapper. ALT OK (196)
+  28. nov. 2026.
+
+Niels samme dag: "Meget bedre. Godt arbejde." og to rettelser:
+
+* "man behøver ikke dragge 'et lag' hen.. det er jo bare tekst": spørgsmålet om
+  glycerol har to korte svarknapper i kortet, To lag og Ét lag, og Indsend svar.
+  Skiltene under glasset er væk. Regel 67 siger nu, at der kun trækkes, når
+  trækket viser noget i scenen.
+* "Hydrogenbindingerne er for fede.. kan de ikke være mere stiplet": luppen på
+  fane 3 tegner dem selv (`tegnHB` i `js/lup_vand.js`) som en tynd, fint stiplet
+  linje. Luppen på fane 2 er uændret. Regel 68 ny.
+* Selvtest ALT OK (197).
+
+Niels: "Super Den er færdig nu. De nye stiplede hydrogenbindinger er gode!"
+T11 er godkendt 28. nov. 2026.
 

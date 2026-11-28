@@ -16,22 +16,22 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-kort", titel: "Kortet", tekst: "Kortet øverst i scenen viser opgaven. Gæt først, hvad der bliver tilbage i diglen. Bagefter viser kortet trinnene, og linjen i kortet siger, hvad du skal gøre nu." },
+            { sel: "#forsoeg-raekke", titel: "Opgaverne", tekst: "Fire opgaver i rækkefølge. Den næste låses op, når du har løst den forrige. Start forfra giver opgaven igen, og Fri leg giver adgang til det hele." },
+            { sel: "#forsoeg-skort", titel: "Kortet", tekst: "Kortet siger, hvad du skal gøre nu. Tal fra vægten skriver du i feltet på kortet, og Giv et hint hjælper, hvis du sidder fast." },
             { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Vægten er nulstillet med den tomme digel og viser derfor massen af det, der er i diglen. En varm digel vejer for lidt." },
             { sel: "#forsoeg-anker-opstilling", titel: "Trefoden og brænderen", tekst: "Træk diglen hen på trefoden, eller klik på den. Diglen står i porcelænstrekanten over flammen." },
-            { sel: "#forsoeg-anker-knapper", titel: "Flammen", tekst: "Brænderen har tre knapper: Sluk, Lav og Høj. Start med lav flamme, ellers sprøjter pulveret ud af diglen." },
-            { sel: "#forsoeg-skema", titel: "Vejningerne", tekst: "Skriv startmassen og hver vejning i skemaet, og tryk på Indsend svar på kortet. Massen er konstant, når to vejninger i træk giver det samme." },
+            { sel: "#forsoeg-anker-knapper", titel: "Varm 3 min", tekst: "Knappen tænder brænderen i 3 minutter. Den slukker selv, og skemaet viser, hvor længe natronen er varmet i alt." },
             { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Natronen består af Na⁺ og HCO₃⁻. Gas forsvinder. Det, der bliver tilbage, står som ?, til du har fundet det på fanen Hypoteserne." },
-            { sel: "#forsoeg-anker-graf", titel: "Grafen", tekst: "Dine vejninger. Kurven bliver vandret, når massen er konstant." },
-            { sel: "#forsoeg-kort", titel: "Giv et hint", tekst: "Sidder du fast, så tryk på Giv et hint på kortet. Først får du et hint, og et tryk mere viser svaret." },
+            { sel: "#forsoeg-anker-ark", titel: "Vejningerne", tekst: "Hver vejning står i skemaet og som et punkt på grafen. Massen er konstant, når to vejninger i træk højst er 0,01 g fra hinanden." },
             { sel: "#journalknap", titel: "Journalen", tekst: "Dit gæt, dine vejninger, beregningerne og konklusionen på én side, som kan udskrives." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Hypoteserne: Regn ud, hvad diglen skal veje i hver hypotese. Fejlkilder: Hvad sker der, når noget går galt?" }
         ],
         "fane-hypoteser": [
-            { sel: "#hypoteser-anker-tavle", titel: "Tavlen", tekst: "Opgaven står på kortet over tavlen. På tavlen står skemaet med dine tal, atomtællingen og beregningen, efterhånden som du skriver den." },
-            { sel: "#hypoteser-raekker", titel: "Afstem, formel og tal", tekst: "Afstem skemaet først. Skriv så formlen med symboler, fx n(Na₂O) = n(NaHCO₃) / 2. Sæt derefter tallene ind, og regn resultatet ud. Tryk på Indsend svar på kortet, eller tryk Enter." },
-            { sel: "#hypoteser-anker-graf", titel: "Grafen", tekst: "Dine vejninger fra forsøget. Hver hypotese, du har regnet, får en stiplet streg ved sin forventede masse." },
-            { sel: "#hypoteser-opgaver", titel: "Opgaverne", tekst: "Først regner du stofmængden af natron og de tre hypoteser. Til sidst afgør du, hvilken streg på grafen kurven ender på." }
+            { sel: "#hyp-raekke", titel: "Opgaverne", tekst: "Fem opgaver i rækkefølge: stofmængden af natron, de tre hypoteser og til sidst, hvilken hypotese der passer. Start forfra giver opgaven igen, og Fri leg giver nye tal." },
+            { sel: "#hyp-skort", titel: "Kortet", tekst: "Kortet stiller spørgsmålet. Formler vælger du blandt tre knapper, og tal skriver du i feltet på kortet. Giv et hint hjælper, hvis du sidder fast." },
+            { sel: "#hyp-skema", titel: "Skemaet", tekst: "Reaktionsskemaet for hypotesen står øverst, og under stofferne står masse, molarmasse og stofmængde. Det, kortet spørger om, har et ? med gul ramme." },
+            { sel: "#hyp-ark", titel: "Beregningen", tekst: "Hver gang du har fundet et tal, kommer regnestykket på arket med et navn over." },
+            { sel: "#hyp-anker-graf", titel: "Grafen", tekst: "Dine vejninger fra Varm og vej. Hver hypotese, du har regnet, får en stiplet streg ved den masse, diglen skal ende på." }
         ],
         "fane-fejl": [
             { sel: "#fejl-anker-g1", titel: "Gruppe 1", tekst: "Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af." },
